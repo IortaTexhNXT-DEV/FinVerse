@@ -280,5 +280,26 @@ never the reverse.
 
 ### 10.7 Help content
 
-Every screen has an entry in `frontend/src/features/help/helpContent.ts` (summary, workflow,
-controls). Add your module's section when you add screens.
+Every screen has an entry in the in-app Help Center (summary, workflow, controls). A module keeps
+its section in `frontend/src/features/<module>/help.ts` (e.g. `UNDERWRITING_HELP`) and registers it
+in `HELP_SECTIONS` (`frontend/src/features/help/helpContent.ts`) in sidebar order. Every non-hidden
+screen route of a `features/*/module.ts` needs exactly one help entry with that `path`, and help
+links must point to menu screens; `helpContent.test.ts` fails the build otherwise. Add or update the
+entry together with the screen.
+
+## 11. Module documentation
+
+Every business module has a guide with its business rules, lifecycle, accounting events and demo
+rules, reports, ports, demo data and open points. Update it together with the code.
+
+| Module | Guide |
+|---|---|
+| Underwriting | [`docs/modules/UNDERWRITING.md`](../modules/UNDERWRITING.md) |
+| Claims | [`docs/modules/CLAIMS.md`](../modules/CLAIMS.md) |
+| Reinsurance | [`docs/modules/REINSURANCE.md`](../modules/REINSURANCE.md) |
+| Receivables & Banking | [`docs/modules/RECEIVABLES_AND_BANKING.md`](../modules/RECEIVABLES_AND_BANKING.md) |
+| Payables & Cash | [`docs/modules/PAYABLES_AND_CASH.md`](../modules/PAYABLES_AND_CASH.md) |
+| Assets & Investments | [`docs/modules/ASSETS_AND_INVESTMENTS.md`](../modules/ASSETS_AND_INVESTMENTS.md) |
+| Planning & Closing | [`docs/development/PLANNING_AND_CLOSING.md`](PLANNING_AND_CLOSING.md) |
+| Actuarial Reserves | [`docs/modules/ACTUARIAL_RESERVES.md`](../modules/ACTUARIAL_RESERVES.md) |
+| Tax & Statutory | [`docs/modules/TAX_AND_STATUTORY.md`](../modules/TAX_AND_STATUTORY.md) |

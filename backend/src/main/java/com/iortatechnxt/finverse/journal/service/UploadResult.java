@@ -7,6 +7,8 @@ import java.util.List;
  * Validation report of a journal upload.
  *
  * @param fileName uploaded file
+ * @param uploadReference upload number recorded as source reference of the journals created (null
+ *     for a dry run)
  * @param committed true when valid vouchers were created (IMPORT), false for a dry run (VALIDATE)
  * @param totalRows data rows read
  * @param vouchers per-voucher outcome
@@ -14,6 +16,7 @@ import java.util.List;
  */
 public record UploadResult(
     String fileName,
+    String uploadReference,
     boolean committed,
     int totalRows,
     List<VoucherResult> vouchers,

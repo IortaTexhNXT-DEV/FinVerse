@@ -77,6 +77,8 @@ export interface RowResult {
 
 export interface UploadResult {
   fileName: string;
+  /** Upload number recorded as the source of the journals created (import only). */
+  uploadReference?: string;
   committed: boolean;
   totalRows: number;
   vouchers: VoucherResult[];

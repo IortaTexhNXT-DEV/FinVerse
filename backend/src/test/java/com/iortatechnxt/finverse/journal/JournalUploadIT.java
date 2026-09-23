@@ -96,6 +96,7 @@ class JournalUploadIT {
     assertThat(result.createdVouchers()).isZero();
     assertThat(result.rows()).allMatch(UploadResult.RowResult::valid);
     assertThat(journalsWithReference("UPL-DRY")).isZero();
+    assertThat(result.uploadReference()).isNull();
   }
 
   @Test
@@ -107,6 +108,12 @@ class JournalUploadIT {
     assertThat(u2.totalDebit()).isEqualByComparingTo("250.00");
     var batch = entries.get(u2.batchId());
     assertThat(batch.getStatus()).isEqualTo(JournalStatus.DRAFT);
+    // Uploaded vouchers record the upload as their source, not manual entry (D-PL-13).
+    assertThat(result.uploadReference()).matches("UPL-\\d{4}-\\d{6}");
+    assertThat(batch.getSourceModule()).isEqualTo(JournalUploadService.SOURCE_MODULE);
+    assertThat(batch.getSourceReference()).isEqualTo(result.uploadReference());
+    assertThat(entries.get(byKey(result).get("U1").batchId()).getSourceReference())
+        .isEqualTo(result.uploadReference());
     assertThat(batch.getNarration()).isEqualTo("Accrual, fees");
     assertThat(batch.getCreatedBy()).isEqualTo("accountant");
     assertThat(journalsWithReference("UPL-REAL")).isEqualTo(2);

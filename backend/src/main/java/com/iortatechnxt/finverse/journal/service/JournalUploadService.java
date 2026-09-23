@@ -5,6 +5,7 @@ import com.iortatechnxt.finverse.audit.service.AuditTrailService;
 import com.iortatechnxt.finverse.coa.domain.BalanceSide;
 import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.finverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.finverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.finverse.journal.api.dto.JournalLineRequest;
 import com.iortatechnxt.finverse.journal.api.dto.JournalRequest;
 import com.iortatechnxt.finverse.journal.domain.JournalBatch;
@@ -14,6 +15,7 @@ import com.iortatechnxt.finverse.journal.service.UploadResult.VoucherStatus;
 import com.iortatechnxt.finverse.organization.domain.BranchRepository;
 import jakarta.validation.Validator;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +46,11 @@ public class JournalUploadService {
   /** Largest accepted file. */
   public static final int MAX_BYTES = 5 * 1024 * 1024;
 
+  /** Source recorded on journals created by an upload; the reference is the upload number. */
+  public static final String SOURCE_MODULE = "JOURNAL_UPLOAD";
+
+  private static final String UPLOAD_PREFIX = "UPL-";
+
   private static final List<String> REQUIRED_HEADER =
       List.of(
           UploadLine.BRANCH_CODE, UploadLine.VALUE_DATE, UploadLine.CURRENCY, UploadLine.NARRATION);
@@ -52,6 +59,8 @@ public class JournalUploadService {
   private final BranchRepository branches;
   private final Validator validator;
   private final AuditTrailService audit;
+  private final DocumentNumberService numbers;
+  private final Clock clock;
   private final TransactionTemplate newTransaction;
 
   /**
@@ -61,6 +70,8 @@ public class JournalUploadService {
    * @param branches branch repository
    * @param validator bean validator
    * @param audit audit trail
+   * @param numbers document numbers (upload references)
+   * @param clock clock
    * @param transactionManager transaction manager
    */
   public JournalUploadService(
@@ -68,17 +79,22 @@ public class JournalUploadService {
       BranchRepository branches,
       Validator validator,
       AuditTrailService audit,
+      DocumentNumberService numbers,
+      Clock clock,
       PlatformTransactionManager transactionManager) {
     this.entries = entries;
     this.branches = branches;
     this.validator = validator;
     this.audit = audit;
+    this.numbers = numbers;
+    this.clock = clock;
     this.newTransaction = new TransactionTemplate(transactionManager);
     this.newTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
   }
 
   /**
-   * Validates an upload file and, when {@code commit} is set, creates the valid vouchers.
+   * Validates an upload file and, when {@code commit} is set, creates the valid vouchers. An import
+   * gets an upload reference (UPL-yyyy-nnnnnn) recorded as the source of every journal it creates.
    *
    * @param companyId company
    * @param fileName file name (.csv or .xlsx)
@@ -101,11 +117,18 @@ public class JournalUploadService {
     lines.stream()
         .filter(l -> !l.voucherKey().isBlank())
         .forEach(l -> vouchers.computeIfAbsent(l.voucherKey(), k -> new ArrayList<>()).add(l));
+    String uploadReference =
+        commit
+            ? newTransaction.execute(
+                s -> numbers.next(UPLOAD_PREFIX + LocalDate.now(clock).getYear()))
+            : null;
     List<VoucherResult> results = new ArrayList<>();
-    vouchers.forEach((key, group) -> results.add(processVoucher(companyId, key, group, commit)));
+    vouchers.forEach(
+        (key, group) -> results.add(processVoucher(companyId, key, group, uploadReference)));
     UploadResult result =
         new UploadResult(
             fileName,
+            uploadReference,
             commit,
             lines.size(),
             results,
@@ -119,7 +142,9 @@ public class JournalUploadService {
                   "JournalUpload",
                   fileName,
                   AuditAction.RUN,
-                  "Journal upload: "
+                  "Journal upload "
+                      + uploadReference
+                      + ": "
                       + result.createdVouchers()
                       + " of "
                       + results.size()
@@ -144,7 +169,7 @@ public class JournalUploadService {
   }
 
   private VoucherResult processVoucher(
-      Long companyId, String key, List<UploadLine> group, boolean commit) {
+      Long companyId, String key, List<UploadLine> group, String uploadReference) {
     List<String> errors = new ArrayList<>();
     group.stream()
         .filter(l -> !l.valid())
@@ -176,15 +201,17 @@ public class JournalUploadService {
     } catch (BusinessRuleException e) {
       errors.add(e.getMessage());
     }
-    return errors.isEmpty() ? create(base, request, commit) : withErrors(base, errors);
+    return errors.isEmpty() ? create(base, request, uploadReference) : withErrors(base, errors);
   }
 
-  private VoucherResult create(VoucherResult base, JournalRequest request, boolean commit) {
+  /** Creates the draft (import) or checks that it could be created and rolls back (dry run). */
+  private VoucherResult create(VoucherResult base, JournalRequest request, String uploadReference) {
+    boolean commit = uploadReference != null;
     try {
       JournalBatch batch =
           newTransaction.execute(
               s -> {
-                JournalBatch draft = entries.createDraft(request);
+                JournalBatch draft = entries.createDraft(request, SOURCE_MODULE, uploadReference);
                 if (!commit) {
                   s.setRollbackOnly();
                 }

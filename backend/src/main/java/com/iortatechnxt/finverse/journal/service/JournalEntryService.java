@@ -103,7 +103,22 @@ public class JournalEntryService {
    * @return draft batch
    */
   public JournalBatch createDraft(JournalRequest request) {
-    JournalBatch saved = factory.create(manualHeader(request), request.lines());
+    return createDraft(request, null, null);
+  }
+
+  /**
+   * Creates a manual journal in DRAFT that records where it came from, e.g. {@code JOURNAL_UPLOAD}
+   * and the upload reference. The source is kept when the draft is edited.
+   *
+   * @param request request
+   * @param sourceModule originating function, null for keyed entry
+   * @param sourceReference reference within the source (e.g. upload batch), may be null
+   * @return draft batch
+   */
+  public JournalBatch createDraft(
+      JournalRequest request, String sourceModule, String sourceReference) {
+    JournalBatch saved =
+        factory.create(manualHeader(request, sourceModule, sourceReference), request.lines());
     audit.record(
         ENTITY,
         saved.getBatchNo(),
@@ -204,6 +219,10 @@ public class JournalEntryService {
   }
 
   private JournalHeader manualHeader(JournalRequest r) {
+    return manualHeader(r, null, null);
+  }
+
+  private JournalHeader manualHeader(JournalRequest r, String sourceModule, String sourceRef) {
     if (!MANUAL_TYPES.contains(r.journalType())) {
       throw new BusinessRuleException(
           "INVALID_JOURNAL_TYPE",
@@ -218,8 +237,8 @@ public class JournalEntryService {
         r.currency(),
         r.narration(),
         r.reference(),
-        null,
-        null,
+        sourceModule,
+        sourceRef,
         null);
   }
 }

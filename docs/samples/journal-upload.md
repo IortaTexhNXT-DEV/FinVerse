@@ -47,7 +47,9 @@ the same voucher may leave them blank; if they repeat a value it must be identic
    rolled back, so **nothing is created** (and no document number is consumed).
 2. **IMPORT**: the same checks; each valid voucher is created as a **DRAFT** journal in its own
    transaction (atomic per voucher). Invalid vouchers are reported and skipped. Drafts are then
-   submitted and approved through the normal maker-checker flow.
+   submitted and approved through the normal maker-checker flow. Each import gets an upload
+   reference (`UPL-yyyy-nnnnnn`, returned as `uploadReference`); every journal it creates records
+   source `JOURNAL_UPLOAD` with that reference, shown as "Journal upload" on the journal detail.
 
 The response lists every voucher (`VALID`, `CREATED` with its batch number, or `ERROR` with
 messages) and every row with row-level errors. An IMPORT is recorded in the audit trail

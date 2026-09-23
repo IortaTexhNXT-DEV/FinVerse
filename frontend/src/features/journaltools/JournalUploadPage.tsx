@@ -61,7 +61,7 @@ function ResultTables({ result }: Readonly<{ result: UploadResult }>) {
       <div className={`alert ${tone}`} role="status">
         <strong>
           {result.committed
-            ? `${s.created} of ${s.vouchers} voucher(s) created as drafts.`
+            ? `${s.created} of ${s.vouchers} voucher(s) created as drafts (upload ${result.uploadReference ?? ''}).`
             : `${s.valid} of ${s.vouchers} voucher(s) are valid. Nothing has been created yet.`}
         </strong>{' '}
         {s.rejected > 0 && `${s.rejected} voucher(s) rejected; ${s.rowErrors} row(s) with errors.`}

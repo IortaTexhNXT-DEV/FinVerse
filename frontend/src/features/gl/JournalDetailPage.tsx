@@ -11,8 +11,10 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, formatDateTime } from '@/utils/format';
 import { JournalActions } from './JournalActions';
+import { journalSource } from './journalSource';
 
 function Summary({ journal: j }: Readonly<{ journal: Journal }>) {
+  const source = journalSource(j);
   return (
     <div className="grid-4">
       <Card>
@@ -31,7 +33,8 @@ function Summary({ journal: j }: Readonly<{ journal: Journal }>) {
       </Card>
       <Card>
         <div className="kpi-label">Source</div>
-        <strong>{j.sourceModule ?? 'Manual entry'}</strong>
+        <strong>{source.label}</strong>
+        {source.reference !== undefined && <div className="muted">{source.reference}</div>}
         {j.reference !== undefined && <div className="muted">Ref {j.reference}</div>}
       </Card>
     </div>

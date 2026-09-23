@@ -45,6 +45,24 @@ describe('recurring template model', () => {
     );
   });
 
+  it('reports non-positive lines instead of silently dropping them', () => {
+    const form = {
+      ...newTemplate(3, 'PHP'),
+      name: 'Rent',
+      narration: 'Rent',
+      lines: [
+        { accountCode: '5603', side: 'DEBIT' as const, amount: -100 },
+        { accountCode: '1111', side: 'CREDIT' as const, amount: -100 },
+      ],
+    };
+    expect(templateProblems(form)).toEqual([
+      'Line 1: Amount must be greater than zero.',
+      'Line 2: Amount must be greater than zero.',
+      'Debits and credits must be equal and greater than zero.',
+    ]);
+    expect(toTemplateInput(1, form).lines).toHaveLength(2);
+  });
+
   it('round-trips an existing template and describes schedules', () => {
     const template: RecurringTemplate = {
       id: 9,

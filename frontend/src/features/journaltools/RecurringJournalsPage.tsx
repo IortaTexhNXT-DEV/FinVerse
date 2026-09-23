@@ -11,7 +11,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { useCompanyId, useWorkspace } from '@/context/workspaceContext';
+import { useCompanyId, useDefaultBranchId, useWorkspace } from '@/context/workspaceContext';
 import { formatAmount, formatDate, humanize } from '@/utils/format';
 import { HistoryDialog, RunDialog, TemplateDialog } from './RecurringDialogs';
 import { describeSchedule, newTemplate, templateForm } from './recurringModel';
@@ -51,7 +51,8 @@ const COLUMNS: Column<RecurringTemplate>[] = [
  */
 export default function RecurringJournalsPage() {
   const companyId = useCompanyId();
-  const { company, branches } = useWorkspace();
+  const { company } = useWorkspace();
+  const defaultBranch = useDefaultBranchId();
   const { can } = useAuth();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<TemplateForm | null>(null);
@@ -124,9 +125,7 @@ export default function RecurringJournalsPage() {
             <Button
               variant="accent"
               icon={<Plus size={16} />}
-              onClick={() =>
-                setForm(newTemplate(branches[0]?.id ?? 0, company?.baseCurrency ?? 'PHP'))
-              }
+              onClick={() => setForm(newTemplate(defaultBranch, company?.baseCurrency ?? 'PHP'))}
             >
               New template
             </Button>

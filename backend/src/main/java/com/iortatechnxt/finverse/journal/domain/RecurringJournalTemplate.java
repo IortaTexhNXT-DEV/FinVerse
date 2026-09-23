@@ -164,6 +164,21 @@ public class RecurringJournalTemplate extends BaseEntity {
   }
 
   /**
+   * First occurrence not generated yet, whether it is already due or still to come: after the last
+   * generated occurrence, or the first on or after the start date. A template started on 1
+   * September for day 15 shows 15 September until that journal is generated, even on 23 September.
+   *
+   * @return next occurrence to generate, or null when the schedule has ended
+   */
+  public LocalDate nextPendingOccurrence() {
+    LocalDate after =
+        lastOccurrenceDate != null && !lastOccurrenceDate.isBefore(startDate)
+            ? lastOccurrenceDate
+            : startDate.minusDays(1);
+    return nextOccurrence(after);
+  }
+
+  /**
    * Records that an occurrence was generated.
    *
    * @param date occurrence date

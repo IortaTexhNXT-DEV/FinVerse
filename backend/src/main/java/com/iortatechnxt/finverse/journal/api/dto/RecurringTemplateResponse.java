@@ -26,7 +26,8 @@ import java.util.List;
  * @param autoSubmit auto-submit flag
  * @param active active flag
  * @param lastOccurrenceDate last generated occurrence
- * @param nextOccurrence next occurrence after today (null when ended or inactive)
+ * @param nextOccurrence first occurrence not generated yet, due or future (null when ended or
+ *     inactive)
  * @param createdBy maker
  * @param lines lines
  */
@@ -55,14 +56,9 @@ public record RecurringTemplateResponse(
    * Maps an entity.
    *
    * @param t template
-   * @param today business date used for the next occurrence
    * @return response
    */
-  public static RecurringTemplateResponse from(RecurringJournalTemplate t, LocalDate today) {
-    LocalDate after =
-        t.getLastOccurrenceDate() != null && t.getLastOccurrenceDate().isAfter(today)
-            ? t.getLastOccurrenceDate()
-            : today;
+  public static RecurringTemplateResponse from(RecurringJournalTemplate t) {
     return new RecurringTemplateResponse(
         t.getId(),
         t.getCompanyId(),
@@ -80,7 +76,7 @@ public record RecurringTemplateResponse(
         t.isAutoSubmit(),
         t.isActive(),
         t.getLastOccurrenceDate(),
-        t.isActive() ? t.nextOccurrence(after) : null,
+        t.isActive() ? t.nextPendingOccurrence() : null,
         t.getCreatedBy(),
         t.getLines().stream().map(RecurringLines::toRequest).toList());
   }

@@ -149,6 +149,6 @@ public class RecurringJournalController {
   }
 
   private RecurringTemplateResponse toResponse(RecurringJournalTemplate t) {
-    return RecurringTemplateResponse.from(t, LocalDate.now(clock));
+    return RecurringTemplateResponse.from(t);
   }
 }

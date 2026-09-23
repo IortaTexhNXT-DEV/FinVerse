@@ -3,7 +3,9 @@ package com.iortatechnxt.finverse.report.core;
 import com.iortatechnxt.finverse.audit.domain.AuditAction;
 import com.iortatechnxt.finverse.audit.service.AuditTrailService;
 import com.iortatechnxt.finverse.common.security.CurrentUser;
-import com.iortatechnxt.finverse.organization.service.OrganizationService;
+import com.iortatechnxt.finverse.organization.domain.BranchRepository;
+import com.iortatechnxt.finverse.organization.domain.Company;
+import com.iortatechnxt.finverse.organization.domain.CompanyRepository;
 import com.iortatechnxt.finverse.report.render.ExportFormat;
 import com.iortatechnxt.finverse.report.render.ReportContext;
 import com.iortatechnxt.finverse.report.render.ReportRenderer;
@@ -27,10 +29,12 @@ public class ReportService {
 
   private static final String DEFAULT_COMPANY = "iNXT FinVerse";
   private static final String COMPANY_PARAM = "companyId";
+  private static final String ID_SEPARATOR = " – ";
 
   private final ReportRegistry registry;
   private final Map<ExportFormat, ReportRenderer> renderers = new EnumMap<>(ExportFormat.class);
-  private final OrganizationService organization;
+  private final CompanyRepository companies;
+  private final BranchRepository branches;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final SystemParameterService parameters;
@@ -41,7 +45,8 @@ public class ReportService {
    *
    * @param registry report catalogue
    * @param renderers export renderers
-   * @param organization organization service
+   * @param companies companies (names in headers and echo)
+   * @param branches branches (names in the echo)
    * @param audit audit trail
    * @param currentUser current user
    * @param parameters system parameters (report footer)
@@ -50,14 +55,16 @@ public class ReportService {
   public ReportService(
       ReportRegistry registry,
       List<ReportRenderer> renderers,
-      OrganizationService organization,
+      CompanyRepository companies,
+      BranchRepository branches,
       AuditTrailService audit,
       CurrentUser currentUser,
       SystemParameterService parameters,
       Clock clock) {
     this.registry = registry;
     renderers.forEach(r -> this.renderers.put(r.format(), r));
-    this.organization = organization;
+    this.companies = companies;
+    this.branches = branches;
     this.audit = audit;
     this.currentUser = currentUser;
     this.parameters = parameters;
@@ -86,7 +93,8 @@ public class ReportService {
   @Transactional
   public ReportResult run(String code, Map<String, String> rawParams) {
     ReportDefinition def = authorized(code);
-    ReportParameters params = ReportParameters.validate(def.metadata(), rawParams, clock);
+    ReportParameters params =
+        ReportParameters.validate(def.metadata(), rawParams, clock, this::displayValue);
     ReportResult result = def.generate(params);
     audit.record("Report", code, AuditAction.RUN, "Ran report " + String.join(", ", params.echo()));
     return result;
@@ -103,7 +111,8 @@ public class ReportService {
   @Transactional
   public RenderedReport export(String code, Map<String, String> rawParams, ExportFormat format) {
     ReportDefinition def = authorized(code);
-    ReportParameters params = ReportParameters.validate(def.metadata(), rawParams, clock);
+    ReportParameters params =
+        ReportParameters.validate(def.metadata(), rawParams, clock, this::displayValue);
     ReportResult result = def.generate(params);
     ReportContext ctx =
         new ReportContext(
@@ -120,10 +129,31 @@ public class ReportService {
     return new RenderedReport(code + "." + format.extension(), format.contentType(), content);
   }
 
+  /**
+   * Company and branch ids as "code – name" in the parameter echo of the screen and every export;
+   * other values as entered. An unknown id is shown as entered.
+   */
+  private String displayValue(ParameterSpec spec, String value) {
+    return switch (spec.type()) {
+      case COMPANY ->
+          companies
+              .findById(Long.valueOf(value))
+              .map(c -> c.getCode() + ID_SEPARATOR + c.getName())
+              .orElse(value);
+      case BRANCH ->
+          branches
+              .findById(Long.valueOf(value))
+              .map(b -> b.getCode() + ID_SEPARATOR + b.getName())
+              .orElse(value);
+      default -> value;
+    };
+  }
+
   private String companyName(ReportParameters params) {
     return params
         .optionalLong(COMPANY_PARAM)
-        .map(id -> organization.getCompany(id).getName())
+        .flatMap(companies::findById)
+        .map(Company::getName)
         .orElse(DEFAULT_COMPANY);
   }
 

@@ -243,4 +243,26 @@ class AdminScreensApiIT {
         .andExpect(status().isUnprocessableEntity())
         .andExpect(jsonPath("$.detail").value("As of Date is required"));
   }
+
+  @Test
+  void reportEchoShowsCompanyAndBranchByCodeAndName() throws Exception {
+    var branch = data.branch("HO");
+    String params =
+        """
+        {"companyId": "%d", "branchId": "%d"}
+        """
+            .formatted(data.company().getId(), branch.getId());
+    mvc.perform(
+            post("/api/v1/reports/GL-TB/run")
+                .with(as("accountant"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(params))
+        .andExpect(status().isOk())
+        .andExpect(
+            jsonPath("$.parameterEcho[0]")
+                .value("Company : " + data.company().getCode() + " – " + data.company().getName()))
+        .andExpect(
+            jsonPath("$.parameterEcho[1]")
+                .value("Branch : " + branch.getCode() + " – " + branch.getName()));
+  }
 }

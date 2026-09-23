@@ -24,10 +24,27 @@ public final class ReportParameters {
 
   private final ReportMetadata metadata;
   private final Map<String, String> values;
+  private final ParameterDisplay display;
 
-  private ReportParameters(ReportMetadata metadata, Map<String, String> values) {
+  private ReportParameters(
+      ReportMetadata metadata, Map<String, String> values, ParameterDisplay display) {
     this.metadata = metadata;
     this.values = Map.copyOf(values);
+    this.display = display;
+  }
+
+  /**
+   * Validates parameters whose echo shows the raw values (see {@link #validate(ReportMetadata, Map,
+   * Clock, ParameterDisplay)}).
+   *
+   * @param metadata report metadata
+   * @param raw raw values from the request
+   * @param clock clock for date keywords
+   * @return validated parameters
+   */
+  public static ReportParameters validate(
+      ReportMetadata metadata, Map<String, String> raw, Clock clock) {
+    return validate(metadata, raw, clock, ParameterDisplay.RAW);
   }
 
   /**
@@ -40,10 +57,11 @@ public final class ReportParameters {
    * @param metadata report metadata
    * @param raw raw values from the request
    * @param clock clock for date keywords
+   * @param display renders values in the echo (company and branch ids as code and name)
    * @return validated parameters
    */
   public static ReportParameters validate(
-      ReportMetadata metadata, Map<String, String> raw, Clock clock) {
+      ReportMetadata metadata, Map<String, String> raw, Clock clock, ParameterDisplay display) {
     Map<String, String> resolved = new HashMap<>();
     List<String> errors = new ArrayList<>();
     for (ParameterSpec spec : metadata.parameters()) {
@@ -65,7 +83,7 @@ public final class ReportParameters {
     if (!errors.isEmpty()) {
       throw new BusinessRuleException("INVALID_REPORT_PARAMETERS", String.join("; ", errors));
     }
-    return new ReportParameters(metadata, resolved);
+    return new ReportParameters(metadata, resolved, display);
   }
 
   /**
@@ -149,7 +167,8 @@ public final class ReportParameters {
   }
 
   /**
-   * Human readable "Label : value" lines of supplied parameters, in declaration order.
+   * Human readable "Label : value" lines of supplied parameters, in declaration order. Ids are
+   * shown as the user knows them ("Company : FVI – FinVerse Insurance"), not as database ids.
    *
    * @return echo lines
    */
@@ -158,7 +177,7 @@ public final class ReportParameters {
     for (ParameterSpec spec : metadata.parameters()) {
       String value = values.get(spec.name());
       if (value != null) {
-        lines.add(spec.label() + " : " + value);
+        lines.add(spec.label() + " : " + display.display(spec, value));
       }
     }
     return lines;

@@ -7,10 +7,12 @@ interface Props {
   spec: ParameterSpec;
   value: string;
   onChange: (value: string) => void;
+  /** Validation message shown under the field. */
+  error?: string;
 }
 
 /** Renders the input control for one report parameter according to its declared type. */
-export function ParameterInput({ spec, value, onChange }: Readonly<Props>) {
+export function ParameterInput({ spec, value, onChange, error }: Readonly<Props>) {
   const { branches } = useWorkspace();
 
   if (spec.type === 'BOOLEAN') {
@@ -26,7 +28,7 @@ export function ParameterInput({ spec, value, onChange }: Readonly<Props>) {
     );
   }
   return (
-    <Field label={spec.label} required={spec.required}>
+    <Field label={spec.label} required={spec.required} error={error}>
       {(id) => {
         switch (spec.type) {
           case 'DATE':

@@ -214,4 +214,33 @@ class AdminScreensApiIT {
                 .content(params))
         .andExpect(status().isForbidden());
   }
+
+  @Test
+  void reportParametersAreValidatedOverHttp() throws Exception {
+    String reversed =
+        """
+        {"companyId": "%d", "fromDate": "2026-09-01", "toDate": "2026-01-31"}
+        """
+            .formatted(data.company().getId());
+    mvc.perform(
+            post("/api/v1/reports/GL-PL/run")
+                .with(as("accountant"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(reversed))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$.code").value("INVALID_REPORT_PARAMETERS"))
+        .andExpect(jsonPath("$.detail").value("To Date must not be before From Date"));
+    String blankAsOf =
+        """
+        {"companyId": "%d", "asOfDate": ""}
+        """
+            .formatted(data.company().getId());
+    mvc.perform(
+            post("/api/v1/reports/GL-TB/run")
+                .with(as("accountant"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(blankAsOf))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$.detail").value("As of Date is required"));
+  }
 }

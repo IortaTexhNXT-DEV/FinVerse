@@ -10,6 +10,7 @@ import { Field } from '@/components/ui/Field';
 import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useWorkspace } from '@/context/workspaceContext';
+import { dateRangeError } from '@/utils/dateRange';
 import { formatAmount, formatDate, today } from '@/utils/format';
 import { useGlLookups } from './useLookups';
 
@@ -22,13 +23,15 @@ export default function AccountInquiryPage() {
   const [from, setFrom] = useState(`${today().slice(0, 7)}-01`);
   const [to, setTo] = useState(today());
   const account = postableAccounts.find((a) => a.code === code);
+  const rangeError = dateRangeError(from, to);
 
   const statement = useQuery({
     queryKey: ['statement', account?.id, from, to, branchId],
     queryFn: () => glApi.statement(account?.id ?? 0, from, to, branchId),
-    enabled: account !== undefined,
+    enabled: account !== undefined && rangeError === undefined,
   });
-  const s = statement.data;
+  // A reversed range is never queried, and the previous range's figures are not shown for it.
+  const s = rangeError === undefined ? statement.data : undefined;
 
   return (
     <div className="stack">
@@ -68,12 +71,13 @@ export default function AccountInquiryPage() {
               />
             )}
           </Field>
-          <Field label="To">
+          <Field label="To" error={rangeError}>
             {(id) => (
               <input
                 id={id}
                 className="input"
                 type="date"
+                aria-invalid={rangeError !== undefined}
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
               />

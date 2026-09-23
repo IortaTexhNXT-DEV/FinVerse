@@ -4,29 +4,15 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { saveFile } from '@/api/client';
 import { reportApi } from '@/api/reports';
-import type { ExportFormat, ParameterSpec } from '@/api/reports';
+import type { ExportFormat } from '@/api/reports';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useWorkspace } from '@/context/workspaceContext';
-import { today } from '@/utils/format';
 import { ParameterInput } from './ParameterInput';
 import { ReportTable } from './ReportTable';
-
-function initialValue(spec: ParameterSpec): string {
-  const now = today();
-  switch (spec.defaultValue) {
-    case 'TODAY':
-      return now;
-    case 'MONTH_START':
-      return `${now.slice(0, 7)}-01`;
-    case 'YEAR_START':
-      return `${now.slice(0, 4)}-01-01`;
-    default:
-      return spec.defaultValue ?? '';
-  }
-}
+import { initialValue, parameterErrors } from './reportParams';
 
 const FORMATS: ExportFormat[] = ['PDF', 'XLSX', 'CSV'];
 
@@ -37,6 +23,7 @@ export default function ReportRunnerPage() {
   const catalogue = useQuery({ queryKey: ['report-catalogue'], queryFn: reportApi.catalogue });
   const entry = catalogue.data?.find((e) => e.code === code);
   const [values, setValues] = useState<Record<string, string>>({});
+  const [checked, setChecked] = useState(false);
 
   const params = (): Record<string, string> => {
     const out: Record<string, string> = {};
@@ -57,6 +44,15 @@ export default function ReportRunnerPage() {
     mutationFn: (format: ExportFormat) => reportApi.export(code, params(), format),
     onSuccess: ({ blob, fileName }) => saveFile(blob, fileName),
   });
+  const errors = parameterErrors(entry?.parameters ?? [], values);
+  const valid = Object.keys(errors).length === 0;
+  /** Runs the action only when the form is valid; otherwise shows the field errors. */
+  const guarded = (action: () => void) => () => {
+    setChecked(true);
+    if (valid) {
+      action();
+    }
+  };
 
   if (entry === undefined) {
     return catalogue.isLoading ? (
@@ -82,7 +78,7 @@ export default function ReportRunnerPage() {
               variant="accent"
               icon={<Play size={16} />}
               busy={run.isPending}
-              onClick={() => run.mutate()}
+              onClick={guarded(() => run.mutate())}
             >
               Run report
             </Button>
@@ -92,7 +88,7 @@ export default function ReportRunnerPage() {
                 variant="secondary"
                 icon={<Download size={15} />}
                 busy={exporter.isPending && exporter.variables === f}
-                onClick={() => exporter.mutate(f)}
+                onClick={guarded(() => exporter.mutate(f))}
               >
                 {f}
               </Button>
@@ -106,6 +102,7 @@ export default function ReportRunnerPage() {
               key={p.name}
               spec={p}
               value={values[p.name] ?? initialValue(p)}
+              error={checked ? errors[p.name] : undefined}
               onChange={(v) => setValues((s) => ({ ...s, [p.name]: v }))}
             />
           ))}

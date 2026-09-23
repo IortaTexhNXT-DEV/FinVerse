@@ -33,6 +33,10 @@ public final class ReportParameters {
   /**
    * Applies defaults and validates raw values against the report's parameter specs.
    *
+   * <p>Defaults apply to parameters the request leaves out. A required parameter sent blank (the
+   * user cleared the field) is an error rather than silently replaced by its default, and a range
+   * whose To value is before its From value is rejected (see {@link ParameterRanges}).
+   *
    * @param metadata report metadata
    * @param raw raw values from the request
    * @param clock clock for date keywords
@@ -43,8 +47,9 @@ public final class ReportParameters {
     Map<String, String> resolved = new HashMap<>();
     List<String> errors = new ArrayList<>();
     for (ParameterSpec spec : metadata.parameters()) {
-      String value = trimToNull(raw == null ? null : raw.get(spec.name()));
-      if (value == null) {
+      boolean supplied = raw != null && raw.containsKey(spec.name());
+      String value = trimToNull(supplied ? raw.get(spec.name()) : null);
+      if (value == null && !(supplied && spec.required())) {
         value = resolveDefault(spec.defaultValue(), clock);
       }
       if (value == null) {
@@ -56,6 +61,7 @@ public final class ReportParameters {
       checkType(spec, value, errors);
       resolved.put(spec.name(), value);
     }
+    ParameterRanges.check(metadata.parameters(), resolved, errors);
     if (!errors.isEmpty()) {
       throw new BusinessRuleException("INVALID_REPORT_PARAMETERS", String.join("; ", errors));
     }

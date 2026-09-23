@@ -12,7 +12,7 @@ import {
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
-const RECEIPT_VIEW = 'RECEIPT_PAYMENT_MAINTAIN';
+const RECEIPT_VIEW = 'JOURNAL_VIEW';
 const RECEIPT_APPROVE = 'RECEIPT_PAYMENT_AUTHORIZE';
 
 export const receivablesModule: FeatureModule = {
@@ -30,7 +30,7 @@ export const receivablesModule: FeatureModule = {
       path: '/receivables/receipts/new',
       label: 'New Receipt',
       icon: FilePlus2,
-      permission: RECEIPT_VIEW,
+      permission: 'RECEIPT_PAYMENT_MAINTAIN',
       component: lazy(() => import('./ReceiptEntryPage')),
     },
     {

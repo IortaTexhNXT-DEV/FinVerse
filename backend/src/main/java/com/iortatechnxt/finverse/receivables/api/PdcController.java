@@ -51,7 +51,7 @@ public class PdcController {
    * @return cheques
    */
   @GetMapping
-  @PreAuthorize("hasAnyAuthority('RECEIPT_PAYMENT_MAINTAIN','RECEIPT_PAYMENT_AUTHORIZE')")
+  @PreAuthorize(ReceivablesAccess.VIEW)
   public List<PdcResponse> list(
       @RequestParam Long companyId, @RequestParam(required = false) PdcStatus status) {
     return pdcs.list(companyId, status).stream().map(p -> PdcResponse.from(p, List.of())).toList();
@@ -64,7 +64,7 @@ public class PdcController {
    * @return cheque
    */
   @GetMapping("/{id}")
-  @PreAuthorize("hasAnyAuthority('RECEIPT_PAYMENT_MAINTAIN','RECEIPT_PAYMENT_AUTHORIZE')")
+  @PreAuthorize(ReceivablesAccess.VIEW)
   public PdcResponse get(@PathVariable Long id) {
     return PdcResponse.from(pdcs.get(id), pdcs.history(id));
   }

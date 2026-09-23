@@ -74,6 +74,15 @@ class ApiSmokeIT {
         "/api/v1/system/session-policy",
         "/api/v1/system/jobs",
         "/api/v1/system/jobs/runs",
+        // payables (payables, payments, petty cash, PDC issued)
+        "/api/v1/payables/bank-accounts?companyId={c}",
+        "/api/v1/payables/bank-accounts?companyId={c}&activeOnly=true",
+        "/api/v1/payables/invoices?companyId={c}",
+        "/api/v1/payables/invoices?companyId={c}&status=APPROVED&partyCode=S-0001",
+        "/api/v1/payables/vouchers?companyId={c}&from=2026-01-01&to=2026-12-31",
+        "/api/v1/payables/vouchers/payable-items?companyId={c}&partyCode=S-0001",
+        "/api/v1/payables/pdc-issued?companyId={c}",
+        "/api/v1/payables/petty-cash/funds?companyId={c}",
       })
   @WithUserDetails("fmanager")
   void readEndpointsRespondOk(String url) throws Exception {

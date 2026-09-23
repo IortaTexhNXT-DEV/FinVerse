@@ -60,6 +60,8 @@ finverse:
     # Spring cron (sec min hour day month weekday), UTC; "-" disables the schedule.
     recurring-journals-cron: ${FINVERSE_JOB_RECURRING_CRON:0 0 1 * * *}
     alert-checks-cron: ${FINVERSE_JOB_ALERTS_CRON:0 30 1 * * *}
+    # Monthly reserve valuation (previous month); disabled by default.
+    reserve-valuation-cron: ${FINVERSE_JOB_RESERVE_VALUATION_CRON:-}
 
 management:
   endpoints:

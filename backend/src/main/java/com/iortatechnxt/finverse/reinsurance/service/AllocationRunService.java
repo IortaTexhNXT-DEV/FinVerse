@@ -82,7 +82,14 @@ public class AllocationRunService {
    */
   public List<AllocationPreviewRow> preview(Long companyId, LocalDate from, LocalDate to) {
     return readOnly.execute(
-        s -> pending(companyId, from, to).stream().map(this::previewRow).toList());
+        s -> {
+          List<AllocationPreviewRow> rows =
+              pending(companyId, from, to).stream().map(this::previewRow).toList();
+          // A preview writes nothing: roll back explicitly, as a transaction that could not be
+          // planned has marked the transaction rollback-only and a commit would then fail.
+          s.setRollbackOnly();
+          return rows;
+        });
   }
 
   /**

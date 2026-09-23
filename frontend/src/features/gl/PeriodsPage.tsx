@@ -12,22 +12,10 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, formatDateTime } from '@/utils/format';
-
-type PeriodAction = 'open' | 'startClosing' | 'close' | 'reopen';
-
-const ACTIONS: Record<Period['status'], { action: PeriodAction; label: string }[]> = {
-  FUTURE: [{ action: 'open', label: 'Open' }],
-  OPEN: [
-    { action: 'startClosing', label: 'Start closing' },
-    { action: 'close', label: 'Close' },
-  ],
-  CLOSING: [
-    { action: 'open', label: 'Back to open' },
-    { action: 'close', label: 'Close' },
-  ],
-  CLOSED: [{ action: 'reopen', label: 'Reopen' }],
-  REOPENED: [{ action: 'close', label: 'Close again' }],
-};
+import { PeriodActionDialog } from './PeriodActionDialog';
+import type { PendingPeriodAction } from './PeriodActionDialog';
+import { PERIOD_ACTIONS } from './periodActions';
+import type { PeriodAction } from './periodActions';
 
 /** Financial calendar and period status console (open, soft close, close, reopen). */
 export default function PeriodsPage() {
@@ -36,6 +24,7 @@ export default function PeriodsPage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [yearId, setYearId] = useState<number | undefined>();
+  const [pending, setPending] = useState<PendingPeriodAction | null>(null);
 
   const years = useQuery({
     queryKey: ['years', companyId],
@@ -50,18 +39,18 @@ export default function PeriodsPage() {
   });
 
   const run = useMutation({
-    mutationFn: ({ period, action }: { period: Period; action: PeriodAction }) => {
-      if (action === 'reopen') {
-        const reason = globalThis.prompt(`Reason for reopening ${period.name}`) ?? '';
-        return periodApi.reopen(period.id, reason);
-      }
-      return periodApi[action](period.id);
-    },
+    mutationFn: ({ period, action, reason }: PendingPeriodAction & { reason: string }) =>
+      action === 'reopen' ? periodApi.reopen(period.id, reason) : periodApi[action](period.id),
     onSuccess: async (p) => {
+      setPending(null);
       await queryClient.invalidateQueries({ queryKey: ['periods'] });
       toast.success(`Period ${p.name} is now ${p.status}`);
     },
   });
+  const ask = (period: Period, action: PeriodAction) => {
+    run.reset();
+    setPending({ period, action });
+  };
   const createYear = useMutation({
     mutationFn: () =>
       periodApi.createYear(
@@ -93,7 +82,15 @@ export default function PeriodsPage() {
           )
         }
       />
-      <ErrorAlert error={run.error ?? createYear.error} />
+      <ErrorAlert error={createYear.error} />
+      <PeriodActionDialog
+        key={pending === null ? 'none' : `${pending.period.id}-${pending.action}`}
+        pending={pending}
+        busy={run.isPending}
+        error={run.error}
+        onCancel={() => setPending(null)}
+        onConfirm={(reason) => pending !== null && run.mutate({ ...pending, reason })}
+      />
       <div className="row">
         {years.data?.map((y) => (
           <Button
@@ -131,12 +128,12 @@ export default function PeriodsPage() {
               render: (p) =>
                 can('PERIOD_MANAGE') && (
                   <div className="row">
-                    {ACTIONS[p.status].map((a) => (
+                    {PERIOD_ACTIONS[p.status].map((a) => (
                       <Button
                         key={a.action}
                         size="sm"
                         variant="secondary"
-                        onClick={() => run.mutate({ period: p, action: a.action })}
+                        onClick={() => ask(p, a.action)}
                       >
                         {a.label}
                       </Button>

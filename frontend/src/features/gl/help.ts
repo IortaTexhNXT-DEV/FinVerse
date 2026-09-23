@@ -86,6 +86,9 @@ export const GL_HELP: HelpSection = {
       path: '/gl/periods',
       summary:
         'Fiscal years and accounting periods with open, closing, closed and reopened states.',
+      controls: [
+        'Every status change asks for confirmation and states its consequence; reopening a closed period needs a reason (at most 200 characters), recorded in the audit trail.',
+      ],
     },
   ],
 };

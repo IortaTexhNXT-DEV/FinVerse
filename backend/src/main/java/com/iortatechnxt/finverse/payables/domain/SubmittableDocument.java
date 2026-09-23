@@ -35,7 +35,7 @@ public abstract class SubmittableDocument extends ApprovableDocument {
   }
 
   @Override
-  protected String maker() {
+  public String maker() {
     return submittedBy != null ? submittedBy : getCreatedBy();
   }
 

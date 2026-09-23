@@ -52,4 +52,13 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
    * @return quotations
    */
   List<Quotation> findByCompanyIdAndStatusIn(Long companyId, Collection<QuotationStatus> statuses);
+
+  /**
+   * Quotations in one status across companies (approval inbox).
+   *
+   * @param status status
+   * @return quotations with their product and iterations, oldest first
+   */
+  @EntityGraph(attributePaths = {"product", "iterations"})
+  List<Quotation> findByStatusOrderById(QuotationStatus status);
 }

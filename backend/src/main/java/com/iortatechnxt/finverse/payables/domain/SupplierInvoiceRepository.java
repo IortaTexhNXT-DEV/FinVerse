@@ -2,6 +2,7 @@ package com.iortatechnxt.finverse.payables.domain;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -71,4 +72,12 @@ public interface SupplierInvoiceRepository extends JpaRepository<SupplierInvoice
       @Param("from") LocalDate from,
       @Param("to") LocalDate to,
       Pageable pageable);
+
+  /**
+   * Invoices in one status across companies (approval inbox).
+   *
+   * @param status status
+   * @return invoices, oldest first
+   */
+  List<SupplierInvoice> findByStatusOrderById(InvoiceStatus status);
 }

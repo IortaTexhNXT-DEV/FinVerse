@@ -3,6 +3,7 @@ package com.iortatechnxt.finverse.investment.domain;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,6 +20,15 @@ public interface InvestmentHoldingRepository extends JpaRepository<InvestmentHol
    */
   List<InvestmentHolding> findByCompanyIdAndStatusOrderByHoldingNo(
       Long companyId, HoldingStatus status);
+
+  /**
+   * Holdings in a status across companies (approval inbox).
+   *
+   * @param status status
+   * @return holdings with their portfolio, oldest first
+   */
+  @EntityGraph(attributePaths = "portfolio")
+  List<InvestmentHolding> findByStatusOrderById(HoldingStatus status);
 
   /**
    * Finds a holding by security code (first match).

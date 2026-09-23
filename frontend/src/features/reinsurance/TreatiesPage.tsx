@@ -17,6 +17,7 @@ import { TreatyEditor } from './TreatyEditor';
 import { blankTreaty, capacityLabel, toForm, toRequest, treatyProblems } from './treatyForm';
 import type { TreatyForm } from './treatyForm';
 import { useRiLookups } from './useRiLookups';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 /** Treaty programme per class and underwriting year (maker-checker master data). */
 export default function TreatiesPage() {
@@ -46,7 +47,6 @@ export default function TreatiesPage() {
     },
   });
   const problems = form === null ? [] : treatyProblems(form);
-  const maker = (t: Treaty) => t.updatedBy ?? t.createdBy;
   const newTreaty = () =>
     setForm(blankTreaty(lookups.companyId, lookups.baseCurrency, new Date().getFullYear()));
 
@@ -91,9 +91,8 @@ export default function TreatiesPage() {
               key: 'a',
               header: 'Actions',
               render: (t) =>
-                t.recordStatus === 'PENDING_AUTHORIZATION' &&
-                can('REINSURANCE_AUTHORIZE') &&
-                maker(t) !== user?.username && (
+                awaitsOtherChecker(t, user?.username) &&
+                can('REINSURANCE_AUTHORIZE') && (
                   <Button
                     size="sm"
                     variant="secondary"

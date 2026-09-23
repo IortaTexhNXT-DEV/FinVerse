@@ -27,12 +27,14 @@ export interface BankAccount {
   notificationFormat: NotificationFormat;
   recordStatus: RecordStatus;
   createdBy: string;
+  /** Creator or last maintainer; unchanged by authorization. */
+  maker?: string;
   authorizedBy?: string;
 }
 
 export type BankAccountRequest = Omit<
   BankAccount,
-  'id' | 'recordStatus' | 'createdBy' | 'authorizedBy'
+  'id' | 'recordStatus' | 'createdBy' | 'maker' | 'authorizedBy'
 >;
 
 export interface ChequeBook {
@@ -209,6 +211,8 @@ export interface Fund {
   establishedOn?: string;
   recordStatus: RecordStatus;
   createdBy: string;
+  /** Creator or last maintainer; unchanged by authorization. */
+  maker?: string;
 }
 
 export interface FundRequest {

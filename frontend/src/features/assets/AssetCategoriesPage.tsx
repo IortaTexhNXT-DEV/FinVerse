@@ -17,6 +17,7 @@ import { monthlyDepreciation } from './assetMath';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
 import { enumOptions } from './options';
 import { useAssetLookups } from './useAssetLookups';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 type CategoryForm = Partial<AssetCategoryInput> & { id?: number };
 
@@ -26,7 +27,7 @@ const SAMPLE_COST = 100_000;
 /** Fixed asset categories: GL accounts and default depreciation policy (maker-checker). */
 export default function AssetCategoriesPage() {
   const { companyId, categories, postableAccounts } = useAssetLookups();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<CategoryForm | null>(null);
@@ -99,7 +100,7 @@ export default function AssetCategoriesPage() {
               key: 'x',
               header: 'Actions',
               render: (c) =>
-                c.recordStatus === 'PENDING_AUTHORIZATION' &&
+                awaitsOtherChecker(c, user?.username) &&
                 can('MASTER_AUTHORIZE') && (
                   <Button
                     size="sm"

@@ -36,10 +36,12 @@ export interface Rule {
   lines: RuleLine[];
   recordStatus: RecordStatus;
   createdBy: string;
+  /** Creator or last maintainer; unchanged by authorization. */
+  maker?: string;
   authorizedBy?: string;
 }
 
-export type RuleInput = Omit<Rule, 'id' | 'recordStatus' | 'createdBy' | 'authorizedBy'>;
+export type RuleInput = Omit<Rule, 'id' | 'recordStatus' | 'createdBy' | 'maker' | 'authorizedBy'>;
 
 export interface SimulationInput {
   companyId: number;

@@ -15,6 +15,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useWorkspace } from '@/context/workspaceContext';
 import { formatDate, today } from '@/utils/format';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 type BranchForm = Partial<Branch>;
 
@@ -32,7 +33,7 @@ const TEXT_FIELDS: { key: keyof Branch; label: string; required?: boolean }[] = 
 /** Office Master maintenance: branches with maker-checker authorization. */
 export default function BranchesPage() {
   const { company, branches } = useWorkspace();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<BranchForm | null>(null);
@@ -95,7 +96,7 @@ export default function BranchesPage() {
               key: 'a',
               header: 'Actions',
               render: (b) =>
-                b.recordStatus === 'PENDING_AUTHORIZATION' &&
+                awaitsOtherChecker(b, user?.username) &&
                 can('MASTER_AUTHORIZE') && (
                   <Button
                     size="sm"

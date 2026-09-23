@@ -38,10 +38,15 @@ export interface Party {
   branchId?: number;
   recordStatus: RecordStatus;
   createdBy: string;
+  /** Creator or last maintainer; unchanged by authorization. */
+  maker?: string;
   authorizedBy?: string;
 }
 
-export type PartyInput = Omit<Party, 'id' | 'recordStatus' | 'createdBy' | 'authorizedBy'>;
+export type PartyInput = Omit<
+  Party,
+  'id' | 'recordStatus' | 'createdBy' | 'maker' | 'authorizedBy'
+>;
 
 export const partiesApi = {
   search: (companyId: number, types: PartyType[], q?: string) => {

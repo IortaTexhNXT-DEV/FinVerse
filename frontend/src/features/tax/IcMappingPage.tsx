@@ -14,6 +14,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { AuthorizeButton, SelectField, TextField } from './MasterControls';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 const SCHEDULES: readonly IcSchedule[] = [
   'PREMIUMS',
@@ -35,7 +36,7 @@ type Form = Partial<IcLineRequest> & { id?: number };
  */
 export default function IcMappingPage() {
   const companyId = useCompanyId();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [schedule, setSchedule] = useState<IcSchedule | undefined>(undefined);
@@ -132,7 +133,7 @@ export default function IcMappingPage() {
               key: 'x',
               header: 'Actions',
               render: (l) =>
-                l.recordStatus === 'PENDING_AUTHORIZATION' && can('MASTER_AUTHORIZE') ? (
+                awaitsOtherChecker(l, user?.username) && can('MASTER_AUTHORIZE') ? (
                   <AuthorizeButton
                     busy={authorize.isPending && authorize.variables === l.id}
                     onClick={() => authorize.mutate(l.id)}

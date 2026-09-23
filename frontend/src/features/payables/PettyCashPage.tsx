@@ -19,6 +19,7 @@ import { formatDate, today } from '@/utils/format';
 import { fundLevel } from './payablesMath';
 import { PettyCashFundPanel } from './PettyCashFundPanel';
 import { usePayablesLookups } from './usePayablesLookups';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 type FundForm = Partial<FundRequest>;
 
@@ -27,7 +28,7 @@ export default function PettyCashPage() {
   const { branches } = useWorkspace();
   const defaultBranch = useDefaultBranchId();
   const { companyId, activeBanks } = usePayablesLookups();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<number | null>(null);
@@ -65,7 +66,7 @@ export default function PettyCashPage() {
   const fund = rows.find((f) => f.id === selected);
 
   const fundAction = (f: Fund) => {
-    if (f.recordStatus === 'PENDING_AUTHORIZATION' && can('MASTER_AUTHORIZE')) {
+    if (awaitsOtherChecker(f, user?.username) && can('MASTER_AUTHORIZE')) {
       return { label: 'Authorize', run: () => authorize.mutate(f.id) };
     }
     if (

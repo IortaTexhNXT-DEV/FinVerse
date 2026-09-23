@@ -9,13 +9,14 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useWorkspace } from '@/context/workspaceContext';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 /** Legal entities keeping their own books (base currency, fiscal year, posting windows). */
 export default function CompaniesPage() {
   const { companies } = useWorkspace();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const queryClient = useQueryClient();
   const authorize = useMutation({
     mutationFn: (id: number) => organizationApi.authorizeCompany(id),
@@ -59,7 +60,7 @@ export default function CompaniesPage() {
               key: 'a',
               header: 'Actions',
               render: (c) =>
-                c.recordStatus === 'PENDING_AUTHORIZATION' &&
+                awaitsOtherChecker(c, user?.username) &&
                 can('MASTER_AUTHORIZE') && (
                   <Button size="sm" variant="secondary" onClick={() => authorize.mutate(c.id)}>
                     Authorize

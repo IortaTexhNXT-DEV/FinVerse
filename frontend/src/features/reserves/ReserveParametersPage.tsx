@@ -17,6 +17,7 @@ import { ParameterFormModal } from './ParameterFormModal';
 import { NEW_PARAMETERS } from './reserveMath';
 import type { ParameterForm } from './reserveMath';
 import { TakafulSettingsCard } from './TakafulSettingsCard';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 function method(p: ReserveParameter): string {
   return p.ibnrMethod === 'RATE'
@@ -27,7 +28,7 @@ function method(p: ReserveParameter): string {
 /** Reserve parameters per line of business (effective dated, maker-checker) and takaful. */
 export default function ReserveParametersPage() {
   const companyId = useCompanyId();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<ParameterForm | null>(null);
@@ -96,7 +97,7 @@ export default function ReserveParametersPage() {
               header: 'Actions',
               render: (p) => (
                 <div className="row" style={{ gap: 'var(--space-1)' }}>
-                  {pending(p) && can('MASTER_AUTHORIZE') && (
+                  {awaitsOtherChecker(p, user?.username) && can('MASTER_AUTHORIZE') && (
                     <Button
                       size="sm"
                       variant="secondary"

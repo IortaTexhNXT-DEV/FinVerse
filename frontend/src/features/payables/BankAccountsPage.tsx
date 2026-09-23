@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDate, today } from '@/utils/format';
 import { PaymentFileModal } from './PaymentFileModal';
 import { usePayablesLookups } from './usePayablesLookups';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 type Form = Partial<BankAccountRequest> & { id?: number };
 
@@ -33,7 +34,7 @@ const TEXT_FIELDS: { key: keyof BankAccountRequest; label: string; required?: bo
 /** Company bank accounts (house banks), their cheque books and the bank payment file. */
 export default function BankAccountsPage() {
   const { companyId, banks } = usePayablesLookups();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<Form | null>(null);
@@ -121,7 +122,7 @@ export default function BankAccountsPage() {
                   >
                     Cheque books
                   </Button>
-                  {b.recordStatus === 'PENDING_AUTHORIZATION' && can('MASTER_AUTHORIZE') && (
+                  {awaitsOtherChecker(b, user?.username) && can('MASTER_AUTHORIZE') && (
                     <Button
                       size="sm"
                       variant="secondary"

@@ -311,6 +311,8 @@ export interface OpenCover extends OpenCoverInput {
   customerName: string;
   recordStatus: RecordStatus;
   createdBy: string;
+  /** Creator or last maintainer; unchanged by authorization. */
+  maker?: string;
   authorizedBy?: string;
 }
 

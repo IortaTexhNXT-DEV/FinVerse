@@ -17,6 +17,7 @@ import { humanize } from '@/utils/format';
 import { PartyEditorModal } from './PartyEditorModal';
 import { emptyParty } from './partyForm';
 import type { PartyForm } from './partyForm';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 /**
  * Business partner master (policyholders, intermediaries, reinsurers, coinsurers, suppliers...):
@@ -25,7 +26,7 @@ import type { PartyForm } from './partyForm';
 export default function PartiesPage() {
   const { company } = useWorkspace();
   const companyId = company?.id ?? 0;
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [type, setType] = useState<PartyType | ''>('');
@@ -115,7 +116,7 @@ export default function PartiesPage() {
               key: 'a',
               header: 'Actions',
               render: (p) =>
-                p.recordStatus === 'PENDING_AUTHORIZATION' &&
+                awaitsOtherChecker(p, user?.username) &&
                 can('MASTER_AUTHORIZE') && (
                   <Button
                     size="sm"

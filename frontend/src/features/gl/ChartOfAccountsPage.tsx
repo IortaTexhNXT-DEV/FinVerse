@@ -15,13 +15,14 @@ import { useToast } from '@/components/ui/toastContext';
 import { AccountForm } from './AccountForm';
 import { blankAccount, toRequest } from './accountModel';
 import { useGlLookups } from './useLookups';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 const INDENT: Record<string, number> = { GROUP: 0, MAIN: 1, SUB: 2, MICRO: 3 };
 
 /** Chart of accounts: multi-tier GL heads with maker-checker maintenance and freeze. */
 export default function ChartOfAccountsPage() {
   const { companyId, accounts } = useGlLookups();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
@@ -132,7 +133,7 @@ export default function ChartOfAccountsPage() {
                   onClick={(e) => e.stopPropagation()}
                   onKeyDown={(e) => e.stopPropagation()}
                 >
-                  {a.recordStatus === 'PENDING_AUTHORIZATION' && can('MASTER_AUTHORIZE') && (
+                  {awaitsOtherChecker(a, user?.username) && can('MASTER_AUTHORIZE') && (
                     <Button
                       size="sm"
                       variant="secondary"

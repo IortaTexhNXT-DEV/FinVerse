@@ -17,6 +17,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { today } from '@/utils/format';
 import { AuthorizeButton, SelectField, TextField } from './MasterControls';
 import { TaxFormsPanel } from './TaxFormsPanel';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 const TAX_TYPES: readonly TaxType[] = [
   'VAT_OUTPUT',
@@ -55,7 +56,7 @@ export default function TaxCodesPage() {
 
 function TaxCodesPanel() {
   const companyId = useCompanyId();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<Form | null>(null);
@@ -118,7 +119,7 @@ function TaxCodesPanel() {
               key: 'x',
               header: 'Actions',
               render: (c) =>
-                c.recordStatus === 'PENDING_AUTHORIZATION' && can('MASTER_AUTHORIZE') ? (
+                awaitsOtherChecker(c, user?.username) && can('MASTER_AUTHORIZE') ? (
                   <AuthorizeButton
                     busy={authorize.isPending && authorize.variables === c.id}
                     onClick={() => authorize.mutate(c.id)}

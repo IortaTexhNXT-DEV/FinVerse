@@ -43,6 +43,8 @@ export interface Company {
   retainedEarningsAccount?: string;
   recordStatus: RecordStatus;
   createdBy: string;
+  /** Creator or last maintainer; unchanged by authorization. */
+  maker?: string;
   authorizedBy?: string;
 }
 
@@ -62,5 +64,7 @@ export interface Branch {
   weeklyHolidays?: string;
   recordStatus: RecordStatus;
   createdBy: string;
+  /** Creator or last maintainer; unchanged by authorization. */
+  maker?: string;
   authorizedBy?: string;
 }

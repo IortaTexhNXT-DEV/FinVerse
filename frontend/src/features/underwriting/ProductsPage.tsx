@@ -15,6 +15,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { CheckboxField, NumberField, SelectField, TextField } from './FormFields';
 import { useUwLookups } from './useUwLookups';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 type ProductForm = ProductInput & { id?: number };
 
@@ -55,7 +56,7 @@ function blank(companyId: number): ProductForm {
 /** Product master: lines of business, commission, earning basis and Philippine premium taxes. */
 export default function ProductsPage() {
   const lookups = useUwLookups();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<ProductForm | null>(null);
@@ -128,7 +129,7 @@ export default function ProductsPage() {
               key: 'a',
               header: 'Actions',
               render: (p) =>
-                p.recordStatus === 'PENDING_AUTHORIZATION' &&
+                awaitsOtherChecker(p, user?.username) &&
                 can('POLICY_AUTHORIZE') && (
                   <Button
                     size="sm"

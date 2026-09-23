@@ -19,6 +19,7 @@ import { formatDate, today } from '@/utils/format';
 import { DateField, NumberField, SelectField, TextField } from './FormFields';
 import { oneYearFrom } from './premiumMath';
 import { useUwLookups } from './useUwLookups';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 function blank(companyId: number, branchId: number): OpenCoverInput {
   return {
@@ -40,7 +41,7 @@ function blank(companyId: number, branchId: number): OpenCoverInput {
 export default function OpenCoversPage() {
   const lookups = useUwLookups();
   const defaultBranch = useDefaultBranchId();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -123,7 +124,7 @@ export default function OpenCoversPage() {
               key: 'a',
               header: 'Actions',
               render: (c) =>
-                c.recordStatus === 'PENDING_AUTHORIZATION' &&
+                awaitsOtherChecker(c, user?.username) &&
                 can('POLICY_AUTHORIZE') && (
                   <Button
                     size="sm"

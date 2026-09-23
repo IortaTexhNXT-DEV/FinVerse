@@ -14,6 +14,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useDefaultBranchId } from '@/context/workspaceContext';
+import { makerOf } from '@/utils/makerChecker';
 import { formatAmount, formatDate, humanize, today } from '@/utils/format';
 import { SelectInput, TextInput } from './FormControls';
 import { HoldingFormModal } from './HoldingFormModal';
@@ -31,7 +32,7 @@ function total(rows: Holding[], pick: (h: Holding) => number): string {
 export default function InvestmentsPage() {
   const { companyId, portfolios, baseCurrency } = useAssetLookups();
   const defaultBranch = useDefaultBranchId();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<HoldingStatus | ''>('');
@@ -158,7 +159,8 @@ export default function InvestmentsPage() {
               header: 'Actions',
               render: (h) =>
                 h.status === 'PENDING_APPROVAL' &&
-                can('MASTER_AUTHORIZE') && (
+                can('MASTER_AUTHORIZE') &&
+                makerOf(h) !== user?.username && (
                   <Button
                     size="sm"
                     variant="secondary"

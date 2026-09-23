@@ -49,10 +49,15 @@ export interface Portfolio {
   fairValueAccount?: string;
   recordStatus: RecordStatus;
   createdBy: string;
+  /** Creator or last maintainer; unchanged by authorization. */
+  maker?: string;
   authorizedBy?: string;
 }
 
-export type PortfolioInput = Omit<Portfolio, 'id' | 'recordStatus' | 'createdBy' | 'authorizedBy'>;
+export type PortfolioInput = Omit<
+  Portfolio,
+  'id' | 'recordStatus' | 'createdBy' | 'maker' | 'authorizedBy'
+>;
 
 export interface Holding {
   id: number;
@@ -95,6 +100,8 @@ export interface Holding {
   purchaseBatchNo?: string;
   recordStatus: RecordStatus;
   createdBy: string;
+  /** Creator or last maintainer; unchanged by authorization. */
+  maker?: string;
   authorizedBy?: string;
 }
 

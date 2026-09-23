@@ -36,6 +36,8 @@ export interface GlAccount {
   allowedRoleCodes: string[];
   recordStatus: RecordStatus;
   createdBy: string;
+  /** Creator or last maintainer; unchanged by authorization. */
+  maker?: string;
   authorizedBy?: string;
 }
 
@@ -48,6 +50,7 @@ export type GlAccountRequest = Omit<
   | 'closedOn'
   | 'recordStatus'
   | 'createdBy'
+  | 'maker'
   | 'authorizedBy'
 >;
 

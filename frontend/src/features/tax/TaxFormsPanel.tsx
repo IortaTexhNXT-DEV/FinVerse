@@ -20,6 +20,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { humanize, today } from '@/utils/format';
 import { AuthorizeButton, SelectField, TextField } from './MasterControls';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 const AUTHORITIES: readonly TaxAuthority[] = ['BIR', 'LGU', 'BFP'];
 const FREQUENCIES: readonly FilingFrequency[] = [
@@ -43,7 +44,7 @@ type Form = Partial<TaxFormRequest> & { id?: number };
 /** Forms of the filing calendar: authority, frequency, due rule and accounts cleared. */
 export function TaxFormsPanel() {
   const companyId = useCompanyId();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<Form | null>(null);
@@ -122,7 +123,7 @@ export function TaxFormsPanel() {
               key: 'x',
               header: 'Actions',
               render: (f) =>
-                f.recordStatus === 'PENDING_AUTHORIZATION' && can('MASTER_AUTHORIZE') ? (
+                awaitsOtherChecker(f, user?.username) && can('MASTER_AUTHORIZE') ? (
                   <AuthorizeButton
                     busy={authorize.isPending && authorize.variables === f.id}
                     onClick={() => authorize.mutate(f.id)}

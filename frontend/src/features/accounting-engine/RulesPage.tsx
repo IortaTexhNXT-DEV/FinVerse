@@ -15,6 +15,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate } from '@/utils/format';
 import { useAccountingLookups } from './useAccountingLookups';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 function conditions(r: Rule): string {
   const parts = [r.businessLine ? `LoB ${r.businessLine}` : '', r.currency ?? ''];
@@ -34,7 +35,7 @@ function linesSummary(r: Rule): string {
 /** Accounting rules per event type: list, authorize, open the editor. */
 export default function RulesPage() {
   const { rules, eventTypes, loading, error } = useAccountingLookups();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -113,7 +114,7 @@ export default function RulesPage() {
               key: 'a',
               header: 'Actions',
               render: (r) =>
-                r.recordStatus === 'PENDING_AUTHORIZATION' &&
+                awaitsOtherChecker(r, user?.username) &&
                 can('MASTER_AUTHORIZE') && (
                   <Button
                     size="sm"

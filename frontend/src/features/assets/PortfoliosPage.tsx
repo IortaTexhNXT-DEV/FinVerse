@@ -16,6 +16,7 @@ import { humanize } from '@/utils/format';
 import { SelectInput, TextInput } from './FormControls';
 import { enumOptions } from './options';
 import { useAssetLookups } from './useAssetLookups';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 type PortfolioForm = Partial<PortfolioInput> & { id?: number };
 
@@ -30,7 +31,7 @@ const ACCOUNT_FIELDS: { key: keyof PortfolioInput; label: string }[] = [
 /** Investment portfolios: PFRS 9 classification and GL accounts (maker-checker). */
 export default function PortfoliosPage() {
   const { companyId, portfolios, postableAccounts } = useAssetLookups();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<PortfolioForm | null>(null);
@@ -97,7 +98,7 @@ export default function PortfoliosPage() {
               key: 'x',
               header: 'Actions',
               render: (p) =>
-                p.recordStatus === 'PENDING_AUTHORIZATION' &&
+                awaitsOtherChecker(p, user?.username) &&
                 can('MASTER_AUTHORIZE') && (
                   <Button
                     size="sm"

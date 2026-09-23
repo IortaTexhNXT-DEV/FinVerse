@@ -14,6 +14,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { AuthorizeButton, SelectField, TextField } from './MasterControls';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 const PAYEE_CLASSES: readonly PayeeClass[] = ['CORPORATE', 'INDIVIDUAL'];
 const VAT_TREATMENTS: readonly VatTreatment[] = ['REGULAR', 'ZERO_RATED', 'EXEMPT'];
@@ -26,7 +27,7 @@ type Form = Partial<PartyTaxProfileRequest> & { id?: number };
  */
 export default function PartyProfilesPage() {
   const companyId = useCompanyId();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<Form | null>(null);
@@ -100,7 +101,7 @@ export default function PartyProfilesPage() {
               key: 'x',
               header: 'Actions',
               render: (p) =>
-                p.recordStatus === 'PENDING_AUTHORIZATION' && can('MASTER_AUTHORIZE') ? (
+                awaitsOtherChecker(p, user?.username) && can('MASTER_AUTHORIZE') ? (
                   <AuthorizeButton
                     busy={authorize.isPending && authorize.variables === p.id}
                     onClick={() => authorize.mutate(p.id)}

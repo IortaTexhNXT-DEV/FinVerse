@@ -10,6 +10,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { NumberInput, TextInput } from '@/features/assets/FormControls';
 import { takafulProducts } from './reserveMath';
+import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 /** One-line description of the settings in force. */
 function takafulSummary(s: TakafulSetting | undefined): string {
@@ -72,7 +73,7 @@ function TakafulForm({ form, busy, onChange, onSave, onDiscard }: Readonly<FormP
 
 /** Takaful surplus (Mudharabah) settings of the company: optional, maker-checker. */
 export function TakafulSettingsCard({ companyId }: Readonly<{ companyId: number }>) {
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<TakafulSettingInput | null>(null);
@@ -98,7 +99,7 @@ export function TakafulSettingsCard({ companyId }: Readonly<{ companyId: number 
     },
   });
   const s = setting.data;
-  const canAuthorize = s?.recordStatus === 'PENDING_AUTHORIZATION' && can('MASTER_AUTHORIZE');
+  const canAuthorize = awaitsOtherChecker(s, user?.username) && can('MASTER_AUTHORIZE');
   const canEdit = form === null && s !== undefined && can('MASTER_MAINTAIN');
 
   return (

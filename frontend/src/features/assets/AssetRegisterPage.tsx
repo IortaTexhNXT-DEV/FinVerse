@@ -14,6 +14,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useDefaultBranchId } from '@/context/workspaceContext';
+import { makerOf } from '@/utils/makerChecker';
 import { formatAmount, formatDate, today } from '@/utils/format';
 import { AssetActionModal } from './AssetActionModal';
 import type { AssetAction } from './AssetActionModal';
@@ -40,7 +41,7 @@ function sum(rows: FixedAsset[], pick: (a: FixedAsset) => number): number {
 export default function AssetRegisterPage() {
   const { companyId, categories, branchName } = useAssetLookups();
   const defaultBranch = useDefaultBranchId();
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<AssetStatus | ''>('');
@@ -71,11 +72,13 @@ export default function AssetRegisterPage() {
 
   const actions = (a: FixedAsset) => (
     <div className="row">
-      {a.status === 'PENDING_CAPITALIZATION' && can('MASTER_AUTHORIZE') && (
-        <Button size="sm" variant="secondary" onClick={() => capitalize.mutate(a.id)}>
-          Capitalize
-        </Button>
-      )}
+      {a.status === 'PENDING_CAPITALIZATION' &&
+        can('MASTER_AUTHORIZE') &&
+        makerOf(a) !== user?.username && (
+          <Button size="sm" variant="secondary" onClick={() => capitalize.mutate(a.id)}>
+            Capitalize
+          </Button>
+        )}
       {IN_SERVICE.includes(a.status) && can('ASSET_MANAGE') && (
         <>
           <Button

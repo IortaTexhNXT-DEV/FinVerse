@@ -19,12 +19,14 @@ export interface AssetCategory {
   residualPercent: number;
   recordStatus: RecordStatus;
   createdBy: string;
+  /** Creator or last maintainer; unchanged by authorization. */
+  maker?: string;
   authorizedBy?: string;
 }
 
 export type AssetCategoryInput = Omit<
   AssetCategory,
-  'id' | 'recordStatus' | 'createdBy' | 'authorizedBy'
+  'id' | 'recordStatus' | 'createdBy' | 'maker' | 'authorizedBy'
 >;
 
 export interface FixedAsset {
@@ -57,6 +59,8 @@ export interface FixedAsset {
   disposalDate?: string;
   recordStatus: RecordStatus;
   createdBy: string;
+  /** Creator or last maintainer; unchanged by authorization. */
+  maker?: string;
   authorizedBy?: string;
 }
 

@@ -115,7 +115,8 @@ public class RenewalDueReport implements ReportDefinition {
     List<Map<String, Object>> rows = new ArrayList<>();
     for (PolicySnapshot policy : expiring) {
       Map<String, Object> m = new LinkedHashMap<>();
-      UwReportSupport.putGroups(m, policy, branches);
+      // The report shows the current period, so it groups by that period's UW year.
+      UwReportSupport.putGroups(m, policy, policy.currentUwYear(), branches);
       m.put(UwReportSupport.K_POLICY, policy.policyNo());
       m.put(UwReportSupport.K_INSURED, policy.insuredName());
       m.put("periodFrom", policy.periodFrom());

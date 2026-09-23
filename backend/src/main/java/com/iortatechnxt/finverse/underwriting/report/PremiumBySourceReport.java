@@ -72,7 +72,7 @@ public class PremiumBySourceReport implements ReportDefinition {
       }
       PremiumBreakdown b = t.premium();
       Map<String, Object> m = new LinkedHashMap<>();
-      UwReportSupport.putGroups(m, t.policy(), branches);
+      UwReportSupport.putGroups(m, t, branches);
       UwReportSupport.putDocument(m, t);
       m.put(SOURCE, t.policy().sourceType().name());
       m.put(K_SHARE, t.policy().sharePct());

@@ -117,7 +117,7 @@ public class PremiumRegisterReport implements ReportDefinition {
       int serial, PremiumTransaction t, ReinsuranceFigures r, Map<Long, String> branches) {
     PremiumBreakdown b = t.premium();
     Map<String, Object> m = new LinkedHashMap<>();
-    UwReportSupport.putGroups(m, t.policy(), branches);
+    UwReportSupport.putGroups(m, t, branches);
     UwReportSupport.putDocument(m, t);
     m.put("serial", String.valueOf(serial));
     m.put("invoiceNo", t.debitNoteNo());

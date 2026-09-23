@@ -207,6 +207,8 @@ export interface Endorsement {
   effectiveDate: string;
   newPeriodFrom?: string;
   newPeriodTo?: string;
+  /** Underwriting year of the period the endorsement belongs to (renewal: its new period). */
+  uwYear: number;
   description: string;
   currency: string;
   document: DocumentStatus;

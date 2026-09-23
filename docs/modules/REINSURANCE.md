@@ -61,6 +61,14 @@ If the surplus has two participants at 60 % / 40 % with 30 % commission, the fir
 | Cancellation | `PRO_RATA` | negative premium, reverses the cession in the same proportions |
 | NIL endorsement | `NONE` | nothing ceded |
 
+**Underwriting year.** A cession carries the underwriting year of the premium transaction it cedes
+(`PremiumTransaction.uwYear`), and a full allocation uses the treaty programme of that year: the
+original issue belongs to the policy's year, a renewal to the year its new period starts, and every
+other endorsement to the year of the period in force when it was made (so an endorsement after a
+renewal is ceded in the renewal's year, in the proportions of the renewal's allocation).
+`uw_year` and `treaty_year` are therefore equal for new cessions; V301 re-aligned the `uw_year` of
+cessions made earlier and kept their `treaty_year` (the programme actually applied).
+
 Cessions are idempotent per transaction (policy + endorsement no.): ceding again returns the
 existing cession. They run on demand per policy (`POST /cessions/policies/{policyId}`, which also
 cedes any earlier transaction not yet ceded first), in a batch **RI allocation run** for a period
@@ -185,3 +193,8 @@ settles one of them and catches up claims when a `ClaimsExperienceView` is prese
 
 * Profit commission % is stored but not computed; reinstatement premiums are not computed.
 * Claims are apportioned at policy level (no risk id on the kernel movement).
+* A pro-rata endorsement is ceded on the full allocation with the latest effective date on or
+  before its own. Because a renewal overwrites the policy period, the original issue's effective
+  date reads as the renewed period start; a renewal whose effective date is before its new period
+  start (renewed early) therefore sorts after the original issue and later endorsements follow the
+  original allocation. Renewals effective on the new period start (the usual case) are not affected.

@@ -200,6 +200,16 @@ The *current period* position is the original issue, or the latest approved rene
 approved endorsements made after it. A financial endorsement whose total due and commission are both
 zero raises no event.
 
+**Underwriting year of an endorsement** (`uw_endorsement.uw_year`, V101). The policy keeps the
+underwriting year of its original issue. A renewal belongs to the year its **new period starts**;
+any other endorsement to the year of the period in force when it is made (the original issue's, or
+the latest approved renewal's). Every `PremiumTransaction` carries this year (`uwYear`): the premium
+registers group by it (PGIBR003, 005, 015, 016, 025, 040, 043) and reinsurance cedes each transaction
+on the treaty programme of that year. Example: a policy for 2026 renewed for 2027 shows the original
+issue under UW year 2026 and the renewal (and a later additional premium) under 2027. PGIBR013
+(renewals due) groups each policy by the year of its current period
+(`PolicySnapshot.currentUwYear()`). V101 set the year of existing endorsements by the same rule.
+
 **Cancellation example.** A 100,000.00 gross policy of the worked example (1 January to
 31 December 2026, 365 days) cancelled with effect from 1 July 2026: 184 unexpired days, ratio
 0.5041095890, return gross −50,410.96, discount +5,041.10, loading −2,520.55, net −47,890.41; DST
@@ -291,12 +301,13 @@ vouchers pay commissions (`COMMISSION_PAYMENT`, Dr 2300 / Cr bank) and premium r
 | `underwriting.service.PolicyClaimsView` | port owned by underwriting, implemented by claims | `claims.service.PolicyClaimsService`: claim count, latest claim, reserve, paid, outstanding and net claims per policy (company share, policy currency); used by PGIBR013 and PGIBR084 |
 | `approval.service.PendingApprovalSource` | platform port implemented by underwriting | `UnderwritingApprovalSource` |
 
-`PolicyQueryService` methods: `findByNumber` / `get` (header of the current period), `risks`,
+`PolicyQueryService` methods: `findByNumber` / `get` (header of the current period; `uwYear` is the
+original issue's, `currentUwYear()` the current period's), `risks`,
 `isInForce`, `approvedTransactions` (approved issues and endorsements of a period with their premium
 figures), `policyTransactions` (premium history of one policy), `transactions` (register selection),
 `coverPeriods` (earning period of each transaction), `policiesExpiring` and `risksInForce`.
 A transaction is a `PremiumTransaction` keyed by `TransactionRef` (policy id + endorsement number,
-0 for the original issue).
+0 for the original issue) and carries its own underwriting year (section 5).
 
 The two ports are injected optionally (`UnderwritingPorts`, `ObjectProvider`): without an
 implementation, or for a transaction without entry, reports show no treaty or FAC premium (the whole
@@ -387,7 +398,12 @@ Claims (`@Order(20)`) and reinsurance (`@Order(15)`) demo data build on this por
 
 - **Renewal overwrites the policy period.** The start of the original period is no longer stored
   once a policy is renewed; `CoverPeriodResolver` (and therefore actuarial reserves) takes the policy
-  issue date as the start of the original period. The underwriting year is not changed by a renewal.
+  issue date as the start of the original period, and the original issue's transaction reports the
+  renewed period start as its effective date. The underwriting year is not affected: the policy
+  keeps the original year and each endorsement stores its own (section 5).
+- **Claims keep the policy's original underwriting year.** A claim snapshots `PolicySnapshot.uwYear`
+  at registration, so a claim on a renewed period is reported under the original year (claims
+  reports group by it); `currentUwYear()` would be the year of the period covering the loss.
 - **Pro-rata cancellation is 1/365 only**, whatever the product's UPR basis, and applies the
   period ratio to the whole current-period gross (endorsements made mid-term are returned at the
   same ratio); short-period scales and a refund of the policy fee are not supported.

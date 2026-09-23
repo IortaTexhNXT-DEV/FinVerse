@@ -17,7 +17,9 @@ import java.time.LocalDate;
 /**
  * Change to an approved policy: additional or return premium, renewal, cancellation or a
  * non-financial (NIL) amendment. Carries its own premium figures (the change, negative for
- * returns), approval workflow and debit/credit note.
+ * returns), approval workflow and debit/credit note, and the underwriting year of the policy period
+ * it belongs to: a renewal the year its new period starts, any other endorsement the year of the
+ * period in force when it is made (the original issue's, or the latest renewal's).
  */
 @Entity
 @Table(name = "uw_endorsement")
@@ -45,6 +47,9 @@ public class Endorsement extends BaseEntity {
 
   @Column(name = "new_period_to")
   private LocalDate newPeriodTo;
+
+  @Column(name = "uw_year", nullable = false)
+  private int uwYear;
 
   @Column(nullable = false, length = 500)
   private String description;
@@ -86,6 +91,8 @@ public class Endorsement extends BaseEntity {
     this.issueDate = issueDate;
     this.effectiveDate = effectiveDate;
     this.description = description;
+    // Only one endorsement may be open, so the policy header holds the period in force.
+    this.uwYear = UnderwritingRules.underwritingYear(policy.getPeriodFrom());
   }
 
   /**
@@ -106,6 +113,7 @@ public class Endorsement extends BaseEntity {
     }
     this.newPeriodFrom = from;
     this.newPeriodTo = to;
+    this.uwYear = UnderwritingRules.underwritingYear(from);
   }
 
   /**
@@ -212,6 +220,16 @@ public class Endorsement extends BaseEntity {
 
   public LocalDate getNewPeriodTo() {
     return newPeriodTo;
+  }
+
+  /**
+   * Underwriting year of the policy period this endorsement belongs to (for a renewal: the year its
+   * new period starts).
+   *
+   * @return underwriting year
+   */
+  public int getUwYear() {
+    return uwYear;
   }
 
   public String getDescription() {

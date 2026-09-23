@@ -70,7 +70,7 @@ public class DailyProductionReport implements ReportDefinition {
     for (PremiumTransaction t : support.transactions(p, basis, UwReportSupport.APPROVED)) {
       LocalDate date = basis == DateBasis.ISSUE ? t.issueDate() : t.approvalDate();
       Map<String, Object> line = new LinkedHashMap<>();
-      UwReportSupport.putGroups(line, t.policy(), branches);
+      UwReportSupport.putGroups(line, t, branches);
       String key = line.get(K_BRANCH) + "|" + line.get(K_PRODUCT) + "|" + date;
       Map<String, Object> day = days.computeIfAbsent(key, k -> line);
       day.put(DATE, date);

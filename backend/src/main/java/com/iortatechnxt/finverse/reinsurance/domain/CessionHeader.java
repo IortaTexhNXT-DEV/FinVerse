@@ -15,7 +15,7 @@ import java.time.LocalDate;
  * @param kind NEW or the endorsement type
  * @param businessLine line of business
  * @param productCode product code
- * @param uwYear underwriting year of the policy
+ * @param uwYear underwriting year of the transaction (a renewal: the year its new period starts)
  * @param treatyYear underwriting year of the treaty programme applied
  * @param issueDate document issue date
  * @param effectiveDate cover start or endorsement effective date

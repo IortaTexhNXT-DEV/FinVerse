@@ -226,7 +226,8 @@ public class UwReportSupport {
   }
 
   /**
-   * Puts the standard grouping cells (branch, class, product, UW year) of a policy in a row.
+   * Puts the standard grouping cells (branch, class, product, UW year) of a policy in a row; the UW
+   * year is the policy's (original issue).
    *
    * @param row row
    * @param policy policy
@@ -234,10 +235,37 @@ public class UwReportSupport {
    */
   public static void putGroups(
       Map<String, Object> row, PolicySnapshot policy, Map<Long, String> branches) {
+    putGroups(row, policy, policy.uwYear(), branches);
+  }
+
+  /**
+   * Puts the standard grouping cells of a premium transaction in a row; the UW year is the
+   * transaction's own (a renewal and the later endorsements of the renewed period belong to the
+   * year the renewed period starts).
+   *
+   * @param row row
+   * @param transaction premium transaction
+   * @param branches branch codes
+   */
+  public static void putGroups(
+      Map<String, Object> row, PremiumTransaction transaction, Map<Long, String> branches) {
+    putGroups(row, transaction.policy(), transaction.uwYear(), branches);
+  }
+
+  /**
+   * Puts the standard grouping cells of a policy in a row with a given UW year.
+   *
+   * @param row row
+   * @param policy policy
+   * @param uwYear underwriting year to group by
+   * @param branches branch codes
+   */
+  public static void putGroups(
+      Map<String, Object> row, PolicySnapshot policy, int uwYear, Map<Long, String> branches) {
     row.put(K_BRANCH, branches.getOrDefault(policy.branchId(), String.valueOf(policy.branchId())));
     row.put(K_CLASS, policy.businessLine());
     row.put(K_PRODUCT, policy.productCode() + " " + policy.productName());
-    row.put(K_UW_YEAR, String.valueOf(policy.uwYear()));
+    row.put(K_UW_YEAR, String.valueOf(uwYear));
   }
 
   /**

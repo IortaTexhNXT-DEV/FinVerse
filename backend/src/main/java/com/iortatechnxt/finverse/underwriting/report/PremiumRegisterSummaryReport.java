@@ -75,7 +75,7 @@ public class PremiumRegisterSummaryReport implements ReportDefinition {
     Map<String, Map<String, Object>> byProduct = new LinkedHashMap<>();
     for (PremiumTransaction t : txns) {
       Map<String, Object> line = new LinkedHashMap<>();
-      UwReportSupport.putGroups(line, t.policy(), branches);
+      UwReportSupport.putGroups(line, t, branches);
       String key =
           line.get(K_BRANCH)
               + "|"

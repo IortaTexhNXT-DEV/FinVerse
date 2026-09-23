@@ -74,6 +74,8 @@ export default function PaymentEntryPage() {
     },
     onSuccess: async (v) => {
       await queryClient.invalidateQueries({ queryKey: ['vouchers'] });
+      // Open payables of the party: the voucher reserves (and on approval settles) them.
+      await queryClient.invalidateQueries({ queryKey: ['payable-items'] });
       toast.success(`${v.voucherNo} submitted for approval`);
       void navigate('/payables/vouchers');
     },

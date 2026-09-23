@@ -62,6 +62,8 @@ export default function PaymentVouchersPage() {
   const done = async (v: Voucher, message: string) => {
     await queryClient.invalidateQueries({ queryKey: ['vouchers'] });
     await queryClient.invalidateQueries({ queryKey: ['voucher', v.id] });
+    // Approving, rejecting or voiding a voucher changes what New Payment may still pay.
+    await queryClient.invalidateQueries({ queryKey: ['payable-items'] });
     setAction(null);
     toast.success(`${v.voucherNo} ${message}`);
   };

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Save } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -67,6 +67,7 @@ const RESET_ALLOCATIONS: (keyof ReceiptForm)[] = ['payerType', 'partyCode', 'ban
 export default function ReceiptEntryPage() {
   const navigate = useNavigate();
   const toast = useToast();
+  const queryClient = useQueryClient();
   const { companyId, branchId, bankAccounts } = useReceivablesLookups();
   const [form, setForm] = useState<ReceiptForm>(emptyReceiptForm);
   const [allocations, setAllocations] = useState<Record<number, number>>({});
@@ -107,6 +108,9 @@ export default function ReceiptEntryPage() {
       };
     },
     onSuccess: async (result) => {
+      await queryClient.invalidateQueries({ queryKey: ['receipts'] });
+      // Allocated debit notes are no longer (fully) open for the next receipt.
+      await queryClient.invalidateQueries({ queryKey: ['open-items'] });
       toast.success(`${result.label} saved`);
       await navigate(result.path);
     },

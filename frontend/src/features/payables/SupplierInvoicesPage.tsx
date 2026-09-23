@@ -51,6 +51,8 @@ export default function SupplierInvoicesPage() {
   const done = async (i: Invoice, message: string) => {
     await queryClient.invalidateQueries({ queryKey: ['invoices'] });
     await queryClient.invalidateQueries({ queryKey: ['invoice', i.id] });
+    // An approved (or cancelled) invoice opens (or closes) a payable offered by New Payment.
+    await queryClient.invalidateQueries({ queryKey: ['payable-items'] });
     setAction(null);
     toast.success(`${i.documentNo} ${message}`);
   };

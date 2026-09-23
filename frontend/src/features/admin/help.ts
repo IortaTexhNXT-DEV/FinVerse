@@ -30,7 +30,7 @@ export const ADMIN_HELP: HelpSection = {
       summary:
         'Every financial and non-financial action with the time, user, action, record and details, filtered by date range, user and entity type.',
       controls: [
-        'The audit trail is insert-only: entries cannot be changed or deleted from the application.',
+        'The audit trail is insert-only: entries cannot be changed or deleted, neither from the application nor directly in the database (database triggers reject every change or deletion).',
         'An entry is written in the same transaction as the change it describes.',
       ],
     },

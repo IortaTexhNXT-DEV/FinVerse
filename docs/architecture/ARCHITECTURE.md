@@ -18,7 +18,7 @@
 |---|---|
 | `common` | Base entities, maker-checker, errors, money, sequences, current user |
 | `security` | Users, roles, permissions, JWT, lockout, bootstrap |
-| `audit` | Insert-only audit trail |
+| `audit` | Insert-only audit trail (UPDATE, DELETE and TRUNCATE rejected by database triggers, V26) |
 | `organization` | Companies, branches (Office Master), holiday calendars |
 | `currency` | Currencies, rate types, exchange rates, conversion |
 | `coa` | Multi-tier chart of accounts, GL categories, posting controls |

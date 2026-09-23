@@ -17,6 +17,7 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 /**
  * Translates exceptions into RFC 7807 problem responses.
@@ -104,6 +105,18 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(IllegalArgumentException.class)
   public ProblemDetail handleIllegalArgument(IllegalArgumentException ex) {
     return problem(HttpStatus.BAD_REQUEST, "BAD_REQUEST", ex.getMessage());
+  }
+
+  /**
+   * Handles uploads above the multipart limit (the attachment service applies the business limit).
+   *
+   * @param ex exception
+   * @return problem detail (413)
+   */
+  @ExceptionHandler(MaxUploadSizeExceededException.class)
+  public ProblemDetail handleUploadTooLarge(MaxUploadSizeExceededException ex) {
+    return problem(
+        HttpStatus.PAYLOAD_TOO_LARGE, "UPLOAD_TOO_LARGE", "The uploaded file is too large");
   }
 
   /**

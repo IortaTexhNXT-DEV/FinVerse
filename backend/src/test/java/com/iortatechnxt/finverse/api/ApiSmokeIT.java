@@ -51,6 +51,23 @@ class ApiSmokeIT {
         "/api/v1/accounting/event-types",
         "/api/v1/accounting/rules?companyId={c}",
         "/api/v1/accounting/events?companyId={c}&from=2026-01-01&to=2026-12-31",
+        "/api/v1/approvals/inbox",
+        "/api/v1/approvals/inbox?companyId={c}",
+        "/api/v1/approvals/counts",
+        "/api/v1/attachments?entityType=JournalBatch&entityId=1",
+        "/api/v1/attachments/policy",
+        "/api/v1/journals/recurring?companyId={c}",
+        "/api/v1/alerts",
+        "/api/v1/alerts?status=OPEN&severity=HIGH&companyId={c}&from=2026-01-01&to=2026-12-31",
+        "/api/v1/alerts/summary",
+        "/api/v1/alerts/exception-codes",
+        "/api/v1/system/parameters",
+        "/api/v1/system/configuration",
+        "/api/v1/system/info",
+        "/api/v1/system/about",
+        "/api/v1/system/session-policy",
+        "/api/v1/system/jobs",
+        "/api/v1/system/jobs/runs",
       })
   @WithUserDetails("fmanager")
   void readEndpointsRespondOk(String url) throws Exception {

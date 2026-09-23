@@ -51,5 +51,12 @@ public enum Permission {
   // Reporting
   REPORT_VIEW,
   REPORT_FINANCIAL,
-  DASHBOARD_VIEW
+  DASHBOARD_VIEW,
+
+  // Platform features: document attachments, alerts, system monitoring
+  ATTACHMENT_VIEW,
+  ATTACHMENT_MANAGE,
+  ALERT_VIEW,
+  ALERT_MANAGE,
+  SYSTEM_MONITOR
 }

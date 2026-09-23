@@ -33,6 +33,11 @@ spring:
   threads:
     virtual:
       enabled: true
+  servlet:
+    multipart:
+      # Must be >= finverse.attachments.max-size (the service applies the business limit).
+      max-file-size: ${FINVERSE_UPLOAD_MAX_FILE_SIZE:20MB}
+      max-request-size: ${FINVERSE_UPLOAD_MAX_REQUEST_SIZE:21MB}
 
 server:
   port: ${FINVERSE_PORT:8080}
@@ -49,6 +54,12 @@ finverse:
     jwt-secret: ${FINVERSE_JWT_SECRET:local-development-secret-change-me-0123456789}
     token-validity: ${FINVERSE_TOKEN_VALIDITY:PT8H}
     allowed-origins: ${FINVERSE_ALLOWED_ORIGINS:http://localhost:5173}
+  attachments:
+    max-size: ${FINVERSE_ATTACHMENT_MAX_SIZE:10MB}
+  jobs:
+    # Spring cron (sec min hour day month weekday), UTC; "-" disables the schedule.
+    recurring-journals-cron: ${FINVERSE_JOB_RECURRING_CRON:0 0 1 * * *}
+    alert-checks-cron: ${FINVERSE_JOB_ALERTS_CRON:0 30 1 * * *}
 
 management:
   endpoints:

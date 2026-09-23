@@ -17,6 +17,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ public class PostingService {
   private final AuditTrailService audit;
   private final Clock clock;
   private final Counter postedCounter;
+  private final List<JournalPostingListener> listeners;
 
   /**
    * Creates the engine.
@@ -46,6 +48,7 @@ public class PostingService {
    * @param audit audit trail
    * @param clock clock
    * @param meters metrics registry
+   * @param listeners post-posting listeners (alert rules)
    */
   public PostingService(
       PeriodService periods,
@@ -53,7 +56,8 @@ public class PostingService {
       LedgerBalanceStore balances,
       AuditTrailService audit,
       Clock clock,
-      MeterRegistry meters) {
+      MeterRegistry meters,
+      List<JournalPostingListener> listeners) {
     this.periods = periods;
     this.ledger = ledger;
     this.balances = balances;
@@ -63,6 +67,7 @@ public class PostingService {
         Counter.builder("finverse.journals.posted")
             .description("Journal batches posted to the general ledger")
             .register(meters);
+    this.listeners = List.copyOf(listeners);
   }
 
   /**
@@ -89,6 +94,7 @@ public class PostingService {
         batch.getBatchNo(),
         AuditAction.POST,
         "Posted " + batch.getJournalType() + " journal, total " + batch.getTotalDebit());
+    listeners.forEach(l -> l.onPosted(batch));
   }
 
   private static LedgerEntryValues toEntry(

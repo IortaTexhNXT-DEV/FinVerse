@@ -51,6 +51,12 @@ class ApiSmokeIT {
         "/api/v1/accounting/event-types",
         "/api/v1/accounting/rules?companyId={c}",
         "/api/v1/accounting/events?companyId={c}&from=2026-01-01&to=2026-12-31",
+        "/api/v1/underwriting/products?companyId={c}",
+        "/api/v1/underwriting/policies?companyId={c}",
+        "/api/v1/underwriting/policies?companyId={c}&status=APPROVED&q=P-&fromDate=2026-01-01",
+        "/api/v1/underwriting/quotations?companyId={c}",
+        "/api/v1/underwriting/quotations?companyId={c}&status=PENDING_APPROVAL",
+        "/api/v1/underwriting/open-covers?companyId={c}",
       })
   @WithUserDetails("fmanager")
   void readEndpointsRespondOk(String url) throws Exception {

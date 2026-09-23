@@ -47,6 +47,12 @@ public class Quotation extends BaseEntity {
   @Column(name = "quotation_no", nullable = false, length = 40)
   private String quotationNo;
 
+  @Column(name = "issue_date", nullable = false)
+  private LocalDate issueDate;
+
+  @Column(name = "validity_days", nullable = false)
+  private int validityDays;
+
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "product_id")
   private Product product;
@@ -65,12 +71,6 @@ public class Quotation extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "intermediary_party_id")
   private Party intermediary;
-
-  @Column(name = "issue_date", nullable = false)
-  private LocalDate issueDate;
-
-  @Column(name = "validity_days", nullable = false)
-  private int validityDays;
 
   @Column(name = "period_from", nullable = false)
   private LocalDate periodFrom;

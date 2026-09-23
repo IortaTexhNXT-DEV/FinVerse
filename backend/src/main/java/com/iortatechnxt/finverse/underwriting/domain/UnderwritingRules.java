@@ -5,6 +5,7 @@ import com.iortatechnxt.finverse.party.domain.Party;
 import com.iortatechnxt.finverse.party.domain.PartyType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Optional;
 
 /** Validation rules shared by quotations, policies and open covers. */
@@ -13,6 +14,27 @@ public final class UnderwritingRules {
   private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
 
   private UnderwritingRules() {}
+
+  /**
+   * Checks that a policy has at least one risk.
+   *
+   * @param risks risks
+   */
+  public static void requireRisks(Collection<?> risks) {
+    if (risks.isEmpty()) {
+      throw new BusinessRuleException("RISK_REQUIRED", "A policy needs at least one risk");
+    }
+  }
+
+  /**
+   * Underwriting year of a policy: the year its cover starts.
+   *
+   * @param periodFrom cover start
+   * @return year
+   */
+  public static int underwritingYear(LocalDate periodFrom) {
+    return periodFrom.getYear();
+  }
 
   /**
    * Checks the cover period.
@@ -61,19 +83,44 @@ public final class UnderwritingRules {
     if (sharePct == null || sharePct.signum() <= 0 || sharePct.compareTo(HUNDRED) > 0) {
       throw new BusinessRuleException("INVALID_SHARE", "Share % must be above 0 and at most 100");
     }
-    boolean coinsured = businessType == BusinessType.DIRECT_WITH_COINSURANCE;
-    if (!coinsured && (sharePct.compareTo(HUNDRED) != 0 || coinsurer != null)) {
+    if (businessType == BusinessType.DIRECT_WITH_COINSURANCE) {
+      requireCoinsurer(sharePct, coinsurer);
+    } else if (sharePct.compareTo(HUNDRED) != 0 || coinsurer != null) {
       throw new BusinessRuleException(
           "INVALID_SHARE", "Direct business is written at 100 % without coinsurer");
     }
-    if (coinsured && (coinsurer == null || coinsurer.getPartyType() != PartyType.COINSURER)) {
+  }
+
+  private static void requireCoinsurer(BigDecimal sharePct, Party coinsurer) {
+    if (coinsurer == null || coinsurer.getPartyType() != PartyType.COINSURER) {
       throw new BusinessRuleException(
           "COINSURER_REQUIRED", "Coinsured business needs a coinsurer party");
     }
-    if (coinsured && sharePct.compareTo(HUNDRED) == 0) {
+    if (sharePct.compareTo(HUNDRED) == 0) {
       throw new BusinessRuleException(
           "INVALID_SHARE", "Coinsured business must have a share below 100 %");
     }
+  }
+
+  /**
+   * Whether a policy covers a date: approved (or cancelled after the date) and within its period.
+   *
+   * @param status policy status
+   * @param cancelledOn cancellation effective date, null when not cancelled
+   * @param periodFrom period start
+   * @param periodTo period end
+   * @param date date
+   * @return true when in force
+   */
+  public static boolean inForce(
+      PolicyStatus status,
+      LocalDate cancelledOn,
+      LocalDate periodFrom,
+      LocalDate periodTo,
+      LocalDate date) {
+    boolean live =
+        status == PolicyStatus.APPROVED || cancelledOn != null && date.isBefore(cancelledOn);
+    return live && !date.isBefore(periodFrom) && !date.isAfter(periodTo);
   }
 
   /**

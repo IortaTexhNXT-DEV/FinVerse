@@ -4,6 +4,7 @@ import com.iortatechnxt.finverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.finverse.underwriting.domain.EndorsementRepository;
 import com.iortatechnxt.finverse.underwriting.domain.Policy;
 import com.iortatechnxt.finverse.underwriting.domain.PolicyRepository;
+import com.iortatechnxt.finverse.underwriting.domain.PolicyRisk;
 import com.iortatechnxt.finverse.underwriting.domain.PolicyStatus;
 import com.iortatechnxt.finverse.underwriting.domain.UnderwritingSpecifications;
 import java.time.LocalDate;
@@ -11,7 +12,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
  *   <li>{@link #approvedTransactions}: approved policy issues and endorsements in a period with
  *       their premium figures (RI cessions, production statistics);
  *   <li>{@link #policyTransactions}: premium history of one policy;
- *   <li>{@link #transactions}: general selection used by the underwriting registers.
+ *   <li>{@link #transactions}: general selection used by the underwriting registers;
+ *   <li>{@link #policiesExpiring} / {@link #risksInForce}: renewal and accumulation views.
  * </ul>
  */
 @Service
@@ -174,6 +178,36 @@ public class PolicyQueryService {
         .stream()
         .map(PolicySnapshot::of)
         .sorted(Comparator.comparing(PolicySnapshot::policyNo))
+        .toList();
+  }
+
+  /**
+   * Risks in force on a date (approved policies, or cancelled after the date), with the number of
+   * approved endorsements of their policy; used for risk accumulation by zone.
+   *
+   * @param companyId company
+   * @param asOf date
+   * @return exposures ordered by accumulation zone and policy
+   */
+  public List<RiskExposure> risksInForce(Long companyId, LocalDate asOf) {
+    List<PolicyRisk> risks =
+        policies.findRisksCovering(
+            companyId, asOf, EnumSet.of(PolicyStatus.APPROVED, PolicyStatus.CANCELLED));
+    List<Long> ids = risks.stream().map(r -> r.getPolicy().getId()).distinct().toList();
+    Map<Long, Long> endorsed =
+        ids.isEmpty()
+            ? Map.of()
+            : endorsements.findByPolicyIdIn(ids).stream()
+                .filter(e -> e.getStatus() == PolicyStatus.APPROVED)
+                .collect(Collectors.groupingBy(e -> e.getPolicy().getId(), Collectors.counting()));
+    return risks.stream()
+        .filter(r -> r.getPolicy().isInForce(asOf))
+        .map(
+            r ->
+                new RiskExposure(
+                    RiskSnapshot.of(r),
+                    PolicySnapshot.of(r.getPolicy()),
+                    endorsed.getOrDefault(r.getPolicy().getId(), 0L).intValue()))
         .toList();
   }
 

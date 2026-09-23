@@ -106,10 +106,7 @@ public class OpenCover extends AuthorizableEntity {
       throw new BusinessRuleException(
           "OPEN_COVER_NOT_ACTIVE", "Open cover " + openCoverNo + " is not authorized");
     }
-    if (sailDate.isBefore(periodFrom) || sailDate.isAfter(periodTo)) {
-      throw new BusinessRuleException(
-          "OUTSIDE_OPEN_COVER", "Shipment date is outside the open cover period");
-    }
+    requireWithinPeriod(sailDate);
     if (sumInsured.compareTo(limitPerShipment) > 0) {
       throw new BusinessRuleException(
           "SHIPMENT_LIMIT_EXCEEDED",
@@ -118,6 +115,13 @@ public class OpenCover extends AuthorizableEntity {
     if (declaredSoFar.add(sumInsured).compareTo(annualLimit) > 0) {
       throw new BusinessRuleException(
           "ANNUAL_LIMIT_EXCEEDED", "Declarations would exceed the annual limit " + annualLimit);
+    }
+  }
+
+  private void requireWithinPeriod(LocalDate sailDate) {
+    if (sailDate.isBefore(periodFrom) || sailDate.isAfter(periodTo)) {
+      throw new BusinessRuleException(
+          "OUTSIDE_OPEN_COVER", "Shipment date is outside the open cover period");
     }
   }
 

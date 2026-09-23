@@ -1,7 +1,6 @@
 package com.iortatechnxt.finverse.underwriting.domain;
 
 import com.iortatechnxt.finverse.common.domain.BaseEntity;
-import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.finverse.common.util.Money;
 import com.iortatechnxt.finverse.party.domain.Party;
 import jakarta.persistence.CascadeType;
@@ -106,7 +105,7 @@ public class Policy extends BaseEntity {
   @Column(name = "cancelled_on")
   private LocalDate cancelledOn;
 
-  @Embedded private ApprovalWorkflow workflow = new ApprovalWorkflow();
+  @Embedded private final ApprovalWorkflow workflow = new ApprovalWorkflow();
 
   @Embedded private PremiumBreakdown premium = new PremiumBreakdown();
 
@@ -135,16 +134,12 @@ public class Policy extends BaseEntity {
   }
 
   /**
-   * Changes the header terms of a draft.
+   * Changes the header terms of a draft (the product is kept: callers pass the policy's product).
    *
    * @param terms new terms
    */
   public void updateTerms(PolicyTerms terms) {
     workflow.requireEditable(label());
-    if (!terms.product().getId().equals(product.getId())) {
-      throw new BusinessRuleException(
-          "PRODUCT_IMMUTABLE", "The product of a policy cannot be changed");
-    }
     applyTerms(terms);
   }
 
@@ -162,7 +157,7 @@ public class Policy extends BaseEntity {
     this.issueDate = t.issueDate();
     this.periodFrom = t.periodFrom();
     this.periodTo = t.periodTo();
-    this.uwYear = t.periodFrom().getYear();
+    this.uwYear = UnderwritingRules.underwritingYear(t.periodFrom());
     this.currency = t.currency();
     this.businessType = t.businessType();
     this.sharePct = t.sharePct();
@@ -180,9 +175,7 @@ public class Policy extends BaseEntity {
    */
   public void replaceRisks(List<RiskValues> values) {
     workflow.requireEditable(label());
-    if (values.isEmpty()) {
-      throw new BusinessRuleException("RISK_REQUIRED", "A policy needs at least one risk");
-    }
+    UnderwritingRules.requireRisks(values);
     risks.clear();
     int line = 1;
     for (RiskValues v : values) {
@@ -201,33 +194,13 @@ public class Policy extends BaseEntity {
   }
 
   /**
-   * Total sum insured of all risks at 100 %.
-   *
-   * @return sum insured
-   */
-  public BigDecimal totalSumInsured() {
-    return risks.stream().map(PolicyRisk::getSumInsured).reduce(Money.zero(), BigDecimal::add);
-  }
-
-  /**
-   * Total gross premium of all risks at 100 %.
-   *
-   * @return gross premium
-   */
-  public BigDecimal totalRiskPremium() {
-    return risks.stream().map(PolicyRisk::getPremium).reduce(Money.zero(), BigDecimal::add);
-  }
-
-  /**
    * Maker submits the policy.
    *
    * @param user maker
    * @param when timestamp
    */
   public void submit(String user, Instant when) {
-    if (risks.isEmpty()) {
-      throw new BusinessRuleException("RISK_REQUIRED", "A policy needs at least one risk");
-    }
+    UnderwritingRules.requireRisks(risks);
     workflow.submit(label(), user, when);
   }
 
@@ -295,10 +268,7 @@ public class Policy extends BaseEntity {
    * @return true when in force
    */
   public boolean isInForce(LocalDate date) {
-    boolean live =
-        workflow.getStatus() == PolicyStatus.APPROVED
-            || cancelledOn != null && date.isBefore(cancelledOn);
-    return live && !date.isBefore(periodFrom) && !date.isAfter(periodTo);
+    return UnderwritingRules.inForce(workflow.getStatus(), cancelledOn, periodFrom, periodTo, date);
   }
 
   /**

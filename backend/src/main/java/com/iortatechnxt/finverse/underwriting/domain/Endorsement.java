@@ -49,7 +49,7 @@ public class Endorsement extends BaseEntity {
   @Column(nullable = false, length = 500)
   private String description;
 
-  @Embedded private ApprovalWorkflow workflow = new ApprovalWorkflow();
+  @Embedded private final ApprovalWorkflow workflow = new ApprovalWorkflow();
 
   @Embedded private PremiumBreakdown premium = new PremiumBreakdown();
 

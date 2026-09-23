@@ -5,6 +5,7 @@ import com.iortatechnxt.finverse.underwriting.domain.BusinessType;
 import com.iortatechnxt.finverse.underwriting.domain.Policy;
 import com.iortatechnxt.finverse.underwriting.domain.PolicyStatus;
 import com.iortatechnxt.finverse.underwriting.domain.SourceType;
+import com.iortatechnxt.finverse.underwriting.domain.UnderwritingRules;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -111,8 +112,6 @@ public record PolicySnapshot(
    * @return true when in force
    */
   public boolean isInForce(LocalDate date) {
-    boolean live =
-        status == PolicyStatus.APPROVED || cancelledOn != null && date.isBefore(cancelledOn);
-    return live && !date.isBefore(periodFrom) && !date.isAfter(periodTo);
+    return UnderwritingRules.inForce(status, cancelledOn, periodFrom, periodTo, date);
   }
 }

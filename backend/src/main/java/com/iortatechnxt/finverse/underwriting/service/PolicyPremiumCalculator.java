@@ -3,10 +3,13 @@ package com.iortatechnxt.finverse.underwriting.service;
 import com.iortatechnxt.finverse.common.util.Money;
 import com.iortatechnxt.finverse.party.domain.Party;
 import com.iortatechnxt.finverse.underwriting.domain.Policy;
+import com.iortatechnxt.finverse.underwriting.domain.PolicyRisk;
 import com.iortatechnxt.finverse.underwriting.domain.PremiumBreakdown;
 import com.iortatechnxt.finverse.underwriting.domain.PremiumInput;
 import com.iortatechnxt.finverse.underwriting.domain.Product;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.function.Function;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,8 +51,8 @@ public class PolicyPremiumCalculator {
     Party intermediary = policy.getIntermediary();
     return PremiumBreakdown.calculate(
         new PremiumInput(
-            policy.totalSumInsured(),
-            policy.totalRiskPremium(),
+            sum(policy.getRisks(), PolicyRisk::getSumInsured),
+            sum(policy.getRisks(), PolicyRisk::getPremium),
             policy.getDiscountRate(),
             policy.getLoadingRate(),
             policy.getSharePct(),
@@ -60,6 +63,10 @@ public class PolicyPremiumCalculator {
             intermediary == null
                 ? BigDecimal.ZERO
                 : Money.nz(intermediary.getWithholdingTaxRate())));
+  }
+
+  private static BigDecimal sum(List<PolicyRisk> risks, Function<PolicyRisk, BigDecimal> amount) {
+    return risks.stream().map(amount).reduce(Money.zero(), BigDecimal::add);
   }
 
   /**

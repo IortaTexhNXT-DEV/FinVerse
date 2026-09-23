@@ -7,6 +7,7 @@ import { glModule } from '@/features/gl/module';
 import { helpModule } from '@/features/help/module';
 import { withJournalAutomation } from '@/features/journaltools/module';
 import { payablesModule } from '@/features/payables/module';
+import { receivablesModule } from '@/features/receivables/module';
 import { reportsModule } from '@/features/reports/module';
 import { setupModule } from '@/features/setup/module';
 import { underwritingModule } from '@/features/underwriting/module';
@@ -25,6 +26,7 @@ export const MODULES: FeatureModule[] = [
   accountingEngineModule,
   payablesModule,
   assetsModule,
+  receivablesModule,
   reportsModule,
   setupModule,
   adminModule,

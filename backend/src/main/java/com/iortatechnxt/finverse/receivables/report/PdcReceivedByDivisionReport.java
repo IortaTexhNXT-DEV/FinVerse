@@ -1,0 +1,29 @@
+package com.iortatechnxt.finverse.receivables.report;
+
+import com.iortatechnxt.finverse.organization.service.OrganizationService;
+import com.iortatechnxt.finverse.receivables.service.PdcQueries;
+import org.springframework.stereotype.Component;
+
+/**
+ * FIN-PDC-RCV-PERIOD-DDB (Src FR2582) PDC Received during the Period by Division/Department and
+ * Bank.
+ */
+@Component
+public class PdcReceivedByDivisionReport extends AbstractPdcReceivedReport {
+
+  /**
+   * Creates the report.
+   *
+   * @param pdcs PDC register
+   * @param organization organization service
+   */
+  public PdcReceivedByDivisionReport(PdcQueries pdcs, OrganizationService organization) {
+    super(
+        pdcs,
+        organization,
+        "FIN-PDC-RCV-PERIOD-DDB",
+        "PDC Received during the Period by Division/Department and Bank",
+        Selection.PERIOD,
+        true);
+  }
+}

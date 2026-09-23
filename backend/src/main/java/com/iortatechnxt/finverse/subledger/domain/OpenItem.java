@@ -128,6 +128,32 @@ public class OpenItem extends BaseEntity {
         outstanding().signum() == 0 ? OpenItemStatus.SETTLED : OpenItemStatus.PARTIALLY_SETTLED;
   }
 
+  /**
+   * Reverses (part of) a settlement when a match is undone, e.g. a cancelled receipt or a bounced
+   * cheque. The item becomes OPEN again when nothing remains settled.
+   *
+   * @param value amount to release (positive, not exceeding the settled amount)
+   */
+  public void unsettle(BigDecimal value) {
+    if (status == OpenItemStatus.WRITTEN_OFF) {
+      throw new BusinessRuleException(
+          "ITEM_WRITTEN_OFF",
+          "Open item " + documentNo + " is written off and cannot be unmatched");
+    }
+    if (value.signum() <= 0 || value.compareTo(settledAmount) > 0) {
+      throw new BusinessRuleException(
+          "INVALID_SETTLEMENT",
+          "Cannot release "
+              + value
+              + " from settled amount "
+              + settledAmount
+              + " of "
+              + documentNo);
+    }
+    settledAmount = settledAmount.subtract(value);
+    status = settledAmount.signum() == 0 ? OpenItemStatus.OPEN : OpenItemStatus.PARTIALLY_SETTLED;
+  }
+
   /** Writes off the remaining balance (e.g. small differences, bad debts after approval). */
   public void writeOff() {
     status = OpenItemStatus.WRITTEN_OFF;

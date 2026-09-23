@@ -1,6 +1,7 @@
 package com.iortatechnxt.finverse.api;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,7 +36,8 @@ class AdminScreensApiIT {
   @Autowired private ObjectMapper json;
 
   private RequestPostProcessor as(String username) {
-    return user(users.loadUserByUsername(username));
+    RequestPostProcessor principal = user(users.loadUserByUsername(username));
+    return request -> csrf().postProcessRequest(principal.postProcessRequest(request));
   }
 
   private String partyJson(String code, String name) {

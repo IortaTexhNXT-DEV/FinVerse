@@ -19,7 +19,8 @@ import java.math.BigDecimal;
  * @param usefulLifeMonths useful life
  * @param residualPercent residual %
  * @param recordStatus maker-checker status
- * @param createdBy maker
+ * @param createdBy creator
+ * @param maker user who created or last maintained the record (unchanged by authorization)
  * @param authorizedBy checker
  */
 public record AssetCategoryResponse(
@@ -35,6 +36,7 @@ public record AssetCategoryResponse(
     BigDecimal residualPercent,
     RecordStatus recordStatus,
     String createdBy,
+    String maker,
     String authorizedBy) {
 
   /**
@@ -57,6 +59,7 @@ public record AssetCategoryResponse(
         c.getResidualPercent(),
         c.getRecordStatus(),
         c.getCreatedBy(),
+        c.getMaker(),
         c.getAuthorizedBy());
   }
 }

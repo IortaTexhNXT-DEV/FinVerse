@@ -73,10 +73,15 @@ class AdminScreensApiIT {
         .andExpect(jsonPath("$.name").value("Test Supplier Renamed"));
     mvc.perform(post("/api/v1/parties/" + id + "/authorize").with(as("checker")))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.recordStatus").value("ACTIVE"));
+        .andExpect(jsonPath("$.recordStatus").value("ACTIVE"))
+        .andExpect(jsonPath("$.maker").value("accountant"))
+        .andExpect(jsonPath("$.authorizedBy").value("checker"));
+    // The authorization does not replace the maker (D-RSV-1).
     mvc.perform(get("/api/v1/parties/" + id).with(as("checker")))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.code").value(code));
+        .andExpect(jsonPath("$.code").value(code))
+        .andExpect(jsonPath("$.maker").value("accountant"))
+        .andExpect(jsonPath("$.authorizedBy").value("checker"));
     mvc.perform(
             post("/api/v1/parties")
                 .with(as("accountant"))

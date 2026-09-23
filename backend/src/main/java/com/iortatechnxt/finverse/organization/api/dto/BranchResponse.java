@@ -21,7 +21,8 @@ import java.time.LocalDate;
  * @param managerName manager
  * @param weeklyHolidays weekly holidays
  * @param recordStatus maker-checker status
- * @param createdBy maker
+ * @param createdBy creator
+ * @param maker user who created or last maintained the record (unchanged by authorization)
  * @param authorizedBy checker
  */
 public record BranchResponse(
@@ -40,6 +41,7 @@ public record BranchResponse(
     String weeklyHolidays,
     RecordStatus recordStatus,
     String createdBy,
+    String maker,
     String authorizedBy) {
 
   /**
@@ -65,6 +67,7 @@ public record BranchResponse(
         b.getWeeklyHolidays(),
         b.getRecordStatus(),
         b.getCreatedBy(),
+        b.getMaker(),
         b.getAuthorizedBy());
   }
 }

@@ -65,6 +65,6 @@ public record IcLineResponse(
         i.getMeasure(),
         i.getRbcFactor(),
         i.getRecordStatus(),
-        i.getUpdatedBy() == null ? i.getCreatedBy() : i.getUpdatedBy());
+        i.getMaker());
   }
 }

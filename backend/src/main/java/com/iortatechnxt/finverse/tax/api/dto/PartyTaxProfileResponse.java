@@ -66,6 +66,6 @@ public record PartyTaxProfileResponse(
         p.getVatTreatment(),
         p.getDefaultAtcCode(),
         p.getRecordStatus(),
-        p.getUpdatedBy() == null ? p.getCreatedBy() : p.getUpdatedBy());
+        p.getMaker());
   }
 }

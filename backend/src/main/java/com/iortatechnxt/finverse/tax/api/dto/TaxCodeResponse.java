@@ -64,7 +64,7 @@ public record TaxCodeResponse(
         c.getEffectiveFrom(),
         c.getEffectiveTo(),
         c.getRecordStatus(),
-        c.getUpdatedBy() == null ? c.getCreatedBy() : c.getUpdatedBy(),
+        c.getMaker(),
         c.getAuthorizedBy());
   }
 }

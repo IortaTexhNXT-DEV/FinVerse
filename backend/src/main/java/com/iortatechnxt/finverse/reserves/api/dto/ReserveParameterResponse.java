@@ -75,7 +75,7 @@ public record ReserveParameterResponse(
         t.facCommissionPct(),
         t.remarks(),
         p.getRecordStatus().name(),
-        p.getUpdatedBy() != null ? p.getUpdatedBy() : p.getCreatedBy(),
+        p.getMaker(),
         p.getAuthorizedBy(),
         p.getAuthorizedAt());
   }

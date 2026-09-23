@@ -26,7 +26,8 @@ import java.math.BigDecimal;
  * @param bankAccountNo bank account
  * @param branchId servicing branch
  * @param recordStatus maker-checker status
- * @param createdBy maker
+ * @param createdBy creator
+ * @param maker user who created or last maintained the record (unchanged by authorization)
  * @param authorizedBy checker
  */
 public record PartyResponse(
@@ -49,6 +50,7 @@ public record PartyResponse(
     Long branchId,
     RecordStatus recordStatus,
     String createdBy,
+    String maker,
     String authorizedBy) {
 
   /**
@@ -78,6 +80,7 @@ public record PartyResponse(
         p.getBranchId(),
         p.getRecordStatus(),
         p.getCreatedBy(),
+        p.getMaker(),
         p.getAuthorizedBy());
   }
 }

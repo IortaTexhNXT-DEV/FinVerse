@@ -59,10 +59,13 @@ class ReservesApiIT {
         .andExpect(status().isForbidden());
     api.doPost("checker", BASE + "/parameters/" + paramId + "/authorize", null)
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.recordStatus").value("ACTIVE"));
+        .andExpect(jsonPath("$.recordStatus").value("ACTIVE"))
+        .andExpect(jsonPath("$.maker").value("accountant"));
     api.doPut("accountant", BASE + "/parameters/" + paramId, parameterBody("MOTOR"))
         .andExpect(status().isUnprocessableEntity());
-    api.doGet("accountant", BASE + "/parameters" + c).andExpect(status().isOk());
+    api.doGet("accountant", BASE + "/parameters" + c)
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[?(@.id == " + paramId + ")].maker").value("accountant"));
 
     api.doPut(
             "accountant",

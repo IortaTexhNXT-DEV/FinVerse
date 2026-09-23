@@ -47,7 +47,7 @@ public record TakafulSettingResponse(
         t.taxPct(),
         t.costCenter(),
         s.getRecordStatus().name(),
-        s.getUpdatedBy() != null ? s.getUpdatedBy() : s.getCreatedBy(),
+        s.getMaker(),
         s.getAuthorizedBy());
   }
 

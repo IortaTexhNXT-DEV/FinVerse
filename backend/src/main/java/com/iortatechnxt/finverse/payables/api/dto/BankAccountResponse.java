@@ -20,7 +20,8 @@ import com.iortatechnxt.finverse.payables.domain.NotificationFormat;
  * @param branchId branch
  * @param notificationFormat notification layout
  * @param recordStatus maker-checker status
- * @param createdBy maker
+ * @param createdBy creator
+ * @param maker user who created or last maintained the record (unchanged by authorization)
  * @param authorizedBy checker
  */
 public record BankAccountResponse(
@@ -38,6 +39,7 @@ public record BankAccountResponse(
     NotificationFormat notificationFormat,
     RecordStatus recordStatus,
     String createdBy,
+    String maker,
     String authorizedBy) {
 
   /**
@@ -62,6 +64,7 @@ public record BankAccountResponse(
         a.getNotificationFormat(),
         a.getRecordStatus(),
         a.getCreatedBy(),
+        a.getMaker(),
         a.getAuthorizedBy());
   }
 }

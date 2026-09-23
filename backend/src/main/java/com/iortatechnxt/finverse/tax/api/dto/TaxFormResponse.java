@@ -65,6 +65,6 @@ public record TaxFormResponse(
         f.isTrackFiling(),
         f.getEffectiveFrom(),
         f.getRecordStatus(),
-        f.getUpdatedBy() == null ? f.getCreatedBy() : f.getUpdatedBy());
+        f.getMaker());
   }
 }

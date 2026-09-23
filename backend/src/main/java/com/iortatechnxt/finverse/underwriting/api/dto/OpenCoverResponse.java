@@ -25,7 +25,8 @@ import java.time.LocalDate;
  * @param rate premium rate %
  * @param cargoDescription goods covered
  * @param recordStatus maker-checker status
- * @param createdBy maker
+ * @param createdBy creator
+ * @param maker user who created or last maintained the record (unchanged by authorization)
  * @param authorizedBy checker
  */
 public record OpenCoverResponse(
@@ -47,6 +48,7 @@ public record OpenCoverResponse(
     String cargoDescription,
     RecordStatus recordStatus,
     String createdBy,
+    String maker,
     String authorizedBy) {
 
   /**
@@ -75,6 +77,7 @@ public record OpenCoverResponse(
         c.getCargoDescription(),
         c.getRecordStatus(),
         c.getCreatedBy(),
+        c.getMaker(),
         c.getAuthorizedBy());
   }
 }

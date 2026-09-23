@@ -18,7 +18,8 @@ import com.iortatechnxt.finverse.investment.domain.InvestmentPortfolio;
  * @param realizedGainAccount realized gain / loss account
  * @param fairValueAccount fair value account
  * @param recordStatus maker-checker status
- * @param createdBy maker
+ * @param createdBy creator
+ * @param maker user who created or last maintained the record (unchanged by authorization)
  * @param authorizedBy checker
  */
 public record PortfolioResponse(
@@ -34,6 +35,7 @@ public record PortfolioResponse(
     String fairValueAccount,
     RecordStatus recordStatus,
     String createdBy,
+    String maker,
     String authorizedBy) {
 
   /**
@@ -56,6 +58,7 @@ public record PortfolioResponse(
         p.getFairValueAccount(),
         p.getRecordStatus(),
         p.getCreatedBy(),
+        p.getMaker(),
         p.getAuthorizedBy());
   }
 }

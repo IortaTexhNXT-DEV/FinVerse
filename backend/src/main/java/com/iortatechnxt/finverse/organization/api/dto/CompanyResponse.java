@@ -17,7 +17,8 @@ import com.iortatechnxt.finverse.organization.domain.Company;
  * @param forwardValueDays forward value days
  * @param retainedEarningsAccount retained earnings account code
  * @param recordStatus maker-checker status
- * @param createdBy maker
+ * @param createdBy creator
+ * @param maker user who created or last maintained the record (unchanged by authorization)
  * @param authorizedBy checker
  */
 public record CompanyResponse(
@@ -33,6 +34,7 @@ public record CompanyResponse(
     String retainedEarningsAccount,
     RecordStatus recordStatus,
     String createdBy,
+    String maker,
     String authorizedBy) {
 
   /**
@@ -55,6 +57,7 @@ public record CompanyResponse(
         c.getRetainedEarningsAccount(),
         c.getRecordStatus(),
         c.getCreatedBy(),
+        c.getMaker(),
         c.getAuthorizedBy());
   }
 }

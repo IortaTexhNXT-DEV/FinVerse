@@ -39,7 +39,8 @@ import java.util.Set;
  * @param allowedBranchIds allowed branches
  * @param allowedRoleCodes access codes
  * @param recordStatus maker-checker status
- * @param createdBy maker
+ * @param createdBy creator
+ * @param maker user who created or last maintained the record (unchanged by authorization)
  * @param authorizedBy checker
  */
 public record GlAccountResponse(
@@ -72,6 +73,7 @@ public record GlAccountResponse(
     Set<String> allowedRoleCodes,
     RecordStatus recordStatus,
     String createdBy,
+    String maker,
     String authorizedBy) {
 
   /**
@@ -111,6 +113,7 @@ public record GlAccountResponse(
         a.getAllowedRoleCodes(),
         a.getRecordStatus(),
         a.getCreatedBy(),
+        a.getMaker(),
         a.getAuthorizedBy());
   }
 }

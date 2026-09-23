@@ -38,7 +38,8 @@ import java.time.LocalDate;
  * @param capitalizationBatchNo capitalization journal
  * @param disposalDate disposal date
  * @param recordStatus maker-checker status
- * @param createdBy maker
+ * @param createdBy creator
+ * @param maker user who created or last maintained the record (unchanged by authorization)
  * @param authorizedBy checker
  */
 public record FixedAssetResponse(
@@ -71,6 +72,7 @@ public record FixedAssetResponse(
     LocalDate disposalDate,
     RecordStatus recordStatus,
     String createdBy,
+    String maker,
     String authorizedBy) {
 
   /**
@@ -110,6 +112,7 @@ public record FixedAssetResponse(
         a.getDisposalDate(),
         a.getRecordStatus(),
         a.getCreatedBy(),
+        a.getMaker(),
         a.getAuthorizedBy());
   }
 }

@@ -54,7 +54,8 @@ import java.time.LocalDate;
  * @param closedDate maturity / sale date
  * @param purchaseBatchNo purchase journal
  * @param recordStatus maker-checker status
- * @param createdBy maker
+ * @param createdBy creator
+ * @param maker user who created or last maintained the record (unchanged by authorization)
  * @param authorizedBy checker
  */
 public record HoldingResponse(
@@ -98,6 +99,7 @@ public record HoldingResponse(
     String purchaseBatchNo,
     RecordStatus recordStatus,
     String createdBy,
+    String maker,
     String authorizedBy) {
 
   /**
@@ -149,6 +151,7 @@ public record HoldingResponse(
         h.getPurchaseBatchNo(),
         h.getRecordStatus(),
         h.getCreatedBy(),
+        h.getMaker(),
         h.getAuthorizedBy());
   }
 }

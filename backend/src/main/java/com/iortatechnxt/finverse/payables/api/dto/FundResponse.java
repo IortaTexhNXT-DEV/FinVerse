@@ -22,7 +22,8 @@ import java.time.LocalDate;
  * @param pendingReimbursement vouchers paid and not yet reimbursed (imprest - cash)
  * @param establishedOn establishment date
  * @param recordStatus maker-checker status
- * @param createdBy maker
+ * @param createdBy creator
+ * @param maker user who created or last maintained the record (unchanged by authorization)
  * @param authorizedBy checker
  */
 public record FundResponse(
@@ -41,6 +42,7 @@ public record FundResponse(
     LocalDate establishedOn,
     RecordStatus recordStatus,
     String createdBy,
+    String maker,
     String authorizedBy) {
 
   /**
@@ -68,6 +70,7 @@ public record FundResponse(
         f.getEstablishedOn(),
         f.getRecordStatus(),
         f.getCreatedBy(),
+        f.getMaker(),
         f.getAuthorizedBy());
   }
 }

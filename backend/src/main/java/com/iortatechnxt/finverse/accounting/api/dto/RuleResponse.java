@@ -19,7 +19,8 @@ import java.util.List;
  * @param effectiveTo effective to
  * @param lines lines
  * @param recordStatus maker-checker status
- * @param createdBy maker
+ * @param createdBy creator
+ * @param maker user who created or last maintained the record (unchanged by authorization)
  * @param authorizedBy checker
  */
 public record RuleResponse(
@@ -35,6 +36,7 @@ public record RuleResponse(
     List<RuleLineDto> lines,
     RecordStatus recordStatus,
     String createdBy,
+    String maker,
     String authorizedBy) {
 
   /**
@@ -57,6 +59,7 @@ public record RuleResponse(
         r.getLines().stream().map(RuleLineDto::from).toList(),
         r.getRecordStatus(),
         r.getCreatedBy(),
+        r.getMaker(),
         r.getAuthorizedBy());
   }
 }

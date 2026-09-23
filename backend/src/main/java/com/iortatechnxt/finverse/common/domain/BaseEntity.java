@@ -69,4 +69,15 @@ public abstract class BaseEntity {
   public String getUpdatedBy() {
     return updatedBy;
   }
+
+  /**
+   * Sets the last modifier after auditing has run (JPA calls entity callbacks after the auditing
+   * listener). Only for a subclass whose change must not replace it, see {@link
+   * AuthorizableEntity}.
+   *
+   * @param username user to keep as last modifier
+   */
+  protected void keepLastModifiedBy(String username) {
+    this.updatedBy = username;
+  }
 }

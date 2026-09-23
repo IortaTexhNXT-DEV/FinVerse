@@ -6,6 +6,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.finverse.support.AsUser;
 import com.iortatechnxt.finverse.support.IntegrationTest;
+import com.iortatechnxt.finverse.system.domain.JobRun;
+import com.iortatechnxt.finverse.system.domain.JobRunStatus;
+import com.iortatechnxt.finverse.system.domain.JobTrigger;
+import com.iortatechnxt.finverse.system.service.JobOutcome;
+import com.iortatechnxt.finverse.system.service.JobRunService;
 import com.iortatechnxt.finverse.underwriting.api.dto.CertificateRequest;
 import com.iortatechnxt.finverse.underwriting.api.dto.ConvertQuotationRequest;
 import com.iortatechnxt.finverse.underwriting.api.dto.IterationRequest;
@@ -23,6 +28,7 @@ import com.iortatechnxt.finverse.underwriting.domain.SourceType;
 import com.iortatechnxt.finverse.underwriting.service.OpenCoverService;
 import com.iortatechnxt.finverse.underwriting.service.PolicyApprovalService;
 import com.iortatechnxt.finverse.underwriting.service.PolicyService;
+import com.iortatechnxt.finverse.underwriting.service.QuotationExpiryJob;
 import com.iortatechnxt.finverse.underwriting.service.QuotationService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -39,6 +45,8 @@ class QuotationAndOpenCoverIT {
   @Autowired private OpenCoverService openCovers;
   @Autowired private PolicyService policies;
   @Autowired private PolicyApprovalService approvals;
+  @Autowired private QuotationExpiryJob expiryJob;
+  @Autowired private JobRunService jobRuns;
   @Autowired private AsUser as;
 
   private QuotationRequest quotationRequest(Product product, String share, int validity) {
@@ -135,6 +143,31 @@ class QuotationAndOpenCoverIT {
                         quotations.convert(
                             open.getId(), new ConvertQuotationRequest(null, null, false, "x"))))
         .isInstanceOf(BusinessRuleException.class);
+  }
+
+  @Test
+  void expiryJobAndManualRunExpireLapsedQuotations() {
+    Product motor = fx.product("MOTOR", false);
+    Quotation scheduled = as.run("uw", () -> quotations.create(quotationRequest(motor, "100", 7)));
+    LocalDate lapsed = ISSUED.plusDays(8);
+
+    JobOutcome outcome = expiryJob.execute(lapsed);
+    assertThat(outcome.itemsProcessed()).isPositive();
+    assertThat(outcome.message()).contains("expired as of " + lapsed).contains("FVI: ");
+    assertThat(quotations.get(scheduled.getId()).getStatus()).isEqualTo(QuotationStatus.EXPIRED);
+    assertThat(expiryJob.name()).isEqualTo(QuotationExpiryJob.JOB_NAME);
+    assertThat(expiryJob.cron()).isEqualTo("0 45 0 * * *");
+
+    Quotation manual = as.run("uw", () -> quotations.create(quotationRequest(motor, "100", 7)));
+    as.run("uw", () -> quotations.submit(manual.getId()));
+    int expired = as.run("uw", () -> expiryJob.runFor(fx.companyId(), lapsed));
+    assertThat(expired).isPositive();
+    assertThat(quotations.get(manual.getId()).getStatus()).isEqualTo(QuotationStatus.EXPIRED);
+    JobRun run = jobRuns.latest(QuotationExpiryJob.JOB_NAME).orElseThrow();
+    assertThat(run.getTrigger()).isEqualTo(JobTrigger.MANUAL);
+    assertThat(run.getTriggeredBy()).isEqualTo("uw");
+    assertThat(run.getStatus()).isEqualTo(JobRunStatus.SUCCEEDED);
+    assertThat(run.getItemsProcessed()).isEqualTo(expired);
   }
 
   private RiskRequest shipment(String si, LocalDate sail) {

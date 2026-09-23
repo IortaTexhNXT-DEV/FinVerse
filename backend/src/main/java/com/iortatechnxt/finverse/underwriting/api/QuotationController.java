@@ -7,6 +7,7 @@ import com.iortatechnxt.finverse.underwriting.api.dto.PolicyResponse;
 import com.iortatechnxt.finverse.underwriting.api.dto.QuotationRequest;
 import com.iortatechnxt.finverse.underwriting.api.dto.QuotationResponse;
 import com.iortatechnxt.finverse.underwriting.domain.QuotationStatus;
+import com.iortatechnxt.finverse.underwriting.service.QuotationExpiryJob;
 import com.iortatechnxt.finverse.underwriting.service.QuotationService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -34,14 +35,17 @@ public class QuotationController {
   private static final String AUTHORIZE = "hasAuthority('POLICY_AUTHORIZE')";
 
   private final QuotationService service;
+  private final QuotationExpiryJob expiry;
 
   /**
    * Creates the controller.
    *
    * @param service quotation service
+   * @param expiry quotation expiry run
    */
-  public QuotationController(QuotationService service) {
+  public QuotationController(QuotationService service, QuotationExpiryJob expiry) {
     this.service = service;
+    this.expiry = expiry;
   }
 
   /**
@@ -171,17 +175,19 @@ public class QuotationController {
   }
 
   /**
-   * Expires lapsed quotations.
+   * Expires the lapsed quotations of a company now (the daily {@code QUOTATION_EXPIRY} job does the
+   * same for every company); the run is recorded in the job monitor.
    *
    * @param companyId company
    * @param asOf date (default today)
    * @return number expired
    */
   @PostMapping("/expire")
-  @PreAuthorize(AUTHORIZE)
+  @PreAuthorize("hasAnyAuthority('POLICY_MAINTAIN', 'POLICY_AUTHORIZE')")
   public Map<String, Integer> expire(
       @RequestParam Long companyId,
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate asOf) {
-    return Map.of("expired", service.expireLapsed(companyId, asOf));
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+          LocalDate asOf) {
+    return Map.of("expired", expiry.runFor(companyId, asOf));
   }
 }

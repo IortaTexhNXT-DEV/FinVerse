@@ -99,7 +99,7 @@ Lifecycle (`Quotation`, `QuotationStatus`):
 DRAFT --submit--> PENDING_APPROVAL --approve--> APPROVED --convert--> CONVERTED
                                    --reject---> REJECTED
 DRAFT / APPROVED / REJECTED --new iteration--> DRAFT
-DRAFT / PENDING_APPROVAL / APPROVED --validity lapsed (expire run)--> EXPIRED
+DRAFT / PENDING_APPROVAL / APPROVED --validity lapsed (expiry run)--> EXPIRED
 ```
 
 - Number `Q-<branch>-<year>-nnnnnn`. Terms: product, client, insured, channel and intermediary,
@@ -109,8 +109,18 @@ DRAFT / PENDING_APPROVAL / APPROVED --validity lapsed (expire run)--> EXPIRED
   (amounts, not rates) with remarks. A new iteration re-opens the quotation as `DRAFT`; the last
   iteration is the one offered. The discount cannot exceed the gross premium.
 - **Maker-checker**: the user who created or submitted the quotation cannot approve or reject it.
-- **Validity**: expiry date = issue date + validity days. `POST /quotations/expire?companyId&asOf`
-  (`POLICY_AUTHORIZE`) marks open quotations past their expiry as `EXPIRED`.
+- **Validity**: expiry date = issue date + validity days. The **expiry run** marks every open
+  quotation (draft, pending approval, approved) whose expiry date is before the run date as
+  `EXPIRED` and writes an audit entry per quotation:
+  - the daily job `QUOTATION_EXPIRY` (`QuotationExpiryJob`, cron `finverse.jobs.quotation-expiry-cron`,
+    default `0 45 0 * * *` UTC, enabled) expires every active company, one transaction per
+    company, on the business date;
+  - the **Expire lapsed quotations** button of the Quotations screen (shown with `POLICY_MAINTAIN`)
+    calls `POST /quotations/expire?companyId[&asOf]` (`POLICY_MAINTAIN` or `POLICY_AUTHORIZE`,
+    `asOf` defaults to today) and shows the number expired.
+
+  Both are recorded in the job monitor (*Administration › Scheduled Jobs*, trigger `SCHEDULED` or
+  `MANUAL`); a failed run raises `JOB_FAILURE`.
 - **Conversion** (`POLICY_MAINTAIN`) of an approved quotation that is still valid on the policy issue
   date creates a **draft policy** with one risk carrying the quoted sum insured and gross premium
   (rate = premium / sum insured); discount and loading become rates on the policy; a share below
@@ -311,7 +321,8 @@ PGIBR036 and PGIBR082 are described in [CLAIMS.md](CLAIMS.md); the UPR report be
 | POST / PUT | `/products`, `/products/{id}` | POLICY_MAINTAIN |
 | POST | `/quotations`, PUT `/quotations/{id}`, `/quotations/{id}/iterations`, `/quotations/{id}/submit`, `/quotations/{id}/convert` | POLICY_MAINTAIN |
 | POST | `/policies/preview`, `/policies`, PUT `/policies/{id}`, `/policies/{id}/submit`, `/policies/{id}/discard`, `/policies/{id}/endorsements`, `/endorsements/{id}/submit`, `/endorsements/{id}/discard`, `/open-covers`, `/open-covers/{id}/certificates` | POLICY_MAINTAIN |
-| POST | `/products/{id}/authorize`, `/quotations/{id}/approve`, `/quotations/{id}/reject`, `/quotations/expire?companyId&asOf`, `/policies/{id}/approve`, `/policies/{id}/reject`, `/endorsements/{id}/approve`, `/endorsements/{id}/reject`, `/open-covers/{id}/authorize` | POLICY_AUTHORIZE |
+| POST | `/quotations/expire?companyId[&asOf]` (returns `{ "expired": n }`) | POLICY_MAINTAIN or POLICY_AUTHORIZE |
+| POST | `/products/{id}/authorize`, `/quotations/{id}/approve`, `/quotations/{id}/reject`, `/policies/{id}/approve`, `/policies/{id}/reject`, `/endorsements/{id}/approve`, `/endorsements/{id}/reject`, `/open-covers/{id}/authorize` | POLICY_AUTHORIZE |
 
 Policy and endorsement approvals take an optional `{ "accountingDate": "yyyy-MM-dd" }` (default
 today). The `UNDERWRITER` role holds `POLICY_VIEW`, `POLICY_MAINTAIN` and `POLICY_AUTHORIZE`.
@@ -361,9 +372,6 @@ Claims (`@Order(20)`) and reinsurance (`@Order(15)`) demo data build on this por
   issue date as the start of the original period. The underwriting year is not changed by a renewal.
 - **No authorization limit** on policy, endorsement or quotation approvals
   (`UnderwritingApprovalSource`); the maker-checker rule is the only approval control.
-- **Quotation expiry** runs only through `POST /quotations/expire`; there is no scheduled job and no
-  button on the Quotations screen, so lapsed quotations stay open until the call is made (conversion
-  after expiry is refused in any case).
 - **Pro-rata cancellation is 1/365 only**, whatever the product's UPR basis, and applies the
   period ratio to the whole current-period gross (endorsements made mid-term are returned at the
   same ratio); short-period scales and a refund of the policy fee are not supported.

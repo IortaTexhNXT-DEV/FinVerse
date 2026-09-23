@@ -89,6 +89,12 @@ class SystemAdminIT {
               assertThat(s.job().name()).isEqualTo("PDC_ISSUED_DUE");
               assertThat(s.job().cron()).isEqualTo("0 15 0 * * *");
               assertThat(s.nextRun()).isNotNull();
+            })
+        .anySatisfy(
+            s -> {
+              assertThat(s.job().name()).isEqualTo("QUOTATION_EXPIRY");
+              assertThat(s.job().cron()).isEqualTo("0 45 0 * * *");
+              assertThat(s.nextRun()).isNotNull();
             });
     assertThat(jobs.nextRun(JobRegistry.DISABLED)).isNull();
     assertThatThrownBy(() -> jobs.run("NO_SUCH_JOB", JobTrigger.MANUAL))

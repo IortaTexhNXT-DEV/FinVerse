@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { CalendarX, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { underwritingApi } from '@/api/underwriting';
@@ -55,6 +55,17 @@ export default function QuotationsPage() {
       await navigate(`/underwriting/quotations/${String(q.id)}`);
     },
   });
+  const expire = useMutation({
+    mutationFn: () => underwritingApi.expireQuotations(companyId),
+    onSuccess: async ({ expired }) => {
+      await queryClient.invalidateQueries({ queryKey: ['quotations'] });
+      toast.success(
+        expired === 0
+          ? 'No lapsed quotations to expire'
+          : `${String(expired)} lapsed quotation(s) expired`,
+      );
+    },
+  });
 
   return (
     <div className="stack">
@@ -64,15 +75,28 @@ export default function QuotationsPage() {
         description="Offers to prospective clients with negotiation iterations, approval and conversion into a policy."
         actions={
           can('POLICY_MAINTAIN') && (
-            <Button
-              variant="accent"
-              icon={<Plus size={16} />}
-              onClick={() =>
-                setForm(newQuotation(companyId, branchId ?? lookups.branches[0]?.id ?? 0, today()))
-              }
-            >
-              New quotation
-            </Button>
+            <>
+              <Button
+                variant="secondary"
+                icon={<CalendarX size={16} />}
+                busy={expire.isPending}
+                disabled={companyId <= 0}
+                onClick={() => expire.mutate()}
+              >
+                Expire lapsed quotations
+              </Button>
+              <Button
+                variant="accent"
+                icon={<Plus size={16} />}
+                onClick={() =>
+                  setForm(
+                    newQuotation(companyId, branchId ?? lookups.branches[0]?.id ?? 0, today()),
+                  )
+                }
+              >
+                New quotation
+              </Button>
+            </>
           )
         }
       />
@@ -87,7 +111,7 @@ export default function QuotationsPage() {
           />
         </div>
       </Card>
-      <ErrorAlert error={query.error} />
+      <ErrorAlert error={query.error ?? expire.error} />
       <Card flush>
         <DataTable<Quotation>
           loading={query.isLoading}

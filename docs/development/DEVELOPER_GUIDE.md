@@ -250,7 +250,10 @@ use `@Scheduled` (the ArchUnit rule `BACKGROUND_WORK_IS_A_MANAGED_JOB` fails the
 records every run in `sys_job_run`, a failure raises `JOB_FAILURE`, and administrators see it on
 *Administration → Scheduled Jobs* with "Run now". For batch runs started from your own screen, wrap
 the work in `JobRunService.execute(jobName, JobTrigger.MANUAL, () -> new JobOutcome(n, message))`.
-Make the cron configurable (`finverse.jobs.<name>-cron`).
+Make the cron configurable (`finverse.jobs.<name>-cron`), add it to `application.yml` with an
+environment variable and document it in `docs/operations/CONFIGURATION.md`. Jobs today:
+`RECURRING_JOURNALS`, `ALERT_DAILY_CHECKS`, `PDC_ISSUED_DUE`, `QUOTATION_EXPIRY` (daily) and
+`RESERVE_VALUATION`, `RI_ALLOCATION` (manual unless scheduled).
 
 ### 10.4 Business parameters – `system`
 

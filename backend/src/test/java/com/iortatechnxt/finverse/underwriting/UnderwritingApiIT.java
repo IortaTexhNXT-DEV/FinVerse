@@ -209,6 +209,19 @@ class UnderwritingApiIT {
                 .param("asOf", "2026-01-01"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.expired").isNumber());
+    // The Quotations screen offers the run to makers (POLICY_MAINTAIN) as well.
+    mvc.perform(
+            post(BASE + "/quotations/expire")
+                .with(as("uw"))
+                .param("companyId", fx.companyId().toString())
+                .param("asOf", "2026-01-01"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.expired").value(0));
+    mvc.perform(
+            post(BASE + "/quotations/expire")
+                .with(as("accountant"))
+                .param("companyId", fx.companyId().toString()))
+        .andExpect(status().isForbidden());
   }
 
   @Test

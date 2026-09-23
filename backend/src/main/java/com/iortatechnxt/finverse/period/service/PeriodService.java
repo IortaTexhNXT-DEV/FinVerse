@@ -208,6 +208,37 @@ public class PeriodService {
   }
 
   /**
+   * Year-close hook used by year-end closing ({@code closing.service.YearEndService}) after the
+   * closing journals are posted: marks the fiscal year CLOSED. Every period must already be CLOSED,
+   * so no further posting into the year is possible.
+   *
+   * @param fiscalYearId year
+   * @return closed year
+   */
+  public FiscalYear closeFiscalYear(Long fiscalYearId) {
+    FiscalYear year = getYear(fiscalYearId);
+    if (year.getStatus() == FiscalYearStatus.CLOSED) {
+      throw new BusinessRuleException(
+          "YEAR_ALREADY_CLOSED", "Fiscal year " + year.getYearCode() + " is already closed");
+    }
+    boolean allClosed =
+        periods.findByFiscalYearIdOrderByPeriodNo(fiscalYearId).stream()
+            .allMatch(p -> p.getStatus() == PeriodStatus.CLOSED);
+    if (!allClosed) {
+      throw new BusinessRuleException(
+          "YEAR_PERIODS_OPEN",
+          "All periods of fiscal year " + year.getYearCode() + " must be closed first");
+    }
+    year.close(currentUser.username(), clock.instant());
+    audit.record(
+        "FiscalYear",
+        year.getYearCode(),
+        AuditAction.CLOSE,
+        "Closed fiscal year " + year.getYearCode());
+    return year;
+  }
+
+  /**
    * Returns the period that a journal will post into, validating that posting is permitted.
    *
    * @param companyId company

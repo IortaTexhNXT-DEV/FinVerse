@@ -58,3 +58,21 @@ export function voucherActions(voucher: Voucher, can: Can): DocumentAction<Vouch
 export function firstError(...errors: unknown[]): unknown {
   return errors.find((e) => e !== null && e !== undefined);
 }
+
+/** Invoice id of a `?invoice=` drill-down link, or null when absent or not a valid id. */
+export function linkedInvoiceId(param: string | null): number | null {
+  const id = Number(param);
+  return param !== null && Number.isInteger(id) && id > 0 ? id : null;
+}
+
+/**
+ * Initial state of the invoice list: the approval queue, or, for a drill-down link, every status
+ * with the linked invoice open.
+ */
+export function invoiceListStart(param: string | null): {
+  status: string;
+  selected: number | null;
+} {
+  const selected = linkedInvoiceId(param);
+  return { status: selected === null ? 'PENDING_APPROVAL' : '', selected };
+}

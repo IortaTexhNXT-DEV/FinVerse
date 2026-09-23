@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { payablesApi } from '@/api/payables';
 import type { Invoice } from '@/api/payables';
 import { useAuth } from '@/auth/authContext';
@@ -19,7 +19,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
 import { DateReasonModal } from './DateReasonModal';
 import { Pager } from './Pager';
-import { invoiceActions } from './payablesActions';
+import { invoiceActions, invoiceListStart } from './payablesActions';
 import type { InvoiceActionId } from './payablesActions';
 
 const STATUSES = ['', 'DRAFT', 'PENDING_APPROVAL', 'APPROVED', 'CANCELLED'];
@@ -32,10 +32,13 @@ export default function SupplierInvoicesPage() {
   const toast = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [status, setStatus] = useState('PENDING_APPROVAL');
+  // Drill-down from other screens (tax worksheets): ?invoice=<id> opens that invoice.
+  const [params] = useSearchParams();
+  const start = invoiceListStart(params.get('invoice'));
+  const [status, setStatus] = useState(start.status);
   const [partyCode, setPartyCode] = useState('');
   const [page, setPage] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
+  const [selected, setSelected] = useState<number | null>(start.selected);
   const [action, setAction] = useState<Action | null>(null);
 
   const list = useQuery({

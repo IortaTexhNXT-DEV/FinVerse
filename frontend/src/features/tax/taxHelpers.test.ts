@@ -112,7 +112,10 @@ describe('tax display', () => {
   it('links documents to their source screens', () => {
     const doc = { sourceType: 'COMMISSION', sourceId: 42 } as TaxDocument;
     expect(sourceLink(doc)).toBe('/underwriting/policies/42');
-    expect(sourceLink({ ...doc, sourceType: 'SUPPLIER_INVOICE' })).toBe('/payables/invoices');
+    expect(sourceLink({ ...doc, sourceType: 'SUPPLIER_INVOICE' })).toBe(
+      '/payables/invoices?invoice=42',
+    );
+    expect(sourceLink({ ...doc, sourceType: 'ENDORSEMENT' })).toBe('/underwriting/policies/42');
   });
 
   it('summarises worksheets', () => {

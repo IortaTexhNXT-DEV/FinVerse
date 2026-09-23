@@ -1,6 +1,12 @@
 import type { Invoice, Voucher } from '@/api/payables';
 import { listQuery } from '@/api/payables';
-import { firstError, invoiceActions, voucherActions } from './payablesActions';
+import {
+  firstError,
+  invoiceActions,
+  invoiceListStart,
+  linkedInvoiceId,
+  voucherActions,
+} from './payablesActions';
 
 const everyone = () => true;
 const makerOnly = (p: string) => p === 'RECEIPT_PAYMENT_MAINTAIN';
@@ -40,5 +46,17 @@ describe('document actions', () => {
     expect(listQuery(7, 'types', ['SUPPLIER', 'GARAGE'])).toBe(
       '?companyId=7&types=SUPPLIER&types=GARAGE',
     );
+  });
+});
+
+describe('invoice drill-down link', () => {
+  it('reads the invoice id of a ?invoice= link', () => {
+    expect(linkedInvoiceId('48')).toBe(48);
+    expect(linkedInvoiceId(null)).toBeNull();
+    expect(linkedInvoiceId('abc')).toBeNull();
+    expect(linkedInvoiceId('0')).toBeNull();
+    expect(linkedInvoiceId('1.5')).toBeNull();
+    expect(invoiceListStart('48')).toEqual({ status: '', selected: 48 });
+    expect(invoiceListStart(null)).toEqual({ status: 'PENDING_APPROVAL', selected: null });
   });
 });

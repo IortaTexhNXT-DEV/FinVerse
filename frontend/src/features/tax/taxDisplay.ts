@@ -16,10 +16,14 @@ export function dueBadge(state: DueState, daysToDue: number): { tone: string; te
   }
 }
 
-/** Frontend route of the source document of a worksheet row. */
+/**
+ * Frontend route of the source document of a worksheet row. Supplier invoices have no page of
+ * their own: the invoice list opens with that invoice's detail. Policies, endorsements and
+ * commissions carry the policy id and open the policy.
+ */
 export function sourceLink(doc: TaxDocument): string {
   return doc.sourceType === 'SUPPLIER_INVOICE'
-    ? '/payables/invoices'
+    ? `/payables/invoices?invoice=${doc.sourceId}`
     : `/underwriting/policies/${doc.sourceId}`;
 }
 

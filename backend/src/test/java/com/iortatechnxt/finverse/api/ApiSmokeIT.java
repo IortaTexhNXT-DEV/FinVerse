@@ -51,6 +51,21 @@ class ApiSmokeIT {
         "/api/v1/accounting/event-types",
         "/api/v1/accounting/rules?companyId={c}",
         "/api/v1/accounting/events?companyId={c}&from=2026-01-01&to=2026-12-31",
+        "/api/v1/receivables/receipts?companyId={c}",
+        "/api/v1/receivables/receipts?companyId={c}&status=APPROVED&mode=CHEQUE&from=2026-01-01",
+        "/api/v1/receivables/bank-accounts?companyId={c}",
+        "/api/v1/receivables/open-items?companyId={c}&partyCode=C-000201",
+        "/api/v1/receivables/party-statement?companyId={c}&partyCode=C-000201&from=2026-01-01&to=2026-12-31",
+        "/api/v1/receivables/ageing-slots",
+        "/api/v1/receivables/deposits/undeposited?companyId={c}",
+        "/api/v1/receivables/deposits/slips?companyId={c}",
+        "/api/v1/receivables/pdcs?companyId={c}",
+        "/api/v1/receivables/pdcs?companyId={c}&status=ON_HAND",
+        "/api/v1/receivables/bank-rec/statements?companyId={c}",
+        "/api/v1/receivables/bank-rec/workbench?companyId={c}&bankAccountCode=1111&asOf=2026-09-30",
+        "/api/v1/receivables/bank-rec/brs?companyId={c}&bankAccountCode=1111&asOf=2026-09-30",
+        "/api/v1/receivables/bank-rec/matches?companyId={c}&bankAccountCode=1111",
+        "/api/v1/receivables/bank-rec/reconciliations?companyId={c}",
       })
   @WithUserDetails("fmanager")
   void readEndpointsRespondOk(String url) throws Exception {

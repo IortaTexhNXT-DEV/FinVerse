@@ -109,6 +109,44 @@ public class OpenItemService {
   }
 
   /**
+   * Undoes a match: both items get the matched amount back as outstanding and the match record is
+   * removed. Used when the document that settled an item is cancelled (cancelled receipt, bounced
+   * cheque). The audit trail keeps the history of the removed match.
+   *
+   * @param matchId match to undo
+   * @param reason why the match is undone (audit)
+   * @return the removed match
+   */
+  public ItemMatch unmatch(Long matchId, String reason) {
+    ItemMatch match =
+        matches
+            .findById(matchId)
+            .orElseThrow(() -> new ResourceNotFoundException("ItemMatch", matchId));
+    OpenItem debit = get(match.getDebitItemId());
+    OpenItem credit = get(match.getCreditItemId());
+    debit.unsettle(match.getAmount());
+    credit.unsettle(match.getAmount());
+    matches.delete(match);
+    audit.record(
+        ENTITY,
+        debit.getDocumentNo(),
+        AuditAction.UPDATE,
+        "Unmatched " + match.getAmount() + " against " + credit.getDocumentNo() + ": " + reason);
+    return match;
+  }
+
+  /**
+   * Undoes every match of an item (see {@link #unmatch(Long, String)}).
+   *
+   * @param itemId item whose matches are undone
+   * @param reason why the matches are undone (audit)
+   * @return the removed matches
+   */
+  public List<ItemMatch> unmatchAll(Long itemId, String reason) {
+    return matchesOf(get(itemId)).stream().map(m -> unmatch(m.getId(), reason)).toList();
+  }
+
+  /**
    * Matches a CREDIT item against the party's oldest DEBIT items (first in, first out), or the
    * reverse for a DEBIT item. Used for automatic allocation of receipts and payments.
    *

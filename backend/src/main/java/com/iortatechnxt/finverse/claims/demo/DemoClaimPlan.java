@@ -100,6 +100,23 @@ final class DemoClaimPlan {
    */
   static List<PlannedClaim> plan(
       List<PolicySnapshot> candidates, Map<Long, BigDecimal> sumsInsured) {
+    Map<Long, Scenario> chosen = choose(candidates);
+    List<PlannedClaim> planned = new ArrayList<>();
+    for (int i = 0; i < candidates.size(); i++) {
+      PolicySnapshot p = candidates.get(i);
+      Scenario s = chosen.get(p.id());
+      LocalDate loss = lossDate(p, i);
+      if (s != null && loss != null) {
+        int lag = i % LATE_CYCLE == LATE_SLOT ? LATE_LAG_DAYS : REPORT_LAG_DAYS;
+        planned.add(
+            new PlannedClaim(p, s, loss, loss.plusDays(lag), reserve(sumsInsured.get(p.id()), i)));
+      }
+    }
+    return planned;
+  }
+
+  /** Scenario of each chosen policy: the special policies first, then a rotation. */
+  private static Map<Long, Scenario> choose(List<PolicySnapshot> candidates) {
     Map<Long, Scenario> chosen = new LinkedHashMap<>();
     special(candidates, p -> USD.equals(p.currency()))
         .ifPresent(p -> chosen.put(p.id(), Scenario.FINAL));
@@ -113,18 +130,7 @@ final class DemoClaimPlan {
         chosen.put(p.id(), rotation[slot++ % rotation.length]);
       }
     }
-    List<PlannedClaim> planned = new ArrayList<>();
-    for (int i = 0; i < candidates.size(); i++) {
-      PolicySnapshot p = candidates.get(i);
-      Scenario s = chosen.get(p.id());
-      LocalDate loss = lossDate(p, i);
-      if (s != null && loss != null) {
-        int lag = i % LATE_CYCLE == LATE_SLOT ? LATE_LAG_DAYS : REPORT_LAG_DAYS;
-        planned.add(
-            new PlannedClaim(p, s, loss, loss.plusDays(lag), reserve(sumsInsured.get(p.id()), i)));
-      }
-    }
-    return planned;
+    return chosen;
   }
 
   /**

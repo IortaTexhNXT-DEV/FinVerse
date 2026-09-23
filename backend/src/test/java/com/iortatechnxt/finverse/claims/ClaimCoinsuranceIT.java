@@ -89,7 +89,7 @@ class ClaimCoinsuranceIT {
   void leaderPaysAndCollectsOneHundredPercentAndBooksTheCoinsurerShare() {
     Policy policy = fx.coinsuredPolicy(true);
     Claim claim = fx.openClaim(policy, "150000", null);
-    assertThat(claim.ourEstimate()).isEqualByComparingTo("90000.00");
+    assertThat(claim.ourShare().estimate()).isEqualByComparingTo("90000.00");
 
     Settlement s =
         fx.settle(claim.getId(), "C-000201", CostType.LOSS, SettlementType.PARTIAL, "100000", null);
@@ -120,7 +120,7 @@ class ClaimCoinsuranceIT {
     assertThat(items("CO-0001", r.getRecoveryNo()))
         .singleElement()
         .satisfies(i -> assertThat(i.getDirection()).isEqualTo(ItemDirection.CREDIT));
-    assertThat(as.run(CHECKER, () -> claims.get(claim.getId())).ourRecovered())
+    assertThat(as.run(CHECKER, () -> claims.get(claim.getId())).ourShare().recovered())
         .isEqualByComparingTo("6000.00");
   }
 

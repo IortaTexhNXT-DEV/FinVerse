@@ -147,7 +147,7 @@ class ClaimControlsIT {
                 lifecycle.decline(
                     open.getId(), ClaimStatus.REJECTED, "Excluded peril", ClaimFixtures.APPROVED));
     assertThat(rejected.getStatus()).isEqualTo(ClaimStatus.REJECTED);
-    assertThat(rejected.ourOutstanding()).isEqualByComparingTo("0");
+    assertThat(rejected.ourShare().outstanding()).isEqualByComparingTo("0");
     assertThatThrownBy(() -> fx.requestReserve(open.getId(), CostType.LOSS, "1000"))
         .hasMessageContaining("REJECTED");
 

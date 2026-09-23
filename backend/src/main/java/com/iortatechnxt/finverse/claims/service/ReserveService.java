@@ -197,7 +197,7 @@ public class ReserveService {
         previous, policy.ourShare(rc.getNewEstimate()).subtract(policy.ourShare(previous)));
     posting.postEstimate(rc, date);
     if (rc.getSide() == EstimateSide.PAYMENT) {
-      alerts.checkReserve(claim, support.toBase(claim, claim.ourEstimate(), date));
+      alerts.checkReserve(claim, support.toBase(claim, claim.ourShare().estimate(), date));
     }
   }
 

@@ -3,6 +3,7 @@ package com.iortatechnxt.finverse.claims.service;
 import com.iortatechnxt.finverse.claims.domain.Claim;
 import com.iortatechnxt.finverse.claims.domain.ClaimRepository;
 import com.iortatechnxt.finverse.claims.domain.ClaimStatus;
+import com.iortatechnxt.finverse.claims.domain.OurShare;
 import com.iortatechnxt.finverse.common.util.Money;
 import com.iortatechnxt.finverse.underwriting.service.ClaimsFigures;
 import com.iortatechnxt.finverse.underwriting.service.PolicyClaimsView;
@@ -63,10 +64,11 @@ public class PolicyClaimsService implements PolicyClaimsView {
     BigDecimal paid = Money.zero();
     BigDecimal outstanding = Money.zero();
     for (Claim c : claims) {
-      paid = paid.add(c.ourPaid()).subtract(c.ourRecovered());
+      OurShare our = c.ourShare();
+      paid = paid.add(our.paid()).subtract(our.recovered());
       if (c.getStatus().isActive()) {
-        reserve = reserve.add(c.ourEstimate());
-        outstanding = outstanding.add(c.ourOutstanding());
+        reserve = reserve.add(our.estimate());
+        outstanding = outstanding.add(our.outstanding());
       }
     }
     return new ClaimsFigures(

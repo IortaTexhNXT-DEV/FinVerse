@@ -20,9 +20,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiFunction;
 
 /**
  * An insurance claim at 100 % under an approved policy in force at the date of loss.
@@ -71,7 +69,7 @@ public class Claim extends BaseEntity {
   @Column(name = "closed_on")
   private LocalDate closedOn;
 
-  @Embedded private ClaimTotals totals = new ClaimTotals();
+  @Embedded private final ClaimTotals totals = new ClaimTotals();
 
   @OneToMany(mappedBy = "claim", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("id")
@@ -99,10 +97,6 @@ public class Claim extends BaseEntity {
       String currency,
       Party claimant,
       Long companyId) {
-    if (loss.getReportedDate().isBefore(loss.getLossDate())) {
-      throw new BusinessRuleException(
-          "INVALID_CLAIM_DATES", "The reported date cannot be before the date of loss");
-    }
     this.claimNo = claimNo;
     this.branchId = branchId;
     this.policy = policy;
@@ -120,16 +114,11 @@ public class Claim extends BaseEntity {
    * @throws BusinessRuleException when the party type does not fit the role or it is already listed
    */
   public void addParty(Party party, ClaimPartyRole role) {
-    if (!role.partyTypes().contains(party.getPartyType())) {
-      throw new BusinessRuleException(
-          "INVALID_CLAIM_PARTY",
-          party.getCode() + " (" + party.getPartyType() + ") cannot act as " + role);
-    }
     if (involves(party, role)) {
       throw new BusinessRuleException(
           "CLAIM_PARTY_EXISTS", party.getCode() + " is already listed as " + role);
     }
-    parties.add(new ClaimParty(this, party, role));
+    parties.add(ClaimParty.of(this, party, role));
   }
 
   /**
@@ -140,8 +129,7 @@ public class Claim extends BaseEntity {
    * @return true when listed
    */
   public boolean involves(Party party, ClaimPartyRole role) {
-    return parties.stream()
-        .anyMatch(p -> p.getRole() == role && Objects.equals(p.getParty().getId(), party.getId()));
+    return parties.stream().anyMatch(p -> p.matches(party, role));
   }
 
   /**
@@ -285,46 +273,13 @@ public class Claim extends BaseEntity {
   }
 
   /**
-   * Company share of the payment estimate (loss and expense). Each cost type is rounded on its own
-   * total, exactly as the movement lines are, so the figure equals the sum of the lines.
+   * Company share of the claim's totals (each cost type rounded on its own total, exactly as the
+   * movement lines are, so the figures equal the sums of the lines).
    *
-   * @return company share
+   * @return company-share figures
    */
-  public BigDecimal ourEstimate() {
-    return ourShareOf(totals::estimate);
-  }
-
-  /**
-   * Company share of the amount settled (loss and expense).
-   *
-   * @return company share
-   */
-  public BigDecimal ourPaid() {
-    return ourShareOf(totals::paid);
-  }
-
-  /**
-   * Company share of the outstanding reserve (estimate − paid).
-   *
-   * @return company share
-   */
-  public BigDecimal ourOutstanding() {
-    return ourEstimate().subtract(ourPaid());
-  }
-
-  /**
-   * Company share of the amount recovered.
-   *
-   * @return company share
-   */
-  public BigDecimal ourRecovered() {
-    return policy.ourShare(totals.getRecovered());
-  }
-
-  private BigDecimal ourShareOf(BiFunction<EstimateSide, CostType, BigDecimal> total) {
-    return policy
-        .ourShare(total.apply(EstimateSide.PAYMENT, CostType.LOSS))
-        .add(policy.ourShare(total.apply(EstimateSide.PAYMENT, CostType.EXPENSE)));
+  public OurShare ourShare() {
+    return totals.ourShare(policy);
   }
 
   private BusinessRuleException invalidStatus(String action) {

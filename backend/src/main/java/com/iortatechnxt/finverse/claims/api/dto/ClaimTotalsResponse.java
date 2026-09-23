@@ -4,6 +4,7 @@ import com.iortatechnxt.finverse.claims.domain.Claim;
 import com.iortatechnxt.finverse.claims.domain.ClaimTotals;
 import com.iortatechnxt.finverse.claims.domain.CostType;
 import com.iortatechnxt.finverse.claims.domain.EstimateSide;
+import com.iortatechnxt.finverse.claims.domain.OurShare;
 import java.math.BigDecimal;
 
 /**
@@ -46,6 +47,7 @@ public record ClaimTotalsResponse(
    */
   public static ClaimTotalsResponse from(Claim c) {
     ClaimTotals t = c.getTotals();
+    OurShare our = c.ourShare();
     return new ClaimTotalsResponse(
         t.getEstimateLoss(),
         t.getEstimateExpense(),
@@ -56,9 +58,9 @@ public record ClaimTotalsResponse(
         t.outstanding(EstimateSide.PAYMENT, CostType.LOSS),
         t.outstanding(EstimateSide.PAYMENT, CostType.EXPENSE),
         t.outstanding(EstimateSide.RECOVERY, CostType.LOSS),
-        c.ourEstimate(),
-        c.ourPaid(),
-        c.ourOutstanding(),
-        c.ourRecovered());
+        our.estimate(),
+        our.paid(),
+        our.outstanding(),
+        our.recovered());
   }
 }

@@ -171,6 +171,19 @@ public class ClaimTotals {
     }
   }
 
+  /**
+   * Company share of the totals: each cost type rounded on its own total.
+   *
+   * @param policy policy facts (share %)
+   * @return company-share figures
+   */
+  public OurShare ourShare(ClaimPolicy policy) {
+    return new OurShare(
+        policy.ourShare(estimateLoss).add(policy.ourShare(estimateExpense)),
+        policy.ourShare(paidLoss).add(policy.ourShare(paidExpense)),
+        policy.ourShare(recovered));
+  }
+
   private static void requireRecoveryIsLoss(EstimateSide side, CostType cost) {
     if (side == EstimateSide.RECOVERY && cost != CostType.LOSS) {
       throw new BusinessRuleException(

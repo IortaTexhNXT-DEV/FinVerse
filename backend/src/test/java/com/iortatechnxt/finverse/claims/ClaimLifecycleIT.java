@@ -35,6 +35,7 @@ import com.iortatechnxt.finverse.subledger.domain.OpenItemStatus;
 import com.iortatechnxt.finverse.subledger.service.OpenItemService;
 import com.iortatechnxt.finverse.support.AsUser;
 import com.iortatechnxt.finverse.support.IntegrationTest;
+import com.iortatechnxt.finverse.support.TestParties;
 import com.iortatechnxt.finverse.underwriting.domain.Policy;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -62,6 +63,7 @@ class ClaimLifecycleIT {
   @Autowired private PaymentVoucherService vouchers;
   @Autowired private PayablesFixtures payables;
   @Autowired private AsUser as;
+  @Autowired private TestParties testParties;
 
   private BigDecimal balance(String account) {
     Long company = fx.companyId();
@@ -131,7 +133,7 @@ class ClaimLifecycleIT {
     Claim closed = as.run(CHECKER, () -> claims.get(claim.getId()));
     assertThat(closed.getStatus()).isEqualTo(ClaimStatus.CLOSED);
     assertThat(closed.getClosedOn()).isEqualTo(last.getApproval().getApprovalDate());
-    assertThat(closed.ourOutstanding()).isEqualByComparingTo("0");
+    assertThat(closed.ourShare().outstanding()).isEqualByComparingTo("0");
     assertThat(balance("2102")).isEqualByComparingTo(reserve);
     assertThat(balance("5100").subtract(paid)).isEqualByComparingTo("910000.00");
     assertThat(balance("2204").subtract(payable)).isEqualByComparingTo("-910000.00");
@@ -159,11 +161,12 @@ class ClaimLifecycleIT {
   void settlementOpenItemIsPaidByPayablesAsClaimPayment() {
     Policy policy = fx.policy("FIRE");
     Claim claim = fx.openClaim(policy, "200000", null);
+    String payee = testParties.create(PartyType.CORPORATE_CLIENT).getCode();
     Settlement s =
-        fx.settle(claim.getId(), "C-000201", CostType.LOSS, SettlementType.PARTIAL, "150000", null);
-    OpenItem item = items("C-000201", s.getSettlementNo()).get(0);
+        fx.settle(claim.getId(), payee, CostType.LOSS, SettlementType.PARTIAL, "150000", null);
+    OpenItem item = items(payee, s.getSettlementNo()).get(0);
 
-    assertThat(vouchers.payableItems(fx.companyId(), "C-000201", null))
+    assertThat(vouchers.payableItems(fx.companyId(), payee, null))
         .anyMatch(p -> p.item().getId().equals(item.getId()));
     assertThat(
             PaymentCategory.defaultFor(PartyType.CORPORATE_CLIENT, Set.of(item.getDocumentType())))
@@ -172,7 +175,7 @@ class ClaimLifecycleIT {
     PaymentVoucher voucher =
         payables.approvedPayment(
             payables.paymentCommand(
-                "C-000201",
+                payee,
                 PaymentMode.BANK_TRANSFER,
                 "BDO-CA",
                 PayablesFixtures.DATE,

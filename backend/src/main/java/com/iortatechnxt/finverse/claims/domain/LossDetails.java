@@ -1,5 +1,6 @@
 package com.iortatechnxt.finverse.claims.domain;
 
+import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.time.LocalDate;
@@ -45,6 +46,10 @@ public class LossDetails {
       String causeOfLoss,
       String lossLocation,
       String description) {
+    if (reportedDate.isBefore(lossDate)) {
+      throw new BusinessRuleException(
+          "INVALID_CLAIM_DATES", "The reported date cannot be before the date of loss");
+    }
     this.lossDate = lossDate;
     this.reportedDate = reportedDate;
     this.natureOfLoss = natureOfLoss;

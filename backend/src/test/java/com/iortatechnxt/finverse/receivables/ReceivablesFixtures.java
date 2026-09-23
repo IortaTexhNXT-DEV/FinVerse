@@ -5,7 +5,6 @@ import com.iortatechnxt.finverse.accounting.service.BusinessEvent;
 import com.iortatechnxt.finverse.coa.service.ChartOfAccountsService;
 import com.iortatechnxt.finverse.currency.service.CurrencyService;
 import com.iortatechnxt.finverse.ledger.service.LedgerQueryService;
-import com.iortatechnxt.finverse.party.api.dto.PartyRequest;
 import com.iortatechnxt.finverse.party.domain.Party;
 import com.iortatechnxt.finverse.party.domain.PartyType;
 import com.iortatechnxt.finverse.party.service.PartyService;
@@ -23,6 +22,7 @@ import com.iortatechnxt.finverse.subledger.domain.OpenItemValues;
 import com.iortatechnxt.finverse.subledger.service.OpenItemService;
 import com.iortatechnxt.finverse.support.AsUser;
 import com.iortatechnxt.finverse.support.TestData;
+import com.iortatechnxt.finverse.support.TestParties;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -48,6 +48,7 @@ public class ReceivablesFixtures {
   private final TransactionTemplate tx;
   private final AsUser as;
   private final TestData data;
+  private final TestParties testParties;
 
   ReceivablesFixtures(
       AccountingEventPublisher publisher,
@@ -60,7 +61,8 @@ public class ReceivablesFixtures {
       ChartOfAccountsService accounts,
       TransactionTemplate tx,
       AsUser as,
-      TestData data) {
+      TestData data,
+      TestParties testParties) {
     this.publisher = publisher;
     this.openItems = openItems;
     this.parties = parties;
@@ -72,6 +74,7 @@ public class ReceivablesFixtures {
     this.tx = tx;
     this.as = as;
     this.data = data;
+    this.testParties = testParties;
   }
 
   public Long company() {
@@ -89,31 +92,7 @@ public class ReceivablesFixtures {
    * @return party code
    */
   public String newAgent() {
-    String code = "A-T" + SEQ.incrementAndGet() + "-" + System.nanoTime() % 100_000;
-    Party party =
-        as.run(
-            "accountant",
-            () ->
-                parties.create(
-                    new PartyRequest(
-                        company(),
-                        code,
-                        "Receivables Test Agent",
-                        PartyType.AGENT,
-                        null,
-                        null,
-                        null,
-                        null,
-                        "PHP",
-                        15,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null)));
-    as.run("checker", () -> parties.authorize(party.getId()));
-    return code;
+    return testParties.create(PartyType.AGENT).getCode();
   }
 
   /** Raises a debit note (POLICY_ISSUE journal + DEBIT open item). */

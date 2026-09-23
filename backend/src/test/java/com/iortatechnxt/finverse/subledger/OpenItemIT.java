@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.finverse.party.domain.Party;
+import com.iortatechnxt.finverse.party.domain.PartyType;
 import com.iortatechnxt.finverse.party.service.PartyService;
 import com.iortatechnxt.finverse.subledger.domain.ItemDirection;
 import com.iortatechnxt.finverse.subledger.domain.OpenItem;
@@ -15,6 +16,7 @@ import com.iortatechnxt.finverse.subledger.service.OpenItemService;
 import com.iortatechnxt.finverse.support.AsUser;
 import com.iortatechnxt.finverse.support.IntegrationTest;
 import com.iortatechnxt.finverse.support.TestData;
+import com.iortatechnxt.finverse.support.TestParties;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -27,6 +29,7 @@ class OpenItemIT {
   @Autowired private OpenItemService openItems;
   @Autowired private AgeingService ageing;
   @Autowired private PartyService parties;
+  @Autowired private TestParties testParties;
   @Autowired private AsUser as;
   @Autowired private TestData data;
 
@@ -54,10 +57,10 @@ class OpenItemIT {
 
   @Test
   void fifoAllocationSettlesOldestDebitsFirst() {
+    Party client = testParties.create(PartyType.CORPORATE_CLIENT);
     as.run(
         "accountant",
         () -> {
-          Party client = parties.getByCode(data.company().getId(), "C-000203");
           OpenItem older =
               item(client, ItemDirection.DEBIT, "300.00", LocalDate.now().minusDays(40));
           OpenItem newer =
@@ -75,7 +78,7 @@ class OpenItemIT {
                   data.company().getId(),
                   LocalDate.now(),
                   AgeingService.DEFAULT_BUCKETS,
-                  i -> i.getPartyCode().equals("C-000203"));
+                  i -> i.getPartyCode().equals(client.getCode()));
           assertThat(rows)
               .singleElement()
               .satisfies(r -> assertThat(r.total()).isEqualByComparingTo("200.00"));

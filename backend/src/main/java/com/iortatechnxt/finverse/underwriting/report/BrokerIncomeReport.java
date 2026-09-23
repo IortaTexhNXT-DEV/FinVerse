@@ -65,7 +65,7 @@ public class BrokerIncomeReport implements ReportDefinition {
       }
       PremiumBreakdown b = t.premium();
       Map<String, Object> m = new LinkedHashMap<>();
-      UwReportSupport.putGroups(m, t.policy(), branches);
+      UwReportSupport.putGroups(m, t, branches);
       UwReportSupport.putDocument(m, t);
       m.put("broker", t.policy().intermediaryCode() + " " + t.policy().intermediaryName());
       m.put(K_SHARE, t.policy().sharePct());

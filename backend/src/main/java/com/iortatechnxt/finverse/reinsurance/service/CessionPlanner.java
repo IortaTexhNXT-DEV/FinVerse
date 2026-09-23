@@ -38,9 +38,10 @@ import org.springframework.transaction.annotation.Transactional;
  * <ul>
  *   <li><b>Full allocation</b> (original issue, renewal): the company net premium is spread over
  *       the insured risks by premium; each risk's company sum insured is split by {@link
- *       AllocationMath#split} on the treaty programme of the line of business and underwriting
- *       year; each treaty layer is shared among the treaty participants; the part beyond treaty
- *       capacity becomes a facultative requirement.
+ *       AllocationMath#split} on the treaty programme of the line of business and the transaction's
+ *       underwriting year (a renewal: the year its new period starts); each treaty layer is shared
+ *       among the treaty participants; the part beyond treaty capacity becomes a facultative
+ *       requirement.
  *   <li><b>Pro-rata</b> (additional premium, refund, cancellation): ceded in the proportions of the
  *       full allocation in force at the effective date; a facultative share goes to the placement's
  *       participants when placed (the unplaced part is retained), otherwise it increases the
@@ -108,7 +109,6 @@ public class CessionPlanner {
   private static CessionHeader header(PremiumTransaction txn) {
     PolicySnapshot p = txn.policy();
     PremiumBreakdown b = txn.premium();
-    boolean renewal = EndorsementType.RENEWAL.name().equals(txn.kind());
     return new CessionHeader(
         p.companyId(),
         p.branchId(),
@@ -119,8 +119,8 @@ public class CessionPlanner {
         txn.kind(),
         p.businessLine(),
         p.productCode(),
-        p.uwYear(),
-        renewal ? txn.effectiveDate().getYear() : p.uwYear(),
+        txn.uwYear(),
+        txn.uwYear(),
         txn.issueDate(),
         txn.effectiveDate(),
         txn.approvalDate(),

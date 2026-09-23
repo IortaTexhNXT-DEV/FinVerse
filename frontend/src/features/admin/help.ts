@@ -30,7 +30,7 @@ export const ADMIN_HELP: HelpSection = {
       summary:
         'Every financial and non-financial action with the time, user, action, record and details, filtered by date range, user and entity type.',
       controls: [
-        'The audit trail is insert-only: entries cannot be changed or deleted from the application.',
+        'The audit trail is insert-only: entries cannot be changed or deleted, neither from the application nor directly in the database (database triggers reject every change or deletion).',
         'An entry is written in the same transaction as the change it describes.',
       ],
     },
@@ -50,6 +50,10 @@ export const ADMIN_HELP: HelpSection = {
       name: 'Scheduled Jobs',
       path: '/admin/jobs',
       summary: 'Background jobs with schedule, last and next run, run history and "Run now".',
+      workflow: [
+        'Daily jobs as delivered: RECURRING_JOURNALS (recurring and accrual journals), ALERT_DAILY_CHECKS (exception codes), PDC_ISSUED_DUE (post-dated cheques issued whose date is reached become due) and QUOTATION_EXPIRY (lapsed quotations become expired).',
+        'Manual by default: RESERVE_VALUATION and RI_ALLOCATION; the schedules are configured by the administrator of the installation.',
+      ],
       controls: ['A failed run raises a JOB_FAILURE alert.'],
     },
     {

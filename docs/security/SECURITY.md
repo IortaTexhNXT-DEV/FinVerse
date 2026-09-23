@@ -6,9 +6,9 @@
 | Password policy | ≥ 10 chars, upper, lower, digit, symbol | `PasswordChangeRequest` |
 | Lockout | 5 consecutive failures lock the account; unlock by administrator; all attempts audited | `AuthService` |
 | Authorization | Fine-grained permissions (`Permission`) on every endpoint via `@PreAuthorize`; roles are permission bundles; report catalogue filtered per permission | controllers, `ReportService` |
-| Segregation of duties | Administrators cannot post; makers cannot authorize their own journals or master data; authorization limits per user | `AuthorizableEntity`, `JournalBatch.authorize`, `JournalAuthorizationService` |
+| Segregation of duties | Administrators cannot post; makers cannot authorize their own journals or master data; authorization limits per user on journals, payables, claims and underwriting approvals (policies, endorsements, quotations), and the approval inbox hides items above the viewer's limit | `AuthorizableEntity`, `JournalBatch.authorize`, `JournalAuthorizationService`, `PayablesSupport`, `ClaimSupport`, `UnderwritingAuthority` |
 | Data integrity | Ledger rows immutable (DB trigger); corrections by reversal only; optimistic locking; balanced-journal invariant; gapless document numbers | V1 migration, `JournalBatch`, `DocumentNumberService` |
-| Audit | Every create/update/authorize/post/reverse/login/report run/export recorded with user and time; insert-only | `audit` |
+| Audit | Every create/update/authorize/post/reverse/login/report run/export recorded with user and time, in the same transaction as the change; insert-only in the application (no update/delete API) **and** in the database: triggers reject every `UPDATE`, `DELETE` and `TRUNCATE` on `audit_log` for every client. There is no retention purge; archiving needs the table owner to disable the triggers, on record | `audit`, V26 migration |
 | Input validation | Bean Validation on all requests; typed parameters; SQL via bound parameters only | DTOs, repositories |
 | Output | RFC 7807 errors; no stack traces or internal messages leaked; CSV formula-injection protection | `GlobalExceptionHandler`, `CsvReportRenderer` |
 | Transport & headers | TLS at ingress; CSP, X-Frame-Options, Referrer-Policy, nosniff; CORS allow-list | nginx.conf, `SecurityConfig` |

@@ -36,6 +36,7 @@ export function EndorsementHistory({
           { key: 'no', header: 'Endorsement', render: (e) => <strong>{e.documentNo}</strong> },
           { key: 'type', header: 'Type', render: (e) => humanize(e.type) },
           { key: 'eff', header: 'Effective', render: (e) => formatDate(e.effectiveDate) },
+          { key: 'uwy', header: 'UW year', numeric: true, render: (e) => e.uwYear },
           { key: 'desc', header: 'Description', render: (e) => e.description },
           {
             key: 'due',

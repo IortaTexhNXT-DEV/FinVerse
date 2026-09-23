@@ -207,6 +207,8 @@ export interface Endorsement {
   effectiveDate: string;
   newPeriodFrom?: string;
   newPeriodTo?: string;
+  /** Underwriting year of the period the endorsement belongs to (renewal: its new period). */
+  uwYear: number;
   description: string;
   currency: string;
   document: DocumentStatus;
@@ -369,6 +371,9 @@ export const underwritingApi = {
     api.post<Quotation>(`${BASE}/quotations/${id}/reject`, { reason }),
   convertQuotation: (id: number, body: ConvertInput) =>
     api.post<Policy>(`${BASE}/quotations/${id}/convert`, body),
+  /** Expires the company's open quotations whose validity has lapsed (default as of today). */
+  expireQuotations: (companyId: number, asOf?: string) =>
+    api.post<{ expired: number }>(`${BASE}/quotations/expire${toQuery({ companyId, asOf })}`),
 
   openCovers: (companyId: number) =>
     api.get<OpenCover[]>(`${BASE}/open-covers${toQuery({ companyId })}`),

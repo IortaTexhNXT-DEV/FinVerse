@@ -46,6 +46,13 @@ workaround is gone.
 `ISSUED → DUE → PRESENTED → CLEARED`, or `CANCELLED` (reversal as above, voucher VOIDED) or
 `REPLACED` (new cheque leaf, no posting). See `IssuedPdcService` for the postings of each step.
 
+`ISSUED → DUE` is a status change only (no posting), made when the cheque date is reached: daily by
+the managed job `PDC_ISSUED_DUE` (`IssuedPdcDueJob`, cron `finverse.jobs.pdc-issued-due-cron`,
+default `0 15 0 * * *` UTC; listed with its run history on *Administration › Scheduled Jobs*, a
+failure raises `JOB_FAILURE`) or on request with **Mark due cheques** on the PDC Issued Register
+(`POST /pdc-issued/refresh-due?asOf`). The job replaces the former `@Scheduled` method and its
+undocumented property `finverse.payables.pdc-due-cron`.
+
 ## 4. Ageing reports
 
 `FIN-AP-AGE-SUM`, `FIN-AP-AGE-DET`, `FIN-AP-SUPOS` and `FIN-AP-SOP` age the vendor open items with the

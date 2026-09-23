@@ -117,6 +117,22 @@ public class BankReconciliationService {
   }
 
   /**
+   * Number of reconciling items of every bank account of a company as of a date: book entries not
+   * matched to the bank and bank statement lines not matched to the book, exactly the items of the
+   * BRS and of the reports FIN-BRS-UNREC-BOOK / FIN-BRS-UNREC-BANK.
+   *
+   * @param companyId company
+   * @param asOf date
+   * @return unreconciled items
+   */
+  @Transactional(readOnly = true)
+  public long unreconciledItems(Long companyId, LocalDate asOf) {
+    return banks.list(companyId).stream()
+        .mapToLong(b -> statement(companyId, b.code(), asOf).itemCount())
+        .sum();
+  }
+
+  /**
    * Saves (or refreshes) the reconciliation as of a date with the current BRS figures.
    *
    * @param r request
@@ -214,5 +230,15 @@ public class BankReconciliationService {
       List<BookEntry> bookCredits,
       List<BankStatementLine> bankDebits,
       List<BankStatementLine> bankCredits,
-      Optional<BankReconciliation> reconciliation) {}
+      Optional<BankReconciliation> reconciliation) {
+
+    /**
+     * Number of reconciling items (book and bank side).
+     *
+     * @return items not reconciled as of the date
+     */
+    public int itemCount() {
+      return bookDebits.size() + bookCredits.size() + bankDebits.size() + bankCredits.size();
+    }
+  }
 }

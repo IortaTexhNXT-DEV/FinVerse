@@ -99,7 +99,7 @@ Lifecycle (`Quotation`, `QuotationStatus`):
 DRAFT --submit--> PENDING_APPROVAL --approve--> APPROVED --convert--> CONVERTED
                                    --reject---> REJECTED
 DRAFT / APPROVED / REJECTED --new iteration--> DRAFT
-DRAFT / PENDING_APPROVAL / APPROVED --validity lapsed (expire run)--> EXPIRED
+DRAFT / PENDING_APPROVAL / APPROVED --validity lapsed (expiry run)--> EXPIRED
 ```
 
 - Number `Q-<branch>-<year>-nnnnnn`. Terms: product, client, insured, channel and intermediary,
@@ -109,8 +109,20 @@ DRAFT / PENDING_APPROVAL / APPROVED --validity lapsed (expire run)--> EXPIRED
   (amounts, not rates) with remarks. A new iteration re-opens the quotation as `DRAFT`; the last
   iteration is the one offered. The discount cannot exceed the gross premium.
 - **Maker-checker**: the user who created or submitted the quotation cannot approve or reject it.
-- **Validity**: expiry date = issue date + validity days. `POST /quotations/expire?companyId&asOf`
-  (`POLICY_AUTHORIZE`) marks open quotations past their expiry as `EXPIRED`.
+  The approver's **authorization limit** applies to the gross premium at 100 % of the last
+  iteration, converted at the SPOT rate of the approval date (section 4).
+- **Validity**: expiry date = issue date + validity days. The **expiry run** marks every open
+  quotation (draft, pending approval, approved) whose expiry date is before the run date as
+  `EXPIRED` and writes an audit entry per quotation:
+  - the daily job `QUOTATION_EXPIRY` (`QuotationExpiryJob`, cron `finverse.jobs.quotation-expiry-cron`,
+    default `0 45 0 * * *` UTC, enabled) expires every active company, one transaction per
+    company, on the business date;
+  - the **Expire lapsed quotations** button of the Quotations screen (shown with `POLICY_MAINTAIN`)
+    calls `POST /quotations/expire?companyId[&asOf]` (`POLICY_MAINTAIN` or `POLICY_AUTHORIZE`,
+    `asOf` defaults to today) and shows the number expired.
+
+  Both are recorded in the job monitor (*Administration › Scheduled Jobs*, trigger `SCHEDULED` or
+  `MANUAL`); a failed run raises `JOB_FAILURE`.
 - **Conversion** (`POLICY_MAINTAIN`) of an approved quotation that is still valid on the policy issue
   date creates a **draft policy** with one risk carrying the quoted sum insured and gross premium
   (rate = premium / sum insured); discount and loading become rates on the policy; a share below
@@ -144,14 +156,28 @@ DRAFT --discard--> CANCELLED
   draft can be edited; every save recomputes the premium.
 - **Checker** (`POLICY_AUTHORIZE`): approves with an optional accounting date (default today) or
   rejects back to draft with a reason. The checker must differ from both the **creator and the
-  submitter** (`MAKER_CHECKER_VIOLATION`). **Underwriting applies no authorization limit.**
+  submitter** (`MAKER_CHECKER_VIOLATION`).
+- **Authorization limit** (`UnderwritingAuthority`), the same control as journals and payables: the
+  **gross premium at 100 %** of the document (before discount, loading, coinsurance share and
+  taxes; a return premium counts at its absolute value), converted to the base currency at the
+  **SPOT rate of the accounting (approval) date**, must not exceed the approver's
+  `UserDirectory.authorizationLimit` (none = unlimited). Otherwise the approval fails with
+  `AUTHORIZATION_LIMIT_EXCEEDED`, e.g. "Policy P-FIRE-HO-2026-000001: gross premium 100000.00
+  exceeds your authorization limit 50000.00", and nothing changes. It applies to policies, marine
+  certificates, endorsements and quotations (quotations: the last iteration, today's rate); a
+  rejection needs no limit. The gross premium at 100 % is used because it is the risk the
+  underwriter accepts, independent of the share kept and of the tax treatment.
 - **Approval is one transaction** (`PolicyApprovalService`): status change, accounting events,
   debit / credit notes and open items either all succeed or nothing changes. If no authorized rule
   exists for an event, the approval fails and the failure is visible in the Event Register.
 - **In force**: a policy covers a date when it is approved (or was cancelled after that date) and the
   date is within its period (`isInForce`, used by claims at notification).
 - Pending policies, endorsements and quotations, and products and open covers pending authorization,
-  appear in **My Approvals** (`UnderwritingApprovalSource`), never to their creator or submitter.
+  appear in **My Approvals** (`UnderwritingApprovalSource`), never to their creator or submitter
+  and, like `JournalApprovalSource`, never to an approver whose authorization limit the gross
+  premium exceeds (converted at today's SPOT rate, the default approval date; a document without a
+  rate stays visible and the approval reports the missing rate). The system view used by the
+  `PENDING_APPROVAL_AGEING` alert sees all of them.
 - Every create, update, submit, approve, reject and discard is written to the audit trail.
 
 ## 5. Endorsements
@@ -173,6 +199,16 @@ renewal it may be later, and the new period must start after the current one.
 The *current period* position is the original issue, or the latest approved renewal, plus the
 approved endorsements made after it. A financial endorsement whose total due and commission are both
 zero raises no event.
+
+**Underwriting year of an endorsement** (`uw_endorsement.uw_year`, V101). The policy keeps the
+underwriting year of its original issue. A renewal belongs to the year its **new period starts**;
+any other endorsement to the year of the period in force when it is made (the original issue's, or
+the latest approved renewal's). Every `PremiumTransaction` carries this year (`uwYear`): the premium
+registers group by it (PGIBR003, 005, 015, 016, 025, 040, 043) and reinsurance cedes each transaction
+on the treaty programme of that year. Example: a policy for 2026 renewed for 2027 shows the original
+issue under UW year 2026 and the renewal (and a later additional premium) under 2027. PGIBR013
+(renewals due) groups each policy by the year of its current period
+(`PolicySnapshot.currentUwYear()`). V101 set the year of existing endorsements by the same rule.
 
 **Cancellation example.** A 100,000.00 gross policy of the worked example (1 January to
 31 December 2026, 365 days) cancelled with effect from 1 July 2026: 184 unexpired days, ratio
@@ -265,12 +301,13 @@ vouchers pay commissions (`COMMISSION_PAYMENT`, Dr 2300 / Cr bank) and premium r
 | `underwriting.service.PolicyClaimsView` | port owned by underwriting, implemented by claims | `claims.service.PolicyClaimsService`: claim count, latest claim, reserve, paid, outstanding and net claims per policy (company share, policy currency); used by PGIBR013 and PGIBR084 |
 | `approval.service.PendingApprovalSource` | platform port implemented by underwriting | `UnderwritingApprovalSource` |
 
-`PolicyQueryService` methods: `findByNumber` / `get` (header of the current period), `risks`,
+`PolicyQueryService` methods: `findByNumber` / `get` (header of the current period; `uwYear` is the
+original issue's, `currentUwYear()` the current period's), `risks`,
 `isInForce`, `approvedTransactions` (approved issues and endorsements of a period with their premium
 figures), `policyTransactions` (premium history of one policy), `transactions` (register selection),
 `coverPeriods` (earning period of each transaction), `policiesExpiring` and `risksInForce`.
 A transaction is a `PremiumTransaction` keyed by `TransactionRef` (policy id + endorsement number,
-0 for the original issue).
+0 for the original issue) and carries its own underwriting year (section 5).
 
 The two ports are injected optionally (`UnderwritingPorts`, `ObjectProvider`): without an
 implementation, or for a transaction without entry, reports show no treaty or FAC premium (the whole
@@ -311,7 +348,8 @@ PGIBR036 and PGIBR082 are described in [CLAIMS.md](CLAIMS.md); the UPR report be
 | POST / PUT | `/products`, `/products/{id}` | POLICY_MAINTAIN |
 | POST | `/quotations`, PUT `/quotations/{id}`, `/quotations/{id}/iterations`, `/quotations/{id}/submit`, `/quotations/{id}/convert` | POLICY_MAINTAIN |
 | POST | `/policies/preview`, `/policies`, PUT `/policies/{id}`, `/policies/{id}/submit`, `/policies/{id}/discard`, `/policies/{id}/endorsements`, `/endorsements/{id}/submit`, `/endorsements/{id}/discard`, `/open-covers`, `/open-covers/{id}/certificates` | POLICY_MAINTAIN |
-| POST | `/products/{id}/authorize`, `/quotations/{id}/approve`, `/quotations/{id}/reject`, `/quotations/expire?companyId&asOf`, `/policies/{id}/approve`, `/policies/{id}/reject`, `/endorsements/{id}/approve`, `/endorsements/{id}/reject`, `/open-covers/{id}/authorize` | POLICY_AUTHORIZE |
+| POST | `/quotations/expire?companyId[&asOf]` (returns `{ "expired": n }`) | POLICY_MAINTAIN or POLICY_AUTHORIZE |
+| POST | `/products/{id}/authorize`, `/quotations/{id}/approve`, `/quotations/{id}/reject`, `/policies/{id}/approve`, `/policies/{id}/reject`, `/endorsements/{id}/approve`, `/endorsements/{id}/reject`, `/open-covers/{id}/authorize` | POLICY_AUTHORIZE |
 
 Policy and endorsement approvals take an optional `{ "accountingDate": "yyyy-MM-dd" }` (default
 today). The `UNDERWRITER` role holds `POLICY_VIEW`, `POLICY_MAINTAIN` and `POLICY_AUTHORIZE`.
@@ -321,7 +359,9 @@ today). The `UNDERWRITER` role holds `POLICY_VIEW`, `POLICY_MAINTAIN` and `POLIC
 `V901` creates the parties (clients `C-000101`–`C-000204`, agents `A-0001` 15 % and `A-0002` 12.5 %,
 brokers `B-0001` 20 % and `B-0002` 17.5 %, all with 10 % withholding; coinsurer `CO-0001`) and the
 five underwriting rules above. `V910` grants `POLICY_AUTHORIZE` to the finance manager, so the
-underwriter `uw` is the maker and `fmanager` the approver.
+underwriter `uw` is the maker and `fmanager` the approver. Neither has an authorization limit
+(`V900`: only the demo `checker` has one, 5,000,000.00, and it holds no underwriting permission),
+so the demo loader approves every document regardless of its premium.
 
 `UnderwritingDemoData` runs through the services (so journals, open items, notes and the event
 register are real) and is skipped when the company already has policies:
@@ -358,12 +398,12 @@ Claims (`@Order(20)`) and reinsurance (`@Order(15)`) demo data build on this por
 
 - **Renewal overwrites the policy period.** The start of the original period is no longer stored
   once a policy is renewed; `CoverPeriodResolver` (and therefore actuarial reserves) takes the policy
-  issue date as the start of the original period. The underwriting year is not changed by a renewal.
-- **No authorization limit** on policy, endorsement or quotation approvals
-  (`UnderwritingApprovalSource`); the maker-checker rule is the only approval control.
-- **Quotation expiry** runs only through `POST /quotations/expire`; there is no scheduled job and no
-  button on the Quotations screen, so lapsed quotations stay open until the call is made (conversion
-  after expiry is refused in any case).
+  issue date as the start of the original period, and the original issue's transaction reports the
+  renewed period start as its effective date. The underwriting year is not affected: the policy
+  keeps the original year and each endorsement stores its own (section 5).
+- **Claims keep the policy's original underwriting year.** A claim snapshots `PolicySnapshot.uwYear`
+  at registration, so a claim on a renewed period is reported under the original year (claims
+  reports group by it); `currentUwYear()` would be the year of the period covering the loss.
 - **Pro-rata cancellation is 1/365 only**, whatever the product's UPR basis, and applies the
   period ratio to the whole current-period gross (endorsements made mid-term are returned at the
   same ratio); short-period scales and a refund of the policy fee are not supported.

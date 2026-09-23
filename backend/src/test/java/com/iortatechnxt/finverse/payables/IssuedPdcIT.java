@@ -11,12 +11,14 @@ import com.iortatechnxt.finverse.payables.domain.PaymentMode;
 import com.iortatechnxt.finverse.payables.domain.PaymentVoucher;
 import com.iortatechnxt.finverse.payables.domain.SupplierInvoice;
 import com.iortatechnxt.finverse.payables.domain.VoucherStatus;
+import com.iortatechnxt.finverse.payables.service.IssuedPdcDueJob;
 import com.iortatechnxt.finverse.payables.service.IssuedPdcService;
 import com.iortatechnxt.finverse.payables.service.PaymentVoucherService;
 import com.iortatechnxt.finverse.subledger.domain.OpenItemStatus;
 import com.iortatechnxt.finverse.subledger.service.OpenItemService;
 import com.iortatechnxt.finverse.support.AsUser;
 import com.iortatechnxt.finverse.support.IntegrationTest;
+import com.iortatechnxt.finverse.system.service.JobOutcome;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.EnumSet;
@@ -31,6 +33,7 @@ class IssuedPdcIT {
   private static final LocalDate CHEQUE_DATE = LocalDate.of(2026, 9, 12);
 
   @Autowired private IssuedPdcService pdcs;
+  @Autowired private IssuedPdcDueJob dueJob;
   @Autowired private PaymentVoucherService vouchers;
   @Autowired private OpenItemService openItems;
   @Autowired private PayablesFixtures fx;
@@ -67,7 +70,9 @@ class IssuedPdcIT {
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("dated");
 
-    assertThat(as.run("accountant", () -> pdcs.refreshDue(CHEQUE_DATE))).isPositive();
+    JobOutcome due = dueJob.execute(CHEQUE_DATE);
+    assertThat(due.itemsProcessed()).isPositive();
+    assertThat(due.message()).contains("marked due as of " + CHEQUE_DATE);
     assertThat(pdcs.get(pdc.getId()).getStatus()).isEqualTo(IssuedPdcStatus.DUE);
 
     IssuedPdc presented =

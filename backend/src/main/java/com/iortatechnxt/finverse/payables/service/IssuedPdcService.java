@@ -13,12 +13,10 @@ import com.iortatechnxt.finverse.payables.domain.IssuedPdcRepository;
 import com.iortatechnxt.finverse.payables.domain.IssuedPdcStatus;
 import com.iortatechnxt.finverse.payables.domain.PaymentVoucher;
 import com.iortatechnxt.finverse.payables.domain.PaymentVoucherRepository;
-import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
  *       issued clearing (2511)</i>. The supplier is settled in the sub-ledger; the company still
  *       owes the amount to whoever presents the cheque, so the liability sits in PDC clearing until
  *       maturity and the bank balance is not reduced before the cheque date.
- *   <li><b>Due</b>: cheque date reached (daily job or on request) — status only, no posting.
+ *   <li><b>Due</b>: cheque date reached (daily job {@link IssuedPdcDueJob} or on request) — status
+ *       only, no posting.
  *   <li><b>Presented</b> (confirmation on or after the cheque date): {@code PDC_ISSUED_PRESENTED}:
  *       <i>Dr PDC issued clearing / Cr bank</i>, dated the presentation (bank) date.
  *   <li><b>Cancelled</b> (stopped before presentation): reversal of the issue posting (<i>Dr PDC
@@ -62,7 +61,6 @@ public class IssuedPdcService {
   private final PaymentPoster poster;
   private final AccountingEventPublisher publisher;
   private final AuditTrailService audit;
-  private final Clock clock;
 
   /**
    * Creates the service.
@@ -75,7 +73,6 @@ public class IssuedPdcService {
    * @param poster payment posting / reversal
    * @param publisher accounting engine
    * @param audit audit trail
-   * @param clock clock
    */
   public IssuedPdcService(
       IssuedPdcRepository pdcs,
@@ -85,8 +82,7 @@ public class IssuedPdcService {
       BankAccountService bankService,
       PaymentPoster poster,
       AccountingEventPublisher publisher,
-      AuditTrailService audit,
-      Clock clock) {
+      AuditTrailService audit) {
     this.pdcs = pdcs;
     this.events = events;
     this.vouchers = vouchers;
@@ -95,7 +91,6 @@ public class IssuedPdcService {
     this.poster = poster;
     this.publisher = publisher;
     this.audit = audit;
-    this.clock = clock;
   }
 
   /**
@@ -176,12 +171,6 @@ public class IssuedPdcService {
       count++;
     }
     return count;
-  }
-
-  /** Daily job: flags cheques that fell due. */
-  @Scheduled(cron = "${finverse.payables.pdc-due-cron:0 15 0 * * *}")
-  public void refreshDueDaily() {
-    refreshDue(LocalDate.now(clock));
   }
 
   /**

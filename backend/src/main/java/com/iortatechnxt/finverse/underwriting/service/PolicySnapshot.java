@@ -30,7 +30,7 @@ import java.time.LocalDate;
  * @param issueDate issue date
  * @param periodFrom current period start
  * @param periodTo current period end
- * @param uwYear underwriting year
+ * @param uwYear underwriting year of the original issue (a renewal does not change it)
  * @param currency currency
  * @param businessType direct / with coinsurance
  * @param sharePct company share %
@@ -106,6 +106,16 @@ public record PolicySnapshot(
         p.getWorkflow().getApprovalDate(),
         p.getCancelledOn(),
         p.getOpenCover() == null ? null : p.getOpenCover().getOpenCoverNo());
+  }
+
+  /**
+   * Underwriting year of the current period: the year it starts, so after a renewal the renewal's
+   * year (the same year the renewal transaction and later endorsements carry).
+   *
+   * @return underwriting year of the period in force
+   */
+  public int currentUwYear() {
+    return UnderwritingRules.underwritingYear(periodFrom);
   }
 
   /**

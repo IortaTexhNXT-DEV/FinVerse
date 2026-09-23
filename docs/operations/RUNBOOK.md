@@ -60,6 +60,9 @@ run automatically at start-up; with several replicas, Flyway's lock makes them w
 - Database: daily full backup + WAL archiving (point-in-time recovery). Test restores quarterly.
 - The ledger (`gl_ledger_entry`) is insert-only and protected by a trigger; corrections are always
   reversal journals, so the audit trail is never lost.
+- The audit trail (`audit_log`) is insert-only as well: triggers (V26) reject `UPDATE`, `DELETE`
+  and `TRUNCATE`. Archiving old entries is a DBA task: the table owner disables the triggers in a
+  recorded change, copies and removes the rows, and re-enables them.
 - `gl_daily_balance` can be rebuilt from `gl_ledger_entry` if ever in doubt:
   ```sql
   begin;

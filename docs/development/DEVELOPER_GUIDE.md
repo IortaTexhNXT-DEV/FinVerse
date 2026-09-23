@@ -20,7 +20,8 @@ so the production support team can understand, trace and fix any module the same
   - no dependency cycles between modules;
   - `domain` never depends on `service` or `api`;
   - services never depend on controllers;
-  - controllers live in `..api..`.
+  - controllers live in `..api..`;
+  - no `@Scheduled` methods: background work is a `ManagedJob` (section 10.3).
   If module A must call into a module B that already depends on A, declare an interface (a *port*) in
   A and implement it in B (example: `coa.service.AccountUsageChecker` implemented by `ledger`, and
   `period.service.PeriodCloseGuard` implemented by `journal`).
@@ -212,7 +213,8 @@ public class PolicyApprovalSource implements PendingApprovalSource {
   (`underwriting.service.UnderwritingApprovalSource`).
 - Apply the same checks as the approval itself: the permission of the approve endpoint, every user
   the approval refuses (creator *and* submitter where both are checked), and the authorization limit
-  where the approval enforces one (`JournalApprovalSource`, `PayablesApprovalSource`).
+  where the approval enforces one (`JournalApprovalSource`, `PayablesApprovalSource`,
+  `ClaimApprovalSource`, `UnderwritingApprovalSource`).
 - Sources today: GL journals, accounting rules, chart of accounts, parties, organization,
   underwriting (policies, endorsements, quotations, products, open covers), payables (invoices,
   vouchers, petty cash, bank accounts, funds), receivables (receipts), budget (submitted versions),
@@ -244,11 +246,15 @@ public class PolicyApprovalSource implements PendingApprovalSource {
 ### 10.3 Background jobs – `system`
 
 Implement `system.service.ManagedJob` (name, description, cron, `execute(businessDate)`); do **not**
-use `@Scheduled`. `JobScheduler` schedules it (UTC cron, `"-"` = manual only), `JobRunService`
+use `@Scheduled` (the ArchUnit rule `BACKGROUND_WORK_IS_A_MANAGED_JOB` fails the build).
+`JobScheduler` schedules it (UTC cron, `"-"` = manual only), `JobRunService`
 records every run in `sys_job_run`, a failure raises `JOB_FAILURE`, and administrators see it on
 *Administration → Scheduled Jobs* with "Run now". For batch runs started from your own screen, wrap
 the work in `JobRunService.execute(jobName, JobTrigger.MANUAL, () -> new JobOutcome(n, message))`.
-Make the cron configurable (`finverse.jobs.<name>-cron`).
+Make the cron configurable (`finverse.jobs.<name>-cron`), add it to `application.yml` with an
+environment variable and document it in `docs/operations/CONFIGURATION.md`. Jobs today:
+`RECURRING_JOURNALS`, `ALERT_DAILY_CHECKS`, `PDC_ISSUED_DUE`, `QUOTATION_EXPIRY` (daily) and
+`RESERVE_VALUATION`, `RI_ALLOCATION` (manual unless scheduled).
 
 ### 10.4 Business parameters – `system`
 

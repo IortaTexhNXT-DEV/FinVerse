@@ -6,7 +6,21 @@ export function CheckBadge({ item }: Readonly<{ item: CheckItem }>) {
   if (item.passed) {
     return <span className="badge success">Pass</span>;
   }
-  return <span className={`badge ${item.blocking ? 'danger' : 'warning'}`}>Fail</span>;
+  if (!item.blocking) {
+    return <span className="badge warning">Warning</span>;
+  }
+  return <span className="badge danger">Fail</span>;
+}
+
+/** Readiness message: blocked, ready with warnings to review, or ready. */
+function readiness(checklist: Checklist): string {
+  if (!checklist.ready) {
+    return 'Closing is blocked until every failed control is resolved.';
+  }
+  if (checklist.items.some((i) => !i.passed)) {
+    return 'Ready to close: no blocking control failed; review the warnings below.';
+  }
+  return 'All controls passed: ready to close.';
 }
 
 /** Checklist table with an overall readiness banner. */
@@ -18,9 +32,7 @@ export function ChecklistView({
     <div className="stack">
       {checklist && (
         <div className={`alert ${checklist.ready ? 'success' : 'warning'}`} role="status">
-          {checklist.ready
-            ? 'All controls passed: ready to close.'
-            : 'Closing is blocked until every failed control is resolved.'}
+          {readiness(checklist)}
         </div>
       )}
       <DataTable<CheckItem>

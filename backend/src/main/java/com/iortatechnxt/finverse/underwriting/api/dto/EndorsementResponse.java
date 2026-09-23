@@ -17,6 +17,7 @@ import java.time.LocalDate;
  * @param effectiveDate effective date
  * @param newPeriodFrom renewed period start
  * @param newPeriodTo renewed period end
+ * @param uwYear underwriting year of the period the endorsement belongs to
  * @param description description
  * @param currency policy currency
  * @param document workflow and accounting references
@@ -33,6 +34,7 @@ public record EndorsementResponse(
     LocalDate effectiveDate,
     LocalDate newPeriodFrom,
     LocalDate newPeriodTo,
+    int uwYear,
     String description,
     String currency,
     DocumentStatusResponse document,
@@ -56,6 +58,7 @@ public record EndorsementResponse(
         e.getEffectiveDate(),
         e.getNewPeriodFrom(),
         e.getNewPeriodTo(),
+        e.getUwYear(),
         e.getDescription(),
         e.getPolicy().getCurrency(),
         DocumentStatusResponse.of(e.getWorkflow(), e.getRefs(), e.getCreatedBy(), e.getCreatedAt()),

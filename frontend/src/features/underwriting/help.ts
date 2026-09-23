@@ -19,7 +19,8 @@ export const UNDERWRITING_HELP: HelpSection = {
         'Changes after approval are made by endorsement (Endorse button on the approved policy).',
       ],
       controls: [
-        'Maker-checker: the user who created or submitted a policy cannot approve it. Underwriting applies no authorization limit.',
+        'Maker-checker: the user who created or submitted a policy cannot approve it.',
+        'Authorization limit: the gross premium at 100 %, converted to the base currency at the SPOT rate of the accounting date, must not exceed the approver’s limit (users without a limit are unrestricted). Items above the limit do not appear in that user’s My Approvals.',
         'Approval and accounting happen in one transaction: either both succeed or nothing changes.',
         'The exchange rate is the SPOT rate of the accounting date; it is stored on the policy.',
         'Every creation, submission, approval, rejection and discard is recorded in the audit trail.',
@@ -49,7 +50,7 @@ export const UNDERWRITING_HELP: HelpSection = {
         'Changes to an approved policy, entered from the policy screen and approved like the policy itself. Each endorsement has its own number (policy/E01, E02…) and its own debit or credit note.',
       workflow: [
         'Additional: extra gross premium (e.g. higher sum insured). Refund: return premium, issued with a credit note.',
-        'Renewal: new period starting after the current one; premium defaults to the original gross, plus the policy fee.',
+        'Renewal: new period starting after the current one; premium defaults to the original gross, plus the policy fee. The renewal belongs to the underwriting year in which its new period starts, and so do later endorsements of that period (premium registers and reinsurance treaty year).',
         'Cancellation: pro-rata return premium (1/365) from the effective date to the end of the period; approval cancels the policy.',
         'NIL: non-financial change such as an address or description; no journal.',
       ],
@@ -57,6 +58,7 @@ export const UNDERWRITING_HELP: HelpSection = {
         'Only one endorsement per policy may be in draft or pending at a time.',
         'The effective date must fall within the policy period; a renewal’s new period must start after the current one.',
         'Endorsements use the policy terms: share, discount and loading rates, product taxes and the original commission rate.',
+        'Approval applies the approver’s authorization limit to the endorsement’s gross premium at 100 % (a return premium counts at its absolute value).',
       ],
     },
     {
@@ -68,10 +70,11 @@ export const UNDERWRITING_HELP: HelpSection = {
         'Create the quotation with its first iteration: sum insured, gross premium, discount, loading and charges.',
         'Submit it; a checker approves or rejects it. A new iteration returns it to draft for renegotiation.',
         'Convert an approved quotation while still valid: a draft policy is created with one risk carrying the quoted figures.',
+        'Expire lapsed quotations (underwriting maintain permission) marks every open quotation of the company whose validity has passed as EXPIRED now and shows how many were expired; the daily QUOTATION_EXPIRY job does the same for every company.',
       ],
       controls: [
-        'The user who prepared or submitted a quotation cannot approve or reject it.',
-        'Validity = issue date + validity days (1 to 365); conversion after expiry is refused, and the expiry run marks lapsed quotations EXPIRED.',
+        'The user who prepared or submitted a quotation cannot approve or reject it, and the approver’s authorization limit applies to the gross premium at 100 % of the last iteration.',
+        'Validity = issue date + validity days (1 to 365); conversion after expiry is refused, and the expiry run (daily job or the Expire lapsed quotations button) marks lapsed quotations EXPIRED. Every run is recorded in the job monitor (Scheduled Jobs).',
         'The discount cannot exceed the gross premium.',
       ],
     },

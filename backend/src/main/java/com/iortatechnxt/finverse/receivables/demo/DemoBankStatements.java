@@ -31,7 +31,10 @@ import org.springframework.stereotype.Component;
  * Demo bank statements of the main bank account (1111) built from its book entries the way a bank
  * reports them (one credit per deposit slip, one line per transfer, cheques paid a few days after
  * issue): January-August, reconciled and finalized as of 31 August, and September to date with bank
- * charges, interest and an unpresented cheque, reconciled but not finalized.
+ * charges, interest and an unpresented cheque, reconciled but not finalized. The January statement
+ * opens with the balance brought forward (one line for the demo opening balance of 1 January,
+ * matched to the opening entries of every branch by their common reference), so its running balance
+ * is the account's real balance.
  */
 @Component
 @Profile("demo")
@@ -49,6 +52,7 @@ public class DemoBankStatements {
   private static final int WINDOW = 7;
   private static final String HEADER = "date,description,reference,debit,credit,balance\n";
   private static final String RECEIPT_PREFIX = "OR-";
+  private static final String OPENING = "OPENING";
 
   private final BankAccountDirectory banks;
   private final BankBookQueries book;
@@ -186,7 +190,20 @@ public class DemoBankStatements {
     }
     return receiptRef
         ? new Keyed(ref, new Line(e.valueDate(), "INWARD CREDIT " + ref, ref, amount))
-        : new Keyed("E" + e.id(), new Line(e.valueDate(), "CREDIT", ref, amount));
+        : otherCredit(e);
+  }
+
+  /**
+   * A credit that is neither a receipt nor a deposit: the take-on balance of the book (one entry
+   * per branch) is the one balance the bank brought forward, anything else a credit of its own.
+   */
+  private static Keyed otherCredit(BookEntry e) {
+    BigDecimal amount = e.signedAmount();
+    if (OPENING.equals(e.journalType())) {
+      return new Keyed(
+          OPENING, new Line(e.valueDate(), "BALANCE BROUGHT FORWARD", e.reference(), amount));
+    }
+    return new Keyed("E" + e.id(), new Line(e.valueDate(), "CREDIT", e.reference(), amount));
   }
 
   private static String debitText(String ref) {

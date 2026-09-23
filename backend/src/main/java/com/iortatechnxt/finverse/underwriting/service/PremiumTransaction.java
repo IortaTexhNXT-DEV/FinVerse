@@ -20,6 +20,8 @@ import java.time.LocalDate;
  * @param policy policy header
  * @param issueDate document issue date
  * @param effectiveDate cover start (policy) or effective date (endorsement)
+ * @param uwYear underwriting year of the transaction: the policy's for the original issue, the
+ *     endorsement's otherwise (a renewal belongs to the year its new period starts)
  * @param approvalDate approval (accounting) date, null while pending
  * @param createdBy maker
  * @param approvedBy checker
@@ -37,6 +39,7 @@ public record PremiumTransaction(
     PolicySnapshot policy,
     LocalDate issueDate,
     LocalDate effectiveDate,
+    int uwYear,
     LocalDate approvalDate,
     String createdBy,
     String approvedBy,
@@ -64,6 +67,7 @@ public record PremiumTransaction(
         PolicySnapshot.of(p),
         p.getIssueDate(),
         p.getPeriodFrom(),
+        p.getUwYear(),
         p.getWorkflow().getApprovalDate(),
         p.getCreatedBy(),
         p.getWorkflow().getApprovedBy(),
@@ -89,6 +93,7 @@ public record PremiumTransaction(
         PolicySnapshot.of(e.getPolicy()),
         e.getIssueDate(),
         e.getEffectiveDate(),
+        e.getUwYear(),
         e.getWorkflow().getApprovalDate(),
         e.getCreatedBy(),
         e.getWorkflow().getApprovedBy(),

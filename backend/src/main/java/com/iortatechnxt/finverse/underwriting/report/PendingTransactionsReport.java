@@ -67,7 +67,7 @@ public class PendingTransactionsReport implements ReportDefinition {
             p, DateBasis.ISSUE, EnumSet.of(PolicyStatus.DRAFT, PolicyStatus.PENDING_APPROVAL))) {
       PremiumBreakdown b = t.premium();
       Map<String, Object> m = new LinkedHashMap<>();
-      UwReportSupport.putGroups(m, t.policy(), branches);
+      UwReportSupport.putGroups(m, t, branches);
       UwReportSupport.putDocument(m, t);
       m.put("status", t.status().name());
       m.put("createdBy", t.createdBy());

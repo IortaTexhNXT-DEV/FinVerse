@@ -77,6 +77,15 @@ statuses "as of" a date are taken from this history.
 * BRS: `Bank balance = Book balance - (1) book debits not in bank + (2) book credits not in bank
   - (3) bank debits not in book + (4) bank credits not in book`; the difference to the imported
   statement balance must be zero to finalize.
+* **Period-end checklist.** `BankReconciliationStatusProvider` implements the port
+  `closing.service.ReconciliationStatusProvider`: the number of reconciling items (1) to (4) of every
+  bank account of the company as of the period (or year) end, i.e. the book entries dated up to then
+  and not reconciled as of then, plus the statement lines dated up to then and not matched, exactly
+  the items of the BRS and of FIN-BRS-UNREC-BOOK / FIN-BRS-UNREC-BANK
+  (`BankReconciliationService.unreconciledItems`). The checklist shows them as a warning (see
+  [PLANNING_AND_CLOSING.md](../development/PLANNING_AND_CLOSING.md)). Receivables depends on
+  closing for this port; closing depends on no module that depends on receivables, so the module
+  graph stays acyclic (checked by `ArchitectureTest`) and the port stays in closing.
 
 ## 5. Reports (FINANCE_REPORTS_SPEC.md)
 
@@ -100,7 +109,29 @@ with PDF/Excel export), so the screen, its menu entry and its endpoint
 `GET /api/v1/receivables/party-statement` were removed. `PartyStatementService` remains as the
 engine of the report.
 
-## 6. Known limitations
+## 6. Demo bank balances and statements (demo profile)
+
+* **Opening balances.** `journal.demo.OpeningBalanceDemoData` (`@Order(5)`, before every other demo
+  runner, idempotent on its source references) posts one `OPENING` journal per branch dated
+  1 January 2026 against 3500 Retained Earnings, the opening-balance account of the fixed asset and
+  investment take-on: 1111 BDO Current PHP 150,000,000.00 (head office 145,000,000.00, Cebu
+  2,000,000.00, Davao 3,000,000.00) and 1112 BPI Savings PHP 20,000,000.00 (head office); the USD
+  account 1113 is left as it is. Without them 1111 was overdrawn by about 44.6 million after the demo
+  investment purchases and supplier payments, and the dashboard cash position was negative. With
+  them every bank account is in credit at every month end of 2026, for the company and for each
+  branch (`OpeningBalanceDemoDataIT`).
+* They are system journals posted by the finance manager, like the take-on of fixed assets and
+  investments: manual journals (maker-checker) are limited to MANUAL, ADJUSTMENT and ACCRUAL and to
+  the company's back-value window, so a 1 January take-on cannot be entered as one. The loader sits
+  in `journal` with its own run-as helper; `underwriting.demo.DemoUserContext` would create the cycle
+  journal → underwriting → accounting → journal.
+* **Statements.** `DemoBankStatements` builds the 1111 statements from the book entries; the
+  January statement opens with one *BALANCE BROUGHT FORWARD* credit of 150,000,000.00, matched to the
+  three branch opening entries by their common reference `OPENING-BANK-2026`, so the statement's
+  running balance is the real account balance and the August reconciliation still finalizes with a
+  zero difference.
+
+## 7. Known limitations
 
 * Unmatching deletes the sub-ledger match (the audit trail keeps it), so an ageing "as of" a date
   before a cancellation shows the re-opened debit note as open on that date.

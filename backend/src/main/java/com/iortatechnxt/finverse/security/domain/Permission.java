@@ -63,5 +63,9 @@ public enum Permission {
   // Fixed assets and investments: disposals, transfers, coupon receipts, maturities, sales and
   // fair value updates (masters use MASTER_*, month-end runs use PERIOD_END_RUN). See V671.
   ASSET_MANAGE,
-  INVESTMENT_MANAGE
+  INVESTMENT_MANAGE,
+
+  // Actuarial reserves: prepare and submit valuation runs (approve / post / cancel use
+  // PERIOD_END_RUN). See V421.
+  RESERVE_PREPARE
 }

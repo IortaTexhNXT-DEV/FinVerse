@@ -44,6 +44,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @IntegrationTest
 class AlertRulesIT {
 
+  private static final BigDecimal ALERT_AMOUNT = new BigDecimal("5000.00");
+
   @Autowired private AlertService alerts;
   @Autowired private JobRegistry jobs;
   @Autowired private JobRunService jobRuns;
@@ -90,7 +92,14 @@ class AlertRulesIT {
 
   @Test
   void dailyChecksAreDeduplicatedAndReRaisedAfterResolution() {
-    journals.posted(journals.request("1606", "1102", "5000.00", LocalDate.now()));
+    // Other test classes post to these accounts too: size the journal so that, whatever their
+    // balances are, petty cash ends in credit and the suspense account is not cleared.
+    LocalDate today = LocalDate.now();
+    BigDecimal amount = journals.balance("1102", today).max(BigDecimal.ZERO).add(ALERT_AMOUNT);
+    if (journals.balance("1606", today).add(amount).signum() == 0) {
+      amount = amount.add(BigDecimal.ONE);
+    }
+    journals.posted(journals.request("1606", "1102", amount.toPlainString(), today));
     var run = jobs.run(AlertDailyJob.JOB_NAME, JobTrigger.MANUAL);
     assertThat(run.getStatus()).isEqualTo(JobRunStatus.SUCCEEDED);
     Alert suspense = liveAlert("SUSPENSE_BALANCE", "1606");

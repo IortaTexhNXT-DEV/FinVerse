@@ -1,11 +1,8 @@
 package com.iortatechnxt.finverse.payables;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.finverse.payables.domain.NotificationFormat;
-import com.iortatechnxt.finverse.payables.report.AgeingSlots;
 import com.iortatechnxt.finverse.payables.service.NotificationRecord;
 import com.iortatechnxt.finverse.payables.service.PaymentNotificationFormatter;
 import java.math.BigDecimal;
@@ -14,28 +11,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class PayablesFormattingTest {
-
-  @Test
-  void ageingSlotsBucketAgesAndLabelBuckets() {
-    AgeingSlots slots = AgeingSlots.of(AgeingSlots.DEFAULT);
-    assertThat(slots.size()).isEqualTo(5);
-    assertThat(slots.index(-10)).isZero();
-    assertThat(slots.index(30)).isZero();
-    assertThat(slots.index(31)).isEqualTo(1);
-    assertThat(slots.index(120)).isEqualTo(3);
-    assertThat(slots.index(121)).isEqualTo(4);
-    assertThat(slots.label(0)).isEqualTo("0-30");
-    assertThat(slots.label(1)).isEqualTo("31-60");
-    assertThat(slots.label(4)).isEqualTo("Over 120");
-    assertThat(slots.columns()).hasSize(5);
-    assertThat(slots.describe()).isEqualTo("30/60/90/120");
-    assertThat(AgeingSlots.parameters()).hasSize(5);
-    assertThatThrownBy(() -> AgeingSlots.of(List.of())).isInstanceOf(BusinessRuleException.class);
-    assertThatThrownBy(() -> AgeingSlots.of(List.of(30, 30)))
-        .isInstanceOf(BusinessRuleException.class);
-    assertThatThrownBy(() -> AgeingSlots.of(List.of(1, 2, 3, 4, 5, 6)))
-        .isInstanceOf(BusinessRuleException.class);
-  }
 
   @Test
   void notificationFileFollowsTheDocumentedLayouts() {

@@ -83,7 +83,10 @@ FIN-AR-AGE-DET, FIN-AR-AGE-SUM, FIN-AR-AGE-DIV (division = branch of the documen
 FIN-AR-SOO-FC, FIN-AR-CHQ-RCPT, FIN-AR-CHQ-UNDEP, FIN-ARAP-SOA-MATCH, FIN-BRS-UNREC-BOOK,
 FIN-BRS-UNREC-BANK, FIN-BRS-STMT, FIN-PDC-RCV-ONHAND, FIN-PDC-RCV-PERIOD, FIN-PDC-RCV-DUEBANK and the
 `-DDB` variants (division / department / bank). Ageing slots are configurable per run (up to five
-ascending day limits, default `30,60,90,120`); the basis is the due date or the document date.
+ascending day limits); left blank, the company default applies: the `AGEING_BUCKETS` system
+parameter (`30,60,90,120` as delivered), read by `subledger.service.AgeingService.defaultSlots()`.
+Debtors and creditors reports share one slot type, `subledger.service.AgeingSlots`. The basis is
+the due date or the document date.
 Balances "as of" ignore matches dated after the date.
 
 ## 6. Known limitations

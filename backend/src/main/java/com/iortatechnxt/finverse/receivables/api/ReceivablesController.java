@@ -1,12 +1,12 @@
 package com.iortatechnxt.finverse.receivables.api;
 
-import com.iortatechnxt.finverse.receivables.report.AgeingSlots;
 import com.iortatechnxt.finverse.receivables.service.BankAccountDirectory;
 import com.iortatechnxt.finverse.receivables.service.BankAccountDirectory.BankAccount;
 import com.iortatechnxt.finverse.receivables.service.PartyStatementService;
 import com.iortatechnxt.finverse.receivables.service.PartyStatementService.PartyStatement;
 import com.iortatechnxt.finverse.receivables.service.ReceiptService;
 import com.iortatechnxt.finverse.subledger.api.dto.OpenItemResponse;
+import com.iortatechnxt.finverse.subledger.service.AgeingService;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,6 +24,7 @@ public class ReceivablesController {
   private final BankAccountDirectory banks;
   private final ReceiptService receipts;
   private final PartyStatementService statements;
+  private final AgeingService ageing;
 
   /**
    * Creates the controller.
@@ -31,12 +32,17 @@ public class ReceivablesController {
    * @param banks bank account directory
    * @param receipts receipt service
    * @param statements party statement service
+   * @param ageing sub-ledger ageing (default slots)
    */
   public ReceivablesController(
-      BankAccountDirectory banks, ReceiptService receipts, PartyStatementService statements) {
+      BankAccountDirectory banks,
+      ReceiptService receipts,
+      PartyStatementService statements,
+      AgeingService ageing) {
     this.banks = banks;
     this.receipts = receipts;
     this.statements = statements;
+    this.ageing = ageing;
   }
 
   /**
@@ -97,13 +103,13 @@ public class ReceivablesController {
   /**
    * Ageing slot labels for a slot definition (UI preview).
    *
-   * @param slots slot text, e.g. "30,60,90,120"
+   * @param slots slot text, e.g. "30,60,90,120" (blank = company default)
    * @return labels
    */
   @GetMapping("/ageing-slots")
   @PreAuthorize(
       "hasAnyAuthority('RECEIPT_PAYMENT_MAINTAIN','RECEIPT_PAYMENT_AUTHORIZE','REPORT_FINANCIAL')")
   public List<String> ageingSlots(@RequestParam(required = false) String slots) {
-    return AgeingSlots.parse(slots).labels();
+    return ageing.slotsOrDefault(slots).labels();
   }
 }

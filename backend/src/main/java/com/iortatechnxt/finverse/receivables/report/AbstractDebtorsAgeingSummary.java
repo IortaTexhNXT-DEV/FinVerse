@@ -12,6 +12,8 @@ import com.iortatechnxt.finverse.report.core.ReportResult;
 import com.iortatechnxt.finverse.report.core.TabularReportBuilder;
 import com.iortatechnxt.finverse.report.gl.GlReportSupport;
 import com.iortatechnxt.finverse.security.domain.Permission;
+import com.iortatechnxt.finverse.subledger.service.AgeingService;
+import com.iortatechnxt.finverse.subledger.service.AgeingSlots;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -31,6 +33,7 @@ public abstract class AbstractDebtorsAgeingSummary implements ReportDefinition {
   private static final String LEDGER = "ledger";
 
   private final ReceivablesQueries queries;
+  private final AgeingService ageing;
   private final String code;
   private final String title;
   private final boolean byDivision;
@@ -39,13 +42,19 @@ public abstract class AbstractDebtorsAgeingSummary implements ReportDefinition {
    * Creates the report.
    *
    * @param queries receivables read model
+   * @param ageing sub-ledger ageing (default slots)
    * @param code report code
    * @param title title
    * @param byDivision group by division (branch) first
    */
   protected AbstractDebtorsAgeingSummary(
-      ReceivablesQueries queries, String code, String title, boolean byDivision) {
+      ReceivablesQueries queries,
+      AgeingService ageing,
+      String code,
+      String title,
+      boolean byDivision) {
     this.queries = queries;
+    this.ageing = ageing;
     this.code = code;
     this.title = title;
     this.byDivision = byDivision;
@@ -64,11 +73,12 @@ public abstract class AbstractDebtorsAgeingSummary implements ReportDefinition {
 
   @Override
   public ReportResult generate(ReportParameters p) {
-    AgeingSlots slots = ReceivablesReportSupport.slots(p);
+    AgeingSlots slots = ReceivablesReportSupport.slots(p, ageing);
     boolean foreign = ReceivablesReportSupport.foreign(p);
     List<ArItem> items = ReceivablesReportSupport.selectedItems(queries, p);
     Map<String, Map<String, Object>> byKey = new LinkedHashMap<>();
-    for (AgedItem a : ReceivablesReportSupport.age(items, p.date(GlReportSupport.AS_OF), p)) {
+    for (AgedItem a :
+        ReceivablesReportSupport.age(items, p.date(GlReportSupport.AS_OF), p, slots)) {
       ArItem i = a.item();
       String currency = foreign ? i.currency() : "BASE";
       String key = (byDivision ? i.branchCode() : "") + "|" + i.partyCode() + "|" + currency;

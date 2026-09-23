@@ -11,6 +11,7 @@ import com.iortatechnxt.finverse.report.core.ReportResult;
 import com.iortatechnxt.finverse.report.core.TabularReportBuilder;
 import com.iortatechnxt.finverse.report.gl.GlReportSupport;
 import com.iortatechnxt.finverse.security.domain.Permission;
+import com.iortatechnxt.finverse.subledger.service.AgeingSlots;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,6 +37,12 @@ public class StatementOfPayablesReport implements ReportDefinition {
   private static final String SUPPLIER = "supplier";
   private static final String BALANCE = "balance";
   private static final String PDC_AMOUNT = "pdcAmount";
+
+  /**
+   * Default slots of this statement's fixed layout (0-30, 31-60, 61-90, 91-180, 181-365, over 365),
+   * which the Reports Book prescribes independently of the company-wide ageing default.
+   */
+  private static final AgeingSlots STATEMENT_SLOTS = AgeingSlots.of(List.of(30, 60, 90, 180, 365));
 
   private final CreditorReportSupport support;
   private final CreditorLedger ledger;
@@ -68,7 +75,7 @@ public class StatementOfPayablesReport implements ReportDefinition {
 
   @Override
   public ReportResult generate(ReportParameters p) {
-    AgeingSlots slots = AgeingSlots.from(p, AgeingSlots.STATEMENT);
+    AgeingSlots slots = CreditorReportSupport.slots(p, STATEMENT_SLOTS);
     String currency = p.optionalText(STATEMENT_CURRENCY).orElse(support.baseCurrency(p));
     LocalDate asOf = p.date(GlReportSupport.AS_OF);
     boolean byDue = CreditorReportSupport.byDueDate(p);
@@ -92,7 +99,7 @@ public class StatementOfPayablesReport implements ReportDefinition {
     columns.add(ReportColumn.date("pdcDate", "PDC Date"));
     columns.add(ReportColumn.text("pdcNo", "PDC Number"));
     columns.add(ReportColumn.amount(PDC_AMOUNT, "PDC Amount"));
-    columns.addAll(slots.columns());
+    columns.addAll(CreditorReportSupport.bucketColumns(slots));
     columns.add(ReportColumn.amount(CreditorReportSupport.ON_ACCOUNT, "On Account"));
     columns.add(ReportColumn.amount("netOfPdc", "Balance Net of PDC"));
     return TabularReportBuilder.of(p)
@@ -140,7 +147,7 @@ public class StatementOfPayablesReport implements ReportDefinition {
     }
     String bucket =
         item.credit()
-            ? AgeingSlots.key(slots.index(item.age(asOf, byDue)))
+            ? CreditorReportSupport.bucketKey(slots.index(item.age(asOf, byDue)))
             : CreditorReportSupport.ON_ACCOUNT;
     row.put(bucket, gross);
     row.put("netOfPdc", netOfPdc);

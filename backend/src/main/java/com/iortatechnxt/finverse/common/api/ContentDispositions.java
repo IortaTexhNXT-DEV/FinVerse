@@ -72,6 +72,9 @@ public final class ContentDispositions {
   }
 
   private static boolean isAttrChar(char c) {
-    return (c < ASCII_LIMIT && Character.isLetterOrDigit(c)) || ATTR_CHAR_SYMBOLS.indexOf(c) >= 0;
+    if (c >= ASCII_LIMIT) {
+      return false;
+    }
+    return Character.isLetterOrDigit(c) || ATTR_CHAR_SYMBOLS.indexOf(c) >= 0;
   }
 }

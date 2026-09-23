@@ -65,11 +65,7 @@ public final class ReportParameters {
     Map<String, String> resolved = new HashMap<>();
     List<String> errors = new ArrayList<>();
     for (ParameterSpec spec : metadata.parameters()) {
-      boolean supplied = raw != null && raw.containsKey(spec.name());
-      String value = trimToNull(supplied ? raw.get(spec.name()) : null);
-      if (value == null && !(supplied && spec.required())) {
-        value = resolveDefault(spec.defaultValue(), clock);
-      }
+      String value = resolve(spec, raw, clock);
       if (value == null) {
         if (spec.required()) {
           errors.add(spec.label() + " is required");
@@ -211,6 +207,19 @@ public final class ReportParameters {
     if (!spec.options().isEmpty() && !spec.options().contains(value)) {
       errors.add(spec.label() + " must be one of " + spec.options());
     }
+  }
+
+  /** Supplied value, else the default of an omitted parameter (never of a cleared required one). */
+  private static String resolve(ParameterSpec spec, Map<String, String> raw, Clock clock) {
+    boolean supplied = raw != null && raw.containsKey(spec.name());
+    if (!supplied) {
+      return resolveDefault(spec.defaultValue(), clock);
+    }
+    String value = trimToNull(raw.get(spec.name()));
+    if (value != null || spec.required()) {
+      return value;
+    }
+    return resolveDefault(spec.defaultValue(), clock);
   }
 
   private static String resolveDefault(String keyword, Clock clock) {

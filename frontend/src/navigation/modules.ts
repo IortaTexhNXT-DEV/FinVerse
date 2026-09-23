@@ -4,6 +4,7 @@ import { dashboardModule } from '@/features/dashboard/module';
 import { glModule } from '@/features/gl/module';
 import { reportsModule } from '@/features/reports/module';
 import { setupModule } from '@/features/setup/module';
+import { underwritingModule } from '@/features/underwriting/module';
 import type { FeatureModule } from './types';
 
 /**
@@ -13,6 +14,7 @@ import type { FeatureModule } from './types';
 export const MODULES: FeatureModule[] = [
   dashboardModule,
   glModule,
+  underwritingModule,
   accountingEngineModule,
   reportsModule,
   setupModule,

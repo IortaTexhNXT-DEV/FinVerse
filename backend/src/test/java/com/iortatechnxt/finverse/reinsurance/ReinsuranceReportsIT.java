@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.finverse.organization.service.OrganizationService;
 import com.iortatechnxt.finverse.reinsurance.demo.ReinsuranceDemoData;
+import com.iortatechnxt.finverse.reinsurance.demo.ReinsuranceStatementsDemoData;
 import com.iortatechnxt.finverse.reinsurance.domain.FacStatus;
 import com.iortatechnxt.finverse.reinsurance.domain.SoaStatus;
 import com.iortatechnxt.finverse.reinsurance.service.AllocationRunService;
@@ -75,8 +76,7 @@ class ReinsuranceReportsIT {
   @Autowired private SoaService statements;
 
   private ReinsuranceDemoData loader() {
-    return new ReinsuranceDemoData(
-        organization, treaties, allocation, placements, claims, statements, users);
+    return new ReinsuranceDemoData(organization, treaties, allocation, placements, claims, users);
   }
 
   @BeforeEach
@@ -95,6 +95,8 @@ class ReinsuranceReportsIT {
                 users)
             .load(data.company().getId());
         loader().load(data.company().getId());
+        new ReinsuranceStatementsDemoData(organization, treaties, statements, users)
+            .load(data.company().getId());
         loaded = true;
       }
     }

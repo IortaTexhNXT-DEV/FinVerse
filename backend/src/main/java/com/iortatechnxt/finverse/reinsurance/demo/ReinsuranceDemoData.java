@@ -3,18 +3,14 @@ package com.iortatechnxt.finverse.reinsurance.demo;
 import com.iortatechnxt.finverse.organization.domain.Company;
 import com.iortatechnxt.finverse.organization.service.OrganizationService;
 import com.iortatechnxt.finverse.reinsurance.api.dto.FacAssignRequest;
-import com.iortatechnxt.finverse.reinsurance.api.dto.SettlementRequest;
-import com.iortatechnxt.finverse.reinsurance.api.dto.SoaRequest;
 import com.iortatechnxt.finverse.reinsurance.api.dto.TreatyRequest;
 import com.iortatechnxt.finverse.reinsurance.domain.FacPlacement;
 import com.iortatechnxt.finverse.reinsurance.domain.FacStatus;
-import com.iortatechnxt.finverse.reinsurance.domain.Soa;
 import com.iortatechnxt.finverse.reinsurance.domain.Treaty;
 import com.iortatechnxt.finverse.reinsurance.service.AllocationRunResult;
 import com.iortatechnxt.finverse.reinsurance.service.AllocationRunService;
 import com.iortatechnxt.finverse.reinsurance.service.ClaimRecoveryService;
 import com.iortatechnxt.finverse.reinsurance.service.FacPlacementService;
-import com.iortatechnxt.finverse.reinsurance.service.SoaService;
 import com.iortatechnxt.finverse.reinsurance.service.TreatyService;
 import com.iortatechnxt.finverse.system.domain.JobTrigger;
 import com.iortatechnxt.finverse.underwriting.demo.DemoUserContext;
@@ -32,25 +28,26 @@ import org.springframework.stereotype.Component;
 
 /**
  * DEMO PROFILE ONLY: creates the reinsurance demo data of the demo company (FVI) at start-up
- * through the services, after the underwriting portfolio ({@code @Order(10)}) and claims
- * ({@code @Order(20)}):
+ * through the services, after the underwriting portfolio ({@code @Order(10)}) and before claims
+ * ({@code @Order(20)}), so that every demo claim movement finds the cession of its policy:
  *
  * <ol>
  *   <li>the 2026 treaty programme (made by the reinsurance officer "reinsurer", authorized by the
  *       finance manager "fmanager");
  *   <li>an RI allocation run over the approved underwriting portfolio;
  *   <li>facultative placements: most placed (a few closed), some submitted, the rest provisional;
- *   <li>claim movements posted before any treaty existed, replayed through the claims port when the
- *       claims module is deployed;
- *   <li>Q1 and Q2 statements of account, approved, and the Q1 fire quota share statement of the
- *       local reinsurer settled.
+ *   <li>claim movements posted before any treaty existed (none in the standard demo order),
+ *       replayed through the claims port when the claims module is deployed.
  * </ol>
+ *
+ * <p>The statements of account come later, from {@link ReinsuranceStatementsDemoData}, so that they
+ * include the reinsurers' share of the demo claims.
  *
  * <p>Idempotent: nothing is created when the company already has treaties.
  */
 @Component
 @Profile("demo")
-@Order(30)
+@Order(15)
 public class ReinsuranceDemoData implements ApplicationRunner {
 
   static final String MAKER = "reinsurer";
@@ -60,24 +57,19 @@ public class ReinsuranceDemoData implements ApplicationRunner {
   private static final String DEMO_COMPANY = "FVI";
   private static final LocalDate YEAR_START = LocalDate.of(DemoTreaties.YEAR, 1, 1);
   private static final LocalDate LAST_POSTING = LocalDate.of(DemoTreaties.YEAR, 9, 22);
-  private static final LocalDate SETTLEMENT_DATE = LocalDate.of(DemoTreaties.YEAR, 7, 31);
   private static final int PLACEMENT_LAG_DAYS = 14;
-  private static final int STATEMENT_LAG_DAYS = 15;
   private static final int SUBMIT_EVERY = 4;
   private static final int PROVISIONAL_EVERY = 5;
   private static final int CLOSE_EVERY = 3;
-  private static final int MONTHS_PER_QUARTER = 3;
   private static final BigDecimal LEAD_SHARE = BigDecimal.valueOf(60);
   private static final BigDecimal FOLLOW_SHARE = BigDecimal.valueOf(30);
   private static final BigDecimal FAC_COMMISSION = BigDecimal.valueOf(20);
-  private static final List<Integer> QUARTERS = List.of(1, 2);
 
   private final OrganizationService organization;
   private final TreatyService treaties;
   private final AllocationRunService allocation;
   private final FacPlacementService placements;
   private final ClaimRecoveryService claims;
-  private final SoaService statements;
   private final DemoUserContext users;
 
   /**
@@ -88,7 +80,6 @@ public class ReinsuranceDemoData implements ApplicationRunner {
    * @param allocation allocation run
    * @param placements facultative placements
    * @param claims claim movement catch-up
-   * @param statements statements of account
    * @param users demo user context
    */
   public ReinsuranceDemoData(
@@ -97,14 +88,12 @@ public class ReinsuranceDemoData implements ApplicationRunner {
       AllocationRunService allocation,
       FacPlacementService placements,
       ClaimRecoveryService claims,
-      SoaService statements,
       DemoUserContext users) {
     this.organization = organization;
     this.treaties = treaties;
     this.allocation = allocation;
     this.placements = placements;
     this.claims = claims;
-    this.statements = statements;
     this.users = users;
   }
 
@@ -142,15 +131,13 @@ public class ReinsuranceDemoData implements ApplicationRunner {
             MAKER, () -> allocation.post(companyId, YEAR_START, LAST_POSTING, JobTrigger.MANUAL));
     int placed = placeFacultative(companyId);
     int replayed = users.runAs(MAKER, () -> claims.catchUp(companyId, YEAR_START, LAST_POSTING));
-    int soas = statements(companyId, created);
     LOG.info(
         "Reinsurance demo data created: {} treaties, {} cessions, {} FAC placed, {} claim"
-            + " movements, {} statements",
+            + " movements",
         created.size(),
         run.ceded(),
         placed,
-        replayed,
-        soas);
+        replayed);
     return created;
   }
 
@@ -187,48 +174,6 @@ public class ReinsuranceDemoData implements ApplicationRunner {
       }
     }
     return placed;
-  }
-
-  private int statements(Long companyId, List<Treaty> created) {
-    int count = 0;
-    for (Treaty t : created) {
-      for (int quarter : QUARTERS) {
-        LocalDate date =
-            LocalDate.of(DemoTreaties.YEAR, quarter * MONTHS_PER_QUARTER, 1)
-                .plusMonths(1)
-                .minusDays(1);
-        SoaRequest request =
-            new SoaRequest(
-                companyId,
-                t.getCode(),
-                null,
-                DemoTreaties.YEAR,
-                quarter,
-                date.plusDays(STATEMENT_LAG_DAYS));
-        List<Soa> soas = users.runAs(MAKER, () -> statements.generate(request));
-        for (Soa s : soas) {
-          users.runAs(CHECKER, () -> statements.approve(s.getId()));
-          count++;
-        }
-      }
-    }
-    settleOne(companyId);
-    return count;
-  }
-
-  private void settleOne(Long companyId) {
-    statements.list(companyId).stream()
-        .filter(s -> "FIRE-QS-26".equals(s.getTreaty().getCode()))
-        .filter(s -> DemoTreaties.LOCAL.equals(s.getParty().getCode()) && s.getQuarter() == 1)
-        .filter(s -> s.getBalance().signum() != 0)
-        .findFirst()
-        .ifPresent(
-            s ->
-                users.runAs(
-                    CHECKER,
-                    () ->
-                        statements.settle(
-                            s.getId(), new SettlementRequest(SETTLEMENT_DATE, "1111"))));
   }
 
   private static LocalDate capped(LocalDate date) {

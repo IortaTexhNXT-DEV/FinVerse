@@ -2,7 +2,7 @@
 
 Package `com.iortatechnxt.finverse.reinsurance`, frontend `src/features/reinsurance`, migrations
 `V300` (schema, event types, alert codes, permission) and `V930` (demo parties and posting rules),
-demo loader `reinsurance.demo.ReinsuranceDemoData` (`@Profile("demo")`, `@Order(30)`, idempotent).
+demo loader `reinsurance.demo.ReinsuranceDemoData` (`@Profile("demo")`, `@Order(15)`, idempotent; statements of account come from `ReinsuranceStatementsDemoData`, `@Order(25)`, after the demo claims).
 
 All reinsurance amounts are accounted in the **company base currency**. A policy in a foreign
 currency is split in its own currency and converted at the cession's rate; treaty limits are in base

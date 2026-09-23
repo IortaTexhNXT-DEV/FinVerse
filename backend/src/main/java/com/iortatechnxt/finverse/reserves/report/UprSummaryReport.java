@@ -133,7 +133,7 @@ public class UprSummaryReport implements ReportDefinition {
     row.put("unearned", BigDecimal.valueOf(i.units().unearned()));
   }
 
-  private static void putAmounts(Map<String, Object> row, BigDecimal[] values) {
+  private static void putAmounts(Map<String, Object> row, BigDecimal... values) {
     for (int n = 0; n < AMOUNTS.length; n++) {
       row.put(AMOUNTS[n], values[n]);
     }

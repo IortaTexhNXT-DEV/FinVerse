@@ -92,7 +92,7 @@ public final class ClaimsTriangleBuilder {
   }
 
   /** Cumulates each row over the ages observed so far (row i observes n − i ages). */
-  private static List<List<BigDecimal>> cumulate(BigDecimal[][] incremental) {
+  private static List<List<BigDecimal>> cumulate(BigDecimal[]... incremental) {
     int n = incremental.length;
     List<List<BigDecimal>> rows = new ArrayList<>();
     for (int i = 0; i < n; i++) {

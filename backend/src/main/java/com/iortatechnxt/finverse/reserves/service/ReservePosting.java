@@ -15,7 +15,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import org.springframework.stereotype.Component;
@@ -170,8 +169,8 @@ public class ReservePosting {
             null,
             unit.key().businessLine(),
             unit.costCenter(),
-            ("R".equals(kind) ? "Reversal of " : "")
-                + eventType.replace('_', ' ').toLowerCase(Locale.ROOT)
+            ("R".equals(kind) ? "Reversal of " : "Reserve movement ")
+                + eventType
                 + " "
                 + run.getPeriodName()
                 + " "

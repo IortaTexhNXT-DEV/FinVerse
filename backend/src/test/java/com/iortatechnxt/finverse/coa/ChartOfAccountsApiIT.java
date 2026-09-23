@@ -53,12 +53,28 @@ class ChartOfAccountsApiIT {
     return prefix + ThreadLocalRandom.current().nextInt(100, 999);
   }
 
+  /**
+   * A new, authorized postable expense account under 5600 used as the parent of the micro accounts
+   * created here. Adding a child turns the parent into a heading, so the tests must never attach
+   * children to shared demo accounts that other test classes post to.
+   */
+  private String testParent() throws Exception {
+    String code = uniqueCode("56T");
+    long id =
+        api.read(api.doPost("accountant", ACCOUNTS, account(code, "EXPENSE", "SUB", "5600")))
+            .get("id")
+            .asLong();
+    api.doPost("checker", ACCOUNTS + "/" + id + "/authorize", null).andExpect(status().isOk());
+    return code;
+  }
+
   @Test
   void accountLifecycleWithMakerCheckerFreezeAndClose() throws Exception {
-    String code = uniqueCode("5613-");
+    String parent = testParent();
+    String code = uniqueCode(parent + "-");
     var created =
         api.read(
-            api.doPost("accountant", ACCOUNTS, account(code, "EXPENSE", "MICRO", "5613"))
+            api.doPost("accountant", ACCOUNTS, account(code, "EXPENSE", "MICRO", parent))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.recordStatus").value("PENDING_AUTHORIZATION")));
     long id = created.get("id").asLong();
@@ -70,7 +86,7 @@ class ChartOfAccountsApiIT {
         .andExpect(jsonPath("$.recordStatus").value("ACTIVE"))
         .andExpect(jsonPath("$.authorizedBy").value("checker"));
 
-    var update = account(code, "EXPENSE", "MICRO", "5613");
+    var update = account(code, "EXPENSE", "MICRO", parent);
     update.put("name", "Renamed " + code);
     api.doPut("accountant", ACCOUNTS + "/" + id, update)
         .andExpect(jsonPath("$.recordStatus").value("PENDING_AUTHORIZATION"))
@@ -91,10 +107,13 @@ class ChartOfAccountsApiIT {
 
   @Test
   void makerCannotAuthorizeOwnAccount() throws Exception {
+    String parent = testParent();
     long id =
         api.read(
                 api.doPost(
-                    "fmanager", ACCOUNTS, account(uniqueCode("5613-"), "EXPENSE", "MICRO", "5613")))
+                    "fmanager",
+                    ACCOUNTS,
+                    account(uniqueCode(parent + "-"), "EXPENSE", "MICRO", parent)))
             .get("id")
             .asLong();
     api.doPost("fmanager", ACCOUNTS + "/" + id + "/authorize", null)
@@ -108,7 +127,7 @@ class ChartOfAccountsApiIT {
         .andExpect(status().isConflict());
     api.doPost("accountant", ACCOUNTS, account(uniqueCode("9-"), "EXPENSE", "MICRO", "5000"))
         .andExpect(jsonPath("$.code").value("INVALID_TIER"));
-    api.doPost("accountant", ACCOUNTS, account(uniqueCode("9-"), "ASSET", "MICRO", "5613"))
+    api.doPost("accountant", ACCOUNTS, account(uniqueCode("9-"), "ASSET", "MICRO", testParent()))
         .andExpect(jsonPath("$.code").value("CLASS_MISMATCH"));
     api.doPost("accountant", ACCOUNTS, account(uniqueCode("9-"), "EXPENSE", "SUB", null))
         .andExpect(jsonPath("$.code").value("PARENT_REQUIRED"));

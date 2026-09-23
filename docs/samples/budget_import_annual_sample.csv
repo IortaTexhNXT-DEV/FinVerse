@@ -1,0 +1,5 @@
+# Annual layout: the annual amount is spread evenly over the twelve months.
+account_code,cost_centre,annual
+4501,,18000000
+5609,MKT,3600000
+5610,IT,4800000

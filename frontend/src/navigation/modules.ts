@@ -2,6 +2,7 @@ import { accountingEngineModule } from '@/features/accounting-engine/module';
 import { adminModule } from '@/features/admin/module';
 import { withOverviewScreens } from '@/features/approvals/module';
 import { assetsModule } from '@/features/assets/module';
+import { planningModule } from '@/features/closing/module';
 import { dashboardModule } from '@/features/dashboard/module';
 import { glModule } from '@/features/gl/module';
 import { helpModule } from '@/features/help/module';
@@ -23,10 +24,11 @@ export const MODULES: FeatureModule[] = [
   withOverviewScreens(dashboardModule),
   withJournalAutomation(glModule),
   underwritingModule,
-  accountingEngineModule,
+  receivablesModule,
   payablesModule,
   assetsModule,
-  receivablesModule,
+  planningModule,
+  accountingEngineModule,
   reportsModule,
   setupModule,
   adminModule,

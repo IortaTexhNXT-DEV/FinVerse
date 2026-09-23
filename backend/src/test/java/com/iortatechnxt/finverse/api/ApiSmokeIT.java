@@ -5,6 +5,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.iortatechnxt.finverse.consolidation.service.ConsolidationGroupService;
+import com.iortatechnxt.finverse.period.service.PeriodService;
 import com.iortatechnxt.finverse.support.IntegrationTest;
 import com.iortatechnxt.finverse.support.TestData;
 import com.jayway.jsonpath.JsonPath;
@@ -27,6 +29,8 @@ class ApiSmokeIT {
 
   @Autowired private MockMvc mvc;
   @Autowired private TestData data;
+  @Autowired private PeriodService periods;
+  @Autowired private ConsolidationGroupService groups;
 
   @ParameterizedTest
   @ValueSource(
@@ -115,6 +119,16 @@ class ApiSmokeIT {
         "/api/v1/receivables/bank-rec/brs?companyId={c}&bankAccountCode=1111&asOf=2026-09-30",
         "/api/v1/receivables/bank-rec/matches?companyId={c}&bankAccountCode=1111",
         "/api/v1/receivables/bank-rec/reconciliations?companyId={c}",
+        "/api/v1/budgets?companyId={c}",
+        "/api/v1/budgets?companyId={c}&fiscalYear=2026",
+        "/api/v1/budgets/variance?companyId={c}&asOf=2026-06-30&byCostCenter=true",
+        "/api/v1/budgets/alerts?companyId={c}&asOf=2026-06-30&threshold=50",
+        "/api/v1/intercompany/relationships",
+        "/api/v1/intercompany/relationships?companyId={c}",
+        "/api/v1/intercompany/transactions?companyId={c}",
+        "/api/v1/intercompany/reconciliation?companyId={c}&asOf=2026-06-30",
+        "/api/v1/consolidation/groups",
+        "/api/v1/closing/fx-revaluations?companyId={c}",
       })
   @WithUserDetails("fmanager")
   void readEndpointsRespondOk(String url) throws Exception {
@@ -131,6 +145,34 @@ class ApiSmokeIT {
     mvc.perform(
             get("/api/v1/currencies/rates/effective?baseCurrency=PHP&currency=USD&date=2026-06-30"))
         .andExpect(status().isOk());
+  }
+
+  @Test
+  @WithUserDetails("fmanager")
+  void planningAndClosingEndpointsRespondOk() throws Exception {
+    Long company = data.company().getId();
+    var year = periods.yearContaining(company, LocalDate.of(2026, 6, 30));
+    Long june =
+        periods.listPeriods(year.getId()).stream()
+            .filter(p -> p.getName().equals("2026-06"))
+            .findFirst()
+            .orElseThrow()
+            .getId();
+    String c = "?companyId=" + company;
+    mvc.perform(get("/api/v1/closing/period-end/checklist" + c + "&periodId=" + june))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.items").isArray());
+    mvc.perform(get("/api/v1/closing/year-end/checklist" + c + "&fiscalYearId=" + year.getId()))
+        .andExpect(status().isOk());
+    mvc.perform(get("/api/v1/closing/year-end/preview" + c + "&fiscalYearId=" + year.getId()))
+        .andExpect(status().isOk());
+    mvc.perform(get("/api/v1/closing/year-end/close?fiscalYearId=" + year.getId()))
+        .andExpect(status().isNoContent());
+    mvc.perform(get("/api/v1/closing/fx-revaluations/preview" + c + "&periodId=" + june))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.periodName").value("2026-06"));
+    Long group = groups.getByCode("FVGRP").getId();
+    mvc.perform(get("/api/v1/consolidation/groups/" + group + "/runs")).andExpect(status().isOk());
   }
 
   @Test

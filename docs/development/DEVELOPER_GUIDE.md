@@ -206,7 +206,19 @@ public class PolicyApprovalSource implements PendingApprovalSource {
 - `link` is the frontend route that opens the item (the inbox navigates there).
 - Maker-checker master data (`AuthorizableEntity`) needs no custom query: use
   `approval.service.MasterRecordApprovals.pending(viewer, Entity.class, e -> new RecordFacts(...))`
-  (see `organization.service.OrganizationApprovalSource`).
+  (see `organization.service.OrganizationApprovalSource`). Records a module authorizes under its own
+  permission pass a `Scope(module, permission)`, e.g. products under `POLICY_AUTHORIZE`
+  (`underwriting.service.UnderwritingApprovalSource`).
+- Apply the same checks as the approval itself: the permission of the approve endpoint, every user
+  the approval refuses (creator *and* submitter where both are checked), and the authorization limit
+  where the approval enforces one (`JournalApprovalSource`, `PayablesApprovalSource`).
+- Sources today: GL journals, accounting rules, chart of accounts, parties, organization,
+  underwriting (policies, endorsements, quotations, products, open covers), payables (invoices,
+  vouchers, petty cash, bank accounts, funds), receivables (receipts), budget (submitted versions),
+  fixed assets (capitalization, categories), investments (holdings, portfolios). Consolidation runs
+  have no maker-checker step, so they have no source.
+- The `PENDING_APPROVAL_AGEING` check reads `ApprovalInboxService.pendingAll()` (the system view of
+  every source) and raises one alert per item, de-duplicated on module, type and reference.
 - API: `GET /api/v1/approvals/inbox?companyId=`, `GET /api/v1/approvals/counts` (header badge).
 
 ### 10.2 Exception codes and alerts – `alert`
@@ -238,7 +250,10 @@ Make the cron configurable (`finverse.jobs.<name>-cron`).
 
 ### 10.4 Business parameters – `system`
 
-Read shared parameters with `SystemParameterService.intValue/text/items(KEY, fallback)`. Add a
+Read shared parameters with `SystemParameterService.intValue/text/items(KEY, fallback)`.
+`AGEING_BUCKETS` is the default of every debtors / creditors ageing report
+(`subledger.service.AgeingService.defaultSlots()`, slots in `subledger.service.AgeingSlots`);
+`REPORT_FOOTER_TEXT` is printed at the foot of every PDF page. Add a
 parameter with an insert into `sys_parameter` in your migration (type `STRING`, `INTEGER`,
 `DECIMAL`, `BOOLEAN`, `INTEGER_LIST` or `CODE_LIST`, optional min/max). Never store secrets there.
 
@@ -250,7 +265,18 @@ stored in PostgreSQL with SHA-256 checksum, type/signature and size checks
 (`finverse.attachments.max-size`, default 10 MB) and audit entries. Malware scanning: add a bean
 implementing `attachment.service.VirusScanner`. Permissions `ATTACHMENT_VIEW` / `ATTACHMENT_MANAGE`.
 
-### 10.6 Help content
+### 10.6 Executive dashboard – `dashboard`
+
+`GET /api/v1/dashboard` is the ledger summary; `/dashboard/{premium,claims,collections,payables,
+cash,budget,workload}` serve one widget each (optional `branchId` and `asOf`), so a widget without
+data or with an error never blanks the others. Ledger figures come from constant SQL over platform
+tables (`DashboardLedgerQueries`); the accounts are mapped in `finverse.dashboard.*`
+(`DashboardProperties`: statement lines for premium and cash, account prefixes for claims paid and
+the outstanding claims reserve). Collections come from `receivables.service.CollectionQueries` and
+the budget from `BudgetMonitoringService`: the dashboard depends on those modules' query services,
+never the reverse.
+
+### 10.7 Help content
 
 Every screen has an entry in `frontend/src/features/help/helpContent.ts` (summary, workflow,
 controls). Add your module's section when you add screens.

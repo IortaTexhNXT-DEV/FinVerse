@@ -45,7 +45,15 @@ export const HELP_SECTIONS: HelpSection[] = [
         name: 'Dashboard',
         path: '/',
         summary:
-          'Key figures of the selected company and branch: cash, receivables, reserves and results.',
+          'Executive view of the selected company and branch: ledger KPIs, gross written premium against the prior year, claims paid and outstanding, collections and receivables ageing, payables due in 7 and 30 days, cash and bank position, expense budget against actual, open alerts and your pending approvals.',
+        workflow: [
+          'Choose the company and branch in the header; every widget follows the selection (the budget is company-wide).',
+          'Click the pending approvals or open alerts figure to open the inbox or the alert list.',
+        ],
+        controls: [
+          'Figures are read from the posted ledger and the sub-ledger in base currency; unposted journals are excluded.',
+          'Each widget loads on its own and shows a message when it has no data.',
+        ],
       },
       {
         name: 'Alerts',

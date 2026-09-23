@@ -3,6 +3,7 @@ import type { ManualJournalType } from '@/api/gl';
 import { Field } from '@/components/ui/Field';
 import { useWorkspace } from '@/context/workspaceContext';
 import { JournalLinesEditor } from '@/features/gl/JournalLinesEditor';
+import { lineProblems } from '@/features/gl/journalMath';
 import { humanize } from '@/utils/format';
 import { FREQUENCIES } from './recurringModel';
 import type { TemplateForm } from './recurringModel';
@@ -182,7 +183,11 @@ export function RecurringTemplateForm({ value, onChange }: Readonly<Props>) {
     <div className="stack">
       <HeaderFields value={value} onChange={onChange} />
       <ScheduleFields value={value} onChange={onChange} />
-      <JournalLinesEditor lines={value.lines} onChange={(lines) => onChange({ ...value, lines })} />
+      <JournalLinesEditor
+        lines={value.lines}
+        problems={lineProblems(value.lines)}
+        onChange={(lines) => onChange({ ...value, lines })}
+      />
     </div>
   );
 }

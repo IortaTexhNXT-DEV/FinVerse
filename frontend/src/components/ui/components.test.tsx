@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { ApiError } from '@/api/client';
 import { DataTable } from './DataTable';
+import { ErrorAlert } from './ErrorAlert';
 import { Modal } from './Modal';
 import { StatusBadge } from './StatusBadge';
 
@@ -47,6 +49,30 @@ describe('ui components', () => {
   it('shows the empty message when there are no rows', () => {
     render(<DataTable rows={[]} rowKey={() => 1} columns={[]} emptyMessage="Nothing here" />);
     expect(screen.getByText('Nothing here')).toBeInTheDocument();
+  });
+
+  it('lists the field errors of a validation failure with readable names', () => {
+    const error = new ApiError(400, {
+      detail: 'Invalid request',
+      code: 'VALIDATION_FAILED',
+      errors: { 'lines[0].amount': 'must be greater than 0', vatRate: 'must be at least 0' },
+    });
+    render(<ErrorAlert error={error} />);
+    const items = screen.getAllByRole('listitem').map((li) => li.textContent);
+    expect(items).toEqual([
+      'Line 1 amount: must be greater than 0',
+      'Vat rate: must be at least 0',
+    ]);
+    expect(screen.getByText('Invalid request')).toBeInTheDocument();
+    expect(screen.getByText('Reference: VALIDATION_FAILED')).toBeInTheDocument();
+  });
+
+  it('shows plain errors without a field list and nothing without an error', () => {
+    const { container, rerender } = render(<ErrorAlert error={new Error('Boom')} />);
+    expect(screen.getByRole('alert')).toHaveTextContent('Boom');
+    expect(screen.queryByRole('list')).toBeNull();
+    rerender(<ErrorAlert error={null} />);
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('closes a modal on Escape', async () => {

@@ -1,6 +1,6 @@
 import type { Journal, JournalInput, JournalLineInput, ManualJournalType } from '@/api/gl';
 import { today } from '@/utils/format';
-import { emptyLine } from './journalMath';
+import { emptyLine, isBlankLine } from './journalMath';
 
 export interface JournalHeaderValues {
   branchId: number;
@@ -55,12 +55,15 @@ export function journalValues(j: Journal): JournalFormValues {
   };
 }
 
-/** Request body; blank lines are dropped. */
+/**
+ * Request body. Only blank placeholder rows are left out; incomplete or non-positive lines are
+ * sent as entered (the form blocks them first, see lineProblems).
+ */
 export function toJournalInput(companyId: number, v: JournalFormValues): JournalInput {
   return {
     ...v.header,
     companyId,
     reference: v.header.reference || undefined,
-    lines: v.lines.filter((l) => l.accountCode !== '' && l.amount > 0),
+    lines: v.lines.filter((l) => !isBlankLine(l)),
   };
 }

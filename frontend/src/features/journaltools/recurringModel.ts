@@ -1,5 +1,5 @@
 import type { Frequency, RecurringTemplate, RecurringTemplateInput } from '@/api/journalAutomation';
-import { emptyLine, totals } from '@/features/gl/journalMath';
+import { emptyLine, isBlankLine, lineProblems, totals } from '@/features/gl/journalMath';
 import { today } from '@/utils/format';
 
 export const FREQUENCIES: Frequency[] = ['MONTHLY', 'QUARTERLY', 'ANNUALLY'];
@@ -52,7 +52,7 @@ function blankToUndefined(value: string | undefined): string | undefined {
   return value === undefined || value.trim() === '' ? undefined : value;
 }
 
-/** Request body: blank lines dropped, blank optional fields omitted. */
+/** Request body: blank placeholder lines dropped, blank optional fields omitted. */
 export function toTemplateInput(companyId: number, f: TemplateForm): RecurringTemplateInput {
   return {
     companyId,
@@ -68,7 +68,7 @@ export function toTemplateInput(companyId: number, f: TemplateForm): RecurringTe
     endDate: blankToUndefined(f.endDate),
     autoReverse: f.autoReverse,
     autoSubmit: f.autoSubmit,
-    lines: f.lines.filter((l) => l.accountCode !== '' && l.amount > 0),
+    lines: f.lines.filter((l) => !isBlankLine(l)),
   };
 }
 
@@ -84,7 +84,10 @@ export function templateProblems(f: TemplateForm): string[] {
   if (f.dayOfMonth < 1 || f.dayOfMonth > 31) {
     problems.push('Day of month must be between 1 and 31.');
   }
-  const t = totals(f.lines.filter((l) => l.accountCode !== '' && l.amount > 0));
+  Object.entries(lineProblems(f.lines)).forEach(([index, problem]) => {
+    problems.push(`Line ${Number(index) + 1}: ${problem.message}.`);
+  });
+  const t = totals(f.lines.filter((l) => !isBlankLine(l)));
   if (!t.balanced) {
     problems.push('Debits and credits must be equal and greater than zero.');
   }

@@ -2,22 +2,39 @@ import { Plus, Trash2 } from 'lucide-react';
 import type { JournalLineInput, Side } from '@/api/gl';
 import { Button } from '@/components/ui/Button';
 import { formatAmount } from '@/utils/format';
-import { emptyLine, totals } from './journalMath';
+import { balanceStatus, emptyLine, totals } from './journalMath';
+import type { LineProblem } from './journalMath';
 import { useGlLookups } from './useLookups';
 
 interface Props {
   lines: JournalLineInput[];
   onChange: (lines: JournalLineInput[]) => void;
   readOnly?: boolean;
+  /** Problems to show inline, by row index (see lineProblems). */
+  problems?: Record<number, LineProblem>;
+}
+
+/** ARIA attributes linking an input to its line's problem message. */
+function problemProps(problem: LineProblem | undefined, field: LineProblem['field'], id: string) {
+  return problem === undefined
+    ? {}
+    : { 'aria-invalid': problem.field === field, 'aria-describedby': id };
 }
 
 /**
  * Editable grid of debit/credit lines with a live balance indicator. Account codes are chosen
- * from the list of active postable accounts (headings cannot be posted to).
+ * from the list of active postable accounts (headings cannot be posted to). Line problems are
+ * shown under the row's account and amount.
  */
-export function JournalLinesEditor({ lines, onChange, readOnly = false }: Readonly<Props>) {
+export function JournalLinesEditor({
+  lines,
+  onChange,
+  readOnly = false,
+  problems = {},
+}: Readonly<Props>) {
   const { postableAccounts, costCenters, businessLines } = useGlLookups();
   const t = totals(lines);
+  const balance = balanceStatus(t);
 
   const update = (index: number, patch: Partial<JournalLineInput>) => {
     onChange(lines.map((l, i) => (i === index ? { ...l, ...patch } : l)));
@@ -52,6 +69,8 @@ export function JournalLinesEditor({ lines, onChange, readOnly = false }: Readon
             {lines.map((line, i) => {
               const account = postableAccounts.find((a) => a.code === line.accountCode);
               const rowLabel = `line ${i + 1}`;
+              const problem = problems[i];
+              const errorId = `journal-line-${i}-error`;
               return (
                 <tr key={i}>
                   <td>{i + 1}</td>
@@ -60,6 +79,7 @@ export function JournalLinesEditor({ lines, onChange, readOnly = false }: Readon
                       className="input"
                       list="postable-accounts"
                       aria-label={`Account for ${rowLabel}`}
+                      {...problemProps(problem, 'account', errorId)}
                       value={line.accountCode}
                       disabled={readOnly}
                       onChange={(e) => update(i, { accountCode: e.target.value.trim() })}
@@ -67,6 +87,11 @@ export function JournalLinesEditor({ lines, onChange, readOnly = false }: Readon
                     <div className="muted" style={{ fontSize: 12 }}>
                       {account?.name ?? ''}
                     </div>
+                    {problem !== undefined && (
+                      <div id={errorId} className="field-error">
+                        {problem.message}
+                      </div>
+                    )}
                   </td>
                   <td>
                     <select
@@ -87,6 +112,7 @@ export function JournalLinesEditor({ lines, onChange, readOnly = false }: Readon
                       min="0"
                       step="0.01"
                       aria-label={`Amount for ${rowLabel}`}
+                      {...problemProps(problem, 'amount', errorId)}
                       value={line.amount || ''}
                       disabled={readOnly}
                       onChange={(e) => update(i, { amount: Number(e.target.value) })}
@@ -188,8 +214,8 @@ export function JournalLinesEditor({ lines, onChange, readOnly = false }: Readon
         <span>
           Credit <strong className="num">{formatAmount(t.credit)}</strong>
         </span>
-        <span className={`badge ${t.balanced ? 'success' : 'danger'}`} role="status">
-          {t.balanced ? 'Balanced' : `Difference ${formatAmount(t.difference)}`}
+        <span className={`badge ${balance.tone}`} role="status">
+          {balance.label}
         </span>
       </div>
     </div>

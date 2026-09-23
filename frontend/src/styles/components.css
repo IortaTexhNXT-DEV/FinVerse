@@ -547,6 +547,11 @@
   background: var(--brand-gold-050);
 }
 
+.alert .field-errors {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-5);
+}
+
 /* ---------- Modal / toast ----------------------------------------------------------------- */
 .modal-backdrop {
   position: fixed;

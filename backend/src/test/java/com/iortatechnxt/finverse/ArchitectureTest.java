@@ -23,14 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 @AnalyzeClasses(
     packages = "com.iortatechnxt.finverse",
     importOptions = ImportOption.DoNotIncludeTests.class)
-class ArchitectureTest {
+final class ArchitectureTest {
 
   @ArchTest
-  static final ArchRule modulesAreFreeOfCycles =
+  static final ArchRule MODULES_ARE_FREE_OF_CYCLES =
       slices().matching("com.iortatechnxt.finverse.(*)..").should().beFreeOfCycles();
 
   @ArchTest
-  static final ArchRule domainDoesNotDependOnUpperLayers =
+  static final ArchRule DOMAIN_DOES_NOT_DEPEND_ON_UPPER_LAYERS =
       noClasses()
           .that()
           .resideInAPackage("..domain..")
@@ -39,7 +39,7 @@ class ArchitectureTest {
           .resideInAnyPackage("..service..", "..api..");
 
   @ArchTest
-  static final ArchRule servicesDoNotDependOnControllers =
+  static final ArchRule SERVICES_DO_NOT_DEPEND_ON_CONTROLLERS =
       noClasses()
           .that()
           .resideInAPackage("..service..")
@@ -48,14 +48,16 @@ class ArchitectureTest {
           .areAnnotatedWith(RestController.class);
 
   @ArchTest
-  static final ArchRule controllersLiveInApiPackages =
+  static final ArchRule CONTROLLERS_LIVE_IN_API_PACKAGES =
       classes().that().areAnnotatedWith(RestController.class).should().resideInAPackage("..api..");
 
   @ArchTest
-  static final ArchRule servicesLiveInServicePackages =
+  static final ArchRule SERVICES_LIVE_IN_SERVICE_PACKAGES =
       classes()
           .that()
           .areAnnotatedWith(Service.class)
           .should()
           .resideInAnyPackage("..service..", "..core..", "..gl..", "..sequence..");
+
+  private ArchitectureTest() {}
 }

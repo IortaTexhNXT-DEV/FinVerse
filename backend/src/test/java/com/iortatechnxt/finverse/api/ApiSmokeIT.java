@@ -44,6 +44,13 @@ class ApiSmokeIT {
         "/api/v1/reports",
         "/api/v1/dashboard?companyId={c}",
         "/api/v1/audit-logs?from=2026-01-01&to=2026-12-31",
+        "/api/v1/parties?companyId={c}",
+        "/api/v1/parties?companyId={c}&types=BROKER&types=AGENT&q=pa",
+        "/api/v1/subledger/items?companyId={c}&partyCode=C-000201",
+        "/api/v1/subledger/outstanding?companyId={c}&asOf=2026-12-31",
+        "/api/v1/accounting/event-types",
+        "/api/v1/accounting/rules?companyId={c}",
+        "/api/v1/accounting/events?companyId={c}&from=2026-01-01&to=2026-12-31",
       })
   @WithUserDetails("fmanager")
   void readEndpointsRespondOk(String url) throws Exception {

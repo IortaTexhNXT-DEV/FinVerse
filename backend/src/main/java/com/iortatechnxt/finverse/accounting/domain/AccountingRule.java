@@ -79,11 +79,18 @@ public class AccountingRule extends AuthorizableEntity {
    * @param newLines lines in order
    */
   public void replaceLines(List<AccountingRuleLine> newLines) {
-    lines.clear();
-    int n = 1;
-    for (AccountingRuleLine line : newLines) {
-      line.attach(this, n++);
-      lines.add(line);
+    // Existing lines are updated in place: removing them and inserting new rows with the same
+    // line numbers in one flush violates uq_rule_line (Hibernate inserts before it deletes).
+    for (int i = 0; i < newLines.size(); i++) {
+      if (i < lines.size()) {
+        lines.get(i).copyFrom(newLines.get(i));
+      } else {
+        newLines.get(i).attach(this, i + 1);
+        lines.add(newLines.get(i));
+      }
+    }
+    while (lines.size() > newLines.size()) {
+      lines.remove(lines.size() - 1);
     }
   }
 

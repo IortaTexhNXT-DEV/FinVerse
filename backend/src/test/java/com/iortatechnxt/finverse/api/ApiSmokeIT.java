@@ -7,11 +7,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.iortatechnxt.finverse.support.IntegrationTest;
 import com.iortatechnxt.finverse.support.TestData;
+import com.jayway.jsonpath.JsonPath;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
@@ -51,6 +53,10 @@ class ApiSmokeIT {
         "/api/v1/accounting/event-types",
         "/api/v1/accounting/rules?companyId={c}",
         "/api/v1/accounting/events?companyId={c}&from=2026-01-01&to=2026-12-31",
+        "/api/v1/accounting/events?companyId={c}&from=2026-01-01&to=2026-12-31&status=FAILED",
+        "/api/v1/subledger/ageing?companyId={c}&asOf=2026-12-31",
+        "/api/v1/subledger/ageing?companyId={c}&asOf=2026-12-31&partyCode=C-000201",
+        "/api/v1/journals?companyId={c}&batchNo=JV-HO-2026",
       })
   @WithUserDetails("fmanager")
   void readEndpointsRespondOk(String url) throws Exception {
@@ -99,12 +105,34 @@ class ApiSmokeIT {
         .andExpect(jsonPath("$.code").value("AUTHENTICATION_FAILED"));
   }
 
+  private String bearerToken(String username) throws Exception {
+    String body =
+        mvc.perform(
+                post("/api/v1/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"username\":\"" + username + "\",\"password\":\"Finverse@2026\"}"))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+    return JsonPath.read(body, "$.accessToken");
+  }
+
   @Test
-  @WithUserDetails("fmanager")
-  void validationErrorsListFields() throws Exception {
-    mvc.perform(post("/api/v1/journals").contentType(MediaType.APPLICATION_JSON).content("{}"))
+  void bearerRequestsAreExemptFromCsrfAndValidationErrorsListFields() throws Exception {
+    mvc.perform(
+            post("/api/v1/journals")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + bearerToken("fmanager"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
         .andExpect(jsonPath("$.errors.companyId").exists());
+  }
+
+  @Test
+  @WithUserDetails("fmanager")
+  void stateChangingRequestWithoutBearerTokenNeedsCsrfToken() throws Exception {
+    mvc.perform(post("/api/v1/journals").contentType(MediaType.APPLICATION_JSON).content("{}"))
+        .andExpect(status().isForbidden());
   }
 }

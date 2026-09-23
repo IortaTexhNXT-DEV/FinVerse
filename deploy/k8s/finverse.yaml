@@ -1,0 +1,120 @@
+# iNXT FinVerse – reference Kubernetes deployment.
+# Prerequisites: an external PostgreSQL 16 database, an ingress controller, and the secret
+# "finverse-secrets" (see finverse-secrets.example.yaml). Images are built by CI and pushed to
+# your registry; replace REGISTRY and TAG.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: finverse
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: finverse-config
+  namespace: finverse
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  FINVERSE_ALLOWED_ORIGINS: "https://finverse.example.com"
+  FINVERSE_TOKEN_VALIDITY: "PT8H"
+  FINVERSE_DB_POOL_SIZE: "20"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finverse-backend
+  namespace: finverse
+  labels: { app: finverse-backend }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: finverse-backend }
+  strategy:
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  template:
+    metadata:
+      labels: { app: finverse-backend }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+        - name: backend
+          image: REGISTRY/finverse-backend:TAG
+          ports: [{ containerPort: 8080 }]
+          envFrom:
+            - configMapRef: { name: finverse-config }
+            - secretRef: { name: finverse-secrets }
+          resources:
+            requests: { cpu: "500m", memory: "1Gi" }
+            limits: { cpu: "2", memory: "2Gi" }
+          readinessProbe:
+            httpGet: { path: /actuator/health/readiness, port: 8080 }
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /actuator/health/liveness, port: 8080 }
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: finverse
+spec:
+  selector: { app: finverse-backend }
+  ports: [{ port: 8080, targetPort: 8080 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finverse-frontend
+  namespace: finverse
+  labels: { app: finverse-frontend }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: finverse-frontend }
+  template:
+    metadata:
+      labels: { app: finverse-frontend }
+    spec:
+      containers:
+        - name: frontend
+          image: REGISTRY/finverse-frontend:TAG
+          ports: [{ containerPort: 8080 }]
+          env:
+            - { name: FINVERSE_BACKEND_HOST, value: backend }
+          resources:
+            requests: { cpu: "50m", memory: "64Mi" }
+            limits: { cpu: "500m", memory: "256Mi" }
+          readinessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: finverse
+spec:
+  selector: { app: finverse-frontend }
+  ports: [{ port: 80, targetPort: 8080 }]
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: finverse
+  namespace: finverse
+spec:
+  rules:
+    - host: finverse.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: frontend, port: { number: 80 } }
+  tls:
+    - hosts: [finverse.example.com]
+      secretName: finverse-tls

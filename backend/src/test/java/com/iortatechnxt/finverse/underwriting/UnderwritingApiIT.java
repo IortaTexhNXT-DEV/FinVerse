@@ -1,6 +1,7 @@
 package com.iortatechnxt.finverse.underwriting;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -45,8 +46,11 @@ class UnderwritingApiIT {
   @Autowired private UserDetailsService users;
   @Autowired private UwFixtures fx;
 
+  /** Authenticated demo user with a CSRF token (session-style requests need one). */
   private RequestPostProcessor as(String username) {
-    return user(users.loadUserByUsername(username));
+    RequestPostProcessor principal = user(users.loadUserByUsername(username));
+    RequestPostProcessor token = csrf();
+    return request -> token.postProcessRequest(principal.postProcessRequest(request));
   }
 
   private JsonNode call(MockHttpServletRequestBuilder request, String username, Object body)

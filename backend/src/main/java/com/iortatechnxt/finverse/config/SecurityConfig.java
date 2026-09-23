@@ -3,9 +3,11 @@ package com.iortatechnxt.finverse.config;
 import com.iortatechnxt.finverse.security.service.JwtAuthenticationFilter;
 import com.iortatechnxt.finverse.security.service.JwtTokenService;
 import com.iortatechnxt.finverse.security.service.SecurityProperties;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,7 +15,6 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,6 +23,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -38,6 +41,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
   private static final int BCRYPT_STRENGTH = 12;
+  private static final String BEARER_PREFIX = "Bearer ";
+
+  /** Login is exempt from CSRF: it carries credentials in the body and establishes no session. */
+  private static final RequestMatcher LOGIN =
+      PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/v1/auth/login");
 
   /**
    * Password hashing (BCrypt, cost 12).
@@ -75,16 +83,15 @@ public class SecurityConfig {
    * @throws Exception on configuration error
    */
   @Bean
-  // CSRF not applicable: stateless bearer-token API (see class doc). Spring's builder API declares
-  // "throws Exception", which this factory method must propagate.
-  @SuppressWarnings({"java:S4502", "PMD.SignatureDeclareThrowsException"})
+  // Spring's builder API declares "throws Exception", which this factory method must propagate.
+  @SuppressWarnings("PMD.SignatureDeclareThrowsException")
   public SecurityFilterChain filterChain(
       HttpSecurity http,
       JwtTokenService tokens,
       UserDetailsService userDetailsService,
       SecurityProperties properties)
       throws Exception {
-    http.csrf(AbstractHttpConfigurer::disable)
+    http.csrf(c -> c.ignoringRequestMatchers(SecurityConfig::carriesBearerToken, LOGIN))
         .cors(c -> c.configurationSource(corsSource(properties.allowedOrigins())))
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .exceptionHandling(
@@ -97,7 +104,7 @@ public class SecurityConfig {
                         r -> r.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)))
         .authorizeHttpRequests(
             a ->
-                a.requestMatchers(HttpMethod.POST, "/api/v1/auth/login")
+                a.requestMatchers(LOGIN)
                     .permitAll()
                     .requestMatchers(
                         "/error",
@@ -115,6 +122,18 @@ public class SecurityConfig {
             new JwtAuthenticationFilter(tokens, userDetailsService),
             UsernamePasswordAuthenticationFilter.class);
     return http.build();
+  }
+
+  /**
+   * Requests authenticated by an explicit bearer token cannot be forged cross-site: browsers never
+   * attach the Authorization header automatically, so CSRF tokens add nothing for them.
+   *
+   * @param request request
+   * @return true when an Authorization: Bearer header is present
+   */
+  private static boolean carriesBearerToken(HttpServletRequest request) {
+    String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+    return header != null && header.startsWith(BEARER_PREFIX);
   }
 
   private static CorsConfigurationSource corsSource(List<String> origins) {

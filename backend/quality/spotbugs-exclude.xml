@@ -38,6 +38,15 @@
     <Class name="com.iortatechnxt.finverse.security.service.JwtAuthenticationFilter"/>
     <Bug pattern="SERVLET_HEADER"/>
   </Match>
+  <!--
+    SERVLET_HEADER in SecurityConfig: the presence of an Authorization header only exempts the
+    request from CSRF tokens. Browsers cannot add that header to a cross-site request without a
+    CORS preflight that the origin allow-list rejects, and a forged token fails authentication.
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.finverse.config.SecurityConfig"/>
+    <Bug pattern="SERVLET_HEADER"/>
+  </Match>
   <!-- Generated/test code is not part of the production artefact. -->
   <Match>
     <Class name="~.*Test.*"/>

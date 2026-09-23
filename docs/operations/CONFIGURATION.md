@@ -16,6 +16,7 @@ are for local development only.
 | `FINVERSE_ADMIN_USERNAME` | first start | `sysadmin` | Initial administrator (created only when no user exists). |
 | `FINVERSE_ADMIN_INITIAL_PASSWORD` | first start | – | Initial administrator password; remove after first login. |
 | `FINVERSE_PORT` | no | `8080` | HTTP port. |
+| `FINVERSE_JOB_RI_ALLOCATION_CRON` | no | `-` (off) | Spring cron (UTC) of the scheduled reinsurance allocation run; the run can always be started on demand. |
 | `FINVERSE_BACKEND_HOST` (frontend container) | yes | `backend` | Host name of the backend service for the `/api` proxy. |
 
 Dashboard KPI mapping (optional, `application.yml` or env `FINVERSE_DASHBOARD_CASH_GROUPS_0` …):

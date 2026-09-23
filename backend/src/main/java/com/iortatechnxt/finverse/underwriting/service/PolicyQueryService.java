@@ -1,6 +1,7 @@
 package com.iortatechnxt.finverse.underwriting.service;
 
 import com.iortatechnxt.finverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.finverse.underwriting.domain.Endorsement;
 import com.iortatechnxt.finverse.underwriting.domain.EndorsementRepository;
 import com.iortatechnxt.finverse.underwriting.domain.Policy;
 import com.iortatechnxt.finverse.underwriting.domain.PolicyRepository;
@@ -9,8 +10,10 @@ import com.iortatechnxt.finverse.underwriting.domain.PolicyStatus;
 import com.iortatechnxt.finverse.underwriting.domain.UnderwritingSpecifications;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -159,6 +162,35 @@ public class PolicyQueryService {
         .filter(t -> t.status() != PolicyStatus.CANCELLED || t.approvalDate() != null)
         .sorted(ORDER)
         .toList();
+  }
+
+  /**
+   * Cover (earning) periods of premium transactions, used by actuarial reserving to earn premium
+   * over the right days: original issue and renewals over their own period, other endorsements from
+   * their effective date to the end of the period in force (see {@link CoverPeriod}).
+   *
+   * @param transactions transactions (any policies)
+   * @return cover period by transaction
+   */
+  public Map<TransactionRef, CoverPeriod> coverPeriods(
+      Collection<PremiumTransaction> transactions) {
+    if (transactions.isEmpty()) {
+      return Map.of();
+    }
+    Map<Long, List<PremiumTransaction>> byPolicy =
+        transactions.stream().collect(Collectors.groupingBy(t -> t.policy().id()));
+    Map<Long, List<Endorsement>> endorsed =
+        endorsements.findByPolicyIdIn(byPolicy.keySet()).stream()
+            .collect(Collectors.groupingBy(e -> e.getPolicy().getId()));
+    Map<TransactionRef, CoverPeriod> out = new HashMap<>();
+    byPolicy.forEach(
+        (policyId, list) -> {
+          CoverPeriodResolver resolver =
+              new CoverPeriodResolver(
+                  list.get(0).policy(), endorsed.getOrDefault(policyId, List.of()));
+          list.forEach(t -> out.put(t.ref(), resolver.coverOf(t)));
+        });
+    return out;
   }
 
   /**

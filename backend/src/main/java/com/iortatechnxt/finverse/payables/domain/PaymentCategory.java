@@ -15,7 +15,7 @@ import java.util.Set;
  *   <tr><td>SUPPLIER</td><td>SUPPLIER_PAYMENT</td><td>suppliers, garages, surveyors</td></tr>
  *   <tr><td>COMMISSION</td><td>COMMISSION_PAYMENT</td><td>agents, brokers</td></tr>
  *   <tr><td>CLAIM</td><td>CLAIM_PAYMENT</td><td>claimants, garages, surveyors</td></tr>
- *   <tr><td>REINSURANCE</td><td>RI_SETTLEMENT_PAYMENT</td><td>reinsurers</td></tr>
+ *   <tr><td>REINSURANCE</td><td>RI_SETTLEMENT_PAYMENT</td><td>reinsurers, RI brokers</td></tr>
  *   <tr><td>PREMIUM_REFUND</td><td>PREMIUM_REFUND_PAYMENT</td><td>policyholders</td></tr>
  * </table>
  */
@@ -30,7 +30,7 @@ public enum PaymentCategory {
           PartyType.CORPORATE_CLIENT,
           PartyType.GARAGE,
           PartyType.SURVEYOR)),
-  REINSURANCE("RI_SETTLEMENT_PAYMENT", EnumSet.of(PartyType.REINSURER)),
+  REINSURANCE("RI_SETTLEMENT_PAYMENT", EnumSet.of(PartyType.REINSURER, PartyType.RI_BROKER)),
   PREMIUM_REFUND(
       "PREMIUM_REFUND_PAYMENT",
       EnumSet.of(PartyType.INDIVIDUAL_CLIENT, PartyType.CORPORATE_CLIENT));
@@ -44,6 +44,7 @@ public enum PaymentCategory {
           PartyType.AGENT, COMMISSION,
           PartyType.BROKER, COMMISSION,
           PartyType.REINSURER, REINSURANCE,
+          PartyType.RI_BROKER, REINSURANCE,
           PartyType.GARAGE, CLAIM,
           PartyType.SURVEYOR, CLAIM);
 

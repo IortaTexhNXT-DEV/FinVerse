@@ -9,7 +9,9 @@ import { helpModule } from '@/features/help/module';
 import { withJournalAutomation } from '@/features/journaltools/module';
 import { payablesModule } from '@/features/payables/module';
 import { receivablesModule } from '@/features/receivables/module';
+import { reinsuranceModule } from '@/features/reinsurance/module';
 import { reportsModule } from '@/features/reports/module';
+import { reservesModule } from '@/features/reserves/module';
 import { setupModule } from '@/features/setup/module';
 import { underwritingModule } from '@/features/underwriting/module';
 import type { FeatureModule } from './types';
@@ -24,10 +26,12 @@ export const MODULES: FeatureModule[] = [
   withOverviewScreens(dashboardModule),
   withJournalAutomation(glModule),
   underwritingModule,
+  reinsuranceModule,
   receivablesModule,
   payablesModule,
   assetsModule,
   planningModule,
+  reservesModule,
   accountingEngineModule,
   reportsModule,
   setupModule,

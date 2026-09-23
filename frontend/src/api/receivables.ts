@@ -12,7 +12,7 @@ export type PdcStatus =
 export const PAYER_PARTY_TYPES: Record<PayerType, string[]> = {
   POLICYHOLDER: ['INDIVIDUAL_CLIENT', 'CORPORATE_CLIENT'],
   INTERMEDIARY: ['AGENT', 'BROKER'],
-  REINSURER: ['REINSURER'],
+  REINSURER: ['REINSURER', 'RI_BROKER'],
   OTHER: [],
 };
 

@@ -1,21 +1,22 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Save, Send } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { glApi } from '@/api/gl';
+import type { Journal } from '@/api/gl';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
-import { useWorkspace } from '@/context/workspaceContext';
+import { useDefaultBranchId, useWorkspace } from '@/context/workspaceContext';
 import { JournalHeaderFields } from './JournalHeaderFields';
 import { JournalLinesEditor } from './JournalLinesEditor';
 import { journalValues, newJournalValues, toJournalInput } from './journalForm';
 import type { JournalFormValues } from './journalForm';
-import { totals } from './journalMath';
-
-type SaveMode = 'draft' | 'submit';
+import { lineProblems, totals } from './journalMath';
+import { useJournalSave } from './useJournalSave';
+import type { SaveMode } from './useJournalSave';
 
 function JournalForm({
   initial,
@@ -26,32 +27,29 @@ function JournalForm({
   const queryClient = useQueryClient();
   const { company } = useWorkspace();
   const [values, setValues] = useState(initial);
-  const [mode, setMode] = useState<SaveMode>('draft');
+  const [checked, setChecked] = useState(false);
 
-  const save = useMutation({
-    mutationFn: async (saveMode: SaveMode) => {
-      setMode(saveMode);
-      const body = toJournalInput(company?.id ?? 0, values);
-      const saved =
-        editingId === undefined
-          ? await glApi.createJournal(body)
-          : await glApi.updateJournal(editingId, body);
-      return saveMode === 'submit' ? glApi.submitJournal(saved.id) : saved;
-    },
-    onSuccess: async (journal) => {
-      await queryClient.invalidateQueries({ queryKey: ['journals'] });
-      await queryClient.invalidateQueries({ queryKey: ['journal', journal.id] });
-      toast.success(`Journal ${journal.batchNo} saved (${journal.status.replace('_', ' ')})`);
-      await navigate(`/gl/journals/${journal.id}`);
-    },
+  const { save, draftId, savedDraft } = useJournalSave(editingId, async (journal: Journal) => {
+    await queryClient.invalidateQueries({ queryKey: ['journal', journal.id] });
+    toast.success(`Journal ${journal.batchNo} saved (${journal.status.replace('_', ' ')})`);
+    await navigate(`/gl/journals/${journal.id}`);
   });
+  const mode = save.variables?.mode;
+  const problems = lineProblems(values.lines);
+  const hasProblems = Object.keys(problems).length > 0;
   const canSubmit = totals(values.lines).balanced && values.header.narration.trim() !== '';
+  const run = (saveMode: SaveMode) => {
+    setChecked(true);
+    if (!hasProblems) {
+      save.mutate({ mode: saveMode, body: toJournalInput(company?.id ?? 0, values) });
+    }
+  };
 
   return (
     <div className="stack">
       <PageHeader
         section="General Ledger"
-        title={editingId === undefined ? 'New Journal Voucher' : 'Edit Journal Voucher'}
+        title={draftId === undefined ? 'New Journal Voucher' : 'Edit Journal Voucher'}
         description="Enter a balanced voucher. Drafts can be saved incomplete; submission sends it to an authorizer."
         actions={
           <>
@@ -59,7 +57,7 @@ function JournalForm({
               variant="secondary"
               icon={<Save size={16} />}
               busy={save.isPending && mode === 'draft'}
-              onClick={() => save.mutate('draft')}
+              onClick={() => run('draft')}
             >
               Save draft
             </Button>
@@ -68,14 +66,25 @@ function JournalForm({
               icon={<Send size={16} />}
               busy={save.isPending && mode === 'submit'}
               disabled={!canSubmit}
-              onClick={() => save.mutate('submit')}
+              onClick={() => run('submit')}
             >
               Save &amp; submit
             </Button>
           </>
         }
       />
+      {savedDraft !== undefined && save.error !== null && (
+        <div className="alert warning" role="status">
+          Draft {savedDraft.batchNo} was saved but not submitted. Correct the voucher and submit
+          again: this updates the same draft.
+        </div>
+      )}
       <ErrorAlert error={save.error} />
+      {checked && hasProblems && (
+        <div className="alert danger" role="alert">
+          Correct the highlighted lines before saving.
+        </div>
+      )}
       <Card title="Voucher header">
         <JournalHeaderFields
           value={values.header}
@@ -85,6 +94,7 @@ function JournalForm({
       <Card title="Lines">
         <JournalLinesEditor
           lines={values.lines}
+          problems={checked ? problems : undefined}
           onChange={(lines) => setValues((v) => ({ ...v, lines }))}
         />
       </Card>
@@ -97,6 +107,7 @@ export default function JournalEntryPage() {
   const { id } = useParams();
   const editingId = id === undefined ? undefined : Number(id);
   const { company, branches } = useWorkspace();
+  const defaultBranch = useDefaultBranchId();
   const existing = useQuery({
     queryKey: ['journal', editingId],
     queryFn: () => glApi.journal(editingId ?? 0),
@@ -118,11 +129,10 @@ export default function JournalEntryPage() {
   if (branches.length === 0) {
     return <span className="spinner" aria-label="Loading" />;
   }
-  const defaultBranch = branches.find((b) => b.headOffice) ?? branches[0];
   return (
     <JournalForm
       key="new"
-      initial={newJournalValues(defaultBranch?.id ?? 0, company?.baseCurrency ?? 'PHP')}
+      initial={newJournalValues(defaultBranch, company?.baseCurrency ?? 'PHP')}
     />
   );
 }

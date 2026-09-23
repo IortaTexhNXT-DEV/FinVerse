@@ -11,7 +11,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { useWorkspace } from '@/context/workspaceContext';
+import { useDefaultBranchId, useWorkspace } from '@/context/workspaceContext';
 import { today } from '@/utils/format';
 import { components, optionalHeader, roles, toAmounts, unbalancedWarning } from './ruleModel';
 import { useAccountingLookups } from './useAccountingLookups';
@@ -23,7 +23,8 @@ import { useAccountingLookups } from './useAccountingLookups';
 export default function SimulatorPage() {
   const [params] = useSearchParams();
   const { eventTypes, rules, companyId } = useAccountingLookups();
-  const { branches, branchId, company } = useWorkspace();
+  const { company } = useWorkspace();
+  const defaultBranch = useDefaultBranchId();
   const [eventType, setEventType] = useState(params.get('eventType') ?? '');
   const [header, setHeader] = useState({
     valueDate: today(),
@@ -43,7 +44,7 @@ export default function SimulatorPage() {
     run.mutate({
       ...optionalHeader(header, company?.baseCurrency),
       companyId,
-      branchId: branchId ?? branches[0]?.id ?? 0,
+      branchId: defaultBranch,
       eventType: selected?.code ?? '',
       amounts: toAmounts(comps, amounts),
       accounts,

@@ -13,7 +13,7 @@ import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { useWorkspace } from '@/context/workspaceContext';
+import { useDefaultBranchId } from '@/context/workspaceContext';
 import { formatAmount, formatDate, humanize, today } from '@/utils/format';
 import { SelectInput, TextInput } from './FormControls';
 import { HoldingFormModal } from './HoldingFormModal';
@@ -30,7 +30,7 @@ function total(rows: Holding[], pick: (h: Holding) => number): string {
 /** Investment holdings: capture (maker) and approval with purchase posting (checker). */
 export default function InvestmentsPage() {
   const { companyId, portfolios, baseCurrency } = useAssetLookups();
-  const { branchId } = useWorkspace();
+  const defaultBranch = useDefaultBranchId();
   const { can } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -72,7 +72,7 @@ export default function InvestmentsPage() {
               icon={<Plus size={16} />}
               onClick={() =>
                 setForm({
-                  branchId,
+                  branchId: defaultBranch || undefined,
                   currency: baseCurrency,
                   instrumentType: 'GOVERNMENT_BOND',
                   couponFrequency: 'SEMI_ANNUAL',

@@ -93,6 +93,7 @@ describe('investment calculations', () => {
     expect(Object.keys(errors)).toEqual(
       expect.arrayContaining([
         'portfolioId',
+        'branchId',
         'description',
         'issuerCode',
         'faceValue',
@@ -107,6 +108,7 @@ describe('investment calculations', () => {
       validateHolding({
         instrumentType: 'EQUITY',
         portfolioId: 1,
+        branchId: 2,
         description: 'Shares',
         issuerCode: 'IS-ALI',
         faceValue: 100,

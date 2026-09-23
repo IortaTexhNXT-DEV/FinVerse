@@ -14,7 +14,7 @@ import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { useWorkspace } from '@/context/workspaceContext';
+import { useDefaultBranchId, useWorkspace } from '@/context/workspaceContext';
 import { formatDate, today } from '@/utils/format';
 import { fundLevel } from './payablesMath';
 import { PettyCashFundPanel } from './PettyCashFundPanel';
@@ -25,6 +25,7 @@ type FundForm = Partial<FundRequest>;
 /** Imprest petty cash: funds per branch, their vouchers and reimbursement claims. */
 export default function PettyCashPage() {
   const { branches } = useWorkspace();
+  const defaultBranch = useDefaultBranchId();
   const { companyId, activeBanks } = usePayablesLookups();
   const { can } = useAuth();
   const toast = useToast();
@@ -89,7 +90,11 @@ export default function PettyCashPage() {
               variant="accent"
               icon={<Plus size={16} />}
               onClick={() =>
-                setForm({ glAccountCode: '1102', replenishBankAccountId: activeBanks[0]?.id })
+                setForm({
+                  glAccountCode: '1102',
+                  branchId: defaultBranch || undefined,
+                  replenishBankAccountId: activeBanks[0]?.id,
+                })
               }
             >
               New fund

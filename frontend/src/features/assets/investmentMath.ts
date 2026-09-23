@@ -106,6 +106,7 @@ function badMaturity(f: HoldingForm): boolean {
 
 const HOLDING_RULES: readonly Rule<HoldingForm>[] = [
   ['portfolioId', (f) => !f.portfolioId, 'Select a portfolio'],
+  ['branchId', (f) => !f.branchId, 'Select the branch'],
   ['description', (f) => !f.description, 'Description is required'],
   ['issuerCode', (f) => !f.issuerCode, 'Select the issuer or bank'],
   ['faceValue', (f) => (f.faceValue ?? 0) <= 0, 'Face value must be positive'],

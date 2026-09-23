@@ -12,7 +12,7 @@ import { Field } from '@/components/ui/Field';
 import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
-import { useWorkspace } from '@/context/workspaceContext';
+import { useDefaultBranchId, useWorkspace } from '@/context/workspaceContext';
 import { useGlLookups } from '@/features/gl/useLookups';
 import { formatAmount, today } from '@/utils/format';
 import { dueDate, invoiceTotals, lineTaxes } from './payablesMath';
@@ -27,7 +27,8 @@ const emptyLine = (): InvoiceLine => ({
 
 /** Captures a supplier invoice with expense lines; VAT, EWT and the payable are previewed live. */
 export default function InvoiceEntryPage() {
-  const { branches, branchId } = useWorkspace();
+  const { branches } = useWorkspace();
+  const defaultBranch = useDefaultBranchId();
   const { companyId, parties } = usePayablesLookups();
   const { postableAccounts, costCenters } = useGlLookups();
   const toast = useToast();
@@ -39,18 +40,18 @@ export default function InvoiceEntryPage() {
   const [due, setDue] = useState('');
   const [vat, setVat] = useState(true);
   const [narration, setNarration] = useState('');
-  const [branch, setBranch] = useState<number | undefined>(branchId);
+  const [branch, setBranch] = useState<number | undefined>();
   const [lines, setLines] = useState<InvoiceLine[]>([emptyLine()]);
   const party = parties.find((p) => p.code === partyCode);
   const whtRate = party?.withholdingTaxRate ?? 0;
   const totals = invoiceTotals(lines, vat, whtRate);
-  const effectiveBranch = branch ?? branches.find((b) => b.headOffice)?.id ?? branches[0]?.id;
+  const effectiveBranch = branch ?? defaultBranch;
 
   const save = useMutation({
     mutationFn: async (andSubmit: boolean) => {
       const created = await payablesApi.createInvoice({
         companyId,
-        branchId: effectiveBranch ?? 0,
+        branchId: effectiveBranch,
         partyCode,
         supplierInvoiceNo: supplierNo,
         invoiceDate,
@@ -142,7 +143,7 @@ export default function InvoiceEntryPage() {
               <select
                 id={id}
                 className="select"
-                value={effectiveBranch ?? ''}
+                value={effectiveBranch}
                 onChange={(e) => setBranch(Number(e.target.value))}
               >
                 {branches.map((b) => (

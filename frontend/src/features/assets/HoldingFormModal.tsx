@@ -77,6 +77,16 @@ export function HoldingFormModal({ initial, onClose }: Readonly<Props>) {
           onChange={(v) => set({ portfolioId: Number(v) })}
         />
         <SelectInput
+          label="Branch"
+          required
+          blank="Select"
+          disabled={form.id !== undefined}
+          error={errors.branchId}
+          value={form.branchId}
+          options={lookups.branches.map((b) => ({ value: String(b.id), label: b.name }))}
+          onChange={(v) => set({ branchId: Number(v) })}
+        />
+        <SelectInput
           label="Instrument"
           required
           value={form.instrumentType}

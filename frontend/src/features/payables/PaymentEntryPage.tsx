@@ -12,7 +12,7 @@ import { Field } from '@/components/ui/Field';
 import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
-import { useWorkspace } from '@/context/workspaceContext';
+import { useDefaultBranchId } from '@/context/workspaceContext';
 import { formatDate, humanize, today } from '@/utils/format';
 import { checkSelection } from './payablesMath';
 import type { Selection } from './payablesMath';
@@ -30,7 +30,7 @@ const CATEGORIES: ('' | PaymentCategory)[] = [
 
 /** New payment voucher: pick the payee's open payables, the amounts, the mode and the bank. */
 export default function PaymentEntryPage() {
-  const { branches, branchId } = useWorkspace();
+  const branch = useDefaultBranchId();
   const { companyId, parties, activeBanks } = usePayablesLookups(PAYEE_TYPES);
   const toast = useToast();
   const navigate = useNavigate();
@@ -52,13 +52,12 @@ export default function PaymentEntryPage() {
   const rows = items.data ?? [];
   const check = checkSelection(rows, selection);
   const bank = bankId ?? activeBanks[0]?.id;
-  const branch = branchId ?? branches.find((b) => b.headOffice)?.id;
 
   const save = useMutation({
     mutationFn: async () => {
       const created = await payablesApi.createVoucher({
         companyId,
-        branchId: branch ?? 0,
+        branchId: branch,
         partyCode,
         category: category === '' ? undefined : category,
         mode,

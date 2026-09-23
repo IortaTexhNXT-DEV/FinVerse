@@ -29,6 +29,14 @@ export function QuotationForm({
           onChange={(v) => set({ productId: Number(v) })}
         />
         <SelectField
+          label="Branch"
+          required
+          value={form.branchId > 0 ? String(form.branchId) : ''}
+          emptyLabel="Select branch"
+          options={lookups.branches.map((b) => ({ value: String(b.id), label: b.name }))}
+          onChange={(v) => set({ branchId: Number(v) })}
+        />
+        <SelectField
           label="Customer"
           required
           value={form.customerCode}

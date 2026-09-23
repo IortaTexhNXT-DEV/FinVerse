@@ -14,7 +14,7 @@ import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { useWorkspace } from '@/context/workspaceContext';
+import { useDefaultBranchId } from '@/context/workspaceContext';
 import { formatDate, today } from '@/utils/format';
 import { DateField, NumberField, SelectField, TextField } from './FormFields';
 import { oneYearFrom } from './premiumMath';
@@ -39,7 +39,7 @@ function blank(companyId: number, branchId: number): OpenCoverInput {
 /** Marine open covers (master cargo policies) under which shipments are declared. */
 export default function OpenCoversPage() {
   const lookups = useUwLookups();
-  const { branchId } = useWorkspace();
+  const defaultBranch = useDefaultBranchId();
   const { can } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
@@ -81,7 +81,7 @@ export default function OpenCoversPage() {
             <Button
               variant="accent"
               icon={<Plus size={16} />}
-              onClick={() => setForm(blank(companyId, branchId ?? lookups.branches[0]?.id ?? 0))}
+              onClick={() => setForm(blank(companyId, defaultBranch))}
             >
               New open cover
             </Button>
@@ -164,6 +164,14 @@ export default function OpenCoversPage() {
               emptyLabel="Select product"
               options={marineProducts.map((p) => ({ value: String(p.id), label: p.name }))}
               onChange={(v) => set({ productId: Number(v) })}
+            />
+            <SelectField
+              label="Branch"
+              required
+              value={form.branchId > 0 ? String(form.branchId) : ''}
+              emptyLabel="Select branch"
+              options={lookups.branches.map((b) => ({ value: String(b.id), label: b.name }))}
+              onChange={(v) => set({ branchId: Number(v) })}
             />
             <SelectField
               label="Client"

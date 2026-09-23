@@ -13,7 +13,7 @@ import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { useWorkspace } from '@/context/workspaceContext';
+import { useDefaultBranchId } from '@/context/workspaceContext';
 import { formatAmount, formatDate, today } from '@/utils/format';
 import { AssetActionModal } from './AssetActionModal';
 import type { AssetAction } from './AssetActionModal';
@@ -39,7 +39,7 @@ function sum(rows: FixedAsset[], pick: (a: FixedAsset) => number): number {
 /** Fixed asset register: registration, capitalization (checker), disposal and transfer. */
 export default function AssetRegisterPage() {
   const { companyId, categories, branchName } = useAssetLookups();
-  const { branchId } = useWorkspace();
+  const defaultBranch = useDefaultBranchId();
   const { can } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -108,7 +108,13 @@ export default function AssetRegisterPage() {
             <Button
               variant="accent"
               icon={<Plus size={16} />}
-              onClick={() => setForm({ branchId, acquisitionDate: today(), takeOn: false })}
+              onClick={() =>
+                setForm({
+                  branchId: defaultBranch || undefined,
+                  acquisitionDate: today(),
+                  takeOn: false,
+                })
+              }
             >
               Register asset
             </Button>

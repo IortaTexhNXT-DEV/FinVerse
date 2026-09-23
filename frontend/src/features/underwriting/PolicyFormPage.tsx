@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
-import { useWorkspace } from '@/context/workspaceContext';
+import { useDefaultBranchId, useWorkspace } from '@/context/workspaceContext';
 import { today } from '@/utils/format';
 import { PolicyHeaderFields } from './PolicyHeaderFields';
 import { fromPolicy, newPolicy, normalize, validatePolicy } from './policyForm';
@@ -114,7 +114,8 @@ function PolicyEditor({ id, title, initial }: Readonly<EditorProps>) {
 export default function PolicyFormPage() {
   const params = useParams();
   const id = params.id === undefined ? undefined : Number(params.id);
-  const { company, branchId, branches } = useWorkspace();
+  const { company, branches } = useWorkspace();
+  const defaultBranch = useDefaultBranchId();
   const existing = useQuery({
     queryKey: ['policy', id],
     queryFn: () => underwritingApi.policy(id ?? 0),
@@ -138,14 +139,14 @@ export default function PolicyFormPage() {
       />
     );
   }
-  if (company === undefined) {
+  if (company === undefined || branches.length === 0) {
     return <span className="spinner" aria-label="Loading" />;
   }
   return (
     <PolicyEditor
       id={undefined}
       title="New policy"
-      initial={newPolicy(company.id, branchId ?? branches[0]?.id ?? 0, today())}
+      initial={newPolicy(company.id, defaultBranch, today())}
     />
   );
 }

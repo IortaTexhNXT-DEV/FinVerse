@@ -12,6 +12,8 @@ Audience: production deployment and support teams.
 
 The backend is stateless (JWT); run ≥ 2 replicas behind the service. Database migrations (Flyway)
 run automatically at start-up; with several replicas, Flyway's lock makes them wait for each other.
+Out-of-order migrations are enabled because versions are allocated in per-module ranges: an upgrade may
+apply, for example, V27 on a database already at V975. `flyway_schema_history` records the actual order.
 
 ## 2. First installation
 

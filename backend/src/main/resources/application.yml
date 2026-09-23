@@ -26,6 +26,9 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+    # Migrations are numbered in per-module ranges (see DEVELOPER_GUIDE "Migrations"), so a new
+    # migration of one module can have a lower version than one already applied by another.
+    out-of-order: true
   jackson:
     serialization:
       write-dates-as-timestamps: false

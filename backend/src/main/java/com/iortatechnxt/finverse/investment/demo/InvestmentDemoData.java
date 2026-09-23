@@ -190,7 +190,7 @@ public class InvestmentDemoData implements ApplicationRunner {
     if (maturity != null && YearMonth.from(maturity).equals(month)) {
       events.add(new DemoEvent(maturity, () -> mature(h)));
     }
-    if (month.equals(YearMonth.from(VALUATION)) && FAIR_VALUES.containsKey(d.code())) {
+    if (needsValuation(h, d, month)) {
       BigDecimal value = new BigDecimal(FAIR_VALUES.get(d.code()));
       events.add(
           new DemoEvent(
@@ -205,6 +205,13 @@ public class InvestmentDemoData implements ApplicationRunner {
       events.add(new DemoEvent(SALE_DATE, () -> holdingEvents.sell(h.getId(), sale)));
     }
     return events;
+  }
+
+  private boolean needsValuation(InvestmentHolding h, DemoHolding d, YearMonth month) {
+    return month.equals(YearMonth.from(VALUATION))
+        && FAIR_VALUES.containsKey(d.code())
+        && !transactions.existsByHoldingIdAndTxnTypeAndTxnDate(
+            h.getId(), TransactionType.FAIR_VALUE, VALUATION);
   }
 
   private List<DemoEvent> couponEvents(InvestmentHolding h, YearMonth month) {

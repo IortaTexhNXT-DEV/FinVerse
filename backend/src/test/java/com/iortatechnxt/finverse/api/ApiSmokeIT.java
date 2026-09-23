@@ -57,6 +57,17 @@ class ApiSmokeIT {
         "/api/v1/subledger/ageing?companyId={c}&asOf=2026-12-31",
         "/api/v1/subledger/ageing?companyId={c}&asOf=2026-12-31&partyCode=C-000201",
         "/api/v1/journals?companyId={c}&batchNo=JV-HO-2026",
+        "/api/v1/assets/categories?companyId={c}",
+        "/api/v1/assets/register?companyId={c}",
+        "/api/v1/assets/register?companyId={c}&status=ACTIVE&q=fa",
+        "/api/v1/assets/depreciation/preview?companyId={c}&period=2026-09",
+        "/api/v1/assets/depreciation/runs?companyId={c}",
+        "/api/v1/investments/portfolios?companyId={c}",
+        "/api/v1/investments/holdings?companyId={c}",
+        "/api/v1/investments/holdings?companyId={c}&status=ACTIVE&q=t",
+        "/api/v1/investments/runs?companyId={c}",
+        "/api/v1/investments/runs/preview?companyId={c}&type=ACCRUAL&period=2026-09",
+        "/api/v1/investments/runs/preview?companyId={c}&type=AMORTIZATION&period=2026-09",
       })
   @WithUserDetails("fmanager")
   void readEndpointsRespondOk(String url) throws Exception {

@@ -70,5 +70,11 @@ public enum Permission {
   RESERVE_PREPARE,
 
   // Reinsurance checker: treaties, facultative placements and statements of account. See V300.
-  REINSURANCE_AUTHORIZE
+  REINSURANCE_AUTHORIZE,
+
+  // Tax & statutory reporting: view worksheets, returns, certificates and IC schedules; maintain
+  // tax masters and prepare, file and pay returns (masters are authorized with MASTER_AUTHORIZE).
+  // See V701.
+  TAX_VIEW,
+  TAX_MANAGE
 }

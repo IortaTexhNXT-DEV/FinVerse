@@ -11,7 +11,8 @@ public enum ReportCategory {
   RECEIVABLES_PAYABLES("Receivables & Payables"),
   BUDGET("Budget"),
   RECONCILIATION("Reconciliation"),
-  CONTROL("Control & Audit");
+  CONTROL("Control & Audit"),
+  TAX_STATUTORY("Tax & Statutory");
 
   private final String label;
 

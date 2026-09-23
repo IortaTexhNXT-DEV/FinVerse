@@ -1,7 +1,9 @@
 import { LogOut } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/auth/authContext';
 import { useWorkspace } from '@/context/workspaceContext';
 import { Brand } from './Brand';
+import { HeaderTools } from './HeaderTools';
 
 function initials(name: string): string {
   return name
@@ -54,10 +56,13 @@ export function Header() {
         </select>
       </div>
       <div className="spacer" />
+      <HeaderTools />
       {user !== null && (
         <div className="header-user">
           <div>
-            <div style={{ fontWeight: 600 }}>{user.fullName}</div>
+            <Link to="/profile" style={{ fontWeight: 600 }} title="My profile">
+              {user.fullName}
+            </Link>
             <div className="muted" style={{ fontSize: 12 }}>
               {user.roles.join(', ')}
             </div>

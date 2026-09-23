@@ -86,6 +86,34 @@
   font-size: 13px;
 }
 
+/* Header shortcuts (approvals inbox, alerts, help, about) with count badges */
+.header-tools {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.header-tool {
+  position: relative;
+  color: var(--brand-navy);
+}
+
+.header-count {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--brand-gold);
+  color: var(--brand-navy);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
+
 .app-sidebar {
   grid-area: sidebar;
   background: var(--brand-navy);

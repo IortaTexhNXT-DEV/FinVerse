@@ -46,6 +46,11 @@ export const tokenStore = {
   },
 };
 
+export interface DownloadedFile {
+  blob: Blob;
+  fileName: string;
+}
+
 type QueryValue = string | number | boolean | null | undefined;
 
 export function toQuery(params: Record<string, QueryValue>): string {
@@ -65,14 +70,17 @@ async function send(method: string, path: string, body?: unknown): Promise<Respo
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
-  if (body !== undefined) {
+  const isForm = body instanceof FormData;
+  if (body !== undefined && !isForm) {
     headers['Content-Type'] = 'application/json';
   }
-  const response = await fetch(`/api/v1${path}`, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  let payload: BodyInit | undefined;
+  if (isForm) {
+    payload = body;
+  } else if (body !== undefined) {
+    payload = JSON.stringify(body);
+  }
+  const response = await fetch(`/api/v1${path}`, { method, headers, body: payload });
   if (response.status === 401 && token) {
     tokenStore.clear();
     unauthorizedHandler?.();
@@ -82,6 +90,12 @@ async function send(method: string, path: string, body?: unknown): Promise<Respo
     throw new ApiError(response.status, problem);
   }
   return response;
+}
+
+async function fileOf(response: Response, fallback: string): Promise<DownloadedFile> {
+  const disposition = response.headers.get('Content-Disposition') ?? '';
+  const match = /filename="?([^";]+)"?/.exec(disposition);
+  return { blob: await response.blob(), fileName: match?.[1] ?? fallback };
 }
 
 async function json<T>(method: string, path: string, body?: unknown): Promise<T> {
@@ -96,13 +110,15 @@ export const api = {
   get: <T>(path: string): Promise<T> => json<T>('GET', path),
   post: <T>(path: string, body?: unknown): Promise<T> => json<T>('POST', path, body ?? {}),
   put: <T>(path: string, body: unknown): Promise<T> => json<T>('PUT', path, body),
+  delete: (path: string): Promise<undefined> => json<undefined>('DELETE', path),
+  /** POSTs a multipart form (file uploads). */
+  upload: <T>(path: string, form: FormData): Promise<T> => json<T>('POST', path, form),
   /** POSTs and returns the response body as a downloadable file. */
-  download: async (path: string, body: unknown): Promise<{ blob: Blob; fileName: string }> => {
-    const response = await send('POST', path, body);
-    const disposition = response.headers.get('Content-Disposition') ?? '';
-    const match = /filename="?([^";]+)"?/.exec(disposition);
-    return { blob: await response.blob(), fileName: match?.[1] ?? 'report' };
-  },
+  download: async (path: string, body: unknown): Promise<DownloadedFile> =>
+    fileOf(await send('POST', path, body), 'report'),
+  /** GETs a file (attachments, templates). */
+  getFile: async (path: string): Promise<DownloadedFile> =>
+    fileOf(await send('GET', path), 'download'),
 };
 
 export function saveFile(blob: Blob, fileName: string): void {

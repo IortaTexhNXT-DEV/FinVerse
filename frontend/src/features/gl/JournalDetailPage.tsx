@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { glApi } from '@/api/gl';
 import type { Journal } from '@/api/gl';
+import { Attachments } from '@/components/attachments/Attachments';
 import { Amount } from '@/components/ui/Amount';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
@@ -119,6 +120,7 @@ export default function JournalDetailPage() {
           ]}
         />
       </Card>
+      <Attachments entityType="JournalBatch" entityId={j.id} />
       <AuditPanel journal={j} />
     </div>
   );

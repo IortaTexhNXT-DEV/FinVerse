@@ -1,4 +1,4 @@
-import { Building2, Coins, Landmark, Tags } from 'lucide-react';
+import { Building2, CalendarDays, Coins, Landmark, Tags } from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -33,6 +33,13 @@ export const setupModule: FeatureModule = {
       icon: Tags,
       permission: 'MASTER_VIEW',
       component: lazy(() => import('./DimensionsPage')),
+    },
+    {
+      path: '/setup/holidays',
+      label: 'Holiday Calendar',
+      icon: CalendarDays,
+      permission: 'MASTER_VIEW',
+      component: lazy(() => import('./HolidaysPage')),
     },
   ],
 };

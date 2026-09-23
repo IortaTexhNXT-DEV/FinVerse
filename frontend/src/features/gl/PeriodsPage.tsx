@@ -11,7 +11,8 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { defaultYear } from '@/features/closing/periodDefaults';
+import { formatDate, formatDateTime, today } from '@/utils/format';
 import { PeriodActionDialog } from './PeriodActionDialog';
 import type { PendingPeriodAction } from './PeriodActionDialog';
 import { PERIOD_ACTIONS } from './periodActions';
@@ -31,7 +32,7 @@ export default function PeriodsPage() {
     queryFn: () => periodApi.years(companyId),
     enabled: companyId > 0,
   });
-  const selectedYear = yearId ?? years.data?.[0]?.id;
+  const selectedYear = yearId ?? defaultYear(years.data ?? [], today())?.id;
   const periods = useQuery({
     queryKey: ['periods', selectedYear],
     queryFn: () => periodApi.periods(selectedYear ?? 0),

@@ -19,7 +19,8 @@ export const UNDERWRITING_HELP: HelpSection = {
         'Changes after approval are made by endorsement (Endorse button on the approved policy).',
       ],
       controls: [
-        'Maker-checker: the user who created or submitted a policy cannot approve it. Underwriting applies no authorization limit.',
+        'Maker-checker: the user who created or submitted a policy cannot approve it.',
+        'Authorization limit: the gross premium at 100 %, converted to the base currency at the SPOT rate of the accounting date, must not exceed the approver’s limit (users without a limit are unrestricted). Items above the limit do not appear in that user’s My Approvals.',
         'Approval and accounting happen in one transaction: either both succeed or nothing changes.',
         'The exchange rate is the SPOT rate of the accounting date; it is stored on the policy.',
         'Every creation, submission, approval, rejection and discard is recorded in the audit trail.',
@@ -57,6 +58,7 @@ export const UNDERWRITING_HELP: HelpSection = {
         'Only one endorsement per policy may be in draft or pending at a time.',
         'The effective date must fall within the policy period; a renewal’s new period must start after the current one.',
         'Endorsements use the policy terms: share, discount and loading rates, product taxes and the original commission rate.',
+        'Approval applies the approver’s authorization limit to the endorsement’s gross premium at 100 % (a return premium counts at its absolute value).',
       ],
     },
     {
@@ -71,7 +73,7 @@ export const UNDERWRITING_HELP: HelpSection = {
         'Expire lapsed quotations (underwriting maintain permission) marks every open quotation of the company whose validity has passed as EXPIRED now and shows how many were expired; the daily QUOTATION_EXPIRY job does the same for every company.',
       ],
       controls: [
-        'The user who prepared or submitted a quotation cannot approve or reject it.',
+        'The user who prepared or submitted a quotation cannot approve or reject it, and the approver’s authorization limit applies to the gross premium at 100 % of the last iteration.',
         'Validity = issue date + validity days (1 to 365); conversion after expiry is refused, and the expiry run (daily job or the Expire lapsed quotations button) marks lapsed quotations EXPIRED. Every run is recorded in the job monitor (Scheduled Jobs).',
         'The discount cannot exceed the gross premium.',
       ],

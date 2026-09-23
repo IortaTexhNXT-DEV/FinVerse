@@ -5,6 +5,7 @@ import com.iortatechnxt.finverse.audit.service.AuditTrailService;
 import com.iortatechnxt.finverse.common.security.CurrentUser;
 import com.iortatechnxt.finverse.underwriting.domain.Endorsement;
 import com.iortatechnxt.finverse.underwriting.domain.Policy;
+import com.iortatechnxt.finverse.underwriting.service.UnderwritingAuthority.Premium;
 import java.time.Clock;
 import java.time.LocalDate;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Checker side of policies and endorsements. Approval and its accounting (premium, commission and
  * coinsurance events, debit / credit notes and open items) happen in ONE transaction: either the
- * document is approved and fully accounted for, or nothing changes.
+ * document is approved and fully accounted for, or nothing changes. The checker must differ from
+ * the maker and the submitter, and the gross premium must be within the checker's authorization
+ * limit ({@link UnderwritingAuthority}).
  */
 @Service
 @Transactional
@@ -22,6 +25,7 @@ public class PolicyApprovalService {
   private final PolicyService policies;
   private final EndorsementService endorsements;
   private final PremiumPostingService posting;
+  private final UnderwritingAuthority authority;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
@@ -32,6 +36,7 @@ public class PolicyApprovalService {
    * @param policies policy service
    * @param endorsements endorsement service
    * @param posting premium accounting
+   * @param authority authorization limit
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
@@ -40,12 +45,14 @@ public class PolicyApprovalService {
       PolicyService policies,
       EndorsementService endorsements,
       PremiumPostingService posting,
+      UnderwritingAuthority authority,
       AuditTrailService audit,
       CurrentUser currentUser,
       Clock clock) {
     this.policies = policies;
     this.endorsements = endorsements;
     this.posting = posting;
+    this.authority = authority;
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
@@ -60,7 +67,17 @@ public class PolicyApprovalService {
    */
   public Policy approvePolicy(Long id, LocalDate accountingDate) {
     Policy policy = policies.get(id);
-    policy.approve(currentUser.username(), clock.instant(), dateOrToday(accountingDate));
+    String checker = currentUser.username();
+    LocalDate date = dateOrToday(accountingDate);
+    policy.approve(checker, clock.instant(), date);
+    authority.requireWithinLimit(
+        checker,
+        policy.label(),
+        new Premium(
+            policy.getCompanyId(),
+            policy.getCurrency(),
+            policy.getPremium().getGrossPremium(),
+            date));
     policy.recordPosting(posting.post(PremiumPosting.of(policy)));
     audit.record(
         PolicyService.ENTITY,
@@ -94,7 +111,17 @@ public class PolicyApprovalService {
    */
   public Endorsement approveEndorsement(Long id, LocalDate accountingDate) {
     Endorsement e = endorsements.get(id);
-    e.approve(currentUser.username(), clock.instant(), dateOrToday(accountingDate));
+    String checker = currentUser.username();
+    LocalDate date = dateOrToday(accountingDate);
+    e.approve(checker, clock.instant(), date);
+    authority.requireWithinLimit(
+        checker,
+        e.label(),
+        new Premium(
+            e.getPolicy().getCompanyId(),
+            e.getPolicy().getCurrency(),
+            e.getPremium().getGrossPremium(),
+            date));
     e.getEndorsementType()
         .eventType()
         .filter(type -> e.getPremium().isFinancial())

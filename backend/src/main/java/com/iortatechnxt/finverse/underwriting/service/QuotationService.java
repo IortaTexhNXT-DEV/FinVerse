@@ -50,6 +50,7 @@ public class QuotationService {
   private final PolicyService policies;
   private final UnderwritingNumbers numbers;
   private final OrganizationService organization;
+  private final UnderwritingAuthority authority;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
@@ -63,6 +64,7 @@ public class QuotationService {
    * @param policies policy creation (conversion)
    * @param numbers document numbers
    * @param organization branches
+   * @param authority authorization limit of the approver
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
@@ -74,6 +76,7 @@ public class QuotationService {
       PolicyService policies,
       UnderwritingNumbers numbers,
       OrganizationService organization,
+      UnderwritingAuthority authority,
       AuditTrailService audit,
       CurrentUser currentUser,
       Clock clock) {
@@ -83,6 +86,7 @@ public class QuotationService {
     this.policies = policies;
     this.numbers = numbers;
     this.organization = organization;
+    this.authority = authority;
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
@@ -181,14 +185,21 @@ public class QuotationService {
   }
 
   /**
-   * Approves (checker).
+   * Approves (checker): not the maker or submitter, and the offered gross premium (100 %, last
+   * iteration) within the checker's authorization limit at today's SPOT rate.
    *
    * @param id id
    * @return quotation
    */
   public Quotation approve(Long id) {
     Quotation q = get(id);
-    q.approve(currentUser.username(), clock.instant());
+    String checker = currentUser.username();
+    q.approve(checker, clock.instant());
+    authority.requireWithinLimit(
+        checker,
+        "Quotation " + q.getQuotationNo(),
+        new UnderwritingAuthority.Premium(
+            q.getCompanyId(), q.getCurrency(), offeredGross(q), LocalDate.now(clock)));
     audit.record(ENTITY, q.getQuotationNo(), AuditAction.AUTHORIZE, "Approved");
     return q;
   }
@@ -305,6 +316,16 @@ public class QuotationService {
         r.currency(),
         r.sharePct(),
         r.commissionRate() != null ? r.commissionRate() : product.getDefaultCommissionRate());
+  }
+
+  /**
+   * Gross premium at 100 % of the iteration on offer (zero before the first iteration).
+   *
+   * @param q quotation
+   * @return gross premium
+   */
+  static BigDecimal offeredGross(Quotation q) {
+    return q.getIterations().isEmpty() ? BigDecimal.ZERO : q.current().getGrossPremium();
   }
 
   private static BigDecimal ratio(BigDecimal part, BigDecimal whole) {

@@ -16,8 +16,12 @@ import com.iortatechnxt.finverse.underwriting.domain.PolicyStatus;
 import com.iortatechnxt.finverse.underwriting.domain.Product;
 import com.iortatechnxt.finverse.underwriting.domain.QuotationRepository;
 import com.iortatechnxt.finverse.underwriting.domain.QuotationStatus;
+import com.iortatechnxt.finverse.underwriting.service.UnderwritingAuthority.Premium;
+import java.time.Clock;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +29,9 @@ import org.springframework.stereotype.Component;
  * Approval inbox source of underwriting: policies, endorsements and quotations pending approval,
  * and products and open covers pending authorization. All are decided under {@code
  * POLICY_AUTHORIZE}; the creator and the submitter of a document may not decide it, so neither sees
- * it. Underwriting applies no authorization limit.
+ * it. Policies, endorsements and quotations whose gross premium exceeds the viewer's authorization
+ * limit are left out as well ({@link UnderwritingAuthority}, converted at today's SPOT rate, the
+ * default approval date), like journals and payables.
  */
 @Component
 public class UnderwritingApprovalSource implements PendingApprovalSource {
@@ -42,6 +48,8 @@ public class UnderwritingApprovalSource implements PendingApprovalSource {
   private final EndorsementRepository endorsements;
   private final QuotationRepository quotations;
   private final MasterRecordApprovals records;
+  private final UnderwritingAuthority authority;
+  private final Clock clock;
 
   /**
    * Creates the source.
@@ -50,16 +58,22 @@ public class UnderwritingApprovalSource implements PendingApprovalSource {
    * @param endorsements endorsement repository
    * @param quotations quotation repository
    * @param records master record helper (products, open covers)
+   * @param authority authorization limit
+   * @param clock clock (rate date)
    */
   public UnderwritingApprovalSource(
       PolicyRepository policies,
       EndorsementRepository endorsements,
       QuotationRepository quotations,
-      MasterRecordApprovals records) {
+      MasterRecordApprovals records,
+      UnderwritingAuthority authority,
+      Clock clock) {
     this.policies = policies;
     this.endorsements = endorsements;
     this.quotations = quotations;
     this.records = records;
+    this.authority = authority;
+    this.clock = clock;
   }
 
   @Override
@@ -68,9 +82,11 @@ public class UnderwritingApprovalSource implements PendingApprovalSource {
       return List.of();
     }
     List<PendingApproval> items = new ArrayList<>();
-    items.addAll(policies(viewer));
-    items.addAll(endorsements(viewer));
-    items.addAll(quotations(viewer));
+    Predicate<Premium> withinLimit = authority.inboxFilter(viewer);
+    LocalDate today = LocalDate.now(clock);
+    items.addAll(policies(viewer, withinLimit, today));
+    items.addAll(endorsements(viewer, withinLimit, today));
+    items.addAll(quotations(viewer, withinLimit, today));
     Scope scope = new Scope(MODULE, PERMISSION);
     items.addAll(records.pending(viewer, scope, Product.class, UnderwritingApprovalSource::facts));
     items.addAll(
@@ -78,12 +94,21 @@ public class UnderwritingApprovalSource implements PendingApprovalSource {
     return items;
   }
 
-  private List<PendingApproval> policies(ApprovalViewer viewer) {
+  private List<PendingApproval> policies(
+      ApprovalViewer viewer, Predicate<Premium> withinLimit, LocalDate today) {
     Specification<Policy> pending =
         (root, query, cb) ->
             cb.equal(root.get(WORKFLOW).get(STATUS), PolicyStatus.PENDING_APPROVAL);
     return policies.findAll(pending).stream()
         .filter(p -> decidable(viewer, p.getCreatedBy(), p.getWorkflow()))
+        .filter(
+            p ->
+                withinLimit.test(
+                    new Premium(
+                        p.getCompanyId(),
+                        p.getCurrency(),
+                        p.getPremium().getGrossPremium(),
+                        today)))
         .map(
             p ->
                 new PendingApproval(
@@ -100,12 +125,21 @@ public class UnderwritingApprovalSource implements PendingApprovalSource {
         .toList();
   }
 
-  private List<PendingApproval> endorsements(ApprovalViewer viewer) {
+  private List<PendingApproval> endorsements(
+      ApprovalViewer viewer, Predicate<Premium> withinLimit, LocalDate today) {
     Specification<Endorsement> pending =
         (root, query, cb) ->
             cb.equal(root.get(WORKFLOW).get(STATUS), PolicyStatus.PENDING_APPROVAL);
     return endorsements.findAll(pending).stream()
         .filter(e -> decidable(viewer, e.getCreatedBy(), e.getWorkflow()))
+        .filter(
+            e ->
+                withinLimit.test(
+                    new Premium(
+                        e.getPolicy().getCompanyId(),
+                        e.getPolicy().getCurrency(),
+                        e.getPremium().getGrossPremium(),
+                        today)))
         .map(
             e ->
                 new PendingApproval(
@@ -122,12 +156,21 @@ public class UnderwritingApprovalSource implements PendingApprovalSource {
         .toList();
   }
 
-  private List<PendingApproval> quotations(ApprovalViewer viewer) {
+  private List<PendingApproval> quotations(
+      ApprovalViewer viewer, Predicate<Premium> withinLimit, LocalDate today) {
     return quotations.findByStatusOrderById(QuotationStatus.PENDING_APPROVAL).stream()
         .filter(
             q ->
                 viewer.mayApproveItemOf(q.getCreatedBy())
                     && viewer.mayApproveItemOf(q.getSubmittedBy()))
+        .filter(
+            q ->
+                withinLimit.test(
+                    new Premium(
+                        q.getCompanyId(),
+                        q.getCurrency(),
+                        QuotationService.offeredGross(q),
+                        today)))
         .map(
             q ->
                 new PendingApproval(

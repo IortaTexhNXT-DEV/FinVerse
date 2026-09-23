@@ -213,7 +213,8 @@ public class PolicyApprovalSource implements PendingApprovalSource {
   (`underwriting.service.UnderwritingApprovalSource`).
 - Apply the same checks as the approval itself: the permission of the approve endpoint, every user
   the approval refuses (creator *and* submitter where both are checked), and the authorization limit
-  where the approval enforces one (`JournalApprovalSource`, `PayablesApprovalSource`).
+  where the approval enforces one (`JournalApprovalSource`, `PayablesApprovalSource`,
+  `ClaimApprovalSource`, `UnderwritingApprovalSource`).
 - Sources today: GL journals, accounting rules, chart of accounts, parties, organization,
   underwriting (policies, endorsements, quotations, products, open covers), payables (invoices,
   vouchers, petty cash, bank accounts, funds), receivables (receipts), budget (submitted versions),

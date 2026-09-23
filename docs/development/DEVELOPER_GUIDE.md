@@ -171,3 +171,86 @@ npm ci
 npm run verify                # prettier, SonarJS lint, typecheck, tests with coverage
 npm run dev                   # http://localhost:5173 (proxies /api to :8080)
 ```
+
+## 10. Platform services for business modules
+
+These cross-cutting services exist once; business modules plug into them. All plug points are
+**ports owned by the platform module that your module implements** (your module depends on the
+platform module, never the reverse), so ArchUnit stays cycle-free.
+
+### 10.1 Approval inbox ("My Approvals") – `approval`
+
+Every document that waits for a checker must appear in the universal inbox. Implement
+`approval.service.PendingApprovalSource` as a Spring bean in **your** module's `service` package:
+
+```java
+@Component
+public class PolicyApprovalSource implements PendingApprovalSource {
+  @Override
+  public List<PendingApproval> pendingFor(ApprovalViewer viewer) {
+    if (!viewer.can("POLICY_AUTHORIZE")) {
+      return List.of();
+    }
+    return policies.findPendingAuthorization().stream()
+        .filter(p -> viewer.mayApproveItemOf(p.getSubmittedBy())) // maker never sees own items
+        .map(p -> new PendingApproval("UNDERWRITING", "Policy", p.getPolicyNo(), p.getInsuredName(),
+            p.getGrossPremium(), p.getCurrency(), p.getSubmittedBy(), p.getSubmittedAt(),
+            p.getCompanyId(), "/underwriting/policies/" + p.getId()))
+        .toList();
+  }
+}
+```
+
+- `ApprovalViewer.system()` (used by the `PENDING_APPROVAL_AGEING` alert) must return **all**
+  pending items: `can()` and `mayApproveItemOf()` are always true for it.
+- `link` is the frontend route that opens the item (the inbox navigates there).
+- Maker-checker master data (`AuthorizableEntity`) needs no custom query: use
+  `approval.service.MasterRecordApprovals.pending(viewer, Entity.class, e -> new RecordFacts(...))`
+  (see `organization.service.OrganizationApprovalSource`).
+- API: `GET /api/v1/approvals/inbox?companyId=`, `GET /api/v1/approvals/counts` (header badge).
+
+### 10.2 Exception codes and alerts – `alert`
+
+- **Seed your exception codes** in your module's migration:
+  `insert into alt_exception_code (code, name, description, module, severity, threshold_amount,
+  threshold_days, created_at, created_by) values (...)`. Administrators tune severity, thresholds
+  and activation on *Administration → Exception Codes*.
+- **Event-time conditions**: call `alert.service.AlertService.raise(code, new AlertFacts(companyId,
+  branchId, entityType, entityId, message, amount, dedupKey))` in your transaction. Nothing is
+  raised when the code is inactive or an alert with the same `dedupKey` is still open or
+  acknowledged – choose the key so it identifies the condition (e.g. `"CLAIM_OVER_RESERVE:" +
+  claimId`). Read thresholds with `AlertService.activeCode(code)`.
+- **Scheduled conditions**: implement `alert.service.AlertCheck` (returns `AlertSignal`s); the
+  daily `ALERT_DAILY_CHECKS` job evaluates every check and raises the signals.
+- Journal posting rules live in `alert.service.JournalPostingAlertRules`, which implements the
+  port `journal.service.JournalPostingListener` (called by `PostingService` inside the posting
+  transaction).
+- The exception report `CTL-EXCEPTIONS` lists all alerts; filter by `code` for a module view.
+
+### 10.3 Background jobs – `system`
+
+Implement `system.service.ManagedJob` (name, description, cron, `execute(businessDate)`); do **not**
+use `@Scheduled`. `JobScheduler` schedules it (UTC cron, `"-"` = manual only), `JobRunService`
+records every run in `sys_job_run`, a failure raises `JOB_FAILURE`, and administrators see it on
+*Administration → Scheduled Jobs* with "Run now". For batch runs started from your own screen, wrap
+the work in `JobRunService.execute(jobName, JobTrigger.MANUAL, () -> new JobOutcome(n, message))`.
+Make the cron configurable (`finverse.jobs.<name>-cron`).
+
+### 10.4 Business parameters – `system`
+
+Read shared parameters with `SystemParameterService.intValue/text/items(KEY, fallback)`. Add a
+parameter with an insert into `sys_parameter` in your migration (type `STRING`, `INTEGER`,
+`DECIMAL`, `BOOLEAN`, `INTEGER_LIST` or `CODE_LIST`, optional min/max). Never store secrets there.
+
+### 10.5 Attachments – `attachment`
+
+Any record can carry documents: frontend `<Attachments entityType="Policy" entityId={policy.id} />`
+(`components/attachments/Attachments`); API `/api/v1/attachments?entityType=&entityId=`. Files are
+stored in PostgreSQL with SHA-256 checksum, type/signature and size checks
+(`finverse.attachments.max-size`, default 10 MB) and audit entries. Malware scanning: add a bean
+implementing `attachment.service.VirusScanner`. Permissions `ATTACHMENT_VIEW` / `ATTACHMENT_MANAGE`.
+
+### 10.6 Help content
+
+Every screen has an entry in `frontend/src/features/help/helpContent.ts` (summary, workflow,
+controls). Add your module's section when you add screens.

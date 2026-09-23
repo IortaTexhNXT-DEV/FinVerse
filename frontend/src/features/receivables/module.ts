@@ -5,7 +5,6 @@ import {
   FilePlus2,
   FileSpreadsheet,
   Landmark,
-  NotebookTabs,
   ReceiptText,
   ScrollText,
 } from 'lucide-react';
@@ -83,13 +82,6 @@ export const receivablesModule: FeatureModule = {
       icon: ArrowLeftRight,
       permission: 'RECONCILIATION_MANAGE',
       component: lazy(() => import('./BankReconciliationPage')),
-    },
-    {
-      path: '/receivables/party-statement',
-      label: 'Party Statement',
-      icon: NotebookTabs,
-      permission: RECEIPT_VIEW,
-      component: lazy(() => import('./PartyStatementPage')),
     },
     {
       path: '/receivables/reports',

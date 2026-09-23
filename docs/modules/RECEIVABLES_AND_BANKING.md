@@ -89,6 +89,16 @@ Debtors and creditors reports share one slot type, `subledger.service.AgeingSlot
 the due date or the document date.
 Balances "as of" ignore matches dated after the date.
 
+**Party statement.** There is one party statement screen: *General Ledger → Party Statement*
+(`/gl/party-statement`, `JOURNAL_VIEW`). It reads the open-item sub-ledger, so it covers every party
+type (policyholders, intermediaries, reinsurers and suppliers), shows settled and outstanding
+amounts, days overdue, the ageing strip and the net position. The former receivables screen
+(`/receivables/party-statement`) showed the documents of a period split into matched and unmatched
+details for debtors only; that view is exactly report FIN-ARAP-SOA-MATCH (debtors and creditors,
+with PDF/Excel export), so the screen, its menu entry and its endpoint
+`GET /api/v1/receivables/party-statement` were removed. `PartyStatementService` remains as the
+engine of the report.
+
 ## 6. Known limitations
 
 * Unmatching deletes the sub-ledger match (the audit trail keeps it), so an ageing "as of" a date

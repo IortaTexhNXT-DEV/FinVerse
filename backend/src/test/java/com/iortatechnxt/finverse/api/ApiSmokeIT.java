@@ -108,7 +108,6 @@ class ApiSmokeIT {
         "/api/v1/receivables/receipts?companyId={c}&status=APPROVED&mode=CHEQUE&from=2026-01-01",
         "/api/v1/receivables/bank-accounts?companyId={c}",
         "/api/v1/receivables/open-items?companyId={c}&partyCode=C-000201",
-        "/api/v1/receivables/party-statement?companyId={c}&partyCode=C-000201&from=2026-01-01&to=2026-12-31",
         "/api/v1/receivables/ageing-slots",
         "/api/v1/receivables/deposits/undeposited?companyId={c}",
         "/api/v1/receivables/deposits/slips?companyId={c}",

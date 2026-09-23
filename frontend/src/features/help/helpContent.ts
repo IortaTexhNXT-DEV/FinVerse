@@ -115,6 +115,16 @@ export const HELP_SECTIONS: HelpSection[] = [
         summary: 'Statement of any account with opening balance, movements and running balance.',
       },
       {
+        name: 'Party Statement',
+        path: '/gl/party-statement',
+        summary:
+          'The single party statement: every receivable and payable document of a policyholder, intermediary, reinsurer or supplier from the sub-ledger, with settled and outstanding amounts, days overdue and ageing.',
+        workflow: [
+          'Find the party by code or name and choose the as-of date.',
+          'For the matched / unmatched statement of a period, run report FIN-ARAP-SOA-MATCH.',
+        ],
+      },
+      {
         name: 'Chart of Accounts',
         path: '/gl/accounts',
         summary:

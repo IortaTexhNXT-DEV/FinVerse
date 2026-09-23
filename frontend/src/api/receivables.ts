@@ -268,29 +268,6 @@ export interface Match {
   createdBy: string;
 }
 
-export interface StatementLineItem {
-  itemId: number;
-  documentDate: string;
-  reference?: string;
-  transactionCode: string;
-  chequeNo?: string;
-  chequeDate?: string;
-  currency: string;
-  debit: number;
-  credit: number;
-  original: number;
-  balance: number;
-}
-
-export interface PartyStatement {
-  partyCode: string;
-  partyName: string;
-  matched: StatementLineItem[];
-  unmatched: StatementLineItem[];
-  matchedNet: number;
-  unmatchedNet: number;
-}
-
 const R = '/receivables';
 
 function partyQuery(companyId: number, types: string[]): string {
@@ -305,16 +282,6 @@ export const receivablesApi = {
     api.get<PartyOption[]>(partyQuery(companyId, types)),
   openItems: (companyId: number, partyCode: string, currency?: string) =>
     api.get<OpenItem[]>(`${R}/open-items${toQuery({ companyId, partyCode, currency })}`),
-  partyStatement: (
-    companyId: number,
-    partyCode: string,
-    from: string,
-    to: string,
-    foreign: boolean,
-  ) =>
-    api.get<PartyStatement[]>(
-      `${R}/party-statement${toQuery({ companyId, partyCode, from, to, foreign })}`,
-    ),
 
   receipts: (f: ReceiptFilters) =>
     api.get<PageResponse<ReceiptSummary>>(`${R}/receipts${toQuery({ ...f })}`),

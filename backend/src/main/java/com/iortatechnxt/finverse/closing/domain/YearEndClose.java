@@ -43,7 +43,7 @@ public class YearEndClose extends BaseEntity {
   private Integer nextYearCode;
 
   @Column(nullable = false, length = 20)
-  private String status = CLOSED;
+  private String status;
 
   protected YearEndClose() {}
 
@@ -61,6 +61,7 @@ public class YearEndClose extends BaseEntity {
     this.retainedEarningsAccount = values.retainedEarningsAccount();
     this.closingBatches = values.closingBatches();
     this.nextYearCode = values.nextYearCode();
+    this.status = CLOSED;
   }
 
   public Long getCompanyId() {

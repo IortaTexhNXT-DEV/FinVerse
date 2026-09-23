@@ -71,7 +71,7 @@ public class Budget extends BaseEntity {
 
   @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("accountCode, costCenter")
-  private List<BudgetLine> lines = new ArrayList<>();
+  private final List<BudgetLine> lines = new ArrayList<>();
 
   protected Budget() {}
 

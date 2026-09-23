@@ -54,7 +54,7 @@ public class ConsolidationRun extends BaseEntity {
 
   @OneToMany(mappedBy = "run", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("lineNo")
-  private List<ConsolidationRunLine> lines = new ArrayList<>();
+  private final List<ConsolidationRunLine> lines = new ArrayList<>();
 
   protected ConsolidationRun() {}
 

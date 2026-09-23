@@ -50,7 +50,7 @@ public class ConsolidationGroup extends BaseEntity {
 
   @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("id")
-  private List<ConsolidationMember> members = new ArrayList<>();
+  private final List<ConsolidationMember> members = new ArrayList<>();
 
   protected ConsolidationGroup() {}
 

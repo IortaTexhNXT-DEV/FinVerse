@@ -5,12 +5,11 @@ import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Parses the budget import CSV (format in {@code docs/samples/budget_import_sample.csv}).
  *
- * <p>Header row required. Two layouts are accepted:
+ * <p>Header row required (lower case names). Two layouts are accepted:
  *
  * <ul>
  *   <li>{@code account_code,cost_centre,m01,...,m12} – twelve monthly amounts;
@@ -41,15 +40,7 @@ public final class BudgetCsvParser {
     if (headerIndex < 0) {
       throw invalid(List.of("The file is empty"));
     }
-    String[] header = rows.get(headerIndex).split(SEPARATOR, -1);
-    int columns = header.length;
-    if (!"account_code".equals(header[0].trim().toLowerCase(Locale.ROOT))
-        || columns != ANNUAL_COLUMNS && columns != MONTHLY_COLUMNS) {
-      throw invalid(
-          List.of(
-              "Header must be account_code,cost_centre,annual"
-                  + " or account_code,cost_centre followed by twelve month columns"));
-    }
+    int columns = headerColumns(rows.get(headerIndex));
     List<ParsedLine> lines = new ArrayList<>();
     List<String> errors = new ArrayList<>();
     for (int i = headerIndex + 1; i < rows.size() && errors.size() < MAX_ERRORS; i++) {
@@ -64,30 +55,45 @@ public final class BudgetCsvParser {
     return lines;
   }
 
+  private static int headerColumns(String headerRow) {
+    String[] header = headerRow.split(SEPARATOR, -1);
+    int columns = header.length;
+    if (!"account_code".equals(header[0].trim())
+        || columns != ANNUAL_COLUMNS && columns != MONTHLY_COLUMNS) {
+      throw invalid(
+          List.of(
+              "Header must be account_code,cost_centre,annual"
+                  + " or account_code,cost_centre followed by twelve month columns"));
+    }
+    return columns;
+  }
+
   private static void parseRow(
       String row, int lineNo, int columns, List<ParsedLine> lines, List<String> errors) {
     String[] cells = row.split(SEPARATOR, -1);
+    String prefix = "Line " + lineNo + ": ";
     if (cells.length != columns) {
-      errors.add("Line " + lineNo + ": expected " + columns + " values but found " + cells.length);
-      return;
-    }
-    String account = cells[0].trim();
-    if (account.isEmpty()) {
-      errors.add("Line " + lineNo + ": account code is missing");
-      return;
-    }
-    try {
-      List<BigDecimal> amounts = new ArrayList<>();
-      for (int c = KEY_COLUMNS; c < columns; c++) {
-        amounts.add(amount(cells[c]));
+      errors.add(prefix + "expected " + columns + " values but found " + cells.length);
+    } else if (cells[0].isBlank()) {
+      errors.add(prefix + "account code is missing");
+    } else {
+      try {
+        lines.add(line(cells, columns));
+      } catch (NumberFormatException ex) {
+        errors.add(prefix + "amounts must be numbers");
       }
-      List<BigDecimal> months =
-          columns == ANNUAL_COLUMNS ? BudgetSpread.even(amounts.get(0)) : amounts;
-      String costCenter = cells[1].trim();
-      lines.add(new ParsedLine(account, costCenter.isEmpty() ? null : costCenter, months));
-    } catch (NumberFormatException ex) {
-      errors.add("Line " + lineNo + ": amounts must be numbers");
     }
+  }
+
+  private static ParsedLine line(String[] cells, int columns) {
+    List<BigDecimal> amounts = new ArrayList<>();
+    for (int c = KEY_COLUMNS; c < columns; c++) {
+      amounts.add(amount(cells[c]));
+    }
+    List<BigDecimal> months =
+        columns == ANNUAL_COLUMNS ? BudgetSpread.even(amounts.get(0)) : amounts;
+    String costCenter = cells[1].trim();
+    return new ParsedLine(cells[0].trim(), costCenter.isEmpty() ? null : costCenter, months);
   }
 
   private static BigDecimal amount(String cell) {

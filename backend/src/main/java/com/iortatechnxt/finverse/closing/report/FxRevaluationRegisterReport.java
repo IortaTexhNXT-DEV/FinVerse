@@ -65,6 +65,28 @@ public class FxRevaluationRegisterReport implements ReportDefinition {
   public ReportResult generate(ReportParameters p) {
     Register register =
         revaluations.register(p.longValue(GlReportSupport.COMPANY), p.date(GlReportSupport.AS_OF));
+    List<Map<String, Object>> rows = rows(register);
+    String basis = basis(register);
+    return TabularReportBuilder.of(p)
+        .columns(
+            ReportColumn.text("who", "Branch / Party"),
+            ReportColumn.text("what", "Account / Document"),
+            ReportColumn.text("currency", "Currency"),
+            ReportColumn.amountNoTotal("fc", "FC Amount"),
+            ReportColumn.amount("booked", "Booked Base"),
+            ReportColumn.amountNoTotal("rate", "Closing Rate"),
+            ReportColumn.amount("revalued", "Revalued Base"),
+            ReportColumn.amount("difference", "Unrealized Gain / (Loss)"))
+        .groupBy(SECTION, "Section")
+        .presorted()
+        .withoutGrandTotal()
+        .rows(rows)
+        .note(basis)
+        .note("Difference = FC amount x closing rate - booked base amount.")
+        .build();
+  }
+
+  private List<Map<String, Object>> rows(Register register) {
     Map<Long, String> branches = new HashMap<>();
     List<Map<String, Object>> rows = new ArrayList<>();
     if (register.run() != null) {
@@ -111,33 +133,19 @@ public class FxRevaluationRegisterReport implements ReportDefinition {
                   o.revaluedBase(),
                   o.gainLoss())));
     }
-    String basis =
-        register.run() == null
-            ? "Preview as of " + register.date() + ": the period has not been revalued yet."
-            : "Posted run "
-                + register.run().getPeriodName()
-                + ", journal "
-                + register.run().getJournalBatchNo()
-                + (register.run().getReversalBatchNo() == null
-                    ? ""
-                    : ", reversed by " + register.run().getReversalBatchNo());
-    return TabularReportBuilder.of(p)
-        .columns(
-            ReportColumn.text("who", "Branch / Party"),
-            ReportColumn.text("what", "Account / Document"),
-            ReportColumn.text("currency", "Currency"),
-            ReportColumn.amountNoTotal("fc", "FC Amount"),
-            ReportColumn.amount("booked", "Booked Base"),
-            ReportColumn.amountNoTotal("rate", "Closing Rate"),
-            ReportColumn.amount("revalued", "Revalued Base"),
-            ReportColumn.amount("difference", "Unrealized Gain / (Loss)"))
-        .groupBy(SECTION, "Section")
-        .presorted()
-        .withoutGrandTotal()
-        .rows(rows)
-        .note(basis)
-        .note("Difference = FC amount x closing rate - booked base amount.")
-        .build();
+    return rows;
+  }
+
+  private static String basis(Register register) {
+    return register.run() == null
+        ? "Preview as of " + register.date() + ": the period has not been revalued yet."
+        : "Posted run "
+            + register.run().getPeriodName()
+            + ", journal "
+            + register.run().getJournalBatchNo()
+            + (register.run().getReversalBatchNo() == null
+                ? ""
+                : ", reversed by " + register.run().getReversalBatchNo());
   }
 
   private String branchCode(Map<Long, String> cache, Long branchId) {

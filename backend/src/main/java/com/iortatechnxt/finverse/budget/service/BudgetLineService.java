@@ -188,7 +188,7 @@ public class BudgetLineService {
       String costCenter =
           c.costCenter() == null || c.costCenter().isBlank() ? null : c.costCenter();
       GlAccount account = byCode.get(c.accountCode());
-      if (account == null || !account.isPostable() || !isProfitAndLoss(account)) {
+      if (!isBudgetable(account)) {
         errors.add("Account " + c.accountCode() + " is not a postable income or expense account");
         continue;
       }
@@ -203,6 +203,10 @@ public class BudgetLineService {
       throw new BusinessRuleException("BUDGET_LINES_INVALID", String.join("; ", errors));
     }
     return values;
+  }
+
+  private static boolean isBudgetable(GlAccount account) {
+    return account != null && account.isPostable() && isProfitAndLoss(account);
   }
 
   private static boolean isProfitAndLoss(GlAccount account) {

@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 class DemoBudgetData {
 
   private static final int YEAR = 2026;
+  private static final String SALARIES = "5601";
 
   /** Premium seasonality: renewals peak at quarter ends and in December. */
   private static final List<BigDecimal> SEASONAL =
@@ -67,10 +68,10 @@ class DemoBudgetData {
         even("4501", null, "18000000"),
         seasonal("5100", null, "150000000"),
         seasonal("5400", null, "54000000"),
-        even("5601", "FIN", "9600000"),
-        even("5601", "UW", "12000000"),
-        even("5601", "CLM", "8400000"),
-        even("5601", "IT", "7200000"),
+        even(SALARIES, "FIN", "9600000"),
+        even(SALARIES, "UW", "12000000"),
+        even(SALARIES, "CLM", "8400000"),
+        even(SALARIES, "IT", "7200000"),
         even("5603", "FIN", "6000000"),
         even("5605", "FIN", "2400000"),
         seasonal("5609", "MKT", "3600000"),

@@ -55,7 +55,7 @@ public class BudgetLine {
   @CollectionTable(name = "bud_budget_amount", joinColumns = @JoinColumn(name = "line_id"))
   @MapKeyColumn(name = "period_no")
   @Column(name = "amount", nullable = false, precision = 19, scale = 2)
-  private Map<Integer, BigDecimal> amounts = new TreeMap<>();
+  private final Map<Integer, BigDecimal> amounts = new TreeMap<>();
 
   protected BudgetLine() {}
 

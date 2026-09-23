@@ -62,7 +62,7 @@ public class FxRevaluationRun extends BaseEntity {
 
   @OneToMany(mappedBy = "run", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("lineNo")
-  private List<FxRevaluationLine> lines = new ArrayList<>();
+  private final List<FxRevaluationLine> lines = new ArrayList<>();
 
   protected FxRevaluationRun() {}
 

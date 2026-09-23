@@ -102,7 +102,8 @@ class ReservesIT {
     assertThat(march.getStatus()).isEqualTo(RunStatus.POSTED);
     assertThat(fx.total(march, ReserveType.UPR, RunLine::getGrossAmount)).isPositive();
     assertThat(fx.total(march, ReserveType.PDR, RunLine::getGrossAmount)).isPositive();
-    assertThat(march.getRemarks()).contains("Claims module not available");
+    // The claims module is deployed: OSLR comes from its ClaimsExperienceView.
+    assertThat(march.getRemarks()).doesNotContain("Claims module not available");
     assertLedgerEqualsReserves(march, MARCH);
 
     ValuationRun april = fx.posted(APRIL);

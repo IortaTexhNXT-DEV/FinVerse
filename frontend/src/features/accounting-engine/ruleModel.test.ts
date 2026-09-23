@@ -6,8 +6,8 @@ import {
   optionalHeader,
   parseAmounts,
   roles,
-  simulationTotals,
   toAmounts,
+  unbalancedWarning,
   toRuleInput,
   validateRule,
 } from './ruleModel';
@@ -84,18 +84,29 @@ describe('accounting rule model', () => {
     expect(input.lines).toEqual(rule.lines);
   });
 
-  it('totals simulated lines and parses register amounts', () => {
-    expect(
-      simulationTotals([
-        { accountCode: '1111', side: 'DEBIT', amount: 100.1 },
-        { accountCode: '1201', side: 'CREDIT', amount: 60.05 },
-        { accountCode: '4700', side: 'CREDIT', amount: 40.05 },
-      ]),
-    ).toEqual({ debit: 100.1, credit: 100.1 });
+  it('parses register amounts', () => {
     expect(parseAmounts('AMOUNT=1000.00, DST=12.50, BAD, X=abc')).toEqual({
       AMOUNT: 1000,
       DST: 12.5,
     });
+  });
+
+  it('warns when the simulated journal is unbalanced and the posting would be rejected', () => {
+    const sim = {
+      ruleId: 1,
+      ruleName: 'Policy issue',
+      lines: [],
+      totalDebit: 100000,
+      totalCredit: 125450,
+      difference: -25450,
+      balanced: false,
+    };
+    expect(unbalancedWarning(sim)).toBe(
+      'Preview is unbalanced by 25,450.00 — posting would be rejected (debits 100,000.00, credits 125,450.00).',
+    );
+    expect(
+      unbalancedWarning({ ...sim, totalCredit: 100000, difference: 0, balanced: true }),
+    ).toBeUndefined();
   });
 
   it('keeps only filled numeric amounts and normalises the simulation header', () => {

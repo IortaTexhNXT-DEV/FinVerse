@@ -57,6 +57,11 @@ export interface Simulation {
   ruleId: number;
   ruleName: string;
   lines: JournalLineInput[];
+  /** Balance computed by the server (event currency). */
+  totalDebit: number;
+  totalCredit: number;
+  difference: number;
+  balanced: boolean;
 }
 
 export type EventStatus = 'POSTED' | 'FAILED';

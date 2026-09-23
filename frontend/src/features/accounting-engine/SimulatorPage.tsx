@@ -13,7 +13,7 @@ import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useWorkspace } from '@/context/workspaceContext';
 import { today } from '@/utils/format';
-import { components, optionalHeader, roles, simulationTotals, toAmounts } from './ruleModel';
+import { components, optionalHeader, roles, toAmounts, unbalancedWarning } from './ruleModel';
 import { useAccountingLookups } from './useAccountingLookups';
 
 /**
@@ -50,7 +50,7 @@ export default function SimulatorPage() {
     });
   };
   const lines = run.data?.lines ?? [];
-  const totals = simulationTotals(lines);
+  const warning = run.data === undefined ? undefined : unbalancedWarning(run.data);
 
   return (
     <div className="stack">
@@ -140,13 +140,19 @@ export default function SimulatorPage() {
         </Card>
       </div>
       <ErrorAlert error={run.error} />
+      {warning !== undefined && (
+        <div className="alert danger" role="alert">
+          {warning}
+        </div>
+      )}
       {run.data !== undefined && (
         <Card
           flush
           title={`Rule applied: ${run.data.ruleName}`}
           actions={
             <span className="muted">
-              Debits <Amount value={totals.debit} /> · Credits <Amount value={totals.credit} />
+              Debits <Amount value={run.data.totalDebit} /> · Credits{' '}
+              <Amount value={run.data.totalCredit} />
             </span>
           }
         >

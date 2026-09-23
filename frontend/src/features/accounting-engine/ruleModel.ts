@@ -1,5 +1,5 @@
-import type { EventType, Rule, RuleInput, RuleLine } from '@/api/accounting';
-import type { JournalLineInput } from '@/api/gl';
+import type { EventType, Rule, RuleInput, RuleLine, Simulation } from '@/api/accounting';
+import { formatAmount } from '@/utils/format';
 
 /** Prefix of account placeholders resolved from the event (e.g. "@BANK"). */
 export const ROLE_PREFIX = '@';
@@ -101,12 +101,18 @@ export function roles(lines: RuleLine[]): string[] {
   return [...new Set(names)];
 }
 
-/** Debit and credit totals of simulated journal lines. */
-export function simulationTotals(lines: JournalLineInput[]): { debit: number; credit: number } {
-  const sum = (side: string) =>
-    Math.round(lines.filter((l) => l.side === side).reduce((acc, l) => acc + l.amount, 0) * 100) /
-    100;
-  return { debit: sum('DEBIT'), credit: sum('CREDIT') };
+/**
+ * Warning for a simulated journal the server reports as unbalanced (sample amounts that do not add
+ * up): the real posting would be rejected. Undefined when balanced.
+ */
+export function unbalancedWarning(sim: Simulation): string | undefined {
+  if (sim.balanced) {
+    return undefined;
+  }
+  return (
+    `Preview is unbalanced by ${formatAmount(Math.abs(sim.difference))} — posting would be ` +
+    `rejected (debits ${formatAmount(sim.totalDebit)}, credits ${formatAmount(sim.totalCredit)}).`
+  );
 }
 
 /** Numeric amounts of the components that were filled in (blank or invalid entries are skipped). */

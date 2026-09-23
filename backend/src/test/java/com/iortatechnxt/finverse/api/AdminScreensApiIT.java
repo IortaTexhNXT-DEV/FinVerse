@@ -148,7 +148,10 @@ class AdminScreensApiIT {
                 .content(simulation))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.lines.length()").value(2))
-        .andExpect(jsonPath("$.lines[0].accountCode").value("1111"));
+        .andExpect(jsonPath("$.lines[0].accountCode").value("1111"))
+        .andExpect(jsonPath("$.totalDebit").value(1500.00))
+        .andExpect(jsonPath("$.totalCredit").value(1500.00))
+        .andExpect(jsonPath("$.balanced").value(true));
     mvc.perform(
             post("/api/v1/accounting/rules")
                 .with(as("fmanager"))

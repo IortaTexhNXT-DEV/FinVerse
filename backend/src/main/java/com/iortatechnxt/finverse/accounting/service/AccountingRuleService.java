@@ -12,10 +12,13 @@ import com.iortatechnxt.finverse.accounting.domain.AccountingRuleRepository;
 import com.iortatechnxt.finverse.accounting.domain.EventStatus;
 import com.iortatechnxt.finverse.audit.domain.AuditAction;
 import com.iortatechnxt.finverse.audit.service.AuditTrailService;
+import com.iortatechnxt.finverse.coa.domain.BalanceSide;
 import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.finverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.finverse.common.security.CurrentUser;
+import com.iortatechnxt.finverse.common.util.Money;
 import com.iortatechnxt.finverse.journal.api.dto.JournalLineRequest;
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -184,7 +187,7 @@ public class AccountingRuleService {
             s.amounts(),
             s.accounts());
     AccountingRule rule = resolver.resolve(event);
-    return new Simulation(rule.getId(), rule.getName(), lineBuilder.build(rule, event));
+    return Simulation.of(rule.getId(), rule.getName(), lineBuilder.build(rule, event));
   }
 
   /**
@@ -222,11 +225,54 @@ public class AccountingRuleService {
   }
 
   /**
-   * Simulation result.
+   * Simulation result with its balance, so the preview can warn when the real posting would be
+   * rejected as unbalanced (e.g. sample amounts that do not add up).
    *
    * @param ruleId rule selected
    * @param ruleName rule name
    * @param lines journal lines that would be generated
+   * @param totalDebit sum of the debit lines (event currency)
+   * @param totalCredit sum of the credit lines (event currency)
+   * @param difference debits minus credits
+   * @param balanced true when there are lines and debits equal credits
    */
-  public record Simulation(Long ruleId, String ruleName, List<JournalLineRequest> lines) {}
+  public record Simulation(
+      Long ruleId,
+      String ruleName,
+      List<JournalLineRequest> lines,
+      BigDecimal totalDebit,
+      BigDecimal totalCredit,
+      BigDecimal difference,
+      boolean balanced) {
+
+    /**
+     * Result with the totals of the generated lines.
+     *
+     * @param ruleId rule selected
+     * @param ruleName rule name
+     * @param lines generated lines
+     * @return simulation
+     */
+    public static Simulation of(Long ruleId, String ruleName, List<JournalLineRequest> lines) {
+      BigDecimal debit = total(lines, BalanceSide.DEBIT);
+      BigDecimal credit = total(lines, BalanceSide.CREDIT);
+      BigDecimal difference = debit.subtract(credit);
+      return new Simulation(
+          ruleId,
+          ruleName,
+          lines,
+          debit,
+          credit,
+          difference,
+          debit.signum() > 0 && difference.signum() == 0);
+    }
+
+    private static BigDecimal total(List<JournalLineRequest> lines, BalanceSide side) {
+      return lines.stream()
+          .filter(l -> l.side() == side)
+          .map(JournalLineRequest::amount)
+          .reduce(Money.zero(), BigDecimal::add)
+          .setScale(Money.SCALE, Money.ROUNDING);
+    }
+  }
 }

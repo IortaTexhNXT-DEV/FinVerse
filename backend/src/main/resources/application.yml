@@ -64,6 +64,8 @@ finverse:
     reserve-valuation-cron: ${FINVERSE_JOB_RESERVE_VALUATION_CRON:-}
     # Batch RI allocation run (cedes approved transactions of the year to date not yet ceded); off by default.
     ri-allocation-cron: ${FINVERSE_JOB_RI_ALLOCATION_CRON:-}
+    # Post-dated cheques issued whose cheque date is reached become DUE (status only).
+    pdc-issued-due-cron: ${FINVERSE_JOB_PDC_ISSUED_DUE_CRON:0 15 0 * * *}
 
 management:
   endpoints:

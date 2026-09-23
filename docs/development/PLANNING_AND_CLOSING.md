@@ -69,6 +69,9 @@ demo data `V960`/`V961` plus the start-up runner `closing.demo.PlanningDemoData`
 - **Checklists** (automatic pass/fail): period status, pending journals (draft / pending / rejected),
   unreconciled items, FX revaluation status, trial balance. Unreconciled items come from beans
   implementing the port `closing.service.ReconciliationStatusProvider` (zero while none exists).
+  Other modules append their own period-end controls through the port
+  `closing.service.PeriodEndCheckProvider` (e.g. actuarial reserves: "Actuarial reserves valued and
+  posted", see `docs/modules/ACTUARIAL_RESERVES.md`).
 - **Year-end close** (`YEAR_END_CLOSE`): requires every period CLOSED or CLOSING with the final
   period in CLOSING (it receives the closing journal), no pending journals, a balanced TB, the
   final period revalued (or nothing to revalue), no unreconciled items and a valid company retained

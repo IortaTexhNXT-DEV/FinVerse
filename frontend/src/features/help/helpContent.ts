@@ -1,3 +1,5 @@
+import { RESERVES_HELP } from '@/features/reserves/help';
+
 /**
  * In-app help. One entry per module; each screen lists its purpose, the usual workflow and the
  * controls (maker-checker, audit, validations) that apply. Keep the text short and factual and
@@ -246,6 +248,7 @@ export const HELP_SECTIONS: HelpSection[] = [
       },
     ],
   },
+  RESERVES_HELP,
 ];
 
 /** Sections whose module, screen names or text contain the search term. */

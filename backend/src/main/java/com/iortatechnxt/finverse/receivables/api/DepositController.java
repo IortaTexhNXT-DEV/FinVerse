@@ -42,7 +42,7 @@ public class DepositController {
    * @return receipts
    */
   @GetMapping("/undeposited")
-  @PreAuthorize("hasAnyAuthority('RECEIPT_PAYMENT_MAINTAIN','RECEIPT_PAYMENT_AUTHORIZE')")
+  @PreAuthorize(ReceivablesAccess.VIEW)
   public List<ReceiptSummaryResponse> undeposited(
       @RequestParam Long companyId, @RequestParam(required = false) String bankAccountCode) {
     return deposits.undeposited(companyId, bankAccountCode).stream()
@@ -57,7 +57,7 @@ public class DepositController {
    * @return slips newest first
    */
   @GetMapping("/slips")
-  @PreAuthorize("hasAnyAuthority('RECEIPT_PAYMENT_MAINTAIN','RECEIPT_PAYMENT_AUTHORIZE')")
+  @PreAuthorize(ReceivablesAccess.VIEW)
   public List<DepositSlipResponse> slips(@RequestParam Long companyId) {
     return deposits.list(companyId).stream()
         .map(s -> DepositSlipResponse.from(s, List.of()))
@@ -71,7 +71,7 @@ public class DepositController {
    * @return slip
    */
   @GetMapping("/slips/{id}")
-  @PreAuthorize("hasAnyAuthority('RECEIPT_PAYMENT_MAINTAIN','RECEIPT_PAYMENT_AUTHORIZE')")
+  @PreAuthorize(ReceivablesAccess.VIEW)
   public DepositSlipResponse slip(@PathVariable Long id) {
     return DepositSlipResponse.from(
         deposits.get(id),

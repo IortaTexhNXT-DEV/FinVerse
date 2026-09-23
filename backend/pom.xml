@@ -29,6 +29,7 @@
     <zonky.embedded-db.version>2.6.0</zonky.embedded-db.version>
     <zonky.embedded-pg.version>2.1.0</zonky.embedded-pg.version>
     <archunit.version>1.4.1</archunit.version>
+    <surefire.runOrder>alphabetical</surefire.runOrder>
 
     <!-- Quality tooling versions -->
     <checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
@@ -185,6 +186,9 @@
             <include>**/*Test.java</include>
             <include>**/*IT.java</include>
           </includes>
+          <!-- Deterministic class order so CI and local runs match; integration tests share one
+               database and must still pass in any order (checked with -Dsurefire.runOrder=...). -->
+          <runOrder>${surefire.runOrder}</runOrder>
         </configuration>
       </plugin>
 

@@ -2,6 +2,7 @@ import { accountingEngineModule } from '@/features/accounting-engine/module';
 import { adminModule } from '@/features/admin/module';
 import { dashboardModule } from '@/features/dashboard/module';
 import { glModule } from '@/features/gl/module';
+import { receivablesModule } from '@/features/receivables/module';
 import { reportsModule } from '@/features/reports/module';
 import { setupModule } from '@/features/setup/module';
 import type { FeatureModule } from './types';
@@ -14,6 +15,7 @@ export const MODULES: FeatureModule[] = [
   dashboardModule,
   glModule,
   accountingEngineModule,
+  receivablesModule,
   reportsModule,
   setupModule,
   adminModule,

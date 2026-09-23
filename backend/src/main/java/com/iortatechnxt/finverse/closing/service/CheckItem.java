@@ -26,6 +26,19 @@ public record CheckItem(
   }
 
   /**
+   * Non-blocking control: a failure is shown as a warning to review, the close may proceed.
+   *
+   * @param code code
+   * @param label label
+   * @param passed result
+   * @param detail detail
+   * @return item
+   */
+  public static CheckItem warning(String code, String label, boolean passed, String detail) {
+    return new CheckItem(code, label, passed, detail, false);
+  }
+
+  /**
    * Whether this item prevents closing.
    *
    * @return true when blocking and failed

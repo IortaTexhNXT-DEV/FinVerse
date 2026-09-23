@@ -76,6 +76,15 @@ statuses "as of" a date are taken from this history.
 * BRS: `Bank balance = Book balance - (1) book debits not in bank + (2) book credits not in bank
   - (3) bank debits not in book + (4) bank credits not in book`; the difference to the imported
   statement balance must be zero to finalize.
+* **Period-end checklist.** `BankReconciliationStatusProvider` implements the port
+  `closing.service.ReconciliationStatusProvider`: the number of reconciling items (1) to (4) of every
+  bank account of the company as of the period (or year) end, i.e. the book entries dated up to then
+  and not reconciled as of then, plus the statement lines dated up to then and not matched, exactly
+  the items of the BRS and of FIN-BRS-UNREC-BOOK / FIN-BRS-UNREC-BANK
+  (`BankReconciliationService.unreconciledItems`). The checklist shows them as a warning (see
+  [PLANNING_AND_CLOSING.md](../development/PLANNING_AND_CLOSING.md)). Receivables depends on
+  closing for this port; closing depends on no module that depends on receivables, so the module
+  graph stays acyclic (checked by `ArchitectureTest`) and the port stays in closing.
 
 ## 5. Reports (FINANCE_REPORTS_SPEC.md)
 

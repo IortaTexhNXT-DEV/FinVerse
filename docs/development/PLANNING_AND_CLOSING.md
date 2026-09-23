@@ -68,14 +68,24 @@ demo data `V960`/`V961` plus the start-up runner `closing.demo.PlanningDemoData`
 
 - **Checklists** (automatic pass/fail): period status, pending journals (draft / pending / rejected),
   unreconciled items, FX revaluation status, trial balance. Unreconciled items come from beans
-  implementing the port `closing.service.ReconciliationStatusProvider` (zero while none exists).
+  implementing the port `closing.service.ReconciliationStatusProvider`; today the bank
+  reconciliation of receivables (`BankReconciliationStatusProvider`: book entries and statement
+  lines of every bank account not reconciled up to the period end, the BRS definition, see
+  [RECEIVABLES_AND_BANKING.md](../modules/RECEIVABLES_AND_BANKING.md)). The control
+  `RECONCILIATIONS` is a **warning** (`CheckItem.warning`, non-blocking): reconciling items such as
+  deposits in transit and unpresented cheques are normal at a period end and are carried in the
+  BRS, so they are shown for review ("n unreconciled item(s) up to <date> (Bank reconciliation n)")
+  but do not block the close or the year-end close; the screen shows them with a *Warning* badge
+  and "ready to close, review the warnings".
+  The port stays in closing: receivables depends on closing and closing depends on no module that
+  depends on receivables, so no neutral kernel package is needed (unlike the insurance kernel).
   Other modules append their own period-end controls through the port
   `closing.service.PeriodEndCheckProvider` (e.g. actuarial reserves: "Actuarial reserves valued and
   posted", see `docs/modules/ACTUARIAL_RESERVES.md`).
 - **Year-end close** (`YEAR_END_CLOSE`): requires every period CLOSED or CLOSING with the final
   period in CLOSING (it receives the closing journal), no pending journals, a balanced TB, the
-  final period revalued (or nothing to revalue), no unreconciled items and a valid company retained
-  earnings account. It posts one `CLOSING` journal per branch dated the last day of the year that
+  final period revalued (or nothing to revalue) and a valid company retained earnings account;
+  unreconciled items are listed as a warning only. It posts one `CLOSING` journal per branch dated the last day of the year that
   zeroes every income and expense balance (per account, cost centre and line of business, base
   currency) against retained earnings, closes the remaining periods, marks the fiscal year CLOSED
   through the hook `PeriodService.closeFiscalYear` and creates the next fiscal year (first

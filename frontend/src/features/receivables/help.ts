@@ -95,6 +95,7 @@ export const RECEIVABLES_HELP: HelpSection = {
       controls: [
         'Matches covered by a finalized reconciliation cannot be undone, so a finalized BRS never changes.',
         'Reconciliation needs RECONCILIATION_MANAGE; every match, unmatch and finalization is audited.',
+        'The period-end and year-end checklists count the unreconciled book entries and statement lines of every bank account up to the period end and show them as a warning.',
       ],
     },
     {

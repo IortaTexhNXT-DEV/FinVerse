@@ -44,6 +44,8 @@ public class ClosingChecklistService {
       EnumSet.of(PeriodStatus.CLOSED, PeriodStatus.CLOSING);
   private static final Set<PeriodStatus> RECEIVES_CLOSING =
       EnumSet.of(PeriodStatus.CLOSING, PeriodStatus.REOPENED);
+  private static final String RECONCILIATIONS = "RECONCILIATIONS";
+  private static final String RECONCILIATIONS_LABEL = "Reconciliations completed";
 
   private final PeriodService periods;
   private final JournalBatchRepository journals;
@@ -174,18 +176,45 @@ public class ClosingChecklistService {
         open + " journal(s) not yet posted or cancelled");
   }
 
+  /**
+   * Unreconciled items of every reconciliation provider up to a date. A warning, not a blocking
+   * control: reconciling items such as deposits in transit and unpresented cheques are normal at a
+   * period end and are carried in the reconciliation statement, so they are shown for review but do
+   * not prevent the close.
+   */
   private CheckItem unreconciled(Long companyId, LocalDate asOf) {
     List<ReconciliationStatusProvider> providers = reconciliations.orderedStream().toList();
-    long count = providers.stream().mapToLong(p -> p.unreconciledItems(companyId, asOf)).sum();
+    if (providers.isEmpty()) {
+      return CheckItem.warning(
+          RECONCILIATIONS,
+          RECONCILIATIONS_LABEL,
+          true,
+          "No reconciliation module registered (0 unreconciled items)");
+    }
+    long count = 0;
+    List<String> open = new ArrayList<>();
+    for (ReconciliationStatusProvider p : providers) {
+      long items = p.unreconciledItems(companyId, asOf);
+      count += items;
+      if (items > 0) {
+        open.add(p.name() + " " + items);
+      }
+    }
     String detail =
-        providers.isEmpty()
-            ? "No reconciliation module registered (0 unreconciled items)"
-            : count
-                + " unreconciled item(s): "
+        count == 0
+            ? "No unreconciled items up to "
+                + asOf
+                + ": "
                 + providers.stream()
                     .map(ReconciliationStatusProvider::name)
-                    .collect(Collectors.joining(", "));
-    return CheckItem.of("RECONCILIATIONS", "Reconciliations completed", count == 0, detail);
+                    .collect(Collectors.joining(", "))
+            : count
+                + " unreconciled item(s) up to "
+                + asOf
+                + " ("
+                + String.join(", ", open)
+                + "); review them before closing";
+    return CheckItem.warning(RECONCILIATIONS, RECONCILIATIONS_LABEL, count == 0, detail);
   }
 
   private CheckItem trialBalance(Long companyId, LocalDate asOf) {

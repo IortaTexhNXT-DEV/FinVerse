@@ -88,6 +88,7 @@ export const PLANNING_HELP: HelpSection = {
       ],
       controls: [
         'The year-end close requires every period closed or closing, no pending journals, a balanced trial balance, the last period revalued and a retained earnings account.',
+        'Unreconciled items: the book entries and bank statement lines of every bank account not yet matched up to the period end (the items of the BRS and the un-reconciled entries reports). They show as a warning to review and do not block the close, because deposits in transit and unpresented cheques are normal at a period end.',
         'A closed fiscal year cannot be reopened.',
         'Soft close and close need PERIOD_MANAGE; the year-end close needs YEAR_END_CLOSE.',
       ],

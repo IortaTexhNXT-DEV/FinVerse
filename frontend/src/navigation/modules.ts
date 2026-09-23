@@ -1,5 +1,6 @@
 import { accountingEngineModule } from '@/features/accounting-engine/module';
 import { adminModule } from '@/features/admin/module';
+import { planningModule } from '@/features/closing/module';
 import { dashboardModule } from '@/features/dashboard/module';
 import { glModule } from '@/features/gl/module';
 import { reportsModule } from '@/features/reports/module';
@@ -14,6 +15,7 @@ export const MODULES: FeatureModule[] = [
   dashboardModule,
   glModule,
   accountingEngineModule,
+  planningModule,
   reportsModule,
   setupModule,
   adminModule,

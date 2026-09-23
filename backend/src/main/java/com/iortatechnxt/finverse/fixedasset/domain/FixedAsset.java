@@ -186,6 +186,25 @@ public class FixedAsset extends AuthorizableEntity {
   }
 
   /**
+   * Takes back depreciation charged for the month of disposal and later (none is charged in the
+   * month of disposal): accumulated depreciation returns to its value at the end of {@code
+   * lastMonth}.
+   *
+   * @param lastMonth last month that keeps its charge (the month before the disposal)
+   * @param months number of monthly charges taken back
+   * @param amount depreciation taken back
+   */
+  public void reverseDepreciation(YearMonth lastMonth, int months, BigDecimal amount) {
+    requireInService();
+    accumulatedDepreciation = accumulatedDepreciation.subtract(amount);
+    monthsDepreciated -= months;
+    lastDepreciationPeriod = lastMonth.toString();
+    if (status == AssetStatus.FULLY_DEPRECIATED && !isFullyDepreciated()) {
+      status = AssetStatus.ACTIVE;
+    }
+  }
+
+  /**
    * Derecognizes the asset.
    *
    * @param date disposal date

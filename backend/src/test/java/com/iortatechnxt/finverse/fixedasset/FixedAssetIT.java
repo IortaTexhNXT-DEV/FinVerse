@@ -211,6 +211,40 @@ class FixedAssetIT {
   }
 
   @Test
+  void disposalReversesTheChargeAlreadyPostedForTheDisposalMonth() {
+    // 60,000 less 3,000 residual over 60 months: 950.00 a month from July.
+    FixedAsset asset = capitalized(request("T-DSP-5", "OFFEQ", "2026-07-01", "60000"));
+    run(JULY);
+    run(AUGUST);
+    run(SEPTEMBER);
+    assertThat(register.get(asset.getId()).getAccumulatedDepreciation())
+        .isEqualByComparingTo("2850.00");
+    BigDecimal expenseBefore = balance("5611");
+    BigDecimal gainBefore = balance("4700");
+
+    AssetMovement disposal =
+        as.run(
+            "accountant",
+            () ->
+                lifecycle.dispose(
+                    asset.getId(),
+                    new DisposalRequest(
+                        LocalDate.of(2026, 9, 23), new BigDecimal("60000"), "1111", null, null)));
+
+    // No depreciation in the month of disposal: September's 950.00 is taken back, so the gain
+    // is measured against the net book value at the end of August.
+    assertThat(disposal.getNetBookValue()).isEqualByComparingTo("58100.00");
+    assertThat(disposal.getGainLoss()).isEqualByComparingTo("1900.00");
+    assertThat(disposal.getBatchNo()).contains("/");
+    assertThat(balance("5611")).isEqualByComparingTo(expenseBefore.subtract(new BigDecimal("950")));
+    assertThat(balance("4700")).isEqualByComparingTo(gainBefore.subtract(new BigDecimal("1900")));
+    FixedAsset disposed = register.get(asset.getId());
+    assertThat(disposed.getStatus()).isEqualTo(AssetStatus.DISPOSED);
+    assertThat(disposed.getAccumulatedDepreciation()).isEqualByComparingTo("1900.00");
+    assertThat(disposed.getLastDepreciationPeriod()).isEqualTo("2026-08");
+  }
+
+  @Test
   void transferMovesTheAssetThroughInterBranchClearing() {
     FixedAsset asset = capitalized(request("T-TRF-1", "FURN", "2026-08-03", "84000"));
     run(AUGUST);

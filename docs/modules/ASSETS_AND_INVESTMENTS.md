@@ -38,7 +38,12 @@ investment portfolio as account roles, and from the rules configured per company
   returns the existing run). Months missed (late capitalization) are caught up. One journal per
   branch, category and cost centre, dated at the period end.
 - **Disposal**: depreciation must be run up to the month before the disposal month; gain = proceeds −
-  net book value (positive to 4700, negative to 5613 in the demo rules).
+  net book value (positive to 4700, negative to 5613 in the demo rules). When the run of the
+  disposal month (or a later one) has already charged the asset, the disposal first reverses that
+  charge (an `ASSET_DEPRECIATION` journal with a negative DEPRECIATION component, dated on the
+  disposal date: Dr accumulated depreciation / Cr depreciation expense), so the gain or loss uses
+  the net book value at the end of the previous month. The movement shows both journal numbers
+  (reversal/disposal).
 - **Inter-branch transfer**: two balanced journals through inter-branch clearing; the asset keeps
   depreciating at the receiving branch with status TRANSFERRED.
 

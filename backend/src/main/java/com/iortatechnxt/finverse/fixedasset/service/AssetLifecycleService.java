@@ -4,6 +4,7 @@ import com.iortatechnxt.finverse.audit.domain.AuditAction;
 import com.iortatechnxt.finverse.audit.service.AuditTrailService;
 import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.finverse.common.security.CurrentUser;
+import com.iortatechnxt.finverse.common.util.Money;
 import com.iortatechnxt.finverse.fixedasset.api.dto.DisposalRequest;
 import com.iortatechnxt.finverse.fixedasset.api.dto.TransferRequest;
 import com.iortatechnxt.finverse.fixedasset.domain.AssetMovement;
@@ -122,7 +123,9 @@ public class AssetLifecycleService {
   /**
    * Disposes of an asset: derecognizes cost and accumulated depreciation, books the proceeds and
    * the gain (proceeds above net book value) or loss. Depreciation must have been run up to the
-   * month before the disposal month (no depreciation in the month of disposal).
+   * month before the disposal month (no depreciation in the month of disposal); a charge already
+   * posted for the disposal month or later is reversed first, so the gain or loss is measured
+   * against the net book value at the end of the previous month.
    *
    * @param id id
    * @param r disposal
@@ -138,6 +141,7 @@ public class AssetLifecycleService {
       throw new BusinessRuleException(
           "BANK_ACCOUNT_REQUIRED", "A bank account is required to receive the proceeds");
     }
+    String reversalBatchNo = reverseChargesFrom(a, r.disposalDate());
     BigDecimal gain = r.proceeds().subtract(a.netBookValue());
     AssetMovement m =
         new AssetMovement(a, MovementType.DISPOSAL, r.disposalDate(), a.getBranchId(), null);
@@ -168,7 +172,8 @@ public class AssetLifecycleService {
                 "Disposal of asset " + a.getTagNo(),
                 amounts,
                 hasProceeds ? Map.of("BANK", r.bankAccount()) : Map.of()));
-    m.setBatchNo(batch.getBatchNo());
+    m.setBatchNo(
+        reversalBatchNo == null ? batch.getBatchNo() : reversalBatchNo + "/" + batch.getBatchNo());
     a.dispose(r.disposalDate());
     audit.record(
         ASSET, a.getTagNo(), AuditAction.UPDATE, "Disposed, gain/(loss) " + gain.toPlainString());
@@ -230,6 +235,56 @@ public class AssetLifecycleService {
     audit.record(
         ASSET, a.getTagNo(), AuditAction.UPDATE, "Transferred to branch " + r.toBranchId());
     return m;
+  }
+
+  /**
+   * Reverses depreciation already posted for the disposal month or later months (full-month
+   * convention: no depreciation in the month of disposal). The charges to keep are recomputed from
+   * the start of depreciation, exactly as the monthly runs computed them.
+   *
+   * @return reversing journal number, null when nothing was charged from the disposal month on
+   */
+  private String reverseChargesFrom(FixedAsset a, LocalDate disposalDate) {
+    YearMonth keepUpTo = YearMonth.from(disposalDate).minusMonths(1);
+    int excess = (int) ChronoUnit.MONTHS.between(keepUpTo, a.lastDepreciatedMonth());
+    if (excess <= 0) {
+      return null;
+    }
+    Position start =
+        a.isTakeOn()
+            ? new Position(a.getOpeningAccumulatedDepreciation(), a.getOpeningMonths())
+            : new Position(Money.zero(), 0);
+    int keptMonths = Math.max(a.getMonthsDepreciated() - excess, start.months());
+    Position kept = DepreciationCalculator.advance(Basis.of(a), start, keptMonths - start.months());
+    BigDecimal amount = a.getAccumulatedDepreciation().subtract(kept.accumulated());
+    if (amount.signum() <= 0) {
+      return null;
+    }
+    a.reverseDepreciation(keepUpTo, a.getMonthsDepreciated() - kept.months(), amount);
+    JournalBatch reversal =
+        accounting.publish(
+            a.getCompanyId(),
+            a.getCategory(),
+            a.getCostCenter(),
+            null,
+            new Posting(
+                "ASSET_DEPRECIATION",
+                a.getBranchId(),
+                disposalDate,
+                PREFIX + a.getId() + ":DISPOSAL:DEPRECIATION-REVERSAL",
+                a.getTagNo(),
+                "Depreciation from "
+                    + keepUpTo.plusMonths(1)
+                    + " reversed on disposal of "
+                    + a.getTagNo(),
+                Map.of("DEPRECIATION", amount.negate()),
+                Map.of()));
+    audit.record(
+        ASSET,
+        a.getTagNo(),
+        AuditAction.REVERSE,
+        "Depreciation of " + amount.toPlainString() + " reversed on disposal");
+    return reversal.getBatchNo();
   }
 
   private static Map<String, BigDecimal> values(FixedAsset a) {

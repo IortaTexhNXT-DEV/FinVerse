@@ -6,7 +6,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.iortatechnxt.finverse.budget.service.BudgetCsvParser;
 import com.iortatechnxt.finverse.budget.service.BudgetSpread;
 import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -89,5 +93,21 @@ class BudgetSpreadTest {
         .hasMessageContaining("Line 2")
         .hasMessageContaining("Line 3")
         .hasMessageContaining("Line 4");
+  }
+
+  @Test
+  void documentedSampleFilesParse() throws IOException {
+    Path samples = Path.of("..", "docs", "samples");
+    List<BudgetCsvParser.ParsedLine> monthly =
+        BudgetCsvParser.parse(
+            Files.readString(samples.resolve("budget_import_sample.csv"), StandardCharsets.UTF_8));
+    assertThat(monthly).hasSize(4);
+    assertThat(sum(monthly.get(0).months())).isEqualByComparingTo("300000000");
+    List<BudgetCsvParser.ParsedLine> annual =
+        BudgetCsvParser.parse(
+            Files.readString(
+                samples.resolve("budget_import_annual_sample.csv"), StandardCharsets.UTF_8));
+    assertThat(annual).extracting(BudgetCsvParser.ParsedLine::costCenter).contains("MKT", "IT");
+    assertThat(sum(annual.get(1).months())).isEqualByComparingTo("3600000");
   }
 }

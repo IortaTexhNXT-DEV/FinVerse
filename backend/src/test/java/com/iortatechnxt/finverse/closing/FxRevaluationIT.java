@@ -9,6 +9,7 @@ import com.iortatechnxt.finverse.closing.service.CheckItem;
 import com.iortatechnxt.finverse.closing.service.ClosingChecklistService;
 import com.iortatechnxt.finverse.closing.service.FxRevaluationService;
 import com.iortatechnxt.finverse.closing.service.FxRevaluationService.Preview;
+import com.iortatechnxt.finverse.closing.service.OpenItemRevaluation.OpenItemLine;
 import com.iortatechnxt.finverse.coa.domain.BalanceSide;
 import com.iortatechnxt.finverse.coa.service.ChartOfAccountsService;
 import com.iortatechnxt.finverse.common.util.Money;
@@ -20,6 +21,7 @@ import com.iortatechnxt.finverse.ledger.service.BalanceQuery;
 import com.iortatechnxt.finverse.ledger.service.LedgerQueryService;
 import com.iortatechnxt.finverse.report.core.ReportService;
 import com.iortatechnxt.finverse.report.render.ExportFormat;
+import com.iortatechnxt.finverse.subledger.domain.ItemDirection;
 import com.iortatechnxt.finverse.support.AsUser;
 import com.iortatechnxt.finverse.support.IntegrationTest;
 import com.iortatechnxt.finverse.support.TestCompanies;
@@ -31,6 +33,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @IntegrationTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -48,6 +51,7 @@ class FxRevaluationIT {
   @Autowired private ReportService reports;
   @Autowired private TestCompanies companies;
   @Autowired private AsUser asUser;
+  @Autowired private JdbcTemplate jdbc;
 
   private Long companyId;
   private Long dollarBank;
@@ -77,6 +81,41 @@ class FxRevaluationIT {
                 null,
                 null),
             TestCompanies.line("1111", BalanceSide.CREDIT, "50000")));
+    insertOpenItems();
+  }
+
+  private void insertOpenItems() {
+    jdbc.update(
+        "insert into pty_party (company_id, code, name, party_type, default_currency, record_status,"
+            + " created_at, created_by) values (?, 'TFX-P1', 'FX test party', 'REINSURER', 'USD',"
+            + " 'ACTIVE', now(), 'test')",
+        companyId);
+    Long partyId =
+        jdbc.queryForObject(
+            "select id from pty_party where company_id = ? and code = 'TFX-P1'",
+            Long.class,
+            companyId);
+    String sql =
+        "insert into sl_open_item (company_id, branch_id, party_id, party_code, direction,"
+            + " document_type, document_no, document_date, due_date, currency, amount, base_amount,"
+            + " settled_amount, status, source_module, created_at, created_by)"
+            + " values (?, ?, ?, 'TFX-P1', ?, 'INVOICE', ?, date '2026-03-05', date '2026-04-05',"
+            + " ?, ?, ?, ?, ?, 'TEST', now(), 'test')";
+    Long branch = companies.headOffice(companyId);
+    jdbc.update(sql, companyId, branch, partyId, "DEBIT", "TFX-D1", "USD", 500, 25_000, 0, "OPEN");
+    jdbc.update(
+        sql,
+        companyId,
+        branch,
+        partyId,
+        "CREDIT",
+        "TFX-C1",
+        "USD",
+        200,
+        10_000,
+        50,
+        "PARTIALLY_SETTLED");
+    jdbc.update(sql, companyId, branch, partyId, "DEBIT", "TFX-P1", "PHP", 900, 900, 0, "OPEN");
   }
 
   private BigDecimal base(Long accountId, LocalDate date) {
@@ -99,6 +138,7 @@ class FxRevaluationIT {
     assertThat(item.revaluedBase()).isEqualByComparingTo(revalued);
     assertThat(item.difference()).isEqualByComparingTo(revalued.subtract(new BigDecimal("50000")));
     assertThat(preview.existingRunId()).isNull();
+    assertOpenItems(preview.openItems(), closing(MARCH_END));
 
     FxRevaluationRun run =
         asUser.run("fmanager", () -> revaluation.post(companyId, march, false, null));
@@ -135,6 +175,29 @@ class FxRevaluationIT {
     assertThat(status.passed()).isTrue();
     assertThat(revaluation.list(companyId)).hasSize(2);
     assertThat(revaluation.get(run.getId()).getLines()).hasSize(1);
+    Map<String, String> params =
+        Map.of("companyId", companyId.toString(), "asOfDate", MARCH_END.toString());
+    assertThat(asUser.run("fmanager", () -> reports.run("GL-FXREV", params).rows()))
+        .hasSizeGreaterThan(2);
+  }
+
+  private static void assertOpenItems(List<OpenItemLine> items, BigDecimal rate) {
+    assertThat(items)
+        .extracting(OpenItemLine::documentNo)
+        .containsExactlyInAnyOrder("TFX-D1", "TFX-C1");
+    OpenItemLine receivable =
+        items.stream().filter(i -> i.direction() == ItemDirection.DEBIT).findFirst().orElseThrow();
+    BigDecimal revalued = Money.convert(new BigDecimal("500"), rate);
+    assertThat(receivable.bookedBase()).isEqualByComparingTo("25000");
+    assertThat(receivable.gainLoss())
+        .isEqualByComparingTo(revalued.subtract(new BigDecimal("25000")));
+    OpenItemLine payable =
+        items.stream().filter(i -> i.direction() == ItemDirection.CREDIT).findFirst().orElseThrow();
+    assertThat(payable.outstanding()).isEqualByComparingTo("150");
+    assertThat(payable.bookedBase()).isEqualByComparingTo("7500");
+    assertThat(payable.gainLoss())
+        .isEqualByComparingTo(
+            new BigDecimal("7500").subtract(Money.convert(new BigDecimal("150"), rate)));
   }
 
   @Test

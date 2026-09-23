@@ -1,7 +1,8 @@
 -- =====================================================================================
 -- DEMO DATA (demo profile only): inter-company relationship FVI <-> FVS, consolidation group
--- FVGRP (FVI parent, 80 % of FVS) and month-end AVERAGE rates (year-to-date average of the
--- daily SPOT rates) used to translate income statement items.
+-- FVGRP (FVI parent, 80 % of FVS) and month-end USD AVERAGE rates (year-to-date average of the
+-- daily SPOT rates) used to translate the subsidiary's income statement items. Other currencies
+-- fall back to the mean of the SPOT rates at run time.
 -- =====================================================================================
 
 insert into ic_relationship (company_a_id, company_b_id, a_due_from_account, a_due_to_account,
@@ -25,6 +26,6 @@ select r.currency_code, 'AVERAGE', m.month_end, round(avg(r.rate), 6), now(), 'S
 from generate_series(1, 9) as g(mo)
 cross join lateral (select (make_date(2026, g.mo, 1) + interval '1 month - 1 day')::date as month_end) m
 join cur_exchange_rate r
-  on r.rate_type = 'SPOT' and r.effective_date between date '2026-01-01' and m.month_end
+  on r.currency_code = 'USD' and r.rate_type = 'SPOT' and r.effective_date between date '2026-01-01' and m.month_end
 group by r.currency_code, m.month_end
 on conflict (currency_code, rate_type, effective_date) do nothing;

@@ -3,7 +3,6 @@ package com.iortatechnxt.finverse.payables.service;
 import com.iortatechnxt.finverse.accounting.service.AccountingEventPublisher;
 import com.iortatechnxt.finverse.accounting.service.BusinessEvent;
 import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
-import com.iortatechnxt.finverse.common.util.Money;
 import com.iortatechnxt.finverse.payables.domain.BankAccount;
 import com.iortatechnxt.finverse.payables.domain.PaymentMode;
 import com.iortatechnxt.finverse.payables.domain.PaymentVoucher;
@@ -28,10 +27,11 @@ import org.springframework.stereotype.Component;
  * A DEBIT open item (document type PAYMENT) is recorded and matched against the paid CREDIT items.
  *
  * <p>Reversal (void of an unpresented cheque, cancellation of a PDC): the same event with a
- * negative AMOUNT (Dr bank or PDC clearing / Cr payable). The sub-ledger is append-only, so the
- * matches of the original payment are kept and each paid item is <em>reinstated</em> as a new
- * CREDIT open item with the original document type, number and dates for the amount that had been
- * paid; ageing and statements therefore show the payable again exactly as before the payment.
+ * negative AMOUNT (Dr bank or PDC clearing / Cr payable). In the sub-ledger the payment's matches
+ * are undone ({@link OpenItemService#unmatchAll}), so the paid invoices are open again under their
+ * own numbers and dates, and the payment item is neutralised by a PAYMENT_REVERSAL CREDIT item
+ * matched against it (the receipts' cancellation works the same way). Ageing and statements
+ * therefore show the payables exactly as before the payment.
  */
 @Component
 public class PaymentPoster {
@@ -39,9 +39,13 @@ public class PaymentPoster {
   /** Open item document type of payments. */
   public static final String PAYMENT_DOCUMENT = "PAYMENT";
 
+  /** Open item document type neutralising a voided or cancelled payment. */
+  public static final String REVERSAL_DOCUMENT = "PAYMENT_REVERSAL";
+
   private static final String AMOUNT = "AMOUNT";
   private static final String BANK = "BANK";
   private static final String REF = "PV:";
+  private static final String VOID_SUFFIX = ":VOID";
   private static final int NARRATION_MAX = 250;
 
   private final AccountingEventPublisher publisher;
@@ -132,7 +136,8 @@ public class PaymentPoster {
   }
 
   /**
-   * Reverses an approved voucher and reinstates the paid items.
+   * Reverses an approved voucher: posts the reversal, re-opens the paid items and neutralises the
+   * payment item.
    *
    * @param voucher approved voucher
    * @param bank bank account
@@ -152,43 +157,36 @@ public class PaymentPoster {
                     voucher,
                     bank,
                     voucher.getAmount().negate(),
-                    REF + voucher.getId() + ":VOID",
+                    REF + voucher.getId() + VOID_SUFFIX,
                     narration,
                     date))
             .getBatchNo();
-    for (VoucherAllocation a : voucher.getAllocations()) {
-      reinstate(voucher, a, batchNo, date);
-    }
+    OpenItem payment = openItems.get(voucher.getOpenItemId());
+    openItems.unmatchAll(payment.getId(), narration);
+    OpenItem reversal = openItems.record(reversalItem(voucher, payment, date, batchNo, narration));
+    openItems.match(payment.getId(), reversal.getId(), payment.getAmount(), date);
     return batchNo;
   }
 
-  private void reinstate(
-      PaymentVoucher voucher, VoucherAllocation a, String batchNo, LocalDate date) {
-    OpenItem original = openItems.get(a.getOpenItemId());
-    BigDecimal base =
-        Money.round(
-            original
-                .getBaseAmount()
-                .multiply(a.getAmount())
-                .divide(original.getAmount(), Money.RATE_SCALE, Money.ROUNDING));
-    openItems.record(
-        new OpenItemValues(
-            original.getCompanyId(),
-            original.getBranchId(),
-            original.getPartyId(),
-            original.getPartyCode(),
-            ItemDirection.CREDIT,
-            original.getDocumentType(),
-            original.getDocumentNo(),
-            original.getDocumentDate(),
-            original.getDueDate(),
-            original.getCurrency(),
-            a.getAmount(),
-            base,
-            PayablesSupport.MODULE,
-            REF + voucher.getId() + ":REINSTATE:" + original.getId(),
-            batchNo,
-            "Reinstated on " + date + " after reversal of " + voucher.getVoucherNo()));
+  private static OpenItemValues reversalItem(
+      PaymentVoucher voucher, OpenItem payment, LocalDate date, String batchNo, String narration) {
+    return new OpenItemValues(
+        payment.getCompanyId(),
+        payment.getBranchId(),
+        payment.getPartyId(),
+        payment.getPartyCode(),
+        ItemDirection.CREDIT,
+        REVERSAL_DOCUMENT,
+        voucher.getVoucherNo() + "-VOID",
+        date,
+        date,
+        payment.getCurrency(),
+        payment.getAmount(),
+        payment.getBaseAmount(),
+        PayablesSupport.MODULE,
+        REF + voucher.getId() + VOID_SUFFIX,
+        batchNo,
+        narration.length() > NARRATION_MAX ? narration.substring(0, NARRATION_MAX) : narration);
   }
 
   private static BusinessEvent event(

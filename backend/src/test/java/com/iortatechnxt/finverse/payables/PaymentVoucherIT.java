@@ -14,6 +14,7 @@ import com.iortatechnxt.finverse.payables.domain.VoucherStatus;
 import com.iortatechnxt.finverse.payables.service.PaymentApprovalService;
 import com.iortatechnxt.finverse.payables.service.PaymentCommand;
 import com.iortatechnxt.finverse.payables.service.PaymentNotificationService;
+import com.iortatechnxt.finverse.payables.service.PaymentPoster;
 import com.iortatechnxt.finverse.payables.service.PaymentVoucherService;
 import com.iortatechnxt.finverse.subledger.domain.ItemDirection;
 import com.iortatechnxt.finverse.subledger.domain.OpenItem;
@@ -26,7 +27,6 @@ import com.iortatechnxt.finverse.support.TestData;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ class PaymentVoucherIT {
   @Autowired private TestData data;
 
   @Test
-  void chequePaymentPostsMatchesAndCanBeVoidedWithReinstatement() {
+  void chequePaymentPostsMatchesAndCanBeVoidedByUnmatching() {
     SupplierInvoice a = fx.approvedInvoice("G-0001", "1000.00", PayablesFixtures.DATE);
     SupplierInvoice b = fx.approvedInvoice("G-0001", "2000.00", PayablesFixtures.DATE);
     PaymentCommand cmd =
@@ -84,13 +84,28 @@ class PaymentVoucherIT {
         as.run("checker", () -> approvals.voidCheque(draft.getId(), PAY_DATE.plusDays(2), "Stale"));
     assertThat(voided.getStatus()).isEqualTo(VoucherStatus.VOIDED);
     assertThat(fx.posted(voided.getVoidBatchNo(), "1111")).isEqualByComparingTo("1600.00");
-    List<OpenItem> reinstated =
-        openItems.partyItems(fx.companyId(), a.getPartyId()).stream()
-            .filter(i -> i.getDocumentNo().equals(a.getDocumentNo()))
-            .toList();
-    assertThat(reinstated).hasSize(2);
-    assertThat(reinstated.get(1).outstanding()).isEqualByComparingTo("1100.00");
-    assertThat(reinstated.get(1).getDueDate()).isEqualTo(a.getDueDate());
+    // The paid invoices are open again under their own numbers: no replacement items.
+    assertThat(openItems.get(a.getOpenItemId()).outstanding()).isEqualByComparingTo("1100.00");
+    assertThat(openItems.get(a.getOpenItemId()).getStatus()).isEqualTo(OpenItemStatus.OPEN);
+    assertThat(openItems.get(b.getOpenItemId()).outstanding()).isEqualByComparingTo("2200.00");
+    assertThat(
+            openItems.partyItems(fx.companyId(), a.getPartyId()).stream()
+                .filter(i -> i.getDocumentNo().equals(a.getDocumentNo())))
+        .hasSize(1);
+    OpenItem payment = openItems.get(paid.getOpenItemId());
+    assertThat(payment.getStatus()).isEqualTo(OpenItemStatus.SETTLED);
+    assertThat(openItems.matchesOf(payment))
+        .singleElement()
+        .satisfies(m -> assertThat(m.getAmount()).isEqualByComparingTo("1600.00"));
+    assertThat(
+            openItems.partyItems(fx.companyId(), a.getPartyId()).stream()
+                .filter(i -> PaymentPoster.REVERSAL_DOCUMENT.equals(i.getDocumentType())))
+        .anySatisfy(
+            i -> {
+              assertThat(i.getDocumentNo()).isEqualTo(paid.getVoucherNo() + "-VOID");
+              assertThat(i.getStatus()).isEqualTo(OpenItemStatus.SETTLED);
+              assertThat(i.getJournalBatchNo()).isEqualTo(voided.getVoidBatchNo());
+            });
   }
 
   @Test

@@ -93,7 +93,7 @@ class IssuedPdcIT {
   }
 
   @Test
-  void cancellingAnOutstandingChequeReversesThePaymentAndReinstatesThePayable() {
+  void cancellingAnOutstandingChequeReversesThePaymentAndReopensThePayable() {
     IssuedPdc pdc = issue("S-0003", "2000.00");
     IssuedPdc cancelled =
         as.run("checker", () -> pdcs.cancel(pdc.getId(), ISSUE.plusDays(3), "Stop payment"));
@@ -102,8 +102,16 @@ class IssuedPdcIT {
         .isEqualByComparingTo(pdc.getAmount());
     PaymentVoucher voucher = vouchers.get(pdc.getVoucherId());
     assertThat(voucher.getStatus()).isEqualTo(VoucherStatus.VOIDED);
+    // The original invoice is unmatched (no replacement item) and the payment item neutralised.
     assertThat(vouchers.payableItems(fx.companyId(), "S-0003", null))
-        .anySatisfy(p -> assertThat(p.available()).isEqualByComparingTo(pdc.getAmount()));
+        .anySatisfy(
+            p -> {
+              assertThat(p.available()).isEqualByComparingTo(pdc.getAmount());
+              assertThat(p.item().getSourceReference()).startsWith("SUPINV:");
+              assertThat(p.item().getStatus()).isEqualTo(OpenItemStatus.OPEN);
+            });
+    assertThat(openItems.get(voucher.getOpenItemId()).getStatus())
+        .isEqualTo(OpenItemStatus.SETTLED);
   }
 
   @Test

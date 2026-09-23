@@ -37,8 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
  *   <li><b>Presented</b> (confirmation on or after the cheque date): {@code PDC_ISSUED_PRESENTED}:
  *       <i>Dr PDC issued clearing / Cr bank</i>, dated the presentation (bank) date.
  *   <li><b>Cancelled</b> (stopped before presentation): reversal of the issue posting (<i>Dr PDC
- *       clearing / Cr party payable</i>) and reinstatement of the paid payables; the voucher
- *       becomes VOIDED.
+ *       clearing / Cr party payable</i>) and the paid payables are re-opened (unmatched); the
+ *       voucher becomes VOIDED.
  *   <li><b>Replaced</b>: a new cheque number / date for the same payment; no posting (the liability
  *       remains in PDC clearing).
  * </ol>
@@ -237,7 +237,7 @@ public class IssuedPdcService {
   }
 
   /**
-   * Stops an outstanding cheque: the payment is reversed and the payables reinstated.
+   * Stops an outstanding cheque: the payment is reversed and the paid payables re-opened.
    *
    * @param id cheque
    * @param date cancellation date

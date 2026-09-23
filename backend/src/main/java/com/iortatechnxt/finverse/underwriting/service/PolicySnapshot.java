@@ -35,6 +35,7 @@ import java.time.LocalDate;
  * @param businessType direct / with coinsurance
  * @param sharePct company share %
  * @param coinsurerCode coinsurer code, null when not coinsured
+ * @param coinsuranceLeader true when the company leads the coinsurance (collects and pays 100 %)
  * @param status status
  * @param approvalDate approval (accounting) date of the original issue
  * @param cancelledOn cancellation effective date, null when not cancelled
@@ -63,6 +64,7 @@ public record PolicySnapshot(
     BusinessType businessType,
     BigDecimal sharePct,
     String coinsurerCode,
+    boolean coinsuranceLeader,
     PolicyStatus status,
     LocalDate approvalDate,
     LocalDate cancelledOn,
@@ -99,6 +101,7 @@ public record PolicySnapshot(
         p.getBusinessType(),
         p.getSharePct(),
         p.getCoinsurer() == null ? null : p.getCoinsurer().getCode(),
+        p.isCoinsuranceLeader(),
         p.getStatus(),
         p.getWorkflow().getApprovalDate(),
         p.getCancelledOn(),

@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -244,11 +245,33 @@ public class AssetLifecycleService {
    *
    * @return reversing journal number, null when nothing was charged from the disposal month on
    */
-  private String reverseChargesFrom(FixedAsset a, LocalDate disposalDate) {
+  /**
+   * Previews a disposal without posting: the depreciation already charged for the disposal month or
+   * later that the disposal would reverse, the net book value the gain or loss is measured against
+   * and the resulting gain (positive) or loss (negative). Same calculation as {@link #dispose}.
+   *
+   * @param id asset id
+   * @param disposalDate disposal date
+   * @param proceeds sale proceeds (zero for a scrapping)
+   * @return preview
+   */
+  @Transactional(readOnly = true)
+  public DisposalPreview previewDisposal(Long id, LocalDate disposalDate, BigDecimal proceeds) {
+    FixedAsset a = register.get(id);
+    BigDecimal reversed =
+        chargeToReverse(a, disposalDate).map(ChargeReversal::amount).orElse(BigDecimal.ZERO);
+    BigDecimal netBookValue = a.netBookValue().add(reversed);
+    return new DisposalPreview(reversed, netBookValue, proceeds.subtract(netBookValue));
+  }
+
+  /** Depreciation posted for the disposal month or later, and the position to go back to. */
+  private record ChargeReversal(YearMonth keepUpTo, Position kept, BigDecimal amount) {}
+
+  private Optional<ChargeReversal> chargeToReverse(FixedAsset a, LocalDate disposalDate) {
     YearMonth keepUpTo = YearMonth.from(disposalDate).minusMonths(1);
     int excess = (int) ChronoUnit.MONTHS.between(keepUpTo, a.lastDepreciatedMonth());
     if (excess <= 0) {
-      return null;
+      return Optional.empty();
     }
     Position start =
         a.isTakeOn()
@@ -257,9 +280,19 @@ public class AssetLifecycleService {
     int keptMonths = Math.max(a.getMonthsDepreciated() - excess, start.months());
     Position kept = DepreciationCalculator.advance(Basis.of(a), start, keptMonths - start.months());
     BigDecimal amount = a.getAccumulatedDepreciation().subtract(kept.accumulated());
-    if (amount.signum() <= 0) {
+    return amount.signum() > 0
+        ? Optional.of(new ChargeReversal(keepUpTo, kept, amount))
+        : Optional.empty();
+  }
+
+  private String reverseChargesFrom(FixedAsset a, LocalDate disposalDate) {
+    Optional<ChargeReversal> charge = chargeToReverse(a, disposalDate);
+    if (charge.isEmpty()) {
       return null;
     }
+    YearMonth keepUpTo = charge.get().keepUpTo();
+    Position kept = charge.get().kept();
+    BigDecimal amount = charge.get().amount();
     a.reverseDepreciation(keepUpTo, a.getMonthsDepreciated() - kept.months(), amount);
     JournalBatch reversal =
         accounting.publish(

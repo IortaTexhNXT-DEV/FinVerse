@@ -22,6 +22,7 @@ import com.iortatechnxt.finverse.fixedasset.service.AssetCategoryService;
 import com.iortatechnxt.finverse.fixedasset.service.AssetLifecycleService;
 import com.iortatechnxt.finverse.fixedasset.service.DepreciationService;
 import com.iortatechnxt.finverse.fixedasset.service.DepreciationService.Proposal;
+import com.iortatechnxt.finverse.fixedasset.service.DisposalPreview;
 import com.iortatechnxt.finverse.fixedasset.service.FixedAssetService;
 import com.iortatechnxt.finverse.ledger.service.LedgerQueryService;
 import com.iortatechnxt.finverse.support.AsUser;
@@ -221,6 +222,20 @@ class FixedAssetIT {
         .isEqualByComparingTo("2850.00");
     BigDecimal expenseBefore = balance("5611");
     BigDecimal gainBefore = balance("4700");
+
+    // The preview predicts exactly what the posting does, without posting anything.
+    DisposalPreview preview =
+        lifecycle.previewDisposal(
+            asset.getId(), LocalDate.of(2026, 9, 23), new BigDecimal("60000"));
+    assertThat(preview.depreciationReversed()).isEqualByComparingTo("950.00");
+    assertThat(preview.netBookValue()).isEqualByComparingTo("58100.00");
+    assertThat(preview.gainOrLoss()).isEqualByComparingTo("1900.00");
+    assertThat(balance("5611")).isEqualByComparingTo(expenseBefore);
+    assertThat(
+            lifecycle
+                .previewDisposal(asset.getId(), LocalDate.of(2026, 10, 5), new BigDecimal("50000"))
+                .depreciationReversed())
+        .isZero();
 
     AssetMovement disposal =
         as.run(

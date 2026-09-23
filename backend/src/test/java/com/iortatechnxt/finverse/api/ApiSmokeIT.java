@@ -204,6 +204,9 @@ class ApiSmokeIT {
   @Test
   @WithUserDetails("accountant")
   void malformedRequestsAreRejectedWithBadRequest() throws Exception {
+    mvc.perform(get("/api/v1/no-such-endpoint"))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.code").value("NOT_FOUND"));
     mvc.perform(
             post("/api/v1/journals")
                 .with(csrf())

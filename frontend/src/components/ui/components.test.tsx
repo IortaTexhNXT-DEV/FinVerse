@@ -61,7 +61,7 @@ describe('ui components', () => {
     const items = screen.getAllByRole('listitem').map((li) => li.textContent);
     expect(items).toEqual([
       'Line 1 amount: must be greater than 0',
-      'Vat rate: must be at least 0',
+      'VAT rate: must be at least 0',
     ]);
     expect(screen.getByText('Invalid request')).toBeInTheDocument();
     expect(screen.getByText('Reference: VALIDATION_FAILED')).toBeInTheDocument();

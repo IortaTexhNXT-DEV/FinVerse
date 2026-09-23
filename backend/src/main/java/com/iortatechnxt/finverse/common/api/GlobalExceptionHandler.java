@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * Translates exceptions into RFC 7807 problem responses.
@@ -132,6 +133,17 @@ public class GlobalExceptionHandler {
           default -> "The request body is not valid JSON or has fields of the wrong type";
         };
     return problem(HttpStatus.BAD_REQUEST, "MALFORMED_REQUEST", detail);
+  }
+
+  /**
+   * Handles requests for routes that do not exist (e.g. a mistyped API path).
+   *
+   * @param ex exception
+   * @return problem detail (404)
+   */
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ProblemDetail handleNoRoute(NoResourceFoundException ex) {
+    return problem(HttpStatus.NOT_FOUND, "NOT_FOUND", "No such endpoint: " + ex.getResourcePath());
   }
 
   /**

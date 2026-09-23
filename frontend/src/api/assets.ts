@@ -157,6 +157,13 @@ export interface AssetSearch {
   q?: string;
 }
 
+/** What a disposal would post: reversed depreciation, measured net book value, gain (+) / loss (−). */
+export interface DisposalPreview {
+  depreciationReversed: number;
+  netBookValue: number;
+  gainOrLoss: number;
+}
+
 const REGISTER = '/assets/register';
 
 export const assetsApi = {
@@ -173,6 +180,10 @@ export const assetsApi = {
   capitalize: (id: number) => api.post<FixedAsset>(`${REGISTER}/${id}/capitalize`),
   dispose: (id: number, body: DisposalInput) =>
     api.post<AssetMovement>(`${REGISTER}/${id}/dispose`, body),
+  disposalPreview: (id: number, disposalDate: string, proceeds: number) =>
+    api.get<DisposalPreview>(
+      `${REGISTER}/${id}/disposal-preview${toQuery({ disposalDate, proceeds })}`,
+    ),
   transfer: (id: number, body: TransferInput) =>
     api.post<AssetMovement>(`${REGISTER}/${id}/transfer`, body),
   movements: (id: number) => api.get<AssetMovement[]>(`${REGISTER}/${id}/movements`),

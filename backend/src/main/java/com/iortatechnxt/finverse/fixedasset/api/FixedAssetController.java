@@ -7,9 +7,13 @@ import com.iortatechnxt.finverse.fixedasset.api.dto.FixedAssetResponse;
 import com.iortatechnxt.finverse.fixedasset.api.dto.TransferRequest;
 import com.iortatechnxt.finverse.fixedasset.domain.AssetStatus;
 import com.iortatechnxt.finverse.fixedasset.service.AssetLifecycleService;
+import com.iortatechnxt.finverse.fixedasset.service.DisposalPreview;
 import com.iortatechnxt.finverse.fixedasset.service.FixedAssetService;
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -139,6 +143,24 @@ public class FixedAssetController {
   public AssetMovementResponse dispose(
       @PathVariable Long id, @Valid @RequestBody DisposalRequest request) {
     return AssetMovementResponse.from(lifecycle.dispose(id, request));
+  }
+
+  /**
+   * Previews a disposal: the depreciation it would reverse, the net book value it is measured
+   * against and the gain or loss, without posting anything.
+   *
+   * @param id id
+   * @param disposalDate disposal date
+   * @param proceeds sale proceeds
+   * @return preview
+   */
+  @GetMapping("/{id}/disposal-preview")
+  @PreAuthorize("hasAuthority('ASSET_MANAGE')")
+  public DisposalPreview disposalPreview(
+      @PathVariable Long id,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate disposalDate,
+      @RequestParam BigDecimal proceeds) {
+    return lifecycle.previewDisposal(id, disposalDate, proceeds);
   }
 
   /**

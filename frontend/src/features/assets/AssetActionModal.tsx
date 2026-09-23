@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { assetsApi } from '@/api/assets';
 import type { FixedAsset } from '@/api/assets';
@@ -31,6 +31,28 @@ interface ActionForm {
   remarks?: string;
 }
 
+/**
+ * Gain or loss a disposal would post. The server preview applies the reversal of depreciation
+ * already charged for the disposal month; the current net book value is used until it arrives.
+ */
+function useDisposalPreview(asset: FixedAsset, date: string, proceeds: number, enabled: boolean) {
+  const preview = useQuery({
+    queryKey: ['asset-disposal-preview', asset.id, date, proceeds],
+    queryFn: () => assetsApi.disposalPreview(asset.id, date, proceeds),
+    enabled: enabled && date !== '',
+  });
+  return {
+    result: preview.data?.gainOrLoss ?? disposalResult(proceeds, asset.netBookValue),
+    reversed: preview.data?.depreciationReversed ?? 0,
+    netBookValue: preview.data?.netBookValue ?? asset.netBookValue,
+  };
+}
+
+function gainLossLabel(result: number): string {
+  const amount = Math.abs(result).toLocaleString('en-PH', { minimumFractionDigits: 2 });
+  return result >= 0 ? `Gain ${amount}` : `Loss ${amount}`;
+}
+
 /** Disposal (sale or scrap, with gain or loss) or inter-branch transfer of an asset. */
 export function AssetActionModal({ asset, action, onClose }: Readonly<Props>) {
   const lookups = useAssetLookups();
@@ -39,7 +61,7 @@ export function AssetActionModal({ asset, action, onClose }: Readonly<Props>) {
   const [form, setForm] = useState<ActionForm>({ date: today(), proceeds: 0 });
   const set = (patch: Partial<ActionForm>) => setForm({ ...form, ...patch });
   const dispose = action === 'DISPOSE';
-  const result = disposalResult(form.proceeds ?? 0, asset.netBookValue);
+  const preview = useDisposalPreview(asset, form.date, form.proceeds ?? 0, dispose);
   const submit = useMutation({
     mutationFn: () =>
       dispose
@@ -81,6 +103,13 @@ export function AssetActionModal({ asset, action, onClose }: Readonly<Props>) {
       <p className="muted">
         {asset.description} – net book value <Amount value={asset.netBookValue} />
       </p>
+      {dispose && preview.reversed > 0 && (
+        <p className="muted">
+          Depreciation of <Amount value={preview.reversed} /> already charged for the disposal month
+          or later will be reversed; the gain or loss is measured against a net book value of{' '}
+          <Amount value={preview.netBookValue} />.
+        </p>
+      )}
       <div className="form-grid">
         <TextInput
           label={dispose ? 'Disposal date' : 'Transfer date'}
@@ -94,7 +123,7 @@ export function AssetActionModal({ asset, action, onClose }: Readonly<Props>) {
             <NumberInput
               label="Sale proceeds"
               required
-              hint={result >= 0 ? `Gain ${result.toFixed(2)}` : `Loss ${(-result).toFixed(2)}`}
+              hint={gainLossLabel(preview.result)}
               value={form.proceeds}
               onChange={(proceeds) => set({ proceeds })}
             />

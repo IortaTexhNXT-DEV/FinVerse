@@ -101,7 +101,7 @@ public class ReceivablesQueries {
   public List<ArItem> items(Long companyId, LocalDate from, LocalDate to, LocalDate balanceDate) {
     return jdbc.query(
         ITEMS_SQL,
-        ReceivablesQueries::mapItem,
+        (rs, i) -> mapItem(rs),
         Date.valueOf(balanceDate),
         companyId,
         Date.valueOf(from),
@@ -119,7 +119,7 @@ public class ReceivablesQueries {
   public List<ChequeRow> chequeAllocations(Long companyId, LocalDate from, LocalDate to) {
     return jdbc.query(
         CHEQUE_ALLOCATIONS_SQL,
-        ReceivablesQueries::mapCheque,
+        (rs, i) -> mapCheque(rs),
         companyId,
         Date.valueOf(from),
         Date.valueOf(to));
@@ -134,10 +134,10 @@ public class ReceivablesQueries {
    */
   public List<ChequeRow> undeposited(Long companyId, LocalDate asOf) {
     Date d = Date.valueOf(asOf);
-    return jdbc.query(UNDEPOSITED_SQL, ReceivablesQueries::mapCheque, companyId, d, d, d, d);
+    return jdbc.query(UNDEPOSITED_SQL, (rs, i) -> mapCheque(rs), companyId, d, d, d, d);
   }
 
-  private static ArItem mapItem(ResultSet rs, int row) throws SQLException {
+  private static ArItem mapItem(ResultSet rs) throws SQLException {
     return new ArItem(
         rs.getLong("id"),
         rs.getString("branch_code"),
@@ -158,7 +158,7 @@ public class ReceivablesQueries {
         toLocalDate(rs.getDate("instrument_date")));
   }
 
-  private static ChequeRow mapCheque(ResultSet rs, int row) throws SQLException {
+  private static ChequeRow mapCheque(ResultSet rs) throws SQLException {
     return new ChequeRow(
         rs.getLong("id"),
         rs.getString("receipt_no"),

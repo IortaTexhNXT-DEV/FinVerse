@@ -23,29 +23,29 @@ public class BankBookQueries {
       "select e.id, e.value_date, e.batch_no, e.journal_type, e.reference, e.narration,"
           + " e.currency, e.debit_fc, e.credit_fc from gl_ledger_entry e";
 
+  private static final String ORDER = " order by e.value_date, e.id";
+
   private static final String UNRECONCILED_SQL =
       COLUMNS
           + " where e.company_id = ? and e.account_id = ? and e.value_date <= ?"
           + " and not exists (select 1 from brs_match_book b join brs_match m on m.id = b.match_id"
           + " where b.ledger_entry_id = e.id and m.match_date <= ?)"
-          + " order by e.value_date, e.id";
+          + ORDER;
 
   private static final String UNMATCHED_SQL =
       COLUMNS
           + " where e.company_id = ? and e.account_id = ? and e.value_date <= ?"
           + " and not exists (select 1 from brs_match_book b where b.ledger_entry_id = e.id)"
-          + " order by e.value_date, e.id";
+          + ORDER;
 
   private static final String BY_IDS_SQL =
       COLUMNS
           + " where e.company_id = ? and e.account_id = ? and e.id = any (?)"
           + " and not exists (select 1 from brs_match_book b where b.ledger_entry_id = e.id)"
-          + " order by e.value_date, e.id";
+          + ORDER;
 
   private static final String BY_MATCH_SQL =
-      COLUMNS
-          + " join brs_match_book b on b.ledger_entry_id = e.id where b.match_id = ?"
-          + " order by e.value_date, e.id";
+      COLUMNS + " join brs_match_book b on b.ledger_entry_id = e.id where b.match_id = ?" + ORDER;
 
   private static final String BALANCE_SQL =
       "select coalesce(sum(debit_fc - credit_fc), 0) from gl_ledger_entry"
@@ -72,7 +72,7 @@ public class BankBookQueries {
    */
   public List<BookEntry> unreconciled(Long companyId, Long accountId, LocalDate asOf) {
     Date date = Date.valueOf(asOf);
-    return jdbc.query(UNRECONCILED_SQL, BankBookQueries::map, companyId, accountId, date, date);
+    return jdbc.query(UNRECONCILED_SQL, (rs, i) -> map(rs), companyId, accountId, date, date);
   }
 
   /**
@@ -84,8 +84,7 @@ public class BankBookQueries {
    * @return entries by value date
    */
   public List<BookEntry> unmatched(Long companyId, Long accountId, LocalDate asOf) {
-    return jdbc.query(
-        UNMATCHED_SQL, BankBookQueries::map, companyId, accountId, Date.valueOf(asOf));
+    return jdbc.query(UNMATCHED_SQL, (rs, i) -> map(rs), companyId, accountId, Date.valueOf(asOf));
   }
 
   /**
@@ -98,7 +97,7 @@ public class BankBookQueries {
    */
   public List<BookEntry> unreconciledByIds(Long companyId, Long accountId, List<Long> ids) {
     return jdbc.query(
-        BY_IDS_SQL, BankBookQueries::map, companyId, accountId, ids.toArray(new Long[0]));
+        BY_IDS_SQL, (rs, i) -> map(rs), companyId, accountId, ids.toArray(new Long[0]));
   }
 
   /**
@@ -108,7 +107,7 @@ public class BankBookQueries {
    * @return entries
    */
   public List<BookEntry> ofMatch(Long matchId) {
-    return jdbc.query(BY_MATCH_SQL, BankBookQueries::map, matchId);
+    return jdbc.query(BY_MATCH_SQL, (rs, i) -> map(rs), matchId);
   }
 
   /**
@@ -124,7 +123,7 @@ public class BankBookQueries {
         BALANCE_SQL, BigDecimal.class, companyId, accountId, Date.valueOf(asOf));
   }
 
-  private static BookEntry map(ResultSet rs, int row) throws SQLException {
+  private static BookEntry map(ResultSet rs) throws SQLException {
     return new BookEntry(
         rs.getLong("id"),
         rs.getDate("value_date").toLocalDate(),

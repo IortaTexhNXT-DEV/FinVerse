@@ -1,5 +1,6 @@
 package com.iortatechnxt.finverse.receivables;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,7 +37,7 @@ class ReceivablesApiIT {
 
   private ResultActions call(String username, MockHttpServletRequestBuilder request)
       throws Exception {
-    return mvc.perform(request.with(user(users.loadUserByUsername(username))));
+    return mvc.perform(request.with(user(users.loadUserByUsername(username))).with(csrf()));
   }
 
   private JsonNode body(ResultActions result) throws Exception {
@@ -266,9 +267,9 @@ class ReceivablesApiIT {
                         ("{\"companyId\":%d,\"bankAccountCode\":\"1120\","
                                 + "\"ledgerEntryIds\":[%d],\"statementLineIds\":[%d]}")
                             .formatted(
-                                    fx.company(),
-                                    bench.path("bookEntries").get(0).path("id").asLong(),
-                                    lines.get(0).path("id").asLong())))
+                                fx.company(),
+                                bench.path("bookEntries").get(0).path("id").asLong(),
+                                lines.get(0).path("id").asLong())))
                 .andExpect(status().isCreated()))
             .path("id")
             .asLong();

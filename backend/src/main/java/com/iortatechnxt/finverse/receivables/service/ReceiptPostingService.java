@@ -139,15 +139,7 @@ public class ReceiptPostingService {
    */
   public Receipt applyUnapplied(Long id, ApplyRequest request) {
     Receipt r = receipts.get(id);
-    r.requireStatus(ReceiptStatus.APPROVED);
-    if (!r.getPayerType().hasParty() || r.unapplied().signum() == 0) {
-      throw new BusinessRuleException(
-          "NOTHING_ON_ACCOUNT", "Receipt " + r.getReceiptNo() + " has no money on account");
-    }
-    if (request.date().isBefore(r.getReceiptDate())) {
-      throw new BusinessRuleException(
-          "INVALID_APPLICATION_DATE", "Application date cannot precede the receipt date");
-    }
+    checkApplicable(r, request);
     List<Planned> plan =
         request.method() == AllocationMethod.MANUAL
             ? planner.manual(r.getPartyId(), r.getCurrency(), r.unapplied(), request.allocations())
@@ -174,6 +166,18 @@ public class ReceiptPostingService {
         AuditAction.UPDATE,
         "Applied " + total + " from money on account");
     return r;
+  }
+
+  private static void checkApplicable(Receipt r, ApplyRequest request) {
+    r.requireStatus(ReceiptStatus.APPROVED);
+    if (!r.getPayerType().hasParty() || r.unapplied().signum() == 0) {
+      throw new BusinessRuleException(
+          "NOTHING_ON_ACCOUNT", "Receipt " + r.getReceiptNo() + " has no money on account");
+    }
+    if (request.date().isBefore(r.getReceiptDate())) {
+      throw new BusinessRuleException(
+          "INVALID_APPLICATION_DATE", "Application date cannot precede the receipt date");
+    }
   }
 
   /**

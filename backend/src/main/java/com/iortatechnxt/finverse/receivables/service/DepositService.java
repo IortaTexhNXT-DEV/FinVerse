@@ -111,17 +111,7 @@ public class DepositService {
                 bank.code(),
                 currency));
     for (Receipt receipt : selected) {
-      if (!receipt.getCompanyId().equals(r.companyId())
-          || !receipt.getBankAccountCode().equals(bank.code())
-          || !receipt.getCurrency().equals(currency)) {
-        throw new BusinessRuleException(
-            "SLIP_MISMATCH",
-            "Receipt " + receipt.getReceiptNo() + " is for another bank account or currency");
-      }
-      if (receipt.getReceiptDate().isAfter(r.slipDate())) {
-        throw new BusinessRuleException(
-            "SLIP_DATE", "Receipt " + receipt.getReceiptNo() + " is dated after the slip");
-      }
+      checkSlipReceipt(receipt, r, bank.code(), currency);
       receipt.addToSlip(slip.getId());
       slip.add(receipt.getAmount());
     }
@@ -131,6 +121,21 @@ public class DepositService {
         AuditAction.CREATE,
         selected.size() + " receipts to " + bank.code());
     return slip;
+  }
+
+  private static void checkSlipReceipt(
+      Receipt receipt, DepositSlipRequest r, String bankCode, String currency) {
+    if (!receipt.getCompanyId().equals(r.companyId())
+        || !receipt.getBankAccountCode().equals(bankCode)
+        || !receipt.getCurrency().equals(currency)) {
+      throw new BusinessRuleException(
+          "SLIP_MISMATCH",
+          "Receipt " + receipt.getReceiptNo() + " is for another bank account or currency");
+    }
+    if (receipt.getReceiptDate().isAfter(r.slipDate())) {
+      throw new BusinessRuleException(
+          "SLIP_DATE", "Receipt " + receipt.getReceiptNo() + " is dated after the slip");
+    }
   }
 
   /**

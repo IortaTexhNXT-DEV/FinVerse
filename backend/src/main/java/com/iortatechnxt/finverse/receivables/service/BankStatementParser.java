@@ -38,6 +38,7 @@ public final class BankStatementParser {
           DateTimeFormatter.ofPattern("dd-MM-uuuu"));
   private static final String INVALID = "INVALID_STATEMENT";
   private static final String BALANCE = "balance";
+  private static final String ROW = "Row ";
   private static final int MAX_TEXT = 250;
   private static final int MAX_REFERENCE = 60;
   private static final Pattern AMOUNT = Pattern.compile("-?\\d{1,17}(\\.\\d{1,2})?");
@@ -83,7 +84,7 @@ public final class BankStatementParser {
       if (r.balance() != null && r.balance().compareTo(running) != 0) {
         throw new BusinessRuleException(
             INVALID,
-            "Row " + r.rowNo() + ": balance " + r.balance() + " does not agree with " + running);
+            ROW + r.rowNo() + ": balance " + r.balance() + " does not agree with " + running);
       }
       totalDebit = totalDebit.add(r.debit());
       totalCredit = totalCredit.add(r.credit());
@@ -126,7 +127,7 @@ public final class BankStatementParser {
         || debit.signum() < 0
         || credit.signum() < 0) {
       throw new BusinessRuleException(
-          INVALID, "Row " + rowNo + ": enter a positive debit or a positive credit");
+          INVALID, ROW + rowNo + ": enter a positive debit or a positive credit");
     }
     String balance = cell(cells, header, BALANCE);
     return new Row(
@@ -152,7 +153,7 @@ public final class BankStatementParser {
         // try the next accepted format
       }
     }
-    throw new BusinessRuleException(INVALID, "Row " + rowNo + ": invalid date '" + text + "'");
+    throw new BusinessRuleException(INVALID, ROW + rowNo + ": invalid date '" + text + "'");
   }
 
   private static BigDecimal amount(String text, int rowNo) {
@@ -161,7 +162,7 @@ public final class BankStatementParser {
     }
     String plain = text.replace(",", "");
     if (!AMOUNT.matcher(plain).matches()) {
-      throw new BusinessRuleException(INVALID, "Row " + rowNo + ": invalid amount '" + text + "'");
+      throw new BusinessRuleException(INVALID, ROW + rowNo + ": invalid amount '" + text + "'");
     }
     return Money.round(new BigDecimal(plain));
   }

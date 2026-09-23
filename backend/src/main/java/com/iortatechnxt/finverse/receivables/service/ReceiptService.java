@@ -110,14 +110,7 @@ public class ReceiptService {
    * @return receipt
    */
   public Receipt create(ReceiptRequest r) {
-    if (r.mode() == ReceiptMode.PDC) {
-      throw new BusinessRuleException(
-          "USE_PDC_REGISTER", "Register post-dated cheques in the PDC register");
-    }
-    if (r.mode() == ReceiptMode.CHEQUE && (isBlank(r.instrumentNo()) || isBlank(r.draweeBank()))) {
-      throw new BusinessRuleException(
-          "CHEQUE_DETAILS_REQUIRED", "Cheque number and drawee bank are required for cheques");
-    }
+    checkInstrument(r);
     Payer payer = payer(r);
     AllocationMethod method =
         r.payerType().hasParty() ? r.allocationMethod() : AllocationMethod.NONE;
@@ -134,9 +127,7 @@ public class ReceiptService {
             blankToNull(r.department()),
             r.mode(),
             blankToNull(r.instrumentNo()),
-            r.mode() == ReceiptMode.CHEQUE && r.instrumentDate() == null
-                ? r.receiptDate()
-                : r.instrumentDate(),
+            instrumentDate(r),
             blankToNull(r.draweeBank()),
             r.currency(),
             null,
@@ -152,6 +143,23 @@ public class ReceiptService {
       addManualAllocations(receipt, r.allocations());
     }
     return receipt;
+  }
+
+  private static void checkInstrument(ReceiptRequest r) {
+    if (r.mode() == ReceiptMode.PDC) {
+      throw new BusinessRuleException(
+          "USE_PDC_REGISTER", "Register post-dated cheques in the PDC register");
+    }
+    if (r.mode() == ReceiptMode.CHEQUE && (isBlank(r.instrumentNo()) || isBlank(r.draweeBank()))) {
+      throw new BusinessRuleException(
+          "CHEQUE_DETAILS_REQUIRED", "Cheque number and drawee bank are required for cheques");
+    }
+  }
+
+  private static LocalDate instrumentDate(ReceiptRequest r) {
+    return r.mode() == ReceiptMode.CHEQUE && r.instrumentDate() == null
+        ? r.receiptDate()
+        : r.instrumentDate();
   }
 
   /**

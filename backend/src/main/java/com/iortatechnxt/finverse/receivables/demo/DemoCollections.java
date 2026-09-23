@@ -151,7 +151,7 @@ public class DemoCollections {
       case DOLLAR_OR_CARD -> dollarOrCard(m, party, date);
       case ON_ACCOUNT -> onAccount(party, date);
       case POST_DATED -> pdc(party, date);
-      case OTHER -> otherOrReinsurer(m, date, approve);
+      default -> otherOrReinsurer(m, date, approve);
     }
   }
 

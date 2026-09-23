@@ -141,7 +141,7 @@ public class Receipt extends BaseEntity {
 
   @OneToMany(mappedBy = "receipt", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("id")
-  private List<ReceiptAllocation> allocations = new ArrayList<>();
+  private final List<ReceiptAllocation> allocations = new ArrayList<>();
 
   protected Receipt() {}
 

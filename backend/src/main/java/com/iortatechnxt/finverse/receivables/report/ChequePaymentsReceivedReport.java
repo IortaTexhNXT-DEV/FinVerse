@@ -34,6 +34,7 @@ public class ChequePaymentsReceivedReport implements ReportDefinition {
   private static final String PARTY = "partyCode";
   private static final String AMOUNT = "chequeAmount";
   private static final String ADJUSTED = "adjusted";
+  private static final String SEP = " / ";
 
   private final ReceivablesQueries queries;
 
@@ -116,16 +117,16 @@ public class ChequePaymentsReceivedReport implements ReportDefinition {
   private static Map<String, Object> cells(ChequeRow c, boolean first) {
     Map<String, Object> cells = new LinkedHashMap<>();
     if (first) {
-      cells.put("customer", c.partyCode() + " / " + c.payerName());
-      cells.put("cheque", c.chequeNo() + " / " + c.chequeDate());
+      cells.put("customer", c.partyCode() + SEP + c.payerName());
+      cells.put("cheque", c.chequeNo() + SEP + c.chequeDate());
       cells.put(AMOUNT, c.amount());
       cells.put("draweeBank", c.draweeBank());
-      cells.put("bank", c.bankName() + " / " + c.bankAccountCode());
-      cells.put("receipt", c.receiptNo() + " / " + c.receiptDate() + statusNote(c.status()));
+      cells.put("bank", c.bankName() + SEP + c.bankAccountCode());
+      cells.put("receipt", c.receiptNo() + SEP + c.receiptDate() + statusNote(c.status()));
       cells.put("currency", c.currency());
     }
     if (c.invoiceNo() != null) {
-      cells.put("invoice", c.invoiceNo() + " / " + c.invoiceDate());
+      cells.put("invoice", c.invoiceNo() + SEP + c.invoiceDate());
       cells.put("invoiceAmount", c.invoiceAmount());
       cells.put(ADJUSTED, c.adjusted());
     }

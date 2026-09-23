@@ -41,11 +41,12 @@ public abstract class AbstractPdcReceivedReport implements ReportDefinition {
     DUE_TO_BANK
   }
 
+  private static final String BANK = "bank";
   private static final String[][] RANGES = {
     {"division", "Division"},
     {"department", "Department"},
     {"party", "Customer Account"},
-    {"bank", "Bank Account"}
+    {BANK, "Bank Account"}
   };
   private static final String FROM_SUFFIX = "From";
   private static final String TO_SUFFIX = "To";
@@ -125,7 +126,7 @@ public abstract class AbstractPdcReceivedReport implements ReportDefinition {
       builder
           .groupBy("division", "Division")
           .groupBy("department", "Department")
-          .groupBy("bank", "Bank");
+          .groupBy(BANK, "Bank");
     }
     return builder
         .rows(rows)
@@ -152,7 +153,7 @@ public abstract class AbstractPdcReceivedReport implements ReportDefinition {
     Map<String, Object> cells = new LinkedHashMap<>();
     cells.put("division", branches.getOrDefault(c.getBranchId(), "-"));
     cells.put("department", c.getDepartment() == null ? "-" : c.getDepartment());
-    cells.put("bank", c.getBankAccountCode());
+    cells.put(BANK, c.getBankAccountCode());
     cells.put("party", c.getPartyCode());
     cells.put("dueDate", c.getChequeDate());
     cells.put("chequeNo", c.getChequeNo());
@@ -185,7 +186,7 @@ public abstract class AbstractPdcReceivedReport implements ReportDefinition {
     columns.add(ReportColumn.text("party", "Customer Account"));
     columns.add(ReportColumn.text("customer", "Customer Name / Bank Name"));
     if (byDivision) {
-      columns.add(ReportColumn.text("bank", "Bank Account"));
+      columns.add(ReportColumn.text(BANK, "Bank Account"));
     }
     columns.add(ReportColumn.text("currency", "Currency"));
     columns.add(ReportColumn.amount("amount", "Cheque Amount"));

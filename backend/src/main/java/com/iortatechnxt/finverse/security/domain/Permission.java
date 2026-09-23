@@ -63,5 +63,10 @@ public enum Permission {
   // Fixed assets and investments: disposals, transfers, coupon receipts, maturities, sales and
   // fair value updates (masters use MASTER_*, month-end runs use PERIOD_END_RUN). See V671.
   ASSET_MANAGE,
-  INVESTMENT_MANAGE
+  INVESTMENT_MANAGE,
+  // Tax & statutory reporting: view worksheets, returns, certificates and IC schedules; maintain
+  // tax masters and prepare, file and pay returns (masters are authorized with MASTER_AUTHORIZE).
+  // See V701.
+  TAX_VIEW,
+  TAX_MANAGE
 }

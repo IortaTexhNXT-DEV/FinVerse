@@ -13,8 +13,8 @@ public enum PayerType {
   POLICYHOLDER(EnumSet.of(PartyType.INDIVIDUAL_CLIENT, PartyType.CORPORATE_CLIENT)),
   /** Agent or broker remitting premium. */
   INTERMEDIARY(EnumSet.of(PartyType.AGENT, PartyType.BROKER)),
-  /** Reinsurer settling its balance. */
-  REINSURER(EnumSet.of(PartyType.REINSURER)),
+  /** Reinsurer (or reinsurance broker) settling its balance. */
+  REINSURER(EnumSet.of(PartyType.REINSURER, PartyType.RI_BROKER)),
   /** Any other income (no sub-ledger matching). */
   OTHER(EnumSet.noneOf(PartyType.class));
 

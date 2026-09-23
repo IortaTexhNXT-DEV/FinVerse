@@ -11,12 +11,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 /**
@@ -105,6 +108,30 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(IllegalArgumentException.class)
   public ProblemDetail handleIllegalArgument(IllegalArgumentException ex) {
     return problem(HttpStatus.BAD_REQUEST, "BAD_REQUEST", ex.getMessage());
+  }
+
+  /**
+   * Handles request bodies that are not valid JSON or do not match the expected types, and missing
+   * or mistyped query/path parameters. Details of the parser are not exposed.
+   *
+   * @param ex exception
+   * @return problem detail (400)
+   */
+  @ExceptionHandler({
+    HttpMessageNotReadableException.class,
+    MissingServletRequestParameterException.class,
+    MethodArgumentTypeMismatchException.class
+  })
+  public ProblemDetail handleUnreadableRequest(Exception ex) {
+    String detail =
+        switch (ex) {
+          case MissingServletRequestParameterException m ->
+              "Required parameter '" + m.getParameterName() + "' is missing";
+          case MethodArgumentTypeMismatchException m ->
+              "Parameter '" + m.getName() + "' has an invalid value";
+          default -> "The request body is not valid JSON or has fields of the wrong type";
+        };
+    return problem(HttpStatus.BAD_REQUEST, "MALFORMED_REQUEST", detail);
   }
 
   /**

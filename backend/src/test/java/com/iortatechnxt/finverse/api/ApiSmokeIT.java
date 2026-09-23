@@ -1,5 +1,6 @@
 package com.iortatechnxt.finverse.api;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -156,6 +157,15 @@ class ApiSmokeIT {
         "/api/v1/reserves/runs?companyId={c}",
         "/api/v1/reserves/summary?companyId={c}&asOf=2026-08-31",
         "/api/v1/reserves/triangles?companyId={c}&businessLine=FIRE&asOf=2026-08-31",
+        // reinsurance
+        "/api/v1/reinsurance/treaties?companyId={c}",
+        "/api/v1/reinsurance/fac-placements?companyId={c}",
+        "/api/v1/reinsurance/fac-placements?companyId={c}&status=PROVISIONAL",
+        "/api/v1/reinsurance/allocation/preview?companyId={c}&from=2026-09-01&to=2026-09-30",
+        "/api/v1/reinsurance/cessions?companyId={c}&policyNo=NONE",
+        "/api/v1/reinsurance/cessions?companyId={c}&from=2026-09-01&to=2026-09-30",
+        "/api/v1/reinsurance/claims/movements?companyId={c}&from=2026-01-01&to=2026-12-31",
+        "/api/v1/reinsurance/soas?companyId={c}",
       })
   @WithUserDetails("fmanager")
   void readEndpointsRespondOk(String url) throws Exception {
@@ -175,6 +185,24 @@ class ApiSmokeIT {
   void readOnlyUsersCanInquireReceiptsAndPayments(String url) throws Exception {
     mvc.perform(get(url.replace("{c}", data.company().getId().toString())))
         .andExpect(status().isOk());
+  }
+
+  @Test
+  @WithUserDetails("accountant")
+  void malformedRequestsAreRejectedWithBadRequest() throws Exception {
+    mvc.perform(
+            post("/api/v1/journals")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"companyId\": \"not-a-number\""))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("MALFORMED_REQUEST"));
+    mvc.perform(get("/api/v1/receivables/bank-accounts"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.detail").value("Required parameter 'companyId' is missing"));
+    mvc.perform(get("/api/v1/receivables/bank-accounts?companyId=abc"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.detail").value("Parameter 'companyId' has an invalid value"));
   }
 
   @Test

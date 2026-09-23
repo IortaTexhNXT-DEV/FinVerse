@@ -7,6 +7,7 @@ export const PARTY_TYPES = [
   'AGENT',
   'BROKER',
   'REINSURER',
+  'RI_BROKER',
   'COINSURER',
   'SUPPLIER',
   'GARAGE',

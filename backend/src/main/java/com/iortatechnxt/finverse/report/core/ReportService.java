@@ -7,6 +7,7 @@ import com.iortatechnxt.finverse.organization.service.OrganizationService;
 import com.iortatechnxt.finverse.report.render.ExportFormat;
 import com.iortatechnxt.finverse.report.render.ReportContext;
 import com.iortatechnxt.finverse.report.render.ReportRenderer;
+import com.iortatechnxt.finverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.util.EnumMap;
 import java.util.List;
@@ -32,6 +33,7 @@ public class ReportService {
   private final OrganizationService organization;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
+  private final SystemParameterService parameters;
   private final Clock clock;
 
   /**
@@ -42,6 +44,7 @@ public class ReportService {
    * @param organization organization service
    * @param audit audit trail
    * @param currentUser current user
+   * @param parameters system parameters (report footer)
    * @param clock clock
    */
   public ReportService(
@@ -50,12 +53,14 @@ public class ReportService {
       OrganizationService organization,
       AuditTrailService audit,
       CurrentUser currentUser,
+      SystemParameterService parameters,
       Clock clock) {
     this.registry = registry;
     renderers.forEach(r -> this.renderers.put(r.format(), r));
     this.organization = organization;
     this.audit = audit;
     this.currentUser = currentUser;
+    this.parameters = parameters;
     this.clock = clock;
   }
 
@@ -101,7 +106,11 @@ public class ReportService {
     ReportParameters params = ReportParameters.validate(def.metadata(), rawParams, clock);
     ReportResult result = def.generate(params);
     ReportContext ctx =
-        new ReportContext(companyName(params), currentUser.username(), clock.instant());
+        new ReportContext(
+            companyName(params),
+            currentUser.username(),
+            clock.instant(),
+            parameters.text(SystemParameterService.REPORT_FOOTER_TEXT, ""));
     byte[] content = renderers.get(format).render(result, ctx);
     audit.record(
         "Report",

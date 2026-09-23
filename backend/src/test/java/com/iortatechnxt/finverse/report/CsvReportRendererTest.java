@@ -29,7 +29,8 @@ class CsvReportRendererTest {
             List.of());
     String csv =
         new String(
-            new CsvReportRenderer().render(result, new ReportContext("C", "u", Instant.now())),
+            new CsvReportRenderer()
+                .render(result, new ReportContext("C", "u", Instant.now(), null)),
             StandardCharsets.UTF_8);
     assertThat(csv).contains("\"'=HYPERLINK(\"\"x\"\")\"");
     assertThat(csv).contains("\"(1,234.50)\"");

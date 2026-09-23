@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Documented, deliberate SpotBugs exclusions. Every entry states WHY it is safe.
+-->
+<FindBugsFilter>
+  <!--
+    EI_EXPOSE_REP / EI_EXPOSE_REP2: Spring beans receive collaborators via constructor
+    injection and JPA entities expose managed associations by design. Both patterns are
+    framework-managed, not caller-controlled mutable state.
+  -->
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+  </Match>
+  <!-- CT_CONSTRUCTOR_THROW: Spring-managed singletons are never subclassed by untrusted code. -->
+  <Match>
+    <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+  </Match>
+  <!--
+    SPRING_ENDPOINT (FindSecBugs): informational marker for every @RestController method.
+    All endpoints are protected by Spring Security + @PreAuthorize (see SecurityConfig).
+  -->
+  <Match>
+    <Bug pattern="SPRING_ENDPOINT"/>
+  </Match>
+  <!--
+    CRLF_INJECTION_LOGS: neutralised centrally. The log layout (application.yml
+    logging.pattern.console) replaces CR/LF in every message with '_', so user data can never
+    forge log lines, whichever logger call writes it.
+  -->
+  <Match>
+    <Bug pattern="CRLF_INJECTION_LOGS"/>
+  </Match>
+  <!--
+    SERVLET_HEADER: the Authorization header is read only to extract a bearer token whose HMAC
+    signature, issuer and expiry are then verified; an altered header simply fails validation.
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.finverse.security.service.JwtAuthenticationFilter"/>
+    <Bug pattern="SERVLET_HEADER"/>
+  </Match>
+  <!-- Generated/test code is not part of the production artefact. -->
+  <Match>
+    <Class name="~.*Test.*"/>
+  </Match>
+</FindBugsFilter>

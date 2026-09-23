@@ -1,0 +1,136 @@
+package com.iortatechnxt.finverse.common.api;
+
+import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.finverse.common.exception.DuplicateResourceException;
+import com.iortatechnxt.finverse.common.exception.ResourceNotFoundException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+/**
+ * Translates exceptions into RFC 7807 problem responses.
+ *
+ * <p>Every error response carries {@code code} (stable, for UI/support) and {@code detail}.
+ * Unexpected errors are logged with a correlation-friendly message and never leak internals.
+ */
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+  private static final String CODE = "code";
+
+  /**
+   * Handles business rule violations.
+   *
+   * @param ex exception
+   * @return problem detail (422)
+   */
+  @ExceptionHandler(BusinessRuleException.class)
+  public ProblemDetail handleBusinessRule(BusinessRuleException ex) {
+    return problem(HttpStatus.UNPROCESSABLE_ENTITY, ex.getCode(), ex.getMessage());
+  }
+
+  /**
+   * Handles missing resources.
+   *
+   * @param ex exception
+   * @return problem detail (404)
+   */
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public ProblemDetail handleNotFound(ResourceNotFoundException ex) {
+    return problem(HttpStatus.NOT_FOUND, "NOT_FOUND", ex.getMessage());
+  }
+
+  /**
+   * Handles duplicate business keys.
+   *
+   * @param ex exception
+   * @return problem detail (409)
+   */
+  @ExceptionHandler(DuplicateResourceException.class)
+  public ProblemDetail handleDuplicate(DuplicateResourceException ex) {
+    return problem(HttpStatus.CONFLICT, "DUPLICATE", ex.getMessage());
+  }
+
+  /**
+   * Handles concurrent modification of the same record.
+   *
+   * @param ex exception
+   * @return problem detail (409)
+   */
+  @ExceptionHandler(OptimisticLockingFailureException.class)
+  public ProblemDetail handleOptimisticLock(OptimisticLockingFailureException ex) {
+    LOG.info("Optimistic lock conflict: {}", ex.getMessage());
+    return problem(
+        HttpStatus.CONFLICT,
+        "CONCURRENT_MODIFICATION",
+        "The record was changed by another user. Please reload and try again.");
+  }
+
+  /**
+   * Handles bean validation failures and lists field errors.
+   *
+   * @param ex exception
+   * @return problem detail (400)
+   */
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
+    Map<String, String> errors = new LinkedHashMap<>();
+    ex.getBindingResult()
+        .getFieldErrors()
+        .forEach(e -> errors.putIfAbsent(e.getField(), e.getDefaultMessage()));
+    ProblemDetail pd = problem(HttpStatus.BAD_REQUEST, "VALIDATION_FAILED", "Invalid request");
+    pd.setProperty("errors", errors);
+    return pd;
+  }
+
+  /**
+   * Handles malformed request arguments.
+   *
+   * @param ex exception
+   * @return problem detail (400)
+   */
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ProblemDetail handleIllegalArgument(IllegalArgumentException ex) {
+    return problem(HttpStatus.BAD_REQUEST, "BAD_REQUEST", ex.getMessage());
+  }
+
+  /**
+   * Handles failed logins.
+   *
+   * @param ex exception
+   * @return problem detail (401)
+   */
+  @ExceptionHandler({BadCredentialsException.class, LockedException.class})
+  public ProblemDetail handleAuthentication(RuntimeException ex) {
+    return problem(HttpStatus.UNAUTHORIZED, "AUTHENTICATION_FAILED", ex.getMessage());
+  }
+
+  /**
+   * Handles missing permissions.
+   *
+   * @param ex exception
+   * @return problem detail (403)
+   */
+  @ExceptionHandler(AccessDeniedException.class)
+  public ProblemDetail handleAccessDenied(AccessDeniedException ex) {
+    return problem(
+        HttpStatus.FORBIDDEN, "ACCESS_DENIED", "You are not permitted to perform this action");
+  }
+
+  private static ProblemDetail problem(HttpStatus status, String code, String detail) {
+    ProblemDetail pd = ProblemDetail.forStatusAndDetail(status, detail);
+    pd.setProperty(CODE, code);
+    return pd;
+  }
+}

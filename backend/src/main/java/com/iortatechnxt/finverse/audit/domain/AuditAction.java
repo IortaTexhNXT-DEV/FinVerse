@@ -1,0 +1,20 @@
+package com.iortatechnxt.finverse.audit.domain;
+
+/** Kinds of auditable activity. */
+public enum AuditAction {
+  CREATE,
+  UPDATE,
+  AUTHORIZE,
+  REJECT,
+  DEACTIVATE,
+  SUBMIT,
+  POST,
+  REVERSE,
+  OPEN,
+  CLOSE,
+  REOPEN,
+  RUN,
+  LOGIN,
+  LOGIN_FAILED,
+  EXPORT
+}

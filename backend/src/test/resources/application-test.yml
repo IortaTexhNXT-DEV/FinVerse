@@ -1,0 +1,9 @@
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/demo
+finverse:
+  security:
+    jwt-secret: test-secret-for-automated-tests-0123456789abcdef
+logging:
+  level:
+    root: WARN

@@ -1,0 +1,14 @@
+# Build output
+target/
+node_modules/
+dist/
+coverage/
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+# Local environment files (never commit secrets)
+.env
+.env.*
+!.env.example

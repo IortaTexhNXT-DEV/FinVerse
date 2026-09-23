@@ -78,6 +78,14 @@ public class AccountingRuleLine {
     this.narration = narration;
   }
 
+  void copyFrom(AccountingRuleLine other) {
+    this.side = other.side;
+    this.accountCode = other.accountCode;
+    this.amountComponent = other.amountComponent;
+    this.partyLine = other.partyLine;
+    this.narration = other.narration;
+  }
+
   void attach(AccountingRule owner, int number) {
     this.rule = owner;
     this.lineNo = number;

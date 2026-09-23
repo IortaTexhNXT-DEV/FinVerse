@@ -17,6 +17,7 @@ import com.iortatechnxt.finverse.security.service.UserDirectory;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.springframework.data.domain.Page;
@@ -123,6 +124,10 @@ public class JournalEntryService {
     requireMaker(batch);
     JournalHeader header = manualHeader(request);
     batch.updateHeader(header);
+    // Delete the old lines first: Hibernate would otherwise insert the new rows before removing the
+    // orphans and violate the (batch_id, line_no) unique key.
+    batch.replaceLines(List.of());
+    batches.flush();
     batch.replaceLines(factory.resolve(header, request.lines()));
     audit.record(ENTITY, batch.getBatchNo(), AuditAction.UPDATE, "Updated journal");
     return batch;

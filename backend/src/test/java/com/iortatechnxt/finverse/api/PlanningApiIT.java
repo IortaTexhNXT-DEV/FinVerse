@@ -1,6 +1,7 @@
 package com.iortatechnxt.finverse.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -58,7 +59,7 @@ class PlanningApiIT {
   private JsonNode send(MockHttpServletRequestBuilder request, String username, int expected)
       throws Exception {
     String body =
-        mvc.perform(request.with(as(username)))
+        mvc.perform(request.with(as(username)).with(csrf()))
             .andExpect(status().is(expected))
             .andReturn()
             .getResponse()

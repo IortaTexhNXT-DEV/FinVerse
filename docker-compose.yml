@@ -1,0 +1,46 @@
+# iNXT FinVerse – local / demo stack.
+#   docker compose up -d --build        -> http://localhost:8081  (demo users, password Finverse@2026)
+# Production: use deploy/ (Kubernetes) or the same images with external PostgreSQL and secrets.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: finverse
+      POSTGRES_USER: finverse
+      POSTGRES_PASSWORD: ${FINVERSE_DB_PASSWORD:-finverse}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finverse -d finverse"]
+      interval: 5s
+      retries: 20
+    ports:
+      - "5433:5432"
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-demo}
+      FINVERSE_DB_URL: jdbc:postgresql://db:5432/finverse
+      FINVERSE_DB_USER: finverse
+      FINVERSE_DB_PASSWORD: ${FINVERSE_DB_PASSWORD:-finverse}
+      FINVERSE_JWT_SECRET: ${FINVERSE_JWT_SECRET:-change-me-local-only-0123456789abcdefghij}
+      FINVERSE_ALLOWED_ORIGINS: http://localhost:8081
+      FINVERSE_ADMIN_INITIAL_PASSWORD: ${FINVERSE_ADMIN_INITIAL_PASSWORD:-}
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    environment:
+      FINVERSE_BACKEND_HOST: backend
+    ports:
+      - "8081:8080"
+
+volumes:
+  db-data:

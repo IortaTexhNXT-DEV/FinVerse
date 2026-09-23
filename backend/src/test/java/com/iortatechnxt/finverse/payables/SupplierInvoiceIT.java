@@ -39,7 +39,7 @@ class SupplierInvoiceIT {
             List.of(
                 new InvoiceLineValues("5607", "CLM", "Aircon repair", new BigDecimal("10000.00")),
                 new InvoiceLineValues("5607", "CLM", "Parts", new BigDecimal("2500.00")),
-                new InvoiceLineValues("5613", "FIN", "Towing", new BigDecimal("1000.00"))));
+                new InvoiceLineValues("5608", "FIN", "Towing", new BigDecimal("1000.00"))));
     SupplierInvoice draft = as.run("accountant", () -> invoices.create(cmd));
     assertThat(draft.getStatus()).isEqualTo(InvoiceStatus.DRAFT);
     assertThat(draft.getNetAmount()).isEqualByComparingTo("13500.00");
@@ -62,7 +62,7 @@ class SupplierInvoiceIT {
     assertThat(fx.posted(batches[0], "1603")).isEqualByComparingTo("1500.00");
     assertThat(fx.posted(batches[0], "2508")).isEqualByComparingTo("-250.00");
     assertThat(fx.posted(batches[0], "2501")).isEqualByComparingTo("-13750.00");
-    assertThat(fx.posted(batches[1], "5613")).isEqualByComparingTo("1000.00");
+    assertThat(fx.posted(batches[1], "5608")).isEqualByComparingTo("1000.00");
     assertThat(fx.posted(batches[1], "2501")).isEqualByComparingTo("-1100.00");
 
     OpenItem item = openItems.get(approved.getOpenItemId());
@@ -109,7 +109,7 @@ class SupplierInvoiceIT {
         fx.invoiceCommand(
             "C-000101",
             PayablesFixtures.DATE,
-            List.of(new InvoiceLineValues("5613", "FIN", "x", new BigDecimal("1.00"))));
+            List.of(new InvoiceLineValues("5608", "FIN", "x", new BigDecimal("1.00"))));
     assertThatThrownBy(() -> as.run("accountant", () -> invoices.create(client)))
         .isInstanceOf(BusinessRuleException.class);
   }

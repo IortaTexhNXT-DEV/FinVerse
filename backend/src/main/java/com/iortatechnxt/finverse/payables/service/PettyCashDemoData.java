@@ -32,11 +32,11 @@ public class PettyCashDemoData {
   private static final long MIX_VOUCHER = 17;
   private static final long MIX_FUND = 13;
   private static final long CENTS = 50;
-  private static final List<String> ACCOUNTS = List.of("5606", "5613", "5604", "5607");
+  private static final List<String> ACCOUNTS = List.of("5606", "5608", "5604", "5607");
   private static final List<String> DESCRIPTIONS =
       List.of(
           "Taxi and jeepney fares",
-          "Pantry supplies",
+          "Notarial and permit fees",
           "Mobile load and courier",
           "Minor office repairs");
   private static final List<String> PAYEES =

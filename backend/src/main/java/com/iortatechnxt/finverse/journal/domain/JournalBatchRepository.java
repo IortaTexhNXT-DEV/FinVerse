@@ -3,12 +3,24 @@ package com.iortatechnxt.finverse.journal.domain;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.EntityGraph.EntityGraphType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /** Persistence for {@link JournalBatch}. Dynamic searches use {@link JournalSpecifications}. */
 public interface JournalBatchRepository
     extends JpaRepository<JournalBatch, Long>, JpaSpecificationExecutor<JournalBatch> {
+
+  /**
+   * Finds a batch with its lines (the aggregate is always used whole).
+   *
+   * @param id id
+   * @return batch if present
+   */
+  @Override
+  @EntityGraph(attributePaths = "lines", type = EntityGraphType.LOAD)
+  Optional<JournalBatch> findById(Long id);
 
   /**
    * Finds a batch by number.

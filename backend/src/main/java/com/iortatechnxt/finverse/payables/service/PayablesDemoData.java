@@ -55,11 +55,14 @@ public class PayablesDemoData {
   private static final String BDO_CA = "BDO-CA";
   private static final String BPI_SA = "BPI-SA";
   private static final List<String> SUPPLIERS = List.of("S-0001", "S-0002", "S-0003");
-  private static final List<String> ACCOUNTS = List.of("5613", "5610", "5603");
-  private static final List<String> SECOND_ACCOUNTS = List.of("5609", "5604", "5607");
+  private static final List<String> ACCOUNTS = List.of("5609", "5610", "5603");
+  private static final List<String> SECOND_ACCOUNTS = List.of("5604", "5604", "5607");
   private static final List<String> COST_CENTERS = List.of("FIN", "IT", "EXEC");
   private static final List<String> DESCRIPTIONS =
-      List.of("Office supplies", "Cloud subscription and IT services", "Office space rental");
+      List.of(
+          "Printing and promotional materials",
+          "Cloud subscription and IT services",
+          "Office space rental");
   private static final List<String> BRANCHES = List.of("HO", "CEB", "DVO");
   private static final BigDecimal HALF = new BigDecimal("0.5");
   private static final long CENT_STEP = 25;

@@ -84,7 +84,7 @@ public class PayablesFixtures {
         invoiceCommand(
             party,
             date,
-            List.of(new InvoiceLineValues("5613", "FIN", "Supplies", new BigDecimal(net))));
+            List.of(new InvoiceLineValues("5608", "FIN", "Supplies", new BigDecimal(net))));
     SupplierInvoice draft =
         as.run("accountant", () -> invoices.submit(invoices.create(cmd).getId()));
     return as.run("checker", () -> invoices.approve(draft.getId()));

@@ -1,6 +1,7 @@
 package com.iortatechnxt.finverse.payables;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,7 +37,8 @@ class PayablesApiIT {
   private JsonNode call(
       String username, MockHttpServletRequestBuilder request, Object body, ResultMatcher expected)
       throws Exception {
-    MockHttpServletRequestBuilder r = request.with(user(users.loadUserByUsername(username)));
+    MockHttpServletRequestBuilder r =
+        request.with(user(users.loadUserByUsername(username))).with(csrf());
     if (body != null) {
       r = r.contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(body));
     }
@@ -132,7 +134,7 @@ class PayablesApiIT {
             List.of(
                 Map.of(
                     "expenseAccountCode",
-                    "5613",
+                    "5608",
                     "costCenter",
                     "FIN",
                     "description",
@@ -213,7 +215,7 @@ class PayablesApiIT {
                     List.of(
                         Map.of(
                             "expenseAccountCode",
-                            "5613",
+                            "5608",
                             "costCenter",
                             "FIN",
                             "description",
@@ -317,7 +319,8 @@ class PayablesApiIT {
                     + "/payment-notifications/file?bankAccountId="
                     + bank
                     + "&from=2026-09-01&to=2026-09-30")
-                .with(user(users.loadUserByUsername("accountant"))))
+                .with(user(users.loadUserByUsername("accountant")))
+                .with(csrf()))
         .andExpect(status().isOk());
   }
 

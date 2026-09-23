@@ -1,8 +1,10 @@
 package com.iortatechnxt.finverse.subledger.api;
 
 import com.iortatechnxt.finverse.party.service.PartyService;
+import com.iortatechnxt.finverse.subledger.api.dto.AgeingResponse;
 import com.iortatechnxt.finverse.subledger.api.dto.MatchRequest;
 import com.iortatechnxt.finverse.subledger.api.dto.OpenItemResponse;
+import com.iortatechnxt.finverse.subledger.service.AgeingService;
 import com.iortatechnxt.finverse.subledger.service.OpenItemService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -24,16 +26,44 @@ public class SubLedgerController {
 
   private final OpenItemService openItems;
   private final PartyService parties;
+  private final AgeingService ageing;
 
   /**
    * Creates the controller.
    *
    * @param openItems open item service
    * @param parties party service
+   * @param ageing ageing service
    */
-  public SubLedgerController(OpenItemService openItems, PartyService parties) {
+  public SubLedgerController(
+      OpenItemService openItems, PartyService parties, AgeingService ageing) {
     this.openItems = openItems;
     this.parties = parties;
+    this.ageing = ageing;
+  }
+
+  /**
+   * Ages outstanding items by due date, per party (optionally one party only).
+   *
+   * @param companyId company
+   * @param asOf as-of date
+   * @param partyCode party filter (optional)
+   * @return ageing
+   */
+  @GetMapping("/ageing")
+  @PreAuthorize("hasAuthority('JOURNAL_VIEW')")
+  public AgeingResponse ageing(
+      @RequestParam Long companyId,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate asOf,
+      @RequestParam(required = false) String partyCode) {
+    return AgeingResponse.from(
+        asOf,
+        AgeingService.DEFAULT_BUCKETS,
+        ageing.age(
+            companyId,
+            asOf,
+            AgeingService.DEFAULT_BUCKETS,
+            item -> partyCode == null || partyCode.equals(item.getPartyCode())));
   }
 
   /**

@@ -51,5 +51,10 @@ public enum Permission {
   // Reporting
   REPORT_VIEW,
   REPORT_FINANCIAL,
-  DASHBOARD_VIEW
+  DASHBOARD_VIEW,
+
+  // Fixed assets and investments: disposals, transfers, coupon receipts, maturities, sales and
+  // fair value updates (masters use MASTER_*, month-end runs use PERIOD_END_RUN). See V671.
+  ASSET_MANAGE,
+  INVESTMENT_MANAGE
 }

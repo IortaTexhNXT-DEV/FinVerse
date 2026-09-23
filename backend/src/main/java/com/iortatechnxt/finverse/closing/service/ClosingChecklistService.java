@@ -53,6 +53,7 @@ public class ClosingChecklistService {
   private final ChartOfAccountsService accounts;
   private final OrganizationService organization;
   private final ObjectProvider<ReconciliationStatusProvider> reconciliations;
+  private final ObjectProvider<PeriodEndCheckProvider> moduleChecks;
 
   /**
    * Creates the service.
@@ -65,6 +66,7 @@ public class ClosingChecklistService {
    * @param accounts chart of accounts
    * @param organization organization service
    * @param reconciliations reconciliation status providers (optional)
+   * @param moduleChecks period-end controls of other modules (optional)
    */
   public ClosingChecklistService(
       PeriodService periods,
@@ -74,7 +76,8 @@ public class ClosingChecklistService {
       FxRevaluationCalculator calculator,
       ChartOfAccountsService accounts,
       OrganizationService organization,
-      ObjectProvider<ReconciliationStatusProvider> reconciliations) {
+      ObjectProvider<ReconciliationStatusProvider> reconciliations,
+      ObjectProvider<PeriodEndCheckProvider> moduleChecks) {
     this.periods = periods;
     this.journals = journals;
     this.ledger = ledger;
@@ -83,6 +86,7 @@ public class ClosingChecklistService {
     this.accounts = accounts;
     this.organization = organization;
     this.reconciliations = reconciliations;
+    this.moduleChecks = moduleChecks;
   }
 
   /**
@@ -107,6 +111,12 @@ public class ClosingChecklistService {
     items.add(unreconciled(companyId, period.getEndDate()));
     items.add(revaluation(companyId, period));
     items.add(trialBalance(companyId, period.getEndDate()));
+    moduleChecks
+        .orderedStream()
+        .forEach(
+            p ->
+                items.addAll(
+                    p.periodEndChecks(companyId, period.getStartDate(), period.getEndDate())));
     return items;
   }
 

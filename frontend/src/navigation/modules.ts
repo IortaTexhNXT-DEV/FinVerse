@@ -10,6 +10,7 @@ import { withJournalAutomation } from '@/features/journaltools/module';
 import { payablesModule } from '@/features/payables/module';
 import { receivablesModule } from '@/features/receivables/module';
 import { reportsModule } from '@/features/reports/module';
+import { reservesModule } from '@/features/reserves/module';
 import { setupModule } from '@/features/setup/module';
 import { taxModule } from '@/features/tax/module';
 import { underwritingModule } from '@/features/underwriting/module';
@@ -29,6 +30,7 @@ export const MODULES: FeatureModule[] = [
   payablesModule,
   assetsModule,
   planningModule,
+  reservesModule,
   accountingEngineModule,
   taxModule,
   reportsModule,

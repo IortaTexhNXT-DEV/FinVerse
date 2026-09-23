@@ -151,6 +151,11 @@ class ApiSmokeIT {
         "/api/v1/tax/ic/schedules/PREMIUMS?companyId={c}&from=2026-01-01&to=2026-09-30",
         "/api/v1/tax/ic/schedules/NET_WORTH?companyId={c}&from=2026-01-01&to=2026-09-30",
         "/api/v1/tax/ic/schedules/RBC?companyId={c}&from=2026-01-01&to=2026-09-30",
+        "/api/v1/reserves/parameters?companyId={c}",
+        "/api/v1/reserves/takaful-setting?companyId={c}",
+        "/api/v1/reserves/runs?companyId={c}",
+        "/api/v1/reserves/summary?companyId={c}&asOf=2026-08-31",
+        "/api/v1/reserves/triangles?companyId={c}&businessLine=FIRE&asOf=2026-08-31",
       })
   @WithUserDetails("fmanager")
   void readEndpointsRespondOk(String url) throws Exception {

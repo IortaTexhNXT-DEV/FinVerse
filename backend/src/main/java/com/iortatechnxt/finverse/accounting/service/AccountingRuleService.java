@@ -139,6 +139,9 @@ public class AccountingRuleService {
     AccountingRule rule = get(id);
     rule.setName(r.name());
     rule.setEffectiveFrom(r.effectiveFrom());
+    // Remove old lines before inserting the new ones (unique (rule_id, line_no)).
+    rule.replaceLines(List.of());
+    rules.flush();
     apply(rule, r);
     rule.markModified();
     audit.record(ENTITY, rule.getId(), AuditAction.UPDATE, "Rule " + rule.getName() + " updated");

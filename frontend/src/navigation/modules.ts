@@ -8,6 +8,7 @@ import { withJournalAutomation } from '@/features/journaltools/module';
 import { payablesModule } from '@/features/payables/module';
 import { reportsModule } from '@/features/reports/module';
 import { setupModule } from '@/features/setup/module';
+import { underwritingModule } from '@/features/underwriting/module';
 import type { FeatureModule } from './types';
 
 /**
@@ -19,6 +20,7 @@ import type { FeatureModule } from './types';
 export const MODULES: FeatureModule[] = [
   withOverviewScreens(dashboardModule),
   withJournalAutomation(glModule),
+  underwritingModule,
   accountingEngineModule,
   payablesModule,
   reportsModule,

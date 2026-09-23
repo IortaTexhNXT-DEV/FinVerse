@@ -142,6 +142,20 @@ class ApiSmokeIT {
         .andExpect(status().isOk());
   }
 
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/api/v1/receivables/receipts?companyId={c}",
+        "/api/v1/receivables/deposits/slips?companyId={c}",
+        "/api/v1/receivables/pdcs?companyId={c}",
+        "/api/v1/payables/invoices?companyId={c}",
+      })
+  @WithUserDetails("auditor")
+  void readOnlyUsersCanInquireReceiptsAndPayments(String url) throws Exception {
+    mvc.perform(get(url.replace("{c}", data.company().getId().toString())))
+        .andExpect(status().isOk());
+  }
+
   @Test
   @WithUserDetails("fmanager")
   void currencyRatesAndStatementRespondOk() throws Exception {

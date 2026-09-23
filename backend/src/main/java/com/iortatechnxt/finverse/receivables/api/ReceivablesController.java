@@ -46,8 +46,7 @@ public class ReceivablesController {
    * @return bank accounts
    */
   @GetMapping("/bank-accounts")
-  @PreAuthorize(
-      "hasAnyAuthority('RECEIPT_PAYMENT_MAINTAIN','RECEIPT_PAYMENT_AUTHORIZE','RECONCILIATION_MANAGE')")
+  @PreAuthorize(ReceivablesAccess.VIEW_OR_RECONCILE)
   public List<BankAccount> bankAccounts(@RequestParam Long companyId) {
     return banks.list(companyId);
   }
@@ -61,7 +60,7 @@ public class ReceivablesController {
    * @return items oldest due first
    */
   @GetMapping("/open-items")
-  @PreAuthorize("hasAnyAuthority('RECEIPT_PAYMENT_MAINTAIN','RECEIPT_PAYMENT_AUTHORIZE')")
+  @PreAuthorize(ReceivablesAccess.VIEW)
   public List<OpenItemResponse> openItems(
       @RequestParam Long companyId,
       @RequestParam String partyCode,
@@ -78,8 +77,7 @@ public class ReceivablesController {
    * @return labels
    */
   @GetMapping("/ageing-slots")
-  @PreAuthorize(
-      "hasAnyAuthority('RECEIPT_PAYMENT_MAINTAIN','RECEIPT_PAYMENT_AUTHORIZE','REPORT_FINANCIAL')")
+  @PreAuthorize(ReceivablesAccess.VIEW_OR_REPORT)
   public List<String> ageingSlots(@RequestParam(required = false) String slots) {
     return ageing.slotsOrDefault(slots).labels();
   }

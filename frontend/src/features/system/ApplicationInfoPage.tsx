@@ -40,8 +40,8 @@ export default function ApplicationInfoPage() {
             />
             <Kpi
               label="Health"
-              value={<StatusBadge status={i.health === 'UP' ? 'ACTIVE' : 'REJECTED'} />}
-              hint={i.health}
+              value={<StatusBadge status={i.health} />}
+              hint="Application health check"
             />
             <Kpi
               label="Database migration"

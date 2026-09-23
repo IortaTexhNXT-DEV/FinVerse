@@ -88,7 +88,7 @@ function Allocations({ receipt }: Readonly<{ receipt: Receipt }>) {
           {
             key: 'st',
             header: 'Matched',
-            render: (a) => <StatusBadge status={a.matched ? 'POSTED' : 'DRAFT'} />,
+            render: (a) => <StatusBadge status={a.matched ? 'MATCHED' : 'UNMATCHED'} />,
           },
         ]}
       />

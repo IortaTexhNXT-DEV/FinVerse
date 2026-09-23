@@ -11,6 +11,25 @@ describe('ui components', () => {
     expect(badge).toHaveClass('badge', 'warning');
   });
 
+  it.each([
+    ['LOCKED', 'Locked', 'danger'],
+    ['FROZEN', 'Frozen', 'danger'],
+    ['SUCCEEDED', 'Succeeded', 'success'],
+    ['POSTED', 'Posted', 'success'],
+    ['UP', 'Up', 'success'],
+    ['ACTIVE', 'Active', 'success'],
+    ['RUNNING', 'Running', 'warning'],
+    ['FAILED', 'Failed', 'danger'],
+  ])('keeps the label of %s and only shares its colour', (status, label, tone) => {
+    render(<StatusBadge status={status} />);
+    expect(screen.getByText(label)).toHaveClass('badge', tone);
+  });
+
+  it('renders an unknown status in the neutral info tone', () => {
+    render(<StatusBadge status="SOMETHING_NEW" />);
+    expect(screen.getByText('Something New').className).toBe('badge ');
+  });
+
   it('renders table rows and handles row clicks', async () => {
     const onClick = vi.fn();
     render(

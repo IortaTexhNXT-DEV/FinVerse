@@ -23,7 +23,7 @@ interface Editing {
 
 function statusOf(u: UserProfile): string {
   if (u.locked) {
-    return 'FROZEN';
+    return 'LOCKED';
   }
   return u.enabled ? 'ACTIVE' : 'INACTIVE';
 }

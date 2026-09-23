@@ -26,14 +26,9 @@ function RunStatus({ run }: Readonly<{ run?: JobRun }>) {
   if (run === undefined) {
     return <span className="muted">Never run</span>;
   }
-  const tone: Record<JobRun['status'], string> = {
-    SUCCEEDED: 'POSTED',
-    FAILED: 'REJECTED',
-    RUNNING: 'PENDING_APPROVAL',
-  };
   return (
     <span title={run.message}>
-      <StatusBadge status={tone[run.status]} /> {run.status.toLowerCase()}
+      <StatusBadge status={run.status} />
     </span>
   );
 }

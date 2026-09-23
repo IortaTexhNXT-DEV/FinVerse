@@ -23,6 +23,12 @@ describe('policy form', () => {
     const coinsured = { ...form, businessType: 'DIRECT_WITH_COINSURANCE' as const };
     expect(validatePolicy(coinsured)).toContain('Select the coinsurer');
     expect(validatePolicy({ ...form, periodTo: '2026-01-01' })).toHaveLength(1);
+    expect(
+      validatePolicy({ ...form, risks: [{ description: 'Plant', sumInsured: 0, rate: 0.18 }] }),
+    ).toEqual(['Every risk needs a sum insured greater than zero']);
+    expect(validatePolicy({ ...form, risks: [{ description: 'Plant', sumInsured: -1 }] })).toEqual([
+      'Every risk needs a sum insured greater than zero',
+    ]);
   });
 
   it('checks the commission override of intermediated business', () => {

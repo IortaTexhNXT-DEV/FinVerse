@@ -6,6 +6,7 @@ import com.iortatechnxt.finverse.party.domain.PartyType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /** Validation rules shared by quotations, policies and open covers. */
@@ -23,6 +24,24 @@ public final class UnderwritingRules {
   public static void requireRisks(Collection<?> risks) {
     if (risks.isEmpty()) {
       throw new BusinessRuleException("RISK_REQUIRED", "A policy needs at least one risk");
+    }
+  }
+
+  /**
+   * Checks that every risk insures a positive sum: a risk of zero (or less) covers nothing and
+   * would post a policy without exposure. Endorsements do not pass through here, so NIL
+   * endorsements with no change in sum insured are unaffected.
+   *
+   * @param risks risks of a policy or certificate
+   */
+  public static void requirePositiveSumsInsured(List<RiskValues> risks) {
+    for (int i = 0; i < risks.size(); i++) {
+      BigDecimal sum = risks.get(i).sumInsured();
+      if (sum == null || sum.signum() <= 0) {
+        throw new BusinessRuleException(
+            "SUM_INSURED_NOT_POSITIVE",
+            "Risk " + (i + 1) + ": the sum insured must be greater than zero");
+      }
     }
   }
 

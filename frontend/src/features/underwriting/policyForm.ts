@@ -117,6 +117,10 @@ function coverChecks(form: PolicyInput): Check[] {
       form.risks.length === 0 || form.risks.some((r) => r.description.trim() === ''),
       'Every risk needs a description',
     ],
+    [
+      form.risks.some((r) => !Number.isFinite(r.sumInsured) || r.sumInsured <= 0),
+      'Every risk needs a sum insured greater than zero',
+    ],
   ];
 }
 

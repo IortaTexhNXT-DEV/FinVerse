@@ -27,6 +27,7 @@ import com.iortatechnxt.finverse.underwriting.domain.Product;
 import com.iortatechnxt.finverse.underwriting.domain.SourceType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +88,21 @@ class UnderwritingApiIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.writeValueAsString(request)))
         .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void riskWithoutPositiveSumInsuredIsRejected() throws Exception {
+    Product fire = fx.product("FIRE", false);
+    PolicyRequest zero =
+        fx.request(fire, SourceType.BROKER, "B-0001", List.of(fx.risk("0", "0", "NCR-1")));
+    mvc.perform(
+            post(BASE + "/policies")
+                .with(as("uw"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(zero)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
+        .andExpect(jsonPath("$.errors['risks[0].sumInsured']").value("must be greater than 0"));
   }
 
   @Test

@@ -6,6 +6,7 @@ import com.iortatechnxt.finverse.underwriting.domain.RiskValues;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -33,7 +34,7 @@ import java.time.LocalDate;
  */
 public record RiskRequest(
     @NotBlank @Size(max = 300) String description,
-    @NotNull @DecimalMin("0") BigDecimal sumInsured,
+    @NotNull @Positive BigDecimal sumInsured,
     @DecimalMin("0") BigDecimal rate,
     @DecimalMin("0") BigDecimal premium,
     @Size(max = 120) String occupation,

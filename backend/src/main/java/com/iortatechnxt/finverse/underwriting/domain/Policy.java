@@ -176,6 +176,7 @@ public class Policy extends BaseEntity {
   public void replaceRisks(List<RiskValues> values) {
     workflow.requireEditable(label());
     UnderwritingRules.requireRisks(values);
+    UnderwritingRules.requirePositiveSumsInsured(values);
     risks.clear();
     int line = 1;
     for (RiskValues v : values) {

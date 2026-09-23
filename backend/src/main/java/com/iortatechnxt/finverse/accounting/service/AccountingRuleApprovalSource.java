@@ -35,6 +35,6 @@ public class AccountingRuleApprovalSource implements PendingApprovalSource {
                 r.getEventType() + " #" + r.getId(),
                 r.getName(),
                 r.getCompanyId(),
-                null));
+                "/accounting/rules/" + r.getId()));
   }
 }

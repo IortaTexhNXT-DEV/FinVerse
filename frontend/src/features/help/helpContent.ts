@@ -130,6 +130,28 @@ export const HELP_SECTIONS: HelpSection[] = [
     ],
   },
   {
+    id: 'accounting-engine',
+    module: 'Accounting Engine',
+    intro: 'How business events (policies, claims, receipts…) become journals automatically.',
+    screens: [
+      {
+        name: 'Event Types and Accounting Rules',
+        path: '/accounting/rules',
+        summary:
+          'Each business event type is mapped to debit/credit accounts by an accounting rule (per business line and currency, by priority and effective dates).',
+        controls: [
+          'New and changed rules must be authorized by another user; they appear in the approval inbox.',
+        ],
+      },
+      {
+        name: 'Rule Simulator and Event Register',
+        path: '/accounting/simulator',
+        summary:
+          'Preview the journal a sample event would produce, and inspect every processed or failed event.',
+      },
+    ],
+  },
+  {
     id: 'reports',
     module: 'Reports',
     intro: 'Financial statements, registers and control reports with PDF, Excel and CSV export.',
@@ -152,6 +174,13 @@ export const HELP_SECTIONS: HelpSection[] = [
         path: '/setup/branches',
         summary: 'Legal entities and offices with their weekly holidays.',
         controls: ['Maker-checker: changes appear in the authorizers’ approval inbox.'],
+      },
+      {
+        name: 'Business Partners',
+        path: '/setup/parties',
+        summary:
+          'Policyholders, agents, brokers, reinsurers, suppliers and banks used by the sub-ledgers.',
+        controls: ['Maker-checker: new and changed partners must be authorized before use.'],
       },
       {
         name: 'Holiday Calendar',

@@ -35,6 +35,6 @@ public class PartyApprovalSource implements PendingApprovalSource {
                 p.getCode(),
                 p.getName(),
                 p.getCompanyId(),
-                null));
+                "/setup/parties"));
   }
 }

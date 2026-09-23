@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarCheck, History } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '@/auth/authContext';
 import { useNavigate } from 'react-router-dom';
 import { receivablesApi } from '@/api/receivables';
 import type { Pdc, PdcStatus } from '@/api/receivables';
@@ -34,6 +35,9 @@ const HELD: PdcStatus[] = ['ON_HAND', 'DUE'];
  * New PDCs are registered from the receipt entry screen (mode PDC).
  */
 export default function PdcPage() {
+  const { can } = useAuth();
+  const maker = can('RECEIPT_PAYMENT_MAINTAIN');
+  const allowed = (status: PdcStatus) => (maker ? pdcActions(status) : []);
   const toast = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -96,19 +100,21 @@ export default function PdcPage() {
         title="PDC Received"
         description="Post-dated cheques are memorandum items until banked; banking raises a receipt."
         actions={
-          <Button
-            variant="accent"
-            icon={<CalendarCheck size={16} />}
-            busy={action.isPending}
-            onClick={() =>
-              action.mutate(async () => {
-                const due = await receivablesApi.markDue(companyId, asOf);
-                return { label: `${due.length} cheque(s) marked due` };
-              })
-            }
-          >
-            Mark due as of date
-          </Button>
+          maker && (
+            <Button
+              variant="accent"
+              icon={<CalendarCheck size={16} />}
+              busy={action.isPending}
+              onClick={() =>
+                action.mutate(async () => {
+                  const due = await receivablesApi.markDue(companyId, asOf);
+                  return { label: `${due.length} cheque(s) marked due` };
+                })
+              }
+            >
+              Mark due as of date
+            </Button>
+          )
         }
       />
       <ErrorAlert error={action.error ?? list.error} />
@@ -154,17 +160,17 @@ export default function PdcPage() {
               header: 'Actions',
               render: (p) => (
                 <div className="row">
-                  {pdcActions(p.status).includes('deposit') && (
+                  {allowed(p.status).includes('deposit') && (
                     <Button size="sm" onClick={() => deposit(p)}>
                       Bank
                     </Button>
                   )}
-                  {pdcActions(p.status).includes('clear') && (
+                  {allowed(p.status).includes('clear') && (
                     <Button size="sm" onClick={() => clear(p)}>
                       Cleared
                     </Button>
                   )}
-                  {pdcActions(p.status).includes('return') && (
+                  {allowed(p.status).includes('return') && (
                     <Button size="sm" variant="ghost" onClick={() => setReturning(p)}>
                       Return
                     </Button>

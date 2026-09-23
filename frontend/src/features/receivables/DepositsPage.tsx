@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Landmark } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '@/auth/authContext';
 import { receivablesApi } from '@/api/receivables';
 import type { DepositSlip, ReceiptSummary } from '@/api/receivables';
 import { Amount } from '@/components/ui/Amount';
@@ -21,6 +22,8 @@ import { bankOptions, useReceivablesLookups } from './useReceivablesLookups';
  * a slip is confirmed when the bank has accepted the deposit.
  */
 export default function DepositsPage() {
+  const { can } = useAuth();
+  const maker = can('RECEIPT_PAYMENT_MAINTAIN');
   const toast = useToast();
   const queryClient = useQueryClient();
   const { companyId, branchId, bankAccounts } = useReceivablesLookups();
@@ -77,15 +80,17 @@ export default function DepositsPage() {
       <Card
         title="Not yet deposited"
         actions={
-          <Button
-            variant="accent"
-            icon={<Landmark size={16} />}
-            disabled={bank === '' || selected.length === 0}
-            busy={create.isPending}
-            onClick={() => create.mutate()}
-          >
-            Prepare slip ({total.toFixed(2)})
-          </Button>
+          maker && (
+            <Button
+              variant="accent"
+              icon={<Landmark size={16} />}
+              disabled={bank === '' || selected.length === 0}
+              busy={create.isPending}
+              onClick={() => create.mutate()}
+            >
+              Prepare slip ({total.toFixed(2)})
+            </Button>
+          )
         }
       >
         <div className="form-grid">
@@ -179,6 +184,7 @@ export default function DepositsPage() {
               key: 'act',
               header: 'Actions',
               render: (s) =>
+                maker &&
                 s.status === 'PREPARED' && (
                   <div className="row">
                     <Button

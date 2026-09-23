@@ -54,7 +54,7 @@ public class ReceiptController {
    * @return page of receipts
    */
   @GetMapping
-  @PreAuthorize("hasAnyAuthority('RECEIPT_PAYMENT_MAINTAIN','RECEIPT_PAYMENT_AUTHORIZE')")
+  @PreAuthorize(ReceivablesAccess.VIEW)
   public PageResponse<ReceiptSummaryResponse> search(
       @Valid @ModelAttribute ReceiptSearchParams params,
       @RequestParam(defaultValue = "0") int page,
@@ -76,7 +76,7 @@ public class ReceiptController {
    * @return receipt
    */
   @GetMapping("/{id}")
-  @PreAuthorize("hasAnyAuthority('RECEIPT_PAYMENT_MAINTAIN','RECEIPT_PAYMENT_AUTHORIZE')")
+  @PreAuthorize(ReceivablesAccess.VIEW)
   public ReceiptResponse get(@PathVariable Long id) {
     return ReceiptResponse.from(receipts.get(id));
   }

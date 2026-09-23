@@ -5,7 +5,6 @@ import static com.iortatechnxt.finverse.reinsurance.RiFixtures.MAKER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.iortatechnxt.finverse.insurance.ClaimMovement;
-import com.iortatechnxt.finverse.insurance.ClaimMovementListener;
 import com.iortatechnxt.finverse.insurance.ClaimMovementType;
 import com.iortatechnxt.finverse.insurance.ClaimReinsuranceView;
 import com.iortatechnxt.finverse.reinsurance.api.dto.FacAssignRequest;
@@ -13,6 +12,7 @@ import com.iortatechnxt.finverse.reinsurance.domain.FacStatus;
 import com.iortatechnxt.finverse.reinsurance.domain.RiClaimMovement;
 import com.iortatechnxt.finverse.reinsurance.domain.RiLayer;
 import com.iortatechnxt.finverse.reinsurance.service.CessionService;
+import com.iortatechnxt.finverse.reinsurance.service.ClaimRecoveryListener;
 import com.iortatechnxt.finverse.reinsurance.service.ClaimRecoveryService;
 import com.iortatechnxt.finverse.reinsurance.service.FacPlacementService;
 import com.iortatechnxt.finverse.subledger.domain.ItemDirection;
@@ -41,7 +41,7 @@ class ClaimRecoveryIT {
   private static final LocalDate MOVED = LocalDate.of(2026, 5, 5);
 
   @Autowired private RiFixtures fx;
-  @Autowired private ClaimMovementListener listener;
+  @Autowired private ClaimRecoveryListener listener;
   @Autowired private ClaimReinsuranceView reserveView;
   @Autowired private ClaimRecoveryService recoveries;
   @Autowired private CessionService cessions;

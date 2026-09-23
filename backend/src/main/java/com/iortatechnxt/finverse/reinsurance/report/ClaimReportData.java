@@ -15,8 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,10 +51,12 @@ public class ClaimReportData {
             .filter(Objects::nonNull)
             .distinct()
             .toList();
-    return ids.isEmpty()
-        ? Map.of()
-        : cessions.findAllById(ids).stream()
-            .collect(Collectors.toMap(Cession::getId, Function.identity()));
+    // A mutable map: movements without a cession look up a null id, which Map.of() rejects.
+    Map<Long, Cession> out = new HashMap<>();
+    if (!ids.isEmpty()) {
+      cessions.findAllById(ids).forEach(c -> out.put(c.getId(), c));
+    }
+    return out;
   }
 
   /**

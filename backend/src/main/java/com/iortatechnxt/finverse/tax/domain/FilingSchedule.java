@@ -63,7 +63,9 @@ public record FilingSchedule(FilingFrequency frequency, int dueMonthsAfter, int 
         }
       }
       default ->
-          out.add(new TaxPeriod(LocalDate.of(year, 1, 1), YearMonth.of(year, 12).atEndOfMonth()));
+          out.add(
+              new TaxPeriod(
+                  LocalDate.of(year, 1, 1), YearMonth.of(year, MONTHS_PER_YEAR).atEndOfMonth()));
     }
     return out;
   }

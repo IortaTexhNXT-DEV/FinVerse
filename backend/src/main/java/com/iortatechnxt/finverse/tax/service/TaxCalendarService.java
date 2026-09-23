@@ -1,5 +1,6 @@
 package com.iortatechnxt.finverse.tax.service;
 
+import com.iortatechnxt.finverse.alert.domain.ExceptionCode;
 import com.iortatechnxt.finverse.alert.service.AlertService;
 import com.iortatechnxt.finverse.tax.domain.ReturnStatus;
 import com.iortatechnxt.finverse.tax.domain.TaxForm;
@@ -94,7 +95,7 @@ public class TaxCalendarService {
   public int dueSoonDays() {
     return alerts
         .activeCode(DUE_CODE)
-        .map(c -> c.getThresholdDays() == null ? DEFAULT_DUE_DAYS : c.getThresholdDays())
+        .map(ExceptionCode::getThresholdDays)
         .orElse(DEFAULT_DUE_DAYS);
   }
 

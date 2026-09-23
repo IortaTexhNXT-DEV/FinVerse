@@ -22,6 +22,8 @@ final class TaxDemoCatalog {
 
   private static final String EWT_PAYABLE = "2508";
   private static final String OUTPUT_VAT = "2504";
+  private static final String COMMISSION_ATC = "WC515";
+  private static final String SERVICES_ATC = "WC160";
   private static final String COMMISSION_NATURE =
       "Commissions of independent and exclusive sales representatives and marketing agents";
 
@@ -61,9 +63,13 @@ final class TaxDemoCatalog {
           ewt("WI120", PayeeClass.INDIVIDUAL, "2", "Income payments to contractors"),
           ewt("WC120", PayeeClass.CORPORATE, "2", "Income payments to contractors"),
           ewt("WC158", PayeeClass.CORPORATE, "1", "Purchase of goods by top withholding agents"),
-          ewt("WC160", PayeeClass.CORPORATE, "2", "Purchase of services by top withholding agents"),
+          ewt(
+              SERVICES_ATC,
+              PayeeClass.CORPORATE,
+              "2",
+              "Purchase of services by top withholding agents"),
           ewt("WI515", PayeeClass.INDIVIDUAL, "10", COMMISSION_NATURE),
-          ewt("WC515", PayeeClass.CORPORATE, "10", COMMISSION_NATURE));
+          ewt(COMMISSION_ATC, PayeeClass.CORPORATE, "10", COMMISSION_NATURE));
 
   /** Filing calendar. */
   static final List<FormSpec> FORMS =
@@ -144,12 +150,12 @@ final class TaxDemoCatalog {
   /** Party tax profiles (TIN taken from the party master). */
   static final List<ProfileSpec> PROFILES =
       List.of(
-          corporate("S-0001", "METRO OFFICE SUPPLIES CO.", "WC160", "1550"),
-          corporate("S-0002", "CLOUD SYSTEMS PHILIPPINES INC.", "WC160", "1634"),
+          corporate("S-0001", "METRO OFFICE SUPPLIES CO.", SERVICES_ATC, "1550"),
+          corporate("S-0002", "CLOUD SYSTEMS PHILIPPINES INC.", SERVICES_ATC, "1634"),
           corporate("S-0003", "AYALA PROPERTY LEASING (DEMO)", "WC100", "1226"),
           corporate("G-0001", "AUTOFIX SERVICE CENTER", "WC120", "1100"),
           corporate("G-0002", "CEBU MOTOR WORKS", "WC120", "6000"),
-          corporate("A-0001", "ROSA MENDOZA INSURANCE AGENCY", "WC515", "1226"),
+          corporate("A-0001", "ROSA MENDOZA INSURANCE AGENCY", COMMISSION_ATC, "1226"),
           new ProfileSpec(
               "A-0002",
               PayeeClass.INDIVIDUAL,
@@ -160,8 +166,8 @@ final class TaxDemoCatalog {
               "6000",
               VatTreatment.REGULAR,
               "WI515"),
-          corporate("B-0001", "PACIFIC INSURANCE BROKERS INC.", "WC515", "1634"),
-          corporate("B-0002", "ASIA RISK ADVISORY BROKERS", "WC515", "1605"),
+          corporate("B-0001", "PACIFIC INSURANCE BROKERS INC.", COMMISSION_ATC, "1634"),
+          corporate("B-0002", "ASIA RISK ADVISORY BROKERS", COMMISSION_ATC, "1605"),
           new ProfileSpec(
               "C-000101",
               PayeeClass.INDIVIDUAL,

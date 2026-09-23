@@ -1,12 +1,12 @@
 package com.iortatechnxt.finverse.payables.api;
 
+import com.iortatechnxt.finverse.common.api.ContentDispositions;
 import com.iortatechnxt.finverse.payables.domain.NotificationFormat;
 import com.iortatechnxt.finverse.payables.service.NotificationRecord;
 import com.iortatechnxt.finverse.payables.service.PaymentNotificationService;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -72,9 +72,7 @@ public class PaymentNotificationController {
       @RequestParam(required = false) NotificationFormat format) {
     var file = service.generate(bankAccountId, from, to, includeCheques, format);
     return ResponseEntity.ok()
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION,
-            ContentDisposition.attachment().filename(file.fileName()).build().toString())
+        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(file.fileName()))
         .contentType(MediaType.parseMediaType(file.contentType()))
         .body(file.content());
   }

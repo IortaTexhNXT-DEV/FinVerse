@@ -1,12 +1,12 @@
 package com.iortatechnxt.finverse.report.api;
 
+import com.iortatechnxt.finverse.common.api.ContentDispositions;
 import com.iortatechnxt.finverse.report.api.dto.ReportCatalogueEntry;
 import com.iortatechnxt.finverse.report.core.ReportResult;
 import com.iortatechnxt.finverse.report.core.ReportService;
 import com.iortatechnxt.finverse.report.render.ExportFormat;
 import java.util.List;
 import java.util.Map;
-import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -77,9 +77,7 @@ public class ReportController {
     var file = service.export(code, params, format);
     return ResponseEntity.ok()
         .contentType(MediaType.parseMediaType(file.contentType()))
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION,
-            ContentDisposition.attachment().filename(file.fileName()).build().toString())
+        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(file.fileName()))
         .body(file.content());
   }
 }

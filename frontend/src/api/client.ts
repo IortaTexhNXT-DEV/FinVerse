@@ -92,10 +92,51 @@ async function send(method: string, path: string, body?: unknown): Promise<Respo
   return response;
 }
 
+/** Decodes an RFC 5987 ext-value such as `UTF-8''na%C3%AFve.pdf` (undefined when malformed). */
+function decodeExtendedValue(value: string): string | undefined {
+  const match = /^([\w!#$&+^`{}~-]+)'[^']*'(.+)$/.exec(value);
+  if (match === null) {
+    return undefined;
+  }
+  const charset = (match[1] ?? '').toUpperCase();
+  const encoded = match[2] ?? '';
+  try {
+    if (charset === 'UTF-8') {
+      return decodeURIComponent(encoded);
+    }
+    // ISO-8859-1, the only other charset RFC 5987 requires: one byte per character.
+    return encoded.replace(/%([\da-f]{2})/gi, (_, hex: string) =>
+      String.fromCodePoint(Number.parseInt(hex, 16)),
+    );
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * File name of a Content-Disposition header. The RFC 5987 `filename*` parameter (percent encoded,
+ * any character) wins; the plain `filename` is only the ASCII fallback for old clients.
+ */
+export function fileNameOf(disposition: string | null, fallback: string): string {
+  const header = disposition ?? '';
+  const extended = /filename\*\s*=\s*([^;]+)/i.exec(header);
+  const decoded =
+    extended?.[1] === undefined ? '' : (decodeExtendedValue(extended[1].trim()) ?? '');
+  return decoded || plainFileName(header) || fallback;
+}
+
+/** The plain (quoted or token) `filename` parameter, or '' when there is none. */
+function plainFileName(header: string): string {
+  const plain = /(?:^|;)\s*filename\s*=\s*(?:"((?:[^"\\]|\\.)*)"|([^;]*))/i.exec(header);
+  if (plain === null) {
+    return '';
+  }
+  return plain[1] === undefined ? (plain[2] ?? '').trim() : plain[1].replace(/\\(.)/g, '$1');
+}
+
 async function fileOf(response: Response, fallback: string): Promise<DownloadedFile> {
-  const disposition = response.headers.get('Content-Disposition') ?? '';
-  const match = /filename="?([^";]+)"?/.exec(disposition);
-  return { blob: await response.blob(), fileName: match?.[1] ?? fallback };
+  const fileName = fileNameOf(response.headers.get('Content-Disposition'), fallback);
+  return { blob: await response.blob(), fileName };
 }
 
 async function json<T>(method: string, path: string, body?: unknown): Promise<T> {

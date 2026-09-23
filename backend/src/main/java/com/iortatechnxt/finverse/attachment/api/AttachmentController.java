@@ -5,10 +5,9 @@ import com.iortatechnxt.finverse.attachment.domain.AllowedFileType;
 import com.iortatechnxt.finverse.attachment.domain.AttachmentTarget;
 import com.iortatechnxt.finverse.attachment.service.AttachmentService;
 import com.iortatechnxt.finverse.attachment.service.AttachmentService.AttachmentFile;
+import com.iortatechnxt.finverse.common.api.ContentDispositions;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -111,10 +110,7 @@ public class AttachmentController {
         .contentType(MediaType.parseMediaType(file.metadata().getContentType()))
         .header(
             HttpHeaders.CONTENT_DISPOSITION,
-            ContentDisposition.attachment()
-                .filename(file.metadata().getFileName(), StandardCharsets.UTF_8)
-                .build()
-                .toString())
+            ContentDispositions.attachment(file.metadata().getFileName()))
         .body(file.content());
   }
 

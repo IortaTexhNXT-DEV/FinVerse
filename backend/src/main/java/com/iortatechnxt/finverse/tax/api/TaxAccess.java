@@ -1,6 +1,6 @@
 package com.iortatechnxt.finverse.tax.api;
 
-import org.springframework.http.ContentDisposition;
+import com.iortatechnxt.finverse.common.api.ContentDispositions;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +33,7 @@ final class TaxAccess {
   static ResponseEntity<byte[]> file(String fileName, String contentType, byte[] content) {
     return ResponseEntity.ok()
         .contentType(MediaType.parseMediaType(contentType))
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION,
-            ContentDisposition.attachment().filename(fileName).build().toString())
+        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(fileName))
         .body(content);
   }
 }

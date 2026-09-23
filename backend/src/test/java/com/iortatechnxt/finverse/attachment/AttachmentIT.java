@@ -126,7 +126,9 @@ class AttachmentIT {
         .andExpect(header().string("Content-Type", "image/png"))
         .andExpect(
             header()
-                .string("Content-Disposition", org.hamcrest.Matchers.containsString("logo.png")));
+                .string(
+                    "Content-Disposition",
+                    "attachment; filename=\"logo.png\"; filename*=UTF-8''logo.png"));
     mvc.perform(get("/api/v1/attachments?entityType=JournalBatch&entityId=ATT-3"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].fileName").value("logo.png"));

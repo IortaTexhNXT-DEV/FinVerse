@@ -1,12 +1,12 @@
 package com.iortatechnxt.finverse.journal.api;
 
+import com.iortatechnxt.finverse.common.api.ContentDispositions;
 import com.iortatechnxt.finverse.journal.service.JournalUploadService;
 import com.iortatechnxt.finverse.journal.service.JournalUploadTemplate;
 import com.iortatechnxt.finverse.journal.service.UploadResult;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDate;
-import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -78,9 +78,7 @@ public class JournalUploadController {
     String name = "journal-upload-template." + (excel ? "xlsx" : "csv");
     return ResponseEntity.ok()
         .contentType(MediaType.parseMediaType(excel ? XLSX : "text/csv"))
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION,
-            ContentDisposition.attachment().filename(name).build().toString())
+        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(name))
         .body(body);
   }
 

@@ -1,5 +1,6 @@
 package com.iortatechnxt.finverse.underwriting.service;
 
+import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.finverse.common.util.Money;
 import com.iortatechnxt.finverse.party.domain.Party;
 import com.iortatechnxt.finverse.underwriting.domain.Policy;
@@ -20,8 +21,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class PolicyPremiumCalculator {
 
+  private static final BigDecimal MAX_RATE = BigDecimal.valueOf(100);
+
   /**
-   * Commission % applicable to a policy.
+   * Commission % applicable to a policy: the rate entered on the policy (validated to 0–100 %),
+   * else the intermediary's rate, else the product's default rate. Preview, save and update all use
+   * this rule, so a saved draft carries exactly the commission its preview showed.
    *
    * @param product product
    * @param intermediary intermediary, null for direct business
@@ -33,6 +38,10 @@ public class PolicyPremiumCalculator {
       return BigDecimal.ZERO;
     }
     if (override != null) {
+      if (override.signum() < 0 || override.compareTo(MAX_RATE) > 0) {
+        throw new BusinessRuleException(
+            "INVALID_COMMISSION_RATE", "Commission must be between 0 and 100 %, not " + override);
+      }
       return override;
     }
     return intermediary.getCommissionRate() != null

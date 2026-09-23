@@ -236,4 +236,55 @@ class PolicyApprovalIT {
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("not authorized");
   }
+
+  @Test
+  void commissionOverrideIsSavedOnCreateAndUpdateLikeThePreviewShowsIt() {
+    Product fire = fx.product("FIRE", false);
+    PolicyRequest request = withCommission(fx.brokerRequest(fire), "7.5");
+    PremiumBreakdown preview = as.run("uw", () -> policies.preview(request));
+    Policy draft = as.run("uw", () -> policies.create(request));
+    assertThat(draft.getPremium().getCommissionRate()).isEqualByComparingTo("7.5");
+    assertThat(draft.getPremium().getCommission())
+        .isEqualByComparingTo(preview.getCommission())
+        .isEqualByComparingTo("7125.00");
+
+    Policy updated =
+        as.run("uw", () -> policies.update(draft.getId(), withCommission(request, "12")));
+    assertThat(updated.getPremium().getCommissionRate()).isEqualByComparingTo("12");
+    Policy reset =
+        as.run("uw", () -> policies.update(draft.getId(), withCommission(request, null)));
+    assertThat(reset.getPremium().getCommissionRate()).isEqualByComparingTo("20");
+
+    assertThatThrownBy(
+            () ->
+                as.run(
+                    "uw", () -> policies.update(draft.getId(), withCommission(request, "100.01"))))
+        .isInstanceOf(BusinessRuleException.class)
+        .hasMessageContaining("between 0 and 100");
+    assertThatThrownBy(() -> as.run("uw", () -> policies.create(withCommission(request, "-1"))))
+        .isInstanceOf(BusinessRuleException.class);
+  }
+
+  private static PolicyRequest withCommission(PolicyRequest r, String rate) {
+    return new PolicyRequest(
+        r.companyId(),
+        r.branchId(),
+        r.productId(),
+        r.customerCode(),
+        r.insuredName(),
+        r.sourceType(),
+        r.intermediaryCode(),
+        r.issueDate(),
+        r.periodFrom(),
+        r.periodTo(),
+        r.currency(),
+        r.businessType(),
+        r.sharePct(),
+        r.coinsurerCode(),
+        r.coinsuranceLeader(),
+        r.discountRate(),
+        r.loadingRate(),
+        rate == null ? null : new BigDecimal(rate),
+        r.risks());
+  }
 }

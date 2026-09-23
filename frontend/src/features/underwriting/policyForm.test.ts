@@ -25,6 +25,25 @@ describe('policy form', () => {
     expect(validatePolicy({ ...form, periodTo: '2026-01-01' })).toHaveLength(1);
   });
 
+  it('checks the commission override of intermediated business', () => {
+    const form = {
+      ...newPolicy(1, 2, '2026-03-10'),
+      productId: 5,
+      customerCode: 'C-000201',
+      insuredName: 'Luzon Steel',
+      sourceType: 'BROKER' as const,
+      intermediaryCode: 'B-0001',
+      risks: [{ description: 'Plant', sumInsured: 1000 }],
+    };
+    const message = 'Commission must be between 0 and 100 %';
+    expect(validatePolicy({ ...form, commissionRate: 12.5 })).toEqual([]);
+    expect(validatePolicy({ ...form, commissionRate: 100.5 })).toContain(message);
+    expect(validatePolicy({ ...form, commissionRate: -1 })).toContain(message);
+    expect(validatePolicy({ ...form, sourceType: 'DIRECT', commissionRate: 150 })).not.toContain(
+      message,
+    );
+  });
+
   it('normalizes dependent fields', () => {
     const form = {
       ...newPolicy(1, 2, '2026-03-10'),

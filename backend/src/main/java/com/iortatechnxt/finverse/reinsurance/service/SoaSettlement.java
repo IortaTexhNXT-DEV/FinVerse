@@ -92,17 +92,8 @@ public class SoaSettlement {
       throw new BusinessRuleException(
           "NOTHING_TO_SETTLE", "Statement " + soa.getSoaNo() + " has no outstanding items");
     }
-    BigDecimal premiumSide = Money.zero();
-    BigDecimal recoverySide = Money.zero();
-    for (OpenItem i : items) {
-      BigDecimal signed =
-          i.getDirection() == ItemDirection.CREDIT ? i.outstanding() : i.outstanding().negate();
-      if (i.getDocumentType().startsWith(ReinsuranceAccounting.RECOVERY_DOCUMENT)) {
-        recoverySide = recoverySide.subtract(signed);
-      } else {
-        premiumSide = premiumSide.add(signed);
-      }
-    }
+    BigDecimal premiumSide = side(items, false);
+    BigDecimal recoverySide = side(items, true).negate();
     BigDecimal net = premiumSide.subtract(recoverySide);
     Long partyId = soa.getParty().getId();
     String ref = "RI:SOA:" + soa.getSoaNo();
@@ -120,6 +111,24 @@ public class SoaSettlement {
     }
     match(items, ctx);
     return batch;
+  }
+
+  /**
+   * Outstanding balance of the premium side (due to reinsurers) or of the recovery side (amounts
+   * recoverable), signed CREDIT positive.
+   */
+  private static BigDecimal side(List<OpenItem> items, boolean recoveries) {
+    return items.stream()
+        .filter(
+            i ->
+                i.getDocumentType().startsWith(ReinsuranceAccounting.RECOVERY_DOCUMENT)
+                    == recoveries)
+        .map(
+            i ->
+                i.getDirection() == ItemDirection.CREDIT
+                    ? i.outstanding()
+                    : i.outstanding().negate())
+        .reduce(Money.zero(), BigDecimal::add);
   }
 
   private void match(List<OpenItem> items, PostingContext ctx) {

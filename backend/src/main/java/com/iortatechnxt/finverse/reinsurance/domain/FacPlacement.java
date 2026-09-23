@@ -106,7 +106,7 @@ public class FacPlacement extends BaseEntity {
   @Fetch(FetchMode.SUBSELECT)
   @CollectionTable(name = "ri_fac_participant", joinColumns = @JoinColumn(name = "placement_id"))
   @OrderBy("lineNo")
-  private List<FacParticipant> participants = new ArrayList<>();
+  private final List<FacParticipant> participants = new ArrayList<>();
 
   /** For JPA. */
   protected FacPlacement() {}

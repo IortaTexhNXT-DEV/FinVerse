@@ -92,7 +92,7 @@ public class Cession extends BaseEntity {
 
   @OneToMany(mappedBy = "cession", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("riskLineNo, layer, id")
-  private List<CessionLine> lines = new ArrayList<>();
+  private final List<CessionLine> lines = new ArrayList<>();
 
   /** For JPA. */
   protected Cession() {}

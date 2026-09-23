@@ -75,7 +75,7 @@ public class RiClaimMovement extends BaseEntity {
 
   @OneToMany(mappedBy = "movement", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("id")
-  private List<RiClaimShare> shares = new ArrayList<>();
+  private final List<RiClaimShare> shares = new ArrayList<>();
 
   /** For JPA. */
   protected RiClaimMovement() {}

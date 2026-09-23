@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -128,11 +129,12 @@ public class AllocationRunService {
   }
 
   private void cedeAll(Long companyId, LocalDate from, LocalDate to, RunTally tally) {
-    List<PremiumTransaction> pending = readOnly.execute(s -> pending(companyId, from, to));
-    for (PremiumTransaction txn : pending == null ? List.<PremiumTransaction>of() : pending) {
+    List<PremiumTransaction> pending =
+        Objects.requireNonNullElse(readOnly.execute(s -> pending(companyId, from, to)), List.of());
+    for (PremiumTransaction txn : pending) {
       try {
-        Cession c = perTransaction.execute(s -> cessionService.cede(txn));
-        tally.success(c);
+        tally.success(
+            Objects.requireNonNull(perTransaction.execute(s -> cessionService.cede(txn))));
       } catch (RuntimeException ex) {
         tally.failure(txn.documentNo() + ": " + ex.getMessage());
       }

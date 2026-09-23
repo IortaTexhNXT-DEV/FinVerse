@@ -19,6 +19,7 @@ import com.iortatechnxt.finverse.reinsurance.domain.Treaty;
 import com.iortatechnxt.finverse.reinsurance.domain.TreatyParticipant;
 import com.iortatechnxt.finverse.reinsurance.domain.TreatyType;
 import java.time.Clock;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -134,26 +135,25 @@ public class SoaService {
       throw new BusinessRuleException(
           "TREATY_NOT_ACTIVE", "Treaty " + r.treatyCode() + " is not authorized");
     }
-    SoaPeriod period =
-        new SoaPeriod(
-            r.year(),
-            r.quarter(),
-            r.statementDate() != null
-                ? r.statementDate()
-                : new SoaPeriod(r.year(), r.quarter(), null).to().plusDays(1));
+    SoaPeriod period = period(r);
     boolean single = r.reinsurerCode() != null && !r.reinsurerCode().isBlank();
     List<Soa> out = new ArrayList<>();
-    for (TreatyParticipant p : treaty.getParticipants()) {
-      if (single && !p.getParty().getCode().equals(r.reinsurerCode())) {
-        continue;
-      }
-      generateOne(treaty, p, period, single).ifPresent(out::add);
-    }
+    treaty.getParticipants().stream()
+        .filter(p -> !single || p.getParty().getCode().equals(r.reinsurerCode()))
+        .forEach(p -> generateOne(treaty, p, period, single).ifPresent(out::add));
     if (single && out.isEmpty()) {
       throw new BusinessRuleException(
           "SOA_PARTICIPANT", r.reinsurerCode() + " does not participate in " + r.treatyCode());
     }
     return out;
+  }
+
+  private static SoaPeriod period(SoaRequest r) {
+    LocalDate date =
+        r.statementDate() != null
+            ? r.statementDate()
+            : new SoaPeriod(r.year(), r.quarter(), null).to().plusDays(1);
+    return new SoaPeriod(r.year(), r.quarter(), date);
   }
 
   private Optional<Soa> generateOne(

@@ -89,9 +89,6 @@ public class Treaty extends AuthorizableEntity {
   @Column(name = "loss_reserve_pct", nullable = false, precision = 19, scale = 8)
   private BigDecimal lossReservePct;
 
-  @Column(name = "statement_frequency", nullable = false, length = 10)
-  private String statementFrequency = QUARTERLY;
-
   @ManyToOne
   @JoinColumn(name = "broker_party_id")
   private Party broker;
@@ -100,13 +97,13 @@ public class Treaty extends AuthorizableEntity {
   @Fetch(FetchMode.SUBSELECT)
   @CollectionTable(name = "ri_treaty_participant", joinColumns = @JoinColumn(name = "treaty_id"))
   @OrderBy("lineNo")
-  private List<TreatyParticipant> participants = new ArrayList<>();
+  private final List<TreatyParticipant> participants = new ArrayList<>();
 
   @ElementCollection(fetch = FetchType.EAGER)
   @Fetch(FetchMode.SUBSELECT)
   @CollectionTable(name = "ri_treaty_layer", joinColumns = @JoinColumn(name = "treaty_id"))
   @OrderBy("layerNo")
-  private List<TreatyLayer> layers = new ArrayList<>();
+  private final List<TreatyLayer> layers = new ArrayList<>();
 
   /** For JPA. */
   protected Treaty() {}
@@ -285,8 +282,14 @@ public class Treaty extends AuthorizableEntity {
     return lossReservePct;
   }
 
+  /**
+   * Statement frequency (column {@code statement_frequency}, database default QUARTERLY; the only
+   * frequency supported).
+   *
+   * @return QUARTERLY
+   */
   public String getStatementFrequency() {
-    return statementFrequency;
+    return QUARTERLY;
   }
 
   public Party getBroker() {

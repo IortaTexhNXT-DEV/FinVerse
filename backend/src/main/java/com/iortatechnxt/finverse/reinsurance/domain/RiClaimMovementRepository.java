@@ -55,4 +55,16 @@ public interface RiClaimMovementRepository extends JpaRepository<RiClaimMovement
   @EntityGraph(attributePaths = "shares")
   List<RiClaimMovement> findByCompanyIdAndMovementTypeInAndMovementDateLessThanEqual(
       Long companyId, Collection<ClaimMovementType> types, LocalDate asOf);
+
+  /**
+   * Movements of claims with a loss date in a period, with their shares.
+   *
+   * @param companyId company
+   * @param from first loss date
+   * @param to last loss date
+   * @return movements
+   */
+  @EntityGraph(attributePaths = "shares")
+  List<RiClaimMovement> findByCompanyIdAndLossDateBetweenOrderByClaimNoAscIdAsc(
+      Long companyId, LocalDate from, LocalDate to);
 }

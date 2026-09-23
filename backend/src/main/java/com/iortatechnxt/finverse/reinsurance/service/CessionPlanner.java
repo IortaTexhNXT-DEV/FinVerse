@@ -141,7 +141,7 @@ public class CessionPlanner {
       RiskSnapshot r = risks.get(i);
       BigDecimal ourSi = AllocationMath.proportion(r.sumInsured(), h.sharePct(), HUNDRED);
       RiskRef risk = new RiskRef(r.id(), r.lineNo(), r.description(), ourSi, premiums.get(i));
-      out.addAll(allocateRisk(risk, programme));
+      out.addAll(allocateRisk(risk, programme, h.exchangeRate()));
     }
     return out;
   }
@@ -149,12 +149,14 @@ public class CessionPlanner {
   /**
    * Allocates one risk on a programme.
    *
-   * @param risk risk (company sum insured and premium)
-   * @param programme treaty programme
+   * @param risk risk (company sum insured and premium, policy currency)
+   * @param programme treaty programme (limits in base currency)
+   * @param rate exchange rate of the policy currency to the base currency
    * @return planned shares, the retention first
    */
-  static List<PlannedLine> allocateRisk(RiskRef risk, TreatyProgramme programme) {
-    SiSplit split = AllocationMath.split(risk.ourSi().max(Money.zero()), programme.capacity());
+  static List<PlannedLine> allocateRisk(RiskRef risk, TreatyProgramme programme, BigDecimal rate) {
+    SiSplit split =
+        AllocationMath.split(risk.ourSi().max(Money.zero()), programme.capacity().inCurrency(rate));
     BigDecimal si = risk.ourSi().max(Money.zero());
     List<PlannedLine> ceded = new ArrayList<>();
     ceded.addAll(treatyShares(risk, programme.quotaShare(), split.quotaShare(), si));

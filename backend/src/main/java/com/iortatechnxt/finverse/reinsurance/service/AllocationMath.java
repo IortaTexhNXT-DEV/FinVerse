@@ -141,6 +141,20 @@ public final class AllocationMath {
     public static final Capacity NONE = new Capacity(BigDecimal.ZERO, null, 0);
 
     /**
+     * The same capacity expressed in another currency (treaty limits are in the base currency).
+     *
+     * @param rate base currency units per unit of the other currency
+     * @return capacity with the line converted
+     */
+    public Capacity inCurrency(BigDecimal rate) {
+      if (line == null || rate.compareTo(BigDecimal.ONE) == 0) {
+        return this;
+      }
+      return new Capacity(
+          quotaShareFraction, line.divide(rate, Money.SCALE, RoundingMode.HALF_EVEN), surplusLines);
+    }
+
+    /**
      * Total sum insured the treaties can absorb per risk.
      *
      * @return line x (1 + lines), null when unlimited

@@ -100,6 +100,7 @@ public class SecurityConfig {
                 a.requestMatchers(HttpMethod.POST, "/api/v1/auth/login")
                     .permitAll()
                     .requestMatchers(
+                        "/error",
                         "/actuator/health/**",
                         "/actuator/info",
                         "/v3/api-docs/**",

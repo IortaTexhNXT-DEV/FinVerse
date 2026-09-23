@@ -5,6 +5,7 @@ import com.iortatechnxt.finverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.finverse.common.exception.ResourceNotFoundException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -126,6 +127,26 @@ public class GlobalExceptionHandler {
   public ProblemDetail handleAccessDenied(AccessDeniedException ex) {
     return problem(
         HttpStatus.FORBIDDEN, "ACCESS_DENIED", "You are not permitted to perform this action");
+  }
+
+  /**
+   * Last-resort handler: logs the failure with a reference the user can quote to support and
+   * returns a generic message (internal details are never exposed to clients).
+   *
+   * @param ex exception
+   * @return problem detail (500)
+   */
+  @ExceptionHandler(Exception.class)
+  public ProblemDetail handleUnexpected(Exception ex) {
+    String reference = UUID.randomUUID().toString();
+    LOG.error("Unexpected error, reference {}", reference, ex);
+    ProblemDetail pd =
+        problem(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "INTERNAL_ERROR",
+            "An unexpected error occurred. Quote reference " + reference + " to support.");
+    pd.setProperty("reference", reference);
+    return pd;
   }
 
   private static ProblemDetail problem(HttpStatus status, String code, String detail) {

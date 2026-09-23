@@ -3,6 +3,8 @@ package com.iortatechnxt.finverse.coa.domain;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.EntityGraph.EntityGraphType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,11 +13,35 @@ import org.springframework.data.repository.query.Param;
 public interface GlAccountRepository extends JpaRepository<GlAccount, Long> {
 
   /**
+   * Associations always needed when an account is shown, loaded in the same query. LOAD semantics
+   * keep the default (eager) fetching of the restriction sets.
+   */
+  String PARENT = "parent";
+
+  /** See {@link #PARENT}. */
+  String CATEGORY = "category";
+
+  /**
+   * Finds an account with its parent and category.
+   *
+   * @param id id
+   * @return account if present
+   */
+  @Override
+  @EntityGraph(
+      attributePaths = {PARENT, CATEGORY},
+      type = EntityGraphType.LOAD)
+  Optional<GlAccount> findById(Long id);
+
+  /**
    * Lists the chart of accounts of a company ordered by code.
    *
    * @param companyId company id
    * @return accounts
    */
+  @EntityGraph(
+      attributePaths = {PARENT, CATEGORY},
+      type = EntityGraphType.LOAD)
   List<GlAccount> findByCompanyIdOrderByCode(Long companyId);
 
   /**
@@ -25,6 +51,9 @@ public interface GlAccountRepository extends JpaRepository<GlAccount, Long> {
    * @param code account code
    * @return account if present
    */
+  @EntityGraph(
+      attributePaths = {PARENT, CATEGORY},
+      type = EntityGraphType.LOAD)
   Optional<GlAccount> findByCompanyIdAndCode(Long companyId, String code);
 
   /**
@@ -60,6 +89,9 @@ public interface GlAccountRepository extends JpaRepository<GlAccount, Long> {
    * @param term search term
    * @return up to the matching accounts, ordered by code
    */
+  @EntityGraph(
+      attributePaths = {PARENT, CATEGORY},
+      type = EntityGraphType.LOAD)
   @Query(
       """
       select a from GlAccount a

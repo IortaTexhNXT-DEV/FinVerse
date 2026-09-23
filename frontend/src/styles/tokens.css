@@ -1,0 +1,53 @@
+/*
+ * iNXT FinVerse design tokens.
+ * Palette follows the BDO Insure visual language: deep BDO blue/navy with a gold accent on
+ * clean white surfaces. Change brand colours here only; components use the tokens.
+ */
+:root {
+  --brand-navy: #00205b;
+  --brand-blue: #0033a0;
+  --brand-blue-600: #1a4bb0;
+  --brand-blue-050: #e8eef8;
+  --brand-gold: #fdb913;
+  --brand-gold-600: #e0a100;
+  --brand-gold-050: #fff6dc;
+
+  --color-bg: #f4f6fa;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f8fafd;
+  --color-text: #1a2433;
+  --color-text-muted: #5b6475;
+  --color-border: #dde3ec;
+  --color-border-strong: #c3ccda;
+
+  --color-success: #1e7e34;
+  --color-success-bg: #e6f4ea;
+  --color-danger: #c62828;
+  --color-danger-bg: #fdecea;
+  --color-warning: #9a5b00;
+  --color-warning-bg: #fff4e0;
+  --color-info: #0b63ce;
+  --color-info-bg: #e7f0fd;
+
+  --font-heading: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Open Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgba(0, 32, 91, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 32, 91, 0.08);
+  --shadow-lg: 0 12px 32px rgba(0, 32, 91, 0.14);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --header-height: 64px;
+  --sidebar-width: 264px;
+  --focus-ring: 0 0 0 3px rgba(253, 185, 19, 0.55);
+}

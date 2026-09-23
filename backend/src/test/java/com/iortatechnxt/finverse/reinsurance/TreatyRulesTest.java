@@ -98,7 +98,8 @@ class TreatyRulesTest {
   void excessOfLossNeedsALayer() {
     Treaty xol = new Treaty(1L, "XL", terms(TreatyType.XOL, null, null, null));
     assertThatThrownBy(
-            () -> xol.define(terms(TreatyType.XOL, null, null, null), null, shares("100"), List.of()))
+            () ->
+                xol.define(terms(TreatyType.XOL, null, null, null), null, shares("100"), List.of()))
         .hasMessageContaining("layer");
     TreatyLayer layer =
         new TreatyLayer(1, new BigDecimal("500000"), new BigDecimal("1000000"), null, 2);

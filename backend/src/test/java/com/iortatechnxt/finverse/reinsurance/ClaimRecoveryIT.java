@@ -52,7 +52,12 @@ class ClaimRecoveryIT {
   @Autowired private JdbcTemplate jdbc;
 
   private ClaimMovement movement(
-      Policy policy, long claimId, String lob, int lossYear, ClaimMovementType type, String amount) {
+      Policy policy,
+      long claimId,
+      String lob,
+      int lossYear,
+      ClaimMovementType type,
+      String amount) {
     BigDecimal value = new BigDecimal(amount);
     return new ClaimMovement(
         fx.companyId(),
@@ -87,12 +92,13 @@ class ClaimRecoveryIT {
   @Test
   void proportionalSharesOfReservesPaymentsAndSalvage() {
     int year = 2033;
-    fx.authorized(fx.quotaShare("TQS33", "FIRE", year, "40", null));
-    fx.authorized(fx.surplus("TSP33", "FIRE", year, "25000000", 3));
+    RiFixtures.Reinsurers ri = fx.reinsurers();
+    fx.authorized(fx.quotaShare(ri, "TQS33", "FIRE", year, "40", null));
+    fx.authorized(fx.surplus(ri, "TSP33", "FIRE", year, "25000000", 3));
     Policy policy =
         fx.policy(fx.product("FIRE"), year, "PHP", List.of(fx.risk("120000000", "240000")));
     as.run(MAKER, () -> cessions.cedePolicy(policy.getId()));
-    placeFacultative(policy);
+    placeFacultative(ri, policy);
     long claim = CLAIM_IDS.incrementAndGet();
 
     ClaimMovement reserve =
@@ -121,7 +127,7 @@ class ClaimRecoveryIT {
     assertThat(paid.ceded()).isEqualByComparingTo("495000");
     assertThat(paid.getNetRetained()).isEqualByComparingTo("105000");
     assertThat(fx.posted("1205", "RI:CLM:" + paid.getId())).isEqualByComparingTo("495000.00");
-    Long r1 = partyId("R-0001");
+    Long r1 = partyId(ri.lead());
     assertThat(
             openItems.partyItems(fx.companyId(), r1).stream()
                 .filter(i -> i.getSourceReference().startsWith("RI:CLM:" + paid.getId() + ":"))
@@ -146,7 +152,7 @@ class ClaimRecoveryIT {
     assertThat(recoveries.catchUp(fx.companyId(), MOVED, MOVED)).isZero();
   }
 
-  private void placeFacultative(Policy policy) {
+  private void placeFacultative(RiFixtures.Reinsurers ri, Policy policy) {
     Long cessionId = cessions.ofPolicy(policy.getId()).get(0).getId();
     Long id =
         placements.list(fx.companyId(), FacStatus.PROVISIONAL).stream()
@@ -160,7 +166,7 @@ class ClaimRecoveryIT {
             placements.assign(
                 id,
                 new FacAssignRequest(
-                    List.of(new FacAssignRequest.Line("R-0004", new BigDecimal("70"), null)),
+                    List.of(new FacAssignRequest.Line(ri.fac(), new BigDecimal("70"), null)),
                     null)));
     as.run(MAKER, () -> placements.submit(id));
     as.run(CHECKER, () -> placements.approve(id, RiFixtures.APPROVAL));
@@ -170,11 +176,13 @@ class ClaimRecoveryIT {
   @Test
   void excessOfLossRecoversAbovePriorityWithinLimitAndAggregate() {
     int year = 2032;
-    fx.authorized(fx.excessOfLoss("TXL32", "MOTOR", year, "500000", "2000000"));
-    Policy motor = fx.policy(fx.product("MOTOR"), year, "PHP", List.of(fx.risk("3000000", "30000")));
+    fx.authorized(fx.excessOfLoss(fx.reinsurers(), "TXL32", "MOTOR", year, "500000", "2000000"));
+    Policy motor =
+        fx.policy(fx.product("MOTOR"), year, "PHP", List.of(fx.risk("3000000", "30000")));
     long claim = CLAIM_IDS.incrementAndGet();
 
-    ClaimMovement first = movement(motor, claim, "MOTOR", year, ClaimMovementType.PAYMENT, "900000");
+    ClaimMovement first =
+        movement(motor, claim, "MOTOR", year, ClaimMovementType.PAYMENT, "900000");
     listener.onClaimMovement(first);
     RiClaimMovement one = processed(first);
     assertThat(one.getCessionId()).isNull();
@@ -186,7 +194,8 @@ class ClaimRecoveryIT {
     listener.onClaimMovement(second);
     assertThat(layer(processed(second), RiLayer.XOL)).isEqualByComparingTo("1600000");
 
-    ClaimMovement third = movement(motor, claim, "MOTOR", year, ClaimMovementType.PAYMENT, "100000");
+    ClaimMovement third =
+        movement(motor, claim, "MOTOR", year, ClaimMovementType.PAYMENT, "100000");
     listener.onClaimMovement(third);
     assertThat(layer(processed(third), RiLayer.XOL)).isZero();
 

@@ -58,7 +58,8 @@ class AllocationMathTest {
   @Test
   void quotaShareLimitSendsTheExcessToFacultative() {
     SiSplit s =
-        AllocationMath.split(bd("40000000"), new Capacity(new BigDecimal("0.5"), bd("30000000"), 0));
+        AllocationMath.split(
+            bd("40000000"), new Capacity(new BigDecimal("0.5"), bd("30000000"), 0));
 
     assertThat(s.quotaShare()).isEqualByComparingTo("15000000");
     assertThat(s.retention()).isEqualByComparingTo("15000000");
@@ -141,7 +142,7 @@ class AllocationMathTest {
     assertThat(layout.total()).isEqualByComparingTo("1084.00");
     assertThat(layout.lines()).hasSize(10);
     assertThat(layout.amountInWords())
-        .isEqualTo("Philippine Peso Four Hundred Forty Nine and 00/100 only");
+        .isEqualTo("Philippine Peso Four Hundred Forty-Nine and 00/100 only");
 
     SoaFigures dueFrom =
         new SoaFigures(

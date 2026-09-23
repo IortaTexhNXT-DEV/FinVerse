@@ -161,17 +161,14 @@ class ReinsuranceReportsIT {
     long all = details(reports.run("PGIR0637", params()));
     long fire = details(reports.run("PGIR0637", params("businessLine", "FIRE")));
     long facOnly = details(reports.run("PGIR0637", params("treatyType", "FAC")));
-    long provisional =
-        details(reports.run("PGIR0637", params("allocationStatus", "PROVISIONAL")));
+    long provisional = details(reports.run("PGIR0637", params("allocationStatus", "PROVISIONAL")));
     long allocated = details(reports.run("PGIR0637", params("allocationStatus", "ALLOCATED")));
     assertThat(fire).isPositive().isLessThan(all);
     assertThat(facOnly).isPositive().isLessThan(all);
     assertThat(provisional + allocated).isEqualTo(all);
     assertThat(
             details(
-                reports.run(
-                    "RI-BDX",
-                    params("treatyCode", "FIRE-SP-26", "bordereau", "CLAIMS"))))
+                reports.run("RI-BDX", params("treatyCode", "FIRE-SP-26", "bordereau", "CLAIMS"))))
         .isNotNegative();
     assertThat(
             details(

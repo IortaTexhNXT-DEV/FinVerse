@@ -24,23 +24,39 @@ class ReinsuranceApiIT {
   @Autowired private Api api;
   @Autowired private RiFixtures fx;
 
+  private RiFixtures.Reinsurers ri;
+
   private Map<String, Object> treaty(String code) {
+    if (ri == null) {
+      ri = fx.reinsurers();
+    }
     return Json.of(
-        "companyId", fx.companyId(),
-        "code", code,
-        "name", "API quota share " + YEAR,
-        "treatyType", "QUOTA_SHARE",
-        "businessLine", "FIRE",
-        "uwYear", YEAR,
-        "periodFrom", YEAR + "-01-01",
-        "periodTo", YEAR + "-12-31",
-        "currency", "PHP",
-        "quotaSharePct", 30,
-        "levyPct", 1,
+        "companyId",
+        fx.companyId(),
+        "code",
+        code,
+        "name",
+        "API quota share " + YEAR,
+        "treatyType",
+        "QUOTA_SHARE",
+        "businessLine",
+        "FIRE",
+        "uwYear",
+        YEAR,
+        "periodFrom",
+        YEAR + "-01-01",
+        "periodTo",
+        YEAR + "-12-31",
+        "currency",
+        "PHP",
+        "quotaSharePct",
+        30,
+        "levyPct",
+        1,
         "participants",
-            List.of(
-                Json.of("reinsurerCode", "R-0001", "sharePct", 70, "commissionPct", 30),
-                Json.of("reinsurerCode", "R-0004", "sharePct", 30, "commissionPct", 30)));
+        List.of(
+            Json.of("reinsurerCode", ri.lead(), "sharePct", 70, "commissionPct", 30),
+            Json.of("reinsurerCode", ri.follow(), "sharePct", 30, "commissionPct", 30)));
   }
 
   @Test
@@ -77,7 +93,11 @@ class ReinsuranceApiIT {
         api.read(
             api.doGet(
                     RiFixtures.MAKER,
-                    BASE + "/cessions?companyId=" + fx.companyId() + "&policyNo=" + policy.getPolicyNo())
+                    BASE
+                        + "/cessions?companyId="
+                        + fx.companyId()
+                        + "&policyNo="
+                        + policy.getPolicyNo())
                 .andExpect(status().isOk()));
     assertThat(cessions).hasSize(1);
     api.doGet(RiFixtures.MAKER, BASE + "/cessions/" + cessions.get(0).get("id").asLong())
@@ -94,11 +114,16 @@ class ReinsuranceApiIT {
                     RiFixtures.MAKER,
                     BASE + "/soas",
                     Json.of(
-                        "companyId", fx.companyId(),
-                        "treatyCode", "API-QS-37",
-                        "reinsurerCode", "R-0004",
-                        "year", 2026,
-                        "quarter", 1))
+                        "companyId",
+                        fx.companyId(),
+                        "treatyCode",
+                        "API-QS-37",
+                        "reinsurerCode",
+                        ri.follow(),
+                        "year",
+                        2026,
+                        "quarter",
+                        1))
                 .andExpect(status().isOk()));
     long soaId = soas.get(0).get("id").asLong();
     api.doGet(RiFixtures.MAKER, BASE + "/soas/" + soaId)
@@ -136,15 +161,16 @@ class ReinsuranceApiIT {
     Policy policy =
         fx.policy(fx.product("FIRE"), 2038, "PHP", List.of(fx.risk("5000000", "10000")));
     String period = "companyId=" + fx.companyId() + "&from=2026-03-10&to=2026-03-10";
-    api.doGet(RiFixtures.MAKER, BASE + "/allocation/preview?" + period)
-        .andExpect(status().isOk());
+    api.doGet(RiFixtures.MAKER, BASE + "/allocation/preview?" + period).andExpect(status().isOk());
     api.doPost(
             RiFixtures.MAKER,
             BASE + "/allocation/runs",
             Json.of("companyId", fx.companyId(), "fromDate", "2026-03-10", "toDate", "2026-03-10"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("SUCCEEDED"));
-    api.doGet(RiFixtures.MAKER, BASE + "/cessions?companyId=" + fx.companyId() + "&from=2026-03-10&to=2026-03-10")
+    api.doGet(
+            RiFixtures.MAKER,
+            BASE + "/cessions?companyId=" + fx.companyId() + "&from=2026-03-10&to=2026-03-10")
         .andExpect(status().isOk());
 
     JsonNode provisional =
@@ -167,15 +193,21 @@ class ReinsuranceApiIT {
             BASE + "/fac-placements/" + id + "/participants",
             Json.of(
                 "participants",
-                List.of(Json.of("reinsurerCode", "R-0003", "sharePct", 100, "commissionPct", 10))))
+                List.of(Json.of("reinsurerCode", ri.fac(), "sharePct", 100, "commissionPct", 10))))
         .andExpect(status().isOk());
     api.doPost(RiFixtures.MAKER, BASE + "/fac-placements/" + id + "/submit", null)
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("PENDING_APPROVAL"));
-    api.doPost(RiFixtures.CHECKER, BASE + "/fac-placements/" + id + "/approve", Json.of("date", "2026-03-31"))
+    api.doPost(
+            RiFixtures.CHECKER,
+            BASE + "/fac-placements/" + id + "/approve",
+            Json.of("date", "2026-03-31"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("PLACED"));
-    api.doPost(RiFixtures.MAKER, BASE + "/fac-placements/" + id + "/close", null)
+    api.doPost(
+            RiFixtures.MAKER,
+            BASE + "/fac-placements/" + id + "/close",
+            Json.of("date", "2026-04-30"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("CLOSED"));
     api.doGet(RiFixtures.MAKER, BASE + "/fac-placements/" + id).andExpect(status().isOk());
@@ -187,7 +219,10 @@ class ReinsuranceApiIT {
   void claimSharesAreListedAndCaughtUp() throws Exception {
     api.doGet(
             RiFixtures.MAKER,
-            BASE + "/claims/movements?companyId=" + fx.companyId() + "&from=2026-01-01&to=2026-12-31")
+            BASE
+                + "/claims/movements?companyId="
+                + fx.companyId()
+                + "&from=2026-01-01&to=2026-12-31")
         .andExpect(status().isOk());
     api.doPost(
             RiFixtures.MAKER,

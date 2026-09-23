@@ -1,5 +1,6 @@
 package com.iortatechnxt.finverse.reinsurance;
 
+import com.iortatechnxt.finverse.party.domain.PartyType;
 import com.iortatechnxt.finverse.reinsurance.api.dto.TreatyRequest;
 import com.iortatechnxt.finverse.reinsurance.api.dto.TreatyRequest.LayerRequest;
 import com.iortatechnxt.finverse.reinsurance.api.dto.TreatyRequest.ParticipantRequest;
@@ -8,6 +9,7 @@ import com.iortatechnxt.finverse.reinsurance.domain.TreatyType;
 import com.iortatechnxt.finverse.reinsurance.service.TreatyService;
 import com.iortatechnxt.finverse.support.AsUser;
 import com.iortatechnxt.finverse.support.TestData;
+import com.iortatechnxt.finverse.support.TestParties;
 import com.iortatechnxt.finverse.underwriting.UwFixtures;
 import com.iortatechnxt.finverse.underwriting.api.dto.EndorsementRequest;
 import com.iortatechnxt.finverse.underwriting.api.dto.PolicyRequest;
@@ -51,6 +53,7 @@ public class RiFixtures {
   private final AsUser as;
   private final TestData data;
   private final JdbcTemplate jdbc;
+  private final TestParties parties;
 
   RiFixtures(
       UwFixtures uw,
@@ -59,7 +62,8 @@ public class RiFixtures {
       EndorsementService endorsements,
       AsUser as,
       TestData data,
-      JdbcTemplate jdbc) {
+      JdbcTemplate jdbc,
+      TestParties parties) {
     this.uw = uw;
     this.treaties = treaties;
     this.approvals = approvals;
@@ -67,6 +71,7 @@ public class RiFixtures {
     this.as = as;
     this.data = data;
     this.jdbc = jdbc;
+    this.parties = parties;
   }
 
   public Long companyId() {
@@ -137,28 +142,48 @@ public class RiFixtures {
     return as.run(CHECKER, () -> treaties.authorize(draft.getId()));
   }
 
-  public TreatyRequest quotaShare(String code, String lob, int year, String pct, String limit) {
-    return request(
-        code, TreatyType.QUOTA_SHARE, lob, year, new Terms(pct, limit, null, null), List.of());
+  /** Fresh reinsurers (a lead, a follower and a facultative market) with no other open items. */
+  public Reinsurers reinsurers() {
+    return new Reinsurers(
+        parties.create(PartyType.REINSURER).getCode(),
+        parties.create(PartyType.REINSURER).getCode(),
+        parties.create(PartyType.REINSURER).getCode());
   }
 
-  public TreatyRequest surplus(String code, String lob, int year, String retention, int lines) {
+  public TreatyRequest quotaShare(
+      Reinsurers r, String code, String lob, int year, String pct, String limit) {
     return request(
-        code, TreatyType.SURPLUS, lob, year, new Terms(null, null, retention, lines), List.of());
+        r, code, TreatyType.QUOTA_SHARE, lob, year, new Terms(pct, limit, null, null), List.of());
   }
 
-  public TreatyRequest excessOfLoss(String code, String lob, int year, String priority, String limit) {
+  public TreatyRequest surplus(
+      Reinsurers r, String code, String lob, int year, String retention, int lines) {
     return request(
+        r, code, TreatyType.SURPLUS, lob, year, new Terms(null, null, retention, lines), List.of());
+  }
+
+  public TreatyRequest excessOfLoss(
+      Reinsurers r, String code, String lob, int year, String priority, String limit) {
+    return request(
+        r,
         code,
         TreatyType.XOL,
         lob,
         year,
         new Terms(null, null, null, null),
-        List.of(new LayerRequest(new BigDecimal(priority), new BigDecimal(limit), new BigDecimal("400000"), 0)));
+        List.of(
+            new LayerRequest(
+                new BigDecimal(priority), new BigDecimal(limit), new BigDecimal("400000"), 0)));
   }
 
   private TreatyRequest request(
-      String code, TreatyType type, String lob, int year, Terms t, List<LayerRequest> layers) {
+      Reinsurers r,
+      String code,
+      TreatyType type,
+      String lob,
+      int year,
+      Terms t,
+      List<LayerRequest> layers) {
     return new TreatyRequest(
         companyId(),
         code,
@@ -179,9 +204,13 @@ public class RiFixtures {
         null,
         List.of(
             new ParticipantRequest(
-                "R-0001", new BigDecimal("60"), new BigDecimal("30"), BigDecimal.ZERO, BigDecimal.ZERO),
+                r.lead(),
+                new BigDecimal("60"),
+                new BigDecimal("30"),
+                BigDecimal.ZERO,
+                BigDecimal.ZERO),
             new ParticipantRequest(
-                "R-0003",
+                r.follow(),
                 new BigDecimal("40"),
                 new BigDecimal("25"),
                 BigDecimal.ZERO,
@@ -205,6 +234,15 @@ public class RiFixtures {
             referencePrefix + "%");
     return value.setScale(2, RoundingMode.HALF_EVEN);
   }
+
+  /**
+   * Fresh reinsurer codes of a test.
+   *
+   * @param lead 60 % treaty participant (30 % commission, no premium reserve)
+   * @param follow 40 % treaty participant (25 % commission, 20 % premium reserve)
+   * @param fac facultative market
+   */
+  public record Reinsurers(String lead, String follow, String fac) {}
 
   /** Numeric treaty terms of a test treaty. */
   private record Terms(String pct, String limit, String retention, Integer lines) {}

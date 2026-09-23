@@ -13,6 +13,7 @@ import com.iortatechnxt.finverse.insurance.ClaimMovementListener;
 import com.iortatechnxt.finverse.insurance.ClaimMovementType;
 import com.iortatechnxt.finverse.reinsurance.api.dto.SettlementRequest;
 import com.iortatechnxt.finverse.reinsurance.api.dto.SoaRequest;
+import com.iortatechnxt.finverse.reinsurance.api.dto.TreatyRequest;
 import com.iortatechnxt.finverse.reinsurance.domain.FacStatus;
 import com.iortatechnxt.finverse.reinsurance.domain.Soa;
 import com.iortatechnxt.finverse.reinsurance.domain.SoaFigures;
@@ -61,14 +62,15 @@ class StatementOfAccountIT {
 
   @Test
   void quarterlyStatementIsApprovedAndSettledAgainstOpenItems() {
-    Treaty qs = fx.authorized(fx.quotaShare("TQS34", "FIRE", YEAR, "40", "50000000"));
+    RiFixtures.Reinsurers ri = fx.reinsurers();
+    Treaty qs = fx.authorized(fx.quotaShare(ri, "TQS34", "FIRE", YEAR, "40", "50000000"));
     Policy policy =
         fx.policy(fx.product("FIRE"), YEAR, "PHP", List.of(fx.risk("120000000", "240000")));
     as.run(MAKER, () -> cessions.cedePolicy(policy.getId()));
     listener.onClaimMovement(claim(policy, ClaimMovementType.RESERVE_CHANGE, "300000"));
     listener.onClaimMovement(claim(policy, ClaimMovementType.PAYMENT, "120000"));
 
-    SoaRequest q1 = new SoaRequest(fx.companyId(), "TQS34", "R-0003", 2026, 1, null);
+    SoaRequest q1 = new SoaRequest(fx.companyId(), "TQS34", ri.follow(), 2026, 1, null);
     Soa soa = as.run(MAKER, () -> statements.generate(q1)).get(0);
     SoaFigures f = soa.figures();
     assertThat(soa.getStatementDate()).isEqualTo(LocalDate.of(2026, 4, 1));
@@ -112,18 +114,23 @@ class StatementOfAccountIT {
                             soa.getId(), new SettlementRequest(LocalDate.of(2026, 4, 20), "1111"))))
         .isInstanceOf(BusinessRuleException.class);
 
-    secondQuarter(qs);
+    secondQuarter(ri, qs);
   }
 
-  private void secondQuarter(Treaty qs) {
+  private void secondQuarter(RiFixtures.Reinsurers ri, Treaty qs) {
     List<Soa> q2 =
         as.run(
             MAKER,
             () ->
                 statements.generate(
-                    new SoaRequest(fx.companyId(), qs.getCode(), null, 2026, 2, LocalDate.of(2026, 7, 10))));
+                    new SoaRequest(
+                        fx.companyId(), qs.getCode(), null, 2026, 2, LocalDate.of(2026, 7, 10))));
     assertThat(q2).hasSize(2);
-    Soa r3 = q2.stream().filter(s -> "R-0003".equals(s.getParty().getCode())).findFirst().orElseThrow();
+    Soa r3 =
+        q2.stream()
+            .filter(s -> ri.follow().equals(s.getParty().getCode()))
+            .findFirst()
+            .orElseThrow();
     SoaFigures f = r3.figures();
     assertThat(f.premium()).isZero();
     assertThat(f.lossesPaid()).isEqualByComparingTo("8000.00");
@@ -165,15 +172,14 @@ class StatementOfAccountIT {
 
   private Set<String> pendingReferences() {
     List<PendingApproval> items =
-        inbox.pendingFor(
-            ApprovalViewer.user(CHECKER, Set.of("REINSURANCE_AUTHORIZE")));
+        inbox.pendingFor(ApprovalViewer.user(CHECKER, Set.of("REINSURANCE_AUTHORIZE")));
     return Set.copyOf(items.stream().map(PendingApproval::reference).toList());
   }
 
   @Test
   void pendingTreatiesAndSlipsReachTheInboxAndOldSlipsRaiseAnAlert() {
-    Treaty draft =
-        as.run(MAKER, () -> treaties.create(fx.surplus("TSP35", "ENGG", 2035, "10000000", 2)));
+    TreatyRequest request = fx.surplus(fx.reinsurers(), "TSP35", "ENGG", 2035, "10000000", 2);
+    Treaty draft = as.run(MAKER, () -> treaties.create(request));
     assertThat(pendingReferences()).contains(draft.getCode());
     assertThat(inbox.pendingFor(ApprovalViewer.user(MAKER, Set.of("REINSURANCE_AUTHORIZE"))))
         .extracting(PendingApproval::reference)
@@ -181,8 +187,7 @@ class StatementOfAccountIT {
     assertThat(inbox.pendingFor(ApprovalViewer.user(CHECKER, Set.of()))).isEmpty();
     as.run(CHECKER, () -> treaties.authorize(draft.getId()));
     assertThatThrownBy(
-            () ->
-                fx.authorized(fx.surplus("TSP35B", "ENGG", 2035, "10000000", 2)))
+            () -> fx.authorized(fx.surplus(fx.reinsurers(), "TSP35B", "ENGG", 2035, "10000000", 2)))
         .hasMessageContaining("already exists");
 
     Policy engineering =

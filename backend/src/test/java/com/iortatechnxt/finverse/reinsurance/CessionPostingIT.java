@@ -65,8 +65,9 @@ class CessionPostingIT {
 
   @Test
   void fullAllocationPostsTreatyPremiumAndCreatesTheFacultativeRequirement() {
-    Treaty qs = fx.authorized(fx.quotaShare("TQS31", "FIRE", YEAR, "40", null));
-    fx.authorized(fx.surplus("TSP31", "FIRE", YEAR, "25000000", 3));
+    RiFixtures.Reinsurers ri = fx.reinsurers();
+    Treaty qs = fx.authorized(fx.quotaShare(ri, "TQS31", "FIRE", YEAR, "40", null));
+    fx.authorized(fx.surplus(ri, "TSP31", "FIRE", YEAR, "25000000", 3));
     Product fire = fx.product("FIRE");
     Policy policy = fx.policy(fire, YEAR, "PHP", List.of(fx.risk("120000000", "240000")));
 
@@ -85,7 +86,7 @@ class CessionPostingIT {
     assertThat(sum(c, RiLayer.RETENTION, false)).isEqualByComparingTo("30000");
     CessionLine qsLead =
         c.getLines().stream()
-            .filter(l -> qs.getId().equals(l.getTreatyId()) && "R-0001".equals(l.getPartyCode()))
+            .filter(l -> qs.getId().equals(l.getTreatyId()) && ri.lead().equals(l.getPartyCode()))
             .findFirst()
             .orElseThrow();
     assertThat(qsLead.getPremium()).isEqualByComparingTo("12000");
@@ -96,7 +97,7 @@ class CessionPostingIT {
     assertThat(fx.posted("4200", ref)).isEqualByComparingTo("170000.00");
     assertThat(fx.posted("4400", ref)).isEqualByComparingTo("-47600.00");
     assertThat(fx.posted("2201", ref)).isEqualByComparingTo("-122400.00");
-    assertThat(creditItems("R-0001", ref)).isEqualByComparingTo("71400.00");
+    assertThat(creditItems(ri.lead(), ref)).isEqualByComparingTo("71400.00");
 
     ReinsuranceFigures f =
         view.figures(List.of(TransactionRef.original(policy.getId()), new TransactionRef(-1L, 0)))
@@ -106,10 +107,10 @@ class CessionPostingIT {
     assertThat(f.netRetention()).isEqualByComparingTo("30000");
     assertThat(view.figures(List.of())).isEmpty();
 
-    int items = openItems.partyItems(fx.companyId(), partyId("R-0001")).size();
+    int items = openItems.partyItems(fx.companyId(), partyId(ri.lead())).size();
     List<Cession> again = as.run(MAKER, () -> cessions.cedePolicy(policy.getId()));
     assertThat(again.get(0).getId()).isEqualTo(c.getId());
-    assertThat(openItems.partyItems(fx.companyId(), partyId("R-0001"))).hasSize(items);
+    assertThat(openItems.partyItems(fx.companyId(), partyId(ri.lead()))).hasSize(items);
     assertThat(
             jdbc.queryForObject(
                 "select count(*) from alt_alert where dedup_key = ?",
@@ -117,10 +118,10 @@ class CessionPostingIT {
                 "RI_TREATY_CAPACITY:" + c.getCessionNo()))
         .isEqualTo(1);
 
-    placeAndEndorse(policy, c);
+    placeAndEndorse(ri, policy, c);
   }
 
-  private void placeAndEndorse(Policy policy, Cession original) {
+  private void placeAndEndorse(RiFixtures.Reinsurers ri, Policy policy, Cession original) {
     FacPlacement f =
         placements.list(fx.companyId(), FacStatus.PROVISIONAL).stream()
             .filter(p -> p.getCession().getId().equals(original.getId()))
@@ -129,7 +130,8 @@ class CessionPostingIT {
     assertThat(f.getFacSi()).isEqualByComparingTo("20000000");
     FacAssignRequest slip =
         new FacAssignRequest(
-            List.of(new FacAssignRequest.Line("R-0004", new BigDecimal("70"), new BigDecimal("15"))),
+            List.of(
+                new FacAssignRequest.Line(ri.fac(), new BigDecimal("70"), new BigDecimal("15"))),
             "Test slip");
     as.run(MAKER, () -> placements.assign(f.getId(), slip));
     assertThatThrownBy(() -> as.run(MAKER, () -> placements.approve(f.getId(), null)))
@@ -144,7 +146,8 @@ class CessionPostingIT {
     assertThat(placed.getStatus()).isEqualTo(FacStatus.PLACED);
     assertThat(placed.getPlacedSi()).isEqualByComparingTo("14000000");
     assertThat(placed.placementPct()).isEqualByComparingTo("70");
-    assertThat(fx.posted("4200", "RI:FAC:" + placed.getPlacementNo())).isEqualByComparingTo("28000.00");
+    assertThat(fx.posted("4200", "RI:FAC:" + placed.getPlacementNo()))
+        .isEqualByComparingTo("28000.00");
 
     fx.endorse(
         policy,
@@ -179,10 +182,12 @@ class CessionPostingIT {
     assertThat(cancel.getOurPremium()).isNegative();
     assertThat(sum(cancel, RiLayer.QUOTA_SHARE, false)).isNegative();
     BigDecimal total =
-        cancel.getLines().stream().map(CessionLine::getPremium).reduce(BigDecimal.ZERO, BigDecimal::add);
+        cancel.getLines().stream()
+            .map(CessionLine::getPremium)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
     assertThat(total).isEqualByComparingTo(cancel.getOurPremium());
     assertThat(
-            openItems.partyItems(fx.companyId(), partyId("R-0001")).stream()
+            openItems.partyItems(fx.companyId(), partyId(ri.lead())).stream()
                 .anyMatch(i -> "REINSURANCE_PREMIUM_RETURN".equals(i.getDocumentType())))
         .isTrue();
     assertThat(cessions.ofPolicyNumber(fx.companyId(), policy.getPolicyNo())).hasSize(3);
@@ -191,7 +196,7 @@ class CessionPostingIT {
 
   @Test
   void allocationRunCedesPendingTransactionsOnce() {
-    fx.authorized(fx.quotaShare("TQS36", "MARINE", 2036, "50", "30000000"));
+    fx.authorized(fx.quotaShare(fx.reinsurers(), "TQS36", "MARINE", 2036, "50", "30000000"));
     Product marine = fx.product("MARINE");
     Policy usd = fx.policy(marine, 2036, "USD", List.of(fx.risk("1000000", "5000")));
     LocalDate day = RiFixtures.APPROVAL;
@@ -213,7 +218,8 @@ class CessionPostingIT {
     Cession c = cessions.ofPolicy(usd.getId()).get(0);
     assertThat(c.getCurrency()).isEqualTo("USD");
     assertThat(c.getExchangeRate()).isGreaterThan(BigDecimal.ONE);
-    assertThat(c.getLines().get(0).getBasePremium()).isGreaterThan(c.getLines().get(0).getPremium());
+    assertThat(c.getLines().get(0).getBasePremium())
+        .isGreaterThan(c.getLines().get(0).getPremium());
   }
 
   private Long partyId(String code) {

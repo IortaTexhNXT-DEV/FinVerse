@@ -11,6 +11,7 @@ export const PAYEE_TYPES = [
   'AGENT',
   'BROKER',
   'REINSURER',
+  'RI_BROKER',
   'INDIVIDUAL_CLIENT',
   'CORPORATE_CLIENT',
 ];

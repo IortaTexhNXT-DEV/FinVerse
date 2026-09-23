@@ -9,6 +9,11 @@ public enum PartyType {
   AGENT(SubLedgerType.INTERMEDIARY),
   BROKER(SubLedgerType.INTERMEDIARY),
   REINSURER(SubLedgerType.REINSURER),
+  /**
+   * Reinsurance broker placing treaties and facultative business; settles in the reinsurer
+   * sub-ledger.
+   */
+  RI_BROKER(SubLedgerType.REINSURER),
   COINSURER(SubLedgerType.COINSURER),
   SUPPLIER(SubLedgerType.VENDOR),
   GARAGE(SubLedgerType.VENDOR),

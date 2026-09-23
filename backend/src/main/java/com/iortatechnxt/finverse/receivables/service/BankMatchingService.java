@@ -159,7 +159,8 @@ public class BankMatchingService {
   }
 
   /**
-   * Matches selected book entries with selected bank lines of the same total.
+   * Matches selected book entries with selected bank lines of the same total, or offsetting entries
+   * of one side only that net to zero (a bounced cheque and its reversal).
    *
    * @param r request
    * @return match
@@ -231,9 +232,10 @@ public class BankMatchingService {
       MatchMethod method,
       List<BookEntry> entries,
       List<BankStatementLine> bankLines) {
-    if (entries.isEmpty() || bankLines.isEmpty()) {
+    if (entries.size() + bankLines.size() < 2) {
       throw new BusinessRuleException(
-          "INVALID_MATCH", "Select at least one book entry and one bank line");
+          "INVALID_MATCH",
+          "Select book entries and bank lines of the same total, or offsetting items of one side");
     }
     BigDecimal bookTotal =
         entries.stream().map(BookEntry::signedAmount).reduce(BigDecimal.ZERO, BigDecimal::add);

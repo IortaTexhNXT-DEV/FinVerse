@@ -186,6 +186,29 @@ class BankReconciliationIT {
                             new ReconciliationRequest(
                                 fx.company(), CASH, LocalDate.of(2026, 6, 10)))))
         .isInstanceOf(BusinessRuleException.class);
+
+    // Offsetting items of one side only (a wrong charge and its reversal) match off at zero.
+    BankStatement julyC =
+        importCsv(
+            "JULY-C",
+            "date,description,reference,debit,credit\n"
+                + "2026-07-02,Charge in error,E1,300.00,\n"
+                + "2026-07-03,Reversal of charge,E1,,300.00\n");
+    List<Long> pair =
+        statements.lines(julyC.getId()).stream().map(BankStatementLine::getId).toList();
+    assertThatThrownBy(
+            () ->
+                matching.manualMatch(
+                    new ManualMatchRequest(fx.company(), CASH, List.of(), pair.subList(0, 1))))
+        .isInstanceOf(BusinessRuleException.class);
+    BankMatch offset =
+        as.run(
+            "accountant",
+            () ->
+                matching.manualMatch(new ManualMatchRequest(fx.company(), CASH, List.of(), pair)));
+    assertThat(offset.getAmount()).isZero();
+    assertThat(statements.lines(julyC.getId()))
+        .allMatch(l -> offset.getId().equals(l.getMatchId()));
   }
 
   @Test

@@ -1,12 +1,12 @@
 package com.iortatechnxt.finverse.receivables.api.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * Manual reconciliation match of book entries with bank statement lines of equal total.
+ * Manual reconciliation match of book entries with bank statement lines of equal total, or of
+ * offsetting items of one side only (e.g. a bounced cheque and its reversal) that net to zero.
  *
  * @param companyId company
  * @param bankAccountCode GL bank account
@@ -16,8 +16,8 @@ import java.util.List;
 public record ManualMatchRequest(
     @NotNull Long companyId,
     @NotBlank String bankAccountCode,
-    @NotEmpty List<Long> ledgerEntryIds,
-    @NotEmpty List<Long> statementLineIds) {
+    List<Long> ledgerEntryIds,
+    List<Long> statementLineIds) {
 
   /** Canonical constructor copying the lists. */
   public ManualMatchRequest {

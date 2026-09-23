@@ -2,9 +2,11 @@ import type {
   BookEntry,
   OpenItem,
   PdcStatus,
+  Receipt,
   ReceiptSummary,
   StatementLine,
 } from '@/api/receivables';
+import { formatAmount } from '@/utils/format';
 
 const CENTS = 100;
 
@@ -74,7 +76,11 @@ export function computeBrs(
   return { computedBankBalance: computed, difference: round2(statementBalance - computed) };
 }
 
-/** Totals of a manual match selection; a match needs both sides and equal totals. */
+/**
+ * Totals of a manual match selection. A selection is balanced when book and bank totals are
+ * equal: book entries against bank lines, or offsetting items of one side only (a bounced cheque
+ * and its reversal) netting to zero. At least two items are needed.
+ */
 export function selectionBalance(
   book: BookEntry[],
   bank: StatementLine[],
@@ -86,7 +92,7 @@ export function selectionBalance(
     bookTotal,
     bankTotal,
     difference,
-    balanced: book.length > 0 && bank.length > 0 && difference === 0,
+    balanced: book.length + bank.length >= 2 && difference === 0,
   };
 }
 
@@ -193,4 +199,21 @@ function canApply(r: ReceiptSummary, can: (permission: string) => boolean): bool
     r.unappliedAmount > 0 &&
     r.payerType !== 'OTHER'
   );
+}
+
+/**
+ * Outcome of "Apply on-account (FIFO)" for the confirmation message, from the receipt before and
+ * after the application: "OR-…: 7,500.00 applied to 2 debit notes, 1,500.00 still on account".
+ */
+export function applicationSummary(before: Receipt, after: Receipt): string {
+  const no = after.summary.receiptNo;
+  const applied = round2(after.summary.appliedAmount - before.summary.appliedAmount);
+  const notes = after.allocations.length - before.allocations.length;
+  const left = after.summary.unappliedAmount;
+  if (applied <= 0) {
+    return `${no}: no open debit notes to apply; ${formatAmount(left)} still on account`;
+  }
+  const target = notes === 1 ? '1 debit note' : `${Math.max(notes, 1)} debit notes`;
+  const rest = left > 0 ? `${formatAmount(left)} still on account` : 'nothing left on account';
+  return `${no}: ${formatAmount(applied)} applied to ${target}, ${rest}`;
 }

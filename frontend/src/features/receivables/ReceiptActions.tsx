@@ -10,7 +10,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { humanize, today } from '@/utils/format';
-import { receiptActions } from './receivablesMath';
+import { applicationSummary, receiptActions } from './receivablesMath';
 
 type Dialog = 'reject' | 'cancel' | 'bounce' | null;
 
@@ -28,14 +28,25 @@ export function ReceiptActions({ receipt }: Readonly<{ receipt: Receipt }>) {
   const r = receipt.summary;
   const allowed = receiptActions(r, user?.username, can);
 
+  const refresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['receipts'] });
+    await queryClient.invalidateQueries({ queryKey: ['receipt', r.id] });
+    await queryClient.invalidateQueries({ queryKey: ['open-items'] });
+  };
   const action = useMutation({
     mutationFn: (run: () => Promise<Receipt>) => run(),
     onSuccess: async (result) => {
       setDialog(null);
       setReason('');
-      await queryClient.invalidateQueries({ queryKey: ['receipts'] });
-      await queryClient.invalidateQueries({ queryKey: ['receipt', r.id] });
+      await refresh();
       toast.success(`${result.summary.receiptNo}: ${humanize(result.summary.status)}`);
+    },
+  });
+  const apply = useMutation({
+    mutationFn: () => receivablesApi.applyReceipt(r.id, today(), 'FIFO', []),
+    onSuccess: async (result) => {
+      await refresh();
+      toast.success(applicationSummary(receipt, result));
     },
   });
   const confirm = () =>
@@ -69,10 +80,8 @@ export function ReceiptActions({ receipt }: Readonly<{ receipt: Receipt }>) {
         <Button
           variant="secondary"
           icon={<CornerDownRight size={16} />}
-          busy={action.isPending}
-          onClick={() =>
-            action.mutate(() => receivablesApi.applyReceipt(r.id, today(), 'FIFO', []))
-          }
+          busy={apply.isPending}
+          onClick={() => apply.mutate()}
         >
           Apply on-account (FIFO)
         </Button>
@@ -90,7 +99,7 @@ export function ReceiptActions({ receipt }: Readonly<{ receipt: Receipt }>) {
       <Button variant="ghost" icon={<Printer size={16} />} onClick={() => window.print()}>
         Print
       </Button>
-      {dialog === null && <ErrorAlert error={action.error} />}
+      {dialog === null && <ErrorAlert error={action.error ?? apply.error} />}
       <Modal
         title={dialog === null ? '' : `${humanize(dialog)} ${r.receiptNo}`}
         open={dialog !== null}

@@ -1,6 +1,13 @@
-import type { BookEntry, OpenItem, ReceiptSummary, StatementLine } from '@/api/receivables';
+import type {
+  BookEntry,
+  OpenItem,
+  Receipt,
+  ReceiptSummary,
+  StatementLine,
+} from '@/api/receivables';
 import {
   allocationErrors,
+  applicationSummary,
   allocationTotal,
   computeBrs,
   csvPreview,
@@ -90,6 +97,26 @@ describe('bank reconciliation', () => {
     expect(selectionBalance(book, []).balanced).toBe(false);
   });
 
+  it('matches offsetting items of one side that net to zero', () => {
+    const bounced = [
+      { id: 1, debit: 25000, credit: 0 } as BookEntry,
+      { id: 2, debit: 0, credit: 25000 } as BookEntry,
+    ];
+    expect(selectionBalance(bounced, [])).toEqual({
+      bookTotal: 0,
+      bankTotal: 0,
+      difference: 0,
+      balanced: true,
+    });
+    const errorAndCorrection = [
+      { id: 7, debit: 300, credit: 0 } as StatementLine,
+      { id: 8, debit: 0, credit: 300 } as StatementLine,
+    ];
+    expect(selectionBalance([], errorAndCorrection).balanced).toBe(true);
+    expect(selectionBalance(bounced.slice(0, 1), []).balanced).toBe(false);
+    expect(selectionBalance([], []).balanced).toBe(false);
+  });
+
   it('previews a statement file', () => {
     const csv =
       'date,description,reference,debit,credit\n2026-09-01,"Dep, A",R1,,"1,000.50"\n\n2026-09-02,Chq,C1,250,\n';
@@ -134,5 +161,32 @@ describe('workflow actions', () => {
       cancel: false,
       bounce: false,
     });
+  });
+});
+
+describe('apply on account', () => {
+  const receipt = (applied: number, unapplied: number, allocations: number) =>
+    ({
+      summary: {
+        receiptNo: 'OR-HO-2026-000076',
+        appliedAmount: applied,
+        unappliedAmount: unapplied,
+      },
+      allocations: Array.from({ length: allocations }, (_, i) => ({ id: i })),
+    }) as unknown as Receipt;
+
+  it('says how much was applied and what stays on account', () => {
+    expect(applicationSummary(receipt(0, 9000, 0), receipt(7500, 1500, 2))).toBe(
+      'OR-HO-2026-000076: 7,500.00 applied to 2 debit notes, 1,500.00 still on account',
+    );
+    expect(applicationSummary(receipt(0, 5000, 0), receipt(5000, 0, 1))).toBe(
+      'OR-HO-2026-000076: 5,000.00 applied to 1 debit note, nothing left on account',
+    );
+  });
+
+  it('says so when there was nothing to apply', () => {
+    expect(applicationSummary(receipt(0, 9000, 0), receipt(0, 9000, 0))).toBe(
+      'OR-HO-2026-000076: no open debit notes to apply; 9,000.00 still on account',
+    );
   });
 });

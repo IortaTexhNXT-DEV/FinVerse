@@ -68,8 +68,9 @@ statuses "as of" a date are taken from this history.
 * Automatic matching (`/bank-rec/auto-match`): one-to-one on equal signed amount within a date
   window (default 7 days), preferring a reference / cheque number found in the other side's text,
   then the closest date; then group matching of a bank line with the book entries of the deposit
-  slip, or of the receipt, named in its reference. Manual matching of any balanced selection;
-  unmatching.
+  slip, or of the receipt, named in its reference. Manual matching of any balanced selection:
+  book entries against bank lines of the same total, or offsetting items of one side only that
+  net to zero (a bounced cheque and its reversal, a bank error and its correction); unmatching.
 * A match is dated with its latest item date (never on or before the last finalized reconciliation),
   so an "as of" BRS never changes once finalized; matches covered by a finalized reconciliation
   cannot be undone.

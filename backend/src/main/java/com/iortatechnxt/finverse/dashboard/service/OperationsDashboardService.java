@@ -8,12 +8,6 @@ import com.iortatechnxt.finverse.budget.service.BudgetMonitoringService.BudgetCo
 import com.iortatechnxt.finverse.budget.service.VarianceLine;
 import com.iortatechnxt.finverse.coa.domain.AccountClass;
 import com.iortatechnxt.finverse.common.util.Money;
-import com.iortatechnxt.finverse.dashboard.service.DashboardWidgets.BudgetLine;
-import com.iortatechnxt.finverse.dashboard.service.DashboardWidgets.BudgetWidget;
-import com.iortatechnxt.finverse.dashboard.service.DashboardWidgets.CollectionsWidget;
-import com.iortatechnxt.finverse.dashboard.service.DashboardWidgets.LabelledAmount;
-import com.iortatechnxt.finverse.dashboard.service.DashboardWidgets.MonthlyValue;
-import com.iortatechnxt.finverse.dashboard.service.DashboardWidgets.WorkloadWidget;
 import com.iortatechnxt.finverse.receivables.service.CollectionQueries;
 import com.iortatechnxt.finverse.receivables.service.CollectionQueries.DueAmount;
 import com.iortatechnxt.finverse.receivables.service.CollectionQueries.MonthlyAmount;
@@ -143,7 +137,7 @@ public class OperationsDashboardService {
         comparison.lines().stream().filter(l -> l.accountClass() == AccountClass.EXPENSE).toList();
     BigDecimal annual = sum(expenses, VarianceLine::annualBudget);
     BigDecimal actual = sum(expenses, VarianceLine::actualYtd);
-    List<BudgetLine> top =
+    List<BudgetAccountFigures> top =
         expenses.stream()
             .sorted(
                 Comparator.comparing((VarianceLine l) -> l.actualYtd().max(l.budgetYtd()))
@@ -151,7 +145,7 @@ public class OperationsDashboardService {
             .limit(TOP_BUDGET_LINES)
             .map(
                 l ->
-                    new BudgetLine(
+                    new BudgetAccountFigures(
                         l.accountCode() + " " + l.accountName(),
                         Money.round(l.budgetYtd()),
                         Money.round(l.actualYtd())))

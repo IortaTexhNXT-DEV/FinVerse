@@ -70,17 +70,21 @@ public record AgeingSlots(List<Integer> boundaries) {
     String value = text.trim();
     List<Integer> bounds = new ArrayList<>();
     for (String part : SEPARATOR.split(value)) {
-      if (part.isEmpty()
-          || part.length() > MAX_DIGITS
-          || !part.chars().allMatch(Character::isDigit)) {
-        throw invalid(value);
-      }
-      bounds.add(Integer.parseInt(part));
+      bounds.add(bound(part, value));
     }
     if (bounds.size() > MAX_SLOTS) {
       throw invalid(value);
     }
     return new AgeingSlots(bounds);
+  }
+
+  private static int bound(String part, String value) {
+    if (part.isEmpty()
+        || part.length() > MAX_DIGITS
+        || !part.chars().allMatch(Character::isDigit)) {
+      throw invalid(value);
+    }
+    return Integer.parseInt(part);
   }
 
   /**

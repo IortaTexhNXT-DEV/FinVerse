@@ -1,16 +1,16 @@
 package com.iortatechnxt.finverse.dashboard.api;
 
+import com.iortatechnxt.finverse.dashboard.service.BudgetWidget;
+import com.iortatechnxt.finverse.dashboard.service.CashWidget;
+import com.iortatechnxt.finverse.dashboard.service.ClaimsWidget;
+import com.iortatechnxt.finverse.dashboard.service.CollectionsWidget;
 import com.iortatechnxt.finverse.dashboard.service.DashboardService;
 import com.iortatechnxt.finverse.dashboard.service.DashboardSummary;
-import com.iortatechnxt.finverse.dashboard.service.DashboardWidgets.BudgetWidget;
-import com.iortatechnxt.finverse.dashboard.service.DashboardWidgets.CashWidget;
-import com.iortatechnxt.finverse.dashboard.service.DashboardWidgets.ClaimsWidget;
-import com.iortatechnxt.finverse.dashboard.service.DashboardWidgets.CollectionsWidget;
-import com.iortatechnxt.finverse.dashboard.service.DashboardWidgets.PayablesWidget;
-import com.iortatechnxt.finverse.dashboard.service.DashboardWidgets.PremiumWidget;
-import com.iortatechnxt.finverse.dashboard.service.DashboardWidgets.WorkloadWidget;
 import com.iortatechnxt.finverse.dashboard.service.LedgerDashboardService;
 import com.iortatechnxt.finverse.dashboard.service.OperationsDashboardService;
+import com.iortatechnxt.finverse.dashboard.service.PayablesWidget;
+import com.iortatechnxt.finverse.dashboard.service.PremiumWidget;
+import com.iortatechnxt.finverse.dashboard.service.WorkloadWidget;
 import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;

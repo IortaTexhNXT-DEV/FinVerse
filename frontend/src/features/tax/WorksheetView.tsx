@@ -13,12 +13,13 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount, today } from '@/utils/format';
+import { formatAmount } from '@/utils/format';
 import { CreateReturnModal } from './CreateReturnModal';
 import { PeriodPicker } from './PeriodPicker';
 import { formsFor, worksheetKpis } from './taxDisplay';
 import type { Granularity, PeriodChoice } from './taxPeriods';
-import { defaultChoice, periodOf } from './taxPeriods';
+import { periodOf } from './taxPeriods';
+import { usePeriodParam } from './usePeriodParam';
 import { WorksheetTables } from './WorksheetTables';
 
 const REPORTS: Record<WorksheetKind, string> = {
@@ -48,7 +49,7 @@ interface Props {
 export function WorksheetView({ kind, title, description, granularity }: Readonly<Props>) {
   const companyId = useCompanyId();
   const { can } = useAuth();
-  const [choice, setChoice] = useState<PeriodChoice>(() => defaultChoice(today(), granularity));
+  const [choice, setChoice] = usePeriodParam(granularity);
   const [creating, setCreating] = useState(false);
   const period = periodOf(choice);
   const worksheet = useQuery({

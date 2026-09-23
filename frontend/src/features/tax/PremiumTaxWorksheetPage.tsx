@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Tabs } from '@/components/ui/Tabs';
 import { WorksheetView } from './WorksheetView';
 
@@ -16,9 +16,12 @@ const DESCRIPTIONS: Record<Levy, string> = {
   FST: 'Fire service tax on fire premiums, remitted monthly for the BFP.',
 };
 
-/** Premium tax, local government tax and fire service tax worksheets. */
+/** Premium tax, local government tax and fire service tax worksheets (a new levy starts on its default period). */
 export default function PremiumTaxWorksheetPage() {
-  const [levy, setLevy] = useState<Levy>('PREMIUM_TAX');
+  // The levy is in the URL (?levy=FST) like the period, so Back from a drill-down returns to it.
+  const [params, setParams] = useSearchParams();
+  const levy = TABS.find((t) => t.id === params.get('levy'))?.id ?? 'PREMIUM_TAX';
+  const setLevy = (next: Levy) => setParams({ levy: next }, { replace: true });
   return (
     <div className="stack">
       <Tabs tabs={TABS} active={levy} onChange={setLevy} />

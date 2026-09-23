@@ -58,6 +58,18 @@ export function choiceLabel(choice: PeriodChoice): string {
     : `${choice.year}-${pad(choice.index)}`;
 }
 
+/** Selection written by {@link choiceLabel} ("2026-Q2", "2026-03"); undefined when invalid. */
+export function parseChoice(label: string | null): PeriodChoice | undefined {
+  const match = /^(\d{4})-(?:Q([1-4])|(0[1-9]|1[0-2]))$/.exec(label ?? '');
+  if (match === null) {
+    return undefined;
+  }
+  const year = Number(match[1]);
+  return match[2] === undefined
+    ? { year, granularity: 'MONTH', index: Number(match[3]) }
+    : { year, granularity: 'QUARTER', index: Number(match[2]) };
+}
+
 /** Options of the index select for a granularity. */
 export function indexOptions(granularity: Granularity): { value: number; label: string }[] {
   if (granularity === 'QUARTER') {

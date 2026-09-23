@@ -69,8 +69,8 @@ class ReservesIT {
 
   @BeforeEach
   void portfolio() {
-    fx.parameters("FIRE", ReserveFixtures.terms(IbnrMethod.RATE, "5", "95"));
-    Product product = uw.product("FIRE", false);
+    fx.parameters("CASUALTY", ReserveFixtures.terms(IbnrMethod.RATE, "5", "95"));
+    Product product = uw.product("CASUALTY", false);
     uw.issue(uw.brokerRequest(product), UwFixtures.ISSUE);
     opening = balances(LocalDate.of(2026, 2, 28));
   }
@@ -173,7 +173,7 @@ class ReservesIT {
     assertThatThrownBy(
             () -> as.run(ReserveFixtures.CHECKER, () -> runs.cancel(run.getId(), "again")))
         .isInstanceOf(BusinessRuleException.class);
-    assertThat(runs.uprDetail(run.getId(), "FIRE", Pageable.ofSize(5))).isNotEmpty();
+    assertThat(runs.uprDetail(run.getId(), "CASUALTY", Pageable.ofSize(5))).isNotEmpty();
   }
 
   @Test

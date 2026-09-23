@@ -67,5 +67,8 @@ public enum Permission {
 
   // Actuarial reserves: prepare and submit valuation runs (approve / post / cancel use
   // PERIOD_END_RUN). See V421.
-  RESERVE_PREPARE
+  RESERVE_PREPARE,
+
+  // Reinsurance checker: treaties, facultative placements and statements of account. See V300.
+  REINSURANCE_AUTHORIZE
 }

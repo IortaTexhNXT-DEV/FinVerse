@@ -1,12 +1,23 @@
+import { ACCOUNTING_ENGINE_HELP } from '@/features/accounting-engine/help';
+import { ADMIN_HELP } from '@/features/admin/help';
+import { ASSETS_HELP } from '@/features/assets/help';
 import { CLAIMS_HELP } from '@/features/claims/help';
+import { PLANNING_HELP } from '@/features/closing/help';
+import { GL_HELP } from '@/features/gl/help';
+import { PAYABLES_HELP } from '@/features/payables/help';
+import { RECEIVABLES_HELP } from '@/features/receivables/help';
 import { REINSURANCE_HELP } from '@/features/reinsurance/help';
 import { RESERVES_HELP } from '@/features/reserves/help';
+import { SETUP_HELP } from '@/features/setup/help';
 import { TAX_HELP } from '@/features/tax/help';
+import { UNDERWRITING_HELP } from '@/features/underwriting/help';
 
 /**
- * In-app help. One entry per module; each screen lists its purpose, the usual workflow and the
- * controls (maker-checker, audit, validations) that apply. Keep the text short and factual and
- * update it together with the screen. Modules added later append their own section here.
+ * In-app help. One section per sidebar module, in sidebar order; each screen lists its purpose,
+ * the usual workflow and the controls (maker-checker, audit, validations) that apply. Keep the
+ * text short and factual and update it together with the screen. A module keeps its section in
+ * `features/<module>/help.ts` and lists it here; every non-hidden screen route needs exactly one
+ * entry with its `path` (enforced by helpContent.test.ts).
  */
 
 export interface HelpScreen {
@@ -42,7 +53,7 @@ export const HELP_SECTIONS: HelpSection[] = [
         ],
         controls: [
           'You never see your own submissions (maker-checker).',
-          'Journals above your authorization limit are not offered to you.',
+          'Journals, payables documents and claim reserves or settlements above your authorization limit are not offered to you.',
           'Items waiting longer than the threshold raise a PENDING_APPROVAL_AGEING alert.',
         ],
       },
@@ -73,108 +84,16 @@ export const HELP_SECTIONS: HelpSection[] = [
       },
     ],
   },
-  {
-    id: 'gl',
-    module: 'General Ledger',
-    intro: 'Journals, account inquiry, chart of accounts and financial periods.',
-    screens: [
-      {
-        name: 'Journals and New Journal',
-        path: '/gl/journals',
-        summary:
-          'Manual, adjustment and accrual vouchers with any number of debit and credit lines.',
-        workflow: [
-          'Save as draft (may be unbalanced), then submit when balanced.',
-          'A different user with authorization rights approves; approval posts to the ledger immediately.',
-          'Posted journals are corrected by reversal, never by editing.',
-        ],
-        controls: [
-          'Maker-checker and per-user authorization limits.',
-          'Value date must fall in an open period and within the back/forward-dated window.',
-          'Attach supporting documents on the journal screen (PDF, images, Excel, CSV, Word; max 10 MB).',
-        ],
-      },
-      {
-        name: 'Recurring Journals',
-        path: '/gl/recurring',
-        summary:
-          'Templates for standing entries and accruals, generated monthly, quarterly or annually on a chosen day (31 = month end).',
-        workflow: [
-          'Create a balanced template with a start (and optional end) date.',
-          'The RECURRING_JOURNALS job generates due occurrences every night; "Run now" generates them on demand.',
-          'Generated journals are drafts, or submitted for approval when auto-submit is on.',
-        ],
-        controls: [
-          'Each occurrence is generated once only, however often the job runs.',
-          'Auto-reverse creates the reversing draft on the first day of the next period.',
-        ],
-      },
-      {
-        name: 'Journal Upload',
-        path: '/gl/upload',
-        summary:
-          'Upload many vouchers from CSV or Excel: one row per line, grouped by voucher key. Download the template for the column layout.',
-        workflow: [
-          'Validate first: every row and voucher is checked and nothing is created.',
-          'Import: each valid voucher becomes a draft journal; invalid vouchers are listed and skipped.',
-        ],
-        controls: [
-          'Each voucher is created atomically; the upload is recorded in the audit trail.',
-        ],
-      },
-      {
-        name: 'Account Inquiry',
-        path: '/gl/inquiry',
-        summary: 'Statement of any account with opening balance, movements and running balance.',
-      },
-      {
-        name: 'Party Statement',
-        path: '/gl/party-statement',
-        summary:
-          'The single party statement: every receivable and payable document of a policyholder, intermediary, reinsurer or supplier from the sub-ledger, with settled and outstanding amounts, days overdue and ageing.',
-        workflow: [
-          'Find the party by code or name and choose the as-of date.',
-          'For the matched / unmatched statement of a period, run report FIN-ARAP-SOA-MATCH.',
-        ],
-      },
-      {
-        name: 'Chart of Accounts',
-        path: '/gl/accounts',
-        summary:
-          'GL heads, sub and micro accounts with posting controls, currencies and dimensions.',
-        controls: ['New and changed accounts must be authorized before they can be posted to.'],
-      },
-      {
-        name: 'Financial Periods',
-        path: '/gl/periods',
-        summary:
-          'Fiscal years and accounting periods with open, closing, closed and reopened states.',
-      },
-    ],
-  },
+  GL_HELP,
+  UNDERWRITING_HELP,
   CLAIMS_HELP,
-  {
-    id: 'accounting-engine',
-    module: 'Accounting Engine',
-    intro: 'How business events (policies, claims, receipts…) become journals automatically.',
-    screens: [
-      {
-        name: 'Event Types and Accounting Rules',
-        path: '/accounting/rules',
-        summary:
-          'Each business event type is mapped to debit/credit accounts by an accounting rule (per business line and currency, by priority and effective dates).',
-        controls: [
-          'New and changed rules must be authorized by another user; they appear in the approval inbox.',
-        ],
-      },
-      {
-        name: 'Rule Simulator and Event Register',
-        path: '/accounting/simulator',
-        summary:
-          'Preview the journal a sample event would produce, and inspect every processed or failed event.',
-      },
-    ],
-  },
+  REINSURANCE_HELP,
+  RECEIVABLES_HELP,
+  PAYABLES_HELP,
+  ASSETS_HELP,
+  PLANNING_HELP,
+  RESERVES_HELP,
+  ACCOUNTING_ENGINE_HELP,
   TAX_HELP,
   {
     id: 'reports',
@@ -182,86 +101,33 @@ export const HELP_SECTIONS: HelpSection[] = [
     intro: 'Financial statements, registers and control reports with PDF, Excel and CSV export.',
     screens: [
       {
-        name: 'Report catalogue',
+        name: 'Report Centre',
         path: '/reports',
         summary:
           'Choose a report, fill in the parameters and run it on screen or export it. The Exception Report (CTL-EXCEPTIONS) lists raised alerts and their handling.',
+        controls: [
+          'Each report has its own permission (e.g. POLICY_VIEW for underwriting reports, CLAIM_VIEW for claims, REPORT_FINANCIAL for financial statements); the catalogue lists only the reports you may run.',
+        ],
       },
     ],
   },
-  {
-    id: 'setup',
-    module: 'Setup',
-    intro: 'Organisation and reference data.',
-    screens: [
-      {
-        name: 'Companies and Branches',
-        path: '/setup/branches',
-        summary: 'Legal entities and offices with their weekly holidays.',
-        controls: ['Maker-checker: changes appear in the authorizers’ approval inbox.'],
-      },
-      {
-        name: 'Business Partners',
-        path: '/setup/parties',
-        summary:
-          'Policyholders, agents, brokers, reinsurers, suppliers and banks used by the sub-ledgers.',
-        controls: ['Maker-checker: new and changed partners must be authorized before use.'],
-      },
-      {
-        name: 'Holiday Calendar',
-        path: '/setup/holidays',
-        summary:
-          'Company-wide or branch holidays. Used for working-day checks such as the WEEKEND_POSTING exception.',
-      },
-      {
-        name: 'Currencies, Rates and Dimensions',
-        path: '/setup/currencies',
-        summary: 'Exchange rates by type and date; cost centres and lines of business.',
-      },
-    ],
-  },
-  REINSURANCE_HELP,
-  {
-    id: 'admin',
-    module: 'Administration',
-    intro: 'Security, configuration and monitoring (administrators).',
-    screens: [
-      {
-        name: 'Users, Roles and Audit Trail',
-        path: '/admin/users',
-        summary:
-          'User accounts, role permissions, authorization limits and the tamper-evident audit trail.',
-      },
-      {
-        name: 'System Parameters',
-        path: '/admin/parameters',
-        summary:
-          'Business parameters such as session timeout, ageing buckets, report footer and suspense accounts, plus a read-only view of the runtime configuration.',
-        controls: ['Values are validated by type and every change is audited.'],
-      },
-      {
-        name: 'Exception Codes',
-        path: '/admin/exception-codes',
-        summary: 'Severity, threshold amount/days and activation of each monitored exception.',
-      },
-      {
-        name: 'Scheduled Jobs',
-        path: '/admin/jobs',
-        summary: 'Background jobs with schedule, last and next run, run history and "Run now".',
-        controls: ['A failed run raises a JOB_FAILURE alert.'],
-      },
-      {
-        name: 'Application Info',
-        path: '/admin/info',
-        summary: 'Version, build, database migration level and health of the installation.',
-      },
-    ],
-  },
+  SETUP_HELP,
+  ADMIN_HELP,
   {
     id: 'account',
-    module: 'Your account',
-    intro: 'Personal settings and security.',
+    module: 'Help and your account',
+    intro: 'This help centre, your personal settings and security.',
     screens: [
+      {
+        name: 'Help Center',
+        path: '/help',
+        summary:
+          'What each screen is for, how its workflow runs and which controls apply, grouped by module in sidebar order.',
+        workflow: [
+          'Search by screen, module or keyword (for example a status, a report code or an alert code).',
+          'Use Open next to a screen to go straight to it; a screen you have no permission for shows an access message instead.',
+        ],
+      },
       {
         name: 'My Profile',
         path: '/profile',
@@ -272,7 +138,6 @@ export const HELP_SECTIONS: HelpSection[] = [
       },
     ],
   },
-  RESERVES_HELP,
 ];
 
 /** Sections whose module, screen names or text contain the search term. */

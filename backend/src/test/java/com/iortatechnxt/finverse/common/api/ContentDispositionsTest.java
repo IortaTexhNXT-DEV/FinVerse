@@ -22,7 +22,7 @@ class ContentDispositionsTest {
 
     assertThat(header)
         .isEqualTo(
-            "attachment; filename=\"Resume 2026 _ _.pdf\";"
+            "attachment; filename=\"R_sum_ 2026 _ _.pdf\";"
                 + " filename*=UTF-8''R%C3%A9sum%C3%A9%202026%20%E2%80%93%20%E2%82%B1.pdf");
     // Spring's own parser (RFC 6266) decodes the exact name again.
     assertThat(ContentDisposition.parse(header).getFilename()).isEqualTo("Résumé 2026 – ₱.pdf");

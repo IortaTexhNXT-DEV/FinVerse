@@ -1,7 +1,6 @@
 package com.iortatechnxt.finverse.common.api;
 
 import java.nio.charset.StandardCharsets;
-import java.text.Normalizer;
 import java.util.HexFormat;
 import java.util.regex.Pattern;
 import org.springframework.http.ContentDisposition;
@@ -16,7 +15,6 @@ import org.springframework.http.ContentDisposition;
  */
 public final class ContentDispositions {
 
-  private static final Pattern COMBINING_MARKS = Pattern.compile("\\p{M}+");
   private static final Pattern NOT_PRINTABLE_ASCII = Pattern.compile("[^\\x20-\\x7E]");
   private static final String ATTR_CHAR_SYMBOLS = "!#$&+-.^_`|~";
   private static final HexFormat HEX = HexFormat.of().withUpperCase();
@@ -30,7 +28,7 @@ public final class ContentDispositions {
    * Header value for an attachment download.
    *
    * @param fileName file name as stored or generated (any characters)
-   * @return e.g. {@code attachment; filename="Resume.pdf"; filename*=UTF-8''R%C3%A9sum%C3%A9.pdf}
+   * @return e.g. {@code attachment; filename="R_sum_.pdf"; filename*=UTF-8''R%C3%A9sum%C3%A9.pdf}
    */
   public static String attachment(String fileName) {
     String name = fileName == null || fileName.isBlank() ? DEFAULT_NAME : fileName.strip();
@@ -40,16 +38,14 @@ public final class ContentDispositions {
   }
 
   /**
-   * ASCII-only variant of a file name: accents are dropped ("é" becomes "e"), any other non-ASCII
-   * or control character becomes an underscore.
+   * ASCII-only variant of a file name for clients without RFC 5987 support: any non-ASCII or
+   * control character becomes an underscore (the exact name travels in {@code filename*}).
    *
    * @param name file name
    * @return printable ASCII name
    */
   static String asciiFallback(String name) {
-    String decomposed = Normalizer.normalize(name, Normalizer.Form.NFD);
-    String withoutMarks = COMBINING_MARKS.matcher(decomposed).replaceAll("");
-    return NOT_PRINTABLE_ASCII.matcher(withoutMarks).replaceAll("_");
+    return NOT_PRINTABLE_ASCII.matcher(name).replaceAll("_");
   }
 
   /**

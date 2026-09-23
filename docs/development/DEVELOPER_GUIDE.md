@@ -215,8 +215,9 @@ public class PolicyApprovalSource implements PendingApprovalSource {
 - Sources today: GL journals, accounting rules, chart of accounts, parties, organization,
   underwriting (policies, endorsements, quotations, products, open covers), payables (invoices,
   vouchers, petty cash, bank accounts, funds), receivables (receipts), budget (submitted versions),
-  fixed assets (capitalization, categories), investments (holdings, portfolios). Consolidation runs
-  have no maker-checker step, so they have no source.
+  fixed assets (capitalization, categories), investments (holdings, portfolios), actuarial reserves
+  (valuation runs, reserve parameters). Consolidation runs have no maker-checker step, so they have
+  no source.
 - The `PENDING_APPROVAL_AGEING` check reads `ApprovalInboxService.pendingAll()` (the system view of
   every source) and raises one alert per item, de-duplicated on module, type and reference.
 - API: `GET /api/v1/approvals/inbox?companyId=`, `GET /api/v1/approvals/counts` (header badge).

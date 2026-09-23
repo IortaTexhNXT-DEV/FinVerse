@@ -58,5 +58,10 @@ public enum Permission {
   ATTACHMENT_MANAGE,
   ALERT_VIEW,
   ALERT_MANAGE,
-  SYSTEM_MONITOR
+  SYSTEM_MONITOR,
+
+  // Fixed assets and investments: disposals, transfers, coupon receipts, maturities, sales and
+  // fair value updates (masters use MASTER_*, month-end runs use PERIOD_END_RUN). See V671.
+  ASSET_MANAGE,
+  INVESTMENT_MANAGE
 }

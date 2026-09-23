@@ -89,6 +89,17 @@ class ApiSmokeIT {
         "/api/v1/underwriting/quotations?companyId={c}",
         "/api/v1/underwriting/quotations?companyId={c}&status=PENDING_APPROVAL",
         "/api/v1/underwriting/open-covers?companyId={c}",
+        "/api/v1/assets/categories?companyId={c}",
+        "/api/v1/assets/register?companyId={c}",
+        "/api/v1/assets/register?companyId={c}&status=ACTIVE&q=fa",
+        "/api/v1/assets/depreciation/preview?companyId={c}&period=2026-09",
+        "/api/v1/assets/depreciation/runs?companyId={c}",
+        "/api/v1/investments/portfolios?companyId={c}",
+        "/api/v1/investments/holdings?companyId={c}",
+        "/api/v1/investments/holdings?companyId={c}&status=ACTIVE&q=t",
+        "/api/v1/investments/runs?companyId={c}",
+        "/api/v1/investments/runs/preview?companyId={c}&type=ACCRUAL&period=2026-09",
+        "/api/v1/investments/runs/preview?companyId={c}&type=AMORTIZATION&period=2026-09",
       })
   @WithUserDetails("fmanager")
   void readEndpointsRespondOk(String url) throws Exception {

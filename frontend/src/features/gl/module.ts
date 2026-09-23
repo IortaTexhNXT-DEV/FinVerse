@@ -1,4 +1,4 @@
-import { BookOpen, CalendarRange, FilePlus2, ListTree, Search } from 'lucide-react';
+import { BookOpen, BookUser, CalendarRange, FilePlus2, ListTree, Search } from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -44,6 +44,13 @@ export const glModule: FeatureModule = {
       icon: Search,
       permission: 'JOURNAL_VIEW',
       component: lazy(() => import('./AccountInquiryPage')),
+    },
+    {
+      path: '/gl/party-statement',
+      label: 'Party Statement',
+      icon: BookUser,
+      permission: 'JOURNAL_VIEW',
+      component: lazy(() => import('./PartyLedgerPage')),
     },
     {
       path: '/gl/accounts',

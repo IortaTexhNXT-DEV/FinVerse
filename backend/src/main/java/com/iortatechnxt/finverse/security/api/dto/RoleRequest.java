@@ -15,6 +15,6 @@ import java.util.Set;
  * @param permissions permissions
  */
 public record RoleRequest(
-    @NotBlank @Size(max = 40) @Pattern(regexp = "[A-Z_]+") String code,
+    @NotBlank @Size(max = 40) @Pattern(regexp = "[A-Z0-9_]+") String code,
     @NotBlank @Size(max = 120) String name,
     @NotNull Set<Permission> permissions) {}

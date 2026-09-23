@@ -12,3 +12,6 @@ coverage/
 .env
 .env.*
 !.env.example
+
+# Local agent worktrees
+.claude/worktrees/

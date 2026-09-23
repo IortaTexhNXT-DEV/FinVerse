@@ -24,7 +24,7 @@ final class DemoTreaties {
   static final String LOCAL = "R-0001";
 
   /** Asian reinsurer (Singapore). */
-  static final String ASIA = "R-0002";
+  static final String ASIA = "R-0005";
 
   /** London market reinsurer. */
   static final String LONDON = "R-0003";

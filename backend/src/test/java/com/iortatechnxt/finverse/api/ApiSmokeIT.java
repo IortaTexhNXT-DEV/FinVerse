@@ -129,6 +129,15 @@ class ApiSmokeIT {
         "/api/v1/intercompany/reconciliation?companyId={c}&asOf=2026-06-30",
         "/api/v1/consolidation/groups",
         "/api/v1/closing/fx-revaluations?companyId={c}",
+        // reinsurance
+        "/api/v1/reinsurance/treaties?companyId={c}",
+        "/api/v1/reinsurance/fac-placements?companyId={c}",
+        "/api/v1/reinsurance/fac-placements?companyId={c}&status=PROVISIONAL",
+        "/api/v1/reinsurance/allocation/preview?companyId={c}&from=2026-09-01&to=2026-09-30",
+        "/api/v1/reinsurance/cessions?companyId={c}&policyNo=NONE",
+        "/api/v1/reinsurance/cessions?companyId={c}&from=2026-09-01&to=2026-09-30",
+        "/api/v1/reinsurance/claims/movements?companyId={c}&from=2026-01-01&to=2026-12-31",
+        "/api/v1/reinsurance/soas?companyId={c}",
       })
   @WithUserDetails("fmanager")
   void readEndpointsRespondOk(String url) throws Exception {

@@ -1,6 +1,6 @@
 -- =====================================================================================
 -- DEMO DATA (demo profile only): reinsurance.
--- An additional Asian reinsurer and a reinsurance broker for the demo company, and the
+-- Two additional Asian reinsurers and a reinsurance broker for the demo company, and the
 -- accounting rules of the reinsurance statement events. Treaties, cessions, facultative
 -- placements and statements of account are created at start-up by ReinsuranceDemoData
 -- through the services, so journals and open items are real.
@@ -14,6 +14,8 @@ select c.id, p.code, p.name, p.t, p.tin, p.addr, p.email, p.phone, p.ccy, p.days
 from org_company c, (values
   ('R-0004', 'Pan Asian Reinsurance (Demo)', 'REINSURER', null, 'Hong Kong',
    'treaty@panasianre.example', '+852 3000 0004', 'PHP', 90, null),
+  ('R-0005', 'Asia Capital Reinsurance (Demo)', 'REINSURER', null, 'Singapore',
+   'treaty@asiacapre.example', '+65 6000 0005', 'PHP', 90, null),
   ('RB-0001', 'Manila Reinsurance Brokers (Demo)', 'RI_BROKER', '602-111-222-000', 'Makati City',
    'placing@manilare.example', '+63 2 888 0101', 'PHP', 60, 'IC-RB-2016-0012')
 ) as p(code, name, t, tin, addr, email, phone, ccy, days, lic)

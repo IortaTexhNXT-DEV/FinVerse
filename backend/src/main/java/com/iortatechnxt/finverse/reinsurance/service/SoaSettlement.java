@@ -62,6 +62,7 @@ public class SoaSettlement {
    * @param soa statement
    * @return items not yet settled
    */
+  @Transactional(readOnly = true)
   public List<OpenItem> outstandingItems(Soa soa) {
     Set<String> refs = new HashSet<>();
     Long treatyId = soa.getTreaty().getId();

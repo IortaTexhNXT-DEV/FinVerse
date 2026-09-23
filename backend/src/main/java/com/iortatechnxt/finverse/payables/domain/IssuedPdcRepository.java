@@ -29,7 +29,7 @@ public interface IssuedPdcRepository extends JpaRepository<IssuedPdc, Long> {
       """)
   List<IssuedPdc> search(
       @Param("companyId") Long companyId,
-      @Param("statuses") Collection<PdcStatus> statuses,
+      @Param("statuses") Collection<IssuedPdcStatus> statuses,
       @Param("from") LocalDate from,
       @Param("to") LocalDate to);
 
@@ -40,7 +40,7 @@ public interface IssuedPdcRepository extends JpaRepository<IssuedPdc, Long> {
    * @param asOf date
    * @return cheques to mark due
    */
-  List<IssuedPdc> findByStatusAndChequeDateLessThanEqual(PdcStatus status, LocalDate asOf);
+  List<IssuedPdc> findByStatusAndChequeDateLessThanEqual(IssuedPdcStatus status, LocalDate asOf);
 
   /**
    * The live cheque of a voucher.
@@ -50,7 +50,7 @@ public interface IssuedPdcRepository extends JpaRepository<IssuedPdc, Long> {
    * @return cheque
    */
   Optional<IssuedPdc> findFirstByVoucherIdAndStatusIn(
-      Long voucherId, Collection<PdcStatus> statuses);
+      Long voucherId, Collection<IssuedPdcStatus> statuses);
 
   /**
    * All cheques of a voucher, oldest first.

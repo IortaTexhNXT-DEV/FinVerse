@@ -18,7 +18,7 @@ import java.time.LocalDate;
  * @param createdBy user
  * @param createdAt time
  */
-public record RunResponse(
+public record InvestmentRunResponse(
     Long id,
     RunType runType,
     String period,
@@ -34,8 +34,8 @@ public record RunResponse(
    * @param r run
    * @return response
    */
-  public static RunResponse from(InvestmentRun r) {
-    return new RunResponse(
+  public static InvestmentRunResponse from(InvestmentRun r) {
+    return new InvestmentRunResponse(
         r.getId(),
         r.getRunType(),
         r.getPeriod(),

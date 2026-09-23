@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.finverse.payables.domain.IssuedPdc;
+import com.iortatechnxt.finverse.payables.domain.IssuedPdcEvent;
+import com.iortatechnxt.finverse.payables.domain.IssuedPdcStatus;
 import com.iortatechnxt.finverse.payables.domain.PaymentMode;
 import com.iortatechnxt.finverse.payables.domain.PaymentVoucher;
-import com.iortatechnxt.finverse.payables.domain.PdcEvent;
-import com.iortatechnxt.finverse.payables.domain.PdcStatus;
 import com.iortatechnxt.finverse.payables.domain.SupplierInvoice;
 import com.iortatechnxt.finverse.payables.domain.VoucherStatus;
 import com.iortatechnxt.finverse.payables.service.IssuedPdcService;
@@ -52,7 +52,7 @@ class IssuedPdcIT {
         .isEqualByComparingTo(v.getAmount().negate());
     assertThat(fx.posted(v.getJournalBatchNo(), "1111")).isEqualByComparingTo(BigDecimal.ZERO);
     return pdcs
-        .search(fx.companyId(), EnumSet.allOf(PdcStatus.class), CHEQUE_DATE, CHEQUE_DATE)
+        .search(fx.companyId(), EnumSet.allOf(IssuedPdcStatus.class), CHEQUE_DATE, CHEQUE_DATE)
         .stream()
         .filter(p -> p.getVoucherId().equals(v.getId()))
         .findFirst()
@@ -62,17 +62,17 @@ class IssuedPdcIT {
   @Test
   void issuedChequeBecomesDueIsPresentedAndCleared() {
     IssuedPdc pdc = issue("S-0003", "5000.00");
-    assertThat(pdc.getStatus()).isEqualTo(PdcStatus.ISSUED);
+    assertThat(pdc.getStatus()).isEqualTo(IssuedPdcStatus.ISSUED);
     assertThatThrownBy(() -> as.run("checker", () -> pdcs.present(pdc.getId(), ISSUE)))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("dated");
 
     assertThat(as.run("accountant", () -> pdcs.refreshDue(CHEQUE_DATE))).isPositive();
-    assertThat(pdcs.get(pdc.getId()).getStatus()).isEqualTo(PdcStatus.DUE);
+    assertThat(pdcs.get(pdc.getId()).getStatus()).isEqualTo(IssuedPdcStatus.DUE);
 
     IssuedPdc presented =
         as.run("checker", () -> pdcs.present(pdc.getId(), CHEQUE_DATE.plusDays(1)));
-    assertThat(presented.getStatus()).isEqualTo(PdcStatus.PRESENTED);
+    assertThat(presented.getStatus()).isEqualTo(IssuedPdcStatus.PRESENTED);
     assertThat(fx.posted(presented.getPresentationBatchNo(), "2511"))
         .isEqualByComparingTo(pdc.getAmount());
     assertThat(fx.posted(presented.getPresentationBatchNo(), "1111"))
@@ -80,10 +80,14 @@ class IssuedPdcIT {
 
     IssuedPdc cleared =
         as.run("accountant", () -> pdcs.clear(pdc.getId(), CHEQUE_DATE.plusDays(2)));
-    assertThat(cleared.getStatus()).isEqualTo(PdcStatus.CLEARED);
+    assertThat(cleared.getStatus()).isEqualTo(IssuedPdcStatus.CLEARED);
     assertThat(pdcs.history(pdc.getId()))
-        .extracting(PdcEvent::getToStatus)
-        .containsExactly(PdcStatus.ISSUED, PdcStatus.DUE, PdcStatus.PRESENTED, PdcStatus.CLEARED);
+        .extracting(IssuedPdcEvent::getToStatus)
+        .containsExactly(
+            IssuedPdcStatus.ISSUED,
+            IssuedPdcStatus.DUE,
+            IssuedPdcStatus.PRESENTED,
+            IssuedPdcStatus.CLEARED);
     assertThatThrownBy(() -> as.run("checker", () -> pdcs.cancel(pdc.getId(), CHEQUE_DATE, "late")))
         .isInstanceOf(BusinessRuleException.class);
   }
@@ -93,7 +97,7 @@ class IssuedPdcIT {
     IssuedPdc pdc = issue("S-0003", "2000.00");
     IssuedPdc cancelled =
         as.run("checker", () -> pdcs.cancel(pdc.getId(), ISSUE.plusDays(3), "Stop payment"));
-    assertThat(cancelled.getStatus()).isEqualTo(PdcStatus.CANCELLED);
+    assertThat(cancelled.getStatus()).isEqualTo(IssuedPdcStatus.CANCELLED);
     assertThat(fx.posted(cancelled.getCancelBatchNo(), "2511"))
         .isEqualByComparingTo(pdc.getAmount());
     PaymentVoucher voucher = vouchers.get(pdc.getVoucherId());
@@ -109,10 +113,10 @@ class IssuedPdcIT {
         as.run(
             "checker",
             () -> pdcs.replace(pdc.getId(), CHEQUE_DATE.plusDays(5), ISSUE.plusDays(1), "Damaged"));
-    assertThat(replacement.getStatus()).isEqualTo(PdcStatus.ISSUED);
+    assertThat(replacement.getStatus()).isEqualTo(IssuedPdcStatus.ISSUED);
     assertThat(replacement.getChequeNo()).isNotEqualTo(pdc.getChequeNo());
     assertThat(replacement.getReplacesId()).isEqualTo(pdc.getId());
-    assertThat(pdcs.get(pdc.getId()).getStatus()).isEqualTo(PdcStatus.REPLACED);
+    assertThat(pdcs.get(pdc.getId()).getStatus()).isEqualTo(IssuedPdcStatus.REPLACED);
     assertThat(vouchers.get(pdc.getVoucherId()).getChequeNo()).isEqualTo(replacement.getChequeNo());
   }
 }

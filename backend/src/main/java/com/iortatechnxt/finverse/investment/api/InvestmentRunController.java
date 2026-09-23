@@ -1,8 +1,8 @@
 package com.iortatechnxt.finverse.investment.api;
 
+import com.iortatechnxt.finverse.investment.api.dto.InvestmentRunResponse;
 import com.iortatechnxt.finverse.investment.api.dto.RunPreviewResponse;
 import com.iortatechnxt.finverse.investment.api.dto.RunPreviewResponse.Line;
-import com.iortatechnxt.finverse.investment.api.dto.RunResponse;
 import com.iortatechnxt.finverse.investment.api.dto.TransactionResponse;
 import com.iortatechnxt.finverse.investment.domain.InvestmentRun;
 import com.iortatechnxt.finverse.investment.domain.RunType;
@@ -49,7 +49,8 @@ public class InvestmentRunController {
     Optional<InvestmentRun> run = service.findRun(companyId, type, period);
     if (run.isPresent()) {
       List<Line> lines = service.transactions(run.get().getId()).stream().map(Line::of).toList();
-      return RunPreviewResponse.of(type, period.toString(), RunResponse.from(run.get()), lines);
+      return RunPreviewResponse.of(
+          type, period.toString(), InvestmentRunResponse.from(run.get()), lines);
     }
     List<Line> lines =
         service.preview(companyId, type, period).stream()
@@ -68,9 +69,9 @@ public class InvestmentRunController {
    */
   @PostMapping
   @PreAuthorize("hasAuthority('PERIOD_END_RUN')")
-  public RunResponse post(
+  public InvestmentRunResponse post(
       @RequestParam Long companyId, @RequestParam RunType type, @RequestParam YearMonth period) {
-    return RunResponse.from(service.post(companyId, type, period));
+    return InvestmentRunResponse.from(service.post(companyId, type, period));
   }
 
   /**
@@ -81,8 +82,8 @@ public class InvestmentRunController {
    */
   @GetMapping
   @PreAuthorize("hasAuthority('MASTER_VIEW')")
-  public List<RunResponse> runs(@RequestParam Long companyId) {
-    return service.runs(companyId).stream().map(RunResponse::from).toList();
+  public List<InvestmentRunResponse> runs(@RequestParam Long companyId) {
+    return service.runs(companyId).stream().map(InvestmentRunResponse::from).toList();
   }
 
   /**

@@ -1,8 +1,8 @@
-package com.iortatechnxt.finverse.finreport;
+package com.iortatechnxt.finverse.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.iortatechnxt.finverse.finreport.service.AmountInWords;
+import com.iortatechnxt.finverse.common.util.AmountInWords;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,5 +31,13 @@ class AmountInWordsTest {
   void spellsAmountWithCurrencyAndCents() {
     assertThat(AmountInWords.spell(new BigDecimal("-1250.5"), "Philippine Peso"))
         .isEqualTo("Philippine Peso One Thousand Two Hundred Fifty and 50/100 only");
+  }
+
+  @Test
+  void spellsCentsOnlyAndLargeAmounts() {
+    assertThat(AmountInWords.spell(new BigDecimal("0.05"), "USD"))
+        .isEqualTo("USD Zero and 05/100 only");
+    assertThat(AmountInWords.spell(new BigDecimal("2000013.00"), "PHP"))
+        .isEqualTo("PHP Two Million Thirteen and 00/100 only");
   }
 }

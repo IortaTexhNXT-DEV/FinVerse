@@ -1,6 +1,7 @@
 package com.iortatechnxt.finverse.receivables.api;
 
 import com.iortatechnxt.finverse.receivables.api.dto.AutoMatchRequest;
+import com.iortatechnxt.finverse.receivables.api.dto.BankStatementLineResponse;
 import com.iortatechnxt.finverse.receivables.api.dto.BrsResponse;
 import com.iortatechnxt.finverse.receivables.api.dto.BrsResponse.MatchResponse;
 import com.iortatechnxt.finverse.receivables.api.dto.BrsResponse.WorkbenchResponse;
@@ -8,7 +9,6 @@ import com.iortatechnxt.finverse.receivables.api.dto.ManualMatchRequest;
 import com.iortatechnxt.finverse.receivables.api.dto.ReconciliationRequest;
 import com.iortatechnxt.finverse.receivables.api.dto.ReconciliationResponse;
 import com.iortatechnxt.finverse.receivables.api.dto.StatementImportRequest;
-import com.iortatechnxt.finverse.receivables.api.dto.StatementLineResponse;
 import com.iortatechnxt.finverse.receivables.api.dto.StatementResponse;
 import com.iortatechnxt.finverse.receivables.service.BankMatchingService;
 import com.iortatechnxt.finverse.receivables.service.BankReconciliationService;
@@ -93,8 +93,8 @@ public class BankReconciliationController {
    */
   @GetMapping("/statements/{id}/lines")
   @PreAuthorize("hasAuthority('RECONCILIATION_MANAGE')")
-  public List<StatementLineResponse> lines(@PathVariable Long id) {
-    return statements.lines(id).stream().map(StatementLineResponse::from).toList();
+  public List<BankStatementLineResponse> lines(@PathVariable Long id) {
+    return statements.lines(id).stream().map(BankStatementLineResponse::from).toList();
   }
 
   /**

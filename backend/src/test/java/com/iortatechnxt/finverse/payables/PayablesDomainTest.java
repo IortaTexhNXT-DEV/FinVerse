@@ -8,9 +8,9 @@ import com.iortatechnxt.finverse.party.domain.PartyType;
 import com.iortatechnxt.finverse.payables.domain.ChequeBook;
 import com.iortatechnxt.finverse.payables.domain.ChequeBookStatus;
 import com.iortatechnxt.finverse.payables.domain.InvoiceCalculator;
+import com.iortatechnxt.finverse.payables.domain.IssuedPdcStatus;
 import com.iortatechnxt.finverse.payables.domain.PaymentCategory;
 import com.iortatechnxt.finverse.payables.domain.PaymentMode;
-import com.iortatechnxt.finverse.payables.domain.PdcStatus;
 import com.iortatechnxt.finverse.payables.domain.PettyCashFund;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -82,7 +82,7 @@ class PayablesDomainTest {
     assertThat(PaymentCategory.REINSURANCE.accepts(PartyType.SUPPLIER)).isFalse();
     assertThat(PaymentMode.BANK_TRANSFER.usesCheque()).isFalse();
     assertThat(PaymentMode.PDC.usesCheque()).isTrue();
-    assertThat(PdcStatus.DUE.isOutstanding()).isTrue();
-    assertThat(PdcStatus.PRESENTED.isOutstanding()).isFalse();
+    assertThat(IssuedPdcStatus.DUE.isOutstanding()).isTrue();
+    assertThat(IssuedPdcStatus.PRESENTED.isOutstanding()).isFalse();
   }
 }

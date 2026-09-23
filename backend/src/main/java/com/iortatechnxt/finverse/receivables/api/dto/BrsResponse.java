@@ -31,8 +31,8 @@ public record BrsResponse(
     boolean hasStatement,
     List<BookEntry> bookDebits,
     List<BookEntry> bookCredits,
-    List<StatementLineResponse> bankDebits,
-    List<StatementLineResponse> bankCredits,
+    List<BankStatementLineResponse> bankDebits,
+    List<BankStatementLineResponse> bankCredits,
     ReconciliationResponse reconciliation) {
 
   /**
@@ -49,8 +49,8 @@ public record BrsResponse(
         b.hasStatement(),
         b.bookDebits(),
         b.bookCredits(),
-        b.bankDebits().stream().map(StatementLineResponse::from).toList(),
-        b.bankCredits().stream().map(StatementLineResponse::from).toList(),
+        b.bankDebits().stream().map(BankStatementLineResponse::from).toList(),
+        b.bankCredits().stream().map(BankStatementLineResponse::from).toList(),
         b.reconciliation().map(ReconciliationResponse::from).orElse(null));
   }
 
@@ -62,7 +62,7 @@ public record BrsResponse(
    * @param bankLines unmatched bank lines
    */
   public record WorkbenchResponse(
-      BankAccount bank, List<BookEntry> bookEntries, List<StatementLineResponse> bankLines) {
+      BankAccount bank, List<BookEntry> bookEntries, List<BankStatementLineResponse> bankLines) {
 
     /**
      * Maps a workbench.
@@ -74,7 +74,7 @@ public record BrsResponse(
       return new WorkbenchResponse(
           w.bank(),
           w.bookEntries(),
-          w.bankLines().stream().map(StatementLineResponse::from).toList());
+          w.bankLines().stream().map(BankStatementLineResponse::from).toList());
     }
   }
 

@@ -18,7 +18,7 @@ import java.time.LocalDate;
  * @param balance running balance
  * @param matchId reconciliation match (null when unmatched)
  */
-public record StatementLineResponse(
+public record BankStatementLineResponse(
     Long id,
     Long statementId,
     int lineNo,
@@ -36,8 +36,8 @@ public record StatementLineResponse(
    * @param l line
    * @return response
    */
-  public static StatementLineResponse from(BankStatementLine l) {
-    return new StatementLineResponse(
+  public static BankStatementLineResponse from(BankStatementLine l) {
+    return new BankStatementLineResponse(
         l.getId(),
         l.getStatementId(),
         l.getLineNo(),

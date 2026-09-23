@@ -1,7 +1,7 @@
 package com.iortatechnxt.finverse.payables.api.dto;
 
 import com.iortatechnxt.finverse.payables.domain.IssuedPdc;
-import com.iortatechnxt.finverse.payables.domain.PdcStatus;
+import com.iortatechnxt.finverse.payables.domain.IssuedPdcStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -31,7 +31,7 @@ import java.time.LocalDate;
  * @param replacedById replacement cheque
  * @param remarks remarks
  */
-public record PdcResponse(
+public record IssuedPdcResponse(
     Long id,
     Long voucherId,
     Long bankAccountId,
@@ -45,7 +45,7 @@ public record PdcResponse(
     BigDecimal amount,
     BigDecimal baseAmount,
     String department,
-    PdcStatus status,
+    IssuedPdcStatus status,
     LocalDate presentedOn,
     String presentationBatchNo,
     LocalDate clearedOn,
@@ -61,8 +61,8 @@ public record PdcResponse(
    * @param p cheque
    * @return response
    */
-  public static PdcResponse from(IssuedPdc p) {
-    return new PdcResponse(
+  public static IssuedPdcResponse from(IssuedPdc p) {
+    return new IssuedPdcResponse(
         p.getId(),
         p.getVoucherId(),
         p.getBankAccountId(),

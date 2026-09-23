@@ -7,12 +7,12 @@ import com.iortatechnxt.finverse.audit.service.AuditTrailService;
 import com.iortatechnxt.finverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.finverse.payables.domain.BankAccount;
 import com.iortatechnxt.finverse.payables.domain.IssuedPdc;
+import com.iortatechnxt.finverse.payables.domain.IssuedPdcEvent;
+import com.iortatechnxt.finverse.payables.domain.IssuedPdcEventRepository;
 import com.iortatechnxt.finverse.payables.domain.IssuedPdcRepository;
+import com.iortatechnxt.finverse.payables.domain.IssuedPdcStatus;
 import com.iortatechnxt.finverse.payables.domain.PaymentVoucher;
 import com.iortatechnxt.finverse.payables.domain.PaymentVoucherRepository;
-import com.iortatechnxt.finverse.payables.domain.PdcEvent;
-import com.iortatechnxt.finverse.payables.domain.PdcEventRepository;
-import com.iortatechnxt.finverse.payables.domain.PdcStatus;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -55,7 +55,7 @@ public class IssuedPdcService {
   private static final String ENTITY = "IssuedPdc";
 
   private final IssuedPdcRepository pdcs;
-  private final PdcEventRepository events;
+  private final IssuedPdcEventRepository events;
   private final PaymentVoucherRepository vouchers;
   private final BankAccountQueryService banks;
   private final BankAccountService bankService;
@@ -79,7 +79,7 @@ public class IssuedPdcService {
    */
   public IssuedPdcService(
       IssuedPdcRepository pdcs,
-      PdcEventRepository events,
+      IssuedPdcEventRepository events,
       PaymentVoucherRepository vouchers,
       BankAccountQueryService banks,
       BankAccountService bankService,
@@ -109,7 +109,7 @@ public class IssuedPdcService {
    */
   @Transactional(readOnly = true)
   public List<IssuedPdc> search(
-      Long companyId, Collection<PdcStatus> statuses, LocalDate from, LocalDate to) {
+      Long companyId, Collection<IssuedPdcStatus> statuses, LocalDate from, LocalDate to) {
     return pdcs.search(companyId, statuses, from, to);
   }
 
@@ -131,7 +131,7 @@ public class IssuedPdcService {
    * @return events
    */
   @Transactional(readOnly = true)
-  public List<PdcEvent> history(Long id) {
+  public List<IssuedPdcEvent> history(Long id) {
     return events.findByPdcIdOrderByIdAsc(id);
   }
 
@@ -144,11 +144,11 @@ public class IssuedPdcService {
   public IssuedPdc register(PaymentVoucher voucher) {
     IssuedPdc pdc = pdcs.save(new IssuedPdc(voucher));
     events.save(
-        new PdcEvent(
+        new IssuedPdcEvent(
             pdc.getId(),
             voucher.getVoucherDate(),
             null,
-            PdcStatus.ISSUED,
+            IssuedPdcStatus.ISSUED,
             voucher.getJournalBatchNo(),
             "Issued with " + voucher.getVoucherNo()));
     return pdc;
@@ -162,14 +162,15 @@ public class IssuedPdcService {
    */
   public int refreshDue(LocalDate asOf) {
     int count = 0;
-    for (IssuedPdc pdc : pdcs.findByStatusAndChequeDateLessThanEqual(PdcStatus.ISSUED, asOf)) {
+    for (IssuedPdc pdc :
+        pdcs.findByStatusAndChequeDateLessThanEqual(IssuedPdcStatus.ISSUED, asOf)) {
       pdc.markDueIfReached(asOf);
       events.save(
-          new PdcEvent(
+          new IssuedPdcEvent(
               pdc.getId(),
               pdc.getChequeDate(),
-              PdcStatus.ISSUED,
-              PdcStatus.DUE,
+              IssuedPdcStatus.ISSUED,
+              IssuedPdcStatus.DUE,
               null,
               "Cheque date reached"));
       count++;
@@ -192,7 +193,7 @@ public class IssuedPdcService {
    */
   public IssuedPdc present(Long id, LocalDate date) {
     IssuedPdc pdc = get(id);
-    PdcStatus from = pdc.getStatus();
+    IssuedPdcStatus from = pdc.getStatus();
     BankAccount bank = banks.get(pdc.getBankAccountId());
     PaymentVoucher voucher = voucher(pdc);
     String batchNo =
@@ -231,7 +232,7 @@ public class IssuedPdcService {
   public IssuedPdc clear(Long id, LocalDate date) {
     IssuedPdc pdc = get(id);
     pdc.clear(date);
-    record(pdc, date, PdcStatus.PRESENTED, null, "Cleared by the bank");
+    record(pdc, date, IssuedPdcStatus.PRESENTED, null, "Cleared by the bank");
     return pdc;
   }
 
@@ -245,7 +246,7 @@ public class IssuedPdcService {
    */
   public IssuedPdc cancel(Long id, LocalDate date, String reason) {
     IssuedPdc pdc = get(id);
-    PdcStatus from = pdc.getStatus();
+    IssuedPdcStatus from = pdc.getStatus();
     PaymentVoucher voucher = voucher(pdc);
     String batchNo = poster.reverse(voucher, banks.get(pdc.getBankAccountId()), date, reason);
     pdc.cancel(date, batchNo, reason);
@@ -265,7 +266,7 @@ public class IssuedPdcService {
    */
   public IssuedPdc replace(Long id, LocalDate newChequeDate, LocalDate date, String reason) {
     IssuedPdc old = get(id);
-    PdcStatus from = old.getStatus();
+    IssuedPdcStatus from = old.getStatus();
     PaymentVoucher voucher = voucher(old);
     String newNo = bankService.nextChequeNo(old.getBankAccountId());
     IssuedPdc replacement = pdcs.save(IssuedPdc.replacementOf(old, newNo, newChequeDate, date));
@@ -273,11 +274,11 @@ public class IssuedPdcService {
     voucher.replaceCheque(newNo, newChequeDate);
     record(old, date, from, null, "Replaced by cheque " + newNo + ": " + reason);
     events.save(
-        new PdcEvent(
+        new IssuedPdcEvent(
             replacement.getId(),
             date,
             null,
-            PdcStatus.ISSUED,
+            IssuedPdcStatus.ISSUED,
             null,
             "Replaces cheque " + old.getChequeNo()));
     return replacement;
@@ -290,8 +291,8 @@ public class IssuedPdcService {
   }
 
   private void record(
-      IssuedPdc pdc, LocalDate date, PdcStatus from, String batchNo, String remarks) {
-    events.save(new PdcEvent(pdc.getId(), date, from, pdc.getStatus(), batchNo, remarks));
+      IssuedPdc pdc, LocalDate date, IssuedPdcStatus from, String batchNo, String remarks) {
+    events.save(new IssuedPdcEvent(pdc.getId(), date, from, pdc.getStatus(), batchNo, remarks));
     audit.record(
         ENTITY,
         pdc.getChequeNo(),

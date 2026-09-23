@@ -118,12 +118,13 @@ class ReceiptFlowIT {
 
   @Test
   void onAccountMoneyIsAppliedLaterFifo() {
-    OpenItem older = fx.debitNote("A-0002", MAY, "4000.00", "PHP");
+    String agent = fx.newAgent();
+    OpenItem older = fx.debitNote(agent, MAY, "4000.00", "PHP");
     Receipt r =
         fx.approved(
             fx.request(
                     PayerType.INTERMEDIARY,
-                    "A-0002",
+                    agent,
                     MAY.plusDays(2),
                     ReceiptMode.CHEQUE,
                     "9000.00",
@@ -132,7 +133,7 @@ class ReceiptFlowIT {
     assertThat(r.getAppliedAmount()).isEqualByComparingTo("4000.00");
     assertThat(fx.outstanding(older)).isZero();
 
-    OpenItem later = fx.debitNote("A-0002", MAY.plusDays(20), "3500.00", "PHP");
+    OpenItem later = fx.debitNote(agent, MAY.plusDays(20), "3500.00", "PHP");
     BigDecimal depositsBefore = fx.balance("2205");
     Receipt applied =
         as.run(

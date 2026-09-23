@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.finverse.payables.domain.NotificationFormat;
 import com.iortatechnxt.finverse.payables.report.AgeingSlots;
-import com.iortatechnxt.finverse.payables.report.AmountInWords;
 import com.iortatechnxt.finverse.payables.service.NotificationRecord;
 import com.iortatechnxt.finverse.payables.service.PaymentNotificationFormatter;
 import java.math.BigDecimal;
@@ -36,18 +35,6 @@ class PayablesFormattingTest {
         .isInstanceOf(BusinessRuleException.class);
     assertThatThrownBy(() -> AgeingSlots.of(List.of(1, 2, 3, 4, 5, 6)))
         .isInstanceOf(BusinessRuleException.class);
-  }
-
-  @Test
-  void amountsAreSpelledForVouchers() {
-    assertThat(AmountInWords.of("PHP", new BigDecimal("1250.75")))
-        .isEqualTo("PHP ONE THOUSAND TWO HUNDRED FIFTY AND 75/100 ONLY");
-    assertThat(AmountInWords.of("USD", new BigDecimal("0.05")))
-        .isEqualTo("USD ZERO AND 05/100 ONLY");
-    assertThat(AmountInWords.of("PHP", new BigDecimal("2000013.00")))
-        .isEqualTo("PHP TWO MILLION THIRTEEN AND 00/100 ONLY");
-    assertThat(AmountInWords.of("PHP", new BigDecimal("999")))
-        .isEqualTo("PHP NINE HUNDRED NINETY-NINE AND 00/100 ONLY");
   }
 
   @Test

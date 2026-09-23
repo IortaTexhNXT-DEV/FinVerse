@@ -1,7 +1,7 @@
 package com.iortatechnxt.finverse.finreport.report;
 
+import com.iortatechnxt.finverse.common.util.AmountInWords;
 import com.iortatechnxt.finverse.finreport.service.AccountHierarchy;
-import com.iortatechnxt.finverse.finreport.service.AmountInWords;
 import com.iortatechnxt.finverse.finreport.service.FinReportQueries;
 import com.iortatechnxt.finverse.finreport.service.StatusFilter;
 import com.iortatechnxt.finverse.finreport.service.VoucherLine;

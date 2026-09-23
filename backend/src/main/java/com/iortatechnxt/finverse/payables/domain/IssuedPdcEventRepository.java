@@ -3,8 +3,8 @@ package com.iortatechnxt.finverse.payables.domain;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-/** Persistence for {@link PdcEvent}. */
-public interface PdcEventRepository extends JpaRepository<PdcEvent, Long> {
+/** Persistence for {@link IssuedPdcEvent}. */
+public interface IssuedPdcEventRepository extends JpaRepository<IssuedPdcEvent, Long> {
 
   /**
    * History of a cheque.
@@ -12,5 +12,5 @@ public interface PdcEventRepository extends JpaRepository<PdcEvent, Long> {
    * @param pdcId cheque
    * @return events in order
    */
-  List<PdcEvent> findByPdcIdOrderByIdAsc(Long pdcId);
+  List<IssuedPdcEvent> findByPdcIdOrderByIdAsc(Long pdcId);
 }

@@ -1,5 +1,6 @@
 package com.iortatechnxt.finverse.payables.report;
 
+import com.iortatechnxt.finverse.common.util.AmountInWords;
 import com.iortatechnxt.finverse.report.core.ParameterSpec;
 import com.iortatechnxt.finverse.report.core.ParameterType;
 import com.iortatechnxt.finverse.report.core.ReportCategory;
@@ -17,6 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -159,7 +161,8 @@ public class PaymentVoucherReport implements ReportDefinition {
   private static String footer(ResultSet rs) throws SQLException {
     return rs.getString("voucher_no")
         + ": "
-        + AmountInWords.of(rs.getString("currency"), rs.getBigDecimal("amount"))
+        + AmountInWords.spell(rs.getBigDecimal("amount"), rs.getString("currency"))
+            .toUpperCase(Locale.ROOT)
         + " | Total "
         + rs.getBigDecimal("amount").toPlainString()
         + " | Entered by "

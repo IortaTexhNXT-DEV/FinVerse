@@ -1,8 +1,8 @@
 package com.iortatechnxt.finverse.consolidation.api;
 
+import com.iortatechnxt.finverse.consolidation.api.dto.ConsolidationRunResponse;
 import com.iortatechnxt.finverse.consolidation.api.dto.GroupRequest;
 import com.iortatechnxt.finverse.consolidation.api.dto.GroupResponse;
-import com.iortatechnxt.finverse.consolidation.api.dto.RunResponse;
 import com.iortatechnxt.finverse.consolidation.service.ConsolidationGroupService;
 import com.iortatechnxt.finverse.consolidation.service.ConsolidationRunService;
 import jakarta.validation.Valid;
@@ -88,8 +88,8 @@ public class ConsolidationController {
    */
   @GetMapping("/groups/{groupId}/runs")
   @PreAuthorize(VIEW)
-  public List<RunResponse> runs(@PathVariable Long groupId) {
-    return runs.list(groupId).stream().map(RunResponse::summary).toList();
+  public List<ConsolidationRunResponse> runs(@PathVariable Long groupId) {
+    return runs.list(groupId).stream().map(ConsolidationRunResponse::summary).toList();
   }
 
   /**
@@ -102,10 +102,10 @@ public class ConsolidationController {
   @PostMapping("/groups/{groupId}/runs")
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(RUN)
-  public RunResponse run(
+  public ConsolidationRunResponse run(
       @PathVariable Long groupId,
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate asOf) {
-    return RunResponse.detail(runs.run(groupId, asOf));
+    return ConsolidationRunResponse.detail(runs.run(groupId, asOf));
   }
 
   /**
@@ -116,8 +116,8 @@ public class ConsolidationController {
    */
   @GetMapping("/runs/{runId}")
   @PreAuthorize(VIEW)
-  public RunResponse run(@PathVariable Long runId) {
-    return RunResponse.detail(runs.get(runId));
+  public ConsolidationRunResponse run(@PathVariable Long runId) {
+    return ConsolidationRunResponse.detail(runs.get(runId));
   }
 
   /**
@@ -128,7 +128,7 @@ public class ConsolidationController {
    */
   @PostMapping("/runs/{runId}/finalize")
   @PreAuthorize(RUN)
-  public RunResponse finalizeRun(@PathVariable Long runId) {
-    return RunResponse.summary(runs.finalizeRun(runId));
+  public ConsolidationRunResponse finalizeRun(@PathVariable Long runId) {
+    return ConsolidationRunResponse.summary(runs.finalizeRun(runId));
   }
 }

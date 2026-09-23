@@ -30,7 +30,7 @@ import java.util.List;
  * @param trialBalance consolidated trial balance (detail view)
  * @param lines consolidated ledger lines (detail view)
  */
-public record RunResponse(
+public record ConsolidationRunResponse(
     Long id,
     Long groupId,
     String runNo,
@@ -52,7 +52,7 @@ public record RunResponse(
    * @param r run
    * @return view
    */
-  public static RunResponse summary(ConsolidationRun r) {
+  public static ConsolidationRunResponse summary(ConsolidationRun r) {
     return of(r, null, null);
   }
 
@@ -62,15 +62,16 @@ public record RunResponse(
    * @param r run
    * @return view
    */
-  public static RunResponse detail(ConsolidationRun r) {
+  public static ConsolidationRunResponse detail(ConsolidationRun r) {
     return of(
         r,
         ConsolidationRunService.trialBalance(r).values().stream().map(TbLine::from).toList(),
         r.getLines().stream().map(Line::from).toList());
   }
 
-  private static RunResponse of(ConsolidationRun r, List<TbLine> tb, List<Line> lines) {
-    return new RunResponse(
+  private static ConsolidationRunResponse of(
+      ConsolidationRun r, List<TbLine> tb, List<Line> lines) {
+    return new ConsolidationRunResponse(
         r.getId(),
         r.getGroupId(),
         r.getRunNo(),

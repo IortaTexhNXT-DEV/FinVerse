@@ -66,7 +66,7 @@ public class IssuedPdc extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 20)
-  private PdcStatus status = PdcStatus.ISSUED;
+  private IssuedPdcStatus status = IssuedPdcStatus.ISSUED;
 
   @Column(name = "presented_on")
   private LocalDate presentedOn;
@@ -156,8 +156,8 @@ public class IssuedPdc extends BaseEntity {
    * @return true when the status changed
    */
   public boolean markDueIfReached(LocalDate asOf) {
-    if (status == PdcStatus.ISSUED && !chequeDate.isAfter(asOf)) {
-      status = PdcStatus.DUE;
+    if (status == IssuedPdcStatus.ISSUED && !chequeDate.isAfter(asOf)) {
+      status = IssuedPdcStatus.DUE;
       return true;
     }
     return false;
@@ -175,7 +175,7 @@ public class IssuedPdc extends BaseEntity {
       throw new BusinessRuleException(
           "PDC_NOT_MATURED", "Cheque " + chequeNo + " is dated " + chequeDate);
     }
-    status = PdcStatus.PRESENTED;
+    status = IssuedPdcStatus.PRESENTED;
     presentedOn = date;
     presentationBatchNo = batchNo;
   }
@@ -186,10 +186,10 @@ public class IssuedPdc extends BaseEntity {
    * @param date clearing date
    */
   public void clear(LocalDate date) {
-    if (status != PdcStatus.PRESENTED) {
+    if (status != IssuedPdcStatus.PRESENTED) {
       throw new BusinessRuleException("PDC_NOT_PRESENTED", "Cheque " + chequeNo + " is " + status);
     }
-    status = PdcStatus.CLEARED;
+    status = IssuedPdcStatus.CLEARED;
     clearedOn = date;
   }
 
@@ -202,7 +202,7 @@ public class IssuedPdc extends BaseEntity {
    */
   public void cancel(LocalDate date, String batchNo, String reason) {
     requireOutstanding("cancel");
-    status = PdcStatus.CANCELLED;
+    status = IssuedPdcStatus.CANCELLED;
     cancelledOn = date;
     cancelBatchNo = batchNo;
     remarks = reason;
@@ -217,7 +217,7 @@ public class IssuedPdc extends BaseEntity {
    */
   public void replaceWith(LocalDate date, IssuedPdc replacement, String reason) {
     requireOutstanding("replace");
-    status = PdcStatus.REPLACED;
+    status = IssuedPdcStatus.REPLACED;
     replacedOn = date;
     replacedById = replacement.getId();
     remarks = reason;
@@ -286,7 +286,7 @@ public class IssuedPdc extends BaseEntity {
     return department;
   }
 
-  public PdcStatus getStatus() {
+  public IssuedPdcStatus getStatus() {
     return status;
   }
 

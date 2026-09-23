@@ -5,9 +5,9 @@ import com.iortatechnxt.finverse.organization.domain.Branch;
 import com.iortatechnxt.finverse.organization.domain.Company;
 import com.iortatechnxt.finverse.organization.service.OrganizationService;
 import com.iortatechnxt.finverse.payables.domain.InvoiceLineValues;
+import com.iortatechnxt.finverse.payables.domain.IssuedPdcStatus;
 import com.iortatechnxt.finverse.payables.domain.PaymentMode;
 import com.iortatechnxt.finverse.payables.domain.PaymentVoucher;
-import com.iortatechnxt.finverse.payables.domain.PdcStatus;
 import com.iortatechnxt.finverse.payables.domain.SupplierInvoice;
 import com.iortatechnxt.finverse.payables.domain.SupplierInvoiceRepository;
 import com.iortatechnxt.finverse.subledger.service.OpenItemService;
@@ -325,7 +325,7 @@ public class PayablesDemoData {
       return pdcs
           .search(
               companyId,
-              EnumSet.of(PdcStatus.ISSUED, PdcStatus.DUE),
+              EnumSet.of(IssuedPdcStatus.ISSUED, IssuedPdcStatus.DUE),
               v.getChequeDate(),
               v.getChequeDate())
           .stream()

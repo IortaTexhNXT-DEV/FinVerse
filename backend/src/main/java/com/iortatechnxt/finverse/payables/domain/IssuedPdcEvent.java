@@ -11,7 +11,7 @@ import java.time.LocalDate;
 /** Status history (confirmation audit trail) of a post-dated cheque issued. Insert only. */
 @Entity
 @Table(name = "pay_pdc_event")
-public class PdcEvent extends BaseEntity {
+public class IssuedPdcEvent extends BaseEntity {
 
   @Column(name = "pdc_id", nullable = false)
   private Long pdcId;
@@ -21,11 +21,11 @@ public class PdcEvent extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "from_status", length = 20)
-  private PdcStatus fromStatus;
+  private IssuedPdcStatus fromStatus;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "to_status", nullable = false, length = 20)
-  private PdcStatus toStatus;
+  private IssuedPdcStatus toStatus;
 
   @Column(name = "batch_no", length = 40)
   private String batchNo;
@@ -33,7 +33,7 @@ public class PdcEvent extends BaseEntity {
   @Column(length = 200)
   private String remarks;
 
-  protected PdcEvent() {}
+  protected IssuedPdcEvent() {}
 
   /**
    * Records a transition.
@@ -45,11 +45,11 @@ public class PdcEvent extends BaseEntity {
    * @param batchNo journal posted by the transition, if any
    * @param remarks remarks
    */
-  public PdcEvent(
+  public IssuedPdcEvent(
       Long pdcId,
       LocalDate eventDate,
-      PdcStatus fromStatus,
-      PdcStatus toStatus,
+      IssuedPdcStatus fromStatus,
+      IssuedPdcStatus toStatus,
       String batchNo,
       String remarks) {
     this.pdcId = pdcId;
@@ -68,11 +68,11 @@ public class PdcEvent extends BaseEntity {
     return eventDate;
   }
 
-  public PdcStatus getFromStatus() {
+  public IssuedPdcStatus getFromStatus() {
     return fromStatus;
   }
 
-  public PdcStatus getToStatus() {
+  public IssuedPdcStatus getToStatus() {
     return toStatus;
   }
 

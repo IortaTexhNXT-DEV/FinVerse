@@ -1,4 +1,4 @@
-package com.iortatechnxt.finverse.finreport.service;
+package com.iortatechnxt.finverse.common.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

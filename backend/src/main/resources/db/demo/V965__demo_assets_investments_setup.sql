@@ -9,7 +9,7 @@ insert into coa_account (company_id, code, name, account_class, level, parent_id
     control_account, sub_ledger_type, allow_manual_posting, cost_center_required, business_line_required,
     revaluation_required, reconcilable, inter_branch, report_group, opened_on, record_status,
     authorized_by, authorized_at, created_at, created_by)
-select c.id, a.code, a.name, a.cls, 'SUB', (select id from coa_account where code = a.parent),
+select c.id, a.code, a.name, a.cls, 'SUB', (select p.id from coa_account p where p.company_id = c.id and p.code = a.parent),
     (select id from coa_category where code = a.cat), true,
     false, 'NONE', true, false, false, false, false, false, a.grp, date '2010-01-01', 'ACTIVE', 'SYSTEM', now(), now(), 'SYSTEM'
 from org_company c,

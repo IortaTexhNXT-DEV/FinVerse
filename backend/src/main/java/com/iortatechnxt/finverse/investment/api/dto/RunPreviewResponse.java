@@ -22,7 +22,7 @@ public record RunPreviewResponse(
     RunType runType,
     String period,
     boolean posted,
-    RunResponse run,
+    InvestmentRunResponse run,
     BigDecimal total,
     List<Line> lines) {
 
@@ -41,7 +41,7 @@ public record RunPreviewResponse(
    * @return response
    */
   public static RunPreviewResponse of(
-      RunType runType, String period, RunResponse run, List<Line> lines) {
+      RunType runType, String period, InvestmentRunResponse run, List<Line> lines) {
     BigDecimal total = lines.stream().map(Line::amount).reduce(BigDecimal.ZERO, BigDecimal::add);
     return new RunPreviewResponse(runType, period, run != null, run, total, lines);
   }

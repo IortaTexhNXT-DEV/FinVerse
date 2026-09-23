@@ -1,7 +1,7 @@
 package com.iortatechnxt.finverse.payables.domain;
 
 /** Status of a post-dated cheque issued. */
-public enum PdcStatus {
+public enum IssuedPdcStatus {
   /** Issued to the payee; cheque date in the future. */
   ISSUED,
   /** Cheque date reached, not yet presented. */

@@ -1,7 +1,7 @@
 package com.iortatechnxt.finverse.payables.api.dto;
 
-import com.iortatechnxt.finverse.payables.domain.PdcEvent;
-import com.iortatechnxt.finverse.payables.domain.PdcStatus;
+import com.iortatechnxt.finverse.payables.domain.IssuedPdcEvent;
+import com.iortatechnxt.finverse.payables.domain.IssuedPdcStatus;
 import java.time.Instant;
 import java.time.LocalDate;
 
@@ -18,8 +18,8 @@ import java.time.LocalDate;
  */
 public record PdcEventResponse(
     LocalDate eventDate,
-    PdcStatus fromStatus,
-    PdcStatus toStatus,
+    IssuedPdcStatus fromStatus,
+    IssuedPdcStatus toStatus,
     String batchNo,
     String remarks,
     String createdBy,
@@ -31,7 +31,7 @@ public record PdcEventResponse(
    * @param e event
    * @return response
    */
-  public static PdcEventResponse from(PdcEvent e) {
+  public static PdcEventResponse from(IssuedPdcEvent e) {
     return new PdcEventResponse(
         e.getEventDate(),
         e.getFromStatus(),

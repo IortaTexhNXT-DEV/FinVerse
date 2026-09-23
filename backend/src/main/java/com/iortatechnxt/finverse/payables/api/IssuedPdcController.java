@@ -1,10 +1,10 @@
 package com.iortatechnxt.finverse.payables.api;
 
 import com.iortatechnxt.finverse.payables.api.dto.DatedReasonRequest;
+import com.iortatechnxt.finverse.payables.api.dto.IssuedPdcResponse;
 import com.iortatechnxt.finverse.payables.api.dto.PdcEventResponse;
-import com.iortatechnxt.finverse.payables.api.dto.PdcResponse;
 import com.iortatechnxt.finverse.payables.api.dto.ReplaceChequeRequest;
-import com.iortatechnxt.finverse.payables.domain.PdcStatus;
+import com.iortatechnxt.finverse.payables.domain.IssuedPdcStatus;
 import com.iortatechnxt.finverse.payables.service.IssuedPdcService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -48,15 +48,15 @@ public class IssuedPdcController {
    */
   @GetMapping
   @PreAuthorize(PayablesAccess.VIEW)
-  public List<PdcResponse> search(
+  public List<IssuedPdcResponse> search(
       @RequestParam Long companyId,
-      @RequestParam(required = false) Set<PdcStatus> statuses,
+      @RequestParam(required = false) Set<IssuedPdcStatus> statuses,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-    Set<PdcStatus> effective =
-        statuses == null || statuses.isEmpty() ? EnumSet.allOf(PdcStatus.class) : statuses;
+    Set<IssuedPdcStatus> effective =
+        statuses == null || statuses.isEmpty() ? EnumSet.allOf(IssuedPdcStatus.class) : statuses;
     return service.search(companyId, effective, ApiDefaults.from(from), ApiDefaults.to(to)).stream()
-        .map(PdcResponse::from)
+        .map(IssuedPdcResponse::from)
         .toList();
   }
 
@@ -68,8 +68,8 @@ public class IssuedPdcController {
    */
   @GetMapping("/{id}")
   @PreAuthorize(PayablesAccess.VIEW)
-  public PdcResponse get(@PathVariable Long id) {
-    return PdcResponse.from(service.get(id));
+  public IssuedPdcResponse get(@PathVariable Long id) {
+    return IssuedPdcResponse.from(service.get(id));
   }
 
   /**
@@ -106,9 +106,9 @@ public class IssuedPdcController {
    */
   @PostMapping("/{id}/present")
   @PreAuthorize(PayablesAccess.AUTHORIZE)
-  public PdcResponse present(
+  public IssuedPdcResponse present(
       @PathVariable Long id, @Valid @RequestBody DatedReasonRequest request) {
-    return PdcResponse.from(service.present(id, request.date()));
+    return IssuedPdcResponse.from(service.present(id, request.date()));
   }
 
   /**
@@ -120,8 +120,9 @@ public class IssuedPdcController {
    */
   @PostMapping("/{id}/clear")
   @PreAuthorize(PayablesAccess.MAINTAIN_OR_AUTHORIZE)
-  public PdcResponse clear(@PathVariable Long id, @Valid @RequestBody DatedReasonRequest request) {
-    return PdcResponse.from(service.clear(id, request.date()));
+  public IssuedPdcResponse clear(
+      @PathVariable Long id, @Valid @RequestBody DatedReasonRequest request) {
+    return IssuedPdcResponse.from(service.clear(id, request.date()));
   }
 
   /**
@@ -133,8 +134,9 @@ public class IssuedPdcController {
    */
   @PostMapping("/{id}/cancel")
   @PreAuthorize(PayablesAccess.AUTHORIZE)
-  public PdcResponse cancel(@PathVariable Long id, @Valid @RequestBody DatedReasonRequest request) {
-    return PdcResponse.from(
+  public IssuedPdcResponse cancel(
+      @PathVariable Long id, @Valid @RequestBody DatedReasonRequest request) {
+    return IssuedPdcResponse.from(
         service.cancel(
             id, request.date(), ApiDefaults.reasonOrDefault(request.reason(), "PDC cancelled")));
   }
@@ -148,9 +150,9 @@ public class IssuedPdcController {
    */
   @PostMapping("/{id}/replace")
   @PreAuthorize(PayablesAccess.AUTHORIZE)
-  public PdcResponse replace(
+  public IssuedPdcResponse replace(
       @PathVariable Long id, @Valid @RequestBody ReplaceChequeRequest request) {
-    return PdcResponse.from(
+    return IssuedPdcResponse.from(
         service.replace(id, request.chequeDate(), request.date(), request.reason()));
   }
 }

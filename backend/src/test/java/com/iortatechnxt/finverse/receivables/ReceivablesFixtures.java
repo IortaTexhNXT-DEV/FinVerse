@@ -5,7 +5,9 @@ import com.iortatechnxt.finverse.accounting.service.BusinessEvent;
 import com.iortatechnxt.finverse.coa.service.ChartOfAccountsService;
 import com.iortatechnxt.finverse.currency.service.CurrencyService;
 import com.iortatechnxt.finverse.ledger.service.LedgerQueryService;
+import com.iortatechnxt.finverse.party.api.dto.PartyRequest;
 import com.iortatechnxt.finverse.party.domain.Party;
+import com.iortatechnxt.finverse.party.domain.PartyType;
 import com.iortatechnxt.finverse.party.service.PartyService;
 import com.iortatechnxt.finverse.receivables.api.dto.AllocationRequest;
 import com.iortatechnxt.finverse.receivables.api.dto.ReceiptRequest;
@@ -78,6 +80,40 @@ public class ReceivablesFixtures {
 
   public Long branch() {
     return data.branch("HO").getId();
+  }
+
+  /**
+   * Creates and authorizes a new agent with no open items, for tests whose FIFO allocation must not
+   * pick up items that other test classes left on the shared demo intermediaries.
+   *
+   * @return party code
+   */
+  public String newAgent() {
+    String code = "A-T" + SEQ.incrementAndGet() + "-" + System.nanoTime() % 100_000;
+    Party party =
+        as.run(
+            "accountant",
+            () ->
+                parties.create(
+                    new PartyRequest(
+                        company(),
+                        code,
+                        "Receivables Test Agent",
+                        PartyType.AGENT,
+                        null,
+                        null,
+                        null,
+                        null,
+                        "PHP",
+                        15,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null)));
+    as.run("checker", () -> parties.authorize(party.getId()));
+    return code;
   }
 
   /** Raises a debit note (POLICY_ISSUE journal + DEBIT open item). */

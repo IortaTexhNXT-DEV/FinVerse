@@ -68,8 +68,7 @@ public class RiskAccumulationReport implements ReportDefinition {
     String zoneFilter = p.optionalText(ZONE).orElse(null);
     List<RiskExposure> exposures =
         policies.risksInForce(p.longValue(UwReportSupport.COMPANY), asOf).stream()
-            .filter(
-                e -> zoneFilter == null || zoneFilter.equals(e.risk().accumulationZone()))
+            .filter(e -> zoneFilter == null || zoneFilter.equals(e.risk().accumulationZone()))
             .sorted(Comparator.comparing(RiskAccumulationReport::zoneOf))
             .toList();
     List<Map<String, Object>> rows = new ArrayList<>();

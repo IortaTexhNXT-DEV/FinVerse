@@ -1,4 +1,6 @@
+import { REINSURANCE_HELP } from '@/features/reinsurance/help';
 import { RESERVES_HELP } from '@/features/reserves/help';
+import { TAX_HELP } from '@/features/tax/help';
 
 /**
  * In-app help. One entry per module; each screen lists its purpose, the usual workflow and the
@@ -171,72 +173,7 @@ export const HELP_SECTIONS: HelpSection[] = [
       },
     ],
   },
-  {
-    id: 'tax',
-    module: 'Tax & Statutory',
-    intro:
-      'BIR, LGU and BFP returns computed from posted documents, BIR Form 2307 certificates and the Insurance Commission schedules.',
-    screens: [
-      {
-        name: 'Tax Calendar',
-        path: '/tax/calendar',
-        summary:
-          'Every form and period of the year with its due date, the return prepared for it and a due / overdue badge.',
-        workflow: ['Prepare a missing return from its row, then file and pay it on Tax Returns.'],
-        controls: [
-          'Alerts TAX_RETURN_DUE and TAX_RETURN_OVERDUE are raised daily for tracked forms.',
-          'Forms marked as reminders (e.g. 1601-C from payroll) raise no alerts.',
-        ],
-      },
-      {
-        name: 'VAT, Withholding, DST and Premium Tax Worksheets',
-        path: '/tax/vat',
-        summary:
-          'Tax of a month or quarter from approved policies, endorsements, commissions and supplier invoices, reconciled with the tax accounts of the ledger.',
-        workflow: [
-          'Pick the period, review the return lines and the reconciliation difference.',
-          'Open a source document from the drill-down table when a figure needs checking.',
-          'Export the worksheet (PDF, Excel, CSV) or the BIR lists (SLS, SLP, QAP) and create the return.',
-        ],
-        controls: [
-          'Payees without an authorized default ATC are listed as UNMAPPED and are not certified on 2307.',
-        ],
-      },
-      {
-        name: 'Tax Returns',
-        path: '/tax/returns',
-        summary: 'Returns register: DRAFT, FILED and PAID returns with their remittance.',
-        workflow: [
-          'Refresh a draft to recompute it from the worksheet.',
-          'File it with the eFPS / eBIRForms reference, then pay it from a bank account.',
-        ],
-        controls: [
-          'A return is filed by a user other than the one who prepared it.',
-          'Paying posts the TAX_REMITTANCE journal that clears the tax payable (and applies input VAT).',
-        ],
-      },
-      {
-        name: 'BIR Form 2307',
-        path: '/tax/2307',
-        summary:
-          'Certificates of creditable tax withheld per payee and quarter, generated in batches and printed as PDF.',
-        controls: ['A payee holds one issued certificate per quarter; cancel it to re-issue.'],
-      },
-      {
-        name: 'IC Statutory Schedules',
-        path: '/tax/ic-schedules',
-        summary:
-          'Premiums, losses and commissions by line of business, net worth, RBC, reserves and investments from the ledger.',
-      },
-      {
-        name: 'Tax masters',
-        path: '/tax/codes',
-        summary:
-          'Tax codes and ATCs, filing forms, party tax profiles and the IC mapping, each subject to authorization.',
-        controls: ['Maker-checker: changes appear in the authorizers’ approval inbox.'],
-      },
-    ],
-  },
+  TAX_HELP,
   {
     id: 'reports',
     module: 'Reports',
@@ -281,72 +218,7 @@ export const HELP_SECTIONS: HelpSection[] = [
       },
     ],
   },
-  {
-    id: 'reinsurance',
-    module: 'Reinsurance',
-    intro:
-      "Treaty programme, cession of premium, facultative placements, reinsurers' share of claims and quarterly statements of account.",
-    screens: [
-      {
-        name: 'Treaties',
-        path: '/reinsurance/treaties',
-        summary:
-          'Quota share, surplus and excess of loss treaties per class and underwriting year, with participants (share, commission, profit commission, premium reserve) and layers.',
-        workflow: [
-          'The reinsurance officer creates or changes a treaty; it is pending authorization.',
-          'A checker with REINSURANCE_AUTHORIZE authorizes it from the list or My Approvals.',
-        ],
-        controls: [
-          'Participants must total 100 %; only one authorized treaty of each type per class and year.',
-          'Statements are kept in the company base currency.',
-        ],
-      },
-      {
-        name: 'RI Allocation',
-        path: '/reinsurance/allocation',
-        summary:
-          'Cedes approved policies and endorsements: retention first, then quota share, surplus lines and the facultative remainder. Endorsements, refunds and cancellations follow the proportions in force.',
-        workflow: [
-          'Preview the period, then post; each transaction is ceded once.',
-          'Look up a policy to see its cessions or cede it on demand.',
-        ],
-        controls: [
-          'Posting publishes RI_PREMIUM_CEDED and records the amounts due to each reinsurer.',
-          'A risk above treaty capacity raises the RI_TREATY_CAPACITY alert.',
-        ],
-      },
-      {
-        name: 'FAC Placements',
-        path: '/reinsurance/fac',
-        summary: 'Facultative slips for the sum insured beyond treaty capacity.',
-        workflow: [
-          'Record the reinsurers and their shares, then submit the slip.',
-          'A different user approves it (premium ceded to the participants); the slip is then closed.',
-        ],
-        controls: ['Slips left unplaced beyond the threshold raise the RI_FAC_UNPLACED alert.'],
-      },
-      {
-        name: 'Claims Recoveries',
-        path: '/reinsurance/claims',
-        summary:
-          "Reinsurers' share of every claim movement: reserve shares, recoveries due on payments, salvage shared back and excess of loss recoveries.",
-        controls: ['Each claim movement is processed once, on its reference.'],
-      },
-      {
-        name: 'Statements of Account',
-        path: '/reinsurance/soa',
-        summary:
-          'Quarterly income / outgo statement per treaty participant with the balance on the smaller side and in words; print or export to PDF.',
-        workflow: [
-          'Generate the quarter (regenerate while pending); a checker approves it.',
-          'Settle the approved statement: the balance is paid or received and the open items are matched.',
-        ],
-        controls: [
-          'Approval posts levy, reserves retained / released and interest (RI_SOA_ADJUSTMENT).',
-        ],
-      },
-    ],
-  },
+  REINSURANCE_HELP,
   {
     id: 'admin',
     module: 'Administration',

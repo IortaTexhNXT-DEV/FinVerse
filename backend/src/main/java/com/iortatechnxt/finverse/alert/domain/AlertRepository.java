@@ -79,4 +79,13 @@ public interface AlertRepository extends JpaRepository<Alert, Long> {
      */
     long getTotal();
   }
+
+  /**
+   * Counts the alerts of a company not in a status.
+   *
+   * @param companyId company
+   * @param status status to exclude (RESOLVED counts the live alerts)
+   * @return count
+   */
+  long countByCompanyIdAndStatusNot(Long companyId, AlertStatus status);
 }

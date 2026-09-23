@@ -54,7 +54,7 @@ public abstract class ApprovableDocument extends BaseEntity {
    *
    * @return maker user name
    */
-  protected String maker() {
+  public String maker() {
     return getCreatedBy();
   }
 

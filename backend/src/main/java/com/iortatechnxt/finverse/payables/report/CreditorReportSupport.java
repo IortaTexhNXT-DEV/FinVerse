@@ -2,8 +2,12 @@ package com.iortatechnxt.finverse.payables.report;
 
 import com.iortatechnxt.finverse.organization.service.OrganizationService;
 import com.iortatechnxt.finverse.report.core.ParameterSpec;
+import com.iortatechnxt.finverse.report.core.ParameterType;
+import com.iortatechnxt.finverse.report.core.ReportColumn;
 import com.iortatechnxt.finverse.report.core.ReportParameters;
 import com.iortatechnxt.finverse.report.gl.GlReportSupport;
+import com.iortatechnxt.finverse.subledger.service.AgeingService;
+import com.iortatechnxt.finverse.subledger.service.AgeingSlots;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,18 +32,24 @@ public class CreditorReportSupport {
   /** Net value column key. */
   public static final String NET = "net";
 
+  private static final String SLOT_PARAM = "slot";
+
   private final CreditorLedger ledger;
   private final OrganizationService organization;
+  private final AgeingService ageing;
 
   /**
    * Creates the helper.
    *
    * @param ledger creditor read model
    * @param organization organization service
+   * @param ageing sub-ledger ageing (company default slots)
    */
-  public CreditorReportSupport(CreditorLedger ledger, OrganizationService organization) {
+  public CreditorReportSupport(
+      CreditorLedger ledger, OrganizationService organization, AgeingService ageing) {
     this.ledger = ledger;
     this.organization = organization;
+    this.ageing = ageing;
   }
 
   /**
@@ -62,8 +72,72 @@ public class CreditorReportSupport {
     if (withCurrencyOption) {
       specs.add(ReportParams.currencyMode());
     }
-    specs.addAll(AgeingSlots.parameters());
+    specs.addAll(slotParameters());
     return specs;
+  }
+
+  /**
+   * Ageing slot parameters {@code slot1..slot5}; all blank = the default slots.
+   *
+   * @return specs
+   */
+  public static List<ParameterSpec> slotParameters() {
+    List<ParameterSpec> specs = new ArrayList<>();
+    for (int i = 1; i <= AgeingSlots.MAX_SLOTS; i++) {
+      specs.add(
+          ParameterSpec.optional(
+              SLOT_PARAM + i, "Ageing Slot " + i + " (days)", ParameterType.NUMBER));
+    }
+    return specs;
+  }
+
+  /**
+   * Slots of a run: the slots entered, else the company default ({@code AGEING_BUCKETS}).
+   *
+   * @param p parameters
+   * @return slots
+   */
+  public AgeingSlots slots(ReportParameters p) {
+    return slots(p, ageing.defaultSlots());
+  }
+
+  /**
+   * Slots of a run: the slots entered ({@code slot1..slot5}, blanks skipped), else the defaults.
+   *
+   * @param p parameters
+   * @param defaults slots used when none is entered
+   * @return slots
+   */
+  public static AgeingSlots slots(ReportParameters p, AgeingSlots defaults) {
+    List<Integer> given = new ArrayList<>();
+    for (int i = 1; i <= AgeingSlots.MAX_SLOTS; i++) {
+      p.optionalDecimal(SLOT_PARAM + i).map(BigDecimal::intValue).ifPresent(given::add);
+    }
+    return given.isEmpty() ? defaults : AgeingSlots.of(given);
+  }
+
+  /**
+   * Cell key of an ageing bucket.
+   *
+   * @param index bucket
+   * @return key
+   */
+  public static String bucketKey(int index) {
+    return "age" + index;
+  }
+
+  /**
+   * Amount columns of every ageing bucket.
+   *
+   * @param slots slots
+   * @return columns headed with the day ranges
+   */
+  public static List<ReportColumn> bucketColumns(AgeingSlots slots) {
+    List<ReportColumn> cols = new ArrayList<>();
+    for (int i = 0; i < slots.size(); i++) {
+      cols.add(ReportColumn.amount(bucketKey(i), slots.label(i)));
+    }
+    return cols;
   }
 
   /**
@@ -141,7 +215,7 @@ public class CreditorReportSupport {
     BigDecimal value = item.signed(base(p));
     String key =
         item.credit()
-            ? AgeingSlots.key(slots.index(item.age(p.date(GlReportSupport.AS_OF), byDueDate(p))))
+            ? bucketKey(slots.index(item.age(p.date(GlReportSupport.AS_OF), byDueDate(p))))
             : ON_ACCOUNT;
     cells.merge(key, value, (a, b) -> ((BigDecimal) a).add((BigDecimal) b));
     cells.merge(NET, value, (a, b) -> ((BigDecimal) a).add((BigDecimal) b));

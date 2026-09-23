@@ -8,6 +8,7 @@ import com.iortatechnxt.finverse.report.core.ReportParameters;
 import com.iortatechnxt.finverse.report.core.ReportResult;
 import com.iortatechnxt.finverse.report.core.TabularReportBuilder;
 import com.iortatechnxt.finverse.security.domain.Permission;
+import com.iortatechnxt.finverse.subledger.service.AgeingSlots;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,7 +49,7 @@ public class CreditorsAgedSummaryReport implements ReportDefinition {
 
   @Override
   public ReportResult generate(ReportParameters p) {
-    AgeingSlots slots = AgeingSlots.from(p, AgeingSlots.DEFAULT);
+    AgeingSlots slots = support.slots(p);
     boolean base = CreditorReportSupport.base(p);
     String baseCurrency = support.baseCurrency(p);
     Map<String, Map<String, Object>> rows = new LinkedHashMap<>();
@@ -64,7 +65,7 @@ public class CreditorsAgedSummaryReport implements ReportDefinition {
     columns.add(ReportColumn.text("partyCode", "Sub A/c"));
     columns.add(ReportColumn.text("partyName", "Account Name"));
     columns.add(ReportColumn.text(CURRENCY, "Currency"));
-    columns.addAll(slots.columns());
+    columns.addAll(CreditorReportSupport.bucketColumns(slots));
     columns.add(ReportColumn.amount(CreditorReportSupport.ON_ACCOUNT, "On A/c"));
     columns.add(ReportColumn.amount(CreditorReportSupport.NET, "Net Value"));
     TabularReportBuilder builder = TabularReportBuilder.of(p).columns(columns);

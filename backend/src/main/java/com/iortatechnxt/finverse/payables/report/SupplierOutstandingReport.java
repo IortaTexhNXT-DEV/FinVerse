@@ -12,6 +12,7 @@ import com.iortatechnxt.finverse.report.core.ReportResult;
 import com.iortatechnxt.finverse.report.core.TabularReportBuilder;
 import com.iortatechnxt.finverse.report.gl.GlReportSupport;
 import com.iortatechnxt.finverse.security.domain.Permission;
+import com.iortatechnxt.finverse.subledger.service.AgeingSlots;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -56,7 +57,7 @@ public class SupplierOutstandingReport implements ReportDefinition {
 
   @Override
   public ReportResult generate(ReportParameters p) {
-    AgeingSlots slots = AgeingSlots.from(p, AgeingSlots.DEFAULT);
+    AgeingSlots slots = support.slots(p);
     Map<String, String> names =
         chart.list(p.longValue(GlReportSupport.COMPANY)).stream()
             .collect(Collectors.toMap(GlAccount::getCode, GlAccount::getName, (a, b) -> a));
@@ -74,7 +75,7 @@ public class SupplierOutstandingReport implements ReportDefinition {
     columns.add(ReportColumn.text("phone", "Phone No."));
     columns.add(ReportColumn.amount(CreditorReportSupport.NET, "Amount"));
     columns.add(ReportColumn.amount(CreditorReportSupport.ON_ACCOUNT, "On A/c"));
-    columns.addAll(slots.columns());
+    columns.addAll(CreditorReportSupport.bucketColumns(slots));
     return TabularReportBuilder.of(p)
         .columns(columns)
         .groupBy(MAIN, "Main Account")

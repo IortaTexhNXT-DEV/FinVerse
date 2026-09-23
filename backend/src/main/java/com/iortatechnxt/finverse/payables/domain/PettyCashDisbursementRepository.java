@@ -58,4 +58,12 @@ public interface PettyCashDisbursementRepository
    * @return vouchers
    */
   List<PettyCashDisbursement> findByReimbursementIdOrderByDisbursementDate(Long reimbursementId);
+
+  /**
+   * Disbursement vouchers in one status across companies (approval inbox).
+   *
+   * @param status status
+   * @return vouchers, oldest first
+   */
+  List<PettyCashDisbursement> findByStatusOrderById(PettyCashStatus status);
 }

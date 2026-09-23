@@ -93,4 +93,12 @@ public interface PaymentVoucherRepository extends JpaRepository<PaymentVoucher, 
       """)
   BigDecimal reservedAmount(
       @Param("openItemId") Long openItemId, @Param("excludeVoucherId") Long excludeVoucherId);
+
+  /**
+   * Vouchers in one status across companies (approval inbox).
+   *
+   * @param status status
+   * @return vouchers, oldest first
+   */
+  List<PaymentVoucher> findByStatusOrderById(VoucherStatus status);
 }

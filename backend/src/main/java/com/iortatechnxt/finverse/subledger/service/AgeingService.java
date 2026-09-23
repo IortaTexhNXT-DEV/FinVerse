@@ -1,8 +1,10 @@
 package com.iortatechnxt.finverse.subledger.service;
 
+import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.finverse.common.util.Money;
 import com.iortatechnxt.finverse.subledger.domain.ItemDirection;
 import com.iortatechnxt.finverse.subledger.domain.OpenItem;
+import com.iortatechnxt.finverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -37,14 +39,43 @@ public class AgeingService {
           new AgeingBucket("Over 365", 366, null));
 
   private final OpenItemService openItems;
+  private final SystemParameterService parameters;
 
   /**
    * Creates the service.
    *
    * @param openItems open item service
+   * @param parameters system parameters ({@code AGEING_BUCKETS})
    */
-  public AgeingService(OpenItemService openItems) {
+  public AgeingService(OpenItemService openItems, SystemParameterService parameters) {
     this.openItems = openItems;
+    this.parameters = parameters;
+  }
+
+  /**
+   * Company-wide default ageing slots of the debtors and creditors reports: the {@code
+   * AGEING_BUCKETS} system parameter, or {@link AgeingSlots#STANDARD} when it is blank or not a
+   * valid slot list (reports must keep working while an administrator fixes the parameter).
+   *
+   * @return default slots
+   */
+  public AgeingSlots defaultSlots() {
+    String configured = String.join(",", parameters.items(SystemParameterService.AGEING_BUCKETS));
+    try {
+      return AgeingSlots.parse(configured, AgeingSlots.STANDARD);
+    } catch (BusinessRuleException invalid) {
+      return AgeingSlots.STANDARD;
+    }
+  }
+
+  /**
+   * Slots of a report run: the slots the user entered, else the default.
+   *
+   * @param text slot text such as "30,60,90,120", blank for the default
+   * @return slots
+   */
+  public AgeingSlots slotsOrDefault(String text) {
+    return text == null || text.isBlank() ? defaultSlots() : AgeingSlots.parse(text, null);
   }
 
   /**

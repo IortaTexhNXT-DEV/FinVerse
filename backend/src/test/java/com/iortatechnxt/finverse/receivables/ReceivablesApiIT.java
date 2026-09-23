@@ -312,14 +312,6 @@ class ReceivablesApiIT {
         .andExpect(jsonPath("$[?(@.code=='1111')]").exists());
     call("accountant", get(BASE + "/open-items?companyId=" + fx.company() + "&partyCode=C-000201"))
         .andExpect(status().isOk());
-    call(
-            "accountant",
-            get(
-                BASE
-                    + "/party-statement?companyId="
-                    + fx.company()
-                    + "&partyCode=C-000201&from=2026-01-01&to=2026-09-30&foreign=false"))
-        .andExpect(jsonPath("$[0].partyCode").value("C-000201"));
     call("accountant", get(BASE + "/ageing-slots?slots=30,60"))
         .andExpect(jsonPath("$[2]").value("Over 60"));
   }

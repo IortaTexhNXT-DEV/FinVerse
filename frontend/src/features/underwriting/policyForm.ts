@@ -101,6 +101,12 @@ function partyChecks(form: PolicyInput): Check[] {
       'Select the agent or broker',
     ],
     [form.businessType !== 'DIRECT' && (form.coinsurerCode ?? '') === '', 'Select the coinsurer'],
+    [
+      form.sourceType !== 'DIRECT' &&
+        form.commissionRate !== undefined &&
+        (form.commissionRate < 0 || form.commissionRate > 100),
+      'Commission must be between 0 and 100 %',
+    ],
   ];
 }
 

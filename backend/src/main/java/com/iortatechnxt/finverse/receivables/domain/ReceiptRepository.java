@@ -55,6 +55,14 @@ public interface ReceiptRepository
   List<Receipt> findByDepositSlipIdOrderByIdAsc(Long slipId);
 
   /**
+   * Lists receipts in one status across companies (approval inbox).
+   *
+   * @param status status
+   * @return receipts oldest first
+   */
+  List<Receipt> findByStatusOrderByIdAsc(ReceiptStatus status);
+
+  /**
    * Counts receipts of a company (demo data idempotency).
    *
    * @param companyId company

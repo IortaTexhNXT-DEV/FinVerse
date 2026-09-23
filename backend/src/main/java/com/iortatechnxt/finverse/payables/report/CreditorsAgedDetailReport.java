@@ -10,6 +10,7 @@ import com.iortatechnxt.finverse.report.core.ReportResult;
 import com.iortatechnxt.finverse.report.core.TabularReportBuilder;
 import com.iortatechnxt.finverse.report.gl.GlReportSupport;
 import com.iortatechnxt.finverse.security.domain.Permission;
+import com.iortatechnxt.finverse.subledger.service.AgeingSlots;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,7 +51,7 @@ public class CreditorsAgedDetailReport implements ReportDefinition {
 
   @Override
   public ReportResult generate(ReportParameters p) {
-    AgeingSlots slots = AgeingSlots.from(p, AgeingSlots.DEFAULT);
+    AgeingSlots slots = support.slots(p);
     boolean base = CreditorReportSupport.base(p);
     String baseCurrency = support.baseCurrency(p);
     boolean byDue = CreditorReportSupport.byDueDate(p);
@@ -85,7 +86,7 @@ public class CreditorsAgedDetailReport implements ReportDefinition {
     columns.add(ReportColumn.text("reference", "Reference"));
     columns.add(ReportColumn.amount("outstanding", "O/S Amount"));
     columns.add(ReportColumn.amount(CreditorReportSupport.ON_ACCOUNT, "On Account"));
-    columns.addAll(slots.columns());
+    columns.addAll(CreditorReportSupport.bucketColumns(slots));
     columns.add(new ReportColumn("days", "Days Pending", ColumnType.NUMBER, false));
     TabularReportBuilder builder =
         TabularReportBuilder.of(p).columns(columns).groupBy(SUB_ACCOUNT, "Sub Account").presorted();

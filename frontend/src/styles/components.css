@@ -242,6 +242,42 @@
   color: var(--color-text-muted);
 }
 
+/* Figures inside a dashboard widget card (smaller than KPI tiles). */
+.widget-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.widget-figure-value {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--brand-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.widget-figure-value.danger {
+  color: var(--color-danger);
+}
+
+.widget-bar {
+  height: 6px;
+  border-radius: var(--radius-sm);
+  background: var(--brand-blue-050);
+}
+
+.widget-bar > div {
+  height: 6px;
+  border-radius: var(--radius-sm);
+  background: var(--brand-blue);
+}
+
+.widget-bar.over > div {
+  background: var(--color-danger);
+}
+
 /* ---------- Buttons --------------------------------------------------------------------- */
 .btn {
   display: inline-flex;

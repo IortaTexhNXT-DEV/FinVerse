@@ -9,6 +9,8 @@ import com.iortatechnxt.finverse.report.core.ReportColumn;
 import com.iortatechnxt.finverse.report.core.ReportParameters;
 import com.iortatechnxt.finverse.report.gl.GlReportSupport;
 import com.iortatechnxt.finverse.subledger.domain.ItemDirection;
+import com.iortatechnxt.finverse.subledger.service.AgeingService;
+import com.iortatechnxt.finverse.subledger.service.AgeingSlots;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -86,8 +88,8 @@ public final class ReceivablesReportSupport {
         ParameterSpec.select(
             ORDER_BY, "Order By (ageing basis)", List.of(DUE_DATE, DOCUMENT_DATE), DUE_DATE),
         ParameterSpec.select(CURRENCY_BASIS, "Currency", List.of(BASE, FOREIGN), BASE),
-        ParameterSpec.optional(SLOTS, "Ageing Slots (days)", ParameterType.TEXT)
-            .withDefault(AgeingSlots.DEFAULT));
+        ParameterSpec.optional(
+            SLOTS, "Ageing Slots (days, blank = company default)", ParameterType.TEXT));
   }
 
   /**
@@ -161,11 +163,13 @@ public final class ReceivablesReportSupport {
    *
    * @param items items with a non-zero balance
    * @param asOf ageing date
-   * @param p parameters (basis, currency basis, slots)
+   * @param p parameters (basis, currency basis)
+   * @param slots ageing slots of the run
    * @return aged items
    */
-  public static List<AgedItem> age(List<ArItem> items, LocalDate asOf, ReportParameters p) {
-    return age(items, asOf, p, foreign(p));
+  public static List<AgedItem> age(
+      List<ArItem> items, LocalDate asOf, ReportParameters p, AgeingSlots slots) {
+    return age(items, asOf, p, foreign(p), slots);
   }
 
   /**
@@ -173,14 +177,14 @@ public final class ReceivablesReportSupport {
    *
    * @param items items
    * @param asOf ageing date
-   * @param p parameters (basis, slots)
+   * @param p parameters (basis)
    * @param foreign true for document currency amounts
+   * @param slots ageing slots of the run
    * @return aged items
    */
   public static List<AgedItem> age(
-      List<ArItem> items, LocalDate asOf, ReportParameters p, boolean foreign) {
+      List<ArItem> items, LocalDate asOf, ReportParameters p, boolean foreign, AgeingSlots slots) {
     boolean dueBasis = DUE_DATE.equals(p.optionalText(ORDER_BY).orElse(DUE_DATE));
-    AgeingSlots slots = slots(p);
     return items.stream()
         .filter(i -> i.balance().signum() != 0)
         .map(
@@ -193,13 +197,14 @@ public final class ReceivablesReportSupport {
   }
 
   /**
-   * Ageing slots of a run.
+   * Ageing slots of a run: the slots entered, else the company default ({@code AGEING_BUCKETS}).
    *
    * @param p parameters
+   * @param ageing sub-ledger ageing (default slots)
    * @return slots
    */
-  public static AgeingSlots slots(ReportParameters p) {
-    return AgeingSlots.parse(p.optionalText(SLOTS).orElse(AgeingSlots.DEFAULT));
+  public static AgeingSlots slots(ReportParameters p, AgeingService ageing) {
+    return ageing.slotsOrDefault(p.optionalText(SLOTS).orElse(null));
   }
 
   /**

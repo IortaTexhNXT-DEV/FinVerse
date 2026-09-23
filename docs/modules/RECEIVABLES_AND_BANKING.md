@@ -83,8 +83,21 @@ FIN-AR-AGE-DET, FIN-AR-AGE-SUM, FIN-AR-AGE-DIV (division = branch of the documen
 FIN-AR-SOO-FC, FIN-AR-CHQ-RCPT, FIN-AR-CHQ-UNDEP, FIN-ARAP-SOA-MATCH, FIN-BRS-UNREC-BOOK,
 FIN-BRS-UNREC-BANK, FIN-BRS-STMT, FIN-PDC-RCV-ONHAND, FIN-PDC-RCV-PERIOD, FIN-PDC-RCV-DUEBANK and the
 `-DDB` variants (division / department / bank). Ageing slots are configurable per run (up to five
-ascending day limits, default `30,60,90,120`); the basis is the due date or the document date.
+ascending day limits); left blank, the company default applies: the `AGEING_BUCKETS` system
+parameter (`30,60,90,120` as delivered), read by `subledger.service.AgeingService.defaultSlots()`.
+Debtors and creditors reports share one slot type, `subledger.service.AgeingSlots`. The basis is
+the due date or the document date.
 Balances "as of" ignore matches dated after the date.
+
+**Party statement.** There is one party statement screen: *General Ledger → Party Statement*
+(`/gl/party-statement`, `JOURNAL_VIEW`). It reads the open-item sub-ledger, so it covers every party
+type (policyholders, intermediaries, reinsurers and suppliers), shows settled and outstanding
+amounts, days overdue, the ageing strip and the net position. The former receivables screen
+(`/receivables/party-statement`) showed the documents of a period split into matched and unmatched
+details for debtors only; that view is exactly report FIN-ARAP-SOA-MATCH (debtors and creditors,
+with PDF/Excel export), so the screen, its menu entry and its endpoint
+`GET /api/v1/receivables/party-statement` were removed. `PartyStatementService` remains as the
+engine of the report.
 
 ## 6. Known limitations
 

@@ -3,6 +3,7 @@ package com.iortatechnxt.finverse.budget.domain;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,6 +18,15 @@ public interface BudgetRepository extends JpaRepository<Budget, Long> {
    * @return versions
    */
   List<Budget> findByCompanyIdOrderByFiscalYearDescVersionNoDesc(Long companyId);
+
+  /**
+   * Lists versions in one status across companies (approval inbox), with their lines.
+   *
+   * @param status status
+   * @return versions, oldest first
+   */
+  @EntityGraph(attributePaths = "lines")
+  List<Budget> findByStatusOrderById(BudgetStatus status);
 
   /**
    * Lists the versions of a company and fiscal year, newest first.

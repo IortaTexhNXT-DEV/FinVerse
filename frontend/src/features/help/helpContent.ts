@@ -1,4 +1,6 @@
+import { REINSURANCE_HELP } from '@/features/reinsurance/help';
 import { RESERVES_HELP } from '@/features/reserves/help';
+import { TAX_HELP } from '@/features/tax/help';
 
 /**
  * In-app help. One entry per module; each screen lists its purpose, the usual workflow and the
@@ -47,7 +49,15 @@ export const HELP_SECTIONS: HelpSection[] = [
         name: 'Dashboard',
         path: '/',
         summary:
-          'Key figures of the selected company and branch: cash, receivables, reserves and results.',
+          'Executive view of the selected company and branch: ledger KPIs, gross written premium against the prior year, claims paid and outstanding, collections and receivables ageing, payables due in 7 and 30 days, cash and bank position, expense budget against actual, open alerts and your pending approvals.',
+        workflow: [
+          'Choose the company and branch in the header; every widget follows the selection (the budget is company-wide).',
+          'Click the pending approvals or open alerts figure to open the inbox or the alert list.',
+        ],
+        controls: [
+          'Figures are read from the posted ledger and the sub-ledger in base currency; unposted journals are excluded.',
+          'Each widget loads on its own and shows a message when it has no data.',
+        ],
       },
       {
         name: 'Alerts',
@@ -115,6 +125,16 @@ export const HELP_SECTIONS: HelpSection[] = [
         name: 'Account Inquiry',
         path: '/gl/inquiry',
         summary: 'Statement of any account with opening balance, movements and running balance.',
+      },
+      {
+        name: 'Party Statement',
+        path: '/gl/party-statement',
+        summary:
+          'The single party statement: every receivable and payable document of a policyholder, intermediary, reinsurer or supplier from the sub-ledger, with settled and outstanding amounts, days overdue and ageing.',
+        workflow: [
+          'Find the party by code or name and choose the as-of date.',
+          'For the matched / unmatched statement of a period, run report FIN-ARAP-SOA-MATCH.',
+        ],
       },
       {
         name: 'Chart of Accounts',
@@ -206,6 +226,7 @@ export const HELP_SECTIONS: HelpSection[] = [
       },
     ],
   },
+  TAX_HELP,
   {
     id: 'reports',
     module: 'Reports',
@@ -250,72 +271,7 @@ export const HELP_SECTIONS: HelpSection[] = [
       },
     ],
   },
-  {
-    id: 'reinsurance',
-    module: 'Reinsurance',
-    intro:
-      "Treaty programme, cession of premium, facultative placements, reinsurers' share of claims and quarterly statements of account.",
-    screens: [
-      {
-        name: 'Treaties',
-        path: '/reinsurance/treaties',
-        summary:
-          'Quota share, surplus and excess of loss treaties per class and underwriting year, with participants (share, commission, profit commission, premium reserve) and layers.',
-        workflow: [
-          'The reinsurance officer creates or changes a treaty; it is pending authorization.',
-          'A checker with REINSURANCE_AUTHORIZE authorizes it from the list or My Approvals.',
-        ],
-        controls: [
-          'Participants must total 100 %; only one authorized treaty of each type per class and year.',
-          'Statements are kept in the company base currency.',
-        ],
-      },
-      {
-        name: 'RI Allocation',
-        path: '/reinsurance/allocation',
-        summary:
-          'Cedes approved policies and endorsements: retention first, then quota share, surplus lines and the facultative remainder. Endorsements, refunds and cancellations follow the proportions in force.',
-        workflow: [
-          'Preview the period, then post; each transaction is ceded once.',
-          'Look up a policy to see its cessions or cede it on demand.',
-        ],
-        controls: [
-          'Posting publishes RI_PREMIUM_CEDED and records the amounts due to each reinsurer.',
-          'A risk above treaty capacity raises the RI_TREATY_CAPACITY alert.',
-        ],
-      },
-      {
-        name: 'FAC Placements',
-        path: '/reinsurance/fac',
-        summary: 'Facultative slips for the sum insured beyond treaty capacity.',
-        workflow: [
-          'Record the reinsurers and their shares, then submit the slip.',
-          'A different user approves it (premium ceded to the participants); the slip is then closed.',
-        ],
-        controls: ['Slips left unplaced beyond the threshold raise the RI_FAC_UNPLACED alert.'],
-      },
-      {
-        name: 'Claims Recoveries',
-        path: '/reinsurance/claims',
-        summary:
-          "Reinsurers' share of every claim movement: reserve shares, recoveries due on payments, salvage shared back and excess of loss recoveries.",
-        controls: ['Each claim movement is processed once, on its reference.'],
-      },
-      {
-        name: 'Statements of Account',
-        path: '/reinsurance/soa',
-        summary:
-          'Quarterly income / outgo statement per treaty participant with the balance on the smaller side and in words; print or export to PDF.',
-        workflow: [
-          'Generate the quarter (regenerate while pending); a checker approves it.',
-          'Settle the approved statement: the balance is paid or received and the open items are matched.',
-        ],
-        controls: [
-          'Approval posts levy, reserves retained / released and interest (RI_SOA_ADJUSTMENT).',
-        ],
-      },
-    ],
-  },
+  REINSURANCE_HELP,
   {
     id: 'admin',
     module: 'Administration',

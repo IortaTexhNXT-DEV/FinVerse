@@ -90,7 +90,7 @@ export default function PartyLedgerPage() {
       <PageHeader
         section="General Ledger"
         title="Party Statement"
-        description="Open items of a policyholder, intermediary, reinsurer or supplier with outstanding balances and ageing (sub-ledger)."
+        description="Open items of a policyholder, intermediary, reinsurer or supplier with outstanding balances and ageing (sub-ledger). For the matched / unmatched statement of a period, run report FIN-ARAP-SOA-MATCH."
       />
       <Card>
         <div className="form-grid">

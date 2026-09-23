@@ -48,7 +48,24 @@ public class MasterRecordApprovals {
   @Transactional(readOnly = true)
   public <E extends AuthorizableEntity> List<PendingApproval> pending(
       ApprovalViewer viewer, Class<E> type, Function<E, RecordFacts> facts) {
-    if (!viewer.can(PERMISSION)) {
+    return pending(viewer, new Scope(MODULE, PERMISSION), type, facts);
+  }
+
+  /**
+   * Pending records of one entity type as inbox items, for records that a business module
+   * authorizes under its own permission (e.g. products under {@code POLICY_AUTHORIZE}).
+   *
+   * @param viewer viewer
+   * @param scope module code shown in the inbox and permission needed to authorize the records
+   * @param type entity class
+   * @param facts maps a record to its display facts
+   * @param <E> entity type
+   * @return items the viewer may authorize
+   */
+  @Transactional(readOnly = true)
+  public <E extends AuthorizableEntity> List<PendingApproval> pending(
+      ApprovalViewer viewer, Scope scope, Class<E> type, Function<E, RecordFacts> facts) {
+    if (!viewer.can(scope.permission())) {
       return List.of();
     }
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -59,7 +76,7 @@ public class MasterRecordApprovals {
         .where(cb.equal(root.get("recordStatus"), RecordStatus.PENDING_AUTHORIZATION));
     return entityManager.createQuery(query).getResultList().stream()
         .filter(e -> viewer.mayApproveItemOf(maker(e)))
-        .map(e -> toItem(e, facts.apply(e)))
+        .map(e -> toItem(scope.module(), e, facts.apply(e)))
         .toList();
   }
 
@@ -67,9 +84,9 @@ public class MasterRecordApprovals {
     return e.getUpdatedBy() != null ? e.getUpdatedBy() : e.getCreatedBy();
   }
 
-  private static PendingApproval toItem(AuthorizableEntity e, RecordFacts f) {
+  private static PendingApproval toItem(String module, AuthorizableEntity e, RecordFacts f) {
     return new PendingApproval(
-        MODULE,
+        module,
         f.type(),
         f.reference(),
         f.description(),
@@ -92,4 +109,12 @@ public class MasterRecordApprovals {
    */
   public record RecordFacts(
       String type, String reference, String description, Long companyId, String link) {}
+
+  /**
+   * Who authorizes a kind of master record.
+   *
+   * @param module module code shown in the inbox, e.g. "UNDERWRITING"
+   * @param permission permission the controller requires to authorize the record
+   */
+  public record Scope(String module, String permission) {}
 }

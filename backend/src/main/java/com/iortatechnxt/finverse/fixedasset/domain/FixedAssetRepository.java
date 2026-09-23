@@ -29,6 +29,14 @@ public interface FixedAssetRepository extends JpaRepository<FixedAsset, Long> {
   boolean existsByCompanyIdAndTagNo(Long companyId, String tagNo);
 
   /**
+   * Lists assets in one status across companies (approval inbox).
+   *
+   * @param status status
+   * @return assets, oldest first
+   */
+  List<FixedAsset> findByStatusOrderById(AssetStatus status);
+
+  /**
    * Lists assets in the given statuses (depreciation run candidates).
    *
    * @param companyId company

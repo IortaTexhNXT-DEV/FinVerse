@@ -1,15 +1,12 @@
 package com.iortatechnxt.finverse.receivables.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.iortatechnxt.finverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.finverse.party.domain.PartyType;
 import com.iortatechnxt.finverse.receivables.domain.BrsFigures;
 import com.iortatechnxt.finverse.receivables.domain.PayerType;
 import com.iortatechnxt.finverse.receivables.domain.PdcStatus;
 import com.iortatechnxt.finverse.receivables.domain.ReceiptMode;
-import com.iortatechnxt.finverse.receivables.report.AgeingSlots;
 import com.iortatechnxt.finverse.receivables.service.AutoMatcher.Item;
 import com.iortatechnxt.finverse.receivables.service.AutoMatcher.Proposal;
 import java.math.BigDecimal;
@@ -111,21 +108,6 @@ class ReceivablesLogicTest {
             new BigDecimal("9170"));
     assertThat(f.computedBankBalance()).isEqualByComparingTo("9170");
     assertThat(f.difference()).isZero();
-  }
-
-  @Test
-  void ageingSlotsParseLabelAndBucket() {
-    AgeingSlots slots = AgeingSlots.parse(null);
-    assertThat(slots.labels()).containsExactly("0-30", "31-60", "61-90", "91-120", "Over 120");
-    assertThat(slots.size()).isEqualTo(5);
-    assertThat(slots.index(-5)).isZero();
-    assertThat(slots.index(30)).isZero();
-    assertThat(slots.index(31)).isEqualTo(1);
-    assertThat(slots.index(500)).isEqualTo(4);
-    assertThat(AgeingSlots.parse("90; 180").labels()).containsExactly("0-90", "91-180", "Over 180");
-    for (String bad : new String[] {"30,20", "0", "1,2,3,4,5,6", "x", ","}) {
-      assertThatThrownBy(() -> AgeingSlots.parse(bad)).isInstanceOf(BusinessRuleException.class);
-    }
   }
 
   @Test

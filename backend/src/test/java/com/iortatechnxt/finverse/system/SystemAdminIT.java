@@ -35,7 +35,7 @@ class SystemAdminIT {
         .extracting("key")
         .contains("SESSION_TIMEOUT_MINUTES", "AGEING_BUCKETS");
     assertThat(parameters.items(SystemParameterService.AGEING_BUCKETS))
-        .containsExactly("30", "60", "90", "180");
+        .containsExactly("30", "60", "90", "120");
     assertThat(parameters.items("MISSING")).isEmpty();
     assertThat(parameters.text(SystemParameterService.REPORT_FOOTER_TEXT, "x"))
         .contains("FinVerse");

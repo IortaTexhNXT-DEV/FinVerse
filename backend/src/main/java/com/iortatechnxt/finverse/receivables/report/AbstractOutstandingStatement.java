@@ -18,6 +18,8 @@ import com.iortatechnxt.finverse.report.core.ReportRow;
 import com.iortatechnxt.finverse.report.core.RowKind;
 import com.iortatechnxt.finverse.report.gl.GlReportSupport;
 import com.iortatechnxt.finverse.security.domain.Permission;
+import com.iortatechnxt.finverse.subledger.service.AgeingService;
+import com.iortatechnxt.finverse.subledger.service.AgeingSlots;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,6 +44,7 @@ public abstract class AbstractOutstandingStatement implements ReportDefinition {
 
   private final ReceivablesQueries queries;
   private final PdcQueries pdcs;
+  private final AgeingService ageing;
   private final String code;
   private final String title;
   private final boolean foreignCurrency;
@@ -51,6 +54,7 @@ public abstract class AbstractOutstandingStatement implements ReportDefinition {
    *
    * @param queries receivables read model
    * @param pdcs PDC register
+   * @param ageing sub-ledger ageing (default slots)
    * @param code report code
    * @param title title
    * @param foreignCurrency one foreign currency, amounts not converted
@@ -58,11 +62,13 @@ public abstract class AbstractOutstandingStatement implements ReportDefinition {
   protected AbstractOutstandingStatement(
       ReceivablesQueries queries,
       PdcQueries pdcs,
+      AgeingService ageing,
       String code,
       String title,
       boolean foreignCurrency) {
     this.queries = queries;
     this.pdcs = pdcs;
+    this.ageing = ageing;
     this.code = code;
     this.title = title;
     this.foreignCurrency = foreignCurrency;
@@ -98,8 +104,9 @@ public abstract class AbstractOutstandingStatement implements ReportDefinition {
         ReceivablesReportSupport.selectedItems(queries, p).stream()
             .filter(i -> currency == null || i.currency().equals(currency))
             .toList();
+    AgeingSlots slots = ReceivablesReportSupport.slots(p, ageing);
     Map<String, List<AgedItem>> byParty =
-        ReceivablesReportSupport.age(items, asOf, p, foreignCurrency).stream()
+        ReceivablesReportSupport.age(items, asOf, p, foreignCurrency, slots).stream()
             .collect(
                 Collectors.groupingBy(
                     a -> ReceivablesReportSupport.partyLabel(a.item()),
@@ -110,7 +117,6 @@ public abstract class AbstractOutstandingStatement implements ReportDefinition {
             .map(PdcAsOf::pdc)
             .filter(c -> currency == null || c.getCurrency().equals(currency))
             .collect(Collectors.groupingBy(PostDatedCheque::getPartyCode));
-    AgeingSlots slots = ReceivablesReportSupport.slots(p);
     List<ReportRow> rows = new ArrayList<>();
     BigDecimal grand = BigDecimal.ZERO;
     for (Map.Entry<String, List<AgedItem>> e : byParty.entrySet()) {

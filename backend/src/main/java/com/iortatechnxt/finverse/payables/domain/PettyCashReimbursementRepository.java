@@ -14,4 +14,12 @@ public interface PettyCashReimbursementRepository
    * @return claims newest first
    */
   List<PettyCashReimbursement> findByFundIdOrderByClaimDateDescIdDesc(Long fundId);
+
+  /**
+   * Reimbursement claims in one status across companies (approval inbox).
+   *
+   * @param status status
+   * @return claims, oldest first
+   */
+  List<PettyCashReimbursement> findByStatusOrderById(PettyCashStatus status);
 }

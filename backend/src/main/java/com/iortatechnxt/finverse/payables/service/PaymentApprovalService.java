@@ -131,7 +131,7 @@ public class PaymentApprovalService {
   }
 
   /**
-   * Voids an unpresented cheque: reverses the posting and reinstates the paid payables.
+   * Voids an unpresented cheque: reverses the posting and re-opens the paid payables.
    *
    * @param id voucher
    * @param date void date

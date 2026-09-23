@@ -126,6 +126,17 @@ public class AlertService {
   }
 
   /**
+   * Number of live (open or acknowledged) alerts of a company.
+   *
+   * @param companyId company
+   * @return count
+   */
+  @Transactional(readOnly = true)
+  public long liveCount(Long companyId) {
+    return alerts.countByCompanyIdAndStatusNot(companyId, AlertStatus.RESOLVED);
+  }
+
+  /**
    * Acknowledges an alert.
    *
    * @param id id

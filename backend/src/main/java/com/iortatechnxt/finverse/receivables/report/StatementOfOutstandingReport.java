@@ -2,6 +2,7 @@ package com.iortatechnxt.finverse.receivables.report;
 
 import com.iortatechnxt.finverse.receivables.service.PdcQueries;
 import com.iortatechnxt.finverse.receivables.service.ReceivablesQueries;
+import com.iortatechnxt.finverse.subledger.service.AgeingService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,8 +17,10 @@ public class StatementOfOutstandingReport extends AbstractOutstandingStatement {
    *
    * @param queries receivables read model
    * @param pdcs PDC register
+   * @param ageing sub-ledger ageing (default slots)
    */
-  public StatementOfOutstandingReport(ReceivablesQueries queries, PdcQueries pdcs) {
-    super(queries, pdcs, "FIN-AR-SOO", "Statement of Outstanding (LC)", false);
+  public StatementOfOutstandingReport(
+      ReceivablesQueries queries, PdcQueries pdcs, AgeingService ageing) {
+    super(queries, pdcs, ageing, "FIN-AR-SOO", "Statement of Outstanding (LC)", false);
   }
 }

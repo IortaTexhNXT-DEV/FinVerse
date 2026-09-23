@@ -13,6 +13,8 @@ import com.iortatechnxt.finverse.report.core.ReportResult;
 import com.iortatechnxt.finverse.report.core.TabularReportBuilder;
 import com.iortatechnxt.finverse.report.gl.GlReportSupport;
 import com.iortatechnxt.finverse.security.domain.Permission;
+import com.iortatechnxt.finverse.subledger.service.AgeingService;
+import com.iortatechnxt.finverse.subledger.service.AgeingSlots;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -30,14 +32,17 @@ public class DebtorsAgeingDetailReport implements ReportDefinition {
   private static final String CODE = "FIN-AR-AGE-DET";
 
   private final ReceivablesQueries queries;
+  private final AgeingService ageing;
 
   /**
    * Creates the report.
    *
    * @param queries receivables read model
+   * @param ageing sub-ledger ageing (default slots)
    */
-  public DebtorsAgeingDetailReport(ReceivablesQueries queries) {
+  public DebtorsAgeingDetailReport(ReceivablesQueries queries, AgeingService ageing) {
     this.queries = queries;
+    this.ageing = ageing;
   }
 
   @Override
@@ -54,10 +59,10 @@ public class DebtorsAgeingDetailReport implements ReportDefinition {
   @Override
   public ReportResult generate(ReportParameters p) {
     LocalDate asOf = p.date(GlReportSupport.AS_OF);
-    AgeingSlots slots = ReceivablesReportSupport.slots(p);
+    AgeingSlots slots = ReceivablesReportSupport.slots(p, ageing);
     List<ArItem> items = ReceivablesReportSupport.selectedItems(queries, p);
     List<Map<String, Object>> rows = new ArrayList<>();
-    for (AgedItem a : ReceivablesReportSupport.age(items, asOf, p)) {
+    for (AgedItem a : ReceivablesReportSupport.age(items, asOf, p, slots)) {
       ArItem i = a.item();
       Map<String, Object> row = new LinkedHashMap<>();
       row.put("party", ReceivablesReportSupport.partyLabel(i));

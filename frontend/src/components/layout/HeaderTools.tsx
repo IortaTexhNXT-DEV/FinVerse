@@ -74,7 +74,7 @@ export function HeaderTools() {
       <button
         type="button"
         className="btn btn-ghost btn-sm header-tool"
-        aria-label="About iNXT BrokerVerse"
+        aria-label="About BIBS"
         title="About"
         onClick={() => setAboutOpen(true)}
       >

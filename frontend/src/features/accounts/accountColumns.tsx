@@ -5,7 +5,7 @@ import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate } from '@/utils/format';
 
-/** Columns of the account lists: ARN chip, client, product, insurer, period, premium, status. */
+/** Columns of the account lists: ARN chip, client, product, insurer, period, premium, status, flags. */
 export const ACCOUNT_COLUMNS: Column<AccountSummary>[] = [
   {
     key: 'arn',
@@ -39,14 +39,14 @@ export const ACCOUNT_COLUMNS: Column<AccountSummary>[] = [
     numeric: true,
     render: (a) => <Amount value={a.grossPremium} />,
   },
+  { key: 's', header: 'Status', render: (a) => <StatusBadge status={a.status} /> },
   {
-    key: 's',
-    header: 'Status',
+    key: 'f',
+    header: 'Flags',
     render: (a) => (
-      <div className="row">
-        <StatusBadge status={a.status} />
-        {a.ffy && <StatusBadge status="FFY" />}
-        {a.directPayment && <StatusBadge status="DIRECT_PAYMENT" />}
+      <div className="tag-list">
+        {a.ffy && <span className="tag">FFY</span>}
+        {a.directPayment && <span className="tag">Direct Payment</span>}
       </div>
     ),
   },

@@ -44,7 +44,7 @@ export default function OutboundMessagesPage() {
       <PageHeader
         section="Broking Setup"
         title="Outbound Messages"
-        description="E-mails sent by BrokerVerse: quotations, slips, placements, e-policies, invoices and their separate password e-mails."
+        description="E-mails sent by BIBS: quotations, slips, placements, e-policies, invoices and their separate password e-mails."
       />
       <ErrorAlert error={messages.error ?? retry.error} />
       <MessageFilterForm filters={filters} onChange={setFilters} />

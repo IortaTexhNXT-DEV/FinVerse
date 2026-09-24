@@ -1,3 +1,55 @@
+/** Codes shown in capitals inside labels (BDO style guide: Title Case, acronyms kept). */
+const ACRONYMS = new Set([
+  'ARN',
+  'AR',
+  'OR',
+  'CL',
+  'CLPC',
+  'CTPL',
+  'CWT',
+  'DP',
+  'DST',
+  'FFY',
+  'GL',
+  'IA',
+  'ID',
+  'IBNR',
+  'KYC',
+  'LGT',
+  'LOV',
+  'NB',
+  'PN',
+  'PR',
+  'PRF',
+  'PS',
+  'QS',
+  'SI',
+  'SLA',
+  'TIN',
+  'TSU',
+  'UPR',
+  'VAT',
+]);
+
+/** Short words kept in lower case inside Title Case labels ("Ready for Placement"). */
+const MINOR_WORDS = new Set([
+  'a',
+  'an',
+  'and',
+  'as',
+  'at',
+  'by',
+  'for',
+  'in',
+  'of',
+  'on',
+  'or',
+  'the',
+  'to',
+  'via',
+  'with',
+]);
+
 /** Display formatting. Money uses accounting style: negatives in parentheses. */
 
 const amountFormat = new Intl.NumberFormat('en-PH', {
@@ -54,8 +106,16 @@ export function today(): string {
 
 export function humanize(code: string): string {
   return code
-    .toLowerCase()
     .split('_')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .map((word, i) => {
+      const w = word.toUpperCase();
+      if (ACRONYMS.has(w)) {
+        return w;
+      }
+      const lower = w.toLowerCase();
+      return i > 0 && MINOR_WORDS.has(lower)
+        ? lower
+        : lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
     .join(' ');
 }

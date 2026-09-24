@@ -96,6 +96,8 @@ brokerverse:
     payment-confirmation-sweep-cron: ${BROKERVERSE_JOB_PAYMENT_CONFIRMATION_SWEEP_CRON:0 0 * * * *}
     # Daily hold cover expiry monitor (BRNB.103): alerts Processing, expires lapsed hold covers.
     hold-cover-expiry-cron: ${BROKERVERSE_JOB_HOLD_COVER_EXPIRY_CRON:0 30 0 * * *}
+    # Quotation requests of source systems (HLS, BRNB.023): manual until an interface exists (Q11).
+    quotation-request-intake-cron: ${BROKERVERSE_JOB_QUOTATION_REQUEST_INTAKE_CRON:-}
 
 management:
   endpoints:

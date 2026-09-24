@@ -1,12 +1,10 @@
 package com.iortatechnxt.brokerverse.bulk.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.bulk.domain.BulkJob;
 import com.iortatechnxt.brokerverse.bulk.domain.BulkJobRepository;
+import com.iortatechnxt.brokerverse.bulk.domain.BulkJobStatus;
 import com.iortatechnxt.brokerverse.bulk.domain.BulkRowRecord;
 import com.iortatechnxt.brokerverse.bulk.domain.BulkRowRepository;
 import com.iortatechnxt.brokerverse.bulk.domain.BulkRowStatus;
@@ -14,6 +12,7 @@ import com.iortatechnxt.brokerverse.bulk.service.ParsedFile.RawRow;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.util.Sha256;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -39,7 +38,6 @@ public class BulkService {
 
   private static final String ENTITY = "BulkJob";
   private static final int DEFAULT_MAX_ROWS = 5000;
-  private static final TypeReference<Map<String, String>> ROW_TYPE = new TypeReference<>() {};
 
   private final BulkHandlerRegistry registry;
   private final BulkFileReader reader;
@@ -48,9 +46,8 @@ public class BulkService {
   private final DocumentNumberService numbers;
   private final SystemParameterService parameters;
   private final AuditTrailService audit;
-  private final ObjectMapper json;
+  private final BulkRowStore store;
   private final TransactionTemplate tx;
-  private final TransactionTemplate rowTx;
   private final Clock clock;
 
   /**
@@ -63,7 +60,7 @@ public class BulkService {
    * @param numbers document numbers
    * @param parameters business parameters (maximum rows)
    * @param audit audit trail
-   * @param json JSON mapper (row storage)
+   * @param store stored rows (values, commit of one row, outcomes)
    * @param txManager transaction manager
    * @param clock clock
    */
@@ -76,7 +73,7 @@ public class BulkService {
       DocumentNumberService numbers,
       SystemParameterService parameters,
       AuditTrailService audit,
-      ObjectMapper json,
+      BulkRowStore store,
       PlatformTransactionManager txManager,
       Clock clock) {
     this.registry = registry;
@@ -86,10 +83,8 @@ public class BulkService {
     this.numbers = numbers;
     this.parameters = parameters;
     this.audit = audit;
-    this.json = json;
+    this.store = store;
     this.tx = new TransactionTemplate(txManager);
-    this.rowTx = new TransactionTemplate(txManager);
-    this.rowTx.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
     this.clock = clock;
   }
 
@@ -111,7 +106,11 @@ public class BulkService {
    */
   public BulkJob upload(BulkUpload upload) {
     BulkImportHandler handler = registry.require(upload.handlerCode());
-    ParsedFile file = reader.read(upload.fileName(), upload.content());
+    String sha256 = Sha256.hex(upload.content());
+    if (handler.blocksDuplicateFiles()) {
+      requireNewFile(upload, sha256);
+    }
+    ParsedFile file = reader.read(upload.fileName(), upload.content(), handler.textLayout());
     requireTemplateHeaders(handler, file);
     int max = parameters.intValue("BULK_MAX_ROWS", DEFAULT_MAX_ROWS);
     if (file.rows().isEmpty()) {
@@ -127,12 +126,31 @@ public class BulkService {
           String jobNo = numbers.next("BLK-" + LocalDate.now(clock).getYear());
           BulkContext context =
               new BulkContext(upload.companyId(), jobNo, LocalDate.now(clock), upload.parameters());
-          return validateAndStore(handler, upload, file, context);
+          return validateAndStore(handler, upload, file, context, sha256);
         });
   }
 
+  private void requireNewFile(BulkUpload upload, String sha256) {
+    jobs.findFirstByCompanyIdAndHandlerCodeAndFileSha256AndStatusNotOrderByIdAsc(
+            upload.companyId(), upload.handlerCode(), sha256, BulkJobStatus.CANCELLED)
+        .ifPresent(
+            earlier -> {
+              throw new BusinessRuleException(
+                  "BULK_DUPLICATE_FILE",
+                  "This file was already uploaded as "
+                      + earlier.getJobNo()
+                      + " ("
+                      + earlier.getFileName()
+                      + ")");
+            });
+  }
+
   private BulkJob validateAndStore(
-      BulkImportHandler handler, BulkUpload upload, ParsedFile file, BulkContext context) {
+      BulkImportHandler handler,
+      BulkUpload upload,
+      ParsedFile file,
+      BulkContext context,
+      String sha256) {
     BulkJob job =
         jobs.save(
             new BulkJob(
@@ -140,7 +158,8 @@ public class BulkService {
                 context.jobNo(),
                 handler.code(),
                 upload.fileName(),
-                write(upload.parameters())));
+                store.write(upload.parameters()),
+                sha256));
     Map<String, Integer> seen = new HashMap<>();
     int valid = 0;
     for (RawRow raw : file.rows()) {
@@ -155,7 +174,7 @@ public class BulkService {
           errors.addAll(handler.validate(row, context));
         }
       }
-      rows.save(new BulkRowRecord(job.getId(), row.rowNo(), write(row.values()), errors));
+      rows.save(new BulkRowRecord(job.getId(), row.rowNo(), store.write(row.values()), errors));
       if (errors.isEmpty()) {
         valid++;
       }
@@ -200,12 +219,15 @@ public class BulkService {
     BulkImportHandler handler = registry.require(job.getHandlerCode());
     BulkContext context =
         new BulkContext(
-            job.getCompanyId(), job.getJobNo(), LocalDate.now(clock), read(job.getParameters()));
+            job.getCompanyId(),
+            job.getJobNo(),
+            LocalDate.now(clock),
+            store.read(job.getParameters()));
     List<BulkRowRecord> valid = rows.findByJobIdAndStatusOrderByRowNo(jobId, BulkRowStatus.VALID);
     int committed = 0;
     int failed = 0;
     for (BulkRowRecord record : valid) {
-      if (commitRow(handler, record, context)) {
+      if (store.commit(handler, record, context)) {
         committed++;
       } else {
         failed++;
@@ -226,18 +248,62 @@ public class BulkService {
         });
   }
 
-  private boolean commitRow(BulkImportHandler handler, BulkRowRecord record, BulkContext context) {
-    BulkRow row = new BulkRow(record.getRowNo(), read(record.getData()));
-    try {
-      String reference = rowTx.execute(s -> handler.commit(row, context));
-      tx.executeWithoutResult(
-          s -> rows.findById(record.getId()).ifPresent(r -> r.committed(reference)));
-      return true;
-    } catch (BusinessRuleException | ResourceNotFoundException e) {
-      tx.executeWithoutResult(
-          s -> rows.findById(record.getId()).ifPresent(r -> r.failed(e.getMessage())));
-      return false;
+  /**
+   * Commits again the rows that failed at commit, one transaction each, after validating them again
+   * (BRQID.006 "failed records can be reviewed and reprocessed"). Rows that fail again keep their
+   * new message.
+   *
+   * @param jobId completed job
+   * @return the job with updated counts
+   */
+  public BulkJob reprocess(Long jobId) {
+    BulkJob job = job(jobId);
+    if (job.getStatus() != BulkJobStatus.COMPLETED) {
+      throw new BusinessRuleException(
+          "BULK_JOB_NOT_COMPLETED", "Upload " + job.getJobNo() + " has not been committed yet");
     }
+    BulkImportHandler handler = registry.require(job.getHandlerCode());
+    BulkContext context =
+        new BulkContext(
+            job.getCompanyId(),
+            job.getJobNo(),
+            LocalDate.now(clock),
+            store.read(job.getParameters()));
+    int recovered = 0;
+    int failed = 0;
+    for (BulkRowRecord record :
+        rows.findByJobIdAndStatusOrderByRowNo(jobId, BulkRowStatus.FAILED)) {
+      if (store.revalidates(handler, record, context) && store.commit(handler, record, context)) {
+        recovered++;
+      } else {
+        failed++;
+      }
+    }
+    int ok = recovered;
+    int ko = failed;
+    return tx.execute(
+        s -> {
+          BulkJob j = job(jobId);
+          j.reprocessed(ok, ko);
+          audit.record(
+              ENTITY,
+              j.getJobNo(),
+              AuditAction.UPDATE,
+              "Reprocessed failed rows: " + ok + " committed, " + ko + " still failed");
+          return j;
+        });
+  }
+
+  /**
+   * Committed rows of a job per outcome category (BRQID.006 run summary), in the handler's category
+   * order; uncategorised rows count as {@code COMMITTED}.
+   *
+   * @param jobId job
+   * @return count per category
+   */
+  @Transactional(readOnly = true)
+  public Map<String, Long> outcomes(Long jobId) {
+    return store.outcomes(registry.get(job(jobId).getHandlerCode()), jobId);
   }
 
   /**
@@ -303,7 +369,7 @@ public class BulkService {
    * @return values by header
    */
   public Map<String, String> values(BulkRowRecord row) {
-    return read(row.getData());
+    return store.read(row.getData());
   }
 
   /**
@@ -317,35 +383,14 @@ public class BulkService {
     BulkJob job = job(jobId);
     List<BulkRowRecord> all = rows.findByJobIdOrderByRowNo(jobId);
     Map<Long, Map<String, String>> values = new HashMap<>();
-    all.forEach(r -> values.put(r.getId(), read(r.getData())));
-    return BulkWorkbooks.report(job, registry.get(job.getHandlerCode()).columns(), all, values);
+    all.forEach(r -> values.put(r.getId(), store.read(r.getData())));
+    return BulkWorkbooks.report(
+        job, registry.get(job.getHandlerCode()).columns(), all, values, outcomes(jobId));
   }
 
   private BulkJob requireOpen(Long jobId) {
     BulkJob job = job(jobId);
     job.requireValidated();
     return job;
-  }
-
-  private String write(Map<String, String> values) {
-    if (values == null || values.isEmpty()) {
-      return values == null ? null : "{}";
-    }
-    try {
-      return json.writeValueAsString(values);
-    } catch (JsonProcessingException e) {
-      throw new IllegalStateException(e);
-    }
-  }
-
-  private Map<String, String> read(String data) {
-    if (data == null || data.isBlank()) {
-      return Map.of();
-    }
-    try {
-      return json.readValue(data, ROW_TYPE);
-    } catch (JsonProcessingException e) {
-      throw new IllegalStateException(e);
-    }
   }
 }

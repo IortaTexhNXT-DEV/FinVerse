@@ -36,7 +36,7 @@ public class JournalLineBuilder {
               amount.signum() > 0 ? rl.getSide() : rl.getSide().opposite(),
               amount.abs(),
               event.currency(),
-              null,
+              event.exchangeRate(),
               event.branchId(),
               event.costCenter(),
               event.businessLine(),

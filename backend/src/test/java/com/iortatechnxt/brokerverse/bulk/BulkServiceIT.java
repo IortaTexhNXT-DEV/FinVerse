@@ -137,7 +137,7 @@ class BulkServiceIT {
             () -> upload("x.csv", "Plate,Amount\nA,1\n".getBytes(StandardCharsets.UTF_8)))
         .extracting("code")
         .isEqualTo("BULK_TEMPLATE_MISMATCH");
-    assertThatThrownBy(() -> upload("x.txt", new byte[] {1}))
+    assertThatThrownBy(() -> upload("x.pdf", new byte[] {1}))
         .extracting("code")
         .isEqualTo("BULK_FILE_TYPE");
     assertThatThrownBy(

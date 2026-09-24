@@ -8,7 +8,7 @@ export interface Currency {
   active: boolean;
 }
 
-export type RateType = 'SPOT' | 'CLOSING' | 'AVERAGE' | 'BUDGET';
+export type RateType = 'SPOT' | 'CLOSING' | 'AVERAGE' | 'BUDGET' | 'BOOK';
 
 export interface ExchangeRate {
   id: number;

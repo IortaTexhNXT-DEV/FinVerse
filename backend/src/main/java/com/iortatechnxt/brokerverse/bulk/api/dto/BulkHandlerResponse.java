@@ -11,9 +11,16 @@ import java.util.List;
  * @param title title
  * @param columns template columns
  * @param instructions extra instructions
+ * @param outcomeCategories outcome categories of committed rows (BRQID.006)
+ * @param blocksDuplicateFiles whether an identical earlier file is refused
  */
 public record BulkHandlerResponse(
-    String code, String title, List<BulkColumn> columns, String instructions) {
+    String code,
+    String title,
+    List<BulkColumn> columns,
+    String instructions,
+    List<String> outcomeCategories,
+    boolean blocksDuplicateFiles) {
 
   /**
    * Maps a handler.
@@ -22,6 +29,12 @@ public record BulkHandlerResponse(
    * @return response
    */
   public static BulkHandlerResponse from(BulkImportHandler h) {
-    return new BulkHandlerResponse(h.code(), h.title(), h.columns(), h.instructions());
+    return new BulkHandlerResponse(
+        h.code(),
+        h.title(),
+        h.columns(),
+        h.instructions(),
+        h.outcomeCategories(),
+        h.blocksDuplicateFiles());
   }
 }

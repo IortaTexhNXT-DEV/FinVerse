@@ -100,6 +100,29 @@ brokerverse:
     quotation-request-intake-cron: ${BROKERVERSE_JOB_QUOTATION_REQUEST_INTAKE_CRON:-}
     # End-of-day booking batch (BRNB.036): queued accounts and started multi-year policy years (20:00 PHT).
     booking-batch-cron: ${BROKERVERSE_JOB_BOOKING_BATCH_CRON:0 0 12 * * *}
+    # ---- Operations (BRD-2), docs/architecture/OPERATIONS_DESIGN.md section 10 ----
+    # Copies booked invoices missing from the Operations invoice ledger (the feed listener copies new ones).
+    ops-invoice-feed-replay-cron: ${BROKERVERSE_JOB_OPS_INVOICE_FEED_REPLAY_CRON:-}
+    # Cashiering: re-match payments waiting for a pre-booked account (CSHID.020), every 2 hours.
+    prebooked-rematch-cron: ${BROKERVERSE_JOB_PREBOOKED_REMATCH_CRON:0 0 */2 * * *}
+    # Cashiering: automatic matching of uploaded payments (CSHID.008), hourly.
+    payment-automatch-cron: ${BROKERVERSE_JOB_PAYMENT_AUTOMATCH_CRON:0 30 * * * *}
+    # Cashiering: warehoused post-dated checks reaching maturity (CSHID.008 item 4), daily 00:30.
+    pdc-maturity-cron: ${BROKERVERSE_JOB_PDC_MATURITY_CRON:0 30 0 * * *}
+    # Cashiering: minimal balance sweep of premium receivables (CSHID.016), daily 20:00 UTC.
+    minimal-balance-sweep-cron: ${BROKERVERSE_JOB_MINIMAL_BALANCE_SWEEP_CRON:0 0 20 * * *}
+    # Remittance: scheduled extraction (RMTID.001/003/005), off-peak 12:00 UTC (20:00 PHT).
+    remittance-extraction-cron: ${BROKERVERSE_JOB_REMITTANCE_EXTRACTION_CRON:0 0 12 * * *}
+    # Remittance: expired holds released (RMTID.021), daily 00:15.
+    hold-expiry-cron: ${BROKERVERSE_JOB_HOLD_EXPIRY_CRON:0 15 0 * * *}
+    # Production reconciliation: production register extraction per insurer schedule (PRCID.001), daily check 01:00.
+    production-extract-cron: ${BROKERVERSE_JOB_PRODUCTION_EXTRACT_CRON:0 0 1 * * *}
+    # Production reconciliation: automatic matching (PRCID.025); manual until the frequency is known (OQ30).
+    recon-automatch-cron: ${BROKERVERSE_JOB_RECON_AUTOMATCH_CRON:-}
+    # Adjustment: daily adjustment report (ADJID.016), 10:00 UTC (18:00 PHT).
+    adj-daily-report-cron: ${BROKERVERSE_JOB_ADJ_DAILY_REPORT_CRON:0 0 10 * * *}
+    # Commission: insurer feedback SLA on direct payment billings (CMRID.011), daily 01:30.
+    dp-feedback-sla-cron: ${BROKERVERSE_JOB_DP_FEEDBACK_SLA_CRON:0 30 1 * * *}
 
 management:
   endpoints:

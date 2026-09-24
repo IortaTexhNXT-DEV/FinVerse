@@ -13,6 +13,8 @@ import java.util.List;
  * @param categoryLabel category label
  * @param description description
  * @param parameters parameters
+ * @param exportable whether the user may download or print it (CSHID.018)
+ * @param archived whether runs and exports are archived
  */
 public record ReportCatalogueEntry(
     String code,
@@ -20,21 +22,26 @@ public record ReportCatalogueEntry(
     String category,
     String categoryLabel,
     String description,
-    List<ParameterSpec> parameters) {
+    List<ParameterSpec> parameters,
+    boolean exportable,
+    boolean archived) {
 
   /**
    * Maps metadata.
    *
    * @param m metadata
+   * @param exportable whether the current user may export it
    * @return entry
    */
-  public static ReportCatalogueEntry from(ReportMetadata m) {
+  public static ReportCatalogueEntry from(ReportMetadata m, boolean exportable) {
     return new ReportCatalogueEntry(
         m.code(),
         m.title(),
         m.category().name(),
         m.category().label(),
         m.description(),
-        m.parameters());
+        m.parameters(),
+        exportable,
+        m.archived());
   }
 }

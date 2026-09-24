@@ -323,6 +323,7 @@ build the external interface itself.
 | Premium tax base | Q43 | `cat_rate` PREMIUM_TAX per line (PROPERTY 12%) |
 | Multi-level Marketing approval of a PRF (TL -> TH -> UH) and of quotations | Q05 | one approval stage per document; the approver permission (`PROPOSAL_APPROVE`, `QUOTE_APPROVE`) decides who approves |
 | "Quotation required" endorsement link | ADJID.008 (Operations BRD) | not built; an endorsement quotation will reuse `QuotationService` once the Adjustment wave defines it |
+| Operations (BRD-2) interfaces: Collection, Disbursement, Marketing, Claims, insurer channels, shared drive, BOOK rate source | OQ01, OQ02, OQ08, OQ17, OQ45, OQ46 | `opsledger` ports with default adapters (manual upload, in-app Disbursement queue, extract repository); see [`docs/modules/OPERATIONS.md`](../modules/OPERATIONS.md) section 1.10 |
 
 ## 7. CRM (`crm`): clients
 

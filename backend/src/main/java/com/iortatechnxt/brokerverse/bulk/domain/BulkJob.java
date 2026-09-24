@@ -51,6 +51,12 @@ public class BulkJob extends BaseEntity {
   @Column(name = "completed_at")
   private Instant completedAt;
 
+  @Column(name = "file_sha256", length = 64, updatable = false)
+  private String fileSha256;
+
+  @Column(name = "reprocess_count", nullable = false)
+  private int reprocessCount;
+
   protected BulkJob() {}
 
   /**
@@ -69,6 +75,27 @@ public class BulkJob extends BaseEntity {
     this.handlerCode = handlerCode;
     this.fileName = fileName;
     this.parameters = parameters;
+  }
+
+  /**
+   * Creates a job for a file with its SHA-256 (duplicate upload detection, CSHID.008).
+   *
+   * @param companyId company
+   * @param jobNo job number
+   * @param handlerCode handler
+   * @param fileName uploaded file name
+   * @param parameters handler parameters (JSON), may be null
+   * @param fileSha256 SHA-256 of the file, hex
+   */
+  public BulkJob(
+      Long companyId,
+      String jobNo,
+      String handlerCode,
+      String fileName,
+      String parameters,
+      String fileSha256) {
+    this(companyId, jobNo, handlerCode, fileName, parameters);
+    this.fileSha256 = fileSha256;
   }
 
   /**
@@ -107,6 +134,22 @@ public class BulkJob extends BaseEntity {
     requireValidated();
     this.status = BulkJobStatus.CANCELLED;
     this.completedAt = when;
+  }
+
+  /**
+   * Records a reprocessing of the rows that failed at commit (BRQID.006).
+   *
+   * @param recovered rows committed this time
+   * @param stillFailed rows still failed
+   */
+  public void reprocessed(int recovered, int stillFailed) {
+    if (status != BulkJobStatus.COMPLETED) {
+      throw new BusinessRuleException(
+          "BULK_JOB_NOT_COMPLETED", "Upload " + jobNo + " has not been committed yet");
+    }
+    this.committedRows += recovered;
+    this.failedRows = stillFailed;
+    this.reprocessCount++;
   }
 
   /** Ensures the job still waits for a decision. */
@@ -163,5 +206,13 @@ public class BulkJob extends BaseEntity {
 
   public Instant getCompletedAt() {
     return completedAt;
+  }
+
+  public String getFileSha256() {
+    return fileSha256;
+  }
+
+  public int getReprocessCount() {
+    return reprocessCount;
   }
 }

@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.organization.domain.BranchRepository;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
+import com.iortatechnxt.brokerverse.report.domain.ReportRun.RunFile;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.report.render.ReportContext;
 import com.iortatechnxt.brokerverse.report.render.ReportRenderer;
@@ -14,11 +15,7 @@ import java.time.Clock;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +29,7 @@ public class ReportService {
   private static final String ID_SEPARATOR = " – ";
 
   private final ReportRegistry registry;
+  private final ReportArchiveService archive;
   private final Map<ExportFormat, ReportRenderer> renderers = new EnumMap<>(ExportFormat.class);
   private final CompanyRepository companies;
   private final BranchRepository branches;
@@ -44,6 +42,7 @@ public class ReportService {
    * Creates the service.
    *
    * @param registry report catalogue
+   * @param archive archive of generated reports
    * @param renderers export renderers
    * @param companies companies (names in headers and echo)
    * @param branches branches (names in the echo)
@@ -52,8 +51,10 @@ public class ReportService {
    * @param parameters system parameters (report footer)
    * @param clock clock
    */
+  @SuppressWarnings("java:S107") // constructor injection
   public ReportService(
       ReportRegistry registry,
+      ReportArchiveService archive,
       List<ReportRenderer> renderers,
       CompanyRepository companies,
       BranchRepository branches,
@@ -62,6 +63,7 @@ public class ReportService {
       SystemParameterService parameters,
       Clock clock) {
     this.registry = registry;
+    this.archive = archive;
     renderers.forEach(r -> this.renderers.put(r.format(), r));
     this.companies = companies;
     this.branches = branches;
@@ -77,10 +79,7 @@ public class ReportService {
    * @return catalogue
    */
   public List<ReportMetadata> catalogue() {
-    Set<String> granted = grantedAuthorities();
-    return registry.catalogue().stream()
-        .filter(m -> granted.contains(m.permission().name()))
-        .toList();
+    return registry.catalogue().stream().filter(ReportAccess::mayView).toList();
   }
 
   /**
@@ -97,6 +96,7 @@ public class ReportService {
         ReportParameters.validate(def.metadata(), rawParams, clock, this::displayValue);
     ReportResult result = def.generate(params);
     audit.record("Report", code, AuditAction.RUN, "Ran report " + String.join(", ", params.echo()));
+    archive.viewed(def.metadata(), params.echo(), result);
     return result;
   }
 
@@ -111,6 +111,9 @@ public class ReportService {
   @Transactional
   public RenderedReport export(String code, Map<String, String> rawParams, ExportFormat format) {
     ReportDefinition def = authorized(code);
+    if (!ReportAccess.mayExport(def.metadata())) {
+      throw new AccessDeniedException("Not permitted to export report " + code);
+    }
     ReportParameters params =
         ReportParameters.validate(def.metadata(), rawParams, clock, this::displayValue);
     ReportResult result = def.generate(params);
@@ -126,7 +129,13 @@ public class ReportService {
         code,
         AuditAction.EXPORT,
         "Exported " + format + " " + String.join(", ", params.echo()));
-    return new RenderedReport(code + "." + format.extension(), format.contentType(), content);
+    String fileName = code + "." + format.extension();
+    archive.exported(
+        def.metadata(),
+        params.echo(),
+        result,
+        new RunFile(format.name(), fileName, format.contentType(), content));
+    return new RenderedReport(fileName, format.contentType(), content);
   }
 
   /**
@@ -159,20 +168,10 @@ public class ReportService {
 
   private ReportDefinition authorized(String code) {
     ReportDefinition def = registry.get(code);
-    if (!grantedAuthorities().contains(def.metadata().permission().name())) {
+    if (!ReportAccess.mayView(def.metadata())) {
       throw new AccessDeniedException("Not permitted to run report " + code);
     }
     return def;
-  }
-
-  private static Set<String> grantedAuthorities() {
-    var auth = SecurityContextHolder.getContext().getAuthentication();
-    if (auth == null) {
-      return Set.of();
-    }
-    return auth.getAuthorities().stream()
-        .map(GrantedAuthority::getAuthority)
-        .collect(Collectors.toSet());
   }
 
   /**

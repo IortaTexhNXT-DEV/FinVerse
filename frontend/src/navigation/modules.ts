@@ -1,13 +1,16 @@
 import { accountingEngineModule } from '@/features/accounting-engine/module';
 import { accountsModule } from '@/features/accounts/module';
+import { adjustmentModule } from '@/features/adjustment/module';
 import { adminModule } from '@/features/admin/module';
 import { withOverviewScreens } from '@/features/approvals/module';
 import { brokingSetupModule } from '@/features/brokingsetup/module';
+import { cashieringModule } from '@/features/cashiering/module';
 import { catalogModule } from '@/features/catalog/module';
 import { bookingModule } from '@/features/booking/module';
 import { bulkModule } from '@/features/bulk/module';
 import { assetsModule } from '@/features/assets/module';
 import { claimsModule } from '@/features/claims/module';
+import { commissionModule } from '@/features/commission/module';
 import { crmModule } from '@/features/crm/module';
 import { proposalsModule } from '@/features/proposals/module';
 import { quotationsModule } from '@/features/quotations/module';
@@ -16,11 +19,14 @@ import { dashboardModule } from '@/features/dashboard/module';
 import { glModule } from '@/features/gl/module';
 import { helpModule } from '@/features/help/module';
 import { issuanceModule } from '@/features/issuance/module';
+import { operationsModule } from '@/features/operations/module';
 import { withJournalAutomation } from '@/features/journaltools/module';
 import { payablesModule } from '@/features/payables/module';
 import { placementModule } from '@/features/placement/module';
+import { prodreconModule } from '@/features/prodrecon/module';
 import { receivablesModule } from '@/features/receivables/module';
 import { reinsuranceModule } from '@/features/reinsurance/module';
+import { remittanceModule } from '@/features/remittance/module';
 import { reportsModule } from '@/features/reports/module';
 import { reservesModule } from '@/features/reserves/module';
 import { setupModule } from '@/features/setup/module';
@@ -50,14 +56,24 @@ export const NAV_GROUPS: NavGroup[] = [
       placementModule,
       issuanceModule,
       bookingModule,
+      // Operations (BRD-2), prototype placement: Product Reconciliation and Adjustment here.
+      prodreconModule,
+      adjustmentModule,
       catalogModule,
       bulkModule,
     ],
   },
+  // Operations (BRD-2) foundation: home, invoice ledger, Disbursement queue, interfaces.
+  // docs/architecture/OPERATIONS_DESIGN.md section 12.
+  { id: 'operations', title: 'Operations', modules: [operationsModule] },
   {
     id: 'finance',
     title: 'Finance',
     modules: [
+      // Operations cash modules first (BDOI prototype placement).
+      cashieringModule,
+      remittanceModule,
+      commissionModule,
       withJournalAutomation(glModule),
       receivablesModule,
       payablesModule,

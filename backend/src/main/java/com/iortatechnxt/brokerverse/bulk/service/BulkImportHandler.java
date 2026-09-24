@@ -8,8 +8,8 @@ import java.util.Locale;
  * Implement it as a Spring bean in the owning module's {@code service} package; the framework
  * provides template, parsing, review, commit and reports.
  *
- * <p>{@link #commit} runs once per valid row in its own transaction: throw a {@code
- * BusinessRuleException} to fail that row only.
+ * <p>{@link #commit} (or {@link #process}) runs once per valid row in its own transaction: throw a
+ * {@code BusinessRuleException} to fail that row only.
  */
 public interface BulkImportHandler {
 
@@ -83,13 +83,58 @@ public interface BulkImportHandler {
   List<String> validate(BulkRow row, BulkContext context);
 
   /**
-   * Creates or updates the business record(s) of a valid row.
+   * Creates or updates the business record(s) of a valid row. Implement this, or {@link #process}
+   * when the handler sorts its rows into outcome categories.
    *
    * @param row row
    * @param context run context
    * @return reference of the record created or updated (shown in the report)
    */
-  String commit(BulkRow row, BulkContext context);
+  default String commit(BulkRow row, BulkContext context) {
+    throw new IllegalStateException(code() + " implements neither commit nor process");
+  }
+
+  /**
+   * Commits a valid row and tells its outcome category (BRQID.006). The default commits the row
+   * with {@link #commit} and returns no category.
+   *
+   * @param row row
+   * @param context run context
+   * @return reference and category
+   */
+  default BulkOutcome process(BulkRow row, BulkContext context) {
+    return BulkOutcome.of(commit(row, context));
+  }
+
+  /**
+   * The outcome categories {@link #process} returns, in report order (e.g. APPLIED, UNAPPLIED,
+   * PREBOOKED, EXCESS). Empty for handlers that do not categorise.
+   *
+   * @return categories
+   */
+  default List<String> outcomeCategories() {
+    return List.of();
+  }
+
+  /**
+   * Layout of plain-text (.txt) files of this handler (CSHID.008). The default is a delimited file
+   * with a header line whose separator is detected.
+   *
+   * @return layout
+   */
+  default TextLayout textLayout() {
+    return TextLayout.AUTO;
+  }
+
+  /**
+   * Whether a file identical (same SHA-256) to an earlier upload of this handler that was not
+   * cancelled is refused (CSHID.008, PRCID.010: the same payment or insurer file twice).
+   *
+   * @return true to refuse duplicate files
+   */
+  default boolean blocksDuplicateFiles() {
+    return false;
+  }
 
   /**
    * Upper-cases and removes spaces (helper for identifiers such as plate or engine numbers).

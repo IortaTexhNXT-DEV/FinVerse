@@ -8,6 +8,8 @@ export interface ScreenDef {
   icon: LucideIcon;
   /** Backend permission required to see and open the screen. */
   permission?: string;
+  /** Other permissions that also open the screen (e.g. the checker of a maker screen). */
+  alsoPermissions?: string[];
   component: LazyExoticComponent<ComponentType>;
   /** Detail/edit screens reached from a list are not shown in the menu. */
   hidden?: boolean;

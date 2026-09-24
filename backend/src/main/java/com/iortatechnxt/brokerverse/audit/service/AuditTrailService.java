@@ -5,6 +5,8 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditLog;
 import com.iortatechnxt.brokerverse.audit.domain.AuditLogRepository;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import java.time.Clock;
+import java.util.Collection;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +66,20 @@ public class AuditTrailService {
   public void recordIndependently(
       String username, String entityType, Object entityId, AuditAction action, String summary) {
     save(username, entityType, entityId, action, summary);
+  }
+
+  /**
+   * Audit history of one record known under several keys (e.g. a client's prospect and client
+   * codes), newest first, at most 500 entries.
+   *
+   * @param entityType entity type
+   * @param entityIds keys of the record
+   * @return entries
+   */
+  @Transactional(readOnly = true)
+  public List<AuditLog> history(String entityType, Collection<String> entityIds) {
+    return repository.findTop500ByEntityTypeAndEntityIdInOrderByOccurredAtDesc(
+        entityType, entityIds);
   }
 
   private void save(

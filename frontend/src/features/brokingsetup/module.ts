@@ -1,5 +1,6 @@
 import { FileText, Mail } from 'lucide-react';
 import { lazy } from 'react';
+import { NBADMIN_SCREENS } from '@/features/nbadmin/screens';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
@@ -10,6 +11,7 @@ export const brokingSetupModule: FeatureModule = {
   id: 'broking-setup',
   section: 'Broking Setup',
   screens: [
+    ...NBADMIN_SCREENS,
     {
       path: '/broking-setup/templates',
       label: 'Document Templates',

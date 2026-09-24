@@ -28,6 +28,7 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'CONVERTED',
     'POLICY_ISSUED',
     'BOOKED',
+    'KYC_VERIFIED',
   ],
   warning: [
     'PENDING_AUTHORIZATION',
@@ -55,8 +56,9 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'QS_SENT',
     'TERMS_RECEIVED',
     'PS_RELEASED',
+    'KYC_REVIEW',
   ],
-  neutral: ['DRAFT', 'FUTURE', 'INACTIVE', 'CANCELLED', 'UNKNOWN'],
+  neutral: ['DRAFT', 'FUTURE', 'INACTIVE', 'CANCELLED', 'UNKNOWN', 'NOT_STARTED'],
   danger: [
     'REJECTED',
     'REVERSED',

@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.audit.domain;
 
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,4 +38,15 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
       @Param("from") Instant from,
       @Param("to") Instant to,
       Pageable pageable);
+
+  /**
+   * Audit history of one record known under several keys (e.g. a client's prospect and client
+   * codes), newest first.
+   *
+   * @param entityType entity type
+   * @param entityIds keys of the record
+   * @return entries
+   */
+  List<AuditLog> findTop500ByEntityTypeAndEntityIdInOrderByOccurredAtDesc(
+      String entityType, Collection<String> entityIds);
 }

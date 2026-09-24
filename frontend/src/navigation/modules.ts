@@ -5,6 +5,7 @@ import { brokingSetupModule } from '@/features/brokingsetup/module';
 import { bulkModule } from '@/features/bulk/module';
 import { assetsModule } from '@/features/assets/module';
 import { claimsModule } from '@/features/claims/module';
+import { crmModule } from '@/features/crm/module';
 import { planningModule } from '@/features/closing/module';
 import { dashboardModule } from '@/features/dashboard/module';
 import { glModule } from '@/features/gl/module';
@@ -31,6 +32,7 @@ export const MODULES: FeatureModule[] = [
   withOverviewScreens(dashboardModule),
   // Broking (BDOI New Business) - docs/architecture/BROKING_ARCHITECTURE.md section 5.
   workspaceModule,
+  crmModule,
   bulkModule,
   brokingSetupModule,
   // Insurer core and finance.

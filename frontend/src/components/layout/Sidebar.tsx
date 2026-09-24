@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/auth/authContext';
+import { mayOpen } from '@/navigation/access';
 import { activeMenuPath } from '@/navigation/activeMenu';
 import { MODULES } from '@/navigation/modules';
 
@@ -12,9 +13,7 @@ export function Sidebar() {
   const { pathname } = useLocation();
   const sections = MODULES.map((module) => ({
     module,
-    screens: module.screens.filter(
-      (s) => s.hidden !== true && (s.permission === undefined || can(s.permission)),
-    ),
+    screens: module.screens.filter((s) => s.hidden !== true && mayOpen(s, can)),
   })).filter((section) => section.screens.length > 0);
   const active = activeMenuPath(
     pathname,

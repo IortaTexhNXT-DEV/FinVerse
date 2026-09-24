@@ -44,7 +44,10 @@ export function App() {
                         key={s.path}
                         path={s.path}
                         element={
-                          <RequirePermission permission={s.permission}>
+                          <RequirePermission
+                            permission={s.permission}
+                            alsoPermissions={s.alsoPermissions}
+                          >
                             <Screen />
                           </RequirePermission>
                         }

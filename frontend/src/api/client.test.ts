@@ -6,6 +6,17 @@ describe('api client', () => {
     tokenStore.clear();
   });
 
+  it('keeps the token and its expiry per tab and clears both', () => {
+    tokenStore.set('abc', '2026-09-24T18:00:00Z');
+    expect(tokenStore.get()).toBe('abc');
+    expect(tokenStore.expiresAt()).toBe('2026-09-24T18:00:00Z');
+    expect(localStorage.length).toBe(0);
+    tokenStore.set('def');
+    expect(tokenStore.expiresAt()).toBeNull();
+    tokenStore.clear();
+    expect(tokenStore.get()).toBeNull();
+  });
+
   it('builds query strings without empty values', () => {
     expect(toQuery({ a: 1, b: '', c: undefined, d: 'x y' })).toBe('?a=1&d=x+y');
     expect(toQuery({})).toBe('');

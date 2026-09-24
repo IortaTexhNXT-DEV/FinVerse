@@ -9,9 +9,14 @@ This page is binding for every BrokerVerse screen. Components read the design to
 
 ## 1. Brand
 
-- **Logo.** Use BDO Insure on Header Blue or on white, with clear space of half the logo height on every side and a minimum height of 24 px. Never redraw, re-colour or deconstruct it.
-  - BrokerVerse shows the official file supplied by BDO Marketing Communications: put it in `frontend/public/brand/` and set `VITE_CLIENT_LOGO_URL` (see `src/branding.ts`).
-  - Until the file is supplied, the sidebar shows the iNXT BrokerVerse wordmark "for BDO Insure".
+- **Product name.** Users see **BIBS – BDOI Broker System**, "Powered by iorta TechNXT". The platform is
+  iNXT BrokerVerse (`frontend/src/branding.ts`).
+- **Logo.** BDO Insure on white or Header Blue, with clear space of half the logo height and a minimum
+  height of 24 px. Never redrawn, recoloured or deconstructed.
+  - The sidebar, sign-in and About dialog use the lockup from the BDOI UX pack
+    (`frontend/src/assets/brand/bdo-insure.png`). Replace it with the master file from BDO Marketing
+    Communications, preferably SVG, once supplied.
+  - The iorta TechNXT logo appears only as "Powered by" on sign-in and in About.
 - **Colours.** Blue is always the dominant colour; yellow is used sparingly.
 
 | Token | Hex | Style guide name | Use |
@@ -66,7 +71,8 @@ This page is binding for every BrokerVerse screen. Components read the design to
 | Dropdown | Opens under the field. Shows 5 options (188 px) and scrolls beyond 5 (200 px) |
 | Form builder set | Input text, text area, dropdown, date picker (range picker with a calendar icon, MM/DD/YYYY), radio button, checkbox, select-search combo box, password, readable fields, upload file |
 | Table | Header row in Header Blue with white bold text and sort chevrons, and alternating white / Background Blue rows. A checkbox column for bulk actions. "Showing 1 to n of N results" with numbered pages on the right |
-| Status pill | Outlined, radius 8: green = Clean / Approved, yellow = Review / Pending, red = Exception / Rejected, blue = in-process (e.g. "Account for Placement") |
+| Flag chip | Record flags such as FFY and Direct Payment go in their own column as small gold-tinted chips, never mixed with the status pill |
+| Status pill | One per record in the Status column. Outlined, radius 8: green = Clean / Approved, yellow = Review / Pending, red = Exception / Rejected, blue = in-process (e.g. "Account for Placement") |
 | Tabs | Boxed tabs; the active tab is white with a 4 px yellow top bar and CTA Blue text, inactive tabs have a light blue gradient |
 | Empty state | Table-and-magnifier illustration with "No items to display" (`EmptyState`) |
 | Modal | Title with a close ✕, body, and a footer with Cancel (secondary) and the action (primary) on the right |
@@ -84,7 +90,9 @@ This page is binding for every BrokerVerse screen. Components read the design to
   - A summary card: code, name, record status pill and risk rating, then icon + label/value pairs (basic details, address, mobile, e-mail) with an Update link and "View All Details".
   - Then tabs for the related records (Quotation | Confirmed Proposals | Renewal).
 - **Dialogs** for a single parameterised action, e.g. Generate Expiry List with a date range.
-- **Sign in.** A split screen: a brand image on the left, and on the right the logo, "Welcome to BDO Insure Portal", Windows ID and Password, and a full-width Login button. Windows ID login needs BDO SSO / Active Directory (BRD-1 Q42, parked); the existing username login is used until then.
+- **Sign in.** A split screen: the photo from the UX pack on the left, and on the right the BDO Insure logo, "Welcome to BIBS" with "BDOI Broker System" below, User ID and Password, a full-width Login button, and "Powered by iorta TechNXT".
+  - Windows ID login needs BDO SSO / Active Directory (BRD-1 Q42, parked).
+  - Confirm with BDOI that the photo is licensed for the application.
 
 ## 6. Observations to confirm with BDOI
 

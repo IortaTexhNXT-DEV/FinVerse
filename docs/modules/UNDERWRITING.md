@@ -1,6 +1,6 @@
 # Underwriting (products, quotations, policies, endorsements, open covers)
 
-Package `com.iortatechnxt.finverse.underwriting`, UI section **Underwriting**
+Package `com.iortatechnxt.brokerverse.underwriting`, UI section **Underwriting**
 (`frontend/src/features/underwriting`), migration `V100__underwriting.sql` (schema), accounting event
 types in `V3__party_subledger_accounting_engine.sql`, demo `V901__demo_parties_and_accounting_rules.sql`
 (parties and posting rules) and `V910__demo_underwriting_roles.sql` (approver grant), demo loader
@@ -114,7 +114,7 @@ DRAFT / PENDING_APPROVAL / APPROVED --validity lapsed (expiry run)--> EXPIRED
 - **Validity**: expiry date = issue date + validity days. The **expiry run** marks every open
   quotation (draft, pending approval, approved) whose expiry date is before the run date as
   `EXPIRED` and writes an audit entry per quotation:
-  - the daily job `QUOTATION_EXPIRY` (`QuotationExpiryJob`, cron `finverse.jobs.quotation-expiry-cron`,
+  - the daily job `QUOTATION_EXPIRY` (`QuotationExpiryJob`, cron `brokerverse.jobs.quotation-expiry-cron`,
     default `0 45 0 * * *` UTC, enabled) expires every active company, one transaction per
     company, on the business date;
   - the **Expire lapsed quotations** button of the Quotations screen (shown with `POLICY_MAINTAIN`)
@@ -318,7 +318,7 @@ Allocation screen and the `AllocationJob` read `approvedTransactions` and cede e
 ## 10. Reports (category Underwriting, permission `POLICY_VIEW`)
 
 Range parameters (branch, class, product, customer, broker / agent) are optional. "Based on" selects
-the date: issue, accounting, approval or period from (accounting date = approval date in FinVerse).
+the date: issue, accounting, approval or period from (accounting date = approval date in BrokerVerse).
 
 | Code | Title | Rules |
 |---|---|---|

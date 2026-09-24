@@ -12,10 +12,10 @@ RUN mvn -B -q -DskipTests -Djacoco.skip=true -Dcheckstyle.skip -Dpmd.skip -Dcpd.
 
 # ---- runtime stage -----------------------------------------------------------------
 FROM eclipse-temurin:21-jre-alpine
-RUN addgroup -S finverse && adduser -S finverse -G finverse
+RUN addgroup -S brokerverse && adduser -S brokerverse -G brokerverse
 WORKDIR /app
-COPY --from=build /workspace/target/finverse-backend.jar app.jar
-USER finverse
+COPY --from=build /workspace/target/brokerverse-backend.jar app.jar
+USER brokerverse
 EXPOSE 8080
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError"
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \

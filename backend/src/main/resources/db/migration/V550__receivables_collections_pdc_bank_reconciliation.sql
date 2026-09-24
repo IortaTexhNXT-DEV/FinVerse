@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V550 Receivables: official receipts (collections), bank deposit slips,
+-- iNXT BrokerVerse - V550 Receivables: official receipts (collections), bank deposit slips,
 -- post-dated cheques received and bank reconciliation.
 --
 -- Banks are identified by their GL bank account code (postable accounts of a bank/cash

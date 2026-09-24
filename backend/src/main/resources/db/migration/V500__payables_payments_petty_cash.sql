@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V500 Payables, payments, petty cash and PDC issued
+-- iNXT BrokerVerse - V500 Payables, payments, petty cash and PDC issued
 -- Company bank accounts and cheque books, supplier invoices (AP), payment vouchers with
 -- open-item allocations, post-dated cheques issued (register + status history) and
 -- imprest petty cash (funds, disbursements, reimbursements).

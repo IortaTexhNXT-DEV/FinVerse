@@ -1,4 +1,4 @@
-# iNXT FinVerse budget import (POST /api/v1/budgets/{id}/import, Content-Type text/plain).
+# iNXT BrokerVerse budget import (POST /api/v1/budgets/{id}/import, Content-Type text/plain).
 # Lines starting with # and blank lines are ignored. Header names are lower case.
 # Layout 1: account_code,cost_centre,m01..m12 (twelve monthly amounts of the fiscal year).
 # Layout 2: account_code,cost_centre,annual (annual amount spread evenly, remainder in month 12).

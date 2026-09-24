@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - DEMO DATA for platform features (loaded only with the 'demo' profile):
+-- iNXT BrokerVerse - DEMO DATA for platform features (loaded only with the 'demo' profile):
 -- suspense account monitoring, recurring journal templates and a supplier awaiting
 -- authorization (visible in the checker's "My Approvals" inbox).
 -- =====================================================================================

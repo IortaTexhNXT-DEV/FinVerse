@@ -1,6 +1,6 @@
 # Fixed Assets and Investments
 
-Packages `com.iortatechnxt.finverse.fixedasset` and `com.iortatechnxt.finverse.investment`;
+Packages `com.iortatechnxt.brokerverse.fixedasset` and `com.iortatechnxt.brokerverse.investment`;
 UI section **Assets & Investments** (`frontend/src/features/assets`). Every posting goes through the
 accounting engine (`AccountingEventPublisher`); GL accounts come from the asset category or the
 investment portfolio as account roles, and from the rules configured per company.

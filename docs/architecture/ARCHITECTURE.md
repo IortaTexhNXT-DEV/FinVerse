@@ -1,4 +1,4 @@
-# iNXT FinVerse – Solution Architecture
+# iNXT BrokerVerse – Solution Architecture
 
 ## Context
 

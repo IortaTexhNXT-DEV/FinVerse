@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V600 Budgets, inter-company relationships/transactions and consolidation.
+-- iNXT BrokerVerse - V600 Budgets, inter-company relationships/transactions and consolidation.
 -- =====================================================================================
 
 -- ---------- Budgets ------------------------------------------------------------------

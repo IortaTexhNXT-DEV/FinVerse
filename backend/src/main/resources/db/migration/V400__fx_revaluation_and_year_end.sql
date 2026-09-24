@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V400 Period-end: FX revaluation runs and year-end closing records.
+-- iNXT BrokerVerse - V400 Period-end: FX revaluation runs and year-end closing records.
 -- =====================================================================================
 
 -- One revaluation run per company and accounting period (idempotency key).

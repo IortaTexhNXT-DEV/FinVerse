@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V650 Finance / MIS reports support objects
+-- iNXT BrokerVerse - V650 Finance / MIS reports support objects
 -- Financial Statement Format master used by the MIS Balance Sheet and Income & Expense
 -- statements (FIN-MIS-*). A built-in format "STANDARD" (derived from account report groups)
 -- is always available and needs no rows here; client specific formats map GL account code

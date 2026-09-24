@@ -10,7 +10,7 @@ export function dueBadge(state: DueState, daysToDue: number): { tone: string; te
     case 'DUE_SOON':
       return { tone: 'warning', text: `Due in ${daysToDue} d` };
     case 'REMINDER':
-      return { tone: 'neutral', text: 'Outside FinVerse' };
+      return { tone: 'neutral', text: 'Outside BrokerVerse' };
     default:
       return { tone: 'neutral', text: `Due in ${daysToDue} d` };
   }

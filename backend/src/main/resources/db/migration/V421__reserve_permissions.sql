@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V421 Permissions for actuarial reserve valuation runs.
+-- iNXT BrokerVerse - V421 Permissions for actuarial reserve valuation runs.
 -- RESERVE_PREPARE: prepare, recalculate and submit a valuation run (maker).
 -- Approving, posting and cancelling a run require PERIOD_END_RUN (checker); reserve
 -- parameters and takaful settings use MASTER_MAINTAIN / MASTER_AUTHORIZE.

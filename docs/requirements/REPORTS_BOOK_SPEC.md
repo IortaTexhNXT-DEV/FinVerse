@@ -1,9 +1,9 @@
 # Insurance (GI) Reports – Implementation Specification
 
 Source: *Annexure 2(c) Reports Book – GI* (78 pages). This file is the traceability baseline used to
-build the insurance reports in iNXT FinVerse. Report codes are kept identical to the source so
+build the insurance reports in iNXT BrokerVerse. Report codes are kept identical to the source so
 business users can recognise them. Where the source did not state a rule explicitly, the rule
-adopted by FinVerse is marked **(FinVerse rule)**.
+adopted by BrokerVerse is marked **(BrokerVerse rule)**.
 
 ## 0. Conventions
 - Range parameters `X From/To` are optional; blank = all values.
@@ -19,7 +19,7 @@ adopted by FinVerse is marked **(FinVerse rule)**.
 ## 1. Underwriting
 | Code | Title | Key parameters | Columns (order) | Group | Rules |
 |---|---|---|---|---|---|
-| PGIBR042 | List of Quotations Pending Approval | Branch, Department(Class), Product, Customer, Broker ranges; Issue date from/to; As-of date; Pending days | Quotation No, Iteration, Issue Date, Customer, Period From, Period To, Our Share %, 100% SI, Our SI, 100% Gross, Our Gross, 100% Disc, Our Disc, 100% Loading, Our Loading, Charges, 100% Net, Our Net, Brokerage | Branch > Class > Customer | Status = pending; pending days 0 = all, else as-of − issue ≥ days **(FinVerse rule: ≥)** |
+| PGIBR042 | List of Quotations Pending Approval | Branch, Department(Class), Product, Customer, Broker ranges; Issue date from/to; As-of date; Pending days | Quotation No, Iteration, Issue Date, Customer, Period From, Period To, Our Share %, 100% SI, Our SI, 100% Gross, Our Gross, 100% Disc, Our Disc, 100% Loading, Our Loading, Charges, 100% Net, Our Net, Brokerage | Branch > Class > Customer | Status = pending; pending days 0 = all, else as-of − issue ≥ days **(BrokerVerse rule: ≥)** |
 | PGIBR005 | Premium Register with DN Number | ranges; Based on (Issue/Accounting/Approval/Period-from); date from/to; Account option | Policy No, Endt No, Insured, Customer, Issue Date, Endt Date, Period, Approval Date, Our Share %, 100%/Our SI, Gross, Disc, Loading, Net, Policy Fee, Other charges, Broker, Broker Commission, Broker CN No, Customer DN No | Branch > Class > Product | DN = debit note of policy; CN = broker credit note |
 | PGIBR040 | Transactions Pending Approval | ranges; issue date from/to | Policy No, Endt count, Assured, Created By, Period, Our Share %, SI, Gross, Disc, Loading, Net, Charges, Commission | Branch > Class > Product | Status draft / pending approval |
 | PGIBR003 | Daily Production Report | ranges; Based on Issue/Approval; date from/to | Date, No of Policies, No of Endorsements, 100% Net, Our Net | Branch > Class > Product | Counts per day |
@@ -59,7 +59,7 @@ adopted by FinVerse is marked **(FinVerse rule)**.
 | PGIBR072 | UPR Summary Report | ranges; Earned/Unearned; UPR processed date; Detail/Summary | Policy, Period, Approval Date, Total Units (days), Earned Units, Unearned Units, Gross Premium, Commission, Earned / Unearned Premium & Commission, Treaty premium/commission earned/unearned, FAC premium/commission earned/unearned | 1/365 (daily pro-rata): unearned = amount × unexpired days / total days |
 | PGIBR079 | IBNR Processing Report | processed date; Summary Y/N | Branch, Line of business, Source type, Product, IBNR Rate, Base (earned premium), IBNR Amount, RI portion | IBNR = base × rate %; RI portion = IBNR × ceded share |
 | PGIBR080 | OSLR Processing Report | processed date | Branch, Line of business, Source type, Product, OSLR Amount | OSLR = Σ(approved estimate − paid) of open claims |
-| PGIBR074 | Surplus / Mudharabah Payment | ranges; approval date from/to; posted/unposted | Branch, Policy, Insured, Product, Expiry, Gross, Discount, Loading, Commission, Claims, Applicable contribution, Retakaful, Tax, Payable | Applicable = gross − discount + loading − commission − claims **(FinVerse rule)** |
+| PGIBR074 | Surplus / Mudharabah Payment | ranges; approval date from/to; posted/unposted | Branch, Policy, Insured, Product, Expiry, Gross, Discount, Loading, Commission, Claims, Applicable contribution, Retakaful, Tax, Payable | Applicable = gross − discount + loading − commission − claims **(BrokerVerse rule)** |
 | PGIBR085 | Risk Accumulation Report | Accumulation group (zone), as-on | S.No, Accumulation zone, Occupation, Policy, Endt, Period (days), SI, Product | Σ SI per group |
 | PGIBR084 | Marine Open Cover Certificate Report | ranges; date from/to | Certificate, Period, Insured, SI FC/LC, Premium FC/LC, Claim, Loss Date, Reserve, Paid, O/S | Open cover totals |
 | RISK-PROFILE | Risk Profile (RI, UW year wise) | UW year from/to; date from/to | SI band, No of Risks, SI & premium split Risk/Retention/QS/Surplus/FAC, paid claims count & split, O/S claims count & split | Risk = Retention + QS + Surplus + FAC |

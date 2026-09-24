@@ -3,7 +3,7 @@ import { ageInDays, oldestAge } from '@/features/approvals/age';
 
 describe('password rules', () => {
   it('accepts a strong matching password', () => {
-    expect(passwordProblems('Finverse@2027', 'Finverse@2027')).toEqual([]);
+    expect(passwordProblems('Brokerverse@2027', 'Brokerverse@2027')).toEqual([]);
   });
 
   it('lists every unmet rule', () => {

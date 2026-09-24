@@ -35,7 +35,7 @@
     signature, issuer and expiry are then verified; an altered header simply fails validation.
   -->
   <Match>
-    <Class name="com.iortatechnxt.finverse.security.service.JwtAuthenticationFilter"/>
+    <Class name="com.iortatechnxt.brokerverse.security.service.JwtAuthenticationFilter"/>
     <Bug pattern="SERVLET_HEADER"/>
   </Match>
   <!--
@@ -44,7 +44,7 @@
     CORS preflight that the origin allow-list rejects, and a forged token fails authentication.
   -->
   <Match>
-    <Class name="com.iortatechnxt.finverse.config.SecurityConfig"/>
+    <Class name="com.iortatechnxt.brokerverse.config.SecurityConfig"/>
     <Bug pattern="SERVLET_HEADER"/>
   </Match>
   <!-- Generated/test code is not part of the production artefact. -->

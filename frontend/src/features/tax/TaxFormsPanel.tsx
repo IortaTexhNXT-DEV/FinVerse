@@ -210,7 +210,7 @@ export function TaxFormsPanel() {
                 checked={form.trackFiling === true}
                 onChange={(e) => set({ trackFiling: e.target.checked })}
               />
-              Returns and alerts managed in FinVerse
+              Returns and alerts managed in BrokerVerse
             </label>
           </div>
         )}

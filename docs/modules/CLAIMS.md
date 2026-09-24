@@ -1,6 +1,6 @@
 # Claims
 
-Package `com.iortatechnxt.finverse.claims`, UI section **Claims** (`frontend/src/features/claims`),
+Package `com.iortatechnxt.brokerverse.claims`, UI section **Claims** (`frontend/src/features/claims`),
 migrations `V200__claims.sql` (schema, event type, exception codes) and `V920__demo_claims.sql`
 (demo roles, parties and accounting rule), demo loader `claims.demo.ClaimsDemoData`.
 
@@ -144,7 +144,7 @@ in base currency unless stated.
 | PGIBR036 | Client-wise Outstanding Claims | open claims with payment O/S as on a date; Branch > Customer |
 | PGIBR012 | Claims Ratio by Class of Business | approved policies expiring in the period; premium of all approved transactions; paid (net of recoveries) and O/S as at the expiry-to date; ratio = (paid + O/S) / our net premium × 100 (0 without premium); New / Renewed; Branch > Class > Product |
 | PGIBR028 | Claims Ratio – Policy | policies with premium approved in the period; net claim = paid + closing O/S − opening O/S; release = opening − paid − closing; Branch > Class > Product > Customer |
-| PGIBR023 | Production / Claims Analysis | our gross premium approved in the period by kind (New, Renewal, Additional = positive endorsement, Refund = negative endorsement), total gross 100 % and our share; claims with a loss date in the period as at its end (FinVerse rule); Branch > Class |
+| PGIBR023 | Production / Claims Analysis | our gross premium approved in the period by kind (New, Renewal, Additional = positive endorsement, Refund = negative endorsement), total gross 100 % and our share; claims with a loss date in the period as at its end (BrokerVerse rule); Branch > Class |
 | PGIBR082 | LPO Issued (OD and TP) | issued LPOs of claims with a loss date in the period, per claim and garage: count, gross, discount, net; cover filter; claim currency; Branch > Garage > Product |
 | CLM-REGISTER | Claims Register (Bordereaux) | claims reported in the period with loss details, status and figures as at the period end; Branch > Class |
 | CLM-MOVEMENT | Claim Movement Statement | every movement of one claim, company share in the claim currency, with the running payment O/S |

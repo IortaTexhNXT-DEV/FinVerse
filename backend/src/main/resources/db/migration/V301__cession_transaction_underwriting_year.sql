@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V301 A cession carries the underwriting year of the premium transaction it
+-- iNXT BrokerVerse - V301 A cession carries the underwriting year of the premium transaction it
 -- cedes (V101: a renewal and the later endorsements of the renewed period belong to the year
 -- the renewed period starts). Cessions made before V101 carry the policy's original year for
 -- renewals and their endorsements; align them, so the RI registers group them by the right

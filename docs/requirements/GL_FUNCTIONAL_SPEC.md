@@ -1,4 +1,4 @@
-# iNXT FinVerse: Insurance GL Functional Specification (condensed)
+# iNXT BrokerVerse: Insurance GL Functional Specification (condensed)
 
 Sources:
 - `Premia General Ledger Module.txt` (292-page functional/solution design; referred to as **PGL**)
@@ -7,7 +7,7 @@ Sources:
 
 Tagging convention:
 - Plain bullets are taken from the docs. Lists marked "(verbatim)" copy the doc's wording.
-- **[IMPL]** marks an implementation decision or gap-fill that FinVerse needs but the docs do not specify. Treat it as a proposal and confirm it with the business.
+- **[IMPL]** marks an implementation decision or gap-fill that BrokerVerse needs but the docs do not specify. Treat it as a proposal and confirm it with the business.
 - Section numbers in parentheses, such as (PGL 3.1.6), point back to the source.
 
 Gaps to know up front:
@@ -266,7 +266,7 @@ Other sources:
 
 The doc provides no other Dr/Cr examples.
 
-**[IMPL] Default rule templates for FinVerse.** These are standard non-life insurance accounting, to be seeded as configurable rules:
+**[IMPL] Default rule templates for BrokerVerse.** These are standard non-life insurance accounting, to be seeded as configurable rules:
 
 | Event code | Dr | Cr |
 |---|---|---|
@@ -1003,7 +1003,7 @@ Every engine (posting, currency, IC, consolidation, reconciliation, reporting, y
 
 ---
 
-## 24. [IMPL] Consolidated FinVerse screen inventory (MVP ordering)
+## 24. [IMPL] Consolidated BrokerVerse screen inventory (MVP ordering)
 
 1. **Org and Setup:** Enterprise/Company/Region/Branch/Department/BU masters; Holiday calendar; System parameters.
 2. **CoA:** GL Heads (tree), Sub GL, Micro GL, GL Category, Currencies allowed per GL, Access codes, Posting controls (own and other branch), GL closure/freeze.

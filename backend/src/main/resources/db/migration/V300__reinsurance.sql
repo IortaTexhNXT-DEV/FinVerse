@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V300 Reinsurance: treaty programme, cessions, facultative placements,
+-- iNXT BrokerVerse - V300 Reinsurance: treaty programme, cessions, facultative placements,
 -- reinsurers' share of claims and quarterly statements of account (SOA).
 -- Reinsurance accounting is kept in the company base currency; policy-currency amounts
 -- are stored next to base amounts where the underwriting registers need them.

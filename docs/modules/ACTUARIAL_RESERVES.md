@@ -1,6 +1,6 @@
 # Actuarial Reserves (period-end technical provisions)
 
-Package `com.iortatechnxt.finverse.reserves`; UI section **Actuarial Reserves**
+Package `com.iortatechnxt.brokerverse.reserves`; UI section **Actuarial Reserves**
 (`frontend/src/features/reserves`). Migrations `V420` (schema, events, job parameter) and `V421`
 (permission); demo `V940` (accounts and rules) and the start-up runner `reserves.demo.ReservesDemoData`
 (`demo` profile, `@Order(90)`, idempotent).
@@ -110,7 +110,7 @@ LAT per line of business:
   PDR             = max(0, expected claims − available), allocated to units by net UPR
 ```
 
-### Takaful surplus / Mudharabah (PGIBR074, FinVerse rule)
+### Takaful surplus / Mudharabah (PGIBR074, BrokerVerse rule)
 
 Optional per company (**Reserve Parameters → Takaful surplus**, maker-checker). For each takaful
 product policy expiring in the valuation month (amounts of the expiring period):
@@ -168,7 +168,7 @@ create (preview) ─► PREVIEW ─submit─► PENDING_APPROVAL ─approve─�
   while its period accepts postings, else the first day of the next period (which must be open).
 - **Approval inbox**: runs pending approval, reserve parameters and takaful settings pending
   authorization (`ReserveApprovalSource`).
-- **Scheduled job** `RESERVE_VALUATION` (`ReserveValuationJob`, cron `finverse.jobs.reserve-valuation-cron`,
+- **Scheduled job** `RESERVE_VALUATION` (`ReserveValuationJob`, cron `brokerverse.jobs.reserve-valuation-cron`,
   default `-` = manual only): prepares and submits the previous month's run for the company codes in
   the system parameter `RESERVES_AUTO_RUN_COMPANIES`.
 - **Period-end checklist**: control `RESERVE_VALUATION` "Actuarial reserves valued and posted" through

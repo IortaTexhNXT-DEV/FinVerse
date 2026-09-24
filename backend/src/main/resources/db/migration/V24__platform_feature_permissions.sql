@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V24 Permissions for attachments, alerts and system monitoring.
+-- iNXT BrokerVerse - V24 Permissions for attachments, alerts and system monitoring.
 -- =====================================================================================
 
 -- Attachments: everyone who can view records may view their documents.

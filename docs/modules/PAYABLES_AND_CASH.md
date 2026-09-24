@@ -1,6 +1,6 @@
 # Payables & Cash (supplier invoices, payments, PDC issued, petty cash)
 
-Package `com.iortatechnxt.finverse.payables`, frontend `src/features/payables`, migrations `V500`
+Package `com.iortatechnxt.brokerverse.payables`, frontend `src/features/payables`, migrations `V500`
 (schema) and `V950` (demo masters).
 
 ## 1. Documents and approval
@@ -47,11 +47,11 @@ workaround is gone.
 `REPLACED` (new cheque leaf, no posting). See `IssuedPdcService` for the postings of each step.
 
 `ISSUED → DUE` is a status change only (no posting), made when the cheque date is reached: daily by
-the managed job `PDC_ISSUED_DUE` (`IssuedPdcDueJob`, cron `finverse.jobs.pdc-issued-due-cron`,
+the managed job `PDC_ISSUED_DUE` (`IssuedPdcDueJob`, cron `brokerverse.jobs.pdc-issued-due-cron`,
 default `0 15 0 * * *` UTC; listed with its run history on *Administration › Scheduled Jobs*, a
 failure raises `JOB_FAILURE`) or on request with **Mark due cheques** on the PDC Issued Register
 (`POST /pdc-issued/refresh-due?asOf`). The job replaces the former `@Scheduled` method and its
-undocumented property `finverse.payables.pdc-due-cron`.
+undocumented property `brokerverse.payables.pdc-due-cron`.
 
 ## 4. Ageing reports
 

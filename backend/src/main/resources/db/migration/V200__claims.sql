@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V200 Claims: claim register (FNOL), involved parties, reserve changes,
+-- iNXT BrokerVerse - V200 Claims: claim register (FNOL), involved parties, reserve changes,
 -- settlements, salvage / subrogation recoveries, local purchase orders (LPO) and the
 -- claim movement ledger (Reports Book estimate / paid lines, company share).
 --

@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V23 Exception code master and alert (exception log) register.
+-- iNXT BrokerVerse - V23 Exception code master and alert (exception log) register.
 -- Every module "exception report" is a filtered view of alt_alert.
 -- =====================================================================================
 

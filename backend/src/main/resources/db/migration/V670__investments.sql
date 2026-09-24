@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V670 Investment portfolio: portfolios (classification + GL accounts),
+-- iNXT BrokerVerse - V670 Investment portfolio: portfolios (classification + GL accounts),
 -- holdings, month-end accrual / amortization runs and the holding transaction history.
 -- =====================================================================================
 

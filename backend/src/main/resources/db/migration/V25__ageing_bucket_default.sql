@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V25 AGEING_BUCKETS becomes the effective default of the debtors and
+-- iNXT BrokerVerse - V25 AGEING_BUCKETS becomes the effective default of the debtors and
 -- creditors ageing reports (AgeingService.defaultSlots). Align the seeded value with the
 -- slots those reports used so far (30/60/90/120 = 0-30, 31-60, 61-90, 91-120, Over 120), so
 -- report output does not change. A value an administrator already changed is left alone.

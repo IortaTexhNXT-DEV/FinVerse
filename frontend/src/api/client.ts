@@ -1,12 +1,12 @@
 /**
- * Thin, typed HTTP client for the FinVerse REST API.
+ * Thin, typed HTTP client for the BrokerVerse REST API.
  *
  * - Attaches the bearer token.
  * - Converts RFC 7807 problem responses into {@link ApiError} with the stable backend `code`.
  * - Signals an expired session through {@link onUnauthorized} so the app can return to login.
  */
 
-const TOKEN_KEY = 'finverse.token';
+const TOKEN_KEY = 'brokerverse.token';
 
 export interface ProblemDetail {
   title?: string;

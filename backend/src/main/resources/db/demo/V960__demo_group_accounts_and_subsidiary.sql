@@ -4,7 +4,7 @@
 --   * FVI (parent, PHP): investment in subsidiaries, due from / due to related companies
 --     (foreign currency, revalued), currency translation reserve, non-controlling interest,
 --     goodwill.
---   * FVS (subsidiary, USD): "FinVerse Demo Insurance (Singapore) Pte. Ltd." with a head office
+--   * FVS (subsidiary, USD): "BrokerVerse Demo Insurance (Singapore) Pte. Ltd." with a head office
 --     branch, a copy of the FVI chart of accounts and dimensions, and fiscal year 2026.
 -- Journals of the subsidiary are posted by PlanningDemoData (demo profile start-up runner).
 -- =====================================================================================
@@ -33,14 +33,14 @@ where c.code = 'FVI';
 insert into org_company (code, name, base_currency, tax_id, address, fiscal_year_start_month,
     back_value_days, forward_value_days, retained_earnings_account, record_status,
     authorized_by, authorized_at, created_at, created_by)
-values ('FVS', 'FinVerse Demo Insurance (Singapore) Pte. Ltd.', 'USD', '201912345K',
+values ('FVS', 'BrokerVerse Demo Insurance (Singapore) Pte. Ltd.', 'USD', '201912345K',
     '1 Raffles Place, Singapore 048616', 1, 45, 5, '3500', 'ACTIVE', 'SYSTEM', now(), now(), 'SYSTEM');
 
 insert into org_branch (company_id, code, name, region, address, opening_date, head_office,
     forex_authorized, contact_phone, contact_email, manager_name, weekly_holidays,
     record_status, authorized_by, authorized_at, created_at, created_by)
 select c.id, 'HO', 'Head Office - Singapore', 'Singapore', '1 Raffles Place, Singapore',
-       date '2019-07-01', true, true, '+65 6000 1000', 'sg@finverse-demo.ph', 'Tan Wei Ming', '6,7',
+       date '2019-07-01', true, true, '+65 6000 1000', 'sg@brokerverse-demo.ph', 'Tan Wei Ming', '6,7',
        'ACTIVE', 'SYSTEM', now(), now(), 'SYSTEM'
 from org_company c where c.code = 'FVS';
 

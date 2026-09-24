@@ -1,6 +1,6 @@
 # Reinsurance (treaties, cessions, FAC, claims recoveries, statements of account)
 
-Package `com.iortatechnxt.finverse.reinsurance`, frontend `src/features/reinsurance`, migrations
+Package `com.iortatechnxt.brokerverse.reinsurance`, frontend `src/features/reinsurance`, migrations
 `V300` (schema, event types, alert codes, permission) and `V930` (demo parties and posting rules),
 demo loader `reinsurance.demo.ReinsuranceDemoData` (`@Profile("demo")`, `@Order(15)`, idempotent; statements of account come from `ReinsuranceStatementsDemoData`, `@Order(25)`, after the demo claims).
 
@@ -74,7 +74,7 @@ existing cession. They run on demand per policy (`POST /cessions/policies/{polic
 cedes any earlier transaction not yet ceded first), in a batch **RI allocation run** for a period
 (`/allocation/preview`, `/allocation/runs`, one transaction per database transaction, failures are
 reported and do not stop the run) and as the scheduled job `RI_ALLOCATION`
-(`finverse.jobs.ri-allocation-cron`, off by default). A sum insured above treaty capacity raises the
+(`brokerverse.jobs.ri-allocation-cron`, off by default). A sum insured above treaty capacity raises the
 `RI_TREATY_CAPACITY` alert.
 
 ### Facultative placements

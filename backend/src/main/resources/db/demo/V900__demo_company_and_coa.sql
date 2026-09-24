@@ -1,13 +1,13 @@
 -- =====================================================================================
--- iNXT FinVerse - DEMO DATA (loaded only with the 'demo' Spring profile).
--- Fictitious company "FinVerse Demo Insurance Corporation" with three branches,
+-- iNXT BrokerVerse - DEMO DATA (loaded only with the 'demo' Spring profile).
+-- Fictitious company "BrokerVerse Demo Insurance Corporation" with three branches,
 -- a Philippine non-life insurance chart of accounts, dimensions, FY 2026 calendar,
--- exchange rates and demo users (password: Finverse@2026 - demo only).
+-- exchange rates and demo users (password: Brokerverse@2026 - demo only).
 -- =====================================================================================
 insert into org_company (code, name, base_currency, tax_id, address, fiscal_year_start_month,
     back_value_days, forward_value_days, retained_earnings_account, record_status,
     authorized_by, authorized_at, created_at, created_by)
-values ('FVI', 'FinVerse Demo Insurance Corporation', 'PHP', '000-123-456-000',
+values ('FVI', 'BrokerVerse Demo Insurance Corporation', 'PHP', '000-123-456-000',
     '8th Floor, Demo Tower, Ayala Avenue, Makati City, Metro Manila', 1, 45, 5, '3500',
     'ACTIVE', 'SYSTEM', now(), now(), 'SYSTEM');
 
@@ -17,9 +17,9 @@ insert into org_branch (company_id, code, name, region, address, opening_date, h
 select c.id, b.code, b.name, b.region, b.address, date '2010-01-04', b.ho, b.fx, b.phone,
        b.email, b.mgr, '6,7', 'ACTIVE', 'SYSTEM', now(), now(), 'SYSTEM'
 from org_company c,
-(values ('HO',  'Head Office - Makati', 'NCR',      'Ayala Avenue, Makati City',        true,  true,  '+63 2 8888 0001', 'ho@finverse-demo.ph',   'Maria Santos'),
-        ('CEB', 'Cebu Branch',          'Visayas',  'Cebu Business Park, Cebu City',    false, true,  '+63 32 888 0002', 'cebu@finverse-demo.ph', 'Jose Reyes'),
-        ('DVO', 'Davao Branch',         'Mindanao', 'J.P. Laurel Avenue, Davao City',   false, false, '+63 82 888 0003', 'davao@finverse-demo.ph','Ana Cruz'))
+(values ('HO',  'Head Office - Makati', 'NCR',      'Ayala Avenue, Makati City',        true,  true,  '+63 2 8888 0001', 'ho@brokerverse-demo.ph',   'Maria Santos'),
+        ('CEB', 'Cebu Branch',          'Visayas',  'Cebu Business Park, Cebu City',    false, true,  '+63 32 888 0002', 'cebu@brokerverse-demo.ph', 'Jose Reyes'),
+        ('DVO', 'Davao Branch',         'Mindanao', 'J.P. Laurel Avenue, Davao City',   false, false, '+63 82 888 0003', 'davao@brokerverse-demo.ph','Ana Cruz'))
      as b(code, name, region, address, ho, fx, phone, email, mgr)
 where c.code = 'FVI';
 
@@ -862,20 +862,20 @@ from (values ('USD', 57.85), ('EUR', 62.40), ('GBP', 73.10), ('JPY', 0.3850), ('
      (values ('SPOT'), ('CLOSING')) as t(rt),
      generate_series(date '2026-01-01', date '2026-09-30', interval '1 day') as d;
 
--- Demo users (password for all: Finverse@2026). DEMO ONLY - never load in production.
+-- Demo users (password for all: Brokerverse@2026). DEMO ONLY - never load in production.
 insert into sec_user (username, full_name, email, password_hash, authorization_limit, home_branch_id,
     created_at, created_by)
 select u.username, u.full_name, u.email,
-       '$2a$12$smv1e9SPXS7CUWBVet12lOAsH3mCPzClJ0ne6V0gX5BmCcwP754j6', u.lim,
+       '$2b$12$Ymr.EsVEy57GidFnteUV2OU/MuNbjvTH4sjMM08B220/9bNvZgdp2', u.lim,
        (select id from org_branch where code = 'HO'), now(), 'SYSTEM'
-from (values ('admin',      'Demo System Administrator', 'admin@finverse-demo.ph',      null::numeric),
-             ('fmanager',   'Fiona Manager',             'fmanager@finverse-demo.ph',   null),
-             ('accountant', 'Andy Accountant',           'accountant@finverse-demo.ph', null),
-             ('checker',    'Carla Checker',             'checker@finverse-demo.ph',    5000000),
-             ('uw',         'Uriel Underwriter',         'uw@finverse-demo.ph',         null),
-             ('claims',     'Clara Claims',              'claims@finverse-demo.ph',     null),
-             ('reinsurer',  'Ramon Reinsurance',         'ri@finverse-demo.ph',         null),
-             ('auditor',    'Audrey Auditor',            'auditor@finverse-demo.ph',    null))
+from (values ('admin',      'Demo System Administrator', 'admin@brokerverse-demo.ph',      null::numeric),
+             ('fmanager',   'Fiona Manager',             'fmanager@brokerverse-demo.ph',   null),
+             ('accountant', 'Andy Accountant',           'accountant@brokerverse-demo.ph', null),
+             ('checker',    'Carla Checker',             'checker@brokerverse-demo.ph',    5000000),
+             ('uw',         'Uriel Underwriter',         'uw@brokerverse-demo.ph',         null),
+             ('claims',     'Clara Claims',              'claims@brokerverse-demo.ph',     null),
+             ('reinsurer',  'Ramon Reinsurance',         'ri@brokerverse-demo.ph',         null),
+             ('auditor',    'Audrey Auditor',            'auditor@brokerverse-demo.ph',    null))
      as u(username, full_name, email, lim);
 
 insert into sec_user_role (user_id, role_id)

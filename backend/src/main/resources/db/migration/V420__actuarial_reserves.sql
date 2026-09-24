@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V420 Actuarial reserves / period-end technical provisions:
+-- iNXT BrokerVerse - V420 Actuarial reserves / period-end technical provisions:
 -- reserve parameters per line of business (effective dated, maker-checker), takaful
 -- settings per company, valuation runs with their reserve lines, policy-level UPR and
 -- takaful surplus detail. See docs/modules/ACTUARIAL_RESERVES.md.

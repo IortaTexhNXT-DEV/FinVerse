@@ -13,7 +13,7 @@ where a.code = 'FVI' and b.code = 'FVS';
 
 insert into con_group (code, name, parent_company_id, currency, cta_account, nci_account,
     goodwill_account, active, created_at, created_by)
-select 'FVGRP', 'FinVerse Demo Group', c.id, 'PHP', '3450', '3600', '1850', true, now(), 'SYSTEM'
+select 'FVGRP', 'BrokerVerse Demo Group', c.id, 'PHP', '3450', '3600', '1850', true, now(), 'SYSTEM'
 from org_company c where c.code = 'FVI';
 
 insert into con_group_member (group_id, company_id, ownership_pct, investment_account, equity_accounts)

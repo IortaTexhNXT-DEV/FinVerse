@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V26 The audit trail is insert-only at database level.
+-- iNXT BrokerVerse - V26 The audit trail is insert-only at database level.
 -- The application only ever inserts into audit_log (AuditTrailService); this trigger makes
 -- the rule hold for every database client as well, the same way V1 protects
 -- gl_ledger_entry. UPDATE and DELETE are rejected row by row; TRUNCATE (which bypasses row

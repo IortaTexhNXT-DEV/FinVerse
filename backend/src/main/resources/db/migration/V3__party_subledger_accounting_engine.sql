@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V3 Party master, open-item sub-ledger and event-driven accounting engine
+-- iNXT BrokerVerse - V3 Party master, open-item sub-ledger and event-driven accounting engine
 -- =====================================================================================
 
 create table pty_party (

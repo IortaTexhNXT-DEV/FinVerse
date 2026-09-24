@@ -1,7 +1,7 @@
 # Source Documents (Requirements Inputs)
 
 Drop client requirement documents here (PDF, DOCX, XLSX, ZIP). They are the baseline that
-iNXT FinVerse is built and traced against.
+iNXT BrokerVerse is built and traced against.
 
 | Document | Status |
 |---|---|

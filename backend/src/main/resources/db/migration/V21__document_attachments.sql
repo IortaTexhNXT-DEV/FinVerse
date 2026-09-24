@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V21 Document attachments on any record (entity type + entity id).
+-- iNXT BrokerVerse - V21 Document attachments on any record (entity type + entity id).
 -- Metadata and content are split so listings never load file bytes.
 -- =====================================================================================
 

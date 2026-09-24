@@ -1,8 +1,8 @@
 {
-  "name": "finverse-frontend",
+  "name": "brokerverse-frontend",
   "private": true,
   "version": "1.0.0",
-  "description": "iNXT FinVerse web application (insurance GL and finance)",
+  "description": "iNXT BrokerVerse web application (insurance GL and finance)",
   "type": "module",
   "engines": {
     "node": ">=22"

@@ -1,8 +1,8 @@
 -- =====================================================================================
--- iNXT FinVerse - V2 Reference data required in every environment:
+-- iNXT BrokerVerse - V2 Reference data required in every environment:
 -- standard roles with their permissions, and ISO currencies.
 -- The first administrator is created at start-up by AdminBootstrap from
--- FINVERSE_ADMIN_USERNAME / FINVERSE_ADMIN_INITIAL_PASSWORD (never hard-coded).
+-- BROKERVERSE_ADMIN_USERNAME / BROKERVERSE_ADMIN_INITIAL_PASSWORD (never hard-coded).
 -- =====================================================================================
 
 insert into sec_role (code, name, created_at, created_by) values

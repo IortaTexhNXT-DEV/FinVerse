@@ -6,8 +6,8 @@ Audience: production deployment and support teams.
 
 | Component | Image | Port | Health |
 |---|---|---|---|
-| Backend (Spring Boot, Java 21) | `finverse-backend` | 8080 | `/actuator/health/liveness`, `/actuator/health/readiness` |
-| Frontend (nginx + SPA, proxies `/api`) | `finverse-frontend` | 8080 | `/healthz` |
+| Backend (Spring Boot, Java 21) | `brokerverse-backend` | 8080 | `/actuator/health/liveness`, `/actuator/health/readiness` |
+| Frontend (nginx + SPA, proxies `/api`) | `brokerverse-frontend` | 8080 | `/healthz` |
 | PostgreSQL 16 | managed service | 5432 | – |
 
 The backend is stateless (JWT); run ≥ 2 replicas behind the service. Database migrations (Flyway)
@@ -18,10 +18,10 @@ apply, for example, V27 on a database already at V975. `flyway_schema_history` r
 ## 2. First installation
 
 1. Create the database and a user owning it.
-2. Create the secret (see `deploy/k8s/finverse-secrets.example.yaml`) including
-   `FINVERSE_ADMIN_INITIAL_PASSWORD`.
-3. Deploy `deploy/k8s/finverse.yaml` (or `docker compose` for a single host).
-4. Sign in as `sysadmin`, change the password, remove `FINVERSE_ADMIN_INITIAL_PASSWORD`.
+2. Create the secret (see `deploy/k8s/brokerverse-secrets.example.yaml`) including
+   `BROKERVERSE_ADMIN_INITIAL_PASSWORD`.
+3. Deploy `deploy/k8s/brokerverse.yaml` (or `docker compose` for a single host).
+4. Sign in as `sysadmin`, change the password, remove `BROKERVERSE_ADMIN_INITIAL_PASSWORD`.
 5. Set up in this order (each item is authorized by a second user – maker-checker):
    company → branches → currencies & rates → chart of accounts → dimensions → fiscal year & open
    periods → parties → accounting rules → users & roles.
@@ -37,7 +37,7 @@ apply, for example, V27 on a database already at V975. `flyway_schema_history` r
 ## 4. Monitoring
 
 - Metrics: `/actuator/prometheus` (requires `SYSTEM_PARAMETER_MANAGE`; scrape with a service
-  account token) – JVM, HTTP, Hikari pool, and `finverse_journals_posted_total`.
+  account token) – JVM, HTTP, Hikari pool, and `brokerverse_journals_posted_total`.
 - Logs: one line per event, ISO timestamps; CR/LF in messages are neutralised. Alert on `ERROR`.
 - Every unexpected error returns HTTP 500 with `code=INTERNAL_ERROR` and a `reference` UUID that is
   also written to the log line – ask users for it and search the logs.

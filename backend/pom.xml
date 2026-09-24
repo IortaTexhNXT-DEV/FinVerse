@@ -12,9 +12,9 @@
   </parent>
 
   <groupId>com.iortatechnxt</groupId>
-  <artifactId>finverse-backend</artifactId>
+  <artifactId>brokerverse-backend</artifactId>
   <version>1.0.0</version>
-  <name>iNXT FinVerse - Backend</name>
+  <name>iNXT BrokerVerse - Backend</name>
   <description>Insurance General Ledger and Finance platform (REST API)</description>
 
   <properties>
@@ -46,7 +46,7 @@
     <jacoco.branch.minimum>0.65</jacoco.branch.minimum>
 
     <!-- SonarQube / SonarCloud (used by `mvn sonar:sonar` in CI) -->
-    <sonar.projectKey>iortatechnxt_finverse-backend</sonar.projectKey>
+    <sonar.projectKey>iortatechnxt_brokerverse-backend</sonar.projectKey>
     <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     <sonar.coverage.exclusions>**/config/**,**/*Application.java,**/dto/**</sonar.coverage.exclusions>
   </properties>
@@ -163,7 +163,7 @@
   </dependencies>
 
   <build>
-    <finalName>finverse-backend</finalName>
+    <finalName>brokerverse-backend</finalName>
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -321,7 +321,7 @@
         <version>${jacoco.version}</version>
         <configuration>
           <excludes>
-            <exclude>**/FinVerseApplication.class</exclude>
+            <exclude>**/BrokerVerseApplication.class</exclude>
             <exclude>**/config/**</exclude>
             <exclude>**/dto/**</exclude>
           </excludes>

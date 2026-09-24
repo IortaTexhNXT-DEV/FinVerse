@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V671 Permissions for fixed asset and investment transactions
+-- iNXT BrokerVerse - V671 Permissions for fixed asset and investment transactions
 -- (disposals, transfers, coupon receipts, maturities, sales, fair value updates).
 -- Masters use MASTER_*; month-end runs use PERIOD_END_RUN.
 -- =====================================================================================

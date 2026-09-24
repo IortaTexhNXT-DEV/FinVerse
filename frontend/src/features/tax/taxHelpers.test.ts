@@ -105,7 +105,7 @@ describe('tax display', () => {
     expect(dueBadge('OVERDUE', -5)).toEqual({ tone: 'danger', text: 'Overdue 5 d' });
     expect(dueBadge('DUE_SOON', 3).tone).toBe('warning');
     expect(dueBadge('PAID', 0).text).toBe('Paid');
-    expect(dueBadge('REMINDER', 10).text).toBe('Outside FinVerse');
+    expect(dueBadge('REMINDER', 10).text).toBe('Outside BrokerVerse');
     expect(dueBadge('UPCOMING', 40)).toEqual({ tone: 'neutral', text: 'Due in 40 d' });
   });
 

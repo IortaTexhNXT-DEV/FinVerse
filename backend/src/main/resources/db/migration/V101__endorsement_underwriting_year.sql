@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V101 Underwriting year of each endorsement.
+-- iNXT BrokerVerse - V101 Underwriting year of each endorsement.
 -- A renewal extends the policy to a new period, which belongs to the underwriting year in
 -- which it starts; endorsements made afterwards belong to that renewed period. The policy row
 -- keeps the underwriting year of the original issue. Every premium transaction (policy issue

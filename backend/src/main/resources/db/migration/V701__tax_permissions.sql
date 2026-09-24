@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V701 Tax & Statutory permissions.
+-- iNXT BrokerVerse - V701 Tax & Statutory permissions.
 --   TAX_VIEW   : worksheets, returns register, 2307 register, IC schedules and tax reports.
 --   TAX_MANAGE : maintain tax masters and IC mappings, prepare / file / pay returns, generate
 --                2307 certificates. Masters are authorized with MASTER_AUTHORIZE (maker-checker);

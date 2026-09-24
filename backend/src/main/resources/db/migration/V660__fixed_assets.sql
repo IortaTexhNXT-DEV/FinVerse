@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V660 Fixed assets: categories, asset register, movements (additions,
+-- iNXT BrokerVerse - V660 Fixed assets: categories, asset register, movements (additions,
 -- disposals, inter-branch transfers) and monthly depreciation runs.
 -- GL accounts are configured per category; postings go through the accounting engine.
 -- =====================================================================================

@@ -1,4 +1,4 @@
-# iNXT FinVerse
+# iNXT BrokerVerse
 
 **Insurance General Ledger & Finance Suite** by IortaTechNXT – event-driven insurance accounting,
 sub-ledgers, reinsurance, reserves, statutory and management reporting, with maker-checker control
@@ -18,7 +18,7 @@ docker compose up -d --build
 open http://localhost:8081
 ```
 
-Demo users (password `Finverse@2026`): `fmanager` (finance manager), `accountant` (maker),
+Demo users (password `Brokerverse@2026`): `fmanager` (finance manager), `accountant` (maker),
 `checker` (authorizer, limit 5M), `uw` (underwriter), `claims`, `reinsurer`, `auditor`, `admin`
 (security administrator). The demo company is fictitious.
 
@@ -51,7 +51,7 @@ Module guides (business rules, accounting, reports, demo data and open points of
 ## Repository layout
 
 ```
-backend/     Spring Boot application (modules under src/main/java/com/iortatechnxt/finverse)
+backend/     Spring Boot application (modules under src/main/java/com/iortatechnxt/brokerverse)
 frontend/    React application (features under src/features)
 deploy/      Kubernetes manifests
 docs/        Architecture, development, operations, security, requirements

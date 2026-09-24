@@ -12,6 +12,6 @@ FROM nginx:1.27-alpine
 COPY --from=build /workspace/dist /usr/share/nginx/html
 # The nginx image renders templates with envsubst (only variables defined in the environment).
 COPY nginx.conf /etc/nginx/templates/default.conf.template
-ENV FINVERSE_BACKEND_HOST=backend
+ENV BROKERVERSE_BACKEND_HOST=backend
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s CMD wget -qO- http://localhost:8080/healthz || exit 1

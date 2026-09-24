@@ -24,7 +24,7 @@ export default function ApplicationInfoPage() {
       <PageHeader
         section="Administration"
         title="Application Info"
-        description="Version, build, database migration level and health of this FinVerse installation."
+        description="Version, build, database migration level and health of this BrokerVerse installation."
       />
       <ErrorAlert error={info.error} />
       {i === undefined ? (

@@ -1,11 +1,11 @@
 # Finance Reports – Implementation Specification
 
 Source: *Annexure 2(b) Reports Book – Finance* (PREMIA 11, v1.0, 125 pages). This is the
-traceability baseline for building the Finance reports in iNXT FinVerse. Companion documents:
+traceability baseline for building the Finance reports in iNXT BrokerVerse. Companion documents:
 `GL_FUNCTIONAL_SPEC.md` (core GL) and `REPORTS_BOOK_SPEC.md` (GI reports).
 
 How to read this file:
-- **FIN code**: the FinVerse report code (stable and short). **Src ID**: the PREMIA report ID printed
+- **FIN code**: the BrokerVerse report code (stable and short). **Src ID**: the PREMIA report ID printed
   on the sample page in the book, so business users can recognise the report.
 - Columns are listed in print order: left to right, then top to bottom when a header wraps onto
   several lines. `A / B` means B is printed under A in the same column.
@@ -22,17 +22,17 @@ How to read this file:
 | Type | Rule |
 |---|---|
 | Standard Report Interface | A fixed set of parameters for each report. Tab moves to the next field. Pressing Tab after the last field opens the **Report popup** (output options, section 1.3). |
-| Dynamic Report Interface | A grid of *Parameter* and *Value* rows. The rows come from the report definition built with the **Report Generator** tool. The user types each value. This is needed for user-defined reports (inferred: FinVerse report-definition metadata). |
+| Dynamic Report Interface | A grid of *Parameter* and *Value* rows. The rows come from the report definition built with the **Report Generator** tool. The user types each value. This is needed for user-defined reports (inferred: BrokerVerse report-definition metadata). |
 
 ### 1.2 Parameter field kinds
 | Kind | Rule |
 |---|---|
-| Data-entry | Free text. In PREMIA a full range is From = `0` and To = `zzzzzzzzzzzz` (alphanumeric), or `0` / `9999999999` (numeric). Tabbing out of an empty field fills these values automatically. **FinVerse:** a blank From/To means "all". The echo prints `0` / `zzzz…` for compatibility (inferred). |
+| Data-entry | Free text. In PREMIA a full range is From = `0` and To = `zzzzzzzzzzzz` (alphanumeric), or `0` / `9999999999` (numeric). Tabbing out of an empty field fills these values automatically. **BrokerVerse:** a blank From/To means "all". The echo prints `0` / `zzzz…` for compatibility (inferred). |
 | LOV Help | Picks a value from a list. The full range is still allowed. |
 | Check box | A Y/N criterion. |
 | Radio (option) | Picks one variant of the report from the same parameters (for example Order By, Base/Foreign currency, Posted/Unposted/Both). |
 | Date | Usually a From/To pair. Some reports use a single As-of date. |
-| Range vs Selection | Some reports offer both. *Range* shows From/To fields. *Selection* shows a single LOV field. The book notes this is "not functional" on some reports. FinVerse supports both on every range parameter (inferred). |
+| Range vs Selection | Some reports offer both. *Range* shows From/To fields. *Selection* shows a single LOV field. The book notes this is "not functional" on some reports. BrokerVerse supports both on every range parameter (inferred). |
 
 Validation (inferred): From ≤ To. Date ranges must fall within the open or closed financial periods
 of the company. Month is 1–12, plus period 13 (adjustment period) where the report shows "13th Period Included".
@@ -41,12 +41,12 @@ of the company. Month is 1–12, plus period 13 (adjustment period) where the re
 | Option | Behaviour |
 |---|---|
 | View | Renders on screen. The popup offers **PDF / Excel / RTF** sub-formats. |
-| Mail | Puts the report in the body or an attachment of a mail message (Outlook in PREMIA). FinVerse sends it by SMTP or the mail integration (inferred). |
+| Mail | Puts the report in the body or an attachment of a mail message (Outlook in PREMIA). BrokerVerse sends it by SMTP or the mail integration (inferred). |
 | Print | Produces a PDF sent to the chosen printer. Fields: **Printer Name** (LOV of printers) and **Number of Copies** (int ≥ 1). |
 | File | Saves the report to a physical path. Sub-formats: PDF / Excel / RTF. |
 | HTML / PDF / XML | Writes the file to the report path. |
 | Excel | Produces an Excel file. |
-| Publish & Subscribe | Schedules generation for a date and time. Users can subscribe to receive the report (see the scheduler in FinVerse, inferred). |
+| Publish & Subscribe | Schedules generation for a date and time. Users can subscribe to receive the report (see the scheduler in BrokerVerse, inferred). |
 
 Other popup fields:
 - **Logo Y/N**: prints the company logo on the report.
@@ -60,7 +60,7 @@ The layout has three sections, in this order:
 3. **Report Data**. Group headers, detail lines, sub-totals and a grand total, then the `***End Of Report***` footer.
 
 Other conventions seen in the samples:
-- Amounts use 2 decimals. Some samples show 3; FinVerse uses the currency's precision (inferred).
+- Amounts use 2 decimals. Some samples show 3; BrokerVerse uses the currency's precision (inferred).
 - Balances print as an absolute value with a `Dr`/`Cr` suffix.
 - MIS statements print negatives as `< n >`.
 - Documents print as `TC-DocNo`, for example `CN100-2013120004`. The transaction code is the voucher-type prefix.
@@ -73,8 +73,8 @@ Other conventions seen in the samples:
 | R-BAL | Balance = Σ Debit − Σ Credit. Print \|x\| with the suffix Dr when x ≥ 0, else Cr. |
 | R-RUN | Running balance: the opening balance plus the cumulative (Dr − Cr), document by document, in sort order. |
 | R-OPEN | Opening balance for a period = all posted entries before the From date. The balance brought forward from the year-end close counts as opening (inferred). |
-| R-TB | TB closing = opening + period Dr − period Cr. It goes in the Closing Debit column when positive, else in the Closing Credit column. Σ Closing Dr must equal Σ Closing Cr. The book says any difference goes to suspense. FinVerse flags the imbalance in the report footer (inferred). |
-| R-AGE | Age days = As-of date − basis date. The basis is **Document Date** or **Due Date** (the Order By / basis option). Each open item's *balance* (original amount − matched amount as of the as-of date) goes into the slot whose bounds contain its age. Slots are configurable: the book mentions 10/20/30/40+ for creditors and 0/30/45/60/75+ for supplier outstanding. The samples show ≤30/31-60/61-90/91-120/≥121, ≤90/91-180/…/≥181, and 0-30/31-60/61-90/91-180/181-365/>365. **FinVerse: up to 5 user slot boundaries plus an "above" bucket, default 30/60/90/120** (inferred). |
+| R-TB | TB closing = opening + period Dr − period Cr. It goes in the Closing Debit column when positive, else in the Closing Credit column. Σ Closing Dr must equal Σ Closing Cr. The book says any difference goes to suspense. BrokerVerse flags the imbalance in the report footer (inferred). |
+| R-AGE | Age days = As-of date − basis date. The basis is **Document Date** or **Due Date** (the Order By / basis option). Each open item's *balance* (original amount − matched amount as of the as-of date) goes into the slot whose bounds contain its age. Slots are configurable: the book mentions 10/20/30/40+ for creditors and 0/30/45/60/75+ for supplier outstanding. The samples show ≤30/31-60/61-90/91-120/≥121, ≤90/91-180/…/≥181, and 0-30/31-60/61-90/91-180/181-365/>365. **BrokerVerse: up to 5 user slot boundaries plus an "above" bucket, default 30/60/90/120** (inferred). |
 | R-ONAC | **On A/c** = unallocated items on the opposite side of the balance: unmatched receipts or payments, advances and credit notes. It is printed separately and not aged. **Net Value = Σ age buckets + On A/c.** On A/c is printed with its sign. |
 | R-FX | LC value = FC amount × the rate stored on the document (historical rate, not revalued, inferred). With the "Base currency" option, reports show LC. With "Foreign currency", they show FC amounts grouped by currency. |
 | R-OPENITEM | Open item = an AR/AP document line posted to a sub-ledger (control) account whose balance, after knock-off/matching, is not zero as of the as-of date (inferred: matching dated after the as-of date is ignored). |
@@ -450,7 +450,7 @@ Activity codes are an analysis dimension with a hierarchy: Main Head 1 / Main He
 
 ### 2.10 Post-Dated Cheques (AR-in-Charge – operational)
 
-PDC lifecycle for FinVerse (inferred from the report semantics):
+PDC lifecycle for BrokerVerse (inferred from the report semantics):
 - Received PDC: `Received (on hand)` → `Deposited/Banked` → `Realised` | `Returned/Bounced` | `Cancelled/Replaced`.
 - Issued PDC: `Issued` → `Presented/Confirmed` (the confirmation voucher posts Dr PDC-issued clearing, Cr Bank) | `Cancelled/Stopped`.
 - Status tests use the status history as of the As-of date.

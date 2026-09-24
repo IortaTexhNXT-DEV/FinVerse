@@ -1,6 +1,6 @@
 # Receivables & Banking (collections, PDC received, bank reconciliation)
 
-Package `com.iortatechnxt.finverse.receivables`, frontend `src/features/receivables`, migrations
+Package `com.iortatechnxt.brokerverse.receivables`, frontend `src/features/receivables`, migrations
 `V550` (schema) and `V955` (demo rule), demo loader `receivables.demo.ReceivablesDemoData`.
 
 Banks are identified by their **GL bank account code** (postable, active accounts of a bank / cash

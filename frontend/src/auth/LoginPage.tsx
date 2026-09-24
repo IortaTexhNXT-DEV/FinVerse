@@ -35,7 +35,7 @@ export default function LoginPage() {
             IortaTechNXT
           </div>
           <h1>
-            iNXT <span>FinVerse</span>
+            iNXT <span>BrokerVerse</span>
           </h1>
           <p style={{ fontSize: 17, maxWidth: 480 }}>
             The insurance finance suite: general ledger, sub-ledgers, reinsurance, reserves and
@@ -60,7 +60,7 @@ export default function LoginPage() {
           <div className="card-body stack">
             <h2>Sign in</h2>
             <p className="muted" style={{ margin: 0 }}>
-              Use your FinVerse credentials.
+              Use your BrokerVerse credentials.
             </p>
             <ErrorAlert error={error} />
             <Field label="User name" required>

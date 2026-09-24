@@ -1,13 +1,13 @@
-# iNXT FinVerse – Developer Guide
+# iNXT BrokerVerse – Developer Guide
 
-This guide is binding for everyone who changes FinVerse. Following it keeps the code base uniform,
+This guide is binding for everyone who changes BrokerVerse. Following it keeps the code base uniform,
 so the production support team can understand, trace and fix any module the same way.
 
 ## 1. Architecture in one page
 
 - **Modular monolith.** One Spring Boot application (`backend/`) and one React SPA (`frontend/`),
   deployed as two containers against one PostgreSQL database.
-- **Modules = top-level packages** under `com.iortatechnxt.finverse`. Each module has the same inner
+- **Modules = top-level packages** under `com.iortatechnxt.brokerverse`. Each module has the same inner
   layout:
 
   | Package   | Contains                                                                  |
@@ -157,7 +157,7 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
 
 - Service logic: integration test annotated `@IntegrationTest` (embedded PostgreSQL, demo data) –
   use `AsUser` to act as demo users (`accountant`, `checker`, `fmanager`, `uw`, `claims`,
-  `reinsurer`, `auditor`; password `Finverse@2026`).
+  `reinsurer`, `auditor`; password `Brokerverse@2026`).
 - Every new read endpoint added to `ApiSmokeIT`.
 - Every report exercised in a test that runs it and exports PDF/XLSX/CSV.
 - Pure logic (calculations): plain JUnit tests.
@@ -257,7 +257,7 @@ use `@Scheduled` (the ArchUnit rule `BACKGROUND_WORK_IS_A_MANAGED_JOB` fails the
 records every run in `sys_job_run`, a failure raises `JOB_FAILURE`, and administrators see it on
 *Administration → Scheduled Jobs* with "Run now". For batch runs started from your own screen, wrap
 the work in `JobRunService.execute(jobName, JobTrigger.MANUAL, () -> new JobOutcome(n, message))`.
-Make the cron configurable (`finverse.jobs.<name>-cron`), add it to `application.yml` with an
+Make the cron configurable (`brokerverse.jobs.<name>-cron`), add it to `application.yml` with an
 environment variable and document it in `docs/operations/CONFIGURATION.md`. Jobs today:
 `RECURRING_JOURNALS`, `ALERT_DAILY_CHECKS`, `PDC_ISSUED_DUE`, `QUOTATION_EXPIRY` (daily) and
 `RESERVE_VALUATION`, `RI_ALLOCATION` (manual unless scheduled).
@@ -276,7 +276,7 @@ parameter with an insert into `sys_parameter` in your migration (type `STRING`, 
 Any record can carry documents: frontend `<Attachments entityType="Policy" entityId={policy.id} />`
 (`components/attachments/Attachments`); API `/api/v1/attachments?entityType=&entityId=`. Files are
 stored in PostgreSQL with SHA-256 checksum, type/signature and size checks
-(`finverse.attachments.max-size`, default 10 MB) and audit entries. Malware scanning: add a bean
+(`brokerverse.attachments.max-size`, default 10 MB) and audit entries. Malware scanning: add a bean
 implementing `attachment.service.VirusScanner`. Permissions `ATTACHMENT_VIEW` / `ATTACHMENT_MANAGE`.
 
 ### 10.6 Executive dashboard – `dashboard`
@@ -284,7 +284,7 @@ implementing `attachment.service.VirusScanner`. Permissions `ATTACHMENT_VIEW` / 
 `GET /api/v1/dashboard` is the ledger summary; `/dashboard/{premium,claims,collections,payables,
 cash,budget,workload}` serve one widget each (optional `branchId` and `asOf`), so a widget without
 data or with an error never blanks the others. Ledger figures come from constant SQL over platform
-tables (`DashboardLedgerQueries`); the accounts are mapped in `finverse.dashboard.*`
+tables (`DashboardLedgerQueries`); the accounts are mapped in `brokerverse.dashboard.*`
 (`DashboardProperties`: statement lines for premium and cash, account prefixes for claims paid and
 the outstanding claims reserve). Collections come from `receivables.service.CollectionQueries` and
 the budget from `BudgetMonitoringService`: the dashboard depends on those modules' query services,

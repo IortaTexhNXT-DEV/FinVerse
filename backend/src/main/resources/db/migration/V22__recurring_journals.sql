@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V22 Recurring / accrual journal templates and their generated occurrences.
+-- iNXT BrokerVerse - V22 Recurring / accrual journal templates and their generated occurrences.
 -- =====================================================================================
 
 create table jnl_recurring_template (

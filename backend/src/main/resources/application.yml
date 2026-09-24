@@ -1,17 +1,17 @@
 # ======================================================================================
-# iNXT FinVerse - application configuration
+# iNXT BrokerVerse - application configuration
 # Every environment specific value is overridable through environment variables
 # (see docs/operations/CONFIGURATION.md). Secrets MUST come from the environment.
 # ======================================================================================
 spring:
   application:
-    name: finverse
+    name: brokerverse
   datasource:
-    url: ${FINVERSE_DB_URL:jdbc:postgresql://localhost:5432/finverse}
-    username: ${FINVERSE_DB_USER:finverse}
-    password: ${FINVERSE_DB_PASSWORD:finverse}
+    url: ${BROKERVERSE_DB_URL:jdbc:postgresql://localhost:5432/brokerverse}
+    username: ${BROKERVERSE_DB_USER:brokerverse}
+    password: ${BROKERVERSE_DB_PASSWORD:brokerverse}
     hikari:
-      maximum-pool-size: ${FINVERSE_DB_POOL_SIZE:20}
+      maximum-pool-size: ${BROKERVERSE_DB_POOL_SIZE:20}
       connection-timeout: 30000
   jpa:
     open-in-view: false
@@ -38,12 +38,12 @@ spring:
       enabled: true
   servlet:
     multipart:
-      # Must be >= finverse.attachments.max-size (the service applies the business limit).
-      max-file-size: ${FINVERSE_UPLOAD_MAX_FILE_SIZE:20MB}
-      max-request-size: ${FINVERSE_UPLOAD_MAX_REQUEST_SIZE:21MB}
+      # Must be >= brokerverse.attachments.max-size (the service applies the business limit).
+      max-file-size: ${BROKERVERSE_UPLOAD_MAX_FILE_SIZE:20MB}
+      max-request-size: ${BROKERVERSE_UPLOAD_MAX_REQUEST_SIZE:21MB}
 
 server:
-  port: ${FINVERSE_PORT:8080}
+  port: ${BROKERVERSE_PORT:8080}
   shutdown: graceful
   error:
     include-stacktrace: never
@@ -51,26 +51,26 @@ server:
   compression:
     enabled: true
 
-finverse:
+brokerverse:
   security:
-    # Must be supplied via FINVERSE_JWT_SECRET in every non-local environment (>= 32 bytes).
-    jwt-secret: ${FINVERSE_JWT_SECRET:local-development-secret-change-me-0123456789}
-    token-validity: ${FINVERSE_TOKEN_VALIDITY:PT8H}
-    allowed-origins: ${FINVERSE_ALLOWED_ORIGINS:http://localhost:5173}
+    # Must be supplied via BROKERVERSE_JWT_SECRET in every non-local environment (>= 32 bytes).
+    jwt-secret: ${BROKERVERSE_JWT_SECRET:local-development-secret-change-me-0123456789}
+    token-validity: ${BROKERVERSE_TOKEN_VALIDITY:PT8H}
+    allowed-origins: ${BROKERVERSE_ALLOWED_ORIGINS:http://localhost:5173}
   attachments:
-    max-size: ${FINVERSE_ATTACHMENT_MAX_SIZE:10MB}
+    max-size: ${BROKERVERSE_ATTACHMENT_MAX_SIZE:10MB}
   jobs:
     # Spring cron (sec min hour day month weekday), UTC; "-" disables the schedule.
-    recurring-journals-cron: ${FINVERSE_JOB_RECURRING_CRON:0 0 1 * * *}
-    alert-checks-cron: ${FINVERSE_JOB_ALERTS_CRON:0 30 1 * * *}
+    recurring-journals-cron: ${BROKERVERSE_JOB_RECURRING_CRON:0 0 1 * * *}
+    alert-checks-cron: ${BROKERVERSE_JOB_ALERTS_CRON:0 30 1 * * *}
     # Monthly reserve valuation (previous month); disabled by default.
-    reserve-valuation-cron: ${FINVERSE_JOB_RESERVE_VALUATION_CRON:-}
+    reserve-valuation-cron: ${BROKERVERSE_JOB_RESERVE_VALUATION_CRON:-}
     # Batch RI allocation run (cedes approved transactions of the year to date not yet ceded); off by default.
-    ri-allocation-cron: ${FINVERSE_JOB_RI_ALLOCATION_CRON:-}
+    ri-allocation-cron: ${BROKERVERSE_JOB_RI_ALLOCATION_CRON:-}
     # Post-dated cheques issued whose cheque date is reached become DUE (status only).
-    pdc-issued-due-cron: ${FINVERSE_JOB_PDC_ISSUED_DUE_CRON:0 15 0 * * *}
+    pdc-issued-due-cron: ${BROKERVERSE_JOB_PDC_ISSUED_DUE_CRON:0 15 0 * * *}
     # Open quotations (draft, pending, approved) past their validity become EXPIRED.
-    quotation-expiry-cron: ${FINVERSE_JOB_QUOTATION_EXPIRY_CRON:0 45 0 * * *}
+    quotation-expiry-cron: ${BROKERVERSE_JOB_QUOTATION_EXPIRY_CRON:0 45 0 * * *}
 
 management:
   endpoints:
@@ -88,7 +88,7 @@ management:
 
 info:
   app:
-    name: iNXT FinVerse
+    name: iNXT BrokerVerse
     vendor: IortaTechNXT
 
 springdoc:
@@ -98,7 +98,7 @@ springdoc:
 logging:
   level:
     root: INFO
-    com.iortatechnxt.finverse: INFO
+    com.iortatechnxt.brokerverse: INFO
   pattern:
     # %replace neutralises CR/LF in messages (log forging protection, see spotbugs-exclude.xml).
     console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%thread] %logger{36} - %replace(%msg){'[\\r\\n]', '_'}%n"

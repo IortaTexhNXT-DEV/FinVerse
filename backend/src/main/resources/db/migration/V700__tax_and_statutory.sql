@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V700 Tax & Statutory Reporting (Philippine BIR and Insurance Commission)
+-- iNXT BrokerVerse - V700 Tax & Statutory Reporting (Philippine BIR and Insurance Commission)
 --
 --   * tax_code             tax codes and ATCs with rates and GL accounts (maker-checker)
 --   * tax_form             filing calendar: BIR / LGU / BFP forms, frequency, due rule and the

@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V1 Foundation schema
+-- iNXT BrokerVerse - V1 Foundation schema
 -- Security, audit, organisation, currency, chart of accounts, dimensions, periods,
 -- journals, ledger and document sequences.
 -- Conventions: snake_case, surrogate BIGINT identity keys, NUMERIC(19,2) money,

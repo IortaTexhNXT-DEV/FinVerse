@@ -1,6 +1,6 @@
 # Tax & Statutory Reporting
 
-Package `com.iortatechnxt.finverse.tax`; UI section **Tax & Statutory** (`frontend/src/features/tax`).
+Package `com.iortatechnxt.brokerverse.tax`; UI section **Tax & Statutory** (`frontend/src/features/tax`).
 The module computes Philippine BIR, LGU and BFP returns and the Insurance Commission (IC) statutory
 schedules from **posted** data. It depends on underwriting, payables, party, coa, accounting,
 journal and the platform modules; no module depends on it (ArchUnit enforces this).
@@ -161,7 +161,7 @@ and appear in the approval inbox.
 1. Confirm every tax code, ATC, rate and GL account (Tax Codes & Forms) against current BIR issuances
    and the company's chart; authorize them.
 2. Configure the forms (due rules, payable / credit accounts, `effectiveFrom` = first period filed in
-   FinVerse) and mark forms filed elsewhere as reminders.
+   BrokerVerse) and mark forms filed elsewhere as reminders.
 3. Create party tax profiles (TIN, registered name, individual name parts, VAT treatment, default
    ATC) for every supplier, agent, broker and zero-rated / exempt customer; worksheets list payees
    still `UNMAPPED`.
@@ -170,4 +170,4 @@ and appear in the approval inbox.
 6. Map the IC schedules to the chart and confirm the RBC factors and hurdle.
 7. Tune thresholds of `TAX_RETURN_DUE` / `TAX_RETURN_OVERDUE` (Administration → Exception Codes).
 8. Reconcile the opening balances of the tax payable accounts (returns of periods before go-live are
-   not cleared by FinVerse).
+   not cleared by BrokerVerse).

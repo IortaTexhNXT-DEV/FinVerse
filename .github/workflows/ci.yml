@@ -74,5 +74,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -t finverse-backend:${{ github.sha }} backend
-      - run: docker build -t finverse-frontend:${{ github.sha }} frontend
+      - run: docker build -t brokerverse-backend:${{ github.sha }} backend
+      - run: docker build -t brokerverse-frontend:${{ github.sha }} frontend

@@ -1,4 +1,4 @@
-// iNXT FinVerse frontend lint rules.
+// iNXT BrokerVerse frontend lint rules.
 // eslint-plugin-sonarjs is SonarSource's own rule set (the same rules SonarQube runs on
 // JavaScript/TypeScript), so `npm run lint` is the local SonarQube quality gate.
 import js from '@eslint/js';

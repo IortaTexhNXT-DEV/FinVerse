@@ -72,7 +72,7 @@ export function HeaderTools() {
       <button
         type="button"
         className="btn btn-ghost btn-sm header-tool"
-        aria-label="About iNXT FinVerse"
+        aria-label="About iNXT BrokerVerse"
         title="About"
         onClick={() => setAboutOpen(true)}
       >

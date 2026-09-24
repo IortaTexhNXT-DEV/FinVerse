@@ -1,5 +1,5 @@
 -- =====================================================================================
--- iNXT FinVerse - V100 Underwriting: products, quotations, policies, risks,
+-- iNXT BrokerVerse - V100 Underwriting: products, quotations, policies, risks,
 -- endorsements and marine open covers.
 -- Premium figures are stored per financial document (policy = original issue,
 -- endorsement = change) with the same column set, so registers can union them.

@@ -8,6 +8,7 @@ import { useAuth } from '@/auth/authContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { AboutDialog } from '@/features/help/AboutDialog';
 import { SessionTimeoutGuard } from '@/session/SessionTimeoutGuard';
+import { NotificationBell } from './NotificationBell';
 
 const REFRESH_MS = 60_000;
 
@@ -46,6 +47,7 @@ export function HeaderTools() {
 
   return (
     <nav className="header-tools" aria-label="Shortcuts">
+      <NotificationBell />
       <Link
         to="/approvals"
         className="btn btn-ghost btn-sm header-tool"

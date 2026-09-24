@@ -22,6 +22,18 @@ public class BusinessRuleException extends RuntimeException {
     this.code = code;
   }
 
+  /**
+   * Creates the exception with its technical cause (kept for the log, never shown to the user).
+   *
+   * @param code stable machine readable code (UPPER_SNAKE_CASE)
+   * @param message human readable explanation
+   * @param cause underlying exception
+   */
+  public BusinessRuleException(String code, String message, Throwable cause) {
+    super(message, cause);
+    this.code = code;
+  }
+
   public String getCode() {
     return code;
   }

@@ -1,6 +1,8 @@
 import { accountingEngineModule } from '@/features/accounting-engine/module';
 import { adminModule } from '@/features/admin/module';
 import { withOverviewScreens } from '@/features/approvals/module';
+import { brokingSetupModule } from '@/features/brokingsetup/module';
+import { bulkModule } from '@/features/bulk/module';
 import { assetsModule } from '@/features/assets/module';
 import { claimsModule } from '@/features/claims/module';
 import { planningModule } from '@/features/closing/module';
@@ -16,6 +18,7 @@ import { reservesModule } from '@/features/reserves/module';
 import { setupModule } from '@/features/setup/module';
 import { taxModule } from '@/features/tax/module';
 import { underwritingModule } from '@/features/underwriting/module';
+import { workspaceModule } from '@/features/workspace/module';
 import type { FeatureModule } from './types';
 
 /**
@@ -26,6 +29,11 @@ import type { FeatureModule } from './types';
  */
 export const MODULES: FeatureModule[] = [
   withOverviewScreens(dashboardModule),
+  // Broking (BDOI New Business) - docs/architecture/BROKING_ARCHITECTURE.md section 5.
+  workspaceModule,
+  bulkModule,
+  brokingSetupModule,
+  // Insurer core and finance.
   withJournalAutomation(glModule),
   underwritingModule,
   claimsModule,

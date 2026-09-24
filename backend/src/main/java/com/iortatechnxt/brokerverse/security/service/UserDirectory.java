@@ -2,8 +2,10 @@ package com.iortatechnxt.brokerverse.security.service;
 
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
+import com.iortatechnxt.brokerverse.security.domain.Permission;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,5 +49,17 @@ public class UserDirectory {
    */
   public Optional<BigDecimal> authorizationLimit(String username) {
     return users.findByUsernameIgnoreCase(username).map(AppUser::getAuthorizationLimit);
+  }
+
+  /**
+   * Enabled users holding a permission (notification recipients, assignee pick lists).
+   *
+   * @param permission permission name
+   * @return user names, sorted
+   */
+  public List<String> usersWithPermission(String permission) {
+    return users.findUsernamesWithPermission(Permission.valueOf(permission)).stream()
+        .sorted()
+        .toList();
   }
 }

@@ -102,7 +102,9 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
   | V600–V649 | budgets, consolidation, inter-company |
   | V650–V699 | finance / MIS reports support objects |
   | V700–V749 | tax & statutory reporting (BIR / LGU / BFP returns, 2307, IC schedules) |
-  | V900–V999 | demo data (`db/demo`, loaded only with the `demo` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979 |
+  | V750–V799 | broking foundations (lov, workflow, bulk, messaging, docgen) and broking administration |
+  | V800–V899 | broking business modules (crm V800s, catalog V810s, account V820s, quotation V830s, non-package V840s, placement V850s, issuance V860s, booking V870s, NB reports V880s) |
+  | V900–V999 | demo data (`db/demo`, loaded only with the `demo` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989 |
 
   Because each module owns a range, a module can add a migration whose version is lower than one
   another module has already applied (for example a new platform `V27` after underwriting's `V101`).
@@ -259,7 +261,7 @@ records every run in `sys_job_run`, a failure raises `JOB_FAILURE`, and administ
 the work in `JobRunService.execute(jobName, JobTrigger.MANUAL, () -> new JobOutcome(n, message))`.
 Make the cron configurable (`brokerverse.jobs.<name>-cron`), add it to `application.yml` with an
 environment variable and document it in `docs/operations/CONFIGURATION.md`. Jobs today:
-`RECURRING_JOURNALS`, `ALERT_DAILY_CHECKS`, `PDC_ISSUED_DUE`, `QUOTATION_EXPIRY` (daily) and
+`RECURRING_JOURNALS`, `ALERT_DAILY_CHECKS`, `PDC_ISSUED_DUE`, `QUOTATION_EXPIRY` (daily), `MAIL_DISPATCH` (every two minutes) and
 `RESERVE_VALUATION`, `RI_ALLOCATION` (manual unless scheduled).
 
 ### 10.4 Business parameters – `system`
@@ -315,3 +317,4 @@ rules, reports, ports, demo data and open points. Update it together with the co
 | Planning & Closing | [`docs/development/PLANNING_AND_CLOSING.md`](PLANNING_AND_CLOSING.md) |
 | Actuarial Reserves | [`docs/modules/ACTUARIAL_RESERVES.md`](../modules/ACTUARIAL_RESERVES.md) |
 | Tax & Statutory | [`docs/modules/TAX_AND_STATUTORY.md`](../modules/TAX_AND_STATUTORY.md) |
+| Broking (BDOI New Business) | [`docs/architecture/BROKING_ARCHITECTURE.md`](../architecture/BROKING_ARCHITECTURE.md) |

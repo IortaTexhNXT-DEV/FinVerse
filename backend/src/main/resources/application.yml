@@ -4,6 +4,16 @@
 # (see docs/operations/CONFIGURATION.md). Secrets MUST come from the environment.
 # ======================================================================================
 spring:
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${MAIL_SMTP_AUTH:true}
+      mail.smtp.starttls.enable: ${MAIL_SMTP_STARTTLS:true}
+      mail.smtp.connectiontimeout: 10000
+      mail.smtp.timeout: 20000
   application:
     name: brokerverse
   datasource:
@@ -59,6 +69,11 @@ brokerverse:
     allowed-origins: ${BROKERVERSE_ALLOWED_ORIGINS:http://localhost:5173}
   attachments:
     max-size: ${BROKERVERSE_ATTACHMENT_MAX_SIZE:10MB}
+  mail:
+    # true = deliver through the SMTP server configured with spring.mail.* (MAIL_HOST ...);
+    # false = simulated delivery (outbox and send log only). See docs/operations/CONFIGURATION.md.
+    enabled: ${BROKERVERSE_MAIL_ENABLED:false}
+    dispatch-on-commit: ${BROKERVERSE_MAIL_DISPATCH_ON_COMMIT:true}
   jobs:
     # Spring cron (sec min hour day month weekday), UTC; "-" disables the schedule.
     recurring-journals-cron: ${BROKERVERSE_JOB_RECURRING_CRON:0 0 1 * * *}
@@ -71,6 +86,8 @@ brokerverse:
     pdc-issued-due-cron: ${BROKERVERSE_JOB_PDC_ISSUED_DUE_CRON:0 15 0 * * *}
     # Open quotations (draft, pending, approved) past their validity become EXPIRED.
     quotation-expiry-cron: ${BROKERVERSE_JOB_QUOTATION_EXPIRY_CRON:0 45 0 * * *}
+    # Outbox relay: delivers queued e-mails and retries failed attempts.
+    mail-dispatch-cron: ${BROKERVERSE_JOB_MAIL_DISPATCH_CRON:0 */2 * * * *}
 
 management:
   endpoints:

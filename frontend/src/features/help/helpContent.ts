@@ -1,6 +1,8 @@
 import { ACCOUNTING_ENGINE_HELP } from '@/features/accounting-engine/help';
 import { ADMIN_HELP } from '@/features/admin/help';
 import { ASSETS_HELP } from '@/features/assets/help';
+import { BROKING_SETUP_HELP } from '@/features/brokingsetup/help';
+import { BULK_HELP } from '@/features/bulk/help';
 import { CLAIMS_HELP } from '@/features/claims/help';
 import { PLANNING_HELP } from '@/features/closing/help';
 import { GL_HELP } from '@/features/gl/help';
@@ -11,6 +13,7 @@ import { RESERVES_HELP } from '@/features/reserves/help';
 import { SETUP_HELP } from '@/features/setup/help';
 import { TAX_HELP } from '@/features/tax/help';
 import { UNDERWRITING_HELP } from '@/features/underwriting/help';
+import { WORKSPACE_HELP } from '@/features/workspace/help';
 
 /**
  * In-app help. One section per sidebar module, in sidebar order; each screen lists its purpose,
@@ -84,6 +87,9 @@ export const HELP_SECTIONS: HelpSection[] = [
       },
     ],
   },
+  WORKSPACE_HELP,
+  BULK_HELP,
+  BROKING_SETUP_HELP,
   GL_HELP,
   UNDERWRITING_HELP,
   CLAIMS_HELP,

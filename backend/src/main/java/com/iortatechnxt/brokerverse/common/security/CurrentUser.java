@@ -33,4 +33,27 @@ public class CurrentUser {
     }
     return Optional.of(auth.getName());
   }
+
+  /**
+   * Whether the current user holds an authority (permission). Background processing holds none.
+   *
+   * @param authority permission name
+   * @return true when granted
+   */
+  public boolean hasAuthority(String authority) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    return auth != null
+        && auth.getAuthorities().stream().anyMatch(a -> authority.equals(a.getAuthority()));
+  }
+
+  /**
+   * Whether two user names denote the same user (user names are case-insensitive).
+   *
+   * @param a user name, may be null
+   * @param b user name, may be null
+   * @return true when both are present and equal ignoring case
+   */
+  public static boolean sameUser(String a, String b) {
+    return a != null && b != null && String.CASE_INSENSITIVE_ORDER.compare(a, b) == 0;
+  }
 }

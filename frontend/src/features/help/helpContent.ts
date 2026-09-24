@@ -9,7 +9,9 @@ import { CLAIMS_HELP } from '@/features/claims/help';
 import { CRM_HELP } from '@/features/crm/help';
 import { PLANNING_HELP } from '@/features/closing/help';
 import { GL_HELP } from '@/features/gl/help';
+import { ISSUANCE_HELP } from '@/features/issuance/help';
 import { PAYABLES_HELP } from '@/features/payables/help';
+import { PLACEMENT_HELP } from '@/features/placement/help';
 import { RECEIVABLES_HELP } from '@/features/receivables/help';
 import { REINSURANCE_HELP } from '@/features/reinsurance/help';
 import { RESERVES_HELP } from '@/features/reserves/help';
@@ -93,6 +95,8 @@ export const HELP_SECTIONS: HelpSection[] = [
   WORKSPACE_HELP,
   CRM_HELP,
   ACCOUNTS_HELP,
+  PLACEMENT_HELP,
+  ISSUANCE_HELP,
   CATALOG_HELP,
   BULK_HELP,
   GL_HELP,

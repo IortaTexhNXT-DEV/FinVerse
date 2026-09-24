@@ -92,6 +92,10 @@ brokerverse:
     kyc-review-due-cron: ${BROKERVERSE_JOB_KYC_REVIEW_DUE_CRON:0 0 2 1 * *}
     # Monthly data retention review (BRNB.106): counts eligible records; never deletes.
     retention-review-cron: ${BROKERVERSE_JOB_RETENTION_REVIEW_CRON:0 0 3 2 * *}
+    # Hourly: applies payments confirmed by the payment confirmation sources (BRNB.067/068).
+    payment-confirmation-sweep-cron: ${BROKERVERSE_JOB_PAYMENT_CONFIRMATION_SWEEP_CRON:0 0 * * * *}
+    # Daily hold cover expiry monitor (BRNB.103): alerts Processing, expires lapsed hold covers.
+    hold-cover-expiry-cron: ${BROKERVERSE_JOB_HOLD_COVER_EXPIRY_CRON:0 30 0 * * *}
 
 management:
   endpoints:

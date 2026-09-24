@@ -607,3 +607,202 @@ Screens (sidebar **Accounts & Placement**):
 - `/bulk/ACCOUNT_CREATE`: the bulk page with product, segment and submit parameters.
 - The shared `<Attachments>` component gains a document type choice, multi-file upload, selection
   with ZIP download, and a linked-file marker. Its existing props are unchanged.
+
+## 13. Placement (`placement`, W3)
+
+Placement takes a validated account from *awaiting payment* to *placed with the insurer*. It
+never changes the account itself: every state change goes through `AccountLifecycleService`.
+
+Tables (V850):
+
+- `plc_payment_gate_rule` and `plc_payment_evidence`
+- `plc_billing_batch` / `_item` and `plc_payment_report` / `_line`
+- `plc_slip` / `_account` / `_file`
+- `plc_hold_cover` and `plc_insurer_return`
+
+Parameters (category PLACEMENT): `HOLD_COVER_DAYS` (30) and `HOLD_COVER_ALERT_DAYS` (5). LOV
+`CLIENT_CONFIRMATION_CHANNEL`; document types `PAYMENT_CONFIRMATION` and `HOLD_COVER`; return
+reason `INSURER_UNDERWRITING`.
+
+Rules:
+
+- **Payment gate** (BRD 2.3.1, BRNB.068/114, `PaymentGateService`):
+  - The rule comes from `plc_payment_gate_rule` by segment and line, highest priority first.
+    Seeds: CBG Property and CBG Motor need `PAYMENT_MATCHED`; everything else needs a
+    `CLIENT_CONFIRMATION` (channel, remarks, optional supporting document).
+  - Direct-payment accounts skip the gate. `/direct-payment` releases an account tagged after
+    validation.
+  - Every decision is kept as evidence (kind, source, reference). Opening the gate calls
+    `markPaymentConfirmed`.
+  - Placement is not a payment intake: no receipts and no cash entries.
+- **CLPC billing** (BRNB.067, `BillingService`):
+  - Candidates are CBG Property accounts awaiting payment that are not already on an unpaid
+    billing item.
+  - A batch `BILL-yyyy-nnnnnn` holds PN no., loan application no., booking date, borrower,
+    originating unit, premium, ARN, BDOI location and amortised Y/N.
+  - The file downloads as .xlsx or .ods.
+- **Payment reports** (BRNB.067/068, `PaymentReportService`), uploaded as .xlsx, .csv or .ods:
+  - `CLPC` reports answer a billing batch and match by PN or loan application no.
+  - `REFERENCE` reports (other segments) match by ARN.
+  - Lines are MATCHED, UNMATCHED or AMBIGUOUS, and the review resolves a line by hand.
+  - Confirm opens the gate of each matched paid line (through the sweep below); the report is then
+    APPLIED.
+- **Payment confirmation port** `PaymentConfirmationSource`:
+  - Methods: `sourceCode()` and `confirmedFor(companyId, arns)`, returning `ConfirmedPayment`.
+  - Operations Cashiering will add its receipt applications as another implementation.
+  - Today's implementation is `ReportPaymentSource` (source `PAYMENT_REPORT`, reference
+    `<reportNo>#<rowNo>`).
+  - The job `PAYMENT_CONFIRMATION_SWEEP` (hourly, or `POST /placement/gate/sweep`) asks every
+    source about the accounts awaiting payment. It applies each confirmation once per source and
+    reference.
+- **Placement slip** (BRNB.069, `PlacementSlipService`):
+  - One slip `PL-yyyy-nnnnnn` per insurer branch, as PDF and XLSX from the `PLACEMENT_SLIP`
+    template.
+  - It is generated only when every account meets the prerequisites (`SlipPrerequisites`). Each
+    unmet one has a code: `NOT_READY_FOR_PLACEMENT`, `PAYMENT_NOT_CONFIRMED` (unless direct
+    payment), `DOCUMENTS_MISSING`, `TSU_NOT_CLEARED`, `INSURER_NOT_USABLE`.
+  - Regenerating after a return creates the next version (`PL-2026-000001 v2`) and marks the old
+    one SUPERSEDED.
+- **Send** (BRNB.071):
+  - E-mail to the insurer branch mailbox from `catalog`, with the attachments protected by
+    `messaging`.
+  - The first send calls `recordPlacement` for each account; later sends are resends.
+  - The send log is the messaging outbox (entity `PlacementSlip`).
+- **Hold cover** (BRNB.072/103, `HoldCoverService`):
+  - Request (template `HOLD_COVER_REQUEST`, `HOLD_COVER_DAYS`), then the insurer's confirmation
+    (insurer, reference, date, expiry) or decline. Each is mirrored through `recordHoldCover`.
+  - Job `HOLD_COVER_EXPIRY` (daily) notifies the holders of `PLACEMENT_MANAGE` once per hold cover
+    within `HOLD_COVER_ALERT_DAYS`. It expires those past their expiry while the policy is awaited.
+- **Insurer returns** (BRNB.033/034, `InsurerReturnService`):
+  - Reason (list RETURN_REASON) and remarks through `recordInsurerReturn`.
+  - Resubmission through `resubmitPlacement`.
+  - The return is resolved when the account leaves RETURNED_BY_INSURER.
+- **Cancel / reactivate** (BRNB.062, BRD 2.1.16, `PlacementBatchService`): one or several
+  accounts with a comment, through `cancelPlacement` / `reactivate`. Each account gets its own
+  result.
+- **Booking hand-off**: the workbench action *For Booking* opens `/booking?arns=<ARN,…>`.
+  Placement never calls booking.
+
+Contracts for other modules:
+
+- `PlacementQueryService.slipsFor(arn)`, `currentSlip(arn)` and `holdCover(arn)`.
+- `PaymentConfirmationSource` (port, above).
+- `PaymentGateService.applyPayment(sourceCode, ConfirmedPayment)`.
+
+API `/api/v1/placement`. Viewing needs `ACCOUNT_VIEW`, `PLACEMENT_MANAGE` or `BILLING_MANAGE`;
+actions need `PLACEMENT_MANAGE`; billing needs `BILLING_MANAGE`.
+
+- `GET /workbench?tab=&q=`, `/workbench/counts`, `/readiness?arns=` and `/accounts/{arn}`.
+- `POST /accounts/{arn}/insurer-return`, `/accounts/{arn}/resubmit`, `/accounts/cancel`,
+  `/accounts/reactivate`, `/accounts/{arn}/hold-cover`, `/hold-cover/confirm` and
+  `/hold-cover/decline`.
+- `/slips`: `GET` list and `/{id}`; `POST /generate`, `/{id}/regenerate`, `/{id}/send` and `/send`
+  (bulk); `GET /{id}/email-draft` and `/{id}/files/{pdf|xlsx}`.
+- `/billing`: `GET /candidates`, `/batches`, `/batches/{id}` and `/batches/{id}/file?format=`;
+  `POST /batches`; `/reports` upload, list and get, `/lines/{lineId}/match`, `/confirm` and
+  `/discard`.
+- `/gate`: `GET /rules` and `/{arn}`; `POST /{arn}/client-confirmation`, `/{arn}/direct-payment`
+  and `/sweep`.
+
+Screens (sidebar **Placement & Booking**):
+
+- Placement Workbench:
+  - Tiles: Awaiting payment, Ready for placement, Placed, Returned by insurer, Hold cover expiring.
+  - Tabs, and the bulk actions For Placement, Send Slips, For Booking, Cancel Placement and
+    Reactivate.
+- Placement Slips.
+- CLPC Billing, with the payment report review.
+- Account placement page: gate, slip, hold cover and returns.
+- The Placement tab on the account detail page (`PlacementPanel`, mounted with a marked comment).
+
+Demo data (V986):
+
+- Accounts `ARN-2026-910001` to `910008`.
+- Billing batch `BILL-2026-900001` (closed, with the matched CLPC report `PMT-2026-900001`) and
+  `900002`.
+- A confirmed ARN report and one in review.
+- Slips `PL-2026-900001` to `900005`, sent.
+- A confirmed hold cover and one about to expire.
+- One account returned by the insurer.
+
+Parked:
+
+- CLPC SFTP transport (Q28): download and upload only.
+- Insurer SFTP / API channels (Q06): a non-EMAIL channel is refused with
+  `PLACEMENT_CHANNEL_PARKED`.
+
+## 14. Issuance (`issuance`, W3)
+
+Issuance takes a placed account to *policy issued* and sends the policy documents out. The policy
+number reaches the account only through `AccountLifecycleService.recordPolicy`.
+
+Tables (V860): `iss_extraction_pattern`, `iss_document_trigger`, `iss_epolicy`, `iss_upload_batch`
+/ `_item` and `iss_insurance_advice`. Parameters (category ISSUANCE): `IA_TRIGGER`
+(`ON_POLICY_ISSUE`, `ON_PLACEMENT` or `MANUAL`) and `EPOLICY_PASSWORD_HINT`. LOV
+`EPOLICY_REJECT_REASON`; document type `INSURANCE_ADVICE`.
+
+Rules:
+
+- **E-policy receipt** (BRNB.073, `EpolicyService`):
+  - A PDF is matched to the account by ARN, policy number or PN (`AccountQueryService.preBooked`),
+    or chosen by hand. It is stored as document type `EPOLICY`.
+  - Bulk upload (`EpolicyUploadService`) matches each file name. A review lets the user fix or
+    skip items before confirming.
+- **Extraction** (BRNB.074/104):
+  - Port `PolicyDataExtractor`. The default `PdfTextPolicyDataExtractor` reads the PDF text
+    (OpenPDF) and applies the `iss_extraction_pattern` regexes per insurer (default row `*`) for the
+    policy number, the period from / to and the premium.
+  - The review shows the extracted values next to the account's. Confirm calls `recordPolicy`.
+  - Multi-year accounts take several policy numbers (BRNB.112).
+  - Reject keeps the file with a reason.
+- **Document triggers** (BRNB.105): `iss_document_trigger` maps a document type to an action.
+  Seed: `EPOLICY` → `EXTRACTION_REVIEW`. Auto-booking belongs to booking, which listens for
+  POLICY_ISSUED; issuance never calls booking.
+- **Insurance Advice** (BRNB.060/070/095):
+  - `IA-yyyy-nnnnnn`, for mortgaged accounts only (`IA_NOT_MORTGAGED`), from the
+    `INSURANCE_ADVICE` template.
+  - Generated automatically, before commit, on the status change chosen by `IA_TRIGGER`, or one or
+    several at a time by hand.
+  - Register with view, download and protected send (BRNB.035).
+- **E-policy dispatch** (BRNB.077/035):
+  - One or a batch, to the client contact. The attachment is encrypted and the password goes in a
+    separate e-mail (standard password policy; the BDOI convention is parked, Q07).
+  - The dispatch report is the messaging log filtered on the purposes `EPOLICY` and
+    `INSURANCE_ADVICE`.
+
+Contracts for other modules:
+
+- `IssuanceQueryService.policyFor(arn)`: policy numbers, e-policy and advice.
+- `PolicyDataExtractor` (port, above).
+- `IssuanceClientRecords` implements `ClientRecordsProvider`: the Insurance Advices in the client
+  360 view.
+
+API `/api/v1/issuance`. Viewing needs `ACCOUNT_VIEW`, `EPOLICY_MANAGE` or `EPOLICY_SEND`; receipt
+and extraction need `EPOLICY_MANAGE`; dispatch needs `EPOLICY_SEND`.
+
+- `GET /workbench?tab=&q=`, `/workbench/counts`, `/policies/{arn}` and `/triggers`.
+- `POST /epolicies` (multipart), `GET /epolicies/{id}`, `POST /epolicies/{id}/extract`,
+  `/confirm` and `/reject`.
+- `POST /epolicy-uploads` (multipart), `GET /epolicy-uploads/{id}`,
+  `POST /epolicy-uploads/{id}/items/{itemId}`, `/confirm` and `/discard`.
+- `/insurance-advice`: `GET` list, `/{id}` and `/{id}/file`; `POST /generate` and `/send`.
+- `/dispatch`: `GET /{epolicyId}/draft` and `/log`; `POST /{epolicyId}` and `/batch`.
+
+Screens (sidebar **Policy Issuance**):
+
+- Issuance Workbench, with the tabs Placed – awaiting policy, Policy received – review, Ready to
+  dispatch and IA to generate.
+- E-policy Upload: single, or bulk with match review.
+- Extraction Review.
+- Insurance Advice register.
+- Dispatch, with the dispatch report.
+- The Policy tab on the account detail page (`PolicyPanel`).
+
+Demo data (V987): three accounts POLICY_ISSUED with confirmed e-policies, one e-policy in review,
+`IA-2026-900001` and `900002` for the mortgaged accounts, and one account dispatched (messaging
+log).
+
+Parked:
+
+- Reading e-policies from a shared mailbox or SFTP (Q12, Q31): manual upload.
+- OCR (Q24): text PDFs only, through the extraction port.

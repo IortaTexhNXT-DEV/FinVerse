@@ -2,6 +2,7 @@ import { ACCOUNTING_ENGINE_HELP } from '@/features/accounting-engine/help';
 import { ACCOUNTS_HELP } from '@/features/accounts/help';
 import { ADMIN_HELP } from '@/features/admin/help';
 import { ASSETS_HELP } from '@/features/assets/help';
+import { BOOKING_HELP } from '@/features/booking/help';
 import { BROKING_SETUP_HELP } from '@/features/brokingsetup/help';
 import { BULK_HELP } from '@/features/bulk/help';
 import { CATALOG_HELP } from '@/features/catalog/help';
@@ -93,6 +94,7 @@ export const HELP_SECTIONS: HelpSection[] = [
   WORKSPACE_HELP,
   CRM_HELP,
   ACCOUNTS_HELP,
+  BOOKING_HELP,
   CATALOG_HELP,
   BULK_HELP,
   GL_HELP,

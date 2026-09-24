@@ -186,6 +186,18 @@ public class AccountingRuleService {
             "Simulation of " + s.eventType(),
             s.amounts(),
             s.accounts());
+    return preview(event);
+  }
+
+  /**
+   * Previews the journal lines an event would generate, without posting (e.g. the pre-booking
+   * confirmation of a broker booking, BRNB.036).
+   *
+   * @param event event as it would be published
+   * @return rule selected and generated lines
+   */
+  @Transactional(readOnly = true)
+  public Simulation preview(BusinessEvent event) {
     AccountingRule rule = resolver.resolve(event);
     return Simulation.of(rule.getId(), rule.getName(), lineBuilder.build(rule, event));
   }

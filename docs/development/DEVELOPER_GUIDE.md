@@ -261,7 +261,7 @@ records every run in `sys_job_run`, a failure raises `JOB_FAILURE`, and administ
 the work in `JobRunService.execute(jobName, JobTrigger.MANUAL, () -> new JobOutcome(n, message))`.
 Make the cron configurable (`brokerverse.jobs.<name>-cron`), add it to `application.yml` with an
 environment variable and document it in `docs/operations/CONFIGURATION.md`. Jobs today:
-`RECURRING_JOURNALS`, `ALERT_DAILY_CHECKS`, `PDC_ISSUED_DUE`, `QUOTATION_EXPIRY` (daily), `MAIL_DISPATCH` (every two minutes) and
+`RECURRING_JOURNALS`, `ALERT_DAILY_CHECKS`, `PDC_ISSUED_DUE`, `QUOTATION_EXPIRY`, `BOOKING_BATCH` (daily), `MAIL_DISPATCH` (every two minutes) and
 `KYC_REVIEW_DUE`, `RETENTION_REVIEW` (monthly) and `RESERVE_VALUATION`, `RI_ALLOCATION` (manual unless
 scheduled).
 

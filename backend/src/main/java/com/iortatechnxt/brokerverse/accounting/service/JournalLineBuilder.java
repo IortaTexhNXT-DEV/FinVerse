@@ -40,7 +40,7 @@ public class JournalLineBuilder {
               event.branchId(),
               event.costCenter(),
               event.businessLine(),
-              rl.isPartyLine() ? event.partyCode() : null,
+              rl.isPartyLine() ? event.partyFor(rl.getAmountComponent()) : null,
               event.reference(),
               rl.getNarration() != null ? rl.getNarration() : event.narration()));
     }

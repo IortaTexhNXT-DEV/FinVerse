@@ -98,6 +98,8 @@ brokerverse:
     hold-cover-expiry-cron: ${BROKERVERSE_JOB_HOLD_COVER_EXPIRY_CRON:0 30 0 * * *}
     # Quotation requests of source systems (HLS, BRNB.023): manual until an interface exists (Q11).
     quotation-request-intake-cron: ${BROKERVERSE_JOB_QUOTATION_REQUEST_INTAKE_CRON:-}
+    # End-of-day booking batch (BRNB.036): queued accounts and started multi-year policy years (20:00 PHT).
+    booking-batch-cron: ${BROKERVERSE_JOB_BOOKING_BATCH_CRON:0 0 12 * * *}
 
 management:
   endpoints:

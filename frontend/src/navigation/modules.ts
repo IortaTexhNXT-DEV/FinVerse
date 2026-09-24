@@ -4,6 +4,7 @@ import { adminModule } from '@/features/admin/module';
 import { withOverviewScreens } from '@/features/approvals/module';
 import { brokingSetupModule } from '@/features/brokingsetup/module';
 import { catalogModule } from '@/features/catalog/module';
+import { bookingModule } from '@/features/booking/module';
 import { bulkModule } from '@/features/bulk/module';
 import { assetsModule } from '@/features/assets/module';
 import { claimsModule } from '@/features/claims/module';
@@ -48,6 +49,7 @@ export const NAV_GROUPS: NavGroup[] = [
       proposalsModule,
       placementModule,
       issuanceModule,
+      bookingModule,
       catalogModule,
       bulkModule,
     ],

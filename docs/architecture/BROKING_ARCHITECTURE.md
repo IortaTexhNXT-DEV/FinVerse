@@ -303,7 +303,9 @@ build the external interface itself.
 | OCR / data extraction from documents | Q24 | `issuance` extraction port with a manual review screen |
 | BDO SSO / Active Directory | Q42 | existing JWT login |
 | Product matrix content | Q01, Q02 | minimum-field, document and TSU rule tables configurable (`catalog`); seeds are defaults |
-| Incentive rules | Q33 | rule table empty |
+| Incentive rules | Q33 | `bkg_incentive_rule` table and setup screen; empty in production, one demo rule (V988). A match sets the incentive flag on the invoice |
+| Real GL accounts of the booking event | OQ07 | event type `BROKER_BOOKING` and its components in V870; the rule lines and GL accounts 1210 / 1220 / 2210 / 2220 / 2221 / 4101 exist only in the demo data (V988). Production configures them in Accounting Rules |
+| BIR CAS / e-invoicing of service invoices | - | `ServiceInvoiceService.issue` is the seam: numbers, stored PDF and dispatch are local; no transmission to BIR |
 | BDO KYC standard fields | Q16 | configurable KYC checklist |
 | Data ownership register | Q37 | not started |
 | Dynamic report builder | Q40 | saved report variants only |
@@ -1040,3 +1042,172 @@ Parked:
 
 - Reading e-policies from a shared mailbox or SFTP (Q12, Q31): manual upload.
 - OCR (Q24): text PDFs only, through the extraction port.
+
+## 15. Booking (`booking`, W3)
+
+Booking turns an issued account (or one flagged for direct booking) into booked invoices with their
+accounting. It covers BRNB.027/036/038/061/076/081/094/100/107/108/111/112. Flyway V870, demo V988.
+
+### 11.1 Booking an account
+
+`BookingService.book(arn, options)` runs in **one transaction**. It:
+
+1. checks the account (`POLICY_ISSUED`, or direct booking), the cost center (mandatory) and the
+   insurer shares (they add up to 100%).
+2. builds the invoice with `InvoiceBuilder`. The number comes from the gap-free
+   `DocumentNumberService` (`BI-<branch>-<yyyy>`).
+3. posts one `BROKER_BOOKING` business event per insurer share, via `AccountingEngine` into
+   `SystemJournalService`.
+4. opens the open items: premium payable to the insurer, commission receivable, and the client's
+   premium receivable unless the account is direct payment.
+5. issues the service invoice if a type is triggered `ON_BOOKING`.
+6. calls `AccountLifecycleService.recordBooking`.
+7. publishes `InvoiceBooked`.
+
+The idempotency key is ARN + transaction number (`NB`, `NB-Y2`, ...). It is a unique constraint on
+`bkg_invoice`, so booking twice returns the invoice that already exists.
+
+Other rules:
+
+- **Multi-year** (BRNB.108): one invoice per policy year. Year 1 is booked; years 2..n are stored
+  `SCHEDULED` and the batch job books them when their year starts (`bookDueYear`).
+- **NB / Renewal flag** (BRNB.107): taken from the account, stored in the invoice facts, and
+  carried on the event.
+- **Commission realization**: the parameter `OPS_COMMISSION_REALIZATION` (default `ON_COLLECTION`)
+  chooses between posting commission as unrealized plus deferred output VAT, or as realized.
+  `BOOKING_WTAX_RATE` (10) sets the withholding tax. `BOOKING_CWT2_SEGMENTS` (empty) lists the
+  segments on the second creditable withholding rate.
+- **Incentive** (BRNB.094): `bkg_incentive_rule` rows (line, segment, year, rate) are matched at
+  booking. A match flags the invoice. The content is parked (Q33).
+- **Business-line dimension**: each event carries the product line as a `BUSINESS_LINE` dimension
+  value.
+
+### 11.2 Queue, batch and upload
+
+- `BookingQueueService.enqueue(companyId, arns, source)` is the **port for placement**. Placement's
+  "For Booking" calls it. It does not throw on a bad ARN; it returns an `EnqueueResult` per ARN.
+  One active queue entry per ARN (a partial unique index).
+- Workbench commands: edit the date or cost center of an entry, remove it, cancel the batch,
+  confirm the selected entries, and book now.
+- `BatchBookingRunner` books every entry in its own `REQUIRES_NEW` transaction, so one failure does
+  not stop the others. It writes one `bkg_batch_run` (`BB-<yyyy>`) with a `bkg_batch_row` per
+  account. Failed entries move to `FAILED` and appear on the Failed tab.
+- The `BOOKING_BATCH` job runs daily. Its cron is `brokerverse.jobs.booking-batch-cron`, env
+  `BROKERVERSE_JOB_BOOKING_BATCH_CRON`, default 20:00 PHT. It runs the queue and the scheduled
+  multi-year invoices of each company.
+- `AutoBookListener` listens for policy issuance after commit. When an `bkg_auto_book_rule`
+  (product / market segment) matches, it queues the account with source `AUTO`.
+- The `BOOKING_UPLOAD` bulk handler takes columns ARN, booking date and cost center. Each row is
+  validated and then booked.
+
+### 11.3 Endorsements and cancellations (BRNB.061/081)
+
+`EndorsementPostingService.post(request)` adds an ENDORSEMENT or CANCELLATION invoice
+(`EN-<yyyy>`) against a booked original:
+
+- **Positive or negative endorsements** carry the premium and sum insured change.
+- **Cancellations**: `FLAT` reverses everything; `FLAT_RETAIN_DST` keeps the documentary stamp tax;
+  `PARTIAL` is pro rata on unexpired days, or an amount entered by the user.
+
+The posting uses the same event, with negative amounts for returns, and publishes `InvoiceBooked`
+with sign -1. If an `ON_ENDORSEMENT` type exists, it issues or credits the service invoice.
+`preview` shows the result without posting. Posting needs `BOOKING_ADJUST`; entry and preview need
+`BOOKING_PROCESS`.
+
+### 11.4 Service invoices (BRNB.100/100b)
+
+- `ServiceInvoiceService.issue(...)` makes a service invoice (`SI-<branch>-<yyyy>`) from a
+  `bkg_si_type`. Types are seeded: `INSURER_COMMISSION` on booking, `INSURER_COMMISSION_ENDT` on
+  endorsement, `INTERNAL` manual.
+- The PDF is composed from the versioned docgen template, and the template version is stored.
+- `credit(...)` issues a credit against an invoice, never more than the amount still open.
+- Dispatch goes to the insurer party's billing e-mail. `ServiceInvoiceDispatchWatcher` records the
+  outcome and notifies the owner (a user or a permission) when a dispatch fails.
+- `resend` sends the invoice again.
+- BIR CAS / e-invoicing is parked: `issue` is the seam.
+
+### 11.5 Contracts added
+
+- `BookingQueueService.enqueue` / `enqueueIssued`: the port for placement.
+- `BookingQueryService.invoice(invoiceNo)` and `invoicesForArn(arn)`: the read contract for
+  Operations, collections and reports.
+- `InvoiceBooked`: an event record published after commit. It holds the invoice, ARN, kind, sign,
+  amounts, insurer and client parties.
+- `BookingClientRecords` implements the crm `ClientRecordsProvider`, so invoices appear in the
+  client 360 view.
+- **Accounting extension**: `BusinessEvent` has a 15th component, `componentParties`
+  (component → party code). It lets one event post the insurer, client and broker sub-ledger lines.
+  The 14-argument constructor is kept, so existing callers are unchanged. `JournalLineBuilder` uses
+  `event.partyFor(component)`. `AccountingRuleService.preview(event)` simulates the posting without
+  writing it.
+
+### 11.6 API (`/api/v1/booking`)
+
+Workbench and queue:
+
+- `GET /workbench/counts`
+- `GET /workbench?tab=READY|QUEUED|BOOKED|FAILED&q=&line=`
+- `POST /preview` and `POST /book`
+- `POST /queue`
+- `PUT /queue/{id}` and `POST /queue/{id}/remove`
+- `POST /batch/confirm`, `POST /batch/cancel` and `POST /book-now`
+- `GET /batch-runs` and `GET /batch-runs/{runNo}`
+
+Invoices:
+
+- `GET /invoices?q=&status=&kind=&insurer=&from=&to=&line=`
+- `GET /invoices/{id}`
+- `GET /invoices/by-no/{no}` and `GET /invoices/by-no/{no}/event`
+- `GET /invoices/{id}/open-items` and `GET /invoices/{id}/journal`
+- `GET /accounts/{arn}/invoices` and `GET /accounts/{arn}/endorsements`
+
+Endorsements:
+
+- `GET /endorsements`
+- `POST /endorsements/preview` and `POST /endorsements`
+
+Service invoices:
+
+- `GET /service-invoices`, `GET /service-invoices/{id}` and
+  `GET /service-invoices/by-invoice/{no}`
+- `GET /service-invoices/{id}/pdf`
+- `POST /service-invoices/{id}/resend`
+- `POST /service-invoices` (issue) and `POST /service-invoices/{id}/credit`
+
+Setup:
+
+- `GET` and `POST /setup/auto-book-rules`, `PUT /setup/auto-book-rules/{id}`
+- `GET` and `POST /setup/incentive-rules`, `PUT /setup/incentive-rules/{id}`
+- `GET` and `POST /setup/service-invoice-types`, `PUT /setup/service-invoice-types/{id}`
+
+Permissions: `BOOKING_PROCESS` or `BOOKING_ADJUST` to view, `BOOKING_PROCESS` to book, and
+`BOOKING_ADJUST` for endorsements and credits. Setup needs `MASTER_MAINTAIN`.
+
+### 11.7 Screens (sidebar **Booking**, group `client-policy`)
+
+- **Booking Workbench**:
+  - tiles and the tabs Ready to Book | Queued for Batch | Booked Account | Failed
+  - "Search Proposal No." and a product line filter
+  - the bulk actions Book Now / Add to Batch / Confirm Batch / Cancel Batch
+  - the handover from the Placement Workbench: `/booking?arns=ARN-1,ARN-2` pre-selects those
+    accounts on the Ready tab. A banner offers "Add All to Batch" for the accounts that are not on
+    the page shown
+  - columns: selection, Name / Client Code, Proposal No. (ARN), Invoice No., Status, Product Line,
+    Department, Booking Date
+- **Book account** (`/booking/book/:arn`): preview of the invoice(s) and journal, then confirm.
+- **Invoice detail**, with the tabs Premium & Commission / Journal / Open Items / Service
+  Invoices / Endorsements / Invoices of the Account, and a cancellation dialog. It can also be
+  opened by invoice number.
+- **Endorsements** list and entry.
+- **Service Invoices** list and detail, with PDF, resend and credit.
+- **Batch Runs** list and detail.
+- **Booking Setup**: auto-book rules, incentive rules and service invoice types.
+- **Upload Bookings**: `/bulk/BOOKING_UPLOAD`.
+
+### 11.8 Demo (V988 and `BookingDemoData`)
+
+- Demo GL accounts, `BROKER_BOOKING` rule lines, one incentive rule and one auto-book rule.
+- Seven issued accounts, `ARN-2026-940001` to `940007`. They include a direct payment account, a
+  co-insured account (CGL01, bank segment), a multi-year account (3 years) and one queued `AUTO`.
+- On start-up, `BookingDemoData` books 940001–940004. It posts a positive endorsement on 940001 and
+  a partial cancellation on 940002.

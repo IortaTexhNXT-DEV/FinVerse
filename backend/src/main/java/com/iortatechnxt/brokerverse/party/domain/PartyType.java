@@ -18,7 +18,12 @@ public enum PartyType {
   SUPPLIER(SubLedgerType.VENDOR),
   GARAGE(SubLedgerType.VENDOR),
   SURVEYOR(SubLedgerType.VENDOR),
-  BANK(SubLedgerType.BANK);
+  BANK(SubLedgerType.BANK),
+  /**
+   * Insurer on the broker's panel (BDOI broking): premium remitted to it and commission receivable
+   * from it settle in the insurer sub-ledger.
+   */
+  INSURER(SubLedgerType.INSURER);
 
   private final SubLedgerType subLedger;
 

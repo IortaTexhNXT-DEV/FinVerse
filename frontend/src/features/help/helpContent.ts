@@ -1,8 +1,10 @@
 import { ACCOUNTING_ENGINE_HELP } from '@/features/accounting-engine/help';
+import { ACCOUNTS_HELP } from '@/features/accounts/help';
 import { ADMIN_HELP } from '@/features/admin/help';
 import { ASSETS_HELP } from '@/features/assets/help';
 import { BROKING_SETUP_HELP } from '@/features/brokingsetup/help';
 import { BULK_HELP } from '@/features/bulk/help';
+import { CATALOG_HELP } from '@/features/catalog/help';
 import { CLAIMS_HELP } from '@/features/claims/help';
 import { PLANNING_HELP } from '@/features/closing/help';
 import { GL_HELP } from '@/features/gl/help';
@@ -88,7 +90,9 @@ export const HELP_SECTIONS: HelpSection[] = [
     ],
   },
   WORKSPACE_HELP,
+  ACCOUNTS_HELP,
   BULK_HELP,
+  CATALOG_HELP,
   BROKING_SETUP_HELP,
   GL_HELP,
   UNDERWRITING_HELP,

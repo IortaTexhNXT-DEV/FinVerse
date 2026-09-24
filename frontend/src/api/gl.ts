@@ -4,7 +4,14 @@ import type { PageResponse, RecordStatus } from './types';
 export type AccountClass = 'ASSET' | 'LIABILITY' | 'EQUITY' | 'INCOME' | 'EXPENSE' | 'MEMORANDUM';
 export type AccountLevel = 'GROUP' | 'MAIN' | 'SUB' | 'MICRO';
 export type SubLedgerType =
-  'NONE' | 'POLICYHOLDER' | 'INTERMEDIARY' | 'REINSURER' | 'COINSURER' | 'BANK' | 'VENDOR';
+  | 'NONE'
+  | 'POLICYHOLDER'
+  | 'INTERMEDIARY'
+  | 'REINSURER'
+  | 'COINSURER'
+  | 'INSURER'
+  | 'BANK'
+  | 'VENDOR';
 
 export interface GlAccount {
   id: number;

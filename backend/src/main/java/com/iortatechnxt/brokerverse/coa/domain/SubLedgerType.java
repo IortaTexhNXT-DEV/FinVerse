@@ -8,5 +8,7 @@ public enum SubLedgerType {
   REINSURER,
   COINSURER,
   BANK,
-  VENDOR
+  VENDOR,
+  /** Panel insurers of the broker (premium payable, commission receivable). */
+  INSURER
 }

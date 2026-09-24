@@ -1,12 +1,19 @@
 package com.iortatechnxt.brokerverse.attachment.api;
 
 import com.iortatechnxt.brokerverse.attachment.api.dto.AttachmentResponse;
+import com.iortatechnxt.brokerverse.attachment.api.dto.LinkRequest;
 import com.iortatechnxt.brokerverse.attachment.domain.AllowedFileType;
 import com.iortatechnxt.brokerverse.attachment.domain.AttachmentTarget;
 import com.iortatechnxt.brokerverse.attachment.service.AttachmentService;
 import com.iortatechnxt.brokerverse.attachment.service.AttachmentService.AttachmentFile;
+import com.iortatechnxt.brokerverse.attachment.service.DocumentNamingService;
+import com.iortatechnxt.brokerverse.attachment.service.DocumentService;
+import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadOptions;
+import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
+import jakarta.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,32 +24,42 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-/** Document attachments on any record (upload, list, download, remove). */
+/**
+ * Document attachments on any record: upload (one or several files, document type, inherited or
+ * nominated names), list (own and linked files), download (single or ZIP), link to other records
+ * and remove (BRNB.026/055/056).
+ */
 @RestController
 @RequestMapping("/api/v1/attachments")
 public class AttachmentController {
 
   private static final String VIEW = "hasAuthority('ATTACHMENT_VIEW')";
+  private static final String MANAGE = "hasAuthority('ATTACHMENT_MANAGE')";
+  private static final String NOMINATE = "NOMINATE";
 
   private final AttachmentService service;
+  private final DocumentService documents;
 
   /**
    * Creates the controller.
    *
    * @param service attachment service
+   * @param documents document features
    */
-  public AttachmentController(AttachmentService service) {
+  public AttachmentController(AttachmentService service, DocumentService documents) {
     this.service = service;
+    this.documents = documents;
   }
 
   /**
-   * Lists the attachments of a record.
+   * Lists the documents of a record (its own files and the files linked to it).
    *
    * @param entityType entity type
    * @param entityId entity id
@@ -52,20 +69,23 @@ public class AttachmentController {
   @PreAuthorize(VIEW)
   public List<AttachmentResponse> list(
       @RequestParam String entityType, @RequestParam String entityId) {
-    return service.list(new AttachmentTarget(entityType, entityId)).stream()
-        .map(AttachmentResponse::from)
-        .toList();
+    AttachmentTarget target = new AttachmentTarget(entityType, entityId);
+    return documents.list(target).stream().map(a -> AttachmentResponse.from(a, target)).toList();
   }
 
   /**
-   * Upload limits for the client.
+   * Upload limits and the file naming syntax for the client.
    *
    * @return policy
    */
   @GetMapping("/policy")
   @PreAuthorize(VIEW)
   public UploadPolicy policy() {
-    return new UploadPolicy(service.maxSizeBytes(), AllowedFileType.allowedExtensions());
+    return new UploadPolicy(
+        service.maxSizeBytes(),
+        AllowedFileType.allowedExtensions(),
+        DocumentNamingService.SYNTAX,
+        DocumentService.MAX_FILES);
   }
 
   /**
@@ -74,26 +94,87 @@ public class AttachmentController {
    * @param entityType entity type
    * @param entityId entity id
    * @param description optional description
+   * @param documentType optional document type (list DOCUMENT_TYPE)
+   * @param naming INHERIT (default) or NOMINATE
+   * @param reference business reference for nominated names
    * @param file file
    * @return metadata
    * @throws IOException when the upload cannot be read
    */
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize("hasAuthority('ATTACHMENT_MANAGE')")
+  @PreAuthorize(MANAGE)
   public AttachmentResponse upload(
       @RequestParam String entityType,
       @RequestParam String entityId,
       @RequestParam(required = false) String description,
+      @RequestParam(required = false) String documentType,
+      @RequestParam(required = false) String naming,
+      @RequestParam(required = false) String reference,
       @RequestParam MultipartFile file)
       throws IOException {
-    service.requireWithinLimit(file.getSize());
-    return AttachmentResponse.from(
-        service.upload(
+    return uploadAll(
             new AttachmentTarget(entityType, entityId),
-            file.getOriginalFilename(),
-            file.getBytes(),
-            description));
+            List.of(file),
+            new UploadOptions(documentType, NOMINATE.equals(naming), reference, description))
+        .get(0);
+  }
+
+  /**
+   * Uploads several files at once (BRNB.026 multi-file upload).
+   *
+   * @param entityType entity type
+   * @param entityId entity id
+   * @param description optional description
+   * @param documentType optional document type
+   * @param naming INHERIT (default) or NOMINATE
+   * @param reference business reference for nominated names
+   * @param files files
+   * @return metadata in upload order
+   * @throws IOException when an upload cannot be read
+   */
+  @PostMapping(value = "/batch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize(MANAGE)
+  public List<AttachmentResponse> uploadBatch(
+      @RequestParam String entityType,
+      @RequestParam String entityId,
+      @RequestParam(required = false) String description,
+      @RequestParam(required = false) String documentType,
+      @RequestParam(required = false) String naming,
+      @RequestParam(required = false) String reference,
+      @RequestParam("files") List<MultipartFile> files)
+      throws IOException {
+    return uploadAll(
+        new AttachmentTarget(entityType, entityId),
+        files,
+        new UploadOptions(documentType, NOMINATE.equals(naming), reference, description));
+  }
+
+  private List<AttachmentResponse> uploadAll(
+      AttachmentTarget target, List<MultipartFile> files, UploadOptions options)
+      throws IOException {
+    List<UploadedFile> uploaded = new ArrayList<>();
+    for (MultipartFile file : files) {
+      service.requireWithinLimit(file.getSize());
+      uploaded.add(new UploadedFile(file.getOriginalFilename(), file.getBytes()));
+    }
+    return documents.upload(target, uploaded, options).stream()
+        .map(a -> AttachmentResponse.from(a, target))
+        .toList();
+  }
+
+  /**
+   * Links a file to further records (e.g. one IDF for several accounts).
+   *
+   * @param id file
+   * @param request records
+   * @return metadata
+   */
+  @PostMapping("/{id}/links")
+  @PreAuthorize(MANAGE)
+  public AttachmentResponse link(@PathVariable Long id, @Valid @RequestBody LinkRequest request) {
+    return AttachmentResponse.from(documents.link(id, request.targets()));
   }
 
   /**
@@ -115,15 +196,40 @@ public class AttachmentController {
   }
 
   /**
-   * Removes an attachment (logical delete).
+   * Downloads several files as one ZIP (BRNB.056).
+   *
+   * @param ids attachment ids
+   * @param name ZIP file name without extension (e.g. the ARN)
+   * @return ZIP file
+   */
+  @GetMapping("/zip")
+  @PreAuthorize(VIEW)
+  public ResponseEntity<byte[]> zip(
+      @RequestParam List<Long> ids, @RequestParam(defaultValue = "documents") String name) {
+    return ResponseEntity.ok()
+        .contentType(MediaType.parseMediaType("application/zip"))
+        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(name + ".zip"))
+        .body(documents.zip(ids));
+  }
+
+  /**
+   * Removes a document: from the record it is linked to (unlink), or everywhere when the record
+   * owns it or no record is given (logical delete).
    *
    * @param id id
+   * @param entityType record the user removes it from, optional
+   * @param entityId record id, optional
    */
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PreAuthorize("hasAuthority('ATTACHMENT_MANAGE')")
-  public void delete(@PathVariable Long id) {
-    service.delete(id);
+  @PreAuthorize(MANAGE)
+  public void delete(
+      @PathVariable Long id,
+      @RequestParam(required = false) String entityType,
+      @RequestParam(required = false) String entityId) {
+    AttachmentTarget target =
+        entityType == null || entityId == null ? null : new AttachmentTarget(entityType, entityId);
+    documents.remove(id, target);
   }
 
   /**
@@ -131,6 +237,9 @@ public class AttachmentController {
    *
    * @param maxSizeBytes largest accepted file
    * @param allowedExtensions accepted extensions
+   * @param namingSyntax syntax of nominated file names
+   * @param maxFiles largest number of files per upload or ZIP
    */
-  public record UploadPolicy(long maxSizeBytes, String allowedExtensions) {}
+  public record UploadPolicy(
+      long maxSizeBytes, String allowedExtensions, String namingSyntax, int maxFiles) {}
 }

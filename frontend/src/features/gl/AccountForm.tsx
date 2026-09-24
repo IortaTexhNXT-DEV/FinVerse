@@ -10,6 +10,7 @@ const SUB_LEDGERS: SubLedgerType[] = [
   'INTERMEDIARY',
   'REINSURER',
   'COINSURER',
+  'INSURER',
   'BANK',
   'VENDOR',
 ];

@@ -9,7 +9,8 @@ import java.util.Optional;
 /**
  * File types accepted as attachments. The type is derived from the file extension and confirmed by
  * the file signature ("magic bytes"), so a renamed executable is rejected; the browser-supplied
- * content type is never trusted.
+ * content type is never trusted. OpenDocument, legacy Office and e-mail files are accepted for
+ * broking documents (BRNB.026).
  */
 public enum AllowedFileType {
   PDF("application/pdf", List.of("pdf"), "%PDF-".getBytes(StandardCharsets.US_ASCII)),
@@ -23,7 +24,19 @@ public enum AllowedFileType {
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       List.of("docx"),
       Signatures.ZIP),
-  CSV("text/csv", List.of("csv"), new byte[0]);
+  CSV("text/csv", List.of("csv"), new byte[0]),
+  /** OpenDocument spreadsheet (BRNB.026, .ods account lists). */
+  ODS("application/vnd.oasis.opendocument.spreadsheet", List.of("ods"), Signatures.ZIP),
+  /** OpenDocument text. */
+  ODT("application/vnd.oasis.opendocument.text", List.of("odt"), Signatures.ZIP),
+  /** Legacy Excel workbook. */
+  XLS("application/vnd.ms-excel", List.of("xls"), Signatures.OLE2),
+  /** Legacy Word document. */
+  DOC("application/msword", List.of("doc"), Signatures.OLE2),
+  /** Outlook message (e.g. a client acceptance e-mail). */
+  MSG("application/vnd.ms-outlook", List.of("msg"), Signatures.OLE2),
+  /** Internet e-mail message. */
+  EML("message/rfc822", List.of("eml"), new byte[0]);
 
   /** Bytes inspected for text detection. */
   private static final int TEXT_PROBE = 4096;
@@ -60,7 +73,7 @@ public enum AllowedFileType {
    * @return true when the signature matches (text without NUL bytes for CSV)
    */
   public boolean matches(byte[] content) {
-    if (this == CSV) {
+    if (this == CSV || this == EML) {
       int limit = Math.min(content.length, TEXT_PROBE);
       for (int i = 0; i < limit; i++) {
         if (content[i] == 0) {
@@ -89,6 +102,9 @@ public enum AllowedFileType {
   /** Shared signatures. */
   private static final class Signatures {
     static final byte[] ZIP = {'P', 'K', 0x03, 0x04};
+    static final byte[] OLE2 = {
+      (byte) 0xD0, (byte) 0xCF, 0x11, (byte) 0xE0, (byte) 0xA1, (byte) 0xB1, 0x1A, (byte) 0xE1
+    };
 
     private Signatures() {}
   }

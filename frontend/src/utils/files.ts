@@ -40,3 +40,24 @@ export function checkFile(
   }
   return undefined;
 }
+
+/**
+ * Pre-checks chosen files (type, size, count). Returns the first problem, or undefined when all may be sent.
+ */
+export function screenFiles(
+  files: readonly { name: string; size: number }[],
+  extensions: readonly string[],
+  maxBytes: number,
+  maxFiles: number,
+): string | undefined {
+  if (files.length > maxFiles) {
+    return `Choose at most ${maxFiles} files at a time.`;
+  }
+  for (const file of files) {
+    const error = checkFile(file, extensions, maxBytes);
+    if (error !== undefined) {
+      return `${file.name}: ${error}`;
+    }
+  }
+  return undefined;
+}

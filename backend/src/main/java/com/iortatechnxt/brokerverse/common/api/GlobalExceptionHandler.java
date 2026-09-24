@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.common.api;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
+import com.iortatechnxt.brokerverse.common.exception.FieldValidationException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -43,7 +44,11 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(BusinessRuleException.class)
   public ProblemDetail handleBusinessRule(BusinessRuleException ex) {
-    return problem(HttpStatus.UNPROCESSABLE_ENTITY, ex.getCode(), ex.getMessage());
+    ProblemDetail pd = problem(HttpStatus.UNPROCESSABLE_ENTITY, ex.getCode(), ex.getMessage());
+    if (ex instanceof FieldValidationException fields) {
+      pd.setProperty("errors", fields.getFieldErrors());
+    }
+    return pd;
   }
 
   /**

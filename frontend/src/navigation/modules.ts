@@ -1,7 +1,9 @@
 import { accountingEngineModule } from '@/features/accounting-engine/module';
+import { accountsModule } from '@/features/accounts/module';
 import { adminModule } from '@/features/admin/module';
 import { withOverviewScreens } from '@/features/approvals/module';
 import { brokingSetupModule } from '@/features/brokingsetup/module';
+import { catalogModule } from '@/features/catalog/module';
 import { bulkModule } from '@/features/bulk/module';
 import { assetsModule } from '@/features/assets/module';
 import { claimsModule } from '@/features/claims/module';
@@ -32,7 +34,11 @@ import type { FeatureModule, NavGroup } from './types';
 export const NAV_GROUPS: NavGroup[] = [
   { id: 'home', modules: [withOverviewScreens(dashboardModule), workspaceModule] },
   // Broking (BDOI New Business) - docs/architecture/BROKING_ARCHITECTURE.md section 5.
-  { id: 'client-policy', title: 'Client & Policy', modules: [crmModule, bulkModule] },
+  {
+    id: 'client-policy',
+    title: 'Client & Policy',
+    modules: [crmModule, accountsModule, catalogModule, bulkModule],
+  },
   {
     id: 'finance',
     title: 'Finance',

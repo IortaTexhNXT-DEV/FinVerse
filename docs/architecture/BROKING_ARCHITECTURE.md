@@ -270,6 +270,7 @@ PROSPECT/KYC_REVIEW/KYC_VERIFIED/CONFIRMED --deactivate(reason)--> INACTIVE
   - **Accounts & Placement**
   - **Issuance & Booking**
   - **Bulk Processing**
+  - **Products & Insurers** (catalog)
   - **Broking Setup**
 
   The insurer and finance sections follow.
@@ -296,11 +297,11 @@ build the external interface itself.
 |---|---|---|
 | HLS inbound interface | Q11 | `quotation` request intake port + bulk handler |
 | CLPC transport (SFTP) | Q28 | billing file generation and payment report import work by upload / download |
-| Insurer channels (SFTP / API) | Q06 | `placement` sends by e-mail |
+| Insurer channels (SFTP / API) | Q06 | `placement` sends by e-mail; `cat_insurer.placement_channel` accepts only EMAIL (`PLACEMENT_CHANNEL_PARKED`) |
 | Shared mailbox reading (requests, e-policies) | Q12, Q31 | manual upload with the e-mail attached |
 | OCR / data extraction from documents | Q24 | `issuance` extraction port with a manual review screen |
 | BDO SSO / Active Directory | Q42 | existing JWT login |
-| Product matrix content | Q01 | minimum-field matrix configurable |
+| Product matrix content | Q01, Q02 | minimum-field, document and TSU rule tables configurable (`catalog`); seeds are defaults |
 | Incentive rules | Q33 | rule table empty |
 | BDO KYC standard fields | Q16 | configurable KYC checklist |
 | Data ownership register | Q37 | not started |
@@ -312,6 +313,12 @@ build the external interface itself.
 | BDO CIF integration (source of truth for bank clients) | Q16 | `bank_client` flag and CIF number captured manually |
 | Retention periods per record type; archive vs purge | Q39 | rule table `nba_retention_rule` and monthly counts; no archive / purge (DBA storage and backup decision) |
 | Forced password change at first sign-in | - | temporary password shown once to the approver; user changes it on My Profile |
+| TSU routing thresholds | Q04 | `cat_tsu_rule` seeds (non-package, fleet of 5, TSI above 50M) until BDOI confirms |
+| Nominated document naming | Q23 | `<REFERENCE>_<DOCTYPE>_<n>` (`DocumentNamingService.SYNTAX`) |
+| Sales organisation and cost centers | Q34, Q41 | `cat_sales_unit` / `cat_sales_officer` tables; demo units only |
+| Motor OD factors and BI / PD tables | Q35 | `cat_rate` MOTOR_OD_* and `cat_motor_limit` hold sample values |
+| Premium tax base | Q43 | `cat_rate` PREMIUM_TAX per line (PROPERTY 12%) |
+| Retention of accounts | nbadmin | `RetentionCandidateProvider` for ACCOUNT not implemented (port not on this branch) |
 
 ## 7. CRM (`crm`): clients
 
@@ -422,3 +429,181 @@ API (`/api/v1/nbadmin`): `GET/POST access-requests`, `GET access-requests/{id}`,
 Screens (section Broking Setup): Lists of Values, Access Requests, User Access Matrix, Data
 Retention. A screen may declare `alsoPermissions` (navigation) so the checker of a maker screen
 (e.g. the Approver on Access Requests) can open it.
+
+## 9. Catalog (`catalog`, W2)
+
+What BDOI sells and with whom. Every table is a maker-checker master (`AuthorizableEntity`): new and
+changed rows wait in My Approvals (`CatalogApprovalSource`). They are authorized or deactivated through
+`POST /api/v1/catalog/records/{kind}/{id}/authorize|deactivate`, and rating and accounts use only
+ACTIVE rows. Rates are effective-dated, and the row in force on the period start applies.
+
+| Table (V810-V812) | Content | Seeds |
+|---|---|---|
+| `cat_product_line` | line, risk item kind (VEHICLE / PROPERTY_LOCATION / PERSON / GENERIC), rating method (PROPERTY / MOTOR / GENERIC) | 12 Annex I lines |
+| `cat_cover_type` | cover types per line | Annex I |
+| `cat_product` | features: package, fleet, market segments, mortgage, direct payment, multi-year and maximum term, FFY, payment gate (PAID / CLIENT_CONFIRMATION), default rate, commission and minimum premium, package TSI limit, TSU involvement | Annex I codes, MTR / PAR packages (TSI limits PAR 20M, MTR 5M) |
+| `cat_field_rule` | minimum-field matrix: scope ALL (`*`) / LINE / PRODUCT, target ACCOUNT / ITEM, field key (`a\|b` = one of) | defaults per line |
+| `cat_document_rule` | documents required before submission | MOTOR → IDF, PERSONAL_ACCIDENT → VALID_ID |
+| `cat_insurer`, `cat_insurer_branch` | insurer panel: party (type INSURER), accreditation, placement channel and e-mails, credit days; branches with LGT rate | demo V982 |
+| `cat_commission_rate` | commission per insurer × product (product blank = all products), effective-dated | demo V982 |
+| `cat_rate` | DST, premium tax, VAT on premium, fire service tax, VAT on commission, motor OD factors; line blank = all lines | DST 12.5, VAT 12 (PROPERTY 0), PTX PROPERTY 12, FST PROPERTY 2, OD 90 / 81 |
+| `cat_short_period_rate` | % of annual premium by months covered | 1-12 months: 20 … 100 |
+| `cat_motor_limit` | BI / PD limit premiums | sample tables |
+| `cat_tsu_rule` | TSU routing criteria: product class, line, fleet units, locations, TSI above, endorsement type, priority | NON_PACKAGE, FLEET_5, TSI_50M |
+| `cat_sales_unit`, `cat_sales_officer` | region → department → team with cost center (inherited), officers per team | demo V982 |
+
+Contracts for other modules:
+
+- `ProductCatalogService.requireProduct(code)` and `requireUsableProduct(code)` (ACTIVE only), plus
+  `products(ProductFilter)`.
+- `ProductRuleService.effectiveFieldRules(product)`, `requiredDocuments(product)` and
+  `missingFields(product, FieldPresence)`: field errors keyed by field path.
+- `InsurerService.requireUsableInsurer(companyId, partyCode)`, `requireUsableBranch(...)` and
+  `panel(companyId)`: the active insurers, each with its active branches.
+- `RateResolver`:
+  - `rate(RateCode, lineCode, date)`
+  - `commission(companyId, insurerCode, productCode, date)`: the product row first, then the insurer-wide row.
+  - `shortPeriodPercent(months, date)`
+  - `motorLimitPremium(coverage, limit, date)`
+- `RatingService.rate(RatingQuery)`: resolves the rates and rates the risk. Also over HTTP:
+  `POST /api/v1/catalog/rating/quote`.
+- `PremiumCalculator` is pure. It rounds DST to centavos and then up to the next 0.50. The
+  minimum premium does not apply to endorsements or pro-rata periods.
+- Endorsements: pass `endorsement = true` and
+  `PremiumRequest.Period.remainingTerm(basis, effective, expiry, shortPeriodPercent)`. The basis
+  is pro-rata days over the year that starts on the effective date, or the short-period table. A
+  negative sum insured gives a return premium, and the minimum premium does not apply.
+- `TsuRoutingService.evaluate(product, TsuFacts)` returns a `TsuDecision`. The product setting
+  ALWAYS / NEVER is checked first. A package above its TSI limit then gives `PACKAGE_TSI_LIMIT`.
+  Otherwise the first matching rule by priority applies.
+- `SalesOrganisationService.assignmentOf(companyId, username)` returns the region, department,
+  team and cost center.
+
+API: `/api/v1/catalog/**`. The endpoints are `lines`, `cover-types`, `products[/{code}]`,
+`field-rules`, `document-rules`, `tsu-rules`, `insurers[/{id}]` (with `/branches` and
+`/commissions`), `rates/taxes`, `rates/short-period`, `rates/motor-limits`,
+`sales-organisation[/assignment|/units|/officers]` and `rating/quote`. Read needs any of
+MASTER_VIEW, ACCOUNT_VIEW, QUOTE_VIEW or TSU_PROCESS. Maintain needs MASTER_MAINTAIN, and
+authorize needs MASTER_AUTHORIZE.
+
+Screens (sidebar **Products & Insurers**):
+
+- Products: list with filters, plus field, document and TSU rules tabs.
+- Product detail: features, field matrix and required documents.
+- Insurers: list, and a profile with branches / LGT and commission rates.
+- Rates & Taxes.
+- Sales Organisation.
+- Premium Calculator.
+
+## 10. Accounts (`account`, W2)
+
+An account (ARN `ARN-yyyy-nnnnnn`) is one client, one product and one or more risk items:
+
+- `VEHICLE`: plate, conduction sticker, engine and chassis numbers, stored in a normalised form for
+  duplicate checks.
+- `PROPERTY_LOCATION`: address, occupancy, construction, and the insured items inside.
+- `PERSON`
+- `GENERIC`
+
+Tables (V820):
+
+- `acc_account`: premium breakdown, FFY, contact, sales stamp, TSU clearance and lifecycle columns.
+- `acc_account_pn` and `acc_account_policy`
+- `acc_risk_item` and `acc_risk_item_detail`
+
+LOVs (V820): VEHICLE_BODY_TYPE, CONSTRUCTION_CLASS, OCCUPANCY, MORTGAGEE_BANK and
+FFY_CANCEL_REASON.
+
+The `acc_account.status` column mirrors the `NB_ACCOUNT` work case (`AccountStatusListener`), and
+every change publishes `AccountStatusChanged(accountId, arn, from, to, …)`.
+
+Rules:
+
+- **Draft**:
+  - The account is created by `AccountService.createDraft(NewAccount)`, for a confirmed client or a prospect.
+  - The product must be usable and allowed for the market segment.
+  - Direct payment, FFY and multi-year are accepted only when the product allows them.
+  - The account is priced on every save, stamped with the creator's sales units and cost center,
+    and given its work case.
+- **Duplicates** (`DuplicateCheckService`):
+  - A vehicle identifier or location key already on a live account (not closed or voided) is
+    refused with `DUPLICATE_ACCOUNT`, and the message names the existing ARN(s).
+  - Exception: CTPL may share a vehicle with a non-CTPL account.
+  - Endorsements get the findings back instead of an error.
+- **Submit / resubmit** (Marketing) require:
+  - every mandatory field of the matrix (`ACCOUNT_INCOMPLETE`, errors keyed by field path);
+  - every required document (`MISSING_DOCUMENTS`);
+  - a rated premium (`PREMIUM_NOT_RATED`).
+- **Validate** (Processing):
+  - The client must be confirmed.
+  - TSU must have cleared the account when a rule or the package limit requires it (`TSU_CLEARANCE_REQUIRED`).
+  - A direct-payment account then moves on with the system action `payment_confirmed`.
+- **Direct booking** requires an attached POLICY_COPY or EPOLICY.
+- **Tags** (`AccountTaggingService`): FFY tag or cancel with a reason, the payment arrangement
+  (`VIA_BDOI` or `DIRECT_TO_INSURER`, giving the `directPayment` flag), and look-up by vehicle.
+- **Bulk handlers**:
+  - `ACCOUNT_CREATE` takes the parameters product, segment and submit. It uses a client by code,
+    matches a client by name and birth date, or creates a new prospect.
+  - `ACCOUNT_UPDATE`
+  - `FFY_TAGGING`
+
+Contracts for other modules:
+
+- `AccountService.createDraft(NewAccount)`: for quotation and nonpackage. `NewAccount.direct()` is
+  for direct creation.
+- `AccountQueryService`, read-only:
+  - `get(id)` and `requireByArn(arn)`: with items and numbers loaded.
+  - `search(AccountSearch, Pageable)`
+  - `byClient(clientId)`
+  - `check(id)`
+  - `preBooked(companyId, reference)`: live, not yet booked accounts found by ARN, policy number or
+    PN number. This serves Cashiering CSHID.020 and Prod Recon PRCID.023.
+- `Account.isDirectPayment()`: the direct payment flag (BRNB.114).
+- `AccountLifecycleService`: placement, issuance and booking move the account through it. It takes
+  the ARN and runs a user transition when a user is signed in, otherwise a system transition.
+  - `markPaymentConfirmed`
+  - `recordPlacement`
+  - `recordInsurerReturn`
+  - `resubmitPlacement`
+  - `cancelPlacement`
+  - `reactivate`
+  - `recordHoldCover`
+  - `recordPolicy`
+  - `recordBooking`: validates the cost center.
+  - `recordCancellation`
+- `AccountClientRecords` implements the crm `ClientRecordsProvider`, which gives the accounts in
+  the client 360 view.
+
+API: `/api/v1/accounts`:
+
+- `GET` search, with text / pn / vehicle / location / product / line / insurer / status / ffy /
+  directPayment / officer / mine / includeVoided and the period.
+- `GET` `/{id}`, `/by-arn/{arn}` and `/{id}/check`.
+- `POST` create and `PUT /{id}`.
+- `POST /{id}/submit`, `/resubmit`, `/validate`, `/direct-booking` and `/tsu-clearance`.
+- `PUT /{id}/ffy` and `POST /{id}/ffy/cancel`.
+- `PUT /{id}/payment-arrangement`.
+
+Documents (`attachment`, V27):
+
+- Document type (list DOCUMENT_TYPE).
+- Multi-file upload: `POST /api/v1/attachments/batch`.
+- Names inherited, or nominated as `<REFERENCE>_<DOCTYPE>_<n>.<ext>`.
+- One file linked to several records (`POST /attachments/{id}/links`), and unlinking.
+- ZIP download of chosen files (`GET /attachments/zip?ids=`), up to 50 files.
+- MSG, EML and legacy Office types added.
+- `DocumentService.documentTypesOf(target)` feeds the document rules.
+
+Screens (sidebar **Accounts & Placement**):
+
+- Accounts: search panel, quick filters (My drafts, Returned to me, Awaiting payment, FFY, Direct
+  payment), status badges and ARN chips.
+- New Account: a six-step wizard with autosave every 30 seconds and a duplicate fall-out that links
+  to the existing ARN.
+- Account detail: header, `WorkflowPanel` with Submit / Resubmit / Validate / Direct booking, and
+  tabs Details / Risk items / Premium / Documents / E-mails / History.
+- FFY Register.
+- Direct Payment.
+- `/bulk/ACCOUNT_CREATE`: the bulk page with product, segment and submit parameters.
+- The shared `<Attachments>` component gains a document type choice, multi-file upload, selection
+  with ZIP download, and a linked-file marker. Its existing props are unchanged.

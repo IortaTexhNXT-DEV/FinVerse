@@ -35,6 +35,9 @@ public class Attachment extends BaseEntity {
   @Column(length = 200)
   private String description;
 
+  @Column(name = "document_type", length = 40)
+  private String documentType;
+
   @Column(nullable = false)
   private boolean deleted;
 
@@ -61,6 +64,15 @@ public class Attachment extends BaseEntity {
     this.sizeBytes = file.sizeBytes();
     this.sha256 = file.sha256();
     this.description = description;
+  }
+
+  /**
+   * Classifies the document (list of values DOCUMENT_TYPE, BRNB.026).
+   *
+   * @param type document type code, null when unclassified
+   */
+  public void classify(String type) {
+    this.documentType = type;
   }
 
   /**
@@ -101,6 +113,10 @@ public class Attachment extends BaseEntity {
 
   public String getDescription() {
     return description;
+  }
+
+  public String getDocumentType() {
+    return documentType;
   }
 
   public boolean isDeleted() {

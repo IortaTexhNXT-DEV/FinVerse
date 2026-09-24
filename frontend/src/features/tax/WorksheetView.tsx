@@ -78,7 +78,7 @@ export function WorksheetView({ kind, title, description, granularity }: Readonl
                 icon={<FilePlus2 size={16} />}
                 onClick={() => setCreating(true)}
               >
-                Create return
+                Create Return
               </Button>
             )}
           </>

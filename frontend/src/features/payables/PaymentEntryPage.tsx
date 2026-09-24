@@ -240,7 +240,7 @@ export default function PaymentEntryPage() {
             },
             {
               key: 'a',
-              header: 'Amount to pay',
+              header: 'Amount to Pay',
               render: (i) =>
                 selection[i.openItemId] !== undefined && (
                   <input
@@ -275,7 +275,7 @@ export default function PaymentEntryPage() {
           busy={save.isPending}
           onClick={() => save.mutate()}
         >
-          Save &amp; submit
+          Save &amp; Submit
         </Button>
       </div>
     </div>

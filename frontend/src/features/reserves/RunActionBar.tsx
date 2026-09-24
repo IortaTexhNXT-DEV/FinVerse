@@ -75,7 +75,7 @@ export function RunActionBar({ run }: Readonly<{ run: ValuationRun }>) {
             disabled={busy}
             onClick={() => step.mutate('submit')}
           >
-            Submit for approval
+            Submit for Approval
           </Button>
         )}
         {actions.approve && (
@@ -105,7 +105,7 @@ export function RunActionBar({ run }: Readonly<{ run: ValuationRun }>) {
             disabled={busy}
             onClick={() => step.mutate('post')}
           >
-            Post journals
+            Post Journals
           </Button>
         )}
         {actions.cancel && (

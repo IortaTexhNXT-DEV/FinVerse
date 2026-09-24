@@ -112,7 +112,7 @@ export default function PdcPage() {
                 })
               }
             >
-              Mark due as of date
+              Mark Due as of Date
             </Button>
           )
         }
@@ -141,10 +141,10 @@ export default function PdcPage() {
           rowKey={(p) => p.id}
           caption="Post-dated cheques"
           columns={[
-            { key: 'due', header: 'Due date', render: (p) => formatDate(p.chequeDate) },
-            { key: 'chq', header: 'Cheque no.', render: (p) => p.chequeNo },
+            { key: 'due', header: 'Due Date', render: (p) => formatDate(p.chequeDate) },
+            { key: 'chq', header: 'Cheque No.', render: (p) => p.chequeNo },
             { key: 'party', header: 'Customer', render: (p) => `${p.partyCode} ${p.payerName}` },
-            { key: 'drawee', header: 'Drawee bank', render: (p) => p.draweeBank },
+            { key: 'drawee', header: 'Drawee Bank', render: (p) => p.draweeBank },
             { key: 'bank', header: 'Deposit to', render: (p) => p.bankAccountCode },
             {
               key: 'amt',
@@ -152,7 +152,7 @@ export default function PdcPage() {
               numeric: true,
               render: (p) => <Amount value={p.amount} />,
             },
-            { key: 'no', header: 'PDC no.', render: (p) => p.pdcNo },
+            { key: 'no', header: 'PDC No.', render: (p) => p.pdcNo },
             { key: 'rcv', header: 'Received', render: (p) => formatDate(p.receivedDate) },
             { key: 'st', header: 'Status', render: (p) => <StatusBadge status={p.status} /> },
             {
@@ -189,7 +189,7 @@ export default function PdcPage() {
         />
       </Card>
       <Modal
-        title="Confirmation audit trail"
+        title="Confirmation Audit Trail"
         open={historyOf !== null}
         onClose={() => setHistoryOf(null)}
       >
@@ -228,7 +228,7 @@ export default function PdcPage() {
               })
             }
           >
-            Return to customer
+            Return to Customer
           </Button>
         }
       >

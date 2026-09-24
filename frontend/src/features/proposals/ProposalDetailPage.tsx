@@ -24,8 +24,8 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
-import { RecordSummary } from '@/features/quotations/RecordSummary';
-import type { Fact } from '@/features/quotations/RecordSummary';
+import { RecordSummary } from '@/components/broking/RecordSummary';
+import type { Fact } from '@/components/broking/RecordSummary';
 import { formatAmount, formatDate } from '@/utils/format';
 import { ProposalActions } from './ProposalActions';
 import {
@@ -157,12 +157,14 @@ export default function ProposalDetailPage() {
           <>
             <ReferenceChip label="ARN" value={p.arn} />
             <StatusBadge status={p.status} />
-            {p.tsuReason && (
-              <span className="badge warning" title={p.tsuReason}>
-                <ShieldCheck size={12} aria-hidden="true" /> TSU
-              </span>
-            )}
           </>
+        }
+        flags={
+          p.tsuReason && (
+            <span className="tag" title={p.tsuReason}>
+              <ShieldCheck size={12} aria-hidden="true" /> TSU
+            </span>
+          )
         }
         facts={facts(p)}
       />

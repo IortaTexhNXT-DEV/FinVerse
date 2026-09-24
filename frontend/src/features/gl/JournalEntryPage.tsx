@@ -59,7 +59,7 @@ function JournalForm({
               busy={save.isPending && mode === 'draft'}
               onClick={() => run('draft')}
             >
-              Save draft
+              Save Draft
             </Button>
             <Button
               variant="accent"
@@ -68,7 +68,7 @@ function JournalForm({
               disabled={!canSubmit}
               onClick={() => run('submit')}
             >
-              Save &amp; submit
+              Save &amp; Submit
             </Button>
           </>
         }

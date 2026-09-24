@@ -5,17 +5,6 @@
   box-shadow: var(--shadow-md);
 }
 
-.booking-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.booking-toolbar .input {
-  min-width: 240px;
-}
-
 .booking-select {
   width: 20px;
   height: 20px;

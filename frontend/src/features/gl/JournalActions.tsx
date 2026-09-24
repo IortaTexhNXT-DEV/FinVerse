@@ -91,7 +91,7 @@ export function JournalActions({ journal }: Readonly<{ journal: Journal }>) {
             Submit
           </Button>
           <Button variant="ghost" onClick={() => action.mutate(() => glApi.cancelJournal(id))}>
-            Cancel voucher
+            Cancel Voucher
           </Button>
         </>
       )}
@@ -103,7 +103,7 @@ export function JournalActions({ journal }: Readonly<{ journal: Journal }>) {
             busy={action.isPending}
             onClick={() => action.mutate(() => glApi.approveJournal(id))}
           >
-            Authorize &amp; post
+            Authorize &amp; Post
           </Button>
           <Button variant="danger" icon={<XCircle size={16} />} onClick={() => setDialog('reject')}>
             Reject

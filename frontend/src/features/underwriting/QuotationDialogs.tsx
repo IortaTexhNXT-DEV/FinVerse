@@ -33,12 +33,12 @@ export function IterateDialog({
   const [iteration, setIteration] = useState<IterationInput>(() => iterationDefaults(q));
   return (
     <Modal
-      title="New iteration"
+      title="New Iteration"
       open={open}
       onClose={onClose}
       footer={
         <Button variant="accent" busy={busy} onClick={() => onSave(iteration)}>
-          Save iteration
+          Save Iteration
         </Button>
       }
     >
@@ -78,7 +78,7 @@ export function ConvertDialog({ quotation: q, open, onClose }: Readonly<DialogPr
           busy={converter.isPending}
           onClick={() => converter.mutate(convert)}
         >
-          Create draft policy
+          Create Draft Policy
         </Button>
       }
     >

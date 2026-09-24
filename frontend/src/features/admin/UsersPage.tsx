@@ -94,7 +94,7 @@ export default function UsersPage() {
             icon={<Plus size={16} />}
             onClick={() => setEditing({ user: EMPTY, password: '' })}
           >
-            New user
+            New User
           </Button>
         }
       />
@@ -106,19 +106,19 @@ export default function UsersPage() {
           rowKey={(u) => u.id}
           onRowClick={edit}
           columns={[
-            { key: 'u', header: 'User name', render: (u) => <strong>{u.username}</strong> },
-            { key: 'n', header: 'Full name', render: (u) => u.fullName },
+            { key: 'u', header: 'User Name', render: (u) => <strong>{u.username}</strong> },
+            { key: 'n', header: 'Full Name', render: (u) => u.fullName },
             { key: 'r', header: 'Roles', render: (u) => u.roles.join(', ') },
             {
               key: 'l',
-              header: 'Authorization limit',
+              header: 'Authorization Limit',
               numeric: true,
               render: (u) =>
                 u.authorizationLimit === undefined
                   ? 'Unlimited'
                   : formatAmount(u.authorizationLimit),
             },
-            { key: 'll', header: 'Last login', render: (u) => formatDateTime(u.lastLoginAt) },
+            { key: 'll', header: 'Last Login', render: (u) => formatDateTime(u.lastLoginAt) },
             {
               key: 's',
               header: 'Status',

@@ -18,10 +18,10 @@ import { daysOverdue, statementLines, summarize } from './partyStatement';
 
 function columns(asOf: string): Column<OpenItem>[] {
   return [
-    { key: 'd', header: 'Doc date', render: (i) => formatDate(i.documentDate) },
+    { key: 'd', header: 'Doc Date', render: (i) => formatDate(i.documentDate) },
     { key: 't', header: 'Type', render: (i) => humanize(i.documentType) },
     { key: 'n', header: 'Document', render: (i) => <strong>{i.documentNo}</strong> },
-    { key: 'due', header: 'Due date', render: (i) => formatDate(i.dueDate) },
+    { key: 'due', header: 'Due Date', render: (i) => formatDate(i.dueDate) },
     { key: 'dr', header: 'Dr/Cr', render: (i) => (i.direction === 'DEBIT' ? 'Dr' : 'Cr') },
     { key: 'c', header: 'Currency', render: (i) => i.currency },
     { key: 'a', header: 'Amount', numeric: true, render: (i) => <Amount value={i.amount} /> },
@@ -39,11 +39,11 @@ function columns(asOf: string): Column<OpenItem>[] {
     },
     {
       key: 'od',
-      header: 'Days overdue',
+      header: 'Days Overdue',
       numeric: true,
       render: (i) => (i.outstanding === 0 ? '' : daysOverdue(i, asOf)),
     },
-    { key: 'j', header: 'GL batch', render: (i) => i.journalBatchNo ?? '' },
+    { key: 'j', header: 'GL Batch', render: (i) => i.journalBatchNo ?? '' },
     { key: 'st', header: 'Status', render: (i) => <StatusBadge status={i.status} /> },
   ];
 }

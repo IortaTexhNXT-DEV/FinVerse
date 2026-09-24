@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { FileBadge, FileText, Search, Send } from 'lucide-react';
+import { FileBadge, FileText, Send } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { issuanceApi } from '@/api/issuance';
@@ -7,6 +7,7 @@ import type { Advice, Outcome } from '@/api/issuance';
 import { useAuth } from '@/auth/authContext';
 import { ItemResultsDialog } from '@/components/broking/ItemResultsDialog';
 import { selectionColumn, useRowSelection } from '@/components/broking/rowSelection';
+import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { useFileDownload } from '@/components/broking/useFileDownload';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -33,7 +34,6 @@ export default function InsuranceAdvicePage() {
   const initial = params.get('ia') ?? '';
   const selection = useRowSelection();
   const download = useFileDownload();
-  const [text, setText] = useState(initial);
   const [search, setSearch] = useState(initial);
   const [page, setPage] = useState(0);
   const [sending, setSending] = useState(false);
@@ -68,30 +68,14 @@ export default function InsuranceAdvicePage() {
       />
       <ErrorAlert error={advices.error ?? download.error} />
       <Card flush>
-        <div className="work-toolbar">
-          <form
-            className="row"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setSearch(text.trim());
-              setPage(0);
-            }}
-          >
-            <label className="visually-hidden" htmlFor="ia-search">
-              Search IA number, ARN or client
-            </label>
-            <input
-              id="ia-search"
-              className="input"
-              placeholder="Search IA No., ARN or client"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            />
-            <Button type="submit" variant="secondary" icon={<Search size={16} />}>
-              Search
-            </Button>
-          </form>
-          <span className="spacer" />
+        <WorklistToolbar
+          placeholder="Search IA No., ARN or client"
+          initial={initial}
+          onSearch={(text) => {
+            setSearch(text);
+            setPage(0);
+          }}
+        >
           {canSend && (
             <Button
               variant="primary"
@@ -102,7 +86,7 @@ export default function InsuranceAdvicePage() {
               Send Selected
             </Button>
           )}
-        </div>
+        </WorklistToolbar>
         <DataTable<Advice>
           caption="Insurance Advices"
           loading={advices.isLoading}

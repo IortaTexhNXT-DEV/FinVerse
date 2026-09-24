@@ -112,7 +112,7 @@ export default function AccessRequestsPage() {
         actions={
           can('ACCESS_REQUEST') && (
             <Button variant="accent" icon={<UserCog size={16} />} onClick={() => setCreating(true)}>
-              New request
+              New Request
             </Button>
           )
         }

@@ -73,7 +73,7 @@ export default function AllocationPage() {
               busy={post.isPending}
               onClick={() => post.mutate()}
             >
-              Post allocation
+              Post Allocation
             </Button>
           )}
         </div>
@@ -110,7 +110,7 @@ export default function AllocationPage() {
               { key: 'c', header: 'Ccy', render: (r) => r.currency },
               {
                 key: 'p',
-                header: 'Our premium',
+                header: 'Our Premium',
                 numeric: true,
                 render: (r) => <Amount value={r.ourPremium} />,
               },

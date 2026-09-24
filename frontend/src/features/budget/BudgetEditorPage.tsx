@@ -60,7 +60,7 @@ function EditorActions({
       {isEditable(budget) && (
         <>
           <Button variant="secondary" icon={<Plus size={16} />} onClick={onAdd}>
-            Add line
+            Add Line
           </Button>
           <Button variant="accent" icon={<Save size={16} />} busy={saving} onClick={onSave}>
             Save

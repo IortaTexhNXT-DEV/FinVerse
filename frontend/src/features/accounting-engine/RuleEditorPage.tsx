@@ -75,7 +75,7 @@ function RuleEditor({ existing, initial }: Readonly<EditorProps>) {
                 busy={save.isPending}
                 onClick={submit}
               >
-                Save for authorization
+                Save for Authorization
               </Button>
             )}
           </>

@@ -94,7 +94,7 @@ export default function ProductsPage() {
               icon={<Plus size={16} />}
               onClick={() => setForm(blank(lookups.companyId))}
             >
-              New product
+              New Product
             </Button>
           )
         }
@@ -119,11 +119,11 @@ export default function ProductsPage() {
             },
             {
               key: 'f',
-              header: 'Policy fee',
+              header: 'Policy Fee',
               numeric: true,
               render: (p) => <Amount value={p.policyFee} />,
             },
-            { key: 'o', header: 'Open cover', render: (p) => (p.openCoverAllowed ? 'Yes' : '') },
+            { key: 'o', header: 'Open Cover', render: (p) => (p.openCoverAllowed ? 'Yes' : '') },
             { key: 's', header: 'Status', render: (p) => <StatusBadge status={p.recordStatus} /> },
             {
               key: 'a',
@@ -152,7 +152,7 @@ export default function ProductsPage() {
         onClose={() => setForm(null)}
         footer={
           <Button variant="accent" busy={save.isPending} onClick={() => form && save.mutate(form)}>
-            Save for authorization
+            Save for Authorization
           </Button>
         }
       >

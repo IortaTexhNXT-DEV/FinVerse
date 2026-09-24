@@ -178,10 +178,10 @@ export default function KycReviewsPage() {
             },
             {
               key: 'verified',
-              header: 'Last verified',
+              header: 'Last Verified',
               render: (c) => formatDateTime(c.kycVerifiedAt),
             },
-            { key: 'due', header: 'Review due', render: (c) => formatDate(c.kycReviewDue) },
+            { key: 'due', header: 'Review Due', render: (c) => formatDate(c.kycReviewDue) },
             { key: 'kyc', header: 'KYC', render: (c) => <StatusBadge status={c.kycStatus} /> },
           ]}
         />

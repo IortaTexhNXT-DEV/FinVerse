@@ -98,7 +98,7 @@ export default function TaxReturnsPage() {
             { key: 'd', header: 'Due', render: (r) => formatDate(r.dueDate) },
             {
               key: 't',
-              header: 'Tax due',
+              header: 'Tax Due',
               numeric: true,
               render: (r) => <Amount value={r.taxDue} />,
             },

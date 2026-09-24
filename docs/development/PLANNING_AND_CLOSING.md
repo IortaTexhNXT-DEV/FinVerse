@@ -100,7 +100,7 @@ demo data `V960`/`V961` plus the start-up runner `closing.demo.PlanningDemoData`
 
 ## Demo data
 
-FVS "BrokerVerse Demo Insurance (Singapore)" (USD) with a copy of the demo chart, FY2026 and monthly
+FVS "BDOI Demo Insurance Brokers (Singapore) Pte. Ltd." (USD, named in V989) with a copy of the demo chart, FY2026 and monthly
 journals; FVI owns 80 % (group `FVGRP`, investment 1506 vs capital 3100); management fees FVI → FVS
 March–August with one settlement (IC accounts 1607 / 2510); FVI FY2026 approved budget; FVI FX
 revaluations July and August with auto-reversal; a consolidation run as of 31 August 2026.

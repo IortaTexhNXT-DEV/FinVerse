@@ -45,7 +45,7 @@ export default function InsurersPage() {
         actions={
           can('MASTER_MAINTAIN') && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => setCreating(true)}>
-              New insurer
+              New Insurer
             </Button>
           )
         }
@@ -61,10 +61,10 @@ export default function InsurersPage() {
           columns={[
             { key: 'c', header: 'Code', render: (i) => <strong>{i.partyCode}</strong> },
             { key: 'n', header: 'Name', render: (i) => i.name },
-            { key: 'a', header: 'Accredited until', render: accreditation },
+            { key: 'a', header: 'Accredited Until', render: accreditation },
             { key: 'p', header: 'Placement', render: (i) => humanize(i.placementChannel) },
             { key: 'e', header: 'Placement e-mails', render: (i) => i.placementEmails.join(', ') },
-            { key: 'd', header: 'Credit days', numeric: true, render: (i) => i.defaultCreditDays },
+            { key: 'd', header: 'Credit Days', numeric: true, render: (i) => i.defaultCreditDays },
             { key: 's', header: 'Status', render: (i) => <StatusBadge status={i.recordStatus} /> },
             {
               key: 'x',

@@ -77,7 +77,7 @@ export function TemplateDialog({
           disabled={problems.length > 0}
           onClick={() => form && save.mutate(form)}
         >
-          Save template
+          Save Template
         </Button>
       }
     >
@@ -117,7 +117,7 @@ export function RunDialog({
           busy={run.isPending}
           onClick={() => template && run.mutate(template)}
         >
-          Generate due journals
+          Generate Due Journals
         </Button>
       }
     >

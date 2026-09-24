@@ -129,7 +129,7 @@ export default function PdcIssuedPage() {
             busy={due.isPending}
             onClick={() => due.mutate()}
           >
-            Mark due cheques
+            Mark Due Cheques
           </Button>
         }
       />
@@ -150,7 +150,7 @@ export default function PdcIssuedPage() {
           onRowClick={(p) => setHistory(p)}
           columns={[
             { key: 'q', header: 'Cheque', render: (p) => <strong>{p.chequeNo}</strong> },
-            { key: 'd', header: 'Cheque date', render: (p) => formatDate(p.chequeDate) },
+            { key: 'd', header: 'Cheque Date', render: (p) => formatDate(p.chequeDate) },
             {
               key: 'n',
               header: 'Days',

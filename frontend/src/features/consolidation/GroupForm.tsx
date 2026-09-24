@@ -76,7 +76,7 @@ export function GroupForm({ open, onClose, companies, parentCompanyId }: Readonl
 
   return (
     <Modal
-      title="New consolidation group"
+      title="New Consolidation Group"
       open={open}
       onClose={onClose}
       footer={
@@ -86,7 +86,7 @@ export function GroupForm({ open, onClose, companies, parentCompanyId }: Readonl
           disabled={form.code === '' || form.name === ''}
           onClick={() => create.mutate()}
         >
-          Create group
+          Create Group
         </Button>
       }
     >
@@ -204,7 +204,7 @@ export function GroupForm({ open, onClose, companies, parentCompanyId }: Readonl
           ])
         }
       >
-        Add subsidiary
+        Add Subsidiary
       </Button>
     </Modal>
   );

@@ -116,7 +116,7 @@ export default function OpenCoverDetailPage() {
                   setDeclaration({ issueDate: today(), transitDays: 60, shipment: emptyRisk() })
                 }
               >
-                Declare shipment
+                Declare Shipment
               </Button>
             )}
           </>
@@ -149,13 +149,13 @@ export default function OpenCoverDetailPage() {
             { key: 'sail', header: 'Sailing', render: (p) => formatDate(p.periodFrom) },
             {
               key: 'si',
-              header: 'Sum insured',
+              header: 'Sum Insured',
               numeric: true,
               render: (p) => <Amount value={p.premium.sumInsured} />,
             },
             {
               key: 'net',
-              header: 'Net premium',
+              header: 'Net Premium',
               numeric: true,
               render: (p) => <Amount value={p.premium.ourNetPremium} />,
             },
@@ -197,7 +197,7 @@ export default function OpenCoverDetailPage() {
             busy={declare.isPending}
             onClick={() => declaration && declare.mutate(declaration)}
           >
-            Create certificate
+            Create Certificate
           </Button>
         }
       >

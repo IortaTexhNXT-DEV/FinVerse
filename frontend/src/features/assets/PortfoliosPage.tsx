@@ -73,7 +73,7 @@ export default function PortfoliosPage() {
               icon={<Plus size={16} />}
               onClick={() => setForm({ classification: 'AMORTIZED_COST' })}
             >
-              New portfolio
+              New Portfolio
             </Button>
           )
         }
@@ -89,10 +89,10 @@ export default function PortfoliosPage() {
             { key: 'n', header: 'Name', render: (p) => p.name },
             { key: 'k', header: 'Classification', render: (p) => humanize(p.classification) },
             { key: 'i', header: 'Investment', render: (p) => p.investmentAccount },
-            { key: 'a', header: 'Accrued int.', render: (p) => p.accruedInterestAccount },
+            { key: 'a', header: 'Accrued Int.', render: (p) => p.accruedInterestAccount },
             { key: 'y', header: 'Income', render: (p) => p.interestIncomeAccount },
             { key: 'g', header: 'Realized', render: (p) => p.realizedGainAccount },
-            { key: 'f', header: 'Fair value', render: (p) => p.fairValueAccount ?? '' },
+            { key: 'f', header: 'Fair Value', render: (p) => p.fairValueAccount ?? '' },
             { key: 's', header: 'Status', render: (p) => <StatusBadge status={p.recordStatus} /> },
             {
               key: 'x',
@@ -121,7 +121,7 @@ export default function PortfoliosPage() {
         onClose={() => setForm(null)}
         footer={
           <Button variant="accent" busy={save.isPending} onClick={() => form && save.mutate(form)}>
-            Save for authorization
+            Save for Authorization
           </Button>
         }
       >

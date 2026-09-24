@@ -11,9 +11,17 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { Tabs } from '@/components/ui/Tabs';
+import { WorkTiles } from '@/components/broking/WorkTiles';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { handedArns, rowLink, selectedArns, withHanded, WORKBENCH_TABS } from './bookingForm';
+import {
+  handedArns,
+  rowLink,
+  selectedArns,
+  withHanded,
+  WORKBENCH_TABS,
+  workbenchTabOf,
+} from './bookingForm';
 import { BookingDateDialog, ConfirmDialog, QueueEditDialog } from './WorkbenchDialogs';
 import { WorkbenchFilters } from './WorkbenchFilters';
 import { WorkbenchTable } from './WorkbenchTable';
@@ -22,12 +30,13 @@ import type { WorkbenchDialog } from './WorkbenchToolbar';
 import './booking.css';
 
 const TILES: readonly { tab: WorkbenchTab; label: string; count: keyof WorkbenchCounts }[] = [
-  { tab: 'READY', label: 'Ready to book', count: 'readyToBook' },
-  { tab: 'QUEUED', label: 'Queued for batch', count: 'queued' },
-  { tab: 'BOOKED', label: 'Booked today', count: 'bookedToday' },
+  { tab: 'READY', label: 'Ready to Book', count: 'readyToBook' },
+  { tab: 'QUEUED', label: 'Queued for Batch', count: 'queued' },
+  { tab: 'BOOKED', label: 'Booked Today', count: 'bookedToday' },
   { tab: 'FAILED', label: 'Failed', count: 'failed' },
 ];
 
+/** Headline counts of the workbench (the shared work tiles of Placement and Issuance). */
 function Tiles({
   counts,
   active,
@@ -38,29 +47,17 @@ function Tiles({
   onChoose: (tab: WorkbenchTab) => void;
 }>) {
   return (
-    <div className="grid-4 booking-tiles">
-      {TILES.map((t) => {
-        const classes = ['kpi', 'kpi-button'];
-        if (t.tab === 'FAILED') {
-          classes.push('kpi-alert');
-        }
-        if (t.tab === active) {
-          classes.push('active');
-        }
-        return (
-          <button
-            key={t.tab}
-            type="button"
-            className={classes.join(' ')}
-            aria-pressed={t.tab === active}
-            onClick={() => onChoose(t.tab)}
-          >
-            <span className="kpi-label">{t.label}</span>
-            <span className="kpi-value">{counts?.[t.count] ?? '–'}</span>
-          </button>
-        );
-      })}
-    </div>
+    <WorkTiles
+      label="Booking status"
+      tiles={TILES.map((t) => ({
+        key: t.tab,
+        label: t.label,
+        value: counts?.[t.count] ?? 0,
+        active: t.tab === active,
+        alert: t.tab === 'FAILED',
+        onClick: () => onChoose(t.tab),
+      }))}
+    />
   );
 }
 
@@ -198,7 +195,8 @@ export default function BookingWorkbenchPage() {
   const navigate = useNavigate();
   const hand = useHanded(companyId);
   const handed = hand.arns;
-  const [tab, setTab] = useState<WorkbenchTab>('READY');
+  const [searchParams] = useSearchParams();
+  const [tab, setTab] = useState<WorkbenchTab>(() => workbenchTabOf(searchParams.get('tab')));
   const [query, setQuery] = useState('');
   const [line, setLine] = useState('');
   const [page, setPage] = useState(0);
@@ -256,8 +254,8 @@ export default function BookingWorkbenchPage() {
         />
       )}
       <Tiles counts={counts.data} active={tab} onChoose={choose} />
-      <Card>
-        <div className="stack">
+      <Card flush>
+        <div>
           <Tabs tabs={WORKBENCH_TABS} active={tab} onChange={choose} />
           <WorkbenchToolbar
             tab={tab}

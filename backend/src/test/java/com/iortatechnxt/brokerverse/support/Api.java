@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.support;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -39,6 +40,10 @@ public class Api {
 
   public ResultActions doPut(String username, String url, Object body) throws Exception {
     return mvc.perform(withBody(as(username, put(url)), body));
+  }
+
+  public ResultActions doDelete(String username, String url) throws Exception {
+    return mvc.perform(as(username, delete(url)));
   }
 
   public JsonNode read(ResultActions result) throws Exception {

@@ -12,16 +12,18 @@ export function mayOpen(
 }
 
 /**
- * Landing page for a user who may not open the dashboard: My Work when allowed (the broking roles'
- * inbox), otherwise the first menu screen in sidebar order the user may open.
+ * Landing page for a user who may not open the finance dashboard: the New Business dashboard of the
+ * broking roles (BRNB.012), else My Work, otherwise the first menu screen in sidebar order the user
+ * may open.
  */
 export function landingPath(
   screens: readonly ScreenDef[],
   can: (permission: string) => boolean,
-  preferred: readonly string[] = ['/my-work'],
+  preferred: readonly string[] = ['/nb/dashboard', '/my-work'],
 ): string | undefined {
   const menu = screens.filter(
     (s) => s.hidden !== true && !s.path.includes(':') && s.path !== '/' && mayOpen(s, can),
   );
-  return (menu.find((s) => preferred.includes(s.path)) ?? menu[0])?.path;
+  const first = preferred.map((p) => menu.find((s) => s.path === p)).find((s) => s !== undefined);
+  return (first ?? menu[0])?.path;
 }

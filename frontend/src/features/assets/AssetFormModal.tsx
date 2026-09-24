@@ -63,7 +63,7 @@ export function AssetFormModal({ initial, onClose }: Readonly<Props>) {
       onClose={onClose}
       footer={
         <Button variant="accent" busy={save.isPending} onClick={submit}>
-          Save for capitalization
+          Save for Capitalization
         </Button>
       }
     >

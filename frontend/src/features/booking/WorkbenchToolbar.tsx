@@ -1,6 +1,6 @@
-import { CalendarCheck, ListPlus, Search, SlidersHorizontal, XCircle } from 'lucide-react';
-import { useState } from 'react';
+import { CalendarCheck, ListPlus, XCircle } from 'lucide-react';
 import type { WorkbenchTab } from '@/api/booking';
+import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Button } from '@/components/ui/Button';
 import { actionsOf } from './bookingForm';
 
@@ -82,39 +82,8 @@ export function WorkbenchToolbar({
   onEnqueue,
   onDialog,
 }: Readonly<Props>) {
-  const [text, setText] = useState('');
   return (
-    <div className="booking-toolbar">
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          onSearch(text.trim());
-        }}
-      >
-        <label className="visually-hidden" htmlFor="booking-search">
-          Search Proposal No.
-        </label>
-        <input
-          id="booking-search"
-          className="input"
-          placeholder="Search Proposal No."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-        <Button type="submit" variant="secondary" icon={<Search size={14} />}>
-          Search
-        </Button>
-      </form>
-      <Button
-        variant="ghost"
-        icon={<SlidersHorizontal size={14} />}
-        aria-expanded={filtersOpen}
-        onClick={onToggleFilters}
-      >
-        Filters
-      </Button>
-      <div className="spacer" />
+    <WorklistToolbar onSearch={onSearch} filters={{ open: filtersOpen, onToggle: onToggleFilters }}>
       {canProcess && (
         <BulkButtons
           tab={tab}
@@ -124,6 +93,6 @@ export function WorkbenchToolbar({
           onDialog={onDialog}
         />
       )}
-    </div>
+    </WorklistToolbar>
   );
 }

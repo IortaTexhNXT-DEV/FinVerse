@@ -77,7 +77,7 @@ function ChangePassword() {
             disabled={form.current === '' || problems.length > 0}
             onClick={() => change.mutate(form)}
           >
-            Change password
+            Change Password
           </Button>
         </div>
       </div>

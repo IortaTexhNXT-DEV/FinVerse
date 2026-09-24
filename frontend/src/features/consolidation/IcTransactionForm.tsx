@@ -139,7 +139,7 @@ export function IcTransactionForm({ companies, companyId }: Readonly<Props>) {
           }
           onClick={() => post.mutate()}
         >
-          Post mirror journals
+          Post Mirror Journals
         </Button>
       </div>
     </div>

@@ -12,6 +12,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId, useWorkspace } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
@@ -47,7 +48,7 @@ export default function JournalsPage() {
               icon={<Plus size={16} />}
               onClick={() => void navigate('/gl/journals/new')}
             >
-              New journal
+              New Journal
             </Button>
           )
         }
@@ -123,8 +124,8 @@ export default function JournalsPage() {
           onRowClick={(j) => void navigate(`/gl/journals/${j.id}`)}
           caption="Journals"
           columns={[
-            { key: 'no', header: 'Batch no.', render: (j) => <strong>{j.batchNo}</strong> },
-            { key: 'date', header: 'Value date', render: (j) => formatDate(j.valueDate) },
+            { key: 'no', header: 'Batch No.', render: (j) => <strong>{j.batchNo}</strong> },
+            { key: 'date', header: 'Value Date', render: (j) => formatDate(j.valueDate) },
             { key: 'type', header: 'Type', render: (j) => j.journalType },
             { key: 'nar', header: 'Narration', render: (j) => j.narration },
             { key: 'by', header: 'Inputter', render: (j) => j.createdBy },
@@ -138,30 +139,7 @@ export default function JournalsPage() {
             { key: 'st', header: 'Status', render: (j) => <StatusBadge status={j.status} /> },
           ]}
         />
-        {data !== undefined && data.totalPages > 1 && (
-          <div className="pagination">
-            <span className="muted">
-              Page {data.page + 1} of {data.totalPages} · {data.totalElements} journals
-            </span>
-            <div className="spacer" />
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={data.page === 0}
-              onClick={() => setFilters((f) => ({ ...f, page: data.page - 1 }))}
-            >
-              Previous
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={data.page + 1 >= data.totalPages}
-              onClick={() => setFilters((f) => ({ ...f, page: data.page + 1 }))}
-            >
-              Next
-            </Button>
-          </div>
-        )}
+        <PageFooter data={data} onPage={(p) => setFilters((f) => ({ ...f, page: p }))} />
       </Card>
     </div>
   );

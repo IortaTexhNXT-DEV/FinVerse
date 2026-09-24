@@ -58,8 +58,8 @@ export default function EventTypesPage() {
             { key: 'c', header: 'Code', render: (t) => <strong>{t.code}</strong> },
             { key: 'n', header: 'Name', render: (t) => t.name },
             { key: 'cat', header: 'Category', render: (t) => humanize(t.category) },
-            { key: 'j', header: 'Journal type', render: (t) => humanize(t.journalType) },
-            { key: 'comp', header: 'Amount components', render: (t) => components(t).join(', ') },
+            { key: 'j', header: 'Journal Type', render: (t) => humanize(t.journalType) },
+            { key: 'comp', header: 'Amount Components', render: (t) => components(t).join(', ') },
             {
               key: 'r',
               header: 'Rules',

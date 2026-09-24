@@ -141,7 +141,7 @@ function ProductList() {
           { key: 'r', header: 'Rate %', numeric: true, render: (p) => p.defaultRate ?? '' },
           {
             key: 'm',
-            header: 'Min. premium',
+            header: 'Min. Premium',
             numeric: true,
             render: (p) => <Amount value={p.minimumPremium} />,
           },
@@ -180,7 +180,7 @@ export default function ProductsPage() {
               icon={<Plus size={16} />}
               onClick={() => setEditing(newProductForm())}
             >
-              New product
+              New Product
             </Button>
           )
         }

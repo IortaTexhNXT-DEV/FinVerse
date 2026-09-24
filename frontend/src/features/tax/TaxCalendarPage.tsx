@@ -91,7 +91,7 @@ export default function TaxCalendarPage() {
             { key: 'n', header: 'Return', render: (e) => e.formName },
             { key: 'a', header: 'Authority', render: (e) => e.authority },
             { key: 'p', header: 'Period', render: (e) => e.periodLabel },
-            { key: 'd', header: 'Due date', render: (e) => formatDate(e.dueDate) },
+            { key: 'd', header: 'Due Date', render: (e) => formatDate(e.dueDate) },
             {
               key: 'b',
               header: 'Due',
@@ -102,7 +102,7 @@ export default function TaxCalendarPage() {
             },
             {
               key: 's',
-              header: 'Return status',
+              header: 'Return Status',
               render: (e) =>
                 e.returnStatus === 'NOT_PREPARED' ? (
                   <span className="muted">{humanize(e.returnStatus)}</span>
@@ -110,7 +110,7 @@ export default function TaxCalendarPage() {
                   <StatusBadge status={e.returnStatus} />
                 ),
             },
-            { key: 'r', header: 'Return no.', render: (e) => e.returnNo ?? '' },
+            { key: 'r', header: 'Return No.', render: (e) => e.returnNo ?? '' },
             {
               key: 'x',
               header: 'Actions',

@@ -104,7 +104,7 @@ export default function Certificates2307Page() {
               busy={generate.isPending}
               onClick={() => generate.mutate()}
             >
-              Generate batch
+              Generate Batch
             </Button>
           )}
         </div>
@@ -126,7 +126,7 @@ export default function Certificates2307Page() {
             { key: 'c', header: 'Certificates', numeric: true, render: (b) => b.certificateCount },
             {
               key: 't',
-              header: 'Tax withheld',
+              header: 'Tax Withheld',
               numeric: true,
               render: (b) => <Amount value={b.totalTax} />,
             },
@@ -171,7 +171,7 @@ export default function Certificates2307Page() {
             },
             {
               key: 't',
-              header: 'Tax withheld',
+              header: 'Tax Withheld',
               numeric: true,
               render: (c) => <Amount value={c.totalTax} />,
             },

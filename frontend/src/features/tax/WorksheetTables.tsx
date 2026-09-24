@@ -37,7 +37,7 @@ export function WorksheetTables({
             { key: 'd', header: 'Description', render: (l) => l.description },
             {
               key: 'b',
-              header: 'Tax base',
+              header: 'Tax Base',
               numeric: true,
               render: (l) => <Amount value={l.base} />,
             },
@@ -58,7 +58,7 @@ export function WorksheetTables({
           emptyMessage="No tax code configured for this worksheet."
           columns={[
             { key: 'd', header: 'Reconciled', render: (c) => c.description },
-            { key: 'a', header: 'GL account', render: (c) => c.accountCode },
+            { key: 'a', header: 'GL Account', render: (c) => c.accountCode },
             {
               key: 'p',
               header: 'Documents',

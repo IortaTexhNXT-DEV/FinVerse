@@ -84,7 +84,7 @@ export default function OpenCoversPage() {
               icon={<Plus size={16} />}
               onClick={() => setForm(blank(companyId, defaultBranch))}
             >
-              New open cover
+              New Open Cover
             </Button>
           )
         }
@@ -98,7 +98,7 @@ export default function OpenCoversPage() {
           onRowClick={(c) => void navigate(`/underwriting/open-covers/${String(c.id)}`)}
           caption="Open covers"
           columns={[
-            { key: 'no', header: 'Open cover', render: (c) => <strong>{c.openCoverNo}</strong> },
+            { key: 'no', header: 'Open Cover', render: (c) => <strong>{c.openCoverNo}</strong> },
             { key: 'ins', header: 'Insured', render: (c) => c.insuredName },
             {
               key: 'per',
@@ -108,13 +108,13 @@ export default function OpenCoversPage() {
             { key: 'ccy', header: 'Ccy', render: (c) => c.currency },
             {
               key: 'lim',
-              header: 'Per shipment',
+              header: 'Per Shipment',
               numeric: true,
               render: (c) => <Amount value={c.limitPerShipment} />,
             },
             {
               key: 'ann',
-              header: 'Annual limit',
+              header: 'Annual Limit',
               numeric: true,
               render: (c) => <Amount value={c.annualLimit} />,
             },
@@ -142,7 +142,7 @@ export default function OpenCoversPage() {
         />
       </Card>
       <Modal
-        title="New open cover"
+        title="New Open Cover"
         open={form !== null}
         onClose={() => setForm(null)}
         footer={
@@ -151,7 +151,7 @@ export default function OpenCoversPage() {
             busy={create.isPending}
             onClick={() => form && create.mutate(form)}
           >
-            Save for authorization
+            Save for Authorization
           </Button>
         }
       >

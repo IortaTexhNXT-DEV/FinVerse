@@ -138,7 +138,7 @@ export default function PaymentVouchersPage() {
               icon={<Plus size={16} />}
               onClick={() => void navigate('/payables/vouchers/new')}
             >
-              New payment
+              New Payment
             </Button>
           )
         }

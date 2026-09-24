@@ -93,7 +93,7 @@ export default function QuotationDetailPage() {
             { key: 'no', header: '#', render: (it) => it.iterationNo },
             {
               key: 'si',
-              header: 'Sum insured',
+              header: 'Sum Insured',
               numeric: true,
               render: (it) => <Amount value={it.sumInsured} />,
             },
@@ -123,7 +123,7 @@ export default function QuotationDetailPage() {
             },
             {
               key: 'our',
-              header: 'Our net',
+              header: 'Our Net',
               numeric: true,
               render: (it) => <Amount value={it.ourNetPremium} />,
             },

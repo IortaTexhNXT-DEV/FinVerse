@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Pager as SharedPager } from '@/components/ui/Pager';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -35,28 +36,7 @@ function Pager({
   total,
   onPage,
 }: Readonly<{ page: number; totalPages: number; total: number; onPage: (p: number) => void }>) {
-  if (totalPages <= 1) {
-    return null;
-  }
-  return (
-    <div className="pagination">
-      <span className="muted">
-        Page {page + 1} of {totalPages} · {total} claims
-      </span>
-      <div className="spacer" />
-      <Button size="sm" variant="secondary" disabled={page === 0} onClick={() => onPage(page - 1)}>
-        Previous
-      </Button>
-      <Button
-        size="sm"
-        variant="secondary"
-        disabled={page + 1 >= totalPages}
-        onClick={() => onPage(page + 1)}
-      >
-        Next
-      </Button>
-    </div>
-  );
+  return <SharedPager page={page} totalPages={totalPages} total={total} onPage={onPage} />;
 }
 
 /** Claim register: search by status, class, number / insured and loss date; open to handle one. */
@@ -88,7 +68,7 @@ export default function ClaimsPage() {
               icon={<Plus size={16} />}
               onClick={() => void navigate('/claims/new')}
             >
-              Notify claim
+              Notify Claim
             </Button>
           )
         }
@@ -131,11 +111,11 @@ export default function ClaimsPage() {
           onRowClick={(c) => void navigate(`/claims/${String(c.id)}`)}
           caption="Claims"
           columns={[
-            { key: 'no', header: 'Claim no.', render: (c) => <strong>{c.claimNo}</strong> },
+            { key: 'no', header: 'Claim No.', render: (c) => <strong>{c.claimNo}</strong> },
             { key: 'pol', header: 'Policy', render: (c) => c.policyNo },
             { key: 'ins', header: 'Insured', render: (c) => c.insuredName },
             { key: 'lob', header: 'Class', render: (c) => c.businessLine },
-            { key: 'loss', header: 'Loss date', render: (c) => formatDate(c.lossDate) },
+            { key: 'loss', header: 'Loss Date', render: (c) => formatDate(c.lossDate) },
             { key: 'nat', header: 'Nature', render: (c) => c.natureOfLoss },
             { key: 'ccy', header: 'Ccy', render: (c) => c.currency },
             {

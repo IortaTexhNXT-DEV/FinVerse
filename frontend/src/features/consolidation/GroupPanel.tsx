@@ -63,7 +63,7 @@ export function GroupPanel(props: Readonly<Props>) {
             onClick={props.onRun}
             style={{ alignSelf: 'end' }}
           >
-            Run consolidation
+            Run Consolidation
           </Button>
         )}
       </div>

@@ -64,7 +64,7 @@ export default function RulesPage() {
               icon={<Plus size={16} />}
               onClick={() => void navigate('/accounting/rules/new')}
             >
-              New rule
+              New Rule
             </Button>
           )
         }
@@ -99,7 +99,7 @@ export default function RulesPage() {
           caption="Accounting rules"
           onRowClick={(r) => void navigate(`/accounting/rules/${r.id}`)}
           columns={[
-            { key: 'e', header: 'Event type', render: (r) => <strong>{r.eventType}</strong> },
+            { key: 'e', header: 'Event Type', render: (r) => <strong>{r.eventType}</strong> },
             { key: 'n', header: 'Rule', render: (r) => r.name },
             { key: 'c', header: 'Conditions', render: conditions },
             { key: 'p', header: 'Priority', numeric: true, render: (r) => r.priority },

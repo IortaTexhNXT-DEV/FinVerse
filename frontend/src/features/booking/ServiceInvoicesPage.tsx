@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { Search } from 'lucide-react';
 import { useState } from 'react';
 import { bookingApi } from '@/api/booking';
 import type { SiKind } from '@/api/booking';
-import { Button } from '@/components/ui/Button';
+import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -28,7 +27,6 @@ const KIND_TABS: readonly { id: KindTab; label: string }[] = [
 export default function ServiceInvoicesPage() {
   const companyId = useCompanyId();
   const [kind, setKind] = useState<KindTab>('ALL');
-  const [text, setText] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(0);
   const rows = useQuery({
@@ -55,28 +53,13 @@ export default function ServiceInvoicesPage() {
               setPage(0);
             }}
           />
-          <form
-            className="booking-toolbar"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setQuery(text.trim());
+          <WorklistToolbar
+            placeholder="Search Service Invoice No., invoice, ARN or recipient"
+            onSearch={(text) => {
+              setQuery(text);
               setPage(0);
             }}
-          >
-            <label className="visually-hidden" htmlFor="si-search">
-              Search Service Invoice No.
-            </label>
-            <input
-              id="si-search"
-              className="input"
-              placeholder="Search Service Invoice No., invoice, ARN or recipient"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            />
-            <Button type="submit" variant="secondary" icon={<Search size={14} />}>
-              Search
-            </Button>
-          </form>
+          />
           <ServiceInvoiceTable rows={rows.data?.content ?? []} loading={rows.isLoading} />
           <PageFooter data={rows.data} noun="service invoices" onPage={setPage} />
         </div>

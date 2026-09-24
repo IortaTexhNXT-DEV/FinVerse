@@ -71,12 +71,12 @@ function ResultTables({ result }: Readonly<{ result: UploadResult }>) {
           rows={result.vouchers}
           rowKey={(v) => v.voucherKey}
           columns={[
-            { key: 'k', header: 'Voucher key', render: (v) => <strong>{v.voucherKey}</strong> },
-            { key: 'r', header: 'First row', numeric: true, render: (v) => v.firstRow },
+            { key: 'k', header: 'Voucher Key', render: (v) => <strong>{v.voucherKey}</strong> },
+            { key: 'r', header: 'First Row', numeric: true, render: (v) => v.firstRow },
             { key: 'l', header: 'Lines', numeric: true, render: (v) => v.lineCount },
             {
               key: 'd',
-              header: 'Total debit',
+              header: 'Total Debit',
               numeric: true,
               render: (v) => <Amount value={v.totalDebit} />,
             },
@@ -102,7 +102,7 @@ function ResultTables({ result }: Readonly<{ result: UploadResult }>) {
           emptyMessage="Every row passed the row-level checks."
           columns={[
             { key: 'n', header: 'Row', numeric: true, render: (r) => r.rowNumber },
-            { key: 'k', header: 'Voucher key', render: (r) => r.voucherKey },
+            { key: 'k', header: 'Voucher Key', render: (r) => r.voucherKey },
             { key: 'm', header: 'Errors', render: (r) => r.messages.join('; ') },
           ]}
         />
@@ -162,14 +162,14 @@ export default function JournalUploadPage() {
               icon={<Download size={16} />}
               onClick={() => template.mutate('csv')}
             >
-              CSV template
+              CSV Template
             </Button>
             <Button
               variant="secondary"
               icon={<Download size={16} />}
               onClick={() => template.mutate('xlsx')}
             >
-              Excel template
+              Excel Template
             </Button>
           </>
         }
@@ -214,7 +214,7 @@ export default function JournalUploadPage() {
               busy={upload.isPending && upload.variables.mode === 'IMPORT'}
               onClick={() => file && upload.mutate({ mode: 'IMPORT', selected: file })}
             >
-              Import valid vouchers
+              Import Valid Vouchers
             </Button>
           </div>
         </div>

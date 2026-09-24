@@ -51,6 +51,12 @@ function ValueActions({
   );
 }
 
+const IN_FORCE: Record<ReturnType<typeof effectivity>, string> = {
+  FUTURE: 'From a future date',
+  ACTIVE: 'In force',
+  EXPIRED: 'Ended',
+};
+
 const period = (v: LovValue) =>
   `${formatDate(v.effectiveFrom)} – ${v.effectiveTo === undefined ? 'open' : formatDate(v.effectiveTo)}`;
 
@@ -63,18 +69,32 @@ export function LovValuesTable({
   onAction,
 }: Readonly<LovValuesTableProps>) {
   const now = today();
+  // Effectivity is a flag of the value, shown as a chip apart from its status pill (BDO).
   const columns: Column<LovValue>[] = [
     { key: 'code', header: 'Code', render: (v) => <span className="mono">{v.code}</span> },
     { key: 'label', header: 'Label', render: (v) => v.label },
     { key: 'order', header: 'Order', numeric: true, render: (v) => v.sortOrder },
     { key: 'parent', header: 'Parent', render: (v) => v.parentCode ?? '' },
-    { key: 'eff', header: 'Effective', render: period },
-    { key: 'in', header: 'In force', render: (v) => <StatusBadge status={effectivity(v, now)} /> },
+    {
+      key: 'eff',
+      header: 'Effective',
+      render: (v) => (
+        <span className="cell-stack">
+          {period(v)}
+          <span className="tag">{IN_FORCE[effectivity(v, now)]}</span>
+        </span>
+      ),
+    },
     { key: 'status', header: 'Status', render: (v) => <StatusBadge status={v.status} /> },
     {
       key: 'mc',
-      header: 'Maker / checker',
-      render: (v) => `${v.maker ?? '—'} / ${v.authorizedBy ?? '—'}`,
+      header: 'Maker / Checker',
+      render: (v) => (
+        <span className="cell-stack">
+          <span>{v.maker ?? '—'}</span>
+          <span className="muted">{v.authorizedBy ?? '—'}</span>
+        </span>
+      ),
     },
     {
       key: 'actions',
@@ -89,7 +109,7 @@ export function LovValuesTable({
       loading={loading}
       rows={values}
       rowKey={(v) => v.id}
-      emptyMessage="No values in this list yet."
+      emptyMessage="No items to display"
       columns={columns}
     />
   );

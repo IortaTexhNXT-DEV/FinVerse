@@ -122,7 +122,7 @@ export function RiskEditor({ risks, marine, single = false, onChange }: Readonly
             icon={<Plus size={16} />}
             onClick={() => onChange([...risks, emptyRisk()])}
           >
-            Add risk
+            Add Risk
           </Button>
         )}
         <div className="spacer" />

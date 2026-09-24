@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Pager as SharedPager } from '@/components/ui/Pager';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -30,28 +31,7 @@ function Pager({
   total,
   onPage,
 }: Readonly<{ page: number; totalPages: number; total: number; onPage: (p: number) => void }>) {
-  if (totalPages <= 1) {
-    return null;
-  }
-  return (
-    <div className="pagination">
-      <span className="muted">
-        Page {page + 1} of {totalPages} · {total} policies
-      </span>
-      <div className="spacer" />
-      <Button size="sm" variant="secondary" disabled={page === 0} onClick={() => onPage(page - 1)}>
-        Previous
-      </Button>
-      <Button
-        size="sm"
-        variant="secondary"
-        disabled={page + 1 >= totalPages}
-        onClick={() => onPage(page + 1)}
-      >
-        Next
-      </Button>
-    </div>
-  );
+  return <SharedPager page={page} totalPages={totalPages} total={total} onPage={onPage} />;
 }
 
 /** Policy register: search by status, product, client, number or insured; open to act on one. */
@@ -84,7 +64,7 @@ export default function PoliciesPage() {
               icon={<Plus size={16} />}
               onClick={() => void navigate('/underwriting/policies/new')}
             >
-              New policy
+              New Policy
             </Button>
           )
         }
@@ -138,7 +118,7 @@ export default function PoliciesPage() {
           onRowClick={(p) => void navigate(`/underwriting/policies/${String(p.id)}`)}
           caption="Policies"
           columns={[
-            { key: 'no', header: 'Policy no.', render: (p) => <strong>{p.policyNo}</strong> },
+            { key: 'no', header: 'Policy No.', render: (p) => <strong>{p.policyNo}</strong> },
             { key: 'prod', header: 'Product', render: (p) => p.productCode },
             { key: 'ins', header: 'Insured', render: (p) => p.insuredName },
             { key: 'src', header: 'Source', render: (p) => p.intermediaryName ?? 'Direct' },
@@ -150,13 +130,13 @@ export default function PoliciesPage() {
             { key: 'ccy', header: 'Ccy', render: (p) => p.currency },
             {
               key: 'net',
-              header: 'Our net premium',
+              header: 'Our Net Premium',
               numeric: true,
               render: (p) => <Amount value={p.premium.ourNetPremium} />,
             },
             {
               key: 'due',
-              header: 'Total due',
+              header: 'Total Due',
               numeric: true,
               render: (p) => <Amount value={p.premium.totalDue} />,
             },

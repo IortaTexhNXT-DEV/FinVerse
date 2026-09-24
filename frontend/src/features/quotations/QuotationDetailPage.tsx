@@ -32,8 +32,8 @@ import { Tabs } from '@/components/ui/Tabs';
 import { formatAmount, formatDate } from '@/utils/format';
 import { QuotationActions } from './QuotationActions';
 import { DetailsTab, HistoryTab, ItemsTab, VersionsTab } from './QuotationTabs';
-import { RecordSummary } from './RecordSummary';
-import type { Fact } from './RecordSummary';
+import { RecordSummary } from '@/components/broking/RecordSummary';
+import type { Fact } from '@/components/broking/RecordSummary';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -229,13 +229,19 @@ export default function QuotationDetailPage() {
           <>
             <ReferenceChip label="ARN" value={q.arn} />
             <StatusBadge status={q.status} />
-            {q.content.directPayment && <StatusBadge status="DIRECT_PAYMENT" />}
-            {q.tsuRequired && (
-              <span className="badge warning" title={q.tsuReason}>
-                <ShieldCheck size={12} aria-hidden="true" /> TSU rule applies
-              </span>
-            )}
           </>
+        }
+        flags={
+          (q.content.directPayment || q.tsuRequired) && (
+            <>
+              {q.content.directPayment && <span className="tag">Direct Payment</span>}
+              {q.tsuRequired && (
+                <span className="tag" title={q.tsuReason}>
+                  <ShieldCheck size={12} aria-hidden="true" /> TSU Rule Applies
+                </span>
+              )}
+            </>
+          )
         }
         facts={facts(q)}
       />

@@ -111,7 +111,7 @@ export default function CurrencyRatesPage() {
               onClick={() => save.mutate()}
               style={{ alignSelf: 'end' }}
             >
-              Save rate
+              Save Rate
             </Button>
           </div>
         </Card>

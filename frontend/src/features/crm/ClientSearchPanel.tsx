@@ -4,7 +4,6 @@ import type { ClientSearch } from '@/api/clients';
 import type { ClientStatus, KycStatus } from '@/api/crm';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
 import { Field } from '@/components/ui/Field';
 import { humanize } from '@/utils/format';
 
@@ -20,17 +19,20 @@ interface TextCriterion {
 }
 
 const TEXT_CRITERIA: TextCriterion[] = [
-  { key: 'code', label: 'Prospect or client code', placeholder: 'PR-2026- or CL-2026-' },
-  { key: 'name', label: 'Name contains', placeholder: 'e.g. Santos' },
+  { key: 'code', label: 'Prospect or Client Code', placeholder: 'PR-2026- or CL-2026-' },
+  { key: 'name', label: 'Name Contains', placeholder: 'e.g. Santos' },
   { key: 'tin', label: 'TIN', placeholder: '000-000-000-000' },
-  { key: 'idNumber', label: 'ID number', placeholder: 'Passport, UMID...' },
+  { key: 'idNumber', label: 'ID Number', placeholder: 'Passport, UMID...' },
   { key: 'email', label: 'E-mail', placeholder: 'name@example.ph' },
   { key: 'mobile', label: 'Mobile', placeholder: '09xxxxxxxxx' },
 ];
 
 const blank = (value: string) => (value.trim() === '' ? undefined : value.trim());
 
-/** Multi-criteria client search (BRNB.046): codes, name, identifiers, status and segment. */
+/**
+ * Advanced filters of the client work list (BRNB.046 multi-criteria search): codes, name,
+ * identifiers, status, KYC status, segment and bank relationship.
+ */
 export function ClientSearchPanel({
   value,
   onSearch,
@@ -38,7 +40,7 @@ export function ClientSearchPanel({
   const [draft, setDraft] = useState<SearchCriteria>(value);
   const set = (patch: Partial<SearchCriteria>) => setDraft((d) => ({ ...d, ...patch }));
   return (
-    <Card>
+    <div className="worklist-filters">
       <form
         className="stack"
         onSubmit={(e) => {
@@ -77,7 +79,7 @@ export function ClientSearchPanel({
               </select>
             )}
           </Field>
-          <Field label="KYC status">
+          <Field label="KYC Status">
             {(id) => (
               <select
                 id={id}
@@ -94,7 +96,7 @@ export function ClientSearchPanel({
               </select>
             )}
           </Field>
-          <Field label="Market segment">
+          <Field label="Market Segment">
             {(id) => (
               <LovSelect
                 id={id}
@@ -105,7 +107,7 @@ export function ClientSearchPanel({
               />
             )}
           </Field>
-          <Field label="BDO bank client">
+          <Field label="BDO Bank Client">
             {(id) => (
               <select
                 id={id}
@@ -123,9 +125,7 @@ export function ClientSearchPanel({
           </Field>
         </div>
         <div className="row">
-          <Button type="submit" variant="primary" icon={<Search size={16} />}>
-            Search
-          </Button>
+          <div className="spacer" />
           <Button
             variant="ghost"
             icon={<X size={16} />}
@@ -134,10 +134,13 @@ export function ClientSearchPanel({
               onSearch({});
             }}
           >
-            Clear
+            Clear Filters
+          </Button>
+          <Button type="submit" variant="secondary" icon={<Search size={16} />}>
+            Apply Filters
           </Button>
         </div>
       </form>
-    </Card>
+    </div>
   );
 }

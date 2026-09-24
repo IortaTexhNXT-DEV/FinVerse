@@ -54,7 +54,7 @@ export function ParameterFormModal({ companyId, form, onChange }: Readonly<Props
       onClose={() => onChange(null)}
       footer={
         <Button variant="accent" busy={save.isPending} onClick={() => form && save.mutate(form)}>
-          Save for authorization
+          Save for Authorization
         </Button>
       }
     >

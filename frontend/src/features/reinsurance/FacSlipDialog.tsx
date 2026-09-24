@@ -76,23 +76,23 @@ export function FacSlipDialog({ placement, reinsurers, onClose, onChanged }: Rea
                 disabled={lines.length === 0}
                 onClick={() => act.mutate('submit')}
               >
-                Submit for approval
+                Submit for Approval
               </Button>
             </>
           )}
           {allowed.approve && (
             <>
               <Button variant="secondary" busy={act.isPending} onClick={() => act.mutate('reject')}>
-                Return to maker
+                Return to Maker
               </Button>
               <Button variant="accent" busy={act.isPending} onClick={() => act.mutate('approve')}>
-                Approve placement
+                Approve Placement
               </Button>
             </>
           )}
           {allowed.close && (
             <Button variant="secondary" busy={act.isPending} onClick={() => act.mutate('close')}>
-              Close slip
+              Close Slip
             </Button>
           )}
         </div>
@@ -157,7 +157,7 @@ export function FacSlipDialog({ placement, reinsurers, onClose, onChanged }: Rea
               ])
             }
           >
-            Add reinsurer
+            Add Reinsurer
           </Button>
           <TextField label="Remarks" disabled={!editable} value={remarks} onChange={setRemarks} />
         </div>

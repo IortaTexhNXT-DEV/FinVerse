@@ -87,9 +87,9 @@ export default function ScheduledJobsPage() {
             { key: 'n', header: 'Job', render: (j) => <strong>{j.name}</strong> },
             { key: 'd', header: 'Description', render: (j) => j.description },
             { key: 'c', header: 'Schedule', render: (j) => <code>{j.cron}</code> },
-            { key: 'l', header: 'Last run', render: (j) => formatDateTime(j.lastRun?.startedAt) },
+            { key: 'l', header: 'Last Run', render: (j) => formatDateTime(j.lastRun?.startedAt) },
             { key: 's', header: 'Status', render: (j) => <RunStatus run={j.lastRun} /> },
-            { key: 'x', header: 'Next run', render: (j) => formatDateTime(j.nextRun) },
+            { key: 'x', header: 'Next Run', render: (j) => formatDateTime(j.nextRun) },
             {
               key: 'a',
               header: 'Actions',
@@ -105,7 +105,7 @@ export default function ScheduledJobsPage() {
                       run.mutate(j.name);
                     }}
                   >
-                    Run now
+                    Run Now
                   </Button>
                 ),
             },
@@ -117,7 +117,7 @@ export default function ScheduledJobsPage() {
         actions={
           selected !== undefined && (
             <Button size="sm" variant="ghost" onClick={() => setSelected(undefined)}>
-              Show all jobs
+              Show All Jobs
             </Button>
           )
         }

@@ -106,7 +106,7 @@ export function MatchWorkbench({ companyId, bank, asOf }: Readonly<WorkbenchProp
               })
             }
           >
-            Match selected
+            Match Selected
           </Button>
         </div>
       </Card>

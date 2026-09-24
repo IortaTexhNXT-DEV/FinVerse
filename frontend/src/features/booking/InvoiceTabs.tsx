@@ -31,7 +31,7 @@ export function JournalTab({ invoice }: Readonly<{ invoice: BookedInvoice }>) {
         <div className="row">
           {batches.map(([batchNo, batchId]) => (
             <Link key={batchNo} to={`/gl/journals/${String(batchId)}`}>
-              Open journal {batchNo}
+              Open Journal {batchNo}
             </Link>
           ))}
         </div>
@@ -194,7 +194,7 @@ export function ScheduleTab({ invoice }: Readonly<{ invoice: BookedInvoice }>) {
               ),
           },
           { key: 'kind', header: 'Kind', render: (i) => labelOf(i.kind) },
-          { key: 'year', header: 'Policy year', render: (i) => i.policyYear },
+          { key: 'year', header: 'Policy Year', render: (i) => i.policyYear },
           { key: 'policy', header: 'Policy No.', render: (i) => i.policyNo ?? '' },
           {
             key: 'period',

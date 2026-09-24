@@ -30,7 +30,7 @@ export function ParticipantRows({
           icon={<Plus size={14} />}
           onClick={() => onChange([...rows, blankParticipant()])}
         >
-          Add reinsurer
+          Add Reinsurer
         </Button>
       </div>
       {rows.map((r) => (
@@ -96,7 +96,7 @@ export function LayerRows({
           icon={<Plus size={14} />}
           onClick={() => onChange([...rows, blankLayer()])}
         >
-          Add layer
+          Add Layer
         </Button>
       </div>
       {rows.map((r, i) => (

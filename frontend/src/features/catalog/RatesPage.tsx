@@ -76,13 +76,13 @@ function ShortPeriod() {
         columns={[
           {
             key: 'm',
-            header: 'Months covered (up to)',
+            header: 'Months Covered (up To)',
             numeric: true,
             render: (r) => r.monthsCovered,
           },
           {
             key: 'p',
-            header: '% of annual premium',
+            header: '% of Annual Premium',
             numeric: true,
             render: (r) => r.percentOfAnnual,
           },
@@ -147,7 +147,7 @@ export default function RatesPage() {
         actions={
           can('MASTER_MAINTAIN') && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => setAdding(true)}>
-              New rate
+              New Rate
             </Button>
           )
         }

@@ -25,7 +25,7 @@ export function DataTable<T>({
   rows,
   rowKey,
   onRowClick,
-  emptyMessage = 'No records found.',
+  emptyMessage = 'No items to display',
   loading = false,
   caption,
 }: Readonly<DataTableProps<T>>) {

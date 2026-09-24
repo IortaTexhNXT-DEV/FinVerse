@@ -84,7 +84,7 @@ export function InsurerEditorModal({ companyId, insurer, onClose }: Readonly<Pro
       onClose={onClose}
       footer={
         <Button variant="accent" busy={save.isPending} onClick={() => save.mutate()}>
-          Save for authorization
+          Save for Authorization
         </Button>
       }
     >

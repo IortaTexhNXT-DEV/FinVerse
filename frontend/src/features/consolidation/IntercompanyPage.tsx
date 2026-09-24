@@ -86,7 +86,7 @@ export default function IntercompanyPage() {
         actions={
           manage && (
             <Button variant="secondary" icon={<Plus size={16} />} onClick={() => setAdding(true)}>
-              New relationship
+              New Relationship
             </Button>
           )
         }
@@ -105,12 +105,12 @@ export default function IntercompanyPage() {
             },
             {
               key: 'a',
-              header: 'A due-from / due-to',
+              header: 'A Due-from / Due-to',
               render: (r) => `${r.aDueFromAccount} / ${r.aDueToAccount}`,
             },
             {
               key: 'b',
-              header: 'B due-from / due-to',
+              header: 'B Due-from / Due-to',
               render: (r) => `${r.bDueFromAccount} / ${r.bDueToAccount}`,
             },
             {
@@ -202,12 +202,12 @@ export default function IntercompanyPage() {
           rows={transactions.data ?? []}
           rowKey={(t) => t.id}
           columns={[
-            { key: 'r', header: 'IC reference', render: (t) => <strong>{t.icReference}</strong> },
-            { key: 'd', header: 'Value date', render: (t) => formatDate(t.valueDate) },
+            { key: 'r', header: 'IC Reference', render: (t) => <strong>{t.icReference}</strong> },
+            { key: 'd', header: 'Value Date', render: (t) => formatDate(t.valueDate) },
             { key: 't', header: 'Type', render: (t) => t.type },
             {
               key: 'p',
-              header: 'Creditor → debtor',
+              header: 'Creditor → Debtor',
               render: (t) => `${code(t.creditorCompanyId)} → ${code(t.debtorCompanyId)}`,
             },
             {
@@ -227,7 +227,7 @@ export default function IntercompanyPage() {
         />
       </Card>
       <Modal
-        title="New inter-company relationship"
+        title="New Inter-company Relationship"
         open={adding}
         onClose={() => setAdding(false)}
         footer={

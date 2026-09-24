@@ -1,15 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { ClipboardList, Plus, Search } from 'lucide-react';
+import { ClipboardList, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { proposalsApi } from '@/api/proposals';
 import type { ProposalListItem } from '@/api/proposals';
 import { useAuth } from '@/auth/authContext';
-import { Button } from '@/components/ui/Button';
+import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
-import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { Tabs } from '@/components/ui/Tabs';
@@ -28,7 +27,6 @@ export default function ProposalsPage() {
   const { can } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<ProposalTab>('drafts');
-  const [text, setText] = useState('');
   const [applied, setApplied] = useState('');
   const [mine, setMine] = useState(false);
   const [page, setPage] = useState(0);
@@ -68,33 +66,18 @@ export default function ProposalsPage() {
             setPage(0);
           }}
         />
-        <form
-          className="worklist-toolbar"
-          onSubmit={(e) => {
-            e.preventDefault();
+        <WorklistToolbar
+          onSearch={(text) => {
             setApplied(text);
             setPage(0);
           }}
-        >
-          <Field label="Search Proposal No.">
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                placeholder="PRF, ARN, slip number, client code or name"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-              />
-            )}
-          </Field>
-          <Button type="submit" icon={<Search size={16} />}>
-            Search
-          </Button>
-          <label className="checkbox">
-            <input type="checkbox" checked={mine} onChange={(e) => setMine(e.target.checked)} />
-            Only my PRFs
-          </label>
-        </form>
+          extra={
+            <label className="checkbox">
+              <input type="checkbox" checked={mine} onChange={(e) => setMine(e.target.checked)} />
+              Only My PRFs
+            </label>
+          }
+        />
         <ErrorAlert error={list.error} />
         <DataTable<ProposalListItem>
           loading={list.isLoading}

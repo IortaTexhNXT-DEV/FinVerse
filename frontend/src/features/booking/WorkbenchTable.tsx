@@ -28,12 +28,29 @@ const STATUS_LABELS: Record<WorkbenchTab, string> = {
 };
 
 function selectColumn(
+  rows: WorkbenchRow[],
   selection: ReadonlySet<number>,
   onSelect: (s: Set<number>) => void,
 ): Column<WorkbenchRow> {
   return {
     key: 'select',
-    header: 'Select',
+    header: (
+      <input
+        type="checkbox"
+        className="booking-select"
+        aria-label="Select all rows shown"
+        disabled={rows.length === 0}
+        checked={rows.length > 0 && rows.every((r) => selection.has(r.id))}
+        onChange={() =>
+          onSelect(
+            toggleAll(
+              selection,
+              rows.map((r) => r.id),
+            ),
+          )
+        }
+      />
+    ),
     width: '48px',
     render: (r) => (
       <input
@@ -100,7 +117,7 @@ export function WorkbenchTable({
     { key: 'date', header: 'Booking Date', render: (r) => formatDate(r.bookingDate) },
   ];
   if (tab !== 'BOOKED') {
-    columns.unshift(selectColumn(selection, onSelect));
+    columns.unshift(selectColumn(rows, selection, onSelect));
   }
   if (tab === 'QUEUED') {
     columns.push({
@@ -137,34 +154,14 @@ export function WorkbenchTable({
     });
   }
   return (
-    <>
-      {tab !== 'BOOKED' && rows.length > 0 && (
-        <label className="checkbox">
-          <input
-            type="checkbox"
-            className="booking-select"
-            checked={rows.every((r) => selection.has(r.id))}
-            onChange={() =>
-              onSelect(
-                toggleAll(
-                  selection,
-                  rows.map((r) => r.id),
-                ),
-              )
-            }
-          />
-          Select all on this page
-        </label>
-      )}
-      <DataTable<WorkbenchRow>
-        caption="Booking workbench"
-        loading={loading}
-        rows={rows}
-        rowKey={(r) => r.id}
-        onRowClick={onOpen}
-        emptyMessage="No items to display"
-        columns={columns}
-      />
-    </>
+    <DataTable<WorkbenchRow>
+      caption="Booking workbench"
+      loading={loading}
+      rows={rows}
+      rowKey={(r) => r.id}
+      onRowClick={onOpen}
+      emptyMessage="No items to display"
+      columns={columns}
+    />
   );
 }

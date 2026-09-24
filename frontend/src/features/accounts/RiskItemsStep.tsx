@@ -106,7 +106,7 @@ function InsuredItems({
           icon={<Plus size={14} />}
           onClick={() => onChange([...rows, { description: '', sumInsured: 0 }])}
         >
-          Add insured item
+          Add Insured Item
         </Button>
       </div>
     </div>

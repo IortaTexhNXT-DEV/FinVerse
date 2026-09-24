@@ -80,7 +80,7 @@ function DocumentRules() {
           },
           {
             key: 'r',
-            header: 'Before submission',
+            header: 'Before Submission',
             render: (r) => (r.required ? 'Required' : 'Optional'),
           },
           ...statusColumns<DocumentRule>('DOCUMENT_RULE', 'document-rules'),
@@ -117,7 +117,7 @@ function TsuRules() {
           { key: 'k', header: 'Criteria', render: criteria },
           {
             key: 't',
-            header: 'TSI above',
+            header: 'TSI Above',
             numeric: true,
             render: (r) => (r.tsiAbove ? <Amount value={r.tsiAbove} /> : ''),
           },
@@ -150,7 +150,7 @@ export function CatalogRulesPanel({ kind }: Readonly<{ kind: RuleKind }>) {
             icon={<Plus size={14} />}
             onClick={() => setAdding(true)}
           >
-            Add rule
+            Add Rule
           </Button>
         )
       }

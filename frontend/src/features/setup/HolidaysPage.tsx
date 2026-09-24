@@ -81,7 +81,7 @@ export default function HolidaysPage() {
                   setForm({ companyId, holidayDate: `${year}-01-01`, description: '' })
                 }
               >
-                Add holiday
+                Add Holiday
               </Button>
             )}
           </>
@@ -107,7 +107,7 @@ export default function HolidaysPage() {
         />
       </Card>
       <Modal
-        title="Add holiday"
+        title="Add Holiday"
         open={form !== null}
         onClose={() => setForm(null)}
         footer={

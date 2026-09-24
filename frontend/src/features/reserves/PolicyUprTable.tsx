@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
+import { PageFooter } from '@/components/ui/Pager';
 import { useState } from 'react';
 import { reservesApi } from '@/api/reserves';
 import type { UprDetail } from '@/api/reserves';
 import { Amount } from '@/components/ui/Amount';
-import { Button } from '@/components/ui/Button';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { SelectInput } from '@/features/assets/FormControls';
@@ -41,7 +41,7 @@ export function PolicyUprTable({ runId, lines }: Readonly<{ runId: number; lines
         columns={[
           {
             key: 'd',
-            header: 'Policy / endorsement',
+            header: 'Policy / Endorsement',
             render: (d) => <strong>{d.documentNo}</strong>,
           },
           { key: 'k', header: 'Kind', render: (d) => humanize(d.kind) },
@@ -54,7 +54,7 @@ export function PolicyUprTable({ runId, lines }: Readonly<{ runId: number; lines
           { key: 'b', header: 'Basis', render: (d) => humanize(d.basis) },
           {
             key: 'u',
-            header: 'Units (earned / total)',
+            header: 'Units (earned / Total)',
             numeric: true,
             render: (d) => `${d.earnedUnits} / ${d.totalUnits}`,
           },
@@ -70,30 +70,7 @@ export function PolicyUprTable({ runId, lines }: Readonly<{ runId: number; lines
           { key: 'ucr', header: 'UCR', numeric: true, render: (d) => <Amount value={d.ucr} /> },
         ]}
       />
-      {data !== undefined && data.totalPages > 1 && (
-        <div className="pagination">
-          <span className="muted">
-            Page {data.page + 1} of {data.totalPages} · {data.totalElements} transactions
-          </span>
-          <div className="spacer" />
-          <Button
-            size="sm"
-            variant="secondary"
-            disabled={data.page === 0}
-            onClick={() => setPage(data.page - 1)}
-          >
-            Previous
-          </Button>
-          <Button
-            size="sm"
-            variant="secondary"
-            disabled={data.page + 1 >= data.totalPages}
-            onClick={() => setPage(data.page + 1)}
-          >
-            Next
-          </Button>
-        </div>
-      )}
+      <PageFooter data={data} onPage={(p) => setPage(p)} />
     </div>
   );
 }

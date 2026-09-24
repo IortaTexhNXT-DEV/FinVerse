@@ -47,7 +47,7 @@ export function CreateReturnModal({ companyId, forms, choice, onClose }: Readonl
           busy={create.isPending}
           onClick={() => create.mutate()}
         >
-          Prepare draft
+          Prepare Draft
         </Button>
       }
     >

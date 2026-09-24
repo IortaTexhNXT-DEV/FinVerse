@@ -16,6 +16,7 @@ import { dashboardModule } from '@/features/dashboard/module';
 import { glModule } from '@/features/gl/module';
 import { helpModule } from '@/features/help/module';
 import { issuanceModule } from '@/features/issuance/module';
+import { nbDashboardModule, nbReportsModule } from '@/features/nbreports/module';
 import { withJournalAutomation } from '@/features/journaltools/module';
 import { payablesModule } from '@/features/payables/module';
 import { placementModule } from '@/features/placement/module';
@@ -37,7 +38,10 @@ import type { FeatureModule, NavGroup } from './types';
  * Alerts join Overview, recurring journals and journal upload join General Ledger.
  */
 export const NAV_GROUPS: NavGroup[] = [
-  { id: 'home', modules: [withOverviewScreens(dashboardModule), workspaceModule] },
+  {
+    id: 'home',
+    modules: [withOverviewScreens(dashboardModule), nbDashboardModule, workspaceModule],
+  },
   // Broking (BDOI New Business) - docs/architecture/BROKING_ARCHITECTURE.md section 5.
   {
     id: 'client-policy',
@@ -72,7 +76,7 @@ export const NAV_GROUPS: NavGroup[] = [
     title: 'Claims & Insurance',
     modules: [underwritingModule, claimsModule, reinsuranceModule, reservesModule],
   },
-  { id: 'reports', title: 'Reports', modules: [reportsModule] },
+  { id: 'reports', title: 'Reports', modules: [nbReportsModule, reportsModule] },
   {
     id: 'setup',
     title: 'Setup & Administration',

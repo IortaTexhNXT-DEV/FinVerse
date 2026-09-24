@@ -38,7 +38,7 @@ export function PaymentFileModal({ open, banks, onClose }: Readonly<PaymentFileM
   });
   return (
     <Modal
-      title="Payment notification to the bank"
+      title="Payment Notification to the Bank"
       open={open}
       onClose={onClose}
       footer={
@@ -48,7 +48,7 @@ export function PaymentFileModal({ open, banks, onClose }: Readonly<PaymentFileM
           busy={generate.isPending}
           onClick={() => generate.mutate()}
         >
-          Generate file
+          Generate File
         </Button>
       }
     >

@@ -169,7 +169,7 @@ function MessageDetail({ message, retrying, onRetry, onClose }: Readonly<Message
   const footer =
     message.status === 'FAILED' ? (
       <Button variant="accent" icon={<RotateCw size={16} />} busy={retrying} onClick={onRetry}>
-        Send again
+        Send Again
       </Button>
     ) : undefined;
   return (

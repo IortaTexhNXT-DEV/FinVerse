@@ -131,7 +131,7 @@ export default function BudgetsPage() {
         description="Budget versions by fiscal year. A version is prepared, submitted and approved by a different user; the latest approved version drives Budget vs Actual."
         actions={
           <Button variant="accent" icon={<Plus size={16} />} onClick={() => setCreating(true)}>
-            New version
+            New Version
           </Button>
         }
       />
@@ -149,7 +149,7 @@ export default function BudgetsPage() {
             { key: 'l', header: 'Lines', numeric: true, render: (b) => b.lineCount },
             {
               key: 't',
-              header: 'Annual total',
+              header: 'Annual Total',
               numeric: true,
               render: (b) => <Amount value={b.total} />,
             },
@@ -163,7 +163,7 @@ export default function BudgetsPage() {
         />
       </Card>
       <Modal
-        title="New budget version"
+        title="New Budget Version"
         open={creating}
         onClose={() => setCreating(false)}
         footer={

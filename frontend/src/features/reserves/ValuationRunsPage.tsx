@@ -65,7 +65,7 @@ export default function ValuationRunsPage() {
               onClick={() => create.mutate()}
               style={{ alignSelf: 'end' }}
             >
-              Calculate preview
+              Calculate Preview
             </Button>
           </div>
         </Card>
@@ -80,7 +80,7 @@ export default function ValuationRunsPage() {
           emptyMessage="No valuation run yet."
           columns={[
             { key: 'p', header: 'Month', render: (r) => <strong>{r.periodName}</strong> },
-            { key: 'd', header: 'Valuation date', render: (r) => formatDate(r.valuationDate) },
+            { key: 'd', header: 'Valuation Date', render: (r) => formatDate(r.valuationDate) },
             { key: 's', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
             { key: 'm', header: 'Prepared by', render: (r) => r.submittedBy ?? r.preparedBy },
             { key: 'a', header: 'Approved by', render: (r) => r.approvedBy ?? '' },

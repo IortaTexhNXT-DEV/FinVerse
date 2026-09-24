@@ -82,7 +82,7 @@ function Tags({ client, editable }: Readonly<{ client: ClientDetail; editable: b
               busy={add.isPending}
               onClick={() => add.mutate()}
             >
-              Add tag
+              Add Tag
             </Button>
           </div>
         )}
@@ -147,7 +147,7 @@ export function NotesTab({ client }: Readonly<{ client: ClientDetail }>) {
               icon={<Plus size={14} />}
               onClick={() => setEditing({})}
             >
-              New instruction
+              New Instruction
             </Button>
           )
         }

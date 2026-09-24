@@ -64,7 +64,7 @@ export default function ReserveParametersPage() {
               icon={<Plus size={16} />}
               onClick={() => setForm({ ...NEW_PARAMETERS, effectiveFrom: today() })}
             >
-              New parameters
+              New Parameters
             </Button>
           )
         }
@@ -80,13 +80,13 @@ export default function ReserveParametersPage() {
           columns={[
             { key: 'l', header: 'Line', render: (p) => <strong>{p.businessLine}</strong> },
             { key: 'e', header: 'Effective from', render: (p) => formatDate(p.effectiveFrom) },
-            { key: 'm', header: 'IBNR method', render: method },
+            { key: 'm', header: 'IBNR Method', render: method },
             { key: 'f', header: 'MfAD %', numeric: true, render: (p) => p.mfadPct },
             { key: 'u', header: 'ULAE %', numeric: true, render: (p) => p.ulaePct },
-            { key: 'r', header: 'Loss ratio %', numeric: true, render: (p) => p.expectedLossRatio },
+            { key: 'r', header: 'Loss Ratio %', numeric: true, render: (p) => p.expectedLossRatio },
             {
               key: 'c',
-              header: 'RI comm. treaty / FAC %',
+              header: 'RI Comm. Treaty / FAC %',
               numeric: true,
               render: (p) => `${p.treatyCommissionPct} / ${p.facCommissionPct}`,
             },

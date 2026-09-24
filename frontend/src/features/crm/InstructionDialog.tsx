@@ -54,7 +54,7 @@ export function InstructionDialog({
             Cancel
           </Button>
           <Button variant="accent" busy={busy} onClick={save}>
-            Save instruction
+            Save Instruction
           </Button>
         </>
       }

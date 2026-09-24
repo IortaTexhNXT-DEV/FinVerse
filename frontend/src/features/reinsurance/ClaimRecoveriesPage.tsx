@@ -51,7 +51,7 @@ export default function ClaimRecoveriesPage() {
               busy={catchUp.isPending}
               onClick={() => catchUp.mutate()}
             >
-              Process missed movements
+              Process Missed Movements
             </Button>
           )
         }
@@ -73,7 +73,7 @@ export default function ClaimRecoveriesPage() {
           columns={[
             { key: 'c', header: 'Claim', render: (m) => <strong>{m.claimNo}</strong> },
             { key: 'l', header: 'Class', render: (m) => m.businessLine },
-            { key: 'd', header: 'Loss date', render: (m) => formatDate(m.lossDate) },
+            { key: 'd', header: 'Loss Date', render: (m) => formatDate(m.lossDate) },
             { key: 'md', header: 'Date', render: (m) => formatDate(m.movementDate) },
             { key: 't', header: 'Movement', render: (m) => humanize(m.movementType) },
             {
@@ -111,7 +111,7 @@ export default function ClaimRecoveriesPage() {
             },
             {
               key: 'n',
-              header: 'Net retained',
+              header: 'Net Retained',
               numeric: true,
               render: (m) => <Amount value={m.netRetained} />,
             },

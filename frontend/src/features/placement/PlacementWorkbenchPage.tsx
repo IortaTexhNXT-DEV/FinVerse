@@ -1,13 +1,13 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Landmark, Search } from 'lucide-react';
+import { Landmark } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { placementApi } from '@/api/placement';
 import type { WorkbenchTab } from '@/api/placement';
 import { useAuth } from '@/auth/authContext';
 import { useRowSelection } from '@/components/broking/rowSelection';
+import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { WorkTiles } from '@/components/broking/WorkTiles';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -30,7 +30,6 @@ export default function PlacementWorkbenchPage() {
   const queryClient = useQueryClient();
   const selection = useRowSelection();
   const [tab, setTab] = useState<WorkbenchTab>('FOR_PLACEMENT');
-  const [text, setText] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const counts = useQuery({
@@ -80,30 +79,12 @@ export default function PlacementWorkbenchPage() {
         <div className="work-tabs">
           <Tabs tabs={WORKBENCH_TABS} active={tab} onChange={choose} />
         </div>
-        <div className="work-toolbar">
-          <form
-            className="row"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setSearch(text.trim());
-              setPage(0);
-            }}
-          >
-            <label className="visually-hidden" htmlFor="placement-search">
-              Search Proposal No.
-            </label>
-            <input
-              id="placement-search"
-              className="input"
-              placeholder="Search Proposal No."
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            />
-            <Button type="submit" variant="secondary" icon={<Search size={16} />}>
-              Search
-            </Button>
-          </form>
-          <span className="spacer" />
+        <WorklistToolbar
+          onSearch={(text) => {
+            setSearch(text);
+            setPage(0);
+          }}
+        >
           <WorkbenchBulkBar
             companyId={companyId}
             tab={tab}
@@ -111,7 +92,7 @@ export default function PlacementWorkbenchPage() {
             selection={selection}
             onChanged={refresh}
           />
-        </div>
+        </WorklistToolbar>
         <WorkbenchTable rows={rows} loading={list.isLoading} selection={selection} />
         <PageFooter data={list.data} noun="accounts" onPage={setPage} />
       </Card>

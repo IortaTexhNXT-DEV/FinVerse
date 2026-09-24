@@ -57,7 +57,7 @@ export function EligibleDialog({
             },
             { key: 'desc', header: 'Description', render: (r) => r.description ?? '' },
             { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
-            { key: 'last', header: 'Last activity', render: (r) => formatDate(r.lastActivity) },
+            { key: 'last', header: 'Last Activity', render: (r) => formatDate(r.lastActivity) },
           ]}
         />
       </div>
@@ -124,7 +124,7 @@ export function RuleDialog({
             disabled={Object.keys(errors).length > 0}
             onClick={() => save.mutate()}
           >
-            Save rule
+            Save Rule
           </Button>
         </>
       }

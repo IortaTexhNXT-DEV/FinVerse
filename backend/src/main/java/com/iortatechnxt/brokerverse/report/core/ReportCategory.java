@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.report.core;
 
 /** Report menu groups. */
 public enum ReportCategory {
+  NEW_BUSINESS("New Business"),
   GENERAL_LEDGER("General Ledger"),
   FINANCIAL_STATEMENTS("Financial Statements"),
   UNDERWRITING("Underwriting"),

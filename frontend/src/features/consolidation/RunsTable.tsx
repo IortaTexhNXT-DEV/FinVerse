@@ -37,13 +37,13 @@ export function RunsTable({ runs, loading, canFinalize, onSelect, onFinalize }: 
           { key: 's', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
           {
             key: 'dr',
-            header: 'Total debit',
+            header: 'Total Debit',
             numeric: true,
             render: (r) => <Amount value={r.totalDebit} />,
           },
           {
             key: 'cr',
-            header: 'Total credit',
+            header: 'Total Credit',
             numeric: true,
             render: (r) => <Amount value={r.totalCredit} />,
           },

@@ -9,8 +9,8 @@ import { AccountTable } from './AccountTable';
 
 const FFY_COLUMNS: Column<AccountSummary>[] = [
   ...ACCOUNT_COLUMNS.filter((c) => c.key !== 'o'),
-  { key: 'fs', header: 'FFY start', render: (a) => formatDate(a.ffyStart) },
-  { key: 'fe', header: 'FFY end', render: (a) => formatDate(a.ffyEnd) },
+  { key: 'fs', header: 'FFY Start', render: (a) => formatDate(a.ffyStart) },
+  { key: 'fe', header: 'FFY End', render: (a) => formatDate(a.ffyEnd) },
   { key: 'o', header: 'Officer', render: (a) => a.accountOfficer ?? '' },
 ];
 

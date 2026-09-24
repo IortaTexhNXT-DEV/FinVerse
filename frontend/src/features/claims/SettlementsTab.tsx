@@ -36,7 +36,7 @@ export function SettlementsTab({ claim, actions, onChange }: Readonly<ClaimTabPr
             icon={<Plus size={14} />}
             onClick={() => setOpen(true)}
           >
-            New settlement
+            New Settlement
           </Button>
         )
       }
@@ -48,7 +48,7 @@ export function SettlementsTab({ claim, actions, onChange }: Readonly<ClaimTabPr
         rowKey={(s) => s.id}
         caption="Settlements"
         columns={[
-          { key: 'no', header: 'Settlement no.', render: (s) => <strong>{s.settlementNo}</strong> },
+          { key: 'no', header: 'Settlement No.', render: (s) => <strong>{s.settlementNo}</strong> },
           { key: 'payee', header: 'Payee', render: (s) => s.payeeName },
           {
             key: 'type',
@@ -63,7 +63,7 @@ export function SettlementsTab({ claim, actions, onChange }: Readonly<ClaimTabPr
           },
           {
             key: 'ded',
-            header: 'Deductible + excess',
+            header: 'Deductible + Excess',
             numeric: true,
             render: (s) => <Amount value={s.deductible + s.excessAmount} />,
           },
@@ -75,7 +75,7 @@ export function SettlementsTab({ claim, actions, onChange }: Readonly<ClaimTabPr
           },
           {
             key: 'our',
-            header: 'Our share',
+            header: 'Our Share',
             numeric: true,
             render: (s) => <Amount value={s.ourAmount} />,
           },
@@ -87,7 +87,7 @@ export function SettlementsTab({ claim, actions, onChange }: Readonly<ClaimTabPr
           },
           {
             key: 'date',
-            header: 'Accounting date',
+            header: 'Accounting Date',
             render: (s) => formatDate(s.approval.approvalDate),
           },
           {

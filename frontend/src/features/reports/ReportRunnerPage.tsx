@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Download, Play } from 'lucide-react';
+import { Download, Play, Printer } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { saveFile } from '@/api/client';
@@ -11,10 +11,24 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useWorkspace } from '@/context/workspaceContext';
 import { ParameterInput } from './ParameterInput';
+import { ReportVariants } from './ReportVariants';
 import { ReportTable } from './ReportTable';
 import { initialValue, parameterErrors } from './reportParams';
 
-const FORMATS: ExportFormat[] = ['PDF', 'XLSX', 'CSV'];
+const FORMATS: { format: ExportFormat; label: string }[] = [
+  { format: 'PDF', label: 'PDF' },
+  { format: 'XLSX', label: 'Excel' },
+  { format: 'ODS', label: 'ODS' },
+  { format: 'CSV', label: 'CSV' },
+  { format: 'XML', label: 'XML' },
+];
+
+/** Opens a PDF in a new tab for the browser's print preview (BRNB.031). */
+function openForPrint(blob: Blob): void {
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank', 'noopener');
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
 
 /** Parameter form, on-screen result and export for one report. */
 export default function ReportRunnerPage() {
@@ -44,6 +58,10 @@ export default function ReportRunnerPage() {
     mutationFn: (format: ExportFormat) => reportApi.export(code, params(), format),
     onSuccess: ({ blob, fileName }) => saveFile(blob, fileName),
   });
+  const printer = useMutation({
+    mutationFn: () => reportApi.export(code, params(), 'PDF'),
+    onSuccess: ({ blob }) => openForPrint(blob),
+  });
   const errors = parameterErrors(entry?.parameters ?? [], values);
   const valid = Object.keys(errors).length === 0;
   /** Runs the action only when the form is valid; otherwise shows the field errors. */
@@ -67,6 +85,7 @@ export default function ReportRunnerPage() {
     <div className="stack">
       <PageHeader
         section={`Reports · ${entry.categoryLabel}`}
+        backTo={entry.category === 'NEW_BUSINESS' ? '/nb/reports' : '/reports'}
         title={entry.title}
         description={`${entry.code} — ${entry.description}`}
       />
@@ -80,43 +99,63 @@ export default function ReportRunnerPage() {
               busy={run.isPending}
               onClick={guarded(() => run.mutate())}
             >
-              Run report
+              Run Report
             </Button>
-            {FORMATS.map((f) => (
-              <Button
-                key={f}
-                variant="secondary"
-                icon={<Download size={15} />}
-                busy={exporter.isPending && exporter.variables === f}
-                onClick={guarded(() => exporter.mutate(f))}
-              >
-                {f}
-              </Button>
-            ))}
+            <Button
+              variant="secondary"
+              icon={<Printer size={16} />}
+              busy={printer.isPending}
+              onClick={guarded(() => printer.mutate())}
+            >
+              Print
+            </Button>
           </div>
         }
       >
-        <div className="form-grid">
-          {visible.map((p) => (
-            <ParameterInput
-              key={p.name}
-              spec={p}
-              value={values[p.name] ?? initialValue(p)}
-              error={checked ? errors[p.name] : undefined}
-              onChange={(v) => setValues((s) => ({ ...s, [p.name]: v }))}
-            />
-          ))}
+        <div className="stack">
+          <ReportVariants
+            code={code}
+            values={params}
+            onApply={(saved) => {
+              setValues(saved);
+              setChecked(false);
+            }}
+          />
+          <div className="form-grid">
+            {visible.map((p) => (
+              <ParameterInput
+                key={p.name}
+                spec={p}
+                value={values[p.name] ?? initialValue(p)}
+                error={checked ? errors[p.name] : undefined}
+                onChange={(v) => setValues((s) => ({ ...s, [p.name]: v }))}
+              />
+            ))}
+          </div>
+          <div className="report-downloads">
+            <span className="muted">Download</span>
+            {FORMATS.map((f) => (
+              <Button
+                key={f.format}
+                size="sm"
+                variant="ghost"
+                icon={<Download size={15} />}
+                busy={exporter.isPending && exporter.variables === f.format}
+                onClick={guarded(() => exporter.mutate(f.format))}
+              >
+                {f.label}
+              </Button>
+            ))}
+          </div>
         </div>
       </Card>
-      <ErrorAlert error={run.error ?? exporter.error} />
+      <ErrorAlert error={run.error ?? exporter.error ?? printer.error} />
       {run.data !== undefined && (
         <Card title={run.data.title} flush>
-          <div style={{ padding: '8px 16px' }} className="muted">
-            {run.data.parameterEcho.join(' · ')}
-          </div>
+          <div className="report-echo muted">{run.data.parameterEcho.join(' · ')}</div>
           <ReportTable result={run.data} />
           {run.data.notes.map((n) => (
-            <div key={n} className="alert" style={{ margin: 12 }}>
+            <div key={n} className="alert report-note">
               {n}
             </div>
           ))}

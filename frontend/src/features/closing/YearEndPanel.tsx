@@ -38,8 +38,8 @@ function ClosingPreview({ companyId, yearId }: Readonly<{ companyId: number; yea
         columns={[
           { key: 'b', header: 'Branch', render: (b) => branch(b.branchId) },
           { key: 'a', header: 'Account', render: (b) => b.accountCode },
-          { key: 'c', header: 'Cost centre', render: (b) => b.costCenter ?? '' },
-          { key: 'l', header: 'Line of business', render: (b) => b.businessLine ?? '' },
+          { key: 'c', header: 'Cost Centre', render: (b) => b.costCenter ?? '' },
+          { key: 'l', header: 'Line of Business', render: (b) => b.businessLine ?? '' },
           {
             key: 'n',
             header: 'Balance (Dr +)',
@@ -115,7 +115,7 @@ export function YearEndPanel({ picker }: Readonly<{ picker: ReturnType<typeof us
             onClick={confirmClose}
             style={{ alignSelf: 'end' }}
           >
-            Close fiscal year
+            Close Fiscal Year
           </Button>
         )}
       </div>

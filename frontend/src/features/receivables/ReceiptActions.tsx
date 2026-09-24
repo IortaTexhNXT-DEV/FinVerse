@@ -83,17 +83,17 @@ export function ReceiptActions({ receipt }: Readonly<{ receipt: Receipt }>) {
           busy={apply.isPending}
           onClick={() => apply.mutate()}
         >
-          Apply on-account (FIFO)
+          Apply On-account (FIFO)
         </Button>
       )}
       {allowed.cancel && (
         <Button variant="secondary" icon={<Undo2 size={16} />} onClick={() => setDialog('cancel')}>
-          Cancel receipt
+          Cancel Receipt
         </Button>
       )}
       {allowed.bounce && (
         <Button variant="danger" icon={<Ban size={16} />} onClick={() => setDialog('bounce')}>
-          Cheque bounced
+          Cheque Bounced
         </Button>
       )}
       <Button variant="ghost" icon={<Printer size={16} />} onClick={() => window.print()}>

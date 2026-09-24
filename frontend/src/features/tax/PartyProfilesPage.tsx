@@ -76,7 +76,7 @@ export default function PartyProfilesPage() {
               icon={<Plus size={16} />}
               onClick={() => setForm({ payeeClass: 'CORPORATE', vatTreatment: 'REGULAR' })}
             >
-              New profile
+              New Profile
             </Button>
           )
         }
@@ -91,7 +91,7 @@ export default function PartyProfilesPage() {
           onRowClick={can('TAX_MANAGE') ? (p) => setForm(p) : undefined}
           columns={[
             { key: 'c', header: 'Party', render: (p) => <strong>{p.partyCode}</strong> },
-            { key: 'n', header: 'Registered name', render: (p) => p.registeredName },
+            { key: 'n', header: 'Registered Name', render: (p) => p.registeredName },
             { key: 't', header: 'TIN', render: (p) => `${p.tin}-${p.branchCode}` },
             { key: 'p', header: 'Payee', render: (p) => p.payeeClass },
             { key: 'v', header: 'VAT', render: (p) => p.vatTreatment },
@@ -117,7 +117,7 @@ export default function PartyProfilesPage() {
         onClose={() => setForm(null)}
         footer={
           <Button variant="accent" busy={save.isPending} onClick={() => form && save.mutate(form)}>
-            Save for authorization
+            Save for Authorization
           </Button>
         }
       >

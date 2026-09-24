@@ -76,7 +76,7 @@ export default function BankAccountsPage() {
               icon={<FileDown size={16} />}
               onClick={() => setFileOpen(true)}
             >
-              Payment file
+              Payment File
             </Button>
             {can('MASTER_MAINTAIN') && (
               <Button
@@ -84,7 +84,7 @@ export default function BankAccountsPage() {
                 icon={<Plus size={16} />}
                 onClick={() => setForm({ currency: 'PHP', notificationFormat: 'FIXED_WIDTH' })}
               >
-                New bank account
+                New Bank Account
               </Button>
             )}
           </>
@@ -101,10 +101,10 @@ export default function BankAccountsPage() {
             { key: 'c', header: 'Code', render: (b) => <strong>{b.code}</strong> },
             { key: 'n', header: 'Name', render: (b) => b.name },
             { key: 'b', header: 'Bank', render: (b) => b.bankName },
-            { key: 'a', header: 'Account no.', render: (b) => b.accountNo },
+            { key: 'a', header: 'Account No.', render: (b) => b.accountNo },
             { key: 'y', header: 'Ccy', render: (b) => b.currency },
             { key: 'g', header: 'GL', render: (b) => b.glAccountCode },
-            { key: 'p', header: 'PDC clearing', render: (b) => b.pdcClearingAccountCode ?? '' },
+            { key: 'p', header: 'PDC Clearing', render: (b) => b.pdcClearingAccountCode ?? '' },
             { key: 's', header: 'Status', render: (b) => <StatusBadge status={b.recordStatus} /> },
             {
               key: 'x',
@@ -120,7 +120,7 @@ export default function BankAccountsPage() {
                       setBooks(b);
                     }}
                   >
-                    Cheque books
+                    Cheque Books
                   </Button>
                   {awaitsOtherChecker(b, user?.username) && can('MASTER_AUTHORIZE') && (
                     <Button
@@ -146,7 +146,7 @@ export default function BankAccountsPage() {
         onClose={() => setForm(null)}
         footer={
           <Button variant="accent" busy={save.isPending} onClick={() => form && save.mutate(form)}>
-            Save for authorization
+            Save for Authorization
           </Button>
         }
       >
@@ -223,7 +223,7 @@ function ChequeBooksModal({ bank, onClose }: Readonly<{ bank: BankAccount; onClo
           rowKey={(b) => b.id}
           columns={[
             { key: 'r', header: 'Range', render: (b) => `${b.firstNo} – ${b.lastNo}` },
-            { key: 'n', header: 'Next leaf', render: (b) => b.nextNo },
+            { key: 'n', header: 'Next Leaf', render: (b) => b.nextNo },
             { key: 'l', header: 'Remaining', numeric: true, render: (b) => b.remaining },
             { key: 'd', header: 'Received', render: (b) => formatDate(b.receivedOn) },
             { key: 's', header: 'Status', render: (b) => <StatusBadge status={b.status} /> },
@@ -259,7 +259,7 @@ function ChequeBooksModal({ bank, onClose }: Readonly<{ bank: BankAccount; onClo
               busy={add.isPending}
               onClick={() => add.mutate()}
             >
-              Add cheque book
+              Add Cheque Book
             </Button>
           </div>
         )}

@@ -80,7 +80,7 @@ export default function ClaimFormPage() {
             busy={register.isPending}
             onClick={submit}
           >
-            Register claim
+            Register Claim
           </Button>
         }
       />
@@ -106,7 +106,7 @@ export default function ClaimFormPage() {
               busy={cover.isFetching}
               onClick={() => setLookup({ policyNo: form.policyNo, lossDate: form.lossDate })}
             >
-              Check cover
+              Check Cover
             </Button>
           </div>
         </div>

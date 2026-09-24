@@ -111,7 +111,7 @@ export default function SystemParametersPage() {
               { key: 'd', header: 'Description', render: (p) => p.description },
               {
                 key: 'u',
-                header: 'Last changed',
+                header: 'Last Changed',
                 render: (p) =>
                   p.updatedBy === undefined ? '' : `${p.updatedBy}, ${formatDateTime(p.updatedAt)}`,
               },

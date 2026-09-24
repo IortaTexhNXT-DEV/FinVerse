@@ -60,7 +60,7 @@ export default function PartiesPage() {
               icon={<Plus size={16} />}
               onClick={() => setEditing(emptyParty(companyId, company?.baseCurrency))}
             >
-              New party
+              New Party
             </Button>
           )
         }
@@ -109,7 +109,7 @@ export default function PartiesPage() {
             { key: 'n', header: 'Name', render: (p) => p.name },
             { key: 't', header: 'Type', render: (p) => humanize(p.partyType) },
             { key: 'cur', header: 'Currency', render: (p) => p.defaultCurrency },
-            { key: 'cd', header: 'Credit days', numeric: true, render: (p) => p.creditDays },
+            { key: 'cd', header: 'Credit Days', numeric: true, render: (p) => p.creditDays },
             { key: 'tin', header: 'TIN', render: (p) => p.taxId ?? '' },
             { key: 's', header: 'Status', render: (p) => <StatusBadge status={p.recordStatus} /> },
             {

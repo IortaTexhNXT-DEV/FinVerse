@@ -102,7 +102,7 @@ export default function ProductDetailPage() {
         icon={<Plus size={14} />}
         onClick={() => setAdding(kind)}
       >
-        Add product rule
+        Add Product Rule
       </Button>
     );
   return (

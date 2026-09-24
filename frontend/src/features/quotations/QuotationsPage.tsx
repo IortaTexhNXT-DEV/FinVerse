@@ -1,81 +1,35 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Filter, Inbox, Plus, Search, Send, Upload } from 'lucide-react';
+import { Inbox, Plus, Send, Upload } from 'lucide-react';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { quotationsApi } from '@/api/quotations';
 import type { QuotationListItem } from '@/api/quotations';
 import { useAuth } from '@/auth/authContext';
+import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
-import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { BatchSendDialog } from './BatchSendDialog';
-import { criteriaOf, QUICK_FILTERS, QUOTATION_TABS, sendable, toggle } from './quotationList';
+import {
+  criteriaOf,
+  QUICK_FILTERS,
+  QUOTATION_TABS,
+  sendable,
+  tabOf,
+  toggle,
+} from './quotationList';
 import type { QuickFilter, QuotationTab } from './quotationList';
 import { QUOTATION_COLUMNS } from './quotationColumns';
 import { selectionColumn } from './selection';
 import '@/styles/quotation.css';
 
 const EXPIRY_WARNING_DAYS = 7;
-
-function Toolbar({
-  text,
-  onText,
-  onSearch,
-  onFilters,
-  selectedCount,
-  onSend,
-}: Readonly<{
-  text: string;
-  onText: (t: string) => void;
-  onSearch: () => void;
-  onFilters: () => void;
-  selectedCount: number;
-  onSend: () => void;
-}>) {
-  return (
-    <form
-      className="worklist-toolbar"
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSearch();
-      }}
-    >
-      <Field label="Search Proposal No.">
-        {(id) => (
-          <input
-            id={id}
-            className="input"
-            placeholder="Proposal No., ARN, client code or name"
-            value={text}
-            onChange={(e) => onText(e.target.value)}
-          />
-        )}
-      </Field>
-      <Button type="submit" variant="primary" icon={<Search size={16} />}>
-        Search
-      </Button>
-      <Button variant="ghost" icon={<Filter size={16} />} onClick={onFilters}>
-        Filters
-      </Button>
-      <div className="spacer" />
-      <Button
-        variant="secondary"
-        icon={<Send size={16} />}
-        disabled={selectedCount === 0}
-        onClick={onSend}
-      >
-        Send via Email{selectedCount > 0 ? ` (${selectedCount})` : ''}
-      </Button>
-    </form>
-  );
-}
 
 /**
  * Quotations (BRNB.020-024/042/043): the work list of package quotations with status tabs, quick
@@ -88,9 +42,9 @@ export default function QuotationsPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<QuotationTab>('drafts');
+  const [params] = useSearchParams();
+  const [tab, setTab] = useState<QuotationTab>(tabOf(params.get('tab')));
   const [quick, setQuick] = useState<QuickFilter>();
-  const [text, setText] = useState('');
   const [applied, setApplied] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [page, setPage] = useState(0);
@@ -130,6 +84,15 @@ export default function QuotationsPage() {
           selected,
           (id) => setSelected((s) => toggle(s, id)),
           (q) => q.quotationNo,
+          {
+            rows,
+            onSetAll: (ids, on) =>
+              setSelected((s) => {
+                const next = new Set(s);
+                ids.forEach((id) => (on ? next.add(id) : next.delete(id)));
+                return next;
+              }),
+          },
         ),
         ...QUOTATION_COLUMNS,
       ]
@@ -173,17 +136,22 @@ export default function QuotationsPage() {
       </div>
       <Card flush>
         <Tabs tabs={QUOTATION_TABS} active={tab} onChange={(t) => choose(t)} />
-        <Toolbar
-          text={text}
-          onText={setText}
-          onSearch={() => {
+        <WorklistToolbar
+          onSearch={(text) => {
             setApplied(text);
             setPage(0);
           }}
-          onFilters={() => setShowFilters((s) => !s)}
-          selectedCount={ready.length}
-          onSend={() => setSending(true)}
-        />
+          filters={{ open: showFilters, onToggle: () => setShowFilters((f) => !f) }}
+        >
+          <Button
+            variant="secondary"
+            icon={<Send size={16} />}
+            disabled={ready.length === 0}
+            onClick={() => setSending(true)}
+          >
+            Send via Email{ready.length > 0 ? ` (${String(ready.length)})` : ''}
+          </Button>
+        </WorklistToolbar>
         {showFilters && (
           <div className="worklist-filters">
             <label className="checkbox">
@@ -192,7 +160,7 @@ export default function QuotationsPage() {
                 checked={quick === 'myDrafts'}
                 onChange={(e) => choose('drafts', e.target.checked ? 'myDrafts' : undefined)}
               />
-              Only my drafts
+              Only My Drafts
             </label>
             <label className="checkbox">
               <input

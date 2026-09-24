@@ -82,7 +82,7 @@ export function CalculatorResult({ result }: Readonly<{ result: RatingResult }>)
               { key: 'l', header: 'Item', render: (i) => i.label },
               {
                 key: 's',
-                header: 'Sum insured',
+                header: 'Sum Insured',
                 numeric: true,
                 render: (i) => <Amount value={i.sumInsured} />,
               },

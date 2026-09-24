@@ -47,7 +47,7 @@ export default function DocumentTemplatesPage() {
               icon={<FilePlus2 size={16} />}
               onClick={() => setEditing(latest)}
             >
-              New version
+              New Version
             </Button>
           )
         }
@@ -144,7 +144,7 @@ function NewVersionDialog({
             disabled={!title.trim() || !body.trim()}
             onClick={() => save.mutate()}
           >
-            Save version
+            Save Version
           </Button>
         </>
       }

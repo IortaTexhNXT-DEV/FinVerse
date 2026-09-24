@@ -73,7 +73,7 @@ export default function BranchesPage() {
                 setForm({ openingDate: today(), headOffice: false, forexAuthorized: false })
               }
             >
-              New branch
+              New Branch
             </Button>
           )
         }
@@ -89,7 +89,7 @@ export default function BranchesPage() {
             { key: 'n', header: 'Name', render: (b) => b.name },
             { key: 'r', header: 'Region', render: (b) => b.region ?? '' },
             { key: 'o', header: 'Opened', render: (b) => formatDate(b.openingDate) },
-            { key: 'h', header: 'Head office', render: (b) => (b.headOffice ? 'Yes' : '') },
+            { key: 'h', header: 'Head Office', render: (b) => (b.headOffice ? 'Yes' : '') },
             { key: 'f', header: 'Forex', render: (b) => (b.forexAuthorized ? 'Authorized' : '') },
             { key: 's', header: 'Status', render: (b) => <StatusBadge status={b.recordStatus} /> },
             {
@@ -119,7 +119,7 @@ export default function BranchesPage() {
         onClose={() => setForm(null)}
         footer={
           <Button variant="accent" busy={save.isPending} onClick={() => form && save.mutate(form)}>
-            Save for authorization
+            Save for Authorization
           </Button>
         }
       >

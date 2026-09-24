@@ -161,7 +161,7 @@ export function RateModal({ table, onClose }: Readonly<{ table: RateTable; onClo
       onClose={onClose}
       footer={
         <Button variant="accent" busy={save.isPending} onClick={() => save.mutate()}>
-          Save for authorization
+          Save for Authorization
         </Button>
       }
     >

@@ -86,7 +86,7 @@ export default function InvestmentsPage() {
                 })
               }
             >
-              New investment
+              New Investment
             </Button>
           )
         }
@@ -152,7 +152,7 @@ export default function InvestmentsPage() {
               numeric: true,
               render: (h) => <Amount value={h.accruedInterest} />,
             },
-            { key: 'sd', header: 'IC deposit', render: (h) => (h.securityDeposit ? 'Yes' : '') },
+            { key: 'sd', header: 'IC Deposit', render: (h) => (h.securityDeposit ? 'Yes' : '') },
             { key: 's', header: 'Status', render: (h) => <StatusBadge status={h.status} /> },
             {
               key: 'x',

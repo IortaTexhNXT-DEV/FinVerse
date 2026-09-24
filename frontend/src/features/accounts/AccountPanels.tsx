@@ -95,7 +95,7 @@ export function ItemsPanel({ account }: Readonly<{ account: Account }>) {
           { key: 'd', header: 'Description', render: (i) => i.description ?? '' },
           {
             key: 's',
-            header: 'Sum insured',
+            header: 'Sum Insured',
             numeric: true,
             render: (i) => <Amount value={i.sumInsured} />,
           },

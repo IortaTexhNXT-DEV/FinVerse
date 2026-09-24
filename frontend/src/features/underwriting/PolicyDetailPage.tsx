@@ -137,7 +137,7 @@ export default function PolicyDetailPage() {
             { key: 'zone', header: 'Zone', render: (r) => r.accumulationZone ?? '' },
             {
               key: 'si',
-              header: 'Sum insured',
+              header: 'Sum Insured',
               numeric: true,
               render: (r) => <Amount value={r.sumInsured} />,
             },

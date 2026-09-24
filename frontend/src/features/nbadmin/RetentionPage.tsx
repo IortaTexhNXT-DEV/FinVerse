@@ -58,7 +58,7 @@ export default function RetentionPage() {
               busy={run.isPending}
               onClick={() => run.mutate()}
             >
-              Run review now
+              Run Review Now
             </Button>
           )
         }
@@ -74,16 +74,16 @@ export default function RetentionPage() {
           rows={rules.data ?? []}
           rowKey={(r) => r.id}
           columns={[
-            { key: 'type', header: 'Record type', render: (r) => humanize(r.recordType) },
+            { key: 'type', header: 'Record Type', render: (r) => humanize(r.recordType) },
             {
               key: 'statuses',
               header: 'Statuses',
               render: (r) => r.statuses.split(',').map(humanize).join(', '),
             },
-            { key: 'online', header: 'Years online', numeric: true, render: (r) => r.yearsOnline },
+            { key: 'online', header: 'Years Online', numeric: true, render: (r) => r.yearsOnline },
             {
               key: 'archive',
-              header: 'Years archive',
+              header: 'Years Archive',
               numeric: true,
               render: (r) => r.yearsArchive,
             },
@@ -93,8 +93,8 @@ export default function RetentionPage() {
               header: 'Rule',
               render: (r) => <StatusBadge status={r.active ? 'ACTIVE' : 'INACTIVE'} />,
             },
-            { key: 'last', header: 'Last review', render: (r) => formatDateTime(r.lastRunAt) },
-            { key: 'eligible', header: 'Eligible records', render: eligibleText },
+            { key: 'last', header: 'Last Review', render: (r) => formatDateTime(r.lastRunAt) },
+            { key: 'eligible', header: 'Eligible Records', render: eligibleText },
             {
               key: 'actions',
               header: '',

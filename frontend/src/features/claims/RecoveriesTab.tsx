@@ -33,7 +33,7 @@ export function RecoveriesTab({ claim, actions, onChange }: Readonly<ClaimTabPro
             icon={<Plus size={14} />}
             onClick={() => setOpen(true)}
           >
-            Record recovery
+            Record Recovery
           </Button>
         )
       }
@@ -48,10 +48,10 @@ export function RecoveriesTab({ claim, actions, onChange }: Readonly<ClaimTabPro
         rowKey={(r) => r.id}
         caption="Recoveries"
         columns={[
-          { key: 'no', header: 'Recovery no.', render: (r) => <strong>{r.recoveryNo}</strong> },
+          { key: 'no', header: 'Recovery No.', render: (r) => <strong>{r.recoveryNo}</strong> },
           { key: 'type', header: 'Type', render: (r) => humanize(r.recoveryType) },
           { key: 'from', header: 'From', render: (r) => r.fromPartyName ?? '—' },
-          { key: 'bank', header: 'Bank account', render: (r) => r.bankAccountCode },
+          { key: 'bank', header: 'Bank Account', render: (r) => r.bankAccountCode },
           {
             key: 'amt',
             header: 'Amount',
@@ -60,13 +60,13 @@ export function RecoveriesTab({ claim, actions, onChange }: Readonly<ClaimTabPro
           },
           {
             key: 'our',
-            header: 'Our share',
+            header: 'Our Share',
             numeric: true,
             render: (r) => <Amount value={r.ourAmount} />,
           },
           {
             key: 'date',
-            header: 'Accounting date',
+            header: 'Accounting Date',
             render: (r) => formatDate(r.approval.approvalDate),
           },
           {

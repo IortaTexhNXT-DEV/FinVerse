@@ -77,7 +77,7 @@ export function BudgetTools({ budget, onUpdated }: Readonly<Props>) {
             onClick={() => copyActuals.mutate()}
             style={{ alignSelf: 'end' }}
           >
-            Copy actuals
+            Copy Actuals
           </Button>
         </div>
         <p className="muted">

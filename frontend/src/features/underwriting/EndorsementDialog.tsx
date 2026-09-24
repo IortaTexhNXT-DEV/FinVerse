@@ -65,7 +65,7 @@ export function EndorsementDialog({
           disabled={form.description.trim() === ''}
           onClick={() => create.mutate(form)}
         >
-          Create draft endorsement
+          Create Draft Endorsement
         </Button>
       }
     >

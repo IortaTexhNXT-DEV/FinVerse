@@ -99,13 +99,13 @@ export default function BankReconciliationPage() {
               { key: 'date', header: 'As of', render: (r) => formatDate(r.asOfDate) },
               {
                 key: 'book',
-                header: 'Book balance',
+                header: 'Book Balance',
                 numeric: true,
                 render: (r) => <Amount value={r.bookBalance} />,
               },
               {
                 key: 'stmt',
-                header: 'Statement balance',
+                header: 'Statement Balance',
                 numeric: true,
                 render: (r) => <Amount value={r.statementBalance} />,
               },

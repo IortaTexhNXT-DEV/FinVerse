@@ -52,7 +52,7 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
           ),
         },
         { key: 'unit', header: 'From', render: (i) => i.originatingUnit ?? i.createdBy },
-        { key: 'age', header: 'In stage', render: (i) => ageText(i.stageEnteredAt) },
+        { key: 'age', header: 'In Stage', render: (i) => ageText(i.stageEnteredAt) },
         { key: 'due', header: 'Due', render: (i) => <DueCell item={i} /> },
         {
           key: 'assignee',

@@ -21,7 +21,7 @@ export function TotalsTable({ totals }: Readonly<{ totals: ReserveTotal[] }>) {
         { key: 'g', header: GROSS, numeric: true, render: (t) => <Amount value={t.gross} /> },
         {
           key: 'r',
-          header: 'RI share / UCR',
+          header: 'RI Share / UCR',
           numeric: true,
           render: (t) => <Amount value={t.ri} />,
         },
@@ -39,7 +39,7 @@ export function LineSummaryTable({ lines }: Readonly<{ lines: ReserveLine[] }>) 
       rowKey={(s) => s.key}
       columns={[
         { key: 't', header: 'Reserve', render: (s) => reserveLabel(s.type) },
-        { key: 'l', header: 'Line of business', render: (s) => s.businessLine },
+        { key: 'l', header: 'Line of Business', render: (s) => s.businessLine },
         { key: 'g', header: GROSS, numeric: true, render: (s) => <Amount value={s.gross} /> },
         { key: 'r', header: RI_SHARE, numeric: true, render: (s) => <Amount value={s.ri} /> },
         { key: 'n', header: NET, numeric: true, render: (s) => <Amount value={s.net} /> },
@@ -81,7 +81,7 @@ export function MovementsTable({ movements }: Readonly<{ movements: ReserveMovem
       columns={[
         { key: 'b', header: 'Branch', render: (m) => m.branchCode },
         { key: 'l', header: 'Line', render: (m) => m.businessLine },
-        { key: 'e', header: 'Accounting event', render: (m) => m.eventType },
+        { key: 'e', header: 'Accounting Event', render: (m) => m.eventType },
         { key: 'c', header: 'Component', render: (m) => m.component },
         { key: 'a', header: 'Movement', numeric: true, render: (m) => <Amount value={m.amount} /> },
       ]}

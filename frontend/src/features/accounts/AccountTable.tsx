@@ -23,7 +23,7 @@ export function AccountTable({
   page,
   onPage,
   columns = ACCOUNT_COLUMNS,
-  emptyMessage = 'No account matches.',
+  emptyMessage = 'No items to display',
 }: Readonly<Props>) {
   const companyId = useCompanyId();
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ export function AccountTable({
         page={page}
         totalPages={result.data?.totalPages ?? 0}
         total={result.data?.totalElements ?? 0}
-        noun="accounts"
+        size={result.data?.size}
         onPage={onPage}
       />
     </>

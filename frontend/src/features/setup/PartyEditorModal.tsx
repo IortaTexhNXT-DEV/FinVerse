@@ -46,7 +46,7 @@ export function PartyEditorModal({ initial, onClose }: Readonly<Props>) {
       onClose={onClose}
       footer={
         <Button variant="accent" busy={save.isPending} onClick={submit}>
-          Save for authorization
+          Save for Authorization
         </Button>
       }
     >

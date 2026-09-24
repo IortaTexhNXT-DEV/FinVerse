@@ -30,7 +30,7 @@ function PeriodActions({ period, ready, busy, onTransition }: Readonly<ActionPro
     <>
       {period.status === 'OPEN' && (
         <Button variant="secondary" busy={busy} onClick={() => onTransition('startClosing')}>
-          Start soft close
+          Start Soft Close
         </Button>
       )}
       {closable && (
@@ -40,7 +40,7 @@ function PeriodActions({ period, ready, busy, onTransition }: Readonly<ActionPro
           disabled={!ready}
           onClick={() => onTransition('close')}
         >
-          Close period
+          Close Period
         </Button>
       )}
     </>
@@ -84,7 +84,7 @@ export function PeriodEndPanel({
               icon={<Coins size={16} />}
               onClick={() => void navigate('/planning/fx-revaluation')}
             >
-              FX revaluation
+              FX Revaluation
             </Button>
             {period && can('PERIOD_MANAGE') && (
               <PeriodActions

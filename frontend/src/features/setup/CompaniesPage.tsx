@@ -37,22 +37,22 @@ export default function CompaniesPage() {
           rowKey={(c) => c.id}
           columns={[
             { key: 'c', header: 'Code', render: (c) => <strong>{c.code}</strong> },
-            { key: 'n', header: 'Legal name', render: (c) => c.name },
+            { key: 'n', header: 'Legal Name', render: (c) => c.name },
             { key: 't', header: 'TIN', render: (c) => c.taxId ?? '' },
-            { key: 'b', header: 'Base currency', render: (c) => c.baseCurrency },
+            { key: 'b', header: 'Base Currency', render: (c) => c.baseCurrency },
             {
               key: 'f',
-              header: 'Fiscal year starts',
+              header: 'Fiscal Year Starts',
               render: (c) => MONTHS[c.fiscalYearStartMonth - 1] ?? '',
             },
             {
               key: 'w',
-              header: 'Back / forward value days',
+              header: 'Back / Forward Value Days',
               render: (c) => `${c.backValueDays} / ${c.forwardValueDays}`,
             },
             {
               key: 'r',
-              header: 'Retained earnings a/c',
+              header: 'Retained Earnings A/C',
               render: (c) => c.retainedEarningsAccount ?? '',
             },
             { key: 's', header: 'Status', render: (c) => <StatusBadge status={c.recordStatus} /> },

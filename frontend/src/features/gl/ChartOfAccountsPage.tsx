@@ -70,7 +70,7 @@ export default function ChartOfAccountsPage() {
         actions={
           can('MASTER_MAINTAIN') && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => open(null)}>
-              New account
+              New Account
             </Button>
           )
         }
@@ -117,7 +117,7 @@ export default function ChartOfAccountsPage() {
               header: 'Sub-ledger',
               render: (a) => (a.controlAccount ? a.subLedgerType : ''),
             },
-            { key: 'grp', header: 'Statement line', render: (a) => a.reportGroup ?? '' },
+            { key: 'grp', header: 'Statement Line', render: (a) => a.reportGroup ?? '' },
             {
               key: 'st',
               header: 'Status',
@@ -171,7 +171,7 @@ export default function ChartOfAccountsPage() {
         onClose={() => setForm(null)}
         footer={
           <Button variant="accent" busy={save.isPending} onClick={() => form && save.mutate(form)}>
-            Save for authorization
+            Save for Authorization
           </Button>
         }
       >

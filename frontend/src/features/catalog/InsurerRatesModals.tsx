@@ -36,12 +36,12 @@ export function BranchModal({ insurerId, onClose }: Readonly<Props>) {
   const set = (patch: Partial<BranchInput>) => setForm((f) => ({ ...f, ...patch }));
   return (
     <Modal
-      title="New branch"
+      title="New Branch"
       open
       onClose={onClose}
       footer={
         <Button variant="accent" busy={save.isPending} onClick={() => save.mutate()}>
-          Save for authorization
+          Save for Authorization
         </Button>
       }
     >
@@ -97,12 +97,12 @@ export function CommissionModal({ insurerId, onClose }: Readonly<Props>) {
   const set = (patch: Partial<CommissionInput>) => setForm((f) => ({ ...f, ...patch }));
   return (
     <Modal
-      title="New commission rate"
+      title="New Commission Rate"
       open
       onClose={onClose}
       footer={
         <Button variant="accent" busy={save.isPending} onClick={() => save.mutate()}>
-          Save for authorization
+          Save for Authorization
         </Button>
       }
     >

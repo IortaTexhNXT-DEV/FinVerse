@@ -104,7 +104,7 @@ export default function JournalDetailPage() {
           columns={[
             { key: 'no', header: '#', render: (l) => l.lineNo },
             { key: 'acc', header: 'Account', render: (l) => `${l.accountCode} – ${l.accountName}` },
-            { key: 'cc', header: 'Cost centre', render: (l) => l.costCenter ?? '' },
+            { key: 'cc', header: 'Cost Centre', render: (l) => l.costCenter ?? '' },
             { key: 'lob', header: 'LOB', render: (l) => l.businessLine ?? '' },
             { key: 'ccy', header: 'Ccy', render: (l) => l.currency },
             {

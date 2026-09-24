@@ -148,7 +148,7 @@ export function AttachmentUploadBar({
           busy={busy}
           onClick={() => input.current?.click()}
         >
-          Attach files
+          Attach Files
         </Button>
         <span className="muted">
           {extensions.join(', ')} · max {formatBytes(maxBytes)} · up to {maxFiles} files

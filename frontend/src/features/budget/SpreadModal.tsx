@@ -20,12 +20,12 @@ export function SpreadModal({ open, initialAnnual, onClose, onApply }: Readonly<
 
   return (
     <Modal
-      title="Spread annual amount"
+      title="Spread Annual Amount"
       open={open}
       onClose={onClose}
       footer={
         <Button variant="accent" onClick={() => onApply(preview)}>
-          Apply to row
+          Apply to Row
         </Button>
       }
     >

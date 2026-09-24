@@ -88,7 +88,7 @@ export default function IcMappingPage() {
                 })
               }
             >
-              New line
+              New Line
             </Button>
           )
         }
@@ -149,7 +149,7 @@ export default function IcMappingPage() {
         onClose={() => setForm(null)}
         footer={
           <Button variant="accent" busy={save.isPending} onClick={() => form && save.mutate(form)}>
-            Save for authorization
+            Save for Authorization
           </Button>
         }
       >

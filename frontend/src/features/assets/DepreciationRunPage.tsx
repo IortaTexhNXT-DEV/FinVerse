@@ -60,7 +60,7 @@ export default function DepreciationRunPage() {
               disabled={!summary.postable}
               onClick={() => post.mutate()}
             >
-              Post depreciation
+              Post Depreciation
             </Button>
           )
         }
@@ -89,7 +89,7 @@ export default function DepreciationRunPage() {
             { key: 'd', header: 'Description', render: (l) => l.description },
             { key: 'c', header: 'Category', render: (l) => l.categoryCode },
             { key: 'b', header: 'Branch', render: (l) => branchName(l.branchId) },
-            { key: 'cc', header: 'Cost centre', render: (l) => l.costCenter ?? '' },
+            { key: 'cc', header: 'Cost Centre', render: (l) => l.costCenter ?? '' },
             { key: 'm', header: 'Months', numeric: true, render: (l) => l.months },
             {
               key: 'a',

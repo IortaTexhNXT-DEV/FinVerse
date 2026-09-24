@@ -84,7 +84,7 @@ export default function BudgetVsActualPage() {
             icon={<FileBarChart2 size={16} />}
             onClick={() => void navigate('/reports/GL-BVA')}
           >
-            Report & export
+            Report & Export
           </Button>
         }
       />
@@ -179,7 +179,7 @@ export default function BudgetVsActualPage() {
               { key: 'a', header: 'Account', render: (l) => `${l.accountCode} ${l.accountName}` },
               {
                 key: 'b',
-                header: 'Annual budget',
+                header: 'Annual Budget',
                 numeric: true,
                 render: (l) => <Amount value={l.annualBudget} />,
               },
@@ -206,7 +206,7 @@ export default function BudgetVsActualPage() {
           columns={[
             { key: 'a', header: 'Account', render: (l) => <strong>{l.accountCode}</strong> },
             { key: 'n', header: 'Name', render: (l) => l.accountName },
-            { key: 'c', header: 'Cost centre', render: (l) => l.costCenter ?? '' },
+            { key: 'c', header: 'Cost Centre', render: (l) => l.costCenter ?? '' },
             {
               key: 'bm',
               header: 'Budget (month)',

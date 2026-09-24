@@ -56,7 +56,7 @@ export function PolicyCessionsCard({ companyId }: Readonly<{ companyId: number }
             busy={cede.isPending}
             onClick={() => cede.mutate(found.id)}
           >
-            Cede now
+            Cede Now
           </Button>
         )
       }
@@ -89,10 +89,10 @@ export function PolicyCessionsCard({ companyId }: Readonly<{ companyId: number }
           { key: 'n', header: 'Cession', render: (c) => <strong>{c.cessionNo}</strong> },
           { key: 'd', header: 'Document', render: (c) => `${c.documentNo} (${humanize(c.kind)})` },
           { key: 'b', header: 'Basis', render: (c) => humanize(c.basis) },
-          { key: 'r', header: 'RI date', render: (c) => formatDate(c.riDate) },
+          { key: 'r', header: 'RI Date', render: (c) => formatDate(c.riDate) },
           {
             key: 'p',
-            header: 'Our premium',
+            header: 'Our Premium',
             numeric: true,
             render: (c) => <Amount value={c.ourPremium} />,
           },
@@ -130,7 +130,7 @@ export function PolicyCessionsCard({ companyId }: Readonly<{ companyId: number }
             { key: 'pc', header: 'SI %', numeric: true, render: (l) => l.sharePct },
             {
               key: 's',
-              header: 'Sum insured',
+              header: 'Sum Insured',
               numeric: true,
               render: (l) => <Amount value={l.sumInsured} />,
             },

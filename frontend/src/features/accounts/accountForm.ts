@@ -52,7 +52,7 @@ export const WIZARD_STEPS = [
 
 export type WizardStep = (typeof WIZARD_STEPS)[number]['id'];
 
-/** Autosave interval of a draft (BRNB.012). */
+/** Autosave interval of a draft (BRNB.051 / 066 "auto-save draft"). */
 export const AUTOSAVE_MS = 30_000;
 
 /** The same day one year later (the usual annual period end). */
@@ -252,15 +252,21 @@ export type QuickFilter = 'all' | 'drafts' | 'returned' | 'payment' | 'ffy' | 'd
 /** Quick filters of the account list (BRNB.050). */
 export const QUICK_FILTERS: Record<QuickFilter, { label: string; criteria: AccountCriteria }> = {
   all: { label: 'All', criteria: {} },
-  drafts: { label: 'My drafts', criteria: { mine: true, status: ['DRAFT'] } },
+  drafts: { label: 'My Drafts', criteria: { mine: true, status: ['DRAFT'] } },
   returned: {
-    label: 'Returned to me',
+    label: 'Returned to Me',
     criteria: { mine: true, status: ['RETURNED_TO_MARKETING'] },
   },
-  payment: { label: 'Awaiting payment', criteria: { status: ['AWAITING_PAYMENT'] } },
+  payment: { label: 'Awaiting Payment', criteria: { status: ['AWAITING_PAYMENT'] } },
   ffy: { label: 'FFY', criteria: { ffy: true } },
-  direct: { label: 'Direct payment', criteria: { directPayment: true } },
+  direct: { label: 'Direct Payment', criteria: { directPayment: true } },
 };
+
+/** The quick filters as work list tabs, in display order. */
+export const QUICK_TABS = (Object.keys(QUICK_FILTERS) as QuickFilter[]).map((id) => ({
+  id,
+  label: QUICK_FILTERS[id].label,
+}));
 
 /** Draft changes when a client is chosen: segment and contact default from the client. */
 export function withClient(d: AccountDraft, c: ClientSummary | undefined): Partial<AccountDraft> {
@@ -310,4 +316,9 @@ export function criteriaOf(panel: SearchPanelValues, quick: QuickFilter): Accoun
   ) as AccountCriteria;
   const status = panel.status === '' ? undefined : [panel.status as AccountStatus];
   return { ...typed, status, ...QUICK_FILTERS[quick].criteria };
+}
+
+/** The search panel opened from a link (`/accounts?status=PLACED`, the NB dashboard drill-down). */
+export function panelOf(status: string | null): SearchPanelValues {
+  return { ...EMPTY_PANEL, status: status ?? '' };
 }

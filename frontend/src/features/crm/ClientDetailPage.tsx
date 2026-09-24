@@ -42,12 +42,16 @@ function Facts({ client: c }: Readonly<{ client: ClientDetail }>) {
       <StatusBadge status={c.status} />
       <span className="muted">KYC</span>
       <StatusBadge status={c.kyc.status} />
-      {!c.infoComplete && (
-        <span className="badge warning" title={c.missingFields.join(', ')}>
-          Information incomplete
+      {(!c.infoComplete || c.bankClient) && (
+        <span className="tag-list">
+          {!c.infoComplete && (
+            <span className="tag" title={c.missingFields.join(', ')}>
+              Information Incomplete
+            </span>
+          )}
+          {c.bankClient && <span className="tag">BDO Bank Client</span>}
         </span>
       )}
-      {c.bankClient && <span className="badge">BDO bank client</span>}
     </div>
   );
 }

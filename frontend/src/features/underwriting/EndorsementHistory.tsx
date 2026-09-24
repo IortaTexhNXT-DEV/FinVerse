@@ -36,11 +36,11 @@ export function EndorsementHistory({
           { key: 'no', header: 'Endorsement', render: (e) => <strong>{e.documentNo}</strong> },
           { key: 'type', header: 'Type', render: (e) => humanize(e.type) },
           { key: 'eff', header: 'Effective', render: (e) => formatDate(e.effectiveDate) },
-          { key: 'uwy', header: 'UW year', numeric: true, render: (e) => e.uwYear },
+          { key: 'uwy', header: 'UW Year', numeric: true, render: (e) => e.uwYear },
           { key: 'desc', header: 'Description', render: (e) => e.description },
           {
             key: 'due',
-            header: 'Total due',
+            header: 'Total Due',
             numeric: true,
             render: (e) => <Amount value={e.premium.totalDue} />,
           },

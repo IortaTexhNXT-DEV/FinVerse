@@ -35,7 +35,7 @@ export const ACCOUNT_COLUMNS: Column<AccountSummary>[] = [
   },
   {
     key: 'g',
-    header: 'Gross premium',
+    header: 'Gross Premium',
     numeric: true,
     render: (a) => <Amount value={a.grossPremium} />,
   },

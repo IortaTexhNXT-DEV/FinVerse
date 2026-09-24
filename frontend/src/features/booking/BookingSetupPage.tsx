@@ -76,7 +76,7 @@ function AutoBookTab({ companyId, canEdit }: Readonly<{ companyId: number; canEd
         emptyMessage="No auto-book rule: every issued account waits in Ready to Book."
         columns={[
           { key: 'product', header: 'Product', render: (r) => r.productCode ?? ANY },
-          { key: 'segment', header: 'Market segment', render: (r) => r.marketSegment ?? ANY },
+          { key: 'segment', header: 'Market Segment', render: (r) => r.marketSegment ?? ANY },
           { key: 'description', header: 'Description', render: (r) => r.description },
           { key: 'enabled', header: 'Status', render: (r) => onOff(r.enabled) },
         ]}

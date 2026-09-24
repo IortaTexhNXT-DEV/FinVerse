@@ -68,11 +68,11 @@ export function DetailsTab({ quotation: q }: Readonly<{ quotation: Quotation }>)
 
 const ITEM_COLUMNS = [
   { key: 'n', header: '#', numeric: true, render: (i: QuotationItemView) => i.itemNo },
-  { key: 'g', header: 'Risk group', numeric: true, render: (i: QuotationItemView) => i.riskGroup },
+  { key: 'g', header: 'Risk Group', numeric: true, render: (i: QuotationItemView) => i.riskGroup },
   { key: 'l', header: 'Risk', render: (i: QuotationItemView) => <strong>{i.label}</strong> },
   {
     key: 's',
-    header: 'Sum insured',
+    header: 'Sum Insured',
     numeric: true,
     render: (i: QuotationItemView) => <Amount value={i.sumInsured} />,
   },
@@ -140,25 +140,25 @@ function DiffTable({ diff }: Readonly<{ diff: QuotationDiff }>) {
           { key: 'r', header: 'Risk', render: (i) => i.risk },
           {
             key: 's1',
-            header: 'Sum insured before',
+            header: 'Sum Insured Before',
             numeric: true,
             render: (i) => <Amount value={i.fromSumInsured} />,
           },
           {
             key: 's2',
-            header: 'Sum insured after',
+            header: 'Sum Insured After',
             numeric: true,
             render: (i) => <Amount value={i.toSumInsured} />,
           },
           {
             key: 'p1',
-            header: 'Premium before',
+            header: 'Premium Before',
             numeric: true,
             render: (i) => <Amount value={i.fromPremium} />,
           },
           {
             key: 'p2',
-            header: 'Premium after',
+            header: 'Premium After',
             numeric: true,
             render: (i) => <Amount value={i.toPremium} />,
           },
@@ -213,13 +213,13 @@ export function VersionsTab({
             },
             {
               key: 'i',
-              header: 'Sum insured',
+              header: 'Sum Insured',
               numeric: true,
               render: (v) => <Amount value={v.totalSumInsured} />,
             },
             {
               key: 'g',
-              header: 'Gross premium',
+              header: 'Gross Premium',
               numeric: true,
               render: (v) => <Amount value={v.grossPremium} />,
             },

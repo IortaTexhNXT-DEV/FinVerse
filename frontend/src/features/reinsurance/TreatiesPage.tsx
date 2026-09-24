@@ -59,7 +59,7 @@ export default function TreatiesPage() {
         actions={
           can('REINSURANCE_MAINTAIN') && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={newTreaty}>
-              New treaty
+              New Treaty
             </Button>
           )
         }
@@ -75,7 +75,7 @@ export default function TreatiesPage() {
           columns={[
             { key: 'c', header: 'Code', render: (t) => <strong>{t.code}</strong> },
             { key: 'n', header: 'Name', render: (t) => t.name },
-            { key: 'y', header: 'UW year', render: (t) => t.uwYear },
+            { key: 'y', header: 'UW Year', render: (t) => t.uwYear },
             { key: 'l', header: 'Class', render: (t) => t.businessLine },
             { key: 't', header: 'Type', render: (t) => humanize(t.treatyType) },
             { key: 'k', header: 'Capacity', render: (t) => capacityLabel(t) },
@@ -120,7 +120,7 @@ export default function TreatiesPage() {
             disabled={problems.length > 0}
             onClick={() => form && save.mutate(form)}
           >
-            Save for authorization
+            Save for Authorization
           </Button>
         }
       >

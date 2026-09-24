@@ -114,7 +114,7 @@ export function BulkUploadWizard({
             icon={<Download size={16} />}
             onClick={() => void download(() => bulkApi.template(handler))}
           >
-            Download template
+            Download Template
           </Button>
         </div>
       </Card>
@@ -149,7 +149,7 @@ export function BulkUploadWizard({
                   }
                 }}
               >
-                Upload and validate
+                Upload and Validate
               </Button>
             </div>
           </div>
@@ -218,7 +218,7 @@ function JobReview(p: Readonly<JobReviewProps>) {
                 disabled={job.validRows === 0}
                 onClick={p.onCommit}
               >
-                Process {job.validRows} valid row(s)
+                Process {job.validRows} Valid Row(s)
               </Button>
               <Button
                 variant="secondary"
@@ -226,16 +226,16 @@ function JobReview(p: Readonly<JobReviewProps>) {
                 busy={p.cancelling}
                 onClick={p.onCancel}
               >
-                Discard upload
+                Discard Upload
               </Button>
             </>
           )}
           <Button variant="secondary" icon={<Download size={16} />} onClick={p.onReport}>
-            Result report
+            Result Report
           </Button>
           {!open && (
             <Button variant="ghost" onClick={p.onReset}>
-              Upload another file
+              Upload Another File
             </Button>
           )}
           <span className="spacer" />
@@ -266,7 +266,7 @@ function JobReview(p: Readonly<JobReviewProps>) {
             ...shown.map((h) => ({ key: h, header: h, render: (r: BulkRow) => r.values[h] ?? '' })),
             {
               key: 'msg',
-              header: 'Messages / reference',
+              header: 'Messages / Reference',
               render: (r) =>
                 r.messages ? (
                   <span className="field-error">{r.messages}</span>

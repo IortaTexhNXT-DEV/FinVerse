@@ -27,7 +27,7 @@ function ExpiryWarning({ minutes, onClose }: Readonly<{ minutes: number; onClose
       onClose={onClose}
       footer={
         <Button variant="accent" onClick={onClose}>
-          I understand
+          I Understand
         </Button>
       }
     >
@@ -123,10 +123,10 @@ export function SessionTimeoutGuard() {
         footer={
           <>
             <Button variant="secondary" onClick={logout}>
-              Sign out now
+              Sign Out Now
             </Button>
             <Button variant="accent" onClick={stay}>
-              Stay signed in
+              Stay Signed In
             </Button>
           </>
         }

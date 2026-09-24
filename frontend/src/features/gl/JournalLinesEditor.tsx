@@ -195,7 +195,7 @@ export function JournalLinesEditor({
               icon={<Plus size={15} />}
               onClick={() => onChange([...lines, emptyLine('DEBIT')])}
             >
-              Add debit
+              Add Debit
             </Button>
             <Button
               variant="secondary"
@@ -203,7 +203,7 @@ export function JournalLinesEditor({
               icon={<Plus size={15} />}
               onClick={() => onChange([...lines, emptyLine('CREDIT')])}
             >
-              Add credit
+              Add Credit
             </Button>
           </>
         )}

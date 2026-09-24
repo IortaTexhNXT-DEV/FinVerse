@@ -66,7 +66,7 @@ function PolicyEditor({ id, title, initial }: Readonly<EditorProps>) {
               busy={preview.isPending}
               onClick={() => run((f) => preview.mutate(f))}
             >
-              Preview premium
+              Preview Premium
             </Button>
             <Button
               variant="accent"
@@ -74,7 +74,7 @@ function PolicyEditor({ id, title, initial }: Readonly<EditorProps>) {
               busy={save.isPending}
               onClick={() => run((f) => save.mutate(f))}
             >
-              Save draft
+              Save Draft
             </Button>
           </>
         }

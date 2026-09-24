@@ -186,12 +186,12 @@ export function RuleEditorModal({ kind, scope, onClose }: Readonly<Props>) {
   });
   return (
     <Modal
-      title="New rule"
+      title="New Rule"
       open
       onClose={onClose}
       footer={
         <Button variant="accent" busy={save.isPending} onClick={() => save.mutate()}>
-          Save for authorization
+          Save for Authorization
         </Button>
       }
     >

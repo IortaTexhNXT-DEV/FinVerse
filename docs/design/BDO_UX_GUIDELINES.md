@@ -103,3 +103,19 @@ This page is binding for every BrokerVerse screen. Components read the design to
 | UX-3 | Customer Service Facility and Employee Benefits menu entries | Not in BRD-1/2; they wait for their BRDs |
 | UX-4 | Windows ID sign-in | BDO SSO / AD parked (Q42) |
 | UX-5 | "Send to TSU" directly from the client record | BrokerVerse routes to TSU from the PRF / quotation (BRNB.098 rules). To confirm whether a client-level TSU request is needed |
+
+## 7. Shared components that implement the patterns
+
+Use these instead of building a screen-specific variant.
+
+| Pattern | Component |
+|---|---|
+| Work list toolbar: search box with Search, Filters toggle, bulk actions on the right | `components/broking/WorklistToolbar` (CSS `.worklist-toolbar`, filters panel `.worklist-filters`) |
+| Status tabs of a work list card | `Tabs` as the first child of a `Card flush` (tabs stand on the card's separator line) |
+| Checkbox column with a select-all box in the header | `components/broking/rowSelection` (`selectionColumn`) |
+| "Showing 1 to n of N results" with numbered pages | `components/ui/Pager` (`Pager`, `PageFooter` for a paged API response) |
+| Record summary card: name, reference chip, status pill, flags, key facts with icons | `components/broking/RecordSummary` (`flags` renders `.tag` chips apart from the pill) |
+| Status pill colours | `StatusBadge`: green done / approved, yellow waiting for review or approval, blue (`info`) in process, red exception, grey draft or inactive |
+| Record flags (FFY, Direct Payment, Information Incomplete, TSU) | `<span className="tag">` inside `.tag-list`, never a status pill |
+| Empty list | `EmptyState` (the `DataTable` default message is "No items to display") |
+| Buttons | one filled primary (`accent`) per area; secondary actions outlined; destructive actions (`danger`) outlined red; labels in Title Case |

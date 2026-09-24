@@ -61,7 +61,7 @@ export default function TriangleViewerPage() {
             icon={<FileBarChart2 size={16} />}
             onClick={() => void navigate('/reports/RSV-TRIANGLE')}
           >
-            Report & export
+            Report & Export
           </Button>
         }
       />

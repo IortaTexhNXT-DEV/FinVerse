@@ -92,7 +92,7 @@ function TagDialogs({
   if (dialog === 'tsu') {
     return (
       <ActionDialog
-        title="TSU clearance"
+        title="TSU Clearance"
         confirmLabel="Record clearance"
         busy={clearTsu.isPending}
         error={clearTsu.error}
@@ -159,7 +159,7 @@ function TagButtons({
       )}
       {can('TSU_PROCESS') && tsuPending && (
         <Button size="sm" variant="secondary" onClick={() => onDialog('tsu')}>
-          Record TSU clearance
+          Record TSU Clearance
         </Button>
       )}
     </div>
@@ -168,7 +168,7 @@ function TagButtons({
 
 /**
  * Tags of an account: Free First Year (BRNB.101-104), payment arrangement / direct payment
- * (BRNB.114) and TSU clearance (BRNB.018), with the actions the user may take.
+ * (BRNB.114) and TSU clearance (BRNB.098), with the actions the user may take.
  */
 export function AccountTagsCard({ account }: Readonly<{ account: Account }>) {
   const [dialog, setDialog] = useState<Dialog>(null);

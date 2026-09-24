@@ -87,7 +87,7 @@ function YearsTable({ invoices }: Readonly<{ invoices: InvoiceDraft[] }>) {
       rows={invoices}
       rowKey={(i) => i.transactionNo}
       columns={[
-        { key: 'year', header: 'Policy year', render: (i) => i.policyYear },
+        { key: 'year', header: 'Policy Year', render: (i) => i.policyYear },
         { key: 'policy', header: 'Policy No.', render: (i) => i.policyNo ?? '' },
         {
           key: 'period',
@@ -96,7 +96,7 @@ function YearsTable({ invoices }: Readonly<{ invoices: InvoiceDraft[] }>) {
         },
         {
           key: 'gross',
-          header: 'Gross premium',
+          header: 'Gross Premium',
           numeric: true,
           render: (i) => formatAmount(i.premium.total),
         },

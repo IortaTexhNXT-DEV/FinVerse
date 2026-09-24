@@ -40,12 +40,12 @@ export function tilesOf(counts: WorkbenchCounts | undefined): Tile[] {
     booked: 0,
   };
   return [
-    { label: 'Awaiting payment', value: c.awaitingPayment, tab: 'AWAITING_PAYMENT' },
-    { label: 'Ready for placement', value: c.readyForPlacement, tab: 'FOR_PLACEMENT' },
+    { label: 'Awaiting Payment', value: c.awaitingPayment, tab: 'AWAITING_PAYMENT' },
+    { label: 'Ready for Placement', value: c.readyForPlacement, tab: 'FOR_PLACEMENT' },
     { label: 'Placed', value: c.placed, tab: 'FOR_PLACEMENT' },
-    { label: 'Returned by insurer', value: c.returnedByInsurer, tab: 'RETURNED', alert: true },
+    { label: 'Returned by Insurer', value: c.returnedByInsurer, tab: 'RETURNED', alert: true },
     {
-      label: 'Hold cover expiring',
+      label: 'Hold Cover Expiring',
       value: c.holdCoverExpiring,
       tab: 'HOLD_COVER_EXPIRING',
       alert: true,

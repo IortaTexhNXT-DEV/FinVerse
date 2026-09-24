@@ -10,6 +10,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatAmount, formatDate, formatDateTime, today } from '@/utils/format';
@@ -129,15 +130,15 @@ export default function EventRegisterPage() {
           caption="Accounting events"
           columns={[
             { key: 't', header: 'Processed', render: (e) => formatDateTime(e.processedAt) },
-            { key: 'e', header: 'Event type', render: (e) => <strong>{e.eventType}</strong> },
+            { key: 'e', header: 'Event Type', render: (e) => <strong>{e.eventType}</strong> },
             { key: 's', header: 'Source', render: (e) => `${e.sourceModule} ${e.sourceReference}` },
             { key: 'r', header: 'Reference', render: (e) => e.reference ?? '' },
-            { key: 'v', header: 'Value date', render: (e) => formatDate(e.valueDate) },
+            { key: 'v', header: 'Value Date', render: (e) => formatDate(e.valueDate) },
             { key: 'a', header: 'Amounts', render: amountsText },
             { key: 'st', header: 'Status', render: (e) => <StatusBadge status={e.status} /> },
             {
               key: 'b',
-              header: 'Journal / error',
+              header: 'Journal / Error',
               render: (e) =>
                 e.batchNo === undefined ? (
                   <span className="field-error">{e.errorMessage ?? ''}</span>
@@ -149,30 +150,7 @@ export default function EventRegisterPage() {
             },
           ]}
         />
-        {data !== undefined && data.totalPages > 1 && (
-          <div className="pagination">
-            <span className="muted">
-              Page {data.page + 1} of {data.totalPages} · {data.totalElements} events
-            </span>
-            <div className="spacer" />
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={data.page === 0}
-              onClick={() => setFilters((f) => ({ ...f, page: data.page - 1 }))}
-            >
-              Previous
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={data.page + 1 >= data.totalPages}
-              onClick={() => setFilters((f) => ({ ...f, page: data.page + 1 }))}
-            >
-              Next
-            </Button>
-          </div>
-        )}
+        <PageFooter data={data} onPage={(p) => setFilters((f) => ({ ...f, page: p }))} />
       </Card>
     </div>
   );

@@ -40,10 +40,10 @@ function Saved({ client, onAnother }: Readonly<{ client: ClientDetail; onAnother
             variant="accent"
             onClick={() => void navigate(`/crm/clients/${String(client.id)}`)}
           >
-            Open client
+            Open Client
           </Button>
           <Button variant="secondary" onClick={onAnother}>
-            Create another
+            Create Another
           </Button>
         </div>
       </div>

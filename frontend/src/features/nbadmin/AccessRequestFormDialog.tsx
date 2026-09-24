@@ -139,7 +139,7 @@ export function AccessRequestFormDialog({
   return (
     <Modal
       open
-      title="New access request"
+      title="New Access Request"
       onClose={onClose}
       footer={
         <>
@@ -147,7 +147,7 @@ export function AccessRequestFormDialog({
             Cancel
           </Button>
           <Button variant="accent" busy={submit.isPending} onClick={send}>
-            Submit for approval
+            Submit for Approval
           </Button>
         </>
       }

@@ -39,7 +39,7 @@ export function ReservesTab({ claim, actions, onChange }: Readonly<ClaimTabProps
             icon={<Plus size={14} />}
             onClick={() => setOpen(true)}
           >
-            Change reserve
+            Change Reserve
           </Button>
         )
       }
@@ -59,7 +59,7 @@ export function ReservesTab({ claim, actions, onChange }: Readonly<ClaimTabProps
           },
           {
             key: 'new',
-            header: 'New estimate',
+            header: 'New Estimate',
             numeric: true,
             render: (r) => <Amount value={r.newEstimate} />,
           },
@@ -71,7 +71,7 @@ export function ReservesTab({ claim, actions, onChange }: Readonly<ClaimTabProps
           },
           {
             key: 'our',
-            header: 'Our share',
+            header: 'Our Share',
             numeric: true,
             render: (r) => <Amount value={r.ourChange} />,
           },
@@ -83,7 +83,7 @@ export function ReservesTab({ claim, actions, onChange }: Readonly<ClaimTabProps
           { key: 'by', header: 'Entered by', render: (r) => r.approval.submittedBy },
           {
             key: 'date',
-            header: 'Accounting date',
+            header: 'Accounting Date',
             render: (r) => formatDate(r.approval.approvalDate),
           },
           {

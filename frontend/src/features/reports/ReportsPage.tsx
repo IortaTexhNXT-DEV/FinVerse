@@ -34,11 +34,10 @@ export default function ReportsPage() {
       <PageHeader
         section="Reports"
         title="Report Centre"
-        description="Run any report on screen or export it to PDF, Excel or CSV."
+        description="Run any report on screen, print it or download it as PDF, Excel, ODS, CSV or XML."
         actions={
           <input
-            className="input"
-            style={{ width: 280 }}
+            className="input report-search"
             aria-label="Search reports"
             placeholder="Search by title or code"
             value={search}
@@ -50,21 +49,16 @@ export default function ReportsPage() {
       {catalogue.isLoading && <span className="spinner" aria-label="Loading" />}
       {groups.map(([category, entries]) => (
         <Card key={category} title={category}>
-          <div className="grid-2">
+          <div className="report-grid">
             {entries.map((e) => (
-              <Link
-                key={e.code}
-                to={`/reports/${e.code}`}
-                className="card"
-                style={{ padding: 16, textDecoration: 'none', color: 'inherit' }}
-              >
-                <div className="row">
-                  <FileBarChart2 size={18} color="#0033A0" aria-hidden="true" />
-                  <strong style={{ color: '#00205B' }}>{e.title}</strong>
-                </div>
-                <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
-                  {e.code} · {e.description}
-                </div>
+              <Link key={e.code} to={`/reports/${e.code}`} className="report-card">
+                <FileBarChart2 size={20} aria-hidden="true" />
+                <span>
+                  <strong>{e.title}</strong>
+                  <span className="muted">
+                    {e.code} · {e.description}
+                  </span>
+                </span>
               </Link>
             ))}
           </div>

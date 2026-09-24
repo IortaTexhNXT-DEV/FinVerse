@@ -2,12 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { adminApi } from '@/api/admin';
 import type { AuditEntry } from '@/api/admin';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { PageFooter } from '@/components/ui/Pager';
 import { formatDateTime, today } from '@/utils/format';
 import { AuditExportButtons } from './AuditExportButtons';
 
@@ -98,30 +98,7 @@ export default function AuditTrailPage() {
             { key: 's', header: 'Details', render: (a) => a.summary },
           ]}
         />
-        {data !== undefined && data.totalPages > 1 && (
-          <div className="pagination">
-            <span className="muted">
-              Page {data.page + 1} of {data.totalPages}
-            </span>
-            <div className="spacer" />
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={data.page === 0}
-              onClick={() => setFilters((f) => ({ ...f, page: f.page - 1 }))}
-            >
-              Previous
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={data.page + 1 >= data.totalPages}
-              onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}
-            >
-              Next
-            </Button>
-          </div>
-        )}
+        <PageFooter data={data} onPage={(p) => setFilters((f) => ({ ...f, page: p }))} />
       </Card>
     </div>
   );

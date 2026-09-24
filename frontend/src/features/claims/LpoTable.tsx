@@ -36,7 +36,7 @@ export function LpoTable({
     },
   });
   const columns = [
-    { key: 'no', header: 'LPO no.', render: (l: Lpo) => <strong>{l.lpoNo}</strong> },
+    { key: 'no', header: 'LPO No.', render: (l: Lpo) => <strong>{l.lpoNo}</strong> },
     ...(showClaim ? [{ key: 'claim', header: 'Claim', render: (l: Lpo) => l.claimNo }] : []),
     { key: 'garage', header: 'Garage', render: (l: Lpo) => l.garageName },
     { key: 'cover', header: 'Cover', render: (l: Lpo) => l.coverType },

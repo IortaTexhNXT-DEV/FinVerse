@@ -119,7 +119,7 @@ export default function AssetRegisterPage() {
                 })
               }
             >
-              Register asset
+              Register Asset
             </Button>
           )
         }
@@ -181,7 +181,7 @@ export default function AssetRegisterPage() {
             },
             {
               key: 'ac',
-              header: 'Accum. depr.',
+              header: 'Accum. Depr.',
               numeric: true,
               render: (a) => <Amount value={a.accumulatedDepreciation} />,
             },

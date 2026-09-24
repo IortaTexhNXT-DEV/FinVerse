@@ -28,7 +28,7 @@ const COLUMNS: Column<RecurringTemplate>[] = [
     render: (t) =>
       formatAmount(t.lines.filter((l) => l.side === 'DEBIT').reduce((s, l) => s + l.amount, 0)),
   },
-  { key: 'l', header: 'Last generated', render: (t) => formatDate(t.lastOccurrenceDate) },
+  { key: 'l', header: 'Last Generated', render: (t) => formatDate(t.lastOccurrenceDate) },
   { key: 'x', header: 'Next', render: (t) => formatDate(t.nextOccurrence) },
   {
     key: 'f',
@@ -95,7 +95,7 @@ export default function RecurringJournalsPage() {
               setRunning(t);
             }}
           >
-            Run now
+            Run Now
           </Button>
         )}
         {canCreate && (
@@ -127,7 +127,7 @@ export default function RecurringJournalsPage() {
               icon={<Plus size={16} />}
               onClick={() => setForm(newTemplate(defaultBranch, company?.baseCurrency ?? 'PHP'))}
             >
-              New template
+              New Template
             </Button>
           )
         }

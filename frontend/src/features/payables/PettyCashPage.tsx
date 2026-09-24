@@ -98,7 +98,7 @@ export default function PettyCashPage() {
                 })
               }
             >
-              New fund
+              New Fund
             </Button>
           )
         }
@@ -128,13 +128,13 @@ export default function PettyCashPage() {
             },
             {
               key: 'h',
-              header: 'Cash in box',
+              header: 'Cash in Box',
               numeric: true,
               render: (f) => <Amount value={f.cashBalance} />,
             },
             {
               key: 'p',
-              header: 'Pending reimb.',
+              header: 'Pending Reimb.',
               numeric: true,
               render: (f) => <Amount value={f.pendingReimbursement} />,
             },
@@ -172,7 +172,7 @@ export default function PettyCashPage() {
       </Card>
       {fund !== undefined && <PettyCashFundPanel fund={fund} />}
       <Modal
-        title="New petty cash fund"
+        title="New Petty Cash Fund"
         open={form !== null}
         onClose={() => setForm(null)}
         footer={
@@ -181,7 +181,7 @@ export default function PettyCashPage() {
             busy={create.isPending}
             onClick={() => form && create.mutate(form)}
           >
-            Save for authorization
+            Save for Authorization
           </Button>
         }
       >

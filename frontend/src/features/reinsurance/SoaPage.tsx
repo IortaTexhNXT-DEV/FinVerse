@@ -152,7 +152,7 @@ function GenerateCard({ companyId, treaties, onGenerated }: Readonly<GeneratePro
         disabled={request.treatyCode === ''}
         onClick={() => generate.mutate()}
       >
-        Generate for all participants
+        Generate for All Participants
       </Button>
     </Card>
   );

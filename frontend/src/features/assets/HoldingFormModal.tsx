@@ -61,7 +61,7 @@ export function HoldingFormModal({ initial, onClose }: Readonly<Props>) {
       onClose={onClose}
       footer={
         <Button variant="accent" busy={save.isPending} onClick={submit}>
-          Save for approval
+          Save for Approval
         </Button>
       }
     >

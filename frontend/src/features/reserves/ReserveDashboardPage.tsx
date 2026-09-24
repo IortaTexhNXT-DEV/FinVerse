@@ -66,7 +66,7 @@ export default function ReserveDashboardPage() {
             icon={<FileBarChart2 size={16} />}
             onClick={() => void navigate('/reports/RSV-SUMMARY')}
           >
-            Report & export
+            Report & Export
           </Button>
         }
       />
@@ -144,13 +144,13 @@ export default function ReserveDashboardPage() {
           emptyMessage="No reserves: prepare a valuation run first."
           columns={[
             { key: 'r', header: 'Reserve', render: (r) => reserveLabel(r.reserve) },
-            { key: 'l', header: 'Line of business', render: (r) => r.businessLine },
+            { key: 'l', header: 'Line of Business', render: (r) => r.businessLine },
             { key: 'g', header: 'Gross', numeric: true, render: (r) => <Amount value={r.gross} /> },
-            { key: 'i', header: 'RI share', numeric: true, render: (r) => <Amount value={r.ri} /> },
+            { key: 'i', header: 'RI Share', numeric: true, render: (r) => <Amount value={r.ri} /> },
             { key: 'n', header: 'Net', numeric: true, render: (r) => <Amount value={r.net} /> },
             {
               key: 'p',
-              header: 'Previous net',
+              header: 'Previous Net',
               numeric: true,
               render: (r) => <Amount value={r.previousNet} />,
             },

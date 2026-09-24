@@ -45,7 +45,7 @@ export function MovementsTab({ claim }: Readonly<{ claim: Claim }>) {
           },
           {
             key: 'amt',
-            header: 'Our share',
+            header: 'Our Share',
             numeric: true,
             render: (m) => <Amount value={m.amount} />,
           },

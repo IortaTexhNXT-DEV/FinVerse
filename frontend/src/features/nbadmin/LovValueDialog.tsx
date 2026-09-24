@@ -73,7 +73,7 @@ export function LovValueDialog({ type, value, nextOrder, onClose }: Readonly<Lov
             Cancel
           </Button>
           <Button variant="accent" busy={save.isPending} onClick={submit}>
-            Save for authorization
+            Save for Authorization
           </Button>
         </>
       }

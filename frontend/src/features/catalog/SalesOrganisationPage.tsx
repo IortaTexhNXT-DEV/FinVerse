@@ -116,7 +116,7 @@ function AddModal({
       onClose={onClose}
       footer={
         <Button variant="accent" busy={save.isPending} onClick={() => save.mutate()}>
-          Save for authorization
+          Save for Authorization
         </Button>
       }
     >
@@ -208,10 +208,10 @@ export default function SalesOrganisationPage() {
                 icon={<User size={16} />}
                 onClick={() => setAdding({ ...BLANK, mode: 'officer' })}
               >
-                Assign officer
+                Assign Officer
               </Button>
               <Button variant="accent" icon={<Plus size={16} />} onClick={() => setAdding(BLANK)}>
-                New unit
+                New Unit
               </Button>
             </>
           )

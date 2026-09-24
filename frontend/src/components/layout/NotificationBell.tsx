@@ -83,7 +83,7 @@ export function NotificationBell() {
               disabled={unread === 0}
               onClick={() => readAll.mutate()}
             >
-              Mark all read
+              Mark All Read
             </button>
           </div>
           <ul className="notification-list">

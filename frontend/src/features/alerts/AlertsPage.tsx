@@ -80,7 +80,7 @@ export default function AlertsPage() {
               busy={runChecks.isPending}
               onClick={() => runChecks.mutate()}
             >
-              Run checks now
+              Run Checks Now
             </Button>
           )
         }

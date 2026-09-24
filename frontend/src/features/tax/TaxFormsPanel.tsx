@@ -93,7 +93,7 @@ export function TaxFormsPanel() {
               })
             }
           >
-            New form
+            New Form
           </Button>
         </div>
       )}
@@ -139,7 +139,7 @@ export function TaxFormsPanel() {
         onClose={() => setForm(null)}
         footer={
           <Button variant="accent" busy={save.isPending} onClick={() => form && save.mutate(form)}>
-            Save for authorization
+            Save for Authorization
           </Button>
         }
       >

@@ -11,6 +11,11 @@ export const QUOTATION_TABS = [
 
 export type QuotationTab = (typeof QUOTATION_TABS)[number]['id'];
 
+/** The tab named in a link (`/quotations?tab=sent`), Drafts when absent or unknown. */
+export function tabOf(value: string | null): QuotationTab {
+  return QUOTATION_TABS.find((t) => t.id === value)?.id ?? 'drafts';
+}
+
 /** Statuses listed under each tab; approved quotations wait with the ones for review. */
 export const TAB_STATUSES: Record<QuotationTab, QuotationStatus[]> = {
   drafts: ['DRAFT'],
@@ -31,8 +36,8 @@ interface QuickDef {
 
 /** Quick filters: each selects a tab, some narrow it further. */
 export const QUICK_FILTERS: Record<QuickFilter, QuickDef> = {
-  myDrafts: { label: 'My drafts', tab: 'drafts', mine: true },
-  forReview: { label: 'For review', tab: 'review' },
+  myDrafts: { label: 'My Drafts', tab: 'drafts', mine: true },
+  forReview: { label: 'For Review', tab: 'review' },
   sent: { label: 'Sent', tab: 'sent' },
   accepted: { label: 'Accepted', tab: 'accepted' },
   expiring: { label: 'Expiring', tab: 'sent', expiring: true },

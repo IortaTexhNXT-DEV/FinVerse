@@ -88,7 +88,7 @@ export default function DepositsPage() {
               busy={create.isPending}
               onClick={() => create.mutate()}
             >
-              Prepare slip ({total.toFixed(2)})
+              Prepare Slip ({total.toFixed(2)})
             </Button>
           )
         }
@@ -149,7 +149,7 @@ export default function DepositsPage() {
             { key: 'no', header: 'Receipt', render: (r) => r.receiptNo },
             { key: 'date', header: 'Date', render: (r) => formatDate(r.receiptDate) },
             { key: 'mode', header: 'Mode', render: (r) => humanize(r.mode) },
-            { key: 'chq', header: 'Cheque no.', render: (r) => r.instrumentNo ?? '' },
+            { key: 'chq', header: 'Cheque No.', render: (r) => r.instrumentNo ?? '' },
             { key: 'payer', header: 'Payer', render: (r) => r.payerName },
             { key: 'bank', header: 'Bank', render: (r) => r.bankAccountCode },
             {
@@ -168,8 +168,8 @@ export default function DepositsPage() {
           rowKey={(s) => s.id}
           caption="Deposit slips"
           columns={[
-            { key: 'no', header: 'Slip no.', render: (s) => <strong>{s.slipNo}</strong> },
-            { key: 'date', header: 'Slip date', render: (s) => formatDate(s.slipDate) },
+            { key: 'no', header: 'Slip No.', render: (s) => <strong>{s.slipNo}</strong> },
+            { key: 'date', header: 'Slip Date', render: (s) => formatDate(s.slipDate) },
             { key: 'bank', header: 'Bank', render: (s) => s.bankAccountCode },
             { key: 'n', header: 'Receipts', numeric: true, render: (s) => s.receiptCount },
             {
@@ -193,7 +193,7 @@ export default function DepositsPage() {
                         slipAction.mutate(() => receivablesApi.confirmSlip(s.id, today()))
                       }
                     >
-                      Confirm deposit
+                      Confirm Deposit
                     </Button>
                     <Button
                       size="sm"

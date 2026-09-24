@@ -103,7 +103,7 @@ export function PettyCashFundPanel({ fund }: Readonly<{ fund: Fund }>) {
               busy={claim.isPending}
               onClick={() => claim.mutate()}
             >
-              Claim reimbursement
+              Claim Reimbursement
             </Button>
             <Button
               size="sm"
@@ -111,7 +111,7 @@ export function PettyCashFundPanel({ fund }: Readonly<{ fund: Fund }>) {
               disabled={fund.establishedOn === undefined}
               onClick={() => setForm({ ...EMPTY })}
             >
-              New voucher
+              New Voucher
             </Button>
           </div>
         )
@@ -201,7 +201,7 @@ export function PettyCashFundPanel({ fund }: Readonly<{ fund: Fund }>) {
             busy={disburse.isPending}
             onClick={() => form && disburse.mutate(form)}
           >
-            Save for approval
+            Save for Approval
           </Button>
         }
       >

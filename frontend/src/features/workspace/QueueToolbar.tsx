@@ -41,7 +41,7 @@ export function QueueToolbar({
           size="sm"
           onClick={() => onFilter({ workflow: undefined, stage: undefined })}
         >
-          Clear stage filter
+          Clear Stage Filter
         </Button>
       )}
       <form

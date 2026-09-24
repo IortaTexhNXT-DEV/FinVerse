@@ -207,7 +207,7 @@ export default function PremiumCalculatorPage() {
             icon={<Plus size={14} />}
             onClick={() => set({ items: [...form.items, { ...EMPTY_ITEM }] })}
           >
-            Add item
+            Add Item
           </Button>
         }
       >

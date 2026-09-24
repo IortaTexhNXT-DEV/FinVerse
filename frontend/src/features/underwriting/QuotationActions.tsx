@@ -41,7 +41,7 @@ export function QuotationActions({ quotation: q }: Readonly<{ quotation: Quotati
           icon={<Layers size={16} />}
           onClick={() => setDialog('iterate')}
         >
-          New iteration
+          New Iteration
         </Button>
       )}
       {allowed.submit && (
@@ -75,7 +75,7 @@ export function QuotationActions({ quotation: q }: Readonly<{ quotation: Quotati
           icon={<FileOutput size={16} />}
           onClick={() => setDialog('convert')}
         >
-          Convert to policy
+          Convert to Policy
         </Button>
       )}
       {dialog === null && <ErrorAlert error={action.error} />}

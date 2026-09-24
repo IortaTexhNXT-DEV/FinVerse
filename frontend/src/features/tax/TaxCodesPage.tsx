@@ -95,7 +95,7 @@ function TaxCodesPanel() {
             icon={<Plus size={16} />}
             onClick={() => setForm({ taxType: 'EWT', rate: 0, effectiveFrom: today() })}
           >
-            New tax code
+            New Tax Code
           </Button>
         </div>
       )}
@@ -135,7 +135,7 @@ function TaxCodesPanel() {
         onClose={() => setForm(null)}
         footer={
           <Button variant="accent" busy={save.isPending} onClick={() => form && save.mutate(form)}>
-            Save for authorization
+            Save for Authorization
           </Button>
         }
       >

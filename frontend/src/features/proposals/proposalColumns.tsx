@@ -39,7 +39,7 @@ export const PROPOSAL_COLUMNS: Column<ProposalListItem>[] = [
   { key: 'product', header: 'Product', render: (p) => p.productCode },
   {
     key: 'tsi',
-    header: 'Sum insured',
+    header: 'Sum Insured',
     numeric: true,
     render: (p) => <Amount value={p.totalSumInsured} />,
   },
@@ -48,6 +48,6 @@ export const PROPOSAL_COLUMNS: Column<ProposalListItem>[] = [
     header: 'Slips',
     render: (p) => [p.qsNo, p.psNo].filter(Boolean).join(' / ') || '—',
   },
-  { key: 'insurer', header: 'Chosen insurer', render: (p) => p.chosenInsurer ?? '—' },
+  { key: 'insurer', header: 'Chosen Insurer', render: (p) => p.chosenInsurer ?? '—' },
   { key: 'status', header: 'Stage', render: (p) => <StatusBadge status={p.status} /> },
 ];

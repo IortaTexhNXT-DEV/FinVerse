@@ -78,7 +78,7 @@ function ValuesPanel({ type }: Readonly<{ type: LovType }>) {
               icon={<Plus size={14} />}
               onClick={() => setEditing({})}
             >
-              New value
+              New Value
             </Button>
           )}
         </div>

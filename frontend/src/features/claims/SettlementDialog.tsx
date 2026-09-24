@@ -62,7 +62,7 @@ export function SettlementDialog({ claim, open, onClose, onSaved }: Readonly<Pro
           busy={save.isPending}
           onClick={() => save.mutate()}
         >
-          Submit for approval
+          Submit for Approval
         </Button>
       }
     >

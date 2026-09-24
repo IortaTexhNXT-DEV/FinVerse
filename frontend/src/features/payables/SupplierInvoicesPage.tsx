@@ -95,7 +95,7 @@ export default function SupplierInvoicesPage() {
               icon={<Plus size={16} />}
               onClick={() => void navigate('/payables/invoices/new')}
             >
-              New invoice
+              New Invoice
             </Button>
           )
         }
@@ -147,7 +147,7 @@ export default function SupplierInvoicesPage() {
           columns={[
             { key: 'd', header: 'Document', render: (i) => <strong>{i.documentNo}</strong> },
             { key: 'p', header: 'Supplier', render: (i) => i.partyCode },
-            { key: 'n', header: 'Supplier inv. no.', render: (i) => i.supplierInvoiceNo },
+            { key: 'n', header: 'Supplier Inv. No.', render: (i) => i.supplierInvoiceNo },
             { key: 'id', header: 'Date', render: (i) => formatDate(i.invoiceDate) },
             { key: 'du', header: 'Due', render: (i) => formatDate(i.dueDate) },
             {
@@ -236,7 +236,7 @@ function InvoiceDetail({ invoice }: Readonly<{ invoice: Invoice }>) {
         rowKey={(l) => l.lineNo ?? 0}
         columns={[
           { key: 'a', header: 'Account', render: (l) => l.expenseAccountCode },
-          { key: 'c', header: 'Cost centre', render: (l) => l.costCenter ?? '' },
+          { key: 'c', header: 'Cost Centre', render: (l) => l.costCenter ?? '' },
           { key: 'd', header: 'Description', render: (l) => l.description },
           { key: 'n', header: 'Net', numeric: true, render: (l) => <Amount value={l.netAmount} /> },
           { key: 'v', header: 'VAT', numeric: true, render: (l) => <Amount value={l.vatAmount} /> },

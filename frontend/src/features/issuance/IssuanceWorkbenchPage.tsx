@@ -1,13 +1,13 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Search, Upload } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { issuanceApi } from '@/api/issuance';
 import type { IssuanceTab } from '@/api/issuance';
 import { useAuth } from '@/auth/authContext';
 import { useRowSelection } from '@/components/broking/rowSelection';
+import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { WorkTiles } from '@/components/broking/WorkTiles';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -29,7 +29,6 @@ export default function IssuanceWorkbenchPage() {
   const queryClient = useQueryClient();
   const selection = useRowSelection();
   const [tab, setTab] = useState<IssuanceTab>('AWAITING_POLICY');
-  const [text, setText] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const counts = useQuery({
@@ -78,37 +77,19 @@ export default function IssuanceWorkbenchPage() {
         <div className="work-tabs">
           <Tabs tabs={ISSUANCE_TABS} active={tab} onChange={choose} />
         </div>
-        <div className="work-toolbar">
-          <form
-            className="row"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setSearch(text.trim());
-              setPage(0);
-            }}
-          >
-            <label className="visually-hidden" htmlFor="issuance-search">
-              Search Proposal No.
-            </label>
-            <input
-              id="issuance-search"
-              className="input"
-              placeholder="Search Proposal No."
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            />
-            <Button type="submit" variant="secondary" icon={<Search size={16} />}>
-              Search
-            </Button>
-          </form>
-          <span className="spacer" />
+        <WorklistToolbar
+          onSearch={(text) => {
+            setSearch(text);
+            setPage(0);
+          }}
+        >
           <IssuanceBulkBar
             tab={tab}
             rows={rows}
             selection={selection}
             onChanged={() => void queryClient.invalidateQueries({ queryKey: ['issuance'] })}
           />
-        </div>
+        </WorklistToolbar>
         <IssuanceTable tab={tab} rows={rows} loading={list.isLoading} selection={selection} />
         <PageFooter data={list.data} noun="items" onPage={setPage} />
       </Card>

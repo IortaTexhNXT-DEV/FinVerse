@@ -43,7 +43,7 @@ export default function ConsolidationPage() {
             disabled={!manage}
             onClick={() => setCreating(true)}
           >
-            New group
+            New Group
           </Button>
         }
       />

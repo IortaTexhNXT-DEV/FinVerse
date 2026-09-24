@@ -61,7 +61,7 @@ function TakafulForm({ form, busy, onChange, onSave, onDiscard }: Readonly<FormP
       />
       <div className="row" style={{ alignSelf: 'end', gap: 'var(--space-2)' }}>
         <Button variant="accent" busy={busy} onClick={onSave}>
-          Save for authorization
+          Save for Authorization
         </Button>
         <Button variant="ghost" onClick={onDiscard}>
           Discard

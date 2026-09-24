@@ -32,8 +32,8 @@ function BookItems({
         caption={title}
         emptyMessage="None."
         columns={[
-          { key: 'date', header: 'Doc. date', render: (e) => formatDate(e.valueDate) },
-          { key: 'no', header: 'Doc. no.', render: (e) => e.batchNo },
+          { key: 'date', header: 'Doc. Date', render: (e) => formatDate(e.valueDate) },
+          { key: 'no', header: 'Doc. No.', render: (e) => e.batchNo },
           { key: 'ref', header: 'Reference', render: (e) => e.reference ?? '' },
           { key: 'nar', header: 'Narration', render: (e) => e.narration ?? '' },
           {
@@ -61,7 +61,7 @@ function BankItems({
         caption={title}
         emptyMessage="None."
         columns={[
-          { key: 'date', header: 'Value date', render: (l) => formatDate(l.valueDate) },
+          { key: 'date', header: 'Value Date', render: (l) => formatDate(l.valueDate) },
           { key: 'ref', header: 'Reference', render: (l) => l.reference ?? '' },
           { key: 'desc', header: 'Description', render: (l) => l.description ?? '' },
           {

@@ -63,7 +63,7 @@ export default function HoldingEventsPage() {
           </Button>
           {h.classification !== 'AMORTIZED_COST' && (
             <Button size="sm" variant="ghost" onClick={open('FAIR_VALUE')}>
-              Fair value
+              Fair Value
             </Button>
           )}
         </div>
@@ -92,7 +92,7 @@ export default function HoldingEventsPage() {
             { key: 'm', header: 'Maturity', render: (h) => formatDate(h.maturityDate) },
             {
               key: 'r',
-              header: 'Days left',
+              header: 'Days Left',
               numeric: true,
               render: (h) => (h.maturityDate === undefined ? '' : actualDays(asOf, h.maturityDate)),
             },
@@ -148,7 +148,7 @@ export default function HoldingEventsPage() {
               },
               {
                 key: 'ca',
-                header: 'Carrying after',
+                header: 'Carrying After',
                 numeric: true,
                 render: (t) => <Amount value={t.carryingAfter} />,
               },

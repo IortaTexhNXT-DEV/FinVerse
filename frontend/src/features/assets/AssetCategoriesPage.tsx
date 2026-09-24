@@ -75,7 +75,7 @@ export default function AssetCategoriesPage() {
                 })
               }
             >
-              New category
+              New Category
             </Button>
           )
         }
@@ -90,7 +90,7 @@ export default function AssetCategoriesPage() {
             { key: 'c', header: 'Code', render: (c) => <strong>{c.code}</strong> },
             { key: 'n', header: 'Name', render: (c) => c.name },
             { key: 'a', header: 'Asset', render: (c) => c.assetAccount },
-            { key: 'ad', header: 'Accum. depr.', render: (c) => c.accumulatedDepreciationAccount },
+            { key: 'ad', header: 'Accum. Depr.', render: (c) => c.accumulatedDepreciationAccount },
             { key: 'e', header: 'Expense', render: (c) => c.depreciationExpenseAccount },
             { key: 'm', header: 'Method', render: (c) => humanize(c.depreciationMethod) },
             { key: 'l', header: 'Life (months)', numeric: true, render: (c) => c.usefulLifeMonths },
@@ -123,7 +123,7 @@ export default function AssetCategoriesPage() {
         onClose={() => setForm(null)}
         footer={
           <Button variant="accent" busy={save.isPending} onClick={() => form && save.mutate(form)}>
-            Save for authorization
+            Save for Authorization
           </Button>
         }
       >

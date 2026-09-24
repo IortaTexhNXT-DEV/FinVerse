@@ -203,7 +203,7 @@ export default function BankStatementsPage() {
             caption="Statement lines"
             columns={[
               { key: 'no', header: '#', numeric: true, render: (l) => l.lineNo },
-              { key: 'date', header: 'Value date', render: (l) => formatDate(l.valueDate) },
+              { key: 'date', header: 'Value Date', render: (l) => formatDate(l.valueDate) },
               { key: 'desc', header: 'Description', render: (l) => l.description ?? '' },
               { key: 'ref', header: 'Reference', render: (l) => l.reference ?? '' },
               {

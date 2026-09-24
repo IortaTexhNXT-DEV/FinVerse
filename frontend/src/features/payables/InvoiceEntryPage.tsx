@@ -185,7 +185,7 @@ export default function InvoiceEntryPage() {
             icon={<Plus size={14} />}
             onClick={() => setLines([...lines, emptyLine()])}
           >
-            Add line
+            Add Line
           </Button>
         }
       >
@@ -288,7 +288,7 @@ export default function InvoiceEntryPage() {
           busy={save.isPending}
           onClick={() => save.mutate(false)}
         >
-          Save draft
+          Save Draft
         </Button>
         <Button
           variant="accent"
@@ -296,7 +296,7 @@ export default function InvoiceEntryPage() {
           busy={save.isPending}
           onClick={() => save.mutate(true)}
         >
-          Save &amp; submit
+          Save &amp; Submit
         </Button>
       </div>
     </div>

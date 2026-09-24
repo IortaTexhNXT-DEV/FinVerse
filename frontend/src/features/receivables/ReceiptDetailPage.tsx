@@ -77,7 +77,7 @@ function Allocations({ receipt }: Readonly<{ receipt: Receipt }>) {
             : 'Nothing allocated: the receipt is held on account.'
         }
         columns={[
-          { key: 'doc', header: 'Debit note', render: (a) => a.documentNo },
+          { key: 'doc', header: 'Debit Note', render: (a) => a.documentNo },
           {
             key: 'amt',
             header: 'Amount',

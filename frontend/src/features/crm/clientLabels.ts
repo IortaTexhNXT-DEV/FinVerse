@@ -4,10 +4,10 @@ import type { SearchCriteria } from './ClientSearchPanel';
 export type QuickFilter = 'ALL' | 'PROSPECT' | 'CONFIRMED' | 'KYC_DUE';
 
 export const QUICK_FILTERS: { id: QuickFilter; label: string }[] = [
-  { id: 'ALL', label: 'All clients' },
+  { id: 'ALL', label: 'All Clients' },
   { id: 'PROSPECT', label: 'Prospects' },
   { id: 'CONFIRMED', label: 'Confirmed' },
-  { id: 'KYC_DUE', label: 'KYC review due' },
+  { id: 'KYC_DUE', label: 'KYC Review Due' },
 ];
 
 /** Search criteria with a quick filter applied on top (the quick filter wins). */

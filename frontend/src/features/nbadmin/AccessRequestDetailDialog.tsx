@@ -125,7 +125,7 @@ function DecisionButtons({
         busy={deciding === true}
         onClick={() => onDecide(true)}
       >
-        Approve and apply
+        Approve and Apply
       </Button>
     </>
   );

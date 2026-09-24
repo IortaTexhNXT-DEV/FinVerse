@@ -56,7 +56,7 @@ export interface ReportResult {
   notes: string[];
 }
 
-export type ExportFormat = 'PDF' | 'XLSX' | 'CSV';
+export type ExportFormat = 'PDF' | 'XLSX' | 'CSV' | 'ODS' | 'XML';
 
 export const reportApi = {
   catalogue: () => api.get<CatalogueEntry[]>('/reports'),

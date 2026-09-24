@@ -132,7 +132,7 @@ export function RuleLinesEditor({ lines, components, onChange, readOnly }: Reado
             icon={<Plus size={14} />}
             onClick={() => onChange([...lines, emptyRuleLine('DEBIT', components[0])])}
           >
-            Add debit line
+            Add Debit Line
           </Button>
           <Button
             size="sm"
@@ -140,7 +140,7 @@ export function RuleLinesEditor({ lines, components, onChange, readOnly }: Reado
             icon={<Plus size={14} />}
             onClick={() => onChange([...lines, emptyRuleLine('CREDIT', components[0])])}
           >
-            Add credit line
+            Add Credit Line
           </Button>
         </div>
       )}

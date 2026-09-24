@@ -74,14 +74,14 @@ export default function ExceptionCodesPage() {
             },
             {
               key: 'a',
-              header: 'Threshold amount',
+              header: 'Threshold Amount',
               numeric: true,
               render: (c) =>
                 c.thresholdAmount === undefined ? '' : <Amount value={c.thresholdAmount} />,
             },
             {
               key: 'd',
-              header: 'Threshold days',
+              header: 'Threshold Days',
               numeric: true,
               render: (c) => c.thresholdDays ?? '',
             },
@@ -90,7 +90,7 @@ export default function ExceptionCodesPage() {
               header: 'Status',
               render: (c) => <StatusBadge status={c.active ? 'ACTIVE' : 'INACTIVE'} />,
             },
-            { key: 'u', header: 'Last changed', render: (c) => formatDateTime(c.updatedAt) },
+            { key: 'u', header: 'Last Changed', render: (c) => formatDateTime(c.updatedAt) },
           ]}
         />
       </Card>

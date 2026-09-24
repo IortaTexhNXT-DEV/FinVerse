@@ -83,14 +83,14 @@ export default function QuotationsPage() {
                 disabled={companyId <= 0}
                 onClick={() => expire.mutate()}
               >
-                Expire lapsed quotations
+                Expire Lapsed Quotations
               </Button>
               <Button
                 variant="accent"
                 icon={<Plus size={16} />}
                 onClick={() => setForm(newQuotation(companyId, defaultBranch, today()))}
               >
-                New quotation
+                New Quotation
               </Button>
             </>
           )
@@ -121,16 +121,16 @@ export default function QuotationsPage() {
             { key: 'prod', header: 'Product', render: (q) => q.productCode },
             { key: 'ins', header: 'Insured', render: (q) => q.insuredName },
             { key: 'iss', header: 'Issued', render: (q) => formatDate(q.issueDate) },
-            { key: 'exp', header: 'Valid until', render: (q) => formatDate(q.expiryDate) },
+            { key: 'exp', header: 'Valid Until', render: (q) => formatDate(q.expiryDate) },
             {
               key: 'si',
-              header: 'Sum insured',
+              header: 'Sum Insured',
               numeric: true,
               render: (q) => <Amount value={latest(q)?.sumInsured} />,
             },
             {
               key: 'net',
-              header: 'Our net premium',
+              header: 'Our Net Premium',
               numeric: true,
               render: (q) => <Amount value={latest(q)?.ourNetPremium} />,
             },
@@ -139,7 +139,7 @@ export default function QuotationsPage() {
         />
       </Card>
       <Modal
-        title="New quotation"
+        title="New Quotation"
         open={form !== null}
         onClose={() => setForm(null)}
         footer={
@@ -148,7 +148,7 @@ export default function QuotationsPage() {
             busy={create.isPending}
             onClick={() => form && create.mutate(form)}
           >
-            Create quotation
+            Create Quotation
           </Button>
         }
       >

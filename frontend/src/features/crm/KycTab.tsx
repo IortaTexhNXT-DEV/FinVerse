@@ -106,7 +106,7 @@ function UploadForm({ clientId }: Readonly<{ clientId: number }>) {
           busy={upload.isPending}
           disabled={documentType === '' || file === null}
         >
-          Upload KYC document
+          Upload KYC Document
         </Button>
       </div>
     </form>

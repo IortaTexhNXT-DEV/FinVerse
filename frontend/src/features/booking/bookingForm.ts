@@ -16,6 +16,11 @@ export const WORKBENCH_TABS: readonly { id: WorkbenchTab; label: string }[] = [
   { id: 'FAILED', label: 'Failed' },
 ];
 
+/** The tab named in a link (`/booking?tab=BOOKED`, NB dashboard drill-down), Ready by default. */
+export function workbenchTabOf(value: string | null): WorkbenchTab {
+  return WORKBENCH_TABS.find((t) => t.id === value)?.id ?? 'READY';
+}
+
 /** The bulk actions a tab offers on its selected rows. */
 export interface TabActions {
   bookNow: boolean;

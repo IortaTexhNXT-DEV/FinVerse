@@ -78,7 +78,7 @@ export default function PeriodsPage() {
               busy={createYear.isPending}
               onClick={() => createYear.mutate()}
             >
-              Create next fiscal year
+              Create Next Fiscal Year
             </Button>
           )
         }
@@ -116,7 +116,7 @@ export default function PeriodsPage() {
             { key: 'st', header: 'Status', render: (p) => <StatusBadge status={p.status} /> },
             {
               key: 'by',
-              header: 'Last change',
+              header: 'Last Change',
               render: (p) =>
                 p.statusChangedBy
                   ? `${p.statusChangedBy} · ${formatDateTime(p.statusChangedAt)}`

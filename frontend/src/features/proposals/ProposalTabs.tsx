@@ -61,11 +61,11 @@ export function DetailsTab({ proposal: p }: Readonly<{ proposal: Proposal }>) {
           emptyMessage="No risk item."
           columns={[
             { key: 'n', header: '#', numeric: true, render: (i) => i.itemNo },
-            { key: 'g', header: 'Risk group', numeric: true, render: (i) => i.riskGroup },
+            { key: 'g', header: 'Risk Group', numeric: true, render: (i) => i.riskGroup },
             { key: 'l', header: 'Risk', render: (i) => <strong>{itemLabel(i.data)}</strong> },
             {
               key: 's',
-              header: 'Sum insured',
+              header: 'Sum Insured',
               numeric: true,
               render: (i) => <Amount value={i.data.sumInsured} />,
             },
@@ -190,7 +190,7 @@ const COMPARE_COLUMNS = [
   { key: 'r', header: 'Rate %', numeric: true, render: (r: ComparativeRow) => r.rate ?? '' },
   { key: 'd', header: 'Deductibles', render: (r: ComparativeRow) => r.deductibles ?? '' },
   { key: 'c', header: 'Conditions', render: (r: ComparativeRow) => r.conditions ?? '' },
-  { key: 'v', header: 'Valid until', render: (r: ComparativeRow) => formatDate(r.validUntil) },
+  { key: 'v', header: 'Valid Until', render: (r: ComparativeRow) => formatDate(r.validUntil) },
   { key: 'm', header: 'Remarks', render: (r: ComparativeRow) => r.remarks ?? '' },
 ];
 

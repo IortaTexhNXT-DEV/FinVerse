@@ -87,7 +87,7 @@ function SaveBar({
         busy={busy}
         onClick={onSave}
       >
-        Save draft
+        Save Draft
       </Button>
     </>
   );
@@ -296,7 +296,7 @@ function Wizard({
 }
 
 /**
- * New account in six steps (BRNB.011-016): client, product, period and payment, risk items,
+ * New account in six steps (BRNB.051): client, product, period and payment, risk items,
  * contact and premium, then review with the completeness check, documents and submission.
  * The draft is saved every 30 seconds once the client and product are chosen; risks already on
  * a live account are refused with the existing ARN. With an id, continues a draft or a

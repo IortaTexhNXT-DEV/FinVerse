@@ -12,6 +12,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, humanize } from '@/utils/format';
@@ -55,7 +56,7 @@ export default function ReceiptsPage() {
               icon={<Plus size={16} />}
               onClick={() => void navigate('/receivables/receipts/new')}
             >
-              New receipt
+              New Receipt
             </Button>
           )
         }
@@ -147,7 +148,7 @@ export default function ReceiptsPage() {
           onRowClick={(r) => void navigate(`${base}/${r.id}`)}
           caption="Receipts"
           columns={[
-            { key: 'no', header: 'Receipt no.', render: (r) => <strong>{r.receiptNo}</strong> },
+            { key: 'no', header: 'Receipt No.', render: (r) => <strong>{r.receiptNo}</strong> },
             { key: 'date', header: 'Date', render: (r) => formatDate(r.receiptDate) },
             { key: 'payer', header: 'Payer', render: (r) => `${r.partyCode ?? ''} ${r.payerName}` },
             { key: 'mode', header: 'Mode', render: (r) => humanize(r.mode) },
@@ -162,7 +163,7 @@ export default function ReceiptsPage() {
             },
             {
               key: 'onacc',
-              header: 'On account',
+              header: 'On Account',
               numeric: true,
               render: (r) => <Amount value={r.unappliedAmount} />,
             },
@@ -171,30 +172,7 @@ export default function ReceiptsPage() {
             { key: 'dep', header: 'Deposit', render: (r) => humanize(r.depositStatus) },
           ]}
         />
-        {data !== undefined && data.totalPages > 1 && (
-          <div className="pagination">
-            <span className="muted">
-              Page {data.page + 1} of {data.totalPages} · {data.totalElements} receipts
-            </span>
-            <div className="spacer" />
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={data.page === 0}
-              onClick={() => setFilters((f) => ({ ...f, page: data.page - 1 }))}
-            >
-              Previous
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={data.page + 1 >= data.totalPages}
-              onClick={() => setFilters((f) => ({ ...f, page: data.page + 1 }))}
-            >
-              Next
-            </Button>
-          </div>
-        )}
+        <PageFooter data={data} onPage={(p) => setFilters((f) => ({ ...f, page: p }))} />
       </Card>
     </div>
   );

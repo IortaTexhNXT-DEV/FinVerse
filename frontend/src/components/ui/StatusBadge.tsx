@@ -1,6 +1,6 @@
 import { humanize } from '@/utils/format';
 
-type Tone = 'success' | 'warning' | 'neutral' | 'danger';
+type Tone = 'success' | 'warning' | 'info' | 'neutral' | 'danger';
 
 /**
  * Colour tone per status. Statuses only share a colour: the badge always shows the status's own
@@ -37,16 +37,20 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'REOPENED',
     'RUNNING',
     'UNMATCHED',
-    // broking
+    // broking: waiting for a review, an approval or a decision
     'QUEUED',
     'VALIDATED',
     'PROSPECT',
     'PENDING',
-    'SUBMITTED',
     'FOR_REVIEW',
     'FOR_MKT_APPROVAL',
     'QS_FOR_APPROVAL',
     'PS_FOR_APPROVAL',
+    'KYC_REVIEW',
+  ],
+  // BDO style guide: blue pills for records moving through processing ("Account for Placement").
+  info: [
+    'SUBMITTED',
     'AWAITING_PAYMENT',
     'READY_FOR_PLACEMENT',
     'PLACED',
@@ -56,7 +60,10 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'QS_SENT',
     'TERMS_RECEIVED',
     'PS_RELEASED',
-    'KYC_REVIEW',
+    'REQUESTED',
+    'GENERATED',
+    'SCHEDULED',
+    'READY',
   ],
   neutral: ['DRAFT', 'FUTURE', 'INACTIVE', 'CANCELLED', 'UNKNOWN', 'NOT_STARTED'],
   danger: [
@@ -85,7 +92,11 @@ const TONES = new Map<string, Tone>(
   ),
 );
 
-/** Colour-coded status pill; unknown statuses render in the neutral info tone. */
+/**
+ * Colour-coded, outlined status pill (BDO): green approved or done, yellow waiting for review or
+ * approval, blue in process, red exception or rejected; unknown statuses render in the neutral
+ * Header Blue tone.
+ */
 export function StatusBadge({ status }: Readonly<{ status: string }>) {
   const tone = TONES.get(status) ?? '';
   return <span className={`badge ${tone}`}>{humanize(status)}</span>;

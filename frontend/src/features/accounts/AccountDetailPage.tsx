@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { Pencil } from 'lucide-react';
+import { Building2, CalendarRange, Layers, Pencil, User, UserCheck, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { accountsApi, ACCOUNT_ENTITY } from '@/api/accounts';
 import type { Account } from '@/api/accounts';
 import { useAuth } from '@/auth/authContext';
 import { Attachments } from '@/components/attachments/Attachments';
+import { RecordSummary } from '@/components/broking/RecordSummary';
+import type { Fact } from '@/components/broking/RecordSummary';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { SentMessages } from '@/components/broking/SentMessages';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
@@ -16,7 +18,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { PolicyPanel } from '@/features/issuance/PolicyPanel';
 import { PlacementPanel } from '@/features/placement/PlacementPanel';
-import { formatAmount } from '@/utils/format';
+import { formatAmount, formatDate } from '@/utils/format';
 import { AccountActions } from './AccountActions';
 import { AccountCheckPanel } from './AccountCheckPanel';
 import { DetailsPanel, HistoryPanel, ItemsPanel } from './AccountPanels';
@@ -26,7 +28,7 @@ import { useAccountRefresh } from './useAccountRefresh';
 
 const TABS = [
   { id: 'details', label: 'Details' },
-  { id: 'items', label: 'Risk items' },
+  { id: 'items', label: 'Risk Items' },
   { id: 'premium', label: 'Premium' },
   { id: 'documents', label: 'Documents' },
   { id: 'emails', label: 'E-mails' },
@@ -39,6 +41,26 @@ const TABS = [
 type TabId = (typeof TABS)[number]['id'];
 
 const EDITABLE = new Set(['DRAFT', 'RETURNED_TO_MARKETING']);
+
+/** Key facts of the account summary card (BDO record page pattern). */
+function accountFacts(a: Account): Fact[] {
+  return [
+    { icon: User, label: 'Client', value: `${a.clientCode ?? '—'} – ${a.clientName}` },
+    { icon: Layers, label: 'Product', value: `${a.productCode} (${a.lineCode})` },
+    { icon: Building2, label: 'Insurer', value: a.insurerCode ?? 'To be advised' },
+    {
+      icon: CalendarRange,
+      label: 'Period',
+      value: `${formatDate(a.periodFrom)} – ${formatDate(a.periodTo)}`,
+    },
+    {
+      icon: Wallet,
+      label: 'Gross Premium',
+      value: `${a.currency} ${formatAmount(a.premium.grossPremium)}`,
+    },
+    { icon: UserCheck, label: 'Account Officer', value: a.sales.accountOfficer },
+  ];
+}
 
 function TabBody({ tab, account }: Readonly<{ tab: TabId; account: Account }>) {
   switch (tab) {
@@ -100,22 +122,35 @@ export default function AccountDetailPage() {
   return (
     <div className="stack">
       <PageHeader
+        backTo="/accounts"
         section="Accounts & Placement · Account"
-        title={a.clientName}
-        description={`${a.productCode} · ${a.currency} ${formatAmount(a.premium.grossPremium)} gross premium`}
+        title={a.arn}
+        description={`${a.productCode} account of ${a.clientName}`}
         actions={
+          editable && (
+            <Link className="btn btn-secondary" to={`/accounts/${a.id}/edit`}>
+              <Pencil size={16} aria-hidden="true" /> Edit Account
+            </Link>
+          )
+        }
+      />
+      <RecordSummary
+        title={a.clientName}
+        chips={
           <>
             <ReferenceChip label="ARN" value={a.arn} />
             <StatusBadge status={a.status} />
-            {a.freeFirstYear.active && <StatusBadge status="FFY" />}
-            {a.directPayment && <StatusBadge status="DIRECT_PAYMENT" />}
-            {editable && (
-              <Link className="btn btn-secondary" to={`/accounts/${a.id}/edit`}>
-                <Pencil size={14} aria-hidden="true" /> Edit
-              </Link>
-            )}
           </>
         }
+        flags={
+          (a.freeFirstYear.active || a.directPayment) && (
+            <>
+              {a.freeFirstYear.active && <span className="tag">FFY</span>}
+              {a.directPayment && <span className="tag">Direct Payment</span>}
+            </>
+          )
+        }
+        facts={accountFacts(a)}
       />
       <WorkflowPanel
         entityType={ACCOUNT_ENTITY}

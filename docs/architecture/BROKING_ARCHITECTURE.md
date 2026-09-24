@@ -1211,3 +1211,89 @@ Permissions: `BOOKING_PROCESS` or `BOOKING_ADJUST` to view, `BOOKING_PROCESS` to
   co-insured account (CGL01, bank segment), a multi-year account (3 years) and one queued `AUTO`.
 - On start-up, `BookingDemoData` books 940001–940004. It posts a positive endorsement on 940001 and
   a partial cancellation on 940002.
+
+## 16. New Business reports and dashboard (`nbreport`, W4)
+
+Requirements: BRNB.011, 012, 031, 037, 057, 075, 078, 115 (and the registers of BRNB.027/100).
+Migration V880; demo V989.
+
+The module reads the broking tables with constant SQL aggregates (`NbReportJdbc`, named bind
+parameters, the pattern of the executive dashboard). It calls no broking service, so it adds no
+compile-time dependency on the broking modules and none of them depends on it.
+
+### 16.1 Reports (category **New Business**, Report Centre)
+
+| Code | Report | BR | Permission |
+|---|---|---|---|
+| `NB-PLC-UPDATE` | Placement Update Report: individual (ARN) or collective, grouped by insurer | BRNB.011 | ACCOUNT_VIEW |
+| `NB-ACC-STATUS` | Account Status Report: stage, stage age, SLA due and breach, stalled flag; exceptions filter | BRNB.075/115 | ACCOUNT_VIEW |
+| `NB-STAGE-OUTCOME` | Successful and fall-out accounts per stage (entered, moved on, returned, voided, cancelled, open) and bulk upload rejects with duplicate fall-outs | BRNB.075 | ACCOUNT_VIEW |
+| `NB-PLC-SUMMARY` | Placement summary per insurer and branch: slips, accounts, sent, resent, failed / queued e-mails | BRNB.075 | PLACEMENT_MANAGE |
+| `NB-CLPC-BILLING` | CLPC billing per batch with payment status | BRNB.067/075 | BILLING_MANAGE |
+| `NB-PAY-MATCH` | Matched / unmatched / ambiguous payment report lines | BRNB.068/075 | BILLING_MANAGE |
+| `NB-PRODUCTION` | Production statistics per region / department / team / officer against target | BRNB.075 | WORK_ASSIGN |
+| `NB-BOOKED-REG` | Booked accounts register (bookings, endorsements, cancellations) by product line | BRNB.027/075/108 | ACCOUNT_VIEW |
+| `NB-SI-REG` | Service invoice register with dispatch outcome | BRNB.100/100b | BOOKING_PROCESS |
+| `NB-DISPATCH` | E-policy and Insurance Advice dispatch report, sent and failed with the reason | BRNB.078 | ACCOUNT_VIEW |
+
+- "Stalled" = no stage movement for `NB_STALLED_DAYS` days (parameter, default 5, `StallRule`).
+- Production attributes each booked invoice to the region, department, team and officer stamped on
+  the account (`acc_account.sales_*`). Targets (`nbr_sales_target`: level, unit, period, count,
+  premium, commission, PHP) are pro-rated by days to the reported period (`ProductionService`).
+- Duplicate fall-outs: accounts refused as duplicates on the screen are never created, so the report
+  counts the bulk upload rows rejected with a duplicate message.
+
+Report framework extensions (`report` module, used by every report):
+
+- `ExportFormat.ODS` (`OdsReportRenderer`) and `ExportFormat.XML` (`XmlReportRenderer`, metadata,
+  columns and typed rows) for BRNB.037.
+- The PDF header is a print metadata block (BRNB.031): report ID, user, run date and a
+  "Filters:" line; the colours follow the BDO style guide (Header Blue, CTA Blue).
+- `ReportCategory.NEW_BUSINESS`.
+
+### 16.2 Dashboard (BRNB.012)
+
+`NbDashboardService.dashboard(companyId, asOf)`: requests, quotations and PRFs by status; quotations
+sent this month and waiting for the client; accounts by stage; open work items past their SLA per
+workflow; bookings of the month (count, premium, commission); the year-to-date funnel quotation →
+sent → accepted → accounts → placed → policy issued → booked; ageing of open accounts by stage
+(< 1, 1-3, 3-7, > 7 days, overdue); production against target per team (month).
+
+The screen `/nb/dashboard` (permission WORK_VIEW) is the landing page of the broking roles:
+`navigation/access.landingPath` prefers it before My Work, and V880 withdraws the finance
+`DASHBOARD_VIEW` from MKT_TL, PROCESSING_TL and NB_APPROVER. Every tile and bar opens its filtered
+list (`/accounts?status=`, `/quotations?tab=`, `/booking?tab=BOOKED`, `/reports/NB-ACC-STATUS`).
+
+### 16.3 Saved report variants (BRNB.057)
+
+`nbr_report_variant` (owner, report, name, parameters as JSON, shared). A user saves the parameters
+of a report he may run (the company is left out: it follows the header), optionally shared with the
+users who may run the report; only the owner deletes it. Every change is audited. The ad-hoc report
+builder is parked (Q40).
+
+### 16.4 API
+
+`/api/v1/nb`: `GET dashboard?companyId=&asOf=` (WORK_VIEW); `GET/POST report-variants`,
+`DELETE report-variants/{id}` (REPORT_VIEW); `GET targets?companyId=&from=&to=` (WORK_ASSIGN or
+MASTER_VIEW), `PUT targets?companyId=` (MASTER_MAINTAIN). The reports run through
+`/api/v1/reports/{code}/run | export?format=PDF|XLSX|ODS|CSV|XML`.
+
+### 16.5 Screens
+
+- Sidebar top: **NB Dashboard** (`/nb/dashboard`).
+- Group Reports: **New Business Reports** (`/nb/reports`, the NB reports by process step) and
+  **Production Targets** (`/nb/targets`, maintained by the Business Administrator).
+- The report runner (`/reports/:code`) gains saved variants, Print (PDF preview) and the ODS / XML
+  downloads.
+
+### 16.6 Parked
+
+| Item | Question | Seam |
+|---|---|---|
+| Dynamic report builder | Q40 | saved report variants only |
+| Sales hierarchy and target values | Q41 | `nbr_sales_target` with demo targets (V989); maintained on Production Targets |
+| Late renewal requests report (BRNB.018) | Q09 | not built; waits for the Renewal BRD |
+
+Demo (V989): the demo company becomes "BDOI Demo Insurance Brokers, Inc." (code FVI kept), monthly
+2026 targets for every unit of the V982 sales organisation and a shared variant "SLA breaches - all
+stages" of the Account Status Report.

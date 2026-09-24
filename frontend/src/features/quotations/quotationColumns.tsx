@@ -58,11 +58,11 @@ export const QUOTATION_COLUMNS: Column<QuotationListItem>[] = [
   { key: 'insurer', header: 'Insurer', render: (q) => q.insurerCode ?? 'To be advised' },
   {
     key: 'gross',
-    header: 'Gross premium',
+    header: 'Gross Premium',
     numeric: true,
     render: (q) => <Amount value={q.grossPremium} />,
   },
-  { key: 'valid', header: 'Valid until', render: validity },
+  { key: 'valid', header: 'Valid Until', render: validity },
   {
     key: 'status',
     header: 'Status',

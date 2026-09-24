@@ -152,7 +152,7 @@ function ResponseHistory({ proposalId }: Readonly<{ proposalId: number }>) {
           },
           {
             key: 'r',
-            header: 'Response / revision',
+            header: 'Response / Revision',
             render: (h) => `#${h.responseId} r${h.revision}`,
           },
           { key: 's', header: 'Status', render: (h) => <StatusBadge status={h.status} /> },
@@ -162,7 +162,7 @@ function ResponseHistory({ proposalId }: Readonly<{ proposalId: number }>) {
             numeric: true,
             render: (h) => <Amount value={h.premium} />,
           },
-          { key: 'v', header: 'Valid until', render: (h) => formatDate(h.validUntil) },
+          { key: 'v', header: 'Valid Until', render: (h) => formatDate(h.validUntil) },
           { key: 'c', header: 'Recommended', render: (h) => (h.recommended ? 'Yes' : '') },
         ]}
       />
@@ -233,7 +233,7 @@ export function ResponsesTab({ proposal }: Readonly<{ proposal: Proposal }>) {
             { key: 'r', header: 'Rate %', numeric: true, render: (r) => r.rate ?? '' },
             { key: 'd', header: 'Deductibles', render: (r) => r.deductibles ?? '' },
             { key: 'c', header: 'Conditions', render: (r) => r.conditions ?? '' },
-            { key: 'v', header: 'Valid until', render: (r) => formatDate(r.validUntil) },
+            { key: 'v', header: 'Valid Until', render: (r) => formatDate(r.validUntil) },
             {
               key: 'x',
               header: 'Document',

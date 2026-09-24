@@ -30,12 +30,14 @@ describe('landing page', () => {
     screen('/', 'DASHBOARD_VIEW'),
     screen('/approvals'),
     screen('/my-work', 'WORK_VIEW'),
+    screen('/nb/dashboard', 'WORK_VIEW'),
     screen('/crm/clients/:id', 'CLIENT_VIEW', true),
     screen('/crm/clients', 'CLIENT_VIEW'),
   ];
 
-  it('prefers My Work, else the first permitted menu screen', () => {
-    expect(landingPath(screens, (p) => p === 'WORK_VIEW')).toBe('/my-work');
+  it('prefers the NB dashboard, then My Work, else the first permitted menu screen', () => {
+    expect(landingPath(screens, (p) => p === 'WORK_VIEW')).toBe('/nb/dashboard');
+    expect(landingPath(screens, (p) => p === 'WORK_VIEW', ['/my-work'])).toBe('/my-work');
     expect(landingPath(screens, (p) => p === 'CLIENT_VIEW')).toBe('/approvals');
     expect(landingPath(screens.slice(3), (p) => p === 'CLIENT_VIEW')).toBe('/crm/clients');
     expect(landingPath([screen('/', 'X')], () => false)).toBeUndefined();

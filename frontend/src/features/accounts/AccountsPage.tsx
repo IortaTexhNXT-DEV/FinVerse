@@ -1,19 +1,25 @@
-import { Plus, Search, Upload } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ACCOUNT_STATUSES } from '@/api/accounts';
 import { useAuth } from '@/auth/authContext';
+import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Tabs } from '@/components/ui/Tabs';
 import { SelectInput, TextInput } from '@/features/assets/FormControls';
 import { enumOptions } from '@/features/assets/options';
-import { criteriaOf, EMPTY_PANEL as EMPTY, QUICK_FILTERS } from './accountForm';
+import { criteriaOf, EMPTY_PANEL as EMPTY, panelOf, QUICK_TABS } from './accountForm';
 import type { QuickFilter, SearchPanelValues as Panel } from './accountForm';
 import { AccountTable } from './AccountTable';
 
-function SearchPanel({ onSearch }: Readonly<{ onSearch: (p: Panel) => void }>) {
-  const [panel, setPanel] = useState(EMPTY);
+/** The advanced filters of the account work list (BRNB.050 multi-criteria search). */
+function FilterPanel({
+  initial,
+  onSearch,
+}: Readonly<{ initial: Panel; onSearch: (p: Panel) => void }>) {
+  const [panel, setPanel] = useState(initial);
   const set = (patch: Partial<Panel>) => setPanel((p) => ({ ...p, ...patch }));
   return (
     <form
@@ -21,23 +27,17 @@ function SearchPanel({ onSearch }: Readonly<{ onSearch: (p: Panel) => void }>) {
         e.preventDefault();
         onSearch(panel);
       }}
-      className="stack"
-      style={{ padding: 'var(--space-4)' }}
+      className="worklist-filters stack"
     >
       <div className="form-grid">
+        <TextInput label="PN Number" value={panel.pn} onChange={(pn) => set({ pn })} />
         <TextInput
-          label="ARN, client code or name"
-          value={panel.text}
-          onChange={(text) => set({ text })}
-        />
-        <TextInput label="PN number" value={panel.pn} onChange={(pn) => set({ pn })} />
-        <TextInput
-          label="Plate, conduction, engine or chassis"
+          label="Plate, Conduction, Engine or Chassis"
           value={panel.vehicle}
           onChange={(vehicle) => set({ vehicle })}
         />
         <TextInput
-          label="Location of risk"
+          label="Location of Risk"
           value={panel.location}
           onChange={(location) => set({ location })}
         />
@@ -61,13 +61,13 @@ function SearchPanel({ onSearch }: Readonly<{ onSearch: (p: Panel) => void }>) {
           onChange={(status) => set({ status })}
         />
         <TextInput
-          label="Starts on or after"
+          label="Starts On or After"
           type="date"
           value={panel.periodFrom}
           onChange={(periodFrom) => set({ periodFrom })}
         />
         <TextInput
-          label="Starts on or before"
+          label="Starts On or Before"
           type="date"
           value={panel.periodTo}
           onChange={(periodTo) => set({ periodTo })}
@@ -80,21 +80,22 @@ function SearchPanel({ onSearch }: Readonly<{ onSearch: (p: Panel) => void }>) {
             checked={panel.includeVoided}
             onChange={(e) => set({ includeVoided: e.target.checked })}
           />
-          Include voided
+          Include Voided
         </label>
         <div className="spacer" />
         <Button
           type="button"
           variant="ghost"
           onClick={() => {
-            setPanel(EMPTY);
-            onSearch(EMPTY);
+            const cleared = { ...EMPTY, text: panel.text };
+            setPanel(cleared);
+            onSearch(cleared);
           }}
         >
-          Clear
+          Clear Filters
         </Button>
-        <Button type="submit" variant="secondary" icon={<Search size={14} />}>
-          Search
+        <Button type="submit" variant="secondary">
+          Apply Filters
         </Button>
       </div>
     </form>
@@ -102,16 +103,20 @@ function SearchPanel({ onSearch }: Readonly<{ onSearch: (p: Panel) => void }>) {
 }
 
 /**
- * Accounts (BRNB.050): search by ARN, client, PN, vehicle identifiers or location, quick filters
- * for the user's drafts and returned accounts, awaiting payment, FFY and direct payment.
+ * Accounts (BRNB.050), BDO work list: quick-filter tabs (all, my drafts, returned to me, awaiting
+ * payment, FFY, direct payment), a search by ARN, client code or name, advanced filters (PN,
+ * vehicle identifiers, location, product, insurer, status, period) and the paged list. A link
+ * with `?status=` (NB dashboard drill-down) opens the list filtered on that status.
  */
 export default function AccountsPage() {
   const { can } = useAuth();
-  const [panel, setPanel] = useState(EMPTY);
+  const [params] = useSearchParams();
+  const [panel, setPanel] = useState<Panel>(() => panelOf(params.get('status')));
+  const [filtersOpen, setFiltersOpen] = useState(params.get('status') !== null);
   const [quick, setQuick] = useState<QuickFilter>('all');
   const [page, setPage] = useState(0);
-  const choose = (q: QuickFilter) => {
-    setQuick(q);
+  const apply = (p: Panel) => {
+    setPanel(p);
     setPage(0);
   };
   return (
@@ -125,36 +130,34 @@ export default function AccountsPage() {
             <>
               {can('BULK_PROCESS') && (
                 <Link className="btn btn-secondary" to="/bulk/ACCOUNT_CREATE">
-                  <Upload size={16} aria-hidden="true" /> Bulk upload
+                  <Upload size={16} aria-hidden="true" /> Bulk Upload
                 </Link>
               )}
               <Link className="btn btn-accent" to="/accounts/new">
-                <Plus size={16} aria-hidden="true" /> New account
+                <Plus size={16} aria-hidden="true" /> New Account
               </Link>
             </>
           )
         }
       />
-      <div className="row" role="group" aria-label="Quick filters">
-        {(Object.keys(QUICK_FILTERS) as QuickFilter[]).map((q) => (
-          <Button
-            key={q}
-            size="sm"
-            variant={quick === q ? 'primary' : 'secondary'}
-            aria-pressed={quick === q}
-            onClick={() => choose(q)}
-          >
-            {QUICK_FILTERS[q].label}
-          </Button>
-        ))}
-      </div>
       <Card flush>
-        <SearchPanel
-          onSearch={(p) => {
-            setPanel(p);
+        <Tabs
+          tabs={QUICK_TABS}
+          active={quick}
+          onChange={(q) => {
+            setQuick(q);
             setPage(0);
           }}
         />
+        <WorklistToolbar
+          placeholder="Search ARN, client code or name"
+          initial={panel.text}
+          onSearch={(text) => apply({ ...panel, text })}
+          filters={{ open: filtersOpen, onToggle: () => setFiltersOpen((o) => !o) }}
+        />
+        {filtersOpen && (
+          <FilterPanel initial={panel} onSearch={(p) => apply({ ...p, text: panel.text })} />
+        )}
         <AccountTable criteria={criteriaOf(panel, quick)} page={page} onPage={setPage} />
       </Card>
     </div>

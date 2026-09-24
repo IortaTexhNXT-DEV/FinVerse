@@ -69,7 +69,7 @@ export default function FacPlacementsPage() {
             },
             {
               key: 'pr',
-              header: 'FAC premium',
+              header: 'FAC Premium',
               numeric: true,
               render: (p) => <Amount value={p.facPremium} />,
             },

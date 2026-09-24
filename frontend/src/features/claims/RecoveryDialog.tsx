@@ -65,7 +65,7 @@ export function RecoveryDialog({ claim, open, onClose, onSaved }: Readonly<Props
           busy={save.isPending}
           onClick={() => save.mutate()}
         >
-          Submit for approval
+          Submit for Approval
         </Button>
       }
     >

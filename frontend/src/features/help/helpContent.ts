@@ -13,6 +13,7 @@ import { QUOTATIONS_HELP } from '@/features/quotations/help';
 import { PLANNING_HELP } from '@/features/closing/help';
 import { GL_HELP } from '@/features/gl/help';
 import { ISSUANCE_HELP } from '@/features/issuance/help';
+import { NB_DASHBOARD_HELP, NB_REPORTS_HELP } from '@/features/nbreports/help';
 import { PAYABLES_HELP } from '@/features/payables/help';
 import { PLACEMENT_HELP } from '@/features/placement/help';
 import { RECEIVABLES_HELP } from '@/features/receivables/help';
@@ -95,6 +96,7 @@ export const HELP_SECTIONS: HelpSection[] = [
       },
     ],
   },
+  NB_DASHBOARD_HELP,
   WORKSPACE_HELP,
   CRM_HELP,
   QUOTATIONS_HELP,
@@ -116,16 +118,22 @@ export const HELP_SECTIONS: HelpSection[] = [
   CLAIMS_HELP,
   REINSURANCE_HELP,
   RESERVES_HELP,
+  NB_REPORTS_HELP,
   {
     id: 'reports',
     module: 'Reports',
-    intro: 'Financial statements, registers and control reports with PDF, Excel and CSV export.',
+    intro:
+      'Financial statements, registers and control reports with PDF, Excel, ODS, CSV and XML export.',
     screens: [
       {
         name: 'Report Centre',
         path: '/reports',
         summary:
-          'Choose a report, fill in the parameters and run it on screen or export it. The Exception Report (CTL-EXCEPTIONS) lists raised alerts and their handling.',
+          'Choose a report, fill in the parameters and run it on screen, print it or export it. The Exception Report (CTL-EXCEPTIONS) lists raised alerts and their handling.',
+        workflow: [
+          'Save the parameters you use often as a named variant; shared variants are offered to everyone who may run the report.',
+          'Print opens the PDF with the report, user, run time and filters printed in its header.',
+        ],
         controls: [
           'Each report has its own permission (e.g. POLICY_VIEW for underwriting reports, CLAIM_VIEW for claims, REPORT_FINANCIAL for financial statements); the catalogue lists only the reports you may run.',
         ],

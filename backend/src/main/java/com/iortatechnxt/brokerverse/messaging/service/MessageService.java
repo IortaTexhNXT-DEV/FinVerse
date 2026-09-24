@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.util.EmailAddresses;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundAttachment;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundAttachmentRepository;
@@ -17,7 +18,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
-import java.util.regex.Pattern;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +39,6 @@ public class MessageService {
   public static final String PASSWORD_PURPOSE = "PASSWORD";
 
   private static final String ENTITY = "OutboundMessage";
-  private static final Pattern EMAIL = Pattern.compile("^[^@\\s,;]+@[^@\\s,;]+\\.[^@\\s,;]+$");
   private static final int MAX_ADDRESS_LIST = 1000;
 
   private final OutboundMessageRepository messages;
@@ -229,7 +228,7 @@ public class MessageService {
     for (String a : addresses) {
       String trimmed = a == null ? "" : a.trim();
       if (!trimmed.isEmpty()) {
-        if (!EMAIL.matcher(trimmed).matches()) {
+        if (!EmailAddresses.isValid(trimmed)) {
           throw new BusinessRuleException("EMAIL_ADDRESS_INVALID", "Invalid e-mail address: " + a);
         }
         clean.add(trimmed);

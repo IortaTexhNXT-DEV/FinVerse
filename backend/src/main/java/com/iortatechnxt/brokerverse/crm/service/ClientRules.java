@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.crm.service;
 
+import com.iortatechnxt.brokerverse.common.util.EmailAddresses;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails;
 import com.iortatechnxt.brokerverse.crm.domain.ClientType;
 import java.time.LocalDate;
@@ -87,13 +88,7 @@ public final class ClientRules {
    * @return true when plausible
    */
   public static boolean isEmail(String text) {
-    int at = text.indexOf('@');
-    if (at <= 0 || at != text.lastIndexOf('@') || text.chars().anyMatch(Character::isWhitespace)) {
-      return false;
-    }
-    String domain = text.substring(at + 1);
-    int dot = domain.lastIndexOf('.');
-    return dot > 0 && dot < domain.length() - 2 && !domain.startsWith(".");
+    return EmailAddresses.isValid(text);
   }
 
   private static boolean present(String value) {

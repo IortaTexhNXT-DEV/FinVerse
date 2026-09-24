@@ -131,7 +131,8 @@ class SystemAdminIT {
     mvc.perform(get("/api/v1/system/session-policy"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.timeoutMinutes").isNumber())
-        .andExpect(jsonPath("$.warningSeconds").value(60));
+        .andExpect(jsonPath("$.warningSeconds").value(900))
+        .andExpect(jsonPath("$.expiryWarningMinutes").value(30));
     mvc.perform(get("/api/v1/system/parameters")).andExpect(status().isForbidden());
     mvc.perform(
             put("/api/v1/system/parameters/SESSION_TIMEOUT_MINUTES")

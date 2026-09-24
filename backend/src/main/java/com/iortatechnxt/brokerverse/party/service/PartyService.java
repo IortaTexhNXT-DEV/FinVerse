@@ -161,6 +161,23 @@ public class PartyService {
     return party;
   }
 
+  /**
+   * Creates a party and authorizes it as a system step in the same transaction. Used when the party
+   * is the by-product of a business record already approved under four eyes, e.g. the sub-ledger
+   * party of a KYC-verified client confirmed in the crm module (BRNB.090).
+   *
+   * @param r request
+   * @param reason why no separate authorization is needed (audited)
+   * @return the active party
+   */
+  public Party createAuthorizedBySystem(PartyRequest r, String reason) {
+    Party party = create(r);
+    party.authorize(CurrentUser.SYSTEM, clock.instant());
+    audit.record(
+        PARTY, party.getCode(), AuditAction.AUTHORIZE, "Authorized by the system: " + reason);
+    return party;
+  }
+
   private static void apply(Party p, PartyRequest r) {
     p.setTaxId(r.taxId());
     p.setAddress(r.address());

@@ -7,6 +7,7 @@
  */
 
 const TOKEN_KEY = 'brokerverse.token';
+const EXPIRES_KEY = 'brokerverse.expiresAt';
 
 export interface ProblemDetail {
   title?: string;
@@ -36,13 +37,24 @@ export function onUnauthorized(handler: () => void): void {
   unauthorizedHandler = handler;
 }
 
+/**
+ * The bearer token and its absolute expiry, kept per tab in sessionStorage (never localStorage);
+ * other tabs obtain them through the session handshake (session/tabSync.ts, BRNB.082).
+ */
 export const tokenStore = {
   get: (): string | null => sessionStorage.getItem(TOKEN_KEY),
-  set: (token: string): void => {
+  expiresAt: (): string | null => sessionStorage.getItem(EXPIRES_KEY),
+  set: (token: string, expiresAt?: string): void => {
     sessionStorage.setItem(TOKEN_KEY, token);
+    if (expiresAt === undefined) {
+      sessionStorage.removeItem(EXPIRES_KEY);
+    } else {
+      sessionStorage.setItem(EXPIRES_KEY, expiresAt);
+    }
   },
   clear: (): void => {
     sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(EXPIRES_KEY);
   },
 };
 

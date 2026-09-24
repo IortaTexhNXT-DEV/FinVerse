@@ -37,7 +37,7 @@ Each module is a top-level package under `com.iortatechnxt.brokerverse`, with th
 | `bulk` | W1 | Bulk upload framework: template, parse XLSX/CSV/ODS, validate, partial commit, error report (BRNB.024/025/039) | system | V752 |
 | `messaging` | W1 | Outbound e-mail outbox, send log, document protection (password / encryption), in-app notifications (BRNB.013/015/035) | security, system | V753 |
 | `docgen` | W1 | Versioned document templates with `{{placeholders}}`; branded PDF / XLSX composition (BRNB.004) | common | V754 |
-| `crm` | W1 core, W2 full | Clients: prospect / confirmed, KYC, tags, special instructions, dedupe, contacts, 360 view (BRNB.030/032/046-049/090/091/099/101/110) | party, lov, workflow | V800-V809 (V981) |
+| `crm` | W1 core, W2 full | Clients: prospect / confirmed, KYC, tags, special instructions, dedupe, contacts, 360 view (BRNB.030/032/046-049/090/091/099/101/110) | party, lov, workflow, messaging, attachment, bulk, report, nbadmin (retention port) | V800-V809 (V981) |
 | `catalog` | W2 | Product lines, cover types, BDOI risk codes, insurer panel and branches, commission and taxes, minimum-field matrix, TSU routing rules, sales organisation, premium calculator (Appendix A) | party, lov, dimension | V810-V819 (V982) |
 | `account` | W2 | Account (ARN), risk items, account contacts, duplicate rules, FFY, direct payment, multi-year, account lifecycle (BRNB.025/050-054/066/102/109/113/114) | crm, catalog, workflow, bulk | V820-V829 (V983) |
 | `quotation` | W3 | Package quotations: request intake, versions, approval, send, acceptance, conversion to accounts, bulk quotations | account, crm, catalog, workflow, docgen, messaging, bulk | V830-V839 (V984) |
@@ -46,7 +46,7 @@ Each module is a top-level package under `com.iortatechnxt.brokerverse`, with th
 | `issuance` | W3 | E-policy receipt, policy number update, Insurance Advice, encrypted e-policy dispatch, dispatch report (BRNB.035/060/070/073-078/095/104/105) | account, workflow, docgen, messaging | V860-V869 (V987) |
 | `booking` | W3 | Individual / batch / direct / multi-year booking, accounting events, service invoice, endorsements, cancellation, incentive flag, cost center (BRNB.027/036/038/061/076/081/094/100/107/108/111/112) | account, catalog, accounting, subledger, workflow, docgen, messaging | V870-V879 (V988) |
 | `nbreport` | W4 | NB operational reports and the NB dashboard (BRNB.011/012/075/078 ...) | all broking modules | V880-V889 (V989) |
-| `nbadmin` | W2 | User access requests with approval, retention policy job, session policy, multi-tab session (BRNB.082/085/106) | security, system, workflow | V790-V799 |
+| `nbadmin` | W2 | User access requests with approval, access matrix, retention policy job, session policy, multi-tab session (BRNB.040/082/083/085/106) | security, system, approval, messaging, docgen | V790-V799 |
 
 Business modules never call "upward". The rules for callbacks between modules are:
 
@@ -247,6 +247,20 @@ DRAFT/SUBMITTED/RETURNED_TO_MARKETING --void--> VOIDED (internal reversal / soft
 - CBG Fire and Motor accounts must be paid. Other Lines need client confirmation (BRD 2.3.1).
 - Direct-payment accounts skip the payment gate (BRNB.114).
 
+### `NB_CLIENT`: client onboarding (BRNB.090/101, seeded in V801)
+
+```
+PROSPECT --submit_kyc--> KYC_REVIEW --verify_kyc--> KYC_VERIFIED --confirm--> CONFIRMED --review_kyc--> CONFIRMED
+KYC_REVIEW --return(reason)--> PROSPECT
+PROSPECT/KYC_REVIEW/KYC_VERIFIED/CONFIRMED --deactivate(reason)--> INACTIVE
+```
+
+- `submit_kyc` (CLIENT_MAINTAIN) and `confirm` need the mandatory KYC documents and the minimum
+  client information; `verify_kyc` / `review_kyc` (CLIENT_APPROVE) are refused to the client's
+  creator and to the user who submitted the KYC (four eyes).
+- `confirm` issues the client code and opens the client's party; `return` is the only generic
+  action (run from the `WorkflowPanel`).
+
 ## 5. Front end
 
 - Broking sections come first in the sidebar:
@@ -292,3 +306,119 @@ build the external interface itself.
 | Data ownership register | Q37 | not started |
 | Dynamic report builder | Q40 | saved report variants only |
 | Override requests (Renewal) | OOS-1 | not built |
+| KYC review frequency by risk rating | Q21 | parameters `KYC_REVIEW_MONTHS`, `KYC_REVIEW_MONTHS_HIGH_RISK` |
+| Duplicate keys and precedence | Q17 | hard keys TIN, ID, name + birth date; soft keys e-mail, mobile, corporate name |
+| Client tags / instruction types and enforcement (block or warn) | Q18 | LOVs `CLIENT_TAG`, `INSTRUCTION_TYPE`; banner only (warn) |
+| BDO CIF integration (source of truth for bank clients) | Q16 | `bank_client` flag and CIF number captured manually |
+| Retention periods per record type; archive vs purge | Q39 | rule table `nba_retention_rule` and monthly counts; no archive / purge (DBA storage and backup decision) |
+| Forced password change at first sign-in | - | temporary password shown once to the approver; user changes it on My Profile |
+
+## 7. CRM (`crm`): clients
+
+Requirements: BRNB.029, 030, 032, 046-049, 065, 090, 091, 099, 101, 110 (legacy BRD 1.1.5, 1.1.6,
+2.1.5-2.1.7, 1.3.3). Migrations V800 (core), V801; demo V981.
+
+- **Client master.** `Client` holds individuals and corporates with identity (TIN, ID type and
+  number), contact and address, market segment, BDO bank client flag and CIF, and a KYC profile
+  (`ClientProfile`: nationality, civil status, occupation, source of funds, risk rating; LOVs
+  `NATIONALITY`, `CIVIL_STATUS`, `SOURCE_OF_FUNDS`, `KYC_RISK_RATING`). `ClientRules` checks the TIN
+  format `000-000-000-000`, e-mail, mobile `09xxxxxxxxx` / `+639xxxxxxxxx`, birth date in the past
+  and the minimum age of an individual (`CLIENT_MIN_AGE`, 18). A prospect needs only the type and
+  the name (BRNB.029); `ClientCompleteness` flags incomplete clients against the parameters
+  `CLIENT_MIN_FIELDS_INDIVIDUAL` / `CLIENT_MIN_FIELDS_CORPORATE` (field codes BIRTH_DATE, TIN, ID,
+  CONTACT, ADDRESS, MARKET_SEGMENT, NATIONALITY, SOURCE_OF_FUNDS, OCCUPATION).
+- **Onboarding** (`ClientOnboardingService`, workflow `NB_CLIENT`, section 4). KYC documents are
+  attachments of entity type `Client` registered with their `DOCUMENT_TYPE` in `crm_kyc_document`
+  (`KycDocumentService`). The mandatory documents per client type are the LOVs
+  `KYC_DOCS_INDIVIDUAL` / `KYC_DOCS_CORPORATE` (codes are `DOCUMENT_TYPE` codes), maintained on the
+  Lists of Values screen. Confirmation issues `CL-<yyyy>-nnnnnn` (the `PR-` code is kept) and opens
+  the client's party (`PartyService.createAuthorizedBySystem`, type INDIVIDUAL_CLIENT or
+  CORPORATE_CLIENT, code = client code) in the same transaction. Verification sets the next review
+  date from the risk rating. Deactivation needs a `CLIENT_DEACTIVATION_REASON`.
+- **Duplicates** (`DuplicateCheckService`, BRNB.032). Normalised keys are stored on the client
+  (`ClientKeys`: ID, mobile, name, corporate name). Hard keys (TIN, ID type + number, last + first
+  name + birth date) block create, update and confirmation with `CLIENT_DUPLICATE` listing the
+  existing codes; the blocked attempt is audited in its own transaction. E-mail, mobile and
+  corporate name only warn. `GET /crm/clients/duplicates` feeds the live warnings of the form.
+- **Tags and special instructions** (`ClientNotesService`, BRNB.091): tags from `CLIENT_TAG`,
+  instructions with an `INSTRUCTION_TYPE`, text and effective dates; every change is written to
+  `crm_client_note_history` (who, when, from / to) and audited.
+- **Client 360** (`Client360Service`, BRNB.099): records of every `ClientRecordsProvider` bean and
+  warnings for missing linkages (confirmed without party, party missing or inactive, incomplete
+  information, KYC expired). History = audit trail under the prospect and client codes.
+- **KYC review** (BRNB.110): monthly job `KYC_REVIEW_DUE` expires overdue KYC and notifies the
+  `CLIENT_MAINTAIN` holders with the count of non-bank clients due (window `KYC_DUE_WINDOW_DAYS`).
+  Report `NB-KYC-DUE` (category Control & Audit) gives download and print.
+- **Bulk** handler `CLIENT_CREATE` (BRNB.047/065, permission CLIENT_MAINTAIN): upsert by prospect or
+  client code (blank cells keep values), else by a single hard duplicate key, else a new prospect.
+- **Retention**: `ClientRetentionProvider` implements `nbadmin.service.RetentionCandidateProvider`
+  for record type `CLIENT` (last activity = last update).
+
+API (`/api/v1/crm`): `GET clients` (search), `GET/PUT clients/{id}`, `POST clients`,
+`GET clients/duplicates`, `GET clients/{id}/kyc-checklist`, `POST clients/{id}/kyc-documents`
+(multipart), `POST clients/{id}/submit-kyc | verify-kyc | confirm | deactivate`,
+`GET clients/{id}/instructions` (banner), `GET clients/{id}/notes`, `POST clients/{id}/tags`,
+`POST clients/{id}/tags/{code}/remove`, `POST clients/{id}/instructions`,
+`PUT clients/{id}/instructions/{iid}`, `POST clients/{id}/instructions/{iid}/end`,
+`GET clients/{id}/records`, `GET clients/{id}/history`, `GET kyc-reviews`. The W1 lookup endpoints
+(`clients/lookup`, `clients/{id}/summary`) are unchanged.
+
+Contracts for other modules:
+
+- `ClientService`: W1 methods unchanged (`createProspect` now also validates, blocks hard
+  duplicates and opens the onboarding case); new `create(companyId, ClientDetails, ClientProfile)`
+  and `update(id, ClientDetails, ClientProfile)`.
+- `ClientRecordsProvider` (port, W1): implement it to list your records on the client page.
+- Frontend: `components/broking/InstructionsBanner` (`clientId`) shows tags and instructions in
+  force; `components/broking/bannerKey` is its query key; `api/clients.ts` (`clientsApi`) is the
+  full client API.
+
+Screens (section Clients): Clients, New Client, KYC Reviews Due, client page (header with codes and
+badges, actions by permission, `WorkflowPanel`, tabs Details / KYC & Documents / Tags &
+Instructions / Linked Records / History).
+
+Demo (V981): 12 clients of company FVI: six confirmed (with authorized parties
+`CL-2026-000001..006`; `CL-2026-000002` has an expired KYC), one prospect in KYC review
+(`PR-2026-000007`, for `mkttl` to verify), one verified prospect (`PR-2026-000008`, to confirm),
+three prospects, one dormant since 2019 (`PR-2026-000011`) and one inactive client since 2020
+(`PR-2026-000012`) for the retention review. Tags and instructions on `CL-2026-000001/2/3/5/6`.
+
+## 8. Broking administration (`nbadmin`)
+
+Requirements: BRNB.040, 079, 082, 083, 085, 086, 089, 106 (legacy BRD 3.3, 3.4). Migration V790.
+
+- **Lists of Values** screen (`/broking-setup/lists?type=`) on the W1 `lov` API: add, change,
+  deactivate (LOV_MANAGE) and authorize (MASTER_AUTHORIZE, not the maker).
+- **User access requests** (`AccessRequestService`, BRNB.085): CREATE_USER, MODIFY_ROLES,
+  DISABLE_USER, ENABLE_USER with a justification (ACCESS_REQUEST); decided by ACCESS_APPROVE, never
+  the requester. Approval applies the change through `UserAdminService` (`AccessChangeApplier`); a
+  created user gets a 14-character temporary password returned once to the approver and never
+  stored in clear. Pending requests appear in My Approvals (`AccessRequestApprovalSource`). Requester
+  and approvers are notified.
+- **User Access Matrix** (BRD 3.3.4): roles x permissions with enabled users per role, read-only,
+  Excel export (`GET /nbadmin/access-matrix/export`, audited).
+- **Session policy** (BRNB.040): `GET /system/session-policy` returns the inactivity timeout, the
+  warning lead (`SESSION_TIMEOUT_MINUTES` minus `SESSION_IDLE_WARNING_MINUTES`, i.e. a warning after
+  15 minutes of inactivity) and `expiryWarningMinutes` (`SESSION_EXPIRY_WARNING_MINUTES`, 30): the
+  web client warns before the absolute sign-out at the token expiry.
+- **Multi-tab session** (BRNB.082, frontend `session/tabSync.ts`): the token stays in each tab's
+  sessionStorage; a new tab asks the open tabs for it over the `BroadcastChannel`
+  `brokerverse.session` (request / share handshake); sign-in, sign-out and activity are broadcast,
+  so signing out in one tab signs out all and activity in one tab keeps all signed in.
+- **Data retention** (BRNB.106): rules in `nba_retention_rule` (record type, statuses, years online /
+  archive, REVIEW or ARCHIVE; seeded 5 / 15 years), results in `nba_retention_run`. Port
+  `nbadmin.service.RetentionCandidateProvider` (record type, `countEligible`, `eligible`) is
+  implemented by `crm` for CLIENT; QUOTATION, PROPOSAL and ACCOUNT rules show "module not yet
+  reporting" until those modules implement it. Monthly job `RETENTION_REVIEW`. **Parked:** physical
+  archive and purge wait for the DBA's storage and backup decision; nothing is ever deleted.
+- **Audit log report** (BRNB.086/089): the existing report `CTL-AUDIT` (date range, user, entity
+  type; PDF / Excel / CSV) is offered as download buttons on Administration > Audit Trail.
+
+API (`/api/v1/nbadmin`): `GET/POST access-requests`, `GET access-requests/{id}`,
+`POST access-requests/{id}/approve | reject`, `GET users`, `GET roles`, `GET access-matrix`,
+`GET access-matrix/export`, `GET retention/rules`, `PUT retention/rules/{id}`,
+`GET retention/rules/{id}/eligible`, `POST retention/review`.
+
+Screens (section Broking Setup): Lists of Values, Access Requests, User Access Matrix, Data
+Retention. A screen may declare `alsoPermissions` (navigation) so the checker of a maker screen
+(e.g. the Approver on Access Requests) can open it.

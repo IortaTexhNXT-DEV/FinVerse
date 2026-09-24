@@ -1,4 +1,5 @@
 import type { HelpSection } from '@/features/help/helpContent';
+import { NBADMIN_HELP_SCREENS } from '@/features/nbadmin/help';
 
 /** In-app help of the Broking Setup screens. */
 export const BROKING_SETUP_HELP: HelpSection = {
@@ -7,6 +8,7 @@ export const BROKING_SETUP_HELP: HelpSection = {
   intro:
     'Masters and controls of the broking operation: templates, lists of values and the e-mail log.',
   screens: [
+    ...NBADMIN_HELP_SCREENS,
     {
       name: 'Document Templates',
       path: '/broking-setup/templates',

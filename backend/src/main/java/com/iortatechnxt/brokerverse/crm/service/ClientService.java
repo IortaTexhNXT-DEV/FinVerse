@@ -7,9 +7,10 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails;
+import com.iortatechnxt.brokerverse.crm.domain.ClientProfile;
 import com.iortatechnxt.brokerverse.crm.domain.ClientRepository;
 import com.iortatechnxt.brokerverse.crm.domain.ClientStatus;
-import com.iortatechnxt.brokerverse.lov.service.LovService;
+import com.iortatechnxt.brokerverse.crm.domain.ClientType;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -36,7 +37,9 @@ public class ClientService {
 
   private final ClientRepository clients;
   private final DocumentNumberService numbers;
-  private final LovService lovs;
+  private final ClientValidator validator;
+  private final DuplicateCheckService duplicates;
+  private final ClientWorkflow workflow;
   private final AuditTrailService audit;
   private final Clock clock;
 
@@ -45,19 +48,25 @@ public class ClientService {
    *
    * @param clients clients
    * @param numbers document numbers
-   * @param lovs lists of values
+   * @param validator client data validation
+   * @param duplicates duplicate detection
+   * @param workflow onboarding workflow
    * @param audit audit trail
    * @param clock clock
    */
   public ClientService(
       ClientRepository clients,
       DocumentNumberService numbers,
-      LovService lovs,
+      ClientValidator validator,
+      DuplicateCheckService duplicates,
+      ClientWorkflow workflow,
       AuditTrailService audit,
       Clock clock) {
     this.clients = clients;
     this.numbers = numbers;
-    this.lovs = lovs;
+    this.validator = validator;
+    this.duplicates = duplicates;
+    this.workflow = workflow;
     this.audit = audit;
     this.clock = clock;
   }
@@ -70,35 +79,78 @@ public class ClientService {
    * @return the prospect
    */
   public Client createProspect(Long companyId, ClientDetails details) {
-    validateCodes(details);
+    return create(companyId, details, ClientProfile.EMPTY);
+  }
+
+  /**
+   * Creates a prospect with its KYC profile (BRNB.030/048): validated, checked for duplicates
+   * (blocked on a hard match, BRNB.032) and opened in the onboarding workflow (BRNB.090).
+   *
+   * @param companyId company
+   * @param details client data
+   * @param profile KYC profile
+   * @return the prospect
+   */
+  public Client create(Long companyId, ClientDetails details, ClientProfile profile) {
+    validator.validate(details, profile);
+    duplicates.requireNoHardMatch(
+        companyId, DuplicateProbe.of(details), null, "creation of " + nameOf(details));
     String code = numbers.next("PR-" + LocalDate.now(clock).getYear());
-    Client saved = clients.save(new Client(companyId, code, details));
+    Client client = new Client(companyId, code, details);
+    client.applyProfile(profile);
+    Client saved = clients.save(client);
+    workflow.start(saved);
     audit.record(ENTITY, code, AuditAction.CREATE, "Prospect " + saved.getDisplayName());
     return saved;
   }
 
   /**
-   * Updates client data.
+   * Updates client data; the KYC profile is kept.
    *
    * @param id client
    * @param details new data
    * @return the client
    */
   public Client update(Long id, ClientDetails details) {
+    return update(id, details, get(id).profile());
+  }
+
+  /**
+   * Updates client data and KYC profile (BRNB.049).
+   *
+   * @param id client
+   * @param details new data
+   * @param profile new KYC profile
+   * @return the client
+   */
+  public Client update(Long id, ClientDetails details, ClientProfile profile) {
     Client client = get(id);
-    validateCodes(details);
+    validator.validate(details, profile);
+    duplicates.requireNoHardMatch(
+        client.getCompanyId(),
+        DuplicateProbe.of(details),
+        id,
+        "update of " + client.getCode() + " " + nameOf(details));
     client.update(details);
+    client.applyProfile(profile);
+    workflow.describe(client);
     audit.record(
-        ENTITY, client.getCode(), AuditAction.UPDATE, "Updated " + client.getDisplayName());
+        ENTITY,
+        client.getProspectCode(),
+        AuditAction.UPDATE,
+        "Updated " + client.getCode() + " " + client.getDisplayName());
     return client;
   }
 
-  private void validateCodes(ClientDetails details) {
-    LocalDate today = LocalDate.now(clock);
-    lovs.validateOptional("MARKET_SEGMENT", details.marketSegment(), today);
-    if (details.identity() != null) {
-      lovs.validateOptional("ID_TYPE", details.identity().idType(), today);
-    }
+  private static String nameOf(ClientDetails details) {
+    return details.name() == null ? "a client" : describe(details);
+  }
+
+  private static String describe(ClientDetails details) {
+    ClientDetails.PersonName n = details.name();
+    return details.clientType() == ClientType.CORPORATE
+        ? String.valueOf(n.corporateName())
+        : n.lastName() + ", " + n.firstName();
   }
 
   /**

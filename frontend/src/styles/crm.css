@@ -1,0 +1,237 @@
+/*
+ * Clients (crm) and Broking Administration (nbadmin) screens. Colours come from tokens.css only.
+ */
+
+/* Client tags and special instructions banner (BRNB.091) */
+.instructions-banner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--brand-gold-600);
+  border-left: 4px solid var(--brand-gold);
+  border-radius: var(--radius-md);
+  background: var(--brand-gold-050);
+  color: var(--color-text);
+}
+
+.instructions-banner-tags,
+.instructions-banner-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+}
+
+.client-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--brand-navy);
+  color: var(--color-surface);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.client-tag-remove {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+/* Record header: codes, status and KYC badges */
+.record-facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Quick filters above lists */
+.quick-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.quick-filter {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.quick-filter:hover,
+.quick-filter:focus-visible,
+.quick-filter[aria-pressed='true'] {
+  border-color: var(--brand-blue);
+  background: var(--brand-blue-050);
+  color: var(--brand-blue);
+}
+
+/* Forms in sections */
+.form-section-title {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  color: var(--brand-navy);
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+}
+
+/* Live duplicate warnings (BRNB.032) */
+.duplicate-list {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-5);
+}
+
+.duplicate-list li {
+  margin-bottom: var(--space-1);
+}
+
+/* Success screen after saving a prospect */
+.success-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+}
+
+.success-panel h2 {
+  margin: 0;
+  color: var(--color-success);
+}
+
+/* KYC checklist */
+.checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.checklist-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.checklist-item:last-child {
+  border-bottom: 0;
+}
+
+.checklist-state {
+  display: inline-flex;
+  width: 22px;
+  justify-content: center;
+}
+
+.checklist-state.done {
+  color: var(--color-success);
+}
+
+.checklist-state.missing {
+  color: var(--color-danger);
+}
+
+.checklist-label {
+  flex: 1 1 220px;
+  font-weight: 600;
+}
+
+.checklist-files {
+  flex: 2 1 260px;
+  font-size: 13px;
+}
+
+/* Linkage warnings on the client page */
+.warning-list {
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+/* User access matrix */
+.matrix-wrap {
+  overflow: auto;
+  max-height: 70vh;
+}
+
+.matrix {
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.matrix th,
+.matrix td {
+  border: 1px solid var(--color-border);
+  padding: var(--space-1) var(--space-2);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.matrix thead th {
+  position: sticky;
+  top: 0;
+  background: var(--color-surface-alt);
+  z-index: 1;
+}
+
+.matrix tbody th {
+  position: sticky;
+  left: 0;
+  text-align: left;
+  background: var(--color-surface);
+  font-family: var(--font-mono);
+}
+
+.matrix-granted {
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+/* List-of-values types with pending values */
+.nav-list-count {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+}
+
+/* Temporary password shown once to the approver */
+.secret-value {
+  display: inline-block;
+  padding: var(--space-2) var(--space-3);
+  border: 1px dashed var(--brand-blue);
+  border-radius: var(--radius-sm);
+  background: var(--brand-blue-050);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+@media print {
+  .no-print {
+    display: none;
+  }
+}

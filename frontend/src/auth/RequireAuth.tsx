@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
+import { mayOpen } from '@/navigation/access';
 import { useAuth } from './authContext';
 
 /** Redirects anonymous users to the login page. */
@@ -14,10 +15,11 @@ export function RequireAuth({ children }: Readonly<{ children: ReactNode }>) {
 /** Guards a screen by permission; users without it see an explanatory message. */
 export function RequirePermission({
   permission,
+  alsoPermissions,
   children,
-}: Readonly<{ permission?: string; children: ReactNode }>) {
+}: Readonly<{ permission?: string; alsoPermissions?: string[]; children: ReactNode }>) {
   const { can } = useAuth();
-  if (permission !== undefined && !can(permission)) {
+  if (!mayOpen({ permission, alsoPermissions }, can)) {
     return (
       <div className="alert warning" role="alert">
         You do not have access to this screen. Contact your administrator if you need it.

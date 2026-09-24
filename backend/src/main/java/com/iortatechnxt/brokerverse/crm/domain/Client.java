@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.crm.domain.ClientDetails.Contact;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails.Identity;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails.PersonName;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -124,6 +125,44 @@ public class Client extends BaseEntity {
   @Column(name = "confirmed_at")
   private Instant confirmedAt;
 
+  @Column(length = 40)
+  private String nationality;
+
+  @Column(name = "civil_status", length = 40)
+  private String civilStatus;
+
+  @Column(length = 120)
+  private String occupation;
+
+  @Column(name = "source_of_funds", length = 40)
+  private String sourceOfFunds;
+
+  @Column(name = "risk_rating", length = 40)
+  private String riskRating;
+
+  @Column(name = "onboarding_stage", length = 40)
+  private String onboardingStage;
+
+  @Column(name = "kyc_submitted_by", length = 50)
+  private String kycSubmittedBy;
+
+  @Column(name = "kyc_submitted_at")
+  private Instant kycSubmittedAt;
+
+  @Column(name = "deactivation_reason", length = 40)
+  private String deactivationReason;
+
+  @Column(name = "deactivation_note", length = 500)
+  private String deactivationNote;
+
+  @Column(name = "deactivated_by", length = 50)
+  private String deactivatedBy;
+
+  @Column(name = "deactivated_at")
+  private Instant deactivatedAt;
+
+  @Embedded private ClientKeys keys;
+
   protected Client() {}
 
   /**
@@ -192,6 +231,77 @@ public class Client extends BaseEntity {
     this.marketSegment = d.marketSegment();
     this.bankClient = d.bankClient();
     this.bankCif = d.bankCif();
+    this.keys =
+        ClientKeys.of(
+            new Identity(null, idType, idNumber),
+            mobile,
+            new PersonName(lastName, firstName, null, null, corporateName));
+  }
+
+  /**
+   * Sets the KYC profile (nationality, civil status, occupation, source of funds, risk rating).
+   *
+   * @param profile profile; null keeps nothing
+   */
+  public void applyProfile(ClientProfile profile) {
+    if (status == ClientStatus.INACTIVE) {
+      throw new BusinessRuleException("CLIENT_INACTIVE", "An inactive client cannot be changed");
+    }
+    ClientProfile p = profile == null ? ClientProfile.EMPTY : profile;
+    this.nationality = p.nationality();
+    this.civilStatus = p.civilStatus();
+    this.occupation = p.occupation();
+    this.sourceOfFunds = p.sourceOfFunds();
+    this.riskRating = p.riskRating();
+  }
+
+  /**
+   * The KYC profile.
+   *
+   * @return profile
+   */
+  public ClientProfile profile() {
+    return new ClientProfile(nationality, civilStatus, occupation, sourceOfFunds, riskRating);
+  }
+
+  /**
+   * Records the submission of the KYC documents for verification (maker step).
+   *
+   * @param user submitting user
+   * @param when time
+   */
+  public void submitKyc(String user, Instant when) {
+    this.kycSubmittedBy = user;
+    this.kycSubmittedAt = when;
+    this.kycStatus = KycStatus.PENDING;
+  }
+
+  /**
+   * Mirrors the onboarding workflow stage (BRNB.090).
+   *
+   * @param stage stage code of workflow NB_CLIENT
+   */
+  public void mirrorStage(String stage) {
+    this.onboardingStage = stage;
+  }
+
+  /**
+   * Deactivates the client with a reason (no new business; history is kept).
+   *
+   * @param reason reason code (list of values CLIENT_DEACTIVATION_REASON)
+   * @param note comment
+   * @param user deactivating user
+   * @param when time
+   */
+  public void deactivate(String reason, String note, String user, Instant when) {
+    if (status == ClientStatus.INACTIVE) {
+      throw new BusinessRuleException("CLIENT_INACTIVE", "The client is already inactive");
+    }
+    this.status = ClientStatus.INACTIVE;
+    this.deactivationReason = reason;
+    this.deactivationNote = note;
+    this.deactivatedBy = user;
+    this.deactivatedAt = when;
   }
 
   private static void requireText(String value, String field) {
@@ -259,11 +369,6 @@ public class Client extends BaseEntity {
     this.status = ClientStatus.CONFIRMED;
     this.confirmedBy = user;
     this.confirmedAt = when;
-  }
-
-  /** Deactivates the client (no new business). */
-  public void deactivate() {
-    this.status = ClientStatus.INACTIVE;
   }
 
   /**
@@ -401,5 +506,37 @@ public class Client extends BaseEntity {
 
   public Instant getConfirmedAt() {
     return confirmedAt;
+  }
+
+  public String getRiskRating() {
+    return riskRating;
+  }
+
+  public String getOnboardingStage() {
+    return onboardingStage;
+  }
+
+  public String getKycSubmittedBy() {
+    return kycSubmittedBy;
+  }
+
+  public Instant getKycSubmittedAt() {
+    return kycSubmittedAt;
+  }
+
+  public String getDeactivationReason() {
+    return deactivationReason;
+  }
+
+  public String getDeactivationNote() {
+    return deactivationNote;
+  }
+
+  public String getDeactivatedBy() {
+    return deactivatedBy;
+  }
+
+  public Instant getDeactivatedAt() {
+    return deactivatedAt;
   }
 }

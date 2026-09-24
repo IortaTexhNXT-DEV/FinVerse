@@ -81,6 +81,7 @@ export const WORKFLOW_NAMES: Record<string, string> = {
   NB_QUOTATION: 'Quotations',
   NB_PROPOSAL: 'Proposal requests',
   NB_ACCOUNT: 'Accounts',
+  NB_CLIENT: 'Client onboarding',
 };
 
 /** Workflow engine: My Work queues, record workflow panel, generic actions, assignment. */

@@ -9,6 +9,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { formatDateTime, today } from '@/utils/format';
+import { AuditExportButtons } from './AuditExportButtons';
 
 /** Audit trail inquiry: originator, modifier and authorizer activity with timestamps. */
 export default function AuditTrailPage() {
@@ -29,6 +30,7 @@ export default function AuditTrailPage() {
         section="Administration"
         title="Audit Trail"
         description="Every financial and non-financial action, who performed it and when. Records cannot be changed."
+        actions={<AuditExportButtons filters={filters} />}
       />
       <Card>
         <div className="form-grid">

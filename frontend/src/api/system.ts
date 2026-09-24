@@ -63,7 +63,10 @@ export interface SystemInfo {
 
 export interface SessionPolicy {
   timeoutMinutes: number;
+  /** Seconds before the inactivity sign-out at which the warning shows. */
   warningSeconds: number;
+  /** Minutes before the absolute session end (token expiry) at which the user is warned. */
+  expiryWarningMinutes?: number;
 }
 
 export const systemApi = {

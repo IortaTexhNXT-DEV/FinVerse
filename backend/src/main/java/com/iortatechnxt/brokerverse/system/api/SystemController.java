@@ -42,6 +42,9 @@ public class SystemController {
   private static final String MANAGE = "hasAuthority('SYSTEM_PARAMETER_MANAGE')";
   private static final int DEFAULT_TIMEOUT_MINUTES = 30;
   private static final int WARNING_SECONDS = 60;
+  private static final int SECONDS_PER_MINUTE = 60;
+  private static final int DEFAULT_IDLE_WARNING_MINUTES = 15;
+  private static final int DEFAULT_EXPIRY_WARNING_MINUTES = 30;
   private static final int DEFAULT_HISTORY_DAYS = 90;
   private static final int MAX_PAGE_SIZE = 200;
 
@@ -139,10 +142,21 @@ public class SystemController {
   @GetMapping("/session-policy")
   @PreAuthorize("isAuthenticated()")
   public SessionPolicyResponse sessionPolicy() {
-    return new SessionPolicyResponse(
+    int timeout =
         parameters.intValue(
-            SystemParameterService.SESSION_TIMEOUT_MINUTES, DEFAULT_TIMEOUT_MINUTES),
-        WARNING_SECONDS);
+            SystemParameterService.SESSION_TIMEOUT_MINUTES, DEFAULT_TIMEOUT_MINUTES);
+    int idleWarning =
+        parameters.intValue(
+            SystemParameterService.SESSION_IDLE_WARNING_MINUTES, DEFAULT_IDLE_WARNING_MINUTES);
+    int warningSeconds =
+        idleWarning < timeout
+            ? Math.max(WARNING_SECONDS, (timeout - idleWarning) * SECONDS_PER_MINUTE)
+            : WARNING_SECONDS;
+    return new SessionPolicyResponse(
+        timeout,
+        warningSeconds,
+        parameters.intValue(
+            SystemParameterService.SESSION_EXPIRY_WARNING_MINUTES, DEFAULT_EXPIRY_WARNING_MINUTES));
   }
 
   /**

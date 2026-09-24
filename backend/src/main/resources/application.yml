@@ -88,6 +88,10 @@ brokerverse:
     quotation-expiry-cron: ${BROKERVERSE_JOB_QUOTATION_EXPIRY_CRON:0 45 0 * * *}
     # Outbox relay: delivers queued e-mails and retries failed attempts.
     mail-dispatch-cron: ${BROKERVERSE_JOB_MAIL_DISPATCH_CRON:0 */2 * * * *}
+    # Monthly KYC review (BRNB.110): expires overdue KYC and notifies Account Officers.
+    kyc-review-due-cron: ${BROKERVERSE_JOB_KYC_REVIEW_DUE_CRON:0 0 2 1 * *}
+    # Monthly data retention review (BRNB.106): counts eligible records; never deletes.
+    retention-review-cron: ${BROKERVERSE_JOB_RETENTION_REVIEW_CRON:0 0 3 2 * *}
 
 management:
   endpoints:

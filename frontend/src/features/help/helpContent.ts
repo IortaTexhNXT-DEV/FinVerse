@@ -4,6 +4,7 @@ import { ASSETS_HELP } from '@/features/assets/help';
 import { BROKING_SETUP_HELP } from '@/features/brokingsetup/help';
 import { BULK_HELP } from '@/features/bulk/help';
 import { CLAIMS_HELP } from '@/features/claims/help';
+import { CRM_HELP } from '@/features/crm/help';
 import { PLANNING_HELP } from '@/features/closing/help';
 import { GL_HELP } from '@/features/gl/help';
 import { PAYABLES_HELP } from '@/features/payables/help';
@@ -88,6 +89,7 @@ export const HELP_SECTIONS: HelpSection[] = [
     ],
   },
   WORKSPACE_HELP,
+  CRM_HELP,
   BULK_HELP,
   BROKING_SETUP_HELP,
   GL_HELP,
@@ -139,7 +141,9 @@ export const HELP_SECTIONS: HelpSection[] = [
         path: '/profile',
         summary: 'Your details, roles, permissions and last sign-in; change your password here.',
         controls: [
-          'You are signed out automatically after the configured period of inactivity; a warning appears one minute before.',
+          'You are signed out automatically after the configured period of inactivity (SESSION_TIMEOUT_MINUTES); a warning appears after SESSION_IDLE_WARNING_MINUTES (15) of inactivity.',
+          'The session also ends at a fixed time after sign-in; a warning appears SESSION_EXPIRY_WARNING_MINUTES (30) before.',
+          'You can work in several tabs: a new tab uses the session of the open tabs, activity in any tab keeps all of them signed in, and signing out in one tab signs out all of them.',
         ],
       },
     ],

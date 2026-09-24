@@ -21,6 +21,12 @@ public class SystemParameterService {
   /** Web session inactivity timeout in minutes. */
   public static final String SESSION_TIMEOUT_MINUTES = "SESSION_TIMEOUT_MINUTES";
 
+  /** Minutes of inactivity after which the web client warns of the coming sign-out (BRNB.040). */
+  public static final String SESSION_IDLE_WARNING_MINUTES = "SESSION_IDLE_WARNING_MINUTES";
+
+  /** Minutes before the absolute session end at which the web client warns (BRNB.040). */
+  public static final String SESSION_EXPIRY_WARNING_MINUTES = "SESSION_EXPIRY_WARNING_MINUTES";
+
   /** Default ageing buckets (days). */
   public static final String AGEING_BUCKETS = "AGEING_BUCKETS";
 

@@ -98,7 +98,7 @@ public class BulkController {
    * @param companyId company
    * @param handler handler
    * @param parameters handler parameters as JSON object, optional
-   * @param file xlsx, ods or csv
+   * @param file xlsx, ods, csv or txt
    * @return validated job
    * @throws IOException when the upload cannot be read
    */
@@ -191,6 +191,28 @@ public class BulkController {
   @PostMapping("/jobs/{id}/commit")
   public BulkJobResponse commit(@PathVariable Long id) {
     return BulkJobResponse.from(bulk.commit(id));
+  }
+
+  /**
+   * Commits again the rows that failed at commit (BRQID.006).
+   *
+   * @param id completed job
+   * @return job with updated counts
+   */
+  @PostMapping("/jobs/{id}/reprocess")
+  public BulkJobResponse reprocess(@PathVariable Long id) {
+    return BulkJobResponse.from(bulk.reprocess(id));
+  }
+
+  /**
+   * Committed rows per outcome category (BRQID.006 run summary).
+   *
+   * @param id job
+   * @return count per category
+   */
+  @GetMapping("/jobs/{id}/outcomes")
+  public Map<String, Long> outcomes(@PathVariable Long id) {
+    return bulk.outcomes(id);
   }
 
   /**

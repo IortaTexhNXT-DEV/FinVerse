@@ -1,12 +1,18 @@
 package com.iortatechnxt.brokerverse.report.api;
 
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
+import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.report.api.dto.ReportCatalogueEntry;
+import com.iortatechnxt.brokerverse.report.api.dto.ReportRunResponse;
+import com.iortatechnxt.brokerverse.report.core.ReportAccess;
+import com.iortatechnxt.brokerverse.report.core.ReportArchiveService;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
+import com.iortatechnxt.brokerverse.report.domain.ReportRun.RunFile;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import java.util.List;
 import java.util.Map;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,15 +34,53 @@ import org.springframework.web.bind.annotation.RestController;
 @PreAuthorize("hasAuthority('REPORT_VIEW')")
 public class ReportController {
 
+  private static final int MAX_PAGE_SIZE = 100;
+
   private final ReportService service;
+  private final ReportArchiveService archive;
 
   /**
    * Creates the controller.
    *
    * @param service report service
+   * @param archive archive of generated reports
    */
-  public ReportController(ReportService service) {
+  public ReportController(ReportService service, ReportArchiveService archive) {
     this.service = service;
+    this.archive = archive;
+  }
+
+  /**
+   * Archived runs and exports of the reports the user may view (CSHID.018).
+   *
+   * @param code one report, optional
+   * @param page page
+   * @param size size
+   * @return runs, newest first
+   */
+  @GetMapping("/runs")
+  public PageResponse<ReportRunResponse> runs(
+      @RequestParam(required = false) String code,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "20") int size) {
+    return PageResponse.of(
+        archive.runs(code, PageRequest.of(page, Math.min(size, MAX_PAGE_SIZE))),
+        ReportRunResponse::from);
+  }
+
+  /**
+   * Downloads an archived export again; needs the report's export permission (CSHID.018).
+   *
+   * @param id archived export
+   * @return file
+   */
+  @GetMapping("/runs/{id}/file")
+  public ResponseEntity<byte[]> runFile(@PathVariable Long id) {
+    RunFile file = archive.file(id);
+    return ResponseEntity.ok()
+        .contentType(MediaType.parseMediaType(file.contentType()))
+        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(file.fileName()))
+        .body(file.content());
   }
 
   /**
@@ -46,7 +90,9 @@ public class ReportController {
    */
   @GetMapping
   public List<ReportCatalogueEntry> catalogue() {
-    return service.catalogue().stream().map(ReportCatalogueEntry::from).toList();
+    return service.catalogue().stream()
+        .map(m -> ReportCatalogueEntry.from(m, ReportAccess.mayExport(m)))
+        .toList();
   }
 
   /**

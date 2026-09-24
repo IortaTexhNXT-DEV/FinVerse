@@ -40,6 +40,12 @@ public class BulkRowRecord {
   @Column(name = "result_ref", length = 100)
   private String resultRef;
 
+  @Column(length = 40)
+  private String outcome;
+
+  @Column(nullable = false)
+  private int attempts;
+
   protected BulkRowRecord() {}
 
   /**
@@ -64,8 +70,21 @@ public class BulkRowRecord {
    * @param reference created or updated record
    */
   public void committed(String reference) {
+    committed(reference, null);
+  }
+
+  /**
+   * Records a successful commit with the handler's outcome category (BRQID.006).
+   *
+   * @param reference created or updated record
+   * @param category outcome category, may be null
+   */
+  public void committed(String reference, String category) {
     this.status = BulkRowStatus.COMMITTED;
     this.resultRef = reference;
+    this.outcome = category;
+    this.messages = null;
+    this.attempts++;
   }
 
   /**
@@ -76,6 +95,7 @@ public class BulkRowRecord {
   public void failed(String error) {
     this.status = BulkRowStatus.FAILED;
     this.messages = join(List.of(error == null ? "Unexpected error" : error));
+    this.attempts++;
   }
 
   private static String join(List<String> errors) {
@@ -109,5 +129,13 @@ public class BulkRowRecord {
 
   public String getResultRef() {
     return resultRef;
+  }
+
+  public String getOutcome() {
+    return outcome;
+  }
+
+  public int getAttempts() {
+    return attempts;
   }
 }

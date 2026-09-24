@@ -29,6 +29,9 @@ import java.util.stream.Collectors;
  * @param componentParties sub-ledger party per amount component, for events whose party lines
  *     concern more than one party (e.g. a broker booking: premium receivable from the client and
  *     due to the insurer, BRNB.027); components not listed use {@code partyCode}
+ * @param exchangeRate explicit rate of the transaction currency (base units per foreign unit) for
+ *     every journal line, e.g. the Comptrollership BOOK rate with 2 decimals of Operations postings
+ *     (CSHID.012-014); null uses the SPOT rate of the value date
  */
 public record BusinessEvent(
     String eventType,
@@ -45,13 +48,68 @@ public record BusinessEvent(
     String narration,
     Map<String, BigDecimal> amounts,
     Map<String, String> accounts,
-    Map<String, String> componentParties) {
+    Map<String, String> componentParties,
+    BigDecimal exchangeRate) {
 
   /** Canonical constructor copying the maps. */
   public BusinessEvent {
     amounts = Map.copyOf(amounts);
     accounts = accounts == null ? Map.of() : Map.copyOf(accounts);
     componentParties = componentParties == null ? Map.of() : Map.copyOf(componentParties);
+  }
+
+  /**
+   * An event at the SPOT rate of its value date (the 15-component form of the booking contract).
+   *
+   * @param eventType event type code
+   * @param companyId company
+   * @param branchId branch
+   * @param valueDate accounting date
+   * @param currency currency
+   * @param sourceModule publishing module
+   * @param sourceReference unique key of the business transaction
+   * @param reference business reference
+   * @param partyCode sub-ledger party
+   * @param businessLine line of business
+   * @param costCenter cost centre
+   * @param narration narration
+   * @param amounts amount components
+   * @param accounts account role overrides
+   * @param componentParties sub-ledger party per amount component
+   */
+  public BusinessEvent(
+      String eventType,
+      Long companyId,
+      Long branchId,
+      LocalDate valueDate,
+      String currency,
+      String sourceModule,
+      String sourceReference,
+      String reference,
+      String partyCode,
+      String businessLine,
+      String costCenter,
+      String narration,
+      Map<String, BigDecimal> amounts,
+      Map<String, String> accounts,
+      Map<String, String> componentParties) {
+    this(
+        eventType,
+        companyId,
+        branchId,
+        valueDate,
+        currency,
+        sourceModule,
+        sourceReference,
+        reference,
+        partyCode,
+        businessLine,
+        costCenter,
+        narration,
+        amounts,
+        accounts,
+        componentParties,
+        null);
   }
 
   /**
@@ -102,7 +160,34 @@ public record BusinessEvent(
         narration,
         amounts,
         accounts,
-        Map.of());
+        Map.of(),
+        null);
+  }
+
+  /**
+   * The same event posted at an explicit exchange rate (Operations: the BOOK rate, CSHID.012).
+   *
+   * @param rate rate of the transaction currency, null for the SPOT rate
+   * @return event with the rate
+   */
+  public BusinessEvent withExchangeRate(BigDecimal rate) {
+    return new BusinessEvent(
+        eventType,
+        companyId,
+        branchId,
+        valueDate,
+        currency,
+        sourceModule,
+        sourceReference,
+        reference,
+        partyCode,
+        businessLine,
+        costCenter,
+        narration,
+        amounts,
+        accounts,
+        componentParties,
+        rate);
   }
 
   /**

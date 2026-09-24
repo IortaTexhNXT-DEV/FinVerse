@@ -4,6 +4,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /** Bulk rows. */
 public interface BulkRowRepository extends JpaRepository<BulkRowRecord, Long> {
@@ -44,4 +46,16 @@ public interface BulkRowRepository extends JpaRepository<BulkRowRecord, Long> {
    */
   Page<BulkRowRecord> findByJobIdAndStatusOrderByRowNo(
       Long jobId, BulkRowStatus status, Pageable pageable);
+
+  /**
+   * Committed rows per outcome category of a job (BRQID.006 run report).
+   *
+   * @param jobId job
+   * @param status committed status
+   * @return rows of [category (null = uncategorised), count]
+   */
+  @Query(
+      "select r.outcome, count(r) from BulkRowRecord r"
+          + " where r.jobId = :jobId and r.status = :status group by r.outcome")
+  List<Object[]> countOutcomes(@Param("jobId") Long jobId, @Param("status") BulkRowStatus status);
 }

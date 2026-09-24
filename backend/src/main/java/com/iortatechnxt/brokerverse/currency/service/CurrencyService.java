@@ -126,12 +126,13 @@ public class CurrencyService {
    * @param currency currency
    * @param rateType rate type
    * @param date effective date
-   * @param rate positive rate
+   * @param given positive rate (a BOOK rate is rounded to 2 decimals)
    * @return saved rate
    */
   public ExchangeRate saveRate(
-      String currency, RateType rateType, LocalDate date, BigDecimal rate) {
+      String currency, RateType rateType, LocalDate date, BigDecimal given) {
     requireActive(currency);
+    BigDecimal rate = rateType.normalize(given);
     if (!Money.isPositive(rate)) {
       throw new BusinessRuleException("INVALID_RATE", "Exchange rate must be positive");
     }

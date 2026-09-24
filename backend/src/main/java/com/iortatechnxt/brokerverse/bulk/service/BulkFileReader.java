@@ -15,7 +15,8 @@ import org.xml.sax.SAXException;
 
 /**
  * Reads the first sheet of an uploaded XLSX, CSV (UTF-8, comma separated, RFC 4180 quotes) or ODS
- * file (BRNB.064 "accept different file formats"). The first row holds the headers. Dates are
+ * file (BRNB.064 "accept different file formats"), or a plain-text TXT file laid out as the handler
+ * declares (delimited or fixed width, CSHID.008). The first row holds the headers. Dates are
  * returned as yyyy-MM-dd, numbers without grouping; blank rows are skipped.
  */
 @Component
@@ -29,17 +30,32 @@ public class BulkFileReader {
    * @return headers and rows
    */
   public ParsedFile read(String fileName, byte[] content) {
+    return read(fileName, content, TextLayout.AUTO);
+  }
+
+  /**
+   * Reads a file; a TXT file follows the given layout.
+   *
+   * @param fileName file name (decides the format)
+   * @param content bytes
+   * @param layout layout of a TXT file
+   * @return headers and rows
+   */
+  public ParsedFile read(String fileName, byte[] content, TextLayout layout) {
     String name = fileName == null ? "" : fileName.toLowerCase(Locale.ROOT);
     try {
-      return toParsed(table(name, content));
+      return toParsed(table(name, content, layout));
     } catch (IOException | SAXException | ParserConfigurationException e) {
       throw new BusinessRuleException(
           "BULK_FILE_UNREADABLE", "The file cannot be read: " + e.getMessage(), e);
     }
   }
 
-  private static List<List<String>> table(String name, byte[] content)
+  private static List<List<String>> table(String name, byte[] content, TextLayout layout)
       throws IOException, SAXException, ParserConfigurationException {
+    if (name.endsWith(".txt")) {
+      return TextTableReader.read(content, layout);
+    }
     if (name.endsWith(".xlsx")) {
       return XlsxTableReader.read(content);
     }
@@ -50,7 +66,8 @@ public class BulkFileReader {
       return OdsTableReader.read(content);
     }
     throw new BusinessRuleException(
-        "BULK_FILE_TYPE", "Upload an Excel (.xlsx), OpenDocument (.ods) or CSV (.csv) file");
+        "BULK_FILE_TYPE",
+        "Upload an Excel (.xlsx), OpenDocument (.ods), CSV (.csv) or text (.txt) file");
   }
 
   private static ParsedFile toParsed(List<List<String>> table) {

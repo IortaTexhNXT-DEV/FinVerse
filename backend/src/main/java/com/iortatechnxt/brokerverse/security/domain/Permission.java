@@ -105,5 +105,53 @@ public enum Permission {
   LOV_MANAGE,
   ACCESS_REQUEST,
   ACCESS_APPROVE,
-  MESSAGE_VIEW
+  MESSAGE_VIEW,
+
+  // Operations (BDOI BRD-2). See docs/architecture/OPERATIONS_DESIGN.md section 6.1 and V760.
+  // Operations home, invoice 360 and Operations reports (view vs download / print, CSHID.018).
+  OPS_VIEW,
+  OPS_REPORT_VIEW,
+  OPS_REPORT_EXPORT,
+  // Cashiering (CSHID.001-027)
+  CASH_RECEIPT,
+  CASH_CANCEL,
+  CASH_REINSTATE,
+  CASH_APPROVE,
+  CASH_APPLY,
+  CASH_UPLOAD,
+  CASH_DISPOSITION,
+  CASH_DISPOSITION_APPROVE,
+  CASH_SERIES_MANAGE,
+  CASH_PRINT,
+  // BIR 2307 (MKTID.010/013, CSHID.026/027)
+  CWT_TAG,
+  CWT_PROCESS,
+  // Disbursement queue, default adapter until the Disbursement system is known (DBMID.001, OQ02)
+  DISB_PROCESS,
+  // Remittance (RMTID), holds and special remittance (MKTID.001-009)
+  REMIT_EXTRACT,
+  REMIT_PROCESS,
+  REMIT_EXCLUDE,
+  REMIT_APPROVE,
+  REMIT_OR_UPLOAD,
+  HOLD_REQUEST,
+  HOLD_APPROVE,
+  SPECIAL_REMIT_REQUEST,
+  SPECIAL_REMIT_APPROVE,
+  // Production reconciliation (PRCID)
+  RECON_PROCESS,
+  RECON_SEND,
+  // Adjustment / cancellation (ADJID, MKTID.008)
+  ADJ_REQUEST,
+  ADJ_PROCESS,
+  ADJ_APPROVE,
+  ADJ_POST,
+  // Commission receivables and incentives (CMRID)
+  COMMREC_PROCESS,
+  COMMREC_APPROVE,
+  INCENTIVE_MANAGE,
+  BIR_CERT_SUBMIT,
+  BIR_CERT_ACK,
+  // Operations interfaces: feed configuration and re-runs (BRQID.004/005)
+  FLOWIN_MANAGE
 }

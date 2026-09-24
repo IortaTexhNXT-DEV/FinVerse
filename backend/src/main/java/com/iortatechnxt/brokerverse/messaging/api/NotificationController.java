@@ -2,13 +2,21 @@ package com.iortatechnxt.brokerverse.messaging.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.messaging.api.dto.NotificationResponse;
+import com.iortatechnxt.brokerverse.messaging.api.dto.PreferenceRequest;
+import com.iortatechnxt.brokerverse.messaging.domain.NotificationPreference.Channels;
+import com.iortatechnxt.brokerverse.messaging.service.NotificationPreferenceService;
+import com.iortatechnxt.brokerverse.messaging.service.NotificationPreferenceService.EventChannels;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
+import jakarta.validation.Valid;
+import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,14 +30,43 @@ public class NotificationController {
   private static final int MAX_PAGE_SIZE = 100;
 
   private final NotificationService notifications;
+  private final NotificationPreferenceService preferences;
 
   /**
    * Creates the controller.
    *
    * @param notifications notification service
+   * @param preferences notification preferences
    */
-  public NotificationController(NotificationService notifications) {
+  public NotificationController(
+      NotificationService notifications, NotificationPreferenceService preferences) {
     this.notifications = notifications;
+    this.preferences = preferences;
+  }
+
+  /**
+   * My channels per notification event (RMTID.034).
+   *
+   * @return events with my channels
+   */
+  @GetMapping("/preferences")
+  public List<EventChannels> preferences() {
+    return preferences.mine();
+  }
+
+  /**
+   * Sets my channels for an event.
+   *
+   * @param eventCode event
+   * @param request in-app and e-mail choice
+   * @return the event with my channels
+   */
+  @PutMapping("/preferences/{eventCode}")
+  public EventChannels updatePreference(
+      @PathVariable String eventCode, @Valid @RequestBody PreferenceRequest request) {
+    return preferences.update(
+        eventCode,
+        new Channels(Boolean.TRUE.equals(request.inApp()), Boolean.TRUE.equals(request.email())));
   }
 
   /**

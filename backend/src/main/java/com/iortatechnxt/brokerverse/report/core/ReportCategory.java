@@ -13,7 +13,8 @@ public enum ReportCategory {
   BUDGET("Budget"),
   RECONCILIATION("Reconciliation"),
   CONTROL("Control & Audit"),
-  TAX_STATUTORY("Tax & Statutory");
+  TAX_STATUTORY("Tax & Statutory"),
+  OPERATIONS("Operations");
 
   private final String label;
 

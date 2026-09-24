@@ -1,12 +1,15 @@
 import { ACCOUNTING_ENGINE_HELP } from '@/features/accounting-engine/help';
 import { ACCOUNTS_HELP } from '@/features/accounts/help';
+import { ADJUSTMENT_HELP } from '@/features/adjustment/help';
 import { ADMIN_HELP } from '@/features/admin/help';
 import { ASSETS_HELP } from '@/features/assets/help';
 import { BOOKING_HELP } from '@/features/booking/help';
 import { BROKING_SETUP_HELP } from '@/features/brokingsetup/help';
 import { BULK_HELP } from '@/features/bulk/help';
+import { CASHIERING_HELP } from '@/features/cashiering/help';
 import { CATALOG_HELP } from '@/features/catalog/help';
 import { CLAIMS_HELP } from '@/features/claims/help';
+import { COMMISSION_HELP } from '@/features/commission/help';
 import { CRM_HELP } from '@/features/crm/help';
 import { PROPOSALS_HELP } from '@/features/proposals/help';
 import { QUOTATIONS_HELP } from '@/features/quotations/help';
@@ -14,10 +17,13 @@ import { PLANNING_HELP } from '@/features/closing/help';
 import { GL_HELP } from '@/features/gl/help';
 import { ISSUANCE_HELP } from '@/features/issuance/help';
 import { NB_DASHBOARD_HELP, NB_REPORTS_HELP } from '@/features/nbreports/help';
+import { OPERATIONS_HELP } from '@/features/operations/help';
 import { PAYABLES_HELP } from '@/features/payables/help';
 import { PLACEMENT_HELP } from '@/features/placement/help';
+import { PRODRECON_HELP } from '@/features/prodrecon/help';
 import { RECEIVABLES_HELP } from '@/features/receivables/help';
 import { REINSURANCE_HELP } from '@/features/reinsurance/help';
+import { REMITTANCE_HELP } from '@/features/remittance/help';
 import { RESERVES_HELP } from '@/features/reserves/help';
 import { SETUP_HELP } from '@/features/setup/help';
 import { TAX_HELP } from '@/features/tax/help';
@@ -105,8 +111,14 @@ export const HELP_SECTIONS: HelpSection[] = [
   PLACEMENT_HELP,
   ISSUANCE_HELP,
   BOOKING_HELP,
+  PRODRECON_HELP,
+  ADJUSTMENT_HELP,
   CATALOG_HELP,
   BULK_HELP,
+  OPERATIONS_HELP,
+  CASHIERING_HELP,
+  REMITTANCE_HELP,
+  COMMISSION_HELP,
   GL_HELP,
   RECEIVABLES_HELP,
   PAYABLES_HELP,

@@ -102,9 +102,10 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
   | V600–V649 | budgets, consolidation, inter-company |
   | V650–V699 | finance / MIS reports support objects |
   | V700–V749 | tax & statutory reporting (BIR / LGU / BFP returns, 2307, IC schedules) |
-  | V750–V799 | broking foundations (lov, workflow, bulk, messaging, docgen) and broking administration |
+  | V750–V759, V790–V799 | broking foundations (lov, workflow, bulk, messaging, docgen) and broking administration |
+  | V760–V789 | Operations (BRD-2): foundation, invoice ledger and platform extensions V760–V762, then cashiering, remittance, product reconciliation, adjustment and commission receivables in their own sub-ranges |
   | V800–V899 | broking business modules (crm V800s, catalog V810s, account V820s, quotation V830s, non-package V840s, placement V850s, issuance V860s, booking V870s, NB reports V880s) |
-  | V900–V999 | demo data (`db/demo`, loaded only with the `demo` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989 |
+  | V900–V999 | demo data (`db/demo`, loaded only with the `demo` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989, Operations V990–V995 |
 
   Because each module owns a range, a module can add a migration whose version is lower than one
   another module has already applied (for example a new platform `V27` after underwriting's `V101`).
@@ -264,7 +265,7 @@ environment variable and document it in `docs/operations/CONFIGURATION.md`. Jobs
 `RECURRING_JOURNALS`, `ALERT_DAILY_CHECKS`, `PDC_ISSUED_DUE`, `QUOTATION_EXPIRY`, `HOLD_COVER_EXPIRY`,
 `BOOKING_BATCH` (daily), `PAYMENT_CONFIRMATION_SWEEP` (hourly), `MAIL_DISPATCH` (every two minutes),
 `KYC_REVIEW_DUE`, `RETENTION_REVIEW` (monthly) and `RESERVE_VALUATION`, `RI_ALLOCATION`,
-`QUOTATION_REQUEST_INTAKE` (manual unless scheduled).
+`QUOTATION_REQUEST_INTAKE`, `OPS_INVOICE_FEED_REPLAY` (manual unless scheduled). The crons of the Operations jobs built on top of the ledger are already configured (`brokerverse.jobs.prebooked-rematch-cron` … `dp-feedback-sla-cron`, see `docs/modules/OPERATIONS.md`).
 
 ### 10.4 Business parameters – `system`
 
@@ -316,6 +317,7 @@ rules, reports, ports, demo data and open points. Update it together with the co
 | Receivables & Banking | [`docs/modules/RECEIVABLES_AND_BANKING.md`](../modules/RECEIVABLES_AND_BANKING.md) |
 | Payables & Cash | [`docs/modules/PAYABLES_AND_CASH.md`](../modules/PAYABLES_AND_CASH.md) |
 | Assets & Investments | [`docs/modules/ASSETS_AND_INVESTMENTS.md`](../modules/ASSETS_AND_INVESTMENTS.md) |
+| Operations (BRD-2) | [`docs/modules/OPERATIONS.md`](../modules/OPERATIONS.md) |
 | Planning & Closing | [`docs/development/PLANNING_AND_CLOSING.md`](PLANNING_AND_CLOSING.md) |
 | Actuarial Reserves | [`docs/modules/ACTUARIAL_RESERVES.md`](../modules/ACTUARIAL_RESERVES.md) |
 | Tax & Statutory | [`docs/modules/TAX_AND_STATUTORY.md`](../modules/TAX_AND_STATUTORY.md) |

@@ -24,6 +24,7 @@ final class BulkWorkbooks {
   private static final int EXAMPLE_COLUMN = 4;
   private static final int MESSAGES_COLUMN = 2;
   private static final int REFERENCE_COLUMN = 3;
+  private static final int OUTCOME_COLUMN = 4;
 
   private BulkWorkbooks() {}
 
@@ -102,16 +103,18 @@ final class BulkWorkbooks {
    * @param columns template columns
    * @param rows rows
    * @param values row values by row id
+   * @param outcomes committed rows per outcome category (BRQID.006)
    * @return xlsx bytes
    */
   static byte[] report(
       BulkJob job,
       List<BulkColumn> columns,
       List<BulkRowRecord> rows,
-      Map<Long, Map<String, String>> values) {
+      Map<Long, Map<String, String>> values,
+      Map<String, Long> outcomes) {
     try (XSSFWorkbook wb = new XSSFWorkbook()) {
       CellStyle head = headStyle(wb);
-      summarySheet(wb, job);
+      summarySheet(wb, job, outcomes);
       rowsSheet(wb, head, columns, rows, values);
       return bytes(wb);
     } catch (IOException e) {
@@ -119,7 +122,7 @@ final class BulkWorkbooks {
     }
   }
 
-  private static void summarySheet(XSSFWorkbook wb, BulkJob job) {
+  private static void summarySheet(XSSFWorkbook wb, BulkJob job, Map<String, Long> outcomes) {
     Sheet summary = wb.createSheet("Summary");
     Object[][] facts = {
       {"Upload", job.getJobNo()},
@@ -131,12 +134,19 @@ final class BulkWorkbooks {
       {"Committed", job.getCommittedRows()},
       {"Failed at commit", job.getFailedRows()},
       {"Uploaded by", job.getCreatedBy()},
-      {"Uploaded at", String.valueOf(job.getCreatedAt())}
+      {"Uploaded at", String.valueOf(job.getCreatedAt())},
+      {"Reprocessed", job.getReprocessCount()}
     };
     for (int i = 0; i < facts.length; i++) {
       Row r = summary.createRow(i);
       r.createCell(0).setCellValue(String.valueOf(facts[i][0]));
       r.createCell(1).setCellValue(String.valueOf(facts[i][1]));
+    }
+    int next = facts.length + 1;
+    for (Map.Entry<String, Long> outcome : outcomes.entrySet()) {
+      Row r = summary.createRow(next++);
+      r.createCell(0).setCellValue("Outcome " + outcome.getKey());
+      r.createCell(1).setCellValue(String.valueOf(outcome.getValue()));
     }
     summary.setColumnWidth(0, WIDTH);
     summary.setColumnWidth(1, WIDTH * 2);
@@ -150,7 +160,7 @@ final class BulkWorkbooks {
       Map<Long, Map<String, String>> values) {
     Sheet sheet = wb.createSheet("Rows");
     Row header = sheet.createRow(0);
-    String[] fixed = {"Row", "Status", "Messages", "Reference"};
+    String[] fixed = {"Row", "Status", "Messages", "Reference", "Outcome"};
     for (int i = 0; i < fixed.length; i++) {
       var cell = header.createCell(i);
       cell.setCellValue(fixed[i]);
@@ -170,6 +180,7 @@ final class BulkWorkbooks {
       out.createCell(1).setCellValue(row.getStatus().name());
       out.createCell(MESSAGES_COLUMN).setCellValue(textOf(row.getMessages()));
       out.createCell(REFERENCE_COLUMN).setCellValue(textOf(row.getResultRef()));
+      out.createCell(OUTCOME_COLUMN).setCellValue(textOf(row.getOutcome()));
       Map<String, String> v = values.getOrDefault(row.getId(), Map.of());
       for (int c = 0; c < columns.size(); c++) {
         out.createCell(fixed.length + c).setCellValue(v.getOrDefault(columns.get(c).header(), ""));

@@ -12,13 +12,17 @@ import java.util.Map;
  * @param messages validation or commit messages
  * @param resultRef record created or updated
  * @param values values by column
+ * @param outcome outcome category of a committed row (BRQID.006)
+ * @param attempts commit attempts
  */
 public record BulkRowResponse(
     int rowNo,
     BulkRowStatus status,
     String messages,
     String resultRef,
-    Map<String, String> values) {
+    Map<String, String> values,
+    String outcome,
+    int attempts) {
 
   /**
    * Maps a row.
@@ -29,6 +33,12 @@ public record BulkRowResponse(
    */
   public static BulkRowResponse from(BulkRowRecord r, Map<String, String> values) {
     return new BulkRowResponse(
-        r.getRowNo(), r.getStatus(), r.getMessages(), r.getResultRef(), values);
+        r.getRowNo(),
+        r.getStatus(),
+        r.getMessages(),
+        r.getResultRef(),
+        values,
+        r.getOutcome(),
+        r.getAttempts());
   }
 }

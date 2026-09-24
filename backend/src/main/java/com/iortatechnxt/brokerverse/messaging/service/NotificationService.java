@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationService {
 
   private final NotificationRepository notifications;
+  private final NotificationPreferenceService preferences;
   private final UserDirectory users;
   private final CurrentUser currentUser;
   private final Clock clock;
@@ -29,16 +30,19 @@ public class NotificationService {
    * Creates the service.
    *
    * @param notifications notifications
+   * @param preferences users' notification preferences (RMTID.034)
    * @param users user directory (permission holders)
    * @param currentUser current user
    * @param clock clock
    */
   public NotificationService(
       NotificationRepository notifications,
+      NotificationPreferenceService preferences,
       UserDirectory users,
       CurrentUser currentUser,
       Clock clock) {
     this.notifications = notifications;
+    this.preferences = preferences;
     this.users = users;
     this.currentUser = currentUser;
     this.clock = clock;
@@ -54,6 +58,43 @@ public class NotificationService {
     if (username != null && !CurrentUser.SYSTEM.equals(username)) {
       notifications.save(new Notification(username, notice, clock.instant()));
     }
+  }
+
+  /**
+   * Notifies one user about an event, unless the user switched its in-app notifications off
+   * (RMTID.034).
+   *
+   * @param username recipient
+   * @param notice content
+   * @param eventCode notification event ({@code msg_notification_event})
+   * @return true when the notification was created
+   */
+  public boolean notifyUser(String username, Notice notice, String eventCode) {
+    if (username == null || !preferences.wantsInApp(username, eventCode)) {
+      return false;
+    }
+    notifyUser(username, notice);
+    return !CurrentUser.SYSTEM.equals(username);
+  }
+
+  /**
+   * Notifies every enabled holder of a permission about an event, except the user who caused it and
+   * users who switched the event's in-app notifications off (RMTID.034).
+   *
+   * @param permission permission
+   * @param notice content
+   * @param eventCode notification event
+   * @return number of users notified
+   */
+  public int notifyPermission(String permission, Notice notice, String eventCode) {
+    String actor = currentUser.username();
+    int count = 0;
+    for (String user : users.usersWithPermission(permission)) {
+      if (!CurrentUser.sameUser(user, actor) && notifyUser(user, notice, eventCode)) {
+        count++;
+      }
+    }
+    return count;
   }
 
   /**

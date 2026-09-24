@@ -12,7 +12,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate, today } from '@/utils/format';
 
-const RATE_TYPES: RateType[] = ['SPOT', 'CLOSING', 'AVERAGE', 'BUDGET'];
+const RATE_TYPES: RateType[] = ['SPOT', 'CLOSING', 'AVERAGE', 'BUDGET', 'BOOK'];
 
 /** Exchange rate maintenance by currency, rate type and effective date. */
 export default function CurrencyRatesPage() {

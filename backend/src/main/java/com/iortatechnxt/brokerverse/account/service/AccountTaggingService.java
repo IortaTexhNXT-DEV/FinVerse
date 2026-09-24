@@ -174,8 +174,7 @@ public class AccountTaggingService {
       return List.of();
     }
     return items
-        .findVehicles(
-            companyId, -1L, DuplicateCheckService.CLOSED, RiskItemKind.VEHICLE, Set.of(id))
+        .findVehicles(companyId, -1L, RiskDuplicateService.CLOSED, RiskItemKind.VEHICLE, Set.of(id))
         .stream()
         .map(RiskItem::getAccount)
         .distinct()
@@ -183,7 +182,7 @@ public class AccountTaggingService {
   }
 
   private static void requireLive(Account account) {
-    if (DuplicateCheckService.CLOSED.contains(account.getStatus())) {
+    if (RiskDuplicateService.CLOSED.contains(account.getStatus())) {
       throw new BusinessRuleException(
           "ACCOUNT_NOT_ACTIVE", "Account " + account.getArn() + " is " + account.getStatus());
     }

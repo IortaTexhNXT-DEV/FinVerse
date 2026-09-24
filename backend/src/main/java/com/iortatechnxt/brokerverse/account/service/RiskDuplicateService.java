@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
-public class DuplicateCheckService {
+public class RiskDuplicateService {
 
   /** Statuses that no longer hold the risk. */
   public static final Set<AccountStatus> CLOSED =
@@ -57,7 +57,7 @@ public class DuplicateCheckService {
    *
    * @param items risk items
    */
-  public DuplicateCheckService(RiskItemRepository items) {
+  public RiskDuplicateService(RiskItemRepository items) {
     this.items = items;
   }
 

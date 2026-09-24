@@ -3,7 +3,7 @@ package com.iortatechnxt.brokerverse.account.service;
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.AccountData;
 import com.iortatechnxt.brokerverse.account.domain.RiskItemData;
-import com.iortatechnxt.brokerverse.account.service.DuplicateCheckService.DuplicateSubject;
+import com.iortatechnxt.brokerverse.account.service.RiskDuplicateService.DuplicateSubject;
 import com.iortatechnxt.brokerverse.attachment.domain.AttachmentTarget;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskItemKind;
@@ -33,7 +33,7 @@ public class AccountChecks {
 
   private final ProductCatalogService catalog;
   private final ProductRuleService rules;
-  private final DuplicateCheckService duplicates;
+  private final RiskDuplicateService duplicates;
   private final TsuRoutingService tsu;
   private final DocumentService documents;
   private final LovService lovs;
@@ -51,7 +51,7 @@ public class AccountChecks {
   public AccountChecks(
       ProductCatalogService catalog,
       ProductRuleService rules,
-      DuplicateCheckService duplicates,
+      RiskDuplicateService duplicates,
       TsuRoutingService tsu,
       DocumentService documents,
       LovService lovs) {

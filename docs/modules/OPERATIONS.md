@@ -193,3 +193,228 @@ stub home page with a help section, so a module fills in only its own feature fo
 | Open LOVs | OQ24, OQ31, OQ32, OQ40 | LOV types exist, empty or with "Others" only |
 | Access matrix per role | OQ48 | grants in V760 follow OPERATIONS_DESIGN section 6 |
 | Direct payment PR | - | booking posts no PR; the ledger keeps the amounts for information (commission uses them) |
+
+## 3. Remittance (`remittance`)
+
+Remittance of paid premiums to the insurers, from extraction through the insurer's OR. It also covers
+the Marketing hold and special remittance requests (RMTID.001-025/027-031/033-036/039,
+MKTID.001-007/009). The code is in package `com.iortatechnxt.brokerverse.remittance`, with Flyway
+`V770__remittance.sql` and `V771__remittance_workflows_and_events.sql`. The demo is
+`V992__demo_remittance.sql` plus `remittance.demo.RemittanceDemoData`, and the screens are in
+`frontend/src/features/remittance`.
+
+### 3.1 Extraction
+
+- **Eligibility** (`RemittanceRules`, which is pure, and `ExtractionWork`). An invoice is examined
+  when its remittance status is UNPROCESSED, WITH_OUTSTANDING_BALANCE or PARTIALLY_REMITTED.
+  - Cancelled invoices (flag `CANCELLED`), direct payment invoices and return invoices (gross
+    premium not positive) are skipped. Positions are read from the original invoice, where amounts
+    due are booked plus the adjustment's ADJUSTED movements (`ADJ:<req>`).
+  - Paid AR is the net applied PR amount of the ledger. Only applied and posted payments count
+    (RMTID.006/028).
+  - The amount to remit is paid AR less the DTIP already remitted.
+  - Blocking reasons:
+    - `ON_HOLD`: the HOLD flag (RMTID.020/031).
+    - `PENDING_NEG_ADJ`: a pending negative adjustment.
+    - `WRITTEN_OFF` (RMTID.022).
+    - `CHECK_HOLDING` (RMTID.017/018): a payment is younger than `REMIT_CHECK_HOLD_DAYS` banking days,
+      counted on the branch working-day calendar from the last applied value date.
+    - `PAID_AR_OVER_DTIP` (RMTID.014): paid AR is above the DTIP balance. By default the invoice is
+      excluded; with `REMIT_PAIDAR_OVER_DTIP_MODE` = `CAP`, only the DTIP balance is remitted (OQ19).
+    - `OTHERS`: another team holds the invoice's lock.
+- **Tags** (`rem_extraction_tag`, RMTID.003/024): every invoice examined in a run gets one of
+  EXTRACTED, UNEXTRACTED_DUE (with its reasons), UNEXTRACTED_NOT_DUE or RETURNED.
+- **Runs** (`rem_extraction_run`, `REX-<yyyy>`). A run is started in one of these ways:
+  - scheduled, by job `REMITTANCE_EXTRACTION` (cron `brokerverse.jobs.remittance-extraction-cron`);
+  - manually for an insurer, or for a single invoice (RMTID.004);
+  - from the end-of-day queue: a search for an invoice can queue it for the evening run (RMTID.005,
+    `rem_eod_request`, OQ18).
+  Each insurer is processed in its own transaction. A failure raises alert `REMIT_EXTRACTION_FAILED`.
+- **Batches** (RMTID.001/007/008/009). Lines are grouped per insurer and remittance type into batch
+  `RMB-<insurer>-<yyyy>`, and each batch starts an `OPS_REMITTANCE` case at REVIEW_IN_PROCESS.
+  - The remittance types are WITH_INCENTIVES, NORMAL_PHP, NORMAL_USD and SPECIAL. An invoice goes to
+    WITH_INCENTIVES when an early-remittance rule (`rem_incentive_rule`, RMTID.023, OQ23) matches its
+    insurer, product line and segment within the window from inception or booking.
+  - The extract file is written through `FileDropPort`, named by `REMIT_FILE_PATTERN` (OQ17).
+  - While in a batch, the invoice is locked by `REMITTANCE`.
+- **Amounts** (RMTID.023, OPERATIONS_DESIGN §5 row 12):
+  - Commission, VAT and WTAX are realised pro rata on the cumulative DTIP remitted. The remittance
+    that clears the DTIP takes whatever balances remain.
+  - Net due = paid AR + WTAX − commission − VAT.
+  - Incentive = rate × the basic premium share, and its VAT follows the invoice's VAT/commission
+    ratio. Payable = net due − incentive with VAT.
+
+### 3.2 Batch processing (RMTID.002/009-011/019/024/027/029)
+
+- **Batch page** (`/remittance/batches/:id`):
+  - a read-only totals strip: Paid AR, commission, VAT, WTAX, DTIP, incentive, net due and payable;
+  - the lines;
+  - exclusions with a reason (`REMIT_EXCLUSION_REASON`), and restore. Both are allowed only while the
+    batch is editable, and an exclusion unlocks the invoice (RMTID.002 addendum);
+  - a preview of the schedule;
+  - the workflow panel;
+  - re-assignment to another processor.
+- **Workflow `OPS_REMITTANCE`**:
+  - submit (RMTID.019 guard: every included line still valid and the batch not empty);
+  - hold (`HOLD_REASON`) and release;
+  - return (`REMIT_RETURN_REASON`), which unlocks the lines and tags them RETURNED;
+  - approve, with four-eyes (`REMIT_FOUR_EYES`), and send back. Submit and approve re-check every
+    included line: still locked by remittance, and not cancelled, on hold, written off or flagged
+    `PENDING_NEG_ADJ`;
+  - after approval, the system actions dv_full, dv_partial and or_received.
+- **Posting on approval** (`BatchPosting`, in the approval transaction):
+  - event `OPS_REMITTANCE` per line, with source ref `RMB:<batch>:<invoice>`: Dr DTIP, Dr CWT /
+    Cr commission receivable, Cr due for disbursement;
+  - the ledger movement REMITTED on DTIP, commission, VAT and WTAX, and remittance status APPROVED;
+  - for a With Incentives batch, event `OPS_REMIT_INCENTIVE` (`RMB:<batch>:INC`): Dr due for
+    disbursement / Cr incentive income, Cr output VAT (§5 row 13);
+  - a `DisbursementGateway` request of type `REMITTANCE` for the payable;
+  - the commission OR (CSHID.007) and the incentive OR through `ReceiptIssuer`.
+- **Documents** (RMTID.011). The remittance schedule (PDF and XLSX) and the payment request PDF come
+  from doc templates `REMITTANCE_SCHEDULE` and `REMITTANCE_PAYMENT_REQUEST` and are stored on the
+  batch (`rem_batch_document`).
+  - *Send schedule* (MKTID.001) e-mails the schedule to the insurer as a password-protected Excel file, with the password in a separate e-mail, once per batch.
+- **Disbursement feedback** (`DisbursementFeedback`, after commit) reacts to `DisbursementStatusChanged`:
+  - DV_ASSIGNED makes each invoice FULLY_REMITTED or PARTIALLY_REMITTED, releases the lock and moves
+    the batch on (RMTID.034/036);
+  - RETURNED notifies the processors.
+  - `NegativeAdjustmentPending` notifies the Remittance Team, with the batch the invoice is in
+    (RMTID.035).
+
+### 3.3 Insurer OR (RMTID.012/013/016)
+
+- The insurer's populated schedule is uploaded as a CSV on `/remittance/insurer-or`. It runs through
+  flow-in feed `INSURER_REMIT_OR` (`FlowInService`, one record per idempotency key).
+- Each row sets the insurer OR number, date and amount on its batch line. The line is MATCHED when the
+  OR amount equals the paid AR, and AMOUNT_MISMATCH otherwise.
+- Duplicates and excluded lines are rejected per record.
+- The batch reaches OR_RECEIVED when every included line has an OR.
+- Exception report: `REM-OR-EXCEPTION`, reachable from the upload history.
+
+### 3.4 Holds (MKTID.002-007, RMTID.021/031)
+
+- Request `HLD-<yyyy>` (`rem_hold_request`, one live request per invoice), workflow `OPS_HOLD`:
+  - draft, then submit: the invoice becomes REQUESTED_FOR_HOLD;
+  - approve with four-eyes (`HOLD_APPROVE`): the HOLD flag is set and the status restored. Reject is
+    the alternative;
+  - extend, with extension approval;
+  - request cancel, with cancel approval;
+  - release;
+  - assign to a processor (MKTID.004).
+- Job `HOLD_EXPIRY` (cron `brokerverse.jobs.hold-expiry-cron`) runs daily:
+  - it releases holds whose date has passed, so the invoice becomes eligible again (RMTID.021);
+  - it notifies `HOLD_EXPIRING` for holds that reach their date the next day.
+- Holds from Collection come in by upload through feed `COLLECTION_HOLD` (source COLLECTION_FEED).
+
+### 3.5 Special remittance (MKTID.009, RMTID.030/033)
+
+- Request `SPR-<yyyy>` (`rem_special_request`), with a condition from LOV `SPECIAL_REMIT_CONDITION`.
+  It is validated on creation: the invoice must be paid, cleared and not on hold.
+  - The claims condition is confirmed through `ClaimsFeed` feed `CLAIMS_SPECIAL_REMIT` when that port
+    is connected. Without it, the request carries a note (OQ46).
+- Workflow `OPS_SPECIAL_REMIT`:
+  - validate;
+  - approve, with four-eyes. Approval creates a SPECIAL batch at once, with no processor so that a
+    different approver approves the batch;
+  - or reject with a reason;
+  - then pushed or returned, following the batch.
+- Requests from Collection come in through feed `COLLECTION_SPECIAL_REMIT`.
+- Status changes are notified to the requester (RMTID.033).
+
+### 3.6 Search, tracking and reports
+
+- **Search**:
+  - `/remittance/dtip`: DTIP status per invoice with the last tag and its reasons. Search by invoice,
+    batch, endorsement reference, policy or assured (RMTID.025).
+  - `/remittance/batches`: the batch queues by stage (RMTID.027).
+  - The Invoice 360 tab (`InvoiceRelatedItems`) lists an invoice's batches, holds and specials
+    (RMTID.036).
+- **Reports**, all through `ReportMetadata.operations` (RMTID.039):
+  - `REM-TRACKER`
+  - `REM-SPECIAL-REGISTER`
+  - `REM-SCHEDULE-NORMAL`, `REM-SCHEDULE-SPECIAL`, `REM-SCHEDULE-INCENTIVE`
+  - `REM-DTIP-SUMMARY`, `REM-DTIP-DETAIL`
+  - `REM-REMITTED-BATCH`
+  - `REM-PAIDAR-OVER-DTIP` (RMTID.015)
+  - `REM-OR-EXCEPTION`
+  - `REM-EXCLUDED`
+  - `REM-HOLD`
+
+  Layouts that the Annex does not detail are drafts (OQ42).
+- **Operations home**: `RemittanceWorkCounts` implements `OpsWorkCountSource`, with batches in review
+  and for approval, holds and specials for approval. `RemittanceApprovalSource` implements
+  `PendingApprovalSource`.
+
+### 3.7 API (`/api/v1/remittance`)
+
+| Resource | Endpoints |
+|---|---|
+| Extraction | `GET/POST runs`, `GET runs/{id}`, `GET runs/{id}/tags`, `GET/POST eod-requests`, `GET accounts`, `GET dtip` |
+| Incentive rules | `GET/POST incentive-rules`, `PUT incentive-rules/{id}` |
+| Insurer OR | `POST insurer-or/upload`, `GET insurer-or/runs`, `GET insurer-or/runs/{id}` |
+| Batches | `GET batches`, `GET batches/{id}`, `GET batches/{id}/preview`, `POST batches/{id}/exclude`, `restore`, `submit`, `approve`, `return`, `assign`, `GET batches/{id}/documents/{kind}`, `POST batches/{id}/send-schedule` |
+| Holds | `GET/POST holds`, `GET/PUT holds/{id}`, `POST holds/{id}/submit`, `cancel`, `decision`, `extend`, `extension-decision`, `request-cancel`, `cancel-decision`, `release`, `assign`, `POST holds/upload` |
+| Special | `GET/POST special`, `GET special/{id}`, `POST special/{id}/approve`, `reject`, `POST special/upload` |
+
+### 3.8 Screens
+
+| Route | Screen | Permission |
+|---|---|---|
+| `/remittance` | Remittance home | `REMIT_PROCESS` |
+| `/remittance/extraction` | Extraction runs, manual and single-invoice extraction, tags | `REMIT_EXTRACT` |
+| `/remittance/batches` | Batch queues with bulk submit / approve | `REMIT_PROCESS` |
+| `/remittance/batches/:id` | Batch (hidden): totals, lines, exclusions, workflow, documents | `REMIT_PROCESS` |
+| `/remittance/insurer-or` | Insurer OR upload and history | `REMIT_OR_UPLOAD` |
+| `/remittance/holds`, `/remittance/holds/:id` | Hold requests | `HOLD_REQUEST` |
+| `/remittance/special`, `/remittance/special/:id` | Special remittance requests | `SPECIAL_REMIT_REQUEST` |
+| `/remittance/dtip` | DTIP status search | `REMIT_PROCESS` |
+| `/remittance/incentive-rules` | Early-remittance incentive rules | `REMIT_APPROVE` |
+
+### 3.9 Demo
+
+- V992 seeds:
+  - the demo accounting rules for `OPS_REMITTANCE`: 2210 / 1602 against 1220 / 2211;
+  - the rules for `OPS_REMIT_INCENTIVE`: 2211 against 4130 / 2504;
+  - an incentive rule: INS-MGIC, PROPERTY, CBG, 2%, 30 days from inception.
+- `RemittanceDemoData` (profile `demo`) puts a hold on invoice ARN-2026-940004 and runs a manual
+  extraction, so the batches and tags have content.
+- Demo users are `remit` and `remittl`.
+
+### 3.10 Parked (seam only)
+
+| Item | Question | Seam |
+|---|---|---|
+| Remittance type rules, batch schedule, file naming, shared drive | OQ17 | type from currency and incentive rule; cron property; `REMIT_FILE_PATTERN`; `FileDropPort` |
+| End-of-day extraction trigger | OQ18 | `rem_eod_request` queue processed by the evening run |
+| Paid AR above DTIP | OQ19 | `REMIT_PAIDAR_OVER_DTIP_MODE` EXCLUDE (default) / CAP |
+| Holding period start and "cleared" source | OQ20 | banking days from the last applied value date |
+| Insurer OR layout, tolerance, insurer channels | OQ22 | CSV upload, exact match, e-mail only |
+| Incentive rates and window | OQ23 | `rem_incentive_rule` maintained on screen |
+| Hold roles, maximum and extension rules | OQ24 | permissions `HOLD_REQUEST` / `HOLD_APPROVE`, no maximum |
+| Report layouts, Mall Assurance columns of the Normal schedule | OQ42 | draft layouts |
+| Marketing and Claims feeds | OQ45, OQ46 | `COLLECTION_HOLD` / `COLLECTION_SPECIAL_REMIT` uploads, `ClaimsFeed` `CLAIMS_SPECIAL_REMIT` |
+| Disbursement system, re-sending a returned payment request | OQ02 | `DisbursementGateway` queue; returned requests are notified only |
+| GL accounts | OQ07 | demo rules only |
+| DTIP open-item settlement in the subledger | OQ07 | the ledger REMITTED movement; GL through the event |
+
+### 3.11 Fit/gap status
+
+| BR ID | Status | Where |
+|---|---|---|
+| RMTID.001 / 003 / 007 / 008 | Built (schedule and naming OQ17) | `REMITTANCE_EXTRACTION`, batches per insurer and type, extract file |
+| RMTID.002 | Built | exclusion and restore with reason, read-only totals |
+| RMTID.004 / 005 | Built (EOD meaning OQ18) | manual single-invoice extraction, end-of-day queue |
+| RMTID.006 / 028 | Built | paid AR from applied and posted payments |
+| RMTID.009 / 010 / 019 / 029 | Built | `OPS_REMITTANCE`, submit guard, hold / return, re-assign |
+| RMTID.011 / MKTID.001 | Built | schedule and payment request documents, send schedule |
+| RMTID.012 / 013 / 016 | Built (layout OQ22) | `INSURER_REMIT_OR`, `REM-OR-EXCEPTION` |
+| RMTID.014 / 015 | Built (mode OQ19) | over-DTIP rule, `REM-PAIDAR-OVER-DTIP` |
+| RMTID.017 / 018 | Built (start and clearing OQ20) | check holding period on banking days |
+| RMTID.020 / 031 / 035 | Built | hold and negative adjustment exclusions, notification |
+| RMTID.021 / MKTID.002-007 | Built (roles OQ24) | `OPS_HOLD`, `HOLD_EXPIRY`, `COLLECTION_HOLD` |
+| RMTID.022 | Built | written-off exclusion |
+| RMTID.023 | Built (rates OQ23) | incentive rules, `OPS_REMIT_INCENTIVE`, incentive OR |
+| RMTID.024 / 025 / 027 | Built | tags, DTIP search, batch queues |
+| RMTID.030 / 033 / MKTID.009 | Built (Claims OQ46) | `OPS_SPECIAL_REMIT`, special batches, `COLLECTION_SPECIAL_REMIT` |
+| RMTID.034 / 036 | Built (Disbursement OQ02) | Disbursement feedback, tracker, Invoice 360 tab |
+| RMTID.039 | Built (layouts OQ42) | 12 `REM-*` reports |

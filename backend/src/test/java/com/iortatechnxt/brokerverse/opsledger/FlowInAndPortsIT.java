@@ -138,7 +138,7 @@ class FlowInAndPortsIT {
         .extracting(f -> f.getCode())
         .contains("OPS_INVOICE_FEED", "COLLECTION_HOLD");
     assertThat(flowIn.hasHandler(TestFlowInHandler.FEED)).isTrue();
-    assertThatThrownBy(() -> flowIn.upload("COLLECTION_HOLD", file("x;OK")))
+    assertThatThrownBy(() -> flowIn.upload("DISBURSEMENT_STATUS", file("x;OK")))
         .extracting("code")
         .isEqualTo("FLOW_IN_NO_HANDLER");
     as.run("admin", () -> flowIn.configure(TestFlowInHandler.FEED, "0 0 3 * * *", false));

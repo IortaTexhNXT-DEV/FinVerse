@@ -66,6 +66,10 @@
   text-transform: uppercase;
 }
 
+.header-context .select {
+  min-width: 200px;
+}
+
 .header-context {
   display: flex;
   gap: var(--space-3);
@@ -345,6 +349,7 @@
   font-size: 15px;
   cursor: pointer;
   white-space: nowrap;
+  text-decoration: none;
   transition:
     background 0.15s,
     border-color 0.15s;
@@ -376,13 +381,14 @@
   background: var(--brand-blue-600);
 }
 
+/* The screen's main call to action. BDO style guide: CTA Blue; yellow is kept for accents. */
 .btn-accent {
-  background: var(--brand-gold);
-  color: var(--brand-navy);
+  background: var(--brand-blue);
+  color: #fff;
 }
 
 .btn-accent:hover:not(:disabled) {
-  background: var(--brand-gold-600);
+  background: var(--brand-blue-600);
 }
 
 .btn-secondary {
@@ -544,6 +550,11 @@
 
 .table tbody tr:hover {
   background: #cfeaff;
+}
+
+.table tbody tr:has(.empty-state),
+.table tbody tr:has(.empty-state):hover {
+  background: var(--color-surface);
 }
 
 .table tr.clickable {
@@ -762,6 +773,39 @@
   color: var(--brand-blue-050);
 }
 
+.login-kicker {
+  color: var(--brand-gold);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.login-lead {
+  font-size: 18px;
+  line-height: 28px;
+  max-width: 480px;
+}
+
+.login-footer {
+  color: var(--brand-field-blue);
+}
+
+.login-title {
+  font-size: 30px;
+  line-height: 36px;
+  text-align: center;
+}
+
+.login-subtitle {
+  margin: 0;
+  text-align: center;
+}
+
+.login-card .btn {
+  width: 100%;
+}
+
 .login-panel {
   display: grid;
   place-items: center;
@@ -769,7 +813,7 @@
 }
 
 .login-card {
-  width: min(400px, 100%);
+  width: min(480px, 100%);
 }
 
 .spinner {

@@ -47,6 +47,8 @@ class BrokingFoundationApiIT {
     "ao, /api/v1/notifications?unreadOnly=true",
     "ao, /api/v1/notifications/unread-count",
     "badmin, /api/v1/doc-templates",
+    "ao, /api/v1/organization/companies",
+    "proc, /api/v1/organization/branches?companyId={c}",
   })
   void readEndpointsRespondOk(String user, String url) throws Exception {
     mvc.perform(

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { useAuth } from './authContext';
+import { CLIENT_BRAND } from '@/branding';
 
 /** Sign-in screen with the product hero panel. */
 export default function LoginPage() {
@@ -31,37 +32,33 @@ export default function LoginPage() {
     <div className="login-page">
       <section className="login-hero">
         <div>
-          <div className="brand-tagline" style={{ color: '#FDB913' }}>
-            IortaTechNXT
-          </div>
+          <div className="login-kicker">IortaTechNXT</div>
           <h1>
             iNXT <span>BrokerVerse</span>
           </h1>
-          <p style={{ fontSize: 17, maxWidth: 480 }}>
-            The insurance finance suite: general ledger, sub-ledgers, reinsurance, reserves and
-            statutory reporting in one secure platform.
+          <p className="login-lead">
+            Insurance broking and finance for {CLIENT_BRAND.name}: clients, quotations and
+            proposals, placement, issuance, booking and accounting in one secure platform.
           </p>
           <ul>
-            <li>Real-time, event-driven insurance accounting</li>
-            <li>Maker-checker controls and complete audit trail</li>
-            <li>Financial, underwriting, claims and reinsurance reports</li>
+            <li>One reference (ARN) from quotation to booking</li>
+            <li>Maker-checker controls, work queues and complete audit trail</li>
+            <li>Broker accounting on the general ledger and sub-ledgers</li>
           </ul>
         </div>
-        <small style={{ color: '#9fb2da' }}>© IortaTechNXT. All rights reserved.</small>
+        <small className="login-footer">© IortaTechNXT. All rights reserved.</small>
       </section>
       <section className="login-panel">
         <form
-          className="card login-card"
+          className="login-card"
           onSubmit={(e) => {
             e.preventDefault();
             submit();
           }}
         >
           <div className="card-body stack">
-            <h2>Sign in</h2>
-            <p className="muted" style={{ margin: 0 }}>
-              Use your BrokerVerse credentials.
-            </p>
+            <h1 className="login-title">Welcome to BrokerVerse</h1>
+            <p className="muted login-subtitle">Sign in with your BrokerVerse credentials.</p>
             <ErrorAlert error={error} />
             <Field label="User name" required>
               {(id) => (

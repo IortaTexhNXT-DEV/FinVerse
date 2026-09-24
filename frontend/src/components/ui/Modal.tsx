@@ -1,3 +1,4 @@
+import { X } from 'lucide-react';
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 
@@ -33,8 +34,13 @@ export function Modal({ title, open, onClose, footer, children }: Readonly<Modal
         <header className="card-header">
           <h2>{title}</h2>
           <div className="spacer" />
-          <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>
-            Close
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm modal-close"
+            onClick={onClose}
+            aria-label="Close"
+          >
+            <X size={22} aria-hidden="true" />
           </button>
         </header>
         <div className="card-body">{children}</div>

@@ -12,14 +12,26 @@ export function RequireAuth({ children }: Readonly<{ children: ReactNode }>) {
   return user === null ? <Navigate to="/login" replace /> : <>{children}</>;
 }
 
-/** Guards a screen by permission; users without it see an explanatory message. */
+/**
+ * Guards a screen by permission. Users without it are sent to `fallbackTo` when given (the home
+ * page sends them to their own landing screen), otherwise they see an explanatory message.
+ */
 export function RequirePermission({
   permission,
   alsoPermissions,
+  fallbackTo,
   children,
-}: Readonly<{ permission?: string; alsoPermissions?: string[]; children: ReactNode }>) {
+}: Readonly<{
+  permission?: string;
+  alsoPermissions?: string[];
+  fallbackTo?: string;
+  children: ReactNode;
+}>) {
   const { can } = useAuth();
   if (!mayOpen({ permission, alsoPermissions }, can)) {
+    if (fallbackTo !== undefined) {
+      return <Navigate to={fallbackTo} replace />;
+    }
     return (
       <div className="alert warning" role="alert">
         You do not have access to this screen. Contact your administrator if you need it.

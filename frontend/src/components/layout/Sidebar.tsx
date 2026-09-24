@@ -48,7 +48,12 @@ interface GroupProps {
 
 function NavGroupBlock({ group, active, open, onToggle }: Readonly<GroupProps>) {
   const sections = group.sections.map((s) => (
-    <NavSection key={s.module.id} {...s} active={active} showTitle={group.sections.length > 1} />
+    <NavSection
+      key={s.module.id}
+      {...s}
+      active={active}
+      showTitle={group.title !== undefined && group.sections.length > 1}
+    />
   ));
   if (group.title === undefined) {
     return <div className="nav-group">{sections}</div>;

@@ -27,6 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrganizationController {
 
   private static final String VIEW = "hasAuthority('MASTER_VIEW')";
+
+  /**
+   * Company and branch lists feed the workspace selectors of every signed-in user (broking roles
+   * have no master-data permission). They hold company and branch reference data only; changes
+   * still need the master-data permissions.
+   */
+  private static final String WORKSPACE = "isAuthenticated()";
+
   private static final String MAINTAIN = "hasAuthority('MASTER_MAINTAIN')";
   private static final String AUTHORIZE = "hasAuthority('MASTER_AUTHORIZE')";
 
@@ -47,7 +55,7 @@ public class OrganizationController {
    * @return companies
    */
   @GetMapping("/companies")
-  @PreAuthorize(VIEW)
+  @PreAuthorize(WORKSPACE)
   public List<CompanyResponse> companies() {
     return service.listCompanies().stream().map(CompanyResponse::from).toList();
   }
@@ -98,7 +106,7 @@ public class OrganizationController {
    * @return branches
    */
   @GetMapping("/branches")
-  @PreAuthorize(VIEW)
+  @PreAuthorize(WORKSPACE)
   public List<BranchResponse> branches(@RequestParam Long companyId) {
     return service.listBranches(companyId).stream().map(BranchResponse::from).toList();
   }

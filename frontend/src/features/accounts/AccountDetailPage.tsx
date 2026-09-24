@@ -14,6 +14,8 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
+import { PolicyPanel } from '@/features/issuance/PolicyPanel';
+import { PlacementPanel } from '@/features/placement/PlacementPanel';
 import { formatAmount } from '@/utils/format';
 import { AccountActions } from './AccountActions';
 import { AccountCheckPanel } from './AccountCheckPanel';
@@ -28,6 +30,9 @@ const TABS = [
   { id: 'premium', label: 'Premium' },
   { id: 'documents', label: 'Documents' },
   { id: 'emails', label: 'E-mails' },
+  // Placement and issuance tabs: mounted here until the account page offers an extension point.
+  { id: 'placement', label: 'Placement' },
+  { id: 'policy', label: 'Policy' },
   { id: 'history', label: 'History' },
 ] as const;
 
@@ -63,6 +68,10 @@ function TabBody({ tab, account }: Readonly<{ tab: TabId; account: Account }>) {
           <SentMessages entityType={ACCOUNT_ENTITY} entityId={account.id} />
         </Card>
       );
+    case 'placement':
+      return <PlacementPanel arn={account.arn} />;
+    case 'policy':
+      return <PolicyPanel arn={account.arn} />;
     default:
       return <HistoryPanel accountId={account.id} />;
   }

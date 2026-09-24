@@ -12,8 +12,10 @@ import { planningModule } from '@/features/closing/module';
 import { dashboardModule } from '@/features/dashboard/module';
 import { glModule } from '@/features/gl/module';
 import { helpModule } from '@/features/help/module';
+import { issuanceModule } from '@/features/issuance/module';
 import { withJournalAutomation } from '@/features/journaltools/module';
 import { payablesModule } from '@/features/payables/module';
+import { placementModule } from '@/features/placement/module';
 import { receivablesModule } from '@/features/receivables/module';
 import { reinsuranceModule } from '@/features/reinsurance/module';
 import { reportsModule } from '@/features/reports/module';
@@ -37,7 +39,14 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     id: 'client-policy',
     title: 'Client & Policy',
-    modules: [crmModule, accountsModule, catalogModule, bulkModule],
+    modules: [
+      crmModule,
+      accountsModule,
+      placementModule,
+      issuanceModule,
+      catalogModule,
+      bulkModule,
+    ],
   },
   {
     id: 'finance',

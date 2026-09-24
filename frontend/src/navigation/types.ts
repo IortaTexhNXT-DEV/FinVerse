@@ -24,3 +24,13 @@ export interface FeatureModule {
   section: string;
   screens: ScreenDef[];
 }
+
+/**
+ * A collapsible sidebar group following the BDOI navigation (Client & Policy, Finance, Claims &
+ * Reports ...). A group without a title is always open and shown first (Dashboard, My Work).
+ */
+export interface NavGroup {
+  id: string;
+  title?: string;
+  modules: FeatureModule[];
+}

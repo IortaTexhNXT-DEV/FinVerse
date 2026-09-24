@@ -2,7 +2,6 @@ import { LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/auth/authContext';
 import { useWorkspace } from '@/context/workspaceContext';
-import { Brand } from './Brand';
 import { HeaderTools } from './HeaderTools';
 
 function initials(name: string): string {
@@ -14,14 +13,13 @@ function initials(name: string): string {
     .toUpperCase();
 }
 
-/** Top bar: brand, company/branch context selectors and the user menu. */
+/** Top bar: company/branch context selectors, notifications and tools, and the user menu. */
 export function Header() {
   const { user, logout } = useAuth();
   const { companies, company, branches, branchId, setCompanyId, setBranchId } = useWorkspace();
 
   return (
     <header className="app-header">
-      <Brand />
       <div className="header-context">
         <label className="visually-hidden" htmlFor="company-select">
           Company

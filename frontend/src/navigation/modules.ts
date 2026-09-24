@@ -20,35 +20,44 @@ import { setupModule } from '@/features/setup/module';
 import { taxModule } from '@/features/tax/module';
 import { underwritingModule } from '@/features/underwriting/module';
 import { workspaceModule } from '@/features/workspace/module';
-import type { FeatureModule } from './types';
+import type { FeatureModule, NavGroup } from './types';
 
 /**
- * Sidebar sections in display order. To add a module: create `features/<name>/module.ts`
- * exporting a FeatureModule and list it here. Routes are generated from the same definitions.
- * Platform screens extend existing sections: My Approvals and Alerts join Overview, recurring
- * journals and journal upload join General Ledger.
+ * Sidebar groups and sections in display order, following the BDOI navigation of the BDO Insure
+ * UX design (docs/design/BDO_UX_GUIDELINES.md). To add a module: create
+ * `features/<name>/module.ts` exporting a FeatureModule and list it in its group here. Routes are
+ * generated from the same definitions. Platform screens extend existing sections: My Approvals and
+ * Alerts join Overview, recurring journals and journal upload join General Ledger.
  */
-export const MODULES: FeatureModule[] = [
-  withOverviewScreens(dashboardModule),
+export const NAV_GROUPS: NavGroup[] = [
+  { id: 'home', modules: [withOverviewScreens(dashboardModule), workspaceModule] },
   // Broking (BDOI New Business) - docs/architecture/BROKING_ARCHITECTURE.md section 5.
-  workspaceModule,
-  crmModule,
-  bulkModule,
-  brokingSetupModule,
-  // Insurer core and finance.
-  withJournalAutomation(glModule),
-  underwritingModule,
-  claimsModule,
-  reinsuranceModule,
-  receivablesModule,
-  payablesModule,
-  assetsModule,
-  planningModule,
-  reservesModule,
-  accountingEngineModule,
-  taxModule,
-  reportsModule,
-  setupModule,
-  adminModule,
-  helpModule,
+  { id: 'client-policy', title: 'Client & Policy', modules: [crmModule, bulkModule] },
+  {
+    id: 'finance',
+    title: 'Finance',
+    modules: [
+      withJournalAutomation(glModule),
+      receivablesModule,
+      payablesModule,
+      assetsModule,
+      planningModule,
+      taxModule,
+      accountingEngineModule,
+    ],
+  },
+  {
+    id: 'insurance',
+    title: 'Claims & Insurance',
+    modules: [underwritingModule, claimsModule, reinsuranceModule, reservesModule],
+  },
+  { id: 'reports', title: 'Reports', modules: [reportsModule] },
+  {
+    id: 'setup',
+    title: 'Setup & Administration',
+    modules: [brokingSetupModule, setupModule, adminModule, helpModule],
+  },
 ];
+
+/** All modules in menu order (routes, help and access checks use the flat list). */
+export const MODULES: FeatureModule[] = NAV_GROUPS.flatMap((group) => group.modules);

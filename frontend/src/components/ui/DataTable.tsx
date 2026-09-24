@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { EmptyState } from './EmptyState';
 
 export interface Column<T> {
   key: string;
@@ -51,8 +52,8 @@ export function DataTable<T>({
           )}
           {!loading && rows.length === 0 && (
             <tr>
-              <td colSpan={columns.length} className="muted">
-                {emptyMessage}
+              <td colSpan={columns.length}>
+                <EmptyState message={emptyMessage} />
               </td>
             </tr>
           )}

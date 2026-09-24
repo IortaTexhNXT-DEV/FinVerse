@@ -8,6 +8,8 @@ import { bulkModule } from '@/features/bulk/module';
 import { assetsModule } from '@/features/assets/module';
 import { claimsModule } from '@/features/claims/module';
 import { crmModule } from '@/features/crm/module';
+import { proposalsModule } from '@/features/proposals/module';
+import { quotationsModule } from '@/features/quotations/module';
 import { planningModule } from '@/features/closing/module';
 import { dashboardModule } from '@/features/dashboard/module';
 import { glModule } from '@/features/gl/module';
@@ -37,7 +39,14 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     id: 'client-policy',
     title: 'Client & Policy',
-    modules: [crmModule, accountsModule, catalogModule, bulkModule],
+    modules: [
+      crmModule,
+      quotationsModule,
+      accountsModule,
+      proposalsModule,
+      catalogModule,
+      bulkModule,
+    ],
   },
   {
     id: 'finance',

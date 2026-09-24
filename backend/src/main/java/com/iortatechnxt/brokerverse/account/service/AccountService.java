@@ -47,7 +47,12 @@ public class AccountService {
   /** Workflow of accounts. */
   public static final String WORKFLOW = "NB_ACCOUNT";
 
-  private static final Pattern ARN = Pattern.compile("ARN-\\d{4}-\\d{6}");
+  /**
+   * ARN-yyyy-nnnnnn; an account created from a quotation or PRF that yields several accounts
+   * carries the quotation's ARN with a two-digit suffix (-01, -02...), BRNB.102.
+   */
+  private static final Pattern ARN = Pattern.compile("ARN-\\d{4}-\\d{6}(-\\d{2})?");
+
   private static final Set<AccountStatus> MARKETING_EDITABLE =
       EnumSet.of(AccountStatus.DRAFT, AccountStatus.RETURNED_TO_MARKETING);
   private static final Set<String> POLICY_DOCUMENTS = Set.of("POLICY_COPY", "EPOLICY");
@@ -153,7 +158,8 @@ public class AccountService {
       return numbers.next("ARN-" + LocalDate.now(clock).getYear());
     }
     if (!ARN.matcher(given).matches()) {
-      throw new BusinessRuleException("ARN_INVALID", "The ARN must read ARN-yyyy-nnnnnn");
+      throw new BusinessRuleException(
+          "ARN_INVALID", "The ARN must read ARN-yyyy-nnnnnn (or ARN-yyyy-nnnnnn-nn)");
     }
     if (accounts.existsByArn(given)) {
       throw new BusinessRuleException("ARN_IN_USE", "An account already has ARN " + given);

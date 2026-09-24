@@ -58,14 +58,14 @@ class RetentionIT {
   }
 
   @Test
-  void rulesWithoutAProviderAreCountedLater() {
-    RuleStatus accounts = rule("ACCOUNT", "VOIDED,CANCELLED");
-    if (!accounts.providerAvailable()) {
-      DrillDown drill = retention.eligible(accounts.rule().getId(), 10);
-      assertThat(drill.records()).isEmpty();
-      as.run("badmin", () -> retention.review(LocalDate.now(ZoneOffset.UTC)));
-      assertThat(rule("ACCOUNT", "VOIDED,CANCELLED").latestRun().isProviderAvailable()).isFalse();
-    }
+  void everyBrokingRecordTypeReportsItsCandidates() {
+    RuleStatus accounts = rule("ACCOUNT", "VOIDED,CANCELLED,PLACEMENT_CANCELLED");
+    assertThat(accounts.providerAvailable()).isTrue();
+    assertThat(rule("QUOTATION", "NOT_PROCEEDED,VOIDED").providerAvailable()).isTrue();
+    assertThat(rule("PROPOSAL", "NOT_PROCEEDED,VOIDED").providerAvailable()).isTrue();
+    DrillDown drill = retention.eligible(accounts.rule().getId(), 10);
+    assertThat(drill.providerAvailable()).isTrue();
+    assertThat(drill.records()).allSatisfy(r -> assertThat(r.link()).startsWith("/accounts/"));
     assertThat(accounts.rule().cutoff(LocalDate.of(2026, 9, 1)))
         .isEqualTo(LocalDate.of(2021, 9, 1));
   }

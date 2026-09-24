@@ -262,8 +262,8 @@ the work in `JobRunService.execute(jobName, JobTrigger.MANUAL, () -> new JobOutc
 Make the cron configurable (`brokerverse.jobs.<name>-cron`), add it to `application.yml` with an
 environment variable and document it in `docs/operations/CONFIGURATION.md`. Jobs today:
 `RECURRING_JOURNALS`, `ALERT_DAILY_CHECKS`, `PDC_ISSUED_DUE`, `QUOTATION_EXPIRY` (daily), `MAIL_DISPATCH` (every two minutes) and
-`KYC_REVIEW_DUE`, `RETENTION_REVIEW` (monthly) and `RESERVE_VALUATION`, `RI_ALLOCATION` (manual unless
-scheduled).
+`KYC_REVIEW_DUE`, `RETENTION_REVIEW` (monthly) and `RESERVE_VALUATION`, `RI_ALLOCATION`,
+`QUOTATION_REQUEST_INTAKE` (manual unless scheduled).
 
 ### 10.4 Business parameters – `system`
 

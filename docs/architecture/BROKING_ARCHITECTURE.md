@@ -217,6 +217,7 @@ DRAFT --submit--> FOR_REVIEW --approve--> APPROVED --send--> SENT_TO_CLIENT --ac
   ^                  |return(reason)                              |decline--> NOT_PROCEEDED
   +------------------+
 DRAFT/FOR_REVIEW --void(reason)--> VOIDED
+APPROVED/SENT_TO_CLIENT --revise--> DRAFT              (V830: the next change is version n+1, BRNB.020)
 ```
 
 ### `NB_PROPOSAL`: non-package PRF (BRNB.005-017)
@@ -318,7 +319,8 @@ build the external interface itself.
 | Sales organisation and cost centers | Q34, Q41 | `cat_sales_unit` / `cat_sales_officer` tables; demo units only |
 | Motor OD factors and BI / PD tables | Q35 | `cat_rate` MOTOR_OD_* and `cat_motor_limit` hold sample values |
 | Premium tax base | Q43 | `cat_rate` PREMIUM_TAX per line (PROPERTY 12%) |
-| Retention of accounts | nbadmin | `RetentionCandidateProvider` for ACCOUNT not implemented (port not on this branch) |
+| Multi-level Marketing approval of a PRF (TL -> TH -> UH) and of quotations | Q05 | one approval stage per document; the approver permission (`PROPOSAL_APPROVE`, `QUOTE_APPROVE`) decides who approves |
+| "Quotation required" endorsement link | ADJID.008 (Operations BRD) | not built; an endorsement quotation will reuse `QuotationService` once the Adjustment wave defines it |
 
 ## 7. CRM (`crm`): clients
 
@@ -415,9 +417,11 @@ Requirements: BRNB.040, 079, 082, 083, 085, 086, 089, 106 (legacy BRD 3.3, 3.4).
 - **Data retention** (BRNB.106): rules in `nba_retention_rule` (record type, statuses, years online /
   archive, REVIEW or ARCHIVE; seeded 5 / 15 years), results in `nba_retention_run`. Port
   `nbadmin.service.RetentionCandidateProvider` (record type, `countEligible`, `eligible`) is
-  implemented by `crm` for CLIENT; QUOTATION, PROPOSAL and ACCOUNT rules show "module not yet
-  reporting" until those modules implement it. Monthly job `RETENTION_REVIEW`. **Parked:** physical
-  archive and purge wait for the DBA's storage and backup decision; nothing is ever deleted.
+  implemented by `crm` (CLIENT), `account` (ACCOUNT: VOIDED, CANCELLED, PLACEMENT_CANCELLED),
+  `quotation` (QUOTATION) and `nonpackage` (PROPOSAL: NOT_PROCEEDED, VOIDED); the shared status
+  and cutoff query is `nbadmin.service.RetentionQueries`. Monthly job `RETENTION_REVIEW`.
+  **Parked:** physical archive and purge wait for the DBA's storage and backup decision; nothing is
+  ever deleted.
 - **Audit log report** (BRNB.086/089): the existing report `CTL-AUDIT` (date range, user, entity
   type; PDF / Excel / CSV) is offered as download buttons on Administration > Audit Trail.
 
@@ -573,6 +577,10 @@ Contracts for other modules:
   - `recordCancellation`
 - `AccountClientRecords` implements the crm `ClientRecordsProvider`, which gives the accounts in
   the client 360 view.
+- `AccountRetentionProvider` implements the nbadmin `RetentionCandidateProvider` for record type
+  ACCOUNT (BRNB.106).
+- ARN format: `ARN-yyyy-nnnnnn`; when one quotation or PRF yields several accounts, each carries
+  its ARN with a suffix, `ARN-yyyy-nnnnnn-01`, `-02`... (see section 11).
 
 API: `/api/v1/accounts`:
 
@@ -607,3 +615,229 @@ Screens (sidebar **Accounts & Placement**):
 - `/bulk/ACCOUNT_CREATE`: the bulk page with product, segment and submit parameters.
 - The shared `<Attachments>` component gains a document type choice, multi-file upload, selection
   with ZIP download, and a linked-file marker. Its existing props are unchanged.
+
+## 11. Quotations (`quotation`, W3)
+
+Package quotations from request to accounts. Requirements: BRNB.004, 013-015, 020-024, 028,
+041-045, 063, 102 and MKTID.011 (Operations BRD). Migration V830; demo V984.
+
+Tables (V830):
+
+- `quo_request`: the request inbox and staging table (BRNB.041, BRNB.023 staging). A request has a
+  channel (`SOURCE_CHANNEL`), an optional source reference (unique per channel), an existing client
+  or the prospect's name and contact, the requested product and cover, and a status NEW / QUOTED /
+  CLOSED. The e-mail is attached to the request as document type `REQUEST_EMAIL` (new
+  `DOCUMENT_TYPE` value).
+- `quo_quotation`: the header. It holds the quotation number (shown as Proposal No.), the ARN, the
+  client, product, segment and channel, and the figures of the current version (insurer, period,
+  validity, direct payment, sums and premium). It also stamps the intake template version
+  (BRNB.004), the TSU routing result, the four-eyes facts, the accepted risk groups and the account
+  ARNs (`quo_quotation_account`).
+- `quo_version`: one row per version, with the content as JSON (items with their risk group and
+  premium, the premium breakdown, insurer, period, validity, direct-payment flag, rating basis,
+  remarks). A version is frozen at submission and never changes afterwards.
+
+Numbers are business parameters, because the numbering format is open (UX-1 / Q15):
+
+| Number | Parameter | Default |
+|---|---|---|
+| Quotation | `QUOTATION_NUMBER_PREFIX` | `QT-<yyyy>-nnnnnn` |
+| Request | `QUOTATION_REQUEST_PREFIX` | `REQ-<yyyy>-nnnnnn` |
+| ARN | - | `ARN-<yyyy>-nnnnnn`, shared with accounts and PRFs |
+
+Other parameters: `QUOTATION_VALIDITY_DAYS` (30, default validity) and `QUOTATION_EXPIRING_DAYS`
+(7, "Expiring" filter).
+
+Rules:
+
+- **Creation** (`QuotationService.create`): a usable client is enough.
+  - A prospect is allowed (BRNB.063 against BRNB.029, Q13).
+  - The product must be usable and offered to the segment. Direct payment (MKTID.011) is accepted
+    only where the product allows it.
+  - The quotation gets its number, its ARN (BRNB.102), version 1 and its `NB_QUOTATION` work case.
+    It is priced with `RatingService` (Appendix A).
+  - The TSU routing rules are evaluated and shown (information only).
+- **Versions** (BRNB.020): a draft is changed in place until it is submitted.
+  - `revise` reopens an APPROVED or SENT_TO_CLIENT quotation as a DRAFT. It is a new business
+    transition, added in V830. The next change opens version n+1.
+  - `QuotationQueryService.diff` compares two versions: changed terms, items added, removed or
+    changed (matched by plate, address, person or description), and the gross premium delta.
+- **Workflow actions**:
+  - `submit`: needs items, a rated premium and a validity that has not passed.
+  - `approve`: needs `QUOTE_APPROVE` and is refused to the creator and the submitter (four eyes,
+    BRNB.014/021).
+  - `send`: allowed only when APPROVED. It sends the PDF (QUOTATION_LETTER and QUOTATION_TERMS
+    templates) and the Excel schedule, always password protected, with the password in a separate
+    e-mail (BRNB.013/043).
+  - `accept`: needs the client's acceptance e-mail attached (`CLIENT_ACCEPTANCE`) and records the
+    accepted risk groups (BRNB.045).
+  - `decline`: the generic panel action, also offered by the API.
+  - `create_accounts`: needs a confirmed client (BRNB.029). It creates one draft account per
+    accepted risk group through `AccountService.createDraft`. The account gets the premium of the
+    group, the insurer, the direct-payment arrangement and the quotation creator as account officer.
+  - Return and void are generic actions of the workflow panel. The workflow engine notifies the
+    originator of every change made by someone else (BRNB.015).
+- **ARN convention**: a quotation that yields one account passes its own ARN. One that yields
+  several accounts passes `<ARN>-01`, `<ARN>-02`... in risk-group order, so every account carries
+  the quotation's ARN. The account module accepts the two-digit suffix.
+- **Bulk handlers** (permission `QUOTE_MAINTAIN`):
+  - `QUOTATION_CREATE` (BRNB.024/028/042/063): parameters `product` and `segment`. Each row
+    becomes one quotation with one item. The client is found by code, or by name and birth date,
+    or is created as a prospect.
+  - `QUOTATION_ACCEPTANCE`: ARN, risk groups and remarks per row. The parameter `createAccounts`
+    creates the accounts at once. The uploaded list, kept with the bulk job, is the acceptance
+    evidence.
+  - `QUOTATION_REQUEST`: requests of a source system (HLS extract) or a mailbox list.
+- **Batch send** (`QuotationDispatchService.sendBatch`, BRNB.042): the selected APPROVED
+  quotations go out as one e-mail per client with all their documents, and the password follows
+  in a separate e-mail.
+
+Contracts for other modules:
+
+- `QuotationQueryService.getByArn(arn)` returns a `QuotationSummary`. It holds the numbers, client,
+  product, status, gross premium, validity, account ARNs and the **direct-payment flag**, and is
+  used by Operations Cashiering. An account ARN with a `-nn` suffix finds its quotation.
+- The port `quotation.service.QuotationRequestSource` (`companyId`, `channel`, `fetch`) serves
+  source systems. The manual-only job `QUOTATION_REQUEST_INTAKE` stores what the sources return
+  and skips references already received.
+- `QuotationClientRecords` implements the crm `ClientRecordsProvider`.
+- `QuotationRetentionProvider` implements the nbadmin port for record type QUOTATION.
+
+API:
+
+- `/api/v1/quotations`:
+  - `GET` list (text, status, product, mine, expiring, clientId), `/{id}`, `/by-arn/{arn}`
+    (QUOTE_VIEW or ACCOUNT_VIEW), `/{id}/versions`, `/{id}/versions/{n}`, `/{id}/diff?from=&to=`,
+    `/{id}/document.pdf` and `/{id}/document.xlsx`.
+  - `POST` create, `/preview` (live premium), `/{id}/submit`, `/approve`, `/revise`, `/decline`,
+    `/send`, `/accept`, `/create-accounts`, and `/batch-send`.
+  - `PUT /{id}`.
+- `/api/v1/quotation-requests`: `GET` list and `/{id}`; `POST` capture, `/{id}/prospect` and
+  `/{id}/close`.
+
+Screens (sidebar **Quotation / Proposal**, group Client & Policy):
+
+- Quotations: a work list with status tabs (Drafts | For Review | Sent to Client | Accepted | Not
+  Proceeded; approved quotations wait under For Review). It has quick filters (My drafts, For
+  review, Sent, Accepted, Expiring), the Proposal No. column, row selection and the **Send via
+  Email** batch action.
+- New Quotation: a wizard (client or prospect, product, items, premium, review) with a live premium
+  breakdown. It reuses the account wizard's risk item editor.
+- Quotation Requests: the request inbox. It captures an e-mailed request (with the e-mail
+  attached), creates the prospect, and offers **Create Quotation** and close.
+- Quotation page:
+  - a header with the ARN chip and the version selector;
+  - the client's instructions banner;
+  - the `WorkflowPanel` with the business buttons;
+  - tabs Details, Items & Premium, Versions (diff), Documents, E-mails and History.
+- The crm client page gains a **Generate Quotation** action and the tabs **Quotation** and
+  **Confirmed Proposals** (BDOI Client Record Details design).
+
+Parked:
+
+- HLS interface (Q11): the port, the staging table, the intake job and the `QUOTATION_REQUEST`
+  upload are the seam. No interface is built.
+- Reading the shared mailbox (Q12): requests are captured manually with the e-mail attached.
+- Multi-level approval beyond one stage (Q05): one `approve` stage with permission `QUOTE_APPROVE`.
+- The "quotation required" endorsement link (ADJID.008) waits for the Operations wave.
+
+Demo (V984): eight quotations of the V981 clients, `QT-2026-900001..008` with ARNs
+`ARN-2026-910001..008`:
+
+- a draft answering request `REQ-2026-900001`;
+- one for review;
+- one approved;
+- one sent and expiring;
+- one accepted with direct payment;
+- one converted into account `ARN-2026-910006`;
+- one declined;
+- one revised into version 2.
+
+Two more requests wait in the inbox.
+
+## 12. Non-package proposals (`nonpackage`, W3)
+
+Proposal Request Forms (PRF) priced by TSU with the insurers. Requirements: BRNB.005-010, 013,
+014, 017 and 098 (consumed), and BRD 2.2. Migration V840; demo V985.
+
+Tables (V840):
+
+- `npk_proposal`: the PRF. It holds:
+  - the marketing reference `PRF-<yyyy>` (gap-free per year) and the ARN;
+  - the client, product, segment and requested period;
+  - the risk details as JSON (free-form sections, and items with their risk group);
+  - the TSU routing rule and the approval facts;
+  - the quotation slip (`QS-<yyyy>`, template version, reply date, preparer, approver, send time);
+  - the chosen insurer and the proposal slip (`PS-<yyyy>` and its version);
+  - the acceptance and the account ARNs.
+
+  The requested and selected insurers are in `npk_proposal_insurer`.
+- `npk_insurer_response`: one response per insurer approached. It has a status PENDING /
+  RECEIVED / DECLINED, the premium, rate, deductibles, conditions, validity and remarks, the
+  response document and the recommended flag. Every change raises the revision and writes an
+  `npk_insurer_response_history` row (BRNB.009 version history).
+
+The prefixes are business parameters (`PROPOSAL_NUMBER_PREFIX`, `QUOTATION_SLIP_PREFIX`,
+`PROPOSAL_SLIP_PREFIX`). `QUOTATION_SLIP_REPLY_DAYS` (5) sets the default reply date. The new
+`DOCUMENT_TYPE` values are `QUOTATION_SLIP`, `INSURER_RESPONSE`, `COMPARATIVE_TABLE` and
+`PROPOSAL_SLIP`.
+
+Workflow `NB_PROPOSAL` (V751), business actions:
+
+| Action | Who | Rule |
+|---|---|---|
+| `submit` | PROPOSAL_REQUEST | The risk details are present and every mandatory document of the product is attached (`ProductRuleService.requiredDocuments`; checklist on the PRF). The catalog TSU routing must require TSU: a non-package risk always does (rule `NON_PACKAGE`); a package risk below every rule is refused with `PRF_NOT_NEEDED` and is quoted as a package quotation. |
+| `approve` | PROPOSAL_APPROVE | Four eyes. One Marketing approval stage: the BRD's TL -> TH -> UH chain waits for Q05, and the approver is configured through the permission. |
+| `prepare_qs` (TSU accept) | TSU_PROCESS | Generic; run from the workflow panel or the TSU Workbench. |
+| update | PROPOSAL_REQUEST in DRAFT; TSU_PROCESS in WITH_TSU or QS_PREPARATION | BRNB.007. The product cannot change. |
+| `submit_qs` | TSU_PROCESS | At least one panel insurer is selected. Numbers the slip and stamps the QUOTATION_SLIP template version. |
+| `approve_qs` | TSU_APPROVE | Four eyes. Sends one protected e-mail per insurer to its placement addresses (delivery log in the messaging outbox) and opens a PENDING response per insurer. |
+| `terms_complete` | TSU_PROCESS | At least one response is RECEIVED. With responses still pending, the user must close the request explicitly. |
+| `submit_ps` | TSU_PROCESS | The chosen insurer (the recommended one by default) has RECEIVED terms. A new PS version is generated and archived on the PRF as a PROPOSAL_SLIP document. |
+| `approve_ps` | TSU_APPROVE | Four eyes. Releases the slip to Marketing. |
+| `send_to_client` | PROPOSAL_REQUEST | Sends the proposal slip and the comparative table, password protected (BRNB.013). |
+| `accept` | PROPOSAL_REQUEST | The client's acceptance e-mail is attached. Records the accepted risk groups. |
+| `create_accounts` | PROPOSAL_REQUEST and ACCOUNT_MAINTAIN | The client is confirmed. Creates one draft account per accepted risk group through `AccountService.createDraft`, with the PRF's ARN (suffix convention of section 11), the chosen insurer and its quoted rate. |
+
+Returns (with a `RETURN_REASON`), decline and void (delete in process only) are generic actions of
+the workflow panel.
+
+The comparative table (BRNB.010) comes from `ComparativeTable.of(responses)`. It lists received
+terms first, cheapest first, and flags the lowest premium and the recommended insurer. It is
+exported as PDF and XLSX, and is sent protected with the proposal slip.
+
+API:
+
+- `/api/v1/proposals`:
+  - `GET` list (text, status, mine, clientId), `/{id}` and `/{id}/checklist`.
+  - `POST` create, `/{id}/submit`, `/approve`, `/send`, `/accept` and `/create-accounts`.
+  - `PUT /{id}`.
+- `/api/v1/proposals/{id}` (TSU):
+  - `PUT insurers` and `PUT responses/{rid}`.
+  - `POST quotation-slip/submit | approve`, `responses/{rid}/document` (multipart),
+    `responses/{rid}/recommend`, `terms-complete`, and `proposal-slip/submit | approve`.
+  - `GET quotation-slip.pdf`, `responses`, `responses/history`, `comparative`,
+    `comparative.pdf | .xlsx` and `proposal-slip.pdf`.
+- Reads need one of PROPOSAL_REQUEST, PROPOSAL_APPROVE, TSU_PROCESS or TSU_APPROVE.
+
+Contracts: `ProposalClientRecords` implements the crm `ClientRecordsProvider`, and
+`ProposalRetentionProvider` implements the nbadmin port for record type PROPOSAL.
+
+Screens (sidebar **Non-Package Management**, group Client & Policy):
+
+- Proposal Requests: a work list with status tabs.
+- New PRF: a form with sections, items, the requested insurers and the product's document
+  checklist.
+- TSU Workbench: the TSU queue, with tiles by stage.
+- PRF page: tabs Details, Quotation Slip, Insurer Responses (editable grid), Comparative Table,
+  Proposal Slip, Documents, E-mails and History.
+
+Demo (V985): five PRFs of the V981 clients, `PRF-2026-900001..005` with ARNs
+`ARN-2026-920001..005`:
+
+- a draft;
+- one waiting for Marketing approval;
+- a prospect's risk in the TSU queue;
+- a marine open policy with three insurer responses (two terms, one declined) and its comparative
+  table (`QS-2026-900001`);
+- an equipment floater accepted by the client after its proposal slip (`PS-2026-900001`).

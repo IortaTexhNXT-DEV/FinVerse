@@ -92,6 +92,8 @@ brokerverse:
     kyc-review-due-cron: ${BROKERVERSE_JOB_KYC_REVIEW_DUE_CRON:0 0 2 1 * *}
     # Monthly data retention review (BRNB.106): counts eligible records; never deletes.
     retention-review-cron: ${BROKERVERSE_JOB_RETENTION_REVIEW_CRON:0 0 3 2 * *}
+    # Quotation requests of source systems (HLS, BRNB.023): manual until an interface exists (Q11).
+    quotation-request-intake-cron: ${BROKERVERSE_JOB_QUOTATION_REQUEST_INTAKE_CRON:-}
 
 management:
   endpoints:

@@ -193,3 +193,245 @@ stub home page with a help section, so a module fills in only its own feature fo
 | Open LOVs | OQ24, OQ31, OQ32, OQ40 | LOV types exist, empty or with "Others" only |
 | Access matrix per role | OQ48 | grants in V760 follow OPERATIONS_DESIGN section 6 |
 | Direct payment PR | - | booking posts no PR; the ledger keeps the amounts for information (commission uses them) |
+
+## 4. Adjustment (`adjustment`)
+
+Endorsement and cancellation requests on booked invoices of the ledger (ADJID.001-026/028,
+MKTID.008). Package `com.iortatechnxt.brokerverse.adjustment`, Flyway `V780__adjustment.sql`,
+demo `V994__demo_adjustment.sql` and `adjustment.demo.AdjustmentDemoData`, screens in
+`frontend/src/features/adjustment`.
+
+### 4.1 Requests
+
+- **One request per invoice** (`adj_request`, number `ENR-<yyyy>`), raised singly, for several
+  invoices at once (the wizard raises one request per invoice) or by upload (`ADJ_BATCH`). The ARN,
+  invoice, policy, client, insurer, segment and AO are copied from the ledger (ADJID.020).
+- **Class** comes from the parent of the `ENDORSEMENT_TYPE` value (`FIN_` financial, `NF_`
+  non-financial, `INT_` internal). A financial request needs an Annex V request type
+  (`ENDORSEMENT_REQUEST_TYPE`); a non-financial one carries no request type, sum insured or amount.
+- **Computation** follows the request type:
+
+  | Request type | Computation | Inputs |
+  |---|---|---|
+  | `FLAT_CANCELLATION`, `FLAT_CANCELLATION_RETAIN_DST`, `PARTIAL_CANCELLATION` | cancellation | reason (`CANCELLATION_REASON`), basis pro-rata / short-period |
+  | `TSI_CHANGE` | sum insured | TSI change (signed), rate (blank = product rate), basis |
+  | `WRITE_OFF` | write-off of the outstanding premium receivable | - |
+  | any other (rate, taxes, cover, extension, commission, cancellation reversal) | amounts | premium component changes and / or commission (derived from the invoice rate when blank) |
+  | none (non-financial, internal without type) | no financial effect | - |
+
+- **Checks** (`RequestRules`, `RequestChecks`, `RequestConflicts`): effective date within the
+  invoice's cover; valid new period for `NF_PERIOD_CHANGE` (same term) and `NF_PERIOD_EXTENSION`;
+  the invoice is not a return invoice, not cancelled or written off and not locked by another
+  module (`INVOICE_LOCKED`, e.g. in a remittance batch); no cancellation together with another
+  open financial request on the invoice (`ADJ_INCOMPATIBLE_REQUEST`, e.g. TSI change with a partial
+  cancellation).
+- **Duplicates** (ADJID.023): same invoice, request type, reason and endorsement reference, not
+  cancelled. Raising one is refused (`ADJ_DUPLICATE_REQUEST`) unless a justification is given; the
+  justification is kept on the request and in the audit trail.
+- **Over-adjustment** (ADJID.028): the ledger's cumulative adjustments of the original invoice
+  plus this request, against the parameter `ADJ_BASELINE_PERCENT` (100) of the original premium, or
+  below zero. Submitting such a request needs a justification and raises `ADJ_OVER_BASELINE`.
+- **Quotation required** (ADJID.008): a TSI increase that takes the account above the package
+  limit (`cat_product.max_sum_insured`) opens a hand-off `QUOTATION_REQUIRED` for `QUOTE_MAINTAIN`
+  at submission; validation waits until the quotation number is linked on the request (link by
+  reference only).
+
+### 4.2 Workflow `OPS_ENDORSEMENT` (V780)
+
+```
+DRAFT(ADJ_REQUEST) --submit--> FOR_VALIDATION(ADJ_PROCESS) --validate--> FOR_APPROVAL(ADJ_APPROVE) --approve--> FOR_POSTING(ADJ_POST)
+FOR_VALIDATION --validate_for_posting--> FOR_POSTING            (no financial effect; FIN_EXTENSION always needs approval)
+FOR_POSTING --post--> POSTED ; FOR_POSTING --post_pending--> AWAITING_REAPPLICATION(ADJ_POST) --reapply--> POSTED
+FOR_VALIDATION/FOR_APPROVAL/FOR_POSTING --return(ADJ_RETURN_REASON)--> RETURNED(ADJ_REQUEST) --resubmit--> FOR_VALIDATION
+DRAFT/RETURNED --cancel--> CANCELLED
+```
+
+- Submit, resubmit, validate, approve, post and re-apply are business actions of the module;
+  return and cancel are generic (workflow panel). `RequestStageListener` mirrors the stage, keeps
+  the return reason and comment, and releases the invoice on a cancellation.
+- Approval is four eyes: refused to the requester, the submitter and the validator
+  (`ADJ_FOUR_EYES`).
+- Notifications (`ADJ_REQUEST_STATUS`): the team of the next stage, and the requester on return,
+  posting and cancellation.
+- Aging (ADJID.021) runs from submission (or creation) to completion, in Philippine days.
+
+### 4.3 Hold on the invoice
+
+- The invoice is **locked** (owner `ADJUSTMENT`) when a request is raised and unlocked when its
+  last open request is posted or cancelled. Remittance cannot extract a locked invoice; cashiering
+  can still apply payments.
+- A request that reduces the invoice raises **`PENDING_NEG_ADJ`** and publishes
+  `NegativeAdjustmentPending(pending = true)` when submitted; the flag is cleared (event with
+  `pending = false`) when the last reducing request is posted or cancelled, **except** while the
+  payments wait for re-application or when an AR Insurer was set up (the invoice was remitted):
+  the flag then stays for remittance to offset or exclude the invoice.
+
+### 4.4 Recompute and posting
+
+- **Recompute** (`RecomputeService`, `PremiumDeltas`): cancellations use booking's own preview
+  (`EndorsementPostingService.preview`), so the preview equals the posting; a TSI change is rated
+  once per insurer share with the catalog calculator in endorsement mode (`RatingService` /
+  `PremiumCalculator`, `endorsement = true`, remaining term pro-rata or short-period, each insurer
+  at its commission rate, the lead with its branch LGT); amounts are split by the insurer shares.
+  The before / after per component and the change per insurer are stored on the request
+  (`adj_request_component`, `adj_request_share`) at every save, submission, validation and posting.
+- **Posting** (`AdjustmentPostingService`, one transaction per request; `PostingBatchService`
+  posts a selection as batch `VB-<yyyy>`, a failure does not stop the others):
+  1. financial endorsements and cancellations through **`EndorsementPostingService.post`** with
+     the source reference `ADJ:<request>`: booking books the endorsement (`EN-<yyyy>`) or return
+     invoice, its journal and open items, issues or credits the service invoice; non-financial
+     endorsements are recorded by booking without GL; internal requests without financial effect
+     post nothing;
+  2. a **decrease or cancellation** posts an `ADJUSTED` movement with the return amounts
+     (premium by component, DTIP, commission, VAT, withholding tax) on the **original invoice**
+     (`ADJ:<request>`). The return invoice reaches the ledger through the feed and is **offset**
+     (`ADJ:<request>:OFFSET`, `ReturnInvoiceOffset`) so the ledger counts the return once, on the
+     original. A positive endorsement is a new collectible invoice; the original is unchanged.
+     Cancellations set the `CANCELLED` flag;
+  3. **after remittance** (row 18): when the DTIP of the original becomes negative and was
+     remitted, the amount (at most the remitted DTIP) is set up as **AR Insurer**: event
+     `OPS_AR_INSURER_SETUP` per insurer share (`ADJ:<request>:ARI:<insurer>`) and an `ADJUSTED`
+     DTIP movement reclassifying the negative DTIP (`ADJ:<request>:ARI`);
+  4. **paid invoice** (row 17): the lock is released and the payments are re-applied through the
+     cashiering port **`PaymentReapplier.reapply`** (`ADJ:<request>`); the excess and its unapplied
+     item are recorded on the request. While cashiering is not installed the default port refuses
+     (`PAYMENT_REAPPLIER_UNAVAILABLE`): the request moves to **AWAITING_REAPPLICATION** ("Payments
+     to Re-apply") and *Re-apply Payments* retries it later;
+  5. a **commission change alone** posts `OPS_ADJ_COMMISSION` per insurer share, an `ADJUSTED`
+     commission movement, and issues a service invoice (`INSURER_COMMISSION_ENDT`) or credits the
+     insurer's service invoice through booking's **`ServiceInvoiceService`** (ADJID.014);
+  6. a **write-off** request clears the premium receivable like the minimal balance file.
+
+### 4.5 Accounting events (V780; demo rules V994, OQ07)
+
+| Event | Source reference | Demo entry |
+|---|---|---|
+| booking `BROKER_BOOKING` (rows 16, 19) | booking's own, request `ADJ:<request>` | reversal or addition of the booking entry |
+| `OPS_AR_INSURER_SETUP` (row 18) | `ADJ:<request>:ARI:<insurer>` | Dr 1225 AR Insurer / Cr 2210 DTIP (insurer) |
+| `OPS_WRITE_OFF` (row 21) | `WO:<invoice>` | debit balance: Dr 6510 / Cr 1210.x (client); credit balance: Dr 1210.x / Cr 4190 Other income |
+| `OPS_ADJ_COMMISSION` (ADJID.014) | `ADJ:<request>:COM:<insurer>` | Dr 1220 / Cr 2220, Cr 2221 (negative amounts reverse) |
+
+Every event carries the invoice's product line and cost center and is priced at the BOOK rate.
+
+### 4.6 Minimal balance file (ADJID.026)
+
+Bulk handler `MINIMAL_BALANCE_FILE` (`ADJ_POST`, duplicate files refused): columns *Invoice No*
+and *Balance*. A row is processed when the invoice exists, its premium receivable balance equals
+the file and lies within `MIN_BALANCE_FILE_RANGE` (10.00-100.00), it was not written off and no
+other module locks it. A debit balance is written off, a credit balance credited (outcome
+categories `WRITE_OFF` / `CREDIT`), with a `WRITE_OFF` movement `WO:<invoice>`, the `WRITTEN_OFF`
+flag and an `adj_min_balance_item` (once per invoice).
+
+### 4.7 API (`/api/v1/adjustment`)
+
+| Endpoint | Permission |
+|---|---|
+| `GET /requests?companyId=&stage=&q=&page=&size=`, `GET /requests/counts`, `GET /requests/{id}`, `GET /requests/{id}/recompute`, `GET /requests/{id}/journal`, `GET /invoices/{no}/requests` | any `ADJ_*` or `OPS_VIEW` |
+| `POST /requests/preview`, `POST /requests`, `PUT /requests/{id}`, `POST /requests/{id}/submit`, `/resubmit`, `/quotation` | `ADJ_REQUEST` or `ADJ_PROCESS` |
+| `POST /requests/{id}/validate` | `ADJ_PROCESS` |
+| `POST /requests/{id}/approve` | `ADJ_APPROVE` |
+| `POST /requests/{id}/post` (batch of one), `/reapply`, `POST /batches` | `ADJ_POST` |
+| `POST /batches/return` | `ADJ_PROCESS`, `ADJ_APPROVE` or `ADJ_POST` (the workflow checks the stage) |
+| `GET /requests/{id}/endorsement-slip`, `/validation-slip` (PDF) | any `ADJ_*` |
+| `GET /batches`, `GET /batches/{no}`, `GET /write-offs` | any `ADJ_*` or `OPS_VIEW` |
+
+### 4.8 Screens (group *Client & Policy*, section *Adjustment*)
+
+| Route | Screen | Permission |
+|---|---|---|
+| `/adjustment` | Adjustment Workbench: tabs per stage with counts, search, aging, flags (`?stage=` from the Operations home tiles) | `ADJ_PROCESS` (+ `ADJ_REQUEST`, `ADJ_APPROVE`, `ADJ_POST`) |
+| `/adjustment/new` | New request wizard: invoices (multi), request (form adapts to the type), recompute before / after and per insurer with the service invoice, payment and remittance effects, duplicate and baseline justifications; save or submit | `ADJ_REQUEST` (+ `ADJ_PROCESS`) |
+| `/adjustment/requests/:id` (hidden) | Request page: summary, workflow panel with the business actions, tabs Details / Recompute / Accounting / Documents / History, endorsement slip and validation slip | any `ADJ_*` or `OPS_VIEW` |
+| `/adjustment/requests/:id/edit` (hidden) | Change of a draft or returned request | `ADJ_REQUEST` (+ `ADJ_PROCESS`) |
+| `/adjustment/batches` | Posting Batches: ready for posting (return selected, post selected) and posted batches with their outcome | `ADJ_POST` |
+| `/adjustment/upload` | Batch Request Upload (`ADJ_BATCH`) | `ADJ_POST` |
+| `/adjustment/minimal-balance` | Minimal Balance File (`MINIMAL_BALANCE_FILE`) and the balances processed | `ADJ_POST` |
+
+Supporting documents (ADJID.025) are attachments of entity type `EndorsementRequest`; the document
+list `ENDORSEMENT_DOC_TYPE` is still open (OQ32).
+
+### 4.9 Documents, reports and job
+
+- **Endorsement slip** (ADJID.015, MKTID.008): PDF with the Annex V fields (date, insurer and
+  co-insurers, request and invoice numbers, request type, reason, effective date, instructions,
+  assured, risk code and description, policy, period, AO, segment, sum insured and change, rate,
+  payment and remittance status, approver), numbered once `ES-<yyyy>`, template
+  `ENDORSEMENT_SLIP`; not for internal adjustments.
+- **Validation slip** (ADJID.018): PDF of a validated request with the validation, before / after,
+  insurer breakdown and GL entries (template `VALIDATION_SLIP`).
+- **Reports** (category Operations, `OPS_REPORT_VIEW` / `OPS_REPORT_EXPORT`, archived):
+
+  | Code | Report | BRD |
+  |---|---|---|
+  | `ADJ-DAILY` | Adjustment and Daily Endorsement Report: requests raised or posted in the period, by type and user | ADJID.016 |
+  | `ADJ-VALIDATION-LIST` | Validation List: posted requests with one row per GL line and the BRD fields | ADJID.017 |
+  | `ADJ-REGISTER` | Adjustment Report by account, segment, AO and risk type | ADJID.019 |
+  | `ADJ-AGING` | Transaction aging with buckets | ADJID.021 |
+  | `ADJ-MINBAL-FILE` | Minimal balance write-off summary per file | ADJID.026 |
+
+  The layouts not given by the BRD are drafts to confirm (OQ42).
+- **Job `ADJ_DAILY_REPORT`** (`brokerverse.jobs.adj-daily-report-cron`, default `0 0 10 * * *`
+  UTC = 18:00 PHT): exports `ADJ-DAILY` of the business date as Excel for every company (archived)
+  and notifies the holders of `ADJ_APPROVE`.
+
+### 4.10 Contracts for the other modules
+
+| Contract | Kind | Use |
+|---|---|---|
+| `OpsLedgerEvents.NegativeAdjustmentPending` with the `PENDING_NEG_ADJ` flag | event published | remittance excludes the invoice and notifies (RMTID.020/035) |
+| `PaymentReapplier.reapply(ReapplyRequest(invoiceNo, "ADJUSTMENT", "ADJ:<request>", date, reason))` | port called | cashiering reverses the applications above the new premium and returns the excess. The invoice is unlocked before the call, and its PR balance is already reduced (negative when overpaid). Return `ReapplyResult.none` when nothing is applied; throw `PAYMENT_REAPPLIER_UNAVAILABLE` only when it cannot work |
+| `ADJUSTED` movements `ADJ:<request>` on the original invoice, `ADJ:<request>:OFFSET` on the return invoice, `ADJ:<request>:ARI` for the AR Insurer | ledger convention | remittance and cashiering read balances from the original invoice; a return invoice of an adjustment always nets to zero |
+| `InvoiceRelatedItems` (section `ADJUSTMENTS`) | SPI implemented | invoice 360 tab: requests raised on the invoice or that booked it |
+| `OpsWorkCountSource` (section `ADJUSTMENT`) | SPI implemented | Operations home tiles: for validation, for approval, for posting, returned, payments to re-apply |
+
+### 4.11 Demo
+
+`V994` adds GL 4190 and the demo rules of the three events. At start-up (demo profile, after the
+booking demo and the ledger replay) `AdjustmentDemoData` raises, as `mktcoll`, a change of the
+assured's information on the invoice of `ARN-2026-940003` (waiting for validation) and a flat
+cancellation of `ARN-2026-940004`, validated by `adjust` and approved by `adjtl`, ready for the
+posting batch.
+
+### 4.12 Parked (seam only)
+
+| Item | Question | Seam |
+|---|---|---|
+| GL accounts of the Adjustment events and of commission realised at booking | OQ07 | event types with demo rules; production configures the Accounting Rules |
+| Payment re-application | cashiering (O1-A) | `PaymentReapplier` port; requests wait in AWAITING_REAPPLICATION until it is available |
+| Over-adjustment baseline value | OQ37 | parameter `ADJ_BASELINE_PERCENT` (100) |
+| Minimal balance range, targets and approval | OQ11 | parameter `MIN_BALANCE_FILE_RANGE`, event `OPS_WRITE_OFF` |
+| Refund basis of partial cancellations and decreases | OQ36 | pro-rata or short-period chosen per request |
+| Credit memo or negative service invoice on a commission decrease | OQ34 | credit of the insurer's service invoice through `ServiceInvoiceService.credit` |
+| Endorsement request number format and document list | OQ32 | `ENR-<yyyy>`, `ES-<yyyy>`; `ENDORSEMENT_DOC_TYPE` holds only "Others" |
+| "Quotation required" link to a quotation | ADJID.008 | hand-off `QUOTATION_REQUIRED` to Marketing and the quotation number linked by reference; `QuotationService` has no endorsement quotation call |
+| Update of the account's risk or assured data by a non-financial endorsement | OQ32 | recorded by booking as a non-financial endorsement with its description; the account is not changed |
+| Package TSI limits and co-insurance model | OQ33 | catalog `max_sum_insured` and the invoice's insurer shares |
+| Report layouts | OQ42 | draft layouts |
+
+### 4.13 Fit/gap status
+
+| BR ID | Status | Where |
+|---|---|---|
+| ADJID.001 | Built | requests on booked invoices, single / multiple / upload, lock and remittance-queue guard, incompatible types |
+| ADJID.002 / 004 | Built | `ENDORSEMENT_TYPE` classes, form by request type, period checks |
+| ADJID.003 | Built (account data update parked, OQ32) | non-financial posting recorded by booking |
+| ADJID.005 / 007 | Built | return with reason from validation, approval or posting batch; requester notified |
+| ADJID.006 | Built | posting batches `VB-<yyyy>`, `ADJ_BATCH` upload |
+| ADJID.008 | Built (quotation link by reference) | recompute per insurer, package limit, hand-off |
+| ADJID.009 / 012 / 013 | Built (seam until cashiering) | `PaymentReapplier`, excess recorded, AWAITING_REAPPLICATION |
+| ADJID.010 | Built | approval stage, `FIN_EXTENSION` always approved |
+| ADJID.011 | Built (GL rules OQ07) | booking `EndorsementPostingService.post`, own events |
+| ADJID.014 | Built | recompute before / after and per insurer; service invoice issue / credit |
+| ADJID.015 / MKTID.008 | Built | endorsement slip `ES-<yyyy>` |
+| ADJID.016 | Built | `ADJ-DAILY` and job `ADJ_DAILY_REPORT` |
+| ADJID.017 | Built | `ADJ-VALIDATION-LIST` |
+| ADJID.018 | Built | validation slip |
+| ADJID.019 | Built | `ADJ-REGISTER` |
+| ADJID.020 | Built | ARN and invoice on every request, invoice 360 tab |
+| ADJID.021 | Built | aging on lists and `ADJ-AGING` |
+| ADJID.022 | Built | before / after, trail, workflow history, audit |
+| ADJID.023 | Built | duplicate check with justification |
+| ADJID.024 | Built | invoice search and invoice 360 (opsledger) with the requests of the invoice |
+| ADJID.025 | Built (document list OQ32) | attachments of the request |
+| ADJID.026 | Built (range and targets OQ11) | `MINIMAL_BALANCE_FILE`, `ADJ-MINBAL-FILE` |
+| ADJID.028 | Built (baseline OQ37) | cumulative control with justification, `ADJ_OVER_BASELINE` |

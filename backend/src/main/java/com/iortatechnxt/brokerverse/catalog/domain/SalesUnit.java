@@ -34,7 +34,24 @@ public class SalesUnit extends AuthorizableEntity implements CatalogRecord {
   @Column(name = "cost_center", length = 20)
   private String costCenter;
 
+  @Column(name = "head_username", length = 50)
+  private String headUsername;
+
   protected SalesUnit() {}
+
+  /**
+   * Sets or clears the Unit Head (BRCLXN.011/012, CQ05): an operational attribute used by the
+   * collection worklist, audited by the caller and not re-authorized.
+   *
+   * @param username head of the unit, null to clear
+   */
+  public void assignHead(String username) {
+    this.headUsername = username;
+  }
+
+  public String getHeadUsername() {
+    return headUsername;
+  }
 
   /**
    * Creates a unit, pending authorization.

@@ -1,12 +1,21 @@
-import { CircleDollarSign } from 'lucide-react';
+import {
+  CircleDollarSign,
+  FileSpreadsheet,
+  ListChecks,
+  Settings2,
+  UserCog,
+  Users,
+  WalletCards,
+} from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
  * Collections (BRD-4, BRCLXN.001-060; docs/architecture/COLLECTIONS_DESIGN.md section 11): the
- * follow-up of premium receivables. Registered by the foundation (C0) with its home screen; the
- * build waves add the worklist, collection account, client view, unapplied payments, escalations,
- * assignments, billing statements, files and set-up screens here (routes under /collections).
+ * follow-up of premium receivables. The core (C1-A) gives the home, the PR worklist, the collection
+ * account, the client view, assignments, files and set-up; the plans / escalation (C1-B) and
+ * unapplied-payment (C1-C) screens are registered here after the worklist (routes under
+ * /collections).
  */
 export const collectionsModule: FeatureModule = {
   id: 'collections',
@@ -19,6 +28,51 @@ export const collectionsModule: FeatureModule = {
       permission: 'CLX_VIEW',
       alsoPermissions: ['CLX_UNAPPLIED_WORK', 'CLX_SETUP', 'CLX_REPORT_VIEW', 'CLX_AUDIT_VIEW'],
       component: lazy(() => import('./CollectionsHomePage')),
+    },
+    {
+      path: '/collections/worklist',
+      label: 'PR Worklist',
+      icon: ListChecks,
+      permission: 'CLX_VIEW',
+      component: lazy(() => import('./WorklistPage')),
+    },
+    {
+      path: '/collections/items/:invoiceNo',
+      label: 'Collection Account',
+      icon: WalletCards,
+      permission: 'CLX_VIEW',
+      component: lazy(() => import('./AccountPage')),
+      hidden: true,
+    },
+    {
+      path: '/collections/clients/:clientCode',
+      label: 'Client View',
+      icon: Users,
+      permission: 'CLX_VIEW',
+      component: lazy(() => import('./ClientViewPage')),
+      hidden: true,
+    },
+    {
+      path: '/collections/assignments',
+      label: 'Assignments',
+      icon: UserCog,
+      permission: 'CLX_ASSIGN',
+      component: lazy(() => import('./AssignmentsPage')),
+    },
+    {
+      path: '/collections/files',
+      label: 'Collections Files',
+      icon: FileSpreadsheet,
+      permission: 'CLX_REPORT_VIEW',
+      alsoPermissions: ['CLX_EXPORT'],
+      component: lazy(() => import('./FilesPage')),
+    },
+    {
+      path: '/collections/setup',
+      label: 'Collections Setup',
+      icon: Settings2,
+      permission: 'CLX_SETUP',
+      component: lazy(() => import('./SetupPage')),
     },
   ],
 };

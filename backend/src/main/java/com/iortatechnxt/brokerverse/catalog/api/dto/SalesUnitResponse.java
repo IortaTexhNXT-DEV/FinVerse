@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
  * @param name name
  * @param parentCode parent unit
  * @param costCenter default cost center
+ * @param headUsername Unit Head (BRCLXN.011, CQ05)
  * @param recordStatus maker-checker status
  * @param maker last maintainer
  * @param authorizedBy checker
@@ -24,6 +25,7 @@ public record SalesUnitResponse(
     String name,
     String parentCode,
     String costCenter,
+    String headUsername,
     RecordStatus recordStatus,
     String maker,
     String authorizedBy) {
@@ -42,6 +44,7 @@ public record SalesUnitResponse(
         e.getName(),
         e.getParentCode(),
         e.getCostCenter(),
+        e.getHeadUsername(),
         e.getRecordStatus(),
         e.getMaker(),
         e.getAuthorizedBy());

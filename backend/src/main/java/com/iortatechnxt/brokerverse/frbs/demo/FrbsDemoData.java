@@ -55,6 +55,9 @@ public class FrbsDemoData implements ApplicationRunner {
   private static final String LEAD = "gltl";
   private static final String COST_CENTRE = "NB-CBG-M";
 
+  /** Low priority, so any rule BDOI configures for the same event is tried first. */
+  private static final int DEMO_RULE_PRIORITY = 9000;
+
   private final CompanyRepository companies;
   private final CostCenterRuleService costCenters;
   private final ServiceFeeRunService runs;
@@ -113,7 +116,7 @@ public class FrbsDemoData implements ApplicationRunner {
       costCenters.create(
           companyId,
           new CostCenterRuleValues(
-              9000,
+              DEMO_RULE_PRIORITY,
               ServiceFees.MODULE,
               ServiceFees.ACCRUAL_EVENT,
               null,

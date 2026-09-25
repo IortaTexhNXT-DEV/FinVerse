@@ -285,3 +285,78 @@ Rules for parallel work:
 2. **Directory authentication unknown.** Mitigation: the port and the LOCAL mode; the Windows ID is captured now, so the switch is a configuration change.
 3. **Shared security files.** The two BRD foundations and the Collections / Accounting build agents touch `Permission.java`. Mitigation: one foundation agent, additive changes only, merge early.
 4. **Inactive roles.** A deactivated role could remove rights from active users by surprise. Mitigation: the request shows the members affected, and UQ16 decides whether deactivation is blocked while the role has members.
+
+## 16. U0 foundation: as built
+
+What the U0 wave built (together with S0 of BRD-10, one foundation agent), and where it differs from or details the
+sections above. U1-A and U1-B build on this.
+
+- **Existing behaviour kept by default.** Every designed behaviour change is behind its parameter with today's
+  behaviour as the seed, until BDOI answers and U1-A delivers the implementation flow:
+  - `UAM_DIRECT_ROLE_EDIT` = **true**: the Roles screen still creates and edits roles directly. Each such edit is
+    audited ("Role created / changed directly (emergency path UAM_DIRECT_ROLE_EDIT)") and raises the alert
+    `UAM_DIRECT_ROLE_EDIT` (one live alert per role). With false, `POST /admin/roles` and `PUT /admin/roles/{id}` are
+    refused with `ROLE_EDIT_BY_REQUEST` unless they carry `?requestNo=` of an approved group-profile request.
+    **U1-A** switches the seed to false in V1062 together with the "Implement request" flow and adapts
+    `UserAdminApiIT` (it edits roles directly today).
+  - `UAM_ROLE_APPLY_ON_APPROVAL` = **true**: approved role-permission requests (PMADD05) apply at once, as today.
+    U1-A reads it in `AccessChangeApplier` (false = FOR_IMPLEMENTATION; UQ03).
+- **Migration `V1060__uam_foundation.sql`.** Roles `UAM_REQUESTOR`, `UAM_APPROVER`, `UAM_SECOND_APPROVER` with the
+  grants of 6.2; BUSINESS_ADMIN, SYSADMIN and AUDITOR grants of 6.2; every role holding ACCESS_REQUEST today also gets
+  UAM_ENROLL / MODIFY / DEACTIVATE / REACTIVATE / CORRECT / CANCEL / VIEW / GROUP_REQUEST, and every role holding
+  ACCESS_APPROVE gets UAM_VIEW. `sec_permission_action`: the `UAM_*` permissions, ACCESS_REQUEST / ACCESS_APPROVE moved
+  from BROKING_ADMIN to `USER_ACCESS`, USER_MANAGE / ROLE_MANAGE (USER_ACCESS, CREATE + AMEND) and the platform
+  administration permissions AUDIT_VIEW, SYSTEM_MONITOR, ALERT_VIEW, ALERT_MANAGE, SYSTEM_PARAMETER_MANAGE (area
+  `ADMINISTRATION`). **Not classified:** the finance permissions (journals, periods, sub-ledgers, reinsurance, tax,
+  budget, assets, FRBS pack): the existing Product Maintenance test pins JOURNAL_CREATE as unclassified, and the
+  finance owner maps them (the group-profile report shows them under "Other" until then). Parameters of section 8
+  (JOB_FAILURE_RECIPIENTS is a STRING of e-mail addresses); `LOGIN_MAX_FAILED_ATTEMPTS` description "all users"
+  (CQ23, D5). LOVs `UAM_BUSINESS_UNIT`, `UAM_USER_LEVEL` (empty, UQ05), `UAM_DEACTIVATION_REASON`. Alert codes and
+  notification events of section 8 (sort orders 600-660).
+- **Migration `V1061__security_user_access_extensions.sql`.** `sec_user` + `windows_id` (unique, case-insensitive,
+  partial index), `business_unit_code`, `user_level`, `password_changed_at`, `must_change_password`, `last_logout_at`;
+  `sec_role` + `active`, `description`, `privilege_level` (LOW / STANDARD / HIGH / ADMIN; SYSADMIN = ADMIN),
+  `deactivated_at/by`; `sec_access_change_log` (insert-only trigger; subject by value, no foreign key; subject types
+  USER / ROLE, V1062 widens to EXTERNAL_USER); `sec_user_session` (`session_id` = jti, `expires_at` added so "online"
+  needs no token); `sec_password_history` (by user name).
+- **security domain.** `AppUser`: the new fields, `changePassword(hash, when, mustChange)`, `recordLogout(when)`;
+  `effectivePermissions()` skips inactive roles. `Role`: `isActive()`, `deactivate(user, when)` /
+  `reactivate()` (`ROLE_ALREADY_INACTIVE` / `ROLE_ALREADY_ACTIVE`), `description`, `PrivilegeLevel privilegeLevel`.
+  `AccessChangeLog` + `AccessChange`, `AccessChangeSource`, `AccessChangeActivity`, `AccessSubjectType`,
+  `AccessChangeLogRepository` (by subject; by request number); `UserSession` + `SessionEndReason`,
+  `UserSessionRepository`; `PasswordHistory` + repository. Inactive roles are skipped by
+  `RolePermissionLookup` (authorities), `UserDirectory.roleCodes` and `usersWithPermission`.
+- **security services.**
+  - `UserAdminService`: every change writes the change log through `AccessChangeRecorder` in the same transaction
+    (one row per changed attribute: fullName, email, homeBranchId, authorizationLimit, windowsId, businessUnitCode,
+    userLevel, roles (ROLES_CHANGED), enabled (DISABLE_USER / ENABLE_USER); roles: name, description, privilegeLevel,
+    permissions (ROLE_PERMISSIONS); UNLOCK; PASSWORD_RESET; DEACTIVATE_ROLE / REACTIVATE_ROLE with attribute active).
+    Overloads with a `ChangeAuthority(requestNo, approvedBy)` (`ChangeAuthority.DIRECT` for none):
+    `createUser(request, password, authority)`, `updateUser(id, request, authority)`, `createRole(request, authority)`,
+    `updateRole(id, request, authority)`, new `deactivateRole(id, authority)`, `reactivateRole(id, authority)`,
+    `getRole(id)`. The existing signatures delegate with DIRECT. Password changes keep the history and
+    `password_changed_at`; a password set by someone else (creation, admin reset) sets `must_change_password`, the
+    user's own change clears it. **Not built (U1-B):** the reuse / age checks against `PASSWORD_HISTORY_COUNT`,
+    `PASSWORD_MIN_AGE_DAYS`, `PASSWORD_MAX_AGE_DAYS` and the flag in `LoginResponse`.
+  - `UserRequest` + optional `windowsId`, `businessUnitCode`, `userLevel` (null keeps the value on update, blank
+    clears it; a Windows ID used by another user is refused with `WINDOWS_ID_IN_USE`); the 7-argument constructor stays.
+    `RoleRequest` + optional `description`, `privilegeLevel` (3-argument constructor stays). `RoleResponse` + `active`,
+    `description`, `privilegeLevel`; `UserProfileResponse` + `windowsId`, `businessUnitCode`, `userLevel`,
+    `mustChangePassword`, `lastLogoutAt`.
+  - `RoleEditGuard` (`authorize(roleCode, requestNo)`, `directEditAllowed()`, `directEditUsed(roleCode, change)`) and
+    the port `security.service.ApprovedRoleRequests` (`Optional<String> approverOf(requestNo, roleCode)`; default
+    `SecurityPortDefaults.noApprovedRoleRequests` knows none). **U1-A implements the port** in nbadmin for
+    FOR_IMPLEMENTATION requests. Event `security.service.DirectRoleEditUsed(roleCode, change, actor)`, turned into the
+    alert by `nbadmin.service.DirectRoleEditAlerts`.
+  - `UserSessionLog`: `open(jti, username, expiresAt)` at login (`AuthService.login`), `end(jti, reason)` at logout
+    (`AuthService.logout`, reason LOGOUT; the user's `last_logout_at` is set), `touch(jti)` (at most every 300 s),
+    `isOnline(username)`, `sessionsOf(username)`. **U1-B** calls `touch` from `JwtAuthenticationFilter` and ends
+    sessions on idle timeout, expiry, lock and admin end.
+- **Navigation.** Group Setup & Administration, section **User Access** before Administration
+  (`features/nbadmin/userAccessModule.ts`, module id `user-access`, help id `user-access`, `USER_ACCESS_HELP` in
+  `features/nbadmin/help.ts`): `/user-access/requests` "Access Request Queues" (UAM_VIEW, also ACCESS_REQUEST,
+  ACCESS_APPROVE, UAM_SECOND_APPROVE), a landing page with links to the Access Requests and User Access Matrix
+  screens, which stay in Broking Setup until U1-A moves them (old routes redirect).
+- **Jobs.** `brokerverse.jobs.uam-effective-changes-cron` `0 5 16 * * *` (00:05 PHT) and
+  `password-expiry-notice-cron` `0 0 22 * * *` (06:00 PHT) in `application.yml` and `CONFIGURATION.md`.
+- **Flyway left to the build waves.** U1-A V1062 and demo V1960; V1063-V1069 and V1961-V1969 free.

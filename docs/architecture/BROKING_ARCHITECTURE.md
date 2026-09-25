@@ -311,7 +311,7 @@ build the external interface itself.
 | Insurer channels (SFTP / API) | Q06 | `placement` sends by e-mail; `cat_insurer.placement_channel` accepts only EMAIL (`PLACEMENT_CHANNEL_PARKED`) |
 | Shared mailbox reading (requests, e-policies) | Q12, Q31 | manual upload with the e-mail attached |
 | OCR / data extraction from documents | Q24 | `issuance` extraction port with a manual review screen |
-| BDO SSO / Active Directory | Q42 (answered by BRD-11: directory sign-in required) | existing JWT login. Planned (USER_ACCESS_DESIGN section 10): `security` port `DirectoryAuthenticator` with `AUTH_MODE` LOCAL / DIRECTORY and the Windows ID on the user; the BDO EUA / LDAP / SSO adapter stays parked until BDO supplies the interface (UQ04), so local sign-in stays |
+| BDO SSO / Active Directory | Q42 (answered by BRD-11: directory sign-in required) | existing JWT login. Planned (USER_ACCESS_DESIGN section 10): `security` port `DirectoryAuthenticator` with `AUTH_MODE` LOCAL / DIRECTORY and the Windows ID on the user; the BDO EUA / LDAP / SSO adapter stays parked until BDO supplies the interface (UQ04), so local sign-in stays. Built so far (U0): parameter `AUTH_MODE` = LOCAL (V1060) and `sec_user.windows_id` (V1061); the port itself comes with U1-B |
 | Product matrix content | Q01, Q02 | minimum-field, document and TSU rule tables configurable (`catalog`); seeds are defaults |
 | Incentive rules | Q33 | `bkg_incentive_rule` table and setup screen; empty in production, one demo rule (V988). A match sets the incentive flag on the invoice |
 | Real GL accounts of the booking event | OQ07 | event type `BROKER_BOOKING` and its components in V870; the rule lines and GL accounts 1210 / 1220 / 2210 / 2220 / 2221 / 4101 exist only in the demo data (V988). Production configures them in Accounting Rules |
@@ -322,12 +322,12 @@ build the external interface itself.
 | Override requests (Renewal) | OOS-1 (answered by BRD-6) | not built in BRD-1. Planned in the `renewal` module (RENEWAL_DESIGN): TL override of the outstanding balance and authorised override of a bucket or disposition with mandatory remarks (`RNW_OVERRIDE`, `rnw_override`); no approval request |
 | KYC review frequency by risk rating | Q21 | parameters `KYC_REVIEW_MONTHS`, `KYC_REVIEW_MONTHS_HIGH_RISK` |
 | Duplicate keys and precedence | Q17 | hard keys TIN, ID, name + birth date; soft keys e-mail, mobile, corporate name |
-| Client tags / instruction types and enforcement (block or warn) | Q18 | LOVs `CLIENT_TAG`, `INSTRUCTION_TYPE`; banner only (warn) |
+| Client tags / instruction types and enforcement (block or warn) | Q18 | LOVs `CLIENT_TAG`, `INSTRUCTION_TYPE`; banner only (warn). Screening sets the PEP / WATCHLIST_REVIEW tags and the risk rating through `crm.service.ClientRiskService` (S0); a block stays behind `SCR_BLOCK_ON_OPEN_MATCH` = false (SQ07) |
 | BDO CIF integration (source of truth for bank clients) | Q16 | `bank_client` flag and CIF number captured manually |
 | Retention periods per record type; archive vs purge | Q39 | rule table `nba_retention_rule` and monthly counts; no archive / purge (DBA storage and backup decision) |
-| Forced password change at first sign-in | - | temporary password shown once to the approver; user changes it on My Profile |
+| Forced password change at first sign-in | - | temporary password shown once to the approver; user changes it on My Profile. The flag `sec_user.must_change_password` is set on creation and admin reset (U0, V1061); its enforcement at sign-in is U1-B |
 | TSU routing thresholds | Q04 | `cat_tsu_rule` seeds (non-package, fleet of 5, TSI above 50M) until BDOI confirms |
-| Nominated document naming | Q23 | `<REFERENCE>_<DOCTYPE>_<n>` (`DocumentNamingService.SYNTAX`) |
+| Nominated document naming | Q23 | `<REFERENCE>_<DOCTYPE>_<n>` (`DocumentNamingService.SYNTAX`); named patterns `NamingPattern.DEFAULT` / `SCREENING` (`<FORM_TYPE>_<CLIENT_NAME>_<yyyyMMdd>_<DOCTYPE>_<n>`, SNSRP-601) |
 | Sales organisation and cost centers | Q34, Q41 | `cat_sales_unit` / `cat_sales_officer` tables; demo units only |
 | Motor OD factors and BI / PD tables | Q35 | `cat_rate` MOTOR_OD_* and `cat_motor_limit` hold sample values |
 | Premium tax base | Q43 | `cat_rate` PREMIUM_TAX per line (PROPERTY 12%) |

@@ -193,3 +193,302 @@ stub home page with a help section, so a module fills in only its own feature fo
 | Open LOVs | OQ24, OQ31, OQ32, OQ40 | LOV types exist, empty or with "Others" only |
 | Access matrix per role | OQ48 | grants in V760 follow OPERATIONS_DESIGN section 6 |
 | Direct payment PR | - | booking posts no PR; the ledger keeps the amounts for information (commission uses them) |
+
+
+## 2. Cashiering (`cashiering`)
+
+Package `com.iortatechnxt.brokerverse.cashiering`, Flyway `V763`-`V764` (demo `V991`), screens in
+`frontend/src/features/cashiering`. Cashiering receives premium and non-premium payments, issues
+acknowledgement receipts (AR) and Head Office official receipts (OR), applies payments to the
+invoice ledger component by component, keeps unapplied payments with their dispositions, and runs
+the BIR 2307 reversal flow with Marketing and Disbursement (CSHID.001-027, MKTID.010/013, DBMID.001).
+
+### 2.1 Receipts and series
+
+- **Series** (`csh_receipt_series`, maker-checker): one per kind (AR / OR) and branch, with prefix,
+  range, BIR ATP number and a warning level. ORs come only from Head Office series (CSHID.006).
+  Every receipt takes the next number under a row lock. A depleted series refuses the receipt
+  (`RECEIPT_SERIES_DEPLETED`, CSHID.015). At the warning level the `RECEIPT_SERIES_LOW` alert is
+  raised.
+- **AR** (`csh_receipt`, kind AR): the class comes from LOV `AR_CLASS` (premium or non-premium).
+  The tender is the mode, check and source. The amount is converted at the BOOK rate. Posting:
+  `OPS_AR_RECEIPT` (Dr bank or cash on hand / Cr unapplied collections), or `OPS_AR_INSURANCE_RECEIPT`
+  for non-premium insurer receipts (AR Insurance, CSHID.021).
+- **OR** (kind OR): the type comes from LOV `OR_TYPE` (service fee, profit share, commission,
+  incentive, others), with lines of gross, VAT and withholding tax. Posting: `OPS_OR_ISSUE`.
+  Commission ORs: the `COMMISSION_PAYMENT` upload stages the insurer payments, and *Issue ORs*
+  issues one OR per payment (CSHID.007).
+- **Cancellation and reinstatement** (`csh_receipt_action`, workflow `OPS_RECEIPT_ACTION`):
+  - A request gets its own number (`CAN-<yyyy>` / `RIN-<yyyy>`) and a reason from LOV
+    `RECEIPT_CANCEL_REASON` / `REINSTATEMENT_REASON`. "Others" needs the text.
+  - A reinstatement also carries the encoded fields of its reason group (CSHID.003-005).
+  - The checker approves and the posting follows (CSHID.012/013). The requester cannot approve.
+  - A cancellation reverses every active application, reverses `OPS_AR_RECEIPT` and closes the
+    unapplied balance of the receipt.
+  - A reinstatement restores the receipt (status REINSTATED, `OPS_RECEIPT_REINSTATE`) for the full
+    or partial amount. It applies the amount to the encoded invoice, and the rest stays unapplied.
+    When the cancelled receipt was a bounced check, the encoded fields are not required.
+- **Search** (CSHID.010): ten criteria (receipt no., client, invoice, policy, payor, assured,
+  insurer, amount, dates, kind / status), paged. Each search is logged in `csh_search_log` (OQ47).
+- **Printing**:
+  - `ReceiptDocument` renders the AR / OR PDF and the certificate of payment (draft layout, OQ42).
+  - *Batch Print* (`csh_print_batch`) prints a selection into one merged PDF. It records each line
+    and retries failures (CSHID.019).
+- **Audit** (CSHID.011): every action records the receipt number and the user in the audit trail.
+
+### 2.2 Payment intake, matching and application
+
+- **Intake** (`csh_payment`): over the counter (*Receive Payment*), the payment files, PDC
+  maturity, check pick-up and the 2307 cash path. Each payment issues its AR and is matched at once
+  (CSHID.008/020).
+- **Matching** (`PaymentMatcher`) on ARN, invoice, policy or PN number. The outcome is one of:
+  - booked invoice with outstanding PR (applied, oldest first);
+  - cancelled invoice (unapplied, origin CANCELLED_REFERENCE);
+  - account not booked yet (pre-booked queue);
+  - no match (unapplied, NO_MATCH).
+- **Application** (`ApplicationService`, `csh_application`): the pure `ApplicationPlanner`
+  allocates by `LedgerComponent.applicationHierarchy()` (DST, VAT / premium tax, LGT, FST, other,
+  basic), never DTIP (CSHID.022). Each application:
+  - posts `OPS_PAYMENT_APPLY` (Dr unapplied collections / Cr PR by component, with the commission
+    realised on collection per `OPS_COMMISSION_REALIZATION`);
+  - posts the ledger movement `APPLIED` with reference `APP:<id>`.
+- **2% CWT clients** are applied up to 98% of the premium (parameter `CWT_APPLICATION_PERCENT`). The 2% waits
+  for the BIR 2307, and anything above it stays unapplied.
+- **Excess** becomes an unapplied item (origin EXCESS) for disposition.
+- **Preview** (`POST /payments/preview`): what a payment would match and apply, the 2% withheld, the
+  excess and the BOOK rate. Nothing is saved.
+- **Payment files** (`BulkImportHandler`, permission `CASH_UPLOAD`, duplicate files blocked):
+  - handlers `PAY_BILLS`, `PAY_TRADE`, `PAY_CLPC`, `PAY_DIRECT_CREDIT` and `PAY_PDC`;
+  - layouts in `csh_payment_file_layout`: AUTO (Excel / CSV / detected TXT), DELIMITED, or
+    FIXED_WIDTH (`Header:start:length;...`);
+  - they are changed on *Cashiering Setup* until BDOI confirms the bank layouts (OQ03/OQ04);
+  - the run summary counts applied, unapplied, pre-booked, excess and failed rows.
+- **Pre-booked** (`csh_prebooked`, OQ12): an account matched before it is booked. The AR is issued,
+  and the money waits as an unapplied item (origin PREBOOKED). The item is applied by:
+  - the `OpsInvoiceBooked` ledger event, or
+  - the `PREBOOKED_REMATCH` job.
+
+  Ageing items raise `PREBOOKED_AGEING`. *Release* moves an item to the unapplied workbench.
+- **Automatch** (`PAYMENT_AUTOMATCH`): unapplied NO_MATCH / PREBOOKED items are matched again with
+  their references, and are applied when the invoice is booked now.
+- **PDC warehouse** (`csh_pdc_item`, `PDCW-<yyyy>`):
+  - a check is warehoused by screen or by the `PAY_PDC` upload;
+  - `PDC_MATURITY` turns a matured check into a payment with its AR;
+  - before maturity a check can be returned, replaced or pulled out.
+- **Check pick-up** (`csh_pickup_request`, CSHID.009): requests come from `CollectionFeed`
+  (`PickupFlowInHandler`) or are entered by hand. *Print ARs* issues and prints the ARs of the
+  selected checks in one batch.
+
+### 2.3 Unapplied payments and dispositions (CSHID.024/025)
+
+- `csh_unapplied` holds every unapplied balance with its origin: no match, excess, cancelled
+  reference, adjustment, cancellation, DP reinstatement, remittance return, re-application,
+  pre-booked or other.
+- The stage mirrors workflow `OPS_DISPOSITION`. The tabs are Unapplied / Monitoring / For
+  Approval / For Reversal / Done.
+- Disposition types are in `csh_disposition_type_rule`, each with an action and whether it needs
+  approval (OQ15):
+
+  | Action | Effect |
+  |---|---|
+  | APPLY / DST_APPLY | apply to another invoice or its DST only |
+  | REFUND | `DisbursementGateway` request, then `OPS_UNAPPLIED_REFUND` when paid |
+  | RECLASS / TRANSFER | `OPS_UNAPPLIED_RECLASS` to another client or unit (whole balance) |
+  | MANUAL | other |
+
+- Four eyes: the approver is never the requester. Submit and approve also run in bulk.
+- A completed disposition can be marked for reversal and reversed on approval. A refund is
+  reversed only after Disbursement returned it.
+- A balance left after a partial disposition goes back to the Unapplied tab.
+
+### 2.4 Minimal balance (CSHID.016, OQ11)
+
+The `MINIMAL_BALANCE_SWEEP` job, or *Run Sweep Now*, works from the rules in
+`csh_minimal_balance_rule`:
+
+- **Premium balances** up to PHP 10 are reversed (`OPS_MINIMAL_BALANCE_REVERSAL`, ledger
+  `MIN_BAL`). A balance is skipped when:
+  - it equals the client's 2% CWT, the DST or the whole premium;
+  - the invoice is already written off (`WRITTEN_OFF`, e.g. by Adjustment's `MINIMAL_BALANCE_FILE`
+    for PHP 10-100).
+- **Excess and unapplied payments** up to PHP 10 go to AP overages (`OPS_EXCESS_TO_OVERAGES`).
+- Every sweep is logged once in `csh_minimal_balance`.
+
+### 2.5 BIR 2307 (CSHID.026/027, MKTID.010/013, DBMID.001)
+
+`csh_cwt_tag` (workflow `OPS_CWT_2307`) and `csh_cwt_batch`:
+
+1. Marketing tags the certificate (or the cash path) of the invoice, by screen or with the
+   `CWT_TAGS` upload (`CWT_TAG`).
+2. Cashiering receives the tag and ticks the CWT-copy checklist.
+3. Cashiering validates a selection per insurer into a report batch. This posts `OPS_CWT_RECLASS`
+   (Dr PR2307 / Cr PR by component).
+4. The batch is routed to Disbursement (`DisbursementGateway`, type CWT2307).
+5. When Disbursement pays it, the batch is released to the insurer. This posts
+   `OPS_CWT_DTIP_OFFSET` (Dr DTIP / Cr PR2307).
+
+On the cash path an AR is issued and applied to the withheld 2% instead (*Settle in Cash*).
+
+### 2.6 Accounting events (V764; demo rules V991, OQ07)
+
+All 11 events use journal type RECEIPT at the BOOK rate:
+
+- `OPS_AR_RECEIPT`, `OPS_AR_INSURANCE_RECEIPT`, `OPS_OR_ISSUE`;
+- `OPS_PAYMENT_APPLY`, `OPS_RECEIPT_REINSTATE`;
+- `OPS_CWT_RECLASS`, `OPS_CWT_DTIP_OFFSET`;
+- `OPS_EXCESS_TO_OVERAGES`, `OPS_MINIMAL_BALANCE_REVERSAL`;
+- `OPS_UNAPPLIED_REFUND`, `OPS_UNAPPLIED_RECLASS`.
+
+The `@BANK` role account comes from the system parameters `CASH_BANK_ACCOUNT` (check and electronic
+modes) and `CASH_ON_HAND_ACCOUNT` (cash). They are empty in production until BDOI gives the GL
+(OQ07). The demo sets them to 1111 / 1101 and adds GL 4190.
+
+### 2.7 Jobs
+
+| Job | Cron property | Default |
+|---|---|---|
+| `PREBOOKED_REMATCH` | `brokerverse.jobs.prebooked-rematch-cron` | every 2 hours |
+| `PAYMENT_AUTOMATCH` | `brokerverse.jobs.payment-automatch-cron` | hourly at :30 |
+| `PDC_MATURITY` | `brokerverse.jobs.pdc-maturity-cron` | 00:30 |
+| `MINIMAL_BALANCE_SWEEP` | `brokerverse.jobs.minimal-balance-sweep-cron` | 20:00 |
+
+Each item runs in its own transaction; a failure is logged and the run goes on.
+
+### 2.8 API (`/api/v1/cashiering`)
+
+| Area | Endpoints |
+|---|---|
+| Receipts | `GET /receipts` (search), `GET /receipts/{id}`, `POST /receipts/ar`, `POST /receipts/or`, `POST /receipts/{id}/cancel`, `POST /receipts/{id}/reinstate`, `GET /receipts/{id}/pdf`, `POST /receipts/{id}/certificate-of-payment` |
+| Receipt actions | `GET /receipt-actions`, `POST /receipt-actions/{id}/approve`, `POST /receipt-actions/{id}/resubmit` |
+| Payments | `POST /payments/preview`, `POST /payments`, `GET /payments`, `GET /prebooked`, `POST /prebooked/{id}/rematch`, `POST /prebooked/{id}/release`, `POST /matching/run` |
+| Unapplied | `GET /unapplied`, `GET /unapplied/{id}`, `GET /unapplied/{id}/dispositions`, `GET /disposition-types`, `POST` / `PUT /unapplied/{id}/disposition`, `POST /unapplied/{id}/submit`, `/approve`, `/withdraw`, `/reversal`, `/reversal/approve`, `POST /unapplied/bulk/submit`, `/bulk/approve` |
+| Checks | `GET` / `POST /pdc`, `POST /pdc/{id}/release`, `POST /pdc/mature`, `GET` / `POST /pickups`, `POST /pickups/import`, `POST /pickups/print`, `POST /pickups/{id}/cancel` |
+| Printing | `GET` / `POST /print-batches`, `GET /print-batches/{id}`, `POST /print-batches/{id}/retry`, `GET /print-batches/{id}/file` |
+| BIR 2307 | `GET` / `POST /cwt`, `GET /cwt/expected`, `POST /cwt/{id}/receive`, `/checklist`, `/settle-cash`, `GET` / `POST /cwt/batches`, `GET /cwt/batches/{id}/tags`, `POST /cwt/batches/{id}/route`, `/release` |
+| Setup | `GET` / `POST /series`, `PUT /series/{id}`, `POST /series/{id}/authorize`, `/deactivate`, `GET /layouts`, `PUT /layouts/{code}`, `GET /minimal-balance/rules`, `POST /minimal-balance/sweep`, `GET /commission-payments`, `POST /commission-payments/issue` |
+
+Permissions are those of V760: `CASH_RECEIPT`, `CASH_CANCEL`, `CASH_REINSTATE`, `CASH_APPROVE`,
+`CASH_APPLY`, `CASH_UPLOAD`, `CASH_DISPOSITION`, `CASH_DISPOSITION_APPROVE`, `CASH_SERIES_MANAGE`,
+`CASH_PRINT`, `CWT_TAG`, `CWT_PROCESS` and `DISB_PROCESS`.
+
+### 2.9 Screens (group *Finance*, section *Cashiering*)
+
+- Cashiering Workbench
+- Receive Payment: two panes, with the live application preview by component, the 98% CWT badge,
+  the excess to unapplied and the BOOK-rate chip.
+- Receipts: search, the Cancellations and Reinstatements tab, and Issue Official Receipt.
+- Receipt page: summary, `WorkflowPanel` of the open request, and the tabs Applications / Lines /
+  Journal / History. Actions are Print, Cancel and Reinstate.
+- Unapplied Payments: workbench with bulk actions, and the item page with the disposition form.
+- Pre-booked Payments
+- Payment Uploads: `BulkUploadWizard` per file type and the run summary tiles.
+- PDC Warehouse: by maturity month.
+- Check Pick-up
+- Batch Print: preview, progress and retry.
+- BIR 2307
+- Commission ORs
+- Receipt Series: remaining-count gauge.
+- Cashiering Setup: layouts and minimal balance.
+
+Each screen has its help entry in `features/cashiering/help.ts`.
+
+### 2.10 Reports (CSHID.023, OQ42/OQ43)
+
+The 24 reports are registered as `ReportMetadata.operations` and built with
+`TabularReportBuilder`:
+
+- `CSH-APPLIED-PREM`, `CSH-APPLIED-COMM`
+- `CSH-PDC-WAREHOUSE`
+- `CSH-MINBAL-EXCESS`, `CSH-MINBAL-PREMIUM`, `CSH-MINBAL-COMMISSION`
+- `CSH-CANCELLED-OR`, `CSH-CANCELLED-AR`
+- `CSH-CHECK-PICKUP`
+- `CSH-PRIORITY-POSTED`
+- `CSH-UNAPPLIED-COMM-MANCOM`, `CSH-UNAPPLIED-COMM-YTD`
+- `CSH-DAILY-CASH-REC`
+- `CSH-ADVANCE-PAYMENT`
+- `CSH-PAYMENT-REVERSAL`
+- `CSH-DIRECT-PAYMENT`
+- `CSH-REINSTATEMENT-MON`, `CSH-REINSTATEMENT`
+- `CSH-REAPPLICATION`
+- `CSH-CERT-OF-PAYMENT`
+- `CSH-CWT`
+- `CSH-AR-OUTSTANDING`
+- `CSH-BATCH-RUN`
+- `CSH-2307-TXN`
+
+Reports whose field list the BRD does not give carry a "draft layout (OQ42)" note. The access
+rules for generating, downloading and view-only use are the platform report permissions
+(CSHID.017/018).
+
+### 2.11 Contracts for the other modules
+
+| Contract | Kind | Use |
+|---|---|---|
+| `ReceiptIssuer.issueOfficialReceipt` | port implemented (`CashieringReceiptIssuer`) | remittance and commission get an OR number, idempotent on (module, source ref) |
+| `UnappliedSink.create` | port implemented (`CashieringUnappliedSink`) | adjustment, remittance and commission put money into unapplied payments for disposition, idempotent on (module, source ref) |
+| `PaymentReapplier.reapply(ReapplyRequest(invoiceNo, "ADJUSTMENT", "ADJ:<request>", date, reason))` | port implemented (`CashieringPaymentReapplier`) | reads the balances of the original invoice (already unlocked and reduced), reverses its active applications (negative `APPLIED`) and applies the money again in hierarchy order. The excess becomes one unapplied item (origin REAPPLY, net Dr 1210.x / Cr 2205), and realised commission is reversed with the applications. Returns `ReapplyResult.none` when nothing was applied. It never throws `PAYMENT_REAPPLIER_UNAVAILABLE`, and it is idempotent on (module, source ref, invoice) through `csh_reapplication` |
+| `placement.service.PaymentConfirmationSource` | adapter (`CashieringPaymentConfirmationSource`, source `CASHIERING`) | returns `APP:<id>` for each active application and `PRE:<id>` for each payment waiting in the pre-booked queue of the ARN, so a payment received before booking opens the NB payment gate |
+| `OpsWorkCountSource`, `InvoiceRelatedItems`, `PendingApprovalSource` | SPIs implemented | Operations home tiles (section `CASHIERING`), the invoice 360 section `RECEIPTS`, and the approvals inbox (series to authorize, receipt actions and dispositions) |
+| `CollectionFeed` (`PickupFlowInHandler`) | flow-in handler | check pick-up requests from the Collection system (OQ01/OQ13) |
+
+### 2.12 Demo
+
+`V991` adds:
+
+- GL 4190 and the demo rules of the 11 events;
+- the series `AR-HO-`, `AR-CEB-` and `OR-HO-`;
+- two check pick-up requests;
+- the bank and cash-on-hand parameters.
+
+At start-up (demo profile) `CashieringDemoData` posts, as `cashier`:
+
+- a full and a partial payment;
+- an unmatched payment with a refund disposition submitted for approval;
+- a payment by ARN (`ARN-2026-940005`);
+- a cancellation request;
+- a warehoused PDC;
+- a service-fee OR.
+
+As `mktcoll` it tags a 2307. The demo users are `cashier`, `cashbr` (CEB), `cashtl` (team
+leader, approvals), `mktcoll`, `disb` and `approver`.
+
+### 2.13 Parked (seam only)
+
+| Item | Question | Seam |
+|---|---|---|
+| Bank / channel file layouts (Bills Payment FS01, Trade, CLPC, Direct Credit) | OQ03, OQ04 | `csh_payment_file_layout` per handler (AUTO / DELIMITED / FIXED_WIDTH), changed on *Cashiering Setup* |
+| BIR ATP and receipt series per branch | OQ05 | series master with ATP number and warning level (`RECEIPT_SERIES_LOW`) |
+| Who approves cancellations, reinstatements and which dispositions | OQ06, OQ15 | workflow `OPS_RECEIPT_ACTION` (CASH_APPROVE) and `requires_approval` per disposition type |
+| GL accounts of the Cashiering events, bank / cash-on-hand accounts | OQ07 | event types with demo rules; parameters `CASH_BANK_ACCOUNT` / `CASH_ON_HAND_ACCOUNT` empty in production |
+| Minimal balance limits, exclusions and targets | OQ11 | `csh_minimal_balance_rule` (PHP 10, CWT / DST / whole premium excluded) |
+| Payments before booking | OQ12 | pre-booked queue, `PREBOOKED_REMATCH`, `PREBOOKED_AGEING`, `PRE:<id>` to the NB payment gate |
+| Collection system (check pick-up, refunds) | OQ01, OQ13 | `CollectionFeed` handler and manual entry; refunds through `DisbursementGateway` |
+| Commission OR grouping (one per check or per payment) | OQ14 | one OR per staged payment line of `COMMISSION_PAYMENT` |
+| 2307 routing and certificate handling with Disbursement | OQ16 | `OPS_CWT_2307` workflow, `DisbursementGateway` type CWT2307, release on `DisbursementStatusChanged` PAID |
+| Report layouts and ageing buckets | OQ42, OQ43 | draft layouts; the pre-booked ageing threshold comes from the alert |
+| Search log retention | OQ47 | `csh_search_log` kept |
+
+### 2.14 Fit/gap status
+
+| BR ID | Status | Where |
+|---|---|---|
+| CSHID.001 | Built | AR issue (OTC, uploads, PDC, pick-up), cancel and reinstate with approval |
+| CSHID.002 | Built | Head Office OR per `OR_TYPE` with VAT / WTAX lines, cancel and reinstate |
+| CSHID.003 / 004 / 005 | Built (lists OQ24) | reasons from LOV, encoded reinstatement fields by reason group |
+| CSHID.006 / 015 | Built (ATP OQ05) | series per kind and branch, OR from Head Office only, depletion check, `RECEIPT_SERIES_LOW` |
+| CSHID.007 | Built (grouping OQ14) | `COMMISSION_PAYMENT` upload, *Issue ORs* |
+| CSHID.008 | Built (layouts OQ03/OQ04) | `PAY_BILLS`, `PAY_TRADE`, `PAY_CLPC`, `PAY_DIRECT_CREDIT`, `PAY_PDC`; PDC warehouse and `PDC_MATURITY` |
+| CSHID.009 | Built (Collection feed OQ01/OQ13) | check pick-up queue, *Print ARs* |
+| CSHID.010 | Built | receipt search with ten criteria, search log |
+| CSHID.011 | Built | audit trail per receipt action |
+| CSHID.012 / 013 / 014 | Built (GL OQ07) | `OPS_AR_RECEIPT`, `OPS_OR_ISSUE`, `OPS_RECEIPT_REINSTATE` and their reversals |
+| CSHID.016 | Built (limits OQ11) | `MINIMAL_BALANCE_SWEEP`, rule table |
+| CSHID.017 / 018 | Built | platform report access |
+| CSHID.019 | Built | batch print with preview, progress and retry |
+| CSHID.020 | Built (pre-booked OQ12) | matching at acceptance, pre-booked queue, automatch |
+| CSHID.021 | Built | AR Insurance (`OPS_AR_INSURANCE_RECEIPT`), segregated from premium |
+| CSHID.022 | Built | component hierarchy, 98% for CWT clients, excess to unapplied |
+| CSHID.023 | Built (layouts OQ42/OQ43) | 24 Cashiering reports |
+| CSHID.024 / 025 | Built (approvals OQ15) | unapplied workbench, dispositions, four eyes, reversal |
+| CSHID.026 / 027, MKTID.010 / 013 | Built (routing OQ16) | 2307 tagging, validation, report, reclass, DTIP offset, cash path |
+| DBMID.001 | Built (in-app Disbursement queue, OQ02) | route to Disbursement, release on PAID |

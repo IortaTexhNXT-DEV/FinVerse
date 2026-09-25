@@ -1,10 +1,36 @@
-import { Banknote } from 'lucide-react';
+import {
+  Banknote,
+  CalendarClock,
+  FileStack,
+  HandCoins,
+  Hash,
+  Hourglass,
+  Printer,
+  Receipt,
+  ReceiptText,
+  Settings2,
+  Truck,
+  Upload,
+  Wallet,
+} from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
+const CASH_ALL = [
+  'CASH_APPLY',
+  'CASH_APPROVE',
+  'CASH_CANCEL',
+  'CASH_REINSTATE',
+  'CASH_DISPOSITION',
+  'CASH_PRINT',
+  'CASH_UPLOAD',
+  'CWT_PROCESS',
+];
+
 /**
- * Cashiering (CSHID.001-027, MKTID.010/013, DBMID.001; docs/architecture/OPERATIONS_DESIGN.md). Registered by the Operations
- * foundation with its landing screen; the cashiering module adds its own screens here.
+ * Cashiering (CSHID.001-027, MKTID.010/013, DBMID.001; docs/architecture/OPERATIONS_DESIGN.md
+ * section 12): payment intake and receipts, application, unapplied payments, checks, printing,
+ * BIR 2307 and the receipt series.
  */
 export const cashieringModule: FeatureModule = {
   id: 'cashiering',
@@ -15,15 +41,119 @@ export const cashieringModule: FeatureModule = {
       label: 'Cashiering Workbench',
       icon: Banknote,
       permission: 'CASH_RECEIPT',
-      alsoPermissions: [
-        'CASH_APPLY',
-        'CASH_APPROVE',
-        'CASH_DISPOSITION',
-        'CASH_UPLOAD',
-        'CWT_PROCESS',
-        'CWT_TAG',
-      ],
+      alsoPermissions: [...CASH_ALL, 'CWT_TAG'],
       component: lazy(() => import('./CashieringHomePage')),
+    },
+    {
+      path: '/cashiering/receive',
+      label: 'Receive Payment',
+      icon: HandCoins,
+      permission: 'CASH_RECEIPT',
+      component: lazy(() => import('./ReceivePaymentPage')),
+    },
+    {
+      path: '/cashiering/receipts',
+      label: 'Receipts',
+      icon: Receipt,
+      permission: 'CASH_RECEIPT',
+      alsoPermissions: CASH_ALL,
+      component: lazy(() => import('./ReceiptsPage')),
+    },
+    {
+      path: '/cashiering/receipts/:id',
+      label: 'Receipt',
+      icon: Receipt,
+      permission: 'CASH_RECEIPT',
+      alsoPermissions: CASH_ALL,
+      component: lazy(() => import('./ReceiptDetailPage')),
+      hidden: true,
+    },
+    {
+      path: '/cashiering/unapplied',
+      label: 'Unapplied Payments',
+      icon: Wallet,
+      permission: 'CASH_DISPOSITION',
+      alsoPermissions: ['CASH_APPROVE', 'CASH_APPLY', 'CASH_RECEIPT'],
+      component: lazy(() => import('./UnappliedPage')),
+    },
+    {
+      path: '/cashiering/unapplied/:id',
+      label: 'Unapplied Payment',
+      icon: Wallet,
+      permission: 'CASH_DISPOSITION',
+      alsoPermissions: ['CASH_APPROVE', 'CASH_APPLY', 'CASH_RECEIPT'],
+      component: lazy(() => import('./UnappliedDetailPage')),
+      hidden: true,
+    },
+    {
+      path: '/cashiering/prebooked',
+      label: 'Pre-booked Payments',
+      icon: Hourglass,
+      permission: 'CASH_APPLY',
+      alsoPermissions: ['CASH_RECEIPT', 'CASH_APPROVE'],
+      component: lazy(() => import('./PrebookedPage')),
+    },
+    {
+      path: '/cashiering/uploads',
+      label: 'Payment Uploads',
+      icon: Upload,
+      permission: 'CASH_UPLOAD',
+      component: lazy(() => import('./PaymentUploadsPage')),
+    },
+    {
+      path: '/cashiering/pdc',
+      label: 'PDC Warehouse',
+      icon: CalendarClock,
+      permission: 'CASH_UPLOAD',
+      alsoPermissions: ['CASH_RECEIPT', 'CASH_APPROVE'],
+      component: lazy(() => import('./PdcWarehousePage')),
+    },
+    {
+      path: '/cashiering/pickups',
+      label: 'Check Pick-up',
+      icon: Truck,
+      permission: 'CASH_RECEIPT',
+      alsoPermissions: ['CASH_PRINT'],
+      component: lazy(() => import('./CheckPickupPage')),
+    },
+    {
+      path: '/cashiering/print',
+      label: 'Batch Print',
+      icon: Printer,
+      permission: 'CASH_PRINT',
+      component: lazy(() => import('./BatchPrintPage')),
+    },
+    {
+      path: '/cashiering/cwt',
+      label: 'BIR 2307',
+      icon: FileStack,
+      permission: 'CWT_PROCESS',
+      alsoPermissions: ['CWT_TAG', 'DISB_PROCESS'],
+      component: lazy(() => import('./Cwt2307Page')),
+    },
+    {
+      path: '/cashiering/commission-ors',
+      label: 'Commission ORs',
+      icon: ReceiptText,
+      permission: 'CASH_UPLOAD',
+      alsoPermissions: ['CASH_RECEIPT'],
+      component: lazy(() => import('./CommissionOrsPage')),
+    },
+    {
+      path: '/cashiering/series',
+      label: 'Receipt Series',
+      icon: Hash,
+      permission: 'CASH_SERIES_MANAGE',
+      alsoPermissions: ['MASTER_AUTHORIZE', 'CASH_RECEIPT'],
+      component: lazy(() => import('./ReceiptSeriesPage')),
+    },
+    {
+      path: '/cashiering/setup',
+      label: 'Cashiering Setup',
+      icon: Settings2,
+      permission: 'CASH_APPROVE',
+      alsoPermissions: ['CASH_RECEIPT'],
+      component: lazy(() => import('./CashieringSetupPage')),
     },
   ],
 };

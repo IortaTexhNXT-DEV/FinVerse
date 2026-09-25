@@ -121,7 +121,7 @@ public class DeductionPosting {
       BigDecimal taken,
       Long branchId,
       LocalDate today) {
-    DeductionApplication app = applications.save(new DeductionApplication(d.getId(), batch, taken));
+    DeductionApplication app = applications.save(new DeductionApplication(d, batch, taken));
     app.posted(
         postings.publish(
             new Posting(

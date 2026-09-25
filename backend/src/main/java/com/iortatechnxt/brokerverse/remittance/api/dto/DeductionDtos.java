@@ -102,6 +102,7 @@ public final class DeductionDtos {
    *
    * @param id id
    * @param deductionId deduction
+   * @param deductionNo deduction number
    * @param batchId batch
    * @param batchNo batch number
    * @param sendCycle send cycle of the batch
@@ -113,6 +114,7 @@ public final class DeductionDtos {
   public record ApplicationResponse(
       Long id,
       Long deductionId,
+      String deductionNo,
       Long batchId,
       String batchNo,
       int sendCycle,
@@ -131,6 +133,7 @@ public final class DeductionDtos {
       return new ApplicationResponse(
           a.getId(),
           a.getDeductionId(),
+          a.getDeductionNo(),
           a.getBatchId(),
           a.getBatchNo(),
           a.getSendCycle(),

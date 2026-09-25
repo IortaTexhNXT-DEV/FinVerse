@@ -43,7 +43,45 @@ export function searchFromParams(params: URLSearchParams): InvoiceSearch {
     insurer: value('insurer'),
     from: value('from'),
     to: value('to'),
+    assured: value('assured'),
+    inceptionFrom: value('inceptionFrom'),
+    inceptionTo: value('inceptionTo'),
+    ao: value('ao'),
   };
+}
+
+/** The filters kept when the status tab changes: text, insurer, dates, assured and officer. */
+export function keptFilters(s: InvoiceSearch): InvoiceSearch {
+  return {
+    q: s.q,
+    insurer: s.insurer,
+    from: s.from,
+    to: s.to,
+    assured: s.assured,
+    inceptionFrom: s.inceptionFrom,
+    inceptionTo: s.inceptionTo,
+    ao: s.ao,
+  };
+}
+
+/** The filter fields of the invoice search panel, in display order. */
+export const FILTER_FIELDS: readonly {
+  key: 'insurer' | 'assured' | 'ao' | 'from' | 'to' | 'inceptionFrom' | 'inceptionTo';
+  label: string;
+  date: boolean;
+}[] = [
+  { key: 'insurer', label: 'Insurer Code', date: false },
+  { key: 'assured', label: 'Name of Assured', date: false },
+  { key: 'ao', label: 'Account Officer', date: false },
+  { key: 'from', label: 'Booked From', date: true },
+  { key: 'to', label: 'Booked To', date: true },
+  { key: 'inceptionFrom', label: 'Inception From', date: true },
+  { key: 'inceptionTo', label: 'Inception To', date: true },
+];
+
+/** How many panel filters are set (shown on the Filters button). */
+export function activeFilterCount(s: InvoiceSearch): number {
+  return FILTER_FIELDS.filter((f) => (s[f.key] ?? '') !== '').length;
 }
 
 /** The tab matching a URL's criteria, ALL when none matches exactly. */

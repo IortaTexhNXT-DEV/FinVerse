@@ -4,6 +4,7 @@ import {
   SECTION_ROUTES,
   componentLabel,
   flagChips,
+  familyTotals,
   invoiceTabs,
   premiumTotals,
   safeUrl,
@@ -84,6 +85,7 @@ describe('operations labels', () => {
     expect(tabs.map((t) => t.id)).toEqual([
       'components',
       'movements',
+      'family',
       'receipts',
       'remittances',
       'adjustments',
@@ -95,5 +97,16 @@ describe('operations labels', () => {
     expect(tabs.find((t) => t.id === 'receipts')?.label).toBe('Receipts (2)');
     expect(tabs.find((t) => t.id === 'commission')?.label).toBe('Commission');
     expect(invoiceTabs({ DOCUMENTS: [item] }).at(-1)?.label).toBe('Documents (1)');
+  });
+
+  it('totals the invoice family', () => {
+    expect(
+      familyTotals([
+        { grossPremium: 1000.1, premiumBalance: 0 },
+        { grossPremium: 200.2, premiumBalance: 200.2 },
+        { grossPremium: -300, premiumBalance: -300 },
+      ]),
+    ).toEqual({ gross: 900.3, outstanding: -99.8 });
+    expect(familyTotals([])).toEqual({ gross: 0, outstanding: 0 });
   });
 });

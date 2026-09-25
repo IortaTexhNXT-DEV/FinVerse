@@ -25,10 +25,11 @@ export const OPERATIONS_HELP: HelpSection = {
       name: 'Invoice Search',
       path: '/operations/invoices',
       summary:
-        'Every invoice of the ledger with its outstanding premium, payment status, remittance status and flags; open one for its invoice 360: components and balances, insurer shares, movements, one tab per Operations module (receipts, remittances, adjustments, reconciliation, commission) with its record count, history and documents.',
+        'Every invoice of the ledger with its outstanding premium, payment status, remittance status and flags; open one for its invoice 360: components and balances, insurer shares, movements, the invoice family, one tab per Operations module (receipts, remittances, adjustments, reconciliation, commission) with its record count, history and documents.',
       workflow: [
         'Search by invoice number, ARN, policy number, client code or assured name, or pick a tab (Outstanding, Paid Not Extracted, On Hold, Locked, Direct Payment).',
-        'Filters narrow the list by insurer and booking date.',
+        'Filters narrow the list by insurer, name of assured, account officer, booking date and inception date.',
+        'The Invoice Family tab lists the original booking with its endorsements and cancellation under one root invoice number, with the family totals (DIS 3.27.2).',
       ],
       controls: [
         'Balances are booked + adjusted - applied + reversed - remitted - written off, per component.',

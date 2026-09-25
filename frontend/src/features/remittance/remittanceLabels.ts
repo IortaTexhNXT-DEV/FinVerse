@@ -90,6 +90,8 @@ export function totalsOf(lines: readonly BatchLine[]): Amounts {
     incentive: 0,
     incentiveVat: 0,
     netDue: 0,
+    cpc2: 0,
+    cpc2Vat: 0,
     payable: 0,
   };
   return lines
@@ -104,6 +106,8 @@ export function totalsOf(lines: readonly BatchLine[]): Amounts {
         incentive: round(sum.incentive + l.amounts.incentive),
         incentiveVat: round(sum.incentiveVat + l.amounts.incentiveVat),
         netDue: round(sum.netDue + l.amounts.netDue),
+        cpc2: round(sum.cpc2 + l.amounts.cpc2),
+        cpc2Vat: round(sum.cpc2Vat + l.amounts.cpc2Vat),
         payable: round(sum.payable + l.amounts.payable),
       }),
       zero,

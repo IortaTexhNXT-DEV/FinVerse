@@ -88,6 +88,10 @@ export interface OpsInvoiceSummary {
   paymentStatus: PaymentStatus;
   remittanceStatus: RemittanceStatus;
   flags: InvoiceFlags;
+  inceptionDate?: string;
+  aoUsername?: string;
+  /** Root of the invoice family (DIS 3.27.2). */
+  rootInvoiceNo?: string;
 }
 
 export interface InvoiceComponentRow {
@@ -223,6 +227,12 @@ export interface InvoiceSearch {
   insurer?: string;
   from?: string;
   to?: string;
+  /** Part of the assured name (DIS 3.27.2). */
+  assured?: string;
+  inceptionFrom?: string;
+  inceptionTo?: string;
+  /** Account officer. */
+  ao?: string;
 }
 
 export interface Disbursement {

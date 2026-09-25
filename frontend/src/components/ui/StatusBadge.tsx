@@ -47,6 +47,8 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'NEGOTIATED',
     'DEBITED',
     'CREDITED',
+    // remittance deductions
+    'APPLIED',
   ],
   warning: [
     'PENDING_AUTHORIZATION',
@@ -90,6 +92,8 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'FOR_REACTIVATION',
     'FOR_APPROVAL_1',
     'FOR_APPROVAL_2',
+    // remittance deductions
+    'FOR_CONFIRMATION',
   ],
   // BDO style guide: blue pills for records moving through processing ("Account for Placement").
   info: [
@@ -146,6 +150,8 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     // disbursement
     'NOT_POSTED',
     'EXHAUSTED',
+    // remittance: settled by deductions, no payment request
+    'NOT_REQUIRED',
   ],
   danger: [
     'REJECTED',

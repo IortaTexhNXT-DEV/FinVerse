@@ -235,11 +235,12 @@ export function IncentiveRuleDialog({
 }
 
 const RECIPIENTS: SiRecipient[] = ['INSURER', 'INTERNAL'];
-const TRIGGERS: SiTrigger[] = ['ON_BOOKING', 'ON_ENDORSEMENT', 'MANUAL'];
+const TRIGGERS: SiTrigger[] = ['ON_BOOKING', 'ON_ENDORSEMENT', 'MANUAL', 'ON_INCENTIVE'];
 const TRIGGER_LABELS: Record<SiTrigger, string> = {
   ON_BOOKING: 'On booking',
   ON_ENDORSEMENT: 'On endorsement',
   MANUAL: 'Manual',
+  ON_INCENTIVE: 'On early incentive (remittance)',
 };
 
 /** Add or change a service invoice type (BRNB.100). */

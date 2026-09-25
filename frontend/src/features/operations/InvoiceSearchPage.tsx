@@ -18,7 +18,16 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
 import { FlagChips } from './OpsParts';
-import { SEARCH_TABS, orUndefined, searchFromParams, tabFilter, tabOf } from './invoiceSearch';
+import {
+  FILTER_FIELDS,
+  SEARCH_TABS,
+  activeFilterCount,
+  keptFilters,
+  orUndefined,
+  searchFromParams,
+  tabFilter,
+  tabOf,
+} from './invoiceSearch';
 import type { SearchTab } from './invoiceSearch';
 
 const COLUMNS: Column<OpsInvoiceSummary>[] = [
@@ -43,7 +52,17 @@ const COLUMNS: Column<OpsInvoiceSummary>[] = [
     ),
   },
   { key: 'insurer', header: 'Insurer', render: (i) => i.insurerCode },
-  { key: 'date', header: 'Booking Date', render: (i) => formatDate(i.bookingDate) },
+  {
+    key: 'date',
+    header: 'Booked / Inception',
+    render: (i) => (
+      <>
+        {formatDate(i.bookingDate)}
+        <div className="ops-muted">{formatDate(i.inceptionDate)}</div>
+      </>
+    ),
+  },
+  { key: 'ao', header: 'Account Officer', render: (i) => i.aoUsername ?? '' },
   {
     key: 'gross',
     header: 'Gross Premium',
@@ -65,53 +84,44 @@ const COLUMNS: Column<OpsInvoiceSummary>[] = [
   { key: 'flags', header: 'Flags', render: (i) => <FlagChips flags={i.flags} /> },
 ];
 
+type FilterKey = (typeof FILTER_FIELDS)[number]['key'];
+
 function Filters({
   search,
   onApply,
 }: Readonly<{ search: InvoiceSearch; onApply: (patch: InvoiceSearch) => void }>) {
-  const [insurer, setInsurer] = useState(search.insurer ?? '');
-  const [from, setFrom] = useState(search.from ?? '');
-  const [to, setTo] = useState(search.to ?? '');
+  const [values, setValues] = useState<Record<FilterKey, string>>(() => {
+    const initial = {} as Record<FilterKey, string>;
+    FILTER_FIELDS.forEach((f) => {
+      initial[f.key] = search[f.key] ?? '';
+    });
+    return initial;
+  });
   return (
     <form
       className="ops-toolbar"
       onSubmit={(e) => {
         e.preventDefault();
-        onApply({ insurer: orUndefined(insurer), from: orUndefined(from), to: orUndefined(to) });
+        const patch: InvoiceSearch = {};
+        FILTER_FIELDS.forEach((f) => {
+          patch[f.key] = orUndefined(values[f.key]);
+        });
+        onApply(patch);
       }}
     >
-      <Field label="Insurer Code">
-        {(id) => (
-          <input
-            id={id}
-            className="input"
-            value={insurer}
-            onChange={(e) => setInsurer(e.target.value)}
-          />
-        )}
-      </Field>
-      <Field label="Booked From">
-        {(id) => (
-          <input
-            id={id}
-            type="date"
-            className="input"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-          />
-        )}
-      </Field>
-      <Field label="Booked To">
-        {(id) => (
-          <input
-            id={id}
-            type="date"
-            className="input"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-          />
-        )}
-      </Field>
+      {FILTER_FIELDS.map((f) => (
+        <Field key={f.key} label={f.label}>
+          {(id) => (
+            <input
+              id={id}
+              type={f.date ? 'date' : 'text'}
+              className="input"
+              value={values[f.key]}
+              onChange={(e) => setValues({ ...values, [f.key]: e.target.value })}
+            />
+          )}
+        </Field>
+      ))}
       <Button type="submit" variant="secondary">
         Apply Filters
       </Button>
@@ -120,9 +130,9 @@ function Filters({
 }
 
 /**
- * Invoice search of the Operations ledger (RMTID.026, ADJID.024): every booked invoice and
- * endorsement with its outstanding premium, payment and remittance status and flags; open one for
- * its invoice 360.
+ * Invoice search of the Operations ledger (RMTID.026, ADJID.024, DIS 3.27.2): every booked invoice
+ * and endorsement with its outstanding premium, payment and remittance status and flags, filtered by
+ * insurer, assured, account officer, booking and inception dates; open one for its invoice 360.
  */
 export default function InvoiceSearchPage() {
   const companyId = useCompanyId();
@@ -142,7 +152,8 @@ export default function InvoiceSearchPage() {
     setSearch(next);
     setPage(0);
   };
-  const keep = { q: search.q, insurer: search.insurer, from: search.from, to: search.to };
+  const keep = keptFilters(search);
+  const filters = activeFilterCount(search);
   return (
     <div className="stack">
       <PageHeader
@@ -171,7 +182,7 @@ export default function InvoiceSearchPage() {
             <input
               id="ops-invoice-search"
               className="input"
-              placeholder="Search Invoice No., ARN, policy or client"
+              placeholder="Search Invoice No., ARN, policy, client or assured"
               value={text}
               onChange={(e) => setText(e.target.value)}
             />
@@ -183,7 +194,7 @@ export default function InvoiceSearchPage() {
               icon={<Filter size={14} />}
               onClick={() => setShowFilters(!showFilters)}
             >
-              Filters
+              {filters > 0 ? `Filters (${filters})` : 'Filters'}
             </Button>
           </form>
           {showFilters && (

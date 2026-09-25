@@ -74,6 +74,9 @@ function Summary({ invoice: i }: Readonly<{ invoice: BookedInvoice }>) {
           <ReferenceChip label="Invoice" value={i.invoiceNo ?? i.transactionNo} />
           <ReferenceChip label="ARN" value={i.arn} />
           {i.endorsementNo && <ReferenceChip label="Endorsement" value={i.endorsementNo} />}
+          {i.rootInvoiceNo !== undefined && i.rootInvoiceNo !== i.invoiceNo && (
+            <ReferenceChip label="Root Invoice" value={i.rootInvoiceNo} />
+          )}
           <StatusBadge status={i.status} />
           {i.flags.directPayment && <StatusBadge status="DIRECT_PAYMENT" />}
           {i.flags.cwt2Percent && <StatusBadge status="CWT_2_PERCENT" />}

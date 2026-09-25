@@ -50,6 +50,7 @@ export const BOOKING_HELP: HelpSection = {
       controls: [
         'Numbers follow a gap-free series per branch and year (SI-branch-year).',
         'The owner of the type is notified when the e-mail is sent or fails, with the reason.',
+        'Early-incentive invoices (type EARLY_INCENTIVE, 2% withholding tax) are issued automatically when a remittance batch with incentives is approved and cannot be issued by hand (DIS 3.29.1).',
       ],
     },
     {

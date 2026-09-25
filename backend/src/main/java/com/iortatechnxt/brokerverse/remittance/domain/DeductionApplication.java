@@ -19,6 +19,9 @@ public class DeductionApplication extends BaseEntity {
   @Column(name = "deduction_id", nullable = false, updatable = false)
   private Long deductionId;
 
+  @Column(name = "deduction_no", nullable = false, length = 30, updatable = false)
+  private String deductionNo;
+
   @Column(name = "batch_id", nullable = false, updatable = false)
   private Long batchId;
 
@@ -45,12 +48,14 @@ public class DeductionApplication extends BaseEntity {
   /**
    * A consumption.
    *
-   * @param deductionId deduction
+   * @param deduction deduction
    * @param batch batch
    * @param amount amount consumed
    */
-  public DeductionApplication(Long deductionId, RemittanceBatch batch, BigDecimal amount) {
-    this.deductionId = deductionId;
+  public DeductionApplication(
+      RemittanceDeduction deduction, RemittanceBatch batch, BigDecimal amount) {
+    this.deductionId = deduction.getId();
+    this.deductionNo = deduction.getDeductionNo();
     this.batchId = batch.getId();
     this.batchNo = batch.getBatchNo();
     this.sendCycle = batch.getSettlement().getSendCycle();
@@ -78,6 +83,10 @@ public class DeductionApplication extends BaseEntity {
 
   public Long getDeductionId() {
     return deductionId;
+  }
+
+  public String getDeductionNo() {
+    return deductionNo;
   }
 
   public Long getBatchId() {

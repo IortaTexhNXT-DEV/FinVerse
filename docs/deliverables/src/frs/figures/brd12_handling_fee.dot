@@ -1,0 +1,21 @@
+// BRD-12: handling-fee tagging (FRS section 5.5; BRIDSP-31).
+digraph sp_fee {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.45, ranksep=0.4, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@WHITE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=13, fontcolor="@NEAR_BLACK", width=2.8, height=0.65];
+  edge  [color="@MUTED", arrowsize=0.7, fontname="Arial", fontsize=11.5, fontcolor="@TEXT"];
+
+  rec   [label="Handling-fee record BILLED\n(PN, location ref, amount)", fillcolor="@BG_BLUE"];
+  upp   [label="Unapplied payment\n(channel CLPC or OTC)", fillcolor="@DIRTY_WHITE"];
+  tag   [label="Tagger (every 30 minutes)\nCLPC: PN; OTC: location ref", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+  req   [label="Disposition request\nRECOGNIZE_INCOME (HANDLING_FEE)"];
+  csh   [label="Cashiering applies it;\nOR issued", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  man   [label="Unmatched / ambiguous:\nUPP handler (Collections view)", fillcolor="@AMBER_BG"];
+
+  rec -> tag; upp -> tag;
+  tag -> req [label=" one match: TAGGED"];
+  req -> csh [label=" APPLIED"];
+  tag -> man [style=dashed, label=" no match"];
+  { rank=same; rec; upp; }
+  { rank=same; req; man; }
+}

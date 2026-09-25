@@ -204,7 +204,7 @@ class CommissionIT {
                 collection.collect(
                     billing.getId(), new CollectRequest(null, BANK, "CERT-" + dp.getInvoiceNo())));
     assertThat(closed.getStage()).isEqualTo("CLOSED");
-    assertThat(closed.getOrStatus()).isEqualTo("DEFERRED");
+    assertThat(closed.getOrStatus()).isEqualTo("ISSUED");
     DpItem reversed = fx.reload(item);
     assertThat(reversed.getTag()).isEqualTo(DpTag.PR_REVERSED);
     assertThat(reversed.getCollectedAmount()).isEqualByComparingTo(item.getNetCommission());

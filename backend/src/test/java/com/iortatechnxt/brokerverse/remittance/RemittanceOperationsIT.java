@@ -228,7 +228,7 @@ class RemittanceOperationsIT {
             line.getBasicPremium()
                 .multiply(new BigDecimal("0.02"))
                 .setScale(2, java.math.RoundingMode.HALF_EVEN));
-    assertThat(batch.getIncentiveOrStatus()).isEqualTo("DEFERRED");
+    assertThat(batch.getIncentiveOrStatus()).isEqualTo("ISSUED");
     DisbursementRequest request = queue.find("REMITTANCE", batch.getBatchNo()).orElseThrow();
     assertThat(request.getAmount())
         .isEqualByComparingTo(

@@ -2,7 +2,6 @@ package com.iortatechnxt.brokerverse.adjustment;
 
 import static com.iortatechnxt.brokerverse.adjustment.AdjustmentFixtures.FROM;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.adjustment.domain.AmountInput;
 import com.iortatechnxt.brokerverse.adjustment.domain.BatchOutcome;
@@ -14,7 +13,6 @@ import com.iortatechnxt.brokerverse.adjustment.service.AdjustmentPostingService;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
 import com.iortatechnxt.brokerverse.booking.domain.PremiumComponents;
 import com.iortatechnxt.brokerverse.catalog.service.PremiumCalculator;
-import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.opsledger.CapturedLedgerEvents;
 import com.iortatechnxt.brokerverse.opsledger.domain.InvoiceFlag;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
@@ -189,7 +187,11 @@ class AdjustmentPostingIT {
   }
 
   @Test
-  void aDecreaseOfAPaidInvoiceWaitsForCashieringToReapplyThePayments() {
+  void aDecreaseOfAPaidInvoiceIsReappliedByCashieringAndPosted() {
+    // Cashiering provides the PaymentReapplier: the request no longer waits for re-application.
+    // The fixture pays through ledger movements only (no cashiering receipt application), so the
+    // re-applier finds nothing to reverse and the request completes; the re-application of real
+    // receipts is covered by AdjustmentReapplierIT and the cashiering tests.
     OpsInvoice invoice = fx.invoice();
     fx.payInFull(invoice);
     EndorsementRequest request =
@@ -202,19 +204,12 @@ class AdjustmentPostingIT {
 
     assertThat(batch.getLines())
         .singleElement()
-        .satisfies(l -> assertThat(l.outcome()).isEqualTo(BatchOutcome.AWAITING_REAPPLICATION));
-    assertThat(batch.getPendingCount()).isEqualTo(1);
-    EndorsementRequest pending = fx.reload(request);
-    assertThat(pending.getStage()).isEqualTo(RequestStage.AWAITING_REAPPLICATION);
-    assertThat(pending.trail().completedAt()).isNull();
-    OpsInvoice original = fx.reload(invoice);
-    assertThat(original.isPendingNegAdj()).isTrue();
-    assertThat(original.getLockOwner()).isNull();
-    assertThat(original.premiumBalance()).isEqualByComparingTo(invoice.getGrossPremium().negate());
-    assertThatThrownBy(
-            () -> as.run(AdjustmentFixtures.PROCESSOR, () -> posting.reapply(request.getId())))
-        .isInstanceOf(BusinessRuleException.class)
-        .hasFieldOrPropertyWithValue("code", "PAYMENT_REAPPLIER_UNAVAILABLE");
+        .satisfies(l -> assertThat(l.outcome()).isNotEqualTo(BatchOutcome.AWAITING_REAPPLICATION));
+    assertThat(batch.getPendingCount()).isZero();
+    EndorsementRequest posted = fx.reload(request);
+    assertThat(posted.getStage()).isNotEqualTo(RequestStage.AWAITING_REAPPLICATION);
+    assertThat(posted.trail().completedAt()).isNotNull();
+    assertThat(fx.reload(invoice).getLockOwner()).isNull();
   }
 
   @Test

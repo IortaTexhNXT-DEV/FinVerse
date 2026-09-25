@@ -180,7 +180,7 @@ class RemittanceIT {
     assertThat(approved.getStage()).isEqualTo(BatchStage.APPROVED);
     assertThat(approved.getApprovedBy()).isEqualTo(REMITTL);
     assertThat(approved.getDisbursementRequestNo()).startsWith("DSQ-");
-    assertThat(approved.getCommissionOrStatus()).isEqualTo("DEFERRED");
+    assertThat(approved.getCommissionOrStatus()).isEqualTo("ISSUED");
     BatchLine line = approved.line(paid.getInvoiceNo());
     assertThat(line.getJournalBatchNo()).isNotBlank();
 

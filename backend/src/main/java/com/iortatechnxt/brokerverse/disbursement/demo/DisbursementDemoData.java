@@ -1,17 +1,18 @@
 package com.iortatechnxt.brokerverse.disbursement.demo;
 
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.DisbursementMode;
+import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.InstrumentStatus;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeSource;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.RequestSource;
 import com.iortatechnxt.brokerverse.disbursement.domain.FundingRequest;
 import com.iortatechnxt.brokerverse.disbursement.domain.FundingRequest.FundingTerms;
-import com.iortatechnxt.brokerverse.disbursement.domain.Instrument;
 import com.iortatechnxt.brokerverse.disbursement.domain.IntakeRequest;
 import com.iortatechnxt.brokerverse.disbursement.domain.IntakeRequest.RequestFacts;
 import com.iortatechnxt.brokerverse.disbursement.domain.Payee;
 import com.iortatechnxt.brokerverse.disbursement.domain.Payee.PayeeDetails;
 import com.iortatechnxt.brokerverse.disbursement.domain.PayeeAccount.AccountDetails;
 import com.iortatechnxt.brokerverse.disbursement.domain.VoucherRepository;
+import com.iortatechnxt.brokerverse.disbursement.service.DisbursementSettings;
 import com.iortatechnxt.brokerverse.disbursement.service.EodService;
 import com.iortatechnxt.brokerverse.disbursement.service.FundingService;
 import com.iortatechnxt.brokerverse.disbursement.service.InstrumentActions;
@@ -34,7 +35,9 @@ import com.iortatechnxt.brokerverse.remittance.service.BatchService;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -269,18 +272,25 @@ public class DisbursementDemoData implements ApplicationRunner {
   }
 
   private void negotiated() {
+    // Only a printed or released check can be negotiated; which check vouchers have reached that
+    // point depends on the end-of-day cut-off (Manila time), so pick one that has, not the first.
+    Set<InstrumentStatus> negotiable =
+        EnumSet.of(InstrumentStatus.PRINTED, InstrumentStatus.RELEASED);
     vouchers.findAll().stream()
         .filter(v -> v.getEodRunId() != null && v.getMode() == DisbursementMode.CHECK)
+        .map(v -> users.as(PROCESSOR, () -> instrumentService.forVoucher(v.getId())))
+        .filter(check -> negotiable.contains(check.getStatus()))
         .findFirst()
         .ifPresent(
-            v -> {
-              Instrument check = users.as(PROCESSOR, () -> instrumentService.forVoucher(v.getId()));
-              users.run(
-                  PROCESSOR,
-                  () ->
-                      uploads.negotiated(
-                          check.getInstrumentNo(), check.getAmount(), "Deposited (demo)", "DEMO"));
-            });
+            check ->
+                users.run(
+                    PROCESSOR,
+                    () ->
+                        uploads.negotiated(
+                            check.getInstrumentNo(),
+                            check.getAmount(),
+                            "Deposited (demo)",
+                            "DEMO")));
   }
 
   private void refund(Long companyId) {
@@ -384,8 +394,9 @@ public class DisbursementDemoData implements ApplicationRunner {
     users.run("disbappr2", () -> funding.approve(f.getId(), APPROVED, "BOB-DEMO-0001"));
   }
 
+  /** The business day in Manila: end of day and its cut-off work on the Philippine date. */
   private LocalDate today() {
-    return LocalDate.now(clock);
+    return LocalDate.now(clock.withZone(DisbursementSettings.MANILA));
   }
 
   private static void step(String name, Runnable work) {

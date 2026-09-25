@@ -2,6 +2,7 @@ import type { HelpSection } from '@/features/help/helpContent';
 import { BILLING_HELP } from './billing/helpEntries';
 import { ESCALATION_HELP } from './escalations/helpEntries';
 import { PLAN_HELP } from './plans/helpEntries';
+import { UNAPPLIED_HELP } from './unapplied/helpEntries';
 
 /** In-app help of the Collections screens (BRCLXN.001-060), in sidebar order. */
 export const COLLECTIONS_HELP: HelpSection = {
@@ -40,6 +41,7 @@ export const COLLECTIONS_HELP: HelpSection = {
     ...PLAN_HELP,
     ...ESCALATION_HELP,
     ...BILLING_HELP,
+    ...UNAPPLIED_HELP,
     {
       name: 'Assignments',
       path: '/collections/assignments',

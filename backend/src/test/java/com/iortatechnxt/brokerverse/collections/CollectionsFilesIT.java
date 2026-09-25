@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.collections.files.domain.ScheduledFile.Frequ
 import com.iortatechnxt.brokerverse.collections.files.domain.ScheduledFile.Spec;
 import com.iortatechnxt.brokerverse.collections.files.domain.ScheduledFile.Status;
 import com.iortatechnxt.brokerverse.collections.files.service.CollectionFiles;
+import com.iortatechnxt.brokerverse.collections.files.service.FilePeriods;
 import com.iortatechnxt.brokerverse.collections.files.service.ScheduledFileService;
 import com.iortatechnxt.brokerverse.collections.report.ActivityReports;
 import com.iortatechnxt.brokerverse.collections.report.ItemReports;
@@ -67,7 +68,7 @@ class CollectionsFilesIT {
   @Test
   void dailyFilesArePublishedAvailableAtOnceAndOncePerDay() {
     fx.listedMotor();
-    LocalDate today = LocalDate.now();
+    LocalDate today = LocalDate.now(FilePeriods.MANILA);
     List<ScheduledFile> daily =
         as.run(CollectionsFixtures.LEAD, () -> files.daily(fx.company(), today));
     assertThat(daily)
@@ -91,7 +92,9 @@ class CollectionsFilesIT {
   @Test
   void weeklyAndMonthlyFilesWaitForTheirAvailabilityTime() {
     tagDp(fx.listedMotor());
-    LocalDate today = LocalDate.now();
+    // Files work on the Philippine calendar (tags are dated in Manila), so "today" must be too:
+    // from 16:00 UTC the Manila date is already the next day.
+    LocalDate today = LocalDate.now(FilePeriods.MANILA);
     LocalDate friday = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
     List<ScheduledFile> weekly =
         as.run(CollectionsFixtures.LEAD, () -> files.weekly(fx.company(), friday));

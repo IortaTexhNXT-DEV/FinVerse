@@ -12,6 +12,7 @@ import type { FeatureModule } from '@/navigation/types';
 import { BILLING_SCREENS } from './billing/screens';
 import { ESCALATION_SCREENS } from './escalations/screens';
 import { PLAN_SCREENS } from './plans/screens';
+import { UNAPPLIED_SCREENS } from './unapplied/screens';
 
 /**
  * Collections (BRD-4, BRCLXN.001-060; docs/architecture/COLLECTIONS_DESIGN.md section 11): the
@@ -58,6 +59,7 @@ export const collectionsModule: FeatureModule = {
     ...PLAN_SCREENS,
     ...ESCALATION_SCREENS,
     ...BILLING_SCREENS,
+    ...UNAPPLIED_SCREENS,
     {
       path: '/collections/assignments',
       label: 'Assignments',

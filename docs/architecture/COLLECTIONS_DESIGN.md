@@ -478,3 +478,58 @@ differs from or details the sections above. C1-A, C1-B and C1-C build on this an
   `docs/operations/CONFIGURATION.md`; each job reads its cron with `@Value("${brokerverse.jobs.<property>:-}")`.
 - **Flyway left to the build waves.** V1001-V1005 as in section 3 (C1-A V1001 / V1005 / demo V1900, C1-B V1002 / V1003
   / demo V1901, C1-C V1004); V1006-V1009 free.
+
+### C1-B as built
+
+Wave C1-B (Collections plans and escalation) built BRCLXN.049-051, 053-055 and 058 / 060 in
+`collections/{installment,promise,escalation,billing,bulk}` and `collections.demo`, without reading the worklist of wave
+C1-A: an invoice is a collection account when it is a client receivable of the ledger (not direct payment, not
+cancelled) with a premium balance above `CLX_MIN_BALANCE_THRESHOLD`. The worklist item (`clx_item`) is referenced by its
+plain keys (invoice no., ARN, client code); balances are read from `opsledger` (`InvoiceLedgerQueryService`, and one
+read-only SQL over `ops_invoice` / `ops_invoice_component` in `escalation.service.EscalationCandidates`).
+
+| BR ID | As built |
+|---|---|
+| BRCLXN.053 | `clx_installment_plan` / `clx_installment` (V1002). A plan is `POLICY_YEARS` (every BOOKING policy-year invoice of an ARN, booked in the ledger or still `SCHEDULED` in booking, split in the cycles of the frequency within its coverage year; the gross premium of a booked year, the premium total of a scheduled one), `GENERATED` (the outstanding of one invoice in N equal installments from a first due date) or `MANUAL` (entered installments that must add up to the outstanding). One live plan per invoice and per policy-year account (partial unique indexes). Installment status NOT_DUE / DUE / OVERDUE / PARTIAL / PAID, `overdue_since`; the plan completes when every installment is paid |
+| BRCLXN.054 | `PlanAllocation`: per invoice of the plan, the settled amount (installments total less the ledger outstanding, so payments, reversals, 2307 reclass, DP reversal and write-offs all count) is allocated oldest due first; policy years booked since the plan was made are linked to their invoice first. Run by `CLX_PROMISE_CHECK` for every live plan, on "Refresh Allocation" and before an SOA |
+| BRCLXN.055 | `clx_promise` (V1002): invoice, optional installment, `promised_on` (day of the promise, not in the future), `promised_date`, amount (default the whole outstanding, never above it). A new promise on the same invoice evaluates the expired one or supersedes the running one. `CLX_PROMISE_CHECK` evaluates promises whose date plus `CLX_PROMISE_GRACE_DAYS` is before the business date: KEPT when the payments applied (APPLIED less UNAPPLIED on the PR components, value date from `promised_on` to the deadline) reach the amount or nothing is left to collect, PARTIALLY_KEPT when some was paid, else BROKEN (rule to confirm, CQ16). A broken promise notifies the recorder and the AO (`CLX_PROMISE_BROKEN`) and publishes `PromiseBroken` |
+| BRCLXN.049 | `clx_escalation_rule` (V1003, maker-checker: `CLX_SETUP` maintains, `MASTER_AUTHORIZE` authorizes, inbox source `EscalationApprovalSource`), bases AGING_FROM_BOOKING / AGING_FROM_INCEPTION / NO_COMMITMENT_BY_DAY (no OPEN promise) / BROKEN_PROMISES_COUNT / INSTALLMENT_OVERDUE_DAYS / AMOUNT_OVER, filters segment / sales unit / product line / outstanding range, target TL / UH / SECTION_HEAD / USER, reason, SLA hours, notify, effective dates. Job `CLX_ESCALATION` (`EscalationJob`, cron `clx-escalation-cron`) raises one case per rule, invoice and month (`dedup_key`, and none while one of the rule is open), then closes open cases whose invoices are collected (`auto_close`). `EscalationEngine` also listens to `PromiseBroken` and applies the BROKEN_PROMISES_COUNT rules at once: **a broken promise escalates to the team lead** (demo rule `CLX-BROKEN-PROMISE` → `mkttl`). `EscalationOverdueCheck` (alert job) raises `CLX_ESCALATION_OVERDUE` past the SLA of the case |
+| BRCLXN.050 | `clx_escalation` / `clx_escalation_item` (V1003), workflow `CLX_ESCALATION` (V1000): a case starts in RAISED and is routed at once (`route` to WITH_TL for TL / USER, `route_to_head` to WITH_UH for UH / SECTION_HEAD; system action for rules, user action for manual escalations), assigned to the designated user when there is one, else it waits in the stage queue and every `CLX_ESCALATION_HANDLE` holder is notified (`CLX_ESCALATED`, with the AOs of the invoices). Manual escalation groups the selected invoices by ARN, one case per account (`POST /api/v1/collections/bulk/escalate`, `CLX_ESCALATE`). Business actions `escalate_further` (reason `CLX_ESCALATION_REASON`; the case moves to the unit / section head queue), `resolve` (resolution required), `resubmit`; `acknowledge` and `return_to_handler` run from the workflow panel. The stage is mirrored by an `@EventListener` on `WorkCaseTransitioned` |
+| BRCLXN.051 | Bulk update handler `CLX_BULK_UPDATE` (`CollectionsBulkUpdateHandler`, permission `CLX_BULK_UPDATE`): per row a promise, an escalation (Escalate = Y, level, user, reason) and, through the port `WorklistUpdates`, the disposition, effort and remarks; each row validated and committed on its own, the upload number is the `bulk_ref` of every record. In-grid bulk actions `POST /api/v1/collections/bulk/{escalate,promises}` return one outcome per invoice (`ItemResult`) |
+| BRCLXN.058 / 060 | `clx_billing_statement` / `_line` / `clx_billing_document` (V1002), `SOA-<yyyy>` numbers, one live SOA per plan and cycle: the cycle's installment (CURRENT) and every earlier unpaid one (ARREARS) with the allocation of the day; PDF from the docgen template `CLX_SOA` (seeded in V1002, version recorded); billing run for the cycles due in a period; e-mail through the messaging outbox with a password-protected PDF (`SoaDispatch`); cancel to bill the cycle again. An SOA creates no receivable and no CR billing |
+
+- **Reports** (`escalation.report.PlanAndEscalationReports`, `ReportMetadata.collections`): `CLX-ESCALATIONS`,
+  `CLX-BROKEN-PROMISES`, `CLX-INSTALLMENTS-DUE` (draft layouts, CQ22).
+- **API** (`/api/v1/collections`): `plans` (list, detail, `by-account`, `installments/due`, `policy-years`, `generated`,
+  `manual`, `{id}/refresh`, `{id}/cancel`), `promises` (list, `by-invoice/{no}`, record, `{id}/cancel`), `escalations`
+  (list, detail, `by-invoice/{no}`, `{id}/actions/{action}`), `escalation-rules` (list, create, change, authorize,
+  deactivate, `{id}/matches`), `billing/statements` (list, detail, `by-plan/{id}`, generate, `generate-due`,
+  `{id}/document`, `{id}/recipient`, `{id}/send`, `{id}/cancel`), `bulk/escalate`, `bulk/promises`.
+- **Screens** (`features/collections/{plans,escalations,billing}`, exported as `PLAN_SCREENS`, `ESCALATION_SCREENS`,
+  `BILLING_SCREENS` with help entries `PLAN_HELP`, `ESCALATION_HELP`, `BILLING_HELP`, to be registered in
+  `features/collections/module.ts` / `help.ts` by the C1-A owner): Installment Plans (+ record with Installments,
+  Statements of Account and Promises tabs), Installments Due, Promises to Pay, Escalations (+ record with the workflow
+  panel), Escalation Rules, Billing Statements (+ statement record). StatusBadge tones added for WITH_TL, WITH_UH,
+  RETURNED, DUE, PARTIAL, PARTIALLY_KEPT (review), IN_ACTION, NOT_DUE (in process), RESOLVED, KEPT (done), OVERDUE,
+  BROKEN (exception).
+- **Demo.** `db/demo/V1901` seeds the process rules (broken promise → `mkttl`, 45 days from booking → TL, 60th day
+  from inception → UH, installment overdue 15 days → TL) and one rule pending authorization (maker `badmin`). The
+  storyline needs booked invoices, so it runs after the Operations demo as `collections.demo.CollectionsPlansDemoData`
+  (order 110): a three-year PAR01 account for CL-2026-000005 issued (`ao`, `proc`) and booked (`proc`), its annual
+  policy-year plan with **an SOA for each of its three billing cycles** (the first e-mailed), a quarterly plan for
+  ARN-2026-940002, a kept promise on ARN-2026-940004, a running one on the quarterly plan and a broken one on the
+  three-year account that escalated it to `mkttl`, who acknowledged it; the job escalated the overdue installment and
+  `mktcoll` escalated ARN-2026-940004 by hand.
+- **Contracts for the other waves.** Event `promise.service.PromiseBroken(companyId, promiseId, invoiceNo)`; port
+  `bulk.service.WorklistUpdates` (validate / apply the disposition, effort and remarks of an invoice with a bulk
+  reference; default `PendingWorklistUpdates` refuses them) for C1-A to implement with `clx_disposition`,
+  `clx_effort` and `clx_field_change`; read services `PromiseService.forInvoice`, `EscalationService.forInvoice`,
+  `InstallmentPlanService.forAccount`, `BillingStatementService.forPlan` for the account page tabs (Installments &
+  Promises, Escalations, Billing Statements); `LedgerBalances` (outstanding, threshold, payments in a window).
+- **Parked (seam only).** Resolving the team lead / unit head of an account from the sales organisation (CQ14: without
+  a designated user a case waits in the stage queue); the promise rule, grace days and partial payments (CQ16);
+  installment terms from the quotation or the account (CQ15: plans are built in Collections); SOA layout, recipient,
+  numbering and e-mail (CQ18: template `CLX_SOA` and a reviewed e-mail); the account-page tabs, home tiles and the
+  installment refresh inside `CLX_DAILY_REFRESH` belong to C1-A (the promise check allocates the plans meanwhile).
+- **Flyway.** V1002 (plans, installments, promises, statements, SOA template), V1003 (rules, escalations), demo V1901.
+  `CLX_SOA` is seeded here, not in V1005.

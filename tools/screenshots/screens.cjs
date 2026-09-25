@@ -71,6 +71,12 @@ module.exports = [
   { slug: 'disbursement-queue', title: 'Disbursement Queue', user: 'disb', path: '/operations/disbursements' },
   { slug: 'ops-interfaces', title: 'Interfaces (flow-in runs)', user: 'admin', path: '/operations/interfaces' },
   // Finance
+  { slug: 'collections-plans', title: 'Installment Plans', user: 'mktcoll', path: '/collections/plans' },
+  { slug: 'collections-plan', title: 'Installment Plan record', user: 'mktcoll', path: '/collections/plans', open: 'first' },
+  { slug: 'collections-promises', title: 'Promises to Pay', user: 'mktcoll', path: '/collections/promises' },
+  { slug: 'collections-escalations', title: 'Escalations', user: 'mkttl', path: '/collections/escalations' },
+  { slug: 'collections-escalation', title: 'Escalation record', user: 'mkttl', path: '/collections/escalations', open: 'first' },
+  { slug: 'collections-billing', title: 'Billing Statements', user: 'mktcoll', path: '/collections/billing' },
   { slug: 'cashiering-workbench', title: 'Cashiering Workbench', user: 'cashier', path: '/cashiering' },
   { slug: 'receive-payment', title: 'Receive Payment', user: 'cashier', path: '/cashiering/receive' },
   { slug: 'cash-receipts', title: 'Receipts', user: 'cashier', path: '/cashiering/receipts' },

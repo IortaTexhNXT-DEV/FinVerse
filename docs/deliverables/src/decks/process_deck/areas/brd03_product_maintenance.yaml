@@ -1,0 +1,144 @@
+# BRD-3 Product Maintenance (packages): chapter 3 of the business process deck.
+# Sources: "Product Maintenance.pdf" p.12-13 (current and envisioned process), p.33 (NFR); FRS BRD-3 sections 2, 5, 7;
+# discrepancy register (DCR-030, 034, 035, 036, 037, 153); open questions PQ01-PQ21.
+id: brd03
+key: pm
+num: 3
+title: Product Maintenance
+brd: BRD-3
+scope: Package products, from the Package Request Form to release and expiry
+status: BUILT
+status_text: Built; FRS v1.0 issued for review (reference FRS)
+department: Marketing Business Services (MBS) and TSU
+roles:
+  - Marketing AO and Marketing TL / TH / UH
+  - TSU Officer, TSU Team Lead, TSU Head
+  - MBS (package set-up)
+  - ManCom (sign-off)
+  - Business Administrator (release)
+figures:
+  - ['13', 'TSU users, all concurrent; MBS 5 (p.33)']
+  - ['485', 'Marketing users, 145 concurrent (p.33)']
+  - ['< 5 s', 'response for every role (p.33)']
+  - ['99.9%', 'availability; use 07:00-18:30 (p.33)']
+sources:
+  - BRD-3 p.12-13 (current and envisioned process)
+  - BRPM.001-022; workshop addendum PMADD01-06
+  - FRS BRD-3 v1.0, sections 2 and 5
+chevrons: [Request, Approval, TSU review, Negotiation, Comparative, ManCom, Set-up, Release]
+notes:
+  glance: >-
+    A package is a pre-arranged programme whose terms, rates and conditions BDOI negotiates with one or more insurers
+    and then offers through Marketing. Product Maintenance feeds the products and package versions that quotations,
+    accounts and booking read. It is built; FRS BRD-3 is the reference FRS for the pack. The BRD states no volumes
+    (the project assumes tens of package requests a month).
+  pains: The eight points are the current-process rows of the BRD (p.12-13).
+  after: No turnaround targets are given in the BRD; the measures are the controls BIBS adds.
+  gaps: The High incentive item is shared with BRD-2, BRD-4 and BRD-5; the criteria are kept once in Product Maintenance.
+asis:
+  caption: 'Package set-up today (BRD-3 p.12-13)'
+  notes: >-
+    Marketing asks TSU for a package placement by e-mail with a TSU request form. TSU prepares quotation slips and
+    e-mails them to insurers, who reply by e-mail with signed slips or approved terms. The comparative table is compiled
+    in Excel and shared by e-mail. Sign-off and advisories are manual, documents go out without password protection,
+    package expiry is watched in spreadsheets or calendars, and changes and approvals are tracked in e-mail threads.
+  cols: 6
+  lanes:
+    - {id: mkt, label: Marketing AO / TL}
+    - {id: tsu, label: TSU}
+    - {id: ins, label: Insurers, kind: external}
+    - {id: mgt, label: 'ManCom, MBS'}
+    - {id: sys, label: 'Excel, e-mail, calendar', kind: system}
+  steps:
+    - {id: a1, lane: mkt, col: 1, text: Request by e-mail with TSU form, pain: [1]}
+    - {id: a2, lane: tsu, col: 2, text: Quotation slips e-mailed, pain: [2]}
+    - {id: a3, lane: ins, col: 3, text: Reply by e-mail with terms, kind: external, pain: [3]}
+    - {id: a4, lane: sys, col: 3, text: Comparative compiled in Excel, kind: legacy, pain: [4]}
+    - {id: a5, lane: mgt, col: 4, text: Sign-off and advisory by hand, pain: [5]}
+    - {id: a6, lane: sys, col: 4, text: Documents sent without password, kind: legacy, pain: [6]}
+    - {id: a7, lane: sys, col: 5, text: History kept in e-mail threads, kind: legacy, pain: [8]}
+    - {id: a8, lane: sys, col: 6, text: Expiry watched in spreadsheets, kind: legacy, pain: [7]}
+    - {id: a9, lane: mkt, col: 6, text: Renewal asked for when noticed}
+  edges:
+    - [a1, a2, dashed, e-mail]
+    - [a2, a3, dashed]
+    - [a3, a4, dashed]
+    - [a4, a5]
+    - [a5, a6]
+    - [a6, a7]
+    - [a7, a8]
+    - [a8, a9, dashed]
+pains:
+  - {n: 1, title: Requests by e-mail, text: 'Marketing requests placements by e-mail using a TSU request form.', ref: 'BRD-3 p.12; BRPM.008'}
+  - {n: 2, title: Quotation slips by e-mail, text: 'TSU prepares and e-mails the slips; no log of what was sent.', ref: 'BRD-3 p.12; BRPM.010'}
+  - {n: 3, title: Insurer replies in mailboxes, text: 'Signed slips and approved terms arrive by e-mail.', ref: 'BRD-3 p.12; BRPM.012'}
+  - {n: 4, title: Comparative in Excel, text: 'Compiled by hand and shared by e-mail.', ref: 'BRD-3 p.12; BRPM.014; PMADD03'}
+  - {n: 5, title: Manual sign-off and advisory, text: 'ManCom sign-off and the advisory are prepared outside a system.', ref: 'BRD-3 p.12-13; BRPM.015, 016'}
+  - {n: 6, title: Documents without a password, text: 'Shared documents have no password protection.', ref: 'BRD-3 p.13'}
+  - {n: 7, title: Expiry in spreadsheets, text: 'Package expiry is monitored in spreadsheets or calendars.', ref: 'BRD-3 p.13; BRPM.017'}
+  - {n: 8, title: History in e-mail threads, text: 'Changes, approvals and documents are tracked in e-mail and files.', ref: 'BRD-3 p.13'}
+tobe:
+  caption: 'Package lifecycle in BIBS: workflow PM_PACKAGE_REQUEST (FRS BRD-3 sections 2.2 and 5)'
+  notes: >-
+    In BIBS Marketing logs the Package Request Form, which BIBS numbers PKR-yyyy-n. A Marketing TL, TH or UH approves
+    it (never the maker); the TSU TL recommends and the TSU Head approves. TSU prepares the quotation slips, which are
+    approved and e-mailed per insurer, protected and logged. Insurer responses are keyed in with their outcome, over as
+    many rounds as needed. BIBS keeps one comparative master per request and derives client views from it. ManCom
+    signs off, which locks the slips; MBS creates the package version and the TSU Head or Business Administrator
+    releases it. The advisory is drafted on release and sent with the signed package slip. A daily job raises expiry
+    alerts and can draft the renewal request.
+  cols: 7
+  lanes:
+    - {id: mkt, label: Marketing AO / TL}
+    - {id: tsu, label: TSU}
+    - {id: ins, label: Insurers, kind: external}
+    - {id: mgt, label: 'ManCom, MBS, TSU Head'}
+    - {id: bibs, label: BIBS (automatic), kind: bibs}
+  steps:
+    - {id: b1, lane: mkt, col: 1, text: 'Package Request Form (PKR-yyyy-n)'}
+    - {id: b2, lane: mkt, col: 2, text: TL approves; never the maker}
+    - {id: b3, lane: tsu, col: 2, text: TSU TL recommends; Head approves}
+    - {id: b4, lane: bibs, col: 3, text: Slips sent protected per insurer, kind: doc}
+    - {id: b5, lane: ins, col: 4, text: Responds with terms, kind: external}
+    - {id: b6, lane: tsu, col: 4, text: Terms keyed per round}
+    - {id: b7, lane: bibs, col: 5, text: Comparative master and client views, kind: auto}
+    - {id: b8, lane: mgt, col: 5, text: ManCom signs off; slips lock}
+    - {id: b9, lane: mgt, col: 6, text: MBS set-up; TSU Head releases}
+    - {id: b10, lane: bibs, col: 6, text: Advisory with signed package slip, kind: doc}
+    - {id: b11, lane: bibs, col: 7, text: Daily expiry alerts; renewal draft, kind: auto}
+    - {id: b12, lane: mkt, col: 7, text: Package used in quotations}
+  edges:
+    - [b1, b2]
+    - [b2, b3]
+    - [b3, b4]
+    - [b4, b5, dashed, e-mail + log]
+    - [b5, b6]
+    - [b6, b7]
+    - [b7, b8]
+    - [b8, b9]
+    - [b9, b10]
+    - [b10, b11]
+    - [b9, b12]
+after:
+  - {n: 1, bibs: 'Package Request Form logged in BIBS, numbered PKR-yyyy-n and tracked by stage', measure: 'Stage and SLA per request'}
+  - {n: 2, bibs: 'Quotation slips prepared, approved and e-mailed per insurer, protected and logged', measure: 'Send log per slip'}
+  - {n: 3, bibs: 'TSU keys in each response with its outcome; every change is kept', measure: 'Rounds recorded'}
+  - {n: 4, bibs: 'One comparative master per package; client views derived from it', measure: 'No Excel re-compile'}
+  - {n: 5, bibs: 'ManCom signs off in BIBS; the advisory is drafted on release', measure: 'Sign-off before release'}
+  - {n: 6, bibs: 'Documents leave password protected; password in a separate e-mail', measure: 'Every document protected'}
+  - {n: 7, bibs: 'Daily job raises expiry alerts and can draft the renewal request', measure: 'No expiry missed'}
+  - {n: 8, bibs: 'Every action in the request history and the audit trail', measure: 'Full history per package'}
+gaps:
+  - {sev: High, gap: Incentive criteria without a definition, impact: Incentive income across four BRDs, owner: 'MBS, Comptrollership', decision: 'List the programmes (CPC2 and others) with rate, base, payer', ref: DCR-037}
+  - {sev: High, gap: Password convention for documents, impact: Clients and insurers cannot open files without a known rule, owner: 'MBS, Information Security', decision: Password rule per document type, ref: DCR-153}
+  - {sev: Medium, gap: Role-to-action matrix; ManCom decision rule, impact: Approval routing and persona tests, owner: 'MBS and TSU', decision: 'Approve the matrix; ManCom membership and quorum', ref: DCR-035}
+  - {sev: Medium, gap: Non-package product maintenance, impact: Scope of the module, owner: MBS, decision: Confirm out of scope for this phase, ref: DCR-036}
+  - {sev: Medium, gap: BRQID.008 dropped without a revision entry, impact: Renewals repriced without client evidence, owner: MBS, decision: Confirm BRRN.038 now governs, ref: DCR-030}
+  - {sev: Parked, gap: Product master feed to other BDOI systems, impact: Other systems not updated automatically, owner: BDO IT, decision: 'Which systems receive product changes', ref: PQ16}
+best:
+  - {practice: Configurable rules owned by the business, status: BIBS, bibs: 'Products, package versions, rates and incentive criteria kept as masters, maintained without IT.', bdoi: 'Name the business owner of each master and its approver.'}
+  - {practice: Maker-checker on product changes, status: BIBS, bibs: 'Marketing approval, TSU Head approval, ManCom sign-off and release validation; never the maker.', bdoi: 'Approve the role-to-action matrix (DCR-035).'}
+  - {practice: One version of the terms, status: BIBS, bibs: 'One comparative master per request and versioned packages; old versions locked.', bdoi: 'Retire Excel comparatives once BIBS is live.'}
+  - {practice: Protected digital documents, status: PARTLY, bibs: 'Slips and advisories password protected, password sent separately, send log.', bdoi: 'Agree the password convention (DCR-153).'}
+  - {practice: Expiry and renewal pipeline, status: BIBS, bibs: 'Daily expiry alerts and a renewal request pre-filled from the current version.', bdoi: 'Set the lead days per package type.'}
+  - {practice: KPI on package turnaround, status: ADOPT, bibs: 'Stage history and SLA per stage (for example 120 hours for negotiation).', bdoi: 'Adopt turnaround targets per stage and review them monthly.'}

@@ -1,0 +1,153 @@
+# BRD-6 Renewal: chapter 6 of the business process deck.
+# Sources: "Renewal (RN) BRD.pdf" p.41-43 (current and envisioned), p.186-188 (NFR), workshop addendum p.3-15;
+# FRS BRD-6 sections 2, 5, 9; cross-BRD decisions D1, D2, D4, XQ01, XQ06; discrepancy register (DCR-062, 063, 064,
+# 075, 112, 129, 146).
+id: brd06
+key: rn
+num: 6
+title: Renewal
+brd: BRD-6
+scope: 'Expiring list, disposition, insurer round-trip, Renewal Advice, acceptance to booking'
+status: DESIGNED
+status_text: Designed, not yet built; FRS v1.0 issued for review
+department: Marketing and Processing (RMEL renewal)
+roles:
+  - Marketing Team Leader (75) and AO / Account Broker (319)
+  - Processing Team Leader (50) and Processing Officer / Broker (73)
+  - Contact Center user (follow-ups, remarks)
+  - LAMD user (paid-off and RMU reports)
+  - Clients and insurers (external)
+figures:
+  - ['25,800', 'transactions a month per process; growth 20% a year (p.186-188)']
+  - ['485', 'users for reports and RA; 145 concurrent']
+  - ['10 s', 'online; 20 s for reports and RA generation']
+  - ['07-22', 'use 07:00-22:00 Monday to Saturday']
+sources:
+  - BRD-6 p.41-43 (current and envisioned process)
+  - Workshop addendum p.3-15 (BRRN.001-040)
+  - FRS BRD-6 v1.0, sections 2 and 5; cross-BRD decisions D1, D2
+chevrons: [Extraction, Sanitation, Initiation, Disposition, Processing, Insurer, Renewal Advice, Booking]
+notes:
+  glance: >-
+    BDOI renews the policies it has placed. RMEL Phase 2 moves the renewal online: the Business Units extract the list
+    themselves, disposition online in a staged workflow, export the accounts per insurer and monitor each renewal. The
+    workshop addendum adds rule-based governance: sanitation, a mandatory reference, buckets, a decision matrix and
+    automatic progression to booking. Renewal is designed; the build needs the shared business-type change BT0 first
+    (decision D1).
+  pains: The eight points are the current-process rows of the BRD (p.42-43) and the workshop addendum (p.3).
+  after: The volumes and response times come from the usage table (p.186-188).
+  gaps: >-
+    Two contradictions inside the BRD decide the workflow triggers: disposition online or by upload (DCR-062), and
+    manual initiation against straight-through processing (DCR-063). Renewal owns the renewal of submitted policies
+    from the hand-off on (decision D2); the one-LAMD-intake question is still open (XQ01).
+asis:
+  caption: 'Renewal today (BRD-6 p.42-43; workshop addendum p.3)'
+  notes: >-
+    Today IT extracts the list of expiring accounts. Eligibility depends on manual pre-cleaning of the list. Marketing
+    records dispositions in spreadsheets and communicates with Processing by e-mail. Accounts go to insurers by e-mail
+    from Excel. Renewal Advices come from an IT text file and work for packaged accounts only, with the upload to QPS;
+    non-packaged accounts and exceptions are handled by hand. Renewal status is monitored by hand, and accepted
+    renewals are re-keyed for placement and booking.
+  cols: 7
+  lanes:
+    - {id: mkt, label: Marketing AO / TL}
+    - {id: prc, label: Processing}
+    - {id: ins, label: Insurers, kind: external}
+    - {id: cli, label: Clients, kind: external}
+    - {id: sys, label: 'IT, QPS, Excel, e-mail', kind: system}
+  steps:
+    - {id: a1, lane: sys, col: 1, text: IT extracts the expiring list, kind: legacy, pain: [1]}
+    - {id: a2, lane: mkt, col: 2, text: List pre-cleaned by hand, pain: [2]}
+    - {id: a3, lane: mkt, col: 3, text: Disposition in a spreadsheet, pain: [3]}
+    - {id: a4, lane: prc, col: 4, text: Dispositions received by e-mail, pain: [4]}
+    - {id: a5, lane: prc, col: 5, text: Excel per insurer e-mailed, pain: [5]}
+    - {id: a6, lane: ins, col: 6, text: Insurer decides and replies, kind: external}
+    - {id: a7, lane: sys, col: 6, text: RA text file for packages only, kind: legacy, pain: [6]}
+    - {id: a8, lane: cli, col: 7, text: Client receives the RA, kind: external}
+    - {id: a9, lane: prc, col: 7, text: Acceptance re-keyed for placement, pain: [8]}
+    - {id: a10, lane: mkt, col: 7, text: Status monitored by hand, pain: [7]}
+  edges:
+    - [a1, a2]
+    - [a2, a3]
+    - [a3, a4, dashed, e-mail]
+    - [a4, a5]
+    - [a5, a6, dashed]
+    - [a6, a7]
+    - [a7, a8, dashed]
+    - [a8, a9]
+    - [a9, a10]
+pains:
+  - {n: 1, title: IT extracts the expiring list, text: 'The RMEL list depends on an IT extraction.', ref: 'BRD-6 p.42; BRRN.002, 005'}
+  - {n: 2, title: Manual pre-cleaning, text: 'Eligibility depends on cleaning the list by hand before disposition.', ref: 'Workshop addendum p.3; BRRN.009, 020'}
+  - {n: 3, title: Disposition in a spreadsheet, text: 'Marketing records the disposition of each account in Excel.', ref: 'BRD-6 p.42; BRD 2.004'}
+  - {n: 4, title: Hand-offs by e-mail, text: 'Marketing and Processing communicate by e-mail; no stage or assignment.', ref: 'BRD-6 p.42'}
+  - {n: 5, title: Accounts to insurers from Excel, text: 'Accounts are sent to insurers by e-mail from Excel files.', ref: 'BRD-6 p.42; BRD 3.009'}
+  - {n: 6, title: RA text file for packages only, text: 'The IT text file and the QPS upload cover packaged accounts only.', ref: 'BRD-6 p.42; BRRN.010'}
+  - {n: 7, title: Status monitored by hand, text: 'No status report or summary counters.', ref: 'BRD-6 p.42-43; BRRN.019, 036'}
+  - {n: 8, title: Accepted renewals re-keyed, text: 'Accepted renewals are keyed again for placement and booking.', ref: 'Workshop addendum p.3; BRRN.038, 040'}
+tobe:
+  caption: 'Renewal in BIBS: workflow RNW_CASE with the decision matrix (FRS BRD-6 sections 2.2 and 5)'
+  notes: >-
+    In BIBS a daily job extracts the accounts that expire within the lead days; users can also generate the list for
+    any date range. BIBS runs the sanitation, matching and eligibility checks and classifies each record Clean, Review
+    or Exception. An authorised user initiates the renewal, in bulk (for example CLG) or one by one. The decision matrix
+    proposes a disposition; a Clean case with an automatic rule proceeds straight through. Otherwise the AO dispositions
+    online and the TL reviews and posts. Processing updates the renewal account; BIBS builds the extract per insurer and
+    sends it protected, and the insurer's decision file is applied: Renew As Is advances, Reject or Revise stops or
+    reroutes. The Renewal Advice (first or second notice) goes out in batch, protected. Acceptance moves the account to
+    placement and booking without re-keying, and it books as business type RENEWAL.
+  cols: 7
+  lanes:
+    - {id: mkt, label: Marketing AO / TL}
+    - {id: prc, label: Processing}
+    - {id: ins, label: Insurers, kind: external}
+    - {id: cli, label: Clients, kind: external}
+    - {id: bibs, label: BIBS (automatic), kind: bibs}
+  steps:
+    - {id: b1, lane: bibs, col: 1, text: Daily extraction at the lead days, kind: auto}
+    - {id: b2, lane: bibs, col: 2, text: 'Sanitation: Clean, Review, Exception', kind: auto}
+    - {id: b3, lane: mkt, col: 2, text: 'Initiation: in bulk or one by one'}
+    - {id: b4, lane: bibs, col: 3, text: Decision matrix; clean cases pass, kind: auto}
+    - {id: b5, lane: mkt, col: 3, text: AO dispositions; TL posts}
+    - {id: b6, lane: prc, col: 4, text: Renewal account updated}
+    - {id: b7, lane: bibs, col: 4, text: Extract per insurer sent protected, kind: doc}
+    - {id: b8, lane: ins, col: 5, text: 'File: Renew As Is, Reject, Revise', kind: external}
+    - {id: b9, lane: bibs, col: 6, text: RA 1st / 2nd notice in batch, kind: doc}
+    - {id: b10, lane: cli, col: 6, text: Client accepts, kind: external}
+    - {id: b11, lane: bibs, col: 7, text: Placed and booked as RENEWAL, kind: auto}
+    - {id: b12, lane: mkt, col: 7, text: 'Renewal home, status report'}
+  edges:
+    - [b1, b2]
+    - [b2, b3]
+    - [b3, b4]
+    - [b4, b5, dashed]
+    - [b5, b6]
+    - [b6, b7]
+    - [b7, b8, dashed]
+    - [b8, b9, dashed, upload]
+    - [b9, b10, dashed]
+    - [b10, b11]
+    - [b11, b12]
+after:
+  - {n: 1, bibs: 'Daily job extracts expiring accounts at the lead days; users generate the list for any range', measure: '25,800 a month without IT'}
+  - {n: 2, bibs: 'Sanitation, matching and eligibility checks classify each record Clean, Review or Exception', measure: 'Checks run by BIBS'}
+  - {n: 3, bibs: 'AO dispositions online; clean cases with an automatic rule get a system disposition', measure: 'Straight-through for clean cases'}
+  - {n: 4, bibs: 'Staged workflow with assignment, review, return and post; notice at each step', measure: 'Stage per renewal'}
+  - {n: 5, bibs: 'Extract per insurer sent protected; insurer decision file uploaded and applied', measure: 'Protected, logged'}
+  - {n: 6, bibs: 'RA first and second notice for any account, from the latest template, in batch', measure: 'RA in 20 s (p.186-188)'}
+  - {n: 7, bibs: 'Renewal home, status report with summary counters, listings with escalation', measure: 'Live status'}
+  - {n: 8, bibs: 'Acceptance moves the account to placement and booking; it books as RENEWAL', measure: 'No re-keying'}
+gaps:
+  - {sev: High, gap: Disposition online or by batch upload, impact: Disposition screens and the upload path, owner: 'Marketing and Processing (RMEL)', decision: 'Which segments disposition online; who prepares the file', ref: DCR-062}
+  - {sev: High, gap: Manual initiation against straight-through, impact: Workflow triggers of the renewal, owner: 'Marketing and Processing (RMEL)', decision: 'Initiation always manual? Is CBG STP started automatically?', ref: DCR-063}
+  - {sev: High, gap: Legacy policies expiring after go-live, impact: First-year renewals could be missed, owner: 'RMEL, BDO IT', decision: 'Load expiring EBIX / QPS policies; how many months', ref: DCR-075}
+  - {sev: High, gap: Boundary with Submitted Policies; LAMD intake, impact: Two renewal paths; two loan-status feeds, owner: 'RMEL and Submitted Policies owners', decision: 'Confirm decision D2; one LAMD report or two', ref: 'DCR-129, 146'}
+  - {sev: High, gap: Sanctions match during renewal, impact: Renewal of a possibly sanctioned client, owner: Compliance, decision: Block or warn while a match is open, ref: DCR-112}
+  - {sev: Medium, gap: NRNS checkpoint, impact: Reminder timing and letters, owner: RMEL, decision: '90 days before expiry? What is "not yet submitted"?', ref: DCR-064}
+best:
+  - {practice: Straight-through processing with exception queues, status: BIBS, bibs: 'Decision matrix; clean cases proceed; Review and Exception buckets go to people.', bdoi: 'Approve the matrix rows and which segments run STP (DCR-063).'}
+  - {practice: Rules owned by the business, status: BIBS, bibs: 'Lead days, buckets, eligibility checks and the matrix are maintained as configuration.', bdoi: 'Name the rule owner and approver in RMEL.'}
+  - {practice: Evidence of client acceptance, status: BIBS, bibs: 'Acceptance recorded; changed terms need evidence (BRRN.038).', bdoi: 'Agree which evidence is enough (e-mail, signed RA).'}
+  - {practice: Protected digital documents, status: PARTLY, bibs: 'Extracts and RAs sent protected in batch with a send log.', bdoi: 'Agree the password convention (DCR-153).'}
+  - {practice: Loss experience in the renewal decision, status: PARTLY, bibs: 'Account history reads claims through the Claims query service (decision D4).', bdoi: 'Build Claims first; decide the total-loss indicator (XQ10).'}
+  - {practice: Persistency KPI, status: ADOPT, bibs: 'Status report and summary counters by unit and segment.', bdoi: 'Define the persistency report (XQ06) and a retention target per segment.'}

@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.frbs;
 
 import static com.iortatechnxt.brokerverse.support.CsrfRequests.multipart;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -20,7 +21,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
@@ -50,6 +51,7 @@ class FrbsApiIT {
   @Autowired private Api api;
   @Autowired private FrbsFixtures fx;
   @Autowired private MockMvc mvc;
+  @Autowired private UserDetailsService users;
 
   private Map<String, String> reportParams() {
     Map<String, String> p = new HashMap<>();
@@ -161,7 +163,6 @@ class FrbsApiIT {
   }
 
   @Test
-  @WithUserDetails(FrbsFixtures.OFFICER)
   void aLiquidationReportIsUploadedOverHttp() throws Exception {
     ServiceFeeRun run = fx.approvedRun();
     ServiceFeeLine line = fx.paidLines(run).get(0);
@@ -176,7 +177,8 @@ class FrbsApiIT {
             multipart(FEE + "/lines/" + line.getId() + "/liquidate")
                 .file(report)
                 .param("liquidatedOn", FrbsFixtures.today().toString())
-                .param("remarks", "Received from the unit"))
+                .param("remarks", "Received from the unit")
+                .with(user(users.loadUserByUsername(FrbsFixtures.OFFICER))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("LIQUIDATED"))
         .andExpect(jsonPath("$.tags.liquidationReportId").exists());

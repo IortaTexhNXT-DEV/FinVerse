@@ -108,6 +108,7 @@ class AccountScheduleIT {
 
   @Test
   void definitionsAndCommentaryAreMaintained() {
+    ops.motorInvoice();
     String code = "SCH-T" + System.nanoTime() % 1_000_000;
     ScheduleValues values =
         new ScheduleValues(
@@ -115,8 +116,8 @@ class AccountScheduleIT {
             ScheduleFamily.OTHER,
             "Test",
             null,
-            SelectorKind.REPORT_GROUP,
-            "Cash and Cash Equivalents",
+            SelectorKind.ACCOUNT_PREFIX,
+            "1210",
             Grouping.BRANCH,
             null,
             Side.DEBIT,

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.remittance.api.dto;
 
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLine;
+import com.iortatechnxt.brokerverse.remittance.domain.BatchSettlement;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceAmounts;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.BatchStage;
@@ -33,7 +34,9 @@ public final class BatchDtos {
    * @param incentive incentive
    * @param incentiveVat VAT on the incentive
    * @param netDue net due before the incentive
-   * @param payable net due less the incentive
+   * @param cpc2 CPC2 incentive (DIS 3.29.2)
+   * @param cpc2Vat VAT on the CPC2 incentive
+   * @param payable net due less the early and CPC2 incentives
    */
   public record Amounts(
       BigDecimal paidAr,
@@ -44,6 +47,8 @@ public final class BatchDtos {
       BigDecimal incentive,
       BigDecimal incentiveVat,
       BigDecimal netDue,
+      BigDecimal cpc2,
+      BigDecimal cpc2Vat,
       BigDecimal payable) {
 
     /**
@@ -62,6 +67,8 @@ public final class BatchDtos {
           a.incentive(),
           a.incentiveVat(),
           a.netDue(),
+          a.cpc2(),
+          a.cpc2Vat(),
           a.payable());
     }
   }
@@ -139,6 +146,8 @@ public final class BatchDtos {
    * @param bookingDate booking date
    * @param lastPaidOn last payment
    * @param basicPremium basic premium part
+   * @param cpc2Code CPC2 criterion applied, null when none
+   * @param cpc2Rate CPC2 rate in percent
    * @param amounts amounts (read-only)
    * @param exclusion exclusion, null when kept
    * @param insurerOr insurer OR, null until uploaded
@@ -157,6 +166,8 @@ public final class BatchDtos {
       LocalDate bookingDate,
       LocalDate lastPaidOn,
       BigDecimal basicPremium,
+      String cpc2Code,
+      BigDecimal cpc2Rate,
       Amounts amounts,
       Exclusion exclusion,
       InsurerOr insurerOr,
@@ -182,6 +193,8 @@ public final class BatchDtos {
           l.getBookingDate(),
           l.getLastPaidOn(),
           l.getBasicPremium(),
+          l.getCpc2Code(),
+          l.getCpc2Rate(),
           Amounts.from(l.getAmounts()),
           Exclusion.from(l),
           InsurerOr.from(l),
@@ -271,6 +284,7 @@ public final class BatchDtos {
    * @param returnReason return reason
    * @param disbursement Disbursement request, status and amount
    * @param receipts commission and incentive ORs
+   * @param settlement deductions, amount due, send cycle, early-incentive SI and cancelled DV
    * @param scheduleSentAt when the schedule was sent to the insurer
    * @param extractFileId extract file in the repository
    * @param lines accounts
@@ -283,6 +297,7 @@ public final class BatchDtos {
       String returnReason,
       Disbursement disbursement,
       Receipts receipts,
+      Settlement settlement,
       Instant scheduleSentAt,
       Long extractFileId,
       List<Line> lines) {
@@ -309,6 +324,7 @@ public final class BatchDtos {
               b.getIncentiveOrNo(),
               b.getIncentiveOrStatus(),
               b.getOrMessage()),
+          Settlement.from(b),
           b.getScheduleSentAt(),
           b.getExtractFileId(),
           b.getLines().stream().map(Line::from).toList());
@@ -323,6 +339,51 @@ public final class BatchDtos {
    * @param amount amount
    */
   public record Disbursement(String requestNo, String status, BigDecimal amount) {}
+
+  /**
+   * How the batch is settled beyond its lines (ACSL 2.9.2, DIS 2.20.0, 3.29.1).
+   *
+   * @param deductionAmount deductions applied in the current cycle
+   * @param amountDue amount payable less the deductions
+   * @param sendCycle send cycle (1, then +1 after each cancelled DV)
+   * @param reference reference of the current payment request
+   * @param earlySiNo early-incentive service invoice
+   * @param earlySiWtax withholding tax on it
+   * @param cancelledDvNo last cancelled DV
+   * @param cancelReason its cancellation reason
+   * @param cancelledAt when it was cancelled
+   */
+  public record Settlement(
+      BigDecimal deductionAmount,
+      BigDecimal amountDue,
+      int sendCycle,
+      String reference,
+      String earlySiNo,
+      BigDecimal earlySiWtax,
+      String cancelledDvNo,
+      String cancelReason,
+      Instant cancelledAt) {
+
+    /**
+     * Maps the settlement of a batch.
+     *
+     * @param b batch
+     * @return DTO
+     */
+    public static Settlement from(RemittanceBatch b) {
+      BatchSettlement s = b.getSettlement();
+      return new Settlement(
+          s.getDeductionAmount(),
+          b.amountDue(),
+          s.getSendCycle(),
+          b.cycleReference(),
+          s.getEarlySiNo(),
+          s.getEarlySiWtax(),
+          s.getCancelledDvNo(),
+          s.getCancelReason(),
+          s.getCancelledAt());
+    }
+  }
 
   /**
    * ORs issued for a batch.

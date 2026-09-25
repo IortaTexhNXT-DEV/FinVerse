@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.remittance.service;
 
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
+import java.math.BigDecimal;
 import java.util.Locale;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,11 @@ public class RemittanceSettings {
 
   /** Extract file naming parameter. */
   public static final String FILE_PATTERN = "REMIT_FILE_PATTERN";
+
+  /** Withholding tax rate (percent) of the early-incentive service invoice (DIS 3.29.1). */
+  public static final String EARLY_INCENTIVE_WTAX_RATE = "EARLY_INCENTIVE_WTAX_RATE";
+
+  private static final BigDecimal DEFAULT_WTAX_RATE = BigDecimal.valueOf(2);
 
   private static final int DEFAULT_HOLD_DAYS = 3;
   private static final String EXCLUDE = "EXCLUDE";
@@ -60,6 +66,20 @@ public class RemittanceSettings {
       return OverDtipMode.valueOf(value) == OverDtipMode.CAP;
     } catch (IllegalArgumentException ex) {
       return false;
+    }
+  }
+
+  /**
+   * Withholding tax rate the insurer applies on the early incentive (DIS 3.29.1, AQ25).
+   *
+   * @return rate in percent, 2 when the parameter is missing or not a number
+   */
+  public BigDecimal earlyIncentiveWtaxRate() {
+    String value = parameters.text(EARLY_INCENTIVE_WTAX_RATE, DEFAULT_WTAX_RATE.toPlainString());
+    try {
+      return new BigDecimal(value.strip());
+    } catch (NumberFormatException ex) {
+      return DEFAULT_WTAX_RATE;
     }
   }
 

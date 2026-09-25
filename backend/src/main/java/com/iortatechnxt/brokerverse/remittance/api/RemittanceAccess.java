@@ -54,6 +54,17 @@ final class RemittanceAccess {
   /** Special remittance approver. */
   static final String SPECIAL_APPROVE = "hasAuthority('SPECIAL_REMIT_APPROVE')";
 
+  /** Deduction readers: ACSL, the confirmers and the remittance team (ACSL 2.9.2). */
+  static final String DEDUCTION_READ =
+      "hasAnyAuthority('ACSL_PROCESS', 'ACSL_VIEW', 'REMIT_DEDUCTION_CONFIRM', 'REMIT_PROCESS',"
+          + " 'REMIT_APPROVE')";
+
+  /** Deduction preparer (ACSL processor). */
+  static final String DEDUCTION_PREPARE = "hasAuthority('ACSL_PROCESS')";
+
+  /** Deduction confirmer. */
+  static final String DEDUCTION_CONFIRM = "hasAuthority('REMIT_DEDUCTION_CONFIRM')";
+
   private static final int MAX_PAGE = 200;
 
   private RemittanceAccess() {}

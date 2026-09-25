@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -69,6 +70,7 @@ public class ExtractionWork {
   private final BatchLedger batchLedger;
   private final LedgerPositions positions;
   private final IncentiveRuleService incentives;
+  private final Cpc2Incentives cpc2;
   private final RemittanceSettings settings;
   private final InvoiceTagRepository tags;
   private final RemittanceBatchRepository batches;
@@ -84,6 +86,7 @@ public class ExtractionWork {
    * @param batchLedger ledger statuses and locks of batch lines
    * @param positions positions and holding period
    * @param incentives incentive rules
+   * @param cpc2 CPC2 incentive criteria
    * @param settings parameters
    * @param tags extraction tags
    * @param batches batches
@@ -97,6 +100,7 @@ public class ExtractionWork {
       BatchLedger batchLedger,
       LedgerPositions positions,
       IncentiveRuleService incentives,
+      Cpc2Incentives cpc2,
       RemittanceSettings settings,
       InvoiceTagRepository tags,
       RemittanceBatchRepository batches,
@@ -108,6 +112,7 @@ public class ExtractionWork {
     this.batchLedger = batchLedger;
     this.positions = positions;
     this.incentives = incentives;
+    this.cpc2 = cpc2;
     this.settings = settings;
     this.tags = tags;
     this.batches = batches;
@@ -142,6 +147,7 @@ public class ExtractionWork {
     HoldingPeriod holding =
         positions.holdingPeriod(settings.checkHoldDays(), run.getBusinessDate());
     Context context = new Context(run, specialRequestNo, holding, settings.capOverDtip());
+    context.cpc2 = cpc2.table(run.getCompanyId());
     for (String invoiceNo : candidates(run)) {
       examine(context, ledger.require(invoiceNo));
     }
@@ -249,14 +255,18 @@ public class ExtractionWork {
     OpsInvoice invoice = e.invoice();
     if (decision.tag() == ExtractionTag.EXTRACTED) {
       BigDecimal rate = e.incentive() == null ? null : e.incentive().getRate();
-      RemittanceRules.Line amounts =
-          RemittanceRules.amounts(LedgerPositions.position(invoice), decision.remittable(), rate);
+      RemittanceRules.Position position = LedgerPositions.position(invoice);
+      RemittanceRules.Line amounts = RemittanceRules.amounts(position, decision.remittable(), rate);
+      Optional<Cpc2Incentives.Match> earned = ctx.cpc2.match(invoice);
       BatchLine line =
           new BatchLine(
               LedgerPositions.facts(invoice, e.lastPaid()),
               invoice.getRemittanceStatus(),
               amounts.basicPremium(),
-              amounts.amounts());
+              earned
+                  .map(m -> RemittanceRules.cpc2(position, amounts, m.rate()))
+                  .orElse(amounts.amounts()));
+      earned.ifPresent(m -> line.cpc2Criterion(m.code(), m.rate()));
       InvoiceTag t = tag(ctx, invoice, e.type(), decision);
       ctx.groups
           .computeIfAbsent(
@@ -369,6 +379,7 @@ public class ExtractionWork {
     private final boolean single;
     private final HoldingPeriod holding;
     private final boolean cap;
+    private Cpc2Incentives.Table cpc2 = new Cpc2Incentives.Table(List.of());
     private final Map<GroupKey, List<Pending>> groups = new LinkedHashMap<>();
     private final Map<String, ExtractionTag> tagged = new LinkedHashMap<>();
 

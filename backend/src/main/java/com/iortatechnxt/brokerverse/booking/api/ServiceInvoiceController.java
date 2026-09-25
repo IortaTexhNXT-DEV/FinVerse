@@ -140,7 +140,7 @@ public class ServiceInvoiceController {
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(BookingAccess.PROCESS)
   public ServiceInvoiceResponse issue(@Valid @RequestBody ServiceInvoiceIssueRequest request) {
-    return ServiceInvoiceResponse.from(serviceInvoices.issue(request.toRequest()));
+    return ServiceInvoiceResponse.from(serviceInvoices.issueManual(request.toRequest()));
   }
 
   /**

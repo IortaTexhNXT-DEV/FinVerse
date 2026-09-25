@@ -121,6 +121,8 @@ public class RemittanceBatch extends BaseEntity {
   @Column(name = "extract_file_id")
   private Long extractFileId;
 
+  @Embedded private BatchSettlement settlement = new BatchSettlement();
+
   @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("id")
   private final List<BatchLine> lines = new ArrayList<>();
@@ -366,6 +368,61 @@ public class RemittanceBatch extends BaseEntity {
    */
   public void assignProcessor(String username) {
     this.processor = username;
+  }
+
+  /**
+   * Records the deductions applied in this send cycle (ACSL 2.9.2).
+   *
+   * @param amount total applied, at most the amount payable
+   */
+  public void deductionsApplied(BigDecimal amount) {
+    settlement.applied(amount);
+  }
+
+  /**
+   * Links the early-incentive service invoice (DIS 3.29.1).
+   *
+   * @param siNo service invoice number
+   * @param wtax withholding tax on it
+   */
+  public void earlyIncentiveInvoice(String siNo, BigDecimal wtax) {
+    settlement.serviceInvoice(siNo, wtax);
+  }
+
+  /**
+   * Records that the batch's DV was cancelled (DIS 2.20.0): the next payment request and postings
+   * use a new cycle reference; the deductions of the cycle are released.
+   *
+   * @param dv cancelled DV, may be null
+   * @param reason cancellation reason
+   * @param at time
+   */
+  public void dvCancelled(String dv, String reason, Instant at) {
+    settlement.cancelled(dv == null ? dvNo : dv, reason, at, MAX_MESSAGE);
+    this.dvNo = null;
+    this.disbursementStatus = "CANCELLED";
+  }
+
+  /**
+   * The reference of the payment request and postings of the current cycle.
+   *
+   * @return batch number, or {@code <batch>/R<cycle>} after a cancelled DV
+   */
+  public String cycleReference() {
+    return settlement.reference(batchNo);
+  }
+
+  /**
+   * What Disbursement pays the insurer now.
+   *
+   * @return amount payable less the deductions applied
+   */
+  public BigDecimal amountDue() {
+    return totals.payable().subtract(settlement.getDeductionAmount());
+  }
+
+  public BatchSettlement getSettlement() {
+    return settlement;
   }
 
   public Long getCompanyId() {

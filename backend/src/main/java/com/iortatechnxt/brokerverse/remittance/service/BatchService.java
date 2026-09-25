@@ -219,7 +219,7 @@ public class BatchService {
     workflow.transition(ENTITY, id.toString(), "approve", TransitionNote.comment(comment));
     posting.post(batch);
     documents.store(batch);
-    if (batch.getSpecialRequestNo() != null) {
+    if (batch.getSpecialRequestNo() != null && batch.getSettlement().getSendCycle() == 1) {
       specials.batchApproved(batch.getSpecialRequestNo());
     }
     audit.record(
@@ -260,7 +260,7 @@ public class BatchService {
                   line.getAmounts().dtip(),
                   line.getAmounts().paidAr())));
     }
-    if (batch.getSpecialRequestNo() != null) {
+    if (batch.getSpecialRequestNo() != null && batch.getSettlement().getSendCycle() == 1) {
       specials.batchReturned(batch.getSpecialRequestNo());
     }
     audit.record(ENTITY, batch.getBatchNo(), AuditAction.REJECT, "Returned: " + reasonCode);
@@ -320,7 +320,7 @@ public class BatchService {
         + " account(s), net due "
         + batch.getCurrency()
         + " "
-        + batch.getTotals().payable();
+        + batch.amountDue();
   }
 
   /**

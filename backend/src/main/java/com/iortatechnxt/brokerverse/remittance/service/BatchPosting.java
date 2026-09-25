@@ -1,13 +1,10 @@
 package com.iortatechnxt.brokerverse.remittance.service;
 
-import com.iortatechnxt.brokerverse.accounting.service.AccountingEventPublisher;
-import com.iortatechnxt.brokerverse.accounting.service.BusinessEvent;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.RemittanceStatus;
-import com.iortatechnxt.brokerverse.opsledger.service.BookRates;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerService;
 import com.iortatechnxt.brokerverse.opsledger.service.MovementRequest;
@@ -20,14 +17,16 @@ import com.iortatechnxt.brokerverse.opsledger.service.port.ReceiptIssuer.Receipt
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLine;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceAmounts;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch;
+import com.iortatechnxt.brokerverse.remittance.service.RemittancePostings.Posting;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -35,35 +34,45 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Posts an approved batch inside the approval transaction (OPERATIONS_DESIGN 5 rows 12-13,
- * RMTID.010/011/019/023, CSHID.007):
+ * RMTID.010/011/019/023, CSHID.007; ACCOUNTING_DISBURSEMENT_DESIGN 6 rows 15-17):
  *
  * <ol>
- *   <li>per invoice line, event {@code OPS_REMITTANCE} ({@code RMB:<batch>:<invoice>}): DTIP (paid
+ *   <li>per invoice line, event {@code OPS_REMITTANCE} ({@code RMB:<ref>:<invoice>}): DTIP (paid
  *       AR) and CWT (WTAX) against the commission receivable (commission and VAT) and the net due
  *       to the insurer for disbursement, at the BOOK rate; and the REMITTED ledger movement on
  *       DTIP, commission, VAT and WTAX with remittance status APPROVED;
- *   <li>for a With Incentives batch, event {@code OPS_REMIT_INCENTIVE} ({@code RMB:<batch>:INC});
+ *   <li>the early incentive with its service invoice and the CPC2 incentive ({@link
+ *       BatchIncentives}, DIS 3.29.1/3.29.2);
+ *   <li>the insurer's confirmed deductions, capped at the amount payable ({@link DeductionPosting},
+ *       ACSL 2.9.2);
  *   <li>the payment request to Disbursement through {@link DisbursementGateway} (type REMITTANCE,
- *       amount payable = net due less the incentive);
- *   <li>the commission OR (CSHID.007) and the incentive OR through {@link ReceiptIssuer} (the
- *       default adapter hands them over to Cashiering until the cashiering module is installed).
+ *       routed straight to the approver with its RFP number, DIS 3.25.0), amount = net due less the
+ *       incentives and deductions; when the deductions took everything, the batch is settled
+ *       without a request;
+ *   <li>the commission OR (CSHID.007) and the incentive OR, with the early-incentive withholding
+ *       tax, through {@link ReceiptIssuer}, once per batch.
  * </ol>
+ *
+ * <p>{@code <ref>} is the batch number, or {@code <batch>/R<n>} when the batch is sent again after
+ * a cancelled DV (DIS 2.20.0).
  */
 @Component
 @Transactional(propagation = Propagation.MANDATORY)
 public class BatchPosting {
 
   /** Remittance event. */
-  public static final String REMITTANCE_EVENT = "OPS_REMITTANCE";
+  public static final String REMITTANCE_EVENT = RemittancePostings.REMITTANCE_EVENT;
 
   /** Incentive event. */
-  public static final String INCENTIVE_EVENT = "OPS_REMIT_INCENTIVE";
+  public static final String INCENTIVE_EVENT = RemittancePostings.INCENTIVE_EVENT;
 
-  private static final String DUE_FOR_DISBURSEMENT = "DUE_FOR_DISBURSEMENT";
-  private static final String PREFIX = "RMB:";
+  private static final String INSURER = "INSURER";
+  private static final String INCENTIVE = "INCENTIVE";
 
-  private final AccountingEventPublisher accounting;
-  private final BookRates rates;
+  private final RemittancePostings postings;
+  private final BatchIncentives incentives;
+  private final DeductionPosting deductions;
+  private final BatchRemittance remittance;
   private final InvoiceLedgerQueryService ledger;
   private final InvoiceLedgerService writer;
   private final DisbursementGateway disbursement;
@@ -74,8 +83,10 @@ public class BatchPosting {
   /**
    * Creates the posting.
    *
-   * @param accounting accounting engine
-   * @param rates BOOK rates
+   * @param postings accounting events
+   * @param incentives incentives and early-incentive SI
+   * @param deductions insurer deductions
+   * @param remittance settlement without payment
    * @param ledger ledger reads
    * @param writer ledger movements and statuses
    * @param disbursement Disbursement port
@@ -83,17 +94,22 @@ public class BatchPosting {
    * @param documents insurer names
    * @param clock clock
    */
+  @SuppressWarnings("java:S107") // constructor injection
   public BatchPosting(
-      AccountingEventPublisher accounting,
-      BookRates rates,
+      RemittancePostings postings,
+      BatchIncentives incentives,
+      DeductionPosting deductions,
+      BatchRemittance remittance,
       InvoiceLedgerQueryService ledger,
       InvoiceLedgerService writer,
       DisbursementGateway disbursement,
       ReceiptIssuer receipts,
       BatchDocuments documents,
       Clock clock) {
-    this.accounting = accounting;
-    this.rates = rates;
+    this.postings = postings;
+    this.incentives = incentives;
+    this.deductions = deductions;
+    this.remittance = remittance;
     this.ledger = ledger;
     this.writer = writer;
     this.disbursement = disbursement;
@@ -110,61 +126,65 @@ public class BatchPosting {
   public void post(RemittanceBatch batch) {
     LocalDate today = LocalDate.now(clock);
     Long branchId = null;
+    Set<String> roots = new LinkedHashSet<>();
     for (BatchLine line : batch.included()) {
       OpsInvoice invoice = ledger.require(line.getInvoiceNo());
       branchId = branchId == null ? invoice.getBranchId() : branchId;
+      roots.add(invoice.getRootInvoiceNo());
       postLine(batch, line, invoice, today);
     }
-    RemittanceAmounts totals = batch.getTotals();
-    if (totals.incentiveTotal().signum() > 0) {
-      postIncentive(batch, branchId, today);
-    }
+    incentives.post(batch, branchId, today);
+    deductions.consume(batch, branchId, today);
     String insurerName = documents.insurerName(batch);
+    if (batch.amountDue().signum() > 0) {
+      send(batch, insurerName, roots.size() == 1 ? roots.iterator().next() : null);
+    } else {
+      batch.sentToDisbursement(null, "NOT_REQUIRED", batch.amountDue());
+      remittance.remitted(batch, "Deductions");
+    }
+    issueReceipts(batch, insurerName, today);
+  }
+
+  private void send(RemittanceBatch batch, String insurerName, String rootInvoiceNo) {
+    String ref = batch.cycleReference();
     DisbursementTicket ticket =
         disbursement.send(
             batch.getCompanyId(),
             new DisbursementRequest.Spec(
-                DisbursementRequest.Type.REMITTANCE,
-                RemittanceSettings.MODULE,
-                batch.getBatchNo(),
-                batch.getInsurerCode(),
-                insurerName,
-                batch.getCurrency(),
-                totals.payable(),
-                "Remittance "
-                    + batch.getBatchNo()
-                    + " to "
-                    + insurerName
-                    + " ("
-                    + batch.getLineCount()
-                    + " account(s))",
-                batch.getBatchNo()));
-    batch.sentToDisbursement(ticket.requestNo(), ticket.status().name(), totals.payable());
-    issueReceipts(batch, insurerName, today);
+                    DisbursementRequest.Type.REMITTANCE,
+                    RemittanceSettings.MODULE,
+                    ref,
+                    batch.getInsurerCode(),
+                    insurerName,
+                    batch.getCurrency(),
+                    batch.amountDue(),
+                    "Remittance "
+                        + ref
+                        + " to "
+                        + insurerName
+                        + " ("
+                        + batch.getLineCount()
+                        + " account(s))",
+                    batch.getBatchNo())
+                .routed(ref, INSURER, "REMITTANCE", rootInvoiceNo, true)
+                .withReferences(List.of(), List.of(RemittancePostings.movementRef(batch))));
+    batch.sentToDisbursement(ticket.requestNo(), ticket.status().name(), batch.amountDue());
   }
 
   private void postLine(
       RemittanceBatch batch, BatchLine line, OpsInvoice invoice, LocalDate today) {
     RemittanceAmounts a = line.getAmounts();
-    Map<String, BigDecimal> amounts = new LinkedHashMap<>();
-    amounts.put("DTIP", a.dtip());
-    amounts.put("CWT", a.wtax());
-    amounts.put("COMMISSION_RECEIVABLE", a.commissionReceivable());
-    amounts.put(DUE_FOR_DISBURSEMENT, a.netDue());
     String journal =
-        accounting
-            .publish(
-                rates.price(
-                    event(
-                        REMITTANCE_EVENT,
-                        new EventKey(
-                            batch,
-                            invoice.getBranchId(),
-                            today,
-                            PREFIX + batch.getBatchNo() + ":" + line.getInvoiceNo()),
-                        invoice,
-                        amounts)))
-            .getBatchNo();
+        postings.publish(
+            new Posting(
+                RemittancePostings.REMITTANCE_EVENT,
+                batch,
+                invoice.getBranchId(),
+                today,
+                RemittancePostings.sourceRef(batch, line.getInvoiceNo()),
+                invoice,
+                RemittancePostings.lineAmounts(a, 1),
+                "Remittance " + invoice.getInvoiceNo() + " " + batch.getBatchNo()));
     Map<LedgerComponent, BigDecimal> moved = new EnumMap<>(LedgerComponent.class);
     moved.put(LedgerComponent.DTIP, a.dtip());
     moved.put(LedgerComponent.COMMISSION, a.commission());
@@ -175,7 +195,7 @@ public class BatchPosting {
             line.getInvoiceNo(),
             MovementType.REMITTED,
             RemittanceSettings.MODULE,
-            PREFIX + batch.getBatchNo(),
+            RemittancePostings.movementRef(batch),
             today,
             moved,
             new DocumentRefs(null, null, batch.getBatchNo(), journal),
@@ -188,47 +208,9 @@ public class BatchPosting {
     line.posted(journal);
   }
 
-  private void postIncentive(RemittanceBatch batch, Long branchId, LocalDate today) {
-    RemittanceAmounts t = batch.getTotals();
-    Map<String, BigDecimal> amounts = new LinkedHashMap<>();
-    amounts.put(DUE_FOR_DISBURSEMENT, t.incentiveTotal());
-    amounts.put("INCENTIVE_INCOME", t.incentive());
-    amounts.put("OUTPUT_VAT", t.incentiveVat());
-    accounting.publish(
-        rates.price(
-            event(
-                INCENTIVE_EVENT,
-                new EventKey(batch, branchId, today, PREFIX + batch.getBatchNo() + ":INC"),
-                null,
-                amounts)));
-  }
-
-  private static BusinessEvent event(
-      String type, EventKey key, OpsInvoice invoice, Map<String, BigDecimal> amounts) {
-    RemittanceBatch batch = key.batch();
-    return new BusinessEvent(
-        type,
-        batch.getCompanyId(),
-        key.branchId(),
-        key.valueDate(),
-        batch.getCurrency(),
-        RemittanceSettings.MODULE,
-        key.sourceRef(),
-        batch.getBatchNo(),
-        batch.getInsurerCode(),
-        invoice == null ? null : invoice.getClassification().productLine(),
-        invoice == null ? null : invoice.getClassification().costCenter(),
-        (invoice == null
-                ? "Early remittance incentive "
-                : "Remittance " + invoice.getInvoiceNo() + " ")
-            + batch.getBatchNo(),
-        amounts,
-        null);
-  }
-
   private void issueReceipts(RemittanceBatch batch, String insurerName, LocalDate today) {
     List<String> messages = new ArrayList<>();
-    if (batch.getTotals().commission().signum() > 0) {
+    if (batch.getTotals().commission().signum() > 0 && batch.getCommissionOrStatus() == null) {
       IssuedReceipt or =
           issue(
               batch,
@@ -239,18 +221,23 @@ public class BatchPosting {
       batch.commissionReceipt(or.status().name(), or.receiptNo());
       messages.add("Commission OR: " + or.message());
     }
-    if (batch.getTotals().incentive().signum() > 0) {
+    if (batch.getTotals().incentive().signum() > 0 && batch.getIncentiveOrStatus() == null) {
       IssuedReceipt or =
           issue(
               batch,
               insurerName,
               today,
-              "INCENTIVE",
-              a -> new BigDecimal[] {a.incentive(), a.incentiveVat(), BigDecimal.ZERO});
+              INCENTIVE,
+              a ->
+                  new BigDecimal[] {
+                    a.incentive(), a.incentiveVat(), incentives.wtaxOn(a.incentive())
+                  });
       batch.incentiveReceipt(or.status().name(), or.receiptNo());
       messages.add("Incentive OR: " + or.message());
     }
-    batch.receiptMessage(messages.isEmpty() ? null : String.join("; ", messages));
+    if (!messages.isEmpty()) {
+      batch.receiptMessage(String.join("; ", messages));
+    }
   }
 
   private IssuedReceipt issue(
@@ -274,6 +261,12 @@ public class BatchPosting {
                 })
             .filter(l -> l.gross().signum() > 0)
             .toList();
+    String si = INCENTIVE.equals(orType) ? batch.getSettlement().getEarlySiNo() : null;
+    String remarks =
+        orType
+            + " of remittance batch "
+            + batch.getBatchNo()
+            + (si == null ? "" : " (service invoice " + si + ")");
     return receipts.issueOfficialReceipt(
         new ReceiptIssuer.ReceiptRequest(
             batch.getCompanyId(),
@@ -283,12 +276,6 @@ public class BatchPosting {
             today,
             lines,
             new ReceiptIssuer.Source(
-                RemittanceSettings.MODULE,
-                batch.getBatchNo() + ":" + orType,
-                null,
-                orType + " of remittance batch " + batch.getBatchNo())));
+                RemittanceSettings.MODULE, batch.getBatchNo() + ":" + orType, si, remarks)));
   }
-
-  private record EventKey(
-      RemittanceBatch batch, Long branchId, LocalDate valueDate, String sourceRef) {}
 }

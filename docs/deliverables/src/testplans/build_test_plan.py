@@ -227,6 +227,9 @@ def fr_priority(fr: Fr) -> str:
     for k, v in PRIORITY_OF.items():
         if k in p:
             return v
+    for level in PRIORITIES:  # an FRS that states the level directly, e.g. "High (BRD p.21)"
+        if re.match(rf"{level.lower()}\b", p):
+            return level
     return "High" if "must" in p else "Medium"
 
 

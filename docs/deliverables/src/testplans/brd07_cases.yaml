@@ -5,8 +5,7 @@
 # build design (docs/architecture/CLAIMS_BROKING_DESIGN.md) and there is no automation reference. Where a
 # check reuses a platform message that exists today (log-in, report parameters, e-mail address), the case
 # quotes the text BIBS shows and a finding records the FRS difference.
-# The FRS priority "High (BRD p.21)" is set on each case (priority: High); the builder maps only
-# "Must have" style values, so the condition sheet shows these conditions as Medium (finding TF-CL-07).
+# The FRS priority "High (BRD p.21)" is read as High by the builder.
 
 meta:
   brd: BRD-07
@@ -2218,9 +2217,6 @@ findings:
   - fr: FR-CL-043
     issue: Two settlement types ("Settled - LOA Issued - For Schedule of Repair", "... Vehicle Under Repair") have "Closes the claim" to confirm (CLQ05), so their closure behaviour cannot be tested yet.
     proposal: Answer CLQ05; the cases treat both as not closing.
-  - fr: FR-CL-002
-    issue: 'The FR is "High (BRD p.21)", a value the test plan builder does not map to High; the Test Conditions sheet shows the Claims conditions of every "High (BRD p.21)" FR as Medium while the cases carry High. The same applies to the other FRs with this priority.'
-    proposal: Write the BRD priority as "High" or "Must have" in the fr blocks (keeping the page note in the trace), or extend the builder mapping.
   - fr: FR-CL-016
     issue: The meaning of the claims authorization code and any TL / TH override are open (CLQ01); the FRS tests only that the button is disabled while premium is unpaid.
     proposal: Answer CLQ01 before UAT and add the override case if one is agreed.

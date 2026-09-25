@@ -43,23 +43,23 @@ public class ProdReconWorkCounts implements OpsWorkCountSource, InvoiceRelatedIt
   @Override
   public List<WorkCount> counts(Long companyId) {
     return List.of(
-        tile("RECON_TO_SEND", "Registers to send", companyId, ReconCycle.EXTRACTED, Severity.INFO),
+        tile("RECON_TO_SEND", "Registers to Send", companyId, ReconCycle.EXTRACTED, Severity.INFO),
         tile(
             "RECON_AWAITING",
-            "Awaiting insurer feedback",
+            "Awaiting Insurer Feedback",
             companyId,
             ReconCycle.SENT,
             Severity.INFO),
         tile(
             "RECON_RECONCILING",
-            "Cycles reconciling",
+            "Cycles Reconciling",
             companyId,
             ReconCycle.RECONCILING,
             Severity.WARNING),
         new WorkCount(
             OpsWorkCountSource.Section.PRODRECON,
             "RECON_UNBOOKED",
-            "Unbooked insurer production",
+            "Unbooked Insurer Production",
             items.countUnbooked(companyId, List.of(UnbookedStatus.OPEN, UnbookedStatus.PREBOOKED)),
             Severity.WARNING,
             "/prodrecon/unbooked"));

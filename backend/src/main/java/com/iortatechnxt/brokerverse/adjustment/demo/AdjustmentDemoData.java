@@ -6,11 +6,15 @@ import com.iortatechnxt.brokerverse.adjustment.domain.EndorsementRequestReposito
 import com.iortatechnxt.brokerverse.adjustment.domain.RefundBasis;
 import com.iortatechnxt.brokerverse.adjustment.domain.RequestTerms;
 import com.iortatechnxt.brokerverse.adjustment.service.EndorsementRequestService;
+import com.iortatechnxt.brokerverse.adjustment.service.PostingBatchService;
 import com.iortatechnxt.brokerverse.adjustment.service.RequestDraft;
 import com.iortatechnxt.brokerverse.adjustment.service.RequestWorkflowService;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
+import com.iortatechnxt.brokerverse.opsledger.demo.DemoUsers;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.slf4j.Logger;
@@ -19,57 +23,63 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 /**
- * Demo storyline of Adjustment (demo profile only), after the booking demo (order 80) and the
- * ledger replay (order 90), through the real services and the demo users:
+ * Demo storyline of Adjustment (demo profile only), after cashiering (order 91) and remittance
+ * (order 92), through the real services and the demo users, so the workbench shows a request at
+ * every stage. Marketing Collection ({@code mktcoll}) raises the requests, the processor ({@code
+ * adjust}) validates, returns and posts, the team leader ({@code adjtl}) approves:
  *
  * <ul>
- *   <li>Marketing Collection ({@code mktcoll}) asks for a change of the assured's information on
- *       the invoice of {@code ARN-2026-940003}: submitted, waiting for validation;
- *   <li>and a flat cancellation of {@code ARN-2026-940004} ("unit sold"), validated by {@code
- *       adjust} and approved by {@code adjtl}: ready for the posting batch.
+ *   <li>on the property invoice of {@code ARN-2026-940002}: a descriptive change still in draft, a
+ *       change of the assured's information waiting for validation, a cover extension returned for
+ *       its documents, and a premium rate increase waiting for approval;
+ *   <li>a flat cancellation of {@code ARN-2026-940004} ("unit sold"), validated and approved: ready
+ *       for the posting batch;
+ *   <li>an internal adjustment of the remitted invoice of {@code ARN-2026-940001}, posted.
  * </ul>
  *
  * Runs once (skipped when requests exist); a step that fails is logged and skipped.
  */
 @Component
 @Profile("demo")
-@Order(95)
+@Order(93)
 public class AdjustmentDemoData implements ApplicationRunner {
 
   private static final Logger LOG = LoggerFactory.getLogger(AdjustmentDemoData.class);
   private static final String REQUESTER = "mktcoll";
+  private static final String PROCESSOR = "adjust";
   private static final int DAYS_AFTER_INCEPTION = 30;
+  private static final BigDecimal RATE_INCREASE = new BigDecimal("1500.00");
 
   private final EndorsementRequestService requests;
   private final RequestWorkflowService workflow;
+  private final PostingBatchService batches;
   private final EndorsementRequestRepository repository;
   private final InvoiceLedgerQueryService ledger;
-  private final UserDetailsService users;
+  private final DemoUsers users;
 
   /**
    * Creates the loader.
    *
    * @param requests raise requests
    * @param workflow submit, validate, approve
+   * @param batches return and post
    * @param repository requests (idempotency)
    * @param ledger Operations ledger
-   * @param users demo users
+   * @param users demo sign-in
    */
   public AdjustmentDemoData(
       EndorsementRequestService requests,
       RequestWorkflowService workflow,
+      PostingBatchService batches,
       EndorsementRequestRepository repository,
       InvoiceLedgerQueryService ledger,
-      UserDetailsService users) {
+      DemoUsers users) {
     this.requests = requests;
     this.workflow = workflow;
+    this.batches = batches;
     this.repository = repository;
     this.ledger = ledger;
     this.users = users;
@@ -80,26 +90,59 @@ public class AdjustmentDemoData implements ApplicationRunner {
     if (repository.count() > 0) {
       return;
     }
-    original("ARN-2026-940003").ifPresent(this::assuredChange);
+    original("ARN-2026-940002").ifPresent(this::propertyRequests);
     original("ARN-2026-940004").ifPresent(this::cancellation);
+    original("ARN-2026-940001").ifPresent(this::internalAdjustment);
   }
 
-  private void assuredChange(OpsInvoice invoice) {
+  private void propertyRequests(OpsInvoice invoice) {
+    step(
+        "descriptive change (draft)",
+        () -> raise(invoice, "NF_DESCRIPTIVE", null, null, "Correct the property address"));
     step(
         "assured information change",
         () -> {
           EndorsementRequest r =
-              as(
+              raise(invoice, "NF_ASSURED_INFO", null, null, "Change of the assured's address");
+          return users.as(REQUESTER, () -> workflow.submit(r.getId(), "Client letter attached"));
+        });
+    step(
+        "cover extension (returned)",
+        () -> {
+          EndorsementRequest r =
+              raise(invoice, "NF_COVER_EXTENSION", null, null, "Add the typhoon clause");
+          users.as(REQUESTER, () -> workflow.submit(r.getId(), null));
+          users.as(
+              PROCESSOR,
+              () ->
+                  batches.returnRequests(
+                      List.of(r.getId()),
+                      "INCOMPLETE_DOCUMENTS",
+                      "Attach the insurer's clause wording"));
+          return r;
+        });
+    step(
+        "premium rate increase (for approval)",
+        () -> {
+          EndorsementRequest r =
+              users.as(
                   REQUESTER,
                   () ->
                       requests.create(
-                          draft(
-                              invoice,
-                              "NF_ASSURED_INFO",
+                          new RequestDraft(
+                              invoice.getInvoiceNo(),
+                              terms(
+                                  invoice,
+                                  "FIN_PREMIUM_RATE",
+                                  "PREMIUM_RATE_CHANGE",
+                                  null,
+                                  "Rate increased after the insurer's survey"),
+                              new AmountInput(
+                                  RATE_INCREASE, null, null, null, null, null, null, null),
                               null,
-                              null,
-                              "Change of the assured's mailing address")));
-          return as(REQUESTER, () -> workflow.submit(r.getId(), "Client letter attached"));
+                              null)));
+          users.as(REQUESTER, () -> workflow.submit(r.getId(), null));
+          return users.as(PROCESSOR, () -> workflow.validate(r.getId(), "Survey report checked"));
         });
   }
 
@@ -108,43 +151,64 @@ public class AdjustmentDemoData implements ApplicationRunner {
         "flat cancellation",
         () -> {
           EndorsementRequest r =
-              as(
-                  REQUESTER,
-                  () ->
-                      requests.create(
-                          draft(
-                              invoice,
-                              "FIN_CHANGE_COVER",
-                              "FLAT_CANCELLATION",
-                              "UNIT_SOLD",
-                              "Vehicle sold before the cover started; flat cancellation")));
-          as(REQUESTER, () -> workflow.submit(r.getId(), null));
-          as("adjust", () -> workflow.validate(r.getId(), "Deed of sale checked"));
-          return as("adjtl", () -> workflow.approve(r.getId(), null));
+              raise(
+                  invoice,
+                  "FIN_CHANGE_COVER",
+                  "FLAT_CANCELLATION",
+                  "UNIT_SOLD",
+                  "Vehicle sold before the cover started; flat cancellation");
+          users.as(REQUESTER, () -> workflow.submit(r.getId(), null));
+          users.as(PROCESSOR, () -> workflow.validate(r.getId(), "Deed of sale checked"));
+          return users.as("adjtl", () -> workflow.approve(r.getId(), null));
         });
   }
 
-  private static RequestDraft draft(
+  private void internalAdjustment(OpsInvoice invoice) {
+    step(
+        "internal adjustment (posted)",
+        () -> {
+          EndorsementRequest r =
+              raise(invoice, "INT_ADJUSTMENT", null, null, "Correct the cost center of the AO");
+          users.as(REQUESTER, () -> workflow.submit(r.getId(), null));
+          users.as(PROCESSOR, () -> workflow.validate(r.getId(), null));
+          users.as(
+              PROCESSOR,
+              () -> batches.post(invoice.getCompanyId(), List.of(r.getId()), "Demo posting"));
+          return r;
+        });
+  }
+
+  private EndorsementRequest raise(
       OpsInvoice invoice, String type, String requestType, String reason, String description) {
-    return new RequestDraft(
-        invoice.getInvoiceNo(),
-        new RequestTerms(
-            type,
-            requestType,
-            reason,
-            null,
-            requestType == null
-                ? invoice.getClassification().inceptionDate().plusDays(DAYS_AFTER_INCEPTION)
-                : invoice.getClassification().inceptionDate(),
-            RefundBasis.PRO_RATA,
-            null,
-            null,
-            null,
-            null,
-            description,
-            null),
-        AmountInput.NONE,
+    return users.as(
+        REQUESTER,
+        () ->
+            requests.create(
+                new RequestDraft(
+                    invoice.getInvoiceNo(),
+                    terms(invoice, type, requestType, reason, description),
+                    AmountInput.NONE,
+                    null,
+                    null)));
+  }
+
+  private static RequestTerms terms(
+      OpsInvoice invoice, String type, String requestType, String reason, String description) {
+    boolean cancellation = reason != null;
+    return new RequestTerms(
+        type,
+        requestType,
+        reason,
+        "DEMO-" + type,
+        cancellation
+            ? invoice.getClassification().inceptionDate()
+            : invoice.getClassification().inceptionDate().plusDays(DAYS_AFTER_INCEPTION),
+        RefundBasis.PRO_RATA,
         null,
+        null,
+        null,
+        null,
+        description,
         null);
   }
 
@@ -152,25 +216,12 @@ public class AdjustmentDemoData implements ApplicationRunner {
     return ledger.forArn(arn).stream().filter(i -> i.getKind() == InvoiceKind.BOOKING).findFirst();
   }
 
-  private void step(String name, Supplier<EndorsementRequest> action) {
+  private static void step(String name, Supplier<EndorsementRequest> action) {
     try {
       EndorsementRequest r = action.get();
-      LOG.info("Adjustment demo: {} {} is {}", name, r.getRequestNo(), r.getStage());
+      LOG.info("Adjustment demo: {} {}", name, r.getRequestNo());
     } catch (RuntimeException ex) {
       LOG.warn("Adjustment demo {} skipped: {}", name, ex.getMessage());
-    }
-  }
-
-  private <T> T as(String username, Supplier<T> action) {
-    Authentication previous = SecurityContextHolder.getContext().getAuthentication();
-    var details = users.loadUserByUsername(username);
-    SecurityContextHolder.getContext()
-        .setAuthentication(
-            new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities()));
-    try {
-      return action.get();
-    } finally {
-      SecurityContextHolder.getContext().setAuthentication(previous);
     }
   }
 }

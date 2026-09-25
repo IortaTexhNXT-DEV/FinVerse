@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  * Demo start-up (demo profile only): after {@code BookingDemoData} (order 80) has booked the demo
  * accounts, copies into the Operations ledger any booked invoice that is not there yet. The feed
  * listener already copies each new booking; this covers databases whose bookings predate
- * Operations. Idempotent.
+ * Operations. Runs as the demo administrator (FLOWIN_MANAGE, like the replay endpoint). Idempotent.
  */
 @Component
 @Profile("demo")
@@ -25,19 +25,22 @@ public class OpsLedgerDemoReplay implements ApplicationRunner {
   private static final Logger LOG = LoggerFactory.getLogger(OpsLedgerDemoReplay.class);
 
   private final InvoiceFeedReplayService replay;
+  private final DemoUsers users;
 
   /**
    * Creates the loader.
    *
    * @param replay replay service
+   * @param users demo sign-in
    */
-  public OpsLedgerDemoReplay(InvoiceFeedReplayService replay) {
+  public OpsLedgerDemoReplay(InvoiceFeedReplayService replay, DemoUsers users) {
     this.replay = replay;
+    this.users = users;
   }
 
   @Override
   public void run(ApplicationArguments args) {
-    FlowInRun run = replay.replayAll(Trigger.REPLAY);
+    FlowInRun run = users.as("admin", () -> replay.replayAll(Trigger.REPLAY));
     LOG.info("Operations ledger demo replay {}: {}", run.getRunNo(), run.getMessage());
   }
 }

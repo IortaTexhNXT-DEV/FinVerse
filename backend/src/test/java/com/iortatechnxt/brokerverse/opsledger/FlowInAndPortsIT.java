@@ -5,11 +5,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
+import com.iortatechnxt.brokerverse.cashiering.service.CashieringPaymentReapplier;
+import com.iortatechnxt.brokerverse.cashiering.service.CashieringReceiptIssuer;
+import com.iortatechnxt.brokerverse.cashiering.service.CashieringUnappliedSink;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.ExtractFile;
+import com.iortatechnxt.brokerverse.opsledger.domain.FlowInEnums;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInEnums.RecordStatus;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInEnums.RunStatus;
+import com.iortatechnxt.brokerverse.opsledger.domain.FlowInFeed;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInRun;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
@@ -32,15 +37,19 @@ import com.iortatechnxt.brokerverse.opsledger.service.adapter.ManualCollectionFe
 import com.iortatechnxt.brokerverse.opsledger.service.adapter.ManualInsurerFileInbox;
 import com.iortatechnxt.brokerverse.opsledger.service.adapter.QueueDisbursementGateway;
 import com.iortatechnxt.brokerverse.opsledger.service.adapter.RepositoryFileDrop;
+import com.iortatechnxt.brokerverse.opsledger.service.port.ClaimsFeed;
 import com.iortatechnxt.brokerverse.opsledger.service.port.CollectionFeed;
 import com.iortatechnxt.brokerverse.opsledger.service.port.DisbursementGateway;
+import com.iortatechnxt.brokerverse.opsledger.service.port.EarlyIncentiveRules;
 import com.iortatechnxt.brokerverse.opsledger.service.port.FeedItem;
 import com.iortatechnxt.brokerverse.opsledger.service.port.FileDropPort;
 import com.iortatechnxt.brokerverse.opsledger.service.port.FileDropPort.DropContent;
 import com.iortatechnxt.brokerverse.opsledger.service.port.InsurerFileInbox;
+import com.iortatechnxt.brokerverse.opsledger.service.port.MarketingFeed;
 import com.iortatechnxt.brokerverse.opsledger.service.port.PaymentReapplier;
 import com.iortatechnxt.brokerverse.opsledger.service.port.ReceiptIssuer;
 import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedSink;
+import com.iortatechnxt.brokerverse.remittance.service.RemittanceEarlyIncentiveRules;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
@@ -50,12 +59,16 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/** The flow-in framework and the default adapters of the Operations ports. */
+/**
+ * The flow-in framework, the default adapters of the Operations ports and which module bean serves
+ * each port once all Operations modules are installed.
+ */
 @IntegrationTest
 class FlowInAndPortsIT {
 
@@ -71,6 +84,9 @@ class FlowInAndPortsIT {
   @Autowired private UnappliedSink activeUnappliedSink;
   @Autowired private PaymentReapplier activeReapplier;
   @Autowired private ObjectMapper json;
+  @Autowired private EarlyIncentiveRules incentiveRules;
+  @Autowired private ObjectProvider<MarketingFeed> marketingFeed;
+  @Autowired private ObjectProvider<ClaimsFeed> claimsFeed;
   @Autowired private InvoiceLedgerQueryService ledgerQuery;
   private ReceiptIssuer receiptIssuer;
   private UnappliedSink unappliedSink;
@@ -169,18 +185,45 @@ class FlowInAndPortsIT {
   }
 
   @Test
-  void theDefaultAdaptersAreInstalledWhileNoModuleProvidesThePorts() {
-    // Cashiering provides the receipt, unapplied and re-application ports: its beans win.
-    assertThat(activeReceiptIssuer).isNotInstanceOf(HandoffReceiptIssuer.class);
-    assertThat(activeUnappliedSink).isNotInstanceOf(HandoffUnappliedSink.class);
-    assertThat(activeReapplier).isNotInstanceOf(LedgerPaymentReapplier.class);
+  void everyPortHasItsModuleBeanAndOnlyParkedIntegrationsKeepTheirDefault() {
+    // Cashiering provides the receipt, unapplied and re-application ports and remittance the early
+    // incentive rules: their beans win over the defaults.
+    assertThat(activeReceiptIssuer).isInstanceOf(CashieringReceiptIssuer.class);
+    assertThat(activeUnappliedSink).isInstanceOf(CashieringUnappliedSink.class);
+    assertThat(activeReapplier).isInstanceOf(CashieringPaymentReapplier.class);
+    assertThat(incentiveRules).isInstanceOf(RemittanceEarlyIncentiveRules.class);
+    // Parked integrations (OQ01, OQ02, OQ17, OQ22) keep the in-app defaults.
     assertThat(gateway).isInstanceOf(QueueDisbursementGateway.class);
     assertThat(collection).isInstanceOf(ManualCollectionFeed.class);
     assertThat(inbox).isInstanceOf(ManualInsurerFileInbox.class);
     assertThat(fileDrop).isInstanceOf(RepositoryFileDrop.class);
+    assertThat(marketingFeed.getIfAvailable()).isNull();
+    assertThat(claimsFeed.getIfAvailable()).isNull();
     assertThat(inbox.pending(fx.company(), "INS-MGIC", "PRODUCTION")).isEmpty();
     assertThat(inbox.transport()).isEqualTo("MANUAL_UPLOAD");
     assertThat(collection.pending(fx.company(), "COLLECTION_HOLD")).isEmpty();
+  }
+
+  @Test
+  void everyInboundFeedByUploadHasItsHandler() {
+    assertThat(flowIn.feeds())
+        .filteredOn(f -> f.getDirection() == FlowInEnums.Direction.INBOUND)
+        .filteredOn(f -> f.getTransport() == FlowInEnums.Transport.MANUAL_UPLOAD)
+        .filteredOn(f -> !f.getCode().equals(TestFlowInHandler.FEED))
+        .extracting(FlowInFeed::getCode)
+        .containsExactlyInAnyOrder(
+            "COLLECTION_CHECK_PICKUP",
+            "COLLECTION_CWT2307",
+            "COLLECTION_COMMISSION_PAYMENT",
+            "COLLECTION_HOLD",
+            "COLLECTION_SPECIAL_REMIT",
+            "COLLECTION_DP_LIST",
+            "INSURER_REMIT_OR",
+            "INSURER_PRODUCTION",
+            "INSURER_DP_RESPONSE")
+        .allSatisfy(code -> assertThat(flowIn.hasHandler(code)).as(code).isTrue());
+    assertThat(flowIn.hasHandler("OPS_INVOICE_FEED")).isFalse();
+    assertThat(flowIn.hasHandler("DISBURSEMENT_STATUS")).isFalse();
   }
 
   @Test

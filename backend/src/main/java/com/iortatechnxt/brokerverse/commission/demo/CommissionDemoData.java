@@ -2,16 +2,19 @@ package com.iortatechnxt.brokerverse.commission.demo;
 
 import com.iortatechnxt.brokerverse.commission.domain.CommissionEnums.DpTag;
 import com.iortatechnxt.brokerverse.commission.domain.CommissionEnums.ListSource;
+import com.iortatechnxt.brokerverse.commission.domain.DpBilling;
 import com.iortatechnxt.brokerverse.commission.domain.DpItem;
 import com.iortatechnxt.brokerverse.commission.domain.DpItem.Submission;
 import com.iortatechnxt.brokerverse.commission.domain.DpItemRepository;
 import com.iortatechnxt.brokerverse.commission.domain.DpList;
 import com.iortatechnxt.brokerverse.commission.domain.DpList.FileKey;
 import com.iortatechnxt.brokerverse.commission.domain.DpList.Origin;
+import com.iortatechnxt.brokerverse.commission.service.DpBillingSender;
 import com.iortatechnxt.brokerverse.commission.service.DpBillingService;
 import com.iortatechnxt.brokerverse.commission.service.DpIntakeService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.opsledger.demo.DemoUsers;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import java.time.LocalDate;
@@ -27,10 +30,11 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Demo start-up (demo profile only, idempotent): the direct payment booking of the demo
- * (ARN-2026-940003) arrives on the Head Office DP list of 30 September 2026 through the real intake
- * (validation and sanitation), is confirmed as fully paid to the insurer and gathered into a
- * commission billing ready to send to INS-MGIC.
+ * Demo start-up (demo profile only, idempotent), signed in as the commission handler ({@code
+ * commrec}): the direct payment booking of the demo (ARN-2026-940003) arrives on the Head Office DP
+ * list of 30 September 2026 through the real intake (validation and sanitation), is confirmed as
+ * fully paid to the insurer, gathered into a commission billing and sent to INS-MGIC, which now has
+ * ten working days to answer.
  */
 @Component
 @Profile("demo")
@@ -40,11 +44,14 @@ public class CommissionDemoData implements ApplicationRunner {
   private static final Logger LOG = LoggerFactory.getLogger(CommissionDemoData.class);
   private static final String ARN = "ARN-2026-940003";
   private static final LocalDate LIST_DATE = LocalDate.parse("2026-09-30");
+  private static final String HANDLER = "commrec";
 
   private final InvoiceLedgerQueryService ledger;
   private final DpIntakeService intake;
   private final DpBillingService billings;
   private final DpItemRepository items;
+  private final DpBillingSender sender;
+  private final DemoUsers users;
   private final TransactionTemplate tx;
 
   /**
@@ -54,6 +61,8 @@ public class CommissionDemoData implements ApplicationRunner {
    * @param intake DP intake
    * @param billings billings
    * @param items DP accounts (idempotency)
+   * @param sender billing e-mail
+   * @param users demo sign-in
    * @param txManager transaction manager
    */
   public CommissionDemoData(
@@ -61,11 +70,15 @@ public class CommissionDemoData implements ApplicationRunner {
       DpIntakeService intake,
       DpBillingService billings,
       DpItemRepository items,
+      DpBillingSender sender,
+      DemoUsers users,
       PlatformTransactionManager txManager) {
     this.ledger = ledger;
     this.intake = intake;
     this.billings = billings;
     this.items = items;
+    this.sender = sender;
+    this.users = users;
     this.tx = new TransactionTemplate(txManager);
   }
 
@@ -78,7 +91,12 @@ public class CommissionDemoData implements ApplicationRunner {
     }
     OpsInvoice invoice = invoices.get(0);
     try {
-      tx.executeWithoutResult(s -> seed(invoice));
+      List<DpBilling> billed = users.as(HANDLER, () -> tx.execute(s -> seed(invoice)));
+      if (billed != null && !billed.isEmpty()) {
+        users.as(
+            HANDLER,
+            () -> sender.send(billed.get(0).getId(), List.of("commission@mgic-demo.ph"), null));
+      }
       LOG.info(
           "Commission demo: DP account {} billed to {}",
           invoice.getInvoiceNo(),
@@ -88,7 +106,7 @@ public class CommissionDemoData implements ApplicationRunner {
     }
   }
 
-  private void seed(OpsInvoice invoice) {
+  private List<DpBilling> seed(OpsInvoice invoice) {
     DpList list =
         intake.open(
             invoice.getCompanyId(),
@@ -110,9 +128,10 @@ public class CommissionDemoData implements ApplicationRunner {
             .filter(i -> i.getTag() == DpTag.DP_FOR_CONFIRMATION)
             .map(DpItem::getId)
             .toList();
-    if (!valid.isEmpty()) {
-      intake.confirm(valid);
-      billings.prepare(invoice.getCompanyId(), valid);
+    if (valid.isEmpty()) {
+      return List.of();
     }
+    intake.confirm(valid);
+    return billings.prepare(invoice.getCompanyId(), valid);
   }
 }

@@ -31,14 +31,14 @@ public class AdjustmentWorkCounts implements OpsWorkCountSource {
   @Override
   public List<WorkCount> counts(Long companyId) {
     return List.of(
-        tile(companyId, RequestStage.FOR_VALIDATION, "Endorsements for validation", Severity.INFO),
-        tile(companyId, RequestStage.FOR_APPROVAL, "Endorsements for approval", Severity.WARNING),
-        tile(companyId, RequestStage.FOR_POSTING, "Endorsements for posting", Severity.INFO),
-        tile(companyId, RequestStage.RETURNED, "Returned to requester", Severity.WARNING),
+        tile(companyId, RequestStage.FOR_VALIDATION, "Endorsements for Validation", Severity.INFO),
+        tile(companyId, RequestStage.FOR_APPROVAL, "Endorsements for Approval", Severity.WARNING),
+        tile(companyId, RequestStage.FOR_POSTING, "Endorsements for Posting", Severity.INFO),
+        tile(companyId, RequestStage.RETURNED, "Returned to Requester", Severity.WARNING),
         tile(
             companyId,
             RequestStage.AWAITING_REAPPLICATION,
-            "Payments to re-apply",
+            "Payments to Re-apply",
             Severity.ALERT));
   }
 

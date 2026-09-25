@@ -57,38 +57,38 @@ public class CommissionWorkCounts implements OpsWorkCountSource, InvoiceRelatedI
     return List.of(
         tile(
             "DP_TO_CONFIRM",
-            "DP accounts to confirm",
+            "DP Accounts to Confirm",
             items.countByCompanyIdAndTag(companyId, DpTag.DP_FOR_CONFIRMATION),
             Severity.INFO,
             VALIDATION),
         tile(
             "DP_TO_BILL",
-            "DP accounts for billing",
+            "DP Accounts for Billing",
             items.countByCompanyIdAndTag(companyId, DpTag.DP_FOR_BILLING),
             Severity.INFO,
             VALIDATION),
         tile(
             "DP_AWAITING",
-            "Billings awaiting insurer",
+            "Billings Awaiting Insurer",
             billings.countByCompanyIdAndStage(companyId, DpBilling.AWAITING),
             Severity.WARNING,
             BILLINGS),
         tile(
             "DP_OVERDUE",
-            "Insurer feedback overdue",
+            "Insurer Feedback Overdue",
             billings.countByCompanyIdAndStageAndSlaDueBefore(
                 companyId, DpBilling.AWAITING, LocalDate.now(clock)),
             Severity.ALERT,
             BILLINGS),
         tile(
             "DP_TO_COLLECT",
-            "Approved billings to collect",
+            "Approved Billings to Collect",
             billings.countByCompanyIdAndStage(companyId, DpBilling.APPROVED),
             Severity.WARNING,
             BILLINGS),
         tile(
             "BIR_CERT_SUBMITTED",
-            "BIR certificates to acknowledge",
+            "BIR Certificates to Acknowledge",
             certificates.countByCompanyIdAndStage(companyId, CertificateSubmission.SUBMITTED),
             Severity.INFO,
             "/commission/certificates"));

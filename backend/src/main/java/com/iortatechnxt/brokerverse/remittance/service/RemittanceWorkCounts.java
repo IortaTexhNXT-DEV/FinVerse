@@ -46,27 +46,27 @@ public class RemittanceWorkCounts implements OpsWorkCountSource {
     return List.of(
         tile(
             "remit-batches-review",
-            "Batches in review",
+            "Batches in Review",
             batches.countByCompanyIdAndStageIn(
                 companyId, List.of(BatchStage.REVIEW_IN_PROCESS, BatchStage.ON_HOLD)),
             Severity.INFO,
             BATCHES),
         tile(
             "remit-batches-approval",
-            "Batches for approval",
+            "Batches for Approval",
             batches.countByCompanyIdAndStageIn(companyId, List.of(BatchStage.FOR_APPROVAL)),
             Severity.WARNING,
             BATCHES + "?tab=FOR_APPROVAL"),
         tile(
             "remit-batches-or",
-            "Awaiting insurer OR",
+            "Awaiting Insurer OR",
             batches.countByCompanyIdAndStageIn(
                 companyId, List.of(BatchStage.PARTIALLY_REMITTED, BatchStage.FULLY_REMITTED)),
             Severity.INFO,
             "/remittance/insurer-or"),
         tile(
             "remit-holds-approval",
-            "Holds for approval",
+            "Holds for Approval",
             holds.countByCompanyIdAndStageIn(
                 companyId,
                 List.of(
@@ -77,13 +77,13 @@ public class RemittanceWorkCounts implements OpsWorkCountSource {
             "/remittance/holds"),
         tile(
             "remit-holds-active",
-            "Active holds",
+            "Active Holds",
             holds.countByCompanyIdAndStageIn(companyId, List.of(HoldStage.ACTIVE)),
             Severity.INFO,
             "/remittance/holds"),
         tile(
             "remit-special-approval",
-            "Special remittances for approval",
+            "Special Remittances for Approval",
             specials.countByCompanyIdAndStageIn(companyId, List.of(SpecialStage.FOR_APPROVAL)),
             Severity.WARNING,
             "/remittance/special"));

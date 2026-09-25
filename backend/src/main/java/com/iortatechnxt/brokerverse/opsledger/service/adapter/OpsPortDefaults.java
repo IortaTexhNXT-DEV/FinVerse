@@ -8,11 +8,13 @@ import com.iortatechnxt.brokerverse.opsledger.service.HandoffService;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.opsledger.service.port.CollectionFeed;
 import com.iortatechnxt.brokerverse.opsledger.service.port.DisbursementGateway;
+import com.iortatechnxt.brokerverse.opsledger.service.port.EarlyIncentiveRules;
 import com.iortatechnxt.brokerverse.opsledger.service.port.FileDropPort;
 import com.iortatechnxt.brokerverse.opsledger.service.port.InsurerFileInbox;
 import com.iortatechnxt.brokerverse.opsledger.service.port.PaymentReapplier;
 import com.iortatechnxt.brokerverse.opsledger.service.port.ReceiptIssuer;
 import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedSink;
+import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -111,5 +113,16 @@ public class OpsPortDefaults {
   @ConditionalOnMissingBean(FileDropPort.class)
   public FileDropPort defaultFileDrop(ExtractRepositoryService repository) {
     return new RepositoryFileDrop(repository);
+  }
+
+  /**
+   * No early remittance incentive rule while remittance is not installed (OQ23).
+   *
+   * @return default adapter
+   */
+  @Bean
+  @ConditionalOnMissingBean(EarlyIncentiveRules.class)
+  public EarlyIncentiveRules defaultEarlyIncentiveRules() {
+    return (companyId, subject) -> Optional.empty();
   }
 }

@@ -56,7 +56,7 @@ This page is binding for every BrokerVerse screen. Components read the design to
 - **Navigation groups.** These follow the BDOI prototype (`frontend/src/navigation/modules.ts`):
   - Dashboard and My Work (always open);
   - **Client & Policy**: Client Management, Quotation / Proposal, Accounts, Non-Package Management, Placement & Booking, Product Reconciliation, Adjustment, Renewal (later BRD), Customer Service Facility (later BRD), Product Maintenance, Bulk Processing;
-  - **Finance**: the operations cash modules (cashiering, remittance, commission) and the general ledger, receivables, payables, assets, planning, tax and accounting engine;
+  - **Finance**: Collections, the operations cash modules (cashiering, remittance, commission), Disbursement, Refund & Cash Advance Requests, ACSL and Accounting Reports, then the general ledger, receivables, payables, assets, planning, tax and accounting engine;
   - **Claims & Insurance**, **Reports**, **Setup & Administration**.
 
   The group holding the current page opens automatically.

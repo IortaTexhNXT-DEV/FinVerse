@@ -93,6 +93,23 @@ public class InvoiceLedgerQueryService {
   }
 
   /**
+   * The family of an invoice (DIS 3.27.2, ACSL 2.16.0): every invoice sharing its root invoice
+   * number (the original booking, its endorsements and cancellations), root first, loaded.
+   *
+   * @param invoiceNo any invoice of the family
+   * @return the family; empty when the invoice is not in the ledger
+   */
+  public List<OpsInvoice> family(String invoiceNo) {
+    List<OpsInvoice> list =
+        invoices
+            .findByInvoiceNo(invoiceNo)
+            .map(i -> invoices.findByRootInvoiceNoOrderByIdAsc(i.getRootInvoiceNo()))
+            .orElseGet(List::of);
+    list.forEach(InvoiceLedgerQueryService::load);
+    return list;
+  }
+
+  /**
    * Searches invoices (collections not loaded).
    *
    * @param search criteria

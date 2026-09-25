@@ -321,7 +321,7 @@ Notification events:
 | `adjustment` (built) | None required. Commission deltas are already posted as `ADJUSTED` movements (`CommissionAdjuster`), which Commission reads for BRCLXN.063. Collections shows `PENDING_NEG_ADJ` on the item | - | - |
 | Disbursement queue (built, `opsledger` `DisbursementQueueService`) | None. Refunds (Cashiering) and commission refunds (draft 063) use `DisbursementGateway` as designed | - | - |
 | GL / accounting | Two new event types (draft 061-063) with demo rules; no change for the signed scope | Comptrollership rule sign-off | O1-D |
-| `catalog` (built, PM extending) | Unit Head on the sales unit: `cat_sales_unit.head_username` + `SalesOrganisationService.unitHead(companyId, unitCode)` | Migration `V819__catalog_sales_unit_head.sql`: V818-V819 are held by Product Maintenance, so agree with the PM owner. Fallback: `clx_unit_head` in V891 | C0 (with PM) |
+| `catalog` (built, PM extending) | Unit Head on the sales unit: `cat_sales_unit.head_username` + `SalesOrganisationService.unitHead(companyId, unitCode)` | Migration `V819__catalog_sales_unit_head.sql`: V818-V819 are held by Product Maintenance, so agree with the PM owner. Fallback: `clx_unit_head` in V891 | **Deferred to C1-A** (P1-A is changing `catalog` during C0; section 14) |
 | `security` (built) | Lockout threshold from a parameter (NFR 3 attempts); Collections permissions | `AppUser.MAX_FAILED_ATTEMPTS` becomes `SecurityProperties.maxFailedAttempts` | C0 |
 | `report` (built) | Scheduled file generation with availability: `ReportArchiveService.archiveGenerated(code, params, file, availableFrom)` | Used by the Collections file jobs | C0 |
 
@@ -419,3 +419,62 @@ Rules for parallel work:
 4. **Export load** (caveat p.93). Mitigation: asynchronous exports, a row cap, a separate permission, and files generated off-peak.
 5. **Legacy data** (EBIX history, invoice format). Mitigation: a migration handler and a pattern parameter accepting both formats (CQ07, CQ13).
 6. **Flyway overlap** with the other pending BRD analyses in V890s. Mitigation: coordinate in the Developer Guide before C0, with the fallback of section 3.
+
+## 14. C0 foundation: as built
+
+What the C0 wave built (together with the BRD-5 foundation A0, because both edit the same shared files), and where it
+differs from or details the sections above. C1-A, C1-B and C1-C build on this and compile only against it.
+
+- **Migration.** `V1000__collections_foundation.sql` (the V890 of section 3, read through the allocation note):
+  - roles `MKT_HANDLER`, `CLX_TL`, `MKT_SECTION_HEAD`, `UNAPPLIED_HANDLER`, `APP_SUPPORT`, `DCO` and the grants of
+    section 6.2. Every new role also has WORK_VIEW, ATTACHMENT_VIEW, REPORT_VIEW, CLIENT_VIEW, ACCOUNT_VIEW and OPS_VIEW
+    (the account page links to Invoice 360); MKT_AO receives OPS_VIEW for the same reason. The "`ACSL` (new, view)" role
+    of 6.2 is not created: BRD-5 created `ACSL_PROCESSOR`, `ACSL_TL` and `ACSL_HEAD` (V890), and they receive CLX_VIEW
+    and CLX_REPORT_VIEW. SYSADMIN and AUDITOR have read access; `sec_permission_action` classifies the `CLX_*`
+    permissions in the area `COLLECTIONS`;
+  - LOV types and the seeds of section 8, all marked "(to confirm)" (CQ08), plus `DP_RETURNED` ("DP returned by insurer",
+    used by the inbox) and `NO_POLICY_NUMBER` (Processing Unit). Billing frequencies ANNUAL / SEMI_ANNUAL / QUARTERLY /
+    MONTHLY; escalation reasons NO_COMMITMENT, BROKEN_PROMISE, AGING, INSTALLMENT_OVERDUE, CTE_REFUSED, OTHERS;
+  - **LOV attributes.** `lov_value` has no attribute columns, so the attributes of sections 4.1 / 4.4 live in
+    `clx_lov_attribute (type_code, code, attribute, value)`, keyed to `lov_value`. Attributes: `category`,
+    `tagging_owner`, `ops_action`, `allowed_roles` (CLX_PR_DISPOSITION) and `requires_invoice`, `cashiering_action`
+    (CLX_UPP_DISPOSITION; values = `UnappliedDispositionRequests.Action` or NONE). `category` (A / B / C) is not seeded
+    until BDOI gives it (CQ08). C1-A maps the table (entity in `collections/common`) and maintains it on Collections
+    Setup; C1-C reads the UPP rows;
+  - workflow `CLX_ESCALATION` (section 7). `RAISED` has no owner; `route` / `route_to_head` are the system routing
+    actions; `auto_close` exists from every open stage; `escalate_further` needs a `CLX_ESCALATION_REASON`,
+    `return_to_handler` a `RETURN_REASON`; `acknowledge` and `return_to_handler` are generic (WorkflowPanel);
+  - parameters of section 8 (`CLX_AGING_BRACKETS` is a CODE_LIST) and `LOGIN_MAX_FAILED_ATTEMPTS` = 3;
+  - alert codes and notification events of section 8;
+  - the five feeds of section 2.2 set to transport `IN_APP`. Their upload handlers stay (fallback), and
+    `ManualCollectionFeed` stays the bean until C1-A declares `InAppCollectionFeed`;
+  - `report_run.available_from` and the action `GENERATE` (scheduled files).
+- **Security.** Permissions `CLX_*` in `Permission.java`. The lockout threshold is the parameter
+  `LOGIN_MAX_FAILED_ATTEMPTS` (seeded 3, CQ23 decides whether it applies to all BIBS users), with
+  `brokerverse.security.max-failed-attempts` (default 5) when the parameter is missing; `AppUser.MAX_FAILED_ATTEMPTS`
+  is gone (`recordFailedLogin(int)`).
+- **Report archive.** `ReportArchiveService.archiveGenerated(code, echo, rowCount, file, availableFrom)` archives a file
+  produced by a job; `ReportService.generate(code, params, format, availableFrom)` runs, renders and archives a
+  registered report in one call (no user permission check: the caller is a `ManagedJob`). The download of a generated
+  file before `availableFrom` is refused with `REPORT_FILE_NOT_AVAILABLE`; the Report Archive screen shows "Available
+  from". `ReportMetadata.collections(...)` gives the Collections category, view permission CLX_REPORT_VIEW and export
+  permission CLX_EXPORT (archived).
+- **Ports (section 9).** Built as specified: `CollectionFeed.acknowledge` (default no-op), `UnappliedDirectory` (default
+  `EmptyUnappliedDirectory`), `UnappliedDispositionRequests` (default `HandoffDispositionRequests`, hand-off port
+  `UnappliedDispositionRequests`, team `CASH_DISPOSITION`; `status(source, sourceRef)` added so C1-C can poll), and the
+  events `CollectionFeedReady` and `UnappliedDispositionChanged` (published by cashiering when it decides a
+  request: ACCEPTED, REJECTED or APPLIED). Cashiering is merged, so the cashiering adapters of the two ports are an open
+  contract ask (C1-C with the cashiering owner, section 12).
+- **Deferred to C1-A: the catalog unit head.** `cat_sales_unit.head_username` and
+  `SalesOrganisationService.unitHead(companyId, unitCode)` (section 9, V819) are not built in C0 because the Product
+  Maintenance wave P1-A is changing `catalog/**` at the same time. C1-A adds them after P1-A merges (agree the
+  migration number with the PM owner: V818 / V819 are held by Product Maintenance), or falls back to `clx_unit_head`
+  in V1001.
+- **Navigation.** Group **Finance**, section **Collections**, first (before Cashiering), as section 11 decides; the
+  home is `/collections` (`features/collections`, module id `collections`, help id `collections`, permission
+  CLX_VIEW), a landing screen until C1-A adds the home tiles. Every other Collections route goes under `/collections`
+  and into `features/collections/module.ts` and `help.ts` (owned by C1-A; C1-B / C1-C add their screens there).
+- **Jobs.** The crons of section 8 are in `application.yml` (`brokerverse.jobs.clx-*-cron`) and
+  `docs/operations/CONFIGURATION.md`; each job reads its cron with `@Value("${brokerverse.jobs.<property>:-}")`.
+- **Flyway left to the build waves.** V1001-V1005 as in section 3 (C1-A V1001 / V1005 / demo V1900, C1-B V1002 / V1003
+  / demo V1901, C1-C V1004); V1006-V1009 free.

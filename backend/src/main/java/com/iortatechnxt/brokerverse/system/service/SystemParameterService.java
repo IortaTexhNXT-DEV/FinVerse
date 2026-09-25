@@ -39,6 +39,9 @@ public class SystemParameterService {
   /** Days of job history shown in the monitor. */
   public static final String JOB_HISTORY_DAYS = "JOB_HISTORY_DAYS";
 
+  /** Consecutive failed logins that lock an account (BDOI NFR, COLLECTIONS_DESIGN section 8). */
+  public static final String LOGIN_MAX_FAILED_ATTEMPTS = "LOGIN_MAX_FAILED_ATTEMPTS";
+
   private static final String ENTITY = "SystemParameter";
 
   private final SystemParameterRepository repository;

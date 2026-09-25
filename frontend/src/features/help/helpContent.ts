@@ -1,4 +1,5 @@
 import { ACCOUNTING_ENGINE_HELP } from '@/features/accounting-engine/help';
+import { ACSL_HELP } from '@/features/acsl/help';
 import { ACCOUNTS_HELP } from '@/features/accounts/help';
 import { ADJUSTMENT_HELP } from '@/features/adjustment/help';
 import { ADMIN_HELP } from '@/features/admin/help';
@@ -9,8 +10,11 @@ import { BULK_HELP } from '@/features/bulk/help';
 import { CASHIERING_HELP } from '@/features/cashiering/help';
 import { CATALOG_HELP } from '@/features/catalog/help';
 import { CLAIMS_HELP } from '@/features/claims/help';
+import { COLLECTIONS_HELP } from '@/features/collections/help';
 import { COMMISSION_HELP } from '@/features/commission/help';
 import { CRM_HELP } from '@/features/crm/help';
+import { DISBURSEMENT_HELP } from '@/features/disbursement/help';
+import { FRBS_HELP } from '@/features/frbs/help';
 import { PROPOSALS_HELP } from '@/features/proposals/help';
 import { QUOTATIONS_HELP } from '@/features/quotations/help';
 import { PLANNING_HELP } from '@/features/closing/help';
@@ -19,6 +23,7 @@ import { ISSUANCE_HELP } from '@/features/issuance/help';
 import { NB_DASHBOARD_HELP, NB_REPORTS_HELP } from '@/features/nbreports/help';
 import { OPERATIONS_HELP } from '@/features/operations/help';
 import { PAYABLES_HELP } from '@/features/payables/help';
+import { PAY_REQUESTS_HELP } from '@/features/payrequest/help';
 import { PLACEMENT_HELP } from '@/features/placement/help';
 import { PRODRECON_HELP } from '@/features/prodrecon/help';
 import { withPackageRequestHelp } from '@/features/productmaint/help';
@@ -117,9 +122,14 @@ export const HELP_SECTIONS: HelpSection[] = [
   withPackageRequestHelp(CATALOG_HELP),
   BULK_HELP,
   OPERATIONS_HELP,
+  COLLECTIONS_HELP,
   CASHIERING_HELP,
   REMITTANCE_HELP,
   COMMISSION_HELP,
+  DISBURSEMENT_HELP,
+  PAY_REQUESTS_HELP,
+  ACSL_HELP,
+  FRBS_HELP,
   GL_HELP,
   RECEIVABLES_HELP,
   PAYABLES_HELP,

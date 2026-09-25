@@ -83,6 +83,18 @@ export const WORKFLOW_NAMES: Record<string, string> = {
   NB_ACCOUNT: 'Accounts',
   NB_CLIENT: 'Client onboarding',
   PM_PACKAGE_REQUEST: 'Package requests',
+  CLX_ESCALATION: 'Collection escalations',
+  DISB_VOUCHER: 'Disbursement vouchers',
+  DISB_STATUS_EDIT: 'Instrument status changes',
+  DISB_FUNDING: 'Account funding',
+  DISB_PAYEE: 'Payees',
+  PRQ_REFUND: 'Refund requests',
+  PRQ_CASH_ADVANCE: 'Cash advance requests',
+  PRQ_CHECK_CANCEL: 'Check cancellation requests',
+  ACSL_CASE: 'ACSL cases',
+  ACSL_CORRECTION: 'ACSL correction entries',
+  REM_DEDUCTION: 'Remittance deductions',
+  FRBS_SERVICE_FEE: 'Service fee runs',
 };
 
 /** Workflow engine: My Work queues, record workflow panel, generic actions, assignment. */

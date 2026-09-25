@@ -14,7 +14,12 @@ public enum ReportCategory {
   RECONCILIATION("Reconciliation"),
   CONTROL("Control & Audit"),
   TAX_STATUTORY("Tax & Statutory"),
-  OPERATIONS("Operations");
+  OPERATIONS("Operations"),
+  COLLECTIONS("Collections"),
+  DISBURSEMENT("Disbursement"),
+  PAYMENT_REQUESTS("Refund & Cash Advance Requests"),
+  ACSL("ACSL"),
+  FRBS("BDOI Report Pack");
 
   private final String label;
 

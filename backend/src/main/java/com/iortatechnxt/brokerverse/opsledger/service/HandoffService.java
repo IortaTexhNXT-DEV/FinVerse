@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsHandoff;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsHandoffRepository;
 import java.time.Clock;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -66,6 +67,19 @@ public class HandoffService {
     return handoffs
         .findByPortAndSourceModuleAndSourceRef(port, spec.sourceModule(), spec.sourceRef())
         .orElseGet(() -> create(companyId, port, team, spec));
+  }
+
+  /**
+   * The hand-off of a source transaction, open or closed.
+   *
+   * @param port port name
+   * @param sourceModule module that asked
+   * @param sourceRef its reference
+   * @return hand-off, empty when none was recorded
+   */
+  @Transactional(readOnly = true)
+  public Optional<OpsHandoff> find(String port, String sourceModule, String sourceRef) {
+    return handoffs.findByPortAndSourceModuleAndSourceRef(port, sourceModule, sourceRef);
   }
 
   private OpsHandoff create(Long companyId, String port, String team, OpsHandoff.Spec spec) {

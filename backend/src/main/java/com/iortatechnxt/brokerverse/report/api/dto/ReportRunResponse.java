@@ -12,13 +12,14 @@ import java.time.Instant;
  * @param title report title
  * @param category category key
  * @param parameters parameter echo
- * @param action VIEW or EXPORT
+ * @param action VIEW, EXPORT or GENERATE
  * @param format export format
  * @param rowCount rows of the result
  * @param fileName exported file name
  * @param sizeBytes exported file size
  * @param createdBy run by
  * @param createdAt run at
+ * @param availableFrom when a generated file may be downloaded, null = at once
  */
 public record ReportRunResponse(
     Long id,
@@ -32,7 +33,8 @@ public record ReportRunResponse(
     String fileName,
     Long sizeBytes,
     String createdBy,
-    Instant createdAt) {
+    Instant createdAt,
+    Instant availableFrom) {
 
   /**
    * Maps a run.
@@ -53,6 +55,7 @@ public record ReportRunResponse(
         r.getFileName(),
         r.getSizeBytes(),
         r.getCreatedBy(),
-        r.getCreatedAt());
+        r.getCreatedAt(),
+        r.getAvailableFrom());
   }
 }

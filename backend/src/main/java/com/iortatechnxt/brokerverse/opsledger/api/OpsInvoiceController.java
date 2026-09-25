@@ -104,6 +104,18 @@ public class OpsInvoiceController {
   }
 
   /**
+   * The invoice family: every invoice sharing the root invoice number (DIS 3.27.2, ACSL 2.16.0).
+   *
+   * @param invoiceNo any invoice of the family
+   * @return invoices, root first
+   */
+  @GetMapping("/invoices/{invoiceNo}/family")
+  @PreAuthorize(OpsAccess.VIEW)
+  public List<OpsInvoiceResponse> family(@PathVariable String invoiceNo) {
+    return ledger.family(invoiceNo).stream().map(OpsInvoiceResponse::from).toList();
+  }
+
+  /**
    * Status, flag and lock history of an invoice.
    *
    * @param invoiceNo invoice number

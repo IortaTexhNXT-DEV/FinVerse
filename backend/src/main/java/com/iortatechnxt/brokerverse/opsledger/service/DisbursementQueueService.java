@@ -24,8 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * The in-app Disbursement queue (default {@code DisbursementGateway}, OQ02): Operations modules
  * send payment requests; Disbursement users ({@code DISB_PROCESS}) acknowledge them, assign the DV
- * number, mark them paid or return them with a reason (RMTID.019, DBMID.001). Each change is
- * audited and published as {@link DisbursementStatusChanged} for the source module.
+ * number, mark them paid or return them with a reason (RMTID.019, DBMID.001), cancel them (DIS
+ * 2.20.0) and record the DV stage and instrument status reported by Disbursement (DIS 2.8, 3.26).
+ * Each change is audited and published as {@link DisbursementStatusChanged} for the source module.
  */
 @Service
 @Transactional
@@ -169,6 +170,34 @@ public class DisbursementQueueService {
     return changed(r, "Returned: " + r.getReturnReason());
   }
 
+  /**
+   * Cancels a request or its approved DV (DIS 2.20.0); the source module restores its records.
+   *
+   * @param id request
+   * @param reason reason
+   * @return the request
+   */
+  public DisbursementRequest cancel(Long id, String reason) {
+    DisbursementRequest r = get(id);
+    r.cancel(reason.strip(), clock.instant());
+    return changed(r, "Cancelled: " + r.getCancelReason());
+  }
+
+  /**
+   * Records the DV stage and instrument status reported by Disbursement without changing the
+   * gateway status (DIS 2.8, 3.26; ACCOUNTING_DISBURSEMENT_DESIGN 7.2).
+   *
+   * @param id request
+   * @param dvStatus DV stage, may be null
+   * @param instrumentStatus instrument status, may be null
+   * @return the request
+   */
+  public DisbursementRequest track(Long id, String dvStatus, String instrumentStatus) {
+    DisbursementRequest r = get(id);
+    r.track(dvStatus, instrumentStatus);
+    return changed(r, "DV stage " + r.getDvStatus() + ", instrument " + r.getInstrumentStatus());
+  }
+
   private DisbursementRequest changed(DisbursementRequest r, String summary) {
     audit.record(ENTITY, r.getRequestNo(), AuditAction.UPDATE, summary);
     events.publishEvent(
@@ -180,7 +209,11 @@ public class DisbursementQueueService {
             r.getSourceRef(),
             r.getStatus(),
             r.getDvNo(),
-            r.getReturnReason()));
+            r.getStatus() == DisbursementRequest.Status.CANCELLED
+                ? r.getCancelReason()
+                : r.getReturnReason(),
+            r.getDvStatus(),
+            r.getInstrumentStatus()));
     notifications.notifyUser(
         r.getCreatedBy(),
         new Notice(

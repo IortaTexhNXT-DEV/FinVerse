@@ -37,7 +37,7 @@ class OpsLedgerDomainTest {
         OpsInvoice.of(
             new OpsInvoiceData(
                 new OpsInvoiceData.Keys(
-                    1L, 1L, "BI-T-1", "ARN-T-1", 9L, kind, null, null, "POL-1", 1),
+                    1L, 1L, "BI-T-1", "ARN-T-1", 9L, kind, null, null, "BI-T-1", "POL-1", 1),
                 new OpsInvoiceData.Parties("CL-1", "Client", "Client", "INS-A"),
                 new OpsInvoiceData.Classification(
                     "PHP", DAY, DAY, DAY.plusYears(1), "MTR10", "MTR", "CBG", "ao", "MKT", "CC"),

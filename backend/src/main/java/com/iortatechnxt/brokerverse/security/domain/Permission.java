@@ -177,5 +177,79 @@ public enum Permission {
   PKG_MANCOM_SIGNOFF,
   PKG_ADVISORY,
   // Package Status Update Report and Product Maintenance home (BRPM.018/019)
-  PKG_REPORT_VIEW
+  PKG_REPORT_VIEW,
+
+  // Collections (BDOI BRD-4). See docs/architecture/COLLECTIONS_DESIGN.md section 6.1 and V1000.
+  // Home, worklist, account page (read-only) and completed collections (BRCLXN.001-012)
+  CLX_VIEW,
+  // Efforts, promises, PR dispositions and remarks on own / assigned items; soft lock (016-023,
+  // 055)
+  CLX_WORK,
+  // Bulk update in the grid and the upload handler (BRCLXN.051)
+  CLX_BULK_UPDATE,
+  // Manual escalation (BRCLXN.050) and acting on escalations (TL / UH / Section Head, 049)
+  CLX_ESCALATE,
+  CLX_ESCALATION_HANDLE,
+  // Reassignment and assignment rules (BRCLXN.052)
+  CLX_ASSIGN,
+  // Collector disposition and application request on unapplied payments (BRCLXN.030-033)
+  CLX_UNAPPLIED_WORK,
+  // Installment plans and billing statements (BRCLXN.053/058)
+  CLX_BILLING,
+  // Threshold, escalation rules, billing frequencies, invoice pattern, Collections LOVs
+  CLX_SETUP,
+  // Export of lists and download of files (caveat p.93); scheduled files and reports; audit log
+  CLX_EXPORT,
+  CLX_REPORT_VIEW,
+  CLX_AUDIT_VIEW,
+
+  // Accounting, Disbursement and ACSL (BDOI BRD-5). See
+  // docs/architecture/ACCOUNTING_DISBURSEMENT_DESIGN.md section 8.1 and V890.
+  // FRBS: journal assignment, revaluation rate, chart upload, close schedule (FRBS 2.2-2.6)
+  JOURNAL_ASSIGN,
+  REVALUATION_RATE_MAINTAIN,
+  COA_UPLOAD,
+  GL_CLOSE_SCHEDULE,
+  // FRBS report pack and service fee (FRBS 2.10, 3.2)
+  FRBS_REPORT_VIEW,
+  FRBS_REPORT_EXPORT,
+  SERVICE_FEE_MANAGE,
+  SERVICE_FEE_APPROVE,
+  SERVICE_FEE_TAG,
+  // Disbursement (DIS 2.2-3.28); DISB_PROCESS above is the processor permission
+  DISB_VIEW,
+  DISB_PAYEE_MAINTAIN,
+  DISB_PAYEE_AUTHORIZE,
+  DISB_PAYEE_VIEW_FULL,
+  DISB_UPLOAD,
+  DISB_REVIEW,
+  DISB_APPROVE,
+  DISB_STATUS_APPROVE,
+  DISB_EOD,
+  DISB_FUNDING_REQUEST,
+  DISB_FUNDING_VERIFY,
+  DISB_FUNDING_APPROVE,
+  DISB_TAG,
+  DISB_REPORT_VIEW,
+  DISB_REPORT_EXPORT,
+  // Marketing refund and cash-advance requests (MKT 1.2-2.26)
+  PRQ_CREATE,
+  PRQ_ASSIGN,
+  PRQ_REVIEW,
+  PRQ_APPROVE,
+  PRQ_HR_APPROVE,
+  PRQ_VIEW,
+  // ACSL (ACSL 2.2-2.16, 2.9.1-2.9.2)
+  ACSL_VIEW,
+  ACSL_UPLOAD,
+  ACSL_PROCESS,
+  ACSL_ASSIGN,
+  ACSL_REVIEW,
+  ACSL_APPROVE,
+  ACSL_APPLY,
+  ACSL_REPORT_VIEW,
+  ACSL_REPORT_EXPORT,
+  REMIT_DEDUCTION_CONFIRM,
+  // Employee / cost-centre master (DIS 3.30.1)
+  EMPLOYEE_MAINTAIN
 }

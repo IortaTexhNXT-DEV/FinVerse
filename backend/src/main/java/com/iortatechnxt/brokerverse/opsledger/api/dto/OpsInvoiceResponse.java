@@ -63,6 +63,7 @@ public record OpsInvoiceResponse(
             i.getKind(),
             i.getEndorsementNo(),
             i.getParentInvoiceNo(),
+            i.getRootInvoiceNo(),
             i.getPolicyNo(),
             i.getPolicyYear(),
             i.getPnNos()),
@@ -93,6 +94,7 @@ public record OpsInvoiceResponse(
    * @param kind kind
    * @param endorsementNo endorsement number
    * @param parentInvoiceNo original invoice
+   * @param rootInvoiceNo root invoice of the family (DIS 3.27.2)
    * @param policyNo policy number
    * @param policyYear policy year
    * @param pnNos PN numbers
@@ -104,6 +106,7 @@ public record OpsInvoiceResponse(
       InvoiceKind kind,
       String endorsementNo,
       String parentInvoiceNo,
+      String rootInvoiceNo,
       String policyNo,
       int policyYear,
       String pnNos) {}

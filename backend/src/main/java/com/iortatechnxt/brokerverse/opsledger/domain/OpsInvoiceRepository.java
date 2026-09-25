@@ -53,6 +53,14 @@ public interface OpsInvoiceRepository
   List<OpsInvoice> findByArnOrderByPolicyYearAscIdAsc(String arn);
 
   /**
+   * The invoices of a family, root first (DIS 3.27.2, ACSL 2.16.0).
+   *
+   * @param rootInvoiceNo root invoice number
+   * @return invoices sharing the root
+   */
+  List<OpsInvoice> findByRootInvoiceNoOrderByIdAsc(String rootInvoiceNo);
+
+  /**
    * Invoice numbers already in the ledger among some.
    *
    * @param invoiceNos invoice numbers

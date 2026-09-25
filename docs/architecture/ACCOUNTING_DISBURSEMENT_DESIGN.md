@@ -585,3 +585,85 @@ Rules for parallel work:
    agreed before A1.
 6. **The demo range is full after V999.** Mitigation: convention for V1000+ written into the Developer Guide by A0
    (section 4).
+
+## 17. A0 foundation: as built
+
+What the A0 wave built (together with the Collections foundation C0, because both edit the same shared files), and
+where it differs from or details the sections above. The A1 waves compile only against this.
+
+- **Migrations.**
+  - `V765__ops_gateway_v2_root_invoice.sql`: new columns of `ops_disbursement_request` (`rfp_no`, `payee_class`,
+    `disbursement_type`, `root_invoice_no`, `attachment_refs`, `accounting_refs`, `straight_to_approval`, `dv_status`,
+    `instrument_status`, `cancelled_at`, `cancel_reason`), the new types and status CANCELLED;
+    `ops_invoice.root_invoice_no` (not null, back-filled along the parent chain, indexed); movement type CORRECTION.
+  - `V890__acct_foundation.sql`: roles and grants of section 8.2 (every new role also has WORK_VIEW, ATTACHMENT_VIEW,
+    REPORT_VIEW, DASHBOARD_VIEW; the Disbursement, request and ACSL roles have OPS_VIEW, OPS_REPORT_VIEW, CLIENT_VIEW
+    and ATTACHMENT_MANAGE; MKT_AO can raise and MKT_TL review refund requests; COMPTROLLERSHIP, SYSADMIN and AUDITOR
+    read); `sec_permission_action` rows for the areas `DISBURSEMENT`, `PAYMENT_REQUESTS` and `ACSL` (the FRBS / GL
+    permissions stay unclassified like the finance modules); the LOV types of section 9 with proposed values; the
+    workflows of section 7; **the accounting event types** of section 6; parameters and alerts of section 9.
+  - `db/demo/V999__demo_acct_chart_rules_users.sql`: the renames of section 3 (1210, 1211, 1225, 2205, 2210), the new
+    accounts 1610, 1611, 1612, 2217, 2240, 2241, 2250, 2260, 4131, 5614, the demo rules of every event type below and the
+    demo users of section 8.2 (`glofficer`, `gltl`, `glhead`, `disbtl`, `disbtl2`, `disbappr`, `disbappr2`, `mktao`,
+    `mktrev`, `mktappr`, `hrappr`, `acsl`, `acsltl`, `acslhead`).
+- **Event types are seeded in V890, not in V772 / V893 / V899.** The demo rules must be in V999 (A0), so the event
+  types have to exist before it. A1 agents publish these events and must not insert them again:
+
+  | Event | Components (amount keys) | Account roles the publisher supplies |
+  |---|---|---|
+  | `DISB_VOUCHER` | the gross in the component of the DV type: `REMITTANCE`, `REFUND`, `REFUND_FROM_INSURER`, `SUPPLIER`, `GOVERNMENT`, `OTHER_BANK_UNIT`, `EMPLOYEE`, `CASH_ADVANCE`, `SERVICE_FEE`, `PASS_ON`, `STALE_REISSUE`, `OTHER`; then `PAID` (net) and `EWT` | `PAY_ACCOUNT` (paying bank, or 2241 for checks when `DISB_CHECK_CLEARING` = ON), `EXPENSE` for OTHER |
+  | `DISB_CHECK_NEGOTIATED` | `AMOUNT` | `BANK` |
+  | `DISB_CHECK_STALE` | `AMOUNT` (party = payee) | - |
+  | `DISB_FUND_TRANSFER` | `AMOUNT` | `TARGET_BANK`, `SOURCE_BANK` |
+  | `TAX_CWT_CERT_RECEIVED` | `COMMISSION_CWT`, `INCENTIVE_CWT` | - |
+  | `OPS_REMIT_CPC2` | `GROSS` (party = insurer), `CPC2_INCOME`, `OUTPUT_VAT` | - |
+  | `OPS_REMIT_DEDUCTION` | `AMOUNT` (party = insurer) | - |
+  | `FRBS_SERVICE_FEE_ACCRUE` | `AMOUNT` (cost centre required on 5614) | - |
+  | `PRQ_CA_LIQUIDATION` | `PER_DIEM`, `REPRESENTATION`, `TRANSPORT`, `LODGING`, `OTHER`, `CASH_RETURNED`, `SHORTAGE`, `ADVANCE` | `PER_DIEM`, `REPRESENTATION`, `TRANSPORT`, `LODGING`, `OTHER`, `CASH` |
+
+  One event type per DV with the type as the component keeps "GL accounts are never chosen in code": the account of
+  each DV type is a rule line. `ACSL_CORRECTION` gets no event type: a correction posts as a system journal with the
+  lines of the correction (row 18).
+- **Not done in V999, left to the owners:** re-parenting 4130 under 4700 (4131 is created with report group "Other
+  Income" under 4000 like 4130; the statements map by report group until FRBS uploads the real chart, AQ01); the USD
+  accounts 1213 / 1221 / 2212 (only if BDOI splits by currency, AQ01); re-pointing the remittance and OR rules to
+  `WTAX_COMMISSION` / `WTAX_INCENTIVE` (A1-OPSX changes the events); the BDOI value of `AGEING_BUCKETS`
+  (30,90,180,365,730) waits for `AgeingSlots.MAX_SLOTS` = 8 (A1-GL).
+- **Demo data of the A1 waves.** V999 is taken by A0, and Flyway cannot hold two V999 files. A1-DSB seeds its demo
+  masters (payees, bank-account statuses, cheque books, employees, cost-centre rules, layouts) with its Java demo
+  runner, like the demo transactions of every A1 module (section 4 "demo takes V999 ... demo runners").
+- **`opsledger` contract (section 12.2).**
+  - `DisbursementRequest.Spec` has 16 components (the 9 of BRD-2, then `rfpNo`, `payeeClass`, `disbursementType`,
+    `attachmentRefs`, `rootInvoiceNo`, `accountingRefs`, `straightToApproval`); the 9-argument constructor is kept, so
+    remittance, cashiering and commission compile unchanged; `spec.routed(rfp, payeeClass, type, root, straight)` and
+    `spec.withReferences(documents, settles)` build the extended form. `Type` gains SUPPLIER, GOVERNMENT,
+    OTHER_BANK_UNIT, EMPLOYEE, CASH_ADVANCE, SERVICE_FEE, OTHER; `Status` gains CANCELLED.
+  - `DisbursementStatusChanged` gains `dvStatus` and `instrumentStatus` (8-argument constructor kept). The queue
+    publishes it on cancel (`DisbursementQueueService.cancel(id, reason)`, `POST /api/v1/ops/disbursements/{id}/cancel`)
+    and on `track(id, dvStatus, instrumentStatus)`, which records the DV stage and instrument status without changing
+    the gateway status; the `reason` of a CANCELLED event is the cancellation reason.
+  - Ports with `@ConditionalOnMissingBean` defaults in `OpsPortDefaults`: `RefundValidationSource` (one bean per
+    validator, `ACSL` / `CASHIERING`; default `HandoffRefundValidationSource` answers `ANY`), the router
+    `opsledger.service.RefundValidations.open(request)` that payrequest calls (it hands over the validator whose module
+    is missing), `PaymentReversalRequester` (default `HandoffPaymentReversalRequester`, team CASH_APPLY),
+    `InvoiceCorrectionSink` (implemented by `LedgerInvoiceCorrectionSink`: signed CORRECTION movements, idempotent on
+    source module / reference / invoice). Results come back as `RefundValidationCompleted` and
+    `PaymentReversalCompleted` in `OpsLedgerEvents`.
+  - `ops_invoice.root_invoice_no`: set by the booking feed (the parent's root, else the invoice itself), exposed on the
+    invoice DTO (`keys.rootInvoiceNo`), `InvoiceLedgerQueryService.family(invoiceNo)` and
+    `GET /api/v1/ops/invoices/{no}/family`. When A1-OPSX adds `bkg_invoice.root_invoice_no`, both agree by
+    construction. The Invoice 360 family view and the search by assured, inception and AO stay with A1-OPSX.
+  - `ReportMetadata.disbursement(...)`, `acsl(...)`, `frbs(...)` and `ReportCategory` DISBURSEMENT, PAYMENT_REQUESTS,
+    ACSL, FRBS for the report catalogue.
+- **Navigation.** Group **Finance**, after Commission Receivables: Disbursement (`/disbursement`, module / help id
+  `disbursement`, DISB_VIEW), Refund & Cash Advance Requests (`/payment-requests`, `payrequest`, PRQ_VIEW), ACSL
+  (`/acsl`, `acsl`, ACSL_VIEW), Accounting Reports (`/frbs`, `frbs`, FRBS_REPORT_VIEW). The requests are in Finance,
+  not in Operations as section 11 proposed (integration decision of this wave). Each is a landing screen until its A1
+  wave adds the real screens in its own `features/<module>/module.ts` and `help.ts`.
+- **Jobs.** The crons of section 9 are in `application.yml` (`journal-auto-reversal-cron`, `gl-period-close-cron`,
+  `broking-books-close-cron`, `book-rate-from-closing-cron`, `disb-check-stale-cron`, `disb-eod-confirmation-cron`,
+  `disb-eod-reports-cron`, `acsl-gl-sl-recon-cron`) and `docs/operations/CONFIGURATION.md`.
+- **Module skeletons.** `disbursement`, `payrequest`, `acsl` and `frbs` hold only `package-info.java`.
+- **Flyway check.** Every version of section 4 is still free except `V791`, which Product Maintenance used for the
+  role-permission change requests (`V791__nbadmin_role_permission_requests.sql`): A1-GL puts the access-request
+  RETURNED status in `V792`. A0 used V765, V890 and demo V999; nothing else of the BRD-5 ranges.

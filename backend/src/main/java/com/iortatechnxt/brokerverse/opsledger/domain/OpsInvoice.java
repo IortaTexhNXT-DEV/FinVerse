@@ -60,6 +60,9 @@ public class OpsInvoice extends BaseEntity {
   @Column(name = "parent_invoice_no", length = 40, updatable = false)
   private String parentInvoiceNo;
 
+  @Column(name = "root_invoice_no", nullable = false, length = 40)
+  private String rootInvoiceNo;
+
   @Column(name = "policy_no", length = 60)
   private String policyNo;
 
@@ -204,6 +207,7 @@ public class OpsInvoice extends BaseEntity {
     this.kind = k.kind();
     this.endorsementNo = k.endorsementNo();
     this.parentInvoiceNo = k.parentInvoiceNo();
+    this.rootInvoiceNo = k.rootInvoiceNo();
     this.policyNo = k.policyNo();
     this.policyYear = k.policyYear();
   }
@@ -431,6 +435,16 @@ public class OpsInvoice extends BaseEntity {
 
   public String getParentInvoiceNo() {
     return parentInvoiceNo;
+  }
+
+  /**
+   * Root of the invoice family (DIS 3.27.2, ACSL 2.16.0): the invoice's own number for an original
+   * booking, the first invoice of the parent chain for endorsements and cancellations.
+   *
+   * @return root invoice number
+   */
+  public String getRootInvoiceNo() {
+    return rootInvoiceNo;
   }
 
   public String getPolicyNo() {

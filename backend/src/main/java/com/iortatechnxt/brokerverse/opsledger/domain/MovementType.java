@@ -25,7 +25,12 @@ public enum MovementType {
    */
   CWT_RECLASS(Bucket.ADJUSTED),
   /** Minimal balance reversed automatically (CSHID.016). */
-  MIN_BAL(Bucket.WRITTEN_OFF);
+  MIN_BAL(Bucket.WRITTEN_OFF),
+  /**
+   * ACSL correction entry posted on the invoice (ACSL 2.9.1, 2.16.0): a signed change of a
+   * component recorded through {@code InvoiceCorrectionSink}; the original movements stay.
+   */
+  CORRECTION(Bucket.ADJUSTED);
 
   private final Bucket bucket;
 

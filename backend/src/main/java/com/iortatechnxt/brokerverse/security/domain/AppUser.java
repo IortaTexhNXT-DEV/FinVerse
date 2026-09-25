@@ -25,9 +25,6 @@ import java.util.Set;
 @Table(name = "sec_user")
 public class AppUser extends BaseEntity {
 
-  /** Consecutive failed logins that lock the account. */
-  public static final int MAX_FAILED_ATTEMPTS = 5;
-
   @Column(nullable = false, unique = true, length = 50)
   private String username;
 
@@ -101,10 +98,14 @@ public class AppUser extends BaseEntity {
     lastLoginAt = when;
   }
 
-  /** Records a failed login; locks the account once the threshold is reached. */
-  public void recordFailedLogin() {
+  /**
+   * Records a failed login; locks the account once the threshold is reached.
+   *
+   * @param maxFailedAttempts consecutive failures that lock the account
+   */
+  public void recordFailedLogin(int maxFailedAttempts) {
     failedAttempts++;
-    if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
+    if (failedAttempts >= maxFailedAttempts) {
       locked = true;
     }
   }

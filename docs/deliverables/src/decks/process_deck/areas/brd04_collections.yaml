@@ -1,0 +1,151 @@
+# BRD-4 Collections: chapter 4 of the business process deck.
+# Sources: "Collections (CLXN) BRD.pdf": CMS BRD current process p.40-41, target p.42, NFR p.51-58, reports p.59-61,
+# signed workshop addendum p.13-20, caveat p.93; requirements baseline BDOI_CLXN_BRD_SPEC.md sections 2, 4, 8, 10;
+# build design COLLECTIONS_DESIGN.md; discrepancy register (DCR-037, 039, 041, 044, 157). No FRS yet.
+id: brd04
+key: clxn
+num: 4
+title: Collections
+brd: BRD-4
+scope: Premium receivable follow-up, unapplied payments, escalation and billing statements
+status: IN BUILD
+status_text: In build (foundation and worklist); FRS to follow
+department: Operations - Collections, with Marketing collection staff
+roles:
+  - Collection Handler; Marketing AO and Marketing Handler
+  - Team Lead, Unit Head, Section Heads (Corporate, Retail)
+  - Unapplied Payment Handler (CQ10)
+  - Cashiering and Commission (act on dispositions)
+  - App Support and DCO (refresh monitoring)
+figures:
+  - ['130', 'users, 56 concurrent (NFR, p.51-58)']
+  - ['1,200', 'dispositions a day; 1,200 payment file lines a day']
+  - ['< 5 s', 'per screen; daily report < 3 min']
+  - ['RPO 4 h', 'and RTO 4 h; use 06:00-22:00 Mon-Fri']
+sources:
+  - CMS BRD p.40-42 (current and target process)
+  - BRCLXN.001-060 (signed); 061-064 draft only
+  - Requirements baseline BDOI_CLXN_BRD_SPEC.md; design COLLECTIONS_DESIGN.md
+chevrons: [Booking, Nightly refresh, Assignment, Follow-up, Promise, Escalation, Disposition, Hand-off]
+notes:
+  glance: >-
+    Collections follows unpaid premium receivables (PR) until they are paid, reversed or cancelled. The CMS BRD
+    describes a separate application fed nightly from EBIX and QPS; in BIBS it is a module that reads the Operations
+    invoice ledger and hands work to Cashiering and Commission inside the application. It posts no money itself.
+    The module is in build; there is no FRS yet, so this chapter uses the requirements baseline and the design.
+  pains: 'Steps 1-10 of the current process (CMS BRD p.40-41) and the handler''s other tasks (p.40).'
+  after: 'The CMS BRD gives volume and response targets (NFR 15.01-15.14) but no collection-rate targets.'
+  gaps: >-
+    BRCLXN.061-064 appear only in the unsigned draft of the workshop addendum; they are designed as Draft and built only
+    after BDOI confirms them (CQ01). The Operations Head's caveat on exports (p.93) is met by asynchronous,
+    permission-gated exports.
+asis:
+  caption: 'Premium receivable follow-up today (CMS BRD p.40-41)'
+  notes: >-
+    Today the AO records the client's payment instruction in the Marketing Diary in ISYS. The Collection Handler takes
+    the outstanding-PR list of the market segment from EBIX and follows up each account as the diary says: new
+    bookings within 10 to 15 days, a payment commitment within 60 days. A commitment outside the credit term goes to the
+    AO, who asks the insurer for a credit term extension and escalates to the Unit Head by e-mail. On day 60 without a
+    commitment the handler sets a disposition and the A / B / C tag. Payment status is checked by channel with
+    Cashiering, the Unapplied screen or the insurer. CWT 2307 tagging moves from Marketing to Operations by hand, and
+    Operations extracts the Direct Payment report every month for PR reversal.
+  cols: 6
+  lanes:
+    - {id: cli, label: Client, kind: external}
+    - {id: mkt, label: Marketing AO}
+    - {id: hdl, label: Collection Handler}
+    - {id: ops, label: 'Operations, Cashiering'}
+    - {id: sys, label: 'EBIX, QPS, ISYS, Excel', kind: system}
+  steps:
+    - {id: a1, lane: mkt, col: 1, text: Client instruction noted}
+    - {id: a2, lane: sys, col: 1, text: Marketing Diary in ISYS, kind: legacy}
+    - {id: a3, lane: sys, col: 2, text: PR list from EBIX by segment, kind: legacy, pain: [1]}
+    - {id: a4, lane: hdl, col: 2, text: Follows up as the diary says, pain: [2]}
+    - {id: a5, lane: cli, col: 3, text: Commitment within 60 days, kind: external}
+    - {id: a6, lane: mkt, col: 3, text: CTE and escalation by e-mail, pain: [3]}
+    - {id: a7, lane: hdl, col: 4, text: 'Day 60: disposition, A/B/C tag', pain: [4]}
+    - {id: a8, lane: ops, col: 4, text: Payment status checked by channel, pain: [5]}
+    - {id: a9, lane: hdl, col: 5, text: 2307 tag handed over by hand, pain: [6]}
+    - {id: a10, lane: ops, col: 6, text: Monthly DP report for reversal, pain: [7]}
+    - {id: a11, lane: hdl, col: 6, text: Cheque pick-up; 2307 printed, pain: [8]}
+  edges:
+    - [a1, a2]
+    - [a2, a3]
+    - [a3, a4]
+    - [a4, a5, dashed]
+    - [a5, a6]
+    - [a6, a7, dashed, e-mail]
+    - [a7, a8, dashed]
+    - [a8, a9]
+    - [a9, a10, dashed]
+    - [a9, a11]
+pains:
+  - {n: 1, title: PR list and diary in two systems, text: 'The handler takes the EBIX list and checks the ISYS Marketing Diary per account.', ref: 'CMS BRD p.40-41, steps 1-2'}
+  - {n: 2, title: Follow-up by hand, text: 'New bookings within 10-15 days, commitment within 60 days, tracked by the handler.', ref: 'CMS BRD p.40-41, steps 3-4'}
+  - {n: 3, title: CTE and escalation by e-mail, text: 'The AO asks the insurer for a credit term extension and escalates to the Unit Head.', ref: 'CMS BRD p.40-41, step 5'}
+  - {n: 4, title: Dispositions kept by hand, text: 'Day-60 disposition, category A / B / C and remarks are updated manually.', ref: 'CMS BRD p.40-41, steps 6-7'}
+  - {n: 5, title: Payment status by channel, text: 'Deposit with Cashiering, bills payment on the Unapplied screen, direct payment with the insurer.', ref: 'CMS BRD p.40-41, step 8'}
+  - {n: 6, title: 2307 tagging handed over, text: 'A net-of-CWT payment stays a Marketing action until the BIR 2307 is collected.', ref: 'CMS BRD p.40-41, step 9'}
+  - {n: 7, title: DP report extracted monthly, text: 'Operations extracts the Direct Payment report as the basis for PR reversal.', ref: 'CMS BRD p.40-41, step 10'}
+  - {n: 8, title: Side tasks by e-mail, text: 'Cheque pick-up requests and 2307 certificates received by e-mail.', ref: 'CMS BRD p.40, other tasks'}
+tobe:
+  caption: 'Collections in BIBS: worklist, promises, escalation (workflow CLX_ESCALATION) and hand-offs (design COLLECTIONS_DESIGN)'
+  notes: >-
+    In BIBS a nightly job after the 22:00 end of day turns every invoice with PR above the threshold into a collection
+    item, refreshes existing items and closes items at zero, keeping their history. The TL assigns items by rule
+    (segment, unit, client). The handler records efforts, promises per installment, the collector disposition and the A
+    / B / C category on the item, with the Marketing Diary in view. Rules escalate by ageing, commitments and broken
+    promises to the TL / UH queue. Dispositions for Operations become in-app requests: "PR 2307 for reversal" to
+    Cashiering, "DP PR for reversal" to Commission, "for check pick-up" to the Cashiering queue. The monthly and weekly
+    files are produced on schedule, and billing statements are issued per billing cycle of multi-year policies.
+  cols: 6
+  lanes:
+    - {id: cli, label: Client, kind: external}
+    - {id: hdl, label: 'Collection Handler, AO'}
+    - {id: tl, label: 'TL, Unit Head'}
+    - {id: ops, label: 'Cashiering, Commission'}
+    - {id: bibs, label: BIBS (automatic), kind: bibs}
+  steps:
+    - {id: b1, lane: bibs, col: 1, text: Nightly refresh; balance on each payment, kind: auto}
+    - {id: b2, lane: tl, col: 2, text: Items assigned by rule}
+    - {id: b3, lane: hdl, col: 2, text: 'Worklist: efforts, diary view'}
+    - {id: b4, lane: cli, col: 3, text: Promise per installment; pays, kind: external}
+    - {id: b5, lane: hdl, col: 3, text: Promise and disposition recorded}
+    - {id: b6, lane: bibs, col: 4, text: Escalation by ageing and broken promise, kind: auto}
+    - {id: b7, lane: tl, col: 4, text: TL / UH escalation queue}
+    - {id: b8, lane: hdl, col: 5, text: '2307, DP reversal, pick-up requests'}
+    - {id: b9, lane: ops, col: 5, text: Request acted on in Cashiering / Commission}
+    - {id: b10, lane: bibs, col: 6, text: 'Scheduled files; SOA per billing cycle', kind: doc}
+  edges:
+    - [b1, b2]
+    - [b2, b3]
+    - [b3, b4, dashed]
+    - [b4, b5]
+    - [b5, b6]
+    - [b6, b7]
+    - [b7, b8]
+    - [b8, b9]
+    - [b9, b10]
+after:
+  - {n: 1, bibs: 'One worklist read from the invoice ledger, with the Marketing Diary in view on the item', measure: 'Refreshed nightly after 22:00'}
+  - {n: 2, bibs: 'Efforts, promises per installment and reminders recorded on the collection item', measure: 'History kept per item'}
+  - {n: 3, bibs: 'Escalation rules by ageing, commitments and broken promises; manual escalation, also in bulk', measure: 'TL / UH queue by rule'}
+  - {n: 4, bibs: 'Disposition from a list of values with category A / B / C; append-only history', measure: 'From / to audit per field'}
+  - {n: 5, bibs: 'Payment status, balances and co-insurance shares read from the invoice ledger', measure: 'Same-day balance refresh'}
+  - {n: 6, bibs: '"PR 2307 for reversal" goes to the Cashiering 2307 intake as an in-app request', measure: 'No e-mail hand-off'}
+  - {n: 7, bibs: 'DP-for-reversal file on the first working day; the same list goes to Commission', measure: 'Ready on working day 1'}
+  - {n: 8, bibs: 'Cheque pick-up request placed on the Cashiering queue from the item', measure: 'Request tracked'}
+gaps:
+  - {sev: High, gap: BRCLXN.061-064 only in the unsigned draft, impact: 'Commission, incentive and refund items not approved', owner: Head of BDOI Operations, decision: 'In scope? Owner: Collections or Commission', ref: 'DCR-039, CQ01'}
+  - {sev: High, gap: List at invoice or cover level, impact: Grain of the list and of the threshold rule, owner: Head of BDOI Operations, decision: 'Confirm invoice level; threshold per invoice, ARN or client', ref: 'DCR-041, CQ02'}
+  - {sev: High, gap: One session per device, impact: Session control for every user, owner: 'Operations with BDO ITIO', decision: 'For all users, Collections only, or no one', ref: 'DCR-044, 141'}
+  - {sev: High, gap: Open EBIX PRs and history at go-live, impact: Worklist incomplete at cut-over, owner: 'Operations, BDO IT', decision: 'Migration scope, cut-off and format', ref: 'DCR-157, CQ07'}
+  - {sev: Medium, gap: 'Minimal balance threshold value', impact: Which invoices enter the list, owner: Operations - Collections, decision: 'Value, currency, net of PR2307?', ref: CQ03}
+  - {sev: Medium, gap: Escalation defaults and promise rules, impact: Escalation and broken-promise tests, owner: Operations - Collections, decision: 'Days (45 / 60), levels, grace days', ref: 'CQ14, CQ16'}
+best:
+  - {practice: Ageing control with escalation by rule, status: BIBS, bibs: 'Rules by ageing, commitments and broken promises; TL / UH queue; manual escalation in bulk.', bdoi: 'Set the default days and levels (CQ14).'}
+  - {practice: Promise-to-pay per installment, status: BIBS, bibs: 'Promises recorded per installment, marked kept or broken from the ledger.', bdoi: 'Define when a promise is kept and the grace days (CQ16).'}
+  - {practice: Single view of the receivable, status: BIBS, bibs: 'Invoice 360: policy, invoice, co-insurance shares, payments and history on one screen.', bdoi: 'Retire the separate EBIX and Excel lists after migration.'}
+  - {practice: Collections monitors; finance posts, status: BIBS, bibs: 'Collections posts no money; Cashiering and Commission act on its requests.', bdoi: 'Keep this split in the role matrix (DCR-121).'}
+  - {practice: Credit term discipline, status: ADOPT, bibs: 'Commitment dates and CTE requests can be recorded on the item.', bdoi: 'Publish credit terms per segment and track CTEs in BIBS (CQ20).'}
+  - {practice: Collection KPIs, status: PARTLY, bibs: 'Outstanding PR, escalation and broken-promise reports; Collections home.', bdoi: 'Define the dashboard per role and the collection targets (CQ21).'}

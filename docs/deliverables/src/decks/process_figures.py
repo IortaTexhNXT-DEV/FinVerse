@@ -18,7 +18,7 @@ from typing import Any
 CANVAS_W = 873.0  # points: 12.13 in, the content width of a 13.33 in slide
 CANVAS_H = 372.0  # points: 5.17 in, below the title band, above the caption
 FONT_PT = 12
-CHAR_PT = 5.3  # average width of an Arial character at 12 pt, with a margin (measured about 4.8)
+CHAR_PT = 5.8  # average width of an Arial character at 12 pt, with a margin
 
 # Lane header colours by lane kind: (fill, font).
 LANE_HEAD = {
@@ -65,7 +65,7 @@ def wrap(text: str, width_pt: float, size: float = FONT_PT) -> list[str]:
     chars = max(8, int(width_pt / (CHAR_PT * size / FONT_PT)))
     lines: list[str] = []
     for part in str(text).split("\n"):
-        lines.extend(textwrap.wrap(part, chars) or [""])
+        lines.extend(textwrap.wrap(part, chars, break_on_hyphens=False) or [""])
     return lines
 
 
@@ -98,9 +98,15 @@ class Canvas:
              style: str = "filled", shape: str = "box", node_id: str | None = None, penwidth: float = 0.8,
              sub: list[str] | None = None, wrap_text: bool = True) -> str:
         nid = node_id or self._id("r")
-        lines = wrap(label, w - 10, size) if (label and wrap_text) else ([label] if label else [])
-        if sub:
-            sub = [x for line in sub for x in wrap(line, w - 10, size - 1)]
+        raw_sub = sub
+        while True:
+            lines = wrap(label, w - 12, size * (1.1 if bold else 1.0)) if (label and wrap_text) else ([label] if label else [])
+            sub = [x for line in raw_sub for x in wrap(line, w - 10, size - 1)] if raw_sub else None
+            height = len(lines) * size * 1.2 + (len(sub) * (size - 1) * 1.2 if sub else 0)
+            # shrink a crowded label by half points, never below 10.5 pt
+            if height <= h - 6 or size <= 10.5 or not wrap_text:
+                break
+            size -= 0.5
         lab = _label(lines, font, bold, size, sub) if label else '""'
         cx, cy = x + w / 2, self.h - (y + h / 2)
         self.nodes.append(

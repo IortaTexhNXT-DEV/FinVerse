@@ -1,0 +1,34 @@
+// BRD-11: interfaces of User Access Maintenance. FRS section 7. Dashed grey = parked seam.
+digraph ua_integration {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.6, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@WHITE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=11, fontcolor="@NEAR_BLACK", width=1.9, height=0.55];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=9.5, fontcolor="@TEXT"];
+
+  eua   [label="BDO EUA / AD / LDAP\n(Windows ID)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+  sso   [label="SSO identity provider\n(SAML / OIDC)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+  acl   [label="External ACL", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+
+  subgraph cluster_uam {
+    label="User Access Maintenance (BIBS)"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=11;
+    style=filled; fillcolor="@BG_BLUE"; color="@BG_BLUE";
+    sec [label="Sign-in, users, roles,\npermissions (security)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+    req [label="Access requests,\napprovers, bulk (nbadmin)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+    log [label="Access-change log,\nsession log", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+  }
+  mods  [label="Every BIBS module\n(menus, screens, API checks)"];
+  portal[label="Portal users (BRD-8)\nexternal user type"];
+  notif [label="Notifications and\ne-mail"];
+  rep   [label="Reports (Control\n& Audit)"];
+  bulk  [label="Bulk upload\n(template file)"];
+
+  eua -> sec [label="authenticate\n(parked, UQ04)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+  sso -> sec [label="parked", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+  acl -> sec [label="parked (UQ14)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+  bulk -> req [label="1.009"];
+  req -> sec [label="apply approved\nchanges"];
+  sec -> log;
+  sec -> mods [label="effective\npermissions"];
+  req -> portal [label="provision on\napproval (D7)"];
+  req -> notif; log -> rep;
+}

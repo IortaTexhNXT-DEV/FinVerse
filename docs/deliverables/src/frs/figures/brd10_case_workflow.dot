@@ -1,0 +1,39 @@
+// BRD-10: workflow SCR_CASE (screening case). FRS section 5.1. Stage owner in the second line.
+// Solid = main path; dashed = returns; dotted = closing without STR. Re-opening a closed case is in table 5.2 only.
+digraph sc_case {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.9, ranksep=0.3, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.5, height=0.5, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  NEW                [label="NEW\nSystem"];
+  INVESTIGATION      [label="INVESTIGATION\nInvestigator"];
+  RETURNED           [label="RETURNED\nInvestigator", fillcolor="@AMBER_BG"];
+  UNIT_HEAD_APPROVAL [label="UNIT_HEAD_APPROVAL\nApprover (Unit Head)"];
+  COMPLIANCE_REVIEW  [label="COMPLIANCE_REVIEW\nCompliance Officer"];
+  AML_COMMITTEE      [label="AML_COMMITTEE\nCommittee members"];
+  STR_PREPARATION    [label="STR_PREPARATION\nCompliance Officer"];
+  STR_EXTRACTION     [label="STR_EXTRACTION\nCompliance Officer"];
+  CLOSED             [label="CLOSED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+
+  NEW -> INVESTIGATION [label=" route (assignment matrix)", weight=10];
+  INVESTIGATION -> UNIT_HEAD_APPROVAL [label=" submit (validated; approval matrix)", weight=10];
+  UNIT_HEAD_APPROVAL -> COMPLIANCE_REVIEW [label=" approve", weight=10];
+  COMPLIANCE_REVIEW -> AML_COMMITTEE [label=" escalate_committee", weight=10];
+  AML_COMMITTEE -> STR_PREPARATION [label=" finalise: approve STR", weight=10];
+  STR_PREPARATION -> STR_EXTRACTION [label=" str_ready", weight=10];
+  STR_EXTRACTION -> CLOSED [label=" filed (AMLC reference)", weight=10];
+
+  UNIT_HEAD_APPROVAL -> RETURNED [label=" disapprove", style=dashed];
+  COMPLIANCE_REVIEW -> RETURNED [label=" return_for_rework", style=dashed];
+  RETURNED -> UNIT_HEAD_APPROVAL [label=" resubmit (to the stage\n that returned it)", style=dashed, constraint=false];
+  AML_COMMITTEE -> COMPLIANCE_REVIEW [label=" finalise: return", style=dashed, constraint=false];
+
+  closeside [shape=box, style="rounded,dotted", color="@MUTED", fontcolor="@MUTED", fontsize=10,
+             label="close without STR:\nsubmit routed to close (INVESTIGATION)\nclose (COMPLIANCE_REVIEW)\nfinalise: no STR (AML_COMMITTEE)", width=3.2];
+  AML_COMMITTEE -> closeside [style=dotted, arrowhead=none];
+  closeside -> CLOSED [style=dotted];
+
+  { rank=same; COMPLIANCE_REVIEW; RETURNED; }
+  { rank=same; STR_PREPARATION; closeside; }
+}

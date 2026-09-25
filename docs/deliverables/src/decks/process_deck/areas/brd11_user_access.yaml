@@ -5,6 +5,7 @@ id: brd11
 key: uam
 num: 11
 title: User Access Maintenance
+short: User Access
 brd: BRD-11
 scope: 'User access requests, approvals, group profiles, access reports'
 status: PARTLY BUILT

@@ -86,18 +86,18 @@ holistic:
     externals:
       - {id: x_cli, text: 'Clients and client HR', sub: [e-mail; EB portal]}
       - {id: x_ins, text: 'Insurers, HMO', sub: [e-mail; files; EB portal]}
-      - {id: x_bank, text: 'BDO bank units', sub: ['HLS, LAMD, CLPC, BOB']}
+      - {id: x_bank, text: 'BDO bank units', sub: ['HLS, LAMD, CLPC', 'and BOB']}
       - {id: x_reg, text: 'BIR, AMLC', sub: [forms and extracts]}
       - {id: x_dir, text: 'BDO directory (EUA)', sub: [parked], kind: parked}
     channels: 'Interfaces: e-mail with send log, file upload, partner portal, parked APIs'
     groups:
-      - {title: 'Client & Policy', w: 170, modules: 'Clients, Screening*, Quotations, Accounts, Non-Package (PRF), Employee Benefits*, Placement, Issuance, Booking, Renewal*, Submitted Policies*, Customer Service*, Prod. Recon, Adjustment, Products'}
+      - {title: 'Client & Policy', w: 172, modules: 'Clients, Screening*, Quotations, Accounts, Non-Package (PRF), Employee Benefits*, Placement, Issuance, Booking, Renewal*, Submitted Policies*, Customer Service*, Prod. Recon, Adjustment, Products'}
       - {title: Operations, w: 80, modules: 'Operations home, invoice ledger, interfaces'}
-      - {title: Finance, w: 128, modules: 'Collections, Cashiering, Remittance, Commission, Disbursement, Refund requests, ACSL, GL, AR, AP, tax'}
+      - {title: Finance, w: 124, modules: 'Collections, Cashiering, Remittance, Commission, Disbursement, Refund requests, ACSL, GL, AR, AP, tax'}
       - {title: 'Claims & Insurance', w: 82, modules: 'Claims Handling*, insurer-side modules'}
-      - {title: Reports, w: 64, modules: 'Report Centre, NB reports'}
-      - {title: 'Setup & Admin', w: 89, modules: 'Broking setup, Compliance setup*, User Access, Portal users*, Admin'}
-    services: ['Workflow and SLA', 'Documents and templates', 'Notifications', 'Reports and exports', 'Audit trail', 'Configuration masters', 'Redis cache', 'Kafka events']
+      - {title: Reports, w: 62, modules: 'Report Centre, NB reports'}
+      - {title: 'Setup & Admin', w: 91, modules: 'Broking setup, Compliance setup*, User Access, Portal users*, Admin'}
+    services: ['Workflow and SLA', 'Documents, templates', 'Notifications', 'Reports, exports', 'Audit trail', 'Masters and rules', 'Redis cache', 'Kafka events']
     hosting: 'Hosting: AWS, Singapore region; production and non-production environments (client BOM)'
     links: [[x_cli, 'e-mail, portal'], [x_ins, 'e-mail, files, portal'], [x_bank, 'files'], [x_reg, 'extracts'], [x_dir, 'parked']]
 

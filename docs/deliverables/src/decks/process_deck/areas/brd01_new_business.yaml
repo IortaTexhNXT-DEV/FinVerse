@@ -150,7 +150,7 @@ after:
   - {n: 6, bibs: 'CLPC billing file produced and payment report matched in BIBS', measure: 'Matching automated'}
   - {n: 7, bibs: 'Slips, hold cover requests and e-policies generated, password protected and logged', measure: 'Send log per document'}
   - {n: 8, bibs: 'Booking posts invoice, GL entry and service invoice in one transaction; batch at 20:00', measure: 'One step instead of three'}
-  - {n: 9, bibs: 'Dashboards and status reports read the workflow history', measure: '10 s response (p.211)'}
+  - {n: 9, bibs: 'Dashboards and status reports read the workflow history', measure: '10 s response (p.210-211)'}
 gaps:
   - {sev: High, gap: Quotation before the client exists, impact: Walk-in and bank-referred prospects may not be quotable, owner: Marketing / Product Owner, decision: 'May BIBS create a prospect code at quotation (BRNB.029 vs 063)?', ref: DCR-001}
   - {sev: High, gap: Fire premium tax rate and base, impact: Gross premium on every Fire quotation and invoice, owner: Comptrollership, decision: 'Which taxes, rates and bases apply to Fire?', ref: DCR-005}

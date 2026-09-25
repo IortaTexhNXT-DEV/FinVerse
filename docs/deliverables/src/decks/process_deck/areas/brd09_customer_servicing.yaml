@@ -5,6 +5,7 @@ id: brd09
 key: csf
 num: 9
 title: Customer Servicing Facility
+short: Customer Servicing
 brd: BRD-9
 scope: 'Contact centre search, servicing view, contact updates, document resends'
 status: DESIGNED

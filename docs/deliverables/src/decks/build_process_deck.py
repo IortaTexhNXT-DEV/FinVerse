@@ -66,6 +66,11 @@ PRACTICE = {  # best-practice support: (label, fill, font)
 }
 
 
+def _short(a: dict) -> str:
+    """Area name for slide titles (a long name would wrap the title onto two lines)."""
+    return a.get("short", a["title"])
+
+
 def load(path: Path) -> Any:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
@@ -105,6 +110,8 @@ class ProcessDeck(BdoiDeck):
         self.slide.notes_slide.notes_text_frame.text = text.strip()
 
     def page(self, title: str):
+        if len(title) > 50:  # 26 pt bold wraps onto the yellow rule beyond about 50 characters
+            print(f"warning: slide {self._n + 1} title is {len(title)} characters: {title}")
         s = self._slide()
         self._chrome(s, title)
         return s
@@ -291,7 +298,7 @@ class ProcessDeck(BdoiDeck):
                 self.chip(s, x + tw - Inches(1.42), y + th - Inches(0.42), label, fill, font, w=Inches(1.3))
 
     def glance(self, a: dict) -> None:
-        s = self.page(f"{a['num']}. {a['title']}: at a glance")
+        s = self.page(f"{a['num']}. {_short(a)}: at a glance")
         colw = (CONTENT_W - Inches(0.4)) / 3
         y0, hh = TOP, Inches(3.95)
         # card 1: department and roles
@@ -329,20 +336,21 @@ class ProcessDeck(BdoiDeck):
         label, fill, font = STATUS[a["status"]]
         self.chip(s, x + Inches(0.12), y0 + Inches(0.58), label, fill, font, w=Inches(1.5), h=Inches(0.36),
                   size=13)
-        self.para(s, x + Inches(1.72), y0 + Inches(0.55), colw - Inches(1.8), Inches(0.5),
-                  [[(a["status_text"], False, brand.TEXT)]], size=12, anchor=MSO_ANCHOR.MIDDLE)
+        self.para(s, x + Inches(0.1), y0 + Inches(1.0), colw - Inches(0.2), Inches(0.5),
+                  [[(a["status_text"], True, brand.NEAR_BLACK)]], size=12)
         runs = [[("•  ", False, brand.HEADER_BLUE), (t, False, brand.TEXT)] for t in a["sources"]]
-        self.para(s, x + Inches(0.1), y0 + Inches(1.1), colw - Inches(0.2), hh - Inches(1.2), runs, size=12,
+        self.para(s, x + Inches(0.1), y0 + Inches(1.55), colw - Inches(0.2), hh - Inches(1.6), runs, size=12,
                   space=3)
         # process in one line
         cy = y0 + hh + Inches(0.22)
         self._text(s, MARGIN, cy, CONTENT_W, Inches(0.3), "The process in one line", size=12, bold=True,
                    colour=brand.MUTED)
-        self.chevrons(s, MARGIN, cy + Inches(0.32), CONTENT_W, Inches(0.72), a["chevrons"])
+        size = 12 if max(len(c) for c in a["chevrons"]) <= 12 else 11
+        self.chevrons(s, MARGIN, cy + Inches(0.32), CONTENT_W, Inches(0.72), a["chevrons"], size=size)
         self.notes(a.get("notes", {}).get("glance", "") + "\n\nSources: " + "; ".join(a["sources"]))
 
     def pain_legend(self, a: dict) -> None:
-        s = self.page(f"{a['num']}. {a['title']}: pain points today")
+        s = self.page(f"{a['num']}. {_short(a)}: pain points today")
         pains = a["pains"]
         cols = 2
         rows = math.ceil(len(pains) / cols)
@@ -362,7 +370,7 @@ class ProcessDeck(BdoiDeck):
         self.notes(notes)
 
     def before_after(self, a: dict) -> None:
-        s = self.page(f"{a['num']}. {a['title']}: before and after")
+        s = self.page(f"{a['num']}. {_short(a)}: before and after")
         pains = {p["n"]: p for p in a["pains"]}
         rows = a["after"]
         head_y = TOP - Inches(0.02)
@@ -393,7 +401,7 @@ class ProcessDeck(BdoiDeck):
     def gaps(self, a: dict | None, title: str | None = None, rows_in: list | None = None,
              notes: str = "") -> None:
         rows_in = rows_in if rows_in is not None else a["gaps"]
-        title = title or f"{a['num']}. {a['title']}: gaps in the envisioned process"
+        title = title or f"{a['num']}. {_short(a)}: gaps to close"
         s = self.page(title)
         headers = ["Level", "Gap", "Impact", "Owner", "Decision needed", "Ref"]
         rows, fills = [], {}
@@ -410,7 +418,7 @@ class ProcessDeck(BdoiDeck):
         self.notes(n)
 
     def best_practice(self, a: dict) -> None:
-        s = self.page(f"{a['num']}. {a['title']}: best practice")
+        s = self.page(f"{a['num']}. {_short(a)}: best practice")
         items = a["best"]
         cols = 3
         gap = Inches(0.18)
@@ -588,16 +596,16 @@ def asis_map_spec(m: dict, areas: dict[str, dict]) -> dict:
 
 def envisioned_map_spec(m: dict) -> dict:
     nodes, edges = [], []
-    ex_w, ex_h = 132.0, 52.0
+    ex_w, ex_h, x0 = 120.0, 52.0, 236.0
     for i, x in enumerate(m["externals"]):
         nodes.append({"id": x["id"], "x": 0, "y": 6 + i * 65.0, "w": ex_w, "h": ex_h, "text": x["text"],
                       "sub": x.get("sub"), "kind": x.get("kind", "external"), "size": 12})
-    nodes.append({"id": "chan", "x": 160, "y": 6, "w": 70, "h": 312, "text": m["channels"], "kind": "screen",
+    nodes.append({"id": "chan", "x": 134, "y": 6, "w": 92, "h": 312, "text": m["channels"], "kind": "screen",
                   "size": 12})
     for xid, label in m["links"]:
         edges.append({"a": xid, "b": "chan", "style": "dashed" if label == "parked" else "solid",
                       "ports": ("e", "w")})
-    x = 244.0
+    x = x0 + 6
     for i, g in enumerate(m["groups"]):
         gid = f"g{i}"
         nodes.append({"id": gid, "x": x, "y": 26, "w": g["w"], "h": 38, "text": g["title"], "kind": "group",
@@ -606,15 +614,16 @@ def envisioned_map_spec(m: dict) -> dict:
                       "kind": "module", "size": 11})
         x += g["w"] + 4
     n = len(m["services"])
-    sw = (pf.CANVAS_W - 244 - 4 * (n - 1)) / n
+    span = pf.CANVAS_W - x0 - 12
+    sw = (span - 3 * (n - 1)) / n
     for i, sv in enumerate(m["services"]):
-        nodes.append({"id": f"s{i}", "x": 244 + i * (sw + 4), "y": 246, "w": sw, "h": 44, "text": sv,
+        nodes.append({"id": f"s{i}", "x": x0 + 6 + i * (sw + 3), "y": 246, "w": sw, "h": 42, "text": sv,
                       "kind": "service", "size": 11})
-    nodes.append({"id": "host", "x": 244, "y": 294, "w": pf.CANVAS_W - 244, "h": 24, "text": m["hosting"],
-                  "kind": "stage", "size": 11})
-    bands = [{"x": 238, "y": 0, "w": pf.CANVAS_W - 238, "h": 222, "fill": "@DIRTY_WHITE",
+    nodes.append({"id": "host", "x": x0 + 6, "y": 293, "w": span, "h": 24, "text": m["hosting"],
+                  "kind": "module", "size": 11})
+    bands = [{"x": x0, "y": 0, "w": pf.CANVAS_W - x0, "h": 222, "fill": "@DIRTY_WHITE",
               "label": "BIBS modules by navigation group", "label_w": 300},
-             {"x": 238, "y": 224, "w": pf.CANVAS_W - 238, "h": 98, "fill": "@BG_BLUE",
+             {"x": x0, "y": 224, "w": pf.CANVAS_W - x0, "h": 98, "fill": "@BG_BLUE",
               "label": "Shared services and hosting", "label_w": 300}]
     return {"bands": bands, "nodes": nodes, "edges": edges,
             "legend": [["external", "External party"], ["group", "Navigation group"],
@@ -623,14 +632,14 @@ def envisioned_map_spec(m: dict) -> dict:
 
 def value_chain_spec(m: dict) -> dict:
     nodes, edges = [], []
-    w, h, gx = 132.0, 104.0, 147.4
+    w, h, gx = 136.0, 120.0, 146.6
     stages = m["stages"]
     for i, st in enumerate(stages):
         row, k = divmod(i, 6)
         col = k if row == 0 else 5 - k
         status = st["status"].lower()
         kind = "vc_build" if "in build" in status else ("vc_designed" if status == "designed" else "vc_built")
-        nodes.append({"id": f"v{i}", "x": 4 + col * gx, "y": 22 + row * 170, "w": w, "h": h, "text": st["text"],
+        nodes.append({"id": f"v{i}", "x": 2 + col * gx, "y": 14 + row * 172, "w": w, "h": h, "text": st["text"],
                       "sub": [st["owner"], "BIBS: " + st["module"], f"({st['status']})"], "kind": kind,
                       "size": 13})
     for i in range(len(stages) - 1):
@@ -756,10 +765,10 @@ def build(previews: str | None = None, figures_only: bool = False) -> Path:
         deck.notes(a.get("notes", {}).get("section", f"{a['brd']} {a['title']}: {a['scope']}."))
         deck.glance(a)
         asis, tobe = figs[a["id"]]
-        deck.diagram(f"{a['num']}. {a['title']}: As-Is process", asis, a["asis"]["caption"],
+        deck.diagram(f"{a['num']}. {_short(a)}: As-Is process", asis, a["asis"]["caption"],
                      a["asis"]["notes"])
         deck.pain_legend(a)
-        deck.diagram(f"{a['num']}. {a['title']}: envisioned in BIBS", tobe, a["tobe"]["caption"],
+        deck.diagram(f"{a['num']}. {_short(a)}: envisioned in BIBS", tobe, a["tobe"]["caption"],
                      a["tobe"]["notes"])
         deck.before_after(a)
         deck.gaps(a)

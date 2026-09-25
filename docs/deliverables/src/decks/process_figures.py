@@ -65,7 +65,7 @@ def wrap(text: str, width_pt: float, size: float = FONT_PT) -> list[str]:
     chars = max(8, int(width_pt / (CHAR_PT * size / FONT_PT)))
     lines: list[str] = []
     for part in str(text).split("\n"):
-        lines.extend(textwrap.wrap(part, chars, break_on_hyphens=False) or [""])
+        lines.extend(textwrap.wrap(part, chars, break_on_hyphens=False, break_long_words=False) or [""])
     return lines
 
 

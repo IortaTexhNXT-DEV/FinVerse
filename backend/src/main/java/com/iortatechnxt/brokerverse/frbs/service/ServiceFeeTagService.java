@@ -151,7 +151,7 @@ public class ServiceFeeTagService {
   }
 
   private void requireNotFuture(LocalDate on) {
-    if (on == null || on.isAfter(LocalDate.now(clock))) {
+    if (on == null || on.isAfter(LocalDate.now(clock.withZone(ServiceFeeBase.MANILA)))) {
       throw new BusinessRuleException("SERVICE_FEE_DATES", "Give a date that is not in the future");
     }
   }

@@ -102,7 +102,7 @@ public class ServiceFeeRunService {
    * @return run in stage COMPUTED
    */
   public ServiceFeeRun compute(Long companyId, LocalDate from, LocalDate to) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = LocalDate.now(clock.withZone(ServiceFeeBase.MANILA));
     if (from == null || to == null || to.isBefore(from) || to.isAfter(today)) {
       throw new BusinessRuleException(
           "SERVICE_FEE_PERIOD", "Give a period that ends on or before today and after it starts");

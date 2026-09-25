@@ -83,7 +83,7 @@ public class ServiceFeeFeedback {
         new Ticket(event.requestNo(), event.status().name(), event.dvNo(), event.reason());
     if (event.status() == Status.PAID && line.getStatus() == LineStatus.SENT) {
       line.track(ticket);
-      line.release(LocalDate.now(clock), ServiceFees.SYSTEM);
+      line.release(LocalDate.now(clock.withZone(ServiceFeeBase.MANILA)), ServiceFees.SYSTEM);
     } else if (event.status() == Status.RETURNED || event.status() == Status.CANCELLED) {
       line.returned(ticket);
     } else {

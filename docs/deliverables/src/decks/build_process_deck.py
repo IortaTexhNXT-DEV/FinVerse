@@ -558,7 +558,7 @@ def asis_map_spec(m: dict, areas: dict[str, dict]) -> dict:
     """Areas above and below, today's systems in the middle; one line per dependency."""
     nodes, edges = [], []
     w, h, gx = 136.0, 50.0, 145.4
-    for key, y in (("areas_top", 26.0), ("areas_bottom", 274.0)):
+    for key, y in (("areas_top", 26.0), ("areas_bottom", 272.0)):
         for i, aid in enumerate(m[key]):
             a = areas.get(aid)
             if a is None:  # chapter not written yet
@@ -578,10 +578,9 @@ def asis_map_spec(m: dict, areas: dict[str, dict]) -> dict:
                           "width": 0.9})
     bands = [{"x": 0, "y": 0, "w": pf.CANVAS_W, "h": 84, "fill": "@WHITE", "label": "Business areas 1-6",
               "label_w": 200},
-             {"x": 0, "y": 124, "w": pf.CANVAS_W, "h": 90, "fill": "#EEF3F8",
-              "label": "Today's systems and channels", "label_w": 260},
-             {"x": 0, "y": 248, "w": pf.CANVAS_W, "h": 84, "fill": "@WHITE", "label": "Business areas 7-12",
-              "label_w": 200}]
+             {"x": 0, "y": 124, "w": pf.CANVAS_W, "h": 90, "fill": "#EEF3F8"},
+             {"x": 0, "y": 248, "w": pf.CANVAS_W, "h": 100, "fill": "@WHITE", "label": "Business areas 7-12",
+              "label_w": 200, "label_pos": "bottom"}]
     return {"bands": bands, "nodes": nodes, "edges": edges,
             "legend": [["area", "Business area"], ["legacy", "Today's system or channel"],
                        ["pain", "Number of pain points in the area chapter"]]}
@@ -652,6 +651,61 @@ def holistic_figures(h: dict, areas: list[dict]) -> dict[str, Path]:
 
 # ====================================================================== build
 
+AREA_KEYS = ("id", "key", "num", "title", "brd", "scope", "status", "status_text", "department", "roles", "figures",
+             "sources", "chevrons", "asis", "pains", "tobe", "after", "gaps", "best")
+
+
+def validate(a: dict, name: str) -> list[str]:
+    """Checks one area file: keys, cross-references and text cells (YAML turns 'a: b' or 'x?' into odd types)."""
+    errs = [f"{name}: missing key {k}" for k in AREA_KEYS if k not in a]
+    if errs:
+        return errs
+    pains = {p["n"] for p in a["pains"]}
+    for diagram in ("asis", "tobe"):
+        lanes = {ln["id"] for ln in a[diagram]["lanes"]}
+        steps = {s["id"] for s in a[diagram]["steps"]}
+        for s in a[diagram]["steps"]:
+            if s["lane"] not in lanes:
+                errs.append(f"{name} {diagram}: step {s['id']} in unknown lane {s['lane']}")
+            if not isinstance(s["text"], str):
+                errs.append(f"{name} {diagram}: step {s['id']} text is not a string")
+            for p in s.get("pain", []) or []:
+                if p not in pains:
+                    errs.append(f"{name} {diagram}: step {s['id']} marks unknown pain point {p}")
+        for e in a[diagram].get("edges", []):
+            for end in e[:2]:
+                if end not in steps:
+                    errs.append(f"{name} {diagram}: edge {e} names unknown step {end}")
+    marked = {p for s in a["asis"]["steps"] for p in (s.get("pain") or [])}
+    errs += [f"{name}: pain point {p} is not marked on the As-Is diagram" for p in sorted(pains - marked)]
+    errs += [f"{name}: before / after row {r['n']} has no pain point" for r in a["after"] if r["n"] not in pains]
+    for g in a["gaps"]:
+        for k in ("sev", "gap", "impact", "owner", "decision", "ref"):
+            if not isinstance(g.get(k), str):
+                errs.append(f"{name}: gap {g.get('ref')} field {k} is not text")
+        if g.get("sev") not in SEVERITY:
+            errs.append(f"{name}: gap {g.get('ref')} has unknown level {g.get('sev')}")
+    for b in a["best"]:
+        if b.get("status") not in PRACTICE or not all(isinstance(b.get(k), str) for k in ("practice", "bibs", "bdoi")):
+            errs.append(f"{name}: best practice {b.get('practice')} is incomplete")
+    return errs
+
+
+def load_areas() -> list[dict]:
+    areas, errs = [], []
+    for p in sorted((DATA / "areas").glob("brd*.yaml")):
+        try:
+            a = load(p)
+        except yaml.YAMLError as exc:
+            errs.append(f"{p.name}: {exc}")
+            continue
+        errs += validate(a, p.name)
+        areas.append(a)
+    if errs:
+        raise SystemExit("Content errors:\n  " + "\n  ".join(errs))
+    return sorted(areas, key=lambda a: a["num"])
+
+
 def register_counts(areas: list[dict]) -> list[list]:
     reg = load(ROOT / "docs/deliverables/src/registers/discrepancy_register.yaml")
     rows = []
@@ -666,8 +720,7 @@ def register_counts(areas: list[dict]) -> list[list]:
 
 def build(previews: str | None = None, figures_only: bool = False) -> Path:
     d = load(DATA / "deck.yaml")
-    areas = [load(p) for p in sorted((DATA / "areas").glob("brd*.yaml"))]
-    areas.sort(key=lambda a: a["num"])
+    areas = load_areas()
     hol = holistic_figures(d["holistic"], areas)
     figs = {a["id"]: area_figures(a) for a in areas}
     if figures_only:

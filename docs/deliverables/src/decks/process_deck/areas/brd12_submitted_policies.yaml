@@ -1,0 +1,150 @@
+# BRD-12 Submitted Policies: chapter 12 of the business process deck.
+# Sources: "BRD - Submitted Policies (with e-sig MCM 4.24.2026).pdf" p.4-7 (current and envisioned process, image
+# pages), p.13-14 (NFR); FRS BRD-12 sections 2, 5, 9; cross-BRD decisions D1, D2, XQ01, XQ03; discrepancy register
+# (DCR-124, 125, 126, 129, 146).
+id: brd12
+key: sp
+num: 12
+title: Submitted Policies
+brd: BRD-12
+scope: 'Policies submitted by bank clients: masterlist, sanitation, review, IAAF, renewal hand-off'
+status: DESIGNED
+status_text: Designed, not yet built; FRS v1.0 issued for review
+department: CBG and Non-CBG Marketing - Submitted Policies
+roles:
+  - Submitted Handler and Submitted Checker (CBG)
+  - Sanitation Handler; Team Lead; rule administrator
+  - Policy Review Officer (Non-CBG Corporate)
+  - Marketing AO, NB Team Lead, TSU
+  - Admin Team UPP handler; Placement and Booking users
+figures:
+  - ['63,000', 'sanitations a year, +25% a year (p.13-14)']
+  - ['30', 'CBG Admin / Marketing users, 15 concurrent']
+  - ['2 s', 'response for every listed transaction']
+  - ['30', 'days to consolidate CBG Motor policies (p.4-5)']
+sources:
+  - BRD-12 p.4-7 (current and envisioned, image pages)
+  - BRIDSP-01 to 33
+  - FRS BRD-12 v1.0, sections 2 and 5; decision D2
+chevrons: [Intake, Extraction, Masterlist, Processing run, Review and IAAF, Limits and TOR, Expiry scan, Renewal]
+notes:
+  glance: >-
+    Submitted policies are policies that bank clients (CBG Motor, CBG Fire, Non-CBG Corporate and Branches, Non-CBG
+    Retail) placed outside BDOI and submitted to the bank. BDOI keeps them on a masterlist, reviews their adequacy, and
+    at expiry converts them to BDOI-placed renewals. In BIBS the renewal from the hand-off on belongs to the Renewal
+    module (decision D2). The module is designed; the build needs BT0, Collections and Cashiering for its ports.
+  pains: The eight points are the current-process rows of FRS BRD-12 section 2.1, read from the image pages of the BRD (p.4-7).
+  after: The usage table gives the volumes and the 2-second response target (p.13-14), the tightest in the twelve BRDs.
+  gaps: The bucket list (DCR-124) and the LAMD intake (DCR-146) decide which submitted policies are renewed.
+asis:
+  caption: 'Submitted policies today (BRD-12 p.4-7)'
+  notes: >-
+    Today CBG Motor Team Leads extract policy details from LFS and CIU and the Submitted Handler consolidates them within
+    30 days; CBG Fire policies come from Home Loan AOs; Non-CBG Corporate and Branch policies are reviewed by a Policy
+    Reviewer who issues an IAAF on paper; Non-CBG Retail policies come from the LAMD report. Each segment keeps an Excel
+    masterlist on a shared drive. At renewal a Sanitation Handler matches the list against LAMD by hand, excludes
+    accounts that must not be renewed, assigns an insurer and sends a proposal with a 30-day hold cover request, and an
+    RA text file goes to COG for mailing. Limit breaches are handled by e-mail with TSU, handling-fee payments are
+    filtered from the UPP list on SharePoint, and status is monitored in the masterlists.
+  cols: 7
+  lanes:
+    - {id: bank, label: 'Bank units: LFS, CIU, LAMD', kind: external}
+    - {id: hdl, label: 'Handlers (CBG)'}
+    - {id: rev, label: 'Policy Reviewer, AO, TSU'}
+    - {id: ins, label: 'Insurers, COG', kind: external}
+    - {id: sys, label: 'Excel on Drive H:, SharePoint', kind: system}
+  steps:
+    - {id: a1, lane: bank, col: 1, text: 'Reports from LFS, CIU, LAMD', kind: external}
+    - {id: a2, lane: hdl, col: 1, text: Details consolidated by hand, pain: [1]}
+    - {id: a3, lane: sys, col: 2, text: Masterlist per segment, kind: legacy, pain: [2]}
+    - {id: a4, lane: hdl, col: 3, text: Sanitation and LAMD match by hand, pain: [3]}
+    - {id: a5, lane: rev, col: 4, text: Review; IAAF signed on paper, pain: [4]}
+    - {id: a6, lane: rev, col: 5, text: Limit breach by e-mail with TSU, pain: [5]}
+    - {id: a7, lane: hdl, col: 6, text: 'Proposal, hold cover, RA file by hand', pain: [6]}
+    - {id: a8, lane: ins, col: 6, text: 'Insurer hold cover; COG mails RA', kind: external}
+    - {id: a9, lane: sys, col: 7, text: Handling fee from UPP list, kind: legacy, pain: [7]}
+    - {id: a10, lane: hdl, col: 7, text: Status monitored in masterlists, pain: [8]}
+  edges:
+    - [a1, a2, dashed]
+    - [a2, a3]
+    - [a3, a4]
+    - [a4, a5]
+    - [a5, a6, dashed, e-mail]
+    - [a6, a7]
+    - [a7, a8, dashed]
+    - [a7, a10]
+pains:
+  - {n: 1, title: Policy details consolidated by hand, text: 'Excel reports and documents per segment; 30 days to consolidate CBG Motor.', ref: 'BRD-12 p.4-5; BRIDSP-01, 02'}
+  - {n: 2, title: Separate masterlists, text: 'One Excel masterlist per segment on Drive H:, with e-mail and SharePoint.', ref: 'BRD-12 p.4-5; BRIDSP-04'}
+  - {n: 3, title: Sanitation and LAMD matching by hand, text: 'Exclusions (FFY, employees, No Touch) applied manually.', ref: 'BRD-12 p.4-7; BRIDSP-08, 09'}
+  - {n: 4, title: Reviews and IAAF on paper, text: 'Adequacy reviews by e-mail; IAAF signed on paper.', ref: 'BRD-12 p.4-5; BRIDSP-05-07'}
+  - {n: 5, title: Limit breaches by e-mail, text: 'Breaches handled with TSU by e-mail.', ref: 'BRD-12 p.4-7; BRIDSP-16-19'}
+  - {n: 6, title: Renewal prepared by hand, text: 'Proposal, 30-day hold cover request and RA text file for COG prepared manually.', ref: 'BRD-12 p.5-7; BRIDSP-22-26'}
+  - {n: 7, title: Handling fee from the UPP list, text: 'Handling-fee payments filtered from the Unapplied Payment List on SharePoint.', ref: 'BRD-12 p.4-7; BRIDSP-31'}
+  - {n: 8, title: Status in the masterlists, text: 'No reports or alerts from live data.', ref: 'BRD-12 p.4-7; BRIDSP-20, 21, 24'}
+tobe:
+  caption: 'Submitted Policies in BIBS: workflow SBM_POLICY and the Renewal hand-off (FRS BRD-12 section 2.2; decision D2)'
+  notes: >-
+    In BIBS each source file is uploaded and validated, one masterlist record per policy; fields are proposed from the
+    policy document and saved only after a user confirms them. One Submitted Masterlist keeps history and role-based
+    access. A processing run sanitises, matches against LAMD by PN, classifies (Inforced or Submitted), buckets and tags
+    each policy; fallout is listed with reason codes. Reviews and the IAAF follow the approval matrix, with stamped
+    signatures. A limit breach produces a TOR approved by the TSU matrix and handed to the AO. The expiry scan hands
+    renewable policies to the Renewal module, which creates the account, requests the 30-day hold cover and sends the
+    letters. Handling-fee payments are tagged in the Unapplied Payment List by PN or location reference. The source
+    feeds, OCR, qualified e-signature and COG transport are parked ports (upload, manual entry, stamped signature,
+    print batch).
+  cols: 7
+  lanes:
+    - {id: bank, label: 'Bank units: LFS, CIU, HLS, LAMD', kind: external}
+    - {id: hdl, label: 'Handlers (CBG)'}
+    - {id: rev, label: 'Policy Reviewer, AO, TSU'}
+    - {id: ins, label: Insurers, kind: external}
+    - {id: bibs, label: BIBS (automatic), kind: bibs}
+  steps:
+    - {id: b1, lane: bank, col: 1, text: 'Source files (feeds parked)', kind: external}
+    - {id: b2, lane: hdl, col: 1, text: Upload; extracted fields confirmed}
+    - {id: b3, lane: bibs, col: 2, text: One masterlist with history, kind: auto}
+    - {id: b4, lane: bibs, col: 3, text: 'Sanitise, match, classify', kind: auto}
+    - {id: b5, lane: hdl, col: 3, text: Fallout resolved with reason codes}
+    - {id: b6, lane: rev, col: 4, text: Review; IAAF by approval matrix}
+    - {id: b7, lane: rev, col: 5, text: 'Limit breach: TOR via TSU matrix'}
+    - {id: b8, lane: bibs, col: 5, text: Expiry scan; hand-off to Renewal, kind: auto}
+    - {id: b9, lane: bibs, col: 6, text: 'Renewal: account, hold cover, RA', kind: doc}
+    - {id: b10, lane: ins, col: 6, text: Confirms the 30-day hold cover, kind: external}
+    - {id: b11, lane: hdl, col: 7, text: 'Reports, alerts; BOOKED shown'}
+    - {id: b12, lane: bibs, col: 7, text: Handling fee tagged by PN, kind: auto}
+  edges:
+    - [b1, b2, dashed, upload]
+    - [b2, b3]
+    - [b3, b4]
+    - [b4, b5, dashed, fallout]
+    - [b4, b6]
+    - [b6, b7]
+    - [b7, b8]
+    - [b8, b9]
+    - [b9, b10, dashed]
+    - [b10, b11]
+after:
+  - {n: 1, bibs: 'Each source uploaded; fields extracted from the document and confirmed by a user', measure: 'Keyed once'}
+  - {n: 2, bibs: 'One Submitted Masterlist with history and role-based access', measure: '2 s response (p.13-14)'}
+  - {n: 3, bibs: 'Configurable rules sanitise, match, classify and bucket every policy; fallout reported', measure: '63,000 a year by rule'}
+  - {n: 4, bibs: 'Reviews, IAAF and approval matrix in BIBS, with stamped signatures', measure: 'Approval trail'}
+  - {n: 5, bibs: 'TOR generated, approved by the TSU matrix and handed over to the AO', measure: 'Limit check by rule'}
+  - {n: 6, bibs: 'Expiry scan hands renewable policies to Renewal: account, hold cover, letters', measure: 'No manual RA file'}
+  - {n: 7, bibs: 'Handling-fee payments tagged automatically by PN or location reference', measure: 'Tagged daily'}
+  - {n: 8, bibs: 'Reports, alerts and notifications from live data', measure: 'Live status'}
+gaps:
+  - {sev: High, gap: Bucket list and precedence, impact: Which submitted policies are renewed, owner: 'CBG and Non-CBG Marketing', decision: 'Complete bucket list; FFY, RMU, Fully Paid renewed?', ref: 'DCR-124'}
+  - {sev: High, gap: Renewal boundary with BRD-6, impact: Two renewal paths for one policy, owner: 'Submitted Policies and RMEL owners', decision: 'Confirm decision D2; notices and proposals (XQ03)', ref: 'DCR-129'}
+  - {sev: High, gap: One LAMD intake or two, impact: Loan status for buckets and renewal eligibility, owner: 'Marketing, LAMD', decision: 'One report, one owner, frequency', ref: 'DCR-146, XQ01'}
+  - {sev: Medium, gap: One IAAF per policy, impact: IAAF generation and approvals, owner: Non-CBG Corporate Marketing, decision: 'One IAAF per policy; approval matrix', ref: 'DCR-125'}
+  - {sev: Medium, gap: Handling fee undefined, impact: 'Amount, payer, VAT, OR, GL account', owner: 'Marketing, Comptrollership', decision: 'Define the fee and who dispositions it', ref: 'DCR-126'}
+  - {sev: Parked, gap: 'Source feeds, OCR, e-signature, COG', impact: 'Uploads, manual entry, stamped signature, print batch', owner: 'BDO IT, COG', decision: 'Interface specifications per source', ref: 'FRS BRD-12 section 7'}
+best:
+  - {practice: Automated matching with bank loan data, status: BIBS, bibs: 'LAMD matching by PN in the processing run; fallout with reason codes.', bdoi: 'One LAMD report and owner (DCR-146).'}
+  - {practice: Rules owned by the business, status: BIBS, bibs: 'Sanitation, bucket and insurer-assignment rules maintained by a rule administrator.', bdoi: 'Give the bucket precedence (DCR-124).'}
+  - {practice: Adequacy review with an approval matrix, status: BIBS, bibs: 'Policy reviews and IAAF routed by the matrix.', bdoi: 'Approve the IAAF matrix (DCR-125).'}
+  - {practice: Digital signature, status: PARTLY, bibs: 'Stamped signature image today; e-signature port parked.', bdoi: 'Choose a qualified e-signature service.'}
+  - {practice: One masterlist, status: BIBS, bibs: 'One record per policy with history, handler and conversion status.', bdoi: 'Migrate the Excel masterlists with reconciliation (BRIDSP-33).'}
+  - {practice: Conversion KPI, status: ADOPT, bibs: 'Masterlist shows BOOKED when the renewal books; persistency report for submitted accounts.', bdoi: 'Set conversion targets per segment.'}

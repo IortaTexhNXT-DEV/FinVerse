@@ -43,7 +43,7 @@ digraph brd01_envisioned {
   r20 [pos="676.7,11.0!", shape=box, style="filled", fillcolor="@WHITE", color="@WHITE", penwidth=0.8, width=1.047, height=0.250, fixedsize=true, margin="0.03,0.02", label=<<font point-size="10.5" color="@TEXT">External party</font>>];
   r21 [pos="741.4,11.0!", shape=box, style="rounded,filled,dashed", fillcolor="@WHITE", color="@MUTED", penwidth=1.2, width=0.361, height=0.222, fixedsize=true, margin="0.03,0.02", label=""];
   r22 [pos="802.2,11.0!", shape=box, style="filled", fillcolor="@WHITE", color="@WHITE", penwidth=0.8, width=1.189, height=0.250, fixedsize=true, margin="0.03,0.02", label=<<font point-size="10.5" color="@TEXT">Parked interface</font>>];
-  b1 -> b2 [color="@MUTED", style=dashed, penwidth=1.3, arrowsize=0.7, tailport=s, headport=n, label=<<font point-size="10" color="@MUTED">upload</font>>];
+  b1 -> b2 [color="@MUTED", style=dashed, penwidth=1.3, arrowsize=0.7, tailport=s, headport=n];
   b2 -> b3 [color="@HEADER_BLUE", style=solid, penwidth=1.3, arrowsize=0.7, tailport=e, headport=w];
   b3 -> b4 [color="@HEADER_BLUE", style=solid, penwidth=1.3, arrowsize=0.7, tailport=s, headport=n];
   b4 -> b5 [color="@HEADER_BLUE", style=solid, penwidth=1.3, arrowsize=0.7, tailport=e, headport=w];

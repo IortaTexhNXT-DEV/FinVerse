@@ -47,7 +47,7 @@ holistic:
       BDO-Insure Front-End over QPS and EBIX (BRD-9 p.4). Almost every hand-off between areas runs by e-mail and
       spreadsheet, so the same client, policy and payment are keyed several times. The yellow number on each area is
       the count of pain points in its chapter.
-    areas_top: [nb, pm, ops, clxn, acct, rn]
+    areas_top: [nb, ops, pm, clxn, acct, rn]
     areas_bottom: [clm, eb, csf, sanc, uam, sp]
     systems:
       - {id: qps, text: QPS}

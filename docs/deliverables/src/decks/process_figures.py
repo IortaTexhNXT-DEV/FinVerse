@@ -213,12 +213,16 @@ def swimlane(name: str, spec: dict[str, Any], mode: str, comment: str) -> str:
         y = lane_y[s["lane"]] + (lane_h - box_h) / 2
         kind = s.get("kind") or ("manual" if mode == "asis" else "screen")
         cv.step(s["id"], x, y, w, box_h, s["text"], kind)
-        for k, p in enumerate(s.get("pain", []) or []):
+        for k, p in enumerate(reversed(s.get("pain", []) or [])):
             cv.marker(x + w - 4 - k * 21, y + 2, str(p))
+    where = {s["id"]: ([ln["id"] for ln in lanes].index(s["lane"]), s["col"]) for s in spec["steps"]}
     for e in spec.get("edges", []):
         a, b = e[0], e[1]
         style = e[2] if len(e) > 2 and e[2] else "solid"
         label = e[3] if len(e) > 3 else ""
+        (la, ca), (lb, cb) = where[a], where[b]
+        if abs(la - lb) + abs(ca - cb) <= 1:  # neighbouring boxes: no room for a label
+            label = ""
         colour = "@MUTED" if style == "dashed" else "@HEADER_BLUE"
         cv.edge(a, b, style=style, label=label, colour=colour)
     cv.legend(LEGENDS[mode], CANVAS_H - legend_h + 4, x0=head_w)
@@ -236,7 +240,8 @@ def free_layout(name: str, spec: dict[str, Any], comment: str) -> str:
         cv.rect(b["x"], b["y"], b["w"], b["h"], b.get("fill", "@DIRTY_WHITE"), b.get("border", "@BORDER"),
                 penwidth=0.8)
         if b.get("label"):
-            cv.rect(b["x"] + 4, b["y"] + 3, b.get("label_w", b["w"] - 8), 18, b.get("fill", "@DIRTY_WHITE"),
+            ly = b["y"] + b["h"] - 21 if b.get("label_pos") == "bottom" else b["y"] + 3
+            cv.rect(b["x"] + 4, ly, b.get("label_w", b["w"] - 8), 18, b.get("fill", "@DIRTY_WHITE"),
                     b.get("fill", "@DIRTY_WHITE"), b["label"], b.get("label_colour", "@HEADER_BLUE"), 11.5,
                     True, wrap_text=False)
     for n in spec.get("nodes", []):

@@ -1,0 +1,140 @@
+# BRD-8 Employee Benefits, including the partner portal: chapter 8 of the business process deck.
+# Sources: "Employee Benefits.pdf": main BRD p.5, p.36-37 (NFR); workshop addendum Add. p.3-5 (current and envisioned),
+# Add. p.14 (teams and volumes); FRS BRD-8 sections 2, 5, 9; cross-BRD decisions D1, D3, D7; discrepancy register
+# (DCR-087, 088, 090, 094, 096, 097).
+id: brd08
+key: eb
+num: 8
+title: Employee Benefits
+brd: BRD-8
+scope: 'Group benefit programmes: renewal advice to placement, member servicing, partner portal'
+status: DESIGNED
+status_text: 'Designed with the partner portal; FRS v1.0 issued for review'
+department: 'Employee Benefits: Marketing, Processing and Collection'
+roles:
+  - EB Marketing AO and TL / UH (five EB teams)
+  - BDOI Management (threshold approval)
+  - EB Processing and Processing Supervisor
+  - EB Collection
+  - 'Portal: insurer and HMO users, client HR users'
+figures:
+  - ['4,200', 'transactions in 2025; 4,150 are renewals (Add. p.14)']
+  - ['20', 'BDOI users: Marketing 13, Processing 4, Collection 3']
+  - ['135', 'days before expiry: default renewal advice (TAT annex)']
+  - ['99.99%', 'availability asked; use 08:30-19:00 (p.36-37)']
+sources:
+  - BRD-8 workshop addendum Add. p.3-5 (current and envisioned)
+  - BRID-001-030; main BRD p.5
+  - FRS BRD-8 v1.0; decision D7 (portal users)
+chevrons: [Renewal advice, Requirements, BOR and franchise, TOR, Proposals, Comparative, Client decision, Placement]
+notes:
+  glance: >-
+    Business comes from five EB teams: BDO (captive bank group accounts), SM, Voluntary, Solicited and New Business.
+    Renewals dominate. Insurers and client HR users are the first external users of BIBS: they work in the partner
+    portal, and nothing they upload takes effect before BDOI validates it. Portal users are provisioned through User
+    Access Maintenance as external users (decision D7). Employee Benefits is designed.
+  pains: The seven points are the current-process rows of FRS BRD-8 section 2.1, from the addendum (Add. p.3).
+  after: The BRD asks for automatic renewal advices, one repository, secure access and standard comparatives (Add. p.4-5); it gives no turnaround target.
+  gaps: 'Member lists and utilization reports are health-related personal data: DCR-094 is the main compliance gap.'
+asis:
+  caption: 'Employee Benefits today (BRD-8 Add. p.3)'
+  notes: >-
+    Today renewal advices are prepared in Word or Excel. The TOR, master lists, utilization reports and proposals
+    travel by e-mail with no repository, and insurers and clients reply by e-mail. The comparative is compiled by hand.
+    Placement starts on an e-mail to Processing, member movements and billing are tracked in spreadsheets, booking is in
+    EBIX, and reports are produced manually.
+  cols: 6
+  lanes:
+    - {id: cli, label: Client HR, kind: external}
+    - {id: mkt, label: EB Marketing AO}
+    - {id: ins, label: 'Insurers, HMO', kind: external}
+    - {id: prc, label: 'Processing, Collection'}
+    - {id: sys, label: 'Word, Excel, e-mail, EBIX', kind: system}
+  steps:
+    - {id: a1, lane: mkt, col: 1, text: RA prepared in Word or Excel, pain: [1]}
+    - {id: a2, lane: cli, col: 2, text: 'Master list, utilization by e-mail', kind: external, pain: [2]}
+    - {id: a3, lane: mkt, col: 3, text: TOR and master list e-mailed}
+    - {id: a4, lane: ins, col: 4, text: Proposal by e-mail, kind: external, pain: [3]}
+    - {id: a5, lane: sys, col: 4, text: Comparative compiled by hand, kind: legacy, pain: [4]}
+    - {id: a6, lane: cli, col: 5, text: Client confirms by e-mail, kind: external}
+    - {id: a7, lane: prc, col: 5, text: Placement starts on an e-mail, pain: [5]}
+    - {id: a8, lane: sys, col: 6, text: Booking in EBIX; members in Excel, kind: legacy, pain: [6]}
+    - {id: a9, lane: mkt, col: 6, text: Reports produced by hand, pain: [7]}
+  edges:
+    - [a1, a2, dashed, e-mail]
+    - [a2, a3, dashed]
+    - [a3, a4, dashed]
+    - [a4, a5]
+    - [a5, a6, dashed]
+    - [a6, a7, dashed]
+    - [a7, a8]
+    - [a8, a9]
+pains:
+  - {n: 1, title: Renewal advices by hand, text: 'Prepared in Word or Excel for each programme.', ref: 'BRD-8 Add. p.3; BRID-001'}
+  - {n: 2, title: No document repository, text: 'TOR, master lists, utilization and proposals travel by e-mail.', ref: 'BRD-8 Add. p.3; BRID-002, 007'}
+  - {n: 3, title: Insurers and clients reply by e-mail, text: 'No secure channel and no validation before use.', ref: 'BRD-8 Add. p.3-4; BRID-005'}
+  - {n: 4, title: Comparative compiled by hand, text: 'Proposals are re-keyed into a comparative.', ref: 'BRD-8 Add. p.3; BRID-010'}
+  - {n: 5, title: Placement starts on an e-mail, text: 'Hand-offs between Marketing, Processing and Collection run on e-mail.', ref: 'BRD-8 Add. p.3; BRID-017'}
+  - {n: 6, title: Members and billing in spreadsheets, text: 'Member movements, direct billing, cards and SOAs tracked in Excel.', ref: 'BRD-8 Add. p.3; BRID-013, 021, 030'}
+  - {n: 7, title: Reports by hand, text: 'Production, renewal and TAT reports compiled manually.', ref: 'BRD-8 Add. p.3; BRID-022'}
+tobe:
+  caption: 'EB cycle in BIBS: workflow EB_CYCLE and the partner portal (FRS BRD-8 sections 2.2 and 5)'
+  notes: >-
+    In BIBS a daily job sends the renewal advice 135 days before expiry (default), with reminders and a feedback
+    request. Client HR users upload the master list, utilization and the signed BOR in the partner portal; the AO
+    validates every upload before it takes effect. Target insurers approve the franchise in the portal; the TOR and the
+    unnamed master list are released to them, and they submit proposals on a structured form. BIBS builds the comparative
+    from the validated proposals; sign-off and the value-threshold approval are workflow steps. The client's
+    confirmation creates one account per benefit line and notifies Processing, who place, issue and book on the BRD-1
+    spine and release the SOA. Member changes, direct billing, contracts, HMO cards and SOAs are tracked items with
+    automatic follow-ups.
+  cols: 6
+  lanes:
+    - {id: cli, label: 'Client HR (portal)', kind: external}
+    - {id: mkt, label: 'EB Marketing, Mgmt'}
+    - {id: ins, label: 'Insurers, HMO (portal)', kind: external}
+    - {id: prc, label: 'Processing, Collection'}
+    - {id: bibs, label: BIBS (automatic), kind: bibs}
+  steps:
+    - {id: b1, lane: bibs, col: 1, text: RA 135 days before expiry; reminders, kind: doc}
+    - {id: b2, lane: cli, col: 2, text: 'Master list, utilization, BOR uploaded', kind: external}
+    - {id: b3, lane: mkt, col: 2, text: AO validates every upload}
+    - {id: b4, lane: mkt, col: 3, text: Franchise and TOR released}
+    - {id: b5, lane: ins, col: 4, text: Proposal on the portal form, kind: external}
+    - {id: b6, lane: bibs, col: 4, text: Comparative built; threshold check, kind: auto}
+    - {id: b7, lane: cli, col: 5, text: Client confirms in the portal, kind: external}
+    - {id: b8, lane: bibs, col: 5, text: One account per benefit line, kind: auto}
+    - {id: b9, lane: prc, col: 6, text: 'Placement to booking; SOA released'}
+    - {id: b10, lane: bibs, col: 6, text: 'Members, cards, billing tracked', kind: auto}
+  edges:
+    - [b1, b2, dashed, e-mail]
+    - [b2, b3]
+    - [b3, b4]
+    - [b4, b5, dashed, portal]
+    - [b5, b6]
+    - [b6, b7, dashed]
+    - [b7, b8]
+    - [b8, b9]
+    - [b9, b10]
+after:
+  - {n: 1, bibs: 'Daily job sends the RA 135 days before expiry, with reminders and a feedback request', measure: 'About 4,150 renewals a year'}
+  - {n: 2, bibs: 'Every document registered with cycle, type, process and version; outbound files protected', measure: 'One repository'}
+  - {n: 3, bibs: 'Insurers and client HR work in the partner portal; uploads take effect after BDOI validation', measure: 'Validation before use'}
+  - {n: 4, bibs: 'Comparative built from the validated proposals; sign-off and threshold approval in the workflow', measure: 'No re-keying'}
+  - {n: 5, bibs: 'Client confirmation creates one account per benefit line and notifies Processing', measure: 'Hand-off in the system'}
+  - {n: 6, bibs: 'Member changes, direct billing, contracts, HMO cards and SOAs are tracked items with follow-ups', measure: 'Automatic follow-ups'}
+  - {n: 7, bibs: 'Production, Renewal, Placement, New Business and TAT reports with a business type filter', measure: 'Live reports'}
+gaps:
+  - {sev: High, gap: No data-privacy rule for member data, impact: 'Health-related personal data under the Data Privacy Act', owner: 'EB, Compliance (DPO)', decision: 'Access, masking and retention for master lists and utilization', ref: 'DCR-094'}
+  - {sev: High, gap: External portal users, impact: 'Internet-facing access: hosting, MFA, provisioning', owner: 'EB, BDO Information Security', decision: 'Who creates and approves portal users; MFA; DMZ', ref: 'DCR-096'}
+  - {sev: Medium, gap: RA 180 or 135 days before expiry, impact: Timing of the renewal cycle, owner: EB Marketing, decision: 'Days before expiry and number of reminders', ref: 'DCR-087'}
+  - {sev: Medium, gap: BOR for renewals, impact: Insurer requests blocked or not, owner: EB Marketing, decision: 'Never, when remarketing, or always', ref: 'DCR-088'}
+  - {sev: Medium, gap: Franchise and ISACOM steps, impact: Steps without requirement rows, owner: EB Marketing, decision: 'What ISACOM approves, and when', ref: 'DCR-090'}
+  - {sev: Medium, gap: HMO providers as insurers, impact: Catalog of placement counterparties, owner: 'EB, MBS', decision: 'List the benefit lines; HMOs held with insurers?', ref: 'DCR-097'}
+best:
+  - {practice: Data-privacy controls on member data, status: PARTLY, bibs: 'Document access classes, protected files, download logging, audit trail.', bdoi: 'Set masking and retention for member data with the DPO (DCR-094).'}
+  - {practice: Secure partner portal, status: PARTLY, bibs: 'Portal roles for insurers and client HR; uploads validated before use; lock-out after 3 attempts.', bdoi: 'Decide MFA, hosting and provisioning (DCR-096).'}
+  - {practice: One version-controlled repository, status: BIBS, bibs: 'Documents registered by cycle, type, process and version.', bdoi: 'Stop e-mailing census files once the portal is live.'}
+  - {practice: Approval thresholds owned by the business, status: BIBS, bibs: 'Threshold rules on TSI or premium route the comparative to BDOI Management.', bdoi: 'Set the threshold values.'}
+  - {practice: Service KPIs per programme, status: BIBS, bibs: 'TAT report and EB home with pending items and overdue follow-ups.', bdoi: 'Agree TAT targets per step with the five EB teams.'}
+  - {practice: Straight-through renewal where terms are unchanged, status: ADOPT, bibs: 'Incumbent indicative terms can go to the client without remarketing.', bdoi: 'Define when a renewal may skip remarketing.'}

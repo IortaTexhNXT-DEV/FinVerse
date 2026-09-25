@@ -1,0 +1,128 @@
+# BRD-11 User Access Maintenance: chapter 11 of the business process deck.
+# Sources: "User Access Maintenance.pdf" p.5 (current and envisioned), p.6 (process diagrams), p.11-18 (NFR);
+# FRS BRD-11 sections 2 (incl. the built baseline), 5, 9; decisions D5, D6, D7; register (DCR-096, 114, 115, 121, 141, 143).
+id: brd11
+key: uam
+num: 11
+title: User Access Maintenance
+brd: BRD-11
+scope: 'User access requests, approvals, group profiles, access reports'
+status: PARTLY BUILT
+status_text: 'Baseline built (users, roles, access requests); BRD-11 changes designed'
+department: UAM process owner (Product Owner) with BDO ITIO
+roles:
+  - Requestor (14 users)
+  - Approver (8) and second approver
+  - Business Administrator (group-profile requests)
+  - System Administrator (implements group profiles)
+  - Auditor; the affected user
+figures:
+  - ['10', 'access transactions a month on average (p.11)']
+  - ['14', 'requestors, 5 concurrent; 8 approvers']
+  - ['10 s', 'response; reports 20 s (p.11)']
+  - ['3', 'failed sign-ins lock the account (built, D5)']
+sources:
+  - BRD-11 p.5-6 (current, envisioned, two process diagrams)
+  - BRD 1.002-4.003; NFR p.11-18
+  - FRS BRD-11 v1.0, sections 2.3 (baseline) and 5
+chevrons: [Draft, Submit, Risk check, Decide, Correct, Apply, Group profile, Reports]
+notes:
+  glance: >-
+    Today BDOI coordinates every QPS access request with IT, which causes delays (BRD-11 p.5). The BRD asks for a module
+    in which the business unit manages permissions, roles and access levels itself, with self-service requests. Part of
+    it is built: users, roles, permissions, sign-in with lock-out after 3 attempts, the session policy (warning at 15
+    minutes, sign-out at 30), access requests under four eyes and the User Access Matrix. BRD-11 adds drafts, returns,
+    chosen approvers, effective dates, bulk, second approval, group-profile requests and four reports. Directory sign-in
+    (EUA) is a parked port until BDO supplies the interface (decision D6).
+  pains: The five points are the current-process rows of the BRD (p.5).
+  after: The volumes are small (p.11); the value is control and speed, not throughput.
+  gaps: >-
+    The BRD is written for the "QPS User Access Maintenance Module" (DCR-114); the project reads it as BIBS-wide.
+    It has no acceptance criteria (DCR-115); the FRS proposes them for BDOI's concurrence.
+asis:
+  caption: 'Access requests today (BRD-11 p.5-6)'
+  notes: >-
+    Today the business unit sends access requests to IT and coordinates them. The approver is reached by e-mail. IT
+    grants the access in QPS, and group profiles are created or changed by IT on request. Access lists are compiled by
+    hand (BRD-11 p.5).
+  cols: 5
+  lanes:
+    - {id: req, label: 'Requestor (business unit)'}
+    - {id: apr, label: Approver}
+    - {id: it, label: BDO IT, kind: external}
+    - {id: sys, label: 'QPS, e-mail, Excel', kind: system}
+  steps:
+    - {id: a1, lane: req, col: 1, text: Access request sent to IT, pain: [1]}
+    - {id: a2, lane: apr, col: 2, text: Approver reached by e-mail, pain: [2]}
+    - {id: a3, lane: it, col: 3, text: IT grants the access, kind: external, pain: [3]}
+    - {id: a4, lane: sys, col: 3, text: User and roles set in QPS, kind: legacy}
+    - {id: a5, lane: it, col: 4, text: Group profile changed on request, kind: external, pain: [4]}
+    - {id: a6, lane: sys, col: 5, text: Access lists compiled by hand, kind: legacy, pain: [5]}
+  edges:
+    - [a1, a2, dashed, e-mail]
+    - [a2, a3, dashed]
+    - [a3, a4]
+    - [a4, a5]
+    - [a5, a6]
+pains:
+  - {n: 1, title: Requests go through IT, text: 'The business unit coordinates every request with IT; this causes delays.', ref: 'BRD-11 p.5'}
+  - {n: 2, title: Approver reached by e-mail, text: 'No queue of requests waiting for a decision.', ref: 'BRD-11 p.5; BRD 2.002'}
+  - {n: 3, title: IT grants the access, text: 'The grant waits for IT; no effective date.', ref: 'BRD-11 p.5-6'}
+  - {n: 4, title: Group profiles changed by IT, text: 'Profile changes are made on request with no approval trail.', ref: 'BRD-11 p.5-6; BRD 3.002'}
+  - {n: 5, title: Access lists by hand, text: 'Who has which access, and since when, is compiled manually.', ref: 'BRD-11 p.5; BRD 3.003, 4.003'}
+tobe:
+  caption: 'User access and group-profile requests in BIBS (FRS BRD-11 section 2.2)'
+  notes: >-
+    In BIBS the Requestor raises the request (enrol, modify, deactivate or reactivate, alone or in bulk), as a draft or
+    submitted, and chooses the approver. BIBS checks it, sets it PENDING and notifies the chosen approver, who sees it
+    under "Assigned to me". A change to a high-privilege profile, or a submission outside working hours, needs a second
+    approval and raises an alert. The approver approves, rejects with a reason or returns it with remarks. BIBS applies
+    the change on approval or on the effective date, logs the from / to values and notifies the requester and the
+    affected user. Group profiles are requested by the Business Administrator, approved in order and implemented by the
+    System Administrator. Four reports and a structured audit log show who has which access, since when and who changed
+    it. Sign-in by the BDO directory (EUA) is a parked port.
+  cols: 6
+  lanes:
+    - {id: req, label: Requestor}
+    - {id: apr, label: 'Approver, 2nd approver'}
+    - {id: adm, label: 'Business and System Admin'}
+    - {id: dir, label: BDO directory, kind: external}
+    - {id: bibs, label: BIBS (automatic), kind: bibs}
+  steps:
+    - {id: b1, lane: req, col: 1, text: 'Request: draft, submit or bulk'}
+    - {id: b2, lane: bibs, col: 2, text: Checked; chosen approver notified, kind: auto}
+    - {id: b3, lane: bibs, col: 3, text: 'Risk rule: high privilege, after hours', kind: auto}
+    - {id: b4, lane: apr, col: 4, text: 'Approve, reject or return'}
+    - {id: b5, lane: bibs, col: 5, text: Applied on approval or effective date, kind: auto}
+    - {id: b6, lane: bibs, col: 6, text: Requester and user notified, kind: doc}
+    - {id: b7, lane: adm, col: 5, text: Group profile approved and implemented}
+    - {id: b8, lane: adm, col: 6, text: Four access reports; audit log}
+    - {id: b9, lane: dir, col: 1, text: Sign-in by EUA (parked), kind: parked}
+  edges:
+    - [b1, b2]
+    - [b2, b3]
+    - [b3, b4]
+    - [b4, b5]
+    - [b5, b6]
+    - [b4, b7, dashed, group profile]
+    - [b7, b8]
+after:
+  - {n: 1, bibs: 'Requestor raises the request in BIBS, as a draft or submitted, alone or in bulk', measure: 'No IT hand-off'}
+  - {n: 2, bibs: 'Chosen approver notified; request listed under "Assigned to me"', measure: 'Queue per approver'}
+  - {n: 3, bibs: 'BIBS applies the access on approval or on the effective date; high-risk changes need a 2nd approval', measure: 'Four eyes on every change'}
+  - {n: 4, bibs: 'Business Administrator requests; approvers approve in order; System Administrator implements', measure: 'Approval trail'}
+  - {n: 5, bibs: 'Four reports and a structured audit log with from / to values', measure: 'Reports in 20 s'}
+gaps:
+  - {sev: High, gap: No BIBS-wide user access matrix, impact: Roles and persona tests of every module, owner: 'UAM process owner, all BRD owners', decision: Provide or approve one matrix, ref: 'DCR-121'}
+  - {sev: High, gap: Directory sign-in (EUA), impact: Identity source for every user, owner: 'BDO ITIO', decision: 'EUA interface; local sign-in meanwhile', ref: 'DCR-143, D6'}
+  - {sev: High, gap: BRD written for QPS only, impact: Scope of access maintenance, owner: UAM process owner, decision: 'Confirm BRD-11 applies to all of BIBS', ref: 'DCR-114'}
+  - {sev: High, gap: No acceptance criteria; NFRs "follow QPS", impact: Test and sign-off, owner: UAM process owner, decision: 'Concur with the FRS criteria; give QPS retention', ref: 'DCR-115'}
+  - {sev: High, gap: Single session per device, impact: Session control for all users, owner: 'UAM owner, ITIO', decision: 'All users, Collections only, or no one', ref: 'DCR-141, XQ11'}
+  - {sev: High, gap: External portal users, impact: First internet-facing users, owner: 'UAM owner, Information Security', decision: 'Provisioning, MFA, hosting (decision D7)', ref: 'DCR-096'}
+best:
+  - {practice: Least privilege from one role matrix, status: PARTLY, bibs: 'Roles by permission and area; User Access Matrix with Excel export.', bdoi: 'Approve one BIBS-wide matrix (DCR-121).'}
+  - {practice: Segregation of duties, status: BIBS, bibs: 'Approver cannot be the requester; maker-checker in every module; incompatible pairs can be blocked.', bdoi: 'Name the role pairs one user must not hold.'}
+  - {practice: 'Joiner, mover, leaver discipline', status: BIBS, bibs: 'Enrol, modify, deactivate and reactivate requests with effective dates.', bdoi: 'Link HR movements to access requests.'}
+  - {practice: Periodic access review, status: ADOPT, bibs: 'User access, group profile and membership reports.', bdoi: 'Run a quarterly recertification by each unit head.'}
+  - {practice: Single sign-on with the BDO directory, status: PARTLY, bibs: 'Directory authentication port; local sign-in with lock-out until then.', bdoi: 'Provide the EUA interface (DCR-143).'}
+  - {practice: Audit of every access change, status: BIBS, bibs: 'Insert-only change log with from / to values and the approver.', bdoi: 'Agree the retention of access logs.'}

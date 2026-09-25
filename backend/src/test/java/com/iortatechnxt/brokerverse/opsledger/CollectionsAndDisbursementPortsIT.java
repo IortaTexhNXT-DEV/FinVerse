@@ -72,11 +72,11 @@ class CollectionsAndDisbursementPortsIT {
   void theNewPortsKeepTheirDefaultsUntilTheModulesAreBuilt() {
     assertThat(directory).isInstanceOf(EmptyUnappliedDirectory.class);
     assertThat(dispositions).isInstanceOf(HandoffDispositionRequests.class);
-    assertThat(defaultValidation).isInstanceOf(HandoffRefundValidationSource.class);
-    assertThat(defaultValidation.validator()).isEqualTo(RefundValidationSource.ANY);
+    // ACSL (wave A1-PRQ) now serves its own refund validations; Cashiering is still handed over.
+    assertThat(defaultValidation.validator()).isEqualTo(RefundValidationSource.ACSL);
     assertThat(reversals).isInstanceOf(HandoffPaymentReversalRequester.class);
     assertThat(corrections).isInstanceOf(LedgerInvoiceCorrectionSink.class);
-    assertThat(validations.installed()).isEmpty();
+    assertThat(validations.installed()).containsExactly(RefundValidationSource.ACSL);
 
     assertThat(directory.open(fx.company(), UnappliedFilter.all(), PageRequest.of(0, 10)))
         .isEmpty();
@@ -121,6 +121,8 @@ class CollectionsAndDisbursementPortsIT {
   @Test
   void refundValidationsAndReversalsAreHandedOverWhileTheirModulesAreMissing() {
     String ref = "RRF-" + BookingFixtures.token();
+    // The ACSL validation opens a case on the invoice, so it must be in the ledger.
+    String invoiceNo = fx.motorInvoice().getInvoiceNo();
     for (String validator :
         List.of(RefundValidationSource.ACSL, RefundValidationSource.CASHIERING)) {
       var ticket =
@@ -133,7 +135,7 @@ class CollectionsAndDisbursementPortsIT {
                               new ValidationRequest(
                                   fx.company(),
                                   validator,
-                                  "BI-HO-2026-000009",
+                                  invoiceNo,
                                   "AR-" + ref,
                                   BookingFixtures.CLIENT,
                                   "PHP",
@@ -141,14 +143,18 @@ class CollectionsAndDisbursementPortsIT {
                                   new RefundValidationSource.Source(
                                       "PAYREQUEST", ref, "mktao", null)))));
       assertThat(ticket.validator()).isEqualTo(validator);
-      assertThat(ticket.status()).isEqualTo(RefundValidationSource.Status.DEFERRED);
-      assertThat(ticket.reference()).startsWith("HANDOFF-");
+      if (RefundValidationSource.CASHIERING.equals(validator)) {
+        assertThat(ticket.status()).isEqualTo(RefundValidationSource.Status.DEFERRED);
+        assertThat(ticket.reference()).startsWith("HANDOFF-");
+      } else {
+        assertThat(ticket.status()).isEqualTo(RefundValidationSource.Status.OPENED);
+      }
     }
     assertThat(
             handoffs.find(
                 HandoffRefundValidationSource.PORT,
                 "PAYREQUEST",
-                RefundValidationSource.ACSL + ":" + ref))
+                RefundValidationSource.CASHIERING + ":" + ref))
         .isPresent();
 
     var reversal =

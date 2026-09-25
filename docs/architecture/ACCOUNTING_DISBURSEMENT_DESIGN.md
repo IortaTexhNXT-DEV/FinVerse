@@ -740,3 +740,68 @@ cost-centre rules, employees, report batch, export options, closing controls, he
 - Frontend of the access-request "Return" (screen owned by `features/brokingsetup`) and of the approval inbox bulk
   approve (screen owned by the approvals feature): the APIs are ready; the Journals screen has its own bulk posting.
 - The broking modules do not implement `BrokingCutoffCheck` yet: the cut-off records "Nothing pending" until they do.
+
+### A1-PRQ as built
+
+What wave A1-PRQ built for `payrequest`, `acsl` and the `crm` payout accounts, and where it differs from or details
+sections 5, 9-11 and 15. The fit/gap rows of `docs/requirements/BDOI_ACCT_BRD_SPEC.md` sections N-P are unchanged;
+this table is their build status.
+
+- **Migrations.** `V802__crm_client_payout_account.sql` (`crm_client_payout_account`: mode CTA / CHECK, payee name and
+  its normalised key, BDO account no., source request, active; partial unique indexes on (client, account no.) and
+  (client, payee key) for CHECK among active rows). `V894__payrequest.sql` (`prq_request`, `prq_request_line` with a
+  unique index on the AR no. of live lines, `prq_validation` unique per (request, round, line, validator) and per
+  (validator, source reference), `prq_liquidation`, `prq_liquidation_line`, the configuration table
+  `prq_liquidation_account`, LOV types `PRQ_PAYMENT_MODE` and `PRQ_RFP_TYPE`, notification event
+  `PRQ_REQUEST_STATUS`). `V895__payrequest_templates.sql` (document templates `PRQ_RRF`, `PRQ_RFP`,
+  `PRQ_LIQUIDATION`). `V896__acsl.sql` (`acsl_case`, `acsl_correction`, `acsl_correction_line`, `acsl_soa_layout`
+  seeded with the standard layout `*`, `acsl_soa_upload` unique per company / insurer / file hash, `acsl_soa_line`,
+  `acsl_recon_run`, `acsl_recon_result`, `acsl_glsl_control`, `acsl_glsl_run`, `acsl_glsl_recon`).
+  `V897__acsl_events_reports.sql` (notification events `ACSL_CASE_STATUS`, `ACSL_GLSL_DIFFERENCE`; parameter
+  `ACSL_SOA_MAX_ROWS`). No event type is inserted: the liquidation publishes `PRQ_CA_LIQUIDATION` of V890 and a
+  correction posts a system journal (section 17).
+- **Contracts.** `crm.service.ClientPayoutAccounts` (validate, record without duplicates, list, deactivate) is what
+  payrequest calls on approval of a refund. `acsl.service.AcslRefundValidationSource` replaces the default
+  `RefundValidationSource` for validator `ACSL` (it opens an ANALYSIS_REQUEST case; the result publishes
+  `RefundValidationCompleted`). payrequest consumes `RefundValidationCompleted` and `DisbursementStatusChanged`; acsl
+  consumes `PaymentReversalCompleted`. The check cancellation is handed off on port `DV_CANCELLATION` (team
+  `DISB_APPROVE`) because the gateway has no cancel for a DV; A1-DSB can pick it up.
+
+| BR ID | Status | How it is built |
+|---|---|---|
+| MKT 1.2.0-1.6.0 | Built | Requests Home `/payment-requests`: tabs by stage with counts, search (request, payee, reference, DV no.), filters by kind and date, bulk endorse / approve with per-item results; request page `/payment-requests/requests/:id` |
+| MKT 1.8.0, 1.17.0 | Built | Generic return and cancel transitions of `PRQ_REFUND`, `PRQ_CASH_ADVANCE`, `PRQ_CHECK_CANCEL`; cancelling releases the AR lines |
+| MKT 1.9.0 | Built | `POST /api/v1/payment-requests/requests/{id}/assign` through `WorkAssignmentService` (PRQ_ASSIGN) |
+| MKT 1.10.0 | Built, seam parked | RRF lines and the RFP; PDF forms from the templates of V895; mandatory fields and approvers wait for AQ18 |
+| MKT 1.11.0 | Built, seam parked | A cancelled-policy line opens one validation per line for `ACSL` (case) and `CASHIERING` (handoff default until C1-C / O1-A provide a source); both results decide validated / returned; manual result entry for a handed-off validator |
+| MKT 1.12.0, 2.22.0 | Built | Attachments on the request; their ids travel to Disbursement in `Spec.withReferences` |
+| MKT 1.14.0-1.16.3 | Built | Submit, endorse, approve (four eyes: no endorse or approve by the requester or the previous actor), HR approval of cash advances |
+| MKT 1.18.0-1.18.1 | Built | Reports `PRQ-STATUS` and `PRQ-REGISTER` (category PAYMENT_REQUESTS) |
+| MKT 1.19.0, 1.16.3 | Built, seam parked | Check cancellation of a disbursed CHECK / manager's check / demand draft with a DV, one live cancellation per request; approved requests are handed off on `DV_CANCELLATION` |
+| MKT 1.20.0, 2.26.0 | Built | `DisbursementStatusChanged` moves the request to disbursed (PAID) or back to the preparer (RETURNED / CANCELLED, resent under a new reference `RRF.../n`); notification `PRQ_REQUEST_STATUS`; Disbursement tab |
+| MKT 2.23.0 | Built | Unique live AR no. (`uq_prq_live_ar`) |
+| MKT 2.24.0 | Built | `DisbursementGateway.send` on final approval (refund) or HR approval (cash advance) |
+| MKT 2.25.0-2.25.1 | Built, seam parked | Payout accounts recorded on approval without duplicates; the account-number format is a 10-16 digit rule until AQ19 |
+| Appendix D liquidation | Built, seam parked | Liquidation tab: fieldwork days, submit, return, post (`PRQ_CA_LIQUIDATION`, four eyes); the account of each expense role is the configuration screen `/payment-requests/liquidation-accounts` (AQ02 / OQ07) |
+| ACSL 2.2.1, 2.4.0 | Built, seam parked | SOA upload (CSV, XLSX, ODS, TXT) per insurer and period, layout per insurer in `acsl_soa_layout` (standard layout until AQ21), upload log `ACSL-SOA-UPLOAD-LOG`; screen `/acsl/soa` |
+| ACSL 2.13.0-2.13.1, 2.14.0-2.14.1 | Built | Reconciliation by invoice no. into Outstanding / For remittance / Remitted / Cancelled / Direct billed / Not found with premium and balance variances; report `ACSL-SOA-RECON` named "insurer_from_to"; reconcile again; screen `/acsl/soa/:id` |
+| ACSL 2.2.0, 2.14.2 | Built | Report `ACSL-BOOKED-FIN-DETAILS` |
+| ACSL 2.13.2 | Built, seam parked | Job `ACSL_GL_SL_RECON` (ManagedJob on `acsl-gl-sl-recon-cron`) and on demand, report `ACSL-GL-SL-RECON`, alert `ACSL_GLSL_DIFFERENCE`; control accounts and their sub-ledger are configuration (`/acsl/gl-sl`, OQ07). The period-end check provider is not built |
+| ACSL 2.14.3-2.14.4 | Not built | Ageing and schedule reports need `AgeingSlots` with 8 slots (A1-GL, OQ43) |
+| ACSL 2.5.0, 2.5.4-2.5.5 | Built | Cases `/acsl` (investigation, analysis request, AR refund application, payment reversal): assign, findings, result to the requester; cases of the invoice family |
+| ACSL 2.6.0-2.6.1 | Built, seam parked | Payment reversal request from a case through `PaymentReversalRequester` (handoff default until Cashiering implements it); the result comes back as `PaymentReversalCompleted` |
+| ACSL 2.6.2 | Built | Message to the Account Officer of the invoice |
+| ACSL 2.7.0-2.12.2, 2.15.0 | Built | Correction entries `/acsl/corrections`: assign / re-assign, lines with party, invoice and ledger component, submit (balanced only), endorse, approve (four eyes) posting a system journal `ACS:<no>` in the journal type of the corrected batch, recording and matching open items, and moving the invoice components through `InvoiceCorrectionSink` |
+| ACSL 2.9.1 | Built, seam parked | "Wrong account" proposal: reversal of the original line plus re-post to the right account, linked by invoice family and original batch / line; the `corrects_batch_id` column on journals waits for A1-GL (AQ22) |
+
+- **Differences from the design.** The SOA upload reads the file with `BulkFileReader` in one request (row limit
+  `ACSL_SOA_MAX_ROWS`) instead of a bulk handler, so the reconciliation runs once the whole file is loaded. Menu:
+  Requests Home, New Refund Request, New Cash Advance, Cancel a Check, Liquidation Accounts; ACSL Cases, Correction
+  Entries, Insurer SOA Reconciliation, GL-SL Reconciliation.
+- **Parked (seams).** AQ18 forms and approvers; AQ19 account-number format; AQ21 insurer SOA layouts (table
+  `acsl_soa_layout`); AQ02 / OQ07 liquidation and GL-SL control accounts (configuration tables); Cashiering validation
+  and payment reversal via handoff until C1-C; DV cancellation via handoff; `corrects_batch_id` until A1-GL; ACSL
+  ageing / schedule reports until `AgeingSlots` has 8 slots.
+- **Tests.** `PayRequestFlowIT`, `RefundValidationIT`, `LiquidationAndReportsIT`, `PayRequestApiIT`,
+  `PayRequestDomainTest`, `AcslSoaIT`, `AcslCorrectionIT`, `AcslApiIT`, `AcslDomainTest`; frontend
+  `requestForm.test.ts`, `acsl.test.ts`.

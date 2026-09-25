@@ -109,4 +109,21 @@ page previews). Sources: `docs/deliverables/src/`; outputs: `docs/deliverables/o
 
 | # | Document | Status |
 |---|---|---|
-| 1 | FRS BRD-3 Product Maintenance (reference FRS for the other BRDs) | Issued v1.0 for BDOI review: `out/FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx` and `.pdf` |
+| 1 | FRS, one per BRD (BRD-5 in two volumes with a cover note) | v1.0 issued for BDOI review: `out/FRS/`, 14 Word files |
+| 2 | Discrepancy and clarification register | v1.0: `out/Registers/BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx` |
+| 3 | Test plans, one per FRS volume | v1.0: `out/TestPlans/`, 13 workbooks and 13 Word summaries; builder `src/testplans/build_test_plan.py` |
+| 17 | Reports in Excel and PDF; documents and schedules in Word and PDF | Built in the platform (`ExportFormat.DOCX`, document renditions); see Developer Guide 6.1-6.2 |
+| 41 | Business process deck | v1.0: `out/Decks/BIBS_Deck_BRD-00_Business_Process_AsIs_Envisioned_BestPractice_v1.0.pptx` |
+
+### Carried into FRS v1.1
+
+The test plans record every FRS statement that cannot be tested as written in the FRS Findings sheet of each
+workbook (about 100 findings). Besides those, v1.1 applies these corrections across all FRS documents:
+
+- quote the platform's log-in, lock-out and no-access messages as built, and the codes of reused platform messages
+  (bulk and attachment file checks, duplicate client, e-mail address, report parameters);
+- write each BRD trace as a block list, one quoted reference per item, so that commas inside a reference do not split
+  it (BRD-4 FR-CL-033, 084, 091-094; BRD-6 FR-RN-090, 103; the page references of BRD-11);
+- BRD-5 Volume 1 gap G1 (no Word output) is closed: schedules and documents are produced in Word;
+- BRD-2: the menu section is "Production Reconciliation" (the platform label is corrected with the alignment pass);
+- BRD-5 Volume 1: Lists of Values and Access Requests are under Setup & Administration > Broking Setup.

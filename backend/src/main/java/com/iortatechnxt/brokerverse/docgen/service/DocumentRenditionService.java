@@ -116,7 +116,7 @@ public class DocumentRenditionService {
       return mapper.readValue(json, DocumentSpec.class);
     } catch (JsonProcessingException ex) {
       throw new BusinessRuleException(
-          "DOCUMENT_WORD_UNAVAILABLE", "This document cannot be produced in Word");
+          "DOCUMENT_WORD_UNAVAILABLE", "This document cannot be produced in Word", ex);
     }
   }
 

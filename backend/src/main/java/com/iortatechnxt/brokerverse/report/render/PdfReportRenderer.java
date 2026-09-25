@@ -162,7 +162,7 @@ public class PdfReportRenderer implements ReportRenderer {
     int details = 0;
     for (ReportRow row : result.rows()) {
       boolean detail = row.kind() == RowKind.DETAIL;
-      addRow(table, row, cols, detail && details % 2 == 1);
+      addRow(table, row, cols, detail && details % 2 != 0);
       if (detail) {
         details++;
       }

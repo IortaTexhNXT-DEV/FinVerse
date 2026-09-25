@@ -5,6 +5,7 @@ import {
   entryLink,
   groupByFamily,
   groupPack,
+  packFormats,
   periodOf,
   quickParams,
   runnerErrors,
@@ -206,5 +207,10 @@ describe('account schedules and report pack', () => {
       quarter: '3',
       schedule: 'SCH-A',
     });
+  });
+
+  it('exports board schedules to Word as well as Excel and PDF (client requirement 16)', () => {
+    expect(packFormats(entry({ wordRequested: true }))).toEqual(['XLSX', 'PDF', 'DOCX']);
+    expect(packFormats(entry({}))).toEqual(['XLSX', 'PDF']);
   });
 });

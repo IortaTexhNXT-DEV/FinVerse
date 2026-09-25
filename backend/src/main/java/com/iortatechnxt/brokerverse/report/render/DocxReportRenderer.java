@@ -118,7 +118,7 @@ public class DocxReportRenderer implements ReportRenderer {
             false,
             BrandAssets.BACKGROUND_BLUE);
       } else {
-        boolean banded = row.kind() == RowKind.DETAIL && details % 2 == 1;
+        boolean banded = row.kind() == RowKind.DETAIL && details % 2 != 0;
         valueRow(x, row, cols, banded ? BrandAssets.ROW_BAND : null);
       }
       if (row.kind() == RowKind.DETAIL) {

@@ -1,15 +1,17 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Download, Play, Printer } from 'lucide-react';
+import { Play, Printer } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { saveFile } from '@/api/client';
 import { reportApi } from '@/api/reports';
-import type { ExportFormat } from '@/api/reports';
+import type { CatalogueEntry, ExportFormat } from '@/api/reports';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useWorkspace } from '@/context/workspaceContext';
+import { ExportButtons } from './ExportButtons';
+import { menuFormats } from './exportFormats';
 import { ParameterInput } from './ParameterInput';
 import { PrintOptionsFields } from './PrintOptionsFields';
 import { ReportVariants } from './ReportVariants';
@@ -18,13 +20,32 @@ import { DEFAULT_PRINT, filterPairs, reportOptionsApi } from './reportOptions';
 import type { ColumnFilters, PrintOptions } from './reportOptions';
 import { initialValue, parameterErrors } from './reportParams';
 
-const FORMATS: { format: ExportFormat; label: string }[] = [
-  { format: 'PDF', label: 'PDF' },
-  { format: 'XLSX', label: 'Excel' },
-  { format: 'ODS', label: 'ODS' },
-  { format: 'CSV', label: 'CSV' },
-  { format: 'XML', label: 'XML' },
-];
+/** The download buttons: Excel and PDF, Word for documents and schedules (client requirement 16). */
+function ReportDownloads({
+  entry,
+  filtered,
+  busy,
+  format,
+  onExport,
+}: Readonly<{
+  entry: CatalogueEntry;
+  filtered: boolean;
+  busy: boolean;
+  format?: ExportFormat;
+  onExport: (format: ExportFormat) => void;
+}>) {
+  return (
+    <div className="report-downloads">
+      <span className="muted">{filtered ? 'Download filtered rows' : 'Download'}</span>
+      <ExportButtons
+        formats={menuFormats(entry)}
+        variant="ghost"
+        pending={busy ? format : undefined}
+        onExport={onExport}
+      />
+    </div>
+  );
+}
 
 /** Opens a PDF in a new tab for the browser's print preview (BRNB.031). */
 function openForPrint(blob: Blob): void {
@@ -35,7 +56,8 @@ function openForPrint(blob: Blob): void {
 
 /**
  * Parameter form, on-screen result with column filters (FRBS 2.4.4) and export or print with the
- * print options (FRBS 2.4.9); exports hold the filtered rows.
+ * print options (FRBS 2.4.9); exports hold the filtered rows. Every report downloads as Excel and
+ * PDF; documents and schedules also as Word (client requirement 16).
  */
 export default function ReportRunnerPage() {
   const code = useParams().code ?? '';
@@ -148,21 +170,13 @@ export default function ReportRunnerPage() {
           <div className="form-grid">
             <PrintOptionsFields value={print} onChange={setPrint} />
           </div>
-          <div className="report-downloads">
-            <span className="muted">{filtered ? 'Download filtered rows' : 'Download'}</span>
-            {FORMATS.map((f) => (
-              <Button
-                key={f.format}
-                size="sm"
-                variant="ghost"
-                icon={<Download size={15} />}
-                busy={exporter.isPending && exporter.variables === f.format}
-                onClick={guarded(() => exporter.mutate(f.format))}
-              >
-                {f.label}
-              </Button>
-            ))}
-          </div>
+          <ReportDownloads
+            entry={entry}
+            filtered={filtered}
+            busy={exporter.isPending}
+            format={exporter.variables}
+            onExport={(format) => guarded(() => exporter.mutate(format))()}
+          />
         </div>
       </Card>
       <ErrorAlert error={run.error ?? exporter.error ?? printer.error} />

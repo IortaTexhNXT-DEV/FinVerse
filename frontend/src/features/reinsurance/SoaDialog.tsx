@@ -1,19 +1,24 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { FileDown, Printer } from 'lucide-react';
+import { Printer } from 'lucide-react';
 import { useState } from 'react';
 import { saveFile } from '@/api/client';
 import { payablesApi } from '@/api/payables';
 import { reinsuranceApi } from '@/api/reinsurance';
 import type { Soa } from '@/api/reinsurance';
 import { reportApi } from '@/api/reports';
+import type { ExportFormat } from '@/api/reports';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Modal } from '@/components/ui/Modal';
+import { ExportButtons } from '@/features/reports/ExportButtons';
 import { DateField, SelectField } from '@/features/underwriting/FormFields';
 import { today } from '@/utils/format';
 import { soaActions, soaReportParams } from './soa';
 import { SoaStatement } from './SoaStatement';
+
+/** A statement is a report and a document: Excel, PDF and Word. */
+const STATEMENT_FORMATS: ExportFormat[] = ['XLSX', 'PDF', 'DOCX'];
 
 interface Props {
   soa: Soa;
@@ -22,7 +27,10 @@ interface Props {
   onChanged: (soa: Soa, message: string) => void;
 }
 
-/** A statement of account: view, print, PDF, approve (checker) and settle. */
+/**
+ * A statement of account: view, print, download as Excel, PDF or Word (client requirement 16),
+ * approve (checker) and settle.
+ */
 export function SoaDialog({ soa, companyId, onClose, onChanged }: Readonly<Props>) {
   const { can, user } = useAuth();
   const [settle, setSettle] = useState({ date: today(), bank: '' });
@@ -42,7 +50,8 @@ export function SoaDialog({ soa, companyId, onClose, onChanged }: Readonly<Props
     onSuccess: (s) => onChanged(s, `Statement ${s.soaNo} settled`),
   });
   const pdf = useMutation({
-    mutationFn: () => reportApi.export('RI-SOA', soaReportParams(soa, companyId), 'PDF'),
+    mutationFn: (format: ExportFormat) =>
+      reportApi.export('RI-SOA', soaReportParams(soa, companyId), format),
     onSuccess: (file) => saveFile(file.blob, file.fileName),
   });
 
@@ -56,14 +65,12 @@ export function SoaDialog({ soa, companyId, onClose, onChanged }: Readonly<Props
           <Button variant="secondary" icon={<Printer size={16} />} onClick={() => window.print()}>
             Print
           </Button>
-          <Button
-            variant="secondary"
-            icon={<FileDown size={16} />}
-            busy={pdf.isPending}
-            onClick={() => pdf.mutate()}
-          >
-            PDF
-          </Button>
+          <ExportButtons
+            formats={STATEMENT_FORMATS}
+            size="md"
+            pending={pdf.isPending ? pdf.variables : undefined}
+            onExport={(format) => pdf.mutate(format)}
+          />
           {actions.approve && (
             <Button variant="accent" busy={approve.isPending} onClick={() => approve.mutate()}>
               Approve

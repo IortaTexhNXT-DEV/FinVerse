@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FilePlus2 } from 'lucide-react';
+import { FilePlus2, FileType2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { docTemplatesApi } from '@/api/docTemplates';
-import type { DocTemplateVersion } from '@/api/docTemplates';
+import type { DocTemplateVersion, TemplateDraft } from '@/api/docTemplates';
 import { useAuth } from '@/auth/authContext';
+import { useFileDownload } from '@/components/broking/useFileDownload';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
@@ -18,7 +19,8 @@ import { formatDate, formatDateTime, today } from '@/utils/format';
 /**
  * Document templates (BRNB.004): the texts merged into quotations, slips, insurance advice and
  * e-mails. A change is a new version effective from a date; generated documents keep the version
- * they used.
+ * they used. A version downloads as Word, and an edited Word file loads into a new version (client
+ * requirement 16).
  */
 export default function DocumentTemplatesPage() {
   const { can } = useAuth();
@@ -33,6 +35,9 @@ export default function DocumentTemplatesPage() {
   const versions = (templates.data ?? []).filter((t) => t.code === current);
   const latest = versions[0];
   const canEdit = can('MASTER_MAINTAIN') || can('LOV_MANAGE');
+  const download = useFileDownload();
+  const downloadWord = (v: DocTemplateVersion) =>
+    download.mutate(() => docTemplatesApi.word(v.code, v.versionNo));
   return (
     <div className="stack">
       <PageHeader
@@ -52,7 +57,7 @@ export default function DocumentTemplatesPage() {
           )
         }
       />
-      <ErrorAlert error={templates.error} />
+      <ErrorAlert error={templates.error ?? download.error} />
       <div className="split">
         <Card title="Templates" flush>
           <ul className="nav-list">
@@ -74,7 +79,20 @@ export default function DocumentTemplatesPage() {
           {latest && (
             <Card
               title={`${latest.title} — version ${latest.versionNo}`}
-              actions={<span className="muted">effective {formatDate(latest.effectiveFrom)}</span>}
+              actions={
+                <div className="row">
+                  <span className="muted">effective {formatDate(latest.effectiveFrom)}</span>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    icon={<FileType2 size={14} />}
+                    busy={download.isPending}
+                    onClick={() => downloadWord(latest)}
+                  >
+                    Download Word
+                  </Button>
+                </div>
+              }
             >
               <pre className="message-body">{latest.body}</pre>
             </Card>
@@ -101,6 +119,21 @@ export default function DocumentTemplatesPage() {
                   header: 'Created',
                   render: (v) => `${v.createdBy} · ${formatDateTime(v.createdAt)}`,
                 },
+                {
+                  key: 'word',
+                  header: '',
+                  render: (v) => (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      icon={<FileType2 size={14} />}
+                      aria-label={`Download version ${v.versionNo} as Word`}
+                      onClick={() => downloadWord(v)}
+                    >
+                      Word
+                    </Button>
+                  ),
+                },
               ]}
             />
           </Card>
@@ -120,6 +153,15 @@ function NewVersionDialog({
   const [title, setTitle] = useState(base.title);
   const [body, setBody] = useState(base.body);
   const [effectiveFrom, setEffectiveFrom] = useState(today());
+  const [draft, setDraft] = useState<TemplateDraft | null>(null);
+  const load = useMutation({
+    mutationFn: (file: File) => docTemplatesApi.readWord(base.code, file),
+    onSuccess: (d) => {
+      setTitle(d.title);
+      setBody(d.body);
+      setDraft(d);
+    },
+  });
   const save = useMutation({
     mutationFn: () => docTemplatesApi.newVersion(base.code, { title, body, effectiveFrom }),
     onSuccess: async (v) => {
@@ -150,7 +192,28 @@ function NewVersionDialog({
       }
     >
       <div className="stack">
-        <ErrorAlert error={save.error} />
+        <ErrorAlert error={save.error ?? load.error} />
+        <Field
+          label="Load from Word"
+          hint="A .docx file: the first paragraph is the title, the others the text. Review it below before saving."
+        >
+          {(id) => (
+            <input
+              id={id}
+              type="file"
+              className="input"
+              accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              disabled={load.isPending}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file !== undefined) {
+                  load.mutate(file);
+                }
+              }}
+            />
+          )}
+        </Field>
+        {draft !== null && <PlaceholderCheck draft={draft} />}
         <Field label="Title" required>
           {(id) => (
             <input
@@ -189,5 +252,27 @@ function NewVersionDialog({
         </Field>
       </div>
     </Modal>
+  );
+}
+
+/** Placeholders an uploaded Word draft dropped or added, compared with the latest version. */
+function PlaceholderCheck({ draft }: Readonly<{ draft: TemplateDraft }>) {
+  if (draft.missingPlaceholders.length === 0 && draft.addedPlaceholders.length === 0) {
+    return <div className="alert success">Loaded from Word: the placeholders are unchanged.</div>;
+  }
+  return (
+    <div className="alert warning">
+      {draft.missingPlaceholders.length > 0 && (
+        <div>
+          No longer in the text: {draft.missingPlaceholders.map((p) => `{{${p}}}`).join(', ')}
+        </div>
+      )}
+      {draft.addedPlaceholders.length > 0 && (
+        <div>
+          New, filled only if the record supplies them:{' '}
+          {draft.addedPlaceholders.map((p) => `{{${p}}}`).join(', ')}
+        </div>
+      )}
+    </div>
   );
 }

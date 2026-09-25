@@ -28,6 +28,12 @@ export interface CatalogueEntry {
   categoryLabel: string;
   description: string;
   parameters: ParameterSpec[];
+  /** Whether the user may download or print it. */
+  exportable?: boolean;
+  /** A document or schedule: Word is offered next to Excel and PDF (client requirement 16). */
+  documentStyle?: boolean;
+  /** Export formats offered, in menu order. */
+  formats?: ExportFormat[];
 }
 
 export type ColumnType = 'TEXT' | 'DATE' | 'NUMBER' | 'AMOUNT' | 'PERCENT';
@@ -56,7 +62,7 @@ export interface ReportResult {
   notes: string[];
 }
 
-export type ExportFormat = 'PDF' | 'XLSX' | 'CSV' | 'ODS' | 'XML';
+export type ExportFormat = 'PDF' | 'XLSX' | 'CSV' | 'ODS' | 'XML' | 'DOCX';
 
 export const reportApi = {
   catalogue: () => api.get<CatalogueEntry[]>('/reports'),

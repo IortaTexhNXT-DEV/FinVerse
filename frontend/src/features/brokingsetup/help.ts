@@ -17,6 +17,7 @@ export const BROKING_SETUP_HELP: HelpSection = {
       workflow: [
         'Choose a template to see its text in force and its version history.',
         'New version: edit the title and text, keep the {{placeholders}}, and choose the date from which it applies.',
+        'To edit in Word, use Download Word on a version, change the text in Word (first paragraph = title) and choose Load from Word in the New Version dialog; placeholders dropped or added are listed before you save.',
       ],
       controls: [
         'Versions are never changed or deleted; each generated document records the template version it used.',

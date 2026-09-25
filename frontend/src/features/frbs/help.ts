@@ -15,7 +15,7 @@ export const FRBS_HELP: HelpSection = {
       controls: [
         'Viewing needs FRBS_REPORT_VIEW and exporting FRBS_REPORT_EXPORT; every run and export is kept in the report archive.',
         'Government reports need TAX_VIEW (granted to the FRBS roles). Several reports at once: Report Centre, Report Batch (ZIP or one merged PDF).',
-        'Board-deck schedules flagged "Word requested" are exported to PDF and Excel: the report platform does not produce Word documents yet.',
+        'Board-deck schedules flagged "Word requested" (GARD, subsidiaries, ManCom) are exported to Word as well as Excel and PDF, with the BDO Insure header, logo and "Confidential" footer.',
       ],
     },
     {

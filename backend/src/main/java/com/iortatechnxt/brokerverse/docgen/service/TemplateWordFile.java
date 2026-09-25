@@ -20,6 +20,8 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
  */
 final class TemplateWordFile {
 
+  private static final String INVALID = "TEMPLATE_WORD_INVALID";
+
   private TemplateWordFile() {}
 
   /**
@@ -57,17 +59,14 @@ final class TemplateWordFile {
         }
       }
     } catch (IOException | RuntimeException ex) {
-      throw invalid("The file is not a Word (.docx) document");
+      throw new BusinessRuleException(INVALID, "The file is not a Word (.docx) document", ex);
     }
     if (paragraphs.size() < 2) {
-      throw invalid("The Word file needs the title in its first paragraph and the text below it");
+      throw new BusinessRuleException(
+          INVALID, "The Word file needs the title in its first paragraph and the text below it");
     }
     return new Draft(
         paragraphs.get(0), String.join("\n\n", paragraphs.subList(1, paragraphs.size())));
-  }
-
-  private static BusinessRuleException invalid(String message) {
-    return new BusinessRuleException("TEMPLATE_WORD_INVALID", message);
   }
 
   /**

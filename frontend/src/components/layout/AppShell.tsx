@@ -1,9 +1,13 @@
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
+import { WordCopyOffer } from '@/components/broking/WordCopyOffer';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 
-/** Authenticated layout: header, permission-filtered sidebar and routed content. */
+/**
+ * Authenticated layout: header, permission-filtered sidebar and routed content, with the Word copy
+ * offer of downloaded documents.
+ */
 export function AppShell() {
   return (
     <div className="app-shell">
@@ -14,6 +18,7 @@ export function AppShell() {
           <Outlet />
         </Suspense>
       </main>
+      <WordCopyOffer />
     </div>
   );
 }

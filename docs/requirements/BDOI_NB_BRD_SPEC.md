@@ -374,6 +374,43 @@ Annex I lists 67 Other Lines risk codes (CAR, CGL, CTP, EEI, EPF, GIP, INL, MOP/
 | Q43 | Taxes | Appendix A shows PTX 12% of net premium for Fire; please confirm premium tax / VAT basis per line and whether BDOI computes taxes or copies insurer figures. | Appendix A |
 | Q44 | Scope boundary | Broker model: confirm insurer-only platform functions (reinsurance, technical reserves, IBNR, claims reserving) are not required for BDOI. | Platform |
 
+### 9.1 Answered by later BRDs
+
+The rows above are kept as asked. This section records what the later BRDs (BRD-6 to BRD-12) answer. The single
+record of every cross-BRD answer, with the design impact, is
+[`BDOI_CROSS_BRD_DECISIONS.md`](BDOI_CROSS_BRD_DECISIONS.md) section 3. Status: **answered**, **partial** (the question
+stays open for the rest) or **open**.
+
+| Q# / ID | Status | Answering BRD and ID | Answer (short) |
+|---|---|---|---|
+| Q42 | answered | BRD-11 UAM (p.13-14, 17; UAM-NFR-11, 17, 33) | Directory sign-in is required: Windows ID against BDO EUA, LDAP / AD or SSO. Built as the parked port `DirectoryAuthenticator`; local sign-in stays until BDO supplies the interface (UQ04). The 30-minute warning is an inactivity log-out, with a warning after 15 minutes. BRD-7 (NFR 1.01) and BRD-9 (BRCSF-001) restate the question; BRD-11 governs |
+| OOS-1 | answered | BRD-6 RN (1.011.1, BRRN.023/031/035) | The renewal overrides are: the Marketing TL overrides accounts with an outstanding balance, and an authorised user overrides a system disposition or bucket with mandatory remarks. No approver selection or push step (`RNW_OVERRIDE`, `rnw_override`) |
+| BRNB.097 | answered | BRD-6 RN (BRRN.033), BRD-8 EB (BRID-022.01), BRD-12 SP (BRIDSP-26/27) | Business type NEW_BUSINESS / RENEWAL is required on the account at creation, carried to the invoice, and a filter on the reports. One shared change for the three BRDs: work item BT0 (`V822__account_business_type.sql`, `InvoiceBuilder` reads the account's type) |
+| Q09 | open | BRD-6 RN (RQ29); BRD-12 SP (Report List #182) | Not answered. The RN reports have no late-renewal-request report; Report List #182 is a *package* late-renewal report (TSU). BRNB.018 stays parked; proposal: a variant of `RNW-LISTING` once BDOI confirms (RQ29) |
+| Q06 | partial | BRD-8 EB (BRID-005, 005.01-005.02, 009) | For EB, insurers use a secure portal or API. Other lines: still e-mail |
+| Q07 | partial | BRD-8 EB (BRID-007) | A standard assigned password or a system-generated one following a defined syntax, sent separately; the convention itself is still missing (EBQ09). BRD-6 needs it for RAs too |
+| Q08 | partial | BRD-9 CSF (p.3 footnote 3) | QPS and EBIX must receive client contact updates during coexistence (`ContactSyncGateway` outbox, CSQ01). Other targets still open |
+| Q10 | partial | BRD-6 RN (personas, tabs, 34 counters, BRRN.040) | Renewal stages and statuses (workflow `RNW_CASE`); counter mapping to confirm (RQ10) |
+| Q11 | partial | BRD-12 SP (p.4-5, Report List #138 / #151) | Sources named: LFS insurance report, HLS daily insurance report, CIU report, SPI list, LAMD report, Loan Booking Report, IA masterlist; all Excel today. Layouts and transports still open (SP SQ01) |
+| Q14 | partial | BRD-6 RN (BRRN.020); BRD-12 SP (Report List #151) | Renewal: sanitation is rule-based in the system, criteria "agreed" but not listed (RQ01). Submitted policies: PN vs LAMD match, FFY / employee / No Touch exclusions, loan status, duplicate checks, PN = serial / motor / assured checks |
+| Q15 | partial | BRD-6 RN (BRRN.022, 1.003.4.1.1.2) | A mandatory unique renewal reference is the matching key of every renewal record; no format given (`RNW-<yyyy>-nnnnnn` as a parameter) |
+| Q18 | partial | BRD-10 SANC (SNSRP-302/303) | `PEP` and high-risk tags are set by screening rules and trigger reviews, not blocks; the block stays a proposal behind a parameter (SANC SQ07) |
+| Q21 | partial | BRD-6 RN (BRRN.028); BRD-10 SANC (SNSRP-102, 303) | KYC due is flagged for visibility only and never blocks renewal; Compliance defines risk categories in the system and high-risk / PEP clients with an active policy get a KYC review / EDD case. The frequency per rating is still not given |
+| Q23 | partial | BRD-8 EB (BRID-002, 005.01, 014); BRD-9 CSF (BRCSF-007); BRD-10 SANC (SNSRP-601) | File types: PDF, Word, Excel and other agreed formats (EB); doc, docx, txt, xls, xlsx, ods, csv, PNG, JPG, HEIF, PDF (CSF). Naming: `<Form Type>_<Client Name>_<Date Received>_<Document Type>_<n>` for screening documents only. Maximum size and the general naming syntax still open |
+| Q24 | partial | BRD-12 SP (BRIDSP-02) | Submitted policy documents (scanned or printed) are extracted and confirmed by a user; scanned input implies OCR (parked port) |
+| Q27 | partial | BRD-6 RN (1.009.3.1.33-34); BRD-12 SP (p.5, BRIDSP-24/32) | Hold covers apply to renewals too; submitted CBG Motor / Fire renewals go to the insurer with a 30-day hold cover request, accepted within 3-5 days, else follow up or re-assign; unbooked hold covers are alerted. Expiry handling still open |
+| Q28 | partial | BRD-12 SP (Report List #65-67) | Three CLPC billing variants with sample files. Transport and schedule still open |
+| Q31 | partial | BRD-8 EB (BRID-005.01) | For EB, insurers upload policy forms and billing through the portal. Other lines still open |
+| Q36 | partial | BRD-12 SP (BRIDSP-13/14, Report List #156) | At renewal an FFY account gets an FFY-specific RA template; FFY is both a renewal and a non-renewal bucket (SP SQ05). The payer is not stated |
+| Q37 | partial | BRD-7 CLM (BRCLM.007, 039); BRD-9 CSF (p.3, BRCSF-002) | The policy number flows from the policy system to Claims, which must not re-key it; QPS and EBIX are today's systems of record for client contact data during coexistence |
+| Q39 | partial | BRD-7 CLM (p.41); BRD-8 EB (NFR); BRD-9 CSF (NFR); BRD-10 SANC (p.25) | Claims 10 years online / 15 archive; EB 5 / 15; CSF 5 / 15 (backup retention 5 years); screening records 5 / 5. Other record types, and archive vs purge, still open; BRD-11 says "follow QPS" (UQ12) |
+| Q40 | partial | BRD-8 EB (BRID-022 AC9); BRD-12 SP (Report List #74) | "Customise needed reports (date range, client, product type)"; "user-defined filters as needed; export to Excel / PDF; no defined template". Saved variants plus column filters meet it; no query builder |
+| Q44 | answered (for claims) | BRD-7 CLM (BRCLM.023/024) | BDOI records the insurer's reserve and settlement as information only; no reserving, no journal. The insurer-side `claims` module stays hidden from BDOI roles |
+| BRNB.085 | extended | BRD-11 UAM (sections A-B) | Access requests gain a Requestor persona, drafts, return, cancel, chosen approver and bulk (`nbadmin` lifecycle) |
+
+Not answered by BRD-6 to BRD-12: Q01-Q05, Q12, Q13, Q16 (BDO CIF; BRD-9 and BRD-10 restate it), Q17, Q19, Q20, Q22,
+Q25, Q26, Q29, Q30, Q32-Q35, Q38, Q41, Q43.
+
 ## 10. Observations on the BRD pack
 
 - Pages 1-22 and 23-44 are the same signed workshop addendum.

@@ -20,19 +20,21 @@ Every class, migration and screen cites its BRD ID in Javadoc or a comment, for 
    inbox; hold cover = `placement`; unapplied payments = `cashiering` via the `opsledger` ports; reports = `report`.
 5. **Parked means seam, not fake.** LFS, HLS, CIU, SPI, LAMD, IBG / Leasing, the mail house (COG), OCR and a qualified
    e-signature each get a port whose default adapter is an upload, a manual step or a stamped signature.
-6. **Renewal is a hand-off.** The renewal leg is shared with the Renewal BRD (analysed in parallel). `submitted`
-   calls a port `RenewalHandOff`; its default adapter (in `submitted`) creates the renewal account and the letters. When a
-   `renewal` module exists it implements the port and the default adapter steps aside (`@ConditionalOnMissingBean`).
+6. **Renewal is a hand-off to the Renewal module.** `submitted` calls its port `RenewalHandOff`; the `renewal` module
+   implements it (`SubmittedPolicyRenewalHandOff`, RENEWAL_DESIGN section 2.3) and owns the renewal of submitted
+   policies from the hand-off on: renewal account, hold cover request and the RA / NRNS / NAL / SFU letters (SQ10
+   closed, `BDOI_CROSS_BRD_DECISIONS.md` decision D2). The default adapter in `submitted` only records the hand-off as
+   pending (`@ConditionalOnMissingBean`); it creates no account and sends no letter.
 
 ## 2. Modules
 
 | Module | State | Purpose | BRD IDs | Depends on | Flyway (demo) |
 |---|---|---|---|---|---|
-| `submitted` | **new** | Sources and intake runs, document extraction and confirmation, the Submitted Masterlist and its history, LAMD loan snapshot, rules and processing runs (sanitation, matching, classification, disposition, limits), buckets and tags, IAAF and reviews, TOR, approval matrices, expiry scan, renewal hand-off, letters and print batches, handling-fee records and tagger, No Touch billing lists, migration, Submitted Policies reports, dashboard counts | BRIDSP-01-25, 28-31, 33 | account, catalog, crm (read), booking (event), placement (port), opsledger (ports), bulk, workflow, docgen, messaging, attachment, lov, alert, system, report, audit, approval, organization | V1070-V1079 (V1970-V1972) |
-| `placement` | built, **changed** | Hold cover re-assignment; unbooked hold-cover alert facts | BRIDSP-32, 24 | as today | V850-V859 (owner's range) |
-| `account` | built, **changed** | Origin SUBMITTED_POLICY, business type RENEWAL and `renewal_of_ref` on the account | BRIDSP-26/27 | as today | V820-V829 |
-| `booking` | built, **changed** | Business type taken from the account, carried on the invoice flags and `InvoiceBooked` | BRIDSP-27 | as today | V870-V879 |
-| `issuance` | built, **changed** | `PolicyDataExtractor` document kind and field set; `OcrEngine` port | BRIDSP-02 | as today | V860-V869 |
+| `submitted` | **new** | Sources and intake runs, document extraction and confirmation, the Submitted Masterlist and its history, LAMD loan snapshot, rules and processing runs (sanitation, matching, classification, disposition, limits), buckets and tags, IAAF and reviews, TOR, approval matrices, expiry scan, renewal hand-off (port and pending default), non-renewal letters and print batches, handling-fee records and tagger, No Touch billing lists, migration, Submitted Policies reports, dashboard counts | BRIDSP-01-25, 28-31, 33 | account, catalog, crm (read), booking (event), placement (port), opsledger (ports), bulk, workflow, docgen, messaging, attachment, lov, alert, system, report, audit, approval, organization | V1070-V1079 (V1970-V1972) |
+| `placement` | built, **changed** | Hold cover re-assignment; unbooked hold-cover alert facts | BRIDSP-32, 24 | as today | V851 (owner's range V850-V859) |
+| `account` | built, **changed** | Business type and `renewal_of_ref`: the shared work item **BT0** (`V822__account_business_type.sql`), also used by Renewal and Employee Benefits; plus the origin value SUBMITTED_POLICY | BRIDSP-26/27 | as today | V822 (BT0, account range) |
+| `booking` | built, **changed** | Business type taken from the account, carried on the invoice and `InvoiceBooked` (part of BT0) | BRIDSP-27 | as today | none (code only; `bkg_invoice.business_type` exists since V870) |
+| `issuance` | built, **changed** | `PolicyDataExtractor` document kind and field set; `OcrEngine` port | BRIDSP-02 | as today | V861 (owner's range V860-V869) |
 | `opsledger` | built, **changed** | `UnappliedDispositionRequests.Action.RECOGNIZE_INCOME` with an income type | BRIDSP-31 | as today | V760-V763 |
 | `cashiering` | being built, **changed** | Disposition type `HANDLING_FEE`, event `SBM_HANDLING_FEE`, OR through `ReceiptIssuer` | BRIDSP-31 | as today | V764-V769 |
 | `collections` | being built, **changed** | LOV value `HANDLING_FEE` in `CLX_UPP_DISPOSITION`; the collector view shows the tag and its source | BRIDSP-31 | as today | V1000-V1009 |
@@ -66,8 +68,8 @@ No built module depends on `submitted`. `booking` publishes `InvoiceBooked` and 
 | `SubmittedSourceFeed` | `submitted.service.port` | default: none (uploads); later LFS / HLS / CIU / SPI / LAMD adapters | intake jobs | Scheduled pull of a source file / API (SQ01) |
 | `PolicyDataExtractor` (extended) | `issuance.service` | `PdfTextPolicyDataExtractor` (text PDFs); `OcrEngine` adapter later | submitted extraction | Field proposals from a document (BRIDSP-02) |
 | `OcrEngine` (new) | `issuance.service` | default: `NoOcrEngine` (returns "not readable" → manual entry) | extractor | Scanned / printed documents (Q24, SQ03) |
-| `RenewalHandOff` | `submitted.service.port` | default `SubmittedRenewalHandOff` (in `submitted`); later the `renewal` module | expiry scan, "Renew with BDOI" action | Start the renewal of a masterlist record (BRIDSP-23/25/26) |
-| `MailHouseGateway` | `submitted.service.port` | default: print batch in the extract repository | letter dispatch | Snail mail through COG (SQ09) |
+| `RenewalHandOff` | `submitted.service.port` | `renewal` (`SubmittedPolicyRenewalHandOff`, wave R3); default `SubmittedRenewalHandOff` (in `submitted`) records the hand-off as PENDING only | expiry scan, "Renew with BDOI" action | Start the renewal of a masterlist record (BRIDSP-23/25/26); Renewal owns what follows (SQ10 closed) |
+| `MailHouseGateway` | `submitted.service.port` | default: print batch in the extract repository | `submitted` letter dispatch and `renewal` letters of submitted policies (channel PRINT) | Snail mail through COG (SQ09) |
 | `SignatureProvider` | `submitted.service.port` | default `StampedSignature` (name, position, time, hash) | IAAF / TOR approval | Qualified e-signature later (SQ07) |
 
 ## 3. Business flows
@@ -123,23 +125,45 @@ RELEASED when the AO opens or downloads it.
 
 ### 3.5 Renewal (BRIDSP-22-27, 32)
 
+**Ownership (SQ10 closed, cross-BRD decision D2).** The Renewal module implements `RenewalHandOff` and owns the renewal
+of submitted policies from the hand-off on: the renewal candidate, the renewal account, the hold cover request and the
+RA / NRNS / NAL / SFU and reminder letters (RENEWAL_DESIGN section 2.3). `submitted` keeps intake, classification,
+buckets, the expiry scan, the insurer rules and the masterlist status.
+
 1. `SBM_EXPIRY_SCAN` (daily) selects FOR_RENEWAL records whose expiry is within the lead days of their segment
-   (`SBM_RENEWAL_LEAD_DAYS` per segment, e.g. CBG Fire 150, CBG Motor 120) and hands them to `RenewalHandOff`.
-2. Default hand-off:
-   - assigns the insurer (rules `sbm_insurer_rule`: by vehicle type, "different from the expiring insurer"), computes the
-     premium with `catalog.PremiumCalculator`, and creates the **renewal account** through
-     `AccountService.createDraft(NewAccount.renewal(...))` (origin SUBMITTED_POLICY, business type RENEWAL,
-     `renewal_of_ref` = SBM number, risk items copied);
-   - requests the **hold cover** through `HoldCoverService.request` (30 days). If the insurer has not accepted within
-     `SBM_INSURER_ACCEPT_DAYS` (default 5) an alert asks the handler to follow up or re-assign
-     (`HoldCoverService.reassign`, BRIDSP-32);
-   - once accepted, queues the **letters** (`sbm_letter`) due by `sbm_letter_rule`: RA (generic or FFY) at
-     `SBM_RA_DAYS_BEFORE_EXPIRY` (90), reminder letters, SFU for mortgaged accounts, NAL for unrenewed accounts.
-3. The client accepts (payment or confirmation): the BRD-1 path runs (payment gate → placement slip → issuance →
+   (`SBM_RENEWAL_LEAD_DAYS` per segment, e.g. CBG Fire 150, CBG Motor 120), assigns the insurer (rules
+   `sbm_insurer_rule`: by vehicle type, "different from the expiring insurer") and calls `RenewalHandOff` with the
+   SBM number, the record's policy and risk data, the RA template (GENERIC / FFY) and the assigned insurer. It writes
+   `sbm_renewal` (hand-off reference, insurer assigned) and moves the record to RENEWAL_IN_PROGRESS.
+2. What the Renewal adapter does (RENEWAL_DESIGN section 2.3, not built in `submitted`):
+   - creates a candidate idempotent on the SBM number, runs the checks and the matrix;
+   - creates the **renewal account** through `AccountService.createDraft(NewAccount.renewal(...))` (origin
+     SUBMITTED_POLICY, business type RENEWAL, `renewal_of_ref` = SBM number, the assigned insurer), rated through
+     `AccountPricing` with purpose RENEWAL;
+   - requests the **hold cover** through `HoldCoverService.request` (30 days);
+   - queues the **letters** in the single renewal letter engine (`rnw_letter`); print letters go through this
+     module's `MailHouseGateway`. Every renewal advice is stored as an attachment of document type
+     **`RENEWAL_ADVICE`** linked to the renewal account and the client (decision D3), so the Customer Servicing
+     Facility resends it like any other RA; the other renewal letters use `RENEWAL_LETTER`.
+
+   Employee Benefits programmes are excluded from the general renewal candidate lists (decision D3); their RAs come
+   from the EB module, with the same document type.
+3. What stays in `submitted` around the hold cover: if the insurer has not accepted within `SBM_INSURER_ACCEPT_DAYS`
+   (default 5), `SBM_HOLD_COVER_WATCH` alerts the handler to follow up or re-assign (`HoldCoverService.reassign`,
+   BRIDSP-32), and it alerts hold covers of unbooked renewal accounts (BRIDSP-24).
+4. The client accepts (payment or confirmation): the BRD-1 path runs (payment gate → placement slip → issuance →
    booking). `AccountStatusChanged` and `InvoiceBooked` update the masterlist conversion status (PROCESS_PLACEMENT,
    PLACED, BOOKED).
-4. The client declines or the expiry passes without renewal: NRNS / NAL letter, status NOT_RENEWED, reason.
-5. Non-CBG Retail: the MAO starts the renewal by hand ("Renew with BDOI"); the quotation is a normal BRD-1 quotation.
+5. The client declines or the expiry passes without renewal: the Renewal module sends the NRNS / NAL letter. The
+   masterlist record gets status NOT_RENEWED with the reason, read through the port (`RenewalHandOff` also answers
+   the status of a hand-off: open, or closed as renewed, not renewed, lost or expired unrenewed, with the reason), by
+   `SBM_HOLD_COVER_WATCH` and on the record page.
+6. Non-CBG Retail: the MAO starts the renewal by hand ("Renew with BDOI"), which calls the same port; the candidate
+   starts unassigned (manual disposition), and a quotation, when needed, is a normal BRD-1 quotation.
+7. **Default adapter** (before Renewal wave R3 is deployed): `SubmittedRenewalHandOff` only records the hand-off as
+   PENDING in `sbm_renewal` and lists it on the Renewal Work List ("Hand-off pending"). It creates no account, requests
+   no hold cover and sends no letter, so there is never a second renewal path. When the Renewal adapter is deployed it
+   replays the PENDING hand-offs (idempotent on the SBM number).
 
 ### 3.6 Handling fee (BRIDSP-31)
 
@@ -218,13 +242,17 @@ invoice no., insurer and client codes), as in Operations.
 
 ### 4.4 Renewal, letters, handling fee, No Touch
 
-- `sbm_renewal`: policy, hand-off (DEFAULT / RENEWAL_MODULE), insurer assigned, premium, ARN, hold-cover reference,
-  insurer accepted at, re-assign count, outcome (RENEWED, DECLINED, EXPIRED, IN_PROGRESS), decline reason.
+- `sbm_renewal`: policy, hand-off status (PENDING / HANDED_OFF), renewal reference (`RNW-...` of the Renewal
+  candidate), insurer assigned, ARN (from the Renewal module), hold-cover reference and insurer accepted at (read from
+  `placement`), re-assign count, outcome (RENEWED, DECLINED, EXPIRED, IN_PROGRESS), decline reason.
 - `sbm_insurer_rule`: segment, vehicle type / occupancy, insurer, priority, exclude-expiring-insurer flag.
-- `sbm_letter_rule`: letter type, segment, bucket, days relative to expiry, channel, template code, active.
-- `sbm_letter`: number `SBL-yyyy-nnnnnn`, policy, type (RA_GENERIC, RA_FFY, NRNS, NAL, SFU, REMINDER, RENEWAL_NOTICE,
-  RENEWAL_PROPOSAL), channel (EMAIL, PRINT, BANK_COUNTERPART), status (QUEUED, GENERATED, SENT, PRINTED, FAILED),
-  message id, print batch, template version.
+- `sbm_letter_rule`: letter type, segment, bucket, days relative to expiry, channel, template code, active (letters
+  that are not renewal letters only).
+- `sbm_letter`: number `SBL-yyyy-nnnnnn`, policy, type (REMINDER for the policy review follow-up of section 3.3;
+  RENEWAL_NOTICE and RENEWAL_PROPOSAL until their owner is confirmed, cross-BRD question XQ03), channel (EMAIL, PRINT,
+  BANK_COUNTERPART), status (QUEUED, GENERATED, SENT, PRINTED, FAILED), message id, print batch, template version.
+  RA (generic / FFY), NRNS, NAL, SFU and renewal reminders are **not** `sbm_letter` rows: they are `rnw_letter` rows
+  of the Renewal module (one RA per client).
 - `sbm_print_batch`: batch no., letter type, count, merged PDF (extract repository), handed to (COG), date.
 - `sbm_handling_fee`: policy, PN no., location reference, amount, currency, billing date, status (BILLED, TAGGED,
   APPLIED, CANCELLED), unapplied ref, disposition ticket, OR no.
@@ -309,9 +337,10 @@ Approval inbox: `SubmittedApprovalSource` (IAAF and TOR levels, maker excluded, 
 
 Crons: `brokerverse.jobs.sbm-*-cron` with environment variables, documented in `docs/operations/CONFIGURATION.md`.
 
-Parameters (category SUBMITTED): `SBM_RENEWAL_LEAD_DAYS` (CODE_LIST per segment), `SBM_RA_DAYS_BEFORE_EXPIRY` (90),
+Parameters (category SUBMITTED): `SBM_RENEWAL_LEAD_DAYS` (CODE_LIST per segment),
 `SBM_MASTERLIST_DAYS_FROM_EXTRACTION` (30), `SBM_INSURER_ACCEPT_DAYS` (5), `SBM_HOLD_COVER_UNBOOKED_ALERT_DAYS` (5),
-`SBM_REVIEW_SLA_DAYS`.
+`SBM_REVIEW_SLA_DAYS`. The RA timing of submitted policies (90 days before expiry in the BRD) is a hand-off parameter
+of the Renewal module (V1017), not a `submitted` parameter.
 
 LOV types: `SBM_BUCKET` (attribute `renewal_action`: RENEW / MANUAL / EXCLUDE), `SBM_REASON`, `SBM_NON_RENEWAL_REASON`,
 `SBM_CONVERSION_STATUS`, `SBM_LOAN_STATUS`, `SBM_SEGMENT`, `SBM_LETTER_TYPE`, `SBM_DECLINE_REASON`,
@@ -324,9 +353,10 @@ Notification events (preference catalogue, BRIDSP-24): SBM_NEW_SUBMISSION, SBM_M
 SBM_TOR_PENDING, SBM_TOR_RELEASED, SBM_BUCKET_CHANGED, SBM_FALLOUT, SBM_EXPIRY_NEAR, SBM_RENEWAL_STARTED,
 SBM_PLACEMENT_READY, SBM_PLACEMENT_SENT, SBM_HOLD_COVER_UNBOOKED.
 
-Templates (`docgen`): `SBM_IAAF`, `SBM_TOR`, `SBM_RA_GENERIC`, `SBM_RA_FFY`, `SBM_NRNS`, `SBM_NAL`, `SBM_SFU`,
-`SBM_REMINDER`, `SBM_RENEWAL_NOTICE`, `SBM_RENEWAL_PROPOSAL`, `SBM_NO_TOUCH_BILLING`; placeholders only until BDOI
-supplies the layouts (SQ07-SQ09).
+Templates (`docgen`): `SBM_IAAF`, `SBM_TOR`, `SBM_REMINDER`, `SBM_RENEWAL_NOTICE`, `SBM_RENEWAL_PROPOSAL`,
+`SBM_NO_TOUCH_BILLING`; placeholders only until BDOI supplies the layouts (SQ07-SQ09). The RA (generic / FFY), NRNS,
+NAL and SFU templates are the Renewal module's (`RNW_RA_FIRST`, `RNW_RA_FFY`, `RNW_NRNS_REMINDER`, `RNW_NAL`,
+`RNW_SFU`).
 
 Bulk handlers: `SBM_LFS_INSURANCE`, `SBM_HLS_INSURANCE`, `SBM_CIU`, `SBM_SPI`, `SBM_LOAN_BOOKING`, `SBM_LAMD`,
 `SBM_IA_MASTERLIST`, `SBM_MIGRATION`, `SBM_HANDLING_FEE_BILLING`, `SBM_NO_TOUCH_RETURN`, `SBM_RULES` (rule import).
@@ -335,8 +365,8 @@ Bulk handlers: `SBM_LFS_INSURANCE`, `SBM_HLS_INSURANCE`, `SBM_CIU`, `SBM_SPI`, `
 
 | Module (state) | Change | Concrete contract | Owner / wave |
 |---|---|---|---|
-| `account` (built) | Origin and business type | `acc_account.business_type` (NEW_BUSINESS / RENEWAL, default NEW_BUSINESS), `origin` value `SUBMITTED_POLICY`, `renewal_of_ref varchar(40)`; `NewAccount.renewal(companyId, clientRef, product, segment, insurer, period, items, renewalOfRef, aoUsername)`; `Account.getBusinessType()`; `AccountStatusChanged` unchanged. Migration `V822__account_business_type.sql` | account owner, S0 |
-| `booking` (built) | Business type from the account | `InvoiceBuilder` passes `account.getBusinessType()` instead of `BusinessType.NEW_BUSINESS` (line 129); `InvoiceBooked` gains `BusinessType businessType` (factory `of(...)` fills it; callers of the canonical constructor updated in the same change) | booking owner, S0 |
+| `account` (built) | Origin and business type: **shared work item BT0** (cross-BRD decision D1; Renewal and Employee Benefits use the same change and create no variant) | `acc_account.business_type` (NEW_BUSINESS / RENEWAL, required, default NEW_BUSINESS), `origin` value `SUBMITTED_POLICY`, `renewal_of_ref varchar(40)`; `NewAccount.renewal(companyId, clientRef, product, segment, insurer, period, items, renewalOfRef, aoUsername)` and the overload with `Integer productVersionNo` (Renewal); `AccountPricing` rates with `RatingQuery.Purpose.RENEWAL` when the business type is RENEWAL (Renewal); `Account.getBusinessType()`, `AccountResponse`, `AccountSearch` filter; `AccountStatusChanged` unchanged. Migration `V822__account_business_type.sql` | account owner; owned by the first of S0 / R0 / E0 to start (BT0) |
+| `booking` (built) | Business type from the account (part of BT0) | `InvoiceBuilder` passes `account.getBusinessType()` instead of `BusinessType.NEW_BUSINESS` (line 129); `InvoiceBooked` gains `BusinessType businessType` (factory `of(...)` fills it; callers of the canonical constructor updated in the same change) | booking owner, with BT0 |
 | `placement` (built) | Hold-cover re-assignment | `HoldCoverService.reassign(String arn, String newInsurerCode, String reasonCode)` returning the new `HoldCover`; `HoldCoverStatus.REASSIGNED`; `AccountLifecycleService.changeInsurer(arn, insurerCode, reason)` in `account`; `PlacementQueryService.holdCovers(arn)` (history). V851 | placement owner, S0 |
 | `issuance` (built) | Extraction for submitted policies | `PolicyDataExtractor.extract(ExtractionRequest(kind, attachmentId, insurerCode))` returning `ExtractionProposal(Map<String, ExtractedValue>)`; kinds `EPOLICY` (today's behaviour) and `SUBMITTED_POLICY`; `iss_extraction_pattern.kind` column (V861); port `OcrEngine` with default `NoOcrEngine` | issuance owner, S0 |
 | `opsledger` (built) | Income disposition | `UnappliedDispositionRequests.Action.RECOGNIZE_INCOME`; `DispositionRequest` gains `String incomeType` (null for the other actions; a secondary constructor keeps the 9-argument form) | opsledger owner, S0 |
@@ -349,8 +379,8 @@ Bulk handlers: `SBM_LFS_INSURANCE`, `SBM_HLS_INSURANCE`, `SBM_CIU`, `SBM_SPI`, `
 | `catalog` / `productmaint` (built) | None required | Limits read through `RiskProduct.exceedsPackageLimit`; insurer acceptance limits live in `sbm_limit_rule` until Product Maintenance takes them over (SQ08) | - |
 | GL / accounting | Event types | `SBM_HANDLING_FEE`, `SBM_NO_TOUCH_FEE` in `acc_event_type` (V1070); demo accounts 4115, 1236 and rules (V1970) | submitted |
 | `frbs` (being built) | Service-fee pack | `FRBS-SERVICE-FEE` should include handling-fee (4115) and No Touch service-fee (4110, SI type SERVICE_FEE_NO_TOUCH) income; no contract change, a column / filter | frbs owner (A1-FRBS) |
-| `nbreport` (built) | None | NB reports already include renewal accounts once `business_type` exists (`NB-BOOKED-REG` gains a business-type column in a later change) | nbreport owner |
-| Renewal BRD (future `renewal`) | Hand-off | Implements `RenewalHandOff` if it owns the renewal of submitted policies (SQ10) | Renewal design |
+| `nbreport` (built) | Business-type filter (part of BT0) | NB reports include renewal accounts once `business_type` exists; the Business Type parameter on `NB-BOOKED-REG`, `NB-PRODUCTION`, `NB-PLC-UPDATE` is delivered with BT0 | with BT0 |
+| `renewal` (Renewal BRD, designed) | Hand-off | **Implements `RenewalHandOff`** and owns the renewal account, hold cover request and renewal letters of submitted policies (SQ10 closed, decision D2); prints through `MailHouseGateway` | Renewal wave R3 (after S1-D) |
 
 ## 10. Integrations to park (seam only)
 
@@ -387,7 +417,7 @@ Bulk handlers: `SBM_LFS_INSURANCE`, `SBM_HLS_INSURANCE`, `SBM_CIU`, `SBM_SPI`, `
 | `SBM-PERSISTENCY` | Renewal Persistency - submitted accounts | RL #135 | The general persistency report belongs to the Renewal BRD |
 | `SBM-PENETRATION` | Penetration Report (CBG Motor per channel) | RL #138 | Needs `SBM_LOAN_BOOKING` and `SBM_IA_MASTERLIST` uploads |
 | `SBM-HOLD-COVER-GAP` | Hold Cover with Gap | RL #138 remark | Reads `plc_hold_cover` of renewal accounts |
-| `SBM-LETTERS` | Letters register | BRIDSP-22/24 | Sent, printed, failed |
+| `SBM-LETTERS` | Letters register | BRIDSP-22/24 | Sent, printed, failed `sbm_letter` rows and print batches; the renewal letters of submitted policies are in Renewal's `RNW-RA-DISPATCH` (source SUBMITTED_POLICY) |
 
 All reports: PDF / XLSX / ODS / CSV / XML (framework), saved variants, archive (BRIDSP-21). Layouts without fields in the
 Report List are built with the obvious columns and flagged "layout to confirm" (SQ25). Heavy reports use SQL aggregates
@@ -412,8 +442,9 @@ pills, flag chips (Renewable, FFY, No Touch, Migrated, Insurer approval), tokens
 - **Processing Runs**: list, run detail with counts and fallout.
 - **Policy Reviews / IAAF**: review queue, IAAF list and page with approvals.
 - **TOR**: list and page.
-- **Renewal Work List**: For Renewal | Hold Cover Pending | Insurer Not Accepted | Letters Due | Converted | Not Renewed;
-  action Re-assign Insurer (BRIDSP-32).
+- **Renewal Work List**: For Renewal | Hand-off Pending | Hold Cover Pending | Insurer Not Accepted | Converted | Not
+  Renewed; action Re-assign Insurer (BRIDSP-32); a link opens the Renewal record (`/renewal/candidates/:ref`) for the
+  letters and the renewal progress.
 - **Letters & Print Batches**.
 - **Handling Fees**: records, tagger results, unmatched items (link to the Collections unapplied view).
 - **No Touch Billing**: export, upload of returns, billing statements.
@@ -440,7 +471,9 @@ The allocation fits in one block of ten; seven versions are used and three stay 
 | `V1972__demo_sbm_review_renewal.sql` | S2 | IAAFs at each stage, a TOR released, letters and a print batch, handling-fee records; the renewal accounts are created by a Java demo runner after the NB demo (as `BookingDemoData`) |
 
 Rules: no foreign keys from V107x tables to V8xx tables (plain codes and ARNs); the owner-range changes (V822, V851,
-V861 and the cashiering / collections seeds) are made by those owners in their own ranges.
+V861 and the cashiering / collections seeds) are made by those owners in their own ranges. V822 is the shared work
+item BT0 (account business type), built once for Submitted Policies, Renewal and Employee Benefits by the first of
+those builds to start; `submitted` adds no migration of its own on `acc_account` or `bkg_invoice`.
 
 ## 14. Build-wave plan
 
@@ -449,11 +482,11 @@ Prerequisites: Collections C1 and Operations O1-A (cashiering) expose `Unapplied
 
 | Wave | Agent | Scope | Files owned | Done when |
 |---|---|---|---|---|
-| **S0** (one agent, sequential) | Foundation | `submitted` package skeleton, permissions, `ReportCategory` / factory, V1070; contract PRs to account (V822), booking, placement (V851), issuance (V861), opsledger port change; `RenewalHandOff`, `SubmittedSourceFeed`, `MailHouseGateway`, `SignatureProvider` interfaces | `submitted/package-info.java`, `submitted/service/port/**`, `security/domain/Permission.java`, `report/core/ReportCategory.java`, `ReportMetadata.java`, `account/**` (business type only), `booking/service/InvoiceBuilder.java`, `InvoiceBooked.java`, `placement/service/HoldCoverService.java`, `issuance/service/PolicyDataExtractor.java`, `opsledger/service/port/UnappliedDispositionRequests.java`, V1070, V822, V851, V861 | Build green; existing ITs pass; ports compile with default adapters |
+| **S0** (one agent, sequential) | Foundation | `submitted` package skeleton, permissions, `ReportCategory` / factory, V1070; contract PRs to account and booking (BT0 / V822, unless Renewal R0 or Employee Benefits E0 already merged it), placement (V851), issuance (V861), opsledger port change; `RenewalHandOff`, `SubmittedSourceFeed`, `MailHouseGateway`, `SignatureProvider` interfaces | `submitted/package-info.java`, `submitted/service/port/**`, `security/domain/Permission.java`, `report/core/ReportCategory.java`, `ReportMetadata.java`, `account/**` (business type only), `booking/service/InvoiceBuilder.java`, `InvoiceBooked.java`, `placement/service/HoldCoverService.java`, `issuance/service/PolicyDataExtractor.java`, `opsledger/service/port/UnappliedDispositionRequests.java`, V1070, V822, V851, V861 | Build green; existing ITs pass; ports compile with default adapters |
 | **S1-A** (parallel) | Intake & masterlist | Sources, bulk handlers, intake runs, extraction review, manual entry, masterlist, history, scope, migration, retention provider | `submitted/{domain,service,api}/intake/**`, `.../masterlist/**`, V1071, `features/submitted/{masterlist,intake,extraction}/**` | Upload → record; document → confirm; migration with error log |
 | **S1-B** (parallel) | Rules & processing | Rule engine, steps, runs, results, limits, buckets, fallout, SBM_PROCESSING job | `submitted/.../processing/**`, V1072, `features/submitted/{runs,setup/rules}/**` | Seeded rules bucket the demo list; fallout rows with reasons |
 | **S1-C** (parallel) | Review, IAAF, TOR | Reviews, IAAF, TOR, approval matrix, signatures, approval source, notifications | `submitted/.../review/**`, V1073, `features/submitted/{iaaf,tor}/**` | IAAF and TOR through two levels with the inbox; PDFs |
-| **S1-D** (parallel) | Renewal, letters, fees | Expiry scan, default `RenewalHandOff`, insurer rules, hold-cover watch, letters and print batches, handling-fee tagger, No Touch billing | `submitted/.../renewal/**`, `.../fee/**`, V1074-V1075, `features/submitted/{renewal,letters,fees,notouch}/**` | Record → renewal account → hold cover → letters → booked status; handling fee tagged and applied via cashiering |
+| **S1-D** (parallel) | Renewal hand-off, letters, fees | Expiry scan, insurer rules, the PENDING default `RenewalHandOff`, hold-cover watch, non-renewal letters, `MailHouseGateway` and print batches, handling-fee tagger, No Touch billing | `submitted/.../renewal/**`, `.../fee/**`, V1074-V1075, `features/submitted/{renewal,letters,fees,notouch}/**` | Record → hand-off PENDING; with the Renewal adapter (R3): renewal account → hold cover → RA → booked status on the masterlist; handling fee tagged and applied via cashiering |
 | **S2** (one agent) | Reports, home, demo, docs | 20 reports, home and counts, help, demo V1970-V1972 and runner, traceability, module guide `docs/modules/SUBMITTED_POLICIES.md`, Developer Guide range row | `submitted/report/**`, `features/submitted/{home,reports}/**`, `help.ts`, V1076, V1970-V1972, docs | Every report runs and exports in tests; ApiSmokeIT; screenshots |
 
 Parallel-work rules:
@@ -475,12 +508,14 @@ Parallel-work rules:
 | IAAF / TOR matrices and templates | 05-07, 16-19 | Matrix tables, placeholder templates, stamped signature | Levels, signatories, layouts, e-signature | SQ07, SQ08 |
 | Letters | 22 | Letter engine, rules, print batches | Templates, lead days, COG | SQ09 |
 | Handling fee / No Touch accounting | 31, RL #164 | Events and demo rules | Accounts, rates, OR / SI rules | SQ13, SQ14, OQ07 |
-| Renewal ownership | 23-26 | Default hand-off | Renewal BRD boundary | SQ10 |
+| Renewal ownership | 23-26 | Port and PENDING default; Renewal R3 adapter | None: SQ10 closed (Renewal owns it, decision D2) | - |
 
 ## 16. Risks
 
-1. **Overlap with the Renewal BRD.** Both may design expiry lists, RA letters and renewal status. Mitigation: the
-   `RenewalHandOff` port and a single letter engine; agree ownership before S1-D.
+1. **Overlap with the Renewal BRD.** Settled (SQ10, decision D2): Renewal implements `RenewalHandOff` and owns the
+   renewal account, hold cover request and renewal letters; one letter engine (`rnw_letter`) and one RA per client.
+   Remaining risk: masterlist records wait as PENDING hand-offs if R3 is late. Mitigation: build R3 right after S1-D
+   (`BDOI_CROSS_BRD_DECISIONS.md` section 6).
 2. **Bucket conflicts** (SQ05) could make the processing results disputed. Mitigation: rules are data, results record
    the rule version, and manual overrides are audited.
 3. **Scanned documents** without OCR mean manual entry for most Non-CBG documents. Mitigation: side-by-side entry

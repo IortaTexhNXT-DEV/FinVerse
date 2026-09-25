@@ -106,7 +106,7 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
   | V755 | Product Maintenance (BRD-3) foundation: roles, grants, permission action classes (`sec_permission_action`), LOV types, workflow `PM_PACKAGE_REQUEST`, parameters |
   | V760–V789 | Operations (BRD-2): foundation, invoice ledger and platform extensions V760–V762, then cashiering, remittance, product reconciliation, adjustment and commission receivables in their own sub-ranges |
   | V800–V889 | broking business modules (crm V800s, catalog V810s, account V820s, quotation V830s, non-package V840s, placement V850s, issuance V860s, booking V870s, NB reports V880s) |
-  | V813–V819 | catalog extensions and Product Maintenance (catalog V813–V815, `productmaint` V816–V819); the version columns of account, quotation and booking are V821, V831 and V871 in their own ranges |
+  | V813–V819 | catalog extensions and Product Maintenance (catalog V813–V815, `productmaint` V816–V819); the version columns of account, quotation and booking are V821, V831 and V871 in their own ranges. Planned contract changes of later BRDs in the owners' ranges (designed, not built): V822 account business type (work item BT0, shared by Renewal, Employee Benefits and Submitted Policies), V851 placement hold-cover re-assignment and V861 issuance extraction kind (Submitted Policies); see `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
   | V890–V899 | Accounting, Disbursement and ACSL (BRD-5): disbursement V891–V893, payrequest V894–V895, acsl V896–V897, frbs V898–V899, foundation V890 |
   | V1000–V1899 | modules of later BRDs, 10 versions each: Collections (BRD-4) V1000–V1009, Renewal V1010–V1019, broking Claims V1020–V1029, Employee Benefits V1030–V1039, Customer Servicing Facility V1040–V1049, Sanction Screening and Risk Profiling V1050–V1059, User Access Maintenance V1060–V1069, Submitted Policies V1070–V1079; the next BRD V1080–V1089 and so on |
   | V900–V999 | demo data (`db/demo`, loaded only with the `demo` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989, Operations V990–V995, Product Maintenance V996–V998 (V996 catalog versions, V997 package requests, V998 Product Maintenance users), Accounting / Disbursement V999 (reference data and users only; its storyline runs as Java demo runners) (full) |
@@ -272,6 +272,18 @@ environment variable and document it in `docs/operations/CONFIGURATION.md`. Jobs
 `KYC_REVIEW_DUE`, `RETENTION_REVIEW` (monthly) and `RESERVE_VALUATION`, `RI_ALLOCATION`,
 `QUOTATION_REQUEST_INTAKE`, `OPS_INVOICE_FEED_REPLAY` (manual unless scheduled). The crons of the Operations jobs built on top of the ledger are already configured (`brokerverse.jobs.prebooked-rematch-cron` … `dp-feedback-sla-cron`, see `docs/modules/OPERATIONS.md`).
 
+Planned jobs of the later BRDs (designed, not built; names, schedules and cron properties are in each design):
+
+| Module | Jobs | Design |
+|---|---|---|
+| `renewal` | `RNW_EXTRACTION`, `RNW_REEVALUATE`, `RNW_NRNS_LETTERS`, `RNW_EXPIRY_SWEEP` (daily); `RNW_LETTER_BATCH` (manual) | `RENEWAL_DESIGN.md` §9 |
+| `brokerclaims` | `BCL_FOLLOW_UP_DUE`, `BCL_PREMIUM_RECHECK`, `BCL_AGEING_ALERTS` (daily) | `CLAIMS_BROKING_DESIGN.md` §9.1 |
+| `eb`, `portal` | `EB_RENEWAL_ADVICE`, `EB_ITEM_FOLLOWUP`, `PORTAL_INVITATION_EXPIRY` (daily) | `EMPLOYEE_BENEFITS_DESIGN.md` §8.1 |
+| `csf` | `CSF_LEGACY_SYNC` (every 15 minutes; manual until `CSF_LEGACY_SYNC_ENABLED`) | `CUSTOMER_SERVICING_DESIGN.md` §7 |
+| `screening` | `SCR_WATCHLIST_INGEST`, `SCR_PERIODIC_SCREENING` (daily), `SCR_SLA_MONITOR` (hourly), `SCR_INGEST_ERROR_DIGEST` (working days) | `SANCTION_SCREENING_DESIGN.md` §8 |
+| `security` / `nbadmin` (User Access) | `UAM_EFFECTIVE_CHANGES`, `PASSWORD_EXPIRY_NOTICE` (daily) | `USER_ACCESS_DESIGN.md` §8 |
+| `submitted` | `SBM_PROCESSING`, `SBM_EXPIRY_SCAN`, `SBM_LETTER_DISPATCH`, `SBM_HOLD_COVER_WATCH` (daily), `SBM_HANDLING_FEE_TAGGER` (every 30 minutes); `SBM_INTAKE_PULL` (manual) | `SUBMITTED_POLICIES_DESIGN.md` §8 |
+
 ### 10.4 Business parameters – `system`
 
 Read shared parameters with `SystemParameterService.intValue/text/items(KEY, fallback)`.
@@ -327,3 +339,20 @@ rules, reports, ports, demo data and open points. Update it together with the co
 | Actuarial Reserves | [`docs/modules/ACTUARIAL_RESERVES.md`](../modules/ACTUARIAL_RESERVES.md) |
 | Tax & Statutory | [`docs/modules/TAX_AND_STATUTORY.md`](../modules/TAX_AND_STATUTORY.md) |
 | Broking (BDOI New Business) | [`docs/architecture/BROKING_ARCHITECTURE.md`](../architecture/BROKING_ARCHITECTURE.md) |
+
+Modules of later BRDs, **designed, not built** (the design is the guide until the module guide is written with the
+code; cross-BRD decisions and the build order are in
+[`BDOI_CROSS_BRD_DECISIONS.md`](../requirements/BDOI_CROSS_BRD_DECISIONS.md)):
+
+| Module (package) | BRD | Flyway (demo) | Design |
+|---|---|---|---|
+| `renewal` | BRD-6 Renewal | V1010–V1017 (V1910–V1911) | [`RENEWAL_DESIGN.md`](../architecture/RENEWAL_DESIGN.md) |
+| `brokerclaims` | BRD-7 Claims | V1020–V1024 (V1920–V1921) | [`CLAIMS_BROKING_DESIGN.md`](../architecture/CLAIMS_BROKING_DESIGN.md) |
+| `eb` | BRD-8 Employee Benefits | V1030, V1031, V1033–V1036 (V1930–V1932) | [`EMPLOYEE_BENEFITS_DESIGN.md`](../architecture/EMPLOYEE_BENEFITS_DESIGN.md) |
+| `portal` (platform) | BRD-8 Employee Benefits | V1032 | [`EMPLOYEE_BENEFITS_DESIGN.md`](../architecture/EMPLOYEE_BENEFITS_DESIGN.md) |
+| `csf` | BRD-9 Customer Servicing Facility | V1040–V1042 (V1940) | [`CUSTOMER_SERVICING_DESIGN.md`](../architecture/CUSTOMER_SERVICING_DESIGN.md) |
+| `screening` | BRD-10 Sanction Screening and Risk Profiling | V1050–V1055 (V1950–V1952) | [`SANCTION_SCREENING_DESIGN.md`](../architecture/SANCTION_SCREENING_DESIGN.md) |
+| `submitted` | BRD-12 Submitted Policies | V1070–V1076 (V1970–V1972) | [`SUBMITTED_POLICIES_DESIGN.md`](../architecture/SUBMITTED_POLICIES_DESIGN.md) |
+
+BRD-11 User Access Maintenance adds no module: it extends `security` and `nbadmin` (V1060–V1062, demo V1960;
+[`USER_ACCESS_DESIGN.md`](../architecture/USER_ACCESS_DESIGN.md)).

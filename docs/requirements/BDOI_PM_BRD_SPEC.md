@@ -232,6 +232,19 @@ BRD-3 answers none of the BRD-1 or Operations questions completely. It settles o
 | PQ20 | Numbering | BRPM.023 does not exist (the earlier version also skips BRQID.023). Confirm that no requirement is missing. | Document |
 | PQ21 | Document protection | Which Product Maintenance documents leave BDOI (QS to insurers, comparative table to clients, advisory to internal units) and which password convention applies (Q07)? | BRPM.020, Q07 |
 
+### 7.1 Answered by later BRDs
+
+The rows above are kept as asked. The single record with the design impact is
+[`BDOI_CROSS_BRD_DECISIONS.md`](BDOI_CROSS_BRD_DECISIONS.md) section 3.
+
+| Q# | Status | Answering BRD and ID | Answer (short) |
+|---|---|---|---|
+| PQ10 | partial | BRD-6 RN (BRRN.038 AC 3) | The dropped BRQID.008 is partly re-introduced: when a renewal has a financial impact, the acceptance method (e-mail, signed RA, payment) must be recorded (`rnw_acceptance` evidence mandatory). What a "rate scheme" covers and who approves a non-current rate stay open |
+| PQ11 | partial | BRD-6 RN (BRRN.030, 033, 035 AC 1c, 038) | Renew As Is changes no terms, pricing or structure, so the renewal account rates with purpose RENEWAL on the expiring account's product version (`NewAccount.renewal(..., productVersionNo)`, part of work item BT0); repricing or restructuring takes the NB path. Extraction lead time is configurable (-140 days). The EXPIRED version case stays open (RQ30); package term and notice period stay open |
+| PQ17 | answered | BRD-11 UAM (p.6) | Group-profile (role-permission) changes are approved: the Business Administrator requests, the approver(s) approve, the System Administrator implements (FOR_IMPLEMENTATION, `UAM_ROLE_APPLY_ON_APPROVAL` default false, UQ03). Direct role editing only through the audited emergency parameter `UAM_DIRECT_ROLE_EDIT`. The matrix content itself is still a BDOI deliverable (OQ48) |
+| PQ21 | partial | BRD-8 EB (BRID-007) | TOR, master list and utilization reports sent to insurers are password protected with the password sent separately. Product Maintenance documents and the convention itself (Q07, EBQ09) stay open |
+| PQ18 | open (more data) | BRD-7 to BRD-12 | Each later BRD adds its own NFR and retention set (OQ44); no alignment yet |
+
 ## 8. Current capability in brief (what is built today)
 
 | Area | Built (file) | Relevance |

@@ -154,9 +154,10 @@ PDF and Excel export come from the report framework (BRCSF-011.002).
 | `issuance` | None: CSF calls `EpolicyDispatchService` inside its own transaction under `CSF_RESEND` | - | CSF-EM09 |
 | `attachment` | Seven file types (section 8) | S0 | BRCSF-007 |
 | `security` | CSF permissions (6.1) | S0 | BRCSF-001 |
-| Renewal (parallel analysis, V1010-V1019) | Store every generated RA as an attachment of document type `RENEWAL_ADVICE` linked to the account (ARN) and the client, with its protection password handled by `DocumentPasswordPolicy` | coordination | BRCSF-006 |
-| Employee Benefits (BRD-8) | Same RA convention (EB design, job `EB_RENEWAL_ADVICE`) | coordination | BRCSF-006 |
-| broking Claims (parallel analysis, V1020-V1029) | Store claims reports as attachments of document type `CLAIM_REPORT` linked to the account and client | coordination | BRCSF-009 |
+| `renewal` (Renewal BRD, designed, V1010-V1019) | **Decided (cross-BRD decision D3):** every generated RA, including those of submitted policies, is an attachment of document type `RENEWAL_ADVICE` linked to the account (ARN) and the client, with its protection password handled by `DocumentPasswordPolicy` (RENEWAL_DESIGN section 2.3) | coordination | BRCSF-006 |
+| `eb` (Employee Benefits, designed) | **Decided (D3):** same RA convention (job `EB_RENEWAL_ADVICE`) | coordination | BRCSF-006 |
+| `brokerclaims` (Claims, designed, V1020-V1029) | **Decided (D3):** claims reports are attachments of document type `CLAIM_REPORT` linked to the claim, the account and the client (CLAIMS_BROKING_DESIGN section 3.1); which claim documents count is cross-BRD question XQ05 | coordination | BRCSF-009 |
+| `attachment` access classes (EB V1031) | The access rows of `RENEWAL_ADVICE` and `CLAIM_REPORT` must let CSF roles list and download them (cross-BRD question XQ04 for the final confidentiality matrix, CSQ07) | coordination | BRCSF-006, 009 |
 | `navigation` | Section Customer Service Facility in Client & Policy (`frontend/src/navigation/modules.ts`), after Renewal | S1 | UX-3 |
 
 ## 12. Integrations to park (seam only)
@@ -167,7 +168,7 @@ PDF and Excel export come from the report framework (BRCSF-011.002).
 | QPS / EBIX / LOS account lookup for non-migrated accounts | `LegacyAccountLookup` (empty default) | CSQ01, CSQ02 |
 | Legacy RA files (IT text-file RAs) | Upload as `RENEWAL_ADVICE` attachments by a one-time bulk load if needed | CSQ06 |
 | Case management / inquiry logging (SharePoint today) | Out of scope; `csf_activity` is the only log | CSQ09 |
-| BDO SSO | Existing JWT login | BRD-1 Q42 |
+| BDO SSO / Windows ID | Q42 answered by BRD-11: directory sign-in is required and is built as the parked `security` port `DirectoryAuthenticator` (USER_ACCESS_DESIGN section 10); local user ID and password sign-in (BRCSF-001) stays until BDO supplies the interface | Q42, UQ04 |
 
 ## 13. Build-wave plan
 

@@ -86,7 +86,7 @@ Target reports (p.7): Submitted Masterlist; Sanitation, Matching, Disposition an
 1. **Submitted Masterlist** (`sbm_policy`): one record per submitted or inforced policy per segment and business type, with loan data, risk details, classification, bucket, renewal tag, handler, conversion status and a full history. It is fed by six sources plus manual entry and by the Excel migration.
 2. **Rule engine for sanitation, matching, classification and disposition** (BRIDSP-08/09/11-15): configurable criteria with maker-checker. Each run records its outcome per policy and a fallout list with reason codes.
 3. **IAAF and TOR** (BRIDSP-05-07/16-19): documents with approval matrices, signatures and hand-over to the AO.
-4. **Renewal hand-off** (BRIDSP-22/23/25/26/27): expiry scan, RA / NRNS / NAL / SFU letters, renewal account, hold cover, placement and booking. It reuses BRD-1 and must be agreed with the Renewal BRD.
+4. **Renewal hand-off** (BRIDSP-22/23/25/26/27): expiry scan, RA / NRNS / NAL / SFU letters, renewal account, hold cover, placement and booking. It reuses BRD-1. Agreed with the Renewal BRD: the Renewal module owns everything after the hand-off (SQ10 closed, cross-BRD decision D2).
 5. **Handling fee tagging in the Unapplied Payment List** (BRIDSP-31): a cross-module change in cashiering and collections.
 
 ## 4. Submitted Policies flow (for concurrence)
@@ -309,6 +309,12 @@ Not answered and still open: OQ01, OQ02, OQ07 (handling-fee and No Touch account
 | SQ23 | Non-CBG Retail | Employee accounts: quotation by the MAO in BIBS quotation module; NRNS "to client (employee)" by e-mail | p.5 |
 | SQ24 | Policy review ageing | Start and end events of the "aging from date of request from the bank to endorsement of BDOI" | RL #134 |
 | SQ25 | Report layouts | Final fields of the rows marked "for editing" (Sanitation, fallout, Conversion summary) and of rows without fields (#152, #154, #155, #157-#162) | BRIDSP-20 |
+
+**SQ10 closed** by cross-BRD decision D2 ([`BDOI_CROSS_BRD_DECISIONS.md`](BDOI_CROSS_BRD_DECISIONS.md)): the Renewal
+module implements `RenewalHandOff` and owns the renewal of submitted policies from the hand-off on (renewal account,
+hold cover request, RA / NRNS / NAL / SFU letters); this BRD keeps intake, classification, the expiry scan and the
+insurer rules. The renewal account then follows the BRD-1 placement and booking screens; which users handle submitted
+renewals there is part of the role matrix (SQ15, OQ48).
 
 ## 11. Observations on the BRD pack
 

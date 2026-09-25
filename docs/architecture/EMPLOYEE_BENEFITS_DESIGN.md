@@ -20,10 +20,10 @@ Requirements baseline: [`BDOI_EB_BRD_SPEC.md`](../requirements/BDOI_EB_BRD_SPEC.
 |---|---|---|---|---|
 | `portal` (new, platform, package `com.iortatechnxt.brokerverse.portal`, tables `ptl_*`) | External identities bound to a party (insurer or client), invitation and approval of portal users, separate security realm and tokens, party context, staged uploads with review, portal notices, portal audit, ports for business modules | BRID-005, 005.01-005.03, 014 (realm and staging), 011 / 015 (channel) | security, attachment, audit, messaging, workflow, system, party | V1032 (V1930) |
 | `eb` (new, package `com.iortatechnxt.brokerverse.eb`, tables `eb_*`) | EB programmes and cycles, RA and reminders, feedback, document register, BOR, franchise, TOR, insurer requests, proposals and revisions, comparative and approvals, value thresholds, client confirmation and placement trigger, submissions, member roster and member changes, tracked items, SOA intake, EB reports and jobs, EB portal endpoints | BRID-001-004, 007-010, 012, 013, 016, 017, 019, 021, 022, 024, 026, 027, 029, 030 | portal, crm, catalog, account, booking (read), opsledger (read, events), adjustment (endorsement intake), issuance (e-policy receipt), workflow, approval, messaging, docgen, attachment, bulk, report, lov, alert, system, nbadmin (retention port) | V1033-V1035 (V1931-V1932) |
-| `account` (built) | + `businessType` required on the account | BRID-022.01 | unchanged | V1031 |
-| `booking` (built) | + business type from the account; + insurer billing number with duplicate block | BRID-020, 022.01 | unchanged | V1031 |
+| `account` (built) | Business type on the account: the shared work item **BT0** (`V822__account_business_type.sql`, account range), also used by Renewal and Submitted Policies; EB creates no column of its own | BRID-022.01 | unchanged | V822 (BT0) |
+| `booking` (built) | Business type from the account (part of BT0); + insurer billing number with duplicate block (EB) | BRID-020, 022.01 | unchanged | V822 (BT0, code only); V1031 (billing number) |
 | `attachment` (platform) | + document access classes; + process tag on links | BRID-025 | unchanged | V1031 |
-| `messaging`, `report`, `nbreport` (built) | + DOCX protection; + DOCX export; + Business Type filter | BRID-007, 022.01 | unchanged | none |
+| `messaging`, `report`, `nbreport` (built) | + DOCX protection; + DOCX export (EB); + Business Type filter (part of BT0) | BRID-007, 022.01 | unchanged | none |
 
 ### 2.1 Dependency graph (arrows = "depends on")
 
@@ -54,8 +54,8 @@ Allocated to Employee Benefits in the Developer Guide: **schema V1030-V1039, dem
 | Version | Owner (wave) | Content |
 |---|---|---|
 | `V1030__eb_foundation.sql` | E0 | Grants of the EB and portal permissions to new and existing roles; roles `EB_AO`, `EB_TL`, `EB_MANAGEMENT`, `EB_PROCESSOR`, `EB_PROC_SUPERVISOR`, `EB_COLLECTION`; LOV types and values (section 8.4); `DOCUMENT_TYPE` values (spec 6.1); `sys_parameter` rows; exception codes; workflows `EB_CYCLE`, `EB_FRANCHISE`, `EB_MEMBER_CHANGE`, `EB_SOA`, `PORTAL_UPLOAD_REVIEW` (`wf_stage`, `wf_transition`); `doc_template` rows; notification events |
-| `V1031__eb_platform_extensions.sql` | E0 | `att_document_access` (document type, permission) and `att_attachment_link.process_tag`; `acc_account.business_type varchar(20) not null default 'NEW_BUSINESS'` with check (NEW_BUSINESS, RENEWAL); `bkg_invoice.insurer_billing_no varchar(60)` and a unique partial index on (company_id, insurer_code, insurer_billing_no) where not null |
-| `V1032__portal.sql` | E1-A | `ptl_user`, `ptl_user_request`, `ptl_invitation`, `ptl_login_event`, `ptl_upload`, `ptl_notice`, `ptl_download_log` |
+| `V1031__eb_platform_extensions.sql` | E0 | `att_document_access` (document type, permission) and `att_attachment_link.process_tag`; the cross-BRD document types `RENEWAL_ADVICE` (Renewal, EB) and `CLAIM_REPORT` (Claims) with their access rows, including the CSF view permission (insert ... on conflict do nothing, so the order against V1010 / V1020 does not matter; final matrix: cross-BRD question XQ04); `bkg_invoice.insurer_billing_no varchar(60)` and a unique partial index on (company_id, insurer_code, insurer_billing_no) where not null. **Not** the account business type: `acc_account.business_type` is the shared `V822__account_business_type.sql` (BT0, cross-BRD decision D1), which must be merged before E1-B creates accounts |
+| `V1032__portal.sql` | E1-A | `ptl_user`, `ptl_invitation`, `ptl_login_event`, `ptl_upload`, `ptl_notice`, `ptl_download_log`. No request table: portal users are provisioned through User Access Maintenance requests (`nba_access_request`, user type EXTERNAL, V1062; decision D7) |
 | `V1033__eb_programmes_cycles.sql` | E1-B | `eb_programme`, `eb_programme_line`, `eb_programme_contact`, `eb_cycle`, `eb_renewal_advice`, `eb_feedback`, `eb_document`, `eb_bor`, `eb_activity_log` |
 | `V1034__eb_marketing.sql` | E1-B | `eb_franchise_request`, `eb_tor`, `eb_tor_item`, `eb_insurer_request`, `eb_proposal`, `eb_proposal_line`, `eb_proposal_item`, `eb_proposal_factor`, `eb_revision_request`, `eb_revision_item`, `eb_revision_target`, `eb_comparative`, `eb_comparative_signoff`, `eb_comment`, `eb_threshold_rule`, `eb_client_confirmation`, `eb_confirmation_line`, `eb_submission`, `eb_submission_document`, `eb_required_document` |
 | `V1035__eb_servicing.sql` | E1-C | `eb_roster_version`, `eb_member`, `eb_member_change`, `eb_member_change_line`, `eb_tracked_item`, `eb_soa` |
@@ -66,7 +66,7 @@ Allocated to Employee Benefits in the Developer Guide: **schema V1030-V1039, dem
 | `db/demo/V1932__demo_eb_servicing.sql` | E2 | Rosters, member changes (one relayed, one billed, one closed), tracked items (an overdue HMO card), SOA received and released, portal uploads waiting for review |
 
 Rules:
-- V1031 alters `acc_account` (V820) and `bkg_invoice` (V870), which always exist before V1031 on a fresh database. The `account` and `booking` entities change in the same wave (E0), because Hibernate validates the schema.
+- V1031 alters `bkg_invoice` (V870) and the attachment tables, which always exist before V1031 on a fresh database. The `booking` entity changes in the same wave (E0), because Hibernate validates the schema. The account business type comes from V822 (BT0), which runs before V1031.
 - EB tables store ARN, invoice no., client code and insurer code as plain values, like Operations. Foreign keys only to platform tables (users, attachments, workflow, LOV) and to EB's own tables.
 - The demo runs after every V9xx demo (V981 clients, V982 catalog, V988 booking), as the range table requires.
 
@@ -79,7 +79,6 @@ Money is `numeric(19,2)`; every table has `company_id`, the audit columns and `v
 | Table | Key fields |
 |---|---|
 | `ptl_user` | username (e-mail, unique), full name, party kind INSURER / CLIENT, party code (insurer party code or client code), company, portal role (INSURER_USER, CLIENT_HR), status INVITED / ACTIVE / LOCKED / DISABLED, password hash, failed attempts, MFA required, last login |
-| `ptl_user_request` | CREATE / DISABLE / ENABLE, target user data, requested by (AO), justification, status, decided by (never the requester) |
 | `ptl_invitation` | user, one-time token hash, expires at (`PORTAL_INVITE_VALID_HOURS`), used at |
 | `ptl_login_event` | user, time, outcome, IP, user agent |
 | `ptl_upload` | portal user, party, target type (EB_INSURER_REQUEST, EB_FRANCHISE, EB_MEMBER_CHANGE, EB_SOA_REQUEST, EB_POLICY_FORM, EB_PROGRAMME_DOCS ...), target id, document type, file name, content, SHA-256, size, virus-scan result, status RECEIVED / VALIDATED / REJECTED, reviewer, reason, attachment id (after validation) |
@@ -155,7 +154,7 @@ The guideline "no payment, no booking on adjustment" (p.3) is handled by the par
 | `EB_COLLECT` | Collection: SOA and billing view, release acknowledgement |
 | `EB_SETUP` | Threshold rules, required documents, EB parameters and templates (authorised with `MASTER_AUTHORIZE`) |
 | `EB_REPORT_VIEW` | EB reports |
-| `PORTAL_USER_REQUEST`, `PORTAL_USER_APPROVE` | Request and approve portal users (four eyes) |
+| `PORTAL_USER_REQUEST`, `PORTAL_USER_APPROVE` | Raise and decide User Access Maintenance requests of user type EXTERNAL (portal users; four eyes by the UAM rules, decision D7) |
 | `PORTAL_ADMIN` | Lock / unlock portal users, portal login and download logs |
 
 ### 6.2 Roles (V1030) and demo users (V1930, password `Brokerverse@2026`)
@@ -176,7 +175,7 @@ The guideline "no payment, no booking on adjustment" (p.3) is handled by the par
 - `config/SecurityConfig.java` gets a second `SecurityFilterChain` ordered first with `securityMatcher("/api/portal/**")`: portal login, invitation acceptance and portal endpoints. Tokens from `JwtTokenService` carry `aud` = `portal` and the claims `partyKind`, `partyCode`. The core chain rejects any token whose audience is not `core`; the portal chain rejects core tokens.
 - `PortalContext.current()` returns the bound party; every EB portal query filters on it (insurer code or client code). A mismatch is `404`, not `403`, so a portal user cannot probe other records.
 - Lockout after `PORTAL_MAX_FAILED_LOGINS`; session timeout `PORTAL_SESSION_MINUTES`; e-mail one-time code when `PORTAL_MFA_REQUIRED` (default true; the final method is EBQ13).
-- Portal users are created only through `ptl_user_request` (AO requests, Business Administrator approves, never the requester); the user receives an invitation link and sets the password. No password is ever sent by e-mail.
+- Portal users are provisioned only through **User Access Maintenance requests** as an **external user type** (cross-BRD decision D7; USER_ACCESS_DESIGN section 4.4): the AO raises a CREATE / DISABLE / ENABLE request of user type EXTERNAL (party kind, party code, portal role) with `PORTAL_USER_REQUEST`; a chosen approver holding `PORTAL_USER_APPROVE` decides it (never the requester), with the UAM draft, return, history and change log. On approval `nbadmin` calls the port `ExternalUserProvisioner`, which `portal` implements: it creates the `ptl_user` (INVITED) and sends the invitation link, and the user sets the password. No password is ever sent by e-mail. Lock / unlock and the login and download logs stay in `portal` (`PORTAL_ADMIN`).
 - Every portal action writes `AuditTrailService` entries under the portal username prefixed `portal:`; downloads go to `ptl_download_log`.
 - Uploads: allowed types from `AllowedFileType`, `PORTAL_MAX_UPLOAD_MB`, signature check, and the `VirusScanner` port. A production adapter is required before go-live (the default is a no-op); the staging status stays RECEIVED until the scan passes.
 - Deployment: the same image can run with profile `portal`, which registers only the portal chain and controllers, in the DMZ; the core runs internally. Details follow BDO Information Security (EBQ13).
@@ -270,7 +269,7 @@ Crons are configurable (`brokerverse.jobs.eb-renewal-advice-cron`, ...), documen
 | Portal Uploads | `/eb/portal-uploads` | Review queue (filtered by the reviewer's permission per target type) | EB_MARKET, EB_PROCESS or EB_COLLECT |
 | EB Setup | `/eb/setup` | Threshold rules, required documents, EB parameters | EB_SETUP |
 
-- **Setup & Administration** group: **Portal Users** (`/admin/portal-users`: requests, approvals, lock / unlock, login and download logs; PORTAL_USER_REQUEST / APPROVE / ADMIN).
+- **Setup & Administration** group: **Portal Users** (`/admin/portal-users`: portal user list, lock / unlock, login and download logs; PORTAL_ADMIN). Requests for portal users are raised and approved on the User Access screens (`/user-access/requests`, user type External; PORTAL_USER_REQUEST / PORTAL_USER_APPROVE).
 - **Reports** group: the EB reports appear in the Report Centre under "Employee Benefits".
 - The crm client page gains the tab **Employee Benefits** through `ClientRecordsProvider` (`EbClientRecords`).
 - Help entries in `frontend/src/features/eb/help.ts`, registered in `HELP_SECTIONS`.
@@ -287,9 +286,9 @@ The portal SPA reuses the UI kit and tokens of `frontend/src/components/ui`, and
 
 | Module | Change | Owner (wave) | BRD |
 |---|---|---|---|
-| `account` | `Account.businessType` (enum NEW_BUSINESS / RENEWAL, column from V1031); `NewAccount` gets `businessType`, required (`ACCOUNT_BUSINESS_TYPE_REQUIRED`), with the existing factory methods defaulting to NEW_BUSINESS so the quotation and PRF callers do not change; `AccountResponse`, `AccountSearch` filter; bulk `ACCOUNT_CREATE` optional column | E0 | BRID-022.01 |
-| `booking` | `InvoiceBuilder` takes `account.getBusinessType()` instead of the constant `BusinessType.NEW_BUSINESS` (`booking/service/InvoiceBuilder.java` line 129); `BookingOptions.insurerBillingNo`, `bkg_invoice.insurer_billing_no`, duplicate block `BILLING_NO_DUPLICATE`, mandatory for the lines in `BOOKING_BILLING_NO_LINES`; `BOOKING_UPLOAD` column; booking notification on success / duplicate | E0 | BRID-020, 022.01 |
-| `nbreport` | Parameter Business Type on `NB-BOOKED-REG`, `NB-PRODUCTION`, `NB-PLC-UPDATE` (read `bkg_invoice.business_type` / `acc_account.business_type`) | E0 | BRID-022.01 |
+| `account` | **Shared work item BT0** (cross-BRD decision D1; SUBMITTED_POLICIES_DESIGN section 9): `acc_account.business_type` (required, default NEW_BUSINESS) and `renewal_of_ref` in `V822__account_business_type.sql`; `Account.getBusinessType()`; the existing `NewAccount` factories keep NEW_BUSINESS, and EB creates the accounts of a RENEWAL cycle with `NewAccount.renewal(...)` (`renewal_of_ref` = the line's current ARN); `AccountResponse`, `AccountSearch` filter; bulk `ACCOUNT_CREATE` optional column. EB's earlier variant (column in V1031, a required `businessType` on every `NewAccount`) is dropped | BT0 (first of S0 / R0 / E0 to start) | BRID-022.01 |
+| `booking` | Part of BT0: `InvoiceBuilder` takes `account.getBusinessType()` instead of the constant `BusinessType.NEW_BUSINESS` (`booking/service/InvoiceBuilder.java` line 129) and `InvoiceBooked` carries `businessType`. EB only: `BookingOptions.insurerBillingNo`, `bkg_invoice.insurer_billing_no` (V1031), duplicate block `BILLING_NO_DUPLICATE`, mandatory for the lines in `BOOKING_BILLING_NO_LINES`; `BOOKING_UPLOAD` column; booking notification on success / duplicate | BT0; E0 (billing number) | BRID-020, 022.01 |
+| `nbreport` | Part of BT0: parameter Business Type on `NB-BOOKED-REG`, `NB-PRODUCTION`, `NB-PLC-UPDATE` (read `bkg_invoice.business_type`) | BT0 | BRID-022.01 |
 | `report` | `ExportFormat.DOCX` and `DocxReportRenderer` (Apache POI XWPF, already a dependency through POI) | E0 | BRID-022.01 |
 | `messaging` | `DocumentProtector.canProtect / protect` for DOCX (POI agile encryption, as XLSX); `DOCUMENT_NOT_PROTECTABLE` for other types when protection is requested | E0 | BRID-007 |
 | `attachment` | `att_document_access` read by `DocumentService` for list, download and ZIP (document types without a row keep today's behaviour); `AttachmentLink.processTag`; `Attachments` component shows only allowed documents | E0 | BRID-025 |
@@ -301,8 +300,8 @@ The portal SPA reuses the UI kit and tokens of `frontend/src/components/ui`, and
 | `nbadmin` | None: `EbRetentionProvider` implements `RetentionCandidateProvider` (EB_PROGRAMME, EB_MEMBER) | E1-C | NFR |
 | `collections` (being built) | None: EB invoices enter the worklist like any invoice; Collection users see EB SOA and billing documents through the COLLECTION access class | - | BRID-021, 025 |
 | `commission` | None: EB accounts billed directly by the insurer use the direct-payment arrangement | - | BRID-025 |
-| Renewal (BRD being analysed in parallel, V1010-V1019) | Boundary to agree: EB programmes are excluded from the general renewal lists (by EB product line), and the Renewal module stores its RAs with the same document type `RENEWAL_ADVICE` linked to the account and client (CSF resends both) | coordination | EBQ28 |
-| User Access Maintenance (parallel, V1060-V1069) | Portal user requests may later move into the UAM request flow; until then `ptl_user_request` | coordination | EBQ13 |
+| `renewal` (Renewal BRD, designed, V1010-V1019) | **Decided (decision D3, EBQ28 closed for the boundary):** EB programmes are excluded from the general renewal candidate lists (`RNW_EXCLUDED_LINES` = the `EB_BENEFIT_LINE` values). Every renewal advice, EB's (job `EB_RENEWAL_ADVICE`) and Renewal's, is stored as document type `RENEWAL_ADVICE` linked to the account and the client (EB also links the programme), so CSF resends both. `RENEWAL_ADVICE` is seeded with `on conflict do nothing` by whichever of V1010 / V1030 runs first. Optional: a read method listing the current ARNs of EB programme lines would let Renewal exclude by ARN as well as by line | coordination | EBQ28 |
+| User Access Maintenance (`security` / `nbadmin`, V1060-V1069) | **Decided (decision D7):** portal users are provisioned through UAM requests as an external user type; `ptl_user_request` is dropped. `portal` implements the `nbadmin` port `ExternalUserProvisioner` (E1-A, after UAM U1-A has committed the port) | E1-A | EBQ13 |
 
 ## 12. Integrations to park (seam only)
 
@@ -320,8 +319,8 @@ The portal SPA reuses the UI kit and tokens of `frontend/src/components/ui`, and
 
 | Wave | Agent | Owns (files) | Delivers | Depends on |
 |---|---|---|---|---|
-| E0 | Foundation | `db/migration/V1030__*`, `V1031__*`; `security/domain/Permission.java` (EB and portal entries); `account/**` (business type only); `booking/service/InvoiceBuilder.java`, `booking/service/BookingService.java`, booking DTOs and `BOOKING_UPLOAD` handler; `nbreport/report/{BookedAccountsRegisterReport,ProductionReport,PlacementUpdateReport}.java`; `report/render/**`; `messaging/service/DocumentProtector.java`; `attachment/**`; `eb/package-info.java` and `eb/domain/EbDocumentTypes.java` (constants) | Section 11 platform changes, roles, workflows, LOVs, parameters | - |
-| E1-A | Portal | `portal/**`, `config/SecurityConfig.java`, `security/service/JwtTokenService.java` (audience), `db/migration/V1032__*`, `frontend/src/portal/**` (shell, sign-in, home, uploads), `frontend/src/features/admin/PortalUsers*` | Realm, users, invitations, staging and review, notices; **the ports of 2.2 are committed on day one** | E0 |
+| E0 | Foundation | `db/migration/V1030__*`, `V1031__*`; `security/domain/Permission.java` (EB and portal entries); the BT0 files (`account/**` business type only, `booking/service/InvoiceBuilder.java`, `InvoiceBooked.java`, the three `nbreport` reports, `V822`) **only if** no Submitted Policies S0 or Renewal R0 has merged BT0 first; `booking/service/BookingService.java`, booking DTOs and `BOOKING_UPLOAD` handler (billing number); `report/render/**`; `messaging/service/DocumentProtector.java`; `attachment/**`; `eb/package-info.java` and `eb/domain/EbDocumentTypes.java` (constants) | Section 11 platform changes, roles, workflows, LOVs, parameters | BT0 merged (or built here) |
+| E1-A | Portal | `portal/**` (including `PortalUserProvisioner` implementing `nbadmin`'s `ExternalUserProvisioner`), `config/SecurityConfig.java`, `security/service/JwtTokenService.java` (audience), `db/migration/V1032__*`, `frontend/src/portal/**` (shell, sign-in, home, uploads), `frontend/src/features/admin/PortalUsers*` | Realm, users, invitations, staging and review, notices; **the ports of 2.2 are committed on day one** | E0; UAM U1-A (the provisioner port and the EXTERNAL request type) |
 | E1-B | EB marketing | `eb/domain` and `eb/service` classes for programme, cycle, RA, feedback, document, BOR, franchise, TOR, insurer request, proposal, revision, comparative, threshold, confirmation, submission, required document; `eb/api` for the same; `db/migration/V1033__*`, `V1034__*`; `frontend/src/features/eb/` except members, pending items, SOA and reports | BRID-001-004, 007-012, 015-017, 024, 026, 027, 029 | E0; portal ports (interfaces only) |
 | E1-C | EB servicing and reports | `eb/domain` and `eb/service` classes for roster, member, member change, tracked item, SOA; `eb/report/**`; EB jobs; `db/migration/V1035__*`, `V1036__*`; `frontend/src/features/eb/{members,pending,soa}*` | BRID-013, 019, 021, 022, 025 (EB side), 030 | E0 |
 | E2 | Integration | `eb/api/portal/**` (EB portal endpoints on `PortalContext`), `eb/service/EbUploadTargets.java`, `EbPortalTasks.java`, portal EB screens in `frontend/src/portal/eb/**`, `db/demo/V1930-V1932`, integration tests, `ApiSmokeIT` entries, help entries, `docs/modules/EMPLOYEE_BENEFITS.md` | End-to-end NB and renewal cycles through the portal; demo storyline | E1-A, E1-B, E1-C |
@@ -353,6 +352,6 @@ Parallel-work rules:
 
 1. **Internet-facing portal.** The first external surface of BIBS. BDO Information Security approval, penetration testing, a production virus scanner and the MFA method can delay go-live. Mitigation: build the portal first (E1-A) and run the internal flow without it (AO uploads on behalf of insurers and clients) until it is approved.
 2. **Sensitive personal data.** Rosters and utilization reports. Mitigation: access classes, download logs, minimal roster fields until EBQ15 is answered, no health data in the roster.
-3. **Boundary with the Renewal BRD.** Two renewal processes could send two RAs to the same client. Mitigation: EB lines excluded from the Renewal lists (EBQ28), one document type for RAs.
-4. **Shared platform changes** (attachment access classes, DOCX export, business type on the account) touch every module. Mitigation: E0 lands them first with defaults that keep today's behaviour.
+3. **Boundary with the Renewal BRD.** Two renewal processes could send two RAs to the same client. Mitigation (decided, D3): EB lines excluded from the Renewal lists (EBQ28), one document type `RENEWAL_ADVICE` for every RA.
+4. **Shared platform changes** (attachment access classes, DOCX export, business type on the account) touch every module. Mitigation: they are cross-BRD prerequisite work items (`BDOI_CROSS_BRD_DECISIONS.md` section 6); the business type is BT0 (V822), built once; E0 lands the access classes and DOCX export with defaults that keep today's behaviour.
 5. **Undefined thresholds and TATs.** Mitigation: every value is a parameter or a rule row.

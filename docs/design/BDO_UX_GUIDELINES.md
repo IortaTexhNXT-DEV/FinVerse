@@ -55,9 +55,13 @@ This page is binding for every BrokerVerse screen. Components read the design to
   - page content on Dirty White with white cards (radius 12).
 - **Navigation groups.** These follow the BDOI prototype (`frontend/src/navigation/modules.ts`):
   - Dashboard and My Work (always open);
-  - **Client & Policy**: Client Management, Quotation / Proposal, Accounts, Non-Package Management, Placement & Booking, Product Reconciliation, Adjustment, Renewal (later BRD), Customer Service Facility (later BRD), Product Maintenance, Bulk Processing;
+  - **Client & Policy**: Client Management, Sanction Screening, Quotation / Proposal, Accounts, Non-Package Management, Employee Benefits, Placement & Booking, Renewal, Submitted Policies, Product Reconciliation, Adjustment, Customer Service Facility, Product Maintenance, Bulk Processing;
   - **Finance**: Collections, the operations cash modules (cashiering, remittance, commission), Disbursement, Refund & Cash Advance Requests, ACSL and Accounting Reports, then the general ledger, receivables, payables, assets, planning, tax and accounting engine;
-  - **Claims & Insurance**, **Reports**, **Setup & Administration**.
+  - **Claims & Insurance**: Claims Handling (broking claims, listed first), then the insurer-side modules;
+  - **Reports**;
+  - **Setup & Administration**: includes Compliance Setup (Sanction Screening configuration and watchlist), User Access (access requests, including portal users, and the User Access Matrix, before Administration) and Portal Users (Employee Benefits portal).
+
+  The sections of the later BRDs (Sanction Screening, Employee Benefits, Renewal, Submitted Policies, Customer Service Facility, Claims Handling, Compliance Setup, User Access, Portal Users) are designed, not built. Their places follow the designs: Sanction Screening after Client Management, Employee Benefits after Non-Package Management, Renewal right after Placement & Booking, Submitted Policies after Renewal and before Product Reconciliation, and Customer Service Facility after Renewal.
 
   The group holding the current page opens automatically.
 
@@ -70,7 +74,7 @@ This page is binding for every BrokerVerse screen. Components read the design to
 | Input text | Label above (14 px, Near Black) and a 44 px field with a Text Field Blue border, radius 8. Placeholder is Medium Grey. Disabled and read-only fields are Dirty White with a Light Grey border. Helper text goes under the field; the error text is red, above the helper text, and the border turns red |
 | Dropdown | Opens under the field. Shows 5 options (188 px) and scrolls beyond 5 (200 px) |
 | Form builder set | Input text, text area, dropdown, date picker (range picker with a calendar icon, MM/DD/YYYY), radio button, checkbox, select-search combo box, password, readable fields, upload file |
-| Table | Header row in Header Blue with white bold text and sort chevrons, and alternating white / Background Blue rows. A checkbox column for bulk actions. "Showing 1 to n of N results" with numbered pages on the right |
+| Table | Header row in Header Blue with white bold text and sort chevrons, and alternating white / Background Blue rows. A checkbox column for bulk actions. "Showing 1 to n of N results" with numbered pages on the right (the Renewal Expiry List asks for one scrollable view instead: UX-6) |
 | Flag chip | Record flags such as FFY and Direct Payment go in their own column as small gold-tinted chips, never mixed with the status pill |
 | Status pill | One per record in the Status column. Outlined, radius 8: green = Clean / Approved, yellow = Review / Pending, red = Exception / Rejected, blue = in-process (e.g. "Account for Placement") |
 | Tabs | Boxed tabs; the active tab is white with a 4 px yellow top bar and CTA Blue text, inactive tabs have a light blue gradient |
@@ -91,7 +95,7 @@ This page is binding for every BrokerVerse screen. Components read the design to
   - Then tabs for the related records (Quotation | Confirmed Proposals | Renewal).
 - **Dialogs** for a single parameterised action, e.g. Generate Expiry List with a date range.
 - **Sign in.** A split screen: the photo from the UX pack on the left, and on the right the BDO Insure logo, "Welcome to BIBS" with "BDOI Broker System" below, User ID and Password, a full-width Login button, and "Powered by iorta TechNXT".
-  - Windows ID login needs BDO SSO / Active Directory (BRD-1 Q42, parked).
+  - Windows ID login is required (BRD-1 Q42, answered by BRD-11). It is built as the parked port `DirectoryAuthenticator` (USER_ACCESS_DESIGN section 10); the User ID and Password sign-in stays until BDO supplies the EUA interface (UX-4).
   - Confirm with BDOI that the photo is licensed for the application.
 
 ## 6. Observations to confirm with BDOI
@@ -99,10 +103,11 @@ This page is binding for every BrokerVerse screen. Components read the design to
 | # | Observation | Current BrokerVerse design |
 |---|---|---|
 | UX-1 | The prototype's proposal number is `MI-06192026-001` (line prefix + MMDDYYYY + sequence) and its client code is `CC01234567890` | ARN-yyyy-nnnnnn (BRNB.102), PRF-/QS-/PS- per document, client code CL-yyyy-nnnnnn. Numbering formats are configurable, so BDOI to confirm the format per document |
-| UX-2 | Renewal screens (disposition assignment, expiry list, Clean / Review / Exception classification) | Renewal is outside BRD-1 (OOS-1); it waits for its BRD |
-| UX-3 | Customer Service Facility and Employee Benefits menu entries | Not in BRD-1/2; they wait for their BRDs |
-| UX-4 | Windows ID sign-in | BDO SSO / AD parked (Q42) |
+| UX-2 | Renewal screens (disposition assignment, expiry list, Clean / Review / Exception classification) | **Closed by BRD-6 (Renewal).** The Expiry List with Generate Expiry List, Assign Disposition, Re-assign Officer and the Classification pill Clean / Review / Exception are in the BRD; the prototype tabs are kept, with For Proposal / Lost Business / Exceptions added (RENEWAL_DESIGN section 12) |
+| UX-3 | Customer Service Facility and Employee Benefits menu entries | **Closed by BRD-8 (EB) and BRD-9 (CSF).** Sections Employee Benefits and Customer Service Facility in Client & Policy (section 3; EMPLOYEE_BENEFITS_DESIGN section 10, CUSTOMER_SERVICING_DESIGN section 10) |
+| UX-4 | Windows ID sign-in | **Closed by BRD-11 (User Access, Q42).** Directory sign-in (BDO EUA / Windows ID, LDAP / AD / SSO) is required. It is built as a parked port; the User ID and Password sign-in stays until BDO supplies the interface (UQ04) |
 | UX-5 | "Send to TSU" directly from the client record | BrokerVerse routes to TSU from the PRF / quotation (BRNB.098 rules). To confirm whether a client-level TSU request is needed |
+| UX-6 | Renewal lists: "no pagination, one scrollable view" (BRRN.004 / 011) against the table rule "Showing 1 to n of N results" with numbered pages (section 4) | Open (Renewal RQ05). The Renewal design uses a new virtualised grid (`GridTable`, keyset chunks, server-side filters) with a row count and no pager for its Expiry List grid; `DataTable` and its pager are unchanged for every other list. BDOI to confirm |
 
 ## 7. Shared components that implement the patterns
 

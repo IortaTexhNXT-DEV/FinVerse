@@ -648,6 +648,32 @@ Addendum updates are recorded on the updated row, as the BRD numbering is unchan
 | OQ49 | Commission OR grouping | CSHID.007 says 'one OR per remittance batch number' and 'OR per individual payment unless consolidation criteria are met': which prevails? | CSHID.007 |
 | OQ50 | Co-insured remittance | For co-insured invoices, is remittance extracted and scheduled per insurer share? | ADJID.027, RMTID.001 |
 
+### 10.1 Answered by later BRDs
+
+The rows above are kept as asked. This section records what BRD-6 to BRD-12 answer; the single record with the
+design impact is [`BDOI_CROSS_BRD_DECISIONS.md`](BDOI_CROSS_BRD_DECISIONS.md) section 3. Nothing below changes an
+Operations contract; the planned consumers are listed in `docs/modules/OPERATIONS.md` ("Planned consumers from later
+BRDs"), to be agreed with the Operations owner.
+
+| Q# | Status | Answering BRD and ID | Answer (short) |
+|---|---|---|---|
+| OQ01 | partial | BRD-7 CLM (p.23); BRD-8 EB (BRID-021, user matrix) | Claims is a BIBS module, not an external system (no external Claims interface). For EB, billing and payment tracking are done by the Collection team inside BIBS. Collection (other lines), Accounting, Disbursement and Marketing still open |
+| OQ12 | partial | BRD-12 SP (BRIDSP-31); BRD-6 RN (BRRN.029/039) | Handling-fee payments are identified by the PN for CLPC and by the Location Reference Number for OTC. The PN is also the key of LAMD loan matching. The key for pre-booked payments in general is still open |
+| OQ15 | partial | BRD-12 SP (Report List #105, BRIDSP-31) | Unapplied dispositions: For Booking, For Reinstatement, For Refund, For Re-application, For Advanced OR / Pre-signed OR, For Client Identification, For AO / Unit Head review, plus Handling Fee (Admin Team UPP handler → NB TL → AO → NB TL). Approvals still open |
+| OQ17 | partial | BRD-12 SP (p.6); BRD-7 CLM (NFR 15.09-15.13, CLQ21) | The target is "a single, master database" in place of Drive H:\ masterlists; Claims still names a shared drive for report files (CLQ21). The in-system repository stays the default |
+| OQ25 | partial | BRD-7 CLM (BRCLM.010) | Claims condition: eligible when the invoice belongs to the cover of an open claim in status "With BDOI - For Premium Remittance" (confirmed through `ClaimsFeed`). Approvers, SLA and the other conditions (renewal, installment, immediate OR) still open |
+| OQ29 | partial | BRD-8 EB (BRID-005) | A secure insurer portal will exist (EB); Prod Recon and Remittance may use it later. Frequencies, templates and naming still open |
+| OQ32 | partial | BRD-6 RN (BRRN.032) | Endorsements before or during renewal must be on the mother policy before renewal approval, and renewal is blocked while the impact is unresolved. Ownership of the request (Marketing vs Adjustment) still open |
+| OQ38 | partial | BRD-8 EB (BRID-025) | EB changes billed directly by the insurer: the AO uploads the direct billing documents; such programmes use the direct-payment arrangement (EBQ17). DP list sources for other lines still open |
+| OQ39 | partial | BRD-12 SP (Report List #164) | "No Touch" accounts are submitted CBG Motor accounts sent to the insurer for validation and billing; BDOI bills a service fee (gross + 12% VAT - 15% WTax). Targets and tiers still open |
+| OQ42 | partial | BRD-12 SP (Report List #85-96, #103) | Key fields of Cashiering reports 9-18, 20-21 and Remittance 8 are listed in the Report List (e.g. Daily Cash Reconciliation, Direct Payment). Column alignment is the cashiering / remittance owners' |
+| OQ45 | partial | BRD-12 SP (BRIDSP-31) | The handling-fee disposition of UPP items is a Marketing (NB TL / AO) activity inside BIBS, in the Collections unapplied view. The other MKTID activities still open |
+| OQ46 | partial | BRD-7 CLM (BRCLM.001, 010); BRD-6 RN (BRRN.027/031/034) | Claims implements `ClaimsFeed` (feed `CLAIMS_SPECIAL_REMIT`); no claim money flows through BDOI (CLQ10 open). Renewal also needs the claims per expiring policy and reads `ClaimExperienceQueryService`; the total-loss indicator is open (CLQ28) |
+| OQ44 | open (more data) | BRD-7, BRD-8, BRD-9, BRD-10, BRD-11, BRD-12 | Each BRD adds its own NFR set (hours, availability, RTO / RPO, retention); no alignment yet |
+| OQ48 | open (more data) | BRD-6 to BRD-12 | Personas and role matrices per new area (roles in each design); the BIBS-wide matrix is still a BDOI deliverable |
+
+Not answered by BRD-6 to BRD-12: OQ02, OQ07 and the other OQ items not listed.
+
 ## 11. Observations on the BRD pack
 
 - The addendum (pp.1-7) supersedes **RMTID.002**. The main BRD allowed editing of the extracted remittance file and pushing it "with or without edit". The addendum allows only row exclusion and forbids changes to financial fields. The addendum also extends **ADJID.014** with service-invoice generation. Both IDs appear twice in the PDF and are recorded once, on the updated row.

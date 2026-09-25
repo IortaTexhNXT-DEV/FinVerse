@@ -101,20 +101,22 @@ Ports of other modules that `renewal` implements or calls:
   - creates the renewal account through `AccountService.createDraft(NewAccount.renewal(...))`, with `renewal_of_ref` = SBM number and the assigned insurer;
   - requests the 30-day hold cover through `HoldCoverService.request`. The insurer-acceptance follow-up and re-assignment (BRIDSP-32) stay in `placement` as Submitted Policies designed it;
   - queues the letters in the **single renewal letter engine** (`rnw_letter`): RA (generic or FFY template), reminder, SFU for mortgaged accounts, NRNS and NAL. Print and mail-house letters go through `submitted`'s `MailHouseGateway` port with channel PRINT.
+  - answers the port's status query of a hand-off (open, or closed as RENEWED / NOT_RENEWED / LOST / EXPIRED_UNRENEWED with the reason) from the candidate, so `submitted` can close masterlist records whose renewal never books.
 - `sbm_letter` is then not written for renewals. One letter engine means one RA per client.
 - **Non-CBG Retail "Renew with BDOI"** calls the same port, and the candidate starts at UNASSIGNED (manual).
 - **No double extraction.** Submitted policies are not booked BIBS invoices, so `RNW_EXTRACTION` never finds them. Once the renewal is booked in BIBS, next year's renewal comes from `RNW_EXTRACTION`, and the masterlist record is closed as BOOKED.
-- **Build order.** The adapter is built in wave R3, after the Submitted Policies S1-D wave. Until then, the default adapter of `submitted` runs. No data migrates between the two: open `sbm_renewal` rows finish on the default path.
+- **Build order.** The adapter is built in wave R3, after the Submitted Policies S1-D wave. Until then, the default adapter of `submitted` only records each hand-off as PENDING in `sbm_renewal` (no account, hold cover or letter; SUBMITTED_POLICIES_DESIGN section 3.5). When R3 is deployed, the adapter replays the PENDING hand-offs, idempotent on the SBM number, so there is never a second renewal path.
 
-**Account business type (one shared change).**
-- The account change is the one designed by Submitted Policies in the account owner's range, `V822__account_business_type.sql`:
+**Account business type (one shared change: work item BT0, cross-BRD decision D1).**
+- The account change is the one designed by Submitted Policies in the account owner's range, `V822__account_business_type.sql`. It is the prerequisite work item BT0 of `BDOI_CROSS_BRD_DECISIONS.md`, built once by the first of Submitted Policies S0, Renewal R0 or Employee Benefits E0 to start. It covers:
   - `acc_account.business_type` (NEW_BUSINESS / RENEWAL, default NEW_BUSINESS);
   - `renewal_of_ref` varchar(40);
   - `NewAccount.renewal(...)` and `Account.getBusinessType()`;
-  - booking's `InvoiceBuilder` (line 129) reads the account's business type instead of the constant NEW_BUSINESS.
-- Employee Benefits' variant (column in V1031 and a required `businessType` on `NewAccount`) is to be folded into V822 as well. Renewal proposes **no third variant**.
+  - booking's `InvoiceBuilder` (line 129) reads the account's business type instead of the constant NEW_BUSINESS, and `InvoiceBooked` carries `businessType`;
+  - the Business Type filter of the NB reports.
+- Employee Benefits' variant (column in V1031 and a required `businessType` on `NewAccount`) is dropped; EB uses V822 (EMPLOYEE_BENEFITS_DESIGN section 11). Renewal proposes **no third variant**.
 - For BIBS policies, `renewal_of_ref` holds the expiring **ARN**; for submitted policies it holds the SBM number. The candidate's `renewal_ref` and `renewal_arn` stay on `rnw_candidate`, not on the account.
-- Renewal needs two small additions to that shared change. They are asked of the account owner and are not a separate migration:
+- Renewal needs two small additions to that shared change. They are part of the BT0 scope (no separate migration):
   - an overload `NewAccount.renewal(..., Integer productVersionNo)`, so a renew-as-is keeps the expiring package version (PQ11);
   - `AccountPricing` rating with `RatingQuery.Purpose.RENEWAL` when the business type is RENEWAL.
 
@@ -130,6 +132,7 @@ Ports of other modules that `renewal` implements or calls:
   - the CLAIMS check and the decision matrix;
   - the Account History tab.
 - `renewal` depends on `brokerclaims` and never the reverse. If `brokerclaims` is not yet merged when R1 is built, the check looks the bean up with `ObjectProvider` and reports INFO "claims not connected".
+- The claims part of the Account History tab waits for the Claims build (wave CL1-B, which delivers `ClaimExperienceQueryService`); until then the tab shows "claims not connected" (decision D4).
 - A **total-loss indicator** is not defined by the Claims BRD (CLQ28). The non-renewal reason "Total Loss Claim" (BRD 2.004.4.5) stays a manual reason, and the matrix condition TOTAL_LOSS is parked until CLQ28 is answered.
 
 ## 3. Flyway allocation
@@ -482,7 +485,7 @@ Each handler validates the renewal ref (BRRN.022). Unmatched rows are kept as EX
 | Mail recipient policy (approved domains, TLS) | BRRN.010 negative 6 | `RecipientPolicy` port in `renewal` with a permissive default; TLS is the SMTP relay configuration | RQ16 |
 | Password convention | BRRN.010, 3.009.5 | `DocumentPasswordPolicy` (messaging), generated passwords | Q07 |
 | BDO CIF KYC data | BRRN.028 | BIBS KYC review date only | Q16, RQ22 |
-| BDO SSO | BRD x.001 | Platform JWT login | Q42 |
+| BDO SSO / Windows ID | BRD x.001 | Q42 answered by BRD-11: directory sign-in is required and is built as the parked `security` port `DirectoryAuthenticator` (USER_ACCESS_DESIGN section 10); local sign-in stays until BDO supplies the interface | UQ04 |
 
 ## 11. Reports (`ReportDefinition`, category "Renewal", package `renewal.report`)
 
@@ -564,7 +567,7 @@ Prerequisites: the BRD-1 modules and Product Maintenance P1-A (RENEWAL purpose) 
 
 | Wave | Agent | Scope | Files owned | Exit criteria |
 |---|---|---|---|---|
-| **R0** (1 agent) | Renewal foundation and contracts | Prerequisite: the shared account / booking business-type change V822 is merged (account owner). Permissions and roles; V1010 / V1011; the fast-track transition, the RENEWAL rating addition, `QueueSource.RENEWAL`, the quotation and nonpackage `renewalRef` (section 13); `report` `CODE_SET`; `GridTable`, `MultiSelectFilter`; `renewal` package skeleton (package-info and `renewal.service.port` interfaces only; the domain belongs to R1-A); `features/renewal/module.ts` with a stub Home and `help.ts`; crons in `application.yml`; demo V1910 | `security/domain/Permission.java`; `account/service/AccountService.java` (`fastTrackRenewal`), `account/service/AccountPricing.java` (only if the shared change did not include the RENEWAL purpose); `booking/domain/QueueSource.java`; `quotation/service/QuotationService.java` + DTO; `nonpackage/service/*Proposal*Service.java` + DTO; `report/core/ParameterSpec*`; `frontend/src/components/ui/GridTable.tsx`, `frontend/src/components/broking/MultiSelectFilter.tsx`; `navigation/modules.ts`, `features/help/helpContent.ts`; `db/migration/V1010`, `V1011`; `db/demo/V1910`; `application.yml`, `docs/operations/CONFIGURATION.md` | Existing NB tests green; a RENEWAL account books with business type RENEWAL; `mvn verify`, `npm run verify` green |
+| **R0** (1 agent) | Renewal foundation and contracts | Prerequisite: the shared account / booking business-type change V822 (work item BT0) is merged; if Renewal is the first of Submitted Policies, Renewal and Employee Benefits to start, R0 builds BT0 first, as one commit agreed with the account and booking owners. Permissions and roles; V1010 / V1011; the fast-track transition, the RENEWAL rating addition, `QueueSource.RENEWAL`, the quotation and nonpackage `renewalRef` (section 13); `report` `CODE_SET`; `GridTable`, `MultiSelectFilter`; `renewal` package skeleton (package-info and `renewal.service.port` interfaces only; the domain belongs to R1-A); `features/renewal/module.ts` with a stub Home and `help.ts`; crons in `application.yml`; demo V1910 | `security/domain/Permission.java`; `account/service/AccountService.java` (`fastTrackRenewal`), `account/service/AccountPricing.java` (only if the shared change did not include the RENEWAL purpose); `booking/domain/QueueSource.java`; `quotation/service/QuotationService.java` + DTO; `nonpackage/service/*Proposal*Service.java` + DTO; `report/core/ParameterSpec*`; `frontend/src/components/ui/GridTable.tsx`, `frontend/src/components/broking/MultiSelectFilter.tsx`; `navigation/modules.ts`, `features/help/helpContent.ts`; `db/migration/V1010`, `V1011`; `db/demo/V1910`; `application.yml`, `docs/operations/CONFIGURATION.md` | Existing NB tests green; a RENEWAL account books with business type RENEWAL; `mvn verify`, `npm run verify` green |
 | **R1-A** | Candidates, checks, buckets, matrix | Extraction job and on-demand extraction; `RenewalCheckEngine` and the section 8 checks; bucket rules; decision matrix; initiation; re-evaluation listeners; non-renewable risk codes; Setup screens; Expiry List grid; record page tabs Details / Checks / History; RNW-EXPIRY-LIST, RNW-SANITATION | `renewal/{candidate,extraction,check,rules,setup}/**`, `renewal/report/{ExpiryList,Sanitation}Report.java`, `V1012`, `V1013`, `features/renewal/{expiry,setup,record}/**` | Demo extraction creates candidates; a FAIL never gives CLEAN; the matrix AUTO path disposes a clean candidate |
 | **R1-B** | Marketing: assignment, transfer, disposition, review, NB path | Assignment / re-assignment, transfers, disposition with reasons and history gate, remarks, TL review / return / post, overrides, NB path (quotation / PRF creation with `renewalRef`), client 360 tab, My Dispositions, TL Review, Transfers screens, RNW-DECISIONS | `renewal/{assignment,transfer,disposition,review,nbpath,client}/**`, `renewal/report/DecisionLogReport.java`, `V1014`, `features/renewal/{mine,review,transfers}/**` | Assign -> dispose -> return -> post; NB path creates a quotation whose account is RENEWAL |
 | **R1-C** | Processing, insurer, LAMD | Processing worklist and PO assignment; renewal account creation (`AccountService.createDraft(NewAccount.renewal(...))`) at FOR_PROCESSING; computations tab; dispositioned-file upload with scope (3.004.4); insurer batches (xlsx, protected send) and response upload with matching and progression; LAMD upload and routing; Insurer / LAMD screens; RNW-INSURER-EXTRACT, RNW-LAMD-MATCH | `renewal/{processing,insurer,lamd,upload}/**`, `renewal/report/{InsurerExtract,LamdMatch}Report.java`, `V1015`, `features/renewal/{processing,insurer,lamd}/**` | Insurer Renew As Is moves to RA_READY; mismatch -> EXCEPTION; paid-off PN -> Not for Renewal |
@@ -602,4 +605,4 @@ Rules for parallel work:
 5. **Online vs offline disposition** (BRRN.018). Mitigation: both paths write the same `rnw_disposition` with the source recorded. The 3.004.4 "not in file" tag needs a declared scope.
 6. **Claims module timing** (`brokerclaims`). Mitigation: the check reports INFO "claims not connected" while the bean is absent, and the matrix can treat "unknown claims" as MANUAL.
 7. **Legacy policies at go-live** (EBIX / QPS). Mitigation: a legacy upload; renewals of legacy policies take the NB path until they are booked once in BIBS.
-8. **Two renewal paths for submitted policies** (default hand-off vs Renewal). Mitigation: one implementation of `RenewalHandOff` at a time (`@ConditionalOnMissingBean`), one letter engine, candidate idempotent on the SBM number.
+8. **Two renewal paths for submitted policies** (default hand-off vs Renewal). Settled: the default hand-off of `submitted` only records PENDING hand-offs, Renewal implements `RenewalHandOff` (`@ConditionalOnMissingBean`), one letter engine, candidate idempotent on the SBM number. Remaining risk: PENDING hand-offs wait if R3 is late; build R3 right after Submitted Policies S1-D.

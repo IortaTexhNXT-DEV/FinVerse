@@ -301,7 +301,7 @@ build the external interface itself.
 | Insurer channels (SFTP / API) | Q06 | `placement` sends by e-mail; `cat_insurer.placement_channel` accepts only EMAIL (`PLACEMENT_CHANNEL_PARKED`) |
 | Shared mailbox reading (requests, e-policies) | Q12, Q31 | manual upload with the e-mail attached |
 | OCR / data extraction from documents | Q24 | `issuance` extraction port with a manual review screen |
-| BDO SSO / Active Directory | Q42 | existing JWT login |
+| BDO SSO / Active Directory | Q42 (answered by BRD-11: directory sign-in required) | existing JWT login. Planned (USER_ACCESS_DESIGN section 10): `security` port `DirectoryAuthenticator` with `AUTH_MODE` LOCAL / DIRECTORY and the Windows ID on the user; the BDO EUA / LDAP / SSO adapter stays parked until BDO supplies the interface (UQ04), so local sign-in stays |
 | Product matrix content | Q01, Q02 | minimum-field, document and TSU rule tables configurable (`catalog`); seeds are defaults |
 | Incentive rules | Q33 | `bkg_incentive_rule` table and setup screen; empty in production, one demo rule (V988). A match sets the incentive flag on the invoice |
 | Real GL accounts of the booking event | OQ07 | event type `BROKER_BOOKING` and its components in V870; the rule lines and GL accounts 1210 / 1220 / 2210 / 2220 / 2221 / 4101 exist only in the demo data (V988). Production configures them in Accounting Rules |
@@ -309,7 +309,7 @@ build the external interface itself.
 | BDO KYC standard fields | Q16 | configurable KYC checklist |
 | Data ownership register | Q37 | not started |
 | Dynamic report builder | Q40 | saved report variants only |
-| Override requests (Renewal) | OOS-1 | not built |
+| Override requests (Renewal) | OOS-1 (answered by BRD-6) | not built in BRD-1. Planned in the `renewal` module (RENEWAL_DESIGN): TL override of the outstanding balance and authorised override of a bucket or disposition with mandatory remarks (`RNW_OVERRIDE`, `rnw_override`); no approval request |
 | KYC review frequency by risk rating | Q21 | parameters `KYC_REVIEW_MONTHS`, `KYC_REVIEW_MONTHS_HIGH_RISK` |
 | Duplicate keys and precedence | Q17 | hard keys TIN, ID, name + birth date; soft keys e-mail, mobile, corporate name |
 | Client tags / instruction types and enforcement (block or warn) | Q18 | LOVs `CLIENT_TAG`, `INSTRUCTION_TYPE`; banner only (warn) |
@@ -323,7 +323,7 @@ build the external interface itself.
 | Premium tax base | Q43 | `cat_rate` PREMIUM_TAX per line (PROPERTY 12%) |
 | Multi-level Marketing approval of a PRF (TL -> TH -> UH) and of quotations | Q05 | one approval stage per document; the approver permission (`PROPOSAL_APPROVE`, `QUOTE_APPROVE`) decides who approves |
 | "Quotation required" endorsement link | ADJID.008 (Operations BRD) | not built; an endorsement quotation will reuse `QuotationService` once the Adjustment wave defines it |
-| Operations (BRD-2) interfaces: Collection, Disbursement, Marketing, Claims, insurer channels, shared drive, BOOK rate source | OQ01, OQ02, OQ08, OQ17, OQ45, OQ46 | `opsledger` ports with default adapters (manual upload, in-app Disbursement queue, extract repository); see [`docs/modules/OPERATIONS.md`](../modules/OPERATIONS.md) section 1.10 |
+| Operations (BRD-2) interfaces: Collection, Disbursement, Marketing, Claims, insurer channels, shared drive, BOOK rate source | OQ01, OQ02, OQ08, OQ17, OQ45, OQ46 | `opsledger` ports with default adapters (manual upload, in-app Disbursement queue, extract repository); see [`docs/modules/OPERATIONS.md`](../modules/OPERATIONS.md) section 1.10. Claims special remittance (OQ46, partly answered by BRD-7): planned `brokerclaims.InAppClaimsFeed` implementing `ClaimsFeed` (feed `CLAIMS_SPECIAL_REMIT`; CLAIMS_BROKING_DESIGN section 3.1), to be agreed with the remittance owner |
 
 ## 7. CRM (`crm`): clients
 
@@ -1293,7 +1293,7 @@ MASTER_VIEW), `PUT targets?companyId=` (MASTER_MAINTAIN). The reports run throug
 |---|---|---|
 | Dynamic report builder | Q40 | saved report variants only |
 | Sales hierarchy and target values | Q41 | `nbr_sales_target` with demo targets (V989); maintained on Production Targets |
-| Late renewal requests report (BRNB.018) | Q09 | not built; waits for the Renewal BRD |
+| Late renewal requests report (BRNB.018) | Q09 (still open after BRD-6) | not built. The Renewal BRD has no such report; proposal: a variant of the Renewal listing `RNW-LISTING` (renewal booked after expiry) once BDOI confirms (RQ29) |
 
 Demo (V989): the demo company becomes "BDOI Demo Insurance Brokers, Inc." (code FVI kept), monthly
 2026 targets for every unit of the V982 sales organisation and a shared variant "SLA breaches - all

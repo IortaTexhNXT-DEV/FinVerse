@@ -193,6 +193,19 @@ Extension points read by the foundation (any number of beans):
   handler accepts uploads. Inside the handler, call `context.accept(idempotencyKey, payload, work)`
   once per record. A key that was already accepted is skipped as a duplicate.
 
+**Planned consumers from later BRDs** (designed, not built; every item is **to be agreed with the Operations owner**,
+and no contract above changes until it is; see `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md`):
+- **Claims** (`brokerclaims`, BRD-7) implements `ClaimsFeed` with `InAppClaimsFeed`, feed `CLAIMS_SPECIAL_REMIT`
+  (CLAIMS_BROKING_DESIGN section 3.1). `SpecialRemittanceService.claimsNote` would then refuse a CLAIMS-condition
+  request without an eligible claim, where today it only adds a note (section 3.5).
+- **Submitted Policies** (`submitted`, BRD-12) needs `UnappliedDispositionRequests.Action.RECOGNIZE_INCOME` with an
+  income type (`DispositionRequest.incomeType`) and the cashiering disposition type HANDLING_FEE
+  (SUBMITTED_POLICIES_DESIGN section 9).
+- **Renewal** (`renewal`, BRD-6) needs a business-type column on `ops_invoice`, copied from `InvoiceBooked` by
+  `InvoiceLedgerFeed` (RENEWAL_DESIGN section 13; ACSL "account status Renewal" needs it too).
+- **Customer Servicing Facility** (`csf`, BRD-9) needs `InvoiceLedgerQueryService.paymentsOfClient(companyId,
+  clientCode, from)` (CUSTOMER_SERVICING_DESIGN section 11).
+
 ### 1.4 Payment confirmation to placement (plan for cashiering)
 
 Placement already sweeps confirmed payments through `placement.service.PaymentConfirmationSource`

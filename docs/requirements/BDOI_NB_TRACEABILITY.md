@@ -266,3 +266,34 @@ Parked parts of built or configured requirements:
 | Q41 | Sales hierarchy and target values (demo targets) | BRNB.075 |
 | Q42 | BDO SSO / Active Directory | BRNB.040 |
 | OQ07 | Real GL accounts of the booking event | BRNB.027 |
+
+### Answered by later BRDs
+
+The rows above are unchanged: they describe what is built today. Later BRDs (BRD-6 to BRD-12) answer some of the
+parked items; nothing below is built yet. The answers are in
+[`BDOI_NB_BRD_SPEC.md`](BDOI_NB_BRD_SPEC.md) section 9.1 and, with the design impact, in
+[`BDOI_CROSS_BRD_DECISIONS.md`](BDOI_CROSS_BRD_DECISIONS.md).
+
+| ID | Question | Status | Answering BRD and ID | Effect on this row (planned, not built) |
+|---|---|---|---|---|
+| BRNB.040 | Q42 | answered | BRD-11 UAM (UAM-NFR-11, 17, 33) | Directory sign-in required; `DirectoryAuthenticator` port with LOCAL default (USER_ACCESS_DESIGN); the EUA adapter stays parked (UQ04) |
+| OOS-1 | - | answered | BRD-6 RN (1.011.1, BRRN.023/031/035) | Stays out of BRD-1; delivered by the Renewal module (`RNW_OVERRIDE`, `rnw_override`) |
+| BRNB.097 | - | answered | BRD-6 RN (BRRN.033), BRD-8 EB (BRID-022.01), BRD-12 SP (BRIDSP-27) | Work item BT0: the booked invoice takes the account's business type instead of the constant NEW_BUSINESS (V822) |
+| BRNB.018 | Q09 | open | BRD-6 RN (RQ29) | Still parked; candidate variant of `RNW-LISTING` |
+| BRNB.023 | Q11 | partial | BRD-12 SP (p.4-5) | Source list named; layouts and transport still open |
+| BRNB.092 | Q37 | partial | BRD-7 CLM (BRCLM.007), BRD-9 CSF (p.3) | Policy number owned by the account / issuance; client contacts owned by QPS / EBIX during coexistence |
+| BRNB.064 | Q14 | partial | BRD-6 RN (BRRN.020), BRD-12 SP (Report List #151) | Criteria for renewal and submitted-policy lists; the NB bulk sanitiser is unchanged |
+| BRNB.091 | Q18 | partial | BRD-10 SANC (SNSRP-302/303) | Screening sets `PEP` / `WATCHLIST_REVIEW`; warn only stays |
+| BRNB.110 | Q21 | partial | BRD-6 RN (BRRN.028), BRD-10 SANC (SNSRP-303) | KYC due is information only in Renewal; high-risk / PEP clients get a screening case |
+| BRNB.026 | Q23 | partial | BRD-8 EB, BRD-9 CSF (BRCSF-007), BRD-10 SANC (SNSRP-601) | More file types (CSF); a second, named naming pattern for screening documents |
+| BRNB.104 | Q24 | partial | BRD-12 SP (BRIDSP-02) | Second extraction document kind; OCR still a parked port |
+| BRNB.072 | Q27 | partial | BRD-6 RN, BRD-12 SP (BRIDSP-24/32) | Hold-cover re-assignment and unbooked alert (Submitted Policies); expiry handling still open |
+| BRNB.067 | Q28 | partial | BRD-12 SP (Report List #65-67) | Three CLPC billing variants; transport still open |
+| BRNB.113 | Q36 | partial | BRD-12 SP (BRIDSP-13) | FFY-specific RA template at renewal; payer still open |
+| BRNB.106 | Q39 | partial | BRD-7, BRD-8, BRD-9, BRD-10 | Retention values for claims, EB, CSF and screening records |
+| BRNB.057 | Q40 | partial | BRD-8 EB (BRID-022 AC9), BRD-12 SP (Report List #74) | Saved variants and column filters confirmed as enough |
+| BRNB.008, 071 | Q06 | partial | BRD-8 EB (BRID-005) | Insurer portal for EB |
+| BRNB.013, 035 | Q07 | partial | BRD-8 EB (BRID-007) | Both password modes confirmed; convention still missing |
+| BRNB.015 | Q08 | partial | BRD-9 CSF (p.3) | Contact updates to QPS / EBIX through an outbox port |
+| BRNB.073 | Q31 | partial | BRD-8 EB (BRID-005.01) | EB policy forms uploaded by insurers through the portal |
+| BRNB.085 | - | extended | BRD-11 UAM (sections A-B) | Request lifecycle with drafts, return, cancel, chosen approver and bulk (`nbadmin`) |

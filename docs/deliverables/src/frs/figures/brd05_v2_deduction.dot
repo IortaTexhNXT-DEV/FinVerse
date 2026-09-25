@@ -1,0 +1,19 @@
+// BRD-5 Volume 2: workflow REM_DEDUCTION (V890; remittance DeductionService). FRS section 5.8.
+digraph v2_ded {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.55, ranksep=0.5, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.2, height=0.55];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  DR [label="DRAFT\nACSL processor"];
+  FC [label="FOR_CONFIRMATION\nACSL TL"];
+  CF [label="CONFIRMED\nconsumed by batches"];
+  AP [label="APPLIED\ninsurer ORs received", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  CA [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  DR -> FC [label=" submit with\n confirmation"];
+  FC -> CF [label=" confirm"];
+  FC -> DR [label=" return", style=dashed];
+  CF -> AP [label=" apply", style=dotted];
+  DR -> CA [label=" cancel"];
+  { rank=same; AP; CA; }
+}

@@ -70,7 +70,8 @@ class UserAdminApiIT {
     api.doPut("admin", "/api/v1/admin/users/" + id, user(username, List.of("NO_SUCH_ROLE")))
         .andExpect(jsonPath("$.code").value("UNKNOWN_ROLE"));
 
-    for (int i = 0; i < 5; i++) {
+    // LOGIN_MAX_FAILED_ATTEMPTS = 3 (BDOI NFR, V1000): the third failure locks the account.
+    for (int i = 0; i < 3; i++) {
       login(username, "wrong-password", 401);
     }
     login(username, STRONG, 401);

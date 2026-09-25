@@ -25,7 +25,11 @@ const TABS: readonly { id: DisbursementStatus; label: string }[] = [
   { id: 'DV_ASSIGNED', label: 'DV Assigned' },
   { id: 'PAID', label: 'Paid' },
   { id: 'RETURNED', label: 'Returned' },
+  { id: 'CANCELLED', label: 'Cancelled' },
 ];
+
+/** Statuses after which the queue offers no action (paid, returned, cancelled by Disbursement). */
+const CLOSED: readonly DisbursementStatus[] = ['PAID', 'RETURNED', 'CANCELLED'];
 
 type DialogKind = 'dv' | 'return';
 
@@ -112,7 +116,7 @@ function actionsOf(
           Mark Paid
         </Button>
       )}
-      {r.status !== 'PAID' && r.status !== 'RETURNED' && (
+      {!CLOSED.includes(r.status) && (
         <Button size="sm" variant="ghost" onClick={() => on.dialog(r, 'return')}>
           Return
         </Button>

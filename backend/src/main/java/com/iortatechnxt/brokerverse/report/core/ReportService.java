@@ -6,12 +6,14 @@ import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.organization.domain.BranchRepository;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
+import com.iortatechnxt.brokerverse.report.domain.ReportRun;
 import com.iortatechnxt.brokerverse.report.domain.ReportRun.RunFile;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.report.render.ReportContext;
 import com.iortatechnxt.brokerverse.report.render.ReportRenderer;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
+import java.time.Instant;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -117,12 +119,7 @@ public class ReportService {
     ReportParameters params =
         ReportParameters.validate(def.metadata(), rawParams, clock, this::displayValue);
     ReportResult result = def.generate(params);
-    ReportContext ctx =
-        new ReportContext(
-            companyName(params),
-            currentUser.username(),
-            clock.instant(),
-            parameters.text(SystemParameterService.REPORT_FOOTER_TEXT, ""));
+    ReportContext ctx = context(params);
     byte[] content = renderers.get(format).render(result, ctx);
     audit.record(
         "Report",
@@ -136,6 +133,37 @@ public class ReportService {
         result,
         new RunFile(format.name(), fileName, format.contentType(), content));
     return new RenderedReport(fileName, format.contentType(), content);
+  }
+
+  /**
+   * Runs, renders and archives a report as a scheduled file (BRCLXN.024-029, 045): no user
+   * permission check (the caller is a {@code ManagedJob}); the file may be downloaded from {@code
+   * availableFrom} on through the report archive.
+   *
+   * @param code report code
+   * @param rawParams raw parameters
+   * @param format file format
+   * @param availableFrom when users may download it; null = at once
+   * @return the archived run
+   */
+  @Transactional
+  public ReportRun generate(
+      String code, Map<String, String> rawParams, ExportFormat format, Instant availableFrom) {
+    ReportDefinition def = registry.get(code);
+    ReportParameters params =
+        ReportParameters.validate(def.metadata(), rawParams, clock, this::displayValue);
+    ReportResult result = def.generate(params);
+    ReportContext ctx = context(params);
+    return archive.archiveGenerated(
+        code,
+        params.echo(),
+        result.rows().size(),
+        new RunFile(
+            format.name(),
+            code + "." + format.extension(),
+            format.contentType(),
+            renderers.get(format).render(result, ctx)),
+        availableFrom);
   }
 
   /**
@@ -156,6 +184,14 @@ public class ReportService {
               .orElse(value);
       default -> value;
     };
+  }
+
+  private ReportContext context(ReportParameters params) {
+    return new ReportContext(
+        companyName(params),
+        currentUser.username(),
+        clock.instant(),
+        parameters.text(SystemParameterService.REPORT_FOOTER_TEXT, ""));
   }
 
   private String companyName(ReportParameters params) {

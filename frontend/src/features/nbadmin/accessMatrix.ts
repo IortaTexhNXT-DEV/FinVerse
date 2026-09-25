@@ -11,6 +11,10 @@ const AREA_LABELS: Record<string, string> = {
   NON_PACKAGE: 'Non-Package / TSU',
   PRODUCTION_RECON: 'Production Reconciliation',
   BROKING_ADMIN: 'Broking Administration',
+  COLLECTIONS: 'Collections',
+  DISBURSEMENT: 'Disbursement',
+  PAYMENT_REQUESTS: 'Refund & Cash Advance Requests',
+  ACSL: 'ACSL',
   [UNCLASSIFIED]: 'Other (not classified)',
 };
 

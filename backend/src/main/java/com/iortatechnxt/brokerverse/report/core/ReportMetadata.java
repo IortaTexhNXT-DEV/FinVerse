@@ -79,4 +79,96 @@ public record ReportMetadata(
         Permission.OPS_REPORT_EXPORT,
         true);
   }
+
+  /**
+   * A Collections report (COLLECTIONS_DESIGN section 11): viewed with {@code CLX_REPORT_VIEW},
+   * exported with {@code CLX_EXPORT} (caveat p.93), archived.
+   *
+   * @param code report code (e.g. {@code CLX-OUTSTANDING-PR})
+   * @param title title
+   * @param description one line purpose
+   * @param parameters parameters
+   * @return metadata in the Collections category
+   */
+  public static ReportMetadata collections(
+      String code, String title, String description, List<ParameterSpec> parameters) {
+    return new ReportMetadata(
+        code,
+        title,
+        ReportCategory.COLLECTIONS,
+        description,
+        parameters,
+        Permission.CLX_REPORT_VIEW,
+        Permission.CLX_EXPORT,
+        true);
+  }
+
+  /**
+   * A Disbursement report (ACCOUNTING_DISBURSEMENT_DESIGN section 10, Appendix B): viewed with
+   * {@code DISB_REPORT_VIEW}, exported with {@code DISB_REPORT_EXPORT}, archived.
+   *
+   * @param code report code (e.g. {@code DSB-MASTERLIST})
+   * @param title title
+   * @param description one line purpose
+   * @param parameters parameters
+   * @return metadata in the Disbursement category
+   */
+  public static ReportMetadata disbursement(
+      String code, String title, String description, List<ParameterSpec> parameters) {
+    return new ReportMetadata(
+        code,
+        title,
+        ReportCategory.DISBURSEMENT,
+        description,
+        parameters,
+        Permission.DISB_REPORT_VIEW,
+        Permission.DISB_REPORT_EXPORT,
+        true);
+  }
+
+  /**
+   * An ACSL report (ACCOUNTING_DISBURSEMENT_DESIGN section 10, Appendix C): viewed with {@code
+   * ACSL_REPORT_VIEW}, exported with {@code ACSL_REPORT_EXPORT}, archived.
+   *
+   * @param code report code (e.g. {@code ACSL-SOA-RECON})
+   * @param title title
+   * @param description one line purpose
+   * @param parameters parameters
+   * @return metadata in the ACSL category
+   */
+  public static ReportMetadata acsl(
+      String code, String title, String description, List<ParameterSpec> parameters) {
+    return new ReportMetadata(
+        code,
+        title,
+        ReportCategory.ACSL,
+        description,
+        parameters,
+        Permission.ACSL_REPORT_VIEW,
+        Permission.ACSL_REPORT_EXPORT,
+        true);
+  }
+
+  /**
+   * A report of the BDOI report pack (ACCOUNTING_DISBURSEMENT_DESIGN section 10, Appendix A):
+   * viewed with {@code FRBS_REPORT_VIEW}, exported with {@code FRBS_REPORT_EXPORT}, archived.
+   *
+   * @param code report code (e.g. {@code FRBS-MANCOM-MARKET})
+   * @param title title
+   * @param description one line purpose
+   * @param parameters parameters
+   * @return metadata in the BDOI report pack category
+   */
+  public static ReportMetadata frbs(
+      String code, String title, String description, List<ParameterSpec> parameters) {
+    return new ReportMetadata(
+        code,
+        title,
+        ReportCategory.FRBS,
+        description,
+        parameters,
+        Permission.FRBS_REPORT_VIEW,
+        Permission.FRBS_REPORT_EXPORT,
+        true);
+  }
 }

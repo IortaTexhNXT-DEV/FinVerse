@@ -39,6 +39,12 @@ public final class QueueDtos {
    * @param returnedAt returned
    * @param returnReason return reason
    * @param sentBy sender
+   * @param rfpNo request-for-payment number (DIS 3.25.0)
+   * @param rootInvoiceNo root invoice of the family (DIS 3.27.2)
+   * @param dvStatus DV stage reported by Disbursement
+   * @param instrumentStatus instrument status reported by Disbursement
+   * @param cancelledAt cancelled (DIS 2.20.0)
+   * @param cancelReason cancellation reason
    */
   public record DisbursementResponse(
       Long id,
@@ -59,7 +65,13 @@ public final class QueueDtos {
       Instant paidAt,
       Instant returnedAt,
       String returnReason,
-      String sentBy) {
+      String sentBy,
+      String rfpNo,
+      String rootInvoiceNo,
+      String dvStatus,
+      String instrumentStatus,
+      Instant cancelledAt,
+      String cancelReason) {
 
     /**
      * Maps a request.
@@ -87,7 +99,13 @@ public final class QueueDtos {
           r.getPaidAt(),
           r.getReturnedAt(),
           r.getReturnReason(),
-          r.getCreatedBy());
+          r.getCreatedBy(),
+          r.getRfpNo(),
+          r.getRootInvoiceNo(),
+          r.getDvStatus(),
+          r.getInstrumentStatus(),
+          r.getCancelledAt(),
+          r.getCancelReason());
     }
   }
 

@@ -30,6 +30,8 @@ public record OpsInvoiceData(
    * @param kind booking, endorsement plus / minus or cancellation
    * @param endorsementNo endorsement number, null for an original booking
    * @param parentInvoiceNo original invoice of an endorsement or cancellation
+   * @param rootInvoiceNo root of the invoice family: the invoice itself for an original booking,
+   *     the root of the parent chain otherwise (DIS 3.27.2, ACSL 2.16.0)
    * @param policyNo policy number
    * @param policyYear policy year
    */
@@ -42,6 +44,7 @@ public record OpsInvoiceData(
       InvoiceKind kind,
       String endorsementNo,
       String parentInvoiceNo,
+      String rootInvoiceNo,
       String policyNo,
       int policyYear) {}
 

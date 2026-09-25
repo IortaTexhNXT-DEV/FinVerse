@@ -206,9 +206,23 @@ class FlowInAndPortsIT {
 
   @Test
   void everyInboundFeedByUploadHasItsHandler() {
+    // Collections serves three COLLECTION_* feeds in-app (V1000); their uploads stay a fallback.
+    assertThat(flowIn.feeds())
+        .filteredOn(f -> f.getTransport() == FlowInEnums.Transport.IN_APP)
+        .extracting(FlowInFeed::getCode)
+        .contains(
+            "COLLECTION_CWT2307",
+            "COLLECTION_DP_LIST",
+            "COLLECTION_CHECK_PICKUP",
+            "COLLECTION_DP_RETURNED",
+            "COLLECTION_REFUND")
+        .doesNotContain("COLLECTION_HOLD", "COLLECTION_SPECIAL_REMIT");
     assertThat(flowIn.feeds())
         .filteredOn(f -> f.getDirection() == FlowInEnums.Direction.INBOUND)
-        .filteredOn(f -> f.getTransport() == FlowInEnums.Transport.MANUAL_UPLOAD)
+        .filteredOn(
+            f ->
+                f.getTransport() == FlowInEnums.Transport.MANUAL_UPLOAD
+                    || f.getCode().startsWith("COLLECTION_"))
         .filteredOn(f -> !f.getCode().equals(TestFlowInHandler.FEED))
         .extracting(FlowInFeed::getCode)
         .containsExactlyInAnyOrder(

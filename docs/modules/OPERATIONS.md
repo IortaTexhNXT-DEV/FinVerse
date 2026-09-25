@@ -169,6 +169,18 @@ module's tests.
 | `MarketingFeed` | `List<FeedItem> fetch(Long companyId, String feedCode, LocalDate since)` | none (optional bean) | Marketing interface (OQ45) |
 | `ClaimsFeed` | same as `MarketingFeed` | none (optional bean) | Claims BRD (OQ46) |
 | `EarlyIncentiveRules` | `Optional<Terms> termsFor(Long companyId, Subject)` | no rule | remittance (`RemittanceEarlyIncentiveRules`, O2) |
+| `UnappliedDirectory` (BRD-4) | `Page<UnappliedView> open(Long companyId, UnappliedFilter, Pageable)`; `Optional<UnappliedView> find(String unappliedRef)`; `List<UnappliedEvent> history(String unappliedRef)` | `EmptyUnappliedDirectory` | cashiering (COLLECTIONS_DESIGN 9) |
+| `UnappliedDispositionRequests` (BRD-4) | `DispositionTicket request(DispositionRequest)`; `Optional<DispositionTicket> status(String source, String sourceRef)` | `HandoffDispositionRequests`: `DEFERRED` + hand-off for team `CASH_DISPOSITION` | cashiering |
+| `RefundValidationSource` (BRD-5) | `String validator()`; `ValidationTicket open(ValidationRequest)`; callers use `RefundValidations.open` | `HandoffRefundValidationSource` (`ANY`): `DEFERRED` + hand-off for `ACSL_PROCESS` / `CASH_DISPOSITION` | acsl (ACSL), cashiering (CASHIERING) |
+| `PaymentReversalRequester` (BRD-5) | `ReversalTicket request(ReversalRequest)` | `HandoffPaymentReversalRequester`: `DEFERRED` + hand-off for `CASH_APPLY` | cashiering |
+| `InvoiceCorrectionSink` (BRD-5) | `CorrectionResult record(CorrectionRequest)` | `LedgerInvoiceCorrectionSink`: signed `CORRECTION` movements | opsledger itself |
+
+`CollectionFeed` also has `default void acknowledge(Long companyId, String feedCode, Collection<String> keys)`
+(no-op for the manual transport; the in-app adapter of Collections marks its outbox rows TAKEN). The
+`DisbursementGateway` request (`DisbursementRequest.Spec`) and the event `DisbursementStatusChanged` carry the BRD-5
+fields (RFP number, payee class, disbursement type, documents, root invoice, accounting references, straight-to-approval,
+DV and instrument statuses) and the status CANCELLED; the BRD-2 constructors are kept
+(ACCOUNTING_DISBURSEMENT_DESIGN section 17).
 
 Extension points read by the foundation (any number of beans):
 - `InvoiceRelatedItems`: `Section section()` and `List<RelatedItem> itemsFor(String invoiceNo)`.
@@ -212,7 +224,11 @@ and records on *Operations → Interfaces*.
 | `RemittanceStatusChanged` | companyId, invoiceNo, from, to, module |
 | `InvoiceLocked` / `InvoiceUnlocked` | companyId, invoiceNo, owner (+ reason) |
 | `NegativeAdjustmentPending` | companyId, invoiceNo, requestNo, pending, requestedBy |
-| `DisbursementStatusChanged` | companyId, requestNo, type, sourceModule, sourceRef, status, dvNo, reason |
+| `DisbursementStatusChanged` | companyId, requestNo, type, sourceModule, sourceRef, status, dvNo, reason, dvStatus, instrumentStatus |
+| `CollectionFeedReady` | companyId, feedCode (published by Collections after commit) |
+| `UnappliedDispositionChanged` | companyId, unappliedRef, source, sourceRef, status (ACCEPTED / REJECTED / APPLIED), cashieringRef, message (published by cashiering) |
+| `RefundValidationCompleted` | companyId, validator, sourceModule, sourceRef, confirmed, newArNo, remarks (published by acsl / cashiering) |
+| `PaymentReversalCompleted` | companyId, sourceModule, sourceRef, approved, reference, remarks (published by cashiering) |
 
 Listen with `@TransactionalEventListener(phase = AFTER_COMMIT)` and do the work in a new
 transaction.

@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.security.api.dto.LoginResponse;
 import com.iortatechnxt.brokerverse.security.api.dto.UserProfileResponse;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,8 +18,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Login with lockout: five consecutive failures lock the account until an administrator unlocks it.
- * Every success and failure is written to the audit trail.
+ * Login with lockout: consecutive failures up to the business parameter {@code
+ * LOGIN_MAX_FAILED_ATTEMPTS} (BDOI NFR: 3; {@code brokerverse.security.max-failed-attempts} when
+ * the parameter is missing) lock the account until an administrator unlocks it. Every success and
+ * failure is written to the audit trail.
  */
 @Service
 public class AuthService {
@@ -30,6 +33,8 @@ public class AuthService {
   private final AppUserRepository users;
   private final JwtTokenService tokens;
   private final AuditTrailService audit;
+  private final SystemParameterService parameters;
+  private final SecurityProperties properties;
   private final Clock clock;
 
   /**
@@ -39,6 +44,8 @@ public class AuthService {
    * @param users user repository
    * @param tokens token service
    * @param audit audit trail
+   * @param parameters business parameters (lockout threshold)
+   * @param properties security settings (default lockout threshold)
    * @param clock clock
    */
   public AuthService(
@@ -46,11 +53,15 @@ public class AuthService {
       AppUserRepository users,
       JwtTokenService tokens,
       AuditTrailService audit,
+      SystemParameterService parameters,
+      SecurityProperties properties,
       Clock clock) {
     this.authenticationManager = authenticationManager;
     this.users = users;
     this.tokens = tokens;
     this.audit = audit;
+    this.parameters = parameters;
+    this.properties = properties;
     this.clock = clock;
   }
 
@@ -80,7 +91,9 @@ public class AuthService {
       authenticationManager.authenticate(
           new UsernamePasswordAuthenticationToken(user.getUsername(), password));
     } catch (AuthenticationException ex) {
-      user.recordFailedLogin();
+      user.recordFailedLogin(
+          parameters.intValue(
+              SystemParameterService.LOGIN_MAX_FAILED_ATTEMPTS, properties.maxFailedAttempts()));
       audit.recordIndependently(
           username,
           ENTITY,

@@ -40,7 +40,21 @@ export type OpsSection =
   | 'DISBURSEMENT'
   | 'INTERFACES';
 export type Severity = 'INFO' | 'WARNING' | 'ALERT';
-export type DisbursementStatus = 'SENT' | 'ACKNOWLEDGED' | 'DV_ASSIGNED' | 'PAID' | 'RETURNED';
+export type DisbursementStatus =
+  'SENT' | 'ACKNOWLEDGED' | 'DV_ASSIGNED' | 'PAID' | 'RETURNED' | 'CANCELLED';
+/** Gateway payment types (opsledger DisbursementRequest.Type; BRD-5 adds the non-Operations ones). */
+export type DisbursementType =
+  | 'REMITTANCE'
+  | 'REFUND'
+  | 'CWT2307'
+  | 'PASS_ON'
+  | 'SUPPLIER'
+  | 'GOVERNMENT'
+  | 'OTHER_BANK_UNIT'
+  | 'EMPLOYEE'
+  | 'CASH_ADVANCE'
+  | 'SERVICE_FEE'
+  | 'OTHER';
 export type RelatedSection =
   'RECEIPTS' | 'REMITTANCES' | 'ADJUSTMENTS' | 'RECONCILIATION' | 'COMMISSION' | 'DOCUMENTS';
 
@@ -96,6 +110,8 @@ export interface OpsInvoice {
     kind: string;
     endorsementNo?: string;
     parentInvoiceNo?: string;
+    /** Root of the invoice family (DIS 3.27.2). */
+    rootInvoiceNo?: string;
     policyNo?: string;
     policyYear: number;
     pnNos?: string;
@@ -212,7 +228,7 @@ export interface InvoiceSearch {
 export interface Disbursement {
   id: number;
   requestNo: string;
-  type: 'REMITTANCE' | 'REFUND' | 'CWT2307' | 'PASS_ON';
+  type: DisbursementType;
   sourceModule: string;
   sourceRef: string;
   payeeCode: string;
@@ -229,6 +245,12 @@ export interface Disbursement {
   returnedAt?: string;
   returnReason?: string;
   sentBy: string;
+  rfpNo?: string;
+  rootInvoiceNo?: string;
+  dvStatus?: string;
+  instrumentStatus?: string;
+  cancelledAt?: string;
+  cancelReason?: string;
 }
 
 export interface Feed {
@@ -315,13 +337,15 @@ export interface ReportRun {
   title: string;
   category: string;
   parameters?: string;
-  action: 'VIEW' | 'EXPORT';
+  action: 'VIEW' | 'EXPORT' | 'GENERATE';
   format?: string;
   rowCount: number;
   fileName?: string;
   sizeBytes?: number;
   createdBy: string;
   createdAt: string;
+  /** When a generated file may be downloaded (scheduled files). */
+  availableFrom?: string;
 }
 
 const enc = encodeURIComponent;
@@ -335,6 +359,8 @@ export const opsApi = {
     ),
   invoice: (invoiceNo: string) => api.get<Invoice360>(`/ops/invoices/${enc(invoiceNo)}`),
   accountInvoices: (arn: string) => api.get<OpsInvoice[]>(`/ops/accounts/${enc(arn)}/invoices`),
+  /** Every invoice sharing the root invoice number of an invoice (DIS 3.27.2), root first. */
+  family: (invoiceNo: string) => api.get<OpsInvoice[]>(`/ops/invoices/${enc(invoiceNo)}/family`),
   replay: (body: { companyId?: number; arn?: string; invoiceNo?: string }) =>
     api.post<FeedRun>('/ops/invoices/replay', body),
   disbursements: (companyId: number, status?: DisbursementStatus, page = 0) =>

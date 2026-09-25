@@ -1,4 +1,5 @@
 import { accountingEngineModule } from '@/features/accounting-engine/module';
+import { acslModule } from '@/features/acsl/module';
 import { accountsModule } from '@/features/accounts/module';
 import { adjustmentModule } from '@/features/adjustment/module';
 import { adminModule } from '@/features/admin/module';
@@ -10,12 +11,15 @@ import { bookingModule } from '@/features/booking/module';
 import { bulkModule } from '@/features/bulk/module';
 import { assetsModule } from '@/features/assets/module';
 import { claimsModule } from '@/features/claims/module';
+import { collectionsModule } from '@/features/collections/module';
 import { commissionModule } from '@/features/commission/module';
 import { crmModule } from '@/features/crm/module';
 import { proposalsModule } from '@/features/proposals/module';
 import { quotationsModule } from '@/features/quotations/module';
 import { planningModule } from '@/features/closing/module';
 import { dashboardModule } from '@/features/dashboard/module';
+import { disbursementModule } from '@/features/disbursement/module';
+import { frbsModule } from '@/features/frbs/module';
 import { glModule } from '@/features/gl/module';
 import { helpModule } from '@/features/help/module';
 import { issuanceModule } from '@/features/issuance/module';
@@ -23,6 +27,7 @@ import { nbDashboardModule, nbReportsModule } from '@/features/nbreports/module'
 import { operationsModule } from '@/features/operations/module';
 import { withJournalAutomation } from '@/features/journaltools/module';
 import { payablesModule } from '@/features/payables/module';
+import { payRequestModule } from '@/features/payrequest/module';
 import { placementModule } from '@/features/placement/module';
 import { prodreconModule } from '@/features/prodrecon/module';
 import { withPackageRequests } from '@/features/productmaint/module';
@@ -76,10 +81,17 @@ export const NAV_GROUPS: NavGroup[] = [
     id: 'finance',
     title: 'Finance',
     modules: [
-      // Operations cash modules first (BDOI prototype placement).
+      // Collections (BRD-4) first, before the Operations cash modules (COLLECTIONS_DESIGN 11).
+      collectionsModule,
+      // Operations cash modules (BDOI prototype placement).
       cashieringModule,
       remittanceModule,
       commissionModule,
+      // Accounting, Disbursement and ACSL (BRD-5), ACCOUNTING_DISBURSEMENT_DESIGN section 11.
+      disbursementModule,
+      payRequestModule,
+      acslModule,
+      frbsModule,
       withJournalAutomation(glModule),
       receivablesModule,
       payablesModule,

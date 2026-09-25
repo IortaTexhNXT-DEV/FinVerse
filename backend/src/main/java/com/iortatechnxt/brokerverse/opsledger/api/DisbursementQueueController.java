@@ -120,4 +120,17 @@ public class DisbursementQueueController {
       @PathVariable Long id, @Valid @RequestBody ReasonRequest request) {
     return DisbursementResponse.from(queue.returnToSource(id, request.reason()));
   }
+
+  /**
+   * Cancels a request or its approved DV (DIS 2.20.0).
+   *
+   * @param id request
+   * @param request reason
+   * @return request
+   */
+  @PostMapping("/{id}/cancel")
+  public DisbursementResponse cancel(
+      @PathVariable Long id, @Valid @RequestBody ReasonRequest request) {
+    return DisbursementResponse.from(queue.cancel(id, request.reason()));
+  }
 }

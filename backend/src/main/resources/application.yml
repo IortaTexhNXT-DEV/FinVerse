@@ -67,6 +67,8 @@ brokerverse:
     jwt-secret: ${BROKERVERSE_JWT_SECRET:local-development-secret-change-me-0123456789}
     token-validity: ${BROKERVERSE_TOKEN_VALIDITY:PT8H}
     allowed-origins: ${BROKERVERSE_ALLOWED_ORIGINS:http://localhost:5173}
+    # Failed logins that lock an account when the business parameter LOGIN_MAX_FAILED_ATTEMPTS is missing.
+    max-failed-attempts: ${BROKERVERSE_MAX_FAILED_ATTEMPTS:5}
   attachments:
     max-size: ${BROKERVERSE_ATTACHMENT_MAX_SIZE:10MB}
   mail:
@@ -127,6 +129,37 @@ brokerverse:
     # Package expiry monitor (BRPM.006/017): supersedes / expires package versions, raises
     # PACKAGE_EXPIRING and drafts renewal requests; daily 17:00 UTC = 01:00 PHT.
     package-expiry-cron: ${BROKERVERSE_JOB_PACKAGE_EXPIRY_CRON:0 0 17 * * *}
+    # ---- Collections (BRD-4), docs/architecture/COLLECTIONS_DESIGN.md section 8 (PHT = UTC+8) ----
+    # Incremental worklist refresh from the invoice ledger after the 22:00 PHT EOD (BRCLXN.001-015, 052, 053).
+    clx-daily-refresh-cron: ${BROKERVERSE_JOB_CLX_DAILY_REFRESH_CRON:0 15 14 * * *}
+    # Promises due yesterday or earlier evaluated (BRCLXN.055), 22:45 PHT.
+    clx-promise-check-cron: ${BROKERVERSE_JOB_CLX_PROMISE_CHECK_CRON:0 45 14 * * *}
+    # Escalation rules applied, one case per account, rule and period (BRCLXN.049), 23:00 PHT.
+    clx-escalation-cron: ${BROKERVERSE_JOB_CLX_ESCALATION_CRON:0 0 15 * * *}
+    # Outstanding PR list and full production report (BRCLXN.045), 22:30 PHT.
+    clx-daily-files-cron: ${BROKERVERSE_JOB_CLX_DAILY_FILES_CRON:0 30 14 * * *}
+    # "For application to invoice" text file of the previous day (BRCLXN.041/042), 05:00 PHT.
+    clx-application-file-cron: ${BROKERVERSE_JOB_CLX_APPLICATION_FILE_CRON:0 0 21 * * *}
+    # Weekly DP PR / PR 2307 for reversal per unit and branch (BRCLXN.028/029), Friday 22:30 PHT.
+    clx-weekly-files-cron: ${BROKERVERSE_JOB_CLX_WEEKLY_FILES_CRON:0 30 14 * * FRI}
+    # Monthly DP PR / PR 2307 for reversal (BRCLXN.024-027): daily check 05:00 PHT, generates on the first working day.
+    clx-monthly-files-cron: ${BROKERVERSE_JOB_CLX_MONTHLY_FILES_CRON:0 0 21 * * *}
+    # ---- Accounting, Disbursement, ACSL (BRD-5), docs/architecture/ACCOUNTING_DISBURSEMENT_DESIGN.md section 9 ----
+    # Accrual auto-reversal on the "reverse on" date (FRBS 2.8.1), 00:05 PHT.
+    journal-auto-reversal-cron: ${BROKERVERSE_JOB_JOURNAL_AUTO_REVERSAL_CRON:0 5 16 * * *}
+    # Scheduled month-end / year-end close per acc_period_close_schedule (FRBS 2.6.0), checked every 15 minutes.
+    gl-period-close-cron: ${BROKERVERSE_JOB_GL_PERIOD_CLOSE_CRON:0 */15 * * * *}
+    # Broking books close on the last day of the month at BROKING_CLOSE_TIME (FRBS 3.4.0/3.4.1), 23:00 PHT.
+    broking-books-close-cron: ${BROKERVERSE_JOB_BROKING_BOOKS_CLOSE_CRON:0 0 15 L * *}
+    # BOOK rate of the month from the previous month-end revaluation rate (OQ08, AQ03), 1st of the month 00:30 PHT.
+    book-rate-from-closing-cron: ${BROKERVERSE_JOB_BOOK_RATE_FROM_CLOSING_CRON:0 30 16 L * *}
+    # Printed or released checks older than DISB_STALE_DAYS become stale (DIS 3.26.2), 00:20 PHT.
+    disb-check-stale-cron: ${BROKERVERSE_JOB_DISB_CHECK_STALE_CRON:0 20 16 * * *}
+    # End-of-day e-mail confirmations and reports: started by each EOD run; no schedule by default (DIS 2.7.12, 3.28.0).
+    disb-eod-confirmation-cron: ${BROKERVERSE_JOB_DISB_EOD_CONFIRMATION_CRON:-}
+    disb-eod-reports-cron: ${BROKERVERSE_JOB_DISB_EOD_REPORTS_CRON:-}
+    # Daily GL-SL reconciliation of the control accounts (ACSL 2.13.2), 20:00 PHT.
+    acsl-gl-sl-recon-cron: ${BROKERVERSE_JOB_ACSL_GL_SL_RECON_CRON:0 0 12 * * *}
 
 management:
   health:

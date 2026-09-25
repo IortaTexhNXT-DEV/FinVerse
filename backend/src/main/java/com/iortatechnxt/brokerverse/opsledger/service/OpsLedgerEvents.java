@@ -139,17 +139,22 @@ public final class OpsLedgerEvents {
       Long companyId, String invoiceNo, String requestNo, boolean pending, String requestedBy) {}
 
   /**
-   * A payment request of the Disbursement queue changed status (acknowledged, DV assigned, paid,
-   * returned; RMTID.019).
+   * A payment request changed status (acknowledged, DV assigned, paid, returned, cancelled;
+   * RMTID.019, DIS 2.20.0), or Disbursement reported a new DV stage or instrument status (DIS 2.8,
+   * 3.26). Published by the adapter of {@code DisbursementGateway} (the in-app queue, then the
+   * {@code disbursement} module).
    *
    * @param companyId company
    * @param requestNo request number
    * @param type request type
    * @param sourceModule module that sent it
    * @param sourceRef its reference
-   * @param status new status
+   * @param status new gateway status
    * @param dvNo disbursement voucher number, when assigned
-   * @param reason return reason, when returned
+   * @param reason return or cancellation reason
+   * @param dvStatus DV stage in Disbursement (IN_PROCESS ... APPROVED, CANCELLED), may be null
+   * @param instrumentStatus instrument status (PRINTED, RELEASED, CREDITED, NEGOTIATED, STALE ...),
+   *     may be null
    */
   public record DisbursementStatusChanged(
       Long companyId,
@@ -159,5 +164,105 @@ public final class OpsLedgerEvents {
       String sourceRef,
       DisbursementRequest.Status status,
       String dvNo,
-      String reason) {}
+      String reason,
+      String dvStatus,
+      String instrumentStatus) {
+
+    /**
+     * A status change without DV stage or instrument status (in-app queue, BRD-2 contract).
+     *
+     * @param companyId company
+     * @param requestNo request number
+     * @param type request type
+     * @param sourceModule module that sent it
+     * @param sourceRef its reference
+     * @param status new status
+     * @param dvNo disbursement voucher number, when assigned
+     * @param reason return reason, when returned
+     */
+    public DisbursementStatusChanged(
+        Long companyId,
+        String requestNo,
+        DisbursementRequest.Type type,
+        String sourceModule,
+        String sourceRef,
+        DisbursementRequest.Status status,
+        String dvNo,
+        String reason) {
+      this(companyId, requestNo, type, sourceModule, sourceRef, status, dvNo, reason, null, null);
+    }
+  }
+
+  /**
+   * Collections has items waiting in the outbox of an inbound {@code COLLECTION_*} feed
+   * (COLLECTIONS_DESIGN 2.2 and 9): consumers (cashiering, commission) may pull at once instead of
+   * waiting for their schedule. Published by the {@code collections} module after commit.
+   *
+   * @param companyId company
+   * @param feedCode feed with pending items (e.g. {@code COLLECTION_CWT2307})
+   */
+  public record CollectionFeedReady(Long companyId, String feedCode) {}
+
+  /**
+   * Cashiering decided a disposition requested through {@code UnappliedDispositionRequests}
+   * (BRCLXN.030-033, 040): accepted, rejected or executed. Published by the implementing module
+   * (cashiering); consumed by Collections to update its application request.
+   *
+   * @param companyId company
+   * @param unappliedRef unapplied item reference
+   * @param source requesting module (COLLECTIONS)
+   * @param sourceRef its reference (idempotency key of the request)
+   * @param status ACCEPTED, REJECTED or APPLIED
+   * @param cashieringRef disposition reference in cashiering
+   * @param message reason or remarks, may be null
+   */
+  public record UnappliedDispositionChanged(
+      Long companyId,
+      String unappliedRef,
+      String source,
+      String sourceRef,
+      String status,
+      String cashieringRef,
+      String message) {}
+
+  /**
+   * A validator answered a refund validation opened through {@code RefundValidationSource} (MKT
+   * 1.11.0, ACSL 2.5.5). Published by the validating module (acsl, cashiering); consumed by
+   * payrequest.
+   *
+   * @param companyId company
+   * @param validator ACSL or CASHIERING
+   * @param sourceModule module that asked (PAYREQUEST)
+   * @param sourceRef its reference
+   * @param confirmed true when confirmed, false when rejected
+   * @param newArNo new acknowledgement receipt number (cashiering reinstatement), may be null
+   * @param remarks result remarks, may be null
+   */
+  public record RefundValidationCompleted(
+      Long companyId,
+      String validator,
+      String sourceModule,
+      String sourceRef,
+      boolean confirmed,
+      String newArNo,
+      String remarks) {}
+
+  /**
+   * A payment reversal requested through {@code PaymentReversalRequester} was decided (ACSL
+   * 2.6.0-2.6.1). Published by cashiering; consumed by acsl.
+   *
+   * @param companyId company
+   * @param sourceModule module that asked (ACSL)
+   * @param sourceRef its reference
+   * @param approved true when approved and posted, false when rejected
+   * @param reference reversal reference in cashiering
+   * @param remarks reason or remarks, may be null
+   */
+  public record PaymentReversalCompleted(
+      Long companyId,
+      String sourceModule,
+      String sourceRef,
+      boolean approved,
+      String reference,
+      String remarks) {}
 }

@@ -33,8 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
  * Copies a booked invoice into the Operations ledger (OPERATIONS_DESIGN 4.1, feed from booking):
  * header facts, insurer shares with the lead flagged (ADJID.027), one BOOKED movement per non-zero
  * component (PR by component, DTIP, commission, VAT on commission, withholding tax), cumulative
- * adjustments of the original for endorsements and cancellations (ADJID.028). Idempotent on the
- * invoice number: an invoice already in the ledger is left as it is.
+ * adjustments of the original for endorsements and cancellations (ADJID.028), and the root invoice
+ * number of the family (the parent's root, DIS 3.27.2 / ACSL 2.16.0). Idempotent on the invoice
+ * number: an invoice already in the ledger is left as it is.
  *
  * <p>Direct payment invoices (BRNB.114, MKTID.011) carry the invoiced premium on their PR and DTIP
  * components although booking posts no premium receivable for them; their payment and remittance
@@ -96,7 +97,11 @@ public class InvoiceLedgerWriter {
     }
     BookedInvoice booked = bookings.byNo(event.invoiceNo());
     OpsInvoice invoice =
-        invoices.save(OpsInvoice.of(data(event, booked), shares(event, booked), source));
+        invoices.save(
+            OpsInvoice.of(
+                data(event, booked, rootOf(event.invoiceNo(), booked.getParentInvoiceNo())),
+                shares(event, booked),
+                source));
     ledger.record(
         invoice,
         new MovementRequest(
@@ -130,7 +135,21 @@ public class InvoiceLedgerWriter {
     return Optional.of(invoice);
   }
 
-  private static OpsInvoiceData data(InvoiceBooked e, BookedInvoice b) {
+  /**
+   * Root of the family of a new invoice: itself for an original booking, else the root of its
+   * parent (or the parent when the parent is not in the ledger).
+   */
+  private String rootOf(String invoiceNo, String parentInvoiceNo) {
+    if (parentInvoiceNo == null) {
+      return invoiceNo;
+    }
+    return invoices
+        .findByInvoiceNo(parentInvoiceNo)
+        .map(OpsInvoice::getRootInvoiceNo)
+        .orElse(parentInvoiceNo);
+  }
+
+  private static OpsInvoiceData data(InvoiceBooked e, BookedInvoice b, String root) {
     return new OpsInvoiceData(
         new OpsInvoiceData.Keys(
             b.getCompanyId(),
@@ -141,6 +160,7 @@ public class InvoiceLedgerWriter {
             e.kind(),
             e.endorsementNo(),
             b.getParentInvoiceNo(),
+            root,
             e.policyNo(),
             e.policyYear()),
         new OpsInvoiceData.Parties(

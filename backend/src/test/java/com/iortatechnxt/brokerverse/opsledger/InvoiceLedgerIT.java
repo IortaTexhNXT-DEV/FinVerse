@@ -286,6 +286,14 @@ class InvoiceLedgerIT {
     OpsInvoice endorsement = queries.require(result.invoiceNo());
     assertThat(endorsement.getKind()).isEqualTo(InvoiceKind.ENDORSEMENT_PLUS);
     assertThat(endorsement.getParentInvoiceNo()).isEqualTo(original.getInvoiceNo());
+    // One invoice family: the endorsement carries the root of its parent (DIS 3.27.2).
+    assertThat(queries.require(original.getInvoiceNo()).getRootInvoiceNo())
+        .isEqualTo(original.getInvoiceNo());
+    assertThat(endorsement.getRootInvoiceNo()).isEqualTo(original.getInvoiceNo());
+    assertThat(queries.family(result.invoiceNo()))
+        .extracting(OpsInvoice::getInvoiceNo)
+        .containsExactly(original.getInvoiceNo(), result.invoiceNo());
+    assertThat(queries.family("NO-SUCH-INVOICE")).isEmpty();
     var total = queries.adjustmentTotal(original.getInvoiceNo()).orElseThrow();
     assertThat(total.getAdjustmentCount()).isEqualTo(1);
     assertThat(total.getAdjustedPremium()).isEqualByComparingTo(endorsement.getGrossPremium());

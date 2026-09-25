@@ -44,6 +44,53 @@ export const SCREENING_SETUP_HELP: HelpSection = {
         'An active version never changes; a change is always a new version, and a case keeps the version it started with (SNSRP-104).',
         'The maker of a version can never approve it (SNSRP-109).',
         'Without an active matching version a screening trigger raises SCR_NO_ACTIVE_CONFIG.',
+        'Only one draft or pending version exists per type; New Draft opens it. The effective date is today or later, and a draft that changes nothing cannot be submitted.',
+        'Changes lists every rule and attribute with its value before and after, against the version in force; the list is kept with the version when it is submitted.',
+      ],
+    },
+    {
+      name: 'Templates',
+      path: '/screening-setup/templates',
+      summary:
+        'The KYC review, transaction review, EDD and STR templates: sections, fields, data types, lists of values, mandatory flags and help texts, with a preview of the form.',
+      workflow: [
+        'Open the template type, click New Draft, add or change fields, check the preview and submit the version for approval.',
+        'A Compliance Checker approves it; reviews and STRs started after its effective date use it, those already started keep their version (SNSRP-104, 105).',
+      ],
+      controls: [
+        'Every field needs a label and a code of capitals, digits and underscores; a list field needs its list of values.',
+        'A template needs at least one mandatory field. The AMLC STR format is parked until BDOI supplies it (SQ09).',
+      ],
+    },
+    {
+      name: 'Watchlist',
+      path: '/screening-setup/watchlist',
+      summary:
+        'The sanctioned names, PEPs and internal watchlist entries by source and status, with their aliases and change history.',
+      workflow: [
+        'A Compliance Officer adds an entry, changes it or deactivates it with a reason; the change waits in Pending Changes (SNSRP-203).',
+        'A Compliance Checker compares the before and after values and approves or rejects with remarks; an approved entry is active from today and screened (SNSRP-204).',
+      ],
+      controls: [
+        'Screening uses active entries only; pending and draft entries have no effect.',
+        'Entries are never deleted, only deactivated; one change per entry waits at a time.',
+        'The maker of a change can never approve it. The demo list uses invented names only.',
+      ],
+    },
+    {
+      name: 'List Sources and Runs',
+      path: '/screening-setup/sources',
+      summary:
+        'The list sources (AML advisory, NLDS-PEP, internal), the list file template, Upload List File and the log of every ingestion run with its failed records.',
+      workflow: [
+        'The job SCR_WATCHLIST_INGEST (01:00) reads the file staged on each file source and applies the official list at once; a source without a new file gets a FAILED run.',
+        'Upload List File logs a run at once; its additions, updates and delistings wait for a Compliance Checker, who can approve them all from the run.',
+        'SCR_INGEST_ERROR_DIGEST (07:00, Monday to Friday) e-mails the failed records to SCR_INGEST_ALERT_RECIPIENTS (SNSRP-202).',
+      ],
+      controls: [
+        'A file is CSV or XLSX in the template; each failed line is kept with its reason and a FAILED or PARTIAL run raises SCR_INGEST_FAILED.',
+        'A reference already on the list is updated, never duplicated; on a full-file source the entries missing from the file are delisted.',
+        'API and NLDS transports are parked until BDOI names them (SQ01).',
       ],
     },
   ],

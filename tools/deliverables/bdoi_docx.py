@@ -1086,8 +1086,9 @@ class BdoiDocument:
         self.doc.save(str(path))
         return path
 
-    def publish(self, path: str | Path, pdf: bool = True) -> tuple[Path, Path | None]:
-        """Saves the .docx; with pdf=True converts it, fills the TOC page numbers and converts again."""
+    def publish(self, path: str | Path, pdf: bool = True, keep_pdf: bool = False) -> tuple[Path, Path | None]:
+        """Saves the .docx. With pdf=True a PDF is rendered to fill the TOC page numbers; it is kept only
+        with keep_pdf=True (the Word file is the editable master; PDFs are produced at issue)."""
         path = self.save(path)
         if not pdf:
             return path, None
@@ -1098,8 +1099,12 @@ class BdoiDocument:
             pages = heading_pages(pdf_path, self.headings)
             self._write_toc(pages)
             self.save(path)
-            pdf_path = render.to_pdf(path)
-        return path, pdf_path
+            if keep_pdf:
+                pdf_path = render.to_pdf(path)
+        if keep_pdf:
+            return path, pdf_path
+        pdf_path.unlink(missing_ok=True)
+        return path, None
 
 
 # --------------------------------------------------------------------------------------------
@@ -1479,7 +1484,8 @@ def lint_source(src: str | Path) -> list[str]:
     return problems
 
 
-def build_markdown(src: str | Path, out: str | Path | None = None, pdf: bool = True) -> tuple[Path, Path | None]:
+def build_markdown(src: str | Path, out: str | Path | None = None, pdf: bool = True,
+                   keep_pdf: bool = False) -> tuple[Path, Path | None]:
     """Builds one Markdown-like source into .docx (and .pdf). Returns the output paths."""
     src = Path(src).resolve()
     front, lines = load_source(src)
@@ -1489,7 +1495,7 @@ def build_markdown(src: str | Path, out: str | Path | None = None, pdf: bool = T
     doc.front_matter()
     render_body(doc, lines)
     target = Path(out) if out else output_path(front, src)
-    return doc.publish(target, pdf=pdf)
+    return doc.publish(target, pdf=pdf, keep_pdf=keep_pdf)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1498,7 +1504,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Build BIBS Word documents from Markdown-like sources")
     ap.add_argument("sources", nargs="+", help="source .md files under docs/deliverables/src")
     ap.add_argument("--out", help="output .docx (only with one source)")
-    ap.add_argument("--no-pdf", action="store_true", help="skip the PDF (and the TOC page numbers)")
+    ap.add_argument("--no-pdf", action="store_true", help="skip the PDF pass (and the TOC page numbers)")
+    ap.add_argument("--keep-pdf", action="store_true", help="keep the PDF next to the .docx (for issue)")
     ap.add_argument("--previews", action="store_true", help="also render page PNG previews and contact sheets")
     ap.add_argument("--check", action="store_true", help="only lint the YAML blocks (fr, glossary, table, signoff) and exit")
     args = ap.parse_args(argv)
@@ -1510,15 +1517,18 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         return 1 if failed else 0
     for s in args.sources:
-        docx_path, pdf_path = build_markdown(s, args.out, pdf=not args.no_pdf)
+        keep = args.keep_pdf or args.previews
+        docx_path, pdf_path = build_markdown(s, args.out, pdf=not args.no_pdf, keep_pdf=keep)
         print(f"docx: {docx_path}")
-        if pdf_path:
-            print(f"pdf:  {pdf_path}")
-            if args.previews:
-                import render
+        if pdf_path and args.previews:
+            import render
 
-                sheets = render.previews(pdf_path)
-                print(f"previews: {sheets[0].parent} ({len(sheets)} files)")
+            sheets = render.previews(pdf_path)
+            print(f"previews: {sheets[0].parent} ({len(sheets)} files)")
+        if pdf_path and not args.keep_pdf:
+            pdf_path.unlink(missing_ok=True)
+        elif pdf_path:
+            print(f"pdf:  {pdf_path}")
     return 0
 
 

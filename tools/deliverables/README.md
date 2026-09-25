@@ -26,16 +26,21 @@ its `.dot` source.
 ## Build and check a document
 
 ```bash
-# lint the requirement blocks, then build .docx + .pdf and page previews
+# lint the YAML blocks, then build the .docx (the editable master) and page previews
 python tools/deliverables/bdoi_docx.py --check docs/deliverables/src/frs/FRS_BRD03_PRODUCT_MAINTENANCE.md
 python tools/deliverables/bdoi_docx.py docs/deliverables/src/frs/FRS_BRD03_PRODUCT_MAINTENANCE.md --previews
+
+# at issue only: also keep the PDF next to the .docx
+python tools/deliverables/bdoi_docx.py docs/deliverables/src/frs/FRS_BRD03_PRODUCT_MAINTENANCE.md --keep-pdf
 
 # any Office file: PDF plus previews
 python tools/deliverables/render.py docs/deliverables/out/FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx --previews
 ```
 
-`publish()` converts twice: the first PDF gives the page of every heading (read from the PDF outline), which is
-written into the table of contents, and the second PDF carries the final numbers. The TOC stays a real Word field
+Word and Excel files are the masters and are the only outputs kept in `docs/deliverables/out/`; PDFs are produced
+when a document is issued (`--keep-pdf`, or `render.py`) and are not committed (`.gitignore`). `publish()` renders a
+temporary PDF to read the page of every heading (from the PDF outline) and writes them into the table of contents;
+the temporary PDF is then deleted. The TOC stays a real Word field
 (Update Field in Word refreshes it).
 
 Previews go to `<output folder>/_previews/<document>/` (`page-001.png`, ... and `sheet-01.png` with six pages per

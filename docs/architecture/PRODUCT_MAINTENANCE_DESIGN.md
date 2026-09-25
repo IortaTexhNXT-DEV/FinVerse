@@ -563,3 +563,111 @@ What the P0 wave built, and where it differs from or details the sections above.
   `features/productmaint/module.ts` (`withPackageRequests(catalogModule)`, one sidebar section) and the new catalog
   screens in `features/catalog/module.ts`, all hidden with a placeholder component. Help:
   `withPackageRequestHelp(CATALOG_HELP)` with the empty `PACKAGE_REQUEST_HELP_SCREENS` list for P1-B.
+
+## 16. P1-B: package request process (`productmaint`) as built
+
+What the P1-B wave built on the P0 contracts, and where it details or differs from sections 4.4 and 7-11. The module
+depends on `catalog` only through `catalog.service.version` (`PackageSetupService`, `ProductVersionQueryService`,
+the four events) plus the existing public catalog, CRM and platform services; it runs end to end on the stub
+`PackageVersionStubDefaults` until P1-A's implementation is merged.
+
+- **Migrations.** `V816__productmaint.sql`: `pm_request` (with its milestones: submitted, approved, recommended, TSU
+  approved, terms final, requirements, set-up, who and when), `pm_negotiation_round` + `pm_round_insurer`,
+  `pm_insurer_response` + `pm_insurer_response_history`, `pm_comparative_output` (unique partial index: one current
+  MASTER per request; `content` keeps the compiled table as JSON so every file is rendered from the values it was
+  generated with), `pm_signoff`, `pm_advisory`; `DOCUMENT_TYPE` values PKG_REQUEST_FORM, PKG_QUOTATION_SLIP,
+  PKG_INSURER_RESPONSE, PKG_COMPARATIVE, PKG_SLIP_SIGNED, MANCOM_SIGNOFF, PKG_ADVISORY; templates PKG_REQUEST_FORM,
+  PKG_QUOTATION_SLIP, PKG_COMPARATIVE, PKG_SLIP, PKG_ADVISORY, PKG_RENEWAL_ADVISORY (draft layouts, Q03).
+  `V817__productmaint_reports_jobs.sql`: exception code PACKAGE_EXPIRING; parameters `PACKAGE_EXPIRY_REMINDER_DAYS`
+  (30,7) and `PKG_ADVISORY_GROUPS`. Reports and the job are beans (no rows). INCENTIVE_PRODUCT_INACTIVE is left to the
+  catalog. Demo `V997`: six requests (draft, TSU review, negotiation in round 2 with "approved with changes", a
+  counter-proposal and a decline, ManCom, with MBS, released with a sent advisory). The package expiring in 45 days
+  needs a catalog version and belongs to V996 (P1-A).
+- **Terms.** Requested and proposed terms are one JSON record (`PackageTerms`: sections, coverages with limits and
+  deductibles, rate scheme, package dates, insurers with role, share, rate and own coverage terms). `VersionTerms`
+  maps a catalog `ProductVersionView` to terms (pre-fill of AMEND / UPDATE / RENEW / REACTIVATE requests, `GET
+  /prefill`, BRPM.011/017 no re-keying) and the proposed terms to a `PackageSpec`; an insurer without own coverage
+  terms gets the package's included coverages, so every panel insurer has a term per included coverage (PMADD02).
+- **Process (workflow PM_PACKAGE_REQUEST, V755).** `PackageRequestService`: create, update (DRAFT by PKG_REQUEST,
+  FOR_TSU_REVIEW by PKG_TSU_RECOMMEND), submit (`PKG_REQUEST_INCOMPLETE`), Marketing approval and TSU Head approval
+  (`PKG_FOUR_EYES`: never the maker or submitter, never the recommender), recommendation (`PKG_RECOMMENDATION_REQUIRED`).
+  `tsu-approve` runs `approve` or `approve_no_negotiation` by the request's flag: RETIRE never negotiates, RENEW /
+  UPDATE / REACTIVATE choose, NEW and AMEND always negotiate; a request without negotiation takes its requested terms
+  as proposed terms. `PackageStatusListener` mirrors every stage, opens round 1 with the target insurers when the TSU
+  Head approves, and records a ManCom return as a RETURNED `pm_signoff`.
+- **Negotiation (BRPM.010/012/013, PMADD04).** `NegotiationService`: prepare (insurers, notes), submit (PQS number
+  from `PKG_QS_PREFIX`, template version, reply date from `PKG_QS_REPLY_DAYS`), approval by PKG_QS_APPROVE and never
+  the preparer (`QS_FOUR_EYES`), which sends one protected e-mail per insurer and opens a PENDING response; resend;
+  `revise_qs` closes the sent round and opens round n+1 (by default with the insurers that did not decline). Rounds
+  are locked at the ManCom sign-off (`QS_LOCKED`). `PackageResponseService`: outcome from the LOV, a rate is required
+  for an offer (`PKG_RESPONSE_RATE_REQUIRED`), terms per coverage, response document (PKG_INSURER_RESPONSE), revision
+  history. `TermsService.termsFinal` needs every insurer of the latest round answered (`NEGOTIATION_INCOMPLETE`),
+  chosen insurers that offered terms (`PKG_INSURER_NOT_OFFERED`), roles LEAD / PARTICIPANT / PANEL and shares that
+  total 100 when used (`PKG_SHARES_INVALID`), and compiles the comparative master. `release_to_marketing` is refused
+  for a generic programme, `skip_marketing_review` for a client-specific package. Marketing's `request_changes`
+  (generic, with a reason) returns to NEGOTIATION with the round still open, so TSU revises or makes the terms final
+  again.
+- **Comparative outputs (BRPM.014, PMADD03).** Field catalogue OUTCOME, RATE, MINIMUM_PREMIUM, COVERAGES,
+  DEDUCTIBLES, CONDITIONS, VALID_UNTIL, REMARKS (PQ06). A new master supersedes the previous one; a CLIENT view needs
+  a current master (`COMPARATIVE_NO_MASTER`) and renders a selection of the master's stored content. Every output is
+  attached as PKG_COMPARATIVE with its SHA-256 and audited; files `comparatives/{id}.pdf | .xlsx`.
+- **Requirements and sign-off (BRPM.015).** `REQUIREMENTS_INCOMPLETE` until the proposed terms have an effective date
+  and a package end date, a scheme rate (or a rate per insurer), a computation basis, at least one insurer and a
+  PKG_SLIP_SIGNED document (the unsigned slip is `package-slip.pdf`). ManCom signs off in the system, never the user who
+  submitted the requirements; an uploaded MANCOM_SIGNOFF sheet is linked, else a generated sign-off record is attached
+  as MANCOM_SIGNOFF (PQ07). Reference `MC-<request no.>`.
+- **MBS hand-off.** `PackageSetupHandoff.setUp` builds the `PackageSpec` (a NEW request needs the risk code and may
+  name the product; origin = request number, ManCom reference, change summary) and calls `createDraftVersion`, or
+  `updateDraftVersion` when the request's version came back DRAFT from the validator. `return_incomplete` needs a
+  reason; a RETIRE request uses `retire` (`PackageSetupService.retireProduct`, stage RETIRED, retirement advisory).
+- **Release follow-up.** `CatalogEventsListener` (`@TransactionalEventListener(fallbackExecution = true)`) and
+  `ReleaseFollowUp` (own transaction): `ProductVersionReleased` whose source is the request moves it FOR_VALIDATION ->
+  RELEASED (`version_released`), drafts the advisory (PACKAGE_READY for NEW / REACTIVATE, RENEWAL for RENEW, else
+  PACKAGE_UPDATED) and notifies Marketing (QUOTE_MAINTAIN holders); `ProductVersionReturned` -> WITH_MBS
+  (`version_returned`); `ProductExpired` notifies the PKG_NEGOTIATE and PRODUCT_MAINTAIN holders. Released and expired
+  changes go to the `ProductMasterFeed` port (BRPM.022), whose default adapter only logs (PQ16).
+- **Advisories (BRPM.016).** Recipient groups from PKG_ADVISORY_GROUP (default `PKG_ADVISORY_GROUPS`). Sending needs
+  PKG_SLIP_SIGNED and MANCOM_SIGNOFF on the request (MANCOM_SIGNOFF only for a retirement), else
+  `ADVISORY_DOCUMENTS_MISSING`. A send stores the advisory PDF (PKG_ADVISORY), notifies each group's users in the app
+  (MARKETING -> QUOTE_MAINTAIN, TSU -> PKG_NEGOTIATE, MBS -> PRODUCT_MAINTAIN, PROCESSING -> ACCOUNT_PROCESS,
+  OPERATIONS -> OPS_VIEW) and, when addresses are given, e-mails the protected PDF, which lists the supporting
+  documents that authorised users open in BIBS.
+- **Expiry (BRPM.017).** `PackageExpiryService` lists `packagesExpiring` with the open RENEW / REACTIVATE request of
+  each package; "Generate Renewal Request" drafts a RENEW request pre-filled from the current version with the next
+  term's dates (start = old end + 1, same length). The ManagedJob `PACKAGE_EXPIRY_MONITOR` (cron
+  `package-expiry-cron`) runs per company: PACKAGE_EXPIRING once per threshold (dedup
+  `PACKAGE_EXPIRING:<code>:<version>:<threshold>`), renewal drafts when `PACKAGE_RENEWAL_AUTODRAFT` is true (never
+  twice for a package), and `PackageSlaSync` copies the PKG_SLA_* parameters into the PM_PACKAGE_REQUEST stage SLA
+  hours. The version state changes (SUPERSEDED / EXPIRED) belong to the catalog (`ProductVersionService.expireDue`,
+  not a P0 contract): P1-A / P2 wire them into this job or into a catalog job.
+- **Reports** (category New Business, PKG_REPORT_VIEW): PM-PKG-STATUS (one request or all; status, type, line,
+  insurer, package end within n days; stage age, rate, insurers, last action), PM-PKG-EXPIRY (end date, days left,
+  anniversary, renewal request and stage), PM-VERSION-HISTORY (every version of the packaged products, read through
+  `ProductVersionQueryService`).
+- **API** (`/api/v1/product-maintenance`): `requests` (GET, POST), `requests/{id}` (GET, PUT), `/submit`, `/approve`,
+  `/recommend`, `/tsu-approve`, `/form.pdf`; `/rounds` (GET, POST = revise), `/rounds/{n}` (PUT),
+  `/rounds/{n}/quotation-slip/submit | approve`, `/rounds/{n}/quotation-slip.pdf`,
+  `/rounds/{n}/insurers/{code}/resend`, `/rounds/{n}/comparative`, `/responses/{rid}` (PUT),
+  `/responses/{rid}/document`, `/responses/history`, `/terms-final`, `/release-to-marketing`, `/skip-marketing-review`,
+  `/accept-terms`; `/comparatives` (GET, POST client view), `/comparatives/master`, `/comparatives/{oid}.pdf | .xlsx`;
+  `/requirements` (GET, PUT), `/submit-requirements`, `/package-slip.pdf`, `/signoff`, `/setup`, `/return-incomplete`,
+  `/retire`, `/advisories`; `advisories` (GET drafts), `advisories/{aid}` (PUT), `advisories/{aid}/send`; `expiry`,
+  `expiry/renewal-requests`; `prefill`; `counts`.
+- **Screens** (`features/productmaint`, menu order Home, Package Requests, TSU Workbench, Package Expiry): Product
+  Maintenance Home (stage tiles with SLA, expiring 30 / 60 / 90, versions for validation, advisories pending, outputs
+  of the week), Package Requests (nine status tabs, search, type filter, bulk Assign), New / Edit Package Request,
+  Package Request page (`RecordSummary`, `WorkflowPanel` with the business actions and their dialogs, tabs Details,
+  Requested Terms, Negotiation, Comparative, Requirements & Sign-off, Set-up with the link to the catalog version
+  editor, Advisories, Documents, E-mails, History), TSU Workbench (packages) and Package Expiry (tabs, bulk Generate
+  Renewal Request, Generate Expiry List dialog).
+- **Tests.** `PackageRequestProcessIT` (draft -> RELEASED with two rounds, a validator return and an advisory; RENEW
+  without negotiation with the advisory blocked until the signed slip is attached; RETIRE; a client-specific request
+  through return, Marketing review and request changes), `PackageExpiryIT` (the job drafts one pre-filled renewal and
+  never a second; SLA sync), `ProductMaintenanceApiIT` (every read endpoint, a request over HTTP, permissions, the
+  three reports in every export format), `PackageLogicTest`; frontend `packageRequest.test.ts`. The tests publish the
+  catalog events themselves and assert only what the contracts guarantee.
+- **Parked / to confirm.** PQ05 outcome list and round limit; PQ06 comparative fields and client layout; PQ07 ManCom
+  quorum (a single sign-off is built); PQ08 SLA values (parameters); PQ12 advisory recipients and channel (group ->
+  permission map in `AdvisoryService`, optional e-mail addresses); PQ14 client of a generic programme (not asked);
+  PQ16 product master synchronisation (`ProductMasterFeed`, logging adapter only); Q03 document layouts (draft
+  templates).

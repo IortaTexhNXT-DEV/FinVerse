@@ -2,15 +2,11 @@ import { FilePlus2, FileStack, Hourglass, LayoutDashboard, Workflow } from 'luci
 import { lazy } from 'react';
 import type { FeatureModule, ScreenDef } from '@/navigation/types';
 
-/** Placeholder of the pre-registered package request screens (wave P1-B replaces it). */
-const placeholder = lazy(() => import('./ProductMaintenancePlaceholder'));
-
 /**
  * Package request screens of Product Maintenance (BRD-3, `productmaint`; BRPM.008-019,
- * PMADD03/04; PRODUCT_MAINTENANCE_DESIGN section 11). Pre-registered and hidden: the productmaint
- * wave replaces the placeholder component of each screen, removes `hidden` from the menu screens
- * (Home, Package Requests, TSU Workbench, Package Expiry) and adds their help entries to
- * `PACKAGE_REQUEST_HELP_SCREENS` (help.ts) in the same order.
+ * PMADD03/04; PRODUCT_MAINTENANCE_DESIGN section 11). The menu screens are Home, Package
+ * Requests, TSU Workbench and Package Expiry (help entries in `PACKAGE_REQUEST_HELP_SCREENS`, same
+ * order); the form and the record page open from the list.
  */
 export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
   {
@@ -19,23 +15,22 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     icon: LayoutDashboard,
     permission: 'PRODUCT_VIEW',
     alsoPermissions: ['PKG_REPORT_VIEW'],
-    component: placeholder,
-    hidden: true,
+    component: lazy(() => import('./ProductMaintenanceHomePage')),
   },
   {
     path: '/product-maintenance/requests',
     label: 'Package Requests',
     icon: FileStack,
     permission: 'PRODUCT_VIEW',
-    component: placeholder,
-    hidden: true,
+    alsoPermissions: ['PKG_REPORT_VIEW'],
+    component: lazy(() => import('./PackageRequestsPage')),
   },
   {
     path: '/product-maintenance/requests/new',
     label: 'New Package Request',
     icon: FilePlus2,
     permission: 'PKG_REQUEST',
-    component: placeholder,
+    component: lazy(() => import('./PackageRequestFormPage')),
     hidden: true,
   },
   {
@@ -43,7 +38,17 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     label: 'Package Request',
     icon: FileStack,
     permission: 'PRODUCT_VIEW',
-    component: placeholder,
+    alsoPermissions: ['PKG_REPORT_VIEW'],
+    component: lazy(() => import('./PackageRequestPage')),
+    hidden: true,
+  },
+  {
+    path: '/product-maintenance/requests/:id/edit',
+    label: 'Edit Package Request',
+    icon: FilePlus2,
+    permission: 'PKG_REQUEST',
+    alsoPermissions: ['PKG_TSU_RECOMMEND'],
+    component: lazy(() => import('./PackageRequestFormPage')),
     hidden: true,
   },
   {
@@ -52,17 +57,15 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     icon: Workflow,
     permission: 'PKG_NEGOTIATE',
     alsoPermissions: ['PKG_TSU_RECOMMEND', 'PKG_TSU_APPROVE'],
-    component: placeholder,
-    hidden: true,
+    component: lazy(() => import('./PackageTsuWorkbenchPage')),
   },
   {
     path: '/product-maintenance/expiry',
     label: 'Package Expiry',
     icon: Hourglass,
     permission: 'PKG_NEGOTIATE',
-    alsoPermissions: ['PRODUCT_MAINTAIN'],
-    component: placeholder,
-    hidden: true,
+    alsoPermissions: ['PRODUCT_MAINTAIN', 'PKG_REPORT_VIEW'],
+    component: lazy(() => import('./PackageExpiryPage')),
   },
 ];
 

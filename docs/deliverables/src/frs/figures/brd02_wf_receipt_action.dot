@@ -1,0 +1,19 @@
+// BRD-2: workflow OPS_RECEIPT_ACTION (V764; CSHID.001-005). FRS section 5. Stage owner in the second line.
+// Solid = main path, dashed = return or optional path, dotted = closes the case.
+digraph wf_receipt_action {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.3, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.4, height=0.45, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  REQUESTED [label="REQUESTED\nCashier (CASH_CANCEL / CASH_REINSTATE)"];
+  FOR_APPROVAL [label="FOR_APPROVAL\nCashiering TL / TH (CASH_APPROVE)"];
+  POSTED [label="POSTED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  WITHDRAWN [label="WITHDRAWN", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  REQUESTED -> FOR_APPROVAL [label=" submit"];
+  FOR_APPROVAL -> POSTED [label=" approve (post)"];
+  FOR_APPROVAL -> REQUESTED [label=" return", style=dashed, constraint=false];
+  REQUESTED -> WITHDRAWN [label=" withdraw", style=dotted];
+  { rank=same; POSTED; WITHDRAWN; }
+}

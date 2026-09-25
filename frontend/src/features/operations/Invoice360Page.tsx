@@ -16,6 +16,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { formatAmount, formatDate, humanize } from '@/utils/format';
 import { ComponentsTab, HistoryTab, MovementsTab, RelatedSectionTab } from './Invoice360Tabs';
+import { InvoiceFamilyTab } from './InvoiceFamilyTab';
 import { RELATED_TABS, flagChips, invoiceTabs } from './opsLabels';
 import type { Invoice360TabId } from './opsLabels';
 
@@ -27,6 +28,8 @@ function TabBody({ tab, view }: Readonly<{ tab: Invoice360TabId; view: Invoice36
   switch (tab) {
     case 'movements':
       return <MovementsTab movements={view.movements} />;
+    case 'family':
+      return <InvoiceFamilyTab invoiceNo={view.invoice.keys.invoiceNo} />;
     case 'history':
       return <HistoryTab history={view.history} />;
     case 'documents':
@@ -84,6 +87,11 @@ function facts(view: Invoice360): Fact[] {
   ];
 }
 
+/** Whether the invoice belongs to the family of another (root) invoice (DIS 3.27.2). */
+function isEndorsementOfFamily(i: Invoice360['invoice']): boolean {
+  return i.keys.rootInvoiceNo !== undefined && i.keys.rootInvoiceNo !== i.keys.invoiceNo;
+}
+
 function Summary({ view }: Readonly<{ view: Invoice360 }>) {
   const i = view.invoice;
   const flags = flagChips(i.flags);
@@ -96,6 +104,9 @@ function Summary({ view }: Readonly<{ view: Invoice360 }>) {
           <ReferenceChip label="ARN" value={i.keys.arn} />
           {i.keys.endorsementNo !== undefined && (
             <ReferenceChip label="Endorsement" value={i.keys.endorsementNo} />
+          )}
+          {isEndorsementOfFamily(i) && (
+            <ReferenceChip label="Root Invoice" value={i.keys.rootInvoiceNo ?? ''} />
           )}
           <StatusBadge status={i.paymentStatus} />
           <StatusBadge status={i.remittanceStatus} />

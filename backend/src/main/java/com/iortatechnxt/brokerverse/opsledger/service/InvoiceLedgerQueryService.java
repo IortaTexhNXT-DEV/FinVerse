@@ -34,6 +34,7 @@ public class InvoiceLedgerQueryService {
 
   private static final String CLASSIFICATION = "classification";
   private static final String BOOKING_DATE = "bookingDate";
+  private static final String INCEPTION = "inceptionDate";
 
   private final OpsInvoiceRepository invoices;
   private final OpsInvoiceMovementRepository movements;
@@ -202,6 +203,7 @@ public class InvoiceLedgerQueryService {
       }
       dates(where, cb, root, s);
       text(where, cb, root, s.text());
+      assuredInceptionAo(where, cb, root, s);
       return cb.and(where.toArray(Predicate[]::new));
     };
   }
@@ -213,6 +215,25 @@ public class InvoiceLedgerQueryService {
     }
     if (s.to() != null) {
       where.add(cb.lessThanOrEqualTo(root.get(CLASSIFICATION).get(BOOKING_DATE), s.to()));
+    }
+  }
+
+  /** Assured, inception and account officer filters (DIS 3.27.2 invoice search). */
+  private static void assuredInceptionAo(
+      List<Predicate> where, CriteriaBuilder cb, Root<OpsInvoice> root, LedgerSearch s) {
+    if (s.assured() != null && !s.assured().isBlank()) {
+      String like = "%" + s.assured().strip().toLowerCase(Locale.ROOT) + "%";
+      where.add(cb.like(cb.lower(root.get("assuredName")), like));
+    }
+    if (s.inceptionFrom() != null) {
+      where.add(
+          cb.greaterThanOrEqualTo(root.get(CLASSIFICATION).get(INCEPTION), s.inceptionFrom()));
+    }
+    if (s.inceptionTo() != null) {
+      where.add(cb.lessThanOrEqualTo(root.get(CLASSIFICATION).get(INCEPTION), s.inceptionTo()));
+    }
+    if (s.aoUsername() != null && !s.aoUsername().isBlank()) {
+      where.add(cb.equal(root.get(CLASSIFICATION).get("aoUsername"), s.aoUsername().strip()));
     }
   }
 

@@ -20,6 +20,10 @@ import org.springframework.format.annotation.DateTimeFormat;
  * @param dp direct payment only (true) or excluded (false)
  * @param from booked on or after
  * @param to booked on or before
+ * @param assured part of the assured name
+ * @param inceptionFrom period starting on or after
+ * @param inceptionTo period starting on or before
+ * @param ao account officer
  */
 public record LedgerSearchParams(
     String q,
@@ -31,7 +35,11 @@ public record LedgerSearchParams(
     Boolean locked,
     Boolean dp,
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+    String assured,
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inceptionFrom,
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inceptionTo,
+    String ao) {
 
   /**
    * The search criteria of a company.
@@ -41,6 +49,20 @@ public record LedgerSearchParams(
    */
   public LedgerSearch toSearch(Long companyId) {
     return new LedgerSearch(
-        companyId, q, insurer, client, payment, remittance, flag, locked, dp, from, to);
+        companyId,
+        q,
+        insurer,
+        client,
+        payment,
+        remittance,
+        flag,
+        locked,
+        dp,
+        from,
+        to,
+        assured,
+        inceptionFrom,
+        inceptionTo,
+        ao);
   }
 }

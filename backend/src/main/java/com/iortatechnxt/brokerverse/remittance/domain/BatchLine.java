@@ -78,6 +78,12 @@ public class BatchLine extends BaseEntity {
 
   @Embedded private RemittanceAmounts amounts;
 
+  @Column(name = "cpc2_code", length = 30, updatable = false)
+  private String cpc2Code;
+
+  @Column(name = "cpc2_rate", precision = 9, scale = 4, updatable = false)
+  private BigDecimal cpc2Rate;
+
   @Column(nullable = false)
   private boolean excluded;
 
@@ -153,6 +159,17 @@ public class BatchLine extends BaseEntity {
     this.previousStatus = previousStatus;
     this.basicPremium = basicPremium;
     this.amounts = amounts;
+  }
+
+  /**
+   * Records the CPC2 criterion applied to the line (DIS 3.29.2); the amounts already carry it.
+   *
+   * @param code incentive criterion code
+   * @param rate rate in percent
+   */
+  public void cpc2Criterion(String code, BigDecimal rate) {
+    this.cpc2Code = code;
+    this.cpc2Rate = rate;
   }
 
   void attach(RemittanceBatch owner) {
@@ -296,6 +313,14 @@ public class BatchLine extends BaseEntity {
 
   public RemittanceAmounts getAmounts() {
     return amounts;
+  }
+
+  public String getCpc2Code() {
+    return cpc2Code;
+  }
+
+  public BigDecimal getCpc2Rate() {
+    return cpc2Rate;
   }
 
   public boolean isExcluded() {

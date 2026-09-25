@@ -98,6 +98,8 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     // collections unapplied payments
     'UNAPPLIED',
     'FOR_REVERSAL',
+    // remittance deductions
+    'FOR_CONFIRMATION',
   ],
   // BDO style guide: blue pills for records moving through processing ("Account for Placement").
   info: [
@@ -160,6 +162,8 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     // disbursement
     'NOT_POSTED',
     'EXHAUSTED',
+    // remittance: settled by deductions, no payment request
+    'NOT_REQUIRED',
   ],
   danger: [
     'REJECTED',
@@ -186,7 +190,6 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'BROKEN',
     // disbursement
     'NO_PAYEE',
-    'RETURNED',
     'STALE',
     'REVERSAL_FAILED',
   ],

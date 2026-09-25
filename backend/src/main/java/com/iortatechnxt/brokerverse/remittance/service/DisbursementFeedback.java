@@ -5,20 +5,15 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
-import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
-import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
-import com.iortatechnxt.brokerverse.opsledger.domain.RemittanceStatus;
-import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
-import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerService;
 import com.iortatechnxt.brokerverse.opsledger.service.OpsLedgerEvents.DisbursementStatusChanged;
 import com.iortatechnxt.brokerverse.opsledger.service.OpsLedgerEvents.NegativeAdjustmentPending;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLine;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLineRepository;
+import com.iortatechnxt.brokerverse.remittance.domain.BatchSettlement;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatchRepository;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.BatchStage;
-import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
-import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
+import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,19 +28,29 @@ import org.springframework.transaction.event.TransactionalEventListener;
  *   <li>Disbursement status of a remittance payment request (RMTID.019/034): with the DV number the
  *       invoices become PARTIALLY_REMITTED or FULLY_REMITTED (DTIP balance left or not), their
  *       remittance lock is released and the batch moves on; a returned request is notified to the
- *       processors (re-sending waits for the Disbursement BRD, OQ02).
+ *       processors.
+ *   <li>A cancelled DV (DIS 2.20.0; the event's reason is the cancellation reason): the postings of
+ *       the batch's cycle are reversed and the batch returns to review, to be sent again ({@link
+ *       BatchCancellation}); when another team locked one of its invoices since, the batch is left
+ *       as it is and the processors are told why.
  *   <li>A negative adjustment raised on an invoice (RMTID.020/035) is notified to the Remittance
  *       Team, with the batch the invoice is in.
  * </ul>
+ *
+ * <p>Only the events of the batch's current payment request count: after a cancelled DV the next
+ * request is sent as {@code <batch>/R<n>}, and events of the earlier request are ignored.
  */
 @Component
 public class DisbursementFeedback {
 
+  private static final String DECIDED = "REMIT_BATCH_DECIDED";
+  private static final String BATCHES = "/remittance/batches/";
+  private static final String DV_OF = "DV of ";
+
   private final RemittanceBatchRepository batches;
   private final BatchLineRepository lines;
-  private final InvoiceLedgerQueryService ledger;
-  private final InvoiceLedgerService writer;
-  private final WorkflowService workflow;
+  private final BatchRemittance remittance;
+  private final BatchCancellation cancellation;
   private final NotificationService notifications;
   private final AuditTrailService audit;
 
@@ -54,25 +59,22 @@ public class DisbursementFeedback {
    *
    * @param batches batches
    * @param lines batch lines
-   * @param ledger ledger reads
-   * @param writer ledger statuses and locks
-   * @param workflow batch workflow
+   * @param remittance DV assigned
+   * @param cancellation DV cancelled
    * @param notifications notifications
    * @param audit audit trail
    */
   public DisbursementFeedback(
       RemittanceBatchRepository batches,
       BatchLineRepository lines,
-      InvoiceLedgerQueryService ledger,
-      InvoiceLedgerService writer,
-      WorkflowService workflow,
+      BatchRemittance remittance,
+      BatchCancellation cancellation,
       NotificationService notifications,
       AuditTrailService audit) {
     this.batches = batches;
     this.lines = lines;
-    this.ledger = ledger;
-    this.writer = writer;
-    this.workflow = workflow;
+    this.remittance = remittance;
+    this.cancellation = cancellation;
     this.notifications = notifications;
     this.audit = audit;
   }
@@ -86,7 +88,10 @@ public class DisbursementFeedback {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void on(DisbursementStatusChanged event) {
     if (RemittanceSettings.MODULE.equals(event.sourceModule())) {
-      batches.findByBatchNo(event.sourceRef()).ifPresent(b -> changed(b, event));
+      batches
+          .findByBatchNo(BatchSettlement.batchNoOf(event.sourceRef()))
+          .filter(b -> event.sourceRef().equals(b.cycleReference()))
+          .ifPresent(b -> changed(b, event));
     }
   }
 
@@ -99,38 +104,45 @@ public class DisbursementFeedback {
         "Disbursement " + event.requestNo() + " " + event.status());
     if (event.status() == DisbursementRequest.Status.DV_ASSIGNED
         && batch.getStage() == BatchStage.APPROVED) {
-      remitted(batch, event.dvNo());
+      remittance.remitted(batch, "DV " + event.dvNo());
     } else if (event.status() == DisbursementRequest.Status.RETURNED) {
-      notifications.notifyPermission(
-          ExtractionService.PROCESSORS,
-          new Notice(
-              "Payment request of " + batch.getBatchNo() + " returned",
-              event.reason(),
-              "/remittance/batches/" + batch.getId(),
-              BatchService.ENTITY,
-              batch.getId().toString()),
-          "REMIT_BATCH_DECIDED");
+      notifyProcessors(batch, "Payment request of " + batch.getBatchNo() + " returned", event);
+    } else if (event.status() == DisbursementRequest.Status.CANCELLED
+        && BatchCancellation.restorable(batch)) {
+      cancelled(batch, event);
     }
   }
 
-  private void remitted(RemittanceBatch batch, String dvNo) {
-    boolean full = true;
-    for (BatchLine line : batch.included()) {
-      OpsInvoice invoice = ledger.require(line.getInvoiceNo());
-      boolean cleared = invoice.component(LedgerComponent.DTIP).getBalance().signum() <= 0;
-      RemittanceStatus status =
-          cleared ? RemittanceStatus.FULLY_REMITTED : RemittanceStatus.PARTIALLY_REMITTED;
-      full &= cleared;
-      String why = "DV " + dvNo + " of " + batch.getBatchNo();
-      writer.setRemittanceStatus(line.getInvoiceNo(), status, RemittanceSettings.MODULE, why);
-      writer.unlock(line.getInvoiceNo(), RemittanceSettings.MODULE, why);
-      line.remitted(status);
+  private void cancelled(RemittanceBatch batch, DisbursementStatusChanged event) {
+    List<String> blockers = cancellation.blockers(batch);
+    if (blockers.isEmpty()) {
+      cancellation.restore(batch, event.dvNo(), event.reason());
+      notifyProcessors(
+          batch, DV_OF + batch.getBatchNo() + " cancelled - batch back to review", event);
+    } else {
+      notifications.notifyPermission(
+          ExtractionService.PROCESSORS,
+          new Notice(
+              DV_OF + batch.getBatchNo() + " cancelled - restore blocked",
+              "Invoices locked by another team: " + String.join(", ", blockers),
+              BATCHES + batch.getId(),
+              BatchService.ENTITY,
+              batch.getId().toString()),
+          DECIDED);
     }
-    workflow.systemTransition(
-        BatchService.ENTITY,
-        batch.getId().toString(),
-        full ? "dv_full" : "dv_partial",
-        TransitionNote.comment("DV " + dvNo));
+  }
+
+  private void notifyProcessors(
+      RemittanceBatch batch, String title, DisbursementStatusChanged event) {
+    notifications.notifyPermission(
+        ExtractionService.PROCESSORS,
+        new Notice(
+            title,
+            event.reason(),
+            BATCHES + batch.getId(),
+            BatchService.ENTITY,
+            batch.getId().toString()),
+        DECIDED);
   }
 
   /**

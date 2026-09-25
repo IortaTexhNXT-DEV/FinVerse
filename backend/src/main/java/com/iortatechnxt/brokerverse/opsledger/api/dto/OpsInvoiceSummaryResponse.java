@@ -24,6 +24,9 @@ import java.time.LocalDate;
  * @param paymentStatus payment status
  * @param remittanceStatus remittance status
  * @param flags flags and lock
+ * @param inceptionDate period start
+ * @param aoUsername account officer
+ * @param rootInvoiceNo root of the invoice family (DIS 3.27.2)
  */
 public record OpsInvoiceSummaryResponse(
     String invoiceNo,
@@ -39,7 +42,10 @@ public record OpsInvoiceSummaryResponse(
     BigDecimal premiumBalance,
     PaymentStatus paymentStatus,
     RemittanceStatus remittanceStatus,
-    FlagsResponse flags) {
+    FlagsResponse flags,
+    LocalDate inceptionDate,
+    String aoUsername,
+    String rootInvoiceNo) {
 
   /**
    * Maps an invoice (components loaded).
@@ -62,6 +68,9 @@ public record OpsInvoiceSummaryResponse(
         i.premiumBalance(),
         i.getPaymentStatus(),
         i.getRemittanceStatus(),
-        FlagsResponse.from(i));
+        FlagsResponse.from(i),
+        i.getClassification().inceptionDate(),
+        i.getClassification().aoUsername(),
+        i.getRootInvoiceNo());
   }
 }

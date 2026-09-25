@@ -60,6 +60,9 @@ public class BookedInvoice extends BaseEntity {
   @Column(name = "parent_invoice_no", length = 40)
   private String parentInvoiceNo;
 
+  @Column(name = "root_invoice_no", length = 40)
+  private String rootInvoiceNo;
+
   @Column(name = "policy_year", nullable = false)
   private int policyYear;
 
@@ -165,6 +168,8 @@ public class BookedInvoice extends BaseEntity {
           "INVOICE_ALREADY_BOOKED", "Invoice " + arn + "/" + transactionNo + " is " + status);
     }
     this.invoiceNo = number;
+    // Endorsements and cancellations always name the original booking as parent (DIS 3.27.2)
+    this.rootInvoiceNo = parentInvoiceNo == null ? number : parentInvoiceNo;
     this.bookingDate = date;
     this.source = bookingSource;
     this.bookedBy = user;
@@ -257,6 +262,16 @@ public class BookedInvoice extends BaseEntity {
 
   public String getParentInvoiceNo() {
     return parentInvoiceNo;
+  }
+
+  /**
+   * Root of the invoice family: the invoice itself for an original booking, else the root of its
+   * parent (DIS 3.27.2); the same value as the Operations ledger's {@code root_invoice_no}.
+   *
+   * @return root invoice number, null before booking
+   */
+  public String getRootInvoiceNo() {
+    return rootInvoiceNo;
   }
 
   public int getPolicyYear() {

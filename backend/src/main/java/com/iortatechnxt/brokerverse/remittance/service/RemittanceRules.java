@@ -118,18 +118,36 @@ public final class RemittanceRules {
         incentiveRate == null
             ? Money.zero()
             : Money.round(basic.multiply(incentiveRate).movePointLeft(2));
-    BigDecimal incentiveVat =
-        p.commission().due().signum() == 0
-            ? Money.zero()
-            : Money.round(
-                incentive
-                    .multiply(p.commissionVat().due())
-                    .divide(p.commission().due(), RATE_SCALE, RoundingMode.HALF_EVEN));
+    BigDecimal incentiveVat = vatOn(incentive, p);
     BigDecimal paid = Money.round(amount);
     BigDecimal net = paid.add(wtax).subtract(commission).subtract(vat);
     return new Line(
         new RemittanceAmounts(paid, commission, vat, wtax, paid, incentive, incentiveVat, net),
         basic);
+  }
+
+  /**
+   * The CPC2 incentive of a line (DIS 3.29.2): the rate of the CPC2 criterion on the basic premium
+   * remitted (the same base as the early incentive; the base and VAT treatment wait for AQ24), with
+   * output VAT at the invoice's commission VAT ratio.
+   *
+   * @param p ledger position
+   * @param line amounts of the line
+   * @param rate CPC2 rate in percent
+   * @return the line's amounts with the CPC2 incentive
+   */
+  public static RemittanceAmounts cpc2(Position p, Line line, BigDecimal rate) {
+    BigDecimal amount = Money.round(line.basicPremium().multiply(rate).movePointLeft(2));
+    return line.amounts().withCpc2(amount, vatOn(amount, p));
+  }
+
+  private static BigDecimal vatOn(BigDecimal amount, Position p) {
+    return p.commission().due().signum() == 0
+        ? Money.zero()
+        : Money.round(
+            amount
+                .multiply(p.commissionVat().due())
+                .divide(p.commission().due(), RATE_SCALE, RoundingMode.HALF_EVEN));
   }
 
   private static BigDecimal realized(Part part, BigDecimal ratio, boolean clears) {

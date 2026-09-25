@@ -14,7 +14,7 @@ export type CancellationKind = 'FLAT' | 'FLAT_RETAIN_DST' | 'PARTIAL';
 export type PeriodBasis = 'PRO_RATA' | 'SHORT_PERIOD';
 export type SiKind = 'INVOICE' | 'CREDIT';
 export type SiRecipient = 'INSURER' | 'INTERNAL';
-export type SiTrigger = 'ON_BOOKING' | 'ON_ENDORSEMENT' | 'MANUAL';
+export type SiTrigger = 'ON_BOOKING' | 'ON_ENDORSEMENT' | 'MANUAL' | 'ON_INCENTIVE';
 export type BalanceSide = 'DEBIT' | 'CREDIT';
 
 export interface WorkbenchCounts {
@@ -111,6 +111,8 @@ export interface BookedInvoice extends InvoiceDraft {
   status: InvoiceStatus;
   endorsementNo?: string;
   parentInvoiceNo?: string;
+  /** Root of the invoice family (DIS 3.27.2). */
+  rootInvoiceNo?: string;
   bookingDate?: string;
   source: string;
   serviceInvoiceNo?: string;

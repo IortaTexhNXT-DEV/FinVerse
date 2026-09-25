@@ -117,6 +117,20 @@ class RemittanceRulesTest {
   }
 
   @Test
+  void cpc2IsTheRateOnTheBasicPremiumWithVatAndReducesThePayable() {
+    Position p = position("1000.00", "0", "0");
+    Line line = RemittanceRules.amounts(p, d("1000.00"), null);
+    RemittanceAmounts a = RemittanceRules.cpc2(p, line, d("1"));
+    assertThat(line.basicPremium()).isEqualByComparingTo("800.00");
+    assertThat(a.cpc2()).isEqualByComparingTo("8.00");
+    assertThat(a.cpc2Vat()).isEqualByComparingTo("0.96");
+    assertThat(a.cpc2Total()).isEqualByComparingTo("8.96");
+    assertThat(a.payable()).isEqualByComparingTo(a.netDue().subtract(d("8.96")));
+    assertThat(a.plus(a).cpc2()).isEqualByComparingTo("16.00");
+    assertThat(line.amounts().cpc2()).isZero();
+  }
+
+  @Test
   void incentiveRulesMatchInsurerLineSegmentPeriodAndWindow() {
     EarlyIncentiveRule rule =
         new EarlyIncentiveRule(

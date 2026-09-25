@@ -22,6 +22,7 @@ import java.util.List;
  * @param status status
  * @param endorsementNo endorsement number
  * @param parentInvoiceNo invoice an endorsement relates to
+ * @param rootInvoiceNo root of the invoice family (DIS 3.27.2)
  * @param policyYear policy year
  * @param policyNo policy number
  * @param facts client, insurer, risk, sales and cost center
@@ -49,6 +50,7 @@ public record InvoiceResponse(
     InvoiceStatus status,
     String endorsementNo,
     String parentInvoiceNo,
+    String rootInvoiceNo,
     int policyYear,
     String policyNo,
     InvoiceFacts facts,
@@ -83,6 +85,7 @@ public record InvoiceResponse(
         i.getStatus(),
         i.getEndorsementNo(),
         i.getParentInvoiceNo(),
+        i.getRootInvoiceNo(),
         i.getPolicyYear(),
         i.getPolicyNo(),
         i.getFacts(),

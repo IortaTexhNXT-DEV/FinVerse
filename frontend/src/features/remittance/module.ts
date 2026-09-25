@@ -2,6 +2,7 @@ import {
   CirclePause,
   FileCheck,
   Layers,
+  MinusCircle,
   PackageSearch,
   Percent,
   Scale,
@@ -12,11 +13,18 @@ import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
 const TEAM = ['REMIT_PROCESS', 'REMIT_EXTRACT', 'REMIT_APPROVE', 'REMIT_OR_UPLOAD'];
+const DEDUCTION_READERS = [
+  'ACSL_VIEW',
+  'REMIT_DEDUCTION_CONFIRM',
+  'REMIT_PROCESS',
+  'REMIT_APPROVE',
+];
 
 /**
  * Remittance (RMTID.001-040, MKTID.001-009; docs/architecture/OPERATIONS_DESIGN.md section 12):
  * the workbench, extraction, batches with Process Remittance, insurer OR upload, holds, special
- * remittance, DTIP status and the early-remittance incentive rules.
+ * remittance, DTIP status, the insurer-confirmed deductions (ACSL 2.9.2) and the early-remittance
+ * incentive rules.
  */
 export const remittanceModule: FeatureModule = {
   id: 'remittance',
@@ -112,6 +120,23 @@ export const remittanceModule: FeatureModule = {
       permission: 'REMIT_PROCESS',
       alsoPermissions: TEAM,
       component: lazy(() => import('./DtipStatusPage')),
+    },
+    {
+      path: '/remittance/deductions',
+      label: 'Remittance Deductions',
+      icon: MinusCircle,
+      permission: 'ACSL_PROCESS',
+      alsoPermissions: DEDUCTION_READERS,
+      component: lazy(() => import('./DeductionsPage')),
+    },
+    {
+      path: '/remittance/deductions/:id',
+      label: 'Remittance Deduction',
+      icon: MinusCircle,
+      permission: 'ACSL_PROCESS',
+      alsoPermissions: DEDUCTION_READERS,
+      component: lazy(() => import('./DeductionDetailPage')),
+      hidden: true,
     },
     {
       path: '/remittance/incentive-rules',

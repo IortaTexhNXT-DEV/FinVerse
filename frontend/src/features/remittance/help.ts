@@ -40,14 +40,17 @@ export const REMITTANCE_HELP: HelpSection = {
       workflow: [
         'Review the accounts of a batch; exclude an account with a reason or restore it from the Exclusions panel while the batch is in review.',
         'Preview and Submit shows the accounts kept, the totals and any problem; the schedule and payment request are stored at submission.',
-        'The team leader approves: the remittance is posted, the payment request goes to Disbursement and the commission and incentive ORs are requested from Cashiering.',
+        'The team leader approves: the remittance, the early and CPC2 incentives and the confirmed insurer deductions are posted, the payment request goes to Disbursement straight to its approver and the commission and incentive ORs are requested from Cashiering.',
+        'An early incentive is billed to the insurer with an automatic service invoice carrying the 2% withholding tax (EARLY_INCENTIVE_WTAX_RATE).',
         'When Disbursement assigns the DV number the invoices become fully or partially remitted; Send Schedule to Insurer e-mails the protected Excel schedule once.',
+        'If Disbursement cancels the DV, the postings are reversed and the batch returns to review; approving it again sends a new payment request (reference ending /R2, /R3...).',
         'Return Batch with a reason gives the invoices back, tagged Returned, for the next extraction.',
       ],
       controls: [
         'The approver cannot be the processor or the submitter (four eyes).',
         'Invoices in a batch are locked for remittance: adjustments wait until the batch is remitted, returned or the invoice excluded.',
         'Every exclusion, restore, submission, approval and return is audited and kept in the status history.',
+        'CPC2 applies to the packaged Fire and Motor products of the CPC2 incentive criterion (Product Maintenance) and is shown per account and on the Settlement tab.',
       ],
     },
     {
@@ -103,6 +106,21 @@ export const REMITTANCE_HELP: HelpSection = {
         'Search by invoice, ARN, policy or assured; filter by insurer and remittance status.',
         'Queue for End of Day asks the scheduled extraction to examine the invoice tonight.',
         'Accounts in Batches finds an account by invoice, batch, endorsement, policy or assured.',
+      ],
+    },
+    {
+      name: 'Remittance Deductions',
+      path: '/remittance/deductions',
+      summary:
+        "Amounts an insurer confirmed in writing, such as an AR insurer's refund, deducted from its next remittance batches (ACSL 2.9.2).",
+      workflow: [
+        "The ACSL processor records the insurer, currency, source, amount and the insurer's confirmation, attaches the letter and submits.",
+        'The ACSL team leader confirms it (or returns it); the next approved batches of that insurer and currency deduct it, oldest first.',
+        'A deduction becomes Applied once the batches that used it received the insurer OR; a cancelled DV gives the amount back.',
+      ],
+      controls: [
+        "No submission without the insurer's confirmation reference and date; the confirmer cannot be the preparer (four eyes).",
+        'A batch never deducts more than it pays; what is left waits for the next batch.',
       ],
     },
     {

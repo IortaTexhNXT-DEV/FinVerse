@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.booking.domain.ServiceInvoiceType;
 import com.iortatechnxt.brokerverse.booking.domain.ServiceInvoiceTypeRepository;
 import com.iortatechnxt.brokerverse.booking.domain.SiKind;
 import com.iortatechnxt.brokerverse.booking.domain.SiRecipient;
+import com.iortatechnxt.brokerverse.booking.domain.SiTrigger;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
@@ -114,6 +115,24 @@ public class ServiceInvoiceService {
             null,
             request.remarks());
     return save(request.companyId(), values, type.getTemplateCode(), "Issued");
+  }
+
+  /**
+   * Issues a service invoice by hand (register screen, BRNB.100): types issued automatically after
+   * the early-incentive computation ({@link SiTrigger#ON_INCENTIVE}) are refused (DIS 3.29.1).
+   *
+   * @param request type, recipient, references and amounts
+   * @return the service invoice
+   */
+  public ServiceInvoice issueManual(IssueRequest request) {
+    if (requireType(request.typeCode()).getTrigger() == SiTrigger.ON_INCENTIVE) {
+      throw new BusinessRuleException(
+          "SERVICE_INVOICE_AUTOMATIC_ONLY",
+          "Service invoices of type "
+              + request.typeCode()
+              + " are issued automatically with the early remittance incentive");
+    }
+    return issue(request);
   }
 
   /**

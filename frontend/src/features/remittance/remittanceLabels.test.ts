@@ -31,7 +31,9 @@ function line(invoiceNo: string, paidAr: number, excluded = false): BatchLine {
       incentive: 0,
       incentiveVat: 0,
       netDue: paidAr - 10.3,
-      payable: paidAr - 10.3,
+      cpc2: 1,
+      cpc2Vat: 0.12,
+      payable: paidAr - 11.42,
     },
     exclusion: excluded ? { excluded: true, reason: 'OTHERS' } : undefined,
   };
@@ -52,6 +54,7 @@ describe('remittance labels', () => {
     expect(totals.paidAr).toBeCloseTo(300.3, 2);
     expect(totals.commission).toBeCloseTo(20.2, 2);
     expect(totals.netDue).toBeCloseTo(279.7, 2);
+    expect(totals.cpc2 + totals.cpc2Vat).toBeCloseTo(2.24, 2);
     expect(isExcluded(line('C', 1, true))).toBe(true);
     expect(isExcluded(line('D', 1))).toBe(false);
   });

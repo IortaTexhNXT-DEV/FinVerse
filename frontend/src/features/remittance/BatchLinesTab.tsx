@@ -46,6 +46,7 @@ const COLUMNS: Column<BatchLine>[] = [
   amountColumn('vat', 'VAT', (l) => l.amounts.commissionVat),
   amountColumn('wtax', 'WTAX', (l) => l.amounts.wtax),
   amountColumn('inc', 'Incentive', (l) => l.amounts.incentive + l.amounts.incentiveVat),
+  amountColumn('cpc2', 'CPC2', (l) => l.amounts.cpc2 + l.amounts.cpc2Vat),
   amountColumn('net', 'Net Due', (l) => l.amounts.netDue),
   {
     key: 'or',

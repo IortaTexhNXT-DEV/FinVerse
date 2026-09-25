@@ -2,6 +2,7 @@ import type {
   InvoiceComponentRow,
   InvoiceFlags,
   LedgerComponent,
+  OpsInvoice,
   OpsSection,
   RelatedItem,
   RelatedSection,
@@ -140,7 +141,12 @@ export const RELATED_TABS = [
 
 /** Id of an Invoice 360 tab. */
 export type Invoice360TabId =
-  'components' | 'movements' | (typeof RELATED_TABS)[number]['id'] | 'history' | 'documents';
+  | 'components'
+  | 'movements'
+  | 'family'
+  | (typeof RELATED_TABS)[number]['id']
+  | 'history'
+  | 'documents';
 
 /**
  * The Invoice 360 tabs in display order, each module tab labelled with its record count so the user
@@ -156,8 +162,29 @@ export function invoiceTabs(
   return [
     { id: 'components', label: 'Components & Balances' },
     { id: 'movements', label: 'Movements' },
+    { id: 'family', label: 'Invoice Family' },
     ...RELATED_TABS.map((t) => ({ id: t.id, label: counted(t.label, t.section) })),
     { id: 'history', label: 'History' },
     { id: 'documents', label: counted('Documents', 'DOCUMENTS') },
   ];
+}
+
+/**
+ * Totals of an invoice family (DIS 3.27.2, ACSL 2.16.0): the gross premium and the outstanding
+ * premium of the original booking with its endorsements and cancellation.
+ */
+export function familyTotals(
+  invoices: readonly Pick<OpsInvoice, 'grossPremium' | 'premiumBalance'>[],
+): {
+  gross: number;
+  outstanding: number;
+} {
+  const round = (n: number) => Math.round(n * 100) / 100;
+  return invoices.reduce(
+    (t, i) => ({
+      gross: round(t.gross + i.grossPremium),
+      outstanding: round(t.outstanding + i.premiumBalance),
+    }),
+    { gross: 0, outstanding: 0 },
+  );
 }

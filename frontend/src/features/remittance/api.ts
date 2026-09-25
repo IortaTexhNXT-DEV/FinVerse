@@ -1,5 +1,6 @@
 import { api } from '@/api/client';
 import type { PageResponse } from '@/api/types';
+import type { Amounts, Settlement } from './amounts';
 
 /** Remittance API client (RMTID.001-039, MKTID.001-009): /api/v1/remittance. */
 
@@ -32,17 +33,7 @@ export type SpecialStage =
   | 'RETURNED';
 export type DocumentKind = 'SCHEDULE_PDF' | 'SCHEDULE_XLSX' | 'PAYMENT_REQUEST_PDF';
 
-export interface Amounts {
-  paidAr: number;
-  commission: number;
-  commissionVat: number;
-  wtax: number;
-  dtip: number;
-  incentive: number;
-  incentiveVat: number;
-  netDue: number;
-  payable: number;
-}
+export type { Amounts, Settlement } from './amounts';
 
 export interface ExtractionRun {
   id: number;
@@ -125,6 +116,8 @@ export interface BatchLine {
   bookingDate: string;
   lastPaidOn?: string;
   basicPremium: number;
+  cpc2Code?: string;
+  cpc2Rate?: number;
   amounts: Amounts;
   exclusion?: Exclusion;
   insurerOr?: InsurerOr;
@@ -146,6 +139,7 @@ export interface Batch {
     incentiveOrStatus?: string;
     message?: string;
   };
+  settlement: Settlement;
   scheduleSentAt?: string;
   extractFileId?: number;
   lines: BatchLine[];

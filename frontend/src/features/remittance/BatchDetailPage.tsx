@@ -31,6 +31,7 @@ import { remittanceApi } from './api';
 import type { Batch, DocumentKind } from './api';
 import { ApproveDialog, PreviewDialog, SendScheduleDialog } from './BatchDialogs';
 import { BatchLinesTab } from './BatchLinesTab';
+import { BatchSettlementTab } from './BatchSettlementTab';
 import { TotalsStrip, TypeChip } from './RemittanceParts';
 import { joinParts } from './remittanceLabels';
 import './remittance.css';
@@ -38,6 +39,7 @@ import './remittance.css';
 const ENTITY = 'RemittanceBatch';
 const TABS = [
   { id: 'lines', label: 'Accounts' },
+  { id: 'settlement', label: 'Settlement' },
   { id: 'documents', label: 'Documents and Receipts' },
 ] as const;
 type TabId = (typeof TABS)[number]['id'];
@@ -47,7 +49,7 @@ const SENDABLE = ['APPROVED', 'PARTIALLY_REMITTED', 'FULLY_REMITTED', 'OR_RECEIV
 function disbursementText(batch: Batch): string {
   const d = batch.disbursement;
   if (d.requestNo === undefined) {
-    return 'Not sent';
+    return d.status === 'NOT_REQUIRED' ? 'Settled by deductions' : 'Not sent';
   }
   const dv = batch.summary.dvNo === undefined ? undefined : `DV ${batch.summary.dvNo}`;
   return joinParts([d.requestNo, humanize(d.status ?? ''), dv]);
@@ -265,17 +267,17 @@ export default function BatchDetailPage() {
           void queryClient.invalidateQueries({ queryKey: ['remittance', 'batch', id] })
         }
       />
-      <TotalsStrip totals={s.totals} currency={s.currency} />
+      <TotalsStrip totals={s.totals} currency={s.currency} settlement={b.settlement} />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
-      {tab === 'lines' ? (
+      {tab === 'lines' && (
         <BatchLinesTab
           batch={b}
           editable={editable}
           onChanged={(next) => queryClient.setQueryData(['remittance', 'batch', id], next)}
         />
-      ) : (
-        <DocumentsTab batch={b} />
       )}
+      {tab === 'settlement' && <BatchSettlementTab batch={b} />}
+      {tab === 'documents' && <DocumentsTab batch={b} />}
       {dialog === 'submit' && (
         <PreviewDialog
           batch={b}

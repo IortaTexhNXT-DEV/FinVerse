@@ -7,5 +7,10 @@ public enum SiTrigger {
   /** Issued automatically on every positive financial endorsement. */
   ON_ENDORSEMENT,
   /** Issued by a user. */
-  MANUAL
+  MANUAL,
+  /**
+   * Issued automatically by remittance after the early-incentive computation (DIS 3.29.1); never
+   * issued by hand.
+   */
+  ON_INCENTIVE
 }

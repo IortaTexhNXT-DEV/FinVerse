@@ -1,6 +1,12 @@
 package com.iortatechnxt.brokerverse.support;
 
+import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
+import io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
@@ -8,9 +14,15 @@ import org.springframework.test.context.TestPropertySource;
 /**
  * Base of the tests that run the application with Redis and Kafka enabled, without Docker: an
  * in-JVM Redis protocol server ({@link EmbeddedRedis}) and an embedded KRaft Kafka broker. Every
- * subclass shares one application context.
+ * test class starts its own context (the annotations of {@code IntegrationTest}, declared here so
+ * the embedded database applies) and closes it afterwards, so the broker and the second context do
+ * not stay in memory for the rest of the run.
  */
-@IntegrationTest
+@SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@AutoConfigureEmbeddedDatabase(provider = DatabaseProvider.ZONKY)
 @EmbeddedKafka(
     kraft = true,
     partitions = 2,

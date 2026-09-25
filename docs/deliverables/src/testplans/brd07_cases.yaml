@@ -1,0 +1,2226 @@
+# Test plan BRD-7 Claims - test data file.
+# Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/testplans/brd07_cases.yaml
+# Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
+# Claims is designed and not built: messages are the FRS texts (no codes), screen paths are those of the
+# build design (docs/architecture/CLAIMS_BROKING_DESIGN.md) and there is no automation reference. Where a
+# check reuses a platform message that exists today (log-in, report parameters, e-mail address), the case
+# quotes the text BIBS shows and a finding records the FRS difference.
+# The FRS priority "High (BRD p.21)" is set on each case (priority: High); the builder maps only
+# "Must have" style values, so the condition sheet shows these conditions as Medium (finding TF-CL-07).
+
+meta:
+  brd: BRD-07
+  name: Claims
+  code: CL
+  frs: FRS_BRD07_CLAIMS.md
+  summary: TP_BRD07_CLAIMS.md
+  version: "1.0"
+  date: 25 September 2026
+  built: false
+
+personas:
+  CLM_OFFICER: {name: Claims Officer / Claims Assistant, short: CLM Off.}
+  CLM_TL: {name: Claims Team Lead, short: CLM TL}
+  CLM_TH: {name: Claims Team Head, short: CLM TH}
+  CLM_UH: {name: Claims Unit Head, short: CLM UH}
+  CLM_RISK: {name: Claims / Risk user, short: CLM Risk}
+  MKT_AO: {name: Marketing AO, short: MKT AO}
+  MKT_TL: {name: Marketing Team Leader, short: MKT TL}
+  REMITTANCE: {name: Operations Remittance user (BRD-2), short: Remit.}
+  SYSADMIN: {name: System Administrator, short: Sys. Admin}
+  AUDITOR: {name: Auditor, short: Audit.}
+  SYSTEM: {name: BIBS scheduled job or event}
+
+screens:
+  LOGIN: Login page
+  HOME: Claims Handling > Claims Home
+  WORKLIST: Claims Handling > Claims Worklist
+  COVER: Claims Handling > Cover Lookup
+  NEWCLAIM: Claims Handling > Record Claim
+  CLAIM: Claims Handling > Claims Worklist > Claim record (summary card)
+  DETAILS: Claims Handling > Claim record > Details tab
+  LOCATIONS: Claims Handling > Claim record > Locations tab
+  INSURERS: Claims Handling > Claim record > Insurers & Updates tab
+  RESERVE: Claims Handling > Claim record > Reserve & Settlement tab
+  DIARY: Claims Handling > Claim record > Diary tab
+  DOCS: Claims Handling > Claim record > Documents tab
+  HIST: Claims Handling > Claim record > History tab
+  LOCREF: Claims Handling > Insurer Location References
+  SETUP: Claims Handling > Claims Setup
+  LOV: Broking Setup > Lists of Values
+  BULK: Broking Setup > Bulk Upload
+  REPORTS: Reports > Report Centre (category Claims Handling)
+  ACCOUNT: Accounts > Account page > Claims tab (BRD-1)
+  INVOICE: Operations > Invoices > Invoice page (BRD-2)
+  SPECREM: Operations > Remittance > Special Remittance request (BRD-2)
+  CASHIER: Cashiering > Receipts (BRD-2)
+  ACCREQ: Broking Setup > Access Requests
+  AUDIT: Administration > Audit Trail
+  NOTIF: Notifications (bell icon in the page header)
+  MAILBOX: Test mailbox of the insurer (SIT mail relay)
+  API: API call with the user's token (tester tool, for example Postman)
+
+data:
+  - id: TD-CL-01
+    name: Test users per Claims role
+    content: cl.officer1 (CLM_OFFICER, unit Motor HO), cl.officer2 (CLM_OFFICER, Non-Motor HO), cl.tl1 (CLM_TL), cl.th1 (CLM_TH), cl.uh1 and cl.uh2 (CLM_UH), cl.risk (CLM_RISK), cl.mktao (MKT_AO), cl.mkttl (MKT_TL), cl.remit (Operations remittance), cl.sysadmin (SYSADMIN), cl.auditor (AUDITOR); cl.officer3 (CLM_OFFICER) is not in the claims handler register
+    source: Created by the test lead on SIT through approved access requests (BRD-11); grants of FRS section 3.3
+  - id: TD-CL-02
+    name: Motor cover, premium paid
+    content: ARN-2026-000501 Motor own damage and theft, currency PHP, policy year 2026, policy MC-2026-11021 issued, one booked endorsement (version 1), all invoices paid, AO cl.mktao of Retail Marketing 1, branch Makati
+    source: Booked and paid through BRD-1 and Cashiering on SIT; masked client
+  - id: TD-CL-03
+    name: Property cover, three locations, two insurers, unpaid endorsement
+    content: ARN-2026-000602 Fire and allied perils, currency USD, locations L1 Makati, L2 Pasig, L3 Cebu; insurers INS-A 60 % and INS-B 40 %; original invoice paid, endorsement invoice PHP 18,400 unpaid; one cancelled unpaid invoice
+    source: Booked on SIT with two insurer shares; endorsement invoice left unpaid
+  - id: TD-CL-04
+    name: Covers for defaults and edge cases
+    content: ARN-2026-000703 without currency (defaults to PHP); ARN-2026-000704 direct-payment account (premium paid to the insurer); ARN-2026-000705 policy not yet issued; ARN-2026-000706 with a second endorsement booked after the loss date
+    source: Booked on SIT by the test lead
+  - id: TD-CL-05
+    name: Claims in every phase
+    content: "BCL-2026-000101 status 1 (NEW); BCL-2026-000102 status 3 (IN_PROGRESS, 5 days in status 3 then status 8 for 2 days); BCL-2026-000103 status 11 awaiting premium remittance; BCL-2026-000104 status 18 (TEMP_CLOSED); BCL-2026-000105 closed Closed - Denied on 15 March; BCL-2026-000106 settled Settled - Signed Release Papers Returned; claims aged 45, 80 and 95 days for the ageing and past-due cases"
+    source: Recorded on SIT by the test lead; reported dates set in the test database for ageing
+  - id: TD-CL-06
+    name: Lists and matrix
+    content: The 18 statuses, 10 settlement types, 25 adjusters, 7 catastrophe codes of the FRS; default status access matrix (TL and TH all statuses; officers statuses 1, 2, 17 and 18); claims handler register (Motor HO, Non-Motor HO, branches)
+    source: Delivered list values of FRS section 9.2; register keyed in by cl.uh1
+  - id: TD-CL-07
+    name: Upload files
+    content: "Insurer claim numbers file (10 rows); insurer updates file of 50 rows with one row whose insurer claim number matches no claim; insurer location references file"
+    source: Prepared from the bulk templates BCL_INSURER_UPDATE and BCL_LOCATION_REF by the test lead
+  - id: TD-CL-08
+    name: Loss figures
+    content: "Claim with reserve 100,000 and paid 60,000 (O/S 40,000); cover with premium 50,000 and losses 25,000 (loss ratio 50.00 %); location L1 with 3 claims in the last 3 years, one tagged Flood"
+    source: Recorded on SIT with reserves and settlements; premiums from the booked invoices
+  - id: TD-CL-09
+    name: Insurer mailboxes
+    content: INS-A claims e-mail cl-ins-a@test.bdoi.local; INS-B without a claims e-mail
+    source: Insurer master on SIT; mailboxes of the SIT relay
+
+scenarios:
+  - id: SC-CL-01
+    persona: SYSADMIN
+    title: Access and audit. Claims users log in, see only the Claims actions of their role, and every change on a claim is kept in its history and the audit trail.
+    pre: Users of TD-CL-01 are active.
+  - id: SC-CL-02
+    persona: CLM_OFFICER
+    title: Cover and premium. The Claims Officer looks up a cover, records a claim with cover, version, policy number and sales data, and gets the authorization code only when the premium is paid.
+    pre: Covers TD-CL-02 to TD-CL-04.
+  - id: SC-CL-03
+    persona: CLM_OFFICER
+    title: Locations and insurers. The officer links several locations and insurers to one claim, records insurer claim numbers and updates, maintains insurer location references and sends the loss advice.
+    pre: Cover TD-CL-03; files TD-CL-07; mailboxes TD-CL-09.
+  - id: SC-CL-04
+    persona: CLM_TL
+    title: Claim handling. The Team Lead overrides the claimant, assigns adjusters, amends the reserve and tags catastrophes.
+    pre: Open claims of TD-CL-05; lists TD-CL-06.
+  - id: SC-CL-05
+    persona: CLM_TL
+    title: Status, settlement and closure. Handlers change statuses within the matrix, set the settlement, close temporarily or permanently, reopen, and request the special remittance.
+    pre: Claims TD-CL-05; matrix TD-CL-06.
+  - id: SC-CL-06
+    persona: CLM_OFFICER
+    title: Follow-up and ageing. BIBS computes follow-up dates and ages; handlers keep the action plan and diary and work the follow-ups due from Claims Home.
+    pre: Claims TD-CL-05.
+  - id: SC-CL-07
+    persona: CLM_UH
+    title: Reports and analytics. Claims users and Marketing run the ageing, outstanding, settled, loss, location and register reports and the data extract within their rights.
+    pre: Claims TD-CL-05 and loss figures TD-CL-08.
+  - id: SC-CL-08
+    persona: CLM_UH
+    title: Set-up. The Unit Head maintains statuses, settlement types, adjusters, catastrophe codes and the status matrix under maker-checker.
+    pre: cl.uh1 and cl.uh2 available.
+
+frs:
+  FR-CL-001:
+    scenario: SC-CL-01
+    persona: CLM_OFFICER
+    screen: LOGIN
+    data: [TD-CL-01]
+    conditions:
+      - A user with a Claims role logs in with a masked password and sees the Claims Handling menu section.
+      - Wrong credentials are refused with a plain message and counted.
+      - After three failed attempts the account is locked until the System Administrator unlocks it.
+      - An idle session ends after the configured timeout.
+      - Every log-in and failed log-in is recorded with user, time and source address, visible to the System Administrator only.
+    cases:
+      - c: 1
+        type: Positive
+        title: Claims Officer logs in and sees Claims Handling
+        steps:
+          - Open the BIBS URL; enter cl.officer1 and the password (shown masked); Sign in.
+          - Open the side menu.
+        expected: The section Claims Handling lists Claims Home, Claims Worklist, Cover Lookup, Record Claim, My Diary and Reports.
+      - c: 2
+        type: Negative
+        title: Wrong password
+        steps:
+          - Enter cl.officer1 and a wrong password; Sign in.
+        expected: The Login page stays open and no session starts.
+        msg: [Invalid user name or password]
+      - c: 3
+        type: Boundary
+        neg: true
+        title: The fourth attempt after three wrong passwords is refused
+        steps:
+          - Enter cl.officer2 with a wrong password three times, then the correct password.
+        expected: The account is locked after the third attempt and the fourth attempt is refused.
+        msg: [Account is locked. Contact your administrator.]
+      - c: 3
+        type: Boundary
+        title: Two wrong passwords do not lock
+        steps:
+          - Enter cl.officer2 (unlocked) with a wrong password twice, then the correct password.
+        expected: The log-in succeeds.
+      - c: 4
+        type: Positive
+        screen: WORKLIST
+        title: Idle session ends after the timeout
+        pre: The session policy idle timeout is set to 15 minutes (CLQ24).
+        steps:
+          - Log in; leave the worklist idle for 15 minutes; click a claim.
+        expected: The session has ended; the Login page opens.
+      - c: 5
+        type: Security-access
+        persona: SYSADMIN
+        screen: AUDIT
+        title: Log-in audit visible to the System Administrator only
+        steps:
+          - As cl.sysadmin open the Audit Trail for today and cl.officer2.
+          - As cl.tl1 look for the Audit Trail.
+        expected: The successful and failed log-ins and the lock are listed with time and source address; cl.tl1 has no Audit Trail in the menu.
+
+  FR-CL-002:
+    scenario: SC-CL-01
+    persona: CLM_OFFICER
+    screen: CLAIM
+    data: [TD-CL-01, TD-CL-05]
+    conditions:
+      - Each Claims action is offered only to the roles holding its permission; a direct call without it is refused (HTTP 403) and logged.
+      - Marketing roles get the Claims reports only, never claim maintenance.
+      - A claim of another company is answered as not found.
+      - Grants change only through an approved User Access request.
+    cases:
+      - c: 1
+        priority: High
+        type: Security-access
+        brd: [BRCLM.005]
+        title: Claims Officer does not see Close
+        steps:
+          - Open BCL-2026-000102; look for Set Settlement and Close.
+          - Call the close endpoint with cl.officer1's token.
+        expected: The actions are not shown; the call returns HTTP 403 and is logged with user, endpoint and time.
+        msg: [You are not permitted to perform this action]
+      - c: 1
+        priority: High
+        type: Security-access
+        neg: false
+        persona: CLM_TL
+        brd: [BRCLM.006, BRCLM.018, BRCLM.024]
+        title: Team Lead sees the TL actions
+        steps:
+          - As cl.tl1 open BCL-2026-000102.
+        expected: Override Claimant, Assign Adjuster, Amend Reserve, Override Follow-up Date, Set Settlement and Change Status are offered.
+      - c: 1
+        priority: High
+        type: Security-access
+        brd: [BRCLM.006, BRCLM.011, BRCLM.015, BRCLM.018, BRCLM.019, BRCLM.021, BRCLM.024]
+        title: Officer cannot override claimant, amend reserve or override follow-up
+        steps:
+          - As cl.officer1 call the claimant override, reserve amendment and follow-up override endpoints.
+        expected: Each call returns HTTP 403; the claim is unchanged.
+        msg: [You are not permitted to perform this action]
+      - c: 2
+        priority: High
+        type: Security-access
+        persona: MKT_AO
+        screen: REPORTS
+        brd: [BRCLM.002]
+        title: Marketing AO opens reports, not the worklist
+        steps:
+          - As cl.mktao open the menu; open Reports, category Claims Handling; type the worklist address.
+        expected: The Claims reports are listed; Claims Worklist and Record Claim are not in the menu; the worklist address shows the no-access page.
+      - c: 3
+        priority: High
+        type: Security-access
+        screen: API
+        brd: [BRCLM.002]
+        title: Claim of another company
+        steps:
+          - Call GET on a claim id of the second test company with cl.officer1's token.
+        expected: The call answers not found and reveals no data.
+      - c: 4
+        priority: High
+        type: Workflow
+        persona: CLM_UH
+        screen: ACCREQ
+        brd: [BRCLM.002]
+        title: Unit Head requests BCL_DATA_EXTRACT for a user
+        steps:
+          - As cl.uh1 raise a User Access request adding BCL_DATA_EXTRACT to cl.tl1; cl.sysadmin approves.
+        expected: cl.tl1 can run the Claims Data Extract after the approval and not before.
+
+  FR-CL-003:
+    scenario: SC-CL-01
+    persona: CLM_TL
+    screen: HIST
+    data: [TD-CL-05]
+    conditions:
+      - The History tab lists every change on the claim (status, reserve, claimant, adjuster, follow-up, action plan, version, code, insurer updates, location references) with user and time.
+      - Each change writes an audit entry with before and after values.
+      - History and audit rows cannot be edited or deleted.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRCLM.041]
+        title: History of a closed claim
+        steps:
+          - Open BCL-2026-000106, History tab.
+        expected: Every status change, the settlement and the closure are listed with user and time in time order; insurer updates are part of the timeline.
+      - c: 2
+        type: Positive
+        brd: [BRCLM.042, NFR 4.01-4.03]
+        title: Reserve amendment shows old and new amounts
+        steps:
+          - Amend the reserve of BCL-2026-000102 from 150,000 to 180,000 with a reason; open History; as cl.auditor open the audit entry.
+        expected: The history shows 150,000, 180,000, the reason, cl.tl1 and the time; the audit entry has the same before and after values.
+      - c: 3
+        type: Security-access
+        screen: API
+        brd: [NFR 4.01-4.03]
+        title: History cannot be changed
+        steps:
+          - Look for edit or delete on the History tab; call PUT and DELETE on a history row.
+        expected: No action exists; the calls are refused.
+
+  FR-CL-010:
+    scenario: SC-CL-02
+    persona: CLM_OFFICER
+    screen: COVER
+    data: [TD-CL-02, TD-CL-03]
+    conditions:
+      - A Claims user finds any cover by ARN, policy number or assured and sees its data read-only (account header, items and locations, endorsements, invoices with payment status, claims, insurer location references).
+      - The Cover Lookup offers no edit action on the account.
+      - A search text shorter than 3 characters, or without a match, is answered with its message.
+      - A user without BCL_COVER_VIEW cannot open Cover Lookup.
+    cases:
+      - c: 1
+        priority: High
+        type: Positive
+        brd: [BRCLM.003]
+        title: Find a cover by policy number
+        steps:
+          - Search by Policy No. MC-2026-11021; open the cover.
+        expected: The account header, the endorsement of 2026 and the invoices with their payment status are shown.
+      - c: 1
+        priority: High
+        type: Positive
+        brd: [BRCLM.003]
+        title: All covers visible regardless of branch
+        steps:
+          - As cl.officer2 (Non-Motor HO) search the Motor cover ARN-2026-000501.
+        expected: The cover opens; no portfolio or branch restriction applies.
+      - c: 2
+        priority: High
+        type: Negative
+        brd: [BRCLM.002]
+        title: No edit action on the cover
+        steps:
+          - Open ARN-2026-000602 in Cover Lookup; look for Edit, Endorse or Cancel.
+        expected: No edit action is offered; Record Claim is the only action.
+      - c: 3
+        priority: High
+        type: Negative
+        brd: [BRCLM.003]
+        title: Search text of two characters, and no match
+        steps:
+          - Search "MC"; then search "ZZZ-NO-MATCH".
+        expected: The first is refused with "Enter at least 3 characters"; the second shows the no-match message.
+        msg: ["No cover found for {ZZZ-NO-MATCH}"]
+      - c: 4
+        priority: High
+        type: Security-access
+        persona: MKT_AO
+        brd: [BRCLM.002]
+        title: User without BCL_COVER_VIEW
+        steps:
+          - As cl.mktao type the Cover Lookup address.
+        expected: The no-access page is shown and no cover data is loaded.
+
+  FR-CL-011:
+    scenario: SC-CL-02
+    persona: CLM_OFFICER
+    screen: NEWCLAIM
+    data: [TD-CL-02, TD-CL-03, TD-CL-04]
+    conditions:
+      - A claim cannot be saved without cover number, policy year and cover version.
+      - The claim currency is the cover currency, else PHP.
+      - A saved claim gets a BCL number, phase NEW, the first status and a next follow-up date, and keeps a snapshot of the cover.
+      - An insurer-reported claim shows the source "Insurer-reported" and the insurer claim number.
+      - Loss date, reported date, nature of loss and a loss date outside the cover period are validated.
+    cases:
+      - c: 1
+        priority: High
+        type: Negative
+        brd: [BRCLM.003]
+        title: Save without a cover
+        steps:
+          - Open Record Claim; enter the loss details without selecting a cover; Save.
+        expected: The claim is not saved.
+        msg: [Select the cover of the claim]
+      - c: 2
+        priority: High
+        type: Positive
+        brd: [BRCLM.009]
+        title: Currency from the cover, else PHP
+        steps:
+          - Record a claim on ARN-2026-000602 (USD); then on ARN-2026-000703 (no currency).
+        expected: The first claim has currency USD, the second PHP.
+      - c: 3
+        priority: High
+        type: Positive
+        brd: [BRCLM.003]
+        title: Record a Motor claim
+        steps:
+          - Record a claim on ARN-2026-000501, policy year 2026; loss date yesterday, reported today, nature Motor own damage, claim type, description; Save.
+        expected: The claim number BCL-yyyy-nnnnnn is assigned; phase NEW, status 1, next follow-up date = today + 7 days; the summary shows policy number, "Cover v1", period, sum insured, Marketing unit, AO and branch; the handler's My Claims lists it; cl.mktao receives BCL_CLAIM_ASSIGNED.
+      - c: 4
+        priority: High
+        type: Positive
+        brd: [BRCLM.041]
+        title: Insurer-reported claim
+        steps:
+          - Record a claim with Source Insurer-reported and INS-A claim number C-INSA-7781.
+        expected: The claim shows source "Insurer-reported" and the insurer claim number on the INS-A line.
+      - c: 5
+        priority: High
+        type: Negative
+        brd: [BRCLM.003]
+        title: Loss date in the future
+        steps:
+          - Enter tomorrow as loss date; Save.
+        expected: The claim is not saved.
+        msg: [Enter a loss date that is not in the future]
+      - c: 5
+        priority: High
+        type: Negative
+        brd: [BRCLM.003]
+        title: Reported date before the loss date
+        steps:
+          - Enter loss date 10 March and reported date 9 March; Save.
+        expected: The claim is not saved.
+        msg: [The reported date must be between the loss date and today]
+      - c: 5
+        priority: High
+        type: Negative
+        brd: [BRCLM.003]
+        title: Nature of loss missing
+        steps:
+          - Leave Nature of loss blank; Save.
+        expected: The claim is not saved.
+        msg: [Select the nature of loss]
+      - c: 5
+        priority: High
+        type: Boundary
+        brd: [BRCLM.003]
+        title: Loss date outside the cover period asks for confirmation
+        steps:
+          - Enter a loss date one day after the cover end; Save; confirm.
+        expected: BIBS warns and saves only after the confirmation.
+        msg: ["The loss date is outside the cover period {01-Jan-2026} to {31-Dec-2026}. Confirm to continue"]
+
+  FR-CL-012:
+    scenario: SC-CL-02
+    persona: CLM_TL
+    screen: DETAILS
+    data: [TD-CL-05]
+    conditions:
+      - The reported date is entered at recording and corrected on an open claim only by a BCL_STATUS_UPDATE holder with a reason; the change is in the history.
+      - The reported date must be between the loss date and today.
+      - A corrected date changes the ages at the next report run.
+      - The reported date of a closed claim cannot change.
+    cases:
+      - c: 1
+        priority: High
+        type: Workflow
+        title: Team Lead corrects the reported date
+        steps:
+          - Open BCL-2026-000102; Correct Reported Date; new date two days earlier; reason; Save.
+        expected: The date is saved; the history shows old and new date, reason, cl.tl1 and time.
+      - c: 1
+        priority: High
+        type: Security-access
+        persona: CLM_OFFICER
+        title: Officer without BCL_STATUS_UPDATE after recording
+        pre: The test lead removes BCL_STATUS_UPDATE from a copy of the officer role.
+        steps:
+          - As that officer open the claim; look for Correct Reported Date.
+        expected: The action is not shown.
+      - c: 2
+        priority: High
+        type: Negative
+        title: Reported date later than today
+        steps:
+          - Correct the reported date to tomorrow.
+        expected: The change is refused.
+        msg: [The reported date must be between the loss date and today]
+      - c: 2
+        priority: High
+        type: Negative
+        title: Correction without a reason
+        steps:
+          - Correct the date with the reason blank.
+        expected: Nothing is saved.
+        msg: [Enter the reason for the change]
+      - c: 3
+        priority: High
+        type: Report-output
+        screen: REPORTS
+        title: Ages follow the corrected date
+        steps:
+          - Run BCL-AGEING before and after the correction.
+        expected: Age overall of the claim is two days higher after the correction.
+      - c: 4
+        priority: High
+        type: Negative
+        title: Closed claim
+        steps:
+          - Correct the reported date of BCL-2026-000105 (closed).
+        expected: The change is refused.
+        msg: [The reported date of a closed claim cannot change]
+
+  FR-CL-013:
+    scenario: SC-CL-02
+    persona: CLM_OFFICER
+    screen: CLAIM
+    data: [TD-CL-02, TD-CL-04]
+    conditions:
+      - The claim shows the policy number of its policy year without any entry, and the invoice of the cover shows the same number.
+      - Claims keeps a copy of the policy number and never edits it.
+      - A claim on a policy not yet issued shows "Policy number pending" and is filled when the policy is issued.
+    cases:
+      - c: 1
+        priority: High
+        type: Positive
+        brd: [BRCLM.007]
+        title: Policy number shown without re-keying
+        steps:
+          - Record a claim on ARN-2026-000501, policy year 2026.
+        expected: The summary shows MC-2026-11021; no policy number field was offered for entry.
+      - c: 1
+        priority: High
+        type: Positive
+        screen: INVOICE
+        brd: [BRCLM.008]
+        title: Invoice shows the same policy number
+        steps:
+          - Open the 2026 invoice of ARN-2026-000501.
+        expected: The invoice shows MC-2026-11021.
+      - c: 2
+        priority: High
+        type: Negative
+        brd: [BRCLM.007]
+        title: Policy number cannot be edited on the claim
+        steps:
+          - Look for an edit action on the policy number; call the claim update with another policy number.
+        expected: The field is read only; the value is not changed.
+      - c: 3
+        priority: High
+        type: Workflow
+        brd: [BRCLM.007]
+        title: Policy number pending, then filled at issuance
+        steps:
+          - Record a claim on ARN-2026-000705; issue the policy in BRD-1; reopen the claim.
+        expected: The claim first shows "Policy number pending", then the issued number after the snapshot refresh.
+
+  FR-CL-014:
+    scenario: SC-CL-02
+    persona: CLM_OFFICER
+    screen: CLAIM
+    data: [TD-CL-02]
+    conditions:
+      - A new claim shows the Marketing team, AO and branch of the account from the sales stamp at recording.
+      - Reports list the stored Marketing Team and Account Officer; Refresh Cover Data reloads changed values and records the change.
+    cases:
+      - c: 1
+        priority: High
+        type: Positive
+        title: Marketing team, AO and branch on a new claim
+        steps:
+          - Record a claim on ARN-2026-000501.
+        expected: The summary shows Retail Marketing 1, cl.mktao and branch Makati.
+      - c: 2
+        priority: High
+        type: Report-output
+        screen: REPORTS
+        title: Outstanding report shows team and AO
+        steps:
+          - Run BCL-OUTSTANDING.
+        expected: Each claim shows its Marketing Team and Account Officer.
+      - c: 2
+        priority: High
+        type: Workflow
+        title: Refresh after the account's sales stamp changed
+        steps:
+          - Change the AO of ARN-2026-000501 in BRD-1; click Refresh Cover Data on the claim.
+        expected: The new AO is shown; the history records the old and new values.
+      - c: 2
+        priority: High
+        type: Negative
+        title: Reports keep the stored values until refresh
+        steps:
+          - Change the account's AO; run BCL-OUTSTANDING before the refresh.
+        expected: The report shows the stored AO, not the new one.
+
+  FR-CL-015:
+    scenario: SC-CL-02
+    persona: CLM_OFFICER
+    screen: CLAIM
+    data: [TD-CL-04]
+    conditions:
+      - The claim shows the cover number and version used, the version being the booked endorsements effective on or before the loss date.
+      - A later endorsement of the policy year sets the flag Newer cover version and notifies the handler; the handler may switch to the latest version.
+      - The cover panel of the claim has no edit action.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRCLM.039]
+        title: Cover number and version on the claim
+        steps:
+          - Record a claim on ARN-2026-000706 with a loss date between its first and second endorsement.
+        expected: The summary shows "Cover v1 (<first endorsement no.>)".
+      - c: 2
+        type: Workflow
+        brd: [BRCLM.039]
+        title: Newer version flag and Use Latest Version
+        steps:
+          - Book a further endorsement of the policy year; open the claim and the bell; click Use Latest Version.
+        expected: The claim shows "Newer cover version" and the handler has BCL_NEWER_COVER_VERSION; after the switch the version is v2 and the history records old and new version.
+      - c: 3
+        type: Negative
+        brd: [BRCLM.003]
+        title: No edit action on the cover panel
+        steps:
+          - Open the cover panel of the claim.
+        expected: The panel is read only.
+
+  FR-CL-016:
+    scenario: SC-CL-02
+    persona: CLM_OFFICER
+    screen: CLAIM
+    data: [TD-CL-02, TD-CL-03, TD-CL-04]
+    conditions:
+      - The premium check reads the invoices of the ARN and policy year (cancelled excluded) and shows PAID, UNPAID, PARTIALLY_PAID, DIRECT_PAYMENT or NO_INVOICE with the unpaid invoices.
+      - The authorization code is generated only when the result is PAID; otherwise the button is disabled and the claim shows Unpaid premium.
+      - A payment re-runs the check, notifies the handler and enables the code.
+      - A direct-payment account needs the insurer's payment evidence (BCL_AUTH_DP_POLICY = CONFIRM).
+      - The premium check answers within 5 seconds.
+    cases:
+      - c: 1
+        priority: High
+        type: Positive
+        brd: [BRCLM.001]
+        title: Cover with one unpaid endorsement invoice
+        steps:
+          - Record a claim on ARN-2026-000602.
+        expected: The cover card shows UNPAID with the endorsement invoice and its balance PHP 18,400; the claim is saved with the flag Unpaid premium; the handler has alert BCL_UNPAID_PREMIUM_CLAIM.
+      - c: 2
+        priority: High
+        type: Negative
+        brd: [BRCLM.001]
+        title: Code refused while premium is unpaid
+        steps:
+          - Look at Generate Authorization Code; call the endpoint.
+        expected: The button is disabled; the call is refused.
+        msg: ["The premium of {ARN-2026-000602} {2026} is not fully paid. The authorization code cannot be generated"]
+      - c: 2
+        priority: High
+        type: Positive
+        brd: [BRCLM.001]
+        title: Code on a paid cover
+        steps:
+          - On a claim of ARN-2026-000501 click Generate Authorization Code.
+        expected: A code CAC-yyyy-nnnnnn is issued; the history records user and time.
+      - c: 3
+        priority: High
+        type: Workflow
+        persona: SYSTEM
+        screen: CASHIER
+        brd: [BRCLM.001]
+        title: Payment enables the code
+        steps:
+          - Pay the endorsement invoice of ARN-2026-000602 in Cashiering; open the claim and the handler's bell.
+        expected: The result is PAID; the handler is notified; the button is enabled.
+      - c: 1
+        priority: High
+        type: Negative
+        brd: [BRCLM.001]
+        title: Cancelled unpaid invoice does not block
+        pre: Only the cancelled invoice of ARN-2026-000602 is unpaid.
+        steps:
+          - Open the claim.
+        expected: The result is PAID; the cancelled invoice is not listed.
+      - c: 4
+        priority: High
+        type: Negative
+        brd: [BRCLM.001]
+        title: Direct payment without evidence
+        steps:
+          - On a claim of ARN-2026-000704 click Generate Authorization Code without an attachment.
+        expected: The code is not issued.
+        msg: [Attach the insurer's payment evidence first]
+      - c: 5
+        priority: High
+        type: Boundary
+        brd: [NFR 15.05]
+        title: Premium check within 5 seconds
+        steps:
+          - Time the cover card from selecting ARN-2026-000602 to the premium result, five times.
+        expected: Each answer comes within 5 seconds.
+
+  FR-CL-020:
+    scenario: SC-CL-03
+    persona: CLM_OFFICER
+    screen: LOCATIONS
+    data: [TD-CL-03]
+    conditions:
+      - A claim links one or more locations of its own cover and keeps one claim number; two or more show the flag Multi-location.
+      - A location of another account, or one already linked, is refused.
+      - Each linked location shows its address and its insurer location references; removal is recorded.
+    cases:
+      - c: 1
+        type: Positive
+        title: Link two of three locations
+        steps:
+          - Record a claim on ARN-2026-000602; in the picker tick L1 and L2 with a damage description each; Save.
+        expected: One claim number with two locations; the flag Multi-location is shown.
+      - c: 2
+        type: Negative
+        screen: API
+        title: Location of another account
+        steps:
+          - Call the link endpoint with a location item of ARN-2026-000501.
+        expected: The link is refused.
+        msg: ["Location {L-000501-1} is not on the cover {ARN-2026-000602}"]
+      - c: 2
+        type: Negative
+        title: Location linked twice
+        steps:
+          - Add L1 again on the Locations tab.
+        expected: The link is refused.
+        msg: ["Location {L1 Makati} is already on this claim"]
+      - c: 3
+        type: Positive
+        title: Locations tab shows address and references; removal recorded
+        steps:
+          - Open the Locations tab; remove L2; open History.
+        expected: L1 shows address, city, province and the INS-A and INS-B references; the removal of L2 is recorded with user and time.
+      - c: 1
+        type: Negative
+        data: [TD-CL-02]
+        title: Motor cover shows no picker
+        steps:
+          - Record a claim on the Motor cover ARN-2026-000501.
+        expected: The location picker is not shown; Place of loss is a text field.
+
+  FR-CL-021:
+    scenario: SC-CL-03
+    persona: CLM_OFFICER
+    screen: INSURERS
+    data: [TD-CL-03, TD-CL-07]
+    conditions:
+      - A claim holds one insurer line per insurer with share, insurer claim number, date reported, reserve, settled amount and adjuster, proposed from the invoice shares; two insurers show Multi-insurer.
+      - The same insurer claim number twice for the same insurer and claim is refused; reuse on another claim warns and raises an alert.
+      - A worklist search by an insurer claim number opens the BDOI claim.
+      - Insurer claim numbers can be loaded by upload after every row is validated.
+    cases:
+      - c: 1
+        type: Positive
+        title: Two insurers, two claim numbers, one claim
+        steps:
+          - On a claim of ARN-2026-000602 open Insurers & Updates; add C-INSA-9001 on INS-A and C-INSB-4410 on INS-B with the dates reported.
+        expected: Shares 60 % and 40 % were proposed; both numbers are shown with the insurer names; the claim stays one claim with the flag Multi-insurer.
+      - c: 2
+        type: Negative
+        title: Same number twice for the same insurer
+        steps:
+          - Add C-INSA-9001 again on the INS-A line.
+        expected: The number is refused.
+        msg: ["Insurer claim number {C-INSA-9001} is already recorded for {INS-A} on this claim"]
+      - c: 2
+        type: Positive
+        screen: NOTIF
+        title: Number used on another claim warns
+        steps:
+          - Add C-INSA-9001 on the INS-A line of another claim; confirm.
+        expected: BIBS shows the other claim and asks for confirmation; after it the number is saved and alert BCL_INSURER_CLAIM_NO_REUSED is raised.
+      - c: 2
+        type: Negative
+        title: Insurer not selected and future date
+        steps:
+          - Add a line without an insurer; then a date reported tomorrow.
+        expected: The first shows "Select the insurer"; the second is refused.
+        msg: [The date cannot be in the future]
+      - c: 3
+        type: Positive
+        screen: WORKLIST
+        title: Search the worklist by insurer claim number
+        steps:
+          - Type C-INSB-4410 in the worklist search.
+        expected: The BDOI claim is found and opens.
+      - c: 4
+        type: Upload-download
+        screen: BULK
+        title: Upload of insurer claim numbers
+        steps:
+          - Upload the insurer claim numbers file of TD-CL-07.
+        expected: All 10 rows are validated before the file is applied; each number appears on its claim line.
+
+  FR-CL-022:
+    scenario: SC-CL-03
+    persona: CLM_OFFICER
+    screen: INSURERS
+    data: [TD-CL-07]
+    conditions:
+      - An insurer update with date, source, reference, remarks and attachments appears in the claim timeline, linked to an insurer line when chosen.
+      - An update cannot be edited or deleted; a correction is a new update that refers to it.
+      - A bulk file is applied only when every row is valid and matched; the unmatched row is named.
+      - Date and remarks are mandatory; the date cannot be in the future.
+    cases:
+      - c: 1
+        type: Positive
+        title: Record an insurer update
+        steps:
+          - Click Record Insurer Update; line INS-A, date today, source E-mail, reference, remarks, attach the insurer's letter; Save.
+        expected: The update is in the timeline with user and time and the attachment.
+      - c: 2
+        type: Negative
+        title: Update cannot be edited
+        steps:
+          - Look for Edit on the update; record a correcting update that refers to it.
+        expected: No edit action exists; the correction is added and both remain.
+      - c: 3
+        type: Negative
+        screen: BULK
+        title: 50-row file with one unmatched row
+        steps:
+          - Upload the insurer updates file of TD-CL-07.
+        expected: The file is refused as a whole; no update is applied.
+        msg: ["Row {37}: no claim found for {INS-B} {C-INSB-0000}"]
+      - c: 3
+        type: Upload-download
+        screen: BULK
+        title: Corrected file applied and handler notified
+        steps:
+          - Correct row 37; upload again.
+        expected: 50 updates are applied to their claims; the handlers are notified; the upload is recorded with its row results.
+      - c: 4
+        type: Negative
+        title: Update without remarks, and with a future date
+        steps:
+          - Save an update with blank remarks; then with tomorrow's date.
+        expected: The first shows "Enter the remarks"; the second is refused.
+        msg: [Enter an update date that is not in the future]
+
+  FR-CL-023:
+    scenario: SC-CL-03
+    persona: CLM_OFFICER
+    screen: LOCREF
+    data: [TD-CL-03, TD-CL-07]
+    conditions:
+      - For each location and insurer BIBS holds one current insurer location reference with effective dates, shown on the claim location.
+      - A change end-dates the previous reference and keeps it.
+      - A blank reference or an effective date not after the current start is refused.
+    cases:
+      - c: 1
+        type: Positive
+        screen: LOCATIONS
+        title: Claim location shows the insurer references
+        steps:
+          - Maintain INS-A reference A-LOC-0091 and INS-B reference B-77-12 for L1; open the claim's Locations tab.
+        expected: L1 shows its internal address with A-LOC-0091 for INS-A and B-77-12 for INS-B.
+      - c: 2
+        type: Workflow
+        title: Change a reference
+        steps:
+          - Enter A-LOC-0105 for L1 and INS-A effective next month.
+        expected: A-LOC-0091 is end-dated the day before and kept in the history; A-LOC-0105 is current from its date.
+      - c: 3
+        type: Negative
+        title: Blank reference
+        steps:
+          - Save a reference with the text blank.
+        expected: Nothing is saved.
+        msg: [Enter the insurer location reference]
+      - c: 3
+        type: Boundary
+        neg: true
+        title: Effective date equal to the current start
+        steps:
+          - Enter a new reference effective on the start date of the current one.
+        expected: The reference is refused.
+        msg: ["The effective date must be after {01-Mar-2026}"]
+      - c: 1
+        type: Upload-download
+        screen: BULK
+        title: Load references by upload
+        steps:
+          - Upload the insurer location references file of TD-CL-07.
+        expected: Each row becomes the current reference of its location and insurer.
+
+  FR-CL-024:
+    scenario: SC-CL-03
+    persona: CLM_OFFICER
+    screen: CLAIM
+    data: [TD-CL-03, TD-CL-09]
+    conditions:
+      - The loss advice is generated from the claim with the PLA / CRF fields, the adjuster and the insurer claim numbers, previewed and e-mailed to each insurer's claims e-mail with a send log.
+      - The sent advice is stored as CLAIM_REPORT on the claim, the account and the client.
+      - A failed send is resent; an insurer without a claims e-mail asks for the address; no insurer or an invalid address is refused.
+    cases:
+      - c: 1
+        priority: High
+        type: Upload-download
+        screen: MAILBOX
+        brd: [Process p.24-25]
+        title: Loss advice of a Non-Motor claim
+        steps:
+          - On a claim of ARN-2026-000602 with an adjuster and C-INSA-9001, click Send Loss Advice; select INS-A; preview; confirm.
+          - Open the INS-A mailbox.
+        expected: The preview (template BCL_LOSS_ADVICE) shows assured, policy, date and location of loss, nature, initial reserve, adjuster and C-INSA-9001; the e-mail arrives; the send log shows recipient, time, subject and attachment name.
+      - c: 2
+        priority: High
+        type: Positive
+        screen: DOCS
+        brd: [BRCLM.041]
+        title: Advice stored as a claims report
+        steps:
+          - Open the Documents tab of the claim and the client's documents.
+        expected: The advice is listed as CLAIM_REPORT in both.
+      - c: 3
+        priority: High
+        type: Workflow
+        brd: [NFR 15.14]
+        title: Resend after a failed send
+        pre: The relay rejects the first send.
+        steps:
+          - Send the advice; restore the relay; resend.
+        expected: The e-mail shows Failed, then Sent after the resend.
+      - c: 3
+        priority: High
+        type: Negative
+        brd: [Process p.24-25]
+        title: Insurer without claims e-mail and an invalid address
+        steps:
+          - Send the advice to INS-B; enter "claims@" as address.
+        expected: BIBS asks for the recipient address and refuses the invalid one.
+        msg: ["Invalid e-mail address: {claims@}"]
+      - c: 3
+        priority: High
+        type: Negative
+        brd: [Process p.24-25]
+        title: No insurer selected
+        steps:
+          - Click Send Loss Advice and confirm with no insurer ticked.
+        expected: Nothing is sent.
+        msg: [Select at least one insurer]
+
+  FR-CL-030:
+    scenario: SC-CL-04
+    persona: CLM_TL
+    screen: DETAILS
+    data: [TD-CL-05]
+    conditions:
+      - A new claim shows the assured as claimant.
+      - A TL or TH overrides or inputs the claimant with a reason; the claim shows Claimant overridden and the change is kept.
+      - Name and reason are mandatory; a Claims Officer does not see the action.
+    cases:
+      - c: 1
+        priority: High
+        type: Positive
+        title: Default claimant is the assured
+        steps:
+          - Open a new claim, Details tab.
+        expected: Claimant = assured name of the cover.
+      - c: 2
+        priority: High
+        type: Workflow
+        title: Team Lead overrides the claimant
+        steps:
+          - Click Override Claimant; name "Juan Dela Cruz (third party)"; reason; Save.
+        expected: The claimant is changed; the flag Claimant overridden is shown; the history keeps old and new names with the reason.
+      - c: 3
+        priority: High
+        type: Negative
+        title: Name or reason blank
+        steps:
+          - Save with the name blank; then with the reason blank.
+        expected: The first shows "Enter the claimant's name"; the second is refused.
+        msg: [Enter the reason for the change]
+      - c: 3
+        priority: High
+        type: Security-access
+        persona: CLM_OFFICER
+        title: Officer does not see Override Claimant
+        steps:
+          - As cl.officer1 open the claim.
+        expected: The action is not shown.
+
+  FR-CL-031:
+    scenario: SC-CL-04
+    persona: CLM_TL
+    screen: CLAIM
+    data: [TD-CL-06]
+    conditions:
+      - The adjuster list offers the 25 companies of the BRD.
+      - A TL or TH assigns or changes the adjuster of a claim or of one insurer line; each change is kept.
+      - An adjuster added by the Unit Head is selectable only after another user authorises it; an ended value stays on the claims that used it.
+      - An assignment without adjuster, or by an officer, is refused.
+    cases:
+      - c: 1
+        priority: High
+        type: Report-output
+        screen: LOV
+        brd: [BRCLM.017]
+        title: The 25 adjusters
+        steps:
+          - Open Lists of Values, BCL_ADJUSTER.
+        expected: The 25 companies of FRS section 9.2 (BRD p.14-15) are listed with their full names, among them Chartered Adjusters, Inc., Crawford & Company Philippines, Inc. and TreborAsia Insurance Adjustment Services.
+      - c: 2
+        priority: High
+        type: Workflow
+        brd: [BRCLM.018]
+        title: Assign an adjuster to one insurer line
+        steps:
+          - Click Assign Adjuster; Applies to Insurer line INS-B; select Crawford & Company Philippines, Inc.; Save.
+        expected: The INS-B line shows the adjuster; the history shows old and new adjuster, user and time.
+      - c: 3
+        priority: High
+        type: Workflow
+        persona: CLM_UH
+        screen: LOV
+        brd: [BRCLM.017]
+        title: New adjuster after authorisation
+        steps:
+          - As cl.uh1 add "Test Adjusters Inc."; before authorisation open Assign Adjuster as cl.tl1; cl.uh2 authorises; open it again.
+        expected: The new value is offered only after cl.uh2 authorises it.
+      - c: 3
+        priority: High
+        type: Positive
+        persona: CLM_UH
+        screen: LOV
+        brd: [BRCLM.017]
+        title: Ended adjuster stays on old claims
+        steps:
+          - End-date an adjuster that is on a claim; open that claim.
+        expected: The claim still shows the adjuster; it is no longer offered for new assignments.
+      - c: 4
+        priority: High
+        type: Negative
+        brd: [BRCLM.018]
+        title: Save without adjuster
+        steps:
+          - Save Assign Adjuster with no adjuster selected.
+        expected: Nothing is saved.
+        msg: [Select the adjuster]
+      - c: 4
+        priority: High
+        type: Security-access
+        persona: CLM_OFFICER
+        brd: [BRCLM.018]
+        title: Officer cannot assign an adjuster
+        steps:
+          - As cl.officer1 open the claim; call the endpoint.
+        expected: The action is not shown; the call returns HTTP 403.
+        msg: [You are not permitted to perform this action]
+
+  FR-CL-032:
+    scenario: SC-CL-04
+    persona: CLM_TL
+    screen: RESERVE
+    data: [TD-CL-05]
+    conditions:
+      - The insurer reserve is held per insurer line, starting from the initial loss reserve; the claim total is the sum of the lines.
+      - A TL or TH amends a line with a reason; the history shows previous and new amounts.
+      - A reserve change produces no accounting entry.
+      - A negative amount or a blank reason is refused; an officer cannot amend after recording.
+    cases:
+      - c: 1
+        priority: High
+        type: Positive
+        brd: [BRCLM.023]
+        title: Reserve per insurer line and total
+        steps:
+          - Record a claim on ARN-2026-000602 with initial loss reserve 150,000 split 90,000 INS-A and 60,000 INS-B; open Reserve & Settlement.
+        expected: Each line shows its reserve and the claim total is 150,000.
+      - c: 2
+        priority: High
+        type: Workflow
+        brd: [BRCLM.024]
+        title: Team Lead amends the reserve
+        steps:
+          - Amend Reserve on INS-A to 120,000 with reason "Adjuster's revised estimate".
+        expected: The line shows 120,000, total 180,000; the reserve history shows 90,000 to 120,000 with the reason, user and time.
+      - c: 3
+        priority: High
+        type: Negative
+        brd: [BRCLM.023]
+        title: No journal from a reserve change
+        steps:
+          - After the amendment, search the general ledger journals for the claim number.
+        expected: No journal entry exists for the reserve change.
+      - c: 4
+        priority: High
+        type: Negative
+        brd: [BRCLM.024]
+        title: Negative reserve
+        steps:
+          - Amend the reserve to -1.00.
+        expected: Nothing is saved.
+        msg: [The reserve cannot be negative]
+      - c: 4
+        priority: High
+        type: Boundary
+        brd: [BRCLM.024]
+        title: Reserve of zero is accepted
+        steps:
+          - Amend the INS-B reserve to 0.00 with a reason.
+        expected: The amount is saved.
+      - c: 4
+        priority: High
+        type: Security-access
+        persona: CLM_OFFICER
+        brd: [BRCLM.024]
+        title: Officer cannot amend the reserve
+        steps:
+          - As cl.officer1 open Reserve & Settlement.
+        expected: Amend Reserve is not shown.
+
+  FR-CL-033:
+    scenario: SC-CL-04
+    persona: CLM_OFFICER
+    screen: DETAILS
+    data: [TD-CL-06]
+    conditions:
+      - A claim tagged with a catastrophe code and event name shows the flag CAT.
+      - The Unit Head adds a code, selectable after authorisation.
+      - An event name without a code is refused.
+    cases:
+      - c: 1
+        priority: High
+        type: Positive
+        title: Tag Typhoon with the event name
+        steps:
+          - Select catastrophe code Typhoon; event name "Typhoon Kristine"; Save.
+        expected: The summary shows the flag CAT; the change is recorded.
+      - c: 2
+        priority: High
+        type: Workflow
+        persona: CLM_UH
+        screen: LOV
+        title: New catastrophe code after authorisation
+        steps:
+          - As cl.uh1 add "Storm surge" to BCL_CATASTROPHE; cl.uh2 authorises; open the claim list of codes.
+        expected: Storm surge is selectable after the authorisation only.
+      - c: 3
+        priority: High
+        type: Negative
+        title: Event name without a code
+        steps:
+          - Enter an event name with the code blank; Save.
+        expected: Nothing is saved.
+        msg: [Select the catastrophe code of the event]
+
+  FR-CL-040:
+    scenario: SC-CL-08
+    persona: CLM_UH
+    screen: SETUP
+    data: [TD-CL-06]
+    conditions:
+      - The status list offers the 18 BRD values on a new database, each with phase, waiting party, follow-up days and the awaiting-remittance flag.
+      - A new status is selectable only after authorisation and once its phase is set.
+      - A status in use is end-dated, never deleted; follow-up days must be a whole number 1 to 365.
+    cases:
+      - c: 1
+        priority: High
+        type: Report-output
+        screen: LOV
+        title: The 18 statuses with their attributes
+        steps:
+          - Open BCL_CLAIM_STATUS and Claims Setup, status attributes.
+        expected: The 18 values of FRS section 5.2 are listed with phase NEW, IN_PROGRESS or TEMP_CLOSED and waiting party; status 11 has Awaiting premium remittance ticked.
+      - c: 2
+        priority: High
+        type: Workflow
+        title: New status usable after authorisation and phase
+        steps:
+          - Add "With Insurer - For Reinspection"; save without a phase and submit.
+          - Set phase IN_PROGRESS; cl.uh2 authorises; open Change Status as cl.tl1.
+        expected: Without a phase the status is refused; after the phase and authorisation it is offered.
+        msg: [Set the phase of the status]
+      - c: 3
+        priority: High
+        type: Negative
+        title: Status in use cannot be deleted
+        steps:
+          - Try to delete status 3.
+        expected: No delete; the status can only be end-dated and stays on the claims that used it.
+      - c: 3
+        priority: High
+        type: Boundary
+        neg: true
+        title: Follow-up days 366 and 2.5
+        steps:
+          - Enter follow-up days 366; then 2.5.
+        expected: Both are refused; 365 is accepted.
+        msg: [Enter a whole number of days]
+
+  FR-CL-041:
+    scenario: SC-CL-05
+    persona: CLM_OFFICER
+    screen: CLAIM
+    data: [TD-CL-06]
+    conditions:
+      - Change Status lists only the statuses the matrix allows for one of the user's roles and the user's unit.
+      - A status outside the matrix is refused even when called directly.
+      - A matrix row takes effect only after another user authorises it.
+      - A user not in the claims handler register cannot change a status.
+    cases:
+      - c: 1
+        priority: High
+        type: Positive
+        brd: [BRCLM.013]
+        title: Motor HO officer sees the officer statuses only
+        steps:
+          - As cl.officer1 open Change Status on BCL-2026-000101.
+        expected: Only statuses 1, 2, 17 and 18 are listed; as cl.tl1 all 18 are listed.
+      - c: 2
+        priority: High
+        type: Security-access
+        screen: API
+        brd: [BRCLM.013]
+        title: Direct call with a status outside the matrix
+        steps:
+          - With cl.officer1's token set status 6 on BCL-2026-000101.
+        expected: The call is refused; the status is unchanged.
+        msg: ["You are not allowed to set the status {For Insurer's Issuance of Check}"]
+      - c: 3
+        priority: High
+        type: Workflow
+        persona: CLM_UH
+        screen: SETUP
+        brd: [BRCLM.012]
+        title: Matrix row after authorisation
+        steps:
+          - As cl.uh1 add a row status 5 / CLM_OFFICER / Non-Motor HO; check cl.officer2's list; cl.uh2 authorises; check again.
+        expected: Status 5 is offered to cl.officer2 only after the authorisation; cl.officer1 (Motor HO) still does not get it.
+      - c: 4
+        priority: High
+        type: Negative
+        brd: [BRCLM.012]
+        title: User not in the handler register
+        steps:
+          - As cl.officer3 open Change Status.
+        expected: No status can be set.
+        msg: [Your claims unit is not set. Contact the Unit Head]
+
+  FR-CL-042:
+    scenario: SC-CL-05
+    persona: CLM_TL
+    screen: CLAIM
+    data: [TD-CL-05]
+    conditions:
+      - A status change with a remark writes a status history row (from, to, time, user, remark, days in the previous status), moves the phase, resets age this stage and recomputes the follow-up date.
+      - Status 11 lists the unremitted invoices with the link to the special remittance.
+      - A closed claim cannot change status until reopened; a status must be selected.
+      - The account officer is notified in the app; the update is saved within 1 minute.
+    cases:
+      - c: 1
+        priority: High
+        type: Workflow
+        brd: [BRCLM.011, BRCLM.027]
+        title: Change status 3 to 8
+        steps:
+          - On BCL-2026-000102 click Change Status; select 8; remark; Save; open History.
+        expected: The status is 8; age this stage is 0 and age overall unchanged; the history shows status 3 with its days; the next follow-up date is recomputed; cl.mktao has BCL_STATUS_CHANGED.
+      - c: 2
+        priority: High
+        type: Positive
+        brd: [BRCLM.011]
+        title: Status 11 lists the unremitted invoices
+        steps:
+          - Set status 11 on a claim of ARN-2026-000602.
+        expected: The unremitted invoices are listed with the link Request Special Remittance.
+      - c: 3
+        priority: High
+        type: Negative
+        brd: [BRCLM.011]
+        title: Change on a closed claim
+        steps:
+          - Call Change Status on BCL-2026-000105.
+        expected: The action is not offered; the call is refused.
+        msg: ["Claim {BCL-2026-000105} is closed. Reopen it before changing the status"]
+      - c: 3
+        priority: High
+        type: Negative
+        brd: [BRCLM.011]
+        title: No status selected
+        steps:
+          - Save Change Status without a status.
+        expected: Nothing is saved.
+        msg: [Select the new status]
+      - c: 4
+        priority: High
+        type: Boundary
+        brd: [BRCLM.011]
+        title: Status update within 1 minute
+        steps:
+          - Time the save of five status changes.
+        expected: Each is saved and shown within 1 minute (NFR 15.06).
+
+  FR-CL-043:
+    scenario: SC-CL-08
+    persona: CLM_UH
+    screen: SETUP
+    data: [TD-CL-06]
+    conditions:
+      - The settlement type list offers the 10 BRD values with outcome, closes-the-claim and requires-amount attributes.
+      - An attribute change takes effect after authorisation without a new build.
+      - A type without an outcome is refused.
+    cases:
+      - c: 1
+        priority: High
+        type: Report-output
+        title: The ten settlement types
+        steps:
+          - Open settlement attributes.
+        expected: The 10 types of FRS section 5.3 are listed with their outcome SETTLED or CLOSED_WITHOUT_PAYMENT and the two flags.
+      - c: 2
+        priority: High
+        type: Workflow
+        title: Change "Settled - LOA Issued - Vehicle Under Repair" not to close
+        steps:
+          - Untick Closes the claim; cl.uh2 authorises; set this type on a claim as cl.tl1.
+        expected: The claim stays open with the type recorded.
+      - c: 3
+        priority: High
+        type: Negative
+        title: Type without an outcome
+        steps:
+          - Add a type with Outcome blank; save.
+        expected: Nothing is saved.
+        msg: [Set the outcome of the settlement type]
+
+  FR-CL-044:
+    scenario: SC-CL-05
+    persona: CLM_TL
+    screen: RESERVE
+    data: [TD-CL-05]
+    conditions:
+      - A TL or TH sets or changes the settlement type; a settled type needs amount and date, which feed the settled and loss reports.
+      - A closing type also needs BCL_CLOSE and closes the claim.
+      - Type missing, amount or date missing, or a future date is refused; an officer does not see the action.
+    cases:
+      - c: 1
+        priority: High
+        type: Workflow
+        brd: [BRCLM.015, BRCLM.029]
+        title: Settled - Signed Release Papers Returned
+        steps:
+          - Set Settlement; type Settled - Signed Release Papers Returned; amount 85,000; date yesterday; Save.
+          - Run BCL-SETTLED for this month.
+        expected: The claim closes with the settlement; it appears in the Settled Claims report with date settled and amount.
+      - c: 1
+        priority: High
+        type: Positive
+        brd: [BRCLM.015]
+        title: Change the settlement type while open
+        steps:
+          - On an open claim set "Settled - LOA Issued - For Schedule of Repair", then change it to "Settled - LOA Issued".
+        expected: The earlier type stays in the history; the current type is the second.
+      - c: 3
+        priority: High
+        type: Negative
+        brd: [BRCLM.015]
+        title: Settled without an amount
+        steps:
+          - Set type Settled with the amount blank; Save.
+        expected: Nothing is saved.
+        msg: [Enter the settlement amount and the date settled]
+      - c: 3
+        priority: High
+        type: Negative
+        brd: [BRCLM.015]
+        title: Date settled in the future
+        steps:
+          - Enter tomorrow as date settled.
+        expected: Nothing is saved.
+        msg: [The date settled cannot be in the future]
+      - c: 2
+        priority: High
+        type: Security-access
+        brd: [BRCLM.015]
+        title: Closing type without BCL_CLOSE
+        pre: The test lead removes BCL_CLOSE from a copy of the TL role.
+        steps:
+          - As that user set Closed - Denied.
+        expected: The action is refused.
+        msg: [You are not permitted to perform this action]
+      - c: 3
+        priority: High
+        type: Security-access
+        persona: CLM_OFFICER
+        brd: [BRCLM.015]
+        title: Officer does not see Set Settlement
+        steps:
+          - As cl.officer1 open Reserve & Settlement.
+        expected: Set Settlement is not shown.
+
+  FR-CL-045:
+    scenario: SC-CL-05
+    persona: CLM_OFFICER
+    screen: CLAIM
+    data: [TD-CL-05]
+    conditions:
+      - Status 17 or 18 closes the claim temporarily; it stays in the Temporarily Closed tab and the outstanding reports and keeps ageing; any permitted user resumes it.
+      - A closing settlement type by a TL or TH closes the claim permanently; it stops ageing and accepts only diary entries, insurer updates and reopen.
+      - A Team Head or Unit Head reopens a closed claim with a reason; a Team Lead cannot; a reopen without a reason is refused.
+    cases:
+      - c: 1
+        priority: High
+        type: Workflow
+        brd: [BRCLM.035]
+        title: Officer closes a claim temporarily with status 18
+        steps:
+          - Set status 18 on BCL-2026-000101; open the worklist tabs; run BCL-OUTSTANDING.
+        expected: The claim is in Temporarily Closed and in the Outstanding Claims report; its age keeps counting.
+      - c: 1
+        priority: High
+        type: Workflow
+        brd: [BRCLM.035]
+        title: Resume a temporarily closed claim
+        steps:
+          - Set status 5 on BCL-2026-000104.
+        expected: The claim is back in IN_PROGRESS.
+      - c: 2
+        priority: High
+        type: Workflow
+        persona: CLM_TL
+        brd: [BRCLM.005]
+        title: Permanent closure with Closed - Denied
+        steps:
+          - Set Settlement Closed - Denied on a claim; open the Closed tab; check the age the next day.
+        expected: The claim is CLOSED with the closure date; age overall stays the same the next day; Change Status is not offered.
+      - c: 2
+        priority: High
+        type: Negative
+        persona: CLM_TL
+        brd: [BRCLM.005]
+        title: Closed claim accepts only diary, updates and reopen
+        steps:
+          - On BCL-2026-000105 edit the loss description.
+        expected: The edit is refused; Add Diary Entry and Record Insurer Update remain available.
+        msg: ["Claim {BCL-2026-000105} is closed. Reopen it before changing it"]
+      - c: 3
+        priority: High
+        type: Workflow
+        persona: CLM_TH
+        brd: [BRCLM.005]
+        title: Team Head reopens with a reason
+        steps:
+          - Click Reopen on BCL-2026-000105; reason; confirm.
+        expected: The claim is IN_PROGRESS; the settlement type is in the history and cleared on the claim; the handler is notified.
+      - c: 3
+        priority: High
+        type: Security-access
+        persona: CLM_TL
+        brd: [BRCLM.005]
+        title: Team Lead cannot reopen
+        steps:
+          - As cl.tl1 look for Reopen on a closed claim.
+        expected: Reopen is not shown.
+      - c: 3
+        priority: High
+        type: Negative
+        persona: CLM_TH
+        brd: [BRCLM.005]
+        title: Reopen without a reason
+        steps:
+          - Confirm Reopen with the reason blank.
+        expected: The claim stays closed.
+        msg: ["Select a reason for 'reopen'"]
+
+  FR-CL-046:
+    scenario: SC-CL-05
+    persona: CLM_OFFICER
+    screen: CLAIM
+    data: [TD-CL-03, TD-CL-05]
+    conditions:
+      - A claim in a status flagged awaiting premium remittance appears in the CLAIMS_SPECIAL_REMIT feed with its unremitted invoice, and the link opens the special remittance with the invoice and condition CLAIMS.
+      - Operations refuses a claims special remittance for an invoice without such a claim.
+      - The handler is notified when the invoice is fully remitted.
+    cases:
+      - c: 1
+        priority: High
+        type: Workflow
+        screen: SPECREM
+        brd: [BRCLM.010]
+        title: Request the special remittance from status 11
+        steps:
+          - On BCL-2026-000103 click Request Special Remittance.
+        expected: The Operations screen opens with the invoice and condition CLAIMS; the feed lists the invoice with the claim.
+      - c: 2
+        priority: High
+        type: Negative
+        persona: REMITTANCE
+        screen: SPECREM
+        brd: [BRCLM.001]
+        title: Claims condition for an invoice without such a claim
+        steps:
+          - As cl.remit raise a claims special remittance for an invoice of ARN-2026-000501.
+        expected: Operations refuses the request for that invoice.
+      - c: 3
+        priority: High
+        type: Workflow
+        persona: REMITTANCE
+        screen: NOTIF
+        brd: [BRCLM.001]
+        title: Handler notified on full remittance
+        steps:
+          - Process the remittance of the BCL-2026-000103 invoice; as the handler open the bell.
+        expected: The handler has BCL_PREMIUM_REMITTED.
+
+  FR-CL-050:
+    scenario: SC-CL-06
+    persona: CLM_TL
+    screen: CLAIM
+    data: [TD-CL-05]
+    conditions:
+      - The next follow-up date is the status's follow-up days (else BCL_FOLLOW_UP_DAYS) from the change date.
+      - A TL or TH overrides the date with a reason; the flag Follow-up overridden is shown and later status changes keep the date until it passes.
+      - A date before today or a blank reason is refused; an officer cannot override.
+    cases:
+      - c: 1
+        priority: High
+        type: Positive
+        title: Status with 5 follow-up days set on 1 March
+        pre: Status 4 has follow-up days 5.
+        steps:
+          - On 1 March set status 4 on a claim; read the next follow-up date.
+        expected: The next follow-up date is 6 March.
+      - c: 1
+        priority: High
+        type: Positive
+        title: Status without follow-up days uses the default
+        steps:
+          - Set a status with blank follow-up days on 1 March.
+        expected: The next follow-up date is 8 March (BCL_FOLLOW_UP_DAYS = 7).
+      - c: 2
+        priority: High
+        type: Workflow
+        title: Override kept across a status change
+        steps:
+          - Override the follow-up date to 20 March with a reason; then change the status.
+        expected: The flag Follow-up overridden is shown; the date stays 20 March after the status change; the history shows old and new date.
+      - c: 3
+        priority: High
+        type: Boundary
+        neg: true
+        title: Override to yesterday
+        steps:
+          - Override the date to yesterday.
+        expected: Nothing is saved; today is accepted.
+        msg: [The follow-up date cannot be before today]
+      - c: 3
+        priority: High
+        type: Security-access
+        persona: CLM_OFFICER
+        title: Officer cannot override the follow-up date
+        steps:
+          - As cl.officer1 open the claim.
+        expected: Override Follow-up Date is not shown.
+
+  FR-CL-051:
+    scenario: SC-CL-06
+    persona: CLM_OFFICER
+    screen: DETAILS
+    data: [TD-CL-05]
+    conditions:
+      - The current Next Action Plan Summary appears in the worklist and in the Follow Ups / Remarks column of the outstanding reports.
+      - Every saved version is kept in the history.
+      - The text has at most 2,000 characters.
+    cases:
+      - c: 1
+        priority: High
+        type: Report-output
+        screen: REPORTS
+        brd: [BRCLM.020]
+        title: Action plan in the Outstanding Claims report
+        steps:
+          - Save the action plan "Follow up LOA with INS-A on Friday"; run BCL-OUTSTANDING.
+        expected: The worklist and the report column Follow Ups / Remarks show the text.
+      - c: 2
+        priority: High
+        type: Positive
+        screen: HIST
+        brd: [BRCLM.021]
+        title: Earlier versions kept
+        steps:
+          - Change the text twice; open History.
+        expected: The three versions are listed with user and time.
+      - c: 3
+        priority: High
+        type: Boundary
+        brd: [BRCLM.020]
+        title: 2,000 characters accepted
+        steps:
+          - Save a text of exactly 2,000 characters.
+        expected: The text is saved in full.
+      - c: 3
+        priority: High
+        type: Boundary
+        neg: true
+        brd: [BRCLM.020]
+        title: 2,001 characters refused
+        steps:
+          - Save a text of 2,001 characters.
+        expected: Nothing is saved.
+        msg: [The action plan can have up to 2000 characters]
+      - c: 3
+        priority: High
+        type: Security-access
+        persona: AUDITOR
+        brd: [BRCLM.021]
+        title: Auditor cannot encode the action plan
+        steps:
+          - As cl.auditor open the claim.
+        expected: The field is read only.
+
+  FR-CL-052:
+    scenario: SC-CL-06
+    persona: CLM_OFFICER
+    screen: DIARY
+    data: [TD-CL-05]
+    conditions:
+      - A diary entry assigned to another handler appears in that handler's My Diary, and the assignee is notified.
+      - The assignee marks the entry done; entries are not deleted.
+      - A diary entry can be added to a closed claim.
+      - Text is mandatory and the due date must be on or after the entry date.
+    cases:
+      - c: 1
+        priority: High
+        type: Positive
+        brd: [BRCLM.022]
+        title: Entry assigned to another handler
+        steps:
+          - Add a Follow-up entry due tomorrow assigned to cl.tl1; as cl.tl1 open My Diary and the bell.
+        expected: The entry is in cl.tl1's My Diary by due date; cl.tl1 has a notice.
+      - c: 2
+        priority: High
+        type: Workflow
+        brd: [BRCLM.022]
+        title: Mark done; no delete
+        steps:
+          - As cl.tl1 mark the entry done; look for Delete.
+        expected: The entry is done with user and time; no delete action exists.
+      - c: 3
+        priority: High
+        type: Positive
+        brd: [NFR 15.08]
+        title: Entry on a closed claim
+        steps:
+          - Add a Note on BCL-2026-000105.
+        expected: The entry is saved.
+      - c: 4
+        priority: High
+        type: Negative
+        brd: [BRCLM.022]
+        title: Due date before the entry date
+        steps:
+          - Add an entry dated today with due date yesterday.
+        expected: Nothing is saved.
+        msg: [The due date must be on or after the entry date]
+      - c: 4
+        priority: High
+        type: Negative
+        brd: [BRCLM.022]
+        title: Entry without text
+        steps:
+          - Save an entry with blank text.
+        expected: Nothing is saved.
+        msg: [Enter the diary text]
+
+  FR-CL-053:
+    scenario: SC-CL-06
+    persona: CLM_OFFICER
+    screen: CLAIM
+    data: [TD-CL-05]
+    conditions:
+      - Age overall is the calendar days from the reported date to today, or to the closure date for a closed claim.
+      - Age this stage is the days in the current status; the status history gives the days of every earlier status.
+      - Temporarily closed claims keep ageing.
+    cases:
+      - c: 1
+        priority: High
+        type: Boundary
+        brd: [BRCLM.025]
+        title: Reported 1 March, open on 31 March
+        steps:
+          - Open a claim reported on 1 March on 31 March.
+        expected: Age overall is 30 (the reported date is day zero).
+      - c: 1
+        priority: High
+        type: Negative
+        brd: [BRCLM.025]
+        title: Closed claim stops ageing
+        steps:
+          - Open a claim reported 1 March and closed 15 March, on 31 March.
+        expected: Age overall stays 14.
+      - c: 2
+        priority: High
+        type: Positive
+        screen: HIST
+        brd: [BRCLM.027]
+        title: Age this stage and history
+        steps:
+          - Open BCL-2026-000102 (5 days in status 3, now 2 days in status 8).
+        expected: Age this stage is 2; the status history shows 5 days for status 3.
+      - c: 3
+        priority: High
+        type: Positive
+        brd: [BRCLM.025]
+        title: Temporarily closed claim keeps ageing
+        steps:
+          - Read the age of BCL-2026-000104 on two days.
+        expected: Age overall rises by one each day.
+
+  FR-CL-054:
+    scenario: SC-CL-06
+    persona: SYSTEM
+    screen: WORKLIST
+    data: [TD-CL-05]
+    conditions:
+      - At 06:00 the job notifies each handler of the claims and diary entries due today; they appear in Follow-ups Due.
+      - A past-due follow-up raises one BCL_FOLLOW_UP_OVERDUE alert per claim until cleared.
+      - A claim with a future follow-up date is not listed as due.
+    cases:
+      - c: 1
+        priority: High
+        type: Workflow
+        brd: [BRCLM.019, BRCLM.034]
+        title: Follow-up due today
+        steps:
+          - Run job BCL_FOLLOW_UP_DUE; as the handler open the bell and Follow-ups Due.
+        expected: The claim with next follow-up today and the diary entry due today are listed; the handler has BCL_FOLLOW_UP_DUE.
+      - c: 2
+        priority: High
+        type: Workflow
+        screen: NOTIF
+        brd: [BRCLM.022]
+        title: Two days past due raises one alert
+        steps:
+          - Run the job on two consecutive days for a claim two days past its date.
+        expected: One BCL_FOLLOW_UP_OVERDUE alert exists for the claim.
+      - c: 3
+        priority: High
+        type: Negative
+        brd: [BRCLM.034]
+        title: Future follow-up not listed
+        steps:
+          - Open Follow-ups Due for a claim due tomorrow.
+        expected: The claim is not listed.
+
+  FR-CL-055:
+    scenario: SC-CL-06
+    persona: CLM_OFFICER
+    screen: HOME
+    data: [TD-CL-05]
+    conditions:
+      - Claims Home shows open claims, follow-ups due and overdue, claims by status and phase, ageing buckets, unpaid covers and awaiting remittance; each tile opens its filtered list; it loads within 5 seconds.
+      - The worklist tabs and the search by claim number, insurer claim number, ARN, policy number and assured work.
+      - TL, TH and UH reassign claims one by one or in bulk with WORK_ASSIGN; the new handler is notified; a handler must be selected.
+    cases:
+      - c: 1
+        type: Boundary
+        brd: [NFR 15.03]
+        title: Claims Home within 5 seconds and tiles
+        steps:
+          - Open Claims Home five times; click Awaiting premium remittance.
+        expected: The page loads within 5 seconds each time; the tile opens the list with BCL-2026-000103.
+      - c: 2
+        type: Positive
+        screen: WORKLIST
+        brd: [BRCLM.043]
+        title: Search by insurer claim number
+        steps:
+          - Search C-INSA-9001 in the worklist.
+        expected: The BDOI claim is returned.
+      - c: 3
+        type: Workflow
+        persona: CLM_TL
+        screen: WORKLIST
+        brd: [BRCLM.034]
+        title: Reassign ten claims in one action
+        steps:
+          - Select ten claims; Reassign; choose cl.officer2.
+        expected: The ten claims are in cl.officer2's My Claims; cl.officer2 has BCL_CLAIM_ASSIGNED; the history shows old and new handler.
+      - c: 3
+        type: Negative
+        persona: CLM_TL
+        screen: WORKLIST
+        brd: [BRCLM.034]
+        title: Reassign without a handler
+        steps:
+          - Select claims; Reassign; confirm with no handler.
+        expected: Nothing changes.
+        msg: [Select the new handler]
+      - c: 3
+        type: Security-access
+        screen: WORKLIST
+        brd: [BRCLM.034]
+        title: Officer cannot reassign
+        steps:
+          - As cl.officer1 select claims.
+        expected: Reassign is not shown.
+
+  FR-CL-060:
+    scenario: SC-CL-07
+    persona: CLM_UH
+    screen: REPORTS
+    data: [TD-CL-05]
+    conditions:
+      - BCL-AGEING lists outstanding claims with age overall and bucket and totals per bucket and insurer; BCL-AGEING-STATUS groups by status and insurer with age this stage.
+      - Export in Excel, PDF or CSV needs BCL_REPORT_EXPORT; the file is named <Report>_<date of extraction>.
+      - An as-of date in the future is refused.
+      - A report is generated within 5 minutes.
+    cases:
+      - c: 1
+        priority: High
+        type: Report-output
+        brd: [BRCLM.026]
+        title: Claim 45 days old in bucket 31-60
+        steps:
+          - Run BCL-AGEING as of today.
+        expected: The 45-day claim is in bucket 31-60; totals per bucket and insurer are shown.
+      - c: 1
+        priority: High
+        type: Report-output
+        brd: [BRCLM.028]
+        title: Ageing per status
+        steps:
+          - Run BCL-AGEING-STATUS.
+        expected: Claims are grouped by status then insurer with age this stage and age overall.
+      - c: 2
+        priority: High
+        type: Upload-download
+        brd: [Report list]
+        title: Export and file name
+        steps:
+          - Export BCL-AGEING to Excel, PDF and CSV.
+        expected: The files are named BCL-AGEING_<date of extraction> with the rows of the screen.
+      - c: 3
+        priority: High
+        type: Negative
+        brd: [BRCLM.026]
+        title: As-of date in the future
+        steps:
+          - Run BCL-AGEING as of tomorrow.
+        expected: The report does not run.
+        msg: [The as-of date cannot be in the future]
+      - c: 4
+        priority: High
+        type: Boundary
+        brd: [Report list]
+        title: Report within 5 minutes
+        steps:
+          - Run BCL-AGEING for all claims of the test company.
+        expected: The result is shown within 5 minutes.
+
+  FR-CL-061:
+    scenario: SC-CL-07
+    persona: CLM_UH
+    screen: REPORTS
+    data: [TD-CL-05]
+    conditions:
+      - BCL-OUTSTANDING lists every claim in phase NEW, IN_PROGRESS or TEMP_CLOSED with the BRD columns and the insurer claim numbers.
+      - BCL-OUTSTANDING-PAST-DUE keeps the claims older than BCL_PAST_DUE_DAYS; the daily job raises BCL_CLAIM_PAST_DUE.
+      - BCL-SETTLED lists the claims closed with a settled outcome in the range, with date settled and amount; closed-without-payment claims are not listed.
+      - BCL-PENDING-ACTIONS lists the follow-ups due or overdue and the open diary entries per handler.
+      - A date range with the end before the start is refused.
+    cases:
+      - c: 1
+        priority: High
+        type: Report-output
+        brd: [BRCLM.031]
+        title: Temporarily closed claim in the outstanding list
+        steps:
+          - Run BCL-OUTSTANDING as of today.
+        expected: BCL-2026-000104 (status 18) is listed; each row has the columns of FRS section 6.1 with the insurer claim numbers.
+      - c: 2
+        priority: High
+        type: Boundary
+        brd: [BRCLM.031]
+        title: 95 days listed, 80 days not
+        steps:
+          - Run BCL-OUTSTANDING-PAST-DUE.
+        expected: The 95-day claim is listed; the 80-day claim is not.
+      - c: 2
+        priority: High
+        type: Workflow
+        screen: NOTIF
+        brd: [BRCLM.031]
+        title: Past due alert
+        steps:
+          - Run job BCL_AGEING_ALERTS; open the handler's bell.
+        expected: BCL_CLAIM_PAST_DUE is raised for the 95-day claim.
+      - c: 3
+        priority: High
+        type: Report-output
+        brd: [BRCLM.029]
+        title: Settled list excludes Closed - Denied
+        steps:
+          - Run BCL-SETTLED for this month.
+        expected: BCL-2026-000106 is listed with Date Settled and Settlement Amount; BCL-2026-000105 (Closed - Denied) is not.
+      - c: 4
+        priority: High
+        type: Report-output
+        brd: [BRCLM.034]
+        title: Pending actions per handler
+        steps:
+          - Run BCL-PENDING-ACTIONS.
+        expected: Each handler's due and overdue follow-ups and open diary entries are listed.
+      - c: 5
+        priority: High
+        type: Negative
+        brd: [Report list]
+        title: End date before the start date
+        steps:
+          - Run BCL-SETTLED from 31 March to 1 March.
+        expected: The report does not run.
+        msg: ["{Date settled to} must not be before {Date settled from}"]
+
+  FR-CL-062:
+    scenario: SC-CL-07
+    persona: CLM_UH
+    screen: REPORTS
+    data: [TD-CL-08]
+    conditions:
+      - The Loss Experience report shows per claim and insurer line paid, O/S (reserve less paid, not below zero) and total.
+      - The Loss Ratio report divides the losses by the signed gross premium of the cover and policy year.
+      - Renewal and the account page show the same figures as the report.
+      - A grouping must be selected.
+    cases:
+      - c: 1
+        priority: High
+        type: Report-output
+        brd: [BRCLM.030]
+        title: Reserve 100,000 and paid 60,000
+        steps:
+          - Run BCL-LOSS-EXPERIENCE for the client of TD-CL-08.
+        expected: The claim shows paid 60,000, O/S 40,000 and total 100,000.
+      - c: 1
+        priority: High
+        type: Boundary
+        brd: [BRCLM.030]
+        title: O/S never below zero
+        steps:
+          - Record paid 110,000 on a line with reserve 100,000; run the report.
+        expected: O/S shows 0, total 110,000.
+      - c: 2
+        priority: High
+        type: Report-output
+        brd: [BRCLM.032]
+        title: Loss ratio 50.00 %
+        steps:
+          - Run BCL-LOSS-RATIO grouped by client for the cover of TD-CL-08.
+        expected: Premium 50,000, losses 25,000, loss ratio 50.00 %.
+      - c: 3
+        priority: High
+        type: Positive
+        screen: ACCOUNT
+        brd: [Report list]
+        title: Same figures on the account page and in Renewal
+        steps:
+          - Open the account's Claims tab and the Renewal account history of the same account.
+        expected: The claim count, paid and outstanding equal the Loss Experience report.
+      - c: 4
+        priority: High
+        type: Negative
+        brd: [BRCLM.032]
+        title: No grouping selected
+        steps:
+          - Run BCL-LOSS-RATIO with Grouping blank.
+        expected: The report does not run.
+        msg: [Select the grouping]
+
+  FR-CL-063:
+    scenario: SC-CL-07
+    persona: CLM_RISK
+    screen: REPORTS
+    data: [TD-CL-08]
+    conditions:
+      - A location with at least BCL_PRONE_MIN_CLAIMS claims in BCL_PRONE_YEARS years is flagged claims-prone.
+      - The catastrophe filter lists only the claims with that code; the drill-down lists the claims of a location.
+      - A period with the end before the start is refused.
+    cases:
+      - c: 1
+        type: Boundary
+        title: Three claims in three years
+        steps:
+          - Run BCL-PRONE-LOCATIONS for the last 3 years.
+        expected: L1 (3 claims) is flagged claims-prone; a location with 2 claims is not.
+      - c: 2
+        type: Report-output
+        title: Filter by Flood and drill down
+        steps:
+          - Filter catastrophe code Flood; open L1.
+        expected: Only Flood-tagged claims are counted; the drill-down lists the claim numbers of L1.
+      - c: 3
+        type: Negative
+        title: Period end before start
+        steps:
+          - Run the report with the period end before its start.
+        expected: The report does not run.
+        msg: ["{Period to} must not be before {Period from}"]
+
+  FR-CL-064:
+    scenario: SC-CL-07
+    persona: CLM_RISK
+    screen: REPORTS
+    data: [TD-CL-03, TD-CL-08]
+    conditions:
+      - The Claims Data Extract gives one row per claim, insurer line and location, downloadable in Excel or CSV.
+      - Users save parameter sets as report variants.
+      - A user without BCL_DATA_EXTRACT cannot run the extract.
+    cases:
+      - c: 1
+        priority: High
+        type: Report-output
+        title: Two insurers and three locations give six rows
+        steps:
+          - Run BCL-DATA-EXTRACT for a claim with INS-A, INS-B and locations L1, L2, L3; download CSV.
+        expected: The claim has 6 rows with every claim field.
+      - c: 2
+        priority: High
+        type: Positive
+        title: Save the parameters as a variant
+        steps:
+          - Save the parameters as "Q1 property"; reopen the report and load the variant.
+        expected: The parameters are restored.
+      - c: 3
+        priority: High
+        type: Security-access
+        persona: CLM_OFFICER
+        title: Officer without BCL_DATA_EXTRACT
+        steps:
+          - As cl.officer1 look for the extract; call the run endpoint.
+        expected: The report is not listed; the call returns HTTP 403.
+        msg: [You are not permitted to perform this action]
+
+  FR-CL-065:
+    scenario: SC-CL-07
+    persona: MKT_AO
+    screen: REPORTS
+    data: [TD-CL-08]
+    conditions:
+      - A Marketing AO views the Loss Experience report and the account's loss summary and cannot download.
+      - A Marketing TL downloads the report in Excel.
+      - Marketing users cannot open a claim record or maintain claims.
+    cases:
+      - c: 1
+        type: Positive
+        title: AO views the loss experience of a client
+        steps:
+          - Run BCL-LOSS-EXPERIENCE for the client; open the account's Claims tab.
+        expected: The figures are shown; the loss summary shows claim count, open claims, paid and outstanding.
+      - c: 1
+        type: Security-access
+        title: AO cannot download
+        steps:
+          - Look for Export; call the export endpoint.
+        expected: Export is not shown; the call is refused.
+        msg: [You are not permitted to perform this action]
+      - c: 2
+        type: Upload-download
+        persona: MKT_TL
+        title: Marketing TL downloads in Excel
+        steps:
+          - As cl.mkttl export BCL-LOSS-EXPERIENCE to Excel.
+        expected: The file is downloaded with the rows of the screen; the export is logged.
+      - c: 3
+        type: Security-access
+        screen: API
+        title: AO cannot open a claim record
+        steps:
+          - Type the address of a claim record; call GET on the claim.
+        expected: The no-access page is shown; the call returns HTTP 403.
+
+  FR-CL-066:
+    scenario: SC-CL-07
+    persona: CLM_UH
+    screen: REPORTS
+    data: [TD-CL-03, TD-CL-05]
+    conditions:
+      - The Insurer Claim Numbers report lists one row per insurer claim number with the BDOI claim, insurer, share, reserve and settled amount.
+      - The Claims Activity Log lists status, field, insurer update, location reference and diary changes with user and time.
+      - Nothing can be edited from the reports; a period with the end before the start is refused.
+    cases:
+      - c: 1
+        type: Report-output
+        brd: [BRCLM.043]
+        title: Two numbers under one BDOI claim
+        steps:
+          - Run BCL-INSURER-CLAIMS for the period.
+        expected: C-INSA-9001 and C-INSB-4410 are listed under the same BDOI claim number with insurer, share, reserve and settled amount.
+      - c: 2
+        type: Report-output
+        brd: [BRCLM.041, BRCLM.042, NFR 15.08]
+        title: Activity log shows a location reference change
+        steps:
+          - Run BCL-ACTIVITY-LOG for the week.
+        expected: The change of A-LOC-0091 to A-LOC-0105 is listed with the old and new reference, user and time, together with the status changes and insurer updates.
+      - c: 3
+        type: Negative
+        brd: [BRCLM.043]
+        title: Period end before start
+        steps:
+          - Run BCL-ACTIVITY-LOG with the end before the start.
+        expected: The report does not run; the report rows offer no edit link.
+        msg: ["{Period to} must not be before {Period from}"]
+
+access:
+  - action: Look up a cover
+    screen: COVER
+    permission: BCL_COVER_VIEW
+    allow: [CLM_OFFICER, CLM_TL, CLM_TH, CLM_UH, CLM_RISK]
+    deny: [MKT_AO, MKT_TL, AUDITOR]
+    denied: Cover Lookup is not in the menu; the address shows the no-access page.
+  - action: Record a claim, locations, insurer numbers and updates
+    screen: NEWCLAIM
+    permission: BCL_RECORD
+    allow: [CLM_OFFICER, CLM_TL, CLM_TH]
+    deny: [CLM_UH, CLM_RISK, MKT_AO]
+    denied: Record Claim is not in the menu; the create call returns HTTP 403.
+  - action: Generate the claims authorization code
+    screen: CLAIM
+    permission: BCL_AUTHORIZE
+    allow: [CLM_OFFICER, CLM_TL, CLM_TH]
+    deny: [CLM_UH, AUDITOR]
+    denied: Generate Authorization Code is not shown.
+  - action: Change the claim status (within the matrix)
+    screen: CLAIM
+    permission: BCL_STATUS_UPDATE
+    allow: [CLM_OFFICER, CLM_TL, CLM_TH]
+    deny: [CLM_UH, CLM_RISK, MKT_TL]
+    denied: Change Status is not shown.
+  - action: Close a claim permanently
+    screen: RESERVE
+    permission: BCL_CLOSE
+    allow: [CLM_TL, CLM_TH]
+    deny: [CLM_OFFICER, CLM_UH]
+    denied: Closing settlement types are refused with "You are not permitted to perform this action".
+  - action: Reopen a closed claim
+    screen: CLAIM
+    permission: BCL_REOPEN
+    allow: [CLM_TH, CLM_UH]
+    deny: [CLM_TL, CLM_OFFICER]
+    denied: Reopen is not shown.
+  - action: Override the claimant
+    screen: DETAILS
+    permission: BCL_CLAIMANT_OVERRIDE
+    allow: [CLM_TL, CLM_TH]
+    deny: [CLM_OFFICER, CLM_UH]
+    denied: Override Claimant is not shown.
+  - action: Set the settlement type
+    screen: RESERVE
+    permission: BCL_SETTLEMENT_UPDATE
+    allow: [CLM_TL, CLM_TH]
+    deny: [CLM_OFFICER]
+    denied: Set Settlement is not shown.
+  - action: Assign the adjuster
+    screen: CLAIM
+    permission: BCL_ADJUSTER_ASSIGN
+    allow: [CLM_TL, CLM_TH]
+    deny: [CLM_OFFICER]
+    denied: Assign Adjuster is not shown.
+  - action: Override the follow-up date
+    screen: CLAIM
+    permission: BCL_FOLLOW_UP_OVERRIDE
+    allow: [CLM_TL, CLM_TH]
+    deny: [CLM_OFFICER]
+    denied: Override Follow-up Date is not shown.
+  - action: Amend the insurer reserve
+    screen: RESERVE
+    permission: BCL_RESERVE_AMEND
+    allow: [CLM_TL, CLM_TH]
+    deny: [CLM_OFFICER, CLM_UH]
+    denied: Amend Reserve is not shown.
+  - action: Maintain insurer location references
+    screen: LOCREF
+    permission: BCL_LOCATION_REF_MAINTAIN
+    allow: [CLM_OFFICER, CLM_TL]
+    deny: [CLM_RISK, MKT_AO]
+    denied: Insurer Location References is not in the menu.
+  - action: Maintain statuses, settlement types, matrix and Claims lists
+    screen: SETUP
+    permission: BCL_SETUP
+    allow: [CLM_UH]
+    deny: [CLM_TH, CLM_TL, SYSADMIN]
+    denied: Claims Setup is not in the menu; the Claims lists are read only.
+  - action: Run the Claims reports
+    screen: REPORTS
+    permission: BCL_REPORT_VIEW
+    allow: [CLM_OFFICER, CLM_UH, MKT_AO, MKT_TL, AUDITOR]
+    deny: [REMITTANCE]
+    denied: The category Claims Handling is not listed.
+  - action: Download the Claims reports
+    screen: REPORTS
+    permission: BCL_REPORT_EXPORT
+    allow: [CLM_TL, CLM_UH, MKT_TL]
+    deny: [MKT_AO, AUDITOR, SYSADMIN]
+    denied: Export is not shown; the export call returns HTTP 403.
+  - action: Run the Claims Data Extract
+    screen: REPORTS
+    permission: BCL_DATA_EXTRACT
+    allow: [CLM_UH, CLM_RISK]
+    deny: [CLM_OFFICER, CLM_TL, MKT_TL]
+    denied: BCL-DATA-EXTRACT is not listed.
+  - action: Reassign claims between handlers
+    screen: WORKLIST
+    permission: WORK_ASSIGN
+    allow: [CLM_TL, CLM_TH, CLM_UH]
+    deny: [CLM_OFFICER]
+    denied: Reassign is not shown.
+  - action: Open the Claims worklist and claim records
+    screen: WORKLIST
+    permission: BCL_VIEW
+    allow: [CLM_OFFICER, CLM_RISK, AUDITOR, SYSADMIN]
+    deny: [MKT_AO, MKT_TL]
+    denied: Claims Worklist is not in the menu; a claim address shows the no-access page.
+
+findings:
+  - fr: FR-CL-001
+    issue: 'The FRS messages "Invalid user ID or password" and "Your account is locked. Contact the System Administrator" differ from the platform log-in ("Invalid user name or password"; "Account is locked. Contact your administrator."). The idle timeout of 15 minutes differs from the BIBS session policy (CLQ24).'
+    proposal: Quote the platform texts in FRS v1.1 and close CLQ24; the cases use the platform texts and a 15-minute test setting.
+  - fr: FR-CL-024
+    issue: 'The FRS pairs EMAIL_ADDRESS_INVALID with "Enter a valid e-mail address"; the platform returns "Invalid e-mail address - <address>" for that code.'
+    proposal: Quote the platform text.
+  - fr: FR-CL-060
+    issue: 'FR-CL-060 to 066 pair INVALID_REPORT_PARAMETERS with FRS texts ("The as-of date cannot be in the future", "The end date must be on or after the start date"). The report engine builds its own texts from the parameter labels, for example "<to> must not be before <from>". The future as-of date check does not exist in the engine today.'
+    proposal: Quote the engine texts, and add the as-of date rule to the report definition at build; the range cases use the engine pattern, TC-CL-060.3-01 uses the FRS text.
+  - fr: FR-CL-012
+    issue: 'Acceptance criterion 3 says a Claims Officer without BCL_STATUS_UPDATE cannot correct the date, but the matrix of section 3.3 grants BCL_STATUS_UPDATE to officers (within the matrix). As written every officer can correct the reported date.'
+    proposal: State whether the correction needs its own permission or is limited to TL / TH (CLQ03); the case removes the permission from a test role until then.
+  - fr: FR-CL-045
+    issue: The persona table gives reopen to the Team Head (CLM_TH) and the matrix gives BCL_REOPEN to TH and UH, while R1 says "TH / UH reopen (to confirm, CLQ06)". Temporarily closed claims keep ageing "to confirm" (R2 of FR-CL-053), so the ageing and outstanding cases depend on CLQ06.
+    proposal: Close CLQ06 before UAT.
+  - fr: FR-CL-043
+    issue: Two settlement types ("Settled - LOA Issued - For Schedule of Repair", "... Vehicle Under Repair") have "Closes the claim" to confirm (CLQ05), so their closure behaviour cannot be tested yet.
+    proposal: Answer CLQ05; the cases treat both as not closing.
+  - fr: FR-CL-002
+    issue: 'The FR is "High (BRD p.21)", a value the test plan builder does not map to High; the Test Conditions sheet shows the Claims conditions of every "High (BRD p.21)" FR as Medium while the cases carry High. The same applies to the other FRs with this priority.'
+    proposal: Write the BRD priority as "High" or "Must have" in the fr blocks (keeping the page note in the trace), or extend the builder mapping.
+  - fr: FR-CL-016
+    issue: The meaning of the claims authorization code and any TL / TH override are open (CLQ01); the FRS tests only that the button is disabled while premium is unpaid.
+    proposal: Answer CLQ01 before UAT and add the override case if one is agreed.

@@ -72,6 +72,7 @@ public class DispositionService {
   private final DispositionRepository dispositions;
   private final DispositionTypeRuleRepository rules;
   private final DispositionExecutor executor;
+  private final CollectorRequestTracker collectorRequests;
   private final WorkflowService workflow;
   private final LovService lovs;
   private final NotificationService notifications;
@@ -86,6 +87,7 @@ public class DispositionService {
    * @param dispositions dispositions
    * @param rules disposition type rules
    * @param executor execution of dispositions
+   * @param collectorRequests collector requests of the dispositions (BRCLXN.030-033)
    * @param workflow workflow
    * @param lovs lists of values
    * @param notifications notifications
@@ -98,6 +100,7 @@ public class DispositionService {
       DispositionRepository dispositions,
       DispositionTypeRuleRepository rules,
       DispositionExecutor executor,
+      CollectorRequestTracker collectorRequests,
       WorkflowService workflow,
       LovService lovs,
       NotificationService notifications,
@@ -108,6 +111,7 @@ public class DispositionService {
     this.dispositions = dispositions;
     this.rules = rules;
     this.executor = executor;
+    this.collectorRequests = collectorRequests;
     this.workflow = workflow;
     this.lovs = lovs;
     this.notifications = notifications;
@@ -255,7 +259,9 @@ public class DispositionService {
   public Unapplied withdraw(Long unappliedId) {
     Unapplied item = item(unappliedId);
     requireStage(item, MONITORING);
-    current(item).markStatus(DispositionStatus.WITHDRAWN);
+    Disposition d = current(item);
+    d.markStatus(DispositionStatus.WITHDRAWN);
+    collectorRequests.withdrawn(item, d, currentUser.username());
     move(item, "withdraw", null);
     return item;
   }

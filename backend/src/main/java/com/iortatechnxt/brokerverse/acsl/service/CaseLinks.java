@@ -22,10 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * What a case asks of other teams (ACSL 2.6.0-2.6.2): the sub-ledger payment reversal requested
- * from Cashiering through the Operations port {@link PaymentReversalRequester} (the default adapter
- * hands it over to the team CASH_APPLY until cashiering implements it) with its outcome ({@code
- * PaymentReversalCompleted}); and the message to the Account Officer of the invoice about a short
- * or over payment.
+ * from Cashiering through the Operations port {@link PaymentReversalRequester} (recorded by
+ * cashiering for its approvers, or handed over to the team CASH_APPLY by the default adapter when
+ * cashiering is not installed) with its outcome ({@code PaymentReversalCompleted}); and the message
+ * to the Account Officer of the invoice about a short or over payment.
  */
 @Service
 @Transactional

@@ -8,6 +8,7 @@ import {
   Printer,
   Receipt,
   ReceiptText,
+  Send,
   Settings2,
   Truck,
   Upload,
@@ -84,6 +85,14 @@ export const cashieringModule: FeatureModule = {
       alsoPermissions: ['CASH_APPROVE', 'CASH_APPLY', 'CASH_RECEIPT'],
       component: lazy(() => import('./UnappliedDetailPage')),
       hidden: true,
+    },
+    {
+      path: '/cashiering/requests',
+      label: 'Incoming Requests',
+      icon: Send,
+      permission: 'CASH_DISPOSITION',
+      alsoPermissions: ['CASH_APPROVE', 'CASH_DISPOSITION_APPROVE', 'CASH_APPLY'],
+      component: lazy(() => import('./CashieringRequestsPage')),
     },
     {
       path: '/cashiering/prebooked',

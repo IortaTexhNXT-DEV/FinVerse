@@ -48,6 +48,7 @@ public class DispositionExecutor {
   private final CashieringPosting posting;
   private final DisbursementGateway disbursement;
   private final AuditTrailService audit;
+  private final CollectorRequestTracker collectorRequests;
   private final Clock clock;
 
   /**
@@ -59,6 +60,7 @@ public class DispositionExecutor {
    * @param posting accounting events
    * @param disbursement Disbursement gateway
    * @param audit audit trail
+   * @param collectorRequests collector requests of the dispositions (BRCLXN.030-033)
    * @param clock clock
    */
   public DispositionExecutor(
@@ -68,6 +70,7 @@ public class DispositionExecutor {
       CashieringPosting posting,
       DisbursementGateway disbursement,
       AuditTrailService audit,
+      CollectorRequestTracker collectorRequests,
       Clock clock) {
     this.applier = applier;
     this.applications = applications;
@@ -75,6 +78,7 @@ public class DispositionExecutor {
     this.posting = posting;
     this.disbursement = disbursement;
     this.audit = audit;
+    this.collectorRequests = collectorRequests;
     this.clock = clock;
   }
 
@@ -137,6 +141,7 @@ public class DispositionExecutor {
         item.getReference(),
         AuditAction.POST,
         d.getDispositionType() + " " + d.getAmount() + " executed (" + ref + ")");
+    collectorRequests.executed(item, d);
   }
 
   /**

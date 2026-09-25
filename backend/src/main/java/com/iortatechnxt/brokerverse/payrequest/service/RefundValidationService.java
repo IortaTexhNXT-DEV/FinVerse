@@ -126,7 +126,7 @@ public class RefundValidationService {
   }
 
   /**
-   * The answer of a validating module (acsl, later cashiering), in its transaction.
+   * The answer of a validating module (acsl, cashiering), in its transaction.
    *
    * @param event result
    */

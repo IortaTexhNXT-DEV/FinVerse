@@ -1,0 +1,39 @@
+// BRD-1: interfaces of New Business. FRS section 7. Dashed grey = parked seam.
+digraph nb_integration {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.55, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@WHITE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=11, fontcolor="@NEAR_BLACK", width=1.9, height=0.55];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=9.5, fontcolor="@TEXT"];
+
+  hls   [label="HLS and source\nsystems", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+  mbox  [label="Shared mailboxes\n(requests, e-policies)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+  pm    [label="Product Maintenance\n(BRD-3 catalogue)"];
+
+  subgraph cluster_nb {
+    label="New Business (BIBS)"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=11;
+    style=filled; fillcolor="@BG_BLUE"; color="@BG_BLUE";
+    front [label="Clients, quotations,\nPRFs, accounts", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+    proc  [label="Payment gate, placement,\nissuance", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+    bkg   [label="Booking and\nservice invoices", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+  }
+
+  mail  [label="E-mail outbox\n(protected PDF / XLSX)"];
+  clpc  [label="CLPC\n(billing file,\npayment report)"];
+  ins   [label="Insurers\n(e-mail)"];
+  acc   [label="Accounting engine\n(GL, open items)"];
+  ops   [label="Operations (BRD-2)\ncashiering, adjustment"];
+  bdoi  [label="Other BDOI systems", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+
+  hls -> front [label="requests (upload today;\nport parked Q11)", style=dashed, color="@MUTED"];
+  mbox -> front [label="manual capture\n(Q12, Q31)", style=dashed, color="@MUTED"];
+  pm -> front [label="products, versions,\nincentive criteria"];
+  front -> proc [label="submitted accounts"];
+  proc -> bkg [label="issued policies"];
+  front -> mail; proc -> mail; bkg -> mail;
+  mail -> ins [label="QS, slips,\nhold cover"];
+  proc -> clpc [label="download /\nupload (Q28)"];
+  bkg -> acc [label="BROKER_BOOKING\nevents"];
+  bkg -> ops [label="InvoiceBooked"];
+  ops -> proc [label="cashier receipts\n(payment confirmed)"];
+  bkg -> bdoi [label="feed parked (Q08)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+}

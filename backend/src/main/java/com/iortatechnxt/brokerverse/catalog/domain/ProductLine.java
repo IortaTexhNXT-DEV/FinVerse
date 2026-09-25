@@ -2,13 +2,12 @@ package com.iortatechnxt.brokerverse.catalog.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.SafePattern;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * Product line of Annex II (Property, Motor, Engineering...). It declares the kind of risk items
@@ -71,18 +70,9 @@ public class ProductLine extends AuthorizableEntity implements CatalogRecord {
   }
 
   private static void requireValidPattern(String pattern) {
-    if (pattern != null && !pattern.isBlank() && !compiles(pattern)) {
+    if (pattern != null && !pattern.isBlank() && !SafePattern.isValid(pattern)) {
       throw new BusinessRuleException(
           "CODE_PATTERN_INVALID", "The risk-code pattern is not a valid regular expression");
-    }
-  }
-
-  private static boolean compiles(String pattern) {
-    try {
-      Pattern.compile(pattern);
-      return true;
-    } catch (PatternSyntaxException e) {
-      return false;
     }
   }
 
@@ -95,7 +85,7 @@ public class ProductLine extends AuthorizableEntity implements CatalogRecord {
   public boolean acceptsCode(String riskCode) {
     return codePattern == null
         || codePattern.isBlank()
-        || Pattern.compile(codePattern).matcher(riskCode).matches();
+        || SafePattern.matches(codePattern, riskCode);
   }
 
   @Override

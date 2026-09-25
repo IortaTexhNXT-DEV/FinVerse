@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.catalog.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.SafePattern;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,8 +10,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * One row of the minimum-field matrix (BRNB.002/003/093): a field of the account or of every risk
@@ -121,7 +120,7 @@ public class FieldRule extends AuthorizableEntity implements CatalogRecord {
    * @return message, empty when the value is valid
    */
   public Optional<String> formatViolation(String value) {
-    if (ruleType == FieldRuleType.PATTERN && !Pattern.compile(pattern).matcher(value).matches()) {
+    if (ruleType == FieldRuleType.PATTERN && !SafePattern.matches(pattern, value)) {
       return Optional.of(label + " has an invalid format");
     }
     if (ruleType == FieldRuleType.RANGE) {
@@ -245,20 +244,8 @@ public class FieldRule extends AuthorizableEntity implements CatalogRecord {
         case REQUIRED -> true;
         case LOV -> lovType != null && !lovType.isBlank();
         case RANGE -> min != null || max != null;
-        case PATTERN -> compiles(pattern);
+        case PATTERN -> SafePattern.isValid(pattern);
       };
-    }
-
-    private static boolean compiles(String regex) {
-      if (regex == null || regex.isBlank()) {
-        return false;
-      }
-      try {
-        Pattern.compile(regex);
-        return true;
-      } catch (PatternSyntaxException e) {
-        return false;
-      }
     }
   }
 }

@@ -26,6 +26,7 @@
     <jjwt.version>0.12.6</jjwt.version>
     <openpdf.version>2.0.3</openpdf.version>
     <poi.version>5.4.1</poi.version>
+    <re2j.version>1.8</re2j.version>
     <zonky.embedded-db.version>2.6.0</zonky.embedded-db.version>
     <zonky.embedded-pg.version>2.1.0</zonky.embedded-pg.version>
     <archunit.version>1.4.1</archunit.version>
@@ -133,6 +134,12 @@
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
       <version>${poi.version}</version>
+    </dependency>
+    <!-- Linear-time regular expressions for patterns entered by administrators (no ReDoS) -->
+    <dependency>
+      <groupId>com.google.re2j</groupId>
+      <artifactId>re2j</artifactId>
+      <version>${re2j.version}</version>
     </dependency>
 
     <!-- Metrics -->

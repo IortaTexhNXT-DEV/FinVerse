@@ -690,6 +690,10 @@ this note is what the code does.
 
 ### 17.2 Behaviour (differences and details)
 
+- **Administrator patterns.** Field-rule PATTERN checks and product-line risk-code patterns are evaluated with RE2J
+  (`common.util.SafePattern`), which matches in linear time, so a pattern cannot stall the server (ReDoS). The syntax is
+  the common regex subset: back-references and look-around are rejected as invalid.
+
 - **Manual item rates (PQ10).** `cat_product_version.manual_rate_allowed` is true only on the backfilled versions 1, so
   today's quotations and accounts behave as before. Versions set up from now on lock the item rate to the scheme
   (or panel insurer) rate: another rate needs an approved rate exception.

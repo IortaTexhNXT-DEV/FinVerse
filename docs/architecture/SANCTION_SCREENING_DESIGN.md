@@ -452,3 +452,84 @@ where it differs from or details the sections above. S1-A, S1-B and S1-C build o
 - **Parked in S0.** The Operations Lead grants (SQ19), the committee rule and size values (SQ15), the disposition list
   (SQ06), the STR reasons (SQ09) and the ingestion alert recipients (SQ01) are placeholders, as listed in section 14.
   The optional gate `ClientComplianceGate` is not built (SQ07).
+
+## 17. S1-A configuration and watchlist: as built
+
+What wave S1-A built on the S0 foundation, and where it details or differs from sections 3-11. S1-B and S1-C build on the
+contracts listed here.
+
+- **Packages.** `screening.config` (`domain`, `service`, `api`), `screening.watchlist` (`domain`, `service`, `api`),
+  `screening.common` (`service.ScreeningPermissions`: permission names and `@PreAuthorize` expressions;
+  `api.DecisionRequest`: checker remarks). `screening/package-info.java` documents the ownership of the sub-packages.
+- **Migrations.** `V1051__screening_config.sql` (the twelve tables of 4.1), `V1052__screening_watchlist.sql` (the seven
+  tables of 4.2, the insert-only trigger of `scr_watchlist_change` once decided, the three BRD sources `AML_ADVISORY`
+  (SANCTION, file, full file), `NLDS_PEP` (PEP, file, delta file) and `INTERNAL` (manual)), demo
+  `V1950__demo_screening_users_config.sql` (users compoff, compchk, compdual (maker and checker, for the four-eyes
+  refusals), ucc, investigator, investigator2, scrapprover, amlcom1, amlcom2; version 1 of every configuration type for
+  company FVI, ACTIVE since 2026-01-01; one PENDING SLA_MATRIX v2 made by compoff).
+- **Details of 4.1.** `scr_config_version.scope` holds the template type of a TEMPLATE version (templates are versioned
+  per type); it is '' for the other types. `change_note` and `base_version_id` (the version compared with) are added;
+  `diff` stores the change lines as JSON (`item`, `attribute`, `before`, `after`). Partial unique indexes enforce one
+  DRAFT or PENDING version per type and scope and one ACTIVE version per type, scope and effective date. Rule tables use
+  `sort_order`, `rule_values`, `trigger_code`, `user_name` and `rule_kind` for the reserved words of 4.1.
+- **Life cycle.** New Draft opens the existing draft or copies the latest approved version; a PENDING version blocks a
+  new draft. Save validates the rows (FRS messages of FR-SS-011 to 017). Submit refuses an effective date before today,
+  an empty draft and a draft identical to the version in force, and stores the difference. Approve makes the version
+  ACTIVE from its effective date (a past date moves to today); `ConfigDecisionService.supersedeDue` marks the previous
+  version SUPERSEDED once the new one is in force (on approval and whenever the version list is read). Reject needs a
+  reason; Discard keeps the draft as REJECTED "withdrawn by maker". The maker (creator or submitter) never decides.
+- **Watchlists are platform reference data** (no `company_id`): the list is the same for every company.
+- **Ingestion (4.2, SNSRP-201/202).** One run per file (`WLR-yyyy-nnnnnn`). The SCR_WATCHLIST template columns are
+  Reference, Entity Type, Primary Name, First Name, Last Name, Aliases (semicolons), Birth Date, Nationality, ID Numbers,
+  Listed On, List Type (blank = the source's) and Remarks. A reference already on the list is updated or left unchanged,
+  never duplicated; a full-file source delists the ACTIVE entries missing from the file. **A scheduled run of the official
+  feed applies its changes at once** (changes recorded APPROVED by SYSTEM, FR-SS-020); **a file uploaded by a Compliance
+  Officer stages them as PENDING changes** (new entries PENDING) that a checker approves one by one or all at once from
+  the run (the exit criterion "file upload -> run log -> entries PENDING -> approved -> ACTIVE"). A FAILED or PARTIAL run
+  raises `SCR_INGEST_FAILED` and notifies the SCR_LIST_MAINTAIN holders.
+- **Transport seam (section 10).** Port `watchlist.service.WatchlistFeed` (`pending(source)`); the default
+  `StagedFileWatchlistFeed` reads the files staged on the source (attachment entity type `ScreeningListSource`, staged
+  with `POST /screening/watchlist/sources/{code}/stage` or the attachments API) that no run has read. An active FILE source
+  without a new file gets a FAILED run "No list file was received". SFTP, e-mail advisory and API / NLDS adapters are
+  parked (SQ01).
+- **Jobs.** `SCR_WATCHLIST_INGEST` (`WatchlistIngestJob`, one transaction per file) and `SCR_INGEST_ERROR_DIGEST`
+  (`IngestErrorDigestJob`: the failed records not yet sent, e-mailed with a CSV attachment to the valid addresses of
+  `SCR_INGEST_ALERT_RECIPIENTS`; no record = no e-mail; no valid recipient = alert "no recipients"). Crons of S0.
+- **Approval inbox.** `ConfigApprovalSource` (versions, SCR_CONFIG_APPROVE) and `WatchlistApprovalSource` (list
+  changes, SCR_LIST_APPROVE) implement the configuration and list parts of `ScreeningApprovalSource`; S1-C adds the case
+  part as its own source.
+- **API.** `/api/v1/screening/config`: `GET versions?companyId&type`, `GET versions/{id}` (rows and changes),
+  `GET versions/{id}/changes`, `POST drafts`, `PUT versions/{id}`, `POST versions/{id}/submit|withdraw|approve|reject`.
+  `/api/v1/screening/watchlist`: `GET|POST entries`, `GET|PUT entries/{id}`, `POST entries/{id}/deactivate`,
+  `GET changes?status`, `GET changes/{id}`, `POST changes/{id}/approve|reject`, `GET sources`, `PUT sources/{code}`,
+  `GET template`, `POST sources/{code}/upload|stage`, `GET runs?source`, `GET runs/{id}`, `POST runs/{id}/approve`.
+- **Screens** (`features/screening/setup`, routes in `setupModule.ts`, help in `SCREENING_SETUP_HELP`):
+  `/screening-setup/config` Configuration Versions, `/screening-setup/templates` Templates (field designer and preview),
+  `/screening-setup/watchlist` Watchlist, `/screening-setup/sources` List Sources and Runs.
+
+### 17.1 Contracts for S1-B and S1-C
+
+- `screening.config.service.ActiveConfig` (implemented by `VersionedActiveConfig`): `activeVersion(companyId, type,
+  scope, asOf)`; by version id `matchCriteria`, `riskRules`, `approvalMatrix`, `assignmentMatrix`, `slaMatrix`,
+  `validationRules`, `template`, `strLayout`; and the same "in force on a date" as default methods taking
+  `(companyId, asOf)` (`template(companyId, TemplateType, asOf)`). Snapshot records: `ConfigVersionRef`, `MatchCriteria`
+  (`rulesFor(listType, subjectType)`), `RiskRules` (rules sorted by priority, `category(code)`, `Rule.test(values)`),
+  `ApprovalMatrix` (`from(stage)`), `AssignmentMatrix`, `SlaMatrix` (`ruleFor(stage, caseType, riskCategory)`, most
+  specific row), `ValidationRules` (`rulesFor(stage, caseType)`), `ReviewTemplate`, `StrLayout`. Empty = no version in
+  force: the caller raises `SCR_NO_ACTIVE_CONFIG`.
+- `screening.watchlist.service.WatchlistDirectory`: `active(listTypes)`, `entries(ids)`, `entry(id)` returning
+  `ListedEntry` (names, aliases, birth date, nationality, IDs, `entryVersion`, status).
+- Event `screening.watchlist.service.WatchlistEntriesChanged(entryIds, cause)`, published inside the transaction that
+  applied approved or feed changes; S1-B rebuilds the name keys of the entries and runs the delta screening with
+  `@TransactionalEventListener(AFTER_COMMIT)`. S1-A never writes `scr_name_key`.
+- The sources are seeded by V1052: V1951 inserts entries only (or uses `on conflict do nothing` for sources).
+
+### 17.2 Parked or deferred in S1-A
+
+- Risk rules test one attribute each (design 4.1); a combination such as "SANCTION and TRUE_MATCH" is expressed by the
+  evaluation point (S1-B evaluates the rules on the match status it decides) until BDOI confirms the categories (SQ03).
+- List transports other than upload / staged file (SQ01); the AMLC STR layout (SQ09, placeholder layout in V1950).
+- The notice to Compliance of each run with new entries (FR-SS-020 notifications) is the approval notice of uploaded
+  runs only; a notice for applied feed runs waits for the recipients of SQ01.
+- The validation of the e-mail addresses when SCR_INGEST_ALERT_RECIPIENTS is saved belongs to the parameter screen
+  (platform); the digest skips invalid addresses.

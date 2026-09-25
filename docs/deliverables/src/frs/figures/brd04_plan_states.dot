@@ -1,0 +1,44 @@
+// BRD-4: statuses of installments, promises and billing statements. FRS section 5.3; BRCLXN.053, 055, 058.
+// Layout: one row per record type, stacked top-down.
+digraph clx_plans {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.25, ranksep=0.55, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=1.4, height=0.5, margin="0.06,0.03"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  subgraph cluster_inst {
+    label="Installment (allocation of ledger payments)"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=12;
+    style=rounded; color="@BORDER";
+    NOT_DUE; DUE; OVERDUE [fillcolor="@AMBER_BG"]; PARTIAL; PAID [fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    NOT_DUE -> DUE [label="due date"];
+    DUE -> OVERDUE [label="past due"];
+    DUE -> PARTIAL [label="part paid"];
+    PARTIAL -> PAID;
+    OVERDUE -> PAID [style=dashed];
+  }
+  subgraph cluster_prom {
+    label="Promise to pay (nightly check)"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=12;
+    style=rounded; color="@BORDER";
+    P_OPEN [label="OPEN"];
+    KEPT [fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    PARTIALLY_KEPT [label="PARTIALLY_KEPT", fillcolor="@AMBER_BG"];
+    BROKEN [fillcolor="@AMBER_BG"];
+    P_CANC [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+    P_OPEN -> KEPT [label="paid in time"];
+    P_OPEN -> PARTIALLY_KEPT [label="part paid"];
+    P_OPEN -> BROKEN [label="nothing paid"];
+    P_OPEN -> P_CANC [label="withdrawn", style=dashed];
+  }
+  subgraph cluster_soa {
+    label="Statement of account"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=12;
+    style=rounded; color="@BORDER";
+    GENERATED; SENT [fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    S_CANC [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+    GENERATED -> SENT [label="e-mailed"];
+    GENERATED -> S_CANC [label="cancel", style=dashed];
+  }
+  esc [label="Escalation\n(FR-CL-051)", fillcolor="@WHITE", style="rounded,dashed,filled"];
+  BROKEN -> esc [label="broken-promise rule"];
+  OVERDUE -> esc [label="overdue rule"];
+  { rank=same; NOT_DUE; P_OPEN; GENERATED; }
+}

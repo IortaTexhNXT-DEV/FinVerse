@@ -1,0 +1,29 @@
+// BRD-4: workflow CLX_ESCALATION (V1000). FRS section 5.1; BRCLXN.049, 050, 055.
+digraph clx_escalation {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.6, ranksep=0.5, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.4, height=0.55, margin="0.08,0.03"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  RAISED    [label="RAISED\nrule (AUTO) or user (MANUAL)", fillcolor="@DIRTY_WHITE"];
+  WITH_TL   [label="WITH_TL\nTeam lead"];
+  WITH_UH   [label="WITH_UH\nUnit / section head"];
+  IN_ACTION [label="IN_ACTION\nReceiving level"];
+  RETURNED  [label="RETURNED\nHandler", fillcolor="@AMBER_BG"];
+  RESOLVED  [label="RESOLVED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+
+  RAISED -> WITH_TL [label=" route"];
+  RAISED -> WITH_UH [label=" route_to_head"];
+  WITH_TL -> IN_ACTION [label=" acknowledge"];
+  WITH_UH -> IN_ACTION [label=" acknowledge"];
+  WITH_TL -> WITH_UH [label=" escalate_further\n (reason)", style=dashed, constraint=false];
+  IN_ACTION -> WITH_UH [label=" escalate_further", style=dashed, constraint=false];
+  WITH_TL -> RETURNED [label=" return_to_handler\n (reason)", style=dashed];
+  WITH_UH -> RETURNED [label=" return_to_handler", style=dashed];
+  RETURNED -> WITH_TL [label=" resubmit", style=dashed, constraint=false];
+  IN_ACTION -> RESOLVED [label=" resolve\n (resolution)"];
+  RETURNED -> RESOLVED [label=" auto_close\n (account collected,\n any open stage)", style=dotted];
+
+  { rank=same; WITH_TL; WITH_UH; }
+  { rank=same; IN_ACTION; RETURNED; }
+}

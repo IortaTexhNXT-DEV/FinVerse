@@ -1,0 +1,24 @@
+// BRD-5 Volume 2: workflow DISB_PAYEE (V890, V893). FRS section 5.5.
+digraph v2_payee {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.55, ranksep=0.5, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.2, height=0.55];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  DR  [label="DRAFT\nTeam Leader"];
+  FA  [label="FOR_AUTHORIZATION\nApprover"];
+  AC  [label="ACTIVE", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  FD  [label="FOR_DEACTIVATION\nApprover"];
+  IN  [label="INACTIVE", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  FRA [label="FOR_REACTIVATION\nApprover"];
+  DR -> FA [label=" submit"];
+  FA -> AC [label=" authorise"];
+  FA -> DR [label=" return", style=dashed];
+  AC -> FA [label=" amend"];
+  AC -> FD [label=" request deactivation"];
+  FD -> IN [label=" authorise"];
+  FD -> AC [label=" keep active", style=dashed];
+  IN -> FRA [label=" request reactivation"];
+  FRA -> AC [label=" authorise"];
+  FRA -> IN [label=" keep inactive", style=dashed];
+}

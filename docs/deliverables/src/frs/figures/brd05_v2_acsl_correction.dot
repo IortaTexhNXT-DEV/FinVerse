@@ -1,0 +1,22 @@
+// BRD-5 Volume 2: workflow ACSL_CORRECTION (V890). FRS section 5.7.
+digraph v2_corr {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.55, ranksep=0.5, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.2, height=0.55];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  TA [label="ASSIGNED\nto assign (TL)"];
+  DR [label="DRAFT\npreparer"];
+  FR [label="FOR_REVIEW\nACSL TL"];
+  FA [label="FOR_APPROVAL\nACSL Head"];
+  PO [label="POSTED\nACS:<no>", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  CA [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  TA -> DR [label=" assign"];
+  DR -> FR [label=" submit (balanced)"];
+  FR -> FA [label=" endorse"];
+  FA -> PO [label=" approve and post"];
+  FR -> DR [label=" return", style=dashed];
+  FA -> DR [label=" return", style=dashed];
+  DR -> CA [label=" cancel"];
+  { rank=same; PO; CA; }
+}

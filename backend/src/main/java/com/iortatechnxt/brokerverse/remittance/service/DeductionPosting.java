@@ -6,16 +6,20 @@ import com.iortatechnxt.brokerverse.common.util.Money;
 import com.iortatechnxt.brokerverse.remittance.domain.DeductionApplication;
 import com.iortatechnxt.brokerverse.remittance.domain.DeductionApplicationRepository;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch;
+import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatchRepository;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceDeduction;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceDeduction.DeductionStage;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceDeductionRepository;
+import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.BatchStage;
 import com.iortatechnxt.brokerverse.remittance.service.RemittancePostings.Posting;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
+import com.iortatechnxt.brokerverse.workflow.service.WorkCaseTransitioned;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Map;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,10 +34,11 @@ import org.springframework.transaction.annotation.Transactional;
  *       the batch pays (net due less the incentives): the total is capped at the amount payable,
  *       and what is left of a deduction waits for the next batch;
  *   <li>each part is posted as {@code OPS_REMIT_DEDUCTION} ({@code RMB:<ref>:<deduction no>}; due
- *       to insurer for disbursement against AR insurer's refund) and recorded as a consumption; a
- *       fully consumed deduction moves to APPLIED (system action {@code apply});
- *   <li>on a cancelled DV the consumptions of the cycle are reversed ({@code :CANCEL}), the amounts
- *       go back to their deductions and an APPLIED deduction is restored to CONFIRMED.
+ *       to insurer for disbursement against AR insurer's refund) and recorded as a consumption;
+ *   <li>on a cancelled DV the consumptions of the cycle are reversed ({@code :CANCEL}) and the
+ *       amounts go back to their deductions, which wait for the next batch again;
+ *   <li>a fully consumed deduction moves to APPLIED (system action {@code apply}) once every batch
+ *       that consumed it received the insurer OR, when its DV can no longer be cancelled.
  * </ul>
  */
 @Component
@@ -44,6 +49,7 @@ public class DeductionPosting {
 
   private final RemittanceDeductionRepository deductions;
   private final DeductionApplicationRepository applications;
+  private final RemittanceBatchRepository batches;
   private final DeductionService service;
   private final RemittancePostings postings;
   private final WorkflowService workflow;
@@ -55,15 +61,18 @@ public class DeductionPosting {
    *
    * @param deductions deductions
    * @param applications consumptions
+   * @param batches batches that consumed them
    * @param service deductions to consume
    * @param postings accounting events
    * @param workflow deduction workflow
    * @param audit audit trail
    * @param clock clock
    */
+  @SuppressWarnings("java:S107") // constructor injection
   public DeductionPosting(
       RemittanceDeductionRepository deductions,
       DeductionApplicationRepository applications,
+      RemittanceBatchRepository batches,
       DeductionService service,
       RemittancePostings postings,
       WorkflowService workflow,
@@ -71,6 +80,7 @@ public class DeductionPosting {
       Clock clock) {
     this.deductions = deductions;
     this.applications = applications;
+    this.batches = batches;
     this.service = service;
     this.postings = postings;
     this.workflow = workflow;
@@ -123,13 +133,6 @@ public class DeductionPosting {
                 null,
                 Map.of(AMOUNT, taken),
                 "Deduction " + d.getDeductionNo() + " from " + batch.getBatchNo())));
-    if (d.remaining().signum() == 0) {
-      workflow.systemTransition(
-          DeductionService.ENTITY,
-          d.getId().toString(),
-          "apply",
-          TransitionNote.comment("Applied to " + batch.getBatchNo()));
-    }
     audit.record(
         DeductionService.ENTITY,
         d.getDeductionNo(),
@@ -163,18 +166,50 @@ public class DeductionPosting {
               "Cancelled DV - deduction " + d.getDeductionNo() + " given back"));
       app.reverse(clock.instant());
       d.giveBack(app.getAmount());
-      if (d.getStage() == DeductionStage.APPLIED) {
-        workflow.systemTransition(
-            DeductionService.ENTITY,
-            d.getId().toString(),
-            "restore",
-            TransitionNote.comment("DV of " + batch.getBatchNo() + " cancelled"));
-      }
       audit.record(
           DeductionService.ENTITY,
           d.getDeductionNo(),
           AuditAction.UPDATE,
           "Given back " + app.getAmount().toPlainString() + " from " + batch.cycleReference());
     }
+  }
+
+  /**
+   * A batch received the insurer OR: the deductions it used up are APPLIED when no other open batch
+   * holds a part of them.
+   *
+   * @param event batch transition
+   */
+  @EventListener
+  public void on(WorkCaseTransitioned event) {
+    if (!BatchService.ENTITY.equals(event.entityType())
+        || !BatchStage.OR_RECEIVED.name().equals(event.toStage())) {
+      return;
+    }
+    Long batchId = Long.valueOf(event.entityId());
+    for (DeductionApplication app : applications.findByBatchIdOrderByIdAsc(batchId)) {
+      RemittanceDeduction d = deductions.findById(app.getDeductionId()).orElseThrow();
+      if (!app.isReversed() && fullyClosed(d, batchId)) {
+        workflow.systemTransition(
+            DeductionService.ENTITY,
+            d.getId().toString(),
+            "apply",
+            TransitionNote.comment("Applied to " + app.getBatchNo()));
+      }
+    }
+  }
+
+  private boolean fullyClosed(RemittanceDeduction d, Long closingBatchId) {
+    if (d.getStage() != DeductionStage.CONFIRMED || d.remaining().signum() > 0) {
+      return false;
+    }
+    return applications.findByDeductionIdOrderByIdAsc(d.getId()).stream()
+        .filter(a -> !a.isReversed() && !a.getBatchId().equals(closingBatchId))
+        .allMatch(
+            a ->
+                batches
+                    .findById(a.getBatchId())
+                    .map(b -> b.getStage() == BatchStage.OR_RECEIVED)
+                    .orElse(true));
   }
 }

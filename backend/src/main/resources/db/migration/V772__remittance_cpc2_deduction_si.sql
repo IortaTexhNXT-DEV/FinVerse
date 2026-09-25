@@ -6,8 +6,9 @@
 --   DIS 3.29.1  early-incentive service invoice (booking type EARLY_INCENTIVE, V872) linked to
 --               the batch, with the 2% withholding tax (parameter EARLY_INCENTIVE_WTAX_RATE, V890)
 --   ACSL 2.9.2  remittance deductions confirmed by ACSL (workflow REM_DEDUCTION, V890), consumed by
---               the next batch of the insurer and capped at the amount payable, event
---               OPS_REMIT_DEDUCTION (seeded in V890)
+--               the next batches of the insurer and capped at the amount payable, event
+--               OPS_REMIT_DEDUCTION (seeded in V890); a fully consumed deduction becomes APPLIED
+--               once its batches received the insurer OR (so a cancelled DV can still give it back)
 --   DIS 2.20.0  cancellation of the DV of a batch: the batch returns to review with its postings
 --               reversed and is sent again under a new cycle (workflow action dv_cancelled)
 -- =====================================================================================
@@ -97,10 +98,6 @@ from (values
     ('OVER_REMITTANCE', 'Over-remittance to the insurer', 20),
     ('OTHER', 'Other amount confirmed by the insurer', 90)
 ) as v(code, label, sort_order);
-
--- A deduction consumed by a batch whose DV is then cancelled is available again (DIS 2.20.0)
-insert into wf_transition (workflow_code, from_stage, action, to_stage, label, permission, generic, reason_lov, sort_order)
-values ('REM_DEDUCTION', 'APPLIED', 'restore', 'CONFIRMED', 'Restored after a cancelled DV', 'REMIT_PROCESS', false, null, 20);
 
 -- ---------- DV cancelled: the batch returns to review (DIS 2.20.0) ---------------------------
 insert into wf_transition (workflow_code, from_stage, action, to_stage, label, permission, generic, reason_lov, sort_order)

@@ -37,7 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
  * prepares a deduction (insurer, currency, source such as an AR insurer's refund, amount), submits
  * it with the insurer's written confirmation, and another user confirms it
  * (REMIT_DEDUCTION_CONFIRM). Confirmed deductions are then consumed by the next approved batches of
- * that insurer and currency ({@link DeductionPosting}). Every change is audited.
+ * that insurer and currency and become APPLIED once those batches are closed ({@link
+ * DeductionPosting}). Every change is audited.
  */
 @Service
 @Transactional
@@ -228,7 +229,7 @@ public class DeductionService {
   }
 
   /**
-   * Confirmed deductions still waiting for a batch of an insurer and currency.
+   * Confirmed deductions with an amount still to deduct from a batch of an insurer and currency.
    *
    * @param companyId company
    * @param insurerCode insurer
@@ -237,8 +238,12 @@ public class DeductionService {
    */
   @Transactional(readOnly = true)
   public List<RemittanceDeduction> pending(Long companyId, String insurerCode, String currency) {
-    return deductions.findByCompanyIdAndInsurerCodeAndCurrencyAndStageOrderByConfirmedAtAscIdAsc(
-        companyId, insurerCode, currency, DeductionStage.CONFIRMED);
+    return deductions
+        .findByCompanyIdAndInsurerCodeAndCurrencyAndStageOrderByConfirmedAtAscIdAsc(
+            companyId, insurerCode, currency, DeductionStage.CONFIRMED)
+        .stream()
+        .filter(d -> d.remaining().signum() > 0)
+        .toList();
   }
 
   /**

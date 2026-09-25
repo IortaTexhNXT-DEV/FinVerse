@@ -158,6 +158,9 @@ class EndorsementIT {
     InvoiceBooked event = events.forInvoice(invoice.getInvoiceNo()).orElseThrow();
     assertThat(event.kind()).isEqualTo(InvoiceKind.ENDORSEMENT_PLUS);
     assertThat(event.endorsementNo()).isEqualTo(result.endorsementNo());
+    assertThat(original.getRootInvoiceNo()).isEqualTo(original.getInvoiceNo());
+    assertThat(invoice.getRootInvoiceNo()).isEqualTo(original.getInvoiceNo());
+    assertThat(event.rootInvoiceNo()).isEqualTo(original.getInvoiceNo());
 
     EndorsementResult replay = as.run("proc", () -> endorsements.post(posting));
     assertThat(replay.endorsementNo()).isEqualTo(result.endorsementNo());

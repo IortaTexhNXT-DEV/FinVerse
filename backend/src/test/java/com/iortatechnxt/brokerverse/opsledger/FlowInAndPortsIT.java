@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.opsledger;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
@@ -20,6 +21,7 @@ import com.iortatechnxt.brokerverse.opsledger.service.ExtractRepositoryService;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInHandler.FlowInFile;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInService;
 import com.iortatechnxt.brokerverse.opsledger.service.HandoffService;
+import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerService;
 import com.iortatechnxt.brokerverse.opsledger.service.MovementRequest;
 import com.iortatechnxt.brokerverse.opsledger.service.OpsLedgerEvents.DisbursementStatusChanged;
@@ -65,9 +67,23 @@ class FlowInAndPortsIT {
   @Autowired private TransactionTemplate tx;
   @Autowired private AsUser as;
   @Autowired private OpsLedgerFixtures fx;
-  @Autowired private ReceiptIssuer receiptIssuer;
-  @Autowired private UnappliedSink unappliedSink;
-  @Autowired private PaymentReapplier reapplier;
+  @Autowired private ReceiptIssuer activeReceiptIssuer;
+  @Autowired private UnappliedSink activeUnappliedSink;
+  @Autowired private PaymentReapplier activeReapplier;
+  @Autowired private ObjectMapper json;
+  @Autowired private InvoiceLedgerQueryService ledgerQuery;
+  private ReceiptIssuer receiptIssuer;
+  private UnappliedSink unappliedSink;
+  private PaymentReapplier reapplier;
+
+  /** The default adapters stay the fallback while no module provides the ports. */
+  @BeforeEach
+  void defaultAdapters() {
+    receiptIssuer = new HandoffReceiptIssuer(handoffs, json);
+    unappliedSink = new HandoffUnappliedSink(handoffs, json);
+    reapplier = new LedgerPaymentReapplier(ledgerQuery);
+  }
+
   @Autowired private DisbursementGateway gateway;
   @Autowired private DisbursementQueueService queue;
   @Autowired private CollectionFeed collection;
@@ -154,9 +170,10 @@ class FlowInAndPortsIT {
 
   @Test
   void theDefaultAdaptersAreInstalledWhileNoModuleProvidesThePorts() {
-    assertThat(receiptIssuer).isInstanceOf(HandoffReceiptIssuer.class);
-    assertThat(unappliedSink).isInstanceOf(HandoffUnappliedSink.class);
-    assertThat(reapplier).isInstanceOf(LedgerPaymentReapplier.class);
+    // Cashiering provides the receipt, unapplied and re-application ports: its beans win.
+    assertThat(activeReceiptIssuer).isNotInstanceOf(HandoffReceiptIssuer.class);
+    assertThat(activeUnappliedSink).isNotInstanceOf(HandoffUnappliedSink.class);
+    assertThat(activeReapplier).isNotInstanceOf(LedgerPaymentReapplier.class);
     assertThat(gateway).isInstanceOf(QueueDisbursementGateway.class);
     assertThat(collection).isInstanceOf(ManualCollectionFeed.class);
     assertThat(inbox).isInstanceOf(ManualInsurerFileInbox.class);

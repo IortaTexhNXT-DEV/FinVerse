@@ -89,10 +89,10 @@ class PackageRequestProcessIT {
 
   private static PackageTerms requested(String... insurers) {
     return new PackageTerms(
-        List.of(new PackageTerms.Section("Target market", "Contractors of public works")),
+        List.of(new PackageTerms.Section("Target market", "Corporate fleet owners")),
         List.of(
-            coverage("CONTRACT_WORKS", "25000000", "PHP 50,000 each loss"),
-            coverage("TPL", "5000000", null)),
+            coverage("OD_THEFT", "2500000", "PHP 5,000 each loss"),
+            coverage("PD", "500000", null)),
         new Scheme(new BigDecimal("0.35"), new BigDecimal("15000"), BigDecimal.TEN, null, null),
         new Dates(START, START, START.plusYears(1).minusDays(1), null),
         Arrays.stream(insurers).map(InsurerLine::target).toList());
@@ -110,8 +110,8 @@ class PackageRequestProcessIT {
         RequestScope.GENERIC,
         "Test package " + SEQ.incrementAndGet(),
         null,
-        isNew ? "ENGINEERING" : "MOTOR",
-        isNew ? "CAR" : "COMPREHENSIVE",
+        "MOTOR",
+        "COMPREHENSIVE",
         product,
         null,
         List.of(),
@@ -150,7 +150,7 @@ class PackageRequestProcessIT {
                     outcome,
                     rate == null ? null : new BigDecimal(rate),
                     new BigDecimal("15000"),
-                    List.of(coverage("CONTRACT_WORKS", "25000000", "PHP 75,000 each loss")),
+                    List.of(coverage("OD_THEFT", "2500000", "PHP 7,500 each loss")),
                     "Standard CAR wording",
                     START,
                     null)));

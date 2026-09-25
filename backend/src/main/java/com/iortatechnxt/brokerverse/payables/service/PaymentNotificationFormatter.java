@@ -36,6 +36,8 @@ import java.util.Locale;
  *   pos  37-54  18  total amount in minor units
  * </pre>
  *
+ * <p><b>DCTF</b>: the Direct Credit Transaction File of Disbursement, see {@link #dctf}.
+ *
  * <p><b>CSV</b>: header line, one line per payment with the same fields (amount with a decimal
  * point, date ISO yyyy-MM-dd), then a trailer line {@code 02,<account>,<file
  * date>,<count>,<total>}.
@@ -43,6 +45,13 @@ import java.util.Locale;
 public final class PaymentNotificationFormatter {
 
   private static final DateTimeFormatter DDMMYYYY = DateTimeFormatter.ofPattern("ddMMyyyy");
+  private static final DateTimeFormatter MMDDYYYY = DateTimeFormatter.ofPattern("MMddyyyy");
+  private static final DateTimeFormatter YYYYMMDD = DateTimeFormatter.ofPattern("yyyyMMdd");
+  private static final int DCTF_ACCOUNT = 12;
+  private static final int DCTF_PAYEE = 30;
+  private static final int DCTF_FILLER = 12;
+  private static final int DCTF_AMOUNT = 15;
+  private static final int DCTF_FILE_NAME = 40;
   private static final String CRLF = "\r\n";
   private static final int ACCOUNT = 20;
   private static final int DOCUMENT = 20;
@@ -72,9 +81,62 @@ public final class PaymentNotificationFormatter {
       String companyAccountNo,
       LocalDate fileDate,
       List<NotificationRecord> records) {
-    return format == NotificationFormat.CSV
-        ? csv(companyAccountNo, fileDate, records)
-        : fixedWidth(companyAccountNo, fileDate, records);
+    return switch (format) {
+      case CSV -> csv(companyAccountNo, fileDate, records);
+      case DCTF -> dctf("DCTF_" + fileDate.format(YYYYMMDD) + ".txt", fileDate, records);
+      default -> fixedWidth(companyAccountNo, fileDate, records);
+    };
+  }
+
+  /**
+   * Writes the Direct Credit Transaction File of the credit-to-account payments forwarded to TPD
+   * for ACA processing (DIS 2.16.1, Appendix B p.147; trailer and totals to confirm, AQ09).
+   *
+   * <pre>
+   * Header (1 line)  : file date MMDDYYYY, one space, file name (40, space padded)
+   * Detail (89 chars): payee account number, digits only, 12 numeric zero padded
+   *                    payee name, 30 alphanumeric, space padded
+   *                    12 blank spaces
+   *                    system reference (DV number), 20, space padded
+   *                    amount 000000000000.00 (15, with the decimal point)
+   * </pre>
+   *
+   * @param fileName file name printed in the header
+   * @param fileDate file date
+   * @param records credits; {@code vendorAccountNo} is the payee account, {@code voucherNo} the
+   *     reference
+   * @return file text with CRLF line ends
+   */
+  public static String dctf(String fileName, LocalDate fileDate, List<NotificationRecord> records) {
+    StringBuilder out =
+        new StringBuilder(fileDate.format(MMDDYYYY))
+            .append(' ')
+            .append(text(fileName, DCTF_FILE_NAME))
+            .append(CRLF);
+    for (NotificationRecord r : records) {
+      out.append(accountDigits(r.vendorAccountNo()))
+          .append(text(r.vendorName(), DCTF_PAYEE))
+          .append(" ".repeat(DCTF_FILLER))
+          .append(text(r.voucherNo(), DOCUMENT))
+          .append(decimalAmount(r.amount()))
+          .append(CRLF);
+    }
+    return out.toString();
+  }
+
+  private static String accountDigits(String accountNo) {
+    String digits = accountNo == null ? "" : accountNo.replaceAll("\\D", "");
+    String cut =
+        digits.length() > DCTF_ACCOUNT ? digits.substring(digits.length() - DCTF_ACCOUNT) : digits;
+    return "0".repeat(DCTF_ACCOUNT - cut.length()) + cut;
+  }
+
+  private static String decimalAmount(BigDecimal amount) {
+    String text = amount.setScale(2, RoundingMode.HALF_EVEN).toPlainString();
+    if (text.length() > DCTF_AMOUNT) {
+      throw new IllegalArgumentException("Amount " + text + " does not fit the DCTF layout");
+    }
+    return "0".repeat(DCTF_AMOUNT - text.length()) + text;
   }
 
   private static String fixedWidth(

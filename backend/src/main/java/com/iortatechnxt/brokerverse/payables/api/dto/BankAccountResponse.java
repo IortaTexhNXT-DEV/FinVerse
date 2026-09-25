@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.payables.api.dto;
 
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import com.iortatechnxt.brokerverse.payables.domain.BankAccount;
+import com.iortatechnxt.brokerverse.payables.domain.BankAccountStatus;
 import com.iortatechnxt.brokerverse.payables.domain.NotificationFormat;
 
 /**
@@ -23,6 +24,8 @@ import com.iortatechnxt.brokerverse.payables.domain.NotificationFormat;
  * @param createdBy creator
  * @param maker user who created or last maintained the record (unchanged by authorization)
  * @param authorizedBy checker
+ * @param status operating status, active or inactive (DIS 2.24.2)
+ * @param requestedStatus status waiting for authorisation, null when none
  */
 public record BankAccountResponse(
     Long id,
@@ -40,7 +43,9 @@ public record BankAccountResponse(
     RecordStatus recordStatus,
     String createdBy,
     String maker,
-    String authorizedBy) {
+    String authorizedBy,
+    BankAccountStatus status,
+    BankAccountStatus requestedStatus) {
 
   /**
    * Maps an entity.
@@ -65,6 +70,8 @@ public record BankAccountResponse(
         a.getRecordStatus(),
         a.getCreatedBy(),
         a.getMaker(),
-        a.getAuthorizedBy());
+        a.getAuthorizedBy(),
+        a.getStatus(),
+        a.getRequestedStatus());
   }
 }

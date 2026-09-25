@@ -1,11 +1,13 @@
 package com.iortatechnxt.brokerverse.payables.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import java.time.Instant;
 
 /**
  * Company bank account (house bank). Master data under maker-checker control, shared by payments,
@@ -15,6 +17,9 @@ import jakarta.persistence.Table;
  * BANK} account role of receipt and payment events). The optional PDC clearing account is the
  * liability credited when a post-dated cheque is issued on this account. Other modules read bank
  * accounts through {@code payables.service.BankAccountQueryService}.
+ *
+ * <p>Disbursement (DIS 2.24.2) tags an account active or inactive with maker-checker: an inactive
+ * account is not {@link #isActive() active} and is refused for new payments.
  */
 @Entity
 @Table(name = "pay_bank_account")
@@ -54,6 +59,14 @@ public class BankAccount extends AuthorizableEntity {
   @Column(name = "notification_format", nullable = false, length = 20)
   private NotificationFormat notificationFormat = NotificationFormat.FIXED_WIDTH;
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
+  private BankAccountStatus status = BankAccountStatus.ACTIVE;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "requested_status", length = 20)
+  private BankAccountStatus requestedStatus;
+
   protected BankAccount() {}
 
   /**
@@ -67,6 +80,48 @@ public class BankAccount extends AuthorizableEntity {
     this.companyId = companyId;
     this.code = code;
     this.currency = currency;
+  }
+
+  /**
+   * Asks to tag the account active or inactive (DIS 2.24.2): the record returns to pending
+   * authorisation and the new status applies once a checker authorises it.
+   *
+   * @param target requested status
+   */
+  public void requestStatus(BankAccountStatus target) {
+    if (target == status) {
+      throw new BusinessRuleException(
+          "BANK_ACCOUNT_STATUS_UNCHANGED", "Bank account " + code + " is already " + target);
+    }
+    requestedStatus = target;
+    markModified();
+  }
+
+  @Override
+  public void authorize(String checker, Instant when) {
+    super.authorize(checker, when);
+    if (requestedStatus != null) {
+      status = requestedStatus;
+      requestedStatus = null;
+    }
+  }
+
+  /**
+   * Usable in transactions: authorised and tagged active (DIS 2.24.2).
+   *
+   * @return true when authorised and active
+   */
+  @Override
+  public boolean isActive() {
+    return super.isActive() && status == BankAccountStatus.ACTIVE;
+  }
+
+  public BankAccountStatus getStatus() {
+    return status;
+  }
+
+  public BankAccountStatus getRequestedStatus() {
+    return requestedStatus;
   }
 
   public Long getCompanyId() {

@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.payables.api.dto;
 
 import com.iortatechnxt.brokerverse.payables.domain.ChequeBook;
 import com.iortatechnxt.brokerverse.payables.domain.ChequeBookStatus;
+import java.time.Instant;
 import java.time.LocalDate;
 
 /**
@@ -15,6 +16,9 @@ import java.time.LocalDate;
  * @param remaining unused leaves
  * @param receivedOn date received
  * @param status status
+ * @param editedBy user who edited the beginning series (DIS 2.23.2), null when never edited
+ * @param editedAt time of that edit
+ * @param previousRange range before the edit
  */
 public record ChequeBookResponse(
     Long id,
@@ -24,7 +28,10 @@ public record ChequeBookResponse(
     long nextNo,
     long remaining,
     LocalDate receivedOn,
-    ChequeBookStatus status) {
+    ChequeBookStatus status,
+    String editedBy,
+    Instant editedAt,
+    String previousRange) {
 
   /**
    * Maps an entity.
@@ -41,6 +48,9 @@ public record ChequeBookResponse(
         b.getNextNo(),
         b.remaining(),
         b.getReceivedOn(),
-        b.getStatus());
+        b.getStatus(),
+        b.getEditedBy(),
+        b.getEditedAt(),
+        b.getPreviousRange());
   }
 }

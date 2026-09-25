@@ -42,6 +42,11 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'KEPT',
     // report batch items (FRBS 2.4.5)
     'OK',
+    // disbursement
+    'IN_VOUCHER',
+    'NEGOTIATED',
+    'DEBITED',
+    'CREDITED',
   ],
   warning: [
     'PENDING_AUTHORIZATION',
@@ -79,6 +84,12 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'DUE',
     'PARTIAL',
     'PARTIALLY_KEPT',
+    // disbursement: waiting for the checker
+    'FOR_AUTHORIZATION',
+    'FOR_DEACTIVATION',
+    'FOR_REACTIVATION',
+    'FOR_APPROVAL_1',
+    'FOR_APPROVAL_2',
   ],
   // BDO style guide: blue pills for records moving through processing ("Account for Placement").
   info: [
@@ -107,6 +118,12 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     // collections plans and escalations
     'IN_ACTION',
     'NOT_DUE',
+    // disbursement: in process
+    'IN_PROCESS',
+    'RECEIVED',
+    'PRINTED',
+    'EMAILED',
+    'EXTRACTED',
   ],
   neutral: [
     'DRAFT',
@@ -121,6 +138,9 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     // collections
     'EXCLUDED_CANCELLED',
     'NOT_APPLICABLE',
+    // disbursement
+    'NOT_POSTED',
+    'EXHAUSTED',
   ],
   danger: [
     'REJECTED',
@@ -145,6 +165,11 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     // collections plans and escalations
     'OVERDUE',
     'BROKEN',
+    // disbursement
+    'NO_PAYEE',
+    'RETURNED',
+    'STALE',
+    'REVERSAL_FAILED',
   ],
 };
 

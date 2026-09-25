@@ -40,6 +40,24 @@ public class EntryValidator {
    * @return trimmed values
    */
   public EntryValues validate(EntryValues v, String remarks) {
+    requireMandatory(v, remarks);
+    lovs.requireValid("SCR_LIST_TYPE", v.listType().trim(), today());
+    requireDates(v);
+    return new EntryValues(
+        v.listType().trim(),
+        v.entityType(),
+        v.primaryName().trim(),
+        trim(v.firstName()),
+        trim(v.lastName()),
+        v.birthDate(),
+        trim(v.nationality()),
+        trim(v.idNumbers()),
+        v.listedOn(),
+        v.delistedOn(),
+        aliases(v.aliases()));
+  }
+
+  private static void requireMandatory(EntryValues v, String remarks) {
     if (v == null || blank(v.primaryName())) {
       throw new BusinessRuleException(
           "SCR_ENTRY_NAME_REQUIRED", "Enter the name of the listed person or entity");
@@ -52,27 +70,17 @@ public class EntryValidator {
       throw new BusinessRuleException(
           "SCR_ENTRY_TYPE_REQUIRED", "Select the entity type (individual or entity)");
     }
-    lovs.requireValid("SCR_LIST_TYPE", v.listType().trim(), today());
-    requireDates(v);
+  }
+
+  private static List<EntryValues.Alias> aliases(List<EntryValues.Alias> given) {
     List<EntryValues.Alias> aliases = new ArrayList<>();
-    for (EntryValues.Alias a : v.aliases()) {
+    for (EntryValues.Alias a : given) {
       if (a != null && !blank(a.name())) {
         aliases.add(
             new EntryValues.Alias(a.name().trim(), a.type() == null ? AliasType.AKA : a.type()));
       }
     }
-    return new EntryValues(
-        v.listType().trim(),
-        v.entityType(),
-        v.primaryName().trim(),
-        trim(v.firstName()),
-        trim(v.lastName()),
-        v.birthDate(),
-        trim(v.nationality()),
-        trim(v.idNumbers()),
-        v.listedOn(),
-        v.delistedOn(),
-        aliases);
+    return aliases;
   }
 
   private void requireDates(EntryValues v) {

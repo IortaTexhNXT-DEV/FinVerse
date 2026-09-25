@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.screening.config.api.dto.SaveDraftRequest;
 import com.iortatechnxt.brokerverse.screening.config.domain.ConfigType;
 import com.iortatechnxt.brokerverse.screening.config.domain.ConfigVersion;
 import com.iortatechnxt.brokerverse.screening.config.service.ConfigChange;
+import com.iortatechnxt.brokerverse.screening.config.service.ConfigDecisionService;
 import com.iortatechnxt.brokerverse.screening.config.service.ConfigVersionService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -32,14 +33,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConfigVersionController {
 
   private final ConfigVersionService service;
+  private final ConfigDecisionService decisions;
 
   /**
    * Creates the controller.
    *
    * @param service configuration versions
+   * @param decisions checker decisions
    */
-  public ConfigVersionController(ConfigVersionService service) {
+  public ConfigVersionController(ConfigVersionService service, ConfigDecisionService decisions) {
     this.service = service;
+    this.decisions = decisions;
   }
 
   /**
@@ -140,7 +144,7 @@ public class ConfigVersionController {
   @PostMapping("/versions/{id}/approve")
   @PreAuthorize(ScreeningPermissions.HAS_CONFIG_APPROVE)
   public ConfigVersionDto approve(@PathVariable Long id) {
-    return ConfigVersionDto.from(service.approve(id));
+    return ConfigVersionDto.from(decisions.approve(id));
   }
 
   /**
@@ -154,7 +158,7 @@ public class ConfigVersionController {
   @PreAuthorize(ScreeningPermissions.HAS_CONFIG_APPROVE)
   public ConfigVersionDto reject(
       @PathVariable Long id, @Valid @RequestBody DecisionRequest request) {
-    return ConfigVersionDto.from(service.reject(id, request.remarks()));
+    return ConfigVersionDto.from(decisions.reject(id, request.remarks()));
   }
 
   private ConfigVersionDetail detail(ConfigVersion v) {

@@ -40,7 +40,7 @@ public class AssignmentRuleRow extends BaseEntity {
   private String teamRole;
 
   @Column(name = "user_name", length = 50, updatable = false)
-  private String userName;
+  private String assigneeUser;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "balancing", nullable = false, length = 20, updatable = false)
@@ -60,7 +60,7 @@ public class AssignmentRuleRow extends BaseEntity {
    * @param marketingUnit marketing unit condition
    * @param clientType client type condition
    * @param teamRole team role target
-   * @param userName user target
+   * @param assigneeUser user target
    * @param balancing balancing
    */
   @SuppressWarnings("java:S107")
@@ -73,7 +73,7 @@ public class AssignmentRuleRow extends BaseEntity {
       String marketingUnit,
       String clientType,
       String teamRole,
-      String userName,
+      String assigneeUser,
       Balancing balancing) {
     this.versionId = versionId;
     this.sortOrder = sortOrder;
@@ -83,7 +83,7 @@ public class AssignmentRuleRow extends BaseEntity {
     this.marketingUnit = marketingUnit;
     this.clientType = clientType;
     this.teamRole = teamRole;
-    this.userName = userName;
+    this.assigneeUser = assigneeUser;
     this.balancing = balancing;
   }
 
@@ -119,8 +119,8 @@ public class AssignmentRuleRow extends BaseEntity {
     return teamRole;
   }
 
-  public String getUserName() {
-    return userName;
+  public String getAssigneeUser() {
+    return assigneeUser;
   }
 
   public Balancing getBalancing() {

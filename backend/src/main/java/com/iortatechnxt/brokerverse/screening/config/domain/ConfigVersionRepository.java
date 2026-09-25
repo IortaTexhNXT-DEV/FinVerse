@@ -19,15 +19,18 @@ public interface ConfigVersionRepository extends JpaRepository<ConfigVersion, Lo
    * @param scope scope ('' when none)
    * @param statuses ACTIVE and SUPERSEDED
    * @param asOf date
-   * @return the version in force
+   * @return the approved versions on or before the date, the one in force first
    */
-  Optional<ConfigVersion>
-      findFirstByCompanyIdAndConfigTypeAndScopeAndStatusInAndEffectiveFromLessThanEqualOrderByEffectiveFromDescVersionNoDesc(
-          Long companyId,
-          ConfigType type,
-          String scope,
-          Collection<ConfigStatus> statuses,
-          LocalDate asOf);
+  @Query(
+      "select v from ConfigVersion v where v.companyId = :companyId and v.configType = :type"
+          + " and v.scope = :scope and v.status in :statuses and v.effectiveFrom <= :asOf"
+          + " order by v.effectiveFrom desc, v.versionNo desc")
+  List<ConfigVersion> inForce(
+      @Param("companyId") Long companyId,
+      @Param("type") ConfigType type,
+      @Param("scope") String scope,
+      @Param("statuses") Collection<ConfigStatus> statuses,
+      @Param("asOf") LocalDate asOf);
 
   /**
    * The newest version of a type and scope in one of the statuses.
@@ -72,9 +75,10 @@ public interface ConfigVersionRepository extends JpaRepository<ConfigVersion, Lo
   List<ConfigVersion> findByStatusOrderBySubmittedAtAsc(ConfigStatus status);
 
   /**
-   * Distinct company, type and scope combinations that have an ACTIVE version (supersession sweep).
+   * Versions in a status (supersession sweep of the ACTIVE ones).
    *
-   * @return versions ACTIVE today
+   * @param status status
+   * @return versions
    */
   List<ConfigVersion> findByStatus(ConfigStatus status);
 

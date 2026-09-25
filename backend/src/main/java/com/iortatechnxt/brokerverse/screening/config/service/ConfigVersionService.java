@@ -8,7 +8,6 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
-import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.screening.config.domain.ConfigStatus;
 import com.iortatechnxt.brokerverse.screening.config.domain.ConfigType;
@@ -17,11 +16,8 @@ import com.iortatechnxt.brokerverse.screening.config.domain.ConfigVersionReposit
 import com.iortatechnxt.brokerverse.screening.config.domain.TemplateType;
 import java.time.Clock;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,9 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ConfigVersionService {
 
-  /** Audit entity type. */
-  public static final String ENTITY = "ScreeningConfigVersion";
-
   /** Notification event of a version submitted for approval. */
   static final String EVENT_TO_APPROVE = "SCR_CONFIG_TO_APPROVE";
 
@@ -50,6 +43,7 @@ public class ConfigVersionService {
   private final ConfigVersionRepository versions;
   private final ConfigContentStore store;
   private final ConfigValidator validator;
+  private final ConfigDecisionService decisions;
   private final AuditTrailService audit;
   private final NotificationService notifications;
   private final CurrentUser currentUser;
@@ -62,6 +56,7 @@ public class ConfigVersionService {
    * @param versions versions
    * @param store version rows
    * @param validator row checks
+   * @param decisions checker decisions (supersession)
    * @param audit audit trail
    * @param notifications in-app notifications
    * @param currentUser current user
@@ -72,6 +67,7 @@ public class ConfigVersionService {
       ConfigVersionRepository versions,
       ConfigContentStore store,
       ConfigValidator validator,
+      ConfigDecisionService decisions,
       AuditTrailService audit,
       NotificationService notifications,
       CurrentUser currentUser,
@@ -80,6 +76,7 @@ public class ConfigVersionService {
     this.versions = versions;
     this.store = store;
     this.validator = validator;
+    this.decisions = decisions;
     this.audit = audit;
     this.notifications = notifications;
     this.currentUser = currentUser;
@@ -96,7 +93,7 @@ public class ConfigVersionService {
    * @return versions
    */
   public List<ConfigVersion> versions(Long companyId, ConfigType type) {
-    supersedeDue(today());
+    decisions.supersedeDue(today());
     return versions.findByCompanyIdAndConfigTypeOrderByScopeAscVersionNoDesc(companyId, type);
   }
 
@@ -137,8 +134,9 @@ public class ConfigVersionService {
   public Optional<ConfigVersion> inForce(
       Long companyId, ConfigType type, String scope, LocalDate asOf) {
     return versions
-        .findFirstByCompanyIdAndConfigTypeAndScopeAndStatusInAndEffectiveFromLessThanEqualOrderByEffectiveFromDescVersionNoDesc(
-            companyId, type, scopeKey(type, scope), IN_FORCE, asOf);
+        .inForce(companyId, type, ConfigVersions.scopeKey(type, scope), IN_FORCE, asOf)
+        .stream()
+        .findFirst();
   }
 
   /**
@@ -151,7 +149,7 @@ public class ConfigVersionService {
    * @return the draft
    */
   public ConfigVersion newDraft(Long companyId, ConfigType type, String scope) {
-    String key = scopeKey(type, scope);
+    String key = ConfigVersions.scopeKey(type, scope);
     Optional<ConfigVersion> open =
         versions.findFirstByCompanyIdAndConfigTypeAndScopeAndStatusInOrderByVersionNoDesc(
             companyId, type, key, OPEN);
@@ -160,7 +158,7 @@ public class ConfigVersionService {
       if (existing.getStatus() == ConfigStatus.PENDING) {
         throw new BusinessRuleException(
             "SCR_CONFIG_PENDING",
-            "Version "
+            ConfigVersions.VERSION
                 + existing.getVersionNo()
                 + " is waiting for approval; a new draft can be made once it is decided");
       }
@@ -181,11 +179,11 @@ public class ConfigVersionService {
     ConfigContent content = base.map(this::content).orElseGet(() -> emptyContent(type, key));
     store.replace(draft.getId(), type, content);
     audit.record(
-        ENTITY,
+        ConfigVersions.ENTITY,
         draft.getId(),
         AuditAction.CREATE,
         "Draft "
-            + label(draft)
+            + ConfigVersions.label(draft)
             + base.map(b -> " copied from version " + b.getVersionNo()).orElse(""));
     return draft;
   }
@@ -217,7 +215,11 @@ public class ConfigVersionService {
     validator.validate(draft.getConfigType(), rows, today());
     draft.editHeader(effectiveFrom, changeNote);
     store.replace(draft.getId(), draft.getConfigType(), rows);
-    audit.record(ENTITY, draft.getId(), AuditAction.UPDATE, "Draft " + label(draft) + " saved");
+    audit.record(
+        ConfigVersions.ENTITY,
+        draft.getId(),
+        AuditAction.UPDATE,
+        "Draft " + ConfigVersions.label(draft) + " saved");
     return draft;
   }
 
@@ -268,13 +270,18 @@ public class ConfigVersionService {
         current.map(ConfigVersion::getId).orElse(null),
         write(changes));
     audit.record(
-        ENTITY,
+        ConfigVersions.ENTITY,
         draft.getId(),
         AuditAction.SUBMIT,
-        "Version " + label(draft) + " submitted with " + changes.size() + " change(s)");
+        ConfigVersions.VERSION
+            + ConfigVersions.label(draft)
+            + " submitted with "
+            + changes.size()
+            + " change(s)");
     notifications.notifyPermission(
         APPROVE_PERMISSION,
-        notice(draft, "Screening configuration to approve", "is waiting for your approval"),
+        ConfigVersions.notice(
+            draft, "Screening configuration to approve", "is waiting for your approval"),
         EVENT_TO_APPROVE);
     return draft;
   }
@@ -305,59 +312,6 @@ public class ConfigVersionService {
   }
 
   /**
-   * Approves a pending version (FR-SS-019): ACTIVE from its effective date; the version it replaces
-   * is SUPERSEDED on that date. The maker is notified.
-   *
-   * @param id version id
-   * @return the ACTIVE version
-   */
-  public ConfigVersion approve(Long id) {
-    ConfigVersion version = get(id);
-    LocalDate today = today();
-    String checker = currentUser.username();
-    version.requireDecidableBy(checker);
-    LocalDate effective =
-        version.getEffectiveFrom().isBefore(today) ? today : version.getEffectiveFrom();
-    versions
-        .findByCompanyIdAndConfigTypeAndScopeAndStatusOrderByEffectiveFromDesc(
-            version.getCompanyId(), version.getConfigType(), scopeKey(version), ConfigStatus.ACTIVE)
-        .stream()
-        .filter(v -> v.getEffectiveFrom().equals(effective))
-        .forEach(ConfigVersion::supersede);
-    versions.flush();
-    version.approve(checker, clock.instant(), today);
-    versions.flush();
-    supersedeDue(today);
-    audit.record(
-        ENTITY,
-        version.getId(),
-        AuditAction.AUTHORIZE,
-        "Version " + label(version) + " approved, effective " + version.getEffectiveFrom());
-    notifyMaker(version, "approved, effective " + version.getEffectiveFrom());
-    return version;
-  }
-
-  /**
-   * Rejects a pending version with a reason (FR-SS-019); the version in force stays.
-   *
-   * @param id version id
-   * @param reason mandatory reason
-   * @return the REJECTED version
-   */
-  public ConfigVersion reject(Long id, String reason) {
-    if (reason == null || reason.isBlank()) {
-      throw new BusinessRuleException(
-          "SCR_REJECT_REASON_REQUIRED", "Enter the reason for the rejection");
-    }
-    ConfigVersion version = get(id);
-    version.reject(currentUser.username(), clock.instant(), reason.trim());
-    audit.record(
-        ENTITY, version.getId(), AuditAction.REJECT, "Version " + label(version) + ": " + reason);
-    notifyMaker(version, "rejected: " + reason.trim());
-    return version;
-  }
-
-  /**
    * The maker discards a draft; it is kept as REJECTED "withdrawn by maker" (FR-SS-010).
    *
    * @param id draft id
@@ -372,103 +326,11 @@ public class ConfigVersionService {
     }
     draft.withdraw(user, clock.instant());
     audit.record(
-        ENTITY, draft.getId(), AuditAction.DEACTIVATE, "Draft " + label(draft) + " discarded");
+        ConfigVersions.ENTITY,
+        draft.getId(),
+        AuditAction.DEACTIVATE,
+        "Draft " + ConfigVersions.label(draft) + " discarded");
     return draft;
-  }
-
-  /**
-   * Marks as SUPERSEDED every ACTIVE version that is no longer in force because a newer ACTIVE
-   * version of the same type and scope has taken effect.
-   *
-   * @param today business date
-   * @return number of versions superseded
-   */
-  public int supersedeDue(LocalDate today) {
-    Map<String, List<ConfigVersion>> groups =
-        versions.findByStatus(ConfigStatus.ACTIVE).stream()
-            .collect(
-                Collectors.groupingBy(
-                    v -> v.getCompanyId() + "|" + v.getConfigType() + "|" + scopeKey(v)));
-    int count = 0;
-    for (List<ConfigVersion> group : groups.values()) {
-      Optional<LocalDate> inForce =
-          group.stream()
-              .map(ConfigVersion::getEffectiveFrom)
-              .filter(d -> !d.isAfter(today))
-              .max(Comparator.naturalOrder());
-      if (inForce.isEmpty()) {
-        continue;
-      }
-      for (ConfigVersion v : group) {
-        if (v.getEffectiveFrom().isBefore(inForce.get())) {
-          v.supersede();
-          count++;
-        }
-      }
-    }
-    return count;
-  }
-
-  private void notifyMaker(ConfigVersion version, String outcome) {
-    String maker =
-        version.getSubmittedBy() != null ? version.getSubmittedBy() : version.getCreatedBy();
-    notifications.notifyUser(maker, notice(version, "Screening configuration decided", outcome));
-  }
-
-  private static Notice notice(ConfigVersion version, String title, String what) {
-    return new Notice(
-        title,
-        "Version " + label(version) + " " + what,
-        link(version),
-        ENTITY,
-        String.valueOf(version.getId()));
-  }
-
-  /**
-   * The screen that opens a version.
-   *
-   * @param version version
-   * @return frontend route
-   */
-  public static String link(ConfigVersion version) {
-    String base =
-        version.getConfigType() == ConfigType.TEMPLATE
-            ? "/screening-setup/templates"
-            : "/screening-setup/config";
-    return base + "?version=" + version.getId();
-  }
-
-  /**
-   * Display label of a version, e.g. "MATCH_CRITERIA v2" or "TEMPLATE KYC_REVIEW v3".
-   *
-   * @param version version
-   * @return label
-   */
-  public static String label(ConfigVersion version) {
-    return version.getConfigType()
-        + (version.getScope() == null ? "" : " " + version.getScope())
-        + " v"
-        + version.getVersionNo();
-  }
-
-  private static String scopeKey(ConfigVersion version) {
-    return version.getScope() == null ? "" : version.getScope();
-  }
-
-  private static String scopeKey(ConfigType type, String scope) {
-    if (type != ConfigType.TEMPLATE) {
-      return "";
-    }
-    if (scope == null || scope.isBlank()) {
-      throw new BusinessRuleException(
-          "SCR_TEMPLATE_TYPE_REQUIRED", "Select the template type (KYC review, EDD ...)");
-    }
-    try {
-      return TemplateType.valueOf(scope.trim()).name();
-    } catch (IllegalArgumentException ex) {
-      throw new BusinessRuleException(
-          "SCR_TEMPLATE_TYPE_REQUIRED", "Unknown template type " + scope, ex);
-    }
   }
 
   private String write(List<ConfigChange> changes) {

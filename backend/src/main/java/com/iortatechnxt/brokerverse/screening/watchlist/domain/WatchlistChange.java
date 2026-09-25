@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.screening.watchlist.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -93,7 +94,7 @@ public class WatchlistChange extends BaseEntity {
       throw new BusinessRuleException(
           "SCR_CHANGE_DECIDED", "The change was already " + status.name().toLowerCase(Locale.ROOT));
     }
-    if (checker != null && checker.equalsIgnoreCase(getCreatedBy())) {
+    if (CurrentUser.sameUser(checker, getCreatedBy())) {
       throw new BusinessRuleException(
           "SCR_LIST_MAKER_APPROVES", "A list change is approved by someone other than its maker");
     }

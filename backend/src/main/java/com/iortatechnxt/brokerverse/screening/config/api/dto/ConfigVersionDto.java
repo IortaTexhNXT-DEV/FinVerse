@@ -3,7 +3,7 @@ package com.iortatechnxt.brokerverse.screening.config.api.dto;
 import com.iortatechnxt.brokerverse.screening.config.domain.ConfigStatus;
 import com.iortatechnxt.brokerverse.screening.config.domain.ConfigType;
 import com.iortatechnxt.brokerverse.screening.config.domain.ConfigVersion;
-import com.iortatechnxt.brokerverse.screening.config.service.ConfigVersionService;
+import com.iortatechnxt.brokerverse.screening.config.service.ConfigVersions;
 import java.time.Instant;
 import java.time.LocalDate;
 
@@ -60,7 +60,7 @@ public record ConfigVersionDto(
         v.getConfigType(),
         v.getScope(),
         v.getVersionNo(),
-        ConfigVersionService.label(v),
+        ConfigVersions.label(v),
         v.getStatus(),
         v.getEffectiveFrom(),
         v.getChangeNote(),

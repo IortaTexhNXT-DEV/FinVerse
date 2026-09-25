@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
@@ -73,7 +74,7 @@ public class ConfigValidator {
       case SLA_MATRIX -> content.slaRules().forEach(ConfigValidator::sla);
       case VALIDATION_RULES -> content.validationRules().forEach(ConfigValidator::validation);
       case TEMPLATE -> template(content.template());
-      case STR_LAYOUT -> layout(content.layout());
+      default -> layout(content.layout());
     }
   }
 
@@ -190,14 +191,16 @@ public class ConfigValidator {
 
   private void assignments(List<AssignmentMatrix.Rule> rules) {
     Set<String> investigators = new HashSet<>();
-    users.usersWithPermission(INVESTIGATE).forEach(u -> investigators.add(u.toLowerCase()));
+    users
+        .usersWithPermission(INVESTIGATE)
+        .forEach(u -> investigators.add(u.toLowerCase(Locale.ROOT)));
     for (AssignmentMatrix.Rule r : rules) {
       require(
           !blank(r.teamRole()) || !blank(r.user()),
           "SCR_ASSIGN_TARGET_REQUIRED",
           "Select a team role or a user");
       require(
-          blank(r.user()) || investigators.contains(r.user().trim().toLowerCase()),
+          blank(r.user()) || investigators.contains(r.user().trim().toLowerCase(Locale.ROOT)),
           "SCR_ASSIGN_USER_NOT_INVESTIGATOR",
           "User " + r.user() + " cannot investigate cases");
       require(r.balancing() != null, "SCR_ASSIGN_BALANCING_REQUIRED", "Select the balancing");

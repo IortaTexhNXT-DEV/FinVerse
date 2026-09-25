@@ -27,7 +27,9 @@ import com.iortatechnxt.brokerverse.screening.config.service.AssignmentMatrix;
 import com.iortatechnxt.brokerverse.screening.config.service.ConfigApprovalSource;
 import com.iortatechnxt.brokerverse.screening.config.service.ConfigChange;
 import com.iortatechnxt.brokerverse.screening.config.service.ConfigContent;
+import com.iortatechnxt.brokerverse.screening.config.service.ConfigDecisionService;
 import com.iortatechnxt.brokerverse.screening.config.service.ConfigVersionService;
+import com.iortatechnxt.brokerverse.screening.config.service.ConfigVersions;
 import com.iortatechnxt.brokerverse.screening.config.service.MatchCriteria;
 import com.iortatechnxt.brokerverse.screening.config.service.ReviewTemplate;
 import com.iortatechnxt.brokerverse.screening.config.service.RiskRules;
@@ -62,6 +64,7 @@ class ScreeningConfigIT {
   private static final String SANCTION = "SANCTION";
 
   @Autowired private ConfigVersionService service;
+  @Autowired private ConfigDecisionService decisions;
   @Autowired private ActiveConfig activeConfig;
   @Autowired private ConfigApprovalSource approvals;
   @Autowired private ScreeningSetupFixtures fx;
@@ -93,7 +96,7 @@ class ScreeningConfigIT {
         as(MAKER, () -> service.newDraft(company, ConfigType.MATCH_CRITERIA, null));
     saved(draft, match("0.85"));
     as(MAKER, () -> service.submit(draft.getId()));
-    return as(CHECKER, () -> service.approve(draft.getId()));
+    return as(CHECKER, () -> decisions.approve(draft.getId()));
   }
 
   @Test
@@ -119,7 +122,7 @@ class ScreeningConfigIT {
     List<ConfigChange> changes = service.changes(v2.getId());
     assertThat(changes)
         .contains(new ConfigChange("SANCTION INDIVIDUAL FUZZY", "Threshold", "0.8500", "0.8800"));
-    as(CHECKER, () -> service.approve(v2.getId()));
+    as(CHECKER, () -> decisions.approve(v2.getId()));
     assertThat(activeConfig.matchCriteria(company, today()).orElseThrow().version().versionNo())
         .isEqualTo(2);
     assertThat(service.versions(company, ConfigType.MATCH_CRITERIA))
@@ -138,21 +141,22 @@ class ScreeningConfigIT {
             () -> as(MAKER, () -> service.newDraft(company, ConfigType.MATCH_CRITERIA, null)))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("waiting for approval");
-    assertThatThrownBy(() -> as(DUAL, () -> service.approve(draft.getId())))
+    assertThatThrownBy(() -> as(DUAL, () -> decisions.approve(draft.getId())))
         .hasMessage("A configuration change is approved by someone other than its maker");
     assertThat(
             approvals.pendingFor(ApprovalViewer.user(DUAL, Set.of("SCR_CONFIG_APPROVE"))).stream()
                 .map(PendingApproval::reference))
-        .doesNotContain(ConfigVersionService.label(draft));
+        .doesNotContain(ConfigVersions.label(draft));
     assertThat(
             approvals
                 .pendingFor(ApprovalViewer.user(CHECKER, Set.of("SCR_CONFIG_APPROVE")))
                 .stream()
                 .map(PendingApproval::link))
-        .contains(ConfigVersionService.link(draft));
-    assertThatThrownBy(() -> as(CHECKER, () -> service.reject(draft.getId(), " ")))
+        .contains(ConfigVersions.link(draft));
+    assertThatThrownBy(() -> as(CHECKER, () -> decisions.reject(draft.getId(), " ")))
         .hasMessage("Enter the reason for the rejection");
-    ConfigVersion rejected = as(CHECKER, () -> service.reject(draft.getId(), "Threshold too low"));
+    ConfigVersion rejected =
+        as(CHECKER, () -> decisions.reject(draft.getId(), "Threshold too low"));
     assertThat(rejected.getStatus()).isEqualTo(ConfigStatus.REJECTED);
     assertThat(rejected.getDecisionReason()).isEqualTo("Threshold too low");
     assertThat(activeConfig.matchCriteria(company, today())).isEmpty();
@@ -166,14 +170,14 @@ class ScreeningConfigIT {
     LocalDate tomorrow = today().plusDays(1);
     as(MAKER, () -> service.saveDraft(v2.getId(), tomorrow, "tomorrow", match("0.92")));
     as(MAKER, () -> service.submit(v2.getId()));
-    as(CHECKER, () -> service.approve(v2.getId()));
+    as(CHECKER, () -> decisions.approve(v2.getId()));
     assertThat(activeConfig.activeVersion(company, ConfigType.MATCH_CRITERIA, null, today()))
         .get()
         .extracting(r -> r.id())
         .isEqualTo(v1.getId());
     assertThat(activeConfig.matchCriteria(company, tomorrow).orElseThrow().version().id())
         .isEqualTo(v2.getId());
-    assertThat(as(MAKER, () -> service.supersedeDue(tomorrow))).isPositive();
+    assertThat(as(MAKER, () -> decisions.supersedeDue(tomorrow))).isPositive();
     assertThat(service.get(v1.getId()).getStatus()).isEqualTo(ConfigStatus.SUPERSEDED);
     assertThat(activeConfig.matchCriteria(v1.getId()).rules()).hasSize(2);
   }
@@ -354,7 +358,7 @@ class ScreeningConfigIT {
         kyc,
         templateOf(field("SOURCE_OF_WEALTH", "Source of wealth", FieldDataType.LONG_TEXT, true)));
     as(MAKER, () -> service.submit(kyc.getId()));
-    as(CHECKER, () -> service.approve(kyc.getId()));
+    as(CHECKER, () -> decisions.approve(kyc.getId()));
     ReviewTemplate active =
         activeConfig.template(company, TemplateType.KYC_REVIEW, today()).orElseThrow();
     assertThat(active.fields())

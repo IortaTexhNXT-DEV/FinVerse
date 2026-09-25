@@ -132,7 +132,7 @@ final class ConfigRowMapper {
         r.getMarketingUnit(),
         r.getClientType(),
         r.getTeamRole(),
-        r.getUserName(),
+        r.getAssigneeUser(),
         r.getBalancing());
   }
 

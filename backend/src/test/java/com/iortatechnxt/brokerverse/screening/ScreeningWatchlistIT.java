@@ -21,12 +21,13 @@ import com.iortatechnxt.brokerverse.screening.watchlist.domain.RunStatus;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.WatchlistChange;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.WatchlistEntry;
 import com.iortatechnxt.brokerverse.screening.watchlist.service.IngestErrorDigest;
+import com.iortatechnxt.brokerverse.screening.watchlist.service.ListFileService;
 import com.iortatechnxt.brokerverse.screening.watchlist.service.ListedEntry;
 import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistApprovalSource;
 import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistBulkHandler;
+import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistDecisionService;
 import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistDirectory;
 import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistIngestJob;
-import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistIngestionService;
 import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
@@ -57,7 +58,8 @@ class ScreeningWatchlistIT {
   private static final String PEP = "PEP";
 
   @Autowired private WatchlistService watchlists;
-  @Autowired private WatchlistIngestionService ingestion;
+  @Autowired private ListFileService listFiles;
+  @Autowired private WatchlistDecisionService decisions;
   @Autowired private WatchlistDirectory directory;
   @Autowired private WatchlistApprovalSource approvals;
   @Autowired private WatchlistBulkHandler handler;
@@ -113,7 +115,7 @@ class ScreeningWatchlistIT {
         .hasMessage(
             "Entry " + entry.getExternalRef() + " already has a change waiting for approval");
 
-    as(CHECKER, () -> watchlists.approve(add.getId(), null));
+    as(CHECKER, () -> decisions.approve(add.getId(), null));
     WatchlistEntry active = watchlists.entry(entry.getId());
     assertThat(active.getStatus()).isEqualTo(EntryStatus.ACTIVE);
     assertThat(active.getEffectiveFrom()).isEqualTo(LocalDate.now(clock));
@@ -122,21 +124,21 @@ class ScreeningWatchlistIT {
     assertThat(listed.aliases()).containsExactly(name + " Alias");
     assertThat(listed.sourceCode()).isEqualTo("INTERNAL");
     assertThat(screened(entry.getId())).isTrue();
-    assertThatThrownBy(() -> as(CHECKER, () -> watchlists.approve(add.getId(), null)))
+    assertThatThrownBy(() -> as(CHECKER, () -> decisions.approve(add.getId(), null)))
         .hasMessageContaining("already approved");
 
     WatchlistChange alias =
         as(MAKER, () -> watchlists.change(entry.getId(), person(name + " Jr"), "New alias"));
     assertThat(watchlists.readValues(alias.getBeforeValues()).primaryName()).isEqualTo(name);
-    assertThatThrownBy(() -> as(CHECKER, () -> watchlists.reject(alias.getId(), "")))
+    assertThatThrownBy(() -> as(CHECKER, () -> decisions.reject(alias.getId(), "")))
         .hasMessage("Enter the remarks for the rejection");
-    as(CHECKER, () -> watchlists.reject(alias.getId(), "Alias not in the advisory"));
+    as(CHECKER, () -> decisions.reject(alias.getId(), "Alias not in the advisory"));
     assertThat(watchlists.entry(entry.getId()).getPrimaryName()).isEqualTo(name);
     assertThat(watchlists.change(alias.getId()).getStatus()).isEqualTo(ChangeStatus.REJECTED);
 
     WatchlistChange off = as(MAKER, () -> watchlists.deactivate(entry.getId(), "Delisted by AMLC"));
     assertThat(off.getChangeType()).isEqualTo(ChangeType.DEACTIVATE);
-    as(CHECKER, () -> watchlists.approve(off.getId(), "ok"));
+    as(CHECKER, () -> decisions.approve(off.getId(), "ok"));
     WatchlistEntry inactive = watchlists.entry(entry.getId());
     assertThat(inactive.getStatus()).isEqualTo(EntryStatus.INACTIVE);
     assertThat(inactive.getDelistedOn()).isEqualTo(LocalDate.now(clock));
@@ -173,9 +175,9 @@ class ScreeningWatchlistIT {
 
     WatchlistChange own =
         as("compdual", () -> watchlists.add(null, person("Dual Invented " + fx.unique()), "dual"));
-    assertThatThrownBy(() -> as("compdual", () -> watchlists.approve(own.getId(), null)))
+    assertThatThrownBy(() -> as("compdual", () -> decisions.approve(own.getId(), null)))
         .hasMessage("A list change is approved by someone other than its maker");
-    as(CHECKER, () -> watchlists.reject(own.getId(), "Not needed"));
+    as(CHECKER, () -> decisions.reject(own.getId(), "Not needed"));
     assertThat(watchlists.entry(own.getEntryId()).getStatus()).isEqualTo(EntryStatus.DRAFT);
     WatchlistChange again =
         as(MAKER, () -> watchlists.change(own.getEntryId(), person("Dual Invented Two"), "retry"));
@@ -196,14 +198,14 @@ class ScreeningWatchlistIT {
             u + "-3,ENTITY,Invented Holdings " + u + " Inc,,,,,,,,,",
             u + "-4,INDIVIDUAL,,,,,,,,,,",
             u + "-5,INDIVIDUAL,Bad Date Invented " + u + ",,,,31-02-1970,,,,,");
-    IngestionRun run = as(MAKER, () -> ingestion.upload("NLDS_PEP", "nlds_" + u + ".csv", file));
+    IngestionRun run = as(MAKER, () -> listFiles.upload("NLDS_PEP", "nlds_" + u + ".csv", file));
     assertThat(run.getTrigger()).isEqualTo(IngestionTrigger.MANUAL_UPLOAD);
     assertThat(run.getStatus()).isEqualTo(RunStatus.PARTIAL);
     assertThat(run.getReceived()).isEqualTo(5);
     assertThat(run.getAdded()).isEqualTo(3);
     assertThat(run.getFailed()).isEqualTo(2);
     assertThat(run.isPendingApproval()).isTrue();
-    assertThat(ingestion.errors(run.getId()))
+    assertThat(listFiles.errors(run.getId()))
         .extracting(IngestionError::getReason)
         .containsExactly("Line 5: name is missing", "Line 6: birth date is not a valid date");
     assertThat(watchlists.pendingOfRun(run.getId())).isEqualTo(3);
@@ -218,12 +220,12 @@ class ScreeningWatchlistIT {
             "select entry_id from scr_watchlist_change where run_id = ?", Long.class, run.getId());
     assertThat(ids).allMatch(id -> watchlists.entry(id).getStatus() == EntryStatus.PENDING);
 
-    IngestionRun again = as(MAKER, () -> ingestion.upload("NLDS_PEP", "again.csv", file));
+    IngestionRun again = as(MAKER, () -> listFiles.upload("NLDS_PEP", "again.csv", file));
     assertThat(again.getAdded()).isZero();
     assertThat(again.getUpdated()).isZero();
     assertThat(again.getUnchanged()).isEqualTo(3);
 
-    assertThat(as(CHECKER, () -> watchlists.approveRun(run.getId()))).isEqualTo(3);
+    assertThat(as(CHECKER, () -> decisions.approveRun(run.getId()))).isEqualTo(3);
     assertThat(ids).allMatch(id -> watchlists.entry(id).getStatus() == EntryStatus.ACTIVE);
     assertThat(directory.entries(ids))
         .filteredOn(e -> e.primaryName().startsWith("Maria"))
@@ -240,7 +242,7 @@ class ScreeningWatchlistIT {
                 as(
                     MAKER,
                     () ->
-                        ingestion.upload(
+                        listFiles.upload(
                             "AML_ADVISORY",
                             "advisory.pdf",
                             "%PDF-1.4".getBytes(StandardCharsets.UTF_8))))
@@ -254,7 +256,7 @@ class ScreeningWatchlistIT {
     as(
         MAKER,
         () ->
-            ingestion.stage(
+            listFiles.stage(
                 source,
                 "list1.csv",
                 csv(
@@ -276,7 +278,7 @@ class ScreeningWatchlistIT {
     as(
         MAKER,
         () ->
-            ingestion.stage(
+            listFiles.stage(
                 source,
                 "list2.csv",
                 csv(
@@ -305,7 +307,7 @@ class ScreeningWatchlistIT {
     as(
         MAKER,
         () ->
-            ingestion.stage(
+            listFiles.stage(
                 source, "broken.csv", "no,header\n1,2\n".getBytes(StandardCharsets.UTF_8)));
     job.execute(LocalDate.now(clock));
     IngestionRun broken = latestRun(source);
@@ -314,7 +316,7 @@ class ScreeningWatchlistIT {
   }
 
   private IngestionRun latestRun(String source) {
-    return ingestion
+    return listFiles
         .runs(source, org.springframework.data.domain.PageRequest.of(0, 1))
         .getContent()
         .get(0);
@@ -326,7 +328,7 @@ class ScreeningWatchlistIT {
     as(
         MAKER,
         () ->
-            ingestion.upload(
+            listFiles.upload(
                 "NLDS_PEP",
                 "digest.csv",
                 csv(u + "-1,INDIVIDUAL,,,,,,,,,,", u + "-2,ALIEN,X,,,,,,,,,")));

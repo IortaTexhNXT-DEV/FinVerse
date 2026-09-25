@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.screening.config.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -230,8 +231,7 @@ public class ConfigVersion extends BaseEntity {
    * @return true for the maker
    */
   public boolean isMaker(String user) {
-    return user != null
-        && (user.equalsIgnoreCase(getCreatedBy()) || user.equalsIgnoreCase(submittedBy));
+    return CurrentUser.sameUser(user, getCreatedBy()) || CurrentUser.sameUser(user, submittedBy);
   }
 
   public Long getCompanyId() {

@@ -41,9 +41,8 @@ public class VersionedActiveConfig implements ActiveConfig {
   public Optional<ConfigVersionRef> activeVersion(
       Long companyId, ConfigType type, String scope, LocalDate asOf) {
     String key = type == ConfigType.TEMPLATE && scope != null ? scope : "";
-    return versions
-        .findFirstByCompanyIdAndConfigTypeAndScopeAndStatusInAndEffectiveFromLessThanEqualOrderByEffectiveFromDescVersionNoDesc(
-            companyId, type, key, READABLE, asOf)
+    return versions.inForce(companyId, type, key, READABLE, asOf).stream()
+        .findFirst()
         .map(VersionedActiveConfig::ref);
   }
 

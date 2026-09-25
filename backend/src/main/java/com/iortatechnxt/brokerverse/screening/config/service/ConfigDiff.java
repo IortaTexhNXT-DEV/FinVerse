@@ -26,6 +26,7 @@ public final class ConfigDiff {
   private static final String RISK_CATEGORY = "Risk category";
   private static final String ORDER = "Order";
   private static final String ANY = "*";
+  private static final String SEP = " / ";
 
   private ConfigDiff() {}
 
@@ -80,7 +81,7 @@ public final class ConfigDiff {
       case SLA_MATRIX -> content.slaRules().forEach(r -> sla(out, r));
       case VALIDATION_RULES -> content.validationRules().forEach(r -> validation(out, r));
       case TEMPLATE -> template(out, content.template());
-      case STR_LAYOUT -> layout(out, content.layout());
+      default -> layout(out, content.layout());
     }
     return out;
   }
@@ -138,7 +139,7 @@ public final class ConfigDiff {
 
   private static void sla(Map<String, Map<String, String>> out, SlaMatrix.Rule r) {
     Map<String, String> a =
-        item(out, "SLA " + r.stage() + " / " + text(r.caseType()) + " / " + text(r.riskCategory()));
+        item(out, "SLA " + r.stage() + SEP + text(r.caseType()) + SEP + text(r.riskCategory()));
     a.put("SLA hours", String.valueOf(r.slaHours()));
     a.put("Reminder lead hours", String.valueOf(r.reminderLeadHours()));
     a.put("Escalate to", r.escalateToRole());
@@ -147,7 +148,7 @@ public final class ConfigDiff {
 
   private static void validation(Map<String, Map<String, String>> out, ValidationRules.Rule r) {
     Map<String, String> a =
-        item(out, "Check " + r.rule() + " / " + text(r.stage()) + " / " + text(r.caseType()));
+        item(out, "Check " + r.rule() + SEP + text(r.stage()) + SEP + text(r.caseType()));
     a.put("Parameters", text(r.parameters()));
     a.put("Blocking", String.valueOf(r.blocking()));
   }

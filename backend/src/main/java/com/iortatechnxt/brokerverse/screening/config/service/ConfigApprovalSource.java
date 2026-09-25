@@ -49,7 +49,7 @@ public class ConfigApprovalSource implements PendingApprovalSource {
     return new PendingApproval(
         ScreeningPermissions.MODULE,
         "Screening configuration",
-        ConfigVersionService.label(v),
+        ConfigVersions.label(v),
         "Effective "
             + v.getEffectiveFrom()
             + (v.getChangeNote() == null ? "" : ": " + v.getChangeNote()),
@@ -58,6 +58,6 @@ public class ConfigApprovalSource implements PendingApprovalSource {
         v.getSubmittedBy(),
         v.getSubmittedAt(),
         v.getCompanyId(),
-        ConfigVersionService.link(v));
+        ConfigVersions.link(v));
   }
 }

@@ -7,8 +7,9 @@ import com.iortatechnxt.brokerverse.screening.watchlist.api.dto.RunDetail;
 import com.iortatechnxt.brokerverse.screening.watchlist.api.dto.RunDto;
 import com.iortatechnxt.brokerverse.screening.watchlist.api.dto.SourceDto;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.IngestionRun;
+import com.iortatechnxt.brokerverse.screening.watchlist.service.ListFileService;
 import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistBulkHandler;
-import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistIngestionService;
+import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistDecisionService;
 import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistService;
 import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistService.SourceSettings;
 import jakarta.validation.Valid;
@@ -46,20 +47,26 @@ public class ListSourceController {
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
   private final WatchlistService watchlists;
-  private final WatchlistIngestionService ingestion;
+  private final ListFileService listFiles;
+  private final WatchlistDecisionService decisions;
   private final BulkService bulk;
 
   /**
    * Creates the controller.
    *
    * @param watchlists sources
-   * @param ingestion ingestion runs
+   * @param listFiles list files and runs
+   * @param decisions checker decisions
    * @param bulk bulk platform (template)
    */
   public ListSourceController(
-      WatchlistService watchlists, WatchlistIngestionService ingestion, BulkService bulk) {
+      WatchlistService watchlists,
+      ListFileService listFiles,
+      WatchlistDecisionService decisions,
+      BulkService bulk) {
     this.watchlists = watchlists;
-    this.ingestion = ingestion;
+    this.listFiles = listFiles;
+    this.decisions = decisions;
     this.bulk = bulk;
   }
 
@@ -122,7 +129,7 @@ public class ListSourceController {
   @PreAuthorize(ScreeningPermissions.HAS_LIST_MAINTAIN)
   public RunDto upload(@PathVariable String code, @RequestParam MultipartFile file)
       throws IOException {
-    IngestionRun run = ingestion.upload(code, file.getOriginalFilename(), file.getBytes());
+    IngestionRun run = listFiles.upload(code, file.getOriginalFilename(), file.getBytes());
     return RunDto.from(run, watchlists.sourceCodes());
   }
 
@@ -140,7 +147,7 @@ public class ListSourceController {
   public Map<String, Long> stage(@PathVariable String code, @RequestParam MultipartFile file)
       throws IOException {
     return Map.of(
-        "attachmentId", ingestion.stage(code, file.getOriginalFilename(), file.getBytes()).getId());
+        "attachmentId", listFiles.stage(code, file.getOriginalFilename(), file.getBytes()).getId());
   }
 
   /**
@@ -159,7 +166,7 @@ public class ListSourceController {
       @RequestParam(defaultValue = "25") int size) {
     Map<Long, String> codes = watchlists.sourceCodes();
     return PageResponse.of(
-        ingestion.runs(source, PageRequest.of(page, Math.min(size, MAX_PAGE))),
+        listFiles.runs(source, PageRequest.of(page, Math.min(size, MAX_PAGE))),
         r -> RunDto.from(r, codes));
   }
 
@@ -173,8 +180,8 @@ public class ListSourceController {
   @PreAuthorize(ScreeningPermissions.HAS_LIST_ACCESS)
   public RunDetail run(@PathVariable Long id) {
     return new RunDetail(
-        RunDto.from(ingestion.run(id), watchlists.sourceCodes()),
-        ingestion.errors(id).stream().map(RunDetail.ErrorRow::from).toList(),
+        RunDto.from(listFiles.run(id), watchlists.sourceCodes()),
+        listFiles.errors(id).stream().map(RunDetail.ErrorRow::from).toList(),
         watchlists.pendingOfRun(id));
   }
 
@@ -187,6 +194,6 @@ public class ListSourceController {
   @PostMapping("/runs/{id}/approve")
   @PreAuthorize(ScreeningPermissions.HAS_LIST_APPROVE)
   public Map<String, Integer> approveRun(@PathVariable Long id) {
-    return Map.of("approved", watchlists.approveRun(id));
+    return Map.of("approved", decisions.approveRun(id));
   }
 }

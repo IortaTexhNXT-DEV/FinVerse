@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.screening.watchlist.domain.ChangeStatus;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.EntryStatus;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.WatchlistChange;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.WatchlistEntry;
+import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistDecisionService;
 import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistService;
 import jakarta.validation.Valid;
 import java.util.Map;
@@ -39,14 +40,17 @@ public class WatchlistController {
   private static final int MAX_PAGE = 200;
 
   private final WatchlistService service;
+  private final WatchlistDecisionService decisions;
 
   /**
    * Creates the controller.
    *
    * @param service watchlist maintenance
+   * @param decisions checker decisions
    */
-  public WatchlistController(WatchlistService service) {
+  public WatchlistController(WatchlistService service, WatchlistDecisionService decisions) {
     this.service = service;
+    this.decisions = decisions;
   }
 
   /**
@@ -169,7 +173,7 @@ public class WatchlistController {
   @PreAuthorize(ScreeningPermissions.HAS_LIST_APPROVE)
   public ChangeDto approve(
       @PathVariable Long id, @Valid @RequestBody(required = false) DecisionRequest request) {
-    return change(service.approve(id, request == null ? null : request.remarks()));
+    return change(decisions.approve(id, request == null ? null : request.remarks()));
   }
 
   /**
@@ -182,7 +186,7 @@ public class WatchlistController {
   @PostMapping("/changes/{id}/reject")
   @PreAuthorize(ScreeningPermissions.HAS_LIST_APPROVE)
   public ChangeDto reject(@PathVariable Long id, @Valid @RequestBody DecisionRequest request) {
-    return change(service.reject(id, request.remarks()));
+    return change(decisions.reject(id, request.remarks()));
   }
 
   private ChangeDto change(WatchlistChange c) {

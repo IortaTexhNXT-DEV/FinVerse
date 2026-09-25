@@ -204,7 +204,7 @@ public class ConfigContentStore {
                 .toList());
       }
       case TEMPLATE -> replaceTemplate(versionId, content.template());
-      case STR_LAYOUT -> replaceLayout(versionId, content.layout());
+      default -> replaceLayout(versionId, content.layout());
     }
   }
 

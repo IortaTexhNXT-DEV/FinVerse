@@ -43,6 +43,7 @@ public class IngestErrorDigest {
 
   private static final Pattern EMAIL = Pattern.compile("[^@\\s,;]+@[^@\\s,;]+\\.[^@\\s,;]+");
   private static final String PURPOSE = "SCR_INGEST_DIGEST";
+  private static final int BODY_CAPACITY = 256;
 
   private final IngestionErrorRepository errors;
   private final IngestionRunRepository runs;
@@ -149,7 +150,7 @@ public class IngestErrorDigest {
     Map<Long, String> sourceCode =
         sources.findAll().stream()
             .collect(Collectors.toMap(WatchlistSource::getId, WatchlistSource::getCode));
-    StringBuilder body = new StringBuilder(256);
+    StringBuilder body = new StringBuilder(BODY_CAPACITY);
     StringBuilder csv = new StringBuilder("Source,Run,Line,Reason,Record\n");
     body.append("Records that failed watchlist ingestion since the last digest (SNSRP-202):\n\n");
     for (IngestionError e : pending) {

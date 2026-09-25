@@ -146,14 +146,18 @@ public record ConfigContent(
   public boolean isEmptyFor(ConfigType type) {
     return switch (type) {
       case MATCH_CRITERIA -> matchRules.isEmpty();
-      case RISK_RULES -> riskCategories.isEmpty() || riskRules.isEmpty();
+      case RISK_RULES -> Math.min(riskCategories.size(), riskRules.size()) == 0;
       case APPROVAL_MATRIX -> routes.isEmpty();
       case ASSIGNMENT_MATRIX -> assignmentRules.isEmpty();
       case SLA_MATRIX -> slaRules.isEmpty();
       case VALIDATION_RULES -> validationRules.isEmpty();
       case TEMPLATE -> template == null || template.fields().isEmpty();
-      case STR_LAYOUT -> layout == null || layout.columns().isEmpty();
+      case STR_LAYOUT -> layoutEmpty();
     };
+  }
+
+  private boolean layoutEmpty() {
+    return layout == null || layout.columns().isEmpty();
   }
 
   /**

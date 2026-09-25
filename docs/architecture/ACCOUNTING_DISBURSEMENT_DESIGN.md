@@ -706,6 +706,8 @@ What the A1-DSB wave built for `disbursement` (DIS 2.2-3.28) and where it differ
   posts through `AccountingEventPublisher` (rule entry) or `SystemJournalService` (edited entry); a posting failure keeps
   the DV for approval with posting status FAILED and the error (`DV_POSTING_FAILED`). Bulk approval is one transaction per DV. Cancelling an approved DV reverses its
   journal (REVERSED / REVERSAL_FAILED) after the workflow transition, cancels the instrument and returns the request.
+  Cancelling a DV also closes the open Payment Requests check-cancellation hand-offs (port `DV_CANCELLATION`, team
+  `DISB_APPROVE`) that name it (`CancellationHandoffs`).
 - **Instruments.** One per approved DV; the life cycle per mode is `InstrumentLifecycle` (section 7.2). Checks take the
   next leaf of the paying account's active cheque book (alert `CHECK_SERIES_LOW` under `DISB_CHECK_SERIES_WARNING`);
   negotiated checks post `DISB_CHECK_NEGOTIATED`, the stale job posts `DISB_CHECK_STALE` and a re-issue creates a

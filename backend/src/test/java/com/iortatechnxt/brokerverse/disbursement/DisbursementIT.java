@@ -20,6 +20,7 @@ import com.iortatechnxt.brokerverse.disbursement.domain.Instrument;
 import com.iortatechnxt.brokerverse.disbursement.domain.IntakeRequest;
 import com.iortatechnxt.brokerverse.disbursement.domain.Payee;
 import com.iortatechnxt.brokerverse.disbursement.domain.Voucher;
+import com.iortatechnxt.brokerverse.disbursement.service.CancellationHandoffs;
 import com.iortatechnxt.brokerverse.disbursement.service.EodService;
 import com.iortatechnxt.brokerverse.disbursement.service.InstrumentActions;
 import com.iortatechnxt.brokerverse.disbursement.service.InstrumentService;
@@ -30,8 +31,10 @@ import com.iortatechnxt.brokerverse.disbursement.service.VoucherActions;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest.Spec;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest.Status;
+import com.iortatechnxt.brokerverse.opsledger.domain.OpsHandoff;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.DisbursementQueueService;
+import com.iortatechnxt.brokerverse.opsledger.service.HandoffService;
 import com.iortatechnxt.brokerverse.opsledger.service.port.DisbursementGateway;
 import com.iortatechnxt.brokerverse.opsledger.service.port.DisbursementGateway.DisbursementTicket;
 import com.iortatechnxt.brokerverse.remittance.RemittanceFixtures;
@@ -67,6 +70,7 @@ class DisbursementIT {
   @Autowired private DisbursementGateway gateway;
   @Autowired private SystemParameterService parameters;
   @Autowired private JdbcTemplate jdbc;
+  @Autowired private HandoffService handoffs;
 
   private int events(String sourceReference) {
     Integer n =
@@ -147,6 +151,23 @@ class DisbursementIT {
             () -> fx.as(PROCESSOR, () -> actions.cancel(auto.getId(), "DUPLICATE", null)))
         .isInstanceOf(BusinessRuleException.class);
 
+    OpsHandoff handoff =
+        fx.as(
+            PROCESSOR,
+            () ->
+                handoffs.record(
+                    auto.getCompanyId(),
+                    CancellationHandoffs.PORT,
+                    "DISB_APPROVE",
+                    new OpsHandoff.Spec(
+                        "PAYREQUEST",
+                        "CKC-" + auto.getDvNo(),
+                        auto.getDvNo(),
+                        auto.getNet(),
+                        auto.getCurrency(),
+                        "Cancel DV " + auto.getDvNo(),
+                        null)));
+
     Voucher cancelled =
         fx.as(APPROVER, () -> actions.cancel(auto.getId(), "REQUESTED_BY_SOURCE", "Wrong batch"));
     assertThat(cancelled.getStage()).isEqualTo(VoucherStage.CANCELLED);
@@ -160,6 +181,10 @@ class DisbursementIT {
         .isEqualTo(RequestStatus.CANCELLED);
     assertThat(fx.as(PROCESSOR, () -> instruments.forVoucher(auto.getId())).getStatus())
         .isEqualTo(InstrumentStatus.CANCELLED);
+    assertThat(
+            jdbc.queryForObject(
+                "select status from ops_handoff where id = ?", String.class, handoff.getId()))
+        .isEqualTo("CLOSED");
   }
 
   @Test

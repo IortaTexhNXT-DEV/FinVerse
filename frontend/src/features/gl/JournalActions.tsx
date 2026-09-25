@@ -11,8 +11,15 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { today } from '@/utils/format';
+import { PostingConfirmation } from './PostingConfirmation';
+import type { PostingStep } from './PostingConfirmation';
 
-type Dialog = 'reject' | 'reverse' | null;
+type Dialog = 'reject' | 'reverse' | PostingStep | null;
+
+const RUN: Record<PostingStep, (id: number) => Promise<Journal>> = {
+  submit: glApi.submitJournal,
+  approve: glApi.approveJournal,
+};
 
 interface Allowed {
   edit: boolean;
@@ -34,6 +41,10 @@ function allowedActions(
     reverse: j.status === 'POSTED' && can('JOURNAL_REVERSE'),
     copy: can('JOURNAL_CREATE'),
   };
+}
+
+function postingStep(dialog: Dialog): PostingStep | null {
+  return dialog === 'submit' || dialog === 'approve' ? dialog : null;
 }
 
 /**
@@ -86,7 +97,7 @@ export function JournalActions({ journal }: Readonly<{ journal: Journal }>) {
             variant="accent"
             icon={<Send size={16} />}
             busy={action.isPending}
-            onClick={() => action.mutate(() => glApi.submitJournal(id))}
+            onClick={() => setDialog('submit')}
           >
             Submit
           </Button>
@@ -101,12 +112,12 @@ export function JournalActions({ journal }: Readonly<{ journal: Journal }>) {
             variant="accent"
             icon={<CheckCircle2 size={16} />}
             busy={action.isPending}
-            onClick={() => action.mutate(() => glApi.approveJournal(id))}
+            onClick={() => setDialog('approve')}
           >
             Authorize &amp; Post
           </Button>
           <Button variant="danger" icon={<XCircle size={16} />} onClick={() => setDialog('reject')}>
-            Reject
+            Return to Maker
           </Button>
         </>
       )}
@@ -129,9 +140,17 @@ export function JournalActions({ journal }: Readonly<{ journal: Journal }>) {
         </Button>
       )}
       {action.error !== null && dialog === null && <ErrorAlert error={action.error} />}
+      <PostingConfirmation
+        journal={journal}
+        step={postingStep(dialog)}
+        busy={action.isPending}
+        error={action.error}
+        onConfirm={(step) => action.mutate(() => RUN[step](id))}
+        onClose={() => setDialog(null)}
+      />
       <Modal
-        title={dialog === 'reject' ? 'Reject journal' : 'Reverse journal'}
-        open={dialog !== null}
+        title={dialog === 'reject' ? 'Return journal to its maker' : 'Reverse journal'}
+        open={dialog === 'reject' || dialog === 'reverse'}
         onClose={() => setDialog(null)}
         footer={
           <Button
@@ -159,7 +178,7 @@ export function JournalActions({ journal }: Readonly<{ journal: Journal }>) {
               )}
             </Field>
           )}
-          <Field label="Reason" required>
+          <Field label="Reason / remarks" required>
             {(fid) => (
               <textarea
                 id={fid}

@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.coa.api.dto;
 import com.iortatechnxt.brokerverse.coa.domain.AccountClass;
 import com.iortatechnxt.brokerverse.coa.domain.AccountLevel;
 import com.iortatechnxt.brokerverse.coa.domain.GlAccount;
+import com.iortatechnxt.brokerverse.coa.domain.NegativeBalancePolicy;
 import com.iortatechnxt.brokerverse.coa.domain.SubLedgerType;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import java.time.LocalDate;
@@ -42,6 +43,7 @@ import java.util.Set;
  * @param createdBy creator
  * @param maker user who created or last maintained the record (unchanged by authorization)
  * @param authorizedBy checker
+ * @param negativeBalancePolicy negative balance control (FRBS 2.5.4)
  */
 public record GlAccountResponse(
     Long id,
@@ -74,7 +76,8 @@ public record GlAccountResponse(
     RecordStatus recordStatus,
     String createdBy,
     String maker,
-    String authorizedBy) {
+    String authorizedBy,
+    NegativeBalancePolicy negativeBalancePolicy) {
 
   /**
    * Maps an entity.
@@ -114,6 +117,7 @@ public record GlAccountResponse(
         a.getRecordStatus(),
         a.getCreatedBy(),
         a.getMaker(),
-        a.getAuthorizedBy());
+        a.getAuthorizedBy(),
+        a.getNegativeBalancePolicy());
   }
 }

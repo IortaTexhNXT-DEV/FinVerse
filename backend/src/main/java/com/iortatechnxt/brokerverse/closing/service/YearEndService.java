@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.closing.service.ClosingLines.Dims;
 import com.iortatechnxt.brokerverse.closing.service.ClosingLines.Value;
 import com.iortatechnxt.brokerverse.coa.domain.BalanceSide;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.Money;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalLineRequest;
 import com.iortatechnxt.brokerverse.journal.domain.JournalType;
 import com.iortatechnxt.brokerverse.journal.service.SystemJournalRequest;
@@ -22,6 +23,7 @@ import com.iortatechnxt.brokerverse.period.domain.FiscalYear;
 import com.iortatechnxt.brokerverse.period.domain.PeriodStatus;
 import com.iortatechnxt.brokerverse.period.service.PeriodService;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,6 +44,8 @@ import org.springframework.transaction.annotation.Transactional;
  *   <li>Close the periods still in soft close and mark the fiscal year CLOSED ({@link
  *       PeriodService#closeFiscalYear}).
  *   <li>Create the next fiscal year if missing and open its first period.
+ *   <li>Verify the close (FRBS 2.7.1): nominal balances and trial balance difference as of the year
+ *       end, both expected to be zero, stored on the close record.
  * </ol>
  *
  * <p>Carry forward is implicit: balance sheet balances are cumulative (the ledger is never reset),
@@ -63,6 +67,7 @@ public class YearEndService {
   private final OrganizationService organization;
   private final YearEndCloseRepository closes;
   private final AuditTrailService audit;
+  private final Clock clock;
 
   /**
    * Creates the service.
@@ -74,6 +79,7 @@ public class YearEndService {
    * @param organization organization service
    * @param closes close records
    * @param audit audit trail
+   * @param clock clock
    */
   public YearEndService(
       ClosingChecklistService checklist,
@@ -82,7 +88,8 @@ public class YearEndService {
       SystemJournalService journals,
       OrganizationService organization,
       YearEndCloseRepository closes,
-      AuditTrailService audit) {
+      AuditTrailService audit,
+      Clock clock) {
     this.checklist = checklist;
     this.balances = balances;
     this.periods = periods;
@@ -90,6 +97,7 @@ public class YearEndService {
     this.organization = organization;
     this.closes = closes;
     this.audit = audit;
+    this.clock = clock;
   }
 
   /**
@@ -166,6 +174,7 @@ public class YearEndService {
                     retained,
                     String.join(",", batchNos),
                     next)));
+    verify(record);
     audit.record(
         "YearEndClose",
         company.getCode() + "/" + year.getYearCode(),
@@ -179,6 +188,40 @@ public class YearEndService {
             + ", journals "
             + batchNos);
     return record;
+  }
+
+  /**
+   * Verifies a closed year again (FRBS 2.7.1): nominal balances and trial balance difference as of
+   * the year end, stored on the close record.
+   *
+   * @param fiscalYearId year
+   * @return close record with the verification
+   */
+  public YearEndClose verify(Long fiscalYearId) {
+    YearEndClose record =
+        closes
+            .findByFiscalYearId(fiscalYearId)
+            .orElseThrow(
+                () ->
+                    new BusinessRuleException(
+                        "YEAR_NOT_CLOSED", "The fiscal year has no year-end close to verify"));
+    verify(record);
+    return record;
+  }
+
+  private void verify(YearEndClose record) {
+    BigDecimal nominal = balances.nominalBalance(record.getCompanyId(), record.getClosingDate());
+    BigDecimal difference =
+        balances.trialBalanceDifference(record.getCompanyId(), record.getClosingDate());
+    record.verify(Money.round(nominal), Money.round(difference), clock.instant());
+    audit.record(
+        "YearEndClose",
+        record.getYearCode(),
+        AuditAction.UPDATE,
+        "Post-close verification: nominal balance "
+            + nominal
+            + ", trial balance difference "
+            + difference);
   }
 
   private String postClosing(

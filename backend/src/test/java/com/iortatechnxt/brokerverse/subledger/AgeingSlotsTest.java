@@ -38,7 +38,7 @@ class AgeingSlotsTest {
 
   @Test
   void rejectsInvalidSlots() {
-    for (String bad : new String[] {"30,20", "0", "1,2,3,4,5,6", "x", ",", "123456"}) {
+    for (String bad : new String[] {"30,20", "0", "1,2,3,4,5,6,7,8,9", "x", ",", "123456"}) {
       assertThatThrownBy(() -> AgeingSlots.parse(bad, AgeingSlots.STANDARD))
           .isInstanceOf(BusinessRuleException.class)
           .hasMessageContaining("ascending positive day limits");
@@ -46,7 +46,7 @@ class AgeingSlotsTest {
     assertThatThrownBy(() -> AgeingSlots.of(List.of())).isInstanceOf(BusinessRuleException.class);
     assertThatThrownBy(() -> AgeingSlots.of(List.of(30, 30)))
         .isInstanceOf(BusinessRuleException.class);
-    assertThatThrownBy(() -> AgeingSlots.of(List.of(1, 2, 3, 4, 5, 6)))
+    assertThatThrownBy(() -> AgeingSlots.of(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9)))
         .isInstanceOf(BusinessRuleException.class);
   }
 }

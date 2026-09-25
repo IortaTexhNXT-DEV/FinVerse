@@ -31,10 +31,16 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "jnl_batch")
+@SuppressWarnings("PMD.GodClass") // aggregate root of the voucher: header, lines, lifecycle, links
 public class JournalBatch extends BaseEntity {
 
   /** Largest base-currency rounding difference that is auto-corrected, per line. */
   private static final BigDecimal ROUNDING_TOLERANCE_PER_LINE = new BigDecimal("0.01");
+
+  private static final Set<JournalStatus> EDITABLE =
+      EnumSet.of(JournalStatus.DRAFT, JournalStatus.REJECTED);
+  private static final Set<JournalStatus> UNPOSTED =
+      EnumSet.of(JournalStatus.DRAFT, JournalStatus.REJECTED, JournalStatus.PENDING_APPROVAL);
 
   @Column(name = "company_id", nullable = false)
   private Long companyId;
@@ -110,6 +116,27 @@ public class JournalBatch extends BaseEntity {
   @Column(name = "posted_at")
   private Instant postedAt;
 
+  @Column(name = "assigned_to", length = 50)
+  private String assignedTo;
+
+  @Column(name = "assigned_by", length = 50)
+  private String assignedBy;
+
+  @Column(name = "assigned_at")
+  private Instant assignedAt;
+
+  @Column(name = "reverse_on")
+  private LocalDate reverseOn;
+
+  @Column(name = "corrects_batch_id")
+  private Long correctsBatchId;
+
+  @Column(name = "related_invoice_no", length = 40)
+  private String relatedInvoiceNo;
+
+  @Column(name = "root_invoice_no", length = 40)
+  private String rootInvoiceNo;
+
   @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("lineNo")
   private final List<JournalLine> lines = new ArrayList<>();
@@ -143,7 +170,7 @@ public class JournalBatch extends BaseEntity {
    * @param specs line values
    */
   public void replaceLines(List<JournalLineSpec> specs) {
-    requireStatus(EnumSet.of(JournalStatus.DRAFT, JournalStatus.REJECTED), "edit");
+    requireStatus(EDITABLE, "edit");
     lines.clear();
     int number = 1;
     for (JournalLineSpec spec : specs) {
@@ -161,7 +188,7 @@ public class JournalBatch extends BaseEntity {
    * @param header new header values
    */
   public void updateHeader(JournalHeader header) {
-    requireStatus(EnumSet.of(JournalStatus.DRAFT, JournalStatus.REJECTED), "edit");
+    requireStatus(EDITABLE, "edit");
     this.branchId = header.branchId();
     this.transactionDate = header.transactionDate();
     this.valueDate = header.valueDate();
@@ -186,7 +213,7 @@ public class JournalBatch extends BaseEntity {
    * @param when timestamp
    */
   public void submit(String user, Instant when) {
-    requireStatus(EnumSet.of(JournalStatus.DRAFT, JournalStatus.REJECTED), "submit");
+    requireStatus(EDITABLE, "submit");
     if (!isBalanced()) {
       throw new BusinessRuleException(
           "UNBALANCED_JOURNAL",
@@ -244,8 +271,73 @@ public class JournalBatch extends BaseEntity {
 
   /** Cancels an unposted batch. Cancelled batches are retained for audit. */
   public void cancel() {
-    requireStatus(EnumSet.of(JournalStatus.DRAFT, JournalStatus.REJECTED), "cancel");
+    requireStatus(EDITABLE, "cancel");
     this.status = JournalStatus.CANCELLED;
+  }
+
+  /**
+   * Assigns the batch to the user who will post it (FRBS 2.5.1); allowed until it is posted.
+   *
+   * @param assignee user, null to clear the assignment
+   * @param by assigning user (TL)
+   * @param when timestamp
+   */
+  public void assign(String assignee, String by, Instant when) {
+    requireStatus(UNPOSTED, "assign");
+    this.assignedTo = assignee;
+    this.assignedBy = assignee == null ? null : by;
+    this.assignedAt = assignee == null ? null : when;
+  }
+
+  /**
+   * Sets the date on which the posted batch is reversed automatically (FRBS 2.8.1). Only manual,
+   * adjustment and accrual journals that are still editable take a reversal date, which must fall
+   * after the value date.
+   *
+   * @param date reversal date, null for none
+   */
+  public void scheduleReversal(LocalDate date) {
+    if (date == null) {
+      this.reverseOn = null;
+      return;
+    }
+    requireStatus(EDITABLE, "set a reversal date on");
+    if (journalType.isSystemGenerated() || journalType == JournalType.REVERSAL) {
+      throw new BusinessRuleException(
+          "REVERSAL_DATE_NOT_ALLOWED", "Only manual journals take an automatic reversal date");
+    }
+    if (!date.isAfter(valueDate)) {
+      throw new BusinessRuleException(
+          "REVERSAL_DATE_INVALID", "The reversal date must be after the value date " + valueDate);
+    }
+    this.reverseOn = date;
+  }
+
+  /**
+   * Links a correcting journal to the journal it corrects and to its invoice family (ACSL 2.9.1,
+   * 2.16.0).
+   *
+   * @param corrects id of the corrected journal, may be null
+   * @param relatedInvoice invoice the correction concerns, may be null
+   * @param rootInvoice root of the invoice family, may be null
+   */
+  public void link(Long corrects, String relatedInvoice, String rootInvoice) {
+    this.correctsBatchId = corrects;
+    this.relatedInvoiceNo = relatedInvoice;
+    this.rootInvoiceNo = rootInvoice;
+  }
+
+  /**
+   * Whether the automatic reversal of the batch is due on a date.
+   *
+   * @param date business date
+   * @return true when posted, not yet reversed and the reversal date has come
+   */
+  public boolean isReversalDue(LocalDate date) {
+    return status == JournalStatus.POSTED
+        && reversedById == null
+        && reverseOn != null
+        && !reverseOn.isAfter(date);
   }
 
   /**
@@ -423,6 +515,34 @@ public class JournalBatch extends BaseEntity {
 
   public Instant getPostedAt() {
     return postedAt;
+  }
+
+  public String getAssignedTo() {
+    return assignedTo;
+  }
+
+  public String getAssignedBy() {
+    return assignedBy;
+  }
+
+  public Instant getAssignedAt() {
+    return assignedAt;
+  }
+
+  public LocalDate getReverseOn() {
+    return reverseOn;
+  }
+
+  public Long getCorrectsBatchId() {
+    return correctsBatchId;
+  }
+
+  public String getRelatedInvoiceNo() {
+    return relatedInvoiceNo;
+  }
+
+  public String getRootInvoiceNo() {
+    return rootInvoiceNo;
   }
 
   public List<JournalLine> getLines() {

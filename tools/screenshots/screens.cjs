@@ -100,11 +100,14 @@ module.exports = [
   { slug: 'commission-certificates', title: 'BIR Certificates', user: 'commrec', path: '/commission/certificates' },
   { slug: 'finance-dashboard', title: 'Finance executive dashboard', user: 'fmanager', path: '/' },
   { slug: 'gl-journals', title: 'GL Journals', user: 'fmanager', path: '/gl/journals' },
+  { slug: 'gl-chart-upload', title: 'Chart Upload & Numbering (GL Team Lead)', user: 'gltl', path: '/gl/accounts/upload' },
+  { slug: 'gl-close', title: 'GL Close & Cut-Off (GL Team Lead)', user: 'gltl', path: '/planning/gl-close' },
   // Reports
   { slug: 'nb-reports', title: 'New Business Reports', user: 'mkttl', path: '/nb/reports' },
   { slug: 'report-account-status', title: 'Account Status Report (run on screen)', user: 'mkttl', path: '/reports/NB-ACC-STATUS', click: '^run report$' },
   { slug: 'production-targets', title: 'Production Targets', user: 'badmin', path: '/nb/targets' },
   { slug: 'report-centre', title: 'Report Centre', user: 'mkttl', path: '/reports' },
+  { slug: 'report-batch', title: 'Modal (Report Batch)', user: 'gltl', path: '/reports', click: '^report batch$' },
   // Setup & Administration
   { slug: 'lists-of-values', title: 'Lists of Values', user: 'badmin', path: '/broking-setup/lists' },
   { slug: 'access-requests', title: 'Access Requests', user: 'badmin', path: '/broking-setup/access-requests' },
@@ -113,4 +116,6 @@ module.exports = [
   { slug: 'data-retention', title: 'Data Retention', user: 'approver', path: '/broking-setup/retention' },
   { slug: 'document-templates', title: 'Document Templates', user: 'approver', path: '/broking-setup/templates' },
   { slug: 'message-log', title: 'Message Log', user: 'badmin', path: '/broking-setup/messages' },
+  { slug: 'employees', title: 'Employees', user: 'fmanager', path: '/setup/employees' },
+  { slug: 'cost-centre-rules', title: 'Cost-Centre Rules', user: 'fmanager', path: '/setup/cost-centre-rules' },
 ];

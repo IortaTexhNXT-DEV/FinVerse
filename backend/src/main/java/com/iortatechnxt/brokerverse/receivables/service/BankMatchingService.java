@@ -18,6 +18,8 @@ import com.iortatechnxt.brokerverse.receivables.domain.DepositSlip;
 import com.iortatechnxt.brokerverse.receivables.domain.DepositSlipRepository;
 import com.iortatechnxt.brokerverse.receivables.domain.DepositSlipStatus;
 import com.iortatechnxt.brokerverse.receivables.domain.MatchMethod;
+import com.iortatechnxt.brokerverse.receivables.domain.MatchRule;
+import com.iortatechnxt.brokerverse.receivables.domain.MatchRuleRepository;
 import com.iortatechnxt.brokerverse.receivables.domain.Receipt;
 import com.iortatechnxt.brokerverse.receivables.domain.ReceiptRepository;
 import com.iortatechnxt.brokerverse.receivables.domain.ReconciliationStatus;
@@ -61,6 +63,7 @@ public class BankMatchingService {
   private final ReceiptRepository receipts;
   private final BankBookQueries book;
   private final BankAccountDirectory banks;
+  private final MatchRuleRepository matchRules;
   private final AuditTrailService audit;
 
   /**
@@ -74,8 +77,10 @@ public class BankMatchingService {
    * @param receipts receipt repository
    * @param book book queries
    * @param banks bank account directory
+   * @param matchRules matching rules per bank account (FRBS 3.3.2)
    * @param audit audit trail
    */
+  @SuppressWarnings("java:S107") // constructor injection
   public BankMatchingService(
       BankMatchRepository matches,
       BankMatchBookRepository matchBooks,
@@ -85,6 +90,7 @@ public class BankMatchingService {
       ReceiptRepository receipts,
       BankBookQueries book,
       BankAccountDirectory banks,
+      MatchRuleRepository matchRules,
       AuditTrailService audit) {
     this.matches = matches;
     this.matchBooks = matchBooks;
@@ -94,6 +100,7 @@ public class BankMatchingService {
     this.receipts = receipts;
     this.book = book;
     this.banks = banks;
+    this.matchRules = matchRules;
     this.audit = audit;
   }
 
@@ -115,7 +122,8 @@ public class BankMatchingService {
   }
 
   /**
-   * Matches automatically on amount, date window and reference, then deposit slips.
+   * Matches automatically: cheque number and amount first when the bank account has the rule
+   * CHECK_NO_AND_AMOUNT (FRBS 3.3.2), then amount, date window and reference, then deposit slips.
    *
    * @param r request
    * @return matches created
@@ -145,7 +153,12 @@ public class BankMatchingService {
                             l.getDescription()))
                 .toList(),
             r.dateWindowDays() == null ? DEFAULT_WINDOW : r.dateWindowDays(),
-            slipReceipts(r.companyId(), r.bankAccountCode()));
+            slipReceipts(r.companyId(), r.bankAccountCode()),
+            matchRules
+                .findByCompanyIdAndBankAccountCodeAndRuleCode(
+                    r.companyId(), r.bankAccountCode(), MatchRule.CHECK_NO_AND_AMOUNT)
+                .filter(MatchRule::isActive)
+                .isPresent());
     return proposals.stream()
         .map(
             p ->

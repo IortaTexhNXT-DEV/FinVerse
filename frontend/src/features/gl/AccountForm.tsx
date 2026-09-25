@@ -1,9 +1,15 @@
 import { useState } from 'react';
-import type { AccountClass, AccountLevel, GlAccountRequest, SubLedgerType } from '@/api/gl';
+import type { AccountClass, AccountLevel, SubLedgerType } from '@/api/gl';
 import { Field } from '@/components/ui/Field';
+import type { FrbsAccountRequest, NegativeBalancePolicy } from './glPlatformApi';
 
 const CLASSES: AccountClass[] = ['ASSET', 'LIABILITY', 'EQUITY', 'INCOME', 'EXPENSE', 'MEMORANDUM'];
 const LEVELS: AccountLevel[] = ['GROUP', 'MAIN', 'SUB', 'MICRO'];
+const NEGATIVE: { id: NegativeBalancePolicy; label: string }[] = [
+  { id: 'ALLOW', label: 'Allow' },
+  { id: 'WARN', label: 'Warn the maker and checker' },
+  { id: 'BLOCK', label: 'Block the posting' },
+];
 const SUB_LEDGERS: SubLedgerType[] = [
   'NONE',
   'POLICYHOLDER',
@@ -35,21 +41,24 @@ const FLAGS: { key: Flag; label: string }[] = [
 ];
 
 interface Props {
-  value: GlAccountRequest;
+  value: FrbsAccountRequest;
   editing: boolean;
-  onChange: (value: GlAccountRequest) => void;
+  onChange: (value: FrbsAccountRequest) => void;
 }
 
 /** GL Heads maintenance form (Main / Sub / Micro GL with posting controls). */
 export function AccountForm({ value, editing, onChange }: Readonly<Props>) {
   const [currencies, setCurrencies] = useState(value.allowedCurrencies.join(', '));
-  const set = <K extends keyof GlAccountRequest>(key: K, v: GlAccountRequest[K]) =>
+  const set = <K extends keyof FrbsAccountRequest>(key: K, v: FrbsAccountRequest[K]) =>
     onChange({ ...value, [key]: v });
 
   return (
     <div className="stack">
       <div className="form-grid">
-        <Field label="Account code" required>
+        <Field
+          label="Account code"
+          hint={editing ? undefined : "Blank = next number of the parent's scheme"}
+        >
           {(id) => (
             <input
               id={id}
@@ -70,7 +79,7 @@ export function AccountForm({ value, editing, onChange }: Readonly<Props>) {
             />
           )}
         </Field>
-        <Field label="Short name">
+        <Field label="Short code" hint="Unique; can be typed instead of the code on journal lines">
           {(id) => (
             <input
               id={id}
@@ -143,6 +152,24 @@ export function AccountForm({ value, editing, onChange }: Readonly<Props>) {
               value={value.reportGroup ?? ''}
               onChange={(e) => set('reportGroup', e.target.value)}
             />
+          )}
+        </Field>
+        <Field label="Negative balance">
+          {(id) => (
+            <select
+              id={id}
+              className="select"
+              value={value.negativeBalancePolicy ?? 'ALLOW'}
+              onChange={(e) =>
+                set('negativeBalancePolicy', e.target.value as NegativeBalancePolicy)
+              }
+            >
+              {NEGATIVE.map((n) => (
+                <option key={n.id} value={n.id}>
+                  {n.label}
+                </option>
+              ))}
+            </select>
           )}
         </Field>
         <Field label="Opened on" required>

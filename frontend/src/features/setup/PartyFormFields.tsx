@@ -1,9 +1,9 @@
-import { PARTY_TYPES } from '@/api/parties';
 import type { PartyType } from '@/api/parties';
 import { Field } from '@/components/ui/Field';
 import { humanize } from '@/utils/format';
 import { hasWithholding, isIntermediary } from './partyForm';
 import type { PartyForm } from './partyForm';
+import { SETUP_PARTY_TYPES } from './partyTypes';
 
 interface Props {
   form: PartyForm;
@@ -64,7 +64,7 @@ export function PartyFormFields({ form, errors, onChange }: Readonly<Props>) {
             value={form.partyType}
             onChange={(e) => set({ partyType: e.target.value as PartyType })}
           >
-            {PARTY_TYPES.map((t) => (
+            {SETUP_PARTY_TYPES.map((t) => (
               <option key={t} value={t}>
                 {humanize(t)}
               </option>

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.nbadmin.domain;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -33,4 +34,12 @@ public interface AccessRequestRepository
    * @return true when one exists
    */
   boolean existsByRoleCodeAndStatus(String roleCode, AccessRequestStatus status);
+
+  /**
+   * A request by number.
+   *
+   * @param requestNo request number
+   * @return request if any
+   */
+  Optional<AccessRequest> findByRequestNo(String requestNo);
 }

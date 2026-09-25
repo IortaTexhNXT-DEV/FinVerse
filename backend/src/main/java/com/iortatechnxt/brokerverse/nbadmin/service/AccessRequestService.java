@@ -147,6 +147,19 @@ public class AccessRequestService {
   }
 
   /**
+   * One request by number (bulk approval from the inbox).
+   *
+   * @param requestNo request number
+   * @return request
+   */
+  @Transactional(readOnly = true)
+  public AccessRequest byNumber(String requestNo) {
+    return requests
+        .findByRequestNo(requestNo)
+        .orElseThrow(() -> new ResourceNotFoundException(ENTITY, requestNo));
+  }
+
+  /**
    * One request.
    *
    * @param id id
@@ -227,7 +240,7 @@ public class AccessRequestService {
     return request;
   }
 
-  private void notifyRequester(AccessRequest request, String outcome) {
+  void notifyRequester(AccessRequest request, String outcome) {
     notifications.notifyUser(
         request.getCreatedBy(),
         new Notice(
@@ -265,11 +278,11 @@ public class AccessRequestService {
     return "Change permissions of role " + c.roleCode() + ": " + String.join("; ", parts);
   }
 
-  private static String link(AccessRequest r) {
+  static String link(AccessRequest r) {
     return SCREEN + "?id=" + r.getId();
   }
 
-  private static String note(String comment) {
+  static String note(String comment) {
     return comment == null || comment.isBlank() ? "" : " (" + comment + ")";
   }
 

@@ -36,6 +36,7 @@ public final class JournalSpecifications {
       }
       equalIgnoreCase(p, cb, root, "createdBy", c.inputter());
       equalIgnoreCase(p, cb, root, "authorizedBy", c.authorizer());
+      equalIgnoreCase(p, cb, root, "assignedTo", c.assignedTo());
       if (c.minAmount() != null) {
         p.add(cb.greaterThanOrEqualTo(root.get("totalDebit"), c.minAmount()));
       }

@@ -30,6 +30,7 @@ import java.util.Set;
  * @param roleCode role of a role-permission change (PMADD05), else null
  * @param permissionsAdded permissions granted by a role-permission change
  * @param permissionsRemoved permissions withdrawn by a role-permission change
+ * @param returnedCount times the request was returned to the requester (BASAU 2.4.1)
  */
 public record AccessRequestResponse(
     Long id,
@@ -50,7 +51,8 @@ public record AccessRequestResponse(
     String decisionComment,
     String roleCode,
     Set<String> permissionsAdded,
-    Set<String> permissionsRemoved) {
+    Set<String> permissionsRemoved,
+    int returnedCount) {
 
   /**
    * Maps a request.
@@ -79,6 +81,7 @@ public record AccessRequestResponse(
         r.getDecisionComment(),
         r.getRoleCode(),
         change == null ? Set.of() : change.added(),
-        change == null ? Set.of() : change.removed());
+        change == null ? Set.of() : change.removed(),
+        r.getReturnedCount());
   }
 }

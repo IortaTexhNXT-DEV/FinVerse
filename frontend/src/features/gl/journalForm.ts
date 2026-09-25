@@ -1,4 +1,5 @@
 import type { Journal, JournalInput, JournalLineInput, ManualJournalType } from '@/api/gl';
+import type { FrbsJournal } from './glPlatformApi';
 import { today } from '@/utils/format';
 import { emptyLine, isBlankLine } from './journalMath';
 
@@ -9,6 +10,8 @@ export interface JournalHeaderValues {
   currency: string;
   narration: string;
   reference: string;
+  /** Date on which the posted voucher is reversed automatically (FRBS 2.8.1), '' for none. */
+  reverseOn: string;
 }
 
 export interface JournalFormValues {
@@ -26,13 +29,14 @@ export function newJournalValues(branchId: number, currency: string): JournalFor
       currency,
       narration: '',
       reference: '',
+      reverseOn: '',
     },
     lines: [emptyLine('DEBIT'), emptyLine('CREDIT')],
   };
 }
 
 /** Form values of an existing draft or rejected voucher. */
-export function journalValues(j: Journal): JournalFormValues {
+export function journalValues(j: Journal | FrbsJournal): JournalFormValues {
   return {
     header: {
       branchId: j.branchId,
@@ -41,6 +45,7 @@ export function journalValues(j: Journal): JournalFormValues {
       currency: j.currency,
       narration: j.narration,
       reference: j.reference ?? '',
+      reverseOn: ('reverseOn' in j ? j.reverseOn : undefined) ?? '',
     },
     lines: j.lines.map((l) => ({
       accountCode: l.accountCode,
@@ -59,11 +64,15 @@ export function journalValues(j: Journal): JournalFormValues {
  * Request body. Only blank placeholder rows are left out; incomplete or non-positive lines are
  * sent as entered (the form blocks them first, see lineProblems).
  */
-export function toJournalInput(companyId: number, v: JournalFormValues): JournalInput {
+export function toJournalInput(
+  companyId: number,
+  v: JournalFormValues,
+): JournalInput & { reverseOn?: string } {
   return {
     ...v.header,
     companyId,
     reference: v.header.reference || undefined,
+    reverseOn: v.header.reverseOn || undefined,
     lines: v.lines.filter((l) => !isBlankLine(l)),
   };
 }

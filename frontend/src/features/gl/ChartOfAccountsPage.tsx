@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ShieldCheck, Snowflake } from 'lucide-react';
+import { Plus, ShieldCheck, Snowflake, Upload } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { glApi } from '@/api/gl';
-import type { GlAccount, GlAccountRequest } from '@/api/gl';
+import type { GlAccount } from '@/api/gl';
+import type { FrbsAccountRequest } from './glPlatformApi';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -24,10 +26,11 @@ export default function ChartOfAccountsPage() {
   const { companyId, accounts } = useGlLookups();
   const { can, user } = useAuth();
   const toast = useToast();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState<GlAccount | null>(null);
-  const [form, setForm] = useState<GlAccountRequest | null>(null);
+  const [form, setForm] = useState<FrbsAccountRequest | null>(null);
 
   const rows = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -40,7 +43,7 @@ export default function ChartOfAccountsPage() {
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['accounts'] });
   const save = useMutation({
-    mutationFn: (body: GlAccountRequest) =>
+    mutationFn: (body: FrbsAccountRequest) =>
       editing ? glApi.updateAccount(editing.id, body) : glApi.createAccount(body),
     onSuccess: async (a) => {
       await refresh();
@@ -68,11 +71,22 @@ export default function ChartOfAccountsPage() {
         title="Chart of Accounts"
         description="Main, Sub and Micro GL heads. Changes require authorization by a second user; accounts are never deleted."
         actions={
-          can('MASTER_MAINTAIN') && (
-            <Button variant="accent" icon={<Plus size={16} />} onClick={() => open(null)}>
-              New Account
-            </Button>
-          )
+          <>
+            {can('COA_UPLOAD') && (
+              <Button
+                variant="secondary"
+                icon={<Upload size={16} />}
+                onClick={() => void navigate('/gl/accounts/upload')}
+              >
+                Upload Chart
+              </Button>
+            )}
+            {can('MASTER_MAINTAIN') && (
+              <Button variant="accent" icon={<Plus size={16} />} onClick={() => open(null)}>
+                New Account
+              </Button>
+            )}
+          </>
         }
       />
       <ErrorAlert error={act.error} />
@@ -84,7 +98,7 @@ export default function ChartOfAccountsPage() {
             className="input"
             style={{ width: 260 }}
             aria-label="Search accounts"
-            placeholder="Search code or name"
+            placeholder="Search code, name or short code"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />

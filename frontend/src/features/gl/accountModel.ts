@@ -1,8 +1,9 @@
-import type { GlAccount, GlAccountRequest } from '@/api/gl';
+import type { GlAccount } from '@/api/gl';
+import type { FrbsAccount, FrbsAccountRequest } from './glPlatformApi';
 import { today } from '@/utils/format';
 
 /** Empty account for the create form. */
-export function blankAccount(companyId: number): GlAccountRequest {
+export function blankAccount(companyId: number): FrbsAccountRequest {
   return {
     companyId,
     code: '',
@@ -21,11 +22,12 @@ export function blankAccount(companyId: number): GlAccountRequest {
     allowedCurrencies: [],
     allowedBranchIds: [],
     allowedRoleCodes: [],
+    negativeBalancePolicy: 'ALLOW',
   };
 }
 
 /** Maps an account to its editable request shape. */
-export function toRequest(a: GlAccount): GlAccountRequest {
+export function toRequest(a: GlAccount | FrbsAccount): FrbsAccountRequest {
   return {
     companyId: a.companyId,
     code: a.code,
@@ -49,5 +51,6 @@ export function toRequest(a: GlAccount): GlAccountRequest {
     allowedCurrencies: a.allowedCurrencies,
     allowedBranchIds: a.allowedBranchIds,
     allowedRoleCodes: a.allowedRoleCodes,
+    negativeBalancePolicy: 'negativeBalancePolicy' in a ? a.negativeBalancePolicy : 'ALLOW',
   };
 }

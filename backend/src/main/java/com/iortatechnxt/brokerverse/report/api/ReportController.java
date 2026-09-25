@@ -4,12 +4,14 @@ import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.report.api.dto.ReportCatalogueEntry;
 import com.iortatechnxt.brokerverse.report.api.dto.ReportRunResponse;
+import com.iortatechnxt.brokerverse.report.core.ExportOptions;
 import com.iortatechnxt.brokerverse.report.core.ReportAccess;
 import com.iortatechnxt.brokerverse.report.core.ReportArchiveService;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.report.domain.ReportRun.RunFile;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
+import com.iortatechnxt.brokerverse.report.render.PrintOptions;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.PageRequest;
@@ -108,19 +110,36 @@ public class ReportController {
   }
 
   /**
-   * Exports a report as a file.
+   * Exports a report as a file, with the PDF print options (FRBS 2.4.9) and the column filters of
+   * the viewer (FRBS 2.4.4).
    *
    * @param code report code
    * @param format format
+   * @param paper paper size (A4, LETTER, LEGAL, A3), PDF only
+   * @param orientation AUTO, PORTRAIT or LANDSCAPE, PDF only
+   * @param fitToWidth stretch the table to the page width, PDF only
+   * @param filter column filters as {@code column:text}
    * @param params parameter values
    * @return file
    */
   @PostMapping("/{code}/export")
+  @SuppressWarnings("java:S107") // request parameters of one endpoint
   public ResponseEntity<byte[]> export(
       @PathVariable String code,
       @RequestParam ExportFormat format,
+      @RequestParam(required = false) String paper,
+      @RequestParam(required = false) String orientation,
+      @RequestParam(required = false) Boolean fitToWidth,
+      @RequestParam(required = false) List<String> filter,
       @RequestBody Map<String, String> params) {
-    var file = service.export(code, params, format);
+    var file =
+        service.export(
+            code,
+            params,
+            format,
+            new ExportOptions(
+                PrintOptions.of(paper, orientation, fitToWidth),
+                ExportOptions.parseFilters(filter)));
     return ResponseEntity.ok()
         .contentType(MediaType.parseMediaType(file.contentType()))
         .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(file.fileName()))

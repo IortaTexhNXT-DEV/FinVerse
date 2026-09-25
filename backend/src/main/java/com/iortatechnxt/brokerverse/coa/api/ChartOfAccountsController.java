@@ -1,13 +1,17 @@
 package com.iortatechnxt.brokerverse.coa.api;
 
+import com.iortatechnxt.brokerverse.coa.api.dto.CoaNumberingRequest;
+import com.iortatechnxt.brokerverse.coa.api.dto.CoaNumberingResponse;
 import com.iortatechnxt.brokerverse.coa.api.dto.GlAccountRequest;
 import com.iortatechnxt.brokerverse.coa.api.dto.GlAccountResponse;
 import com.iortatechnxt.brokerverse.coa.api.dto.GlCategoryRequest;
 import com.iortatechnxt.brokerverse.coa.api.dto.GlCategoryResponse;
 import com.iortatechnxt.brokerverse.coa.service.ChartOfAccountsService;
+import com.iortatechnxt.brokerverse.coa.service.CoaNumberingService;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,21 +34,81 @@ public class ChartOfAccountsController {
   private static final String AUTHORIZE = "hasAuthority('MASTER_AUTHORIZE')";
 
   private final ChartOfAccountsService service;
+  private final CoaNumberingService numbering;
 
   /**
    * Creates the controller.
    *
    * @param service chart of accounts service
+   * @param numbering account numbering schemes
    */
-  public ChartOfAccountsController(ChartOfAccountsService service) {
+  public ChartOfAccountsController(ChartOfAccountsService service, CoaNumberingService numbering) {
     this.service = service;
+    this.numbering = numbering;
+  }
+
+  /**
+   * Finds an account by its code or short code (journal line entry, FRBS 2.8.1).
+   *
+   * @param companyId company
+   * @param key account code or short code
+   * @return account
+   */
+  @GetMapping("/accounts/lookup")
+  @PreAuthorize(VIEW)
+  public GlAccountResponse lookup(@RequestParam Long companyId, @RequestParam String key) {
+    return GlAccountResponse.from(service.lookup(companyId, key));
+  }
+
+  /**
+   * The next system-generated code under a parent (FRBS 2.3.2).
+   *
+   * @param companyId company
+   * @param parentCode parent account code
+   * @return {"code": proposed code}
+   */
+  @GetMapping("/accounts/next-code")
+  @PreAuthorize(VIEW)
+  public Map<String, String> nextCode(
+      @RequestParam Long companyId, @RequestParam String parentCode) {
+    return Map.of("code", numbering.nextCode(companyId, parentCode));
+  }
+
+  /**
+   * Numbering schemes of a company.
+   *
+   * @param companyId company
+   * @return schemes
+   */
+  @GetMapping("/numbering")
+  @PreAuthorize(VIEW)
+  public List<CoaNumberingResponse> numbering(@RequestParam Long companyId) {
+    return numbering.list(companyId).stream().map(CoaNumberingResponse::from).toList();
+  }
+
+  /**
+   * Creates or changes the numbering scheme of a parent account.
+   *
+   * @param request scheme
+   * @return scheme
+   */
+  @PutMapping("/numbering")
+  @PreAuthorize(MAINTAIN)
+  public CoaNumberingResponse saveNumbering(@Valid @RequestBody CoaNumberingRequest request) {
+    return CoaNumberingResponse.from(
+        numbering.save(
+            request.companyId(),
+            request.parentCode(),
+            request.separator(),
+            request.width(),
+            request.active()));
   }
 
   /**
    * Lists or searches accounts.
    *
    * @param companyId company
-   * @param q optional search term (code prefix or name)
+   * @param q optional search term (code prefix, name or short code)
    * @return accounts
    */
   @GetMapping("/accounts")

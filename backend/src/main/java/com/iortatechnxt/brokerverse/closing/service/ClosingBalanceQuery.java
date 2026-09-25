@@ -26,6 +26,20 @@ public class ClosingBalanceQuery {
       order by e.branch_id, a.code, e.cost_center, e.business_line
       """;
 
+  private static final String NOMINAL_SQL =
+      """
+      select coalesce(sum(e.debit_base - e.credit_base), 0)
+      from gl_ledger_entry e join coa_account a on a.id = e.account_id
+      where e.company_id = ? and e.value_date <= ? and a.account_class in ('INCOME', 'EXPENSE')
+      """;
+
+  private static final String TB_SQL =
+      """
+      select coalesce(sum(e.debit_base - e.credit_base), 0)
+      from gl_ledger_entry e
+      where e.company_id = ? and e.value_date <= ?
+      """;
+
   private final JdbcTemplate jdbc;
 
   /**
@@ -56,6 +70,28 @@ public class ClosingBalanceQuery {
                 rs.getBigDecimal("net_debit")),
         companyId,
         Date.valueOf(asOf));
+  }
+
+  /**
+   * Net income and expense balance as of a date (zero after a year-end close, FRBS 2.7.1).
+   *
+   * @param companyId company
+   * @param asOf date (inclusive)
+   * @return net debit
+   */
+  public BigDecimal nominalBalance(Long companyId, LocalDate asOf) {
+    return jdbc.queryForObject(NOMINAL_SQL, BigDecimal.class, companyId, Date.valueOf(asOf));
+  }
+
+  /**
+   * Trial balance difference (total debit minus total credit) as of a date (FRBS 2.7.1).
+   *
+   * @param companyId company
+   * @param asOf date (inclusive)
+   * @return difference, zero when the books balance
+   */
+  public BigDecimal trialBalanceDifference(Long companyId, LocalDate asOf) {
+    return jdbc.queryForObject(TB_SQL, BigDecimal.class, companyId, Date.valueOf(asOf));
   }
 
   /**

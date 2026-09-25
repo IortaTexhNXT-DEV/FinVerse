@@ -11,14 +11,17 @@ import com.iortatechnxt.brokerverse.journal.domain.JournalLineSpec;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 /**
- * Turns line requests into resolved line values: looks up accounts, defaults currency/branch and
- * converts to base currency using the explicit rate or the SPOT rate on the value date.
+ * Turns line requests into resolved line values: looks up accounts (by code, else by short code,
+ * FRBS 2.3.3 / 2.8.1), defaults currency/branch and converts to base currency using the explicit
+ * rate or the SPOT rate on the value date.
  */
 @Component
 public class JournalLineResolver {
@@ -45,18 +48,30 @@ public class JournalLineResolver {
    * @return resolved lines
    */
   public List<JournalLineSpec> resolve(HeaderContext ctx, List<JournalLineRequest> requests) {
+    List<String> keys = requests.stream().map(JournalLineRequest::accountCode).toList();
     Map<String, GlAccount> byCode =
-        accounts
-            .findByCompanyIdAndCodeIn(
-                ctx.companyId(), requests.stream().map(JournalLineRequest::accountCode).toList())
-            .stream()
-            .collect(Collectors.toMap(GlAccount::getCode, Function.identity()));
-    return requests.stream().map(r -> resolveLine(ctx, r, byCode)).toList();
+        accounts.findByCompanyIdAndCodeIn(ctx.companyId(), keys).stream()
+            .collect(Collectors.toMap(GlAccount::getCode, Function.identity(), (a, b) -> a));
+    List<String> shortCodes =
+        keys.stream()
+            .filter(k -> k != null && !byCode.containsKey(k))
+            .map(k -> k.toLowerCase(Locale.ROOT))
+            .distinct()
+            .toList();
+    Map<String, GlAccount> byShortCode = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    if (!shortCodes.isEmpty()) {
+      accounts
+          .findByShortNames(ctx.companyId(), shortCodes)
+          .forEach(a -> byShortCode.putIfAbsent(a.getShortName(), a));
+    }
+    Function<String, GlAccount> find =
+        k -> k == null ? null : byCode.getOrDefault(k, byShortCode.get(k));
+    return requests.stream().map(r -> resolveLine(ctx, r, find)).toList();
   }
 
   private JournalLineSpec resolveLine(
-      HeaderContext ctx, JournalLineRequest r, Map<String, GlAccount> byCode) {
-    GlAccount account = byCode.get(r.accountCode());
+      HeaderContext ctx, JournalLineRequest r, Function<String, GlAccount> find) {
+    GlAccount account = find.apply(r.accountCode());
     if (account == null) {
       throw new BusinessRuleException("UNKNOWN_ACCOUNT", "Unknown GL account " + r.accountCode());
     }

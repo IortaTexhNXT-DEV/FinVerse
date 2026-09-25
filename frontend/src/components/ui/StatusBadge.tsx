@@ -34,6 +34,8 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'SIGNED',
     'CURRENT',
     'ACCEPTED_AS_REQUESTED',
+    // report batch items (FRBS 2.4.5)
+    'OK',
   ],
   warning: [
     'PENDING_AUTHORIZATION',
@@ -62,6 +64,8 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'FOR_APPROVAL',
     'APPROVED_WITH_CHANGES',
     'COUNTER_PROPOSAL',
+    // report batches with a failed report (FRBS 2.4.5)
+    'PARTIAL',
   ],
   // BDO style guide: blue pills for records moving through processing ("Account for Placement").
   info: [

@@ -20,6 +20,10 @@ import java.time.LocalDate;
  * @param status status
  * @param closedBy user
  * @param closedAt time
+ * @param nominalBalance nominal balances as of the year end after the close (FRBS 2.7.1)
+ * @param tbDifference trial balance difference as of the year end
+ * @param verified whether both are zero
+ * @param verifiedAt verification time
  */
 public record YearEndCloseResponse(
     Long id,
@@ -33,7 +37,11 @@ public record YearEndCloseResponse(
     Integer nextYearCode,
     String status,
     String closedBy,
-    Instant closedAt) {
+    Instant closedAt,
+    BigDecimal nominalBalance,
+    BigDecimal tbDifference,
+    Boolean verified,
+    Instant verifiedAt) {
 
   /**
    * Maps an entity.
@@ -54,6 +62,10 @@ public record YearEndCloseResponse(
         c.getNextYearCode(),
         c.getStatus(),
         c.getCreatedBy(),
-        c.getCreatedAt());
+        c.getCreatedAt(),
+        c.getNominalBalance(),
+        c.getTbDifference(),
+        c.getVerified(),
+        c.getVerifiedAt());
   }
 }

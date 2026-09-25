@@ -91,6 +91,7 @@ public class SystemJournalService {
             request.sourceReference(),
             null);
     JournalBatch batch = factory.create(header, request.lines());
+    batch.link(request.correctsBatchId(), request.relatedInvoiceNo(), request.rootInvoiceNo());
     String user = currentUser.username();
     validator.validate(batch, userDirectory.roleCodes(user));
     batch.submit(user, clock.instant());

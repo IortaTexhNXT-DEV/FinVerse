@@ -88,6 +88,10 @@ public class GlAccount extends AuthorizableEntity {
   @Column(name = "report_group", length = 60)
   private String reportGroup;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "negative_balance_policy", nullable = false, length = 10)
+  private NegativeBalancePolicy negativeBalancePolicy = NegativeBalancePolicy.ALLOW;
+
   @Column(nullable = false)
   private boolean frozen;
 
@@ -342,6 +346,14 @@ public class GlAccount extends AuthorizableEntity {
 
   public void setReportGroup(String reportGroup) {
     this.reportGroup = reportGroup;
+  }
+
+  public NegativeBalancePolicy getNegativeBalancePolicy() {
+    return negativeBalancePolicy;
+  }
+
+  public void setNegativeBalancePolicy(NegativeBalancePolicy negativeBalancePolicy) {
+    this.negativeBalancePolicy = negativeBalancePolicy;
   }
 
   public boolean isFrozen() {

@@ -1,4 +1,4 @@
-import { CalendarCheck, Coins } from 'lucide-react';
+import { CalendarCheck, CalendarClock, Coins } from 'lucide-react';
 import { lazy } from 'react';
 import { budgetScreens } from '@/features/budget/module';
 import { consolidationScreens } from '@/features/consolidation/module';
@@ -27,6 +27,13 @@ export const planningModule: FeatureModule = {
       icon: CalendarCheck,
       permission: 'PERIOD_END_RUN',
       component: lazy(() => import('./PeriodEndPage')),
+    },
+    {
+      path: '/planning/gl-close',
+      label: 'GL Close & Cut-Off',
+      icon: CalendarClock,
+      permission: 'GL_CLOSE_SCHEDULE',
+      component: lazy(() => import('./GlClosePage')),
     },
   ],
 };

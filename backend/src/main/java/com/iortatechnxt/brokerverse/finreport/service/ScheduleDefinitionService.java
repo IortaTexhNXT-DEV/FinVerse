@@ -200,12 +200,8 @@ public class ScheduleDefinitionService {
   }
 
   private static void validate(ScheduleValues v) {
-    if (v.name() == null
-        || v.family() == null
-        || v.selectorKind() == null
-        || v.grouping() == null
-        || v.side() == null
-        || v.basis() == null) {
+    boolean kinds = v.family() != null && v.selectorKind() != null && v.grouping() != null;
+    if (v.name() == null || !kinds || v.side() == null || v.basis() == null) {
       throw new BusinessRuleException(
           "SCHEDULE_INCOMPLETE", "Give the name, family, selector, grouping, side and basis");
     }

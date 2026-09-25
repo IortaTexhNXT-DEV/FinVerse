@@ -153,5 +153,29 @@ public enum Permission {
   BIR_CERT_SUBMIT,
   BIR_CERT_ACK,
   // Operations interfaces: feed configuration and re-runs (BRQID.004/005)
-  FLOWIN_MANAGE
+  FLOWIN_MANAGE,
+
+  // Product Maintenance (BDOI BRD-3, BRPM.002, PMADD05). See
+  // docs/architecture/PRODUCT_MAINTENANCE_DESIGN.md section 6.1 and V755; the action class of
+  // each permission (VIEW / CREATE / AMEND / APPROVE) is in sec_permission_action.
+  // Catalog product areas: read, archive (expired / retired packages), maintain, authorise and
+  // the post-set-up validation of package versions (PMADD06).
+  PRODUCT_VIEW,
+  PRODUCT_ARCHIVE_VIEW,
+  PRODUCT_MAINTAIN,
+  PRODUCT_AUTHORIZE,
+  PRODUCT_VALIDATE,
+  // Incentive criteria on the maintained products matrix (PMADD07/08)
+  INCENTIVE_CRITERIA_MAINTAIN,
+  // Package request lifecycle (BRPM.008-017)
+  PKG_REQUEST,
+  PKG_REQUEST_APPROVE,
+  PKG_TSU_RECOMMEND,
+  PKG_TSU_APPROVE,
+  PKG_NEGOTIATE,
+  PKG_QS_APPROVE,
+  PKG_MANCOM_SIGNOFF,
+  PKG_ADVISORY,
+  // Package Status Update Report and Product Maintenance home (BRPM.018/019)
+  PKG_REPORT_VIEW
 }

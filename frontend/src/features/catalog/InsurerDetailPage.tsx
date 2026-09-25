@@ -120,7 +120,7 @@ export default function InsurerDetailPage() {
   return (
     <div className="stack">
       <PageHeader
-        section="Products & Insurers · Insurer"
+        section="Product Maintenance · Insurer"
         title={d.insurer.name}
         actions={
           <>

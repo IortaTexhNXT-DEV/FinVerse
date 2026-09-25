@@ -123,6 +123,10 @@ brokerverse:
     adj-daily-report-cron: ${BROKERVERSE_JOB_ADJ_DAILY_REPORT_CRON:0 0 10 * * *}
     # Commission: insurer feedback SLA on direct payment billings (CMRID.011), daily 01:30.
     dp-feedback-sla-cron: ${BROKERVERSE_JOB_DP_FEEDBACK_SLA_CRON:0 30 1 * * *}
+    # ---- Product Maintenance (BRD-3), docs/architecture/PRODUCT_MAINTENANCE_DESIGN.md section 8 ----
+    # Package expiry monitor (BRPM.006/017): supersedes / expires package versions, raises
+    # PACKAGE_EXPIRING and drafts renewal requests; daily 17:00 UTC = 01:00 PHT.
+    package-expiry-cron: ${BROKERVERSE_JOB_PACKAGE_EXPIRY_CRON:0 0 17 * * *}
 
 management:
   health:

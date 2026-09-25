@@ -271,7 +271,7 @@ PROSPECT/KYC_REVIEW/KYC_VERIFIED/CONFIRMED --deactivate(reason)--> INACTIVE
   - **Accounts & Placement**
   - **Issuance & Booking**
   - **Bulk Processing**
-  - **Products & Insurers** (catalog)
+  - **Product Maintenance** (catalog; formerly Products & Insurers)
   - **Broking Setup**
 
   The insurer and finance sections follow.
@@ -493,7 +493,7 @@ API: `/api/v1/catalog/**`. The endpoints are `lines`, `cover-types`, `products[/
 MASTER_VIEW, ACCOUNT_VIEW, QUOTE_VIEW or TSU_PROCESS. Maintain needs MASTER_MAINTAIN, and
 authorize needs MASTER_AUTHORIZE.
 
-Screens (sidebar **Products & Insurers**):
+Screens (sidebar **Product Maintenance**, formerly Products & Insurers):
 
 - Products: list with filters, plus field, document and TSU rules tabs.
 - Product detail: features, field matrix and required documents.

@@ -24,4 +24,13 @@ public interface AccessRequestRepository
    * @return true when one exists
    */
   boolean existsByUsernameIgnoreCaseAndStatus(String username, AccessRequestStatus status);
+
+  /**
+   * Whether a role-permission change request for a role is still open (PMADD05).
+   *
+   * @param roleCode role
+   * @param status status (PENDING)
+   * @return true when one exists
+   */
+  boolean existsByRoleCodeAndStatus(String roleCode, AccessRequestStatus status);
 }

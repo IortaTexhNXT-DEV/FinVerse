@@ -34,12 +34,26 @@ function Facts({ request: r }: Readonly<{ request: AccessRequest }>) {
       <dd>
         {REQUEST_TYPE_LABELS[r.type]} · <StatusBadge status={r.status} />
       </dd>
-      <dt>User</dt>
-      <dd>
-        {r.username}
-        {r.fullName ? ` – ${r.fullName}` : ''}
-        {r.email ? ` (${r.email})` : ''}
-      </dd>
+      {r.username !== undefined && (
+        <>
+          <dt>User</dt>
+          <dd>
+            {r.username}
+            {r.fullName ? ` – ${r.fullName}` : ''}
+            {r.email ? ` (${r.email})` : ''}
+          </dd>
+        </>
+      )}
+      {r.roleCode !== undefined && (
+        <>
+          <dt>Role</dt>
+          <dd>{r.roleCode}</dd>
+          <dt>Permissions added</dt>
+          <dd className="mono">{r.permissionsAdded.join(', ') || '—'}</dd>
+          <dt>Permissions removed</dt>
+          <dd className="mono">{r.permissionsRemoved.join(', ') || '—'}</dd>
+        </>
+      )}
       {r.roleCodes.length > 0 && (
         <>
           <dt>Requested roles</dt>

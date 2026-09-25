@@ -21,6 +21,7 @@ import { OPERATIONS_HELP } from '@/features/operations/help';
 import { PAYABLES_HELP } from '@/features/payables/help';
 import { PLACEMENT_HELP } from '@/features/placement/help';
 import { PRODRECON_HELP } from '@/features/prodrecon/help';
+import { withPackageRequestHelp } from '@/features/productmaint/help';
 import { RECEIVABLES_HELP } from '@/features/receivables/help';
 import { REINSURANCE_HELP } from '@/features/reinsurance/help';
 import { REMITTANCE_HELP } from '@/features/remittance/help';
@@ -113,7 +114,7 @@ export const HELP_SECTIONS: HelpSection[] = [
   BOOKING_HELP,
   PRODRECON_HELP,
   ADJUSTMENT_HELP,
-  CATALOG_HELP,
+  withPackageRequestHelp(CATALOG_HELP),
   BULK_HELP,
   OPERATIONS_HELP,
   CASHIERING_HELP,

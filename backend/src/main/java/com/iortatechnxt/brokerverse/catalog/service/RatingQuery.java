@@ -41,6 +41,21 @@ public record RatingQuery(
   }
 
   /**
+   * Why a transaction is rated, which decides the package version that prices it (BRPM.007,
+   * PRODUCT_MAINTENANCE_DESIGN section 5.2). Non-packaged products are rated the same way for every
+   * purpose. Until the Renewal BRD gives accounts a business type, quotations and accounts rate as
+   * NEW_BUSINESS and endorsements as ENDORSEMENT; RENEWAL is the seam.
+   */
+  public enum Purpose {
+    /** The current released version on the transaction date, whatever the period start. */
+    NEW_BUSINESS,
+    /** The given version when released or superseded (not expired), else the current one. */
+    RENEWAL,
+    /** The version of the original account (mandatory). */
+    ENDORSEMENT
+  }
+
+  /**
    * One item to rate.
    *
    * @param label label (plate number, address, description)

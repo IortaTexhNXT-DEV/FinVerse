@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestRepository;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
+import com.iortatechnxt.brokerverse.nbadmin.domain.RolePermissionChange;
 import jakarta.persistence.criteria.Predicate;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -26,9 +27,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * User access requests (BRNB.085, BRD 3.3.5 / 3.4.2): the Business Administrator submits, the
- * Approver approves (not the requester) and the approval applies the change through {@link
- * AccessChangeApplier}; or rejects with a comment. Both steps are audited and notified.
+ * User access requests (BRNB.085, BRD 3.3.5 / 3.4.2) and role-permission change requests (PMADD05):
+ * the Business Administrator submits, the Approver approves (not the requester) and the approval
+ * applies the change through {@link AccessChangeApplier}; or rejects with a comment. Both steps are
+ * audited and notified.
  */
 @Service
 @Transactional
@@ -88,12 +90,7 @@ public class AccessRequestService {
    */
   public AccessRequest submit(AccessRequestContent content) {
     AccessRequestContent clean = validator.validate(content);
-    if (requests.existsByUsernameIgnoreCaseAndStatus(
-        clean.username(), AccessRequestStatus.PENDING)) {
-      throw new BusinessRuleException(
-          "ACCESS_REQUEST_PENDING",
-          "A request for user " + clean.username() + " is already waiting for approval");
-    }
+    requireNoPendingRequest(clean);
     String no = numbers.next("AR-" + LocalDate.now(clock).getYear());
     AccessRequest saved = requests.save(new AccessRequest(no, clean));
     audit.record(
@@ -165,7 +162,7 @@ public class AccessRequestService {
    *
    * @param status status, null for all
    * @param type request type, null for all
-   * @param text user name or request number fragment, null for all
+   * @param text user name, role code or request number fragment, null for all
    * @param pageable page
    * @return requests
    */
@@ -186,6 +183,7 @@ public class AccessRequestService {
             p.add(
                 cb.or(
                     cb.like(cb.lower(root.get("username")), like),
+                    cb.like(cb.lower(root.get("roleCode")), like),
                     cb.like(cb.lower(root.get("requestNo")), like)));
           }
           return cb.and(p.toArray(Predicate[]::new));
@@ -201,6 +199,21 @@ public class AccessRequestService {
   @Transactional(readOnly = true)
   public List<AccessRequest> pending() {
     return requests.findByStatusOrderByIdAsc(AccessRequestStatus.PENDING);
+  }
+
+  private void requireNoPendingRequest(AccessRequestContent clean) {
+    RolePermissionChange change = clean.permissionChange();
+    boolean pending =
+        change == null
+            ? requests.existsByUsernameIgnoreCaseAndStatus(
+                clean.username(), AccessRequestStatus.PENDING)
+            : requests.existsByRoleCodeAndStatus(change.roleCode(), AccessRequestStatus.PENDING);
+    if (pending) {
+      String subject = change == null ? "user " + clean.username() : "role " + change.roleCode();
+      throw new BusinessRuleException(
+          "ACCESS_REQUEST_PENDING",
+          "A request for " + subject + " is already waiting for approval");
+    }
   }
 
   private AccessRequest decide(Long id, boolean approved, String comment) {
@@ -237,7 +250,19 @@ public class AccessRequestService {
       case MODIFY_ROLES -> "Change roles of " + r.getUsername() + " to " + r.roles();
       case DISABLE_USER -> "Disable user " + r.getUsername();
       case ENABLE_USER -> "Enable user " + r.getUsername();
+      case MODIFY_ROLE_PERMISSIONS -> describePermissions(r.permissionChange());
     };
+  }
+
+  private static String describePermissions(RolePermissionChange c) {
+    List<String> parts = new ArrayList<>();
+    if (!c.added().isEmpty()) {
+      parts.add("add " + c.added());
+    }
+    if (!c.removed().isEmpty()) {
+      parts.add("remove " + c.removed());
+    }
+    return "Change permissions of role " + c.roleCode() + ": " + String.join("; ", parts);
   }
 
   private static String link(AccessRequest r) {

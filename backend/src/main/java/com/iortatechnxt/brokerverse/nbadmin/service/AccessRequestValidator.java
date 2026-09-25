@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 /**
  * Checks a user access request before it is submitted: the user must not exist for a creation and
  * must exist for any other request, roles must exist, and a creation needs a full name.
+ * Role-permission changes (PMADD05) are checked by {@link RolePermissionChangeValidator}.
  */
 @Component
 public class AccessRequestValidator {
@@ -23,16 +24,22 @@ public class AccessRequestValidator {
 
   private final AppUserRepository users;
   private final RoleRepository roles;
+  private final RolePermissionChangeValidator permissionChanges;
 
   /**
    * Creates the validator.
    *
    * @param users users
    * @param roles roles
+   * @param permissionChanges role-permission change checks (PMADD05)
    */
-  public AccessRequestValidator(AppUserRepository users, RoleRepository roles) {
+  public AccessRequestValidator(
+      AppUserRepository users,
+      RoleRepository roles,
+      RolePermissionChangeValidator permissionChanges) {
     this.users = users;
     this.roles = roles;
+    this.permissionChanges = permissionChanges;
   }
 
   /**
@@ -42,6 +49,9 @@ public class AccessRequestValidator {
    * @return normalised content
    */
   public AccessRequestContent validate(AccessRequestContent c) {
+    if (c.type() == AccessRequestType.MODIFY_ROLE_PERMISSIONS) {
+      return permissionChanges.validate(c);
+    }
     String username = c.username() == null ? "" : c.username().trim();
     if (!USERNAME.matcher(username).matches()) {
       throw new BusinessRuleException(

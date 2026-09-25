@@ -170,7 +170,7 @@ export default function ProductsPage() {
   return (
     <div className="stack">
       <PageHeader
-        section="Products & Insurers"
+        section="Product Maintenance"
         title="Products"
         description="Products offered to clients, the data and documents each requires, and when TSU reviews an account."
         actions={

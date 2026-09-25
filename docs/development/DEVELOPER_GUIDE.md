@@ -102,12 +102,14 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
   | V600–V649 | budgets, consolidation, inter-company |
   | V650–V699 | finance / MIS reports support objects |
   | V700–V749 | tax & statutory reporting (BIR / LGU / BFP returns, 2307, IC schedules) |
-  | V750–V759, V790–V799 | broking foundations (lov, workflow, bulk, messaging, docgen) and broking administration |
+  | V750–V759, V790–V799 | broking foundations (lov, workflow, bulk, messaging, docgen) and broking administration (V790 access requests and retention, V791 role-permission change requests) |
+  | V755 | Product Maintenance (BRD-3) foundation: roles, grants, permission action classes (`sec_permission_action`), LOV types, workflow `PM_PACKAGE_REQUEST`, parameters |
   | V760–V789 | Operations (BRD-2): foundation, invoice ledger and platform extensions V760–V762, then cashiering, remittance, product reconciliation, adjustment and commission receivables in their own sub-ranges |
   | V800–V889 | broking business modules (crm V800s, catalog V810s, account V820s, quotation V830s, non-package V840s, placement V850s, issuance V860s, booking V870s, NB reports V880s) |
+  | V813–V819 | catalog extensions and Product Maintenance (catalog V813–V815, `productmaint` V816–V819); the version columns of account, quotation and booking are V821, V831 and V871 in their own ranges |
   | V890–V899 | Accounting, Disbursement and ACSL (BRD-5): disbursement V891–V893, payrequest V894–V895, acsl V896–V897, frbs V898–V899, foundation V890 |
   | V1000–V1899 | modules of later BRDs, 10 versions each: Collections (BRD-4) V1000–V1009, then the next BRD V1010–V1019 and so on |
-  | V900–V999 | demo data (`db/demo`, loaded only with the `demo` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989, Operations V990–V995, Product Maintenance V996–V997, Accounting / Disbursement V998–V999 (full) |
+  | V900–V999 | demo data (`db/demo`, loaded only with the `demo` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989, Operations V990–V995, Product Maintenance V996–V998 (V996 catalog versions, V997 package requests, V998 Product Maintenance users), Accounting / Disbursement V999 (reference data and users only; its storyline runs as Java demo runners) (full) |
   | V1900–V1999 | demo data of the V1000+ modules, 10 versions each in the same order: Collections V1900–V1909, then V1910–V1919 … (runs after all V9xx demo, so it can build on the Operations and booking demo) |
 
   Because each module owns a range, a module can add a migration whose version is lower than one

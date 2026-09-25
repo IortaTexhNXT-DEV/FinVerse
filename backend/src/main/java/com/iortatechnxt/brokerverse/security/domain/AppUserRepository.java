@@ -34,6 +34,15 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
   boolean existsByWindowsIdIgnoreCase(String windowsId);
 
   /**
+   * Whether a Windows ID is used by a user other than the given one.
+   *
+   * @param windowsId Windows ID
+   * @param id the user that may keep it
+   * @return true when another user has it
+   */
+  boolean existsByWindowsIdIgnoreCaseAndIdNot(String windowsId, Long id);
+
+  /**
    * Enabled users holding a permission through any of their active roles.
    *
    * @param permission permission

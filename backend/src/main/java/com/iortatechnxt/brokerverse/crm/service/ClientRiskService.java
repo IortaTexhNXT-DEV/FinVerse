@@ -38,6 +38,7 @@ public class ClientRiskService {
   public static final String SOURCE_MANUAL = "MANUAL";
 
   private static final String RATING_LIST = "KYC_RISK_RATING";
+  private static final int DESCRIPTION_CAPACITY = 160;
 
   private final ClientService clients;
   private final ClientNotesService notes;
@@ -160,7 +161,8 @@ public class ClientRiskService {
 
   private static String describe(ClientRiskProfile p, RiskProfileChange change) {
     StringBuilder sb =
-        new StringBuilder("Risk rating ")
+        new StringBuilder(DESCRIPTION_CAPACITY)
+            .append("Risk rating ")
             .append(p.previousRating())
             .append(" -> ")
             .append(p.riskRating());

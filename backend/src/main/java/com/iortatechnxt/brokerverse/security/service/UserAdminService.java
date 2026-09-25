@@ -43,6 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@SuppressWarnings(
+    "PMD.GodClass") // one facade of user and role changes: every change writes the change log
 public class UserAdminService {
 
   private static final String USER = "AppUser";
@@ -444,9 +446,7 @@ public class UserAdminService {
   private void applyDirectoryAttributes(AppUser user, UserRequest request) {
     if (request.windowsId() != null) {
       String windowsId = blankToNull(request.windowsId());
-      if (windowsId != null
-          && !windowsId.equalsIgnoreCase(user.getWindowsId())
-          && users.existsByWindowsIdIgnoreCase(windowsId)) {
+      if (windowsId != null && windowsIdTaken(windowsId, user.getId())) {
         throw new BusinessRuleException(
             "WINDOWS_ID_IN_USE", "Windows ID " + windowsId + " is already used by another user");
       }
@@ -458,6 +458,12 @@ public class UserAdminService {
     if (request.userLevel() != null) {
       user.setUserLevel(blankToNull(request.userLevel()));
     }
+  }
+
+  private boolean windowsIdTaken(String windowsId, Long userId) {
+    return userId == null
+        ? users.existsByWindowsIdIgnoreCase(windowsId)
+        : users.existsByWindowsIdIgnoreCaseAndIdNot(windowsId, userId);
   }
 
   private static void applyRole(Role role, RoleRequest request) {

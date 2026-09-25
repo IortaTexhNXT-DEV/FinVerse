@@ -20,6 +20,10 @@ export interface UserProfile {
   homeBranchId?: number;
   authorizationLimit?: number;
   lastLoginAt?: string;
+  /** Windows ID, business unit group and user level (BRD 1.002.1.1.1; UAM-NFR-15). */
+  windowsId?: string;
+  businessUnitCode?: string;
+  userLevel?: string;
   roles: string[];
   permissions: string[];
 }

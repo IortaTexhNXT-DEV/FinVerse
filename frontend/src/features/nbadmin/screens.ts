@@ -3,8 +3,8 @@ import { lazy } from 'react';
 import type { ScreenDef } from '@/navigation/types';
 
 /**
- * Broking Administration screens (nbadmin), shown in the Broking Setup section: lists of values,
- * user access requests, the user access matrix and data retention.
+ * Broking Administration screens (nbadmin), shown in the Broking Setup section: lists of values
+ * and data retention. The access requests and the user access matrix moved to User Access.
  */
 export const NBADMIN_SCREENS: ScreenDef[] = [
   {
@@ -15,21 +15,24 @@ export const NBADMIN_SCREENS: ScreenDef[] = [
     alsoPermissions: ['MASTER_AUTHORIZE'],
     component: lazy(() => import('./LovPage')),
   },
+  // Moved to the User Access section (BRD-11, wave U1-A); the old routes redirect.
   {
     path: '/broking-setup/access-requests',
     label: 'Access Requests',
     icon: UserCog,
-    permission: 'ACCESS_REQUEST',
-    alsoPermissions: ['ACCESS_APPROVE'],
-    component: lazy(() => import('./AccessRequestsPage')),
+    component: lazy(() =>
+      import('./legacyRedirects').then((m) => ({ default: m.AccessRequestsRedirect })),
+    ),
+    hidden: true,
   },
   {
     path: '/broking-setup/access-matrix',
     label: 'User Access Matrix',
     icon: Grid3x3,
-    permission: 'ACCESS_REQUEST',
-    alsoPermissions: ['ACCESS_APPROVE', 'ROLE_MANAGE', 'AUDIT_VIEW'],
-    component: lazy(() => import('./AccessMatrixPage')),
+    component: lazy(() =>
+      import('./legacyRedirects').then((m) => ({ default: m.AccessMatrixRedirect })),
+    ),
+    hidden: true,
   },
   {
     path: '/broking-setup/retention',

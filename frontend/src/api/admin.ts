@@ -6,7 +6,13 @@ export interface Role {
   code: string;
   name: string;
   permissions: string[];
+  /** Inactive profiles grant nothing (BRD 3.002.3). */
+  active?: boolean;
+  description?: string;
+  privilegeLevel?: 'LOW' | 'STANDARD' | 'HIGH' | 'ADMIN';
 }
+
+export type RoleInput = Pick<Role, 'code' | 'name' | 'permissions'>;
 
 export interface UserInput {
   username: string;
@@ -41,8 +47,8 @@ export const adminApi = {
     api.post<undefined>(`/admin/users/${id}/reset-password`, { newPassword }),
   roles: () => api.get<Role[]>('/admin/roles'),
   permissions: () => api.get<string[]>('/admin/permissions'),
-  updateRole: (id: number, body: Omit<Role, 'id'>) => api.put<Role>(`/admin/roles/${id}`, body),
-  createRole: (body: Omit<Role, 'id'>) => api.post<Role>('/admin/roles', body),
+  updateRole: (id: number, body: RoleInput) => api.put<Role>(`/admin/roles/${id}`, body),
+  createRole: (body: RoleInput) => api.post<Role>('/admin/roles', body),
   audit: (params: {
     from: string;
     to: string;

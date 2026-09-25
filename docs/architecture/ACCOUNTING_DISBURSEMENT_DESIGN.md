@@ -1000,9 +1000,10 @@ additions, and where it differs from or details sections 5.4, 6, 7.3, 10 and 12.
   - Unit: `ScheduleMathTest`, `ServiceFeeCalculatorTest`, `FormWorksheetTest`.
   - Frontend: `frbs.test.ts`, `birOutputs.test.ts`.
 - **Gaps and parked items (seams built).**
-  - **Word output of board-deck schedules.** The report platform renders PDF, Excel, ODS, CSV and XML only. The GARD
-    and subsidiaries schedules and the Mancom summary are flagged "Word requested". They are exported to PDF and
-    Excel until a Word renderer is added to `report/render` (owner: report platform).
+  - **Word output of board-deck schedules: closed.** `DocxReportRenderer` (report platform, client requirement 16)
+    exports the GARD and subsidiaries schedules (`GL-SCHEDULE`), the actual vs budget (`GL-BVA`) and the Mancom
+    summary (`FRBS-MANCOM-MARKET`) to Word as well as Excel and PDF; these reports are declared documents
+    (`ReportMetadata.asDocument`) and the Report Pack shows a Word button where "Word requested" is set.
   - Layouts of GARD, subsidiaries and Mancom (AQ05) and segment budgets.
   - The real chart behind the selectors (AQ01).
   - Service-fee rates, recipients and liquidation content (AQ20).

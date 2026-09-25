@@ -11,6 +11,7 @@ import org.apache.poi.util.Units;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.Borders;
 import org.apache.poi.xwpf.usermodel.Document;
+import org.apache.poi.xwpf.usermodel.LineSpacingRule;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFFooter;
@@ -50,6 +51,8 @@ public final class BrandedDocx {
   private static final int GRID_SIZE = 4;
   private static final int GOLD_RULE_SIZE = 12;
   private static final int CELL_MARGIN = 60;
+  private static final int CELL_MARGIN_VERTICAL = 20;
+  private static final int HEADING_SPACE_BEFORE = 200;
   private static final double LOGO_HEIGHT_POINTS = 22;
   private static final double FOOTER_SIZE = 7;
   private static final String GREY = "808080";
@@ -153,6 +156,9 @@ public final class BrandedDocx {
   public XWPFParagraph paragraph(String text, TextStyle textStyle) {
     XWPFParagraph p = doc.createParagraph();
     p.setSpacingAfter(textStyle.spacingAfter());
+    if (textStyle == TextStyle.HEADING) {
+      p.setSpacingBefore(HEADING_SPACE_BEFORE);
+    }
     style(p.createRun(), text, textStyle);
     return p;
   }
@@ -211,7 +217,7 @@ public final class BrandedDocx {
     table.setRightBorder(XWPFBorderType.SINGLE, GRID_SIZE, 0, BrandAssets.GRID);
     table.setInsideHBorder(XWPFBorderType.SINGLE, GRID_SIZE, 0, BrandAssets.GRID);
     table.setInsideVBorder(XWPFBorderType.SINGLE, GRID_SIZE, 0, BrandAssets.GRID);
-    table.setCellMargins(CELL_MARGIN, CELL_MARGIN, CELL_MARGIN, CELL_MARGIN);
+    table.setCellMargins(CELL_MARGIN_VERTICAL, CELL_MARGIN, CELL_MARGIN_VERTICAL, CELL_MARGIN);
     return table;
   }
 
@@ -242,7 +248,9 @@ public final class BrandedDocx {
   public static void cell(
       XWPFTableCell cell, String text, TextStyle textStyle, boolean right, String fill) {
     XWPFParagraph p = cell.getParagraphs().get(0);
+    p.setSpacingBefore(0);
     p.setSpacingAfter(0);
+    p.setSpacingBetween(1.0, LineSpacingRule.AUTO);
     if (right) {
       p.setAlignment(ParagraphAlignment.RIGHT);
     }
@@ -324,18 +332,20 @@ public final class BrandedDocx {
   }
 
   private static void field(XWPFParagraph p, String instruction) {
-    XWPFRun begin = p.createRun();
-    begin.getCTR().addNewFldChar().setFldCharType(STFldCharType.BEGIN);
-    XWPFRun code = p.createRun();
-    code.getCTR().addNewInstrText().setStringValue(" " + instruction + " ");
-    XWPFRun separate = p.createRun();
-    separate.getCTR().addNewFldChar().setFldCharType(STFldCharType.SEPARATE);
-    XWPFRun value = p.createRun();
-    value.setText("1");
-    value.setFontSize(FOOTER_SIZE);
-    value.setColor(GREY);
-    XWPFRun end = p.createRun();
-    end.getCTR().addNewFldChar().setFldCharType(STFldCharType.END);
+    footerRun(p).getCTR().addNewFldChar().setFldCharType(STFldCharType.BEGIN);
+    footerRun(p).getCTR().addNewInstrText().setStringValue(" " + instruction + " ");
+    footerRun(p).getCTR().addNewFldChar().setFldCharType(STFldCharType.SEPARATE);
+    footerRun(p).setText("1");
+    footerRun(p).getCTR().addNewFldChar().setFldCharType(STFldCharType.END);
+  }
+
+  /** A run in the footer style (field runs carry it too, so the page numbers match the text). */
+  private static XWPFRun footerRun(XWPFParagraph p) {
+    XWPFRun run = p.createRun();
+    run.setFontFamily(BrandAssets.FONT);
+    run.setFontSize(FOOTER_SIZE);
+    run.setColor(GREY);
+    return run;
   }
 
   private static BigInteger twips(long value) {

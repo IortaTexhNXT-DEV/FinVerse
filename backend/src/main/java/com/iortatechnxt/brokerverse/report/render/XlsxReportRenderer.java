@@ -79,13 +79,14 @@ public class XlsxReportRenderer implements ReportRenderer {
       int headerRow = r;
       Row head = sheet.createRow(r++);
       text(head, 0, "", styles.head);
+      // Column widths in column order: Excel refuses a sheet whose column list is not sorted.
+      sheet.setColumnWidth(0, LABEL_WIDTH);
       List<ReportColumn> cols = result.columns();
       for (int i = 0; i < cols.size(); i++) {
         text(head, i + 1, cols.get(i).label(), styles.head);
         sheet.setColumnWidth(
             i + 1, cols.get(i).type() == ColumnType.TEXT ? TEXT_WIDTH : NUMBER_WIDTH);
       }
-      sheet.setColumnWidth(0, LABEL_WIDTH);
       sheet.createFreezePane(1, headerRow + 1);
       printSetup(sheet, result, context, headerRow);
       for (ReportRow row : result.rows()) {

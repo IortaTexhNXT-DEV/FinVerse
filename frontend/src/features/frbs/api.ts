@@ -69,6 +69,7 @@ export interface ScheduleValues {
 export interface Schedule {
   code: string;
   values: ScheduleValues;
+  /** Also exported to Word (board document, client requirement 16). */
   wordOutput: boolean;
   updatedAt: string;
 }

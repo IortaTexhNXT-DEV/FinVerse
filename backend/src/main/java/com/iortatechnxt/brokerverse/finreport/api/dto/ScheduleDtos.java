@@ -111,7 +111,8 @@ public final class ScheduleDtos {
    *
    * @param code code
    * @param values content
-   * @param wordOutput whether a Word document is available (board decks; not yet, gap)
+   * @param wordOutput whether the schedule is also exported to Word (board decks, client requirement
+   *     16)
    * @param updatedAt last change
    */
   public record ScheduleResponse(
@@ -127,7 +128,7 @@ public final class ScheduleDtos {
       return new ScheduleResponse(
           d.getCode(),
           d.values(),
-          false,
+          d.values().boardDocument(),
           d.getUpdatedAt() == null ? d.getCreatedAt() : d.getUpdatedAt());
     }
   }

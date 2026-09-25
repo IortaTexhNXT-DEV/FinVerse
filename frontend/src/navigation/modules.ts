@@ -23,6 +23,7 @@ import { frbsModule } from '@/features/frbs/module';
 import { glModule } from '@/features/gl/module';
 import { helpModule } from '@/features/help/module';
 import { issuanceModule } from '@/features/issuance/module';
+import { userAccessModule } from '@/features/nbadmin/userAccessModule';
 import { nbDashboardModule, nbReportsModule } from '@/features/nbreports/module';
 import { operationsModule } from '@/features/operations/module';
 import { withJournalAutomation } from '@/features/journaltools/module';
@@ -36,6 +37,8 @@ import { reinsuranceModule } from '@/features/reinsurance/module';
 import { remittanceModule } from '@/features/remittance/module';
 import { reportsModule } from '@/features/reports/module';
 import { reservesModule } from '@/features/reserves/module';
+import { screeningModule } from '@/features/screening/module';
+import { screeningSetupModule } from '@/features/screening/setupModule';
 import { setupModule } from '@/features/setup/module';
 import { taxModule } from '@/features/tax/module';
 import { underwritingModule } from '@/features/underwriting/module';
@@ -60,6 +63,8 @@ export const NAV_GROUPS: NavGroup[] = [
     title: 'Client & Policy',
     modules: [
       crmModule,
+      // Sanction Screening (BRD-10) after Client Management, SANCTION_SCREENING_DESIGN 11.2.
+      screeningModule,
       quotationsModule,
       accountsModule,
       proposalsModule,
@@ -110,7 +115,16 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     id: 'setup',
     title: 'Setup & Administration',
-    modules: [brokingSetupModule, setupModule, adminModule, helpModule],
+    modules: [
+      brokingSetupModule,
+      // Compliance Setup (BRD-10), SANCTION_SCREENING_DESIGN 11.2.
+      screeningSetupModule,
+      setupModule,
+      // User Access (BRD-11) before Administration, USER_ACCESS_DESIGN 11.2.
+      userAccessModule,
+      adminModule,
+      helpModule,
+    ],
   },
 ];
 

@@ -20,6 +20,10 @@ import java.util.Objects;
  * @param remarks remarks printed on the quotation
  * @param items risk items with their premium
  * @param premium premium breakdown of all items, {@link AccountPremium#NONE} until rated
+ * @param schemeVersion package version that priced the content (BRPM.007), null for a product
+ *     without versions or content written before versions existed
+ * @param schemeDeviation an item rate differs from the scheme rate: submission needs an approved
+ *     rate exception
  */
 public record QuotationContent(
     String insurerCode,
@@ -31,12 +35,54 @@ public record QuotationContent(
     String ratingBasis,
     String remarks,
     List<QuotationItem> items,
-    AccountPremium premium) {
+    AccountPremium premium,
+    Integer schemeVersion,
+    boolean schemeDeviation) {
 
   /** Defensive copy; a missing premium means not rated. */
   public QuotationContent {
     items = items == null ? List.of() : List.copyOf(items);
     premium = premium == null ? AccountPremium.NONE : premium;
+  }
+
+  /**
+   * Content not yet priced on a package version.
+   *
+   * @param insurerCode insurer party code
+   * @param insurerBranch insurer branch
+   * @param periodFrom period start
+   * @param periodTo period end
+   * @param validUntil validity
+   * @param directPayment direct payment
+   * @param ratingBasis rating basis
+   * @param remarks remarks
+   * @param items items
+   * @param premium premium breakdown
+   */
+  public QuotationContent(
+      String insurerCode,
+      String insurerBranch,
+      LocalDate periodFrom,
+      LocalDate periodTo,
+      LocalDate validUntil,
+      boolean directPayment,
+      String ratingBasis,
+      String remarks,
+      List<QuotationItem> items,
+      AccountPremium premium) {
+    this(
+        insurerCode,
+        insurerBranch,
+        periodFrom,
+        periodTo,
+        validUntil,
+        directPayment,
+        ratingBasis,
+        remarks,
+        items,
+        premium,
+        null,
+        false);
   }
 
   /**

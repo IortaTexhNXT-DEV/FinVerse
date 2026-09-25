@@ -40,6 +40,8 @@ import java.util.List;
  * @param createdBy maker
  * @param createdAt created
  * @param content current content
+ * @param productVersionNo package version that priced the current version (BRPM.007)
+ * @param rateOverrideRef approved rate-scheme exception used, null when none
  */
 public record QuotationResponse(
     Long id,
@@ -72,7 +74,9 @@ public record QuotationResponse(
     List<String> accountArns,
     String createdBy,
     Instant createdAt,
-    QuotationContentResponse content) {
+    QuotationContentResponse content,
+    Integer productVersionNo,
+    String rateOverrideRef) {
 
   /**
    * Maps a quotation (account references loaded) with its current content.
@@ -113,6 +117,8 @@ public record QuotationResponse(
         List.copyOf(q.getAccountArns()),
         q.getCreatedBy(),
         q.getCreatedAt(),
-        QuotationContentResponse.from(content));
+        QuotationContentResponse.from(content),
+        content.schemeVersion(),
+        q.getRateOverrideRef());
   }
 }

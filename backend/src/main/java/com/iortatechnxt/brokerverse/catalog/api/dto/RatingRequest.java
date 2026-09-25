@@ -8,6 +8,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,6 +28,8 @@ import java.util.List;
  * @param periodTo period end
  * @param commissionRate commission override %, optional
  * @param endorsement endorsement (no minimum premium)
+ * @param schemeVersion package version to price on (history look-up of the calculator, BRPM.007),
+ *     empty for the version in force
  */
 public record RatingRequest(
     @NotNull Long companyId,
@@ -39,7 +42,8 @@ public record RatingRequest(
     LocalDate periodFrom,
     LocalDate periodTo,
     @DecimalMin("0") @DecimalMax("100") BigDecimal commissionRate,
-    boolean endorsement) {
+    boolean endorsement,
+    @Positive Integer schemeVersion) {
 
   /**
    * One item to rate.
@@ -80,6 +84,9 @@ public record RatingRequest(
         periodTo,
         commissionRate,
         endorsement,
+        null,
+        schemeVersion == null ? null : RatingQuery.Purpose.RENEWAL,
+        schemeVersion,
         null);
   }
 

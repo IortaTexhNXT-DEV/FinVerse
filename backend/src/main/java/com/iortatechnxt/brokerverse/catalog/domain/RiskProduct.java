@@ -82,6 +82,10 @@ public class RiskProduct extends AuthorizableEntity implements CatalogRecord {
   @Column(name = "tsu_involvement", nullable = false, length = 20)
   private TsuInvolvement tsuInvolvement;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "lifecycle_status", nullable = false, length = 10)
+  private ProductLifecycle lifecycleStatus = ProductLifecycle.ACTIVE;
+
   protected RiskProduct() {}
 
   /**
@@ -103,6 +107,24 @@ public class RiskProduct extends AuthorizableEntity implements CatalogRecord {
   public void update(ProductDetails details) {
     apply(details);
     markModified();
+  }
+
+  /**
+   * Changes the product; the commercial columns of a versioned package are owned by its versions
+   * (BRPM.007) and cannot be changed here.
+   *
+   * @param details new attributes
+   * @param versioned whether the product has package versions
+   */
+  public void update(ProductDetails details, boolean versioned) {
+    if (packaged && versioned && changesVersionedColumns(details)) {
+      throw new BusinessRuleException(
+          "PRODUCT_FIELD_VERSIONED",
+          "The rate, minimum premium, commission and TSI limit of package "
+              + code
+              + " change through a new version (Versions tab)");
+    }
+    update(details);
   }
 
   private static int requireValid(ProductDetails d) {
@@ -141,6 +163,65 @@ public class RiskProduct extends AuthorizableEntity implements CatalogRecord {
     this.minimumPremium = d.minimumPremium();
     this.maxSumInsured = d.maxSumInsured();
     this.tsuInvolvement = d.tsuInvolvement() == null ? TsuInvolvement.BY_RULES : d.tsuInvolvement();
+  }
+
+  /**
+   * Writes the rate scheme of the released package version on the commercial columns (BRPM.007;
+   * PRODUCT_MAINTENANCE_DESIGN section 4.2). The release is the checkpoint, so the product is not
+   * re-authorised; the product becomes sellable again if it had expired (REACTIVATE request).
+   *
+   * @param scheme rate scheme of the released version
+   */
+  public void projectScheme(SchemeTerms scheme) {
+    this.defaultRate = scheme.defaultRate();
+    this.minimumPremium = scheme.minimumPremium();
+    this.defaultCommissionRate = scheme.defaultCommissionRate();
+    this.maxSumInsured = scheme.maxSumInsured();
+    this.lifecycleStatus = ProductLifecycle.ACTIVE;
+  }
+
+  /**
+   * Whether new details would change a column that a package version owns (rate, minimum premium,
+   * commission or TSI limit).
+   *
+   * @param d new details
+   * @return true when a versioned column differs
+   */
+  public boolean changesVersionedColumns(ProductDetails d) {
+    return differs(defaultRate, d.defaultRate())
+        || differs(minimumPremium, d.minimumPremium())
+        || differs(defaultCommissionRate, d.defaultCommissionRate())
+        || differs(maxSumInsured, d.maxSumInsured());
+  }
+
+  private static boolean differs(BigDecimal a, BigDecimal b) {
+    if (a == null || b == null) {
+      return !(a == null && b == null);
+    }
+    return a.compareTo(b) != 0;
+  }
+
+  /**
+   * Changes the commercial lifecycle (BRPM.006): EXPIRED by the expiry step, RETIRED by a RETIRE
+   * request. Nothing is deleted.
+   *
+   * @param lifecycle new lifecycle
+   */
+  public void changeLifecycle(ProductLifecycle lifecycle) {
+    this.lifecycleStatus = lifecycle;
+  }
+
+  /**
+   * Whether the product may be sold to new business: authorised, active and not expired or retired.
+   *
+   * @return true when sellable
+   */
+  public boolean isSellable() {
+    return isActive() && lifecycleStatus == ProductLifecycle.ACTIVE;
+  }
+
+  public ProductLifecycle getLifecycleStatus() {
+    return lifecycleStatus;
   }
 
   /**

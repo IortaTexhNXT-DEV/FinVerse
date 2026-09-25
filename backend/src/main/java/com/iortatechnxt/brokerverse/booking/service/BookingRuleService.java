@@ -6,6 +6,9 @@ import com.iortatechnxt.brokerverse.booking.domain.AutoBookRule;
 import com.iortatechnxt.brokerverse.booking.domain.AutoBookRuleRepository;
 import com.iortatechnxt.brokerverse.booking.domain.IncentiveRule;
 import com.iortatechnxt.brokerverse.booking.domain.IncentiveRuleRepository;
+import com.iortatechnxt.brokerverse.catalog.service.IncentiveCriteriaService;
+import com.iortatechnxt.brokerverse.catalog.service.IncentiveCriteriaService.IncentiveFacts;
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import java.time.LocalDate;
 import java.util.List;
@@ -14,7 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Booking rules maintained on the setup screen: auto-book rules (BRNB.076) and incentive
- * eligibility rules (BRNB.107, content parked Q33). Every change is audited.
+ * eligibility (BRNB.107). Every change is audited.
+ *
+ * <p>Product Maintenance (PMADD07/08; PRODUCT_MAINTENANCE_DESIGN section 9.4): incentive
+ * eligibility is decided by the catalog incentive criteria ({@link IncentiveCriteriaService}); the
+ * booking incentive rules were copied into the catalog (V871) and are frozen: they stay readable
+ * and can no longer be created or changed here ({@code INCENTIVE_RULES_FROZEN}).
  */
 @Service
 @Transactional
@@ -25,21 +33,25 @@ public class BookingRuleService {
 
   private final AutoBookRuleRepository autoBook;
   private final IncentiveRuleRepository incentives;
+  private final IncentiveCriteriaService criteria;
   private final AuditTrailService audit;
 
   /**
    * Creates the service.
    *
    * @param autoBook auto-book rules
-   * @param incentives incentive rules
+   * @param incentives frozen booking incentive rules (read-only)
+   * @param criteria catalog incentive criteria
    * @param audit audit trail
    */
   public BookingRuleService(
       AutoBookRuleRepository autoBook,
       IncentiveRuleRepository incentives,
+      IncentiveCriteriaService criteria,
       AuditTrailService audit) {
     this.autoBook = autoBook;
     this.incentives = incentives;
+    this.criteria = criteria;
     this.audit = audit;
   }
 
@@ -107,46 +119,70 @@ public class BookingRuleService {
   }
 
   /**
-   * Whether a booking is incentive eligible: an active rule matches its product, segment, channel
-   * and booking date (BRNB.107).
+   * The codes of the catalog incentive criteria a booking matches (PMADD07; BRNB.107).
    *
    * @param companyId company
-   * @param facts product, segment and channel
+   * @param facts product, cover type, segment, channel and insurer
+   * @param date booking date
+   * @return criteria codes, empty when not eligible
+   */
+  @Transactional(readOnly = true)
+  public List<String> incentiveCriteria(Long companyId, RuleFacts facts, LocalDate date) {
+    return criteria.matching(
+        companyId,
+        new IncentiveFacts(
+            facts.productCode(),
+            facts.coverTypeCode(),
+            facts.segment(),
+            facts.channel(),
+            facts.insurerCode(),
+            date));
+  }
+
+  /**
+   * Whether a booking is incentive eligible: at least one catalog incentive criterion matches
+   * (PMADD07; BRNB.107).
+   *
+   * @param companyId company
+   * @param facts product, cover type, segment, channel and insurer
    * @param date booking date
    * @return incentive flag
    */
   @Transactional(readOnly = true)
   public boolean incentiveEligible(Long companyId, RuleFacts facts, LocalDate date) {
-    return incentiveRules(companyId).stream()
-        .anyMatch(r -> r.matches(facts.productCode(), facts.segment(), facts.channel(), date));
+    return !incentiveCriteria(companyId, facts, date).isEmpty();
   }
 
   /**
-   * Adds an incentive rule.
+   * Refused: the booking incentive rules are frozen; incentive criteria are maintained in Product
+   * Maintenance (PMADD07).
    *
    * @param companyId company
-   * @param criteria criteria
-   * @return rule
+   * @param rule criteria
+   * @return never
    */
-  public IncentiveRule createIncentiveRule(Long companyId, IncentiveRule.Criteria criteria) {
-    IncentiveRule rule = incentives.save(new IncentiveRule(companyId, criteria));
-    audit.record(INCENTIVE, rule.getId(), AuditAction.CREATE, rule.getDescription());
-    return rule;
+  public IncentiveRule createIncentiveRule(Long companyId, IncentiveRule.Criteria rule) {
+    throw frozen();
   }
 
   /**
-   * Changes an incentive rule.
+   * Refused: the booking incentive rules are frozen (PMADD07).
    *
    * @param id rule
-   * @param criteria criteria
-   * @return rule
+   * @param rule criteria
+   * @return never
    */
-  public IncentiveRule updateIncentiveRule(Long id, IncentiveRule.Criteria criteria) {
-    IncentiveRule rule =
-        incentives.findById(id).orElseThrow(() -> new ResourceNotFoundException(INCENTIVE, id));
-    rule.apply(criteria);
-    audit.record(INCENTIVE, rule.getId(), AuditAction.UPDATE, rule.getDescription());
-    return rule;
+  public IncentiveRule updateIncentiveRule(Long id, IncentiveRule.Criteria rule) {
+    if (!incentives.existsById(id)) {
+      throw new ResourceNotFoundException(INCENTIVE, id);
+    }
+    throw frozen();
+  }
+
+  private static BusinessRuleException frozen() {
+    return new BusinessRuleException(
+        "INCENTIVE_RULES_FROZEN",
+        "Incentive rules are maintained in Product Maintenance > Incentive Criteria");
   }
 
   private static String describe(AutoBookRule rule) {
@@ -159,11 +195,18 @@ public class BookingRuleService {
   }
 
   /**
-   * What a rule is matched on.
+   * What an incentive criterion is matched on.
    *
    * @param productCode product
+   * @param coverTypeCode cover type
    * @param segment market segment
    * @param channel source channel
+   * @param insurerCode lead insurer
    */
-  public record RuleFacts(String productCode, String segment, String channel) {}
+  public record RuleFacts(
+      String productCode,
+      String coverTypeCode,
+      String segment,
+      String channel,
+      String insurerCode) {}
 }

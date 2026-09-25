@@ -19,6 +19,8 @@ export interface CalcForm {
   multiYear: boolean;
   endorsement: boolean;
   commissionRate: string;
+  /** Package version to price on (history, BRPM.007); empty for the version in force. */
+  schemeVersion: string;
   items: CalcItem[];
 }
 
@@ -41,6 +43,7 @@ export function newCalcForm(): CalcForm {
     multiYear: false,
     endorsement: false,
     commissionRate: '',
+    schemeVersion: '',
     items: [{ ...EMPTY_ITEM }],
   };
 }
@@ -91,6 +94,7 @@ export function toRatingInput(
     periodTo: form.periodTo || undefined,
     commissionRate: number(form.commissionRate),
     endorsement: form.endorsement,
+    schemeVersion: number(form.schemeVersion),
     items: form.items
       .filter((i) => number(i.sumInsured) !== undefined)
       .map((i, index) => ({

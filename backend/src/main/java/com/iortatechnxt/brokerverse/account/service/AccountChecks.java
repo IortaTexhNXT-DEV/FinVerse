@@ -17,7 +17,9 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.FieldValidationException;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -74,7 +76,7 @@ public class AccountChecks {
     AccountData data = snapshot(account);
     TsuDecision decision = tsu.evaluate(product, tsuFacts(product, data));
     return new AccountCheck(
-        rules.missingFields(product, AccountFields.presence(data)),
+        fieldErrors(product, data),
         missingDocuments(product, account),
         duplicates.findings(subject(account.getCompanyId(), account.getId(), data)),
         account.getPremium().isRated(),
@@ -82,6 +84,17 @@ public class AccountChecks {
         decision.ruleCode(),
         decision.reason(),
         account.getTsu().clearedAt() != null);
+  }
+
+  /**
+   * Field errors of account data: the minimum-field matrix and the typed field rules of the product
+   * (BRNB.002/003, BRPM.004).
+   */
+  private Map<String, String> fieldErrors(RiskProduct product, AccountData data) {
+    Map<String, String> errors =
+        new LinkedHashMap<>(rules.missingFields(product, AccountFields.presence(data)));
+    rules.violations(product, AccountFields.values(data)).forEach(errors::putIfAbsent);
+    return errors;
   }
 
   /**
@@ -95,7 +108,7 @@ public class AccountChecks {
   public AccountCheck checkData(Long companyId, AccountData data, RiskProduct product) {
     TsuDecision decision = tsu.evaluate(product, tsuFacts(product, data));
     return new AccountCheck(
-        rules.missingFields(product, AccountFields.presence(data)),
+        fieldErrors(product, data),
         List.of(),
         duplicates.findings(subject(companyId, null, data)),
         true,

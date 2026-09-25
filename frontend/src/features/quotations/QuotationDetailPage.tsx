@@ -31,6 +31,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { formatAmount, formatDate } from '@/utils/format';
 import { QuotationActions } from './QuotationActions';
+import { RateSchemePanel } from './RateExceptionDialog';
 import { DetailsTab, HistoryTab, ItemsTab, VersionsTab } from './QuotationTabs';
 import { RecordSummary } from '@/components/broking/RecordSummary';
 import type { Fact } from '@/components/broking/RecordSummary';
@@ -246,6 +247,7 @@ export default function QuotationDetailPage() {
         facts={facts(q)}
       />
       <InstructionsBanner clientId={q.clientId} />
+      <RateSchemePanel quotation={q} />
       <WorkflowPanel
         entityType={QUOTATION_ENTITY}
         entityId={q.id}

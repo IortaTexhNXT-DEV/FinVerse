@@ -59,11 +59,15 @@ public class CatalogRuleController {
    */
   @PostMapping("/field-rules")
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize(CatalogAccess.MAINTAIN)
+  @PreAuthorize(CatalogAccess.MAINTAIN_PRODUCTS)
   public FieldRuleResponse createFieldRule(@Valid @RequestBody FieldRuleRequest request) {
     return FieldRuleResponse.from(
         rules.createFieldRule(
-            request.key(), request.label().trim(), request.required(), request.sortOrder()));
+            request.key(),
+            request.label().trim(),
+            request.required(),
+            request.sortOrder(),
+            request.check()));
   }
 
   /**
@@ -74,11 +78,12 @@ public class CatalogRuleController {
    * @return rule
    */
   @PutMapping("/field-rules/{id}")
-  @PreAuthorize(CatalogAccess.MAINTAIN)
+  @PreAuthorize(CatalogAccess.MAINTAIN_PRODUCTS)
   public FieldRuleResponse updateFieldRule(
       @PathVariable Long id, @Valid @RequestBody FieldRuleRequest request) {
     return FieldRuleResponse.from(
-        rules.updateFieldRule(id, request.label().trim(), request.required(), request.sortOrder()));
+        rules.updateFieldRule(
+            id, request.label().trim(), request.required(), request.sortOrder(), request.check()));
   }
 
   /**
@@ -100,7 +105,7 @@ public class CatalogRuleController {
    */
   @PostMapping("/document-rules")
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize(CatalogAccess.MAINTAIN)
+  @PreAuthorize(CatalogAccess.MAINTAIN_PRODUCTS)
   public DocumentRuleResponse createDocumentRule(@Valid @RequestBody DocumentRuleRequest request) {
     return DocumentRuleResponse.from(
         rules.createDocumentRule(
@@ -115,7 +120,7 @@ public class CatalogRuleController {
    * @return rule
    */
   @PutMapping("/document-rules/{id}")
-  @PreAuthorize(CatalogAccess.MAINTAIN)
+  @PreAuthorize(CatalogAccess.MAINTAIN_PRODUCTS)
   public DocumentRuleResponse updateDocumentRule(
       @PathVariable Long id, @Valid @RequestBody DocumentRuleRequest request) {
     return DocumentRuleResponse.from(rules.updateDocumentRule(id, request.required()));
@@ -140,7 +145,7 @@ public class CatalogRuleController {
    */
   @PostMapping("/tsu-rules")
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize(CatalogAccess.MAINTAIN)
+  @PreAuthorize(CatalogAccess.MAINTAIN_PRODUCTS)
   public TsuRuleResponse createTsuRule(@Valid @RequestBody TsuRuleRequest request) {
     return TsuRuleResponse.from(tsu.create(request.code(), request.criteria()));
   }
@@ -153,7 +158,7 @@ public class CatalogRuleController {
    * @return rule
    */
   @PutMapping("/tsu-rules/{id}")
-  @PreAuthorize(CatalogAccess.MAINTAIN)
+  @PreAuthorize(CatalogAccess.MAINTAIN_PRODUCTS)
   public TsuRuleResponse updateTsuRule(
       @PathVariable Long id, @Valid @RequestBody TsuRuleRequest request) {
     return TsuRuleResponse.from(tsu.update(id, request.criteria()));

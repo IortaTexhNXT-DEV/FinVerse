@@ -44,6 +44,10 @@ export interface QuotationContent {
   totalSumInsured: number;
   groups: number[];
   rated: boolean;
+  /** Package version that priced the content (BRPM.007). */
+  schemeVersion?: number;
+  /** An item rate differs from the scheme rate: submission needs an approved rate exception. */
+  schemeDeviation?: boolean;
 }
 
 export interface Quotation {
@@ -78,6 +82,10 @@ export interface Quotation {
   createdBy: string;
   createdAt: string;
   content: QuotationContent;
+  /** Package version of the current version (BRPM.007). */
+  productVersionNo?: number;
+  /** Approved rate-scheme exception used, when one was needed. */
+  rateOverrideRef?: string;
 }
 
 export interface QuotationListItem {

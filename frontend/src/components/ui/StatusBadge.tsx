@@ -29,6 +29,8 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'POLICY_ISSUED',
     'BOOKED',
     'KYC_VERIFIED',
+    // product maintenance
+    'RELEASED',
   ],
   warning: [
     'PENDING_AUTHORIZATION',
@@ -47,6 +49,7 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'QS_FOR_APPROVAL',
     'PS_FOR_APPROVAL',
     'KYC_REVIEW',
+    'FOR_VALIDATION',
   ],
   // BDO style guide: blue pills for records moving through processing ("Account for Placement").
   info: [

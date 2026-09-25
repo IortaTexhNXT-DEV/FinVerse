@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { catalogApi } from '@/api/catalog';
 import type { Product, ProductFilter } from '@/api/catalog';
+import type { ProductLifecycle } from '@/api/productCatalog';
 import { useAuth } from '@/auth/authContext';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Amount } from '@/components/ui/Amount';
@@ -30,10 +31,15 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]['id'];
 
+const PRODUCT_MAINTAINERS = ['MASTER_MAINTAIN', 'PRODUCT_MAINTAIN'] as const;
+const PRODUCT_AUTHORIZERS = ['MASTER_AUTHORIZE', 'PRODUCT_AUTHORIZE'] as const;
+
 function ProductFilters({
   filter,
   onChange,
 }: Readonly<{ filter: ProductFilter; onChange: (f: ProductFilter) => void }>) {
+  const { can } = useAuth();
+  const archive = can('PRODUCT_ARCHIVE_VIEW');
   const lines = useQuery({ queryKey: ['catalog', 'lines'], queryFn: catalogApi.lines });
   let packagedValue = '';
   if (filter.packaged !== undefined) {
@@ -99,6 +105,24 @@ function ProductFilters({
           />
         )}
       </Field>
+      {archive && (
+        <Field label="Lifecycle">
+          {(id) => (
+            <select
+              id={id}
+              className="select"
+              value={filter.lifecycle ?? 'ACTIVE'}
+              onChange={(e) =>
+                onChange({ ...filter, lifecycle: e.target.value as ProductLifecycle })
+              }
+            >
+              <option value="ACTIVE">Sellable</option>
+              <option value="EXPIRED">Expired</option>
+              <option value="RETIRED">Retired</option>
+            </select>
+          )}
+        </Field>
+      )}
       <label className="checkbox" style={{ alignSelf: 'end' }}>
         <input
           type="checkbox"
@@ -134,6 +158,16 @@ function ProductList() {
           { key: 'l', header: 'Line', render: (p) => p.lineCode },
           { key: 'p', header: 'Package', render: (p) => (p.packaged ? 'Yes' : '') },
           {
+            key: 'v',
+            header: 'Version',
+            render: (p) => (
+              <span className="row">
+                {p.currentVersionNo ? `v${p.currentVersionNo}` : ''}
+                {p.openVersionStatus && <StatusBadge status={p.openVersionStatus} />}
+              </span>
+            ),
+          },
+          {
             key: 's',
             header: 'Segments',
             render: (p) => (p.marketSegments.length ? p.marketSegments.join(', ') : 'All'),
@@ -145,12 +179,30 @@ function ProductList() {
             numeric: true,
             render: (p) => <Amount value={p.minimumPremium} />,
           },
-          { key: 'st', header: 'Status', render: (p) => <StatusBadge status={p.recordStatus} /> },
+          {
+            key: 'st',
+            header: 'Status',
+            render: (p) => (
+              <StatusBadge
+                status={
+                  p.lifecycleStatus && p.lifecycleStatus !== 'ACTIVE'
+                    ? p.lifecycleStatus
+                    : p.recordStatus
+                }
+              />
+            ),
+          },
           {
             key: 'a',
             header: 'Actions',
             render: (p) => (
-              <RecordActions kind="PRODUCT" record={p} refresh={[['catalog', 'products']]} />
+              <RecordActions
+                kind="PRODUCT"
+                record={p}
+                refresh={[['catalog', 'products']]}
+                authorizers={PRODUCT_AUTHORIZERS}
+                maintainers={PRODUCT_MAINTAINERS}
+              />
             ),
           },
         ]}
@@ -160,8 +212,10 @@ function ProductList() {
 }
 
 /**
- * Product catalog (BRNB.001-004): lines, cover types and products with their features, the
- * field and document rules that make an account complete, and the TSU routing rules.
+ * Product catalog (BRNB.001-004, BRPM.006/007): lines, cover types and products with their
+ * features, lifecycle and current package version, the field and document rules that make an
+ * account complete, and the TSU routing rules. Expired and retired products are listed for
+ * PRODUCT_ARCHIVE_VIEW holders.
  */
 export default function ProductsPage() {
   const { can } = useAuth();
@@ -174,7 +228,7 @@ export default function ProductsPage() {
         title="Products"
         description="Products offered to clients, the data and documents each requires, and when TSU reviews an account."
         actions={
-          can('MASTER_MAINTAIN') && (
+          PRODUCT_MAINTAINERS.some((p) => can(p)) && (
             <Button
               variant="accent"
               icon={<Plus size={16} />}

@@ -21,6 +21,7 @@ export const QUOTATIONS_HELP: HelpSection = {
         'A quotation is approved by someone other than its maker (four eyes) and can be sent only when approved.',
         'Every document sent to a client is password protected; the password is sent in a separate e-mail.',
         'Every change, action and e-mail is audited and visible in the History and E-mails tabs.',
+        'Packages are priced on their current version; an item rate other than the scheme rate needs a rate exception (Request Rate Exception) approved in My Approvals before submission.',
       ],
     },
     {
@@ -34,7 +35,7 @@ export const QUOTATIONS_HELP: HelpSection = {
         'Save Draft keeps the quotation open; Submit for Review sends it to the approver.',
       ],
       controls: [
-        'The premium is computed by the server with the rates in force (Appendix A).',
+        'The premium is computed by the server with the rates in force (Appendix A) and, for a package, the rate scheme of its current version.',
         'When a TSU routing rule applies (fleet, total sum insured, non-package risk) the wizard says so: consider a Proposal Request.',
         'The intake template version in force is stamped on the quotation.',
       ],

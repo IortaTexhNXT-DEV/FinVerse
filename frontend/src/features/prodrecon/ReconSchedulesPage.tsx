@@ -194,7 +194,7 @@ export default function ReconSchedulesPage() {
   return (
     <div className="stack">
       <PageHeader
-        section="Product Reconciliation"
+        section="Production Reconciliation"
         title="Extract Schedules"
         description="When each insurer's production register is extracted and whether it is sent automatically."
         actions={

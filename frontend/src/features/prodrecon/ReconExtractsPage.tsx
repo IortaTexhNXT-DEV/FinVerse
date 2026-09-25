@@ -131,7 +131,7 @@ export default function ReconExtractsPage() {
   return (
     <div className="stack">
       <PageHeader
-        section="Product Reconciliation"
+        section="Production Reconciliation"
         title="Production Extracts"
         description="Registers of booked production extracted for each insurer, by schedule or on request."
         actions={

@@ -1,9 +1,9 @@
 import type { HelpSection } from '@/features/help/helpContent';
 
-/** In-app help of the Product Reconciliation screens (PRCID.001-039). */
+/** In-app help of the Production Reconciliation screens (PRCID.001-039). */
 export const PRODRECON_HELP: HelpSection = {
   id: 'prodrecon',
-  module: 'Product Reconciliation',
+  module: 'Production Reconciliation',
   intro:
     'Production Reconciliation sends each insurer the register of booked accounts, uploads the insurer feedback, matches it within the tolerance and follows unmatched and unbooked accounts to closure.',
   screens: [

@@ -6,13 +6,13 @@ const PROCESS = 'RECON_PROCESS';
 const SEND = ['RECON_SEND'];
 
 /**
- * Product Reconciliation (PRCID.001-039; docs/architecture/OPERATIONS_DESIGN.md): the workbench,
+ * Production Reconciliation (PRCID.001-039; docs/architecture/OPERATIONS_DESIGN.md): the workbench,
  * reconciliation cycles per insurer and month, production extracts, insurer feedback uploads,
  * the unbooked repository and the extract schedules.
  */
 export const prodreconModule: FeatureModule = {
   id: 'prodrecon',
-  section: 'Product Reconciliation',
+  section: 'Production Reconciliation',
   screens: [
     {
       path: '/prodrecon',

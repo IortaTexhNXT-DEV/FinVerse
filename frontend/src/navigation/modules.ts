@@ -66,7 +66,7 @@ export const NAV_GROUPS: NavGroup[] = [
       placementModule,
       issuanceModule,
       bookingModule,
-      // Operations (BRD-2), prototype placement: Product Reconciliation and Adjustment here.
+      // Operations (BRD-2), prototype placement: Production Reconciliation and Adjustment here.
       prodreconModule,
       adjustmentModule,
       // Product Maintenance (BRD-3): catalog screens with the package request screens.

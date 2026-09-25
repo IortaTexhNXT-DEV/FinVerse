@@ -229,7 +229,7 @@ export default function ReconCyclePage() {
   return (
     <div className="stack">
       <PageHeader
-        section="Product Reconciliation · Cycles"
+        section="Production Reconciliation · Cycles"
         backTo="/prodrecon/cycles"
         title={c.cycleNo}
         description={`${c.insurerCode} · ${monthLabel(c.productionMonth)}`}

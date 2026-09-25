@@ -72,7 +72,7 @@ export default function ReconCyclesPage() {
   return (
     <div className="stack">
       <PageHeader
-        section="Product Reconciliation"
+        section="Production Reconciliation"
         title="Reconciliation Cycles"
         description="Production registers sent to each insurer and the matching of their feedback, month by month."
       />

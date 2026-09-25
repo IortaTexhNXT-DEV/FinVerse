@@ -29,6 +29,11 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'POLICY_ISSUED',
     'BOOKED',
     'KYC_VERIFIED',
+    // product maintenance
+    'RELEASED',
+    'SIGNED',
+    'CURRENT',
+    'ACCEPTED_AS_REQUESTED',
   ],
   warning: [
     'PENDING_AUTHORIZATION',
@@ -47,6 +52,16 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'QS_FOR_APPROVAL',
     'PS_FOR_APPROVAL',
     'KYC_REVIEW',
+    // product maintenance: approvals, reviews and sign-off
+    'FOR_TSU_REVIEW',
+    'FOR_TSU_APPROVAL',
+    'TERMS_REVIEW',
+    'FOR_MKT_REVIEW',
+    'FOR_MANCOM',
+    'FOR_VALIDATION',
+    'FOR_APPROVAL',
+    'APPROVED_WITH_CHANGES',
+    'COUNTER_PROPOSAL',
   ],
   // BDO style guide: blue pills for records moving through processing ("Account for Placement").
   info: [
@@ -64,8 +79,23 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'GENERATED',
     'SCHEDULED',
     'READY',
+    // product maintenance: work in progress
+    'NEGOTIATION',
+    'REQUIREMENTS_PREP',
+    'WITH_MBS',
+    'PREPARATION',
   ],
-  neutral: ['DRAFT', 'FUTURE', 'INACTIVE', 'CANCELLED', 'UNKNOWN', 'NOT_STARTED'],
+  neutral: [
+    'DRAFT',
+    'FUTURE',
+    'INACTIVE',
+    'CANCELLED',
+    'UNKNOWN',
+    'NOT_STARTED',
+    // product maintenance
+    'SUPERSEDED',
+    'RETIRED',
+  ],
   danger: [
     'REJECTED',
     'REVERSED',
@@ -83,6 +113,9 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'RETURNED_BY_INSURER',
     'PLACEMENT_CANCELLED',
     'EXPIRED',
+    // product maintenance
+    'DECLINED',
+    'NO_RESPONSE',
   ],
 };
 

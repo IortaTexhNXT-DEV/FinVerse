@@ -56,7 +56,7 @@ class OperationsSeamsIT {
 
   @Test
   void productionReconciliationReadsRemittancesIncentiveRules() {
-    String insurer = "INS-T" + BookingFixtures.token().substring(0, 6);
+    String insurer = "INS-T" + BookingFixtures.token();
     Subject subject = new Subject(insurer, "CBG", "MOTOR", BOOKED.plusDays(10), BOOKED);
     assertThat(port.termsFor(cash.company(), subject)).isEmpty();
 

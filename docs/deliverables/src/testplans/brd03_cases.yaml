@@ -25,7 +25,7 @@ personas:
   BUSINESS_ADMIN: {name: Business Administrator, user: badmin, short: Bus. Admin}
   NB_APPROVER: {name: New Business approver, user: approver, short: NB Appr.}
   SYSADMIN: {name: System Administrator, user: admin}
-  AUDITOR: {name: Auditor, user: auditor, short: Auditor}
+  AUDITOR: {name: Auditor, user: auditor, short: Audit.}
   SYSTEM: {name: BIBS scheduled job or event, user: "-"}
 
 screens:
@@ -201,7 +201,7 @@ frs:
         type: Boundary
         neg: true
         title: The account locks at the configured number of failed attempts
-        pre: Parameter of the session policy shows the lock-out threshold (default 5).
+        pre: Administration > System Parameters shows LOGIN_MAX_FAILED_ATTEMPTS (3 as delivered).
         steps:
           - Enter user ID ao2 with a wrong password as many times as the threshold.
           - Enter the correct password.
@@ -2585,8 +2585,8 @@ findings:
     issue: 'Acceptance criterion 3 ("The field list per line is set up by MBS as each package is set up (content Q02)") depends on BDOI content that is not yet given, so it cannot be tested as written. The unsafe-pattern message "The pattern is not a valid expression" differs from the build ("The risk-code pattern is not a valid regular expression", CODE_PATTERN_INVALID, for line patterns).'
     proposal: Replace criterion 3 with a testable statement (MBS adds a field rule for a line without IT) and align the pattern message with the build.
   - fr: FR-PM-001
-    issue: The FRS gives the log-in and lock-out messages without codes and the threshold only as "configured". The build locks at 5 failed attempts by default and the log-in endpoint also rate-limits (LOGIN_RATE_LIMITED, HTTP 429), which the FRS does not mention.
-    proposal: Name the parameter and default of the lock-out threshold and add the rate limit to FR-PM-001.
+    issue: 'The FRS messages "Invalid user ID or password" and "Your account is locked. Contact the System Administrator" differ from the build ("Invalid user name or password", "Account is locked. Contact your administrator.", code AUTHENTICATION_FAILED). The threshold is given only as "configured"; the build reads LOGIN_MAX_FAILED_ATTEMPTS (3 as delivered). The log-in endpoint also rate-limits (LOGIN_RATE_LIMITED, HTTP 429), which the FRS does not mention.'
+    proposal: Quote the built messages and code, name the parameter and its value, and add the rate limit to FR-PM-001.
   - fr: FR-PM-021
     issue: Button labels in the FRS are in title case ("Approve and Send to TSU", "Sign Off and Send to MBS"); the screens use the workflow labels in sentence case ("Approve and send to TSU", "Sign off and send to MBS").
     proposal: Use the screen labels in FRS v1.1 so testers and users read the same words.

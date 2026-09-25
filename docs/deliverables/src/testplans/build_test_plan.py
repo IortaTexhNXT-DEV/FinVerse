@@ -176,12 +176,13 @@ class Plan:
 
     @property
     def all_brd_ids(self) -> list[str]:
+        """Every BRD ID traced by the FRS: requirement IDs in number order, then other references."""
         seen: list[str] = []
         for fr in self.frs.values():
             for b in fr.brd:
                 if b not in seen:
                     seen.append(b)
-        return seen
+        return sorted(seen, key=_id_key)
 
 
 def _text(value: Any) -> str:
@@ -192,9 +193,16 @@ def _text(value: Any) -> str:
     return str(value).strip()
 
 
-def brd_id(ref: str) -> str:
-    """'BRPM.008 (p.18-19)' -> 'BRPM.008'."""
-    return re.split(r"\s*\(", str(ref).strip(), maxsplit=1)[0].strip()
+def brd_ids(ref: str) -> list[str]:
+    """'BRPM.008 (p.18-19)' -> ['BRPM.008']; page notes in brackets are dropped and several IDs
+    separated by ';' or ',' are split."""
+    text = re.sub(r"\([^)]*\)", "", str(ref))
+    return [part.strip() for part in re.split(r"[;,]", text) if part.strip()]
+
+
+def _id_key(b: str) -> tuple:
+    m = re.match(r"^([A-Z]+)[.\-]?(\d+)(\w*)$", b)
+    return (0, m.group(1), int(m.group(2)), m.group(3)) if m else (1, b, 0, "")
 
 
 def read_frs(files: list[str]) -> "OrderedDict[str, Fr]":
@@ -207,9 +215,8 @@ def read_frs(files: list[str]) -> "OrderedDict[str, Fr]":
             refs = refs if isinstance(refs, list) else [refs]
             ids: list[str] = []
             for r in refs:
-                for part in re.split(r";\s*", str(r)):
-                    b = brd_id(part)
-                    if b and b not in ids:
+                for b in brd_ids(r):
+                    if b not in ids:
                         ids.append(b)
             frs[fr["id"]] = Fr(fr["id"], str(fr.get("title", "")), ids, str(fr.get("priority", "")), name)
     return frs
@@ -733,6 +740,19 @@ def _table(opts: str, headers: list[str], rows: list[list[Any]]) -> list[str]:
     return lines + [""]
 
 
+def _paired(opts: str, headers: list[str], rows: list[list[Any]], min_rows: int = 40) -> list[str]:
+    """A long narrow table set as two halves side by side, so it takes half the pages."""
+    if len(rows) < min_rows:
+        return _table(opts, headers, rows)
+    half = (len(rows) + 1) // 2
+    left, right = rows[:half], rows[half:]
+    right = right + [[""] * len(headers)] * (half - len(right))
+    m = re.search(r"widths=([\d.,]+)", opts)
+    if m:
+        opts = opts.replace(m.group(0), "widths=" + m.group(1) + "," + m.group(1))
+    return _table(opts, headers + headers, [a + b for a, b in zip(left, right)])
+
+
 def placeholder(plan: Plan, name: str) -> list[str]:
     t = totals(plan)
     if name == "counts":
@@ -753,11 +773,17 @@ def placeholder(plan: Plan, name: str) -> list[str]:
     if name == "coverage":
         rows = [[r["item"], r["title"], r["traces"], r["conditions"], r["positive"], r["negative"], r["total"],
                  r["automated"]] for r in fr_stats(plan)]
-        return _table('widths=2.3,6.4,3.2,1.5,1.5,1.5,1.3,1.6 caption="Coverage by FR" size=8',
+        size = "7.5" if len(rows) > 50 else "8"
+        return _table(f'widths=2.3,6.4,3.2,1.5,1.5,1.5,1.3,1.6 caption="Coverage by FR" size={size}',
                       ["FR", "Title", "BRD IDs", "Cond.", "Pos.", "Neg.", "Total", "Auto."], rows)
     if name == "brd-coverage":
+        stats = brd_stats(plan)
+        if len(stats) >= 40:
+            rows = [[r["item"], r["traces"].replace("FR-", ""), r["positive"], r["negative"]] for r in stats]
+            return _paired('widths=2.3,3.6,1.1,1.1 caption="Coverage by BRD ID (FRs without the FR- prefix)" '
+                           'size=7.5', ["BRD ID", "FRs", "Pos.", "Neg."], rows)
         rows = [[r["item"], r["traces"], r["conditions"], r["positive"], r["negative"], r["total"]]
-                for r in brd_stats(plan)]
+                for r in stats]
         return _table('widths=2.6,8,1.8,1.6,1.6,1.6 caption="Coverage by BRD ID" size=8',
                       ["BRD ID", "FRs", "Conditions", "Positive", "Negative", "Total"], rows)
     if name == "scenarios":
@@ -800,8 +826,8 @@ def placeholder(plan: Plan, name: str) -> list[str]:
         rows = [[k, v] for k, v in sorted(classes.items(), key=lambda x: (-x[1], x[0]))]
         if not rows:
             return ["No automated test exists yet for this BRD; every case is run manually.", ""]
-        return _table('widths=11,3 caption="Automated tests referenced by the cases"',
-                      ["Test class", "Cases referencing it"], rows)
+        return _paired('widths=6,1.6 caption="Automated tests referenced by the cases" size=8',
+                       ["Test class", "Cases"], rows, min_rows=24)
     if name == "findings":
         if not plan.findings:
             return ["No FRS finding was raised while the cases were written.", ""]

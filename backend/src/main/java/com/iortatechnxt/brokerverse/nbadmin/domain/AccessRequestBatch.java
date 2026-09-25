@@ -8,8 +8,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * A bulk access request (BRD 1.009): one line request ({@link AccessRequest} with this batch) per
@@ -74,26 +74,26 @@ public class AccessRequestBatch extends BaseEntity {
   }
 
   static AccessBatchStatus statusOf(Collection<AccessRequestStatus> statuses) {
-    Set<AccessRequestStatus> distinct =
-        statuses.isEmpty()
-            ? EnumSet.noneOf(AccessRequestStatus.class)
-            : statuses.stream()
-                .collect(Collectors.toCollection(() -> EnumSet.noneOf(AccessRequestStatus.class)));
-    distinct.remove(AccessRequestStatus.CANCELLED);
-    if (distinct.isEmpty()) {
+    Set<AccessRequestStatus> open = EnumSet.noneOf(AccessRequestStatus.class);
+    open.addAll(statuses);
+    open.remove(AccessRequestStatus.CANCELLED);
+    if (open.isEmpty()) {
       return statuses.isEmpty() ? AccessBatchStatus.DRAFT : AccessBatchStatus.CANCELLED;
     }
-    if (distinct.contains(AccessRequestStatus.DRAFT)) {
-      return AccessBatchStatus.DRAFT;
+    return undecided(open).orElseGet(() -> decided(open));
+  }
+
+  private static Optional<AccessBatchStatus> undecided(Set<AccessRequestStatus> statuses) {
+    if (statuses.contains(AccessRequestStatus.DRAFT)) {
+      return Optional.of(AccessBatchStatus.DRAFT);
     }
-    if (distinct.contains(AccessRequestStatus.PENDING)
-        || distinct.contains(AccessRequestStatus.PENDING_SECOND)) {
-      return AccessBatchStatus.PENDING;
+    if (statuses.contains(AccessRequestStatus.PENDING)
+        || statuses.contains(AccessRequestStatus.PENDING_SECOND)) {
+      return Optional.of(AccessBatchStatus.PENDING);
     }
-    if (distinct.contains(AccessRequestStatus.RETURNED)) {
-      return AccessBatchStatus.RETURNED;
-    }
-    return decided(distinct);
+    return statuses.contains(AccessRequestStatus.RETURNED)
+        ? Optional.of(AccessBatchStatus.RETURNED)
+        : Optional.empty();
   }
 
   private static AccessBatchStatus decided(Set<AccessRequestStatus> distinct) {

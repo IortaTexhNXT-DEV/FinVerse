@@ -216,7 +216,7 @@ class CrmAdminApiIT {
 
   @Test
   void accessRequestsAndRetentionOverHttp() throws Exception {
-    String name = "api" + System.nanoTime();
+    String name = String.format("a%09d", Math.floorMod(System.nanoTime(), 1_000_000_000L));
     JsonNode submitted =
         api.read(
             api.doPost(
@@ -241,7 +241,7 @@ class CrmAdminApiIT {
         .andExpect(jsonPath("$.request.status").value("APPROVED"))
         .andExpect(jsonPath("$.temporaryPassword").isString());
     api.doPost("badmin", "/api/v1/nbadmin/access-requests", Map.of("type", "CREATE_USER"))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isUnprocessableEntity());
     api.doGet("ao", "/api/v1/nbadmin/access-requests").andExpect(status().isForbidden());
 
     String rule = rules.findAll().get(0).getId().toString();

@@ -32,10 +32,12 @@ import java.util.TreeSet;
  */
 @Entity
 @Table(name = "nba_access_request")
+@SuppressWarnings("PMD.GodClass") // aggregate root of the request: content, approvers, lifecycle
 public class AccessRequest extends BaseEntity {
 
   private static final String SEPARATOR = ",";
   private static final String REQUEST = "Request ";
+  private static final String DECIDED = "ACCESS_REQUEST_DECIDED";
   private static final int MAX_TEXT = 1000;
 
   @Column(name = "request_no", nullable = false, length = 30, updatable = false)
@@ -101,7 +103,7 @@ public class AccessRequest extends BaseEntity {
       orphanRemoval = true,
       fetch = FetchType.EAGER)
   @OrderBy("sequence")
-  private List<AccessRequestApprover> approvers = new ArrayList<>();
+  private final List<AccessRequestApprover> approvers = new ArrayList<>();
 
   @Column(name = "submitted_by", length = 50)
   private String submittedBy;
@@ -149,16 +151,6 @@ public class AccessRequest extends BaseEntity {
   private String applyError;
 
   protected AccessRequest() {}
-
-  /**
-   * Creates a draft request.
-   *
-   * @param requestNo request number
-   * @param content what is requested
-   */
-  public AccessRequest(String requestNo, AccessRequestContent content) {
-    this(requestNo, content, null);
-  }
 
   /**
    * Creates a draft request, as a line of a bulk batch when a batch is given.
@@ -265,7 +257,7 @@ public class AccessRequest extends BaseEntity {
    * @return true when a later approver still has to approve (the request stays PENDING)
    */
   public boolean recordApproval(String approver, Instant when, String comment) {
-    requireStatus(Set.of(AccessRequestStatus.PENDING), "ACCESS_REQUEST_DECIDED");
+    requireStatus(Set.of(AccessRequestStatus.PENDING), DECIDED);
     currentApprover().ifPresent(a -> a.decide(AccessApproverDecision.APPROVED, comment, when));
     Optional<AccessRequestApprover> next = currentApprover();
     next.ifPresent(a -> this.assignedApprover = a.getApprover());
@@ -277,7 +269,7 @@ public class AccessRequest extends BaseEntity {
 
   /** After the (last) first-level approval of a flagged request: waits for the second approver. */
   public void awaitSecondApproval() {
-    requireStatus(Set.of(AccessRequestStatus.PENDING), "ACCESS_REQUEST_DECIDED");
+    requireStatus(Set.of(AccessRequestStatus.PENDING), DECIDED);
     this.status = AccessRequestStatus.PENDING_SECOND;
     this.assignedApprover = null;
   }
@@ -292,7 +284,7 @@ public class AccessRequest extends BaseEntity {
    * @param comment optional comment
    */
   public void approve(AccessRequestStatus outcome, String approver, Instant when, String comment) {
-    requireStatus(AccessRequestStatus.AWAITING_DECISION, "ACCESS_REQUEST_DECIDED");
+    requireStatus(AccessRequestStatus.AWAITING_DECISION, DECIDED);
     this.status = outcome;
     this.assignedApprover = null;
     this.decidedBy = approver;
@@ -332,7 +324,7 @@ public class AccessRequest extends BaseEntity {
       String approver,
       Instant when,
       String comment) {
-    requireStatus(AccessRequestStatus.AWAITING_DECISION, "ACCESS_REQUEST_DECIDED");
+    requireStatus(AccessRequestStatus.AWAITING_DECISION, DECIDED);
     currentApprover().ifPresent(a -> a.decide(decision, comment, when));
     this.status = to;
     this.assignedApprover = null;
@@ -350,7 +342,7 @@ public class AccessRequest extends BaseEntity {
    * @param when time
    */
   public void cancel(String reason, String by, Instant when) {
-    requireStatus(AccessRequestStatus.CANCELLABLE, "ACCESS_REQUEST_DECIDED");
+    requireStatus(AccessRequestStatus.CANCELLABLE, DECIDED);
     this.status = AccessRequestStatus.CANCELLED;
     this.assignedApprover = null;
     this.cancelReason = reason;
@@ -414,12 +406,17 @@ public class AccessRequest extends BaseEntity {
    * @return true when the user approved it
    */
   public boolean approvedBy(String user) {
-    return approvers.stream()
+    boolean approver =
+        approvers.stream()
             .anyMatch(
                 a ->
                     a.getDecision() == AccessApproverDecision.APPROVED
-                        && a.getApprover().equalsIgnoreCase(user))
-        || (decidedBy != null && decidedBy.equalsIgnoreCase(user));
+                        && sameUser(a.getApprover(), user));
+    return approver || sameUser(user, decidedBy);
+  }
+
+  private static boolean sameUser(String a, String b) {
+    return a != null && b != null && String.CASE_INSENSITIVE_ORDER.compare(a, b) == 0;
   }
 
   /**

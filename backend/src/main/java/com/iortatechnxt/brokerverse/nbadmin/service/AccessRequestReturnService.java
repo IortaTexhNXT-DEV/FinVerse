@@ -120,6 +120,18 @@ public class AccessRequestReturnService {
     }
     AccessRequest r = requests.get(id);
     String me = currentUser.username();
+    requireCanceller(r, me);
+    String approver = r.getAssignedApprover() == null ? r.getDecidedBy() : r.getAssignedApprover();
+    AccessRequestStatus from = r.getStatus();
+    r.cancel(reason.trim(), me, clock.instant());
+    history.record(r, AccessRequestAction.CANCEL, from, reason.trim());
+    if (from != AccessRequestStatus.DRAFT && !CurrentUser.sameUser(me, approver)) {
+      notifier.cancelled(r, approver);
+    }
+    return r;
+  }
+
+  private void requireCanceller(AccessRequest r, String me) {
     boolean creator = CurrentUser.sameUser(me, r.getCreatedBy());
     boolean scheduledApprover =
         r.getStatus() == AccessRequestStatus.SCHEDULED
@@ -133,13 +145,5 @@ public class AccessRequestReturnService {
         && !currentUser.hasAuthority("ACCESS_REQUEST")) {
       throw new AccessDeniedException("Not permitted to cancel access requests");
     }
-    String approver = r.getAssignedApprover() == null ? r.getDecidedBy() : r.getAssignedApprover();
-    AccessRequestStatus from = r.getStatus();
-    r.cancel(reason.trim(), me, clock.instant());
-    history.record(r, AccessRequestAction.CANCEL, from, reason.trim());
-    if (from != AccessRequestStatus.DRAFT && !CurrentUser.sameUser(me, approver)) {
-      notifier.cancelled(r, approver);
-    }
-    return r;
   }
 }

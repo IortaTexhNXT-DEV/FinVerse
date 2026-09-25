@@ -49,15 +49,7 @@ public class RolePermissionChangeValidator {
    */
   public AccessRequestContent validate(AccessRequestContent c) {
     RolePermissionChange change = c.permissionChange();
-    if (change == null || change.roleCode() == null || change.roleCode().isBlank()) {
-      throw new BusinessRuleException("ACCESS_ROLE", "Select the role to change");
-    }
-    String code = change.roleCode().trim();
-    Role role =
-        roles
-            .findByCode(code)
-            .orElseThrow(
-                () -> new BusinessRuleException("ACCESS_UNKNOWN_ROLE", "Unknown role(s): " + code));
+    Role role = requireRole(change);
     requireKnown(change.added());
     requireKnown(change.removed());
     Set<String> overlap = new TreeSet<>(change.added());
@@ -83,6 +75,17 @@ public class RolePermissionChangeValidator {
     requireStorable(removed);
     return AccessRequestContent.groupProfile(
         AccessRequestType.MODIFY_ROLE_PERMISSIONS, effective, data, c.justification());
+  }
+
+  private Role requireRole(RolePermissionChange change) {
+    if (change == null || change.roleCode() == null || change.roleCode().isBlank()) {
+      throw new BusinessRuleException("ACCESS_ROLE", "Select the role to change");
+    }
+    String code = change.roleCode().trim();
+    return roles
+        .findByCode(code)
+        .orElseThrow(
+            () -> new BusinessRuleException("ACCESS_UNKNOWN_ROLE", "Unknown role(s): " + code));
   }
 
   /**

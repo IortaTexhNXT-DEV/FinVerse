@@ -32,6 +32,7 @@ public class AccessDecisionService {
   public static final String PRIVILEGED_CHANGE = "UAM_PRIVILEGED_CHANGE";
 
   private static final String SECOND_APPROVE = "UAM_SECOND_APPROVE";
+  private static final String REQUEST = "Request ";
 
   private final AccessRequestRepository requests;
   private final AccessRequestValidator validator;
@@ -93,7 +94,7 @@ public class AccessDecisionService {
     if (r.getStatus() == AccessRequestStatus.PENDING_SECOND) {
       throw new BusinessRuleException(
           "ACCESS_SECOND_APPROVAL_PENDING",
-          "Request " + r.getRequestNo() + " waits for the second approval");
+          REQUEST + r.getRequestNo() + " waits for the second approval");
     }
     requireMayDecide(r);
     validator.recheck(r.content());
@@ -143,7 +144,7 @@ public class AccessDecisionService {
     if (r.getStatus() != AccessRequestStatus.PENDING_SECOND) {
       throw new BusinessRuleException(
           "ACCESS_NOT_SECOND_APPROVAL",
-          "Request "
+          REQUEST
               + r.getRequestNo()
               + " is "
               + r.getStatus()
@@ -210,6 +211,18 @@ public class AccessDecisionService {
    */
   void requireMayDecide(AccessRequest r) {
     String me = currentUser.username();
+    requireNotConcerned(r, me);
+    switch (r.getStatus()) {
+      case PENDING -> requireChosenApprover(r, me);
+      case PENDING_SECOND -> requireSecondApprover(r, me);
+      default ->
+          throw new BusinessRuleException(
+              "ACCESS_REQUEST_DECIDED",
+              REQUEST + r.getRequestNo() + " is already " + r.getStatus());
+    }
+  }
+
+  private static void requireNotConcerned(AccessRequest r, String me) {
     if (CurrentUser.sameUser(me, r.getCreatedBy())
         || CurrentUser.sameUser(me, AccessRequestNotifier.requester(r))) {
       throw new BusinessRuleException(
@@ -218,14 +231,6 @@ public class AccessDecisionService {
     if (r.getUserType() == AccessUserType.INTERNAL && CurrentUser.sameUser(me, r.getUsername())) {
       throw new BusinessRuleException(
           "ACCESS_SUBJECT_DECIDES", "You cannot decide a request about your own access");
-    }
-    switch (r.getStatus()) {
-      case PENDING -> requireChosenApprover(r, me);
-      case PENDING_SECOND -> requireSecondApprover(r, me);
-      default ->
-          throw new BusinessRuleException(
-              "ACCESS_REQUEST_DECIDED",
-              "Request " + r.getRequestNo() + " is already " + r.getStatus());
     }
   }
 
@@ -237,7 +242,7 @@ public class AccessDecisionService {
     if (assigned != null && !CurrentUser.sameUser(me, assigned) && !settings.anyApprover()) {
       throw new BusinessRuleException(
           "ACCESS_NOT_ASSIGNED",
-          "Request " + r.getRequestNo() + " is assigned to " + assigned + " for approval");
+          REQUEST + r.getRequestNo() + " is assigned to " + assigned + " for approval");
     }
   }
 

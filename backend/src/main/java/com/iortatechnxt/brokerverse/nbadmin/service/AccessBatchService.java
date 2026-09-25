@@ -34,6 +34,7 @@ public class AccessBatchService {
   private final AccessRequestBatchRepository batches;
   private final AccessRequestRepository requests;
   private final AccessRequestService requestService;
+  private final AccessRequestPermissions permissions;
   private final AccessRequestValidator validator;
   private final AccessDecisionService decisions;
   private final AccessRequestReturnService returns;
@@ -41,6 +42,7 @@ public class AccessBatchService {
   private final CurrentUser currentUser;
   private final TransactionTemplate tx;
   private final TransactionTemplate lineTx;
+  private final TransactionTemplate checkTx;
 
   /**
    * Creates the service.
@@ -48,6 +50,7 @@ public class AccessBatchService {
    * @param batches batches
    * @param requests line requests
    * @param requestService access requests
+   * @param permissions request functions of the current user
    * @param validator request checks
    * @param decisions decisions
    * @param returns return and cancellation
@@ -59,6 +62,7 @@ public class AccessBatchService {
       AccessRequestBatchRepository batches,
       AccessRequestRepository requests,
       AccessRequestService requestService,
+      AccessRequestPermissions permissions,
       AccessRequestValidator validator,
       AccessDecisionService decisions,
       AccessRequestReturnService returns,
@@ -68,6 +72,7 @@ public class AccessBatchService {
     this.batches = batches;
     this.requests = requests;
     this.requestService = requestService;
+    this.permissions = permissions;
     this.validator = validator;
     this.decisions = decisions;
     this.returns = returns;
@@ -76,16 +81,24 @@ public class AccessBatchService {
     this.tx = new TransactionTemplate(transactions);
     this.lineTx = new TransactionTemplate(transactions);
     this.lineTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+    this.checkTx = new TransactionTemplate(transactions);
+    this.checkTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+    this.checkTx.setReadOnly(true);
   }
 
   /**
-   * Checks one row as a single request (FR-UA-019 R1), before the batch is created.
+   * Checks one row as a single request (FR-UA-019 R1), before the batch is created. The check runs
+   * in its own read-only transaction, so a refused row does not roll back the upload.
    *
    * @param content the row's request
    * @return normalised content
    */
   public AccessRequestContent validateLine(AccessRequestContent content) {
-    requestService.requireRequestPermission(content);
+    return checkTx.execute(s -> check(content));
+  }
+
+  private AccessRequestContent check(AccessRequestContent content) {
+    permissions.requireRequestPermission(content);
     return validator.validate(content);
   }
 
@@ -100,7 +113,7 @@ public class AccessBatchService {
   public AccessRequest addLine(String batchNo, String fileName, AccessRequestContent content) {
     return tx.execute(
         s -> {
-          AccessRequestContent clean = validateLine(content);
+          AccessRequestContent clean = check(content);
           AccessRequestBatch batch =
               batches
                   .findByBatchNo(batchNo)
@@ -201,28 +214,36 @@ public class AccessBatchService {
 
   private LineOutcome approveLine(Long lineId, String comment) {
     try {
-      Decision d =
-          lineTx.execute(
-              s -> {
-                AccessRequest line = requests.findById(lineId).orElseThrow();
-                return line.getStatus() == AccessRequestStatus.PENDING_SECOND
-                    ? decisions.secondApprove(lineId, comment)
-                    : decisions.approve(lineId, comment);
-              });
-      AccessRequest r = d.request();
-      return new LineOutcome(
-          r.getRequestNo(), r.getUsername(), r.getStatus(), d.temporaryPassword(), null);
+      Decision d = lineTx.execute(s -> decide(lineId, comment));
+      AccessRequest r = d == null ? null : d.request();
+      return r == null
+          ? new LineOutcome(null, null, null, null, "Not decided")
+          : new LineOutcome(
+              r.getRequestNo(), r.getUsername(), r.getStatus(), d.temporaryPassword(), null);
     } catch (RuntimeException e) {
-      AccessRequest failed =
-          lineTx.execute(
-              s -> {
-                AccessRequest line = requests.findById(lineId).orElseThrow();
-                line.applyFailed(e.getMessage());
-                return line;
-              });
-      return new LineOutcome(
-          failed.getRequestNo(), failed.getUsername(), failed.getStatus(), null, e.getMessage());
+      AccessRequest failed = lineTx.execute(s -> markFailed(lineId, e.getMessage()));
+      return failed == null
+          ? new LineOutcome(null, null, null, null, e.getMessage())
+          : new LineOutcome(
+              failed.getRequestNo(),
+              failed.getUsername(),
+              failed.getStatus(),
+              null,
+              e.getMessage());
     }
+  }
+
+  private Decision decide(Long lineId, String comment) {
+    AccessRequest line = requests.findById(lineId).orElseThrow();
+    return line.getStatus() == AccessRequestStatus.PENDING_SECOND
+        ? decisions.secondApprove(lineId, comment)
+        : decisions.approve(lineId, comment);
+  }
+
+  private AccessRequest markFailed(Long lineId, String message) {
+    AccessRequest line = requests.findById(lineId).orElseThrow();
+    line.applyFailed(message);
+    return line;
   }
 
   /**

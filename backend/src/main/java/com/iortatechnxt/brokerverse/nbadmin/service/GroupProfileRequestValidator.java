@@ -60,15 +60,7 @@ public class GroupProfileRequestValidator {
   }
 
   private AccessRequestContent create(AccessRequestContent c) {
-    String code = requireCode(c.roleCode());
-    if (!CODE.matcher(code).matches()) {
-      throw new BusinessRuleException(
-          "ACCESS_ROLE_CODE",
-          "The profile code has up to 40 capital letters, digits or underscores");
-    }
-    if (roles.findByCode(code).isPresent()) {
-      throw new BusinessRuleException("DUPLICATE", "Role " + code + " already exists");
-    }
+    String code = requireNewCode(c.roleCode());
     RequestedRole role = c.role();
     if (role == null || role.name() == null) {
       throw new BusinessRuleException("ACCESS_ROLE_NAME", "Enter the name of the group profile");
@@ -91,6 +83,19 @@ public class GroupProfileRequestValidator {
         c.justification());
   }
 
+  private String requireNewCode(String raw) {
+    String code = requireCode(raw);
+    if (!CODE.matcher(code).matches()) {
+      throw new BusinessRuleException(
+          "ACCESS_ROLE_CODE",
+          "The profile code has up to 40 capital letters, digits or underscores");
+    }
+    if (roles.findByCode(code).isPresent()) {
+      throw new BusinessRuleException("DUPLICATE", "Role " + code + " already exists");
+    }
+    return code;
+  }
+
   private AccessRequestContent activation(AccessRequestContent c, boolean deactivate) {
     String code = requireCode(c.roleCode());
     Role role =
@@ -98,20 +103,25 @@ public class GroupProfileRequestValidator {
             .findByCode(code)
             .orElseThrow(
                 () -> new BusinessRuleException("ACCESS_UNKNOWN_ROLE", "Unknown role(s): " + code));
-    if (deactivate && SYSADMIN.equals(role.getCode())) {
-      throw new BusinessRuleException(
-          "ACCESS_ROLE_PROTECTED", PROFILE + SYSADMIN + " cannot be deactivated");
-    }
-    if (deactivate && !role.isActive()) {
-      throw new BusinessRuleException(
-          "ACCESS_ROLE_ALREADY_INACTIVE", PROFILE + code + " is already inactive");
-    }
-    if (!deactivate && role.isActive()) {
+    if (deactivate) {
+      requireDeactivatable(role);
+    } else if (role.isActive()) {
       throw new BusinessRuleException(
           "ACCESS_ROLE_ALREADY_ACTIVE", PROFILE + code + " is already active");
     }
     return AccessRequestContent.groupProfile(
         c.type(), new RolePermissionChange(code, Set.of(), Set.of()), null, c.justification());
+  }
+
+  private static void requireDeactivatable(Role role) {
+    if (SYSADMIN.equals(role.getCode())) {
+      throw new BusinessRuleException(
+          "ACCESS_ROLE_PROTECTED", PROFILE + SYSADMIN + " cannot be deactivated");
+    }
+    if (!role.isActive()) {
+      throw new BusinessRuleException(
+          "ACCESS_ROLE_ALREADY_INACTIVE", PROFILE + role.getCode() + " is already inactive");
+    }
   }
 
   private static String requireCode(String raw) {

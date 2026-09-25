@@ -65,13 +65,20 @@ public class AccessChangeApplier {
       externalUsers.apply(r);
       return null;
     }
+    if (r.getRequestType().isGroupProfile()) {
+      return applyGroupProfile(r, authority);
+    }
+    return r.getRequestType() == AccessRequestType.CREATE_USER
+        ? create(r, authority)
+        : change(r, authority);
+  }
+
+  private String applyGroupProfile(AccessRequest r, ChangeAuthority authority) {
     return switch (r.getRequestType()) {
-      case CREATE_USER -> create(r, authority);
-      case MODIFY_ROLES, MODIFY_USER, DISABLE_USER, ENABLE_USER -> change(r, authority);
       case CREATE_ROLE -> createRole(r, authority);
-      case MODIFY_ROLE_PERMISSIONS -> changePermissions(r, authority);
       case DEACTIVATE_ROLE -> activation(r, false, authority);
       case REACTIVATE_ROLE -> activation(r, true, authority);
+      default -> changePermissions(r, authority);
     };
   }
 
@@ -100,7 +107,7 @@ public class AccessChangeApplier {
     AccessRequestType type = r.getRequestType();
     Set<String> requestedRoles = r.roles();
     Set<String> newRoles =
-        requestedRoles.isEmpty() ? UserRequestValidator.roleCodes(user) : requestedRoles;
+        requestedRoles.isEmpty() ? UserStateRules.roleCodes(user) : requestedRoles;
     boolean enabled =
         switch (type) {
           case DISABLE_USER -> false;

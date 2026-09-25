@@ -303,6 +303,16 @@ class UserAccessExtensionsIT {
 
   @Test
   void roleEditsNeedAnApprovedRequestOrTheEmergencyPath() throws Exception {
+    // V1062 closes the emergency path (UAM_DIRECT_ROLE_EDIT = false); it is opened for this test.
+    as.run(ADMIN, () -> parameters.update(RoleEditGuard.DIRECT_EDIT_PARAMETER, "true"));
+    try {
+      emergencyPathIsAuditedAndGuarded();
+    } finally {
+      as.run(ADMIN, () -> parameters.update(RoleEditGuard.DIRECT_EDIT_PARAMETER, "false"));
+    }
+  }
+
+  private void emergencyPathIsAuditedAndGuarded() throws Exception {
     String code = unique("UAMT_");
     long id =
         api.read(
@@ -337,21 +347,18 @@ class UserAccessExtensionsIT {
         .andExpect(jsonPath("$.code").value("ROLE_REQUEST_NOT_APPROVED"));
 
     as.run(ADMIN, () -> parameters.update(RoleEditGuard.DIRECT_EDIT_PARAMETER, "false"));
-    try {
-      api.doPut(
-              ADMIN,
-              "/api/v1/admin/roles/" + id,
-              Json.of("code", code, "name", "Changed", "permissions", List.of()))
-          .andExpect(status().isUnprocessableEntity())
-          .andExpect(jsonPath("$.code").value("ROLE_EDIT_BY_REQUEST"));
-      api.doPost(
-              ADMIN,
-              "/api/v1/admin/roles",
-              Json.of("code", unique("UAMT_"), "name", "Blocked", "permissions", List.of()))
-          .andExpect(jsonPath("$.code").value("ROLE_EDIT_BY_REQUEST"));
-    } finally {
-      as.run(ADMIN, () -> parameters.update(RoleEditGuard.DIRECT_EDIT_PARAMETER, "true"));
-    }
+    api.doPut(
+            ADMIN,
+            "/api/v1/admin/roles/" + id,
+            Json.of("code", code, "name", "Changed", "permissions", List.of()))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$.code").value("ROLE_EDIT_BY_REQUEST"));
+    api.doPost(
+            ADMIN,
+            "/api/v1/admin/roles",
+            Json.of("code", unique("UAMT_"), "name", "Blocked", "permissions", List.of()))
+        .andExpect(jsonPath("$.code").value("ROLE_EDIT_BY_REQUEST"));
+    as.run(ADMIN, () -> parameters.update(RoleEditGuard.DIRECT_EDIT_PARAMETER, "true"));
     api.doPut(
             ADMIN,
             "/api/v1/admin/roles/" + id,

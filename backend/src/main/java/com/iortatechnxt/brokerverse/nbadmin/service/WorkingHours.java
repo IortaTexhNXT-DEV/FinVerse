@@ -6,7 +6,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.EnumSet;
-import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -45,7 +44,7 @@ public record WorkingHours(LocalTime start, LocalTime end, Set<DayOfWeek> days) 
     if (value == null || value.isBlank()) {
       return ALWAYS;
     }
-    String[] parts = value.trim().toUpperCase(Locale.ROOT).split(",", 2);
+    String[] parts = value.trim().split(",", 2);
     String[] hours = parts[0].trim().split("-");
     if (hours.length != 2) {
       return ALWAYS;
@@ -83,7 +82,9 @@ public record WorkingHours(LocalTime start, LocalTime end, Set<DayOfWeek> days) 
   private static DayOfWeek day(String abbreviation) {
     String a = abbreviation.trim();
     for (DayOfWeek d : DayOfWeek.values()) {
-      if (d.name().startsWith(a) && a.length() >= 2) {
+      if (a.length() >= 2
+          && a.length() <= d.name().length()
+          && String.CASE_INSENSITIVE_ORDER.compare(d.name().substring(0, a.length()), a) == 0) {
         return d;
       }
     }

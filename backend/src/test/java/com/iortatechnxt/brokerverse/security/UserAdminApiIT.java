@@ -1,8 +1,10 @@
 package com.iortatechnxt.brokerverse.security;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.Json;
@@ -127,14 +129,41 @@ class UserAdminApiIT {
         .andExpect(jsonPath("$.code").value("SELF_ROLE_CHANGE"));
   }
 
+  /**
+   * Roles change only by implementing an approved group-profile request (PQ17; UAM_DIRECT_ROLE_EDIT
+   * = false since V1062): create through the Roles screen with the request number, change through
+   * "Implement request".
+   */
   @Test
-  void rolesAndPermissionsCanBeMaintained() throws Exception {
-    String code = "TEST_ROLE_" + ThreadLocalRandom.current().nextInt(100, 999);
+  void rolesAndPermissionsAreMaintainedThroughApprovedRequests() throws Exception {
+    String code = "TEST_ROLE_" + ThreadLocalRandom.current().nextInt(100_000, 999_999);
+    api.doPost(
+            "admin",
+            "/api/v1/admin/roles",
+            Json.of("code", code, "name", "Test", "permissions", List.of("REPORT_VIEW")))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$.code").value("ROLE_EDIT_BY_REQUEST"));
+
+    String createNo =
+        approvedRequest(
+            Json.of(
+                "type",
+                "CREATE_ROLE",
+                "roleCode",
+                code,
+                "roleName",
+                "Test",
+                "permissionsAdded",
+                List.of("REPORT_VIEW"),
+                "justification",
+                "New test profile",
+                "approvers",
+                List.of("uamapprover")));
     long id =
         api.read(
                 api.doPost(
                         "admin",
-                        "/api/v1/admin/roles",
+                        "/api/v1/admin/roles?requestNo=" + createNo,
                         Json.of(
                             "code", code, "name", "Test", "permissions", List.of("REPORT_VIEW")))
                     .andExpect(status().isCreated()))
@@ -142,23 +171,73 @@ class UserAdminApiIT {
             .asLong();
     api.doPost(
             "admin",
-            "/api/v1/admin/roles",
+            "/api/v1/admin/roles?requestNo=" + createNo,
             Json.of("code", code, "name", "Test", "permissions", List.of()))
-        .andExpect(status().isConflict());
+        .andExpect(jsonPath("$.code").value("ROLE_REQUEST_NOT_APPROVED"));
     api.doPut(
             "admin",
             "/api/v1/admin/roles/" + id,
-            Json.of(
-                "code",
-                code,
-                "name",
-                "Renamed",
-                "permissions",
-                List.of("REPORT_VIEW", "AUDIT_VIEW")))
-        .andExpect(jsonPath("$.permissions.length()").value(2));
-    api.doGet("admin", "/api/v1/admin/roles").andExpect(status().isOk());
+            Json.of("code", code, "name", "Renamed", "permissions", List.of("REPORT_VIEW")))
+        .andExpect(jsonPath("$.code").value("ROLE_EDIT_BY_REQUEST"));
+
+    long changeId =
+        api.read(
+                api.doPost(
+                    "badmin",
+                    "/api/v1/nbadmin/access-requests",
+                    Json.of(
+                        "type",
+                        "MODIFY_ROLE_PERMISSIONS",
+                        "roleCode",
+                        code,
+                        "roleName",
+                        "Renamed",
+                        "permissionsAdded",
+                        List.of("AUDIT_VIEW"),
+                        "justification",
+                        "Audit read access",
+                        "approvers",
+                        List.of("uamapprover"))))
+            .get("id")
+            .asLong();
+    api.doPost(
+            "uamapprover",
+            "/api/v1/nbadmin/access-requests/" + changeId + "/approve",
+            Json.of("comment", "ok"))
+        .andExpect(jsonPath("$.request.status").value("FOR_IMPLEMENTATION"));
+    api.doPost("admin", "/api/v1/nbadmin/access-requests/" + changeId + "/implement", null)
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("IMPLEMENTED"));
+    JsonNode role = null;
+    for (JsonNode r : api.read(api.doGet("admin", "/api/v1/admin/roles"))) {
+      if (code.equals(r.get("code").asText())) {
+        role = r;
+      }
+    }
+    assertThat(role).isNotNull();
+    assertThat(role.get("name").asText()).isEqualTo("Renamed");
+    assertThat(role.get("permissions")).hasSize(2);
     api.doGet("admin", "/api/v1/admin/permissions").andExpect(status().isOk());
     api.doGet("accountant", "/api/v1/admin/roles").andExpect(status().isForbidden());
+  }
+
+  private String approvedRequest(Map<String, Object> body) throws Exception {
+    long id =
+        api.read(
+                api.doPost("badmin", "/api/v1/nbadmin/access-requests", body)
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.status").value("PENDING")))
+            .get("id")
+            .asLong();
+    return api.read(
+            api.doPost(
+                    "uamapprover",
+                    "/api/v1/nbadmin/access-requests/" + id + "/approve",
+                    Json.of("comment", "ok"))
+                .andExpect(jsonPath("$.request.status").value("FOR_IMPLEMENTATION")))
+        .get("request")
+        .get("requestNo")
+        .asText();
   }
 
   @Test

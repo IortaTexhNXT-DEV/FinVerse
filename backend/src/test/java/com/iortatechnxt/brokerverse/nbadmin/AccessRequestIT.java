@@ -35,8 +35,9 @@ class AccessRequestIT {
   @Autowired private PasswordEncoder encoder;
   @Autowired private AsUser as;
 
-  private static String username() {
-    return "u" + System.nanoTime();
+  /** A new user ID in the BDOI format (USER_ID_PATTERN a999999999). */
+  static String username() {
+    return String.format("u%09d", Math.floorMod(System.nanoTime(), 1_000_000_000L));
   }
 
   private AccessRequest submit(String user, AccessRequestContent content) {
@@ -135,11 +136,14 @@ class AccessRequestIT {
     assertThat(rejected.temporaryPassword()).isNull();
     assertThat(users.getByUsername(name).isEnabled()).isFalse();
     assertThat(
-            requests.search(
-                AccessRequestStatus.REJECTED,
-                AccessRequestType.ENABLE_USER,
-                name,
-                Pageable.ofSize(5)))
+            as.run(
+                "approver",
+                () ->
+                    requests.search(
+                        AccessRequestStatus.REJECTED,
+                        AccessRequestType.ENABLE_USER,
+                        name,
+                        Pageable.ofSize(5))))
         .extracting(AccessRequest::getId)
         .containsExactly(enable.getId());
   }
@@ -221,7 +225,7 @@ class AccessRequestIT {
 
     AccessRequest own =
         submit(
-            "approver",
+            "badmin",
             new AccessRequestContent(
                 AccessRequestType.CREATE_USER,
                 username(),
@@ -230,10 +234,10 @@ class AccessRequestIT {
                 Set.of("TSU"),
                 null,
                 "x"));
-    assertThatThrownBy(() -> as.run("approver", () -> requests.approve(own.getId(), null)))
+    assertThatThrownBy(() -> as.run("badmin", () -> requests.approve(own.getId(), null)))
         .extracting("code")
         .isEqualTo("ACCESS_FOUR_EYES");
-    as.run("badmin", () -> requests.reject(own.getId(), "Withdrawn"));
+    as.run("uamapprover", () -> requests.reject(own.getId(), "Withdrawn"));
   }
 
   @Test

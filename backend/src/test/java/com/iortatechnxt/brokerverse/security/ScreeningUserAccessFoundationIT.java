@@ -109,7 +109,9 @@ class ScreeningUserAccessFoundationIT {
             "UAM_REACTIVATE",
             "UAM_CORRECT",
             "UAM_CANCEL",
-            "UAM_VIEW");
+            "UAM_VIEW",
+            // V1062 (U1-A): bulk request files go through the bulk upload framework (BRD 1.009).
+            "BULK_PROCESS");
     assertThat(rolePermissions("UAM_APPROVER")).contains("ACCESS_APPROVE", "UAM_REPORT_VIEW");
     assertThat(rolePermissions("UAM_SECOND_APPROVER")).contains("UAM_SECOND_APPROVE");
     assertThat(authorities("badmin"))
@@ -180,8 +182,9 @@ class ScreeningUserAccessFoundationIT {
     assertThat(parameters.intValue("SCR_COMMITTEE_SIZE", 0)).isEqualTo(5);
     assertThat(parameters.items("SCR_SCREENING_SCOPE")).containsExactly("PROSPECT", "CONFIRMED");
     assertThat(parameters.text("AUTH_MODE", "")).isEqualTo("LOCAL");
-    assertThat(parameters.text("UAM_DIRECT_ROLE_EDIT", "")).isEqualTo("true");
-    assertThat(parameters.text("UAM_ROLE_APPLY_ON_APPROVAL", "")).isEqualTo("true");
+    // U1-A (V1062) closed both switches once the implement-request flow was live.
+    assertThat(parameters.text("UAM_DIRECT_ROLE_EDIT", "")).isEqualTo("false");
+    assertThat(parameters.text("UAM_ROLE_APPLY_ON_APPROVAL", "")).isEqualTo("false");
     assertThat(parameters.text("UAM_ANY_APPROVER", "")).isEqualTo("false");
     assertThat(parameters.intValue("PASSWORD_HISTORY_COUNT", 0)).isEqualTo(8);
     assertThat("a123456789").matches(parameters.text("USER_ID_PATTERN", ""));

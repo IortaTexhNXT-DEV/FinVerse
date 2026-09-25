@@ -2,28 +2,23 @@ package com.iortatechnxt.brokerverse.nbadmin.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessRequestEventResponse;
+import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessRequestQuery;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessRequestRequest;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessRequestResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessSettingsResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessSubmitRequest;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.ApproverResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.UserAccessResponse;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessUserType;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessApprovers;
-import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestSearch;
-import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestSearch.Scope;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessSettings;
 import com.iortatechnxt.brokerverse.security.api.dto.RoleResponse;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import jakarta.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -84,36 +79,16 @@ public class AccessRequestController {
   /**
    * Work list of the current user, newest first (FR-UA-017, FR-UA-018).
    *
-   * @param scope tab (MINE, ASSIGNED, SECOND, IMPLEMENTATION, ALL)
-   * @param status status
-   * @param type request type
-   * @param text user name, role or request number
-   * @param requester requester
-   * @param approver approver
-   * @param from requested on or after
-   * @param to requested on or before
-   * @param groupProfiles true for group-profile requests only, false for user requests only
-   * @param page page
+   * @param query tab, filters and page
    * @return requests
    */
   @GetMapping("/access-requests")
   @PreAuthorize(VIEW)
-  public PageResponse<AccessRequestResponse> search(
-      @RequestParam(required = false) Scope scope,
-      @RequestParam(required = false) AccessRequestStatus status,
-      @RequestParam(required = false) AccessRequestType type,
-      @RequestParam(required = false) String text,
-      @RequestParam(required = false) String requester,
-      @RequestParam(required = false) String approver,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
-      @RequestParam(required = false) Boolean groupProfiles,
-      @RequestParam(defaultValue = "0") int page) {
+  public PageResponse<AccessRequestResponse> search(@Valid AccessRequestQuery query) {
     return PageResponse.of(
         requests.search(
-            new AccessRequestSearch(
-                scope, status, type, text, requester, approver, from, to, groupProfiles),
-            PageRequest.of(page, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "id"))),
+            query.search(),
+            PageRequest.of(query.pageOrFirst(), PAGE_SIZE, Sort.by(Sort.Direction.DESC, "id"))),
         AccessRequestResponse::from);
   }
 

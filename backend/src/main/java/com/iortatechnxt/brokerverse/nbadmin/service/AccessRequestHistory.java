@@ -1,6 +1,5 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
-import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
@@ -68,7 +67,7 @@ public class AccessRequestHistory {
     audit.record(
         AccessRequestService.ENTITY,
         r.getRequestNo(),
-        auditAction(action),
+        action.auditAction(),
         action.label()
             + ": "
             + AccessRequestService.describe(r)
@@ -84,16 +83,5 @@ public class AccessRequestHistory {
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<AccessRequestEvent> of(Long requestId) {
     return events.findByRequestIdOrderByIdAsc(requestId);
-  }
-
-  private static AuditAction auditAction(AccessRequestAction action) {
-    return switch (action) {
-      case SAVE -> AuditAction.CREATE;
-      case EDIT, SCHEDULE, APPLY_FAILED, FOR_IMPLEMENTATION -> AuditAction.UPDATE;
-      case SUBMIT, RESUBMIT -> AuditAction.SUBMIT;
-      case RETURN, REJECT -> AuditAction.REJECT;
-      case CANCEL -> AuditAction.DEACTIVATE;
-      case APPROVE, SECOND_APPROVE, APPLY, IMPLEMENT -> AuditAction.AUTHORIZE;
-    };
   }
 }

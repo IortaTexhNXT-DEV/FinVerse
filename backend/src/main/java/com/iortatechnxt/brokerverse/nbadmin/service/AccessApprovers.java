@@ -95,16 +95,7 @@ public class AccessApprovers {
    */
   public List<String> validate(List<String> chosen, AccessRequestContent content) {
     List<String> names = chosen == null ? List.of() : chosen;
-    boolean groupProfile = content.type().isGroupProfile();
-    if (names.isEmpty()) {
-      throw groupProfile
-          ? new BusinessRuleException("ACCESS_APPROVER_REQUIRED", "Add at least one approver")
-          : new BusinessRuleException("ACCESS_APPROVER_REQUIRED", "Select the approver");
-    }
-    if (!groupProfile && names.size() > 1) {
-      throw new BusinessRuleException(
-          "ACCESS_ONE_APPROVER", "A user request is decided by one approver");
-    }
+    requireCount(names, content.type().isGroupProfile());
     List<ApproverOption> eligible = eligible(content.userType(), content.username());
     Set<String> seen = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
     List<String> result = new ArrayList<>();
@@ -114,17 +105,32 @@ public class AccessApprovers {
         throw new BusinessRuleException(
             "ACCESS_APPROVER_TWICE", name + " is already an approver of this request");
       }
-      result.add(
-          eligible.stream()
-              .map(ApproverOption::username)
-              .filter(u -> u.equalsIgnoreCase(name))
-              .findFirst()
-              .orElseThrow(
-                  () ->
-                      new BusinessRuleException(
-                          "ACCESS_APPROVER_NOT_ELIGIBLE", name + " cannot approve this request")));
+      result.add(resolve(name, eligible));
     }
     return result;
+  }
+
+  private static void requireCount(List<String> names, boolean groupProfile) {
+    if (names.isEmpty()) {
+      throw new BusinessRuleException(
+          "ACCESS_APPROVER_REQUIRED",
+          groupProfile ? "Add at least one approver" : "Select the approver");
+    }
+    if (!groupProfile && names.size() > 1) {
+      throw new BusinessRuleException(
+          "ACCESS_ONE_APPROVER", "A user request is decided by one approver");
+    }
+  }
+
+  private static String resolve(String name, List<ApproverOption> eligible) {
+    return eligible.stream()
+        .map(ApproverOption::username)
+        .filter(u -> CurrentUser.sameUser(u, name))
+        .findFirst()
+        .orElseThrow(
+            () ->
+                new BusinessRuleException(
+                    "ACCESS_APPROVER_NOT_ELIGIBLE", name + " cannot approve this request"));
   }
 
   /**

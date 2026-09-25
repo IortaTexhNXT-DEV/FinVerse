@@ -45,6 +45,7 @@ public class AccessRequestService {
   private final AccessRequestNotifier notifier;
   private final AccessRequestVisibility visibility;
   private final AccessDecisionService decisions;
+  private final AccessRequestPermissions permissions;
   private final DocumentNumberService numbers;
   private final CurrentUser currentUser;
   private final Clock clock;
@@ -60,6 +61,7 @@ public class AccessRequestService {
    * @param notifier notifications
    * @param visibility who sees which request
    * @param decisions approval and rejection
+   * @param permissions request functions of the current user
    * @param numbers document numbers
    * @param currentUser current user
    * @param clock clock
@@ -73,6 +75,7 @@ public class AccessRequestService {
       AccessRequestNotifier notifier,
       AccessRequestVisibility visibility,
       AccessDecisionService decisions,
+      AccessRequestPermissions permissions,
       DocumentNumberService numbers,
       CurrentUser currentUser,
       Clock clock) {
@@ -84,6 +87,7 @@ public class AccessRequestService {
     this.notifier = notifier;
     this.visibility = visibility;
     this.decisions = decisions;
+    this.permissions = permissions;
     this.numbers = numbers;
     this.currentUser = currentUser;
     this.clock = clock;
@@ -111,7 +115,7 @@ public class AccessRequestService {
    */
   public AccessRequest create(
       AccessRequestContent content, boolean draft, List<String> chosenApprovers) {
-    requireRequestPermission(content);
+    permissions.requireRequestPermission(content);
     AccessRequestContent clean =
         draft ? validator.validateDraft(content) : validator.validate(content);
     return create(clean, draft, chosenApprovers, null);
@@ -146,7 +150,7 @@ public class AccessRequestService {
    */
   public AccessRequest edit(Long id, AccessRequestContent content) {
     AccessRequest r = requireCreator(get(id), "edit");
-    requireCorrectionRight(r);
+    permissions.requireCorrectionRight(r);
     AccessRequestContent clean = validator.validateDraft(content);
     AccessRequestStatus from = r.getStatus();
     r.edit(clean);
@@ -168,13 +172,13 @@ public class AccessRequestService {
     AccessRequest r = requireCreator(get(id), "submit");
     boolean resubmission = r.getStatus() == AccessRequestStatus.RETURNED;
     if (resubmission) {
-      requireCorrectionRight(r);
+      permissions.requireCorrectionRight(r);
       if (remarks == null || remarks.isBlank()) {
         throw new BusinessRuleException(
             "ACCESS_CORRECTION_REMARKS", "Enter the correction remarks");
       }
     }
-    requireRequestPermission(r.content());
+    permissions.requireRequestPermission(r.content());
     r.edit(validator.validateSubmission(r.content(), r.getId()));
     submitSaved(
         r,
@@ -325,45 +329,6 @@ public class AccessRequestService {
           "ACCESS_NOT_REQUESTER", "Only the creator can " + what + " request " + r.getRequestNo());
     }
     return r;
-  }
-
-  private void requireCorrectionRight(AccessRequest r) {
-    if (r.getStatus() == AccessRequestStatus.RETURNED
-        && !currentUser.hasAuthority("UAM_CORRECT")
-        && !currentUser.hasAuthority("ACCESS_REQUEST")) {
-      throw new AccessDeniedException("Not permitted to correct access requests");
-    }
-  }
-
-  /**
-   * Requires the request function of the type (BRD 4.002.2; ACCESS_REQUEST covers them all).
-   *
-   * @param c request content
-   */
-  void requireRequestPermission(AccessRequestContent c) {
-    String specific = requestPermission(c);
-    if (!currentUser.hasAuthority(specific) && !currentUser.hasAuthority("ACCESS_REQUEST")) {
-      throw new AccessDeniedException("Not permitted to raise this access request");
-    }
-  }
-
-  /**
-   * The permission of the request function of a request.
-   *
-   * @param c request content
-   * @return permission name
-   */
-  static String requestPermission(AccessRequestContent c) {
-    if (c.external() != null) {
-      return "PORTAL_USER_REQUEST";
-    }
-    return switch (c.type()) {
-      case CREATE_USER -> "UAM_ENROLL";
-      case MODIFY_ROLES, MODIFY_USER -> "UAM_MODIFY";
-      case DISABLE_USER -> "UAM_DEACTIVATE";
-      case ENABLE_USER -> "UAM_REACTIVATE";
-      default -> "UAM_GROUP_REQUEST";
-    };
   }
 
   /**

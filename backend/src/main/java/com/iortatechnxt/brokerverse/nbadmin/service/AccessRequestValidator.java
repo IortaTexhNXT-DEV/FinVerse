@@ -186,7 +186,7 @@ public class AccessRequestValidator {
   }
 
   private void requireNoOpenRequest(AccessRequestContent clean, Long requestId) {
-    Long self = requestId == null ? -1L : requestId;
+    Long self = requestId == null ? Long.valueOf(-1L) : requestId;
     boolean groupProfile = clean.type().isGroupProfile();
     boolean open =
         groupProfile

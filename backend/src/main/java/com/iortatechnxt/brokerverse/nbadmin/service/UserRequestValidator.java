@@ -10,12 +10,10 @@ import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,7 +68,7 @@ public class UserRequestValidator {
     if (c.type() == AccessRequestType.CREATE_USER) {
       requireNewUser(c, username, user);
     } else {
-      requireState(c.type(), username, user);
+      UserStateRules.requireState(c.type(), username, user);
       username = user.getUsername();
     }
     Set<String> roleCodes = requireRoles(c);
@@ -91,7 +89,7 @@ public class UserRequestValidator {
             c.effectiveFrom());
     if (user != null) {
       requireNotOwnRoles(clean, user);
-      requireChange(clean, user);
+      UserStateRules.requireChange(clean, user);
     }
     return clean;
   }
@@ -131,20 +129,6 @@ public class UserRequestValidator {
       return Pattern.compile(pattern).matcher(username).matches();
     } catch (PatternSyntaxException e) {
       return true;
-    }
-  }
-
-  private static void requireState(AccessRequestType type, String username, AppUser user) {
-    if (user == null) {
-      throw new BusinessRuleException("ACCESS_UNKNOWN_USER", USER + username + " does not exist");
-    }
-    if (type == AccessRequestType.DISABLE_USER && !user.isEnabled()) {
-      throw new BusinessRuleException(
-          "ACCESS_USER_ALREADY_INACTIVE", USER + username + " is already deactivated");
-    }
-    if (type == AccessRequestType.ENABLE_USER && user.isEnabled() && !user.isLocked()) {
-      throw new BusinessRuleException(
-          "ACCESS_USER_ALREADY_ACTIVE", USER + username + " is already active");
     }
   }
 
@@ -195,48 +179,9 @@ public class UserRequestValidator {
     if (c.type().carriesUserRoles()
         && !c.roleCodes().isEmpty()
         && CurrentUser.sameUser(currentUser.username(), user.getUsername())
-        && !c.roleCodes().equals(roleCodes(user))) {
+        && !c.roleCodes().equals(UserStateRules.roleCodes(user))) {
       throw new BusinessRuleException("SELF_ROLE_CHANGE", "You cannot change your own roles");
     }
-  }
-
-  private static void requireChange(AccessRequestContent c, AppUser user) {
-    if (c.type() == AccessRequestType.MODIFY_USER && !changes(c, user)) {
-      throw new BusinessRuleException(
-          "ACCESS_NOTHING_CHANGED", "The request does not change the user");
-    }
-  }
-
-  private static boolean changes(AccessRequestContent c, AppUser user) {
-    return dataChanges(c, user)
-        || attributesChange(c.userData(), user)
-        || (!c.roleCodes().isEmpty() && !c.roleCodes().equals(roleCodes(user)));
-  }
-
-  private static boolean dataChanges(AccessRequestContent c, AppUser user) {
-    return differs(c.fullName(), user.getFullName())
-        || differs(c.email(), user.getEmail())
-        || differs(c.homeBranchId(), user.getHomeBranchId());
-  }
-
-  private static boolean attributesChange(RequestedUserData d, AppUser user) {
-    return differs(d.windowsId(), user.getWindowsId())
-        || differs(d.businessUnitCode(), user.getBusinessUnitCode())
-        || differs(d.userLevel(), user.getUserLevel());
-  }
-
-  private static boolean differs(Object requested, Object current) {
-    return requested != null && !Objects.equals(requested, current);
-  }
-
-  /**
-   * The role codes of a user.
-   *
-   * @param user user
-   * @return codes
-   */
-  static Set<String> roleCodes(AppUser user) {
-    return user.getRoles().stream().map(Role::getCode).collect(Collectors.toSet());
   }
 
   private static String trimmed(String value) {

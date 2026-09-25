@@ -213,26 +213,17 @@ class BookingApiIT {
             "/api/v1/booking/setup/auto-book-rules/" + rule.get("id").asLong(),
             Map.of("productCode", "MTR38", "enabled", false, "description", "API test rule (off)"))
         .andExpect(status().isOk());
-    JsonNode incentive =
-        api.read(
-            api.doPost(
-                    "badmin",
-                    "/api/v1/booking/setup/incentive-rules?companyId=" + c(),
-                    Map.of(
-                        "productCode", "MTR38",
-                        "periodFrom", "2030-01-01",
-                        "active", false,
-                        "description", "API test incentive"))
-                .andExpect(status().isCreated()));
-    api.doPut(
+    // Incentive rules are frozen: criteria are maintained in Product Maintenance (PMADD07).
+    api.doPost(
             "badmin",
-            "/api/v1/booking/setup/incentive-rules/" + incentive.get("id").asLong(),
+            "/api/v1/booking/setup/incentive-rules?companyId=" + c(),
             Map.of(
+                "productCode", "MTR38",
                 "periodFrom", "2030-01-01",
-                "periodTo", "2029-01-01",
                 "active", false,
-                "description", "Invalid period"))
-        .andExpect(status().isUnprocessableEntity());
+                "description", "API test incentive"))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$.code").value("INCENTIVE_RULES_FROZEN"));
     String code = "API_" + BookingFixtures.token();
     JsonNode type =
         api.read(

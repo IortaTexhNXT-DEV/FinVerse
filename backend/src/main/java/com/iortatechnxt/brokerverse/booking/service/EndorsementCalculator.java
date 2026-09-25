@@ -98,7 +98,10 @@ public class EndorsementCalculator {
                     year.expiry(),
                     year.commission().rate(),
                     true,
-                    posting.effectiveDate()))
+                    posting.effectiveDate(),
+                    RatingQuery.Purpose.ENDORSEMENT,
+                    account.getProductVersionNo(),
+                    null))
             .breakdown();
     PremiumComponents premium =
         new PremiumComponents(

@@ -110,7 +110,11 @@ public class InvoiceBuilder {
             : settings.cwt2Segments().contains(account.getMarketSegment());
     RuleFacts ruleFacts =
         new RuleFacts(
-            account.getProductCode(), account.getMarketSegment(), account.getSourceChannel());
+            account.getProductCode(),
+            account.getCoverTypeCode(),
+            account.getMarketSegment(),
+            account.getSourceChannel(),
+            account.getInsurerCode());
     List<InvoiceDraft> drafts = new ArrayList<>();
     int years = Math.max(1, account.getTermYears());
     for (int year = 1; year <= years; year++) {
@@ -119,11 +123,11 @@ public class InvoiceBuilder {
           year == years ? account.getPeriodTo() : account.getPeriodFrom().plusYears(year);
       LocalDate flagDate = year == 1 ? bookingDate : inception;
       InvoiceFlags flags =
-          new InvoiceFlags(
+          InvoiceFlags.withCriteria(
               account.isDirectPayment(),
               cwt2,
-              rules.incentiveEligible(account.getCompanyId(), ruleFacts, flagDate),
-              BusinessType.NEW_BUSINESS);
+              BusinessType.NEW_BUSINESS,
+              rules.incentiveCriteria(account.getCompanyId(), ruleFacts, flagDate));
       drafts.add(
           new InvoiceDraft(
               account.getCompanyId(),
@@ -199,7 +203,8 @@ public class InvoiceBuilder {
         sales(account, SalesStamp::accountOfficer),
         sales(account, SalesStamp::team),
         sales(account, SalesStamp::department),
-        costCenter(account, costCenterOverride));
+        costCenter(account, costCenterOverride),
+        account.getProductVersionNo());
   }
 
   /**

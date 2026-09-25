@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.ProductLine;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
+import com.iortatechnxt.brokerverse.catalog.service.RatingQuery;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
@@ -89,12 +90,24 @@ public class AccountRules {
     return resolve(companyId, draft, new ClientRef(null, null, clientName), contact);
   }
 
+  /**
+   * A product of an existing account, whatever its status.
+   *
+   * @param code risk code
+   * @return product
+   */
+  public RiskProduct product(String code) {
+    return catalog.requireProduct(code);
+  }
+
   private Resolved resolve(
       Long companyId, AccountDraft draft, ClientRef client, AccountContact contact) {
     if (draft.productCode() == null || draft.productCode().isBlank()) {
       throw new BusinessRuleException("ACCOUNT_PRODUCT_REQUIRED", "Select the product");
     }
-    RiskProduct product = catalog.requireUsableProduct(draft.productCode());
+    RiskProduct product =
+        catalog.requireSellable(
+            draft.productCode(), RatingQuery.Purpose.NEW_BUSINESS, LocalDate.now(clock));
     ProductLine line = catalog.requireLine(product.getLineCode());
     AccountTerms.check(product, draft);
     checkCodes(draft);

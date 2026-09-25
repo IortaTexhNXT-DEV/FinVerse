@@ -55,6 +55,8 @@ import java.util.List;
  * @param items risk items
  * @param createdBy creator
  * @param createdAt creation time
+ * @param productVersionNo package version that priced the premium (BRPM.007), null when none
+ * @param rateOverrideRef approved rate-scheme exception used, null when none
  */
 public record AccountResponse(
     Long id,
@@ -95,7 +97,9 @@ public record AccountResponse(
     List<String> policyNumbers,
     List<ItemResponse> items,
     String createdBy,
-    Instant createdAt) {
+    Instant createdAt,
+    Integer productVersionNo,
+    String rateOverrideRef) {
 
   /**
    * Maps an account (items and numbers loaded).
@@ -143,6 +147,8 @@ public record AccountResponse(
         a.getPolicyNumbers(),
         a.getItems().stream().map(ItemResponse::from).toList(),
         a.getCreatedBy(),
-        a.getCreatedAt());
+        a.getCreatedAt(),
+        a.getProductVersionNo(),
+        a.getRateOverrideRef());
   }
 }

@@ -17,6 +17,7 @@ import jakarta.validation.constraints.Size;
  * @param riskItemKind kind of risk items
  * @param ratingMethod Appendix A formula
  * @param sortOrder display order
+ * @param codePattern regular expression new risk codes must match (PMADD01, PQ02), empty for none
  */
 public record LineRequest(
     @NotBlank @Size(max = 30) @Pattern(regexp = "[A-Z0-9_]+", message = "use A-Z, 0-9 and _")
@@ -24,7 +25,8 @@ public record LineRequest(
     @NotBlank @Size(max = 120) String name,
     @NotNull RiskItemKind riskItemKind,
     @NotNull RatingMethod ratingMethod,
-    @PositiveOrZero int sortOrder) {
+    @PositiveOrZero int sortOrder,
+    @Size(max = 120) String codePattern) {
 
   /**
    * Maintainable attributes.
@@ -32,6 +34,11 @@ public record LineRequest(
    * @return details
    */
   public LineDetails details() {
-    return new LineDetails(name.trim(), riskItemKind, ratingMethod, sortOrder);
+    return new LineDetails(
+        name.trim(),
+        riskItemKind,
+        ratingMethod,
+        sortOrder,
+        codePattern == null || codePattern.isBlank() ? null : codePattern.strip());
   }
 }

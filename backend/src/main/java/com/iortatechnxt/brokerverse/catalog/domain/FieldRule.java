@@ -1,11 +1,16 @@
 package com.iortatechnxt.brokerverse.catalog.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * One row of the minimum-field matrix (BRNB.002/003/093): a field of the account or of every risk
@@ -40,6 +45,22 @@ public class FieldRule extends AuthorizableEntity implements CatalogRecord {
   @Column(name = "sort_order", nullable = false)
   private int sortOrder;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "rule_type", nullable = false, length = 10)
+  private FieldRuleType ruleType = FieldRuleType.REQUIRED;
+
+  @Column(name = "lov_type", length = 40)
+  private String lovType;
+
+  @Column(name = "min_value", precision = 19, scale = 2)
+  private BigDecimal minValue;
+
+  @Column(name = "max_value", precision = 19, scale = 2)
+  private BigDecimal maxValue;
+
+  @Column(length = 200)
+  private String pattern;
+
   protected FieldRule() {}
 
   /**
@@ -72,6 +93,55 @@ public class FieldRule extends AuthorizableEntity implements CatalogRecord {
     this.required = newRequired;
     this.sortOrder = newSortOrder;
     markModified();
+  }
+
+  /**
+   * Sets what the rule checks besides presence (BRPM.004); it must be authorized again.
+   *
+   * @param check rule type and parameters
+   */
+  public void check(Check check) {
+    Check c = check == null ? Check.PRESENCE : check;
+    if (!c.complete()) {
+      throw new BusinessRuleException(
+          "FIELD_RULE_INCOMPLETE", "Complete the parameters of the " + c.type() + " rule");
+    }
+    this.ruleType = c.type();
+    this.lovType = c.type() == FieldRuleType.LOV ? c.lovType() : null;
+    this.minValue = c.type() == FieldRuleType.RANGE ? c.min() : null;
+    this.maxValue = c.type() == FieldRuleType.RANGE ? c.max() : null;
+    this.pattern = c.type() == FieldRuleType.PATTERN ? c.pattern() : null;
+    markModified();
+  }
+
+  /**
+   * The RANGE or PATTERN violation of a given value (LOV rules are checked by the service).
+   *
+   * @param value value as text, not blank
+   * @return message, empty when the value is valid
+   */
+  public Optional<String> formatViolation(String value) {
+    if (ruleType == FieldRuleType.PATTERN && !Pattern.compile(pattern).matcher(value).matches()) {
+      return Optional.of(label + " has an invalid format");
+    }
+    if (ruleType == FieldRuleType.RANGE) {
+      BigDecimal number;
+      try {
+        number = new BigDecimal(value.strip());
+      } catch (NumberFormatException e) {
+        return Optional.of(label + " must be a number");
+      }
+      if (minValue != null && number.compareTo(minValue) < 0
+          || maxValue != null && number.compareTo(maxValue) > 0) {
+        return Optional.of(
+            label + " must be between " + bound(minValue) + " and " + bound(maxValue));
+      }
+    }
+    return Optional.empty();
+  }
+
+  private static String bound(BigDecimal value) {
+    return value == null ? "any" : value.stripTrailingZeros().toPlainString();
   }
 
   @Override
@@ -112,6 +182,26 @@ public class FieldRule extends AuthorizableEntity implements CatalogRecord {
     return sortOrder;
   }
 
+  public FieldRuleType getRuleType() {
+    return ruleType;
+  }
+
+  public String getLovType() {
+    return lovType;
+  }
+
+  public BigDecimal getMinValue() {
+    return minValue;
+  }
+
+  public BigDecimal getMaxValue() {
+    return maxValue;
+  }
+
+  public String getPattern() {
+    return pattern;
+  }
+
   /**
    * Identity of a field rule.
    *
@@ -121,4 +211,54 @@ public class FieldRule extends AuthorizableEntity implements CatalogRecord {
    * @param fieldKey field key (alternatives separated by |)
    */
   public record RuleKey(RuleScope scope, String scopeCode, FieldTarget target, String fieldKey) {}
+
+  /**
+   * What a rule checks (BRPM.004).
+   *
+   * @param type REQUIRED, LOV, RANGE or PATTERN
+   * @param lovType list of values (LOV)
+   * @param min minimum (RANGE), null for none
+   * @param max maximum (RANGE), null for none
+   * @param pattern regular expression (PATTERN)
+   */
+  public record Check(
+      FieldRuleType type, String lovType, BigDecimal min, BigDecimal max, String pattern) {
+
+    /** Presence only (the minimum-field matrix). */
+    public static final Check PRESENCE = new Check(FieldRuleType.REQUIRED, null, null, null, null);
+
+    /** A null type means presence only. */
+    public Check {
+      type = type == null ? FieldRuleType.REQUIRED : type;
+    }
+
+    /**
+     * Whether the parameters the type needs are given (and the pattern compiles).
+     *
+     * @return true when complete
+     */
+    public boolean complete() {
+      if (min != null && max != null && max.compareTo(min) < 0) {
+        return false;
+      }
+      return switch (type) {
+        case REQUIRED -> true;
+        case LOV -> lovType != null && !lovType.isBlank();
+        case RANGE -> min != null || max != null;
+        case PATTERN -> compiles(pattern);
+      };
+    }
+
+    private static boolean compiles(String regex) {
+      if (regex == null || regex.isBlank()) {
+        return false;
+      }
+      try {
+        Pattern.compile(regex);
+        return true;
+      } catch (PatternSyntaxException e) {
+        return false;
+      }
+    }
+  }
 }

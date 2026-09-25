@@ -671,3 +671,109 @@ the four events) plus the existing public catalog, CRM and platform services; it
   permission map in `AdvisoryService`, optional e-mail addresses); PQ14 client of a generic programme (not asked);
   PQ16 product master synchronisation (`ProductMasterFeed`, logging adapter only); Q03 document layouts (draft
   templates).
+
+## 17. P1-A catalog and consumers: as built
+
+Built note of the catalog wave (sections 4.1-4.3, 5 and 9.1-9.4). Where it differs from or details the sections above,
+this note is what the code does.
+
+### 17.1 Migrations
+
+| Version | Content |
+|---|---|
+| `V813__catalog_hierarchy_and_clauses.sql` | `cat_cover_type.parent_code` (subtype, depth 2), `cat_product_line.code_pattern` (null until PQ02), check "packaged -> cover type", `cat_coverage` (Motor and Property defaults), `cat_clause` (six defaults), `cat_field_rule.rule_type / lov_type / min_value / max_value / pattern` |
+| `V814__catalog_product_versions.sql` | `cat_product.lifecycle_status`, `cat_product_version` with `cat_package_coverage`, `cat_package_insurer`, `cat_package_insurer_term`; `cat_rate_scheme_exception`; backfill of version 1 RELEASED (effective 2020-01-01, validated by SYSTEM) for every packaged product |
+| `V815__catalog_incentive_criteria.sql` | `cat_incentive_criteria`, `cat_incentive_criteria_product`, INCENTIVE_TYPE `MIGRATED`, alert code `INCENTIVE_PRODUCT_INACTIVE` |
+| `V821` / `V831` | `acc_account` and `quo_quotation`: `product_version_no`, `rate_override_ref` |
+| `V871__booking_incentive_criteria.sql` | `bkg_invoice.product_version_no`, `incentive_criteria`; one-time copy of `bkg_incentive_rule` into the catalog (code `MIG-<id>`, PENDING_AUTHORIZATION) |
+| `db/demo/V996__demo_product_versions.sql` | MTR12 version 2 DRAFT set up by `mbs` (two panel insurers, terms, clauses), criterion `CPC2 (demo)` ACTIVE on MTR10 (CBG), MTR12, PAR19, PAR25; the demo booking rule copied like V871; PAR25 version 1 ends 45 days after the load date (Package Expiry list) |
+
+### 17.2 Behaviour (differences and details)
+
+- **Manual item rates (PQ10).** `cat_product_version.manual_rate_allowed` is true only on the backfilled versions 1, so
+  today's quotations and accounts behave as before. Versions set up from now on lock the item rate to the scheme
+  (or panel insurer) rate: another rate needs an approved rate exception.
+- **Draft versus submission.** Rating has two entry points: `RatingService.rate` (strict: a deviating item rate is
+  refused with `RATE_SCHEME_NOT_CURRENT`) and `rateDraft` (the deviation is priced and reported in
+  `Rating.schemeDeviation`). Quotation and account drafts are priced with `rateDraft`; `submit` of a quotation and
+  `submit` / `resubmit` of an account run the strict check, and refuse a content priced on a version that is no longer
+  current. The approved exception is found by the transaction reference (quotation number or ARN) and stored on the
+  record (`rate_override_ref`).
+- **Version resolution** (`SchemeResolver`): NEW_BUSINESS takes the version in force on the clock date by selling
+  period (so rating does not depend on the daily job); a version other than the current one only with an approved
+  exception that names it. ENDORSEMENT without a version (accounts created before versions) takes the version in force
+  on the rating date. The 12-argument `RatingQuery` constructor keeps compiling: its purpose is ENDORSEMENT when the
+  `endorsement` flag is set, else NEW_BUSINESS. Packaged products without any version (created in the old product
+  editor) are rated from the product columns until a version exists.
+- **Checkpoint.** Submission and validation check completeness (section 5.1) and that the effective date is today or
+  later and after the latest released version. The "required templates exist" item is a checklist item of the
+  validator (the catalog does not depend on `docgen`). Release ends the previous version the day before (SUPERSEDED at
+  once when that day has passed), projects the scheme on the product when effective today (else in the daily step),
+  and authorises a new product created by the set-up (the validator is the checker). The validator may not be the
+  version's creator or submitter (`MAKER_CHECKER_VIOLATION`).
+- **Daily step.** `ProductVersionService.expireDue(date)` supersedes ended versions, projects versions that took effect
+  and expires packages whose end date passed (product EXPIRED, `ProductExpired`, `INCENTIVE_PRODUCT_INACTIVE` alerts).
+  The catalog runs it with its own ManagedJob `PACKAGE_VERSION_LIFECYCLE` on the same schedule as
+  `PACKAGE_EXPIRY_MONITOR` (`brokerverse.jobs.package-expiry-cron`); `productmaint` reacts to `ProductExpired`.
+- **Retirement** (`retireProduct`) sets RETIRED and flags the product's incentive criteria.
+- **Product list.** `GET /products` lists sellable (lifecycle ACTIVE) products; `lifecycle=EXPIRED|RETIRED` needs
+  PRODUCT_ARCHIVE_VIEW. Each row carries `lifecycleStatus`, `currentVersionNo`, `openVersionNo / Status` and the package
+  end date.
+- **Draft content API.** One `PUT /products/{code}/versions/{n}` replaces the whole draft (rate scheme, dates,
+  coverages, insurers, insurer terms) instead of three sub-resources; "New Version" (`POST .../versions`) copies the
+  version in force, effective tomorrow.
+- **Incentive amendments.** `PUT /incentive-criteria/{id}` changes a pending row or amends an active one (successor);
+  the active row is end-dated when the successor is authorised, not when it is requested, so an unauthorised
+  amendment never leaves a gap.
+- **Maker-checker by kind.** `CatalogKind` names who maintains and authorises each kind: coverages, clauses and rate
+  exceptions PRODUCT_MAINTAIN / PRODUCT_AUTHORIZE, incentive criteria INCENTIVE_CRITERIA_MAINTAIN / PRODUCT_AUTHORIZE,
+  the older product-area kinds accept both the MASTER_* and PRODUCT_* permissions. A rate exception is rejected by
+  deactivating it (PRODUCT_AUTHORIZE).
+- **Typed field rules (BRPM.004).** `ProductRuleService.violations` checks LOV, RANGE and PATTERN rules; the account
+  checks (`AccountChecks`) add them to the minimum-field errors.
+- **Booking.** The incentive flag is "at least one catalog criterion matches" (product, cover type, segment, channel,
+  lead insurer, booking date); the invoice stores the codes and the account's version, and endorsements inherit both.
+  `POST / PUT /booking/setup/incentive-rules` answer 422 `INCENTIVE_RULES_FROZEN`; the GET stays.
+
+### 17.3 Contracts for P1-B and the integration wave
+
+- `PackageSetupService` is implemented by `catalog.service.version.CatalogPackageSetupService` and
+  `ProductVersionQueryService` by `ProductVersionQueries` (both `@Primary`, so the P0 stubs are inactive; P2 deletes
+  `PackageVersionStubDefaults`). `createDraftVersion` needs PRODUCT_MAINTAIN; with `newProduct` it creates the package
+  (pending authorisation until its first version is validated).
+- `ProductVersionService`: `submitForValidation(code, n)`, `validate(code, n, checklist)`, `returnToDraft(code, n,
+  reason)`, `expireDue(date)` returning `ExpiryOutcome(superseded, projected, expired)`.
+- Events `ProductVersionReleased`, `ProductVersionReturned`, `ProductExpired`, `IncentiveCriteriaChanged` are published
+  with Spring's publisher inside the catalog transaction: listeners use `@TransactionalEventListener(phase =
+  AFTER_COMMIT)` (and their own transaction for writes), as for `InvoiceBooked`.
+- Rating: `RatingQuery(... , Purpose purpose, Integer schemeVersion, String rateOverrideRef)` and `withScheme(...)`;
+  `Rating` + `schemeVersion`, `schemeRate`, `overrideRef`, `schemeDeviation`; `RatingService.rateDraft`,
+  `testPremium`. Operations `adjustment` should pass `Purpose.ENDORSEMENT` and `account.getProductVersionNo()`.
+- `RateSchemeExceptionService`: `request`, `requireApproved`, `latestApproved(transactionRef, product)`, `list`.
+- `IncentiveCriteriaService.matching(companyId, IncentiveFacts)` returns the matched codes (Operations `commission`
+  can reference `cat_incentive_criteria.code`, OQ39).
+- `ProductCatalogService.requireSellable(code, Purpose, date)` (`PRODUCT_NOT_SELLABLE`).
+- Consumers: `NewAccount` + `productVersionNo`, `rateOverrideRef` (six-argument constructor kept);
+  `Account.getProductVersionNo()` / `getRateOverrideRef()`; `QuotationContent.schemeVersion` / `schemeDeviation`;
+  `Quotation.getProductVersionNo()` / `getRateOverrideRef()`; `QuotationSummary.productVersionNo`;
+  `InvoiceFacts.productVersionNo`; `InvoiceFlags.incentiveCriteria` (`incentiveCriteriaCodes()`); `InvoiceBooked` +
+  `productVersionNo`, `incentiveCriteria` (additive, last components).
+
+### 17.4 Screens
+
+Products (lifecycle filter, version column), Product page (summary, Versions / Features / Field Rules & Documents
+tabs, New Version), Version editor (`/catalog/products/:code/versions/:n`: rate scheme and dates, coverages,
+insurers, insurer terms, validation checklist), Validation Queue, Coverages & Clauses, Incentive Criteria (current /
+pending / history, amendment, deactivation), the calculator's version line and picker, and the quotation's rate
+scheme panel with "Request Rate Exception". Field rules gained the check type (presence, list, range, pattern).
+
+### 17.5 Tests
+
+`CatalogVersionIT`, `RatingSchemeIT`, `IncentiveCriteriaIT` (with the booking stamp of CPC2), `CatalogProductMaintenanceApiIT`
+and the Vitest suite `productMaintenanceForms.test.ts`. `BookingApiIT` was changed for the frozen incentive rules.
+
+### 17.6 Parked
+
+PQ02 (risk-code patterns: column empty), PQ04 (CPC2 content: demo only), PQ09 (final checklist and validator role),
+PQ10 (manual item rates and statutory rates in the scheme), PQ11 (renewal of accounts on superseded versions: the
+RENEWAL purpose is the seam), BRPM.022 (`ProductMasterFeed` port: not part of this wave).

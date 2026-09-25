@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { catalogApi } from '@/api/catalog';
-import type { FieldTarget, ProductClass, RuleScope } from '@/api/catalog';
+import type { FieldRuleType, FieldTarget, ProductClass, RuleScope } from '@/api/catalog';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -19,6 +19,12 @@ const TARGETS = [
   { value: 'ITEM', label: 'Risk item' },
 ];
 const CLASSES = enumOptions(['ANY', 'PACKAGE', 'NON_PACKAGE']);
+const CHECKS = [
+  { value: 'REQUIRED', label: 'Presence only' },
+  { value: 'LOV', label: 'List of values' },
+  { value: 'RANGE', label: 'Number range' },
+  { value: 'PATTERN', label: 'Format (pattern)' },
+];
 
 interface RuleForm {
   scope: RuleScope;
@@ -37,6 +43,11 @@ interface RuleForm {
   minLocations?: number;
   tsiAbove?: number;
   priority?: number;
+  ruleType: FieldRuleType;
+  lovType: string;
+  minValue?: number;
+  maxValue?: number;
+  pattern: string;
 }
 
 interface Props {
@@ -57,6 +68,11 @@ function send(kind: RuleKind, f: RuleForm): Promise<unknown> {
       label: f.label,
       required: f.required,
       sortOrder: f.sortOrder ?? 100,
+      ruleType: f.ruleType,
+      lovType: f.ruleType === 'LOV' ? f.lovType : undefined,
+      minValue: f.ruleType === 'RANGE' ? f.minValue : undefined,
+      maxValue: f.ruleType === 'RANGE' ? f.maxValue : undefined,
+      pattern: f.ruleType === 'PATTERN' ? f.pattern : undefined,
     });
   }
   if (kind === 'documents') {
@@ -158,6 +174,55 @@ function TsuFields({
   );
 }
 
+/** What a field rule checks on a given value (BRPM.004). */
+function CheckFields({
+  form,
+  set,
+}: Readonly<{ form: RuleForm; set: (p: Partial<RuleForm>) => void }>) {
+  return (
+    <>
+      <SelectInput
+        label="Check"
+        value={form.ruleType}
+        options={CHECKS}
+        onChange={(v) => set({ ruleType: v as FieldRuleType })}
+      />
+      {form.ruleType === 'LOV' && (
+        <TextInput
+          label="List of values"
+          required
+          upper
+          value={form.lovType}
+          onChange={(lovType) => set({ lovType })}
+        />
+      )}
+      {form.ruleType === 'RANGE' && (
+        <>
+          <NumberInput
+            label="Minimum"
+            value={form.minValue}
+            onChange={(minValue) => set({ minValue })}
+          />
+          <NumberInput
+            label="Maximum"
+            value={form.maxValue}
+            onChange={(maxValue) => set({ maxValue })}
+          />
+        </>
+      )}
+      {form.ruleType === 'PATTERN' && (
+        <TextInput
+          label="Pattern"
+          required
+          hint="Regular expression, e.g. ^[A-Z]{3} [0-9]{4}$"
+          value={form.pattern}
+          onChange={(pattern) => set({ pattern })}
+        />
+      )}
+    </>
+  );
+}
+
 /** Adds a field, document or TSU routing rule (maker-checker). */
 export function RuleEditorModal({ kind, scope, onClose }: Readonly<Props>) {
   const toast = useToast();
@@ -174,6 +239,9 @@ export function RuleEditorModal({ kind, scope, onClose }: Readonly<Props>) {
     description: '',
     productClass: 'ANY',
     lineCode: '',
+    ruleType: 'REQUIRED',
+    lovType: '',
+    pattern: '',
   });
   const set = (patch: Partial<RuleForm>) => setForm((f) => ({ ...f, ...patch }));
   const save = useMutation({
@@ -219,6 +287,7 @@ export function RuleEditorModal({ kind, scope, onClose }: Readonly<Props>) {
               value={form.label}
               onChange={(label) => set({ label })}
             />
+            <CheckFields form={form} set={set} />
           </>
         )}
         {kind === 'documents' && (

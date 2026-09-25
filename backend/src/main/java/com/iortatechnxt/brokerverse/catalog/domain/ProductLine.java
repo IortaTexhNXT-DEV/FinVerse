@@ -1,11 +1,14 @@
 package com.iortatechnxt.brokerverse.catalog.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Product line of Annex II (Property, Motor, Engineering...). It declares the kind of risk items
@@ -32,6 +35,9 @@ public class ProductLine extends AuthorizableEntity implements CatalogRecord {
   @Column(name = "sort_order", nullable = false)
   private int sortOrder;
 
+  @Column(name = "code_pattern", length = 120)
+  private String codePattern;
+
   protected ProductLine() {}
 
   /**
@@ -56,10 +62,40 @@ public class ProductLine extends AuthorizableEntity implements CatalogRecord {
   }
 
   private void apply(LineDetails details) {
+    requireValidPattern(details.codePattern());
     this.name = details.name();
     this.riskItemKind = details.riskItemKind();
     this.ratingMethod = details.ratingMethod();
     this.sortOrder = details.sortOrder();
+    this.codePattern = details.codePattern();
+  }
+
+  private static void requireValidPattern(String pattern) {
+    if (pattern != null && !pattern.isBlank() && !compiles(pattern)) {
+      throw new BusinessRuleException(
+          "CODE_PATTERN_INVALID", "The risk-code pattern is not a valid regular expression");
+    }
+  }
+
+  private static boolean compiles(String pattern) {
+    try {
+      Pattern.compile(pattern);
+      return true;
+    } catch (PatternSyntaxException e) {
+      return false;
+    }
+  }
+
+  /**
+   * Whether a new risk code follows the line's naming convention (PMADD01 AC3, PQ02).
+   *
+   * @param riskCode risk code
+   * @return true when no pattern is set or the code matches it
+   */
+  public boolean acceptsCode(String riskCode) {
+    return codePattern == null
+        || codePattern.isBlank()
+        || Pattern.compile(codePattern).matcher(riskCode).matches();
   }
 
   @Override
@@ -92,6 +128,10 @@ public class ProductLine extends AuthorizableEntity implements CatalogRecord {
     return sortOrder;
   }
 
+  public String getCodePattern() {
+    return codePattern;
+  }
+
   /**
    * Maintainable attributes of a product line.
    *
@@ -99,7 +139,26 @@ public class ProductLine extends AuthorizableEntity implements CatalogRecord {
    * @param riskItemKind kind of risk items
    * @param ratingMethod Appendix A formula
    * @param sortOrder display order
+   * @param codePattern regular expression new risk codes of the line must match, null for none
    */
   public record LineDetails(
-      String name, RiskItemKind riskItemKind, RatingMethod ratingMethod, int sortOrder) {}
+      String name,
+      RiskItemKind riskItemKind,
+      RatingMethod ratingMethod,
+      int sortOrder,
+      String codePattern) {
+
+    /**
+     * Attributes without a naming convention.
+     *
+     * @param name name
+     * @param riskItemKind kind of risk items
+     * @param ratingMethod Appendix A formula
+     * @param sortOrder display order
+     */
+    public LineDetails(
+        String name, RiskItemKind riskItemKind, RatingMethod ratingMethod, int sortOrder) {
+      this(name, riskItemKind, ratingMethod, sortOrder, null);
+    }
+  }
 }

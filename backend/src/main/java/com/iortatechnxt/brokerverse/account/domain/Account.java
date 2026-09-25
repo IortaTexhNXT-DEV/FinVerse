@@ -94,6 +94,12 @@ public class Account extends BaseEntity {
 
   @Embedded private AccountPremium premium;
 
+  @Column(name = "product_version_no")
+  private Integer productVersionNo;
+
+  @Column(name = "rate_override_ref", length = 30)
+  private String rateOverrideRef;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "payment_arrangement", nullable = false, length = 20)
   private PaymentArrangement paymentArrangement = PaymentArrangement.VIA_BDOI;
@@ -238,7 +244,27 @@ public class Account extends BaseEntity {
    * @param newPremium breakdown
    */
   public void setPremium(AccountPremium newPremium) {
-    this.premium = newPremium == null ? AccountPremium.NONE : newPremium;
+    this.premium = Objects.requireNonNullElse(newPremium, AccountPremium.NONE);
+  }
+
+  /**
+   * Records the package version that priced the premium and the rate-scheme exception used
+   * (BRPM.007: the scheme version is logged on each transaction).
+   *
+   * @param versionNo package version, null for a product without versions
+   * @param overrideRef approved exception, null when none
+   */
+  public void stampScheme(Integer versionNo, String overrideRef) {
+    this.productVersionNo = versionNo;
+    this.rateOverrideRef = overrideRef;
+  }
+
+  public Integer getProductVersionNo() {
+    return productVersionNo;
+  }
+
+  public String getRateOverrideRef() {
+    return rateOverrideRef;
   }
 
   /**
@@ -249,7 +275,7 @@ public class Account extends BaseEntity {
    * @param when time
    */
   public void setPaymentArrangement(PaymentArrangement arrangement, String user, Instant when) {
-    PaymentArrangement value = arrangement == null ? PaymentArrangement.VIA_BDOI : arrangement;
+    PaymentArrangement value = Objects.requireNonNullElse(arrangement, PaymentArrangement.VIA_BDOI);
     if (value != paymentArrangement) {
       this.directPaymentTaggedBy = value == PaymentArrangement.DIRECT_TO_INSURER ? user : null;
       this.directPaymentTaggedAt = value == PaymentArrangement.DIRECT_TO_INSURER ? when : null;
@@ -272,7 +298,7 @@ public class Account extends BaseEntity {
    * @param ffy tag
    */
   public void setFreeFirstYear(FreeFirstYear ffy) {
-    this.freeFirstYear = ffy == null ? FreeFirstYear.NONE : ffy;
+    this.freeFirstYear = Objects.requireNonNullElse(ffy, FreeFirstYear.NONE);
   }
 
   /**

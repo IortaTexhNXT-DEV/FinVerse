@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
  * @param code code
  * @param name name
  * @param sortOrder display order
+ * @param parentCode parent cover type of a subtype, null for a top-level type
  * @param recordStatus maker-checker status
  * @param maker last maintainer
  * @param authorizedBy checker
@@ -21,6 +22,7 @@ public record CoverTypeResponse(
     String code,
     String name,
     int sortOrder,
+    String parentCode,
     RecordStatus recordStatus,
     String maker,
     String authorizedBy) {
@@ -38,6 +40,7 @@ public record CoverTypeResponse(
         e.getCode(),
         e.getName(),
         e.getSortOrder(),
+        e.getParentCode(),
         e.getRecordStatus(),
         e.getMaker(),
         e.getAuthorizedBy());

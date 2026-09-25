@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.quotation.service;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
+import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.catalog.service.TsuRoutingService.TsuDecision;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
@@ -57,6 +58,7 @@ public class QuotationService {
   private final QuotationPricing pricing;
   private final QuotationNumbers numbers;
   private final QuotationRequestService requests;
+  private final ProductCatalogService catalog;
   private final DocTemplateService templates;
   private final WorkflowService workflow;
   private final AuditTrailService audit;
@@ -72,6 +74,7 @@ public class QuotationService {
    * @param pricing premium and TSU routing
    * @param numbers numbering
    * @param requests quotation requests
+   * @param catalog products
    * @param templates document templates
    * @param workflow workflow engine
    * @param audit audit trail
@@ -85,6 +88,7 @@ public class QuotationService {
       QuotationPricing pricing,
       QuotationNumbers numbers,
       QuotationRequestService requests,
+      ProductCatalogService catalog,
       DocTemplateService templates,
       WorkflowService workflow,
       AuditTrailService audit,
@@ -96,6 +100,7 @@ public class QuotationService {
     this.pricing = pricing;
     this.numbers = numbers;
     this.requests = requests;
+    this.catalog = catalog;
     this.templates = templates;
     this.workflow = workflow;
     this.audit = audit;
@@ -214,7 +219,8 @@ public class QuotationService {
   }
 
   private QuotationContent show(Quotation quotation, RiskProduct product, QuotationContent raw) {
-    QuotationContent priced = pricing.price(quotation.getCompanyId(), product, raw);
+    QuotationContent priced =
+        pricing.price(quotation.getCompanyId(), product, raw, quotation.getQuotationNo());
     quotation.showContent(priced, QuotationPricing.totalSumInsured(priced));
     TsuDecision decision = pricing.tsu(product, priced);
     quotation.routeTsu(decision.required(), decision.reason());
@@ -245,6 +251,10 @@ public class QuotationService {
       throw new BusinessRuleException(
           "QUOTATION_EXPIRED", "The validity date has passed: change it before submitting");
     }
+    RiskProduct product = catalog.requireProduct(quotation.getProductCode());
+    quotation.useRateOverride(
+        pricing.requireScheme(
+            quotation.getCompanyId(), product, content, quotation.getQuotationNo()));
     workflow.transition(ENTITY, String.valueOf(id), "submit", TransitionNote.comment(comment));
     versions.freeze(quotation, currentUser.username(), clock.instant());
     quotation.markSubmitted(currentUser.username(), clock.instant());

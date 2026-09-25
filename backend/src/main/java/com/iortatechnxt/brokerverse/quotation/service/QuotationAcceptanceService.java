@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.catalog.service.PeriodBasis;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
+import com.iortatechnxt.brokerverse.catalog.service.RatingQuery;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.quotation.domain.Quotation;
@@ -22,6 +23,7 @@ import com.iortatechnxt.brokerverse.quotation.domain.QuotationItem;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -155,7 +157,9 @@ public class QuotationAcceptanceService {
     Quotation q = service.get(id);
     clients.requireConfirmed(q.getClientId());
     QuotationContent content = versions.current(q);
-    RiskProduct product = catalog.requireUsableProduct(q.getProductCode());
+    RiskProduct product =
+        catalog.requireSellable(
+            q.getProductCode(), RatingQuery.Purpose.NEW_BUSINESS, LocalDate.now(clock));
     List<Integer> groups = q.getAcceptedGroupList();
     if (groups.isEmpty()) {
       throw new BusinessRuleException(
@@ -175,8 +179,11 @@ public class QuotationAcceptanceService {
                   arn,
                   new Origin(q.getQuotationNo(), null),
                   draft(q, content, group),
-                  pricing.rateGroup(q.getCompanyId(), product, content, group),
-                  q.getCreatedBy()));
+                  pricing.rateGroup(
+                      q.getCompanyId(), product, content, group, q.getRateOverrideRef()),
+                  q.getCreatedBy(),
+                  content.schemeVersion(),
+                  q.getRateOverrideRef()));
       arns.add(account.getArn());
     }
     q.linkAccounts(arns);

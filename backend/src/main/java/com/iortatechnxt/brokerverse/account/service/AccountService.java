@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.account.service.AccountPricing.Terms;
 import com.iortatechnxt.brokerverse.account.service.AccountRules.Resolved;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.catalog.service.PeriodBasis;
 import com.iortatechnxt.brokerverse.catalog.service.SalesOrganisationService;
 import com.iortatechnxt.brokerverse.catalog.service.TsuRoutingService.TsuDecision;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
@@ -130,6 +131,9 @@ public class AccountService {
     Account account =
         Account.create(request.companyId(), arn, request.origin(), resolved.data(), stamp);
     applyTags(account, request.draft(), true);
+    if (request.premium() != null) {
+      account.stampScheme(request.productVersionNo(), request.rateOverrideRef());
+    }
     pricing.price(account, resolved.product(), terms(request.draft()), request.premium());
     checks.rejectDuplicates(account);
     Account saved = accounts.save(account);
@@ -242,6 +246,8 @@ public class AccountService {
   private Account send(Long id, String action, String comment) {
     Account account = get(id);
     checks.requireComplete(account);
+    pricing.requireScheme(
+        account, rules.product(account.getProductCode()), new Terms(PeriodBasis.ANNUAL, null));
     checks.applyTsu(account);
     workflow.transition(ENTITY, String.valueOf(id), action, TransitionNote.comment(comment));
     return account;

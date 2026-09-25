@@ -12,16 +12,13 @@ import {
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
-/** Placeholder of the catalog screens pre-registered for Product Maintenance (wave P1-A). */
-const placeholder = lazy(() => import('./CatalogPlaceholder'));
-
 /**
  * Product Maintenance (BDOI prototype name of the catalog section, BRD-3): product catalog and
  * rules, insurer panel, rates and taxes, sales organisation and the premium calculator
- * (docs/architecture/BROKING_ARCHITECTURE.md, catalog). The package request screens of
- * `productmaint` join this section (features/productmaint/module.ts). The hidden screens below are
- * pre-registered for the Product Maintenance build (PRODUCT_MAINTENANCE_DESIGN section 11): the
- * catalog wave replaces their component, shows them in the menu and adds their help entries.
+ * (docs/architecture/BROKING_ARCHITECTURE.md, catalog), with the Product Maintenance catalog
+ * screens (BRD-3, PRODUCT_MAINTENANCE_DESIGN section 11): package versions and their validation,
+ * coverages and clauses, and incentive criteria. The package request screens of `productmaint`
+ * join this section (features/productmaint/module.ts).
  */
 export const catalogModule: FeatureModule = {
   id: 'catalog',
@@ -31,14 +28,16 @@ export const catalogModule: FeatureModule = {
       path: '/catalog/products',
       label: 'Products',
       icon: Package,
-      permission: 'MASTER_VIEW',
+      permission: 'PRODUCT_VIEW',
+      alsoPermissions: ['MASTER_VIEW'],
       component: lazy(() => import('./ProductsPage')),
     },
     {
       path: '/catalog/products/:code',
       label: 'Product',
       icon: Package,
-      permission: 'MASTER_VIEW',
+      permission: 'PRODUCT_VIEW',
+      alsoPermissions: ['MASTER_VIEW'],
       component: lazy(() => import('./ProductDetailPage')),
       hidden: true,
     },
@@ -47,8 +46,8 @@ export const catalogModule: FeatureModule = {
       label: 'Package Version',
       icon: Layers,
       permission: 'PRODUCT_VIEW',
-      alsoPermissions: ['PRODUCT_MAINTAIN', 'PRODUCT_VALIDATE'],
-      component: placeholder,
+      alsoPermissions: ['MASTER_VIEW', 'PRODUCT_MAINTAIN', 'PRODUCT_VALIDATE'],
+      component: lazy(() => import('./VersionEditorPage')),
       hidden: true,
     },
     {
@@ -56,8 +55,7 @@ export const catalogModule: FeatureModule = {
       label: 'Validation Queue',
       icon: BadgeCheck,
       permission: 'PRODUCT_VALIDATE',
-      component: placeholder,
-      hidden: true,
+      component: lazy(() => import('./ValidationQueuePage')),
     },
     {
       path: '/catalog/coverages',
@@ -65,8 +63,7 @@ export const catalogModule: FeatureModule = {
       icon: ListChecks,
       permission: 'PRODUCT_VIEW',
       alsoPermissions: ['MASTER_VIEW'],
-      component: placeholder,
-      hidden: true,
+      component: lazy(() => import('./CoveragesPage')),
     },
     {
       path: '/catalog/incentives',
@@ -74,8 +71,7 @@ export const catalogModule: FeatureModule = {
       icon: Gift,
       permission: 'PRODUCT_VIEW',
       alsoPermissions: ['INCENTIVE_CRITERIA_MAINTAIN'],
-      component: placeholder,
-      hidden: true,
+      component: lazy(() => import('./IncentivesPage')),
     },
     {
       path: '/catalog/insurers',

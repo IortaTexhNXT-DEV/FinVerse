@@ -8,11 +8,13 @@ import com.iortatechnxt.brokerverse.catalog.domain.TsuRule.TsuFacts;
 import com.iortatechnxt.brokerverse.catalog.service.PeriodBasis;
 import com.iortatechnxt.brokerverse.catalog.service.PremiumBreakdown;
 import com.iortatechnxt.brokerverse.catalog.service.PremiumBreakdown.ItemPremium;
+import com.iortatechnxt.brokerverse.catalog.service.RateSchemeExceptionService;
 import com.iortatechnxt.brokerverse.catalog.service.RatingQuery;
 import com.iortatechnxt.brokerverse.catalog.service.RatingService;
 import com.iortatechnxt.brokerverse.catalog.service.RatingService.Rating;
 import com.iortatechnxt.brokerverse.catalog.service.TsuRoutingService;
 import com.iortatechnxt.brokerverse.catalog.service.TsuRoutingService.TsuDecision;
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationContent;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationItem;
 import java.math.BigDecimal;
@@ -27,26 +29,34 @@ import org.springframework.stereotype.Component;
  * BRNB.043) and evaluates the TSU routing rules (BRNB.098, shown to Marketing). Content that is not
  * yet rateable (an item without sum insured, or without rate when the product has no default rate)
  * stays unrated; submission requires a premium.
+ *
+ * <p>Quotations are new business (BRPM.007): a package is priced on its current released version,
+ * which the content records. A draft may carry an item rate other than the scheme rate (flagged);
+ * submission and account creation need the approved rate exception of the quotation for it.
  */
 @Component
 public class QuotationPricing {
 
   private final RatingService rating;
   private final TsuRoutingService tsu;
+  private final RateSchemeExceptionService exceptions;
 
   /**
    * Creates the pricing.
    *
    * @param rating rating service
    * @param tsu TSU routing rules
+   * @param exceptions approved rate-scheme exceptions of a quotation
    */
-  public QuotationPricing(RatingService rating, TsuRoutingService tsu) {
+  public QuotationPricing(
+      RatingService rating, TsuRoutingService tsu, RateSchemeExceptionService exceptions) {
     this.rating = rating;
     this.tsu = tsu;
+    this.exceptions = exceptions;
   }
 
   /**
-   * Prices every item of a content.
+   * Prices every item of a content (wizard preview: no quotation number, so no exception).
    *
    * @param companyId company
    * @param product product
@@ -54,13 +64,35 @@ public class QuotationPricing {
    * @return content with item premiums and the breakdown (unrated when not rateable)
    */
   public QuotationContent price(Long companyId, RiskProduct product, QuotationContent content) {
+    return price(companyId, product, content, null);
+  }
+
+  /**
+   * Prices every item of a quotation's content on the current package version, with the quotation's
+   * approved rate exception when it has one.
+   *
+   * @param companyId company
+   * @param product product
+   * @param content content as entered
+   * @param quotationNo quotation number, null before creation
+   * @return content with item premiums, breakdown and version (unrated when not rateable)
+   */
+  public QuotationContent price(
+      Long companyId, RiskProduct product, QuotationContent content, String quotationNo) {
     if (!rateable(product, content)) {
       return withPremium(
           content,
           content.items().stream().map(QuotationPricing::unrated).toList(),
-          AccountPremium.NONE);
+          AccountPremium.NONE,
+          null);
     }
-    Rating result = rate(companyId, product, content, content.items());
+    Rating result =
+        rate(
+            companyId,
+            product,
+            content,
+            content.items(),
+            new Scheme(null, overrideOf(quotationNo, product), false));
     PremiumBreakdown b = result.breakdown();
     List<QuotationItem> items = new ArrayList<>();
     for (int i = 0; i < content.items().size(); i++) {
@@ -73,25 +105,77 @@ public class QuotationPricing {
               p == null ? null : p.premium(),
               p == null ? null : p.ratePercent()));
     }
-    return withPremium(content, items, premiumOf(result, content.ratingBasis()));
+    return withPremium(content, items, premiumOf(result, content.ratingBasis()), result);
   }
 
   /**
-   * The premium breakdown of one risk group (one account), as passed to the account module.
+   * Checks the submitted content against the package rate scheme (BRPM.007): it must be priced on
+   * the current version, and an item rate other than the scheme rate needs the approved exception
+   * of the quotation ({@code RATE_SCHEME_NOT_CURRENT}).
+   *
+   * @param companyId company
+   * @param product product
+   * @param content content (rated)
+   * @param quotationNo quotation number
+   * @return the exception reference used, null when none was needed
+   */
+  public String requireScheme(
+      Long companyId, RiskProduct product, QuotationContent content, String quotationNo) {
+    Rating strict =
+        rate(
+            companyId,
+            product,
+            content,
+            content.items(),
+            new Scheme(null, overrideOf(quotationNo, product), true));
+    if (content.schemeVersion() != null
+        && !content.schemeVersion().equals(strict.schemeVersion())) {
+      throw new BusinessRuleException(
+          RateSchemeExceptionService.NOT_CURRENT,
+          "The quotation is priced on version "
+              + content.schemeVersion()
+              + " of "
+              + product.getCode()
+              + "; version "
+              + strict.schemeVersion()
+              + " is current: save the quotation again to re-price it");
+    }
+    return strict.overrideRef();
+  }
+
+  /**
+   * The premium breakdown of one risk group (one account), as passed to the account module: new
+   * business on the version the quotation was priced on, which must still be current unless the
+   * quotation's approved exception allows it (BRPM.007).
    *
    * @param companyId company
    * @param product product
    * @param content content
    * @param group risk group
+   * @param overrideRef approved exception of the quotation, null when none
    * @return breakdown, null when the group is not rateable
    */
   public PremiumBreakdown rateGroup(
-      Long companyId, RiskProduct product, QuotationContent content, int group) {
+      Long companyId,
+      RiskProduct product,
+      QuotationContent content,
+      int group,
+      String overrideRef) {
     List<QuotationItem> items = content.itemsOf(group);
     if (items.isEmpty() || !rateable(product, content)) {
       return null;
     }
-    return rate(companyId, product, content, items).breakdown();
+    return rate(
+            companyId,
+            product,
+            content,
+            items,
+            new Scheme(content.schemeVersion(), overrideRef, true))
+        .breakdown();
+  }
+
+  private String overrideOf(String quotationNo, RiskProduct product) {
+    return exceptions.latestApproved(quotationNo, product.getCode());
   }
 
   /**
@@ -161,8 +245,12 @@ public class QuotationPricing {
   }
 
   private Rating rate(
-      Long companyId, RiskProduct product, QuotationContent content, List<QuotationItem> items) {
-    return rating.rate(
+      Long companyId,
+      RiskProduct product,
+      QuotationContent content,
+      List<QuotationItem> items,
+      Scheme scheme) {
+    RatingQuery query =
         new RatingQuery(
             companyId,
             product.getCode(),
@@ -184,8 +272,21 @@ public class QuotationPricing {
             content.periodTo(),
             null,
             false,
-            null));
+            null,
+            RatingQuery.Purpose.NEW_BUSINESS,
+            scheme.version(),
+            scheme.overrideRef());
+    return scheme.strict() ? rating.rate(query) : rating.rateDraft(query);
   }
+
+  /**
+   * How a quotation is priced.
+   *
+   * @param version package version wanted, null for the current one
+   * @param overrideRef approved exception, null when none
+   * @param strict refuse item rates other than the scheme rate without the exception
+   */
+  private record Scheme(Integer version, String overrideRef, boolean strict) {}
 
   private static boolean rateable(RiskProduct product, QuotationContent content) {
     boolean itemsReady =
@@ -230,7 +331,7 @@ public class QuotationPricing {
   }
 
   private static QuotationContent withPremium(
-      QuotationContent c, List<QuotationItem> items, AccountPremium premium) {
+      QuotationContent c, List<QuotationItem> items, AccountPremium premium, Rating rated) {
     return new QuotationContent(
         c.insurerCode(),
         c.insurerBranch(),
@@ -241,6 +342,8 @@ public class QuotationPricing {
         c.ratingBasis(),
         c.remarks(),
         items,
-        premium);
+        premium,
+        rated == null ? null : rated.schemeVersion(),
+        rated != null && rated.schemeDeviation());
   }
 }

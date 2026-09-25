@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.catalog.service.PeriodBasis;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
+import com.iortatechnxt.brokerverse.catalog.service.RatingQuery;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.FieldValidationException;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
@@ -97,7 +98,9 @@ public class QuotationRules {
           "Select the product",
           Map.of("productCode", "Select the product"));
     }
-    RiskProduct product = catalog.requireUsableProduct(draft.productCode());
+    RiskProduct product =
+        catalog.requireSellable(
+            draft.productCode(), RatingQuery.Purpose.NEW_BUSINESS, LocalDate.now(clock));
     String segment = blankToNull(draft.marketSegment());
     if (!product.allowsSegment(segment)) {
       throw new BusinessRuleException(

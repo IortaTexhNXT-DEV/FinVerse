@@ -46,7 +46,7 @@ public class CatalogRecordController {
    * @return record
    */
   @PostMapping("/{kind}/{id}/deactivate")
-  @PreAuthorize(CatalogAccess.MAINTAIN)
+  @PreAuthorize(CatalogAccess.DEACTIVATE)
   public CatalogRecordResponse deactivate(@PathVariable CatalogKind kind, @PathVariable Long id) {
     return CatalogRecordResponse.from(kind, records.deactivate(kind, id));
   }

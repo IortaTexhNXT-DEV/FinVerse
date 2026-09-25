@@ -1,4 +1,5 @@
 import { api, toQuery } from './client';
+import type { ProductLifecycle, VersionStatus } from './productCatalog';
 import type { RecordStatus } from './types';
 
 /** Product catalog, insurer panel, rate tables, sales organisation and rating (catalog module). */
@@ -36,7 +37,11 @@ export type CatalogKind =
   | 'SHORT_PERIOD_RATE'
   | 'MOTOR_LIMIT'
   | 'SALES_UNIT'
-  | 'SALES_OFFICER';
+  | 'SALES_OFFICER'
+  | 'COVERAGE'
+  | 'CLAUSE'
+  | 'INCENTIVE_CRITERIA'
+  | 'RATE_SCHEME_EXCEPTION';
 
 export const RATE_CODES: RateCode[] = [
   'DST',
@@ -97,7 +102,14 @@ export interface ProductInput {
   tsuInvolvement?: TsuInvolvement;
 }
 
-export type Product = ProductInput & Authorizable;
+export interface Product extends ProductInput, Authorizable {
+  /** ACTIVE, EXPIRED or RETIRED (BRPM.006); current package version (BRPM.007). */
+  lifecycleStatus?: ProductLifecycle;
+  currentVersionNo?: number;
+  openVersionNo?: number;
+  openVersionStatus?: VersionStatus;
+  packageEndDate?: string;
+}
 
 export interface FieldRuleInput {
   scope: RuleScope;
@@ -107,7 +119,15 @@ export interface FieldRuleInput {
   label: string;
   required: boolean;
   sortOrder: number;
+  /** What a given value is checked against (BRPM.004); REQUIRED when empty. */
+  ruleType?: FieldRuleType;
+  lovType?: string;
+  minValue?: number;
+  maxValue?: number;
+  pattern?: string;
 }
+
+export type FieldRuleType = 'REQUIRED' | 'LOV' | 'RANGE' | 'PATTERN';
 
 export type FieldRule = FieldRuleInput & Authorizable;
 
@@ -149,6 +169,7 @@ export interface ProductFilter {
   segment?: string;
   q?: string;
   activeOnly?: boolean;
+  lifecycle?: ProductLifecycle;
 }
 
 export interface InsurerInput {
@@ -304,6 +325,8 @@ export interface RatingInput {
   periodTo?: string;
   commissionRate?: number;
   endorsement: boolean;
+  /** Earlier package version to price on, for information (BRPM.007). */
+  schemeVersion?: number;
 }
 
 export interface ItemPremium {
@@ -353,6 +376,12 @@ export interface RatingResult {
   rates: RatingRates;
   basis: PeriodBasis;
   shortPeriodPercent?: number;
+  /** Package version that priced it (BRPM.007). */
+  schemeVersion?: number;
+  schemeRate?: number;
+  schemeEffectiveFrom?: string;
+  nonCurrent: boolean;
+  schemeDeviation: boolean;
 }
 
 export interface CatalogRecordResult extends Authorizable {

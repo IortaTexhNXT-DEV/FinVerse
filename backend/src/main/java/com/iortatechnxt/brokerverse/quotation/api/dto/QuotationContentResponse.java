@@ -26,6 +26,8 @@ import java.util.stream.IntStream;
  * @param totalSumInsured total sum insured
  * @param groups risk groups
  * @param rated whether the premium is computed
+ * @param schemeVersion package version that priced it (BRPM.007)
+ * @param schemeDeviation an item rate differs from the scheme rate (needs a rate exception)
  */
 public record QuotationContentResponse(
     String insurerCode,
@@ -40,7 +42,9 @@ public record QuotationContentResponse(
     AccountPremium premium,
     BigDecimal totalSumInsured,
     List<Integer> groups,
-    boolean rated) {
+    boolean rated,
+    Integer schemeVersion,
+    boolean schemeDeviation) {
 
   /**
    * One item.
@@ -94,6 +98,8 @@ public record QuotationContentResponse(
         c.premium(),
         QuotationPricing.totalSumInsured(c),
         c.groups(),
-        c.isRated());
+        c.isRated(),
+        c.schemeVersion(),
+        c.schemeDeviation());
   }
 }

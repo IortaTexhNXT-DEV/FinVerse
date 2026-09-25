@@ -30,8 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Minimum-field matrix and document checklist per product (BRNB.002/003/093, BRNB.026): rules for
  * every product, per line and per product, where the narrowest scope wins, and the check of a
- * record against them. The matrix content itself is parked (Q01/Q02): the rows are maintained on
- * the Products screen under maker-checker.
+ * record against them. Field rules may also check the format of a given value (BRPM.004: LOV,
+ * RANGE, PATTERN), see {@link #violations}. The matrix content itself is parked (Q01/Q02): the rows
+ * are maintained on the Products screen under maker-checker.
  */
 @Service
 @Transactional
@@ -47,6 +48,7 @@ public class ProductRuleService {
   private final ProductCatalogService catalog;
   private final LovService lovs;
   private final AuditTrailService audit;
+  private final FieldValueRules valueRules;
   private final Clock clock;
 
   /**
@@ -57,6 +59,7 @@ public class ProductRuleService {
    * @param catalog products and lines
    * @param lovs lists of values (document types)
    * @param audit audit trail
+   * @param valueRules typed checks of given values
    * @param clock clock
    */
   public ProductRuleService(
@@ -65,12 +68,14 @@ public class ProductRuleService {
       ProductCatalogService catalog,
       LovService lovs,
       AuditTrailService audit,
+      FieldValueRules valueRules,
       Clock clock) {
     this.fieldRules = fieldRules;
     this.documentRules = documentRules;
     this.catalog = catalog;
     this.lovs = lovs;
     this.audit = audit;
+    this.valueRules = valueRules;
     this.clock = clock;
   }
 
@@ -104,6 +109,21 @@ public class ProductRuleService {
    * @return rule
    */
   public FieldRule createFieldRule(RuleKey key, String label, boolean required, int sortOrder) {
+    return createFieldRule(key, label, required, sortOrder, FieldRule.Check.PRESENCE);
+  }
+
+  /**
+   * Adds a typed field rule (BRPM.004), pending authorization.
+   *
+   * @param key scope, target and field key
+   * @param label label
+   * @param required mandatory flag
+   * @param sortOrder order
+   * @param check what is checked on a given value
+   * @return rule
+   */
+  public FieldRule createFieldRule(
+      RuleKey key, String label, boolean required, int sortOrder, FieldRule.Check check) {
     requireScope(key.scope(), key.scopeCode());
     if (fieldRules
         .findByScopeAndScopeCodeAndTargetAndFieldKey(
@@ -111,7 +131,10 @@ public class ProductRuleService {
         .isPresent()) {
       throw new DuplicateResourceException(CatalogKind.FIELD_RULE.label(), key.fieldKey());
     }
-    FieldRule saved = fieldRules.save(new FieldRule(key, label, required, sortOrder));
+    FieldRule rule = new FieldRule(key, label, required, sortOrder);
+    rule.check(check);
+    valueRules.requireLovType(check);
+    FieldRule saved = fieldRules.save(rule);
     audit.record(
         CatalogKind.FIELD_RULE.label(), saved.catalogReference(), AuditAction.CREATE, label);
     return saved;
@@ -127,11 +150,42 @@ public class ProductRuleService {
    * @return rule
    */
   public FieldRule updateFieldRule(Long id, String label, boolean required, int sortOrder) {
+    FieldRule current =
+        fieldRules
+            .findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException(CatalogKind.FIELD_RULE.label(), id));
+    return updateFieldRule(
+        id,
+        label,
+        required,
+        sortOrder,
+        new FieldRule.Check(
+            current.getRuleType(),
+            current.getLovType(),
+            current.getMinValue(),
+            current.getMaxValue(),
+            current.getPattern()));
+  }
+
+  /**
+   * Changes a typed field rule (BRPM.004), pending authorization.
+   *
+   * @param id rule
+   * @param label label
+   * @param required mandatory flag
+   * @param sortOrder order
+   * @param check what is checked on a given value
+   * @return rule
+   */
+  public FieldRule updateFieldRule(
+      Long id, String label, boolean required, int sortOrder, FieldRule.Check check) {
     FieldRule rule =
         fieldRules
             .findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(CatalogKind.FIELD_RULE.label(), id));
+    valueRules.requireLovType(check);
     rule.update(label, required, sortOrder);
+    rule.check(check);
     audit.record(
         CatalogKind.FIELD_RULE.label(),
         rule.catalogReference(),
@@ -188,6 +242,20 @@ public class ProductRuleService {
         AuditAction.UPDATE,
         rule.catalogDescription());
     return rule;
+  }
+
+  /**
+   * Checks the given values of a record against the typed field rules of its product (BRPM.004): a
+   * value outside its list, range or pattern is an error. Missing values are the minimum-field
+   * matrix's concern ({@link #missingFields}).
+   *
+   * @param product product
+   * @param values given values of the record and its items
+   * @return field errors by field path ("items[0].yearModel"); empty when valid
+   */
+  @Transactional(readOnly = true)
+  public Map<String, String> violations(RiskProduct product, FieldValues values) {
+    return valueRules.violations(effectiveFieldRules(product), values);
   }
 
   private void requireScope(RuleScope scope, String scopeCode) {

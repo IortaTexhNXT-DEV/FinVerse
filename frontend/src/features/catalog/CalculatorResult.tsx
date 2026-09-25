@@ -3,7 +3,7 @@ import { Amount } from '@/components/ui/Amount';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { Kpi } from '@/components/ui/Kpi';
-import { formatAmount, humanize } from '@/utils/format';
+import { formatAmount, formatDate, humanize } from '@/utils/format';
 
 type Line = readonly [string, number | undefined, string?];
 
@@ -48,6 +48,19 @@ export function CalculatorResult({ result }: Readonly<{ result: RatingResult }>)
   const b = result.breakdown;
   return (
     <div className="stack">
+      {result.schemeVersion && (
+        <div
+          className={
+            result.nonCurrent || result.schemeDeviation ? 'alert warning' : 'alert success'
+          }
+        >
+          Priced on package version {result.schemeVersion} (effective{' '}
+          {formatDate(result.schemeEffectiveFrom)}, scheme rate {result.schemeRate ?? '–'}%)
+          {result.nonCurrent && ' – not the current version: for information only.'}
+          {result.schemeDeviation &&
+            ' – an item rate differs from the scheme rate: a quotation needs an approved rate exception.'}
+        </div>
+      )}
       <div className="grid-4">
         <Kpi label="Sum insured" value={formatAmount(b.sumInsured)} />
         <Kpi label="Net premium" value={formatAmount(b.netPremium)} hint={periodText(result)} />

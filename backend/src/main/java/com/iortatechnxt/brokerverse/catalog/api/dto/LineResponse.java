@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
  * @param riskItemKind kind of risk items
  * @param ratingMethod Appendix A formula
  * @param sortOrder display order
+ * @param codePattern risk-code pattern, null for none
  * @param recordStatus maker-checker status
  * @param maker last maintainer
  * @param authorizedBy checker
@@ -25,6 +26,7 @@ public record LineResponse(
     RiskItemKind riskItemKind,
     RatingMethod ratingMethod,
     int sortOrder,
+    String codePattern,
     RecordStatus recordStatus,
     String maker,
     String authorizedBy) {
@@ -43,6 +45,7 @@ public record LineResponse(
         e.getRiskItemKind(),
         e.getRatingMethod(),
         e.getSortOrder(),
+        e.getCodePattern(),
         e.getRecordStatus(),
         e.getMaker(),
         e.getAuthorizedBy());

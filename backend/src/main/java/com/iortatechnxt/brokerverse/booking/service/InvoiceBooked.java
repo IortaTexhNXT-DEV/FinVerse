@@ -47,6 +47,8 @@ import java.util.Map;
  * @param policyNo policy number of the year
  * @param policyYear policy year (multi-year accounts)
  * @param lineCode product line
+ * @param productVersionNo package version of the account (BRPM.007), null when none
+ * @param incentiveCriteria codes of the incentive criteria matched (PMADD07), empty when none
  */
 public record InvoiceBooked(
     String invoiceNo,
@@ -73,12 +75,15 @@ public record InvoiceBooked(
     InvoiceKind kind,
     String policyNo,
     int policyYear,
-    String lineCode) {
+    String lineCode,
+    Integer productVersionNo,
+    List<String> incentiveCriteria) {
 
   /** Defensive copies. */
   public InvoiceBooked {
     shares = List.copyOf(shares);
     components = Map.copyOf(components);
+    incentiveCriteria = incentiveCriteria == null ? List.of() : List.copyOf(incentiveCriteria);
   }
 
   /**
@@ -113,7 +118,9 @@ public record InvoiceBooked(
         invoice.getKind(),
         invoice.getPolicyNo(),
         invoice.getPolicyYear(),
-        invoice.getFacts().lineCode());
+        invoice.getFacts().lineCode(),
+        invoice.getFacts().productVersionNo(),
+        invoice.getFlags().incentiveCriteriaCodes());
   }
 
   /**

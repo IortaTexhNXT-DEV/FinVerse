@@ -25,6 +25,8 @@ import java.util.List;
  * @param validUntil validity
  * @param directPayment premium paid directly to the insurer
  * @param accountArns accounts created from the quotation
+ * @param productVersionNo package version that priced the current version (BRPM.007), null when
+ *     none
  */
 public record QuotationSummary(
     Long id,
@@ -40,7 +42,8 @@ public record QuotationSummary(
     BigDecimal grossPremium,
     LocalDate validUntil,
     boolean directPayment,
-    List<String> accountArns) {
+    List<String> accountArns,
+    Integer productVersionNo) {
 
   /** Defensive copy. */
   public QuotationSummary {
@@ -68,6 +71,7 @@ public record QuotationSummary(
         q.getGrossPremium(),
         q.getValidUntil(),
         q.isDirectPayment(),
-        q.getAccountArns());
+        q.getAccountArns(),
+        q.getProductVersionNo());
   }
 }

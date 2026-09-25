@@ -58,6 +58,7 @@ public record QuotationDiff(
     field(fields, "Direct payment", from, to, QuotationContent::directPayment);
     field(fields, "Rating basis", from, to, QuotationContent::ratingBasis);
     field(fields, "Remarks", from, to, QuotationContent::remarks);
+    field(fields, "Package version", from, to, QuotationContent::schemeVersion);
     BigDecimal grossFrom = from.premium().grossPremium();
     BigDecimal grossTo = to.premium().grossPremium();
     return new QuotationDiff(

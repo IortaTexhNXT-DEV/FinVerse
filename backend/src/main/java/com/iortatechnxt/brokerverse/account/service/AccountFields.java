@@ -12,9 +12,13 @@ import com.iortatechnxt.brokerverse.account.domain.RiskItemData.Person;
 import com.iortatechnxt.brokerverse.account.domain.RiskItemData.Vehicle;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskItemKind;
 import com.iortatechnxt.brokerverse.catalog.service.FieldPresence;
+import com.iortatechnxt.brokerverse.catalog.service.FieldValues;
 import com.iortatechnxt.brokerverse.catalog.service.PeriodBasis;
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -29,6 +33,8 @@ import java.util.Set;
  */
 final class AccountFields {
 
+  private static final String SUM_INSURED = "sumInsured";
+
   private AccountFields() {}
 
   /**
@@ -38,7 +44,19 @@ final class AccountFields {
    * @return presence for the minimum-field check
    */
   static FieldPresence presence(AccountData d) {
-    Set<String> keys = new HashSet<>();
+    FieldValues values = values(d);
+    return new FieldPresence(
+        values.record().keySet(), values.items().stream().map(AccountFields::present).toList());
+  }
+
+  /**
+   * The given values as text, for the typed field rules (BRPM.004).
+   *
+   * @param d account data
+   * @return values of the account and of each item
+   */
+  static FieldValues values(AccountData d) {
+    Map<String, String> keys = new HashMap<>();
     put(keys, "clientId", d.client() == null ? null : d.client().id());
     put(keys, "productCode", d.product() == null ? null : d.product().code());
     put(keys, "marketSegment", d.marketSegment());
@@ -51,24 +69,32 @@ final class AccountFields {
     Mortgage m = d.mortgage() == null ? Mortgage.NONE : d.mortgage();
     put(keys, "mortgageeBank", m.bank());
     put(keys, "loanApplicationNo", m.loanApplicationNo());
-    put(keys, "pnNumbers", m.pnNumbers().isEmpty() ? null : m.pnNumbers());
+    put(keys, "pnNumbers", m.pnNumbers().isEmpty() ? null : String.join(",", m.pnNumbers()));
     if (d.contact() != null) {
       put(keys, "contactEmail", d.contact().email());
       put(keys, "contactMobile", d.contact().mobile());
     }
-    put(keys, "items", d.items().isEmpty() ? null : d.items());
-    return new FieldPresence(keys, d.items().stream().map(AccountFields::itemPresence).toList());
+    put(keys, "items", d.items().isEmpty() ? null : d.items().size());
+    return new FieldValues(keys, d.items().stream().map(AccountFields::itemValues).toList());
   }
 
-  private static Set<String> itemPresence(RiskItemData item) {
-    Set<String> keys = new HashSet<>();
-    put(keys, "description", item.description());
-    if (item.sumInsured() != null && item.sumInsured().signum() > 0) {
-      keys.add("sumInsured");
+  /** Presence of an item: a sum insured counts only when positive. */
+  private static Set<String> present(Map<String, String> item) {
+    Set<String> keys = new HashSet<>(item.keySet());
+    String sum = item.get(SUM_INSURED);
+    if (sum != null && new BigDecimal(sum).signum() <= 0) {
+      keys.remove(SUM_INSURED);
     }
+    return keys;
+  }
+
+  private static Map<String, String> itemValues(RiskItemData item) {
+    Map<String, String> keys = new HashMap<>();
+    put(keys, "description", item.description());
+    put(keys, SUM_INSURED, item.sumInsured());
     put(keys, "rate", item.rate());
-    vehiclePresence(keys, item.vehicle());
-    locationPresence(keys, item.location());
+    vehicleValues(keys, item.vehicle());
+    locationValues(keys, item.location());
     Person p = item.person();
     if (p != null) {
       put(keys, "personName", p.name());
@@ -77,7 +103,7 @@ final class AccountFields {
     return keys;
   }
 
-  private static void vehiclePresence(Set<String> keys, Vehicle v) {
+  private static void vehicleValues(Map<String, String> keys, Vehicle v) {
     if (v == null) {
       return;
     }
@@ -93,7 +119,7 @@ final class AccountFields {
     put(keys, "seatingCapacity", v.seatingCapacity());
   }
 
-  private static void locationPresence(Set<String> keys, Location l) {
+  private static void locationValues(Map<String, String> keys, Location l) {
     if (l == null) {
       return;
     }
@@ -102,14 +128,14 @@ final class AccountFields {
     put(keys, "province", l.province());
     put(keys, "occupancy", l.occupancy());
     put(keys, "constructionClass", l.constructionClass());
-    put(keys, "insuredItems", l.insuredItems().isEmpty() ? null : l.insuredItems());
+    put(keys, "insuredItems", l.insuredItems().isEmpty() ? null : l.insuredItems().size());
   }
 
-  private static void put(Set<String> keys, String key, Object value) {
+  private static void put(Map<String, String> keys, String key, Object value) {
     if (value == null || value instanceof String s && s.isBlank()) {
       return;
     }
-    keys.add(key);
+    keys.put(key, value instanceof BigDecimal b ? b.toPlainString() : String.valueOf(value));
   }
 
   /**

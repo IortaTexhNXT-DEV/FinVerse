@@ -109,6 +109,12 @@ public class Quotation extends BaseEntity {
   @Column(name = "commission", precision = 19, scale = 2)
   private BigDecimal commission;
 
+  @Column(name = "product_version_no")
+  private Integer productVersionNo;
+
+  @Column(name = "rate_override_ref", length = 30)
+  private String rateOverrideRef;
+
   @Column(name = "tsu_required", nullable = false)
   private boolean tsuRequired;
 
@@ -202,6 +208,24 @@ public class Quotation extends BaseEntity {
     this.netPremium = content.premium().netPremium();
     this.grossPremium = content.premium().grossPremium();
     this.commission = content.premium().commission();
+    this.productVersionNo = content.schemeVersion();
+  }
+
+  /**
+   * Records the approved rate-scheme exception the submitted version is priced with (BRPM.007).
+   *
+   * @param reference exception reference, null when none was needed
+   */
+  public void useRateOverride(String reference) {
+    this.rateOverrideRef = reference;
+  }
+
+  public Integer getProductVersionNo() {
+    return productVersionNo;
+  }
+
+  public String getRateOverrideRef() {
+    return rateOverrideRef;
   }
 
   /**

@@ -2,7 +2,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { Calculator, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { catalogApi } from '@/api/catalog';
-import type { PeriodBasis, RatingMethod } from '@/api/catalog';
+import { productCatalogApi } from '@/api/productCatalog';
+import type { PeriodBasis, Product, RatingMethod } from '@/api/catalog';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -94,6 +95,35 @@ function ItemRow({
   );
 }
 
+/** Released and superseded versions of a package, to price on an earlier one (BRPM.007). */
+function VersionPicker({
+  product,
+  value,
+  onChange,
+}: Readonly<{ product: Product | undefined; value: string; onChange: (v: string) => void }>) {
+  const code = product?.code ?? '';
+  const versions = useQuery({
+    queryKey: ['catalog', 'versions', code],
+    queryFn: () => productCatalogApi.versions(code),
+    enabled: product?.packaged === true,
+  });
+  const sold = (versions.data ?? []).filter(
+    (v) => v.status === 'RELEASED' || v.status === 'SUPERSEDED',
+  );
+  if (sold.length < 2) {
+    return null;
+  }
+  return (
+    <SelectInput
+      label="Package version"
+      value={value}
+      options={sold.map((v) => ({ value: String(v.versionNo), label: `Version ${v.versionNo}` }))}
+      blank="Version in force"
+      onChange={onChange}
+    />
+  );
+}
+
 /**
  * Interactive premium calculator (BRNB.007): rates a product for an insurer branch, annual,
  * pro-rata or short period, for a new account or an endorsement over the remaining term, and
@@ -139,7 +169,7 @@ export default function PremiumCalculatorPage() {
               value: p.code,
               label: `${p.code} – ${p.name}`,
             }))}
-            onChange={(productCode) => set({ productCode })}
+            onChange={(productCode) => set({ productCode, schemeVersion: '' })}
           />
           <SelectInput
             label="Insurer"
@@ -177,6 +207,11 @@ export default function PremiumCalculatorPage() {
             label="Commission % override"
             value={form.commissionRate}
             onChange={(commissionRate) => set({ commissionRate })}
+          />
+          <VersionPicker
+            product={product}
+            value={form.schemeVersion}
+            onChange={(schemeVersion) => set({ schemeVersion })}
           />
           <label className="checkbox" style={{ alignSelf: 'end' }}>
             <input

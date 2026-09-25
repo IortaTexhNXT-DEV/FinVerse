@@ -1,16 +1,16 @@
-package com.iortatechnxt.brokerverse.prodrecon.service.port;
+package com.iortatechnxt.brokerverse.opsledger.service.port;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
 /**
- * Seam of the early remittance incentive rule (PRCID.028, RMTID.023, OQ23): the rate and window
- * that apply to a booked invoice, e.g. 2% of the premium of CLG / CBG motor and fire accounts
- * remitted within 30 days of inception. The rule belongs to remittance ({@code
- * rem_incentive_rule}); until it is connected (a remittance bean implementing this port, or a port
- * moved to {@code opsledger} in the integration wave) the default adapter knows no rule and the
- * validation reports every line as "rule pending".
+ * Early remittance incentive terms (PRCID.028, RMTID.023, OQ23): the rate and window that apply to
+ * a booked invoice, e.g. 2% of the basic premium of CBG motor accounts remitted within 30 days of
+ * inception. Remittance owns the rules ({@code rem_incentive_rule}) and implements this port;
+ * production reconciliation reads it to validate the early incentive the insurer reports. The
+ * default adapter ({@code OpsPortDefaults}) knows no rule, so a module running without remittance
+ * reports every line as "no rule".
  */
 public interface EarlyIncentiveRules {
 

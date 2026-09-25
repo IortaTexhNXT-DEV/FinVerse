@@ -86,9 +86,11 @@ public class LedgerEffects {
    *
    * @param request request
    * @param returned return invoice as booked (negative amounts)
+   * @param journalBatchNo booking journal of the return invoice, null when none
    */
-  public void adjustOriginal(EndorsementRequest request, InvoiceBooked returned) {
-    adjust(request, amountsOf(returned), returned.invoiceNo());
+  public void adjustOriginal(
+      EndorsementRequest request, InvoiceBooked returned, String journalBatchNo) {
+    adjust(request, amountsOf(returned), journalBatchNo);
   }
 
   /**
@@ -96,10 +98,10 @@ public class LedgerEffects {
    *
    * @param request request
    * @param amounts signed amounts per component
-   * @param document booked invoice or journal carrying the change
+   * @param journalBatchNo journal batch carrying the change, null when none
    */
   public void adjust(
-      EndorsementRequest request, Map<LedgerComponent, BigDecimal> amounts, String document) {
+      EndorsementRequest request, Map<LedgerComponent, BigDecimal> amounts, String journalBatchNo) {
     ledger.post(
         new MovementRequest(
             request.getSubject().invoiceNo(),
@@ -108,7 +110,7 @@ public class LedgerEffects {
             Adjustments.sourceRef(request.getRequestNo()),
             LocalDate.now(clock),
             amounts,
-            new DocumentRefs(null, null, request.outcome().batchNo(), document),
+            new DocumentRefs(null, null, request.outcome().batchNo(), journalBatchNo),
             request.getTerms().endorsementType() + " " + request.getRequestNo()));
   }
 

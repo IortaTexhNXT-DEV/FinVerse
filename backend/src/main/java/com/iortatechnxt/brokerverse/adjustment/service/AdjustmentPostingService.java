@@ -270,7 +270,10 @@ public class AdjustmentPostingService {
     EndorsementResult posted = endorsements.post(bookingPosting(request, invoice, result));
     journals.addAll(posted.journalBatches());
     if (posted.invoice() != null && posted.invoice().kind().isNegative()) {
-      effects.adjustOriginal(request, posted.invoice());
+      effects.adjustOriginal(
+          request,
+          posted.invoice(),
+          posted.journalBatches().isEmpty() ? null : posted.journalBatches().get(0));
     }
     List<String> documents =
         serviceInvoices.forInvoice(posted.invoiceNo()).stream()

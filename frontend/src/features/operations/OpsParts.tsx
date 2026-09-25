@@ -1,6 +1,4 @@
 import { AlarmClock } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
-import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { InvoiceFlags, WorkCount } from '@/api/operations';
 import { flagChips, tileTone } from './opsLabels';
@@ -20,23 +18,6 @@ export function FlagChips({ flags }: Readonly<{ flags: InvoiceFlags }>) {
         </span>
       ))}
     </span>
-  );
-}
-
-/** One icon + label / value fact of a record summary card. */
-export function OpsFact({
-  icon: Icon,
-  label,
-  children,
-}: Readonly<{ icon: LucideIcon; label: string; children: ReactNode }>) {
-  return (
-    <div className="ops-fact">
-      <Icon size={20} aria-hidden="true" />
-      <div>
-        <div className="ops-fact-label">{label}</div>
-        <div className="ops-fact-value">{children}</div>
-      </div>
-    </div>
   );
 }
 

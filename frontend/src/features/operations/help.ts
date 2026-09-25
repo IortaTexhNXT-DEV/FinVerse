@@ -25,7 +25,7 @@ export const OPERATIONS_HELP: HelpSection = {
       name: 'Invoice Search',
       path: '/operations/invoices',
       summary:
-        'Every invoice of the ledger with its outstanding premium, payment status, remittance status and flags; open one for its invoice 360: components and balances, insurer shares, movements, receipts, remittances and adjustments, history and documents.',
+        'Every invoice of the ledger with its outstanding premium, payment status, remittance status and flags; open one for its invoice 360: components and balances, insurer shares, movements, one tab per Operations module (receipts, remittances, adjustments, reconciliation, commission) with its record count, history and documents.',
       workflow: [
         'Search by invoice number, ARN, policy number, client code or assured name, or pick a tab (Outstanding, Paid Not Extracted, On Hold, Locked, Direct Payment).',
         'Filters narrow the list by insurer and booking date.',

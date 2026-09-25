@@ -3,8 +3,103 @@
 Guide of the Operations modules of iNXT BrokerVerse: the shared invoice ledger (`opsledger`), and
 cashiering, remittance, product reconciliation, adjustment and commission receivables. The build
 design is [`docs/architecture/OPERATIONS_DESIGN.md`](../architecture/OPERATIONS_DESIGN.md); the
-requirements are [`docs/requirements/BDOI_OPS_BRD_SPEC.md`](../requirements/BDOI_OPS_BRD_SPEC.md).
-Each module adds its own section below the foundation.
+requirements are [`docs/requirements/BDOI_OPS_BRD_SPEC.md`](../requirements/BDOI_OPS_BRD_SPEC.md)
+and their status per BR ID is in
+[`docs/requirements/BDOI_OPS_TRACEABILITY.md`](../requirements/BDOI_OPS_TRACEABILITY.md).
+Section 0 is the overview of the whole; sections 1 to 6 describe each module; section 7 is the
+integration of the modules (wave O2) and section 8 the consolidated list of parked items.
+
+## 0. Overview
+
+### 0.1 What Operations does
+
+Operations takes over every booked invoice from New Business and follows its money until the
+insurer has been paid and the file is closed.
+
+| Team | Module | Screens (sidebar) | What it does |
+|---|---|---|---|
+| All Operations teams | `opsledger` | *Operations*: home, invoice search, Invoice 360, Disbursement queue, hand-offs, interfaces, report archive, notification settings | One ledger line per invoice with its premium receivable by component, DTIP, commission, flags, lock and statuses; the ports to the systems BDOI has not specified yet |
+| Cashiering | `cashiering` | *Finance / Cashiering* | Receives payments (counter, bank files, PDC, pick-up), issues ARs and ORs, applies money to the invoices by component, keeps unapplied money until it is disposed of, runs the BIR 2307 flow |
+| Remittance | `remittance` | *Finance / Remittance* | Extracts what clients paid, groups it into batches per insurer, gets them approved, asks Disbursement to pay the insurer and records the insurer's OR; holds and special remittances |
+| Product reconciliation | `prodrecon` | *Client & Policy / Product Reconciliation* | Sends each insurer the register of what BDOI booked, takes the insurer's answer and follows every difference |
+| Adjustment | `adjustment` | *Client & Policy / Adjustment* | Endorsement and cancellation requests on booked invoices, with validation, approval, posting, re-application of payments and the AR Insurer after remittance |
+| Commission receivables | `commission` | *Finance / Commission Receivables* | Bills insurers for the commission on direct payment accounts, collects it with an OR, reverses the premium receivable; incentive schemes and BIR certificates |
+
+The modules never call each other. They share the ledger (`InvoiceLedgerService`), the events of
+`OpsLedgerEvents` and the ports of `opsledger.service.port`, which the owning module implements
+(section 1.3 and 7.2).
+
+### 0.2 The life of an invoice (end to end)
+
+The flow below is the one `OperationsEndToEndIT` walks through with the demo users (section 7.3).
+Each arrow is a real service call; the ledger movement it leaves is in brackets.
+
+```mermaid
+flowchart LR
+    NB["Booking (New Business)<br/>InvoiceBooked"] -->|feed after commit| L[("Invoice ledger<br/>ops_invoice<br/>[BOOKED]")]
+    subgraph CASH[Cashiering]
+      P["Payment<br/>OTC / files / PDC / pick-up"] --> AR[AR issued<br/>OPS_AR_RECEIPT]
+      AR --> M{Match}
+      M -->|booked| APP["Applied per component<br/>OPS_PAYMENT_APPLY [APPLIED]"]
+      M -->|not booked yet| PRE[Pre-booked queue]
+      M -->|no match / excess| UN[Unapplied item]
+      UN --> DSP[Disposition<br/>refund / apply / reclass]
+    end
+    PRE -.->|PaymentConfirmationSource<br/>PRE: / APP:| GATE[Placement payment gate]
+    L --> P
+    APP --> X
+    subgraph REM[Remittance]
+      X["Extraction<br/>tags, batch per insurer"] --> B["Batch<br/>exclude / restore"]
+      B -->|submit, four-eyes approve<br/>OPS_REMITTANCE [REMITTED]| APPR[Approved]
+      APPR --> OR1[Commission OR<br/>ReceiptIssuer]
+      INSOR[Insurer OR upload<br/>INSURER_REMIT_OR] --> ORR[OR received]
+    end
+    APPR -->|DisbursementGateway| DQ[Disbursement queue]
+    DQ -->|DV assigned| FR[Fully / partially remitted<br/>invoice unlocked]
+    FR --> INSOR
+    DSP -->|refund| DQ
+    subgraph REC[Production reconciliation]
+      RX[Register extract and send] --> RU[Insurer upload<br/>INSURER_PRODUCTION] --> RM["Match: matched / discrepancy /<br/>BDOI only / insurer only"]
+      RM -.->|EarlyIncentiveRules| EI[Early incentive check]
+    end
+    L --> RX
+    subgraph ADJ[Adjustment]
+      RQ[Request] --> VAL[Validate / approve] --> PST["Post<br/>EndorsementPostingService [ADJUSTED]"]
+      PST -->|after remittance| ARI[AR Insurer<br/>OPS_AR_INSURER_SETUP<br/>PENDING_NEG_ADJ]
+      PST -->|paid invoice| RA[PaymentReapplier]
+    end
+    FR --> RQ
+    RA --> UN
+    subgraph CMR[Commission receivables]
+      DPL["DP list<br/>COLLECTION_DP_LIST"] --> BIL[Billing to insurer] --> ANS[Insurer answer] --> COL["Collection<br/>OPS_DP_COMMISSION_COLLECT<br/>[DP_REVERSAL]"]
+      COL --> OR2[Commission OR<br/>ReceiptIssuer]
+    end
+    L --> DPL
+    L --> WO["Minimal balance file<br/>OPS_WRITE_OFF [WRITE_OFF]"]
+```
+
+In words:
+
+1. **Booking.** `InvoiceBooked` reaches the ledger after the booking commits (`InvoiceLedgerFeed`):
+   components booked, remittance status `WITH_OUTSTANDING_BALANCE`, the booking's open items in
+   the subledger.
+2. **Payment.** Cashiering issues the AR and applies the money in hierarchy order (DST, premium tax
+   / VAT, LGT, FST, other charges, basic); the invoice becomes `PAID`. A payment for an account
+   that is not booked yet waits in the pre-booked queue and opens the placement payment gate.
+3. **Remittance.** Extraction puts the paid invoice in a batch and locks it; exclusion unlocks it
+   and restore takes it back; submission and four-eyes approval post the remittance (DTIP,
+   commission, VAT and withholding tax remitted), issue the commission OR and send the payment
+   request to Disbursement. The DV makes the invoice `FULLY_REMITTED` and releases the lock; the
+   insurer's OR schedule closes the batch.
+4. **Reconciliation.** The register goes to the insurer; the insurer's file is matched, and the
+   early incentive of each remitted invoice is checked against remittance's rules.
+5. **Cancellation after remittance.** The adjustment posts the return on the original invoice,
+   sets up the AR Insurer for the remitted DTIP, keeps `PENDING_NEG_ADJ` for remittance and has
+   cashiering re-apply the payments: the money becomes an unapplied item to refund.
+6. **Direct payment.** The DP account is listed, billed, approved by the insurer and collected: the
+   premium receivable is reversed and cashiering issues the commission OR.
+7. **Minimal balance.** A small balance is written off from the minimal balance file; remittance
+   then refuses the written-off invoice.
 
 ## 1. Foundation (`opsledger` and platform extensions)
 
@@ -73,6 +168,7 @@ module's tests.
 | `FileDropPort` | `DroppedFile drop(Long companyId, ExtractFile.Location, DropContent, ExtractFile.Origin)` | `RepositoryFileDrop` (extract repository) | shared drive (OQ17) |
 | `MarketingFeed` | `List<FeedItem> fetch(Long companyId, String feedCode, LocalDate since)` | none (optional bean) | Marketing interface (OQ45) |
 | `ClaimsFeed` | same as `MarketingFeed` | none (optional bean) | Claims BRD (OQ46) |
+| `EarlyIncentiveRules` | `Optional<Terms> termsFor(Long companyId, Subject)` | no rule | remittance (`RemittanceEarlyIncentiveRules`, O2) |
 
 Extension points read by the foundation (any number of beans):
 - `InvoiceRelatedItems`: `Section section()` and `List<RelatedItem> itemsFor(String invoiceNo)`.
@@ -429,6 +525,7 @@ rules for generating, downloading and view-only use are the platform report perm
 | `placement.service.PaymentConfirmationSource` | adapter (`CashieringPaymentConfirmationSource`, source `CASHIERING`) | returns `APP:<id>` for each active application and `PRE:<id>` for each payment waiting in the pre-booked queue of the ARN, so a payment received before booking opens the NB payment gate |
 | `OpsWorkCountSource`, `InvoiceRelatedItems`, `PendingApprovalSource` | SPIs implemented | Operations home tiles (section `CASHIERING`), the invoice 360 section `RECEIPTS`, and the approvals inbox (series to authorize, receipt actions and dispositions) |
 | `CollectionFeed` (`PickupFlowInHandler`) | flow-in handler | check pick-up requests from the Collection system (OQ01/OQ13) |
+| `COLLECTION_CWT2307`, `COLLECTION_COMMISSION_PAYMENT` (`CollectionFlowInFeeds`, O2) | flow-in handlers | 2307 tags and commission payment details from Collection, with the checks of the `CWT_TAGS` / `COMMISSION_PAYMENT` uploads and a `Company` column |
 
 ### 2.12 Demo
 
@@ -439,9 +536,11 @@ rules for generating, downloading and view-only use are the platform report perm
 - two check pick-up requests;
 - the bank and cash-on-hand parameters.
 
-At start-up (demo profile) `CashieringDemoData` posts, as `cashier`:
+At start-up (demo profile, order 91, before remittance) `CashieringDemoData` posts, as `cashier`,
+with payments valued a week back so remittance can extract them:
 
-- a full and a partial payment;
+- the booking and endorsement invoices of `ARN-2026-940001` paid in full and a partial payment of
+  `ARN-2026-940004`;
 - an unmatched payment with a refund disposition submitted for approval;
 - a payment by ARN (`ARN-2026-940005`);
 - a cancellation request;
@@ -674,8 +773,9 @@ MKTID.001-007/009). The code is in package `com.iortatechnxt.brokerverse.remitta
   - the demo accounting rules for `OPS_REMITTANCE`: 2210 / 1602 against 1220 / 2211;
   - the rules for `OPS_REMIT_INCENTIVE`: 2211 against 4130 / 2504;
   - an incentive rule: INS-MGIC, PROPERTY, CBG, 2%, 30 days from inception.
-- `RemittanceDemoData` (profile `demo`) puts a hold on invoice ARN-2026-940004 and runs a manual
-  extraction, so the batches and tags have content.
+- `RemittanceDemoData` (profile `demo`, order 92) asks for a hold on ARN-2026-940004, remits the
+  paid invoice of ARN-2026-940001 through approval, DV and insurer OR, and runs a manual
+  extraction whose batch waits for review (section 7.4).
 - Demo users are `remit` and `remittl`.
 
 ### 3.10 Parked (seam only)
@@ -909,11 +1009,11 @@ list `ENDORSEMENT_DOC_TYPE` is still open (OQ32).
 
 ### 4.11 Demo
 
-`V994` adds GL 4190 and the demo rules of the three events. At start-up (demo profile, after the
-booking demo and the ledger replay) `AdjustmentDemoData` raises, as `mktcoll`, a change of the
-assured's information on the invoice of `ARN-2026-940003` (waiting for validation) and a flat
-cancellation of `ARN-2026-940004`, validated by `adjust` and approved by `adjtl`, ready for the
-posting batch.
+`V994` adds GL 4190 and the demo rules of the three events. At start-up (demo profile, order 93,
+after cashiering and remittance) `AdjustmentDemoData` leaves a request at every stage: on
+`ARN-2026-940002` a draft, a request waiting for validation, a returned request and a premium rate
+increase waiting for approval; a flat cancellation of `ARN-2026-940004` ready for the posting
+batch; an internal adjustment of `ARN-2026-940001` posted (section 7.4).
 
 ### 4.12 Parked (seam only)
 
@@ -1023,8 +1123,9 @@ schedules).
 - **Closing**: a cycle closes by itself (`for_closure`) when every item is matched or marked for
   closure. Otherwise the user closes it with a comment.
 - **Early incentive** (PRCID.028): each booked account's remittance date is checked against the
-  insurer's rate and window from the `EarlyIncentiveRules` port. The default adapter returns no rule,
-  so the result is `NO_RULE` until remittance supplies the rates (OQ23).
+  insurer's rate and window from the `opsledger.service.port.EarlyIncentiveRules` port, which
+  remittance implements with its `rem_incentive_rule` rules (section 7.1). An invoice no rule
+  covers is `NO_RULE`; the rates themselves are parked (OQ23).
 
 ### 5.3 API (`/api/v1/prodrecon`)
 
@@ -1090,7 +1191,7 @@ the reconciliation items of an invoice.
 | PRCID.015, 016, 017, 018, 038, 039 | Built: feedback fields and register variants. The company-concerned and disposition lists are demo values (OQ31). |
 | PRCID.019, 023, 033 | Built: unbooked repository with the pre-booked lookup. |
 | PRCID.024, 025, 026, 027, 030 | Built: match on booking, `RECON_AUTOMATCH`, tolerance, criteria, statuses. The keys and the timing are parameters (OQ30). |
-| PRCID.028 | Seam: the `EarlyIncentiveRules` port and the report. The rates are parked with remittance (OQ23). |
+| PRCID.028 | Built: the `EarlyIncentiveRules` port, read from remittance's incentive rules, and the report. The rates are parked (OQ23). |
 | PRCID.029 | Built: workflow history and audit trail. |
 | PRCID.035, 036, 037 | Built: reports. |
 
@@ -1101,7 +1202,7 @@ the reconciliation items of an invoice.
 | Extract frequency, template, naming, password per insurer | OQ29 | `prc_schedule`, `PRODRECON_FILE_PATTERN`, `PRODRECON_COVER_LETTER` |
 | Match keys and automatch time | OQ30 | `RECON_MATCH_KEYS`, `RECON_TOLERANCE`, `recon-automatch-cron` |
 | Company concerned and disposition lists | OQ31 | LOVs `RECON_COMPANY_CONCERNED`, `RECON_DISPOSITION` (demo values in V993) |
-| Early incentive rates and windows | OQ23 | `prodrecon.service.port.EarlyIncentiveRules` (default: no rule) |
+| Early incentive rates and windows | OQ23 | `rem_incentive_rule` read through `opsledger.service.port.EarlyIncentiveRules` |
 | Insurer channels (SFTP / API) and shared drive | OQ17 | Manual upload to `INSURER_PRODUCTION`; `FileDropPort` to the extract repository |
 | Sum insured on the register | - | Not in the Operations ledger; column left out |
 
@@ -1269,3 +1370,134 @@ invoice.
 | GL accounts of the DP collection and PR reversal | OQ07 | Demo rules in V995, `DP_PR_REVERSAL_POSTING` off |
 | Branch pass-on payment | OQ02 | `DisbursementGateway` `PASS_ON` request |
 | Co-insurance split of DP commission | - | Lead insurer is the commission party |
+
+## 7. Integration of the modules (wave O2)
+
+### 7.1 What changed in the integration wave
+
+| Change | Where | Why |
+|---|---|---|
+| `EarlyIncentiveRules` moved from `prodrecon.service.port` to `opsledger.service.port`; its "no rule" default moved to `OpsPortDefaults`; remittance implements it (`RemittanceEarlyIncentiveRules`, rule `rem_incentive_rule` covering the insurer, product line and segment on the booking date) | `opsledger`, `remittance`, `prodrecon` | PRCID.028 / RMTID.023: production reconciliation validates the early incentive against the rates remittance keeps. The port sits with the other Operations ports so that the sibling modules stay independent (design section 2.1) |
+| Flow-in handlers for `COLLECTION_CWT2307` and `COLLECTION_COMMISSION_PAYMENT` (`CollectionFlowInFeeds`): each record runs the checks and commit of the `CWT_TAGS` / `COMMISSION_PAYMENT` bulk handlers, once per idempotency key; the files carry the bulk columns plus `Company` | `cashiering` | Every inbound feed by upload now has its handler, so *Operations → Interfaces* accepts all of them (CSHID.007/026, MKTID.013) |
+| Adjustment's `ADJUSTED` movement of a return invoice carries the booking **journal batch** (it carried the return invoice number in the journal field) | `adjustment` (`LedgerEffects`, `AdjustmentPostingService`) | Bug found by the end-to-end test: Invoice 360 and the journal checks follow the movement's journal batch |
+| Home tile labels in Title Case, minor words lowercase ("Batches in Review", "Paid, Not Yet Extracted") | every `OpsWorkCountSource` | BDO UX guideline; guarded by `OperationsSeamsIT` |
+| Invoice 360: `RecordSummary` with reference chips, payment and remittance pills and flag tags; one tab per module (Receipts, Remittances, Adjustments, Reconciliation, Commission) with its record count and an empty state | `features/operations` | BDO UX guideline section 7 |
+| Demo runners in storyline order, each signed in as the demo user whose job it is (`opsledger.demo.DemoUsers`) | all Operations `demo` packages | Real data on every Operations screen after start-up (section 7.4) |
+
+### 7.2 Ports and their beans
+
+| Port | Bean with all Operations modules installed | Default (kept for parked integrations and for a module's own tests) |
+|---|---|---|
+| `ReceiptIssuer` | `CashieringReceiptIssuer` | `HandoffReceiptIssuer` |
+| `UnappliedSink` | `CashieringUnappliedSink` | `HandoffUnappliedSink` |
+| `PaymentReapplier` | `CashieringPaymentReapplier` | `LedgerPaymentReapplier` |
+| `EarlyIncentiveRules` | `RemittanceEarlyIncentiveRules` | no rule |
+| `DisbursementGateway` | `QueueDisbursementGateway` (default) | parked: Disbursement module of BRD-5 (OQ02 answered) |
+| `CollectionFeed` | `ManualCollectionFeed` (default) | parked: Collections module of BRD-4 (OQ01 answered) |
+| `InsurerFileInbox` | `ManualInsurerFileInbox` (default) | parked: insurer channels |
+| `FileDropPort` | `RepositoryFileDrop` (default) | parked: shared drive / FS04 (OQ17) |
+| `MarketingFeed`, `ClaimsFeed` | none | parked (OQ45, OQ46) |
+| `placement.service.PaymentConfirmationSource` | `CashieringPaymentConfirmationSource` (`CASHIERING`) next to placement's own report source | - |
+
+`FlowInAndPortsIT` asserts this table. Inbound flow-in feeds and their handlers:
+
+| Feed | Handler | Module |
+|---|---|---|
+| `COLLECTION_CHECK_PICKUP` | `PickupFlowInHandler` | cashiering |
+| `COLLECTION_CWT2307` | `CollectionFlowInFeeds.Cwt2307Feed` | cashiering |
+| `COLLECTION_COMMISSION_PAYMENT` | `CollectionFlowInFeeds.CommissionPaymentFeed` | cashiering |
+| `COLLECTION_HOLD` | `RemittanceFeedHandlers.HoldFeed` | remittance |
+| `COLLECTION_SPECIAL_REMIT` | `RemittanceFeedHandlers.SpecialRemitFeed` | remittance |
+| `INSURER_REMIT_OR` | `RemittanceFeedHandlers.InsurerOrFeed` | remittance |
+| `INSURER_PRODUCTION` | `InsurerProductionHandler` | prodrecon |
+| `COLLECTION_DP_LIST` | `DpListHandler` | commission |
+| `INSURER_DP_RESPONSE` | `DpResponseHandler` | commission |
+
+`OPS_INVOICE_FEED` is fed in-app by booking; `COLLECTION_DP_RETURNED`, `COLLECTION_REFUND`,
+`DISBURSEMENT_REQUEST` and `DISBURSEMENT_STATUS` are outbound or in-app and have no upload.
+
+### 7.3 End-to-end test
+
+`opsintegration.OperationsEndToEndIT` runs the flow of section 0.2 through the real services as
+the demo users, without mocks (`OpsJourney` and `OpsJourneyLater` hold the steps). At each step it
+checks the ledger (components, movements, flags, payment and remittance status, lock), the journals
+(every accounting event of the step is posted and balanced, every journal a movement points to
+exists and balances) and the open items (the booking's subledger items, the ledger balances).
+
+| Step | Users | Checks |
+|---|---|---|
+| 1 Booking | proc | `UNPAID`, `WITH_OUTSTANDING_BALANCE`, PR = DTIP = gross, `BOOKED` movements, client premium, DTIP and commission open items |
+| 2 OTC payment | cashier | AR `OPS_AR_RECEIPT`, application `OPS_PAYMENT_APPLY`, `APPLIED` per component equal to booked, DTIP untouched, `PAID` |
+| 3 Payment gate | ao, proc, cashier | payment by ARN before booking goes pre-booked; the placement sweep opens the gate with evidence `CASHIERING` / `PRE:<id>` |
+| 4 Extraction | remit | tag `EXTRACTED`, batch in review, lock `REMITTANCE`, paid AR on the line |
+| 5 Exclusion, restore, approval | remit, remittl | exclusion unlocks, restore locks, approval refused to the submitter, `OPS_REMITTANCE`, DTIP and commission remitted, commission OR issued by cashiering |
+| 6 Disbursement | disb | request amount = payable, DV assigned and paid, batch and invoice `FULLY_REMITTED`, lock released |
+| 7 Insurer OR | remit | `INSURER_REMIT_OR` run, line `MATCHED`, batch `OR_RECEIVED` |
+| 8 Reconciliation | recon, remittl | register extracted, sent, answered; `MATCHED` and a gross premium discrepancy; early incentive `ELIGIBLE` at the rate of a remittance rule |
+| 9 Cancellation after remittance | mktcoll, adjust, adjtl, cashier, cashtl | AR Insurer = remitted DTIP (`OPS_AR_INSURER_SETUP`), `CANCELLED`, `PENDING_NEG_ADJ`, applications reversed, unapplied item refunded through the Disbursement queue |
+| 10 Direct payment | proc, commrec | DP list through `COLLECTION_DP_LIST`, billing, approval, collection `OPS_DP_COMMISSION_COLLECT`, `DP_REVERSAL`, commission OR issued by cashiering |
+| 11 Minimal balance | cashier, adjust, remit | PHP 50 left by a payment, `MINIMAL_BALANCE_FILE` upload, `OPS_WRITE_OFF`, `WRITTEN_OFF`, extraction tag `UNEXTRACTED_DUE` / `WRITTEN_OFF` |
+
+`OperationsSeamsIT` covers the early incentive port, the two new Collection feeds and the home
+tiles (count, Title Case label, link to a screen). All data is created by the tests with unique
+keys, so they pass in either order.
+
+### 7.4 Demo storyline (`--spring.profiles.active=demo`, fresh database)
+
+| Order | Runner | Signed in as | What it leaves on the screens |
+|---|---|---|---|
+| 80 | `booking.demo.BookingDemoData` (New Business) | - | four booked accounts, a positive endorsement of ARN-2026-940001, a partial cancellation of ARN-2026-940002 |
+| 90 | `OpsLedgerDemoReplay` | admin | the ledger of every booked invoice (replay run on *Interfaces*) |
+| 91 | `CashieringDemoData` | cashier, mktcoll | ARN-2026-940001 booking and endorsement invoices paid (value date a week back), ARN-2026-940004 partly paid, an unmatched payment with a refund for approval, a pre-booked payment (ARN-2026-940005), an excess with a cancellation request, a PDC, a service fee OR, a BIR 2307 tag |
+| 92 | `RemittanceDemoData` | mktcoll, remit, remittl, disb | a hold for approval on ARN-2026-940004; the batch of ARN-2026-940001 approved, paid by DV-DEMO-0001 and closed by the insurer's OR; a manual extraction whose batch (the endorsement) waits for review |
+| 93 | `AdjustmentDemoData` | mktcoll, adjust, adjtl | on ARN-2026-940002 a draft, a request for validation, a returned request and a rate increase for approval; a flat cancellation of ARN-2026-940004 for posting; an internal adjustment of ARN-2026-940001 posted |
+| 94 | `ProdReconDemoData` | recon | the INS-MGIC September register extracted and sent, the insurer's answer uploaded: a match, a premium discrepancy and an unbooked policy |
+| 96 | `CommissionDemoData` | commrec | the direct payment account ARN-2026-940003 listed, confirmed, billed and sent to INS-MGIC |
+
+Each runner checks its own marker and does nothing on a restart; a step that fails is logged and
+skipped. `OperationsDemoDataIT` starts the demo profile on its own database and checks the
+storyline, the user of each step, the Operations home counts and that running the runners again
+changes nothing.
+
+## 8. Parked items (consolidated)
+
+Everything here is built as a seam (port, configuration table, parameter or manual upload); no
+integration is faked. "Superseded" means a later BRD answered the question and designs the
+replacement; it is not built in Operations.
+
+| Item | Question | Seam in Operations | Module(s) | Status |
+|---|---|---|---|---|
+| Collection system interface (check pick-up, 2307 tags, commission payments, holds, special remittance, DP lists, refunds) | OQ01, OQ13, OQ38, OQ45 | `CollectionFeed` (CSV in the extract repository), `COLLECTION_*` flow-in feeds by upload | opsledger, cashiering, remittance, commission | **Superseded by BRD-4**: Collections is a BrokerVerse module; `CollectionFeed` gets its in-app adapter there |
+| Marketing activities MKTID.010/012/013 (2307 and DP PR tagging) | OQ45 | 2307 tagging screen and `CWT_TAGS` / `COLLECTION_CWT2307`; DP list | cashiering, commission | **Superseded by BRD-4** (Collections dispositions); MKTID.001-009/011 stay in Operations as built |
+| Disbursement system, DV numbers and statuses, re-sending returned requests | OQ02 | `DisbursementGateway` and the in-app queue | opsledger, remittance, cashiering, commission | **Superseded by BRD-5**: Disbursement module implements the gateway |
+| GL accounts of every Operations event, bank / cash accounts, subledger settlement of DTIP and PR open items | OQ07 | event types with demo rules; `CASH_BANK_ACCOUNT` / `CASH_ON_HAND_ACCOUNT`; ledger movements | all | **Partly superseded by BRD-5** (GL kept in BIBS; accounts still to be given) |
+| Marketing and Claims feeds | OQ45, OQ46 | `MarketingFeed`, `ClaimsFeed` without adapters; special remittance note | opsledger, remittance | parked (Claims BRD) |
+| Insurer channels (SFTP / API) | OQ22, OQ29, OQ38 | `InsurerFileInbox`, manual upload | opsledger, remittance, prodrecon, commission | parked |
+| Shared drive | OQ17 | `FileDropPort` to the extract repository | opsledger, remittance, prodrecon | parked (FS04 named by BRD-4) |
+| BOOK rate source | OQ08 | `RateType.BOOK` kept by hand | opsledger | parked (proposal in BRD-5) |
+| Lock reasons and who lifts them | OQ28 | free-text reason, owner module unlocks | opsledger | parked |
+| Bank / channel payment file layouts | OQ03, OQ04 | `csh_payment_file_layout` per handler | cashiering | parked |
+| BIR ATP and receipt series | OQ05 | series master with ATP number | cashiering | parked |
+| Approvers of cancellations, reinstatements, dispositions | OQ06, OQ15 | workflows and `requires_approval` per disposition type | cashiering | parked |
+| Minimal balance limits and targets | OQ11 | `csh_minimal_balance_rule`, `MIN_BALANCE_FILE_RANGE` | cashiering, adjustment | parked |
+| Payments before booking | OQ12 | pre-booked queue, `PREBOOKED_REMATCH` | cashiering | parked |
+| Commission OR grouping | OQ14 | one OR per staged payment line | cashiering | parked |
+| 2307 routing with Disbursement | OQ16 | `OPS_CWT_2307`, gateway type CWT2307 | cashiering | parked |
+| Remittance schedule, file naming, EOD trigger | OQ17, OQ18 | cron property, `REMIT_FILE_PATTERN`, `rem_eod_request` | remittance | parked |
+| Paid AR above DTIP | OQ19 | `REMIT_PAIDAR_OVER_DTIP_MODE` | remittance | parked |
+| Holding period start and "cleared" source | OQ20 | banking days from the last applied value date | remittance | parked |
+| Early incentive rates and window | OQ23 | `rem_incentive_rule` (read by prodrecon through `EarlyIncentiveRules`) | remittance, prodrecon | parked (rates) |
+| Hold roles, maximum and extensions | OQ24 | `HOLD_REQUEST` / `HOLD_APPROVE`, no maximum | remittance | parked |
+| Extract frequency, template, naming, password per insurer; match keys | OQ29, OQ30 | `prc_schedule`, `PRODRECON_FILE_PATTERN`, `RECON_MATCH_KEYS`, `RECON_TOLERANCE` | prodrecon | parked |
+| Company-concerned and disposition lists; open LOVs | OQ24, OQ31, OQ32, OQ40 | LOV types, demo or "Others" values | all | parked |
+| Endorsement numbering, documents, account update by non-financial endorsements | OQ32 | `ENR-`/`ES-` numbers, `ENDORSEMENT_DOC_TYPE`, recorded by booking | adjustment | parked |
+| Package TSI limits, co-insurance | OQ33 | catalog `max_sum_insured`, insurer shares | adjustment | parked |
+| Credit memo on commission decrease; refund basis | OQ34, OQ36 | `ServiceInvoiceService.credit`; basis per request | adjustment | parked |
+| Over-adjustment baseline | OQ37 | `ADJ_BASELINE_PERCENT` | adjustment | parked |
+| DP list folders; billing and answer formats | OQ38, OQ40 | `COLLECTION_DP_LIST` upload, `DpBillingSender` columns, `INSURER_DP_RESPONSE` layout | commission | parked (DP list source superseded by BRD-4) |
+| Incentive targets and amounts | OQ39 | inactive demo schemes | commission | parked |
+| OR issuance for DP collections; certificates | OQ41 | `ReceiptIssuer` (cashiering OR); `cmr_certificate` | commission | answered by BRD-5 (one received-certificate register) |
+| Report layouts and ageing buckets | OQ42, OQ43 | draft layouts | all | parked |
+| Search log retention | OQ47 | `csh_search_log` kept | cashiering | parked |
+| Access matrix per role | OQ48 | grants of V760 | all | parked (partly answered by BRD-4/5) |
+| Direct payment PR accounting | OQ07 | `DP_PR_REVERSAL_POSTING` off; ledger movement always | commission | parked |

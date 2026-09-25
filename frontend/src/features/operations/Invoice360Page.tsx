@@ -1,93 +1,117 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Building2, CalendarRange, Landmark, ReceiptText, UserRound, Wallet } from 'lucide-react';
+import { Building2, CalendarRange, Landmark, UserRound, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { opsApi } from '@/api/operations';
 import type { Invoice360 } from '@/api/operations';
 import { useAuth } from '@/auth/authContext';
 import { Attachments } from '@/components/attachments/Attachments';
+import { RecordSummary } from '@/components/broking/RecordSummary';
+import type { Fact } from '@/components/broking/RecordSummary';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
-import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { formatAmount, formatDate, humanize } from '@/utils/format';
-import { ComponentsTab, HistoryTab, MovementsTab, RelatedTab } from './Invoice360Tabs';
-import { FlagChips, OpsFact } from './OpsParts';
+import { ComponentsTab, HistoryTab, MovementsTab, RelatedSectionTab } from './Invoice360Tabs';
+import { RELATED_TABS, flagChips, invoiceTabs } from './opsLabels';
+import type { Invoice360TabId } from './opsLabels';
 
-const TABS = [
-  { id: 'components', label: 'Components & Balances' },
-  { id: 'movements', label: 'Movements' },
-  { id: 'related', label: 'Receipts, Remittances & Adjustments' },
-  { id: 'history', label: 'History' },
-  { id: 'documents', label: 'Documents' },
-] as const;
-
-type TabId = (typeof TABS)[number]['id'];
-
-function TabBody({ tab, view }: Readonly<{ tab: TabId; view: Invoice360 }>) {
+function TabBody({ tab, view }: Readonly<{ tab: Invoice360TabId; view: Invoice360 }>) {
+  const module = RELATED_TABS.find((t) => t.id === tab);
+  if (module !== undefined) {
+    return <RelatedSectionTab section={module.section} items={view.related[module.section]} />;
+  }
   switch (tab) {
     case 'movements':
       return <MovementsTab movements={view.movements} />;
-    case 'related':
-      return <RelatedTab related={view.related} />;
     case 'history':
       return <HistoryTab history={view.history} />;
     case 'documents':
       return (
-        <Attachments
-          entityType="OpsInvoice"
-          entityId={view.invoice.keys.invoiceNo}
-          reference={view.invoice.keys.invoiceNo}
-        />
+        <div className="stack">
+          {(view.related.DOCUMENTS?.length ?? 0) > 0 && (
+            <RelatedSectionTab section="DOCUMENTS" items={view.related.DOCUMENTS} />
+          )}
+          <Attachments
+            entityType="OpsInvoice"
+            entityId={view.invoice.keys.invoiceNo}
+            reference={view.invoice.keys.invoiceNo}
+          />
+        </div>
       );
     default:
       return <ComponentsTab view={view} />;
   }
 }
 
+function facts(view: Invoice360): Fact[] {
+  const i = view.invoice;
+  return [
+    {
+      icon: UserRound,
+      label: 'Client',
+      value: [i.parties.clientCode, i.parties.payorName].filter(Boolean).join(' · payor '),
+    },
+    {
+      icon: Building2,
+      label: 'Insurer(s)',
+      value: i.shares.map((s) => `${s.insurerCode} ${formatAmount(s.sharePct)}%`).join(', '),
+    },
+    {
+      icon: CalendarRange,
+      label: 'Period',
+      value: `${formatDate(i.classification.inceptionDate)} – ${formatDate(i.classification.expiryDate)}`,
+    },
+    {
+      icon: Wallet,
+      label: 'Gross / Outstanding Premium',
+      value: `${i.classification.currency} ${formatAmount(i.grossPremium)} / ${formatAmount(i.premiumBalance)}`,
+    },
+    {
+      icon: Landmark,
+      label: 'Booked',
+      value: [
+        formatDate(i.classification.bookingDate),
+        i.classification.costCenter,
+        i.classification.aoUsername,
+      ]
+        .filter(Boolean)
+        .join(' · '),
+    },
+  ];
+}
+
 function Summary({ view }: Readonly<{ view: Invoice360 }>) {
   const i = view.invoice;
+  const flags = flagChips(i.flags);
   return (
-    <Card>
-      <div className="stack">
-        <div className="ops-record-facts">
+    <RecordSummary
+      title={i.parties.assuredName}
+      chips={
+        <>
           <ReferenceChip label="Invoice" value={i.keys.invoiceNo} />
           <ReferenceChip label="ARN" value={i.keys.arn} />
           {i.keys.endorsementNo !== undefined && (
             <ReferenceChip label="Endorsement" value={i.keys.endorsementNo} />
           )}
           <StatusBadge status={i.paymentStatus} />
-          <FlagChips flags={i.flags} />
-        </div>
-        <div className="ops-summary">
-          <OpsFact icon={UserRound} label="Assured">
-            {i.parties.assuredName} <span className="ops-muted">{i.parties.clientCode}</span>
-          </OpsFact>
-          <OpsFact icon={Building2} label="Insurer(s)">
-            {i.shares.map((s) => `${s.insurerCode} ${formatAmount(s.sharePct)}%`).join(', ')}
-          </OpsFact>
-          <OpsFact icon={CalendarRange} label="Period">
-            {formatDate(i.classification.inceptionDate)} – {formatDate(i.classification.expiryDate)}
-          </OpsFact>
-          <OpsFact icon={ReceiptText} label="Remittance">
-            {humanize(i.remittanceStatus)}
-          </OpsFact>
-          <OpsFact icon={Wallet} label="Gross / Outstanding Premium">
-            {i.classification.currency} {formatAmount(i.grossPremium)}{' '}
-            <span className="ops-muted">/ {formatAmount(i.premiumBalance)}</span>
-          </OpsFact>
-          <OpsFact icon={Landmark} label="Booked">
-            {formatDate(i.classification.bookingDate)}{' '}
-            <span className="ops-muted">
-              {i.classification.costCenter} {i.classification.aoUsername}
-            </span>
-          </OpsFact>
-        </div>
-      </div>
-    </Card>
+          <StatusBadge status={i.remittanceStatus} />
+        </>
+      }
+      flags={
+        flags.length === 0
+          ? undefined
+          : flags.map((f) => (
+              <span key={f} className="tag">
+                {f}
+              </span>
+            ))
+      }
+      facts={facts(view)}
+    />
   );
 }
 
@@ -101,7 +125,7 @@ export default function Invoice360Page() {
   const invoiceNo = decodeURIComponent(useParams().no ?? '');
   const { can } = useAuth();
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<TabId>('components');
+  const [tab, setTab] = useState<Invoice360TabId>('components');
   const view = useQuery({
     queryKey: ['ops', 'invoice', invoiceNo],
     queryFn: () => opsApi.invoice(invoiceNo),
@@ -147,7 +171,7 @@ export default function Invoice360Page() {
           }
         />
       )}
-      <Tabs tabs={TABS} active={tab} onChange={setTab} />
+      <Tabs tabs={invoiceTabs(v.related)} active={tab} onChange={setTab} />
       <TabBody tab={tab} view={v} />
     </div>
   );

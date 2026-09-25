@@ -119,4 +119,31 @@ public class IncentiveRuleService {
         .filter(r -> r.isEarly(c.inceptionDate(), c.bookingDate(), remittedOn))
         .findFirst();
   }
+
+  /**
+   * The first active rule of an insurer that covers a product line and segment on a date, whatever
+   * the remittance date (PRCID.028: production reconciliation checks the window itself).
+   *
+   * @param companyId company
+   * @param cover insurer, product line and segment
+   * @param on date the rule must be effective on
+   * @return the rule
+   */
+  @Transactional(readOnly = true)
+  public Optional<EarlyIncentiveRule> ruleFor(Long companyId, Cover cover, LocalDate on) {
+    return rules
+        .findByCompanyIdAndInsurerCodeAndActiveTrueOrderByIdAsc(companyId, cover.insurerCode())
+        .stream()
+        .filter(r -> r.covers(cover.insurerCode(), cover.productLine(), cover.segment(), on))
+        .findFirst();
+  }
+
+  /**
+   * What a rule covers.
+   *
+   * @param insurerCode insurer
+   * @param productLine product line
+   * @param segment market segment
+   */
+  public record Cover(String insurerCode, String productLine, String segment) {}
 }

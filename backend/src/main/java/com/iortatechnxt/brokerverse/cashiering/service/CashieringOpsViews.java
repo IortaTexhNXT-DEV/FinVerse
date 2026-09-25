@@ -84,44 +84,44 @@ public class CashieringOpsViews implements OpsWorkCountSource, InvoiceRelatedIte
     return List.of(
         tile(
             "UNAPPLIED",
-            "Unapplied payments",
+            "Unapplied Payments",
             unapplied.countByCompanyIdAndStage(companyId, Unapplied.STAGE_INITIAL),
             Severity.WARNING,
             UNAPPLIED_LINK),
         tile(
             "DISPOSITION_APPROVAL",
-            "Dispositions for approval",
+            "Dispositions for Approval",
             unapplied.countByCompanyIdAndStage(companyId, "FOR_APPROVAL"),
             Severity.WARNING,
             UNAPPLIED_LINK),
         tile(
             "PREBOOKED",
-            "Pre-booked payments",
+            "Pre-booked Payments",
             prebooked.countByCompanyIdAndStatus(companyId, Prebooked.OPEN),
             Severity.INFO,
             "/cashiering/prebooked"),
         tile(
             "RECEIPT_APPROVAL",
-            "Cancellations and reinstatements for approval",
+            "Cancellations and Reinstatements for Approval",
             actions.countByCompanyIdAndStage(companyId, "FOR_APPROVAL"),
             Severity.WARNING,
             "/cashiering/receipts"),
         tile(
             "PDC_WAREHOUSED",
-            "Post-dated checks in the warehouse",
+            "Post-dated Checks in the Warehouse",
             pdcs.countByCompanyIdAndStatus(companyId, PdcStatus.WAREHOUSED),
             Severity.INFO,
             "/cashiering/pdc"),
         tile(
             "PICKUP_DUE",
-            "Check pick-ups due",
+            "Check Pick-ups Due",
             pickups.countByCompanyIdAndStatusAndPickupDateLessThanEqual(
                 companyId, PickupStatus.FOR_PICKUP, today),
             Severity.WARNING,
             "/cashiering/pickups"),
         tile(
             "CWT_VALIDATING",
-            "BIR 2307 to validate",
+            "BIR 2307 to Validate",
             tags.countByCompanyIdAndStage(companyId, "VALIDATING")
                 + tags.countByCompanyIdAndStage(companyId, "TAGGED"),
             Severity.INFO,

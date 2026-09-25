@@ -72,7 +72,7 @@ public class LedgerWorkCounts implements OpsWorkCountSource {
         new WorkCount(
             Section.CASHIERING,
             "outstanding",
-            "Invoices With Outstanding Premium",
+            "Invoices with Outstanding Premium",
             invoices.countByCompanyIdAndPaymentStatusIn(
                 companyId, List.of(PaymentStatus.UNPAID, PaymentStatus.PARTIALLY_PAID)),
             Severity.INFO,
@@ -96,7 +96,7 @@ public class LedgerWorkCounts implements OpsWorkCountSource {
         new WorkCount(
             Section.REMITTANCE,
             "on-hold",
-            "Invoices On Hold",
+            "Invoices on Hold",
             invoices.countByCompanyIdAndHoldFlagTrue(companyId),
             Severity.WARNING,
             INVOICES + "?flag=HOLD"),
@@ -141,7 +141,7 @@ public class LedgerWorkCounts implements OpsWorkCountSource {
         new WorkCount(
             Section.DISBURSEMENT,
             "to-process",
-            "Payment Requests To Process",
+            "Payment Requests to Process",
             disbursements.countByCompanyIdAndStatusIn(
                 companyId,
                 List.of(
@@ -161,7 +161,7 @@ public class LedgerWorkCounts implements OpsWorkCountSource {
         new WorkCount(
             Section.CASHIERING,
             "handoffs",
-            "Hand-offs To Complete",
+            "Hand-offs to Complete",
             handoffs.countByCompanyIdAndStatus(companyId, OpsHandoff.Status.OPEN),
             Severity.WARNING,
             "/operations/handoffs"));

@@ -23,6 +23,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.Inta
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.IntakeTarget;
 import com.iortatechnxt.brokerverse.cashiering.service.PdcWarehouseService;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptActionService;
+import com.iortatechnxt.brokerverse.opsledger.demo.DemoUsers;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
@@ -31,32 +32,35 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 /**
  * Demo storyline of Cashiering (demo profile only), posted through the real services after the
- * Operations ledger replay (order 90): a full and a partial premium payment, a payment without a
- * match (with a refund disposition waiting for approval), an excess, a payment received before
+ * Operations ledger replay (order 90) and before remittance (order 92), which extracts what is paid
+ * here: the booking and the endorsement invoices of ARN-2026-940001 paid in full and a partial
+ * payment of ARN-2026-940004 (valued a week back, past the check holding period), a payment without
+ * a match (with a refund disposition waiting for approval), an excess, a payment received before
  * booking (pre-booked queue), a post-dated check in the warehouse, a Head Office service fee OR, a
- * cancellation waiting for approval and a BIR 2307 tag. Idempotent.
+ * cancellation waiting for approval and a BIR 2307 tag. Signed in as cashier (mktcoll for the tag).
+ * Idempotent.
  */
 @Component
 @Profile("demo")
-@Order(95)
+@Order(91)
 public class CashieringDemoData implements ApplicationRunner {
 
   private static final int PDC_DAYS = 30;
+
+  /** Age of the demo payments: past the check holding period, so remittance can extract them. */
+  private static final int PAYMENT_AGE_DAYS = 7;
+
   private static final LocalDate CWT_PERIOD_FROM = LocalDate.parse("2026-07-01");
   private static final LocalDate CWT_PERIOD_TO = LocalDate.parse("2026-09-30");
 
@@ -74,7 +78,7 @@ public class CashieringDemoData implements ApplicationRunner {
   private final InvoiceLedgerQueryService ledger;
   private final CompanyRepository companies;
   private final CashieringSettings settings;
-  private final UserDetailsService users;
+  private final DemoUsers users;
   private final Clock clock;
 
   /**
@@ -90,7 +94,7 @@ public class CashieringDemoData implements ApplicationRunner {
    * @param ledger invoice ledger
    * @param companies companies
    * @param settings settings
-   * @param users users
+   * @param users demo sign-in
    * @param clock clock
    */
   public CashieringDemoData(
@@ -104,7 +108,7 @@ public class CashieringDemoData implements ApplicationRunner {
       InvoiceLedgerQueryService ledger,
       CompanyRepository companies,
       CashieringSettings settings,
-      UserDetailsService users,
+      DemoUsers users,
       Clock clock) {
     this.intake = intake;
     this.payments = payments;
@@ -132,28 +136,17 @@ public class CashieringDemoData implements ApplicationRunner {
     Long companyId = company.get();
     Long ho = settings.headOffice(companyId).getId();
     try {
-      as("cashier", () -> story(companyId, ho));
-      as("mktcoll", () -> tag(companyId));
+      users.as("cashier", () -> story(companyId, ho));
+      users.as("mktcoll", () -> tag(companyId));
       LOG.info("Cashiering demo data posted");
     } catch (RuntimeException ex) {
       LOG.warn("Cashiering demo data skipped: {}", ex.getMessage());
-    } finally {
-      SecurityContextHolder.clearContext();
     }
   }
 
   private boolean story(Long companyId, Long ho) {
-    first("ARN-2026-940001")
-        .ifPresent(
-            i ->
-                pay(
-                    companyId,
-                    ho,
-                    MARKER,
-                    i.getInvoiceNo(),
-                    i.premiumBalance(),
-                    i.getAssuredName()));
-    first("ARN-2026-940004")
+    paidInFull(companyId, ho);
+    original("ARN-2026-940004")
         .ifPresent(
             i ->
                 pay(
@@ -197,6 +190,29 @@ public class CashieringDemoData implements ApplicationRunner {
             "Maria Clara Santos");
     actions.requestCancel(small.payment().getReceiptId(), new Reason("GEN_ISSUANCE_ERROR", null));
     return checksAndOr(companyId, ho);
+  }
+
+  private void paidInFull(Long companyId, Long ho) {
+    original("ARN-2026-940001")
+        .ifPresent(
+            i ->
+                pay(
+                    companyId,
+                    ho,
+                    MARKER,
+                    i.getInvoiceNo(),
+                    i.premiumBalance(),
+                    i.getAssuredName()));
+    endorsement("ARN-2026-940001")
+        .ifPresent(
+            i ->
+                pay(
+                    companyId,
+                    ho,
+                    "DEMO:940001-EN",
+                    i.getInvoiceNo(),
+                    i.premiumBalance(),
+                    i.getAssuredName()));
   }
 
   private boolean checksAndOr(Long companyId, Long ho) {
@@ -251,7 +267,7 @@ public class CashieringDemoData implements ApplicationRunner {
   }
 
   private boolean tag(Long companyId) {
-    first("ARN-2026-940004")
+    original("ARN-2026-940004")
         .ifPresent(
             i ->
                 cwt.tag(
@@ -280,19 +296,19 @@ public class CashieringDemoData implements ApplicationRunner {
             List.of(),
             new PaymentIntake.Payor(null, payor),
             null,
-            new PaymentIntake.Money(amount, PHP, LocalDate.now(clock)),
+            new PaymentIntake.Money(amount, PHP, LocalDate.now(clock).minusDays(PAYMENT_AGE_DAYS)),
             PaymentIntake.Tender.of(PaymentMode.CASH)));
   }
 
-  private Optional<OpsInvoice> first(String arn) {
-    return ledger.forArn(arn).stream().filter(i -> i.premiumBalance().signum() > 0).findFirst();
+  private Optional<OpsInvoice> original(String arn) {
+    return outstanding(arn).filter(i -> i.getEndorsementNo() == null).findFirst();
   }
 
-  private void as(String username, Supplier<Boolean> work) {
-    UserDetails details = users.loadUserByUsername(username);
-    SecurityContextHolder.getContext()
-        .setAuthentication(
-            new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities()));
-    work.get();
+  private Optional<OpsInvoice> endorsement(String arn) {
+    return outstanding(arn).filter(i -> i.getEndorsementNo() != null).findFirst();
+  }
+
+  private Stream<OpsInvoice> outstanding(String arn) {
+    return ledger.forArn(arn).stream().filter(i -> i.premiumBalance().signum() > 0);
   }
 }

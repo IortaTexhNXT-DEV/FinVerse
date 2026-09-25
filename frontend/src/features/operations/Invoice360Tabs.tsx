@@ -170,30 +170,27 @@ export function HistoryTab({ history }: Readonly<{ history: StatusChange[] }>) {
   );
 }
 
-/** Records of the Operations modules that concern the invoice. */
-export function RelatedTab({ related }: Readonly<{ related: Invoice360['related'] }>) {
-  const sections = (Object.keys(RELATED_LABELS) as RelatedSection[]).filter(
-    (s) => (related[s]?.length ?? 0) > 0,
-  );
-  if (sections.length === 0) {
+/** The records one Operations module keeps for the invoice (one Invoice 360 tab). */
+export function RelatedSectionTab({
+  section,
+  items,
+}: Readonly<{ section: RelatedSection; items: RelatedItem[] | undefined }>) {
+  const title = RELATED_LABELS[section];
+  if (items === undefined || items.length === 0) {
     return (
-      <Card>
-        <EmptyState message="No receipts, remittances, adjustments or other records yet" />
+      <Card title={title}>
+        <EmptyState message={`No ${title.toLowerCase()} for this invoice yet`} />
       </Card>
     );
   }
   return (
-    <div className="stack">
-      {sections.map((s) => (
-        <Card key={s} title={RELATED_LABELS[s]} flush>
-          <DataTable
-            caption={RELATED_LABELS[s]}
-            columns={RELATED_COLUMNS}
-            rows={related[s] ?? []}
-            rowKey={(i) => `${i.type}-${i.reference}`}
-          />
-        </Card>
-      ))}
-    </div>
+    <Card title={title} flush>
+      <DataTable
+        caption={title}
+        columns={RELATED_COLUMNS}
+        rows={items}
+        rowKey={(i) => `${i.type}-${i.reference}`}
+      />
+    </Card>
   );
 }

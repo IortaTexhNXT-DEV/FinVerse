@@ -4,6 +4,7 @@ import {
   SECTION_ROUTES,
   componentLabel,
   flagChips,
+  invoiceTabs,
   premiumTotals,
   safeUrl,
   tileTone,
@@ -75,5 +76,24 @@ describe('operations labels', () => {
 
   it('has a label and a route for every section', () => {
     expect(Object.keys(SECTION_LABELS)).toEqual(Object.keys(SECTION_ROUTES));
+  });
+
+  it('gives Invoice 360 one tab per Operations module, counting its records', () => {
+    const item = { type: 'RECEIPT', reference: 'AR-1', status: 'ACTIVE' };
+    const tabs = invoiceTabs({ RECEIPTS: [item, { ...item, reference: 'AR-2' }], COMMISSION: [] });
+    expect(tabs.map((t) => t.id)).toEqual([
+      'components',
+      'movements',
+      'receipts',
+      'remittances',
+      'adjustments',
+      'reconciliation',
+      'commission',
+      'history',
+      'documents',
+    ]);
+    expect(tabs.find((t) => t.id === 'receipts')?.label).toBe('Receipts (2)');
+    expect(tabs.find((t) => t.id === 'commission')?.label).toBe('Commission');
+    expect(invoiceTabs({ DOCUMENTS: [item] }).at(-1)?.label).toBe('Documents (1)');
   });
 });

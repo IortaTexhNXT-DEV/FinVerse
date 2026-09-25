@@ -3,6 +3,8 @@ import type {
   InvoiceFlags,
   LedgerComponent,
   OpsSection,
+  RelatedItem,
+  RelatedSection,
   Severity,
 } from '@/api/operations';
 
@@ -125,4 +127,37 @@ export function tileTone(count: number, severity: Severity): string {
 /** An external link's address when it is a web address; anything else is shown as text only. */
 export function safeUrl(url: string | undefined): string | undefined {
   return url !== undefined && /^https?:\/\//i.test(url) ? url : undefined;
+}
+
+/** Tabs of Invoice 360 that list the records of one Operations module. */
+export const RELATED_TABS = [
+  { id: 'receipts', section: 'RECEIPTS', label: 'Receipts' },
+  { id: 'remittances', section: 'REMITTANCES', label: 'Remittances' },
+  { id: 'adjustments', section: 'ADJUSTMENTS', label: 'Adjustments' },
+  { id: 'reconciliation', section: 'RECONCILIATION', label: 'Reconciliation' },
+  { id: 'commission', section: 'COMMISSION', label: 'Commission' },
+] as const satisfies readonly { id: string; section: RelatedSection; label: string }[];
+
+/** Id of an Invoice 360 tab. */
+export type Invoice360TabId =
+  'components' | 'movements' | (typeof RELATED_TABS)[number]['id'] | 'history' | 'documents';
+
+/**
+ * The Invoice 360 tabs in display order, each module tab labelled with its record count so the user
+ * sees at a glance where the invoice has been (RMTID.026/038, ADJID.024).
+ */
+export function invoiceTabs(
+  related: Partial<Record<RelatedSection, RelatedItem[]>>,
+): { id: Invoice360TabId; label: string }[] {
+  const counted = (label: string, section: RelatedSection) => {
+    const n = related[section]?.length ?? 0;
+    return n === 0 ? label : `${label} (${String(n)})`;
+  };
+  return [
+    { id: 'components', label: 'Components & Balances' },
+    { id: 'movements', label: 'Movements' },
+    ...RELATED_TABS.map((t) => ({ id: t.id, label: counted(t.label, t.section) })),
+    { id: 'history', label: 'History' },
+    { id: 'documents', label: counted('Documents', 'DOCUMENTS') },
+  ];
 }

@@ -77,6 +77,7 @@ Ports declared in `opsledger.service.port` and implemented by their owners:
 | `CollectionFeed` | default adapter = upload / screens | cashiering (check pick-up, 2307 tags), remittance (hold, special remittance), commission (DP lists, returned accounts) | Inbound and outbound Collection data |
 | `InsurerFileInbox` | default = manual upload | prodrecon, remittance, commission | Insurer reports and responses |
 | `FileDropPort` | default = in-system extract repository | remittance (shared drive folders per type), prodrecon | Shared-drive export (parked) |
+| `EarlyIncentiveRules` (added in O2) | remittance (`rem_incentive_rule`); default = no rule | prodrecon (early incentive validation, PRCID.028) | Rate, window and basis of the early-remittance incentive of an invoice |
 | `NegativeAdjustmentPending` (event) | published by adjustment | remittance (exclude + notify, RMTID.020/035) | Via the `PENDING_NEG_ADJ` flag, plus a Spring event for the notification |
 
 Events published by `opsledger`, so that siblings react without depending on each other:

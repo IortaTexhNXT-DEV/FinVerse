@@ -91,6 +91,23 @@ export const PLANNING_HELP: HelpSection = {
         'Unreconciled items: the book entries and bank statement lines of every bank account not yet matched up to the period end (the items of the BRS and the un-reconciled entries reports). They show as a warning to review and do not block the close, because deposits in transit and unpresented cheques are normal at a period end.',
         'A closed fiscal year cannot be reopened.',
         'Soft close and close need PERIOD_MANAGE; the year-end close needs YEAR_END_CLOSE.',
+        'After the year-end close the verification shows the nominal balances and the trial balance difference as of the year end; both must be zero (FRBS 2.7.1). The YEAR_END_CLOSE_DUE alert warns when the previous year is still open near the 15 April deadline.',
+      ],
+    },
+    {
+      name: 'GL Close & Cut-Off',
+      path: '/planning/gl-close',
+      summary:
+        'Scheduled month-end close of the previous month (FRBS 2.6.0 / 2.6.1) and the cut-off of the broking books at month end (FRBS 3.4.0 / 3.4.1).',
+      workflow: [
+        'Schedule Close: pick the period and the date and time (proposed: the 2nd banking day of the next month, 17:00 Manila). The GL_PERIOD_CLOSE job runs the checklist then and closes the period; Close Now does it at once.',
+        'A failed close is recorded with the blocking checklist items and raises GL_CLOSE_FAILED; fix them and schedule again.',
+        'Broking books: the BROKING_BOOKS_CLOSE job closes them on the last day of the month at BROKING_CLOSE_TIME; the GL Team Lead can close them earlier or reopen them with a reason.',
+      ],
+      controls: [
+        'With CLOSE_ONLY_PREVIOUS_MONTH on, only the month before the close date can be closed.',
+        'Once the broking books are closed, postings of booking, Operations, cashiering, remittance, adjustment, commission and disbursement into that month are refused; FRBS adjustments still post until the month-end close.',
+        'Needs GL_CLOSE_SCHEDULE (GL Team Lead and Head).',
       ],
     },
   ],

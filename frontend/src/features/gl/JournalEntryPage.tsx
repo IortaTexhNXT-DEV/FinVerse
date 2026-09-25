@@ -4,19 +4,69 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { glApi } from '@/api/gl';
 import type { Journal } from '@/api/gl';
+import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
 import { useDefaultBranchId, useWorkspace } from '@/context/workspaceContext';
+import { formatDate } from '@/utils/format';
+import { ConfirmPostingDialog } from './ConfirmPostingDialog';
 import { JournalHeaderFields } from './JournalHeaderFields';
 import { JournalLinesEditor } from './JournalLinesEditor';
 import { journalValues, newJournalValues, toJournalInput } from './journalForm';
 import type { JournalFormValues } from './journalForm';
-import { lineProblems, totals } from './journalMath';
+import { isBlankLine, lineProblems, totals } from './journalMath';
 import { useJournalSave } from './useJournalSave';
 import type { SaveMode } from './useJournalSave';
+
+function SubmitConfirmation({
+  open,
+  values,
+  busy,
+  onConfirm,
+  onClose,
+}: Readonly<{
+  open: boolean;
+  values: JournalFormValues;
+  busy: boolean;
+  onConfirm: () => void;
+  onClose: () => void;
+}>) {
+  const sums = totals(values.lines);
+  const reverseOn = values.header.reverseOn;
+  return (
+    <ConfirmPostingDialog
+      open={open}
+      title="Submit journal for posting"
+      intro="Check the voucher before it goes to the authorizer. A submitted voucher can no longer be edited unless it is returned."
+      facts={[
+        { label: 'Value date', value: formatDate(values.header.valueDate) },
+        {
+          label: 'Reverse on',
+          value: reverseOn === '' ? 'No automatic reversal' : formatDate(reverseOn),
+        },
+        { label: 'Lines', value: values.lines.filter((l) => !isBlankLine(l)).length },
+        { label: 'Total debit', value: <Amount value={sums.debit} /> },
+        { label: 'Total credit', value: <Amount value={sums.credit} /> },
+      ]}
+      confirmLabel="Save & Submit"
+      busy={busy}
+      onConfirm={onConfirm}
+      onClose={onClose}
+    />
+  );
+}
+
+function reversalProblem(values: JournalFormValues): boolean {
+  const { reverseOn, valueDate } = values.header;
+  return reverseOn !== '' && reverseOn <= valueDate;
+}
+
+function submittable(values: JournalFormValues, blocked: boolean): boolean {
+  return totals(values.lines).balanced && values.header.narration.trim() !== '' && !blocked;
+}
 
 function JournalForm({
   initial,
@@ -28,6 +78,7 @@ function JournalForm({
   const { company } = useWorkspace();
   const [values, setValues] = useState(initial);
   const [checked, setChecked] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   const { save, draftId, savedDraft } = useJournalSave(editingId, async (journal: Journal) => {
     await queryClient.invalidateQueries({ queryKey: ['journal', journal.id] });
@@ -37,12 +88,18 @@ function JournalForm({
   const mode = save.variables?.mode;
   const problems = lineProblems(values.lines);
   const hasProblems = Object.keys(problems).length > 0;
-  const canSubmit = totals(values.lines).balanced && values.header.narration.trim() !== '';
+  const blocked = hasProblems || reversalProblem(values);
+  const canSubmit = submittable(values, blocked);
   const run = (saveMode: SaveMode) => {
     setChecked(true);
-    if (!hasProblems) {
+    setConfirming(false);
+    if (!blocked) {
       save.mutate({ mode: saveMode, body: toJournalInput(company?.id ?? 0, values) });
     }
+  };
+  const confirmSubmit = () => {
+    setChecked(true);
+    setConfirming(!blocked);
   };
 
   return (
@@ -66,7 +123,7 @@ function JournalForm({
               icon={<Send size={16} />}
               busy={save.isPending && mode === 'submit'}
               disabled={!canSubmit}
-              onClick={() => run('submit')}
+              onClick={confirmSubmit}
             >
               Save &amp; Submit
             </Button>
@@ -85,6 +142,13 @@ function JournalForm({
           Correct the highlighted lines before saving.
         </div>
       )}
+      <SubmitConfirmation
+        open={confirming}
+        values={values}
+        busy={save.isPending}
+        onConfirm={() => run('submit')}
+        onClose={() => setConfirming(false)}
+      />
       <Card title="Voucher header">
         <JournalHeaderFields
           value={values.header}

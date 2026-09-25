@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 
 /**
@@ -45,6 +46,18 @@ public class YearEndClose extends BaseEntity {
   @Column(nullable = false, length = 20)
   private String status;
 
+  @Column(name = "nominal_balance", precision = 19, scale = 2)
+  private BigDecimal nominalBalance;
+
+  @Column(name = "tb_difference", precision = 19, scale = 2)
+  private BigDecimal tbDifference;
+
+  @Column(name = "verified")
+  private Boolean verified;
+
+  @Column(name = "verified_at")
+  private Instant verifiedAt;
+
   protected YearEndClose() {}
 
   /**
@@ -62,6 +75,37 @@ public class YearEndClose extends BaseEntity {
     this.closingBatches = values.closingBatches();
     this.nextYearCode = values.nextYearCode();
     this.status = CLOSED;
+  }
+
+  /**
+   * Records the post-close verification (FRBS 2.7.1): the nominal (income and expense) balances as
+   * of the year end and the trial balance difference must both be zero.
+   *
+   * @param nominal net nominal balance as of the year end
+   * @param tbDifference total debit minus total credit of the ledger as of the year end
+   * @param when verification time
+   */
+  public void verify(BigDecimal nominal, BigDecimal tbDifference, Instant when) {
+    this.nominalBalance = nominal;
+    this.tbDifference = tbDifference;
+    this.verified = nominal.signum() == 0 && tbDifference.signum() == 0;
+    this.verifiedAt = when;
+  }
+
+  public BigDecimal getNominalBalance() {
+    return nominalBalance;
+  }
+
+  public BigDecimal getTbDifference() {
+    return tbDifference;
+  }
+
+  public Boolean getVerified() {
+    return verified;
+  }
+
+  public Instant getVerifiedAt() {
+    return verifiedAt;
   }
 
   public Long getCompanyId() {

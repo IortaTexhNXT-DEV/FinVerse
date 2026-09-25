@@ -9,12 +9,15 @@ import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
 import com.iortatechnxt.brokerverse.report.domain.ReportRun;
 import com.iortatechnxt.brokerverse.report.domain.ReportRun.RunFile;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
+import com.iortatechnxt.brokerverse.report.render.PrintOptions;
 import com.iortatechnxt.brokerverse.report.render.ReportContext;
 import com.iortatechnxt.brokerverse.report.render.ReportRenderer;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.security.access.AccessDeniedException;
@@ -112,27 +115,99 @@ public class ReportService {
    */
   @Transactional
   public RenderedReport export(String code, Map<String, String> rawParams, ExportFormat format) {
+    return export(code, rawParams, format, ExportOptions.NONE);
+  }
+
+  /**
+   * Runs and renders a report with print options and column filters (FRBS 2.4.4, 2.4.9).
+   *
+   * @param code report code
+   * @param rawParams raw parameters
+   * @param format export format
+   * @param options print options and column filters
+   * @return rendered file
+   */
+  @Transactional
+  public RenderedReport export(
+      String code, Map<String, String> rawParams, ExportFormat format, ExportOptions options) {
     ReportDefinition def = authorized(code);
     if (!ReportAccess.mayExport(def.metadata())) {
       throw new AccessDeniedException("Not permitted to export report " + code);
     }
     ReportParameters params =
         ReportParameters.validate(def.metadata(), rawParams, clock, this::displayValue);
-    ReportResult result = def.generate(params);
-    ReportContext ctx = context(params);
+    ReportResult result = options.filter(def.generate(params));
+    ReportContext ctx = context(params).withPrint(options.print());
     byte[] content = renderers.get(format).render(result, ctx);
+    List<String> echo = new ArrayList<>(params.echo());
+    if (format == ExportFormat.PDF && !options.print().echo().isEmpty()) {
+      echo.add(options.print().echo());
+    }
     audit.record(
-        "Report",
-        code,
-        AuditAction.EXPORT,
-        "Exported " + format + " " + String.join(", ", params.echo()));
+        "Report", code, AuditAction.EXPORT, "Exported " + format + " " + String.join(", ", echo));
     String fileName = code + "." + format.extension();
     archive.exported(
         def.metadata(),
-        params.echo(),
+        echo,
         result,
         new RunFile(format.name(), fileName, format.contentType(), content));
     return new RenderedReport(fileName, format.contentType(), content);
+  }
+
+  /**
+   * Runs a report for a batch and keeps its result for rendering (FRBS 2.4.5).
+   *
+   * @param code report code
+   * @param rawParams shared parameters (those the report does not declare are ignored)
+   * @return result
+   */
+  @Transactional
+  public ReportResult runForExport(String code, Map<String, String> rawParams) {
+    ReportDefinition def = authorized(code);
+    if (!ReportAccess.mayExport(def.metadata())) {
+      throw new AccessDeniedException("Not permitted to export report " + code);
+    }
+    Map<String, String> own = new HashMap<>();
+    def.metadata()
+        .parameters()
+        .forEach(
+            spec -> {
+              String value = rawParams.get(spec.name());
+              if (value != null) {
+                own.put(spec.name(), value);
+              }
+            });
+    ReportParameters params =
+        ReportParameters.validate(def.metadata(), own, clock, this::displayValue);
+    ReportResult result = def.generate(params);
+    audit.record(
+        "Report", code, AuditAction.EXPORT, "Batch export " + String.join(", ", params.echo()));
+    return result;
+  }
+
+  /**
+   * Renders a result with the print context of the current user.
+   *
+   * @param result report result
+   * @param format format
+   * @param print PDF print options
+   * @param companyId company named in the header, may be null
+   * @return file bytes
+   */
+  public byte[] render(
+      ReportResult result, ExportFormat format, PrintOptions print, Long companyId) {
+    String company =
+        companyId == null
+            ? DEFAULT_COMPANY
+            : companies.findById(companyId).map(Company::getName).orElse(DEFAULT_COMPANY);
+    ReportContext ctx =
+        new ReportContext(
+            company,
+            currentUser.username(),
+            clock.instant(),
+            parameters.text(SystemParameterService.REPORT_FOOTER_TEXT, ""),
+            print);
+    return renderers.get(format).render(result, ctx);
   }
 
   /**

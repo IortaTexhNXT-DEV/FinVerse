@@ -11,6 +11,7 @@ import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate, today } from '@/utils/format';
+import { RevaluationRatesCard } from './RevaluationRatesCard';
 
 const RATE_TYPES: RateType[] = ['SPOT', 'CLOSING', 'AVERAGE', 'BUDGET', 'BOOK'];
 
@@ -45,8 +46,9 @@ export default function CurrencyRatesPage() {
       <PageHeader
         section="Setup"
         title="Currencies & Exchange Rates"
-        description="Rates are base-currency units per one unit of foreign currency."
+        description="Rates are base-currency units per one unit of foreign currency. The monthly revaluation rate is the month-end CLOSING rate."
       />
+      <RevaluationRatesCard currencies={(currencies.data ?? []).filter((c) => c.active)} />
       {can('MASTER_MAINTAIN') && (
         <Card title="Maintain rate">
           <ErrorAlert error={save.error} />

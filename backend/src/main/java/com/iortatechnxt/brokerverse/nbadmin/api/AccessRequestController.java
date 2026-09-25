@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.nbadmin.api.dto.DecisionRequest;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.UserAccessResponse;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
+import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestReturnService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
 import com.iortatechnxt.brokerverse.security.api.dto.RoleResponse;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
@@ -40,16 +41,22 @@ public class AccessRequestController {
 
   private final AccessRequestService requests;
   private final UserAdminService userAdmin;
+  private final AccessRequestReturnService returns;
 
   /**
    * Creates the controller.
    *
    * @param requests access requests
    * @param userAdmin users and roles
+   * @param returns return and resubmission of requests
    */
-  public AccessRequestController(AccessRequestService requests, UserAdminService userAdmin) {
+  public AccessRequestController(
+      AccessRequestService requests,
+      UserAdminService userAdmin,
+      AccessRequestReturnService returns) {
     this.requests = requests;
     this.userAdmin = userAdmin;
+    this.returns = returns;
   }
 
   /**
@@ -128,6 +135,34 @@ public class AccessRequestController {
   public AccessDecisionResponse reject(
       @PathVariable Long id, @Valid @RequestBody DecisionRequest body) {
     return AccessDecisionResponse.from(requests.reject(id, body.comment()));
+  }
+
+  /**
+   * Returns a request to its requester with remarks (BASAU 2.4.1, 2.6.x).
+   *
+   * @param id request
+   * @param body remarks
+   * @return the returned request
+   */
+  @PostMapping("/access-requests/{id}/return")
+  @PreAuthorize(APPROVE)
+  public AccessRequestResponse returnRequest(
+      @PathVariable Long id, @Valid @RequestBody DecisionRequest body) {
+    return AccessRequestResponse.from(returns.returnRequest(id, body.comment()));
+  }
+
+  /**
+   * Resubmits a returned request with a corrected justification (requester).
+   *
+   * @param id request
+   * @param body new justification
+   * @return the pending request
+   */
+  @PostMapping("/access-requests/{id}/resubmit")
+  @PreAuthorize("hasAuthority('ACCESS_REQUEST')")
+  public AccessRequestResponse resubmit(
+      @PathVariable Long id, @Valid @RequestBody DecisionRequest body) {
+    return AccessRequestResponse.from(returns.resubmit(id, body.comment()));
   }
 
   /**

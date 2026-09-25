@@ -667,3 +667,76 @@ where it differs from or details the sections above. The A1 waves compile only a
 - **Flyway check.** Every version of section 4 is still free except `V791`, which Product Maintenance used for the
   role-permission change requests (`V791__nbadmin_role_permission_requests.sql`): A1-GL puts the access-request
   RETURNED status in `V792`. A0 used V765, V890 and demo V999; nothing else of the BRD-5 ranges.
+
+### A1-GL as built
+
+GL platform wave (section 12.1 rows coa, journal, period / closing, currency, accounting, organization, report,
+receivables, subledger, party, nbadmin, approval). Every change is additive; existing callers and tests are unchanged.
+
+**Migrations** (only V1-V27 tables are referenced by V28-V33, so they are safe before every module on a fresh
+database):
+
+| Version | Content |
+|---|---|
+| `V28__coa_upload_numbering_short_code.sql` | `coa_account.negative_balance_policy` (ALLOW / WARN / BLOCK); short code unique per company (case-insensitive, later duplicates cleared first); `coa_numbering` |
+| `V29__journal_assignment_reversal_links.sql` | `jnl_batch.assigned_to / assigned_by / assigned_at`, `reverse_on`, `corrects_batch_id`, `related_invoice_no`, `root_invoice_no` |
+| `V30__period_module_lock_close_schedule.sql` | `acc_period_module_lock`, `acc_period_close_schedule`; parameter `BROKING_SOURCE_MODULES` |
+| `V31__cost_center_rules_and_employees.sql` | `acc_cost_center_rule`, `org_employee` |
+| `V32__report_batch_print_options.sql` | `report_batch`, `report_batch_item` (print options on the batch; `report_run` is created later by V762, so the options of a single export go into its parameter echo) |
+| `V33__party_payee_types.sql` | party types EMPLOYEE, GOVERNMENT, OTHER_PAYEE (sub-ledger VENDOR); check constraint on `pty_party.party_type` |
+| `V402__closing_year_end_verification.sql` | `yec_year_end_close.nominal_balance`, `tb_difference`, `verified`, `verified_at` (the parameters `CLOSE_ONLY_PREVIOUS_MONTH` and `YEAR_END_CLOSE_DEADLINE` were already seeded by V890) |
+| `V551__bank_statement_layouts_rules.sql` | `brs_statement_layout`, `brs_match_rule` (by GL bank account code) |
+| `V792__access_request_returned.sql` | access request status RETURNED, `returned_count` |
+
+**By requirement.**
+
+| BR | As built |
+|---|---|
+| FRBS 2.2.0, 3.6.0 | `currency.service.RevaluationRateService`: the monthly revaluation rate is the CLOSING rate of the month end (`POST /api/v1/currencies/revaluation-rates`, `REVALUATION_RATE_MAINTAIN`; `GET ...?year=`). Job `BOOK_RATE_FROM_CLOSING` (`book-rate-from-closing-cron`) copies the rates of the month that ends as the BOOK rates of the next month when `OPS_BOOK_RATE_SOURCE = CLOSING_PREV_MONTH`, never overwriting a BOOK rate; `POST .../revaluation-rates/{yyyy-MM}/copy-to-book` does it on demand. Screen: Setup > Currencies & Rates, card "Monthly revaluation rates" |
+| FRBS 2.3.1 | Bulk handler `COA_ACCOUNTS` (`coa.service.CoaUploadHandler`) on the bulk framework, exposed under the chart's own permission `COA_UPLOAD` by `/api/v1/coa/uploads` (template, upload, rows, commit, cancel, report), because FRBS_TL has no BULK_PROCESS. A parent is an existing account or an earlier row of the file; every account is created PENDING_AUTHORIZATION. Sample `docs/samples/coa_upload_sample.xlsx` (8 accounts under new groups 1900 / 2900) loads cleanly (`GlPlatformApiIT`). Screen: General Ledger > Chart Upload |
+| FRBS 2.3.2 | `coa_numbering` per parent (separator and width); a blank code on create or upload takes the next free number (`CoaNumberingService.nextCode`, existing codes with the prefix are never reused); `GET /coa/accounts/next-code`, `GET/PUT /coa/numbering` |
+| FRBS 2.3.3 | Short code unique (`SHORT_CODE_TAKEN`, `coa.service.ShortCodes`), searched with code and name; `GET /coa/accounts/lookup?key=` by code or short code; journal lines accept a short code in place of the account code (`JournalLineResolver`) |
+| FRBS 2.5.1 | `POST /journals/assign` (`JOURNAL_ASSIGN`; the assignee must hold JOURNAL_AUTHORIZE and not be the submitter), `GET /journals/assignees`, filter `assignedTo` on the journal search; Journals screen "Assign" and "Assigned to me" |
+| FRBS 2.5.4, 2.5.5, 2.8.4, 3.6.0b | `journal.service.NegativeBalanceCheck` (manual journals only): BLOCK accounts refuse the journal in `JournalValidator` (submit and approve), WARN accounts give warnings (`GET /journals/{id}/warnings`) shown in the confirmation dialogs; natural side from the account class |
+| FRBS 2.5.6, BASAU 2.5.3 | `POST /journals/bulk-approve` (each journal in its own transaction with every control; partial success report) and the generic `POST /api/v1/approvals/bulk-approve` over the new port `approval.service.BulkApprovalAction`, implemented for GL journals and access requests (new-user requests are refused in bulk because their temporary password is shown once) |
+| FRBS 2.5.7 | "Reject" is labelled "Return to Maker" on the journal screen |
+| FRBS 2.5.10, 2.8.3 | Confirmation dialog with totals, lines, dates and warnings before submit and before authorize (`features/gl/ConfirmPostingDialog`) |
+| FRBS 2.8.1 | `reverse_on` on manual / adjustment / accrual journals (must follow the value date, editable while DRAFT / REJECTED); job `JOURNAL_AUTO_REVERSAL` posts a REVERSAL system journal (source `AUTOREV`, key `JV:<batch>:AUTOREV`, `reversal_of_id`) on that date, one transaction per journal. Manual journals record no sub-ledger open items today, so there is none to reverse |
+| FRBS 2.6.0, 2.6.1 | `closing.service.PeriodCloseScheduleService`: schedule (proposal: 2nd banking day of the next month, 17:00 Manila, company holidays skipped), withdraw, close now; job `GL_PERIOD_CLOSE` runs due closes: checklist, then `PeriodService.close`; a refusal is recorded on the schedule and raises `GL_CLOSE_FAILED`. With `CLOSE_ONLY_PREVIOUS_MONTH` only the month before the close date is accepted. Screen: Planning & Closing > GL Close & Cut-Off |
+| FRBS 2.7.0 | Alert check `YEAR_END_CLOSE_DUE` (`YearEndCloseDueCheck`, daily alert job): previous fiscal year open within the threshold days (15) before `YEAR_END_CLOSE_DEADLINE` |
+| FRBS 2.7.1 | `YearEndService.close` verifies the close (nominal balance and TB difference as of the year end) and stores it; `POST /closing/year-end/verify`; shown on the year-end panel with "Verify Again" |
+| FRBS 3.4.0, 3.4.1 | `acc_period_module_lock` (group `BROKING`); `PeriodService.requirePostingPeriod(company, date, systemOrAdjustment, module)` overload; the accounting engine refuses events of the source modules in `BROKING_SOURCE_MODULES` into a period whose broking books are closed (`BOOKS_CLOSED`), so booking, Operations, cashiering, remittance, adjustment, commission and disbursement are cut off without changing their code; GL adjustments still post. Job `BROKING_BOOKS_CLOSE` closes them on the last day of the month; `/closing/broking-books` (status, pending, close, reopen with reason). Pending items come from the new port `closing.service.BrokingCutoffCheck` (no implementation yet) |
+| FRBS 2.4.4, 2.4.5, 2.4.7, 2.4.9 | Column filter row in the report viewer; exports take `filter=column:text` (detail rows only, note on the file), `paper`, `orientation`, `fitToWidth` (PDF); report batches `POST /api/v1/reports/batches` (ZIP of any format or one merged PDF, per-report permissions, failures listed, status COMPLETED / PARTIAL / FAILED), `GET /reports/batches[/{id}[/file]]` (creator only). Batches run synchronously in the request; one transaction per report. Screen: Report Centre > Report Batch |
+| FRBS 3.1.1, DIS 3.30.0 | `acc_cost_center_rule` (`/api/v1/accounting/cost-center-rules`, ACCOUNTING_RULE_MANAGE or MASTER_MAINTAIN): the engine fills the lines of cost-centre-required accounts from the first matching rule; still missing: `COST_CENTER_MISSING` (event FAILED in the register, alert raised in its own transaction). Screen: Setup > Cost-Centre Rules |
+| FRBS 3.3.1, 3.3.2 | `brs_statement_layout` per bank account and `POST /receivables/bank-rec/statements/file` (xlsx / ods / csv via the bulk reader, mapped to the standard statement, imported, then auto-matched); rule `CHECK_NO_AND_AMOUNT` (`AutoMatcher` first pass: same cheque number in the reference or narration, same amount, any date). Screen: Setup > Bank Statement Layouts |
+| DIS 2.2.2 | Party types EMPLOYEE, GOVERNMENT, OTHER_PAYEE |
+| DIS 3.30.1, 3.30.2 | `org_employee` (`/api/v1/organization/employees`, EMPLOYEE_MAINTAIN), report `ORG-HEADCOUNT-CC` (`ReportMetadata.frbs`). Screen: Setup > Employees |
+| ACSL 2.9.1, 2.16.0 | `SystemJournalRequest.correcting(corrects, relatedInvoice, rootInvoice)` stores the links on the journal (for the ACSL correction entries of A1-PRQ) |
+| ACSL 2.14.3 | `AgeingSlots.MAX_SLOTS` = 8 (the BDOI buckets 30, 90, 180, 365, 730 fit; setting `AGEING_BUCKETS` to them is a configuration step, it changes every ageing report's default) |
+| BASAU 2.4.1, 2.6.0-2.6.3 | Access request RETURNED (`nbadmin.service.AccessRequestReturnService`): `POST /nbadmin/access-requests/{id}/return` (remarks mandatory, four eyes, requester notified) and `/{id}/resubmit` (requester, new justification) |
+
+**Contracts for other modules.** `PeriodService.requirePostingPeriod(..., module)` and `findPeriod`;
+`PeriodModuleLockService.requireOpen(company, date, module)`; port `closing.service.BrokingCutoffCheck` (broking
+modules list their pending items); port `approval.service.BulkApprovalAction` (bulk approval of inbox items);
+`SystemJournalRequest.correcting(...)`; `CostCenterRuleService` (applied by the engine, nothing to call);
+`ReportService.export(code, params, format, ExportOptions)`, `runForExport`, `render`; `EmployeeService.active`.
+
+**Jobs.** `JOURNAL_AUTO_REVERSAL`, `GL_PERIOD_CLOSE`, `BROKING_BOOKS_CLOSE`, `BOOK_RATE_FROM_CLOSING` on their
+pre-registered crons (`...-cron:-` defaults).
+
+**Tests.** `GlPlatformApiIT` (HTTP: read endpoints, chart upload of the sample file, numbering, revaluation rates,
+cost-centre rules, employees, report batch, export options, closing controls, headcount report),
+`JournalFrbsControlsIT`, `CloseControlsIT`, `CostCenterRuleIT`, `StatementFileImportIT`, `AccessRequestReturnIT`,
+`YearEndIT` (verification), unit tests `CoaNumberingTest`, `ExportOptionsTest`, `AutoMatcherChequeTest`,
+`AgeingSlotsTest`; frontend `closeTimes`, `setupForms`, `reportOptions` tests.
+
+**Parked / not done here.**
+- Real chart, entries and cost-centre rules stay configuration (AQ01, AQ02, AQ26, OQ07); close times and reopen policy
+  (AQ04); daily revaluation and the rate source (AQ03); bank file layouts (AQ08) are data of `brs_statement_layout`.
+- The re-parenting of 4130 under 4700, the USD accounts 1213 / 1221 / 2212 and the BDOI `AGEING_BUCKETS` value are
+  chart / parameter configuration, not migrations (AQ01).
+- Grants that belong in a later version: FRBS_TL has no `BULK_PROCESS` and my Flyway ranges all run before V890 on a
+  fresh database, so the chart upload got its own endpoints under `COA_UPLOAD` instead of a grant.
+- Frontend of the access-request "Return" (screen owned by `features/brokingsetup`) and of the approval inbox bulk
+  approve (screen owned by the approvals feature): the APIs are ready; the Journals screen has its own bulk posting.
+- The broking modules do not implement `BrokingCutoffCheck` yet: the cut-off records "Nothing pending" until they do.

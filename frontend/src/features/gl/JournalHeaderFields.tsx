@@ -8,7 +8,10 @@ interface Props {
   onChange: (value: JournalHeaderValues) => void;
 }
 
-/** Voucher header inputs: type, branch, value date, currency, reference and narration. */
+/**
+ * Voucher header inputs: type, branch, value date, currency, automatic reversal date (FRBS
+ * 2.8.1), reference and narration.
+ */
 export function JournalHeaderFields({ value, onChange }: Readonly<Props>) {
   const { branches } = useWorkspace();
   const set = <K extends keyof JournalHeaderValues>(key: K, v: JournalHeaderValues[K]) =>
@@ -66,6 +69,26 @@ export function JournalHeaderFields({ value, onChange }: Readonly<Props>) {
               maxLength={3}
               value={value.currency}
               onChange={(e) => set('currency', e.target.value.toUpperCase())}
+            />
+          )}
+        </Field>
+        <Field
+          label="Reverse on"
+          hint="Accruals: the posted voucher is reversed automatically on this date"
+          error={
+            value.reverseOn !== '' && value.reverseOn <= value.valueDate
+              ? 'Must be after the value date'
+              : undefined
+          }
+        >
+          {(id) => (
+            <input
+              id={id}
+              className="input"
+              type="date"
+              min={value.valueDate}
+              value={value.reverseOn}
+              onChange={(e) => set('reverseOn', e.target.value)}
             />
           )}
         </Field>

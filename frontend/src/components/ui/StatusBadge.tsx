@@ -40,6 +40,8 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     // collections plans and escalations
     'RESOLVED',
     'KEPT',
+    // report batch items (FRBS 2.4.5)
+    'OK',
   ],
   warning: [
     'PENDING_AUTHORIZATION',

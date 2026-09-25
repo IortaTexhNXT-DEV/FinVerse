@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Lock } from 'lucide-react';
+import { Lock, ShieldCheck } from 'lucide-react';
 import { closingApi } from '@/api/closing';
-import type { ClosingBalance, YearEndClose } from '@/api/closing';
+import type { ClosingBalance } from '@/api/closing';
 import { useAuth } from '@/auth/authContext';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
@@ -12,6 +12,8 @@ import { useToast } from '@/components/ui/toastContext';
 import { useWorkspace } from '@/context/workspaceContext';
 import { formatAmount, formatDateTime } from '@/utils/format';
 import { ChecklistView } from './ChecklistView';
+import { closeControlsApi } from './closeControlsApi';
+import type { VerifiedYearEndClose } from './closeControlsApi';
 import { PeriodSelectors } from './PeriodSelectors';
 import type { usePeriodPicker } from './usePeriodPicker';
 
@@ -56,19 +58,83 @@ function ClosingPreview({ companyId, yearId }: Readonly<{ companyId: number; yea
   );
 }
 
-function CloseRecord({ record }: Readonly<{ record: YearEndClose }>) {
+function verificationText(record: VerifiedYearEndClose): string {
+  if (record.verifiedAt === undefined) {
+    return 'not run yet.';
+  }
+  const outcome = record.verified === true ? 'both zero' : 'check the books';
+  return `nominal accounts ${formatAmount(record.nominalBalance ?? 0)}, trial balance difference ${formatAmount(record.tbDifference ?? 0)} — ${outcome} (${formatDateTime(record.verifiedAt)}).`;
+}
+
+function CloseRecord({
+  record,
+  onVerify,
+  verifying,
+}: Readonly<{ record: VerifiedYearEndClose; onVerify?: () => void; verifying: boolean }>) {
+  const verified = record.verified === true;
   return (
-    <div className="alert success">
-      FY {record.yearCode} closed by {record.closedBy} on {formatDateTime(record.closedAt)}: net
-      result {formatAmount(record.netResult)} transferred to {record.retainedEarningsAccount}{' '}
-      (journals {record.closingBatches}).
+    <div className="stack">
+      <div className="alert success">
+        FY {record.yearCode} closed by {record.closedBy} on {formatDateTime(record.closedAt)}: net
+        result {formatAmount(record.netResult)} transferred to {record.retainedEarningsAccount}{' '}
+        (journals {record.closingBatches}).
+      </div>
+      <div className={verified ? 'alert info' : 'alert warning'} role="status">
+        Post-close verification (FRBS 2.7.1): {verificationText(record)}
+        {onVerify !== undefined && (
+          <>
+            {' '}
+            <Button
+              size="sm"
+              variant="secondary"
+              icon={<ShieldCheck size={14} />}
+              busy={verifying}
+              onClick={onVerify}
+            >
+              Verify Again
+            </Button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
 
+/** The close record with the verification and, for the GL team, "Verify Again". */
+function VerifiedRecord({
+  companyId,
+  yearId,
+  record,
+}: Readonly<{ companyId: number; yearId: number; record: VerifiedYearEndClose }>) {
+  const { can } = useAuth();
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  const verify = useMutation({
+    mutationFn: () => closeControlsApi.verifyYear(companyId, yearId),
+    onSuccess: async (r) => {
+      await queryClient.invalidateQueries({ queryKey: ['year-close', yearId] });
+      toast.success(
+        `FY ${r.yearCode} verified: ${r.verified === true ? 'balanced' : 'differences found'}`,
+      );
+    },
+  });
+  const allowed = can('YEAR_END_CLOSE') || can('GL_CLOSE_SCHEDULE');
+  return (
+    <>
+      <ErrorAlert error={verify.error} />
+      <CloseRecord
+        record={record}
+        verifying={verify.isPending}
+        onVerify={allowed ? () => verify.mutate() : undefined}
+      />
+    </>
+  );
+}
+
 /**
- * Year-end close: pre-close checklist, preview of the transfer to retained earnings, and the close
- * itself (closing journal per branch, fiscal year locked, next year opened).
+ * Year-end close: pre-close checklist, preview of the transfer to retained earnings, the close
+ * itself (closing journal per branch, fiscal year locked, next year opened) and the post-close
+ * verification that nominal balances and the trial balance difference are zero (FRBS 2.7.1).
  */
 export function YearEndPanel({ picker }: Readonly<{ picker: ReturnType<typeof usePeriodPicker> }>) {
   const { companyId } = picker;
@@ -120,7 +186,7 @@ export function YearEndPanel({ picker }: Readonly<{ picker: ReturnType<typeof us
         )}
       </div>
       <ErrorAlert error={checklist.error ?? close.error} />
-      {record.data && <CloseRecord record={record.data} />}
+      {record.data && <VerifiedRecord companyId={companyId} yearId={yearId} record={record.data} />}
       <Card title="Pre-close checklist" flush>
         <ChecklistView checklist={checklist.data} loading={checklist.isLoading} />
       </Card>

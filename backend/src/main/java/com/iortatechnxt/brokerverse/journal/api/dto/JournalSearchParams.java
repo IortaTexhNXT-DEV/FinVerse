@@ -22,6 +22,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  * @param authorizer checker
  * @param minAmount cut-off amount
  * @param sourceModule source module
+ * @param assignedTo assignee filter (FRBS 2.5.1)
  */
 public record JournalSearchParams(
     @NotNull Long companyId,
@@ -34,7 +35,8 @@ public record JournalSearchParams(
     String inputter,
     String authorizer,
     BigDecimal minAmount,
-    String sourceModule) {
+    String sourceModule,
+    String assignedTo) {
 
   /**
    * Converts to domain search criteria.
@@ -53,6 +55,7 @@ public record JournalSearchParams(
         inputter,
         authorizer,
         minAmount,
-        sourceModule);
+        sourceModule,
+        assignedTo);
   }
 }

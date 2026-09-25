@@ -11,6 +11,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, formatDateTime } from '@/utils/format';
 import { JournalActions } from './JournalActions';
+import type { FrbsJournal } from './glPlatformApi';
 import { journalSource } from './journalSource';
 
 function Summary({ journal: j }: Readonly<{ journal: Journal }>) {
@@ -41,7 +42,33 @@ function Summary({ journal: j }: Readonly<{ journal: Journal }>) {
   );
 }
 
-function AuditPanel({ journal }: Readonly<{ journal: Journal }>) {
+function ControlFacts({ journal: j }: Readonly<{ journal: FrbsJournal }>) {
+  const facts: [string, string][] = [];
+  if (j.assignedTo !== undefined) {
+    facts.push(['Assigned to', `${j.assignedTo} (by ${j.assignedBy ?? '—'})`]);
+  }
+  if (j.reverseOn !== undefined) {
+    facts.push(['Automatic reversal on', formatDate(j.reverseOn)]);
+  }
+  if (j.rootInvoiceNo !== undefined || j.relatedInvoiceNo !== undefined) {
+    facts.push(['Invoice / family', `${j.relatedInvoiceNo ?? '—'} / ${j.rootInvoiceNo ?? '—'}`]);
+  }
+  if (facts.length === 0) {
+    return null;
+  }
+  return (
+    <>
+      {facts.map(([label, value]) => (
+        <div key={label}>
+          <dt className="muted">{label}</dt>
+          <dd style={{ margin: 0, fontWeight: 600 }}>{value}</dd>
+        </div>
+      ))}
+    </>
+  );
+}
+
+function AuditPanel({ journal }: Readonly<{ journal: FrbsJournal }>) {
   const rows: [string, string | undefined, string | undefined][] = [
     ['Input by', journal.createdBy, journal.createdAt],
     ['Submitted by', journal.submittedBy, journal.submittedAt],
@@ -59,9 +86,10 @@ function AuditPanel({ journal }: Readonly<{ journal: Journal }>) {
             </dd>
           </div>
         ))}
+        <ControlFacts journal={journal} />
         {journal.rejectionReason !== undefined && (
           <div>
-            <dt className="muted">Rejected by {journal.rejectedBy}</dt>
+            <dt className="muted">Returned by {journal.rejectedBy}</dt>
             <dd style={{ margin: 0 }}>{journal.rejectionReason}</dd>
           </div>
         )}

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { PARTY_TYPES, partiesApi } from '@/api/parties';
+import { partiesApi } from '@/api/parties';
 import type { Party, PartyType } from '@/api/parties';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
@@ -18,6 +18,7 @@ import { PartyEditorModal } from './PartyEditorModal';
 import { emptyParty } from './partyForm';
 import type { PartyForm } from './partyForm';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { SETUP_PARTY_TYPES } from './partyTypes';
 
 /**
  * Business partner master (policyholders, intermediaries, reinsurers, coinsurers, suppliers...):
@@ -76,7 +77,7 @@ export default function PartiesPage() {
                 onChange={(e) => setType(e.target.value as PartyType | '')}
               >
                 <option value="">All types</option>
-                {PARTY_TYPES.map((t) => (
+                {SETUP_PARTY_TYPES.map((t) => (
                   <option key={t} value={t}>
                     {humanize(t)}
                   </option>

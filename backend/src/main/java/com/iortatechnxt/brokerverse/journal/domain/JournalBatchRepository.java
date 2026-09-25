@@ -2,11 +2,14 @@ package com.iortatechnxt.brokerverse.journal.domain;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.EntityGraph.EntityGraphType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /** Persistence for {@link JournalBatch}. Dynamic searches use {@link JournalSpecifications}. */
 public interface JournalBatchRepository
@@ -45,6 +48,22 @@ public interface JournalBatchRepository
       String sourceModule,
       String sourceReference,
       Collection<JournalStatus> excluded);
+
+  /**
+   * Posted journals whose automatic reversal date has come and that are not reversed yet (FRBS
+   * 2.8.1), oldest first.
+   *
+   * @param date business date
+   * @return ids
+   */
+  @Query(
+      """
+      select b.id from JournalBatch b
+      where b.status = com.iortatechnxt.brokerverse.journal.domain.JournalStatus.POSTED
+        and b.reverseOn is not null and b.reverseOn <= :date and b.reversedById is null
+      order by b.reverseOn, b.id
+      """)
+  List<Long> reversalsDue(@Param("date") LocalDate date);
 
   /**
    * Counts batches in given statuses whose value date falls within a range.

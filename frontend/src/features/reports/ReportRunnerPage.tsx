@@ -11,8 +11,11 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useWorkspace } from '@/context/workspaceContext';
 import { ParameterInput } from './ParameterInput';
+import { PrintOptionsFields } from './PrintOptionsFields';
 import { ReportVariants } from './ReportVariants';
 import { ReportTable } from './ReportTable';
+import { DEFAULT_PRINT, filterPairs, reportOptionsApi } from './reportOptions';
+import type { ColumnFilters, PrintOptions } from './reportOptions';
 import { initialValue, parameterErrors } from './reportParams';
 
 const FORMATS: { format: ExportFormat; label: string }[] = [
@@ -30,7 +33,10 @@ function openForPrint(blob: Blob): void {
   window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
-/** Parameter form, on-screen result and export for one report. */
+/**
+ * Parameter form, on-screen result with column filters (FRBS 2.4.4) and export or print with the
+ * print options (FRBS 2.4.9); exports hold the filtered rows.
+ */
 export default function ReportRunnerPage() {
   const code = useParams().code ?? '';
   const { company, branchId } = useWorkspace();
@@ -38,6 +44,8 @@ export default function ReportRunnerPage() {
   const entry = catalogue.data?.find((e) => e.code === code);
   const [values, setValues] = useState<Record<string, string>>({});
   const [checked, setChecked] = useState(false);
+  const [filters, setFilters] = useState<ColumnFilters>({});
+  const [print, setPrint] = useState<PrintOptions>(DEFAULT_PRINT);
 
   const params = (): Record<string, string> => {
     const out: Record<string, string> = {};
@@ -53,15 +61,20 @@ export default function ReportRunnerPage() {
     return out;
   };
 
-  const run = useMutation({ mutationFn: () => reportApi.run(code, params()) });
+  const run = useMutation({
+    mutationFn: () => reportApi.run(code, params()),
+    onSuccess: () => setFilters({}),
+  });
   const exporter = useMutation({
-    mutationFn: (format: ExportFormat) => reportApi.export(code, params(), format),
+    mutationFn: (format: ExportFormat) =>
+      reportOptionsApi.export(code, params(), format, print, filters),
     onSuccess: ({ blob, fileName }) => saveFile(blob, fileName),
   });
   const printer = useMutation({
-    mutationFn: () => reportApi.export(code, params(), 'PDF'),
+    mutationFn: () => reportOptionsApi.export(code, params(), 'PDF', print, filters),
     onSuccess: ({ blob }) => openForPrint(blob),
   });
+  const filtered = filterPairs(filters).length > 0;
   const errors = parameterErrors(entry?.parameters ?? [], values);
   const valid = Object.keys(errors).length === 0;
   /** Runs the action only when the form is valid; otherwise shows the field errors. */
@@ -132,8 +145,11 @@ export default function ReportRunnerPage() {
               />
             ))}
           </div>
+          <div className="form-grid">
+            <PrintOptionsFields value={print} onChange={setPrint} />
+          </div>
           <div className="report-downloads">
-            <span className="muted">Download</span>
+            <span className="muted">{filtered ? 'Download filtered rows' : 'Download'}</span>
             {FORMATS.map((f) => (
               <Button
                 key={f.format}
@@ -153,7 +169,11 @@ export default function ReportRunnerPage() {
       {run.data !== undefined && (
         <Card title={run.data.title} flush>
           <div className="report-echo muted">{run.data.parameterEcho.join(' · ')}</div>
-          <ReportTable result={run.data} />
+          <ReportTable
+            result={run.data}
+            filters={filters}
+            onFilterChange={(column, text) => setFilters((f) => ({ ...f, [column]: text }))}
+          />
           {run.data.notes.map((n) => (
             <div key={n} className="alert report-note">
               {n}

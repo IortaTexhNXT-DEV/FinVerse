@@ -30,7 +30,7 @@ class AgeingDefaultsIT {
 
   @Test
   void anUnusableParameterFallsBackToTheStandardSlots() {
-    parameters.update(SystemParameterService.AGEING_BUCKETS, "10,20,30,40,50,60");
+    parameters.update(SystemParameterService.AGEING_BUCKETS, "10,20,30,40,50,60,70,80,90");
     assertThat(ageing.defaultSlots()).isEqualTo(AgeingSlots.STANDARD);
   }
 }

@@ -91,6 +91,11 @@ class YearEndIT {
 
     YearEndClose record = asUser.run("fmanager", () -> yearEnd.close(companyId, year.getId()));
     assertThat(record.getNetResult()).isEqualByComparingTo("70000");
+    // FRBS 2.7.1: nominal balances and trial balance difference are zero after the close.
+    assertThat(record.getVerified()).isTrue();
+    assertThat(record.getNominalBalance()).isEqualByComparingTo("0");
+    assertThat(record.getTbDifference()).isEqualByComparingTo("0");
+    assertThat(asUser.run("fmanager", () -> yearEnd.verify(year.getId())).getVerified()).isTrue();
     assertThat(record.getNextYearCode()).isEqualTo(2026);
     assertThat(balance(companyId, "4100")).isEqualByComparingTo("0");
     assertThat(balance(companyId, "5601")).isEqualByComparingTo("0");

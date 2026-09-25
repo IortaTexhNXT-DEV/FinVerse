@@ -23,7 +23,13 @@ public enum PartyType {
    * Insurer on the broker's panel (BDOI broking): premium remitted to it and commission receivable
    * from it settle in the insurer sub-ledger.
    */
-  INSURER(SubLedgerType.INSURER);
+  INSURER(SubLedgerType.INSURER),
+  /** Employee as a payee: payroll-related payments and cash advances (DIS 2.2.2, 3.30.1). */
+  EMPLOYEE(SubLedgerType.VENDOR),
+  /** Government agency (BIR, SSS, PhilHealth, HDMF, LGU) as a payee (DIS 2.2.2). */
+  GOVERNMENT(SubLedgerType.VENDOR),
+  /** Any other payee of a disbursement (DIS 2.2.2). */
+  OTHER_PAYEE(SubLedgerType.VENDOR);
 
   private final SubLedgerType subLedger;
 

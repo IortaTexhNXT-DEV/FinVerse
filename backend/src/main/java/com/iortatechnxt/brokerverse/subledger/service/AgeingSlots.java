@@ -7,9 +7,9 @@ import java.util.regex.Pattern;
 
 /**
  * Configurable ageing slots (rule R-AGE of the finance reports spec) shared by the debtors and
- * creditors reports: up to five ascending upper bounds in days plus an "over" bucket, e.g. {@code
- * 30,60,90,120} gives 0-30, 31-60, 61-90, 91-120 and Over 120. Items not yet due (negative age)
- * fall into the first bucket.
+ * creditors reports: up to eight ascending upper bounds in days (ACSL 2.14.3: BDOI ages 30, 90,
+ * 180, 365 and 730 days) plus an "over" bucket, e.g. {@code 30,60,90,120} gives 0-30, 31-60, 61-90,
+ * 91-120 and Over 120. Items not yet due (negative age) fall into the first bucket.
  *
  * <p>The company-wide default comes from the {@code AGEING_BUCKETS} system parameter (see {@link
  * AgeingService#defaultSlots()}); reports let users override the slots per run.
@@ -22,7 +22,7 @@ public record AgeingSlots(List<Integer> boundaries) {
   public static final AgeingSlots STANDARD = new AgeingSlots(List.of(30, 60, 90, 120));
 
   /** Maximum number of slots (buckets before "over"). */
-  public static final int MAX_SLOTS = 5;
+  public static final int MAX_SLOTS = 8;
 
   private static final int MAX_DIGITS = 5;
   private static final Pattern SEPARATOR = Pattern.compile("[,;\\s]+");
@@ -30,7 +30,7 @@ public record AgeingSlots(List<Integer> boundaries) {
   /**
    * Validates and copies the bounds.
    *
-   * @param boundaries 1 to 5 ascending positive upper bounds
+   * @param boundaries 1 to 8 ascending positive upper bounds
    */
   public AgeingSlots {
     boundaries = List.copyOf(boundaries);
@@ -49,7 +49,7 @@ public record AgeingSlots(List<Integer> boundaries) {
   /**
    * Creates slots from explicit bounds.
    *
-   * @param boundaries 1 to 5 ascending positive upper bounds
+   * @param boundaries 1 to 8 ascending positive upper bounds
    * @return slots
    */
   public static AgeingSlots of(List<Integer> boundaries) {

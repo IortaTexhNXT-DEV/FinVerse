@@ -13,11 +13,15 @@ import com.iortatechnxt.brokerverse.period.domain.AccountingPeriodRepository;
 import com.iortatechnxt.brokerverse.period.domain.FiscalYear;
 import com.iortatechnxt.brokerverse.period.domain.FiscalYearRepository;
 import com.iortatechnxt.brokerverse.period.domain.FiscalYearStatus;
+import com.iortatechnxt.brokerverse.period.domain.PeriodModuleLock;
+import com.iortatechnxt.brokerverse.period.domain.PeriodModuleLockRepository;
 import com.iortatechnxt.brokerverse.period.domain.PeriodStatus;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +39,7 @@ public class PeriodService {
 
   private final FiscalYearRepository years;
   private final AccountingPeriodRepository periods;
+  private final PeriodModuleLockRepository moduleLocks;
   private final OrganizationService organization;
   private final List<PeriodCloseGuard> closeGuards;
   private final AuditTrailService audit;
@@ -46,6 +51,7 @@ public class PeriodService {
    *
    * @param years fiscal year repository
    * @param periods period repository
+   * @param moduleLocks cut-off of groups of books (FRBS 3.4.0)
    * @param organization organization service
    * @param closeGuards pre-close checks contributed by other modules
    * @param audit audit trail
@@ -55,6 +61,7 @@ public class PeriodService {
   public PeriodService(
       FiscalYearRepository years,
       AccountingPeriodRepository periods,
+      PeriodModuleLockRepository moduleLocks,
       OrganizationService organization,
       List<PeriodCloseGuard> closeGuards,
       AuditTrailService audit,
@@ -62,6 +69,7 @@ public class PeriodService {
       Clock clock) {
     this.years = years;
     this.periods = periods;
+    this.moduleLocks = moduleLocks;
     this.organization = organization;
     this.closeGuards = List.copyOf(closeGuards);
     this.audit = audit;
@@ -111,6 +119,18 @@ public class PeriodService {
   @Transactional(readOnly = true)
   public AccountingPeriod getPeriod(Long id) {
     return periods.findById(id).orElseThrow(() -> new ResourceNotFoundException("Period", id));
+  }
+
+  /**
+   * The period containing a date, if one is defined.
+   *
+   * @param companyId company
+   * @param date date
+   * @return period
+   */
+  @Transactional(readOnly = true)
+  public Optional<AccountingPeriod> findPeriod(Long companyId, LocalDate date) {
+    return periods.findContaining(companyId, date);
   }
 
   /**
@@ -264,6 +284,34 @@ public class PeriodService {
               + " is "
               + period.getStatus()
               + " and does not accept this posting");
+    }
+    return period;
+  }
+
+  /**
+   * As {@link #requirePostingPeriod(Long, LocalDate, boolean)}, and also refuses the posting when
+   * the books of a group of modules are closed for the period (FRBS 3.4.0: the broking books are
+   * cut off at month end while the GL stays open for adjustments). Existing callers are unchanged.
+   *
+   * @param companyId company
+   * @param date accounting (value) date
+   * @param systemOrAdjustment true for system generated or adjustment journals
+   * @param module group of books, e.g. {@link PeriodModuleLock#BROKING}; null skips the check
+   * @return the period
+   */
+  @Transactional(readOnly = true)
+  public AccountingPeriod requirePostingPeriod(
+      Long companyId, LocalDate date, boolean systemOrAdjustment, String module) {
+    AccountingPeriod period = requirePostingPeriod(companyId, date, systemOrAdjustment);
+    if (module != null
+        && moduleLocks.existsByPeriodIdAndModuleAndLockedTrue(period.getId(), module)) {
+      throw new BusinessRuleException(
+          "BOOKS_CLOSED",
+          "The "
+              + module.toLowerCase(Locale.ROOT)
+              + " books of "
+              + period.getName()
+              + " are closed");
     }
     return period;
   }

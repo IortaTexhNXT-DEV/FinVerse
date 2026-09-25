@@ -54,6 +54,7 @@ public class PdfReportRenderer implements ReportRenderer {
   private static final float CELL_PADDING = 2.5f;
   private static final float GRID_WIDTH = 0.4f;
   private static final float END_SPACING = 8f;
+  private static final float NATURAL_POINTS_PER_WEIGHT = 40f;
   private static final Color GRID = new Color(0xD5, 0xDB, 0xE5);
   private static final DateTimeFormatter STAMP =
       DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withZone(ZoneId.of("Asia/Manila"));
@@ -72,8 +73,7 @@ public class PdfReportRenderer implements ReportRenderer {
 
   @Override
   public byte[] render(ReportResult result, ReportContext context) {
-    boolean landscape = result.columns().size() > LANDSCAPE_THRESHOLD;
-    Rectangle size = landscape ? PageSize.A4.rotate() : PageSize.A4;
+    Rectangle size = pageSize(result, context.print());
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     try (Document doc = new Document(size, MARGIN, MARGIN, MARGIN, MARGIN + 10)) {
       PdfWriter writer = PdfWriter.getInstance(doc, out);
@@ -82,7 +82,7 @@ public class PdfReportRenderer implements ReportRenderer {
       // has not ended yet, so the footer still applies to every page.
       writer.setPageEvent(new PageFooter(result.code(), context.footerText(), writer));
       addHeader(doc, result, context);
-      doc.add(table(result));
+      doc.add(table(result, context.print().fitToWidth(), size.getWidth() - 2 * MARGIN));
       for (String note : result.notes()) {
         doc.add(new Paragraph("Note: " + note, META));
       }
@@ -117,14 +117,46 @@ public class PdfReportRenderer implements ReportRenderer {
     doc.add(spacer);
   }
 
-  private static PdfPTable table(ReportResult result) {
+  /**
+   * Page size of the print options (FRBS 2.4.9); AUTO turns wide reports to landscape.
+   *
+   * @param result report
+   * @param print options
+   * @return page size
+   */
+  static Rectangle pageSize(ReportResult result, PrintOptions print) {
+    Rectangle paper =
+        switch (print.paper()) {
+          case A4 -> PageSize.A4;
+          case LETTER -> PageSize.LETTER;
+          case LEGAL -> PageSize.LEGAL;
+          case A3 -> PageSize.A3;
+        };
+    boolean landscape =
+        switch (print.orientation()) {
+          case AUTO -> result.columns().size() > LANDSCAPE_THRESHOLD;
+          case PORTRAIT -> false;
+          case LANDSCAPE -> true;
+        };
+    return landscape ? paper.rotate() : paper;
+  }
+
+  private static PdfPTable table(ReportResult result, boolean fitToWidth, float pageWidth) {
     List<ReportColumn> cols = result.columns();
     PdfPTable table = new PdfPTable(cols.size() + 1);
-    table.setWidthPercentage(100);
     float[] widths = new float[cols.size() + 1];
     widths[0] = LABEL_WEIGHT;
+    float total = LABEL_WEIGHT;
     for (int i = 0; i < cols.size(); i++) {
       widths[i + 1] = cols.get(i).type() == ColumnType.TEXT ? TEXT_WEIGHT : NUMBER_WEIGHT;
+      total += widths[i + 1];
+    }
+    if (fitToWidth || total * NATURAL_POINTS_PER_WEIGHT >= pageWidth) {
+      table.setWidthPercentage(100);
+    } else {
+      table.setTotalWidth(total * NATURAL_POINTS_PER_WEIGHT);
+      table.setLockedWidth(true);
+      table.setHorizontalAlignment(Element.ALIGN_LEFT);
     }
     table.setWidths(widths);
     table.setHeaderRows(1);

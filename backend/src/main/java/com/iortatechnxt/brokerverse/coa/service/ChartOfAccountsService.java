@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.coa.domain.GlAccount;
 import com.iortatechnxt.brokerverse.coa.domain.GlAccountRepository;
 import com.iortatechnxt.brokerverse.coa.domain.GlCategory;
 import com.iortatechnxt.brokerverse.coa.domain.GlCategoryRepository;
+import com.iortatechnxt.brokerverse.coa.domain.NegativeBalancePolicy;
 import com.iortatechnxt.brokerverse.coa.domain.SubLedgerType;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
@@ -44,6 +45,8 @@ public class ChartOfAccountsService {
   private final GlAccountRepository accounts;
   private final GlCategoryRepository categories;
   private final AccountUsageChecker usageChecker;
+  private final CoaNumberingService numbering;
+  private final ShortCodes shortCodes;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
@@ -54,6 +57,8 @@ public class ChartOfAccountsService {
    * @param accounts account repository
    * @param categories category repository
    * @param usageChecker ledger usage port
+   * @param numbering system-generated account numbers
+   * @param shortCodes short codes
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
@@ -62,12 +67,16 @@ public class ChartOfAccountsService {
       GlAccountRepository accounts,
       GlCategoryRepository categories,
       AccountUsageChecker usageChecker,
+      CoaNumberingService numbering,
+      ShortCodes shortCodes,
       AuditTrailService audit,
       CurrentUser currentUser,
       Clock clock) {
     this.accounts = accounts;
     this.categories = categories;
     this.usageChecker = usageChecker;
+    this.numbering = numbering;
+    this.shortCodes = shortCodes;
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
@@ -85,7 +94,7 @@ public class ChartOfAccountsService {
   }
 
   /**
-   * Searches accounts by code prefix or name.
+   * Searches accounts by code prefix, name or short code (FRBS 2.3.3).
    *
    * @param companyId company
    * @param term search term
@@ -122,19 +131,36 @@ public class ChartOfAccountsService {
   }
 
   /**
-   * Creates an account (pending authorization).
+   * Finds an account by its code or, failing that, its short code (FRBS 2.3.3, 2.8.1).
+   *
+   * @param companyId company
+   * @param key account code or short code
+   * @return account
+   */
+  @Transactional(readOnly = true)
+  public GlAccount lookup(Long companyId, String key) {
+    return shortCodes.lookup(companyId, key);
+  }
+
+  /**
+   * Creates an account (pending authorization). A blank code is generated from the numbering scheme
+   * of the parent (FRBS 2.3.2).
    *
    * @param request request
    * @return created account
    */
   public GlAccount create(GlAccountRequest request) {
-    if (accounts.existsByCompanyIdAndCode(request.companyId(), request.code())) {
-      throw new DuplicateResourceException(ACCOUNT, request.code());
+    String code =
+        request.code() == null || request.code().isBlank()
+            ? numbering.proposedCode(request.companyId(), request.parentCode())
+            : request.code().trim();
+    if (accounts.existsByCompanyIdAndCode(request.companyId(), code)) {
+      throw new DuplicateResourceException(ACCOUNT, code);
     }
     GlAccount account =
         new GlAccount(
             request.companyId(),
-            request.code(),
+            code,
             request.name(),
             request.accountClass(),
             request.level(),
@@ -283,7 +309,11 @@ public class ChartOfAccountsService {
   }
 
   private void apply(GlAccount account, GlAccountRequest request) {
-    account.setShortName(request.shortName());
+    account.setShortName(shortCodes.checked(account, request.shortName()));
+    account.setNegativeBalancePolicy(
+        request.negativeBalancePolicy() == null
+            ? NegativeBalancePolicy.ALLOW
+            : request.negativeBalancePolicy());
     account.setCategory(
         request.categoryCode() == null || request.categoryCode().isBlank()
             ? null

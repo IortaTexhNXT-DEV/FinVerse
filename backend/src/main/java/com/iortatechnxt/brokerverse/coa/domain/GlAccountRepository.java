@@ -83,11 +83,50 @@ public interface GlAccountRepository extends JpaRepository<GlAccount, Long> {
   boolean existsByParentId(Long parentId);
 
   /**
-   * Searches accounts by code prefix or name fragment.
+   * Finds an account by its short code (case-insensitive, FRBS 2.3.3 / 2.8.1).
+   *
+   * @param companyId company id
+   * @param shortName short code
+   * @return account if present
+   */
+  @EntityGraph(
+      attributePaths = {PARENT, CATEGORY},
+      type = EntityGraphType.LOAD)
+  Optional<GlAccount> findByCompanyIdAndShortNameIgnoreCase(Long companyId, String shortName);
+
+  /**
+   * Accounts by short codes (case-insensitive), for journal lines keyed by short code.
+   *
+   * @param companyId company id
+   * @param shortNames short codes, lower case
+   * @return accounts
+   */
+  @Query(
+      "select a from GlAccount a where a.companyId = :companyId and lower(a.shortName) in"
+          + " :shortNames")
+  List<GlAccount> findByShortNames(
+      @Param("companyId") Long companyId, @Param("shortNames") Collection<String> shortNames);
+
+  /**
+   * Codes starting with a prefix (numbering, FRBS 2.3.2: a generated code never collides with an
+   * existing one, linked to the parent or not).
+   *
+   * @param companyId company id
+   * @param prefix code prefix
+   * @return codes
+   */
+  @Query(
+      "select a.code from GlAccount a where a.companyId = :companyId and a.code like"
+          + " concat(:prefix, '%')")
+  List<String> codesStartingWith(
+      @Param("companyId") Long companyId, @Param("prefix") String prefix);
+
+  /**
+   * Searches accounts by code prefix, name fragment or short code.
    *
    * @param companyId company id
    * @param term search term
-   * @return up to the matching accounts, ordered by code
+   * @return the matching accounts, ordered by code
    */
   @EntityGraph(
       attributePaths = {PARENT, CATEGORY},
@@ -97,7 +136,8 @@ public interface GlAccountRepository extends JpaRepository<GlAccount, Long> {
       select a from GlAccount a
       where a.companyId = :companyId
         and (lower(a.code) like lower(concat(:term, '%'))
-             or lower(a.name) like lower(concat('%', :term, '%')))
+             or lower(a.name) like lower(concat('%', :term, '%'))
+             or lower(a.shortName) like lower(concat(:term, '%')))
       order by a.code
       """)
   List<GlAccount> search(@Param("companyId") Long companyId, @Param("term") String term);

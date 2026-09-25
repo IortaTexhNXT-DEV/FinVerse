@@ -1,4 +1,12 @@
-import { BookOpen, BookUser, CalendarRange, FilePlus2, ListTree, Search } from 'lucide-react';
+import {
+  BookOpen,
+  BookUser,
+  CalendarRange,
+  FilePlus2,
+  ListTree,
+  Search,
+  Upload,
+} from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -58,6 +66,13 @@ export const glModule: FeatureModule = {
       icon: ListTree,
       permission: 'MASTER_VIEW',
       component: lazy(() => import('./ChartOfAccountsPage')),
+    },
+    {
+      path: '/gl/accounts/upload',
+      label: 'Chart Upload',
+      icon: Upload,
+      permission: 'COA_UPLOAD',
+      component: lazy(() => import('./ChartUploadPage')),
     },
     {
       path: '/gl/periods',

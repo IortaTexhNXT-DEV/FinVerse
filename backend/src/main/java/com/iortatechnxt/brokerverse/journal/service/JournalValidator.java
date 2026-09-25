@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.journal.service;
 
+import com.iortatechnxt.brokerverse.coa.domain.NegativeBalancePolicy;
 import com.iortatechnxt.brokerverse.coa.service.PostingContext;
 import com.iortatechnxt.brokerverse.coa.service.PostingEligibilityService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
@@ -21,8 +22,8 @@ import org.springframework.stereotype.Component;
  * Validates a journal batch before submission and again before posting.
  *
  * <p>Checks, in order: organisation (active company/branches), accounting period, value-date
- * window, line count and balance, account posting controls, currencies and dimensions. All
- * violations are reported together.
+ * window, line count and balance, account posting controls, currencies and dimensions, and for
+ * manual journals the negative balance control (FRBS 2.5.4). All violations are reported together.
  */
 @Component
 public class JournalValidator {
@@ -33,6 +34,7 @@ public class JournalValidator {
   private final PeriodService periods;
   private final PostingEligibilityService eligibility;
   private final DimensionService dimensions;
+  private final NegativeBalanceCheck negativeBalances;
   private final Clock clock;
 
   /**
@@ -42,6 +44,7 @@ public class JournalValidator {
    * @param periods period service
    * @param eligibility account eligibility rules
    * @param dimensions dimension service
+   * @param negativeBalances negative balance control (FRBS 2.5.4)
    * @param clock clock
    */
   public JournalValidator(
@@ -49,11 +52,13 @@ public class JournalValidator {
       PeriodService periods,
       PostingEligibilityService eligibility,
       DimensionService dimensions,
+      NegativeBalanceCheck negativeBalances,
       Clock clock) {
     this.organization = organization;
     this.periods = periods;
     this.eligibility = eligibility;
     this.dimensions = dimensions;
+    this.negativeBalances = negativeBalances;
     this.clock = clock;
   }
 
@@ -86,9 +91,33 @@ public class JournalValidator {
     for (JournalLine line : batch.getLines()) {
       errors.addAll(lineErrors(batch, line, manual, makerRoles));
     }
+    if (manual && errors.isEmpty()) {
+      negativeBalances.check(batch).stream()
+          .filter(f -> f.policy() == NegativeBalancePolicy.BLOCK)
+          .map(NegativeBalanceCheck.Finding::message)
+          .forEach(errors::add);
+    }
     if (!errors.isEmpty()) {
       throw new BusinessRuleException("JOURNAL_INVALID", String.join("; ", errors));
     }
+  }
+
+  /**
+   * Non-blocking warnings of a manual journal (FRBS 2.5.5, 2.8.4): accounts with policy WARN left
+   * with a negative balance. Shown to the maker before submission and to the checker before
+   * approval; they never stop the posting.
+   *
+   * @param batch batch
+   * @return warning messages, empty when none
+   */
+  public List<String> warnings(JournalBatch batch) {
+    if (batch.getJournalType().isSystemGenerated() || batch.getLines().isEmpty()) {
+      return List.of();
+    }
+    return negativeBalances.check(batch).stream()
+        .filter(f -> f.policy() == NegativeBalancePolicy.WARN)
+        .map(NegativeBalanceCheck.Finding::message)
+        .toList();
   }
 
   private List<String> lineErrors(

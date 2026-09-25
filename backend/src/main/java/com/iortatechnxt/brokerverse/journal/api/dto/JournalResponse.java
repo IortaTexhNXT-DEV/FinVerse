@@ -38,6 +38,12 @@ import java.util.List;
  * @param rejectionReason rejection reason
  * @param postedAt posting time
  * @param lines lines (empty in list views)
+ * @param assignedTo user the entry is assigned to for posting (FRBS 2.5.1)
+ * @param assignedBy assigning user
+ * @param reverseOn automatic reversal date (FRBS 2.8.1)
+ * @param correctsBatchId journal corrected by this one (ACSL 2.9.1)
+ * @param relatedInvoiceNo related invoice
+ * @param rootInvoiceNo root of the invoice family
  */
 public record JournalResponse(
     Long id,
@@ -66,7 +72,13 @@ public record JournalResponse(
     String rejectedBy,
     String rejectionReason,
     Instant postedAt,
-    List<JournalLineResponse> lines) {
+    List<JournalLineResponse> lines,
+    String assignedTo,
+    String assignedBy,
+    LocalDate reverseOn,
+    Long correctsBatchId,
+    String relatedInvoiceNo,
+    String rootInvoiceNo) {
 
   /**
    * Maps an entity including lines.
@@ -116,6 +128,12 @@ public record JournalResponse(
         b.getRejectedBy(),
         b.getRejectionReason(),
         b.getPostedAt(),
-        lines);
+        lines,
+        b.getAssignedTo(),
+        b.getAssignedBy(),
+        b.getReverseOn(),
+        b.getCorrectsBatchId(),
+        b.getRelatedInvoiceNo(),
+        b.getRootInvoiceNo());
   }
 }

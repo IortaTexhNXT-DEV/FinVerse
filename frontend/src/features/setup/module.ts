@@ -1,4 +1,14 @@
-import { Building2, CalendarDays, Coins, Landmark, Tags, Users } from 'lucide-react';
+import {
+  Building2,
+  CalendarDays,
+  Coins,
+  FileSpreadsheet,
+  IdCard,
+  Landmark,
+  Split,
+  Tags,
+  Users,
+} from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -40,6 +50,27 @@ export const setupModule: FeatureModule = {
       icon: Users,
       permission: 'MASTER_VIEW',
       component: lazy(() => import('./PartiesPage')),
+    },
+    {
+      path: '/setup/employees',
+      label: 'Employees',
+      icon: IdCard,
+      permission: 'MASTER_VIEW',
+      component: lazy(() => import('./EmployeesPage')),
+    },
+    {
+      path: '/setup/cost-centre-rules',
+      label: 'Cost-Centre Rules',
+      icon: Split,
+      permission: 'MASTER_VIEW',
+      component: lazy(() => import('./CostCentreRulesPage')),
+    },
+    {
+      path: '/setup/statement-layouts',
+      label: 'Bank Statement Layouts',
+      icon: FileSpreadsheet,
+      permission: 'RECONCILIATION_MANAGE',
+      component: lazy(() => import('./StatementLayoutsPage')),
     },
     {
       path: '/setup/holidays',

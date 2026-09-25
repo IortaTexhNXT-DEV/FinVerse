@@ -1,5 +1,7 @@
 import type { ReportResult, ReportRow } from '@/api/reports';
 import { formatAmount, formatDate } from '@/utils/format';
+import { filterRows } from './reportOptions';
+import type { ColumnFilters } from './reportOptions';
 
 const ROW_CLASS: Record<ReportRow['kind'], string | undefined> = {
   DETAIL: undefined,
@@ -71,15 +73,53 @@ function ValueCells({
   );
 }
 
+interface ReportTableProps {
+  result: ReportResult;
+  /** Column filters (FRBS 2.4.4); shown as a filter row when {@link onFilterChange} is given. */
+  filters?: ColumnFilters;
+  onFilterChange?: (column: string, text: string) => void;
+}
+
+function FilterRow({
+  result,
+  labels,
+  filters,
+  onFilterChange,
+}: Readonly<{
+  result: ReportResult;
+  labels: boolean;
+  filters: ColumnFilters;
+  onFilterChange: (column: string, text: string) => void;
+}>) {
+  return (
+    <tr className="report-filters">
+      {labels && <th aria-label="No filter" />}
+      {result.columns.map((c) => (
+        <th key={c.key}>
+          <input
+            className="input"
+            aria-label={`Filter ${c.label}`}
+            placeholder="Filter"
+            value={filters[c.key] ?? ''}
+            onChange={(e) => onFilterChange(c.key, e.target.value)}
+          />
+        </th>
+      ))}
+    </tr>
+  );
+}
+
 /**
  * On-screen rendering of a report result with group headers, subtotals and totals. Group headers
  * span the full width; a subtotal or total label spans the leading columns it leaves empty, so a
- * separate label column is shown only when a label has no room.
+ * separate label column is shown only when a label has no room. With column filters, only the
+ * matching detail rows are shown (totals no longer add up and are hidden, as in the export).
  */
-export function ReportTable({ result }: Readonly<{ result: ReportResult }>) {
+export function ReportTable({ result, filters = {}, onFilterChange }: Readonly<ReportTableProps>) {
   const { columns } = result;
   const labels = needsLabelColumn(result);
   const span = columns.length + (labels ? 1 : 0);
+  const rows = filterRows(result, filters);
   return (
     <div className="table-wrap report-result">
       <table className="table">
@@ -93,9 +133,17 @@ export function ReportTable({ result }: Readonly<{ result: ReportResult }>) {
               </th>
             ))}
           </tr>
+          {onFilterChange !== undefined && (
+            <FilterRow
+              result={result}
+              labels={labels}
+              filters={filters}
+              onFilterChange={onFilterChange}
+            />
+          )}
         </thead>
         <tbody>
-          {result.rows.map((row, i) => {
+          {rows.map((row, i) => {
             const label = row.label ? `${'  '.repeat(row.level)}${row.label}` : '';
             if (row.kind === 'GROUP_HEADER' || row.kind === 'SECTION') {
               return (

@@ -119,6 +119,7 @@ public class JournalEntryService {
       JournalRequest request, String sourceModule, String sourceReference) {
     JournalBatch saved =
         factory.create(manualHeader(request, sourceModule, sourceReference), request.lines());
+    saved.scheduleReversal(request.reverseOn());
     audit.record(
         ENTITY,
         saved.getBatchNo(),
@@ -144,6 +145,7 @@ public class JournalEntryService {
     batch.replaceLines(List.of());
     batches.flush();
     batch.replaceLines(factory.resolve(header, request.lines()));
+    batch.scheduleReversal(request.reverseOn());
     audit.record(ENTITY, batch.getBatchNo(), AuditAction.UPDATE, "Updated journal");
     return batch;
   }
@@ -161,6 +163,53 @@ public class JournalEntryService {
     batch.submit(user, clock.instant());
     audit.record(ENTITY, batch.getBatchNo(), AuditAction.SUBMIT, "Submitted for authorization");
     return batch;
+  }
+
+  /**
+   * Assigns unposted journals to the user who will post them, or clears the assignment (FRBS
+   * 2.5.1). The assignee must hold the journal authorization permission and must not be the
+   * journal's submitter.
+   *
+   * @param ids journals
+   * @param assignee user name, null or blank to clear
+   * @return assigned journals
+   */
+  public List<JournalBatch> assign(List<Long> ids, String assignee) {
+    String user = assignee == null || assignee.isBlank() ? null : assignee.trim();
+    if (user != null
+        && userDirectory.usersWithPermission("JOURNAL_AUTHORIZE").stream()
+            .noneMatch(user::equalsIgnoreCase)) {
+      throw new BusinessRuleException(
+          "ASSIGNEE_NOT_AUTHORIZER", user + " is not allowed to authorize journals");
+    }
+    return ids.stream().map(id -> assignOne(get(id), user)).toList();
+  }
+
+  private JournalBatch assignOne(JournalBatch batch, String user) {
+    if (CurrentUser.sameUser(user, batch.getSubmittedBy())) {
+      throw new BusinessRuleException(
+          "ASSIGNEE_IS_MAKER",
+          batch.getBatchNo() + " cannot be assigned to the user who submitted it");
+    }
+    batch.assign(user, currentUser.username(), clock.instant());
+    audit.record(
+        ENTITY,
+        batch.getBatchNo(),
+        AuditAction.UPDATE,
+        user == null ? "Assignment cleared" : "Assigned to " + user);
+    return batch;
+  }
+
+  /**
+   * Non-blocking warnings of a journal (FRBS 2.5.5 / 2.8.4), for the confirmation before submit and
+   * approve (FRBS 2.5.10 / 2.8.3).
+   *
+   * @param id journal
+   * @return warnings
+   */
+  @Transactional(readOnly = true)
+  public List<String> warnings(Long id) {
+    return validator.warnings(get(id));
   }
 
   /**

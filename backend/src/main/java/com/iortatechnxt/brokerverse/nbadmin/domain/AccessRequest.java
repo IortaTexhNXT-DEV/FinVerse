@@ -45,7 +45,7 @@ public class AccessRequest extends BaseEntity {
   @Column(name = "home_branch_id", updatable = false)
   private Long homeBranchId;
 
-  @Column(nullable = false, length = 1000, updatable = false)
+  @Column(nullable = false, length = 1000)
   private String justification;
 
   @Column(name = "role_code", length = 40, updatable = false)
@@ -69,6 +69,9 @@ public class AccessRequest extends BaseEntity {
 
   @Column(name = "decision_comment", length = 1000)
   private String decisionComment;
+
+  @Column(name = "returned_count", nullable = false)
+  private int returnedCount;
 
   protected AccessRequest() {}
 
@@ -112,14 +115,55 @@ public class AccessRequest extends BaseEntity {
    * @param comment comment
    */
   public void decide(boolean approved, String approver, Instant when, String comment) {
-    if (status != AccessRequestStatus.PENDING) {
-      throw new BusinessRuleException(
-          "ACCESS_REQUEST_DECIDED", "Request " + requestNo + " is already " + status);
-    }
+    requirePending();
     this.status = approved ? AccessRequestStatus.APPROVED : AccessRequestStatus.REJECTED;
     this.decidedBy = approver;
     this.decidedAt = when;
     this.decisionComment = comment;
+  }
+
+  /**
+   * Returns the request to its requester with remarks (BASAU 2.4.1, 2.6.0 / 2.6.1).
+   *
+   * @param approver returning user
+   * @param when time
+   * @param comment remarks
+   */
+  public void returnToRequester(String approver, Instant when, String comment) {
+    requirePending();
+    this.status = AccessRequestStatus.RETURNED;
+    this.decidedBy = approver;
+    this.decidedAt = when;
+    this.decisionComment = comment;
+    this.returnedCount++;
+  }
+
+  /**
+   * Resubmits a returned request with a corrected justification; it waits for approval again.
+   *
+   * @param newJustification justification answering the remarks
+   */
+  public void resubmit(String newJustification) {
+    if (status != AccessRequestStatus.RETURNED) {
+      throw new BusinessRuleException(
+          "ACCESS_REQUEST_NOT_RETURNED",
+          "Request " + requestNo + " is " + status + ", not returned");
+    }
+    this.justification = newJustification;
+    this.status = AccessRequestStatus.PENDING;
+    this.decidedBy = null;
+    this.decidedAt = null;
+  }
+
+  private void requirePending() {
+    if (status != AccessRequestStatus.PENDING) {
+      throw new BusinessRuleException(
+          "ACCESS_REQUEST_DECIDED", "Request " + requestNo + " is already " + status);
+    }
+  }
+
+  public int getReturnedCount() {
+    return returnedCount;
   }
 
   /**

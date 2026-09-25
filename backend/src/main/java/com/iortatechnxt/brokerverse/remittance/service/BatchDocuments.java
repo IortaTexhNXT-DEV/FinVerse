@@ -245,7 +245,6 @@ public class BatchDocuments {
   }
 
   private StoredFile paymentRequestPdf(RemittanceBatch batch) {
-    RemittanceAmounts t = batch.getTotals();
     MergedText text =
         templates.merge(
             PAYMENT_REQUEST,
@@ -254,7 +253,7 @@ public class BatchDocuments {
                 "reference", batch.getBatchNo(),
                 "insurerName", insurerName(batch),
                 "currency", batch.getCurrency(),
-                "amount", amount(t.payable()),
+                "amount", amount(batch.amountDue()),
                 "approvedBy",
                     batch.getApprovedBy() == null
                         ? "the Remittance Team Leader"
@@ -297,7 +296,14 @@ public class BatchDocuments {
           List.of(
               "Less: early remittance incentive with VAT", amount(t.incentiveTotal().negate())));
     }
-    rows.add(List.of("Amount payable", amount(t.payable())));
+    if (t.cpc2Total().signum() != 0) {
+      rows.add(List.of("Less: CPC2 incentive with VAT", amount(t.cpc2Total().negate())));
+    }
+    BigDecimal deducted = batch.getSettlement().getDeductionAmount();
+    if (deducted.signum() != 0) {
+      rows.add(List.of("Less: insurer-confirmed deductions", amount(deducted.negate())));
+    }
+    rows.add(List.of("Amount payable", amount(batch.amountDue())));
     return new Table(
         "Totals (" + batch.getCurrency() + ")", List.of("Item", "Amount"), rows, List.of(1));
   }

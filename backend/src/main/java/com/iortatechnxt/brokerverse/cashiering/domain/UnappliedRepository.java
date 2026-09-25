@@ -99,4 +99,23 @@ public interface UnappliedRepository extends JpaRepository<Unapplied, Long> {
    * @return items, oldest first
    */
   List<Unapplied> findByStageOrderByIdAsc(String stage, Pageable pageable);
+
+  /**
+   * Items of a company with a balance left for an invoice or a client (candidates of a refund
+   * validation, MKT 1.11.0).
+   *
+   * @param companyId company
+   * @param invoiceNo invoice, may be null
+   * @param clientCode client, may be null
+   * @param pageable limit
+   * @return items, newest first
+   */
+  @Query(
+      "select u from Unapplied u where u.companyId = :companyId and u.balance > 0"
+          + " and (u.invoiceNo = :invoiceNo or u.clientCode = :clientCode) order by u.id desc")
+  List<Unapplied> withBalanceFor(
+      @Param("companyId") Long companyId,
+      @Param("invoiceNo") String invoiceNo,
+      @Param("clientCode") String clientCode,
+      Pageable pageable);
 }

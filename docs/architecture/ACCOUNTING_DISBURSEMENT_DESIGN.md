@@ -773,7 +773,7 @@ this table is their build status.
 | MKT 1.8.0, 1.17.0 | Built | Generic return and cancel transitions of `PRQ_REFUND`, `PRQ_CASH_ADVANCE`, `PRQ_CHECK_CANCEL`; cancelling releases the AR lines |
 | MKT 1.9.0 | Built | `POST /api/v1/payment-requests/requests/{id}/assign` through `WorkAssignmentService` (PRQ_ASSIGN) |
 | MKT 1.10.0 | Built, seam parked | RRF lines and the RFP; PDF forms from the templates of V895; mandatory fields and approvers wait for AQ18 |
-| MKT 1.11.0 | Built, seam parked | A cancelled-policy line opens one validation per line for `ACSL` (case) and `CASHIERING` (handoff default until C1-C / O1-A provide a source); both results decide validated / returned; manual result entry for a handed-off validator |
+| MKT 1.11.0 | Built | A cancelled-policy line opens one validation per line for `ACSL` (case) and `CASHIERING` (task `RVL-` answered by `CashieringRefundValidationSource` since C1-C, see COLLECTIONS_DESIGN "C1-C as built"); both results decide validated / returned; manual result entry stays for a handed-off validator |
 | MKT 1.12.0, 2.22.0 | Built | Attachments on the request; their ids travel to Disbursement in `Spec.withReferences` |
 | MKT 1.14.0-1.16.3 | Built | Submit, endorse, approve (four eyes: no endorse or approve by the requester or the previous actor), HR approval of cash advances |
 | MKT 1.18.0-1.18.1 | Built | Reports `PRQ-STATUS` and `PRQ-REGISTER` (category PAYMENT_REQUESTS) |
@@ -789,7 +789,7 @@ this table is their build status.
 | ACSL 2.13.2 | Built, seam parked | Job `ACSL_GL_SL_RECON` (ManagedJob on `acsl-gl-sl-recon-cron`) and on demand, report `ACSL-GL-SL-RECON`, alert `ACSL_GLSL_DIFFERENCE`; control accounts and their sub-ledger are configuration (`/acsl/gl-sl`, OQ07). The period-end check provider is not built |
 | ACSL 2.14.3-2.14.4 | Not built | Ageing and schedule reports need `AgeingSlots` with 8 slots (A1-GL, OQ43) |
 | ACSL 2.5.0, 2.5.4-2.5.5 | Built | Cases `/acsl` (investigation, analysis request, AR refund application, payment reversal): assign, findings, result to the requester; cases of the invoice family |
-| ACSL 2.6.0-2.6.1 | Built, seam parked | Payment reversal request from a case through `PaymentReversalRequester` (handoff default until Cashiering implements it); the result comes back as `PaymentReversalCompleted` |
+| ACSL 2.6.0-2.6.1 | Built | Payment reversal request from a case through `PaymentReversalRequester`, implemented by `CashieringPaymentReversals` since C1-C (request `PRV-`, approved by a second cashiering user, applications reversed and the money back to unapplied); the result comes back as `PaymentReversalCompleted` |
 | ACSL 2.6.2 | Built | Message to the Account Officer of the invoice |
 | ACSL 2.7.0-2.12.2, 2.15.0 | Built | Correction entries `/acsl/corrections`: assign / re-assign, lines with party, invoice and ledger component, submit (balanced only), endorse, approve (four eyes) posting a system journal `ACS:<no>` in the journal type of the corrected batch, recording and matching open items, and moving the invoice components through `InvoiceCorrectionSink` |
 | ACSL 2.9.1 | Built, seam parked | "Wrong account" proposal: reversal of the original line plus re-post to the right account, linked by invoice family and original batch / line; the `corrects_batch_id` column on journals waits for A1-GL (AQ22) |

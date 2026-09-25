@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.opsledger;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
@@ -54,10 +55,10 @@ class CollectionsAndDisbursementPortsIT {
   private static final String SOURCE = "TESTMOD";
 
   @Autowired private UnappliedDirectory directory;
-  @Autowired private UnappliedDispositionRequests dispositions;
-  @Autowired private RefundValidationSource defaultValidation;
+  @Autowired private UnappliedDispositionRequests dispositionBean;
   @Autowired private RefundValidations validations;
-  @Autowired private PaymentReversalRequester reversals;
+  @Autowired private PaymentReversalRequester reversalBean;
+  @Autowired private ObjectMapper json;
   @Autowired private InvoiceCorrectionSink corrections;
   @Autowired private CollectionFeed collection;
   @Autowired private DisbursementQueueService queue;
@@ -69,19 +70,22 @@ class CollectionsAndDisbursementPortsIT {
   @Autowired private TransactionTemplate tx;
 
   @Test
-  void theNewPortsKeepTheirDefaultsUntilTheModulesAreBuilt() {
-    assertThat(directory).isInstanceOf(EmptyUnappliedDirectory.class);
-    assertThat(dispositions).isInstanceOf(HandoffDispositionRequests.class);
-    // ACSL (wave A1-PRQ) now serves its own refund validations; Cashiering is still handed over.
-    assertThat(defaultValidation.validator()).isEqualTo(RefundValidationSource.ACSL);
-    assertThat(reversals).isInstanceOf(HandoffPaymentReversalRequester.class);
+  void cashieringReplacesTheDefaultsWhichStillWorkOnTheirOwn() {
+    // Cashiering (wave C1-C) implements the Collections and ACSL ports; the defaults stay for a
+    // deployment without cashiering and are exercised directly below.
+    assertThat(directory).isNotInstanceOf(EmptyUnappliedDirectory.class);
+    assertThat(dispositionBean).isNotInstanceOf(HandoffDispositionRequests.class);
+    assertThat(reversalBean).isNotInstanceOf(HandoffPaymentReversalRequester.class);
     assertThat(corrections).isInstanceOf(LedgerInvoiceCorrectionSink.class);
-    assertThat(validations.installed()).containsExactly(RefundValidationSource.ACSL);
+    assertThat(validations.installed())
+        .containsExactlyInAnyOrder(RefundValidationSource.ACSL, RefundValidationSource.CASHIERING);
 
-    assertThat(directory.open(fx.company(), UnappliedFilter.all(), PageRequest.of(0, 10)))
-        .isEmpty();
-    assertThat(directory.find("UPP-1")).isEmpty();
-    assertThat(directory.history("UPP-1")).isEmpty();
+    UnappliedDirectory empty = new EmptyUnappliedDirectory();
+    assertThat(empty.open(fx.company(), UnappliedFilter.all(), PageRequest.of(0, 10))).isEmpty();
+    assertThat(empty.find("UPP-1")).isEmpty();
+    assertThat(empty.history("UPP-1")).isEmpty();
+    assertThat(directory.find("UPP-NO-SUCH-1")).isEmpty();
+    assertThat(directory.history("UPP-NO-SUCH-1")).isEmpty();
     // Collections serves the feeds in-app; acknowledging an unknown key is harmless.
     collection.acknowledge(fx.company(), "COLLECTION_CWT2307", List.of("CWT:NO-SUCH:1"));
     assertThat(collection.transport()).isEqualTo("IN_APP");
@@ -89,6 +93,7 @@ class CollectionsAndDisbursementPortsIT {
 
   @Test
   void collectorDispositionsAreHandedOverOncePerRequest() {
+    UnappliedDispositionRequests dispositions = new HandoffDispositionRequests(handoffs, json);
     String ref = "APR-" + BookingFixtures.token();
     DispositionRequest request =
         new DispositionRequest(
@@ -120,6 +125,8 @@ class CollectionsAndDisbursementPortsIT {
 
   @Test
   void refundValidationsAndReversalsAreHandedOverWhileTheirModulesAreMissing() {
+    RefundValidationSource handoff = new HandoffRefundValidationSource(handoffs, json);
+    PaymentReversalRequester reversals = new HandoffPaymentReversalRequester(handoffs, json);
     String ref = "RRF-" + BookingFixtures.token();
     // The ACSL validation opens a case on the invoice, so it must be in the ledger.
     String invoiceNo = fx.motorInvoice().getInvoiceNo();
@@ -131,7 +138,8 @@ class CollectionsAndDisbursementPortsIT {
               () ->
                   tx.execute(
                       s ->
-                          validations.open(
+                          open(
+                              RefundValidationSource.CASHIERING.equals(validator) ? handoff : null,
                               new ValidationRequest(
                                   fx.company(),
                                   validator,
@@ -289,5 +297,11 @@ class CollectionsAndDisbursementPortsIT {
             null);
     assertThat(event.dvStatus()).isNull();
     assertThat(event.instrumentStatus()).isNull();
+  }
+
+  /** Opens a validation with a given source, or through the router when none is given. */
+  private RefundValidationSource.ValidationTicket open(
+      RefundValidationSource source, ValidationRequest request) {
+    return source == null ? validations.open(request) : source.open(request);
   }
 }

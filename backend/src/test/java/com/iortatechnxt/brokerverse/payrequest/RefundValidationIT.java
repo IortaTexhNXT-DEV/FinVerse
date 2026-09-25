@@ -11,6 +11,10 @@ import com.iortatechnxt.brokerverse.acsl.domain.CaseOutcome;
 import com.iortatechnxt.brokerverse.acsl.domain.CaseStage;
 import com.iortatechnxt.brokerverse.acsl.domain.CaseType;
 import com.iortatechnxt.brokerverse.acsl.service.CaseService;
+import com.iortatechnxt.brokerverse.cashiering.CashFixtures;
+import com.iortatechnxt.brokerverse.cashiering.domain.RefundCheck;
+import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
+import com.iortatechnxt.brokerverse.cashiering.service.CashieringRefundValidationSource;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.opsledger.service.RefundValidations;
 import com.iortatechnxt.brokerverse.payrequest.domain.PaymentRequest;
@@ -24,14 +28,16 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowViewService;
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 
 /**
  * Validation of refunds of cancelled policies (MKT 1.11.0, ACSL 2.5.5): the refund goes to ACSL (an
- * analysis case through the port) and Cashiering (handed over until cashiering implements the
- * port), both answers are needed before review, and a rejection sends it back to the preparer.
+ * analysis case through the port) and Cashiering (a validation task of its own adapter), both
+ * answers are needed before review, and a rejection sends it back to the preparer.
  */
 @IntegrationTest
 class RefundValidationIT {
@@ -44,6 +50,8 @@ class RefundValidationIT {
   @Autowired private AcslCaseRepository caseRepository;
   @Autowired private WorkflowService workCases;
   @Autowired private WorkflowViewService views;
+  @Autowired private CashieringRefundValidationSource cashieringChecks;
+  @Autowired private CashFixtures cash;
   @Autowired private AsUser as;
 
   private PaymentRequest submittedForValidation() {
@@ -81,19 +89,33 @@ class RefundValidationIT {
         tasks.stream().filter(t -> "CASHIERING".equals(t.getValidator())).findFirst().orElseThrow();
     assertThat(acsl.getStatus()).isEqualTo(ValidationStatus.OPEN);
     assertThat(acsl.getTicketRef()).startsWith("ACS-");
-    assertThat(cashiering.getStatus()).isEqualTo(ValidationStatus.DEFERRED);
-    assertThat(cashiering.getTicketRef()).startsWith("HANDOFF-");
+    // Cashiering answers through its own adapter (wave C1-C): a task for the cashiers.
+    assertThat(cashiering.getStatus()).isEqualTo(ValidationStatus.OPEN);
+    assertThat(cashiering.getTicketRef()).startsWith("RVL-");
 
     AcslCase c = investigate(acsl);
     as.run("acsl", () -> cases.provideResult(c.getId(), CaseOutcome.CONFIRMED, "In order"));
     assertThat(cases.get(c.getId()).getStage()).isEqualTo(CaseStage.RESULT_PROVIDED);
     assertThat(fx.reload(r).getStage()).isEqualTo(RequestStage.FOR_VALIDATION);
 
+    Unapplied premium =
+        cash.pay("REINSTATED-" + System.nanoTime(), new BigDecimal("300.00")).unapplied();
+    RefundCheck task =
+        cashieringChecks
+            .list(r.getCompanyId(), List.of(RefundCheck.Status.OPEN), PageRequest.of(0, 200))
+            .stream()
+            .filter(t -> t.getTaskNo().equals(cashiering.getTicketRef()))
+            .findFirst()
+            .orElseThrow();
+    as.run(
+        "cashier",
+        () -> cashieringChecks.confirm(task.getId(), premium.getId(), "AR-NEW-1", "Reinstated"));
     RefundValidation recorded =
-        as.run(
-            REVIEWER,
-            () ->
-                validations.record(r.getId(), cashiering.getId(), true, "AR-NEW-1", "Reinstated"));
+        validations.of(r.getId()).stream()
+            .filter(t -> t.getId().equals(cashiering.getId()))
+            .findFirst()
+            .orElseThrow();
+    assertThat(recorded.getStatus()).isEqualTo(ValidationStatus.CONFIRMED);
     assertThat(recorded.getNewArNo()).isEqualTo("AR-NEW-1");
     assertThat(fx.reload(r).getStage()).isEqualTo(RequestStage.FOR_REVIEW);
     assertThatThrownBy(

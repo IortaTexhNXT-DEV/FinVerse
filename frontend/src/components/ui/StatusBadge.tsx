@@ -47,6 +47,8 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'NEGOTIATED',
     'DEBITED',
     'CREDITED',
+    // collections unapplied payments
+    'APPLIED',
   ],
   warning: [
     'PENDING_AUTHORIZATION',
@@ -90,6 +92,9 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'FOR_REACTIVATION',
     'FOR_APPROVAL_1',
     'FOR_APPROVAL_2',
+    // collections unapplied payments
+    'UNAPPLIED',
+    'FOR_REVERSAL',
   ],
   // BDO style guide: blue pills for records moving through processing ("Account for Placement").
   info: [
@@ -124,6 +129,9 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'PRINTED',
     'EMAILED',
     'EXTRACTED',
+    // collections unapplied payments
+    'DEFERRED',
+    'MONITORING',
   ],
   neutral: [
     'DRAFT',

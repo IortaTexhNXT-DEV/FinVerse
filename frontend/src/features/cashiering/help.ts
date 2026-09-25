@@ -57,6 +57,22 @@ export const CASHIERING_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Incoming Requests',
+      path: '/cashiering/requests',
+      summary:
+        'What other modules ask of Cashiering: collector requests on unapplied payments from Collections (apply to an invoice, refund, reclass, transfer), refund validations from Payment Requests (is the premium of a cancelled account back in the unapplied list with a new AR?) and payment reversals from ACSL.',
+      workflow: [
+        'Collector Requests: select one and Accept Request to assign its disposition (the invoice, amount and remarks come from the collector; add the client for a reclass or the unit for a transfer), or Reject Request with a reason.',
+        'Tick "Submit the disposition now" to process an application at once; a refund, reclass or transfer goes for approval as usual.',
+        'Refund Validations: Confirm Validation with the unapplied item holding the returned premium (its AR is the new AR unless another is entered), or reject it.',
+        "Payment Reversals: an approver reverses the receipt's application on the invoice; the money goes back to the unapplied list.",
+      ],
+      controls: [
+        'Collections, Payment Requests and ACSL receive each decision at once.',
+        'Accepting and validating need CASH_DISPOSITION; a reversal is approved by a second user with CASH_APPROVE.',
+      ],
+    },
+    {
       name: 'Pre-booked Payments',
       path: '/cashiering/prebooked',
       summary:

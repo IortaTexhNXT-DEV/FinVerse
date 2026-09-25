@@ -246,7 +246,8 @@ class AcslCorrectionIT {
             () ->
                 links.requestReversal(
                     opened.getId(), "AR-INV-1", null, "Applied to wrong invoice"));
-    assertThat(reversal.getReversalStatus()).isEqualTo("DEFERRED");
+    assertThat(reversal.getReversalStatus()).isEqualTo("SUBMITTED");
+    assertThat(reversal.getReversalRef()).startsWith("PRV-");
     tx.executeWithoutResult(
         s ->
             events.publishEvent(

@@ -614,3 +614,70 @@ read-only SQL over `ops_invoice` / `ops_invoice_component` in `escalation.servic
   installment refresh inside `CLX_DAILY_REFRESH` belong to C1-A (the promise check allocates the plans meanwhile).
 - **Flyway.** V1002 (plans, installments, promises, statements, SOA template), V1003 (rules, escalations), demo V1901.
   `CLX_SOA` is seeded here, not in V1005.
+
+### C1-C as built
+
+Wave C1-C built the collector side of unapplied payments (BRCLXN.030-042, 047/048) in `collections.unapplied` and,
+because Cashiering is merged and owns the unapplied items, the Cashiering adapters of the four Operations ports it
+needs, additively in `cashiering`.
+
+| BR ID | As built |
+|---|---|
+| BRCLXN.034-036 | `UnappliedWorklistService` reads Cashiering's open items through `UnappliedDirectory` (never copied): payment date and age, payment file (the upload batch reference), transaction no., amount, balance, payment type, payor, bank, check no., payor reference, matched client / invoice, sales unit, the Cashiering tab (UNAPPLIED, MONITORING, FOR_APPROVAL, FOR_REVERSAL, DONE; the "processing stage", CQ11) and the status of the Cashiering disposition or collector request. The account fields of the matched invoice (assured, PR balance, inception, segment, sales unit, unit head, AO, insurer, invoice category, handler) come from the collection item, else the invoice ledger. Filters: text, client, unit, tab, payment dates and age run in Cashiering; market segment and collector disposition (`NONE` = none yet) run in Collections over at most 2,000 items |
+| BRCLXN.031/033, 037-040 | `clx_unapplied_disposition` (V1004), append-only: only active `CLX_UPP_DISPOSITION` values; the attribute `cashiering_action` (APPLY_TO_INVOICE / REFUND / RECLASS / TRANSFER / NONE) decides whether a request is sent. The history (`GET /unapplied/{ref}/history`) merges Cashiering's events (`UnappliedDirectory.history`: intake, collector requests and decisions, dispositions, applied / refunded / reclassified / transferred / released, withdrawn, reversed, closed) with the collector dispositions; it stays after the payment is applied or refunded. Each disposition is also a `clx_field_change` row |
+| BRCLXN.047/048 | `requires_invoice` makes the invoice mandatory; it must match `CLX_INVOICE_NO_PATTERN` (EBIX `I########` or BrokerVerse `BI-...`, CQ13) and exist in the invoice ledger of the company (`CLX_INVOICE_REQUIRED`, `CLX_INVOICE_FORMAT`, `CLX_INVOICE_UNKNOWN`); the form checks the same pattern before sending |
+| BRCLXN.030/032 | `clx_application_request` (V1004): the request sent through `UnappliedDispositionRequests` with the key `CLX-UPP-<disposition id>` and the p.60 payment fields as a snapshot. Status SENT / DEFERRED (hand-off) / ACCEPTED / REJECTED / APPLIED, updated by `UnappliedDispositionChanged` (the requester is notified) or by "Check Status" (`POST /unapplied/requests/{id}/refresh`, a poll of the port). Role `UNAPPLIED_HANDLER` (V1000, CQ10) holds `CLX_UNAPPLIED_WORK`; demo user `upphandler` |
+| BRCLXN.041/042 | Job `CLX_APPLICATION_FILE` (`ApplicationFileJob`, cron `clx-application-file-cron`, 05:00 PHT) writes, per company, the pipe-delimited text file `FOR_APPLICATION_TO_INVOICE_<yyyyMMdd>_<time>.txt` of the application requests made up to the end of the previous day and not yet listed (payment date, payment file, transaction no., paid amount, currency, payment type, payor, reference no., assured, invoice no., user ID, unapplied reference, request key) through `FileDropPort` into folder `FS04/CLX_APPLICATION_TO_INVOICE` (in-system extract repository until OQ17); each request records the file name. Manual run `POST /unapplied/application-file` (CLX_SETUP or CLX_EXPORT). Report `CLX-APPLICATION-TO-INVOICE` lists the same requests for a period |
+
+- **Cashiering adapters** (V1006 `csh_collector_request`, `csh_refund_validation`, `csh_payment_reversal`; no existing
+  cashiering table changed):
+  - `CashieringUnappliedDirectory` implements `UnappliedDirectory` (open items with a balance, by SQL over
+    `csh_unapplied`, `csh_payment`, `csh_receipt`); `UnappliedHistory` builds the history.
+  - `CollectorRequestService` implements `UnappliedDispositionRequests`: a request is refused at once (REJECTED) when
+    the item is unknown, has no balance, the amount is above the balance or an application has no invoice; otherwise it
+    is queued (`CRQ-<yyyy>`, SUBMITTED) for `CASH_DISPOSITION`, idempotent on (source, source reference). On the
+    Cashiering screen **Incoming Requests** (`/cashiering/requests`) a cashier accepts it - a disposition of
+    `OPS_DISPOSITION` is assigned with the default type of the action (APPLY_OTHER_INVOICE, REFUND, RECLASS,
+    TRANSFER_UNIT; the type must carry out the action) and the fields the collector cannot give (reclass client,
+    transfer unit, payee), optionally submitted at once - or rejects it with a reason. `CollectorRequestTracker`
+    publishes `UnappliedDispositionChanged` ACCEPTED on acceptance, APPLIED when the disposition is executed
+    (application, refund through `DisbursementGateway`, reclass, transfer), REJECTED on rejection or when the cashier
+    withdraws the disposition; the approval rules of the disposition types stay.
+  - `CashieringRefundValidationSource` implements `RefundValidationSource` for validator CASHIERING (MKT 1.11.0): a
+    task `RVL-<yyyy>` for `CASH_DISPOSITION`; the cashier confirms it with the unapplied item that holds the returned
+    premium (its AR is the new AR number unless another is given) or rejects it; the answer is
+    `RefundValidationCompleted`, so payrequest's validation no longer waits for a manual entry.
+  - `CashieringPaymentReversals` implements `PaymentReversalRequester` (ACSL 2.6.0-2.6.1): the request `PRV-<yyyy>` is
+    SUBMITTED for `CASH_APPROVE`; the approver (not the requester) reverses the receipt's active applications on the
+    invoice newest first with the application engine (negative `OPS_PAYMENT_APPLY` and an UNAPPLIED ledger movement),
+    applies back what exceeded the requested amount, and puts the money reversed in a new unapplied item; the decision
+    is `PaymentReversalCompleted`.
+- **Contract changes forced by the real beans.** `CollectionsAndDisbursementPortsIT` now tests the default adapters
+  directly; `RefundValidationIT` confirms the CASHIERING validation through the adapter; `AcslCorrectionIT` expects a
+  SUBMITTED reversal with a `PRV-` reference. The hand-off defaults stay for a deployment without cashiering.
+- **API** (`/api/v1/collections/unapplied`): list (`q`, `clientCode`, `salesUnit`, `tab`, `paidFrom`, `paidTo`,
+  `ageMin`, `ageMax`, `segment`, `disposition`), `disposition-rules`, `requests` (+ `/{id}/refresh`),
+  `application-file`, `{ref}`, `{ref}/history`, `{ref}/dispositions` (POST). Cashiering (`/api/v1/cashiering`):
+  `requests/counts`, `collector-requests` (+ `/{id}/accept`, `/{id}/reject`), `unapplied/{id}/collector-requests`,
+  `refund-validations` (+ `/{id}/candidates`, `/{id}/confirm`, `/{id}/reject`), `payment-reversals`
+  (+ `/{id}/approve`, `/{id}/reject`).
+- **Screens.** `features/collections/unapplied` exports `UNAPPLIED_SCREENS` and `UNAPPLIED_HELP` (Unapplied Payments,
+  Requests to Cashiering, and the hidden record `/collections/unapplied/:ref` with the tabs Payment & Account,
+  Collector Dispositions, Requests to Cashiering, History) for the Collections owner to register; Cashiering gains
+  **Incoming Requests** (tabs Collector Requests, Refund Validations, Payment Reversals, each To Do / Decided).
+  StatusBadge tones added: APPLIED (done), UNAPPLIED and FOR_REVERSAL (review), DEFERRED and MONITORING (in process).
+- **Home and reports.** `UnappliedWorkCounts` adds the tiles "Unapplied Awaiting Disposition" and "My Requests in
+  Cashiering" for `CLX_UNAPPLIED_WORK` users. Reports `CLX-APPLICATION-TO-INVOICE` and `CLX-UNAPPLIED-DISPOSITIONS`
+  (`ReportMetadata.collections`).
+- **Demo** (Java runners, no new demo migration): `cashiering.demo.UnappliedDemoPayments` (order 125) receives four
+  unmatched payments as `cashier`; `collections.demo.UnappliedDemoData` (126) creates `upphandler` (role
+  UNAPPLIED_HANDLER) and, as the collectors, asks to apply Grace Villanueva's payment to an open invoice outside the
+  installment plans, notes "Coordinate further" on Juan Dela Cruz's, asks for the refund of Mega Traders Inc.'s, and
+  writes the day's application file; `cashiering.demo.CollectorRequestDemoData` (127) accepts and processes the
+  application as `cashier`. The refund request stays queued; Liza Manalo's payment has no disposition.
+- **Flyway.** V1004 (Collections), V1006 (Cashiering adapters; V1007-V1009 free).
+- **Parked (seam only).** FS04 transport (OQ17: in-system extract repository) and the file layout (CQ12); the
+  "Processing Stage", "Business Origin", "Client Code Match" and "System Generated Remarks" definitions (CQ11: the
+  Cashiering tab and status are shown); the booker name and names in place of usernames for UH / AO (BRCLXN.036);
+  who the Unapplied Payment Handler is (CQ10: role and demo user only); the real disposition values (CQ08); a REFUND
+  disposition still goes to Disbursement directly, not through a payrequest RRF (OQ15/OQ16).

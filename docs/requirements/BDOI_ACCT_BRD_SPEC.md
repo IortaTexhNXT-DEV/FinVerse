@@ -116,7 +116,7 @@ Rows from the addenda: Addendum 1 (Dec-2025) updates DIS 2.2.8, DIS 2.17.4, DIS 
 
 | Module | Rows | Note |
 |---|---|---|
-| `disbursement` | 84 | New module; implements the Operations `DisbursementGateway` |
+| `disbursement` | 84 | New module; implements the Operations `DisbursementGateway`. Built in wave A1-DSB (design section 17, "A1-DSB as built"; parked content AQ09-AQ17) |
 | `platform (report)` | 30 | Extension of a built module |
 | `acsl` | 26 | New module; SOA and GL-SL reconciliation, investigation cases, correction entries, ACSL reports |
 | `payrequest` | 25 | New module; Marketing refund and cash-advance requests |

@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.CashieringPaymentReapplie
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringReceiptIssuer;
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringUnappliedSink;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
+import com.iortatechnxt.brokerverse.disbursement.service.DisbursementGatewayAdapter;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.ExtractFile;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInEnums;
@@ -35,7 +36,6 @@ import com.iortatechnxt.brokerverse.opsledger.service.adapter.HandoffUnappliedSi
 import com.iortatechnxt.brokerverse.opsledger.service.adapter.LedgerPaymentReapplier;
 import com.iortatechnxt.brokerverse.opsledger.service.adapter.ManualCollectionFeed;
 import com.iortatechnxt.brokerverse.opsledger.service.adapter.ManualInsurerFileInbox;
-import com.iortatechnxt.brokerverse.opsledger.service.adapter.QueueDisbursementGateway;
 import com.iortatechnxt.brokerverse.opsledger.service.adapter.RepositoryFileDrop;
 import com.iortatechnxt.brokerverse.opsledger.service.port.ClaimsFeed;
 import com.iortatechnxt.brokerverse.opsledger.service.port.CollectionFeed;
@@ -192,8 +192,9 @@ class FlowInAndPortsIT {
     assertThat(activeUnappliedSink).isInstanceOf(CashieringUnappliedSink.class);
     assertThat(activeReapplier).isInstanceOf(CashieringPaymentReapplier.class);
     assertThat(incentiveRules).isInstanceOf(RemittanceEarlyIncentiveRules.class);
-    // Parked integrations (OQ01, OQ02, OQ17, OQ22) keep the in-app defaults.
-    assertThat(gateway).isInstanceOf(QueueDisbursementGateway.class);
+    // Disbursement (A1-DSB, OQ02) replaces the queue gateway, keeping the queue record.
+    assertThat(gateway).isInstanceOf(DisbursementGatewayAdapter.class);
+    // Parked integrations (OQ01, OQ17, OQ22) keep the in-app defaults.
     assertThat(collection).isInstanceOf(ManualCollectionFeed.class);
     assertThat(inbox).isInstanceOf(ManualInsurerFileInbox.class);
     assertThat(fileDrop).isInstanceOf(RepositoryFileDrop.class);

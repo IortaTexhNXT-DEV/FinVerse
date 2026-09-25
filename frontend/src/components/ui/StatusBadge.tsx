@@ -34,6 +34,11 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'SIGNED',
     'CURRENT',
     'ACCEPTED_AS_REQUESTED',
+    // disbursement
+    'IN_VOUCHER',
+    'NEGOTIATED',
+    'DEBITED',
+    'CREDITED',
   ],
   warning: [
     'PENDING_AUTHORIZATION',
@@ -62,6 +67,12 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'FOR_APPROVAL',
     'APPROVED_WITH_CHANGES',
     'COUNTER_PROPOSAL',
+    // disbursement: waiting for the checker
+    'FOR_AUTHORIZATION',
+    'FOR_DEACTIVATION',
+    'FOR_REACTIVATION',
+    'FOR_APPROVAL_1',
+    'FOR_APPROVAL_2',
   ],
   // BDO style guide: blue pills for records moving through processing ("Account for Placement").
   info: [
@@ -84,6 +95,12 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'REQUIREMENTS_PREP',
     'WITH_MBS',
     'PREPARATION',
+    // disbursement: in process
+    'IN_PROCESS',
+    'RECEIVED',
+    'PRINTED',
+    'EMAILED',
+    'EXTRACTED',
   ],
   neutral: [
     'DRAFT',
@@ -95,6 +112,9 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     // product maintenance
     'SUPERSEDED',
     'RETIRED',
+    // disbursement
+    'NOT_POSTED',
+    'EXHAUSTED',
   ],
   danger: [
     'REJECTED',
@@ -116,6 +136,11 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     // product maintenance
     'DECLINED',
     'NO_RESPONSE',
+    // disbursement
+    'NO_PAYEE',
+    'RETURNED',
+    'STALE',
+    'REVERSAL_FAILED',
   ],
 };
 

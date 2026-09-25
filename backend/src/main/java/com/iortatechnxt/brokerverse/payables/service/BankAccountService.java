@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.currency.service.CurrencyService;
 import com.iortatechnxt.brokerverse.payables.domain.BankAccount;
 import com.iortatechnxt.brokerverse.payables.domain.BankAccountRepository;
+import com.iortatechnxt.brokerverse.payables.domain.BankAccountStatus;
 import com.iortatechnxt.brokerverse.payables.domain.ChequeBook;
 import com.iortatechnxt.brokerverse.payables.domain.ChequeBookRepository;
 import com.iortatechnxt.brokerverse.payables.domain.NotificationFormat;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BankAccountService {
 
   private static final String ENTITY = "BankAccount";
+  private static final String CHEQUE_BOOK = "Cheque book";
 
   private final BankAccountRepository accounts;
   private final ChequeBookRepository books;
@@ -145,6 +147,53 @@ public class BankAccountService {
   }
 
   /**
+   * Asks to tag a bank account active or inactive (DIS 2.24.2); it applies on authorisation by
+   * another user ({@link #authorize(Long)}).
+   *
+   * @param id bank account
+   * @param status requested status
+   * @return account (pending authorisation)
+   */
+  public BankAccount requestStatus(Long id, BankAccountStatus status) {
+    BankAccount account = query.get(id);
+    account.requestStatus(status);
+    audit.record(ENTITY, account.getCode(), AuditAction.UPDATE, "Requested status " + status);
+    return account;
+  }
+
+  /**
+   * Edits the beginning check series of an unused cheque book (DIS 2.23.2); the new range may not
+   * overlap another book of the account.
+   *
+   * @param bookId cheque book
+   * @param firstNo new first leaf
+   * @param lastNo new last leaf
+   * @return book
+   */
+  public ChequeBook editChequeBook(Long bookId, long firstNo, long lastNo) {
+    ChequeBook book =
+        books
+            .findById(bookId)
+            .orElseThrow(() -> new ResourceNotFoundException(CHEQUE_BOOK, bookId));
+    boolean overlap =
+        books.findByBankAccountIdOrderByFirstNo(book.getBankAccountId()).stream()
+            .filter(b -> !b.getId().equals(bookId))
+            .anyMatch(b -> b.overlaps(firstNo, lastNo));
+    if (overlap) {
+      throw new BusinessRuleException(
+          "CHEQUE_RANGE_OVERLAP", "Cheque range overlaps another book of the account");
+    }
+    String before = book.getFirstNo() + "-" + book.getLastNo();
+    book.editRange(firstNo, lastNo, currentUser.username(), clock.instant());
+    audit.record(
+        ENTITY,
+        book.getBankAccountId(),
+        AuditAction.UPDATE,
+        "Edited cheque book " + before + " to " + firstNo + "-" + lastNo);
+    return book;
+  }
+
+  /**
    * Withdraws a cheque book.
    *
    * @param bookId book
@@ -154,7 +203,7 @@ public class BankAccountService {
     ChequeBook book =
         books
             .findById(bookId)
-            .orElseThrow(() -> new ResourceNotFoundException("Cheque book", bookId));
+            .orElseThrow(() -> new ResourceNotFoundException(CHEQUE_BOOK, bookId));
     book.cancel();
     audit.record(ENTITY, book.getBankAccountId(), AuditAction.UPDATE, "Cancelled cheque book");
     return book;

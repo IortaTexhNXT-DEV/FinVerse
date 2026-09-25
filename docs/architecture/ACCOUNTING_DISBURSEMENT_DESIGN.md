@@ -667,3 +667,79 @@ where it differs from or details the sections above. The A1 waves compile only a
 - **Flyway check.** Every version of section 4 is still free except `V791`, which Product Maintenance used for the
   role-permission change requests (`V791__nbadmin_role_permission_requests.sql`): A1-GL puts the access-request
   RETURNED status in `V792`. A0 used V765, V890 and demo V999; nothing else of the BRD-5 ranges.
+
+### A1-DSB as built
+
+What the A1-DSB wave built for `disbursement` (DIS 2.2-3.28) and where it differs from or details the sections above.
+
+- **Migrations.** `V502__payables_bank_status_dctf.sql` (`pay_bank_account.status` / `requested_status`, DCTF
+  notification format, cheque-book edit audit `edited_by` / `edited_at` / `previous_range`);
+  `V891__disbursement_payees_requests.sql` (`dsb_payee`, `dsb_payee_account`, `dsb_payee_request`, `dsb_request`; the
+  one-time insert-select copies the queue rows still SENT / ACKNOWLEDGED as NO_PAYEE requests);
+  `V892__disbursement_vouchers_instruments.sql` (`dsb_voucher`, `dsb_voucher_line`, `dsb_instrument`,
+  `dsb_instrument_event`, `dsb_voucher_tag`, `dsb_status_edit`, `dsb_eod_run`, `dsb_eod_output`,
+  `dsb_funding_request`); `V893__disbursement_events_templates.sql`. The event types stay in V890 (section 17), so
+  V893 holds only the document templates (`DSB_VOUCHER`, `DSB_ATD`, `DSB_ATD_EMAIL`, `DSB_MC_DD`, `DSB_CREDIT_TICKET`,
+  `DSB_TT`, `DSB_CHECK`, `DSB_PAYMENT_ADVICE`) and the smallest shared additions the module needed: parameters
+  `DISB_NO_PAYEE_ACTION` (HOLD), `DISB_CHECK_SERIES_WARNING` (20), `DISB_CHECK_CLEARING_ACCOUNT` (2241); LOV value
+  `DISBURSEMENT_TYPE` / `STALE_REISSUE`; workflow transition `DISB_PAYEE` ACTIVE -`amend`-> FOR_AUTHORIZATION.
+- **No V999 masters.** V999 is A0's; the demo masters and storyline are in the Java runner
+  `disbursement.demo.DisbursementDemoData` (`@Order(97)`, after the Operations runners, each step signed in through
+  `DemoUsers.as`): payees by `disbtl` authorised by `disbappr`; a second remittance batch in review (only when
+  Operations left more than one, so its storyline keeps a batch in review) approved and paid by check, otherwise an
+  e-mailed remittance encoded and left for the approver; a refund by credit to account; a supplier check printed,
+  released and negotiated; a supplier request left in process; the end of day; a funding through maker, verifier and
+  two approvers.
+- **Gateway.** `DisbursementGatewayAdapter` is the `@Primary` `DisbursementGateway`. It keeps the Operations queue record
+  (DSQ numbers, `DisbursementStatusChanged` events) through `DisbursementQueueService` and creates the `dsb_request`;
+  it never acknowledges at send. `GatewaySync` mirrors the DV back to the queue: every DV stage -> `track`, approval ->
+  `assignDv` (DV_ASSIGNED), paid instrument -> `markPaid`, rejection / return -> return to source, cancellation ->
+  `cancel(reason)` (CANCELLED, which A1-OPSX consumes to restore the remittance batch). Requests already moved on the
+  queue screen get no DV.
+- **Intake and automatic DV (DIS 3.25.x).** A request with a usable payee (party code first, then the only payee of
+  that name) gets its DV at once through `VoucherFactory` (non-transactional, so a refused DV never marks the caller's
+  transaction rollback-only); remittances and refunds route straight to the approver. Without a payee the request
+  waits as NO_PAYEE with a NO_MATCH payee request and the alert `DISB_PAYEE_NO_MATCH`, and resumes on
+  `PayeeService.PayeeAuthorized`; `DISB_NO_PAYEE_ACTION` = RETURN returns it at once instead.
+- **Voucher.** Terms (mode, paying and payee account, EWT, purpose, value date, cost centre, expense account), proforma
+  from `RuleResolver` / `JournalLineBuilder`, line edits marked EDITED, expense allocation, rebuild from rule. Approval
+  posts through `AccountingEventPublisher` (rule entry) or `SystemJournalService` (edited entry); a posting failure keeps
+  the DV for approval with posting status FAILED and the error (`DV_POSTING_FAILED`). Bulk approval is one transaction per DV. Cancelling an approved DV reverses its
+  journal (REVERSED / REVERSAL_FAILED) after the workflow transition, cancels the instrument and returns the request.
+- **Instruments.** One per approved DV; the life cycle per mode is `InstrumentLifecycle` (section 7.2). Checks take the
+  next leaf of the paying account's active cheque book (alert `CHECK_SERIES_LOW` under `DISB_CHECK_SERIES_WARNING`);
+  negotiated checks post `DISB_CHECK_NEGOTIATED`, the stale job posts `DISB_CHECK_STALE` and a re-issue creates a
+  `STALE_REISSUE` request. Status edits go through `DISB_STATUS_EDIT` (team leader). Forms and vouchers are PDFs of
+  the templates above; the ATD is e-mailed to the branch.
+- **End of day.** `EodService.run(company, date)` freezes the approved DVs, writes the DCTF (`PaymentNotificationFormatter.dctf`:
+  header `MMddyyyy` + name, 89-character detail: 12-digit account, 30 payee, 12 blanks, 20 reference, amount
+  `000000000000.00`, upper case; no trailer until AQ09), the check batch, the forms and the six EOD reports; `confirm`
+  sends the payment advices. Jobs (`ManagedJob` on the A0 crons): `DISB_CHECK_STALE`, `DISB_EOD_CONFIRMATION`,
+  `DISB_EOD_REPORTS`.
+- **Uploads** (bulk handlers): `DISB_REQUESTS`, `DISB_CHECKS_NEGOTIATED`, `DISB_CTA_CREDITED`, `DISB_BOB_APPROVED`,
+  `DISB_PAYEE_MIGRATION`.
+- **Reports** (`ReportMetadata.disbursement`): `DSB-MASTERLIST`, `DSB-UNRELEASED-CHECKS`, `DSB-ML-STALE`, `DSB-ATD`,
+  `DSB-CASH-FLOW`, `DSB-CWT-COMMISSION`, `DSB-PAYEE`, `DSB-PAYEE-NOMATCH`, `DSB-UPLOAD-FALLOUT`, `DSB-UNREGULARIZED`,
+  `DSB-EOD-REMIT`, `-REFUND`, `-SUPPLIER`, `-EMPLOYEE`, `-OTHER`, `-SUMMARY`.
+- **API** (`/api/v1/disbursement`): `summary`; `requests` (list, get, encode, `/{id}/voucher`, `/return`, `/release`);
+  `vouchers` (list, get, `terms`, `proforma`, `proforma/reset`, `allocation`, `submit`, `route`, `submit-for-approval`,
+  `approve`, bulk `vouchers/approve`, `reject`, `cancel`, `document`, `tags/receipt`, `tags/cwt`,
+  `instrument/print|document|release|email|debited|received|reissue|status-edits`); `status-edits` (list,
+  `/{id}/approve`); `payees` (CRUD, `submit`, `authorize`, `deactivate`, `reactivate`, accounts), `payee-requests`;
+  `eod/runs`, `eod/runs/{id}/confirm`, `eod/outputs/{id}`; `banks` (`status`, `authorize`, `cheque-books`),
+  `cheque-books/{id}`; `funding` (CRUD, `submit`, `verify`, `approve`).
+- **Screens** (`features/disbursement`): Disbursement Workbench, voucher record (details, entry, instrument, OR / AR
+  and CWT, documents, e-mails), Encode Payment Request, Payees and payee record, Disbursement Uploads, Disbursement End
+  of Day, Account Funding and funding record, Bank Accounts and Checks, Disbursement Reports.
+- **Payables changes (additive).** `BankAccount.status` / `requestedStatus` (a status change waits for authorisation;
+  `isActive()` = authorised and ACTIVE), `ChequeBook.editRange` (before the first leaf), `NotificationFormat.DCTF`;
+  `BankAccountResponse` and `ChequeBookResponse` gain the new fields.
+- **Tests changed outside the module.** `FlowInAndPortsIT` now expects `DisbursementGatewayAdapter` as the gateway.
+- **Parked (seams built).** AQ09 bank channel layouts (DCTF trailer / totals, credited and deposited-check files, BOB
+  report: the uploads take a minimal CSV); AQ10 funding accounts and limits (both approvers required, in order); AQ11
+  payee migration file and the default no-payee behaviour; AQ12 request sources and upload columns; AQ13 DV number
+  format and EWT on the DV; AQ14 check, voucher and form layouts and signatories (draft templates); AQ15 cancellation
+  after release; AQ16 the received-certificate register behind `DSB-CWT-COMMISSION`; AQ17 which DVs need an OR / AR back
+  (all approved DVs are unregularised until tagged); the remittance schedule attachment on the insurer check; open-item
+  matching of the paid AP line (the DV posts through the rules only); hiding the Operations queue screen
+  `/operations/disbursements` (shared navigation, left to the Operations owner).

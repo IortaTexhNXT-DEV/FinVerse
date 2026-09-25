@@ -98,6 +98,11 @@ module.exports = [
   { slug: 'commission-dp-billing', title: 'DP Billing record', user: 'commrec', path: '/commission/dp/billings', open: 'first' },
   { slug: 'commission-incentive-schemes', title: 'Incentive Schemes', user: 'commtl', path: '/commission/incentives/schemes' },
   { slug: 'commission-certificates', title: 'BIR Certificates', user: 'commrec', path: '/commission/certificates' },
+  { slug: 'disbursement-workbench', title: 'Disbursement Workbench', user: 'disbappr', path: '/disbursement?tab=FOR_APPROVAL' },
+  { slug: 'disbursement-voucher', title: 'Disbursement Voucher record', user: 'disbappr', path: '/disbursement?tab=APPROVED', open: 'first' },
+  { slug: 'disbursement-payees', title: 'Payees', user: 'disbtl', path: '/disbursement/payees' },
+  { slug: 'disbursement-eod', title: 'Disbursement End of Day', user: 'disbtl', path: '/disbursement/eod' },
+  { slug: 'disbursement-funding', title: 'Account Funding', user: 'disbtl', path: '/disbursement/funding?tab=DONE' },
   { slug: 'finance-dashboard', title: 'Finance executive dashboard', user: 'fmanager', path: '/' },
   { slug: 'gl-journals', title: 'GL Journals', user: 'fmanager', path: '/gl/journals' },
   // Reports

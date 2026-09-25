@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import java.time.LocalDate;
 
 /** Range of pre-printed cheque leaves of a bank account; hands out leaves in order. */
@@ -32,6 +33,15 @@ public class ChequeBook extends BaseEntity {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 20)
   private ChequeBookStatus status = ChequeBookStatus.ACTIVE;
+
+  @Column(name = "edited_by", length = 50)
+  private String editedBy;
+
+  @Column(name = "edited_at")
+  private Instant editedAt;
+
+  @Column(name = "previous_range", length = 60)
+  private String previousRange;
 
   protected ChequeBook() {}
 
@@ -70,6 +80,32 @@ public class ChequeBook extends BaseEntity {
       status = ChequeBookStatus.EXHAUSTED;
     }
     return format(number);
+  }
+
+  /**
+   * Corrects the beginning check series while no leaf has been used (DIS 2.23.2); the previous
+   * range is kept on the book with the user and time of the edit.
+   *
+   * @param first new first leaf
+   * @param last new last leaf
+   * @param user user editing
+   * @param at time
+   */
+  public void editRange(long first, long last, String user, Instant at) {
+    if (status != ChequeBookStatus.ACTIVE || nextNo != firstNo) {
+      throw new BusinessRuleException(
+          "CHEQUE_BOOK_IN_USE", "Only an active cheque book with no leaf used can be edited");
+    }
+    if (first <= 0 || last < first) {
+      throw new BusinessRuleException(
+          "INVALID_CHEQUE_RANGE", "Cheque range " + first + "-" + last + " is invalid");
+    }
+    previousRange = firstNo + "-" + lastNo;
+    firstNo = first;
+    lastNo = last;
+    nextNo = first;
+    editedBy = user;
+    editedAt = at;
   }
 
   /** Withdraws the book (lost or damaged); unused leaves are never issued. */
@@ -128,5 +164,17 @@ public class ChequeBook extends BaseEntity {
 
   public ChequeBookStatus getStatus() {
     return status;
+  }
+
+  public String getEditedBy() {
+    return editedBy;
+  }
+
+  public Instant getEditedAt() {
+    return editedAt;
+  }
+
+  public String getPreviousRange() {
+    return previousRange;
   }
 }

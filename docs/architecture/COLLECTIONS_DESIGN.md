@@ -35,7 +35,7 @@ Requirements baseline: [`BDOI_CLXN_BRD_SPEC.md`](../requirements/BDOI_CLXN_BRD_S
 
 | Module | Purpose | BRD IDs | Depends on | Flyway (demo) |
 |---|---|---|---|---|
-| `collections` (new, package `com.iortatechnxt.brokerverse.collections`, tables `clx_*`) | Collection worklist per invoice (refresh from the ledger), assignment and reassignment, collection efforts, PR collector dispositions (category, owner, Operations action), promises, installment plans, escalation rules and cases, billing statements (SOA), collector dispositions on unapplied payments and application requests, the in-app `CollectionFeed` adapter (outbox / inbox), scheduled files and reports, field-level change log, Collections home | BRCLXN.001-058, 060 | opsledger (query, ports, events), account, booking (read), issuance (read), catalog (sales organisation), crm (client), workflow, messaging, bulk, report, docgen, lov, alert, system, organization | V890-V895 (V1900-V1901) |
+| `collections` (new, package `com.iortatechnxt.brokerverse.collections`, tables `clx_*`) | Collection worklist per invoice (refresh from the ledger), assignment and reassignment, collection efforts, PR collector dispositions (category, owner, Operations action), promises, installment plans, escalation rules and cases, billing statements (SOA), collector dispositions on unapplied payments and application requests, the in-app `CollectionFeed` adapter (outbox / inbox), scheduled files and reports, field-level change log, Collections home | BRCLXN.001-058, 060 | opsledger (query, ports, events), account, booking (read), issuance (read), catalog (sales organisation), crm (client), workflow, messaging, bulk, report, docgen, lov, alert, system, organization | V1000-V1005 (V1900-V1901), see §3 decision |
 | `commission` (Operations, being built) | + CR billing gate on PR confirmation; + receivable type (regular / incentive); + incentive campaigns and service-invoice billing; + commission refunds; + collectible portion on mixed payments | BRCLXN.059, 061-064 | unchanged (opsledger, catalog, booking `ServiceInvoiceService`) | commission range V785-V789 (V995) |
 | `cashiering` (Operations, being built) | + implements `UnappliedDirectory` and `UnappliedDispositionRequests`; + pulls `COLLECTION_CWT2307` / `COLLECTION_CHECK_PICKUP` from `CollectionFeed` | BRCLXN.030-036, 040 (execution side) | unchanged | cashiering range V764-V769 (V991) |
 | `opsledger` (built) | + two ports and a default method on `CollectionFeed`; + event `CollectionFeedReady` | - | unchanged | none (code only) |
@@ -90,6 +90,12 @@ The port stays (`opsledger/service/port/CollectionFeed.java`). Collections decla
 ```
 
 ## 3. Flyway allocation
+
+> **Allocation decision (integration, 2026-09-25):** V890–V899 went to BRD-5 Accounting / Disbursement, which needs the whole
+> block for four modules. Collections uses **schema V1000–V1009** and **demo V1900–V1909** (Developer Guide range table).
+> Mapping of the files below: V890→V1000, V891→V1001, V892→V1002, V893→V1003, V894→V1004, V895→V1005 (V1006–V1009 kept
+> free); demo V1900–V1901 unchanged. Everywhere else in this document, read the V89x numbers through this mapping.
+
 
 The Developer Guide ranges and the free versions were checked in `backend/src/main/resources/db/{migration,demo}`:
 - Schema versions used: V1-V99, V100-V749, V750-V754, V760-V762, V770-V771, V780, V790, V800-V880.

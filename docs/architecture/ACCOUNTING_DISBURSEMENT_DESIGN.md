@@ -127,6 +127,10 @@ would duplicate every demo migration of V980-V997 for a second company and give 
 
 ## 4. Flyway allocation
 
+> **Allocation decision (integration, 2026-09-25):** confirmed. BRD-5 keeps V890–V899 and demo V998–V999. Collections
+> (BRD-4) moved to V1000–V1009 with demo V1900–V1909. Later BRDs use V1010+ and demo V1910+ (Developer Guide range table).
+
+
 Used today: V1-V27, V100-V101, V200, V300-V301, V400, V420-V421, V500, V550, V600, V650, V660, V670-V671, V700-V701,
 V750-V754, V760-V762, V770-V771, V780, V790, V800-V880 (see `backend/src/main/resources/db/migration`); demo V900-V902,
 V910, V920, V930, V940, V950, V955, V960-V961, V965, V970, V975, V980-V990, V992, V994. Claimed by designs not yet built:

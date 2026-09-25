@@ -59,3 +59,13 @@ so each document can be regenerated after every build.
 - Short sentences in the active voice. Use tables for anything that has more than two attributes.
 - Every requirement, test and finding cites its source (BRD ID and page, or file and line).
 - Use BDOI's own terms (ARN, PRF, TSU, DP, FFY, CLPC, RA) exactly as the BRDs use them. Define each acronym once in the glossary.
+
+## Toolkit and status
+
+Toolkit: [`tools/deliverables/`](../../tools/deliverables/README.md) (Word, Excel and PowerPoint builders, PDF and
+page previews). Sources: `docs/deliverables/src/`; outputs: `docs/deliverables/out/`, named
+`BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>`.
+
+| # | Document | Status |
+|---|---|---|
+| 1 | FRS BRD-3 Product Maintenance (reference FRS for the other BRDs) | Issued v1.0 for BDOI review: `out/FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx` and `.pdf` |

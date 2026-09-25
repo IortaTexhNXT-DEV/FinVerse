@@ -1,4 +1,5 @@
 import type { RequestListItem } from '@/api/productmaint';
+import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate } from '@/utils/format';
@@ -21,7 +22,7 @@ export const REQUEST_COLUMNS: Column<RequestListItem>[] = [
     header: 'Request No.',
     render: (r) => (
       <>
-        <strong className="mono">{r.requestNo}</strong>
+        <ReferenceChip value={r.requestNo} />
         <div className="muted">{formatDate(r.createdAt.slice(0, 10))}</div>
       </>
     ),

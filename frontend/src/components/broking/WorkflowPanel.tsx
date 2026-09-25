@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime } from '@/utils/format';
+import { formatDateTime, titleCase } from '@/utils/format';
 import { ActionDialog } from './ActionDialog';
 import { StageTimeline } from './StageTimeline';
 import { workflowKey } from './workflowKey';
@@ -74,7 +74,7 @@ export function WorkflowPanel({
         <div>
           <div className="workflow-stage">
             <StatusBadge status={item.stageCode} />
-            <span className="workflow-stage-name">{item.stageName}</span>
+            <span className="workflow-stage-name">{titleCase(item.stageName)}</span>
           </div>
           <div className="workflow-meta muted">
             Since {formatDateTime(item.stageEnteredAt)}
@@ -97,7 +97,7 @@ export function WorkflowPanel({
           {renderBusinessActions?.(business)}
           {generic.map((a) => (
             <Button key={a.action} variant="secondary" size="sm" onClick={() => setPending(a)}>
-              {a.label}
+              {titleCase(a.label)}
             </Button>
           ))}
         </div>
@@ -105,9 +105,9 @@ export function WorkflowPanel({
       {showHistory && <StageTimeline history={history} />}
       {pending && (
         <ActionDialog
-          title={pending.label}
+          title={titleCase(pending.label)}
           reasonLov={pending.reasonLov}
-          confirmLabel={pending.label}
+          confirmLabel={titleCase(pending.label)}
           busy={act.isPending}
           error={act.error}
           onClose={() => setPending(null)}

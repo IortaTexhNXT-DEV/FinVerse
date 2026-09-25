@@ -7,6 +7,7 @@ import { ActionDialog } from '@/components/broking/ActionDialog';
 import { workflowKey } from '@/components/broking/workflowKey';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/toastContext';
+import { titleCase } from '@/utils/format';
 import { RecommendDialog, ReviseDialog, SetupDialog, TermsFinalDialog } from './ActionDialogs';
 
 type Simple =
@@ -93,9 +94,14 @@ export function PackageActions({
   const kind = pending?.action;
   return (
     <>
-      {offeredActions(request, actions).map((a) => (
-        <Button key={a.action} size="sm" variant="accent" onClick={() => setPending(a)}>
-          {a.label}
+      {offeredActions(request, actions).map((a, i) => (
+        <Button
+          key={a.action}
+          size="sm"
+          variant={i === 0 ? 'accent' : 'secondary'}
+          onClick={() => setPending(a)}
+        >
+          {titleCase(a.label)}
         </Button>
       ))}
       {kind === 'recommend' && <RecommendDialog request={request} onClose={close} onDone={done} />}

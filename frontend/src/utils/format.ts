@@ -119,3 +119,32 @@ export function humanize(code: string): string {
     })
     .join(' ');
 }
+
+function titleWord(word: string, first: boolean): string {
+  const start = word.search(/[A-Za-z]/);
+  if (start < 0) {
+    return word;
+  }
+  const lead = word.slice(0, start);
+  const core = word.slice(start);
+  if (/[A-Z]/.test(core.slice(1))) {
+    return word; // acronyms and mixed case as written: TSU, ManCom, OR
+  }
+  const lower = core.toLowerCase();
+  if (!first && start === 0 && MINOR_WORDS.has(lower)) {
+    return lower;
+  }
+  return lead + lower.charAt(0).toUpperCase() + lower.slice(1);
+}
+
+/**
+ * Title Case for labels that are already words, e.g. workflow stages and actions kept as
+ * sentences in the database ("Revise quotation slip (new round)" → "Revise Quotation Slip (New
+ * Round)"). Words written with inner capitals are kept; minor words after the first are lowercase.
+ */
+export function titleCase(label: string): string {
+  return label
+    .split(' ')
+    .map((word, i) => titleWord(word, i === 0))
+    .join(' ');
+}

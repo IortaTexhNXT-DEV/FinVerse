@@ -1,4 +1,4 @@
-import { formatAmount, formatCompact, formatDate, humanize } from './format';
+import { formatAmount, formatCompact, formatDate, humanize, titleCase } from './format';
 
 describe('format', () => {
   it('formats amounts in accounting style', () => {
@@ -21,5 +21,22 @@ describe('format', () => {
 
   it('humanizes enum codes', () => {
     expect(humanize('PENDING_APPROVAL')).toBe('Pending Approval');
+  });
+});
+
+describe('titleCase', () => {
+  it('capitalises sentence labels and keeps minor words lowercase', () => {
+    expect(titleCase('Revise quotation slip (new round)')).toBe(
+      'Revise Quotation Slip (New Round)',
+    );
+    expect(titleCase('Holds for approval')).toBe('Holds for Approval');
+    expect(titleCase('not proceeded')).toBe('Not Proceeded');
+  });
+
+  it('keeps acronyms and mixed-case words as written', () => {
+    expect(titleCase('TSU recommendation')).toBe('TSU Recommendation');
+    expect(titleCase('Sent to ManCom')).toBe('Sent to ManCom');
+    expect(titleCase('Awaiting insurer OR')).toBe('Awaiting Insurer OR');
+    expect(titleCase('')).toBe('');
   });
 });

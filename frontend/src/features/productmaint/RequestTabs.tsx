@@ -23,7 +23,7 @@ function step(by: string | undefined, at: string | undefined): string {
 export function DetailsTab({ request: p }: Readonly<{ request: PackageRequest }>) {
   const m = p.milestones;
   return (
-    <div className="split">
+    <div className="grid-2">
       <Card title="Request">
         <dl className="detail-list">
           <dt>Type</dt>
@@ -34,7 +34,7 @@ export function DetailsTab({ request: p }: Readonly<{ request: PackageRequest }>
           <dd>{p.clientName === undefined ? '—' : `${p.clientCode ?? ''} – ${p.clientName}`}</dd>
           <dt>Line / cover type</dt>
           <dd>
-            {p.lineCode} / {p.coverTypeCode ?? '—'}
+            {p.lineCode} / {p.coverTypeCode === undefined ? '—' : humanize(p.coverTypeCode)}
           </dd>
           <dt>Market segments</dt>
           <dd>{p.marketSegments.join(', ') || '—'}</dd>

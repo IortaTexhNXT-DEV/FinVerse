@@ -1938,7 +1938,7 @@ audit:
   - Runs are archived (FR-OP-009).
 acceptance:
   - REM-TRACKER lists insurer, remit type, batch number, accounts extracted, net due, incentive and due date.
-  - REM-DTIP-DETAIL lists the outstanding DTIP per invoice with the ageing columns of Annex III #6.
+  - "REM-DTIP-DETAIL lists the outstanding DTIP per invoice with the ageing columns of Annex III #6."
 ```
 
 ## Adjustment / Cancellation

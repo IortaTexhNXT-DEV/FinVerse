@@ -1395,6 +1395,42 @@ def _render_block(doc: BdoiDocument, kind: str, text: str) -> None:
 FR_ROW_WIDTHS = {"rules": 4, "validations": 3, "fields": 5}
 
 
+YAML_BLOCK_KINDS = ("fr", "requirement", "glossary", "table", "signoff")
+_QUOTED_OR_STRUCTURED = ("'", '"', "|", ">", "[", "{", "&", "*", "!")
+
+
+def _plain_scalar(line: str) -> str | None:
+    """The unquoted text value of a YAML line (``key: text`` or ``- text``), or None."""
+    body = line.strip()
+    if body.startswith("- "):
+        body = body[2:].lstrip()
+        key = re.match(r"^[\w-]+:(?: |$)", body)
+        if not key:
+            return body if body and not body.startswith(_QUOTED_OR_STRUCTURED) else None
+    key = re.match(r"^[\w-]+: (.*)$", body)
+    if not key:
+        return None
+    value = key.group(1).strip()
+    return value if value and not value.startswith(_QUOTED_OR_STRUCTURED) else None
+
+
+def _lint_plain_scalars(kind: str, block: str) -> list[str]:
+    """Finds unquoted values that YAML silently changes: ' #' starts a comment (the rest of the
+    text is dropped) and ': ' inside a list item turns it into a mapping."""
+    problems: list[str] = []
+    for number, line in enumerate(block.splitlines(), start=1):
+        value = _plain_scalar(line)
+        if value is None:
+            continue
+        if " #" in value:
+            problems.append(f"{kind} block line {number}: ' #' starts a YAML comment and cuts the text; "
+                            f"quote the value: {line.strip()[:90]}")
+        if line.strip().startswith("- ") and ": " in value:
+            problems.append(f"{kind} block line {number}: ': ' in a list item makes it a mapping; "
+                            f"quote the value: {line.strip()[:90]}")
+    return problems
+
+
 def lint_source(src: str | Path) -> list[str]:
     """Checks a source for the usual YAML slips in ```fr blocks.
 
@@ -1408,6 +1444,8 @@ def lint_source(src: str | Path) -> list[str]:
     text = src.read_text(encoding="utf-8")
     problems: list[str] = []
     for kind, block in re.findall(r"```(\w+)\n(.*?)```", text, re.S):
+        if kind in YAML_BLOCK_KINDS:
+            problems.extend(_lint_plain_scalars(kind, block))
         if kind not in ("fr", "requirement"):
             continue
         try:
@@ -1462,7 +1500,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", help="output .docx (only with one source)")
     ap.add_argument("--no-pdf", action="store_true", help="skip the PDF (and the TOC page numbers)")
     ap.add_argument("--previews", action="store_true", help="also render page PNG previews and contact sheets")
-    ap.add_argument("--check", action="store_true", help="only lint the ```fr blocks and exit")
+    ap.add_argument("--check", action="store_true", help="only lint the YAML blocks (fr, glossary, table, signoff) and exit")
     args = ap.parse_args(argv)
     failed = False
     for s in args.sources:

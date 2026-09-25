@@ -1,0 +1,43 @@
+// BRD-1: workflow NB_PROPOSAL (V751), non-package Proposal Request Form. FRS section 5.3; BRNB.005-017.
+digraph nb_proposal {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.4, ranksep=0.22, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.5, height=0.45, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  DRAFT            [label="DRAFT\nMarketing AO"];
+  FOR_MKT_APPROVAL [label="FOR_MKT_APPROVAL\nMarketing TL / TH / UH"];
+  WITH_TSU         [label="WITH_TSU\nTSU", fillcolor="@WHITE"];
+  QS_PREPARATION   [label="QS_PREPARATION\nTSU", fillcolor="@WHITE"];
+  QS_FOR_APPROVAL  [label="QS_FOR_APPROVAL\nTSU approver", fillcolor="@WHITE"];
+  QS_SENT          [label="QS_SENT\nTSU (insurer terms)", fillcolor="@WHITE"];
+  TERMS_RECEIVED   [label="TERMS_RECEIVED\nTSU", fillcolor="@WHITE"];
+  PS_FOR_APPROVAL  [label="PS_FOR_APPROVAL\nTSU approver", fillcolor="@WHITE"];
+  PS_RELEASED      [label="PS_RELEASED\nMarketing"];
+  SENT_TO_CLIENT   [label="SENT_TO_CLIENT\nMarketing"];
+  ACCEPTED         [label="ACCEPTED\nMarketing"];
+  CONVERTED        [label="CONVERTED\n(accounts created)", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  NOT_PROCEEDED    [label="NOT_PROCEEDED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  VOIDED           [label="VOIDED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  DRAFT -> FOR_MKT_APPROVAL [label=" submit"];
+  FOR_MKT_APPROVAL -> WITH_TSU [label=" approve"];
+  WITH_TSU -> QS_PREPARATION [label=" prepare_qs"];
+  QS_PREPARATION -> QS_FOR_APPROVAL [label=" submit_qs"];
+  QS_FOR_APPROVAL -> QS_SENT [label=" approve_qs (e-mail\n per insurer)"];
+  QS_SENT -> TERMS_RECEIVED [label=" terms_complete"];
+  TERMS_RECEIVED -> PS_FOR_APPROVAL [label=" submit_ps"];
+  PS_FOR_APPROVAL -> PS_RELEASED [label=" approve_ps"];
+  PS_RELEASED -> SENT_TO_CLIENT [label=" send_to_client"];
+  SENT_TO_CLIENT -> ACCEPTED [label=" accept"];
+  ACCEPTED -> CONVERTED [label=" create_accounts"];
+  FOR_MKT_APPROVAL -> DRAFT [label=" return", style=dashed, constraint=false];
+  WITH_TSU -> DRAFT [label=" return", style=dashed, constraint=false];
+  QS_FOR_APPROVAL -> QS_PREPARATION [label=" return", style=dashed, constraint=false];
+  PS_FOR_APPROVAL -> TERMS_RECEIVED [label=" return", style=dashed, constraint=false];
+  SENT_TO_CLIENT -> NOT_PROCEEDED [label=" decline", style=dotted];
+  WITH_TSU -> VOIDED [label=" void (DRAFT to\n WITH_TSU)", style=dotted];
+
+  { rank=same; WITH_TSU; VOIDED; }
+  { rank=same; ACCEPTED; NOT_PROCEEDED; }
+}

@@ -111,8 +111,8 @@ public final class ScheduleDtos {
    *
    * @param code code
    * @param values content
-   * @param wordOutput whether the schedule is also exported to Word (board decks, client requirement
-   *     16)
+   * @param wordOutput whether the schedule is also exported to Word (board decks, client
+   *     requirement 16)
    * @param updatedAt last change
    */
   public record ScheduleResponse(

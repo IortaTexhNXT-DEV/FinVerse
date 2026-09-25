@@ -1,0 +1,22 @@
+// BRD-2: workflow OPS_SPECIAL_REMIT (V771; MKTID.009, RMTID.030/033). FRS section 5. Stage owner in the second line.
+// Solid = main path, dashed = return or optional path, dotted = closes the case.
+digraph wf_special {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.3, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.4, height=0.45, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  REQUESTED [label="REQUESTED\nMarketing (SPECIAL_REMIT_REQUEST)"];
+  FOR_APPROVAL [label="FOR_APPROVAL\nRemittance TL (SPECIAL_REMIT_APPROVE)"];
+  IN_PROCESS_REMITTANCE [label="IN_PROCESS_REMITTANCE\nProcessor (REMIT_PROCESS)"];
+  PUSHED_TO_DISBURSEMENT [label="PUSHED_TO_DISBURSEMENT", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  REJECTED [label="REJECTED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  RETURNED [label="RETURNED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  REQUESTED -> FOR_APPROVAL [label=" validate (system)"];
+  FOR_APPROVAL -> IN_PROCESS_REMITTANCE [label=" approve\n(SPECIAL batch)"];
+  FOR_APPROVAL -> REJECTED [label=" reject", style=dotted];
+  IN_PROCESS_REMITTANCE -> PUSHED_TO_DISBURSEMENT [label=" pushed"];
+  IN_PROCESS_REMITTANCE -> RETURNED [label=" returned", style=dotted];
+  { rank=same; PUSHED_TO_DISBURSEMENT; RETURNED; }
+}

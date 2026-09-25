@@ -1,0 +1,31 @@
+// BRD-2: workflow OPS_ENDORSEMENT (V780; ADJID.001-010). FRS section 5. Stage owner in the second line.
+// Solid = main path, dashed = return or optional path, dotted = closes the case.
+digraph wf_endorsement {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.3, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.4, height=0.45, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  DRAFT [label="DRAFT\nRequester (ADJ_REQUEST)"];
+  FOR_VALIDATION [label="FOR_VALIDATION\nAdjustment processor (ADJ_PROCESS)"];
+  FOR_APPROVAL [label="FOR_APPROVAL\nAdjustment TL (ADJ_APPROVE)"];
+  FOR_POSTING [label="FOR_POSTING\nAdjustment processor (ADJ_POST)"];
+  AWAITING_REAPPLICATION [label="AWAITING_REAPPLICATION\nADJ_POST"];
+  POSTED [label="POSTED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  RETURNED [label="RETURNED\nRequester (ADJ_REQUEST)"];
+  CANCELLED [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  DRAFT -> FOR_VALIDATION [label=" submit"];
+  FOR_VALIDATION -> FOR_APPROVAL [label=" validate"];
+  FOR_VALIDATION -> FOR_POSTING [label=" validate_for_posting", style=dashed];
+  FOR_APPROVAL -> FOR_POSTING [label=" approve"];
+  FOR_POSTING -> POSTED [label=" post"];
+  FOR_POSTING -> AWAITING_REAPPLICATION [label=" post_pending", style=dashed];
+  AWAITING_REAPPLICATION -> POSTED [label=" reapply", style=dashed];
+  FOR_VALIDATION -> RETURNED [label=" return", style=dashed, constraint=false];
+  RETURNED -> FOR_VALIDATION [label=" resubmit", style=dashed, constraint=false];
+  RETURNED -> CANCELLED [label=" cancel", style=dotted];
+  DRAFT -> CANCELLED [label=" cancel", style=dotted];
+  { rank=same; POSTED; AWAITING_REAPPLICATION; }
+  { rank=same; FOR_APPROVAL; RETURNED; }
+}

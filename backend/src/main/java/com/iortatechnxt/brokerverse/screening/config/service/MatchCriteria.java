@@ -57,7 +57,7 @@ public record MatchCriteria(ConfigVersionRef version, List<Rule> rules) {
 
     /** Defensive copy. */
     public Rule {
-      fields = Set.copyOf(fields);
+      fields = fields == null ? Set.of() : Set.copyOf(fields);
     }
   }
 }

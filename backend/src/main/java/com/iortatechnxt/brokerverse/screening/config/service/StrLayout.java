@@ -49,7 +49,7 @@ public record StrLayout(
 
     /** Defensive copy. */
     public Column {
-      codeMap = Map.copyOf(codeMap);
+      codeMap = codeMap == null ? Map.of() : Map.copyOf(codeMap);
     }
   }
 }

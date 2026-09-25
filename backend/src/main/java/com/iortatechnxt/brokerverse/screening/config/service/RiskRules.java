@@ -57,7 +57,7 @@ public record RiskRules(ConfigVersionRef version, List<Category> categories, Lis
 
     /** Defensive copy. */
     public Category {
-      tags = Set.copyOf(tags);
+      tags = tags == null ? Set.of() : Set.copyOf(tags);
     }
   }
 
@@ -82,7 +82,7 @@ public record RiskRules(ConfigVersionRef version, List<Category> categories, Lis
 
     /** Defensive copy. */
     public Rule {
-      values = Set.copyOf(values);
+      values = values == null ? Set.of() : Set.copyOf(values);
     }
 
     /**

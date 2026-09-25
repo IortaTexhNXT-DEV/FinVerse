@@ -16,6 +16,9 @@ public record PrintOptions(Paper paper, Orientation orientation, boolean fitToWi
   /** The default layout: A4, orientation by width, fitted to the page. */
   public static final PrintOptions DEFAULT = new PrintOptions(Paper.A4, Orientation.AUTO, true);
 
+  /** Above this many columns AUTO turns the page to landscape. */
+  public static final int LANDSCAPE_THRESHOLD = 7;
+
   /** Nulls become the defaults. */
   public PrintOptions {
     paper = paper == null ? Paper.A4 : paper;
@@ -51,6 +54,20 @@ public record PrintOptions(Paper paper, Orientation orientation, boolean fitToWi
         + " "
         + orientation
         + (fitToWidth ? ", fit to width" : ", natural width");
+  }
+
+  /**
+   * Whether the page is turned for a report with this many columns (AUTO: wide reports).
+   *
+   * @param columns number of report columns
+   * @return true for landscape
+   */
+  public boolean landscape(int columns) {
+    return switch (orientation) {
+      case AUTO -> columns > LANDSCAPE_THRESHOLD;
+      case PORTRAIT -> false;
+      case LANDSCAPE -> true;
+    };
   }
 
   private static <E extends Enum<E>> E parse(Class<E> type, String value) {

@@ -16,9 +16,9 @@ import java.util.Map;
  * @param parameters shared parameters
  * @param format format of the files in the ZIP (ignored for a merged PDF)
  * @param mergedPdf one merged PDF instead of a ZIP
- * @param paper paper size of PDFs
- * @param orientation orientation of PDFs
- * @param fitToWidth fit PDF tables to the page width, null = true
+ * @param paper paper size of PDF and Word files
+ * @param orientation orientation of PDF and Word files
+ * @param fitToWidth fit PDF and Word tables to the page width, null = true
  */
 public record ReportBatchRequest(
     @NotEmpty @Size(max = 30) List<@NotBlank String> codes,

@@ -136,50 +136,51 @@ public class FrbsReports {
   @Bean
   public ReportDefinition frbsMancomMarket(NamedParameterJdbcTemplate jdbc) {
     return new FrbsSqlReport(
-        new Spec(
-            "FRBS-MANCOM-MARKET",
-            "Market Performance Summary - Premium and Commission",
-            "Booked premium and commission per segment and location: month, year to date and"
-                + " previous year to date with growth (FRBS 3.2.0, Appendix A V)",
-            Dates.AS_OF,
-            "select d.*, case when d.comm_prev = 0 then null"
-                + " else round((d.comm_ytd - d.comm_prev) * 100 / d.comm_prev, 2) end growth"
-                + " from (select coalesce(i.segment, '(none)') segment, b.name location, i.currency,"
-                + " coalesce(sum(i.gross_premium) filter (where i.booking_date >= :monthStart), 0)"
-                + " prem_month,"
-                + " coalesce(sum(i.commission) filter (where i.booking_date >= :monthStart), 0)"
-                + " comm_month,"
-                + " coalesce(sum(i.gross_premium) filter (where i.booking_date >= :yearStart), 0)"
-                + " prem_ytd,"
-                + " coalesce(sum(i.commission) filter (where i.booking_date >= :yearStart), 0)"
-                + " comm_ytd,"
-                + " coalesce(sum(i.gross_premium) filter (where i.booking_date <= :prevTo), 0)"
-                + " prem_prev,"
-                + " coalesce(sum(i.commission) filter (where i.booking_date <= :prevTo), 0)"
-                + " comm_prev"
-                + " from ops_invoice i join org_branch b on b.id = i.branch_id"
-                + " where i.company_id = :companyId and not i.cancelled"
-                + " and ((i.booking_date between :yearStart and :to)"
-                + " or (i.booking_date between :prevYearStart and :prevTo))"
-                + " group by coalesce(i.segment, '(none)'), b.name, i.currency) d"
-                + " order by d.segment, d.location, d.currency",
-            List.of(
-                ReportColumn.text(SEGMENT, SEGMENT_LABEL),
-                ReportColumn.text("location", "Location"),
-                ReportColumn.text(CURRENCY, CURRENCY_LABEL),
-                ReportColumn.amount("prem_month", "Premium - Month"),
-                ReportColumn.amount("comm_month", "Commission - Month"),
-                ReportColumn.amount("prem_ytd", "Premium - YTD"),
-                ReportColumn.amount("comm_ytd", "Commission - YTD"),
-                ReportColumn.amount("prem_prev", "Premium - Previous YTD"),
-                ReportColumn.amount("comm_prev", "Commission - Previous YTD"),
-                ReportColumn.percent("growth", "Commission Growth")),
-            SEGMENT,
-            SEGMENT_LABEL,
-            List.of(
-                "Budget columns wait for the segment budgets (AQ05); amounts in invoice currency.",
-                DRAFT)),
-        jdbc);
+            new Spec(
+                "FRBS-MANCOM-MARKET",
+                "Market Performance Summary - Premium and Commission",
+                "Booked premium and commission per segment and location: month, year to date and"
+                    + " previous year to date with growth (FRBS 3.2.0, Appendix A V)",
+                Dates.AS_OF,
+                "select d.*, case when d.comm_prev = 0 then null"
+                    + " else round((d.comm_ytd - d.comm_prev) * 100 / d.comm_prev, 2) end growth"
+                    + " from (select coalesce(i.segment, '(none)') segment, b.name location, i.currency,"
+                    + " coalesce(sum(i.gross_premium) filter (where i.booking_date >= :monthStart), 0)"
+                    + " prem_month,"
+                    + " coalesce(sum(i.commission) filter (where i.booking_date >= :monthStart), 0)"
+                    + " comm_month,"
+                    + " coalesce(sum(i.gross_premium) filter (where i.booking_date >= :yearStart), 0)"
+                    + " prem_ytd,"
+                    + " coalesce(sum(i.commission) filter (where i.booking_date >= :yearStart), 0)"
+                    + " comm_ytd,"
+                    + " coalesce(sum(i.gross_premium) filter (where i.booking_date <= :prevTo), 0)"
+                    + " prem_prev,"
+                    + " coalesce(sum(i.commission) filter (where i.booking_date <= :prevTo), 0)"
+                    + " comm_prev"
+                    + " from ops_invoice i join org_branch b on b.id = i.branch_id"
+                    + " where i.company_id = :companyId and not i.cancelled"
+                    + " and ((i.booking_date between :yearStart and :to)"
+                    + " or (i.booking_date between :prevYearStart and :prevTo))"
+                    + " group by coalesce(i.segment, '(none)'), b.name, i.currency) d"
+                    + " order by d.segment, d.location, d.currency",
+                List.of(
+                    ReportColumn.text(SEGMENT, SEGMENT_LABEL),
+                    ReportColumn.text("location", "Location"),
+                    ReportColumn.text(CURRENCY, CURRENCY_LABEL),
+                    ReportColumn.amount("prem_month", "Premium - Month"),
+                    ReportColumn.amount("comm_month", "Commission - Month"),
+                    ReportColumn.amount("prem_ytd", "Premium - YTD"),
+                    ReportColumn.amount("comm_ytd", "Commission - YTD"),
+                    ReportColumn.amount("prem_prev", "Premium - Previous YTD"),
+                    ReportColumn.amount("comm_prev", "Commission - Previous YTD"),
+                    ReportColumn.percent("growth", "Commission Growth")),
+                SEGMENT,
+                SEGMENT_LABEL,
+                List.of(
+                    "Budget columns wait for the segment budgets (AQ05); amounts in invoice currency.",
+                    DRAFT)),
+            jdbc)
+        .asDocument();
   }
 
   /**

@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.report.render;
 
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
+import com.iortatechnxt.brokerverse.common.office.PdfBrandFooter;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
@@ -12,12 +14,8 @@ import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.BaseFont;
-import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfPageEventHelper;
-import com.lowagie.text.pdf.PdfTemplate;
 import com.lowagie.text.pdf.PdfWriter;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
@@ -29,8 +27,9 @@ import org.springframework.stereotype.Component;
 /**
  * PDF export in the corporate report layout: company, title, a metadata block (report ID, user, run
  * date and the filters applied, BRNB.031), repeated column headings, group headers, subtotals,
- * grand total, "*** End of Report ***" and a page footer with the administrator's footer text
- * ({@code REPORT_FOOTER_TEXT}) and "Page n of m".
+ * grand total, "*** End of Report ***" and a page footer with the "Confidential" classification,
+ * the administrator's footer text ({@code REPORT_FOOTER_TEXT}) and "Page n of m", under the BDO
+ * Insure logo.
  */
 // OpenPDF's Paragraph extends ArrayList (LooseCoupling false positive); PdfWriter is closed by the
 // enclosing Document (CloseResource false positive).
@@ -39,12 +38,13 @@ import org.springframework.stereotype.Component;
 public class PdfReportRenderer implements ReportRenderer {
 
   // BDO style guide: Header Blue #004EA8, CTA Blue #0072D8, Background Blue #E5F5FF.
-  private static final Color BRAND_NAVY = new Color(0x00, 0x4E, 0xA8);
-  private static final Color BRAND_BLUE = new Color(0x00, 0x72, 0xD8);
-  private static final Color BRAND_GOLD = new Color(0xFD, 0xB9, 0x13);
-  private static final Color GROUP_BG = new Color(0xE5, 0xF5, 0xFF);
-  private static final Color SUBTOTAL_BG = new Color(0xF4, 0xF6, 0xFA);
-  private static final int LANDSCAPE_THRESHOLD = 7;
+  private static final Color BRAND_NAVY = BrandAssets.color(BrandAssets.HEADER_BLUE);
+  private static final Color BRAND_BLUE = BrandAssets.color(BrandAssets.CTA_BLUE);
+  private static final Color BRAND_GOLD = BrandAssets.color(BrandAssets.GOLD);
+  private static final Color GROUP_BG = BrandAssets.color(BrandAssets.BACKGROUND_BLUE);
+  private static final Color SUBTOTAL_BG = BrandAssets.color(BrandAssets.BAND);
+  private static final Color ROW_BAND = BrandAssets.color(BrandAssets.ROW_BAND);
+  private static final float LOGO_HEIGHT = 22f;
   private static final float MARGIN = 28f;
   private static final float BODY_SIZE = 7.5f;
   private static final float LABEL_WEIGHT = 1.6f;
@@ -55,7 +55,7 @@ public class PdfReportRenderer implements ReportRenderer {
   private static final float GRID_WIDTH = 0.4f;
   private static final float END_SPACING = 8f;
   private static final float NATURAL_POINTS_PER_WEIGHT = 40f;
-  private static final Color GRID = new Color(0xD5, 0xDB, 0xE5);
+  private static final Color GRID = BrandAssets.color(BrandAssets.GRID);
   private static final DateTimeFormatter STAMP =
       DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withZone(ZoneId.of("Asia/Manila"));
 
@@ -80,7 +80,9 @@ public class PdfReportRenderer implements ReportRenderer {
       doc.open();
       // The footer's "of m" template can only be created once the document is open; page 1
       // has not ended yet, so the footer still applies to every page.
-      writer.setPageEvent(new PageFooter(result.code(), context.footerText(), writer));
+      writer.setPageEvent(
+          new PdfBrandFooter(
+              context.footerText(), "iNXT BrokerVerse  |  " + result.code(), writer));
       addHeader(doc, result, context);
       doc.add(table(result, context.print().fitToWidth(), size.getWidth() - 2 * MARGIN));
       for (String note : result.notes()) {
@@ -95,6 +97,7 @@ public class PdfReportRenderer implements ReportRenderer {
   }
 
   private static void addHeader(Document doc, ReportResult result, ReportContext ctx) {
+    doc.add(PdfBrandFooter.logo(LOGO_HEIGHT));
     doc.add(new Paragraph(ctx.companyName(), COMPANY));
     Paragraph title = new Paragraph(result.title(), TITLE);
     title.setSpacingAfter(2);
@@ -132,13 +135,7 @@ public class PdfReportRenderer implements ReportRenderer {
           case LEGAL -> PageSize.LEGAL;
           case A3 -> PageSize.A3;
         };
-    boolean landscape =
-        switch (print.orientation()) {
-          case AUTO -> result.columns().size() > LANDSCAPE_THRESHOLD;
-          case PORTRAIT -> false;
-          case LANDSCAPE -> true;
-        };
-    return landscape ? paper.rotate() : paper;
+    return print.landscape(result.columns().size()) ? paper.rotate() : paper;
   }
 
   private static PdfPTable table(ReportResult result, boolean fitToWidth, float pageWidth) {
@@ -162,25 +159,32 @@ public class PdfReportRenderer implements ReportRenderer {
     table.setHeaderRows(1);
     table.addCell(headCell(""));
     cols.forEach(c -> table.addCell(headCell(c.label())));
+    int details = 0;
     for (ReportRow row : result.rows()) {
-      addRow(table, row, cols);
+      boolean detail = row.kind() == RowKind.DETAIL;
+      addRow(table, row, cols, detail && details % 2 == 1);
+      if (detail) {
+        details++;
+      }
     }
     return table;
   }
 
-  private static void addRow(PdfPTable table, ReportRow row, List<ReportColumn> cols) {
+  private static void addRow(
+      PdfPTable table, ReportRow row, List<ReportColumn> cols, boolean banded) {
     if (row.kind() == RowKind.GROUP_HEADER || row.kind() == RowKind.SECTION) {
       PdfPCell cell = cell(indent(row) + row.label(), BOLD, Element.ALIGN_LEFT, GROUP_BG);
       cell.setColspan(cols.size() + 1);
       table.addCell(cell);
     } else {
-      addValueRow(table, row, cols);
+      addValueRow(table, row, cols, banded ? ROW_BAND : null);
     }
   }
 
-  private static void addValueRow(PdfPTable table, ReportRow row, List<ReportColumn> cols) {
+  private static void addValueRow(
+      PdfPTable table, ReportRow row, List<ReportColumn> cols, Color band) {
     boolean emphasis = row.kind() == RowKind.SUBTOTAL || row.kind() == RowKind.TOTAL;
-    Color bg = emphasis ? SUBTOTAL_BG : null;
+    Color bg = emphasis ? SUBTOTAL_BG : band;
     Font font = emphasis ? BOLD : BODY;
     String label = row.label() == null ? "" : indent(row) + row.label();
     table.addCell(cell(label, font, Element.ALIGN_LEFT, bg));
@@ -223,72 +227,5 @@ public class PdfReportRenderer implements ReportRenderer {
       cell.setBackgroundColor(bg);
     }
     return cell;
-  }
-
-  /**
-   * Writes the footer text (left, shortened with an ellipsis when it would reach the page number)
-   * and "iNXT BrokerVerse | report code | Page n of m" (right) at the foot of every page.
-   */
-  private static final class PageFooter extends PdfPageEventHelper {
-
-    private static final float FOOTER_Y = 16f;
-    private static final float TEMPLATE_WIDTH = 30f;
-    private static final float TEMPLATE_HEIGHT = 12f;
-    private static final float FONT_SIZE = 7f;
-    private static final float GAP = 12f;
-    private static final String ELLIPSIS = "...";
-
-    private final String code;
-    private final String footerText;
-    private final PdfTemplate total;
-    private final BaseFont font;
-
-    PageFooter(String code, String footerText, PdfWriter writer) {
-      this.code = code;
-      this.footerText = footerText;
-      this.total = writer.getDirectContent().createTemplate(TEMPLATE_WIDTH, TEMPLATE_HEIGHT);
-      this.font = new Font(Font.HELVETICA).getCalculatedBaseFont(false);
-    }
-
-    @Override
-    public void onEndPage(PdfWriter writer, Document document) {
-      PdfContentByte cb = writer.getDirectContent();
-      String text = "iNXT BrokerVerse  |  " + code + "  |  Page " + writer.getPageNumber() + " of ";
-      float x = document.right() - font.getWidthPoint(text, FONT_SIZE) - TEMPLATE_WIDTH;
-      cb.beginText();
-      cb.setFontAndSize(font, FONT_SIZE);
-      cb.setColorFill(Color.GRAY);
-      cb.setTextMatrix(x, FOOTER_Y);
-      cb.showText(text);
-      String left = fit(footerText, x - GAP - document.left());
-      if (!left.isEmpty()) {
-        cb.setTextMatrix(document.left(), FOOTER_Y);
-        cb.showText(left);
-      }
-      cb.endText();
-      cb.addTemplate(total, x + font.getWidthPoint(text, FONT_SIZE), FOOTER_Y);
-    }
-
-    /** The text, shortened with an ellipsis to the available width (empty when nothing fits). */
-    private String fit(String text, float width) {
-      if (font.getWidthPoint(text, FONT_SIZE) <= width) {
-        return text;
-      }
-      String shortened = text;
-      while (!shortened.isEmpty() && font.getWidthPoint(shortened + ELLIPSIS, FONT_SIZE) > width) {
-        shortened = shortened.substring(0, shortened.length() - 1);
-      }
-      return shortened.isEmpty() ? "" : shortened.strip() + ELLIPSIS;
-    }
-
-    @Override
-    public void onCloseDocument(PdfWriter writer, Document document) {
-      total.beginText();
-      total.setFontAndSize(font, FONT_SIZE);
-      total.setColorFill(Color.GRAY);
-      total.setTextMatrix(0, 0);
-      total.showText(String.valueOf(writer.getPageNumber()));
-      total.endText();
-    }
   }
 }

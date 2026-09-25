@@ -1,9 +1,11 @@
 package com.iortatechnxt.brokerverse.docgen.service;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.List;
 
 /**
- * A generated PDF document.
+ * A generated business document, rendered as PDF or Word ({@link DocumentComposer}).
  *
  * @param companyName issuing company (letterhead)
  * @param title document title
@@ -26,7 +28,13 @@ public record DocumentSpec(
     signatures = signatures == null ? List.of() : List.copyOf(signatures);
   }
 
-  /** A content block. */
+  /** A content block (typed in JSON, for the Word rendition of a composed PDF). */
+  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
+  @JsonSubTypes({
+    @JsonSubTypes.Type(value = Fields.class, name = "FIELDS"),
+    @JsonSubTypes.Type(value = Table.class, name = "TABLE"),
+    @JsonSubTypes.Type(value = Text.class, name = "TEXT")
+  })
   public sealed interface Section permits Fields, Table, Text {}
 
   /**

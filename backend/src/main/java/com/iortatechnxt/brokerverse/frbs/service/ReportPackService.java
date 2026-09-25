@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * The BDOI report pack (FRBS 3.2.0, Appendix A; V899): the report groups in order with their
  * reports, each marked available when the report exists in the catalogue and the user may run it.
- * Every entry is exported to Excel and PDF through the Report Centre; the Word document asked for
- * board decks is not produced by the report platform (gap, see the design's A1-FRBS section).
+ * Every entry is exported to Excel and PDF through the Report Centre; an entry for which BDOI asks
+ * for a Word document (board decks) is also exported to Word (client requirement 16).
  */
 @Service
 @Transactional(readOnly = true)
@@ -68,7 +68,7 @@ public class ReportPackService {
    * @param scheduleCode schedule definition of {@code GL-SCHEDULE}, null for other reports
    * @param title title
    * @param sourceRef appendix row or report list number
-   * @param wordRequested whether BDOI asks for a Word document (not produced yet, gap)
+   * @param wordRequested whether BDOI asks for a Word document (exported to Word as well)
    * @param available whether the current user may run it
    */
   public record PackEntry(

@@ -20,6 +20,8 @@ import org.springframework.stereotype.Component;
  * section 10): runs the definition named by {@code schedule} ({@code GARD-*}, {@code SUBS-*},
  * {@code SCH-*}) for a company and period, so every schedule of the BDOI report pack is viewed and
  * exported (Excel, PDF, ODS, CSV) through the Report Centre, with the report archive and batches.
+ * The GARD, subsidiaries and ManCom schedules are board documents, so the report is also exported
+ * to Word (A1-FRBS {@code word_requested}, client requirement 16).
  */
 @Component
 public class AccountScheduleReport implements ReportDefinition {
@@ -52,18 +54,19 @@ public class AccountScheduleReport implements ReportDefinition {
   @Override
   public ReportMetadata metadata() {
     return ReportMetadata.frbs(
-        CODE,
-        "Account Schedule",
-        "Schedule of the BDOI report pack run from its definition (GARD, subsidiaries, schedules and"
-            + " ageing)",
-        List.of(
-            ParameterSpec.required(COMPANY, "Company", ParameterType.COMPANY),
-            ParameterSpec.required(SCHEDULE, "Schedule code", ParameterType.TEXT)
-                .withDefault("SCH-PR-PHP"),
-            ParameterSpec.optional(
-                FROM, "Period from (default: first day of the month)", ParameterType.DATE),
-            ParameterSpec.required(AS_OF, "As of", ParameterType.DATE).withDefault("TODAY"),
-            ParameterSpec.optional(BRANCH, "Branch", ParameterType.BRANCH)));
+            CODE,
+            "Account Schedule",
+            "Schedule of the BDOI report pack run from its definition (GARD, subsidiaries, schedules and"
+                + " ageing)",
+            List.of(
+                ParameterSpec.required(COMPANY, "Company", ParameterType.COMPANY),
+                ParameterSpec.required(SCHEDULE, "Schedule code", ParameterType.TEXT)
+                    .withDefault("SCH-PR-PHP"),
+                ParameterSpec.optional(
+                    FROM, "Period from (default: first day of the month)", ParameterType.DATE),
+                ParameterSpec.required(AS_OF, "As of", ParameterType.DATE).withDefault("TODAY"),
+                ParameterSpec.optional(BRANCH, "Branch", ParameterType.BRANCH)))
+        .asDocument();
   }
 
   @Override

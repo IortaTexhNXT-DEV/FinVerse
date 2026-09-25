@@ -1,0 +1,41 @@
+// BRD-6: workflow RNW_CASE, part 2 (processing to closure). FRS section 5.
+digraph rn_workflow_proc {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.28, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.3, height=0.45, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  FOR_PROCESSING        [label="FOR_PROCESSING\nProcessing TL"];
+  IN_PROCESSING         [label="IN_PROCESSING\nProcessing Officer"];
+  WITH_INSURER          [label="WITH_INSURER\nProcessing (insurer file)"];
+  RA_READY              [label="RA_READY\nMarketing / Processing"];
+  RA_GENERATED          [label="RA_GENERATED\nMarketing locked"];
+  RA_SENT               [label="RA_SENT\nAwaiting Response"];
+  ACCEPTED              [label="ACCEPTED\nSystem"];
+  FOR_PLACEMENT_BOOKING [label="FOR_PLACEMENT_BOOKING\nNB placement, booking"];
+  RENEWED               [label="RENEWED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  BACK                  [label="FOR_DISPOSITION /\nFOR_TL_REVIEW (part 1)", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  LETTER_PENDING        [label="LETTER_PENDING\nNFR / NAL"];
+  CLOSED_NR             [label="CLOSED\n(NOT_RENEWED)", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  CLOSED_EX             [label="CLOSED\n(EXPIRED_UNRENEWED)", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  FOR_PROCESSING -> IN_PROCESSING [label=" assign_po"];
+  IN_PROCESSING -> BACK [label=" return (reason)", style=dashed];
+  IN_PROCESSING -> WITH_INSURER [label=" send_to_insurer"];
+  WITH_INSURER -> RA_READY [label=" Renew As Is,\n matched"];
+  WITH_INSURER -> IN_PROCESSING [label=" Revise", style=dashed, constraint=false];
+  WITH_INSURER -> LETTER_PENDING [label=" Reject", style=dashed];
+  RA_READY -> RA_GENERATED [label=" generate_ra"];
+  RA_GENERATED -> RA_SENT [label=" send (batch)"];
+  RA_SENT -> ACCEPTED [label=" accept (e-mail,\n signed RA, payment)"];
+  ACCEPTED -> FOR_PLACEMENT_BOOKING [label=" fast track\n (system)"];
+  FOR_PLACEMENT_BOOKING -> RENEWED [label=" InvoiceBooked"];
+  LETTER_PENDING -> CLOSED_NR [label=" send NFR / NAL"];
+  RA_SENT -> CLOSED_EX [label=" expiry, no\n acceptance (NRNS)", style=dotted];
+  CLOSED_NR -> BACK [label=" reopen (until expiry\n + RNW_REOPEN_DAYS)", style=dashed, constraint=false];
+
+  { rank=same; IN_PROCESSING; BACK; }
+  { rank=same; RA_READY; LETTER_PENDING; }
+  { rank=same; RA_SENT; CLOSED_NR; }
+  { rank=same; RENEWED; CLOSED_EX; }
+}

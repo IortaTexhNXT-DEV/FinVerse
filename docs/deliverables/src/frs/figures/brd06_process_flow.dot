@@ -1,0 +1,57 @@
+// BRD-6 Renewal: renewal process by actor (FRS section 2.2; BRD p.42-43, BRRN.001-040, BRD 1.003-4.09).
+// Colour tokens (@HEADER_BLUE ...) are replaced by tools/deliverables before rendering.
+// Layout: four rows of three steps; the fill colour of a step is its actor (legend at the bottom).
+digraph rn_process {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.45, ranksep=0.5, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=13, fontcolor="@NEAR_BLACK", width=2.6, height=0.9, margin="0.12,0.06"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2, fontname="Arial", fontsize=11, fontcolor="@MUTED"];
+
+  // Actors: System = @DIRTY_WHITE, Marketing = @BG_BLUE, Processing = @WHITE, Client = @AMBER_BG
+  s1  [label=<<b>1. Extraction</b><br/><font point-size="11">Job at lead days, or TL range<br/>BRRN.002, 005, 030</font>>, fillcolor="@DIRTY_WHITE"];
+  s2  [label=<<b>2. Sanitation, buckets</b><br/><font point-size="11">Checks; Clean / Review / Exception<br/>BRRN.020, 022, 023</font>>, fillcolor="@DIRTY_WHITE"];
+  s3  [label=<<b>3. Initiation</b><br/><font point-size="11">Authorised user; bulk or single<br/>BRRN.021</font>>, fillcolor="@BG_BLUE"];
+  s4  [label=<<b>4. Rule-based disposition</b><br/><font point-size="11">Decision matrix; STP if AUTO<br/>BRRN.031, 034, 039</font>>, fillcolor="@DIRTY_WHITE"];
+  s5  [label=<<b>5. Assignment, transfer</b><br/><font point-size="11">Marketing TL (non-CBG)<br/>BRD 1.005-1.007</font>>, fillcolor="@BG_BLUE"];
+  s6  [label=<<b>6. Disposition</b><br/><font point-size="11">Marketing AO; history viewed<br/>BRD 2.004, BRRN.027</font>>, fillcolor="@BG_BLUE"];
+  s7  [label=<<b>7. Review and post</b><br/><font point-size="11">Marketing TL; return or post<br/>BRD 1.008, 1.011</font>>, fillcolor="@BG_BLUE"];
+  s8  [label=<<b>8. Processing</b><br/><font point-size="11">Processing TL / Officer<br/>BRD 3.004-3.008, BRRN.018</font>>, fillcolor="@WHITE"];
+  s9  [label=<<b>9. Insurer round-trip</b><br/><font point-size="11">Extract per insurer; response<br/>BRD 3.009, BRRN.035</font>>, fillcolor="@WHITE"];
+  s10 [label=<<b>10. Renewal Advice</b><br/><font point-size="11">1st / 2nd notice; batch, protected<br/>BRRN.010</font>>, fillcolor="@WHITE"];
+  s11 [label=<<b>11. Follow-up, letters</b><br/><font point-size="11">NRNS, NAL, NFR; Contact Center<br/>BRRN.001, 025, 026, 037</font>>, fillcolor="@DIRTY_WHITE"];
+  s12 [label=<<b>12. Acceptance to booking</b><br/><font point-size="11">Client accepts; placement, booking<br/>BRRN.038, 040</font>>, fillcolor="@AMBER_BG"];
+  nb  [label=<<b>NB path</b><br/><font point-size="11">Quotation or PRF<br/>BRRN.033, 038</font>>, fillcolor="@BG_BLUE", color="@MUTED", style="rounded,dashed,filled"];
+
+  { rank=same; s1; s2; s3; }
+  { rank=same; s4; s5; s6; }
+  { rank=same; s7; s8; s9; }
+  { rank=same; s10; s11; s12; }
+  { rank=same; nb; }
+
+  s1 -> s4 -> s7 -> s10 [style=invis, weight=10];
+  s2 -> s5 -> s8 -> s11 [style=invis, weight=10];
+  s3 -> s6 -> s9 -> s12 [style=invis, weight=10];
+  s10 -> nb [style=invis];
+
+  s1 -> s2 -> s3;
+  s3 -> s4 [constraint=false];
+  s4 -> s5 -> s6;
+  s6 -> s7 [constraint=false];
+  s7 -> s8 -> s9;
+  s9 -> s10 [constraint=false];
+  s10 -> s11 -> s12;
+  s7 -> nb [style=dashed, color="@MUTED", label=" For Quotation /\n For Proposal"];
+
+  legend [shape=plaintext, style="", label=<
+    <table border="0" cellborder="1" cellspacing="4" cellpadding="4">
+      <tr>
+        <td border="0"><font point-size="11" color="@MUTED">Actor:</font></td>
+        <td bgcolor="@DIRTY_WHITE" color="@HEADER_BLUE"><font point-size="11">System</font></td>
+        <td bgcolor="@BG_BLUE" color="@HEADER_BLUE"><font point-size="11">Marketing</font></td>
+        <td bgcolor="@WHITE" color="@HEADER_BLUE"><font point-size="11">Processing</font></td>
+        <td bgcolor="@AMBER_BG" color="@HEADER_BLUE"><font point-size="11">Client</font></td>
+      </tr>
+    </table>>];
+  { rank=same; nb; legend; }
+  s11 -> legend [style=invis];
+}

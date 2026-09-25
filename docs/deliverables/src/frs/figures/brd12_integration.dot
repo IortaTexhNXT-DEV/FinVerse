@@ -1,0 +1,35 @@
+// BRD-12: interfaces of Submitted Policies. FRS section 7. Sources on top, targets below. Dashed grey = parked seam.
+digraph sp_integration {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.55, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", fillcolor="@WHITE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=13, fontcolor="@NEAR_BLACK", width=2.5, height=0.75];
+  edge  [color="@MUTED", arrowsize=0.7, fontname="Arial", fontsize=11, fontcolor="@TEXT"];
+
+  src    [label="Bank sources (upload)\nLFS, HLS, CIU, SPI,\nLoan Booking, IA masterlist"];
+  lamd   [label="LAMD loan snapshot\n(upload)"];
+  docs   [label="Policy documents\n(extraction; OCR parked)"];
+  legacy [label="Excel masterlists\n(migration)"];
+
+  sbm  [label="Submitted Policies (BIBS)\nmasterlist, rules, IAAF, TOR,\nexpiry scan, handling fee", fillcolor="@HEADER_BLUE", fontcolor="@WHITE", width=4.2, height=1.0];
+
+  rn    [label="Renewal (BRD-6)\nRenewalHandOff"];
+  plc   [label="Placement (hold cover\nre-assignment)"];
+  bkg   [label="Account, booking\n(BRD-1) events"];
+  csh   [label="Cashiering / Collections\nunapplied payments"];
+  mail  [label="E-mail, mail house (COG)\nprint batches", color="@MUTED"];
+  rep   [label="Reports, alerts,\nnotifications"];
+
+  { rank=same; src; lamd; docs; legacy; }
+  { rank=same; rn; plc; bkg; }
+  { rank=same; csh; mail; rep; }
+  rn -> csh [style=invis]; plc -> mail [style=invis]; bkg -> rep [style=invis];
+
+  src -> sbm; lamd -> sbm; docs -> sbm; legacy -> sbm;
+  sbm -> rn [label=" hand-off"];
+  rn -> sbm [label=" status", style=dashed, constraint=false];
+  sbm -> plc [label=" re-assign"];
+  bkg -> sbm [label=" booked", style=dashed];
+  sbm -> csh [label=" RECOGNIZE_INCOME"];
+  sbm -> mail [style=dashed];
+  sbm -> rep;
+}

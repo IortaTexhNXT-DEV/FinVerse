@@ -1,0 +1,31 @@
+// BRD-6: sanitation checks, bucket rules and decision matrix (FRS section 5.3; BRRN.020, 023, 031, 034).
+digraph rn_rules {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.4, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@WHITE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=13, fontcolor="@NEAR_BLACK", width=2.6, height=0.65];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=11.5, fontcolor="@TEXT"];
+
+  trig   [label="Trigger: extraction, upload, insurer file,\nLAMD file, endorsement, payment, nightly", fillcolor="@DIRTY_WHITE"];
+  checks [label="Check engine\n(one result per check:\nPASS / WARN / FAIL / INFO)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+  nr     [label="System Not for Renewal\n(non-renewable risk code,\nLAMD paid-off / RMU)", fillcolor="@AMBER_BG"];
+  rules  [label="Bucket rule set\n(active version)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+  clean  [label="CLEAN", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  review [label="REVIEW", fillcolor="@AMBER_BG"];
+  exc    [label="EXCEPTION", fillcolor="@DANGER_BG", color="@DANGER"];
+  matrix [label="Decision matrix\n(after initiation; first rule\nby priority)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+  auto   [label="AUTO: system disposition\n(source MATRIX)", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  manual [label="MANUAL: proposal shown\nto the AO as default", fillcolor="@BG_BLUE"];
+
+  trig -> checks;
+  checks -> nr [label=" risk code / LAMD", style=dashed];
+  checks -> rules;
+  rules -> clean [label=" no FAIL, no WARN"];
+  rules -> review [label=" FAIL_REVIEW or WARN"];
+  rules -> exc [label=" FAIL_EXCEPTION"];
+  clean -> matrix;
+  review -> matrix;
+  matrix -> auto [label=" CLEAN and AUTO"];
+  matrix -> manual [label=" otherwise"];
+  { rank=same; clean; review; exc; }
+  { rank=same; auto; manual; }
+}

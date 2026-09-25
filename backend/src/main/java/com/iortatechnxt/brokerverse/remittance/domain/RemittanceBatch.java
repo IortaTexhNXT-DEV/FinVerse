@@ -121,7 +121,7 @@ public class RemittanceBatch extends BaseEntity {
   @Column(name = "extract_file_id")
   private Long extractFileId;
 
-  @Embedded private BatchSettlement settlement = new BatchSettlement();
+  @Embedded private final BatchSettlement settlement = new BatchSettlement();
 
   @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("id")

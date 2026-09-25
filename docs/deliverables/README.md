@@ -69,6 +69,7 @@ so each document can be regenerated after every build.
 | 38 | Observability and alert catalogue: dashboards, metrics, log fields (correlation id), and alerts routed to PagerDuty with their runbook step | Word + Excel | B |
 | 39 | Training material per department (quick-reference cards and walkthroughs), derived from the user manuals | Word + PowerPoint | B |
 | 40 | Accessibility and browser support statement (WCAG 2.1 AA checks on the main screens) | Word | B |
+| 41 | Business process deck: As-Is, Envisioned (BIBS), gaps and best practice per business area, plus the holistic enterprise view (current, envisioned, best practice) | PowerPoint | A (refreshed in B) |
 
 ## FRS with annotated screenshots (FRS v1.1)
 

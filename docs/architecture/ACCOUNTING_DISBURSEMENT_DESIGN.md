@@ -883,3 +883,76 @@ What the A1-DSB wave built for `disbursement` (DIS 2.2-3.28) and where it differ
   (all approved DVs are unregularised until tagged); the remittance schedule attachment on the insurer check; open-item
   matching of the paid AP line (the DV posts through the rules only); hiding the Operations queue screen
   `/operations/disbursements` (shared navigation, left to the Operations owner).
+
+### A1-OPSX as built
+
+What the A1-OPSX wave built in `remittance`, `booking` and the Operations invoice views (DIS 2.20.0, 3.27.2,
+3.29.1, 3.29.2; ACSL 2.5.3, 2.9.2, 2.16.0) and where it differs from or details the sections above.
+
+- **Migrations.** `V772__remittance_cpc2_deduction_si.sql`: `rem_batch_line.cpc2` / `cpc2_vat` / `cpc2_code` /
+  `cpc2_rate`; batch totals `rem_batch.cpc2` / `cpc2_vat`; the batch settlement columns `deduction_amount`,
+  `send_cycle`, `early_si_no`, `early_si_wtax`, `cancelled_dv_no`, `cancel_reason`, `cancelled_at`;
+  `rem_deduction` and `rem_deduction_application`; LOV type `REMIT_DEDUCTION_SOURCE` (AR_INSURER_REFUND,
+  OVER_REMITTANCE, OTHER; AQ23); workflow transitions `OPS_REMITTANCE` APPROVED / PARTIALLY_REMITTED /
+  FULLY_REMITTED -`dv_cancelled`-> REVIEW_IN_PROCESS. `V872__booking_root_invoice_incentive_si.sql`:
+  `bkg_invoice.root_invoice_no` (back-filled along the parent chain, indexed), trigger `ON_INCENTIVE` and service
+  invoice type `EARLY_INCENTIVE` (insurer, owner REMIT_APPROVE). Event types, workflow `REM_DEDUCTION`, permission
+  and parameter stay in V890 and V999 as seeded; nothing of them is inserted again.
+- **Why no `restore` transition on `REM_DEDUCTION`.** V772 runs before V890 on a fresh database, so it cannot add
+  a transition to the V890 workflow. A deduction therefore stays CONFIRMED while batches consume it (remaining
+  shown on the record) and moves to APPLIED (system action `apply`) only when every batch that used it received
+  the insurer OR, when its DV can no longer be cancelled. A cancelled DV simply gives the amount back.
+- **CPC2 (DIS 3.29.2).** `Cpc2Incentives` reads the ACTIVE catalog criteria of code `CPC2` with a RATE basis
+  through `IncentiveCriteriaService.list` (products matrix: risk code, segment, insurer; effective on the booking
+  date; optional rule parameter `minimumPremium` on the gross premium). The extraction applies the rate to the
+  basic premium remitted (the early-incentive base) with output VAT at the invoice's commission VAT ratio
+  (`RemittanceRules.cpc2`); `RemittanceAmounts` gains `cpc2` / `cpc2Vat` and `payable()` deducts them. Approval
+  posts `OPS_REMIT_CPC2` per batch (`RMB:<ref>:CPC2`: GROSS, CPC2_INCOME, OUTPUT_VAT). The base, VAT treatment,
+  fixed-amount and rule criteria wait for AQ24 / OQ39 / PQ04; the CPC2 report (DIS 3.29.0) is not built.
+- **Early-incentive service invoice (DIS 3.29.1).** When a batch with an early incentive is approved,
+  `BatchIncentives` issues once per batch a booking service invoice of type `EARLY_INCENTIVE` to the insurer
+  (incentive, its VAT, withholding tax = incentive x `EARLY_INCENTIVE_WTAX_RATE`, 2%, summed per line) and links
+  it on the batch; the incentive OR carries the same withholding tax per line and names the SI. Booking refuses
+  a manual issue of an `ON_INCENTIVE` type (`ServiceInvoiceService.issueManual`, `SERVICE_INVOICE_AUTOMATIC_ONLY`).
+  Parked (AQ25): the accounting of the insurer's 2% (Dr 1611 / Cr 2211) needs a component on
+  `OPS_REMIT_INCENTIVE` and a rule line; the incentive is still deducted in full from the remittance.
+- **Deductions (ACSL 2.9.2).** `DeductionService` (prepare / change / submit with the insurer's confirmation
+  reference and date / confirm by another user) and `DeductionPosting`: at approval the CONFIRMED deductions of
+  the batch's insurer and currency are consumed oldest first, the total capped at the amount payable (net due less
+  the incentives); each part is posted as `OPS_REMIT_DEDUCTION` (`RMB:<ref>:<deduction no>`, AMOUNT) and recorded
+  in `rem_deduction_application`. The payment request is for `amountDue()` = payable less deductions; when the
+  deductions take everything the batch is settled without a request (disbursement status NOT_REQUIRED, invoices
+  remitted, `dv_full` / `dv_partial`). Whether a deduction may span batches and which sources exist wait for AQ23.
+- **Cancelled DV (DIS 2.20.0).** `DisbursementFeedback` handles `DisbursementStatusChanged` CANCELLED (reason = the
+  event's reason) for a batch APPROVED, PARTIALLY_REMITTED or FULLY_REMITTED: `BatchCancellation` reverses the
+  cycle with the opposite sign (`<ref>:CANCEL` for `OPS_REMITTANCE` per line, `OPS_REMIT_INCENTIVE`,
+  `OPS_REMIT_CPC2` and each deduction, which gets its amount back), posts a negative REMITTED movement per
+  invoice, puts the invoices back in REVIEW_IN_PROCESS with the remittance lock, records the cancelled DV and
+  moves the batch to REVIEW_IN_PROCESS (`dv_cancelled`) with the next send cycle. Approving it again sends a new
+  request and new postings under `<batch>/R<n>` (the gateway and the accounting are idempotent per reference);
+  the ORs and the early-incentive SI are issued once per batch. Events of an earlier request are ignored. When
+  another team locked one of the invoices since, the batch is left as it is and the processors are notified.
+- **Payment request.** Built with `Spec.routed(<ref>, INSURER, REMITTANCE, <root invoice when the batch has one
+  family>, straight to approver)` and `Spec.withReferences(List.of(), List.of("RMB:<ref>"))`.
+- **Root invoice (DIS 3.27.2).** `BookedInvoice.root_invoice_no` is set at booking: the invoice itself for an
+  original booking, else its parent (endorsements and cancellations always name the original booking), which is
+  the ledger's `ops_invoice.root_invoice_no` by construction; `InvoiceBooked.rootInvoiceNo` (27-argument
+  constructor kept) and the booking invoice DTO expose it.
+- **Invoice 360 and search.** `LedgerSearch` gains `assured`, `inceptionFrom`, `inceptionTo`, `aoUsername` (the
+  11-argument constructor is kept); `GET /api/v1/ops/invoices` takes `assured`, `inceptionFrom`, `inceptionTo`,
+  `ao`, and the summary gains `inceptionDate`, `aoUsername`, `rootInvoiceNo`. The Invoice 360 has an Invoice
+  Family tab over `GET /api/v1/ops/invoices/{no}/family` with the family totals, and a Root Invoice chip.
+- **API.** `/api/v1/remittance/deductions` (list, get, `{id}/applications`, `by-batch/{batchId}`, `pending`,
+  create, update, `{id}/submit`, `{id}/confirm`; cancel and return through the workflow panel); the batch DTO
+  gains `settlement` (deductions, amount due, send cycle, reference, SI, cancelled DV), line `cpc2Code` /
+  `cpc2Rate` and amounts `cpc2` / `cpc2Vat`.
+- **Screens.** Remittance Deductions (work list and record with workflow, batches and the insurer's confirmation
+  documents) in the Remittance section; the batch record's Settlement tab and CPC2 column / totals; the Invoice
+  Search filters (assured, account officer, inception dates) and columns; the Invoice 360 Invoice Family tab; the
+  booking invoice Root Invoice chip; the `ON_INCENTIVE` trigger on the service invoice types.
+- **Demo.** `remittance.demo.DeductionDemoData` (`@Order(98)`): `acsl` records and submits an INS-LAC deduction
+  that waits for `acsltl`.
+- **Tests.** `RemittanceSettlementIT` (CPC2 posted, SI with 2% WTAX and manual issue refused, deduction consumed,
+  capped and applied after the insurer OR, cancelled DV restores the batch and it is sent again),
+  `OperationsSettlementApiIT`, `RemittanceRulesTest` (CPC2), `EndorsementIT` (root invoice). Tests changed outside
+  the module: none.

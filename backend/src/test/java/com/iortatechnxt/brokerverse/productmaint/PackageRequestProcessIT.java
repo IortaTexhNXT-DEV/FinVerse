@@ -91,8 +91,7 @@ class PackageRequestProcessIT {
     return new PackageTerms(
         List.of(new PackageTerms.Section("Target market", "Corporate fleet owners")),
         List.of(
-            coverage("OD_THEFT", "2500000", "PHP 5,000 each loss"),
-            coverage("PD", "500000", null)),
+            coverage("OD_THEFT", "2500000", "PHP 5,000 each loss"), coverage("PD", "500000", null)),
         new Scheme(new BigDecimal("0.35"), new BigDecimal("15000"), BigDecimal.TEN, null, null),
         new Dates(START, START, START.plusYears(1).minusDays(1), null),
         Arrays.stream(insurers).map(InsurerLine::target).toList());

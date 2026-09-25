@@ -47,6 +47,9 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'NEGOTIATED',
     'DEBITED',
     'CREDITED',
+    // accounting reports: service fee and certificates received
+    'LIQUIDATED',
+    'RECORDED',
   ],
   warning: [
     'PENDING_AUTHORIZATION',
@@ -124,6 +127,9 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'PRINTED',
     'EMAILED',
     'EXTRACTED',
+    // accounting reports: computed service fee, schedule layout to confirm
+    'COMPUTED',
+    'TO_CONFIRM',
   ],
   neutral: [
     'DRAFT',

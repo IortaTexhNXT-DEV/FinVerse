@@ -360,3 +360,63 @@ sections above. U1-A and U1-B build on this.
 - **Jobs.** `brokerverse.jobs.uam-effective-changes-cron` `0 5 16 * * *` (00:05 PHT) and
   `password-expiry-notice-cron` `0 0 22 * * *` (06:00 PHT) in `application.yml` and `CONFIGURATION.md`.
 - **Flyway left to the build waves.** U1-A V1062 and demo V1960; V1063-V1069 and V1961-V1969 free.
+
+## 17. U1-A request lifecycle and screens: as built
+
+What wave U1-A built on the U0 foundation, and where it differs from or details sections 4-11.
+
+- **Port first (decision D7).** `nbadmin.service.ExternalUserProvisioner` (`available()`, `validate(action, account)`,
+  `create`, `disable`, `enable` with `ExternalUserAccount(requestNo, username, fullName, email, partyKind, partyCode,
+  portalRole, approvedBy)`) and its refusing default `NbadminPortDefaults.noExternalUsers()`
+  (`@ConditionalOnMissingBean`; every call throws `EXTERNAL_USERS_NOT_AVAILABLE`). `portal` (EB E1-A) registers a bean
+  of the interface; `nbadmin` never depends on `portal`. The port is also called on submission (`validate`), so an
+  EXTERNAL request is refused before it reaches an approver. Enums `AccessUserType` and `ExternalPartyKind` are in
+  `nbadmin.domain`.
+- **Migration `V1062__nbadmin_request_lifecycle.sql`.** The columns, statuses and types of section 4.2 (with
+  `reason_code`, `unlock_account`, `cancelled_by/at` and `apply_error` in addition); `nba_access_request_approver`
+  (unique sequence per request, deferred so a resubmission replaces the list), `nba_access_request_event` (insert-only
+  trigger; the history of the requests created before the release is back-filled), `nba_access_request_batch`;
+  `sec_access_change_log.subject_type` + EXTERNAL_USER; BULK_PROCESS for UAM_REQUESTOR (the bulk file goes through
+  the bulk upload framework); retention rule ACCESS_REQUEST (CANCELLED, REJECTED; REVIEW only). **Switches:**
+  `UAM_DIRECT_ROLE_EDIT` = false and `UAM_ROLE_APPLY_ON_APPROVAL` = false (sections 8 and FRS 9.1).
+- **Lifecycle (`nbadmin.service`).** `AccessRequestService` (drafts with format checks, edit, submit / resubmit with
+  the chosen approvers, visibility, work-list tabs MINE / ASSIGNED / SECOND / IMPLEMENTATION / ALL),
+  `AccessDecisionService` (approve in order, second approval, reject; applies now, SCHEDULED or FOR_IMPLEMENTATION),
+  `AccessRequestReturnService` (return, compatible resubmit, cancel), `AccessImplementationService` (implement; the
+  adapter of the security port `ApprovedRoleRequests`), `AccessScheduledChanges` + job `UAM_EFFECTIVE_CHANGES`,
+  `AccessRiskRules` + `WorkingHours` (PRIVILEGE_INCREASE: a new HIGH / ADMIN profile for a user, a new HIGH / ADMIN
+  profile, a level raised to HIGH / ADMIN, the reactivation of a HIGH / ADMIN profile; OUTSIDE_HOURS in Philippine
+  time), `AccessApprovers`, `AccessRequestHistory` (event + audit trail), `AccessRequestNotifier` (the events of
+  section 8; the affected user also by e-mail), `AccessBatchService` and the bulk handler
+  `nbadmin.service.bulk.AccessRequestBulkHandler` (`UAM_ACCESS_REQUEST`).
+- **Compatibility.** `POST /access-requests` without approvers still creates and submits in one call (PMADD05
+  screens); such a request has no chosen approver and any holder of ACCESS_APPROVE decides it. With approvers, or with
+  `?draft=true`, the BRD-11 lifecycle applies. The request endpoints check the type permission or ACCESS_REQUEST.
+- **Implementation (PQ17).** Two paths close a FOR_IMPLEMENTATION request: `POST /access-requests/{id}/implement`
+  (the Roles screen "Implement Request" and the request page) applies the approved change; and a role change made
+  with `?requestNo=` on `/admin/roles` (`RoleEditGuard` asks `ApprovedRoleRequests.approverOf`, which knows only
+  FOR_IMPLEMENTATION requests of that role, never for their requester). Both publish
+  `security.service.RoleChangedOnRequest(requestNo, roleCode, actor)` from `UserAdminService` (new event, in the
+  transaction of the change) and `AccessImplementationService` marks the request IMPLEMENTED.
+- **Endpoints (`/api/v1/nbadmin`).** `GET access-requests` (scope, status, type, text, requester, approver, from, to,
+  groupProfiles, page), `GET access-requests/{id}`, `GET .../{id}/history`, `POST access-requests[?draft=true]`,
+  `PUT .../{id}`, `POST .../{id}/submit`, `.../approve`, `.../second-approve`, `.../reject`, `.../return`,
+  `.../resubmit`, `.../cancel`, `.../implement`, `GET approvers?userType=&subject=`, `GET access-settings`,
+  `GET access-batches`, `GET access-batches/{id}`, `GET .../{id}/lines`, `POST .../{id}/submit | approve | reject |
+  return | cancel`. The bulk file itself is uploaded through `/api/v1/bulk/jobs` (handler `UAM_ACCESS_REQUEST`), not
+  a separate multipart endpoint.
+- **Screens.** User Access: Access Requests (`/user-access/requests`, tabs), New / Edit Request
+  (`/user-access/requests/new`, `/:id/edit`), request page (`/user-access/requests/:id`: summary, actions, tabs
+  Details / Approvers / History), Group Profile Requests (`/user-access/group-profiles`), Bulk Request
+  (`/user-access/bulk`, batch page `/user-access/bulk/:id`), User Access Matrix (`/user-access/matrix`). The old
+  Broking Setup routes redirect. Administration > Users: Windows ID, business unit, user level, status filter,
+  "Raise Request" (direct create / edit only while `UAM_DIRECT_ROLE_EDIT` is open); Roles & Permissions: privilege
+  level, active flag, "Approved Requests to Implement", read-only matrix unless the emergency path is open.
+- **Demo `V1960__demo_user_access.sql`.** Users `requestor`, `uamapprover`, `secapprover` and subject users
+  a013000101-104; requests AR-DEMO-000001-000008 in every status and the batch BLK-DEMO-000001 of three lines; change
+  log rows of the applied enrolment. It opens `UAM_WORKING_HOURS` to the whole week in the demo and test database
+  (the automated tests run at any hour); the delivered value stays 08:00-18:00,MON-FRI in V1060.
+- **Parked / not built.** A scheduled enrolment creates the user with a password that is never shown: the System
+  Administrator resets it (the self-service reset is U1-B). Business unit and user level codes are not checked against
+  their lists (empty until UQ05). A deactivation with members is allowed (UQ16). Members of a deactivated or changed
+  profile are not notified one by one (the requester is). The five reports are U1-B.

@@ -958,7 +958,7 @@ class BdoiDocument:
         if isinstance(brd_refs, str):
             brd_refs = [brd_refs]
         pairs = [
-            ("BRD trace", ", ".join(brd_refs)),
+            ("BRD trace", ", ".join(str(ref) for ref in brd_refs)),
             ("Actor", fr.get("actor", "")),
             ("Priority", fr.get("priority", "Must have")),
             ("Fit", fr.get("fit", "")),
@@ -1300,7 +1300,8 @@ def render_body(doc: BdoiDocument, lines: list[str]) -> None:
             flush_para()
             rows = []
             while i < n and lines[i].strip().startswith("|"):
-                cells = [c.strip() for c in lines[i].strip().strip("|").split("|")]
+                row_text = lines[i].strip().removeprefix("|").removesuffix("|")
+                cells = [c.strip().replace("\\|", "|") for c in re.split(r"(?<!\\)\|", row_text)]
                 rows.append(cells)
                 i += 1
             header, body_rows = rows[0], [r for r in rows[1:] if not all(re.fullmatch(r":?-{2,}:?", c) for c in r)]
@@ -1462,6 +1463,10 @@ def lint_source(src: str | Path) -> list[str]:
         for key in ("id", "title", "brd", "actor", "description", "main_flow", "acceptance"):
             if not fr.get(key):
                 problems.append(f"{rid}: missing '{key}'")
+        brd_refs = fr.get("brd")
+        for ref in brd_refs if isinstance(brd_refs, list) else []:
+            if not isinstance(ref, str):
+                problems.append(f"{rid}: brd item read as {type(ref).__name__} (quote it): {ref}")
         for key, width in FR_ROW_WIDTHS.items():
             for row in fr.get(key) or []:
                 if not isinstance(row, list) or len(row) != width:

@@ -27,7 +27,9 @@ function RoleHeaders({ roles }: Readonly<{ roles: MatrixRole[] }>) {
       {roles.map((r) => (
         <th key={r.code} scope="col" title={r.name}>
           {r.code}
-          <div className="muted">{r.enabledUsers} users</div>
+          <div className="muted">
+            {r.enabledUsers} {r.enabledUsers === 1 ? 'user' : 'users'}
+          </div>
         </th>
       ))}
     </>

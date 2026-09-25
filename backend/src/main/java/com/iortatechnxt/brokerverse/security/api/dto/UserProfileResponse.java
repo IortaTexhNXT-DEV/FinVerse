@@ -22,7 +22,12 @@ import java.util.stream.Collectors;
  * @param authorizationLimit authorization limit
  * @param lastLoginAt last login
  * @param roles role codes
- * @param permissions effective permissions
+ * @param permissions effective permissions (active roles only)
+ * @param windowsId Windows ID (directory sign-in)
+ * @param businessUnitCode business unit group
+ * @param userLevel user level
+ * @param mustChangePassword true when the password was set by an administrator
+ * @param lastLogoutAt last sign-out
  */
 public record UserProfileResponse(
     Long id,
@@ -35,7 +40,12 @@ public record UserProfileResponse(
     BigDecimal authorizationLimit,
     Instant lastLoginAt,
     Set<String> roles,
-    Set<Permission> permissions) {
+    Set<Permission> permissions,
+    String windowsId,
+    String businessUnitCode,
+    String userLevel,
+    boolean mustChangePassword,
+    Instant lastLogoutAt) {
 
   /**
    * Maps an entity.
@@ -55,6 +65,11 @@ public record UserProfileResponse(
         u.getAuthorizationLimit(),
         u.getLastLoginAt(),
         u.getRoles().stream().map(Role::getCode).collect(Collectors.toCollection(TreeSet::new)),
-        u.effectivePermissions());
+        u.effectivePermissions(),
+        u.getWindowsId(),
+        u.getBusinessUnitCode(),
+        u.getUserLevel(),
+        u.isMustChangePassword(),
+        u.getLastLogoutAt());
   }
 }

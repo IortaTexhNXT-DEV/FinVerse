@@ -251,5 +251,52 @@ public enum Permission {
   ACSL_REPORT_EXPORT,
   REMIT_DEDUCTION_CONFIRM,
   // Employee / cost-centre master (DIS 3.30.1)
-  EMPLOYEE_MAINTAIN
+  EMPLOYEE_MAINTAIN,
+
+  // Sanction Screening and Risk Profiling (BDOI BRD-10). See
+  // docs/architecture/SANCTION_SCREENING_DESIGN.md section 6.1 and V1050.
+  // Cases, the client screening tab and the watchlists (read)
+  SCR_VIEW,
+  // Versioned configuration: draft / submit (SNSRP-101-108) and approve / reject (SNSRP-109)
+  SCR_CONFIG_MAINTAIN,
+  SCR_CONFIG_APPROVE,
+  // Watchlist entries and list files: maintain (SNSRP-203) and approve changes (SNSRP-204)
+  SCR_LIST_MAINTAIN,
+  SCR_LIST_APPROVE,
+  // Investigation: reviews, documents, dispositions (SNSRP-501, 502, 601)
+  SCR_INVESTIGATE,
+  // Manual risk-tag update with justification (SNSRP-304)
+  SCR_RISK_TAG,
+  // Case re-assignment (SNSRP-404)
+  SCR_CASE_ASSIGN,
+  // Unit Head approval (SNSRP-702), BU escalation review and STR preparation (SNSRP-703, 705)
+  SCR_CASE_APPROVE,
+  SCR_COMPLIANCE_REVIEW,
+  // AML Committee vote (SNSRP-704)
+  SCR_COMMITTEE,
+  // STR extraction and filing reference (SNSRP-706)
+  SCR_STR_EXTRACT,
+  // Compliance reports and export (SNSRP-901); screening audit log (SNSRP-903)
+  SCR_REPORT_VIEW,
+  SCR_AUDIT_VIEW,
+
+  // User Access Maintenance (BDOI BRD-11, BRD 4.002.2). See
+  // docs/architecture/USER_ACCESS_DESIGN.md section 6.1 and V1060. ACCESS_REQUEST and
+  // ACCESS_APPROVE (above) stay: the umbrella request permission and the approver permission.
+  // 1-4. Enroll, modify, deactivate and reactivate users by request
+  UAM_ENROLL,
+  UAM_MODIFY,
+  UAM_DEACTIVATE,
+  UAM_REACTIVATE,
+  // 5. Apply a correction to a returned request; 6. cancel a request
+  UAM_CORRECT,
+  UAM_CANCEL,
+  // 7. View requests
+  UAM_VIEW,
+  // 9. Group-profile (role) requests
+  UAM_GROUP_REQUEST,
+  // 10. User access reports
+  UAM_REPORT_VIEW,
+  // Second approval of privileged or out-of-hours changes (UAM-NFR-40)
+  UAM_SECOND_APPROVE
 }

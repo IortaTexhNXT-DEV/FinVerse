@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.security.api.dto.LoginResponse;
 import com.iortatechnxt.brokerverse.security.api.dto.UserProfileResponse;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
+import com.iortatechnxt.brokerverse.security.domain.SessionEndReason;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,7 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
  * the parameter is missing) lock the account until an administrator unlocks it. Failures are
  * counted on the shared counter ({@link LoginAttemptTracker}) so concurrent attempts on several
  * instances all count; the user record keeps the count. Logout revokes the token ({@link
- * TokenRevocationStore}). Every success, failure and logout is written to the audit trail.
+ * TokenRevocationStore}). Every success, failure and logout is written to the audit trail, and
+ * every issued token opens a session in the session log that the logout ends ({@link
+ * UserSessionLog}, UAM-NFR-35).
  */
 @Service
 public class AuthService {
@@ -40,6 +43,7 @@ public class AuthService {
   private final Clock clock;
   private final LoginAttemptTracker attempts;
   private final TokenRevocationStore revocations;
+  private final UserSessionLog sessions;
 
   /**
    * Creates the service.
@@ -53,6 +57,7 @@ public class AuthService {
    * @param clock clock
    * @param attempts shared failed-login counter
    * @param revocations token denylist
+   * @param sessions session log
    */
   public AuthService(
       AuthenticationManager authenticationManager,
@@ -63,7 +68,8 @@ public class AuthService {
       SecurityProperties properties,
       Clock clock,
       LoginAttemptTracker attempts,
-      TokenRevocationStore revocations) {
+      TokenRevocationStore revocations,
+      UserSessionLog sessions) {
     this.authenticationManager = authenticationManager;
     this.users = users;
     this.tokens = tokens;
@@ -73,6 +79,7 @@ public class AuthService {
     this.clock = clock;
     this.attempts = attempts;
     this.revocations = revocations;
+    this.sessions = sessions;
   }
 
   /**
@@ -120,12 +127,13 @@ public class AuthService {
     audit.recordIndependently(
         user.getUsername(), ENTITY, user.getUsername(), AuditAction.LOGIN, "Logged in");
     JwtTokenService.IssuedToken token = tokens.issue(user.getUsername());
+    sessions.open(token.tokenId(), user.getUsername(), token.expiresAt());
     return new LoginResponse(token.token(), token.expiresAt(), UserProfileResponse.from(user));
   }
 
   /**
-   * Signs the caller out: the token is revoked until it expires (every instance refuses it) and the
-   * logout is audited (UAM-NFR-35).
+   * Signs the caller out: the token is revoked until it expires (every instance refuses it), its
+   * session is ended, the sign-out time is kept on the user and the logout is audited (UAM-NFR-35).
    *
    * @param token the caller's bearer token
    */
@@ -136,6 +144,10 @@ public class AuthService {
     if (claims.tokenId() != null && claims.expiresAt() != null) {
       revocations.revoke(claims.tokenId(), claims.username(), claims.expiresAt());
     }
+    sessions.end(claims.tokenId(), SessionEndReason.LOGOUT);
+    users
+        .findByUsernameIgnoreCase(claims.username())
+        .ifPresent(u -> u.recordLogout(clock.instant()));
     audit.record(ENTITY, claims.username(), AuditAction.LOGOUT, "Logged out");
   }
 }

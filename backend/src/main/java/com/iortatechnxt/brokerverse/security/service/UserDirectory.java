@@ -29,7 +29,8 @@ public class UserDirectory {
   }
 
   /**
-   * Returns the role codes of a user.
+   * Returns the codes of the active roles of a user; a deactivated role counts as not held (BRD
+   * 3.002.3).
    *
    * @param username user
    * @return role codes (empty for unknown users, e.g. SYSTEM)
@@ -37,7 +38,12 @@ public class UserDirectory {
   public Set<String> roleCodes(String username) {
     return users
         .findByUsernameIgnoreCase(username)
-        .map(u -> u.getRoles().stream().map(Role::getCode).collect(Collectors.toSet()))
+        .map(
+            u ->
+                u.getRoles().stream()
+                    .filter(Role::isActive)
+                    .map(Role::getCode)
+                    .collect(Collectors.toSet()))
         .orElse(Set.of());
   }
 

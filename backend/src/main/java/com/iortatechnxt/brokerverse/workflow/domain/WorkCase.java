@@ -91,6 +91,16 @@ public class WorkCase extends BaseEntity {
   }
 
   /**
+   * Replaces the due time of the current stage (a dated SLA matrix of the business module, e.g. the
+   * screening SLA matrix, SNSRP-108).
+   *
+   * @param newDueAt new due time; null removes the SLA of the stage
+   */
+  public void overrideDue(Instant newDueAt) {
+    this.dueAt = newDueAt;
+  }
+
+  /**
    * Assigns the case (null releases it to the team queue).
    *
    * @param username assignee

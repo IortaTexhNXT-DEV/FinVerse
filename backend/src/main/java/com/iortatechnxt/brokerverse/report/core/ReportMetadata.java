@@ -127,6 +127,29 @@ public record ReportMetadata(
   }
 
   /**
+   * A Compliance report (SANCTION_SCREENING_DESIGN section 11.1, SNSRP-901 / 903): viewed and
+   * exported with {@code SCR_REPORT_VIEW}, archived.
+   *
+   * @param code report code (e.g. {@code SCR-CASE-STATUS})
+   * @param title title
+   * @param description one line purpose
+   * @param parameters parameters
+   * @return metadata in the Compliance category
+   */
+  public static ReportMetadata compliance(
+      String code, String title, String description, List<ParameterSpec> parameters) {
+    return new ReportMetadata(
+        code,
+        title,
+        ReportCategory.COMPLIANCE,
+        description,
+        parameters,
+        Permission.SCR_REPORT_VIEW,
+        Permission.SCR_REPORT_VIEW,
+        true);
+  }
+
+  /**
    * An ACSL report (ACCOUNTING_DISBURSEMENT_DESIGN section 10, Appendix C): viewed with {@code
    * ACSL_REPORT_VIEW}, exported with {@code ACSL_REPORT_EXPORT}, archived.
    *

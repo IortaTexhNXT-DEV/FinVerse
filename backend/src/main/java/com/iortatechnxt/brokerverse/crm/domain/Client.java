@@ -256,6 +256,24 @@ public class Client extends BaseEntity {
   }
 
   /**
+   * Sets the KYC risk rating from risk profiling (SNSRP-302, 304) without touching the other
+   * profile fields; a review date earlier than the current one brings the periodic KYC review
+   * forward (BRNB.110).
+   *
+   * @param code risk rating (list of values KYC_RISK_RATING)
+   * @param reviewDue review date implied by the new rating, null to keep the current one
+   */
+  public void applyRiskRating(String code, LocalDate reviewDue) {
+    if (status == ClientStatus.INACTIVE) {
+      throw new BusinessRuleException("CLIENT_INACTIVE", "An inactive client cannot be changed");
+    }
+    this.riskRating = code;
+    if (reviewDue != null && (kycReviewDue == null || reviewDue.isBefore(kycReviewDue))) {
+      this.kycReviewDue = reviewDue;
+    }
+  }
+
+  /**
    * The KYC profile.
    *
    * @return profile

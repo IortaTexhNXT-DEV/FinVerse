@@ -20,6 +20,10 @@ import java.util.Set;
  * <p>Carries the security controls required by the GL: account lockout after repeated failed
  * logins, a home branch, and an authorization limit capping the value of batches the user may
  * authorize.
+ *
+ * <p>BRD-11 adds the directory identity (Windows ID), the business unit group and user level (BRD
+ * 1.002.1.1.1), the password dates and the forced change flag (UAM-NFR-36) and the last sign-out
+ * (UAM-NFR-35). Deactivated roles grant nothing (BRD 3.002.3).
  */
 @Entity
 @Table(name = "sec_user")
@@ -55,6 +59,24 @@ public class AppUser extends BaseEntity {
   @Column(name = "authorization_limit", precision = 19, scale = 2)
   private BigDecimal authorizationLimit;
 
+  @Column(name = "windows_id", length = 50)
+  private String windowsId;
+
+  @Column(name = "business_unit_code", length = 40)
+  private String businessUnitCode;
+
+  @Column(name = "user_level", length = 40)
+  private String userLevel;
+
+  @Column(name = "password_changed_at")
+  private Instant passwordChangedAt;
+
+  @Column(name = "must_change_password", nullable = false)
+  private boolean mustChangePassword;
+
+  @Column(name = "last_logout_at")
+  private Instant lastLogoutAt;
+
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "sec_user_role",
@@ -78,14 +100,38 @@ public class AppUser extends BaseEntity {
   }
 
   /**
-   * Collects the permissions granted by all roles.
+   * Collects the permissions granted by the active roles; a deactivated role grants nothing (BRD
+   * 3.002.3).
    *
    * @return effective permissions
    */
   public Set<Permission> effectivePermissions() {
     Set<Permission> result = EnumSet.noneOf(Permission.class);
-    roles.forEach(r -> result.addAll(r.getPermissions()));
+    roles.stream().filter(Role::isActive).forEach(r -> result.addAll(r.getPermissions()));
     return result;
+  }
+
+  /**
+   * Records a password change: the change time and whether the user must change it at the next
+   * sign-in (after an administrator reset or on creation; UAM-NFR-36).
+   *
+   * @param newHash BCrypt hash of the new password
+   * @param when change time
+   * @param mustChange true when the password was set by someone else
+   */
+  public void changePassword(String newHash, Instant when, boolean mustChange) {
+    this.passwordHash = newHash;
+    this.passwordChangedAt = when;
+    this.mustChangePassword = mustChange;
+  }
+
+  /**
+   * Records a sign-out (UAM-NFR-35).
+   *
+   * @param when sign-out time
+   */
+  public void recordLogout(Instant when) {
+    this.lastLogoutAt = when;
   }
 
   /**
@@ -189,6 +235,42 @@ public class AppUser extends BaseEntity {
 
   public void setAuthorizationLimit(BigDecimal authorizationLimit) {
     this.authorizationLimit = authorizationLimit;
+  }
+
+  public String getWindowsId() {
+    return windowsId;
+  }
+
+  public void setWindowsId(String windowsId) {
+    this.windowsId = windowsId;
+  }
+
+  public String getBusinessUnitCode() {
+    return businessUnitCode;
+  }
+
+  public void setBusinessUnitCode(String businessUnitCode) {
+    this.businessUnitCode = businessUnitCode;
+  }
+
+  public String getUserLevel() {
+    return userLevel;
+  }
+
+  public void setUserLevel(String userLevel) {
+    this.userLevel = userLevel;
+  }
+
+  public Instant getPasswordChangedAt() {
+    return passwordChangedAt;
+  }
+
+  public boolean isMustChangePassword() {
+    return mustChangePassword;
+  }
+
+  public Instant getLastLogoutAt() {
+    return lastLogoutAt;
   }
 
   /**

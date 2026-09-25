@@ -19,7 +19,8 @@ public enum ReportCategory {
   DISBURSEMENT("Disbursement"),
   PAYMENT_REQUESTS("Refund & Cash Advance Requests"),
   ACSL("ACSL"),
-  FRBS("BDOI Report Pack");
+  FRBS("BDOI Report Pack"),
+  COMPLIANCE("Compliance");
 
   private final String label;
 

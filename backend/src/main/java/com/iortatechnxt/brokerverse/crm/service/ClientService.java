@@ -13,8 +13,10 @@ import com.iortatechnxt.brokerverse.crm.domain.ClientStatus;
 import com.iortatechnxt.brokerverse.crm.domain.ClientType;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,6 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
  * Client master (core): prospect creation, lookup and update. Other broking modules use {@link
  * #get}, {@link #requireByCode} and {@link #requireUsable}; onboarding (KYC verification and
  * confirmation), duplicate checks, tags and instructions extend this service in the crm module.
+ *
+ * <p>Events (SANCTION_SCREENING_DESIGN section 9): {@link ClientRegistered} when a client is
+ * created and {@link ClientIdentityChanged} when an update changes the name, birth date,
+ * nationality, TIN or ID document; both are published inside the transaction.
  */
 @Service
 @Transactional
@@ -41,6 +47,7 @@ public class ClientService {
   private final DuplicateCheckService duplicates;
   private final ClientWorkflow workflow;
   private final AuditTrailService audit;
+  private final ApplicationEventPublisher events;
   private final Clock clock;
 
   /**
@@ -52,6 +59,7 @@ public class ClientService {
    * @param duplicates duplicate detection
    * @param workflow onboarding workflow
    * @param audit audit trail
+   * @param events event publisher
    * @param clock clock
    */
   public ClientService(
@@ -61,6 +69,7 @@ public class ClientService {
       DuplicateCheckService duplicates,
       ClientWorkflow workflow,
       AuditTrailService audit,
+      ApplicationEventPublisher events,
       Clock clock) {
     this.clients = clients;
     this.numbers = numbers;
@@ -68,6 +77,7 @@ public class ClientService {
     this.duplicates = duplicates;
     this.workflow = workflow;
     this.audit = audit;
+    this.events = events;
     this.clock = clock;
   }
 
@@ -101,6 +111,8 @@ public class ClientService {
     Client saved = clients.save(client);
     workflow.start(saved);
     audit.record(ENTITY, code, AuditAction.CREATE, "Prospect " + saved.getDisplayName());
+    events.publishEvent(
+        new ClientRegistered(companyId, saved.getId(), code, saved.getClientType()));
     return saved;
   }
 
@@ -131,6 +143,7 @@ public class ClientService {
         DuplicateProbe.of(details),
         id,
         "update of " + client.getCode() + " " + nameOf(details));
+    List<Object> identityBefore = identityOf(client);
     client.update(details);
     client.applyProfile(profile);
     workflow.describe(client);
@@ -139,7 +152,24 @@ public class ClientService {
         client.getProspectCode(),
         AuditAction.UPDATE,
         "Updated " + client.getCode() + " " + client.getDisplayName());
+    if (!identityBefore.equals(identityOf(client))) {
+      events.publishEvent(new ClientIdentityChanged(client.getCompanyId(), client.getId()));
+    }
     return client;
+  }
+
+  /** What identifies a client for screening: names, birth date, nationality, TIN and ID. */
+  private static List<Object> identityOf(Client c) {
+    return Arrays.asList(
+        c.getLastName(),
+        c.getFirstName(),
+        c.getMiddleName(),
+        c.getCorporateName(),
+        c.getBirthDate(),
+        c.profile().nationality(),
+        c.getTin(),
+        c.getIdType(),
+        c.getIdNumber());
   }
 
   private static String nameOf(ClientDetails details) {

@@ -251,6 +251,20 @@ brokerverse:
     disb-eod-reports-cron: ${BROKERVERSE_JOB_DISB_EOD_REPORTS_CRON:-}
     # Daily GL-SL reconciliation of the control accounts (ACSL 2.13.2), 20:00 PHT.
     acsl-gl-sl-recon-cron: ${BROKERVERSE_JOB_ACSL_GL_SL_RECON_CRON:0 0 12 * * *}
+    # ---- Sanction Screening (BRD-10), docs/architecture/SANCTION_SCREENING_DESIGN.md section 8 (PHT = UTC+8) ----
+    # Watchlist ingestion of every active source through its WatchlistFeed (SNSRP-201), 01:00 PHT.
+    scr-watchlist-ingest-cron: ${BROKERVERSE_JOB_SCR_WATCHLIST_INGEST_CRON:0 0 17 * * *}
+    # Delta screening of the in-scope clients; full rescreen on SCR_FULL_RESCREEN_DAY (SNSRP-301), 01:30 PHT.
+    scr-periodic-screening-cron: ${BROKERVERSE_JOB_SCR_PERIODIC_SCREENING_CRON:0 30 17 * * *}
+    # Case SLA reminders, breaches and escalations; missing-document reminders (SNSRP-405, 802), hourly.
+    scr-sla-monitor-cron: ${BROKERVERSE_JOB_SCR_SLA_MONITOR_CRON:0 0 * * * *}
+    # Digest of failed watchlist records to SCR_INGEST_ALERT_RECIPIENTS (SNSRP-202), 07:00 PHT Monday to Friday.
+    scr-ingest-error-digest-cron: ${BROKERVERSE_JOB_SCR_INGEST_ERROR_DIGEST_CRON:0 0 23 * * SUN-THU}
+    # ---- User Access Maintenance (BRD-11), docs/architecture/USER_ACCESS_DESIGN.md section 8 ----
+    # Applies SCHEDULED access requests whose effective date is reached (UAM-NFR-14), 00:05 PHT.
+    uam-effective-changes-cron: ${BROKERVERSE_JOB_UAM_EFFECTIVE_CHANGES_CRON:0 5 16 * * *}
+    # LOCAL sign-in: notifies users whose password expires within 7 days (UAM-NFR-36), 06:00 PHT.
+    password-expiry-notice-cron: ${BROKERVERSE_JOB_PASSWORD_EXPIRY_NOTICE_CRON:0 0 22 * * *}
 
 management:
   health:

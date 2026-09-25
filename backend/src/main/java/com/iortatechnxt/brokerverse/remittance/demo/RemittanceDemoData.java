@@ -13,12 +13,17 @@ import com.iortatechnxt.brokerverse.remittance.service.HoldService;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,11 +42,15 @@ public class RemittanceDemoData implements ApplicationRunner {
   private static final String HELD_ARN = "ARN-2026-940004";
   private static final int HOLD_DAYS = 30;
 
+  /** Demo Marketing Collection user who requests the hold (holds HOLD_REQUEST). */
+  private static final String HOLD_REQUESTER = "mktcoll";
+
   private final ExtractionRunRepository runs;
   private final ExtractionService extraction;
   private final HoldService holds;
   private final InvoiceLedgerQueryService ledger;
   private final Clock clock;
+  private final UserDetailsService users;
 
   /**
    * Creates the loader.
@@ -51,18 +60,21 @@ public class RemittanceDemoData implements ApplicationRunner {
    * @param holds hold requests
    * @param ledger ledger reads
    * @param clock clock
+   * @param users demo users (the hold is requested by Marketing Collection)
    */
   public RemittanceDemoData(
       ExtractionRunRepository runs,
       ExtractionService extraction,
       HoldService holds,
       InvoiceLedgerQueryService ledger,
-      Clock clock) {
+      Clock clock,
+      UserDetailsService users) {
     this.runs = runs;
     this.extraction = extraction;
     this.holds = holds;
     this.ledger = ledger;
     this.clock = clock;
+    this.users = users;
   }
 
   @Override
@@ -76,15 +88,18 @@ public class RemittanceDemoData implements ApplicationRunner {
   private void seed(OpsInvoice invoice) {
     LocalDate today = LocalDate.now(clock);
     try {
-      holds.create(
-          invoice.getCompanyId(),
-          invoice.getInvoiceNo(),
-          new Terms(
-              "OTHERS",
-              "Demo: client disputes the premium; hold until Marketing confirms (OQ24)",
-              today.plusDays(HOLD_DAYS)),
-          true,
-          RequestSource.SCREEN);
+      as(
+          HOLD_REQUESTER,
+          () ->
+              holds.create(
+                  invoice.getCompanyId(),
+                  invoice.getInvoiceNo(),
+                  new Terms(
+                      "OTHERS",
+                      "Demo: client disputes the premium; hold until Marketing confirms (OQ24)",
+                      today.plusDays(HOLD_DAYS)),
+                  true,
+                  RequestSource.SCREEN));
     } catch (RuntimeException ex) {
       LOG.warn("Remittance demo hold skipped: {}", ex.getMessage());
     }
@@ -92,5 +107,18 @@ public class RemittanceDemoData implements ApplicationRunner {
         extraction.run(
             invoice.getCompanyId(), new Scope(ExtractionTrigger.MANUAL, null, null, null), today);
     LOG.info("Remittance demo data: extraction {} - {}", run.getRunNo(), run.getMessage());
+  }
+
+  private <T> T as(String username, Supplier<T> action) {
+    Authentication previous = SecurityContextHolder.getContext().getAuthentication();
+    var details = users.loadUserByUsername(username);
+    SecurityContextHolder.getContext()
+        .setAuthentication(
+            new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities()));
+    try {
+      return action.get();
+    } finally {
+      SecurityContextHolder.getContext().setAuthentication(previous);
+    }
   }
 }

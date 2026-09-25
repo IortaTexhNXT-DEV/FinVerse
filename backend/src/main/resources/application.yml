@@ -125,6 +125,11 @@ brokerverse:
     dp-feedback-sla-cron: ${BROKERVERSE_JOB_DP_FEEDBACK_SLA_CRON:0 30 1 * * *}
 
 management:
+  health:
+    mail:
+      # The SMTP check is meaningful only when real delivery is on; with simulated delivery it would
+      # report DOWN and take the whole health endpoint (load balancer checks) down with it.
+      enabled: ${BROKERVERSE_MAIL_ENABLED:false}
   endpoints:
     web:
       exposure:

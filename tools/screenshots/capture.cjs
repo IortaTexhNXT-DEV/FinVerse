@@ -12,6 +12,9 @@ const SCREENS = require('./screens.cjs');
 const ROOT = path.resolve(__dirname, '../..');
 const OUT = path.join(ROOT, 'docs/design/screenshots');
 const BASE = process.env.BASE || 'http://localhost:5173';
+// Backend base URL (not proxied by Vite): used to wait until the demo start-up runners have finished.
+const API = process.env.API || 'http://localhost:8080';
+const READY_TIMEOUT_MS = 20 * 60 * 1000;
 const PASSWORD = process.env.DEMO_PASSWORD || 'Brokerverse@2026';
 const VIEWPORT = { width: 1600, height: 1000 };
 
@@ -22,12 +25,15 @@ async function settle(page) {
 
 async function signIn(browser, user) {
   const page = await (await browser.newContext({ viewport: VIEWPORT })).newPage();
+  page.setDefaultTimeout(30000);
   await page.goto(`${BASE}/login`);
   if (user) {
     await page.getByLabel('User ID').fill(user);
     await page.getByLabel('Password').fill(PASSWORD);
     await page.getByRole('button', { name: /^login$/i }).click();
-    await page.waitForURL((u) => !u.pathname.startsWith('/login'), { timeout: 30000 });
+    await page.waitForURL((u) => !u.pathname.startsWith('/login'), { timeout: 30000 }).catch(() => {
+      throw new Error(`sign-in of ${user} failed (check BROKERVERSE_ALLOWED_ORIGINS includes ${BASE})`);
+    });
   }
   return page;
 }
@@ -71,7 +77,25 @@ function writeIndex(rows) {
   fs.writeFileSync(path.join(OUT, 'README.md'), lines.join('\n'));
 }
 
+// "Started" is logged before the demo ApplicationRunners (booking, ledger replay, Operations demo data)
+// run; readiness turns UP only after them, so screens are captured with the complete demo data.
+async function waitUntilReady() {
+  const deadline = Date.now() + READY_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    const status = await fetch(`${API}/actuator/health/readiness`)
+      .then((r) => r.json())
+      .then((b) => b.status)
+      .catch(() => 'DOWN');
+    if (status === 'UP') {
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 5000));
+  }
+  throw new Error(`backend at ${API} not ready after ${READY_TIMEOUT_MS / 60000} minutes`);
+}
+
 (async () => {
+  await waitUntilReady();
   fs.mkdirSync(OUT, { recursive: true });
   fs.readdirSync(OUT)
     .filter((f) => f.endsWith('.png') || f === 'index.json')

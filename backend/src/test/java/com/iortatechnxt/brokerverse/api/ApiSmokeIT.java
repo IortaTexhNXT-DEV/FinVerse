@@ -202,6 +202,13 @@ class ApiSmokeIT {
   }
 
   @Test
+  void healthIsUpWithSimulatedMailDelivery() throws Exception {
+    mvc.perform(get("/actuator/health"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("UP"));
+  }
+
+  @Test
   @WithUserDetails("accountant")
   void malformedRequestsAreRejectedWithBadRequest() throws Exception {
     mvc.perform(get("/api/v1/no-such-endpoint"))

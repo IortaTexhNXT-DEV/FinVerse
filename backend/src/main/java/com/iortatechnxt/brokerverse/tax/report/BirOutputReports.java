@@ -14,7 +14,6 @@ import com.iortatechnxt.brokerverse.tax.service.BirOutputQueries;
 import com.iortatechnxt.brokerverse.tax.service.FormWorksheetService;
 import com.iortatechnxt.brokerverse.tax.service.TaxWorksheetService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -238,8 +237,8 @@ public class BirOutputReports {
             .rows(
                 queries.production(
                     TaxReportSupport.companyId(p),
-                    LocalDate.of(year, 1, 1),
-                    LocalDate.of(year, 12, 31)))
+                    TaxReportSupport.yearPeriod(year).from(),
+                    TaxReportSupport.yearPeriod(year).to()))
             .presorted()
             .note("Booked production of " + year + "; IC layout to confirm (AQ07).")
             .build();

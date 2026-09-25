@@ -5,21 +5,14 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
-import com.iortatechnxt.brokerverse.finreport.domain.ScheduleColumn;
 import com.iortatechnxt.brokerverse.finreport.domain.ScheduleDefinition;
 import com.iortatechnxt.brokerverse.finreport.domain.ScheduleDefinitionRepository;
-import com.iortatechnxt.brokerverse.finreport.domain.ScheduleEnums.Basis;
-import com.iortatechnxt.brokerverse.finreport.domain.ScheduleEnums.Comparative;
-import com.iortatechnxt.brokerverse.finreport.domain.ScheduleEnums.Measure;
 import com.iortatechnxt.brokerverse.finreport.domain.ScheduleValues;
 import com.iortatechnxt.brokerverse.finreport.domain.StatementComment;
 import com.iortatechnxt.brokerverse.finreport.domain.StatementComment.CommentKey;
 import com.iortatechnxt.brokerverse.finreport.domain.StatementCommentRepository;
-import com.iortatechnxt.brokerverse.subledger.service.AgeingSlots;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,11 +28,6 @@ public class ScheduleDefinitionService {
 
   private static final String ENTITY = "ScheduleDefinition";
   private static final Pattern CODE = Pattern.compile("^[A-Z0-9][A-Z0-9-]{1,39}$");
-  private static final Pattern PERIOD = Pattern.compile("^\\d{4}-(0[1-9]|1[0-2])$");
-  private static final Pattern CURRENCY = Pattern.compile("^[A-Z]{3}$");
-  private static final Set<Measure> COMPARED =
-      EnumSet.of(Measure.COMPARATIVE, Measure.VARIANCE, Measure.VARIANCE_PCT);
-  private static final int MAX_COMMENT = 1000;
 
   private final ScheduleDefinitionRepository definitions;
   private final StatementCommentRepository comments;
@@ -103,7 +91,7 @@ public class ScheduleDefinitionService {
     if (definitions.existsByCode(clean)) {
       throw new DuplicateResourceException("Account schedule", clean);
     }
-    validate(values);
+    ScheduleRules.validate(values);
     ScheduleDefinition def = definitions.save(new ScheduleDefinition(clean, values));
     audit.record(ENTITY, clean, AuditAction.CREATE, "Schedule " + values.name());
     return def;
@@ -118,7 +106,7 @@ public class ScheduleDefinitionService {
    */
   public ScheduleDefinition update(String code, ScheduleValues values) {
     ScheduleDefinition def = get(code);
-    validate(values);
+    ScheduleRules.validate(values);
     def.apply(values);
     audit.record(
         ENTITY,
@@ -156,21 +144,7 @@ public class ScheduleDefinitionService {
    */
   public StatementComment comment(CommentKey key, String text) {
     ScheduleDefinition def = get(key.scheduleCode());
-    if (!def.isCommentary()) {
-      throw new BusinessRuleException(
-          "SCHEDULE_NO_COMMENTARY", "Schedule " + def.getCode() + " has no commentary column");
-    }
-    if (key.period() == null || !PERIOD.matcher(key.period()).matches()) {
-      throw new BusinessRuleException("COMMENT_PERIOD", "Give the month as yyyy-MM");
-    }
-    if (key.rowKey() == null || key.rowKey().isBlank()) {
-      throw new BusinessRuleException("COMMENT_ROW", "Give the row of the comment");
-    }
-    String clean = text == null ? "" : text.trim();
-    if (clean.length() > MAX_COMMENT) {
-      throw new BusinessRuleException(
-          "COMMENT_TOO_LONG", "A comment has at most " + MAX_COMMENT + " characters");
-    }
+    String clean = ScheduleRules.comment(def, key, text);
     CommentKey normalised =
         new CommentKey(key.companyId(), def.getCode(), key.period(), key.rowKey().trim());
     StatementComment existing =
@@ -197,50 +171,5 @@ public class ScheduleDefinitionService {
     }
     audit.record(ENTITY, def.getCode(), AuditAction.UPDATE, "Comment on " + subject);
     return saved;
-  }
-
-  private static void validate(ScheduleValues v) {
-    boolean kinds = v.family() != null && v.selectorKind() != null && v.grouping() != null;
-    if (v.name() == null || !kinds || v.side() == null || v.basis() == null) {
-      throw new BusinessRuleException(
-          "SCHEDULE_INCOMPLETE", "Give the name, family, selector, grouping, side and basis");
-    }
-    if (v.selectorEntries().isEmpty()) {
-      throw new BusinessRuleException(
-          "SCHEDULE_ACCOUNTS", "List at least one account prefix or report group");
-    }
-    if (v.currency() != null && !CURRENCY.matcher(v.currency()).matches()) {
-      throw new BusinessRuleException("SCHEDULE_CURRENCY", "Use a 3-letter currency code");
-    }
-    validateColumns(v);
-    if (v.ageingSlots() != null) {
-      if (v.basis() != Basis.BALANCE) {
-        throw new BusinessRuleException(
-            "SCHEDULE_AGEING_BASIS", "Only a balance schedule can be aged");
-      }
-      AgeingSlots.parse(v.ageingSlots(), AgeingSlots.STANDARD);
-    }
-  }
-
-  private static void validateColumns(ScheduleValues v) {
-    List<ScheduleColumn> columns = v.columns();
-    if (columns.isEmpty()) {
-      throw new BusinessRuleException("SCHEDULE_COLUMNS", "Choose at least one figure");
-    }
-    Set<Measure> seen = EnumSet.noneOf(Measure.class);
-    for (ScheduleColumn c : columns) {
-      if (c.measure() == null || c.label() == null || c.label().isBlank()) {
-        throw new BusinessRuleException("SCHEDULE_COLUMNS", "Every figure needs a heading");
-      }
-      if (!seen.add(c.measure())) {
-        throw new BusinessRuleException(
-            "SCHEDULE_COLUMNS", "Figure " + c.measure() + " is chosen twice");
-      }
-    }
-    boolean compared = seen.stream().anyMatch(COMPARED::contains);
-    if (compared && v.comparative() == Comparative.NONE) {
-      throw new BusinessRuleException(
-          "SCHEDULE_COMPARATIVE", "Choose a comparative period for the comparative figures");
-    }
   }
 }

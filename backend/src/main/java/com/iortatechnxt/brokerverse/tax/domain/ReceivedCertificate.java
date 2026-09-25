@@ -83,7 +83,7 @@ public class ReceivedCertificate extends BaseEntity {
       name = "tax_certificate_received_line",
       joinColumns = @JoinColumn(name = "certificate_id"))
   @OrderBy("lineNo")
-  private List<ReceivedCertificateLine> lines = new ArrayList<>();
+  private final List<ReceivedCertificateLine> lines = new ArrayList<>();
 
   /** Status of a recorded certificate. */
   public static final String RECORDED = "RECORDED";

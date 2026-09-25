@@ -11,8 +11,11 @@ import com.iortatechnxt.brokerverse.tax.service.TaxDocumentLine;
 import com.iortatechnxt.brokerverse.tax.service.TaxWorksheet;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +62,23 @@ final class TaxReportSupport {
         "Quarter",
         List.of("1", "2", "3", "4"),
         String.valueOf(TaxPeriod.quarterNumber(LocalDate.now(clock))));
+  }
+
+  static ParameterSpec month(Clock clock) {
+    return ParameterSpec.select(
+        MONTH,
+        "Month",
+        Arrays.stream(Month.values()).map(m -> String.valueOf(m.getValue())).toList(),
+        String.valueOf(LocalDate.now(clock).getMonthValue()));
+  }
+
+  static TaxPeriod monthPeriod(ReportParameters p) {
+    return TaxPeriod.month(YearMonth.of(year(p), Integer.parseInt(p.text(MONTH))));
+  }
+
+  static TaxPeriod yearPeriod(int year) {
+    LocalDate first = Year.of(year).atDay(1);
+    return new TaxPeriod(first, first.plusYears(1).minusDays(1));
   }
 
   static Long companyId(ReportParameters p) {

@@ -60,19 +60,18 @@ public class ServiceFeeFeedback {
    */
   @EventListener
   public void on(DisbursementStatusChanged event) {
-    if (!ServiceFees.MODULE.equals(event.sourceModule()) || event.sourceRef() == null) {
-      return;
+    String[] parts =
+        ServiceFees.MODULE.equals(event.sourceModule()) && event.sourceRef() != null
+            ? event.sourceRef().split(":")
+            : new String[0];
+    if (parts.length >= 2 && parts[1].chars().allMatch(Character::isDigit)) {
+      runs.findByRunNo(parts[0])
+          .ifPresent(
+              run ->
+                  line(run, Integer.parseInt(parts[1]))
+                      .filter(l -> l.sourceRef(run.getRunNo()).equals(event.sourceRef()))
+                      .ifPresent(l -> follow(run, l, event)));
     }
-    String[] parts = event.sourceRef().split(":");
-    if (parts.length < 2 || !parts[1].chars().allMatch(Character::isDigit)) {
-      return;
-    }
-    runs.findByRunNo(parts[0])
-        .ifPresent(
-            run ->
-                line(run, Integer.parseInt(parts[1]))
-                    .filter(l -> l.sourceRef(run.getRunNo()).equals(event.sourceRef()))
-                    .ifPresent(l -> follow(run, l, event)));
   }
 
   private Optional<ServiceFeeLine> line(ServiceFeeRun run, int lineNo) {

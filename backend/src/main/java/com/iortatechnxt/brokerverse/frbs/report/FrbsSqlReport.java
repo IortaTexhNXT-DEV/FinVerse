@@ -9,8 +9,10 @@ import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.TabularReportBuilder;
 import java.sql.Date;
+import java.sql.ResultSetMetaData;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,7 +61,7 @@ public final class FrbsSqlReport implements ReportDefinition {
       }
       case AS_OF ->
           params.add(ParameterSpec.required(TO, "As of", ParameterType.DATE).withDefault("TODAY"));
-      case YEAR ->
+      default ->
           params.add(
               ParameterSpec.required(YEAR, "Year", ParameterType.NUMBER)
                   .withDefault(String.valueOf(LocalDate.now(MANILA).getYear())));
@@ -78,8 +80,8 @@ public final class FrbsSqlReport implements ReportDefinition {
     LocalDate from;
     if (spec.dates() == Dates.YEAR) {
       int year = Integer.parseInt(p.text(YEAR));
-      from = LocalDate.of(year, 1, 1);
-      to = LocalDate.of(year, 12, 31);
+      from = Year.of(year).atDay(1);
+      to = from.plusYears(1).minusDays(1);
     } else {
       to = p.date(TO);
       from = p.optionalDate(FROM).orElse(to.withDayOfMonth(1));
@@ -102,20 +104,25 @@ public final class FrbsSqlReport implements ReportDefinition {
   }
 
   private List<Map<String, Object>> rows(Map<String, Object> args) {
-    List<Map<String, Object>> rows = new ArrayList<>();
-    for (Map<String, Object> row : jdbc.queryForList(spec.sql(), args)) {
-      Map<String, Object> out = new LinkedHashMap<>();
-      row.forEach((k, v) -> out.put(k, local(v)));
-      rows.add(out);
-    }
-    return rows;
+    return jdbc.query(
+        spec.sql(),
+        args,
+        (rs, i) -> {
+          ResultSetMetaData meta = rs.getMetaData();
+          Map<String, Object> out = new LinkedHashMap<>();
+          for (int c = 1; c <= meta.getColumnCount(); c++) {
+            out.put(meta.getColumnLabel(c), toLocal(rs.getObject(c)));
+          }
+          return out;
+        });
   }
 
-  private static Object local(Object v) {
-    if (v instanceof Timestamp t) {
-      return t.toInstant().atZone(MANILA).toLocalDate();
-    }
-    return v instanceof Date d ? d.toLocalDate() : v;
+  private static Object toLocal(Object value) {
+    return switch (value) {
+      case Timestamp t -> t.toInstant().atZone(MANILA).toLocalDate();
+      case Date d -> d.toLocalDate();
+      case null, default -> value;
+    };
   }
 
   /** The dates a report takes. */

@@ -97,7 +97,7 @@ public class ScheduleDefinition extends BaseEntity {
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "fin_schedule_column", joinColumns = @JoinColumn(name = "schedule_id"))
   @OrderBy("seq")
-  private List<ScheduleColumn> columns = new ArrayList<>();
+  private final List<ScheduleColumn> columns = new ArrayList<>();
 
   protected ScheduleDefinition() {}
 

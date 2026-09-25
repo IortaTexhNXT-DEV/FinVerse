@@ -29,9 +29,6 @@ public class ServiceFeeRule extends BaseEntity {
   @Column(nullable = false, precision = 9, scale = 4)
   private BigDecimal rate;
 
-  @Column(nullable = false, length = 30)
-  private String base = BASE;
-
   @Column(name = "net_of_wtax", nullable = false)
   private boolean netOfWtax;
 
@@ -82,11 +79,10 @@ public class ServiceFeeRule extends BaseEntity {
    * @return true when active, effective and covering the segment
    */
   public boolean covers(String marketSegment, LocalDate date) {
-    return active
-        && marketSegment != null
-        && !date.isBefore(effectiveFrom)
-        && (effectiveTo == null || !date.isAfter(effectiveTo))
-        && getMarketSegments().contains(marketSegment);
+    boolean effective =
+        !date.isBefore(effectiveFrom) && (effectiveTo == null || !date.isAfter(effectiveTo));
+    boolean known = marketSegment != null && getMarketSegments().contains(marketSegment);
+    return active && effective && known;
   }
 
   public String getSegment() {
@@ -107,7 +103,7 @@ public class ServiceFeeRule extends BaseEntity {
   }
 
   public String getBase() {
-    return base;
+    return BASE;
   }
 
   public boolean isNetOfWtax() {

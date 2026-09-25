@@ -30,6 +30,7 @@ public final class ScheduleMath {
 
   private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
   private static final int PERCENT_SCALE = 2;
+  private static final int MONTHS_IN_YEAR = 12;
 
   private ScheduleMath() {}
 
@@ -50,7 +51,7 @@ public final class ScheduleMath {
     if (yearStart.isAfter(asOf)) {
       yearStart = yearStart.minusYears(1);
     }
-    int months = comparative == Comparative.PREVIOUS_YEAR ? 12 : 1;
+    int months = comparative == Comparative.PREVIOUS_YEAR ? MONTHS_IN_YEAR : 1;
     LocalDate cmpTo = shift(asOf, months);
     LocalDate cmpFrom = basis == Basis.BALANCE ? BEGINNING : shift(from, months);
     if (comparative == Comparative.NONE) {

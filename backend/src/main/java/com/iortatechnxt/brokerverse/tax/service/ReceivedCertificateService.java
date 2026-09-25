@@ -220,6 +220,11 @@ public class ReceivedCertificateService {
       throw new BusinessRuleException(
           "CERTIFICATE_INCOMPLETE", "Give the certificate number and the withholding agent");
     }
+    requireDates(f);
+    validateLines(lines);
+  }
+
+  private void requireDates(Facts f) {
     if (f.periodFrom() == null || f.periodTo() == null || f.periodTo().isBefore(f.periodFrom())) {
       throw new BusinessRuleException(
           "CERTIFICATE_PERIOD", "Give the period covered: its end is after its start");
@@ -228,6 +233,9 @@ public class ReceivedCertificateService {
       throw new BusinessRuleException(
           "CERTIFICATE_RECEIVED_ON", "Give the date received, not in the future");
     }
+  }
+
+  private static void validateLines(List<ReceivedCertificateLine> lines) {
     if (lines.isEmpty()) {
       throw new BusinessRuleException(
           "CERTIFICATE_LINES", "Give at least one income payment with the tax withheld");
@@ -242,7 +250,8 @@ public class ReceivedCertificateService {
   }
 
   private static boolean complete(ReceivedCertificateLine l) {
-    return l.kind() != null && !blank(l.atc()) && l.income() != null && l.tax() != null;
+    boolean amounts = l.income() != null && l.tax() != null;
+    return l.kind() != null && !blank(l.atc()) && amounts;
   }
 
   private static boolean blank(String s) {

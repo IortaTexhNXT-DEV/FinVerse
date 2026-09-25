@@ -30,6 +30,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SawtReport implements ReportDefinition {
 
+  private static final String CERTIFICATES = "certificates";
+
   private final ReceivedCertificateService certificates;
   private final Clock clock;
 
@@ -76,13 +78,13 @@ public class SawtReport implements ReportDefinition {
                   r.put("nature", l.incomeNature());
                   r.put(TaxReportSupport.BASE, BigDecimal.ZERO);
                   r.put(TaxReportSupport.TAX, BigDecimal.ZERO);
-                  r.put("certificates", 0);
+                  r.put(CERTIFICATES, 0);
                   return r;
                 });
         row.put(
             TaxReportSupport.BASE, ((BigDecimal) row.get(TaxReportSupport.BASE)).add(l.income()));
         row.put(TaxReportSupport.TAX, ((BigDecimal) row.get(TaxReportSupport.TAX)).add(l.tax()));
-        row.put("certificates", (Integer) row.get("certificates") + 1);
+        row.put(CERTIFICATES, (Integer) row.get(CERTIFICATES) + 1);
       }
     }
     List<Map<String, Object>> rows = new ArrayList<>();
@@ -104,7 +106,7 @@ public class SawtReport implements ReportDefinition {
             ReportColumn.text(TaxReportSupport.PARTY, "Withholding agent"),
             ReportColumn.text("atc", "ATC"),
             ReportColumn.text("nature", "Nature of income"),
-            ReportColumn.count("certificates", "Certificates"),
+            ReportColumn.count(CERTIFICATES, "Certificates"),
             ReportColumn.percent("rate", "Rate"),
             ReportColumn.amount(TaxReportSupport.BASE, "Income payment"),
             ReportColumn.amount(TaxReportSupport.TAX, "Tax withheld"))

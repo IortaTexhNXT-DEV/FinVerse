@@ -14,12 +14,10 @@ import com.iortatechnxt.brokerverse.tax.service.FormWorksheetService;
 import com.iortatechnxt.brokerverse.tax.service.FormWorksheetService.LineValue;
 import java.time.Clock;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 /**
  * A BIR form worksheet of the report pack (FRBS 3.2.0, Appendix A VII): 0619-F (monthly final
@@ -28,8 +26,6 @@ import java.util.stream.IntStream;
  * filing channel are open (AQ07), so the worksheet prepares the figures of the return.
  */
 public final class FormWorksheetReport implements ReportDefinition {
-
-  private static final String MONTH = "month";
 
   private final FormWorksheetService forms;
   private final Clock clock;
@@ -54,12 +50,7 @@ public final class FormWorksheetReport implements ReportDefinition {
     params.add(TaxReportSupport.company());
     params.add(TaxReportSupport.year(clock));
     if (form.frequency() == Frequency.MONTH) {
-      params.add(
-          ParameterSpec.select(
-              MONTH,
-              "Month",
-              IntStream.rangeClosed(1, 12).mapToObj(String::valueOf).toList(),
-              String.valueOf(LocalDate.now(clock).getMonthValue())));
+      params.add(TaxReportSupport.month(clock));
     } else if (form.frequency() != Frequency.YEAR) {
       params.add(TaxReportSupport.quarter(clock));
     }
@@ -77,11 +68,11 @@ public final class FormWorksheetReport implements ReportDefinition {
     int year = TaxReportSupport.year(p);
     TaxPeriod period =
         switch (form.frequency()) {
-          case MONTH -> TaxPeriod.month(YearMonth.of(year, Integer.parseInt(p.text(MONTH))));
+          case MONTH -> TaxReportSupport.monthPeriod(p);
           case QUARTER -> TaxReportSupport.quarterPeriod(p);
           case QUARTER_YTD ->
               new TaxPeriod(LocalDate.of(year, 1, 1), TaxReportSupport.quarterPeriod(p).to());
-          case YEAR -> new TaxPeriod(LocalDate.of(year, 1, 1), LocalDate.of(year, 12, 31));
+          case YEAR -> TaxReportSupport.yearPeriod(year);
         };
     List<LineValue> lines =
         forms.compute(TaxReportSupport.companyId(p), form.code(), period, period);

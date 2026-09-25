@@ -171,6 +171,10 @@ public class ServiceFeeSetupService {
           "SERVICE_FEE_RULE", "List the market segments the rule covers");
     }
     v.marketSegments().forEach(m -> lovs.requireValid(MARKET_LOV, m, today));
+    requireRateAndDates(v);
+  }
+
+  private static void requireRateAndDates(RuleValues v) {
     if (v.rate().signum() <= 0 || v.rate().compareTo(MAX_RATE) > 0) {
       throw new BusinessRuleException("SERVICE_FEE_RATE", "The rate is a percentage above 0");
     }

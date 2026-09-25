@@ -14,12 +14,14 @@ import com.iortatechnxt.brokerverse.lov.domain.LovValueRepository;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Lists of values: lookup for validations and screens, maintenance under maker-checker (BRNB.083).
- * Business modules validate coded fields with {@link #requireValid}.
+ * Business modules validate coded fields with {@link #requireValid}. Pick lists, labels and
+ * optional-field validation read the cached list ({@link LovLookup}); every change clears it.
  */
 @Service
 @Transactional
@@ -32,6 +34,7 @@ public class LovService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final LovLookup lookup;
 
   /**
    * Creates the service.
@@ -41,18 +44,21 @@ public class LovService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param lookup cached list read
    */
   public LovService(
       LovTypeRepository types,
       LovValueRepository values,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      LovLookup lookup) {
     this.types = types;
     this.values = values;
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.lookup = lookup;
   }
 
   /**
@@ -90,6 +96,22 @@ public class LovService {
   }
 
   /**
+   * Pick-list options usable on a date, from the cache.
+   *
+   * @param typeCode list
+   * @param date business date
+   * @return usable values in display order
+   */
+  @Transactional(readOnly = true)
+  public List<LovEntries.Entry> options(String typeCode, LocalDate date) {
+    LovEntries list = lookup.entries(typeCode);
+    if (!list.known()) {
+      throw new ResourceNotFoundException("LovType", typeCode);
+    }
+    return list.usableOn(date);
+  }
+
+  /**
    * Validates a coded field: the code must be usable on the date.
    *
    * @param typeCode list
@@ -102,11 +124,12 @@ public class LovService {
     return values
         .findByTypeCodeAndCode(typeCode, code)
         .filter(v -> v.isUsableOn(date))
-        .orElseThrow(
-            () ->
-                new BusinessRuleException(
-                    "LOV_VALUE_INVALID",
-                    "'" + code + "' is not a valid value of " + typeCode + " on " + date));
+        .orElseThrow(() -> invalid(typeCode, code, date));
+  }
+
+  private static BusinessRuleException invalid(String typeCode, String code, LocalDate date) {
+    return new BusinessRuleException(
+        "LOV_VALUE_INVALID", "'" + code + "' is not a valid value of " + typeCode + " on " + date);
   }
 
   /**
@@ -118,8 +141,10 @@ public class LovService {
    */
   @Transactional(readOnly = true)
   public void validateOptional(String typeCode, String code, LocalDate date) {
-    if (code != null && !code.isBlank()) {
-      requireValid(typeCode, code, date);
+    if (code != null
+        && !code.isBlank()
+        && lookup.entries(typeCode).find(code).filter(v -> v.isUsableOn(date)).isEmpty()) {
+      throw invalid(typeCode, code, date);
     }
   }
 
@@ -135,7 +160,7 @@ public class LovService {
     if (code == null) {
       return null;
     }
-    return values.findByTypeCodeAndCode(typeCode, code).map(LovValue::getLabel).orElse(code);
+    return lookup.entries(typeCode).find(code).map(LovEntries.Entry::label).orElse(code);
   }
 
   /**
@@ -146,6 +171,7 @@ public class LovService {
    * @param details label, order, parent and effectivity
    * @return the value
    */
+  @CacheEvict(cacheNames = LovCaches.VALUES, allEntries = true)
   public LovValue create(String typeCode, String code, LovDetails details) {
     requireMaintainable(typeCode);
     if (values.findByTypeCodeAndCode(typeCode, code).isPresent()) {
@@ -163,6 +189,7 @@ public class LovService {
    * @param details new attributes
    * @return the value
    */
+  @CacheEvict(cacheNames = LovCaches.VALUES, allEntries = true)
   public LovValue update(Long id, LovDetails details) {
     LovValue value = get(id);
     requireMaintainable(value.getTypeCode());
@@ -185,6 +212,7 @@ public class LovService {
    * @param id value id
    * @return the value
    */
+  @CacheEvict(cacheNames = LovCaches.VALUES, allEntries = true)
   public LovValue authorize(Long id) {
     LovValue value = get(id);
     value.authorize(currentUser.username(), clock.instant());
@@ -198,6 +226,7 @@ public class LovService {
    * @param id value id
    * @return the value
    */
+  @CacheEvict(cacheNames = LovCaches.VALUES, allEntries = true)
   public LovValue deactivate(Long id) {
     LovValue value = get(id);
     requireMaintainable(value.getTypeCode());

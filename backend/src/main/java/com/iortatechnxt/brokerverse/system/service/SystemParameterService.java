@@ -7,12 +7,15 @@ import com.iortatechnxt.brokerverse.system.domain.ParameterValueType;
 import com.iortatechnxt.brokerverse.system.domain.SystemParameter;
 import com.iortatechnxt.brokerverse.system.domain.SystemParameterRepository;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Business parameters stored in {@code sys_parameter}. Any module may read them through the typed
- * getters; changes are validated against the parameter type and audited with old and new value.
+ * getters (cached, {@link SystemCaches#PARAMETERS}); changes are validated against the parameter
+ * type, audited with old and new value and clear the cache on every instance.
  */
 @Service
 @Transactional
@@ -46,16 +49,20 @@ public class SystemParameterService {
 
   private final SystemParameterRepository repository;
   private final AuditTrailService audit;
+  private final SystemParameterLookup lookup;
 
   /**
    * Creates the service.
    *
    * @param repository parameter repository
    * @param audit audit trail
+   * @param lookup cached raw values
    */
-  public SystemParameterService(SystemParameterRepository repository, AuditTrailService audit) {
+  public SystemParameterService(
+      SystemParameterRepository repository, AuditTrailService audit, SystemParameterLookup lookup) {
     this.repository = repository;
     this.audit = audit;
+    this.lookup = lookup;
   }
 
   /**
@@ -88,6 +95,7 @@ public class SystemParameterService {
    * @param value new value
    * @return updated parameter
    */
+  @CacheEvict(cacheNames = SystemCaches.PARAMETERS, key = "#key")
   public SystemParameter update(String key, String value) {
     SystemParameter parameter = get(key);
     String previous = parameter.getValue();
@@ -109,12 +117,7 @@ public class SystemParameterService {
    */
   @Transactional(readOnly = true)
   public int intValue(String key, int fallback) {
-    return repository
-        .findByKey(key)
-        .map(SystemParameter::getValue)
-        .map(String::trim)
-        .map(Integer::parseInt)
-        .orElse(fallback);
+    return raw(key).map(String::trim).map(Integer::parseInt).orElse(fallback);
   }
 
   /**
@@ -126,7 +129,7 @@ public class SystemParameterService {
    */
   @Transactional(readOnly = true)
   public String text(String key, String fallback) {
-    return repository.findByKey(key).map(SystemParameter::getValue).orElse(fallback);
+    return raw(key).orElse(fallback);
   }
 
   /**
@@ -137,9 +140,10 @@ public class SystemParameterService {
    */
   @Transactional(readOnly = true)
   public List<String> items(String key) {
-    return repository
-        .findByKey(key)
-        .map(p -> ParameterValueType.items(p.getValue()))
-        .orElse(List.of());
+    return raw(key).map(ParameterValueType::items).orElse(List.of());
+  }
+
+  private Optional<String> raw(String key) {
+    return Optional.ofNullable(lookup.value(key));
   }
 }

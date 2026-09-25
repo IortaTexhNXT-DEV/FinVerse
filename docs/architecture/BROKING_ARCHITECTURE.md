@@ -118,6 +118,9 @@ Business modules never call "upward". The rules for callbacks between modules ar
   (AES) with a password and XLSX files are password-protected. If `deliverPasswordSeparately` is
   set, a second e-mail carrying only the password is queued (BRNB.035).
 - Messages are dispatched by the `MAIL_DISPATCH` managed job, and immediately after the commit.
+  With Kafka enabled the immediate delivery is asynchronous: every queued e-mail is published as
+  `bibs.messaging.notification-requested.v1` and the e-mail dispatch consumer delivers it; the job
+  stays the safety net ([`PLATFORM_CACHE_AND_EVENTS.md`](PLATFORM_CACHE_AND_EVENTS.md)).
 - The transport is the `MailTransport` port. By default it is SMTP when `brokerverse.mail.enabled`
   is set; otherwise messages are recorded as `SENT (simulated)`, so demos and tests never send
   e-mail.
@@ -192,6 +195,13 @@ BDOI roles, seeded in V750 from the BRD personas:
 | `BUSINESS_ADMIN` | Business Administrator |
 
 The existing `SYSADMIN` role is the System Administrator.
+
+Sessions: every access token carries a `jti`; `POST /api/v1/auth/logout` revokes it on every instance
+(Redis denylist, database fallback) and audits `LOGOUT`. Failed logins are counted on a counter shared
+by the instances (the user record stays the reference for `LOGIN_MAX_FAILED_ATTEMPTS`) and the login
+endpoint is rate limited per client address (HTTP 429). The permissions of each role are cached
+(`security-role-permissions`) and the cache is cleared by any role change. See
+[`PLATFORM_CACHE_AND_EVENTS.md`](PLATFORM_CACHE_AND_EVENTS.md) §2.3.
 
 Demo users (V980; password `Brokerverse@2026`):
 

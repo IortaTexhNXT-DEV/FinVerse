@@ -16,5 +16,6 @@ public enum AuditAction {
   RUN,
   LOGIN,
   LOGIN_FAILED,
+  LOGOUT,
   EXPORT
 }

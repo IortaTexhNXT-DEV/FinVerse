@@ -104,7 +104,18 @@ public class AppUser extends BaseEntity {
    * @param maxFailedAttempts consecutive failures that lock the account
    */
   public void recordFailedLogin(int maxFailedAttempts) {
-    failedAttempts++;
+    recordFailedLogins(failedAttempts + 1, maxFailedAttempts);
+  }
+
+  /**
+   * Records the consecutive failed logins counted across all instances (shared counter); locks the
+   * account once the threshold is reached. The recorded count never decreases here.
+   *
+   * @param consecutiveFailures failures counted so far, including the current one
+   * @param maxFailedAttempts consecutive failures that lock the account
+   */
+  public void recordFailedLogins(int consecutiveFailures, int maxFailedAttempts) {
+    failedAttempts = Math.max(failedAttempts, consecutiveFailures);
     if (failedAttempts >= maxFailedAttempts) {
       locked = true;
     }

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.lov.api.dto;
 
 import com.iortatechnxt.brokerverse.lov.domain.LovValue;
+import com.iortatechnxt.brokerverse.lov.service.LovEntries;
 
 /**
  * A pick-list option.
@@ -19,5 +20,15 @@ public record LovOption(String code, String label, String parentCode) {
    */
   public static LovOption from(LovValue v) {
     return new LovOption(v.getCode(), v.getLabel(), v.getParentCode());
+  }
+
+  /**
+   * Maps a cached value.
+   *
+   * @param v cached value
+   * @return option
+   */
+  public static LovOption from(LovEntries.Entry v) {
+    return new LovOption(v.code(), v.label(), v.parentCode());
   }
 }

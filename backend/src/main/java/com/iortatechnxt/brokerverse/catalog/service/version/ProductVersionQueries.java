@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
  * PRODUCT_MAINTENANCE_DESIGN sections 5.1, 5.2 and 9.1). The version in force is decided by the
  * selling period (effective from / to) of the RELEASED and SUPERSEDED versions, so rating does not
  * depend on the daily job having run. Also gives rating and the version screens the entities.
+ *
+ * <p>The views of the port are cached ({@link CatalogCaches#PRODUCT_VERSIONS}); the entity methods
+ * are not.
  */
 @Service
 @Primary
@@ -51,21 +55,31 @@ public class ProductVersionQueries implements ProductVersionQueryService {
   }
 
   @Override
+  @Cacheable(
+      cacheNames = CatalogCaches.PRODUCT_VERSIONS,
+      key = "'current:' + #productCode + ':' + T(java.time.LocalDate).now(@clock)")
   public Optional<ProductVersionView> current(String productCode) {
     return inForce(productCode, LocalDate.now(clock));
   }
 
   @Override
+  @Cacheable(
+      cacheNames = CatalogCaches.PRODUCT_VERSIONS,
+      key = "'inForce:' + #productCode + ':' + #date")
   public Optional<ProductVersionView> inForce(String productCode, LocalDate date) {
     return inForceEntity(productCode, date).map(this::view);
   }
 
   @Override
+  @Cacheable(
+      cacheNames = CatalogCaches.PRODUCT_VERSIONS,
+      key = "'version:' + #productCode + ':' + #versionNo")
   public Optional<ProductVersionView> version(String productCode, int versionNo) {
     return versions.findByProductCodeAndVersionNo(productCode, versionNo).map(this::view);
   }
 
   @Override
+  @Cacheable(cacheNames = CatalogCaches.PRODUCT_VERSIONS, key = "'versions:' + #productCode")
   public List<ProductVersionView> versions(String productCode) {
     String name = products.findByCode(productCode).map(RiskProduct::getName).orElse(null);
     return versions.findByProductCodeOrderByVersionNoDesc(productCode).stream()

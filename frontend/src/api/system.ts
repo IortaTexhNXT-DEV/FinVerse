@@ -28,7 +28,8 @@ export interface JobRun {
   triggeredBy: string;
   startedAt: string;
   finishedAt?: string;
-  status: 'RUNNING' | 'SUCCEEDED' | 'FAILED';
+  /** SKIPPED_LOCKED: not run, the job was already running on another instance. */
+  status: 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'SKIPPED_LOCKED';
   itemsProcessed: number;
   message?: string;
 }

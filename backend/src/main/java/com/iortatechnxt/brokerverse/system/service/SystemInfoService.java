@@ -47,6 +47,13 @@ public class SystemInfoService {
           "brokerverse.attachments.max-size",
           "brokerverse.jobs.recurring-journals-cron",
           "brokerverse.jobs.alert-checks-cron",
+          "brokerverse.redis.enabled",
+          "spring.data.redis.host",
+          "spring.data.redis.port",
+          "spring.data.redis.ssl.enabled",
+          "brokerverse.kafka.enabled",
+          "spring.kafka.bootstrap-servers",
+          "spring.kafka.properties.security.protocol",
           "management.endpoints.web.exposure.include",
           "logging.level.root");
 

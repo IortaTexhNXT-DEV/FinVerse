@@ -39,6 +39,11 @@ apply, for example, V27 on a database already at V975. `flyway_schema_history` r
 - Metrics: `/actuator/prometheus` (requires `SYSTEM_PARAMETER_MANAGE`; scrape with a service
   account token) – JVM, HTTP, Hikari pool, and `brokerverse_journals_posted_total`.
 - Logs: one line per event, ISO timestamps; CR/LF in messages are neutralised. Alert on `ERROR`.
+- Every HTTP response carries `X-Correlation-Id` (the caller's value when valid, else generated); the
+  same id is in the envelope of the integration events the request published (`evt_outbox`,
+  `evt_archive`).
+- `/actuator/health` includes Redis when `BROKERVERSE_REDIS_ENABLED=true`. Watch `evt_outbox` rows in
+  `PENDING` / `FAILED` and new dead letters (Administration → Integration Events).
 - Every unexpected error returns HTTP 500 with `code=INTERNAL_ERROR` and a `reference` UUID that is
   also written to the log line – ask users for it and search the logs.
 
@@ -85,3 +90,6 @@ apply, for example, V27 on a database already at V975. `flyway_schema_history` r
 | Who changed what | Administration → Audit Trail, or report `CTL-AUDIT` |
 | Failed accounting events | Accounting Engine → Event Register (status FAILED) |
 | Period close blocked | Journals filtered by status + period dates |
+| Integration events stuck or failed (Kafka), dead letters | Administration → Integration Events; runbook in [`PLATFORM_CACHE_AND_EVENTS.md`](../architecture/PLATFORM_CACHE_AND_EVENTS.md) §5 |
+| Reference data changed by SQL not visible (cache) | `POST /api/v1/admin/caches/{name}/clear` (§5.3 of the same document) |
+| A job shows `SKIPPED_LOCKED` | Normal with several replicas: another instance ran it (job lock, §5.4) |

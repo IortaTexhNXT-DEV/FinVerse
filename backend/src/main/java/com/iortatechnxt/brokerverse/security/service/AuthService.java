@@ -20,8 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Login with lockout: consecutive failures up to the business parameter {@code
  * LOGIN_MAX_FAILED_ATTEMPTS} (BDOI NFR: 3; {@code brokerverse.security.max-failed-attempts} when
- * the parameter is missing) lock the account until an administrator unlocks it. Every success and
- * failure is written to the audit trail.
+ * the parameter is missing) lock the account until an administrator unlocks it. Failures are
+ * counted on the shared counter ({@link LoginAttemptTracker}) so concurrent attempts on several
+ * instances all count; the user record keeps the count. Logout revokes the token ({@link
+ * TokenRevocationStore}). Every success, failure and logout is written to the audit trail.
  */
 @Service
 public class AuthService {
@@ -36,6 +38,8 @@ public class AuthService {
   private final SystemParameterService parameters;
   private final SecurityProperties properties;
   private final Clock clock;
+  private final LoginAttemptTracker attempts;
+  private final TokenRevocationStore revocations;
 
   /**
    * Creates the service.
@@ -47,6 +51,8 @@ public class AuthService {
    * @param parameters business parameters (lockout threshold)
    * @param properties security settings (default lockout threshold)
    * @param clock clock
+   * @param attempts shared failed-login counter
+   * @param revocations token denylist
    */
   public AuthService(
       AuthenticationManager authenticationManager,
@@ -55,7 +61,9 @@ public class AuthService {
       AuditTrailService audit,
       SystemParameterService parameters,
       SecurityProperties properties,
-      Clock clock) {
+      Clock clock,
+      LoginAttemptTracker attempts,
+      TokenRevocationStore revocations) {
     this.authenticationManager = authenticationManager;
     this.users = users;
     this.tokens = tokens;
@@ -63,6 +71,8 @@ public class AuthService {
     this.parameters = parameters;
     this.properties = properties;
     this.clock = clock;
+    this.attempts = attempts;
+    this.revocations = revocations;
   }
 
   /**
@@ -91,7 +101,8 @@ public class AuthService {
       authenticationManager.authenticate(
           new UsernamePasswordAuthenticationToken(user.getUsername(), password));
     } catch (AuthenticationException ex) {
-      user.recordFailedLogin(
+      user.recordFailedLogins(
+          attempts.recordFailure(user.getUsername(), user.getFailedAttempts()),
           parameters.intValue(
               SystemParameterService.LOGIN_MAX_FAILED_ATTEMPTS, properties.maxFailedAttempts()));
       audit.recordIndependently(
@@ -102,10 +113,29 @@ public class AuthService {
           "Failed login attempt " + user.getFailedAttempts());
       throw new BadCredentialsException(INVALID, ex);
     }
+    if (user.getFailedAttempts() > 0) {
+      attempts.reset(user.getUsername());
+    }
     user.recordSuccessfulLogin(clock.instant());
     audit.recordIndependently(
         user.getUsername(), ENTITY, user.getUsername(), AuditAction.LOGIN, "Logged in");
     JwtTokenService.IssuedToken token = tokens.issue(user.getUsername());
     return new LoginResponse(token.token(), token.expiresAt(), UserProfileResponse.from(user));
+  }
+
+  /**
+   * Signs the caller out: the token is revoked until it expires (every instance refuses it) and the
+   * logout is audited (UAM-NFR-35).
+   *
+   * @param token the caller's bearer token
+   */
+  @Transactional
+  public void logout(String token) {
+    JwtTokenService.TokenClaims claims =
+        tokens.parse(token).orElseThrow(() -> new BadCredentialsException("Invalid token"));
+    if (claims.tokenId() != null && claims.expiresAt() != null) {
+      revocations.revoke(claims.tokenId(), claims.username(), claims.expiresAt());
+    }
+    audit.record(ENTITY, claims.username(), AuditAction.LOGOUT, "Logged out");
   }
 }

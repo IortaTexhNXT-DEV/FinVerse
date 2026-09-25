@@ -4,5 +4,7 @@ package com.iortatechnxt.brokerverse.system.domain;
 public enum JobRunStatus {
   RUNNING,
   SUCCEEDED,
-  FAILED
+  FAILED,
+  /** Not run: another instance held the job lock (the job was already running). */
+  SKIPPED_LOCKED
 }

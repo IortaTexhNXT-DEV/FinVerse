@@ -1,7 +1,23 @@
 # iNXT BrokerVerse – reference Kubernetes deployment.
-# Prerequisites: an external PostgreSQL 16 database, an ingress controller, and the secret
-# "brokerverse-secrets" (see brokerverse-secrets.example.yaml). Images are built by CI and pushed to
-# your registry; replace REGISTRY and TAG.
+# Prerequisites: an external PostgreSQL 16 database, Redis 7, Apache Kafka 3.6+, an ingress
+# controller, and the secret "brokerverse-secrets" (see brokerverse-secrets.example.yaml). Images are
+# built by CI and pushed to your registry; replace REGISTRY and TAG.
+#
+# AWS ap-southeast-1 (Singapore) reference:
+#   - PostgreSQL: Amazon RDS for PostgreSQL 16 (Multi-AZ).
+#   - Redis: Amazon ElastiCache for Redis OSS 7.x, cluster mode DISABLED (one shard, a primary and a
+#     replica in another AZ, automatic failover), in-transit encryption ON (BROKERVERSE_REDIS_TLS),
+#     AUTH token or RBAC user (BROKERVERSE_REDIS_PASSWORD / _USERNAME), at-rest encryption ON.
+#     BROKERVERSE_REDIS_HOST = the primary endpoint. Security group: 6379 from the EKS node group.
+#   - Kafka: Amazon MSK (Kafka 3.6 or later), three brokers in three AZs, SASL/SCRAM-SHA-512 with the
+#     secret in AWS Secrets Manager (AmazonMSK_ prefix, KMS key) and TLS in transit:
+#     BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS = the SASL/SCRAM bootstrap brokers (port 9096),
+#     BROKERVERSE_KAFKA_SECURITY_PROTOCOL = SASL_SSL, BROKERVERSE_KAFKA_REPLICATION_FACTOR = 3.
+#     Cluster configuration: auto.create.topics.enable=false, min.insync.replicas=2. The application
+#     creates its topics (and <topic>.dlt) at start-up; the SCRAM user needs Create/Describe/Write on
+#     topics bibs.*, Read on consumer groups bibs-* (ACLs). Security group: 9096 from the EKS nodes.
+#   With 2 backend replicas every scheduled job still runs once per schedule: the job lock is in
+#   Redis (docs/architecture/PLATFORM_CACHE_AND_EVENTS.md).
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -17,6 +33,22 @@ data:
   BROKERVERSE_ALLOWED_ORIGINS: "https://brokerverse.example.com"
   BROKERVERSE_TOKEN_VALIDITY: "PT8H"
   BROKERVERSE_DB_POOL_SIZE: "20"
+  # Client address of the login rate limit comes from X-Forwarded-For set by the ingress.
+  SERVER_FORWARD_HEADERS_STRATEGY: "native"
+  # ---- Redis 7 (AWS ElastiCache); password / AUTH token in brokerverse-secrets ----
+  BROKERVERSE_REDIS_ENABLED: "true"
+  BROKERVERSE_REDIS_HOST: "master.brokerverse-redis.xxxxxx.apse1.cache.amazonaws.com"
+  BROKERVERSE_REDIS_PORT: "6379"
+  BROKERVERSE_REDIS_TLS: "true"
+  BROKERVERSE_REDIS_KEY_PREFIX: "bv:"
+  # ---- Apache Kafka (Amazon MSK); SASL JAAS configuration in brokerverse-secrets ----
+  BROKERVERSE_KAFKA_ENABLED: "true"
+  BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS: "b-1.brokerverse.xxxxxx.c2.kafka.ap-southeast-1.amazonaws.com:9096,b-2.brokerverse.xxxxxx.c2.kafka.ap-southeast-1.amazonaws.com:9096,b-3.brokerverse.xxxxxx.c2.kafka.ap-southeast-1.amazonaws.com:9096"
+  BROKERVERSE_KAFKA_SECURITY_PROTOCOL: "SASL_SSL"
+  BROKERVERSE_KAFKA_SASL_MECHANISM: "SCRAM-SHA-512"
+  BROKERVERSE_KAFKA_PARTITIONS: "3"
+  BROKERVERSE_KAFKA_REPLICATION_FACTOR: "3"
+  BROKERVERSE_KAFKA_CREATE_TOPICS: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment

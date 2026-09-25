@@ -30,6 +30,7 @@
     <zonky.embedded-db.version>2.6.0</zonky.embedded-db.version>
     <zonky.embedded-pg.version>2.1.0</zonky.embedded-pg.version>
     <archunit.version>1.4.1</archunit.version>
+    <jedis-mock.version>1.1.19</jedis-mock.version>
     <surefire.runOrder>alphabetical</surefire.runOrder>
 
     <!-- Quality tooling versions -->
@@ -96,6 +97,26 @@
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
+    </dependency>
+
+    <!-- Shared state (Redis 7: caches, job locks, token denylist, counters) and event streaming
+         (Apache Kafka 3.6+: transactional outbox relay, consumers). See
+         docs/architecture/PLATFORM_CACHE_AND_EVENTS.md. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.github.ben-manes.caffeine</groupId>
+      <artifactId>caffeine</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.kafka</groupId>
+      <artifactId>spring-kafka</artifactId>
     </dependency>
 
     <!-- JWT -->
@@ -169,6 +190,19 @@
       <groupId>io.zonky.test</groupId>
       <artifactId>embedded-postgres</artifactId>
       <version>${zonky.embedded-pg.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- In-JVM Kafka (KRaft) broker for the outbox relay / consumer tests; no Docker needed. -->
+    <dependency>
+      <groupId>org.springframework.kafka</groupId>
+      <artifactId>spring-kafka-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Pure-Java Redis protocol server for the Redis adapter tests; no Docker or native binary. -->
+    <dependency>
+      <groupId>com.github.fppt</groupId>
+      <artifactId>jedis-mock</artifactId>
+      <version>${jedis-mock.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -57,6 +57,21 @@ export const ADMIN_HELP: HelpSection = {
       controls: ['A failed run raises a JOB_FAILURE alert.'],
     },
     {
+      name: 'Integration Events',
+      path: '/admin/integration-events',
+      summary:
+        'Business events sent to Kafka through the transactional outbox (invoices booked, payments applied, receipts issued, remittance and disbursement status, collection feeds, product versions, clients, e-mail requests), with the events a consumer could not process.',
+      workflow: [
+        'Dead Letters: read the error, fix the cause, then Retry (the event is published again to its topic) or Discard it.',
+        'Outbox: a FAILED event (Kafka did not acknowledge it after all attempts) can be sent again with Send Again.',
+        'Topics: the catalogue of topics, their event types and dead-letter topics.',
+      ],
+      controls: [
+        'System Administrator only; retries and discards are logged with the user.',
+        'Consumers ignore an event they already processed (event id), so a retry never processes it twice.',
+      ],
+    },
+    {
       name: 'Application Info',
       path: '/admin/info',
       summary: 'Version, build, database migration level and health of the installation.',

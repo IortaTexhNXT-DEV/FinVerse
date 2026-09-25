@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.config;
 
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.security.service.LoginProtectionProperties;
 import com.iortatechnxt.brokerverse.security.service.SecurityProperties;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -20,7 +21,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 @EnableScheduling
-@EnableConfigurationProperties(SecurityProperties.class)
+@EnableConfigurationProperties({SecurityProperties.class, LoginProtectionProperties.class})
 public class ApplicationConfig {
 
   private static final String BEARER = "bearerAuth";

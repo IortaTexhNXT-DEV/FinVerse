@@ -57,12 +57,67 @@ are for local development only.
 | `BROKERVERSE_JOB_DISB_EOD_CONFIRMATION_CRON` | no | `-` (off) | Spring cron (UTC) of `DISB_EOD_CONFIRMATION` (disbursement, DIS 2.7.12; started by each end-of-day run (e-mail confirmations with the remittance schedule); no schedule by default). Property `brokerverse.jobs.disb-eod-confirmation-cron`. |
 | `BROKERVERSE_JOB_DISB_EOD_REPORTS_CRON` | no | `-` (off) | Spring cron (UTC) of `DISB_EOD_REPORTS` (disbursement, DIS 3.28.0; started by each end-of-day run (EOD reports); no schedule by default). Property `brokerverse.jobs.disb-eod-reports-cron`. |
 | `BROKERVERSE_JOB_ACSL_GL_SL_RECON_CRON` | no | `0 0 12 * * *` | Spring cron (UTC) of `ACSL_GL_SL_RECON` (acsl, ACSL 2.13.2; 20:00 PHT and at period end: reconciles every control account with its sub-ledger (`ACSL_GLSL_DIFFERENCE`)). Property `brokerverse.jobs.acsl-gl-sl-recon-cron`. |
+| `BROKERVERSE_JOB_EVENT_OUTBOX_RELAY_CRON` | no | `0 * * * * *` | Spring cron (UTC) of `EVENT_OUTBOX_RELAY` (platform, every minute): sends the integration events the after-commit relay left in `evt_outbox` (broker down, instance stopped) and the retries that are due; with Kafka disabled marks leftovers `LOCAL`. Property `brokerverse.jobs.event-outbox-relay-cron`. |
+| `BROKERVERSE_JOB_EVENT_HOUSEKEEPING_CRON` | no | `0 50 0 * * *` | Spring cron (UTC) of `EVENT_HOUSEKEEPING` (platform, daily): deletes delivered outbox rows older than `BROKERVERSE_KAFKA_OUTBOX_RETENTION`, archived events and resolved dead letters older than `BROKERVERSE_KAFKA_ARCHIVE_RETENTION`. Property `brokerverse.jobs.event-housekeeping-cron`. |
+| `BROKERVERSE_JOB_SHARED_STATE_CLEANUP_CRON` | no | `0 40 0 * * *` | Spring cron (UTC) of `SHARED_STATE_CLEANUP` (platform, daily): deletes expired rows of `sec_revoked_token` and `sys_shared_counter` (database fallback of Redis). Property `brokerverse.jobs.shared-state-cleanup-cron`. |
+| `BROKERVERSE_JOB_LOCK_LEASE` | no | `PT2M` | Lease of the Redis job lock, renewed every third of it while the job runs; an instance that dies frees the lock after at most one lease. Property `brokerverse.jobs.lock-lease`. |
 | `BROKERVERSE_MAIL_ENABLED` | no | `false` | `true` delivers e-mails through the SMTP server below; `false` records them in the outbox as *simulated* (demo, test, UAT without mail). Addresses ending in `.invalid` are always rejected by the simulated transport. |
 | `BROKERVERSE_MAIL_DISPATCH_ON_COMMIT` | no | `true` | Deliver right after the business transaction commits; `false` leaves delivery to the `MAIL_DISPATCH` job only. |
 | `MAIL_HOST` / `MAIL_PORT` | when mail enabled | `localhost` / `587` | SMTP server. |
 | `MAIL_USERNAME` / `MAIL_PASSWORD` | when the server requires it | — | SMTP credentials (secret: supply from the vault, never in files). |
 | `MAIL_SMTP_AUTH` / `MAIL_SMTP_STARTTLS` | no | `true` / `true` | SMTP authentication and STARTTLS. |
 | `BROKERVERSE_BACKEND_HOST` (frontend container) | yes | `backend` | Host name of the backend service for the `/api` proxy. |
+
+## Redis 7 and Apache Kafka (platform cache and events)
+
+Design, topic catalogue and runbook: [`PLATFORM_CACHE_AND_EVENTS.md`](../architecture/PLATFORM_CACHE_AND_EVENTS.md).
+Both default to **on** in `application.yml` and are **off** in the `test` profile. With either off the
+application starts and behaves correctly on its fallbacks (in-memory cache, PostgreSQL advisory locks
+and tables of V28, events recorded `LOCAL`, e-mail sent after commit). Every instance of one
+environment must use the same settings.
+
+| Variable | Required in prod | Default | Purpose |
+|---|---|---|---|
+| `BROKERVERSE_REDIS_ENABLED` | yes (`true`) | `true` | `brokerverse.redis.enabled`. `true`: Redis holds the reference-data cache, the job locks, the token denylist and the shared counters; `false`: in-memory cache (per instance, bounded by the time to live), PostgreSQL advisory job locks, tables `sec_revoked_token` / `sys_shared_counter`. Also switches the Redis health check (`management.health.redis.enabled`). |
+| `BROKERVERSE_REDIS_HOST` / `BROKERVERSE_REDIS_PORT` | when enabled | `localhost` / `6379` | `spring.data.redis.host` / `port`. On AWS: the ElastiCache (Redis 7) primary endpoint. |
+| `BROKERVERSE_REDIS_USERNAME` | no | – | `spring.data.redis.username` (ElastiCache RBAC user; blank = default user). |
+| `BROKERVERSE_REDIS_PASSWORD` | when the server requires it | – | `spring.data.redis.password` (ElastiCache AUTH token or RBAC password). **Secret**: from the vault. |
+| `BROKERVERSE_REDIS_TLS` | yes on AWS | `false` | `spring.data.redis.ssl.enabled`: `true` with ElastiCache in-transit encryption. |
+| `BROKERVERSE_REDIS_DATABASE` | no | `0` | `spring.data.redis.database`. |
+| `BROKERVERSE_REDIS_TIMEOUT` / `BROKERVERSE_REDIS_CONNECT_TIMEOUT` | no | `2s` / `5s` | Command and connect time-outs. |
+| `BROKERVERSE_REDIS_KEY_PREFIX` | no | `bv:` | `brokerverse.redis.key-prefix`: prefix of every key (`bv:cache:…`, `bv:joblock:…`, `bv:session:revoked:…`, `bv:counter:…`); use one per environment when environments share a Redis. |
+| `BROKERVERSE_CACHE_TTL_LOV` | no | `PT1H` | `brokerverse.cache.ttl.lov-values`: time to live of the list-of-values cache. |
+| `BROKERVERSE_CACHE_TTL_PARAMETERS` | no | `PT15M` | `brokerverse.cache.ttl.system-parameters`. |
+| `BROKERVERSE_CACHE_TTL_ROLE_PERMISSIONS` | no | `PT15M` | `brokerverse.cache.ttl.security-role-permissions`. |
+| `BROKERVERSE_CACHE_TTL_CATALOG` | no | `PT1H` | `brokerverse.cache.ttl.catalog-product-versions`. |
+| `BROKERVERSE_CACHE_TTL_ORGANIZATION` | no | `PT1H` | `brokerverse.cache.ttl.organization-units`. |
+| `BROKERVERSE_CACHE_MAX_SIZE` | no | `10000` | `brokerverse.cache.maximum-size`: entries per cache of the in-memory fallback. |
+| `BROKERVERSE_LOGIN_RATE_LIMIT` | no | `20` | `brokerverse.security.login-protection.max-attempts-per-window`: login requests accepted per client address and window, counted across all instances; above it `POST /auth/login` answers HTTP 429 (`LOGIN_RATE_LIMITED`). Behind the ingress set `SERVER_FORWARD_HEADERS_STRATEGY=native` (or `framework`) so the address is the caller's. |
+| `BROKERVERSE_LOGIN_RATE_WINDOW` | no | `PT1M` | `brokerverse.security.login-protection.rate-limit-window`. |
+| `BROKERVERSE_LOGIN_FAILURE_WINDOW` | no | `P1D` | `brokerverse.security.login-protection.failed-attempt-window`: life of the shared failed-login counter of a user. The lockout itself still follows `LOGIN_MAX_FAILED_ATTEMPTS`; `sec_user.failed_attempts` stays the record. |
+| `BROKERVERSE_KAFKA_ENABLED` | yes (`true`) | `true` | `brokerverse.kafka.enabled`. `true`: the outbox is relayed to Kafka and the consumers run (archive, e-mail dispatch, dead-letter recorder); `false`: events are recorded as delivered in-process (`LOCAL`) and e-mails are sent after commit and by `MAIL_DISPATCH`. |
+| `BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS` | when enabled | `localhost:9092` | `spring.kafka.bootstrap-servers`. On AWS: the Amazon MSK bootstrap brokers (SASL/SCRAM port 9096 or TLS port 9094). |
+| `BROKERVERSE_KAFKA_SECURITY_PROTOCOL` | yes on AWS | `PLAINTEXT` | `spring.kafka.properties.security.protocol`: `SASL_SSL` on MSK with SASL/SCRAM, `SSL` with TLS only. |
+| `BROKERVERSE_KAFKA_SASL_MECHANISM` | with SASL | `SCRAM-SHA-512` | `spring.kafka.properties.sasl.mechanism`. |
+| `BROKERVERSE_KAFKA_SASL_JAAS_CONFIG` | with SASL | – | `spring.kafka.properties.sasl.jaas.config`, e.g. `org.apache.kafka.common.security.scram.ScramLoginModule required username="…" password="…";` (MSK secret in AWS Secrets Manager). **Secret**. |
+| `BROKERVERSE_KAFKA_CLIENT_ID` | no | `brokerverse` | `spring.kafka.client-id`. |
+| `BROKERVERSE_KAFKA_CREATE_TOPICS` | no | `true` | `spring.kafka.admin.auto-create`: the application creates missing topics (and their `.dlt` topics) at start-up with the partitions and replication factor below. Broker-side auto-creation is off (`allow.auto.create.topics=false` on every client; `auto.create.topics.enable=false` on MSK). Set `false` when the topics are provisioned by infrastructure code. |
+| `BROKERVERSE_KAFKA_PARTITIONS` | no | `3` | `brokerverse.kafka.partitions` of each topic created. |
+| `BROKERVERSE_KAFKA_REPLICATION_FACTOR` | yes on MSK | `1` | `brokerverse.kafka.replication-factor`: `3` on a three-AZ MSK cluster. |
+| `BROKERVERSE_KAFKA_GROUP_PREFIX` | no | `bibs` | `brokerverse.kafka.consumer-group-prefix` of the consumer groups (`bibs-event-archive`, `bibs-mail-dispatch`, `bibs-dead-letter-recorder`). |
+| `BROKERVERSE_KAFKA_RELAY_BATCH_SIZE` | no | `200` | Outbox rows sent per relay round. |
+| `BROKERVERSE_KAFKA_RELAY_MAX_ATTEMPTS` | no | `10` | Send attempts of an outbox row before it becomes `FAILED` (support screen: *Send Again*). |
+| `BROKERVERSE_KAFKA_RELAY_RETRY_BACKOFF` | no | `PT30S` | First retry delay of a row; doubles per attempt, at most one hour. |
+| `BROKERVERSE_KAFKA_SEND_TIMEOUT` | no | `PT30S` | Wait for the broker acknowledgement of a send. |
+| `BROKERVERSE_KAFKA_DELIVERY_TIMEOUT_MS` / `BROKERVERSE_KAFKA_MAX_BLOCK_MS` | no | `30000` / `15000` | Producer `delivery.timeout.ms` / `max.block.ms`. |
+| `BROKERVERSE_KAFKA_CONSUMER_RETRIES` | no | `3` | Retries of a failing consumed record before it goes to `<topic>.dlt`. |
+| `BROKERVERSE_KAFKA_CONSUMER_RETRY_BACKOFF` | no | `PT2S` | Delay between consumer retries. |
+| `BROKERVERSE_KAFKA_OUTBOX_RETENTION` | no | `P30D` | Age after which delivered outbox rows (`SENT`, `LOCAL`) are deleted. |
+| `BROKERVERSE_KAFKA_ARCHIVE_RETENTION` | no | `P400D` | Age after which archived events and resolved dead letters are deleted. |
+
+Fixed producer / consumer settings (`application.yml`): `acks=all`, `enable.idempotence=true`,
+`max.in.flight.requests.per.connection=5` (order per partition kept), consumer
+`auto-offset-reset=earliest`, `enable-auto-commit=false`, `isolation.level=read_committed`.
 
 Every background job is a `ManagedJob` listed on *Administration › Scheduled Jobs* with its next
 run, run history and "Run now". A cron of `-` disables the schedule (manual runs only); cron

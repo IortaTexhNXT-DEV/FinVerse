@@ -1,0 +1,3316 @@
+# Test plan BRD-5 Volume 2 (Disbursement, Payment Requests and ACSL) - test data file.
+# Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/testplans/brd05_vol2_cases.yaml
+# Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
+# Messages and codes are the ones BIBS returns (backend/src/main: disbursement, payrequest, acsl,
+# remittance, tax, organization); labels are those of frontend/src/features.
+
+meta:
+  brd: BRD-05
+  name: Accounting Disbursement ACSL Vol2
+  code: DPA
+  frs: FRS_BRD05_ACCOUNTING_VOL2.md
+  summary: TP_BRD05_ACCOUNTING_VOL2.md
+  version: "1.0"
+  date: 25 September 2026
+  built: true
+
+personas:
+  DISBURSEMENT: {name: Disbursement Processor, user: disb, short: Disb. Proc.}
+  DISB_TL: {name: Disbursement Team Leader, user: "disbtl, disbtl2", short: Disb. TL}
+  DISB_APPROVER: {name: Disbursement Approver, user: "disbappr, disbappr2", short: Disb. Appr.}
+  PRQ_PROCESSOR: {name: Marketing Processor (AO), user: mktao, short: MKT Proc.}
+  PRQ_REVIEWER: {name: Marketing Reviewer, user: mktrev, short: MKT Rev.}
+  PRQ_APPROVER: {name: Marketing Approver, user: mktappr, short: MKT Appr.}
+  HR_APPROVER: {name: HR Approver, user: hrappr, short: HR}
+  ACSL_PROCESSOR: {name: ACSL Processor, user: acsl, short: ACSL Proc.}
+  ACSL_TL: {name: ACSL Team Leader, user: acsltl, short: ACSL TL}
+  ACSL_HEAD: {name: ACSL Head, user: acslhead, short: ACSL Head}
+  CASHIER: {name: Cashier, user: "cashier, cashtl", short: Cashier}
+  REMIT_TL: {name: Remittance Team Lead, user: remittl, short: Remit TL}
+  FRBS_PROCESSOR: {name: GL Officer, user: glofficer, short: GL Officer}
+  FIN_ADMIN: {name: Comptrollership administrator, user: "fmanager, badmin", short: Fin. Admin}
+  COMPTROLLERSHIP: {name: Comptrollership, user: comptrol, short: Compt.}
+  AUDITOR: {name: Auditor, user: auditor, short: Audit.}
+  SYSTEM: {name: BIBS scheduled job or event, user: "-"}
+
+screens:
+  LOGIN: Login page
+  WB: Finance > Disbursement > Disbursement Workbench
+  ENC: Finance > Disbursement > Encode Payment Request
+  DV: Finance > Disbursement > Disbursement Voucher (Details tab)
+  DVENTRY: Finance > Disbursement > Disbursement Voucher > Entry tab
+  DVINST: Finance > Disbursement > Disbursement Voucher > Instrument tab
+  DVTAG: Finance > Disbursement > Disbursement Voucher > OR / AR and CWT tab
+  PAYEES: Finance > Disbursement > Payees
+  PAYEE: Finance > Disbursement > Payees > Payee
+  UPL: Finance > Disbursement > Disbursement Uploads
+  EOD: Finance > Disbursement > Disbursement End of Day
+  FUND: Finance > Disbursement > Account Funding > Funding Request
+  BANKS: Finance > Disbursement > Bank Accounts and Checks
+  DREP: Finance > Disbursement > Disbursement Reports
+  EMP: Setup & Administration > Setup > Employees
+  CERTS: Finance > Tax & Statutory > Certificates Received
+  F2307: Finance > Tax & Statutory > BIR Form 2307
+  REMIT: Finance > Remittance > Remittance Batches > Remittance Batch (Settlement tab)
+  DEDS: Finance > Remittance > Remittance Deductions
+  DED: Finance > Remittance > Remittance Deductions > Remittance Deduction
+  SINV: Client & Policy > Booking > Service Invoices
+  INVSEARCH: Operations > Invoice Search
+  INV360: Operations > Invoice 360 (Invoice Family tab)
+  PQHOME: Finance > Refund & Cash Advance Requests > Requests Home
+  NEWRRF: Finance > Refund & Cash Advance Requests > New Refund Request
+  NEWCA: Finance > Refund & Cash Advance Requests > New Cash Advance
+  CCR: Finance > Refund & Cash Advance Requests > Cancel a Check
+  REQ: Finance > Refund & Cash Advance Requests > Request (workflow panel)
+  LIQACC: Finance > Refund & Cash Advance Requests > Liquidation Accounts
+  CASES: Finance > ACSL > ACSL Cases
+  CASE: Finance > ACSL > ACSL Cases > ACSL Case
+  CORRS: Finance > ACSL > Correction Entries
+  CORR: Finance > ACSL > Correction Entries > Correction Entry
+  SOA: Finance > ACSL > Insurer SOA Reconciliation
+  SOAD: Finance > ACSL > Insurer SOA Reconciliation > Insurer SOA
+  GLSL: Finance > ACSL > GL-SL Reconciliation
+  CASHTASK: Finance > Cashiering > Incoming Requests (validations and reversals)
+  REPORTS: Reports > Report Centre
+  LOV: Setup & Administration > Broking Setup > Lists of Values
+  APPROVALS: My Approvals (home section)
+  ALERTS: Alerts (home section and bell icon in the page header)
+  JOBS: Setup & Administration > Administration > Scheduled Jobs
+  API: API call with the user's token (tester tool, for example Postman)
+
+data:
+  - id: TD-DPA-01
+    name: Demo users and roles
+    content: disb (DISBURSEMENT), disbtl and disbtl2 (DISB_TL), disbappr and disbappr2 (DISB_APPROVER), mktao (PRQ_PROCESSOR), mktrev (PRQ_REVIEWER), mktappr (PRQ_APPROVER), hrappr (HR_APPROVER), acsl (ACSL_PROCESSOR), acsltl (ACSL_TL), acslhead (ACSL_HEAD), cashier and cashtl (CASHIER, CASHIER_TL), remittl (REMIT_TL), glofficer (FRBS_PROCESSOR), fmanager (FIN_ADMIN), badmin (BUSINESS_ADMIN), comptrol, admin, auditor. The demo password is issued by the test lead.
+    source: Demo seeds V999 (BRD-5 users), V990, V980, V900; grants V890
+  - id: TD-DPA-02
+    name: Disbursement masters
+    content: Payees of an insurer, a client and a supplier maintained by disbtl and authorised by disbappr; BDOIR bank accounts with their cheque books; parameters DISB_STALE_DAYS 180, DISB_CHECK_SERIES_WARNING 20, DISB_AUTO_APPROVER_ROUTING REFUND and REMITTANCE, DISB_NO_PAYEE_ACTION HOLD, DISB_CHECK_CLEARING ON (account 2241)
+    source: Migrations V891-V893 and the demo runner DisbursementDemoData
+  - id: TD-DPA-03
+    name: Disbursement storyline
+    content: A remittance DV approved and paid by check (printed and released), a client refund by credit to account approved, a supplier payment by check approved and a second one left In Process, the end of day of the load date with its DCTF, check batch and reports, the deposited-checks file that tags a check Negotiated, a funding through maker, verifier and two approvers
+    source: Demo runner DisbursementDemoData (after the Operations runners)
+  - id: TD-DPA-04
+    name: Upload files
+    content: Request upload of 20 rows with 3 unknown payees; payee migration file of 100 payees with 2 invalid rows; deposited-checks file (check no., amount, date); credited-accounts file; BOB approvals file; one row with a wrong amount in each
+    source: Prepared by the test lead from the templates of Disbursement Uploads
+  - id: TD-DPA-05
+    name: Payment requests keyed in the test
+    content: A refund request (RRF) of one client with two AR numbers of the cashiering demo, reason Overpayment, credit to account; a refund of a cancelled policy; a cash advance (RFP) for an employee with purpose and amount 5,000.00; documents (PDF and XLSX)
+    source: Keyed in by the tester (no Payment Requests demo storyline)
+  - id: TD-DPA-06
+    name: ACSL data
+    content: An insurer SOA file of 1,200 rows with 3 rows without invoice number in the standard layout; GL-SL control accounts set up for premium receivable; a remittance deduction of INS-LAC (AR insurer's refund) recorded by acsl and waiting for acsltl
+    source: SOA file prepared by the test lead; controls of V896-V897; demo runner DeductionDemoData
+  - id: TD-DPA-07
+    name: Remittance and incentives
+    content: Remittance batches of the Operations demo; CPC2 incentive criterion (code CPC2, RATE basis) on packaged Motor lines; early-remittance incentive rules; EARLY_INCENTIVE_WTAX_RATE 2 %
+    source: Demo seeds V992, V996 and migration V772
+  - id: TD-DPA-08
+    name: Employee master and liquidation accounts
+    content: Demo employees with number, unit, branch and cost centre; the expense-role accounts of PRQ_CA_LIQUIDATION
+    source: Demo seed V999 and the Liquidation Accounts screen
+
+scenarios:
+  - id: SC-DPA-01
+    persona: DISB_TL
+    title: Access and payees. Users see only their screens; the team leader maintains payees that the approver authorises, and the existing payees are migrated.
+    pre: Users TD-DPA-01; masters TD-DPA-02; migration file TD-DPA-04.
+  - id: SC-DPA-02
+    persona: DISBURSEMENT
+    title: Requests and vouchers. Requests arrive from the modules, by e-mail or upload; the processor completes the DV, its entry and allocation and submits it.
+    pre: Masters TD-DPA-02; upload file TD-DPA-04.
+  - id: SC-DPA-03
+    persona: DISB_APPROVER
+    title: Review, approval and cancellation. The team leader reviews, the approver approves, rejects or cancels, and the accounting is regularised.
+    pre: DVs of TD-DPA-03.
+  - id: SC-DPA-04
+    persona: DISBURSEMENT
+    title: Instruments and tags. Each mode of payment goes through its statuses; checks are negotiated or staled and re-issued; OR / AR and CWT are tagged.
+    pre: Approved DVs of TD-DPA-03; bank files TD-DPA-04.
+  - id: SC-DPA-05
+    persona: DISB_TL
+    title: End of day, funding, banks and reports. The end of day produces the DCTF, checks, forms and reports; the main account is funded; bank accounts and check series are maintained; reports run.
+    pre: Approved DVs of the day; masters TD-DPA-02.
+  - id: SC-DPA-06
+    persona: REMIT_TL
+    title: Remittance incentives and invoice families. CPC2 and early incentives are computed, invoiced and posted per batch; related invoices are linked to the root.
+    pre: Remittance data TD-DPA-07.
+  - id: SC-DPA-07
+    persona: PRQ_PROCESSOR
+    title: Refund requests. Marketing raises, validates, reviews and approves refund requests that Disbursement pays; duplicates are refused.
+    pre: Data TD-DPA-05.
+  - id: SC-DPA-08
+    persona: PRQ_PROCESSOR
+    title: Cash advances and check cancellations. Cash advances go through Marketing and HR, are paid and liquidated; a disbursed check is cancelled through Disbursement.
+    pre: Data TD-DPA-05 and TD-DPA-08.
+  - id: SC-DPA-09
+    persona: ACSL_PROCESSOR
+    title: ACSL reconciliation and investigation. Insurer SOAs are uploaded and reconciled, GL and SL are compared, cases are investigated and answered.
+    pre: Data TD-DPA-06.
+  - id: SC-DPA-10
+    persona: ACSL_PROCESSOR
+    title: Corrections and deductions. Correction entries are prepared, reviewed, approved and posted; insurer-confirmed deductions reduce the next remittance.
+    pre: Data TD-DPA-06 and TD-DPA-07.
+
+frs:
+  FR-DS-001:
+    scenario: SC-DPA-01
+    persona: DISBURSEMENT
+    screen: LOGIN
+    data: [TD-DPA-01]
+    conditions:
+      - Each user logs in with an own profile and sees only the Disbursement, Payment Requests or ACSL screens of the roles.
+      - Wrong credentials are refused.
+      - The inactivity warning appears after SESSION_IDLE_WARNING_MINUTES.
+    cases:
+      - c: 1
+        type: Security-access
+        neg: false
+        title: Disbursement Processor sees the workbench, not ACSL
+        steps:
+          - Log in as disb and open the group Finance.
+        expected: Disbursement (Disbursement Workbench and the processor screens) is shown; ACSL and Refund & Cash Advance Requests are not.
+        auto: CollectionsAccountingFoundationIT#demoPersonasHoldTheirPermissions
+      - c: 1
+        type: Security-access
+        persona: PRQ_PROCESSOR
+        title: Marketing processor sees only the request screens
+        steps:
+          - Log in as mktao and open the group Finance; type /disbursement.
+        expected: Requests Home, New Refund Request, New Cash Advance and Cancel a Check are shown; the Disbursement link is refused ("You do not have access to this screen. Contact your administrator if you need it.").
+        auto: PayRequestApiIT#permissionsAndValidationAreEnforced
+      - c: 2
+        type: Negative
+        persona: ACSL_PROCESSOR
+        title: Wrong password
+        steps:
+          - Enter user ID acsl and a wrong password.
+        expected: No session starts.
+        msg: [Invalid user name or password, AUTHENTICATION_FAILED]
+        auto: ApiSmokeIT#loginReturnsTokenAndWrongPasswordIsRejected
+      - c: 3
+        type: Positive
+        persona: DISB_TL
+        screen: WB
+        title: Inactivity warning after 15 minutes
+        steps:
+          - Log in as disbtl and leave the workbench open without activity for 15 minutes.
+        expected: The dialog "Your session is about to expire" appears with the seconds left.
+        msg: [Your session is about to expire, "-"]
+        auto: idleTimer.test.ts#moves from active to warning to expired
+
+  FR-DS-010:
+    scenario: SC-DPA-01
+    persona: DISB_TL
+    screen: PAYEE
+    data: [TD-DPA-02]
+    conditions:
+      - A new payee is a draft, is submitted and becomes ACTIVE when the approver authorises it; changes, deactivation and reactivation are authorised the same way.
+      - The maker cannot authorise the own payee.
+      - A payee needs a code, at least one mode and a default mode among the allowed modes; a payee under authorisation cannot be edited.
+      - Account numbers are masked unless the user holds DISB_PAYEE_VIEW_FULL.
+    cases:
+      - c: 1
+        type: Workflow
+        title: New supplier payee authorised
+        steps:
+          - As disbtl, click New Payee, class Supplier, name, TIN, modes Check and CTA, default Check, one bank account; save and submit.
+          - As disbappr, open For Authorisation and authorise it.
+        expected: The payee is DRAFT, then for authorisation, then ACTIVE and offered on new DVs.
+        auto: DisbursementProcessingIT#payeesNeedTheCheckerAndOnlyUnusedDraftsAreDeleted
+      - c: 1
+        type: Workflow
+        persona: DISB_APPROVER
+        title: Return a payee to the maker
+        steps:
+          - As disbappr, return a submitted payee with a reason.
+        expected: The payee is back with disbtl as a draft with the reason.
+      - c: 2
+        type: Security-access
+        title: Maker authorises the own payee
+        pre: disbtl2 also holds DISB_PAYEE_AUTHORIZE (test user prepared by the test lead).
+        steps:
+          - As disbtl2, create and submit a payee, then authorise it.
+        expected: The authorisation is refused.
+        msg: [A payee cannot be authorised by the user who maintained it, MAKER_CHECKER_VIOLATION]
+        auto: DisbursementProcessingIT#payeesNeedTheCheckerAndOnlyUnusedDraftsAreDeleted
+      - c: 3
+        type: Negative
+        title: No mode of payment
+        steps:
+          - Save a payee without any mode.
+        expected: The payee is refused.
+        msg: [Select at least one mode of payment, PAYEE_MODE]
+        auto: labels.test.ts#requires the code, class, name and a bank account for credit modes
+      - c: 3
+        type: Negative
+        title: Default mode not allowed
+        steps:
+          - Save a payee with modes Check only and default ATD.
+        expected: The payee is refused.
+        msg: [The default mode of payment must be one of the allowed modes, PAYEE_MODE]
+      - c: 3
+        type: Negative
+        screen: API
+        title: Payee without code
+        steps:
+          - POST a payee without payee code.
+        expected: The call is refused.
+        msg: [Company and payee code are required, PAYEE_CODE]
+      - c: 3
+        type: Negative
+        title: Edit a payee waiting for authorisation
+        steps:
+          - Change the address of a payee that is for authorisation.
+        expected: The change is refused.
+        msg: ["Payee {code} is {FOR_AUTHORIZATION}", PAYEE_NOT_EDITABLE]
+      - c: 4
+        type: Security-access
+        persona: DISBURSEMENT
+        screen: PAYEES
+        title: Processor sees masked account numbers
+        steps:
+          - Log in as disb and open Payees and a payee.
+        expected: Account numbers show only their last four digits.
+        auto: InstrumentLifecycleTest#accountNumbersAreMaskedButTheLastFourDigits; DisbursementApiIT#payeesShowMaskedAccountsWithoutTheFullViewPermission
+      - c: 4
+        type: Security-access
+        neg: false
+        screen: PAYEES
+        title: Team leader sees full account numbers
+        steps:
+          - Log in as disbtl and open the same payee.
+        expected: The full account numbers are shown.
+
+  FR-DS-011:
+    scenario: SC-DPA-01
+    persona: DISB_TL
+    screen: PAYEE
+    conditions:
+      - Each payee has a class of PAYEE_CLASS and its allowed modes among the seven modes.
+      - A DV cannot use a mode the payee does not allow.
+    cases:
+      - c: 1
+        type: Positive
+        title: Classes and modes offered
+        steps:
+          - Open New Payee and the lists Class and Modes.
+        expected: Classes Supplier, Insurer, Employee, Client, Government agency, Others; modes Credit to Account, Debit BDOIR Main Account (ATD), Manager's Check or Demand Draft, Credit Ticket, Telegraphic Transfer, Online Banking, Check.
+      - c: 2
+        type: Negative
+        persona: DISBURSEMENT
+        screen: DV
+        title: ATD for a payee allowed Check and CTA
+        steps:
+          - On a DV of the supplier payee (modes Check and CTA) choose mode ATD; save.
+        expected: The terms are refused.
+        msg: ["Mode {ATD} is not allowed for payee {code}", DV_MODE]
+
+  FR-DS-012:
+    scenario: SC-DPA-01
+    persona: DISB_TL
+    screen: PAYEES
+    conditions:
+      - Payee requests come from refunds, Disbursement and requests without payee (NO_MATCH); authorising the payee closes the request and resumes the waiting request.
+      - A request not needed is closed; a closed request cannot be acted on.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: REMIT_TL
+        title: Remittance for an insurer without payee
+        steps:
+          - Approve a remittance batch of an insurer without a payee.
+          - As disbtl open Payee Requests; create the payee from the request; disbappr authorises it.
+        expected: A NO_MATCH payee request is listed; after the authorisation it is DONE and the remittance request creates its DV.
+        auto: DisbursementIT#aRequestWithoutPayeeWaitsForItAndContinuesOnceAuthorised
+      - c: 2
+        type: Negative
+        title: Act on a closed payee request
+        steps:
+          - Close a payee request not needed; try to close it again.
+        expected: The second action is refused.
+        msg: ["The payee request is {CLOSED}", PAYEE_REQUEST_CLOSED]
+
+  FR-DS-013:
+    scenario: SC-DPA-01
+    persona: DISB_TL
+    screen: PAYEE
+    conditions:
+      - A draft payee never used can be deleted.
+      - A payee that is active or has been used is deactivated with authorisation and can be reactivated; inactive payees are not offered on new DVs.
+    cases:
+      - c: 1
+        type: Positive
+        title: Delete an unused draft
+        steps:
+          - Create a draft payee and click Delete.
+        expected: The payee is deleted.
+        auto: DisbursementProcessingIT#payeesNeedTheCheckerAndOnlyUnusedDraftsAreDeleted
+      - c: 2
+        type: Negative
+        title: Delete a payee paid last month
+        steps:
+          - Click Delete on the supplier payee of TD-DPA-03.
+        expected: The deletion is refused.
+        msg: [Only a draft payee never used can be deleted; deactivate it instead, PAYEE_IN_USE]
+        auto: DisbursementProcessingIT#payeesNeedTheCheckerAndOnlyUnusedDraftsAreDeleted
+      - c: 2
+        type: Workflow
+        title: Deactivate and reactivate
+        steps:
+          - Request Deactivation of a payee; disbappr authorises it.
+          - Encode a request for that payee; then reactivate the payee (authorised).
+        expected: The payee is INACTIVE and not offered on the DV; after reactivation it is offered again.
+
+  FR-DS-014:
+    scenario: SC-DPA-01
+    persona: DISB_TL
+    screen: UPL
+    data: [TD-DPA-04]
+    conditions:
+      - The Payees screen lists maintained payees by tab with masked accounts.
+      - The migration upload creates valid payees with source MIGRATION and lists the refused rows with their reasons.
+    cases:
+      - c: 1
+        type: Positive
+        persona: DISBURSEMENT
+        screen: PAYEES
+        title: Consolidated list of payees
+        steps:
+          - Open Payees, tabs Active and Inactive.
+        expected: Name, address, masked account number, mode and disbursement type of each payee.
+        auto: DisbursementApiIT#payeesShowMaskedAccountsWithoutTheFullViewPermission
+      - c: 2
+        type: Upload-download
+        title: Migration of 100 payees with 2 invalid rows
+        steps:
+          - Upload the migration file of TD-DPA-04 with the template DISB_PAYEE_MIGRATION.
+        expected: 98 payees are created with source MIGRATION; the reconciliation lists 2 refused rows with their reasons.
+      - c: 2
+        type: Negative
+        title: Row without payee code
+        steps:
+          - Upload a migration file with one row without payee code.
+        expected: That row is refused with its reason; the others load.
+
+  FR-DS-020:
+    scenario: SC-DPA-02
+    persona: SYSTEM
+    screen: WB
+    data: [TD-DPA-02]
+    conditions:
+      - A module request with a maintained payee creates its DV at once; refund and remittance DVs go straight to For Approval.
+      - A request without a maintained payee waits under No Payee with a NO_MATCH request and the alert, and resumes when the payee is authorised.
+      - A duplicate request, an amount that is not positive or an action in the wrong status is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: REMIT_TL
+        title: Approved remittance batch becomes a DV For Approval
+        steps:
+          - Approve a remittance batch; open the Disbursement Workbench, For Approval.
+        expected: A remittance DV of the batch amount is For Approval with the RFP number and the root invoice.
+        auto: DisbursementIT#aRemittanceBatchBecomesAVoucherThatIsApprovedPrintedAndNegotiated
+      - c: 2
+        type: Workflow
+        persona: PRQ_APPROVER
+        title: Refund for a client without payee waits
+        steps:
+          - Approve a refund for a client without payee; open No Payee.
+          - Authorise the client payee (disbtl, disbappr).
+        expected: The request waits under No Payee and DISB_PAYEE_NO_MATCH is raised; after the authorisation the DV is created.
+        auto: DisbursementIT#aRequestWithoutPayeeWaitsForItAndContinuesOnceAuthorised
+      - c: 3
+        type: Negative
+        screen: API
+        title: Same source reference twice
+        steps:
+          - Send the same gateway request twice (test harness of the test lead).
+        expected: The second request is refused.
+        msg: ["Request {ref} was already received", DISB_REQUEST_DUPLICATE]
+      - c: 3
+        type: Negative
+        screen: API
+        title: Zero amount
+        steps:
+          - Send a gateway request of 0.00.
+        expected: The request is refused.
+        msg: [A payment request needs a positive amount, DISB_AMOUNT]
+      - c: 3
+        type: Negative
+        persona: DISBURSEMENT
+        title: Voucher for a request still without payee
+        steps:
+          - Open a No Payee request and click Create Voucher.
+        expected: The action is refused.
+        msg: ["Maintain payee {code} before creating the voucher", DISB_PAYEE_NOT_MAINTAINED]
+
+  FR-DS-021:
+    scenario: SC-DPA-02
+    persona: SYSTEM
+    screen: WB
+    conditions:
+      - Each request carries its disbursement type from the source or the payee class, which drives the rule, reports and end-of-day files.
+      - A type outside DISBURSEMENT_TYPE is not offered.
+    cases:
+      - c: 1
+        type: Positive
+        persona: DISBURSEMENT
+        title: Government payee classified and reported
+        steps:
+          - Encode a request for a government payee; approve it; run the end of day.
+        expected: The DV type is Payment to government agencies and it appears in DSB-EOD-OTHER.
+      - c: 2
+        type: Negative
+        persona: DISBURSEMENT
+        screen: ENC
+        title: Types offered for encoding
+        steps:
+          - Open the disbursement type list on Encode Payment Request.
+        expected: Only Remittance, Refund, Payment to supplier, Employee-related and Other are offered.
+
+  FR-DS-022:
+    scenario: SC-DPA-02
+    persona: SYSTEM
+    screen: DREP
+    conditions:
+      - The payee is matched by party code, then by a unique name.
+      - A request without a match is listed on the unmatched-payee report and waits.
+    cases:
+      - c: 1
+        type: Positive
+        title: Match by name when the code is missing
+        steps:
+          - Send a request with the payee name of a maintained payee and no code.
+        expected: The DV is created for that payee.
+      - c: 2
+        type: Report-output
+        persona: DISBURSEMENT
+        title: No-match report
+        steps:
+          - Run DSB-PAYEE-NOMATCH.
+        expected: The waiting request is listed with its source, payee code and amount.
+        auto: DisbursementApiIT#everyDisbursementReportRunsAndExports
+      - c: 2
+        type: Negative
+        title: Two payees with the same name
+        pre: Two active payees share a name.
+        steps:
+          - Send a request with that name and no code.
+        expected: The request is not matched and waits under No Payee.
+
+  FR-DS-023:
+    scenario: SC-DPA-02
+    persona: DISBURSEMENT
+    screen: ENC
+    conditions:
+      - An encoded request with a maintained payee becomes a DV In Process with the payee's details.
+      - The amount must be positive and the payee maintained.
+    cases:
+      - c: 1
+        type: Positive
+        title: Supplier request of 25,000.00
+        steps:
+          - Encode type Payment to supplier, the supplier payee, PHP 25,000.00, purpose, RFP no., expense account and cost centre; attach the invoice PDF; save.
+        expected: A DV In Process with the supplier's details and the attachment.
+        auto: DisbursementDemoIT#theStorylineCoversEveryDisbursementScreen; labels.test.ts#validates the encode form
+      - c: 2
+        type: Negative
+        title: Amount zero
+        steps:
+          - Encode a request of 0.00.
+        expected: The request is refused.
+        msg: [A payment request needs a positive amount, DISB_AMOUNT]
+      - c: 2
+        type: Negative
+        title: Payee not maintained
+        steps:
+          - Encode a request for a payee code that is not maintained.
+        expected: The request is refused.
+        msg: ["Maintain payee {code} before creating the voucher", DISB_PAYEE_NOT_MAINTAINED]
+
+  FR-DS-024:
+    scenario: SC-DPA-02
+    persona: DISBURSEMENT
+    screen: UPL
+    data: [TD-DPA-04]
+    conditions:
+      - Valid rows of the upload become requests with their DVs; failed rows are listed with their reason.
+      - A user without DISB_UPLOAD cannot upload.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: 20 rows with 3 unknown payees
+        steps:
+          - Upload the request file of TD-DPA-04 with the template DISB_REQUESTS.
+        expected: 17 requests with DVs in the processing list; the fall-out lists 3 rows with their reason.
+      - c: 1
+        type: Negative
+        title: Row with a negative amount
+        steps:
+          - Upload a file with one row of -100.00.
+        expected: That row is in the fall-out with its reason; the others load.
+      - c: 2
+        type: Security-access
+        persona: DISB_APPROVER
+        title: Approver cannot upload
+        steps:
+          - Log in as disbappr; open the menu.
+        expected: Disbursement Uploads is not shown.
+
+  FR-DS-025:
+    scenario: SC-DPA-02
+    persona: DISBURSEMENT
+    screen: WB
+    data: [TD-DPA-03]
+    conditions:
+      - The workbench lists requests and DVs by tab with filters on the received date and every column.
+      - The DV shows the request, payee details and taxes, documents, entry, instrument and history.
+      - A DV claimed by one user is read only for others.
+    cases:
+      - c: 1
+        type: Positive
+        title: Filter on the received date
+        steps:
+          - Open In Process; set Received From and Received To to yesterday.
+        expected: Only the requests received yesterday are listed.
+        auto: DisbursementApiIT#theWorkbenchRequestsAndVouchersAreReadAndProcessedThroughTheApi; labels.test.ts#maps the workbench tab of the URL, defaulting to the system requests
+      - c: 2
+        type: Positive
+        screen: DV
+        title: Supplier DV shows TIN and ATC
+        steps:
+          - Open the supplier DV.
+        expected: The payee's TIN and ATC, currency and mode are shown with the documents (view and download).
+      - c: 3
+        type: Negative
+        persona: DISB_TL
+        screen: DV
+        title: DV claimed by another user
+        steps:
+          - While disb works the DV, open it as disbtl and change the terms.
+        expected: The DV is read only for disbtl.
+
+  FR-DS-030:
+    scenario: SC-DPA-02
+    persona: DISBURSEMENT
+    screen: DV
+    data: [TD-DPA-02]
+    conditions:
+      - The DV is numbered DV-yyyy-n with terms pre-filled from the payee; the processor completes the terms.
+      - The paying account is active and in the DV currency; the payee account is active; EWT is zero or more and below the gross.
+      - A DV with missing terms cannot be submitted; a DV past In Process cannot be changed.
+    cases:
+      - c: 1
+        type: Positive
+        title: Encoded request gets its DV
+        steps:
+          - Open the DV of the supplier request.
+        expected: DV-2026-n with mode, payee account and taxes pre-filled from the payee.
+        auto: DisbursementProcessingIT#anEditedProformaIsPostedAsGivenAndTheCheckGoesThroughItsStatuses
+      - c: 2
+        type: Negative
+        title: Paying account in another currency
+        steps:
+          - Choose a USD paying account on a PHP DV.
+        expected: The terms are refused.
+        msg: ["The paying account must be in {PHP}", DV_BANK_CURRENCY]
+      - c: 2
+        type: Negative
+        title: Inactive payee account
+        steps:
+          - Choose an inactive account of the payee.
+        expected: The terms are refused.
+        msg: [Select an active account of the payee, DV_PAYEE_ACCOUNT]
+      - c: 2
+        type: Boundary
+        neg: true
+        title: EWT equal to the gross
+        steps:
+          - Enter EWT 25,000.00 on the DV of 25,000.00.
+        expected: The terms are refused; 24,999.99 is accepted.
+        msg: [The withholding tax must be at least zero and below the gross amount, DV_EWT]
+      - c: 3
+        type: Negative
+        title: Submit without paying account
+        steps:
+          - Leave the paying account blank and click Submit.
+        expected: The DV is not submitted.
+        msg: ["Complete DV {no}: {paying account}", DV_INCOMPLETE]
+        auto: DisbursementDemoIT#theStorylineCoversEveryDisbursementScreen
+      - c: 3
+        type: Negative
+        screen: API
+        title: Change terms of an approved DV
+        steps:
+          - PUT .../vouchers/{id}/terms on an APPROVED DV.
+        expected: The change is refused.
+        msg: ["DV {no} is {APPROVED} and can no longer be changed", DV_NOT_EDITABLE]
+
+  FR-DS-031:
+    scenario: SC-DPA-02
+    persona: DISBURSEMENT
+    screen: DVENTRY
+    conditions:
+      - The proforma entry is built from the rule; edited lines are marked Edited and shown to the approver; Rebuild from rule discards the edits.
+      - An entry without lines or unbalanced cannot be saved.
+    cases:
+      - c: 1
+        type: Positive
+        title: Change the expense account of a supplier DV
+        steps:
+          - On the Entry tab change the expense account of the supplier DV; save.
+          - As disbappr open the DV.
+        expected: The line is marked Edited and disbappr sees that the entry was changed; on approval the edited lines post as given.
+        auto: DisbursementProcessingIT#anEditedProformaIsPostedAsGivenAndTheCheckGoesThroughItsStatuses; labels.test.ts#totals the proforma entry in cents
+      - c: 1
+        type: Positive
+        title: Rebuild from rule
+        steps:
+          - Click Rebuild from rule.
+        expected: The lines of the rule return and the Edited marks disappear.
+      - c: 2
+        type: Negative
+        title: Unbalanced edited entry
+        steps:
+          - Change one line amount only; save.
+        expected: The entry is refused and the errors listed.
+        msg: ["{errors}", DV_ENTRY_INVALID]
+      - c: 2
+        type: Negative
+        screen: API
+        title: Entry without lines
+        steps:
+          - PUT .../vouchers/{id}/proforma with no line.
+        expected: The call is refused.
+        msg: [The proforma entry has no line, DV_ENTRY_EMPTY]
+
+  FR-DS-032:
+    scenario: SC-DPA-02
+    persona: DISBURSEMENT
+    screen: DVENTRY
+    conditions:
+      - An allocation of account, cost centre and amount builds the expense lines; it must add up to the gross.
+    cases:
+      - c: 1
+        type: Positive
+        title: Rent allocated to HO and Cebu
+        steps:
+          - On a rent DV of 30,000.00 click Apply Allocation with 20,000.00 HO and 10,000.00 Cebu.
+        expected: Two expense lines with those cost centres; they post at approval.
+      - c: 1
+        type: Negative
+        title: Allocation that does not add up
+        steps:
+          - Apply an allocation of 20,000.00 and 5,000.00 on the DV of 30,000.00.
+        expected: The allocation is refused.
+        msg: ["The allocation must add up to the gross amount {30,000.00}", DV_ALLOCATION_TOTAL]
+
+  FR-DS-033:
+    scenario: SC-DPA-04
+    persona: DISBURSEMENT
+    screen: DVINST
+    conditions:
+      - An approved DV has one instrument of its mode, numbered from the check series or the mode's series.
+      - A DV has no instrument before approval; a status outside the life cycle of the mode is refused; a mode without form is processed by file.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Check printed from the series
+        steps:
+          - Approve a check DV (disbappr); click Print on its instrument.
+        expected: The check takes the next number of the paying account's series (for example 000124) and is PRINTED.
+        auto: DisbursementIT#aRemittanceBatchBecomesAVoucherThatIsApprovedPrintedAndNegotiated; InstrumentLifecycleTest#aCheckIsPrintedReleasedAndNegotiatedOrStale
+      - c: 2
+        type: Negative
+        screen: API
+        title: Print before approval
+        steps:
+          - POST .../instrument/print on a DV For Review.
+        expected: The call is refused.
+        msg: [The DV has no instrument until it is approved, DV_NOT_APPROVED]
+      - c: 2
+        type: Negative
+        screen: API
+        title: Negotiated check released again
+        steps:
+          - POST .../instrument/release on a NEGOTIATED check.
+        expected: The call is refused.
+        msg: ["{Check} {000124} is {NEGOTIATED} and cannot become {RELEASED}", INSTRUMENT_STATUS]
+        auto: InstrumentLifecycleTest#eachModeHasItsOwnStatuses
+      - c: 2
+        type: Negative
+        title: Print a credit to account
+        steps:
+          - Click Print on a CTA instrument.
+        expected: The action is refused.
+        msg: ["{Credit to account} has no printed form; it is processed by file", DISB_NO_FORM]
+
+  FR-DS-034:
+    scenario: SC-DPA-04
+    persona: DISBURSEMENT
+    screen: DVINST
+    conditions:
+      - An ATD is Printed, Emailed to the branch and Debited on the branch's confirmation.
+      - Only an ATD is e-mailed.
+    cases:
+      - c: 1
+        type: Workflow
+        title: ATD printed, e-mailed and confirmed
+        steps:
+          - Print the ATD of an approved ATD DV; click E-mail (branch mailbox of BRANCH_EMAIL, requester in copy); click Debited.
+        expected: The history shows PRINTED, EMAILED and DEBITED; the e-mail is on the E-mails tab.
+        auto: InstrumentLifecycleTest#eachModeHasItsOwnStatuses; labels.test.ts#offers the instrument actions of each mode and status
+      - c: 2
+        type: Negative
+        screen: API
+        title: E-mail a check
+        steps:
+          - POST .../instrument/email on a check DV.
+        expected: The call is refused.
+        msg: [Only an authority to debit is e-mailed, DISB_NOT_ATD]
+
+  FR-DS-035:
+    scenario: SC-DPA-04
+    persona: DISBURSEMENT
+    screen: DVINST
+    conditions:
+      - An MC / DD goes Printed, Received, Released; a Credit Ticket or TT goes Printed, Debited.
+      - A status outside the life cycle is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Manager's check and credit ticket
+        steps:
+          - Print, Receive and Release a manager's check; print and mark Debited a credit ticket.
+        expected: The MC is PRINTED, RECEIVED, RELEASED; the credit ticket PRINTED, DEBITED.
+        auto: InstrumentLifecycleTest#eachModeHasItsOwnStatuses
+      - c: 2
+        type: Negative
+        title: Release an MC not received
+        steps:
+          - Click Release on a PRINTED manager's check.
+        expected: The action is refused.
+        msg: ["{Manager's check} {no} is {PRINTED} and cannot become {RELEASED}", INSTRUMENT_STATUS]
+
+  FR-DS-036:
+    scenario: SC-DPA-02
+    persona: DISBURSEMENT
+    screen: DV
+    conditions:
+      - A complete DV is submitted to For Review with the confirmation of its totals.
+      - An incomplete DV is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Submit a complete DV
+        steps:
+          - Complete the supplier DV and click Submit; confirm.
+        expected: The DV is in the For Review tab.
+        auto: DisbursementProcessingIT#vouchersAreApprovedInBulkOrRejectedBackToTheirSource
+      - c: 2
+        type: Negative
+        title: Submit without the mode
+        steps:
+          - Clear the mode of payment and submit.
+        expected: The DV is not submitted.
+        msg: ["Complete DV {no}: {mode of payment}", DV_INCOMPLETE]
+
+  FR-DS-037:
+    scenario: SC-DPA-02
+    persona: FIN_ADMIN
+    screen: EMP
+    data: [TD-DPA-08]
+    conditions:
+      - The employee master holds a unique employee number, cost centre, unit, branch and dates, and feeds the headcount report.
+      - A missing cost centre, a separation before hiring or a branch of another company is refused.
+    cases:
+      - c: 1
+        type: Positive
+        title: New employee
+        steps:
+          - As fmanager, add an employee with number, name, position, unit, branch HO, cost centre and hiring date.
+        expected: The employee is saved and is the default cost centre of an employee payee.
+        auto: GlPlatformApiIT#costCentreRulesAndEmployeesAreMaintained
+      - c: 1
+        type: Negative
+        title: Duplicate employee number
+        steps:
+          - Add a second employee with the same number.
+        expected: The employee is refused.
+      - c: 1
+        type: Report-output
+        screen: REPORTS
+        title: Headcount per cost centre
+        steps:
+          - Run ORG-HEADCOUNT-CC as of 30 September; export to Excel and PDF.
+        expected: The active employees are counted per cost centre.
+        auto: GlPlatformApiIT#headcountPerCostCentreRunsForTheGlTeam
+      - c: 2
+        type: Negative
+        title: No cost centre
+        steps:
+          - Save an employee without cost centre.
+        expected: The employee is refused.
+        msg: ["Enter the employee's cost centre", COST_CENTER_REQUIRED]
+      - c: 2
+        type: Negative
+        title: Separation before hiring
+        steps:
+          - Enter a separation date before the hiring date.
+        expected: The employee is refused.
+        msg: [The separation date is before the hiring date, SEPARATION_BEFORE_HIRING]
+      - c: 2
+        type: Negative
+        screen: API
+        title: Branch of another company
+        steps:
+          - POST an employee with a branch of another company.
+        expected: The call is refused.
+        msg: [The branch belongs to another company, BRANCH_OF_OTHER_COMPANY]
+
+  FR-DS-040:
+    scenario: SC-DPA-03
+    persona: DISB_TL
+    screen: DV
+    data: [TD-DPA-03]
+    conditions:
+      - The TL reviews a DV For Review and submits it for approval or returns it with a reason and instructions.
+      - The checker is never the processor.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Return with "Incomplete supporting documents"
+        steps:
+          - Open a DV For Review, click Return with the reason Incomplete supporting documents and remarks.
+        expected: The DV is In Process again with the reason visible to the processor.
+        auto: DisbursementProcessingIT#vouchersAreApprovedInBulkOrRejectedBackToTheirSource
+      - c: 1
+        type: Workflow
+        title: Submit for approval
+        steps:
+          - Review a complete DV and click Submit for Approval.
+        expected: The DV is For Approval.
+      - c: 1
+        type: Negative
+        title: Return without a reason
+        steps:
+          - Click Return without a reason.
+        expected: The return is refused.
+        msg: ["Select a reason for '{return}'", WORKFLOW_REASON_REQUIRED]
+      - c: 2
+        type: Security-access
+        title: Checker is the processor
+        pre: disbtl encoded and submitted the DV.
+        steps:
+          - As disbtl, submit the DV for approval.
+        expected: The action is refused.
+        msg: [The processor cannot check their own voucher, DV_FOUR_EYES]
+        auto: DisbursementDemoIT#theApproverIsNeverTheProcessorAndOperationsKeepsItsBatchInReview
+
+  FR-DS-041:
+    scenario: SC-DPA-03
+    persona: DISB_APPROVER
+    screen: WB
+    data: [TD-DPA-03]
+    conditions:
+      - Approval posts the DV entry, creates the instrument and reports the status to the source; several DVs are approved each on its own.
+      - A posting failure keeps the DV For Approval with posting status FAILED.
+      - The approver is never the processor or checker; only a DV For Approval with an entry is approved.
+    cases:
+      - c: 1
+        type: Workflow
+        screen: DV
+        title: Approve a refund DV
+        steps:
+          - Open a refund DV For Approval and click Approve.
+        expected: Dr refund payable / Cr bank is posted; the instrument is created; Payment Requests sees the DV assigned.
+        auto: DisbursementIT#aRefundIsPaidByCreditToAccountThroughTheEndOfDay
+      - c: 2
+        type: Negative
+        title: Five DVs, one without rule
+        pre: One DV of a type whose rule the test lead deactivates.
+        steps:
+          - Select five DVs For Approval and click Approve.
+        expected: Four are APPROVED; one stays For Approval with posting status FAILED and the error.
+        msg: ["DV {no} could not be posted: {reason}", DV_POSTING_FAILED]
+        auto: DisbursementProcessingIT#vouchersAreApprovedInBulkOrRejectedBackToTheirSource
+      - c: 3
+        type: Security-access
+        title: Approver was the checker
+        pre: A user holding DISB_REVIEW and DISB_APPROVE checked the DV (test user prepared by the test lead).
+        steps:
+          - That user approves the DV.
+        expected: The approval is refused.
+        msg: [The approver of a voucher cannot be its processor or checker, DV_FOUR_EYES]
+        auto: DisbursementDemoIT#theApproverIsNeverTheProcessorAndOperationsKeepsItsBatchInReview
+      - c: 3
+        type: Negative
+        screen: API
+        title: Approve a DV In Process
+        steps:
+          - POST .../vouchers/{id}/approve on a DV In Process.
+        expected: The call is refused.
+        msg: ["DV {no} is {IN_PROCESS}", DV_NOT_FOR_APPROVAL]
+      - c: 3
+        type: Negative
+        screen: API
+        title: DV without entry
+        steps:
+          - Approve a DV whose entry is empty (prepared by the test lead).
+        expected: The approval is refused.
+        msg: ["DV {no} has no entry", DV_ENTRY_EMPTY]
+
+  FR-DS-042:
+    scenario: SC-DPA-03
+    persona: DISB_APPROVER
+    screen: DV
+    conditions:
+      - A rejected DV is final and its request returns to the source, which is notified.
+      - A rejection needs a reason.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Reject a refund DV
+        steps:
+          - Reject a refund DV For Approval with a reason and remarks.
+          - As mktao, open the refund request.
+        expected: The DV is REJECTED; the refund is back with its preparer and notified.
+        auto: DisbursementProcessingIT#vouchersAreApprovedInBulkOrRejectedBackToTheirSource; PayRequestFlowIT#aRefundReturnedByDisbursementIsSentAgainUnderANewReference
+      - c: 2
+        type: Negative
+        title: Reject without a reason
+        steps:
+          - Click Reject without a reason.
+        expected: The rejection is refused.
+        msg: ["Select a reason for '{reject}'", WORKFLOW_REASON_REQUIRED]
+
+  FR-DS-043:
+    scenario: SC-DPA-03
+    persona: DISBURSEMENT
+    screen: WB
+    conditions:
+      - A DV In Process (processor) or For Review (TL) is cancelled with a reason and its request returns to the source.
+      - A cancellation needs a reason; a request already in a voucher cannot be cancelled on its own.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Cancel a duplicate supplier DV
+        steps:
+          - Search the second supplier DV by payee; click Cancel with reason "Duplicate request or DV" and remarks.
+        expected: The DV is CANCELLED and the request goes back to its source.
+      - c: 2
+        type: Negative
+        screen: DV
+        title: Cancel without a reason
+        steps:
+          - Click Cancel without a reason.
+        expected: The cancellation is refused.
+        msg: ["Select a reason for '{cancel}'", WORKFLOW_REASON_REQUIRED]
+      - c: 2
+        type: Negative
+        screen: API
+        title: Cancel the request of a live voucher
+        steps:
+          - Cancel the request of a DV In Process through the request endpoint.
+        expected: The call is refused.
+        msg: ["Cancel or reject the voucher of {request}", DISB_REQUEST_IN_VOUCHER]
+        auto: CollectionsAndDisbursementPortsIT#aPaymentRequestCarriesTheDisbursementRoutingAndCanBeCancelled
+
+  FR-DS-044:
+    scenario: SC-DPA-03
+    persona: DISB_APPROVER
+    screen: DV
+    data: [TD-DPA-03]
+    conditions:
+      - Cancelling an approved DV reverses its journal, cancels the instrument when not final and returns the request to its source.
+      - A cancelled remittance DV restores the batch postings, invoices and deductions and the batch is re-sent under a new reference.
+      - A DV whose instrument is final cannot be cancelled; a cancellation needs a reason.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Cancel an approved refund DV
+        steps:
+          - Cancel the approved refund DV with a reason.
+          - Open the refund request (mktao).
+        expected: The DV journal is reversed (posting REVERSED); the refund request is reopened.
+        auto: DisbursementIT#cancellingAnApprovedVoucherReversesItAndTellsTheSource
+      - c: 2
+        type: Workflow
+        persona: REMIT_TL
+        screen: REMIT
+        title: Cancelled remittance DV restores the batch
+        steps:
+          - Cancel an approved remittance DV (disbappr).
+          - Open the batch.
+        expected: The remittance, incentive, CPC2 and deduction postings are reversed; the batch is back in review; re-approval sends a new request under <batch>/R1.
+        auto: RemittanceSettlementIT#aCancelledDvRestoresTheBatchWhichIsSentAgainUnderANewReference
+      - c: 3
+        type: Negative
+        title: Cancel the DV of a negotiated check
+        steps:
+          - Cancel the DV whose check is NEGOTIATED.
+        expected: The cancellation is refused.
+        msg: ["{Check} {000124} is {NEGOTIATED} and cannot be cancelled", INSTRUMENT_FINAL]
+      - c: 3
+        type: Negative
+        title: Cancel without a reason
+        steps:
+          - Click Cancel approved DV without a reason.
+        expected: The cancellation is refused.
+        msg: ["Select a reason for '{cancel}'", WORKFLOW_REASON_REQUIRED]
+
+  FR-DS-045:
+    scenario: SC-DPA-03
+    persona: DISBURSEMENT
+    screen: DREP
+    conditions:
+      - DVs whose posting FAILED or REVERSAL_FAILED and approved DVs without OR / AR tag are listed as unregularised.
+      - A posted DV cannot be edited.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Failed posting in DSB-UNREGULARIZED
+        steps:
+          - Run DSB-UNREGULARIZED after the failed approval of FR-DS-041.
+        expected: The DV is listed with the error; the workbench KPI Unregularised counts it.
+        auto: DisbursementApiIT#everyDisbursementReportRunsAndExports
+      - c: 2
+        type: Negative
+        screen: DVENTRY
+        title: Edit the entry of an approved DV
+        steps:
+          - Change a line of the entry of an approved DV.
+        expected: The change is refused.
+        msg: ["DV {no} is {APPROVED}; return it first", DV_NOT_EDITABLE]
+
+  FR-DS-050:
+    scenario: SC-DPA-04
+    persona: DISBURSEMENT
+    screen: DVINST
+    conditions:
+      - The processor tags a check Released with the date and the person who received it, and the other manual statuses of each mode.
+      - A status outside the life cycle is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Release a check on 2 October
+        steps:
+          - Click Release on a PRINTED check; date 2 October, received by the payee's representative.
+        expected: The check is RELEASED with the date and the person.
+        auto: InstrumentLifecycleTest#aCheckIsPrintedReleasedAndNegotiatedOrStale
+      - c: 2
+        type: Negative
+        title: Mark a check Debited
+        steps:
+          - POST .../instrument/debited on a check.
+        expected: The call is refused.
+        msg: ["{Check} {no} is {PRINTED} and cannot become {DEBITED}", INSTRUMENT_STATUS]
+
+  FR-DS-051:
+    scenario: SC-DPA-04
+    persona: DISBURSEMENT
+    screen: DVINST
+    conditions:
+      - A wrongly tagged status is corrected through a status edit that the TL approves or rejects.
+      - A status of another mode, a second pending edit or a changed instrument is refused; the requester never approves the own edit.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Released check set back to Printed
+        steps:
+          - Request Status Edit to Printed with a reason on a check wrongly RELEASED.
+          - As disbtl, approve the edit.
+        expected: The check is PRINTED again; the edit is APPLIED.
+        auto: DisbursementProcessingIT#anEditedProformaIsPostedAsGivenAndTheCheckGoesThroughItsStatuses
+      - c: 1
+        type: Workflow
+        persona: DISB_TL
+        title: Reject a status edit
+        steps:
+          - Reject a requested edit with a reason.
+        expected: The edit is REJECTED and the status stays.
+      - c: 2
+        type: Negative
+        title: Status of another mode
+        steps:
+          - Request the status Debited on a check.
+        expected: The request is refused.
+        msg: ["{DEBITED} is not another status of a {Check}", STATUS_EDIT_INVALID]
+      - c: 2
+        type: Negative
+        title: Second pending edit
+        steps:
+          - Request a second edit while one is pending.
+        expected: The request is refused.
+        msg: [A status edit of this instrument already waits for approval, STATUS_EDIT_PENDING]
+      - c: 2
+        type: Negative
+        persona: DISB_TL
+        title: Instrument changed meanwhile
+        steps:
+          - While an edit is pending, the check is negotiated by the upload; approve the edit.
+        expected: The approval is refused.
+        msg: ["The instrument is now {NEGOTIATED}; request the edit again", STATUS_EDIT_STALE]
+      - c: 2
+        type: Security-access
+        persona: DISB_TL
+        title: Requester approves the own edit
+        steps:
+          - As disbtl, request an edit and approve it.
+        expected: The approval is refused.
+        msg: [A status edit cannot be approved by its requestor, MAKER_CHECKER_VIOLATION]
+
+  FR-DS-052:
+    scenario: SC-DPA-04
+    persona: SYSTEM
+    screen: DVINST
+    data: [TD-DPA-04]
+    conditions:
+      - Forms set Printed when generated; online banking is Approved on DV approval and Debited by the BOB approval upload.
+      - An upload row with an unknown DV, another amount or another mode is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: DISBURSEMENT
+        screen: UPL
+        title: BOB approval upload sets Debited
+        steps:
+          - Approve an online-banking DV; upload the BOB approvals file with its reference and amount.
+        expected: The payment is APPROVED on approval and DEBITED after the upload.
+        auto: InstrumentLifecycleTest#eachModeHasItsOwnStatuses
+      - c: 2
+        type: Negative
+        persona: DISBURSEMENT
+        screen: UPL
+        title: BOB row with an unknown DV
+        steps:
+          - Upload a BOB row with DV-2026-999999.
+        expected: The row is refused.
+        msg: ["No DV {DV-2026-999999}", DV_NOT_FOUND]
+      - c: 2
+        type: Negative
+        persona: DISBURSEMENT
+        screen: UPL
+        title: BOB row of a check DV
+        steps:
+          - Upload a BOB row with the reference of a check DV.
+        expected: The row is refused.
+        msg: ["DV {no} is paid by {Check}, not {Online banking}", INSTRUMENT_MODE]
+
+  FR-DS-053:
+    scenario: SC-DPA-04
+    persona: DISBURSEMENT
+    screen: UPL
+    data: [TD-DPA-04]
+    conditions:
+      - The deposited-checks file tags each matched check Negotiated and posts its clearing entry; the credited-accounts file tags CTAs Credited.
+      - A row with an unknown check or another amount is refused.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Deposited check 000124 for 15,000.00
+        steps:
+          - Upload the deposited-checks file with check 000124 for 15,000.00.
+        expected: The check is NEGOTIATED and its clearing entry posts.
+        auto: DisbursementIT#aRemittanceBatchBecomesAVoucherThatIsApprovedPrintedAndNegotiated
+      - c: 1
+        type: Upload-download
+        title: Credited accounts file
+        steps:
+          - Upload the credited-accounts file of the extracted CTA of the day.
+        expected: The CTA is CREDITED.
+        auto: DisbursementIT#aRefundIsPaidByCreditToAccountThroughTheEndOfDay
+      - c: 2
+        type: Negative
+        title: Row whose amount differs
+        steps:
+          - Upload check 000124 for 15,000.01.
+        expected: The row is refused.
+        msg: ["Amount {15,000.01} differs from {15,000.00} of {000124}", INSTRUMENT_AMOUNT]
+      - c: 2
+        type: Negative
+        title: Unknown check
+        steps:
+          - Upload check 999999.
+        expected: The row is refused.
+        msg: ["No printed or released check {999999} ({0} found)", CHECK_NOT_FOUND]
+
+  FR-DS-054:
+    scenario: SC-DPA-04
+    persona: SYSTEM
+    screen: DVINST
+    conditions:
+      - DISB_CHECK_STALE tags Stale every check still Printed or Released DISB_STALE_DAYS after its print date and raises the alert.
+      - A stale check is re-issued through a new DV; a check that is not stale cannot be re-issued.
+    cases:
+      - c: 1
+        type: Boundary
+        title: Check printed on 1 April stale on 28 September
+        pre: A check printed 180 days ago (print date moved by the test lead).
+        steps:
+          - Run DISB_CHECK_STALE; open the check.
+        expected: The check is STALE; the stale entry posts; DISB_CHECK_STALE is raised. A check printed 179 days ago stays.
+        auto: InstrumentLifecycleTest#aCheckIsPrintedReleasedAndNegotiatedOrStale
+      - c: 2
+        type: Workflow
+        persona: DISBURSEMENT
+        title: Re-issue a stale check
+        steps:
+          - Click Re-issue on the stale check.
+        expected: A STALE_REISSUE request creates a new DV for the payee in the normal flow.
+      - c: 2
+        type: Negative
+        persona: DISBURSEMENT
+        title: Re-issue a check that is not stale
+        steps:
+          - POST .../instrument/reissue on a RELEASED check.
+        expected: The call is refused.
+        msg: [Only a stale check is re-issued, CHECK_NOT_STALE]
+
+  FR-DS-055:
+    scenario: SC-DPA-04
+    persona: SYSTEM
+    screen: DVENTRY
+    conditions:
+      - With DISB_CHECK_CLEARING ON, an approved check DV credits 2241; negotiation posts 2241 against the bank; staling posts 2241 against stale checks; a re-issue posts the stale liability against the paying account.
+      - Without the clearing model no clearing entry is posted.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Negotiated check of 15,000.00
+        steps:
+          - Negotiate the check by the upload; open the entries.
+        expected: Dr 2241 / Cr bank 15,000.00.
+        auto: DisbursementIT#aRemittanceBatchBecomesAVoucherThatIsApprovedPrintedAndNegotiated
+      - c: 1
+        type: Workflow
+        title: Staled check
+        steps:
+          - Open the entry of the check staled in FR-DS-054.
+        expected: Dr 2241 / Cr 2240 Miscellaneous Liability - stale checks.
+      - c: 2
+        type: Negative
+        pre: The test lead sets DISB_CHECK_CLEARING OFF.
+        title: No clearing entry with the model off
+        steps:
+          - Approve and negotiate a check DV.
+        expected: The approval credits the bank directly; the negotiation posts nothing. Reset the parameter afterwards.
+
+  FR-DS-056:
+    scenario: SC-DPA-04
+    persona: DISBURSEMENT
+    screen: DVTAG
+    conditions:
+      - The processor tags the OR or AR of an approved DV; the DV leaves the unregularised list.
+      - Only an approved DV is tagged.
+    cases:
+      - c: 1
+        type: Positive
+        title: Supplier OR 12345
+        steps:
+          - Tag OR 12345, its date, date received and amount on the supplier DV.
+        expected: The tag is saved and the DV leaves DSB-UNREGULARIZED.
+      - c: 1
+        type: Positive
+        title: Remittance DV shows the insurer OR
+        steps:
+          - Open the remittance DV whose insurer OR was uploaded in Remittance.
+        expected: The OR is shown without keying.
+      - c: 2
+        type: Negative
+        title: Tag a DV For Review
+        steps:
+          - Tag an OR on a DV For Review.
+        expected: The tag is refused.
+        msg: ["Only an approved DV is tagged; DV {no} is {FOR_REVIEW}", DV_NOT_APPROVED]
+
+  FR-DS-057:
+    scenario: SC-DPA-04
+    persona: DISBURSEMENT
+    screen: CERTS
+    conditions:
+      - An insurer certificate received is recorded in one register, posts TAX_CWT_CERT_RECEIVED and feeds the SAWT; a supplier 2307 released is tagged on the DV.
+      - An incomplete certificate, reversed period, no income line or a future date is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Insurer 2307 of 2,000.00 on commission
+        steps:
+          - Record a certificate of an insurer - number, period Q3, date received, income payment with 2,000.00 withheld on commission.
+        expected: Dr AR-BIR on hand / Cr AR-BIR on commission 2,000.00 is posted; the certificate appears in the SAWT of Q3.
+        auto: BirOutputsIT#aCertificateIsPostedListedInTheSawtAndCancelled
+      - c: 1
+        type: Positive
+        screen: DVTAG
+        title: Supplier 2307 released
+        steps:
+          - Tag CWT Released on the supplier DV with certificate number, period and amount.
+        expected: The tag is saved on the DV.
+      - c: 2
+        type: Negative
+        title: Certificate without number
+        steps:
+          - Record a certificate without number.
+        expected: The certificate is refused.
+        msg: [Give the certificate number and the withholding agent, CERTIFICATE_INCOMPLETE]
+        auto: BirOutputsIT#aCertificateIsValidatedAndNotRecordedTwice
+      - c: 2
+        type: Negative
+        title: Date received tomorrow
+        steps:
+          - Record a certificate received tomorrow.
+        expected: The certificate is refused.
+        msg: ["Give the date received, not in the future", CERTIFICATE_RECEIVED_ON]
+      - c: 2
+        type: Negative
+        title: No income line
+        steps:
+          - Record a certificate without income payment.
+        expected: The certificate is refused.
+        msg: [Give at least one income payment with the tax withheld, CERTIFICATE_LINES]
+      - c: 2
+        type: Negative
+        screen: DVTAG
+        title: Period reversed on the CWT tag
+        steps:
+          - Tag CWT with a period ending before it starts.
+        expected: The tag is refused.
+        msg: [The period covered ends before it starts, CWT_PERIOD]
+
+  FR-DS-058:
+    scenario: SC-DPA-04
+    persona: DISBURSEMENT
+    screen: F2307
+    conditions:
+      - BIR Form 2307 is filled per payee and quarter from the withholding and saved as PDF, one or in batch.
+      - A period that is not a quarter or without payees to certify is refused.
+    cases:
+      - c: 1
+        type: Report-output
+        title: 2307 of a supplier for Q3
+        steps:
+          - Generate the 2307 of the supplier for Q3; download the PDF.
+        expected: The income and tax withheld of each month of Q3 are shown with the total.
+        auto: Certificate2307AggregatorTest#incomeIsSplitByMonthOfTheQuarterAndTaxIsTotalled
+      - c: 2
+        type: Negative
+        title: Period of two months
+        steps:
+          - Generate for 1 July to 31 August.
+        expected: The generation is refused.
+        msg: ["Form 2307 covers a calendar quarter, not {2026-07-01 - 2026-08-31}", NOT_A_QUARTER]
+        auto: Certificate2307AggregatorTest#onlyQuartersAndDatesInsideThemAreAccepted
+      - c: 2
+        type: Negative
+        title: Nothing to issue
+        steps:
+          - Generate the batch of a quarter already fully issued.
+        expected: The batch is refused.
+        msg: ["No payee of {Q3 2026} needs a new certificate", NO_CERTIFICATES]
+
+  FR-DS-060:
+    scenario: SC-DPA-05
+    persona: DISB_TL
+    screen: EOD
+    conditions:
+      - The end of day of a date produces the DCTF, check batch, forms, vouchers and reports, downloadable from the run.
+      - A date is run once.
+    cases:
+      - c: 1
+        type: Report-output
+        title: End of day of 30 September
+        steps:
+          - Run End of Day for 30 September; open the outputs.
+        expected: EOD-2026-n lists the DCTF, the check batch, the ATD, MC / DD, credit ticket and TT forms, the vouchers and six reports, each downloadable.
+        auto: DisbursementIT#aRefundIsPaidByCreditToAccountThroughTheEndOfDay; DisbursementApiIT#endOfDayFundingAndBankAccountsAreServed
+      - c: 2
+        type: Negative
+        title: Second run of the same date
+        steps:
+          - Run End of Day for 30 September again.
+        expected: The run is refused.
+        msg: ["The end of day of {2026-09-30} was already processed", EOD_ALREADY_RUN]
+
+  FR-DS-061:
+    scenario: SC-DPA-05
+    persona: DISB_TL
+    screen: EOD
+    conditions:
+      - The DCTF has a header and one 89-character upper-case line per CTA payment; each included payment becomes Extracted.
+      - A payment is extracted once.
+    cases:
+      - c: 1
+        type: Report-output
+        title: CTA of 12,500.00
+        steps:
+          - Download the DCTF of the run with a CTA of 12,500.00 to 001234567890.
+        expected: One detail line of 89 characters with the account number, payee name, 12 blanks, reference and amount 000000012500.00; the CTA is EXTRACTED.
+        auto: DisbursementIT#aRefundIsPaidByCreditToAccountThroughTheEndOfDay
+      - c: 2
+        type: Negative
+        title: Extracted CTA not in the next file
+        steps:
+          - Run the end of day of the next day.
+        expected: The CTA of 12,500.00 is not in the new DCTF.
+
+  FR-DS-062:
+    scenario: SC-DPA-05
+    persona: DISB_TL
+    screen: EOD
+    conditions:
+      - The check batch prints the checks in order from the next leaves of the cheque book; vouchers print one or in batch.
+      - CHECK_SERIES_LOW is raised when DISB_CHECK_SERIES_WARNING leaves remain.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Three checks in order
+        steps:
+          - Approve three check DVs; run the end of day; download the check batch.
+        expected: Checks 000125 to 000127 are printed in order; the vouchers print with the report print options.
+        auto: DisbursementApiIT#theInstrumentOfAnApprovedVoucherIsPrintedAndDownloaded
+      - c: 2
+        type: Boundary
+        neg: true
+        persona: SYSTEM
+        screen: ALERTS
+        title: Cheque book with 20 leaves left
+        pre: A cheque book with 21 unused leaves.
+        steps:
+          - Print one check; open the alerts.
+        expected: CHECK_SERIES_LOW is raised at 20 leaves left.
+
+  FR-DS-063:
+    scenario: SC-DPA-05
+    persona: DISB_TL
+    screen: EOD
+    conditions:
+      - After the end of day one payment advice is e-mailed to each payee of the day and logged on the DV.
+      - The confirmations of a run are sent once.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Confirm the run of 30 September
+        steps:
+          - Click Confirm on the run; open the test mailboxes and the E-mails tab of a DV.
+        expected: One payment advice per payee paid that day; the e-mail is logged on each DV.
+      - c: 2
+        type: Negative
+        title: Confirm twice
+        steps:
+          - Click Confirm again.
+        expected: Nothing is sent again.
+        msg: ["The confirmations of {EOD-2026-5} were already sent", EOD_CONFIRMED]
+
+  FR-DS-064:
+    scenario: SC-DPA-05
+    persona: DISB_TL
+    screen: FUND
+    conditions:
+      - A funding request is made, verified by another TL and approved by two further approvers; the second approval posts the transfer.
+      - An approver can decline and each step can return to the maker with remarks.
+      - Amount, accounts and currencies are validated; four-eyes rules hold at each step.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Maker, verifier and two approvers
+        steps:
+          - disbtl creates FND-yyyy-n (source and target BDOIR accounts, amount, purpose) and submits; disbtl2 verifies; disbappr and disbappr2 approve.
+        expected: The request is APPROVED and DISB_FUND_TRANSFER posts (Dr target bank / Cr source bank); the BOB reference is recorded.
+        auto: DisbursementProcessingIT#fundingNeedsAVerifierAndTwoDifferentApprovers
+      - c: 2
+        type: Workflow
+        persona: DISB_APPROVER
+        title: Decline at the first approval
+        steps:
+          - disbappr declines a verified request with remarks.
+        expected: The request is DECLINED with the remarks.
+      - c: 3
+        type: Security-access
+        persona: DISB_APPROVER
+        title: Same approver twice
+        steps:
+          - After disbappr's approval, disbappr approves again.
+        expected: The second approval is refused.
+        msg: [The second approval must be given by another approver, FUNDING_FOUR_EYES]
+        auto: DisbursementProcessingIT#fundingNeedsAVerifierAndTwoDifferentApprovers
+      - c: 3
+        type: Security-access
+        title: Maker verifies
+        steps:
+          - disbtl verifies own request.
+        expected: The verification is refused.
+        msg: [The maker cannot verify the funding request, FUNDING_FOUR_EYES]
+      - c: 3
+        type: Negative
+        title: Same source and target
+        steps:
+          - Create a request with the same account as source and target.
+        expected: The request is refused.
+        msg: [The source and target accounts must differ, FUNDING_SAME_ACCOUNT]
+        auto: labels.test.ts#needs two different accounts, an amount, a purpose and a value date
+      - c: 3
+        type: Negative
+        title: Accounts in different currencies
+        steps:
+          - Choose a PHP source and a USD target.
+        expected: The request is refused.
+        msg: ["Both accounts must be in {PHP}", FUNDING_CURRENCY]
+      - c: 3
+        type: Negative
+        title: Amount zero
+        steps:
+          - Enter an amount of 0.00.
+        expected: The request is refused.
+        msg: [The amount must be positive, FUNDING_AMOUNT]
+
+  FR-DS-070:
+    scenario: SC-DPA-05
+    persona: DISB_APPROVER
+    screen: BANKS
+    conditions:
+      - The approver adds a cheque book whose first leaf is used first and corrects its range only before the first check is printed.
+      - An invalid, overlapping or used range is refused.
+    cases:
+      - c: 1
+        type: Positive
+        title: New series 000100-000199
+        steps:
+          - Add a cheque book 000100 to 000199 to a paying account; print a check from it.
+        expected: The check is 000100.
+        auto: DisbursementProcessingIT#bankAccountsAreTaggedInactiveWithFourEyesAndCheckSeriesEdited
+      - c: 2
+        type: Negative
+        title: Correct a book already used
+        steps:
+          - Change the last number of the book used above.
+        expected: The change is refused.
+        msg: [Only an active cheque book with no leaf used can be edited, CHEQUE_BOOK_IN_USE]
+      - c: 2
+        type: Negative
+        title: Overlapping range
+        steps:
+          - Add a book 000150-000250 on the same account.
+        expected: The book is refused.
+        msg: [Cheque range overlaps another book of the account, CHEQUE_RANGE_OVERLAP]
+      - c: 2
+        type: Negative
+        title: Last before first
+        steps:
+          - Add a book 000300-000200.
+        expected: The book is refused.
+        msg: ["Cheque range {000300}-{000200} is invalid", INVALID_CHEQUE_RANGE]
+
+  FR-DS-071:
+    scenario: SC-DPA-05
+    persona: DISB_APPROVER
+    screen: BANKS
+    conditions:
+      - A status change of a BDOIR account waits for authorisation; inactive accounts are not offered on new DVs.
+      - The maker cannot authorise the own change.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Account tagged inactive
+        steps:
+          - disbappr tags an account inactive; disbappr2 authorises it.
+          - On a new DV open the paying account list.
+        expected: The account is INACTIVE and not offered.
+        auto: DisbursementProcessingIT#bankAccountsAreTaggedInactiveWithFourEyesAndCheckSeriesEdited
+      - c: 2
+        type: Security-access
+        title: Maker authorises the own change
+        steps:
+          - disbappr authorises the change disbappr made.
+        expected: The authorisation is refused.
+        msg: [A record cannot be authorized by the user who maintained it, MAKER_CHECKER_VIOLATION]
+        auto: DisbursementProcessingIT#bankAccountsAreTaggedInactiveWithFourEyesAndCheckSeriesEdited
+
+  FR-DS-080:
+    scenario: SC-DPA-05
+    persona: DISBURSEMENT
+    screen: DREP
+    conditions:
+      - The Disbursement reports run for a date or period, export to XLSX, ODS or PDF and print with the print options.
+      - A missing mandatory parameter is refused; users without DISB_REPORT_VIEW do not see the reports.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Masterlist of September
+        steps:
+          - Run DSB-MASTERLIST for September; export to XLSX; print landscape fit to width.
+        expected: The file and the print hold every disbursement of September.
+        auto: DisbursementApiIT#everyDisbursementReportRunsAndExports
+      - c: 2
+        type: Negative
+        title: Date range left blank
+        steps:
+          - Run DSB-MASTERLIST without dates.
+        expected: The report does not run.
+        msg: ["Parameter {dateFrom} is required", MISSING_PARAMETER]
+      - c: 2
+        type: Security-access
+        persona: PRQ_PROCESSOR
+        screen: REPORTS
+        title: Marketing processor does not see the Disbursement reports
+        steps:
+          - As mktao, open the Report Centre.
+        expected: The category Disbursement is not listed.
+
+  FR-DS-081:
+    scenario: SC-DPA-05
+    persona: SYSTEM
+    screen: EOD
+    conditions:
+      - The end of day generates the six end-of-day reports of the date and archives them with the run.
+      - A DV approved on another date is not in the reports of the date.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Remittance report of 30 September
+        steps:
+          - Open the DSB-EOD-REMIT output of the run of 30 September.
+        expected: Every remittance DV approved that day is listed with the withholding at 2 % and 15 %.
+        auto: DisbursementApiIT#everyDisbursementReportRunsAndExports
+      - c: 2
+        type: Negative
+        title: DV of 1 October not in the report of 30 September
+        steps:
+          - Approve a remittance DV on 1 October; reopen the report of 30 September.
+        expected: The DV is not listed.
+
+  FR-DS-082:
+    scenario: SC-DPA-05
+    persona: DISBURSEMENT
+    screen: DREP
+    conditions:
+      - The real-time reports run for any date range with their ageing buckets and subtotals.
+      - A check outside a bucket's range is not counted in it.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Unreleased check 45 days old
+        steps:
+          - Run DSB-UNRELEASED-CHECKS as of today.
+        expected: A check printed 45 days ago is in bucket 31-60 with the subtotals.
+        auto: DisbursementApiIT#everyDisbursementReportRunsAndExports
+      - c: 1
+        type: Report-output
+        title: CWT on commission, ATD, stale checks and cash flow
+        steps:
+          - Run DSB-CWT-COMMISSION, DSB-ATD, DSB-ML-STALE and DSB-CASH-FLOW for September.
+        expected: Each report runs and exports; DSB-ML-STALE shows the stale check of FR-DS-054.
+      - c: 1
+        type: Negative
+        title: Reversed date range
+        steps:
+          - Run DSB-MASTERLIST from 30 September to 1 September.
+        expected: The report does not run; the range is refused.
+        auto: ReportParametersTest#reversedDateAndNumberRangesAreRejected
+      - c: 2
+        type: Boundary
+        title: Check of exactly 30 days
+        steps:
+          - Look for a check printed 30 days ago.
+        expected: It is in the current-30 bucket, not in 31-60.
+
+  FR-DS-083:
+    scenario: SC-DPA-05
+    persona: DISBURSEMENT
+    screen: DREP
+    data: [TD-DPA-04]
+    conditions:
+      - The payee report lists the payees with masked account numbers unless permitted; the fall-out report lists the refused upload rows of a period.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Fall-out report of September
+        steps:
+          - Run DSB-UPLOAD-FALLOUT for September.
+        expected: The 3 refused rows of the request upload are listed with their reasons.
+        auto: DisbursementApiIT#everyDisbursementReportRunsAndExports
+      - c: 1
+        type: Security-access
+        title: Payee report masked for the processor
+        steps:
+          - As disb, run DSB-PAYEE.
+        expected: Account numbers are masked; disbtl sees them in full.
+
+  FR-DS-090:
+    scenario: SC-DPA-06
+    persona: REMIT_TL
+    screen: REMIT
+    data: [TD-DPA-07]
+    conditions:
+      - A qualifying line gets CPC2 at the rate of the criterion on the basic premium remitted, with VAT, deducted from the payable and shown apart from commission.
+      - Approval posts OPS_REMIT_CPC2 per batch to CPC2 incentive income.
+      - A line without an active CPC2 criterion or below the minimum premium gets no CPC2.
+    cases:
+      - c: 1
+        type: Positive
+        title: Packaged Motor line with CPC2 of 2 %
+        steps:
+          - Extract a batch with a packaged Motor line of basic premium remitted 100,000.00 matched by a CPC2 criterion of 2 %.
+          - Open the batch, Settlement tab.
+        expected: The line shows CPC2 2,000.00 plus VAT with the criterion code and rate; the batch payable is reduced by that amount; the payment request and schedule show CPC2 apart from commission.
+        auto: RemittanceSettlementIT#packagedMotorLinesEarnCpc2PostedSeparatelyFromTheCommission; RemittanceRulesTest#cpc2IsTheRateOnTheBasicPremiumWithVatAndReducesThePayable
+      - c: 2
+        type: Workflow
+        title: Approval posts CPC2 income
+        steps:
+          - Approve the batch; open its journals.
+        expected: OPS_REMIT_CPC2 with reference RMB:<batch>:CPC2 credits CPC2 incentive income (4131) and output VAT.
+        auto: RemittanceSettlementIT#packagedMotorLinesEarnCpc2PostedSeparatelyFromTheCommission
+      - c: 3
+        type: Negative
+        title: Line below the minimum premium
+        pre: The CPC2 criterion has a minimum gross premium above the line's premium.
+        steps:
+          - Extract a batch with that line.
+        expected: The line has no CPC2.
+
+  FR-DS-091:
+    scenario: SC-DPA-06
+    persona: REMIT_TL
+    screen: REMIT
+    data: [TD-DPA-07]
+    conditions:
+      - Approving a batch with an early incentive issues one EARLY_INCENTIVE service invoice with 2 % withholding, linked to the batch.
+      - A re-sent batch does not issue a second invoice; a manual issue of the type is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Early incentive of 5,000.00
+        steps:
+          - Approve a batch with an early incentive of 5,000.00; open the Settlement tab.
+        expected: One service invoice with 100.00 withholding tax is linked to the batch; the incentive OR names it.
+        auto: RemittanceSettlementIT#theEarlyIncentiveIsInvoicedAutomaticallyWithTwoPercentWithholdingTax
+      - c: 2
+        type: Negative
+        screen: SINV
+        title: Manual EARLY_INCENTIVE invoice
+        steps:
+          - Issue a service invoice of type EARLY_INCENTIVE by hand.
+        expected: The invoice is refused.
+        msg: ["Service invoices of type {EARLY_INCENTIVE} are issued automatically with the early remittance incentive", SERVICE_INVOICE_AUTOMATIC_ONLY]
+        auto: RemittanceSettlementIT#theEarlyIncentiveIsInvoicedAutomaticallyWithTwoPercentWithholdingTax
+      - c: 2
+        type: Negative
+        title: Re-sent batch
+        steps:
+          - Cancel the batch's DV and approve the batch again.
+        expected: No second EARLY_INCENTIVE invoice is issued.
+
+  FR-DS-092:
+    scenario: SC-DPA-06
+    persona: DISBURSEMENT
+    screen: DREP
+    conditions:
+      - CPC2 amounts are on the batch, payment request and schedule until the report is built (gap G4).
+      - The CPC2 report is not offered.
+    cases:
+      - c: 1
+        type: Positive
+        persona: REMIT_TL
+        screen: REMIT
+        title: CPC2 visible on the batch
+        steps:
+          - Open the batch of FR-DS-090 and its payment request.
+        expected: Code, rate, amount and VAT of CPC2 per line are shown.
+      - c: 2
+        type: Negative
+        title: DSB-CPC2-INCENTIVE not offered (gap G4)
+        steps:
+          - Look for the CPC2 report in Disbursement Reports.
+        expected: The report is not listed; the case is re-run when the report is built.
+
+  FR-DS-093:
+    scenario: SC-DPA-06
+    persona: ACSL_PROCESSOR
+    screen: INV360
+    conditions:
+      - The Invoice Family lists all invoices of the root with the family totals; remittance requests carry the root invoice.
+      - Each invoice keeps its own BIR number.
+    cases:
+      - c: 1
+        type: Positive
+        title: Family of an endorsed and cancelled invoice
+        steps:
+          - Search the original invoice in Invoice Search; open Invoice 360, Invoice Family.
+        expected: The original, its endorsement and its cancellation are listed with the family totals.
+        auto: CollectionsAccountingFoundationApiIT#theInvoiceFamilyIsReadThroughTheApi; OperationsSettlementApiIT#aBatchShowsItsSettlementAndTheInvoiceSearchFindsItsFamily
+      - c: 2
+        type: Negative
+        title: The endorsement keeps its own number
+        steps:
+          - Open the endorsement invoice.
+        expected: Its BIR invoice number differs from the original's; the root chip shows the original.
+
+  FR-PQ-001:
+    scenario: SC-DPA-07
+    persona: PRQ_REVIEWER
+    screen: PQHOME
+    data: [TD-DPA-05]
+    conditions:
+      - Requests Home lists the requests by stage with counts, searches by number, payee, reference or DV and filters by kind and date.
+      - Several requests are endorsed or approved at once with a result per request.
+      - A user without PRQ_VIEW does not see Requests Home.
+    cases:
+      - c: 1
+        type: Positive
+        title: For Review tab of the reviewer
+        steps:
+          - Log in as mktrev and open Requests Home, tab For Review.
+        expected: The tab shows the count and the requests waiting for mktrev; a search by RRF number finds one.
+        auto: PayRequestApiIT#readEndpointsRespond; requestForm.test.ts#reads the tab of the URL
+      - c: 2
+        type: Positive
+        title: Endorse three requests at once
+        steps:
+          - Select three requests For Review raised by mktao and click Endorse.
+        expected: One result per request; the three are For Approval.
+        auto: requestForm.test.ts#offers one button per business action and labels them by stage
+      - c: 2
+        type: Negative
+        title: Bulk endorse with one own request
+        pre: One of the three requests was raised by mktrev.
+        steps:
+          - Endorse the three at once.
+        expected: Two are endorsed; the own request is refused in its result.
+        msg: ["You raised or already moved {RRF-2026-12}: another user decides", PRQ_FOUR_EYES]
+      - c: 3
+        type: Security-access
+        persona: DISBURSEMENT
+        title: Disbursement processor does not see Requests Home
+        steps:
+          - Log in as disb; type /payment-requests.
+        expected: The screen is refused ("You do not have access to this screen. Contact your administrator if you need it.").
+
+  FR-PQ-002:
+    scenario: SC-DPA-07
+    persona: PRQ_PROCESSOR
+    screen: REPORTS
+    conditions:
+      - The Marketing roles run the Operations reports of unapplied payments for a date range and export them.
+      - A missing mandatory parameter is refused.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Unapplied-payment report of September to XLSX
+        steps:
+          - As mktao, run the Cashiering report of unapplied payments for September; export to XLSX; print.
+        expected: The file and the print list the unapplied payments of September.
+      - c: 2
+        type: Negative
+        title: Date range left blank
+        steps:
+          - Run the report without dates.
+        expected: The report does not run.
+        msg: ["Parameter {dateFrom} is required", MISSING_PARAMETER]
+
+  FR-PQ-003:
+    scenario: SC-DPA-07
+    persona: PRQ_PROCESSOR
+    screen: NEWRRF
+    data: [TD-DPA-05]
+    conditions:
+      - An RRF of one client with 1 to 50 lines is saved and printed from the Appendix D template; a Draft or Preparing request can be edited.
+      - All lines belong to one client; each line has the AR number and assured name; invoices exist in the ledger.
+      - Amount and currency are validated; a request past Preparing cannot be edited.
+    cases:
+      - c: 1
+        type: Positive
+        title: RRF of one client with two lines
+        steps:
+          - Fill the RRF - segment, reference, unit, purpose, PHP, credit to account with the client's BDO account, two lines with AR no., client code, assured, invoice, amount, reason Overpayment; save.
+          - Open the printable form.
+        expected: RRF-yyyy-n in Draft with the total of the lines; the PDF follows the Appendix D layout.
+        auto: PayRequestFlowIT#anRrfIsApprovedSentToDisbursementAndDisbursed; requestForm.test.ts#accepts a complete form and totals the lines
+      - c: 2
+        type: Negative
+        title: Lines of two clients
+        steps:
+          - Add a line of another client; save.
+        expected: The request is refused.
+        msg: [All accounts of a refund request belong to one client (AQ18), PRQ_ONE_CLIENT]
+        auto: requestForm.test.ts#flags duplicate ARs, bad amounts, missing reasons and mixed clients
+      - c: 2
+        type: Boundary
+        neg: true
+        title: 51 lines
+        steps:
+          - Save an RRF with 51 lines.
+        expected: The request is refused; 50 lines are accepted.
+        msg: [A refund request has between 1 and 50 accounts, PRQ_LINES_REQUIRED]
+      - c: 2
+        type: Negative
+        title: Line without AR number
+        steps:
+          - Save a line without AR number.
+        expected: The request is refused.
+        msg: [Every line needs the AR number and the assured name, PRQ_LINE_INCOMPLETE]
+      - c: 2
+        type: Negative
+        title: Invoice not in the ledger
+        steps:
+          - Enter invoice BI-2026-999999 on a line.
+        expected: The request is refused.
+        msg: ["Invoice {BI-2026-999999} is not in the ledger", PRQ_INVOICE_UNKNOWN]
+      - c: 3
+        type: Negative
+        title: Amount with three decimals
+        steps:
+          - Enter an amount of 100.005.
+        expected: The request is refused.
+        msg: [The amount must be positive with at most two decimals, PRQ_AMOUNT_INVALID]
+      - c: 3
+        type: Negative
+        screen: API
+        title: Currency of two letters
+        steps:
+          - POST a refund with currency PH.
+        expected: The call is refused.
+        msg: [Currency must be a 3-letter code, PRQ_CURRENCY_INVALID]
+      - c: 3
+        type: Negative
+        screen: API
+        title: Edit a request For Approval
+        steps:
+          - PUT .../requests/{id}/refund on a request For Approval.
+        expected: The change is refused.
+        msg: ["{RRF-2026-12} is {FOR_APPROVAL} for this action", PRQ_WRONG_STAGE]
+
+  FR-PQ-004:
+    scenario: SC-DPA-08
+    persona: PRQ_PROCESSOR
+    screen: NEWCA
+    data: [TD-DPA-05]
+    conditions:
+      - An RFP of type Cash advance, Petty cash or Others is saved with the employee as payee and printed from the Appendix D template.
+      - Purpose, payee and a positive amount are required.
+    cases:
+      - c: 1
+        type: Positive
+        title: Cash advance of 5,000.00
+        steps:
+          - Fill the RFP - segment, reference, unit, type Cash advance, purpose, PHP, employee number and name, check, 5,000.00; save.
+        expected: RFP-yyyy-n in Draft with the employee as payee; the PDF prints.
+        auto: PayRequestFlowIT#aCashAdvanceNeedsMarketingThenHrApproval
+      - c: 2
+        type: Negative
+        title: No purpose
+        steps:
+          - Save the RFP without purpose.
+        expected: The request is refused.
+        msg: [Give the purpose of the cash advance (Appendix D RFP), PRQ_PURPOSE_REQUIRED]
+        auto: PayRequestApiIT#permissionsAndValidationAreEnforced
+      - c: 2
+        type: Negative
+        title: No payee
+        steps:
+          - Save the RFP without employee.
+        expected: The request is refused.
+        msg: [Give the payee code and name, PRQ_PAYEE_REQUIRED]
+      - c: 2
+        type: Negative
+        title: Negative amount
+        steps:
+          - Enter -5,000.00.
+        expected: The request is refused.
+        msg: [The amount must be positive with at most two decimals, PRQ_AMOUNT_INVALID]
+
+  FR-PQ-005:
+    scenario: SC-DPA-07
+    persona: PRQ_REVIEWER
+    screen: REQ
+    conditions:
+      - The reviewer assigns or re-assigns a refund to a preparer; it moves to Preparing in the preparer's work.
+      - A request is returned one step back with a reason; an action in the wrong stage is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Re-assign from mktao to another preparer
+        pre: A second preparer account (for example ao, MKT_AO) exists.
+        steps:
+          - Assign a Draft RRF to mktao; then re-assign it to ao.
+        expected: The request is Preparing and appears in ao's work, no longer in mktao's.
+        auto: PayRequestFlowIT#anRrfIsApprovedSentToDisbursementAndDisbursed
+      - c: 2
+        type: Negative
+        title: Return without a reason
+        steps:
+          - On a request For Review click Return to preparer without a reason.
+        expected: The return is refused.
+        msg: ["Select a reason for '{return}'", WORKFLOW_REASON_REQUIRED]
+      - c: 2
+        type: Workflow
+        title: Return to the preparer
+        steps:
+          - Return the request with a reason and remarks.
+        expected: The request is Preparing with the reason in its history.
+      - c: 2
+        type: Negative
+        screen: API
+        title: Assign a request For Review
+        steps:
+          - POST .../requests/{id}/assign on a request For Review.
+        expected: The call is refused.
+        msg: ["{RRF-2026-12} is {FOR_REVIEW} for this action", PRQ_WRONG_STAGE]
+
+  FR-PQ-006:
+    scenario: SC-DPA-07
+    persona: PRQ_PROCESSOR
+    screen: REQ
+    data: [TD-DPA-05]
+    conditions:
+      - A refund line of a cancelled policy opens one ACSL and one Cashiering validation.
+      - The request goes For Review only when all validations are confirmed; a rejection returns it to the preparer.
+      - A validation result is given once.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Send a cancelled-policy refund for validation
+        steps:
+          - Create an RRF with reason Cancelled policy; click Send for validation.
+          - Open the Validations tab.
+        expected: One ACSL validation (case of type Account analysis request) and one Cashiering task RVL-yyyy-n per line, OPEN.
+        auto: RefundValidationIT#acslAndCashieringConfirmThenTheRefundGoesToReview
+      - c: 2
+        type: Workflow
+        persona: ACSL_PROCESSOR
+        screen: CASE
+        title: ACSL confirms and Cashiering gives the new AR
+        steps:
+          - As acsl, provide the result Confirmed on the case.
+          - As cashier, confirm the reinstatement with the new AR number.
+        expected: Both validations are CONFIRMED and the request is For Review.
+        auto: RefundValidationIT#acslAndCashieringConfirmThenTheRefundGoesToReview; CashieringAdaptersIT#cashieringConfirmsOrRejectsARefundValidation
+      - c: 2
+        type: Workflow
+        persona: CASHIER
+        screen: CASHTASK
+        title: Cashiering rejects the validation
+        steps:
+          - Reject the Cashiering validation with a reason.
+        expected: The request returns to the preparer; resubmission opens a new round.
+        auto: RefundValidationIT#aRejectionSendsTheRefundBackAndResubmissionOpensANewRound
+      - c: 3
+        type: Negative
+        persona: CASHIER
+        screen: API
+        title: Result given twice
+        steps:
+          - POST the result of a validation already CONFIRMED.
+        expected: The call is refused.
+        msg: ["This validation was already {CONFIRMED}", PRQ_VALIDATION_DONE]
+
+  FR-PQ-007:
+    scenario: SC-DPA-07
+    persona: PRQ_PROCESSOR
+    screen: REQ
+    data: [TD-DPA-05]
+    conditions:
+      - Documents attached to a request are viewed, downloaded singly or as a ZIP, and travel to the DV.
+      - A file type outside the accepted list is refused.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: PDF and XLSX reach the refund DV
+        steps:
+          - Attach a PDF and an XLSX to the RRF with their document types; download both as a ZIP.
+          - After approval, open the refund DV, Documents.
+        expected: The ZIP holds both files; the DV shows both documents.
+      - c: 2
+        type: Negative
+        title: Executable file
+        steps:
+          - Attach a .exe file.
+        expected: The file is refused.
+        msg: ["Only these file types are allowed: {pdf, png, jpg, jpeg, xlsx, docx, csv, ods, odt, xls, doc, msg, eml}", ATTACHMENT_TYPE_NOT_ALLOWED]
+
+  FR-PQ-008:
+    scenario: SC-DPA-07
+    persona: PRQ_REVIEWER
+    screen: REQ
+    data: [TD-DPA-05]
+    conditions:
+      - The preparer submits the request; the reviewer endorses it to the approver or returns it.
+      - The reviewer is never the user who raised or last moved the request.
+      - An AR already refunded by another live request is refused at submission.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Submit and endorse
+        steps:
+          - As mktao, click Submit for review.
+          - As mktrev, click Endorse for approval.
+        expected: The request is For Review, then For Approval.
+        auto: PayRequestFlowIT#anRrfIsApprovedSentToDisbursementAndDisbursed
+      - c: 2
+        type: Security-access
+        persona: PRQ_PROCESSOR
+        title: Preparer endorses the own request
+        pre: mktao also holds PRQ_REVIEW for the case (test user prepared by the test lead).
+        steps:
+          - mktao endorses the request he submitted.
+        expected: The endorsement is refused.
+        msg: ["You raised or already moved {RRF-2026-12}: another user decides", PRQ_FOUR_EYES]
+        auto: PayRequestFlowIT#fourEyesAndOneLiveRefundPerAr
+      - c: 3
+        type: Negative
+        persona: PRQ_PROCESSOR
+        title: AR already on a live refund
+        steps:
+          - Submit a second RRF with an AR of the first live RRF.
+        expected: The submission is refused.
+        msg: ["AR {2026-00123} is already refunded by request {RRF-2026-12} (MKT 2.23.0)", PRQ_DUPLICATE_AR]
+      - c: 2
+        type: Negative
+        screen: API
+        title: Endorse a request in Draft
+        steps:
+          - POST .../requests/{id}/endorse on a Draft request.
+        expected: The call is refused.
+        msg: ["{RRF-2026-12} is {DRAFT} for this action", PRQ_WRONG_STAGE]
+
+  FR-PQ-009:
+    scenario: SC-DPA-08
+    persona: PRQ_APPROVER
+    screen: REQ
+    data: [TD-DPA-05]
+    conditions:
+      - An approved refund goes to Disbursement; an approved cash advance goes to HR, whose approval sends it to Disbursement.
+      - The approver returns a request to the reviewer with a reason; HR returns to the Marketing approver.
+      - The approver is never the requester or the previous actor; the stage must allow the action.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Cash advance through Marketing and HR
+        steps:
+          - As mktappr approve the endorsed cash advance.
+          - As hrappr approve it.
+        expected: The request is HR_APPROVAL, then SENT_TO_DISBURSEMENT.
+        auto: PayRequestFlowIT#aCashAdvanceNeedsMarketingThenHrApproval
+      - c: 2
+        type: Workflow
+        persona: HR_APPROVER
+        title: HR returns to the Marketing approver
+        steps:
+          - As hrappr, Return to Marketing approver with a reason.
+        expected: The request is For Approval with the reason.
+      - c: 2
+        type: Negative
+        title: Return without reason
+        steps:
+          - Click Return to reviewer without a reason.
+        expected: The return is refused.
+        msg: ["Select a reason for '{return}'", WORKFLOW_REASON_REQUIRED]
+      - c: 3
+        type: Security-access
+        title: Approver who endorsed the request
+        pre: A user holding PRQ_REVIEW and PRQ_APPROVE endorsed the request.
+        steps:
+          - That user approves it.
+        expected: The approval is refused.
+        msg: ["You raised or already moved {RRF-2026-12}: another user decides", PRQ_FOUR_EYES]
+      - c: 3
+        type: Negative
+        persona: HR_APPROVER
+        screen: API
+        title: HR approves a refund
+        steps:
+          - As hrappr, POST .../requests/{id}/approve on a refund For Approval.
+        expected: HTTP 403; the refund stays For Approval.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
+
+  FR-PQ-010:
+    scenario: SC-DPA-07
+    persona: PRQ_PROCESSOR
+    screen: REQ
+    conditions:
+      - Before approval a request is cancelled with a reason and its AR numbers are released.
+      - A cancellation needs a reason; an approved request is cancelled only through Disbursement.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Cancelled RRF frees its AR
+        steps:
+          - Cancel a Draft RRF with reason and remarks.
+          - Create a new RRF with the same AR.
+        expected: The first is CANCELLED; the new RRF with the AR is accepted.
+        auto: PayRequestDomainTest#aRequestStartsInItsKindsFirstStageAndReleasesItsArsWhenCancelled
+      - c: 2
+        type: Negative
+        title: Cancel without reason
+        steps:
+          - Click Cancel without a reason.
+        expected: The cancellation is refused.
+        msg: ["Select a reason for '{cancel}'", WORKFLOW_REASON_REQUIRED]
+      - c: 2
+        type: Negative
+        screen: API
+        title: Cancel a request sent to Disbursement
+        steps:
+          - Cancel a request SENT_TO_DISBURSEMENT from the workflow panel.
+        expected: No Cancel action exists in that stage; the call is refused.
+
+  FR-PQ-011:
+    scenario: SC-DPA-08
+    persona: PRQ_PROCESSOR
+    screen: CCR
+    conditions:
+      - A check-cancellation request (CCR) of a request paid by check is reviewed, approved and sent to the Disbursement approvers, who cancel the DV.
+      - Only a refund or cash advance paid by check with a DV and no cancellation in progress can be cancelled.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Cancel a disbursed check
+        steps:
+          - Raise CCR-yyyy-n for a refund paid by check with the check number, reason and remarks; mktrev endorses; mktappr approves.
+          - As disbappr cancel the DV.
+        expected: The CCR is SENT as a DV_CANCELLATION hand-off; after the DV cancellation the hand-off is closed and the refund reopened.
+        auto: PayRequestFlowIT#aDisbursedCheckIsCancelledThroughAHandOff
+      - c: 2
+        type: Negative
+        title: Refund paid by credit to account
+        steps:
+          - Raise a CCR for a CTA refund.
+        expected: The request is refused.
+        msg: ["{RRF-2026-12} was not paid by check", PRQ_TARGET_NOT_CHECK]
+      - c: 2
+        type: Negative
+        title: Second cancellation in progress
+        steps:
+          - Raise a second CCR for the same refund.
+        expected: The request is refused.
+        msg: ["A cancellation of the check of {RRF-2026-12} is already in progress", PRQ_CANCELLATION_PENDING]
+      - c: 2
+        type: Negative
+        title: Refund without DV
+        steps:
+          - Raise a CCR for a refund not yet disbursed.
+        expected: The request is refused.
+        msg: ["{RRF-2026-12} has no disbursement voucher yet", PRQ_TARGET_NOT_DISBURSED]
+      - c: 2
+        type: Negative
+        screen: API
+        title: Target that is not a refund or cash advance
+        steps:
+          - POST a CCR naming a CCR number as target.
+        expected: The call is refused.
+        msg: ["Request {CCR-2026-3} is not a refund or cash advance", PRQ_TARGET_UNKNOWN]
+
+  FR-PQ-012:
+    scenario: SC-DPA-07
+    persona: PRQ_PROCESSOR
+    screen: REPORTS
+    conditions:
+      - Each request shows its stage, trail and DV status; the status report and register export for a date range.
+      - A missing mandatory parameter is refused.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Status report of September
+        steps:
+          - Run PRQ-STATUS and PRQ-REGISTER for September; export to XLSX.
+        expected: Each request is listed with its stage and DV number; the register with its details.
+        auto: LiquidationAndReportsIT#theRequestReportsAndFormsRunAndExport
+      - c: 1
+        type: Positive
+        screen: REQ
+        title: Trail and Disbursement tab
+        steps:
+          - Open a sent refund, tabs History and Disbursement.
+        expected: The trail of every action with user and time; the DV number and its status.
+        auto: PayRequestDomainTest#theTrailAndTrackKeepEarlierFacts
+      - c: 2
+        type: Negative
+        title: Report without dates
+        steps:
+          - Run PRQ-STATUS without dates.
+        expected: The report does not run.
+        msg: ["Parameter {dateFrom} is required", MISSING_PARAMETER]
+
+  FR-PQ-013:
+    scenario: SC-DPA-07
+    persona: SYSTEM
+    screen: REQ
+    conditions:
+      - When the refund or advance is paid the request becomes Disbursed and the requester is notified.
+      - When Disbursement returns, rejects or cancels, the request goes back and is resent under a new reference.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Released check makes the refund Disbursed
+        steps:
+          - Release the check of an approved refund DV (disb); open the refund.
+        expected: The refund is DISBURSED with the DV number; mktao is notified.
+        auto: PayRequestFlowIT#anRrfIsApprovedSentToDisbursementAndDisbursed
+      - c: 2
+        type: Workflow
+        title: Returned by Disbursement and resent
+        steps:
+          - disbappr rejects the refund DV; mktao corrects and the request is approved again.
+        expected: The refund goes back to Preparing and is resent as RRF-.../1.
+        auto: PayRequestFlowIT#aRefundReturnedByDisbursementIsSentAgainUnderANewReference; PayRequestDomainTest#aResentRequestGetsANewSourceReference
+      - c: 2
+        type: Negative
+        title: A rejected DV does not make the refund Disbursed
+        steps:
+          - Open the refund after the rejection.
+        expected: The refund is not DISBURSED and has no paid date.
+
+  FR-PQ-014:
+    scenario: SC-DPA-07
+    persona: PRQ_PROCESSOR
+    screen: NEWRRF
+    conditions:
+      - An AR number is on one live request only; cancelling frees it.
+      - The same AR twice on a request is refused.
+    cases:
+      - c: 1
+        type: Negative
+        title: Second RRF for AR 2026-00123
+        steps:
+          - Raise a second RRF with AR 2026-00123 while the first is live.
+        expected: The request is refused.
+        msg: ["AR {2026-00123} is already refunded by request {RRF-2026-12} (MKT 2.23.0)", PRQ_DUPLICATE_AR]
+        auto: PayRequestFlowIT#fourEyesAndOneLiveRefundPerAr
+      - c: 1
+        type: Positive
+        title: AR free again after cancellation
+        steps:
+          - Cancel the first RRF; raise the second again.
+        expected: The second RRF is accepted.
+      - c: 2
+        type: Negative
+        title: Same AR on two lines
+        steps:
+          - Enter AR 2026-00124 on two lines of one RRF.
+        expected: The request is refused.
+        msg: ["AR {2026-00124} appears twice on the request (MKT 2.23.0)", PRQ_DUPLICATE_AR]
+        auto: requestForm.test.ts#flags duplicate ARs, bad amounts, missing reasons and mixed clients
+
+  FR-PQ-015:
+    scenario: SC-DPA-07
+    persona: SYSTEM
+    screen: WB
+    conditions:
+      - An approved refund is sent to Disbursement as type Refund and goes straight to the approver; a cash advance is sent after HR approval as type Cash advance.
+      - A request not yet approved is not sent.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: DISB_APPROVER
+        title: Approved refund in the workbench
+        steps:
+          - After mktappr approves the RRF, open the workbench For Approval.
+        expected: The refund DV carries the RRF number, payee, amount, mode, account and documents.
+        auto: PayRequestFlowIT#anRrfIsApprovedSentToDisbursementAndDisbursed; CollectionsAndDisbursementPortsIT#aPaymentRequestCarriesTheDisbursementRoutingAndCanBeCancelled
+      - c: 2
+        type: Negative
+        persona: DISB_APPROVER
+        title: Cash advance before HR approval
+        steps:
+          - After mktappr approves a cash advance, look for it in the workbench.
+        expected: It is not in Disbursement until hrappr approves.
+        auto: PayRequestFlowIT#aCashAdvanceNeedsMarketingThenHrApproval
+
+  FR-PQ-016:
+    scenario: SC-DPA-07
+    persona: SYSTEM
+    screen: NEWRRF
+    conditions:
+      - On approval of a refund the client's payout details are added to the client once and offered on the next form.
+      - The payout details are validated.
+    cases:
+      - c: 1
+        type: Positive
+        persona: PRQ_PROCESSOR
+        title: Second refund to the same account
+        steps:
+          - After the approval of a CTA refund, open a new RRF for the same client and approve it with the same account.
+        expected: The form offers the recorded account; no second payout account is added.
+        auto: LiquidationAndReportsIT#payoutAccountsAreAddedOnceAndValidated
+      - c: 2
+        type: Boundary
+        neg: true
+        persona: PRQ_PROCESSOR
+        title: BDO account number of 9 digits
+        steps:
+          - Enter a CTA account number of 9 digits.
+        expected: The form is refused; 10 digits are accepted.
+        msg: [A credit to account needs the BDO account number (10 to 16 digits AQ19), PAYOUT_ACCOUNT_INVALID]
+        auto: requestForm.test.ts#checks the credit to account details
+      - c: 2
+        type: Negative
+        persona: PRQ_PROCESSOR
+        screen: API
+        title: Payout details missing
+        steps:
+          - POST a payout account without mode.
+        expected: The call is refused.
+        msg: [Give the payout mode and the account or check payee name, PAYOUT_INCOMPLETE]
+
+  FR-PQ-017:
+    scenario: SC-DPA-08
+    persona: PRQ_PROCESSOR
+    screen: REQ
+    data: [TD-DPA-05, TD-DPA-08]
+    conditions:
+      - After a cash advance is disbursed the employee records up to 60 fieldwork days and submits; the checker posts it with the excess or shortage.
+      - The checker returns it; the checker is not the employee.
+      - The liquidation is validated (disbursed advance, days, amounts, accounts, status).
+    cases:
+      - c: 1
+        type: Workflow
+        title: Liquidation of 4,500.00 against 5,000.00
+        steps:
+          - Record two fieldwork days with expenses totalling 4,500.00; submit.
+          - As the checker (mktrev), post it.
+        expected: PRQ_CA_LIQUIDATION posts the expenses by category and 500.00 cash returned against the advance of 5,000.00.
+        auto: LiquidationAndReportsIT#aDisbursedCashAdvanceIsLiquidatedAndPosted
+      - c: 2
+        type: Workflow
+        persona: PRQ_REVIEWER
+        title: Return a liquidation
+        steps:
+          - Return a submitted liquidation with remarks.
+        expected: The liquidation is DRAFT again for the employee.
+        auto: LiquidationAndReportsIT#aShortLiquidationIsReturnedAndCannotStartBeforePayment
+      - c: 2
+        type: Security-access
+        title: Employee checks the own liquidation
+        pre: The employee also holds the checker permission (test user).
+        steps:
+          - The employee posts the own liquidation.
+        expected: The posting is refused.
+        msg: [A liquidation is checked by someone other than the employee, PRQ_FOUR_EYES]
+      - c: 3
+        type: Negative
+        title: Liquidate an advance not disbursed
+        steps:
+          - Open the liquidation of a cash advance For Approval.
+        expected: The liquidation is refused.
+        msg: [Only a disbursed cash advance is liquidated, PRQ_NOT_LIQUIDABLE]
+        auto: LiquidationAndReportsIT#aShortLiquidationIsReturnedAndCannotStartBeforePayment
+      - c: 3
+        type: Negative
+        title: Submit without a day
+        steps:
+          - Submit a liquidation with no fieldwork day.
+        expected: The submission is refused.
+        msg: [Enter at least one fieldwork day before submitting, PRQ_LIQUIDATION_EMPTY]
+      - c: 3
+        type: Boundary
+        neg: true
+        title: 61 fieldwork days
+        steps:
+          - Enter 61 days.
+        expected: The liquidation is refused; 60 are accepted.
+        msg: [A liquidation has up to 60 fieldwork days, PRQ_LIQUIDATION_LINES]
+        auto: requestForm.test.ts#flags incomplete days and bad amounts
+      - c: 3
+        type: Negative
+        title: Day without particulars
+        steps:
+          - Enter a day with date and no particulars.
+        expected: The liquidation is refused.
+        msg: [Every fieldwork day needs its date and particulars, PRQ_LIQUIDATION_LINE]
+      - c: 3
+        type: Negative
+        title: Negative expense
+        steps:
+          - Enter a transport expense of -100.00.
+        expected: The liquidation is refused.
+        msg: [Expenses are zero or positive with at most two decimals, PRQ_AMOUNT_INVALID]
+      - c: 3
+        type: Negative
+        persona: PRQ_REVIEWER
+        title: Account of an expense role not set
+        pre: The test lead clears the account of role LODGING on Liquidation Accounts.
+        steps:
+          - Post a liquidation with a lodging expense.
+        expected: The posting is refused. Restore the account afterwards.
+        msg: ["Comptrollership has not set the account of {LODGING} for liquidations (AQ02)", PRQ_LIQUIDATION_ACCOUNT_MISSING]
+      - c: 3
+        type: Negative
+        screen: API
+        title: Change a posted liquidation
+        steps:
+          - PUT .../requests/{id}/liquidation on a POSTED liquidation.
+        expected: The change is refused.
+        msg: ["{LIQ-2026-2} is {POSTED}", PRQ_LIQUIDATION_LOCKED]
+
+  FR-AS-001:
+    scenario: SC-DPA-09
+    persona: ACSL_PROCESSOR
+    screen: REPORTS
+    conditions:
+      - ACSL runs its reports without IT and exports them singly or as a batch; the booked-accounts list carries the BRD file name.
+      - A missing mandatory parameter is refused.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Booked-accounts list of September
+        steps:
+          - Run ACSL-BOOKED-FIN-DETAILS for September and the premium receivable GL account; export to XLSX.
+        expected: The file is named "List of all booked accounts_<GL account name>_<period>" and lists the booked accounts with their financial details.
+        auto: AcslApiIT#soaAndGlSlEndpointsRespond
+      - c: 1
+        type: Report-output
+        title: ACSL reports in a batch
+        steps:
+          - Run ACSL-SOA-RECON, ACSL-SOA-UPLOAD-LOG and ACSL-GL-SL-RECON in one report batch.
+        expected: One ZIP with the three files.
+      - c: 2
+        type: Negative
+        title: GL account left blank
+        steps:
+          - Run ACSL-BOOKED-FIN-DETAILS without the GL account.
+        expected: The report does not run.
+        msg: ["Parameter {glAccount} is required", MISSING_PARAMETER]
+
+  FR-AS-002:
+    scenario: SC-DPA-09
+    persona: ACSL_PROCESSOR
+    screen: SOA
+    data: [TD-DPA-06]
+    conditions:
+      - An SOA of an insurer and period is read with the layout, numbered SOA-yyyy-n and reconciled; the upload log lists the rows read, loaded and failed.
+      - The same file cannot be uploaded twice for an insurer.
+      - Insurer, period, size, rows and layout are validated.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: SOA of 1,200 rows with 3 without invoice
+        steps:
+          - Upload the SOA of TD-DPA-06 for the insurer and period.
+          - Open the upload log.
+        expected: 1,197 rows are loaded; the log lists the 3 rows with their reason.
+        auto: AcslSoaIT#anSoaUploadProducesTheUploadLogAndTheReconciliationReport
+      - c: 2
+        type: Negative
+        title: Same file again
+        steps:
+          - Upload the same file again for the insurer.
+        expected: The upload is refused.
+        msg: ["This file was already uploaded for {INS-LAC} as {SOA-2026-4}", ACSL_SOA_DUPLICATE]
+      - c: 3
+        type: Negative
+        title: File without the layout columns
+        steps:
+          - Upload a file without the column Invoice No.
+        expected: The upload is refused.
+        msg: ["The file does not follow the layout '{*}'; missing column(s) {Invoice No}", ACSL_SOA_LAYOUT_MISMATCH]
+        auto: AcslSoaIT#aFileWithoutTheLayoutColumnsOrPeriodIsRefused
+      - c: 3
+        type: Negative
+        title: Period ending before it starts
+        steps:
+          - Upload with a covered period from 30 September to 1 September.
+        expected: The upload is refused.
+        msg: [The covered period ends before it starts, ACSL_SOA_PERIOD]
+        auto: AcslSoaIT#aFileWithoutTheLayoutColumnsOrPeriodIsRefused
+      - c: 3
+        type: Negative
+        title: No insurer
+        steps:
+          - Upload without choosing the insurer.
+        expected: The upload is refused.
+        msg: [Give the insurer and the covered period of the statement, ACSL_SOA_PERIOD]
+      - c: 3
+        type: Boundary
+        neg: true
+        title: File above 10 MB
+        steps:
+          - Upload a file of 10.5 MB.
+        expected: The upload is refused.
+        msg: [The file must be at most 10 MB, ACSL_SOA_TOO_LARGE]
+      - c: 3
+        type: Boundary
+        neg: true
+        title: 20,001 rows
+        steps:
+          - Upload a file of 20,001 rows.
+        expected: The upload is refused; 20,000 rows are accepted.
+        msg: ["An SOA upload has at most {20000} rows", ACSL_SOA_TOO_LARGE]
+
+  FR-AS-003:
+    scenario: SC-DPA-09
+    persona: ACSL_PROCESSOR
+    screen: SOAD
+    data: [TD-DPA-06]
+    conditions:
+      - Each SOA line is matched by invoice number and reported Outstanding, For remittance, Remitted, Cancelled or Direct billed, with the variances.
+      - A line without invoice in BIBS is Not found.
+      - The reconciliation report is named insurer_from_to and the processor can reconcile again.
+    cases:
+      - c: 1
+        type: Positive
+        title: Remitted line
+        steps:
+          - Open the results of the upload.
+        expected: A line whose invoice was remitted shows Remitted with the batch and date.
+        auto: AcslSoaIT#anSoaUploadProducesTheUploadLogAndTheReconciliationReport; AcslDomainTest#aControlSplitsItsListsAndARunCountsItsBuckets
+      - c: 2
+        type: Negative
+        title: Unknown invoice
+        steps:
+          - Look for the line with an invoice number not booked.
+        expected: The line is Not found.
+      - c: 3
+        type: Report-output
+        title: Report and reconcile again
+        steps:
+          - Download the reconciliation report; after a remittance of one invoice click Reconcile Again.
+        expected: The report is named "<insurer>_<from>_<to>" and exports to XLSX, ODS and PDF; after reconciling again the invoice moves to Remitted.
+
+  FR-AS-004:
+    scenario: SC-DPA-09
+    persona: ACSL_PROCESSOR
+    screen: GLSL
+    data: [TD-DPA-06]
+    conditions:
+      - For each control account BIBS compares the GL balance with its sub-ledger and raises ACSL_GLSL_DIFFERENCE on a difference.
+      - A control setting without its sub-ledger source is refused.
+    cases:
+      - c: 1
+        type: Positive
+        title: Difference of 1,500.00
+        pre: The test lead posts a GL-only adjustment of 1,500.00 to premium receivable.
+        steps:
+          - Run the GL-SL reconciliation now.
+        expected: The row shows GL 1,000,000.00, SL 998,500.00 and a difference of 1,500.00; ACSL_GLSL_DIFFERENCE is raised.
+        auto: AcslSoaIT#theGlSlReconciliationComparesEveryControlAccount
+      - c: 2
+        type: Negative
+        persona: ACSL_TL
+        title: Control without components
+        steps:
+          - Save a control account with source PARTY_LEDGER and no components.
+        expected: The setting is refused.
+        msg: ["Give the sub-ledger, and the components (Operations ledger) or document types (open items)", ACSL_GLSL_SETTING]
+
+  FR-AS-005:
+    scenario: SC-DPA-09
+    persona: ACSL_PROCESSOR
+    screen: REPORTS
+    conditions:
+      - Until the ACSL aging reports are built (gap G3) the Volume 1 account schedules and the GL-SL reconciliation give the balances and differences.
+      - The ACSL aging reports are not offered.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Aged premium receivable from the account schedules
+        steps:
+          - Run SCH-PR with ageing (Volume 1 Account Schedules) for September.
+        expected: The balances are aged per party; the GL-SL reconciliation gives the SL-GL difference.
+        auto: AccountScheduleIT#premiumReceivablesAreAgedPerPartyAndTheBucketsAddUpToTheBalance
+      - c: 2
+        type: Negative
+        title: ACSL aging reports not offered (gap G3)
+        steps:
+          - Look for the ACSL aging reports in the Report Centre, category ACSL.
+        expected: They are not listed; the case is re-run when they are built.
+
+  FR-AS-010:
+    scenario: SC-DPA-09
+    persona: ACSL_PROCESSOR
+    screen: CASES
+    conditions:
+      - A case of ACSL_CASE_TYPE is assigned by the TL; the processor finds the transaction and its family and records the findings.
+      - A case without type or subject, an unknown invoice or an action in the wrong stage is refused.
+      - The processor sends a case back for re-assignment with a reason.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: ACSL_TL
+        title: Assign and investigate
+        steps:
+          - As acsltl, create an Investigation case with the invoice and assign it to acsl.
+          - As acsl, start the investigation, search Invoice Search by assured name and record the findings.
+        expected: The invoice is found; the case shows its endorsement and cancellation with their collections and remittances.
+        auto: AcslCorrectionIT#anInvestigationRaisesACorrectionAndAsksCashieringForAReversal; AcslApiIT#casesAndCorrectionsOverHttp
+      - c: 2
+        type: Negative
+        title: Case without subject
+        steps:
+          - Create a case without subject.
+        expected: The case is refused.
+        msg: [Give the case type and subject, ACSL_CASE_INCOMPLETE]
+      - c: 2
+        type: Negative
+        title: Unknown invoice
+        steps:
+          - Create a case with invoice BI-2026-999999.
+        expected: The case is refused.
+        msg: ["Invoice {BI-2026-999999} is not in the ledger", ACSL_INVOICE_UNKNOWN]
+      - c: 2
+        type: Negative
+        screen: API
+        title: Findings on a case not assigned
+        steps:
+          - PUT .../cases/{id}/findings on a RECEIVED case.
+        expected: The call is refused.
+        msg: ["{ACS-2026-3} is {RECEIVED}, not {INVESTIGATING}", ACSL_WRONG_STAGE]
+      - c: 3
+        type: Workflow
+        title: Send back for re-assignment
+        steps:
+          - Click Send back for reassignment with a reason.
+        expected: The case is RECEIVED again for the TL.
+
+  FR-AS-011:
+    scenario: SC-DPA-09
+    persona: ACSL_PROCESSOR
+    screen: CASE
+    conditions:
+      - The processor gives the result Confirmed, Rejected or No action; the requester receives it and a Payment Requests validation moves its request.
+      - A result outside the three outcomes is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Confirm a cancelled-policy analysis
+        steps:
+          - Provide the result Confirmed with remarks on the analysis case of an RRF.
+        expected: The case is RESULT_PROVIDED; the ACSL validation of the RRF is CONFIRMED.
+        auto: RefundValidationIT#acslAndCashieringConfirmThenTheRefundGoesToReview
+      - c: 2
+        type: Negative
+        screen: API
+        title: Unknown outcome
+        steps:
+          - POST .../cases/{id}/result with outcome MAYBE.
+        expected: The call is refused.
+        msg: ["Give the result: confirmed, rejected or no action", ACSL_OUTCOME_INVALID]
+
+  FR-AS-012:
+    scenario: SC-DPA-09
+    persona: ACSL_PROCESSOR
+    screen: CASE
+    conditions:
+      - From a case the processor requests a payment reversal that a second cashier approves; the money goes back to unapplied and the result returns to the case.
+      - A reversal without invoice or receipt, or approved by its requester, is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Reversal of 3,000.00 on OR 555
+        steps:
+          - Click Request Payment Reversal - receipt OR 555, 3,000.00, reason.
+          - As cashier record it; as cashtl approve it.
+        expected: The applications are reversed and 3,000.00 is back in unapplied (Dr receivable / Cr unapplied); the case shows the result.
+        auto: AcslCorrectionIT#anInvestigationRaisesACorrectionAndAsksCashieringForAReversal; CashieringAdaptersIT#anAcslReversalIsApprovedWithFourEyesAndTheMoneyGoesBackToUnapplied
+      - c: 2
+        type: Negative
+        title: Reversal without receipt
+        steps:
+          - Request a reversal without receipt number.
+        expected: The request is refused.
+        msg: ["A payment reversal needs the case's invoice and the receipt", ACSL_REVERSAL_INCOMPLETE]
+      - c: 2
+        type: Security-access
+        persona: CASHIER
+        screen: CASHTASK
+        title: Cashier approves the reversal he recorded
+        steps:
+          - As cashier, record the reversal and approve it.
+        expected: The approval is refused.
+        msg: [The requester cannot approve the payment reversal, MAKER_CHECKER_VIOLATION]
+        auto: CashieringAdaptersIT#aReversalIsRefusedToItsRequesterAndCanBeRejected
+
+  FR-AS-013:
+    scenario: SC-DPA-09
+    persona: ACSL_PROCESSOR
+    screen: CASE
+    conditions:
+      - The processor messages the AO of the invoice from the case; the AO is notified and the message is kept.
+      - A message without AO or empty is refused.
+    cases:
+      - c: 1
+        type: Positive
+        title: Short payment of 150.00
+        steps:
+          - Click Message the AO with "Short payment of 150.00 on invoice 2026-0456".
+        expected: The AO of the invoice receives a notification; the message is on the case.
+      - c: 2
+        type: Negative
+        title: Empty message
+        steps:
+          - Send an empty message.
+        expected: The message is refused.
+        msg: ["The case's invoice has no Account Officer, or the message is empty", ACSL_NO_ACCOUNT_OFFICER]
+
+  FR-AS-020:
+    scenario: SC-DPA-10
+    persona: ACSL_TL
+    screen: CORRS
+    conditions:
+      - A correction raised from a case or directly is assigned by the TL and can be re-assigned while it is a draft.
+      - An assignment in the wrong stage is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Re-assign a correction
+        pre: A second processor account (acsltl acts as preparer for the case, or a second ACSL user).
+        steps:
+          - Assign COR-yyyy-n to acsl; re-assign it to the second preparer.
+        expected: The correction is DRAFT in the second preparer's Draft tab.
+        auto: AcslApiIT#casesAndCorrectionsOverHttp
+      - c: 2
+        type: Negative
+        screen: API
+        title: Assign a correction For Review
+        steps:
+          - POST .../corrections/{id}/assign on a correction For Review.
+        expected: The call is refused.
+        msg: ["{COR-2026-5} is {FOR_REVIEW}, not {DRAFT}", ACSL_WRONG_STAGE]
+
+  FR-AS-021:
+    scenario: SC-DPA-10
+    persona: ACSL_PROCESSOR
+    screen: CORR
+    conditions:
+      - For a wrong GL account, Propose builds the reversal of the original line and the re-post to the right account, both linked to the invoice.
+      - A balanced correction of at least two lines is submitted for review.
+      - Lines are validated (account, side, amount, heading, party, component, line count, journal line).
+      - A draft is cancelled with a reason.
+    cases:
+      - c: 1
+        type: Positive
+        title: Premium posted to 4110 instead of 4120
+        steps:
+          - Kind Posting to a wrong GL account, the invoice and the original journal; click Propose with target 4120.
+        expected: Two lines - reversal of 4110 and re-post to 4120 - linked to the invoice and batch.
+        auto: acsl.test.ts#reverses a line and re-posts it to the right account; AcslDomainTest#aProposalReusesTheComponentUnlessAnotherIsGiven
+      - c: 2
+        type: Workflow
+        title: Submit a balanced correction
+        steps:
+          - Enter the description; submit.
+        expected: The correction is For Review.
+        auto: AcslCorrectionIT#aCorrectionIsReviewedApprovedAndPostedWithOpenItemsAndLedgerMovements
+      - c: 2
+        type: Negative
+        title: Unbalanced correction
+        steps:
+          - Change one line amount; submit.
+        expected: The submission is refused.
+        msg: ["A correction needs at least two lines and equal debits ({1000.00}) and credits ({900.00})", ACSL_CORRECTION_UNBALANCED]
+        auto: AcslCorrectionIT#aReturnedCorrectionMustBalanceBeforeItIsSubmittedAgain; acsl.test.ts#checks balance and lines
+      - c: 3
+        type: Negative
+        title: Description missing
+        steps:
+          - Submit without description.
+        expected: The submission is refused.
+        msg: [Describe the correction, ACSL_DESCRIPTION_REQUIRED]
+      - c: 3
+        type: Negative
+        title: Line on a heading account
+        steps:
+          - Enter a line on heading account 4100.
+        expected: The line is refused.
+        msg: ["Account {4100} is a heading", ACSL_ACCOUNT_NOT_POSTABLE]
+      - c: 3
+        type: Negative
+        title: Control account without party
+        steps:
+          - Enter a line on 1210 without the party.
+        expected: The line is refused.
+        msg: ["Control account {1210} needs the sub-ledger party", ACSL_PARTY_REQUIRED]
+      - c: 3
+        type: Negative
+        title: Line without side
+        steps:
+          - Enter a line without Debit or Credit.
+        expected: The line is refused.
+        msg: [Every line needs a side and a positive amount with two decimals, ACSL_LINE_INVALID]
+      - c: 3
+        type: Negative
+        title: Component without invoice
+        steps:
+          - Enter a line with the ledger component PREMIUM and no invoice.
+        expected: The line is refused.
+        msg: ["A ledger component ({PREMIUM}) needs the invoice it corrects", ACSL_COMPONENT_INVALID]
+      - c: 3
+        type: Boundary
+        neg: true
+        screen: API
+        title: 201 lines
+        steps:
+          - PUT .../corrections/{id}/lines with 201 lines.
+        expected: The call is refused; 200 lines are accepted.
+        msg: [A correction has at most 200 lines, ACSL_TOO_MANY_LINES]
+      - c: 3
+        type: Negative
+        title: Unknown line of the original journal
+        steps:
+          - Propose from line 99 of a journal of 4 lines.
+        expected: The proposal is refused.
+        msg: ["Journal {batch} has no line {99}", ACSL_LINE_UNKNOWN]
+      - c: 4
+        type: Workflow
+        title: Cancel a draft
+        steps:
+          - Cancel the draft with a reason.
+        expected: The correction is CANCELLED.
+
+  FR-AS-022:
+    scenario: SC-DPA-10
+    persona: ACSL_TL
+    screen: CORR
+    conditions:
+      - The reviewer endorses a correction for approval or returns it with a reason.
+      - The reviewer is not the preparer.
+    cases:
+      - c: 1
+        type: Workflow
+        title: acsltl endorses acsl's correction
+        steps:
+          - Open the correction For Review; click Endorse for approval with a comment.
+        expected: The correction is For Approval with the comment in the trail.
+        auto: AcslCorrectionIT#aCorrectionIsReviewedApprovedAndPostedWithOpenItemsAndLedgerMovements
+      - c: 1
+        type: Workflow
+        title: Return to the preparer
+        steps:
+          - Return a correction with a reason.
+        expected: The correction is DRAFT again.
+        auto: AcslCorrectionIT#aReturnedCorrectionMustBalanceBeforeItIsSubmittedAgain
+      - c: 2
+        type: Security-access
+        title: Preparer reviews the own correction
+        steps:
+          - As acsltl, prepare and submit a correction, then endorse it.
+        expected: The endorsement is refused.
+        msg: [A correction is reviewed by someone other than its preparer, ACSL_FOUR_EYES]
+
+  FR-AS-023:
+    scenario: SC-DPA-10
+    persona: ACSL_HEAD
+    screen: CORR
+    conditions:
+      - The Head approves with a comment or returns with a reason and comment; comments are kept in the trail.
+      - The approver is not the maker; a return needs a reason.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Return with a comment
+        steps:
+          - Return an endorsed correction with reason and comment.
+        expected: The correction is DRAFT with the Head's comment.
+        auto: AcslCorrectionIT#aReturnedCorrectionMustBalanceBeforeItIsSubmittedAgain
+      - c: 2
+        type: Negative
+        title: Return without reason
+        steps:
+          - Click Return to preparer without a reason.
+        expected: The return is refused.
+        msg: ["Select a reason for '{return}'", WORKFLOW_REASON_REQUIRED]
+      - c: 2
+        type: Security-access
+        title: Maker approves
+        pre: A test user holding ACSL_PROCESS and ACSL_APPROVE prepared the correction.
+        steps:
+          - That user approves it.
+        expected: The approval is refused.
+        msg: [The approver of a correction is not its maker, ACSL_FOUR_EYES]
+
+  FR-AS-024:
+    scenario: SC-DPA-10
+    persona: SYSTEM
+    screen: CORR
+    conditions:
+      - On approval BIBS posts the system journal ACS:<no>, matches the open items of the lines and moves the invoice components.
+      - An unknown account or party refuses the posting.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: ACSL_HEAD
+        title: Approve and post
+        steps:
+          - Approve the correction with a comment; open its Journal.
+        expected: The journal ACS:COR-yyyy-n is posted; the invoice balance changes by the corrected component.
+        auto: AcslCorrectionIT#aCorrectionIsReviewedApprovedAndPostedWithOpenItemsAndLedgerMovements; CollectionsAndDisbursementPortsIT#anAcslCorrectionMovesTheInvoiceOnceAndKeepsTheOriginalMovements
+      - c: 2
+        type: Negative
+        persona: ACSL_HEAD
+        title: Party removed before approval
+        pre: The party of a line is removed from the master by the test lead after submission.
+        steps:
+          - Approve the correction.
+        expected: The approval is refused and nothing is posted.
+        msg: ["Party {code} of a correction line is not maintained", ACSL_PARTY_UNKNOWN]
+      - c: 2
+        type: Negative
+        persona: ACSL_HEAD
+        title: Account not in the chart
+        pre: A line names an account the test lead closes after submission.
+        steps:
+          - Approve the correction.
+        expected: The approval is refused.
+        msg: ["Account {code} is not in the chart", ACSL_ACCOUNT_UNKNOWN]
+
+  FR-AS-025:
+    scenario: SC-DPA-10
+    persona: ACSL_PROCESSOR
+    screen: DED
+    data: [TD-DPA-06, TD-DPA-07]
+    conditions:
+      - A deduction with the insurer's confirmation is submitted and confirmed by another user.
+      - The next approved batch of the insurer consumes the confirmed deductions, capped at the amount payable, and posts OPS_REMIT_DEDUCTION.
+      - A deduction needs a positive amount and the insurer's confirmation; it changes only as a draft; the preparer cannot confirm it.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: ACSL_TL
+        title: Confirm the INS-LAC deduction
+        steps:
+          - Open the deduction of TD-DPA-06 For Confirmation and click Confirm deduction.
+        expected: The deduction is CONFIRMED.
+        auto: OperationsSettlementApiIT#aDeductionIsPreparedSubmittedAndConfirmedThroughTheApi
+      - c: 2
+        type: Workflow
+        persona: REMIT_TL
+        screen: REMIT
+        title: Deduction of 10,000.00 on the next batch
+        steps:
+          - Approve the next INS-LAC batch.
+        expected: The payable is reduced by 10,000.00; OPS_REMIT_DEDUCTION posts with reference RMB:<batch>:<deduction>.
+        auto: RemittanceSettlementIT#aConfirmedDeductionIsConsumedByTheNextBatchesAndCappedAtTheAmountPayable
+      - c: 2
+        type: Boundary
+        persona: REMIT_TL
+        screen: REMIT
+        title: Deduction of 50,000.00 against a payable of 30,000.00
+        steps:
+          - Approve a batch of 30,000.00 payable with a confirmed deduction of 50,000.00.
+        expected: 30,000.00 is consumed; the batch is settled without a payment request; 20,000.00 remains on the deduction.
+        auto: RemittanceSettlementIT#aConfirmedDeductionIsConsumedByTheNextBatchesAndCappedAtTheAmountPayable
+      - c: 3
+        type: Negative
+        title: Submit without the insurer's confirmation
+        steps:
+          - Record a deduction without confirmation reference; submit.
+        expected: The submission is refused.
+        msg: ["Deduction {RDN-2026-2} needs the insurer's confirmation reference and date before submission", REMIT_DEDUCTION_UNCONFIRMED]
+        auto: deductionForm.test.ts#requires the insurer, source, reference and a positive amount
+      - c: 3
+        type: Negative
+        title: Amount zero
+        steps:
+          - Record a deduction of 0.00.
+        expected: The deduction is refused.
+        msg: [A deduction needs a positive amount, REMIT_DEDUCTION_AMOUNT]
+      - c: 3
+        type: Negative
+        screen: API
+        title: Change a submitted deduction
+        steps:
+          - PUT .../deductions/{id} on a deduction For Confirmation.
+        expected: The change is refused.
+        msg: ["Deduction {RDN-2026-2} can only change as a draft", REMIT_DEDUCTION_STAGE]
+      - c: 3
+        type: Security-access
+        persona: ACSL_TL
+        title: Preparer confirms the own deduction
+        steps:
+          - As acsltl, record and submit a deduction, then confirm it.
+        expected: The confirmation is refused.
+        msg: ["Deduction {RDN-2026-3} must be confirmed by another user", REMIT_DEDUCTION_FOUR_EYES]
+
+  FR-AS-026:
+    scenario: SC-DPA-10
+    persona: ACSL_PROCESSOR
+    screen: INV360
+    conditions:
+      - ACSL sees for an invoice the whole family with its corrections and cases through the root invoice.
+      - Each invoice keeps its own BIR number.
+    cases:
+      - c: 1
+        type: Positive
+        title: Invoice cancelled and rebooked
+        steps:
+          - Open Invoice 360, Invoice Family, of an invoice cancelled and rebooked; open its cases.
+        expected: Both invoices are listed with their cases and corrections.
+        auto: OperationsSettlementApiIT#aBatchShowsItsSettlementAndTheInvoiceSearchFindsItsFamily
+      - c: 2
+        type: Negative
+        title: The rebooked invoice keeps its own number
+        steps:
+          - Compare the numbers of the original and the rebooked invoice.
+        expected: The numbers differ; only the root links them.
+
+access:
+  - action: Process DVs, encode requests and tag instruments
+    screen: DV
+    permission: DISB_PROCESS
+    allow: [DISBURSEMENT, DISB_TL]
+    deny: [DISB_APPROVER, COMPTROLLERSHIP, AUDITOR]
+    denied: Encode Payment Request is not in the menu; the DV is read only; POST /requests returns HTTP 403.
+    auto: DisbursementApiIT#theWorkbenchRequestsAndVouchersAreReadAndProcessedThroughTheApi
+  - action: Upload requests, payees and bank files
+    screen: UPL
+    permission: DISB_UPLOAD
+    allow: [DISBURSEMENT, DISB_TL]
+    deny: [DISB_APPROVER]
+    denied: Disbursement Uploads is not in the menu.
+  - action: Review and submit DVs for approval
+    screen: DV
+    permission: DISB_REVIEW
+    allow: [DISB_TL]
+    deny: [DISBURSEMENT, DISB_APPROVER]
+    denied: Submit for Approval and Return are not shown on DVs For Review.
+  - action: Approve, reject and cancel approved DVs
+    screen: DV
+    permission: DISB_APPROVE
+    allow: [DISB_APPROVER]
+    deny: [DISBURSEMENT, DISB_TL]
+    denied: Approve, Reject and Cancel approved DV are not shown; POST /vouchers/{id}/approve returns HTTP 403.
+    auto: DisbursementDemoIT#theApproverIsNeverTheProcessorAndOperationsKeepsItsBatchInReview
+  - action: Maintain payees
+    screen: PAYEE
+    permission: DISB_PAYEE_MAINTAIN
+    allow: [DISB_TL]
+    deny: [DISBURSEMENT, DISB_APPROVER]
+    denied: New Payee is not shown; POST /payees returns HTTP 403.
+  - action: Authorise payees
+    screen: PAYEES
+    permission: DISB_PAYEE_AUTHORIZE
+    allow: [DISB_APPROVER]
+    deny: [DISB_TL, DISBURSEMENT]
+    denied: Authorise is not shown on For Authorisation.
+    auto: DisbursementProcessingIT#payeesNeedTheCheckerAndOnlyUnusedDraftsAreDeleted
+  - action: See full payee account numbers
+    screen: PAYEES
+    permission: DISB_PAYEE_VIEW_FULL
+    allow: [DISB_TL, DISB_APPROVER]
+    deny: [DISBURSEMENT]
+    denied: Account numbers show the last four digits only.
+    auto: DisbursementApiIT#payeesShowMaskedAccountsWithoutTheFullViewPermission
+  - action: Run the end of day and confirmations
+    screen: EOD
+    permission: DISB_EOD
+    allow: [DISB_TL, DISB_APPROVER]
+    deny: [DISBURSEMENT]
+    denied: Disbursement End of Day is not in the menu.
+  - action: Request and verify account funding
+    screen: FUND
+    permission: DISB_FUNDING_REQUEST, DISB_FUNDING_VERIFY
+    allow: [DISB_TL]
+    deny: [DISBURSEMENT, DISB_APPROVER]
+    denied: New Funding Request and Verify are not shown.
+    auto: DisbursementProcessingIT#fundingNeedsAVerifierAndTwoDifferentApprovers
+  - action: Approve account funding
+    screen: FUND
+    permission: DISB_FUNDING_APPROVE
+    allow: [DISB_APPROVER]
+    deny: [DISB_TL]
+    denied: Approve and Decline are not shown on the funding request.
+    auto: DisbursementProcessingIT#fundingNeedsAVerifierAndTwoDifferentApprovers
+  - action: Maintain bank accounts and check series
+    screen: BANKS
+    permission: MASTER_MAINTAIN
+    allow: [DISB_APPROVER]
+    deny: [DISB_TL, DISBURSEMENT]
+    denied: Add cheque book and status actions are not shown.
+  - action: Raise refund and cash-advance requests
+    screen: NEWRRF
+    permission: PRQ_CREATE
+    allow: [PRQ_PROCESSOR, PRQ_REVIEWER]
+    deny: [PRQ_APPROVER, HR_APPROVER, DISBURSEMENT]
+    denied: New Refund Request and New Cash Advance are not in the menu; POST /requests/refunds returns HTTP 403.
+    auto: PayRequestApiIT#permissionsAndValidationAreEnforced
+  - action: Assign and endorse requests
+    screen: REQ
+    permission: PRQ_ASSIGN, PRQ_REVIEW
+    allow: [PRQ_REVIEWER]
+    deny: [PRQ_PROCESSOR, PRQ_APPROVER, HR_APPROVER]
+    denied: Assign preparer and Endorse for approval are not shown.
+    auto: PayRequestApiIT#permissionsAndValidationAreEnforced
+  - action: Approve requests (Marketing)
+    screen: REQ
+    permission: PRQ_APPROVE
+    allow: [PRQ_APPROVER]
+    deny: [PRQ_PROCESSOR, PRQ_REVIEWER, HR_APPROVER]
+    denied: Approve and send is not shown; POST /requests/{id}/approve returns HTTP 403.
+  - action: Approve cash advances (HR)
+    screen: REQ
+    permission: PRQ_HR_APPROVE
+    allow: [HR_APPROVER]
+    deny: [PRQ_APPROVER]
+    denied: Approve and send to Disbursement is not shown at HR_APPROVAL.
+    auto: PayRequestFlowIT#aCashAdvanceNeedsMarketingThenHrApproval
+  - action: Upload SOAs, investigate and prepare corrections
+    screen: SOA
+    permission: ACSL_UPLOAD, ACSL_PROCESS
+    allow: [ACSL_PROCESSOR, ACSL_TL]
+    deny: [ACSL_HEAD, COMPTROLLERSHIP]
+    denied: Upload SOA and the case actions are not shown.
+    auto: AcslApiIT#permissionsAreEnforced
+  - action: Assign cases and review corrections
+    screen: CORR
+    permission: ACSL_ASSIGN, ACSL_REVIEW
+    allow: [ACSL_TL]
+    deny: [ACSL_PROCESSOR, ACSL_HEAD]
+    denied: Assign and Endorse for approval are not shown.
+    auto: AcslApiIT#permissionsAreEnforced
+  - action: Approve corrections
+    screen: CORR
+    permission: ACSL_APPROVE
+    allow: [ACSL_HEAD]
+    deny: [ACSL_TL, ACSL_PROCESSOR]
+    denied: Approve and post is not shown; POST /corrections/{id}/approve returns HTTP 403.
+    auto: AcslApiIT#permissionsAreEnforced
+  - action: Confirm a remittance deduction
+    screen: DED
+    permission: REMIT_DEDUCTION_CONFIRM
+    allow: [ACSL_TL]
+    deny: [ACSL_PROCESSOR, ACSL_HEAD]
+    denied: Confirm deduction is not shown.
+  - action: View Disbursement and ACSL screens (read only)
+    screen: WB
+    permission: DISB_VIEW, ACSL_VIEW
+    allow: [COMPTROLLERSHIP, AUDITOR]
+    deny: [PRQ_PROCESSOR, HR_APPROVER]
+    allowed: The workbench and ACSL Cases open without work actions.
+    denied: Disbursement and ACSL are not in the menu.
+  - action: Maintain employees and cost centres
+    screen: EMP
+    permission: EMPLOYEE_MAINTAIN
+    allow: [FIN_ADMIN]
+    deny: [DISB_TL, COMPTROLLERSHIP]
+    denied: New Employee is not shown; POST /organization/employees returns HTTP 403.
+    auto: GlPlatformApiIT#costCentreRulesAndEmployeesAreMaintained
+
+findings:
+  - fr: FR-DS-001
+    issue: 'The FRS message "Invalid user ID or password" differs from the build ("Invalid user name or password", code AUTHENTICATION_FAILED).'
+    proposal: Quote the built message and code, as in Volume 1.
+  - fr: FR-DS-025
+    issue: The FRS names a Disbursement Workbench tab "Unregularised" (also FR-DS-045); the build shows the unregularised count as a KPI on the workbench and lists the DVs in the report DSB-UNREGULARIZED. The FRS also says a claimed DV is read only for others without naming the message or the release of the claim.
+    proposal: Describe the KPI and the report instead of a tab, and state how a claim is released (leave the DV, time-out or by the TL).
+  - fr: FR-PQ-005
+    issue: '"Any handler can return a request to the previous handler" is broader than the workflow: there is no return from Preparing, the refund returns go reviewer to preparer and approver to reviewer, and the cash advance returns to the requester (Draft).'
+    proposal: List the return actions per stage as in the workflow table of section 5.6.
+  - fr: FR-PQ-009
+    issue: '"A request is declined by returning or cancelling it with a reason" - at For Approval the approver has only Return to reviewer; cancellation is possible only in Draft, Preparing and For review.'
+    proposal: State that the approver declines by returning, and who cancels afterwards.
+  - fr: FR-PQ-017
+    issue: The FRS names the checker "Marketing / Comptrollership" without the permission that allows posting a liquidation; testers cannot tell which demo user checks.
+    proposal: Name the permission (and role) of the liquidation checker.
+  - fr: FR-DS-092
+    issue: FR-DS-092 (CPC2 report) and FR-AS-005 (ACSL aging reports) are not built (gaps G4 and G3); their acceptance criterion "to be accepted when built" cannot be tested.
+    proposal: Keep the gaps open with a target release; the cases check the interim views and are re-run when the reports are delivered.
+  - fr: FR-DS-055
+    issue: 'Stale-check accounting and re-issue are "to be confirmed" (AQ02, AQ14), and FR-DS-044 leaves the cancellation after release open (AQ15); the expected entries of these cases may change.'
+    proposal: Confirm the entries with Comptrollership before UAT.
+  - fr: FR-DS-062
+    issue: The FRS does not say at which number of remaining leaves CHECK_SERIES_LOW is raised (at 20 left or below 20).
+    proposal: State the boundary of DISB_CHECK_SERIES_WARNING.
+  - fr: FR-AS-020
+    issue: The demo data has one ACSL processor (acsl); re-assigning a correction to "acslproc2" (acceptance criterion) needs a second processor that the demo does not provide.
+    proposal: Add a second ACSL processor to the demo users or change the criterion.

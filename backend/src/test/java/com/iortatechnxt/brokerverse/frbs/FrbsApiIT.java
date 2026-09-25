@@ -105,6 +105,9 @@ class FrbsApiIT {
     api.doGet(FrbsFixtures.OFFICER, SCHEDULES + "/SCH-PR-USD")
         .andExpect(jsonPath("$.values.currency").value("USD"))
         .andExpect(jsonPath("$.wordOutput").value(false));
+    // Board documents are exported to Word as well (client requirement 16).
+    api.doGet(FrbsFixtures.OFFICER, SCHEDULES + "/GARD-CASH")
+        .andExpect(jsonPath("$.wordOutput").value(true));
   }
 
   @Test

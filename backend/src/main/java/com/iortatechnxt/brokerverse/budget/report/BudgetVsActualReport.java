@@ -44,15 +44,17 @@ public class BudgetVsActualReport implements ReportDefinition {
   @Override
   public ReportMetadata metadata() {
     return new ReportMetadata(
-        "GL-BVA",
-        "Budget vs Actual",
-        ReportCategory.BUDGET,
-        "Month and year-to-date budget against actual with variance amount and percent",
-        List.of(
-            GlReportSupport.companyParam(),
-            GlReportSupport.asOfParam(),
-            ParameterSpec.optional(BY_COST_CENTRE, "Split by cost centre", ParameterType.BOOLEAN)),
-        Permission.REPORT_FINANCIAL);
+            "GL-BVA",
+            "Budget vs Actual",
+            ReportCategory.BUDGET,
+            "Month and year-to-date budget against actual with variance amount and percent",
+            List.of(
+                GlReportSupport.companyParam(),
+                GlReportSupport.asOfParam(),
+                ParameterSpec.optional(
+                    BY_COST_CENTRE, "Split by cost centre", ParameterType.BOOLEAN)),
+            Permission.REPORT_FINANCIAL)
+        .asDocument(); // FS analysis actual vs budget, a board schedule (A1-FRBS, Word)
   }
 
   @Override

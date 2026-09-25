@@ -140,7 +140,8 @@ public class ReportService {
     ReportContext ctx = context(params).withPrint(options.print());
     byte[] content = renderers.get(format).render(result, ctx);
     List<String> echo = new ArrayList<>(params.echo());
-    if (format == ExportFormat.PDF && !options.print().echo().isEmpty()) {
+    if ((format == ExportFormat.PDF || format == ExportFormat.DOCX)
+        && !options.print().echo().isEmpty()) {
       echo.add(options.print().echo());
     }
     audit.record(

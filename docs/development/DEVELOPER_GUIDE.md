@@ -146,10 +146,54 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
 - Report codes: GI reports keep the codes of the Reports Book (e.g. `PGIBR015`); finance reports use
   `FIN-…` codes from `docs/requirements/FINANCE_REPORTS_SPEC.md`; GL reports `GL-…`.
 - Declare parameters with `ParameterSpec` (dates default via `TODAY`, `MONTH_START`, `YEAR_START`).
-  The UI builds the parameter form automatically; PDF/Excel/CSV export is automatic.
+  The UI builds the parameter form automatically; export is automatic.
 - Use `TabularReportBuilder` for grouped layouts (`groupBy` = Branch > Class > Product…), totals
   are computed for summed columns.
 - Heavy reports: query with SQL/JPQL aggregates, not by loading every entity.
+
+### 6.1 Output formats (client requirement 16)
+
+| Output | Formats | How it is declared |
+|---|---|---|
+| Every report | Excel and PDF (plus ODS, CSV, XML) | nothing to do: `ReportService.export` renders every `ExportFormat` |
+| A report that is a document or schedule (board schedules, statements, voucher forms) | Excel, PDF **and Word** | `metadata().asDocument()` (sets `ReportMetadata.documentStyle`) |
+| A business document (slip, letter, statement, form, advisory) | PDF and Word | compose it with `DocumentComposer` (below) |
+| An e-mail attachment | PDF (password-protected where the flow already protects it) | unchanged: attach `composer.pdf(spec)` |
+
+- **Report renderers** (`report.render`): `PdfReportRenderer`, `XlsxReportRenderer`,
+  `DocxReportRenderer`, `CsvReportRenderer`, `OdsReportRenderer`, `XmlReportRenderer`. The Word
+  renderer has the layout of the PDF: logo and company in the page header, title block with report
+  ID, user, run date and filters, the table with a Header Blue heading row repeated on every page,
+  banded rows, group headers, subtotals, a grand total under a gold rule, notes and a footer with
+  "Confidential", the `REPORT_FOOTER_TEXT` and "Page x of y". `PrintOptions` (paper, orientation,
+  fit to width) apply to PDF, Word and the Excel print setup alike (`PrintOptions.landscape`).
+- **Catalogue**: `GET /api/v1/reports` returns `documentStyle` and `formats` per report; the export
+  menus (`features/reports/ExportButtons` with `menuFormats(entry)`) show Excel and PDF on every
+  report and Word only where `documentStyle` is set. The server renders Word for any report (API,
+  batches `format=DOCX`, `ReportService.generate` for archived and scheduled files).
+- **Brand**: colours, logo (`/brand/bdo-insure.png`), font (Arial as the file fallback of Nunito)
+  and the "Confidential" classification come from `common.office.BrandAssets`;
+  `common.office.BrandedDocx` builds branded Word files and `common.office.PdfBrandFooter` the PDF
+  footer. Never hard-code colours in a renderer.
+
+### 6.2 Business documents in PDF and Word
+
+- Build a `DocumentSpec` (title, reference, `Fields` / `Table` / `Text` sections, signatures, small
+  print) and call `DocumentComposer.render(spec, DocumentFormat)` for a download that offers both
+  formats, `pdf(spec)` for PDF (e-mail, stored copy) or `docx(spec)` for Word. Both formats have the
+  same content, BDO header and footer.
+- Every PDF composed by `DocumentComposer.pdf` is recorded (`doc_rendition`, V756) with the SHA-256
+  of its bytes, its content and date. `POST /api/v1/doc-renditions/word` returns the Word copy of a
+  PDF the caller presents; `GET /api/v1/doc-renditions/{sha256}` says whether one exists. The
+  frontend offers it on every screen: `saveFile` announces saved PDFs and `WordCopyOffer` (in the
+  app shell) shows "Download Word" for a composed document. Existing download endpoints therefore
+  need no change to offer Word; a new document just uses the composer.
+- PDFs that are not composed (the BIR 2307 form, merged print batches, password-protected
+  attachments) have no Word copy.
+- **Templates**: `GET /api/v1/doc-templates/{code}/versions/{n}/docx` downloads a template version as
+  Word (first paragraph = title); `POST /api/v1/doc-templates/{code}/docx` reads an edited file back
+  as the draft of a new version, listing placeholders dropped or added. Nothing is saved until the
+  administrator saves the version.
 
 ## 7. Frontend conventions
 

@@ -70,21 +70,22 @@ public class PaymentVoucherReport implements ReportDefinition {
   @Override
   public ReportMetadata metadata() {
     return new ReportMetadata(
-        "FIN-AP-VOUCHER",
-        "Payment Voucher",
-        ReportCategory.RECEIVABLES_PAYABLES,
-        "Printable payment vouchers with entries, amount in words and signatures (FGL001 layout)",
-        List.of(
-            GlReportSupport.companyParam(),
-            GlReportSupport.fromParam().withDefault("YEAR_START"),
-            GlReportSupport.toParam(),
-            ParameterSpec.optional(VOUCHER_NO, "Voucher No", ParameterType.TEXT),
-            ParameterSpec.select(
-                STATUS,
-                "Status",
-                List.of(ALL, "DRAFT", "PENDING_APPROVAL", "APPROVED", "VOIDED", "CANCELLED"),
-                ALL)),
-        Permission.REPORT_VIEW);
+            "FIN-AP-VOUCHER",
+            "Payment Voucher",
+            ReportCategory.RECEIVABLES_PAYABLES,
+            "Printable payment vouchers with entries, amount in words and signatures (FGL001 layout)",
+            List.of(
+                GlReportSupport.companyParam(),
+                GlReportSupport.fromParam().withDefault("YEAR_START"),
+                GlReportSupport.toParam(),
+                ParameterSpec.optional(VOUCHER_NO, "Voucher No", ParameterType.TEXT),
+                ParameterSpec.select(
+                    STATUS,
+                    "Status",
+                    List.of(ALL, "DRAFT", "PENDING_APPROVAL", "APPROVED", "VOIDED", "CANCELLED"),
+                    ALL)),
+            Permission.REPORT_VIEW)
+        .asDocument(); // the printed voucher form: Word and PDF
   }
 
   @Override

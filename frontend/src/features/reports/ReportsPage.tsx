@@ -11,6 +11,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDateTime } from '@/utils/format';
+import { FORMAT_LABELS, formatLabel, menuFormats } from './exportFormats';
 import { ReportBatchDialog } from './ReportBatchDialog';
 import { downloadBatch, reportOptionsApi } from './reportOptions';
 import type { ReportBatch } from './reportOptions';
@@ -42,7 +43,7 @@ function RecentBatches() {
           {
             key: 'fmt',
             header: 'Output',
-            render: (b) => (b.mergedPdf ? 'Merged PDF' : `ZIP of ${b.format}`),
+            render: (b) => (b.mergedPdf ? 'Merged PDF' : `ZIP of ${formatLabel(b.format)} files`),
           },
           { key: 'st', header: 'Status', render: (b) => <StatusBadge status={b.status} /> },
           {
@@ -88,7 +89,7 @@ export default function ReportsPage() {
       <PageHeader
         section="Reports"
         title="Report Centre"
-        description="Run any report on screen, print it or download it as PDF, Excel, ODS, CSV or XML; download or print several at once as a batch."
+        description="Run any report on screen, print it or download it as Excel, PDF, ODS, CSV or XML (documents and schedules also as Word); download or print several at once as a batch."
         actions={
           <>
             <input
@@ -122,6 +123,11 @@ export default function ReportsPage() {
                   <strong>{e.title}</strong>
                   <span className="muted">
                     {e.code} · {e.description}
+                  </span>
+                  <span className="muted">
+                    {menuFormats(e, ['XLSX', 'PDF', 'DOCX'])
+                      .map((f) => FORMAT_LABELS[f])
+                      .join(' · ')}
                   </span>
                 </span>
               </Link>

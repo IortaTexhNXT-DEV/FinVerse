@@ -139,6 +139,18 @@ Business modules never call "upward". The rules for callbacks between modules ar
 - `DocumentComposer.pdf(DocumentSpec)` renders a BDOI-branded PDF. The spec contains the title,
   reference, key-value sections, tables, merged template text and a signature block.
   `DocumentComposer.xlsx(SheetSpec)` renders spreadsheets such as placement slips and billing files.
+- Word output (client requirement 16): `DocumentComposer.docx(spec)` and `render(spec, DocumentFormat)`
+  produce the same document as Word, with the BDO Insure logo, Header Blue tables, "Confidential"
+  footer and page x of y. Every composed PDF is recorded in `doc_rendition` (V756) by the SHA-256 of
+  its bytes, so any composed document downloaded as PDF can be downloaded again as Word through
+  `/api/v1/doc-renditions` (the client presents the PDF; the frontend offers it after every PDF
+  download). E-mail attachments stay PDF, password-protected where they already are.
+- Templates are downloaded as Word and an edited Word file is read back as the draft of a new
+  version (`/api/v1/doc-templates/{code}/versions/{n}/docx`, `/api/v1/doc-templates/{code}/docx`).
+- Follow-ups (not parked on BDOI): renditions are kept without a retention job (they hold the
+  content of documents that are themselves kept); merged print batches and the BIR 2307 form have no
+  Word copy; templates hold plain text, so Word formatting (bold, tables) is not carried into a new
+  version.
 
 ### 3.6 Numbers
 

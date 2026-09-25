@@ -1,11 +1,10 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { FileSpreadsheet, FileText, Layers, ListChecks } from 'lucide-react';
+import { Layers, ListChecks } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { saveFile } from '@/api/client';
 import type { ExportFormat } from '@/api/reports';
 import { useAuth } from '@/auth/authContext';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
@@ -14,14 +13,16 @@ import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
+import { ExportButtons } from '@/features/reports/ExportButtons';
+import { FORMAT_LABELS } from '@/features/reports/exportFormats';
 import { DEFAULT_PRINT, reportOptionsApi } from '@/features/reports/reportOptions';
 import { today } from '@/utils/format';
 import { frbsApi } from './api';
 import type { PackEntry } from './api';
-import { entryLink, groupPack, quickParams } from './schedules';
+import { entryLink, groupPack, packFormats, quickParams } from './schedules';
 import './frbs.css';
 
-function ExportButtons({
+function PackExportButtons({
   entry,
   busy,
   onExport,
@@ -36,24 +37,11 @@ function ExportButtons({
   }
   return (
     <span className="frbs-actions">
-      <Button
-        size="sm"
-        variant="secondary"
-        icon={<FileSpreadsheet size={14} />}
+      <ExportButtons
+        formats={packFormats(entry)}
         disabled={busy}
-        onClick={() => onExport(entry, 'XLSX')}
-      >
-        Excel
-      </Button>
-      <Button
-        size="sm"
-        variant="secondary"
-        icon={<FileText size={14} />}
-        disabled={busy}
-        onClick={() => onExport(entry, 'PDF')}
-      >
-        PDF
-      </Button>
+        onExport={(format) => onExport(entry, format)}
+      />
     </span>
   );
 }
@@ -62,8 +50,8 @@ function ExportButtons({
  * Report Pack (FRBS 3.2.0, Appendix A): the BDOI report groups - end of day, GARD, subsidiaries,
  * schedules and ageing, Mancom, service fee, government - with every report opened in its runner
  * and exported at once to Excel or PDF (month to date, today's quarter and year). Board-deck
- * schedules for which BDOI asks for a Word document are flagged: the report platform exports them
- * to PDF and Excel only.
+ * schedules for which BDOI asks for a Word document are also exported to Word (client requirement
+ * 16).
  */
 export default function FrbsHomePage() {
   const companyId = useCompanyId();
@@ -107,9 +95,11 @@ export default function FrbsHomePage() {
       header: 'Formats',
       render: (e) => (
         <span className="tag-list">
-          <span className="tag">Excel</span>
-          <span className="tag">PDF</span>
-          {e.wordRequested && <span className="tag frbs-gap">Word requested (not yet)</span>}
+          {packFormats(e).map((f) => (
+            <span key={f} className="tag">
+              {FORMAT_LABELS[f]}
+            </span>
+          ))}
         </span>
       ),
     },
@@ -117,7 +107,7 @@ export default function FrbsHomePage() {
       key: 'export',
       header: 'Export',
       render: (e) => (
-        <ExportButtons
+        <PackExportButtons
           entry={e}
           busy={busyCode === e.reportCode + (e.scheduleCode ?? '')}
           onExport={(entry, format) => exporter.mutate({ entry, format })}
@@ -130,7 +120,7 @@ export default function FrbsHomePage() {
       <PageHeader
         section="Finance · Accounting Reports"
         title="Report Pack"
-        description="The BDOI Comptrollership report pack of Appendix A: open a report with its parameters or export it to Excel or PDF for the month to date."
+        description="The BDOI Comptrollership report pack of Appendix A: open a report with its parameters or export it to Excel or PDF for the month to date; board schedules also to Word."
         actions={
           <>
             <Link className="btn btn-secondary" to="/reports">
@@ -150,7 +140,7 @@ export default function FrbsHomePage() {
         <Kpi
           label="Word Documents Requested"
           value={entries.filter((e) => e.wordRequested).length}
-          hint="Exported to PDF and Excel until the platform produces Word"
+          hint="Board schedules exported to Word as well as Excel and PDF"
         />
       </div>
       {pack.isLoading && <span className="spinner" aria-label="Loading" />}

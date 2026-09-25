@@ -174,6 +174,18 @@ export const api = {
     fileOf(await send('GET', path), 'download'),
 };
 
+/** Event raised on window when a PDF has been saved (detail: {@link DownloadedFile}). */
+export const PDF_SAVED_EVENT = 'brokerverse:pdf-saved';
+
+/** Whether a saved file is a PDF (by type or name). */
+export function isPdf(blob: Blob, fileName: string): boolean {
+  return blob.type === 'application/pdf' || /\.pdf$/i.test(fileName);
+}
+
+/**
+ * Saves a file in the browser. A saved PDF is announced ({@link PDF_SAVED_EVENT}) so the Word copy
+ * of a generated document can be offered (client requirement 16).
+ */
 export function saveFile(blob: Blob, fileName: string): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -181,4 +193,8 @@ export function saveFile(blob: Blob, fileName: string): void {
   link.download = fileName;
   link.click();
   URL.revokeObjectURL(url);
+  if (isPdf(blob, fileName)) {
+    const detail: DownloadedFile = { blob, fileName };
+    globalThis.dispatchEvent(new CustomEvent(PDF_SAVED_EVENT, { detail }));
+  }
 }

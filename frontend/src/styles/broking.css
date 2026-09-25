@@ -470,3 +470,39 @@
   border-radius: var(--radius-sm);
   background: var(--color-surface-alt);
 }
+
+/* Word copy of a downloaded document (client requirement 16), left of the toasts. */
+.word-offer {
+  position: fixed;
+  left: var(--space-5);
+  bottom: var(--space-5);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: min(520px, calc(100vw - 2 * var(--space-5)));
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-left: 5px solid var(--brand-blue);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.word-offer-icon {
+  flex: none;
+  color: var(--brand-blue);
+}
+
+.word-offer-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.word-offer-text strong,
+.word-offer-text span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

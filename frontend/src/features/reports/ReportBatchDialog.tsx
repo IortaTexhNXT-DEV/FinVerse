@@ -11,11 +11,12 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { today } from '@/utils/format';
+import { FORMAT_LABELS } from './exportFormats';
 import { PrintOptionsFields } from './PrintOptionsFields';
 import { DEFAULT_PRINT, downloadBatch, reportOptionsApi } from './reportOptions';
 import type { PrintOptions, ReportBatch, ReportBatchItem } from './reportOptions';
 
-const FORMATS: ExportFormat[] = ['XLSX', 'ODS', 'PDF', 'CSV'];
+const FORMATS: ExportFormat[] = ['XLSX', 'PDF', 'DOCX', 'ODS', 'CSV'];
 const MAX_REPORTS = 30;
 
 interface Props {
@@ -144,7 +145,7 @@ export function ReportBatchDialog({ open, entries, onClose }: Readonly<Props>) {
               >
                 {FORMATS.map((f) => (
                   <option key={f} value={f}>
-                    ZIP of {f} files
+                    ZIP of {FORMAT_LABELS[f]} files
                   </option>
                 ))}
                 <option value="MERGED">One merged PDF (print)</option>

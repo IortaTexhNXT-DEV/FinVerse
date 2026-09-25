@@ -47,6 +47,8 @@ class BrokingFoundationApiIT {
     "ao, /api/v1/notifications?unreadOnly=true",
     "ao, /api/v1/notifications/unread-count",
     "badmin, /api/v1/doc-templates",
+    "badmin, /api/v1/doc-templates/QUOTATION_TERMS/versions/1/docx",
+    "ao, /api/v1/doc-renditions/0000000000000000000000000000000000000000000000000000000000000000",
     "ao, /api/v1/organization/companies",
     "proc, /api/v1/organization/branches?companyId={c}",
   })

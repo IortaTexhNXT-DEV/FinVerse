@@ -146,7 +146,7 @@ export const HELP_SECTIONS: HelpSection[] = [
     id: 'reports',
     module: 'Reports',
     intro:
-      'Financial statements, registers and control reports with PDF, Excel, ODS, CSV and XML export.',
+      'Financial statements, registers and control reports with Excel, PDF, ODS, CSV and XML export; documents and schedules also in Word.',
     screens: [
       {
         name: 'Report Centre',
@@ -156,6 +156,8 @@ export const HELP_SECTIONS: HelpSection[] = [
         workflow: [
           'Save the parameters you use often as a named variant; shared variants are offered to everyone who may run the report.',
           'Print opens the PDF with the report, user, run time and filters printed in its header.',
+          'Every report downloads as Excel and PDF. A report that is a document or schedule (board schedules, statements, vouchers) also downloads as Word, with the same layout: BDO Insure logo, Header Blue table headings repeated on every page, "Confidential" footer and page x of y. Paper, orientation and fit to width apply to PDF and Word.',
+          'Any generated document downloaded as PDF (slips, letters, statements, forms) can also be downloaded as Word: after the download, choose Download Word in the prompt at the bottom of the screen.',
         ],
         controls: [
           'Each report has its own permission (e.g. POLICY_VIEW for underwriting reports, CLAIM_VIEW for claims, REPORT_FINANCIAL for financial statements); the catalogue lists only the reports you may run.',

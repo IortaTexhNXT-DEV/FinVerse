@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { FileSpreadsheet, FileText, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useState } from 'react';
 import { saveFile } from '@/api/client';
 import { reportApi } from '@/api/reports';
@@ -12,11 +12,12 @@ import { Field } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
 import { DEFAULT_PRINT, reportOptionsApi } from '@/features/reports/reportOptions';
+import { ExportButtons } from '@/features/reports/ExportButtons';
 import { ReportTable } from '@/features/reports/ReportTable';
 import { today } from '@/utils/format';
 import type { Schedule } from './api';
 import { ScheduleCommentary } from './ScheduleCommentary';
-import { groupByFamily, runnerErrors, scheduleParams } from './schedules';
+import { groupByFamily, packFormats, runnerErrors, scheduleParams } from './schedules';
 import type { RunnerErrors } from './schedules';
 
 const REPORT = 'GL-SCHEDULE';
@@ -88,32 +89,6 @@ function DateField({
   );
 }
 
-function ExportButtons({
-  pending,
-  onExport,
-}: Readonly<{ pending?: ExportFormat; onExport: (format: ExportFormat) => void }>) {
-  return (
-    <>
-      <Button
-        variant="secondary"
-        icon={<FileSpreadsheet size={16} />}
-        busy={pending === 'XLSX'}
-        onClick={() => onExport('XLSX')}
-      >
-        Export to Excel
-      </Button>
-      <Button
-        variant="secondary"
-        icon={<FileText size={16} />}
-        busy={pending === 'PDF'}
-        onClick={() => onExport('PDF')}
-      >
-        Export to PDF
-      </Button>
-    </>
-  );
-}
-
 function SelectedNote({ schedule }: Readonly<{ schedule?: Schedule }>) {
   if (schedule === undefined) {
     return null;
@@ -123,7 +98,7 @@ function SelectedNote({ schedule }: Readonly<{ schedule?: Schedule }>) {
       {schedule.values.sourceRef ?? schedule.code} ·{' '}
       <StatusBadge status={schedule.values.layoutStatus} />
       {schedule.values.boardDocument &&
-        ' · Board document: BDOI asks for Word; the report platform exports PDF and Excel.'}
+        ' · Board document: exported to Word as well as Excel and PDF.'}
     </p>
   );
 }
@@ -147,7 +122,8 @@ function ResultCard({ result }: Readonly<{ result: ReportResult }>) {
 
 /**
  * Runs an account schedule of the report pack (FRBS 3.2.0): schedule, as-of date and optional
- * period start; the result on screen with its notes, the export to Excel or PDF, and the
+ * period start; the result on screen with its notes, the export to Excel or PDF (and Word for a
+ * board document), and the
  * commentary of the month for a variance analysis.
  */
 export function ScheduleRunner({
@@ -211,6 +187,9 @@ export function ScheduleRunner({
             </Button>
             {can('FRBS_REPORT_EXPORT') && (
               <ExportButtons
+                formats={packFormats({ wordRequested: selected?.values.boardDocument === true })}
+                size="md"
+                prefix="Export to"
                 pending={exporter.isPending ? exporter.variables : undefined}
                 onExport={(format) => guard(() => exporter.mutate(format))}
               />

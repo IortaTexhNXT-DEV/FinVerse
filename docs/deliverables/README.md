@@ -35,7 +35,7 @@ so each document can be regenerated after every build.
 | 14 | Persona-based menus: each user sees only their screens | verified in the platform | B | permissions audit and tests |
 | 15 | Notifications and workflows per role | test evidence | B | workflow and notification tests |
 | 16 | Configuration over code: rules, validations and definitions maintained from front-end masters by the System Administrator | gap list and fixes | B | code review of hard-coded rules |
-| 17 | Reports in Excel and PDF; document schedules in Word and PDF | platform change and tests | B | report and docgen modules |
+| 17 | Reports in Excel and PDF; document schedules in Word and PDF | platform change and tests | B | report and docgen modules. Built: `DocxReportRenderer` (layout of the PDF, print options honoured) and DOCX in the API, batches, archive and scheduled files; Word on documents and schedules (`ReportMetadata.asDocument`: GL-SCHEDULE, GL-BVA, FRBS-MANCOM-MARKET, RI-SOA, FIN-AP-VOUCHER); every composed business document downloadable as Word (`doc_rendition`, Word copy offer after each PDF download); templates to and from Word; BDO Insure logo, Header Blue tables, "Confidential" footer and page x of y on PDF, Word and Excel |
 | 18 | Screen-by-screen and field-by-field alignment review | findings and fixes | B | screenshots and review |
 | 19 | API catalogue | Excel + OpenAPI file | B | OpenAPI specification |
 | 20 | Upload and download templates in one folder | files | B | bulk handlers, report layouts |

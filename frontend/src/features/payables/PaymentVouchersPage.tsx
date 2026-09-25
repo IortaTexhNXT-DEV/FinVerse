@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, Printer } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { saveFile } from '@/api/client';
 import { payablesApi } from '@/api/payables';
 import type { Voucher } from '@/api/payables';
 import { reportApi } from '@/api/reports';
+import type { ExportFormat } from '@/api/reports';
 import { useAuth } from '@/auth/authContext';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
@@ -17,6 +18,8 @@ import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
+import { ExportButtons } from '@/features/reports/ExportButtons';
+import { DOCUMENT_FORMATS } from '@/features/reports/exportFormats';
 import { humanize, formatDate } from '@/utils/format';
 import { DateReasonModal } from './DateReasonModal';
 import { firstError, voucherActions } from './payablesActions';
@@ -37,7 +40,10 @@ function approvedMessage(v: Voucher): string {
   return v.chequeNo === undefined ? 'approved and posted' : `approved, cheque ${v.chequeNo}`;
 }
 
-/** Payment vouchers: approval queue, posting, cheque presentation / void and voucher print. */
+/**
+ * Payment vouchers: approval queue, posting, cheque presentation / void and the voucher form as PDF
+ * or Word.
+ */
 export default function PaymentVouchersPage() {
   const { companyId, bankName } = usePayablesLookups();
   const { can } = useAuth();
@@ -101,7 +107,7 @@ export default function PaymentVouchersPage() {
     onSuccess: (v) => done(v, humanize(v.status).toLowerCase()),
   });
   const print = useMutation({
-    mutationFn: (v: Voucher) =>
+    mutationFn: ({ v, format }: { v: Voucher; format: ExportFormat }) =>
       reportApi.export(
         'FIN-AP-VOUCHER',
         {
@@ -111,7 +117,7 @@ export default function PaymentVouchersPage() {
           toDate: v.voucherDate,
           status: 'ALL',
         },
-        'PDF',
+        format,
       ),
     onSuccess: ({ blob, fileName }) => saveFile(blob, fileName),
   });
@@ -206,14 +212,12 @@ export default function PaymentVouchersPage() {
         footer={
           v !== undefined && (
             <div className="row">
-              <Button
+              <ExportButtons
+                formats={DOCUMENT_FORMATS}
                 variant="ghost"
-                icon={<Printer size={14} />}
-                busy={print.isPending}
-                onClick={() => print.mutate(v)}
-              >
-                Print
-              </Button>
+                pending={print.isPending ? print.variables.format : undefined}
+                onExport={(format) => print.mutate({ v, format })}
+              />
               {voucherActions(v, can).map((b) => (
                 <Button
                   key={b.id}

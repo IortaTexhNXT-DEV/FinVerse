@@ -49,6 +49,10 @@ public final class FrbsSqlReport implements ReportDefinition {
    * @param jdbc JDBC
    */
   FrbsSqlReport(Spec spec, NamedParameterJdbcTemplate jdbc) {
+    this(spec, jdbc, false);
+  }
+
+  private FrbsSqlReport(Spec spec, NamedParameterJdbcTemplate jdbc, boolean document) {
     this.spec = spec;
     this.jdbc = jdbc;
     List<ParameterSpec> params = new ArrayList<>();
@@ -66,7 +70,18 @@ public final class FrbsSqlReport implements ReportDefinition {
               ParameterSpec.required(YEAR, "Year", ParameterType.NUMBER)
                   .withDefault(String.valueOf(LocalDate.now(MANILA).getYear())));
     }
-    this.metadata = ReportMetadata.frbs(spec.code(), spec.title(), spec.description(), params);
+    ReportMetadata m = ReportMetadata.frbs(spec.code(), spec.title(), spec.description(), params);
+    this.metadata = document ? m.asDocument() : m;
+  }
+
+  /**
+   * The same report as a board document, also exported to Word (A1-FRBS {@code word_requested},
+   * client requirement 16).
+   *
+   * @return report
+   */
+  FrbsSqlReport asDocument() {
+    return new FrbsSqlReport(spec, jdbc, true);
   }
 
   @Override

@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.report.core;
 
+import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,7 +21,12 @@ import java.util.List;
  * @param parameters parameters
  * @param permission permission required to run (view)
  * @param exportPermission permission required to export (download, print)
+ *     <p>Every report exports to PDF, Excel, ODS, CSV and XML. A {@link #documentStyle} report (a
+ *     document or schedule, such as the board schedules BDOI asks for in Word, A1-FRBS) also offers
+ *     Word in the export menus (client requirement 16); declare it with {@link #asDocument()}. The
+ *     renderer itself accepts Word for any report (batches, API).
  * @param archived whether runs and exports are archived
+ * @param documentStyle whether the report is a document or schedule, also exported to Word
  */
 public record ReportMetadata(
     String code,
@@ -29,12 +36,88 @@ public record ReportMetadata(
     List<ParameterSpec> parameters,
     Permission permission,
     Permission exportPermission,
-    boolean archived) {
+    boolean archived,
+    boolean documentStyle) {
 
   /** Canonical constructor copying the parameter list; export defaults to the view permission. */
   public ReportMetadata {
     parameters = List.copyOf(parameters);
     exportPermission = exportPermission == null ? permission : exportPermission;
+  }
+
+  /**
+   * A tabular report (not a document): PDF, Excel, ODS, CSV and XML.
+   *
+   * @param code report code
+   * @param title title
+   * @param category menu group
+   * @param description one line purpose
+   * @param parameters parameters
+   * @param permission permission required to run (view)
+   * @param exportPermission permission required to export
+   * @param archived whether runs and exports are archived
+   */
+  @SuppressWarnings("java:S107") // the record components of a catalogue entry
+  public ReportMetadata(
+      String code,
+      String title,
+      ReportCategory category,
+      String description,
+      List<ParameterSpec> parameters,
+      Permission permission,
+      Permission exportPermission,
+      boolean archived) {
+    this(
+        code,
+        title,
+        category,
+        description,
+        parameters,
+        permission,
+        exportPermission,
+        archived,
+        false);
+  }
+
+  /**
+   * The same report declared as a document or schedule, exported to Word as well.
+   *
+   * @return metadata with {@code documentStyle}
+   */
+  public ReportMetadata asDocument() {
+    return new ReportMetadata(
+        code,
+        title,
+        category,
+        description,
+        parameters,
+        permission,
+        exportPermission,
+        archived,
+        true);
+  }
+
+  /**
+   * The formats offered in the export menus: Word only for documents and schedules.
+   *
+   * @return formats in menu order
+   */
+  public List<ExportFormat> formats() {
+    List<ExportFormat> formats = new ArrayList<>(List.of(ExportFormat.values()));
+    if (!documentStyle) {
+      formats.remove(ExportFormat.DOCX);
+    }
+    return List.copyOf(formats);
+  }
+
+  /**
+   * Whether the export menus offer a format for the report.
+   *
+   * @param format format
+   * @return true when offered
+   */
+  public boolean offers(ExportFormat format) {
+    return format != ExportFormat.DOCX || documentStyle;
   }
 
   /**

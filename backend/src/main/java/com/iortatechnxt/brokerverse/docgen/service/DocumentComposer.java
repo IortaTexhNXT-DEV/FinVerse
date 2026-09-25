@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.docgen.service;
 
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
+import com.iortatechnxt.brokerverse.common.office.PdfBrandFooter;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Field;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Fields;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Section;
@@ -11,11 +13,8 @@ import com.lowagie.text.Font;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
-import com.lowagie.text.pdf.ColumnText;
-import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfPageEventHelper;
 import com.lowagie.text.pdf.PdfWriter;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
@@ -34,9 +33,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
 /**
- * Renders business documents in the BDOI layout: navy letterhead with gold rule, title and
- * reference, field blocks, tables, text and signature lines, page footer. Spreadsheets get a
- * branded header row and frozen panes.
+ * Renders business documents in the BDO Insure layout: the logo and company above a gold rule,
+ * title and reference, field blocks, tables with Header Blue headings, text and signature lines,
+ * and a page footer with the "Confidential" classification, the document's small print and "Page n
+ * of m". Every document is rendered as PDF or Word with the same content (client requirement 16);
+ * each composed PDF is recorded so its Word copy can be downloaded later ({@link
+ * DocumentRenditionService}). Spreadsheets get a branded header row and frozen panes.
  */
 // OpenPDF's Paragraph extends ArrayList (LooseCoupling false positive); PdfWriter is closed by the
 // enclosing Document (CloseResource false positive).
@@ -44,10 +46,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class DocumentComposer {
 
-  private static final Color NAVY = new Color(0x00, 0x20, 0x5B);
-  private static final Color GOLD = new Color(0xFD, 0xB9, 0x13);
-  private static final Color SHADE = new Color(0xF3, 0xF5, 0xFA);
-  private static final Color GRID = new Color(0xD5, 0xDB, 0xE5);
+  private static final Color NAVY = BrandAssets.color(BrandAssets.HEADER_BLUE);
+  private static final Color COMPANY_BLUE = BrandAssets.color(BrandAssets.CTA_BLUE);
+  private static final Color GOLD = BrandAssets.color(BrandAssets.GOLD);
+  private static final Color SHADE = BrandAssets.color(BrandAssets.BACKGROUND_BLUE);
+  private static final Color GRID = BrandAssets.color(BrandAssets.GRID);
+  private static final float LOGO_HEIGHT = 26f;
   private static final float MARGIN = 40f;
   private static final float SPACING = 8f;
   private static final float PADDING = 4f;
@@ -57,10 +61,9 @@ public class DocumentComposer {
   private static final float LABEL_WIDTH = 1.2f;
   private static final float VALUE_WIDTH = 2.8f;
   private static final float SIGNATURE_SPACING = 36f;
-  private static final float FOOTER_Y = 22f;
   private static final int SHEET_COLUMN_WIDTH = 20 * 256;
 
-  private static final Font COMPANY = new Font(Font.HELVETICA, 11, Font.BOLD, NAVY);
+  private static final Font COMPANY = new Font(Font.HELVETICA, 11, Font.BOLD, COMPANY_BLUE);
   private static final Font TITLE = new Font(Font.HELVETICA, 15, Font.BOLD, NAVY);
   private static final Font REF = new Font(Font.HELVETICA, 9, Font.NORMAL, Color.DARK_GRAY);
   private static final Font HEADING = new Font(Font.HELVETICA, 10, Font.BOLD, NAVY);
@@ -70,29 +73,60 @@ public class DocumentComposer {
   private static final Font SMALL = new Font(Font.HELVETICA, 7, Font.NORMAL, Color.GRAY);
 
   private final Clock clock;
+  private final DocumentRenditionService renditions;
 
   /**
    * Creates the composer.
    *
    * @param clock clock (document date)
+   * @param renditions record of composed PDFs, for their Word copies
    */
-  public DocumentComposer(Clock clock) {
+  public DocumentComposer(Clock clock, DocumentRenditionService renditions) {
     this.clock = clock;
+    this.renditions = renditions;
   }
 
   /**
-   * Renders a PDF.
+   * Renders a PDF and records its content, so the same document can later be downloaded as Word.
    *
    * @param spec document
    * @return PDF bytes
    */
   public byte[] pdf(DocumentSpec spec) {
+    LocalDate date = LocalDate.now(clock);
+    byte[] pdf = pdf(spec, date);
+    renditions.record(pdf, spec, date);
+    return pdf;
+  }
+
+  /**
+   * Renders the document as Word, with the content and layout of its PDF.
+   *
+   * @param spec document
+   * @return DOCX bytes
+   */
+  public byte[] docx(DocumentSpec spec) {
+    return DocumentWordWriter.write(spec, LocalDate.now(clock));
+  }
+
+  /**
+   * Renders the document in a format (downloads offer PDF and Word).
+   *
+   * @param spec document
+   * @param format format
+   * @return file bytes
+   */
+  public byte[] render(DocumentSpec spec, DocumentFormat format) {
+    return format == DocumentFormat.DOCX ? docx(spec) : pdf(spec);
+  }
+
+  private static byte[] pdf(DocumentSpec spec, LocalDate date) {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     try (Document doc = new Document(PageSize.A4, MARGIN, MARGIN, MARGIN, MARGIN)) {
       PdfWriter writer = PdfWriter.getInstance(doc, out);
-      writer.setPageEvent(new Footer(spec.footer()));
       doc.open();
-      letterhead(doc, spec, LocalDate.now(clock));
+      writer.setPageEvent(new PdfBrandFooter(spec.footer(), "", writer));
+      letterhead(doc, spec, date);
       for (Section section : spec.sections()) {
         render(doc, section);
       }
@@ -102,6 +136,7 @@ public class DocumentComposer {
   }
 
   private static void letterhead(Document doc, DocumentSpec spec, LocalDate date) {
+    doc.add(PdfBrandFooter.logo(LOGO_HEIGHT));
     doc.add(new Paragraph(spec.companyName(), COMPANY));
     PdfPTable rule = new PdfPTable(1);
     rule.setWidthPercentage(100);
@@ -275,30 +310,6 @@ public class DocumentComposer {
       }
       case Boolean b -> cell.setCellValue(Boolean.TRUE.equals(b) ? "Y" : "N");
       default -> cell.setCellValue(value.toString());
-    }
-  }
-
-  /** Page footer: small print and page number. */
-  private static final class Footer extends PdfPageEventHelper {
-
-    private final String text;
-
-    Footer(String text) {
-      this.text = text == null ? "" : text;
-    }
-
-    @Override
-    public void onEndPage(PdfWriter writer, Document document) {
-      PdfContentByte cb = writer.getDirectContent();
-      ColumnText.showTextAligned(
-          cb, Element.ALIGN_LEFT, new Phrase(text, SMALL), document.left(), FOOTER_Y, 0);
-      ColumnText.showTextAligned(
-          cb,
-          Element.ALIGN_RIGHT,
-          new Phrase("Page " + writer.getPageNumber(), SMALL),
-          document.right(),
-          FOOTER_Y,
-          0);
     }
   }
 }

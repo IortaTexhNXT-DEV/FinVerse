@@ -28,8 +28,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Generic report API: catalogue, on-screen run and export (PDF / XLSX / CSV). Per-report
- * permissions are enforced by {@link ReportService}.
+ * Generic report API: catalogue, on-screen run and export (PDF / XLSX / CSV / ODS / XML / DOCX).
+ * Per-report permissions are enforced by {@link ReportService}.
  */
 @RestController
 @RequestMapping("/api/v1/reports")
@@ -115,9 +115,9 @@ public class ReportController {
    *
    * @param code report code
    * @param format format
-   * @param paper paper size (A4, LETTER, LEGAL, A3), PDF only
-   * @param orientation AUTO, PORTRAIT or LANDSCAPE, PDF only
-   * @param fitToWidth stretch the table to the page width, PDF only
+   * @param paper paper size (A4, LETTER, LEGAL, A3), PDF and Word
+   * @param orientation AUTO, PORTRAIT or LANDSCAPE, PDF and Word
+   * @param fitToWidth stretch the table to the page width, PDF and Word
    * @param filter column filters as {@code column:text}
    * @param params parameter values
    * @return file

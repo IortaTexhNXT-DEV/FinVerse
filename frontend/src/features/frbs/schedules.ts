@@ -1,3 +1,4 @@
+import type { ExportFormat } from '@/api/reports';
 import type { Measure, PackEntry, Schedule, ScheduleFamily, ScheduleValues } from './api';
 
 /** Titles of the Appendix A families of the schedules (FRBS 3.2.0). */
@@ -199,4 +200,15 @@ export function quickParams(
     params.schedule = e.scheduleCode;
   }
   return params;
+}
+
+/**
+ * Export formats of a report pack entry: Excel and PDF, and Word for the board schedules BDOI
+ * asks for in Word (client requirement 16).
+ *
+ * @param e pack entry
+ * @returns formats in button order
+ */
+export function packFormats(e: Pick<PackEntry, 'wordRequested'>): ExportFormat[] {
+  return e.wordRequested ? ['XLSX', 'PDF', 'DOCX'] : ['XLSX', 'PDF'];
 }

@@ -75,18 +75,20 @@ public class StatementOfAccountReport implements ReportDefinition {
   @Override
   public ReportMetadata metadata() {
     return new ReportMetadata(
-        "RI-SOA",
-        "Statement of Account for Reinsurer",
-        ReportCategory.REINSURANCE,
-        "Quarterly income / outgo statement per treaty and participant with balance in words",
-        List.of(
-            ParameterSpec.required(RiReportSupport.COMPANY, "Company", ParameterType.COMPANY),
-            ParameterSpec.required(YEAR, "Treaty Year", ParameterType.NUMBER),
-            ParameterSpec.required(TREATY, "Treaty Code", ParameterType.TEXT),
-            ParameterSpec.select(QUARTER, "Quarter", List.of("1", "2", "3", "4"), "1"),
-            ParameterSpec.required(DATE, "Statement Date", ParameterType.DATE).withDefault("TODAY"),
-            ParameterSpec.optional(REINSURER, "Reinsurer Code", ParameterType.TEXT)),
-        Permission.REINSURANCE_VIEW);
+            "RI-SOA",
+            "Statement of Account for Reinsurer",
+            ReportCategory.REINSURANCE,
+            "Quarterly income / outgo statement per treaty and participant with balance in words",
+            List.of(
+                ParameterSpec.required(RiReportSupport.COMPANY, "Company", ParameterType.COMPANY),
+                ParameterSpec.required(YEAR, "Treaty Year", ParameterType.NUMBER),
+                ParameterSpec.required(TREATY, "Treaty Code", ParameterType.TEXT),
+                ParameterSpec.select(QUARTER, "Quarter", List.of("1", "2", "3", "4"), "1"),
+                ParameterSpec.required(DATE, "Statement Date", ParameterType.DATE)
+                    .withDefault("TODAY"),
+                ParameterSpec.optional(REINSURER, "Reinsurer Code", ParameterType.TEXT)),
+            Permission.REINSURANCE_VIEW)
+        .asDocument(); // a statement sent to the reinsurer: Word and PDF
   }
 
   @Override

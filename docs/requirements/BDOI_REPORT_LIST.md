@@ -34,21 +34,21 @@ Statuses:
 
 | Status | Reports |
 |---|---|
-| BUILT | 51 |
-| BUILT (partial) | 21 |
-| DESIGNED | 67 |
-| MISSING | 43 |
+| BUILT | 70 |
+| BUILT (partial) | 23 |
+| DESIGNED | 47 |
+| MISSING | 42 |
 | DROPPED | 3 |
 | **Total** | **185** |
 
 | Group (list column "BRD") | Reports | BUILT | partial | DESIGNED | MISSING | DROPPED |
 |---|---|---|---|---|---|---|
-| FRBS (BRD-5 Accounting) | 31 | 9 | 4 | 18 | 0 | 0 |
+| FRBS (BRD-5 Accounting) | 31 | 27 | 4 | 0 | 0 | 0 |
 | Disbursement (BRD-5) | 12 | 0 | 0 | 12 | 0 | 0 |
-| ACSL (BRD-5) | 15 | 0 | 0 | 15 | 0 | 0 |
+| ACSL (BRD-5) | 15 | 0 | 2 | 13 | 0 | 0 |
 | Collection Management (BRD-4) | 4 | 1 | 1 | 2 | 0 | 0 |
 | Operations (BRD-2) | 35 | 32 | 1 | 0 | 2 | 0 |
-| New Business / Renewal / other (BRD-1 and unassigned) | 33 | 6 | 10 | 4 | 10 | 3 |
+| New Business / Renewal / other (BRD-1 and unassigned) | 33 | 7 | 10 | 4 | 9 | 3 |
 | Renewal (Renewal BRD) | 3 | 0 | 0 | 0 | 3 | 0 |
 | Product Maintenance / TSU (BRD-3) | 9 | 3 | 5 | 0 | 1 | 0 |
 | Submitted Policies (BRD-12) | 16 | 0 | 0 | 16 | 0 | 0 |
@@ -76,7 +76,7 @@ is not in the pack) and to a small set of BRD-1 reports that no BRNB requirement
 | 141 | Hold Cover Report | `nbreport` | `NB-HOLD-COVER` | Over `plc_hold_cover`; submitted renewals appear too |
 | 143, 144 | Booked Non-Bank Client / Booked PEP Client (quarterly RCTC) | `nbreport` + `crm` | `NB-RCTC-NONBANK`, `NB-RCTC-PEP` | PEP flag and screening result from the Sanction Screening BRD |
 | 167 | Insurer's scorecard | `nbreport` | `NB-INSURER-SCORECARD` | Policies received vs placed, TAT, quarterly |
-| 169 | Sustainability Report - Risk Management | `frbs` (or `nbreport`) | `FRBS-SUSTAINABILITY-PROD` | Yearly, first Monday of January |
+| 169 | Sustainability Report - Risk Management | `frbs` | `FRBS-SUSTAINABILITY-PROD` | Built by A1-FRBS; yearly, first Monday of January |
 | 178 | Sustainability Report - Claims | broker-claims module | - | Claims BRD |
 | 76, 78, 79 | List of Expiring Accounts, Renewal Status Report, Generated Renewal Advice | future `renewal` module | - | Submitted part designed in BRD-12 (`SBM-RENEWABLE`, `SBM-LETTERS`) |
 | 112-115 | Reinsurance (premium payment and RI commission, RI production, RI placement list, audit trails) | future reinsurance-broking module | - | The Reinsurance BRD is not in the pack; the platform `reinsurance` module is insurer-side |
@@ -103,29 +103,29 @@ Columns: # = row in the list; p. = page; Group = the list's "BRD" column as writ
 | 6 | 1 | FRBS | Cash Disbursements | Existing | FRBS 3.2.0, App. A I | `FIN-GL-DAYBOOK` variant (journal type PAYMENT) | **BUILT (partial)** | finreport; saved variant; payee / TIN columns to confirm |
 | 7 | 2 | FRBS | Cash Receipts | Existing | FRBS 3.2.0, App. A I | `FIN-GL-DAYBOOK` variant (RECEIPT); OR / AR detail in `CSH-DAILY-CASH-REC` | **BUILT (partial)** | finreport + cashiering; OR / AR columns (TIN, income type, VAT, WTax) are not in the day book |
 | 8 | 2 | FRBS | Invoice Register | Existing | FRBS 3.2.0, App. A IV | `NB-BOOKED-REG` | **BUILT (partial)** | nbreport; 'same details as Production report': align with `CLX-FULL-PRODUCTION` |
-| 9 | 2 | FRBS | Schedule of Commission Income | Existing | FRBS 3.2.0, App. A IV (commission income) | `GL-SCHEDULE` definition `SCH-*` | **DESIGNED** | finreport schedule engine (BRD-5 wave A1-FRBS) |
-| 10 | 3 | FRBS | Expense Allocation per cost center | Existing | FRBS 3.2.0, App. A IV (expense grouping) | `FRBS-EXPENSE-GROUPING` | **DESIGNED** | frbs |
+| 9 | 2 | FRBS | Schedule of Commission Income | Existing | FRBS 3.2.0, App. A IV (commission income) | `GL-SCHEDULE` definition `SCH-COMMISSION-INCOME` | **BUILT** | finreport schedule engine (A1-FRBS); layout to confirm (AQ05) |
+| 10 | 3 | FRBS | Expense Allocation per cost center | Existing | FRBS 3.2.0, App. A IV (expense grouping) | `FRBS-EXPENSE-GROUPING` | **BUILT** | frbs (A1-FRBS); also schedule `SCH-EXPENSE-CC` |
 | 11 | 3 | FRBS | SA Reconciliation | Existing | FRBS 3.2.0, App. A IV | `FIN-BRS-STMT` | **BUILT** | receivables (bank reconciliation) |
 | 12 | 3 | FRBS | CA Reconciliation | Existing | FRBS 3.2.0, App. A IV | `FIN-BRS-STMT` | **BUILT** | receivables |
 | 13 | 3 | FRBS | Aging of Outstanding checks | Existing | FRBS 3.2.0, App. A IV (checks and other cash items) | `FIN-BRS-UNREC-BOOK` | **BUILT (partial)** | receivables; aging buckets (current-30 ... over 365) missing; check statuses come from `disbursement` |
 | 14 | 3 | FRBS | Revaluation Report | Existing | FRBS 3.2.0, App. A IV (revaluation) | `GL-FXREV` | **BUILT** | closing |
-| 15 | 3 | FRBS | Market Performance Summary – Premium Commission | Existing | FRBS 3.2.0, App. A V | `FRBS-MANCOM-MARKET` | **DESIGNED** | frbs |
-| 16 | 4 | FRBS | Branch Production report per BDO Branch | Existing | FRBS 3.2.0, App. A V | `FRBS-BRANCH-PRODUCTION` | **DESIGNED** | frbs |
-| 17 | 4 | FRBS | Service Fee report | Existing | FRBS 3.2.0, App. A VI (FRBS 2.10.0) | `FRBS-SERVICE-FEE` | **DESIGNED** | frbs; add handling-fee and No Touch fee income (BRD-12) |
-| 18 | 4 | FRBS | General Journal (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-GJ` | **DESIGNED** | tax |
-| 19 | 4 | FRBS | Purchase Journal (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-PJ` | **DESIGNED** | tax |
-| 20 | 5 | FRBS | Sales Revenue Journal (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-SJ` | **DESIGNED** | tax |
-| 21 | 5 | FRBS | Cash Receipts (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-CRB` | **DESIGNED** | tax |
-| 22 | 5 | FRBS | Cash Disbursements (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-CDB` | **DESIGNED** | tax |
-| 23 | 5 | FRBS | General Ledger – Assets (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-SL` (assets) | **DESIGNED** | tax; `FIN-GL-LEDGER-LC` is the built interim |
-| 24 | 6 | FRBS | General Ledger – Liabilities (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-SL` (liabilities) | **DESIGNED** | tax |
-| 25 | 6 | FRBS | General Ledger – Capital (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-SL` (capital) | **DESIGNED** | tax |
-| 26 | 6 | FRBS | General Ledger – Income (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-SL` (income) | **DESIGNED** | tax |
-| 27 | 6 | FRBS | General Ledger – Expenses (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-SL` (expenses) | **DESIGNED** | tax |
-| 28 | 6 | FRBS | Monthly Alphalist of Payees | Existing | FRBS 3.2.0, App. A VII | `TAX-MAP` | **DESIGNED** | tax; quarterly `TAX-QAP` built |
+| 15 | 3 | FRBS | Market Performance Summary – Premium Commission | Existing | FRBS 3.2.0, App. A V | `FRBS-MANCOM-MARKET` | **BUILT** | frbs (A1-FRBS); budget columns wait for segment budgets (AQ05) |
+| 16 | 4 | FRBS | Branch Production report per BDO Branch | Existing | FRBS 3.2.0, App. A V | `FRBS-BRANCH-PRODUCTION`, `FRBS-BRANCH-PRODUCTION-SUM` | **BUILT** | frbs (A1-FRBS); BDO branch codes = sales units until AQ05 |
+| 17 | 4 | FRBS | Service Fee report | Existing | FRBS 3.2.0, App. A VI (FRBS 2.10.0) | `FRBS-SERVICE-FEE`, `FRBS-SERVICE-FEE-DETAIL` | **BUILT** | frbs (A1-FRBS); add handling-fee and No Touch fee income (BRD-12) |
+| 18 | 4 | FRBS | General Journal (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-GJ` | **BUILT** | tax (A1-FRBS); format to confirm (AQ07) |
+| 19 | 4 | FRBS | Purchase Journal (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-PJ` | **BUILT** | tax (A1-FRBS); format to confirm (AQ07) |
+| 20 | 5 | FRBS | Sales Revenue Journal (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-SJ` | **BUILT** | tax (A1-FRBS); format to confirm (AQ07) |
+| 21 | 5 | FRBS | Cash Receipts (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-CRB` | **BUILT** | tax (A1-FRBS); format to confirm (AQ07) |
+| 22 | 5 | FRBS | Cash Disbursements (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-CDB` | **BUILT** | tax (A1-FRBS); format to confirm (AQ07) |
+| 23 | 5 | FRBS | General Ledger – Assets (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-SL` (assets) | **BUILT** | tax (A1-FRBS); format to confirm (AQ07) |
+| 24 | 6 | FRBS | General Ledger – Liabilities (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-SL` (liabilities) | **BUILT** | tax (A1-FRBS); format to confirm (AQ07) |
+| 25 | 6 | FRBS | General Ledger – Capital (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-SL` (capital) | **BUILT** | tax (A1-FRBS); format to confirm (AQ07) |
+| 26 | 6 | FRBS | General Ledger – Income (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-SL` (income) | **BUILT** | tax (A1-FRBS); format to confirm (AQ07) |
+| 27 | 6 | FRBS | General Ledger – Expenses (Books of Accounts) | Existing | FRBS 3.2.0, App. A VII | `TAX-BOOK-SL` (expenses) | **BUILT** | tax (A1-FRBS); format to confirm (AQ07) |
+| 28 | 6 | FRBS | Monthly Alphalist of Payees | Existing | FRBS 3.2.0, App. A VII | `TAX-MAP` | **BUILT** | tax (A1-FRBS); quarterly `TAX-QAP` built; DAT format AQ07 |
 | 29 | 7 | FRBS | Value Added Tax Payable (Output VAT and Input VAT) | Existing | FRBS 3.2.0, App. A VII | `TAX-VAT-2550Q`, `TAX-SLS`, `TAX-SLP` | **BUILT** | tax |
-| 30 | 7 | FRBS | Summary of Alphalist of Withholding Taxes | Existing | FRBS 3.2.0, App. A VII | `TAX-SAWT` | **DESIGNED** | tax |
-| 31 | 7 | FRBS | Broker's Annual Statement of Business Operations | Existing | FRBS 3.2.0, App. A VII | `IC-BROKER-ASBO` | **DESIGNED** | tax |
+| 30 | 7 | FRBS | Summary of Alphalist of Withholding Taxes | Existing | FRBS 3.2.0, App. A VII | `TAX-SAWT` | **BUILT** | tax (A1-FRBS), from the received-certificate register (V702) |
+| 31 | 7 | FRBS | Broker's Annual Statement of Business Operations | Existing | FRBS 3.2.0, App. A VII | `IC-BROKER-ASBO` | **BUILT** | tax (A1-FRBS); IC layout to confirm (AQ07) |
 | 32 | 8 | Disbursement | Masterlist of all Disbursement Transactions | Existing | DIS 3.28.3, App. B | `DSB-MASTERLIST` | **DESIGNED** | disbursement |
 | 33 | 8 | Disbursement | List of Unreleased Check | Existing | DIS 3.28.3, App. B | `DSB-UNRELEASED-CHECKS` | **DESIGNED** | disbursement |
 | 34 | 9 | Disbursement | CWT on Commission Report | Existing | DIS 3.28.3, App. B | `DSB-CWT-COMMISSION` | **DESIGNED** | disbursement |
@@ -139,8 +139,8 @@ Columns: # = row in the list; p. = page; Group = the list's "BRD" column as writ
 | 42 | 12 | Disbursement | Summary End-of-day | - | DIS 3.28.2, App. B | `DSB-EOD-SUMMARY` | **DESIGNED** | disbursement |
 | 43 | 12 | ACSL | SCHEDULE OF PAYABLE TO INSURANCE COMPANIES - Peso | Existing - Isys | ACSL 2.14.x, App. C | `ACSL-SCHED-PAY-INS-PHP` | **DESIGNED** | acsl |
 | 44 | 13 | ACSL | SCHEDULE OF PAYABLE TO INSURANCE COMPANIES - USD | Existing - Isys | ACSL 2.14.x, App. C | `ACSL-SCHED-PAY-INS-USD` | **DESIGNED** | acsl |
-| 45 | 13 | ACSL | SCHEDULE OF RECEIVABLE FROM INSURANCE COMPANIES CLIENTS - PESO | Existing - Isys | ACSL 2.14.x, App. C | `ACSL-AGING-PR-PHP` (aging only) | **DESIGNED** | acsl; the schedule layout itself is not in the ACSL design (gap) |
-| 46 | 14 | ACSL | SCHEDULE OF RECEIVABLE FROM INSURANCE COMPANIES CLIENTS - USD | Existing - Isys | ACSL 2.14.x, App. C | `ACSL-AGING-PR-USD` (aging only) | **DESIGNED** | acsl; as #45 |
+| 45 | 13 | ACSL | SCHEDULE OF RECEIVABLE FROM INSURANCE COMPANIES CLIENTS - PESO | Existing - Isys | ACSL 2.14.x, App. C | `GL-SCHEDULE` definition `SCH-PR-PHP`; `ACSL-AGING-PR-PHP` (aging) | **BUILT (partial)** | finreport schedule engine (A1-FRBS): schedule per client with ageing 30/90/180/365/730, layout to confirm (AQ05); the ACSL ageing report stays with acsl |
+| 46 | 14 | ACSL | SCHEDULE OF RECEIVABLE FROM INSURANCE COMPANIES CLIENTS - USD | Existing - Isys | ACSL 2.14.x, App. C | `GL-SCHEDULE` definition `SCH-PR-USD`; `ACSL-AGING-PR-USD` (aging) | **BUILT (partial)** | finreport schedule engine (A1-FRBS): schedule per client with ageing 30/90/180/365/730, layout to confirm (AQ05); the ACSL ageing report stays with acsl |
 | 47 | 14 | ACSL | SCHEDULE OF A/P REFUND FROM INSURER - Peso | New | ACSL 2.14.x, App. C | `ACSL-SCHED-AP-REFUND-INS` | **DESIGNED** | acsl |
 | 48 | 14 | ACSL | SCHEDULE OF AR INSURER'S REFUND - Peso | New | ACSL 2.14.x, App. C | `ACSL-SCHED-AR-INS-REFUND` | **DESIGNED** | acsl |
 | 49 | 15 | ACSL | SCHEDULE OF COMMISSION RECEIVABLES - Peso | Existing - Isys | ACSL 2.14.x, App. C | `ACSL-SCHED-COMM-PHP` | **DESIGNED** | acsl |
@@ -263,7 +263,7 @@ Columns: # = row in the list; p. = page; Group = the list's "BRD" column as writ
 | 166 | 53 | Renewal/New Business | List of Accounts without Policy number | Existing | BRNB.073/115 | issuance workbench tab 'Placed - awaiting policy' | **BUILT (partial)** | nbreport: `NB-NO-POLICY` with submission age in working days (holiday calendar) |
 | 167 | 54 | Renewal/New Business | Insurer's scorecard | Existing | none | - | **MISSING** | nbreport: `NB-INSURER-SCORECARD` (policies received vs placed per insurer, branch, segment; TAT) |
 | 168 | 54 | Renewal/New Business | Policy Transmittal | Existing | BRNB.078 | `NB-DISPATCH` | **DROPPED** | remark: DELETE, same as the Policy Transmittal List (#72) |
-| 169 | 54 | N/A | Sustainability Report- Risk Management | Existing | none | - | **MISSING** | frbs / nbreport: yearly sustainability extract (production per client type and region) |
+| 169 | 54 | N/A | Sustainability Report- Risk Management | Existing | report list #169 | `FRBS-SUSTAINABILITY-PROD` | **BUILT** | frbs (A1-FRBS): yearly production per client type, region and line of business |
 | 170 | 55 | Employee Benefits | Production Report | Existing | Employee Benefits BRD | - | **MISSING** | future employee-benefits module |
 | 171 | 55 | Employee Benefits | Renewal Report | New | Employee Benefits BRD | - | **MISSING** | future employee-benefits module |
 | 172 | 55 | Employee Benefits | Placement report | New | Employee Benefits BRD | - | **MISSING** | future employee-benefits module |

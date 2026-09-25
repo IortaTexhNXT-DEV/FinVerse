@@ -883,3 +883,131 @@ What the A1-DSB wave built for `disbursement` (DIS 2.2-3.28) and where it differ
   (all approved DVs are unregularised until tagged); the remittance schedule attachment on the insurer check; open-item
   matching of the paid AP line (the DV posts through the rules only); hiding the Operations queue screen
   `/operations/disbursements` (shared navigation, left to the Operations owner).
+
+### A1-FRBS as built
+
+What wave A1-FRBS built for the `finreport` schedule engine, the `frbs` report pack and service fee and the `tax`
+additions, and where it differs from or details sections 5.4, 6, 7.3, 10 and 12.1.
+
+- **Migrations.**
+  - `V652__account_schedule_engine.sql`: `fin_schedule_def`, `fin_schedule_column`, `fin_statement_comment`. It seeds
+    28 draft definitions: GARD `GARD-*` (cash, operating expenses, other income, FX, miscellaneous assets, accrued
+    expenses and taxes, variance analysis SIE month on month with commentary), subsidiaries `SUBS-*` (SIE year on year,
+    SOC month on month) and schedules `SCH-*`. The `SCH-*` schedules include commission income (#9), premium
+    receivable PHP / USD with ageing (#45 / #46), PR 2307, commission receivable, AR-BIR, AR-BIR per insurer, AR
+    insurer's refund, AR officers, prepaid, FFE, payable to insurers, A/P refund from insurer, AP others, AP officers,
+    stale checks, checks outstanding, service fee payable and expenses per cost centre. Every layout is `TO_CONFIRM`
+    (AQ05). The account selectors point at the demo chart until the real chart is uploaded (AQ01).
+  - `V702__tax_received_certificates.sql`: `tax_certificate_received` (+ `_line`).
+  - `V703__tax_books_and_forms.sql`: `tax_book_def` (GJ, PJ, SJ, CRB, CDB, SL) and `tax_form_output_line` (lines of
+    0619-F, 1603, 1702-Q and 1702). It also seeds the parameters `TAX_RCIT_RATE` (25), `TAX_FBT_RATE` (35) and
+    `TAX_FBT_GROSSUP_RATE`.
+  - `V898__frbs_service_fee.sql`: `frbs_service_fee_rule`, `frbs_service_fee_recipient`, `frbs_service_fee_run`,
+    `frbs_service_fee_line` and `frbs_service_fee_item`, with a partial unique index so that an invoice is in one live
+    run only. It seeds the proposed rules CBG 2.5% (CBG, RETAIL) and IBG 1% (COMBANK, CORBANK, INSTITUTIONAL) on the
+    commission net of the insurer's withholding tax (AQ20).
+  - `V899__frbs_events.sql`: the event types stay in V890 (section 17). V899 holds the report pack catalogue
+    `frbs_report_pack_entry` (the Appendix A groups I-VII with 58 entries) and one grant: TAX_VIEW for FRBS_PROCESSOR,
+    FRBS_TL and FRBS_HEAD, so that the GL team runs the government reports of the pack. This is the smallest shared
+    addition, placed in V899 because V70x runs before V890 on a fresh database.
+- **Schedule engine (FRBS 3.2.0).** `finreport.service.ScheduleEngine` runs a definition as report `GL-SCHEDULE`
+  (parameters `schedule`, `asOf`, optional `fromDate` and `branchId`; ReportMetadata `frbs`). The steps:
+  - It selects the postable accounts by code prefix or report group.
+  - It aggregates the posted ledger in one constant SQL statement. Rows are grouped by account, party, party and
+    document, cost centre, branch or business line. Amounts are in base currency, or in one currency when the
+    definition names one.
+  - It computes the figures on the schedule's side: opening, debits, credits, movement, closing (year to date for a
+    movement schedule, from the company's fiscal year start), the comparative (previous month or year, balance or
+    shifted period), the variance and the variance %.
+  - Optional ageing uses up to 8 buckets (`AgeingSlots`), first in first out: the balance is spread over the most
+    recent increases.
+  - An optional commentary column prints the month's comment per row.
+
+  The definitions are maintained on the screen (MASTER_MAINTAIN, `/api/v1/finreport/schedules`), and so is the
+  commentary (FRBS_REPORT_EXPORT, `PUT .../{code}/comments`). Every schedule exports through the Report Centre to
+  Excel, PDF, ODS and CSV, with the report archive and report batches.
+- **FRBS reports (ReportMetadata `frbs`, archived).**
+  - Service fee: `FRBS-SERVICE-FEE` (summary per segment) and `FRBS-SERVICE-FEE-DETAIL` (invoices).
+  - Mancom: `FRBS-MANCOM-MARKET` (premium and commission per segment and location: month, YTD, previous YTD, growth).
+  - Branch production: `FRBS-BRANCH-PRODUCTION` (detail) and `-SUM` (summary).
+  - `FRBS-EXPENSE-GROUPING` (expenses per cost centre and account).
+  - `FRBS-GAP`: open sub-ledger receivables and payables by time to maturity, with the gap and the cumulative gap.
+  - `FRBS-CASH-FLOW`: cash and bank opening balance, receipts and payments per journal type, closing balance.
+  - `FRBS-SUSTAINABILITY-PROD` (#169: yearly production per client type, region and line).
+
+  The report pack screen (`GET /api/v1/frbs/report-pack`) lists all groups. It opens each report in its runner and
+  exports it at once to Excel or PDF.
+- **Service fee (FRBS 2.10.0-2.10.2).** The steps of a run:
+  - `ServiceFeeRunService.compute(company, from, to)` reads the Operations ledger. It takes the invoices whose payment
+    status became PAID in the Manila period, are not cancelled, have commission and are not in a live run.
+  - It applies the rule of their market segment in force on the day paid. The fee is (commission − insurer WTAX) ×
+    rate, 2 decimals.
+  - It groups the invoices into one line per service-fee segment, sales unit and currency.
+  - The payee is the unit's recipient (`frbs_service_fee_recipient`), else the unit code. The cost centre is the
+    recipient's, else the unit's (`cat_sales_unit`), else the invoice's, else the A1-GL cost-centre rules of the
+    engine.
+  - Workflow `FRBS_SERVICE_FEE`: submit (SERVICE_FEE_MANAGE), then approve (SERVICE_FEE_APPROVE; four eyes, the
+    approver is neither the preparer nor the submitter).
+  - Approval posts `FRBS_SERVICE_FEE_ACCRUE` per line (`<run>:<line>`, AMOUNT = fee, BOOK rate for USD). It sends the
+    payout through `DisbursementGateway.send`: type SERVICE_FEE, RFP no. = run no., payee class OTHER, source
+    reference `<run>:<line>[:n]`, and the accrual journal in the accounting references.
+  - `DisbursementStatusChanged` PAID tags the line RELEASED on that day. RETURNED / CANCELLED before release puts the
+    line back for "Send Again".
+  - The manual tags are Released (credit date) and Liquidated (date and the unit's liquidation report, uploaded as an
+    attachment on `FrbsServiceFeeLine`).
+  - When every paid line is released, the run moves to RELEASED by a system transition. When every line is
+    liquidated, it moves to LIQUIDATED.
+  - Recompute (computed runs) and the panel's cancel free the invoices.
+- **Tax (DIS 2.11, FRBS 3.2.0 Appendix A VII).**
+  - `tax.service.ReceivedCertificateService` is the one register of the insurers' BIR 2307 certificates on
+    commission and incentives. `record` posts `TAX_CWT_CERT_RECEIVED` (`CRT:<id>`: COMMISSION_CWT, INCENTIVE_CWT).
+    `cancel` reverses it with negative amounts (`CRT:<id>:CANCEL`). Duplicates per agent and number are refused.
+  - Endpoints `/api/v1/tax/received-certificates`: view TAX_VIEW or DISB_TAG, record TAX_MANAGE or DISB_TAG, cancel
+    TAX_MANAGE.
+  - New BIR outputs (TAX_VIEW):
+    - `TAX-MAP` (monthly alphalist) and `TAX-1604E` (annual alphalist) from the EWT worksheet;
+    - `TAX-SAWT` from the register;
+    - `TAX-0619F`, `TAX-1603`, `TAX-1702Q` (year to date) and `TAX-1702` from the `tax_form_output_line`
+      definitions: ledger movements of account prefixes, sums, rates from parameters, and the certificates received;
+    - the books of accounts `TAX-BOOK-GJ`, `-PJ`, `-SJ`, `-CRB`, `-CDB` (posted lines by journal type and accounting
+      event type) and `TAX-BOOK-SL` (general ledger per account class with the balance forward);
+    - `IC-BROKER-ASBO` (business placed per line of business).
+- **Screens.**
+  - Accounting Reports (`features/frbs`): Report Pack, Account Schedules (run and export, commentary, definitions
+    editor), Service Fee Runs (work list by stage, compute), the service-fee run record (summary, workflow panel,
+    lines with tags, invoices) and Service Fee Rates (rules and recipients).
+  - Tax & Statutory (`features/tax`): Certificates Received (register, record, cancel) and BIR Forms & Books (period
+    choice, open or export each output).
+  - StatusBadge gained COMPUTED, TO_CONFIRM (info) and LIQUIDATED, RECORDED (success).
+- **Demo.** `frbs.demo.FrbsDemoData` (`@Order(98)`, signed in through `DemoUsers.as`):
+  - `gltl` adds the cost-centre rule of the accrual;
+  - `glofficer` computes the service fee of the month, which `gltl` approves (accrual and payout requests);
+  - `disb` records an insurer certificate for the quarter.
+- **Contracts for other modules.**
+  - `tax.service.ReceivedCertificateService.record(companyId, Facts, lines)`, `bySource(module, ref)` and
+    `inPeriod(company, TaxPeriod)`. Disbursement's CWT tag (DIS 2.11.2) and Commission's certificate submission
+    (CMRID.015) can record through it instead of keeping the certificate as text (AQ16).
+  - `finreport.service.ScheduleDefinitionService` and report `GL-SCHEDULE`, with the parameter `schedule`, for any
+    configured schedule.
+  - frbs consumes `DisbursementStatusChanged` (source module `FRBS`) and `WorkCaseTransitioned` (entity
+    `FrbsServiceFeeRun`).
+- **Tests.**
+  - Integration: `AccountScheduleIT` (every seeded definition runs and exports to Excel and PDF, ageing adds up,
+    definitions and commentary), `ServiceFeeIT` (approval, accrual, payout, release, liquidation, return and resend,
+    recompute and cancel, rules and recipients), `BirOutputsIT` (register posting, SAWT, cancellation, every new
+    output generated and exported to Excel and PDF) and `FrbsApiIT` (HTTP reads, the Excel and PDF exports of every
+    FRBS report, the service-fee flow, the liquidation upload, setup, permissions).
+  - Unit: `ScheduleMathTest`, `ServiceFeeCalculatorTest`, `FormWorksheetTest`.
+  - Frontend: `frbs.test.ts`, `birOutputs.test.ts`.
+- **Gaps and parked items (seams built).**
+  - **Word output of board-deck schedules.** The report platform renders PDF, Excel, ODS, CSV and XML only. The GARD
+    and subsidiaries schedules and the Mancom summary are flagged "Word requested". They are exported to PDF and
+    Excel until a Word renderer is added to `report/render` (owner: report platform).
+  - Layouts of GARD, subsidiaries and Mancom (AQ05) and segment budgets.
+  - The real chart behind the selectors (AQ01).
+  - Service-fee rates, recipients and liquidation content (AQ20).
+  - BIR formats and channels (AQ07). The worksheets and loose-leaf books are not eFPS, DAT or CAS files. The final
+    withholding tax account of 0619-F is not mapped.
+  - BDO branch codes for the branch production report: the sales units stand in until AQ05.
+  - The ACSL ageing report codes (`ACSL-AGING-*`) stay with acsl. The `SCH-PR-*` schedules cover report list
+    #45 / #46.

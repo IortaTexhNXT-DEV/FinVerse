@@ -26,13 +26,30 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
   boolean existsByUsernameIgnoreCase(String username);
 
   /**
-   * Enabled users holding a permission through any of their roles.
+   * Whether a Windows ID (directory identity) is already used by a user.
+   *
+   * @param windowsId Windows ID
+   * @return true when taken
+   */
+  boolean existsByWindowsIdIgnoreCase(String windowsId);
+
+  /**
+   * Whether a Windows ID is used by a user other than the given one.
+   *
+   * @param windowsId Windows ID
+   * @param id the user that may keep it
+   * @return true when another user has it
+   */
+  boolean existsByWindowsIdIgnoreCaseAndIdNot(String windowsId, Long id);
+
+  /**
+   * Enabled users holding a permission through any of their active roles.
    *
    * @param permission permission
    * @return user names
    */
   @Query(
       "select distinct u.username from AppUser u join u.roles r join r.permissions p"
-          + " where p = :permission and u.enabled = true and u.locked = false")
+          + " where p = :permission and r.active = true and u.enabled = true and u.locked = false")
   List<String> findUsernamesWithPermission(@Param("permission") Permission permission);
 }

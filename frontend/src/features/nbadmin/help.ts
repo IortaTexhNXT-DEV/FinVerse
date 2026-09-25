@@ -1,4 +1,4 @@
-import type { HelpScreen } from '@/features/help/helpContent';
+import type { HelpScreen, HelpSection } from '@/features/help/helpContent';
 
 /** Help of the Broking Administration screens (part of the Broking Setup section). */
 export const NBADMIN_HELP_SCREENS: HelpScreen[] = [
@@ -65,3 +65,28 @@ export const NBADMIN_HELP_SCREENS: HelpScreen[] = [
     ],
   },
 ];
+
+/** In-app help of the User Access section (BRD-11 User Access Maintenance). */
+export const USER_ACCESS_HELP: HelpSection = {
+  id: 'user-access',
+  module: 'User Access',
+  intro:
+    'User Access Maintenance: every change to a user or a group profile (role) is made through an approved request with a chosen approver and four eyes; each applied change is kept attribute by attribute in the access change log with its request number, who did it and who approved it.',
+  screens: [
+    {
+      name: 'Access Request Queues',
+      path: '/user-access/requests',
+      summary:
+        'Your access request queues: drafts, returned requests, requests assigned to you, second approvals and approved group-profile requests to implement. Open Access Requests and the User Access Matrix from the page header.',
+      workflow: [
+        'A requester enrolls, modifies, deactivates or reactivates a user, or asks for a group-profile change, and chooses the approver.',
+        'The approver approves, returns with remarks or rejects; a privileged or out-of-hours change also needs a second approval (UAM_WORKING_HOURS).',
+      ],
+      controls: [
+        'The requester and the user a request is about never decide it.',
+        'A deactivated group profile grants nothing to its members until it is reactivated.',
+        'Roles are edited directly on the Roles screen only through the emergency path UAM_DIRECT_ROLE_EDIT; every such edit is audited and raises the UAM_DIRECT_ROLE_EDIT alert.',
+      ],
+    },
+  ],
+};

@@ -6,6 +6,8 @@ import com.iortatechnxt.brokerverse.security.api.dto.RoleResponse;
 import com.iortatechnxt.brokerverse.security.api.dto.UserProfileResponse;
 import com.iortatechnxt.brokerverse.security.api.dto.UserRequest;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
+import com.iortatechnxt.brokerverse.security.service.ChangeAuthority;
+import com.iortatechnxt.brokerverse.security.service.RoleEditGuard;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import jakarta.validation.Valid;
 import java.util.Arrays;
@@ -18,10 +20,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Security administration: users, roles and permissions. */
+/**
+ * Security administration: users, roles and permissions. Role creation and changes are guarded
+ * (PQ17, {@link RoleEditGuard}): they carry the number of an approved group-profile request, or use
+ * the audited emergency path {@code UAM_DIRECT_ROLE_EDIT}.
+ */
 @RestController
 @RequestMapping("/api/v1/admin")
 public class UserAdminController {
@@ -30,14 +37,17 @@ public class UserAdminController {
   private static final String ROLES = "hasAuthority('ROLE_MANAGE')";
 
   private final UserAdminService service;
+  private final RoleEditGuard guard;
 
   /**
    * Creates the controller.
    *
    * @param service user administration
+   * @param guard role edit guard
    */
-  public UserAdminController(UserAdminService service) {
+  public UserAdminController(UserAdminService service, RoleEditGuard guard) {
     this.service = service;
+    this.guard = guard;
   }
 
   /**
@@ -128,29 +138,45 @@ public class UserAdminController {
   }
 
   /**
-   * Creates a role.
+   * Creates a role (implementation of an approved group-profile request, or the emergency path).
    *
    * @param request request
+   * @param requestNo number of the approved group-profile request (optional)
    * @return role
    */
   @PostMapping("/roles")
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(ROLES)
-  public RoleResponse createRole(@Valid @RequestBody RoleRequest request) {
-    return RoleResponse.from(service.createRole(request));
+  public RoleResponse createRole(
+      @Valid @RequestBody RoleRequest request, @RequestParam(required = false) String requestNo) {
+    ChangeAuthority authority = guard.authorize(request.code(), requestNo);
+    RoleResponse created = RoleResponse.from(service.createRole(request, authority));
+    if (authority.isDirect()) {
+      guard.directEditUsed(created.code(), "created");
+    }
+    return created;
   }
 
   /**
-   * Updates a role.
+   * Updates a role (implementation of an approved group-profile request, or the emergency path).
    *
    * @param id id
    * @param request request
+   * @param requestNo number of the approved group-profile request (optional)
    * @return role
    */
   @PutMapping("/roles/{id}")
   @PreAuthorize(ROLES)
-  public RoleResponse updateRole(@PathVariable Long id, @Valid @RequestBody RoleRequest request) {
-    return RoleResponse.from(service.updateRole(id, request));
+  public RoleResponse updateRole(
+      @PathVariable Long id,
+      @Valid @RequestBody RoleRequest request,
+      @RequestParam(required = false) String requestNo) {
+    ChangeAuthority authority = guard.authorize(service.getRole(id).getCode(), requestNo);
+    RoleResponse updated = RoleResponse.from(service.updateRole(id, request, authority));
+    if (authority.isDirect()) {
+      guard.directEditUsed(updated.code(), "changed");
+    }
+    return updated;
   }
 
   /**

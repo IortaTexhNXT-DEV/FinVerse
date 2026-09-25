@@ -61,7 +61,7 @@ This page is binding for every BrokerVerse screen. Components read the design to
   - **Reports**;
   - **Setup & Administration**: includes Compliance Setup (Sanction Screening configuration and watchlist), User Access (access requests, including portal users, and the User Access Matrix, before Administration) and Portal Users (Employee Benefits portal).
 
-  The sections of the later BRDs (Sanction Screening, Employee Benefits, Renewal, Submitted Policies, Customer Service Facility, Claims Handling, Compliance Setup, User Access, Portal Users) are designed, not built. Their places follow the designs: Sanction Screening after Client Management, Employee Benefits after Non-Package Management, Renewal right after Placement & Booking, Submitted Policies after Renewal and before Product Reconciliation, and Customer Service Facility after Renewal.
+  The sections of the later BRDs (Employee Benefits, Renewal, Submitted Policies, Customer Service Facility, Claims Handling, Portal Users) are designed, not built; Sanction Screening, Compliance Setup and User Access are registered with their landing screens (foundation S0 / U0), Compliance Setup after Broking Setup. Their places follow the designs: Sanction Screening after Client Management, Employee Benefits after Non-Package Management, Renewal right after Placement & Booking, Submitted Policies after Renewal and before Product Reconciliation, and Customer Service Facility after Renewal.
 
   The group holding the current page opens automatically.
 

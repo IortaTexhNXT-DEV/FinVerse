@@ -26,6 +26,8 @@ import java.util.stream.Stream;
 @Table(name = "crm_client")
 public class Client extends BaseEntity {
 
+  private static final String CLIENT_INACTIVE = "CLIENT_INACTIVE";
+
   @Column(name = "company_id", nullable = false, updatable = false)
   private Long companyId;
 
@@ -184,9 +186,7 @@ public class Client extends BaseEntity {
    * @param details new data
    */
   public void update(ClientDetails details) {
-    if (status == ClientStatus.INACTIVE) {
-      throw new BusinessRuleException("CLIENT_INACTIVE", "An inactive client cannot be changed");
-    }
+    requireChangeable();
     if (status == ClientStatus.CONFIRMED && details.clientType() != clientType) {
       throw new BusinessRuleException(
           "CLIENT_TYPE_LOCKED", "The client type of a confirmed client cannot be changed");
@@ -238,21 +238,41 @@ public class Client extends BaseEntity {
             new PersonName(lastName, firstName, null, null, corporateName));
   }
 
+  private void requireChangeable() {
+    if (status == ClientStatus.INACTIVE) {
+      throw new BusinessRuleException(CLIENT_INACTIVE, "An inactive client cannot be changed");
+    }
+  }
+
   /**
    * Sets the KYC profile (nationality, civil status, occupation, source of funds, risk rating).
    *
    * @param profile profile; null keeps nothing
    */
   public void applyProfile(ClientProfile profile) {
-    if (status == ClientStatus.INACTIVE) {
-      throw new BusinessRuleException("CLIENT_INACTIVE", "An inactive client cannot be changed");
-    }
+    requireChangeable();
     ClientProfile p = profile == null ? ClientProfile.EMPTY : profile;
     this.nationality = p.nationality();
     this.civilStatus = p.civilStatus();
     this.occupation = p.occupation();
     this.sourceOfFunds = p.sourceOfFunds();
     this.riskRating = p.riskRating();
+  }
+
+  /**
+   * Sets the KYC risk rating from risk profiling (SNSRP-302, 304) without touching the other
+   * profile fields; a review date earlier than the current one brings the periodic KYC review
+   * forward (BRNB.110).
+   *
+   * @param code risk rating (list of values KYC_RISK_RATING)
+   * @param reviewDue review date implied by the new rating, null to keep the current one
+   */
+  public void applyRiskRating(String code, LocalDate reviewDue) {
+    requireChangeable();
+    this.riskRating = code;
+    if (reviewDue != null && (kycReviewDue == null || reviewDue.isBefore(kycReviewDue))) {
+      this.kycReviewDue = reviewDue;
+    }
   }
 
   /**
@@ -295,7 +315,7 @@ public class Client extends BaseEntity {
    */
   public void deactivate(String reason, String note, String user, Instant when) {
     if (status == ClientStatus.INACTIVE) {
-      throw new BusinessRuleException("CLIENT_INACTIVE", "The client is already inactive");
+      throw new BusinessRuleException(CLIENT_INACTIVE, "The client is already inactive");
     }
     this.status = ClientStatus.INACTIVE;
     this.deactivationReason = reason;

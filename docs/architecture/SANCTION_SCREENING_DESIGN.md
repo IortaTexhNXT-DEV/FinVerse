@@ -371,3 +371,84 @@ Rules for parallel work:
 3. **Contract changes in crm and workflow.** Mitigation: small, additive, done in one S0 change set with tests; existing signatures stay.
 4. **Regulatory content in the demo.** Mitigation: invented names only, flagged in the demo migration header.
 5. **Investigator population.** 287 users may be MKT_AO holders. Mitigation: role grants are additive and the case list is scoped by team.
+
+## 16. S0 foundation: as built
+
+What the S0 wave built (together with U0 of BRD-11, one foundation agent, because both edit the shared files), and
+where it differs from or details the sections above. S1-A, S1-B and S1-C build on this and compile only against it.
+
+- **Migration `V1050__screening_foundation.sql`.**
+  - Roles `COMPLIANCE_OFFICER`, `COMPLIANCE_CHECKER`, `UNIT_COMPLIANCE_COORD`, `SCR_INVESTIGATOR`, `SCR_APPROVER`,
+    `AML_COMMITTEE` with the grants of section 6.2; `AUDITOR` + SCR_VIEW, SCR_REPORT_VIEW, SCR_AUDIT_VIEW; `SYSADMIN` +
+    SCR_VIEW. The Operations Lead grant waits for SQ19 (no role is named yet). Demo users come with V1950 (S1-A).
+  - `sec_permission_action`: the 14 `SCR_*` permissions in the area `SCREENING` with the action classes of 6.1.
+  - LOV types `SCR_DISPOSITION` (parent = stage), `SCR_CASE_TYPE`, `SCR_LIST_TYPE`, `SCR_REASSIGN_REASON`,
+    `SCR_STR_REASON` (no values until SQ09), `SCR_FORM_TYPE`, `SCR_DOCUMENT_TYPE` (parent = `DOCUMENT_TYPE` code).
+    LOV codes are unique per type, so the committee "return" disposition is `COMMITTEE_RETURN` (parent
+    `AML_COMMITTEE`); `RETURN` stays the Compliance review one. All dispositions are marked "(to confirm)" (SQ06).
+  - Parameters of section 8 (category SCREENING). `SCR_INGEST_ALERT_RECIPIENTS` is a STRING (comma separated e-mail
+    addresses; CODE_LIST does not accept addresses). `SCR_BLOCK_ON_OPEN_MATCH` = false.
+  - Alert codes and notification events of section 8 (event sort orders 500-590).
+  - Workflow `SCR_CASE` of section 7. Action codes (the unique key is stage + action):
+    `NEW.route`; `INVESTIGATION.submit | close_no_approval | request_info` (self); `RETURNED.resubmit` (to
+    UNIT_HEAD_APPROVAL) and `RETURNED.resubmit_to_compliance` (to COMPLIANCE_REVIEW); `UNIT_HEAD_APPROVAL.approve` (to
+    COMPLIANCE_REVIEW), `approve_close` (to CLOSED), `disapprove` (RETURN_REASON); `COMPLIANCE_REVIEW.escalate_committee
+    | prepare_str | close | return_for_rework` (RETURN_REASON); `AML_COMMITTEE.finalise_str | finalise_no_str |
+    finalise_return`; `STR_PREPARATION.str_ready`; `STR_EXTRACTION.filed`; `CLOSED.reopen` (RETURN_REASON). No action
+    is generic: every stage change goes through the case service (S1-C), which picks the action from the route.
+  - Retention rules `SCREENING_CASE` (CLOSED) and `WATCHLIST_ENTRY` (INACTIVE), 5 / 5 years, action REVIEW; the review
+    run shows "no provider" until S1-C implements `RetentionCandidateProvider`.
+- **Permissions.** 14 constants `SCR_*` in `Permission.java` (section 6.1).
+- **crm contract (section 9).**
+  - `crm.service.ClientRiskService.applyRiskProfile(Long clientId, RiskProfileChange change)` returns
+    `crm.service.ClientRiskProfile` (clientId, clientCode, previousRating, riskRating, activeTags, tagsAdded,
+    tagsRemoved, kycReviewDue; `changed()`). `RiskProfileChange(riskRating, addTags, removeTags, source, reason,
+    reference)`: source `ClientRiskService.SOURCE_RULE` ("RULE") or `SOURCE_MANUAL` ("MANUAL", reason mandatory,
+    `RISK_JUSTIFICATION_REQUIRED`); the rating is validated against `KYC_RISK_RATING`; a null rating keeps it. Tags go
+    through `ClientNotesService` (history and banner as for a manual tag); adding an active tag or ending an absent one
+    is ignored. When the rating becomes HIGH and the client has a review cycle (verified KYC), `kycReviewDue` moves to
+    the earlier of the current date and `KycReviewPolicy.nextReview(HIGH, verifiedOn)`; it never moves later. Audited
+    "Risk rating X -> Y; tags added [...] (source, reference: reason)". `ClientRiskService.activeTags(clientId)` reads
+    the active tags. **Naming:** S1-B names its history entity differently (e.g. `RiskProfileEntry` on
+    `scr_client_risk_profile`) to avoid confusion with the crm record.
+  - `Client.applyRiskRating(String code, LocalDate reviewDue)` (domain; refuses an inactive client).
+  - Events `crm.service.ClientRegistered(companyId, clientId, code, type)` from `ClientService.create` /
+    `createProspect` (the `CLIENT_CREATE` bulk handler, quotation and account intake all create through it, so no
+    change was needed in `ClientBulkHandler`) and `crm.service.ClientIdentityChanged(companyId, clientId)` from
+    `ClientService.update` when last / first / middle / corporate name, birth date, nationality, TIN, ID type or ID
+    number changes. Both are published inside the transaction; screening listens with
+    `@TransactionalEventListener(AFTER_COMMIT)`.
+- **workflow contract.** `WorkflowService.overrideDue(Long caseId, Instant dueAt, String reason)` (null clears the SLA;
+  refused on a closed case; history action `WorkflowService.SLA_OVERRIDE` = "sla_override", from = to = current stage,
+  comment = reason; audited). `WorkAssignmentService.assign(Long caseId, String assignee, List<String> eligibleUsers,
+  String reasonCode, String comment)`: with a reason or comment it writes a history row (action
+  `WorkAssignmentService.REASSIGN` = "reassign", reason code, comment "previous -> assignee: comment"); the
+  three-argument form delegates with nulls and writes no history row (unchanged behaviour). The caller validates the
+  reason against `SCR_REASSIGN_REASON`.
+- **attachment contract.** `DocumentNamingService.nominate(NamingPattern pattern, NamingFacts facts)`;
+  `NamingPattern.DEFAULT` (the existing syntax, unchanged) and `NamingPattern.SCREENING`
+  (`<FORM_TYPE>_<CLIENT_NAME>_<yyyyMMdd>_<DOCTYPE>_<n>.<ext>`, e.g. `KYC-REVIEW_DELA-CRUZ-JUAN_20260915_VALID-ID_1.jpg`;
+  no date gives `NODATE`); `NamingFacts(reference, formType, clientName, dateReceived, documentType, sequence,
+  originalName)` and `NamingFacts.of(reference, documentType, sequence, originalName)`. The existing four-argument
+  method is unchanged. The upload options of `DocumentService` still use DEFAULT: S1-C calls `nominate(SCREENING, ...)`
+  itself and stores the result in `scr_case_document.nominated_name`.
+- **report contract.** `ReportCategory.COMPLIANCE("Compliance")`; `ReportMetadata.compliance(code, title,
+  description, parameters)` (view and export SCR_REPORT_VIEW, archived).
+- **Navigation.** Group Client & Policy, section **Sanction Screening** after Client Management
+  (`features/screening/module.ts`, module id `screening`, help id `screening`): `/screening` "Screening Home"
+  (SCR_VIEW), a landing screen until S1-C adds the tiles. Group Setup & Administration, section **Compliance Setup**
+  after Broking Setup (`features/screening/setupModule.ts`, module id `screening-setup`, help id `screening-setup`):
+  `/screening-setup/config` "Configuration Versions" (SCR_CONFIG_MAINTAIN, also SCR_CONFIG_APPROVE,
+  SCR_LIST_MAINTAIN, SCR_LIST_APPROVE), a landing screen until S1-A adds the editor. Both help sections are in
+  `features/screening/help.ts` (`SCREENING_HELP`, `SCREENING_SETUP_HELP`), registered in `HELP_SECTIONS` in sidebar
+  order. S1-A / S1-B / S1-C add their routes to these two modules and their help entries to these two sections.
+- **Jobs.** Crons in `application.yml` and `docs/operations/CONFIGURATION.md`, in UTC for the PHT times of section 8:
+  `brokerverse.jobs.scr-watchlist-ingest-cron` `0 0 17 * * *` (01:00 PHT), `scr-periodic-screening-cron`
+  `0 30 17 * * *` (01:30 PHT), `scr-sla-monitor-cron` `0 0 * * * *`, `scr-ingest-error-digest-cron`
+  `0 0 23 * * SUN-THU` (07:00 PHT Monday to Friday). Each job reads its cron with
+  `@Value("${brokerverse.jobs.<property>:-}")`.
+- **Flyway left to the build waves.** As section 3: S1-A V1051, V1052, demo V1950; S1-B V1053, demo V1951; S1-C V1054,
+  V1055, demo V1952; V1056-V1059 and V1953-V1959 free.
+- **Parked in S0.** The Operations Lead grants (SQ19), the committee rule and size values (SQ15), the disposition list
+  (SQ06), the STR reasons (SQ09) and the ingestion alert recipients (SQ01) are placeholders, as listed in section 14.
+  The optional gate `ClientComplianceGate` is not built (SQ07).

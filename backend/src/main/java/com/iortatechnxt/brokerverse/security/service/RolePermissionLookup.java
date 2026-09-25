@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.service;
 
+import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
 import java.util.List;
 import org.springframework.cache.annotation.Cacheable;
@@ -8,7 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Cached role to permission resolution ({@link SecurityCaches#ROLE_PERMISSIONS}), used on every
- * authenticated request to build the user's authorities.
+ * authenticated request to build the user's authorities. A deactivated role grants nothing (BRD
+ * 3.002.3); role changes evict the cache.
  */
 @Service
 public class RolePermissionLookup {
@@ -28,7 +30,7 @@ public class RolePermissionLookup {
    * Permissions granted by a role.
    *
    * @param roleCode role code
-   * @return permission names, sorted; empty for an unknown role
+   * @return permission names, sorted; empty for an unknown or inactive role
    */
   @Cacheable(cacheNames = SecurityCaches.ROLE_PERMISSIONS, key = "#roleCode")
   @Transactional(readOnly = true)
@@ -37,6 +39,7 @@ public class RolePermissionLookup {
         roleCode,
         roles
             .findByCode(roleCode)
+            .filter(Role::isActive)
             .map(r -> r.getPermissions().stream().map(Enum::name).sorted().toList())
             .orElse(List.of()));
   }

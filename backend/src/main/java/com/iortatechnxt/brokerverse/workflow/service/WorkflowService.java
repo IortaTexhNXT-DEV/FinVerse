@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.workflow.domain.WorkCaseRepository;
 import com.iortatechnxt.brokerverse.workflow.domain.WorkflowStage;
 import com.iortatechnxt.brokerverse.workflow.domain.WorkflowTransition;
 import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,9 @@ public class WorkflowService {
 
   /** Audit entity type of work cases. */
   public static final String ENTITY = "WorkCase";
+
+  /** History action of a due-time override. */
+  public static final String SLA_OVERRIDE = "sla_override";
 
   private final WorkCaseRepository cases;
   private final WorkCaseHistoryRepository history;
@@ -263,6 +267,40 @@ public class WorkflowService {
       sb.append(" - ").append(note.comment());
     }
     return sb.toString();
+  }
+
+  /**
+   * Overrides the due time of a case's current stage (SNSRP-108): business modules with a dated SLA
+   * matrix set the due time the matrix gives; {@code wf_stage.sla_hours} stays the default. The
+   * override is kept in the status history (action {@value #SLA_OVERRIDE}) and audited.
+   *
+   * @param caseId case
+   * @param dueAt new due time; null removes the SLA of the stage
+   * @param reason why (e.g. the SLA rule applied), kept as the history comment
+   * @return the case
+   */
+  public WorkCase overrideDue(Long caseId, Instant dueAt, String reason) {
+    WorkCase workCase =
+        cases.findById(caseId).orElseThrow(() -> new ResourceNotFoundException(ENTITY, caseId));
+    if (workCase.isClosed()) {
+      throw new BusinessRuleException("WORK_CASE_CLOSED", "The item is closed");
+    }
+    Instant previous = workCase.getDueAt();
+    workCase.overrideDue(dueAt);
+    history.save(
+        new WorkCaseHistory(
+            workCase.getId(),
+            new StageChange(
+                workCase.getStageCode(), workCase.getStageCode(), SLA_OVERRIDE, null, reason),
+            currentUser.username(),
+            currentUser.optionalUsername().isEmpty(),
+            clock.instant()));
+    audit.record(
+        ENTITY,
+        workCase.getReference(),
+        AuditAction.UPDATE,
+        "Due time " + previous + " -> " + dueAt + (reason == null ? "" : " - " + reason));
+    return workCase;
   }
 
   /**

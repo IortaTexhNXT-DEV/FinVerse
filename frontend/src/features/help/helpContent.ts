@@ -20,6 +20,7 @@ import { QUOTATIONS_HELP } from '@/features/quotations/help';
 import { PLANNING_HELP } from '@/features/closing/help';
 import { GL_HELP } from '@/features/gl/help';
 import { ISSUANCE_HELP } from '@/features/issuance/help';
+import { USER_ACCESS_HELP } from '@/features/nbadmin/help';
 import { NB_DASHBOARD_HELP, NB_REPORTS_HELP } from '@/features/nbreports/help';
 import { OPERATIONS_HELP } from '@/features/operations/help';
 import { PAYABLES_HELP } from '@/features/payables/help';
@@ -31,6 +32,7 @@ import { RECEIVABLES_HELP } from '@/features/receivables/help';
 import { REINSURANCE_HELP } from '@/features/reinsurance/help';
 import { REMITTANCE_HELP } from '@/features/remittance/help';
 import { RESERVES_HELP } from '@/features/reserves/help';
+import { SCREENING_HELP, SCREENING_SETUP_HELP } from '@/features/screening/help';
 import { SETUP_HELP } from '@/features/setup/help';
 import { TAX_HELP } from '@/features/tax/help';
 import { UNDERWRITING_HELP } from '@/features/underwriting/help';
@@ -111,6 +113,7 @@ export const HELP_SECTIONS: HelpSection[] = [
   NB_DASHBOARD_HELP,
   WORKSPACE_HELP,
   CRM_HELP,
+  SCREENING_HELP,
   QUOTATIONS_HELP,
   ACCOUNTS_HELP,
   PROPOSALS_HELP,
@@ -166,7 +169,9 @@ export const HELP_SECTIONS: HelpSection[] = [
     ],
   },
   BROKING_SETUP_HELP,
+  SCREENING_SETUP_HELP,
   SETUP_HELP,
+  USER_ACCESS_HELP,
   ADMIN_HELP,
   {
     id: 'account',

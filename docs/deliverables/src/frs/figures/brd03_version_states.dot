@@ -1,0 +1,20 @@
+// BRD-3: package version states (catalog cat_product_version). FRS section 5.3; BRPM.006/007, PMADD06.
+digraph pm_versions {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.6, ranksep=0.45, bgcolor="white", pad=0.2];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=11, fontcolor="@NEAR_BLACK", width=2.2, height=0.55];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=8.5, fontcolor="@TEXT"];
+
+  DRAFT          [label="DRAFT\n(editable, not rated)"];
+  FOR_VALIDATION [label="FOR_VALIDATION"];
+  RELEASED       [label="RELEASED\n(sold to new business)", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  SUPERSEDED     [label="SUPERSEDED\n(renewals, endorsements)", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  EXPIRED        [label="EXPIRED\n(archived, searchable)", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  DRAFT -> FOR_VALIDATION [label="Submit for Validation\n(MBS)"];
+  FOR_VALIDATION -> RELEASED [label="Validate\n(PRODUCT_VALIDATE,\nnot the maker)"];
+  FOR_VALIDATION -> DRAFT [label="Return (reason)", style=dashed];
+  RELEASED -> SUPERSEDED [label="next version\neffective"];
+  RELEASED -> EXPIRED [label="package end date passed,\nno newer version"];
+  { rank=same; SUPERSEDED; EXPIRED; }
+}

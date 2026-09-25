@@ -9,6 +9,9 @@ import {
 } from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
+import { BILLING_SCREENS } from './billing/screens';
+import { ESCALATION_SCREENS } from './escalations/screens';
+import { PLAN_SCREENS } from './plans/screens';
 
 /**
  * Collections (BRD-4, BRCLXN.001-060; docs/architecture/COLLECTIONS_DESIGN.md section 11): the
@@ -52,6 +55,9 @@ export const collectionsModule: FeatureModule = {
       component: lazy(() => import('./ClientViewPage')),
       hidden: true,
     },
+    ...PLAN_SCREENS,
+    ...ESCALATION_SCREENS,
+    ...BILLING_SCREENS,
     {
       path: '/collections/assignments',
       label: 'Assignments',

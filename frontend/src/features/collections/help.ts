@@ -1,4 +1,7 @@
 import type { HelpSection } from '@/features/help/helpContent';
+import { BILLING_HELP } from './billing/helpEntries';
+import { ESCALATION_HELP } from './escalations/helpEntries';
+import { PLAN_HELP } from './plans/helpEntries';
 
 /** In-app help of the Collections screens (BRCLXN.001-060), in sidebar order. */
 export const COLLECTIONS_HELP: HelpSection = {
@@ -34,6 +37,9 @@ export const COLLECTIONS_HELP: HelpSection = {
         'Export to Files produces the Outstanding PR List in the background, capped at CLX_EXPORT_MAX_ROWS, under CLX_EXPORT.',
       ],
     },
+    ...PLAN_HELP,
+    ...ESCALATION_HELP,
+    ...BILLING_HELP,
     {
       name: 'Assignments',
       path: '/collections/assignments',

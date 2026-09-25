@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -186,6 +187,7 @@ public class UserAdminService {
    * @param request request
    * @return role
    */
+  @CacheEvict(cacheNames = SecurityCaches.ROLE_PERMISSIONS, allEntries = true)
   public Role createRole(RoleRequest request) {
     if (roles.findByCode(request.code()).isPresent()) {
       throw new DuplicateResourceException(ROLE, request.code());
@@ -205,6 +207,7 @@ public class UserAdminService {
    * @param request request
    * @return role
    */
+  @CacheEvict(cacheNames = SecurityCaches.ROLE_PERMISSIONS, allEntries = true)
   public Role updateRole(Long id, RoleRequest request) {
     Role role = roles.findById(id).orElseThrow(() -> new ResourceNotFoundException(ROLE, id));
     role.setName(request.name());

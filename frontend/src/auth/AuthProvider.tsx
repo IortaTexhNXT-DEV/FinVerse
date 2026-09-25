@@ -24,6 +24,11 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   }, []);
 
   const logout = useCallback(() => {
+    if (tokenStore.get() !== null) {
+      // Revoke the token on the server (every instance refuses it from now on). The request reads
+      // the token before signOutHere clears it; a failure (already expired) changes nothing here.
+      api.post('/auth/logout').catch(() => undefined);
+    }
     signOutHere();
     tabSession().announceLogout();
   }, [signOutHere]);

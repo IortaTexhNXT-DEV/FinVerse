@@ -6,7 +6,9 @@ so the production support team can understand, trace and fix any module the same
 ## 1. Architecture in one page
 
 - **Modular monolith.** One Spring Boot application (`backend/`) and one React SPA (`frontend/`),
-  deployed as two containers against one PostgreSQL database.
+  deployed as two containers against one PostgreSQL database, with Redis 7 (cache, job locks,
+  session state) and Apache Kafka (integration events) as platform services
+  ([`PLATFORM_CACHE_AND_EVENTS.md`](../architecture/PLATFORM_CACHE_AND_EVENTS.md)).
 - **Modules = top-level packages** under `com.iortatechnxt.brokerverse`. Each module has the same inner
   layout:
 
@@ -65,6 +67,9 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
 | Paged API result | `common.api.PageResponse.of(page, Dto::from)` |
 | Reason payloads | `common.api.ReasonRequest` |
 | Reports | implement `report.core.ReportDefinition`; build with `TabularReportBuilder` |
+| Business event for other systems / async work | `events.service.IntegrationEventPublisher.publish(IntegrationEvent)` in your transaction (§10.8) |
+| Cached reference-data lookup | a `cache.service.CacheSpec` bean + `@Cacheable` read method returning records (§10.9) |
+| Company / branch codes and names on hot paths | `organization.service.OrganizationDirectory` (cached records) |
 
 ## 3. Coding conventions (Java)
 
@@ -92,7 +97,7 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
 
   | Range | Owner |
   |---|---|
-  | V1–V99 | platform (foundation, engine, party, sub-ledger) |
+  | V1–V99 | platform (foundation, engine, party, sub-ledger); V28 platform cache and events (job lock status `SKIPPED_LOCKED`, `sec_revoked_token`, `sys_shared_counter`, `evt_outbox`, `evt_archive`, `evt_dead_letter`) |
   | V100–V199 | underwriting |
   | V200–V299 | claims |
   | V300–V399 | reinsurance |
@@ -263,13 +268,18 @@ Implement `system.service.ManagedJob` (name, description, cron, `execute(busines
 use `@Scheduled` (the ArchUnit rule `BACKGROUND_WORK_IS_A_MANAGED_JOB` fails the build).
 `JobScheduler` schedules it (UTC cron, `"-"` = manual only), `JobRunService`
 records every run in `sys_job_run`, a failure raises `JOB_FAILURE`, and administrators see it on
-*Administration → Scheduled Jobs* with "Run now". For batch runs started from your own screen, wrap
+*Administration → Scheduled Jobs* with "Run now". Every run holds the cluster-wide `JobLock` of the
+job name (Redis, or a PostgreSQL advisory lock when Redis is disabled): with two or more replicas the
+job runs once, the other instances record `SKIPPED_LOCKED`. Do not add your own locking; do not call
+`JobRunService.execute` for a job name from inside a run of that same job (the lock is not
+re-entrant). For batch runs started from your own screen, wrap
 the work in `JobRunService.execute(jobName, JobTrigger.MANUAL, () -> new JobOutcome(n, message))`.
 Make the cron configurable (`brokerverse.jobs.<name>-cron`), add it to `application.yml` with an
 environment variable and document it in `docs/operations/CONFIGURATION.md`. Jobs today:
 `RECURRING_JOURNALS`, `ALERT_DAILY_CHECKS`, `PDC_ISSUED_DUE`, `QUOTATION_EXPIRY`, `HOLD_COVER_EXPIRY`,
 `BOOKING_BATCH` (daily), `PAYMENT_CONFIRMATION_SWEEP` (hourly), `MAIL_DISPATCH` (every two minutes),
-`KYC_REVIEW_DUE`, `RETENTION_REVIEW` (monthly) and `RESERVE_VALUATION`, `RI_ALLOCATION`,
+`KYC_REVIEW_DUE`, `RETENTION_REVIEW` (monthly), the platform jobs `EVENT_OUTBOX_RELAY` (every minute),
+`EVENT_HOUSEKEEPING`, `SHARED_STATE_CLEANUP` (daily) and `RESERVE_VALUATION`, `RI_ALLOCATION`,
 `QUOTATION_REQUEST_INTAKE`, `OPS_INVOICE_FEED_REPLAY` (manual unless scheduled). The crons of the Operations jobs built on top of the ledger are already configured (`brokerverse.jobs.prebooked-rematch-cron` … `dp-feedback-sla-cron`, see `docs/modules/OPERATIONS.md`).
 
 Planned jobs of the later BRDs (designed, not built; names, schedules and cron properties are in each design):
@@ -320,6 +330,84 @@ in `HELP_SECTIONS` (`frontend/src/features/help/helpContent.ts`) in sidebar orde
 screen route of a `features/*/module.ts` needs exactly one help entry with that `path`, and help
 links must point to menu screens; `helpContent.test.ts` fails the build otherwise. Add or update the
 entry together with the screen.
+
+### 10.8 Integration events (Kafka) – `events`, `integration`
+
+In-process Spring events stay for logic that runs **in the same transaction** (mirroring a stage,
+feeding the Operations ledger). A business fact that other systems or asynchronous work need goes out
+through the **transactional outbox** and Kafka.
+
+1. **Declare the topic** (once): an `events.service.IntegrationTopic` bean, name
+   `bibs.<domain>.<event>.v<version>`, with its event types. Platform topics are in
+   `integration.service.IntegrationTopics`; the dead-letter topic `<name>.dlt` is created with it.
+2. **Publish inside your transaction** – directly from your service, or (to leave a module untouched)
+   from an adapter listening to its Spring event before the commit:
+
+   ```java
+   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT, fallbackExecution = true)
+   public void on(PolicyIssued event) {
+     publisher.publish(
+         new IntegrationEvent(
+             "bibs.issuance.policy-issued.v1",     // declared topic
+             "issuance.policy.issued",             // event type
+             event.policyNo(),                     // key: events of a key keep their order
+             event.companyId(),                    // company (code resolved in the envelope)
+             new PolicyIssuedPayload(event.policyNo(), event.arn(), event.issueDate())));
+   }
+   ```
+
+   The row commits (or rolls back) with your change; after the commit the relay sends it. The payload
+   is a record of plain values: no entities, no personal data beyond identifiers, no secrets.
+3. **Consume** (asynchronous work in this application): a `@KafkaListener` bean
+   `@ConditionalOnProperty(name = EventsProperties.ENABLED_PROPERTY, havingValue = "true")`, group
+   `${brokerverse.kafka.consumer-group-prefix:bibs}-<purpose>`, reading the envelope with
+   `EventEnvelopeReader`. Make it **idempotent** (at-least-once delivery: deduplicate on `eventId` or
+   make the action repeatable) and keep a non-Kafka path when the work must also happen with Kafka off
+   (example: `NotificationDeliveryConsumer` and the `MAIL_DISPATCH` job).
+4. Test with Kafka off (`@IntegrationTest`: the row is `LOCAL` in `evt_outbox`) and, for consumers, in
+   a class extending `support.PlatformServicesSupport` (embedded Kafka and Redis).
+
+Failed events are on *Administration › Integration Events* (dead letters with retry, FAILED outbox rows).
+
+### 10.9 Cached lookups (Redis) – `cache`
+
+Cache reference data that is read on hot paths and changed rarely by administrators.
+
+1. **Declare the cache** in your module (the entity types listed clear it on any JPA change, on every
+   instance):
+
+   ```java
+   @Configuration(proxyBeanMethods = false)
+   public class TaxCaches {
+     public static final String RATES = "tax-rates";
+
+     @Bean
+     public CacheSpec taxRatesCache() {
+       return CacheSpec.of(RATES, Duration.ofHours(1), TaxRate.class, TaxCode.class);
+     }
+   }
+   ```
+
+   Name `<module>-<content>`; the time to live can be overridden with `brokerverse.cache.ttl.<name>`
+   (add it to `application.yml` and `CONFIGURATION.md`). Use `.servedOnlyOutsideWriteTransactions()`
+   when the value is derived from many entities written in many places (the catalog).
+2. **Read through a `@Cacheable` method of a separate bean** (self-invocation is not proxied) that
+   returns an immutable **record** (or a string, number or list of records), never an entity:
+
+   ```java
+   @Cacheable(cacheNames = TaxCaches.RATES, key = "#code + ':' + #date")
+   @Transactional(readOnly = true)
+   public TaxRateView rate(String code, LocalDate date) { ... }
+   ```
+
+   Keys are the natural lookup keys; the value is stored as JSON on Redis (only application types are
+   deserialized).
+3. **Evict on write**: the listed entity types already clear the cache; also put
+   `@CacheEvict(cacheNames = TaxCaches.RATES, allEntries = true)` on your maintenance service methods so
+   a read later in the same request sees the change.
+4. Changes made with SQL outside JPA are not seen: say so in your module guide (support flushes with
+   `POST /api/v1/admin/caches/{name}/clear`). In tests that change such tables with `JdbcTemplate`,
+   clear the cache after the update.
 
 ## 11. Module documentation
 

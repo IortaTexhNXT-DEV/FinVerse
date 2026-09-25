@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.util.List;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
  * Maintains the enterprise structure: companies, branches and holiday calendars.
  *
  * <p>Companies and branches follow maker-checker: every change must be authorized by another user
- * before the record can be used for posting.
+ * before the record can be used for posting. Every change clears the organisation cache read by
+ * {@link OrganizationDirectory}.
  */
 @Service
 @Transactional
@@ -112,6 +114,7 @@ public class OrganizationService {
    * @param request request
    * @return created company
    */
+  @CacheEvict(cacheNames = OrganizationCaches.UNITS, allEntries = true)
   public Company createCompany(CompanyRequest request) {
     if (companies.existsByCode(request.code())) {
       throw new DuplicateResourceException(COMPANY, request.code());
@@ -131,6 +134,7 @@ public class OrganizationService {
    * @param request request
    * @return updated company
    */
+  @CacheEvict(cacheNames = OrganizationCaches.UNITS, allEntries = true)
   public Company updateCompany(Long id, CompanyRequest request) {
     Company company = getCompany(id);
     company.setName(request.name());
@@ -147,6 +151,7 @@ public class OrganizationService {
    * @param id company id
    * @return authorized company
    */
+  @CacheEvict(cacheNames = OrganizationCaches.UNITS, allEntries = true)
   public Company authorizeCompany(Long id) {
     Company company = getCompany(id);
     company.authorize(currentUser.username(), clock.instant());
@@ -198,6 +203,7 @@ public class OrganizationService {
    * @param request request
    * @return created branch
    */
+  @CacheEvict(cacheNames = OrganizationCaches.UNITS, allEntries = true)
   public Branch createBranch(BranchRequest request) {
     Company company = getCompany(request.companyId());
     if (branches.existsByCompanyIdAndCode(company.getId(), request.code())) {
@@ -217,6 +223,7 @@ public class OrganizationService {
    * @param request request
    * @return updated branch
    */
+  @CacheEvict(cacheNames = OrganizationCaches.UNITS, allEntries = true)
   public Branch updateBranch(Long id, BranchRequest request) {
     Branch branch = getBranch(id);
     branch.setName(request.name());
@@ -233,6 +240,7 @@ public class OrganizationService {
    * @param id branch id
    * @return authorized branch
    */
+  @CacheEvict(cacheNames = OrganizationCaches.UNITS, allEntries = true)
   public Branch authorizeBranch(Long id) {
     Branch branch = getBranch(id);
     branch.authorize(currentUser.username(), clock.instant());
@@ -246,6 +254,7 @@ public class OrganizationService {
    * @param id branch id
    * @return deactivated branch
    */
+  @CacheEvict(cacheNames = OrganizationCaches.UNITS, allEntries = true)
   public Branch deactivateBranch(Long id) {
     Branch branch = getBranch(id);
     branch.deactivate();

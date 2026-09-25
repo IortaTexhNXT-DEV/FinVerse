@@ -57,7 +57,7 @@ public class LovController {
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
           LocalDate date) {
     LocalDate on = date == null ? LocalDate.now(clock) : date;
-    return service.activeValues(type, on).stream().map(LovOption::from).toList();
+    return service.options(type, on).stream().map(LovOption::from).toList();
   }
 
   /**

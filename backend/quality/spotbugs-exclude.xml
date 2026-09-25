@@ -47,6 +47,15 @@
     <Class name="com.iortatechnxt.brokerverse.config.SecurityConfig"/>
     <Bug pattern="SERVLET_HEADER"/>
   </Match>
+  <!--
+    SERVLET_HEADER in CorrelationIdFilter: X-Correlation-Id is only a log / event correlation label.
+    It is used only when it matches [A-Za-z0-9_-]{1,64} (otherwise a new UUID is generated), carries
+    no authority and is never used in a query or a file name.
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.brokerverse.events.service.CorrelationIdFilter"/>
+    <Bug pattern="SERVLET_HEADER"/>
+  </Match>
   <!-- Generated/test code is not part of the production artefact. -->
   <Match>
     <Class name="~.*Test.*"/>

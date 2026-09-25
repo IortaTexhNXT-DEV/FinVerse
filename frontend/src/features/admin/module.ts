@@ -1,4 +1,5 @@
 import {
+  Cable,
   History,
   Server,
   ShieldCheck,
@@ -55,6 +56,13 @@ export const adminModule: FeatureModule = {
       icon: Timer,
       permission: 'SYSTEM_MONITOR',
       component: lazy(() => import('@/features/system/ScheduledJobsPage')),
+    },
+    {
+      path: '/admin/integration-events',
+      label: 'Integration Events',
+      icon: Cable,
+      permission: 'SYSTEM_PARAMETER_MANAGE',
+      component: lazy(() => import('@/features/system/IntegrationEventsPage')),
     },
     {
       path: '/admin/info',

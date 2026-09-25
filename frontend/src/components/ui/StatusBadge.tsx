@@ -87,6 +87,11 @@ const TONE_GROUPS: Record<Tone, string[]> = {
   ],
   neutral: [
     'DRAFT',
+    // platform: job run not started (another instance ran it), event delivered in-process
+    'SKIPPED_LOCKED',
+    'LOCAL',
+    'DISCARDED',
+    'RETRIED',
     'FUTURE',
     'INACTIVE',
     'CANCELLED',

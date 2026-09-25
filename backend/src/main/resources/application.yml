@@ -46,6 +46,51 @@ spring:
   threads:
     virtual:
       enabled: true
+  # ---- Redis 7 (caches, job locks, token denylist, shared counters); brokerverse.redis.enabled ----
+  data:
+    redis:
+      client-type: lettuce
+      host: ${BROKERVERSE_REDIS_HOST:localhost}
+      port: ${BROKERVERSE_REDIS_PORT:6379}
+      username: ${BROKERVERSE_REDIS_USERNAME:}
+      password: ${BROKERVERSE_REDIS_PASSWORD:}
+      database: ${BROKERVERSE_REDIS_DATABASE:0}
+      timeout: ${BROKERVERSE_REDIS_TIMEOUT:2s}
+      connect-timeout: ${BROKERVERSE_REDIS_CONNECT_TIMEOUT:5s}
+      ssl:
+        # true for AWS ElastiCache with in-transit encryption.
+        enabled: ${BROKERVERSE_REDIS_TLS:false}
+      repositories:
+        enabled: false
+  # ---- Apache Kafka 3.6+ (integration events); brokerverse.kafka.enabled ----
+  kafka:
+    bootstrap-servers: ${BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    client-id: ${BROKERVERSE_KAFKA_CLIENT_ID:brokerverse}
+    properties:
+      # PLAINTEXT locally; SASL_SSL with SCRAM-SHA-512 on Amazon MSK (see CONFIGURATION.md).
+      security.protocol: ${BROKERVERSE_KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+      sasl.mechanism: ${BROKERVERSE_KAFKA_SASL_MECHANISM:SCRAM-SHA-512}
+      sasl.jaas.config: ${BROKERVERSE_KAFKA_SASL_JAAS_CONFIG:}
+      # Topics are created by the application (KafkaAdmin), never implicitly by a client.
+      allow.auto.create.topics: false
+    producer:
+      acks: all
+      retries: 2147483647
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+        delivery.timeout.ms: ${BROKERVERSE_KAFKA_DELIVERY_TIMEOUT_MS:30000}
+        request.timeout.ms: 15000
+        max.block.ms: ${BROKERVERSE_KAFKA_MAX_BLOCK_MS:15000}
+    consumer:
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      properties:
+        isolation.level: read_committed
+    admin:
+      # Do not refuse to start when the broker is briefly unreachable; topics are created later.
+      fail-fast: false
+      auto-create: ${BROKERVERSE_KAFKA_CREATE_TOPICS:true}
   servlet:
     multipart:
       # Must be >= brokerverse.attachments.max-size (the service applies the business limit).
@@ -69,8 +114,45 @@ brokerverse:
     allowed-origins: ${BROKERVERSE_ALLOWED_ORIGINS:http://localhost:5173}
     # Failed logins that lock an account when the business parameter LOGIN_MAX_FAILED_ATTEMPTS is missing.
     max-failed-attempts: ${BROKERVERSE_MAX_FAILED_ATTEMPTS:5}
+    login-protection:
+      # Login requests accepted per client address and window (HTTP 429 above), shared by all pods.
+      max-attempts-per-window: ${BROKERVERSE_LOGIN_RATE_LIMIT:20}
+      rate-limit-window: ${BROKERVERSE_LOGIN_RATE_WINDOW:PT1M}
+      # Life of the shared failed-login counter of a user (the user record stays the reference).
+      failed-attempt-window: ${BROKERVERSE_LOGIN_FAILURE_WINDOW:P1D}
   attachments:
     max-size: ${BROKERVERSE_ATTACHMENT_MAX_SIZE:10MB}
+  # ---- Platform cache and events, docs/architecture/PLATFORM_CACHE_AND_EVENTS.md ----
+  redis:
+    # true: Redis for caches, job locks, token denylist and shared counters (spring.data.redis.*);
+    # false: in-memory cache, PostgreSQL advisory job locks and the V28 tables.
+    enabled: ${BROKERVERSE_REDIS_ENABLED:true}
+    key-prefix: ${BROKERVERSE_REDIS_KEY_PREFIX:bv:}
+  cache:
+    # Per-cache time to live (ISO-8601), overriding the defaults of the declarations.
+    ttl:
+      lov-values: ${BROKERVERSE_CACHE_TTL_LOV:PT1H}
+      system-parameters: ${BROKERVERSE_CACHE_TTL_PARAMETERS:PT15M}
+      security-role-permissions: ${BROKERVERSE_CACHE_TTL_ROLE_PERMISSIONS:PT15M}
+      catalog-product-versions: ${BROKERVERSE_CACHE_TTL_CATALOG:PT1H}
+      organization-units: ${BROKERVERSE_CACHE_TTL_ORGANIZATION:PT1H}
+    # Entries per cache of the in-memory fallback.
+    maximum-size: ${BROKERVERSE_CACHE_MAX_SIZE:10000}
+  kafka:
+    # true: the outbox is relayed to Kafka (spring.kafka.*) and the consumers run;
+    # false: events are recorded as delivered in-process (LOCAL) and e-mails go out after commit.
+    enabled: ${BROKERVERSE_KAFKA_ENABLED:true}
+    partitions: ${BROKERVERSE_KAFKA_PARTITIONS:3}
+    replication-factor: ${BROKERVERSE_KAFKA_REPLICATION_FACTOR:1}
+    consumer-group-prefix: ${BROKERVERSE_KAFKA_GROUP_PREFIX:bibs}
+    relay-batch-size: ${BROKERVERSE_KAFKA_RELAY_BATCH_SIZE:200}
+    relay-max-attempts: ${BROKERVERSE_KAFKA_RELAY_MAX_ATTEMPTS:10}
+    relay-retry-backoff: ${BROKERVERSE_KAFKA_RELAY_RETRY_BACKOFF:PT30S}
+    send-timeout: ${BROKERVERSE_KAFKA_SEND_TIMEOUT:PT30S}
+    consumer-retries: ${BROKERVERSE_KAFKA_CONSUMER_RETRIES:3}
+    consumer-retry-backoff: ${BROKERVERSE_KAFKA_CONSUMER_RETRY_BACKOFF:PT2S}
+    outbox-retention: ${BROKERVERSE_KAFKA_OUTBOX_RETENTION:P30D}
+    archive-retention: ${BROKERVERSE_KAFKA_ARCHIVE_RETENTION:P400D}
   mail:
     # true = deliver through the SMTP server configured with spring.mail.* (MAIL_HOST ...);
     # false = simulated delivery (outbox and send log only). See docs/operations/CONFIGURATION.md.
@@ -90,6 +172,15 @@ brokerverse:
     quotation-expiry-cron: ${BROKERVERSE_JOB_QUOTATION_EXPIRY_CRON:0 45 0 * * *}
     # Outbox relay: delivers queued e-mails and retries failed attempts.
     mail-dispatch-cron: ${BROKERVERSE_JOB_MAIL_DISPATCH_CRON:0 */2 * * * *}
+    # ---- Platform: job lock, integration events, shared state (PLATFORM_CACHE_AND_EVENTS.md) ----
+    # Lease of the Redis job lock, renewed every third of it while the job runs.
+    lock-lease: ${BROKERVERSE_JOB_LOCK_LEASE:PT2M}
+    # Integration event outbox: sends what the after-commit relay left and the due retries.
+    event-outbox-relay-cron: ${BROKERVERSE_JOB_EVENT_OUTBOX_RELAY_CRON:0 * * * * *}
+    # Deletes delivered outbox rows, old archived events and resolved dead letters.
+    event-housekeeping-cron: ${BROKERVERSE_JOB_EVENT_HOUSEKEEPING_CRON:0 50 0 * * *}
+    # Deletes expired revoked tokens and counters of the database fallback of Redis.
+    shared-state-cleanup-cron: ${BROKERVERSE_JOB_SHARED_STATE_CLEANUP_CRON:0 40 0 * * *}
     # Monthly KYC review (BRNB.110): expires overdue KYC and notifies Account Officers.
     kyc-review-due-cron: ${BROKERVERSE_JOB_KYC_REVIEW_DUE_CRON:0 0 2 1 * *}
     # Monthly data retention review (BRNB.106): counts eligible records; never deletes.
@@ -163,6 +254,9 @@ brokerverse:
 
 management:
   health:
+    redis:
+      # Reported only when Redis is in use (a disabled Redis must not take readiness down).
+      enabled: ${BROKERVERSE_REDIS_ENABLED:true}
     mail:
       # The SMTP check is meaningful only when real delivery is on; with simulated delivery it would
       # report DOWN and take the whole health endpoint (load balancer checks) down with it.

@@ -190,6 +190,23 @@ class ApiSmokeIT {
   @ParameterizedTest
   @ValueSource(
       strings = {
+        // platform cache and integration events (System Administrator)
+        "/api/v1/admin/caches",
+        "/api/v1/admin/events/topics",
+        "/api/v1/admin/events/outbox",
+        "/api/v1/admin/events/outbox?status=FAILED&topic=bibs.booking.invoice-booked.v1&key=X",
+        "/api/v1/admin/events/archive?correlationId=none",
+        "/api/v1/admin/events/dead-letters",
+        "/api/v1/admin/events/dead-letters?status=ALL&page=1&size=500",
+      })
+  @WithUserDetails("admin")
+  void platformSupportEndpointsRespondOk(String url) throws Exception {
+    mvc.perform(get(url)).andExpect(status().isOk());
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
         "/api/v1/receivables/receipts?companyId={c}",
         "/api/v1/receivables/deposits/slips?companyId={c}",
         "/api/v1/receivables/pdcs?companyId={c}",

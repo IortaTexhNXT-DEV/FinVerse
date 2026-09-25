@@ -19,7 +19,10 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Delivers queued e-mails, one message per transaction: right after the business transaction
- * commits and, for anything left (server down, retries), in the {@code MAIL_DISPATCH} job.
+ * commits and, for anything left (server down, retries), in the {@code MAIL_DISPATCH} job. When
+ * Kafka is enabled ({@code brokerverse.kafka.enabled}) the immediate delivery is done by the
+ * consumer of {@code bibs.messaging.notification-requested.v1} instead (asynchronous, see {@code
+ * integration.service.NotificationDeliveryConsumer}); the job stays the safety net.
  */
 @Service
 public class MailDispatcher {
@@ -45,6 +48,8 @@ public class MailDispatcher {
    * @param clock clock
    * @param dispatchOnCommit deliver right after the commit ({@code
    *     brokerverse.mail.dispatch-on-commit}); when false only the job delivers
+   * @param kafkaDelivers true when the Kafka consumer delivers queued messages ({@code
+   *     brokerverse.kafka.enabled}); the delivery after commit is then skipped
    */
   public MailDispatcher(
       OutboundMessageRepository messages,
@@ -53,7 +58,8 @@ public class MailDispatcher {
       SystemParameterService parameters,
       PlatformTransactionManager txManager,
       Clock clock,
-      @Value("${brokerverse.mail.dispatch-on-commit:true}") boolean dispatchOnCommit) {
+      @Value("${brokerverse.mail.dispatch-on-commit:true}") boolean dispatchOnCommit,
+      @Value("${brokerverse.kafka.enabled:false}") boolean kafkaDelivers) {
     this.messages = messages;
     this.attachments = attachments;
     this.transport = transport;
@@ -61,7 +67,7 @@ public class MailDispatcher {
     this.tx = new TransactionTemplate(txManager);
     this.tx.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
     this.clock = clock;
-    this.dispatchOnCommit = dispatchOnCommit;
+    this.dispatchOnCommit = dispatchOnCommit && !kafkaDelivers;
   }
 
   /**

@@ -1,9 +1,21 @@
 spring:
   flyway:
     locations: classpath:db/migration,classpath:db/demo
+management:
+  health:
+    redis:
+      enabled: false
 brokerverse:
   security:
     jwt-secret: test-secret-for-automated-tests-0123456789abcdef
+    login-protection:
+      # MockMvc logs in many times from one address; the limiter has its own tests.
+      max-attempts-per-window: 100000
+  # No Redis or Kafka in the test profile: in-memory cache, database fallbacks, events LOCAL.
+  redis:
+    enabled: false
+  kafka:
+    enabled: false
 logging:
   level:
     root: WARN

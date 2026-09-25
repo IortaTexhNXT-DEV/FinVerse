@@ -2,7 +2,10 @@ package com.iortatechnxt.brokerverse.config;
 
 import com.iortatechnxt.brokerverse.security.service.JwtAuthenticationFilter;
 import com.iortatechnxt.brokerverse.security.service.JwtTokenService;
+import com.iortatechnxt.brokerverse.security.service.LoginRateLimitFilter;
+import com.iortatechnxt.brokerverse.security.service.LoginRateLimiter;
 import com.iortatechnxt.brokerverse.security.service.SecurityProperties;
+import com.iortatechnxt.brokerverse.security.service.TokenRevocationStore;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +48,8 @@ public class SecurityConfig {
 
   /** Login is exempt from CSRF: it carries credentials in the body and establishes no session. */
   private static final RequestMatcher LOGIN =
-      PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/v1/auth/login");
+      PathPatternRequestMatcher.withDefaults()
+          .matcher(HttpMethod.POST, LoginRateLimitFilter.LOGIN_PATH);
 
   /**
    * Password hashing (BCrypt, cost 12).
@@ -79,6 +83,8 @@ public class SecurityConfig {
    * @param tokens token service
    * @param userDetailsService user loader
    * @param properties security properties
+   * @param revocations token denylist (logout)
+   * @param loginRateLimiter login rate limit
    * @return filter chain
    * @throws Exception on configuration error
    */
@@ -89,8 +95,12 @@ public class SecurityConfig {
       HttpSecurity http,
       JwtTokenService tokens,
       UserDetailsService userDetailsService,
-      SecurityProperties properties)
+      SecurityProperties properties,
+      TokenRevocationStore revocations,
+      LoginRateLimiter loginRateLimiter)
       throws Exception {
+    JwtAuthenticationFilter jwt =
+        new JwtAuthenticationFilter(tokens, userDetailsService, revocations);
     http.csrf(c -> c.ignoringRequestMatchers(SecurityConfig::carriesBearerToken, LOGIN))
         .cors(c -> c.configurationSource(corsSource(properties.allowedOrigins())))
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -118,9 +128,8 @@ public class SecurityConfig {
                     .hasAuthority("SYSTEM_PARAMETER_MANAGE")
                     .anyRequest()
                     .authenticated())
-        .addFilterBefore(
-            new JwtAuthenticationFilter(tokens, userDetailsService),
-            UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwt, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(new LoginRateLimitFilter(loginRateLimiter), JwtAuthenticationFilter.class);
     return http.build();
   }
 

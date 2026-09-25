@@ -32,7 +32,7 @@ public class JobRun extends BaseEntity {
   private Instant finishedAt;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false, length = 10)
+  @Column(nullable = false, length = 20)
   private JobRunStatus status = JobRunStatus.RUNNING;
 
   @Column(name = "items_processed", nullable = false)
@@ -77,6 +77,16 @@ public class JobRun extends BaseEntity {
    */
   public void fail(String text, Instant when) {
     finish(JobRunStatus.FAILED, itemsProcessed, text, when);
+  }
+
+  /**
+   * Completes the run as skipped: another instance holds the job lock.
+   *
+   * @param text reason
+   * @param when finish time
+   */
+  public void skipLocked(String text, Instant when) {
+    finish(JobRunStatus.SKIPPED_LOCKED, 0, text, when);
   }
 
   private void finish(JobRunStatus result, int items, String text, Instant when) {

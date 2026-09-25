@@ -9,10 +9,14 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 import javax.crypto.SecretKey;
 import org.springframework.stereotype.Service;
 
-/** Issues and validates signed JWT access tokens (HS256). */
+/**
+ * Issues and validates signed JWT access tokens (HS256). Every token carries a unique {@code jti}
+ * (token id) so it can be revoked before it expires (logout, {@link TokenRevocationStore}).
+ */
 @Service
 public class JwtTokenService {
 
@@ -38,20 +42,22 @@ public class JwtTokenService {
    * Issues a token for a user.
    *
    * @param username subject
-   * @return issued token and its expiry
+   * @return issued token, its id and its expiry
    */
   public IssuedToken issue(String username) {
     Instant now = clock.instant();
     Instant expiry = now.plus(properties.tokenValidity());
+    String tokenId = UUID.randomUUID().toString();
     String token =
         Jwts.builder()
+            .id(tokenId)
             .issuer(ISSUER)
             .subject(username)
             .issuedAt(Date.from(now))
             .expiration(Date.from(expiry))
             .signWith(key)
             .compact();
-    return new IssuedToken(token, expiry);
+    return new IssuedToken(token, expiry, tokenId);
   }
 
   /**
@@ -61,6 +67,16 @@ public class JwtTokenService {
    * @return username when the token is valid and unexpired
    */
   public Optional<String> validate(String token) {
+    return parse(token).map(TokenClaims::username);
+  }
+
+  /**
+   * Validates a token and extracts its claims.
+   *
+   * @param token compact JWT
+   * @return claims when the token is valid and unexpired
+   */
+  public Optional<TokenClaims> parse(String token) {
     try {
       Claims claims =
           Jwts.parser()
@@ -70,17 +86,32 @@ public class JwtTokenService {
               .build()
               .parseSignedClaims(token)
               .getPayload();
-      return Optional.ofNullable(claims.getSubject());
+      if (claims.getSubject() == null) {
+        return Optional.empty();
+      }
+      Instant expiresAt =
+          claims.getExpiration() == null ? null : claims.getExpiration().toInstant();
+      return Optional.of(new TokenClaims(claims.getSubject(), claims.getId(), expiresAt));
     } catch (JwtException | IllegalArgumentException ex) {
       return Optional.empty();
     }
   }
 
   /**
-   * A signed token with its expiry.
+   * A signed token with its id and expiry.
    *
    * @param token compact JWT
    * @param expiresAt expiry instant
+   * @param tokenId unique token id ({@code jti})
    */
-  public record IssuedToken(String token, Instant expiresAt) {}
+  public record IssuedToken(String token, Instant expiresAt, String tokenId) {}
+
+  /**
+   * Claims of a valid token.
+   *
+   * @param username subject
+   * @param tokenId token id ({@code jti}); null for tokens issued before token ids existed
+   * @param expiresAt expiry
+   */
+  public record TokenClaims(String username, String tokenId, Instant expiresAt) {}
 }

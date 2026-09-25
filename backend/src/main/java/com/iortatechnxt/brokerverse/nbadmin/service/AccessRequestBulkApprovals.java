@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.approval.service.BulkApprovalAction;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
+import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -17,36 +18,45 @@ import org.springframework.stereotype.Component;
 public class AccessRequestBulkApprovals implements BulkApprovalAction {
 
   private final AccessRequestService requests;
+  private final AccessDecisionService decisions;
   private final CurrentUser currentUser;
 
   /**
    * Creates the component.
    *
    * @param requests access requests
+   * @param decisions decisions
    * @param currentUser current user
    */
-  public AccessRequestBulkApprovals(AccessRequestService requests, CurrentUser currentUser) {
+  public AccessRequestBulkApprovals(
+      AccessRequestService requests, AccessDecisionService decisions, CurrentUser currentUser) {
     this.requests = requests;
+    this.decisions = decisions;
     this.currentUser = currentUser;
   }
 
   @Override
   public boolean supports(String module, String type) {
-    return "BROKING_ADMIN".equals(module) && "Access request".equals(type);
+    return AccessRequestApprovalSource.MODULE.equals(module)
+        && AccessRequestApprovalSource.TYPE.equals(type);
   }
 
   @Override
   public String approve(Long companyId, String reference) {
-    if (!currentUser.hasAuthority("ACCESS_APPROVE")) {
+    AccessRequest request = requests.byNumber(reference);
+    boolean second = request.getStatus() == AccessRequestStatus.PENDING_SECOND;
+    if (!currentUser.hasAuthority(second ? "UAM_SECOND_APPROVE" : "ACCESS_APPROVE")) {
       throw new AccessDeniedException("Not permitted to approve access requests");
     }
-    AccessRequest request = requests.byNumber(reference);
     if (request.getRequestType() == AccessRequestType.CREATE_USER) {
       throw new BusinessRuleException(
           "ACCESS_APPROVE_INDIVIDUALLY",
           "Approve " + reference + " on its own: the new user's temporary password is shown once");
     }
-    return "Approved and applied "
-        + requests.approve(request.getId(), null).request().getRequestNo();
+    AccessRequest decided =
+        second
+            ? decisions.secondApprove(request.getId(), null).request()
+            : decisions.approve(request.getId(), null).request();
+    return "Approved " + decided.getRequestNo() + " (" + decided.getStatus() + ")";
   }
 }

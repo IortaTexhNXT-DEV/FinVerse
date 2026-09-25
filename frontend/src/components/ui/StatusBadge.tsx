@@ -34,6 +34,9 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'SIGNED',
     'CURRENT',
     'ACCEPTED_AS_REQUESTED',
+    // collections
+    'TAKEN',
+    'PUBLISHED',
   ],
   warning: [
     'PENDING_AUTHORIZATION',
@@ -62,6 +65,8 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'FOR_APPROVAL',
     'APPROVED_WITH_CHANGES',
     'COUNTER_PROPOSAL',
+    // collections
+    'UNPAID',
   ],
   // BDO style guide: blue pills for records moving through processing ("Account for Placement").
   info: [
@@ -84,6 +89,9 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'REQUIREMENTS_PREP',
     'WITH_MBS',
     'PREPARATION',
+    // collections
+    'CREDIT',
+    'PARTIALLY_PAID',
   ],
   neutral: [
     'DRAFT',
@@ -95,6 +103,9 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     // product maintenance
     'SUPERSEDED',
     'RETIRED',
+    // collections
+    'EXCLUDED_CANCELLED',
+    'NOT_APPLICABLE',
   ],
   danger: [
     'REJECTED',

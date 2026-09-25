@@ -478,3 +478,84 @@ differs from or details the sections above. C1-A, C1-B and C1-C build on this an
   `docs/operations/CONFIGURATION.md`; each job reads its cron with `@Value("${brokerverse.jobs.<property>:-}")`.
 - **Flyway left to the build waves.** V1001-V1005 as in section 3 (C1-A V1001 / V1005 / demo V1900, C1-B V1002 / V1003
   / demo V1901, C1-C V1004); V1006-V1009 free.
+
+### C1-A as built
+
+Collections core (wave C1-A): worklist, assignment, dispositions, efforts, change log, soft lock, the in-app
+`CollectionFeed`, files and reports, and the screens Home, PR Worklist, Collection account, Client view,
+Assignments, Files and Setup. It builds on section 14 and differs from sections 3-11 where noted.
+
+- **Flyway.** `V1001__collections_worklist.sql` (`clx_item`, `clx_item_balance`, `clx_assignment`,
+  `clx_assignment_rule`, `clx_disposition`, `clx_effort`, `clx_field_change`, `clx_outbox`, `clx_inbox`),
+  `V1005__collections_files.sql` (`clx_scheduled_file`; the SOA template is left to C1-B's billing),
+  `V819__catalog_sales_unit_head.sql` (the catalog Unit Head, V819 being free after Product Maintenance merged)
+  and `db/demo/V1900__demo_collections.sql` (users `clxhandler` MKT_COLLECTION, `clxtl` CLX_TL, `clxuh`
+  MKT_SECTION_HEAD, `mkthandler` MKT_HANDLER; Unit Heads; three assignment rules). The demo items, dispositions,
+  reassignment and files are made at start-up by `collections.demo.CollectionsDemoData` (order 97) as those users,
+  because the demo invoices reach the ledger only when the booking and Operations runners have run.
+- **Packages.** `collections.common` (item entity and repository, LOV attributes `LovAttributes`, change recorder
+  `ChangeRecorder`, parameters `ClxSettings`, the read / edit contract `CollectionItems` and the home port
+  `CollectionsWorkCountSource`), `worklist` (refresh, job, balance listener, assignment, rules, edit lock, account
+  views), `disposition` (PR dispositions `PrDispositionService`, efforts, timeline), `feed` (outbox, inbox,
+  `InAppCollectionFeed`, stale check), `files` (publication, jobs), `report`, `home`, `setup`, `demo`. The PR
+  disposition entity is `PrDisposition` (`clx_disposition`) because Cashiering already has a `Disposition` bean.
+- **Refresh rules** (`ItemSnapshots`): the total to collect is the six PR components plus PR2307. Above
+  `CLX_MIN_BALANCE_THRESHOLD` the item is OPEN; at or below it COMPLETED (a new invoice is not listed); an invoice
+  without a client receivable (payment status NOT_APPLICABLE: direct payment, return invoices) is never listed; a
+  negative total is EXCLUDED_CANCELLED for cancellations / return kinds and CREDIT otherwise (CQ04). The balance
+  listener refreshes listed items after each committed movement or flag change; new invoices wait for
+  `CLX_DAILY_REFRESH` (or "Refresh from Ledger" on the account, `POST /items/{no}/refresh`). The Unit Head is the head
+  of the invoice's sales unit, else of its department or region (`SalesOrganisationService.unitHead`, CQ05).
+- **Assignment.** New open items without a handler go to the first matching active rule (`clx_assignment_rule`:
+  segment, unit, client, amount and aging ranges, priority), else to their AO when the AO holds CLX_WORK.
+  Reassignment (selection or criteria with a preview) is PERMANENT or TEMPORARY with an end date; the daily refresh
+  returns an ended temporary assignment to the previous handler unless a later assignment replaced it.
+  `CLX_REASSIGNED` notifies the new and previous handlers. Bulk references `CLXRA-<yyyy>-nnnnnn`.
+- **Dispositions.** Only active `CLX_PR_DISPOSITION` values; `allowed_roles` restricts a value to roles; several
+  accounts need CLX_BULK_UPDATE and share a bulk reference `CLXBU-<yyyy>-nnnnnn`. Hand-offs (fields in the layout the
+  consumer already reads):
+  - CHECK_PICKUP -> `COLLECTION_CHECK_PICKUP` (`PickupService.details` fields), key `PU:<invoice>:<id>`; needs the
+    pick-up date (today or later), address and amount;
+  - CWT2307_REVERSAL -> `COLLECTION_CWT2307` (`CWT_TAGS` columns), key `CWT:<invoice>:<id>`, queued when the owner is
+    OPERATIONS or the path is CASH; a CERTIFICATE path needs the certificate number;
+  - DP_REVERSAL -> `COLLECTION_DP_LIST` (DP list columns, branch code of the invoicing branch), key `DP:<invoice>:<id>`;
+  - CANCEL_REQUEST: no feed (the cancellation is raised in Adjustment).
+  A later disposition supersedes the current one and withdraws its PENDING hand-off (CANCELLED).
+- **CollectionFeed (IN_APP).** `pending` delivers the PENDING outbox rows once and marks them TAKEN (the in-app
+  consumers take every item of the call and log it in their own flow-in run, and do not acknowledge yet);
+  `acknowledge` also marks rows TAKEN; `send` runs
+  one flow-in run (trigger EVENT) whose records become `clx_inbox` rows. `COLLECTION_DP_RETURNED` reopens the item,
+  records the disposition `DP_RETURNED` with the reason and time, and notifies the handler (`CLX_DP_RETURNED`);
+  `COLLECTION_REFUND` rows are kept for C1-C. Queuing publishes `CollectionFeedReady` after commit.
+  `CLX_OUTBOX_STALE` (an `AlertCheck`) flags items pending more than a day.
+- **Edit lock.** Opening an account as a CLX_WORK user takes the lock for `CLX_EDIT_LOCK_MINUTES`; changes by
+  others are refused with `CLX_ITEM_LOCKED` "<user> is editing"; system updates (refresh, inbox) ignore it.
+- **Change log.** Every field change of items, rules, parameters, LOV attributes and Unit Heads is a
+  `clx_field_change` row with from / to, user, time, source IP and bulk reference; the account's History tab and
+  the `CLX-AUDIT-LOG` report (view and export CLX_AUDIT_VIEW) read it.
+- **Files.** `CLX_DAILY_FILES` publishes the Outstanding PR List and the Full Production Report (month to date),
+  available at once; `CLX_WEEKLY_FILES` the DP PR and PR 2307 for reversal of the Saturday-Friday week, one file per
+  sales unit and invoicing branch with tagged accounts, available the next Monday 08:00 PHT; `CLX_MONTHLY_FILES`
+  (run daily at 05:00 PHT) the two files of the previous month on the first working day of the head office
+  calendar, available from 08:00. Each file is an XLSX GENERATE run of the report archive recorded once per report,
+  period and scope; users with CLX_EXPORT are notified (`CLX_FILE_READY`); a failure is recorded and raises
+  `CLX_FILE_NOT_PUBLISHED`. Exports of the Outstanding PR List run on request, refused above `CLX_EXPORT_MAX_ROWS`.
+- **Reports** (`ReportMetadata.collections`): `CLX-OUTSTANDING-PR`, `CLX-FULL-PRODUCTION`, `CLX-DP-FOR-REVERSAL`,
+  `CLX-PR2307-FOR-REVERSAL`, `CLX-COMPLETED-COLLECTIONS`, `CLX-INVOICES-WITH-DISPOSITION`, `CLX-REASSIGNMENTS`,
+  `CLX-AUDIT-LOG`. The p.59-61 fields BrokerVerse holds are filled; legacy-only fields wait for CQ22.
+- **API** (`/api/v1/collections`): `home`; `worklist` (+ `/totals`); `items/{no}` with `payments`, `policy`,
+  `assignments`, `history`, `dispositions`, `efforts`, `handoffs`, `timeline`, `lock` (POST / DELETE), `refresh`,
+  `details` (PUT); `dispositions`, `efforts`, `disposition-rules`; `clients/{code}`; `handlers`; `assignment-rules`
+  (+ `/{id}`, `/{id}/active`); `reassignments` (+ `/preview`); `files`, `files/generate`, `exports`; `refresh`;
+  `setup`, `setup/parameters/{key}`, `setup/lov-attributes`, `setup/unit-heads/{unit}`.
+- **Contracts for C1-B / C1-C.** `CollectionItems` (`find`, `require`, `of`, `ofClient`, `requireEditable`,
+  `requireForUpdate`), the item flags `CollectionItem.flagPromise / flagEscalation / flagInstallmentOverdue`,
+  `ChangeRecorder.record`, `LovAttributes` (`of`, `ofType`, `prRule`), `ClxSettings`, `WorklistFilter` (with its
+  promise / escalation work filters) and the port `CollectionsWorkCountSource` for the home tiles. Screens are added
+  to `features/collections/module.ts` after the PR Worklist and before Assignments.
+- **Parked / open.** Cashiering has no pull of `COLLECTION_CWT2307` (its upload stays the path): those outbox items
+  stay PENDING and `CLX_OUTBOX_STALE` reports them (contract ask to the cashiering owner, with `acknowledge` after
+  each accepted record for all consumers). Delivery date on the policy tab (CQ17), CTE and the
+  Marketing Diary (CQ20), the legacy EBIX migration handler (CQ07), the real disposition, effort and category values
+  (CQ08), the threshold value (CQ03) and the data scope per user (CQ06: every CLX_VIEW user sees every account,
+  with filters) stay as designed seams.

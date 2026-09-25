@@ -82,9 +82,9 @@ class CollectionsAndDisbursementPortsIT {
         .isEmpty();
     assertThat(directory.find("UPP-1")).isEmpty();
     assertThat(directory.history("UPP-1")).isEmpty();
-    // The manual transport has no outbox: acknowledging is harmless.
-    collection.acknowledge(fx.company(), "COLLECTION_CWT2307", List.of("CWT:1"));
-    assertThat(collection.pending(fx.company(), "COLLECTION_CWT2307")).isEmpty();
+    // Collections serves the feeds in-app; acknowledging an unknown key is harmless.
+    collection.acknowledge(fx.company(), "COLLECTION_CWT2307", List.of("CWT:NO-SUCH:1"));
+    assertThat(collection.transport()).isEqualTo("IN_APP");
   }
 
   @Test

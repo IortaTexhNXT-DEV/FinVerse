@@ -195,6 +195,59 @@ public class SalesOrganisationService {
             });
   }
 
+  /**
+   * The Unit Head of a sales unit (BRCLXN.011/012, CQ05): the head of the unit itself, else of its
+   * department, else of its region.
+   *
+   * @param companyId company
+   * @param unitCode sales unit (usually a team), may be null
+   * @return head user name; empty when no unit on the way up has a head
+   */
+  @Transactional(readOnly = true)
+  public Optional<String> unitHead(Long companyId, String unitCode) {
+    String code = unitCode;
+    for (int level = 0; code != null && level < SalesLevel.values().length; level++) {
+      Optional<SalesUnit> unit = units.findByCompanyIdAndCode(companyId, code);
+      if (unit.isEmpty()) {
+        return Optional.empty();
+      }
+      if (unit.get().getHeadUsername() != null) {
+        return Optional.of(unit.get().getHeadUsername());
+      }
+      code = unit.get().getParentCode();
+    }
+    return Optional.empty();
+  }
+
+  /**
+   * Sets or clears the Unit Head of a sales unit (BRCLXN.011/012), audited; the unit keeps its
+   * authorization status (operational attribute).
+   *
+   * @param companyId company
+   * @param unitCode sales unit
+   * @param username head, null or blank to clear
+   * @return the unit
+   */
+  public SalesUnit assignHead(Long companyId, String unitCode, String username) {
+    SalesUnit unit =
+        units
+            .findByCompanyIdAndCode(companyId, unitCode)
+            .orElseThrow(
+                () -> new ResourceNotFoundException(CatalogKind.SALES_UNIT.label(), unitCode));
+    String head = username == null || username.isBlank() ? null : username.strip();
+    if (head != null && !users.existsByUsernameIgnoreCase(head)) {
+      throw new BusinessRuleException("USER_UNKNOWN", "Unknown user " + head);
+    }
+    String previous = unit.getHeadUsername();
+    unit.assignHead(head);
+    audit.record(
+        CatalogKind.SALES_UNIT.label(),
+        unitCode,
+        AuditAction.UPDATE,
+        "Unit head changed from " + previous + " to " + head);
+    return unit;
+  }
+
   private Optional<SalesUnit> activeUnit(Long companyId, String code) {
     return code == null
         ? Optional.empty()

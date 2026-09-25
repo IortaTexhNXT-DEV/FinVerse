@@ -71,6 +71,12 @@ module.exports = [
   { slug: 'disbursement-queue', title: 'Disbursement Queue', user: 'disb', path: '/operations/disbursements' },
   { slug: 'ops-interfaces', title: 'Interfaces (flow-in runs)', user: 'admin', path: '/operations/interfaces' },
   // Finance
+  { slug: 'collections-home', title: 'Collections Home', user: 'clxtl', path: '/collections' },
+  { slug: 'collections-worklist', title: 'PR Worklist', user: 'clxhandler', path: '/collections/worklist' },
+  { slug: 'collection-account', title: 'Collection account', user: 'clxhandler', path: '/collections/worklist', open: 'first' },
+  { slug: 'collections-assignments', title: 'Collection Assignments', user: 'clxtl', path: '/collections/assignments' },
+  { slug: 'collections-files', title: 'Collections Files', user: 'clxtl', path: '/collections/files' },
+  { slug: 'collections-setup', title: 'Collections Setup', user: 'clxuh', path: '/collections/setup' },
   { slug: 'cashiering-workbench', title: 'Cashiering Workbench', user: 'cashier', path: '/cashiering' },
   { slug: 'receive-payment', title: 'Receive Payment', user: 'cashier', path: '/cashiering/receive' },
   { slug: 'cash-receipts', title: 'Receipts', user: 'cashier', path: '/cashiering/receipts' },

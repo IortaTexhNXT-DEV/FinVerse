@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.booking.BookingFixtures;
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringPaymentReapplier;
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringReceiptIssuer;
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringUnappliedSink;
+import com.iortatechnxt.brokerverse.collections.feed.service.InAppCollectionFeed;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.ExtractFile;
@@ -192,9 +193,10 @@ class FlowInAndPortsIT {
     assertThat(activeUnappliedSink).isInstanceOf(CashieringUnappliedSink.class);
     assertThat(activeReapplier).isInstanceOf(CashieringPaymentReapplier.class);
     assertThat(incentiveRules).isInstanceOf(RemittanceEarlyIncentiveRules.class);
-    // Parked integrations (OQ01, OQ02, OQ17, OQ22) keep the in-app defaults.
+    // Collections serves the Collection feeds in-app (BRD-4, OQ01 answered).
+    assertThat(collection).isInstanceOf(InAppCollectionFeed.class);
+    // Parked integrations (OQ02, OQ17, OQ22) keep the in-app defaults.
     assertThat(gateway).isInstanceOf(QueueDisbursementGateway.class);
-    assertThat(collection).isInstanceOf(ManualCollectionFeed.class);
     assertThat(inbox).isInstanceOf(ManualInsurerFileInbox.class);
     assertThat(fileDrop).isInstanceOf(RepositoryFileDrop.class);
     assertThat(marketingFeed.getIfAvailable()).isNull();
@@ -450,12 +452,14 @@ class FlowInAndPortsIT {
                             new ExtractFile.Origin("REMITTANCE", "RUN-2"))))
         .isInstanceOf(DuplicateResourceException.class);
 
+    // The manual transport (default until Collections, kept as a fallback) writes a CSV.
     String key = BookingFixtures.token();
+    ManualCollectionFeed manual = new ManualCollectionFeed(flowIn, extracts);
     String runNo =
         as.run(
             "commrec",
             () ->
-                collection.send(
+                manual.send(
                     fx.company(),
                     "COLLECTION_DP_RETURNED",
                     List.of(

@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.crm.service.ClientPayoutAccounts;
 import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestInputs.CashAdvanceInput;
 import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestInputs.CheckCancellationInput;
 import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestInputs.RefundInput;
+import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestInputs.RequestDates;
 import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestViews.RequestSummary;
 import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestViews.RequestView;
 import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestViews.ValidationView;
@@ -21,12 +22,10 @@ import com.iortatechnxt.brokerverse.payrequest.service.PayRequestQueryService.Fi
 import com.iortatechnxt.brokerverse.payrequest.service.RefundValidationService;
 import com.iortatechnxt.brokerverse.payrequest.service.RequestFormService;
 import jakarta.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -89,8 +88,7 @@ public class PayRequestController {
    * @param companyId company
    * @param stage stage
    * @param kind kind
-   * @param from first request date
-   * @param to last request date
+   * @param dates request-date range ({@code from}, {@code to})
    * @param q request, payee, reference or DV number
    * @param page page
    * @param size size
@@ -102,8 +100,7 @@ public class PayRequestController {
       @RequestParam Long companyId,
       @RequestParam(required = false) RequestStage stage,
       @RequestParam(required = false) RequestKind kind,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+      RequestDates dates,
       @RequestParam(required = false) String q,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "20") int size) {
@@ -113,7 +110,7 @@ public class PayRequestController {
             Math.min(Math.max(size, 1), PayRequestAccess.MAX_PAGE),
             Sort.by(Sort.Direction.DESC, "id"));
     return PageResponse.of(
-        queries.search(companyId, new Filter(stage, kind, from, to, q), pageable),
+        queries.search(companyId, new Filter(stage, kind, dates.from(), dates.to(), q), pageable),
         RequestSummary::from);
   }
 

@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestViews.Liquidati
 import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestViews.RequestView;
 import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestViews.ValidationView;
 import com.iortatechnxt.brokerverse.payrequest.domain.PaymentRequest;
+import com.iortatechnxt.brokerverse.payrequest.service.LiquidationAccounts;
 import com.iortatechnxt.brokerverse.payrequest.service.LiquidationService;
 import com.iortatechnxt.brokerverse.payrequest.service.PayRequestWorkflowService;
 import com.iortatechnxt.brokerverse.payrequest.service.RefundValidationService;
@@ -40,6 +41,7 @@ public class PayRequestActionController {
   private final PayRequestWorkflowService workflow;
   private final RefundValidationService validations;
   private final LiquidationService liquidations;
+  private final LiquidationAccounts accounts;
 
   /**
    * Creates the controller.
@@ -47,14 +49,17 @@ public class PayRequestActionController {
    * @param workflow business steps
    * @param validations validation tasks
    * @param liquidations liquidations
+   * @param accounts accounts of the liquidation event roles
    */
   public PayRequestActionController(
       PayRequestWorkflowService workflow,
       RefundValidationService validations,
-      LiquidationService liquidations) {
+      LiquidationService liquidations,
+      LiquidationAccounts accounts) {
     this.workflow = workflow;
     this.validations = validations;
     this.liquidations = liquidations;
+    this.accounts = accounts;
   }
 
   /**
@@ -188,7 +193,7 @@ public class PayRequestActionController {
   @GetMapping("/liquidation-accounts")
   @PreAuthorize(PayRequestAccess.VIEW)
   public List<AccountView> accounts(@RequestParam Long companyId) {
-    return liquidations.accounts(companyId).stream().map(AccountView::from).toList();
+    return accounts.accounts(companyId).stream().map(AccountView::from).toList();
   }
 
   /**
@@ -202,7 +207,7 @@ public class PayRequestActionController {
   @PreAuthorize(PayRequestAccess.ACCOUNTS)
   public AccountView assignAccount(
       @RequestParam Long companyId, @Valid @RequestBody LiquidationAccountInput input) {
-    return AccountView.from(liquidations.assign(companyId, input.role(), input.accountCode()));
+    return AccountView.from(accounts.assign(companyId, input.role(), input.accountCode()));
   }
 
   private RequestView view(PaymentRequest r) {

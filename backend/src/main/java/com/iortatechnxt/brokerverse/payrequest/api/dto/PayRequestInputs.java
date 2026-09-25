@@ -15,9 +15,21 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /** Request bodies of the refund and cash-advance request endpoints (MKT 1.2-2.26, Appendix D). */
 public interface PayRequestInputs {
+
+  /**
+   * Request-date range of the work list search, bound from the query parameters {@code from} and
+   * {@code to}.
+   *
+   * @param from first request date
+   * @param to last request date
+   */
+  record RequestDates(
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {}
 
   /**
    * One account of a Refund Request Form.

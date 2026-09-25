@@ -71,7 +71,7 @@ public class Liquidation extends BaseEntity {
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "liquidation_id", nullable = false)
   @OrderBy("lineNo")
-  private List<LiquidationLine> lines = new ArrayList<>();
+  private final List<LiquidationLine> lines = new ArrayList<>();
 
   protected Liquidation() {}
 

@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.payrequest.domain.Liquidation;
 import com.iortatechnxt.brokerverse.payrequest.domain.LiquidationStatus;
 import com.iortatechnxt.brokerverse.payrequest.domain.PaymentRequest;
 import com.iortatechnxt.brokerverse.payrequest.domain.RequestStage;
+import com.iortatechnxt.brokerverse.payrequest.service.LiquidationAccounts;
 import com.iortatechnxt.brokerverse.payrequest.service.LiquidationService;
 import com.iortatechnxt.brokerverse.payrequest.service.PayRequestDocuments;
 import com.iortatechnxt.brokerverse.payrequest.service.PayRequestWorkflowService;
@@ -44,6 +45,7 @@ class LiquidationAndReportsIT {
   @Autowired private RequestFormService forms;
   @Autowired private PayRequestWorkflowService workflow;
   @Autowired private LiquidationService liquidations;
+  @Autowired private LiquidationAccounts accounts;
   @Autowired private PayRequestDocuments documents;
   @Autowired private ClientPayoutAccounts payouts;
   @Autowired private JournalBatchRepository journals;
@@ -69,9 +71,9 @@ class LiquidationAndReportsIT {
         () -> {
           for (String role :
               List.of("PER_DIEM", "REPRESENTATION", "TRANSPORT", "LODGING", "OTHER")) {
-            liquidations.assign(fx.company(), role, "5606");
+            accounts.assign(fx.company(), role, "5606");
           }
-          return liquidations.assign(fx.company(), "CASH", "1101");
+          return accounts.assign(fx.company(), "CASH", "1101");
         });
   }
 

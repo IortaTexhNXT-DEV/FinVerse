@@ -84,7 +84,7 @@ public class BookedFinancialDetailsReport implements ReportDefinition {
             .toList();
     return TabularReportBuilder.of(p)
         .columns(
-            ReportColumn.text("insurer", "Insurer"),
+            ReportColumn.text(INSURER, "Insurer"),
             ReportColumn.text("invoiceNo", "Invoice No."),
             ReportColumn.text("rootInvoiceNo", "Root Invoice"),
             ReportColumn.text("arn", "ARN"),
@@ -99,7 +99,7 @@ public class BookedFinancialDetailsReport implements ReportDefinition {
             ReportColumn.amount("remitted", "Remitted"),
             ReportColumn.amount("commission", "Commission"),
             ReportColumn.text("directBilled", "Direct Billed"))
-        .groupBy("insurer", "Insurer")
+        .groupBy(INSURER, "Insurer")
         .rows(rows)
         .build();
   }
@@ -107,7 +107,7 @@ public class BookedFinancialDetailsReport implements ReportDefinition {
   private static Map<String, Object> row(OpsInvoice i) {
     Map<String, Object> m = new LinkedHashMap<>();
     BigDecimal balance = i.premiumBalance();
-    m.put("insurer", i.getInsurerCode());
+    m.put(INSURER, i.getInsurerCode());
     m.put("invoiceNo", i.getInvoiceNo());
     m.put("rootInvoiceNo", i.getRootInvoiceNo());
     m.put("arn", i.getArn());

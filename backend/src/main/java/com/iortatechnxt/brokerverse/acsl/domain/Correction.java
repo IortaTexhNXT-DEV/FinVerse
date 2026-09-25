@@ -95,7 +95,7 @@ public class Correction extends BaseEntity {
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "correction_id", nullable = false)
   @OrderBy("lineNo")
-  private List<CorrectionLine> lines = new ArrayList<>();
+  private final List<CorrectionLine> lines = new ArrayList<>();
 
   protected Correction() {}
 

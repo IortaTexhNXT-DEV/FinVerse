@@ -11,8 +11,6 @@ import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.payrequest.domain.ExpenseValues;
 import com.iortatechnxt.brokerverse.payrequest.domain.Liquidation;
-import com.iortatechnxt.brokerverse.payrequest.domain.LiquidationAccount;
-import com.iortatechnxt.brokerverse.payrequest.domain.LiquidationAccountRepository;
 import com.iortatechnxt.brokerverse.payrequest.domain.LiquidationLine;
 import com.iortatechnxt.brokerverse.payrequest.domain.LiquidationRepository;
 import com.iortatechnxt.brokerverse.payrequest.domain.LiquidationStatus;
@@ -36,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
  * confirmed, AQ18): the employee enters the fieldwork days and expenses and submits; a reviewer who
  * is not the employee checks and posts it with event {@code PRQ_CA_LIQUIDATION} (expenses by
  * category against the advance, the excess returned or the shortage payable to the employee). The
- * expense and cash accounts of the event roles are configuration ({@link LiquidationAccount}).
+ * expense and cash accounts of the event roles are configuration ({@link LiquidationAccounts}).
  */
 @Service
 @Transactional
@@ -45,15 +43,11 @@ public class LiquidationService {
   /** Event type of the liquidation (V890). */
   public static final String EVENT = "PRQ_CA_LIQUIDATION";
 
-  /** Account roles of the event, in form order. */
-  public static final List<String> ROLES =
-      List.of("PER_DIEM", "REPRESENTATION", "TRANSPORT", "LODGING", "OTHER", "CASH");
-
   private static final String ENTITY = "Liquidation";
   private static final int MAX_LINES = 60;
 
   private final LiquidationRepository liquidations;
-  private final LiquidationAccountRepository accounts;
+  private final LiquidationAccounts accounts;
   private final PaymentRequestRepository requests;
   private final AccountingEventPublisher accounting;
   private final DocumentNumberService numbers;
@@ -75,7 +69,7 @@ public class LiquidationService {
    */
   public LiquidationService(
       LiquidationRepository liquidations,
-      LiquidationAccountRepository accounts,
+      LiquidationAccounts accounts,
       PaymentRequestRepository requests,
       AccountingEventPublisher accounting,
       DocumentNumberService numbers,
@@ -201,46 +195,12 @@ public class LiquidationService {
                 liquidation.getCostCenter(),
                 "Liquidation of cash advance " + advance.getRequestNo(),
                 amounts,
-                roleAccounts(advance.getCompanyId(), amounts),
+                accounts.forAmounts(advance.getCompanyId(), amounts),
                 Map.of()));
     liquidation.posted(currentUser.username(), clock.instant(), batch.getBatchNo());
     audit.record(
         ENTITY, liquidation.getLiquidationNo(), AuditAction.POST, "Posted " + batch.getBatchNo());
     return liquidation;
-  }
-
-  /**
-   * The accounts of the event roles.
-   *
-   * @param companyId company
-   * @return accounts by role
-   */
-  @Transactional(readOnly = true)
-  public List<LiquidationAccount> accounts(Long companyId) {
-    return accounts.findByCompanyIdOrderByAccountRole(companyId);
-  }
-
-  /**
-   * Sets the account of an event role (Comptrollership configuration, AQ02).
-   *
-   * @param companyId company
-   * @param role role
-   * @param accountCode GL account
-   * @return the configuration
-   */
-  public LiquidationAccount assign(Long companyId, String role, String accountCode) {
-    if (!ROLES.contains(role) || accountCode == null || accountCode.isBlank()) {
-      throw new BusinessRuleException(
-          "PRQ_LIQUIDATION_ROLE", "Give one of the roles " + ROLES + " and an account code");
-    }
-    LiquidationAccount account =
-        accounts
-            .findByCompanyIdAndAccountRole(companyId, role)
-            .orElseGet(
-                () -> accounts.save(new LiquidationAccount(companyId, role, accountCode.strip())));
-    account.changeAccount(accountCode.strip());
-    audit.record(ENTITY, role, AuditAction.UPDATE, "Account of " + role + ": " + accountCode);
-    return account;
   }
 
   private static Map<String, BigDecimal> amounts(Liquidation l) {
@@ -261,24 +221,6 @@ public class LiquidationService {
     if (value.signum() != 0) {
       amounts.put(key, value);
     }
-  }
-
-  private Map<String, String> roleAccounts(Long companyId, Map<String, BigDecimal> amounts) {
-    Map<String, String> roles = new LinkedHashMap<>();
-    for (LiquidationAccount a : accounts.findByCompanyIdOrderByAccountRole(companyId)) {
-      roles.put(a.getAccountRole(), a.getAccountCode());
-    }
-    List<String> missing =
-        ROLES.stream()
-            .filter(r -> amounts.containsKey("CASH".equals(r) ? "CASH_RETURNED" : r))
-            .filter(r -> !roles.containsKey(r))
-            .toList();
-    if (!missing.isEmpty()) {
-      throw new BusinessRuleException(
-          "PRQ_LIQUIDATION_ACCOUNT_MISSING",
-          "Comptrollership has not set the account of " + missing + " for liquidations (AQ02)");
-    }
-    return roles;
   }
 
   private List<LiquidationLine> lines(List<ExpenseValues> days) {

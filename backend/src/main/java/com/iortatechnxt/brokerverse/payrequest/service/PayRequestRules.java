@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Component;
@@ -275,7 +276,7 @@ public class PayRequestRules {
       }
     }
     List<String> entered = values.stream().map(RefundLineValues::arNo).toList();
-    List<Object[]> live = lines.liveRefunds(entered, requestId == null ? -1L : requestId);
+    List<Object[]> live = lines.liveRefunds(entered, Objects.requireNonNullElse(requestId, -1L));
     if (!live.isEmpty()) {
       Object[] first = live.get(0);
       throw new BusinessRuleException(

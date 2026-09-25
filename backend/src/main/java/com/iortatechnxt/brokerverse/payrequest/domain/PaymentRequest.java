@@ -79,7 +79,7 @@ public class PaymentRequest extends BaseEntity {
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "request_id", nullable = false)
   @OrderBy("lineNo")
-  private List<RefundLine> lines = new ArrayList<>();
+  private final List<RefundLine> lines = new ArrayList<>();
 
   protected PaymentRequest() {}
 

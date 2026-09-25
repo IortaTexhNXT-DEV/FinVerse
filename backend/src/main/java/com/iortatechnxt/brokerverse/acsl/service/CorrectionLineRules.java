@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import org.springframework.stereotype.Component;
 
 /**
@@ -57,13 +58,7 @@ public class CorrectionLineRules {
    * @return the line to keep
    */
   public CorrectionLineValues check(Correction c, CorrectionLineValues v) {
-    if (v.side() == null
-        || v.amount() == null
-        || v.amount().signum() <= 0
-        || v.amount().scale() > 2) {
-      throw new BusinessRuleException(
-          "ACSL_LINE_INVALID", "Every line needs a side and a positive amount with two decimals");
-    }
+    requireSideAndAmount(v);
     String code = Acsl.blankToNull(v.accountCode());
     if (code == null) {
       throw new BusinessRuleException("ACSL_LINE_INVALID", "Every line needs a GL account");
@@ -74,12 +69,8 @@ public class CorrectionLineRules {
       throw new BusinessRuleException(
           "ACSL_PARTY_REQUIRED", "Control account " + code + " needs the sub-ledger party");
     }
-    String invoice = Acsl.blankToNull(v.invoiceNo());
+    String invoice = knownInvoice(v.invoiceNo());
     String component = component(v.component(), invoice);
-    if (invoice != null && ledger.find(invoice).isEmpty()) {
-      throw new BusinessRuleException(
-          "ACSL_INVOICE_UNKNOWN", "Invoice " + invoice + " is not in the ledger");
-    }
     return new CorrectionLineValues(
         code,
         v.side(),
@@ -90,9 +81,28 @@ public class CorrectionLineRules {
         Acsl.blankToNull(v.costCenter()),
         Acsl.blankToNull(v.businessLine()),
         narration(c, v),
-        v.origin() == null ? LineOrigin.MANUAL : v.origin(),
+        Objects.requireNonNullElse(v.origin(), LineOrigin.MANUAL),
         Acsl.blankToNull(v.originalBatchNo()),
         v.originalLineNo());
+  }
+
+  private String knownInvoice(String invoiceNo) {
+    String invoice = Acsl.blankToNull(invoiceNo);
+    if (invoice != null && ledger.find(invoice).isEmpty()) {
+      throw new BusinessRuleException(
+          "ACSL_INVOICE_UNKNOWN", "Invoice " + invoice + " is not in the ledger");
+    }
+    return invoice;
+  }
+
+  private static void requireSideAndAmount(CorrectionLineValues v) {
+    if (v.side() == null
+        || v.amount() == null
+        || v.amount().signum() <= 0
+        || v.amount().scale() > 2) {
+      throw new BusinessRuleException(
+          "ACSL_LINE_INVALID", "Every line needs a side and a positive amount with two decimals");
+    }
   }
 
   /**

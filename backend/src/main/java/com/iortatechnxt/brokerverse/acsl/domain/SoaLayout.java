@@ -48,7 +48,7 @@ public class SoaLayout extends BaseEntity {
   private String paidHeader;
 
   @Column(nullable = false)
-  private boolean active = true;
+  private boolean active;
 
   protected SoaLayout() {}
 

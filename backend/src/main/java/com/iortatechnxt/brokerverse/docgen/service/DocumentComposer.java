@@ -215,8 +215,17 @@ public class DocumentComposer {
    * @return xlsx bytes
    */
   public byte[] xlsx(SheetSpec spec) {
+    return xlsx(List.of(spec));
+  }
+
+  /**
+   * Renders a workbook with one sheet per spec, in order.
+   *
+   * @param specs sheets (at least one)
+   * @return xlsx bytes
+   */
+  public byte[] xlsx(List<SheetSpec> specs) {
     try (XSSFWorkbook wb = new XSSFWorkbook()) {
-      Sheet sheet = wb.createSheet(spec.sheetName());
       CellStyle head = wb.createCellStyle();
       org.apache.poi.ss.usermodel.Font font = wb.createFont();
       font.setBold(true);
@@ -226,27 +235,33 @@ public class DocumentComposer {
       head.setFillPattern(FillPatternType.SOLID_FOREGROUND);
       CellStyle date = wb.createCellStyle();
       date.setDataFormat(wb.getCreationHelper().createDataFormat().getFormat("yyyy-mm-dd"));
-      Row header = sheet.createRow(0);
-      for (int c = 0; c < spec.headers().size(); c++) {
-        var cell = header.createCell(c);
-        cell.setCellValue(spec.headers().get(c));
-        cell.setCellStyle(head);
-        sheet.setColumnWidth(c, SHEET_COLUMN_WIDTH);
+      for (SheetSpec spec : specs) {
+        writeSheet(wb.createSheet(spec.sheetName()), spec, head, date);
       }
-      int r = 1;
-      for (List<Object> values : spec.rows()) {
-        Row row = sheet.createRow(r++);
-        for (int c = 0; c < values.size(); c++) {
-          write(row.createCell(c), values.get(c), date);
-        }
-      }
-      sheet.createFreezePane(0, 1);
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       wb.write(out);
       return out.toByteArray();
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
+  }
+
+  private static void writeSheet(Sheet sheet, SheetSpec spec, CellStyle head, CellStyle date) {
+    Row header = sheet.createRow(0);
+    for (int c = 0; c < spec.headers().size(); c++) {
+      var cell = header.createCell(c);
+      cell.setCellValue(spec.headers().get(c));
+      cell.setCellStyle(head);
+      sheet.setColumnWidth(c, SHEET_COLUMN_WIDTH);
+    }
+    int r = 1;
+    for (List<Object> values : spec.rows()) {
+      Row row = sheet.createRow(r++);
+      for (int c = 0; c < values.size(); c++) {
+        write(row.createCell(c), values.get(c), date);
+      }
+    }
+    sheet.createFreezePane(0, 1);
   }
 
   private static void write(org.apache.poi.ss.usermodel.Cell cell, Object value, CellStyle date) {

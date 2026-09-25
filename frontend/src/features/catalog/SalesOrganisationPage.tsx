@@ -197,7 +197,7 @@ export default function SalesOrganisationPage() {
   return (
     <div className="stack">
       <PageHeader
-        section="Products & Insurers"
+        section="Product Maintenance"
         title="Sales Organisation"
         description="Regions, departments and teams, their cost centers and the account officers of each team."
         actions={

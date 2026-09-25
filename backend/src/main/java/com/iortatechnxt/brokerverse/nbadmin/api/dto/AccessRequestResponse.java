@@ -3,12 +3,13 @@ package com.iortatechnxt.brokerverse.nbadmin.api.dto;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
+import com.iortatechnxt.brokerverse.nbadmin.domain.RolePermissionChange;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
 import java.time.Instant;
 import java.util.Set;
 
 /**
- * A user access request.
+ * An access request (user or role-permission change).
  *
  * @param id id
  * @param requestNo request number
@@ -26,6 +27,9 @@ import java.util.Set;
  * @param decidedBy approver
  * @param decidedAt decision time
  * @param decisionComment decision comment
+ * @param roleCode role of a role-permission change (PMADD05), else null
+ * @param permissionsAdded permissions granted by a role-permission change
+ * @param permissionsRemoved permissions withdrawn by a role-permission change
  */
 public record AccessRequestResponse(
     Long id,
@@ -43,7 +47,10 @@ public record AccessRequestResponse(
     Instant requestedAt,
     String decidedBy,
     Instant decidedAt,
-    String decisionComment) {
+    String decisionComment,
+    String roleCode,
+    Set<String> permissionsAdded,
+    Set<String> permissionsRemoved) {
 
   /**
    * Maps a request.
@@ -52,6 +59,7 @@ public record AccessRequestResponse(
    * @return response
    */
   public static AccessRequestResponse from(AccessRequest r) {
+    RolePermissionChange change = r.permissionChange();
     return new AccessRequestResponse(
         r.getId(),
         r.getRequestNo(),
@@ -68,6 +76,9 @@ public record AccessRequestResponse(
         r.getCreatedAt(),
         r.getDecidedBy(),
         r.getDecidedAt(),
-        r.getDecisionComment());
+        r.getDecisionComment(),
+        r.getRoleCode(),
+        change == null ? Set.of() : change.added(),
+        change == null ? Set.of() : change.removed());
   }
 }

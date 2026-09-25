@@ -22,15 +22,16 @@ export const NBADMIN_HELP_SCREENS: HelpScreen[] = [
     name: 'Access Requests',
     path: '/broking-setup/access-requests',
     summary:
-      'Requests of the Business Administrator to create a user, change the roles of a user, or disable or enable a user, each with a justification.',
+      'Requests of the Business Administrator to create a user, change the roles of a user, disable or enable a user, or change the permissions of a role, each with a justification.',
     workflow: [
       'New request: choose the request type and the user, the roles and home branch for a new user, and give the justification.',
       'The Approver opens the request from My Approvals and approves it (the change is applied at once) or rejects it with a comment.',
       'For a new user, the approval shows a temporary password once; hand it over securely.',
+      'Change role permissions: pick the role, tick the permissions it should hold (grouped by area) and check the added / removed summary.',
     ],
     controls: [
       'Four eyes: the requester cannot decide their own request.',
-      'Only one open request per user at a time; the requester is notified of the decision.',
+      'Only one open request per user or role at a time; the requester is notified of the decision.',
       'Requests, decisions and the applied change are recorded in the audit trail.',
     ],
   },
@@ -38,8 +39,15 @@ export const NBADMIN_HELP_SCREENS: HelpScreen[] = [
     name: 'User Access Matrix',
     path: '/broking-setup/access-matrix',
     summary:
-      'The agreed user access matrix: every role against every permission as granted today, with the number of enabled users per role. Export it to Excel for sign-off.',
-    controls: ['Read-only; roles change through access requests and Roles & Permissions.'],
+      'The agreed user access matrix: every role against every permission as granted today, with the number of enabled users per role, and the role-to-action view by area and action class (view only, create, amend, approve). Export both views to Excel for sign-off.',
+    workflow: [
+      'By Permission: one row per permission with its area and action class.',
+      'By Action: one row per area and action class; each cell lists the permissions the role holds.',
+    ],
+    controls: [
+      'Read-only; role permissions change through access requests (Change role permissions), decided by another user.',
+      'The export is recorded in the audit trail.',
+    ],
   },
   {
     name: 'Data Retention',

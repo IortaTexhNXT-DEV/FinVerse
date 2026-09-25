@@ -8,6 +8,12 @@ export interface AccessRequestForm {
   roleCodes: string[];
   homeBranchId: string;
   justification: string;
+  /** Role whose permissions change (MODIFY_ROLE_PERMISSIONS). */
+  roleCode: string;
+  /** Permissions the role holds today (loaded when the role is chosen). */
+  currentPermissions: string[];
+  /** Permissions the role should hold after the change. */
+  permissions: string[];
 }
 
 export type AccessRequestErrors = Partial<Record<keyof AccessRequestForm, string>>;
@@ -20,6 +26,9 @@ export const EMPTY_ACCESS_REQUEST: AccessRequestForm = {
   roleCodes: [],
   homeBranchId: '',
   justification: '',
+  roleCode: '',
+  currentPermissions: [],
+  permissions: [],
 };
 
 export const REQUEST_TYPE_LABELS: Record<AccessRequestType, string> = {
@@ -27,7 +36,19 @@ export const REQUEST_TYPE_LABELS: Record<AccessRequestType, string> = {
   MODIFY_ROLES: 'Change roles',
   DISABLE_USER: 'Disable user',
   ENABLE_USER: 'Enable user',
+  MODIFY_ROLE_PERMISSIONS: 'Change role permissions',
 };
+
+/** Codes added and removed by a change (roles of a user, permissions of a role). */
+export function roleChanges(
+  current: readonly string[],
+  requested: readonly string[],
+): { added: string[]; removed: string[] } {
+  return {
+    added: requested.filter((r) => !current.includes(r)),
+    removed: current.filter((r) => !requested.includes(r)),
+  };
+}
 
 const USERNAME = /^[a-zA-Z0-9._-]{3,50}$/;
 
@@ -56,6 +77,9 @@ export function validateAccessRequest(
   f: AccessRequestForm,
   users: UserAccess[],
 ): AccessRequestErrors {
+  if (f.type === 'MODIFY_ROLE_PERMISSIONS') {
+    return validatePermissionChange(f);
+  }
   const errors: AccessRequestErrors = USERNAME.test(f.username.trim())
     ? userErrors(f, users)
     : { username: 'Use 3 to 50 letters, digits, dots, dashes or underscores' };
@@ -71,8 +95,35 @@ export function validateAccessRequest(
   return errors;
 }
 
+/** Field errors of a role-permission change: a role, at least one change and a justification. */
+function validatePermissionChange(f: AccessRequestForm): AccessRequestErrors {
+  const errors: AccessRequestErrors = {};
+  if (f.roleCode === '') {
+    errors.roleCode = 'Select the role to change';
+  } else {
+    const { added, removed } = roleChanges(f.currentPermissions, f.permissions);
+    if (added.length === 0 && removed.length === 0) {
+      errors.permissions = 'Grant or withdraw at least one permission';
+    }
+  }
+  if (f.justification.trim() === '') {
+    errors.justification = 'Explain why the change is needed';
+  }
+  return errors;
+}
+
 /** Request body (fields that do not apply to the type are left out). */
 export function toAccessRequest(f: AccessRequestForm): AccessRequestInput {
+  if (f.type === 'MODIFY_ROLE_PERMISSIONS') {
+    const { added, removed } = roleChanges(f.currentPermissions, f.permissions);
+    return {
+      type: f.type,
+      roleCode: f.roleCode,
+      permissionsAdded: added,
+      permissionsRemoved: removed,
+      justification: f.justification.trim(),
+    };
+  }
   const create = f.type === 'CREATE_USER';
   const withRoles = create || f.type === 'MODIFY_ROLES';
   return {
@@ -83,16 +134,5 @@ export function toAccessRequest(f: AccessRequestForm): AccessRequestInput {
     roleCodes: withRoles ? f.roleCodes : undefined,
     homeBranchId: create && f.homeBranchId !== '' ? Number(f.homeBranchId) : undefined,
     justification: f.justification.trim(),
-  };
-}
-
-/** Roles added and removed by a role change. */
-export function roleChanges(
-  current: readonly string[],
-  requested: readonly string[],
-): { added: string[]; removed: string[] } {
-  return {
-    added: requested.filter((r) => !current.includes(r)),
-    removed: current.filter((r) => !requested.includes(r)),
   };
 }

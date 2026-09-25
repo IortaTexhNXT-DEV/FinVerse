@@ -25,6 +25,7 @@ import { withJournalAutomation } from '@/features/journaltools/module';
 import { payablesModule } from '@/features/payables/module';
 import { placementModule } from '@/features/placement/module';
 import { prodreconModule } from '@/features/prodrecon/module';
+import { withPackageRequests } from '@/features/productmaint/module';
 import { receivablesModule } from '@/features/receivables/module';
 import { reinsuranceModule } from '@/features/reinsurance/module';
 import { remittanceModule } from '@/features/remittance/module';
@@ -63,7 +64,8 @@ export const NAV_GROUPS: NavGroup[] = [
       // Operations (BRD-2), prototype placement: Product Reconciliation and Adjustment here.
       prodreconModule,
       adjustmentModule,
-      catalogModule,
+      // Product Maintenance (BRD-3): catalog screens with the package request screens.
+      withPackageRequests(catalogModule),
       bulkModule,
     ],
   },

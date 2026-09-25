@@ -14,6 +14,7 @@ import {
   validateAccessRequest,
 } from './accessRequest';
 import type { AccessRequestErrors, AccessRequestForm } from './accessRequest';
+import { RolePermissionFields } from './RolePermissionFields';
 
 const TYPES = Object.keys(REQUEST_TYPE_LABELS) as AccessRequestType[];
 
@@ -109,8 +110,9 @@ function CreateFields({
 }
 
 /**
- * New user access request (BRNB.085, BRD 3.3.5): create a user, change roles, disable or enable a
- * user, with a justification. Nothing changes until the Approver approves the request.
+ * New access request (BRNB.085, BRD 3.3.5): create a user, change roles, disable or enable a user,
+ * or change the permissions of a role (PMADD05), with a justification. Nothing changes until the
+ * Approver approves the request.
  */
 export function AccessRequestFormDialog({
   onClose,
@@ -136,6 +138,7 @@ export function AccessRequestFormDialog({
     }
   };
   const existingUser = form.type !== 'CREATE_USER';
+  const rolePermissions = form.type === 'MODIFY_ROLE_PERMISSIONS';
   return (
     <Modal
       open
@@ -161,7 +164,15 @@ export function AccessRequestFormDialog({
                 id={id}
                 className="select"
                 value={form.type}
-                onChange={(e) => set({ type: e.target.value as AccessRequestType, username: '' })}
+                onChange={(e) =>
+                  set({
+                    type: e.target.value as AccessRequestType,
+                    username: '',
+                    roleCode: '',
+                    currentPermissions: [],
+                    permissions: [],
+                  })
+                }
               >
                 {TYPES.map((t) => (
                   <option key={t} value={t}>
@@ -171,38 +182,41 @@ export function AccessRequestFormDialog({
               </select>
             )}
           </Field>
-          <Field label="User name" required error={errors.username}>
-            {(id) =>
-              existingUser ? (
-                <select
-                  id={id}
-                  className="select"
-                  value={form.username}
-                  onChange={(e) => {
-                    const user = users.data?.find((u) => u.username === e.target.value);
-                    set({ username: e.target.value, roleCodes: user?.roleCodes ?? [] });
-                  }}
-                >
-                  <option value="">Select a user…</option>
-                  {(users.data ?? []).map((u) => (
-                    <option key={u.username} value={u.username}>
-                      {u.username} – {u.fullName}
-                      {u.enabled ? '' : ' (disabled)'}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  id={id}
-                  className="input"
-                  value={form.username}
-                  onChange={(e) => set({ username: e.target.value })}
-                />
-              )
-            }
-          </Field>
+          {!rolePermissions && (
+            <Field label="User name" required error={errors.username}>
+              {(id) =>
+                existingUser ? (
+                  <select
+                    id={id}
+                    className="select"
+                    value={form.username}
+                    onChange={(e) => {
+                      const user = users.data?.find((u) => u.username === e.target.value);
+                      set({ username: e.target.value, roleCodes: user?.roleCodes ?? [] });
+                    }}
+                  >
+                    <option value="">Select a user…</option>
+                    {(users.data ?? []).map((u) => (
+                      <option key={u.username} value={u.username}>
+                        {u.username} – {u.fullName}
+                        {u.enabled ? '' : ' (disabled)'}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    id={id}
+                    className="input"
+                    value={form.username}
+                    onChange={(e) => set({ username: e.target.value })}
+                  />
+                )
+              }
+            </Field>
+          )}
         </div>
         {form.type === 'CREATE_USER' && <CreateFields form={form} set={set} errors={errors} />}
+        {rolePermissions && <RolePermissionFields form={form} set={set} errors={errors} />}
         {(form.type === 'CREATE_USER' || form.type === 'MODIFY_ROLES') && (
           <RolePicker form={form} set={set} error={errors.roleCodes} />
         )}

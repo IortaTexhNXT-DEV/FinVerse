@@ -1,16 +1,18 @@
 import { api, toQuery } from './client';
 import type { PageResponse } from './types';
 
-export type AccessRequestType = 'CREATE_USER' | 'MODIFY_ROLES' | 'DISABLE_USER' | 'ENABLE_USER';
+export type AccessRequestType =
+  'CREATE_USER' | 'MODIFY_ROLES' | 'DISABLE_USER' | 'ENABLE_USER' | 'MODIFY_ROLE_PERMISSIONS';
 export type AccessRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
-/** A user access request (BRNB.085). */
+/** An access request (BRNB.085): a user request, or a role-permission change (PMADD05). */
 export interface AccessRequest {
   id: number;
   requestNo: string;
   type: AccessRequestType;
   summary: string;
-  username: string;
+  /** User of a user request; absent for a role-permission change. */
+  username?: string;
   fullName?: string;
   email?: string;
   roleCodes: string[];
@@ -22,16 +24,23 @@ export interface AccessRequest {
   decidedBy?: string;
   decidedAt?: string;
   decisionComment?: string;
+  /** Role of a role-permission change. */
+  roleCode?: string;
+  permissionsAdded: string[];
+  permissionsRemoved: string[];
 }
 
 export interface AccessRequestInput {
   type: AccessRequestType;
-  username: string;
+  username?: string;
   fullName?: string;
   email?: string;
   roleCodes?: string[];
   homeBranchId?: number;
   justification: string;
+  roleCode?: string;
+  permissionsAdded?: string[];
+  permissionsRemoved?: string[];
 }
 
 export interface AccessDecision {
@@ -61,9 +70,30 @@ export interface RoleInfo {
   permissions: string[];
 }
 
+export type ActionClass = 'VIEW' | 'CREATE' | 'AMEND' | 'APPROVE';
+
+export interface MatrixRole {
+  code: string;
+  name: string;
+  enabledUsers: number;
+}
+
+/** User access matrix by permission, each permission with its area and action classes (PMADD05). */
 export interface AccessMatrix {
-  roles: { code: string; name: string; enabledUsers: number }[];
-  permissions: { permission: string; roles: string[] }[];
+  roles: MatrixRole[];
+  permissions: { permission: string; roles: string[]; area?: string; actions: ActionClass[] }[];
+}
+
+/** Role-to-action matrix (PMADD05): one row per area and action class. */
+export interface AccessActionMatrix {
+  roles: MatrixRole[];
+  rows: {
+    area: string;
+    action: ActionClass;
+    permissions: string[];
+    /** Role code -> the permissions of the row the role holds (roles holding none are absent). */
+    grants: Record<string, string[] | undefined>;
+  }[];
 }
 
 export type RetentionAction = 'REVIEW' | 'ARCHIVE';
@@ -119,6 +149,7 @@ export const nbadminApi = {
   users: () => api.get<UserAccess[]>('/nbadmin/users'),
   roles: () => api.get<RoleInfo[]>('/nbadmin/roles'),
   matrix: () => api.get<AccessMatrix>('/nbadmin/access-matrix'),
+  matrixByAction: () => api.get<AccessActionMatrix>('/nbadmin/access-matrix/by-action'),
   exportMatrix: () => api.getFile('/nbadmin/access-matrix/export'),
   retentionRules: () => api.get<RetentionRule[]>('/nbadmin/retention/rules'),
   updateRetentionRule: (id: number, body: RetentionRuleInput) =>

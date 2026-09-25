@@ -14,21 +14,23 @@ import java.util.TreeSet;
 
 /**
  * A request by the Business Administrator to create a user, change a user's roles or disable /
- * enable a user (BRNB.085, BRD 3.3.5 and 3.4.2). Nothing changes until the Approver approves it;
- * the approval applies the change.
+ * enable a user (BRNB.085, BRD 3.3.5 and 3.4.2), or to add / remove permissions of a role
+ * (PMADD05). Nothing changes until the Approver approves it; the approval applies the change.
  */
 @Entity
 @Table(name = "nba_access_request")
 public class AccessRequest extends BaseEntity {
 
+  private static final String SEPARATOR = ",";
+
   @Column(name = "request_no", nullable = false, length = 30, updatable = false)
   private String requestNo;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "request_type", nullable = false, length = 20, updatable = false)
+  @Column(name = "request_type", nullable = false, length = 30, updatable = false)
   private AccessRequestType requestType;
 
-  @Column(nullable = false, length = 50, updatable = false)
+  @Column(length = 50, updatable = false)
   private String username;
 
   @Column(name = "full_name", length = 120, updatable = false)
@@ -45,6 +47,15 @@ public class AccessRequest extends BaseEntity {
 
   @Column(nullable = false, length = 1000, updatable = false)
   private String justification;
+
+  @Column(name = "role_code", length = 40, updatable = false)
+  private String roleCode;
+
+  @Column(name = "permissions_added", length = 2000, updatable = false)
+  private String permissionsAdded;
+
+  @Column(name = "permissions_removed", length = 2000, updatable = false)
+  private String permissionsRemoved;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 20)
@@ -73,12 +84,23 @@ public class AccessRequest extends BaseEntity {
     this.username = content.username();
     this.fullName = content.fullName();
     this.email = content.email();
-    this.roleCodes =
-        content.roleCodes() == null || content.roleCodes().isEmpty()
-            ? null
-            : String.join(",", new TreeSet<>(content.roleCodes()));
+    this.roleCodes = joined(content.roleCodes());
     this.homeBranchId = content.homeBranchId();
     this.justification = content.justification();
+    RolePermissionChange change = content.permissionChange();
+    if (change != null) {
+      this.roleCode = change.roleCode();
+      this.permissionsAdded = joined(change.added());
+      this.permissionsRemoved = joined(change.removed());
+    }
+  }
+
+  private static String joined(Set<String> codes) {
+    return codes == null || codes.isEmpty() ? null : String.join(SEPARATOR, new TreeSet<>(codes));
+  }
+
+  private static Set<String> split(String codes) {
+    return codes == null ? Set.of() : new TreeSet<>(Arrays.asList(codes.split(SEPARATOR)));
   }
 
   /**
@@ -106,7 +128,18 @@ public class AccessRequest extends BaseEntity {
    * @return role codes, empty when none
    */
   public Set<String> roles() {
-    return roleCodes == null ? Set.of() : new TreeSet<>(Arrays.asList(roleCodes.split(",")));
+    return split(roleCodes);
+  }
+
+  /**
+   * The role-permission change of a MODIFY_ROLE_PERMISSIONS request (PMADD05).
+   *
+   * @return role and permissions added / removed, null for a user request
+   */
+  public RolePermissionChange permissionChange() {
+    return roleCode == null
+        ? null
+        : new RolePermissionChange(roleCode, split(permissionsAdded), split(permissionsRemoved));
   }
 
   public String getRequestNo() {
@@ -131,6 +164,10 @@ public class AccessRequest extends BaseEntity {
 
   public Long getHomeBranchId() {
     return homeBranchId;
+  }
+
+  public String getRoleCode() {
+    return roleCode;
   }
 
   public String getJustification() {

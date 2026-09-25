@@ -39,7 +39,7 @@ export default function InsurersPage() {
   return (
     <div className="stack">
       <PageHeader
-        section="Products & Insurers"
+        section="Product Maintenance"
         title="Insurers"
         description="The insurer panel: accreditation, placement channel and e-mails, branches with their local government tax, and commission rates."
         actions={

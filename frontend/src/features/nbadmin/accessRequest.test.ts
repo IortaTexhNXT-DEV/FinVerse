@@ -93,3 +93,48 @@ describe('access request mapping', () => {
     expect(roleChanges(['A', 'B'], ['B', 'C'])).toEqual({ added: ['C'], removed: ['A'] });
   });
 });
+
+describe('role-permission change requests (PMADD05)', () => {
+  const base = {
+    ...EMPTY_ACCESS_REQUEST,
+    type: 'MODIFY_ROLE_PERMISSIONS' as const,
+    justification: ' Package requests ',
+  };
+
+  it('needs a role, a change and a justification', () => {
+    expect(validateAccessRequest({ ...base, justification: '' }, USERS)).toEqual({
+      roleCode: 'Select the role to change',
+      justification: 'Explain why the change is needed',
+    });
+    expect(
+      validateAccessRequest(
+        { ...base, roleCode: 'TSU', currentPermissions: ['A'], permissions: ['A'] },
+        USERS,
+      ),
+    ).toEqual({ permissions: 'Grant or withdraw at least one permission' });
+    expect(
+      validateAccessRequest(
+        { ...base, roleCode: 'TSU', currentPermissions: ['A'], permissions: ['B'] },
+        USERS,
+      ),
+    ).toEqual({});
+  });
+
+  it('sends the role with the permissions added and removed', () => {
+    expect(
+      toAccessRequest({
+        ...base,
+        username: 'ignored',
+        roleCode: 'TSU',
+        currentPermissions: ['A', 'B'],
+        permissions: ['B', 'C'],
+      }),
+    ).toEqual({
+      type: 'MODIFY_ROLE_PERMISSIONS',
+      roleCode: 'TSU',
+      permissionsAdded: ['C'],
+      permissionsRemoved: ['A'],
+      justification: 'Package requests',
+    });
+  });
+});

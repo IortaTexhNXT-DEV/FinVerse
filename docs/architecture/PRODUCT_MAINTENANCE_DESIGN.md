@@ -522,3 +522,44 @@ Operations):
    `InvoiceBooked` additions to the Operations agents before merging.
 5. **Scope creep into renewals.** BRPM.017 is the renewal of the *package*, not of client policies (Renewal BRD).
    Mitigation: RENEW requests only produce a new catalog version; account renewal stays parked.
+
+## 15. P0 foundation: as built
+
+What the P0 wave built, and where it differs from or details the sections above. P1-A and P1-B build on this.
+
+- **Migrations.** `V755__product_maintenance_foundation.sql` (roles, grants, `sec_permission_action`, LOV types, workflow,
+  parameters). The access-request change of PMADD05 needs `nba_access_request` (V790), which does not exist when V755
+  runs on a fresh database, so it is in the broking-administration range: `V791__nbadmin_role_permission_requests.sql`.
+  The demo users of section 6.2 are in `db/demo/V998__demo_product_maintenance_users.sql` (`tsuhead`, `mbs`, `mbs2`,
+  `mancom`; `tsulead` also receives TSU_TL). V996 / V997 stay with P1-A / P1-B.
+- **Additional grants** beyond the table of section 6.2: every new role has WORK_VIEW, ATTACHMENT_VIEW, REPORT_VIEW,
+  CLIENT_VIEW and PRODUCT_VIEW; MKT_TL also has PKG_REQUEST (FOR_MKT_REVIEW is a Marketing stage); TSU_TL and
+  TSU_HEAD have WORK_ASSIGN; TSU_TL and MBS have ATTACHMENT_MANAGE; MBS has MASTER_VIEW (the catalog screens read
+  with MASTER_VIEW until P1-A switches them to PRODUCT_VIEW); NB_APPROVER has PRODUCT_VIEW and PRODUCT_AUTHORIZE (it
+  authorises catalog records today); SYSADMIN and AUDITOR have read access.
+- **Workflow additions** to section 7: stage `RETIRED` (terminal) with `WITH_MBS --retire--> RETIRED` for RETIRE
+  requests (`PackageSetupService.retireProduct`); `FOR_TSU_APPROVAL --approve_no_negotiation--> FOR_MANCOM` (RETIRE / no
+  negotiation); the catalog outcomes are the system actions `version_released` (FOR_VALIDATION -> RELEASED) and
+  `version_returned` (FOR_VALIDATION -> WITH_MBS); `not_proceeded` requires a reason from the new LOV
+  `PKG_NOT_PROCEEDED_REASON`; `return_incomplete` requires a RETURN_REASON; `void` is allowed from DRAFT to
+  FOR_TSU_APPROVAL. `wf_stage.sla_hours` holds the SLA defaults (the engine reads it); the `PKG_SLA_*` parameters carry
+  the same values for BDOI to confirm (PQ08), and P1-B copies a changed parameter into the stage when it wires them.
+- **Action classes.** `sec_permission_action` classifies every permission of the broking and Operations areas;
+  finance and platform permissions stay unclassified and show only in the permission view. The User Access Matrix
+  has the views "By Permission" and "By Action" (`GET /api/v1/nbadmin/access-matrix/by-action?area=`), and the Excel
+  export has one sheet per view.
+- **Role-permission changes.** Access request type `MODIFY_ROLE_PERMISSIONS` (role, permissions added, permissions
+  removed; stored as the effective change), four eyes, applied through `UserAdminService.updateRole` on the role as it
+  is at approval. **Parked (PQ17):** restricting the direct `PUT /api/v1/admin/roles/{id}` with a parameter
+  `ROLE_CHANGE_REQUIRES_APPROVAL` is not built and the parameter is not seeded: `security` cannot read `system`
+  parameters without a module cycle, and the restriction waits for BDOI's answer.
+- **Catalog contracts** (`catalog/service/version`): `PackageSetupService`, `ProductVersionQueryService`,
+  `PackageSpec`, `VersionRef`, `ProductVersionView`, the events `ProductVersionReleased`, `ProductVersionReturned`,
+  `ProductExpired`, `IncentiveCriteriaChanged`; the enums `catalog.domain.ProductVersionStatus` and
+  `PackageInsurerRole`; `RatingQuery.Purpose`. `PackageSetupService` also has `retireProduct` for RETIRE requests.
+  `PackageVersionStubDefaults` registers in-memory stubs (`@ConditionalOnMissingBean`) of both services until the
+  catalog implements them; P2 deletes it.
+- **Frontend.** The catalog section is renamed "Product Maintenance". The package request screens are registered in
+  `features/productmaint/module.ts` (`withPackageRequests(catalogModule)`, one sidebar section) and the new catalog
+  screens in `features/catalog/module.ts`, all hidden with a placeholder component. Help:
+  `withPackageRequestHelp(CATALOG_HELP)` with the empty `PACKAGE_REQUEST_HELP_SCREENS` list for P1-B.

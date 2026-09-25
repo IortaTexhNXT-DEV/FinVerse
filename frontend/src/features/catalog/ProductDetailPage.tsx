@@ -108,7 +108,7 @@ export default function ProductDetailPage() {
   return (
     <div className="stack">
       <PageHeader
-        section="Products & Insurers · Product"
+        section="Product Maintenance · Product"
         title={`${d.product.code} – ${d.product.name}`}
         actions={
           <>

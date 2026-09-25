@@ -141,7 +141,7 @@ export default function RatesPage() {
   return (
     <div className="stack">
       <PageHeader
-        section="Products & Insurers"
+        section="Product Maintenance"
         title="Rates & Taxes"
         description="Statutory charges and rating tables applied by the premium calculator. The rate in force on the period start is used."
         actions={

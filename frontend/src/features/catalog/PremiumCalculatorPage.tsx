@@ -124,7 +124,7 @@ export default function PremiumCalculatorPage() {
   return (
     <div className="stack">
       <PageHeader
-        section="Products & Insurers"
+        section="Product Maintenance"
         title="Premium Calculator"
         description="Rate a product with the charges in force: for a quotation, a new account or an endorsement over the remaining term."
       />

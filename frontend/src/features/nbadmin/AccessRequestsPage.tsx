@@ -71,7 +71,7 @@ function Filters({
             </select>
           )}
         </Field>
-        <Field label="User name or request number">
+        <Field label="User, role or request number">
           {(id) => (
             <input
               id={id}
@@ -87,8 +87,9 @@ function Filters({
 }
 
 /**
- * User access requests (BRNB.085, BRD 3.3.5 / 3.4.2): the Business Administrator requests user
- * creation, role changes or disabling; the Approver approves (the change is applied) or rejects.
+ * User access requests (BRNB.085, BRD 3.3.5 / 3.4.2) and role-permission changes (PMADD05): the
+ * Business Administrator requests user creation, role changes, disabling or a change of a role's
+ * permissions; the Approver approves (the change is applied) or rejects.
  */
 export default function AccessRequestsPage() {
   const { can } = useAuth();
@@ -108,7 +109,7 @@ export default function AccessRequestsPage() {
       <PageHeader
         section="Broking Setup"
         title="Access Requests"
-        description="Requests to create users, change their roles or disable them. Nothing changes until an approver other than the requester approves."
+        description="Requests to create users, change their roles, disable them or change the permissions of a role. Nothing changes until an approver other than the requester approves."
         actions={
           can('ACCESS_REQUEST') && (
             <Button variant="accent" icon={<UserCog size={16} />} onClick={() => setCreating(true)}>

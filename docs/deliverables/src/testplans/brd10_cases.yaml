@@ -1,0 +1,2311 @@
+# Test plan BRD-10 Sanction Screening and Risk Profiling - test data file.
+# Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/testplans/brd10_cases.yaml
+# Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
+# BRD-10 is designed, not built: the expected results quote the message text of the FRS and the build
+# design (docs/architecture/SANCTION_SCREENING_DESIGN.md) without codes, and no case names an automated
+# test. Screen paths follow section 11 of the build design. All list names used in the tests are
+# invented; no real listed person or entity is used.
+
+meta:
+  brd: BRD-10
+  name: Sanction Screening
+  code: SS
+  frs: FRS_BRD10_SANCTION_SCREENING.md
+  summary: TP_BRD10_SANCTION_SCREENING.md
+  version: "1.0"
+  date: 25 September 2026
+  built: false
+
+personas:
+  COMPLIANCE_OFFICER: {name: Compliance Officer (maker), short: Comp. Off.}
+  COMPLIANCE_CHECKER: {name: Compliance Officer (Checker), short: Checker}
+  UNIT_COMPLIANCE_COORD: {name: Unit Compliance (User) Coordinator, short: UCC}
+  SCR_INVESTIGATOR: {name: Investigator, short: Invest.}
+  SCR_APPROVER: {name: Approver (Unit Head), short: Appr.}
+  AML_COMMITTEE: {name: AML Committee Member, short: AML}
+  OPS_LEAD: {name: Operations Lead, short: Ops}
+  AUDITOR: {name: Auditor, short: Audit.}
+  SYSADMIN: {name: System Administrator, short: Sys Adm.}
+  BUSINESS_ADMIN: {name: Business Administrator (Lists of Values), short: Bus. Admin}
+  MKT_AO: {name: Marketing AO (client and account data entry), short: MKT AO}
+  SYSTEM: {name: BIBS scheduled job or event}
+
+screens:
+  HOME: Sanction Screening > Screening Home
+  CASES: Sanction Screening > Cases
+  CASE: Sanction Screening > Cases > Case page (workflow panel)
+  CMATCH: Sanction Screening > Cases > Case page > Matches tab
+  REVIEW: Sanction Screening > Cases > Case page > Review tab
+  CDOCS: Sanction Screening > Cases > Case page > Documents tab
+  DECISIONS: Sanction Screening > Cases > Case page > Decisions tab
+  CSTR: Sanction Screening > Cases > Case page > STR tab
+  TIMELINE: Sanction Screening > Cases > Case page > Timeline tab
+  MATCHES: Sanction Screening > Matches
+  HIGHRISK: Sanction Screening > High-risk Clients
+  STR: Sanction Screening > STR
+  CONFIG: Compliance Setup > Configuration Versions
+  TEMPLATES: Compliance Setup > Templates
+  WATCHLIST: Compliance Setup > Watchlist
+  SOURCES: Compliance Setup > List Sources and Runs
+  LOV: Broking Setup > Lists of Values
+  APPROVALS: My Approvals
+  CLIENT: Client Management > Clients > Client page (Screening tab)
+  NEWCLIENT: Client Management > New Client
+  ACCOUNT: Quotation / Proposal > Account page (Submit)
+  REPORTS: Reports > Report Centre (category Compliance)
+  AUDIT: Administration > Audit Trail
+  PARAMS: Administration > System Parameters
+  JOBS: Administration > Scheduled Jobs
+  NOTIF: Notifications (bell icon in the page header)
+  MAIL: Test mailbox of the recipient
+  DB: Database console of the test environment (database administrator)
+  API: API call with the user's token (tester tool, for example Postman)
+
+data:
+  - id: TD-SS-01
+    name: Test users per role
+    content: compoff (COMPLIANCE_OFFICER), compchk (COMPLIANCE_CHECKER), ucc (UNIT_COMPLIANCE_COORD), investigator and investigator2 of two teams (SCR_INVESTIGATOR), scrapprover (SCR_APPROVER, Unit Head of the Corbank unit), amlcom1 to amlcom5 (AML_COMMITTEE), opslead (OPS_LEAD), auditor, admin, badmin (BUSINESS_ADMIN), ao (MKT_AO). A combined test user holding SCR_INVESTIGATE and SCR_CASE_APPROVE for the four-eyes cases.
+    source: Planned demo seed V1950 (compoff, compchk, ucc, investigator, scrapprover, amlcom1, amlcom2); the others created by the test lead through User Access requests
+  - id: TD-SS-02
+    name: Active configuration versions
+    content: One ACTIVE version of every type - matching criteria (EXACT, PHONETIC, FUZZY 0.85, case threshold 0.90 for SANCTION individuals), three risk categories (HIGH_SANCTION rating HIGH with tag WATCHLIST_REVIEW, PEP with tag PEP and EDD, STANDARD), approval routes with a Corbank route, assignment matrix with a Retail PEP scenario, SLA matrix, validation rules requiring the KYC form, KYC / transaction / EDD / STR templates and an STR layout; one PENDING draft made by compoff.
+    source: Planned demo seed V1950 of the build design
+  - id: TD-SS-03
+    name: Watchlist with invented names
+    content: Sources AML_ADVISORY (sanction, file), NLDS_PEP (PEP, file) and INTERNAL (manual); 25 invented entries, among them "Juan de la Cruz" (individual, sanction) and "Maria Santos Reyes" (PEP).
+    source: Planned demo seed V1951; invented names only
+  - id: TD-SS-04
+    name: List files
+    content: AML_ADVISORY CSV with 3 new and 1 changed entry; a CSV with 2 bad lines (one without name, one with birth date 31-02-1970); an unreadable (truncated) CSV; the same valid file again; a PDF file for the AML_ADVISORY source; an NLDS_PEP file adding 5 entries.
+    source: Prepared by the test lead from the source layouts; invented names only
+  - id: TD-SS-05
+    name: Masked clients
+    content: Prospect "Juan Dela Cruz" (individual, Retail unit); client "ABC Trading" (entity, Corbank unit) with a booked account; client with a PEP profile and a booked account (Retail unit); client without an active policy; inactive client; a client whose account officer is investigator2.
+    source: Masked demo clients (V981) plus clients keyed in by the test lead on SIT
+  - id: TD-SS-06
+    name: Cases in every stage
+    content: Cases in NEW, INVESTIGATION, RETURNED, UNIT_HEAD_APPROVAL, COMPLIANCE_REVIEW, AML_COMMITTEE (one vote pending), STR_PREPARATION and CLOSED; one STR APPROVED and one EXTRACTED.
+    source: Planned demo seed V1952 of the build design
+  - id: TD-SS-07
+    name: Case documents
+    content: KYC form PDF for "ABC Trading" received 12-May-2026; ID copy (JPG); source-of-funds letter (PDF); an .exe file.
+    source: Test document folder of the test lead (no client data)
+  - id: TD-SS-08
+    name: Committee settings
+    content: SCR_COMMITTEE_RULE MAJORITY, SCR_COMMITTEE_SIZE 5, five committee users amlcom1 to amlcom5.
+    source: Parameters as delivered; users of TD-SS-01
+  - id: TD-SS-09
+    name: STR data
+    content: Case in STR_PREPARATION for "ABC Trading" with two receipts and one invoice; test STR reason codes UAT01 and UAT02 added to SCR_STR_REASON by the test lead; an STR approved by the committee this month and one approved last month.
+    source: Case of TD-SS-06; reason codes keyed in Lists of Values until BDOI supplies the AMLC codes (SQ09)
+  - id: TD-SS-10
+    name: Parameters and jobs as delivered
+    content: "SCR_SCREENING_SCOPE PROSPECT, CONFIRMED; SCR_FULL_RESCREEN_DAY 1; SCR_BLOCK_ON_OPEN_MATCH false; SCR_COMMITTEE_RULE MAJORITY; SCR_COMMITTEE_SIZE 5; SCR_INGEST_ALERT_RECIPIENTS = test mailbox; jobs SCR_WATCHLIST_INGEST 01:00, SCR_PERIODIC_SCREENING 01:30, SCR_SLA_MONITOR hourly, SCR_INGEST_ERROR_DIGEST 07:00 Monday to Friday."
+    source: Configuration delivered with the build (FRS section 9.1); recipients set by the test lead
+
+scenarios:
+  - id: SC-SS-01
+    persona: SYSADMIN
+    title: Access, segregation of duties and audit. Each screening role sees only its screens and actions; four-eyes rules hold whatever the grants; every action is in an immutable log.
+    pre: Users of TD-SS-01.
+  - id: SC-SS-02
+    persona: COMPLIANCE_OFFICER
+    title: Configuration. The Compliance Officer drafts matching criteria, risk rules, matrices, SLA, templates, STR layout and dispositions; the checker approves or rejects each version.
+    pre: Active versions of TD-SS-02.
+  - id: SC-SS-03
+    persona: COMPLIANCE_OFFICER
+    title: Watchlist. List files are loaded on schedule or uploaded, failed records are reported, and manual entries go through maker-checker.
+    pre: Sources and entries of TD-SS-03; files TD-SS-04.
+  - id: SC-SS-04
+    persona: SYSTEM
+    title: Matching, risk tagging and case creation. New clients, identity changes, account submissions, list changes and the batch window start screening; matches tag the client and open cases.
+    pre: Clients TD-SS-05; configuration TD-SS-02; watchlist TD-SS-03.
+  - id: SC-SS-05
+    persona: SCR_INVESTIGATOR
+    title: Investigation. The Investigator works the case list, completes the review, uploads documents, updates the risk tag and submits a disposition.
+    pre: Cases TD-SS-06; documents TD-SS-07.
+  - id: SC-SS-06
+    persona: SCR_APPROVER
+    title: Approval and escalation. The case is validated, approved or returned by the Unit Head, reviewed by Compliance and decided by the AML Committee.
+    pre: Cases TD-SS-06; committee TD-SS-08.
+  - id: SC-SS-07
+    persona: COMPLIANCE_OFFICER
+    title: STR. The Compliance Officer prepares the STR from the case, extracts the committee-approved STRs and records the AMLC filing reference.
+    pre: STR data TD-SS-09.
+  - id: SC-SS-08
+    persona: UNIT_COMPLIANCE_COORD
+    title: Monitoring. SLA reminders and escalations, notifications, the Screening Home, the high-risk list and the compliance reports.
+    pre: Cases TD-SS-06; parameters TD-SS-10.
+
+frs:
+  FR-SS-001:
+    scenario: SC-SS-01
+    persona: SCR_INVESTIGATOR
+    screen: HOME
+    data: [TD-SS-01]
+    conditions:
+      - An Investigator sees Screening Home, Cases and Matches and does not see Compliance Setup.
+      - A Compliance Checker can approve a configuration version and cannot edit it.
+      - A screen or call without the permission is refused, and a refused call is logged.
+      - An Investigator sees the cases of the own team only; committee members act only on cases in the AML_COMMITTEE stage.
+      - A user acts on a case only while it is assigned to him or her.
+    cases:
+      - c: 1
+        type: Security-access
+        neg: false
+        title: Investigator menu
+        steps:
+          - Log in as investigator and open the side menu.
+        expected: Sanction Screening shows Screening Home, Cases, Matches and High-risk Clients. Compliance Setup and STR are not in the menu.
+      - c: 1
+        type: Security-access
+        screen: CONFIG
+        title: Investigator opens Compliance Setup by its address
+        steps:
+          - As investigator type the address /screening-setup/config.
+        expected: The page shows the no-access message and no configuration is loaded.
+      - c: 2
+        type: Security-access
+        neg: false
+        persona: COMPLIANCE_CHECKER
+        screen: CONFIG
+        title: Checker approves but cannot edit
+        pre: The PENDING draft of TD-SS-02.
+        steps:
+          - Log in as compchk; open the PENDING draft.
+          - Look for Edit, New Draft and Submit for Approval.
+        expected: Approve and Reject are shown; Edit, New Draft and Submit for Approval are not.
+      - c: 3
+        type: Security-access
+        persona: SCR_INVESTIGATOR
+        screen: API
+        title: Direct committee decision call without SCR_COMMITTEE
+        steps:
+          - As investigator call Record Decision on a case in AML_COMMITTEE.
+          - As auditor open Administration > Audit Trail.
+        expected: The call returns HTTP 403 and no vote is recorded. The refused call is logged with user, endpoint and time.
+        msg: [You are not permitted to perform this action]
+      - c: 4
+        type: Security-access
+        screen: CASES
+        title: Investigator does not see another team's cases
+        steps:
+          - As investigator open Cases, tab Team; search a case assigned to investigator2's team.
+        expected: The case is not listed; its direct address shows the no-access page.
+      - c: 4
+        type: Security-access
+        persona: AML_COMMITTEE
+        screen: CASE
+        title: Committee member cannot act on a case outside the committee stage
+        steps:
+          - As amlcom1 open a case in COMPLIANCE_REVIEW.
+        expected: The case opens read only; Record Decision is not shown.
+      - c: 5
+        type: Negative
+        persona: UNIT_COMPLIANCE_COORD
+        screen: API
+        title: Action on a case assigned to another user
+        steps:
+          - As the combined test user (SCR_INVESTIGATE) call Submit on a case in INVESTIGATION assigned to investigator.
+        expected: The action is refused and the case does not move.
+        msg: ["Case {SCR-2026-000010} is assigned to {investigator}"]
+
+  FR-SS-010:
+    scenario: SC-SS-02
+    persona: COMPLIANCE_OFFICER
+    screen: CONFIG
+    data: [TD-SS-02]
+    conditions:
+      - New Draft copies the active version; the submitted draft stores the before and after values against the active version and becomes PENDING.
+      - An active version cannot be edited; a change needs a new draft, and only one draft or pending version exists per type.
+      - The effective date cannot be before today, a draft without rules and a draft identical to the active version are refused.
+      - A case keeps the versions active when it was created; a newer version does not change it.
+      - A draft discarded by the maker is kept as REJECTED with the reason withdrawn by maker.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Draft of the matching criteria with a changed threshold
+        steps:
+          - Open tab Matching Criteria; click New Draft.
+          - Change the FUZZY threshold of SANCTION individuals from 0.85 to 0.88; effective from tomorrow; change note "UAT threshold".
+          - Open Changes; click Submit for Approval.
+        expected: The draft opens with the rules of the active version. Changes shows threshold 0.85 before and 0.88 after. After submission the version is PENDING and appears in compchk's My Approvals.
+      - c: 2
+        type: Negative
+        title: An active version cannot be edited
+        steps:
+          - Open the ACTIVE version of Matching Criteria.
+        expected: The rules are read only; the only action is New Draft.
+      - c: 2
+        type: Negative
+        title: A second draft of the same type opens the existing one
+        pre: A draft of type MATCH_CRITERIA exists.
+        steps:
+          - Click New Draft on tab Matching Criteria again.
+        expected: BIBS opens the existing draft; no second draft is created.
+      - c: 3
+        type: Boundary
+        neg: true
+        title: Effective date yesterday
+        steps:
+          - In a draft set Effective from to yesterday; submit.
+        expected: The draft is not submitted.
+        msg: [The effective date cannot be before today]
+      - c: 3
+        type: Boundary
+        title: Effective date today
+        steps:
+          - Set Effective from to today; submit.
+        expected: The draft is submitted and PENDING.
+      - c: 3
+        type: Negative
+        title: Draft without any rule
+        steps:
+          - Create a draft of type SLA_MATRIX; delete all rows; submit.
+        expected: The draft is not submitted.
+        msg: [Add at least one rule before submitting]
+      - c: 3
+        type: Negative
+        title: Draft identical to the active version
+        steps:
+          - Create a draft of type RISK_RULES; change nothing; submit.
+        expected: The draft is not submitted.
+        msg: [The draft does not change the active configuration]
+      - c: 4
+        type: Workflow
+        persona: SCR_INVESTIGATOR
+        screen: CASE
+        title: A case opened before a new assignment matrix keeps its assignee
+        pre: Case A assigned to investigator under the active assignment matrix.
+        steps:
+          - As compoff and compchk, activate a new assignment matrix that sends the same scenario to investigator2.
+          - Open case A; create a new case of the same scenario.
+        expected: Case A keeps investigator and records the old version; the new case goes to investigator2 and records the new version.
+      - c: 5
+        type: Positive
+        title: Maker discards a draft
+        steps:
+          - Open an own draft; click Discard; confirm.
+        expected: The draft shows REJECTED with the reason "withdrawn by maker"; the active version is unchanged.
+
+  FR-SS-011:
+    scenario: SC-SS-02
+    persona: COMPLIANCE_OFFICER
+    screen: CONFIG
+    data: [TD-SS-02]
+    conditions:
+      - A matching rule per list type and subject type holds the algorithm, threshold, fields compared and case threshold, and the approved version is used by the next run.
+      - Thresholds are between 0 and 1; a value outside is refused.
+      - The case threshold cannot be below the matching threshold, and at least the name field is compared.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Fuzzy threshold 0.92 used by the next run
+        steps:
+          - Draft Matching Criteria; set FUZZY threshold 0.92 for SANCTION individuals, effective today; submit.
+          - As compchk approve it.
+          - Create a new client and open the run log.
+        expected: The run of the new client shows the new configuration version and scores against 0.92.
+      - c: 2
+        type: Boundary
+        neg: true
+        title: Threshold 1.5
+        steps:
+          - In a draft enter threshold 1.5; save.
+        expected: The value is refused.
+        msg: [Enter a threshold between 0 and 1]
+      - c: 2
+        type: Boundary
+        title: Threshold 1.0000 and 0.0000 accepted
+        steps:
+          - Enter threshold 1.0000 on one rule and 0.0000 on another; save.
+        expected: Both values are saved with four decimals.
+      - c: 3
+        type: Negative
+        title: Case threshold below the matching threshold
+        steps:
+          - Enter threshold 0.90 and minimum score for a case 0.80; save.
+        expected: The rule is not saved.
+        msg: [The case threshold must be at least the matching threshold]
+      - c: 3
+        type: Negative
+        title: Name field removed from Fields compared
+        steps:
+          - Remove Name from Fields compared; save.
+        expected: The rule is not saved.
+        msg: [Select at least the name field]
+
+  FR-SS-012:
+    scenario: SC-SS-02
+    persona: COMPLIANCE_OFFICER
+    screen: CONFIG
+    data: [TD-SS-02, TD-SS-05]
+    conditions:
+      - A risk rule on match list type SANCTION and status TRUE_MATCH sets the client to the category's rating and tags, with an audit record.
+      - A category whose rating is not in KYC_RISK_RATING cannot be submitted.
+      - Each rule has its own priority, and a rule cannot name a category missing from the version.
+      - The first matching rule by priority decides the category.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: SCR_INVESTIGATOR
+        screen: CLIENT
+        title: Confirmed sanction match sets the High-risk category
+        pre: Active rule "match list type = SANCTION and status = TRUE_MATCH gives HIGH_SANCTION".
+        steps:
+          - As investigator confirm the match of "Juan Dela Cruz" as TRUE_MATCH on its case.
+          - Open the client's Screening tab and Administration > Audit Trail.
+        expected: The client rating is HIGH with tag WATCHLIST_REVIEW; the risk-profile history shows the rule; the audit trail shows the change.
+      - c: 2
+        type: Negative
+        title: Category with a rating outside the list
+        steps:
+          - Draft Risk Rules; add category UAT_X with rating VERY_HIGH; submit.
+        expected: The draft is not submitted.
+        msg: ["Risk rating {VERY_HIGH} is not a value of KYC_RISK_RATING"]
+      - c: 3
+        type: Negative
+        title: Two rules with the same priority
+        steps:
+          - Give two rules priority 10; save.
+        expected: The draft is not saved.
+        msg: [Each rule needs its own priority]
+      - c: 3
+        type: Negative
+        title: Rule pointing to an unknown category
+        steps:
+          - Add a rule with category UAT_MISSING; save.
+        expected: The draft is not saved.
+        msg: ["Category {UAT_MISSING} is not defined in this version"]
+      - c: 4
+        type: Positive
+        persona: SYSTEM
+        screen: CLIENT
+        title: First matching rule by priority wins
+        pre: Active rules - priority 10 PEP = true gives PEP; priority 20 nationality in a test list gives HIGH_SANCTION; a PEP client with that nationality.
+        steps:
+          - Run the screening of the client; open its risk-profile history.
+        expected: The category is PEP (rule of priority 10), and the history names that rule.
+
+  FR-SS-013:
+    scenario: SC-SS-02
+    persona: COMPLIANCE_OFFICER
+    screen: CONFIG
+    data: [TD-SS-02, TD-SS-05]
+    conditions:
+      - A submitted case goes to the approver of the first route whose conditions match, and the timeline shows the route.
+      - The outcome Escalate to Committee in COMPLIANCE_REVIEW routes the case to AML_COMMITTEE.
+      - With no matching route the case goes to the Unit Head of the client's unit as the default route; with no Unit Head it goes to the unit's approver queue and Compliance is alerted.
+      - A route needs a next stage, an approving user for kind User, and a to-stage that can follow the from-stage.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: SCR_INVESTIGATOR
+        screen: TIMELINE
+        title: HIGH_RISK case of the Corbank unit goes to the named approver
+        pre: Active route INVESTIGATION, case type HIGH_RISK, unit Corbank, to UNIT_HEAD_APPROVAL, approver scrapprover.
+        steps:
+          - As investigator submit a HIGH_RISK case of "ABC Trading" (Corbank).
+          - Open the Timeline tab.
+        expected: The case is in UNIT_HEAD_APPROVAL assigned to scrapprover; the timeline shows the route used.
+      - c: 2
+        type: Workflow
+        persona: COMPLIANCE_OFFICER
+        screen: CASE
+        title: Escalate to Committee routes to AML_COMMITTEE
+        steps:
+          - As compoff record the outcome Escalate to committee on a case in COMPLIANCE_REVIEW.
+        expected: The case moves to AML_COMMITTEE and the committee members are notified.
+      - c: 3
+        type: Positive
+        persona: SCR_INVESTIGATOR
+        screen: TIMELINE
+        title: No route matches - default route
+        pre: A case type and unit that no route covers.
+        steps:
+          - Submit the case; open the Timeline.
+        expected: The case goes to UNIT_HEAD_APPROVAL with the Unit Head of the client's unit; the timeline records "default route".
+      - c: 3
+        type: Negative
+        persona: SCR_INVESTIGATOR
+        screen: NOTIF
+        title: Unit without a Unit Head
+        pre: A client of a marketing unit without a Unit Head.
+        steps:
+          - Submit the case; as compoff open the bell.
+        expected: The case is assigned to the SCR_APPROVER queue of the unit; Compliance receives an alert.
+      - c: 4
+        type: Negative
+        title: Route without a next stage
+        steps:
+          - In a draft Approval Matrix add a route and leave To stage blank; save.
+        expected: The route is not saved.
+        msg: [Select the next stage]
+      - c: 4
+        type: Negative
+        title: Approver kind User without a user
+        steps:
+          - Add a route with Approver kind User and no user; save.
+        expected: The route is not saved.
+        msg: [Select the approving user]
+      - c: 4
+        type: Negative
+        title: Route to a stage that cannot follow
+        steps:
+          - Add a route from UNIT_HEAD_APPROVAL to STR_EXTRACTION; save.
+        expected: The route is not saved.
+        msg: ["Stage {STR_EXTRACTION} cannot follow {UNIT_HEAD_APPROVAL}"]
+
+  FR-SS-014:
+    scenario: SC-SS-02
+    persona: COMPLIANCE_OFFICER
+    screen: CONFIG
+    data: [TD-SS-02, TD-SS-05]
+    conditions:
+      - A new case is assigned by the first matching scenario when it is created, with the balancing of the scenario.
+      - A new matrix does not move cases already assigned.
+      - With no matching scenario the case goes unassigned to the Investigator team queue and the UCC is notified.
+      - The client's own account officer is never assigned; only enabled users with SCR_INVESTIGATE are targets.
+      - A scenario needs a team role or a user.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: SYSTEM
+        screen: CASE
+        title: New PEP case of the Retail unit assigned by its scenario
+        steps:
+          - Create the PEP client of TD-SS-05 in the Retail unit (triggers screening).
+          - Open the new PEP case.
+        expected: The case is assigned by the Retail PEP scenario to the user or team it names.
+      - c: 1
+        type: Positive
+        persona: SYSTEM
+        screen: CASES
+        title: Round robin balancing
+        pre: A scenario with team role SCR_INVESTIGATOR and ROUND_ROBIN; two eligible investigators.
+        steps:
+          - Create two cases of the scenario in turn.
+        expected: The first case goes to one investigator and the second to the other.
+      - c: 2
+        type: Workflow
+        persona: SYSTEM
+        screen: CASES
+        title: Existing cases keep their assignees after a new matrix
+        steps:
+          - Activate a new assignment matrix; open the cases assigned before it.
+        expected: The earlier cases keep their assignees; new cases follow the new matrix.
+      - c: 3
+        type: Negative
+        persona: UNIT_COMPLIANCE_COORD
+        screen: NOTIF
+        title: No scenario matches
+        steps:
+          - Create a case whose type and unit no scenario covers; as ucc open the bell and Cases.
+        expected: The case is unassigned in the Investigator team queue; ucc is notified.
+      - c: 4
+        type: Negative
+        persona: SYSTEM
+        screen: CASE
+        title: The client's account officer is not assigned
+        pre: A scenario targeting the team of investigator2; the client's account officer is investigator2.
+        steps:
+          - Create a case for that client.
+        expected: The case goes to another investigator of the team, never to investigator2.
+      - c: 4
+        type: Negative
+        title: Target user without SCR_INVESTIGATE
+        steps:
+          - In a draft add a scenario with user compchk; save.
+        expected: The scenario is not saved.
+        msg: ["User {compchk} cannot investigate cases"]
+      - c: 5
+        type: Negative
+        title: Scenario without team role or user
+        steps:
+          - Add a scenario with no team role and no user; save.
+        expected: The scenario is not saved.
+        msg: [Select a team role or a user]
+
+  FR-SS-015:
+    scenario: SC-SS-02
+    persona: COMPLIANCE_OFFICER
+    screen: CONFIG
+    data: [TD-SS-02]
+    conditions:
+      - A case entering a stage gets its due time from the SLA row of the matrix active on that date, the most specific row first.
+      - An SLA change shows its before and after values and applies only to stage entries from its effective date.
+      - SLA hours must be greater than 0 and the reminder lead below the SLA.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: SYSTEM
+        screen: CASE
+        title: 48-hour calendar SLA for INVESTIGATION
+        pre: A version with INVESTIGATION 48 hours, calendar hours, is active.
+        steps:
+          - Create a case; read its due time.
+          - Move the due time into the past in the test database; run SCR_SLA_MONITOR.
+        expected: The due time is 48 hours after the stage entry; after the run the case shows the Breached badge.
+      - c: 1
+        type: Positive
+        persona: SYSTEM
+        screen: CASE
+        title: The most specific row wins
+        pre: Rows INVESTIGATION any type 72 hours and INVESTIGATION PEP 24 hours.
+        steps:
+          - Create a PEP case and a NAME_MATCH case.
+        expected: The PEP case is due in 24 hours, the NAME_MATCH case in 72 hours.
+      - c: 2
+        type: Positive
+        title: SLA change in the version history; running due times do not move
+        steps:
+          - Open the approved version; open Changes.
+          - Open a case that entered the stage before the new version.
+        expected: Changes shows 72 before and 48 after. The older case keeps its original due time.
+      - c: 3
+        type: Boundary
+        neg: true
+        title: SLA hours 0
+        steps:
+          - Enter SLA hours 0; save.
+        expected: The row is not saved.
+        msg: [Enter the SLA in hours (greater than 0)]
+      - c: 3
+        type: Boundary
+        neg: true
+        title: Reminder lead equal to the SLA
+        steps:
+          - Enter SLA hours 24 and reminder lead 24; save.
+        expected: The row is not saved.
+        msg: [The reminder must fall before the SLA ends]
+      - c: 3
+        type: Boundary
+        title: Reminder lead one hour below the SLA
+        steps:
+          - Enter SLA hours 24 and reminder lead 23; save.
+        expected: The row is saved.
+
+  FR-SS-016:
+    scenario: SC-SS-02
+    persona: COMPLIANCE_OFFICER
+    screen: TEMPLATES
+    data: [TD-SS-02]
+    conditions:
+      - A new template version, once approved, is used by reviews started after its effective date.
+      - A review in progress keeps the template version it started with.
+      - A field needs a label, a list field needs its list type, and a review template needs at least one mandatory field.
+    cases:
+      - c: 1
+        type: Workflow
+        title: New KYC review template version used by new reviews
+        steps:
+          - Open the KYC review template; create a draft; add field "Source of wealth" (long text, mandatory); preview; submit.
+          - As compchk approve it effective today.
+          - As investigator open the Review tab of a new KYC case.
+        expected: The preview shows the new field. The new review shows "Source of wealth" marked mandatory.
+      - c: 2
+        type: Positive
+        persona: SCR_INVESTIGATOR
+        screen: REVIEW
+        title: Review started on version 1 keeps version 1
+        pre: A review saved as draft before version 2 became active.
+        steps:
+          - Open the Review tab of that case.
+        expected: The review shows version 1 fields without "Source of wealth".
+      - c: 3
+        type: Negative
+        title: Field without label
+        steps:
+          - Add a field with code UAT_F1 and no label; save.
+        expected: The field is not saved.
+        msg: [Enter the field label]
+      - c: 3
+        type: Negative
+        title: List field without list type
+        steps:
+          - Add a field of data type List without a list type; save.
+        expected: The field is not saved.
+        msg: [Select the list of values of the field]
+      - c: 3
+        type: Negative
+        title: Template without a mandatory field
+        steps:
+          - Untick Mandatory on every field of the draft; submit.
+        expected: The template is not submitted.
+        msg: [A review template needs at least one mandatory field]
+
+  FR-SS-017:
+    scenario: SC-SS-07
+    persona: COMPLIANCE_OFFICER
+    screen: TEMPLATES
+    data: [TD-SS-02, TD-SS-09]
+    conditions:
+      - An STR created after a new STR template version uses the new fields; an STR already submitted keeps its fields.
+      - The extraction file follows the column order of the active STR layout.
+      - Every layout column needs an STR field or a fixed value, and a fixed-width column needs a length.
+    cases:
+      - c: 1
+        type: Workflow
+        title: New STR template field on new STRs only
+        steps:
+          - Draft the STR template; add field "Branch of transaction"; submit; approve as compchk.
+          - Open the STR of a case that reaches STR_PREPARATION afterwards, and an STR marked ready before.
+        expected: The new STR shows the new field; the earlier STR keeps its fields and template version.
+      - c: 2
+        type: Report-output
+        screen: STR
+        title: Extraction file follows the layout column order
+        pre: An active CSV layout with columns STR no., subject name, amount, reason code in that order.
+        steps:
+          - Extract the approved STRs of the month; open the file.
+        expected: The header and the columns are in the layout order; the delimiter and encoding are those of the layout.
+      - c: 3
+        type: Negative
+        screen: CONFIG
+        title: Layout column without source
+        steps:
+          - Draft STR Layout; add column 5 with no STR field and no fixed value; save.
+        expected: The column is not saved.
+        msg: ["Column {5} needs an STR field or a fixed value"]
+      - c: 3
+        type: Negative
+        screen: CONFIG
+        title: Fixed-width column without length
+        steps:
+          - Set the format to fixed width; add a column without length; save.
+        expected: The column is not saved.
+        msg: [Enter the column length]
+
+  FR-SS-018:
+    scenario: SC-SS-02
+    persona: BUSINESS_ADMIN
+    screen: LOV
+    data: [TD-SS-02]
+    conditions:
+      - The case screen offers only the dispositions of the current stage.
+      - An end-dated disposition is no longer offered and stays on the cases that used it.
+      - A disposition needs a stage, and a list change is applied only after a second user approves it.
+    cases:
+      - c: 1
+        type: Positive
+        persona: SCR_APPROVER
+        screen: CASE
+        title: Unit Head sees only CONCUR and NOT_CONCUR
+        steps:
+          - As scrapprover open a case in UNIT_HEAD_APPROVAL; open the Decision list.
+        expected: The list shows Concur and Not concur only.
+      - c: 1
+        type: Negative
+        persona: SCR_INVESTIGATOR
+        screen: API
+        title: Disposition of another stage refused
+        steps:
+          - As investigator submit a case in INVESTIGATION with disposition CONCUR through the API.
+        expected: The submission is refused; the case stays in INVESTIGATION.
+        msg: ["The action {submit} is not allowed in stage {INVESTIGATION}"]
+      - c: 2
+        type: Workflow
+        title: End-date the disposition Need more information
+        steps:
+          - End-date NEED_MORE_INFO today; approve as a second user.
+          - Tomorrow, open a case in INVESTIGATION and a case that used NEED_MORE_INFO before.
+        expected: The new list does not offer it; the older case still shows it on its timeline.
+      - c: 3
+        type: Negative
+        title: Disposition without stage
+        steps:
+          - Add value UAT_DISP to SCR_DISPOSITION without a parent stage; save.
+        expected: The value is not saved.
+        msg: [Select the case stage of the disposition]
+      - c: 3
+        type: Security-access
+        title: The maker cannot approve the own list change
+        steps:
+          - As badmin open the own pending change of SCR_DISPOSITION in My Approvals.
+        expected: Approve is not offered to badmin; the change waits for another approver.
+
+  FR-SS-019:
+    scenario: SC-SS-02
+    persona: COMPLIANCE_CHECKER
+    screen: APPROVALS
+    data: [TD-SS-02]
+    conditions:
+      - An approved version is ACTIVE from its effective date and supersedes the previous version on that date; the maker is notified.
+      - A rejection needs a reason; the rejected version keeps it and the active version is unchanged.
+      - The maker of a version cannot approve it, even with SCR_CONFIG_APPROVE.
+      - If no active version exists when a trigger fires, the run stops and an alert is raised.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Approve a version effective tomorrow
+        steps:
+          - Open the PENDING matching-criteria version; review the changes; click Approve.
+          - Check both versions today and again tomorrow (date moved in the test database).
+        expected: Today the new version shows ACTIVE from tomorrow and the old one stays in force; tomorrow the old version is SUPERSEDED. compoff is notified of the approval.
+      - c: 2
+        type: Workflow
+        title: Reject with a reason
+        steps:
+          - Open a PENDING version; click Reject; enter "Threshold too low"; confirm.
+        expected: The version is REJECTED with the reason; the active version is unchanged; compoff is notified.
+      - c: 2
+        type: Negative
+        title: Reject without a reason
+        steps:
+          - Click Reject; leave the reason blank; confirm.
+        expected: The version stays PENDING.
+        msg: [Enter the reason for the rejection]
+      - c: 3
+        type: Security-access
+        title: The maker approves the own version
+        pre: A combined test user holding SCR_CONFIG_MAINTAIN and SCR_CONFIG_APPROVE made and submitted a draft.
+        steps:
+          - As that user open the version and click Approve.
+        expected: The approval is refused; the version stays PENDING.
+        msg: [A configuration change is approved by someone other than its maker]
+      - c: 4
+        type: Negative
+        persona: SYSTEM
+        screen: NOTIF
+        title: No active matching version when a client is created
+        pre: On a test copy, the only matching-criteria version is set to future effective date (no ACTIVE version today).
+        steps:
+          - Create a new client; open the run log and the bell as compoff.
+        expected: No screening run starts; alert SCR_NO_ACTIVE_CONFIG is raised.
+
+  FR-SS-020:
+    scenario: SC-SS-03
+    persona: SYSTEM
+    screen: SOURCES
+    data: [TD-SS-03, TD-SS-04, TD-SS-10]
+    conditions:
+      - A scheduled run of a source file adds, updates and delists entries and logs received, added, updated, delisted and failed counts with its status.
+      - A run that cannot read its file is FAILED with the reason and raises an alert.
+      - Uploading the same file twice adds no duplicate entries.
+      - The Compliance Officer uploads a list file; the run is logged with trigger manual upload, and a file of a type the source does not accept is refused.
+      - An entry missing from a full-file source is delisted (INACTIVE with a delisting date), never deleted.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Scheduled run with 3 new and 1 changed entry
+        pre: The AML_ADVISORY file of TD-SS-04 (3 new, 1 changed) is in the source location.
+        steps:
+          - Run SCR_WATCHLIST_INGEST (or wait for 01:00).
+          - Open the run in List Sources and Runs.
+        expected: Received 4, added 3, updated 1, delisted 0, failed 0, status SUCCESS; delta screening starts for the changed entries.
+      - c: 2
+        type: Negative
+        persona: COMPLIANCE_OFFICER
+        screen: NOTIF
+        title: Unreadable file
+        steps:
+          - Put the truncated CSV in the source location; run the job; open the run and the bell.
+        expected: The run is FAILED with the reason; alert SCR_INGEST_FAILED is shown to Compliance Officers.
+      - c: 3
+        type: Negative
+        persona: COMPLIANCE_OFFICER
+        title: Same file uploaded twice
+        steps:
+          - Upload the valid AML_ADVISORY file with Upload List File; upload it again.
+          - Count the entries of the source.
+        expected: The second run adds 0 and updates 0; no entry is duplicated.
+      - c: 4
+        type: Upload-download
+        persona: COMPLIANCE_OFFICER
+        title: Manual upload of the NLDS_PEP file
+        steps:
+          - Click Upload List File; select NLDS_PEP and the file adding 5 entries; confirm.
+        expected: The run shows trigger MANUAL_UPLOAD, added 5, status SUCCESS.
+      - c: 4
+        type: Negative
+        persona: COMPLIANCE_OFFICER
+        title: PDF uploaded for a CSV source
+        steps:
+          - Upload the PDF for AML_ADVISORY.
+        expected: The upload is refused and no run is created.
+        msg: ["The file type is not allowed for source {AML_ADVISORY}"]
+      - c: 5
+        type: Positive
+        screen: WATCHLIST
+        title: Entry missing from the full file is delisted
+        pre: The next AML_ADVISORY file omits one active entry.
+        steps:
+          - Run the ingestion; open the omitted entry on Watchlist.
+        expected: The entry is INACTIVE with today's delisting date and is still listed; the run shows delisted 1.
+
+  FR-SS-021:
+    scenario: SC-SS-03
+    persona: SYSTEM
+    screen: SOURCES
+    data: [TD-SS-04, TD-SS-10]
+    conditions:
+      - Each failed record is kept with source, run, line, raw record and reason, and the run is PARTIAL.
+      - The digest e-mails the failed records since the last digest to the recipients; the report SCR-INGEST-ERRORS shows the same records.
+      - No failed record means no e-mail; no recipient means the digest is skipped with an alert.
+      - An invalid address in the recipient list is refused.
+    cases:
+      - c: 1
+        type: Negative
+        title: File with 2 bad lines
+        steps:
+          - Upload the CSV with the missing name and the invalid date; open the run detail.
+        expected: The valid lines are loaded; the run is PARTIAL with failed 2.
+        msg: ["Line {7}: name is missing"]
+      - c: 1
+        type: Negative
+        title: Invalid date in a list record
+        steps:
+          - Open the second failed line of the same run.
+        expected: The raw record and the reason are shown.
+        msg: ["Line {12}: {birth date} is not a valid date"]
+      - c: 2
+        type: Report-output
+        screen: MAIL
+        title: Digest lists both failed lines
+        steps:
+          - Run SCR_INGEST_ERROR_DIGEST; open the recipients' test mailbox.
+          - As compoff run SCR-INGEST-ERRORS for today.
+        expected: The e-mail lists both lines with source, run, line and reason; the report shows the same two records.
+      - c: 3
+        type: Negative
+        screen: MAIL
+        title: No failed records - no e-mail
+        pre: No failed record since the last digest.
+        steps:
+          - Run SCR_INGEST_ERROR_DIGEST; check the mailbox.
+        expected: No e-mail is sent.
+      - c: 3
+        type: Negative
+        persona: COMPLIANCE_OFFICER
+        screen: NOTIF
+        title: No recipient configured
+        pre: SCR_INGEST_ALERT_RECIPIENTS is empty; a run with failed records exists.
+        steps:
+          - Run the digest; open the bell.
+        expected: The digest is skipped; the alert shows "no recipients".
+      - c: 4
+        type: Negative
+        persona: SYSADMIN
+        screen: PARAMS
+        title: Invalid recipient address
+        steps:
+          - Set SCR_INGEST_ALERT_RECIPIENTS to "compliance@@test"; save.
+        expected: The value is refused.
+        msg: ["{compliance@@test} is not a valid e-mail address"]
+
+  FR-SS-022:
+    scenario: SC-SS-03
+    persona: COMPLIANCE_OFFICER
+    screen: WATCHLIST
+    data: [TD-SS-03]
+    conditions:
+      - A new manual entry is saved PENDING with before and after values and is not used by screening until approved.
+      - Saving without name, list type or remarks is refused and names the missing field.
+      - A second change of an entry is refused while one is pending.
+      - Entries are never deleted; they are deactivated.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Add an internal entry
+        steps:
+          - Click Add Entry; source INTERNAL, list type Internal, Individual, primary name "Pedro Invented Lagman", birth date, remarks "Internal finding UAT"; save.
+          - Create a client "Pedro Invented Lagman".
+        expected: The entry is PENDING and appears in compchk's My Approvals. The new client's screening records no match against it.
+      - c: 2
+        type: Negative
+        title: Entry without name
+        steps:
+          - Add Entry with list type and remarks but no primary name; save.
+        expected: Not saved; Primary name is marked.
+        msg: [Enter the name of the listed person or entity]
+      - c: 2
+        type: Negative
+        title: Entry without remarks
+        steps:
+          - Add Entry with a name and list type; leave Remarks blank; save.
+        expected: Not saved; Remarks is marked.
+        msg: [Enter the reason for the change]
+      - c: 2
+        type: Negative
+        title: Entry without list type
+        steps:
+          - Add Entry with a name and remarks; leave List type blank; save.
+        expected: Not saved.
+        msg: [Select the list type]
+      - c: 3
+        type: Negative
+        title: Second change while one is pending
+        steps:
+          - Open an entry with a pending change; click Change; save a new alias.
+        expected: The second change is refused.
+        msg: ["Entry {INT-000003} already has a change waiting for approval"]
+      - c: 4
+        type: Negative
+        title: No delete action
+        steps:
+          - Open an active entry; look for Delete; click Deactivate with remarks; save.
+        expected: No Delete action exists; the deactivation is saved PENDING.
+
+  FR-SS-023:
+    scenario: SC-SS-03
+    persona: COMPLIANCE_CHECKER
+    screen: APPROVALS
+    data: [TD-SS-03, TD-SS-05]
+    conditions:
+      - An approved new entry is ACTIVE and the next delta screening matches clients against it.
+      - A rejected change leaves the entry as it was and shows the checker's remarks.
+      - The maker of a list change cannot approve it, and rejecting needs remarks.
+      - A decided change is read only.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Approve the internal entry and match a client
+        pre: TC-SS-022.1-01 is done.
+        steps:
+          - Open the change; compare the values; click Approve.
+          - Open the Matches screen.
+        expected: The entry is ACTIVE with its effective date; delta screening records a match for the client "Pedro Invented Lagman".
+      - c: 2
+        type: Workflow
+        title: Reject an alias change
+        steps:
+          - Open a pending alias change; enter remarks "Alias not in the advisory"; click Reject.
+        expected: The entry keeps its former aliases; the change shows REJECTED with the remarks and compchk's user and time.
+      - c: 3
+        type: Negative
+        title: Reject without remarks
+        steps:
+          - Click Reject with blank remarks.
+        expected: The change stays PENDING.
+        msg: [Enter the remarks for the rejection]
+      - c: 3
+        type: Security-access
+        title: The maker approves the own list change
+        pre: A combined user holding SCR_LIST_MAINTAIN and SCR_LIST_APPROVE made a change.
+        steps:
+          - As that user click Approve on the change.
+        expected: The approval is refused.
+        msg: [A list change is approved by someone other than its maker]
+      - c: 4
+        type: Negative
+        screen: WATCHLIST
+        title: Decided change is read only
+        steps:
+          - Open the approved change of TC-SS-023.1-01.
+        expected: No action is offered; the values cannot be edited.
+
+  FR-SS-030:
+    scenario: SC-SS-04
+    persona: SYSTEM
+    screen: CLIENT
+    data: [TD-SS-05, TD-SS-10]
+    conditions:
+      - Creating a client starts a screening run for that client only, without user action, and never delays the save.
+      - A change of the client's name, birth date, nationality, TIN or ID, or the submission of an account, screens that client.
+      - The batch run screens all prospects and confirmed clients against the changed entries (full list on the re-screen day) and no inactive client.
+      - The run log shows trigger, scope, configuration version and counts; re-running the same versions creates no second match.
+      - Each client of a bulk upload is screened and the runs are grouped under the bulk job.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: MKT_AO
+        screen: NEWCLIENT
+        title: New client screened on creation
+        steps:
+          - As ao create the prospect "Juan Dela Cruz"; time the save.
+          - As compoff open the client's Screening tab and the run log.
+        expected: The save completes normally. A run with trigger client registered screened this client only (clients screened 1).
+      - c: 2
+        type: Workflow
+        persona: MKT_AO
+        title: Name change screens the client
+        steps:
+          - As ao change the name of a confirmed client; save.
+        expected: A run with trigger client identity changed screens the client.
+      - c: 2
+        type: Workflow
+        persona: MKT_AO
+        screen: ACCOUNT
+        title: Account submission screens the client
+        steps:
+          - As ao submit an account of "ABC Trading".
+        expected: A run with trigger account submitted screens the client; the submission is not delayed.
+      - c: 2
+        type: Negative
+        persona: MKT_AO
+        title: A change of a non-identity field does not screen
+        steps:
+          - As ao change only the mobile number of a confirmed client; save.
+        expected: No screening run is started for the client.
+      - c: 3
+        type: Positive
+        screen: JOBS
+        title: Batch window screens prospects and confirmed clients only
+        steps:
+          - Run SCR_PERIODIC_SCREENING; open the run log.
+        expected: The run covers every prospect and confirmed client; the inactive client of TD-SS-05 is not in the scope.
+      - c: 4
+        type: Negative
+        screen: HOME
+        title: Re-run with the same versions records no duplicate
+        steps:
+          - Run SCR_PERIODIC_SCREENING twice without list or configuration changes; open the run log and Matches.
+        expected: The second run records 0 new matches; the log shows trigger, configuration version and counts for both runs.
+      - c: 5
+        type: Upload-download
+        persona: MKT_AO
+        title: Bulk client upload screens each client
+        steps:
+          - Upload a client bulk file of three prospects; open the run log.
+        expected: Three runs, one per client, grouped under the bulk job.
+
+  FR-SS-031:
+    scenario: SC-SS-04
+    persona: SYSTEM
+    screen: MATCHES
+    data: [TD-SS-03, TD-SS-05]
+    conditions:
+      - A client name that meets a matching rule records a POTENTIAL match with client, entry and version, score, algorithm and matched fields.
+      - A pair below the threshold records no match.
+      - A second run with the same versions records no duplicate; a changed entry is matched again even after a false positive.
+    cases:
+      - c: 1
+        type: Positive
+        title: Juan Dela Cruz matches Juan de la Cruz
+        pre: TC-SS-030.1-01 is done.
+        steps:
+          - Open Matches; filter on the client "Juan Dela Cruz".
+        expected: A POTENTIAL match to the entry "Juan de la Cruz" with its score, the algorithm and the fields matched.
+      - c: 2
+        type: Negative
+        title: Pair below the threshold
+        steps:
+          - Create the prospect "Juana Cruzado"; open Matches.
+        expected: No match is recorded for "Juana Cruzado".
+      - c: 3
+        type: Negative
+        title: No duplicate on a second run
+        steps:
+          - Run the batch twice; filter Matches on "Juan Dela Cruz".
+        expected: Still one match for the same client, entry version and configuration version.
+      - c: 3
+        type: Positive
+        title: Changed entry is matched again after a false positive
+        pre: The match of "Juan Dela Cruz" is marked false positive.
+        steps:
+          - Change the birth date of the entry (maker and checker); run delta screening.
+        expected: A new POTENTIAL match for the new entry version is recorded.
+
+  FR-SS-032:
+    scenario: SC-SS-05
+    persona: SCR_INVESTIGATOR
+    screen: MATCHES
+    data: [TD-SS-03, TD-SS-05, TD-SS-07]
+    conditions:
+      - Potential matches below the case threshold are listed with score and fields, and the Investigator compares client and entry side by side.
+      - A match marked false positive leaves the list and is not raised again for the same entry version.
+      - Opening a case from a match for a client with an open case of the same type adds the match to that case.
+      - A false positive needs a justification and evidence.
+    cases:
+      - c: 1
+        type: Positive
+        title: Filter and compare a potential match
+        steps:
+          - Open Matches; filter on score 0.85 to 0.90 and list type Sanction; open a match.
+        expected: The match shows the client and the entry side by side with the score and matched fields.
+      - c: 2
+        type: Workflow
+        title: Mark a match false positive
+        steps:
+          - Click Mark False Positive; enter the justification; attach the ID copy; save.
+          - Run delta screening again.
+        expected: The match leaves the list with status FALSE_POSITIVE and is not raised again.
+      - c: 3
+        type: Workflow
+        title: Open Case adds the match to the open case
+        pre: The client has an open NAME_MATCH case.
+        steps:
+          - Click Open Case on another match of the client.
+        expected: No new case; the match is added to the open case and its timeline records it.
+      - c: 4
+        type: Negative
+        title: False positive without justification
+        steps:
+          - Click Mark False Positive; leave the justification blank; save.
+        expected: Not saved.
+        msg: [Enter the justification and attach the evidence]
+
+  FR-SS-033:
+    scenario: SC-SS-04
+    persona: SYSTEM
+    screen: CLIENT
+    data: [TD-SS-02, TD-SS-05]
+    conditions:
+      - A confirmed sanction match under an active High-risk rule sets the client rating and the WATCHLIST_REVIEW tag automatically.
+      - The Screening tab shows the rule and match that caused the change.
+      - The KYC review date moves to the date of the higher rating.
+      - With no qualifying rule, or the same rating and tags, nothing is written; a rule never lowers a rating set by hand for the same entry version.
+      - A tag warns and does not block business while SCR_BLOCK_ON_OPEN_MATCH is false.
+    cases:
+      - c: 1
+        type: Positive
+        title: Automatic High-risk tag
+        pre: The match of "Juan Dela Cruz" is confirmed TRUE_MATCH.
+        steps:
+          - Open the client page.
+        expected: Rating HIGH and tag WATCHLIST_REVIEW; the client banner shows the tag.
+      - c: 2
+        type: Positive
+        title: Rule and match on the Screening tab
+        steps:
+          - Open the Screening tab, risk-profile history.
+        expected: The row shows category, rating, tags, source RULE, the rule, the match and the time.
+      - c: 3
+        type: Positive
+        title: KYC review date follows the higher rating
+        steps:
+          - Compare the KYC review date before and after the tag.
+        expected: The review date moves to the date set for rating HIGH by the KYC review cycle.
+      - c: 4
+        type: Negative
+        title: No qualifying rule - profile unchanged
+        steps:
+          - Screen a client whose match is below every rule; open the history.
+        expected: No new history row; rating and tags unchanged.
+      - c: 4
+        type: Negative
+        title: Manual rating not lowered by a rule
+        pre: The Investigator set the rating by hand with evidence (FR-SS-035).
+        steps:
+          - Run the batch for the same entry version.
+        expected: The manual rating stays; no RULE row is written.
+      - c: 5
+        type: Positive
+        persona: MKT_AO
+        screen: ACCOUNT
+        title: Tag warns and does not block
+        steps:
+          - As ao submit an account of the tagged client.
+        expected: A warning shows the tag; the account is submitted.
+
+  FR-SS-034:
+    scenario: SC-SS-04
+    persona: SYSTEM
+    screen: CASES
+    data: [TD-SS-05]
+    conditions:
+      - A High-risk tag on a client with a booked account opens a case SCR-yyyy-nnnnnn, assigned by the routing rules, with the configuration versions in force.
+      - For a client without an active policy a MONITOR case opens and the UCC and the Investigator are notified.
+      - Submitting an account of a listed client opens an ACCOUNT_APPLICATION case.
+      - A client has one open case per type; a new match joins the open case.
+    cases:
+      - c: 1
+        type: Workflow
+        title: High-risk tag on a client with a booked account
+        steps:
+          - Confirm a sanction match for "ABC Trading" (booked account).
+          - Open Cases.
+        expected: A HIGH_RISK case SCR-yyyy-nnnnnn in INVESTIGATION, active-policy flag Yes, unit and Unit Head filled, assigned by the matrix; the case records the configuration versions.
+      - c: 2
+        type: Workflow
+        persona: UNIT_COMPLIANCE_COORD
+        screen: NOTIF
+        title: Client without an active policy
+        steps:
+          - Tag the client without an active policy High-risk; as ucc and as the investigator open the bell.
+        expected: A MONITOR case opens; ucc and the investigator receive the notice of a client without an active policy.
+      - c: 3
+        type: Workflow
+        persona: MKT_AO
+        screen: ACCOUNT
+        title: Account submission of a listed client
+        steps:
+          - As ao submit an account of "Juan Dela Cruz".
+        expected: An ACCOUNT_APPLICATION case opens automatically.
+      - c: 4
+        type: Negative
+        title: No second open case of the same type
+        pre: The client "ABC Trading" has an open HIGH_RISK case.
+        steps:
+          - Record another match that qualifies for HIGH_RISK.
+        expected: No new case; the match joins the open case and the timeline records it.
+
+  FR-SS-035:
+    scenario: SC-SS-05
+    persona: SCR_INVESTIGATOR
+    screen: CASE
+    data: [TD-SS-05, TD-SS-07]
+    conditions:
+      - For a validated false positive the Investigator updates rating and tags with a justification and evidence; the change shows at once on the client with source MANUAL.
+      - The change cannot be saved without evidence or justification, or with a rating outside the list.
+      - The same entry version does not raise the client again; a later change of the entry lifts the suppression.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Lower the rating after a false positive
+        steps:
+          - On the case click Update Risk Tag; rating STANDARD; remove WATCHLIST_REVIEW; justification "Different birth date and nationality"; attach the ID copy; save.
+          - Open the client page.
+        expected: The client shows STANDARD without the tag at once; the history row has source MANUAL.
+      - c: 2
+        type: Negative
+        title: No evidence attached
+        steps:
+          - Update Risk Tag with a justification and no file; save.
+        expected: Not saved.
+        msg: [Attach at least one evidence document]
+      - c: 2
+        type: Negative
+        title: Justification blank
+        steps:
+          - Update Risk Tag with a file and no justification; save.
+        expected: Not saved.
+        msg: [Enter the justification of the change]
+      - c: 2
+        type: Negative
+        screen: API
+        title: Rating outside the list
+        steps:
+          - Call Update Risk Tag with rating VERY_LOW.
+        expected: Refused.
+        msg: [Select a valid risk rating]
+      - c: 3
+        type: Positive
+        persona: SYSTEM
+        screen: MATCHES
+        title: Suppression holds for the same entry version
+        steps:
+          - Run the batch after TC-SS-035.1-01.
+        expected: No new match for the client against the same entry version.
+
+  FR-SS-040:
+    scenario: SC-SS-05
+    persona: SCR_INVESTIGATOR
+    screen: CASE
+    data: [TD-SS-06]
+    conditions:
+      - After the Investigator submits, the case is read only to the Investigator.
+      - The Timeline tab lists every transition with user, time, disposition, reason and remarks.
+      - Only the transitions of the workflow are possible.
+      - A closed case is re-opened only by Compliance with a reason.
+    cases:
+      - c: 1
+        type: Negative
+        title: Investigator edits a submitted case
+        steps:
+          - Submit a case; reopen it; try Save Draft on the Review tab through the API.
+        expected: The case is read only; the call is refused.
+        msg: ["Case {SCR-2026-000012} is no longer assigned to you"]
+      - c: 2
+        type: Positive
+        screen: TIMELINE
+        title: Timeline of a case through three stages
+        steps:
+          - Open the Timeline tab of a case in COMPLIANCE_REVIEW.
+        expected: Every transition is listed with user, time, disposition, reason and remarks.
+      - c: 3
+        type: Negative
+        persona: COMPLIANCE_OFFICER
+        screen: API
+        title: Transition not in the workflow
+        steps:
+          - Call prepare_str on a case in UNIT_HEAD_APPROVAL.
+        expected: Refused; the case stays.
+        msg: ["The action {prepare_str} is not allowed in stage {UNIT_HEAD_APPROVAL}"]
+      - c: 4
+        type: Workflow
+        persona: COMPLIANCE_OFFICER
+        title: Re-open a closed case with a reason
+        steps:
+          - Open a CLOSED case; click Re-open; select a return reason; confirm.
+        expected: The case goes to INVESTIGATION; the timeline shows the reason.
+      - c: 4
+        type: Security-access
+        title: Investigator cannot re-open a closed case
+        steps:
+          - As investigator open a CLOSED case.
+        expected: Re-open is not offered.
+
+  FR-SS-041:
+    scenario: SC-SS-05
+    persona: SCR_INVESTIGATOR
+    screen: CASES
+    data: [TD-SS-06]
+    conditions:
+      - The Cases screen lists the cases the user may see in the tabs My Cases, Team, For Approval, Committee, STR and Closed, and a row opens the case page with its tabs.
+      - Filtering by marketing unit and date created shows only the cases of that unit created in the period; the list exports to Excel.
+      - An Investigator does not see cases of another team.
+      - A filter with the end date before the start date is refused.
+    cases:
+      - c: 1
+        type: Positive
+        title: Open a case from My Cases
+        steps:
+          - Open Cases, tab My Cases; click a case.
+        expected: The case page shows the summary (case number, client, status, risk flags, SLA badge) and the tabs Matches, Review, Documents, Decisions, STR and Timeline.
+      - c: 2
+        type: Report-output
+        persona: UNIT_COMPLIANCE_COORD
+        title: Filter by unit and date and export
+        steps:
+          - As ucc filter Corbank and date created this month; export to Excel.
+        expected: Only Corbank cases created this month are listed; the Excel file has the same rows; the filters stay in the address.
+      - c: 3
+        type: Security-access
+        title: Another team's cases are hidden
+        steps:
+          - As investigator open tab Team.
+        expected: Only the cases of investigator's team are listed.
+      - c: 4
+        type: Negative
+        persona: UNIT_COMPLIANCE_COORD
+        title: Date to before date from
+        steps:
+          - Set date created from 30 of this month to 1 of this month.
+        expected: The list is not filtered.
+        msg: [The end date must be on or after the start date]
+
+  FR-SS-042:
+    scenario: SC-SS-05
+    persona: UNIT_COMPLIANCE_COORD
+    screen: CASES
+    data: [TD-SS-06]
+    conditions:
+      - Searching a case number returns that case only.
+      - Searching a client name fragment with a date range returns the matching cases created in the range, ignoring case and accents.
+      - Search text shorter than 3 characters is refused.
+    cases:
+      - c: 1
+        type: Positive
+        title: Search by case number
+        steps:
+          - Enter a case number in the search toolbar.
+        expected: That case only.
+      - c: 2
+        type: Positive
+        title: Name fragment and date range
+        steps:
+          - Enter "dela" and this month's range.
+        expected: The cases of "Juan Dela Cruz" created this month; the search ignores case.
+      - c: 3
+        type: Boundary
+        neg: true
+        title: Two-character search
+        steps:
+          - Enter "de".
+        expected: No search runs.
+        msg: [Enter at least 3 characters]
+
+  FR-SS-043:
+    scenario: SC-SS-05
+    persona: UNIT_COMPLIANCE_COORD
+    screen: CASE
+    data: [TD-SS-05, TD-SS-06]
+    conditions:
+      - A case in a review or approval stage is re-assigned to an eligible user with a reason; data, stage and history are unchanged.
+      - The client's own account officer and users without the stage permission are not offered.
+      - After re-assignment only the new assignee can act on the case; the timeline shows the reason and both users.
+      - A reason is required, and a comment for reason Others.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Re-assign an investigation for absence
+        steps:
+          - Open a case in INVESTIGATION; click Re-assign; select investigator2; reason Absence; comment; confirm.
+        expected: The assignee is investigator2; the stage and data are unchanged; both users are notified.
+      - c: 2
+        type: Negative
+        title: The account officer is not offered
+        pre: A case of the client whose account officer is investigator2.
+        steps:
+          - Click Re-assign; open the list.
+        expected: investigator2 is not in the list.
+      - c: 2
+        type: Negative
+        screen: API
+        title: Re-assign to a user without the stage permission
+        steps:
+          - Call Re-assign with new assignee compchk.
+        expected: Refused.
+        msg: ["{compchk} cannot take cases in stage {INVESTIGATION}"]
+      - c: 3
+        type: Negative
+        persona: SCR_INVESTIGATOR
+        screen: TIMELINE
+        title: Previous assignee cannot act
+        steps:
+          - As investigator open the re-assigned case; open the Timeline.
+        expected: The case is read only to investigator; the timeline shows reason Absence, investigator and investigator2.
+      - c: 4
+        type: Negative
+        title: No reason
+        steps:
+          - Click Re-assign; select a user; no reason; confirm.
+        expected: Not saved.
+        msg: [Select the reason for the re-assignment]
+      - c: 4
+        type: Negative
+        title: Others without comment
+        steps:
+          - Reason Others; no comment; confirm.
+        expected: Not saved.
+        msg: [Enter a comment for reason Others]
+
+  FR-SS-044:
+    scenario: SC-SS-08
+    persona: SYSTEM
+    screen: HOME
+    data: [TD-SS-06, TD-SS-10]
+    conditions:
+      - A case inside its reminder lead receives one reminder.
+      - A breached case is flagged, escalated to the role of the SLA matrix, raises an alert and is counted in the breached tile.
+      - One reminder and one escalation per case and stage entry.
+    cases:
+      - c: 1
+        type: Boundary
+        screen: NOTIF
+        title: Reminder 2 hours before due with a 4-hour lead
+        pre: A case due in 2 hours with a 4-hour lead.
+        steps:
+          - Run SCR_SLA_MONITOR; as the assignee open the bell.
+        expected: One reminder; the case shows Due soon.
+      - c: 1
+        type: Boundary
+        neg: true
+        screen: NOTIF
+        title: No reminder 5 hours before due
+        pre: A case due in 5 hours with a 4-hour lead.
+        steps:
+          - Run the monitor.
+        expected: No reminder; the badge shows On time.
+      - c: 2
+        type: Workflow
+        title: Breached case escalated
+        pre: A case past its due time.
+        steps:
+          - Run the monitor; open Screening Home and the bell of the escalation role.
+        expected: The case shows Breached; the escalation role is notified; alert SCR_SLA_BREACH; the breached tile counts it.
+      - c: 3
+        type: Negative
+        screen: NOTIF
+        title: No second reminder or escalation
+        steps:
+          - Run the monitor twice more.
+        expected: No further reminder or escalation for the same stage entry.
+
+  FR-SS-045:
+    scenario: SC-SS-08
+    persona: UNIT_COMPLIANCE_COORD
+    screen: HOME
+    data: [TD-SS-05, TD-SS-06]
+    conditions:
+      - The breached tile opens the case list filtered to breached cases; tiles show open cases per stage, SLA due today and breached, potential matches not yet cased and the last list run.
+      - The high-risk list shows clients with a high-risk category, PEP or watchlist tag and exports to Excel with the same rows.
+      - Counts and lists follow the user's case scope.
+    cases:
+      - c: 1
+        type: Positive
+        title: Breached tile opens the filtered list
+        steps:
+          - Open Screening Home; click the breached tile.
+        expected: The Cases list opens filtered to breached cases, with the same count as the tile.
+      - c: 2
+        type: Report-output
+        screen: HIGHRISK
+        title: High-risk list export
+        steps:
+          - Open High-risk Clients; filter Retail; export to Excel.
+        expected: The PEP and high-risk clients of Retail with rating, tags, open case and unit; the file has the same rows.
+      - c: 3
+        type: Security-access
+        persona: SCR_INVESTIGATOR
+        title: Investigator tiles count only the team's cases
+        steps:
+          - As investigator open Screening Home.
+        expected: The tile counts include only cases of investigator's team.
+
+  FR-SS-050:
+    scenario: SC-SS-05
+    persona: SCR_INVESTIGATOR
+    screen: REVIEW
+    data: [TD-SS-06]
+    conditions:
+      - When the review opens, the template of the case type in its active version shows with mandatory fields marked, and a draft can be saved at any time.
+      - A submission with a blank mandatory field or a value of the wrong type is refused and each field is flagged.
+      - An EDD review is used when the category requires EDD and the client has an active policy.
+    cases:
+      - c: 1
+        type: Positive
+        title: KYC review opens with mandatory fields marked
+        steps:
+          - Open the Review tab of a NAME_MATCH case; fill two fields; Save Draft.
+        expected: The KYC review template shows; mandatory fields are marked; the draft is saved.
+      - c: 2
+        type: Negative
+        title: Blank mandatory field
+        steps:
+          - Leave a mandatory field blank; submit with a disposition.
+        expected: The case stays in INVESTIGATION and the field is flagged.
+        msg: ["{Source of funds} is required"]
+      - c: 2
+        type: Negative
+        title: Text in a number field
+        steps:
+          - Enter "ten" in a number field; submit.
+        expected: The field is flagged.
+        msg: ["{Annual income} must be a {number}"]
+      - c: 3
+        type: Positive
+        title: EDD template for a PEP client with an active policy
+        steps:
+          - Open the Review tab of the PEP case of the client with a booked account.
+        expected: The EDD template is shown.
+
+  FR-SS-051:
+    scenario: SC-SS-05
+    persona: SCR_INVESTIGATOR
+    screen: CASE
+    data: [TD-SS-06]
+    conditions:
+      - A submitted case goes to the approver of the matching route and is read only to the Investigator.
+      - Only INVESTIGATION dispositions are offered.
+      - The disposition and the recommendation are mandatory.
+      - Disposition Need more information keeps the case with the Investigator.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Submit with False positive
+        steps:
+          - Complete the review; select False positive; write the recommendation; Submit.
+        expected: The case is in UNIT_HEAD_APPROVAL with the route's approver, who is notified; the case is read only to investigator.
+      - c: 2
+        type: Positive
+        title: Dispositions of the stage
+        steps:
+          - Open the Disposition list.
+        expected: False positive; True match, for review; Possible match, EDD; Need more information.
+      - c: 3
+        type: Negative
+        title: Disposition not selected
+        steps:
+          - Write the recommendation; Submit without a disposition.
+        expected: Not submitted.
+        msg: [Select the disposition]
+      - c: 3
+        type: Negative
+        title: Recommendation blank
+        steps:
+          - Select a disposition; Submit without a recommendation.
+        expected: Not submitted.
+        msg: [Write the recommendation]
+      - c: 4
+        type: Workflow
+        screen: TIMELINE
+        title: Need more information
+        steps:
+          - Select Need more information; write the request; Submit.
+        expected: The case stays in INVESTIGATION with investigator; the timeline records the request for information.
+
+  FR-SS-052:
+    scenario: SC-SS-05
+    persona: SCR_INVESTIGATOR
+    screen: CDOCS
+    data: [TD-SS-05, TD-SS-07]
+    conditions:
+      - An uploaded document is stored with its metadata, named by the BRD convention and shown on the timeline; KYC documents also appear on the client's KYC documents.
+      - A document without date received or other metadata, with a future date or of a type not allowed is refused.
+      - Documents are never deleted from a submitted case.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Upload the KYC form of ABC Trading
+        steps:
+          - Click Upload; choose the KYC form; form type KYC review; document type KYC form; date received 12-May-2026; source Branch; confirm.
+          - Open the client's KYC documents.
+        expected: The file is named KYC_REVIEW_ABC Trading_20260512_<document type>_1 and appears on the timeline and on the client's KYC documents.
+      - c: 2
+        type: Negative
+        title: No date received
+        steps:
+          - Upload with Date received blank.
+        expected: Not stored.
+        msg: ["Enter the {date received} of the document"]
+      - c: 2
+        type: Boundary
+        neg: true
+        title: Date received tomorrow
+        steps:
+          - Upload with Date received tomorrow.
+        expected: Not stored.
+        msg: [The date received cannot be in the future]
+      - c: 2
+        type: Negative
+        title: Executable file
+        steps:
+          - Upload the .exe file with complete metadata.
+        expected: Not stored.
+        msg: [The file type is not allowed]
+      - c: 3
+        type: Negative
+        title: No delete on a submitted case
+        steps:
+          - Open the Documents tab of a submitted case.
+        expected: No Delete action; the call to delete an attachment of the case is refused.
+
+  FR-SS-060:
+    scenario: SC-SS-06
+    persona: SYSTEM
+    screen: CASE
+    data: [TD-SS-06, TD-SS-07]
+    conditions:
+      - A case without the required KYC document cannot be submitted and the timeline records VALIDATION_FAILED.
+      - A valid case is logged VALIDATED and routed to the approver.
+      - A disposition that requires the STR flag is refused without it; a non-blocking rule gives a warning only.
+    cases:
+      - c: 1
+        type: Negative
+        persona: SCR_INVESTIGATOR
+        title: Required KYC form missing
+        steps:
+          - Submit a complete review without the KYC form; open the Timeline.
+        expected: The case stays in INVESTIGATION; the timeline shows VALIDATION_FAILED with the message.
+        msg: ["Upload the {KYC form} before submitting"]
+      - c: 2
+        type: Workflow
+        persona: SCR_INVESTIGATOR
+        screen: TIMELINE
+        title: Valid case routed
+        steps:
+          - Upload the KYC form; submit again.
+        expected: The timeline shows VALIDATED; the case goes to the approver.
+      - c: 3
+        type: Negative
+        persona: SCR_INVESTIGATOR
+        title: STR flag inconsistent with the disposition
+        pre: A rule STR_FLAG_CONSISTENT requires the flag for True match, for review.
+        steps:
+          - Select True match, for review; leave STR required unticked; submit.
+        expected: Not submitted.
+        msg: ["Disposition {True match, for review} requires the STR flag"]
+      - c: 3
+        type: Positive
+        persona: SCR_INVESTIGATOR
+        title: Non-blocking rule gives a warning
+        pre: A non-blocking DOCUMENT_TYPES_PRESENT rule for the source-of-funds letter.
+        steps:
+          - Submit without the letter.
+        expected: A warning is shown and the case is submitted.
+
+  FR-SS-061:
+    scenario: SC-SS-06
+    persona: SCR_APPROVER
+    screen: CASE
+    data: [TD-SS-06]
+    conditions:
+      - An approved case moves to the next step of the approval matrix.
+      - A disapproved case is RETURNED with the rationale visible to the Investigator.
+      - Disapproving needs a rationale, and the Investigator of a case never approves it.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Approve a recommendation
+        steps:
+          - Open the case from For Approval; comment; Approve.
+        expected: The case moves to COMPLIANCE_REVIEW (or CLOSED by the route); the timeline records Concur.
+      - c: 2
+        type: Workflow
+        persona: SCR_INVESTIGATOR
+        title: Disapprove with rationale
+        steps:
+          - As scrapprover Disapprove with return reason and rationale "KYC form is expired".
+          - As investigator open My Cases.
+        expected: The case is RETURNED; investigator is notified and sees the rationale.
+      - c: 3
+        type: Negative
+        title: Disapprove without rationale
+        steps:
+          - Disapprove with a return reason and no rationale.
+        expected: Not saved.
+        msg: [Write the rationale for disapproving]
+      - c: 3
+        type: Security-access
+        title: The Investigator approves the own case
+        pre: The combined test user investigated and submitted the case, and it is assigned to the same user for approval.
+        steps:
+          - As that user click Approve.
+        expected: Refused.
+        msg: [A case is approved by someone other than its Investigator]
+
+  FR-SS-062:
+    scenario: SC-SS-06
+    persona: SCR_INVESTIGATOR
+    screen: CASE
+    data: [TD-SS-06]
+    conditions:
+      - A case returned by Compliance goes back to COMPLIANCE_REVIEW on resubmission; one returned by the Unit Head goes back to UNIT_HEAD_APPROVAL.
+      - Each return and resubmission is a new round on the timeline.
+      - A resubmission needs a response.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Resubmit a case returned by Compliance
+        steps:
+          - Open the RETURNED case of TD-SS-06; read the reason; correct; response; Resubmit.
+        expected: The case is in COMPLIANCE_REVIEW.
+      - c: 2
+        type: Positive
+        screen: TIMELINE
+        title: Rounds on the timeline
+        steps:
+          - Open the Timeline.
+        expected: The return and the resubmission are separate rounds; the first round stays readable.
+      - c: 3
+        type: Negative
+        title: Resubmit without response
+        steps:
+          - Resubmit with the response blank.
+        expected: Not resubmitted.
+        msg: [Write your response to the return]
+
+  FR-SS-063:
+    scenario: SC-SS-06
+    persona: COMPLIANCE_OFFICER
+    screen: CASE
+    data: [TD-SS-06]
+    conditions:
+      - The outcome Escalate to committee routes the case to AML_COMMITTEE; Close no action closes it; For STR moves it to STR_PREPARATION.
+      - A return sets the case to RETURNED with the remarks and logs the action.
+      - An outcome is required and a return needs remarks.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Escalate to committee
+        steps:
+          - Open the COMPLIANCE_REVIEW case; outcome Escalate to committee; remarks; confirm.
+        expected: The case is in AML_COMMITTEE; the members are notified.
+      - c: 1
+        type: Workflow
+        title: Close with no action
+        steps:
+          - On another case choose Close, no action; remarks; confirm.
+        expected: The case is CLOSED with outcome, user, time and remarks.
+      - c: 2
+        type: Workflow
+        persona: SCR_INVESTIGATOR
+        title: Return for rework
+        steps:
+          - As compoff choose Return; reason; remarks "Add the source of funds"; confirm.
+          - As investigator open the bell.
+        expected: The case is RETURNED with the remarks; investigator is notified.
+      - c: 3
+        type: Negative
+        title: No outcome
+        steps:
+          - Confirm without an outcome.
+        expected: Not saved.
+        msg: [Select the outcome]
+      - c: 3
+        type: Negative
+        title: Return without remarks
+        steps:
+          - Choose Return; leave remarks blank; confirm.
+        expected: Not saved.
+        msg: [Enter the items to correct]
+
+  FR-SS-064:
+    scenario: SC-SS-06
+    persona: AML_COMMITTEE
+    screen: DECISIONS
+    data: [TD-SS-06, TD-SS-08]
+    conditions:
+      - A member sees the case details, findings, documents and prior comments before deciding.
+      - With rule MAJORITY of 5, the third Approve STR vote moves the case to STR_PREPARATION; before that the case stays and the votes are shown.
+      - Each vote is recorded with user, date and time; a member votes once and cannot change the vote.
+      - A tie with all members voted returns the case to COMPLIANCE_REVIEW with the note no majority.
+      - A decision is required.
+    cases:
+      - c: 1
+        type: Positive
+        screen: CASE
+        title: Member reviews the full case
+        steps:
+          - As amlcom1 open the case from the Committee tab; open each tab.
+        expected: Details, review, documents and prior comments are readable; Record Decision is offered.
+      - c: 2
+        type: Boundary
+        title: Two Approve STR votes - case stays
+        steps:
+          - amlcom1 and amlcom2 record Approve STR.
+        expected: The case stays in AML_COMMITTEE; the Decisions tab shows 2 votes.
+      - c: 2
+        type: Boundary
+        title: Third Approve STR vote finalises
+        steps:
+          - amlcom3 records Approve STR.
+        expected: The case moves to STR_PREPARATION; compoff is notified.
+      - c: 3
+        type: Negative
+        title: Second vote by the same member
+        steps:
+          - As amlcom1 click Record Decision again on the same case round.
+        expected: Refused; the first vote stands with user, date and time.
+        msg: [You have already recorded your decision on this case]
+      - c: 4
+        type: Negative
+        title: Tie with all five votes
+        steps:
+          - On another case record Approve STR x2, No STR x2, Return x1.
+        expected: The case returns to COMPLIANCE_REVIEW with the note "no majority".
+      - c: 5
+        type: Negative
+        title: No decision selected
+        steps:
+          - Click Record Decision; write remarks; confirm without a decision.
+        expected: Not saved.
+        msg: [Select your decision]
+
+  FR-SS-070:
+    scenario: SC-SS-07
+    persona: COMPLIANCE_OFFICER
+    screen: CSTR
+    data: [TD-SS-09]
+    conditions:
+      - Opening the STR of a case prefills the client's details, the narrative, the transactions and the case documents as a snapshot.
+      - The completeness check highlights each missing field; Mark Ready is refused while gaps remain.
+      - An STR needs at least one transaction, positive amounts and at least one reason code.
+      - Mark Ready moves the case to STR_EXTRACTION and the STR to FOR_APPROVAL.
+    cases:
+      - c: 1
+        type: Positive
+        title: Prefilled STR
+        steps:
+          - Open the STR tab of the STR_PREPARATION case.
+        expected: A DRAFT STR with number and template version; subject from the client, narrative from the review, the two receipts and the invoice, and the case documents listed.
+      - c: 1
+        type: Positive
+        persona: MKT_AO
+        title: Later client change does not alter the STR subject
+        steps:
+          - As ao change the client address; reopen the STR.
+        expected: The STR subject keeps the address of the snapshot.
+      - c: 2
+        type: Negative
+        title: Gaps listed by Check Completeness
+        steps:
+          - Clear the narrative; click Check Completeness; click Mark Ready.
+        expected: The narrative is highlighted; Mark Ready is refused.
+        msg: ["{Narrative} is required for the STR"]
+      - c: 3
+        type: Negative
+        title: No transaction
+        steps:
+          - Remove all transactions; Mark Ready.
+        expected: Refused.
+        msg: [Add at least one transaction]
+      - c: 3
+        type: Boundary
+        neg: true
+        title: Transaction amount 0
+        steps:
+          - Set a transaction amount to 0.00; save.
+        expected: Refused.
+        msg: [The amount must be greater than 0]
+      - c: 4
+        type: Workflow
+        title: Mark Ready
+        steps:
+          - Complete every field; select reason code UAT01; Check Completeness; Mark Ready.
+        expected: The case is in STR_EXTRACTION and the STR is FOR_APPROVAL (APPROVED when the committee decided Approve STR).
+
+  FR-SS-071:
+    scenario: SC-SS-07
+    persona: COMPLIANCE_OFFICER
+    screen: STR
+    data: [TD-SS-09]
+    conditions:
+      - An extraction for a month includes only the committee-approved STRs of that month not yet extracted, and never an STR without the committee decision.
+      - The file is saved and downloadable, the extraction is recorded and appears in the audit trail, and the STRs become EXTRACTED.
+      - With nothing to extract no file is created; a period with the end before the start is refused.
+      - An STR is extracted once; a re-extraction needs a reason.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Extract this month
+        steps:
+          - Click Extract Approved STRs; period this month; check the list; confirm.
+        expected: The list and the file hold the approved STR of this month only; last month's STR and any FOR_APPROVAL STR are not included.
+      - c: 2
+        type: Upload-download
+        screen: AUDIT
+        title: File saved, downloadable and audited
+        steps:
+          - Download the file from the STR screen; open the audit trail.
+        expected: The file downloads; the extraction (batch, period, count, file, user, time) is in the audit trail; the STR shows EXTRACTED.
+      - c: 3
+        type: Negative
+        title: Nothing to extract
+        steps:
+          - Extract for a month without approved STRs.
+        expected: No file is created.
+        msg: [No committee-approved STR to extract]
+      - c: 3
+        type: Negative
+        title: Period end before start
+        steps:
+          - Period from 30 to 1 of this month.
+        expected: Refused.
+        msg: [The end date must be on or after the start date]
+      - c: 4
+        type: Negative
+        title: Re-extraction without reason
+        steps:
+          - Extract the same month again without a reason.
+        expected: The extracted STR is not included; a re-extraction asks for a reason and is recorded as such.
+
+  FR-SS-072:
+    scenario: SC-SS-07
+    persona: COMPLIANCE_OFFICER
+    screen: STR
+    data: [TD-SS-09]
+    conditions:
+      - Recording the AMLC reference and filing date sets the STR FILED and closes the case.
+      - The reference is required and unique, and the filing date cannot be before the extraction date.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Record the filing
+        steps:
+          - Open the EXTRACTED STR; Record Filing; reference "UAT-AMLC-0001"; filing date today; save.
+        expected: The STR is FILED in the register and the case is CLOSED with action filed.
+      - c: 2
+        type: Negative
+        title: Reference blank
+        steps:
+          - Record Filing with a date and no reference.
+        expected: Not saved.
+        msg: [Enter the AMLC reference]
+      - c: 2
+        type: Negative
+        title: Filing date before extraction
+        steps:
+          - Enter a filing date one day before the extraction date.
+        expected: Not saved.
+        msg: [The filing date cannot be before the extraction date]
+      - c: 2
+        type: Negative
+        title: Reference used before
+        steps:
+          - Record Filing on another STR with "UAT-AMLC-0001".
+        expected: Refused; the reference is unique.
+
+  FR-SS-080:
+    scenario: SC-SS-08
+    persona: SCR_INVESTIGATOR
+    screen: NOTIF
+    data: [TD-SS-06]
+    conditions:
+      - The assignee of a new case receives a notification and opens the case from it; approvers, returned-case owners and committee members receive their events.
+      - The notification log shows recipient, type and time; e-mail follows the user's preferences.
+      - A user who is not concerned receives no notification.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Assignee opens the case from the notification
+        steps:
+          - Create a case assigned to investigator; open the bell; click the notification.
+        expected: The notification opens the case page.
+      - c: 2
+        type: Positive
+        persona: SYSADMIN
+        title: Notification log and e-mail preference
+        steps:
+          - Set investigator's preference for new cases to e-mail; create a case; open the notification log.
+        expected: The log shows recipient, type and time; the e-mail reaches the test mailbox.
+      - c: 3
+        type: Negative
+        title: Other investigator not notified
+        steps:
+          - As investigator2 open the bell.
+        expected: No notification for the case of investigator.
+
+  FR-SS-081:
+    scenario: SC-SS-08
+    persona: SYSTEM
+    screen: NOTIF
+    data: [TD-SS-06, TD-SS-07]
+    conditions:
+      - A case missing its KYC form one day before the SLA ends sends a reminder naming the KYC form to the assignee and the UCC.
+      - At most one document reminder per case per day; no reminder when the documents are present.
+    cases:
+      - c: 1
+        type: Positive
+        title: Reminder names the missing KYC form
+        pre: A case due tomorrow without the KYC form; reminder lead 24 hours.
+        steps:
+          - Run SCR_SLA_MONITOR; as the assignee and as ucc open the bell.
+        expected: Both receive a reminder naming the KYC form.
+      - c: 2
+        type: Negative
+        title: No second reminder the same day
+        steps:
+          - Run the monitor again the same day.
+        expected: No second document reminder.
+      - c: 2
+        type: Negative
+        title: No reminder when the documents are present
+        steps:
+          - Upload the KYC form; run the monitor the next day.
+        expected: No document reminder.
+
+  FR-SS-082:
+    scenario: SC-SS-03
+    persona: COMPLIANCE_OFFICER
+    screen: NOTIF
+    data: [TD-SS-04]
+    conditions:
+      - A run that adds entries notifies the Compliance Officers once with the source, the count and a link to the run.
+      - A run that adds no entry sends no notification.
+    cases:
+      - c: 1
+        type: Positive
+        title: Run adding 5 entries
+        steps:
+          - Upload the NLDS_PEP file adding 5 entries; open the bell; click the notification.
+        expected: One notification with source NLDS_PEP and 5 entries added; the link opens the run.
+      - c: 2
+        type: Negative
+        title: Run with no new entry
+        steps:
+          - Upload the same file again.
+        expected: No new notification.
+
+  FR-SS-090:
+    scenario: SC-SS-08
+    persona: COMPLIANCE_OFFICER
+    screen: REPORTS
+    data: [TD-SS-06]
+    conditions:
+      - The case status report filtered by marketing unit and case status lists only those cases.
+      - Each report exports to CSV, XLSX and PDF with the same rows and prints the parameters, user and time in the header.
+      - A user without SCR_REPORT_VIEW cannot run the reports; a date range with the end before the start is refused.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Case status report by unit and status
+        steps:
+          - Run SCR-CASE-STATUS for Corbank and status UNIT_HEAD_APPROVAL.
+        expected: Only Corbank cases in UNIT_HEAD_APPROVAL, with stage, assignee, age and SLA state.
+      - c: 2
+        type: Report-output
+        persona: OPS_LEAD
+        title: Export in three formats
+        steps:
+          - Run SCR-SLA-BREACHES for the month; export to CSV, XLSX and PDF.
+        expected: The three files hold the same rows; the header shows the parameters, the user and the time.
+      - c: 2
+        type: Report-output
+        title: Sanctioned names, PEP clients and STR register run
+        steps:
+          - Run SCR-SANCTIONED-NAMES, SCR-PEP-CLIENTS, SCR-HIGH-RISK-CLIENTS and SCR-STR-REGISTER for the month.
+        expected: Each report runs with its proposed columns and exports.
+      - c: 3
+        type: Security-access
+        persona: SCR_INVESTIGATOR
+        title: Investigator cannot run the reports
+        steps:
+          - As investigator open Reports; call the run of SCR-CASE-STATUS.
+        expected: The Compliance category is not listed; the call returns HTTP 403.
+        msg: [You are not permitted to perform this action]
+      - c: 3
+        type: Negative
+        title: Invalid date range
+        steps:
+          - Run SCR-CASE-STATUS with the end date before the start date.
+        expected: Not run.
+        msg: [The end date must be on or after the start date]
+
+  FR-SS-091:
+    scenario: SC-SS-01
+    persona: SYSADMIN
+    screen: AUDIT
+    data: [TD-SS-06]
+    conditions:
+      - Every user and system action writes an audit entry in the same transaction, and the timeline, configuration differences and list change records keep before and after values.
+      - No screen or service allows an audit row or timeline event to be edited or deleted, including by the System Administrator.
+      - A database update of a timeline row is refused.
+    cases:
+      - c: 1
+        type: Positive
+        title: Actions of a case in the audit trail
+        steps:
+          - Filter the audit trail on a case and on a configuration version.
+        expected: Each action is listed with user and time; the version shows the before and after values.
+      - c: 2
+        type: Security-access
+        title: No edit or delete of audit rows
+        steps:
+          - Open an audit row and a timeline event; look for edit and delete; call delete through the API.
+        expected: No action offered; the API offers no update or delete and the call is refused.
+      - c: 3
+        type: Negative
+        screen: DB
+        title: Database update of a timeline row
+        steps:
+          - As the database administrator run an UPDATE on a row of the case timeline table.
+        expected: The database refuses the update.
+
+  FR-SS-092:
+    scenario: SC-SS-08
+    persona: AUDITOR
+    screen: REPORTS
+    data: [TD-SS-06]
+    conditions:
+      - The audit log report lists screening, configuration, list and case events with date, event, case or entry, from and to values, user and remarks; a disposition filter lists only the events of cases with that disposition.
+      - The report exports to PDF and XLSX with the same rows.
+      - A user without SCR_AUDIT_VIEW cannot run it; an invalid date range is refused.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Filter by disposition
+        steps:
+          - Run SCR-AUDIT-LOG for the month with disposition False positive.
+        expected: Only events of cases with that disposition, with from and to values, user and remarks.
+      - c: 2
+        type: Report-output
+        title: Export to PDF and XLSX
+        steps:
+          - Export the report to PDF and XLSX.
+        expected: Both files hold the same rows.
+      - c: 3
+        type: Security-access
+        persona: UNIT_COMPLIANCE_COORD
+        title: UCC cannot run the audit log report
+        steps:
+          - As ucc call the run of SCR-AUDIT-LOG.
+        expected: HTTP 403.
+        msg: [You are not permitted to perform this action]
+      - c: 3
+        type: Negative
+        title: Invalid date range
+        steps:
+          - Run the report with the end date before the start date.
+        expected: Not run.
+        msg: [The end date must be on or after the start date]
+
+access:
+  - action: Open Sanction Screening screens and cases (read)
+    screen: CASES
+    permission: SCR_VIEW
+    allow: [COMPLIANCE_OFFICER, COMPLIANCE_CHECKER, UNIT_COMPLIANCE_COORD, SCR_INVESTIGATOR, SCR_APPROVER, AML_COMMITTEE, OPS_LEAD, AUDITOR, SYSADMIN]
+    deny: [MKT_AO]
+    denied: Sanction Screening is not in the menu; /screening shows the no-access page.
+  - action: Draft and submit configuration versions
+    screen: CONFIG
+    permission: SCR_CONFIG_MAINTAIN
+    allow: [COMPLIANCE_OFFICER]
+    deny: [COMPLIANCE_CHECKER, UNIT_COMPLIANCE_COORD, SCR_INVESTIGATOR, SYSADMIN]
+    denied: New Draft and Submit for Approval are not shown; the call returns HTTP 403.
+  - action: Approve or reject configuration versions
+    screen: CONFIG
+    permission: SCR_CONFIG_APPROVE
+    allow: [COMPLIANCE_CHECKER]
+    deny: [COMPLIANCE_OFFICER, SCR_APPROVER]
+    denied: Approve and Reject are not shown; the call returns HTTP 403.
+  - action: Maintain list entries and upload list files
+    screen: WATCHLIST
+    permission: SCR_LIST_MAINTAIN
+    allow: [COMPLIANCE_OFFICER]
+    deny: [COMPLIANCE_CHECKER, SCR_INVESTIGATOR, UNIT_COMPLIANCE_COORD]
+    denied: Add Entry and Upload List File are not shown; the call returns HTTP 403.
+  - action: Approve or reject list changes
+    screen: APPROVALS
+    permission: SCR_LIST_APPROVE
+    allow: [COMPLIANCE_CHECKER]
+    deny: [COMPLIANCE_OFFICER, AUDITOR]
+    denied: The list change is not offered in My Approvals; the call returns HTTP 403.
+  - action: Work the investigation stage
+    screen: REVIEW
+    permission: SCR_INVESTIGATE
+    allow: [SCR_INVESTIGATOR]
+    deny: [UNIT_COMPLIANCE_COORD, COMPLIANCE_OFFICER, SCR_APPROVER]
+    denied: The Review tab is read only and Submit is not shown.
+  - action: Update a client's risk tag
+    screen: CASE
+    permission: SCR_RISK_TAG
+    allow: [SCR_INVESTIGATOR]
+    deny: [UNIT_COMPLIANCE_COORD, COMPLIANCE_OFFICER]
+    denied: Update Risk Tag and Mark False Positive are not shown.
+  - action: Re-assign cases and approvals
+    screen: CASE
+    permission: SCR_CASE_ASSIGN
+    allow: [COMPLIANCE_OFFICER, UNIT_COMPLIANCE_COORD, SCR_APPROVER]
+    deny: [SCR_INVESTIGATOR, AML_COMMITTEE]
+    denied: Re-assign is not shown; the call returns HTTP 403.
+  - action: Approve or disapprove as Unit Head
+    screen: CASE
+    permission: SCR_CASE_APPROVE
+    allow: [SCR_APPROVER]
+    deny: [SCR_INVESTIGATOR, COMPLIANCE_OFFICER]
+    denied: Approve and Disapprove are not shown; the call returns HTTP 403.
+  - action: Review BU escalations and prepare the STR
+    screen: CASE
+    permission: SCR_COMPLIANCE_REVIEW
+    allow: [COMPLIANCE_OFFICER]
+    deny: [UNIT_COMPLIANCE_COORD, SCR_APPROVER, AML_COMMITTEE]
+    denied: The outcome list and the STR tab actions are not shown; the call returns HTTP 403.
+  - action: Record an AML Committee decision
+    screen: DECISIONS
+    permission: SCR_COMMITTEE
+    allow: [AML_COMMITTEE]
+    deny: [COMPLIANCE_OFFICER, SCR_APPROVER, SCR_INVESTIGATOR]
+    denied: Record Decision is not shown; the call returns HTTP 403.
+  - action: Extract STRs and record the filing reference
+    screen: STR
+    permission: SCR_STR_EXTRACT
+    allow: [COMPLIANCE_OFFICER]
+    deny: [UNIT_COMPLIANCE_COORD, AUDITOR]
+    denied: Extract Approved STRs and Record Filing are not shown; the call returns HTTP 403.
+  - action: Run the compliance reports
+    screen: REPORTS
+    permission: SCR_REPORT_VIEW
+    allow: [COMPLIANCE_OFFICER, COMPLIANCE_CHECKER, UNIT_COMPLIANCE_COORD, OPS_LEAD, AUDITOR]
+    deny: [SCR_INVESTIGATOR, SCR_APPROVER, AML_COMMITTEE]
+    denied: The Compliance category is not listed; the run call returns HTTP 403.
+  - action: Run the screening audit log report
+    screen: REPORTS
+    permission: SCR_AUDIT_VIEW
+    allow: [COMPLIANCE_OFFICER, AUDITOR]
+    deny: [UNIT_COMPLIANCE_COORD, OPS_LEAD, SYSADMIN]
+    denied: SCR-AUDIT-LOG is not listed; the run call returns HTTP 403.
+
+findings:
+  - fr: FR-SS-001
+    issue: 'The FRS gives the no-access text as "You do not have access to this page". The platform screen shows "You do not have access to this screen. Contact your administrator if you need it." (frontend/src/auth/RequireAuth.tsx), as found for BRD-3.'
+    proposal: Quote the platform text in FRS v1.1; the cases check the no-access page without quoting it.
+  - fr: FR-SS-031
+    issue: 'Acceptance criterion 1 says "Juan Dela Cruz" matches "Juan de la Cruz" by the phonetic rule, but the normalisation of R4 (case, punctuation, word order) may already give an exact or fuzzy match first. The FRS does not say which algorithm is recorded when several meet their thresholds, or the expected score.'
+    proposal: State the order of the algorithms and which one is recorded; give the expected algorithm and a score range for the acceptance example.
+  - fr: FR-SS-034
+    issue: The FRS says only clients with an active policy need a KYC review or EDD and others get a MONITOR case, but it does not say whether a NAME_MATCH or ACCOUNT_APPLICATION case of a client without an active policy also becomes MONITOR.
+    proposal: State the case type per trigger for clients without an active policy; the cases assume only HIGH_RISK, PEP and EDD become MONITOR.
+  - fr: FR-SS-043
+    issue: The FR names the Investigator as an actor of re-assignment, but the role matrix does not grant SCR_CASE_ASSIGN to the Investigator (SQ13).
+    proposal: Align the actor line with the matrix after SQ13; the access checks deny re-assignment to the Investigator.
+  - fr: FR-SS-052
+    issue: 'The naming example "KYC_REVIEW_ABC Trading_20260512_<type>_1" keeps a space and would keep other characters of the client name that file systems or the AMLC may refuse. The document-type code in the name is not fixed.'
+    proposal: State how the client name is cleaned (spaces, punctuation, length) and which document-type value is used; the case checks the example as written.
+  - fr: FR-SS-064
+    issue: 'The FRS does not say whether MAJORITY means a majority of SCR_COMMITTEE_SIZE or of the members who hold AML_COMMITTEE, or what happens when fewer members than the size hold the role or a member is absent.'
+    proposal: Define the quorum and the behaviour with fewer members; the cases use five members.
+  - fr: FR-SS-070
+    issue: At least one reason code is mandatory on the STR, but the list SCR_STR_REASON is delivered empty until BDOI supplies the AMLC codes (SQ09). An STR cannot be completed in UAT as delivered.
+    proposal: Deliver placeholder reason codes for testing or make the field optional until SQ09; the cases use test codes UAT01 and UAT02 added by the test lead.
+  - fr: FR-SS-071
+    issue: 'Acceptance criterion 1 "the committee-approved STRs of that month" does not say whether the month is the committee decision date, the STR creation date or the date the STR was marked ready.'
+    proposal: Name the date the period filters on; the cases assume the committee decision date.
+  - fr: FR-SS-018
+    issue: The acceptance criterion quotes delivered values (CONCUR, NOT_CONCUR) that are placeholders until BDOI confirms the dispositions (SQ06); the test changes when the list changes.
+    proposal: Keep the criterion in terms of "the dispositions whose parent is the stage" and move the values to section 9.2.
+  - fr: FR-SS-091
+    issue: Acceptance criterion 2 (a database update of a timeline row is refused) needs database access that testers do not have, and the 5-year archive retention may be shorter than AMLA requires (SQ18).
+    proposal: Record the database check as evidence from the database administrator; confirm the retention period under SQ18.

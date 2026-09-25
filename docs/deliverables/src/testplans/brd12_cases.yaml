@@ -1,0 +1,1465 @@
+# Test plan BRD-12 Submitted Policies - test data file.
+# Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/testplans/brd12_cases.yaml
+# Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
+# BRD-12 is designed, not built: the expected results quote the message text of the FRS and the build
+# design (docs/architecture/SUBMITTED_POLICIES_DESIGN.md) without codes, and no case names an automated
+# test. Screen paths follow section 12 of the build design (section Submitted Policies).
+
+meta:
+  brd: BRD-12
+  name: Submitted Policies
+  code: SP
+  frs: FRS_BRD12_SUBMITTED_POLICIES.md
+  summary: TP_BRD12_SUBMITTED_POLICIES.md
+  version: "1.0"
+  date: 25 September 2026
+  built: false
+
+personas:
+  SBM_HANDLER: {name: Submitted Handler (CBG), short: SBM Hand.}
+  SBM_CHECKER: {name: Submitted Checker, short: SBM Check.}
+  SBM_SANITATION: {name: Sanitation Handler, short: Sanit.}
+  SBM_TL: {name: Team Lead (Submitted Policies), short: SBM TL}
+  SBM_POLICY_REVIEWER: {name: Policy Review Officer (Non-CBG Corporate), short: Pol. Rev.}
+  SBM_RULE_ADMIN: {name: Rule administrator, short: Rule Admin}
+  SBM_UPP_HANDLER: {name: Admin Team UPP handler, short: UPP}
+  MKT_AO: {name: Marketing AO / MAO, short: MKT AO}
+  MKT_TL: {name: NB Team Lead, short: MKT TL}
+  TSU: {name: TSU approver, short: TSU}
+  PROCESSOR: {name: Placement and Booking user, short: Proc.}
+  SYSTEM: {name: BIBS scheduled job or event}
+
+screens:
+  HOME: Submitted Policies > Submitted Policies Home
+  ML: Submitted Policies > Masterlist
+  REC: Submitted Policies > Masterlist > Policy record (Details tab)
+  LOAN: Submitted Policies > Masterlist > Policy record > Loan & Matching tab
+  RULES: Submitted Policies > Masterlist > Policy record > Rule Results tab
+  RECREV: Submitted Policies > Masterlist > Policy record > Review & IAAF tab
+  RECTOR: Submitted Policies > Masterlist > Policy record > TOR tab
+  RECRNW: Submitted Policies > Masterlist > Policy record > Renewal tab
+  RECLET: Submitted Policies > Masterlist > Policy record > Letters tab
+  RECHIST: Submitted Policies > Masterlist > Policy record > History tab
+  INTAKE: Submitted Policies > Upload & Intake
+  EXTRACT: Submitted Policies > Extraction Review
+  RUNS: Submitted Policies > Processing Runs
+  IAAF: Submitted Policies > Policy Reviews / IAAF
+  TOR: Submitted Policies > TOR
+  RWL: Submitted Policies > Renewal Work List
+  LETTERS: Submitted Policies > Letters & Print Batches
+  HF: Submitted Policies > Handling Fees
+  SETUP: Submitted Policies > Submitted Policies Setup
+  APPROVALS: My Approvals
+  REPORTS: Reports > Report Centre (category Submitted Policies)
+  PLACEMENT: Placement & Booking > Placement (BRD-1 screens)
+  BOOKING: Placement & Booking > Booking Workbench
+  RENEWAL: Renewal > Renewal record (BRD-6)
+  UNAPPLIED: Collections > Unapplied Payments
+  PARAMS: Administration > System Parameters
+  JOBS: Administration > Scheduled Jobs
+  AUDIT: Administration > Audit Trail
+  NOTIF: Notifications (bell icon in the page header)
+  MAIL: Test mailbox of the recipient
+  API: API call with the user's token (tester tool, for example Postman)
+
+data:
+  - id: TD-SP-01
+    name: Test users per role and scope
+    content: sbmhandler (SBM_HANDLER, scope CBG Motor), firehandler (SBM_HANDLER, scope CBG Fire), sbmchecker (SBM_CHECKER, IAAF level 1), sanitation (SBM_SANITATION), sbmtl (SBM_TL), polreview (SBM_POLICY_REVIEWER), badmin (SBM_RULE_ADMIN), upphandler (SBM_UPP_HANDLER), ao and ao2 (MKT_AO, own records), mkttl (MKT_TL, IAAF level 2 and rule approval), tsu (TSU), proc (PROCESSOR).
+    source: Planned demo seed V1970 of the build design; firehandler and ao2 created by the test lead with their user scope
+  - id: TD-SP-02
+    name: Source files
+    content: LFS insurance report of 300 CBG Motor rows; the same file again; an LFS file with 5 rows without PN; an LFS file with one row that updates an existing policy (new premium); a CSV without header row; a PDF file.
+    source: Prepared by the test lead from the upload template of the LFS source; masked data
+  - id: TD-SP-03
+    name: Policy documents
+    content: A text PDF of a motor policy (insurer with an extraction pattern); a scanned image PDF without text.
+    source: Test document folder of the test lead; masked policy copies
+  - id: TD-SP-04
+    name: Legacy masterlist
+    content: NB Motor legacy Excel file of 1,000 rows, of which 12 are invalid (status not in the map, blank PN, blank expiry).
+    source: Masked extract of a BDOI masterlist prepared by the test lead
+  - id: TD-SP-05
+    name: LAMD snapshot
+    content: PN rows with active non-amortised loans (FFY and generic), fully paid loans, RMU (remedial) and open-market loans; one row without PN.
+    source: Planned demo seed V1971; masked rows added by the test lead
+  - id: TD-SP-06
+    name: Rules and masters
+    content: Active demo rule sets for sanitation, matching, classification and disposition; SM Group employee list; No Touch list; limit rule for insurer INS-MGIC Motor, maximum vehicle age 10 years; insurer rules by vehicle type (Motor) and different-from-expiring (Fire); letter rules; IAAF matrix (level 1 SBM_CHECKER, level 2 MKT_TL) and TSU matrix for TOR.
+    source: Planned demo seed V1970 of the build design
+  - id: TD-SP-07
+    name: Masterlist records
+    content: About 60 records over the four segments, NB and RB, including migrated records, with handlers and conversion statuses.
+    source: Planned demo seed V1971 of the build design
+  - id: TD-SP-08
+    name: Review, TOR and handling-fee data
+    content: A Non-CBG Corporate record IN_REVIEW with its documents; a CBG Motor record with a 12-year-old vehicle insured with INS-MGIC; billed handling-fee records with PN and location reference; a CLPC unapplied payment carrying a billed PN; an OTC payment with an unknown location reference; one payment matching two records.
+    source: Planned demo seed V1972; payments keyed in Collections by the test lead
+  - id: TD-SP-09
+    name: Renewal candidates
+    content: A For Renewal CBG Fire record expiring in 150 days (expiring insurer INS-LAC); a For Renewal CBG Motor record expiring in 120 days; a Non-CBG Retail record of ao; a renewal account with a hold cover request open for 6 days.
+    source: Planned demo seeds V1971-V1972; expiry dates set by the test lead
+  - id: TD-SP-10
+    name: Parameters and jobs as delivered
+    content: "SBM_RENEWAL_LEAD_DAYS CBG_FIRE=150, CBG_MOTOR=120; SBM_MASTERLIST_DAYS_FROM_EXTRACTION 30; SBM_INSURER_ACCEPT_DAYS 5; SBM_HOLD_COVER_UNBOOKED_ALERT_DAYS 5; jobs SBM_PROCESSING 21:30, SBM_EXPIRY_SCAN 22:00, SBM_LETTER_DISPATCH 06:30, SBM_HOLD_COVER_WATCH 07:00 PHT, SBM_HANDLING_FEE_TAGGER every 30 minutes."
+    source: Configuration delivered with the build (FRS section 9.1)
+
+scenarios:
+  - id: SC-SP-01
+    persona: SBM_HANDLER
+    title: Intake. Handlers upload source files, confirm extracted policy details, create records by hand and migrate the Excel masterlists.
+    pre: Files TD-SP-02, documents TD-SP-03, legacy file TD-SP-04.
+  - id: SC-SP-02
+    persona: SBM_HANDLER
+    title: Masterlist. One masterlist with history, handler, conversion status and remarks; each user sees and extracts only the records of the own scope.
+    pre: Records TD-SP-07; users TD-SP-01.
+  - id: SC-SP-03
+    persona: SBM_SANITATION
+    title: Rules and processing. Rule sets are approved by a checker; processing runs after intake, on schedule and on demand; fallout is reported and resolved.
+    pre: Rules TD-SP-06; LAMD TD-SP-05.
+  - id: SC-SP-04
+    persona: SYSTEM
+    title: Classification and buckets. Policies are classified Inforced or Submitted, bucketed, excluded or made ready for renewal with the RA template.
+    pre: Records TD-SP-07; LAMD TD-SP-05; rules TD-SP-06.
+  - id: SC-SP-05
+    persona: SBM_POLICY_REVIEWER
+    title: Policy review and IAAF. The reviewer records reviews, generates one IAAF per policy and routes it through the approval matrix to the bank counterpart.
+    pre: Review data TD-SP-08; IAAF matrix TD-SP-06.
+  - id: SC-SP-06
+    persona: MKT_AO
+    title: Limits and TOR. A limit breach is flagged, the TOR is prepared, approved by TSU and handed over to the AO.
+    pre: Flagged record TD-SP-08; TSU matrix TD-SP-06.
+  - id: SC-SP-07
+    persona: SBM_SANITATION
+    title: Renewal. Expiring policies are handed to Renewal with the assigned insurer; letters are sent; the insurer is re-assigned while a hold cover is open; placement and booking update the masterlist.
+    pre: Renewal candidates TD-SP-09; parameters TD-SP-10.
+  - id: SC-SP-08
+    persona: SBM_UPP_HANDLER
+    title: Handling fee. Handling-fee payments are tagged in the Unapplied Payment List and applied by Cashiering.
+    pre: Handling-fee data TD-SP-08.
+  - id: SC-SP-09
+    persona: SBM_TL
+    title: Monitoring. The home page, the Submitted Policies reports in several formats, and the notifications and alerts of key events.
+    pre: Scenarios SC-SP-01 to SC-SP-08 ran in the test period.
+
+frs:
+  FR-SP-001:
+    scenario: SC-SP-01
+    persona: SBM_HANDLER
+    screen: INTAKE
+    data: [TD-SP-02]
+    conditions:
+      - An LFS report of 300 rows creates 300 CBG Motor records with status RECEIVED, numbered SBM-yyyy-nnnnnn, and an intake run SBI-yyyy-nnnnnn.
+      - Loading the same file a second time is refused and names the earlier run.
+      - A row updating an existing policy changes the record and writes the history.
+      - Invalid rows are listed with the reason and valid rows are committed; a file of a wrong type or without header row is refused.
+      - The handlers of the segment are notified of new records.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Upload an LFS report of 300 rows
+        steps:
+          - Choose source LFS insurance report; upload the 300-row file; check the counts; confirm.
+          - Open the Masterlist filtered on the run.
+        expected: Valid 300, invalid 0. 300 CBG Motor records with status RECEIVED and SBM numbers; the run has an SBI number and a processing run starts.
+      - c: 2
+        type: Negative
+        title: Same file again
+        steps:
+          - Upload the same file.
+        expected: Refused; no record is created.
+        msg: ["This file was already loaded in run {SBI-2026-000001}"]
+      - c: 3
+        type: Positive
+        screen: RECHIST
+        title: Row updating an existing policy
+        steps:
+          - Upload the file with the changed premium; open the record's History tab.
+        expected: The record shows the new premium; the history shows the old and new value with the run.
+      - c: 4
+        type: Negative
+        title: Rows without PN
+        steps:
+          - Upload the file with 5 rows without PN; download the invalid rows.
+        expected: The 5 rows are listed with the reason; the other rows are committed.
+        msg: ["Row {4}: {PN no.} is required"]
+      - c: 4
+        type: Negative
+        title: CSV without header row
+        steps:
+          - Upload the CSV without header row.
+        expected: Refused.
+        msg: [The file has no header row]
+      - c: 4
+        type: Negative
+        title: PDF uploaded as a source file
+        steps:
+          - Upload the PDF.
+        expected: Refused.
+        msg: [The file type is not allowed]
+      - c: 5
+        type: Positive
+        screen: NOTIF
+        title: Handlers notified
+        steps:
+          - After TC-SP-001.1-01, as sbmhandler open the bell; as firehandler open the bell.
+        expected: sbmhandler (CBG Motor) is notified of the new submissions; firehandler is not.
+
+  FR-SP-002:
+    scenario: SC-SP-01
+    persona: SBM_HANDLER
+    screen: EXTRACT
+    data: [TD-SP-03]
+    conditions:
+      - A text PDF of a motor policy produces a proposal; after confirmation the record shows the confirmed values and status VALIDATED.
+      - Before confirmation the masterlist is unchanged.
+      - A scanned document without text leads to manual entry; a proposal can be rejected with a reason.
+      - Confirmation needs the mandatory fields.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Extract and confirm a motor policy
+        steps:
+          - Upload the text PDF as a new record; check each proposed value and its confidence; correct the plate number; Confirm.
+        expected: The record shows the confirmed values, including the corrected plate, and status VALIDATED.
+      - c: 2
+        type: Negative
+        screen: ML
+        title: Masterlist unchanged before confirmation
+        steps:
+          - Upload the PDF; before confirming, search the masterlist for its policy number.
+        expected: No record with the proposed values; handlers receive the manual-validation notice.
+      - c: 3
+        type: Negative
+        title: Scanned document without text
+        steps:
+          - Upload the scanned PDF.
+        expected: Extraction returns "not readable"; the user is sent to manual entry.
+      - c: 3
+        type: Negative
+        title: Reject without a reason
+        steps:
+          - Open a proposal; Reject without a reason.
+        expected: Not rejected.
+        msg: [Enter the reason of the rejection]
+      - c: 4
+        type: Negative
+        title: Confirm with the expiry blank
+        steps:
+          - Clear the expiry date; Confirm.
+        expected: Not confirmed.
+        msg: ["{Expiry} is required"]
+
+  FR-SP-003:
+    scenario: SC-SP-01
+    persona: SBM_POLICY_REVIEWER
+    screen: ML
+    data: [TD-SP-07]
+    conditions:
+      - A manually created Non-CBG Corporate policy is saved as VALIDATED and appears in the masterlist.
+      - A record tagged Non-Renewable shows the chip and appears in the Non-Renewal filter and report; the tag needs a reason.
+      - A later processing run does not change a manual tag.
+      - Mandatory fields per segment are required and a policy already in the masterlist is refused.
+    cases:
+      - c: 1
+        type: Positive
+        title: Create a Non-CBG Corporate policy by hand
+        steps:
+          - Click New Policy; segment Non-CBG Corporate; NB; assured, insurer, policy number, dates, amounts, location; save.
+        expected: The record is VALIDATED and listed in the masterlist.
+      - c: 2
+        type: Positive
+        screen: REC
+        title: Tag Non-Renewable with a reason
+        steps:
+          - Open the record; Tag Non-Renewable; reason; save; open tab Non-Renewal and SBM-NON-RENEWAL.
+        expected: The Non-Renewable chip shows; the record is in the filter and in the report with the reason.
+      - c: 2
+        type: Negative
+        screen: REC
+        title: Non-Renewable without a reason
+        steps:
+          - Tag Non-Renewable without a reason.
+        expected: Not saved.
+        msg: [Select the reason for Non-Renewable]
+      - c: 3
+        type: Positive
+        persona: SBM_SANITATION
+        screen: RULES
+        title: Run keeps the manual tag
+        steps:
+          - Run processing for the record; open Rule Results.
+        expected: The run records its own result; the tag stays Non-Renewable.
+      - c: 4
+        type: Negative
+        persona: SBM_HANDLER
+        title: CBG Motor record without PN
+        steps:
+          - New Policy, CBG Motor, without PN; save.
+        expected: Not saved.
+        msg: ["{PN no.} is required"]
+      - c: 4
+        type: Negative
+        title: Policy already in the masterlist
+        steps:
+          - New Policy with the policy number of an existing record; save.
+        expected: Refused.
+        msg: ["Policy {PC-12345} is already in the masterlist ({SBM-2026-000031})"]
+
+  FR-SP-004:
+    scenario: SC-SP-01
+    persona: SBM_TL
+    screen: INTAKE
+    data: [TD-SP-04]
+    conditions:
+      - A legacy file with 1,000 rows and 12 invalid rows migrates 988 records flagged Migrated and logs 12 errors with reason codes.
+      - A migrated record keeps its original date received and legacy reference, and its legacy status is mapped to a BIBS status and bucket.
+      - Running the same file again creates no duplicates.
+      - A status without a mapping or a blank mandatory column is refused per row.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Migrate the NB Motor file
+        steps:
+          - Upload the legacy file; layout NB Motor; check the result; confirm.
+          - Run SBM-MIGRATION-ERRORS.
+        expected: 988 records flagged Migrated; the report lists 12 rows with reason codes.
+      - c: 2
+        type: Positive
+        screen: REC
+        title: Migrated record keeps its history data
+        steps:
+          - Open a migrated record.
+        expected: The original date received, legacy reference, mapped status and bucket, and the Migrated chip.
+      - c: 3
+        type: Negative
+        title: Same file again
+        steps:
+          - Run the migration of the same file again.
+        expected: No duplicate; the counts show 0 created.
+      - c: 4
+        type: Negative
+        title: Status not in the map
+        steps:
+          - Open the error of the row whose status has no mapping.
+        expected: The row is not migrated.
+        msg: ["Row {15}: status {PENDING-OLD} has no mapping"]
+      - c: 4
+        type: Negative
+        title: Blank expiry column
+        steps:
+          - Open the error of the row with a blank expiry.
+        expected: The row is not migrated.
+        msg: ["Row {27}: {Expiry} is required"]
+
+  FR-SP-010:
+    scenario: SC-SP-02
+    persona: SBM_HANDLER
+    screen: ML
+    data: [TD-SP-07]
+    conditions:
+      - After a record is updated by an upload, the masterlist shows the new values at once.
+      - Filters by segment, business type, bucket, expiry month, insurer, handler, conversion status and Migrated return only the matching records.
+      - The policy record shows the summary card with flag chips and the tabs; every change writes the history and the audit trail.
+    cases:
+      - c: 1
+        type: Positive
+        title: Update shows at once
+        steps:
+          - After TC-SP-001.3-01, open the masterlist row.
+        expected: The new premium is shown without refresh delay.
+      - c: 2
+        type: Positive
+        title: Filter by segment and expiry month
+        steps:
+          - Filter CBG Motor and next month.
+        expected: Only CBG Motor records expiring next month.
+      - c: 2
+        type: Negative
+        title: Filter excludes other segments
+        steps:
+          - As sbmtl filter CBG Fire; look for a CBG Motor record.
+        expected: No CBG Motor record is listed.
+      - c: 3
+        type: Positive
+        screen: REC
+        title: Record page and history
+        steps:
+          - Open a record; change the remarks; open History and Administration > Audit Trail.
+        expected: The summary card shows the chips; the tabs Details to History are present; the remarks change is in the history and the audit trail.
+
+  FR-SP-011:
+    scenario: SC-SP-02
+    persona: SBM_HANDLER
+    screen: ML
+    data: [TD-SP-01, TD-SP-07]
+    conditions:
+      - A CBG Motor handler does not see CBG Fire records.
+      - An AO sees only his or her own records.
+      - The extract follows the user's scope and is archived; a user without SBM_EXPORT cannot extract the masterlist.
+    cases:
+      - c: 1
+        type: Security-access
+        title: CBG Motor handler and a CBG Fire record
+        steps:
+          - As sbmhandler search a CBG Fire record by number; open its address.
+        expected: Not listed; the address shows the no-access page.
+      - c: 2
+        type: Security-access
+        persona: MKT_AO
+        title: AO sees own records only
+        steps:
+          - As ao open the masterlist; open a record of ao2 by address.
+        expected: Only ao's records; ao2's record does not open.
+      - c: 3
+        type: Report-output
+        title: Extract within scope
+        steps:
+          - As sbmhandler filter and click Export (XLSX); open Report Archive.
+        expected: The file holds only CBG Motor records with the Report List row 151 fields; the export is archived.
+      - c: 3
+        type: Security-access
+        persona: SBM_POLICY_REVIEWER
+        screen: API
+        title: Export without SBM_EXPORT
+        steps:
+          - As polreview look for Export; call the export.
+        expected: No Export button; the call is refused.
+        msg: [You are not permitted to perform this action]
+
+  FR-SP-012:
+    scenario: SC-SP-02
+    persona: SBM_HANDLER
+    screen: ML
+    data: [TD-SP-07]
+    conditions:
+      - A handler change shows at once in the masterlist and in the record history, and the new handler is notified; bulk Assign Handler changes several records.
+      - The quick filter Changed since yesterday lists the records updated today.
+      - The handler must be an active user.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Assign a handler in bulk
+        steps:
+          - Tick three records; Assign Handler; choose sanitation; save.
+        expected: The three rows show sanitation; each history shows the change; sanitation is notified.
+      - c: 1
+        type: Positive
+        screen: REC
+        title: Conversion status and remarks
+        steps:
+          - Set conversion status Renewed - Inforce and remarks; save.
+        expected: The list shows the new status and remarks; History shows both changes.
+      - c: 2
+        type: Positive
+        title: Changed since yesterday
+        steps:
+          - Apply the quick filter Changed since yesterday.
+        expected: The records changed today, and no others.
+      - c: 3
+        type: Negative
+        screen: API
+        title: Handler not active
+        steps:
+          - Assign the disabled user as handler through the API.
+        expected: Refused.
+        msg: ["{uatdisabled} is not an active user"]
+
+  FR-SP-020:
+    scenario: SC-SP-03
+    persona: SBM_RULE_ADMIN
+    screen: SETUP
+    data: [TD-SP-06]
+    conditions:
+      - A new exclusion rule applies to the next run only after the approver approves it, with an effective date.
+      - Each run result shows the rule and version that produced it; a record with no matching rule is fallout with reason no rule.
+      - The maker cannot approve the own rule set; a rejection keeps the version a draft.
+      - A rule needs an outcome and conditions on known fields only.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: MKT_TL
+        screen: APPROVALS
+        title: SM Group employee exclusion rule
+        steps:
+          - As badmin draft the disposition rule set; add a rule "employee list = Yes gives BDO / SM Group Employee Accounts, stop"; submit.
+          - Run processing before approval; as mkttl compare and approve effective today; run again.
+        expected: The first run does not apply the rule; after approval the employee record goes to BDO / SM Group Employee Accounts.
+      - c: 2
+        type: Positive
+        persona: SBM_SANITATION
+        screen: RULES
+        title: Rule and version on the result
+        steps:
+          - Open Rule Results of the employee record.
+        expected: Each step shows the rule, the rule-set version, the outcome and the reason code.
+      - c: 2
+        type: Negative
+        persona: SBM_SANITATION
+        screen: RUNS
+        title: No matching rule
+        pre: A record whose segment has no matching disposition rule.
+        steps:
+          - Run processing; open the fallout.
+        expected: The record is fallout with reason SBM_NO_RULE.
+      - c: 3
+        type: Security-access
+        title: Maker approves the own rule set
+        pre: sbmtl (maker right) holds SBM_RULE_APPROVE for this case.
+        steps:
+          - As sbmtl draft and submit a rule set; click Approve.
+        expected: Refused.
+        msg: [A rule set is approved by someone other than its maker]
+      - c: 3
+        type: Workflow
+        persona: MKT_TL
+        screen: APPROVALS
+        title: Reject a rule set
+        steps:
+          - Reject a pending version with a reason.
+        expected: The version is a draft again with the reason; the active version is unchanged.
+      - c: 4
+        type: Negative
+        title: Rule without outcome
+        steps:
+          - Add a rule with conditions and no outcome; save.
+        expected: Not saved.
+        msg: [Select the outcome of the rule]
+      - c: 4
+        type: Negative
+        title: Condition on an unknown field
+        steps:
+          - Import a rule file with a condition on field "color".
+        expected: Refused.
+        msg: ["Field {color} cannot be used in a rule"]
+
+  FR-SP-021:
+    scenario: SC-SP-03
+    persona: SYSTEM
+    screen: RUNS
+    data: [TD-SP-02, TD-SP-05, TD-SP-06]
+    conditions:
+      - Uploading an LFS file starts a run; each new record ends with a classification and a bucket, or fallout, through the steps in order.
+      - A record matched to an active LAMD loan is moved to the right bucket and the handlers are notified.
+      - Sanitation marks duplicates (same PN or same serial / motor number) For Review and incomplete records as fallout.
+      - A run starts from the daily job and on demand, each with an SBR number.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Run after intake
+        steps:
+          - Upload an LFS file; open the run.
+        expected: An SBR run with steps Sanitation, Matching, Classification, Disposition, Limits; every record has a classification and bucket or is fallout.
+      - c: 2
+        type: Positive
+        screen: NOTIF
+        title: Matched record bucketed and notified
+        steps:
+          - Open the record whose PN is an active LAMD loan; open the bell of its handler.
+        expected: The record is in its bucket; the handler is notified of the bucket change.
+      - c: 3
+        type: Negative
+        screen: RULES
+        title: Duplicate serial number
+        pre: Two records with the same motor number.
+        steps:
+          - Run processing; open both records.
+        expected: Both are For Review with the duplicate reason.
+      - c: 4
+        type: Positive
+        persona: SBM_SANITATION
+        screen: ML
+        title: Run on demand and by the job
+        steps:
+          - Tick records; Run Processing; run SBM_PROCESSING from Scheduled Jobs.
+        expected: Two runs with SBR numbers; the job run covers the records due.
+
+  FR-SP-022:
+    scenario: SC-SP-03
+    persona: SBM_SANITATION
+    screen: RUNS
+    data: [TD-SP-02]
+    conditions:
+      - A run with five records without PN produces a fallout list and report with the five records and their reason code, and raises the fallout alert.
+      - A corrected record leaves the fallout after the next run.
+      - Intake and extraction failures are listed in the document fallout report.
+    cases:
+      - c: 1
+        type: Negative
+        screen: REPORTS
+        title: Five records without PN
+        steps:
+          - Run processing of the 5 records; open the Fallout tab; run SBM-PROCESS-FALLOUT; open the bell.
+        expected: The five records with their reason code; the report shows the same; alert SBM_FALLOUT.
+      - c: 2
+        type: Workflow
+        title: Correct and re-run
+        steps:
+          - Enter the PN of one record; re-run it.
+        expected: The record leaves the fallout and gets a bucket.
+      - c: 3
+        type: Report-output
+        screen: REPORTS
+        title: Document fallout report
+        steps:
+          - Run SBM-DOC-FALLOUT for today.
+        expected: The unreadable scanned PDF and the invalid intake rows are listed with their reasons.
+
+  FR-SP-030:
+    scenario: SC-SP-04
+    persona: SYSTEM
+    screen: LOAN
+    data: [TD-SP-05]
+    conditions:
+      - A record whose PN matches an active LAMD loan is Submitted.
+      - A record whose PN is not in LAMD is Inforced.
+    cases:
+      - c: 1
+        type: Positive
+        title: PN of an active loan
+        steps:
+          - Run processing; open Loan & Matching of the record.
+        expected: Classification SUBMITTED with the matched loan.
+      - c: 2
+        type: Negative
+        title: PN not in LAMD
+        steps:
+          - Open a record whose PN is not in the snapshot.
+        expected: Classification INFORCED; no loan matched.
+
+  FR-SP-031:
+    scenario: SC-SP-04
+    persona: SYSTEM
+    screen: ML
+    data: [TD-SP-05, TD-SP-06]
+    conditions:
+      - A Submitted CBG Motor policy of an active loan with no exclusion goes to For Renewal.
+      - A policy on the employee list goes to BDO / SM Group Employee Accounts and is not handed to renewal.
+      - A record in For Manual Disposition is disposed by hand with a reason.
+    cases:
+      - c: 1
+        type: Positive
+        title: Active loan to For Renewal
+        steps:
+          - Run processing; open tab For Renewal.
+        expected: The record is FOR_RENEWAL; the handlers are notified.
+      - c: 2
+        type: Negative
+        persona: SYSTEM
+        screen: RWL
+        title: Employee account not renewed
+        steps:
+          - Open the employee record; run SBM_EXPIRY_SCAN when it is within the lead days.
+        expected: Bucket BDO / SM Group Employee Accounts; no hand-off.
+      - c: 3
+        type: Workflow
+        persona: SBM_SANITATION
+        screen: REC
+        title: Manual disposition
+        steps:
+          - Open a record in Manual Disposition; Dispose; For Renewal; reason; save.
+        expected: The record is FOR_RENEWAL; the history shows the reason.
+      - c: 3
+        type: Negative
+        persona: SBM_SANITATION
+        screen: REC
+        title: Dispose without reason
+        steps:
+          - Dispose without a reason.
+        expected: Not saved.
+        msg: [Select a reason for 'Dispose']
+
+  FR-SP-032:
+    scenario: SC-SP-04
+    persona: SBM_SANITATION
+    screen: INTAKE
+    data: [TD-SP-05]
+    conditions:
+      - An FFY account with an active non-amortised loan gets the FFY RA template; a generic account gets the Generic RA template.
+      - A snapshot row without PN is refused.
+    cases:
+      - c: 1
+        type: Positive
+        screen: LOAN
+        title: FFY RA template
+        steps:
+          - Upload the LAMD snapshot; run processing; open the FFY record.
+        expected: RA template FFY on the record.
+      - c: 1
+        type: Positive
+        screen: LOAN
+        title: Generic RA template
+        steps:
+          - Open the generic active-loan record.
+        expected: RA template Generic.
+      - c: 2
+        type: Negative
+        title: Snapshot row without PN
+        steps:
+          - Upload the snapshot; read the row errors.
+        expected: The row is refused.
+        msg: ["Row {9}: PN is required"]
+
+  FR-SP-033:
+    scenario: SC-SP-04
+    persona: SYSTEM
+    screen: ML
+    data: [TD-SP-06, TD-SP-07]
+    conditions:
+      - A No Touch account is tagged Non-Renewal and listed in the non-renewal report with reason No Touch.
+      - An excluded record is never handed to renewal.
+      - A handler reinstates an excluded record with a reason.
+    cases:
+      - c: 1
+        type: Report-output
+        screen: REPORTS
+        title: No Touch account in the non-renewal report
+        steps:
+          - Run processing; run SBM-NON-RENEWAL.
+        expected: The No Touch record with reason No Touch.
+      - c: 2
+        type: Negative
+        screen: RWL
+        title: Excluded record not handed over
+        steps:
+          - Run SBM_EXPIRY_SCAN when the record is within the lead days.
+        expected: No hand-off; the record stays EXCLUDED.
+      - c: 3
+        type: Workflow
+        persona: SBM_SANITATION
+        screen: REC
+        title: Reinstate with a reason
+        steps:
+          - Reinstate; reason; save; run processing.
+        expected: The record is classified again at the next run.
+      - c: 3
+        type: Negative
+        persona: SBM_SANITATION
+        screen: REC
+        title: Reinstate without reason
+        steps:
+          - Reinstate without a reason.
+        expected: Not saved.
+        msg: [Select a reason for 'Reinstate']
+
+  FR-SP-034:
+    scenario: SC-SP-04
+    persona: SYSTEM
+    screen: RECRNW
+    data: [TD-SP-05, TD-SP-06]
+    conditions:
+      - An inforced Fully Paid Loan policy marked eligible reaches For Renewal and, after hand-off, has an RA and a proposal.
+      - An inforced policy in a bucket that is not eligible is not handed over.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Fully Paid Loan to renewal
+        steps:
+          - Run processing; run the expiry scan within the lead days; open the Renewal tab and the Renewal record.
+        expected: Bucket Fully Paid Loan, FOR_RENEWAL, handed over; the Renewal record shows the RA and the proposal.
+      - c: 2
+        type: Negative
+        title: Bucket not eligible
+        pre: A Sold record (not eligible in the demo rules).
+        steps:
+          - Run the expiry scan.
+        expected: No hand-off.
+
+  FR-SP-040:
+    scenario: SC-SP-05
+    persona: SBM_POLICY_REVIEWER
+    screen: IAAF
+    data: [TD-SP-08]
+    conditions:
+      - A policy reviewed twice shows two reviews and a review count of 2 on its IAAF; findings are e-mailed to the bank counterpart and the record stays IN_REVIEW.
+      - A second IAAF for the same policy is refused.
+      - An IAAF linked to the previous term's record shows the link.
+      - The adequacy is required, and an IAAF cannot be generated while the last review has findings.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Two reviews then IAAF
+        steps:
+          - Record review 1 With findings; send the findings to the bank counterpart.
+          - Record review 2 Adequate; Generate IAAF.
+        expected: The findings e-mail reaches the test mailbox. The IAAF (IAAF-yyyy-nnnnnn) shows two reviews and a review count of 2.
+      - c: 2
+        type: Negative
+        title: Second IAAF
+        steps:
+          - Click Generate IAAF again on the same policy.
+        expected: Refused.
+        msg: ["Policy {SBM-2026-000040} already has IAAF {IAAF-2026-000003}"]
+      - c: 3
+        type: Positive
+        screen: RECREV
+        title: Link to the previous term
+        steps:
+          - Link the previous term's record by SBM number.
+        expected: The IAAF shows the link.
+      - c: 4
+        type: Negative
+        title: Adequacy not selected
+        steps:
+          - Save a review without adequacy.
+        expected: Not saved.
+        msg: [Select the adequacy]
+      - c: 4
+        type: Negative
+        title: IAAF with findings open
+        steps:
+          - Record a review With findings; Generate IAAF.
+        expected: Refused.
+        msg: [The last review has findings; record an adequate review first]
+
+  FR-SP-041:
+    scenario: SC-SP-05
+    persona: SBM_CHECKER
+    screen: APPROVALS
+    data: [TD-SP-06, TD-SP-08]
+    conditions:
+      - An IAAF of a Non-CBG Corporate policy goes to level 1 and, after approval, to level 2; the last approval sets APPROVED.
+      - The issued IAAF PDF shows the stamped name, position and time of every approver; Send to bank counterpart sets ISSUED.
+      - The preparer cannot approve; a return needs a reason.
+      - An IAAF with no matrix row for its segment and sum insured cannot be submitted.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: MKT_TL
+        title: Level 1 then level 2
+        steps:
+          - polreview submits the IAAF; sbmchecker approves; mkttl approves.
+        expected: Level 1 then level 2 are notified in turn; the IAAF is APPROVED.
+      - c: 2
+        type: Upload-download
+        persona: SBM_POLICY_REVIEWER
+        title: Issued IAAF PDF
+        steps:
+          - Click Send to bank counterpart; open the mailbox and the PDF.
+        expected: ISSUED; the PDF shows each approver's stamped name, position and time.
+      - c: 3
+        type: Security-access
+        persona: SBM_TL
+        title: Preparer approves
+        pre: sbmtl prepared the IAAF and holds IAAF_APPROVE.
+        steps:
+          - As sbmtl click Approve.
+        expected: Refused.
+        msg: [An IAAF is approved by someone other than its preparer]
+      - c: 3
+        type: Negative
+        title: Return without reason
+        steps:
+          - Return without a reason.
+        expected: Refused.
+        msg: [Select a reason for 'Return']
+      - c: 4
+        type: Negative
+        persona: SBM_POLICY_REVIEWER
+        title: No matrix row
+        pre: A CBG Fire IAAF above every sum-insured band of the matrix.
+        steps:
+          - Submit the IAAF.
+        expected: Refused.
+        msg: ["No approval level is defined for segment {CBG Fire} and sum insured {PHP 250,000,000.00}"]
+
+  FR-SP-050:
+    scenario: SC-SP-06
+    persona: SYSTEM
+    screen: RULES
+    data: [TD-SP-06, TD-SP-08]
+    conditions:
+      - A motor policy whose vehicle is older than the insurer's maximum age is flagged Insurer approval required with the limit and value, and a TOR task is created.
+      - A policy within the limits is not flagged.
+    cases:
+      - c: 1
+        type: Positive
+        title: Vehicle older than 10 years
+        steps:
+          - Run processing of the 12-year-old vehicle record; open Rule Results and the AO's tasks.
+        expected: Flag Insurer approval required; the check shows limit 10 and value 12; the handling Marketing user has a TOR task.
+      - c: 2
+        type: Negative
+        title: Vehicle within the limit
+        steps:
+          - Run processing of a 5-year-old vehicle record.
+        expected: No flag and no TOR task.
+
+  FR-SP-051:
+    scenario: SC-SP-06
+    persona: MKT_AO
+    screen: TOR
+    data: [TD-SP-08]
+    conditions:
+      - A TOR generated for a flagged record lists its breached limits and the proposed terms.
+      - The proposed terms are required, and a TOR cannot be generated for a record without a breach.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Generate the TOR
+        steps:
+          - Open the TOR task; Generate TOR; proposed terms; Account Officer; save; submit.
+        expected: TOR-yyyy-nnnnnn with the vehicle-age breach and the terms; FOR_APPROVAL after submission.
+      - c: 2
+        type: Negative
+        title: Proposed terms blank
+        steps:
+          - Save the TOR without proposed terms.
+        expected: Not saved.
+        msg: [Enter the proposed terms]
+      - c: 2
+        type: Negative
+        screen: API
+        title: Record without a breach
+        steps:
+          - Call Generate TOR for the 5-year-old vehicle record.
+        expected: Refused.
+        msg: ["Policy {SBM-2026-000045} exceeds no limit"]
+
+  FR-SP-052:
+    scenario: SC-SP-06
+    persona: TSU
+    screen: APPROVALS
+    data: [TD-SP-06, TD-SP-08]
+    conditions:
+      - A TOR reaches the TSU approver of its level and, after the last approval, carries the signed PDF.
+      - The preparer never approves; a return needs a reason.
+    cases:
+      - c: 1
+        type: Workflow
+        title: TSU approval
+        steps:
+          - As tsu open the TOR in My Approvals; approve.
+        expected: APPROVED; the signed PDF is attached as type TOR.
+      - c: 2
+        type: Security-access
+        persona: SBM_TL
+        title: Preparer approves the TOR
+        pre: sbmtl prepared the TOR and holds TOR_APPROVE for this case.
+        steps:
+          - As sbmtl click Approve.
+        expected: Refused.
+        msg: [A TOR is approved by someone other than its preparer]
+      - c: 2
+        type: Negative
+        title: Return without reason
+        steps:
+          - Return without a reason.
+        expected: Refused.
+        msg: [Select a reason for 'Return']
+
+  FR-SP-053:
+    scenario: SC-SP-06
+    persona: MKT_AO
+    screen: TOR
+    data: [TD-SP-08]
+    conditions:
+      - The assigned AO is notified of the approved TOR and can download it; the TOR then shows Released.
+      - Another AO cannot open the TOR.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: AO downloads the TOR
+        steps:
+          - Open the notification; open the TOR; Download.
+        expected: The signed PDF downloads; the TOR shows RELEASED.
+      - c: 2
+        type: Security-access
+        title: Another AO
+        steps:
+          - As ao2 open the TOR address.
+        expected: The TOR does not open.
+
+  FR-SP-060:
+    scenario: SC-SP-07
+    persona: SYSTEM
+    screen: RWL
+    data: [TD-SP-06, TD-SP-09, TD-SP-10]
+    conditions:
+      - A For Renewal CBG Fire record 150 days before expiry is handed over with an insurer different from the expiring one; the record is RENEWAL_IN_PROGRESS and the handler and AO are notified.
+      - A second scan does not hand the same record over again.
+      - Before the Renewal adapter exists, the hand-off shows as pending and no letter is sent.
+      - A record with no insurer rule stays For Renewal and appears in the fallout; Renew with BDOI works only on a For Renewal record.
+    cases:
+      - c: 1
+        type: Boundary
+        title: CBG Fire at 150 days
+        steps:
+          - Run SBM_EXPIRY_SCAN; open the record and the bell.
+        expected: Handed over with an insurer other than INS-LAC; RENEWAL_IN_PROGRESS; handler and AO notified.
+      - c: 1
+        type: Boundary
+        neg: true
+        title: CBG Fire at 151 days
+        steps:
+          - Run the scan for a Fire record expiring in 151 days.
+        expected: Not handed over.
+      - c: 2
+        type: Negative
+        title: Second scan
+        steps:
+          - Run the scan again.
+        expected: No second hand-off.
+      - c: 3
+        type: Positive
+        title: Renewal adapter not deployed
+        pre: Renewal module not deployed on the test environment.
+        steps:
+          - Run the scan; open tab Hand-off Pending; check the letters.
+        expected: The hand-off is PENDING; no account and no letter.
+      - c: 4
+        type: Negative
+        screen: RUNS
+        title: No insurer rule
+        steps:
+          - Run the scan for a record whose vehicle type has no insurer rule.
+        expected: The record stays For Renewal; fallout reason no insurer.
+      - c: 4
+        type: Negative
+        persona: MKT_AO
+        screen: API
+        title: Renew with BDOI on a record not For Renewal
+        steps:
+          - Call Renew with BDOI on an EXCLUDED record.
+        expected: Refused.
+        msg: ["Policy {SBM-2026-000050} is not For Renewal"]
+      - c: 4
+        type: Workflow
+        persona: MKT_AO
+        screen: ML
+        title: Renew with BDOI (Non-CBG Retail)
+        steps:
+          - Open the Retail record; Renew with BDOI.
+        expected: The hand-off is made; RENEWAL_IN_PROGRESS.
+
+  FR-SP-061:
+    scenario: SC-SP-07
+    persona: SBM_SANITATION
+    screen: RWL
+    data: [TD-SP-09]
+    conditions:
+      - The For Renewal tab for a month lists every renewable record expiring in that month in the user's scope.
+      - The export has the same rows as the screen; AOs can be assigned in bulk.
+      - Records outside the user's scope are not listed.
+    cases:
+      - c: 1
+        type: Positive
+        title: For Renewal of March
+        steps:
+          - Open tab For Renewal; filter March.
+        expected: Every renewable record expiring in March in scope.
+      - c: 2
+        type: Report-output
+        title: Export and assign AO
+        steps:
+          - Assign ao to three records; export SBM-RENEWABLE.
+        expected: The file matches the screen; ao is notified.
+      - c: 3
+        type: Security-access
+        persona: SBM_HANDLER
+        title: Out-of-scope records
+        steps:
+          - As firehandler open tab For Renewal.
+        expected: No CBG Motor record.
+
+  FR-SP-062:
+    scenario: SC-SP-07
+    persona: SYSTEM
+    screen: LETTERS
+    data: [TD-SP-06, TD-SP-09]
+    conditions:
+      - A reviewed policy with a renewal opportunity gets the reminder letter by the rule's channel and date.
+      - A print batch contains one PDF with all letters of the day and a control list.
+      - No RA is produced by this module; the RA of a handed-over policy appears on its Renewal record.
+      - A delivery failure sets the letter FAILED with an alert; a client without e-mail cannot get an e-mail letter.
+    cases:
+      - c: 1
+        type: Positive
+        screen: MAIL
+        title: Reminder letter by e-mail
+        steps:
+          - Run SBM_LETTER_DISPATCH on the rule's date; open the mailbox of the bank counterpart.
+        expected: The reminder letter to the client c/o the bank counterpart.
+      - c: 2
+        type: Report-output
+        title: Print batch
+        steps:
+          - Open today's print batch.
+        expected: One merged PDF with every print letter and a control list.
+      - c: 3
+        type: Negative
+        screen: RECLET
+        title: No RA from this module
+        steps:
+          - Open the Letters tab of a handed-over record; open its Renewal record.
+        expected: No RA on the Letters tab; the RA is on the Renewal record.
+      - c: 4
+        type: Negative
+        screen: NOTIF
+        title: Delivery failure
+        pre: The mail relay refuses the address of one bank counterpart.
+        steps:
+          - Run the dispatch; open the letter and the bell.
+        expected: The letter is FAILED; alert SBM_LETTER_FAILED; the user can resend it.
+      - c: 4
+        type: Negative
+        title: Client without e-mail
+        steps:
+          - Run the dispatch for a client without e-mail on an e-mail rule.
+        expected: The letter is not sent.
+        msg: ["Client {UAT Client Nine} has no e-mail address"]
+
+  FR-SP-063:
+    scenario: SC-SP-07
+    persona: SBM_SANITATION
+    screen: RWL
+    data: [TD-SP-09, TD-SP-10]
+    conditions:
+      - An insurer that has not accepted the hold cover within 5 days raises an alert.
+      - After re-assignment the old request shows Reassigned, a new request is sent to the new insurer and the renewal account shows the new insurer.
+      - The new insurer must differ from the current one and a reason is required.
+    cases:
+      - c: 1
+        type: Boundary
+        screen: NOTIF
+        title: Alert after 5 days
+        steps:
+          - Run SBM_HOLD_COVER_WATCH for the request open 6 days; open the bell.
+        expected: Alert SBM_INSURER_NOT_ACCEPTED; the record is on tab Insurer Not Accepted.
+      - c: 1
+        type: Boundary
+        neg: true
+        screen: NOTIF
+        title: No alert at 4 days
+        steps:
+          - Run the watch for a request open 4 days.
+        expected: No alert.
+      - c: 2
+        type: Workflow
+        title: Re-assign the insurer
+        steps:
+          - Re-assign Insurer; new insurer; reason; save; open the renewal account and the mailbox.
+        expected: The old request is Reassigned; the new insurer receives the hold cover request; the account shows the new insurer.
+      - c: 3
+        type: Negative
+        title: Same insurer
+        steps:
+          - Select the current insurer; save.
+        expected: Refused.
+        msg: [Select an insurer other than the current one]
+      - c: 3
+        type: Negative
+        title: No reason
+        steps:
+          - Select another insurer without a reason; save.
+        expected: Refused.
+        msg: [Select the reason]
+
+  FR-SP-064:
+    scenario: SC-SP-07
+    persona: PROCESSOR
+    screen: PLACEMENT
+    data: [TD-SP-09]
+    conditions:
+      - After the client confirms and pays, the slip is sent to the insurer and the masterlist record shows Placed.
+      - The slip is not sent before the payment gate passes.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Place the renewal account
+        steps:
+          - Confirm and pay the renewal account; generate and send the placement slip; open the masterlist record.
+        expected: The insurer receives the protected slip; the record is PLACED; the handler is notified.
+      - c: 2
+        type: Negative
+        title: Payment gate not passed
+        steps:
+          - Try to send the slip of an unpaid renewal account.
+        expected: The slip is not sent; the record stays RENEWAL_IN_PROGRESS.
+
+  FR-SP-065:
+    scenario: SC-SP-07
+    persona: PROCESSOR
+    screen: BOOKING
+    data: [TD-SP-09]
+    conditions:
+      - A booked renewal shows BOOKED, the invoice number and the booking date in the masterlist; the invoice has business type RENEWAL.
+      - A renewal that is declined, lost or expired becomes NOT_RENEWED with the reason.
+    cases:
+      - c: 1
+        type: Workflow
+        screen: ML
+        title: Booked renewal
+        steps:
+          - Book the placed renewal account; open the masterlist record and the invoice.
+        expected: BOOKED with invoice number and date; business type RENEWAL.
+      - c: 2
+        type: Negative
+        screen: REC
+        title: Declined renewal
+        steps:
+          - Decline the renewal in the Renewal module; open the record.
+        expected: NOT_RENEWED with the reason.
+
+  FR-SP-070:
+    scenario: SC-SP-08
+    persona: SBM_UPP_HANDLER
+    screen: HF
+    data: [TD-SP-08]
+    conditions:
+      - A CLPC payment carrying the PN of a billed record is tagged Handling Fee and applied with an OR.
+      - An OTC payment with an unknown location reference stays in the unapplied list; a payment matching two records stays untagged as ambiguous.
+      - A payment already tagged cannot be tagged by hand again.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: SYSTEM
+        title: CLPC payment tagged
+        steps:
+          - Run SBM_HANDLING_FEE_TAGGER; open the record and Cashiering.
+        expected: TAGGED then APPLIED; an OR is issued.
+      - c: 2
+        type: Negative
+        screen: UNAPPLIED
+        title: Unknown OTC reference
+        steps:
+          - Run the tagger; open the unapplied list.
+        expected: The OTC payment stays for the UPP handler.
+      - c: 2
+        type: Negative
+        title: Payment matching two records
+        steps:
+          - Run the tagger; open the tagger results.
+        expected: The payment is untagged and listed as ambiguous.
+      - c: 3
+        type: Negative
+        screen: API
+        title: Manual tag of a tagged payment
+        steps:
+          - Tag the CLPC payment by hand.
+        expected: Refused.
+        msg: ["Payment {UP-2026-000101} is already tagged"]
+
+  FR-SP-080:
+    scenario: SC-SP-09
+    persona: SBM_TL
+    screen: REPORTS
+    data: [TD-SP-07]
+    conditions:
+      - The Sanitation Report of a month shows the counts per the grouping of Report List row 156.
+      - The process fallout report of a run lists every fallout record with its reason code; each home tile opens its filtered list.
+      - A date range with the end before the start is refused; reports follow the user's scope.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Sanitation Report
+        steps:
+          - Run SBM-SANITATION for the month.
+        expected: Counts under Expiring accounts, For renewal, Not for renewal and Other with the lines of row 156.
+      - c: 2
+        type: Report-output
+        screen: HOME
+        title: Home tiles
+        steps:
+          - Open the home page; click the fallout tile.
+        expected: The list opens filtered on the last run's fallout, with the tile's count.
+      - c: 3
+        type: Negative
+        title: Invalid date range
+        steps:
+          - Run SBM-DISPOSITION with the end date before the start date.
+        expected: Not run.
+        msg: [The end date must be on or after the start date]
+      - c: 3
+        type: Security-access
+        persona: SBM_HANDLER
+        title: Report scope
+        steps:
+          - As firehandler run SBM-CLASSIFICATION.
+        expected: CBG Fire records only.
+
+  FR-SP-081:
+    scenario: SC-SP-09
+    persona: SBM_TL
+    screen: REPORTS
+    data: [TD-SP-07]
+    conditions:
+      - SBM-MASTERLIST exported as Excel and as PDF has the same rows; ODS, CSV and XML are also offered, and exports are archived.
+      - A user without SBM_REPORT_EXPORT cannot export.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Export in five formats
+        steps:
+          - Run SBM-MASTERLIST; export to XLSX, PDF, ODS, CSV and XML; print preview; open Report Archive.
+        expected: Same rows in every file; the exports are archived with user and parameters.
+      - c: 2
+        type: Security-access
+        persona: SBM_CHECKER
+        title: Export without permission
+        steps:
+          - As sbmchecker run the report; call the export.
+        expected: No Export; the call is refused.
+        msg: [You are not permitted to perform this action]
+
+  FR-SP-082:
+    scenario: SC-SP-09
+    persona: SYSTEM
+    screen: NOTIF
+    data: [TD-SP-08, TD-SP-09, TD-SP-10]
+    conditions:
+      - The approvers of level 1 are notified when an IAAF is submitted.
+      - A confirmed hold cover whose account is not booked 5 days before it ends raises the unbooked alert; one booked is not alerted.
+      - Users follow their in-app and e-mail preferences per event type.
+    cases:
+      - c: 1
+        type: Positive
+        persona: SBM_CHECKER
+        title: IAAF pending notice
+        steps:
+          - polreview submits an IAAF; sbmchecker opens the bell.
+        expected: The notice opens the IAAF.
+      - c: 2
+        type: Boundary
+        title: Unbooked hold cover at 5 days
+        steps:
+          - Run SBM_HOLD_COVER_WATCH for a hold cover ending in 5 days on an unbooked account.
+        expected: Alert SBM_HOLD_COVER_UNBOOKED to the handler and TL.
+      - c: 2
+        type: Negative
+        title: Booked account not alerted
+        steps:
+          - Run the watch for a booked account whose hold cover ends in 5 days.
+        expected: No alert.
+      - c: 3
+        type: Positive
+        persona: SBM_HANDLER
+        screen: MAIL
+        title: E-mail preference
+        steps:
+          - Set the preference for new submissions to e-mail; upload a file.
+        expected: The notice arrives by e-mail.
+
+access:
+  - action: View the masterlist and records
+    screen: ML
+    permission: SBM_VIEW
+    allow: [SBM_HANDLER, SBM_CHECKER, SBM_SANITATION, SBM_TL, SBM_POLICY_REVIEWER, SBM_UPP_HANDLER, MKT_AO, MKT_TL, PROCESSOR]
+    deny: [SBM_RULE_ADMIN, TSU]
+    denied: Submitted Policies is not in the menu; the list call returns HTTP 403.
+  - action: Create and edit records, tag renewal, confirm extraction
+    screen: REC
+    permission: SBM_MAINTAIN
+    allow: [SBM_HANDLER, SBM_SANITATION, SBM_TL, SBM_POLICY_REVIEWER, MKT_AO]
+    deny: [SBM_CHECKER, MKT_TL, PROCESSOR]
+    denied: New Policy, Edit and the tag actions are not shown; the call returns HTTP 403.
+  - action: Upload sources and LAMD snapshots
+    screen: INTAKE
+    permission: SBM_INTAKE
+    allow: [SBM_HANDLER, SBM_SANITATION, SBM_TL]
+    deny: [SBM_POLICY_REVIEWER, MKT_AO]
+    denied: Upload & Intake is not in the menu; the call returns HTTP 403.
+  - action: Run processing, resolve fallout, hand off, re-assign insurer
+    screen: RUNS
+    permission: SBM_PROCESS
+    allow: [SBM_SANITATION, SBM_TL]
+    deny: [SBM_HANDLER, MKT_AO]
+    denied: Run Processing and Re-assign Insurer are not shown; the call returns HTTP 403.
+  - action: Maintain rule sets and matrices (maker)
+    screen: SETUP
+    permission: SBM_RULE_MAINTAIN
+    allow: [SBM_RULE_ADMIN, SBM_TL]
+    deny: [SBM_HANDLER, MKT_TL]
+    denied: Submitted Policies Setup is read only or not in the menu; the call returns HTTP 403.
+  - action: Approve rule sets
+    screen: APPROVALS
+    permission: SBM_RULE_APPROVE
+    allow: [MKT_TL]
+    deny: [SBM_RULE_ADMIN, SBM_TL]
+    denied: The rule set is not offered in My Approvals; the call returns HTTP 403.
+  - action: Prepare reviews and IAAF
+    screen: IAAF
+    permission: IAAF_PREPARE
+    allow: [SBM_HANDLER, SBM_TL, SBM_POLICY_REVIEWER]
+    deny: [SBM_CHECKER, MKT_AO]
+    denied: Generate IAAF is not shown; the call returns HTTP 403.
+  - action: Approve an IAAF level
+    screen: APPROVALS
+    permission: IAAF_APPROVE
+    allow: [SBM_CHECKER, MKT_TL]
+    deny: [SBM_POLICY_REVIEWER, SBM_HANDLER]
+    denied: The IAAF is not offered in My Approvals; the call returns HTTP 403.
+  - action: Prepare a TOR
+    screen: TOR
+    permission: TOR_PREPARE
+    allow: [SBM_HANDLER, SBM_TL, MKT_AO]
+    deny: [TSU, SBM_SANITATION]
+    denied: Generate TOR is not shown; the call returns HTTP 403.
+  - action: Approve a TOR
+    screen: APPROVALS
+    permission: TOR_APPROVE
+    allow: [TSU]
+    deny: [MKT_AO, SBM_TL]
+    denied: The TOR is not offered in My Approvals; the call returns HTTP 403.
+  - action: Send and print letters
+    screen: LETTERS
+    permission: SBM_LETTER_SEND
+    allow: [SBM_SANITATION, SBM_TL]
+    deny: [SBM_HANDLER, MKT_AO]
+    denied: Letters & Print Batches actions are not shown; the call returns HTTP 403.
+  - action: Handling-fee records and manual tag
+    screen: HF
+    permission: SBM_HANDLING_FEE
+    allow: [SBM_UPP_HANDLER, SBM_TL]
+    deny: [SBM_SANITATION, SBM_HANDLER]
+    denied: Handling Fees is not in the menu; the call returns HTTP 403.
+  - action: Migrate Excel masterlists
+    screen: INTAKE
+    permission: SBM_MIGRATE
+    allow: [SBM_TL]
+    deny: [SBM_HANDLER, SBM_SANITATION]
+    denied: The Migration upload is not shown; the call returns HTTP 403.
+  - action: Extract the masterlist
+    screen: ML
+    permission: SBM_EXPORT
+    allow: [SBM_HANDLER, SBM_SANITATION, SBM_TL]
+    deny: [SBM_POLICY_REVIEWER, SBM_CHECKER, MKT_AO]
+    denied: Export is not shown; the call returns HTTP 403.
+  - action: Run Submitted Policies reports
+    screen: REPORTS
+    permission: SBM_REPORT_VIEW
+    allow: [SBM_HANDLER, SBM_CHECKER, SBM_SANITATION, SBM_TL, SBM_POLICY_REVIEWER]
+    deny: [SBM_UPP_HANDLER, MKT_AO, TSU]
+    denied: The Submitted Policies category is not listed; the run call returns HTTP 403.
+
+findings:
+  - fr: FR-SP-001
+    issue: 'The natural key includes the expiry date, so a row for the next term of the same policy creates a new record, while acceptance criterion 3 speaks of "a row updating an existing policy". The FRS does not say which fields may change on an update and which make a new record.'
+    proposal: List the fields that update a record and state that a new expiry date makes a new term record linked to the previous one.
+  - fr: FR-SP-030
+    issue: 'The default classification uses "BDOI did not place the policy", which is not a field of the masterlist or LAMD; the definition is open (SP SQ04).'
+    proposal: Name the data element that tells whether BDOI placed the policy; the cases test the PN match only.
+  - fr: FR-SP-031
+    issue: Bucket precedence and the RMU / FFY conflicts are open (SP SQ05) and the conflicting rules are seeded inactive, so a record that is both FFY and RMU cannot be tested.
+    proposal: Answer SP SQ05 and add the precedence to the FRS; a case is added then.
+  - fr: FR-SP-032
+    issue: The rule that chooses the Generic or the FFY RA is to be confirmed (SP SQ06); the cases follow the demo rule.
+    proposal: State the rule in the FRS when SP SQ06 is answered.
+  - fr: FR-SP-040
+    issue: The FRS keeps one IAAF per policy with links, while the BRD's current process lets one IAAF cover several policies (SP SQ07). The bank counterpart may expect one form.
+    proposal: Confirm with BDOI; the cases test one IAAF per policy.
+  - fr: FR-SP-053
+    issue: The meaning of Released is to be confirmed (SP SQ08); the default is the AO's first opening, which a preview by another user could not trigger but a download by the assigned AO does.
+    proposal: Define Released (first opening, first download or explicit acknowledgement) in the FRS.
+  - fr: FR-SP-062
+    issue: The owner of the renewal notice and renewal proposal letters is not confirmed (XQ03); the cases may move to the BRD-6 plan.
+    proposal: Record the owner after XQ03; the cases here test the reminder letter and the print batch.
+  - fr: FR-SP-063
+    issue: The BRD gives an acceptance window of 3-5 days; the FRS default is 5 (SP SQ12). The FRS does not say whether days are calendar or working days.
+    proposal: State calendar or working days; the boundary cases use calendar days.
+  - fr: FR-SP-070
+    issue: Amount, VAT, OR and GL account of the handling fee are to be confirmed (SP SQ13), so the accounting of the applied payment cannot be checked.
+    proposal: Add the accounting entry to the FRS after SP SQ13; the cases check tagging and the OR only.
+  - fr: FR-SP-080
+    issue: BRIDSP-30 repeats BRIDSP-20 word for word; the FRS traces both to one FR, which inflates the BRD ID count.
+    proposal: Ask the BRD owner to confirm that BRIDSP-30 is a duplicate and mark it so in the traceability.

@@ -1,0 +1,1336 @@
+# BRD-13 Data Migration - single source of the data objects, extract layouts, code map sets, data-quality
+# rules and open decisions. Read by build_migration_pack.py, which produces:
+#   * the BDOI Data Requirements Workbook (one sheet per layout, plus register, code maps, control totals,
+#     rules and decisions);
+#   * the CSV extract templates in docs/deliverables/out/Migration/templates/ (header row = field names);
+#   * the object tables of the Strategy, Runbook and Reconciliation documents.
+# Sources: docs/requirements/BDOI_DM_BRD_SPEC.md (R2), docs/architecture/DATA_MIGRATION_DESIGN.md (R3) sections 2,
+# 5, 8, 12 and 27; target columns from the Flyway scripts named in each row. Columns marked "(new)" are proposed by
+# R3 section 14.5 and are created by the migration build.
+#
+# Field lines: name | description | type | length | mandatory | allowed values or code list | format | example |
+#              BIBS target | validation rule | source system hint
+# type: Text, Code, Date, Timestamp, Amount, Integer, Decimal, Flag. mandatory: Y, N, C (conditional, see rule).
+
+meta:
+  version: "1.0"
+  date: 26 September 2026
+  issue_date: 26 Sep 2026
+
+decision_classes:
+  - [MIGRATE, "Clean master or reference data needed on Day 1; loaded into BIBS business tables through the owning service"]
+  - [CARRY_FORWARD, "Open operational or financial item at cutover; loaded with its open position and processed in BIBS"]
+  - [CONDITIONAL, "Migrated only when the condition decided by BDOI is met (BRID 4.1; DMQ09, DMQ30)"]
+  - [ARCHIVE, "History kept read-only in legacy or loaded into the BIBS archive for inquiry (BRID 11.1)"]
+  - [EXCLUDED, "Not migrated; rebuilt in BIBS or not needed"]
+
+milestones:
+  - [M0, "Pack issued to BDOI", "26 Sep 2026"]
+  - [M1, "Build-shaping decisions (answers that change what is built)", "16 Oct 2026"]
+  - [M2, "Owners, stewards, keys and remaining business rules", "6 Nov 2026"]
+  - [M3, "Object decisions signed (gate G1); layouts frozen (G2 part 1)", "T-16 weeks"]
+  - [M4, "First full extracts in the templates, with control files and volumes", "T-14 weeks"]
+  - [M5, "Code maps approved for Mock 2 (G2)", "T-10 weeks"]
+  - [M6, "Cutover calendar, fallback and decommissioning criteria agreed", "T-6 weeks"]
+
+# --------------------------------------------------------------------------------------------------------------
+# Data object register. decision: MIGRATE / CARRY_FORWARD / CONDITIONAL / ARCHIVE / EXCLUDED (proposal; BDOI
+# confirms at gate G1). layouts: template codes; an object without a layout has no extract file.
+objects:
+  - code: R01
+    name: Lists of values and MIS values
+    category: Reference
+    decision: MIGRATE
+    rationale: Every coded field of clients, policies and open items needs its BIBS value on Day 1 (BRID 3.1). Legacy values are mapped to BIBS values; missing values are created through the LOV master with maker-checker.
+    source: QPS, EBIX
+    target: "lov_value through LovService; MIS field catalogue (Core Replacement CR-W1)"
+    owner: Product Owner, Marketing Business System (MBS)
+    steward: MBS data steward (to name)
+    history: Current values and values used by any migrated record
+    delta: None after the map freeze (T-7 days); changes by change request and a new map version
+    format: CSV
+    controls: Row count; count of distinct (list_type, code)
+    due: M4
+    order: 1
+    brd: BRID 3.1
+    questions: DMQ08
+    bound: A few thousand values
+    layouts: [R01]
+  - code: R02
+    name: Branches and invoicing branches
+    category: Reference
+    decision: MIGRATE
+    rationale: Branch codes are mapped only; BIBS branches are configured by Comptrollership before the load.
+    source: EBIX
+    target: org_branch (check only, code map BRANCH)
+    owner: Head, Comptrollership
+    steward: Comptrollership data steward (to name)
+    history: Current
+    delta: None
+    format: CSV
+    controls: Row count
+    due: M4
+    order: 1
+    brd: BRID 3.1
+    questions: DMQ08
+    bound: Under 100
+    layouts: [R02]
+  - code: R03
+    name: Sales organisation (regions, departments, teams, unit heads, account officers)
+    category: Reference
+    decision: MIGRATE
+    rationale: Clients, policies and open items carry the AO and unit; MIS reporting and Collections assignment need them on Day 1.
+    source: QPS, EBIX
+    target: cat_sales_unit, cat_sales_officer (catalog services)
+    owner: Heads, Retail and Corporate Marketing
+    steward: Marketing data steward (to name)
+    history: Current, plus inactive AOs referenced by open items
+    delta: Weekly until the freeze
+    format: CSV
+    controls: Row count per record type
+    due: M4
+    order: 2
+    brd: BRID 3.1
+    questions: DMQ08
+    bound: About 600 AOs (485 Marketing users, BRD-3)
+    layouts: [R03]
+  - code: R04
+    name: Insurers and insurer branches
+    category: Reference
+    decision: MIGRATE
+    rationale: Every open invoice, header and remittance position is owed to or by an insurer.
+    source: QPS, EBIX
+    target: cat_insurer, cat_insurer_branch (InsurerService), party
+    owner: Head, Operations
+    steward: Operations data steward (to name)
+    history: Active insurers, and inactive insurers with open items
+    delta: None
+    format: CSV
+    controls: Row count per file
+    due: M4
+    order: 2
+    brd: BRID 3.1
+    questions: DMQ08
+    bound: Under 100 insurers
+    layouts: [R04, R04B]
+  - code: R05
+    name: Product lines, cover types, products and risk codes
+    category: Reference
+    decision: MIGRATE
+    rationale: The risk code decides the premium components, taxes and commission of every open invoice and header.
+    source: QPS, EBIX
+    target: cat_product_line, cat_cover_type, cat_product (ProductCatalogService)
+    owner: Product Owner, MBS
+    steward: MBS data steward (to name)
+    history: Current, plus codes used by in-force policies and open items
+    delta: None
+    format: CSV
+    controls: Row count
+    due: M4
+    order: 3
+    brd: BRID 3.1
+    questions: DMQ08
+    bound: A few hundred codes
+    layouts: [R05]
+  - code: R06
+    name: Packages (active package versions)
+    category: Reference
+    decision: MIGRATE
+    rationale: Renewals of packaged policies need the active package version (BRD-3).
+    source: QPS
+    target: cat_product_version, cat_package_insurer, cat_package_insurer_term
+    owner: Product Owner, MBS; TSU
+    steward: MBS data steward (to name)
+    history: Active versions only
+    delta: None
+    format: XLSX or CSV
+    controls: Row count
+    due: M4
+    order: 3
+    brd: BRID 3.1
+    questions: DMQ08
+    bound: Under 200 packages
+    layouts: [R06]
+  - code: R07
+    name: Commission rates by insurer and product
+    category: Reference
+    decision: MIGRATE
+    rationale: Endorsements and renewals of legacy policies compute commission from the rate table.
+    source: QPS, EBIX
+    target: cat_commission_rate
+    owner: Head, Operations
+    steward: Operations data steward (to name)
+    history: Rates effective at cutover and later
+    delta: None
+    format: CSV
+    controls: Row count
+    due: M4
+    order: 3
+    brd: BRID 3.1
+    questions: DMQ30
+    bound: Insurers x products
+    layouts: [R07]
+  - code: R08
+    name: Chart of accounts mapping (legacy GL account to BIBS account)
+    category: Reference
+    decision: MIGRATE
+    rationale: The GL opening trial balance (G01) is loaded through this map; legacy control accounts are mapped to Migration Clearing.
+    source: EBIX, ISYS GL
+    target: Code map GL_ACCOUNT to coa_account (chart configured by Comptrollership)
+    owner: Head, Comptrollership; Product Owner FRBS and ACSL
+    steward: Comptrollership data steward (to name)
+    history: Current chart
+    delta: None
+    format: XLSX or CSV
+    controls: Row count
+    due: M4
+    order: 3
+    brd: BRID 5.1-8.1; AQ01
+    questions: DMQ18
+    bound: A few thousand accounts
+    layouts: [R08]
+  - code: R09
+    name: Payees
+    category: Reference
+    decision: CONDITIONAL
+    rationale: The payee migration handler exists (DISB_PAYEE_MIGRATION); in scope if BDOI confirms (AQ11, DMQ30).
+    source: EBIX, Disbursement files
+    target: party and payee through the DISB_PAYEE_MIGRATION service
+    owner: Product Owner, Comptrollership - Disbursement
+    steward: Disbursement data steward (to name)
+    history: Active payees
+    delta: None
+    format: CSV
+    controls: Row count
+    due: M4
+    order: 4
+    brd: AQ11
+    questions: DMQ30
+    bound: To supply
+    layouts: [R09]
+  - code: R10
+    name: Users and roles
+    category: Reference
+    decision: EXCLUDED
+    rationale: Users are created through User Access requests and approvals (BRD-11); legacy user IDs are only mapped (map set USER) so AO, handler and collector fields resolve.
+    source: QPS, EBIX
+    target: None (code map USER only)
+    owner: Unit Head, Analytics and Risk Management (User Access)
+    steward: IT security administrator
+    history: "-"
+    delta: "-"
+    format: "-"
+    controls: "-"
+    due: M5 (USER map)
+    order: 0
+    brd: BRD-11
+    questions: DMQ30
+    bound: About 1,344 named users (umbrella p.44)
+    layouts: []
+  - code: R11
+    name: Receipt series in use (AR and OR, ATP and next number)
+    category: Reference
+    decision: CARRY_FORWARD
+    rationale: Receipts issued in BIBS after go-live must continue the BIR-authorised series without gap or overlap.
+    source: EBIX
+    target: csh_receipt_series
+    owner: Operations - Financial Transactions
+    steward: Cashiering data steward (to name)
+    history: Series in use at the freeze
+    delta: Final values at the freeze (T-3)
+    format: CSV
+    controls: Row count
+    due: M4; final at T-3
+    order: 4
+    brd: BRID 6.1
+    questions: DMQ14
+    bound: One per branch and kind
+    layouts: [R11]
+  - code: C01
+    name: Client master (individual and corporate)
+    category: Client
+    decision: MIGRATE
+    rationale: Marketing, Operations and Renewal must find and use clients on Day 1 without re-encoding (BRID 2.1); clients are deduplicated before load. Umbrella BRD p.43 asks for clients "2020 to present" and daily client batches (DCR-173).
+    source: QPS, EBIX, CMS
+    target: crm_client through ClientOnboardingService.registerMigrated (new)
+    owner: Product Owner, MBS; Heads, Retail and Corporate Marketing
+    steward: Marketing data steward (to name)
+    history: Clients from 2020 to present (umbrella p.43); filter per DMQ05
+    delta: Daily new and changed clients from T-14 days until the freeze
+    format: CSV
+    controls: Row count; count of distinct legacy_client_no
+    due: M4; deltas daily from T-14 days
+    order: 5
+    brd: BRID 2.1
+    questions: DMQ04, DMQ05, DMQ06, DCR-173
+    bound: Loaders sized for 1,000,000 rows
+    layouts: [C01, C02]
+  - code: C03
+    name: Client payout accounts (for refunds)
+    category: Client
+    decision: MIGRATE
+    rationale: Refunds of legacy UPP (BRID 5.4) need the client's payout account.
+    source: EBIX
+    target: crm_client_payout_account (ClientPayoutAccounts)
+    owner: Product Owner, Comptrollership - Disbursement
+    steward: Disbursement data steward (to name)
+    history: Active accounts
+    delta: None
+    format: CSV
+    controls: Row count
+    due: M4
+    order: 6
+    brd: BRID 5.4
+    questions: DMQ17
+    bound: To supply
+    layouts: [C03]
+  - code: C04
+    name: KYC documents and IDs
+    category: Client
+    decision: ARCHIVE
+    rationale: Documents stay retrievable for audit; BIBS keeps the KYC status and review date on the client (DMQ07 may change this to MIGRATE).
+    source: QPS, file shares
+    target: BIBS archive (mig_archive_record, attachment LEGACY_DOCUMENT)
+    owner: Compliance
+    steward: Compliance data steward (to name)
+    history: Per retention
+    delta: None
+    format: CSV index plus files
+    controls: Row count; SHA-256 per file
+    due: Before decommissioning
+    order: 16
+    brd: BRID 11.1
+    questions: DMQ07, DMQ24
+    bound: To supply
+    layouts: [H02]
+  - code: C05
+    name: Screening results and risk ratings
+    category: Client
+    decision: EXCLUDED
+    rationale: One full screening run after the client load gives current results (BRD-10); legacy results are archived with the client history.
+    source: Excel, Compliance
+    target: None (SCR_PERIODIC_SCREENING full run after C01)
+    owner: Compliance
+    steward: "-"
+    history: "-"
+    delta: "-"
+    format: "-"
+    controls: "-"
+    due: "-"
+    order: 0
+    brd: BRID 2.1
+    questions: DMQ06
+    bound: "-"
+    layouts: []
+  - code: P01
+    name: In-force policy headers
+    category: Policy
+    decision: CONDITIONAL
+    rationale: Needed to locate active coverage, to endorse legacy invoices (BRID 9) and to renew in BIBS (BRID 12.1); the scope condition is decided by BDOI (DMQ09).
+    source: QPS, EBIX
+    target: acc_account through AccountService.importLegacy (new)
+    owner: Head, Operations
+    steward: Operations data steward (to name)
+    history: Policies in force at T (DMQ09)
+    delta: Single load after the freeze
+    format: CSV
+    controls: Row count; sum of sum_insured and gross_premium per currency; count of distinct legacy_policy_ref
+    due: M4; final at T-2
+    order: 7
+    brd: BRID 4.1
+    questions: DMQ09, DMQ22
+    bound: 250,000-310,000 renewable accounts a year (umbrella p.44-45)
+    layouts: [P01, P01S]
+  - code: P02
+    name: Expired policies and policy history
+    category: Policy
+    decision: ARCHIVE
+    rationale: History is not converted (BRD p.3); kept for inquiry.
+    source: QPS, EBIX
+    target: BIBS archive record type POLICY
+    owner: Head, Operations
+    steward: Operations data steward (to name)
+    history: Per retention (5 years online, 15 years archive, umbrella p.45)
+    delta: None
+    format: CSV
+    controls: Row count and hash total per record type
+    due: Before decommissioning
+    order: 16
+    brd: BRID 11.1
+    questions: DMQ24
+    bound: To supply
+    layouts: [H01]
+  - code: P03
+    name: RMEL cohorts already extracted in legacy (renewal candidates in disposition)
+    category: Policy
+    decision: CARRY_FORWARD
+    rationale: Policies expiring in the 140 days after go-live were already extracted by legacy RMEL; they continue in BIBS Renewal with their disposition (BRID 12.1; DMQ26).
+    source: RMEL files, QPS
+    target: mig_legacy_candidate served to Renewal (LegacyPolicySource)
+    owner: Heads, Retail and Corporate Marketing (Renewal)
+    steward: Renewal data steward (to name)
+    history: Cohorts with expiry from T to T+140 days
+    delta: Single load after the freeze
+    format: XLSX or CSV
+    controls: Row count per expiry month
+    due: M4; final at T-2
+    order: 13
+    brd: BRID 12.1
+    questions: DMQ26
+    bound: About 25,800 a month (umbrella p.44-45), 4-5 cohorts
+    layouts: [P03]
+  - code: P04
+    name: Submitted-policy masterlists
+    category: Policy
+    decision: CONDITIONAL
+    rationale: Loaded through the Submitted Policies migration handler (SBM_MIGRATION) if BDOI confirms (SP SQ16, DMQ30); layout issued with that module.
+    source: Excel
+    target: sbm_policy through SBM_MIGRATION
+    owner: CBG and Non-CBG Marketing (Submitted Policies)
+    steward: Submitted Policies data steward (to name)
+    history: All active records
+    delta: None
+    format: XLSX
+    controls: Row count per segment
+    due: M4 if in scope
+    order: 14
+    brd: BRIDSP-33
+    questions: DMQ30
+    bound: To supply
+    layouts: []
+  - code: P05
+    name: Employee Benefits programmes
+    category: Policy
+    decision: CONDITIONAL
+    rationale: Loaded through EB_PROGRAMME_LOAD if BDOI confirms (DMQ30); layout issued with the EB module.
+    source: EBIX
+    target: EB programme tables through EB_PROGRAMME_LOAD
+    owner: Head, Employee Benefits
+    steward: EB data steward (to name)
+    history: Active programmes
+    delta: None
+    format: XLSX
+    controls: Row count
+    due: M4 if in scope
+    order: 14
+    brd: BRD-8
+    questions: DMQ30
+    bound: To supply
+    layouts: []
+  - code: F01
+    name: Open legacy invoices (premium receivable, paid not remitted, commission receivable, PR2307), with components and insurer shares
+    category: Open item
+    decision: CARRY_FORWARD
+    rationale: Receivables and payables open at cutover must be collected, remitted, reversed and endorsed in BIBS (BRID 5.1-10.1).
+    source: EBIX, QPS
+    target: ops_invoice, ops_invoice_share, ops_invoice_component through LegacyInvoiceIntake (new); opening entry MIG_LEGACY_INVOICE_OPENING
+    owner: Operations - Financial Transactions; Head, Comptrollership
+    steward: Operations data steward (to name)
+    history: Every invoice with any open component at T (DMQ10)
+    delta: Single load after the freeze
+    format: CSV with control file
+    controls: Row count per file; sums per component, bucket and currency; count of distinct legacy_invoice_no
+    due: M4; final at T-2
+    order: 8
+    brd: BRID 5.2, 6.1-6.4, 7.1, 7.2, 8.1, 9.1-9.3, 10.1
+    questions: DMQ10, DMQ11, DMQ12, DMQ13, DMQ35
+    bound: Loaders sized for 500,000 rows
+    layouts: [F01, F01S, F01C]
+  - code: F02
+    name: Unapplied premium payments (UPP) with disposition in progress
+    category: Open item
+    decision: CARRY_FORWARD
+    rationale: Unapplied cash must not be lost after cutover (BRID 5.1); it is applied, refunded or reclassified in BIBS.
+    source: EBIX, CMS
+    target: csh_unapplied through UnappliedService.createMigrated (new); opening entry MIG_UPP_OPENING
+    owner: Operations - Financial Transactions
+    steward: Cashiering data steward (to name)
+    history: Every UPP item with a balance at T
+    delta: Single load after the freeze
+    format: CSV with control file
+    controls: Row count; sums of amount and balance per currency; count of distinct legacy_upp_ref
+    due: M4; final at T-2
+    order: 9
+    brd: BRID 5.1-5.5, 6.3, 6.4
+    questions: DMQ14, DMQ15, DMQ16
+    bound: To supply
+    layouts: [F02]
+  - code: F03
+    name: Open collection state (dispositions, promises to pay, installment plans, collector assignments)
+    category: Open item
+    decision: CARRY_FORWARD
+    rationale: Collectors continue their follow-up without re-keying (CQ07); only the open state is carried, history is archived (DMQ34).
+    source: CMS
+    target: Collections legacy state (CLX_LEGACY_ITEMS, LegacyItemStateService, new)
+    owner: Head, Operations (Collections)
+    steward: Collections data steward (to name)
+    history: Open items only
+    delta: Single load after the freeze
+    format: CSV
+    controls: Row count; sum of promise_amount per currency
+    due: M4; final at T-2
+    order: 10
+    brd: CQ07
+    questions: DMQ34
+    bound: 1,200 dispositions a day (umbrella p.42)
+    layouts: [F03]
+  - code: F04
+    name: Remittance in flight (batches not yet paid, holds, special remittances)
+    category: Open item
+    decision: CONDITIONAL
+    rationale: Proposal - complete legacy batches before the freeze; carry only holds and special remittances that cannot complete (DMQ21).
+    source: EBIX
+    target: rem_hold_request, rem_special_request (remittance services)
+    owner: Operations - Remittance
+    steward: Remittance data steward (to name)
+    history: Open at T
+    delta: Single load after the freeze
+    format: CSV
+    controls: Row count; sum of amount per currency
+    due: M4; final at T-2
+    order: 11
+    brd: BRID 8.1
+    questions: DMQ21
+    bound: To supply
+    layouts: [F04]
+  - code: F05
+    name: DP billing in process and DP commission receivable
+    category: Open item
+    decision: CARRY_FORWARD
+    rationale: Carried inside F01 (dp_flag and the COMMISSION components of direct-payment invoices); no separate file.
+    source: EBIX, Operations files
+    target: Part of F01; commission DP list service
+    owner: Operations - Financial Transactions
+    steward: Operations data steward (to name)
+    history: Open at T
+    delta: "-"
+    format: In F01
+    controls: In F01
+    due: With F01
+    order: 8
+    brd: BRID 7.1
+    questions: DMQ19
+    bound: "-"
+    layouts: []
+  - code: F06
+    name: PDCs in the warehouse, check pick-ups and refunds in process
+    category: Open item
+    decision: CONDITIONAL
+    rationale: Proposal - carry PDCs in the warehouse; complete pick-ups and refunds in legacy before the freeze where possible (DMQ33).
+    source: EBIX
+    target: csh_pdc_item and the cashiering pick-up service
+    owner: Operations - Cashiering
+    steward: Cashiering data steward (to name)
+    history: Open at T
+    delta: Single load after the freeze
+    format: CSV
+    controls: Row count; sum of amount per currency and record type
+    due: M4; final at T-2
+    order: 11
+    brd: BRID 5.1
+    questions: DMQ33
+    bound: To supply
+    layouts: [F06]
+  - code: F07
+    name: Open claims
+    category: Open item
+    decision: CONDITIONAL
+    rationale: Loaded through the Claims migration (BCL_CLAIM_MIGRATION, V1025 held) if BDOI decides (CLQ14, DMQ30); closed claims are archived.
+    source: EBIX, ISYS
+    target: bcl_claim through BCL_CLAIM_MIGRATION
+    owner: Unit Head, Claims, RI and TU
+    steward: Claims data steward (to name)
+    history: Open at T
+    delta: Single load after the freeze
+    format: CSV
+    controls: Row count; sum of reserve and claimed amounts per currency
+    due: M4 if in scope
+    order: 14
+    brd: CLQ14
+    questions: DMQ30
+    bound: 55 new claims a day (umbrella p.42)
+    layouts: []
+  - code: G01
+    name: GL opening trial balance per account, branch and currency
+    category: GL
+    decision: MIGRATE
+    rationale: The BIBS GL starts from the legacy closing balances; the legacy control-account lines go to Migration Clearing, which the F01 and F02 opening entries clear to 0.00.
+    source: EBIX GL, ISYS GL
+    target: jnl_batch, jnl_line (SystemJournalService, journal type OPENING)
+    owner: Head, Comptrollership
+    steward: Comptrollership data steward (to name)
+    history: Balances at the last legacy EOD before T (after month-end close)
+    delta: Single load after the freeze
+    format: XLSX or CSV with control file
+    controls: Row count; total debit and total credit per branch and currency (must be equal)
+    due: M4; final at T-2
+    order: 12
+    brd: BRID 1.1b, 5.1-8.1
+    questions: DMQ18, DMQ25, DMQ35
+    bound: A few thousand lines
+    layouts: [G01]
+  - code: G02
+    name: GL history (journals and balances before cutover)
+    category: History
+    decision: ARCHIVE
+    rationale: Kept for audit; BIBS starts from the opening trial balance.
+    source: EBIX GL, ISYS GL
+    target: BIBS archive record type GL_JOURNAL
+    owner: Head, Comptrollership
+    steward: Comptrollership data steward (to name)
+    history: Per retention
+    delta: None
+    format: CSV
+    controls: Row count and debit / credit totals per period
+    due: Before decommissioning
+    order: 16
+    brd: BRID 11.1
+    questions: DMQ24
+    bound: To supply
+    layouts: [H01]
+  - code: H01
+    name: Closed transactions (paid and remitted invoices, receipts, remittances, endorsements, claims, renewal advices, letters)
+    category: History
+    decision: ARCHIVE
+    rationale: History stays in read-only legacy or the BIBS archive with logged access (BRID 11.1).
+    source: EBIX, QPS, ISYS
+    target: mig_archive_record (Legacy Inquiry)
+    owner: Audit / Compliance; legacy system owners
+    steward: Compliance data steward (to name)
+    history: Per retention (5 years online, 15 years archive, umbrella p.45)
+    delta: None
+    format: CSV
+    controls: Row count, amount totals and hash total per record type
+    due: Before decommissioning
+    order: 16
+    brd: BRID 11.1
+    questions: DMQ24, DMQ27
+    bound: To supply
+    layouts: [H01]
+  - code: H02
+    name: Legacy documents (policies, SOAs, ORs, certificates, letters)
+    category: History
+    decision: ARCHIVE
+    rationale: Documents are kept with their archive record and a checksum.
+    source: File shares, EBIX
+    target: attachment (type LEGACY_DOCUMENT) linked to mig_archive_record
+    owner: Audit / Compliance
+    steward: Compliance data steward (to name)
+    history: Per retention
+    delta: None
+    format: CSV index plus files
+    controls: Row count; SHA-256 per file
+    due: Before decommissioning
+    order: 16
+    brd: BRID 11.1
+    questions: DMQ24
+    bound: To supply
+    layouts: [H02]
+
+# --------------------------------------------------------------------------------------------------------------
+# Extract layouts. key: legacy key column(s); hash: hash total rule of the control file; amounts: amount columns
+# totalled per currency in the control file.
+layouts:
+  R01:
+    title: Lists of values and MIS values
+    object: R01
+    key: [list_type, code]
+    hash: Count of distinct (list_type, code)
+    amounts: []
+    fields: |
+      list_type | Legacy name of the list (for example MARKET_SEGMENT, BUSINESS_ORIGIN, CUSTOMER_SEGMENT, REGION, AREA, DEPARTMENT, ACCOUNT_TYPE, ID_TYPE, NATIONALITY) | Code | 40 | Y | Legacy list names; one code map set LOV:<list> or MIS:<field> per list | Upper case | MARKET_SEGMENT | Code map set LOV:<list> / MIS:<field> | Known list name | QPS and EBIX maintenance tables
+      code | Legacy value code | Code | 40 | Y | - | As stored in legacy | CBG | lov_value.code (through the code map) | Unique per list_type | QPS and EBIX maintenance tables
+      description | Legacy value description | Text | 200 | Y | - | Free text | Consumer Banking Group | lov_value.label (for CREATE) | Not blank | QPS and EBIX
+      parent_code | Code of the parent value for hierarchical lists (area under region) | Code | 40 | N | Codes of the same file | - | NCR | Hierarchy of the MIS field | Parent exists in the file | QPS
+      active_flag | Value in use in legacy | Flag | 1 | Y | Y, N | Y or N | Y | lov_value.record_status | Y or N | QPS and EBIX
+      effective_from | First day the value is valid | Date | 10 | N | - | yyyy-MM-dd | 2020-01-01 | lov_value.effective_from | Valid date | QPS and EBIX
+      effective_to | Last day the value is valid | Date | 10 | N | - | yyyy-MM-dd | - | lov_value.effective_to | Not before effective_from | QPS and EBIX
+      used_count | Number of legacy records that use the value (helps the mapping) | Integer | 9 | N | - | Digits | 1520 | - (profiling only) | 0 or more | Legacy query
+  R02:
+    title: Branches and invoicing branches
+    object: R02
+    key: [branch_code]
+    hash: Count of distinct branch_code
+    amounts: []
+    fields: |
+      branch_code | Legacy branch code | Code | 20 | Y | - | As stored in legacy | MKT01 | Code map BRANCH to org_branch.code | Unique | EBIX branch table
+      branch_name | Branch name | Text | 120 | Y | - | Free text | Makati Head Office | org_branch name (check) | Not blank | EBIX
+      invoicing_branch_flag | Branch issues invoices and receipts | Flag | 1 | Y | Y, N | Y or N | Y | org_branch configuration (check) | Y or N | EBIX
+      city | City of the branch | Text | 80 | N | - | Free text | Makati City | - (check) | - | EBIX
+      active_flag | Branch active in legacy | Flag | 1 | Y | Y, N | Y or N | Y | - (check) | Y or N | EBIX
+  R03:
+    title: Sales organisation (units and account officers)
+    object: R03
+    key: [record_type, unit_code, ao_user_id]
+    hash: Count of rows per record_type
+    amounts: []
+    fields: |
+      record_type | Kind of row | Code | 12 | Y | REGION, DEPARTMENT, TEAM, AO | Upper case | TEAM | cat_sales_unit.unit_level / cat_sales_officer | In the list | QPS sales hierarchy
+      unit_code | Legacy code of the unit (for an AO row, the team of the AO) | Code | 20 | Y | - | As stored in legacy | T-RET-07 | Code map SALES_UNIT to cat_sales_unit.code | Exists as a TEAM row for AO rows | QPS
+      unit_name | Unit name | Text | 120 | C | - | Free text | Retail Team 7 | cat_sales_unit.name | Mandatory for REGION, DEPARTMENT, TEAM | QPS
+      parent_unit_code | Code of the parent unit (department of a team, region of a department) | Code | 20 | C | unit_code values of the file | As stored in legacy | D-RET | cat_sales_unit.parent_code | Mandatory for DEPARTMENT and TEAM; parent exists | QPS
+      unit_head_user_id | Legacy user ID of the unit head | Code | 50 | N | Code map USER | As stored in legacy | jdelacruz | MIS field unit head | Mapped in USER | QPS
+      cost_center | Cost centre of the unit | Code | 20 | N | Code map COST_CENTER | As stored in legacy | 4100 | cat_sales_unit.cost_center | Mapped | EBIX
+      ao_user_id | Legacy user ID of the account officer | Code | 50 | C | Code map USER | As stored in legacy | mreyes | cat_sales_officer.username (through USER) | Mandatory for AO rows; mapped in USER | QPS
+      ao_code | Legacy AO code if different from the user ID | Code | 20 | N | Code map AO | As stored in legacy | AO0457 | Code map AO | Unique | EBIX
+      ao_name | AO full name | Text | 120 | C | - | Free text | Maria Reyes | - (check against the BIBS user) | Mandatory for AO rows | QPS
+      branch_code | Branch of the unit or AO | Code | 20 | N | Code map BRANCH | As stored in legacy | MKT01 | Branch of the unit | Mapped | QPS
+      active_flag | Unit or AO active | Flag | 1 | Y | Y, N | Y or N | Y | record_status | Y or N | QPS
+  R04:
+    title: Insurers
+    object: R04
+    key: [insurer_code]
+    hash: Count of distinct insurer_code
+    amounts: []
+    fields: |
+      insurer_code | Legacy insurer code | Code | 30 | Y | - | As stored in legacy | MAL | Code map INSURER to cat_insurer (party_code) | Unique | QPS and EBIX insurer tables
+      insurer_name | Registered name | Text | 200 | Y | - | Free text | Malayan Insurance Co., Inc. | cat_insurer.name | Not blank | QPS and EBIX
+      short_name | Short name | Text | 40 | N | - | Free text | Malayan | cat_insurer.short_name | - | QPS
+      tin | Tax identification number | Text | 20 | N | - | 000-000-000-000 | 000-123-456-000 | party TIN | 9 to 12 digits | EBIX
+      address | Registered address | Text | 300 | N | - | Free text | 500 Quintin Paredes St., Manila | party address | - | EBIX
+      accreditation_no | Insurance Commission accreditation number | Text | 40 | N | - | Free text | IC-2025-0123 | cat_insurer.accreditation_no | - | QPS
+      accredited_until | End of accreditation | Date | 10 | N | - | yyyy-MM-dd | 2027-06-30 | cat_insurer.accredited_until | Valid date | QPS
+      placement_email | E-mail address(es) for placement, separated by semicolons | Text | 500 | N | - | name@domain;name@domain | placement@insurer.example | cat_insurer.placement_emails | Valid e-mail addresses | QPS
+      default_credit_days | Credit term in days | Integer | 3 | N | - | Digits | 60 | cat_insurer.default_credit_days | 0 to 365 | EBIX
+      status | Insurer status in legacy | Code | 20 | Y | Code map STATUS:INSURER | As stored in legacy | ACTIVE | cat_insurer.record_status | Mapped | QPS and EBIX
+  R04B:
+    title: Insurer branches
+    object: R04
+    key: [insurer_code, branch_code]
+    hash: Count of distinct (insurer_code, branch_code)
+    amounts: []
+    fields: |
+      insurer_code | Legacy insurer code | Code | 30 | Y | Code map INSURER | As stored in legacy | MAL | cat_insurer_branch.insurer_id | Exists in R04 | QPS
+      branch_code | Legacy insurer branch code | Code | 20 | Y | - | As stored in legacy | MAL-CEB | Code map INSURER_BRANCH to cat_insurer_branch.code | Unique per insurer | QPS
+      branch_name | Branch name | Text | 120 | Y | - | Free text | Malayan Cebu | cat_insurer_branch.name | Not blank | QPS
+      city | City | Text | 80 | N | - | Free text | Cebu City | cat_insurer_branch.city | - | QPS
+      lgt_rate | Local government tax rate of the branch location, in percent | Decimal | 9,4 | N | - | Dot decimal | 0.75 | cat_insurer_branch.lgt_rate | 0 to 5 | QPS
+      placement_email | Branch placement e-mail | Text | 120 | N | - | name@domain | cebu@insurer.example | cat_insurer_branch.placement_email | Valid e-mail | QPS
+      status | Branch status | Code | 20 | Y | Code map STATUS:INSURER | As stored in legacy | ACTIVE | cat_insurer_branch.record_status | Mapped | QPS
+  R05:
+    title: Product lines, cover types, products and risk codes
+    object: R05
+    key: [risk_code]
+    hash: Count of distinct risk_code
+    amounts: []
+    fields: |
+      line_code | Legacy line of business | Code | 30 | Y | Code map LINE | As stored in legacy | MOTOR | cat_product.line_code (through LINE) | Mapped | QPS and EBIX product tables
+      line_name | Line name | Text | 120 | N | - | Free text | Motor Car | cat_product_line name (check) | - | QPS
+      cover_type_code | Legacy cover type | Code | 30 | N | Code map COVER_TYPE | As stored in legacy | COMP | cat_product.cover_type_code | Mapped | QPS
+      risk_code | Legacy risk code / product code | Code | 20 | Y | - | As stored in legacy | MC-PC-COMP | Code map PRODUCT to cat_product.code | Unique | QPS and EBIX
+      risk_name | Product / risk name | Text | 200 | Y | - | Free text | Private Car Own Damage and Theft | cat_product.name (for CREATE) | Not blank | QPS
+      packaged_flag | Sold as a package | Flag | 1 | N | Y, N | Y or N | N | cat_product.packaged | Y or N | QPS
+      market_segments | Segments that may use the product, separated by semicolons | Text | 300 | N | Code map LOV:MARKET_SEGMENT | CODE;CODE | CBG;RETAIL | cat_product.market_segments | Each mapped | QPS
+      status | Status in legacy | Code | 20 | Y | Code map STATUS:PRODUCT | As stored in legacy | ACTIVE | cat_product.record_status | Mapped | QPS
+      open_item_count | Open invoices and in-force policies using the code (helps the mapping) | Integer | 9 | N | - | Digits | 4211 | - (profiling only) | 0 or more | Legacy query
+  R06:
+    title: Packages (active versions)
+    object: R06
+    key: [package_code, package_version, insurer_code]
+    hash: Count of distinct (package_code, package_version)
+    amounts: []
+    fields: |
+      package_code | Legacy package code | Code | 20 | Y | - | As stored in legacy | PKG-HOME-01 | Code map PACKAGE to cat_product_version | Exists | QPS package tables
+      package_version | Version number in legacy | Integer | 4 | Y | - | Digits | 3 | cat_product_version version | One active version per package | QPS
+      package_name | Package name | Text | 200 | Y | - | Free text | Home Protect Plus | cat_product_version name | Not blank | QPS
+      risk_code | Product / risk code of the package | Code | 20 | Y | Code map PRODUCT | As stored in legacy | FI-HOME | cat_product_version product | Mapped | QPS
+      insurer_code | Insurer of the package | Code | 30 | Y | Code map INSURER | As stored in legacy | MAL | cat_package_insurer | Mapped | QPS
+      share_pct | Insurer share in percent | Decimal | 9,4 | N | - | Dot decimal | 100.0000 | cat_package_insurer share | Shares of a version add to 100 | QPS
+      premium_rate_pct | Package premium rate in percent | Decimal | 9,6 | N | - | Dot decimal | 0.250000 | cat_package_insurer_term rate | 0 to 100 | QPS
+      commission_rate_pct | Commission rate in percent | Decimal | 9,4 | N | - | Dot decimal | 20.0000 | cat_package_insurer_term commission | 0 to 100 | QPS
+      effective_from | Version valid from | Date | 10 | Y | - | yyyy-MM-dd | 2025-01-01 | cat_product_version effective from | Valid date | QPS
+      effective_to | Version valid to | Date | 10 | N | - | yyyy-MM-dd | - | cat_product_version effective to | Not before effective_from | QPS
+  R07:
+    title: Commission rates by insurer and product
+    object: R07
+    key: [insurer_code, risk_code, effective_from]
+    hash: Count of rows
+    amounts: []
+    fields: |
+      insurer_code | Legacy insurer code | Code | 30 | Y | Code map INSURER | As stored in legacy | MAL | cat_commission_rate.insurer_code | Mapped | QPS and EBIX rate tables
+      risk_code | Legacy product / risk code | Code | 20 | Y | Code map PRODUCT | As stored in legacy | MC-PC-COMP | cat_commission_rate.product_code | Mapped | QPS and EBIX
+      rate_pct | Commission rate in percent | Decimal | 9,4 | Y | - | Dot decimal | 20.0000 | cat_commission_rate.rate | 0 to 100 | QPS and EBIX
+      effective_from | Rate valid from | Date | 10 | Y | - | yyyy-MM-dd | 2026-01-01 | cat_commission_rate.effective_from | Valid date | QPS and EBIX
+      effective_to | Rate valid to | Date | 10 | N | - | yyyy-MM-dd | - | cat_commission_rate.effective_to | No overlap for the same insurer and product | QPS and EBIX
+  R08:
+    title: Chart of accounts mapping
+    object: R08
+    key: [legacy_account_code]
+    hash: Count of distinct legacy_account_code
+    amounts: []
+    fields: |
+      legacy_account_code | Legacy GL account code | Code | 30 | Y | - | As stored in legacy | 1101-02 | Code map GL_ACCOUNT | Unique | EBIX and ISYS chart of accounts
+      legacy_account_name | Legacy account name | Text | 200 | Y | - | Free text | Cash in Bank - BDO Makati | - | Not blank | EBIX and ISYS
+      account_type | Account type | Code | 12 | Y | ASSET, LIABILITY, EQUITY, INCOME, EXPENSE | Upper case | ASSET | coa_account category (check) | In the list | EBIX and ISYS
+      normal_balance | Normal balance side | Code | 2 | Y | DR, CR | Upper case | DR | - (check) | In the list | EBIX and ISYS
+      legacy_control_type | Marks the legacy control accounts whose balance F01 or F02 rebuilds in detail | Code | 20 | N | PR, PR2307, DTIP, COMMISSION_REC, UNREALIZED_COMM, DEFERRED_VAT, UPP, NONE | Upper case | NONE | Mapped to Migration Clearing when not NONE | In the list | Comptrollership
+      bibs_account_code | BIBS account the legacy account maps to (filled by Comptrollership) | Code | 30 | C | coa_account codes | As in the BIBS chart | X102.03 (illustrative code, not in use) | coa_account.code | Mandatory when legacy_control_type is NONE; exists and active in BIBS | Comptrollership
+      branch_specific_flag | Balances are kept per branch | Flag | 1 | N | Y, N | Y or N | Y | coa_account_branch (check) | Y or N | EBIX
+      remarks | Mapping remarks | Text | 300 | N | - | Free text | Merged with 1201-01 | - | - | Comptrollership
+  R09:
+    title: Payees
+    object: R09
+    key: [payee_code]
+    hash: Count of distinct payee_code
+    amounts: []
+    fields: |
+      payee_code | Legacy payee code | Code | 30 | Y | - | As stored in legacy | SUP-0001 | DISB_PAYEE_MIGRATION "Payee code" | Unique | EBIX payee table
+      payee_class | Payee class | Code | 20 | Y | LOV PAYEE_CLASS | Upper case | SUPPLIER | "Payee class" | In the list | EBIX
+      name | Payee name | Text | 250 | Y | - | Free text | Acme Office Supply | "Name" | Not blank | EBIX
+      address | Address | Text | 300 | N | - | Free text | Makati City | "Address" | - | EBIX
+      email | E-mail for payment advices | Text | 120 | N | - | name@domain | ap@acme.example | "Email" | Valid e-mail | EBIX
+      tin | Tax identification number | Text | 20 | N | - | 000-000-000-000 | 123-456-789-000 | "TIN" | 9 to 12 digits | EBIX
+      default_mode | Default payment mode | Code | 20 | Y | CTA, ATD, MC_DD, CREDIT_TICKET, TT, ONLINE_BANKING, CHECK | Upper case | CHECK | "Default mode" | One of allowed_modes | EBIX
+      allowed_modes | Allowed payment modes separated by a vertical bar | Text | 100 | Y | Same list as default_mode | MODE\|MODE | CHECK\|CTA | "Allowed modes" | Each in the list | EBIX
+      currency | Currency | Code | 3 | Y | ISO 4217 | Upper case | PHP | "Currency" | Valid code | EBIX
+      bank | Bank of the payee account | Text | 120 | N | Code map BANK | Free text | BDO Unibank | "Bank" | Mapped | EBIX
+      account_no | Payee account number | Text | 40 | C | - | Digits | 001234567890 | "Account no" | Mandatory for CTA | EBIX
+  R11:
+    title: Receipt series in use
+    object: R11
+    key: [branch_code, kind, prefix]
+    hash: Count of rows
+    amounts: []
+    fields: |
+      branch_code | Issuing branch | Code | 20 | Y | Code map BRANCH | As stored in legacy | MKT01 | csh_receipt_series.branch_id | Mapped | EBIX receipt set-up
+      kind | Receipt kind | Code | 2 | Y | AR, OR | Upper case | AR | csh_receipt_series.kind | In the list | EBIX
+      atp_no | BIR Authority to Print number | Text | 40 | Y | - | As printed | ATP-OCN-2025-000123 | csh_receipt_series.atp_no | Not blank | EBIX
+      prefix | Series prefix | Text | 20 | N | - | As printed | AR-MKT | csh_receipt_series.prefix | Unique per branch and kind | EBIX
+      from_no | First number of the series | Integer | 12 | Y | - | Digits | 100001 | csh_receipt_series.from_no | Less than to_no | EBIX
+      to_no | Last number of the series | Integer | 12 | Y | - | Digits | 150000 | csh_receipt_series.to_no | More than from_no | EBIX
+      last_used_no | Last number issued in legacy at the freeze | Integer | 12 | Y | - | Digits | 131245 | - (check) | Between from_no and to_no | EBIX
+      next_no | Next number BIBS issues | Integer | 12 | Y | - | Digits | 131246 | csh_receipt_series.next_no | = last_used_no + 1 | EBIX
+  C01:
+    title: Client master
+    object: C01
+    key: [legacy_client_no]
+    hash: Count of distinct legacy_client_no
+    amounts: []
+    fields: |
+      legacy_client_no | Client number in the source system | Code | 30 | Y | - | As stored in legacy | Q-0012345 | mig_key_xref.legacy_key | Unique in the file | QPS assured / client record; EBIX client record; CMS client
+      client_type | Individual or corporate | Code | 1 | Y | I, C | Upper case | I | crm_client.client_type (INDIVIDUAL, CORPORATE) | In the list | QPS, EBIX
+      last_name | Last name (individual) | Text | 100 | C | - | Free text | Reyes | crm_client.last_name | Mandatory for I | QPS, EBIX
+      first_name | First name (individual) | Text | 100 | C | - | Free text | Ana | crm_client.first_name | Mandatory for I | QPS, EBIX
+      middle_name | Middle name | Text | 100 | N | - | Free text | Cruz | crm_client.middle_name | - | QPS, EBIX
+      suffix | Name suffix | Text | 20 | N | - | Free text | Jr. | crm_client.suffix | - | QPS
+      corporate_name | Registered name (corporate) | Text | 200 | C | - | Free text | Acme Trading Corp. | crm_client.corporate_name | Mandatory for C | QPS, EBIX
+      registration_no | SEC or DTI registration number (corporate) | Text | 60 | N | - | As registered | CS201912345 | crm_client.id_number with id_type SEC_REG / DTI_REG | - | QPS
+      birth_date | Birth date (individual) | Date | 10 | C | - | yyyy-MM-dd | 1990-04-15 | crm_client.birth_date | Mandatory for I; not in the future; age 0 to 120 | QPS, EBIX
+      tin | Tax identification number | Text | 20 | N | - | 000-000-000-000 | 123-456-789-000 | crm_client.tin | 9 to 12 digits; duplicate key K1 | QPS, EBIX
+      id_type | Government ID type | Code | 40 | N | Code map LOV:ID_TYPE | As stored in legacy | PASSPORT | crm_client.id_type | Mapped | QPS
+      id_number | Government ID number | Text | 60 | C | - | As printed | P1234567A | crm_client.id_number | Mandatory when id_type is given; duplicate key K2 | QPS
+      bank_client_flag | BDO bank client | Flag | 1 | N | Y, N | Y or N | Y | crm_client.bank_client | Y or N | QPS, CMS
+      bank_cif | BDO customer information file number | Text | 40 | N | - | Digits | 1234567890 | crm_client.bank_cif | Duplicate key K5 if agreed (DMQ04) | QPS, CMS
+      nationality | Nationality | Code | 40 | N | Code map LOV:NATIONALITY | As stored in legacy | FILIPINO | Client KYC data | Mapped | QPS
+      source_of_funds | Source of funds | Code | 40 | N | Code map LOV:SOURCE_OF_FUNDS | As stored in legacy | SALARY | Client KYC data | Mapped | QPS
+      market_segment | Market segment | Code | 40 | Y | Code map LOV:MARKET_SEGMENT | As stored in legacy | CBG | crm_client.market_segment | Mapped | QPS, EBIX
+      customer_segment | Customer segment (MIS) | Code | 40 | N | Code map MIS:CUSTOMER_SEGMENT | As stored in legacy | AFFLUENT | MIS field customer segment | Mapped | QPS
+      business_origin | Business origin (MIS) | Code | 40 | N | Code map MIS:BUSINESS_ORIGIN | As stored in legacy | BANK_REFERRAL | MIS field business origin | Mapped | QPS
+      ao_user_id | Account officer | Code | 50 | N | Code map USER | As stored in legacy | mreyes | Client AO | Mapped in USER | QPS, EBIX
+      sales_unit_code | Sales unit of the client | Code | 20 | N | Code map SALES_UNIT | As stored in legacy | T-RET-07 | Client sales unit | Mapped | QPS
+      branch_code | Servicing branch | Code | 20 | N | Code map BRANCH | As stored in legacy | MKT01 | Client branch | Mapped | EBIX
+      email | Primary e-mail | Text | 120 | N | - | name@domain | ana.reyes@example.ph | crm_client.email | Valid e-mail; soft key K6 | QPS, EBIX
+      mobile | Primary mobile number | Text | 30 | N | - | 09xxxxxxxxx or +639xxxxxxxxx | 09171234567 | crm_client.mobile | PH mobile format; soft key K6 | QPS, EBIX
+      phone | Landline | Text | 30 | N | - | Free text | (02) 8123 4567 | crm_client.phone | - | QPS
+      address_line | Primary street address | Text | 300 | N | - | Free text | 12 Rizal St., Brgy. San Antonio | crm_client.address_line | - | QPS, EBIX
+      city | City / municipality | Text | 80 | N | - | Free text | Pasig | crm_client.city | - | QPS, EBIX
+      province | Province | Text | 80 | N | - | Free text | Metro Manila | crm_client.province | - | QPS, EBIX
+      postal_code | Postal code | Text | 10 | N | - | 4 digits | 1600 | crm_client.postal_code | 4 digits | QPS, EBIX
+      kyc_status | KYC status in legacy | Code | 20 | N | Code map STATUS:KYC (to NOT_STARTED, PENDING, VERIFIED, EXPIRED) | As stored in legacy | COMPLETE | crm_client.kyc_status | Mapped | QPS
+      kyc_verified_date | Date KYC was verified | Date | 10 | N | - | yyyy-MM-dd | 2024-03-11 | crm_client.kyc_verified_at | Not in the future | QPS
+      kyc_review_due | Next KYC review date | Date | 10 | N | - | yyyy-MM-dd | 2027-03-11 | crm_client.kyc_review_due | Valid date | QPS
+      risk_rating | KYC risk rating | Code | 20 | N | Code map LOV:KYC_RISK_RATING | As stored in legacy | STANDARD | Client risk profile | Mapped | QPS, Compliance
+      client_status | Client status in legacy | Code | 20 | Y | Code map STATUS:CLIENT | As stored in legacy | ACTIVE | crm_client.status (CONFIRMED or INACTIVE) | Mapped | QPS, EBIX
+      created_date | Date the client was created in legacy | Date | 10 | Y | - | yyyy-MM-dd | 2021-07-02 | - (scope filter 2020 to present, DMQ05) | Valid date | QPS, EBIX
+      last_updated | Last change in legacy (survivorship and deltas) | Timestamp | 19 | Y | - | yyyy-MM-dd HH:mm:ss | 2026-08-30 14:22:05 | - (survivorship rule) | Valid timestamp | QPS, EBIX
+  C02:
+    title: Client addresses and contacts
+    object: C01
+    key: [legacy_client_no, record_type, seq_no]
+    hash: Count of rows
+    amounts: []
+    fields: |
+      legacy_client_no | Client number in the source system | Code | 30 | Y | legacy_client_no of C01 | As stored in legacy | Q-0012345 | Client (through mig_key_xref) | Exists in C01 of the same source | QPS, EBIX
+      record_type | Address or contact person | Code | 10 | Y | ADDRESS, CONTACT | Upper case | ADDRESS | - | In the list | QPS, EBIX
+      seq_no | Sequence within the client and record type | Integer | 3 | Y | - | Digits | 1 | - | Unique per client and record type | QPS, EBIX
+      address_type | Kind of address | Code | 12 | C | HOME, BUSINESS, MAILING, BILLING | Upper case | MAILING | Primary address fields of crm_client | Mandatory for ADDRESS | QPS
+      address_line | Street address | Text | 300 | C | - | Free text | 12 Rizal St., Brgy. San Antonio | crm_client.address_line (primary) | Mandatory for ADDRESS | QPS, EBIX
+      city | City / municipality | Text | 80 | N | - | Free text | Pasig | crm_client.city (primary) | - | QPS, EBIX
+      province | Province | Text | 80 | N | - | Free text | Metro Manila | crm_client.province (primary) | - | QPS, EBIX
+      postal_code | Postal code | Text | 10 | N | - | 4 digits | 1600 | crm_client.postal_code (primary) | 4 digits | QPS, EBIX
+      contact_name | Contact person (corporate clients) | Text | 200 | C | - | Free text | Jose Santos | Contact of the client (DMQ05) | Mandatory for CONTACT | QPS
+      contact_role | Role of the contact | Text | 60 | N | - | Free text | HR Manager | Contact of the client (DMQ05) | - | QPS
+      email | E-mail | Text | 120 | N | - | name@domain | jose.santos@acme.example | Contact e-mail | Valid e-mail | QPS
+      mobile | Mobile number | Text | 30 | N | - | 09xxxxxxxxx | 09181234567 | Contact mobile | PH mobile format | QPS
+      primary_flag | Primary address or contact | Flag | 1 | Y | Y, N | Y or N | Y | Chooses the address kept on crm_client | One primary ADDRESS per client | QPS, EBIX
+  C03:
+    title: Client payout accounts
+    object: C03
+    key: [legacy_client_no, account_no]
+    hash: Count of rows
+    amounts: []
+    fields: |
+      legacy_client_no | Client number in the source system | Code | 30 | Y | legacy_client_no of C01 | As stored in legacy | E-0098765 | crm_client_payout_account.client_code (through xref) | Client loaded | EBIX refund set-up
+      mode | Payout mode | Code | 10 | Y | CTA, CHECK | Upper case | CTA | crm_client_payout_account.mode | In the list | EBIX
+      payee_name | Name on the account or check | Text | 250 | Y | - | Free text | Ana C. Reyes | crm_client_payout_account.payee_name | Not blank | EBIX
+      bank_code | Bank of the account | Code | 30 | C | Code map BANK | As stored in legacy | BDO | Payout bank | Mandatory for CTA; mapped | EBIX
+      account_no | Account number | Text | 40 | C | - | Digits | 001234567890 | crm_client_payout_account.account_no | Mandatory for CTA | EBIX
+      active_flag | Account in use | Flag | 1 | Y | Y, N | Y or N | Y | crm_client_payout_account.active | Y or N | EBIX
+  P01:
+    title: In-force policy headers
+    object: P01
+    key: [legacy_policy_ref]
+    hash: Count of distinct legacy_policy_ref
+    amounts: [sum_insured, gross_premium, net_premium]
+    fields: |
+      legacy_policy_ref | Unique legacy reference of the policy term (cover no. and version, or policy reference) | Code | 60 | Y | - | <cover no.>-<version> | C-2026-004512-01 | acc_account.legacy_ref (new); mig_key_xref | Unique in the file | QPS cover; EBIX policy record
+      cover_no | Legacy cover number | Text | 40 | Y | - | As stored in legacy | C-2026-004512 | acc_account.legacy_ref (part) | Not blank | QPS
+      cover_version | Legacy cover version | Integer | 4 | N | - | Digits | 1 | acc_account.legacy_ref (part) | 0 or more | QPS
+      policy_no | Insurer policy number | Text | 60 | Y | - | As issued | MC-PC-26-0012345 | acc_account policy no. | Not blank | QPS, EBIX
+      legacy_client_no | Client number of the assured | Code | 30 | Y | legacy_client_no of C01 | As stored in legacy | Q-0012345 | acc_account.client_id (through xref) | Client loaded | QPS, EBIX
+      assured_name | Assured name as on the policy | Text | 250 | Y | - | Free text | Ana C. Reyes | acc_account.client_name (check) | Not blank | QPS
+      risk_code | Product / risk code | Code | 20 | Y | Code map PRODUCT | As stored in legacy | MC-PC-COMP | acc_account.product_code | Mapped | QPS, EBIX
+      line_code | Line of business | Code | 30 | Y | Code map LINE | As stored in legacy | MOTOR | acc_account.line_code | Mapped; consistent with risk_code | QPS, EBIX
+      cover_type_code | Cover type | Code | 30 | N | Code map COVER_TYPE | As stored in legacy | COMP | acc_account.cover_type_code | Mapped | QPS
+      business_type | New business or renewal | Code | 2 | Y | NB, RB | Upper case | RB | acc_account business type (BT0) | In the list | QPS
+      policy_status | Status of the term in legacy | Code | 20 | Y | Code map STATUS:POLICY | As stored in legacy | ISSUED | acc_account.status BOOKED | Mapped to an in-force status | QPS, EBIX
+      inception_date | Period from | Date | 10 | Y | - | yyyy-MM-dd | 2026-03-15 | acc_account.period_from | Valid date | QPS, EBIX
+      expiry_date | Period to | Date | 10 | Y | - | yyyy-MM-dd | 2027-03-15 | acc_account.period_to | After inception_date; on or after the cutover date | QPS, EBIX
+      currency | Policy currency | Code | 3 | Y | ISO 4217 | Upper case | PHP | acc_account.currency | Valid code | QPS, EBIX
+      sum_insured | Total sum insured | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 950000.00 | acc_account.total_sum_insured | 0 or more | QPS
+      net_premium | Basic premium | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 21375.00 | acc_account.net_premium | 0 or more | QPS, EBIX
+      gross_premium | Gross premium including taxes and charges | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 25946.25 | acc_account.gross_premium | Not below net_premium | QPS, EBIX
+      commission_rate_pct | Commission rate in percent | Decimal | 9,4 | N | - | Dot decimal | 20.0000 | acc_account.commission_rate | 0 to 100 | QPS
+      payment_arrangement | Premium paid through BDOI or directly to the insurer | Code | 20 | Y | VIA_BDOI, DIRECT | Upper case | VIA_BDOI | acc_account.payment_arrangement | In the list | QPS, EBIX
+      pn_nos | Loan promissory note numbers, separated by semicolons | Text | 500 | N | - | PN;PN | PN-2019-000123 | Account PN numbers | - | QPS
+      loan_application_no | Loan application number | Text | 40 | N | - | As stored in legacy | LA-2019-5566 | acc_account.loan_application_no | - | QPS
+      mortgagee_bank | Mortgagee | Code | 40 | N | Code map BANK | As stored in legacy | BDO | acc_account.mortgagee_bank | Mapped | QPS
+      ffy_flag | Free first year | Flag | 1 | N | Y, N | Y or N | N | acc_account.ffy | Y or N | QPS
+      ao_user_id | Account officer | Code | 50 | Y | Code map USER | As stored in legacy | mreyes | acc_account.account_officer | Mapped in USER | QPS
+      sales_unit_code | Sales team | Code | 20 | Y | Code map SALES_UNIT | As stored in legacy | T-RET-07 | acc_account.sales_team (region and department derived) | Mapped | QPS
+      branch_code | Branch | Code | 20 | Y | Code map BRANCH | As stored in legacy | MKT01 | Account branch | Mapped | EBIX
+      market_segment | Market segment | Code | 40 | Y | Code map LOV:MARKET_SEGMENT | As stored in legacy | CBG | acc_account.market_segment | Mapped | QPS
+      source_channel | Business origin / channel | Code | 40 | N | Code map MIS:BUSINESS_ORIGIN | As stored in legacy | BANK_REFERRAL | acc_account.source_channel | Mapped | QPS
+      risk_description | Short risk description (vehicle, location) | Text | 300 | N | - | Free text | 2022 Toyota Vios ABC 1234 | Account risk summary | - | QPS
+  P01S:
+    title: Policy insurer shares
+    object: P01
+    key: [legacy_policy_ref, share_seq]
+    hash: Count of rows
+    amounts: []
+    fields: |
+      legacy_policy_ref | Legacy reference of the policy term | Code | 60 | Y | legacy_policy_ref of P01 | As in P01 | C-2026-004512-01 | Account insurer shares | Exists in P01 | QPS
+      share_seq | Sequence of the insurer | Integer | 2 | Y | - | Digits | 1 | Share index | Unique per policy | QPS
+      insurer_code | Insurer | Code | 30 | Y | Code map INSURER | As stored in legacy | MAL | acc_account.insurer_code (lead) and shares | Mapped | QPS
+      insurer_branch_code | Insurer branch | Code | 20 | N | Code map INSURER_BRANCH | As stored in legacy | MAL-CEB | acc_account.insurer_branch | Mapped | QPS
+      share_pct | Share in percent | Decimal | 9,4 | Y | - | Dot decimal | 100.0000 | Share percent | Above 0; shares of a policy add to 100 | QPS
+      lead_flag | Lead insurer | Flag | 1 | Y | Y, N | Y or N | Y | Lead insurer | One lead per policy | QPS
+  P03:
+    title: RMEL cohorts already extracted in legacy
+    object: P03
+    key: [legacy_policy_ref]
+    hash: Count of distinct legacy_policy_ref per expiry month
+    amounts: [expiring_premium]
+    fields: |
+      legacy_policy_ref | Legacy reference of the expiring policy term | Code | 60 | Y | legacy_policy_ref of P01 | As in P01 | C-2026-004512-01 | mig_legacy_candidate (LegacyPolicySource) | Exists in P01 | RMEL file; QPS
+      expiry_date | Expiry date | Date | 10 | Y | - | yyyy-MM-dd | 2027-03-15 | Renewal candidate expiry | From T to T+140 days | RMEL file
+      rmel_month | RMEL expiry month | Text | 7 | Y | - | yyyy-MM | 2027-03 | Cohort | = month of expiry_date | RMEL file
+      extraction_date | Date legacy extracted the policy into RMEL | Date | 10 | Y | - | yyyy-MM-dd | 2026-10-26 | Candidate history | Before the cutover date | RMEL file
+      expiring_premium | Expiring gross premium | Amount | 19,2 | N | - | Dot decimal, 2 decimals | 25946.25 | Candidate expiring premium | 0 or more | RMEL file
+      disposition | Renewal disposition in legacy | Code | 40 | Y | Code map STATUS:RENEWAL | As stored in legacy | FOR_QUOTATION | Renewal candidate status | Mapped | RMEL file
+      disposition_date | Date of the disposition | Date | 10 | N | - | yyyy-MM-dd | 2026-11-05 | Candidate history | Not after the freeze | RMEL file
+      handler_user_id | Marketing handler | Code | 50 | Y | Code map USER | As stored in legacy | mreyes | Candidate handler | Mapped in USER | RMEL file
+      ra_sent_flag | Renewal advice sent | Flag | 1 | N | Y, N | Y or N | Y | Candidate RA status | Y or N | RMEL file
+      ra_sent_date | Date the RA was sent | Date | 10 | C | - | yyyy-MM-dd | 2026-11-02 | Candidate RA status | Mandatory when ra_sent_flag is Y | RMEL file
+      proposed_insurer_code | Insurer proposed for the renewal | Code | 30 | N | Code map INSURER | As stored in legacy | MAL | Candidate insurer | Mapped | RMEL file
+      remarks | Handler remarks | Text | 500 | N | - | Free text | Client asked for a quote with higher SI | Candidate remarks | - | RMEL file
+  F01:
+    title: Open legacy invoices - header
+    object: F01
+    key: [legacy_invoice_no]
+    hash: Count of distinct legacy_invoice_no
+    amounts: [gross_premium, commission, vat_on_commission]
+    fields: |
+      legacy_invoice_no | Invoice number in the source system | Code | 40 | Y | - | EBIX I######## | I00123456 | ops_invoice.legacy_invoice_no (new); invoice_no unless it collides (DMQ11) | Unique across EBIX and QPS | EBIX invoice; QPS billing
+      invoice_kind | Kind of invoice | Code | 20 | Y | BOOKING, ENDORSEMENT_PLUS, ENDORSEMENT_MINUS, CANCELLATION | Upper case | BOOKING | ops_invoice.kind | In the list | EBIX
+      parent_invoice_no | Original invoice of an endorsement or cancellation invoice | Code | 40 | C | legacy_invoice_no values | As stored in legacy | I00119876 | ops_invoice.parent_invoice_no | Mandatory for ENDORSEMENT_PLUS, ENDORSEMENT_MINUS and CANCELLATION; parent in the file or loaded | EBIX
+      endorsement_no | Legacy endorsement number | Text | 40 | N | - | As stored in legacy | END-2026-0456 | ops_invoice.endorsement_no | - | EBIX
+      legacy_policy_ref | Legacy reference of the policy term | Code | 60 | C | legacy_policy_ref of P01 | As in P01 | C-2026-004512-01 | ops_invoice.arn (account of the header) or LGY-<source>-<cover no.> | Mandatory when P01 is in scope; exists in P01 | EBIX, QPS
+      policy_no | Insurer policy number | Text | 60 | Y | - | As issued | MC-PC-26-0012345 | ops_invoice.policy_no | Not blank | EBIX
+      policy_year | Year of a multi-year policy | Integer | 2 | N | - | Digits | 1 | ops_invoice.policy_year | 1 or more | EBIX
+      legacy_client_no | Client number of the assured | Code | 30 | Y | legacy_client_no of C01 | As stored in legacy | Q-0012345 | ops_invoice.client_code (through xref) | Client loaded | EBIX, QPS
+      assured_name | Assured name on the invoice | Text | 250 | Y | - | Free text | Ana C. Reyes | ops_invoice.assured_name | Not blank | EBIX
+      payor_name | Payor if not the assured | Text | 250 | N | - | Free text | BDO Unibank - Auto Loans | ops_invoice.payor_name | - | EBIX
+      currency | Invoice currency | Code | 3 | Y | ISO 4217 | Upper case | PHP | ops_invoice.currency | Valid code | EBIX
+      booking_fx_rate | Exchange rate used at booking (foreign currency) | Decimal | 12,6 | C | - | Dot decimal | 56.125000 | Opening entry rate (DMQ35) | Mandatory when currency is not PHP | EBIX
+      booking_date | Legacy booking date | Date | 10 | Y | - | yyyy-MM-dd | 2026-03-10 | ops_invoice.booking_date | Before the cutover date | EBIX
+      invoice_date | Invoice date | Date | 10 | Y | - | yyyy-MM-dd | 2026-03-10 | Open item document date | Before the cutover date | EBIX
+      due_date | Due date | Date | 10 | Y | - | yyyy-MM-dd | 2026-04-09 | Open item due date; Collections ageing | Valid date | EBIX
+      inception_date | Period from | Date | 10 | Y | - | yyyy-MM-dd | 2026-03-15 | ops_invoice.inception_date | Valid date | EBIX
+      expiry_date | Period to | Date | 10 | Y | - | yyyy-MM-dd | 2027-03-15 | ops_invoice.expiry_date | On or after inception_date | EBIX
+      risk_code | Product / risk code | Code | 20 | Y | Code map PRODUCT | As stored in legacy | MC-PC-COMP | ops_invoice.risk_code | Mapped | EBIX
+      line_code | Line of business | Code | 30 | Y | Code map LINE | As stored in legacy | MOTOR | ops_invoice.product_line | Mapped | EBIX
+      market_segment | Market segment | Code | 40 | Y | Code map LOV:MARKET_SEGMENT | As stored in legacy | CBG | ops_invoice.segment | Mapped | EBIX
+      ao_user_id | Account officer | Code | 50 | Y | Code map USER | As stored in legacy | mreyes | ops_invoice.ao_username | Mapped in USER | EBIX
+      sales_unit_code | Sales team | Code | 20 | Y | Code map SALES_UNIT | As stored in legacy | T-RET-07 | ops_invoice.sales_unit | Mapped | EBIX
+      branch_code | Invoicing branch | Code | 20 | Y | Code map BRANCH | As stored in legacy | MKT01 | ops_invoice.branch_id | Mapped | EBIX
+      cost_center | Cost centre | Code | 20 | N | Code map COST_CENTER | As stored in legacy | 4100 | ops_invoice.cost_center | Mapped | EBIX
+      pn_nos | Loan PN numbers, separated by semicolons | Text | 500 | N | - | PN;PN | PN-2019-000123 | ops_invoice.pn_nos | - | EBIX
+      gross_premium | Gross premium of the invoice (sum of the six premium components) | Amount | 19,2 | Y | - | Dot decimal, 2 decimals; minus for return invoices | 25946.25 | ops_invoice.gross_premium | = sum of F01C booked for BASIC, DST, PREMIUM_TAX_VAT, LGT, FST, OTHER | EBIX
+      commission | Commission of the invoice | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 4275.00 | ops_invoice.commission | = F01C booked COMMISSION | EBIX
+      vat_on_commission | VAT on commission | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 513.00 | ops_invoice.vat_on_commission | = F01C booked COMMISSION_VAT | EBIX
+      wtax_rate_pct | Withholding tax rate on commission, in percent | Decimal | 9,4 | Y | - | Dot decimal | 10.0000 | ops_invoice.wtax_rate | 0 to 100 | EBIX
+      commission_realised | Commission already realised (recognised as income) in legacy | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 1710.00 | Opening entry unrealised commission (DMQ13) | 0 to commission | EBIX GL sub-ledger
+      deferred_vat_open | Output VAT on commission still deferred | Amount | 19,2 | N | - | Dot decimal, 2 decimals | 307.80 | Opening entry deferred VAT (DMQ13) | 0 to vat_on_commission | EBIX GL sub-ledger
+      dp_flag | Direct-payment invoice (premium paid to the insurer) | Flag | 1 | Y | Y, N | Y or N | N | ops_invoice.dp_flag | Y or N | EBIX
+      cwt_flag | Client withholds 2% (BIR 2307) | Flag | 1 | Y | Y, N | Y or N | N | ops_invoice.cwt_flag | Y or N | EBIX
+      incentive_eligible_flag | Counts for incentive programmes | Flag | 1 | N | Y, N | Y or N | N | ops_invoice.incentive_eligible | Y or N | EBIX
+      hold_flag | Remittance on hold in legacy | Flag | 1 | N | Y, N | Y or N | N | ops_invoice.hold_flag | Y or N | EBIX
+      legacy_service_invoice_no | Legacy service invoice issued for the commission | Text | 40 | N | - | As printed | SI-000456789 | Frozen snapshot (credit notes of negative endorsements) | - | EBIX
+      last_payment_date | Date of the last payment applied in legacy | Date | 10 | N | - | yyyy-MM-dd | 2026-05-02 | Invoice 360 legacy block | Not after the freeze | EBIX
+      remarks | Legacy remarks | Text | 500 | N | - | Free text | Balance under dispute | Frozen snapshot | - | EBIX
+  F01S:
+    title: Open legacy invoices - insurer shares
+    object: F01
+    key: [legacy_invoice_no, share_seq]
+    hash: Count of rows
+    amounts: []
+    fields: |
+      legacy_invoice_no | Invoice number in the source system | Code | 40 | Y | legacy_invoice_no of F01 | As in F01 | I00123456 | ops_invoice_share.invoice_id | Exists in F01 | EBIX
+      share_seq | Sequence of the insurer | Integer | 2 | Y | - | Digits | 1 | ops_invoice_share.share_index | Unique per invoice | EBIX
+      insurer_code | Insurer | Code | 30 | Y | Code map INSURER | As stored in legacy | MAL | ops_invoice_share.insurer_code; ops_invoice.insurer_code (lead) | Mapped | EBIX
+      share_pct | Share in percent | Decimal | 9,4 | Y | - | Dot decimal | 100.0000 | ops_invoice_share.share_pct | Above 0 and at most 100; shares of an invoice add to 100 | EBIX
+      lead_flag | Lead insurer | Flag | 1 | Y | Y, N | Y or N | Y | ops_invoice_share.lead | One lead per invoice | EBIX
+  F01C:
+    title: Open legacy invoices - components and positions
+    object: F01
+    key: [legacy_invoice_no, component]
+    hash: Count of rows
+    amounts: [booked, adjusted, paid, remitted, written_off, open_balance]
+    fields: |
+      legacy_invoice_no | Invoice number in the source system | Code | 40 | Y | legacy_invoice_no of F01 | As in F01 | I00123456 | ops_invoice_component.invoice_id | Exists in F01 | EBIX
+      component | Premium or settlement component | Code | 20 | Y | BASIC, DST, PREMIUM_TAX_VAT, LGT, FST, OTHER, DTIP, COMMISSION, COMMISSION_VAT, WTAX, PR2307 | Upper case | BASIC | ops_invoice_component.component (LedgerComponent) | In the list; one row per component and invoice | EBIX
+      booked | Amount booked in legacy | Amount | 19,2 | Y | - | Dot decimal, 2 decimals; minus for return invoices | 21375.00 | BOOKED movement | Same sign as the invoice | EBIX
+      adjusted | Net legacy adjustments kept on the same invoice | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 0.00 | LEGACY_ADJUSTED movement (new) | - | EBIX
+      paid | Paid by the client before cutover (premium components and PR2307) | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 8550.00 | LEGACY_PAID movement to APPLIED (new) | 0 for DTIP, COMMISSION, COMMISSION_VAT, WTAX | EBIX, CMS
+      remitted | Settled with the insurer before cutover (DTIP, commission, VAT on commission, WTAX) | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 0.00 | LEGACY_REMITTED movement to REMITTED (new) | 0 for premium components | EBIX
+      written_off | Written off or DP-reversed before cutover | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 0.00 | LEGACY_WRITTEN_OFF movement (new) | - | EBIX
+      open_balance | Open balance at the freeze | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 12825.00 | ops_invoice_component.balance; opening entry line | Premium components and PR2307 = booked + adjusted - paid - written_off; DTIP, COMMISSION, COMMISSION_VAT, WTAX = booked + adjusted - remitted - written_off; within 0 and booked + adjusted | EBIX
+  F02:
+    title: Unapplied premium payments (UPP)
+    object: F02
+    key: [legacy_upp_ref]
+    hash: Count of distinct legacy_upp_ref
+    amounts: [amount, balance]
+    fields: |
+      legacy_upp_ref | UPP reference in the source system | Code | 40 | Y | - | As stored in legacy | UPP-2026-004321 | csh_unapplied.source_ref (source_module MIGRATION) | Unique | EBIX unapplied list; CMS
+      legacy_ar_no | Acknowledgment receipt issued in legacy | Text | 40 | Y | - | As printed | AR-MKT-131002 | csh_unapplied.legacy_ar_no (new) | Not blank | EBIX
+      legacy_ar_date | AR date | Date | 10 | Y | - | yyyy-MM-dd | 2026-07-14 | csh_unapplied.legacy_ar_date (new) | Before the cutover date | EBIX
+      value_date | Value date of the cash | Date | 10 | Y | - | yyyy-MM-dd | 2026-07-14 | UPP age | Before the cutover date | EBIX
+      channel | Channel of the payment | Code | 20 | Y | OTC, BILLS_PAYMENT, TRADE, CLPC, DIRECT_CREDIT, CHECK, OTHER | Upper case | DIRECT_CREDIT | UPP channel (remarks) | In the list | EBIX, CMS
+      payor_name | Payor | Text | 250 | Y | - | Free text | Ana C. Reyes | csh_unapplied.payor_name | Not blank | EBIX
+      legacy_client_no | Client if identified | Code | 30 | N | legacy_client_no of C01 | As stored in legacy | Q-0012345 | csh_unapplied.client_code (through xref) | Client loaded when given | EBIX
+      currency | Currency | Code | 3 | Y | ISO 4217 | Upper case | PHP | csh_unapplied.currency | Valid code | EBIX
+      amount | Amount received | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 5000.00 | csh_unapplied.amount | Above 0 | EBIX
+      balance | Unapplied balance at the freeze | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 5000.00 | csh_unapplied.balance; MIG_UPP_OPENING | Above 0 and at most amount | EBIX
+      sales_unit_code | Sales unit | Code | 20 | N | Code map SALES_UNIT | As stored in legacy | T-RET-07 | csh_unapplied.sales_unit | Mapped | EBIX
+      branch_code | Branch that received the cash | Code | 20 | Y | Code map BRANCH | As stored in legacy | MKT01 | csh_unapplied.branch_id | Mapped | EBIX
+      ref_invoice_nos | Invoice numbers the payor quoted, separated by semicolons | Text | 400 | N | - | NO;NO | I00123456 | csh_unapplied.match_refs (new) | At least one ref_ field is recommended | EBIX
+      ref_cover_nos | Cover or policy numbers quoted | Text | 400 | N | - | NO;NO | C-2026-004512 | csh_unapplied.match_refs (new) | - | EBIX
+      ref_pn_nos | PN numbers quoted | Text | 400 | N | - | PN;PN | PN-2019-000123 | csh_unapplied.match_refs (new) | - | EBIX
+      ref_bank_reference | Bank or payment file reference | Text | 80 | N | - | As in the payment file | DC20260714-000981 | csh_unapplied.match_refs (new) | - | EBIX, CMS
+      legacy_status | UPP status in legacy | Code | 30 | Y | Code map STATUS:UPP (to Unapplied, Monitoring, For Approval) | As stored in legacy | FOR_MONITORING | csh_unapplied.stage | Mapped | EBIX
+      disposition_type | Disposition in progress in legacy | Code | 40 | N | Code map DISPOSITION_TYPE | As stored in legacy | REFUND | Disposition of the item | Mapped | EBIX
+      disposition_status | Status of the disposition | Code | 20 | C | MONITORING, FOR_APPROVAL, IN_PROCESS | Upper case | FOR_APPROVAL | Disposition status | Mandatory when disposition_type is given | EBIX
+      disposition_details | Details (target invoice, refund payee, amount) | Text | 500 | N | - | Free text | Refund to CTA 001234567890 | Disposition details | - | EBIX
+      remarks | Legacy remarks | Text | 250 | N | - | Free text | Client to confirm invoice | csh_unapplied.remarks | - | EBIX
+  F03:
+    title: Open collection state
+    object: F03
+    key: [legacy_invoice_no, record_type, seq_no]
+    hash: Count of rows
+    amounts: [promise_amount, installment_amount]
+    fields: |
+      legacy_invoice_no | Invoice the follow-up belongs to | Code | 40 | Y | legacy_invoice_no of F01 | As in F01 | I00123456 | Collections item (through the ledger) | Exists in F01 | CMS
+      record_type | Kind of row | Code | 12 | Y | DISPOSITION, PROMISE, INSTALLMENT, ASSIGNMENT | Upper case | PROMISE | Collections legacy state (V1007) | In the list | CMS
+      seq_no | Sequence within the invoice and record type | Integer | 3 | Y | - | Digits | 1 | - | Unique per invoice and record type | CMS
+      disposition_code | Latest disposition | Code | 40 | C | Code map DISPOSITION_CLX | As stored in legacy | PTP | Item disposition | Mandatory for DISPOSITION; mapped | CMS
+      disposition_date | Date of the disposition | Date | 10 | C | - | yyyy-MM-dd | 2026-08-20 | Item disposition date | Mandatory for DISPOSITION | CMS
+      promise_date | Promised payment date | Date | 10 | C | - | yyyy-MM-dd | 2026-09-30 | Promise to pay | Mandatory for PROMISE | CMS
+      promise_amount | Promised amount | Amount | 19,2 | C | - | Dot decimal, 2 decimals | 6000.00 | Promise to pay | Mandatory for PROMISE; at most the open PR | CMS
+      installment_no | Installment number | Integer | 3 | C | - | Digits | 2 | Installment plan | Mandatory for INSTALLMENT | CMS
+      installment_due | Installment due date | Date | 10 | C | - | yyyy-MM-dd | 2026-10-15 | Installment plan | Mandatory for INSTALLMENT | CMS
+      installment_amount | Installment amount | Amount | 19,2 | C | - | Dot decimal, 2 decimals | 3000.00 | Installment plan | Mandatory for INSTALLMENT | CMS
+      collector_user_id | Assigned collector | Code | 50 | C | Code map USER | As stored in legacy | jgarcia | Item assignment | Mandatory for ASSIGNMENT; mapped | CMS
+      remarks | Collector remarks | Text | 500 | N | - | Free text | Client will pay after salary | Item remarks | - | CMS
+  F04:
+    title: Remittance in flight
+    object: F04
+    key: [legacy_batch_no, legacy_invoice_no]
+    hash: Count of rows
+    amounts: [amount]
+    fields: |
+      record_type | Kind of row | Code | 10 | Y | HOLD, SPECIAL, BATCH | Upper case | HOLD | rem_hold_request / rem_special_request | In the list | EBIX remittance
+      legacy_batch_no | Legacy remittance batch number (BATCH, SPECIAL) | Text | 40 | C | - | As stored in legacy | RB-2026-0877 | Remittance reference | Mandatory for BATCH and SPECIAL | EBIX
+      insurer_code | Insurer | Code | 30 | Y | Code map INSURER | As stored in legacy | MAL | Remittance insurer | Mapped | EBIX
+      legacy_invoice_no | Invoice of the line | Code | 40 | Y | legacy_invoice_no of F01 | As in F01 | I00123456 | Remittance line invoice | Exists in F01 | EBIX
+      currency | Currency | Code | 3 | Y | ISO 4217 | Upper case | PHP | Remittance currency | Valid code | EBIX
+      amount | Amount held or to remit | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 21671.25 | Hold or special amount | At most the open DTIP | EBIX
+      status | Status in legacy | Code | 30 | Y | Code map STATUS:REMITTANCE | As stored in legacy | ON_HOLD | Hold or special status | Mapped | EBIX
+      hold_reason | Reason of the hold | Text | 250 | C | - | Free text | Pending negative endorsement | rem_hold_request reason | Mandatory for HOLD | EBIX
+      hold_until | End of the hold | Date | 10 | N | - | yyyy-MM-dd | 2026-10-31 | rem_hold_request end | Valid date | EBIX
+      requested_by_user_id | Requester | Code | 50 | N | Code map USER | As stored in legacy | rtan | Request maker | Mapped | EBIX
+  F06:
+    title: PDCs, check pick-ups and refunds in process
+    object: F06
+    key: [record_type, reference]
+    hash: Count of rows per record_type
+    amounts: [amount]
+    fields: |
+      record_type | Kind of item | Code | 10 | Y | PDC, PICKUP, REFUND | Upper case | PDC | csh_pdc_item / pick-up / refund service | In the list | EBIX cashiering
+      reference | Legacy reference of the item | Text | 80 | Y | - | As stored in legacy | PDC-2026-000345 | csh_pdc_item.reference | Unique per record type | EBIX
+      warehouse_no | PDC warehouse number | Text | 30 | C | - | As stored in legacy | WH-02 | csh_pdc_item.warehouse_no | Mandatory for PDC | EBIX
+      check_no | Check number | Text | 40 | C | - | Digits | 0004567 | csh_pdc_item.check_no | Mandatory for PDC and PICKUP | EBIX
+      bank_code | Drawee bank | Code | 30 | C | Code map BANK | As stored in legacy | BPI | csh_pdc_item.bank_code | Mandatory for PDC; mapped | EBIX
+      check_branch | Drawee branch | Text | 60 | N | - | Free text | BPI Ortigas | csh_pdc_item.check_branch | - | EBIX
+      check_date | Check date or maturity date | Date | 10 | C | - | yyyy-MM-dd | 2026-11-15 | csh_pdc_item.maturity_date | Mandatory for PDC | EBIX
+      currency | Currency | Code | 3 | Y | ISO 4217 | Upper case | PHP | csh_pdc_item.currency | Valid code | EBIX
+      amount | Amount | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 6000.00 | csh_pdc_item.amount | Above 0 | EBIX
+      legacy_client_no | Client | Code | 30 | N | legacy_client_no of C01 | As stored in legacy | Q-0012345 | csh_pdc_item.client_code | Client loaded when given | EBIX
+      payor_name | Payor | Text | 250 | Y | - | Free text | Ana C. Reyes | csh_pdc_item.payor_name | Not blank | EBIX
+      legacy_invoice_no | Invoice the item pays or refunds | Code | 40 | N | legacy_invoice_no of F01 | As in F01 | I00123456 | Payment reference | Exists in F01 when given | EBIX
+      status | Status in legacy | Code | 20 | Y | Code map STATUS:PDC | As stored in legacy | WAREHOUSED | csh_pdc_item.status | Mapped | EBIX
+      remarks | Remarks | Text | 250 | N | - | Free text | Replacement check expected | csh_pdc_item.status_reason | - | EBIX
+  G01:
+    title: GL opening trial balance
+    object: G01
+    key: [branch_code, currency, legacy_account_code, cost_center]
+    hash: Count of rows
+    amounts: [debit_fc, credit_fc, debit_php, credit_php]
+    fields: |
+      as_of_date | Trial balance date (last legacy EOD before the cutover) | Date | 10 | Y | - | yyyy-MM-dd | 2027-02-26 | Journal reference MIG-TB-<as-of> | One date in the file; = freeze date | EBIX GL, ISYS GL
+      branch_code | Branch | Code | 20 | Y | Code map BRANCH | As stored in legacy | MKT01 | jnl_line branch | Mapped | EBIX GL
+      currency | Account currency | Code | 3 | Y | ISO 4217 | Upper case | USD | jnl_line currency | Valid code | EBIX GL
+      legacy_account_code | Legacy account | Code | 30 | Y | Code map GL_ACCOUNT | As stored in legacy | 1101-02 | jnl_line account (through GL_ACCOUNT; control accounts to Migration Clearing) | Mapped | EBIX GL
+      cost_center | Cost centre | Code | 20 | N | Code map COST_CENTER | As stored in legacy | 4100 | jnl_line cost centre | Mapped | EBIX GL
+      debit_fc | Debit balance in the account currency | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 12500.00 | jnl_line debit (currency) | 0 or more; debit or credit, not both | EBIX GL
+      credit_fc | Credit balance in the account currency | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 0.00 | jnl_line credit (currency) | 0 or more | EBIX GL
+      debit_php | Debit balance in PHP | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 701562.50 | jnl_line debit (base) | 0 or more | EBIX GL
+      credit_php | Credit balance in PHP | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 0.00 | jnl_line credit (base) | 0 or more | EBIX GL
+      fx_rate | Rate used for the PHP amount | Decimal | 12,6 | C | - | Dot decimal | 56.125000 | BOOK rate check (DMQ35) | Mandatory when currency is not PHP | EBIX GL
+  H01:
+    title: Archive records (closed transactions and history)
+    object: H01
+    key: [record_type, legacy_key]
+    hash: Count of distinct (record_type, legacy_key)
+    amounts: [amount]
+    fields: |
+      record_type | Kind of record | Code | 20 | Y | CLIENT, POLICY, INVOICE, RECEIPT, REMITTANCE, ENDORSEMENT, CLAIM, GL_JOURNAL, RENEWAL_ADVICE, LETTER, OTHER | Upper case | INVOICE | mig_archive_record.record_type | In the list | EBIX, QPS, ISYS
+      legacy_key | Unique key of the record in the source | Code | 80 | Y | - | As stored in legacy | I00098765 | mig_archive_record.legacy_key | Unique per record type | EBIX, QPS, ISYS
+      legacy_client_no | Client number | Code | 30 | N | - | As stored in legacy | Q-0012345 | mig_archive_record client key | - | EBIX, QPS
+      client_name | Client name | Text | 250 | N | - | Free text | Ana C. Reyes | mig_archive_record client name | - | EBIX, QPS
+      policy_no | Policy or cover number | Text | 60 | N | - | As stored in legacy | MC-PC-22-0004567 | mig_archive_record policy no. | - | EBIX, QPS
+      invoice_no | Invoice number | Text | 40 | N | - | As stored in legacy | I00098765 | mig_archive_record invoice no. | - | EBIX
+      receipt_no | AR or OR number | Text | 40 | N | - | As printed | AR-MKT-098001 | mig_archive_record receipt no. | - | EBIX
+      claim_no | Claim number | Text | 40 | N | - | As stored in legacy | CL-2023-000456 | mig_archive_record claim no. | - | EBIX, ISYS
+      document_date | Date of the record | Date | 10 | Y | - | yyyy-MM-dd | 2022-05-10 | mig_archive_record document date | Valid date | EBIX, QPS, ISYS
+      period_from | Period from | Date | 10 | N | - | yyyy-MM-dd | 2022-05-15 | mig_archive_record period | Valid date | EBIX, QPS
+      period_to | Period to | Date | 10 | N | - | yyyy-MM-dd | 2023-05-15 | mig_archive_record period | Not before period_from | EBIX, QPS
+      currency | Currency | Code | 3 | N | ISO 4217 | Upper case | PHP | mig_archive_record currency | Valid code | EBIX
+      amount | Main amount of the record | Amount | 19,2 | N | - | Dot decimal, 2 decimals | 18450.00 | mig_archive_record amount | - | EBIX
+      status | Status in legacy | Text | 40 | N | - | As stored in legacy | PAID_REMITTED | mig_archive_record status | - | EBIX, QPS, ISYS
+      detail_json | All other legacy columns as a JSON object of label and value | Text | 20000 | N | - | JSON object | {"Insurer":"MAL","Remitted on":"2022-07-01"} | mig_archive_record summary (JSONB) | Valid JSON | EBIX, QPS, ISYS
+  H02:
+    title: Archive documents index
+    object: H02
+    key: [record_type, legacy_key, file_name]
+    hash: Count of rows; SHA-256 per file
+    amounts: []
+    fields: |
+      record_type | Kind of the archive record the document belongs to | Code | 20 | Y | Same list as H01 record_type | Upper case | CLIENT | Archive record (link) | In the list | File shares, EBIX
+      legacy_key | Key of the archive record (or legacy_client_no for KYC documents) | Code | 80 | Y | legacy_key of H01 | As in H01 | Q-0012345 | Archive record (link) | Record exists in H01 or C01 | File shares, EBIX
+      document_type | Kind of document | Code | 40 | Y | Code map DOCUMENT_TYPE | As stored in legacy | KYC_ID | attachment document type LEGACY_DOCUMENT and sub-type | Mapped | File shares
+      document_no | Document number (ID number, policy number) | Text | 60 | N | - | As printed | P1234567A | Attachment description | - | File shares
+      document_date | Date of the document | Date | 10 | N | - | yyyy-MM-dd | 2021-07-02 | Attachment date | Valid date | File shares
+      file_name | File name in the transfer folder | Text | 255 | Y | - | name.ext | Q-0012345_KYC_ID_1.pdf | attachment file name | File present in the transfer | File shares
+      file_size_bytes | File size | Integer | 12 | Y | - | Digits | 245760 | attachment size | = size of the received file | File shares
+      sha256 | SHA-256 of the file, 64 hexadecimal characters | Text | 64 | Y | - | Lower-case hex | 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08 | attachment checksum | = checksum computed at intake | File shares
+
+# Control file (one per data file; name <data file>.ctl.csv). One row per measure.
+control:
+  fields: |
+    object | Object code of the data file | Code | 5 | Y | Register object codes | Upper case | F01 | mig_extract.object | Matches the file name | Extract job
+    layout | Layout (template) code | Code | 5 | Y | Layout codes of this workbook | Upper case | F01C | mig_extract layout | Matches the header row | Extract job
+    source_system | Source system | Code | 10 | Y | EBIX, QPS, ISYS, CMS, EXCEL | Upper case | EBIX | mig_extract.source_system | Matches the file name | Extract job
+    data_file | Name of the data file | Text | 120 | Y | - | <LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv | F01C_EBIX_20270226_01.csv | mig_extract file name | File received | Extract job
+    as_of | Date and time the data represents | Timestamp | 19 | Y | - | yyyy-MM-dd HH:mm:ss | 2027-02-26 22:00:00 | mig_extract as-of | Not earlier than the previous extract of the layout | Extract job
+    extracted_at | When the extract ran | Timestamp | 19 | Y | - | yyyy-MM-dd HH:mm:ss | 2027-02-26 23:40:12 | mig_extract extraction time | After as_of | Extract job
+    extracted_by | BDOI IT user who ran the extract | Text | 50 | Y | - | Free text | bdoi.it.jramos | mig_extract extracted by | Not blank | Extract job
+    measure | Kind of control | Code | 12 | Y | ROW_COUNT, AMOUNT_TOTAL, HASH_TOTAL, SHA256 | Upper case | AMOUNT_TOTAL | mig_extract control totals | In the list | Extract job
+    column_name | Column the measure applies to (AMOUNT_TOTAL, HASH_TOTAL) | Text | 40 | C | Columns of the layout | As in the header | open_balance | Control total column | Mandatory for AMOUNT_TOTAL and HASH_TOTAL | Extract job
+    currency | Currency of an AMOUNT_TOTAL | Code | 3 | C | ISO 4217 | Upper case | PHP | Control total currency | Mandatory for AMOUNT_TOTAL | Extract job
+    filter | Optional filter of the measure (for example component=BASIC) | Text | 80 | N | - | column=value | component=BASIC | Control total filter | Column exists | Extract job
+    value | Value of the measure | Text | 80 | Y | - | Digits; dot decimal for amounts; hex for SHA256 | 1284533.75 | Compared at intake (FR-DM-010) | Numeric or 64-character hex | Extract job
+
+control_example:
+  - [F01C, F01C, EBIX, F01C_EBIX_20270226_01.csv, "2027-02-26 22:00:00", "2027-02-26 23:40:12", bdoi.it.jramos, ROW_COUNT, "", "", "", "184220"]
+  - [F01C, F01C, EBIX, F01C_EBIX_20270226_01.csv, "2027-02-26 22:00:00", "2027-02-26 23:40:12", bdoi.it.jramos, HASH_TOTAL, legacy_invoice_no, "", "", "31207"]
+  - [F01C, F01C, EBIX, F01C_EBIX_20270226_01.csv, "2027-02-26 22:00:00", "2027-02-26 23:40:12", bdoi.it.jramos, AMOUNT_TOTAL, open_balance, PHP, "component=BASIC", "98450221.40"]
+  - [F01C, F01C, EBIX, F01C_EBIX_20270226_01.csv, "2027-02-26 22:00:00", "2027-02-26 23:40:12", bdoi.it.jramos, AMOUNT_TOTAL, open_balance, PHP, "component=DTIP", "-84120775.15"]
+  - [F01C, F01C, EBIX, F01C_EBIX_20270226_01.csv, "2027-02-26 22:00:00", "2027-02-26 23:40:12", bdoi.it.jramos, AMOUNT_TOTAL, open_balance, USD, "component=BASIC", "412330.00"]
+  - [F01C, F01C, EBIX, F01C_EBIX_20270226_01.csv, "2027-02-26 22:00:00", "2027-02-26 23:40:12", bdoi.it.jramos, AMOUNT_TOTAL, booked, PHP, "", "1284533.75"]
+  - [F01C, F01C, EBIX, F01C_EBIX_20270226_01.csv, "2027-02-26 22:00:00", "2027-02-26 23:40:12", bdoi.it.jramos, SHA256, "", "", "", "3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b"]
+
+# --------------------------------------------------------------------------------------------------------------
+# Code map sets (BRID 3.1; R3 section 7). used_by: layouts whose columns use the set.
+map_sets:
+  - [LOV:<list>, "One set per legacy list (market segment, ID type, nationality, source of funds, KYC risk rating, account type, ...)", lov_value, "Product Owner, MBS", "MBS data steward", "R01, C01, P01, F01", M5]
+  - [MIS:<field>, "One set per MIS field (market segment, department, unit head, AO, region, area, branch, business origin, customer segment; umbrella p.40)", MIS field catalogue (CR-W1), "Product Owner, MBS", "MBS data steward", "R01, C01, P01", M5]
+  - [INSURER, Legacy insurer code to BIBS insurer, cat_insurer, "Head, Operations", "Operations data steward", "R04, R06, R07, P01S, P03, F01S, F04", M5]
+  - [INSURER_BRANCH, Legacy insurer branch to BIBS insurer branch, cat_insurer_branch, "Head, Operations", "Operations data steward", "R04B, P01S", M5]
+  - [LINE, Legacy line of business to BIBS product line, cat_product_line, "Product Owner, MBS", "MBS data steward", "R05, P01, F01", M5]
+  - [COVER_TYPE, Legacy cover type to BIBS cover type, cat_cover_type, "Product Owner, MBS", "MBS data steward", "R05, P01", M5]
+  - [PRODUCT, Legacy product / risk code to BIBS product code, cat_product, "Product Owner, MBS", "MBS data steward", "R05, R06, R07, P01, F01", M5]
+  - [PACKAGE, Legacy package and version to BIBS package version, cat_product_version, "Product Owner, MBS; TSU", "MBS data steward", R06, M5]
+  - [BRANCH, Legacy branch to BIBS branch, org_branch, "Head, Comptrollership", "Comptrollership data steward", "R02, R03, R11, C01, P01, F01, F02, G01", M5]
+  - [SALES_UNIT, "Legacy region, department and team to BIBS sales unit", cat_sales_unit, "Heads, Retail and Corporate Marketing", "Marketing data steward", "R03, C01, P01, F01, F02", M5]
+  - [AO, Legacy AO code to BIBS account officer, cat_sales_officer, "Heads, Retail and Corporate Marketing", "Marketing data steward", R03, M5]
+  - [USER, "Legacy user ID to BIBS username (AO, handler, collector, requester)", BIBS users (User Access), "Unit Head, Analytics and Risk Management", IT security administrator, "R03, C01, P01, P03, F01, F03, F04", M5]
+  - [COST_CENTER, Legacy cost centre to BIBS cost centre, Cost centre master, "Head, Comptrollership", "Comptrollership data steward", "R03, F01, G01", M5]
+  - [GL_ACCOUNT, Legacy GL account to BIBS account (legacy control accounts to Migration Clearing), coa_account, "Head, Comptrollership", "Comptrollership data steward", "R08, G01", M5]
+  - [BANK, Legacy bank code to BIBS bank list, Bank list (LOV), "Product Owner, Comptrollership - Disbursement", "Disbursement data steward", "R09, C03, P01, F06", M5]
+  - [CURRENCY, Legacy currency code to ISO 4217, Currency master, "Head, Comptrollership", "Comptrollership data steward", All amount layouts, M5]
+  - [STATUS:<object>, "Legacy statuses per object to BIBS statuses (CLIENT, KYC, INSURER, PRODUCT, POLICY, RENEWAL, UPP, REMITTANCE, PDC)", Status of the target record, Owner of the object, Steward of the object, "C01, R04, R05, P01, P03, F02, F04, F06", M5]
+  - [DISPOSITION_TYPE, Legacy UPP disposition types to BIBS disposition types, csh_disposition_type_rule, Operations - Financial Transactions, "Cashiering data steward", F02, M5]
+  - [DISPOSITION_CLX, Legacy collection dispositions to BIBS collection dispositions, Collections disposition list, "Head, Operations (Collections)", "Collections data steward", F03, M5]
+  - [DOCUMENT_TYPE, Legacy document types to archive document types, attachment document types, Compliance, "Compliance data steward", H02, Before archive load]
+
+map_example:
+  - [INSURER, EBIX, MAL, "Malayan Insurance Co., Inc.", "1,240", MAP, INS-MAL, "Malayan Insurance Co., Inc.", ""]
+  - [INSURER, QPS, 0012, Malayan Insurance, "310", MAP, INS-MAL, "Malayan Insurance Co., Inc.", QPS numeric code of the same insurer]
+  - [LOV:MARKET_SEGMENT, QPS, CBG, Consumer Banking Group, "88,410", MAP, CBG, Consumer Banking Group, ""]
+  - [LOV:MARKET_SEGMENT, QPS, OLD-RET, Retail (discontinued 2019), "12", DEFAULT, RETAIL, Retail, Set default]
+  - [PRODUCT, EBIX, MC-PC-COMP, Private Car Own Damage and Theft, "41,002", MAP, MCPC01, Private Car - Own Damage and Theft, ""]
+  - [STATUS:UPP, EBIX, FOR_MONITORING, For monitoring, "815", MAP, MONITORING, Monitoring tab, ""]
+  - [USER, QPS, mreyes, Maria Reyes, "3,112", MAP, maria.reyes, Maria Reyes, BIBS user created through User Access]
+  - [MIS:BUSINESS_ORIGIN, QPS, WALKIN, Walk-in, "57", CREATE, WALK_IN, Walk-in, New MIS value; authorised in the LOV master]
+
+# --------------------------------------------------------------------------------------------------------------
+# Data-quality rules catalogue (R3 section 8). [id, layout, columns, kind, rule, severity, message, fixed by]
+# fixed by: who corrects a failing row - BDOI (at source), Steward (code map / waiver), iorta (mapping or loader).
+dq_rules:
+  - [DQ-001, All, Mandatory columns, MANDATORY, "A column marked Y in the layout has a value; a column marked C has a value when its condition holds", ERROR, "{field} is mandatory", BDOI data steward (fix at source)]
+  - [DQ-002, All, Date and amount columns, FORMAT, "Dates are yyyy-MM-dd; timestamps yyyy-MM-dd HH:mm:ss; amounts have a dot decimal, 2 decimals and no thousands separator", ERROR, "{field} {value} is not a valid {type}", BDOI IT (extract)]
+  - [DQ-003, All, Coded columns, LOOKUP, "Every coded column has an entry in the APPROVED version of its code map set", "ERROR (mandatory column) / WARNING (optional column)", "Code {code} of {set} is not mapped", Data Steward (code map)]
+  - [DQ-004, All, Key columns, UNIQUE, The legacy key of the layout is unique in the file, ERROR, "{key} appears twice", BDOI IT (extract)]
+  - [DQ-005, All, Length, FORMAT, No value is longer than the length of the layout, ERROR, "{field} is longer than {n} characters", BDOI data steward]
+  - [DQ-006, C01, "tin", FORMAT, TIN has 9 to 12 digits after removing separators, ERROR, "TIN {value} is not valid", BDOI data steward]
+  - [DQ-007, C01, "email, mobile", FORMAT, "E-mail and PH mobile follow the crm formats (09xxxxxxxxx or +639xxxxxxxxx)", WARNING, "{field} {value} is not valid; it is loaded blank", BDOI data steward]
+  - [DQ-008, C01, "birth_date", PLAUSIBILITY, "Birth date not in the future and age at most 120 years", ERROR, "Birth date {value} is not plausible", BDOI data steward]
+  - [DQ-009, C01, "client_type, names", CROSS_FIELD, "Individual has last and first name; corporate has corporate name", ERROR, "{field} is mandatory for client type {type}", BDOI data steward]
+  - [DQ-010, C01, All identity keys, DUPLICATE_CLIENT, "Pairs scoring 90 or more merge automatically; 60 to 89 go to the review queue (R3 section 9)", "WARNING (review)", "{n} client pairs are waiting for review", Data Steward (review queue)]
+  - [DQ-011, C01, "created_date", PLAUSIBILITY, "Client in scope per DMQ05 (created from 2020, or with an in-force policy or open item)", WARNING, "Client {no} is outside the migration scope", Data owner (decision)]
+  - [DQ-012, C02, legacy_client_no, REFERENTIAL, "The client exists in C01 of the same source", ERROR, "{parent} {key} is not loaded", BDOI IT (extract)]
+  - [DQ-013, C02, "primary_flag", CROSS_FIELD, One primary ADDRESS per client, WARNING, "Client {no} has {n} primary addresses; the latest is kept", BDOI data steward]
+  - [DQ-014, P01, "inception_date, expiry_date", CROSS_FIELD, Expiry after inception and on or after the cutover date, ERROR, The expiry date is before the inception date, BDOI data steward]
+  - [DQ-015, P01S, share_pct, CROSS_FIELD, "Shares of a policy add up to 100 and exactly one lead", ERROR, "Insurer shares add up to {x} percent", BDOI data steward]
+  - [DQ-016, P01, legacy_client_no, REFERENTIAL, The client is loaded (xref) or in the same load, ERROR, "{parent} {key} is not loaded", iorta (load order) / BDOI (extract)]
+  - [DQ-017, P01, "risk_code, line_code", CROSS_FIELD, The product belongs to the line (cat_product.line_code), ERROR, "Product {code} is not in line {line}", Data Steward (code map)]
+  - [DQ-018, P03, legacy_policy_ref, REFERENTIAL, The policy header exists in P01, ERROR, "Cover {no} has no migrated header", BDOI IT (extract)]
+  - [DQ-019, P03, expiry_date, CROSS_FIELD, Expiry from the cutover date to cutover + 140 days, ERROR, "Expiry {date} is outside the carried cohorts", BDOI data steward]
+  - [DQ-020, F01, legacy_invoice_no, UNIQUE, Invoice number unique across EBIX and QPS; a collision is prefixed with the source system (DMQ11), WARNING, "Invoice {no} exists in two source systems; loaded as {source}-{no}", iorta (loader)]
+  - [DQ-021, F01, "gross_premium", CROSS_FIELD, Gross premium = sum of the booked amounts of the six premium components in F01C, ERROR, "The premium components add up to {x}; the gross premium is {y}", BDOI IT (extract)]
+  - [DQ-022, F01C, "open_balance", BALANCE, "Premium components and PR2307 - open = booked + adjusted - paid - written_off; DTIP, commission, VAT on commission, WTAX - open = booked + adjusted - remitted - written_off", ERROR, "The open balance of {component} does not equal booked + adjusted - paid / remitted - written off", BDOI IT (extract)]
+  - [DQ-023, F01C, "open_balance", BALANCE, Open balance within 0 and booked + adjusted (same sign as the invoice), ERROR, "The open balance of {component} is outside the booked amount", BDOI data steward]
+  - [DQ-024, F01, "every row", CROSS_FIELD, "At least one component has an open balance (else the invoice is not carried forward, DMQ10)", WARNING, "Invoice {no} has no open balance", Data owner (decision)]
+  - [DQ-025, F01S, share_pct, CROSS_FIELD, "Shares of an invoice add up to 100 and exactly one lead", ERROR, "Insurer shares add up to {x} percent", BDOI data steward]
+  - [DQ-026, F01, parent_invoice_no, REFERENTIAL, The parent invoice of an endorsement invoice is in the file or loaded, ERROR, "{parent} {key} is not loaded", BDOI IT (extract)]
+  - [DQ-027, F01, "commission_realised, deferred_vat_open", BALANCE, Realised commission within 0 and commission; deferred VAT within 0 and VAT on commission, ERROR, "{field} is outside 0 and {limit}", BDOI (Comptrollership)]
+  - [DQ-028, F01, due_date, PLAUSIBILITY, Invoice open more than 5 years, WARNING, "Invoice {no} has been open since {date}", Data owner (review)]
+  - [DQ-029, F01, "currency, booking_fx_rate", CROSS_FIELD, Foreign-currency invoice has a booking rate, ERROR, "booking_fx_rate is mandatory for currency {currency}", BDOI IT (extract)]
+  - [DQ-030, F02, "balance, amount", BALANCE, Balance above 0 and at most amount, ERROR, The balance is more than the amount received, BDOI data steward]
+  - [DQ-031, F02, "ref_ columns", PLAUSIBILITY, At least one match reference is given, WARNING, "UPP {ref} has no reference to match; it stays for manual disposition", BDOI data steward]
+  - [DQ-032, F02, value_date, PLAUSIBILITY, UPP older than 2 years, WARNING, "UPP {ref} is older than 2 years", Data owner (review; candidate for income reclassification)]
+  - [DQ-033, F03, legacy_invoice_no, REFERENTIAL, The invoice is in F01, ERROR, "{parent} {key} is not loaded", BDOI IT (extract)]
+  - [DQ-034, F03, promise_amount, BALANCE, Promise at most the open premium receivable of the invoice, WARNING, "Promise {amount} is above the open balance {balance}", BDOI data steward]
+  - [DQ-035, F04, amount, BALANCE, Hold or special amount at most the open DTIP of the invoice, ERROR, "Amount {x} is above the open DTIP {y}", BDOI data steward]
+  - [DQ-036, F06, "check_no, bank_code", UNIQUE, "Check number and bank unique among PDCs (uq_csh_pdc_check)", ERROR, "Check {no} of {bank} appears twice", BDOI data steward]
+  - [DQ-037, G01, "debit_php, credit_php", BALANCE, Total debit = total credit per branch and currency, ERROR, "The trial balance of {branch} {currency} is out of balance by {x}", BDOI (Comptrollership)]
+  - [DQ-038, G01, "debit_fc, credit_fc", CROSS_FIELD, A line is debit or credit and not both, ERROR, "Line {account} has a debit and a credit", BDOI IT (extract)]
+  - [DQ-039, G01, legacy_account_code, LOOKUP, Every account maps to a BIBS account or to Migration Clearing (legacy control accounts), ERROR, "Account {code} is not mapped", BDOI (Comptrollership)]
+  - [DQ-040, G01 with F01 and F02, "control accounts", BALANCE, "Per branch and currency, the TB lines of each legacy control account equal the F01 / F02 opening detail (Migration Clearing nets to 0.00)", ERROR, "Migration Clearing is {amount} in {branch} {currency}; it must be zero", BDOI (Comptrollership) with iorta]
+  - [DQ-041, R11, "next_no", CROSS_FIELD, "next_no = last_used_no + 1 and within from_no and to_no", ERROR, "Next number {n} is outside the series", BDOI data steward]
+  - [DQ-042, R06, share_pct, CROSS_FIELD, Shares of a package version add up to 100, ERROR, "Insurer shares add up to {x} percent", BDOI data steward]
+  - [DQ-043, R07, "effective_from, effective_to", CROSS_FIELD, No two rates overlap for the same insurer and product, ERROR, "Rates of {insurer} {product} overlap", BDOI data steward]
+  - [DQ-044, H01, "record_type, legacy_key", UNIQUE, Key unique per record type, ERROR, "{key} appears twice", BDOI IT (extract)]
+  - [DQ-045, H02, "sha256, file_size_bytes", FORMAT, Checksum and size equal the received file, ERROR, "File {name} does not match its checksum", BDOI IT (transfer)]
+  - [DQ-046, All, "as_of (control file)", FORMAT, "The data file agrees with its control file - SHA-256, row count, amount totals, hash total (FR-DM-010)", ERROR (extract rejected), "The file has {n} rows; the control file says {m}", BDOI IT (extract)]
+
+# --------------------------------------------------------------------------------------------------------------
+# Open decisions. [id, topic, question (short), blocks, needed by, BDOI owner, status]
+register_refs:
+  DMQ01: DCR-195
+  DMQ02: DCR-192
+  DMQ03: DCR-195
+  DMQ06: DCR-208
+  DMQ09: DCR-194
+  DMQ11: DCR-207
+  DMQ12: DCR-207
+  DMQ14: DCR-204
+  DMQ16: "DCR-198, DCR-205"
+  DMQ18: DCR-197
+  DMQ19: "DCR-198, DCR-206"
+  DMQ22: DCR-194
+  DMQ24: DCR-209
+  DMQ25: DCR-200
+  DMQ26: DCR-199
+  DMQ28: DCR-193
+  DMQ29: DCR-193
+  DMQ30: DCR-196
+  DMQ31: DCR-200
+  DMQ32: DCR-200
+  DMQ33: DCR-200
+  DMQ34: DCR-203
+  DCR-173: DCR-173
+  DCR-189: DCR-189
+  DCR-202: DCR-202
+
+decisions:
+  - [DCR-189, BRD sign-off, "The Data Migration BRD is a draft v0.01 without signatures (p.2, p.15-16); when is it walked through and signed, and by whom", "Baseline of this document set; FRS re-issue", M2, Program Manager, OPEN]
+  - [DCR-173, Client migration period and daily client batches, "Umbrella BRD p.43 asks for a one-time client migration 'from Broker and source, 2020 to present' and daily midday / EOD client batches with a modification report. Confirm the period and filter (DMQ05), the source systems, and that the daily batches run only until the freeze (proposal) and not as a feed after go-live", "C01 scope and delta design; build wave DM1-C", M1, "Product Owner, MBS", OPEN]
+  - [DMQ01, Data object inventory, "Confirm the objects, classes and source systems of the register; name the business owner and data steward per object", "All objects; gate G1", M2, Program Manager, OPEN]
+  - [DMQ02, Decision rule, "Confirm who rates the four criteria, who approves, and the rule that turns ratings into a class (proposal in the Strategy section 3.1)", Gate G1, M2, Program Manager, OPEN]
+  - [DMQ03, Source systems, "Confirm the systems in scope (EBIX, QPS, ISYS, CMS, Excel) and the system of record per object where two hold it", All layouts, M1, BDOI IT, OPEN]
+  - [DMQ04, Client dedupe keys, "Agreed keys (is the bank CIF a key?), survivorship per field, who reviews doubtful matches and within what time", C01 matching; DM1-C, M2, "Product Owner, MBS", OPEN]
+  - [DMQ05, Client scope, "All clients since 2020, or only those with an in-force policy, open item or activity since a date; prospects; corporate contacts", C01 volumes; filter, M2, "Product Owner, MBS", PARTIAL]
+  - [DMQ06, Screening of migrated clients, One full screening run after the load instead of per client; legacy results archived, C01 load; cutover task CT-P5, M2, Compliance, OPEN]
+  - [DMQ07, KYC documents, Migrate as attachments or archive; KYC status and review dates, "C04, H02", M2, Compliance, OPEN]
+  - [DMQ08, Code map owners, "Owner and signer per map set; MIS fields required", Gate G2; all map sets, M2, "Product Owner, MBS", OPEN]
+  - [DMQ09, In-force header condition, "All in-force policies, or only those with open legacy invoices or that may be endorsed or claimed; the header fields", "P01, P01S; endorsements BRID 9; DM1-C", M1, "Head, Operations", OPEN]
+  - [DMQ10, Legacy invoice scope, "Which invoices carry forward (open PR, paid not remitted, open commission, open PR2307); zero-balance invoices of in-force policies for endorsement; history depth", "F01; DM1-A", M1, Operations - Financial Transactions, OPEN]
+  - [DMQ11, Invoice numbers, Are EBIX and QPS invoice numbers unique across both systems; QPS invoice format, "F01 keys; payment matching", M1, BDOI IT, OPEN]
+  - [DMQ12, Components and shares, Can legacy give open balances per component and per insurer share; if not which split rule, "F01C; DM1-A", M1, BDOI IT; Comptrollership, OPEN]
+  - [DMQ13, Commission state, "Realised / unrealised commission, deferred output VAT, commission collected by remittance, per invoice", F01 opening entry, M1, "Head, Comptrollership", OPEN]
+  - [DMQ14, UPP receipt and statuses, "New BIBS AR, reprint of the legacy AR, or none for a migrated UPP; legacy UPP statuses and dispositions in progress", "F02; DM1-B", M1, Operations - Financial Transactions, OPEN]
+  - [DMQ15, UPP matching references, References held per UPP; automatch rerun frequency after cutover, F02 ref_ columns, M2, Operations - Financial Transactions, OPEN]
+  - [DMQ16, Reclassification to income, "Who is top management; criteria, frequency, GL account, customer notice, reversal", FR-DM-055 configuration, M2, "Head, Comptrollership", OPEN]
+  - [DMQ17, Legacy UPP refunds, Same approvers and Disbursement flow as new UPP refunds, FR-DM-054 configuration, M2, Operations - Financial Transactions, OPEN]
+  - [DMQ18, Legacy sub-ledgers and GL, "Separate legacy control accounts and Migration Clearing; end state after run-off; whole opening TB per branch and currency; GL ageing of legacy PR", "R08, G01; DM1-A; accounting rules", M1, "Head, Comptrollership", OPEN]
+  - [DMQ19, DPPR, "Definition, entries including Commission Receivable, source of the approved list, approver", FR-DM-070 rules, M2, "Head, Comptrollership", OPEN]
+  - [DMQ20, PR2307 reversal, "Entries, evidence, approver", FR-DM-071 rules, M2, "Head, Comptrollership", OPEN]
+  - [DMQ21, Remittance positions, "Batches in process, holds and special remittances at cutover - completed in legacy or carried; insurer ORs outstanding", F04 decision, M2, Operations - Remittance, OPEN]
+  - [DMQ22, Endorsement coexistence, "Confirm legacy invoices are endorsed in BIBS from cutover; types; service invoice numbering; renewal uses BIBS values", "P01 condition; DM2-A", M1, "Head, Operations", OPEN]
+  - [DMQ23, Legacy change report, "Which changes count; fields, period, frequency, recipients", FR-DM-100 report, M2, Operations - Prod Recon, OPEN]
+  - [DMQ24, Read-only legacy or archive, "Per legacy system - read-only (how long, who hosts, access logging) or archived in BIBS before decommissioning; record types, search keys, retention", "H01, H02, C04; DM2-B", M2, Audit / Compliance; BDOI IT, OPEN]
+  - [DMQ25, Cutover date and window, "Go-live month (M1) and exact date (M6); freeze length; last legacy EOD; month-end alignment; blackout dates", "Whole calendar; runbook", "M1 (month), M6 (date)", Program Manager, OPEN]
+  - [DMQ26, RMEL transition, "Cohorts already extracted in legacy carried into BIBS or finished in legacy; first cohort extracted by BIBS; path of legacy renewals", "P03; Renewal build", M1, "Heads, Retail and Corporate Marketing", OPEN]
+  - [DMQ27, Decommissioning criteria, "Criteria and owner per legacy system; retention of the legacy database", Decommissioning checklists, M6, Program Manager; BDOI IT, OPEN]
+  - [DMQ28, Volumes and quality, "Row counts per object and source, growth to go-live, known quality issues, history depth, extract owner and delta frequency", Register volumes; performance test, M4, BDOI IT, OPEN]
+  - [DMQ29, Consolidated NFR, "Name, version and owner of the consolidated NFR; cutover window, load time, retention of migration evidence", NFR targets, M2, Program Manager, OPEN]
+  - [DMQ30, Objects not in the BRD, "Open claims, EB programmes, submitted-policy masterlists, payees, open disbursements, PDCs, users - in scope?", "R09, P04, P05, F06, F07", M1, Program Manager, OPEN]
+  - [DMQ31, Rehearsals and test data, "Number of mocks and the dress rehearsal; masked production extracts in SIT / UAT; who masks and approves", Migration cycles, M2, Program Manager; Compliance, OPEN]
+  - [DMQ32, Fallback, "Point of no return; fallback to legacy after go-live; who decides", Runbook rollback, M6, Program Manager, OPEN]
+  - [DMQ33, In-flight items at the freeze, "Pending endorsements, un-booked accounts, placements, PDCs, pick-ups and refunds - completed before the freeze, carried or re-keyed", "F06; freeze plan", M2, "Head, Operations", OPEN]
+  - [DMQ34, Collection history, "Carry open dispositions, promises, installment plans and collector assignments", F03, M2, "Head, Operations (Collections)", OPEN]
+  - [DCR-202, Write-back to legacy, "Confirm that no contact or client update is written back to QPS / EBIX after the freeze (legacy read-only; proposal)", "C01 deltas; CSF ContactSyncGateway", M1, "Product Owner, MBS", OPEN]
+  - [DMQ35, Foreign currency, "Rate for the openings of USD invoices and UPP (legacy booking rate or cutover BOOK rate); FX difference at collection", "F01, F02, G01", M2, "Head, Comptrollership", OPEN]

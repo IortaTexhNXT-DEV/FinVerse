@@ -1,0 +1,15 @@
+// BRD-13 Data Migration Strategy: migration cycles from the first extract to production (T = go-live).
+digraph dm_cycles {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.25, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=12, fontcolor="@NEAR_BLACK", width=6.4, height=0.58, margin="0.14,0.05", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2];
+  x  [label=<<b>T-14 weeks - first full extracts and profiling</b><br/><font point-size="10">all Migrate and Carry-forward objects; volumes; draft code maps</font>>, fillcolor="@AMBER_BG"];
+  m1 [label=<<b>T-12 weeks - Mock 1 (SIT, masked)</b><br/><font point-size="10">reference data, clients, policy headers; first reconciliation L1-L4</font>>, fillcolor="@BG_BLUE"];
+  m2 [label=<<b>T-9 weeks - Mock 2 (SIT, masked)</b><br/><font point-size="10">all objects end to end; L1-L5; Migration Clearing 0.00</font>>, fillcolor="@BG_BLUE"];
+  m3 [label=<<b>T-6 weeks - Mock 3 = UAT load (UAT, masked)</b><br/><font point-size="10">business verification on screens; UAT runs on migrated data</font>>, fillcolor="@BG_BLUE"];
+  dr [label=<<b>T-3 weeks - Dress rehearsal (production-sized, masked)</b><br/><font point-size="10">full volume, timed against the window, rollback rehearsed</font>>, fillcolor="@BG_BLUE"];
+  pl [label=<<b>T-14 days - production pre-load</b><br/><font point-size="10">reference data and clients; daily client deltas until the freeze</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  pr [label=<<b>T-3 to T - production cutover</b><br/><font point-size="10">freeze, final extracts, open items and GL, reconciliation, go / no-go</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  x -> m1 -> m2 -> m3 -> dr -> pl -> pr;
+}

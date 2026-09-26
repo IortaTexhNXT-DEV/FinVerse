@@ -1,0 +1,17 @@
+// BRD-13 Reconciliation: how Migration Clearing proves that the open-item detail equals the legacy GL.
+digraph dm_clearing {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.5, ranksep=0.45, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=12, fontcolor="@NEAR_BLACK", width=3.0, height=0.8, margin="0.12,0.06", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2, fontname="Arial", fontsize=10, fontcolor="@MUTED"];
+  tb  [label=<<b>G01 legacy trial balance</b><br/><font point-size="10">control-account lines (PR, DTIP,<br/>commission, UPP) go to clearing</font>>, fillcolor="@AMBER_BG"];
+  f01 [label=<<b>F01 open invoices</b><br/><font point-size="10">MIG_LEGACY_INVOICE_OPENING<br/>per invoice, offset to clearing</font>>, fillcolor="@AMBER_BG"];
+  f02 [label=<<b>F02 UPP</b><br/><font point-size="10">MIG_UPP_OPENING<br/>per item, offset to clearing</font>>, fillcolor="@AMBER_BG"];
+  clr [label=<<b>Migration Clearing</b><br/><font point-size="10">per branch and currency</font>>, fillcolor="@BG_BLUE", width=3.6];
+  ok  [label=<<b>0.00 = detail agrees with the GL</b><br/><font point-size="10">go / no-go criterion 5</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  br  [label=<<b>not 0.00 = break</b><br/><font point-size="10">missing or extra item, wrong amount,<br/>late legacy posting; fix or explain</font>>, fillcolor="@DANGER_BG", color="@DANGER"];
+  { rank=same; tb; f01; f02; }
+  tb -> clr [label=" TB control lines"]; f01 -> clr [label=" opening offsets"]; f02 -> clr;
+  clr -> ok; clr -> br [style=dashed];
+  { rank=same; ok; br; }
+}

@@ -509,3 +509,56 @@ compile only against it.
   before Underwriting, with one entry per menu route.
 - **Flyway left.** Schema V1022 (CL1-A), V1023-V1024 (CL1-B), V1025 held (CLQ14), V1026-V1029 free; demo V1921
   (CL1-A), V1922-V1929 free.
+
+## 18. CL1-B status, follow-up and reports: as built
+
+What wave CL1-B built on top of section 17 (package `brokerclaims.{status,diary,home,setup,report,service}`).
+
+- **Migrations.** `V1023__brokerclaims_activity.sql`: `bcl_diary_entry`, `bcl_claim_event` (fields of 5.2 plus
+  `HANDLER` for reassignments) and `bcl_attribute_change` (status / settlement attribute proposals under maker-checker,
+  applied to `bcl_lov_attribute` on authorization; a null value removes the attribute). `V1024__brokerclaims_reports.sql`:
+  report indexes and the shared variants "Outstanding by insurer" (`BCL-AGEING`) and "Past due 90 days"
+  (`BCL-OUTSTANDING-PAST-DUE`), owner `SYSTEM`.
+- **Status engine.** `ClaimProgress` has the mutators (`changeStatus`, `scheduleFollowUp`, `overrideFollowUp`,
+  `planNextAction`, `assignAdjuster`, `settle`, `close`, `reopen`); only `brokerclaims.status` calls them.
+  `ClaimStatusService.recordInitialStatus(claim, statusCode, remark)` (called by CL1-A's recording service in its
+  transaction), `change(companyId, claimId, statusCode, remark)`, `allowedStatuses(companyId, claimId)`;
+  `ClaimClosureService.settle(...)` / `reopen(...)`; `ClaimFollowUpService.overrideFollowUp / planNextAction /
+  assignAdjuster`. Every change goes through `StatusTransitions`: `bcl_status_history` row (days in the previous
+  status), workflow stage, audit, in-app `BCL_STATUS_CHANGED` to the account officer, then `ClaimStatusChanged`
+  (first status with `from = null`, closure by settlement type with the status kept and phase CLOSED, reopen from
+  CLOSED to IN_PROGRESS with the status kept).
+- **Matrix.** A status is selectable when an active `bcl_status_access` row matches one of the user's roles and his
+  unit in `bcl_handler` (null unit = any); a user outside the register gets `BCL_UNIT_NOT_SET`; outside the matrix
+  `BCL_STATUS_NOT_ALLOWED` ("You are not allowed to set the status <label>"). System calls (no user) skip the matrix.
+- **Workflow decision (no way back to NEW).** A status of phase NEW is refused once the claim has left NEW
+  (`BCL_STATUS_BACK_TO_NEW`) and is not offered in Change Status; the stage therefore always equals the phase.
+  `ClaimWorkflow.sync` opens the case (in the stage of the claim's phase) when a claim has none, so claims recorded
+  before the case exists or migrated claims are wired on their first change. IN_PROGRESS cases are assigned to the
+  claim's handler; TEMP_CLOSED / CLOSED stages have no owner.
+- **Closure.** Temporary: statuses of phase TEMP_CLOSED (closure TEMPORARY, keeps ageing). Permanent: a settlement
+  type with `closes_claim` (needs `BCL_CLOSE`, else HTTP 403), closure date = today. Reopen: `BCL_REOPEN` + reason
+  (`BCL_REOPEN_REASON`); the settlement is cleared on the claim and kept in the claim timeline; the handler is
+  notified.
+- **Jobs.** `BCL_FOLLOW_UP_DUE` (notice `BCL_FOLLOW_UP_DUE` for follow-ups and diary entries due on the business
+  date, alert `BCL_FOLLOW_UP_OVERDUE` once per claim for past dates) and `BCL_AGEING_ALERTS` (alert
+  `BCL_CLAIM_PAST_DUE` once per outstanding claim older than `BCL_PAST_DUE_DAYS`, notice to the handler).
+  `BCL_PREMIUM_RECHECK` is CL1-A's (premium side).
+- **Reports** (all `ReportMetadata.claimsHandling`, the extract with `BCL_DATA_EXTRACT`): the twelve codes of
+  section 10. The as-of date may not be in the future ("The as-of date cannot be in the future"); ranges use the
+  engine message "<to> must not be before <from>". Loss figures come from `brokerclaims.service.LossLines` (paid =
+  line settled amount, else the claim settlement amount at the line share; O/S = max(reserve - paid, 0) while open),
+  which `ClaimExperienceQueryService.summary(arn, policyYear)` also uses. The activity log adds the entries of every
+  `brokerclaims.report.ClaimActivitySource` bean (port for CL1-A: insurer updates, location reference changes).
+- **API.** `/api/v1/broker-claims/{id}/progress|history|allowed-statuses|status|settlement|reopen|follow-up|
+  action-plan|adjuster|diary`, `/diary/mine`, `/diary/{entryId}/done`, `/home`, `/worklist`, `/assignees`,
+  `/reassign`, `/experience?arn=&policyYear=`, `/setup/attributes/{list}`, `/setup/statuses/{code}/attributes`,
+  `/setup/settlement-types/{code}/attributes`, `/setup/matrix[...]`, `/setup/handlers`, `/setup/users`,
+  `/setup/lists`. Every claim call carries `companyId`.
+- **Frontend.** Pages Claims Home, Claims Worklist (reassign with WORK_ASSIGN), My Diary, Claims Setup (Status
+  Attributes, Settlement Types, Status Access Matrix, Claims Handler Register, Claims Lists through the list-of-values
+  API with the owner permission) and Claims Reports. Components for the claim record page of CL1-A:
+  `status/ClaimStatusPanel` (status, ages, follow-up, action plan and the status actions), `status/HistoryTab` and
+  `diary/DiaryTab` (props `claimId`, `companyId`).
+- **Not built here.** The claim-level demo storyline (status history, diary) extends CL1-A's `BrokerClaimsDemoData`
+  at CL2; the handler register has no maker-checker columns (CL0 table), changes are audited.

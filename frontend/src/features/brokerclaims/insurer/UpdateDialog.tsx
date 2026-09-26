@@ -12,7 +12,7 @@ import type { UpdateErrors } from './insurerLogic';
 import { updateErrors } from './insurerLogic';
 
 /**
- * Record Insurer Update (BRCLM.041, FR-CL-022): date, source, insurer's reference, remarks, the
+ * Record Insurer Update (BRCLM.041, FR-CM-022): date, source, insurer's reference, remarks, the
  * insurer line and the claim documents carrying the insurer's letter; a correction refers to the
  * update it corrects. Updates cannot be edited afterwards.
  */

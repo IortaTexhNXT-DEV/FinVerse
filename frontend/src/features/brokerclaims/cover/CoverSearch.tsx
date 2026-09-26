@@ -19,11 +19,11 @@ const SEARCH_BY: { id: SearchBy; label: string }[] = [
   { id: 'ASSURED', label: 'Assured' },
 ];
 
-/** Shortest search text (FR-CL-010). */
+/** Shortest search text (FR-CM-010). */
 export const MIN_SEARCH = 3;
 
 /**
- * Cover search of Cover Lookup and Record Claim (FR-CL-010): by ARN, policy number or assured,
+ * Cover search of Cover Lookup and Record Claim (FR-CM-010): by ARN, policy number or assured,
  * every cover of the company with no branch restriction; at least three characters.
  */
 export function CoverSearch({

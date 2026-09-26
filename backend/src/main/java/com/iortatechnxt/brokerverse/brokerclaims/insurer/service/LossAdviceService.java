@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The loss advice to the insurers (process p.24-25, NFR 15.14, BRCLM.041; FR-CL-024): the PLA /
+ * The loss advice to the insurers (process p.24-25, NFR 15.14, BRCLM.041; FR-CM-024): the PLA /
  * formal loss advice composed from template {@code BCL_LOSS_ADVICE} for each insurer of the claim,
  * e-mailed to the recipients the officer confirms (the insurer's placement mailboxes are proposed:
  * the insurer master has no claims mailbox yet, CLQ11 / CLQ22) with a send log on the claim, and

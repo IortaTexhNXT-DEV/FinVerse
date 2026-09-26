@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Premium check and claims authorization code of a claim (BRCLM.001, NFR 15.05;
- * CLAIMS_BROKING_DESIGN 8.3, FR-CL-016). The check reads the invoices of the claim's ARN and policy
+ * CLAIMS_BROKING_DESIGN 8.3, FR-CM-016). The check reads the invoices of the claim's ARN and policy
  * year from the Operations ledger at recording, on each payment posted to an invoice of the cover
  * and in the daily job {@code BCL_PREMIUM_RECHECK}; an unpaid or partly paid cover raises {@code
  * BCL_UNPAID_PREMIUM_CLAIM}, and the handler is told when it becomes paid. The code {@code

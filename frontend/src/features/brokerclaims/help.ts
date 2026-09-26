@@ -16,7 +16,9 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
       summary:
         'Your claims at a glance: open claims, follow-ups due today and overdue, claims by status and phase, ageing buckets, claims on unpaid premium and claims waiting for premium remittance.',
       workflow: [
-        'A claim moves through the phases New, In progress, Temporarily closed and Closed (workflow BCL_CLAIM). The 18 BDOI statuses each belong to one phase.',
+        'A claim moves through the phases New, In progress, Temporarily closed and Closed (workflow BCL_CLAIM). The 18 BDOI statuses each belong to one phase; a claim that has left New does not go back to a newly filed status.',
+        'Each tile opens the worklist filtered: My Open Claims, Follow-ups Due Today, Follow-ups Overdue, My Diary Due, Temporarily Closed, Unpaid Premium and Awaiting Premium Remittance.',
+        'Open Claims by Status and Outstanding Claims by Age (brackets of parameter BCL_AGEING_BUCKETS, default 0-30 / 31-60 / 61-90 / 91-180 / 181+ days) count the outstanding claims.',
         'Record Claim starts a new claim; Open Worklist lists every claim you may see.',
       ],
       controls: [
@@ -28,8 +30,14 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
       path: '/claims-handling/worklist',
       summary:
         'Every claim you may see in the tabs My Claims, Open, Temporarily Closed, Closed and Follow-ups Due, searchable by claim number, insurer claim number, ARN, policy number or assured.',
+      workflow: [
+        'Ages are in calendar days: age overall from the reported date (to the closure date once closed), age this stage from the day the current status was set. Temporarily closed claims keep ageing.',
+        'On the claim, Change Status lists only the statuses the status access matrix gives your role and claims unit; the change is kept in the History tab with the days spent in the previous status, and the next follow-up date is recomputed unless a Team Lead overrode it.',
+        'Statuses 17 and 18 close a claim temporarily; any in-progress status resumes it. Set Settlement with a closing type closes it permanently (BCL_CLOSE); Reopen needs BCL_REOPEN and a reason.',
+      ],
       controls: [
-        'Reassigning claims to another handler needs WORK_ASSIGN (Team Lead, Team Head, Unit Head) and notifies the new handler (BCL_CLAIM_ASSIGNED).',
+        'Reassigning claims to another handler needs WORK_ASSIGN (Team Lead, Team Head, Unit Head) and notifies the new handler (BCL_CLAIM_ASSIGNED); the History tab shows the old and new handler.',
+        'Changing a status needs BCL_STATUS_UPDATE and a unit in the claims handler register; the settlement needs BCL_SETTLEMENT_UPDATE; the follow-up override and adjuster need the Team Lead rights; the action plan needs BCL_ACTION_PLAN.',
       ],
     },
     // Wave CL1-A entry (Record Claim and the claim record).
@@ -68,8 +76,12 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
       path: '/claims-handling/diary',
       summary:
         'Your calls, e-mails, meetings, notes and follow-ups across claims, with the entries due today and overdue (BRCLM.022).',
+      workflow: [
+        'Add Diary Entry on a claim records a call, e-mail, meeting, note or follow-up with an optional due date and assignee; an entry assigned to someone else notifies that user.',
+        'The assignee or the author marks an entry done; entries are never deleted, and closed claims accept entries.',
+      ],
       controls: [
-        'The daily job BCL_FOLLOW_UP_DUE (06:00) reminds you of follow-ups and diary entries due today; past dates raise BCL_FOLLOW_UP_OVERDUE.',
+        'The daily job BCL_FOLLOW_UP_DUE (06:00) reminds you of follow-ups and diary entries due today; past dates raise BCL_FOLLOW_UP_OVERDUE once per claim.',
       ],
     },
     // Wave CL1-A entry.
@@ -87,8 +99,14 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
       path: '/claims-handling/reports',
       summary:
         'The Claims Handling reports: outstanding and past due claims, settled claims, ageing overall and per status, loss experience, loss ratio, pending actions, claims-prone locations, insurer claim numbers, activity log and the data extract.',
+      workflow: [
+        'Outstanding lists cover the phases New, In progress and Temporarily closed on the as-of date (not in the future); the past due variant keeps the claims older than BCL_PAST_DUE_DAYS (default 90), which the daily job BCL_AGEING_ALERTS also flags.',
+        'Loss experience: paid = settled amount, O/S = insurer reserve less paid while open (never below zero); loss ratio = losses over the signed gross premium of the cover and policy year x 100.',
+        'Claims-prone locations: at least BCL_PRONE_MIN_CLAIMS claims in BCL_PRONE_YEARS years; enter a location key to list its claims.',
+        'Files are named <Report>_<date of extraction>; save your parameters as a report variant.',
+      ],
       controls: [
-        'Running a report on screen needs BCL_REPORT_VIEW, downloading it BCL_REPORT_EXPORT; the data extract needs BCL_DATA_EXTRACT.',
+        'Running a report on screen needs BCL_REPORT_VIEW, downloading it (Excel, PDF, CSV) BCL_REPORT_EXPORT; the data extract needs BCL_DATA_EXTRACT.',
         'Marketing users see the reports only, never the claims themselves (BRCLM.040).',
       ],
     },
@@ -97,8 +115,14 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
       path: '/claims-handling/setup',
       summary:
         'Status attributes (phase, waiting party, follow-up days, awaiting premium remittance), settlement type attributes (outcome, closes the claim, amount required), the status access matrix per role and unit, and the claims handler register.',
+      workflow: [
+        'Status Attributes: phase (New, In progress, Temporarily closed), the party the claim waits on, follow-up days (1-365; blank = BCL_FOLLOW_UP_DAYS) and Awaiting premium remittance. A new status is usable once it is authorized, has a phase and has a matrix row.',
+        'Settlement Types: outcome (Settled or Closed without payment), whether the type closes the claim and whether amount and date are required.',
+        'Status Access Matrix: the roles and claims units that may select each status (blank unit = any unit). Claims Handler Register: the unit and team of each claims user.',
+        'Claims Lists: the values of every Claims list (statuses, settlement types, adjusters, catastrophe codes, units, diary types, reasons).',
+      ],
       controls: [
-        'Needs BCL_SETUP (Unit Head). The Claims lists of values (statuses, settlement types, adjusters, catastrophe codes and the others) are maintained with the same permission; every change is authorized by another user.',
+        'Needs BCL_SETUP (Unit Head). Attribute changes, matrix rows and list values take effect only after another BCL_SETUP user (or a master data authorizer) authorizes them in My Approvals or on this screen.',
       ],
     },
   ],

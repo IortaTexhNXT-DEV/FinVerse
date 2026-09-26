@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Cover Lookup and the cover card of Record Claim (BRCLM.001/002/003/016/039/042; FR-CL-010/011):
+ * Cover Lookup and the cover card of Record Claim (BRCLM.001/002/003/016/039/042; FR-CM-010/011):
  * read-only views of any cover of the company. Opening a cover is logged as a view in the audit
  * trail of the account.
  */

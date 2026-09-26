@@ -15,20 +15,25 @@ import { PremiumPanel } from './CoverCard';
 import { InsurersTab } from '../insurer/InsurersTab';
 import { ReserveTab } from '../insurer/ReserveTab';
 import { LocationsTab } from '../location/LocationsTab';
+import { DiaryTab } from '../diary/DiaryTab';
+import { ClaimStatusPanel } from '../status/ClaimStatusPanel';
+import { HistoryTab } from '../status/HistoryTab';
 import type { Claim } from './api';
 import { CLAIM_ENTITY, claimApi } from './api';
 import { ClaimActions } from './ClaimActions';
 import { ClaimSummary } from './ClaimSummary';
 import { DetailsTab } from './DetailsTab';
 
-type TabId = 'details' | 'locations' | 'insurers' | 'reserve' | 'documents';
+type TabId = 'details' | 'locations' | 'insurers' | 'reserve' | 'diary' | 'documents' | 'history';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'details', label: 'Details' },
   { id: 'locations', label: 'Locations' },
   { id: 'insurers', label: 'Insurers & Updates' },
   { id: 'reserve', label: 'Reserve & Settlement' },
+  { id: 'diary', label: 'Diary' },
   { id: 'documents', label: 'Documents' },
+  { id: 'history', label: 'History' },
 ];
 
 /** Premium and special remittance notes of a claim (BRCLM.001, OQ46). */
@@ -67,6 +72,8 @@ function ClaimTabs({ claim, companyId }: Readonly<{ claim: Claim; companyId: num
         {tab === 'locations' && <LocationsTab claim={claim} companyId={companyId} />}
         {tab === 'insurers' && <InsurersTab claim={claim} companyId={companyId} />}
         {tab === 'reserve' && <ReserveTab claim={claim} companyId={companyId} />}
+        {tab === 'diary' && <DiaryTab claimId={claim.id} companyId={companyId} />}
+        {tab === 'history' && <HistoryTab claimId={claim.id} companyId={companyId} />}
         {tab === 'documents' && (
           <div className="stack">
             <Attachments
@@ -87,7 +94,7 @@ function ClaimTabs({ claim, companyId }: Readonly<{ claim: Claim; companyId: num
  * Claim record (BRCLM.001-043; design 11): header with the claim number, the summary card with the
  * status pill and flags, the workflow panel, the actions (authorization code, loss advice, cover
  * refresh, latest version) and the tabs Details, Locations, Insurers & Updates, Reserve &
- * Settlement and Documents. Wave CL1-B adds the status actions and the Diary and History tabs.
+ * Settlement, Diary, Documents and History; the status panel and status actions of wave CL1-B.
  */
 export default function ClaimPage() {
   const id = Number(useParams().id);
@@ -115,6 +122,7 @@ export default function ClaimPage() {
       {c && (
         <>
           <ClaimSummary claim={c} />
+          <ClaimStatusPanel claimId={c.id} companyId={companyId} />
           <PremiumNotes claim={c} />
           <WorkflowPanel
             entityType={CLAIM_ENTITY}

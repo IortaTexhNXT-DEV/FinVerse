@@ -10,7 +10,7 @@ export interface LineDraft {
 }
 
 /**
- * The insurers of a new claim (BRCLM.043; FR-CL-021): proposed from the invoice shares of the
+ * The insurers of a new claim (BRCLM.043; FR-CM-021): proposed from the invoice shares of the
  * cover; the officer confirms the shares and enters the insurer claim numbers and reserves known
  * at recording.
  */

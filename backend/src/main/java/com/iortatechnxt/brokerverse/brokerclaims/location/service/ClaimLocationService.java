@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The insured locations of a claim (BRCLM.037; FR-CL-020): several locations of the claim's own
+ * The insured locations of a claim (BRCLM.037; FR-CM-020): several locations of the claim's own
  * cover under one claim reference, each linked once with a snapshot of its address and location key
  * and the damage there. Links and removals are allowed while the claim is open and are audited on
  * the claim.
@@ -85,7 +85,7 @@ public class ClaimLocationService {
   }
 
   /**
-   * Removes a location from an open claim; the removal is audited (FR-CL-020).
+   * Removes a location from an open claim; the removal is audited (FR-CM-020).
    *
    * @param claim open claim
    * @param itemNo item number

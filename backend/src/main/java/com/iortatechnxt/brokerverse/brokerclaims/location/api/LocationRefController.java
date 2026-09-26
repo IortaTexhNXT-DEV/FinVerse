@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Insurer location references (BRCLM.042; FR-CL-023): search and maintenance ({@code
+ * Insurer location references (BRCLM.042; FR-CM-023): search and maintenance ({@code
  * BCL_LOCATION_REF_MAINTAIN}) and the references of a cover (Cover Lookup, claim locations).
  */
 @RestController

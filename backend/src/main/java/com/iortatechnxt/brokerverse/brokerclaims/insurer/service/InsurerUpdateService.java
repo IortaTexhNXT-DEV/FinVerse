@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Insurer updates of a claim (BRCLM.041; FR-CL-022): each communication from an insurer with its
+ * Insurer updates of a claim (BRCLM.041; FR-CM-022): each communication from an insurer with its
  * date, source, reference, remarks and the claim attachments that carry the insurer's document,
  * optionally tied to an insurer line. Updates are insert-only and allowed on closed claims too
  * (design 5.1); a correction is a new update that refers to the wrong one.

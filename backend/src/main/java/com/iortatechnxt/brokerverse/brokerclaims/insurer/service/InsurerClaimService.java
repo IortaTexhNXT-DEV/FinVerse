@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The insurers of a claim incident (BRCLM.018/023/024/043; FR-CL-021/031/032): one line per insurer
+ * The insurers of a claim incident (BRCLM.018/023/024/043; FR-CM-021/031/032): one line per insurer
  * and insurer claim number under one claim reference, the insurer's share, the number and date
  * reported to the insurer (no duplicate for the same insurer and claim, AC6; a warning and the
  * alert {@code BCL_INSURER_CLAIM_NO_REUSED} when another claim carries it), the insurer reserve
@@ -89,7 +89,7 @@ public class InsurerClaimService {
   }
 
   /**
-   * Adds an insurer line to a claim, with its number when known (FR-CL-021).
+   * Adds an insurer line to a claim, with its number when known (FR-CM-021).
    *
    * @param claim open claim
    * @param line insurer, share, number, date reported and initial reserve
@@ -118,7 +118,7 @@ public class InsurerClaimService {
   }
 
   /**
-   * Records an insurer claim number on a line (FR-CL-021). A line that already has a number keeps
+   * Records an insurer claim number on a line (FR-CM-021). A line that already has a number keeps
    * it: the new number becomes a further line of the same insurer.
    *
    * @param claim open claim

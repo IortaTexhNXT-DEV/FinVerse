@@ -140,7 +140,7 @@ function RefDialog({
 }
 
 /**
- * Insurer Location References (BRCLM.042; FR-CL-023): the reference each insurer uses for a
+ * Insurer Location References (BRCLM.042; FR-CM-023): the reference each insurer uses for a
  * location of a cover, with effective dates. A new reference ends the current one; nothing is
  * deleted. References also load by the bulk upload BCL_LOCATION_REF.
  */

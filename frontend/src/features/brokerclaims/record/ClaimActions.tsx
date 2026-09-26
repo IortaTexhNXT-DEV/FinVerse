@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { useToast } from '@/components/ui/toastContext';
 import { LossAdviceDialog } from '../insurer/LossAdviceDialog';
+import { ClaimStatusActions } from '../status/ClaimStatusActions';
 import type { Claim } from './api';
 import { claimApi } from './api';
 import { AuthorizeDialog } from './ClaimDialogs';
@@ -14,9 +15,10 @@ import { authorizationBlock } from './recordLogic';
 type Dialog = 'authorize' | 'advice';
 
 /**
- * Page actions of a claim (BRCLM.001/016/039, FR-CL-014/015/016/024): Generate Authorization Code
+ * Page actions of a claim (BRCLM.001/016/039, FR-CM-014/015/016/024): Generate Authorization Code
  * (disabled while the premium is not paid), Send Loss Advice, Refresh Cover Data and Use Latest
- * Version when a newer cover version exists. The status actions come with wave CL1-B.
+ * Version when a newer cover version exists, and the status actions of wave CL1-B (Change Status,
+ * Set Settlement, Override Follow-up Date, Assign Adjuster, Reopen).
  */
 export function ClaimActions({ claim, companyId }: Readonly<{ claim: Claim; companyId: number }>) {
   const { can } = useAuth();
@@ -59,6 +61,7 @@ export function ClaimActions({ claim, companyId }: Readonly<{ claim: Claim; comp
   );
   return (
     <>
+      <ClaimStatusActions claimId={claim.id} companyId={companyId} />
       {open && can('BCL_AUTHORIZE') && (
         <Button
           variant="accent"

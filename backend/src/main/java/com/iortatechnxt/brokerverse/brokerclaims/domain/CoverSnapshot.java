@@ -135,7 +135,7 @@ public class CoverSnapshot {
 
   /**
    * Reloads the policy number, sum insured and sales data from the account (BRCLM.016 "Refresh
-   * Cover Data"; FR-CL-013 policy number pending until issued). ARN, policy year and currency never
+   * Cover Data"; FR-CM-013 policy number pending until issued). ARN, policy year and currency never
    * change.
    *
    * @param policy current policy facts of the same cover

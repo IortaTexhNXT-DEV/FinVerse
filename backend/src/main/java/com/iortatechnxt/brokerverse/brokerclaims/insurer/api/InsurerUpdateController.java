@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Insurer communication of a claim (BRCLM.041; FR-CL-022/024): the insurer updates (timeline,
+ * Insurer communication of a claim (BRCLM.041; FR-CM-022/024): the insurer updates (timeline,
  * insert-only) and the loss advice e-mailed to the insurers with its drafts for review.
  */
 @RestController

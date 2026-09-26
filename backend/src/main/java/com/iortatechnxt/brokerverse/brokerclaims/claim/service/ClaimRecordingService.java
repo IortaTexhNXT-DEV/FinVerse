@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Records a claim on a cover (BRCLM.003/004/006/009/016/037/039/041/043; FR-CL-011): cover (ARN,
+ * Records a claim on a cover (BRCLM.003/004/006/009/016/037/039/041/043; FR-CM-011): cover (ARN,
  * policy year and version at the loss date) and loss data are mandatory; the snapshot copies the
  * policy number, period, sum insured, lead insurer, Marketing unit, AO and branch; the currency is
  * the cover's, else {@code BCL_DEFAULT_CURRENCY}; the claimant is the assured; the premium is

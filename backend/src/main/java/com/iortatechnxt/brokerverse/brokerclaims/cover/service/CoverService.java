@@ -45,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class CoverService {
 
-  /** Shortest search text (FR-CL-010). */
+  /** Shortest search text (FR-CM-010). */
   public static final int MIN_SEARCH = 3;
 
   private static final int MAX_HITS = 50;
@@ -84,7 +84,7 @@ public class CoverService {
   }
 
   /**
-   * Covers matching a search (FR-CL-010): every account of the company, whatever its branch or
+   * Covers matching a search (FR-CM-010): every account of the company, whatever its branch or
    * account officer.
    *
    * @param companyId company
@@ -354,7 +354,7 @@ public class CoverService {
     return "%" + lower(text) + "%";
   }
 
-  /** What a cover search text is (FR-CL-010). */
+  /** What a cover search text is (FR-CM-010). */
   public enum SearchBy {
     /** Account reference number. */
     ARN,

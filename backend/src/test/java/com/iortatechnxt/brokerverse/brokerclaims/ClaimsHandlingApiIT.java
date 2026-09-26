@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * The Claims Handling endpoints of wave CL1-A through the full HTTP stack: every read endpoint
  * answers, a claim is recorded and worked through the API, and the permissions of the role matrix
- * hold (FR-CL-002).
+ * hold (FR-CM-002).
  */
 @IntegrationTest
 class ClaimsHandlingApiIT {

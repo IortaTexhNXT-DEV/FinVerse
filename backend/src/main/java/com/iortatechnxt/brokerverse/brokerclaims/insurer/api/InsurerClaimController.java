@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * The insurers of a claim (BRCLM.018/023/024/043; FR-CL-021/031/032): insurer lines with their
+ * The insurers of a claim (BRCLM.018/023/024/043; FR-CM-021/031/032): insurer lines with their
  * names, add a line or an insurer claim number ({@code BCL_RECORD}), change a share, amend the
  * reserve ({@code BCL_RESERVE_AMEND}), assign the adjuster of a line ({@code BCL_ADJUSTER_ASSIGN})
  * and the reserve history. Every answer is the claim's lines after the change.

@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Bulk upload {@code BCL_INSURER_UPDATE} of insurer updates, e.g. an insurer's bordereau
- * (BRCLM.041; design 9.5, FR-CL-022): each row names the claim by BDOI claim number, or by insurer
+ * (BRCLM.041; design 9.5, FR-CM-022): each row names the claim by BDOI claim number, or by insurer
  * and insurer claim number, with the update date, source, reference and remarks. Every row is
  * validated before the file is applied; the handler of each claim is notified of the updates
  * loaded.

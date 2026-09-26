@@ -5,7 +5,7 @@ import java.time.Instant;
 /**
  * Spring application event published by {@link ClaimRecordingService} once a claim, its locations,
  * its insurer lines and its workflow case (stage NEW) are saved, inside the same transaction
- * (FR-CL-011). The status engine of wave CL1-B listens to it to set the first status chosen at
+ * (FR-CM-011). The status engine of wave CL1-B listens to it to set the first status chosen at
  * recording (phase NEW, BRCLM.010) and the next follow-up date (BRCLM.019); it publishes {@code
  * ClaimStatusChanged} in turn.
  *

@@ -67,7 +67,7 @@ function AddLocationsDialog({
 }
 
 /**
- * Locations tab of a claim (BRCLM.037/042; FR-CL-020/023): the insured locations of the cover
+ * Locations tab of a claim (BRCLM.037/042; FR-CM-020/023): the insured locations of the cover
  * linked to the claim with their address and the reference of each insurer valid today; links and
  * removals while the claim is open (BCL_RECORD), each recorded in the claim history.
  */

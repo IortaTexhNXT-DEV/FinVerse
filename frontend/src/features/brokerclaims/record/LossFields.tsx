@@ -16,7 +16,7 @@ export type LossFieldKey =
   | 'initialReserve';
 
 /**
- * The loss of a claim (p.24-25; FR-CL-011/033): dates, nature and type, description, place,
+ * The loss of a claim (p.24-25; FR-CM-011/033): dates, nature and type, description, place,
  * catastrophe tag and amounts, with their field errors.
  */
 export function LossFields({

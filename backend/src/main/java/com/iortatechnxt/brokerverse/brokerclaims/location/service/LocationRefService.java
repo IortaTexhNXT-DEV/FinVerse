@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Insurer location references (BRCLM.042; FR-CL-023): for each insured location of a cover and each
+ * Insurer location references (BRCLM.042; FR-CM-023): for each insured location of a cover and each
  * insurer, the reference the insurer uses, with effective dates. A new reference end-dates the open
  * one of the same location and insurer the day before it starts; nothing is deleted and every
  * change is audited. Maintained on screen (BCL_LOCATION_REF_MAINTAIN) or by the bulk upload {@code
@@ -124,7 +124,7 @@ public class LocationRefService {
   }
 
   /**
-   * The references of a cover valid on a date (shown on every claim location, FR-CL-023).
+   * The references of a cover valid on a date (shown on every claim location, FR-CM-023).
    *
    * @param companyId company
    * @param arn account reference number

@@ -103,7 +103,7 @@ public class LossDetails {
   }
 
   /**
-   * Corrects the reported date (BRCLM.004, FR-CL-012; BCL_STATUS_UPDATE with a reason).
+   * Corrects the reported date (BRCLM.004, FR-CM-012; BCL_STATUS_UPDATE with a reason).
    *
    * @param date new reported date
    * @param reason reason ({@code BCL_OVERRIDE_REASON})

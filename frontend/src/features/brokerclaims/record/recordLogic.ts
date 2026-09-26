@@ -2,7 +2,7 @@ import type { PremiumStatus } from '../cover/api';
 import type { ClaimFlags, ClaimSource } from './api';
 
 /**
- * Pure rules of the claim screens (FR-CL-011/016/020/021/033): form validation with the FRS
+ * Pure rules of the claim screens (FR-CM-011/016/020/021/033): form validation with the FRS
  * messages, amounts, premium labels and the flags of the summary card.
  */
 
@@ -62,7 +62,7 @@ export function amountError(text: string): string | undefined {
   return Number.isNaN(value) || value < 0 ? 'Enter an amount of 0 or more' : undefined;
 }
 
-/** Errors of the loss dates (FR-CL-011/012). */
+/** Errors of the loss dates (FR-CM-011/012). */
 export function dateErrors(lossDate: string, reportedDate: string, today: string): ClaimFormErrors {
   const errors: ClaimFormErrors = {};
   if (lossDate === '' || lossDate > today) {

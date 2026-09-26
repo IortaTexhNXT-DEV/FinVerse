@@ -217,7 +217,7 @@ function DialogHost({
 }
 
 /**
- * Insurers & Updates tab of a claim (BRCLM.018/041/043; FR-CL-021/022/031): one line per insurer
+ * Insurers & Updates tab of a claim (BRCLM.018/041/043; FR-CM-021/022/031): one line per insurer
  * and insurer claim number with share, date reported and adjuster, and the insert-only timeline of
  * insurer updates.
  */

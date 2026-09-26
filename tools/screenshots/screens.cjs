@@ -135,6 +135,7 @@ module.exports = [
   { slug: 'frbs-service-fee', title: 'Service Fee Runs', user: 'gltl', path: '/frbs/service-fee' },
   { slug: 'frbs-service-fee-run', title: 'Service Fee Run record', user: 'gltl', path: '/frbs/service-fee', open: 'first' },
   { slug: 'finance-dashboard', title: 'Finance executive dashboard', user: 'fmanager', path: '/' },
+  { slug: 'dashboard-bdoi-role', title: 'Home dashboard of a BDOI role (no insurer widgets)', user: 'disbappr', path: '/' },
   { slug: 'gl-journals', title: 'GL Journals', user: 'fmanager', path: '/gl/journals' },
   { slug: 'gl-chart-upload', title: 'Chart Upload & Numbering (GL Team Lead)', user: 'gltl', path: '/gl/accounts/upload' },
   { slug: 'gl-close', title: 'GL Close & Cut-Off (GL Team Lead)', user: 'gltl', path: '/planning/gl-close' },

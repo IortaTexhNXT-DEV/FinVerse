@@ -1,4 +1,6 @@
 import type { NbDashboard, StatusCount } from '@/api/nbReports';
+import { WORKFLOW_NAMES } from '@/api/workflow';
+import { humanize } from '@/utils/format';
 
 /** Drill-down route of an account stage: the Accounts list filtered on the status. */
 export function accountsPath(status: string): string {
@@ -67,11 +69,19 @@ export function barWidth(value: number, max: number): number {
 }
 
 /** Short summary of the overdue items per workflow ("3 Accounts · 1 Quotations"). */
+/** A workflow or status label for business users: a code such as PM_PACKAGE_REQUEST becomes its name. */
+function readableLabel(label: string): string {
+  if (!/^[A-Z0-9_]+$/.test(label)) {
+    return label;
+  }
+  return WORKFLOW_NAMES[label] ?? humanize(label);
+}
+
 export function overdueHint(overdue: readonly StatusCount[]): string {
   if (overdue.length === 0) {
     return 'Every item is within its service level';
   }
-  return overdue.map((o) => `${String(o.count)} ${o.label}`).join(' · ');
+  return overdue.map((o) => `${String(o.count)} ${readableLabel(o.label)}`).join(' · ');
 }
 
 /** Requests hint: quotations and PRFs in progress next to the new requests. */

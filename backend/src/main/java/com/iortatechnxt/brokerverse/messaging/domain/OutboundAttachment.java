@@ -9,7 +9,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/** A file attached to an outbound e-mail, stored as sent (protected when requested). */
+/**
+ * A file attached to an outbound e-mail, stored as sent (protected when requested). The content is
+ * in the file store ({@code stored_file}, build step ST1); attachments queued before ST1 keep their
+ * bytes in {@code content} until {@code FILE_BYTEA_MIGRATION} copies them.
+ */
 @Entity
 @Table(name = "msg_outbound_attachment")
 public class OutboundAttachment {
@@ -37,28 +41,29 @@ public class OutboundAttachment {
   private boolean passwordProtected;
 
   @Basic(fetch = FetchType.LAZY)
-  @Column(nullable = false)
+  @Column(name = "content")
   private byte[] content;
+
+  @Column(name = "stored_file_id")
+  private Long storedFileId;
 
   protected OutboundAttachment() {}
 
   /**
-   * Creates an attachment.
+   * Creates an attachment whose content is in the file store.
    *
    * @param messageId message
    * @param file file as sent
-   * @param sha256 checksum of the content sent
-   * @param passwordProtected whether the file was encrypted
+   * @param stored stored file of the content, its checksum and whether it was encrypted
    */
-  public OutboundAttachment(
-      Long messageId, MessageFile file, String sha256, boolean passwordProtected) {
+  public OutboundAttachment(Long messageId, MessageFile file, StoredContent stored) {
     this.messageId = messageId;
     this.fileName = file.fileName();
     this.mimeType = file.mimeType();
-    this.content = file.content().clone();
     this.sizeBytes = file.content().length;
-    this.sha256 = sha256;
-    this.passwordProtected = passwordProtected;
+    this.sha256 = stored.sha256();
+    this.passwordProtected = stored.passwordProtected();
+    this.storedFileId = stored.storedFileId();
   }
 
   public Long getId() {
@@ -90,11 +95,29 @@ public class OutboundAttachment {
   }
 
   /**
-   * File bytes (copy).
+   * File bytes of an attachment queued before ST1 (copy).
    *
-   * @return content
+   * @return content, null when the content is in the file store
    */
   public byte[] getContent() {
-    return content.clone();
+    return content == null ? null : content.clone();
   }
+
+  /**
+   * The stored file of the content; null for an attachment queued before ST1 and not yet copied.
+   *
+   * @return stored file id
+   */
+  public Long getStoredFileId() {
+    return storedFileId;
+  }
+
+  /**
+   * Where the content of an attachment is kept.
+   *
+   * @param storedFileId stored file
+   * @param sha256 checksum of the content sent
+   * @param passwordProtected whether the file was encrypted
+   */
+  public record StoredContent(Long storedFileId, String sha256, boolean passwordProtected) {}
 }

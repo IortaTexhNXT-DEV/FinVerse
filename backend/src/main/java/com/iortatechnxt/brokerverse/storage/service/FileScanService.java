@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.common.storage.ObjectMetadata;
 import com.iortatechnxt.brokerverse.common.storage.ObjectRef;
 import com.iortatechnxt.brokerverse.common.storage.StorageProperties;
 import com.iortatechnxt.brokerverse.common.storage.StoredObject;
+import com.iortatechnxt.brokerverse.storage.domain.FileOrigin;
 import com.iortatechnxt.brokerverse.storage.domain.RecordClass;
 import com.iortatechnxt.brokerverse.storage.domain.ScanStatus;
 import com.iortatechnxt.brokerverse.storage.domain.StoredFile;
@@ -128,6 +129,20 @@ public class FileScanService {
     }
     quarantine(file, result.get());
     return ScanStatus.QUARANTINED;
+  }
+
+  /**
+   * Records a file the application generated as clean without a malware scan ({@link
+   * FileOrigin#GENERATED}); a clean file of a record class under legal hold receives its hold.
+   *
+   * @param file stored file
+   */
+  public void generated(StoredFile file) {
+    if (file.getScanStatus() != ScanStatus.PENDING) {
+      return;
+    }
+    file.scannedClean(FileOrigin.GENERATED_RESULT, clock.instant());
+    applyClassHold(file);
   }
 
   private static Optional<String> scanResult(ObjectMetadata metadata, String tag) {

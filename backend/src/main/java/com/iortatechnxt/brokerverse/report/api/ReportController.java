@@ -9,9 +9,10 @@ import com.iortatechnxt.brokerverse.report.core.ReportAccess;
 import com.iortatechnxt.brokerverse.report.core.ReportArchiveService;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
-import com.iortatechnxt.brokerverse.report.domain.ReportRun.RunFile;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.report.render.PrintOptions;
+import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.PageRequest;
@@ -40,14 +41,18 @@ public class ReportController {
 
   private final ReportService service;
   private final ReportArchiveService archive;
+  private final FileDownloads downloads;
 
   /**
    * Creates the controller.
    *
    * @param service report service
    * @param archive archive of generated reports
+   * @param downloads file download answers
    */
-  public ReportController(ReportService service, ReportArchiveService archive) {
+  public ReportController(
+      ReportService service, ReportArchiveService archive, FileDownloads downloads) {
+    this.downloads = downloads;
     this.service = service;
     this.archive = archive;
   }
@@ -71,18 +76,17 @@ public class ReportController {
   }
 
   /**
-   * Downloads an archived export again; needs the report's export permission (CSHID.018).
+   * Downloads an archived export again; needs the report's export permission (CSHID.018). The
+   * answer is a redirect to the presigned link of the stored file, or the bytes of a file kept in
+   * the database before ST1.
    *
    * @param id archived export
-   * @return file
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or file
    */
   @GetMapping("/runs/{id}/file")
-  public ResponseEntity<byte[]> runFile(@PathVariable Long id) {
-    RunFile file = archive.file(id);
-    return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(file.contentType()))
-        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(file.fileName()))
-        .body(file.content());
+  public ResponseEntity<byte[]> runFile(@PathVariable Long id, HttpServletRequest request) {
+    return downloads.respond(archive.download(id), request);
   }
 
   /**

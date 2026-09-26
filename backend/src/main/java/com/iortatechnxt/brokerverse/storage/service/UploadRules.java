@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.storage.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.storage.StorageProperties;
+import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Locale;
@@ -144,6 +145,44 @@ public class UploadRules {
       clean = "file" + clean;
     }
     return clean.length() > MAX_NAME ? clean.substring(clean.length() - MAX_NAME) : clean;
+  }
+
+  /**
+   * Refuses a missing or malformed owner.
+   *
+   * @param owner owning record
+   * @return the owner
+   */
+  static FileOwner requireOwner(FileOwner owner) {
+    if (owner == null || !owner.isValid()) {
+      throw new BusinessRuleException("INVALID_FILE_OWNER", "Invalid owner entity type or id");
+    }
+    return owner;
+  }
+
+  /**
+   * Refuses content whose SHA-256 differs from the checksum the sender declared (if any).
+   *
+   * @param declared declared checksum, may be null
+   * @param actual computed checksum
+   */
+  static void requireDeclaredChecksum(String declared, String actual) {
+    if (declared != null
+        && !declared.isBlank()
+        && String.CASE_INSENSITIVE_ORDER.compare(declared.strip(), actual) != 0) {
+      throw new BusinessRuleException(
+          "FILE_CHECKSUM_MISMATCH", "The file does not match the SHA-256 checksum declared");
+    }
+  }
+
+  /**
+   * A stripped text, null when blank.
+   *
+   * @param text text
+   * @return text or null
+   */
+  static String blankToNull(String text) {
+    return text == null || text.isBlank() ? null : text.strip();
   }
 
   private static String extension(String fileName) {

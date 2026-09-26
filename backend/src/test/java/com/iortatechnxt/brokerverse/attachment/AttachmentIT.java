@@ -121,7 +121,14 @@ class AttachmentIT {
             .getResponse()
             .getContentAsString();
     String id = body.replaceAll(".*\"id\":(\\d+).*", "$1");
-    mvc.perform(get("/api/v1/attachments/" + id + "/content"))
+    String location =
+        mvc.perform(get("/api/v1/attachments/" + id + "/content"))
+            .andExpect(status().isFound())
+            .andExpect(header().string("Cache-Control", "no-store"))
+            .andReturn()
+            .getResponse()
+            .getHeader("Location");
+    mvc.perform(get(location))
         .andExpect(status().isOk())
         .andExpect(header().string("Content-Type", "image/png"))
         .andExpect(

@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.messaging.service.OutboundEmail;
 import com.iortatechnxt.brokerverse.messaging.service.OutboundEmail.Protection;
 import com.iortatechnxt.brokerverse.messaging.service.QueuedEmail;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.system.domain.JobTrigger;
@@ -48,6 +49,7 @@ class MessagingIT {
   @Autowired private DocumentComposer composer;
   @Autowired private JobRegistry jobs;
   @Autowired private AsUser as;
+  @Autowired private StoredFileService storedFiles;
 
   private byte[] pdf() {
     return composer.pdf(
@@ -96,14 +98,14 @@ class MessagingIT {
     assertThat(mail.isSimulated()).isTrue();
     List<OutboundAttachment> files = messages.attachments(mail.getId());
     assertThat(files).allMatch(OutboundAttachment::isPasswordProtected);
-    assertThatThrownBy(() -> new PdfReader(files.get(0).getContent()).close())
-        .isInstanceOf(Exception.class);
-    PdfReader opened =
-        new PdfReader(files.get(0).getContent(), "Secret#123".getBytes(StandardCharsets.UTF_8));
+    assertThat(files).allMatch(f -> f.getStoredFileId() != null && f.getContent() == null);
+    byte[] sentPdf = storedFiles.read(files.get(0).getStoredFileId());
+    byte[] sentXlsx = storedFiles.read(files.get(1).getStoredFileId());
+    assertThatThrownBy(() -> new PdfReader(sentPdf).close()).isInstanceOf(Exception.class);
+    PdfReader opened = new PdfReader(sentPdf, "Secret#123".getBytes(StandardCharsets.UTF_8));
     assertThat(opened.getNumberOfPages()).isEqualTo(1);
     opened.close();
-    try (POIFSFileSystem fs =
-        new POIFSFileSystem(new ByteArrayInputStream(files.get(1).getContent()))) {
+    try (POIFSFileSystem fs = new POIFSFileSystem(new ByteArrayInputStream(sentXlsx))) {
       Decryptor d = Decryptor.getInstance(new EncryptionInfo(fs));
       assertThat(d.verifyPassword("wrong")).isFalse();
       assertThat(d.verifyPassword("Secret#123")).isTrue();

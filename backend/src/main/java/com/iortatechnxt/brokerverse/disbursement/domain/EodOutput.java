@@ -37,8 +37,11 @@ public class EodOutput extends BaseEntity {
   private String contentType;
 
   @Basic(fetch = FetchType.LAZY)
-  @Column(nullable = false, updatable = false)
+  @Column(name = "content", updatable = false)
   private byte[] content;
+
+  @Column(name = "stored_file_id")
+  private Long storedFileId;
 
   @Column(name = "item_count", nullable = false, updatable = false)
   private int itemCount;
@@ -60,7 +63,6 @@ public class EodOutput extends BaseEntity {
     this.code = code;
     this.fileName = file.fileName();
     this.contentType = file.contentType();
-    this.content = file.content();
     this.itemCount = itemCount;
   }
 
@@ -85,12 +87,31 @@ public class EodOutput extends BaseEntity {
   }
 
   /**
-   * The file content.
+   * The content of an output produced before ST1 and not yet copied to the file store (null
+   * otherwise).
    *
    * @return a copy of the bytes
    */
   public byte[] getContent() {
-    return content.clone();
+    return content == null ? null : content.clone();
+  }
+
+  /**
+   * Records the stored file of the output (file store, build step ST1).
+   *
+   * @param id stored file id
+   */
+  public void storedIn(Long id) {
+    this.storedFileId = id;
+  }
+
+  /**
+   * The stored file of the output; null for an output produced before ST1 and not yet copied.
+   *
+   * @return stored file id
+   */
+  public Long getStoredFileId() {
+    return storedFileId;
   }
 
   public int getItemCount() {

@@ -23,9 +23,11 @@ import com.iortatechnxt.brokerverse.issuance.service.IssuanceQueryService;
 import com.iortatechnxt.brokerverse.issuance.service.IssuanceQueryService.IssuanceCounts;
 import com.iortatechnxt.brokerverse.issuance.service.IssuanceTab;
 import com.iortatechnxt.brokerverse.messaging.service.MessageService;
+import com.iortatechnxt.brokerverse.storage.service.FileDownload;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.PlacementTestData;
+import com.iortatechnxt.brokerverse.support.StoredDownloads;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -48,6 +50,7 @@ class AdviceAndDispatchIT {
   @Autowired private AccountQueryService accounts;
   @Autowired private PlacementTestData fx;
   @Autowired private AsUser as;
+  @Autowired private StoredDownloads downloads;
 
   private Epolicy issued(String arn) {
     String number = "POL-" + PlacementTestData.token();
@@ -78,7 +81,9 @@ class AdviceAndDispatchIT {
     assertThat(advice.getIaNo()).startsWith("IA-");
     assertThat(advice.getTriggerEvent()).isEqualTo(AdviceTrigger.MANUAL);
     assertThat(advice.getPolicyNumbers()).isNull();
-    assertThat(as.run("proc", () -> advices.download(advice.getId())).getContent()).isNotEmpty();
+    FileDownload adviceFile = as.run("proc", () -> advices.download(advice.getId()));
+    assertThat(adviceFile.isStored()).isTrue();
+    assertThat(downloads.bytes(adviceFile)).startsWith((byte) '%');
     assertThat(advices.register(fx.company(), advice.getIaNo(), PageRequest.of(0, 5))).hasSize(1);
     Long clientId = accounts.requireByArn(mortgaged).getClientId();
     assertThat(clientRecords.recordsOf(clientId))

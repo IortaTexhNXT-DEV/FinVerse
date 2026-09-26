@@ -62,6 +62,9 @@ public class ReportBatch extends BaseEntity {
   @Column(name = "content")
   private byte[] content;
 
+  @Column(name = "stored_file_id")
+  private Long storedFileId;
+
   @Column(name = "size_bytes")
   private Long sizeBytes;
 
@@ -106,7 +109,8 @@ public class ReportBatch extends BaseEntity {
   }
 
   /**
-   * Stores the file and closes the batch: COMPLETED, PARTIAL or FAILED.
+   * Closes the batch (COMPLETED, PARTIAL or FAILED) with the name, type and size of its file; the
+   * content goes to the file store ({@link #storedIn(Long)}).
    *
    * @param name file name
    * @param type content type
@@ -122,7 +126,6 @@ public class ReportBatch extends BaseEntity {
     }
     this.fileName = bytes == null ? null : name;
     this.contentType = bytes == null ? null : type;
-    this.content = bytes == null ? null : bytes.clone();
     this.sizeBytes = bytes == null ? null : (long) bytes.length;
     this.completedAt = when;
   }
@@ -172,12 +175,31 @@ public class ReportBatch extends BaseEntity {
   }
 
   /**
-   * File content.
+   * File content of a batch completed before ST1 (not yet copied to the file store).
    *
    * @return copy of the content, null when none
    */
   public byte[] getContent() {
     return content == null ? null : content.clone();
+  }
+
+  /**
+   * Records the stored file of the batch.
+   *
+   * @param id stored file id
+   */
+  public void storedIn(Long id) {
+    this.storedFileId = id;
+  }
+
+  /**
+   * The stored file of the batch; null when nothing was produced or for a batch whose file is still
+   * in the database (before ST1).
+   *
+   * @return stored file id
+   */
+  public Long getStoredFileId() {
+    return storedFileId;
   }
 
   public Long getSizeBytes() {

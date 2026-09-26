@@ -18,6 +18,11 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.storage.domain.FileOrigin;
+import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
+import com.iortatechnxt.brokerverse.storage.service.FileDownload;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService.StoreRequest;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -43,11 +48,17 @@ public class BillingStatementService {
   /** Audit entity type. */
   public static final String ENTITY = "BillingStatement";
 
+  /** Record class of statements of account. */
+  public static final String RECORD_CLASS = "STATEMENT_OF_ACCOUNT";
+
+  private static final String PDF = "application/pdf";
+
   private static final LocalDate EARLIEST = LocalDate.of(1900, 1, 1);
   private static final LocalDate LATEST = LocalDate.of(9999, 12, 31);
 
   private final BillingStatementRepository statements;
   private final BillingDocumentRepository documents;
+  private final StoredFileService storedFiles;
   private final InstallmentPlanService plans;
   private final PlanAllocation allocation;
   private final SoaDocument renderer;
@@ -60,6 +71,7 @@ public class BillingStatementService {
    *
    * @param statements statements
    * @param documents rendered statements
+   * @param storedFiles file store (statement PDFs)
    * @param plans installment plans
    * @param allocation payment allocation
    * @param renderer PDF renderer
@@ -71,6 +83,7 @@ public class BillingStatementService {
   public BillingStatementService(
       BillingStatementRepository statements,
       BillingDocumentRepository documents,
+      StoredFileService storedFiles,
       InstallmentPlanService plans,
       PlanAllocation allocation,
       SoaDocument renderer,
@@ -79,6 +92,7 @@ public class BillingStatementService {
       Clock clock) {
     this.statements = statements;
     this.documents = documents;
+    this.storedFiles = storedFiles;
     this.plans = plans;
     this.allocation = allocation;
     this.renderer = renderer;
@@ -189,8 +203,7 @@ public class BillingStatementService {
                     current.getDueDate()),
                 lines(plan, current)));
     byte[] pdf = renderer.render(soa);
-    documents.save(
-        new BillingDocument(soa.getId(), soa.getSoaNo() + ".pdf", "application/pdf", pdf));
+    storePdf(soa, pdf);
     audit.record(
         ENTITY,
         soa.getSoaNo(),
@@ -276,6 +289,24 @@ public class BillingStatementService {
     return soa;
   }
 
+  private void storePdf(BillingStatement soa, byte[] pdf) {
+    String fileName = soa.getSoaNo() + ".pdf";
+    Long stored =
+        storedFiles
+            .storeChecked(
+                new StoreRequest(
+                    new FileOwner(soa.getCompanyId(), ENTITY, String.valueOf(soa.getId())),
+                    null,
+                    RECORD_CLASS,
+                    fileName,
+                    pdf,
+                    null),
+                PDF,
+                FileOrigin.GENERATED)
+            .getId();
+    documents.save(new BillingDocument(soa.getId(), fileName, PDF, stored));
+  }
+
   /**
    * The rendered statement.
    *
@@ -287,5 +318,34 @@ public class BillingStatementService {
     return documents
         .findByStatementId(id)
         .orElseThrow(() -> new ResourceNotFoundException("Statement document", id));
+  }
+
+  /**
+   * The rendered statement for the download endpoint: a presigned link to the stored PDF, or the
+   * bytes of a PDF rendered before ST1.
+   *
+   * @param id statement
+   * @return download
+   */
+  @Transactional(readOnly = true)
+  public FileDownload download(Long id) {
+    BillingDocument document = document(id);
+    return document.getStoredFileId() == null
+        ? FileDownload.inline(
+            document.getFileName(), document.getContentType(), document.getContent())
+        : FileDownload.stored(document.getStoredFileId());
+  }
+
+  /**
+   * The rendered PDF of a statement (e-mail attachment), read from the file store with its SHA-256
+   * checked, or from the row for a PDF rendered before ST1.
+   *
+   * @param document statement document
+   * @return bytes
+   */
+  public byte[] content(BillingDocument document) {
+    return document.getStoredFileId() == null
+        ? document.getContent()
+        : storedFiles.read(document.getStoredFileId());
   }
 }

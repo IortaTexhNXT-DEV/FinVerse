@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.PlacementTestData;
 import com.iortatechnxt.brokerverse.support.TestData;
@@ -31,6 +32,7 @@ class PlacementIssuanceApiIT {
   @Autowired private UserDetailsService users;
   @Autowired private JdbcTemplate jdbc;
   @Autowired private PlacementTestData fx;
+  @Autowired private Api api;
 
   private String id(String sql, String key) {
     return String.valueOf(jdbc.queryForObject(sql, Long.class, key));
@@ -96,14 +98,10 @@ class PlacementIssuanceApiIT {
 
   @Test
   void filesAreDownloaded() throws Exception {
-    mvc.perform(
-            get(resolve("/api/v1/placement/slips/{slip}/files/pdf"))
-                .with(user(users.loadUserByUsername("proc"))))
+    api.download("proc", resolve("/api/v1/placement/slips/{slip}/files/pdf"))
         .andExpect(status().isOk())
         .andExpect(header().string("Content-Type", "application/pdf"));
-    mvc.perform(
-            get(resolve("/api/v1/placement/slips/{slip}/files/xlsx"))
-                .with(user(users.loadUserByUsername("proc"))))
+    api.download("proc", resolve("/api/v1/placement/slips/{slip}/files/xlsx"))
         .andExpect(status().isOk());
     mvc.perform(
             get(resolve("/api/v1/placement/billing/batches/{batch}/file?format=ods"))
@@ -115,9 +113,7 @@ class PlacementIssuanceApiIT {
             get(resolve("/api/v1/placement/billing/batches/{batch}/file"))
                 .with(user(users.loadUserByUsername("proc"))))
         .andExpect(status().isOk());
-    mvc.perform(
-            get(resolve("/api/v1/issuance/insurance-advice/{ia}/file"))
-                .with(user(users.loadUserByUsername("ao"))))
+    api.download("ao", resolve("/api/v1/issuance/insurance-advice/{ia}/file"))
         .andExpect(status().isOk())
         .andExpect(header().string("Content-Type", "application/pdf"));
   }

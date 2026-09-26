@@ -61,6 +61,7 @@ public class EodService {
   private final EodConfirmations confirmations;
   private final DocumentNumberService numbers;
   private final AuditTrailService audit;
+  private final EodOutputFiles outputFiles;
 
   /**
    * Creates the service.
@@ -76,6 +77,7 @@ public class EodService {
    * @param confirmations payment confirmations
    * @param numbers run numbers
    * @param audit audit trail
+   * @param outputFiles output files (file store)
    */
   @SuppressWarnings("java:S107") // constructor injection
   public EodService(
@@ -89,7 +91,9 @@ public class EodService {
       EodReports reports,
       EodConfirmations confirmations,
       DocumentNumberService numbers,
-      AuditTrailService audit) {
+      AuditTrailService audit,
+      EodOutputFiles outputFiles) {
+    this.outputFiles = outputFiles;
     this.runs = runs;
     this.outputs = outputs;
     this.vouchers = vouchers;
@@ -253,7 +257,7 @@ public class EodService {
   }
 
   private void save(EodRun run, OutputKind kind, String code, OutputFile file, int count) {
-    outputs.save(new EodOutput(run.getId(), kind, code, file, count));
+    outputFiles.save(run, kind, code, file, count);
   }
 
   /**

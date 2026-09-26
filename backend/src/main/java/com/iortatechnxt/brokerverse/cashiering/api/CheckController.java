@@ -16,6 +16,8 @@ import com.iortatechnxt.brokerverse.cashiering.service.PdcWarehouseService;
 import com.iortatechnxt.brokerverse.cashiering.service.PickupService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -45,6 +47,7 @@ public class CheckController {
   private final PickupService pickups;
   private final BatchPrintService printing;
   private final Clock clock;
+  private final FileDownloads downloads;
 
   /**
    * Creates the controller.
@@ -53,9 +56,15 @@ public class CheckController {
    * @param pickups pick-up queue
    * @param printing batch printing
    * @param clock clock
+   * @param downloads file download answers
    */
   public CheckController(
-      PdcWarehouseService pdcs, PickupService pickups, BatchPrintService printing, Clock clock) {
+      PdcWarehouseService pdcs,
+      PickupService pickups,
+      BatchPrintService printing,
+      Clock clock,
+      FileDownloads downloads) {
+    this.downloads = downloads;
     this.pdcs = pdcs;
     this.pickups = pickups;
     this.printing = printing;
@@ -288,15 +297,16 @@ public class CheckController {
   }
 
   /**
-   * The merged PDF of a batch.
+   * The merged PDF of a batch: a redirect to its presigned link, or the bytes of a batch printed
+   * before ST1.
    *
    * @param id batch
-   * @return PDF
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or PDF
    */
   @GetMapping("/print-batches/{id}/file")
   @PreAuthorize(CashAccess.PRINT)
-  public ResponseEntity<byte[]> file(@PathVariable Long id) {
-    var batch = printing.get(id);
-    return CashAccess.pdf(batch.getBatchNo() + ".pdf", batch.document());
+  public ResponseEntity<byte[]> file(@PathVariable Long id, HttpServletRequest request) {
+    return downloads.respond(printing.file(id), request);
   }
 }

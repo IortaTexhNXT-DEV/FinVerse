@@ -274,7 +274,7 @@ class GlPlatformApiIT {
                 .andExpect(jsonPath("$.items[0].status").value("OK"))
                 .andExpect(jsonPath("$.items[2].status").value("FAILED")));
     long id = batch.get("id").asLong();
-    api.doGet("fmanager", "/api/v1/reports/batches/" + id + "/file")
+    api.download("fmanager", "/api/v1/reports/batches/" + id + "/file")
         .andExpect(status().isOk())
         .andExpect(header().string("Content-Type", "application/zip"));
     api.doGet("fmanager", "/api/v1/reports/batches/" + id).andExpect(status().isOk());

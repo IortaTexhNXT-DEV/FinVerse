@@ -221,7 +221,7 @@ class OperationsFoundationApiIT {
                                 new DropContent("text/csv", "x\n".getBytes(StandardCharsets.UTF_8)),
                                 new ExtractFile.Origin("REMITTANCE", null))
                             .id()));
-    api.doGet("recon", "/api/v1/ops/extracts/" + fileId + "/file")
+    api.download("recon", "/api/v1/ops/extracts/" + fileId + "/file")
         .andExpect(status().isOk())
         .andExpect(content().bytes("x\n".getBytes(StandardCharsets.UTF_8)));
 

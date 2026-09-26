@@ -5,7 +5,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-/** The rendered PDF of a statement of account (BRCLXN.058), kept apart from the statement. */
+/**
+ * The rendered PDF of a statement of account (BRCLXN.058), kept apart from the statement. The
+ * content is in the file store ({@code stored_file}, build step ST1); PDFs rendered before ST1 keep
+ * their bytes in {@code content} until {@code FILE_BYTEA_MIGRATION} copies them.
+ */
 @Entity
 @Table(name = "clx_billing_document")
 public class BillingDocument extends BaseEntity {
@@ -19,8 +23,11 @@ public class BillingDocument extends BaseEntity {
   @Column(name = "content_type", nullable = false, length = 100)
   private String contentType;
 
-  @Column(nullable = false)
+  @Column(name = "content")
   private byte[] content;
+
+  @Column(name = "stored_file_id")
+  private Long storedFileId;
 
   protected BillingDocument() {}
 
@@ -30,13 +37,13 @@ public class BillingDocument extends BaseEntity {
    * @param statementId statement
    * @param fileName file name
    * @param contentType media type
-   * @param content bytes
+   * @param storedFileId stored file of the PDF
    */
-  public BillingDocument(Long statementId, String fileName, String contentType, byte[] content) {
+  public BillingDocument(Long statementId, String fileName, String contentType, Long storedFileId) {
     this.statementId = statementId;
     this.fileName = fileName;
     this.contentType = contentType;
-    this.content = content.clone();
+    this.storedFileId = storedFileId;
   }
 
   public Long getStatementId() {
@@ -51,7 +58,21 @@ public class BillingDocument extends BaseEntity {
     return contentType;
   }
 
+  /**
+   * The bytes of a PDF rendered before ST1 and not yet copied to the file store.
+   *
+   * @return bytes, null when the PDF is in the file store
+   */
   public byte[] getContent() {
-    return content.clone();
+    return content == null ? null : content.clone();
+  }
+
+  /**
+   * The stored file of the PDF; null for a PDF rendered before ST1 and not yet copied.
+   *
+   * @return stored file id
+   */
+  public Long getStoredFileId() {
+    return storedFileId;
   }
 }

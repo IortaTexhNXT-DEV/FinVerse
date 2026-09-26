@@ -8,7 +8,9 @@ import jakarta.persistence.Table;
 /**
  * A file in the in-system extract repository, the default {@code FileDropPort} in place of the
  * shared-drive folders (RMTID.001 one folder per remittance type, CMRID.001 DP lists; OQ17): kept
- * with folder, name, checksum and the module that produced it.
+ * with folder, name, checksum and the module that produced it. The content is in the file store
+ * ({@code stored_file}, build step ST1); files kept before ST1 have their bytes in {@code content}
+ * until {@code FILE_BYTEA_MIGRATION} copies them.
  */
 @Entity
 @Table(name = "ops_extract_file")
@@ -32,8 +34,11 @@ public class ExtractFile extends BaseEntity {
   @Column(nullable = false, length = 64, updatable = false)
   private String sha256;
 
-  @Column(nullable = false, updatable = false)
+  @Column(name = "content", updatable = false)
   private byte[] content;
+
+  @Column(name = "stored_file_id")
+  private Long storedFileId;
 
   @Column(name = "source_module", nullable = false, length = 30, updatable = false)
   private String sourceModule;
@@ -44,7 +49,7 @@ public class ExtractFile extends BaseEntity {
   protected ExtractFile() {}
 
   /**
-   * Stores a file.
+   * Records a file; its content goes to the file store ({@link #storedIn(Long)}).
    *
    * @param companyId company
    * @param location folder and file name
@@ -57,8 +62,7 @@ public class ExtractFile extends BaseEntity {
     this.fileName = location.fileName();
     this.contentType = file.contentType();
     this.sha256 = file.sha256();
-    this.content = file.bytes();
-    this.sizeBytes = this.content.length;
+    this.sizeBytes = file.bytes().length;
     this.sourceModule = source.module();
     this.sourceRef = source.reference();
   }
@@ -88,12 +92,30 @@ public class ExtractFile extends BaseEntity {
   }
 
   /**
-   * The file.
+   * The bytes of a file kept before ST1 and not yet copied to the file store.
    *
-   * @return bytes
+   * @return bytes, null when the content is in the file store
    */
   public byte[] getContent() {
-    return content.clone();
+    return content == null ? null : content.clone();
+  }
+
+  /**
+   * Records the stored file that holds the content.
+   *
+   * @param id stored file id
+   */
+  public void storedIn(Long id) {
+    this.storedFileId = id;
+  }
+
+  /**
+   * The stored file that holds the content; null for a file kept before ST1 and not yet copied.
+   *
+   * @return stored file id
+   */
+  public Long getStoredFileId() {
+    return storedFileId;
   }
 
   public String getSourceModule() {

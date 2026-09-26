@@ -196,7 +196,7 @@ class DisbursementApiIT {
     JsonNode detail =
         api.read(api.doGet("disb", BASE + "/eod/runs/" + runId).andExpect(status().isOk()));
     long outputId = detail.get("outputs").get(0).get("id").asLong();
-    api.doGet("disb", BASE + "/eod/outputs/" + outputId).andExpect(status().isOk());
+    api.download("disb", BASE + "/eod/outputs/" + outputId).andExpect(status().isOk());
     api.doPost("disbtl", BASE + "/eod/runs/" + runId + "/confirm", Map.of())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("CONFIRMED"));

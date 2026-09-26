@@ -206,6 +206,16 @@ brokerverse:
       orphan-cron: ${BROKERVERSE_JOB_FILE_ORPHAN_CRON:0 10 2 * * *}
       retention-cron: ${BROKERVERSE_JOB_FILE_RETENTION_CRON:0 40 2 * * *}
       ecm-archive-cron: ${BROKERVERSE_JOB_FILE_ECM_ARCHIVE_CRON:0 */15 * * * *}
+    # Download endpoints of the modules for a stored file: redirect (presigned link; needs CORS on
+    # the buckets and the bucket hosts in connect-src of the web client) or stream (through the
+    # application, the default until those are deployed). /api/v1/files/{id}/link always links.
+    downloads:
+      mode: ${BROKERVERSE_STORAGE_DOWNLOAD_MODE:stream}
+    # One-off copy of the files still kept in the database to the file store (ST1), job
+    # FILE_BYTEA_MIGRATION: manual ("-") by default, run from the job monitor.
+    content-migration:
+      cron: ${BROKERVERSE_JOB_FILE_BYTEA_MIGRATION_CRON:-}
+      batch-size: ${BROKERVERSE_FILE_BYTEA_MIGRATION_BATCH:20}
   # ---- Platform cache and events, docs/architecture/PLATFORM_CACHE_AND_EVENTS.md ----
   redis:
     # true: Redis for caches, job locks, token denylist and shared counters (spring.data.redis.*);

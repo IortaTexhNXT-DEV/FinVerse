@@ -34,6 +34,7 @@ public class ServiceInvoiceDispatch {
   private final MessageService messages;
   private final NotificationService notifications;
   private final ApplicationEventPublisher events;
+  private final ServiceInvoiceDocument documents;
 
   /**
    * Creates the dispatch.
@@ -41,11 +42,14 @@ public class ServiceInvoiceDispatch {
    * @param messages outbox
    * @param notifications in-app notifications
    * @param events event publisher
+   * @param documents service invoice documents (PDF content)
    */
   public ServiceInvoiceDispatch(
       MessageService messages,
       NotificationService notifications,
-      ApplicationEventPublisher events) {
+      ApplicationEventPublisher events,
+      ServiceInvoiceDocument documents) {
+    this.documents = documents;
     this.messages = messages;
     this.notifications = notifications;
     this.events = events;
@@ -81,7 +85,7 @@ public class ServiceInvoiceDispatch {
                         + si.getSiNo()
                         + (si.getInvoiceNo() == null ? "" : " for invoice " + si.getInvoiceNo())
                         + ".\n\nBDO Insurance and Reinsurance Brokers, Inc.",
-                    List.of(new MessageFile(si.getSiNo() + ".pdf", PDF, si.getDocument())),
+                    List.of(new MessageFile(si.getSiNo() + ".pdf", PDF, documents.content(si))),
                     null,
                     new RecordLink(ENTITY, String.valueOf(si.getId()), si.getSiNo())))
             .messageId();

@@ -1,22 +1,20 @@
 package com.iortatechnxt.brokerverse.placement.api;
 
-import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.placement.api.dto.AccountsRequest;
 import com.iortatechnxt.brokerverse.placement.api.dto.SlipEmailRequest;
 import com.iortatechnxt.brokerverse.placement.api.dto.SlipResponse;
-import com.iortatechnxt.brokerverse.placement.domain.SlipFile;
 import com.iortatechnxt.brokerverse.placement.domain.SlipStatus;
 import com.iortatechnxt.brokerverse.placement.service.PlacementBatchService;
 import com.iortatechnxt.brokerverse.placement.service.PlacementBatchService.ItemResult;
 import com.iortatechnxt.brokerverse.placement.service.PlacementSlipService;
 import com.iortatechnxt.brokerverse.placement.service.PlacementSlipService.SlipEmail;
+import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,14 +38,18 @@ public class SlipController {
 
   private final PlacementSlipService slips;
   private final PlacementBatchService batch;
+  private final FileDownloads downloads;
 
   /**
    * Creates the controller.
    *
    * @param slips placement slips
    * @param batch multi-account actions
+   * @param downloads file download answers
    */
-  public SlipController(PlacementSlipService slips, PlacementBatchService batch) {
+  public SlipController(
+      PlacementSlipService slips, PlacementBatchService batch, FileDownloads downloads) {
+    this.downloads = downloads;
     this.slips = slips;
     this.batch = batch;
   }
@@ -154,25 +156,19 @@ public class SlipController {
   }
 
   /**
-   * Downloads a slip file.
+   * Downloads a slip file: a redirect to its presigned link, or the bytes of a file rendered before
+   * ST1.
    *
    * @param id slip
    * @param format pdf or xlsx
-   * @return file
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or file
    */
   @GetMapping("/{id}/files/{format}")
   @PreAuthorize(PlacementController.VIEW)
-  public ResponseEntity<byte[]> file(@PathVariable Long id, @PathVariable String format) {
-    SlipFile file = slips.file(id, formatOf(format));
-    MediaType type =
-        PlacementSlipService.PDF.equals(file.getFormat())
-            ? MediaType.APPLICATION_PDF
-            : MediaType.parseMediaType(
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    return ResponseEntity.ok()
-        .contentType(type)
-        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(file.getFileName()))
-        .body(file.getContent());
+  public ResponseEntity<byte[]> file(
+      @PathVariable Long id, @PathVariable String format, HttpServletRequest request) {
+    return downloads.respond(slips.file(id, formatOf(format)), request);
   }
 
   private static String formatOf(String format) {

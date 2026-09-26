@@ -71,9 +71,9 @@ class ReportArchiveIT {
         .andExpect(jsonPath("$[?(@.code == 'OPS-TEST-ARCHIVED')].exportable").value(false));
     api.doGet("cashier", "/api/v1/reports")
         .andExpect(jsonPath("$[?(@.code == 'OPS-TEST-ARCHIVED')].exportable").value(true));
-    api.doGet("cashier", "/api/v1/reports/runs/" + exported.getId() + "/file")
+    api.download("cashier", "/api/v1/reports/runs/" + exported.getId() + "/file")
         .andExpect(status().isOk());
-    api.doGet("comptrol", "/api/v1/reports/runs/" + exported.getId() + "/file")
+    api.download("comptrol", "/api/v1/reports/runs/" + exported.getId() + "/file")
         .andExpect(status().isForbidden());
   }
 

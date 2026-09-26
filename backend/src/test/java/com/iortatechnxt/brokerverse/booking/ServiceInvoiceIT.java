@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceTypeService;
 import com.iortatechnxt.brokerverse.messaging.service.MessageService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import com.iortatechnxt.brokerverse.support.StoredDownloads;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,7 @@ class ServiceInvoiceIT {
   @Autowired private MessageService messages;
   @Autowired private PlatformTransactionManager txManager;
   @Autowired private AsUser as;
+  @Autowired private StoredDownloads downloads;
 
   private IssueRequest internal(String amount) {
     return new IssueRequest(
@@ -74,7 +76,10 @@ class ServiceInvoiceIT {
     assertThat(first.getSiNo()).startsWith("SI-HO-2026-");
     assertThat(first.getNetAmount()).isEqualByComparingTo("102.00");
     assertThat(first.getDispatchStatus()).isEqualTo(DispatchStatus.NOT_SENT);
-    assertThat(new String(register.document(first.getId()), 0, 4, StandardCharsets.US_ASCII))
+    assertThat(register.document(first.getId()).isStored()).isTrue();
+    assertThat(
+            new String(
+                downloads.bytes(register.document(first.getId())), 0, 4, StandardCharsets.US_ASCII))
         .isEqualTo("%PDF");
     assertThat(register.search(fx.company(), first.getSiNo(), SiKind.INVOICE, PageRequest.of(0, 5)))
         .hasSize(1);

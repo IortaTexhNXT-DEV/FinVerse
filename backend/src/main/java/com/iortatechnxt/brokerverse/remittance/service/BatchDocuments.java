@@ -13,9 +13,7 @@ import com.iortatechnxt.brokerverse.docgen.service.MergedText;
 import com.iortatechnxt.brokerverse.docgen.service.SheetSpec;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.party.service.PartyService;
-import com.iortatechnxt.brokerverse.remittance.domain.BatchDocument;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchDocument.StoredFile;
-import com.iortatechnxt.brokerverse.remittance.domain.BatchDocumentRepository;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLine;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceAmounts;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch;
@@ -36,7 +34,8 @@ import org.springframework.stereotype.Component;
  * Remittance documents (RMTID.011, Annex III): the remittance schedule as PDF and Excel (layout per
  * type, With Incentives with the incentive columns; the Mall Assurance columns of the Normal layout
  * are parked with the layouts, OQ42) and the payment request to Disbursement. Documents are
- * rendered live before submission and stored on the batch at submission with the template version.
+ * rendered live before submission and stored on the batch at submission with the template version
+ * ({@link BatchDocumentStore}).
  */
 @Component
 public class BatchDocuments {
@@ -76,7 +75,6 @@ public class BatchDocuments {
 
   private final DocTemplateService templates;
   private final DocumentComposer composer;
-  private final BatchDocumentRepository documents;
   private final OrganizationService organization;
   private final PartyService parties;
   private final Clock clock;
@@ -86,7 +84,6 @@ public class BatchDocuments {
    *
    * @param templates templates
    * @param composer PDF / XLSX composer
-   * @param documents stored documents
    * @param organization company names
    * @param parties insurer names
    * @param clock clock
@@ -94,49 +91,14 @@ public class BatchDocuments {
   public BatchDocuments(
       DocTemplateService templates,
       DocumentComposer composer,
-      BatchDocumentRepository documents,
       OrganizationService organization,
       PartyService parties,
       Clock clock) {
     this.templates = templates;
     this.composer = composer;
-    this.documents = documents;
     this.organization = organization;
     this.parties = parties;
     this.clock = clock;
-  }
-
-  /**
-   * A document of a batch: the stored one after submission, else rendered now.
-   *
-   * @param batch batch with lines
-   * @param kind kind
-   * @return file
-   */
-  public StoredFile document(RemittanceBatch batch, DocumentKind kind) {
-    return documents
-        .findByBatchIdAndKind(batch.getId(), kind)
-        .map(
-            d ->
-                new StoredFile(
-                    d.getFileName(), d.getContentType(), d.getContent(), d.getTemplateVersion()))
-        .orElseGet(() -> render(batch, kind));
-  }
-
-  /**
-   * Renders and stores the three documents on the batch (submission, RMTID.011).
-   *
-   * @param batch batch with lines
-   */
-  public void store(RemittanceBatch batch) {
-    for (DocumentKind kind : DocumentKind.values()) {
-      StoredFile file = render(batch, kind);
-      documents
-          .findByBatchIdAndKind(batch.getId(), kind)
-          .ifPresentOrElse(
-              d -> d.replace(file),
-              () -> documents.save(new BatchDocument(batch.getId(), kind, file)));
-    }
   }
 
   /**

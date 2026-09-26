@@ -5,22 +5,20 @@ import com.iortatechnxt.brokerverse.collections.billing.api.dto.BillingDtos.Gene
 import com.iortatechnxt.brokerverse.collections.billing.api.dto.BillingDtos.RecipientResponse;
 import com.iortatechnxt.brokerverse.collections.billing.api.dto.BillingDtos.SendRequest;
 import com.iortatechnxt.brokerverse.collections.billing.api.dto.BillingDtos.StatementResponse;
-import com.iortatechnxt.brokerverse.collections.billing.domain.BillingDocument;
 import com.iortatechnxt.brokerverse.collections.billing.domain.BillingStatement.StatementStatus;
 import com.iortatechnxt.brokerverse.collections.billing.service.BillingStatementService;
 import com.iortatechnxt.brokerverse.collections.billing.service.SoaDispatch;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,14 +43,18 @@ public class BillingStatementController {
 
   private final BillingStatementService statements;
   private final SoaDispatch dispatch;
+  private final FileDownloads downloads;
 
   /**
    * Creates the controller.
    *
    * @param statements statements
    * @param dispatch e-mail
+   * @param downloads file download answers
    */
-  public BillingStatementController(BillingStatementService statements, SoaDispatch dispatch) {
+  public BillingStatementController(
+      BillingStatementService statements, SoaDispatch dispatch, FileDownloads downloads) {
+    this.downloads = downloads;
     this.statements = statements;
     this.dispatch = dispatch;
   }
@@ -145,21 +147,17 @@ public class BillingStatementController {
   }
 
   /**
-   * The PDF of a statement.
+   * The PDF of a statement: a redirect to its presigned link, or the bytes of a PDF rendered before
+   * ST1.
    *
    * @param id statement
-   * @return file
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or file
    */
   @GetMapping("/{id}/document")
   @PreAuthorize("hasAuthority('CLX_VIEW')")
-  public ResponseEntity<byte[]> document(@PathVariable Long id) {
-    BillingDocument file = statements.document(id);
-    return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(file.getContentType()))
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION,
-            ContentDisposition.attachment().filename(file.getFileName()).build().toString())
-        .body(file.getContent());
+  public ResponseEntity<byte[]> document(@PathVariable Long id, HttpServletRequest request) {
+    return downloads.respond(statements.download(id), request);
   }
 
   /**

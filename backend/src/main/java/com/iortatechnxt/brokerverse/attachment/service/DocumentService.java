@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
+import com.iortatechnxt.brokerverse.storage.service.FileDownload;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -153,7 +154,7 @@ public class DocumentService {
           options.nominate()
               ? naming.nominate(options.reference(), type, ++sequence, file.name())
               : file.name();
-      Attachment a = attachments.upload(target, name, file.content(), options.description());
+      Attachment a = attachments.upload(target, name, file.content(), options.description(), type);
       a.classify(type);
       a.tagProcess(blankToNull(options.processTag()));
       saved.add(a);
@@ -267,6 +268,18 @@ public class DocumentService {
   public AttachmentFile download(Long id) {
     access.requireView(attachments.get(id));
     return attachments.download(id);
+  }
+
+  /**
+   * One document the current user may see, for the download endpoint: a presigned link to the
+   * stored file, or the bytes of a file attached before ST1 and not yet copied; audited.
+   *
+   * @param id attachment id
+   * @return download
+   */
+  public FileDownload downloadable(Long id) {
+    access.requireView(attachments.get(id));
+    return attachments.downloadable(id);
   }
 
   /**

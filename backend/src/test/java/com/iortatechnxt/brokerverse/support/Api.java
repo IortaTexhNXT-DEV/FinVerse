@@ -6,10 +6,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,6 +36,21 @@ public class Api {
 
   public ResultActions doGet(String username, String url) throws Exception {
     return mvc.perform(as(username, get(url)));
+  }
+
+  /**
+   * A download endpoint of a module (build step ST1): a stored file answers with a redirect to its
+   * presigned link, which is followed as the same user (the local store serves the link); content
+   * still in the database (or built on the fly) answers directly.
+   */
+  public ResultActions download(String username, String url) throws Exception {
+    ResultActions first = doGet(username, url);
+    MockHttpServletResponse response = first.andReturn().getResponse();
+    if (response.getStatus() != HttpStatus.FOUND.value()) {
+      return first;
+    }
+    first.andExpect(header().string(HttpHeaders.CACHE_CONTROL, "no-store"));
+    return doGet(username, response.getHeader(HttpHeaders.LOCATION));
   }
 
   public ResultActions doPost(String username, String url, Object body) throws Exception {

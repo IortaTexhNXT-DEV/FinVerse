@@ -361,13 +361,13 @@ class ScreeningEndToEndApiIT {
             .get("id")
             .asLong();
     String file =
-        api.doGet(MAKER, BASE + "/str/extractions/" + extractionId + "/file")
+        api.download(MAKER, BASE + "/str/extractions/" + extractionId + "/file")
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()
             .getContentAsString(StandardCharsets.UTF_8);
     assertThat(file).contains(strNo);
-    api.doGet(UCC, BASE + "/str/extractions/" + extractionId + "/file")
+    api.download(UCC, BASE + "/str/extractions/" + extractionId + "/file")
         .andExpect(status().isForbidden());
     api.doPost(
             MAKER,

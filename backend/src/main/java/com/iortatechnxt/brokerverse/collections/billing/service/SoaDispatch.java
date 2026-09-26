@@ -92,7 +92,9 @@ public class SoaDispatch {
                 mail.cc(),
                 mail.subject(),
                 mail.body(),
-                List.of(new MessageFile(pdf.getFileName(), pdf.getContentType(), pdf.getContent())),
+                List.of(
+                    new MessageFile(
+                        pdf.getFileName(), pdf.getContentType(), statements.content(pdf))),
                 new OutboundEmail.Protection(null, true, mail.passwordHint()),
                 new RecordLink(
                     BillingStatementService.ENTITY, String.valueOf(id), soa.getSoaNo())));

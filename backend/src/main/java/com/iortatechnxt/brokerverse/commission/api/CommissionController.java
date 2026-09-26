@@ -14,21 +14,20 @@ import com.iortatechnxt.brokerverse.commission.service.DpBillingService;
 import com.iortatechnxt.brokerverse.commission.service.DpResponseHandler;
 import com.iortatechnxt.brokerverse.commission.service.EstimatedItemService;
 import com.iortatechnxt.brokerverse.commission.service.FeedbackCalendar;
-import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
-import com.iortatechnxt.brokerverse.opsledger.domain.ExtractFile;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInRun;
 import com.iortatechnxt.brokerverse.opsledger.service.ExtractRepositoryService;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInHandler.FlowInFile;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInService;
+import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -56,6 +55,7 @@ public class CommissionController {
   private final ExtractRepositoryService repository;
   private final FlowInService flowIn;
   private final SystemParameterService parameters;
+  private final FileDownloads downloads;
 
   /**
    * Creates the controller.
@@ -66,6 +66,7 @@ public class CommissionController {
    * @param repository extract repository (billing files)
    * @param flowIn flow-in (insurer answers)
    * @param parameters business parameters
+   * @param downloads file download answers
    */
   public CommissionController(
       CertificateService certificates,
@@ -73,7 +74,9 @@ public class CommissionController {
       DpBillingService billings,
       ExtractRepositoryService repository,
       FlowInService flowIn,
-      SystemParameterService parameters) {
+      SystemParameterService parameters,
+      FileDownloads downloads) {
+    this.downloads = downloads;
     this.certificates = certificates;
     this.estimated = estimated;
     this.billings = billings;
@@ -224,23 +227,21 @@ public class CommissionController {
   }
 
   /**
-   * Downloads a billing file.
+   * Downloads a billing file: a redirect to its presigned link, or the bytes of a file kept before
+   * ST1.
    *
    * @param id billing
-   * @return the workbook
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or the workbook
    */
   @GetMapping("/dp/billings/{id}/file")
   @PreAuthorize(CommissionAccess.READ)
-  public ResponseEntity<byte[]> billingFile(@PathVariable Long id) {
+  public ResponseEntity<byte[]> billingFile(@PathVariable Long id, HttpServletRequest request) {
     DpBilling billing = billings.require(id);
     if (billing.getFileId() == null) {
       throw new ResourceNotFoundException("Billing file", billing.getBillingNo());
     }
-    ExtractFile file = repository.download(billing.getFileId());
-    return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(file.getContentType()))
-        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(file.getFileName()))
-        .body(file.getContent());
+    return downloads.respond(repository.downloadable(billing.getFileId()), request);
   }
 
   /**

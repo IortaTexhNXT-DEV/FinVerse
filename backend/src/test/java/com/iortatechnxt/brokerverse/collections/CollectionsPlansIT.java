@@ -20,6 +20,7 @@ import com.iortatechnxt.brokerverse.messaging.service.MessageService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import com.iortatechnxt.brokerverse.support.StoredDownloads;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
@@ -47,6 +48,7 @@ class CollectionsPlansIT {
   @Autowired private SoaDispatch dispatch;
   @Autowired private MessageService messages;
   @Autowired private AsUser as;
+  @Autowired private StoredDownloads downloads;
 
   private static BigDecimal d(String v) {
     return new BigDecimal(v);
@@ -121,7 +123,7 @@ class CollectionsPlansIT {
         .extracting(l -> l.getKind().name())
         .contains("CURRENT");
     assertThat(statements.forPlan(plan.getId())).hasSize(3);
-    byte[] pdf = statements.document(soas.get(0).getId()).getContent();
+    byte[] pdf = downloads.bytes(statements.download(soas.get(0).getId()));
     assertThat(new String(pdf, 0, 4, StandardCharsets.US_ASCII)).isEqualTo("%PDF");
     assertThat(statements.get(soas.get(0).getId()).getTemplateCode()).isEqualTo("CLX_SOA");
 

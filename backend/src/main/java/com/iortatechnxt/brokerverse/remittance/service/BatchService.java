@@ -48,7 +48,7 @@ public class BatchService {
   private final InvoiceTagRepository tags;
   private final BatchLedger batchLedger;
   private final BatchPosting posting;
-  private final BatchDocuments documents;
+  private final BatchDocumentStore documents;
   private final SpecialRemittanceService specials;
   private final WorkflowService workflow;
   private final WorkflowViewService workflowViews;
@@ -85,7 +85,7 @@ public class BatchService {
       InvoiceTagRepository tags,
       BatchLedger batchLedger,
       BatchPosting posting,
-      BatchDocuments documents,
+      BatchDocumentStore documents,
       SpecialRemittanceService specials,
       WorkflowService workflow,
       WorkflowViewService workflowViews,

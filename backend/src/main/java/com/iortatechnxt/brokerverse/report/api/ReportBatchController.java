@@ -1,17 +1,14 @@
 package com.iortatechnxt.brokerverse.report.api;
 
-import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
-import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.report.api.dto.ReportBatchRequest;
 import com.iortatechnxt.brokerverse.report.api.dto.ReportBatchResponse;
 import com.iortatechnxt.brokerverse.report.core.ReportBatchService;
-import com.iortatechnxt.brokerverse.report.domain.ReportBatch;
+import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,13 +32,16 @@ public class ReportBatchController {
   private static final int MAX_PAGE_SIZE = 100;
 
   private final ReportBatchService service;
+  private final FileDownloads downloads;
 
   /**
    * Creates the controller.
    *
    * @param service batch service
+   * @param downloads file download answers
    */
-  public ReportBatchController(ReportBatchService service) {
+  public ReportBatchController(ReportBatchService service, FileDownloads downloads) {
+    this.downloads = downloads;
     this.service = service;
   }
 
@@ -84,23 +84,15 @@ public class ReportBatchController {
   }
 
   /**
-   * The batch file (ZIP or merged PDF).
+   * The batch file (ZIP or merged PDF): a redirect to its presigned link, or the bytes of a batch
+   * completed before ST1.
    *
    * @param id batch
-   * @return file
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or file
    */
   @GetMapping("/{id}/file")
-  public ResponseEntity<byte[]> file(@PathVariable Long id) {
-    ReportBatch batch = service.get(id);
-    byte[] content = batch.getContent();
-    if (content == null) {
-      throw new BusinessRuleException(
-          "REPORT_BATCH_EMPTY", "Batch " + batch.getBatchNo() + " produced no file");
-    }
-    return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(batch.getContentType()))
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(batch.getFileName()))
-        .body(content);
+  public ResponseEntity<byte[]> file(@PathVariable Long id, HttpServletRequest request) {
+    return downloads.respond(service.file(id), request);
   }
 }

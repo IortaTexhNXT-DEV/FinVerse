@@ -124,7 +124,7 @@ class CommissionApiIT {
             Map.of("to", List.of("billing@insurer-seed.ph")))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.stage").value(DpBilling.AWAITING));
-    api.doGet(HANDLER, BASE + "/dp/billings/" + id + "/file").andExpect(status().isOk());
+    api.download(HANDLER, BASE + "/dp/billings/" + id + "/file").andExpect(status().isOk());
     api.doPost(HANDLER, BASE + "/dp/billings/" + id + "/cancel", Map.of("comment", "late"))
         .andExpect(status().is4xxClientError());
     Map<String, Object> answer = new HashMap<>();

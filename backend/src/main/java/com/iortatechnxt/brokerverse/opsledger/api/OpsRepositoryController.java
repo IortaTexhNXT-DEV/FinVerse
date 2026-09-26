@@ -1,19 +1,17 @@
 package com.iortatechnxt.brokerverse.opsledger.api;
 
-import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
 import com.iortatechnxt.brokerverse.opsledger.api.dto.QueueDtos.ExtractFileResponse;
 import com.iortatechnxt.brokerverse.opsledger.api.dto.QueueDtos.HandoffResponse;
-import com.iortatechnxt.brokerverse.opsledger.domain.ExtractFile;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsHandoff;
 import com.iortatechnxt.brokerverse.opsledger.service.ExtractRepositoryService;
 import com.iortatechnxt.brokerverse.opsledger.service.HandoffService;
+import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,14 +32,18 @@ public class OpsRepositoryController {
 
   private final ExtractRepositoryService extracts;
   private final HandoffService handoffs;
+  private final FileDownloads downloads;
 
   /**
    * Creates the controller.
    *
    * @param extracts extract repository
    * @param handoffs hand-offs
+   * @param downloads file download answers
    */
-  public OpsRepositoryController(ExtractRepositoryService extracts, HandoffService handoffs) {
+  public OpsRepositoryController(
+      ExtractRepositoryService extracts, HandoffService handoffs, FileDownloads downloads) {
+    this.downloads = downloads;
     this.extracts = extracts;
     this.handoffs = handoffs;
   }
@@ -61,19 +63,17 @@ public class OpsRepositoryController {
   }
 
   /**
-   * Downloads a file of the extract repository.
+   * Downloads a file of the extract repository: a redirect to its presigned link, or the bytes of a
+   * file kept before ST1.
    *
    * @param id file
-   * @return file
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or file
    */
   @GetMapping("/extracts/{id}/file")
   @PreAuthorize(OpsAccess.VIEW)
-  public ResponseEntity<byte[]> extract(@PathVariable Long id) {
-    ExtractFile file = extracts.download(id);
-    return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(file.getContentType()))
-        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(file.getFileName()))
-        .body(file.getContent());
+  public ResponseEntity<byte[]> extract(@PathVariable Long id, HttpServletRequest request) {
+    return downloads.respond(extracts.downloadable(id), request);
   }
 
   /**

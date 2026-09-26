@@ -251,10 +251,8 @@
 }
 
 .kpi-label {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
   color: var(--color-text-muted);
 }
 

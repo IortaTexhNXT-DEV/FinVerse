@@ -10,7 +10,9 @@ import jakarta.persistence.Table;
 
 /**
  * A document stored on a batch at submission (RMTID.011): the remittance schedule (PDF and Excel)
- * and the payment request, with the template version used (BRNB.004 convention).
+ * and the payment request, with the template version used (BRNB.004 convention). The content is in
+ * the file store ({@code stored_file}, build step ST1); documents stored before ST1 keep their
+ * bytes in {@code content} until {@code FILE_BYTEA_MIGRATION} copies them.
  */
 @Entity
 @Table(name = "rem_batch_document")
@@ -29,8 +31,11 @@ public class BatchDocument extends BaseEntity {
   @Column(name = "content_type", nullable = false, length = 100)
   private String contentType;
 
-  @Column(nullable = false)
+  @Column(name = "content")
   private byte[] content;
+
+  @Column(name = "stored_file_id")
+  private Long storedFileId;
 
   @Column(name = "template_version", length = 60)
   private String templateVersion;
@@ -62,8 +67,28 @@ public class BatchDocument extends BaseEntity {
   private void apply(StoredFile file) {
     this.fileName = file.fileName();
     this.contentType = file.contentType();
-    this.content = file.content();
+    this.content = null;
+    this.storedFileId = null;
     this.templateVersion = file.templateVersion();
+  }
+
+  /**
+   * Records the stored file that holds the content.
+   *
+   * @param id stored file id
+   */
+  public void storedIn(Long id) {
+    this.storedFileId = id;
+  }
+
+  /**
+   * The stored file that holds the content; null for a document stored before ST1 and not yet
+   * copied.
+   *
+   * @return stored file id
+   */
+  public Long getStoredFileId() {
+    return storedFileId;
   }
 
   public Long getBatchId() {
@@ -83,12 +108,12 @@ public class BatchDocument extends BaseEntity {
   }
 
   /**
-   * The file.
+   * The bytes of a document stored before ST1 and not yet copied to the file store.
    *
-   * @return bytes
+   * @return bytes, null when the content is in the file store
    */
   public byte[] getContent() {
-    return content.clone();
+    return content == null ? null : content.clone();
   }
 
   public String getTemplateVersion() {

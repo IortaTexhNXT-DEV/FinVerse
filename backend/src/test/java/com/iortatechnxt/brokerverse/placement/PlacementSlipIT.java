@@ -19,9 +19,11 @@ import com.iortatechnxt.brokerverse.placement.service.PlacementSlipService.Readi
 import com.iortatechnxt.brokerverse.placement.service.PlacementSlipService.SlipEmail;
 import com.iortatechnxt.brokerverse.placement.service.SlipPrerequisites.Unmet;
 import com.iortatechnxt.brokerverse.placement.service.WorkbenchTab;
+import com.iortatechnxt.brokerverse.storage.service.FileDownload;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.PlacementTestData;
+import com.iortatechnxt.brokerverse.support.StoredDownloads;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,7 @@ class PlacementSlipIT {
   @Autowired private AccountQueryService accounts;
   @Autowired private PlacementTestData fx;
   @Autowired private AsUser as;
+  @Autowired private StoredDownloads downloads;
 
   private AccountStatus status(String arn) {
     return accounts.requireByArn(arn).getStatus();
@@ -72,11 +75,12 @@ class PlacementSlipIT {
     assertThat(slip.getSlipNo()).startsWith("PL-");
     assertThat(slip.getAccounts()).hasSize(2);
     assertThat(slip.getStatus()).isEqualTo(SlipStatus.GENERATED);
+    FileDownload pdf = as.run("proc", () -> slips.file(slip.getId(), PlacementSlipService.PDF));
+    assertThat(pdf.isStored()).isTrue();
+    assertThat(downloads.bytes(pdf)).startsWith((byte) '%');
     assertThat(
-            as.run("proc", () -> slips.file(slip.getId(), PlacementSlipService.PDF).getContent()))
-        .startsWith((byte) '%');
-    assertThat(
-            as.run("proc", () -> slips.file(slip.getId(), PlacementSlipService.XLSX).getFileName()))
+            downloads.fileName(
+                as.run("proc", () -> slips.file(slip.getId(), PlacementSlipService.XLSX))))
         .endsWith(".xlsx");
 
     SlipEmail draft = slips.draft(slip.getId());

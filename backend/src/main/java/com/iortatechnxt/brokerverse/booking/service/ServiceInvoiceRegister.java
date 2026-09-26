@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.booking.domain.ServiceInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.ServiceInvoiceRepository;
 import com.iortatechnxt.brokerverse.booking.domain.SiKind;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.storage.service.FileDownload;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,15 +74,16 @@ public class ServiceInvoiceRegister {
   }
 
   /**
-   * The stored PDF of a service invoice.
+   * The PDF of a service invoice as issued, for the download endpoint: a presigned link to the
+   * stored file, or the bytes of a service invoice issued before ST1.
    *
    * @param id service invoice
-   * @return PDF bytes
+   * @return download
    */
-  public byte[] document(Long id) {
-    return serviceInvoices
-        .findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException(ServiceInvoiceDispatch.ENTITY, id))
-        .getDocument();
+  public FileDownload document(Long id) {
+    return ServiceInvoiceDocument.download(
+        serviceInvoices
+            .findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException(ServiceInvoiceDispatch.ENTITY, id)));
   }
 }

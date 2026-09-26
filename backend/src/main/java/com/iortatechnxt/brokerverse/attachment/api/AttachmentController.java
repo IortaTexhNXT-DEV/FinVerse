@@ -5,12 +5,13 @@ import com.iortatechnxt.brokerverse.attachment.api.dto.LinkRequest;
 import com.iortatechnxt.brokerverse.attachment.domain.AllowedFileType;
 import com.iortatechnxt.brokerverse.attachment.domain.AttachmentTarget;
 import com.iortatechnxt.brokerverse.attachment.service.AttachmentService;
-import com.iortatechnxt.brokerverse.attachment.service.AttachmentService.AttachmentFile;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentNamingService;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadOptions;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
+import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,14 +48,18 @@ public class AttachmentController {
 
   private final AttachmentService service;
   private final DocumentService documents;
+  private final FileDownloads downloads;
 
   /**
    * Creates the controller.
    *
    * @param service attachment service
    * @param documents document features
+   * @param downloads file download answers
    */
-  public AttachmentController(AttachmentService service, DocumentService documents) {
+  public AttachmentController(
+      AttachmentService service, DocumentService documents, FileDownloads downloads) {
+    this.downloads = downloads;
     this.service = service;
     this.documents = documents;
   }
@@ -161,21 +166,17 @@ public class AttachmentController {
   }
 
   /**
-   * Downloads a file the user may see (document access classes, BRID-025).
+   * Downloads a file the user may see (document access classes, BRID-025): a redirect to the
+   * presigned link of the stored file, or the bytes of a file not yet copied to the file store.
    *
    * @param id id
-   * @return file
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or file
    */
   @GetMapping("/{id}/content")
   @PreAuthorize(VIEW)
-  public ResponseEntity<byte[]> download(@PathVariable Long id) {
-    AttachmentFile file = documents.download(id);
-    return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(file.metadata().getContentType()))
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION,
-            ContentDispositions.attachment(file.metadata().getFileName()))
-        .body(file.content());
+  public ResponseEntity<byte[]> download(@PathVariable Long id, HttpServletRequest request) {
+    return downloads.respond(documents.downloadable(id), request);
   }
 
   /**

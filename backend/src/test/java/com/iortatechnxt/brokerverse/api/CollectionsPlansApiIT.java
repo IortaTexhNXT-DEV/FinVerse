@@ -94,7 +94,7 @@ class CollectionsPlansApiIT {
     api.doGet(TEAM_LEAD, STATEMENTS + "?companyId=" + company + "&q=" + year1.getArn())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.totalElements").value(1));
-    api.doGet(TEAM_LEAD, STATEMENTS + "/" + soaId + "/document")
+    api.download(TEAM_LEAD, STATEMENTS + "/" + soaId + "/document")
         .andExpect(status().isOk())
         .andExpect(header().string("Content-Type", "application/pdf"));
     api.doGet(HANDLER, STATEMENTS + "/" + soaId + "/recipient").andExpect(status().isOk());

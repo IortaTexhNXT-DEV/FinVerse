@@ -132,10 +132,10 @@ class CollectionsAccountingFoundationApiIT {
     api.doGet("comptrol", "/api/v1/reports/runs?code=" + TestArchivedReport.CODE)
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content[?(@.action == 'GENERATE')]").exists());
-    api.doGet("cashier", "/api/v1/reports/runs/" + later.getId() + "/file")
+    api.download("cashier", "/api/v1/reports/runs/" + later.getId() + "/file")
         .andExpect(status().isUnprocessableEntity())
         .andExpect(jsonPath("$.code").value("REPORT_FILE_NOT_AVAILABLE"));
-    api.doGet("cashier", "/api/v1/reports/runs/" + ready.getId() + "/file")
+    api.download("cashier", "/api/v1/reports/runs/" + ready.getId() + "/file")
         .andExpect(status().isOk());
 
     ReportRun generated =
@@ -147,7 +147,7 @@ class CollectionsAccountingFoundationApiIT {
     assertThat(generated.getAction()).isEqualTo(ReportRunAction.GENERATE);
     assertThat(generated.getRowCount()).isEqualTo(1);
     assertThat(generated.getAvailableFrom()).isNull();
-    api.doGet("cashier", "/api/v1/reports/runs/" + generated.getId() + "/file")
+    api.download("cashier", "/api/v1/reports/runs/" + generated.getId() + "/file")
         .andExpect(status().isOk());
   }
 }

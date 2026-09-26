@@ -27,6 +27,11 @@ import com.iortatechnxt.brokerverse.issuance.domain.AdviceTrigger;
 import com.iortatechnxt.brokerverse.issuance.domain.InsuranceAdvice;
 import com.iortatechnxt.brokerverse.issuance.domain.InsuranceAdviceRepository;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
+import com.iortatechnxt.brokerverse.storage.domain.FileOrigin;
+import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
+import com.iortatechnxt.brokerverse.storage.service.FileDownload;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService.StoreRequest;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -59,6 +64,11 @@ public class InsuranceAdviceService {
   /** Audit entity type. */
   public static final String ENTITY = "InsuranceAdvice";
 
+  /** Record class of Insurance Advices. */
+  public static final String RECORD_CLASS = "POLICY_DOCUMENT";
+
+  private static final String PDF = "application/pdf";
+
   /** Parameter: automatic generation event. */
   public static final String TRIGGER_PARAMETER = "IA_TRIGGER";
 
@@ -69,6 +79,7 @@ public class InsuranceAdviceService {
       EnumSet.of(AccountStatus.PLACED, AccountStatus.POLICY_ISSUED, AccountStatus.BOOKED);
 
   private final InsuranceAdviceRepository advices;
+  private final StoredFileService storedFiles;
   private final AccountQueryService accounts;
   private final InsurerService insurers;
   private final DocTemplateService templates;
@@ -83,6 +94,7 @@ public class InsuranceAdviceService {
    * Creates the service.
    *
    * @param advices insurance advices
+   * @param storedFiles file store (advice PDFs)
    * @param accounts account reads
    * @param insurers insurer panel
    * @param templates document templates
@@ -95,6 +107,7 @@ public class InsuranceAdviceService {
    */
   public InsuranceAdviceService(
       InsuranceAdviceRepository advices,
+      StoredFileService storedFiles,
       AccountQueryService accounts,
       InsurerService insurers,
       DocTemplateService templates,
@@ -105,6 +118,7 @@ public class InsuranceAdviceService {
       AuditTrailService audit,
       Clock clock) {
     this.advices = advices;
+    this.storedFiles = storedFiles;
     this.accounts = accounts;
     this.insurers = insurers;
     this.templates = templates;
@@ -178,6 +192,19 @@ public class InsuranceAdviceService {
                     account.getInsurerCode(),
                     policies),
                 new AdviceDocument(trigger, text.versionTag(), iaNo + ".pdf", sha256(pdf), pdf)));
+    saved.storedIn(
+        storedFiles
+            .storeChecked(
+                new StoreRequest(
+                    new FileOwner(account.getCompanyId(), ENTITY, String.valueOf(saved.getId())),
+                    TEMPLATE,
+                    RECORD_CLASS,
+                    saved.getFileName(),
+                    pdf,
+                    saved.getSha256()),
+                PDF,
+                FileOrigin.GENERATED)
+            .getId());
     audit.record(
         ENTITY, iaNo, AuditAction.CREATE, "Insurance Advice for " + arn + " (" + trigger + ")");
     return saved;
@@ -288,16 +315,32 @@ public class InsuranceAdviceService {
   }
 
   /**
-   * Downloads an advice; the download is audited.
+   * The PDF of an advice for the download endpoint: a presigned link to the stored file, or the
+   * bytes of an advice generated before ST1; the download is audited.
    *
    * @param id advice
-   * @return advice with its PDF
+   * @return download
    */
-  public InsuranceAdvice download(Long id) {
+  public FileDownload download(Long id) {
     InsuranceAdvice advice = get(id);
     audit.record(
         ENTITY, advice.getIaNo(), AuditAction.EXPORT, "Downloaded " + advice.getFileName());
-    return advice;
+    return advice.getStoredFileId() == null
+        ? FileDownload.inline(advice.getFileName(), PDF, advice.getContent())
+        : FileDownload.stored(advice.getStoredFileId());
+  }
+
+  /**
+   * The PDF of an advice (e-mail attachment): read from the file store with its SHA-256 checked, or
+   * from the row for an advice generated before ST1.
+   *
+   * @param advice advice
+   * @return bytes
+   */
+  public byte[] content(InsuranceAdvice advice) {
+    return advice.getStoredFileId() == null
+        ? advice.getContent()
+        : storedFiles.read(advice.getStoredFileId());
   }
 
   static String sha256(byte[] content) {

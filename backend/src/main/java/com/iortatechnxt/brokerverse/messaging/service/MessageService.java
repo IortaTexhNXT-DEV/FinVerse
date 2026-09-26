@@ -7,11 +7,16 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.util.EmailAddresses;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundAttachment;
+import com.iortatechnxt.brokerverse.messaging.domain.OutboundAttachment.StoredContent;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundAttachmentRepository;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage.Addressing;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessageRepository;
 import com.iortatechnxt.brokerverse.messaging.service.OutboundEmail.Protection;
+import com.iortatechnxt.brokerverse.storage.domain.FileOrigin;
+import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService.StoreRequest;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -38,11 +43,18 @@ public class MessageService {
   /** Purpose code of the separate password e-mail. */
   public static final String PASSWORD_PURPOSE = "PASSWORD";
 
-  private static final String ENTITY = "OutboundMessage";
+  /** Owner entity type of the stored attachments of e-mails. */
+  public static final String OWNER_TYPE = "OutboundMessage";
+
+  /** Record class of e-mail attachments as sent. */
+  public static final String RECORD_CLASS = "GENERAL_DOCUMENT";
+
+  private static final String ENTITY = OWNER_TYPE;
   private static final int MAX_ADDRESS_LIST = 1000;
 
   private final OutboundMessageRepository messages;
   private final OutboundAttachmentRepository attachments;
+  private final StoredFileService storedFiles;
   private final DocumentProtector protector;
   private final DocumentPasswordPolicy passwords;
   private final ApplicationEventPublisher events;
@@ -53,6 +65,7 @@ public class MessageService {
    *
    * @param messages messages
    * @param attachments attachments
+   * @param storedFiles file store (attachments as sent)
    * @param protector document protection
    * @param passwords password convention
    * @param events event publisher (dispatch after commit)
@@ -61,12 +74,14 @@ public class MessageService {
   public MessageService(
       OutboundMessageRepository messages,
       OutboundAttachmentRepository attachments,
+      StoredFileService storedFiles,
       DocumentProtector protector,
       DocumentPasswordPolicy passwords,
       ApplicationEventPublisher events,
       AuditTrailService audit) {
     this.messages = messages;
     this.attachments = attachments;
+    this.storedFiles = storedFiles;
     this.protector = protector;
     this.passwords = passwords;
     this.events = events;
@@ -100,7 +115,10 @@ public class MessageService {
     for (MessageFile file : email.attachments()) {
       MessageFile sent = password == null ? file : protector.protect(file, password);
       attachments.save(
-          new OutboundAttachment(message.getId(), sent, sha256(sent.content()), password != null));
+          new OutboundAttachment(
+              message.getId(),
+              sent,
+              new StoredContent(store(message, sent), sha256(sent.content()), password != null)));
     }
     audit.record(
         ENTITY,
@@ -119,6 +137,26 @@ public class MessageService {
       passwordMessageId = queuePasswordMail(email, to, message, password).getId();
     }
     return new QueuedEmail(message.getId(), passwordMessageId);
+  }
+
+  /**
+   * Keeps an attachment as sent in the file store (owner type {@value #OWNER_TYPE}, the message).
+   * Protected files cannot be scanned; like every file the application sends, they are recorded as
+   * generated.
+   */
+  private Long store(OutboundMessage message, MessageFile sent) {
+    return storedFiles
+        .storeChecked(
+            new StoreRequest(
+                new FileOwner(message.getCompanyId(), OWNER_TYPE, String.valueOf(message.getId())),
+                message.getPurpose(),
+                RECORD_CLASS,
+                sent.fileName(),
+                sent.content(),
+                null),
+            sent.mimeType(),
+            FileOrigin.GENERATED)
+        .getId();
   }
 
   private OutboundMessage queuePasswordMail(
@@ -184,7 +222,7 @@ public class MessageService {
   }
 
   /**
-   * Attachments of a message (metadata and content).
+   * Attachments of a message (metadata).
    *
    * @param messageId message
    * @return attachments

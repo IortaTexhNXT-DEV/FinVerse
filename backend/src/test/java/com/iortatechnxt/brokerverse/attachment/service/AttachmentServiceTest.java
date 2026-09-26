@@ -17,6 +17,8 @@ import com.iortatechnxt.brokerverse.attachment.service.VirusScanner.ScanVerdict;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.storage.domain.StoredFile;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.util.List;
@@ -28,11 +30,13 @@ class AttachmentServiceTest {
 
   private final AttachmentRepository attachments = mock(AttachmentRepository.class);
   private final AttachmentContentRepository contents = mock(AttachmentContentRepository.class);
+  private final StoredFileService storedFiles = mock(StoredFileService.class);
 
   private AttachmentService service(VirusScanner scanner, DataSize max) {
     return new AttachmentService(
         attachments,
         contents,
+        storedFiles,
         List.of(scanner),
         new AttachmentProperties(max),
         mock(AuditTrailService.class),
@@ -72,8 +76,13 @@ class AttachmentServiceTest {
     var target = new AttachmentTarget("Party", "C-1");
     byte[] csv = "x\n".getBytes(StandardCharsets.UTF_8);
     when(attachments.save(any())).thenAnswer(i -> i.getArgument(0));
+    StoredFile stored = mock(StoredFile.class);
+    when(stored.getId()).thenReturn(11L);
+    when(storedFiles.storeChecked(any(), any(), any())).thenReturn(stored);
     var saved = service.upload(target, "x.csv", csv, " ");
     assertThat(saved.getDescription()).isNull();
+    assertThat(saved.getStoredFileId()).isEqualTo(11L);
+    saved.storedIn(null); // an attachment kept in the database before ST1
     when(attachments.findById(7L)).thenReturn(Optional.of(saved));
     when(contents.findById(7L))
         .thenReturn(

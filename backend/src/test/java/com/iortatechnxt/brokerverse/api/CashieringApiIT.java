@@ -131,7 +131,7 @@ class CashieringApiIT {
                     Map.of("companyId", fx.company(), "ids", List.of(receiptId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.printedCount").value(1)));
-    api.doGet("cashier", BASE + "/print-batches/" + batch.get("id").asLong() + "/file")
+    api.download("cashier", BASE + "/print-batches/" + batch.get("id").asLong() + "/file")
         .andExpect(status().isOk());
     api.doGet("cashier", BASE + "/print-batches/" + batch.get("id").asLong())
         .andExpect(status().isOk());

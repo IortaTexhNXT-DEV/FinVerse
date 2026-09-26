@@ -3,19 +3,17 @@ package com.iortatechnxt.brokerverse.booking.api;
 import com.iortatechnxt.brokerverse.booking.api.dto.ServiceInvoiceCreditRequest;
 import com.iortatechnxt.brokerverse.booking.api.dto.ServiceInvoiceIssueRequest;
 import com.iortatechnxt.brokerverse.booking.api.dto.ServiceInvoiceResponse;
-import com.iortatechnxt.brokerverse.booking.domain.ServiceInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.SiKind;
 import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceRegister;
 import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceService;
-import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,15 +35,20 @@ public class ServiceInvoiceController {
 
   private final ServiceInvoiceService serviceInvoices;
   private final ServiceInvoiceRegister register;
+  private final FileDownloads downloads;
 
   /**
    * Creates the controller.
    *
    * @param serviceInvoices issue, credit, resend
    * @param register register reads
+   * @param downloads file download answers
    */
   public ServiceInvoiceController(
-      ServiceInvoiceService serviceInvoices, ServiceInvoiceRegister register) {
+      ServiceInvoiceService serviceInvoices,
+      ServiceInvoiceRegister register,
+      FileDownloads downloads) {
+    this.downloads = downloads;
     this.serviceInvoices = serviceInvoices;
     this.register = register;
   }
@@ -102,20 +105,17 @@ public class ServiceInvoiceController {
   }
 
   /**
-   * The PDF as issued.
+   * The PDF as issued: a redirect to its presigned link, or the bytes of a service invoice issued
+   * before ST1.
    *
    * @param id service invoice
-   * @return PDF
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or PDF
    */
   @GetMapping("/{id}/pdf")
   @PreAuthorize(BookingAccess.VIEW)
-  public ResponseEntity<byte[]> pdf(@PathVariable Long id) {
-    ServiceInvoice si = serviceInvoices.get(id);
-    return ResponseEntity.ok()
-        .contentType(MediaType.APPLICATION_PDF)
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(si.getSiNo() + ".pdf"))
-        .body(register.document(id));
+  public ResponseEntity<byte[]> pdf(@PathVariable Long id, HttpServletRequest request) {
+    return downloads.respond(register.document(id), request);
   }
 
   /**

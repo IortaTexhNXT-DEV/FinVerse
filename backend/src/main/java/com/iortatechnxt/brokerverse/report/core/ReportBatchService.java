@@ -12,6 +12,11 @@ import com.iortatechnxt.brokerverse.report.domain.ReportBatch.BatchSpec;
 import com.iortatechnxt.brokerverse.report.domain.ReportBatchRepository;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.report.render.PrintOptions;
+import com.iortatechnxt.brokerverse.storage.domain.FileOrigin;
+import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
+import com.iortatechnxt.brokerverse.storage.service.FileDownload;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService.StoreRequest;
 import com.lowagie.text.Document;
 import com.lowagie.text.pdf.PdfCopy;
 import com.lowagie.text.pdf.PdfReader;
@@ -30,6 +35,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
@@ -38,18 +44,25 @@ import org.springframework.transaction.support.TransactionTemplate;
  * permissions; a report that fails (not permitted, missing parameter) is recorded on its item and
  * the others go on. The batch file stays downloadable by its creator.
  *
+ * <p>The batch file is kept in the file store (owner type {@value #OWNER_TYPE}, record class {@code
+ * REPORT_OUTPUT}; build step ST1).
+ *
  * <p>Not transactional itself: each report runs in its own transaction, so a refused report cannot
  * roll the batch back.
  */
 @Service
 public class ReportBatchService {
 
-  private static final String ENTITY = "ReportBatch";
+  /** Owner entity type of the stored files of batches. */
+  public static final String OWNER_TYPE = "ReportBatch";
+
+  private static final String ENTITY = OWNER_TYPE;
   private static final int MAX_PARAMETERS = 2000;
   private static final int MAX_REPORTS = 30;
 
   private final ReportService reports;
   private final ReportBatchRepository batches;
+  private final StoredFileService storedFiles;
   private final DocumentNumberService numbers;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
@@ -61,6 +74,7 @@ public class ReportBatchService {
    *
    * @param reports report runs and rendering
    * @param batches batch repository
+   * @param storedFiles file store
    * @param numbers batch numbers
    * @param audit audit trail
    * @param currentUser current user
@@ -71,6 +85,7 @@ public class ReportBatchService {
   public ReportBatchService(
       ReportService reports,
       ReportBatchRepository batches,
+      StoredFileService storedFiles,
       DocumentNumberService numbers,
       AuditTrailService audit,
       CurrentUser currentUser,
@@ -78,6 +93,7 @@ public class ReportBatchService {
       PlatformTransactionManager transactions) {
     this.reports = reports;
     this.batches = batches;
+    this.storedFiles = storedFiles;
     this.numbers = numbers;
     this.audit = audit;
     this.currentUser = currentUser;
@@ -101,11 +117,14 @@ public class ReportBatchService {
     Long companyId = companyOf(request.parameters());
     ReportBatch batch = newBatch(request, format, companyId);
     Map<String, byte[]> files = runReports(request, batch, format, companyId);
-    complete(batch, files, merged);
+    byte[] content = complete(batch, files, merged);
     String described = merged ? "merged PDF" : format + " ZIP";
     return tx.execute(
         s -> {
           ReportBatch b = batches.save(batch);
+          if (content != null) {
+            b.storedIn(store(b, content));
+          }
           audit.record(
               ENTITY,
               b.getBatchNo(),
@@ -115,7 +134,22 @@ public class ReportBatchService {
         });
   }
 
-  private void complete(ReportBatch batch, Map<String, byte[]> files, boolean merged) {
+  private Long store(ReportBatch batch, byte[] content) {
+    return storedFiles
+        .storeChecked(
+            new StoreRequest(
+                new FileOwner(batch.getCompanyId(), OWNER_TYPE, String.valueOf(batch.getId())),
+                null,
+                ReportArchiveService.REPORT_OUTPUT,
+                batch.getFileName(),
+                content,
+                null),
+            batch.getContentType(),
+            FileOrigin.GENERATED)
+        .getId();
+  }
+
+  private byte[] complete(ReportBatch batch, Map<String, byte[]> files, boolean merged) {
     byte[] content = null;
     if (!files.isEmpty()) {
       content = merged ? merge(files) : zip(files);
@@ -123,6 +157,7 @@ public class ReportBatchService {
     String contentType = merged ? ExportFormat.PDF.contentType() : "application/zip";
     batch.complete(
         batch.getBatchNo() + (merged ? ".pdf" : ".zip"), contentType, content, clock.instant());
+    return content;
   }
 
   private ReportBatch newBatch(BatchRequest request, ExportFormat format, Long companyId) {
@@ -179,6 +214,27 @@ public class ReportBatchService {
       throw new AccessDeniedException("Report batch " + batch.getBatchNo() + " is not yours");
     }
     return batch;
+  }
+
+  /**
+   * The batch file for the download endpoint (creator only): a presigned link to the stored file,
+   * or the bytes of a batch completed before ST1.
+   *
+   * @param id batch
+   * @return download
+   */
+  @Transactional(readOnly = true)
+  public FileDownload file(Long id) {
+    ReportBatch batch = get(id);
+    if (batch.getStoredFileId() != null) {
+      return FileDownload.stored(batch.getStoredFileId());
+    }
+    byte[] content = batch.getContent();
+    if (content == null) {
+      throw new BusinessRuleException(
+          "REPORT_BATCH_EMPTY", "Batch " + batch.getBatchNo() + " produced no file");
+    }
+    return FileDownload.inline(batch.getFileName(), batch.getContentType(), content);
   }
 
   private static Long companyOf(Map<String, String> parameters) {

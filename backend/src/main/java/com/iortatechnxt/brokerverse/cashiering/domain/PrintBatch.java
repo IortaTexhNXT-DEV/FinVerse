@@ -56,6 +56,9 @@ public class PrintBatch extends BaseEntity {
   @Column(name = "content")
   private byte[] content;
 
+  @Column(name = "stored_file_id")
+  private Long storedFileId;
+
   @ElementCollection
   @CollectionTable(name = "csh_print_line", joinColumns = @JoinColumn(name = "print_batch_id"))
   @OrderColumn(name = "line_no")
@@ -87,14 +90,13 @@ public class PrintBatch extends BaseEntity {
   }
 
   /**
-   * Stores the merged document and the counts.
+   * Records the file name and the counts; the merged document goes to the file store ({@link
+   * #storedIn(Long)}).
    *
    * @param name file name
-   * @param pdf merged PDF, may be null when nothing printed
    */
-  public void finish(String name, byte[] pdf) {
+  public void finish(String name) {
     this.fileName = name;
-    this.content = pdf == null ? null : pdf.clone();
     this.requestedCount = lines.size();
     this.printedCount = (int) lines.stream().filter(l -> PRINTED.equals(l.getStatus())).count();
     this.failedCount = requestedCount - printedCount;
@@ -106,12 +108,31 @@ public class PrintBatch extends BaseEntity {
   }
 
   /**
-   * The merged PDF.
+   * The merged PDF of a batch printed before ST1 and not yet copied to the file store.
    *
    * @return copy of the content, empty when none
    */
   public byte[] document() {
     return content == null ? new byte[0] : content.clone();
+  }
+
+  /**
+   * Records the stored file of the merged document.
+   *
+   * @param id stored file id
+   */
+  public void storedIn(Long id) {
+    this.storedFileId = id;
+  }
+
+  /**
+   * The stored file of the merged document; null when nothing was printed or for a batch printed
+   * before ST1 and not yet copied.
+   *
+   * @return stored file id
+   */
+  public Long getStoredFileId() {
+    return storedFileId;
   }
 
   public Long getCompanyId() {

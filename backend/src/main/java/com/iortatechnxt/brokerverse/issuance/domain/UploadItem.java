@@ -38,8 +38,11 @@ public class UploadItem {
   @Column(nullable = false, length = 64, updatable = false)
   private String sha256;
 
-  @Column(nullable = false, updatable = false)
+  @Column(name = "content", updatable = false)
   private byte[] content;
+
+  @Column(name = "stored_file_id")
+  private Long storedFileId;
 
   @Column(length = 30)
   private String arn;
@@ -67,7 +70,6 @@ public class UploadItem {
     this.lineNo = lineNo;
     this.fileName = file.fileName();
     this.sha256 = file.sha256();
-    this.content = file.content();
   }
 
   /**
@@ -134,8 +136,31 @@ public class UploadItem {
     return sha256;
   }
 
+  /**
+   * The bytes of a file uploaded before ST1 and not yet copied to the file store.
+   *
+   * @return bytes, null when the file is in the file store
+   */
   public byte[] getContent() {
-    return content.clone();
+    return content == null ? null : content.clone();
+  }
+
+  /**
+   * Records the stored file of the upload (file store, build step ST1).
+   *
+   * @param id stored file id
+   */
+  public void storedIn(Long id) {
+    this.storedFileId = id;
+  }
+
+  /**
+   * The stored file of the upload; null for a file uploaded before ST1 and not yet copied.
+   *
+   * @return stored file id
+   */
+  public Long getStoredFileId() {
+    return storedFileId;
   }
 
   public String getArn() {

@@ -85,7 +85,8 @@ public class AdviceDispatchService {
                 + advice.getArn()
                 + "). The document is password protected; the password follows in a separate"
                 + " e-mail.\n\nBDO Insurance and Reinsurance Brokers, Inc.",
-            List.of(new MessageFile(advice.getFileName(), "application/pdf", advice.getContent())),
+            List.of(
+                new MessageFile(advice.getFileName(), "application/pdf", advices.content(advice))),
             new Protection(null, true, request.passwordHint()),
             new RecordLink(
                 InsuranceAdviceService.ENTITY, String.valueOf(advice.getId()), advice.getIaNo())));

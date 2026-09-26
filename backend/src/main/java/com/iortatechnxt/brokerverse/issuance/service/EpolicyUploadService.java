@@ -9,6 +9,10 @@ import com.iortatechnxt.brokerverse.issuance.domain.UploadBatchRepository;
 import com.iortatechnxt.brokerverse.issuance.domain.UploadItem;
 import com.iortatechnxt.brokerverse.issuance.domain.UploadItem.HeldFile;
 import com.iortatechnxt.brokerverse.issuance.service.EpolicyService.ReceivedFile;
+import com.iortatechnxt.brokerverse.storage.domain.FileOrigin;
+import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService.StoreRequest;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -22,7 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
  * Bulk e-policy upload (BRNB.073): many PDFs at once. The account of each file is proposed from the
  * file name convention (the ARN, e.g. {@code ARN-2026-000123_policy.pdf}) or the ARN printed in the
  * document; the user reviews and corrects the matches, then confirms. Each confirmed file is
- * received like a single upload (see {@link EpolicyUploadConfirmation}).
+ * received like a single upload (see {@link EpolicyUploadConfirmation}). The files wait in the file
+ * store (owner type {@value #OWNER_TYPE}, the upload; record class {@code INBOUND_FILE}; build step
+ * ST1) and are used once their malware scan is clean.
  */
 @Service
 @Transactional
@@ -31,10 +37,18 @@ public class EpolicyUploadService {
   /** Largest number of files in one upload. */
   public static final int MAX_FILES = 50;
 
-  private static final String ENTITY = "EpolicyUpload";
+  /** Owner entity type of the stored upload files (the upload). */
+  public static final String OWNER_TYPE = "EpolicyUpload";
+
+  /** Record class of the upload files. */
+  public static final String RECORD_CLASS = "INBOUND_FILE";
+
+  private static final String ENTITY = OWNER_TYPE;
+  private static final String PDF = "application/pdf";
 
   private final UploadBatchRepository batches;
   private final EpolicyMatcher matcher;
+  private final StoredFileService storedFiles;
   private final AuditTrailService audit;
 
   /**
@@ -42,12 +56,17 @@ public class EpolicyUploadService {
    *
    * @param batches uploads
    * @param matcher account matching
+   * @param storedFiles file store (the uploaded files)
    * @param audit audit trail
    */
   public EpolicyUploadService(
-      UploadBatchRepository batches, EpolicyMatcher matcher, AuditTrailService audit) {
+      UploadBatchRepository batches,
+      EpolicyMatcher matcher,
+      StoredFileService storedFiles,
+      AuditTrailService audit) {
     this.batches = batches;
     this.matcher = matcher;
+    this.storedFiles = storedFiles;
     this.audit = audit;
   }
 
@@ -70,12 +89,31 @@ public class EpolicyUploadService {
       propose(companyId, item, file);
     }
     UploadBatch saved = batches.save(batch);
+    List<UploadItem> items = saved.getItems();
+    for (int i = 0; i < items.size(); i++) {
+      items.get(i).storedIn(store(saved, items.get(i), files.get(i)));
+    }
     audit.record(
         ENTITY,
         saved.getId(),
         AuditAction.CREATE,
         files.size() + " e-policies uploaded for review");
     return saved;
+  }
+
+  private Long store(UploadBatch batch, UploadItem item, IncomingFile file) {
+    return storedFiles
+        .storeChecked(
+            new StoreRequest(
+                new FileOwner(batch.getCompanyId(), OWNER_TYPE, String.valueOf(batch.getId())),
+                null,
+                RECORD_CLASS,
+                item.getFileName(),
+                file.content(),
+                item.getSha256()),
+            PDF,
+            FileOrigin.UPLOADED)
+        .getId();
   }
 
   private void propose(Long companyId, UploadItem item, IncomingFile file) {
@@ -122,12 +160,14 @@ public class EpolicyUploadService {
    * @param itemId item
    * @return file with its chosen account
    */
-  @Transactional(readOnly = true)
   public ReceivedFile fileOf(Long batchId, Long itemId) {
     UploadBatch batch = get(batchId);
     UploadItem item = item(batch, itemId);
-    return new ReceivedFile(
-        batch.getCompanyId(), item.getFileName(), item.getContent(), item.getArn(), null);
+    byte[] content =
+        item.getStoredFileId() == null
+            ? item.getContent()
+            : storedFiles.read(item.getStoredFileId());
+    return new ReceivedFile(batch.getCompanyId(), item.getFileName(), content, item.getArn(), null);
   }
 
   /**

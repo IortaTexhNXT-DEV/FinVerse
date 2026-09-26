@@ -8,7 +8,9 @@ import java.time.Instant;
 
 /**
  * Metadata of a document attached to any record, identified by entity type and id (for example
- * {@code JournalBatch} / {@code 42}). The file bytes live in {@link AttachmentContent}.
+ * {@code JournalBatch} / {@code 42}). The file content is in the file store ({@code stored_file},
+ * build step ST1); files attached before ST1 keep their bytes in {@link AttachmentContent} until
+ * {@code FILE_BYTEA_MIGRATION} copies them.
  */
 @Entity
 @Table(name = "doc_attachment")
@@ -40,6 +42,9 @@ public class Attachment extends BaseEntity {
 
   @Column(name = "process_tag", length = 40)
   private String processTag;
+
+  @Column(name = "stored_file_id")
+  private Long storedFileId;
 
   @Column(nullable = false)
   private boolean deleted;
@@ -86,6 +91,25 @@ public class Attachment extends BaseEntity {
    */
   public void tagProcess(String tag) {
     this.processTag = tag;
+  }
+
+  /**
+   * Records the stored file that holds the content.
+   *
+   * @param id stored file id
+   */
+  public void storedIn(Long id) {
+    this.storedFileId = id;
+  }
+
+  /**
+   * The stored file that holds the content; null while the content is still in {@link
+   * AttachmentContent}.
+   *
+   * @return stored file id
+   */
+  public Long getStoredFileId() {
+    return storedFileId;
   }
 
   public String getProcessTag() {

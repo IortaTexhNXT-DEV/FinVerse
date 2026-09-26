@@ -83,8 +83,11 @@ public class ServiceInvoice extends BaseEntity {
   private int templateVersion;
 
   @Basic(fetch = FetchType.LAZY)
-  @Column(nullable = false)
+  @Column(name = "document")
   private byte[] document;
+
+  @Column(name = "stored_file_id")
+  private Long storedFileId;
 
   @Column(name = "owner_username", length = 50, updatable = false)
   private String ownerUsername;
@@ -143,16 +146,26 @@ public class ServiceInvoice extends BaseEntity {
   }
 
   /**
-   * Stores the generated document with the template version used (BRNB.004).
+   * Records the generated document (in the file store, build step ST1) with the template version
+   * used (BRNB.004).
    *
    * @param template template code
    * @param version template version
-   * @param pdf document
+   * @param storedFile stored file of the PDF
    */
-  public void attachDocument(String template, int version, byte[] pdf) {
+  public void attachDocument(String template, int version, Long storedFile) {
     this.templateCode = template;
     this.templateVersion = version;
-    this.document = pdf.clone();
+    this.storedFileId = storedFile;
+  }
+
+  /**
+   * The stored file of the PDF; null for a service invoice issued before ST1 and not yet copied.
+   *
+   * @return stored file id
+   */
+  public Long getStoredFileId() {
+    return storedFileId;
   }
 
   /**
@@ -262,6 +275,11 @@ public class ServiceInvoice extends BaseEntity {
     return templateVersion;
   }
 
+  /**
+   * The PDF of a service invoice issued before ST1 and not yet copied to the file store.
+   *
+   * @return bytes, empty when the PDF is in the file store
+   */
   public byte[] getDocument() {
     return document == null ? new byte[0] : document.clone();
   }

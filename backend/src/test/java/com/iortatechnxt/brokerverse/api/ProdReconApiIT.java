@@ -86,7 +86,7 @@ class ProdReconApiIT {
     long extractId = extract.get("id").asLong();
     long cycleId = extract.get("cycleId").asLong();
     api.doGet(RECON, BASE + "/extracts/" + extractId + "/lines").andExpect(status().isOk());
-    api.doGet(RECON, BASE + "/extracts/" + extractId + "/file").andExpect(status().isOk());
+    api.download(RECON, BASE + "/extracts/" + extractId + "/file").andExpect(status().isOk());
     api.doGet(RECON, BASE + "/cycles/" + cycleId + "/extracts").andExpect(status().isOk());
     api.doPost(RECON, BASE + "/extracts/" + extractId + "/send", Map.of("to", List.of("x@y.ph")))
         .andExpect(status().isOk())

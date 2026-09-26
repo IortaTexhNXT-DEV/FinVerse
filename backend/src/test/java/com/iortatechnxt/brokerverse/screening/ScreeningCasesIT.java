@@ -9,7 +9,6 @@ import com.iortatechnxt.brokerverse.common.exception.FieldValidationException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientRiskService;
-import com.iortatechnxt.brokerverse.report.domain.ReportRun.RunFile;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseEvent;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseEventType;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseStage;
@@ -31,7 +30,9 @@ import com.iortatechnxt.brokerverse.screening.str.service.StrExtractionService;
 import com.iortatechnxt.brokerverse.screening.str.service.StrFilingService;
 import com.iortatechnxt.brokerverse.screening.str.service.StrService;
 import com.iortatechnxt.brokerverse.screening.str.service.StrService.StrEdit;
+import com.iortatechnxt.brokerverse.storage.service.FileDownload;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import com.iortatechnxt.brokerverse.support.StoredDownloads;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
@@ -70,6 +71,7 @@ class ScreeningCasesIT {
   @Autowired private StrExtractionService extractions;
   @Autowired private StrFilingService filings;
   @Autowired private ClientRiskService clientRisk;
+  @Autowired private StoredDownloads downloads;
 
   private List<CaseEventType> events(ScreeningCase c) {
     return timeline.of(c.getId()).stream().map(CaseEvent::getEvent).toList();
@@ -230,8 +232,9 @@ class ScreeningCasesIT {
             COMPLIANCE, () -> extractions.extract(fx.reload(c).getCompanyId(), today, today, null));
     assertThat(extraction.getStrIds()).contains(str.getId());
     assertThat(strs.get(str.getId()).getStatus()).isEqualTo(StrStatus.EXTRACTED);
-    RunFile file = fx.as(COMPLIANCE, () -> extractions.file(extraction.getId()));
-    assertThat(new String(file.content(), StandardCharsets.UTF_8)).contains(str.getStrNo());
+    FileDownload file = fx.as(COMPLIANCE, () -> extractions.file(extraction.getId()));
+    assertThat(file.isStored()).isTrue();
+    assertThat(new String(downloads.bytes(file), StandardCharsets.UTF_8)).contains(str.getStrNo());
     assertThatThrownBy(
             () ->
                 fx.as(

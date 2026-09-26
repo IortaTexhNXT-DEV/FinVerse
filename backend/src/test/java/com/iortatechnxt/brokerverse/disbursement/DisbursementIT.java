@@ -21,6 +21,7 @@ import com.iortatechnxt.brokerverse.disbursement.domain.IntakeRequest;
 import com.iortatechnxt.brokerverse.disbursement.domain.Payee;
 import com.iortatechnxt.brokerverse.disbursement.domain.Voucher;
 import com.iortatechnxt.brokerverse.disbursement.service.CancellationHandoffs;
+import com.iortatechnxt.brokerverse.disbursement.service.EodOutputFiles;
 import com.iortatechnxt.brokerverse.disbursement.service.EodService;
 import com.iortatechnxt.brokerverse.disbursement.service.InstrumentActions;
 import com.iortatechnxt.brokerverse.disbursement.service.InstrumentService;
@@ -41,6 +42,7 @@ import com.iortatechnxt.brokerverse.remittance.RemittanceFixtures;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.BatchStage;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import com.iortatechnxt.brokerverse.support.StoredDownloads;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -71,6 +73,8 @@ class DisbursementIT {
   @Autowired private SystemParameterService parameters;
   @Autowired private JdbcTemplate jdbc;
   @Autowired private HandoffService handoffs;
+  @Autowired private StoredDownloads downloads;
+  @Autowired private EodOutputFiles eodFiles;
 
   private int events(String sourceReference) {
     Integer n =
@@ -208,7 +212,9 @@ class DisbursementIT {
     List<EodOutput> outputs = fx.as(LEADER, () -> eod.outputs(run.getId()));
     EodOutput dctf =
         outputs.stream().filter(o -> o.getKind() == OutputKind.DCTF).findFirst().orElseThrow();
-    assertThat(new String(dctf.getContent(), StandardCharsets.US_ASCII))
+    assertThat(dctf.getStoredFileId()).isNotNull();
+    assertThat(
+            new String(downloads.bytes(eodFiles.download(dctf.getId())), StandardCharsets.US_ASCII))
         .contains(approved.getDvNo())
         .contains("000000002500.00");
     assertThat(outputs)

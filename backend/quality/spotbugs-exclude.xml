@@ -78,4 +78,13 @@
   <Match>
     <Class name="~.*Test.*"/>
   </Match>
+  <!--
+    SQL_INJECTION_SPRING_JDBC in FileContentMigrationService: the statements are constants that the
+    owning modules declare as LegacyFileTable beans in code (no request, parameter or table value
+    is concatenated); every value is a bound parameter.
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.brokerverse.storage.service.FileContentMigrationService"/>
+    <Bug pattern="SQL_INJECTION_SPRING_JDBC"/>
+  </Match>
 </FindBugsFilter>

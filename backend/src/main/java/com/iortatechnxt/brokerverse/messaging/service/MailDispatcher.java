@@ -2,9 +2,11 @@ package com.iortatechnxt.brokerverse.messaging.service;
 
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageStatus;
+import com.iortatechnxt.brokerverse.messaging.domain.OutboundAttachment;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundAttachmentRepository;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessageRepository;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.util.Arrays;
@@ -36,6 +38,7 @@ public class MailDispatcher {
   private final TransactionTemplate tx;
   private final Clock clock;
   private final boolean dispatchOnCommit;
+  private final StoredFileService storedFiles;
 
   /**
    * Creates the dispatcher.
@@ -50,6 +53,7 @@ public class MailDispatcher {
    *     brokerverse.mail.dispatch-on-commit}); when false only the job delivers
    * @param kafkaDelivers true when the Kafka consumer delivers queued messages ({@code
    *     brokerverse.kafka.enabled}); the delivery after commit is then skipped
+   * @param storedFiles file store (attachments as sent)
    */
   public MailDispatcher(
       OutboundMessageRepository messages,
@@ -59,7 +63,9 @@ public class MailDispatcher {
       PlatformTransactionManager txManager,
       Clock clock,
       @Value("${brokerverse.mail.dispatch-on-commit:true}") boolean dispatchOnCommit,
-      @Value("${brokerverse.kafka.enabled:false}") boolean kafkaDelivers) {
+      @Value("${brokerverse.kafka.enabled:false}") boolean kafkaDelivers,
+      StoredFileService storedFiles) {
+    this.storedFiles = storedFiles;
     this.messages = messages;
     this.attachments = attachments;
     this.transport = transport;
@@ -121,7 +127,7 @@ public class MailDispatcher {
   private void attempt(OutboundMessage message) {
     List<MessageFile> files =
         attachments.findByMessageIdOrderById(message.getId()).stream()
-            .map(a -> new MessageFile(a.getFileName(), a.getMimeType(), a.getContent()))
+            .map(a -> new MessageFile(a.getFileName(), a.getMimeType(), content(a)))
             .toList();
     MailEnvelope envelope =
         new MailEnvelope(
@@ -138,6 +144,16 @@ public class MailDispatcher {
       message.markAttemptFailed(
           e.getMessage(), parameters.intValue("MAIL_MAX_ATTEMPTS", DEFAULT_ATTEMPTS));
     }
+  }
+
+  /**
+   * The content of an attachment as sent: read from the file store (SHA-256 re-checked) or, for an
+   * attachment queued before ST1 and not yet copied, from its row.
+   */
+  private byte[] content(OutboundAttachment attachment) {
+    return attachment.getStoredFileId() == null
+        ? attachment.getContent()
+        : storedFiles.read(attachment.getStoredFileId());
   }
 
   private static List<String> split(String addresses) {

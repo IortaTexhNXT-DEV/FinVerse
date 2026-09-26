@@ -8,7 +8,6 @@ import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ReportArchiveService;
-import com.iortatechnxt.brokerverse.report.domain.ReportRun.RunFile;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseEvent.EventFacts;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseEventType;
 import com.iortatechnxt.brokerverse.screening.cases.domain.ScreeningCase;
@@ -22,6 +21,7 @@ import com.iortatechnxt.brokerverse.screening.str.domain.StrRepository;
 import com.iortatechnxt.brokerverse.screening.str.domain.StrStatus;
 import com.iortatechnxt.brokerverse.screening.str.domain.StrTransaction.Line;
 import com.iortatechnxt.brokerverse.screening.str.domain.SuspiciousTransactionReport;
+import com.iortatechnxt.brokerverse.storage.service.FileDownload;
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -262,12 +262,13 @@ public class StrExtractionService {
   }
 
   /**
-   * The file of an extraction (from the report archive).
+   * The file of an extraction (from the report archive) for the download endpoint: a presigned link
+   * to the stored file, or the bytes of a file archived before ST1.
    *
    * @param id the extraction
    * @return the file
    */
-  public RunFile file(Long id) {
+  public FileDownload file(Long id) {
     StrExtraction extraction =
         extractions
             .findById(id)
@@ -277,7 +278,7 @@ public class StrExtractionService {
           "SCR_STR_FILE_ELSEWHERE",
           "The file of " + extraction.getBatchNo() + " was saved outside BIBS");
     }
-    return archive.file(extraction.getReportRunId());
+    return archive.download(extraction.getReportRunId());
   }
 
   private static void requirePeriod(LocalDate from, LocalDate to) {

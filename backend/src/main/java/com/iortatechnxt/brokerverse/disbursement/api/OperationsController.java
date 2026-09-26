@@ -1,6 +1,5 @@
 package com.iortatechnxt.brokerverse.disbursement.api;
 
-import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.BankResponse;
@@ -8,18 +7,18 @@ import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.BankStatu
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.BookRequest;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.EodRequest;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.EodRunResponse;
-import com.iortatechnxt.brokerverse.disbursement.domain.EodOutput;
 import com.iortatechnxt.brokerverse.disbursement.domain.EodRun;
+import com.iortatechnxt.brokerverse.disbursement.service.EodOutputFiles;
 import com.iortatechnxt.brokerverse.disbursement.service.EodService;
 import com.iortatechnxt.brokerverse.payables.domain.BankAccount;
 import com.iortatechnxt.brokerverse.payables.service.BankAccountQueryService;
 import com.iortatechnxt.brokerverse.payables.service.BankAccountService;
+import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.util.List;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,6 +45,8 @@ public class OperationsController {
   private final BankAccountQueryService banks;
   private final BankAccountService bankService;
   private final Clock clock;
+  private final EodOutputFiles outputFiles;
+  private final FileDownloads downloads;
 
   /**
    * Creates the controller.
@@ -54,9 +55,18 @@ public class OperationsController {
    * @param banks bank account reads
    * @param bankService bank account maintenance
    * @param clock clock
+   * @param outputFiles output files
+   * @param downloads file download answers
    */
   public OperationsController(
-      EodService eod, BankAccountQueryService banks, BankAccountService bankService, Clock clock) {
+      EodService eod,
+      BankAccountQueryService banks,
+      BankAccountService bankService,
+      Clock clock,
+      EodOutputFiles outputFiles,
+      FileDownloads downloads) {
+    this.downloads = downloads;
+    this.outputFiles = outputFiles;
     this.eod = eod;
     this.banks = banks;
     this.bankService = bankService;
@@ -121,19 +131,17 @@ public class OperationsController {
   }
 
   /**
-   * An output file of a run.
+   * An output file of a run: a redirect to its presigned link, or the bytes of an output produced
+   * before ST1.
    *
    * @param outputId output
-   * @return file
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or file
    */
   @GetMapping("/eod/outputs/{outputId}")
   @PreAuthorize(DisbursementAccess.EOD_READ)
-  public ResponseEntity<byte[]> output(@PathVariable Long outputId) {
-    EodOutput o = eod.output(outputId);
-    return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(o.getFileName()))
-        .contentType(MediaType.parseMediaType(o.getContentType()))
-        .body(o.getContent());
+  public ResponseEntity<byte[]> output(@PathVariable Long outputId, HttpServletRequest request) {
+    return downloads.respond(outputFiles.download(outputId), request);
   }
 
   /**

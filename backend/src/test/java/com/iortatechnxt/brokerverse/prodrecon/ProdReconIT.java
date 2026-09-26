@@ -108,7 +108,7 @@ class ProdReconIT {
     Long cycleId = extract.getCycleId();
     assertThat(fx.item(cycleId, a.getInvoiceNo()).getStatus()).isEqualTo(ReconStatus.BDOI_ONLY);
 
-    byte[] workbook = repository.download(extract.getFileId()).getContent();
+    byte[] workbook = repository.content(extract.getFileId());
     try (XSSFWorkbook wb = new XSSFWorkbook(new ByteArrayInputStream(workbook))) {
       XSSFSheet sheet = wb.getSheetAt(0);
       assertThat(sheet.getProtect()).isTrue();

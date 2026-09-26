@@ -12,6 +12,11 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.storage.domain.FileOrigin;
+import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
+import com.iortatechnxt.brokerverse.storage.service.FileDownload;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService.StoreRequest;
 import java.sql.Timestamp;
 import java.time.Clock;
 import java.util.ArrayList;
@@ -28,19 +33,30 @@ import org.springframework.transaction.annotation.Transactional;
  * Batch printing of ARs and ORs (CSHID.019): the selected receipts (a selection or the result of a
  * filter by location, insurer or date) are printed into one merged PDF kept as the batch copy; each
  * receipt's print count is logged, cancelled receipts fail with a message, and the failures can be
- * retried in a new batch. Also issues Certificates of Payment (Annex II report 19).
+ * retried in a new batch. Also issues Certificates of Payment (Annex II report 19). The merged PDF
+ * is kept in the file store (owner type {@value #OWNER_TYPE}, record class {@code
+ * OFFICIAL_RECEIPT}; build step ST1).
  */
 @Service
 @Transactional
 public class BatchPrintService {
 
-  private static final String ENTITY = "PrintBatch";
+  /** Owner entity type of the stored merged PDFs. */
+  public static final String OWNER_TYPE = "PrintBatch";
+
+  /** Record class of receipt prints. */
+  public static final String RECORD_CLASS = "OFFICIAL_RECEIPT";
+
+  private static final String PDF = "application/pdf";
+
+  private static final String ENTITY = OWNER_TYPE;
   private static final String COP_LOG =
       "insert into csh_certificate_of_payment (company_id, receipt_id, receipt_no, policy_no,"
           + " requesting_unit, issued_at, issued_by) values (?, ?, ?, ?, ?, ?, ?)";
   private static final int MAX_BATCH = 500;
 
   private final PrintBatchRepository batches;
+  private final StoredFileService storedFiles;
   private final CashReceiptRepository receipts;
   private final ReceiptDocument documents;
   private final DocumentNumberService numbers;
@@ -53,6 +69,7 @@ public class BatchPrintService {
    * Creates the service.
    *
    * @param batches print batches
+   * @param storedFiles file store (merged PDFs)
    * @param receipts receipts
    * @param documents receipt documents
    * @param numbers document numbers
@@ -63,6 +80,7 @@ public class BatchPrintService {
    */
   public BatchPrintService(
       PrintBatchRepository batches,
+      StoredFileService storedFiles,
       CashReceiptRepository receipts,
       ReceiptDocument documents,
       DocumentNumberService numbers,
@@ -71,6 +89,7 @@ public class BatchPrintService {
       CurrentUser currentUser,
       Clock clock) {
     this.batches = batches;
+    this.storedFiles = storedFiles;
     this.receipts = receipts;
     this.documents = documents;
     this.numbers = numbers;
@@ -111,14 +130,47 @@ public class BatchPrintService {
       r.printed(clock.instant());
       batch.add(new PrintBatch.Line(r.getId(), r.getReceiptNo(), PrintBatch.PRINTED, null));
     }
-    batch.finish(batch.getBatchNo() + ".pdf", pdfs.isEmpty() ? null : ReceiptDocument.merge(pdfs));
+    batch.finish(batch.getBatchNo() + ".pdf");
     PrintBatch saved = batches.save(batch);
+    if (!pdfs.isEmpty()) {
+      saved.storedIn(store(saved, ReceiptDocument.merge(pdfs)));
+    }
     audit.record(
         ENTITY,
         saved.getBatchNo(),
         AuditAction.EXPORT,
         saved.getPrintedCount() + " printed, " + saved.getFailedCount() + " failed: " + criteria);
     return saved;
+  }
+
+  private Long store(PrintBatch batch, byte[] pdf) {
+    return storedFiles
+        .storeChecked(
+            new StoreRequest(
+                new FileOwner(batch.getCompanyId(), OWNER_TYPE, String.valueOf(batch.getId())),
+                null,
+                RECORD_CLASS,
+                batch.getFileName(),
+                pdf,
+                null),
+            PDF,
+            FileOrigin.GENERATED)
+        .getId();
+  }
+
+  /**
+   * The merged PDF of a batch for the download endpoint: a presigned link to the stored file, or
+   * the bytes of a batch printed before ST1 (empty when nothing was printed).
+   *
+   * @param id batch
+   * @return download
+   */
+  @Transactional(readOnly = true)
+  public FileDownload file(Long id) {
+    PrintBatch batch = get(id);
+    return batch.getStoredFileId() == null
+        ? FileDownload.inline(batch.getBatchNo() + ".pdf", PDF, batch.document())
+        : FileDownload.stored(batch.getStoredFileId());
   }
 
   /**

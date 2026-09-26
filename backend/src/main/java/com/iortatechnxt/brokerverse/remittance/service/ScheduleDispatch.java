@@ -38,7 +38,7 @@ public class ScheduleDispatch {
           BatchStage.OR_RECEIVED);
 
   private final RemittanceBatchRepository batches;
-  private final BatchDocuments documents;
+  private final BatchDocumentStore documents;
   private final MessageService messages;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
@@ -56,7 +56,7 @@ public class ScheduleDispatch {
    */
   public ScheduleDispatch(
       RemittanceBatchRepository batches,
-      BatchDocuments documents,
+      BatchDocumentStore documents,
       MessageService messages,
       AuditTrailService audit,
       CurrentUser currentUser,

@@ -61,8 +61,11 @@ public class InsuranceAdvice extends BaseEntity {
   @Column(nullable = false, length = 64, updatable = false)
   private String sha256;
 
-  @Column(nullable = false, updatable = false)
+  @Column(name = "content", updatable = false)
   private byte[] content;
+
+  @Column(name = "stored_file_id")
+  private Long storedFileId;
 
   @Column(name = "send_count", nullable = false)
   private int sendCount;
@@ -98,7 +101,24 @@ public class InsuranceAdvice extends BaseEntity {
     this.templateVersion = document.templateVersion();
     this.fileName = document.fileName();
     this.sha256 = document.sha256();
-    this.content = document.content();
+  }
+
+  /**
+   * Records the stored file of the PDF (file store, build step ST1).
+   *
+   * @param id stored file id
+   */
+  public void storedIn(Long id) {
+    this.storedFileId = id;
+  }
+
+  /**
+   * The stored file of the PDF; null for an advice generated before ST1 and not yet copied.
+   *
+   * @return stored file id
+   */
+  public Long getStoredFileId() {
+    return storedFileId;
   }
 
   /**
@@ -170,8 +190,13 @@ public class InsuranceAdvice extends BaseEntity {
     return sha256;
   }
 
+  /**
+   * The PDF of an advice generated before ST1 and not yet copied to the file store.
+   *
+   * @return bytes, null when the PDF is in the file store
+   */
   public byte[] getContent() {
-    return content.clone();
+    return content == null ? null : content.clone();
   }
 
   public int getSendCount() {

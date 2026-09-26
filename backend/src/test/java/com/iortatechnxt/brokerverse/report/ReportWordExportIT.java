@@ -116,7 +116,7 @@ class ReportWordExportIT {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.format").value("DOCX")));
     byte[] zip =
-        api.doGet("fmanager", "/api/v1/reports/batches/" + batch.get("id").asLong() + "/file")
+        api.download("fmanager", "/api/v1/reports/batches/" + batch.get("id").asLong() + "/file")
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()

@@ -2,7 +2,6 @@ package com.iortatechnxt.brokerverse.attachment.service;
 
 import com.iortatechnxt.brokerverse.attachment.domain.AllowedFileType;
 import com.iortatechnxt.brokerverse.attachment.domain.Attachment;
-import com.iortatechnxt.brokerverse.attachment.domain.AttachmentContent;
 import com.iortatechnxt.brokerverse.attachment.domain.AttachmentContentRepository;
 import com.iortatechnxt.brokerverse.attachment.domain.AttachmentRepository;
 import com.iortatechnxt.brokerverse.attachment.domain.AttachmentTarget;
@@ -13,6 +12,11 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.storage.domain.FileOrigin;
+import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
+import com.iortatechnxt.brokerverse.storage.service.FileDownload;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService.StoreRequest;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
@@ -27,13 +31,20 @@ import org.springframework.transaction.annotation.Transactional;
  * Document attachments for any record: upload with size, type, signature and malware checks,
  * SHA-256 checksum, download with integrity verification, and logical deletion. Every action is
  * audited against the owning record.
+ *
+ * <p>The content is kept in the file store through {@link StoredFileService} (owner type {@value
+ * #OWNER_TYPE}, the attachment id; build step ST1). Files attached before ST1 are read from {@code
+ * doc_attachment_content} until {@code FILE_BYTEA_MIGRATION} has copied them.
  */
 @Service
 @Transactional
 @EnableConfigurationProperties(AttachmentProperties.class)
 public class AttachmentService {
 
-  private static final String ENTITY = "Attachment";
+  /** Owner entity type of the stored files of attachments. */
+  public static final String OWNER_TYPE = "Attachment";
+
+  private static final String ENTITY = OWNER_TYPE;
   private static final Pattern ENTITY_TYPE = Pattern.compile("[A-Za-z][A-Za-z0-9_]{1,59}");
   private static final Pattern ENTITY_ID = Pattern.compile("[A-Za-z0-9_.:/-]{1,60}");
   private static final Pattern UNSAFE_NAME_CHARS = Pattern.compile("[\\p{Cntrl}\"\\\\/:*?<>|]");
@@ -41,6 +52,7 @@ public class AttachmentService {
 
   private final AttachmentRepository attachments;
   private final AttachmentContentRepository contents;
+  private final StoredFileService storedFiles;
   private final List<VirusScanner> scanners;
   private final AttachmentProperties properties;
   private final AuditTrailService audit;
@@ -51,7 +63,8 @@ public class AttachmentService {
    * Creates the service.
    *
    * @param attachments metadata repository
-   * @param contents content repository
+   * @param contents content repository (files attached before ST1)
+   * @param storedFiles file store
    * @param scanners malware scanners
    * @param properties settings
    * @param audit audit trail
@@ -61,6 +74,7 @@ public class AttachmentService {
   public AttachmentService(
       AttachmentRepository attachments,
       AttachmentContentRepository contents,
+      StoredFileService storedFiles,
       List<VirusScanner> scanners,
       AttachmentProperties properties,
       AuditTrailService audit,
@@ -68,6 +82,7 @@ public class AttachmentService {
       Clock clock) {
     this.attachments = attachments;
     this.contents = contents;
+    this.storedFiles = storedFiles;
     this.scanners = List.copyOf(scanners);
     this.properties = properties;
     this.audit = audit;
@@ -115,6 +130,26 @@ public class AttachmentService {
    */
   public Attachment upload(
       AttachmentTarget target, String originalName, byte[] content, String description) {
+    return upload(target, originalName, content, description, null);
+  }
+
+  /**
+   * Stores a new attachment of a document type, which sets its record class ({@link
+   * AttachmentRecordClasses}).
+   *
+   * @param target record the file belongs to
+   * @param originalName file name as uploaded
+   * @param content file bytes
+   * @param description optional description
+   * @param documentType document type, null when unclassified
+   * @return saved metadata
+   */
+  public Attachment upload(
+      AttachmentTarget target,
+      String originalName,
+      byte[] content,
+      String description,
+      String documentType) {
     requireValidTarget(target);
     requireWithinLimit(content.length);
     String fileName = sanitize(originalName);
@@ -133,7 +168,19 @@ public class AttachmentService {
     scan(fileName, content);
     StoredFile file = new StoredFile(fileName, type.mimeType(), content.length, sha256(content));
     Attachment saved = attachments.save(new Attachment(target, file, blankToNull(description)));
-    contents.save(new AttachmentContent(saved.getId(), content));
+    saved.storedIn(
+        storedFiles
+            .storeChecked(
+                new StoreRequest(
+                    new FileOwner(null, OWNER_TYPE, String.valueOf(saved.getId())),
+                    documentType,
+                    AttachmentRecordClasses.of(documentType),
+                    fileName,
+                    content,
+                    file.sha256()),
+                type.mimeType(),
+                FileOrigin.UPLOADED)
+            .getId());
     audit.record(
         ENTITY,
         saved.getId(),
@@ -166,13 +213,42 @@ public class AttachmentService {
   }
 
   /**
-   * Downloads a file after verifying its checksum; the download is audited.
+   * Reads a file after verifying its checksum (streamed flows: ZIP files, e-mail attachments,
+   * feeds); the read is audited.
    *
    * @param id id
    * @return metadata and bytes
    */
   public AttachmentFile download(Long id) {
     Attachment attachment = get(id);
+    byte[] bytes =
+        attachment.getStoredFileId() == null
+            ? legacyContent(attachment)
+            : storedFiles.read(attachment.getStoredFileId());
+    auditDownload(attachment);
+    return new AttachmentFile(attachment, bytes);
+  }
+
+  /**
+   * A file for the download endpoint: the stored file (answered with a presigned link) or, for a
+   * file attached before ST1 and not yet copied, its checksum-verified bytes; audited.
+   *
+   * @param id id
+   * @return download
+   */
+  public FileDownload downloadable(Long id) {
+    Attachment attachment = get(id);
+    FileDownload download =
+        attachment.getStoredFileId() == null
+            ? FileDownload.inline(
+                attachment.getFileName(), attachment.getContentType(), legacyContent(attachment))
+            : FileDownload.stored(attachment.getStoredFileId());
+    auditDownload(attachment);
+    return download;
+  }
+
+  private byte[] legacyContent(Attachment attachment) {
+    Long id = attachment.getId();
     byte[] bytes =
         contents
             .findById(id)
@@ -182,9 +258,13 @@ public class AttachmentService {
       throw new BusinessRuleException(
           "ATTACHMENT_INTEGRITY_FAILURE", "Stored file failed its checksum verification");
     }
+    return bytes;
+  }
+
+  private void auditDownload(Attachment attachment) {
     audit.record(
         ENTITY,
-        id,
+        attachment.getId(),
         AuditAction.EXPORT,
         "Downloaded "
             + attachment.getFileName()
@@ -192,7 +272,6 @@ public class AttachmentService {
             + attachment.getEntityType()
             + " "
             + attachment.getEntityId());
-    return new AttachmentFile(attachment, bytes);
   }
 
   /**

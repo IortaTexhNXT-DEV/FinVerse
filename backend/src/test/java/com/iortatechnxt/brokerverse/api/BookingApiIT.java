@@ -105,7 +105,7 @@ class BookingApiIT {
                 .andExpect(status().isOk()));
     long siId = sis.get(0).get("id").asLong();
     api.doGet("proc", "/api/v1/booking/service-invoices/" + siId).andExpect(status().isOk());
-    api.doGet("proc", "/api/v1/booking/service-invoices/" + siId + "/pdf")
+    api.download("proc", "/api/v1/booking/service-invoices/" + siId + "/pdf")
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_PDF));
     api.doPost("proc", "/api/v1/booking/service-invoices/" + siId + "/resend", null)

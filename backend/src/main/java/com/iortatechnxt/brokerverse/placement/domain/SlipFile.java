@@ -7,7 +7,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/** A rendered placement slip file (PDF or XLSX) with its checksum. */
+/**
+ * A rendered placement slip file (PDF or XLSX) with its checksum. The content is in the file store
+ * ({@code stored_file}, build step ST1); files rendered before ST1 keep their bytes in {@code
+ * content} until {@code FILE_BYTEA_MIGRATION} copies them.
+ */
 @Entity
 @Table(name = "plc_slip_file")
 public class SlipFile {
@@ -28,26 +32,29 @@ public class SlipFile {
   @Column(nullable = false, length = 64, updatable = false)
   private String sha256;
 
-  @Column(nullable = false, updatable = false)
+  @Column(name = "content", updatable = false)
   private byte[] content;
+
+  @Column(name = "stored_file_id")
+  private Long storedFileId;
 
   protected SlipFile() {}
 
   /**
-   * Stores a rendered file.
+   * Records a rendered file whose content is in the file store.
    *
    * @param slipId slip
    * @param format PDF or XLSX
    * @param fileName file name
    * @param sha256 checksum
-   * @param content bytes
+   * @param storedFileId stored file of the content
    */
-  public SlipFile(Long slipId, String format, String fileName, String sha256, byte[] content) {
+  public SlipFile(Long slipId, String format, String fileName, String sha256, Long storedFileId) {
     this.slipId = slipId;
     this.format = format;
     this.fileName = fileName;
     this.sha256 = sha256;
-    this.content = content.clone();
+    this.storedFileId = storedFileId;
   }
 
   public Long getId() {
@@ -70,7 +77,21 @@ public class SlipFile {
     return sha256;
   }
 
+  /**
+   * The bytes of a file rendered before ST1 and not yet copied to the file store.
+   *
+   * @return bytes, null when the content is in the file store
+   */
   public byte[] getContent() {
-    return content.clone();
+    return content == null ? null : content.clone();
+  }
+
+  /**
+   * The stored file of the content; null for a file rendered before ST1 and not yet copied.
+   *
+   * @return stored file id
+   */
+  public Long getStoredFileId() {
+    return storedFileId;
   }
 }

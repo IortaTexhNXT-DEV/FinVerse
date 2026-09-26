@@ -23,6 +23,7 @@ import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.DocumentKi
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.IncentiveBasis;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.OrStatus;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.RemittanceType;
+import com.iortatechnxt.brokerverse.remittance.service.BatchDocumentStore;
 import com.iortatechnxt.brokerverse.remittance.service.BatchDocuments;
 import com.iortatechnxt.brokerverse.remittance.service.BatchService;
 import com.iortatechnxt.brokerverse.remittance.service.ExtractionService;
@@ -93,6 +94,7 @@ class RemittanceOperationsIT {
   @Autowired private AsUser as;
   @Autowired private TransactionTemplate tx;
   @Autowired private JdbcTemplate jdbc;
+  @Autowired private BatchDocumentStore store;
 
   private void assignDv(RemittanceBatch batch) {
     DisbursementRequest request = queue.find("REMITTANCE", batch.getBatchNo()).orElseThrow();
@@ -271,7 +273,7 @@ class RemittanceOperationsIT {
     OpsInvoice paid = fx.paidInvoice();
     fx.extract(paid.getInvoiceNo());
     RemittanceBatch review = fx.batchOf(paid.getInvoiceNo());
-    assertThat(documents.document(review, DocumentKind.SCHEDULE_PDF).content()).isNotEmpty();
+    assertThat(store.document(review, DocumentKind.SCHEDULE_PDF).content()).isNotEmpty();
     assertThatThrownBy(
             () ->
                 as.run(
@@ -285,7 +287,7 @@ class RemittanceOperationsIT {
     as.run("remittl", () -> batches.approve(review.getId(), null));
     RemittanceBatch approved = fx.batchOf(paid.getInvoiceNo());
     for (DocumentKind kind : DocumentKind.values()) {
-      assertThat(documents.document(approved, kind).content()).isNotEmpty();
+      assertThat(store.document(approved, kind).content()).isNotEmpty();
     }
     var queued =
         as.run(

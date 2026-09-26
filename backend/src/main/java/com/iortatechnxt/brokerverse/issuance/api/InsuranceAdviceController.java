@@ -1,19 +1,17 @@
 package com.iortatechnxt.brokerverse.issuance.api;
 
-import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.issuance.api.dto.AdviceResponse;
 import com.iortatechnxt.brokerverse.issuance.api.dto.AdviceSendRequest;
 import com.iortatechnxt.brokerverse.issuance.api.dto.ArnsRequest;
-import com.iortatechnxt.brokerverse.issuance.domain.InsuranceAdvice;
 import com.iortatechnxt.brokerverse.issuance.service.AdviceDispatchService;
 import com.iortatechnxt.brokerverse.issuance.service.InsuranceAdviceService;
 import com.iortatechnxt.brokerverse.issuance.service.IssuanceBatchService;
 import com.iortatechnxt.brokerverse.issuance.service.IssuanceBatchService.Outcome;
+import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +36,7 @@ public class InsuranceAdviceController {
   private final InsuranceAdviceService advices;
   private final AdviceDispatchService dispatch;
   private final IssuanceBatchService batch;
+  private final FileDownloads downloads;
 
   /**
    * Creates the controller.
@@ -45,9 +44,14 @@ public class InsuranceAdviceController {
    * @param advices insurance advices
    * @param dispatch sending
    * @param batch generation for several accounts
+   * @param downloads file download answers
    */
   public InsuranceAdviceController(
-      InsuranceAdviceService advices, AdviceDispatchService dispatch, IssuanceBatchService batch) {
+      InsuranceAdviceService advices,
+      AdviceDispatchService dispatch,
+      IssuanceBatchService batch,
+      FileDownloads downloads) {
+    this.downloads = downloads;
     this.advices = advices;
     this.dispatch = dispatch;
     this.batch = batch;
@@ -87,20 +91,17 @@ public class InsuranceAdviceController {
   }
 
   /**
-   * Downloads the PDF of an advice.
+   * Downloads the PDF of an advice: a redirect to its presigned link, or the bytes of an advice
+   * generated before ST1.
    *
    * @param id advice
-   * @return PDF
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or PDF
    */
   @GetMapping("/{id}/file")
   @PreAuthorize(IssuanceController.VIEW)
-  public ResponseEntity<byte[]> file(@PathVariable Long id) {
-    InsuranceAdvice advice = advices.download(id);
-    return ResponseEntity.ok()
-        .contentType(MediaType.APPLICATION_PDF)
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(advice.getFileName()))
-        .body(advice.getContent());
+  public ResponseEntity<byte[]> file(@PathVariable Long id, HttpServletRequest request) {
+    return downloads.respond(advices.download(id), request);
   }
 
   /**

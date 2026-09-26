@@ -1,14 +1,12 @@
 package com.iortatechnxt.brokerverse.disbursement.service;
 
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.OutputKind;
-import com.iortatechnxt.brokerverse.disbursement.domain.EodOutput;
 import com.iortatechnxt.brokerverse.disbursement.domain.EodOutput.OutputFile;
 import com.iortatechnxt.brokerverse.disbursement.domain.EodOutputRepository;
 import com.iortatechnxt.brokerverse.disbursement.domain.EodRun;
+import com.iortatechnxt.brokerverse.report.core.ReportArchiveService;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.report.domain.ReportRun;
-import com.iortatechnxt.brokerverse.report.domain.ReportRunFile;
-import com.iortatechnxt.brokerverse.report.domain.ReportRunFileRepository;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import java.util.List;
 import java.util.Map;
@@ -35,20 +33,26 @@ public class EodReports {
           "DSB-UNREGULARIZED");
 
   private final ReportService reports;
-  private final ReportRunFileRepository files;
+  private final ReportArchiveService archive;
   private final EodOutputRepository outputs;
+  private final EodOutputFiles outputFiles;
 
   /**
    * Creates the helper.
    *
    * @param reports report service
-   * @param files archived report files
+   * @param archive report archive (content of the archived files)
    * @param outputs run outputs
+   * @param outputFiles output files (file store)
    */
   public EodReports(
-      ReportService reports, ReportRunFileRepository files, EodOutputRepository outputs) {
+      ReportService reports,
+      ReportArchiveService archive,
+      EodOutputRepository outputs,
+      EodOutputFiles outputFiles) {
+    this.outputFiles = outputFiles;
     this.reports = reports;
-    this.files = files;
+    this.archive = archive;
     this.outputs = outputs;
   }
 
@@ -69,18 +73,14 @@ public class EodReports {
         continue;
       }
       ReportRun archived = reports.generate(code, params, ExportFormat.XLSX, null);
-      byte[] content =
-          files.findById(archived.getId()).map(ReportRunFile::getContent).orElse(new byte[0]);
-      outputs.save(
-          new EodOutput(
-              run.getId(),
-              OutputKind.REPORT,
-              code,
-              new OutputFile(
-                  run.getRunNo() + "_" + archived.getFileName(),
-                  archived.getContentType(),
-                  content),
-              archived.getRowCount()));
+      byte[] content = archive.content(archived);
+      outputFiles.save(
+          run,
+          OutputKind.REPORT,
+          code,
+          new OutputFile(
+              run.getRunNo() + "_" + archived.getFileName(), archived.getContentType(), content),
+          archived.getRowCount());
     }
     run.reported(CODES.size());
     return CODES.size();

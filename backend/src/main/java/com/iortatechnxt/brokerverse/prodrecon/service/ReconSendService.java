@@ -129,7 +129,7 @@ public class ReconSendService {
     if (extract.getFileId() == null) {
       throw new ResourceNotFoundException("Production register file", extract.getExtractNo());
     }
-    byte[] file = repository.download(extract.getFileId()).getContent();
+    byte[] file = repository.content(extract.getFileId());
     MergedText letter = coverLetter(extract, cycle, insurerName);
     QueuedEmail queued =
         messages.queueEmail(

@@ -1,6 +1,5 @@
 package com.iortatechnxt.brokerverse.remittance.api;
 
-import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.messaging.service.QueuedEmail;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.AssignRequest;
@@ -13,20 +12,20 @@ import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.QueuedResponse;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.RestoreRequest;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.ReturnRequest;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.SendScheduleRequest;
-import com.iortatechnxt.brokerverse.remittance.domain.BatchDocument.StoredFile;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.BatchStage;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.DocumentKind;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.RemittanceType;
+import com.iortatechnxt.brokerverse.remittance.service.BatchDocumentStore;
 import com.iortatechnxt.brokerverse.remittance.service.BatchDocuments;
 import com.iortatechnxt.brokerverse.remittance.service.BatchService;
 import com.iortatechnxt.brokerverse.remittance.service.RemittanceQueryService;
 import com.iortatechnxt.brokerverse.remittance.service.RemittanceQueryService.BatchSearch;
 import com.iortatechnxt.brokerverse.remittance.service.ScheduleDispatch;
+import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,6 +50,8 @@ public class RemittanceBatchController {
   private final RemittanceQueryService queries;
   private final BatchDocuments documents;
   private final ScheduleDispatch dispatch;
+  private final FileDownloads downloads;
+  private final BatchDocumentStore store;
 
   /**
    * Creates the controller.
@@ -59,12 +60,18 @@ public class RemittanceBatchController {
    * @param queries reads
    * @param documents schedule and payment request
    * @param dispatch schedule e-mail
+   * @param downloads file download answers
+   * @param store stored batch documents
    */
   public RemittanceBatchController(
       BatchService batches,
       RemittanceQueryService queries,
       BatchDocuments documents,
-      ScheduleDispatch dispatch) {
+      ScheduleDispatch dispatch,
+      FileDownloads downloads,
+      BatchDocumentStore store) {
+    this.store = store;
+    this.downloads = downloads;
     this.batches = batches;
     this.queries = queries;
     this.documents = documents;
@@ -205,20 +212,19 @@ public class RemittanceBatchController {
   }
 
   /**
-   * The schedule (PDF / Excel) or payment request (RMTID.011).
+   * The schedule (PDF / Excel) or payment request (RMTID.011): after submission a redirect to the
+   * presigned link of the stored document, before it the document rendered now.
    *
    * @param id batch
    * @param kind document
-   * @return file
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or file
    */
   @GetMapping("/{id}/documents/{kind}")
   @PreAuthorize(RemittanceAccess.BATCH_READ)
-  public ResponseEntity<byte[]> document(@PathVariable Long id, @PathVariable DocumentKind kind) {
-    StoredFile file = documents.document(batches.get(id), kind);
-    return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(file.contentType()))
-        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(file.fileName()))
-        .body(file.content());
+  public ResponseEntity<byte[]> document(
+      @PathVariable Long id, @PathVariable DocumentKind kind, HttpServletRequest request) {
+    return downloads.respond(store.download(batches.get(id), kind), request);
   }
 
   /**

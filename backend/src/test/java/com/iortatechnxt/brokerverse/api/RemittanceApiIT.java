@@ -118,7 +118,7 @@ class RemittanceApiIT {
     api.doGet("remit", batch + "/preview")
         .andExpect(jsonPath("$.lineCount").value(1))
         .andExpect(jsonPath("$.problems").isEmpty());
-    api.doGet("remit", batch + "/documents/SCHEDULE_PDF")
+    api.download("remit", batch + "/documents/SCHEDULE_PDF")
         .andExpect(status().isOk())
         .andExpect(header().string("Content-Type", "application/pdf"));
     api.doPost("remittl", batch + "/assign", Map.of("username", "remit"))
@@ -129,8 +129,8 @@ class RemittanceApiIT {
     api.doPost("remittl", batch + "/approve", Map.of("comment", "OK"))
         .andExpect(jsonPath("$.summary.stage").value("APPROVED"))
         .andExpect(jsonPath("$.disbursement.requestNo").isNotEmpty());
-    api.doGet("remit", batch + "/documents/PAYMENT_REQUEST_PDF").andExpect(status().isOk());
-    api.doGet("remit", batch + "/documents/SCHEDULE_XLSX").andExpect(status().isOk());
+    api.download("remit", batch + "/documents/PAYMENT_REQUEST_PDF").andExpect(status().isOk());
+    api.download("remit", batch + "/documents/SCHEDULE_XLSX").andExpect(status().isOk());
     api.doPost(
             "remit",
             batch + "/send-schedule",

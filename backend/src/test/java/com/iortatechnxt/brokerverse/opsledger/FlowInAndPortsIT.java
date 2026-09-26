@@ -442,7 +442,7 @@ class FlowInAndPortsIT {
     assertThat(extracts.list(fx.company(), folder))
         .singleElement()
         .satisfies(f -> assertThat(f.sizeBytes()).isEqualTo(8));
-    byte[] downloaded = tx.execute(s -> extracts.download(dropped.id()).getContent());
+    byte[] downloaded = tx.execute(s -> extracts.content(dropped.id()));
     assertThat(downloaded).hasSize(8);
     assertThatThrownBy(
             () ->

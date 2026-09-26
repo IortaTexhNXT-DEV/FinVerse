@@ -2,7 +2,8 @@
 
 Status: **Approved by BDOI, 26-Sep-2026** (option C, GuardDuty, governance and legal hold per the DOA, BDOI-owned keys,
 ECM for records management). BDOI instruction: "documents and attachments live in an S3 bucket only".
-Build step ST0 is built (section 6); the module moves of ST1 follow the plan of section 7.
+Build step ST0 is built (section 6). Build step ST1 is built (section 7): every module writes its files through the
+file store; the copy of the existing bytes and the later drop of the `bytea` columns are run per environment.
 
 ## 1. What is stored today
 
@@ -114,7 +115,7 @@ e-mail attachments, and ZIP bundles that are built on the fly.
 
 ## 6. As built: ST0 foundation (26-Sep-2026)
 
-ST0 is in the code. No module table has moved yet: the `bytea` columns stay until ST1 (section 7).
+ST0 is in the code. The module tables moved in ST1 (section 7).
 
 **Components.**
 
@@ -156,33 +157,126 @@ names. Seed users: `holdofficer`, `holdapprover` and `infosec` (V1109, seed data
 - The DOA role names (DSQ03).
 - The buckets, keys, IRSA role, VPC endpoint, replication, Object Lock and GuardDuty per environment (BDOI IT,
   section 4).
-- The module moves of ST1.
 
-## 7. ST1 plan per table
+## 7. As built: ST1 module move (26-Sep-2026)
 
-Each table is moved in the owner's Flyway range, in three steps:
-1. Add a nullable `stored_file_id` and write new files through `StoredFileService.store`.
-2. Copy the existing bytes with a one-off system job that stores each file, checks the SHA-256 and sets
-   `stored_file_id`. Reads then switch to a presigned link (downloads) or `StoredFileService.read` (streamed flows).
-3. After the reconciliation report of the copy is signed off, a later migration drops the `bytea` column.
+Every module that kept file bytes in PostgreSQL writes new files through `StoredFileService`. The existing bytes are
+copied by a one-off job; the `bytea` columns stay until the copy is signed off in each environment, then a later
+migration drops them.
 
-Each owning module also adds a `FileOwnerAccess` bean for its owner types, which reuses the permission of today's
-download endpoint.
+**The 13 tables.** The migrations were checked: these are all the `bytea` columns of BIBS. Screening case documents,
+STR supporting documents, watchlist files, KYC documents, payment-request documents, EB and claim documents are
+attachments (`doc_attachment_content`); DP lists and billings, remittance extracts and production registers are in
+the extract repository (`ops_extract_file`); STR files as filed are report runs (`report_run_file`). Journal uploads
+are read and posted, not kept. `doc_rendition` (V756) keeps only the specification and the SHA-256.
 
-| Table (migration) | Module | Record class | Download after ST1 |
-|---|---|---|---|
-| `doc_attachment_content` (V21) | attachment | `GENERAL_DOCUMENT`; screening, STR, KYC, claim and payment-request documents by document type | Link. The document access classes (V1031) become the `FileOwnerAccess` of `attachment`. ZIP bundles are streamed |
-| `report_batch` (V32), `report_run_file` (V762) | report | `REPORT_OUTPUT` (reports bucket) | Link. Report jobs write straight to S3 |
-| `msg_outbound_attachment` (V753) | messaging | Class of the attached record | Streamed: password-protected e-mail attachments are read with `read` |
-| `ops_extract_file` (V761) | opsledger | `WORKING_FILE` | Link |
-| `csh_print_batch` (V763) | cashiering | `OFFICIAL_RECEIPT` (receipt prints) | Link |
-| `rem_batch_document` (V770) | remittance | `GENERAL_DOCUMENT` | Link |
-| `plc_slip_file` (V850) | placement | `POLICY_DOCUMENT` (slips) | Link |
-| `iss_upload_item` (V860) | issuance | `INBOUND_FILE` | Link |
-| `iss_insurance_advice` (V860) | issuance | `POLICY_DOCUMENT` | Link |
-| `bkg_service_invoice` (V870) | booking | `STATEMENT_OF_ACCOUNT` | Link |
-| `dsb_eod_output` (V892) | disbursement | `WORKING_FILE` (bank files) | Link |
-| `clx_billing_document` (V1002) | collections | `STATEMENT_OF_ACCOUNT` | Link |
+| Table (migration) | Module | Owner type (key) | Record class | Origin | Who may open it (`FileOwnerAccess`) | `stored_file_id` on |
+|---|---|---|---|---|---|---|
+| `doc_attachment_content` (V21) | attachment | `Attachment` (attachment id) | by document type: `POLICY_DOCUMENT` (e-policy, policy copy, Insurance Advice, EB policy form), `OFFICIAL_RECEIPT`, `CLAIM_SETTLEMENT` (settlement and release papers), else `GENERAL_DOCUMENT` | uploaded | `ATTACHMENT_VIEW` and the document access classes (V1031); adding `ATTACHMENT_MANAGE` | `doc_attachment` |
+| `report_run_file` (V762) | report | `ReportRun` (run id) | `REPORT_OUTPUT`; STR files `STR` | generated | the export permission of the report and its availability time | `report_run` |
+| `report_batch` (V32) | report | `ReportBatch` (batch id) | `REPORT_OUTPUT` | generated | `REPORT_VIEW`, creator only | `report_batch` |
+| `msg_outbound_attachment` (V753) | messaging | `OutboundMessage` (message id) | `GENERAL_DOCUMENT` | generated | `MESSAGE_VIEW` | same table |
+| `ops_extract_file` (V761) | opsledger | `ExtractFile` (file id) | `WORKING_FILE` | generated | `OPS_VIEW`; DP billings also `COMMREC_*`, production registers `RECON_PROCESS` / `RECON_SEND` | same table |
+| `csh_print_batch` (V763) | cashiering | `PrintBatch` (batch id) | `OFFICIAL_RECEIPT` | generated | `CASH_PRINT` | same table |
+| `rem_batch_document` (V770) | remittance | `RemittanceBatchDocument` (document id) | `GENERAL_DOCUMENT` | generated | `REMIT_PROCESS`, `REMIT_EXTRACT`, `REMIT_APPROVE`, `REMIT_OR_UPLOAD` | same table |
+| `plc_slip_file` (V850) | placement | `PlacementSlip` (slip id) | `POLICY_DOCUMENT` | generated | `ACCOUNT_VIEW`, `PLACEMENT_MANAGE`, `BILLING_MANAGE` | same table |
+| `iss_upload_item` (V860) | issuance | `EpolicyUpload` (upload id) | `INBOUND_FILE` | uploaded | `EPOLICY_MANAGE` (also adds them) | same table |
+| `iss_insurance_advice` (V860) | issuance | `InsuranceAdvice` (advice id) | `POLICY_DOCUMENT` | generated | `ACCOUNT_VIEW`, `EPOLICY_MANAGE`, `EPOLICY_SEND` | same table |
+| `bkg_service_invoice` (V870, column `document`) | booking | `ServiceInvoice` (SI number) | `STATEMENT_OF_ACCOUNT` | generated | `BOOKING_PROCESS`, `BOOKING_ADJUST` | same table |
+| `dsb_eod_output` (V892) | disbursement | `EodOutput` (output id) | `WORKING_FILE` | generated | `DISB_EOD`, `DISB_VIEW` | same table |
+| `clx_billing_document` (V1002) | collections | `BillingStatement` (statement id) | `STATEMENT_OF_ACCOUNT` | generated | `CLX_VIEW` | same table |
 
-`doc_rendition` (V756) keeps only the specification and the SHA-256, so it does not move. Watchlist feeds and bank or
-insurer files that arrive in bulk use the inbound presigned upload.
+Only the attachment and e-policy upload owners accept files through `POST /api/v1/files`; the other resolvers answer
+`mayStore = false` (their files are produced by the application). Owner types opened by a list of permissions use
+`storage.service.PermissionFileAccess`; attachments, extract files and reports have resolvers of their own.
+
+**Migrations.** V1111 (platform: attachments, report runs and batches, e-mail attachments), V1112 (Operations:
+extract repository, print batches, remittance documents), V1113 (broking: slips, e-policy uploads, Insurance Advices,
+service invoices) and V1114 (disbursement outputs, statements of account) add the nullable `stored_file_id` and make
+the `bytea` columns nullable. V1115 to V1119 stay free for step 3.
+
+**Writing.** `StoredFileService.storeChecked(request, contentType, origin)` is used by the modules: the module has
+produced the content or validated it with its own rules (the attachment module keeps its type, signature, size and
+malware checks), so the upload allow-list and the 25 MB limit of `store` do not apply; the SHA-256, the SSE-KMS
+write, the metadata row and the audit entry do. The origin decides the malware scan:
+- `UPLOADED` (attachments, e-policy uploads): the file waits for its scan result like any upload and can be opened
+  only when clean;
+- `GENERATED` (everything the application renders or sends, including password-protected e-mail attachments that no
+  scanner can read): recorded clean with the scan result `APPLICATION_GENERATED`. GuardDuty covers the inbound bucket
+  and uploads; generated files in the documents and reports buckets would otherwise never become downloadable.
+
+**Reading.** A row with `stored_file_id` is read from the file store; a row still holding bytes (not yet copied) is
+read from its column as before, so nothing breaks between the deployment and the copy.
+- Download endpoints answer through `storage.api.FileDownloads`. With `brokerverse.storage.downloads.mode=redirect`
+  a stored file is answered with `302 Found` to its presigned link (owner permission, scan state, audit entry by
+  `FileLinkService`; attachment disposition, no-store). With `stream` (the default, until the browser settings below
+  are deployed) the same owner check applies and the file is read by `StoredFileService.read` (SHA-256 re-checked,
+  audited). Bytes still in the database are sent as before.
+- Streamed flows read with `StoredFileService.read`: e-mail attachments at dispatch (`MailDispatcher`), ZIP bundles of
+  attachments, attachments read by other modules (watchlist feeds, e-policy extraction and dispatch), slips,
+  Insurance Advices, service invoices and statements of account attached to e-mails, production registers sent to
+  insurers, report files copied into the end-of-day outputs.
+
+| Endpoint | Answer for a stored file |
+|---|---|
+| `GET /api/v1/attachments/{id}/content` | link or stream (ZIP `GET /api/v1/attachments/zip` is always built and streamed) |
+| `GET /api/v1/reports/runs/{id}/file`, `GET /api/v1/reports/batches/{id}/file` | link or stream |
+| `GET /api/v1/screening/str/extractions/{id}/file` | link or stream |
+| `GET /api/v1/ops/extracts/{id}/file`, `GET /api/v1/commission/dp/billings/{id}/file`, `GET /api/v1/prodrecon/extracts/{id}/file` | link or stream |
+| `GET /api/v1/cashiering/print-batches/{id}/file` | link or stream |
+| `GET /api/v1/remittance/batches/{id}/documents/{kind}` | link or stream after submission; before it the document is rendered and streamed as before |
+| `GET /api/v1/placement/slips/{id}/files/{format}` | link or stream |
+| `GET /api/v1/issuance/insurance-advice/{id}/file` | link or stream |
+| `GET /api/v1/booking/service-invoices/{id}/pdf` | link or stream |
+| `GET /api/v1/disbursement/eod/outputs/{outputId}` | link or stream |
+| `GET /api/v1/collections/billing/statements/{id}/document` | link or stream |
+
+The response body of these endpoints does not change: the file itself, with its `Content-Type` and
+`Content-Disposition`. Documents rendered on request (receipts, certificates of payment, vouchers, instruments,
+quotation and proposal slips, BIR forms, billing workbooks) are not stored and stay as they are.
+
+**Web client (frontend team).** The client downloads with `fetch` and the bearer token, then saves the blob; `fetch`
+follows the redirect. To switch an S3 environment to `redirect`:
+- `frontend/nginx.conf`: add the bucket hosts of the environment (for example
+  `https://bibs-<env>-documents.s3.ap-southeast-1.amazonaws.com` and the reports and inbound buckets) to
+  `connect-src`; today `connect-src 'self'` would block the redirected request;
+- the file name is read from `Content-Disposition`, which S3 returns only if the bucket CORS rule exposes it;
+- optionally, the client may call `GET /api/v1/files/{id}/link` itself and navigate to the URL, which needs no CORS
+  (the module responses do not carry the stored file id today).
+With the local store (developer machines and seed stacks) the link is an application URL and `redirect` works as is.
+
+**Copying the existing bytes: `FILE_BYTEA_MIGRATION`** (`storage.service.FileContentMigrationJob`, workload `BATCH`,
+manual by default: `brokerverse.storage.content-migration.cron`, batch size `...batch-size`, default 20).
+- Each module declares its table as a `LegacyFileTable` bean (select of the rows still to copy, update of
+  `stored_file_id`, counts); the storage module does not depend on the modules. The STR files are declared by
+  screening (`@Order(0)`) so that they are copied under the class `STR` before the general copy of `report_run_file`.
+- Per row, in its own transaction: the content read from the table is compared with the SHA-256 the module recorded
+  (attachments, extract files, e-mail attachments, slips, uploads, Insurance Advices); the file is stored; the object
+  is read back and its SHA-256 compared with the content; then `stored_file_id` is set, only if still empty. A failing
+  row is logged and counted and stays as it is; its object, if written, is an orphan for
+  `FILE_ORPHAN_RECONCILIATION`.
+- Restartable and idempotent: copied rows are never read again; a second run copies nothing. The run message lists,
+  per table, the rows copied, failed and left.
+- Reconciliation report: `GET /api/v1/files/content-migration` (`SYSTEM_MONITOR`, `SYSTEM_PARAMETER_MANAGE` or
+  `AUDIT_VIEW`) gives per table the rows with content, the rows copied and the rows left
+  (`report_run_file (STR files)` is a subset of `report_run_file`).
+- Retention of the copies starts at the copy date (the metadata row's creation), not at the original date.
+
+**Step 3, not applied.** `docs/architecture/st1/ST1_DROP_BYTEA_COLUMNS.sql` drops the `bytea` columns (and the tables
+`doc_attachment_content` and `report_run_file`) and refuses to run while any row still holds content without a stored
+file. It is copied into `db/migration` with the next free version of V1115 to V1119 once the report of every
+environment is signed off, together with the removal of the old read paths in the entities and services above.
+
+**Tests.** `ModuleFileAccessIT` (every owner type: link issued with the module's permission, refused without it;
+attachments with their class, content read back and no database copy; extract files by producing module; report runs
+by export permission, STR class, batches by creator), `FileContentMigrationIT` (legacy rows of four tables served from
+the database, copied with the checksum checked, a row with a wrong recorded checksum left and counted, second run
+copies nothing, report counts and permission), `FileDownloadsTest` (redirect, stream with the owner check, bytes still
+in the database), `ContentMigrationSettingsTest` (job settings, owner keys, attachment classes), and the module tests, which now check that their files are stored and download through the link.
+
+**For BDOI IT.**
+- Run `FILE_BYTEA_MIGRATION` in each environment after the deployment, until the report shows nothing left; sign off
+  the report; then schedule step 3.
+- Bucket CORS on the documents, reports and inbound buckets for the web origin (method `GET`, exposed headers
+  `Content-Disposition`, `Content-Type`) before `BROKERVERSE_STORAGE_DOWNLOAD_MODE=redirect` is set.
+- GuardDuty stays on the inbound bucket and the uploads; generated files are not scanned (see "Writing").

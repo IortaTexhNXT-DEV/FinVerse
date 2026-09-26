@@ -1,10 +1,8 @@
 package com.iortatechnxt.brokerverse.prodrecon.api;
 
-import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
-import com.iortatechnxt.brokerverse.opsledger.domain.ExtractFile;
 import com.iortatechnxt.brokerverse.opsledger.service.ExtractRepositoryService;
 import com.iortatechnxt.brokerverse.prodrecon.api.dto.ProdReconDtos.UploadResponse;
 import com.iortatechnxt.brokerverse.prodrecon.api.dto.ProdReconDtos.UploadResultResponse;
@@ -22,10 +20,11 @@ import com.iortatechnxt.brokerverse.prodrecon.service.ReconScheduleService;
 import com.iortatechnxt.brokerverse.prodrecon.service.ReconSendService;
 import com.iortatechnxt.brokerverse.prodrecon.service.ReconSettings;
 import com.iortatechnxt.brokerverse.prodrecon.service.ReconUploadService;
+import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,6 +53,7 @@ public class ReconExtractController {
   private final ReconScheduleService schedules;
   private final ReconSettings settings;
   private final ExtractRepositoryService repository;
+  private final FileDownloads downloads;
 
   /**
    * Creates the controller.
@@ -64,6 +64,7 @@ public class ReconExtractController {
    * @param schedules schedules
    * @param settings parameters
    * @param repository extract repository (files)
+   * @param downloads file download answers
    */
   public ReconExtractController(
       ProductionExtractService extracts,
@@ -71,7 +72,9 @@ public class ReconExtractController {
       ReconUploadService uploads,
       ReconScheduleService schedules,
       ReconSettings settings,
-      ExtractRepositoryService repository) {
+      ExtractRepositoryService repository,
+      FileDownloads downloads) {
+    this.downloads = downloads;
     this.extracts = extracts;
     this.sender = sender;
     this.uploads = uploads;
@@ -151,23 +154,21 @@ public class ReconExtractController {
   }
 
   /**
-   * Downloads the register workbook.
+   * Downloads the register workbook: a redirect to its presigned link, or the bytes of a file kept
+   * before ST1.
    *
    * @param id extract
-   * @return the workbook
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or the workbook
    */
   @GetMapping("/extracts/{id}/file")
   @PreAuthorize(ReconAccess.READ)
-  public ResponseEntity<byte[]> file(@PathVariable Long id) {
+  public ResponseEntity<byte[]> file(@PathVariable Long id, HttpServletRequest request) {
     ReconExtract extract = extracts.require(id);
     if (extract.getFileId() == null) {
       throw new ResourceNotFoundException("Production register file", extract.getExtractNo());
     }
-    ExtractFile file = repository.download(extract.getFileId());
-    return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(file.getContentType()))
-        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(file.getFileName()))
-        .body(file.getContent());
+    return downloads.respond(repository.downloadable(extract.getFileId()), request);
   }
 
   /**

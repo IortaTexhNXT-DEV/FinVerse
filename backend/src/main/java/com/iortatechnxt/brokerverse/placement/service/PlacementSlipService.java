@@ -25,6 +25,11 @@ import com.iortatechnxt.brokerverse.placement.domain.SlipStatus;
 import com.iortatechnxt.brokerverse.placement.service.InsurerDirectory.PlacementAddress;
 import com.iortatechnxt.brokerverse.placement.service.SlipDocuments.SlipHeader;
 import com.iortatechnxt.brokerverse.placement.service.SlipPrerequisites.Unmet;
+import com.iortatechnxt.brokerverse.storage.domain.FileOrigin;
+import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
+import com.iortatechnxt.brokerverse.storage.service.FileDownload;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService.StoreRequest;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
@@ -53,6 +58,12 @@ public class PlacementSlipService {
   /** Entity type of slips (audit, e-mail send log). */
   public static final String ENTITY = "PlacementSlip";
 
+  /** Owner entity type of the stored slip files (the slip). */
+  public static final String OWNER_TYPE = ENTITY;
+
+  /** Record class of slip files. */
+  public static final String RECORD_CLASS = "POLICY_DOCUMENT";
+
   /** PDF file format. */
   public static final String PDF = "PDF";
 
@@ -66,6 +77,7 @@ public class PlacementSlipService {
 
   private final PlacementSlipRepository slips;
   private final SlipFileRepository files;
+  private final StoredFileService storedFiles;
   private final PlacementAccounts accounts;
   private final SlipPrerequisites prerequisites;
   private final InsurerDirectory insurers;
@@ -82,6 +94,7 @@ public class PlacementSlipService {
    *
    * @param slips slips
    * @param files slip files
+   * @param storedFiles file store (slip files)
    * @param accounts account look-ups
    * @param prerequisites slip prerequisites
    * @param insurers insurer addressing
@@ -96,6 +109,7 @@ public class PlacementSlipService {
   public PlacementSlipService(
       PlacementSlipRepository slips,
       SlipFileRepository files,
+      StoredFileService storedFiles,
       PlacementAccounts accounts,
       SlipPrerequisites prerequisites,
       InsurerDirectory insurers,
@@ -108,6 +122,7 @@ public class PlacementSlipService {
       Clock clock) {
     this.slips = slips;
     this.files = files;
+    this.storedFiles = storedFiles;
     this.accounts = accounts;
     this.prerequisites = prerequisites;
     this.insurers = insurers;
@@ -227,8 +242,8 @@ public class PlacementSlipService {
     String name = slip.displayNo().replace(' ', '_');
     SlipHeader header =
         new SlipHeader(companyId, slip.displayNo(), insurer.insurerCode(), address, text);
-    store(slip.getId(), PDF, name + ".pdf", documents.slipPdf(header, slipAccounts));
-    store(slip.getId(), XLSX, name + ".xlsx", documents.slipXlsx(slip.displayNo(), slipAccounts));
+    store(slip, PDF, name + ".pdf", documents.slipPdf(header, slipAccounts));
+    store(slip, XLSX, name + ".xlsx", documents.slipXlsx(slip.displayNo(), slipAccounts));
     audit.record(
         ENTITY,
         slip.displayNo(),
@@ -242,8 +257,22 @@ public class PlacementSlipService {
     return slip;
   }
 
-  private void store(Long slipId, String format, String fileName, byte[] content) {
-    files.save(new SlipFile(slipId, format, fileName, sha256(content), content));
+  private void store(PlacementSlip slip, String format, String fileName, byte[] content) {
+    String sha256 = sha256(content);
+    Long stored =
+        storedFiles
+            .storeChecked(
+                new StoreRequest(
+                    new FileOwner(slip.getCompanyId(), OWNER_TYPE, String.valueOf(slip.getId())),
+                    format,
+                    RECORD_CLASS,
+                    fileName,
+                    content,
+                    sha256),
+                PDF.equals(format) ? PDF_TYPE : XLSX_TYPE,
+                FileOrigin.GENERATED)
+            .getId();
+    files.save(new SlipFile(slip.getId(), format, fileName, sha256, stored));
   }
 
   /**
@@ -294,7 +323,7 @@ public class PlacementSlipService {
                     new MessageFile(
                         f.getFileName(),
                         PDF.equals(f.getFormat()) ? PDF_TYPE : XLSX_TYPE,
-                        f.getContent()))
+                        content(f)))
             .toList();
     messages.queueEmail(
         new OutboundEmail(
@@ -355,20 +384,32 @@ public class PlacementSlipService {
   }
 
   /**
-   * One file of a slip; the download is audited.
+   * One file of a slip for the download endpoint: a presigned link to the stored file, or the bytes
+   * of a file rendered before ST1; the download is audited.
    *
    * @param slipId slip
    * @param format PDF or XLSX
-   * @return file
+   * @return download
    */
-  public SlipFile file(Long slipId, String format) {
+  public FileDownload file(Long slipId, String format) {
     SlipFile file =
         files
             .findBySlipIdAndFormat(slipId, format)
             .orElseThrow(
                 () -> new ResourceNotFoundException("Placement slip file", slipId + "/" + format));
     audit.record(ENTITY, slipId, AuditAction.EXPORT, "Downloaded " + file.getFileName());
-    return file;
+    return file.getStoredFileId() == null
+        ? FileDownload.inline(
+            file.getFileName(),
+            PDF.equals(file.getFormat()) ? PDF_TYPE : XLSX_TYPE,
+            file.getContent())
+        : FileDownload.stored(file.getStoredFileId());
+  }
+
+  private byte[] content(SlipFile file) {
+    return file.getStoredFileId() == null
+        ? file.getContent()
+        : storedFiles.read(file.getStoredFileId());
   }
 
   static String sha256(byte[] content) {

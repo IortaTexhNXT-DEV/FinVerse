@@ -3,7 +3,6 @@ package com.iortatechnxt.brokerverse.screening.str.api;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentFormat;
-import com.iortatechnxt.brokerverse.report.domain.ReportRun.RunFile;
 import com.iortatechnxt.brokerverse.screening.cases.api.dto.ReviewDto;
 import com.iortatechnxt.brokerverse.screening.cases.service.CaseQueries;
 import com.iortatechnxt.brokerverse.screening.str.api.dto.StrDtos;
@@ -16,6 +15,8 @@ import com.iortatechnxt.brokerverse.screening.str.service.StrDocumentService;
 import com.iortatechnxt.brokerverse.screening.str.service.StrExtractionService;
 import com.iortatechnxt.brokerverse.screening.str.service.StrFilingService;
 import com.iortatechnxt.brokerverse.screening.str.service.StrService;
+import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
@@ -53,6 +54,7 @@ public class StrController {
   private final StrFilingService filings;
   private final StrDocumentService documents;
   private final CaseQueries cases;
+  private final FileDownloads downloads;
 
   /**
    * Creates the controller.
@@ -62,13 +64,16 @@ public class StrController {
    * @param filings filing
    * @param documents PDF / Word
    * @param cases case reads (scope)
+   * @param downloads file download answers
    */
   public StrController(
       StrService strs,
       StrExtractionService extractions,
       StrFilingService filings,
       StrDocumentService documents,
-      CaseQueries cases) {
+      CaseQueries cases,
+      FileDownloads downloads) {
+    this.downloads = downloads;
     this.strs = strs;
     this.extractions = extractions;
     this.filings = filings;
@@ -215,19 +220,17 @@ public class StrController {
   }
 
   /**
-   * Downloads the file of an extraction.
+   * Downloads the file of an extraction: a redirect to its presigned link, or the bytes of a file
+   * archived before ST1.
    *
    * @param id the extraction
-   * @return the file
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or file
    */
   @GetMapping("/str/extractions/{id}/file")
   @PreAuthorize(HAS_EXTRACT)
-  public ResponseEntity<byte[]> file(@PathVariable Long id) {
-    RunFile file = extractions.file(id);
-    return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(file.contentType()))
-        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(file.fileName()))
-        .body(file.content());
+  public ResponseEntity<byte[]> file(@PathVariable Long id, HttpServletRequest request) {
+    return downloads.respond(extractions.file(id), request);
   }
 
   /**

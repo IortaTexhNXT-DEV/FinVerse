@@ -12,8 +12,9 @@ import java.util.Objects;
 
 /**
  * One archived run (on-screen view) or export of a report (CSHID.018: generated reports with name,
- * date and creator, downloadable only by users allowed to export). The file of an export is kept
- * apart in {@link ReportRunFile}.
+ * date and creator, downloadable only by users allowed to export). The file of an export is in the
+ * file store ({@code stored_file}, build step ST1); files of runs before ST1 are kept apart in
+ * {@link ReportRunFile} until {@code FILE_BYTEA_MIGRATION} copies them.
  */
 @Entity
 @Table(name = "report_run")
@@ -54,6 +55,9 @@ public class ReportRun extends BaseEntity {
 
   @Column(name = "available_from", updatable = false)
   private Instant availableFrom;
+
+  @Column(name = "stored_file_id")
+  private Long storedFileId;
 
   protected ReportRun() {}
 
@@ -161,6 +165,25 @@ public class ReportRun extends BaseEntity {
 
   public Long getSizeBytes() {
     return sizeBytes;
+  }
+
+  /**
+   * Records the stored file of the export.
+   *
+   * @param id stored file id
+   */
+  public void storedIn(Long id) {
+    this.storedFileId = id;
+  }
+
+  /**
+   * The stored file of the export; null for an on-screen run and for a file kept in {@link
+   * ReportRunFile}.
+   *
+   * @return stored file id
+   */
+  public Long getStoredFileId() {
+    return storedFileId;
   }
 
   public Instant getAvailableFrom() {

@@ -31,6 +31,7 @@ import com.iortatechnxt.brokerverse.opsledger.service.FlowInHandler.FlowInFile;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import com.iortatechnxt.brokerverse.support.StoredDownloads;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
@@ -58,6 +59,7 @@ class SeriesPrintPickupIT {
   @Autowired private ApprovalInboxService inbox;
   @Autowired private JdbcTemplate jdbc;
   @Autowired private AsUser as;
+  @Autowired private StoredDownloads downloads;
 
   private Receipt ar(Long branch) {
     return as.run(
@@ -233,7 +235,9 @@ class SeriesPrintPickupIT {
                 printing.print(
                     fx.company(), List.of(ar.getId(), or.getId(), third.getId()), "test"));
     assertThat(batch.getPrintedCount()).isEqualTo(3);
-    assertThat(batch.document()).isNotEmpty();
+    assertThat(batch.getStoredFileId()).isNotNull();
+    assertThat(downloads.bytes(as.run("cashier", () -> printing.file(batch.getId()))))
+        .startsWith((byte) '%');
     assertThatThrownBy(() -> as.run("cashier", () -> printing.retry(batch.getId())))
         .extracting("code")
         .isEqualTo("PRINT_NOTHING_FAILED");

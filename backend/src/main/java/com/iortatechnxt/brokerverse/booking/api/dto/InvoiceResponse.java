@@ -39,6 +39,7 @@ import java.util.List;
  * @param bookedAt time
  * @param shares insurer shares
  * @param journalBatches journal batches
+ * @param insurerBillingNo insurer billing number (BRID-020), null when none
  */
 public record InvoiceResponse(
     Long id,
@@ -66,7 +67,8 @@ public record InvoiceResponse(
     String bookedBy,
     Instant bookedAt,
     List<ShareDto> shares,
-    List<String> journalBatches) {
+    List<String> journalBatches,
+    String insurerBillingNo) {
 
   /**
    * Maps an invoice (collections loaded).
@@ -101,6 +103,7 @@ public record InvoiceResponse(
         i.getBookedBy(),
         i.getBookedAt(),
         i.getShares().stream().map(ShareDto::from).toList(),
-        i.getJournalBatches());
+        i.getJournalBatches(),
+        i.getInsurerBillingNo());
   }
 }

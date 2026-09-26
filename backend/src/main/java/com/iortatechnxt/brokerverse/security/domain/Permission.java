@@ -329,5 +329,30 @@ public enum Permission {
   // Claims Handling reports: on screen, export, flat data extract (BRCLM.026-034/038/040)
   BCL_REPORT_VIEW,
   BCL_REPORT_EXPORT,
-  BCL_DATA_EXTRACT
+  BCL_DATA_EXTRACT,
+
+  // Employee Benefits (BDOI BRD-8). See docs/architecture/EMPLOYEE_BENEFITS_DESIGN.md section 6.1
+  // and V1030. Documents are further restricted by the access classes of V1031 (BRID-025).
+  // EB screens, programmes, cycles and documents (BRID-023)
+  EB_VIEW,
+  // AO maker actions: programme, RA, feedback, BOR, franchise, TOR, requests, proposals,
+  // comparative, revisions, confirmation, placement trigger, member changes (BRID-001-017)
+  EB_MARKET,
+  // Authorised signatory of the comparative, never its maker (BRID-010)
+  EB_COMPARATIVE_APPROVE,
+  // BDOI Management approval above the value threshold (BRID-016)
+  EB_THRESHOLD_APPROVE,
+  // Processing: validate member changes, policy forms and SOAs (BRID-018-021, 025)
+  EB_PROCESS,
+  // Collection: SOA and billing view, release acknowledgement (BRID-021, 025)
+  EB_COLLECT,
+  // Threshold rules, required documents, EB parameters and templates (BRID-016)
+  EB_SETUP,
+  // EB reports (BRID-022, 022.01)
+  EB_REPORT_VIEW
+  // The portal permissions of design 6.1 (PORTAL_USER_REQUEST, PORTAL_USER_APPROVE, PORTAL_ADMIN)
+  // are parked with the partner portal (BDOI Drop 2 "Employee Benefits (No Portal Feature)"):
+  // adding
+  // PORTAL_USER_APPROVE switches the approver of EXTERNAL access requests (AccessApprovers), so it
+  // comes with the portal wave.
 }

@@ -36,6 +36,17 @@ public interface BookedInvoiceRepository
   boolean existsByArnAndTransactionNo(String arn, String transactionNo);
 
   /**
+   * The invoice that already carries an insurer billing number (BRID-020 duplicate block).
+   *
+   * @param companyId company
+   * @param insurerCode lead insurer
+   * @param insurerBillingNo billing number
+   * @return invoice, if any
+   */
+  Optional<BookedInvoice> findFirstByCompanyIdAndFactsInsurerCodeAndInsurerBillingNo(
+      Long companyId, String insurerCode, String insurerBillingNo);
+
+  /**
    * Scheduled policy years that start on or before a date (multi-year, BRNB.112).
    *
    * @param status SCHEDULED

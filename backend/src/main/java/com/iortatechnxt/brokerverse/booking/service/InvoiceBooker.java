@@ -114,7 +114,10 @@ public class InvoiceBooker {
             + ", commission "
             + saved.getCommission().commission().toPlainString()
             + ", cost center "
-            + saved.getFacts().costCenter());
+            + saved.getFacts().costCenter()
+            + (saved.getInsurerBillingNo() == null
+                ? ""
+                : ", insurer billing no. " + saved.getInsurerBillingNo()));
     return saved;
   }
 

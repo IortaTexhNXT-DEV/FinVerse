@@ -79,6 +79,9 @@ final class AccountSpecifications {
     if (s.ffy() != null) {
       where.add(cb.equal(root.get("freeFirstYear").get("active"), s.ffy()));
     }
+    if (s.businessType() != null) {
+      where.add(cb.equal(root.get("classification").get("businessType"), s.businessType()));
+    }
     if (s.directPayment() != null) {
       Expression<PaymentArrangement> arrangement = root.get("paymentArrangement");
       where.add(

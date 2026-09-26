@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.account.service;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.AccountPremium;
+import com.iortatechnxt.brokerverse.account.domain.BusinessType;
 import com.iortatechnxt.brokerverse.account.domain.RiskItem;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.catalog.service.PeriodBasis;
@@ -9,6 +10,7 @@ import com.iortatechnxt.brokerverse.catalog.service.PremiumBreakdown;
 import com.iortatechnxt.brokerverse.catalog.service.PremiumBreakdown.ItemPremium;
 import com.iortatechnxt.brokerverse.catalog.service.RateSchemeExceptionService;
 import com.iortatechnxt.brokerverse.catalog.service.RatingQuery;
+import com.iortatechnxt.brokerverse.catalog.service.RatingQuery.Purpose;
 import com.iortatechnxt.brokerverse.catalog.service.RatingService;
 import com.iortatechnxt.brokerverse.catalog.service.RatingService.Rating;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
@@ -23,11 +25,12 @@ import org.springframework.stereotype.Component;
  * yet rateable (an item without sum insured, or without rate when the product has no default) is
  * saved unrated; submission requires a premium.
  *
- * <p>Accounts are new business (BRPM.007): a package is rated on its current released version (or
- * the version an approved rate exception of the account allows), which the account records; a
- * premium computed by the quotation keeps the quotation's version. An item rate other than the
- * scheme rate is refused on submission without the approved exception of the account ({@link
- * #requireScheme}).
+ * <p>A new-business account (BRPM.007) is rated on the package's current released version (or the
+ * version an approved rate exception of the account allows), which the account records; a premium
+ * computed by the quotation keeps the quotation's version. A RENEWAL account (shared work item BT0)
+ * is rated with the RENEWAL purpose on the version it keeps when that version is still released or
+ * superseded, else on the current one (PQ11). An item rate other than the scheme rate is refused on
+ * submission without the approved exception of the account ({@link #requireScheme}).
  */
 @Component
 public class AccountPricing {
@@ -104,6 +107,8 @@ public class AccountPricing {
   }
 
   private RatingQuery query(Account account, RiskProduct product, Terms terms, PeriodBasis basis) {
+    Purpose purpose =
+        account.getBusinessType() == BusinessType.RENEWAL ? Purpose.RENEWAL : Purpose.NEW_BUSINESS;
     String override =
         account.getRateOverrideRef() != null
             ? account.getRateOverrideRef()
@@ -130,7 +135,8 @@ public class AccountPricing {
             terms.commissionRate(),
             false,
             null)
-        .withScheme(RatingQuery.Purpose.NEW_BUSINESS, null, override);
+        .withScheme(
+            purpose, purpose == Purpose.RENEWAL ? account.getProductVersionNo() : null, override);
   }
 
   private static boolean rateable(Account account, RiskProduct product, PeriodBasis basis) {

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * Booked Accounts Register (NB-BOOKED-REG, BRNB.027 / 036 / 075 / 108): the invoices booked in the
  * period (bookings, endorsements and cancellations) with ARN, client, insurer, product, policy,
  * premium and charges, commission, cost center, officer, incentive flag and payment arrangement,
- * grouped by product line.
+ * grouped by product line. Filter Business Type (BRID-022.01, shared work item BT0).
  */
 @Component
 public class BookedAccountsRegisterReport implements ReportDefinition {
@@ -43,6 +43,7 @@ public class BookedAccountsRegisterReport implements ReportDefinition {
           + " and i.booking_date between :from and :to"
           + " and (cast(:kind as varchar) is null or i.kind = :kind)"
           + " and (cast(:insurer as varchar) is null or i.insurer_code = :insurer)"
+          + " and (cast(:businessType as varchar) is null or i.business_type = :businessType)"
           + " order by i.line_code, i.booking_date, i.invoice_no";
 
   private final NbReportJdbc jdbc;
@@ -75,7 +76,8 @@ public class BookedAccountsRegisterReport implements ReportDefinition {
                 "ENDORSEMENT_MINUS",
                 "CANCELLATION"),
             NbReportSupport.ALL),
-        ParameterSpec.optional(INSURER, "Insurer Code", ParameterType.TEXT));
+        ParameterSpec.optional(INSURER, "Insurer Code", ParameterType.TEXT),
+        NbReportSupport.businessTypeFilter());
   }
 
   @Override
@@ -83,7 +85,10 @@ public class BookedAccountsRegisterReport implements ReportDefinition {
     var args =
         NbReportSupport.args(p)
             .with(KIND, NbReportSupport.selected(p, KIND))
-            .with(INSURER, NbReportSupport.upper(p, INSURER));
+            .with(INSURER, NbReportSupport.upper(p, INSURER))
+            .with(
+                NbReportSupport.BUSINESS_TYPE,
+                NbReportSupport.selected(p, NbReportSupport.BUSINESS_TYPE));
     var rows =
         jdbc.rows(SQL, args.map()).stream()
             .map(

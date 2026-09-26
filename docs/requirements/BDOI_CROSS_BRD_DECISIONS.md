@@ -248,6 +248,11 @@ Check after the edits:
 | **P4** | **`ReportCategory` additions** | All seven builds | `RENEWAL` ("Renewal"), `CLAIMS_HANDLING` ("Claims Handling"), `EMPLOYEE_BENEFITS` ("Employee Benefits"), `CUSTOMER_SERVICE` ("Customer Service"), `COMPLIANCE` ("Compliance"), `SUBMITTED_POLICIES` ("Submitted Policies"); UAM uses the existing `CONTROL`. The `ReportMetadata` factories (`claimsHandling`, `compliance`, `submitted`, ...) and Renewal's `ParameterType.CODE_SET` stay with each build | All six values in one commit by the first foundation wave (6.2, step A2); later foundations add only their factory |
 | **P5** | **Order of the shared files** (`security/domain/Permission.java` first) | All seven foundation waves, plus the Collections and Accounting build agents | Shared files: `Permission.java`; `navigation/modules.ts`; `features/help/helpContent.ts`; `application.yml` and `docs/operations/CONFIGURATION.md`; `report/core/ReportCategory.java` / `ReportMetadata.java`; `crm/service/ClientService.java` (SANC S0 events, CSF S1 `updateContact`); `attachment/**` (EB E0 access classes, CSF S0 `AllowedFileType`, SANC S0 `DocumentNamingService`); `workflow/**` (SANC S0); `account/**` and `booking/**` (BT0, Renewal R0 fast track and `QueueSource.RENEWAL`, EB E0 billing number); `opsledger` ports (SP S0; CSF S1 with the Operations owner) | Foundation waves run **one at a time**, in the order of 6.2; each is additive and merged before the next starts |
 
+Status: **BT0 and P3 are built** by EB E0 (BT0 in its own commit, V822; P3 in V1031), and the DOCX protection of P2
+(`DocumentProtector`); the as-built contract is EMPLOYEE_BENEFITS_DESIGN section 16. EB is in BDOI Drop 2 without the
+partner portal, so decision D7's portal side (`ExternalUserProvisioner` implementation, `PORTAL_*` permissions) is
+parked with the portal.
+
 Wave names collide between designs (S0 is used by CSF, Sanction Screening and Submitted Policies). In plans, prefix
 them: RN-R0, CL-CL0, EB-E0, CSF-S0, SANC-S0, UAM-U0, SP-S0.
 

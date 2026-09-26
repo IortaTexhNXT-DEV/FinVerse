@@ -222,7 +222,20 @@ export interface Account {
   items: AccountItem[];
   createdBy: string;
   createdAt: string;
+  /** New Business or Renewal (BRNB.097, BRID-022.01; shared work item BT0). */
+  businessType: BusinessType;
+  /** What a renewal renews: expiring ARN, SBM number or legacy reference. */
+  renewalOfRef?: string;
+  /** How the account was created. */
+  origin: AccountOrigin;
 }
+
+/** Business type of an account (shared work item BT0). */
+export type BusinessType = 'NEW_BUSINESS' | 'RENEWAL';
+
+/** How an account was created (shared work item BT0). */
+export type AccountOrigin =
+  'QUOTATION' | 'PROPOSAL' | 'DIRECT' | 'SUBMITTED_POLICY' | 'EMPLOYEE_BENEFITS' | 'RENEWAL';
 
 export interface AccountSummary {
   id: number;
@@ -245,6 +258,7 @@ export interface AccountSummary {
   directPayment: boolean;
   accountOfficer?: string;
   createdAt: string;
+  businessType: BusinessType;
 }
 
 export interface DuplicateFinding {
@@ -283,6 +297,7 @@ export interface AccountCriteria {
   status?: AccountStatus[];
   periodFrom?: string;
   periodTo?: string;
+  businessType?: string;
 }
 
 /** Workflow entity type of accounts (NB_ACCOUNT work cases, attachments, e-mails). */

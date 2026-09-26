@@ -20,7 +20,8 @@ import org.springframework.stereotype.Component;
  * Production Statistics (NB-PRODUCTION, BRNB.075): bookings, premium and commission per region,
  * department, team or account officer (the sales organisation stamped on the account) for a date
  * range, against the units' targets pro rata to the period. Targets are demo values until BDOI
- * gives the hierarchy and target values (Q41).
+ * gives the hierarchy and target values (Q41). Filter Business Type (BRID-022.01, shared work item
+ * BT0): targets are shown unchanged whatever the filter.
  */
 @Component
 public class ProductionReport implements ReportDefinition {
@@ -53,7 +54,8 @@ public class ProductionReport implements ReportDefinition {
             LEVEL,
             "Sales Unit Level",
             Arrays.stream(UnitLevel.values()).map(Enum::name).toList(),
-            UnitLevel.TEAM.name()));
+            UnitLevel.TEAM.name()),
+        NbReportSupport.businessTypeFilter());
   }
 
   @Override
@@ -64,7 +66,8 @@ public class ProductionReport implements ReportDefinition {
                 p.longValue(NbReportSupport.COMPANY),
                 UnitLevel.valueOf(p.text(LEVEL)),
                 p.date(NbReportSupport.FROM),
-                p.date(NbReportSupport.TO))
+                p.date(NbReportSupport.TO),
+                NbReportSupport.selected(p, NbReportSupport.BUSINESS_TYPE))
             .stream()
             .map(ProductionReport::row)
             .toList();

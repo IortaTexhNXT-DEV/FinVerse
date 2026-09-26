@@ -38,6 +38,9 @@ public class Attachment extends BaseEntity {
   @Column(name = "document_type", length = 40)
   private String documentType;
 
+  @Column(name = "process_tag", length = 40)
+  private String processTag;
+
   @Column(nullable = false)
   private boolean deleted;
 
@@ -73,6 +76,20 @@ public class Attachment extends BaseEntity {
    */
   public void classify(String type) {
     this.documentType = type;
+  }
+
+  /**
+   * Tags the document with the process it belongs to (BRID-025: placement, renewal, endorsement,
+   * adjustment, franchise; the owning module's list of values).
+   *
+   * @param tag process code, null when none
+   */
+  public void tagProcess(String tag) {
+    this.processTag = tag;
+  }
+
+  public String getProcessTag() {
+    return processTag;
   }
 
   /**

@@ -302,4 +302,28 @@ public record ReportMetadata(
         Permission.BCL_REPORT_EXPORT,
         true);
   }
+
+  /**
+   * An Employee Benefits report (EMPLOYEE_BENEFITS_DESIGN section 9, BRID-022, 022.01, 030): viewed
+   * and exported with {@code EB_REPORT_VIEW}, archived. Reports that are documents add {@link
+   * #asDocument()} for the Word export.
+   *
+   * @param code report code (e.g. {@code EB-PRODUCTION})
+   * @param title title
+   * @param description one line purpose
+   * @param parameters parameters
+   * @return metadata in the Employee Benefits category
+   */
+  public static ReportMetadata employeeBenefits(
+      String code, String title, String description, List<ParameterSpec> parameters) {
+    return new ReportMetadata(
+        code,
+        title,
+        ReportCategory.EMPLOYEE_BENEFITS,
+        description,
+        parameters,
+        Permission.EB_REPORT_VIEW,
+        Permission.EB_REPORT_VIEW,
+        true);
+  }
 }

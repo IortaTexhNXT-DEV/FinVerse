@@ -252,7 +252,7 @@ class BookingBatchIT {
     assertThat(invoiceNo).startsWith("BI-HO-");
     assertThat(upload.validate(good, context)).isNotEmpty();
     assertThat(upload.code()).isEqualTo("BOOKING_UPLOAD");
-    assertThat(upload.columns()).hasSize(3);
+    assertThat(upload.columns()).hasSize(4);
     assertThat(upload.duplicateKey(good)).isEqualTo(account.getArn());
     assertThat(upload.title()).isNotBlank();
     assertThat(upload.instructions()).isNotBlank();

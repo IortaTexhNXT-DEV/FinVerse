@@ -19,6 +19,7 @@ import java.time.Instant;
  * @param uploadedAt upload time
  * @param documentType document type (list DOCUMENT_TYPE)
  * @param linked whether the file belongs to another record and is linked to this one
+ * @param processTag process the document belongs to (BRID-025), null when none
  */
 public record AttachmentResponse(
     Long id,
@@ -32,7 +33,8 @@ public record AttachmentResponse(
     String uploadedBy,
     Instant uploadedAt,
     String documentType,
-    boolean linked) {
+    boolean linked,
+    String processTag) {
 
   /**
    * Maps an entity.
@@ -68,6 +70,7 @@ public record AttachmentResponse(
         a.getCreatedBy(),
         a.getCreatedAt(),
         a.getDocumentType(),
-        !own);
+        !own,
+        a.getProcessTag());
   }
 }

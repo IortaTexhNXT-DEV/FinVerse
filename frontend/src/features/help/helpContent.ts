@@ -15,6 +15,7 @@ import { COLLECTIONS_HELP } from '@/features/collections/help';
 import { COMMISSION_HELP } from '@/features/commission/help';
 import { CRM_HELP } from '@/features/crm/help';
 import { DISBURSEMENT_HELP } from '@/features/disbursement/help';
+import { EB_HELP } from '@/features/eb/help';
 import { FRBS_HELP } from '@/features/frbs/help';
 import { PROPOSALS_HELP } from '@/features/proposals/help';
 import { QUOTATIONS_HELP } from '@/features/quotations/help';
@@ -118,6 +119,7 @@ export const HELP_SECTIONS: HelpSection[] = [
   QUOTATIONS_HELP,
   ACCOUNTS_HELP,
   PROPOSALS_HELP,
+  EB_HELP,
   PLACEMENT_HELP,
   ISSUANCE_HELP,
   BOOKING_HELP,

@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.booking;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.AccountData.Mortgage;
+import com.iortatechnxt.brokerverse.account.domain.AccountOrigin;
 import com.iortatechnxt.brokerverse.account.domain.InsuredItem;
 import com.iortatechnxt.brokerverse.account.domain.PaymentArrangement;
 import com.iortatechnxt.brokerverse.account.domain.RiskItemData;
@@ -104,8 +105,29 @@ public class BookingFixtures {
         new Spec("PAR01", "CBG", PaymentArrangement.VIA_BDOI, from, from.plusYears(years), years));
   }
 
+  /**
+   * An issued MTR10 CBG motor account created as a RENEWAL (shared work item BT0).
+   *
+   * @param renewalOf what it renews
+   * @return account
+   */
+  public Account renewalMotor(String renewalOf) {
+    return issued(spec("MTR10", "CBG", PaymentArrangement.VIA_BDOI), renewalOf);
+  }
+
   /** Brings an account to POLICY_ISSUED by direct booking (BRNB.111) with its policy numbers. */
   public Account issued(Spec spec) {
+    return issued(spec, null);
+  }
+
+  /**
+   * Brings an account to POLICY_ISSUED by direct booking, as new business or as a renewal.
+   *
+   * @param spec what to issue
+   * @param renewalOf what a renewal renews, null for new business
+   * @return account
+   */
+  public Account issued(Spec spec, String renewalOf) {
     Long clientId = clients.requireByCode(company(), CLIENT).getId();
     String id = token();
     RiskItemData item =
@@ -130,7 +152,11 @@ public class BookingFixtures {
             null,
             null,
             null);
-    Account account = as.run("ao", () -> accounts.createDraft(NewAccount.direct(company(), draft)));
+    NewAccount request =
+        renewalOf == null
+            ? NewAccount.direct(company(), draft)
+            : NewAccount.renewal(company(), AccountOrigin.RENEWAL, draft, renewalOf, null);
+    Account account = as.run("ao", () -> accounts.createDraft(request));
     attach(account.getId(), "IDF");
     attach(account.getId(), "EPOLICY");
     as.run("ao", () -> accounts.submit(account.getId(), null));

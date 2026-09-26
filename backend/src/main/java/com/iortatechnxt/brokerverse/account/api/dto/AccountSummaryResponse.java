@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.account.api.dto;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.AccountStatus;
+import com.iortatechnxt.brokerverse.account.domain.BusinessType;
 import com.iortatechnxt.brokerverse.account.domain.PaymentArrangement;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -30,6 +31,7 @@ import java.time.LocalDate;
  * @param directPayment direct payment flag
  * @param accountOfficer account officer
  * @param createdAt creation time
+ * @param businessType New Business or Renewal (BRNB.097, BT0)
  */
 public record AccountSummaryResponse(
     Long id,
@@ -51,7 +53,8 @@ public record AccountSummaryResponse(
     PaymentArrangement paymentArrangement,
     boolean directPayment,
     String accountOfficer,
-    Instant createdAt) {
+    Instant createdAt,
+    BusinessType businessType) {
 
   /**
    * Maps an account (scalar columns only).
@@ -80,6 +83,7 @@ public record AccountSummaryResponse(
         a.getPaymentArrangement(),
         a.isDirectPayment(),
         a.getSales().accountOfficer(),
-        a.getCreatedAt());
+        a.getCreatedAt(),
+        a.getBusinessType());
   }
 }

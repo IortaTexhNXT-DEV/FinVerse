@@ -2,8 +2,10 @@ package com.iortatechnxt.brokerverse.account.api.dto;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.AccountContact;
+import com.iortatechnxt.brokerverse.account.domain.AccountOrigin;
 import com.iortatechnxt.brokerverse.account.domain.AccountPremium;
 import com.iortatechnxt.brokerverse.account.domain.AccountStatus;
+import com.iortatechnxt.brokerverse.account.domain.BusinessType;
 import com.iortatechnxt.brokerverse.account.domain.FreeFirstYear;
 import com.iortatechnxt.brokerverse.account.domain.PaymentArrangement;
 import com.iortatechnxt.brokerverse.account.domain.SalesStamp;
@@ -57,6 +59,9 @@ import java.util.List;
  * @param createdAt creation time
  * @param productVersionNo package version that priced the premium (BRPM.007), null when none
  * @param rateOverrideRef approved rate-scheme exception used, null when none
+ * @param businessType New Business or Renewal (BRNB.097, BRID-022.01; BT0)
+ * @param renewalOfRef what a renewal renews (expiring ARN, SBM number, legacy reference)
+ * @param origin how the account was created
  */
 public record AccountResponse(
     Long id,
@@ -99,7 +104,10 @@ public record AccountResponse(
     String createdBy,
     Instant createdAt,
     Integer productVersionNo,
-    String rateOverrideRef) {
+    String rateOverrideRef,
+    BusinessType businessType,
+    String renewalOfRef,
+    AccountOrigin origin) {
 
   /**
    * Maps an account (items and numbers loaded).
@@ -149,6 +157,9 @@ public record AccountResponse(
         a.getCreatedBy(),
         a.getCreatedAt(),
         a.getProductVersionNo(),
-        a.getRateOverrideRef());
+        a.getRateOverrideRef(),
+        a.getBusinessType(),
+        a.getClassification().renewalOfRef(),
+        a.getClassification().origin());
   }
 }

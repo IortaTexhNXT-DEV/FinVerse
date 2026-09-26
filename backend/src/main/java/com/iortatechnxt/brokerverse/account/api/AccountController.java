@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.account.api.dto.FfyRequest;
 import com.iortatechnxt.brokerverse.account.api.dto.PaymentArrangementRequest;
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.AccountStatus;
+import com.iortatechnxt.brokerverse.account.domain.BusinessType;
 import com.iortatechnxt.brokerverse.account.service.AccountQueryService;
 import com.iortatechnxt.brokerverse.account.service.AccountSearch;
 import com.iortatechnxt.brokerverse.account.service.AccountService;
@@ -114,7 +115,8 @@ public class AccountController {
             periodFrom,
             periodTo,
             officer,
-            Boolean.TRUE.equals(criteria.includeVoided()));
+            Boolean.TRUE.equals(criteria.includeVoided()),
+            criteria.businessType());
     PageRequest pageable =
         PageRequest.of(
             Math.max(page, 0),
@@ -315,6 +317,7 @@ public class AccountController {
    * @param officer account officer
    * @param mine only the current user's accounts
    * @param includeVoided include voided accounts
+   * @param businessType New Business or Renewal (BT0), null for both
    */
   public record SearchParams(
       String text,
@@ -328,5 +331,6 @@ public class AccountController {
       Boolean directPayment,
       String officer,
       Boolean mine,
-      Boolean includeVoided) {}
+      Boolean includeVoided,
+      BusinessType businessType) {}
 }

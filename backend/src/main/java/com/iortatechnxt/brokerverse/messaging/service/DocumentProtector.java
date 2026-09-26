@@ -21,9 +21,10 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.springframework.stereotype.Component;
 
 /**
- * Password-protects outbound documents (BRNB.013/035): PDF with AES-256, Excel workbooks with
- * Office agile encryption. Other file types cannot be protected and are refused, so an unprotected
- * copy is never sent by mistake.
+ * Password-protects outbound documents (BRNB.013/035, BRID-007): PDF with AES-256, Excel workbooks
+ * and Word documents with Office agile encryption. Other file types (CSV, images...) cannot be
+ * protected and are refused ({@code DOCUMENT_NOT_PROTECTABLE}), so an unprotected copy is never
+ * sent by mistake.
  */
 @Component
 public class DocumentProtector {
@@ -31,6 +32,8 @@ public class DocumentProtector {
   private static final String PDF = "application/pdf";
   private static final String XLSX =
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  private static final String DOCX =
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
   private final DocumentPasswordPolicy passwords;
 
@@ -47,10 +50,10 @@ public class DocumentProtector {
    * Whether a file can be protected.
    *
    * @param file file
-   * @return true for PDF and XLSX
+   * @return true for PDF, XLSX and DOCX
    */
   public boolean canProtect(MessageFile file) {
-    return isPdf(file) || isXlsx(file);
+    return isPdf(file) || isOfficeOpenXml(file);
   }
 
   /**
@@ -65,8 +68,9 @@ public class DocumentProtector {
       if (isPdf(file)) {
         return new MessageFile(file.fileName(), file.mimeType(), protectPdf(file, password));
       }
-      if (isXlsx(file)) {
-        return new MessageFile(file.fileName(), file.mimeType(), protectXlsx(file, password));
+      if (isOfficeOpenXml(file)) {
+        return new MessageFile(
+            file.fileName(), file.mimeType(), protectOfficeOpenXml(file, password));
       }
     } catch (IOException | GeneralSecurityException | InvalidFormatException e) {
       throw new BusinessRuleException(
@@ -76,7 +80,7 @@ public class DocumentProtector {
     }
     throw new BusinessRuleException(
         "DOCUMENT_NOT_PROTECTABLE",
-        file.fileName() + " cannot be password protected (only PDF and Excel files can)");
+        file.fileName() + " cannot be password protected. Send it as PDF, Excel or Word");
   }
 
   private byte[] protectPdf(MessageFile file, String password) throws IOException {
@@ -92,7 +96,8 @@ public class DocumentProtector {
     return out.toByteArray();
   }
 
-  private static byte[] protectXlsx(MessageFile file, String password)
+  /** Excel and Word files share the Office Open XML package and its agile encryption. */
+  private static byte[] protectOfficeOpenXml(MessageFile file, String password)
       throws IOException, GeneralSecurityException, InvalidFormatException {
     try (POIFSFileSystem fs = new POIFSFileSystem()) {
       Encryptor encryptor = new EncryptionInfo(EncryptionMode.agile).getEncryptor();
@@ -111,8 +116,11 @@ public class DocumentProtector {
     return PDF.equals(file.mimeType()) || lowerName(file).endsWith(".pdf");
   }
 
-  private static boolean isXlsx(MessageFile file) {
-    return XLSX.equals(file.mimeType()) || lowerName(file).endsWith(".xlsx");
+  private static boolean isOfficeOpenXml(MessageFile file) {
+    return XLSX.equals(file.mimeType())
+        || DOCX.equals(file.mimeType())
+        || lowerName(file).endsWith(".xlsx")
+        || lowerName(file).endsWith(".docx");
   }
 
   private static String lowerName(MessageFile file) {

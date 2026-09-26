@@ -102,6 +102,9 @@ public class BookedInvoice extends BaseEntity {
   @Column(name = "booked_at")
   private Instant bookedAt;
 
+  @Column(name = "insurer_billing_no", length = 60)
+  private String insurerBillingNo;
+
   @ElementCollection
   @CollectionTable(name = "bkg_invoice_share", joinColumns = @JoinColumn(name = "invoice_id"))
   @OrderColumn(name = "share_index")
@@ -195,6 +198,20 @@ public class BookedInvoice extends BaseEntity {
    */
   public void linkServiceInvoice(String number) {
     this.serviceInvoiceNo = number;
+  }
+
+  /**
+   * Records the insurer's billing number of the invoice (BRID-020); unique per company and insurer
+   * ({@code BILLING_NO_DUPLICATE}, checked by the booking service and the database).
+   *
+   * @param billingNo billing number, null when none
+   */
+  public void recordInsurerBillingNo(String billingNo) {
+    this.insurerBillingNo = billingNo;
+  }
+
+  public String getInsurerBillingNo() {
+    return insurerBillingNo;
   }
 
   /** A scheduled policy year of a cancelled account will not be booked. */

@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component;
 /**
  * Booking parameters (sys_parameter, V870) and the booking branch: commission realization {@code
  * OPS_COMMISSION_REALIZATION}, withholding tax rate on commission {@code BOOKING_WTAX_RATE} and the
- * CWT 2 % segments {@code BOOKING_CWT2_SEGMENTS}.
+ * CWT 2 % segments {@code BOOKING_CWT2_SEGMENTS}; the product lines that need the insurer billing
+ * number {@code BOOKING_BILLING_NO_LINES} (V1030, BRID-020).
  */
 @Component
 public class BookingSettings {
@@ -28,6 +29,9 @@ public class BookingSettings {
 
   /** Segments whose clients withhold 2 % creditable tax on premium. */
   public static final String CWT2_SEGMENTS = "BOOKING_CWT2_SEGMENTS";
+
+  /** Product lines whose bookings need the insurer billing number (BRID-020). */
+  public static final String BILLING_NO_LINES = "BOOKING_BILLING_NO_LINES";
 
   private static final String DEFAULT_WTAX = "10";
 
@@ -71,6 +75,15 @@ public class BookingSettings {
    */
   public List<String> cwt2Segments() {
     return parameters.items(CWT2_SEGMENTS);
+  }
+
+  /**
+   * Product lines whose bookings need the insurer billing number (BRID-020; EB lines by default).
+   *
+   * @return product line codes
+   */
+  public List<String> billingNoLines() {
+    return parameters.items(BILLING_NO_LINES);
   }
 
   /**

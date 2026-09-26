@@ -23,6 +23,7 @@ interface Options {
   bookingDate: string;
   costCenter: string;
   cwt2Percent: boolean;
+  insurerBillingNo: string;
 }
 
 function requestOf(arn: string, o: Options): BookRequest {
@@ -31,6 +32,7 @@ function requestOf(arn: string, o: Options): BookRequest {
     bookingDate: o.bookingDate,
     costCenter: o.costCenter.trim() || undefined,
     cwt2Percent: o.cwt2Percent ? true : undefined,
+    insurerBillingNo: o.insurerBillingNo.trim() || undefined,
   };
 }
 
@@ -65,6 +67,20 @@ function OptionsForm({
             maxLength={20}
             value={value.costCenter}
             onChange={(e) => onChange({ ...value, costCenter: e.target.value.toUpperCase() })}
+          />
+        )}
+      </Field>
+      <Field
+        label="Insurer billing no."
+        hint="Required for Employee Benefits lines (HMO, GLI, GPA); unique per insurer."
+      >
+        {(id) => (
+          <input
+            id={id}
+            className="input"
+            maxLength={60}
+            value={value.insurerBillingNo}
+            onChange={(e) => onChange({ ...value, insurerBillingNo: e.target.value })}
           />
         )}
       </Field>
@@ -185,6 +201,7 @@ export default function BookingConfirmPage() {
     bookingDate: today(),
     costCenter: '',
     cwt2Percent: false,
+    insurerBillingNo: '',
   });
   const [applied, setApplied] = useState<Options>(options);
   const account = useQuery({

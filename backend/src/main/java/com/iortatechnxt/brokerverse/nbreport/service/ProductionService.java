@@ -39,6 +39,7 @@ public class ProductionService {
           + " from bkg_invoice i join acc_account a on a.id = i.account_id"
           + " where i.company_id = :company and i.status = 'BOOKED'"
           + " and i.booking_date between :from and :to"
+          + " and (cast(:businessType as varchar) is null or i.business_type = :businessType)"
           + " group by 1";
 
   private static final String UNIT_NAMES =
@@ -70,11 +71,27 @@ public class ProductionService {
    */
   public List<UnitProduction> production(
       long companyId, UnitLevel level, LocalDate from, LocalDate to) {
+    return production(companyId, level, from, to, null);
+  }
+
+  /**
+   * Production and targets of every unit of a level in a period, for one business type.
+   *
+   * @param companyId company
+   * @param level unit level
+   * @param from period start
+   * @param to period end
+   * @param businessType NEW_BUSINESS or RENEWAL (BRID-022.01), null for both
+   * @return units by code
+   */
+  public List<UnitProduction> production(
+      long companyId, UnitLevel level, LocalDate from, LocalDate to, String businessType) {
     Map<String, Object> args =
         SqlArgs.company(companyId)
             .with("level", level.name())
             .with("from", from)
             .with("to", to)
+            .with("businessType", businessType)
             .map();
     Map<String, Totals> units = new TreeMap<>();
     for (Map<String, Object> row : jdbc.rows(PRODUCTION, args)) {

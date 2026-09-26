@@ -34,7 +34,8 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Document attachments on any record: upload (one or several files, document type, inherited or
  * nominated names), list (own and linked files), download (single or ZIP), link to other records
- * and remove (BRNB.026/055/056).
+ * and remove (BRNB.026/055/056). Lists and downloads apply the document access classes and uploads
+ * and links take a process tag (BRID-025).
  */
 @RestController
 @RequestMapping("/api/v1/attachments")
@@ -93,10 +94,7 @@ public class AttachmentController {
    *
    * @param entityType entity type
    * @param entityId entity id
-   * @param description optional description
-   * @param documentType optional document type (list DOCUMENT_TYPE)
-   * @param naming INHERIT (default) or NOMINATE
-   * @param reference business reference for nominated names
+   * @param form description, document type, naming, reference and process tag (all optional)
    * @param file file
    * @return metadata
    * @throws IOException when the upload cannot be read
@@ -107,16 +105,10 @@ public class AttachmentController {
   public AttachmentResponse upload(
       @RequestParam String entityType,
       @RequestParam String entityId,
-      @RequestParam(required = false) String description,
-      @RequestParam(required = false) String documentType,
-      @RequestParam(required = false) String naming,
-      @RequestParam(required = false) String reference,
+      UploadForm form,
       @RequestParam MultipartFile file)
       throws IOException {
-    return uploadAll(
-            new AttachmentTarget(entityType, entityId),
-            List.of(file),
-            new UploadOptions(documentType, NOMINATE.equals(naming), reference, description))
+    return uploadAll(new AttachmentTarget(entityType, entityId), List.of(file), form.options())
         .get(0);
   }
 
@@ -125,10 +117,7 @@ public class AttachmentController {
    *
    * @param entityType entity type
    * @param entityId entity id
-   * @param description optional description
-   * @param documentType optional document type
-   * @param naming INHERIT (default) or NOMINATE
-   * @param reference business reference for nominated names
+   * @param form description, document type, naming, reference and process tag (all optional)
    * @param files files
    * @return metadata in upload order
    * @throws IOException when an upload cannot be read
@@ -139,16 +128,10 @@ public class AttachmentController {
   public List<AttachmentResponse> uploadBatch(
       @RequestParam String entityType,
       @RequestParam String entityId,
-      @RequestParam(required = false) String description,
-      @RequestParam(required = false) String documentType,
-      @RequestParam(required = false) String naming,
-      @RequestParam(required = false) String reference,
+      UploadForm form,
       @RequestParam("files") List<MultipartFile> files)
       throws IOException {
-    return uploadAll(
-        new AttachmentTarget(entityType, entityId),
-        files,
-        new UploadOptions(documentType, NOMINATE.equals(naming), reference, description));
+    return uploadAll(new AttachmentTarget(entityType, entityId), files, form.options());
   }
 
   private List<AttachmentResponse> uploadAll(
@@ -174,11 +157,11 @@ public class AttachmentController {
   @PostMapping("/{id}/links")
   @PreAuthorize(MANAGE)
   public AttachmentResponse link(@PathVariable Long id, @Valid @RequestBody LinkRequest request) {
-    return AttachmentResponse.from(documents.link(id, request.targets()));
+    return AttachmentResponse.from(documents.link(id, request.targets(), request.processTag()));
   }
 
   /**
-   * Downloads a file.
+   * Downloads a file the user may see (document access classes, BRID-025).
    *
    * @param id id
    * @return file
@@ -186,7 +169,7 @@ public class AttachmentController {
   @GetMapping("/{id}/content")
   @PreAuthorize(VIEW)
   public ResponseEntity<byte[]> download(@PathVariable Long id) {
-    AttachmentFile file = service.download(id);
+    AttachmentFile file = documents.download(id);
     return ResponseEntity.ok()
         .contentType(MediaType.parseMediaType(file.metadata().getContentType()))
         .header(
@@ -230,6 +213,29 @@ public class AttachmentController {
     AttachmentTarget target =
         entityType == null || entityId == null ? null : new AttachmentTarget(entityType, entityId);
     documents.remove(id, target);
+  }
+
+  /**
+   * Optional fields of an upload, bound from the request parameters.
+   *
+   * @param description description of the files
+   * @param documentType document type (list DOCUMENT_TYPE)
+   * @param naming INHERIT (default) or NOMINATE
+   * @param reference business reference for nominated names
+   * @param processTag process the documents belong to (BRID-025)
+   */
+  public record UploadForm(
+      String description, String documentType, String naming, String reference, String processTag) {
+
+    /**
+     * The upload options.
+     *
+     * @return options
+     */
+    UploadOptions options() {
+      return new UploadOptions(
+          documentType, NOMINATE.equals(naming), reference, description, processTag);
+    }
   }
 
   /**

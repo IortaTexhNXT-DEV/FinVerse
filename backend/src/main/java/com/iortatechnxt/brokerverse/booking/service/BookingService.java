@@ -28,7 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * <p>The booking key is the ARN plus the transaction number ({@code NB} for the original booking):
  * a second booking of the same transaction is refused (BRNB.076). A multi-year account books its
- * first policy year and schedules the others ({@link #bookDueYear}).
+ * first policy year and schedules the others ({@link #bookDueYear}). The insurer billing number,
+ * when given or required, is stored on the first invoice (BRID-020).
  */
 @Service
 @Transactional
@@ -40,6 +41,7 @@ public class BookingService {
   private final QueueEntryRepository queue;
   private final InvoiceBuilder builder;
   private final InvoiceBooker booker;
+  private final InsurerBillingNumbers billing;
   private final Clock clock;
 
   /**
@@ -51,6 +53,7 @@ public class BookingService {
    * @param queue booking queue
    * @param builder invoice builder
    * @param booker invoice booker
+   * @param billing insurer billing number checks (BRID-020)
    * @param clock clock
    */
   public BookingService(
@@ -60,6 +63,7 @@ public class BookingService {
       QueueEntryRepository queue,
       InvoiceBuilder builder,
       InvoiceBooker booker,
+      InsurerBillingNumbers billing,
       Clock clock) {
     this.accounts = accounts;
     this.lifecycle = lifecycle;
@@ -67,6 +71,7 @@ public class BookingService {
     this.queue = queue;
     this.builder = builder;
     this.booker = booker;
+    this.billing = billing;
     this.clock = clock;
   }
 
@@ -74,18 +79,22 @@ public class BookingService {
    * Books an account.
    *
    * @param arn Account Reference Number
-   * @param options booking date, cost center, CWT 2 % and insurer shares
+   * @param options booking date, cost center, CWT 2 %, insurer shares and insurer billing number
    * @param source how it is booked
    * @return the booked invoice of the first policy year
    */
   public BookedInvoice book(String arn, BookingOptions options, BookingSource source) {
     Account account = requireBookable(arn);
+    String billingNo = checkBillingNo(account, options.insurerBillingNo());
     LocalDate date = options.bookingDate() == null ? LocalDate.now(clock) : options.bookingDate();
     List<InvoiceDraft> drafts = builder.drafts(account, options, date);
     for (InvoiceDraft later : drafts.subList(1, drafts.size())) {
       invoices.save(BookedInvoice.draft(later));
     }
-    BookedInvoice first = booker.book(BookedInvoice.draft(drafts.get(0)), date, source);
+    BookedInvoice firstDraft = BookedInvoice.draft(drafts.get(0));
+    firstDraft.recordInsurerBillingNo(billingNo);
+    BookedInvoice first = booker.book(firstDraft, date, source);
+    billing.notifyBooked(first);
     lifecycle.recordBooking(
         arn,
         first.getInvoiceNo(),
@@ -124,6 +133,26 @@ public class BookingService {
     }
     LocalDate today = LocalDate.now(clock);
     return booker.book(invoice, businessDate.isAfter(today) ? today : businessDate, source);
+  }
+
+  /**
+   * Checks the insurer billing number of a booking (BRID-020): required for the lines of {@code
+   * BOOKING_BILLING_NO_LINES}, unique per company and insurer. A duplicate notifies the booker and
+   * the account officer before it is refused.
+   *
+   * @param account account to book
+   * @param billingNo billing number, null when none
+   * @return the billing number, null when none
+   */
+  public String checkBillingNo(Account account, String billingNo) {
+    try {
+      return billing.check(account, billingNo);
+    } catch (BusinessRuleException e) {
+      if (InsurerBillingNumbers.DUPLICATE.equals(e.getCode())) {
+        billing.notifyDuplicate(account, e.getMessage());
+      }
+      throw e;
+    }
   }
 
   /**

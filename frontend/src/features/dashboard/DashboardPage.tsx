@@ -14,12 +14,14 @@ import { CollectionsWidget } from './widgets/CollectionsWidget';
 import { PayablesWidget } from './widgets/PayablesWidget';
 import { PremiumWidget } from './widgets/PremiumWidget';
 import { SummaryCharts, SummaryKpis } from './widgets/SummaryWidgets';
+import { showsInsurerWidgets } from './insurerWidgets';
 import { WorkloadWidget } from './widgets/WorkloadWidget';
 
 /**
- * Executive finance dashboard: headline KPIs of the ledger, then one widget per area (premium,
- * claims, collections, payables, cash, budget). Every widget loads on its own and shows a message
- * instead of a chart when it has no data.
+ * Executive finance dashboard: headline KPIs of the ledger, then one widget per area
+ * (collections, payables, cash, budget). Every widget loads on its own and shows a message
+ * instead of a chart when it has no data. The insurer premium and claims widgets are hidden for
+ * every BDOI role (they show insurer KPIs).
  */
 export default function DashboardPage() {
   const companyId = useCompanyId();
@@ -27,6 +29,7 @@ export default function DashboardPage() {
   const { user, can } = useAuth();
   const navigate = useNavigate();
   const allowed = can('DASHBOARD_VIEW');
+  const insurerKpis = allowed && showsInsurerWidgets(user?.roles);
   const summary = useQuery({
     queryKey: ['dashboard', companyId, branchId],
     queryFn: () => dashboardApi.summary(companyId, branchId),
@@ -61,8 +64,8 @@ export default function DashboardPage() {
         <WorkloadWidget enabled={allowed} />
       </div>
       <div className="grid-2">
-        <PremiumWidget enabled={allowed} />
-        <ClaimsWidget enabled={allowed} />
+        {insurerKpis && <PremiumWidget enabled />}
+        {insurerKpis && <ClaimsWidget enabled />}
         <CollectionsWidget enabled={allowed} />
         <PayablesWidget enabled={allowed} />
         <CashWidget enabled={allowed} />

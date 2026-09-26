@@ -703,6 +703,14 @@ dl.form-grid dd {
   align-items: start;
 }
 
+.header-role {
+  font-size: 12px;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ---------- Tabs with counts ------------------------------------------------------------- */
 .tab-count {
   display: inline-block;

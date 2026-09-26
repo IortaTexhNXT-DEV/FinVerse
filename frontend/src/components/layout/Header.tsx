@@ -4,6 +4,8 @@ import { useAuth } from '@/auth/authContext';
 import { useWorkspace } from '@/context/workspaceContext';
 import { HeaderTools } from './HeaderTools';
 import { shortCompanyName } from './companyName';
+import { useRoleName } from '@/components/ui/useDisplayName';
+import { humanize } from '@/utils/format';
 
 function initials(name: string): string {
   return name
@@ -18,6 +20,7 @@ function initials(name: string): string {
 export function Header() {
   const { user, logout } = useAuth();
   const { companies, company, branches, branchId, setCompanyId, setBranchId } = useWorkspace();
+  const roleName = useRoleName();
 
   return (
     <header className="app-header">
@@ -63,8 +66,8 @@ export function Header() {
             <Link to="/profile" style={{ fontWeight: 600 }} title="My profile">
               {user.fullName}
             </Link>
-            <div className="muted" style={{ fontSize: 12 }}>
-              {user.roles.join(', ')}
+            <div className="muted header-role" title={user.roles.map(humanize).join(', ')}>
+              {roleName(user.username) ?? humanize(user.roles[0] ?? '')}
             </div>
           </div>
           <span className="avatar" aria-hidden="true">

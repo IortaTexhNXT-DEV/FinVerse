@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.adjustment.domain.EndorsementRequest.Content
 import com.iortatechnxt.brokerverse.adjustment.domain.RequestClass;
 import com.iortatechnxt.brokerverse.adjustment.domain.RequestTerms;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.domain.LovValue;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
@@ -63,7 +64,7 @@ public class RequestRules {
   public Content content(RequestDraft draft, OpsInvoice invoice) {
     RequestTerms terms = draft.terms();
     requireComplete(terms);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     LovValue type = lovs.requireValid(TYPE_LOV, terms.endorsementType(), today);
     RequestClass requestClass = classOf(type);
     lovs.validateOptional(REQUEST_TYPE_LOV, terms.requestType(), today);

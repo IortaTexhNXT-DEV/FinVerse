@@ -120,8 +120,7 @@ public class AccessAuditLogReport implements ReportDefinition {
     return UamReportSupport.metadata(
         CODE,
         "User Access Audit Log",
-        "Access activities with from and to values, done by, approved by and request number"
-            + " (BRD 4.003.1)",
+        "Access activities with from and to values, done by, approved by and request number",
         params);
   }
 

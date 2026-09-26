@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.ApplicationService.ApplyO
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
@@ -22,7 +23,6 @@ import com.iortatechnxt.brokerverse.opsledger.service.OpsLedgerEvents.PaymentRev
 import com.iortatechnxt.brokerverse.opsledger.service.port.PaymentReversalRequester;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -122,7 +122,7 @@ public class CashieringPaymentReversals implements PaymentReversalRequester {
                     request.receiptNo(),
                     request.currency(),
                     request.amount(),
-                    request.valueDate() == null ? LocalDate.now(clock) : request.valueDate(),
+                    request.valueDate() == null ? BusinessClock.today(clock) : request.valueDate(),
                     request.reason(),
                     request.source().requestedBy())));
     support.audit(

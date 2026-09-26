@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.ExtractFile;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
@@ -175,7 +176,7 @@ public class ProductionExtractService {
             cycle.getInsurerCode(),
             cycle.getProductionMonth(),
             no.substring(no.lastIndexOf('-') + 1),
-            LocalDate.now(clock));
+            BusinessClock.today(clock));
     DroppedFile file =
         drop.drop(
             companyId,

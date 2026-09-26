@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.screening.cases.service;
 
 import com.iortatechnxt.brokerverse.alert.domain.AlertFacts;
 import com.iortatechnxt.brokerverse.alert.service.AlertService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseEvent.EventFacts;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseEventType;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseStage;
@@ -76,7 +77,7 @@ public class SlaMonitor {
    */
   public Result run() {
     Instant now = clock.instant();
-    LocalDate today = LocalDate.now(clock.withZone(CaseSpecs.MANILA));
+    LocalDate today = BusinessClock.today(clock);
     int reminders = 0;
     int breaches = 0;
     int documents = 0;

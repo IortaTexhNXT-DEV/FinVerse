@@ -55,7 +55,9 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
 | Error for a broken business rule | `throw new BusinessRuleException("UPPER_SNAKE_CODE", "Readable message")` → HTTP 422 |
 | Not found / duplicate | `ResourceNotFoundException` (404), `DuplicateResourceException` (409) |
 | Current user | `common.security.CurrentUser` |
-| Time | inject `java.time.Clock` (never `LocalDate.now()` without a clock) |
+| Time | inject `java.time.Clock`; timestamps (`Instant`, audit columns) stay UTC via `clock.instant()` |
+| Business date | `common.time.BusinessClock`: `today(clock)`, `currentMonth(clock)`, `currentYear(clock)`, `dateOf(instant)`, `startOf(date)` on the business zone (see "Business date" below) |
+| Error texts shown to users | business wording only, no requirement or question references (see "User-facing text" below) |
 | Money | `BigDecimal` only, scale 2; helpers in `common.util.Money` |
 | Document numbers | `common.sequence.DocumentNumberService.next("PREFIX-BRANCH-YYYY")` |
 | Audit trail | `audit.service.AuditTrailService.record(entity, key, AuditAction, summary)` on every change |
@@ -91,6 +93,41 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
   (≥ 4), no copy-pasted blocks (CPD 120 tokens).
 - Formatting is automatic: run `mvn spotless:apply` before committing.
 
+### Business date
+
+The platform has one business date: the calendar day of the business zone
+`brokerverse.business-zone` (default `Asia/Manila`, variable `BROKERVERSE_BUSINESS_ZONE`), taken by
+`common.time.BusinessClock`. Between 16:00 and 24:00 UTC the UTC date is still the previous day, so
+a date taken from the UTC clock refuses a Manila "today" as a future date in the evening.
+
+- Every business date comes from `BusinessClock`: "today" (`today(clock)`), "not in the future",
+  period and cut-off checks, the current month or year (`currentMonth`, `currentYear`), report date
+  keywords, job run dates. The business day of a recorded timestamp is `dateOf(instant)`; the lower
+  bound of a date filter on timestamps is `startOf(date)`. Report SQL cuts days with
+  `at time zone '" + BusinessClock.zoneId() + "'`.
+- Timestamps stay UTC: `clock.instant()`, `Instant` and `OffsetDateTime` audit columns. The cron
+  expressions of the jobs are UTC.
+- Keep injecting `java.time.Clock`: `BusinessClock` reads the instant of the clock and ignores its
+  zone, so a test fixes time with `Clock.fixed(instant, ZoneOffset.UTC)` and gets the Manila date
+  (`BusinessClockTest` fixes 17:00 UTC, already the next day in Manila).
+- `ArchitectureTest` fails the build on `LocalDate.now`, `LocalDateTime.now`, `YearMonth.now` or
+  `Year.now` anywhere in main code outside `BusinessClock`.
+- The zone is read before any bean is created (`BusinessZoneSettings`, registered in
+  `META-INF/spring.factories`); an unknown zone refuses the start.
+
+### User-facing text
+
+Messages of `BusinessRuleException` and validation errors, notification and e-mail texts, bulk
+template column descriptions, report titles, descriptions and notes, job descriptions and the
+reference data of migrations (list of values, parameter, event and exception descriptions) are read
+by users. They carry the business meaning and, where the user must act, what to do. They carry no
+internal references: no requirement identifiers (`BRNB.108`, `CSHID.016`), no question numbers
+(`Q06`, `OQ42`, `AQ19`), no `DCR-`, `FR-`, "Annex", "BRD p." or "pending decision", no internal job
+keys in sentences. Keep those in code comments and Javadoc. The machine code of an error
+(`COST_CENTER_REQUIRED`) never changes; only its text does. `UserTextReferencesTest` scans the
+string literals of main code and `application.yml`; `UserTextReferencesIT` scans the reference
+tables of the migrated database.
+
 ## 4. Database
 
 - Flyway only; never edit an applied migration. Naming `V<version>__<snake_description>.sql`.
@@ -114,8 +151,9 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
   | V800–V889 | broking business modules (crm V800s, catalog V810s, account V820s, quotation V830s, non-package V840s, placement V850s, issuance V860s, booking V870s, NB reports V880s) |
   | V813–V819 | catalog extensions and Product Maintenance (catalog V813–V815, `productmaint` V816–V819); the version columns of account, quotation and booking are V821, V831 and V871 in their own ranges. Planned contract changes of later BRDs in the owners' ranges (V822 built): V822 account business type (work item BT0, shared by Renewal, Employee Benefits and Submitted Policies; built by EB E0), and (designed, not built) V851 placement hold-cover re-assignment and V861 issuance extraction kind (Submitted Policies); see `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
   | V890–V899 | Accounting, Disbursement and ACSL (BRD-5): disbursement V891–V893, payrequest V894–V895, acsl V896–V897, frbs V898–V899, foundation V890 |
-  | V1000–V1899 | modules of later BRDs, 10 versions each: Collections (BRD-4) V1000–V1009, Renewal V1010–V1019, broking Claims V1020–V1029, Employee Benefits V1030–V1039, Customer Servicing Facility V1040–V1049, Sanction Screening and Risk Profiling V1050–V1059, User Access Maintenance V1060–V1069 (V1060–V1064 used; V1064 hides the insurer suite), Submitted Policies V1070–V1079, Data Migration (BRD-13) V1080–V1089, Core Replacement platform items (BRD-00 umbrella) V1090–V1099; document storage V1100–V1109 (next row); the next BRD V1110–V1119 and so on. Data Migration uses V1086 (`opsledger`, whose range V760–V763 is full) and V1087 (`acsl`, range full) for the owners; its other owner changes go into the owners' free versions: V766 cashiering, V786 commission, V803 crm, V823 account (after BT0 V822), V873 booking, V1007 collections (designed, not built; see [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md) §24). Core Replacement waves CR-W0 to CR-W5 use V1090–V1096, V1097–V1099 reserved ([`CORE_REPLACEMENT_IMPACT.md`](../architecture/CORE_REPLACEMENT_IMPACT.md) §8) |
+  | V1000–V1899 | modules of later BRDs, 10 versions each: Collections (BRD-4) V1000–V1009, Renewal V1010–V1019, broking Claims V1020–V1029, Employee Benefits V1030–V1039, Customer Servicing Facility V1040–V1049, Sanction Screening and Risk Profiling V1050–V1059, User Access Maintenance V1060–V1069 (V1060–V1064 used; V1064 hides the insurer suite), Submitted Policies V1070–V1079, Data Migration (BRD-13) V1080–V1089, Core Replacement platform items (BRD-00 umbrella) V1090–V1099; document storage V1100–V1109 (next row); V1110 platform wording (next rows); the next BRD V1120–V1129 and so on. Data Migration uses V1086 (`opsledger`, whose range V760–V763 is full) and V1087 (`acsl`, range full) for the owners; its other owner changes go into the owners' free versions: V766 cashiering, V786 commission, V803 crm, V823 account (after BT0 V822), V873 booking, V1007 collections (designed, not built; see [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md) §24). Core Replacement waves CR-W0 to CR-W5 use V1090–V1096, V1097–V1099 reserved ([`CORE_REPLACEMENT_IMPACT.md`](../architecture/CORE_REPLACEMENT_IMPACT.md) §8) |
   | V1100–V1109 | document storage (build step ST0, platform `storage` module): V1100 `stored_file`, `sto_record_class`, `sto_legal_hold_request`; V1101 record classes, roles, grants, `FILE_LINK_TTL_SECONDS`, `FILE_QUARANTINED`; seed users V1109 in `db/seed`. The ST1 moves of module `bytea` columns go into the owners' ranges |
+  | V1110 | platform wording (MSG0): V1110 rewrites the delivered reference texts (lists of values, parameters, notification events, exception codes, accounting events, feeds, layouts, rules) without internal references; it updates a text only where it still holds the delivered value. Its seed counterpart is V2000 in `db/seed`, after all seed data |
   | V900–V999 | seed data (`db/seed`, loaded only with the `seed` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989, Operations V990–V995, Product Maintenance V996–V998 (V996 catalog versions, V997 package requests, V998 Product Maintenance users), Accounting / Disbursement V999 (reference data and users only; its storyline runs as Java seed runners) (full) |
   | V1900–V1999 | seed data of the V1000+ modules, 10 versions each in the same order: Collections V1900–V1909, Renewal V1910–V1919, Claims V1920–V1929, Employee Benefits V1930–V1939, Customer Servicing V1940–V1949, Sanctions V1950–V1959, User Access V1960–V1969 (V1960–V1961 used), Submitted Policies V1970–V1979, Data Migration V1980–V1989, Core Replacement V1990–V1999 (runs after all V9xx seed, so it can build on the Operations and booking seed) |
 
@@ -148,8 +186,8 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
 - Report codes: GI reports keep the codes of the Reports Book (e.g. `PGIBR015`); finance reports use
   `FIN-…` codes from `docs/requirements/FINANCE_REPORTS_SPEC.md`; GL reports `GL-…`.
 - Declare parameters with `ParameterSpec` (dates default via `TODAY`, `MONTH_START`, `YEAR_START`, resolved on
-  the Manila business day, `ReportParameters.BUSINESS_ZONE`, as in the browser; tests that compute "today" for a
-  report use `LocalDate.now(ReportParameters.BUSINESS_ZONE)`, never the UTC `LocalDate.now()`).
+  the Manila business day by `BusinessClock`, as in the browser; tests that compute "today" for a report use
+  `BusinessClock.today(clock)`, never the UTC date).
   The UI builds the parameter form automatically; export is automatic.
 - Use `TabularReportBuilder` for grouped layouts (`groupBy` = Branch > Class > Product…), totals
   are computed for summed columns.

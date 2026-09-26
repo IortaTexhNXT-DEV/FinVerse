@@ -23,8 +23,8 @@ import com.iortatechnxt.brokerverse.collections.worklist.service.WorklistRefresh
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Sort;
@@ -293,6 +293,6 @@ public class WorklistController {
   @PostMapping("/refresh")
   @PreAuthorize(ClxAccess.SETUP)
   public RefreshResponse refresh(@RequestParam Long companyId) {
-    return RefreshResponse.from(refresh.refreshAll(companyId, LocalDate.now(clock)));
+    return RefreshResponse.from(refresh.refreshAll(companyId, BusinessClock.today(clock)));
   }
 }

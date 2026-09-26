@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.opsledger.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequestRepository;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInEnums.RunStatus;
@@ -110,7 +111,7 @@ public class LedgerWorkCounts implements OpsWorkCountSource {
   }
 
   private List<WorkCount> followUp(Long companyId) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     return List.of(
         new WorkCount(
             Section.PRODRECON,

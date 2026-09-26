@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.collections.installment.service.InstallmentP
 import com.iortatechnxt.brokerverse.collections.promise.domain.PaymentPromise;
 import com.iortatechnxt.brokerverse.collections.promise.service.PromiseService;
 import com.iortatechnxt.brokerverse.collections.promise.service.PromiseService.PromiseInput;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceMovement;
@@ -172,7 +173,7 @@ public class CollectionsPlansSeedData implements ApplicationRunner {
         sendFirst(soa);
       }
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     PaymentPromise promise =
         users.as(
             HANDLER,
@@ -222,7 +223,7 @@ public class CollectionsPlansSeedData implements ApplicationRunner {
                     QUARTERS,
                     "Seed: quarterly installments agreed with the client"));
     Installment second = plan.getInstallments().get(1);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     users.run(
         HANDLER,
         () ->
@@ -272,11 +273,11 @@ public class CollectionsPlansSeedData implements ApplicationRunner {
                         null,
                         "Client promised a partial payment by the end of the week"),
                     null));
-    users.run(HANDLER, () -> promises.evaluate(promise.getId(), LocalDate.now(clock)));
+    users.run(HANDLER, () -> promises.evaluate(promise.getId(), BusinessClock.today(clock)));
   }
 
   private void escalate(Long companyId) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     users.run("admin", () -> escalationJob.execute(today));
     bookingInvoice(PAID_ARN)
         .ifPresent(

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.remittance.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -33,7 +34,9 @@ public final class RemittanceSchedules {
           + " l.insurer_or_date, l.insurer_or_no, l.insurer_or_amount"
           + " from rem_batch_line l join rem_batch b on b.id = l.batch_id"
           + " where b.company_id = :companyId and b.remittance_type in (:types)"
-          + " and cast(b.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+          + " and cast(b.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to"
           + " and (cast(:insurer as varchar) is null or b.insurer_code = :insurer)"
           + " and (cast(:batchNo as varchar) is null or b.batch_no = :batchNo)"
           + " and not l.excluded order by b.id, l.id";
@@ -112,7 +115,7 @@ public final class RemittanceSchedules {
       return RemittanceSchedules.metadata(
           "REM-SCHEDULE-NORMAL",
           "Remittance Schedule Normal",
-          "Accounts of the Normal (peso and dollar) remittance batches (RMTID.011/039)");
+          "Accounts of the Normal (peso and dollar) remittance batches");
     }
 
     @Override
@@ -141,7 +144,7 @@ public final class RemittanceSchedules {
       return RemittanceSchedules.metadata(
           "REM-SCHEDULE-SPECIAL",
           "Remittance Schedule Special",
-          "Accounts of the special remittance batches (MKTID.009, RMTID.039)");
+          "Accounts of the special remittance batches");
     }
 
     @Override
@@ -170,7 +173,7 @@ public final class RemittanceSchedules {
       return RemittanceSchedules.metadata(
           "REM-SCHEDULE-INCENTIVE",
           "Remittance Schedule with Incentives",
-          "Accounts of the With Incentives batches with the early remittance incentive (RMTID.023/039)");
+          "Accounts of the With Incentives batches with the early remittance incentive");
     }
 
     @Override

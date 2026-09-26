@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.booking.service.BookingEvents.ShareEvent;
 import com.iortatechnxt.brokerverse.coa.domain.BalanceSide;
 import com.iortatechnxt.brokerverse.coa.service.ChartOfAccountsService;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalLineRequest;
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -70,7 +71,8 @@ public class BookingPreviewService {
    */
   public BookingPreview preview(String arn, BookingOptions options) {
     Account account = booking.requireBookable(arn);
-    LocalDate date = options.bookingDate() == null ? LocalDate.now(clock) : options.bookingDate();
+    LocalDate date =
+        options.bookingDate() == null ? BusinessClock.today(clock) : options.bookingDate();
     List<InvoiceDraft> drafts = builder.drafts(account, options, date);
     return new BookingPreview(date, drafts, journal(drafts.get(0), date));
   }

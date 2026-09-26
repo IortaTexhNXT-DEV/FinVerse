@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.accounting.service.AccountingEventPublisher;
 import com.iortatechnxt.brokerverse.accounting.service.BusinessEvent;
 import com.iortatechnxt.brokerverse.coa.service.ChartOfAccountsService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.journal.domain.JournalStatus;
 import com.iortatechnxt.brokerverse.journal.domain.JournalType;
@@ -17,7 +18,7 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ class AccountingEngineIT {
         "POLICY_ISSUE",
         data.company().getId(),
         data.branch("HO").getId(),
-        LocalDate.now(),
+        BusinessClock.today(Clock.systemUTC()),
         "PHP",
         "UNDERWRITING",
         key,
@@ -62,7 +63,8 @@ class AccountingEngineIT {
   void policyIssuePostsBalancedPremiumJournalAndIsIdempotent() {
     Long company = data.company().getId();
     Long receivable = accounts.getByCode(company, "1201").getId();
-    BigDecimal before = ledger.netBalance(company, receivable, null, LocalDate.now());
+    BigDecimal before =
+        ledger.netBalance(company, receivable, null, BusinessClock.today(Clock.systemUTC()));
     String key = UUID.randomUUID().toString();
 
     JournalBatch batch = as.run("uw", () -> publisher.publish(policyIssue(key)));
@@ -71,7 +73,7 @@ class AccountingEngineIT {
     assertThat(batch.getJournalType()).isEqualTo(JournalType.PREMIUM);
     assertThat(batch.getTotalDebit()).isEqualByComparingTo("127000.00");
     assertThat(batch.getLines()).anyMatch(l -> "C-000201".equals(l.getPartyCode()));
-    assertThat(ledger.netBalance(company, receivable, null, LocalDate.now()))
+    assertThat(ledger.netBalance(company, receivable, null, BusinessClock.today(Clock.systemUTC())))
         .isEqualByComparingTo(before.add(new BigDecimal("127000.00")));
 
     JournalBatch again = as.run("uw", () -> publisher.publish(policyIssue(key)));
@@ -86,7 +88,7 @@ class AccountingEngineIT {
             "CLAIM_RESERVE",
             data.company().getId(),
             data.branch("HO").getId(),
-            LocalDate.now(),
+            BusinessClock.today(Clock.systemUTC()),
             "PHP",
             "CLAIMS",
             key,
@@ -111,7 +113,7 @@ class AccountingEngineIT {
             "PREMIUM_RECEIPT",
             data.company().getId(),
             data.branch("HO").getId(),
-            LocalDate.now(),
+            BusinessClock.today(Clock.systemUTC()),
             "PHP",
             "RECEIPTS",
             key,
@@ -131,8 +133,8 @@ class AccountingEngineIT {
                     data.company().getId(),
                     EventStatus.FAILED,
                     "PREMIUM_RECEIPT",
-                    LocalDate.now(),
-                    LocalDate.now(),
+                    BusinessClock.today(Clock.systemUTC()),
+                    BusinessClock.today(Clock.systemUTC()),
                     Pageable.unpaged())
                 .getContent())
         .anyMatch(e -> key.equals(e.getSourceReference()));

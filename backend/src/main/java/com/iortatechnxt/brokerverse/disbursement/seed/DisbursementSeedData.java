@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.disbursement.seed;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.DisbursementMode;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.InstrumentStatus;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeSource;
@@ -12,7 +13,6 @@ import com.iortatechnxt.brokerverse.disbursement.domain.Payee;
 import com.iortatechnxt.brokerverse.disbursement.domain.Payee.PayeeDetails;
 import com.iortatechnxt.brokerverse.disbursement.domain.PayeeAccount.AccountDetails;
 import com.iortatechnxt.brokerverse.disbursement.domain.VoucherRepository;
-import com.iortatechnxt.brokerverse.disbursement.service.DisbursementSettings;
 import com.iortatechnxt.brokerverse.disbursement.service.EodService;
 import com.iortatechnxt.brokerverse.disbursement.service.FundingService;
 import com.iortatechnxt.brokerverse.disbursement.service.InstrumentActions;
@@ -390,7 +390,7 @@ public class DisbursementSeedData implements ApplicationRunner {
 
   /** The business day in Manila: end of day and its cut-off work on the Philippine date. */
   private LocalDate today() {
-    return LocalDate.now(clock.withZone(DisbursementSettings.MANILA));
+    return BusinessClock.today(clock);
   }
 
   private static void step(String name, Runnable work) {

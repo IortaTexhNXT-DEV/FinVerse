@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.alert.service.AlertService;
 import com.iortatechnxt.brokerverse.catalog.domain.IncentiveCriteria;
 import com.iortatechnxt.brokerverse.catalog.domain.IncentiveCriteriaRepository;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -49,7 +50,7 @@ public class PackageIncentiveReview {
    * @return criteria flagged
    */
   public List<IncentiveCriteria> productInactive(String productCode, String what) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     List<IncentiveCriteria> affected =
         criteria.findByRecordStatus(RecordStatus.ACTIVE).stream()
             .filter(c -> c.getEffectiveTo() == null || !c.getEffectiveTo().isBefore(today))

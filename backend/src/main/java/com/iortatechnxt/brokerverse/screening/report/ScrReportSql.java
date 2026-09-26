@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.screening.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
@@ -49,10 +50,6 @@ public class ScrReportSql {
   /** Case status (stage) filter. */
   public static final String STATUS = "caseStatus";
 
-  /** Note printed under every compliance report. */
-  static final String LAYOUT_NOTE =
-      "Columns proposed by the project until BDOI confirms them (SQ17).";
-
   /** The optional case filters on {@code scr_case k}. */
   static final String CASE_FILTERS =
       " and (cast(:marketingUnit as varchar) is null or k.marketing_unit = :marketingUnit)"
@@ -61,9 +58,9 @@ public class ScrReportSql {
           + " and (cast(:caseStatus as varchar) is null or k.stage = :caseStatus)";
 
   /** Philippine calendar day of a timestamp column (the period filter). */
-  static final String DAY = " at time zone 'Asia/Manila' as date)";
+  static final String DAY = " at time zone '" + BusinessClock.zoneId() + "' as date)";
 
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  private static final ZoneId MANILA = BusinessClock.zone();
   private static final DateTimeFormatter STAMP = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
   private final NamedParameterJdbcTemplate jdbc;

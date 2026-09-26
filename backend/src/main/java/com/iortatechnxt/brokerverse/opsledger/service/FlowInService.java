@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.Sha256;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
@@ -22,7 +23,6 @@ import com.iortatechnxt.brokerverse.opsledger.domain.FlowInRun.FileRef;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInRunRepository;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInHandler.FlowInFile;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -125,7 +125,7 @@ public class FlowInService {
                     runs.save(
                         new FlowInRun(
                             feed.getCode(),
-                            numbers.next("FIR-" + LocalDate.now(clock).getYear()),
+                            numbers.next("FIR-" + BusinessClock.today(clock).getYear()),
                             trigger,
                             file,
                             clock.instant()))));

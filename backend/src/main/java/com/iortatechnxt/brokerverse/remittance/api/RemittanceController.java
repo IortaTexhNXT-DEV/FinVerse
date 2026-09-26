@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.remittance.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.PaymentStatus;
 import com.iortatechnxt.brokerverse.opsledger.domain.RemittanceStatus;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInHandler.FlowInFile;
@@ -26,7 +27,6 @@ import com.iortatechnxt.brokerverse.remittance.service.RemittanceQueryService;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -146,7 +146,7 @@ public class RemittanceController {
                 blankToNull(request.insurerCode()),
                 request.type(),
                 invoiceNo),
-            LocalDate.now(clock)));
+            BusinessClock.today(clock)));
   }
 
   /**

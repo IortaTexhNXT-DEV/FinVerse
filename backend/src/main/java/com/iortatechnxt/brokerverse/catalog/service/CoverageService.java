@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.Coverage.CoverageDetails;
 import com.iortatechnxt.brokerverse.catalog.domain.CoverageRepository;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -206,6 +207,6 @@ public class CoverageService {
   }
 
   private LocalDate today() {
-    return LocalDate.now(clock);
+    return BusinessClock.today(clock);
   }
 }

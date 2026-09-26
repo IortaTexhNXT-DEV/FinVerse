@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.attachment.domain.AttachmentTarget;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadOptions;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.messaging.service.MessageService;
 import com.iortatechnxt.brokerverse.nbadmin.service.RetentionCriteria;
@@ -39,6 +40,7 @@ import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -317,10 +319,13 @@ class ProposalIT {
                 new TransitionNote("CLIENT_WITHDREW", null)));
     assertThat(queries.get(p.getId()).getStatus()).isEqualTo(ProposalStatus.VOIDED);
     RetentionCriteria criteria =
-        new RetentionCriteria(Set.of("VOIDED", "BOGUS"), LocalDate.now().plusDays(1));
+        new RetentionCriteria(
+            Set.of("VOIDED", "BOGUS"), BusinessClock.today(Clock.systemUTC()).plusDays(1));
     assertThat(retention.countEligible(criteria)).isPositive();
     assertThat(retention.eligible(criteria, 500)).extracting("reference").contains(p.getPrfNo());
-    assertThat(retention.countEligible(new RetentionCriteria(Set.of("BOGUS"), LocalDate.now())))
+    assertThat(
+            retention.countEligible(
+                new RetentionCriteria(Set.of("BOGUS"), BusinessClock.today(Clock.systemUTC()))))
         .isZero();
   }
 }

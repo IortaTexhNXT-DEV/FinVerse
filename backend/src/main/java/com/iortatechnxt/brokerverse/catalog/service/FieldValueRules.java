@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.FieldRule;
 import com.iortatechnxt.brokerverse.catalog.domain.FieldRuleType;
 import com.iortatechnxt.brokerverse.catalog.domain.FieldTarget;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -50,7 +51,7 @@ class FieldValueRules {
    */
   Map<String, String> violations(List<FieldRule> rules, FieldValues values) {
     Map<String, String> errors = new LinkedHashMap<>();
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     for (FieldRule rule : rules) {
       if (rule.getRuleType() == FieldRuleType.REQUIRED) {
         continue;

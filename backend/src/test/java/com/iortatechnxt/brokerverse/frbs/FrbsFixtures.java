@@ -3,9 +3,9 @@ package com.iortatechnxt.brokerverse.frbs;
 import com.iortatechnxt.brokerverse.accounting.domain.CostCenterRuleValues;
 import com.iortatechnxt.brokerverse.accounting.service.CostCenterRuleService;
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeLine;
 import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeRun;
-import com.iortatechnxt.brokerverse.frbs.service.ServiceFeeBase;
 import com.iortatechnxt.brokerverse.frbs.service.ServiceFeeQueryService;
 import com.iortatechnxt.brokerverse.frbs.service.ServiceFeeRunService;
 import com.iortatechnxt.brokerverse.opsledger.OpsLedgerFixtures;
@@ -20,6 +20,7 @@ import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerService;
 import com.iortatechnxt.brokerverse.opsledger.service.MovementRequest;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.EnumMap;
 import java.util.List;
@@ -80,7 +81,7 @@ public class FrbsFixtures {
 
   /** Today in Manila (the business day of the payment status change). */
   public static LocalDate today() {
-    return LocalDate.now(ServiceFeeBase.MANILA);
+    return BusinessClock.today(Clock.systemUTC());
   }
 
   /** A booked motor invoice paid in full today; returns its number. */

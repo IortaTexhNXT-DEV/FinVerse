@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.finreport.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.AmountInWords;
 import com.iortatechnxt.brokerverse.finreport.service.AccountHierarchy;
 import com.iortatechnxt.brokerverse.finreport.service.FinReportQueries;
@@ -18,7 +19,6 @@ import com.iortatechnxt.brokerverse.report.core.RowKind;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -149,9 +149,7 @@ public class VoucherPrintReport implements ReportDefinition {
   }
 
   private static String date(Instant instant) {
-    return instant == null
-        ? DATE_UNKNOWN
-        : instant.atOffset(ZoneOffset.UTC).toLocalDate().toString();
+    return instant == null ? DATE_UNKNOWN : BusinessClock.dateOf(instant).toString();
   }
 
   private static List<ReportColumn> columns() {

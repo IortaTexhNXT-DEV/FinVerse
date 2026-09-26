@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.screening.cases.service;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseEvent.EventFacts;
@@ -153,7 +154,7 @@ public class CaseOpeningService implements MatchCaseOpener {
    */
   @Transactional(readOnly = true)
   public boolean hasActivePolicy(Long clientId) {
-    return activePolicy.hasActivePolicy(clientId, LocalDate.now(clock));
+    return activePolicy.hasActivePolicy(clientId, BusinessClock.today(clock));
   }
 
   /**
@@ -179,7 +180,7 @@ public class CaseOpeningService implements MatchCaseOpener {
   }
 
   private ScreeningCase create(Client client, OpenSpec spec) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     Long companyId = client.getCompanyId();
     boolean active = activePolicy.hasActivePolicy(client.getId(), today);
     String prefix = parameters.text(PREFIX_PARAMETER, DEFAULT_PREFIX);

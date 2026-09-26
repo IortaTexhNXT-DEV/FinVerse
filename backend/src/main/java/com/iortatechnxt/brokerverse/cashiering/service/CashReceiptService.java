@@ -220,7 +220,7 @@ public class CashReceiptService {
     Branch office = settings.headOffice(issue.companyId());
     if (issue.branchId() != null && !issue.branchId().equals(office.getId())) {
       throw new BusinessRuleException(
-          "OR_HEAD_OFFICE_ONLY", "Official receipts are issued by Head Office only (CSHID.006)");
+          "OR_HEAD_OFFICE_ONLY", "Official receipts are issued by Head Office only");
     }
     OrAmounts totals =
         issue.lines().stream()

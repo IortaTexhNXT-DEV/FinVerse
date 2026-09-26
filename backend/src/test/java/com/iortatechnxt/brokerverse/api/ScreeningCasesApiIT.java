@@ -3,10 +3,11 @@ package com.iortatechnxt.brokerverse.api;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -49,9 +50,9 @@ class ScreeningCasesApiIT {
                 + "/cases?companyId="
                 + company
                 + "&tab=COMMITTEE&stage=AML_COMMITTEE&marketingUnit=CBG-NCR&createdFrom="
-                + LocalDate.now().minusYears(1)
+                + BusinessClock.today(Clock.systemUTC()).minusYears(1)
                 + "&createdTo="
-                + LocalDate.now().plusDays(1))
+                + BusinessClock.today(Clock.systemUTC()).plusDays(1))
         .andExpect(status().isOk());
     api.doGet(UCC, BASE + "/cases?companyId=" + company + "&q=ab")
         .andExpect(status().isUnprocessableEntity());
@@ -123,8 +124,8 @@ class ScreeningCasesApiIT {
             BASE + "/str/extractions/preview",
             Map.of(
                 "companyId", company,
-                "from", LocalDate.now().minusYears(1).toString(),
-                "to", LocalDate.now().plusDays(1).toString()))
+                "from", BusinessClock.today(Clock.systemUTC()).minusYears(1).toString(),
+                "to", BusinessClock.today(Clock.systemUTC()).plusDays(1).toString()))
         .andExpect(status().isOk());
     api.doPost(
             UCC,

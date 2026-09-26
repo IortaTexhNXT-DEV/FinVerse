@@ -2,8 +2,8 @@ package com.iortatechnxt.brokerverse.frbs.seed;
 
 import com.iortatechnxt.brokerverse.accounting.domain.CostCenterRuleValues;
 import com.iortatechnxt.brokerverse.accounting.service.CostCenterRuleService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeRun;
-import com.iortatechnxt.brokerverse.frbs.service.ServiceFeeBase;
 import com.iortatechnxt.brokerverse.frbs.service.ServiceFeeQueryService;
 import com.iortatechnxt.brokerverse.frbs.service.ServiceFeeRunService;
 import com.iortatechnxt.brokerverse.frbs.service.ServiceFees;
@@ -123,13 +123,13 @@ public class FrbsSeedData implements ApplicationRunner {
               null,
               null,
               COST_CENTRE,
-              "Service fee accrual charged to the referring sales team (seed, AQ26)",
+              "Service fee accrual charged to the referring sales team",
               true));
     }
   }
 
   private void serviceFee(Long companyId) {
-    LocalDate today = LocalDate.now(clock.withZone(ServiceFeeBase.MANILA));
+    LocalDate today = BusinessClock.today(clock);
     ServiceFeeRun run =
         users.as(OFFICER, () -> runs.compute(companyId, today.withDayOfMonth(1), today));
     users.run(OFFICER, () -> runs.submit(run.getId(), "Service fee of the month"));
@@ -137,7 +137,7 @@ public class FrbsSeedData implements ApplicationRunner {
   }
 
   private void certificate(Long companyId) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     TaxPeriod quarter = TaxPeriod.quarterOf(today);
     certificates.record(
         companyId,

@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.common.storage.BucketClass;
 import com.iortatechnxt.brokerverse.common.storage.FileStore;
 import com.iortatechnxt.brokerverse.common.storage.ObjectRef;
 import com.iortatechnxt.brokerverse.common.storage.StorageProperties;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.Sha256;
 import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
 import com.iortatechnxt.brokerverse.storage.domain.HoldAction;
@@ -33,9 +34,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Set;
@@ -87,7 +88,7 @@ class StorageJobsIT {
   }
 
   private static LocalDate today() {
-    return LocalDate.now(ZoneOffset.UTC);
+    return BusinessClock.today(Clock.systemUTC());
   }
 
   private void pastRetention(StoredFile file) {

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.screening.risk.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientRiskProfile;
 import com.iortatechnxt.brokerverse.crm.service.ClientRiskService;
 import com.iortatechnxt.brokerverse.crm.service.RiskProfileChange;
@@ -17,7 +18,6 @@ import com.iortatechnxt.brokerverse.screening.risk.service.RiskRuleEvaluator.Cli
 import com.iortatechnxt.brokerverse.screening.risk.service.RiskRuleEvaluator.MatchFacts;
 import com.iortatechnxt.brokerverse.screening.risk.service.RiskRuleEvaluator.Qualification;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -200,12 +200,12 @@ public class RiskProfiler {
   }
 
   private Map<String, Integer> ranks() {
-    return lovs.activeValues(RATING_LIST, LocalDate.now(clock)).stream()
+    return lovs.activeValues(RATING_LIST, BusinessClock.today(clock)).stream()
         .collect(Collectors.toMap(LovValue::getCode, LovValue::getSortOrder, (a, b) -> a));
   }
 
   private Set<String> validTags() {
-    return lovs.activeValues(TAG_LIST, LocalDate.now(clock)).stream()
+    return lovs.activeValues(TAG_LIST, BusinessClock.today(clock)).stream()
         .map(LovValue::getCode)
         .collect(Collectors.toSet());
   }

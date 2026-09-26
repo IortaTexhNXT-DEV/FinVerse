@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.iortatechnxt.brokerverse.approval.service.ApprovalViewer;
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.DisbursementQueueService;
@@ -39,6 +40,7 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -322,10 +324,10 @@ class RemittanceOperationsIT {
                         ("invoiceNo,reasonCode,holdUntil,remarks\n"
                                 + forHold.getInvoiceNo()
                                 + ",OTHERS,"
-                                + LocalDate.now().plusDays(7)
+                                + BusinessClock.today(Clock.systemUTC()).plusDays(7)
                                 + ",From Collection\n"
                                 + "NO-SUCH-INVOICE,OTHERS,"
-                                + LocalDate.now().plusDays(7)
+                                + BusinessClock.today(Clock.systemUTC()).plusDays(7)
                                 + ",x\n")
                             .getBytes(StandardCharsets.UTF_8))));
     assertThat(holdRun.getOkCount()).isEqualTo(1);
@@ -365,7 +367,7 @@ class RemittanceOperationsIT {
     EodRequest again =
         as.run("remit", () -> extraction.queueForEndOfDay(fx.company(), paid.getInvoiceNo()));
     assertThat(again.getId()).isEqualTo(first.getId());
-    job.execute(LocalDate.now());
+    job.execute(BusinessClock.today(Clock.systemUTC()));
     Integer processed =
         jdbc.queryForObject(
             "select count(*) from rem_eod_request where id = ? and run_no is not null and tag = 'EXTRACTED'",
@@ -432,7 +434,7 @@ class RemittanceOperationsIT {
     Map<String, String> params = new HashMap<>();
     params.put("companyId", fx.company().toString());
     params.put("from", "2026-01-01");
-    params.put("to", LocalDate.now().plusDays(1).toString());
+    params.put("to", BusinessClock.today(Clock.systemUTC()).plusDays(1).toString());
     as.run(
         "remittl",
         () -> {

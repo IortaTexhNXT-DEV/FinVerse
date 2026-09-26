@@ -10,13 +10,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.screening.ScreeningMatchingFixtures;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.Json;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,7 @@ class ScreeningEndToEndApiIT {
   @Autowired private JdbcTemplate jdbc;
 
   private static String today() {
-    return LocalDate.now(MANILA).toString();
+    return BusinessClock.today(Clock.systemUTC()).toString();
   }
 
   private String caseUrl(long caseId) {
@@ -270,7 +271,8 @@ class ScreeningEndToEndApiIT {
                         "file", "kyc form.pdf", "application/pdf", ScreeningMatchingFixtures.PDF))
                 .param("formType", "KYC_REVIEW")
                 .param("documentType", "KYC_FORM")
-                .param("dateReceived", LocalDate.now(MANILA).minusDays(1).toString())
+                .param(
+                    "dateReceived", BusinessClock.today(Clock.systemUTC()).minusDays(1).toString())
                 .param("source", "Branch")
                 .with(user(users.loadUserByUsername(INVESTIGATOR)))
                 .with(csrf()))
@@ -389,9 +391,9 @@ class ScreeningEndToEndApiIT {
             "/api/v1/reports/" + code + "/run",
             Map.of(
                 "companyId", String.valueOf(data.company().getId()),
-                "fromDate", LocalDate.now(MANILA).minusDays(1).toString(),
-                "toDate", LocalDate.now(MANILA).plusDays(1).toString(),
-                "asOfDate", LocalDate.now(MANILA).plusDays(1).toString()))
+                "fromDate", BusinessClock.today(Clock.systemUTC()).minusDays(1).toString(),
+                "toDate", BusinessClock.today(Clock.systemUTC()).plusDays(1).toString(),
+                "asOfDate", BusinessClock.today(Clock.systemUTC()).plusDays(1).toString()))
         .andExpect(status().isOk())
         .andReturn()
         .getResponse()

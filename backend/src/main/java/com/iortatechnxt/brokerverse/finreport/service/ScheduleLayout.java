@@ -80,7 +80,7 @@ final class ScheduleLayout {
               + " days, first in first out: the balance is made of the most recent increases");
     }
     if (def.getLayoutStatus() == LayoutStatus.TO_CONFIRM) {
-      notes.add("Draft layout, to be confirmed with FRBS (AQ05)");
+      notes.add("Layout not yet confirmed by Financial Reporting");
     }
     return notes;
   }

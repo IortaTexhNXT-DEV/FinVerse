@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.opsledger.service.OpsLedgerEvents.RefundValidationCompleted;
@@ -24,7 +25,6 @@ import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowViewService;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.time.LocalDate;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -150,7 +150,7 @@ public class CaseService {
   }
 
   private AcslCase open(Long companyId, CaseDraft draft, AcslCase.Requester requester) {
-    String number = numbers.next("ACS-" + LocalDate.now(clock).getYear());
+    String number = numbers.next("ACS-" + BusinessClock.today(clock).getYear());
     AcslCase saved =
         cases.save(
             new AcslCase(

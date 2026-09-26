@@ -44,7 +44,7 @@ public class HeadcountByCostCentreReport implements ReportDefinition {
     return ReportMetadata.frbs(
         "ORG-HEADCOUNT-CC",
         "Headcount per Cost Centre",
-        "Active employees grouped by cost centre, with the headcount of each (DIS 3.30.2)",
+        "Active employees grouped by cost centre, with the headcount of each",
         List.of(GlReportSupport.companyParam()));
   }
 

@@ -37,7 +37,7 @@ public class JournalAutoReversalJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Posts the automatic reversal of accruals on their reversal date (FRBS 2.8.1)";
+    return "Posts the automatic reversal of accruals on their reversal date";
   }
 
   @Override

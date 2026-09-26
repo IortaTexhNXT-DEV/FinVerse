@@ -48,7 +48,7 @@ public class InsurerDirectory {
           insurer.getName()
               + " is set up for "
               + insurer.getPlacementChannel()
-              + " placements; only e-mail is available (Q06)");
+              + " placements; only e-mail is available: set the insurer to e-mail placement");
     }
     List<String> to =
         branch.getPlacementEmail() == null || branch.getPlacementEmail().isBlank()

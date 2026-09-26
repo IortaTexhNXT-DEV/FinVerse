@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.VoucherStage;
 import com.iortatechnxt.brokerverse.disbursement.domain.Instrument;
 import com.iortatechnxt.brokerverse.disbursement.domain.IntakeRequest;
@@ -17,7 +18,6 @@ import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
-import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -205,7 +205,7 @@ public class VoucherActions {
    * @return voucher
    */
   public Voucher cancel(Long id, String reasonCode, String comment) {
-    lovs.requireValid(CANCEL_LOV, reasonCode, LocalDate.now(clock));
+    lovs.requireValid(CANCEL_LOV, reasonCode, BusinessClock.today(clock));
     Voucher v = vouchers.get(id);
     boolean approved = v.getStage() == VoucherStage.APPROVED;
     String reason = reasonText(reasonCode, comment);

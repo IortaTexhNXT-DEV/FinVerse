@@ -7,11 +7,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.consolidation.service.ConsolidationGroupService;
 import com.iortatechnxt.brokerverse.period.service.PeriodService;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
 import com.jayway.jsonpath.JsonPath;
+import java.time.Clock;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -370,7 +372,7 @@ class ApiSmokeIT {
   @Test
   @WithUserDetails("fmanager")
   void currencyRatesAndStatementRespondOk() throws Exception {
-    String today = LocalDate.now().toString();
+    String today = BusinessClock.today(Clock.systemUTC()).toString();
     mvc.perform(get("/api/v1/currencies/rates?from=2026-01-01&to=" + today))
         .andExpect(status().isOk());
     mvc.perform(

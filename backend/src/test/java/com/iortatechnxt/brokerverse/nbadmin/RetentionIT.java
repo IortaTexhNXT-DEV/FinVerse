@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.nbadmin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RetentionAction;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RetentionRule;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RetentionTerms;
@@ -13,8 +14,8 @@ import com.iortatechnxt.brokerverse.nbadmin.service.RetentionService.RuleStatus;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.system.service.JobOutcome;
+import java.time.Clock;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,7 +43,7 @@ class RetentionIT {
     assertThat(rule("QUOTATION", "NOT_PROCEEDED,VOIDED").rule().getAction())
         .isEqualTo(RetentionAction.ARCHIVE);
 
-    JobOutcome outcome = job.execute(LocalDate.now(ZoneOffset.UTC));
+    JobOutcome outcome = job.execute(BusinessClock.today(Clock.systemUTC()));
     assertThat(outcome.itemsProcessed()).isGreaterThanOrEqualTo(5);
     RuleStatus after = rule("CLIENT", "INACTIVE");
     assertThat(after.latestRun()).isNotNull();

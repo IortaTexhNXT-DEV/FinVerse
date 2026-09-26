@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.booking.BookingFixtures;
 import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkOutcome;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
@@ -25,7 +26,7 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,10 @@ class AdjustmentFilesAndReportsIT {
 
   private BulkContext context() {
     return new BulkContext(
-        fx.company(), "BLK-ADJ-" + BookingFixtures.token(), LocalDate.now(), Map.of());
+        fx.company(),
+        "BLK-ADJ-" + BookingFixtures.token(),
+        BusinessClock.today(Clock.systemUTC()),
+        Map.of());
   }
 
   private static BulkRow line(int n, String invoiceNo, String balance) {
@@ -141,8 +145,8 @@ class AdjustmentFilesAndReportsIT {
     Map<String, String> params =
         Map.of(
             "companyId", String.valueOf(fx.company()),
-            "from", LocalDate.now().minusDays(1).toString(),
-            "to", LocalDate.now().plusDays(1).toString());
+            "from", BusinessClock.today(Clock.systemUTC()).minusDays(1).toString(),
+            "to", BusinessClock.today(Clock.systemUTC()).plusDays(1).toString());
 
     as.run(
         "adjtl",
@@ -160,6 +164,6 @@ class AdjustmentFilesAndReportsIT {
             StandardCharsets.UTF_8);
     assertThat(validationList).contains(posted.getRequestNo());
     assertThat(job.name()).isEqualTo("ADJ_DAILY_REPORT");
-    assertThat(job.execute(LocalDate.now()).itemsProcessed()).isPositive();
+    assertThat(job.execute(BusinessClock.today(Clock.systemUTC())).itemsProcessed()).isPositive();
   }
 }

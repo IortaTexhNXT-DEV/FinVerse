@@ -5,6 +5,7 @@ import static com.iortatechnxt.brokerverse.screening.ScreeningMatchingFixtures.w
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.nbadmin.service.RetentionCriteria;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseEvent;
@@ -30,7 +31,7 @@ import com.iortatechnxt.brokerverse.screening.matching.service.ScreeningComplete
 import com.iortatechnxt.brokerverse.screening.matching.service.ScreeningResult;
 import com.iortatechnxt.brokerverse.screening.risk.service.RiskOutcome;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -107,7 +108,7 @@ class ScreeningCaseRulesIT {
         "update scr_case set due_at = now() - interval '1 hour', remind_at = now() - interval '5 hours'"
             + " where id = ?",
         c.getId());
-    assertThat(job.execute(LocalDate.now()).message()).contains("breach");
+    assertThat(job.execute(BusinessClock.today(Clock.systemUTC())).message()).contains("breach");
     monitor.run();
     ScreeningCase breached = fx.reload(c);
     assertThat(breached.isBreached()).isTrue();
@@ -261,11 +262,14 @@ class ScreeningCaseRulesIT {
     assertThat(reopened.getAssignee()).isEqualTo(INVESTIGATOR);
     assertThat(
             retention.countEligible(
-                new RetentionCriteria(Set.of("CLOSED"), LocalDate.now().plusDays(1))))
+                new RetentionCriteria(
+                    Set.of("CLOSED"), BusinessClock.today(Clock.systemUTC()).plusDays(1))))
         .isPositive();
     assertThat(
             retention.eligible(
-                new RetentionCriteria(Set.of("CLOSED"), LocalDate.now().plusDays(1)), 5))
+                new RetentionCriteria(
+                    Set.of("CLOSED"), BusinessClock.today(Clock.systemUTC()).plusDays(1)),
+                5))
         .isNotEmpty();
   }
 
@@ -348,8 +352,8 @@ class ScreeningCaseRulesIT {
             null,
             null,
             null,
-            LocalDate.now().minusDays(1),
-            LocalDate.now().plusDays(1));
+            BusinessClock.today(Clock.systemUTC()).minusDays(1),
+            BusinessClock.today(Clock.systemUTC()).plusDays(1));
     assertThat(fx.as("ucc", () -> queries.search(search, PageRequest.of(0, 10)).getContent()))
         .hasSize(3);
     assertThatThrownBy(

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.cashiering.report;
 
 import com.iortatechnxt.brokerverse.cashiering.report.SqlReport.Spec;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import java.util.List;
@@ -62,17 +63,27 @@ public class CashieringReceiptReports {
       "select r.receipt_date as date_issued, x.reason_code as reason, r.receipt_no,"
           + " coalesce(r.assured_name, r.payor_name) as assured,"
           + " case when r.kind = 'OR' then r.gross else r.amount end as gross, r.vat, r.wtax, r.amount,"
-          + " cast(x.approved_at as date) as cancelled_on, x.transaction_no from csh_receipt r"
+          + " cast(x.approved_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) as cancelled_on, x.transaction_no from csh_receipt r"
           + " join csh_receipt_action x on x.receipt_id = r.id and x.action = 'CANCEL'"
           + " and x.stage = 'POSTED' where r.company_id = :company and r.kind = ";
 
   private static final String CANCELLED_PERIOD =
-      " and cast(x.approved_at as date) between :from and :to order by x.approved_at";
+      " and cast(x.approved_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to order by x.approved_at";
 
   private static final String PICKUP =
-      "select cast(p.requested_at as date) as request_date,"
-          + " to_char(p.requested_at at time zone 'Asia/Manila', 'HH24:MI') as request_time,"
-          + " p.receipt_no as ar_no, cast(p.printed_at as date) as date_issued, p.amount,"
+      "select cast(p.requested_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) as request_date,"
+          + " to_char(p.requested_at at time zone '"
+          + BusinessClock.zoneId()
+          + "', 'HH24:MI') as request_time,"
+          + " p.receipt_no as ar_no, cast(p.printed_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) as date_issued, p.amount,"
           + " p.payor_name, p.requestor, p.collection_ref, p.status, 1 as cnt from csh_pickup_request p"
           + " where p.company_id = :company and p.pickup_date between :from and :to"
           + " order by p.pickup_date, p.collection_ref";
@@ -118,7 +129,7 @@ public class CashieringReceiptReports {
         new Spec(
             "CSH-APPLIED-PREM",
             "Applied Premium Report",
-            "Premium applied to invoices by AR in the period (CSHID.023 Annex II #1)",
+            "Premium applied to invoices by AR in the period",
             APPLIED_PREMIUM,
             List.of(
                 ReportColumn.text(AR_NO, "AR No."),
@@ -146,7 +157,7 @@ public class CashieringReceiptReports {
         new Spec(
             "CSH-APPLIED-COMM",
             "Applied Commission Report",
-            "Commission ORs with their invoices, commission, WTAX and EVAT (CSHID.023 Annex II #2)",
+            "Commission ORs with their invoices, commission, WTAX and EVAT",
             APPLIED_COMMISSION,
             List.of(
                 ReportColumn.text("or_no", "OR Number"),
@@ -176,7 +187,7 @@ public class CashieringReceiptReports {
         new Spec(
             "CSH-PDC-WAREHOUSE",
             "Post-dated Checks Warehousing",
-            "Post-dated checks by maturity date (CSHID.008, CSHID.023 Annex II #3)",
+            "Post-dated checks by maturity date",
             PDC_WAREHOUSE,
             List.of(
                 ReportColumn.date("ar_date", "AR Date"),
@@ -208,7 +219,7 @@ public class CashieringReceiptReports {
         new Spec(
             "CSH-MINBAL-EXCESS",
             "Minimal Balance of Unapplied Payments (Excess Payments)",
-            "Excess payments moved to AP overages (Cashiering summary 5.f, CSHID.023 Annex II #4)",
+            "Excess payments moved to AP overages",
             MINBAL_EXCESS,
             List.of(
                 ReportColumn.text(AR_NO, AR_NUMBER),
@@ -233,7 +244,7 @@ public class CashieringReceiptReports {
    */
   @Bean
   SqlReport cancelledOrReport(NamedParameterJdbcTemplate jdbc) {
-    return cancelled(jdbc, "CSH-CANCELLED-OR", "Cancelled Official Receipts", "'OR'", "#5");
+    return cancelled(jdbc, "CSH-CANCELLED-OR", "Cancelled Official Receipts", "'OR'");
   }
 
   /**
@@ -244,18 +255,16 @@ public class CashieringReceiptReports {
    */
   @Bean
   SqlReport cancelledArReport(NamedParameterJdbcTemplate jdbc) {
-    return cancelled(jdbc, "CSH-CANCELLED-AR", "Cancelled Acknowledgment Receipts", "'AR'", "#6");
+    return cancelled(jdbc, "CSH-CANCELLED-AR", "Cancelled Acknowledgment Receipts", "'AR'");
   }
 
   private static SqlReport cancelled(
-      NamedParameterJdbcTemplate jdbc, String code, String title, String kind, String annex) {
+      NamedParameterJdbcTemplate jdbc, String code, String title, String kind) {
     return new SqlReport(
         new Spec(
             code,
             title,
-            "Receipts cancelled in the period with the reason (CSHID.012, CSHID.023 Annex II "
-                + annex
-                + ")",
+            "Receipts cancelled in the period with the reason",
             CANCELLED + kind + CANCELLED_PERIOD,
             List.of(
                 ReportColumn.date("date_issued", "Date Issued"),
@@ -286,7 +295,7 @@ public class CashieringReceiptReports {
         new Spec(
             "CSH-CHECK-PICKUP",
             "Check Pick-Up Requests",
-            "Checks tagged for pick-up by Collection and their ARs (CSHID.009, CSHID.023 Annex II #7)",
+            "Checks tagged for pick-up by Collection and their ARs",
             PICKUP,
             List.of(
                 ReportColumn.date("request_date", "Date of Request"),
@@ -317,7 +326,7 @@ public class CashieringReceiptReports {
         new Spec(
             "CSH-PRIORITY-POSTED",
             "Priority Posted Accounts",
-            "Payments posted to invoices with encoder and branch (CSHID.023 Annex II #8)",
+            "Payments posted to invoices with encoder and branch",
             PRIORITY_POSTED,
             List.of(
                 ReportColumn.text("or_no", "Receipt Number"),
@@ -333,7 +342,7 @@ public class CashieringReceiptReports {
                 ReportColumn.text("corporate_dept", "Corporate Depart")),
             null,
             null,
-            "The meaning of 'priority' is to be confirmed by BDOI (OQ42); all postings are listed."),
+            "All priority postings are listed."),
         jdbc);
   }
 
@@ -349,7 +358,7 @@ public class CashieringReceiptReports {
         new Spec(
             "CSH-UNAPPLIED-COMM-MANCOM",
             "Unapplied Commission Receivable Extract for Mancom",
-            "Commission receivable not yet collected per insurer (CSHID.023 Annex II #9, draft)",
+            "Commission receivable not yet collected per insurer",
             COMMISSION_OUTSTANDING,
             List.of(
                 ReportColumn.text(INVOICE, INVOICE_LABEL),
@@ -361,7 +370,7 @@ public class CashieringReceiptReports {
                 new ReportColumn("age_days", "Age (days)", ColumnType.NUMBER, false)),
             INSURER,
             INSURER_LABEL,
-            SqlReport.DRAFT),
+            null),
         jdbc);
   }
 
@@ -377,7 +386,7 @@ public class CashieringReceiptReports {
         new Spec(
             "CSH-UNAPPLIED-COMM-YTD",
             "Unapplied Commission Receivable YTD Balance",
-            "Year-to-date commission receivable balance per insurer and segment (CSHID.023 Annex II #10, draft)",
+            "Year-to-date commission receivable balance per insurer and segment",
             COMMISSION_YTD,
             List.of(
                 ReportColumn.text(INSURER, INSURER_LABEL),
@@ -387,7 +396,7 @@ public class CashieringReceiptReports {
                 ReportColumn.amount("outstanding", "Outstanding")),
             null,
             null,
-            SqlReport.DRAFT),
+            null),
         jdbc);
   }
 
@@ -399,7 +408,7 @@ public class CashieringReceiptReports {
    */
   @Bean
   SqlReport premiumMinimalReport(NamedParameterJdbcTemplate jdbc) {
-    return minimal(jdbc, "CSH-MINBAL-PREMIUM", "Premium Minimal Balance", "'PREMIUM'", "#11");
+    return minimal(jdbc, "CSH-MINBAL-PREMIUM", "Premium Minimal Balance", "'PREMIUM'");
   }
 
   /**
@@ -410,19 +419,16 @@ public class CashieringReceiptReports {
    */
   @Bean
   SqlReport commissionMinimalReport(NamedParameterJdbcTemplate jdbc) {
-    return minimal(
-        jdbc, "CSH-MINBAL-COMMISSION", "Commission Minimal Balance", "'COMMISSION'", "#12");
+    return minimal(jdbc, "CSH-MINBAL-COMMISSION", "Commission Minimal Balance", "'COMMISSION'");
   }
 
   private static SqlReport minimal(
-      NamedParameterJdbcTemplate jdbc, String code, String title, String kind, String annex) {
+      NamedParameterJdbcTemplate jdbc, String code, String title, String kind) {
     return new SqlReport(
         new Spec(
             code,
             title,
-            "Minimal balances reversed by the sweep (CSHID.016, CSHID.023 Annex II "
-                + annex
-                + ", draft)",
+            "Minimal balances reversed by the sweep",
             MINBAL + kind + MINBAL_ORDER,
             List.of(
                 ReportColumn.date("swept_on", "Swept On"),
@@ -435,7 +441,7 @@ public class CashieringReceiptReports {
                 ReportColumn.count(COUNT, COUNT_LABEL)),
             null,
             null,
-            SqlReport.DRAFT),
+            null),
         jdbc);
   }
 }

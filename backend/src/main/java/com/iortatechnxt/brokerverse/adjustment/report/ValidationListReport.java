@@ -54,7 +54,7 @@ public class ValidationListReport implements ReportDefinition {
     return ReportMetadata.operations(
         CODE,
         "Validation List",
-        "Posted endorsement transactions with their GL entries and remarks (ADJID.017)",
+        "Posted endorsement transactions with their GL entries and remarks",
         AdjustmentReportSupport.period("MONTH_START"));
   }
 

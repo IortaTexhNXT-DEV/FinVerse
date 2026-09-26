@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.sharedstate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.security.service.SharedCounterStore;
 import com.iortatechnxt.brokerverse.security.service.TokenRevocationStore;
 import com.iortatechnxt.brokerverse.sharedstate.service.JdbcSessionStore;
@@ -9,7 +10,6 @@ import com.iortatechnxt.brokerverse.sharedstate.service.SharedStateCleanupJob;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.time.Clock;
 import java.time.Duration;
-import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -44,7 +44,7 @@ class JdbcSessionStoreIT extends SessionStoreContract {
     Thread.sleep(100);
     assertThat(cleanup.cron()).isNotBlank();
     assertThat(cleanup.description()).contains("revoked");
-    assertThat(cleanup.execute(LocalDate.now(clock)).itemsProcessed()).isPositive();
+    assertThat(cleanup.execute(BusinessClock.today(clock)).itemsProcessed()).isPositive();
     assertThat(
             jdbc.queryForObject(
                 "select count(*) from sys_shared_counter where counter_key = 'cleanup-test'",

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.disbursement.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.report.SqlReport.Spec;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
@@ -19,7 +20,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 public class DisbursementReports {
 
   /** Philippine time of the report dates. */
-  static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  static final ZoneId MANILA = BusinessClock.zone();
 
   /** Voucher columns shared by the voucher reports. */
   static final String VOUCHER_COLUMNS =
@@ -63,14 +64,16 @@ public class DisbursementReports {
         new Spec(
             "DSB-MASTERLIST",
             "Masterlist of Disbursements",
-            "Every disbursement voucher of the period with payee, mode, amounts and status (DIS 3.28.3)",
+            "Every disbursement voucher of the period with payee, mode, amounts and status",
             true,
             "select v.disbursement_type as type, "
                 + VOUCHER_COLUMNS
                 + ", v.stage, i.status as instrument_status, v.journal_no, v.created_at"
                 + VOUCHER_FROM
                 + " where v.company_id = :companyId"
-                + " and cast(v.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+                + " and cast(v.created_at at time zone '"
+                + BusinessClock.zoneId()
+                + "' as date) between :from and :to"
                 + " order by v.disbursement_type, v.id",
             voucherColumns(
                 ReportColumn.text("stage", "DV Status"),
@@ -121,7 +124,7 @@ public class DisbursementReports {
         new Spec(
             "DSB-UNRELEASED-CHECKS",
             "Unreleased Checks",
-            "Printed checks not released to the payee, aged from the print date (DIS 3.28.3)",
+            "Printed checks not released to the payee, aged from the print date",
             true,
             String.format(CHECKS_AGED, "'PRINTED'"),
             checkColumns(),
@@ -144,7 +147,7 @@ public class DisbursementReports {
         new Spec(
             "DSB-ML-STALE",
             "Miscellaneous Liability - Stale Checks",
-            "Unnegotiated checks aged to 181 days and over; stale ones in Miscellaneous Liability (DIS 3.28.3)",
+            "Unnegotiated checks aged to 181 days and over; stale ones in Miscellaneous Liability",
             true,
             String.format(CHECKS_AGED, "'PRINTED', 'RELEASED', 'STALE'"),
             checkColumns(),
@@ -177,13 +180,15 @@ public class DisbursementReports {
         new Spec(
             "DSB-ATD",
             "Authority to Debit",
-            "Authorities to debit of the period: printed, e-mailed to the branch and debited (DIS 3.28.3)",
+            "Authorities to debit of the period: printed, e-mailed to the branch and debited",
             true,
             "select i.status, i.instrument_no, v.dv_no, v.payee_name, i.printed_at, i.emailed_at,"
                 + " i.debited_at, i.reference, i.amount from dsb_instrument i"
                 + " join dsb_voucher v on v.id = i.voucher_id where v.company_id = :companyId"
                 + " and i.mode = 'ATD'"
-                + " and cast(i.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+                + " and cast(i.created_at at time zone '"
+                + BusinessClock.zoneId()
+                + "' as date) between :from and :to"
                 + " order by i.status, i.id",
             List.of(
                 ReportColumn.text("instrument_no", "ATD No."),
@@ -213,14 +218,16 @@ public class DisbursementReports {
         new Spec(
             "DSB-CASH-FLOW",
             "Disbursement Cash Flow",
-            "Approved payments per paying account, mode and instrument status (DIS 3.28.3)",
+            "Approved payments per paying account, mode and instrument status",
             true,
             "select b.code || ' - ' || b.name as bank, v.mode, coalesce(i.status, 'PENDING') as"
                 + " status, count(*) as items, sum(v.net) as amount from dsb_voucher v"
                 + " join pay_bank_account b on b.id = v.bank_account_id"
                 + " left join dsb_instrument i on i.voucher_id = v.id"
                 + " where v.company_id = :companyId and v.stage = 'APPROVED'"
-                + " and cast(v.approved_at at time zone 'Asia/Manila' as date) between :from and :to"
+                + " and cast(v.approved_at at time zone '"
+                + BusinessClock.zoneId()
+                + "' as date) between :from and :to"
                 + " group by b.code, b.name, v.mode, i.status order by b.code, v.mode, 3",
             List.of(
                 ReportColumn.text("mode", "Mode"),
@@ -229,7 +236,7 @@ public class DisbursementReports {
                 ReportColumn.amount(AMOUNT_KEY, AMOUNT)),
             "bank",
             "Paying Account",
-            "Inter-office transfers and savings balances come from the bank reconciliation (AQ09)."),
+            "Inter-office transfers and savings balances come from the bank reconciliation."),
         jdbc);
   }
 
@@ -246,7 +253,7 @@ public class DisbursementReports {
         new Spec(
             "DSB-CWT-COMMISSION",
             "CWT / BIR 2307 on Commission",
-            "CWT certificates received from insurers or released to suppliers, per payee (DIS 3.28.3)",
+            "CWT certificates received from insurers or released to suppliers, per payee",
             true,
             "select v.payee_code || ' - ' || v.payee_name as payee, t.direction, t.doc_no,"
                 + " t.period_from, t.period_to, coalesce(t.received_on, t.released_on) as tagged_on,"
@@ -264,8 +271,8 @@ public class DisbursementReports {
                 ReportColumn.amount(AMOUNT_KEY, AMOUNT)),
             "payee",
             PAYEE,
-            "Comparison with the AR-BIR on commission and incentives balances waits for the"
-                + " received-certificate register (AQ16)."),
+            "The comparison with the AR-BIR on commission and incentives balances is not"
+                + " included."),
         jdbc);
   }
 }

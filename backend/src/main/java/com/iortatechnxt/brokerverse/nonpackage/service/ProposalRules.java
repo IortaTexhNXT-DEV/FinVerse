@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.catalog.service.TsuRoutingService;
 import com.iortatechnxt.brokerverse.catalog.service.TsuRoutingService.TsuDecision;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.FieldValidationException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
@@ -83,7 +84,7 @@ public class ProposalRules {
           "Product " + product.getCode() + " is not offered to segment " + draft.marketSegment());
     }
     requirePeriod(draft);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     lovs.validateOptional("MARKET_SEGMENT", blank(draft.marketSegment()), today);
     lovs.validateOptional("SOURCE_CHANNEL", blank(draft.sourceChannel()), today);
     draft.insurers().forEach(code -> insurers.requireUsableInsurer(companyId, code));

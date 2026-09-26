@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.disbursement.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.report.SqlReport.Spec;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
@@ -31,7 +32,7 @@ public class DisbursementControlReports {
         new Spec(
             "DSB-PAYEE",
             "Payee Report",
-            "Payees with address, account, mode of payment, disbursement types and source (DIS 3.28.1)",
+            "Payees with address, account, mode of payment, disbursement types and source",
             false,
             "select p.payee_class, p.payee_code, p.name, p.address,"
                 + " (select case when length(a.account_no) > 4 then repeat('*', length(a.account_no) - 4)"
@@ -71,13 +72,15 @@ public class DisbursementControlReports {
         new Spec(
             "DSB-PAYEE-NOMATCH",
             "Payees Not Matched",
-            "Payment requests whose payee is not in the payee master (DIS 3.25.2)",
+            "Payment requests whose payee is not in the payee master",
             true,
             "select r.source_module, r.request_no, r.source_ref, r.payee_code, r.payee_name,"
                 + " r.disbursement_type, r.currency, r.amount, r.received_at, r.status"
                 + " from dsb_request r where r.company_id = :companyId"
                 + " and (r.status = 'NO_PAYEE' or r.status_reason like 'PAYEE_NOT_MAINTAINED%')"
-                + " and cast(r.received_at at time zone 'Asia/Manila' as date) between :from and :to"
+                + " and cast(r.received_at at time zone '"
+                + BusinessClock.zoneId()
+                + "' as date) between :from and :to"
                 + " order by r.source_module, r.id",
             List.of(
                 ReportColumn.text("request_no", "Request No."),
@@ -108,13 +111,15 @@ public class DisbursementControlReports {
         new Spec(
             "DSB-UPLOAD-FALLOUT",
             "Request Upload Fall-out",
-            "Refused or failed rows of the disbursement request uploads, with reasons (DIS 3.28.4)",
+            "Refused or failed rows of the disbursement request uploads, with reasons",
             true,
             "select j.job_no || ' - ' || j.file_name as upload, r.row_no, r.status, r.messages,"
                 + " j.created_by, j.created_at from bulk_row r join bulk_job j on j.id = r.job_id"
                 + " where j.company_id = :companyId and j.handler_code = 'DISB_REQUESTS'"
                 + " and r.status in ('INVALID', 'FAILED')"
-                + " and cast(j.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+                + " and cast(j.created_at at time zone '"
+                + BusinessClock.zoneId()
+                + "' as date) between :from and :to"
                 + " order by j.id, r.row_no",
             List.of(
                 ReportColumn.count("row_no", "Row"),
@@ -141,7 +146,7 @@ public class DisbursementControlReports {
         new Spec(
             "DSB-UNREGULARIZED",
             "Unregularised Transactions",
-            "Vouchers with a failed posting or reversal and cancellations not regularised (DIS 3.27.0)",
+            "Vouchers with a failed posting or reversal and cancellations not regularised",
             true,
             "select case when v.posting_status in ('FAILED', 'REVERSAL_FAILED') then 'Posting failed'"
                 + " else 'Source not regularised' end as issue, v.dv_no, v.payee_name,"
@@ -153,7 +158,9 @@ public class DisbursementControlReports {
                 + " and (v.posting_status in ('FAILED', 'REVERSAL_FAILED')"
                 + " or (v.stage = 'CANCELLED' and v.posting_status = 'REVERSED'"
                 + " and q.id is not null and q.status <> 'CANCELLED'))"
-                + " and cast(coalesce(v.updated_at, v.created_at) at time zone 'Asia/Manila' as date)"
+                + " and cast(coalesce(v.updated_at, v.created_at) at time zone '"
+                + BusinessClock.zoneId()
+                + "' as date)"
                 + " <= :to order by 1, v.id",
             List.of(
                 ReportColumn.text("dv_no", "DV No."),

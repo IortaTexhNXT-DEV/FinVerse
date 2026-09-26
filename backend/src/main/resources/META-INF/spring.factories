@@ -1,3 +1,5 @@
-# Start-up safeguards of a production deployment (seed data guard, required secrets).
+# Start-up settings read before any bean is created: the business zone of the platform date, and
+# the safeguards of a production deployment (seed data guard, required secrets).
 org.springframework.boot.env.EnvironmentPostProcessor=\
+  com.iortatechnxt.brokerverse.common.time.BusinessZoneSettings,\
   com.iortatechnxt.brokerverse.config.ProductionSafeguards

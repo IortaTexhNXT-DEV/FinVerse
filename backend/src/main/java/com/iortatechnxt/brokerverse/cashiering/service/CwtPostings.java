@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied.UnappliedSpec;
 import com.iortatechnxt.brokerverse.cashiering.service.ApplicationService.ApplyOptions;
 import com.iortatechnxt.brokerverse.cashiering.service.CashReceiptService.ArIssue;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
@@ -96,7 +97,7 @@ public class CwtPostings {
    */
   public String cashPath(CwtTag tag, Long branchId) {
     OpsInvoice invoice = invoice(tag);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     Receipt ar =
         receipts.issueAr(
             new ArIssue(
@@ -183,7 +184,7 @@ public class CwtPostings {
     String batch =
         posting.publish(
             ApplicationService.context(
-                invoice, LocalDate.now(clock), "BIR 2307 reclass " + tag.getReference()),
+                invoice, BusinessClock.today(clock), "BIR 2307 reclass " + tag.getReference()),
             CashieringPosting.CWT_RECLASS,
             ref,
             amounts);
@@ -235,7 +236,7 @@ public class CwtPostings {
     String batch =
         posting.publish(
             ApplicationService.context(
-                invoice, LocalDate.now(clock), "BIR 2307 released " + tag.getReference()),
+                invoice, BusinessClock.today(clock), "BIR 2307 released " + tag.getReference()),
             CashieringPosting.CWT_DTIP_OFFSET,
             ref,
             Map.of("DTIP", tag.getAmount(), "PR2307", tag.getAmount()),
@@ -259,7 +260,7 @@ public class CwtPostings {
             type,
             CashieringSettings.MODULE,
             ref,
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             amounts,
             new DocumentRefs(null, null, null, batch),
             "BIR 2307"));

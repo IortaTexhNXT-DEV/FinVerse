@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.crm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.KycStatus;
 import com.iortatechnxt.brokerverse.crm.service.ClientOnboardingService;
@@ -13,8 +14,8 @@ import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.system.service.JobOutcome;
+import java.time.Clock;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +36,7 @@ class KycReviewIT {
   @Test
   void overdueKycExpiresIsListedAndReviewedAgain() {
     Client c = fx.confirmed(CrmFixtures.person());
-    LocalDate today = LocalDate.now(ZoneOffset.UTC);
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     jdbc.update(
         "update crm_client set kyc_review_due = ? where id = ?", today.minusDays(1), c.getId());
 

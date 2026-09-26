@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.remittance.seed;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.seed.SeedUsers;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
@@ -80,7 +81,7 @@ public class DeductionSeedData implements ApplicationRunner {
   }
 
   private void seed(Long companyId) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     RemittanceDeduction draft =
         users.as(
             PREPARER,

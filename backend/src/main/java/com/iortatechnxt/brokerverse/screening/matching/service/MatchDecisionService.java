@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.screening.config.domain.ConfigType;
 import com.iortatechnxt.brokerverse.screening.config.service.ActiveConfig;
@@ -22,7 +23,6 @@ import com.iortatechnxt.brokerverse.screening.risk.service.RiskOutcome;
 import com.iortatechnxt.brokerverse.screening.risk.service.RiskOverrideService;
 import com.iortatechnxt.brokerverse.screening.risk.service.RiskProfiler;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -135,7 +135,8 @@ public class MatchDecisionService {
     audit.record(MATCH_ENTITY, matchId, AuditAction.UPDATE, describe(match, "confirmed"));
     Long riskVersion =
         config
-            .activeVersion(match.getCompanyId(), ConfigType.RISK_RULES, null, LocalDate.now(clock))
+            .activeVersion(
+                match.getCompanyId(), ConfigType.RISK_RULES, null, BusinessClock.today(clock))
             .map(ConfigVersionRef::id)
             .orElse(null);
     RiskOutcome outcome =

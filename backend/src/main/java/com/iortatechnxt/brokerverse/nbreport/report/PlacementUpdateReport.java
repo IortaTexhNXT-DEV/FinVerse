@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbreport.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
@@ -52,7 +53,9 @@ public class PlacementUpdateReport implements ReportDefinition {
           + " or lower(a.account_officer) = lower(cast(:officer as varchar)))"
           + " and (cast(:businessType as varchar) is null or a.business_type = :businessType)"
           + " and (cast(:arn as varchar) is not null"
-          + " or cast(c.stage_entered_at at time zone 'Asia/Manila' as date) between :from and :to)"
+          + " or cast(c.stage_entered_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to)"
           + " order by 4, a.arn";
 
   private final NbReportJdbc jdbc;
@@ -71,8 +74,7 @@ public class PlacementUpdateReport implements ReportDefinition {
     return NbReportSupport.metadata(
         CODE,
         "Placement Update Report",
-        "Placement status of accounts with the insurers, individual (ARN) or collective"
-            + " (BRNB.011)",
+        "Placement status of accounts with the insurers, individual (ARN) or collective",
         Permission.ACCOUNT_VIEW,
         true,
         ParameterSpec.optional(ARN, "ARN (individual report)", ParameterType.TEXT),

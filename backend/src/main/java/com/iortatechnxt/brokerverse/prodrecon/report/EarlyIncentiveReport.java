@@ -48,7 +48,7 @@ public class EarlyIncentiveReport implements ReportDefinition {
     return ReconReportSupport.metadata(
         CODE,
         "Early Incentive Validation",
-        "Incentives on accounts remitted within the window from inception (PRCID.028)");
+        "Incentives on accounts remitted within the window from inception");
   }
 
   @Override

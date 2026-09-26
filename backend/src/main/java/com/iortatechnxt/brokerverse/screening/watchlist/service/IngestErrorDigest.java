@@ -152,7 +152,7 @@ public class IngestErrorDigest {
             .collect(Collectors.toMap(WatchlistSource::getId, WatchlistSource::getCode));
     StringBuilder body = new StringBuilder(BODY_CAPACITY);
     StringBuilder csv = new StringBuilder("Source,Run,Line,Reason,Record\n");
-    body.append("Records that failed watchlist ingestion since the last digest (SNSRP-202):\n\n");
+    body.append("Records that failed watchlist ingestion since the last digest:\n\n");
     for (IngestionError e : pending) {
       IngestionRun run = runById.get(e.getRunId());
       String source = run == null ? "" : sourceCode.getOrDefault(run.getSourceId(), "");

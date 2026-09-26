@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.acsl.service.SoaUploadService;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.report.core.ReportService.RenderedReport;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
@@ -257,7 +258,7 @@ public class AcslReconController {
       @RequestParam Long companyId,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
           LocalDate asOf) {
-    return GlSlRunView.from(glsl.run(companyId, asOf == null ? LocalDate.now(clock) : asOf));
+    return GlSlRunView.from(glsl.run(companyId, asOf == null ? BusinessClock.today(clock) : asOf));
   }
 
   /**

@@ -9,10 +9,11 @@ import com.iortatechnxt.brokerverse.collections.escalation.domain.Escalation;
 import com.iortatechnxt.brokerverse.collections.escalation.service.EscalationService;
 import com.iortatechnxt.brokerverse.collections.promise.domain.PaymentPromise;
 import com.iortatechnxt.brokerverse.collections.promise.service.PromiseService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ class CollectionsBulkUpdateIT {
   @Autowired private TransactionTemplate tx;
 
   private BulkContext context(String jobNo) {
-    return new BulkContext(fx.company(), jobNo, LocalDate.now(), Map.of());
+    return new BulkContext(fx.company(), jobNo, BusinessClock.today(Clock.systemUTC()), Map.of());
   }
 
   private static BulkRow row(String... pairs) {
@@ -110,7 +111,7 @@ class CollectionsBulkUpdateIT {
                     "Invoice No",
                     no,
                     "Promise Date",
-                    LocalDate.now().plusDays(5).toString(),
+                    BusinessClock.today(Clock.systemUTC()).plusDays(5).toString(),
                     "Escalate",
                     "Y",
                     "Escalation Reason",
@@ -136,7 +137,7 @@ class CollectionsBulkUpdateIT {
     BulkRow row =
         row(
             "Invoice No", no,
-            "Promise Date", LocalDate.now().plusDays(5).toString(),
+            "Promise Date", BusinessClock.today(Clock.systemUTC()).plusDays(5).toString(),
             "Promise Amount", "250.00",
             "Escalate", "Y",
             "Escalation Level", "tl",

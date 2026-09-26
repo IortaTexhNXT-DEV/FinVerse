@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.nbreport.api;
 
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbreport.api.dto.NbDashboardResponse;
 import com.iortatechnxt.brokerverse.nbreport.api.dto.ReportVariantDto;
 import com.iortatechnxt.brokerverse.nbreport.api.dto.SalesTargetDto;
@@ -78,7 +79,7 @@ public class NbReportController {
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
           LocalDate asOf) {
     return NbDashboardResponse.from(
-        dashboard.dashboard(companyId, asOf == null ? LocalDate.now(clock) : asOf));
+        dashboard.dashboard(companyId, asOf == null ? BusinessClock.today(clock) : asOf));
   }
 
   /**

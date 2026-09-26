@@ -62,7 +62,7 @@ public class PromiseCheckJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Allocates payments to installments and checks the promises to pay due (BRCLXN.053/055)";
+    return "Allocates payments to installments and checks the promises to pay due";
   }
 
   @Override

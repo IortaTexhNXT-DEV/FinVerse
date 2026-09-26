@@ -47,7 +47,7 @@ public class GlSlReconReport implements ReportDefinition {
     return ReportMetadata.acsl(
         CODE,
         "GL-SL Reconciliation",
-        "General ledger against sub-ledger per control account, with the difference (ACSL 2.13.2)",
+        "General ledger against sub-ledger per control account, with the difference",
         List.of(
             ParameterSpec.required(COMPANY, "Company", ParameterType.COMPANY),
             ParameterSpec.required(AS_OF, "As Of", ParameterType.DATE).withDefault("TODAY")));

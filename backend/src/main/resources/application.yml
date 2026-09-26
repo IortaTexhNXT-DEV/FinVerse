@@ -132,6 +132,9 @@ brokerverse:
   # Kind of environment: local, sit, uat, training, preprod or production. "production" (or the prod
   # profile) turns on the start-up safeguards: no seed profile, every required secret present.
   environment: ${BROKERVERSE_ENVIRONMENT:local}
+  # Time zone of the business day (BusinessClock): today, "not in the future" and cut-off checks,
+  # periods, report date keywords and job run dates. Timestamps stay in UTC.
+  business-zone: ${BROKERVERSE_BUSINESS_ZONE:Asia/Manila}
   # ---- Workload role of the instance (INF0), ARCHITECTURE_OPTION_DECISION.md section 2 ----
   runtime:
     # web: user screens and APIs; jobs: schedulers and batch jobs; integration: outbox relay, Kafka

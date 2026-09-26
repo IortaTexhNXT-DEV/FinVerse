@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.collections.unapplied.domain.ApplicationRequest;
 import com.iortatechnxt.brokerverse.collections.unapplied.domain.ApplicationRequestRepository;
 import com.iortatechnxt.brokerverse.collections.unapplied.domain.PaymentSnapshot;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.ExtractFile;
 import com.iortatechnxt.brokerverse.opsledger.service.port.FileDropPort;
 import com.iortatechnxt.brokerverse.opsledger.service.port.FileDropPort.DropContent;
@@ -43,7 +44,7 @@ public class ApplicationFileService {
       "PAYMENT_DATE|PAYMENT_FILE_NAME|TRANSACTION_NO|PAID_AMOUNT|CURRENCY|PAYMENT_TYPE|PAYOR"
           + "|REFERENCE_NO|ASSURED|INVOICE_NO|USER_ID|UNAPPLIED_REF|REQUEST_REF";
 
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  private static final ZoneId MANILA = BusinessClock.zone();
   private static final DateTimeFormatter STAMP = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
   private static final String SEPARATOR = "|";
 
@@ -77,7 +78,7 @@ public class ApplicationFileService {
    * @return day
    */
   public LocalDate previousDay() {
-    return LocalDate.ofInstant(clock.instant(), MANILA).minusDays(1);
+    return BusinessClock.today(clock).minusDays(1);
   }
 
   /**

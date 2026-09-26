@@ -1,13 +1,13 @@
 package com.iortatechnxt.brokerverse.journal.service;
 
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatchRepository;
 import com.iortatechnxt.brokerverse.journal.domain.JournalHeader;
 import com.iortatechnxt.brokerverse.journal.domain.JournalStatus;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
@@ -82,7 +82,7 @@ public class SystemJournalService {
             request.companyId(),
             request.branchId(),
             request.journalType(),
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             request.valueDate(),
             request.currency(),
             request.narration(),

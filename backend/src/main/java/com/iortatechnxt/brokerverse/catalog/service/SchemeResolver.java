@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.SchemeTerms;
 import com.iortatechnxt.brokerverse.catalog.domain.VersionInsurer;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQueries;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -71,7 +72,7 @@ public class SchemeResolver {
     if (!product.isPackaged() || !versions.isVersioned(product.getCode())) {
       return Scheme.of(product);
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     return switch (query.purpose()) {
       case RENEWAL ->
           Scheme.of(

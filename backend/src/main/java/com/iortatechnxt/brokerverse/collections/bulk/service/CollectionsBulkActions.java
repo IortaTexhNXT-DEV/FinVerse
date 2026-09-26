@@ -11,9 +11,9 @@ import com.iortatechnxt.brokerverse.collections.promise.service.PromiseService.P
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -142,7 +142,7 @@ public class CollectionsBulkActions {
   }
 
   private String bulkRef() {
-    return numbers.next("CLXB-" + LocalDate.now(clock).getYear());
+    return numbers.next("CLXB-" + BusinessClock.today(clock).getYear());
   }
 
   private <T> T inTx(Supplier<T> work) {

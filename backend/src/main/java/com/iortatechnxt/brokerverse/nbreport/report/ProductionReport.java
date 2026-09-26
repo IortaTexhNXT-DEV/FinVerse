@@ -47,7 +47,7 @@ public class ProductionReport implements ReportDefinition {
     return NbReportSupport.metadata(
         CODE,
         "Production Statistics",
-        "Production per region, department, team or officer against target (BRNB.075)",
+        "Production per region, department, team or officer against target",
         Permission.WORK_ASSIGN,
         true,
         ParameterSpec.select(

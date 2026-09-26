@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.adjustment.domain.EndorsementRequest;
 import com.iortatechnxt.brokerverse.booking.domain.PremiumComponent;
 import com.iortatechnxt.brokerverse.booking.service.InvoiceBooked;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
@@ -108,7 +109,7 @@ public class LedgerEffects {
             MovementType.ADJUSTED,
             Adjustments.MODULE,
             Adjustments.sourceRef(request.getRequestNo()),
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             amounts,
             new DocumentRefs(null, null, request.outcome().batchNo(), journalBatchNo),
             request.getTerms().endorsementType() + " " + request.getRequestNo()));
@@ -130,7 +131,7 @@ public class LedgerEffects {
       return BigDecimal.ZERO.setScale(MONEY);
     }
     String ref = Adjustments.sourceRef(request.getRequestNo()) + ":ARI";
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     InsurerShareAllocator.allocate(amount, invoice.getShares())
         .forEach(
             (insurer, part) -> {
@@ -181,7 +182,7 @@ public class LedgerEffects {
                   request.getSubject().invoiceNo(),
                   Adjustments.MODULE,
                   Adjustments.sourceRef(request.getRequestNo()),
-                  LocalDate.now(clock),
+                  BusinessClock.today(clock),
                   request.getTerms().endorsementType() + " " + request.getRequestNo())));
     } catch (BusinessRuleException e) {
       if (REAPPLIER_UNAVAILABLE.equals(e.getCode())) {

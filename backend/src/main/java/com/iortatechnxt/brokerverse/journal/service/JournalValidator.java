@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.coa.domain.NegativeBalancePolicy;
 import com.iortatechnxt.brokerverse.coa.service.PostingContext;
 import com.iortatechnxt.brokerverse.coa.service.PostingEligibilityService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.dimension.domain.DimensionType;
 import com.iortatechnxt.brokerverse.dimension.service.DimensionService;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
@@ -147,7 +148,7 @@ public class JournalValidator {
   }
 
   private void checkValueDateWindow(Company company, LocalDate valueDate, List<String> errors) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     if (valueDate.isBefore(today.minusDays(company.getBackValueDays()))) {
       errors.add(
           "Value date "

@@ -94,9 +94,7 @@ public final class FormWorksheetReport implements ReportDefinition {
         .rows(rows)
         .presorted()
         .withoutGrandTotal()
-        .note(
-            period.label()
-                + "; worksheet of the return, form layout and channel to confirm (AQ07).")
+        .note(period.label() + "; worksheet of the return.")
         .build();
   }
 

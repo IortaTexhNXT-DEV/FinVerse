@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.party.domain.PartyType;
 import com.iortatechnxt.brokerverse.party.service.PartyService;
@@ -21,7 +22,6 @@ import com.iortatechnxt.brokerverse.workflow.service.WorkCaseTransitioned;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import jakarta.persistence.criteria.Predicate;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -112,7 +112,7 @@ public class DeductionService {
     RemittanceDeduction deduction =
         deductions.save(
             new RemittanceDeduction(
-                companyId, numbers.next("RDN-" + LocalDate.now(clock).getYear()), terms));
+                companyId, numbers.next("RDN-" + BusinessClock.today(clock).getYear()), terms));
     workflow.start(
         new StartCase(
             companyId,
@@ -261,7 +261,7 @@ public class DeductionService {
   }
 
   private void validate(Long companyId, Terms terms) {
-    lovs.requireValid(SOURCE_LOV, terms.sourceType(), LocalDate.now(clock));
+    lovs.requireValid(SOURCE_LOV, terms.sourceType(), BusinessClock.today(clock));
     parties.requireActive(companyId, terms.insurerCode(), List.of(PartyType.INSURER));
   }
 

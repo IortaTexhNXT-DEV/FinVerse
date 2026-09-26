@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.catalog.service.version.PackageSpec;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductExpired;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQueryService;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionView;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageRequest;
 import com.iortatechnxt.brokerverse.productmaint.domain.RequestStage;
@@ -21,6 +22,7 @@ import com.iortatechnxt.brokerverse.support.TestData;
 import com.iortatechnxt.brokerverse.system.service.JobOutcome;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -97,13 +99,13 @@ class PackageExpiryIT {
 
   @Test
   void theMonitorAlertsAndDraftsOneRenewalRequestPrefilledFromTheVersion() {
-    LocalDate end = LocalDate.now().plusDays(20);
+    LocalDate end = BusinessClock.today(Clock.systemUTC()).plusDays(20);
     PackageExpiryMonitorJob job =
         new PackageExpiryMonitorJob(source(expiring(end)), expiry, slas, organization, "-");
     String before = parameters.get("PACKAGE_RENEWAL_AUTODRAFT").getValue();
     try {
       parameters.update("PACKAGE_RENEWAL_AUTODRAFT", "true");
-      JobOutcome first = job.execute(LocalDate.now());
+      JobOutcome first = job.execute(BusinessClock.today(Clock.systemUTC()));
       assertThat(first.message()).contains("renewal request(s) drafted");
       Optional<PackageRequest> renewal = expiry.openRenewal(PRODUCT);
       assertThat(renewal).isPresent();
@@ -117,7 +119,7 @@ class PackageExpiryIT {
           .isEqualTo(end.plusDays(1));
       assertThat(codec.terms(r.getRequestedTerms()).insurerCodes()).isSubsetOf("INS-MGIC");
 
-      job.execute(LocalDate.now());
+      job.execute(BusinessClock.today(Clock.systemUTC()));
       assertThat(expiry.openRenewal(PRODUCT))
           .get()
           .extracting(PackageRequest::getId)

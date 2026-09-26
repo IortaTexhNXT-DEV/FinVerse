@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.brokerclaims.status.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -19,7 +20,7 @@ import java.util.List;
 public final class ClaimAgeing {
 
   /** Time zone of the business dates. */
-  public static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  public static final ZoneId MANILA = BusinessClock.zone();
 
   private ClaimAgeing() {}
 
@@ -30,7 +31,7 @@ public final class ClaimAgeing {
    * @return business date
    */
   public static LocalDate today(Clock clock) {
-    return LocalDate.now(clock.withZone(MANILA));
+    return BusinessClock.today(clock);
   }
 
   /**

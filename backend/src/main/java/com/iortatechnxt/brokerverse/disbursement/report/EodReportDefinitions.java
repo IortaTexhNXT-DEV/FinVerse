@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.disbursement.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.report.SqlReport.Spec;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
@@ -19,7 +20,9 @@ public class EodReportDefinitions {
   private static final String APPROVED_IN_RANGE =
       " where v.company_id = :companyId and v.approved_at is not null"
           + " and v.posting_status in ('POSTED', 'REVERSED')"
-          + " and cast(v.approved_at at time zone 'Asia/Manila' as date) between :from and :to";
+          + " and cast(v.approved_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to";
 
   /**
    * {@code DSB-EOD-REMIT}: remittances to insurers (withholding 2% / 15% in the tax column).
@@ -91,7 +94,7 @@ public class EodReportDefinitions {
         new Spec(
             code,
             title,
-            title + ": vouchers approved on the business date (DIS 3.28.2)",
+            title + ": vouchers approved on the business date",
             true,
             "select v.mode as mode_group, "
                 + DisbursementReports.VOUCHER_COLUMNS
@@ -122,7 +125,7 @@ public class EodReportDefinitions {
         new Spec(
             "DSB-EOD-SUMMARY",
             "Disbursement Summary End-of-Day",
-            "Vouchers approved on the business date per disbursement type and mode (DIS 3.28.2)",
+            "Vouchers approved on the business date per disbursement type and mode",
             true,
             "select v.disbursement_type as type, v.mode, v.currency, count(*) as items,"
                 + " sum(v.gross) as gross, sum(v.ewt) as ewt, sum(v.net) as net"

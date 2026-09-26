@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.domain.LovValue;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
@@ -24,7 +25,6 @@ import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -120,7 +120,7 @@ public class ReceiptActionService {
         actions.save(
             new ReceiptAction(
                 receipt,
-                numbers.next("CAN-" + LocalDate.now(clock).getYear()),
+                numbers.next("CAN-" + BusinessClock.today(clock).getYear()),
                 ReceiptActionType.CANCEL,
                 reason,
                 receipt.liveAmount()));
@@ -149,7 +149,7 @@ public class ReceiptActionService {
     ReceiptAction action =
         new ReceiptAction(
             receipt,
-            numbers.next("RIN-" + LocalDate.now(clock).getYear()),
+            numbers.next("RIN-" + BusinessClock.today(clock).getYear()),
             request.full() ? ReceiptActionType.REINSTATE_FULL : ReceiptActionType.REINSTATE_PARTIAL,
             request.reason(),
             amount);
@@ -279,7 +279,7 @@ public class ReceiptActionService {
     if (reason == null || reason.code() == null || reason.code().isBlank()) {
       throw new BusinessRuleException("RECEIPT_REASON_REQUIRED", "Select a reason");
     }
-    LovValue value = lovs.requireValid(lov, reason.code(), LocalDate.now(clock));
+    LovValue value = lovs.requireValid(lov, reason.code(), BusinessClock.today(clock));
     if (reason.code().endsWith("_OTHERS") && (reason.text() == null || reason.text().isBlank())) {
       throw new BusinessRuleException(
           "RECEIPT_REASON_TEXT_REQUIRED", "Specify the reason when 'Others' is selected");

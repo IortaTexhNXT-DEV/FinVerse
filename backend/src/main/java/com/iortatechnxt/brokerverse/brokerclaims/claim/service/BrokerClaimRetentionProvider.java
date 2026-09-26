@@ -4,12 +4,12 @@ import com.iortatechnxt.brokerverse.brokerclaims.domain.BrokerClaimRepository;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimCodes;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimPhase;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.service.RetentionCandidate;
 import com.iortatechnxt.brokerverse.nbadmin.service.RetentionCandidateProvider;
 import com.iortatechnxt.brokerverse.nbadmin.service.RetentionCriteria;
 import com.iortatechnxt.brokerverse.nbadmin.service.RetentionQueries;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -69,7 +69,7 @@ public class BrokerClaimRetentionProvider implements RetentionCandidateProvider 
   }
 
   private static Instant cutoff(RetentionCriteria criteria) {
-    return criteria.lastActivityOnOrBefore().plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+    return BusinessClock.startOf(criteria.lastActivityOnOrBefore().plusDays(1));
   }
 
   private static RetentionCandidate candidate(Claim c) {

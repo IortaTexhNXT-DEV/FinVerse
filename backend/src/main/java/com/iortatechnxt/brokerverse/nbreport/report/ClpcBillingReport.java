@@ -51,7 +51,7 @@ public class ClpcBillingReport implements ReportDefinition {
     return NbReportSupport.metadata(
         CODE,
         "CLPC Billing Report",
-        "CBG Fire accounts billed to CLPC with their payment status (BRNB.067/075)",
+        "CBG Fire accounts billed to CLPC with their payment status",
         Permission.BILLING_MANAGE,
         true,
         ParameterSpec.select(

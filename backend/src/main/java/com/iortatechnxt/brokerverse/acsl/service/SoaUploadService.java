@@ -13,10 +13,10 @@ import com.iortatechnxt.brokerverse.bulk.service.ParsedFile;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.Sha256;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,7 +121,7 @@ public class SoaUploadService {
         uploads.save(
             new SoaUpload(
                 companyId,
-                numbers.next("SOA-" + LocalDate.now(clock).getYear()),
+                numbers.next("SOA-" + BusinessClock.today(clock).getYear()),
                 checked,
                 new SoaUpload.FileFacts(fileName, sha),
                 layout.getInsurerCode()));

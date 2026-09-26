@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.collections.common.domain.CollectionItem;
 import com.iortatechnxt.brokerverse.collections.common.service.CollectionItems;
 import com.iortatechnxt.brokerverse.collections.unapplied.domain.UnappliedDisposition;
 import com.iortatechnxt.brokerverse.collections.unapplied.domain.UnappliedDispositionRepository;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedDirectory;
 import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedDirectory.UnappliedFilter;
@@ -78,7 +79,7 @@ public class UnappliedWorklistService {
    * @return rows, latest payment first
    */
   public Page<CollectorRow> list(Long companyId, CollectorFilter filter, Pageable pageable) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     UnappliedFilter base =
         new UnappliedFilter(
             filter.text(),
@@ -116,7 +117,7 @@ public class UnappliedWorklistService {
     if (views.isEmpty()) {
       return List.of();
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     Map<String, UnappliedDisposition> latest =
         dispositions
             .latest(companyId, views.stream().map(UnappliedView::unappliedRef).toList())

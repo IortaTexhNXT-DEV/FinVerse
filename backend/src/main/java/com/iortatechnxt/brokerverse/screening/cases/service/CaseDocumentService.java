@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.attachment.service.NamingPattern;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.ClientStatus;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.crm.service.KycDocumentService;
@@ -105,7 +106,7 @@ public class CaseDocumentService {
       throw new BusinessRuleException("SCR_CASE_CLOSED", "Case " + c.getCaseNo() + " is closed");
     }
     access.requireActor(c, "Upload", EnumSet.of(c.getStage()));
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     validate(meta, today);
     LovValue type = lovs.requireValid(CaseCodes.DOCUMENT_TYPE_LOV, meta.documentType(), today);
     int sequence = (int) documents.countByCaseIdAndDocumentType(c.getId(), meta.documentType()) + 1;
@@ -180,7 +181,7 @@ public class CaseDocumentService {
     boolean kycType =
         clientType != null
             && !OTHERS.equals(clientType)
-            && lovs.activeValues(CLIENT_DOCUMENT_TYPES, LocalDate.now(clock)).stream()
+            && lovs.activeValues(CLIENT_DOCUMENT_TYPES, BusinessClock.today(clock)).stream()
                 .anyMatch(v -> v.getCode().equals(clientType));
     if (!kycType || clients.get(c.getClientId()).getStatus() == ClientStatus.INACTIVE) {
       return Optional.empty();

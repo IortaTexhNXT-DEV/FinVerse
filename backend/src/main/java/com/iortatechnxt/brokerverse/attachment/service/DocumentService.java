@@ -9,12 +9,12 @@ import com.iortatechnxt.brokerverse.attachment.service.AttachmentService.Attachm
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -168,7 +168,7 @@ public class DocumentService {
     }
     String type = blankToNull(options.documentType());
     if (type != null) {
-      lovs.requireValid(DOCUMENT_TYPE, type, LocalDate.now(clock));
+      lovs.requireValid(DOCUMENT_TYPE, type, BusinessClock.today(clock));
     }
     if (options.nominate() && blankToNull(options.reference()) == null) {
       throw new BusinessRuleException(

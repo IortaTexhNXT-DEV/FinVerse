@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.payrequest.domain.CancellationTarget;
 import com.iortatechnxt.brokerverse.payrequest.domain.Payee;
@@ -172,7 +173,7 @@ public class RequestFormService {
           "PRQ_CANCELLATION_PENDING",
           "A cancellation of the check of " + paid.getRequestNo() + " is already in progress");
     }
-    lovs.requireValid("DISB_CANCEL_REASON", draft.reasonCode(), LocalDate.now(clock));
+    lovs.requireValid("DISB_CANCEL_REASON", draft.reasonCode(), BusinessClock.today(clock));
     PaymentRequest request = open(companyId, paid.getBranchId(), RequestKind.CHECK_CANCELLATION);
     RequestContent content =
         rules.content(
@@ -211,7 +212,7 @@ public class RequestFormService {
     RequestContent given = draft.content();
     if (given.purpose() == null || given.purpose().isBlank()) {
       throw new BusinessRuleException(
-          "PRQ_PURPOSE_REQUIRED", "Give the purpose of the cash advance (Appendix D RFP)");
+          "PRQ_PURPOSE_REQUIRED", "Give the purpose of the cash advance");
     }
     RequestContent content =
         rules.content(
@@ -227,7 +228,7 @@ public class RequestFormService {
   }
 
   private PaymentRequest open(Long companyId, Long branchId, RequestKind kind) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     String number = numbers.next(kind.prefix() + "-" + today.getYear());
     return new PaymentRequest(companyId, branchId, number, kind, today);
   }

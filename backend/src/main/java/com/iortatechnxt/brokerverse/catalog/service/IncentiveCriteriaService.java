@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -201,7 +202,7 @@ public class IncentiveCriteriaService implements CatalogRecordHook {
   public IncentiveCriteria deactivate(Long id, LocalDate lastDay) {
     requireMaintainer();
     IncentiveCriteria row = get(id);
-    LocalDate end = lastDay != null ? lastDay : LocalDate.now(clock);
+    LocalDate end = lastDay != null ? lastDay : BusinessClock.today(clock);
     if (row.isActive()) {
       row.endOn(end.isBefore(row.getEffectiveFrom()) ? row.getEffectiveFrom() : end);
     }
@@ -279,7 +280,7 @@ public class IncentiveCriteriaService implements CatalogRecordHook {
       throw new BusinessRuleException(
           "INCENTIVE_PRODUCTS_REQUIRED", "Select at least one product of the products matrix");
     }
-    lovs.requireValid("INCENTIVE_TYPE", details.incentiveType(), LocalDate.now(clock));
+    lovs.requireValid("INCENTIVE_TYPE", details.incentiveType(), BusinessClock.today(clock));
     details.scopes().forEach(scope -> requireActive(companyId, scope));
     if (details.ruleParams() != null && !isJson(details.ruleParams())) {
       throw new BusinessRuleException(

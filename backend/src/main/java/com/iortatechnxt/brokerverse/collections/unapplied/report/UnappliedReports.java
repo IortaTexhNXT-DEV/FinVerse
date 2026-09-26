@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.collections.unapplied.report;
 
 import com.iortatechnxt.brokerverse.collections.report.ClxReportSql;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -27,7 +28,8 @@ public final class UnappliedReports {
   /** Unapplied dispositions code. */
   public static final String UNAPPLIED_DISPOSITIONS = "CLX-UNAPPLIED-DISPOSITIONS";
 
-  private static final String PERIOD = " at time zone 'Asia/Manila' as date) between :from and :to";
+  private static final String PERIOD =
+      " at time zone '" + BusinessClock.zoneId() + "' as date) between :from and :to";
 
   private UnappliedReports() {}
 
@@ -77,7 +79,7 @@ public final class UnappliedReports {
           APPLICATION_TO_INVOICE,
           "For Application To Invoice",
           "Collector requests to apply unapplied payments to invoices, with the fields of the daily"
-              + " text file (BRCLXN.041)",
+              + " text file",
           parameters());
     }
 
@@ -137,7 +139,7 @@ public final class UnappliedReports {
           UNAPPLIED_DISPOSITIONS,
           "Unapplied Payment Dispositions",
           "Collector dispositions of unapplied payments in the period with their Cashiering"
-              + " request (BRCLXN.031/033, 040)",
+              + " request",
           parameters());
     }
 

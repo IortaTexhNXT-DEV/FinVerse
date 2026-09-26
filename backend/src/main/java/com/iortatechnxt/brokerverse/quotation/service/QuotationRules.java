@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.catalog.service.RatingQuery;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.FieldValidationException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
@@ -100,7 +101,7 @@ public class QuotationRules {
     }
     RiskProduct product =
         catalog.requireSellable(
-            draft.productCode(), RatingQuery.Purpose.NEW_BUSINESS, LocalDate.now(clock));
+            draft.productCode(), RatingQuery.Purpose.NEW_BUSINESS, BusinessClock.today(clock));
     String segment = blankToNull(draft.marketSegment());
     if (!product.allowsSegment(segment)) {
       throw new BusinessRuleException(
@@ -168,7 +169,7 @@ public class QuotationRules {
   }
 
   private void checkCodes(QuotationDraft draft) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     lovs.validateOptional("MARKET_SEGMENT", blankToNull(draft.marketSegment()), today);
     lovs.validateOptional("SOURCE_CHANNEL", blankToNull(draft.sourceChannel()), today);
     for (QuotationDraft.DraftItem item : draft.items()) {
@@ -189,7 +190,8 @@ public class QuotationRules {
    * @return date
    */
   public LocalDate defaultValidity() {
-    return LocalDate.now(clock).plusDays(parameters.intValue(VALIDITY_DAYS, DEFAULT_VALIDITY));
+    return BusinessClock.today(clock)
+        .plusDays(parameters.intValue(VALIDITY_DAYS, DEFAULT_VALIDITY));
   }
 
   private static String basis(String given) {

@@ -65,7 +65,7 @@ public class DataExtractReport implements ReportDefinition {
         CODE,
         "Claims Data Extract",
         ReportCategory.CLAIMS_HANDLING,
-        "Every claim field, one row per claim, insurer line and location (BRCLM.033)",
+        "Every claim field, one row per claim, insurer line and location",
         BclReportSql.rangeFilters("reportedFrom", "reportedTo", "Date reported", false),
         Permission.BCL_DATA_EXTRACT,
         Permission.BCL_DATA_EXTRACT,

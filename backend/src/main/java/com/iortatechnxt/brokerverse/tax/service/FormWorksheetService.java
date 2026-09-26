@@ -102,7 +102,7 @@ public class FormWorksheetService {
         case "ACCOUNT_CREDITS", "ACCOUNT_DEBITS" -> {
           if (d.selector().isEmpty()) {
             amount = BigDecimal.ZERO;
-            note = "No account mapped yet (AQ07)";
+            note = "No account mapped yet";
           } else {
             amount = accounts.apply(d);
             note = "Accounts " + String.join(", ", d.selector());

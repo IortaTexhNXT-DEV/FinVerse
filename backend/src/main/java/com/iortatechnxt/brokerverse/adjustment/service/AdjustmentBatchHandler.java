@@ -100,7 +100,8 @@ public class AdjustmentBatchHandler implements BulkImportHandler {
         BulkColumn.required(
             INVOICE, "Invoice number of the Operations ledger", "BI-HO-2026-000001"),
         BulkColumn.required(TYPE, "Endorsement type code", "FIN_CHANGE_COVER"),
-        BulkColumn.optional(REQUEST_TYPE, "Annex V request type code", "FLAT_CANCELLATION"),
+        BulkColumn.optional(
+            REQUEST_TYPE, "Request type code of the endorsement slip", "FLAT_CANCELLATION"),
         BulkColumn.optional(REASON, "Cancellation reason code", "UNIT_SOLD"),
         BulkColumn.optional(REFERENCE, "Insurer endorsement reference", "END-2026-0001"),
         new BulkColumn(EFFECTIVE, "Effective date", true, BulkColumn.Type.DATE, "2026-10-01"),

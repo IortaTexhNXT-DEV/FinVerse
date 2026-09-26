@@ -80,7 +80,7 @@ public class ProductionExtractJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Extracts the production register of every insurer whose schedule is due (PRCID.001)";
+    return "Extracts the production register of every insurer whose schedule is due";
   }
 
   @Override

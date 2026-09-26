@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.productmaint.domain.NegotiationRound;
 import com.iortatechnxt.brokerverse.productmaint.domain.NegotiationRoundRepository;
@@ -162,7 +163,7 @@ public class PackageResponseService {
    */
   public PackageInsurerResponse record(Long id, Long responseId, ResponseTerms terms) {
     PackageInsurerResponse response = open(id, responseId);
-    lovs.requireValid("PKG_RESPONSE_OUTCOME", terms.outcome(), LocalDate.now(clock));
+    lovs.requireValid("PKG_RESPONSE_OUTCOME", terms.outcome(), BusinessClock.today(clock));
     if (ComparativeTable.offered(terms.outcome()) && terms.rate() == null) {
       throw new BusinessRuleException(
           "PKG_RESPONSE_RATE_REQUIRED",

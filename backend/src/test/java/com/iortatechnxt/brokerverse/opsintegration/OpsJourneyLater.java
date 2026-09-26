@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.commission.service.DpCollectionService.Colle
 import com.iortatechnxt.brokerverse.commission.service.DpFeedbackService;
 import com.iortatechnxt.brokerverse.commission.service.DpFeedbackService.Answer;
 import com.iortatechnxt.brokerverse.commission.service.DpIntakeService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInEnums.RunStatus;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInRun;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
@@ -54,6 +55,7 @@ import com.iortatechnxt.brokerverse.remittance.service.IncentiveRuleService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -328,7 +330,7 @@ public class OpsJourneyLater {
             extraction.run(
                 journey.company(),
                 new Scope(ExtractionTrigger.MANUAL_INVOICE, null, null, invoiceNo),
-                LocalDate.now()));
+                BusinessClock.today(Clock.systemUTC())));
     assertThat(tags.findFirstByInvoiceNoOrderByIdDesc(invoiceNo))
         .hasValueSatisfying(
             t -> {

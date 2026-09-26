@@ -29,6 +29,7 @@ import com.iortatechnxt.brokerverse.collections.promise.service.PromiseCheckJob;
 import com.iortatechnxt.brokerverse.collections.promise.service.PromiseService;
 import com.iortatechnxt.brokerverse.collections.promise.service.PromiseService.PromiseInput;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
@@ -38,6 +39,7 @@ import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowViewService;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +61,7 @@ class CollectionsEscalationIT {
 
   private static final String HANDLER = "mktcoll";
   private static final String TEAM_LEAD = "mkttl";
-  private static final LocalDate TODAY = LocalDate.now();
+  private static final LocalDate TODAY = BusinessClock.today(Clock.systemUTC());
 
   @Autowired private CollectionsPlanFixtures fx;
   @Autowired private PromiseService promises;

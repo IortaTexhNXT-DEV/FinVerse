@@ -132,7 +132,7 @@ public class AccountCreateBulkHandler implements BulkImportHandler {
             "N"));
     columns.add(
         BulkColumn.optional(
-            Headers.BUSINESS_TYPE, "NEW_BUSINESS (default) or RENEWAL (BRNB.097)", "NEW_BUSINESS"));
+            Headers.BUSINESS_TYPE, "NEW_BUSINESS (default) or RENEWAL", "NEW_BUSINESS"));
     columns.add(
         BulkColumn.optional(
             Headers.RENEWAL_OF, "Renewal: expiring ARN or policy reference", "ARN-2025-000123"));

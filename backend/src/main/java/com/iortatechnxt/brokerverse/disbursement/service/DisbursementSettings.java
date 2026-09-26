@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.disbursement.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
@@ -94,7 +95,7 @@ public final class DisbursementSettings {
   public static final String PAYEE_NOT_MAINTAINED = "PAYEE_NOT_MAINTAINED";
 
   /** Philippine time, the business day of Disbursement. */
-  public static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  public static final ZoneId MANILA = BusinessClock.zone();
 
   private DisbursementSettings() {}
 

@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.booking.domain.SiTrigger;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.party.domain.Party;
 import com.iortatechnxt.brokerverse.party.domain.PartyType;
 import com.iortatechnxt.brokerverse.party.service.PartyService;
@@ -105,7 +106,7 @@ public class ServiceInvoiceService {
             recipient.code(),
             recipient.name(),
             recipient.email(),
-            request.issueDate() == null ? LocalDate.now(clock) : request.issueDate(),
+            request.issueDate() == null ? BusinessClock.today(clock) : request.issueDate(),
             request.currency(),
             money(request.commission()),
             money(request.vatOnCommission()),
@@ -170,7 +171,7 @@ public class ServiceInvoiceService {
             original.getRecipientCode(),
             original.getRecipientName(),
             original.getRecipientEmail(),
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             original.getCurrency(),
             commission,
             vat,

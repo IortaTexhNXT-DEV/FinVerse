@@ -191,7 +191,7 @@ public class MinimalBalanceService {
             date,
             reversed,
             new DocumentRefs(null, null, null, batch),
-            "Minimal balance (CSHID.016)"));
+            "Minimal balance"));
     log(
         new LogRow(
             invoice.getCompanyId(),

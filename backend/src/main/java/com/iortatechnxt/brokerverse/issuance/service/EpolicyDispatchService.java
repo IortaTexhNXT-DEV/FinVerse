@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.MergedText;
 import com.iortatechnxt.brokerverse.issuance.domain.Epolicy;
@@ -22,7 +23,6 @@ import com.iortatechnxt.brokerverse.messaging.service.OutboundEmail;
 import com.iortatechnxt.brokerverse.messaging.service.OutboundEmail.Protection;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Page;
@@ -107,7 +107,7 @@ public class EpolicyDispatchService {
     MergedText text =
         templates.merge(
             TEMPLATE,
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             Map.of(
                 "clientName", account.getClientName(),
                 "policyNo", String.join(", ", epolicy.getPolicyNumberList()),

@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.currency.service.CurrencyService;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeRequestStatus;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeSource;
@@ -354,7 +355,7 @@ public class PayeeService {
   }
 
   private void validate(PayeeDetails details) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     lovs.requireValid(PAYEE_CLASS, details.payeeClass(), today);
     details.disbursementTypes().forEach(t -> lovs.requireValid(DISBURSEMENT_TYPE, t, today));
     currencies.requireActive(details.currency());

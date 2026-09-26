@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.docgen.service;
 
 import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.office.PdfBrandFooter;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Field;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Fields;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Section;
@@ -93,7 +94,7 @@ public class DocumentComposer {
    * @return PDF bytes
    */
   public byte[] pdf(DocumentSpec spec) {
-    LocalDate date = LocalDate.now(clock);
+    LocalDate date = BusinessClock.today(clock);
     byte[] pdf = pdf(spec, date);
     renditions.record(pdf, spec, date);
     return pdf;
@@ -106,7 +107,7 @@ public class DocumentComposer {
    * @return DOCX bytes
    */
   public byte[] docx(DocumentSpec spec) {
-    return DocumentWordWriter.write(spec, LocalDate.now(clock));
+    return DocumentWordWriter.write(spec, BusinessClock.today(clock));
   }
 
   /**

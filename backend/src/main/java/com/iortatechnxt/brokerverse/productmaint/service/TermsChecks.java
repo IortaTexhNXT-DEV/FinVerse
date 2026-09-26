@@ -83,7 +83,7 @@ final class TermsChecks {
       RequestType type, String coverTypeCode, boolean negotiationRequired, PackageTerms terms) {
     List<String> missing = new ArrayList<>();
     if (type == RequestType.NEW && coverTypeCode == null) {
-      missing.add("the cover type (PMADD01)");
+      missing.add("the cover type");
     }
     if (negotiationRequired && terms.insurers().isEmpty()) {
       missing.add("at least one target insurer");

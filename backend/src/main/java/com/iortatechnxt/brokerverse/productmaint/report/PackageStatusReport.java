@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.productmaint.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.productmaint.domain.RequestStage;
 import com.iortatechnxt.brokerverse.productmaint.domain.RequestType;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
@@ -45,7 +46,9 @@ public class PackageStatusReport implements ReportDefinition {
           + " coalesce(r.client_name, 'Programme') as client, r.title, r.line_code as line,"
           + " r.target_product_code as product, r.resulting_version_no as version,"
           + " r.status as stage, (cast(:today as date)"
-          + " - cast(c.stage_entered_at at time zone 'Asia/Manila' as date)) as stage_age,"
+          + " - cast(c.stage_entered_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date)) as stage_age,"
           + " r.package_end_date as end_date, r.scheme_rate as rate, r.chosen_insurers as insurers,"
           + " h.action as last_action, h.occurred_at as last_action_at, h.actor as last_actor"
           + " from pm_request r"
@@ -86,7 +89,7 @@ public class PackageStatusReport implements ReportDefinition {
         CODE,
         "Package Status Update Report",
         "Status of package requests, one or all, with stage age, end date, rates and the last"
-            + " action (BRPM.018)",
+            + " action",
         ParameterSpec.optional(REQUEST, "Request No. (individual report)", ParameterType.TEXT),
         ParameterSpec.select(STATUS, "Status", stages, PmReportSupport.ALL),
         ParameterSpec.select(TYPE, "Request Type", types, PmReportSupport.ALL),
@@ -97,7 +100,7 @@ public class PackageStatusReport implements ReportDefinition {
 
   @Override
   public ReportResult generate(ReportParameters p) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     MapSqlParameterSource args =
         new MapSqlParameterSource()
             .addValue("company", p.longValue(PmReportSupport.COMPANY))

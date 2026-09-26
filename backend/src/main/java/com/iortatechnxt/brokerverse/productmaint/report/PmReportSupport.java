@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.productmaint.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportCategory;
@@ -29,7 +30,7 @@ final class PmReportSupport {
   static final String ALL = "ALL";
 
   /** Business time zone of BDOI. */
-  static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  static final ZoneId MANILA = BusinessClock.zone();
 
   private PmReportSupport() {}
 

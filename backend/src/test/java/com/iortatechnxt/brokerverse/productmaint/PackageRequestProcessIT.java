@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadOpt
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionReleased;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionReturned;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.messaging.service.MessageService;
 import com.iortatechnxt.brokerverse.productmaint.domain.Advisory;
@@ -46,6 +47,7 @@ import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +66,8 @@ import org.springframework.context.ApplicationEventPublisher;
 class PackageRequestProcessIT {
 
   private static final AtomicInteger SEQ = new AtomicInteger();
-  private static final LocalDate START = LocalDate.now().plusMonths(2).withDayOfMonth(1);
+  private static final LocalDate START =
+      BusinessClock.today(Clock.systemUTC()).plusMonths(2).withDayOfMonth(1);
 
   @Autowired private PackageRequestService requests;
   @Autowired private PackageRequests reader;

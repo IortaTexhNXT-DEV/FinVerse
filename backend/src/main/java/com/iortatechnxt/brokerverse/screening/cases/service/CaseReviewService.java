@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.FieldValidationException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.domain.LovValue;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseAnswer;
@@ -21,7 +22,6 @@ import com.iortatechnxt.brokerverse.screening.config.service.ActiveConfig;
 import com.iortatechnxt.brokerverse.screening.config.service.ReviewTemplate;
 import com.iortatechnxt.brokerverse.screening.config.service.ReviewTemplate.Field;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -97,7 +97,8 @@ public class CaseReviewService {
       return existing;
     }
     return config
-        .template(c.getCompanyId(), TemplateType.valueOf(c.getTemplateType()), LocalDate.now(clock))
+        .template(
+            c.getCompanyId(), TemplateType.valueOf(c.getTemplateType()), BusinessClock.today(clock))
         .map(t -> reviews.save(new CaseReview(c.getId(), t.version().id(), c.getTemplateType())));
   }
 
@@ -221,7 +222,7 @@ public class CaseReviewService {
     if (field.dataType() != FieldDataType.LOV || field.lovType() == null) {
       return Set.of();
     }
-    return lovs.activeValues(field.lovType(), LocalDate.now(clock)).stream()
+    return lovs.activeValues(field.lovType(), BusinessClock.today(clock)).stream()
         .map(LovValue::getCode)
         .collect(Collectors.toSet());
   }

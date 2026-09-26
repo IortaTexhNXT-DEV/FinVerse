@@ -7,10 +7,10 @@ import com.iortatechnxt.brokerverse.commission.domain.DpBilling;
 import com.iortatechnxt.brokerverse.commission.domain.DpBillingRepository;
 import com.iortatechnxt.brokerverse.commission.domain.DpItem;
 import com.iortatechnxt.brokerverse.commission.domain.DpItemRepository;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.service.port.InvoiceRelatedItems;
 import com.iortatechnxt.brokerverse.opsledger.service.port.OpsWorkCountSource;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,7 +77,7 @@ public class CommissionWorkCounts implements OpsWorkCountSource, InvoiceRelatedI
             "DP_OVERDUE",
             "Insurer Feedback Overdue",
             billings.countByCompanyIdAndStageAndSlaDueBefore(
-                companyId, DpBilling.AWAITING, LocalDate.now(clock)),
+                companyId, DpBilling.AWAITING, BusinessClock.today(clock)),
             Severity.ALERT,
             BILLINGS),
         tile(

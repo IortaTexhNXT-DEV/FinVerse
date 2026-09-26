@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.remittance.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
@@ -52,7 +53,7 @@ public final class DtipStatusReports {
       return RemittanceReportSql.metadata(
           "REM-DTIP-SUMMARY",
           "DTIP Status Report - Summary",
-          "Outstanding due to insurers per insurer and remittance status (RMTID.028/039)",
+          "Outstanding due to insurers per insurer and remittance status",
           false);
     }
 
@@ -91,7 +92,10 @@ public final class DtipStatusReports {
             + " and m.movement_type = 'REMITTED') as last_remitted,"
             + " (select max(m.value_date) from ops_invoice_movement m where m.invoice_id = i.id"
             + " and m.movement_type = 'APPLIED') as last_paid,"
-            + " current_date - i.inception_date as age_inception,"
+            + " cast(now() at time zone '"
+            + BusinessClock.zoneId()
+            + "' as date)"
+            + " - i.inception_date as age_inception,"
             + " d.balance as dtip,"
             + " (select sum(c.balance) from ops_invoice_component c where c.invoice_id = i.id"
             + " and c.component in ('BASIC','DST','PREMIUM_TAX_VAT','LGT','FST','OTHER')) as ra,"
@@ -118,7 +122,7 @@ public final class DtipStatusReports {
       return RemittanceReportSql.metadata(
           "REM-DTIP-DETAIL",
           "DTIP Status Report - Detailed",
-          "Invoices with outstanding due to insurer, collections and remittances (RMTID.028/039)",
+          "Invoices with outstanding due to insurer, collections and remittances",
           false);
     }
 
@@ -147,7 +151,7 @@ public final class DtipStatusReports {
           .groupBy(INSURER, "Insurance Company")
           .rows(sql.rows(SQL, RemittanceReportSql.args(p)))
           .presorted()
-          .note("CAT collected and the ageing from last payment wait for their definitions (OQ42).")
+          .note("CAT collected and the ageing from the last payment are not included.")
           .build();
     }
   }

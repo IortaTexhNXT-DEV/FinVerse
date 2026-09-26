@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.remittance.seed;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.seed.SeedUsers;
@@ -144,7 +145,7 @@ public class RemittanceSeedData implements ApplicationRunner {
                 invoice.getInvoiceNo(),
                 new Terms(
                     "OTHERS",
-                    "Seed: client disputes the premium; hold until Marketing confirms (OQ24)",
+                    "Seed: client disputes the premium; hold until Marketing confirms",
                     today().plusDays(HOLD_DAYS)),
                 true,
                 RequestSource.SCREEN));
@@ -199,7 +200,7 @@ public class RemittanceSeedData implements ApplicationRunner {
   }
 
   private LocalDate today() {
-    return LocalDate.now(clock);
+    return BusinessClock.today(clock);
   }
 
   private static void step(String name, Runnable work) {

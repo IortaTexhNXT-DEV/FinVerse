@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.dimension.domain.DimensionType;
 import com.iortatechnxt.brokerverse.dimension.service.DimensionService;
 import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeRecipient;
@@ -160,7 +161,7 @@ public class ServiceFeeSetupService {
   }
 
   private void validate(RuleValues v) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     if (v.segment() == null || v.rate() == null || v.effectiveFrom() == null) {
       throw new BusinessRuleException(
           "SERVICE_FEE_RULE", "Give the segment, the rate and the start date");

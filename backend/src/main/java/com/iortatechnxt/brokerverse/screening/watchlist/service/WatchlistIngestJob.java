@@ -65,7 +65,7 @@ public class WatchlistIngestJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Reads the sanctions / PEP list files of the active sources and logs each run (SNSRP-201)";
+    return "Reads the sanctions / PEP list files of the active sources and logs each run";
   }
 
   /**

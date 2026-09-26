@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.frbs.domain.FrbsEnums.LineStatus;
 import com.iortatechnxt.brokerverse.frbs.domain.FrbsEnums.RunStage;
 import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeLine;
@@ -151,7 +152,7 @@ public class ServiceFeeTagService {
   }
 
   private void requireNotFuture(LocalDate on) {
-    if (on == null || on.isAfter(LocalDate.now(clock.withZone(ServiceFeeBase.MANILA)))) {
+    if (on == null || on.isAfter(BusinessClock.today(clock))) {
       throw new BusinessRuleException("SERVICE_FEE_DATES", "Give a date that is not in the future");
     }
   }

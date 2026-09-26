@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.SheetSpec;
 import com.iortatechnxt.brokerverse.placement.domain.BillingBatch;
@@ -129,7 +130,7 @@ public class BillingService {
       throw new BusinessRuleException(
           "BILLING_NOTHING_TO_BILL", "No CBG Fire account awaiting payment is left to bill");
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     BillingBatch batch =
         new BillingBatch(companyId, numbers.next("BILL-" + today.getYear()), today);
     chosen.forEach(a -> batch.add(lineOf(a)));

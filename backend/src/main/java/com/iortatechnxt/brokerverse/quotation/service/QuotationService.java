@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.catalog.service.TsuRoutingService.TsuDecisio
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.docgen.domain.DocTemplate;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
@@ -24,7 +25,6 @@ import com.iortatechnxt.brokerverse.workflow.service.StartCase;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
-import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -118,12 +118,12 @@ public class QuotationService {
    */
   public Quotation create(Long companyId, QuotationDraft draft) {
     Resolved resolved = rules.resolve(companyId, draft);
-    if (resolved.content().validUntil().isBefore(LocalDate.now(clock))) {
+    if (resolved.content().validUntil().isBefore(BusinessClock.today(clock))) {
       throw new BusinessRuleException(
           "QUOTATION_VALIDITY_PAST", "The validity date cannot be in the past");
     }
     RiskProduct product = resolved.product();
-    DocTemplate template = templates.current(TEMPLATE, LocalDate.now(clock));
+    DocTemplate template = templates.current(TEMPLATE, BusinessClock.today(clock));
     Quotation quotation =
         Quotation.create(
             new QuotationHeader(
@@ -247,7 +247,7 @@ public class QuotationService {
           "The premium cannot be computed: give each item a sum insured (and a rate when the"
               + " product has no default rate)");
     }
-    if (content.validUntil().isBefore(LocalDate.now(clock))) {
+    if (content.validUntil().isBefore(BusinessClock.today(clock))) {
       throw new BusinessRuleException(
           "QUOTATION_EXPIRED", "The validity date has passed: change it before submitting");
     }

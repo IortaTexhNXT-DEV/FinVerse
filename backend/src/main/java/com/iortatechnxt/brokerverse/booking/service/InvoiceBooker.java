@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.booking.domain.SiTrigger;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -86,7 +87,7 @@ public class InvoiceBooker {
    * @return the booked invoice
    */
   public BookedInvoice book(BookedInvoice invoice, LocalDate date, BookingSource source) {
-    if (date.isAfter(LocalDate.now(clock))) {
+    if (date.isAfter(BusinessClock.today(clock))) {
       throw new BusinessRuleException(
           "BOOKING_DATE_FUTURE", "The booking date " + date + " is in the future");
     }

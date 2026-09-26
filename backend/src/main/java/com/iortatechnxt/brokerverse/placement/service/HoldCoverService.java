@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.account.service.AccountService;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.MergedText;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
@@ -136,7 +137,7 @@ public class HoldCoverService {
     PlacementAddress address =
         insurers.address(
             account.getCompanyId(), account.getInsurerCode(), account.getInsurerBranch());
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     LocalDate start = request.startDate() == null ? today : request.startDate();
     LocalDate expiry = start.plusDays(parameters.intValue(DAYS, DEFAULT_DAYS));
     MergedText text =
@@ -186,7 +187,9 @@ public class HoldCoverService {
       throw new BusinessRuleException("HOLD_COVER_REFERENCE", "Enter the insurer's reference");
     }
     LocalDate date =
-        confirmation.confirmedOn() == null ? LocalDate.now(clock) : confirmation.confirmedOn();
+        confirmation.confirmedOn() == null
+            ? BusinessClock.today(clock)
+            : confirmation.confirmedOn();
     HoldCover cover =
         current(arn)
             .filter(HoldCover::isOpen)
@@ -242,7 +245,7 @@ public class HoldCoverService {
                     new BusinessRuleException(
                         "HOLD_COVER_NONE", "Account " + arn + " has no open hold cover"));
     cover.decline(reference);
-    lifecycle.recordHoldCover(arn, HoldCoverStatus.DECLINED, reference, LocalDate.now(clock));
+    lifecycle.recordHoldCover(arn, HoldCoverStatus.DECLINED, reference, BusinessClock.today(clock));
     audit.record(ENTITY, arn, AuditAction.UPDATE, "Hold cover declined by the insurer");
     return cover;
   }

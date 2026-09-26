@@ -39,7 +39,7 @@ public final class ItemReports {
           ClxReportSql.metadata(
               OUTSTANDING_PR,
               "Outstanding PR List",
-              "Open collection items with the outstanding premium (BRCLXN.001-012, 045)",
+              "Open collection items with the outstanding premium",
               false),
           " and i.status = 'OPEN'" + BY_AGING);
     }
@@ -63,7 +63,7 @@ public final class ItemReports {
           ClxReportSql.metadata(
               FULL_PRODUCTION,
               "Full Production Report",
-              "Collection items of the invoices booked in the period, any status (BRCLXN.045)",
+              "Collection items of the invoices booked in the period, any status",
               true),
           " and i.booking_date between :from and :to order by i.booking_date, i.invoice_no");
     }
@@ -87,7 +87,7 @@ public final class ItemReports {
           ClxReportSql.metadata(
               COMPLETED,
               "Completed Collections",
-              "Items completed (paid or below the threshold) in the period (BRCLXN.008, 022)",
+              "Items completed (paid or below the threshold) in the period",
               true),
           " and i.status = 'COMPLETED' and i.completed_on between :from and :to"
               + " order by i.completed_on, i.invoice_no");
@@ -109,7 +109,7 @@ public final class ItemReports {
           ClxReportSql.metadata(
               WITH_DISPOSITION,
               "Invoices with Disposition",
-              "Open items with their current collector disposition (BRCLXN.016-021)",
+              "Open items with their current collector disposition",
               false),
           " and i.status = 'OPEN' and i.disposition_code is not null"
               + " order by i.disposition_code, i.invoice_no");

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.productmaint.service;
 
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQueryService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.productmaint.domain.Advisory;
 import com.iortatechnxt.brokerverse.productmaint.domain.AdvisoryRepository;
 import com.iortatechnxt.brokerverse.productmaint.domain.ComparativeOutputRepository;
@@ -95,7 +96,7 @@ public class PackageQueryService {
    * @return page
    */
   public Page<PackageRequest> search(Search search, Pageable pageable) {
-    return requests.findAll(search.toSpecification(LocalDate.now(clock)), pageable);
+    return requests.findAll(search.toSpecification(BusinessClock.today(clock)), pageable);
   }
 
   /**

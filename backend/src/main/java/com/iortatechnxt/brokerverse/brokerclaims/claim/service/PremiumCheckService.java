@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.domain.CoverSnapshot;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
@@ -158,7 +159,7 @@ public class PremiumCheckService {
     Claim claim = claims.requireOpen(companyId, claimId);
     PremiumCheck result = check(claim);
     Long evidence = allowed(claim, result.status(), evidenceAttachmentId);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     String code = numbers.next(ClaimCodes.AUTHORIZATION_CODE_PREFIX + "-" + today.getYear());
     claim.getCover().authorize(code, currentUser.username(), clock.instant(), evidence);
     audit.record(

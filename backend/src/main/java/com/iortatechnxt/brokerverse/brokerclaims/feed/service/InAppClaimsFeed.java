@@ -7,13 +7,13 @@ import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimLovAttribute;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimLovAttributeRepository;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimPhase;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimProgress;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.RemittanceStatus;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.opsledger.service.port.ClaimsFeed;
 import com.iortatechnxt.brokerverse.opsledger.service.port.FeedItem;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -83,10 +83,7 @@ public class InAppClaimsFeed implements ClaimsFeed {
     for (Claim claim :
         claims
             .findByCompanyIdAndProgressStatusCodeInAndProgressPhaseNotAndProgressStatusSinceGreaterThanEqual(
-                companyId,
-                awaiting,
-                ClaimPhase.CLOSED,
-                from.atStartOfDay(ZoneOffset.UTC).toInstant())) {
+                companyId, awaiting, ClaimPhase.CLOSED, BusinessClock.startOf(from))) {
       items.addAll(items(claim));
     }
     return items;

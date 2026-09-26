@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.collections.installment.service.LedgerBalanc
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import com.iortatechnxt.brokerverse.workflow.domain.WorkCase;
 import com.iortatechnxt.brokerverse.workflow.service.StartCase;
@@ -218,7 +219,7 @@ public class EscalationService {
   }
 
   private Escalation open(Header header, List<Candidate> invoices, boolean automatic) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     List<EscalationItem.Facts> facts =
         invoices.stream()
             .map(
@@ -338,7 +339,7 @@ public class EscalationService {
   }
 
   private String nextNumber() {
-    return numbers.next("ESC-" + LocalDate.now(clock).getYear());
+    return numbers.next("ESC-" + BusinessClock.today(clock).getYear());
   }
 
   private static boolean isBlank(String text) {

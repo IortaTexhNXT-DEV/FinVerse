@@ -15,12 +15,12 @@ import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied.UnappliedSpec;
 import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedRepository;
 import com.iortatechnxt.brokerverse.cashiering.service.ApplicationService.ApplyOptions;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -174,7 +174,7 @@ public class ReceiptReversalService {
                   null,
                   ApplicationSource.REINSTATEMENT,
                   action.getTransactionNo()),
-              new ApplyOptions(LocalDate.now(clock), false, receipt.getReceiptNo()));
+              new ApplyOptions(BusinessClock.today(clock), false, receipt.getReceiptNo()));
       left = left.subtract(app.map(Application::getAmount).orElse(BigDecimal.ZERO));
     }
     if (left.signum() > 0) {

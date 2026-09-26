@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.commission.domain.DpBilling;
 import com.iortatechnxt.brokerverse.commission.domain.DpItem;
 import com.iortatechnxt.brokerverse.commission.domain.DpItemRepository;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.SheetSpec;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
@@ -147,7 +148,7 @@ public class DpBillingSender {
             new Addressees(recipients, cc),
             insurer.map(InsurerProfile::getName).orElse(billing.getInsurerCode()),
             new MessageFile(fileName, XLSX, workbook));
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     billing.sent(
         new DpBilling.FileRef(file.id(), fileName),
         clock.instant(),

@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestAction;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
@@ -12,7 +13,6 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestRepository;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -132,7 +132,7 @@ public class AccessRequestService {
    */
   AccessRequest create(
       AccessRequestContent clean, boolean draft, List<String> chosenApprovers, Long batchId) {
-    String no = numbers.next("AR-" + LocalDate.now(clock).getYear());
+    String no = numbers.next("AR-" + BusinessClock.today(clock).getYear());
     AccessRequest saved = requests.save(new AccessRequest(no, clean, batchId));
     history.record(saved, AccessRequestAction.SAVE, null, clean.justification());
     if (!draft) {

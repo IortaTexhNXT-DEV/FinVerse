@@ -27,8 +27,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 public class BirOutputReports {
 
-  private static final String FORM_SOURCE = " (FRBS 3.2.0, App. A VII)";
-
   /**
    * {@code TAX-MAP}: monthly alphalist of payees (list #28).
    *
@@ -68,7 +66,7 @@ public class BirOutputReports {
         new Form(
             "0619F",
             "Monthly Remittance of Final Income Taxes Withheld (0619-F)",
-            "Final withholding taxes of the month to remit" + FORM_SOURCE,
+            "Final withholding taxes of the month to remit",
             Frequency.MONTH));
   }
 
@@ -87,7 +85,7 @@ public class BirOutputReports {
         new Form(
             "1603",
             "Quarterly Remittance of Fringe Benefit Tax (1603)",
-            "Fringe benefits of the quarter, grossed-up value and tax due" + FORM_SOURCE,
+            "Fringe benefits of the quarter, grossed-up value and tax due",
             Frequency.QUARTER));
   }
 
@@ -107,8 +105,7 @@ public class BirOutputReports {
             "1702Q",
             "Quarterly Income Tax Return (1702-Q)",
             "Gross income, expenses, taxable income, tax due and creditable taxes to the end of the"
-                + " quarter"
-                + FORM_SOURCE,
+                + " quarter",
             Frequency.QUARTER_YTD));
   }
 
@@ -127,8 +124,7 @@ public class BirOutputReports {
         new Form(
             "1702",
             "Annual Income Tax Return (1702)",
-            "Gross income, expenses, taxable income, tax due and creditable taxes of the year"
-                + FORM_SOURCE,
+            "Gross income, expenses, taxable income, tax due and creditable taxes of the year",
             Frequency.YEAR));
   }
 
@@ -216,8 +212,7 @@ public class BirOutputReports {
             "IC-BROKER-ASBO",
             "Broker's Annual Statement of Business Operations",
             ReportCategory.TAX_STATUTORY,
-            "Insurance Commission statement: business placed per line of business in the year"
-                + FORM_SOURCE,
+            "Insurance Commission statement: business placed per line of business in the year",
             List.of(TaxReportSupport.company(), TaxReportSupport.year(clock)),
             Permission.TAX_VIEW);
       }
@@ -240,7 +235,7 @@ public class BirOutputReports {
                     TaxReportSupport.yearPeriod(year).from(),
                     TaxReportSupport.yearPeriod(year).to()))
             .presorted()
-            .note("Booked production of " + year + "; IC layout to confirm (AQ07).")
+            .note("Booked production of " + year + ".")
             .build();
       }
     };

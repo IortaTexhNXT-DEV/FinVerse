@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.messaging.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.EmailAddresses;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage.RecordLink;
 import com.iortatechnxt.brokerverse.system.domain.JobRun;
@@ -28,7 +29,7 @@ public class JobFailureMailer implements JobFailureListener {
   public static final String PURPOSE = "JOB_FAILURE";
 
   private static final Logger LOG = LoggerFactory.getLogger(JobFailureMailer.class);
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  private static final ZoneId MANILA = BusinessClock.zone();
   private static final DateTimeFormatter WHEN =
       DateTimeFormatter.ofPattern("d MMM yyyy HH:mm:ss", Locale.ENGLISH);
 

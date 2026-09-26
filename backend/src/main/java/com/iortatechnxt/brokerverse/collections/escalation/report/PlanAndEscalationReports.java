@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.collections.escalation.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
@@ -40,7 +41,9 @@ public final class PlanAndEscalationReports {
             + " (select string_agg(i.invoice_no, ', ' order by i.invoice_no)"
             + " from clx_escalation_item i where i.escalation_id = e.id) as invoices"
             + " from clx_escalation e where e.company_id = :companyId"
-            + " and cast(e.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+            + " and cast(e.created_at at time zone '"
+            + BusinessClock.zoneId()
+            + "' as date) between :from and :to"
             + " and (cast(:scope as varchar) is null"
             + " or (cast(:scope as varchar) = 'OPEN' and e.status <> 'RESOLVED')"
             + " or (cast(:scope as varchar) = 'RESOLVED' and e.status = 'RESOLVED'))"
@@ -62,7 +65,7 @@ public final class PlanAndEscalationReports {
       return PlanReportSql.metadata(
           "CLX-ESCALATIONS",
           "Escalated Accounts",
-          "Escalations raised in a period with their target, reason and stage (BRCLXN.049/050)",
+          "Escalations raised in a period with their target, reason and stage",
           "MONTH_START",
           ParameterSpec.select(STATUS, "Escalations", List.of(ALL, "OPEN", "RESOLVED"), ALL));
     }
@@ -89,7 +92,6 @@ public final class PlanAndEscalationReports {
           .groupBy(STATUS, STATUS_LABEL)
           .rows(sql.rows(SQL, args))
           .presorted()
-          .note(PlanReportSql.DRAFT_NOTE)
           .build();
     }
   }
@@ -123,7 +125,7 @@ public final class PlanAndEscalationReports {
       return PlanReportSql.metadata(
           "CLX-BROKEN-PROMISES",
           "Broken Promises to Pay",
-          "Promises to pay broken or partially kept, by promised date (BRCLXN.055, CQ16)",
+          "Promises to pay broken or partially kept, by promised date",
           "MONTH_START");
     }
 
@@ -143,7 +145,6 @@ public final class PlanAndEscalationReports {
           .groupBy(STATUS, STATUS_LABEL)
           .rows(sql.rows(SQL, PlanReportSql.args(p)))
           .presorted()
-          .note(PlanReportSql.DRAFT_NOTE)
           .build();
     }
   }
@@ -179,7 +180,7 @@ public final class PlanAndEscalationReports {
       return PlanReportSql.metadata(
           "CLX-INSTALLMENTS-DUE",
           "Installments Due and Overdue",
-          "Unpaid installments of the live plans falling due in a period (BRCLXN.053)",
+          "Unpaid installments of the live plans falling due in a period",
           "YEAR_START");
     }
 
@@ -202,7 +203,6 @@ public final class PlanAndEscalationReports {
           .groupBy(STATUS, STATUS_LABEL)
           .rows(sql.rows(SQL, PlanReportSql.args(p)))
           .presorted()
-          .note(PlanReportSql.DRAFT_NOTE)
           .build();
     }
   }

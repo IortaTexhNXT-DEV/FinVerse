@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.location.domain.LocationRef;
 import com.iortatechnxt.brokerverse.brokerclaims.location.domain.LocationRefRepository;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -76,7 +77,7 @@ public class LocationRefService {
     String insurer =
         insurers.requireInsurer(companyId, request.insurerCode().strip()).getPartyCode();
     LocalDate from =
-        request.effectiveFrom() == null ? LocalDate.now(clock) : request.effectiveFrom();
+        request.effectiveFrom() == null ? BusinessClock.today(clock) : request.effectiveFrom();
     LocationRef created =
         new LocationRef(
             companyId,

@@ -6,9 +6,9 @@ import com.iortatechnxt.brokerverse.booking.domain.ServiceInvoiceType;
 import com.iortatechnxt.brokerverse.booking.domain.ServiceInvoiceTypeRepository;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +68,7 @@ public class ServiceInvoiceTypeService {
     if (types.findByCode(code).isPresent()) {
       throw new DuplicateResourceException("Service invoice type", code);
     }
-    templates.current(settings.templateCode(), LocalDate.now(clock));
+    templates.current(settings.templateCode(), BusinessClock.today(clock));
     ServiceInvoiceType type = types.save(new ServiceInvoiceType(code, settings));
     audit.record(ENTITY, code, AuditAction.CREATE, settings.name());
     return type;
@@ -84,7 +84,7 @@ public class ServiceInvoiceTypeService {
   public ServiceInvoiceType update(Long id, ServiceInvoiceType.Settings settings) {
     ServiceInvoiceType type =
         types.findById(id).orElseThrow(() -> new ResourceNotFoundException(ENTITY, id));
-    templates.current(settings.templateCode(), LocalDate.now(clock));
+    templates.current(settings.templateCode(), BusinessClock.today(clock));
     type.apply(settings);
     audit.record(ENTITY, type.getCode(), AuditAction.UPDATE, settings.name());
     return type;

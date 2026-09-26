@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.MergedText;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
@@ -20,7 +21,6 @@ import com.iortatechnxt.brokerverse.prodrecon.domain.ReconExtract;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -171,7 +171,7 @@ public class ReconSendService {
   private MergedText coverLetter(ReconExtract extract, ReconCycle cycle, String insurerName) {
     return templates.merge(
         "PRODRECON_COVER_LETTER",
-        LocalDate.now(clock),
+        BusinessClock.today(clock),
         Map.of(
             "insurerName", insurerName,
             "extractNo", extract.getExtractNo(),

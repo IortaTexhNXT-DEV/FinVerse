@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.insurer.domain.InsurerUpdateRep
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -72,7 +73,7 @@ public class InsurerUpdateService {
    * @return the update
    */
   public InsurerUpdate record(Claim claim, NewUpdate request) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     if (request.source() == null || request.source().isBlank()) {
       throw new BusinessRuleException("BCL_SOURCE_REQUIRED", "Select the source of the update");
     }

@@ -5,10 +5,18 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noMethods;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.domain.JavaMethodCall;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.lang.ArchRule;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Year;
+import java.time.YearMonth;
+import java.util.Set;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -25,6 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
  *   <li>Controllers live in {@code ..api..}; services never depend on controllers.
  *   <li>Background work is a {@code system.service.ManagedJob} (job monitor, run history, failure
  *       alert), never a {@code @Scheduled} method (developer guide section 10.3).
+ *   <li>Business dates come from {@link BusinessClock} (business zone, default Asia/Manila): no
+ *       {@code LocalDate.now}, {@code LocalDateTime.now}, {@code YearMonth.now} or {@code Year.now}
+ *       elsewhere, as those take the date of the clock's zone (UTC).
  * </ul>
  *
  * <p>A plain JUnit Jupiter test (not the ArchUnit engine), so it runs in the alphabetical class
@@ -83,6 +94,29 @@ final class ArchitectureTest {
           .beAnnotatedWith(Scheduled.class)
           .because("background work must be a ManagedJob shown in the job monitor");
 
+  private static final Set<String> DATE_TYPES =
+      Set.of(
+          LocalDate.class.getName(),
+          LocalDateTime.class.getName(),
+          YearMonth.class.getName(),
+          Year.class.getName());
+
+  private static final DescribedPredicate<JavaMethodCall> CURRENT_DATE_CALL =
+      DescribedPredicate.describe(
+          "LocalDate/LocalDateTime/YearMonth/Year.now",
+          call ->
+              "now".equals(call.getName()) && DATE_TYPES.contains(call.getTargetOwner().getName()));
+
+  private static final ArchRule BUSINESS_DATES_COME_FROM_THE_BUSINESS_CLOCK =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(BusinessClock.class)
+          .should()
+          .callMethodWhere(CURRENT_DATE_CALL)
+          .because(
+              "the business date is taken in the business zone by BusinessClock, not in the"
+                  + " zone of the injected clock (UTC)");
+
   @Test
   void modulesAreFreeOfCycles() {
     MODULES_ARE_FREE_OF_CYCLES.check(classes);
@@ -111,5 +145,10 @@ final class ArchitectureTest {
   @Test
   void backgroundWorkIsAManagedJob() {
     BACKGROUND_WORK_IS_A_MANAGED_JOB.check(classes);
+  }
+
+  @Test
+  void businessDatesComeFromTheBusinessClock() {
+    BUSINESS_DATES_COME_FROM_THE_BUSINESS_CLOCK.check(classes);
   }
 }

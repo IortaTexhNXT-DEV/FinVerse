@@ -8,11 +8,11 @@ import com.iortatechnxt.brokerverse.cashiering.domain.CollectorRequestRepository
 import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
 import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedRepository;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedDispositionRequests;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,7 +80,7 @@ public class CashieringDispositionRequests implements UnappliedDispositionReques
     CollectorRequest saved =
         requests.save(
             new CollectorRequest(
-                numbers.next("CRQ-" + LocalDate.now(clock).getYear()),
+                numbers.next("CRQ-" + BusinessClock.today(clock).getYear()),
                 item.getId(),
                 new Spec(
                     request.companyId(),

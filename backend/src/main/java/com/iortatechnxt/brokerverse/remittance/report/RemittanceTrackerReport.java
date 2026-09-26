@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.remittance.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
@@ -25,7 +26,9 @@ public class RemittanceTrackerReport implements ReportDefinition {
           + " b.net_due - b.incentive - b.incentive_vat as payable, b.stage,"
           + " b.created_at as extracted, b.approved_at as due_date, b.dv_no"
           + " from rem_batch b where b.company_id = :companyId"
-          + " and cast(b.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+          + " and cast(b.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to"
           + " and (cast(:insurer as varchar) is null or b.insurer_code = :insurer)"
           + " order by b.insurer_code, b.id";
 
@@ -45,7 +48,7 @@ public class RemittanceTrackerReport implements ReportDefinition {
     return RemittanceReportSql.metadata(
         CODE,
         "Remittance Tracker",
-        "Remittance batches per insurer with accounts, net due, incentive and status (RMTID.039)",
+        "Remittance batches per insurer with accounts, net due, incentive and status",
         true);
   }
 
@@ -66,7 +69,7 @@ public class RemittanceTrackerReport implements ReportDefinition {
         .groupBy("insurer", "Insurance Company")
         .rows(sql.rows(SQL, RemittanceReportSql.args(p)))
         .presorted()
-        .note("Due date = approval date until BDOI defines the remittance due date (OQ42).")
+        .note("Due date = approval date of the batch.")
         .build();
   }
 }

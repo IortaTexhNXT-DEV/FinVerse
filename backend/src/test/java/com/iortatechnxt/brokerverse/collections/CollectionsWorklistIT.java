@@ -34,6 +34,7 @@ import com.iortatechnxt.brokerverse.collections.worklist.service.WorklistRefresh
 import com.iortatechnxt.brokerverse.commission.domain.DpItemRepository;
 import com.iortatechnxt.brokerverse.commission.service.DpListService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.service.port.CollectionFeed;
 import com.iortatechnxt.brokerverse.opsledger.service.port.FeedItem;
 import com.iortatechnxt.brokerverse.support.AsUser;
@@ -41,6 +42,7 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.system.domain.JobTrigger;
 import com.iortatechnxt.brokerverse.system.service.JobRegistry;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -156,7 +158,7 @@ class CollectionsWorklistIT {
     CollectionItem item = fx.listedMotor();
     Map<String, String> details =
         Map.of(
-            "pickupDate", LocalDate.now().plusDays(2).toString(),
+            "pickupDate", BusinessClock.today(Clock.systemUTC()).plusDays(2).toString(),
             "pickupAddress", "21 Paseo de Roxas",
             "amount", "1500.00",
             "checkNo", "CHK-1");
@@ -322,7 +324,7 @@ class CollectionsWorklistIT {
     ItemSelection selection = new ItemSelection(List.of(no), null);
     assertThat(as.run(CollectionsFixtures.LEAD, () -> assignments.preview(fx.company(), selection)))
         .satisfies(s -> assertThat(s.total()).isEqualTo(1));
-    LocalDate today = LocalDate.now();
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     as.run(
         CollectionsFixtures.LEAD,
         () ->

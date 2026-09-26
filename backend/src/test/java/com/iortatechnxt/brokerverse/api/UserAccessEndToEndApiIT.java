@@ -10,13 +10,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.Json;
 import com.iortatechnxt.brokerverse.support.PersonaMenus;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -157,7 +158,8 @@ class UserAccessEndToEndApiIT {
   /** A group-profile change submitted outside UAM_WORKING_HOURS needs a second approval. */
   private String modifyOutsideWorkingHours(String userId) throws Exception {
     String hours = parameter("UAM_WORKING_HOURS");
-    String tomorrow = LocalDate.now(MANILA).plusDays(1).getDayOfWeek().name().substring(0, 3);
+    String tomorrow =
+        BusinessClock.today(Clock.systemUTC()).plusDays(1).getDayOfWeek().name().substring(0, 3);
     setHours("00:00-24:00," + tomorrow);
     try {
       long id =
@@ -245,7 +247,7 @@ class UserAccessEndToEndApiIT {
   }
 
   private String auditLog(String userId) throws Exception {
-    String today = LocalDate.now(MANILA).toString();
+    String today = BusinessClock.today(Clock.systemUTC()).toString();
     Map<String, String> params =
         userId == null
             ? Map.of("from", today, "to", today)

@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.report.gl;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditLog;
 import com.iortatechnxt.brokerverse.audit.domain.AuditLogRepository;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportCategory;
@@ -12,7 +13,6 @@ import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.TabularReportBuilder;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
-import java.time.ZoneOffset;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,8 +59,8 @@ public class AuditTrailReport implements ReportDefinition {
             p.optionalText("username").orElse(null),
             p.optionalText("entityType").orElse(null),
             null,
-            p.date(GlReportSupport.FROM).atStartOfDay().toInstant(ZoneOffset.UTC),
-            p.date(GlReportSupport.TO).plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC),
+            BusinessClock.startOf(p.date(GlReportSupport.FROM)),
+            BusinessClock.startOf(p.date(GlReportSupport.TO).plusDays(1)),
             PageRequest.of(0, MAX_ROWS, Sort.by("occurredAt")));
     List<Map<String, Object>> rows = page.getContent().stream().map(AuditTrailReport::row).toList();
     return TabularReportBuilder.of(p)

@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.Receipt;
 import com.iortatechnxt.brokerverse.cashiering.domain.ReceiptActionRepository;
 import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
 import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedRepository;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.service.port.InvoiceRelatedItems;
 import com.iortatechnxt.brokerverse.opsledger.service.port.OpsWorkCountSource;
 import java.time.Clock;
@@ -80,7 +81,7 @@ public class CashieringOpsViews implements OpsWorkCountSource, InvoiceRelatedIte
 
   @Override
   public List<WorkCount> counts(Long companyId) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     return List.of(
         tile(
             "UNAPPLIED",

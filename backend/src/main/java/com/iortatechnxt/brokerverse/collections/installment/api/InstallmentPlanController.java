@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.collections.installment.domain.PlanEnums.Pla
 import com.iortatechnxt.brokerverse.collections.installment.service.InstallmentPlanService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -137,7 +138,7 @@ public class InstallmentPlanController {
             companyId,
             PlanStatus.ACTIVE,
             statuses,
-            until == null ? LocalDate.now(clock) : until,
+            until == null ? BusinessClock.today(clock) : until,
             pageOf(page, size, Sort.unsorted())),
         DueInstallmentResponse::from);
   }

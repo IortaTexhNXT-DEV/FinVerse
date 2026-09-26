@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.DisbursementFixtures;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.DisbursementMode;
 import com.iortatechnxt.brokerverse.disbursement.domain.Payee;
@@ -17,7 +18,7 @@ import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,7 +92,7 @@ class DisbursementApiIT {
     terms.put("bankAccountId", fx.voucher(voucherId).getBankAccountId());
     terms.put("ewt", 42.01);
     terms.put("purpose", "Printer toner");
-    terms.put("valueDate", LocalDate.now().toString());
+    terms.put("valueDate", BusinessClock.today(Clock.systemUTC()).toString());
     api.doPut("disb", BASE + "/vouchers/" + voucherId + "/terms", terms)
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.summary.net").value(4158.49));
@@ -126,9 +127,9 @@ class DisbursementApiIT {
                 "receiptNo",
                 "OR-1",
                 "receiptDate",
-                LocalDate.now().toString(),
+                BusinessClock.today(Clock.systemUTC()).toString(),
                 "receivedOn",
-                LocalDate.now().toString()))
+                BusinessClock.today(Clock.systemUTC()).toString()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.tags[0].kind").value("OR_AR"));
   }
@@ -220,7 +221,7 @@ class DisbursementApiIT {
     funding.put("amount", 10.00);
     funding.put("currency", "PHP");
     funding.put("purpose", "API funding");
-    funding.put("valueDate", LocalDate.now().toString());
+    funding.put("valueDate", BusinessClock.today(Clock.systemUTC()).toString());
     JsonNode created =
         api.read(
             api.doPost("disbtl", BASE + "/funding", funding)
@@ -236,8 +237,8 @@ class DisbursementApiIT {
     Map<String, String> params =
         Map.of(
             "companyId", fx.company().toString(),
-            "from", LocalDate.now().minusMonths(1).toString(),
-            "to", LocalDate.now().toString());
+            "from", BusinessClock.today(Clock.systemUTC()).minusMonths(1).toString(),
+            "to", BusinessClock.today(Clock.systemUTC()).toString());
     List<String> codes =
         List.of(
             "DSB-MASTERLIST",

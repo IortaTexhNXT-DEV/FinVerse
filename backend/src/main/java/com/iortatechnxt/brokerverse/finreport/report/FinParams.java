@@ -1,11 +1,11 @@
 package com.iortatechnxt.brokerverse.finreport.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.finreport.service.StatusFilter;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -121,7 +121,10 @@ public final class FinParams {
   public static ParameterSpec month(Clock clock) {
     List<String> months = IntStream.rangeClosed(1, MONTHS).mapToObj(String::valueOf).toList();
     return ParameterSpec.select(
-        MONTH, "Calendar Month", months, String.valueOf(LocalDate.now(clock).getMonthValue()));
+        MONTH,
+        "Calendar Month",
+        months,
+        String.valueOf(BusinessClock.today(clock).getMonthValue()));
   }
 
   /**
@@ -132,7 +135,7 @@ public final class FinParams {
    */
   public static ParameterSpec year(Clock clock) {
     return ParameterSpec.required(YEAR, "Calendar Year", ParameterType.NUMBER)
-        .withDefault(String.valueOf(LocalDate.now(clock).getYear()));
+        .withDefault(String.valueOf(BusinessClock.today(clock).getYear()));
   }
 
   /**

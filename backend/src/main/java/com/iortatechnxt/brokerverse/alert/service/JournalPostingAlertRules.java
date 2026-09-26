@@ -1,12 +1,12 @@
 package com.iortatechnxt.brokerverse.alert.service;
 
 import com.iortatechnxt.brokerverse.alert.domain.AlertFacts;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.journal.service.JournalPostingListener;
 import com.iortatechnxt.brokerverse.organization.domain.Branch;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import org.springframework.stereotype.Component;
 
@@ -48,7 +48,7 @@ public class JournalPostingAlertRules implements JournalPostingListener {
     if (batch.getJournalType().isSystemGenerated()) {
       return;
     }
-    LocalDate postedOn = LocalDate.ofInstant(batch.getPostedAt(), ZoneOffset.UTC);
+    LocalDate postedOn = BusinessClock.dateOf(batch.getPostedAt());
     checkBackDated(batch, postedOn);
     checkNonWorkingDay(batch, postedOn);
   }

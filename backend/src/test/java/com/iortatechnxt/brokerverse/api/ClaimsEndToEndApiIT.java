@@ -10,15 +10,16 @@ import com.iortatechnxt.brokerverse.account.domain.PaymentArrangement;
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
 import com.iortatechnxt.brokerverse.brokerclaims.ClaimsFixtures;
 import com.iortatechnxt.brokerverse.cashiering.CashFixtures;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.PaymentStatus;
 import com.iortatechnxt.brokerverse.opsledger.domain.RemittanceStatus;
 import com.iortatechnxt.brokerverse.opsledger.service.DisbursementQueueService;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.remittance.RemittanceFixtures;
-import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,7 +63,7 @@ class ClaimsEndToEndApiIT {
 
   /** The business day (Manila), as the application and the report date keywords use it. */
   private static LocalDate today() {
-    return LocalDate.now(ReportParameters.BUSINESS_ZONE);
+    return BusinessClock.today(Clock.systemUTC());
   }
 
   private String c() {

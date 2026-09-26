@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.domain.DocTemplate;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
@@ -198,7 +199,7 @@ public class NegotiationService {
       throw new BusinessRuleException(
           "QS_NO_INSURER", "Select at least one insurer for the quotation slip");
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     DocTemplate template = templates.current(PackageDocuments.QS_TEMPLATE, today);
     LocalDate reply =
         replyBy != null

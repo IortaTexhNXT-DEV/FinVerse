@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.opsledger.service.OpsLedgerEvents.PaymentReversalCompleted;
 import com.iortatechnxt.brokerverse.opsledger.service.port.PaymentReversalRequester;
@@ -15,7 +16,6 @@ import com.iortatechnxt.brokerverse.opsledger.service.port.PaymentReversalReques
 import com.iortatechnxt.brokerverse.opsledger.service.port.PaymentReversalRequester.ReversalTicket;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.time.LocalDate;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,7 +98,7 @@ public class CaseLinks {
                 receiptNo.strip(),
                 account.currency(),
                 amount,
-                LocalDate.now(clock),
+                BusinessClock.today(clock),
                 Acsl.blankToNull(reason),
                 new PaymentReversalRequester.Source(
                     Acsl.MODULE, c.getCaseNo(), currentUser.username())));

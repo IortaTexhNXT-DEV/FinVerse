@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.placement.service;
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.AccountStatus;
 import com.iortatechnxt.brokerverse.account.domain.HoldCoverStatus;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.placement.domain.HoldCover;
 import com.iortatechnxt.brokerverse.placement.domain.HoldCoverRepository;
 import com.iortatechnxt.brokerverse.placement.domain.PlacementSlip;
@@ -141,7 +142,7 @@ public class PlacementQueryService {
   }
 
   private LocalDate horizon() {
-    return LocalDate.now(clock)
+    return BusinessClock.today(clock)
         .plusDays(parameters.intValue(HoldCoverService.ALERT_DAYS, DEFAULT_ALERT_DAYS));
   }
 

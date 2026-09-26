@@ -23,6 +23,7 @@ import com.iortatechnxt.brokerverse.booking.service.EndorsementCalculator.Amount
 import com.iortatechnxt.brokerverse.booking.service.EndorsementCalculator.PolicyYear;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -332,7 +333,7 @@ public class EndorsementPostingService {
   }
 
   private LocalDate bookingDate(EndorsementPosting posting) {
-    return posting.bookingDate() == null ? LocalDate.now(clock) : posting.bookingDate();
+    return posting.bookingDate() == null ? BusinessClock.today(clock) : posting.bookingDate();
   }
 
   private static void requireComplete(EndorsementPosting posting) {

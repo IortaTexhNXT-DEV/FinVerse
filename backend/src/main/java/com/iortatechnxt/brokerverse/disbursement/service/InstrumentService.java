@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.EventSource;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.InstrumentStatus;
 import com.iortatechnxt.brokerverse.disbursement.domain.Instrument;
@@ -221,7 +222,7 @@ public class InstrumentService {
 
   private void post(Instrument i, String eventType, String suffix, boolean withBank) {
     Voucher v = voucherOf(i);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     Map<String, String> accounts =
         withBank ? Map.of("BANK", banks.get(i.getBankAccountId()).getGlAccountCode()) : Map.of();
     publisher.publish(

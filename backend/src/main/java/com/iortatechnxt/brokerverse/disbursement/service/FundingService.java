@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.Money;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.FundingStage;
 import com.iortatechnxt.brokerverse.disbursement.domain.FundingRequest;
@@ -21,7 +22,6 @@ import com.iortatechnxt.brokerverse.workflow.service.StartCase;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Page;
@@ -99,7 +99,7 @@ public class FundingService {
         fundings.save(
             new FundingRequest(
                 companyId,
-                numbers.next(DisbursementSettings.series("FND", LocalDate.now(clock))),
+                numbers.next(DisbursementSettings.series("FND", BusinessClock.today(clock))),
                 terms));
     workflow.start(
         new StartCase(

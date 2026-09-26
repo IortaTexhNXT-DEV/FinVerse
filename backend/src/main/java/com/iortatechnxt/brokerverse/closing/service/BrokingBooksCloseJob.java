@@ -38,7 +38,7 @@ public class BrokingBooksCloseJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Closes the broking books of the month on its last day (FRBS 3.4.0 / 3.4.1)";
+    return "Closes the broking books of the month on its last day";
   }
 
   @Override

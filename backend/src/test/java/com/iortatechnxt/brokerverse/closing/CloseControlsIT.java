@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.closing.service.PeriodCloseScheduleService;
 import com.iortatechnxt.brokerverse.closing.service.YearEndCloseDueCheck;
 import com.iortatechnxt.brokerverse.coa.domain.BalanceSide;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalLineRequest;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalRequest;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
@@ -29,6 +30,7 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestCompanies;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -66,8 +68,8 @@ class CloseControlsIT {
     Long company = companies.create(code, "PHP").getId();
     YearMonth previous = previousMonth();
     companies.openYear(company, previous.getYear());
-    if (previous.getYear() != LocalDate.now().getYear()) {
-      companies.openYear(company, LocalDate.now().getYear());
+    if (previous.getYear() != BusinessClock.today(Clock.systemUTC()).getYear()) {
+      companies.openYear(company, BusinessClock.today(Clock.systemUTC()).getYear());
     }
     return company;
   }
@@ -87,12 +89,12 @@ class CloseControlsIT {
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("already has a scheduled close");
 
-    var outcome = as.run("gltl", () -> closeJob.execute(LocalDate.now()));
+    var outcome = as.run("gltl", () -> closeJob.execute(BusinessClock.today(Clock.systemUTC())));
     assertThat(outcome.itemsProcessed()).isGreaterThanOrEqualTo(1);
     assertThat(schedules.list(company).get(0).getStatus()).isEqualTo(PeriodCloseSchedule.COMPLETED);
     assertThat(periods.getPeriod(previous.getId()).getStatus()).isEqualTo(PeriodStatus.CLOSED);
 
-    AccountingPeriod current = companies.period(company, LocalDate.now());
+    AccountingPeriod current = companies.period(company, BusinessClock.today(Clock.systemUTC()));
     assertThatThrownBy(() -> as.run("gltl", () -> schedules.closeNow(company, current.getId())))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("may be closed");

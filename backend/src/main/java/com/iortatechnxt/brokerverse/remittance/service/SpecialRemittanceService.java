@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
@@ -138,7 +139,7 @@ public class SpecialRemittanceService {
    * @return the request, for approval
    */
   public SpecialRemittance request(Long companyId, NewRequest request, RequestSource source) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     lovs.requireValid(CONDITION_LOV, request.conditionCode(), today);
     OpsInvoice invoice = ledger.require(request.invoiceNo().strip());
     requests
@@ -210,7 +211,7 @@ public class SpecialRemittanceService {
   private String claimsNote(OpsInvoice invoice) {
     ClaimsFeed feed = claims.getIfAvailable();
     if (feed == null) {
-      return "; claims confirmation not connected (OQ46)";
+      return "; claims confirmation not connected";
     }
     boolean confirmed =
         feed.fetch(invoice.getCompanyId(), CLAIMS_FEED, invoice.getBookingDate()).stream()
@@ -244,7 +245,7 @@ public class SpecialRemittanceService {
             request.getCompanyId(),
             request.getInvoiceNo(),
             request.getRequestNo(),
-            LocalDate.now(clock));
+            BusinessClock.today(clock));
     request.inBatch(batch.getBatchNo());
     audit.record(
         ENTITY, request.getRequestNo(), AuditAction.AUTHORIZE, "Batch " + batch.getBatchNo());

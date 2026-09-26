@@ -52,7 +52,7 @@ public class ReconSummaryReport implements ReportDefinition {
     return ReconReportSupport.metadata(
         CODE,
         "Production Reconciliation Summary",
-        "Matched, discrepant and unmatched items and amounts per insurer (PRCID.035)");
+        "Matched, discrepant and unmatched items and amounts per insurer");
   }
 
   @Override

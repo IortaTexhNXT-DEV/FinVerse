@@ -11,17 +11,18 @@ import com.iortatechnxt.brokerverse.collections.files.domain.ScheduledFile.Frequ
 import com.iortatechnxt.brokerverse.collections.files.domain.ScheduledFile.Spec;
 import com.iortatechnxt.brokerverse.collections.files.domain.ScheduledFile.Status;
 import com.iortatechnxt.brokerverse.collections.files.service.CollectionFiles;
-import com.iortatechnxt.brokerverse.collections.files.service.FilePeriods;
 import com.iortatechnxt.brokerverse.collections.files.service.ScheduledFileService;
 import com.iortatechnxt.brokerverse.collections.report.ActivityReports;
 import com.iortatechnxt.brokerverse.collections.report.ItemReports;
 import com.iortatechnxt.brokerverse.collections.report.ReversalReports;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ReportArchiveService;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -68,7 +69,7 @@ class CollectionsFilesIT {
   @Test
   void dailyFilesArePublishedAvailableAtOnceAndOncePerDay() {
     fx.listedMotor();
-    LocalDate today = LocalDate.now(FilePeriods.MANILA);
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     List<ScheduledFile> daily =
         as.run(CollectionsFixtures.LEAD, () -> files.daily(fx.company(), today));
     assertThat(daily)
@@ -94,7 +95,7 @@ class CollectionsFilesIT {
     tagDp(fx.listedMotor());
     // Files work on the Philippine calendar (tags are dated in Manila), so "today" must be too:
     // from 16:00 UTC the Manila date is already the next day.
-    LocalDate today = LocalDate.now(FilePeriods.MANILA);
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     LocalDate friday = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
     List<ScheduledFile> weekly =
         as.run(CollectionsFixtures.LEAD, () -> files.weekly(fx.company(), friday));
@@ -161,8 +162,8 @@ class CollectionsFilesIT {
     Map<String, String> params =
         Map.of(
             "companyId", fx.company().toString(),
-            "from", LocalDate.now().minusMonths(1).toString(),
-            "to", LocalDate.now().plusDays(1).toString());
+            "from", BusinessClock.today(Clock.systemUTC()).minusMonths(1).toString(),
+            "to", BusinessClock.today(Clock.systemUTC()).plusDays(1).toString());
     for (String code :
         List.of(
             ItemReports.OUTSTANDING_PR,

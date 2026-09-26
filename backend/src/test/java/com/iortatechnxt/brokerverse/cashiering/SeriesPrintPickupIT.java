@@ -25,6 +25,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSearchService;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSearchService.ReceiptCriteria;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSeriesService;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSeriesService.SeriesRequest;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInHandler.FlowInFile;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInService;
@@ -32,7 +33,7 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,7 @@ class SeriesPrintPickupIT {
                     fx.company(),
                     branch,
                     "REFUND",
-                    LocalDate.now(),
+                    BusinessClock.today(Clock.systemUTC()),
                     "INS-LAC",
                     "LAC Refund",
                     null,
@@ -140,7 +141,7 @@ class SeriesPrintPickupIT {
             fx.company(),
             fx.branch("CEB"),
             "SERVICE_FEE",
-            LocalDate.now(),
+            BusinessClock.today(Clock.systemUTC()),
             "CL-2026-000003",
             "Pacific Harbor Logistics Inc.",
             "PHP",
@@ -215,8 +216,8 @@ class SeriesPrintPickupIT {
                             "harbor",
                             null,
                             new BigDecimal("1100.00"),
-                            LocalDate.now().minusDays(1),
-                            LocalDate.now(),
+                            BusinessClock.today(Clock.systemUTC()).minusDays(1),
+                            BusinessClock.today(Clock.systemUTC()),
                             null,
                             null,
                             null,
@@ -261,7 +262,7 @@ class SeriesPrintPickupIT {
                         null,
                         "Pick-up Payor",
                         null,
-                        LocalDate.now(),
+                        BusinessClock.today(Clock.systemUTC()),
                         "Collection",
                         new BigDecimal("700.00"),
                         "PHP",
@@ -280,7 +281,7 @@ class SeriesPrintPickupIT {
                         null,
                         "Pick-up Payor",
                         null,
-                        LocalDate.now().plusDays(10),
+                        BusinessClock.today(Clock.systemUTC()).plusDays(10),
                         "Collection",
                         new BigDecimal("700.00"),
                         "PHP",
@@ -300,7 +301,7 @@ class SeriesPrintPickupIT {
                                 null,
                                 "P",
                                 null,
-                                LocalDate.now(),
+                                BusinessClock.today(Clock.systemUTC()),
                                 "C",
                                 BigDecimal.ONE,
                                 "PHP",

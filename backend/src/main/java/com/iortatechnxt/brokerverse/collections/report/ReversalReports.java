@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.collections.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
@@ -35,7 +36,9 @@ public final class ReversalReports {
           + " left join org_branch b on b.id = i.branch_id"
           + " left join ops_invoice o on o.invoice_no = i.invoice_no"
           + " where d.company_id = :companyId and d.ops_action = :action"
-          + " and cast(d.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+          + " and cast(d.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to"
           + ClxReportSql.ITEM_FILTERS
           + " order by d.created_at, i.invoice_no";
 
@@ -75,7 +78,6 @@ public final class ReversalReports {
           .columns(columns)
           .rows(sql.rows(SQL, args))
           .presorted()
-          .note(ClxReportSql.DRAFT_NOTE)
           .build();
     }
   }
@@ -95,7 +97,7 @@ public final class ReversalReports {
           ClxReportSql.metadata(
               DP,
               "DP PR for Reversal",
-              "Accounts tagged \"DP PR for reversal\" in the period (BRCLXN.024-029)",
+              "Accounts tagged \"DP PR for reversal\" in the period",
               true),
           "DP_REVERSAL");
     }
@@ -116,7 +118,7 @@ public final class ReversalReports {
           ClxReportSql.metadata(
               PR2307,
               "PR 2307 for Reversal",
-              "Accounts tagged \"PR 2307 for reversal\" in the period (BRCLXN.026-029)",
+              "Accounts tagged \"PR 2307 for reversal\" in the period",
               true),
           "CWT2307_REVERSAL");
     }

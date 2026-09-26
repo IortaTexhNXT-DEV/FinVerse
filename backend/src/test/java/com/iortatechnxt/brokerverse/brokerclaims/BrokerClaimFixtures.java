@@ -3,9 +3,11 @@ package com.iortatechnxt.brokerverse.brokerclaims;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.BrokerClaimRepository;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
 import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimStatusService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -48,7 +50,7 @@ public class BrokerClaimFixtures {
 
   /** Today in Manila. */
   public static LocalDate today() {
-    return LocalDate.now(MANILA);
+    return BusinessClock.today(Clock.systemUTC());
   }
 
   /** Company FVI. */

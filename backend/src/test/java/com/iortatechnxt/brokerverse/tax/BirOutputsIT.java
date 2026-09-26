@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatchRepository;
 import com.iortatechnxt.brokerverse.opsledger.OpsLedgerFixtures;
 import com.iortatechnxt.brokerverse.report.core.ExportOptions;
@@ -19,6 +20,7 @@ import com.iortatechnxt.brokerverse.tax.domain.ReceivedCertificateLine.Kind;
 import com.iortatechnxt.brokerverse.tax.domain.TaxPeriod;
 import com.iortatechnxt.brokerverse.tax.service.ReceivedCertificateService;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +62,7 @@ class BirOutputsIT {
   @Autowired private OpsLedgerFixtures ops;
   @Autowired private AsUser as;
 
-  private static final LocalDate TODAY = LocalDate.now();
+  private static final LocalDate TODAY = BusinessClock.today(Clock.systemUTC());
 
   private Map<String, String> params() {
     Map<String, String> p = new HashMap<>();

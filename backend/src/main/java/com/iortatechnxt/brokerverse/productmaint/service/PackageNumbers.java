@@ -1,9 +1,9 @@
 package com.iortatechnxt.brokerverse.productmaint.service;
 
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
-import java.time.LocalDate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,6 +51,7 @@ public class PackageNumbers {
   }
 
   private String series(String parameter, String fallback) {
-    return numbers.next(parameters.text(parameter, fallback) + LocalDate.now(clock).getYear());
+    return numbers.next(
+        parameters.text(parameter, fallback) + BusinessClock.today(clock).getYear());
   }
 }

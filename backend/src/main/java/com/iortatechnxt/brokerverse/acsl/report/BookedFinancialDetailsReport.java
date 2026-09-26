@@ -54,8 +54,7 @@ public class BookedFinancialDetailsReport implements ReportDefinition {
     return ReportMetadata.acsl(
         CODE,
         "List of Booked Accounts with Financial Details",
-        "Invoices booked in the period with references, premium, payments, remittance and commission"
-            + " (ACSL 2.14.2)",
+        "Invoices booked in the period with references, premium, payments, remittance and commission",
         List.of(
             ParameterSpec.required(COMPANY, "Company", ParameterType.COMPANY),
             ParameterSpec.required(FROM, "From", ParameterType.DATE).withDefault("MONTH_START"),

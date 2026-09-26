@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.PaymentPreviewService;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentPreviewService.Preview;
 import com.iortatechnxt.brokerverse.cashiering.service.PrebookedService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -88,7 +89,7 @@ public class PaymentController {
         request.references(),
         request.amount(),
         request.currency(),
-        request.date() == null ? LocalDate.now(clock) : request.date());
+        request.date() == null ? BusinessClock.today(clock) : request.date());
   }
 
   /**
@@ -163,7 +164,7 @@ public class PaymentController {
       @RequestParam(defaultValue = Prebooked.OPEN) String status,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "20") int size) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     return PageResponse.of(
         prebooked.list(companyId, status, CashAccess.page(page, size)),
         p -> PrebookedResponse.from(p, today));
@@ -178,7 +179,7 @@ public class PaymentController {
   @PostMapping("/prebooked/{id}/rematch")
   @PreAuthorize(CashAccess.APPLY)
   public PrebookedResponse rematch(@PathVariable Long id) {
-    return PrebookedResponse.from(prebooked.rematchNow(id), LocalDate.now(clock));
+    return PrebookedResponse.from(prebooked.rematchNow(id), BusinessClock.today(clock));
   }
 
   /**
@@ -191,7 +192,7 @@ public class PaymentController {
   @PostMapping("/prebooked/{id}/release")
   @PreAuthorize(CashAccess.APPLY)
   public PrebookedResponse release(@PathVariable Long id, @Valid @RequestBody ReasonBody body) {
-    return PrebookedResponse.from(prebooked.release(id, body.reason()), LocalDate.now(clock));
+    return PrebookedResponse.from(prebooked.release(id, body.reason()), BusinessClock.today(clock));
   }
 
   /**
@@ -202,7 +203,7 @@ public class PaymentController {
   @PostMapping("/matching/run")
   @PreAuthorize(CashAccess.APPLY)
   public Map<String, Integer> runMatching() {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     return Map.of("prebooked", prebooked.rematchAll(today), "automatch", automatch.run(today));
   }
 }

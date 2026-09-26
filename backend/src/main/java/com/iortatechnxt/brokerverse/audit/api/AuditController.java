@@ -3,8 +3,8 @@ package com.iortatechnxt.brokerverse.audit.api;
 import com.iortatechnxt.brokerverse.audit.api.dto.AuditLogResponse;
 import com.iortatechnxt.brokerverse.audit.domain.AuditLogRepository;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -63,8 +63,8 @@ public class AuditController {
             blankToNull(username),
             blankToNull(entityType),
             blankToNull(entityId),
-            from.atStartOfDay().toInstant(ZoneOffset.UTC),
-            to.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC),
+            BusinessClock.startOf(from),
+            BusinessClock.startOf(to.plusDays(1)),
             pageable),
         AuditLogResponse::from);
   }

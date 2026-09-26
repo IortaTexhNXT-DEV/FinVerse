@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.remittance.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
@@ -124,7 +125,7 @@ public class BatchPosting {
    * @param batch approved batch with its lines
    */
   public void post(RemittanceBatch batch) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     Long branchId = null;
     Set<String> roots = new LinkedHashSet<>();
     for (BatchLine line : batch.included()) {

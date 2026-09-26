@@ -64,7 +64,7 @@ public class AdjustmentDailyReportJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Exports and archives the Adjustment and Daily Endorsement Report of the day (ADJID.016)";
+    return "Exports and archives the Adjustment and Daily Endorsement Report of the day";
   }
 
   @Override

@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.insurer.service.InsurerUpdateSe
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.ClaimLocationService.LocationPick;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.seed.SeedUsers;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
@@ -141,7 +142,7 @@ public class BrokerClaimsSeedData implements ApplicationRunner {
   }
 
   private Claim property(Long companyId) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     LossDetails.Loss loss =
         new LossDetails.Loss(
             today.minusDays(2),
@@ -211,7 +212,7 @@ public class BrokerClaimsSeedData implements ApplicationRunner {
                 "INS-MGIC",
                 new BigDecimal("100"),
                 "MGIC-CL-2026-0402",
-                LocalDate.now(clock),
+                BusinessClock.today(clock),
                 null)));
   }
 
@@ -249,7 +250,7 @@ public class BrokerClaimsSeedData implements ApplicationRunner {
   }
 
   private LossDetails.Loss loss(String nature, String description, String place) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     return new LossDetails.Loss(
         today.minusDays(LOSS_DAYS_AGO),
         today.minusDays(2),

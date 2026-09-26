@@ -101,7 +101,7 @@ public class ProneLocationsReport implements ReportDefinition {
     return ReportMetadata.claimsHandling(
         CODE,
         "Claims by Location / Claims-prone Locations",
-        "Claims, paid and outstanding per location with the claims-prone flag (BRCLM.038)",
+        "Claims, paid and outstanding per location with the claims-prone flag",
         params);
   }
 
@@ -146,7 +146,7 @@ public class ProneLocationsReport implements ReportDefinition {
                 + minClaims
                 + " claims with a loss in the last "
                 + years
-                + " years (BCL_PRONE_MIN_CLAIMS, BCL_PRONE_YEARS; CLQ16). Enter a location key to"
+                + " years (BCL_PRONE_MIN_CLAIMS, BCL_PRONE_YEARS). Enter a location key to"
                 + " list its claims.")
         .build();
   }

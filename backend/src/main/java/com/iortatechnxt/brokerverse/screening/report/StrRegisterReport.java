@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.screening.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -27,8 +28,12 @@ public class StrRegisterReport implements ReportDefinition {
 
   private static final String SQL =
       "select s.str_no, k.case_no, s.subject_name, s.status, k.committee_decision,"
-          + " cast(s.committee_decided_at at time zone 'Asia/Manila' as date) as committee_date,"
-          + " x.batch_no, cast(s.extracted_at at time zone 'Asia/Manila' as date) as extracted_on,"
+          + " cast(s.committee_decided_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) as committee_date,"
+          + " x.batch_no, cast(s.extracted_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) as extracted_on,"
           + " s.amlc_reference, s.filed_on, s.created_by as prepared_by"
           + " from scr_str s join scr_case k on k.id = s.case_id"
           + " left join scr_str_extraction x on x.id = s.extraction_id"
@@ -66,7 +71,7 @@ public class StrRegisterReport implements ReportDefinition {
     return ReportMetadata.compliance(
             CODE,
             "STR Register",
-            "STRs drafted, approved, extracted and filed with their AMLC reference (SNSRP-705, 706)",
+            "STRs drafted, approved, extracted and filed with their AMLC reference",
             params)
         .asDocument();
   }
@@ -91,7 +96,6 @@ public class StrRegisterReport implements ReportDefinition {
         .rows(sql.rows(SQL, args))
         .presorted()
         .withoutGrandTotal()
-        .note(ScrReportSql.LAYOUT_NOTE)
         .build();
   }
 }

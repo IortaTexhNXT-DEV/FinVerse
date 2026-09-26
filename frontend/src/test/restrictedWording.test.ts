@@ -9,7 +9,16 @@ const rot13 = (text: string): string =>
     return String.fromCharCode(((c.charCodeAt(0) - base + 13) % 26) + base);
   });
 
-const NAMES = ['pynhqr', 'naguebcvp', 'bcranv', 'pungtcg', 'trzvav', 'pbcvybg', 'yynzn', 'tvguho'].map(rot13);
+const NAMES = [
+  'pynhqr',
+  'naguebcvp',
+  'bcranv',
+  'pungtcg',
+  'trzvav',
+  'pbcvybg',
+  'yynzn',
+  'tvguho',
+].map(rot13);
 const RESTRICTED = new RegExp(
   `${rot13('qrzb')}(?!nstrat|li)|\\b(?:${NAMES.join('|')}|${rot13('tcg')}-?\\d)\\b`,
   'i',

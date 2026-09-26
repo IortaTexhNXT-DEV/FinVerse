@@ -1,6 +1,6 @@
 -- =====================================================================================
 -- iNXT BrokerVerse - SEED DATA (loaded only with the 'seed' Spring profile).
--- Fictitious company "BDO Insurance and Reinsurance Brokers, Inc." with three branches,
+-- Seed company "BDO Insurance and Reinsurance Brokers, Inc." (code FVI) with three branches,
 -- a Philippine non-life insurance chart of accounts, dimensions, FY 2026 calendar,
 -- exchange rates and SIT/UAT users (password: Brokerverse@2026 - seed only).
 -- =====================================================================================

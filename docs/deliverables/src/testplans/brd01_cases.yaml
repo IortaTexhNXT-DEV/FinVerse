@@ -650,11 +650,11 @@ frs:
       - c: 2
         type: Negative
         screen: API
-        title: A Word file cannot be protected
+        title: A CSV file cannot be protected
         steps:
-          - Send a message with a .docx attachment through the messaging API used by the send dialog.
+          - Send a message with a .csv attachment through the messaging API used by the send dialog.
         expected: Refused.
-        msg: ["{letter.docx} cannot be password protected (only PDF and Excel files can)", DOCUMENT_NOT_PROTECTABLE]
+        msg: ["{notes.csv} cannot be password protected. Send it as PDF, Excel or Word", DOCUMENT_NOT_PROTECTABLE]
         auto: MessagingIT#rejectsBadAddressesAndUnprotectableFiles
       - c: 2
         type: Negative

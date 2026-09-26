@@ -1798,7 +1798,7 @@ frs:
           - Raise CREATE_USER with user name "ab".
         expected: The request is refused.
         msg: ["The user name has 3 to 50 letters, digits, dots, dashes or underscores", ACCESS_USERNAME]
-        auto: AccessRequestIT#requestsAreValidatedAndDecidedUnderFourEyes; accessRequest.test.ts#needs a new user name, full name, roles and justification to create a user
+        auto: AccessRequestIT#requestsAreValidatedAndDecidedUnderFourEyes; accessRequest.test.ts#needs the new user data, a group profile, the remarks and the approver to submit
       - c: 2
         type: Negative
         title: User exists

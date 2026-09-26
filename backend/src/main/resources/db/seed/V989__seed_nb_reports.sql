@@ -4,7 +4,7 @@
 --     so every seed reference stays valid), and its Singapore subsidiary likewise.
 --   * Monthly production targets for 2026 per region, department, team and account officer of
 --     the V982 sales organisation (BRNB.075). BDOI has not given its targets yet (Q41): these
---     are sample values only.
+--     are placeholder values only.
 --   * One shared saved variant of the Account Status Report (BRNB.057).
 -- =====================================================================================
 

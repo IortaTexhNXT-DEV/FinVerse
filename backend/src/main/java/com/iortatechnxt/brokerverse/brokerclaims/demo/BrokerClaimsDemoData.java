@@ -37,8 +37,11 @@ import org.springframework.stereotype.Component;
  * through the real services - a motor claim with the authorization code when its premium is paid, a
  * property claim on a location with its insurer location reference, a typhoon tag, the insurer's
  * claim number and an insurer update, a claim on a direct-payment cover and an insurer-reported
- * claim; the Team Head amends a reserve. Wave CL1-B extends the storyline with statuses. A step
- * that cannot run (a demo cover missing) is logged and skipped; start-up never fails.
+ * claim; the Team Head amends a reserve. Wave CL2 completes the storyline ({@link
+ * BrokerClaimsDemoStory}): statuses through the matrix, an adjuster, action plans, diary entries
+ * and follow-ups, a temporarily closed claim, a claim settled on the LOA and closed, a claim closed
+ * and reopened, and a claim waiting for the premium remittance. A step that cannot run (a demo
+ * cover missing) is logged and skipped; start-up never fails.
  */
 @Component
 @Profile("demo")
@@ -60,6 +63,7 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
   private final InsurerClaimService insurers;
   private final InsurerUpdateService updates;
   private final DemoUsers users;
+  private final BrokerClaimsDemoStory story;
   private final Clock clock;
 
   /**
@@ -72,6 +76,7 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
    * @param insurers insurer lines
    * @param updates insurer updates
    * @param users demo sign-in
+   * @param story claim-level storyline (wave CL2)
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // constructor injection
@@ -83,6 +88,7 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
       InsurerClaimService insurers,
       InsurerUpdateService updates,
       DemoUsers users,
+      BrokerClaimsDemoStory story,
       Clock clock) {
     this.companies = companies;
     this.claims = claims;
@@ -91,6 +97,7 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
     this.insurers = insurers;
     this.updates = updates;
     this.users = users;
+    this.story = story;
     this.clock = clock;
   }
 
@@ -105,14 +112,17 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
   public void load() {
     for (Company company : companies.findAll()) {
       Long id = company.getId();
-      step("motor claim", () -> motor(id));
-      step("property claim", () -> property(id));
-      step("direct payment claim", () -> directPayment(id));
-      step("insurer-reported claim", () -> insurerReported(id));
+      step("motor claim", () -> story.motorInProgress(id, motor(id).getId()));
+      step("property claim", () -> story.propertyOffer(id, property(id).getId()));
+      step("direct payment claim", () -> story.temporarilyClosed(id, directPayment(id).getId()));
+      step("insurer-reported claim", () -> story.settledOnLoa(id, insurerReported(id).getId()));
+      step("reopened claim", () -> story.reopened(id, reopenedFire(id).getId()));
+      step("claim awaiting remittance", () -> story.awaitingRemittance(id, awaiting(id).getId()));
+      step("newly filed claim", () -> story.newlyFiled(id, liability(id).getId()));
     }
   }
 
-  private void motor(Long companyId) {
+  private Claim motor(Long companyId) {
     Claim claim =
         record(
             OFFICER,
@@ -127,9 +137,10 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
     } catch (BusinessRuleException ex) {
       LOG.info("Claims demo: {} not authorised: {}", claim.getClaimNo(), ex.getMessage());
     }
+    return claim;
   }
 
-  private void property(Long companyId) {
+  private Claim property(Long companyId) {
     LocalDate today = LocalDate.now(clock);
     LossDetails.Loss loss =
         new LossDetails.Loss(
@@ -173,10 +184,11 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
         () ->
             insurers.amendReserve(
                 claim, line.getId(), new BigDecimal("250000.00"), "Insurer's initial estimate"));
+    return claim;
   }
 
-  private void directPayment(Long companyId) {
-    record(
+  private Claim directPayment(Long companyId) {
+    return record(
         OFFICER,
         companyId,
         "ARN-2026-940003",
@@ -186,8 +198,8 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
         List.of());
   }
 
-  private void insurerReported(Long companyId) {
-    record(
+  private Claim insurerReported(Long companyId) {
+    return record(
         OFFICER,
         companyId,
         "ARN-2026-940005",
@@ -201,6 +213,39 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
                 "MGIC-CL-2026-0402",
                 LocalDate.now(clock),
                 null)));
+  }
+
+  private Claim reopenedFire(Long companyId) {
+    return record(
+        NON_MOTOR,
+        companyId,
+        "ARN-2026-940006",
+        ClaimSource.BDOI_NOTICE,
+        loss(FIRE, "Electrical fire in the stock room", "Lahug, Cebu City"),
+        List.of(),
+        List.of());
+  }
+
+  private Claim awaiting(Long companyId) {
+    return record(
+        NON_MOTOR,
+        companyId,
+        "ARN-2026-940007",
+        ClaimSource.BDOI_NOTICE,
+        loss(FIRE, "Kitchen fire spread to the dining area", "Kapitolyo, Pasig City"),
+        List.of(),
+        List.of());
+  }
+
+  private Claim liability(Long companyId) {
+    return record(
+        NON_MOTOR,
+        companyId,
+        "ARN-2026-940004",
+        ClaimSource.BDOI_NOTICE,
+        loss("LIABILITY", "Visitor injured by falling crates in the warehouse", "Port Area"),
+        List.of(),
+        List.of());
   }
 
   private LossDetails.Loss loss(String nature, String description, String place) {

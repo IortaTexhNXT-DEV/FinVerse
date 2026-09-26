@@ -7,6 +7,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimRecordingService;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.PremiumCheckService;
 import com.iortatechnxt.brokerverse.brokerclaims.demo.BrokerClaimsDemoData;
+import com.iortatechnxt.brokerverse.brokerclaims.demo.BrokerClaimsDemoStory;
+import com.iortatechnxt.brokerverse.brokerclaims.diary.service.DiaryService;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.BrokerClaimRepository;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.service.InsurerClaimNoBulkHandler;
@@ -16,6 +18,9 @@ import com.iortatechnxt.brokerverse.brokerclaims.insurer.service.InsurerUpdateSe
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.ClaimLocationService.LocationPick;
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.LocationRefBulkHandler;
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.LocationRefService;
+import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimClosureService;
+import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimFollowUpService;
+import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimStatusService;
 import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
 import com.iortatechnxt.brokerverse.opsledger.demo.DemoUsers;
@@ -57,6 +62,10 @@ class ClaimsBulkIT {
   @Autowired private AsUser as;
   @Autowired private JdbcTemplate jdbc;
   @Autowired private Clock clock;
+  @Autowired private ClaimStatusService statuses;
+  @Autowired private ClaimClosureService closures;
+  @Autowired private ClaimFollowUpService followUps;
+  @Autowired private DiaryService diaries;
 
   private BulkContext context() {
     return new BulkContext(
@@ -211,9 +220,18 @@ class ClaimsBulkIT {
   @Test
   void theDemoStorylineRecordsClaimsThroughTheServices() {
     long before = claims.count();
+    DemoUsers demoUsers = new DemoUsers(users);
     var demo =
         new BrokerClaimsDemoData(
-            companies, claims, recording, premiums, insurers, updates, new DemoUsers(users), clock);
+            companies,
+            claims,
+            recording,
+            premiums,
+            insurers,
+            updates,
+            demoUsers,
+            new BrokerClaimsDemoStory(statuses, closures, followUps, diaries, demoUsers, clock),
+            clock);
     demo.load();
     assertThat(claims.count()).isGreaterThan(before);
     assertThat(
@@ -222,6 +240,34 @@ class ClaimsBulkIT {
                 String.class))
         .isNotEmpty()
         .allMatch(u -> u.startsWith("clmofficer"));
+    // The storyline of wave CL2: every phase, a reopen, diary entries and follow-ups.
+    assertThat(
+            jdbc.queryForList(
+                "select distinct phase from bcl_claim where arn like 'ARN-2026-9400%'",
+                String.class))
+        .contains("NEW", "IN_PROGRESS", "TEMP_CLOSED", "CLOSED");
+    assertThat(
+            jdbc.queryForList(
+                "select c.arn from bcl_status_history h join bcl_claim c on c.id = h.claim_id"
+                    + " where c.arn like 'ARN-2026-9400%' and h.from_phase = 'CLOSED'",
+                String.class))
+        .contains("ARN-2026-940006");
+    assertThat(
+            jdbc.queryForList(
+                "select distinct c.status_code from bcl_claim c where c.arn like 'ARN-2026-9400%'",
+                String.class))
+        .contains(
+            "ADJUSTER_REVIEW",
+            "CLAIMANT_OFFER_ACCEPTANCE",
+            "TEMP_CLOSED_NO_DOCS",
+            "INSURER_LOA_ISSUANCE",
+            "BDOI_PREMIUM_REMITTANCE");
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from bcl_diary_entry d join bcl_claim c on c.id = d.claim_id"
+                    + " where c.arn like 'ARN-2026-9400%'",
+                Long.class))
+        .isGreaterThanOrEqualTo(4L);
     demo.run(new DefaultApplicationArguments());
   }
 }

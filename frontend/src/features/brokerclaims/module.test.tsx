@@ -55,9 +55,9 @@ describe('Claims Handling module', () => {
       '/claims-handling/reports',
       '/claims-handling/setup',
     ]);
-    expect(brokerClaimsModule.screens.filter((s) => s.hidden === true).map((s) => s.path)).toEqual(
-      ['/claims-handling/:id'],
-    );
+    expect(brokerClaimsModule.screens.filter((s) => s.hidden === true).map((s) => s.path)).toEqual([
+      '/claims-handling/:id',
+    ]);
     brokerClaimsModule.screens.forEach((s) => expect(s.permission).toMatch(/^BCL_/));
   });
 

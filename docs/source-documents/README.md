@@ -7,6 +7,8 @@ iNXT BrokerVerse is built and traced against.
 |---|---|
 | Annexure 2 (b) – Reports Book – Finance | **Awaiting upload** |
 | Annexure 2 (c) – Reports Book – GI | Received (see `docs/requirements/REPORTS_BOOK_SPEC.md`) |
+| 00 – BRD BDOI Core Replacement v01 (umbrella BRD, 48 pages) | Received 26-Sep-2026; analysis in `docs/requirements/BDOI_CORE_BRD_SPEC.md` |
+| BRD – Data Migration – draft V0.01 (16 pages) | Received 26-Sep-2026; analysis in `docs/requirements/BDOI_DM_BRD_SPEC.md` |
 | Premia General Ledger Module / GL Module / FAQ / Screens | Received (see `docs/requirements/GL_FUNCTIONAL_SPEC.md`) |
 
 ## How to upload from the browser

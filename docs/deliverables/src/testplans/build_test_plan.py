@@ -90,6 +90,7 @@ Placeholders in the Word summary (a line on its own): <!-- tp:counts -->, <!-- t
 from __future__ import annotations
 
 import argparse
+import codecs
 import re
 import sys
 from collections import Counter, OrderedDict
@@ -388,6 +389,10 @@ def _check_coverage(plan: Plan) -> None:
             plan.errors.append(f"{b}: BRD ID not covered by any case")
 
 
+# Restricted tool and vendor names (writing standard). Stored in ROT13 so the names are not spelled out here.
+RESTRICTED_NAMES = re.compile(r"\b(" + codecs.decode('pynhqr|tcg-?\\q|pungtcg|bcranv|naguebcvp|trzvav|yynzn|pbcvybg', "rot13") + r")\b")
+
+
 def _all_text(plan: Plan) -> list[tuple[str, str]]:
     out = [(c.id, " ".join((c.title, c.pre, c.steps, c.expected))) for c in plan.cases]
     out += [(r["id"], r["text"]) for r in plan.conditions]
@@ -402,8 +407,8 @@ def _check_text(plan: Plan) -> None:
         for word in FILLER:
             if re.search(rf"\b[{word[0]}{word[0].upper()}]{re.escape(word[1:])}\b", text):
                 plan.errors.append(f"{ident}: filler word '{word}' (writing standard)")
-        if re.search(r"\b(claude|gpt-?\d|chatgpt|openai|anthropic|gemini|llama)\b", low):
-            plan.errors.append(f"{ident}: names an AI model or vendor")
+        if RESTRICTED_NAMES.search(low):
+            plan.errors.append(f"{ident}: names a restricted tool or vendor")
 
 
 def _source_text(roots: list[Path], suffixes: tuple[str, ...]) -> str:

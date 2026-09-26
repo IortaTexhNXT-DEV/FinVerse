@@ -29,13 +29,3 @@ built and traced against. Each BRD has its analysis in `docs/requirements/` and 
 | `BDOI Integration Systems 1.png`, `BDOI Integration Systems 2.png` | `docs/architecture/CORE_REPLACEMENT_IMPACT.md` |
 | `BDOI_IER_Workbook_v20_iorta.xlsx` (infrastructure estimate) | `BDOI_DROP_PLAN.md` |
 
-## How to upload from the browser
-
-1. Open this folder on GitHub (branch `iortatechnxt/zen-einstein-ew7cvm`).
-2. Click **Add file → Upload files**.
-3. Drag the file in (GitHub web upload accepts files up to 25 MB; for larger files zip it or
-   split it into parts, e.g. `Finance_Reports_Book_part1.pdf`).
-4. Commit directly to the same branch.
-
-Keep one copy of each document, in this folder only. When BDOI issues a new version of a document, replace the file
-(git keeps the earlier version) and update the analysis named above.

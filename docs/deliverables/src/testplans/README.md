@@ -29,7 +29,7 @@ The build stops, and prints each problem, when:
 - (built BRDs 1-5) a quoted code does not occur in `backend/src/main` or `frontend/src`, a literal part of a quoted
   message does not occur there, or an automation reference names a test class or method that does not exist;
 - (designed BRDs 6-12) a case quotes a message code or an automation reference;
-- a text uses a filler word of the writing standard or names a restricted tool or vendor.
+- a text uses a filler word of the writing standard or names a restricted tool or vendor, or uses the retired word for seed data.
 
 ## Writing the YAML
 

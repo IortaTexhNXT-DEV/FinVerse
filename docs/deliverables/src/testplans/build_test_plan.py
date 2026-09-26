@@ -388,8 +388,8 @@ def _check_coverage(plan: Plan) -> None:
             plan.errors.append(f"{b}: BRD ID not covered by any case")
 
 
-# Restricted tool and vendor names (writing standard). Stored in ROT13 so the names are not spelled out here.
-RESTRICTED_NAMES = re.compile(r"\b(" + codecs.decode('pynhqr|tcg-?\\q|pungtcg|bcranv|naguebcvp|trzvav|yynzn|pbcvybg', "rot13") + r")\b")
+# Restricted tool and vendor names and the retired word for seed data (writing standard). Stored in ROT13 so the names are not spelled out here.
+RESTRICTED_NAMES = re.compile(r"\b(" + codecs.decode('pynhqr|tcg-?\\q|pungtcg|bcranv|naguebcvp|trzvav|yynzn|pbcvybg|tvguho|qrzb', "rot13") + r")\b")
 
 
 def _all_text(plan: Plan) -> list[tuple[str, str]]:

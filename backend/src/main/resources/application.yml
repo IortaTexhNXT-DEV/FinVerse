@@ -19,7 +19,8 @@ spring:
   datasource:
     url: ${BROKERVERSE_DB_URL:jdbc:postgresql://localhost:5432/brokerverse}
     username: ${BROKERVERSE_DB_USER:brokerverse}
-    password: ${BROKERVERSE_DB_PASSWORD:brokerverse}
+    # No default: the seed profile has a local value; production must set it (ProductionSafeguards).
+    password: ${BROKERVERSE_DB_PASSWORD:}
     hikari:
       maximum-pool-size: ${BROKERVERSE_DB_POOL_SIZE:20}
       connection-timeout: 30000
@@ -107,9 +108,13 @@ server:
     enabled: true
 
 brokerverse:
+  # Kind of environment: local, sit, uat, training, preprod or production. "production" (or the prod
+  # profile) turns on the start-up safeguards: no seed profile, every required secret present.
+  environment: ${BROKERVERSE_ENVIRONMENT:local}
   security:
-    # Must be supplied via BROKERVERSE_JWT_SECRET in every non-local environment (>= 32 bytes).
-    jwt-secret: ${BROKERVERSE_JWT_SECRET:local-development-secret-change-me-0123456789}
+    # Supplied via BROKERVERSE_JWT_SECRET (>= 32 random bytes); only the seed and test profiles carry
+    # a local value. Production refuses to start without it (ProductionSafeguards).
+    jwt-secret: ${BROKERVERSE_JWT_SECRET:}
     token-validity: ${BROKERVERSE_TOKEN_VALIDITY:PT8H}
     allowed-origins: ${BROKERVERSE_ALLOWED_ORIGINS:http://localhost:5173}
     # Failed logins that lock an account when the business parameter LOGIN_MAX_FAILED_ATTEMPTS is missing.
@@ -318,10 +323,32 @@ logging:
     console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%thread] %logger{36} - %replace(%msg){'[\\r\\n]', '_'}%n"
 
 ---
-# Local development / seed profile: loads seed data (company, branches, COA, users).
+# Seed profile (local development, SIT, UAT and training): loads the seed data (company, branches,
+# chart of accounts, SIT/UAT users). Refused in production by ProductionSafeguards.
 spring:
   config:
     activate:
       on-profile: seed
   flyway:
     locations: classpath:db/migration,classpath:db/seed
+  datasource:
+    password: ${BROKERVERSE_DB_PASSWORD:brokerverse}
+brokerverse:
+  security:
+    # Local value for seed stacks only; set BROKERVERSE_JWT_SECRET in every shared environment.
+    jwt-secret: ${BROKERVERSE_JWT_SECRET:seed-profile-local-signing-key-0123456789abcdef}
+
+---
+# Production profile: no defaults for connection settings or secrets. ProductionSafeguards refuses
+# the start when one is missing or when the seed profile is active as well.
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${BROKERVERSE_DB_URL:}
+    username: ${BROKERVERSE_DB_USER:}
+  mail:
+    host: ${MAIL_HOST:}
+brokerverse:
+  environment: production

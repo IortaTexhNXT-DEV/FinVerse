@@ -97,7 +97,8 @@ export const userAccessModule: FeatureModule = {
       label: 'User Access Matrix',
       icon: Grid3x3,
       permission: 'ACCESS_REQUEST',
-      alsoPermissions: ['ACCESS_APPROVE', 'ROLE_MANAGE', 'AUDIT_VIEW', 'UAM_VIEW'],
+      // The permissions of the matrix endpoint: UAM_VIEW alone showed an entry that answers 403.
+      alsoPermissions: ['ACCESS_APPROVE', 'ROLE_MANAGE', 'AUDIT_VIEW'],
       component: lazy(() => import('./AccessMatrixPage')),
     },
     {

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.api;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -14,10 +15,12 @@ import com.jayway.jsonpath.JsonPath;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,6 +35,7 @@ class ApiSmokeIT {
   @Autowired private TestData data;
   @Autowired private PeriodService periods;
   @Autowired private ConsolidationGroupService groups;
+  @Autowired private UserDetailsService users;
 
   @ParameterizedTest
   @ValueSource(
@@ -208,6 +212,57 @@ class ApiSmokeIT {
   @WithUserDetails("admin")
   void platformSupportEndpointsRespondOk(String url) throws Exception {
     mvc.perform(get(url)).andExpect(status().isOk());
+  }
+
+  /**
+   * The list reads of Sanction Screening (BRD-10) and User Access Maintenance (BRD-11), each as the
+   * persona whose screen makes it (waves S2 / U2); the record reads are in the module API tests.
+   */
+  @ParameterizedTest
+  @CsvSource({
+    "compoff, /api/v1/screening/cases?companyId={c}",
+    "compoff, /api/v1/screening/cases?companyId={c}&tab=STR&sla=BREACHED&page=0&size=10",
+    "ucc, /api/v1/screening/cases?companyId={c}&tab=TEAM",
+    "investigator, /api/v1/screening/cases?companyId={c}&tab=MY",
+    "scrapprover, /api/v1/screening/cases?companyId={c}&tab=APPROVAL",
+    "amlcom1, /api/v1/screening/cases?companyId={c}&tab=COMMITTEE",
+    "compoff, /api/v1/screening/cases/tiles?companyId={c}",
+    "compoff, /api/v1/screening/matches?companyId={c}",
+    "compoff, /api/v1/screening/matches?companyId={c}&status=TRUE_MATCH&uncased=true",
+    "compoff, /api/v1/screening/runs?companyId={c}",
+    "compoff, /api/v1/screening/runs?companyId={c}&trigger=PERIODIC",
+    "compoff, /api/v1/screening/high-risk-clients?companyId={c}",
+    "compoff, /api/v1/screening/str?companyId={c}",
+    "compoff, /api/v1/screening/str?companyId={c}&status=APPROVED",
+    "auditor, /api/v1/screening/str?companyId={c}",
+    "compoff, /api/v1/screening/str/extractions?companyId={c}",
+    "compoff, /api/v1/screening/config/versions?companyId={c}&type=MATCH_CRITERIA",
+    "compchk, /api/v1/screening/config/versions?companyId={c}&type=TEMPLATE",
+    "compoff, /api/v1/screening/watchlist/entries",
+    "compchk, /api/v1/screening/watchlist/changes?status=PENDING",
+    "compoff, /api/v1/screening/watchlist/sources",
+    "compoff, /api/v1/screening/watchlist/template",
+    "compoff, /api/v1/screening/watchlist/runs",
+    "compoff, /api/v1/screening/watchlist/runs?source=AML_ADVISORY",
+    "requestor, /api/v1/nbadmin/access-requests",
+    "requestor, /api/v1/nbadmin/access-requests?scope=MINE&status=DRAFT",
+    "uamapprover, /api/v1/nbadmin/access-requests?scope=ASSIGNED",
+    "secapprover, /api/v1/nbadmin/access-requests?scope=SECOND",
+    "admin, /api/v1/nbadmin/access-requests?scope=IMPLEMENTATION&groupProfiles=true",
+    "requestor, /api/v1/nbadmin/approvers",
+    "badmin, /api/v1/nbadmin/approvers?userType=INTERNAL&subject=a013000101",
+    "requestor, /api/v1/nbadmin/access-settings",
+    "requestor, /api/v1/nbadmin/access-batches",
+    "uamapprover, /api/v1/nbadmin/users",
+    "uamapprover, /api/v1/nbadmin/roles",
+    "uamapprover, /api/v1/nbadmin/access-matrix",
+    "uamapprover, /api/v1/nbadmin/access-matrix/by-action",
+  })
+  void screeningAndUserAccessListsRespondOk(String user, String url) throws Exception {
+    mvc.perform(
+            get(url.replace("{c}", data.company().getId().toString()))
+                .with(user(users.loadUserByUsername(user))))
+        .andExpect(status().isOk());
   }
 
   @ParameterizedTest

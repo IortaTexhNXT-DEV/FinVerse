@@ -1,6 +1,7 @@
 # Application architecture: IER picture or BIBS as built
 
-Status: **Recommendation, for BDOI confirmation** (IER question IQ25, register DCR-222 / DCR-223). Date: 26-Sep-2026.
+Status: **Architecture confirmed by BDOI, 26-Sep-2026** (the BIBS architecture with the three IER elements). The edge and in-cluster
+encryption proposals are in section 5 (IER question IQ25, register DCR-222 / DCR-223).
 
 ## 1. The two options
 
@@ -62,8 +63,62 @@ scheduling globally in `config/ApplicationConfig.java`).
 | Build | Workload-role switch (`brokerverse.runtime.role` = web / jobs / integration / all) controlling scheduling and Kafka consumers; Kubernetes manifests and Helm values for the four deployments |
 | Documents | Technical and deployment architecture (deliverable 12) and the BOM (deliverable 4) follow this decision |
 
-## 4. Decision needed from BDOI
+## 4. BDOI confirmation (26-Sep-2026)
 
-1. Confirm the BIBS architecture, with the three elements taken from the IER.
-2. The edge standard: ALB and WAF, or Apigee X for inter-system APIs.
-3. Whether BDO security requires mTLS inside the cluster.
+BDOI confirmed the BIBS architecture with the three elements taken from the IER. BDOI uses Apigee X across its internal
+landscape and asked for best-practice proposals on the edge and on encryption inside the cluster (section 5).
+
+## 5. Proposals: edge and in-cluster encryption
+
+### 5.1 Edge: two separate paths
+
+Users and systems enter BIBS through different paths. Each path gets the control that suits it, and neither pays for
+the other's.
+
+| Path | Route | Controls |
+|---|---|---|
+| **Users (browser)** | BDO network (Direct Connect / VPN, VDI) → Route 53 private zone → **AWS WAF** → **internal Application Load Balancer** (AWS Load Balancer Controller) → `bibs-frontend` (nginx) and `/api` → `bibs-web` | ALB is **internal** (no public exposure); TLS 1.2+ with an ACM certificate on the BDO domain. WAF uses the AWS managed rule groups (core rule set, known bad inputs, SQL injection) plus a rate-based rule on `/api/v1/auth/*` on top of the in-app login rate limit. Security headers (CSP, HSTS, frame options) come from nginx. Sign-in is through EIAM (Entra ID) once IQ04 is settled |
+| **Other BDO systems (APIs)** | BDO systems → **Apigee X** (BDO's standard) → private connectivity → internal ALB, path `/integration/*` → `bibs-integration` / `bibs-web` | Each BIBS API used by another system (EGL, EDP, CMS / New BOB, OBPCS, PMS and the rest) is published as an Apigee proxy with OAuth 2.0 client credentials, quotas, spike arrest and analytics. BIBS checks the Apigee-issued token (audience and scopes) and accepts `/integration/*` only from the Apigee path, enforced by a WAF rule and a security group. **Outbound** calls from BIBS to BDO systems also go through Apigee, so BDO IT governs every interface in one place. Asynchronous events stay on MSK Kafka |
+
+Apigee is **not** placed in the user path: it would add latency and cost to every screen action and gives nothing that
+WAF and the ALB do not already give for browser traffic. Using ALB and WAF for users and Apigee for systems follows
+both AWS practice and BDO's own API governance.
+
+### 5.2 Encryption inside the cluster: TLS on every hop, no service mesh
+
+BIBS has four deployments, and almost all its internal traffic goes to AWS managed services. East-west traffic between
+pods is limited to the load balancer reaching the frontend and backend. The proposal is **encrypt every hop with
+TLS, lock down pod-to-pod traffic with network policies, and use no service mesh**:
+
+| Hop | Control |
+|---|---|
+| ALB → pods | HTTPS to the pods (target-group protocol HTTPS); certificates from cert-manager with a private CA (ACM Private CA), rotated automatically. The backend serves TLS (`server.ssl`), nginx serves TLS |
+| Backend → RDS PostgreSQL | TLS required: RDS parameter `rds.force_ssl=1`; JDBC `sslmode=verify-full` with the RDS CA bundle |
+| Backend → ElastiCache Redis | In-transit encryption on, Redis AUTH or RBAC user (`BROKERVERSE_REDIS_TLS=true`, already supported) |
+| Backend → MSK Kafka | TLS with SASL/SCRAM or IAM authentication (`BROKERVERSE_KAFKA_SECURITY_PROTOCOL=SASL_SSL`, already supported); plaintext listeners disabled on the cluster |
+| Backend → S3, KMS, other AWS APIs | TLS through VPC endpoints; bucket policies deny non-TLS requests |
+| Backend → BDO systems | Through Apigee over TLS (5.1); SMTP to CCM with STARTTLS (already configured) |
+| Pod to pod | Kubernetes **NetworkPolicies**, deny by default: only ingress → frontend and backend, and backend → the data services. EKS security groups for pods; workload identities (IRSA) with least-privilege IAM |
+
+**Why no mesh.** A service mesh (Istio or similar) is worth it with many services calling each other. BIBS has almost
+no pod-to-pod calls, so a mesh would add sidecars, certificates to operate, upgrades and skills for little security
+gain. The controls above already give encryption in transit end to end, and least-privilege network and identity
+controls. If BDO security later mandates mTLS between every pod as a zero-trust rule, a sidecar-less mesh (for example
+Istio ambient mode) can be added at the platform layer without any change to BIBS.
+
+### 5.3 Build items (INF0)
+
+| Item | Where |
+|---|---|
+| Workload role switch `brokerverse.runtime.role` (web / jobs / integration / all) controlling scheduling and Kafka consumers | `config/**`, jobs and Kafka consumer configuration |
+| Backend HTTPS (`server.ssl` from a mounted certificate), nginx TLS listener | `application.yml`, `deploy/nginx` |
+| Database TLS in the documented JDBC URL; Redis and Kafka TLS on by default outside `dev` / `test` | `application.yml`, CONFIGURATION.md |
+| Apigee token validation for `/integration/*` (issuer, audience, scopes) as a separate security chain | `security/**` |
+| Kubernetes manifests / Helm values: four deployments, HPA, PodDisruptionBudgets, NetworkPolicies (deny by default), IRSA service accounts, ALB ingress annotations (internal, HTTPS backend, WAF ACL) | `deploy/k8s/**` |
+| Documentation: technical and deployment architecture (deliverable 12), BOM (deliverable 4), IER restatement | docs |
+
+### 5.4 Points for BDO IT
+
+1. Confirm the two-path edge (ALB and WAF for users; Apigee X for systems, inbound and outbound).
+2. Confirm TLS on every hop with network policies and no mesh; or state if a zero-trust mTLS mandate applies.
+3. The private connectivity between Apigee X and the BIBS VPC (Private Service Connect, VPN or Interconnect), and the certificate authority to use (ACM Private CA or BDO PKI).

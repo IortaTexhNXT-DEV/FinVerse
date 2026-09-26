@@ -12,8 +12,7 @@ File bytes sit in PostgreSQL `bytea` columns. There are at least 13 tables, amon
 - cashiering, remittance, placement, issuance and booking documents (V763, V770, V850, V860, V870);
 - disbursement vouchers (V892);
 - collections (V1002);
-- report runs and batches (V32, `ReportRunFile`);
-- Word renditions (`doc_rendition`);
+- report runs and batches (V32, `ReportRunFile`); the Word rendition table `doc_rendition` holds only the specification and the SHA-256, not bytes;
 - screening case documents, STR files and watchlist files;
 - KYC documents, DP lists, payment-request documents and journal uploads.
 

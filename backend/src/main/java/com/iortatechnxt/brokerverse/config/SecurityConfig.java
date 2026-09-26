@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.security.service.LoginRateLimitFilter;
 import com.iortatechnxt.brokerverse.security.service.LoginRateLimiter;
 import com.iortatechnxt.brokerverse.security.service.SecurityProperties;
 import com.iortatechnxt.brokerverse.security.service.TokenRevocationStore;
+import com.iortatechnxt.brokerverse.security.service.UserSessionLog;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -52,6 +53,14 @@ public class SecurityConfig {
           .matcher(HttpMethod.POST, LoginRateLimitFilter.LOGIN_PATH);
 
   /**
+   * "Forgot password?" (UAM-NFR-37): request a link, check it and set the password with it. Open to
+   * anonymous callers and, like login, exempt from CSRF (no session, no cookie); the link token in
+   * the body is the credential.
+   */
+  private static final RequestMatcher PASSWORD_RESET =
+      PathPatternRequestMatcher.withDefaults().matcher("/api/v1/auth/password-reset/**");
+
+  /**
    * Password hashing (BCrypt, cost 12).
    *
    * @return encoder
@@ -85,6 +94,7 @@ public class SecurityConfig {
    * @param properties security properties
    * @param revocations token denylist (logout)
    * @param loginRateLimiter login rate limit
+   * @param sessions session log (ended sessions are refused; activity is recorded)
    * @return filter chain
    * @throws Exception on configuration error
    */
@@ -97,11 +107,15 @@ public class SecurityConfig {
       UserDetailsService userDetailsService,
       SecurityProperties properties,
       TokenRevocationStore revocations,
-      LoginRateLimiter loginRateLimiter)
+      LoginRateLimiter loginRateLimiter,
+      UserSessionLog sessions)
       throws Exception {
     JwtAuthenticationFilter jwt =
-        new JwtAuthenticationFilter(tokens, userDetailsService, revocations);
-    http.csrf(c -> c.ignoringRequestMatchers(SecurityConfig::carriesBearerToken, LOGIN))
+        new JwtAuthenticationFilter(tokens, userDetailsService, revocations, sessions);
+    http.csrf(
+            c ->
+                c.ignoringRequestMatchers(
+                    SecurityConfig::carriesBearerToken, LOGIN, PASSWORD_RESET))
         .cors(c -> c.configurationSource(corsSource(properties.allowedOrigins())))
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .exceptionHandling(
@@ -114,7 +128,7 @@ public class SecurityConfig {
                         r -> r.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)))
         .authorizeHttpRequests(
             a ->
-                a.requestMatchers(LOGIN)
+                a.requestMatchers(LOGIN, PASSWORD_RESET)
                     .permitAll()
                     .requestMatchers(
                         "/error",

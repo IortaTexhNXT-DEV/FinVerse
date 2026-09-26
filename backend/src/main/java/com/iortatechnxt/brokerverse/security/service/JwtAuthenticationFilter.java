@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.service;
 
+import com.iortatechnxt.brokerverse.security.domain.SessionEndReason;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,8 +22,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *
  * <p>The user is reloaded on every request so that disabling, locking or changing roles takes
  * effect immediately, without waiting for token expiry. A token revoked by logout ({@link
- * TokenRevocationStore}) authenticates nobody. Tokens issued before token ids existed carry no
- * {@code jti} and are accepted until they expire.
+ * TokenRevocationStore}) authenticates nobody, nor does a token whose session was ended in the
+ * session log (sign-out, administrator, lock, idle timeout or expiry; UAM-NFR-35). Each request
+ * records the activity of its session ({@link UserSessionLog#check}, at most every five minutes),
+ * and a token of a user found locked or disabled ends its session. Tokens issued before token ids
+ * existed carry no {@code jti} and are accepted until they expire.
  */
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -32,6 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtTokenService tokens;
   private final UserDetailsService userDetailsService;
   private final TokenRevocationStore revocations;
+  private final UserSessionLog sessions;
 
   /**
    * Creates the filter.
@@ -39,14 +44,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
    * @param tokens token service
    * @param userDetailsService user loader
    * @param revocations token denylist
+   * @param sessions session log
    */
   public JwtAuthenticationFilter(
       JwtTokenService tokens,
       UserDetailsService userDetailsService,
-      TokenRevocationStore revocations) {
+      TokenRevocationStore revocations,
+      UserSessionLog sessions) {
     this.tokens = tokens;
     this.userDetailsService = userDetailsService;
     this.revocations = revocations;
+    this.sessions = sessions;
   }
 
   @Override
@@ -58,7 +66,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       tokens
           .parse(header.substring(BEARER.length()))
           .filter(claims -> !revoked(claims))
-          .ifPresent(claims -> authenticate(claims.username(), request));
+          .filter(this::sessionUsable)
+          .ifPresent(claims -> authenticate(claims, request));
     }
     chain.doFilter(request, response);
   }
@@ -79,16 +88,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
   }
 
-  private void authenticate(String username, HttpServletRequest request) {
+  /**
+   * Whether the session of the token is still usable, recording its activity. When the session log
+   * cannot be read the token is accepted (and the failure logged), as for the denylist.
+   */
+  private boolean sessionUsable(JwtTokenService.TokenClaims claims) {
     try {
-      UserDetails user = userDetailsService.loadUserByUsername(username);
+      return sessions.check(claims.tokenId()) != UserSessionLog.SessionState.ENDED;
+    } catch (RuntimeException ex) {
+      LOG.error("Session log unavailable; token of {} accepted", claims.username(), ex);
+      return true;
+    }
+  }
+
+  private void authenticate(JwtTokenService.TokenClaims claims, HttpServletRequest request) {
+    try {
+      UserDetails user = userDetailsService.loadUserByUsername(claims.username());
       if (user.isEnabled() && user.isAccountNonLocked()) {
         var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
         auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(auth);
+      } else {
+        endSession(
+            claims,
+            user.isAccountNonLocked() ? SessionEndReason.ADMIN_ENDED : SessionEndReason.LOCKED);
       }
     } catch (UsernameNotFoundException ex) {
       SecurityContextHolder.clearContext();
+    }
+  }
+
+  private void endSession(JwtTokenService.TokenClaims claims, SessionEndReason reason) {
+    try {
+      sessions.end(claims.tokenId(), reason);
+    } catch (RuntimeException ex) {
+      LOG.error("Session of {} not ended", claims.username(), ex);
     }
   }
 }

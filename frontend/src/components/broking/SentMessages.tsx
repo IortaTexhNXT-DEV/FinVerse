@@ -21,9 +21,14 @@ export function SentMessages({
       loading={messages.isLoading}
       rows={messages.data ?? []}
       rowKey={(m) => m.id}
-      emptyMessage="Nothing sent yet."
+      emptyMessage="No e-mails sent for this record"
       columns={[
-        { key: 'when', header: 'Queued', render: (m) => formatDateTime(m.createdAt) },
+        {
+          key: 'when',
+          header: 'Queued',
+          kind: 'datetime',
+          render: (m) => formatDateTime(m.createdAt),
+        },
         { key: 'purpose', header: 'Purpose', render: (m) => humanize(m.purpose) },
         { key: 'to', header: 'To', render: (m) => m.recipients },
         {
@@ -46,13 +51,18 @@ export function SentMessages({
         {
           key: 'status',
           header: 'Outcome',
-          render: (m) => (
-            <span>
-              <StatusBadge status={m.status} />
-              {m.lastError && <div className="field-error">{m.lastError}</div>}
-              {m.sentAt && <div className="muted">{formatDateTime(m.sentAt)}</div>}
-            </span>
-          ),
+          kind: 'status',
+          render: (m) => <StatusBadge status={m.status} />,
+        },
+        {
+          key: 'sent',
+          header: 'Sent / Reason',
+          render: (m) =>
+            m.lastError ? (
+              <span className="field-error">{m.lastError}</span>
+            ) : (
+              <span className="nowrap">{formatDateTime(m.sentAt) || '—'}</span>
+            ),
         },
       ]}
     />

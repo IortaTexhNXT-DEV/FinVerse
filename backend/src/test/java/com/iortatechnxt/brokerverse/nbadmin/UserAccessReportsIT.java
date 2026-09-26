@@ -104,8 +104,7 @@ class UserAccessReportsIT {
     assertThat(rows)
         .anySatisfy(
             r -> {
-              assertThat(r.get("activity"))
-                  .isEqualTo("Modify User Group Profile of " + username);
+              assertThat(r.get("activity")).isEqualTo("Modify User Group Profile of " + username);
               assertThat(r.get("fromValue")).isEqualTo("Marketing Team Leader / Head (approver)");
               assertThat(r.get("toValue")).isEqualTo("Processing Team Leader");
               assertThat(r.get("approvedBy")).isEqualTo("uamapprover");
@@ -122,14 +121,19 @@ class UserAccessReportsIT {
         Map.of("from", today(), "to", today(), "user", username, "includeSignIns", "true");
     assertThat(details(run(AccessAuditLogReport.CODE, withSignIns)))
         .anySatisfy(r -> assertThat(r.get("activity")).isEqualTo("Failed Log-in " + username));
-    assertThat(details(run(AccessAuditLogReport.CODE, Map.of("from", today(), "to", today(), "user", username))))
+    assertThat(
+            details(
+                run(
+                    AccessAuditLogReport.CODE,
+                    Map.of("from", today(), "to", today(), "user", username))))
         .noneSatisfy(r -> assertThat((String) r.get("activity")).startsWith("Failed Log-in"));
 
     assertThatThrownBy(
             () ->
                 run(
                     AccessAuditLogReport.CODE,
-                    Map.of("from", today(), "to", LocalDate.parse(today()).minusDays(1).toString())))
+                    Map.of(
+                        "from", today(), "to", LocalDate.parse(today()).minusDays(1).toString())))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessage("The end date must be on or after the start date");
   }
@@ -178,8 +182,7 @@ class UserAccessReportsIT {
         details(run(GroupProfileReport.CODE, Map.of("groupProfile", MKT_TL, "area", "CLIENTS")));
     assertThat(tasks)
         .isNotEmpty()
-        .allSatisfy(
-            r -> assertThat(r.get("access")).isIn("With Access", "No Access"));
+        .allSatisfy(r -> assertThat(r.get("access")).isIn("With Access", "No Access"));
     assertThat(details(run(GroupProfileReport.CODE, Map.of("groupProfile", MKT_TL))))
         .anySatisfy(r -> assertThat(r.get("access")).isEqualTo("With Access"));
     assertThat(details(run(AccessRequestsReport.CODE, Map.of("from", "2020-01-01", "to", today()))))

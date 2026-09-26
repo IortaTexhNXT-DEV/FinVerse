@@ -93,8 +93,7 @@ class SignInPasswordIT {
             .header(HttpHeaders.AUTHORIZATION, BEARER + token)
             .contentType(MediaType.APPLICATION_JSON)
             .content(
-                json.writeValueAsString(
-                    Map.of("currentPassword", current, "newPassword", next))));
+                json.writeValueAsString(Map.of("currentPassword", current, "newPassword", next))));
   }
 
   private ResultActions anonymous(String path, Map<String, String> body) throws Exception {
@@ -151,7 +150,8 @@ class SignInPasswordIT {
     ageThePassword(username, 2);
     change(token, P2, P1)
         .andExpect(jsonPath("$.code").value("PASSWORD_REUSED"))
-        .andExpect(jsonPath("$.detail").value("You used this password recently. Choose another one"));
+        .andExpect(
+            jsonPath("$.detail").value("You used this password recently. Choose another one"));
     change(token, P2, "Weak").andExpect(status().isBadRequest());
     change(token, "wrong", P3).andExpect(jsonPath("$.code").value("INVALID_PASSWORD"));
     change(token, P2, P3).andExpect(status().isNoContent());
@@ -184,8 +184,7 @@ class SignInPasswordIT {
         .andExpect(jsonPath("$.code").value("RESET_LINK_EXPIRED"));
 
     int before = resetMails();
-    anonymous("request", Map.of("userId", "nobody-" + IDS.get()))
-        .andExpect(status().isAccepted());
+    anonymous("request", Map.of("userId", "nobody-" + IDS.get())).andExpect(status().isAccepted());
     assertThat(resetMails()).isEqualTo(before);
   }
 
@@ -213,7 +212,8 @@ class SignInPasswordIT {
   @Test
   void directoryModeWithoutItsAdapterRefusesSignInWithAServiceMessage() throws Exception {
     String username = newUser(null);
-    jdbc.update("update sec_user set windows_id = ? where username = ?", "WIN\\" + username, username);
+    jdbc.update(
+        "update sec_user set windows_id = ? where username = ?", "WIN\\" + username, username);
     setMode(AuthMode.DIRECTORY);
     try {
       login("WIN\\" + username, INITIAL)

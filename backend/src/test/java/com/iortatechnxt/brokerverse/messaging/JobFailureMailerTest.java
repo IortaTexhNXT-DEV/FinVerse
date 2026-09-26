@@ -27,7 +27,10 @@ class JobFailureMailerTest {
 
   private static JobRun failedRun() {
     return new JobRun(
-        "UAM_EFFECTIVE_CHANGES", JobTrigger.SCHEDULED, "SYSTEM", Instant.parse("2026-09-25T16:05:00Z"));
+        "UAM_EFFECTIVE_CHANGES",
+        JobTrigger.SCHEDULED,
+        "SYSTEM",
+        Instant.parse("2026-09-25T16:05:00Z"));
   }
 
   @Test

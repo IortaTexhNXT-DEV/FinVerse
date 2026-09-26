@@ -183,7 +183,8 @@ class SessionLogIT {
             put(ME)
                 .header(HttpHeaders.AUTHORIZATION, BEARER + token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(json.writeValueAsString(Map.of("email", "not-an-address", "mobileNo", "x"))))
+                .content(
+                    json.writeValueAsString(Map.of("email", "not-an-address", "mobileNo", "x"))))
         .andExpect(status().isUnprocessableEntity())
         .andExpect(jsonPath("$.errors.email").exists())
         .andExpect(jsonPath("$.errors.mobileNo").exists());

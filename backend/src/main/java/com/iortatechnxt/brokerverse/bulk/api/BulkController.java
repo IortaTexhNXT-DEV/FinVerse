@@ -237,6 +237,17 @@ public class BulkController {
     return xlsx(bulk.job(id).getJobNo() + "_result.xlsx", bulk.report(id));
   }
 
+  /**
+   * Error file: the rows not processed with an Error column, in the template layout.
+   *
+   * @param id job
+   * @return xlsx
+   */
+  @GetMapping("/jobs/{id}/error-file")
+  public ResponseEntity<byte[]> errorFile(@PathVariable Long id) {
+    return xlsx(bulk.job(id).getJobNo() + "_errors.xlsx", bulk.errorFile(id));
+  }
+
   private static ResponseEntity<byte[]> xlsx(String fileName, byte[] content) {
     return ResponseEntity.ok()
         .contentType(XLSX)

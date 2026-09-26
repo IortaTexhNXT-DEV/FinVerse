@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The user directory shown on screens: every user's display name and main role, so tables,
- * record headers and histories show "Paula Unapplied Handler (Unapplied Handler)" instead of the
- * login id. It holds no access data beyond the role names already shown in the header.
+ * The user directory shown on screens: every user's display name and main role, so tables, record
+ * headers and histories show "Paula Unapplied Handler (Unapplied Handler)" instead of the login id.
+ * It holds no access data beyond the role names already shown in the header.
  */
 @Service
 public class UserDirectoryService {

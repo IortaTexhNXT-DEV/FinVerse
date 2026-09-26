@@ -103,7 +103,8 @@ class AccountScheduleIT {
       }
       assertThat(buckets).isEqualByComparingTo((BigDecimal) row.cells().get("closing"));
     }
-    assertThat(r.notes()).anyMatch(n -> n.contains("AQ05"));
+    // Business wording: the draft-layout design note and its reference are not shown.
+    assertThat(r.notes()).isNotEmpty().noneMatch(n -> n.contains("AQ05") || n.contains("Draft"));
   }
 
   @Test

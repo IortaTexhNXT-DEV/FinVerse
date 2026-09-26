@@ -35,6 +35,13 @@ class BusinessTextTest {
   }
 
   @Test
+  void recognisesDesignNotes() {
+    assertThat(BusinessText.isDesignNote("Draft layout, to be confirmed with FRBS (AQ05)."))
+        .isTrue();
+    assertThat(BusinessText.isDesignNote("Amounts in PHP, transactions in PHP only")).isFalse();
+  }
+
+  @Test
   void keepsNullAndEmptyTexts() {
     assertThat(BusinessText.clean(null)).isNull();
     assertThat(BusinessText.clean("")).isEmpty();

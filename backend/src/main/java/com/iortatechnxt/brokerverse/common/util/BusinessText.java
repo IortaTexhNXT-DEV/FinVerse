@@ -38,7 +38,23 @@ public final class BusinessText {
           "\\b[A-Z]{2,6}ID\\.\\d|\\bBR[A-Z]{2,4}\\.\\d|\\bAnnex II\\b|\\bOQ\\d+\\b"
               + "|\\blayout to confirm\\b");
 
+  /** A footnote that is only a design note ("Draft layout, to be confirmed with FRBS"). */
+  private static final Pattern DESIGN_NOTE =
+      Pattern.compile(
+          "^\\s*(draft layout|layout to confirm)|\\bto be confirmed (with|by)\\b",
+          Pattern.CASE_INSENSITIVE);
+
   private BusinessText() {}
+
+  /**
+   * Whether a text is only a design note, which is left out of what business users see.
+   *
+   * @param text text (may be null)
+   * @return true for a design note
+   */
+  public static boolean isDesignNote(String text) {
+    return text != null && DESIGN_NOTE.matcher(text).find();
+  }
 
   /**
    * Removes requirement references and design notes from a text shown to business users.

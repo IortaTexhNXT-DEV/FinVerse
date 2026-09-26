@@ -151,11 +151,11 @@ The Migration Lead draws the samples from the loaded batch (random with a fixed 
 
 For each object and cycle the evidence pack holds: the extract numbers with file names, SHA-256 and control totals; the map versions used; MIG-DQ-ISSUES with waivers; MIG-REJECTS; MIG-RECON-SUMMARY and MIG-RECON-DETAIL; MIG-GL-CLEARING for financial objects; the sample list with the check results; and the signed forms of section 9. The pack is exported from the Migration Console and filed in the project records. Staging rows and files are purged within 5 days of sign-off, but counts, hashes, totals, reports and sign-offs are kept (proposed 10 years, DMQ29).
 
-<!-- pagebreak -->
-
 # Sign-off forms
 
 The forms below are signed in the Migration Console (gates G5 and G6) and printed for the project file. One form per object and cycle.
+
+<!-- pagebreak -->
 
 ## Object reconciliation and acceptance (G5 and G6)
 
@@ -183,11 +183,9 @@ Sample seed and size: "Seed ............     Records checked ............"
 |---|---|---|---|
 | 1 | | | |
 | 2 | | | |
-| 3 | | | |
 
 ```signoff
 rows:
-  - {name: "", role: "Data steward (prepared)", organisation: BDOI}
   - {name: "", role: "Reconciliation approver - G5 (Comptrollership for financial objects)", organisation: BDOI}
   - {name: "", role: "Data owner - G6 object accepted", organisation: BDOI}
   - {name: "", role: "Data Migration Lead - G6", organisation: BDOI}

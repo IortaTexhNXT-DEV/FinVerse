@@ -148,8 +148,16 @@ def check(lay: dict[str, Any], cut: dict[str, Any]) -> list[str]:
 
 # ------------------------------------------------------------------------------------------------ workbook
 
+SHORT = {"R01": "LOV and MIS values", "R02": "Branches", "R03": "Sales organisation", "R05": "Products and risk codes",
+         "R06": "Packages", "R07": "Commission rates", "R08": "GL account map", "R11": "Receipt series",
+         "C02": "Client addresses", "C03": "Payout accounts", "P01": "Policy headers", "P01S": "Policy shares",
+         "P03": "RMEL cohorts", "F01": "Invoice header", "F01S": "Invoice shares", "F01C": "Invoice components",
+         "F02": "UPP", "F06": "PDCs pick-ups refunds", "G01": "GL trial balance", "H01": "Archive records",
+         "H02": "Archive documents"}
+
+
 def sheet_name(layout: dict[str, Any]) -> str:
-    title = layout["title"]
+    title = SHORT.get(layout["code"], layout["title"])
     title = title.replace("Open legacy invoices - ", "Invoices ").replace(" (", " ").replace(")", "")
     name = f"{layout['code']} {title}"
     while len(name) > 31:

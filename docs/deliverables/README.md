@@ -93,6 +93,86 @@ so each document can be regenerated after every build.
 5. NFR evidence (item 37), architecture conformance to the client BOM (item 4, including Redis and Kafka), and the code-quality report (item 27).
 6. UAT per department with sign-off (item 30). Production readiness means the runbook, observability, alerts and error catalogue are in place (items 24, 35 and 38).
 
+## UAT readiness programme (after the end-to-end build)
+
+The platform goes to BDOI UAT only when every item below is complete and evidenced. Each step is run through the
+screens with data keyed field by field, not only through automated tests. Every result is recorded against the
+requirement it proves.
+
+**1. Users and access set up from the front end.** The System Administrator creates each persona's user on the
+User Access screens through a request and its approval. No user is seeded by script for this run.
+- Each persona signs in and sees only its own menus and screens (items 14 and 6).
+- A screen the persona is not granted is refused, even when it is opened by URL.
+
+**2. Persona end-to-end runs per BRD and FRS.** Each persona keys its own transactions, and the work moves to the
+next persona through the workflow: approvals, returns, hand-offs between departments and notifications (items 7, 8,
+13 and 15). Every FR, acceptance criterion and test case of the test plans (item 3) is executed on screen. Every
+field-level validation is tried with valid, invalid and boundary values.
+
+**3. Cross-module continuity (the "disconnect" check).** One record is followed through every module it touches.
+Amounts, statuses and references must agree at each hand-off:
+- quotation → placement → issuance → booking → invoice → Collections → Cashiering receipt → remittance to the insurer
+  → commission → Accounting (GL entries, sub-ledgers) → FRBS schedules and reports;
+- claims, renewals, Employee Benefits, Customer Servicing, Sanction Screening, User Access and Submitted Policies, each
+  with its link into Operations and Accounting;
+- a tie-out at period end: sub-ledger to GL, Operations totals to Accounting totals, report totals to the ledger.
+
+**4. Batch processes and scheduled jobs.** Every job named in the BRDs and FRS is run and its effect checked:
+- when it runs (Philippine time), rerunning safely and the lock against a double run;
+- what happens on failure (alert, e-mail to the job-failure recipients), and catching up after downtime;
+- month-end and year-end close rehearsed on test data.
+
+**5. Documents, schedules and reports.** Every print, schedule and report named in the BRDs is generated with the
+BDOI theme and checked against the source data:
+- reports in Excel and PDF; documents and schedules in Word and PDF (item 17);
+- upload and download templates tested from the templates folder (item 20).
+
+**6. Requirement master list with results.** One workbook lists every requirement of all twelve BRDs (the RTM, item 21).
+For each requirement it shows:
+- the FR, the screen and the field;
+- the test case, the result on screen, the evidence (screenshot) and the defect, if any;
+- a readiness status.
+
+Its summary is the UAT readiness statement per module and for the platform.
+
+**7. Code standard report** (item 27), module by module and screen by screen. It shows:
+- static analysis (SonarQube rules, PMD, SpotBugs, Checkstyle), duplication, code smells and coverage;
+- dependency and licence scan;
+- a hard-coding audit: no business rule, list or threshold held in code instead of configuration (item 16);
+- consistent naming and error codes (item 35), so the production support team can trace a defect from the screen
+  message to the code.
+
+**8. Performance and volume** (item 28). BDOI is a volume business (retail and transactions), so the tests cover:
+- load tests at the BRD volumes and peak periods (month end, renewal season, bulk uploads);
+- screen response times against the NFRs, batch run times, report generation under load;
+- database growth and archiving.
+
+**9. Security** (item 26):
+- role and data-access tests (every endpoint against every role);
+- OWASP Top 10 checks and a dynamic scan;
+- password, lock-out and session rules;
+- audit trail completeness;
+- masking of non-production data;
+- secrets handling;
+- dependency vulnerabilities.
+
+**10. Resilience and operations:**
+- backup and restore test, and the disaster recovery switch-over (hosting appendix);
+- Redis and Kafka outages handled without losing a transaction;
+- monitoring and alerts (item 38), and the runbook (item 24).
+
+**11. Also in scope** (added to the client's list):
+- a data migration dry run with reconciliation of migrated balances (item 29);
+- browser and screen-size checks and the accessibility statement (item 40);
+- concurrency (two users on the same record);
+- e-mail and notification delivery;
+- time-zone and holiday handling;
+- a defect triage and retest cycle with severity rules;
+- UAT entry and exit criteria and the sign-off forms (item 30).
+
+**Exit.** Every requirement has been tested and passed, or has an agreed disposition with BDOI; no open Critical or High
+defect remains. The readiness statement is then issued for BDOI to approve the move into UAT.
+
 ## Writing standard (binding for every document)
 
 - Write as the project team writes to the client: specific and factual, with BRD IDs, screen names, field names and values.

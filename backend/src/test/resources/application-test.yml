@@ -16,6 +16,12 @@ brokerverse:
     enabled: false
   kafka:
     enabled: false
+  # Local file store under the build folder (document storage, ST0).
+  storage:
+    provider: local
+    local:
+      root: target/storage-files
+      link-secret: test-link-secret-for-local-file-links
 logging:
   level:
     root: WARN

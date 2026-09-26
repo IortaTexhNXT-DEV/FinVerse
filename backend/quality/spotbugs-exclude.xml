@@ -56,6 +56,15 @@
     <Class name="com.iortatechnxt.brokerverse.events.service.CorrelationIdFilter"/>
     <Bug pattern="SERVLET_HEADER"/>
   </Match>
+  <!--
+    PATH_TRAVERSAL_IN / PATH_TRAVERSAL_OUT in LocalFileStore (developer, test and seed stacks only;
+    refused in production): object keys are validated by ObjectRef ([a-z0-9/_.-], no "..", no empty
+    segment) and every resolved path is normalised and checked to stay under the configured root.
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.brokerverse.common.storage.LocalFileStore"/>
+    <Bug pattern="PATH_TRAVERSAL_IN,PATH_TRAVERSAL_OUT"/>
+  </Match>
   <!-- Generated/test code is not part of the production artefact. -->
   <Match>
     <Class name="~.*Test.*"/>

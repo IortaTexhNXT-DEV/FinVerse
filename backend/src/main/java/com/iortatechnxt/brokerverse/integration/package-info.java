@@ -4,7 +4,9 @@
  * topics this application acts on asynchronously (e-mail dispatch of {@code notification
  * requested}). The source modules are not changed: the adapters listen to their Spring events
  * ({@code @TransactionalEventListener(BEFORE_COMMIT)}, so the outbox row commits with the business
- * change) or, where a module publishes no event (client, receipt), to its entity changes.
+ * change) or, where a module publishes no event (client, receipt), to its entity changes. It also
+ * implements notification ports of platform modules that must not depend on messaging or alerts
+ * ({@code storage.service.FileQuarantineListener}).
  *
  * <p>See docs/architecture/PLATFORM_CACHE_AND_EVENTS.md (topic catalogue).
  */

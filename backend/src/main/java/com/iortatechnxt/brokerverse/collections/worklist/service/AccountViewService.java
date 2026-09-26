@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.collections.common.domain.CollectionItem;
 import com.iortatechnxt.brokerverse.collections.common.service.CollectionItems;
 import com.iortatechnxt.brokerverse.collections.worklist.domain.Assignment;
 import com.iortatechnxt.brokerverse.collections.worklist.service.EditLockService.LockState;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
@@ -35,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class AccountViewService {
 
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  private static final ZoneId MANILA = BusinessClock.zone();
   private static final Set<MovementType> PAYMENTS =
       Set.of(MovementType.APPLIED, MovementType.UNAPPLIED);
 

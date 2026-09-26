@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.collections.promise.domain.PaymentPromiseRep
 import com.iortatechnxt.brokerverse.collections.promise.domain.PromiseStatus;
 import com.iortatechnxt.brokerverse.collections.promise.service.PromiseBroken;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -110,7 +111,7 @@ public class EscalationEngine {
    */
   @EventListener
   public void on(PromiseBroken event) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     rulesOn(today).stream()
         .filter(r -> r.getCompanyId().equals(event.companyId()))
         .filter(r -> r.getBasis() == Basis.BROKEN_PROMISES_COUNT)

@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.crm.service;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientTag;
 import com.iortatechnxt.brokerverse.crm.domain.ClientTagRepository;
@@ -142,7 +143,7 @@ public class ClientRiskService {
           "RISK_JUSTIFICATION_REQUIRED", "Enter the justification of the manual risk change");
     }
     if (change.riskRating() != null) {
-      lovs.requireValid(RATING_LIST, change.riskRating(), LocalDate.now(clock));
+      lovs.requireValid(RATING_LIST, change.riskRating(), BusinessClock.today(clock));
     }
   }
 
@@ -154,8 +155,8 @@ public class ClientRiskService {
     }
     LocalDate verifiedOn =
         client.getKycVerifiedAt() == null
-            ? LocalDate.now(clock)
-            : LocalDate.ofInstant(client.getKycVerifiedAt(), clock.getZone());
+            ? BusinessClock.today(clock)
+            : BusinessClock.dateOf(client.getKycVerifiedAt());
     return reviewPolicy.nextReview(rating, verifiedOn);
   }
 

@@ -12,10 +12,10 @@ import com.iortatechnxt.brokerverse.bulk.service.ParsedFile.RawRow;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.Sha256;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -123,9 +123,10 @@ public class BulkService {
     }
     return tx.execute(
         s -> {
-          String jobNo = numbers.next("BLK-" + LocalDate.now(clock).getYear());
+          String jobNo = numbers.next("BLK-" + BusinessClock.today(clock).getYear());
           BulkContext context =
-              new BulkContext(upload.companyId(), jobNo, LocalDate.now(clock), upload.parameters());
+              new BulkContext(
+                  upload.companyId(), jobNo, BusinessClock.today(clock), upload.parameters());
           return validateAndStore(handler, upload, file, context, sha256);
         });
   }
@@ -221,7 +222,7 @@ public class BulkService {
         new BulkContext(
             job.getCompanyId(),
             job.getJobNo(),
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             store.read(job.getParameters()));
     List<BulkRowRecord> valid = rows.findByJobIdAndStatusOrderByRowNo(jobId, BulkRowStatus.VALID);
     int committed = 0;
@@ -267,7 +268,7 @@ public class BulkService {
         new BulkContext(
             job.getCompanyId(),
             job.getJobNo(),
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             store.read(job.getParameters()));
     int recovered = 0;
     int failed = 0;

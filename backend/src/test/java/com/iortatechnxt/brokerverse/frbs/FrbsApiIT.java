@@ -8,13 +8,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeLine;
 import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeRun;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,11 +57,11 @@ class FrbsApiIT {
   private Map<String, String> reportParams() {
     Map<String, String> p = new HashMap<>();
     p.put("companyId", String.valueOf(fx.company()));
-    p.put("from", LocalDate.now().withDayOfYear(1).toString());
-    p.put("to", LocalDate.now().toString());
-    p.put("year", String.valueOf(LocalDate.now().getYear()));
+    p.put("from", BusinessClock.today(Clock.systemUTC()).withDayOfYear(1).toString());
+    p.put("to", BusinessClock.today(Clock.systemUTC()).toString());
+    p.put("year", String.valueOf(BusinessClock.today(Clock.systemUTC()).getYear()));
     p.put("schedule", "SCH-COMM-RECEIVABLE");
-    p.put("asOf", LocalDate.now().toString());
+    p.put("asOf", BusinessClock.today(Clock.systemUTC()).toString());
     return p;
   }
 
@@ -75,7 +76,11 @@ class FrbsApiIT {
             SCHEDULES,
             SCHEDULES + "?activeOnly=true",
             SCHEDULES + "/SCH-PR-PHP",
-            SCHEDULES + "/GARD-VARIANCE-SIE/comments" + c + "&period=" + YearMonth.now(),
+            SCHEDULES
+                + "/GARD-VARIANCE-SIE/comments"
+                + c
+                + "&period="
+                + BusinessClock.currentMonth(Clock.systemUTC()),
             FEE + "/runs" + c,
             FEE + "/runs" + c + "&stage=APPROVED&q=sfr&page=0&size=5",
             FEE + "/runs/counts" + c,
@@ -230,7 +235,7 @@ class FrbsApiIT {
             "companyId",
             fx.company(),
             "period",
-            YearMonth.now().toString(),
+            BusinessClock.currentMonth(Clock.systemUTC()).toString(),
             "rowKey",
             "4101",
             "text",
@@ -262,9 +267,9 @@ class FrbsApiIT {
     cert.put("certificateNo", "H-" + System.nanoTime() % 1_000_000);
     cert.put("agentCode", "INS-HTTP");
     cert.put("agentName", "HTTP Insurer");
-    cert.put("periodFrom", LocalDate.now().withDayOfMonth(1).toString());
-    cert.put("periodTo", LocalDate.now().toString());
-    cert.put("receivedOn", LocalDate.now().toString());
+    cert.put("periodFrom", BusinessClock.today(Clock.systemUTC()).withDayOfMonth(1).toString());
+    cert.put("periodTo", BusinessClock.today(Clock.systemUTC()).toString());
+    cert.put("receivedOn", BusinessClock.today(Clock.systemUTC()).toString());
     cert.put(
         "lines", List.of(Map.of("kind", "COMMISSION", "atc", "WC158", "income", 1000, "tax", 20)));
     JsonNode recorded =

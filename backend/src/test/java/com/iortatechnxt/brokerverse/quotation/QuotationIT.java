@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.PaymentArrangement;
 import com.iortatechnxt.brokerverse.account.service.AccountQueryService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage;
 import com.iortatechnxt.brokerverse.messaging.service.MessageService;
@@ -32,6 +33,7 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowViewService;
+import java.time.Clock;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +74,7 @@ class QuotationIT {
     assertThat(q.getStatus()).isEqualTo(QuotationStatus.DRAFT);
     assertThat(q.getTemplateVersion()).isEqualTo("QUOTATION_LETTER v1");
     assertThat(q.getGrossPremium()).isPositive();
-    assertThat(q.getValidUntil()).isAfter(java.time.LocalDate.now());
+    assertThat(q.getValidUntil()).isAfter(BusinessClock.today(Clock.systemUTC()));
     QuotationContent content = queries.content(queries.get(q.getId()));
     assertThat(content.isRated()).isTrue();
     assertThat(content.items())

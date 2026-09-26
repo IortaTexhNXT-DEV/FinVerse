@@ -11,9 +11,9 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.sql.Timestamp;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -94,7 +94,8 @@ public class BatchPrintService {
           "PRINT_SELECTION", "Select between 1 and " + MAX_BATCH + " receipts to print");
     }
     PrintBatch batch =
-        new PrintBatch(companyId, numbers.next("PRB-" + LocalDate.now(clock).getYear()), criteria);
+        new PrintBatch(
+            companyId, numbers.next("PRB-" + BusinessClock.today(clock).getYear()), criteria);
     List<byte[]> pdfs = new ArrayList<>();
     for (Receipt r : receipts.findByIdInOrderByIdAsc(receiptIds)) {
       if (!r.getCompanyId().equals(companyId)) {

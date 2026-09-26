@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
 import com.iortatechnxt.brokerverse.booking.service.InvoiceBooked;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionReleased;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails.PersonName;
@@ -39,6 +40,7 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
 import com.iortatechnxt.brokerverse.workflow.service.WorkCaseTransitioned;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -212,12 +214,14 @@ class IntegrationEventsLocalIT {
     assertThat(relayJob.name()).isEqualTo("EVENT_OUTBOX_RELAY");
     assertThat(relayJob.cron()).isNotBlank();
     assertThat(relayJob.description()).isNotBlank();
-    assertThat(relayJob.execute(LocalDate.now()).itemsProcessed()).isPositive();
+    assertThat(relayJob.execute(BusinessClock.today(Clock.systemUTC())).itemsProcessed())
+        .isPositive();
     assertThat(only(key).status()).isEqualTo(OutboxStatus.LOCAL);
     assertThat(housekeeping.name()).isEqualTo(EventHousekeepingJob.JOB_NAME);
     assertThat(housekeeping.description()).isNotBlank();
     assertThat(housekeeping.cron()).isNotBlank();
-    assertThat(housekeeping.execute(LocalDate.now()).message()).contains("outbox");
+    assertThat(housekeeping.execute(BusinessClock.today(Clock.systemUTC())).message())
+        .contains("outbox");
   }
 
   @Test

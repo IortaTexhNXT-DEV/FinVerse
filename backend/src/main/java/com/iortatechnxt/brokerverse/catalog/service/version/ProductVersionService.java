@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.catalog.service.RatingService;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
@@ -145,7 +146,7 @@ public class ProductVersionService {
     }
     RiskProduct product = catalog.requireProduct(productCode);
     checkComplete(product, version);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     endPrevious(version, today);
     BigDecimal testPremium =
         rating
@@ -292,7 +293,7 @@ public class ProductVersionService {
             .map(Coverage::getCode)
             .collect(Collectors.toSet());
     PackageCompleteness.check(
-        product, version, basic::contains, latestReleased(version), LocalDate.now(clock));
+        product, version, basic::contains, latestReleased(version), BusinessClock.today(clock));
   }
 
   private ProductVersion latestReleased(ProductVersion version) {

@@ -39,8 +39,7 @@ public class MinimalBalanceFileReport implements ReportDefinition {
     return ReportMetadata.operations(
         CODE,
         "Minimal Balance Write-off Summary",
-        "Balances of 10.00 to 100.00 written off or credited by the minimal balance file"
-            + " (ADJID.026; layout to confirm, OQ42)",
+        "Balances of 10.00 to 100.00 written off or credited by the minimal balance file",
         AdjustmentReportSupport.period("MONTH_START"));
   }
 

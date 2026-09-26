@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails;
 import com.iortatechnxt.brokerverse.crm.domain.ClientProfile;
@@ -12,7 +13,6 @@ import com.iortatechnxt.brokerverse.crm.domain.ClientRepository;
 import com.iortatechnxt.brokerverse.crm.domain.ClientStatus;
 import com.iortatechnxt.brokerverse.crm.domain.ClientType;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -105,7 +105,7 @@ public class ClientService {
     validator.validate(details, profile);
     duplicates.requireNoHardMatch(
         companyId, DuplicateProbe.of(details), null, "creation of " + nameOf(details));
-    String code = numbers.next("PR-" + LocalDate.now(clock).getYear());
+    String code = numbers.next("PR-" + BusinessClock.today(clock).getYear());
     Client client = new Client(companyId, code, details);
     client.applyProfile(profile);
     Client saved = clients.save(client);

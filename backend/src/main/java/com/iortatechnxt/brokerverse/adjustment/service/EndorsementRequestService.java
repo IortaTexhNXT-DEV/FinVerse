@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.HandoffService;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
@@ -16,7 +17,6 @@ import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import com.iortatechnxt.brokerverse.workflow.service.StartCase;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -130,7 +130,7 @@ public class EndorsementRequestService {
     Recompute result =
         recompute.compute(
             invoice.getInvoiceNo(), content.computation(), content.terms(), content.amounts());
-    String number = numbers.next("ENR-" + LocalDate.now(clock).getYear());
+    String number = numbers.next("ENR-" + BusinessClock.today(clock).getYear());
     EndorsementRequest request =
         new EndorsementRequest(
             invoice.getCompanyId(), invoice.getBranchId(), number, subjectOf(invoice), content);

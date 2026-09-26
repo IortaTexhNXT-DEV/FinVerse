@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.coa.domain.BalanceSide;
 import com.iortatechnxt.brokerverse.coa.domain.GlAccount;
 import com.iortatechnxt.brokerverse.coa.domain.SubLedgerType;
 import com.iortatechnxt.brokerverse.coa.service.ChartOfAccountsService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.organization.api.dto.BranchRequest;
 import com.iortatechnxt.brokerverse.organization.api.dto.CompanyRequest;
@@ -32,6 +33,7 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.JournalFixtures;
 import com.iortatechnxt.brokerverse.support.TestData;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -60,7 +62,8 @@ class ApprovalInboxIT {
   @Test
   void submittedJournalReachesCheckersButNotItsMaker() {
     JournalBatch batch =
-        journals.submitted(journals.request("5603", "1111", "1234.00", LocalDate.now()));
+        journals.submitted(
+            journals.request("5603", "1111", "1234.00", BusinessClock.today(Clock.systemUTC())));
 
     List<PendingApproval> checker = as.run("checker", () -> inbox.inbox(null));
     assertThat(references(checker)).contains(batch.getBatchNo());
@@ -87,7 +90,8 @@ class ApprovalInboxIT {
   @Test
   void journalsAboveTheCheckersLimitAreNotOffered() {
     JournalBatch big =
-        journals.submitted(journals.request("5603", "1111", "6000000.00", LocalDate.now()));
+        journals.submitted(
+            journals.request("5603", "1111", "6000000.00", BusinessClock.today(Clock.systemUTC())));
     assertThat(references(as.run("checker", () -> inbox.inbox(null))))
         .doesNotContain(big.getBatchNo());
     assertThat(references(as.run("fmanager", () -> inbox.inbox(null)))).contains(big.getBatchNo());

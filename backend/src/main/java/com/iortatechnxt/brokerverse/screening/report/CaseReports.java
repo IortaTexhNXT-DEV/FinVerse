@@ -91,7 +91,7 @@ public final class CaseReports {
       return ReportMetadata.compliance(
           CASE_STATUS,
           "Case Status Monitoring",
-          "Screening cases created in the period by stage, assignee, age and SLA state (SNSRP-901)",
+          "Screening cases created in the period by stage, assignee, age and SLA state",
           params);
     }
 
@@ -117,7 +117,6 @@ public final class CaseReports {
           .rows(sql.rows(SQL, args))
           .presorted()
           .withoutGrandTotal()
-          .note(ScrReportSql.LAYOUT_NOTE)
           .build();
     }
   }
@@ -161,7 +160,7 @@ public final class CaseReports {
       return ReportMetadata.compliance(
           SLA_BREACHES,
           "SLA Reminders and Breaches",
-          "Reminders, breaches and escalations of screening cases in the period (SNSRP-405)",
+          "Reminders, breaches and escalations of screening cases in the period",
           params);
     }
 
@@ -182,7 +181,6 @@ public final class CaseReports {
           .rows(sql.rows(SQL, args))
           .presorted()
           .withoutGrandTotal()
-          .note(ScrReportSql.LAYOUT_NOTE)
           .build();
     }
   }
@@ -246,7 +244,7 @@ public final class CaseReports {
           AUDIT_LOG,
           "Screening Audit Log",
           ReportCategory.COMPLIANCE,
-          "Case, configuration, watchlist and screening events with from / to values (SNSRP-903)",
+          "Case, configuration, watchlist and screening events with from / to values",
           params,
           Permission.SCR_AUDIT_VIEW,
           Permission.SCR_AUDIT_VIEW,
@@ -270,7 +268,6 @@ public final class CaseReports {
           .rows(sql.rows(SQL, args))
           .presorted()
           .withoutGrandTotal()
-          .note(ScrReportSql.LAYOUT_NOTE)
           .build();
     }
   }

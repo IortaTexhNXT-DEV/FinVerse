@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.dashboard.service;
 
 import com.iortatechnxt.brokerverse.coa.domain.AccountClass;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.dashboard.service.DashboardSummary.CompositionItem;
 import com.iortatechnxt.brokerverse.dashboard.service.DashboardSummary.MonthlyPoint;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatchRepository;
@@ -65,7 +66,7 @@ public class DashboardService {
    * @return summary
    */
   public DashboardSummary summary(Long companyId, Long branchId) {
-    LocalDate asOf = LocalDate.now(clock);
+    LocalDate asOf = BusinessClock.today(clock);
     LocalDate yearStart = periods.yearContaining(companyId, asOf).getStartDate();
     var ytd = statements.performance(companyId, branchId, yearStart, asOf);
     BigDecimal income = FinancialStatementService.total(ytd, AccountClass.INCOME);

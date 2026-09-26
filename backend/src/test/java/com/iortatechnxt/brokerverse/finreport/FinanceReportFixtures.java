@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.finreport;
 import com.iortatechnxt.brokerverse.accounting.service.AccountingEventPublisher;
 import com.iortatechnxt.brokerverse.accounting.service.BusinessEvent;
 import com.iortatechnxt.brokerverse.coa.domain.BalanceSide;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalLineRequest;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalRequest;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
@@ -12,7 +13,7 @@ import com.iortatechnxt.brokerverse.journal.service.JournalEntryService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -126,7 +127,7 @@ class FinanceReportFixtures {
                     "PREMIUM_RECEIPT",
                     data.company().getId(),
                     data.branch("CEB").getId(),
-                    LocalDate.now(),
+                    BusinessClock.today(Clock.systemUTC()),
                     "PHP",
                     "RECEIPTS",
                     "FINREP-RCT-1",
@@ -151,7 +152,7 @@ class FinanceReportFixtures {
                     "POLICY_ISSUE",
                     data.company().getId(),
                     data.branch("HO").getId(),
-                    LocalDate.now(),
+                    BusinessClock.today(Clock.systemUTC()),
                     "PHP",
                     "UNDERWRITING",
                     "FINREP-POL-" + party,
@@ -174,8 +175,8 @@ class FinanceReportFixtures {
           template.getCompanyId(),
           template.getBranchId(),
           no,
-          LocalDate.now(),
-          LocalDate.now());
+          BusinessClock.today(Clock.systemUTC()),
+          BusinessClock.today(Clock.systemUTC()));
     }
   }
 
@@ -191,7 +192,7 @@ class FinanceReportFixtures {
         data.company().getId(),
         data.branch("HO").getId(),
         type,
-        LocalDate.now(),
+        BusinessClock.today(Clock.systemUTC()),
         "PHP",
         narration,
         "FINREP",

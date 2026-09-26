@@ -4,10 +4,10 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.cashiering.domain.PaymentReversal;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import java.time.Clock;
-import java.time.LocalDate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +50,7 @@ public class PaymentReversalSupport {
    * @return {@code PRV-<yyyy>-nnnnnn}
    */
   public String nextNumber() {
-    return numbers.next("PRV-" + LocalDate.now(clock).getYear());
+    return numbers.next("PRV-" + BusinessClock.today(clock).getYear());
   }
 
   /**

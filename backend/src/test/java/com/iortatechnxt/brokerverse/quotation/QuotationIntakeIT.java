@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkColumn;
 import com.iortatechnxt.brokerverse.bulk.service.BulkImportHandler;
 import com.iortatechnxt.brokerverse.bulk.service.BulkService;
 import com.iortatechnxt.brokerverse.bulk.service.BulkUpload;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.quotation.domain.Quotation;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationRequest;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationStatus;
@@ -32,7 +33,7 @@ import com.iortatechnxt.brokerverse.quotation.service.QuotationService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -175,7 +176,7 @@ class QuotationIntakeIT {
                     fx.company(), RequestStatus.CLOSED, other.getRequestNo(), PageRequest.of(0, 5))
                 .getContent())
         .hasSize(1);
-    assertThat(intakeJob.execute(LocalDate.now()).itemsProcessed()).isZero();
+    assertThat(intakeJob.execute(BusinessClock.today(Clock.systemUTC())).itemsProcessed()).isZero();
     assertThat(intakeJob.cron()).isEqualTo("-");
   }
 

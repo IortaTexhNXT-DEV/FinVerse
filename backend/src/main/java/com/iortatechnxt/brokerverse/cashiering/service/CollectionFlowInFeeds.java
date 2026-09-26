@@ -6,11 +6,11 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkImportHandler;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
 import com.iortatechnxt.brokerverse.bulk.service.ParsedFile;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInContext;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInHandler;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +75,7 @@ public final class CollectionFlowInFeeds {
                       new BusinessRuleException(
                           "FLOW_IN_COMPANY_UNKNOWN", "Unknown company " + row.text(COMPANY)))
               .getId();
-      BulkContext context = new BulkContext(companyId, runNo, LocalDate.now(clock), Map.of());
+      BulkContext context = new BulkContext(companyId, runNo, BusinessClock.today(clock), Map.of());
       List<String> errors = rows.validate(row, context);
       if (!errors.isEmpty()) {
         throw new BusinessRuleException("FLOW_IN_RECORD_INVALID", String.join("; ", errors));

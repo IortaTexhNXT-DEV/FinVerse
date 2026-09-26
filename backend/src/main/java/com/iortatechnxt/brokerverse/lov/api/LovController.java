@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.lov.api;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.api.dto.LovOption;
 import com.iortatechnxt.brokerverse.lov.api.dto.LovTypeResponse;
 import com.iortatechnxt.brokerverse.lov.api.dto.LovValueRequest;
@@ -60,7 +61,7 @@ public class LovController {
       @PathVariable String type,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
           LocalDate date) {
-    LocalDate on = date == null ? LocalDate.now(clock) : date;
+    LocalDate on = date == null ? BusinessClock.today(clock) : date;
     return service.options(type, on).stream().map(LovOption::from).toList();
   }
 

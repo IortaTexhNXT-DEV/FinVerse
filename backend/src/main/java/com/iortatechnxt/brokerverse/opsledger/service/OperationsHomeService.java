@@ -1,13 +1,13 @@
 package com.iortatechnxt.brokerverse.opsledger.service;
 
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.domain.LovValue;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.opsledger.service.port.OpsWorkCountSource;
 import com.iortatechnxt.brokerverse.opsledger.service.port.OpsWorkCountSource.Section;
 import com.iortatechnxt.brokerverse.opsledger.service.port.OpsWorkCountSource.WorkCount;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -105,7 +105,7 @@ public class OperationsHomeService {
    * @return links; a value without "|url" has no address yet
    */
   public List<ExternalLink> links() {
-    return lovs.activeValues(LINK_LOV, LocalDate.now(clock)).stream()
+    return lovs.activeValues(LINK_LOV, BusinessClock.today(clock)).stream()
         .map(OperationsHomeService::link)
         .toList();
   }

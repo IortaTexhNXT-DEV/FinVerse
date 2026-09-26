@@ -56,8 +56,7 @@ public class ProductionRegisterReport implements ReportDefinition {
     return ReconReportSupport.metadata(
         CODE,
         "Production Register",
-        "Booked accounts sent to the insurers, plain or with insurer / Marketing feedback"
-            + " (PRCID.017/018/020)",
+        "Booked accounts sent to the insurers, plain or with insurer / Marketing feedback",
         ParameterSpec.select(
             VARIANT, "Variant", List.of("PLAIN", "INSURER", "MARKETING", BOTH), "PLAIN"));
   }

@@ -7,6 +7,7 @@ are for local development only.
 |---|---|---|---|
 | `SPRING_PROFILES_ACTIVE` | yes | – | `prod` in production. `seed` loads the seed data of SIT, UAT and training (never in production: the start is refused, see "Production start-up safeguards"). |
 | `BROKERVERSE_ENVIRONMENT` | yes | `local` (`seed` with the seed profile) | `brokerverse.environment`: `local`, `sit`, `uat`, `training`, `preprod` or `production`. `production` (set by the `prod` profile) turns on the start-up safeguards. |
+| `BROKERVERSE_BUSINESS_ZONE` | no | `Asia/Manila` | `brokerverse.business-zone`: time zone of the business date (`BusinessClock`). "Today", "not in the future" and cut-off checks, accounting periods, report date keywords, job run dates and the report day cuts use the calendar day of this zone; timestamps stay UTC and the job cron expressions are UTC. An unknown zone refuses the start. Change it only with a new deployment, never on a running platform. |
 | `BROKERVERSE_DB_URL` | yes | `jdbc:postgresql://localhost:5432/brokerverse`; none with `prod` | JDBC URL. Leave `sslmode` out: `BROKERVERSE_DB_SSL_MODE` applies (an `sslmode` in the URL takes precedence, and a plaintext one is refused in production). |
 | `BROKERVERSE_DB_USER` | yes | `brokerverse`; none with `prod` | Database user (owner of the schema; Flyway migrates on start). |
 | `BROKERVERSE_DB_PASSWORD` | yes | none (a local value with the `seed` profile only) | Database password (from secret store). |

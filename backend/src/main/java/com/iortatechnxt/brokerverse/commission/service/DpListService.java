@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.commission.domain.DpList.FileKey;
 import com.iortatechnxt.brokerverse.commission.domain.DpList.Origin;
 import com.iortatechnxt.brokerverse.commission.domain.DpListRepository;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.Sha256;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInEnums.Trigger;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInRun;
@@ -125,7 +126,7 @@ public class DpListService {
                 FileRef.NONE,
                 ctx -> {
                   Origin origin =
-                      new Origin(ListSource.COLLECTION_FEED, branch, LocalDate.now(clock));
+                      new Origin(ListSource.COLLECTION_FEED, branch, BusinessClock.today(clock));
                   DpList list = intake.open(companyId, origin, FileKey.NONE);
                   int row = 0;
                   for (FeedItem item : items) {

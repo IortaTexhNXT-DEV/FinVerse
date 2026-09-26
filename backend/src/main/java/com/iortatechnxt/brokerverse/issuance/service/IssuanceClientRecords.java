@@ -1,11 +1,10 @@
 package com.iortatechnxt.brokerverse.issuance.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientRecord;
 import com.iortatechnxt.brokerverse.crm.service.ClientRecordsProvider;
 import com.iortatechnxt.brokerverse.issuance.domain.InsuranceAdvice;
 import com.iortatechnxt.brokerverse.issuance.domain.InsuranceAdviceRepository;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +38,7 @@ public class IssuanceClientRecords implements ClientRecordsProvider {
         a.getIaNo(),
         a.getArn() + " - mortgagee " + a.getMortgageeBank(),
         a.getStatus().name(),
-        LocalDate.ofInstant(a.getCreatedAt(), ZoneOffset.UTC),
+        BusinessClock.dateOf(a.getCreatedAt()),
         "/issuance/insurance-advice?ia=" + a.getIaNo());
   }
 }

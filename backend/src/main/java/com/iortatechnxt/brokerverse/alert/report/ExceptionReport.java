@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.alert.domain.Alert;
 import com.iortatechnxt.brokerverse.alert.domain.AlertStatus;
 import com.iortatechnxt.brokerverse.alert.service.AlertService;
 import com.iortatechnxt.brokerverse.alert.service.AlertService.AlertSearch;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportCategory;
@@ -14,7 +15,6 @@ import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.TabularReportBuilder;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
-import java.time.ZoneOffset;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,8 +72,8 @@ public class ExceptionReport implements ReportDefinition {
             null,
             p.optionalText(CODE).orElse(null),
             p.optionalLong("companyId").orElse(null),
-            p.date(FROM).atStartOfDay().toInstant(ZoneOffset.UTC),
-            p.date(TO).plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC));
+            BusinessClock.startOf(p.date(FROM)),
+            BusinessClock.startOf(p.date(TO).plusDays(1)));
     List<Map<String, Object>> rows =
         alerts.search(criteria, PageRequest.of(0, MAX_ROWS)).getContent().stream()
             .map(ExceptionReport::row)

@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -148,7 +149,7 @@ public class InsuranceAdviceService {
           "IA_ACCOUNT_STATUS",
           "Account " + arn + " is " + account.getStatus() + "; it must be placed first");
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     String iaNo = numbers.next("IA-" + today.getYear());
     String mortgagee = lovs.label(MORTGAGEE_LOV, account.getMortgageeBank());
     String insurerName = insurerName(account);

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.tax.api;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.tax.api.dto.CalendarEntryResponse;
 import com.iortatechnxt.brokerverse.tax.api.dto.WorksheetResponse;
 import com.iortatechnxt.brokerverse.tax.domain.TaxPeriod;
@@ -79,7 +80,7 @@ public class TaxWorksheetController {
   @PreAuthorize(TaxAccess.VIEW)
   public List<CalendarEntryResponse> calendar(
       @RequestParam Long companyId, @RequestParam int year) {
-    return calendar.calendar(companyId, year, LocalDate.now(clock)).stream()
+    return calendar.calendar(companyId, year, BusinessClock.today(clock)).stream()
         .map(CalendarEntryResponse::from)
         .toList();
   }

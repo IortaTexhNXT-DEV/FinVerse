@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.payrequest.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.PayoutDetails;
 import com.iortatechnxt.brokerverse.crm.domain.PayoutMode;
 import com.iortatechnxt.brokerverse.crm.service.ClientPayoutAccounts;
@@ -103,7 +104,7 @@ public class PayRequestRules {
     requireOneClient(values, client);
     clients.requireByCode(companyId, client);
     requireNoDuplicateAr(values, requestId);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     List<RefundLine> built = new ArrayList<>();
     int no = 1;
     for (RefundLineValues v : values) {
@@ -145,7 +146,7 @@ public class PayRequestRules {
     if (blank(code) || blank(name)) {
       throw new BusinessRuleException("PRQ_PAYEE_REQUIRED", "Give the payee code and name");
     }
-    lovs.requireValid(MODE_LOV, payout.mode(), LocalDate.now(clock));
+    lovs.requireValid(MODE_LOV, payout.mode(), BusinessClock.today(clock));
     PayoutMode mode = payoutMode(payout.mode());
     if (mode != null) {
       payouts.validate(new PayoutDetails(mode, payout.accountName(), payout.accountNo()));
@@ -171,7 +172,7 @@ public class PayRequestRules {
     if (!currency.matches("[A-Z]{3}")) {
       throw new BusinessRuleException("PRQ_CURRENCY_INVALID", "Currency must be a 3-letter code");
     }
-    lovs.validateOptional("PRQ_RFP_TYPE", content.rfpType(), LocalDate.now(clock));
+    lovs.validateOptional("PRQ_RFP_TYPE", content.rfpType(), BusinessClock.today(clock));
     return new RequestContent(
         trim(content.segment()),
         trim(content.referenceText()),
@@ -263,7 +264,7 @@ public class PayRequestRules {
     boolean mixed = blank(client) || values.stream().anyMatch(v -> !client.equals(v.clientCode()));
     if (mixed) {
       throw new BusinessRuleException(
-          "PRQ_ONE_CLIENT", "All accounts of a refund request belong to one client (AQ18)");
+          "PRQ_ONE_CLIENT", "All accounts of a refund request belong to one client");
     }
   }
 

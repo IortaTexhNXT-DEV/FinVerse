@@ -8,11 +8,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.remittance.RemittanceFixtures;
 import com.iortatechnxt.brokerverse.support.Api;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -177,7 +178,7 @@ class RemittanceApiIT {
     body.put("companyId", fx.company());
     body.put("invoiceNo", paid.getInvoiceNo());
     body.put("reasonCode", "OTHERS");
-    body.put("holdUntil", LocalDate.now().plusDays(5).toString());
+    body.put("holdUntil", BusinessClock.today(Clock.systemUTC()).plusDays(5).toString());
     body.put("submit", false);
     JsonNode hold =
         api.read(
@@ -194,7 +195,7 @@ class RemittanceApiIT {
                 "remarks",
                 "Changed",
                 "holdUntil",
-                LocalDate.now().plusDays(6).toString()))
+                BusinessClock.today(Clock.systemUTC()).plusDays(6).toString()))
         .andExpect(jsonPath("$.remarks").value("Changed"));
     api.doPost("mktcoll", url + "/submit", null)
         .andExpect(jsonPath("$.stage").value("FOR_APPROVAL"));
@@ -205,7 +206,9 @@ class RemittanceApiIT {
     api.doPost("mkttl", url + "/assign", Map.of("username", "remit"))
         .andExpect(jsonPath("$.assignedProcessor").value("remit"));
     api.doPost(
-            "mktcoll", url + "/extend", Map.of("holdUntil", LocalDate.now().plusDays(9).toString()))
+            "mktcoll",
+            url + "/extend",
+            Map.of("holdUntil", BusinessClock.today(Clock.systemUTC()).plusDays(9).toString()))
         .andExpect(jsonPath("$.stage").value("EXTENSION_FOR_APPROVAL"));
     api.doPost("mkttl", url + "/extension-decision", Map.of("approve", true))
         .andExpect(jsonPath("$.extensionCount").value(1));
@@ -218,7 +221,7 @@ class RemittanceApiIT {
     api.doGet("remit", url)
         .andExpect(jsonPath("$.requestNo").value(hold.get("requestNo").asText()));
 
-    body.put("holdUntil", LocalDate.now().plusDays(3).toString());
+    body.put("holdUntil", BusinessClock.today(Clock.systemUTC()).plusDays(3).toString());
     JsonNode draft =
         api.read(api.doPost("mktcoll", BASE + "/holds", body).andExpect(status().isCreated()));
     api.doPost("mktcoll", BASE + "/holds/" + draft.get("id").asLong() + "/cancel", null)
@@ -228,7 +231,7 @@ class RemittanceApiIT {
             BASE + "/holds/upload",
             "invoiceNo,reasonCode,holdUntil\nNO-SUCH,"
                 + "OTHERS,"
-                + LocalDate.now().plusDays(3)
+                + BusinessClock.today(Clock.systemUTC()).plusDays(3)
                 + "\n")
         .andExpect(jsonPath("$.failed").value(1));
   }

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails.Contact;
@@ -25,8 +26,8 @@ import com.iortatechnxt.brokerverse.party.service.PartyService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowViewService;
+import java.time.Clock;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +73,8 @@ class ClientOnboardingIT {
     Client verified = as.run("mkttl", () -> onboarding.verifyKyc(p.getId(), "ok"));
     assertThat(verified.getKycStatus()).isEqualTo(KycStatus.VERIFIED);
     assertThat(verified.getKycVerifiedBy()).isEqualTo("mkttl");
-    assertThat(verified.getKycReviewDue()).isEqualTo(LocalDate.now(ZoneOffset.UTC).plusMonths(36));
+    assertThat(verified.getKycReviewDue())
+        .isEqualTo(BusinessClock.today(Clock.systemUTC()).plusMonths(36));
 
     Client confirmed = as.run("ao", () -> onboarding.confirm(p.getId(), null));
     assertThat(confirmed.getStatus()).isEqualTo(ClientStatus.CONFIRMED);
@@ -236,7 +238,7 @@ class ClientOnboardingIT {
         new ClientDetails(
             ClientType.INDIVIDUAL,
             good.name(),
-            LocalDate.now(ZoneOffset.UTC).minusYears(10),
+            BusinessClock.today(Clock.systemUTC()).minusYears(10),
             good.identity(),
             good.contact(),
             good.marketSegment(),

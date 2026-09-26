@@ -349,7 +349,7 @@ class ProdReconIT {
     assertThat(after.getNextRunDate()).isAfter(due);
     assertThat(after.getLastRunAt()).isNotNull();
     assertThat(extractJob.name()).isEqualTo("PRODUCTION_EXTRACT");
-    assertThat(extractJob.description()).contains("PRCID.001");
+    assertThat(extractJob.description()).contains("production register");
   }
 
   @Test

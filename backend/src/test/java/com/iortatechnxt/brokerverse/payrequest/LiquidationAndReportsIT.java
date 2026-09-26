@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.PayoutDetails;
 import com.iortatechnxt.brokerverse.crm.domain.PayoutMode;
 import com.iortatechnxt.brokerverse.crm.service.ClientPayoutAccounts;
@@ -28,7 +29,7 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -79,7 +80,7 @@ class LiquidationAndReportsIT {
 
   private static ExpenseValues day(String perDiem, String transport) {
     return new ExpenseValues(
-        LocalDate.now(),
+        BusinessClock.today(Clock.systemUTC()),
         "Client visit",
         new BigDecimal(perDiem),
         BigDecimal.ZERO,
@@ -159,8 +160,8 @@ class LiquidationAndReportsIT {
     Map<String, String> params =
         Map.of(
             "companyId", String.valueOf(fx.company()),
-            "from", LocalDate.now().minusDays(1).toString(),
-            "to", LocalDate.now().plusDays(1).toString(),
+            "from", BusinessClock.today(Clock.systemUTC()).minusDays(1).toString(),
+            "to", BusinessClock.today(Clock.systemUTC()).plusDays(1).toString(),
             "kind", "ALL");
     String csv =
         as.run(
@@ -182,8 +183,8 @@ class LiquidationAndReportsIT {
                             "PRQ-STATUS",
                             Map.of(
                                 "companyId", String.valueOf(fx.company()),
-                                "from", LocalDate.now().toString(),
-                                "to", LocalDate.now().toString(),
+                                "from", BusinessClock.today(Clock.systemUTC()).toString(),
+                                "to", BusinessClock.today(Clock.systemUTC()).toString(),
                                 "kind", "CASH_ADVANCE")))
                 .code())
         .isEqualTo("PRQ-STATUS");

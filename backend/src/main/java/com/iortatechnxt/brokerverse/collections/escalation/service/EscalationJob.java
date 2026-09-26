@@ -66,7 +66,7 @@ public class EscalationJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Escalates the accounts meeting the escalation rules and closes collected ones (BRCLXN.049)";
+    return "Escalates the accounts meeting the escalation rules and closes collected ones";
   }
 
   @Override

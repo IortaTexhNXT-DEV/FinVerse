@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.screening.watchlist.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.AliasType;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.EntryValues;
@@ -107,7 +108,7 @@ public class EntryValidator {
   }
 
   private LocalDate today() {
-    return LocalDate.now(clock);
+    return BusinessClock.today(clock);
   }
 
   private static boolean blank(String value) {

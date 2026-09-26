@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -113,9 +114,9 @@ public class AdjustmentDocuments {
     EndorsementRequest r = queries.get(id);
     if (r.getRequestClass() == RequestClass.INTERNAL) {
       throw new BusinessRuleException(
-          "ADJ_NO_SLIP_FOR_INTERNAL", "Internal adjustments have no endorsement slip (ADJID.015)");
+          "ADJ_NO_SLIP_FOR_INTERNAL", "Internal adjustments have no endorsement slip");
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     r.assignSlip(numbers.next("ES-" + today.getYear()));
     OpsInvoice invoice = ledger.require(r.getSubject().invoiceNo());
     Account account = accounts.requireByArn(r.getSubject().arn());
@@ -150,7 +151,7 @@ public class AdjustmentDocuments {
       throw new BusinessRuleException(
           "ADJ_NOT_VALIDATED", r.getRequestNo() + " has not passed validation yet");
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     Map<String, String> values = values(r, today);
     MergedText intro = templates.merge("VALIDATION_SLIP", today, values);
     DocumentSpec spec =

@@ -46,7 +46,7 @@ public class PackageExpiryReport implements ReportDefinition {
     return PmReportSupport.metadata(
         CODE,
         "Package Expiry Report",
-        "Released packages by package end date with their renewal status (BRPM.017)",
+        "Released packages by package end date with their renewal status",
         ParameterSpec.required(WITHIN, "Ending Within (days)", ParameterType.NUMBER)
             .withDefault(String.valueOf(DEFAULT_WITHIN)));
   }

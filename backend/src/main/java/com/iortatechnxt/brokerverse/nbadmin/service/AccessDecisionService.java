@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.alert.service.AlertService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestAction;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestRepository;
@@ -12,7 +13,6 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessUserType;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService.Decision;
 import java.time.Clock;
-import java.time.LocalDate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -186,8 +186,7 @@ public class AccessDecisionService {
       notifier.decided(r, "approved, for implementation");
       return new Decision(r, null);
     }
-    if (r.getEffectiveFrom() != null
-        && r.getEffectiveFrom().isAfter(LocalDate.now(clock.withZone(WorkingHours.ZONE)))) {
+    if (r.getEffectiveFrom() != null && r.getEffectiveFrom().isAfter(BusinessClock.today(clock))) {
       r.approve(AccessRequestStatus.SCHEDULED, approver, clock.instant(), note);
       history.record(r, action, from, note);
       notifier.decided(r, "approved, applies on " + r.getEffectiveFrom());

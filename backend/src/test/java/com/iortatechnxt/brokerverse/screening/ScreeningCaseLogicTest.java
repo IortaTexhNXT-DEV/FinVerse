@@ -87,6 +87,6 @@ class ScreeningCaseLogicTest {
     assertThat(new String(file, StandardCharsets.UTF_8)).isEqualTo("    S1A very lonX   BDOI\r\n");
     assertThat(StrFileWriter.extension(layout(StrFormat.FIXED))).isEqualTo("txt");
     assertThatThrownBy(() -> StrFileWriter.write(layout(StrFormat.XML), List.of()))
-        .hasMessageContaining("SQ09");
+        .hasMessageContaining("use CSV or FIXED");
   }
 }

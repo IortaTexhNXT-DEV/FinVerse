@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.screening;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ReportCategory;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
@@ -11,7 +12,7 @@ import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,9 +47,9 @@ class ScreeningReportsIT {
   private Map<String, String> params() {
     Map<String, String> p = new HashMap<>();
     p.put("companyId", String.valueOf(data.company().getId()));
-    p.put("fromDate", LocalDate.now().minusYears(1).toString());
-    p.put("toDate", LocalDate.now().plusDays(1).toString());
-    p.put("asOfDate", LocalDate.now().plusDays(1).toString());
+    p.put("fromDate", BusinessClock.today(Clock.systemUTC()).minusYears(1).toString());
+    p.put("toDate", BusinessClock.today(Clock.systemUTC()).plusDays(1).toString());
+    p.put("asOfDate", BusinessClock.today(Clock.systemUTC()).plusDays(1).toString());
     return p;
   }
 
@@ -89,7 +90,7 @@ class ScreeningReportsIT {
     assertThat(as.run(COMPLIANCE, () -> reports.run("SCR-AUDIT-LOG", byDisposition)).rows())
         .isNotEmpty();
     Map<String, String> reversed = params();
-    reversed.put("toDate", LocalDate.now().minusYears(2).toString());
+    reversed.put("toDate", BusinessClock.today(Clock.systemUTC()).minusYears(2).toString());
     assertThatThrownBy(() -> as.run(COMPLIANCE, () -> reports.run("SCR-CASE-STATUS", reversed)))
         .isNotNull();
     assertThatThrownBy(() -> as.run("ucc", () -> reports.run("SCR-AUDIT-LOG", params())))

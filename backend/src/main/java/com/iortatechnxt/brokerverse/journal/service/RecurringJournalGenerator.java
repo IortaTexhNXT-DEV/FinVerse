@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalLineRequest;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatchRepository;
@@ -188,7 +189,7 @@ public class RecurringJournalGenerator {
         t.getCompanyId(),
         t.getBranchId(),
         t.getJournalType(),
-        LocalDate.now(clock),
+        BusinessClock.today(clock),
         valueDate,
         t.getCurrency(),
         narration,

@@ -120,8 +120,7 @@ public final class LossReports {
       return ReportMetadata.claimsHandling(
           EXPERIENCE,
           "Loss Experience",
-          "Paid, outstanding and total loss per claim and insurer, by client and cover"
-              + " (BRCLM.030)",
+          "Paid, outstanding and total loss per claim and insurer, by client and cover",
           lossParameters());
     }
 
@@ -153,7 +152,7 @@ public final class LossReports {
           .presorted()
           .note(
               "Paid = settled amount; O/S = insurer reserve less paid while open, never below"
-                  + " zero (CLQ08).")
+                  + " zero.")
           .build();
     }
   }
@@ -184,7 +183,7 @@ public final class LossReports {
           RATIO,
           "Loss Ratio",
           "Losses over the premium of the cover and policy year, by client, product line or"
-              + " insurer (BRCLM.032)",
+              + " insurer",
           params);
     }
 
@@ -225,7 +224,7 @@ public final class LossReports {
           .rows(rows)
           .note(
               "Premium = signed gross premium of the ledger invoices of the cover and policy year"
-                  + " (originals, endorsements, cancellations; CLQ20).")
+                  + " (originals, endorsements, cancellations).")
           .build();
     }
 

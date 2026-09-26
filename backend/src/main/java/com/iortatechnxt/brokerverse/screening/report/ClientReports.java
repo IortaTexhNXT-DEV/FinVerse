@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.screening.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -42,7 +43,9 @@ public final class ClientReports {
   static final String LAST_PROFILE =
       " left join lateral (select p.category_code, p.risk_version_id, p.effective_at, p.source"
           + " from scr_client_risk_profile p where p.client_id = c.id"
-          + " and cast(p.effective_at at time zone 'Asia/Manila' as date) <= :asOfDate"
+          + " and cast(p.effective_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) <= :asOfDate"
           + " order by p.effective_at desc, p.id desc limit 1) lp on true";
 
   /** The latest case of a client (marketing unit, unit head, account officer). */
@@ -72,7 +75,9 @@ public final class ClientReports {
     private static final String SQL =
         "select * from (select coalesce(c.client_code, c.prospect_code) as client_code,"
             + " c.display_name, c.client_type, lp.category_code as risk_category, rc.tier,"
-            + " c.risk_rating, tg.tags, cast(lp.effective_at at time zone 'Asia/Manila' as date)"
+            + " c.risk_rating, tg.tags, cast(lp.effective_at at time zone '"
+            + BusinessClock.zoneId()
+            + "' as date)"
             + " as tagged_on, lp.source, coalesce(oc.open_case, 'None') as open_case,"
             + " case when exists (select 1 from acc_account a where a.client_id = c.id"
             + " and a.status in ('POLICY_ISSUED', 'BOOKED')) then 'Yes' else 'No' end as active_policy,"
@@ -166,7 +171,6 @@ public final class ClientReports {
           .rows(sql.rows(SQL, args))
           .presorted()
           .withoutGrandTotal()
-          .note(ScrReportSql.LAYOUT_NOTE)
           .build();
     }
   }
@@ -195,14 +199,18 @@ public final class ClientReports {
 
     private static final String SQL =
         "select * from (select coalesce(c.client_code, c.prospect_code) as client_code,"
-            + " c.display_name, cast(t.created_at at time zone 'Asia/Manila' as date) as pep_since,"
+            + " c.display_name, cast(t.created_at at time zone '"
+            + BusinessClock.zoneId()
+            + "' as date) as pep_since,"
             + " (select m.entry_name || ' (' || m.source_code || ')' from scr_match m"
             + " where m.client_id = c.id and m.list_type = 'PEP' and m.status <> 'FALSE_POSITIVE'"
             + " order by m.id desc limit 1) as matched_entry,"
             + " (select k.case_no || coalesce(' / ' || k.disposition, '') from scr_case k"
             + " where k.client_id = c.id order by k.id desc limit 1) as case_outcome,"
             + " case when rc.requires_edd then 'Yes' else 'No' end as edd_required,"
-            + " (select cast(k.closed_at at time zone 'Asia/Manila' as date) from scr_case k"
+            + " (select cast(k.closed_at at time zone '"
+            + BusinessClock.zoneId()
+            + "' as date) from scr_case k"
             + " where k.client_id = c.id and k.template_type = 'EDD' and k.status = 'CLOSED'"
             + " order by k.closed_at desc limit 1) as last_edd,"
             + " lc.marketing_unit,"
@@ -214,7 +222,9 @@ public final class ClientReports {
             + " and rc.code = lp.category_code"
             + LAST_CASE
             + " where c.company_id = :companyId and c.status <> 'INACTIVE'"
-            + " and cast(t.created_at at time zone 'Asia/Manila' as date) <= :asOfDate) r"
+            + " and cast(t.created_at at time zone '"
+            + BusinessClock.zoneId()
+            + "' as date) <= :asOfDate) r"
             + " where (cast(:marketingUnit as varchar) is null or r.marketing_unit = :marketingUnit)"
             + " order by r.display_name";
 
@@ -234,7 +244,7 @@ public final class ClientReports {
       return ReportMetadata.compliance(
           PEP,
           "List of Approved PEP Clients",
-          "Clients tagged PEP with the matched entry, case outcome and EDD (p.7)",
+          "Clients tagged PEP with the matched entry, case outcome and EDD",
           base());
     }
 
@@ -253,7 +263,6 @@ public final class ClientReports {
           .rows(sql.rows(SQL, args(p)))
           .presorted()
           .withoutGrandTotal()
-          .note(ScrReportSql.LAYOUT_NOTE)
           .build();
     }
   }

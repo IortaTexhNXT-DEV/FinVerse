@@ -42,7 +42,7 @@ public class CashieringJobs {
       @Value("${brokerverse.jobs.prebooked-rematch-cron:-}") String cron) {
     return new CashieringJob(
         PREBOOKED_REMATCH,
-        "Applies pre-booked payments whose account is now booked (CSHID.020)",
+        "Applies pre-booked payments whose account is now booked",
         cron,
         date -> {
           int n = service.rematchAll(date);
@@ -63,7 +63,7 @@ public class CashieringJobs {
       @Value("${brokerverse.jobs.payment-automatch-cron:-}") String cron) {
     return new CashieringJob(
         PAYMENT_AUTOMATCH,
-        "Matches unapplied payments again against booked invoices (CSHID.008)",
+        "Matches unapplied payments again against booked invoices",
         cron,
         date -> {
           int n = service.run(date);
@@ -83,7 +83,7 @@ public class CashieringJobs {
       PdcWarehouseService service, @Value("${brokerverse.jobs.pdc-maturity-cron:-}") String cron) {
     return new CashieringJob(
         PDC_MATURITY,
-        "Creates the payment and AR of post-dated checks at maturity (CSHID.008)",
+        "Creates the payment and AR of post-dated checks at maturity",
         cron,
         date -> {
           int n = service.mature(date);
@@ -104,7 +104,7 @@ public class CashieringJobs {
       @Value("${brokerverse.jobs.minimal-balance-sweep-cron:-}") String cron) {
     return new CashieringJob(
         MINIMAL_BALANCE_SWEEP,
-        "Reverses minimal premium balances and moves minimal excess to AP overages (CSHID.016)",
+        "Reverses minimal premium balances and moves minimal excess to AP overages",
         cron,
         date -> {
           Sweep sweep = service.sweep(date);

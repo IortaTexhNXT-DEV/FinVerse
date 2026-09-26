@@ -72,7 +72,7 @@ public final class BookOfAccountsReport implements ReportDefinition {
         "TAX-BOOK-" + book,
         "Books of Accounts - " + title,
         ReportCategory.TAX_STATUTORY,
-        "BIR book of accounts: " + title + " (FRBS 3.2.0, App. A VII)",
+        "BIR book of accounts: " + title,
         params,
         Permission.TAX_VIEW);
   }
@@ -112,9 +112,6 @@ public final class BookOfAccountsReport implements ReportDefinition {
               ReportColumn.amount(CREDIT, "Credit"))
           .rows(queries.journal(companyId, def, from, to));
     }
-    return builder
-        .note(
-            def.description() + "; posted entries in base currency, CAS format to confirm (AQ07).")
-        .build();
+    return builder.note(def.description() + "; posted entries in base currency.").build();
   }
 }

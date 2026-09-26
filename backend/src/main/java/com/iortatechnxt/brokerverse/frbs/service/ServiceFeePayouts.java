@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.accounting.service.AccountingEventPublisher;
 import com.iortatechnxt.brokerverse.accounting.service.BusinessEvent;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeLine;
 import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeLine.Ticket;
 import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeRun;
@@ -13,7 +14,6 @@ import com.iortatechnxt.brokerverse.opsledger.service.BookRates;
 import com.iortatechnxt.brokerverse.opsledger.service.port.DisbursementGateway;
 import com.iortatechnxt.brokerverse.opsledger.service.port.DisbursementGateway.DisbursementTicket;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -74,7 +74,7 @@ public class ServiceFeePayouts {
             ServiceFees.ACCRUAL_EVENT,
             run.getCompanyId(),
             line.getBranchId(),
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             line.getCurrency(),
             ServiceFees.MODULE,
             run.getRunNo() + ":" + line.getLineNo(),

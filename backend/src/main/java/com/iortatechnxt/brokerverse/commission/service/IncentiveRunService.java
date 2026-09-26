@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.domain.LovValue;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
@@ -122,10 +123,10 @@ public class IncentiveRunService {
     if (scheme.getTiers().isEmpty()) {
       throw new BusinessRuleException(
           "INCENTIVE_SCHEME_EMPTY",
-          "Scheme " + scheme.getName() + " has no tiers yet (targets and amounts from BDOI, OQ39)");
+          "Scheme " + scheme.getName() + " has no tiers yet (targets and amounts from BDOI)");
     }
     Set<String> rules =
-        lovs.activeValues("INCENTIVE_EXCLUSION_RULE", LocalDate.now(clock)).stream()
+        lovs.activeValues("INCENTIVE_EXCLUSION_RULE", BusinessClock.today(clock)).stream()
             .map(LovValue::getCode)
             .collect(Collectors.toSet());
     List<Candidate> candidates = new ArrayList<>();

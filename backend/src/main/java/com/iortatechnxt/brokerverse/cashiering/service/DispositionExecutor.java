@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
 import com.iortatechnxt.brokerverse.cashiering.service.ApplicationService.ApplyOptions;
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringPosting.PostingContext;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
@@ -21,7 +22,6 @@ import com.iortatechnxt.brokerverse.opsledger.service.port.DisbursementGateway;
 import com.iortatechnxt.brokerverse.opsledger.service.port.DisbursementGateway.DisbursementTicket;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -202,7 +202,7 @@ public class DispositionExecutor {
                 new Application.Origin(
                     item.getReceiptId(), item.getId(), ApplicationSource.DISPOSITION, ref),
                 new ApplyOptions(
-                    LocalDate.now(clock), d.getAction() == DispositionAction.DST_APPLY, null))
+                    BusinessClock.today(clock), d.getAction() == DispositionAction.DST_APPLY, null))
             .orElseThrow(
                 () ->
                     new BusinessRuleException(
@@ -281,7 +281,7 @@ public class DispositionExecutor {
     return new PostingContext(
         item.getCompanyId(),
         item.getBranchId(),
-        LocalDate.now(clock),
+        BusinessClock.today(clock),
         item.getCurrency(),
         item.getReference(),
         item.getClientCode(),

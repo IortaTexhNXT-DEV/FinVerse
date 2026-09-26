@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.BatchPrintService;
 import com.iortatechnxt.brokerverse.cashiering.service.PdcWarehouseService;
 import com.iortatechnxt.brokerverse.cashiering.service.PickupService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -133,7 +134,7 @@ public class CheckController {
   @PostMapping("/pdc/mature")
   @PreAuthorize(CashAccess.UPLOAD)
   public Map<String, Integer> mature() {
-    return Map.of("matured", pdcs.mature(LocalDate.now(clock)));
+    return Map.of("matured", pdcs.mature(BusinessClock.today(clock)));
   }
 
   /**

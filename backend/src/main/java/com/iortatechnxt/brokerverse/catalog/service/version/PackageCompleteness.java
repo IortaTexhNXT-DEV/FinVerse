@@ -56,7 +56,7 @@ public final class PackageCompleteness {
     if (product.getCoverTypeCode() == null || !basic) {
       throw new BusinessRuleException(
           "PACKAGE_HIERARCHY_INCOMPLETE",
-          "The package needs its cover type and at least one included basic coverage (PMADD01)");
+          "The package needs its cover type and at least one included basic coverage");
     }
   }
 

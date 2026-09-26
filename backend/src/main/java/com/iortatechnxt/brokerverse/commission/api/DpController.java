@@ -24,6 +24,7 @@ import com.iortatechnxt.brokerverse.commission.service.DpIntakeService;
 import com.iortatechnxt.brokerverse.commission.service.DpItemFilter;
 import com.iortatechnxt.brokerverse.commission.service.DpListService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.Clock;
@@ -109,7 +110,7 @@ public class DpController {
       @RequestParam(required = false) LocalDate to,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "20") int size) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     return PageResponse.of(
         lists.lists(
             companyId,
@@ -391,7 +392,7 @@ public class DpController {
   }
 
   private BillingResponse view(DpBilling b) {
-    return BillingResponse.from(b, LocalDate.now(clock));
+    return BillingResponse.from(b, BusinessClock.today(clock));
   }
 
   private static String blank(String v) {

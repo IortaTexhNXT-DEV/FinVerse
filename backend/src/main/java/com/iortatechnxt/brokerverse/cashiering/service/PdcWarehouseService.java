@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.Inta
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -94,7 +95,7 @@ public class PdcWarehouseService {
             new PdcItem(
                 companyId,
                 branchId,
-                numbers.next("PDCW-" + LocalDate.now(clock).getYear()),
+                numbers.next("PDCW-" + BusinessClock.today(clock).getYear()),
                 check));
     audit.record(
         ENTITY,

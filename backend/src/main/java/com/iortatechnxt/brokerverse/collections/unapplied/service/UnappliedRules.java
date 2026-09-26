@@ -2,13 +2,13 @@ package com.iortatechnxt.brokerverse.collections.unapplied.service;
 
 import com.iortatechnxt.brokerverse.collections.common.service.LovAttributes;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.domain.LovValue;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -70,7 +70,7 @@ public class UnappliedRules {
    * @return rules
    */
   public List<Rule> active() {
-    return lovs.activeValues(LovAttributes.UPP_DISPOSITION, LocalDate.now(clock)).stream()
+    return lovs.activeValues(LovAttributes.UPP_DISPOSITION, BusinessClock.today(clock)).stream()
         .map(v -> rule(v.getCode(), v.getLabel()))
         .toList();
   }
@@ -82,7 +82,8 @@ public class UnappliedRules {
    * @return rule
    */
   public Rule require(String code) {
-    LovValue value = lovs.requireValid(LovAttributes.UPP_DISPOSITION, code, LocalDate.now(clock));
+    LovValue value =
+        lovs.requireValid(LovAttributes.UPP_DISPOSITION, code, BusinessClock.today(clock));
     return rule(value.getCode(), value.getLabel());
   }
 

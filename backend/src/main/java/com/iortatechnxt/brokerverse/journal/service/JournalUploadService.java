@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.coa.domain.BalanceSide;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalLineRequest;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalRequest;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
@@ -120,7 +121,7 @@ public class JournalUploadService {
     String uploadReference =
         commit
             ? newTransaction.execute(
-                s -> numbers.next(UPLOAD_PREFIX + LocalDate.now(clock).getYear()))
+                s -> numbers.next(UPLOAD_PREFIX + BusinessClock.today(clock).getYear()))
             : null;
     List<VoucherResult> results = new ArrayList<>();
     vouchers.forEach(

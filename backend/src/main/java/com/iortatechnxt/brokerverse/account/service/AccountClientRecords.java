@@ -2,10 +2,10 @@ package com.iortatechnxt.brokerverse.account.service;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.AccountRepository;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientRecord;
 import com.iortatechnxt.brokerverse.crm.service.ClientRecordsProvider;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,9 +36,7 @@ public class AccountClientRecords implements ClientRecordsProvider {
   private static ClientRecord record(Account a) {
     String insurer = a.getInsurerCode() == null ? "insurer to be selected" : a.getInsurerCode();
     LocalDate date =
-        a.getPeriodFrom() != null
-            ? a.getPeriodFrom()
-            : LocalDate.ofInstant(a.getCreatedAt(), ZoneOffset.UTC);
+        a.getPeriodFrom() != null ? a.getPeriodFrom() : BusinessClock.dateOf(a.getCreatedAt());
     return new ClientRecord(
         "Account",
         a.getArn(),

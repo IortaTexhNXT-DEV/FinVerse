@@ -8,9 +8,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +38,7 @@ class ClaimsHandlingApiIT {
   }
 
   private Map<String, Object> recordBody(String arn) {
-    LocalDate today = LocalDate.now();
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     Map<String, Object> loss = new HashMap<>();
     loss.put("lossDate", today.minusDays(2).toString());
     loss.put("reportedDate", today.minusDays(1).toString());
@@ -77,7 +79,7 @@ class ClaimsHandlingApiIT {
                 + "/claim-draft"
                 + c()
                 + "&policyYear=1&lossDate="
-                + LocalDate.now())
+                + BusinessClock.today(Clock.systemUTC()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.premium.status").value("UNPAID"))
         .andExpect(jsonPath("$.insurers.length()").value(2))
@@ -142,7 +144,11 @@ class ClaimsHandlingApiIT {
     api.doPost(
             OFFICER,
             one + "/reported-date" + c(),
-            Map.of("reportedDate", LocalDate.now().toString(), "reason", "DATA_CORRECTION"))
+            Map.of(
+                "reportedDate",
+                BusinessClock.today(Clock.systemUTC()).toString(),
+                "reason",
+                "DATA_CORRECTION"))
         .andExpect(status().isOk());
     api.doPost(OFFICER, one + "/premium-check" + c(), Map.of())
         .andExpect(status().isOk())
@@ -157,7 +163,7 @@ class ClaimsHandlingApiIT {
             one + "/updates" + c(),
             Map.of(
                 "updateDate",
-                LocalDate.now().toString(),
+                BusinessClock.today(Clock.systemUTC()).toString(),
                 "source",
                 "EMAIL",
                 "remarks",
@@ -199,7 +205,7 @@ class ClaimsHandlingApiIT {
             one + "/loss" + c(),
             Map.of(
                 "lossDate",
-                LocalDate.now().minusDays(2).toString(),
+                BusinessClock.today(Clock.systemUTC()).minusDays(2).toString(),
                 "lossNature",
                 "FIRE",
                 "claimType",

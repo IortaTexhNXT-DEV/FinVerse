@@ -102,7 +102,7 @@ public class SoaDocument {
                     AMOUNT_COLUMNS),
                 new Text(text.title(), text.text())),
             List.of("Prepared by"),
-            text.versionTag() + " - billing is for monitoring only (BRCLXN.060)");
+            text.versionTag() + " - billing is for monitoring only");
     return composer.pdf(spec);
   }
 

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.remittance.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
@@ -41,10 +42,7 @@ public class RemittanceReportSql {
   /** "Any" option of the select filters. */
   static final String ALL = "ALL";
 
-  /** Note on draft layouts. */
-  static final String DRAFT_NOTE = "Draft layout - fields to confirm with BDOI (OQ42).";
-
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  private static final ZoneId MANILA = BusinessClock.zone();
 
   private final NamedParameterJdbcTemplate jdbc;
 

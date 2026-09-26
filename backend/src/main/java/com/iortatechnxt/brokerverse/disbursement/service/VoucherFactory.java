@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.domain.IntakeRequest;
 import com.iortatechnxt.brokerverse.disbursement.domain.Payee;
 import com.iortatechnxt.brokerverse.disbursement.domain.PayeeAccount;
@@ -88,7 +89,7 @@ public class VoucherFactory {
    * @return the voucher
    */
   public Voucher create(IntakeRequest request, Payee payee, boolean straight) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     Optional<BankAccount> paying =
         banks.listActive(request.getCompanyId(), request.getCurrency()).stream().findFirst();
     Voucher v =

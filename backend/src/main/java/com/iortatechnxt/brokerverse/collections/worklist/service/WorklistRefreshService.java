@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.collections.common.domain.FieldChange.Target
 import com.iortatechnxt.brokerverse.collections.common.service.ChangeRecorder;
 import com.iortatechnxt.brokerverse.collections.common.service.ClxSettings;
 import com.iortatechnxt.brokerverse.collections.common.service.CollectionItems;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.opsledger.service.LedgerSearch;
@@ -148,7 +149,7 @@ public class WorklistRefreshService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public Optional<CollectionItem> refreshInvoice(String invoiceNo) {
     Optional<CollectionItem> item = refresh(invoiceNo);
-    item.ifPresent(i -> assignments.assignByRules(i, LocalDate.now(clock)));
+    item.ifPresent(i -> assignments.assignByRules(i, BusinessClock.today(clock)));
     return item;
   }
 
@@ -159,7 +160,7 @@ public class WorklistRefreshService {
     }
     OpsInvoice inv = invoice.get();
     inv.loadCollections();
-    apply(inv, context(LocalDate.now(clock)));
+    apply(inv, context(BusinessClock.today(clock)));
     return items.findByCompanyIdAndInvoiceNo(inv.getCompanyId(), invoiceNo);
   }
 

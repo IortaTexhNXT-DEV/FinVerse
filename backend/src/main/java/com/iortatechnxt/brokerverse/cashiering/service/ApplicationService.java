@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.CashReceiptRepository;
 import com.iortatechnxt.brokerverse.cashiering.service.ApplicationPlanner.InvoiceBalances;
 import com.iortatechnxt.brokerverse.cashiering.service.ApplicationPlanner.Plan;
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringPosting.PostingContext;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.Money;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
@@ -206,7 +207,7 @@ public class ApplicationService {
   public void reverse(Application app, OpsInvoice invoice, Reversal reversal) {
     String reversalRef = reversal.ref();
     String reason = reversal.reason();
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     Map<LedgerComponent, BigDecimal> allocation = app.allocation();
     Map<String, BigDecimal> amounts = new LinkedHashMap<>();
     amounts.put("APPLIED", app.getAmount().negate());

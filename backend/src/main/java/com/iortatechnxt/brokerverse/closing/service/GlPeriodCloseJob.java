@@ -39,7 +39,7 @@ public class GlPeriodCloseJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Runs the scheduled month-end closes that are due (FRBS 2.6.0)";
+    return "Runs the scheduled month-end closes that are due";
   }
 
   @Override

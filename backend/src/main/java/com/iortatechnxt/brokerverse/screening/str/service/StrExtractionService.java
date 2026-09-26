@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ReportArchiveService;
 import com.iortatechnxt.brokerverse.report.domain.ReportRun.RunFile;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseEvent.EventFacts;
@@ -51,7 +52,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class StrExtractionService {
 
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  private static final ZoneId MANILA = BusinessClock.zone();
 
   private final StrRepository strs;
   private final StrExtractionRepository extractions;
@@ -149,7 +150,7 @@ public class StrExtractionService {
       throw new BusinessRuleException(
           "SCR_NOTHING_TO_EXTRACT", "No committee-approved STR to extract");
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     StrLayout layout =
         config
             .strLayout(companyId, today)
@@ -244,7 +245,7 @@ public class StrExtractionService {
         "COMMITTEE_DATE",
         str.getCommitteeDecidedAt() == null
             ? ""
-            : LocalDate.ofInstant(str.getCommitteeDecidedAt(), MANILA).toString());
+            : BusinessClock.dateOf(str.getCommitteeDecidedAt()).toString());
     return row;
   }
 

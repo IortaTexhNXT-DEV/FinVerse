@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.remittance.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
@@ -21,8 +22,13 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // holder of the reports
 public final class RemittanceControlReports {
 
+  /** Business date of a timestamp within the report period. */
+  private static final String BUSINESS_DAY_IN_PERIOD =
+      "at time zone '" + BusinessClock.zoneId() + "' as date) between :from and :to";
+
   private static final String PERIOD_FILTER =
-      " and cast(b.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+      " and cast(b.created_at "
+          + BUSINESS_DAY_IN_PERIOD
           + " and (cast(:insurer as varchar) is null or b.insurer_code = :insurer)";
   private static final String INVOICE_NO = "invoice_no";
   private static final String INVOICE = "Invoice Number";
@@ -66,7 +72,7 @@ public final class RemittanceControlReports {
       return RemittanceReportSql.metadata(
           "REM-REMITTED-BATCH",
           "List of Remitted Accounts with Batch Number",
-          "Accounts of the approved remittance batches with DV and insurer OR (RMTID.039)",
+          "Accounts of the approved remittance batches with DV and insurer OR",
           true);
     }
 
@@ -87,7 +93,6 @@ public final class RemittanceControlReports {
           .groupBy(BATCH, BATCH_LABEL)
           .rows(sql.rows(SQL, RemittanceReportSql.args(p)))
           .presorted()
-          .note(RemittanceReportSql.DRAFT_NOTE)
           .build();
     }
   }
@@ -104,7 +109,8 @@ public final class RemittanceControlReports {
             + " from rem_extraction_tag t left join rem_extraction_run r on r.id = t.run_id"
             + " where t.company_id = :companyId"
             + " and (t.reasons like '%PAID_AR_OVER_DTIP%' or t.remarks like 'Paid AR capped%')"
-            + " and cast(t.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+            + " and cast(t.created_at "
+            + BUSINESS_DAY_IN_PERIOD
             + " and (cast(:insurer as varchar) is null or t.insurer_code = :insurer)"
             + " order by t.id";
 
@@ -124,7 +130,7 @@ public final class RemittanceControlReports {
       return RemittanceReportSql.metadata(
           "REM-PAIDAR-OVER-DTIP",
           "Paid AR Higher than DTIP Balance",
-          "Invoices whose paid AR exceeded the DTIP balance at extraction (RMTID.014/015, OQ19)",
+          "Invoices whose paid AR exceeded the DTIP balance at extraction",
           true);
     }
 
@@ -180,7 +186,7 @@ public final class RemittanceControlReports {
       return RemittanceReportSql.metadata(
           "REM-OR-EXCEPTION",
           "OR vs Paid PR Exception Report",
-          "Insurer OR amounts compared with the paid AR per account, per upload (RMTID.016)",
+          "Insurer OR amounts compared with the paid AR per account, per upload",
           true,
           ParameterSpec.select(
               STATUS,
@@ -224,14 +230,16 @@ public final class RemittanceControlReports {
             + " l.excluded_by as by_user, l.excluded_at as on_date, l.paid_ar"
             + " from rem_batch_line l join rem_batch b on b.id = l.batch_id"
             + " where b.company_id = :companyId and l.excluded"
-            + " and cast(l.excluded_at at time zone 'Asia/Manila' as date) between :from and :to"
+            + " and cast(l.excluded_at "
+            + BUSINESS_DAY_IN_PERIOD
             + " and (cast(:insurer as varchar) is null or b.insurer_code = :insurer)"
             + " union all"
             + " select 'Not extracted', r.run_no, t.invoice_no, t.insurer_code, t.reasons, t.remarks,"
             + " t.created_by, t.created_at, t.paid_ar"
             + " from rem_extraction_tag t left join rem_extraction_run r on r.id = t.run_id"
             + " where t.company_id = :companyId and t.tag = 'UNEXTRACTED_DUE'"
-            + " and cast(t.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+            + " and cast(t.created_at "
+            + BUSINESS_DAY_IN_PERIOD
             + " and (cast(:insurer as varchar) is null or t.insurer_code = :insurer)"
             + " order by 1, 8";
 
@@ -252,7 +260,7 @@ public final class RemittanceControlReports {
           "REM-EXCLUDED",
           "Accounts Excluded from Remittance",
           "Invoices excluded from batches or not extracted: hold, pending negative adjustment,"
-              + " write-off, check holding, over DTIP (RMTID.002/020/022/031)",
+              + " write-off, check holding, over DTIP",
           true);
     }
 
@@ -284,7 +292,8 @@ public final class RemittanceControlReports {
             + " h.reason_code, h.hold_until, h.extension_count, h.stage, h.requested_by,"
             + " h.approved_by, h.assigned_processor, h.source, h.released_at"
             + " from rem_hold_request h where h.company_id = :companyId"
-            + " and cast(h.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+            + " and cast(h.created_at "
+            + BUSINESS_DAY_IN_PERIOD
             + " and (cast(:insurer as varchar) is null or h.insurer_code = :insurer)"
             + " order by h.stage, h.hold_until, h.id";
 
@@ -304,7 +313,7 @@ public final class RemittanceControlReports {
       return RemittanceReportSql.metadata(
           "REM-HOLD",
           "Remittance Hold Register",
-          "Hold requests with status, hold-until date, extensions and assignment (RMTID.021/032)",
+          "Hold requests with status, hold-until date, extensions and assignment",
           true);
     }
 

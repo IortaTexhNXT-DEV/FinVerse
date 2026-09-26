@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbreport.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
@@ -44,7 +45,9 @@ public class StageOutcomeReport implements ReportDefinition {
           + " from wf_stage s"
           + " left join (wf_case_history h join wf_case c on c.id = h.case_id"
           + " and c.company_id = :company and c.workflow_code = 'NB_ACCOUNT'"
-          + " and cast(h.occurred_at at time zone 'Asia/Manila' as date) between :from and :to)"
+          + " and cast(h.occurred_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to)"
           + " on h.to_stage = s.stage_code or h.from_stage = s.stage_code"
           + " where s.workflow_code = 'NB_ACCOUNT'"
           + " group by s.workflow_code, s.stage_code, s.sort_order, s.name"
@@ -62,7 +65,9 @@ public class StageOutcomeReport implements ReportDefinition {
           + " count(r.id) filter (where r.status = 'VALID') as open"
           + " from bulk_job j join bulk_row r on r.job_id = j.id"
           + " where j.company_id = :company"
-          + " and cast(j.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+          + " and cast(j.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to"
           + " group by j.handler_code order by j.handler_code";
 
   private final NbReportJdbc jdbc;
@@ -82,7 +87,7 @@ public class StageOutcomeReport implements ReportDefinition {
         CODE,
         "Successful and Fall-out Accounts per Stage",
         "Accounts entering, passing, returned, voided or cancelled per stage, and bulk upload"
-            + " rejects and duplicate fall-outs (BRNB.075)",
+            + " rejects and duplicate fall-outs",
         Permission.ACCOUNT_VIEW,
         true);
   }

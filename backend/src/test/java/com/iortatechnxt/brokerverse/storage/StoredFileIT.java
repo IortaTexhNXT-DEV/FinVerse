@@ -18,6 +18,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.storage.FileStore;
 import com.iortatechnxt.brokerverse.common.storage.LocalFileStore;
 import com.iortatechnxt.brokerverse.common.storage.ObjectKeys;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.Sha256;
 import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
 import com.iortatechnxt.brokerverse.storage.domain.StoredFile;
@@ -32,9 +33,9 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.StorageTestOwnerAccess;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -92,7 +93,7 @@ class StoredFileIT {
   }
 
   private static LocalDate today() {
-    return LocalDate.now(ZoneOffset.UTC);
+    return BusinessClock.today(Clock.systemUTC());
   }
 
   @Test

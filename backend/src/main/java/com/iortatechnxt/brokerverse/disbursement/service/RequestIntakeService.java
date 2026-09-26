@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.Money;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeRequestSource;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.RequestSource;
@@ -26,7 +27,6 @@ import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest.Status;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest.Type;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Optional;
 import org.springframework.context.event.EventListener;
@@ -162,7 +162,7 @@ public class RequestIntakeService {
     if (!Money.isPositive(facts.amount())) {
       throw new BusinessRuleException("DISB_AMOUNT", "A payment request needs a positive amount");
     }
-    lovs.requireValid("DISBURSEMENT_TYPE", facts.disbursementType(), LocalDate.now(clock));
+    lovs.requireValid("DISBURSEMENT_TYPE", facts.disbursementType(), BusinessClock.today(clock));
     if (facts.sourceRef() != null
         && requests
             .findBySourceModuleAndSourceRef(facts.sourceModule(), facts.sourceRef())
@@ -177,7 +177,7 @@ public class RequestIntakeService {
     IntakeRequest saved =
         requests.save(
             new IntakeRequest(
-                numbers.next(DisbursementSettings.series("DSR", LocalDate.now(clock))),
+                numbers.next(DisbursementSettings.series("DSR", BusinessClock.today(clock))),
                 facts,
                 clock.instant()));
     audit.record(
@@ -333,7 +333,7 @@ public class RequestIntakeService {
    * @return the request
    */
   public IntakeRequest returnToSource(Long id, String reasonCode, String comment) {
-    lovs.requireValid(RETURN_LOV, reasonCode, LocalDate.now(clock));
+    lovs.requireValid(RETURN_LOV, reasonCode, BusinessClock.today(clock));
     IntakeRequest r = get(id);
     if (r.getVoucherId() != null) {
       throw new BusinessRuleException(

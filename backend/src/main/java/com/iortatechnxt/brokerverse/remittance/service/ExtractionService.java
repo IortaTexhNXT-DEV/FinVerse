@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.opsledger.domain.ExtractFile;
@@ -293,7 +294,7 @@ public class ExtractionService {
   @Transactional
   public EodRequest queueForEndOfDay(Long companyId, String invoiceNo) {
     OpsInvoice invoice = ledger.require(invoiceNo);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     return eod.findByInvoiceNoAndRequestedOn(invoice.getInvoiceNo(), today)
         .orElseGet(
             () -> {

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.crm.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.KycStatus;
 import com.iortatechnxt.brokerverse.crm.service.KycDueQuery;
@@ -15,7 +16,6 @@ import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.TabularReportBuilder;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
-import java.time.ZoneOffset;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +61,7 @@ public class KycReviewDueReport implements ReportDefinition {
         CODE,
         "KYC Reviews Due",
         ReportCategory.CONTROL,
-        "Clients whose periodic KYC review is overdue or falls due by the date (BRNB.110)",
+        "Clients whose periodic KYC review is overdue or falls due by the date",
         List.of(
             ParameterSpec.required("companyId", "Company", ParameterType.COMPANY),
             ParameterSpec.optional("dueBy", "Due By", ParameterType.DATE),
@@ -115,9 +115,7 @@ public class KycReviewDueReport implements ReportDefinition {
     m.put("risk", lovs.label("KYC_RISK_RATING", c.getRiskRating()));
     m.put(
         "verified",
-        c.getKycVerifiedAt() == null
-            ? null
-            : c.getKycVerifiedAt().atZone(ZoneOffset.UTC).toLocalDate());
+        c.getKycVerifiedAt() == null ? null : BusinessClock.dateOf(c.getKycVerifiedAt()));
     m.put("due", c.getKycReviewDue());
     m.put("state", c.getKycStatus() == KycStatus.EXPIRED ? "Overdue (expired)" : "Due");
     return m;

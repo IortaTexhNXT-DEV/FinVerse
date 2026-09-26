@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.journal.api;
 
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.service.JournalUploadService;
 import com.iortatechnxt.brokerverse.journal.service.JournalUploadTemplate;
 import com.iortatechnxt.brokerverse.journal.service.UploadResult;
@@ -73,7 +74,7 @@ public class JournalUploadController {
   @PreAuthorize("hasAuthority('JOURNAL_CREATE')")
   public ResponseEntity<byte[]> template(@RequestParam(defaultValue = "csv") String format) {
     boolean excel = "xlsx".equals(format);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     byte[] body = excel ? JournalUploadTemplate.xlsx(today) : JournalUploadTemplate.csv(today);
     String name = "journal-upload-template." + (excel ? "xlsx" : "csv");
     return ResponseEntity.ok()

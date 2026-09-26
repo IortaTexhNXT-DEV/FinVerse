@@ -93,7 +93,7 @@ public class AccountStatusReport implements ReportDefinition {
     return NbReportSupport.metadata(
         CODE,
         "Account Status Report",
-        "Current status per account with stage age, SLA breach and stalled flag (BRNB.075/115)",
+        "Current status per account with stage age, SLA breach and stalled flag",
         Permission.ACCOUNT_VIEW,
         false,
         ParameterSpec.select(STATUS, "Status", STATUSES, NbReportSupport.ALL),

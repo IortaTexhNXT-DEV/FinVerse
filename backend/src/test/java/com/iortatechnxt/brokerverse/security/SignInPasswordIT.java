@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.service.PasswordExpiryNoticeJob;
 import com.iortatechnxt.brokerverse.security.api.dto.UserRequest;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
@@ -15,7 +16,7 @@ import com.iortatechnxt.brokerverse.security.service.directory.AuthMode;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -192,7 +193,7 @@ class SignInPasswordIT {
   void usersWhosePasswordExpiresSoonAreTold() {
     String username = newUser("expiry-" + IDS.get() + "@example.ph");
     ageThePassword(username, 85);
-    expiryJob.execute(LocalDate.now());
+    expiryJob.execute(BusinessClock.today(Clock.systemUTC()));
     assertThat(
             jdbc.queryForObject(
                 "select count(*) from msg_notification where recipient = ?"

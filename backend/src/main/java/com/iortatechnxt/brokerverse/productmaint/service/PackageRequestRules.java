@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQueryService;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionView;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
@@ -68,7 +69,7 @@ public class PackageRequestRules {
    * @return header and cleaned terms
    */
   public Checked check(Long companyId, RequestDraft draft) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     if (draft.title() == null || draft.title().isBlank()) {
       throw new BusinessRuleException(INCOMPLETE, "Enter the package or programme name");
     }
@@ -147,7 +148,7 @@ public class PackageRequestRules {
     }
     if (draft.clientId() == null) {
       throw new BusinessRuleException(
-          INCOMPLETE, "Select the client of the client-specific package (PQ14)");
+          INCOMPLETE, "Select the client of the client-specific package");
     }
     Client c = clients.requireUsable(draft.clientId());
     return new ClientRef(c.getId(), c.getCode(), c.getDisplayName());

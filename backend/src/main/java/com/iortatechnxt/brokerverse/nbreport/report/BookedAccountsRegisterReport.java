@@ -62,8 +62,7 @@ public class BookedAccountsRegisterReport implements ReportDefinition {
     return NbReportSupport.metadata(
         CODE,
         "Booked Accounts Register",
-        "Invoices booked in the period with premium, commission and cost center"
-            + " (BRNB.027/075/108)",
+        "Invoices booked in the period with premium, commission and cost center",
         Permission.ACCOUNT_VIEW,
         true,
         ParameterSpec.select(

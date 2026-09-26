@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -107,7 +108,7 @@ public class InsurerClaimService {
     InsurerClaim created =
         new InsurerClaim(
             claim.getCompanyId(), claim.getId(), insurer, line.sharePct(), line.reserve());
-    created.number(number, line.reportedOn(), LocalDate.now(clock));
+    created.number(number, line.reportedOn(), BusinessClock.today(clock));
     InsurerClaim saved = lines.save(created);
     audit.record(
         ClaimCodes.ENTITY_TYPE,
@@ -141,7 +142,7 @@ public class InsurerClaimService {
           claim, new NewLine(line.getInsurerCode(), null, value, reportedOn, null), confirmReuse);
     }
     checkNumber(claim, line.getInsurerCode(), value, line.getId(), confirmReuse);
-    line.number(value, reportedOn, LocalDate.now(clock));
+    line.number(value, reportedOn, BusinessClock.today(clock));
     audit.record(
         ClaimCodes.ENTITY_TYPE,
         claim.getClaimNo(),
@@ -221,7 +222,7 @@ public class InsurerClaimService {
     if (adjusterCode == null || adjusterCode.isBlank()) {
       throw new BusinessRuleException("BCL_ADJUSTER_REQUIRED", "Select the adjuster");
     }
-    lovs.requireValid(ClaimCodes.LOV_ADJUSTER, adjusterCode, LocalDate.now(clock));
+    lovs.requireValid(ClaimCodes.LOV_ADJUSTER, adjusterCode, BusinessClock.today(clock));
     String previous = line.assignAdjuster(adjusterCode);
     audit.record(
         ClaimCodes.ENTITY_TYPE,

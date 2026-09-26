@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.placement.domain.EvidenceKind;
 import com.iortatechnxt.brokerverse.placement.domain.GateRule;
@@ -19,7 +20,6 @@ import com.iortatechnxt.brokerverse.placement.domain.PaymentEvidenceRepository;
 import com.iortatechnxt.brokerverse.placement.domain.PaymentGateRule;
 import com.iortatechnxt.brokerverse.placement.domain.PaymentGateRuleRepository;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -144,7 +144,7 @@ public class PaymentGateService {
           "GATE_REQUIRES_PAYMENT",
           "Account " + arn + " must be paid: match its payment from a payment report");
     }
-    lovs.requireValid(CHANNEL_LOV, confirmation.channel(), LocalDate.now(clock));
+    lovs.requireValid(CHANNEL_LOV, confirmation.channel(), BusinessClock.today(clock));
     PaymentEvidence saved =
         record(
             account,

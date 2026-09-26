@@ -1,9 +1,9 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -76,11 +76,11 @@ public final class RetentionQueries {
    * Date of the last change of a record.
    *
    * @param entity record
-   * @return update date, else creation date (UTC)
+   * @return business date of the update, else of the creation
    */
   public static LocalDate lastActivity(BaseEntity entity) {
     Instant last = entity.getUpdatedAt() != null ? entity.getUpdatedAt() : entity.getCreatedAt();
-    return last.atZone(ZoneOffset.UTC).toLocalDate();
+    return BusinessClock.dateOf(last);
   }
 
   private static <E extends Enum<E>> Set<E> statuses(RetentionCriteria criteria, Class<E> type) {
@@ -93,7 +93,7 @@ public final class RetentionQueries {
   }
 
   private static <T, E> Specification<T> eligible(Set<E> statuses, LocalDate cutoff) {
-    Instant limit = cutoff.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC);
+    Instant limit = BusinessClock.startOf(cutoff.plusDays(1));
     return (root, query, cb) ->
         cb.and(
             root.get(STATUS).in(statuses),

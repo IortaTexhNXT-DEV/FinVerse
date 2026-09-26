@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.iortatechnxt.brokerverse.approval.service.ApprovalViewer;
 import com.iortatechnxt.brokerverse.approval.service.PendingApproval;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.screening.config.domain.ApproverKind;
 import com.iortatechnxt.brokerverse.screening.config.domain.Balancing;
 import com.iortatechnxt.brokerverse.screening.config.domain.ConfigStatus;
@@ -73,7 +74,7 @@ class ScreeningConfigIT {
   @Autowired private Clock clock;
 
   private LocalDate today() {
-    return LocalDate.now(clock);
+    return BusinessClock.today(clock);
   }
 
   private <T> T as(String user, Supplier<T> action) {

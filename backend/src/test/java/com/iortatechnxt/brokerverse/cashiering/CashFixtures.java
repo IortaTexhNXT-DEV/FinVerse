@@ -16,12 +16,13 @@ import com.iortatechnxt.brokerverse.cashiering.service.CashReceiptService.ArIssu
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.IntakeResult;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.IntakeTarget;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
@@ -131,7 +132,7 @@ public class CashFixtures {
                     List.of(),
                     new PaymentIntake.Payor(null, "Test Payor " + reference),
                     null,
-                    new PaymentIntake.Money(amount, "PHP", LocalDate.now()),
+                    new PaymentIntake.Money(amount, "PHP", BusinessClock.today(Clock.systemUTC())),
                     PaymentIntake.Tender.of(PaymentMode.CASH))));
   }
 
@@ -146,7 +147,7 @@ public class CashFixtures {
         company(),
         ho(),
         "AR_INSURANCE",
-        LocalDate.now(),
+        BusinessClock.today(Clock.systemUTC()),
         insurer,
         "Insurer payment",
         null,

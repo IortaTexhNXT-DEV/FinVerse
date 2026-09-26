@@ -41,9 +41,7 @@ public final class StrFileWriter {
     }
     throw new BusinessRuleException(
         "SCR_STR_FORMAT_PARKED",
-        "STR layout format "
-            + layout.format()
-            + " waits for the AMLC format (SQ09); use CSV or FIXED");
+        "STR layout format " + layout.format() + " waits for the AMLC format; use CSV or FIXED");
   }
 
   /**

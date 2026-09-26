@@ -45,7 +45,7 @@ class FormWorksheetTest {
             new BigDecimal("150.00"),
             new BigDecimal("20.00"),
             new BigDecimal("130.00"));
-    assertThat(lines.get(1).note()).contains("AQ07");
+    assertThat(lines.get(1).note()).isEqualTo("No account mapped yet");
     List<LineValue> loss =
         FormWorksheetService.calculate(
             List.of(

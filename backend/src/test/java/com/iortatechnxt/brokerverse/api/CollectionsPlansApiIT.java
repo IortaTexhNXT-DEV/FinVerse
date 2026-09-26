@@ -8,10 +8,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.JsonNode;
 import com.iortatechnxt.brokerverse.booking.domain.BookedInvoice;
 import com.iortatechnxt.brokerverse.collections.CollectionsPlanFixtures;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,7 +128,7 @@ class CollectionsPlansApiIT {
                 "frequency",
                 "QUARTERLY",
                 "firstDue",
-                LocalDate.now().toString(),
+                BusinessClock.today(Clock.systemUTC()).toString(),
                 "count",
                 4))
         .andExpect(status().isCreated())
@@ -146,7 +147,7 @@ class CollectionsPlansApiIT {
                 "entries",
                 List.of(
                     Map.of(
-                        "dueDate", LocalDate.now().toString(),
+                        "dueDate", BusinessClock.today(Clock.systemUTC()).toString(),
                         "amount", other.premiumBalance()))))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.source").value("MANUAL"));
@@ -168,7 +169,7 @@ class CollectionsPlansApiIT {
                         "invoiceNo",
                         no,
                         "promisedDate",
-                        LocalDate.now().plusDays(3).toString(),
+                        BusinessClock.today(Clock.systemUTC()).plusDays(3).toString(),
                         "amount",
                         "100.00"))
                 .andExpect(status().isCreated())
@@ -191,7 +192,7 @@ class CollectionsPlansApiIT {
             Map.of(
                 "companyId", company,
                 "invoiceNo", no,
-                "promisedDate", LocalDate.now().plusDays(3).toString()))
+                "promisedDate", BusinessClock.today(Clock.systemUTC()).plusDays(3).toString()))
         .andExpect(status().isForbidden());
 
     Map<String, Object> escalate = new HashMap<>();
@@ -231,7 +232,7 @@ class CollectionsPlansApiIT {
             Map.of(
                 "companyId", company,
                 "invoiceNos", List.of(no),
-                "promisedDate", LocalDate.now().plusDays(4).toString()))
+                "promisedDate", BusinessClock.today(Clock.systemUTC()).plusDays(4).toString()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].ok").value(true));
 
@@ -259,7 +260,9 @@ class CollectionsPlansApiIT {
     api.doPost("approver", RULES + "/" + ruleId + "/authorize", null)
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.recordStatus").value("ACTIVE"));
-    api.doGet("badmin", RULES + "/" + ruleId + "/matches?asOf=" + LocalDate.now())
+    api.doGet(
+            "badmin",
+            RULES + "/" + ruleId + "/matches?asOf=" + BusinessClock.today(Clock.systemUTC()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[?(@.invoiceNo == '" + no + "')]").exists());
     api.doGet(TEAM_LEAD, RULES + "?companyId=" + company)

@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
@@ -25,7 +26,6 @@ import com.iortatechnxt.brokerverse.workflow.service.WorkAssignmentService;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowViewService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -148,7 +148,7 @@ public class CorrectionService {
   }
 
   private Correction open(Long companyId, Draft draft, Long caseId) {
-    lovs.requireValid(KIND_LOV, draft.kind(), LocalDate.now(clock));
+    lovs.requireValid(KIND_LOV, draft.kind(), BusinessClock.today(clock));
     if (Acsl.blankToNull(draft.description()) == null) {
       throw new BusinessRuleException("ACSL_DESCRIPTION_REQUIRED", "Describe the correction");
     }
@@ -176,7 +176,7 @@ public class CorrectionService {
             .map(JournalBatch::getCurrency)
             .or(() -> invoice.map(OpsInvoice::getCurrency))
             .orElse(DEFAULT_CURRENCY);
-    String number = numbers.next("COR-" + LocalDate.now(clock).getYear());
+    String number = numbers.next("COR-" + BusinessClock.today(clock).getYear());
     Correction saved =
         corrections.save(
             new Correction(

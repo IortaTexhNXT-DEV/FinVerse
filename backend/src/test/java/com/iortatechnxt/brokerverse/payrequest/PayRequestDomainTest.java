@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.payrequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.ClientPayoutAccount;
 import com.iortatechnxt.brokerverse.crm.domain.PayoutMode;
 import com.iortatechnxt.brokerverse.payrequest.domain.DisbursementTrack;
@@ -14,8 +15,8 @@ import com.iortatechnxt.brokerverse.payrequest.domain.RequestTrail;
 import com.iortatechnxt.brokerverse.payrequest.domain.ValidationStatus;
 import com.iortatechnxt.brokerverse.payrequest.service.PayRequestRules;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -25,10 +26,15 @@ class PayRequestDomainTest {
   @Test
   void aRequestStartsInItsKindsFirstStageAndReleasesItsArsWhenCancelled() {
     PaymentRequest refund =
-        new PaymentRequest(1L, 1L, "RRF-2026-000001", RequestKind.REFUND, LocalDate.now());
+        new PaymentRequest(
+            1L, 1L, "RRF-2026-000001", RequestKind.REFUND, BusinessClock.today(Clock.systemUTC()));
     PaymentRequest cancel =
         new PaymentRequest(
-            1L, 1L, "CCR-2026-000001", RequestKind.CHECK_CANCELLATION, LocalDate.now());
+            1L,
+            1L,
+            "CCR-2026-000001",
+            RequestKind.CHECK_CANCELLATION,
+            BusinessClock.today(Clock.systemUTC()));
     assertThat(refund.getStage()).isEqualTo(RequestStage.DRAFT);
     assertThat(cancel.getStage()).isEqualTo(RequestStage.REQUESTED);
     assertThat(RequestKind.CHECK_CANCELLATION.pays()).isFalse();
@@ -63,7 +69,8 @@ class PayRequestDomainTest {
   @Test
   void aResentRequestGetsANewSourceReference() {
     PaymentRequest r =
-        new PaymentRequest(1L, 1L, "RRF-2026-000002", RequestKind.REFUND, LocalDate.now());
+        new PaymentRequest(
+            1L, 1L, "RRF-2026-000002", RequestKind.REFUND, BusinessClock.today(Clock.systemUTC()));
     assertThat(r.nextSendRef()).isEqualTo("RRF-2026-000002");
     assertThat(r.nextSendRef()).isEqualTo("RRF-2026-000002/2");
     assertThat(r.currentSendRef()).isEqualTo("RRF-2026-000002/2");

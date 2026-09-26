@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage.RecordLink;
 import com.iortatechnxt.brokerverse.messaging.service.MessageService;
@@ -30,7 +31,7 @@ public class PasswordNoticeMailer {
 
   private static final String ENTITY = "AppUser";
   private static final String PROFILE = "/profile";
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  private static final ZoneId MANILA = BusinessClock.zone();
   private static final DateTimeFormatter WHEN =
       DateTimeFormatter.ofPattern("d MMM yyyy HH:mm", Locale.ENGLISH);
 

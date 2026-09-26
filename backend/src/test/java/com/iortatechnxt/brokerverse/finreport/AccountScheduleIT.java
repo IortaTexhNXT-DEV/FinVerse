@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.finreport;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.finreport.domain.ScheduleColumn;
 import com.iortatechnxt.brokerverse.finreport.domain.ScheduleDefinition;
 import com.iortatechnxt.brokerverse.finreport.domain.ScheduleEnums.Basis;
@@ -27,8 +28,7 @@ import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.YearMonth;
+import java.time.Clock;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +55,7 @@ class AccountScheduleIT {
     Map<String, String> p = new HashMap<>();
     p.put("companyId", String.valueOf(ops.company()));
     p.put(AccountScheduleReport.SCHEDULE, schedule);
-    p.put("asOf", LocalDate.now().toString());
+    p.put("asOf", BusinessClock.today(Clock.systemUTC()).toString());
     return p;
   }
 
@@ -103,8 +103,10 @@ class AccountScheduleIT {
       }
       assertThat(buckets).isEqualByComparingTo((BigDecimal) row.cells().get("closing"));
     }
-    // Business wording: the draft-layout design note and its reference are not shown.
-    assertThat(r.notes()).isNotEmpty().noneMatch(n -> n.contains("AQ05") || n.contains("Draft"));
+    // Business wording: the layout note reads plainly, without its reference.
+    assertThat(r.notes())
+        .contains("Layout not yet confirmed by Financial Reporting")
+        .noneMatch(n -> n.contains("AQ05"));
   }
 
   @Test
@@ -144,7 +146,7 @@ class AccountScheduleIT {
     ReportRow firstRow =
         r.rows().stream().filter(x -> x.kind() == RowKind.DETAIL).findFirst().orElseThrow();
     String rowKey = String.valueOf(firstRow.cells().get("code"));
-    String period = YearMonth.now().toString();
+    String period = BusinessClock.currentMonth(Clock.systemUTC()).toString();
     CommentKey key = new CommentKey(ops.company(), code, period, rowKey);
     assertThat(as.run(OFFICER, () -> definitions.comment(key, "Higher collections")).getText())
         .isEqualTo("Higher collections");
@@ -191,7 +193,7 @@ class AccountScheduleIT {
   @Test
   void aPeriodStartingAfterItsEndIsRefused() {
     Map<String, String> p = params("GARD-OPEX");
-    p.put("fromDate", LocalDate.now().plusDays(1).toString());
+    p.put("fromDate", BusinessClock.today(Clock.systemUTC()).plusDays(1).toString());
     assertThatThrownBy(() -> as.run(OFFICER, () -> reports.run(AccountScheduleReport.CODE, p)))
         .isNotNull();
   }

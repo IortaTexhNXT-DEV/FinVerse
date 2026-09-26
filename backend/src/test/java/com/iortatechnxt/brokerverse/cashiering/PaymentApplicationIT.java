@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.Receipt;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.IntakeResult;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentPreviewService;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentPreviewService.Preview;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
@@ -20,7 +21,7 @@ import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,7 +128,11 @@ class PaymentApplicationIT {
             "cashier",
             () ->
                 preview.preview(
-                    fx.company(), List.of(invoice.getInvoiceNo()), due, null, LocalDate.now()));
+                    fx.company(),
+                    List.of(invoice.getInvoiceNo()),
+                    due,
+                    null,
+                    BusinessClock.today(Clock.systemUTC())));
     assertThat(p.match()).isEqualTo("BOOKED");
     assertThat(p.cwtWithheld()).isPositive();
     assertThat(p.excess()).isEqualByComparingTo(p.cwtWithheld());

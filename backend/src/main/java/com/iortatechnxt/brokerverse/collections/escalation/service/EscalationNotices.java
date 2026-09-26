@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.collections.escalation.domain.EscalationEnum
 import com.iortatechnxt.brokerverse.collections.escalation.service.EscalationCandidates.Candidate;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
@@ -12,7 +13,6 @@ import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.workflow.domain.WorkflowStage;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowDefinitions;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -94,7 +94,7 @@ public class EscalationNotices {
    * @param reasonCode reason
    */
   public void requireReason(String reasonCode) {
-    lovs.requireValid(REASON_LOV, reasonCode, LocalDate.now(clock));
+    lovs.requireValid(REASON_LOV, reasonCode, BusinessClock.today(clock));
   }
 
   /**

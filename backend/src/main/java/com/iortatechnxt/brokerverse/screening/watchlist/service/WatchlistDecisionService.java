@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.ChangeStatus;
@@ -160,7 +161,7 @@ public class WatchlistDecisionService {
   }
 
   private LocalDate today() {
-    return LocalDate.now(clock);
+    return BusinessClock.today(clock);
   }
 
   private static boolean blank(String value) {

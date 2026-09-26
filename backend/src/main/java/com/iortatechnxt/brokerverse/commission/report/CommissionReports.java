@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.commission.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
@@ -29,6 +30,11 @@ import org.springframework.context.annotation.Configuration;
 public class CommissionReports {
 
   private static final String COMPANY = "companyId";
+
+  /** Casts a timestamp to its business date. */
+  private static final String BUSINESS_DAY =
+      " at time zone '" + BusinessClock.zoneId() + "' as date)";
+
   private static final String FROM = "from";
   private static final String TO = "to";
   private static final String INSURER = "insurer";
@@ -51,8 +57,7 @@ public class CommissionReports {
         metadata(
             "CMR-COMMISSION-RECEIVABLE",
             "Commission Receivable - Direct Payment vs Regular",
-            "Commission booked, collected and outstanding, net of VAT and withholding tax, per insurer"
-                + " (CMRID.004)"),
+            "Commission booked, collected and outstanding, net of VAT and withholding tax, per insurer"),
         "select i.insurer_code as insurer,"
             + " case when i.dp_flag then 'Direct payment' else 'Regular' end as kind,"
             + " count(*) as invoices, sum(c.booked + c.adjusted) as commission,"
@@ -89,8 +94,7 @@ public class CommissionReports {
         metadata(
             "CMR-PRODUCTION-YEARLY",
             "Production per Branch and Insurer - Yearly",
-            "Total production and commission per branch, insurer and year, estimated items apart"
-                + " (CMRID.014, RMTID.037)"),
+            "Total production and commission per branch, insurer and year, estimated items apart"),
         "select coalesce(b.name, 'Unassigned') as branch, i.insurer_code as insurer,"
             + " cast(extract(year from i.booking_date) as varchar) as year, count(*) as invoices,"
             + " sum(i.gross_premium) as production, sum(i.commission) as commission,"
@@ -125,13 +129,15 @@ public class CommissionReports {
         metadata(
             "CMR-DP-STATUS",
             "Direct Payment Accounts per Status",
-            "DP accounts received in the period by tag, with billing, feedback and OR (CMRID.008)"),
+            "DP accounts received in the period by tag, with billing, feedback and OR"),
         "select d.tag, d.insurer_code as insurer, d.branch_code as branch, d.invoice_no,"
             + " d.assured_name as assured, d.sanitation, d.net_commission, b.billing_no,"
             + " d.feedback_reason, d.or_no, d.collected_on"
             + " from cmr_dp_item d left join cmr_billing b on b.id = d.billing_id"
             + " where d.company_id = :companyId"
-            + " and cast(d.created_at as date) between :from and :to"
+            + " and cast(d.created_at at time zone '"
+            + BusinessClock.zoneId()
+            + "' as date) between :from and :to"
             + INSURER_FILTER.formatted("d.insurer_code")
             + " order by d.tag, d.insurer_code, d.id",
         "tag",
@@ -162,8 +168,7 @@ public class CommissionReports {
         metadata(
             "CMR-INCENTIVE",
             "Incentive Runs",
-            "Incentive runs ending in the period with the incentive per invoice and exclusions"
-                + " (CMRID.003/005/006)"),
+            "Incentive runs ending in the period with the incentive per invoice and exclusions"),
         "select s.name || ' ' || r.run_no || ' (' || r.status || ')' as run, l.insurer_code as insurer,"
             + " l.sales_unit, l.invoice_no, l.gross_premium, l.basic_premium,"
             + " coalesce(l.exclusion_reason, '') as exclusion, l.incentive"
@@ -197,13 +202,23 @@ public class CommissionReports {
         metadata(
             "CMR-FEEDBACK-SLA",
             "Insurer Feedback Timeline",
-            "Billings sent in the period with the feedback due date and the days late (CMRID.011)"),
-        "select b.insurer_code as insurer, b.billing_no, b.handler, cast(b.sent_at as date) as sent,"
-            + " b.sla_due, cast(b.responded_at as date) as responded, b.stage, b.item_count,"
-            + " b.total_net, cast(greatest(0, coalesce(cast(b.responded_at as date), current_date)"
+            "Billings sent in the period with the feedback due date and the days late"),
+        "select b.insurer_code as insurer, b.billing_no, b.handler, cast(b.sent_at "
+            + BUSINESS_DAY
+            + " as sent,"
+            + " b.sla_due, cast(b.responded_at "
+            + BUSINESS_DAY
+            + " as responded, b.stage, b.item_count,"
+            + " b.total_net, cast(greatest(0, coalesce(cast(b.responded_at "
+            + BUSINESS_DAY
+            + ", cast(now() "
+            + BUSINESS_DAY
+            + ")"
             + " - b.sla_due) as varchar) as days_late"
             + " from cmr_billing b where b.company_id = :companyId and b.sent_at is not null"
-            + " and cast(b.sent_at as date) between :from and :to"
+            + " and cast(b.sent_at "
+            + BUSINESS_DAY
+            + " between :from and :to"
             + INSURER_FILTER.formatted("b.insurer_code")
             + " order by b.insurer_code, b.id",
         INSURER,
@@ -233,14 +248,18 @@ public class CommissionReports {
         metadata(
             "CMR-BIR-CERT",
             "BIR Certificate Submissions",
-            "Withholding tax certificates tagged to ORs and submitted to Comptrollership (CMRID.015)"),
+            "Withholding tax certificates tagged to ORs and submitted to Comptrollership"),
         "select c.insurer_code as insurer, c.submission_no, c.certificate_form, c.certificate_no,"
             + " c.period_from, c.period_to, c.tax_withheld,"
             + " (select string_agg(o.or_no, ', ' order by o.or_index) from cmr_certificate_or o"
             + " where o.certificate_id = c.id) as receipts, c.stage, c.submitted_count,"
-            + " cast(c.decided_at as date) as decided, c.decided_by, c.reject_reason"
+            + " cast(c.decided_at at time zone '"
+            + BusinessClock.zoneId()
+            + "' as date) as decided, c.decided_by, c.reject_reason"
             + " from cmr_certificate c where c.company_id = :companyId"
-            + " and cast(c.created_at as date) between :from and :to"
+            + " and cast(c.created_at at time zone '"
+            + BusinessClock.zoneId()
+            + "' as date) between :from and :to"
             + INSURER_FILTER.formatted("c.insurer_code")
             + " order by c.insurer_code, c.id",
         INSURER,

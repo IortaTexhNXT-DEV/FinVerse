@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceService;
 import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceService.CreditRequest;
 import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceService.IssueRequest;
 import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceService.Remaining;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
@@ -76,7 +77,7 @@ public class CommissionAdjuster {
    */
   public List<String> adjust(
       EndorsementRequest request, OpsInvoice invoice, Recompute recompute, List<String> journals) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     String ref = Adjustments.sourceRef(request.getRequestNo()) + ":COM:";
     List<String> documents = new ArrayList<>();
     for (ShareChange share : recompute.shares()) {
@@ -126,7 +127,7 @@ public class CommissionAdjuster {
                   invoice.getArn(),
                   share.insurerCode(),
                   null,
-                  LocalDate.now(clock),
+                  BusinessClock.today(clock),
                   invoice.getCurrency(),
                   share.commissionDelta(),
                   share.vatDelta(),

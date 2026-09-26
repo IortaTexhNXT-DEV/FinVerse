@@ -1,10 +1,10 @@
 package com.iortatechnxt.brokerverse.report.core;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,15 +16,12 @@ import java.util.Optional;
  * Validated, typed access to report parameter values.
  *
  * <p>Default keywords for dates: {@code TODAY}, {@code MONTH_START}, {@code YEAR_START}. They are
- * resolved on the business day of the Philippines ({@link #BUSINESS_ZONE}), as the web client
+ * resolved on the business day of the platform ({@link BusinessClock}, Manila), as the web client
  * resolves them in the user's browser and as the reports read their dates (claims, user access,
  * cashiering, remittance and other reports cut days at Manila midnight). The UTC date would be the
  * previous day between 16:00 and 24:00 UTC.
  */
 public final class ReportParameters {
-
-  /** Time zone of the business day that date keywords resolve in. */
-  public static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Manila");
 
   private static final String TODAY = "TODAY";
   private static final String MONTH_START = "MONTH_START";
@@ -234,7 +231,7 @@ public final class ReportParameters {
     if (keyword == null) {
       return null;
     }
-    LocalDate today = LocalDate.now(clock.withZone(BUSINESS_ZONE));
+    LocalDate today = BusinessClock.today(clock);
     return switch (keyword) {
       case TODAY -> today.toString();
       case MONTH_START -> today.withDayOfMonth(1).toString();

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
@@ -29,7 +30,7 @@ import com.iortatechnxt.brokerverse.remittance.service.RemittanceExtractionJob;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,10 +62,10 @@ class RemittanceIT {
   void theScheduledExtractionTagsInvoicesAndBatchesTheEligibleOnes() {
     OpsInvoice paid = fx.paidInvoice();
     OpsInvoice holding = fx.invoice();
-    fx.payInFull(holding, LocalDate.now());
+    fx.payInFull(holding, BusinessClock.today(Clock.systemUTC()));
     OpsInvoice unpaid = fx.invoice();
 
-    job.execute(LocalDate.now());
+    job.execute(BusinessClock.today(Clock.systemUTC()));
 
     BatchLine line = fx.lineOf(paid.getInvoiceNo());
     assertThat(line).isNotNull();
@@ -123,7 +124,7 @@ class RemittanceIT {
                                 "INS-LAC",
                                 null,
                                 fx.paidInvoice().getInvoiceNo()),
-                            LocalDate.now())))
+                            BusinessClock.today(Clock.systemUTC()))))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("INS-LAC");
   }

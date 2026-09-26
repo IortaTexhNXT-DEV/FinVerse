@@ -41,7 +41,6 @@ public abstract class ItemListReport implements ReportDefinition {
         .columns(ClxReportSql.itemColumns())
         .rows(sql.rows(query, ClxReportSql.args(p)))
         .presorted()
-        .note(ClxReportSql.DRAFT_NOTE)
         .build();
   }
 }

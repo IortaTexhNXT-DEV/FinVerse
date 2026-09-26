@@ -1,9 +1,9 @@
 package com.iortatechnxt.brokerverse.quotation.service;
 
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
-import java.time.LocalDate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -66,6 +66,6 @@ public class QuotationNumbers {
   }
 
   private int year() {
-    return LocalDate.now(clock).getYear();
+    return BusinessClock.today(clock).getYear();
   }
 }

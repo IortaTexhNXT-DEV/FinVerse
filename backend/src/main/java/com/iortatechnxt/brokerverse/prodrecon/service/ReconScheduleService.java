@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.organization.domain.Branch;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconSchedule;
@@ -77,7 +78,7 @@ public class ReconScheduleService {
       throw new DuplicateResourceException("Extraction schedule", insurer);
     }
     ReconSchedule schedule =
-        schedules.save(new ReconSchedule(companyId, insurer, terms, LocalDate.now(clock)));
+        schedules.save(new ReconSchedule(companyId, insurer, terms, BusinessClock.today(clock)));
     roll(schedule);
     audit.record(ENTITY, schedule.getId(), AuditAction.CREATE, describe(schedule));
     return schedule;
@@ -93,7 +94,7 @@ public class ReconScheduleService {
   public ReconSchedule update(Long id, Terms terms) {
     ReconSchedule schedule =
         schedules.findById(id).orElseThrow(() -> new ResourceNotFoundException(ENTITY, id));
-    schedule.update(terms, LocalDate.now(clock));
+    schedule.update(terms, BusinessClock.today(clock));
     roll(schedule);
     audit.record(ENTITY, id, AuditAction.UPDATE, describe(schedule));
     return schedule;

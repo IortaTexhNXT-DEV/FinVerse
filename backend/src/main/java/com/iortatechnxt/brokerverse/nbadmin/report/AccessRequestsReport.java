@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
@@ -69,7 +70,7 @@ public class AccessRequestsReport implements ReportDefinition {
     return UamReportSupport.metadata(
         CODE,
         "Access Requests",
-        "Access requests by status, type, requester and approver, with their age (BRD 1.008)",
+        "Access requests by status, type, requester and approver, with their age",
         params);
   }
 
@@ -81,7 +82,7 @@ public class AccessRequestsReport implements ReportDefinition {
     args.put("end", Timestamp.from(UamReportSupport.endOf(period[1])));
     args.put(STATUS, p.text(STATUS));
     args.put(TYPE, p.text(TYPE));
-    LocalDate today = LocalDate.now(clock.withZone(UamReportSupport.MANILA));
+    LocalDate today = BusinessClock.today(clock);
     List<Map<String, Object>> rows =
         jdbc
             .queryForList(

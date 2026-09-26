@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.crm;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientInstruction;
 import com.iortatechnxt.brokerverse.crm.domain.InstructionContent;
@@ -11,8 +12,8 @@ import com.iortatechnxt.brokerverse.crm.service.ClientBanner;
 import com.iortatechnxt.brokerverse.crm.service.ClientNotesService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import java.time.Clock;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,7 +27,7 @@ class ClientNotesIT {
   @Test
   void tagsAndInstructionsShowOnTheBannerAndKeepHistory() {
     Client c = fx.prospect(CrmFixtures.person());
-    LocalDate today = LocalDate.now(ZoneOffset.UTC);
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     as.run("ao", () -> notes.addTag(c.getId(), "VIP"));
     assertThatThrownBy(() -> as.run("ao", () -> notes.addTag(c.getId(), "VIP")))
         .extracting("code")

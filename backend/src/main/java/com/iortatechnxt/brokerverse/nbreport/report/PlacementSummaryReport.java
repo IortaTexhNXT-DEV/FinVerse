@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbreport.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
@@ -39,7 +40,9 @@ public class PlacementSummaryReport implements ReportDefinition {
           + " where o.entity_type = 'PlacementSlip' and o.entity_id = cast(s.id as varchar)"
           + " and o.purpose = 'PLACEMENT_SLIP') m on true"
           + " where s.company_id = :company"
-          + " and cast(s.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+          + " and cast(s.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to"
           + " group by coalesce(i.name, s.insurer_code), s.branch_code order by 1, 2";
 
   private final NbReportJdbc jdbc;
@@ -58,7 +61,7 @@ public class PlacementSummaryReport implements ReportDefinition {
     return NbReportSupport.metadata(
         CODE,
         "Placement Summary",
-        "Placement slips sent, failed and resent by insurer (BRNB.075)",
+        "Placement slips sent, failed and resent by insurer",
         Permission.PLACEMENT_MANAGE,
         true);
   }

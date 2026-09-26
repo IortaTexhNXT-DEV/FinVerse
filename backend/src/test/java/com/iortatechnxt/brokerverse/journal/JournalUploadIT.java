@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalStatus;
 import com.iortatechnxt.brokerverse.journal.service.JournalEntryService;
 import com.iortatechnxt.brokerverse.journal.service.JournalUploadService;
@@ -19,7 +20,7 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -68,7 +69,7 @@ class JournalUploadIT {
   }
 
   private static String validFile(String reference) {
-    String date = LocalDate.now().toString();
+    String date = BusinessClock.today(Clock.systemUTC()).toString();
     return HEADER
         + "U1,HO,MANUAL,"
         + date
@@ -119,7 +120,9 @@ class JournalUploadIT {
     assertThat(journalsWithReference("UPL-REAL")).isEqualTo(2);
 
     // Uploaded drafts behave like any manual draft: they can be copied and cancelled.
-    var copy = as.run("accountant", () -> entries.copy(u2.batchId(), LocalDate.now()));
+    var copy =
+        as.run(
+            "accountant", () -> entries.copy(u2.batchId(), BusinessClock.today(Clock.systemUTC())));
     assertThat(copy.getStatus()).isEqualTo(JournalStatus.DRAFT);
     assertThat(as.run("accountant", () -> entries.cancel(u2.batchId())).getStatus())
         .isEqualTo(JournalStatus.CANCELLED);
@@ -127,7 +130,7 @@ class JournalUploadIT {
 
   @Test
   void invalidVouchersAreReportedAndSkippedWhileValidOnesAreCreated() {
-    String date = LocalDate.now().toString();
+    String date = BusinessClock.today(Clock.systemUTC()).toString();
     String csv =
         HEADER
             + "OK,HO,MANUAL,"
@@ -199,7 +202,7 @@ class JournalUploadIT {
                 service.process(
                     data.company().getId(),
                     "template.xlsx",
-                    JournalUploadTemplate.xlsx(LocalDate.now()),
+                    JournalUploadTemplate.xlsx(BusinessClock.today(Clock.systemUTC())),
                     false));
     assertThat(result.vouchers()).hasSize(2).allMatch(v -> v.status() == VoucherStatus.VALID);
   }

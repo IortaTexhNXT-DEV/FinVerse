@@ -85,7 +85,7 @@ public class ReceiptSeriesService {
     Branch branch = settings.branch(request.companyId(), request.branchId());
     if (request.kind() == ReceiptKind.OR && !branch.isHeadOffice()) {
       throw new BusinessRuleException(
-          "OR_HEAD_OFFICE_ONLY", "Official receipt series belong to Head Office only (CSHID.006)");
+          "OR_HEAD_OFFICE_ONLY", "Official receipt series belong to Head Office only");
     }
     ReceiptSeries created =
         new ReceiptSeries(
@@ -171,7 +171,7 @@ public class ReceiptSeriesService {
     if (usable.isEmpty()) {
       throw new BusinessRuleException(
           "RECEIPT_SERIES_DEPLETED",
-          "No authorized " + kind + " series with numbers left for this branch (CSHID.015)");
+          "No authorized " + kind + " series with numbers left for this branch");
     }
     ReceiptSeries s = usable.get(0);
     String number = s.allocate();

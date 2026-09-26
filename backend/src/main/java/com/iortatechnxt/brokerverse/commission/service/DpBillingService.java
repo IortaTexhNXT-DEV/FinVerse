@@ -11,13 +11,13 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import com.iortatechnxt.brokerverse.workflow.service.StartCase;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkCaseTransitioned;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -114,7 +114,7 @@ public class DpBillingService {
   }
 
   private DpBilling open(Long companyId, String insurerCode, List<DpItem> list) {
-    String no = numbers.next("CRB-" + LocalDate.now(clock).getYear());
+    String no = numbers.next("CRB-" + BusinessClock.today(clock).getYear());
     DpBilling billing =
         billings.save(new DpBilling(companyId, no, insurerCode, currentUser.username()));
     list.forEach(i -> i.assign(billing.getId()));

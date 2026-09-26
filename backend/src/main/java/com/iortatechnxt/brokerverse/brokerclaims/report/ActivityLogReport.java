@@ -102,7 +102,7 @@ public class ActivityLogReport implements ReportDefinition {
         CODE,
         "Claims Activity Log",
         "Status and field changes, insurer updates, location references and diary, with user and"
-            + " time (BRCLM.041/042)",
+            + " time",
         params);
   }
 

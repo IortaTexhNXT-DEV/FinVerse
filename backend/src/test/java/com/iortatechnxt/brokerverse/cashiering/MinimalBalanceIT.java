@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
 import com.iortatechnxt.brokerverse.cashiering.service.MinimalBalanceService;
 import com.iortatechnxt.brokerverse.cashiering.service.UnappliedService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.PaymentStatus;
@@ -12,7 +13,7 @@ import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -49,7 +50,8 @@ class MinimalBalanceIT {
     Unapplied excess =
         fx.pay("UNKNOWN-MIN-" + System.nanoTime(), new BigDecimal("4.50")).unapplied();
 
-    MinimalBalanceService.Sweep sweep = as.run("cashtl", () -> minimal.sweep(LocalDate.now()));
+    MinimalBalanceService.Sweep sweep =
+        as.run("cashtl", () -> minimal.sweep(BusinessClock.today(Clock.systemUTC())));
     assertThat(sweep.premium()).isPositive();
     assertThat(sweep.excess()).isPositive();
 
@@ -66,7 +68,7 @@ class MinimalBalanceIT {
     assertThat(swept.getBalance()).isZero();
     assertThat(logged("EXCESS", excess.getReference())).isEqualTo(1);
 
-    as.run("cashtl", () -> minimal.sweep(LocalDate.now()));
+    as.run("cashtl", () -> minimal.sweep(BusinessClock.today(Clock.systemUTC())));
     assertThat(logged("PREMIUM", invoice.getInvoiceNo())).isEqualTo(1);
     assertThat(minimal.rules()).hasSize(3);
   }
@@ -74,7 +76,7 @@ class MinimalBalanceIT {
   @Test
   void aSmallInvoiceStillFullyUnpaidIsNotReversed() {
     OpsInvoice invoice = fx.motorInvoice();
-    as.run("cashtl", () -> minimal.sweep(LocalDate.now()));
+    as.run("cashtl", () -> minimal.sweep(BusinessClock.today(Clock.systemUTC())));
     assertThat(fx.invoice(invoice.getInvoiceNo()).getPaymentStatus())
         .isEqualTo(PaymentStatus.UNPAID);
     assertThat(logged("PREMIUM", invoice.getInvoiceNo())).isZero();

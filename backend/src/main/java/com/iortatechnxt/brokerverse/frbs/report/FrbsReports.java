@@ -32,7 +32,6 @@ public class FrbsReports {
   private static final String COMMISSION_LABEL = "Commission";
   private static final String POLICIES = "policies";
   private static final String COUNT_LABEL = "Invoices";
-  private static final String DRAFT = "Draft layout, to be confirmed with FRBS (AQ05).";
   private static final String PRODUCTION_FROM =
       " from ops_invoice i left join cat_sales_unit u"
           + " on u.company_id = i.company_id and u.code = i.sales_unit"
@@ -51,8 +50,7 @@ public class FrbsReports {
         new Spec(
             "FRBS-SERVICE-FEE",
             "Service Fee Report - Summary",
-            "Service fee of the runs of the period per segment and unit, released and liquidated"
-                + " (FRBS 2.10.0, Appendix A VI)",
+            "Service fee of the runs of the period per segment and unit, released and liquidated",
             Dates.PERIOD,
             "select l.segment, r.run_no, r.stage, l.sales_unit, l.payee_name, l.currency,"
                 + " l.invoice_count, l.commission, l.wtax, l.base, l.rate, l.fee, l.status,"
@@ -95,8 +93,7 @@ public class FrbsReports {
         new Spec(
             "FRBS-SERVICE-FEE-DETAIL",
             "Service Fee Report - Details",
-            "Fully paid invoices behind the service fee of the period, per segment (FRBS 2.10.0,"
-                + " Appendix A VI)",
+            "Fully paid invoices behind the service fee of the period, per segment",
             Dates.PERIOD,
             "select l.segment, r.run_no, l.sales_unit, f.invoice_no, f.client_code, f.assured_name,"
                 + " f.insurer_code, f.paid_on, l.currency, f.commission, f.wtax, f.base, l.rate,"
@@ -140,7 +137,7 @@ public class FrbsReports {
                 "FRBS-MANCOM-MARKET",
                 "Market Performance Summary - Premium and Commission",
                 "Booked premium and commission per segment and location: month, year to date and"
-                    + " previous year to date with growth (FRBS 3.2.0, Appendix A V)",
+                    + " previous year to date with growth",
                 Dates.AS_OF,
                 "select d.*, case when d.comm_prev = 0 then null"
                     + " else round((d.comm_ytd - d.comm_prev) * 100 / d.comm_prev, 2) end growth"
@@ -177,8 +174,8 @@ public class FrbsReports {
                 SEGMENT,
                 SEGMENT_LABEL,
                 List.of(
-                    "Budget columns wait for the segment budgets (AQ05); amounts in invoice currency.",
-                    DRAFT)),
+                    "Budget columns stay empty until the segment budgets are loaded; amounts in"
+                        + " invoice currency.")),
             jdbc)
         .asDocument();
   }
@@ -196,7 +193,7 @@ public class FrbsReports {
         new Spec(
             "FRBS-BRANCH-PRODUCTION",
             "Branch Production Report - Detailed",
-            "Booked invoices of the period per BDO branch / unit (FRBS 3.2.0, Appendix A V)",
+            "Booked invoices of the period per BDO branch / unit",
             Dates.PERIOD,
             "select coalesce(i.sales_unit, '(none)') || ' ' || coalesce(u.name, '') unit,"
                 + " i.booking_date, i.invoice_no, i.policy_no, i.assured_name, i.product_line,"
@@ -218,8 +215,7 @@ public class FrbsReports {
                 ReportColumn.amount(COMMISSION, COMMISSION_LABEL)),
             "unit",
             UNIT_LABEL,
-            List.of(
-                "Units are the sales units of the booking; BDO branch codes to confirm (AQ05).")),
+            List.of("Units are the sales units of the booking.")),
         jdbc);
   }
 
@@ -236,8 +232,7 @@ public class FrbsReports {
         new Spec(
             "FRBS-BRANCH-PRODUCTION-SUM",
             "Branch Production Report - Summary",
-            "Invoices, premium and commission of the period per BDO branch / unit (FRBS 3.2.0,"
-                + " Appendix A V)",
+            "Invoices, premium and commission of the period per BDO branch / unit",
             Dates.PERIOD,
             "select coalesce(i.sales_unit, '(none)') sales_unit, coalesce(u.name, '') unit_name,"
                 + " i.currency, count(*) policies, sum(i.gross_premium) premium,"
@@ -272,7 +267,7 @@ public class FrbsReports {
         new Spec(
             "FRBS-EXPENSE-GROUPING",
             "Expense Allocation per Cost Centre",
-            "Posted expenses of the period per cost centre and account (FRBS 3.2.0, Appendix A IV)",
+            "Posted expenses of the period per cost centre and account",
             Dates.PERIOD,
             "select coalesce(e.cost_center, '(none)') || coalesce(' ' || d.name, '') cost_center,"
                 + " a.code account, a.name account_name,"
@@ -291,7 +286,7 @@ public class FrbsReports {
                 ReportColumn.amount("amount", "Expense")),
             "cost_center",
             "Cost Centre",
-            List.of("Amounts in base currency. " + DRAFT)),
+            List.of("Amounts in base currency.")),
         jdbc);
   }
 
@@ -309,7 +304,7 @@ public class FrbsReports {
             "FRBS-GAP",
             "GAP Report",
             "Open receivables and payables of the sub-ledger by time to maturity, gap and"
-                + " cumulative gap (FRBS 3.2.0, Appendix A IV)",
+                + " cumulative gap",
             Dates.AS_OF,
             "select g.bucket, g.assets, g.liabilities, g.assets - g.liabilities gap,"
                 + " sum(g.assets - g.liabilities) over (order by g.bucket) cumulative"
@@ -334,7 +329,7 @@ public class FrbsReports {
                 ReportColumn.amountNoTotal("cumulative", "Cumulative Gap")),
             null,
             null,
-            List.of("Open sub-ledger items in base currency by due date. " + DRAFT)),
+            List.of("Open sub-ledger items in base currency by due date.")),
         jdbc);
   }
 
@@ -355,8 +350,7 @@ public class FrbsReports {
         new Spec(
             "FRBS-CASH-FLOW",
             "Cash Flow Report",
-            "Cash and bank: opening balance, receipts and payments per source and closing balance"
-                + " (FRBS 3.2.0, Appendix A IV)",
+            "Cash and bank: opening balance, receipts and payments per source and closing balance",
             Dates.PERIOD,
             "select 0 seq, 'Opening cash and bank balance' line, null receipts, null payments,"
                 + " coalesce(sum(e.debit_base - e.credit_base), 0) net"
@@ -378,7 +372,7 @@ public class FrbsReports {
                 ReportColumn.amountNoTotal("net", "Net / Balance")),
             null,
             null,
-            List.of("Accounts of the bank and cash categories, base currency. " + DRAFT)),
+            List.of("Accounts of the bank and cash categories, base currency.")),
         jdbc);
   }
 
@@ -395,8 +389,7 @@ public class FrbsReports {
         new Spec(
             "FRBS-SUSTAINABILITY-PROD",
             "Sustainability Report - Risk Management (Production)",
-            "Booked production of the year per client type, region and line of business (report"
-                + " list #169)",
+            "Booked production of the year per client type, region and line of business",
             Dates.YEAR,
             "select coalesce(c.client_type, 'UNKNOWN') client_type,"
                 + " coalesce(b.region, '(none)') region, coalesce(i.product_line, '(none)') line,"
@@ -419,7 +412,7 @@ public class FrbsReports {
                 ReportColumn.amount(COMMISSION, COMMISSION_LABEL)),
             "client_type",
             "Client Type",
-            List.of("Yearly extract, first Monday of January (report list #169). " + DRAFT)),
+            List.of("Yearly extract, first Monday of January.")),
         jdbc);
   }
 }

@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.party.domain.PartyType;
 import com.iortatechnxt.brokerverse.party.service.PartyService;
 import com.iortatechnxt.brokerverse.reinsurance.api.dto.FacAssignRequest;
@@ -148,7 +149,7 @@ public class FacPlacementService {
    */
   public FacPlacement approve(Long id, LocalDate date) {
     FacPlacement placement = get(id);
-    LocalDate on = date == null ? LocalDate.now(clock) : date;
+    LocalDate on = date == null ? BusinessClock.today(clock) : date;
     placement.place(
         currentUser.username(),
         on,
@@ -183,7 +184,7 @@ public class FacPlacementService {
    */
   public FacPlacement close(Long id, LocalDate date) {
     FacPlacement placement = get(id);
-    placement.close(date == null ? LocalDate.now(clock) : date);
+    placement.close(date == null ? BusinessClock.today(clock) : date);
     audit.record(ENTITY, placement.getPlacementNo(), AuditAction.CLOSE, "Closed slip");
     return placement;
   }

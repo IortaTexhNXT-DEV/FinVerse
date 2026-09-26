@@ -41,8 +41,7 @@ public class AdjustmentDailyReport implements ReportDefinition {
     return ReportMetadata.operations(
         CODE,
         "Adjustment and Daily Endorsement Report",
-        "Endorsement requests raised or posted in the period, by type and user (ADJID.016;"
-            + " layout to confirm, OQ42)",
+        "Endorsement requests raised or posted in the period, by type and user",
         AdjustmentReportSupport.periodTypeUser("TODAY"));
   }
 

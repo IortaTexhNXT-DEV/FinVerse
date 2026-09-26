@@ -57,8 +57,7 @@ public class VersionHistoryReport implements ReportDefinition {
     return PmReportSupport.metadata(
         CODE,
         "Package Version History",
-        "Versions of the packaged products with validator, dates and change summary"
-            + " (BRPM.006/007, PMADD06)",
+        "Versions of the packaged products with validator, dates and change summary",
         ParameterSpec.optional(PRODUCT, "Product Code", ParameterType.TEXT));
   }
 

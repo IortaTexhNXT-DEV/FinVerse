@@ -18,13 +18,13 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import com.iortatechnxt.brokerverse.workflow.service.StartCase;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -176,7 +176,7 @@ public class AccountService {
 
   private String arnFor(String given) {
     if (given == null || given.isBlank()) {
-      return numbers.next("ARN-" + LocalDate.now(clock).getYear());
+      return numbers.next("ARN-" + BusinessClock.today(clock).getYear());
     }
     if (!ARN.matcher(given).matches()) {
       throw new BusinessRuleException(

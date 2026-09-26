@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbreport.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
@@ -33,7 +34,9 @@ public class PaymentMatchReport implements ReportDefinition {
           + " coalesce(l.apply_message, l.message) as message"
           + " from plc_payment_report r join plc_payment_report_line l on l.report_id = r.id"
           + " where r.company_id = :company"
-          + " and cast(r.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+          + " and cast(r.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to"
           + " and (cast(:match as varchar) is null or l.match_status = :match)"
           + " order by l.match_status, r.report_no, l.row_no";
 
@@ -53,7 +56,7 @@ public class PaymentMatchReport implements ReportDefinition {
     return NbReportSupport.metadata(
         CODE,
         "Matched and Unmatched Payments",
-        "Payment report lines matched to accounts or left unmatched (BRNB.067/068/075)",
+        "Payment report lines matched to accounts or left unmatched",
         Permission.BILLING_MANAGE,
         true,
         ParameterSpec.select(

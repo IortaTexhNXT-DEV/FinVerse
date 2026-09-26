@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.nonpackage.service;
 
 import com.iortatechnxt.brokerverse.account.domain.RiskItemData;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -19,7 +20,6 @@ import com.iortatechnxt.brokerverse.nonpackage.service.ComparativeTable.Row;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -100,7 +100,7 @@ public class ProposalDocuments {
     MergedText text =
         templates.merge(
             QS_TEMPLATE,
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             Map.of(REFERENCE, p.getQsNo(), "replyBy", String.valueOf(p.getQsReplyBy())));
     List<Section> sections = new ArrayList<>();
     sections.add(new Text(null, text.text()));
@@ -182,7 +182,7 @@ public class ProposalDocuments {
     MergedText text =
         templates.merge(
             PS_TEMPLATE,
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             Map.of("clientName", p.getClientName(), REFERENCE, p.getPsNo()));
     List<Section> sections = new ArrayList<>();
     sections.add(new Text(null, text.text()));

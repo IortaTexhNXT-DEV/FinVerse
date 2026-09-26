@@ -23,6 +23,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.Inta
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.IntakeTarget;
 import com.iortatechnxt.brokerverse.cashiering.service.PdcWarehouseService;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptActionService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.seed.SeedUsers;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
@@ -216,7 +217,7 @@ public class CashieringSeedData implements ApplicationRunner {
   }
 
   private boolean checksAndOr(Long companyId, Long ho) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     pdcs.warehouse(
         companyId,
         ho,
@@ -296,7 +297,8 @@ public class CashieringSeedData implements ApplicationRunner {
             List.of(),
             new PaymentIntake.Payor(null, payor),
             null,
-            new PaymentIntake.Money(amount, PHP, LocalDate.now(clock).minusDays(PAYMENT_AGE_DAYS)),
+            new PaymentIntake.Money(
+                amount, PHP, BusinessClock.today(clock).minusDays(PAYMENT_AGE_DAYS)),
             PaymentIntake.Tender.of(PaymentMode.CASH)));
   }
 

@@ -11,12 +11,13 @@ import com.iortatechnxt.brokerverse.accounting.service.BusinessEvent;
 import com.iortatechnxt.brokerverse.accounting.service.CostCenterRuleService;
 import com.iortatechnxt.brokerverse.alert.domain.AlertRepository;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ class CostCenterRuleIT {
         EVENT,
         data.company().getId(),
         data.branch("HO").getId(),
-        LocalDate.now(),
+        BusinessClock.today(Clock.systemUTC()),
         "PHP",
         MODULE,
         key,

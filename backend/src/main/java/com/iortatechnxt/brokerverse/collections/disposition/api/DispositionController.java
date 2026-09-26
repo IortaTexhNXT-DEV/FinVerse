@@ -16,10 +16,10 @@ import com.iortatechnxt.brokerverse.collections.feed.service.OutboxService;
 import com.iortatechnxt.brokerverse.collections.worklist.api.ClxAccess;
 import com.iortatechnxt.brokerverse.collections.worklist.api.dto.AccountDtos.TimelineResponse;
 import com.iortatechnxt.brokerverse.collections.worklist.api.dto.ItemResponse;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import jakarta.validation.Valid;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -89,7 +89,7 @@ public class DispositionController {
   @GetMapping("/disposition-rules")
   @PreAuthorize(ClxAccess.VIEW)
   public List<DispositionRuleResponse> rules() {
-    return lovs.activeValues(LovAttributes.PR_DISPOSITION, LocalDate.now(clock)).stream()
+    return lovs.activeValues(LovAttributes.PR_DISPOSITION, BusinessClock.today(clock)).stream()
         .map(v -> DispositionRuleResponse.from(v.getLabel(), attributes.prRule(v.getCode())))
         .toList();
   }

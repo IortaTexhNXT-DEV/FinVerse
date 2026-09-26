@@ -22,6 +22,7 @@ import com.iortatechnxt.brokerverse.collections.unapplied.service.UnappliedWorkC
 import com.iortatechnxt.brokerverse.collections.unapplied.service.UnappliedWorklistService;
 import com.iortatechnxt.brokerverse.collections.unapplied.service.UnappliedWorklistService.CollectorFilter;
 import com.iortatechnxt.brokerverse.collections.unapplied.service.UnappliedWorklistService.CollectorRow;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.PaymentStatus;
 import com.iortatechnxt.brokerverse.opsledger.service.port.FileDropPort.DroppedFile;
@@ -31,7 +32,7 @@ import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -148,13 +149,18 @@ class CollectionsUnappliedIT {
         .hasSize(1);
 
     DroppedFile file =
-        as.run(HANDLER, () -> files.publish(fx.company(), LocalDate.now().plusDays(1)))
+        as.run(
+                HANDLER,
+                () ->
+                    files.publish(fx.company(), BusinessClock.today(Clock.systemUTC()).plusDays(1)))
             .orElseThrow();
     assertThat(file.path()).contains(ApplicationFileService.FOLDER).endsWith(".txt");
     assertThat(file.path()).endsWith(requests.get(d.getRequestId()).getFileRunNo());
-    assertThat(files.publish(fx.company(), LocalDate.now().plusDays(1))).isEmpty();
+    assertThat(files.publish(fx.company(), BusinessClock.today(Clock.systemUTC()).plusDays(1)))
+        .isEmpty();
     assertThat(fileJob.name()).isEqualTo("CLX_APPLICATION_FILE");
-    assertThat(fileJob.execute(LocalDate.now()).message()).contains("file(s)");
+    assertThat(fileJob.execute(BusinessClock.today(Clock.systemUTC())).message())
+        .contains("file(s)");
   }
 
   @Test
@@ -226,9 +232,9 @@ class CollectionsUnappliedIT {
             "companyId",
             String.valueOf(fx.company()),
             "from",
-            LocalDate.now().minusDays(1).toString(),
+            BusinessClock.today(Clock.systemUTC()).minusDays(1).toString(),
             "to",
-            LocalDate.now().plusDays(1).toString());
+            BusinessClock.today(Clock.systemUTC()).plusDays(1).toString());
     for (String code : List.of("CLX-APPLICATION-TO-INVOICE", "CLX-UNAPPLIED-DISPOSITIONS")) {
       assertThat(as.run(HANDLER, () -> reports.export(code, params, ExportFormat.CSV)).content())
           .isNotEmpty();

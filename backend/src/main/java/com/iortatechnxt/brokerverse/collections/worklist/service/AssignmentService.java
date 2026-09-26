@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.collections.worklist.domain.AssignmentReposi
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
@@ -117,7 +118,7 @@ public class AssignmentService {
    * @return the bulk reference and the items moved
    */
   public Reassigned reassign(Long companyId, ItemSelection selection, Reassign command) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     validate(command, today);
     boolean temporary = command.kind() == AssignmentKind.TEMPORARY;
     List<CollectionItem> selected = select(companyId, selection);

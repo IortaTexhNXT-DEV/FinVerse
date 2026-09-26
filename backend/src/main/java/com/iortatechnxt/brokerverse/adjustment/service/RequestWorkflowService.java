@@ -137,7 +137,7 @@ public class RequestWorkflowService {
       throw new BusinessRuleException(
           "ADJ_QUOTATION_REQUIRED",
           "The TSI increase exceeds the package limit: link the quotation prepared by Marketing"
-              + " first (ADJID.008)");
+              + " first");
     }
     refresh(request);
     request.validated(currentUser.username(), clock.instant());

@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -69,7 +70,7 @@ public class RateSchemeExceptionService {
    */
   public RateOverride request(Request request) {
     requireComplete(request);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     LocalDate validUntil =
         request.validUntil() != null ? request.validUntil() : today.plusDays(DEFAULT_VALIDITY_DAYS);
     if (validUntil.isBefore(today)) {
@@ -162,7 +163,7 @@ public class RateSchemeExceptionService {
     }
     return exceptions
         .findByReferenceNo(reference)
-        .filter(e -> e.covers(productCode, LocalDate.now(clock)))
+        .filter(e -> e.covers(productCode, BusinessClock.today(clock)))
         .filter(e -> approves(e, versionNo, rate))
         .orElseThrow(
             () ->
@@ -196,7 +197,7 @@ public class RateSchemeExceptionService {
     if (transactionRef == null) {
       return null;
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     return exceptions.findByTransactionRefOrderByIdDesc(transactionRef).stream()
         .filter(e -> e.covers(productCode, today))
         .map(RateOverride::getReferenceNo)
@@ -218,7 +219,7 @@ public class RateSchemeExceptionService {
     }
     return exceptions
         .findByReferenceNo(reference)
-        .filter(e -> e.covers(productCode, LocalDate.now(clock)))
+        .filter(e -> e.covers(productCode, BusinessClock.today(clock)))
         .orElse(null);
   }
 }

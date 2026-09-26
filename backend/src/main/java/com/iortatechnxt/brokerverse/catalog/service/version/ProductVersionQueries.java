@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.ProductVersionStatus;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProductRepository;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -59,7 +60,7 @@ public class ProductVersionQueries implements ProductVersionQueryService {
       cacheNames = CatalogCaches.PRODUCT_VERSIONS,
       key = "'current:' + #productCode + ':' + T(java.time.LocalDate).now(@clock)")
   public Optional<ProductVersionView> current(String productCode) {
-    return inForce(productCode, LocalDate.now(clock));
+    return inForce(productCode, BusinessClock.today(clock));
   }
 
   @Override
@@ -89,7 +90,7 @@ public class ProductVersionQueries implements ProductVersionQueryService {
 
   @Override
   public List<ProductVersionView> packagesExpiring(Long companyId, int withinDays) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     LocalDate until = today.plusDays(Math.max(0, withinDays));
     return versions
         .findByStatusInOrderBySubmittedAtAscIdAsc(List.of(ProductVersionStatus.RELEASED))
@@ -164,7 +165,7 @@ public class ProductVersionQueries implements ProductVersionQueryService {
    * @return facts by risk code
    */
   public Map<String, VersionFacts> facts() {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     Map<String, VersionFacts> result = new HashMap<>();
     versions.findAll().stream()
         .collect(Collectors.groupingBy(ProductVersion::getProductCode))
@@ -179,7 +180,7 @@ public class ProductVersionQueries implements ProductVersionQueryService {
    * @return facts, {@link VersionFacts#NONE} for a product without versions
    */
   public VersionFacts facts(String productCode) {
-    return VersionFacts.of(entities(productCode), LocalDate.now(clock));
+    return VersionFacts.of(entities(productCode), BusinessClock.today(clock));
   }
 
   private ProductVersionView view(ProductVersion v) {

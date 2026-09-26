@@ -94,7 +94,7 @@ public class LiquidationAccounts {
     if (!missing.isEmpty()) {
       throw new BusinessRuleException(
           "PRQ_LIQUIDATION_ACCOUNT_MISSING",
-          "Comptrollership has not set the account of " + missing + " for liquidations (AQ02)");
+          "Comptrollership has not set the account of " + missing + " for liquidations");
     }
     return roles;
   }

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.crm.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails;
 import com.iortatechnxt.brokerverse.crm.domain.ClientProfile;
 import com.iortatechnxt.brokerverse.crm.service.ClientRules.Violation;
@@ -63,7 +64,7 @@ public class ClientValidator {
    * @return violations
    */
   public List<Violation> violations(ClientDetails details, ClientProfile profile) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     List<Violation> found = new ArrayList<>();
     BiConsumer<String, String> lov = (type, code) -> checkLov(type, code, today, found);
     lov.accept("MARKET_SEGMENT", details.marketSegment());

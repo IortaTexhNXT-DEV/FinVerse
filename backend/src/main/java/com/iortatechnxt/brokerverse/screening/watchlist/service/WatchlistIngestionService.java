@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkFileReader;
 import com.iortatechnxt.brokerverse.bulk.service.ParsedFile;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.screening.common.service.ScreeningPermissions;
@@ -27,7 +28,6 @@ import com.iortatechnxt.brokerverse.screening.watchlist.domain.WatchlistEntryRep
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.WatchlistSource;
 import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistFeed.FeedFile;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -159,7 +159,7 @@ public class WatchlistIngestionService {
 
   private IngestionRun start(
       WatchlistSource source, IngestionTrigger trigger, String fileName, boolean staged) {
-    String runNo = numbers.next("WLR-" + LocalDate.now(clock).getYear());
+    String runNo = numbers.next("WLR-" + BusinessClock.today(clock).getYear());
     return runs.save(
         new IngestionRun(runNo, source.getId(), trigger, fileName, staged, clock.instant()));
   }
@@ -255,7 +255,7 @@ public class WatchlistIngestionService {
           entry,
           ChangeType.DEACTIVATE,
           before,
-          WatchlistService.withDelisting(before, LocalDate.now(clock)),
+          WatchlistService.withDelisting(before, BusinessClock.today(clock)),
           "Run " + pass.run.getRunNo() + ": not in the list file any more");
       pass.delisted++;
     }
@@ -275,7 +275,7 @@ public class WatchlistIngestionService {
     } else {
       change.appliedByFeed(clock.instant(), "Official feed, run " + pass.run.getRunNo());
       store.save(change);
-      store.apply(change, entry, LocalDate.now(clock));
+      store.apply(change, entry, BusinessClock.today(clock));
       pass.applied.add(entry.getId());
     }
   }

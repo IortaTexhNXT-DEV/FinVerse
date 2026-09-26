@@ -127,7 +127,7 @@ public class QuotationCreateBulkHandler implements BulkImportHandler {
         QuotationBulkSupport.day(VALID, "Valid until (default: configured validity)", false),
         BulkColumn.optional(INSURER, "Insurer party code", ""),
         BulkColumn.optional(BRANCH, "Insurer branch code (LGT)", ""),
-        QuotationBulkSupport.flag(DP, "Premium paid directly to the insurer (MKTID.011)"),
+        QuotationBulkSupport.flag(DP, "Premium paid directly to the insurer"),
         QuotationBulkSupport.numeric(SI, "Sum insured", true, "850000"),
         QuotationBulkSupport.numeric(RATE, "Rate in percent (empty = product default)", false, ""),
         BulkColumn.optional(DESCRIPTION, "Description of the risk (other lines)", ""),

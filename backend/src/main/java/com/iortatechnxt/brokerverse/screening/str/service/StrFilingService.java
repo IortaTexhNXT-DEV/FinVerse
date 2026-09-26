@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseEvent.EventFacts;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseEventType;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseStage;
@@ -34,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class StrFilingService {
 
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  private static final ZoneId MANILA = BusinessClock.zone();
   private static final int MAX_REFERENCE = 60;
 
   private final StrRepository strs;
@@ -135,12 +136,12 @@ public class StrFilingService {
     if (filedOn == null) {
       throw new BusinessRuleException("SCR_FILING_DATE_REQUIRED", "Enter the filing date");
     }
-    LocalDate extracted = LocalDate.ofInstant(str.getExtractedAt(), MANILA);
+    LocalDate extracted = BusinessClock.dateOf(str.getExtractedAt());
     if (filedOn.isBefore(extracted)) {
       throw new BusinessRuleException(
           "SCR_FILING_BEFORE_EXTRACTION", "The filing date cannot be before the extraction date");
     }
-    if (filedOn.isAfter(LocalDate.now(clock.withZone(MANILA)))) {
+    if (filedOn.isAfter(BusinessClock.today(clock))) {
       throw new BusinessRuleException(
           "SCR_FILING_DATE_FUTURE", "The filing date cannot be in the future");
     }

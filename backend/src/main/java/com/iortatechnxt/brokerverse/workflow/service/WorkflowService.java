@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
@@ -18,7 +19,6 @@ import com.iortatechnxt.brokerverse.workflow.domain.WorkflowStage;
 import com.iortatechnxt.brokerverse.workflow.domain.WorkflowTransition;
 import java.time.Clock;
 import java.time.Instant;
-import java.time.LocalDate;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -226,7 +226,7 @@ public class WorkflowService {
       throw new BusinessRuleException(
           "WORKFLOW_REASON_REQUIRED", "Select a reason for '" + t.getLabel() + "'");
     }
-    lovs.requireValid(t.getReasonLov(), note.reasonCode(), LocalDate.now(clock));
+    lovs.requireValid(t.getReasonLov(), note.reasonCode(), BusinessClock.today(clock));
   }
 
   private String assigneeAfterMove(WorkCase workCase, WorkflowStage target) {

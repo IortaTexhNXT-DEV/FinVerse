@@ -89,7 +89,7 @@ public class ReceiptDocument {
             r.getReceiptNo(),
             sections,
             List.of("Cashier"),
-            "Receipt format and BIR ATP details to be confirmed (OQ05)"));
+            "CSH_RECEIPT"));
   }
 
   /**
@@ -118,7 +118,7 @@ public class ReceiptDocument {
                         new Field("Requested by", requestingUnit))),
                 details(r)),
             List.of("Cashiering"),
-            "Certificate of Payment layout to be confirmed (OQ42)"));
+            "CSH_PAYMENT_CERTIFICATE"));
   }
 
   /**

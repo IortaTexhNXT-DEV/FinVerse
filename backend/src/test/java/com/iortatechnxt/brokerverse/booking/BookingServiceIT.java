@@ -26,11 +26,13 @@ import com.iortatechnxt.brokerverse.booking.service.BookingService;
 import com.iortatechnxt.brokerverse.booking.service.BookingSettings;
 import com.iortatechnxt.brokerverse.booking.service.InvoiceBooked;
 import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceRegister;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.subledger.domain.ItemDirection;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -260,7 +262,10 @@ class BookingServiceIT {
         .extracting("code")
         .isEqualTo("INSURER_SHARES_INVALID");
     assertThatThrownBy(
-            () -> book(account.getArn(), BookingOptions.of(LocalDate.now().plusDays(3), null)))
+            () ->
+                book(
+                    account.getArn(),
+                    BookingOptions.of(BusinessClock.today(Clock.systemUTC()).plusDays(3), null)))
         .extracting("code")
         .isEqualTo("BOOKING_DATE_FUTURE");
     assertThatThrownBy(() -> booking.requireBookable("ARN-1900-000000"))

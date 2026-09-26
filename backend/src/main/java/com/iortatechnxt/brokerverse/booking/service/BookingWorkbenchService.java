@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.booking.domain.InvoiceStatus;
 import com.iortatechnxt.brokerverse.booking.domain.QueueEntry;
 import com.iortatechnxt.brokerverse.booking.domain.QueueEntryRepository;
 import com.iortatechnxt.brokerverse.booking.domain.QueueStatus;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -74,7 +75,7 @@ public class BookingWorkbenchService {
         readyAccounts(companyId, Filter.NONE).size(),
         queue.countByCompanyIdAndStatus(companyId, QueueStatus.QUEUED),
         invoices.countByCompanyIdAndStatusAndBookingDate(
-            companyId, InvoiceStatus.BOOKED, LocalDate.now(clock)),
+            companyId, InvoiceStatus.BOOKED, BusinessClock.today(clock)),
         queue.countByCompanyIdAndStatus(companyId, QueueStatus.FAILED));
   }
 

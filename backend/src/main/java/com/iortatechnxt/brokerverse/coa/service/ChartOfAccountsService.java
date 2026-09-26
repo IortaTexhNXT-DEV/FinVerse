@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -237,7 +238,7 @@ public class ChartOfAccountsService {
    */
   public GlAccount close(Long id) {
     GlAccount account = get(id);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     account.close(today);
     audit.record(ENTITY, account.getCode(), AuditAction.CLOSE, "Closed from " + today);
     return account;

@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -119,7 +120,7 @@ public class AccountTaggingService {
           "FFY_NOT_TAGGED", "Account " + account.getArn() + " is not tagged Free First Year");
     }
     String reason =
-        lovs.requireValid("FFY_CANCEL_REASON", reasonCode, LocalDate.now(clock)).getLabel();
+        lovs.requireValid("FFY_CANCEL_REASON", reasonCode, BusinessClock.today(clock)).getLabel();
     String text = comment == null || comment.isBlank() ? reason : reason + " - " + comment.strip();
     account.setFreeFirstYear(
         account.getFreeFirstYear().cancelled(clock.instant(), currentUser.username(), text));

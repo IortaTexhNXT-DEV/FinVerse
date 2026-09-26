@@ -39,7 +39,7 @@ public class BookRateFromClosingJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Copies the month-end revaluation rates as the BOOK rates of the next month (FRBS 2.2.0)";
+    return "Copies the month-end revaluation rates as the BOOK rates of the next month";
   }
 
   @Override

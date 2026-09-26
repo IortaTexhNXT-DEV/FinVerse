@@ -63,7 +63,7 @@ public class DpFeedbackSlaJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Flags direct payment billings whose insurer feedback is overdue (CMRID.011)";
+    return "Flags direct payment billings whose insurer feedback is overdue";
   }
 
   @Override

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.cashiering.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -37,11 +38,7 @@ public class SqlReport implements ReportDefinition {
   /** Period end. */
   static final String TO = "to";
 
-  /** Footnote of the draft layouts. */
-  static final String DRAFT =
-      "Draft layout: fields to be confirmed by BDOI (OQ42). Report of the Cashiering module.";
-
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  private static final ZoneId MANILA = BusinessClock.zone();
   private static final LocalDate EARLIEST = LocalDate.of(1900, 1, 1);
   private static final LocalDate LATEST = LocalDate.of(9999, 12, 31);
 

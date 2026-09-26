@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.underwriting.api.dto.ConvertQuotationRequest;
 import com.iortatechnxt.brokerverse.underwriting.api.dto.IterationRequest;
@@ -199,7 +200,7 @@ public class QuotationService {
         checker,
         "Quotation " + q.getQuotationNo(),
         new UnderwritingAuthority.Premium(
-            q.getCompanyId(), q.getCurrency(), offeredGross(q), LocalDate.now(clock)));
+            q.getCompanyId(), q.getCurrency(), offeredGross(q), BusinessClock.today(clock)));
     audit.record(ENTITY, q.getQuotationNo(), AuditAction.AUTHORIZE, "Approved");
     return q;
   }
@@ -228,7 +229,7 @@ public class QuotationService {
    */
   public Policy convert(Long id, ConvertQuotationRequest r) {
     Quotation q = get(id);
-    LocalDate issueDate = r.issueDate() != null ? r.issueDate() : LocalDate.now(clock);
+    LocalDate issueDate = r.issueDate() != null ? r.issueDate() : BusinessClock.today(clock);
     q.requireConvertible(issueDate);
     QuotationIteration it = q.current();
     Product product = products.requireActive(q.getCompanyId(), q.getProduct().getId());

@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.underwriting.service;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.underwriting.domain.Endorsement;
 import com.iortatechnxt.brokerverse.underwriting.domain.Policy;
 import com.iortatechnxt.brokerverse.underwriting.service.UnderwritingAuthority.Premium;
@@ -146,6 +147,6 @@ public class PolicyApprovalService {
   }
 
   private LocalDate dateOrToday(LocalDate date) {
-    return date != null ? date : LocalDate.now(clock);
+    return date != null ? date : BusinessClock.today(clock);
   }
 }

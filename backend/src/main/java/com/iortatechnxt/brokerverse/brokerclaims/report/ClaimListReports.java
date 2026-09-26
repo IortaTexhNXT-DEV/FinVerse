@@ -48,7 +48,7 @@ public final class ClaimListReports {
           + " and a.value = 'SETTLED') order by c.date_settled, c.claim_no";
 
   private static final String TEMP_NOTE =
-      "Outstanding = phases New, In progress and Temporarily closed on the as-of date (CLQ06);"
+      "Outstanding = phases New, In progress and Temporarily closed on the as-of date;"
           + " ages in calendar days, the reported date is day zero.";
 
   private ClaimListReports() {}
@@ -73,8 +73,7 @@ public final class ClaimListReports {
       return ReportMetadata.claimsHandling(
           OUTSTANDING,
           "List of all Outstanding Claims",
-          "Open and temporarily closed claims with ages, follow-up and insurer claim numbers"
-              + " (BRCLM.031)",
+          "Open and temporarily closed claims with ages, follow-up and insurer claim numbers",
           BclReportSql.asOfFilters());
     }
 
@@ -112,7 +111,7 @@ public final class ClaimListReports {
       return ReportMetadata.claimsHandling(
           PAST_DUE,
           "Outstanding Claims 90 Days Past Due",
-          "Outstanding claims older than BCL_PAST_DUE_DAYS from the reported date (BRCLM.031)",
+          "Outstanding claims older than BCL_PAST_DUE_DAYS from the reported date",
           params);
     }
 
@@ -151,7 +150,7 @@ public final class ClaimListReports {
       return ReportMetadata.claimsHandling(
           SETTLED,
           "List of all Settled Claims",
-          "Claims closed with a settled outcome, by date settled (BRCLM.029)",
+          "Claims closed with a settled outcome, by date settled",
           BclReportSql.rangeFilters("settledFrom", "settledTo", "Date settled", true));
     }
 
@@ -163,7 +162,7 @@ public final class ClaimListReports {
           .columns(ClaimColumns.settled())
           .rows(sql.claimRows(SETTLED_SQL, args, to))
           .presorted()
-          .note("Settled outcome = settlement type attribute outcome SETTLED (CLQ05, CLQ09).")
+          .note("Settled outcome = settlement type attribute outcome SETTLED.")
           .build();
     }
   }

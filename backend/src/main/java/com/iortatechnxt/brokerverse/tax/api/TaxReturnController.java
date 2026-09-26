@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.tax.api;
 
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.tax.api.dto.FileReturnRequest;
 import com.iortatechnxt.brokerverse.tax.api.dto.PayReturnRequest;
 import com.iortatechnxt.brokerverse.tax.api.dto.TaxReturnRequest;
@@ -58,7 +59,7 @@ public class TaxReturnController {
       @RequestParam int year,
       @RequestParam(required = false) String formCode,
       @RequestParam(required = false) ReturnStatus status) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     return service.list(companyId, year, formCode, status).stream()
         .map(r -> TaxReturnResponse.summary(r, today))
         .toList();
@@ -145,6 +146,6 @@ public class TaxReturnController {
 
   private TaxReturnResponse detail(TaxReturn r) {
     return TaxReturnResponse.detail(
-        r, LocalDate.now(clock), service.remittance(r.getId()).orElse(null));
+        r, BusinessClock.today(clock), service.remittance(r.getId()).orElse(null));
   }
 }

@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
@@ -89,7 +90,7 @@ public class QuotationRequestService {
    * @return the request in NEW
    */
   public QuotationRequest receive(Long companyId, IncomingQuotationRequest incoming) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     lovs.requireValid("SOURCE_CHANNEL", incoming.channel(), today);
     lovs.validateOptional("MARKET_SEGMENT", blank(incoming.marketSegment()), today);
     Long clientId = null;

@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.crm.service;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientRepository;
 import com.iortatechnxt.brokerverse.crm.domain.ClientStatus;
@@ -113,7 +114,7 @@ public class KycReviewService {
                   "KYC reviews due: " + due + " client(s)",
                   "Non-bank clients whose periodic KYC review is overdue or due by "
                       + policy.dueHorizon(businessDate)
-                      + " (BRNB.110).",
+                      + ".",
                   SCREEN,
                   null,
                   null));
@@ -122,7 +123,7 @@ public class KycReviewService {
   }
 
   private Specification<Client> specification(KycDueQuery q) {
-    LocalDate dueBy = q.dueBy() != null ? q.dueBy() : policy.dueHorizon(LocalDate.now(clock));
+    LocalDate dueBy = q.dueBy() != null ? q.dueBy() : policy.dueHorizon(BusinessClock.today(clock));
     return (root, query, cb) -> {
       List<Predicate> p = new ArrayList<>();
       if (q.companyId() != null) {

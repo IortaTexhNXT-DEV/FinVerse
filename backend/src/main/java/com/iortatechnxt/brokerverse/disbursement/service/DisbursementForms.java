@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.disbursement.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.DisbursementMode;
 import com.iortatechnxt.brokerverse.disbursement.domain.Instrument;
 import com.iortatechnxt.brokerverse.disbursement.domain.PayeeAccount;
@@ -269,7 +270,7 @@ public class DisbursementForms {
   }
 
   private LocalDate today() {
-    return LocalDate.now(clock);
+    return BusinessClock.today(clock);
   }
 
   /**

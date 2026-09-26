@@ -8,11 +8,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.screening.ScreeningSetupFixtures;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -66,7 +66,7 @@ class ScreeningSetupApiIT {
             MAKER,
             CONFIG + "/versions/" + id,
             Map.of(
-                "effectiveFrom", LocalDate.now(clock).toString(),
+                "effectiveFrom", BusinessClock.today(clock).toString(),
                 "changeNote", "API test",
                 "content", Map.of("slaRules", List.of(row))))
         .andExpect(status().isOk())
@@ -76,7 +76,7 @@ class ScreeningSetupApiIT {
             MAKER,
             CONFIG + "/versions/" + id,
             Map.of(
-                "effectiveFrom", LocalDate.now(clock).toString(),
+                "effectiveFrom", BusinessClock.today(clock).toString(),
                 "content", Map.of("slaRules", List.of(Map.of("stage", "INVESTIGATION")))))
         .andExpect(status().isUnprocessableEntity())
         .andExpect(jsonPath("$.code").value("SCR_SLA_HOURS"));

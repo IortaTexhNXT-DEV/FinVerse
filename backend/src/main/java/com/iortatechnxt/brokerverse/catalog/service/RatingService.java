@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.catalog.service.PremiumRequest.Period;
 import com.iortatechnxt.brokerverse.catalog.service.PremiumRequest.RatedItem;
 import com.iortatechnxt.brokerverse.catalog.service.PremiumRequest.RatingRates;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -140,7 +141,7 @@ public class RatingService {
     }
     RiskProduct product = catalog.requireProduct(productCode);
     ProductLine line = catalog.requireLine(product.getLineCode());
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     SchemeResolver.Scheme scheme =
         new SchemeResolver.Scheme(
             null,
@@ -181,7 +182,7 @@ public class RatingService {
     if (query.ratingDate() != null) {
       return query.ratingDate();
     }
-    return query.periodFrom() != null ? query.periodFrom() : LocalDate.now(clock);
+    return query.periodFrom() != null ? query.periodFrom() : BusinessClock.today(clock);
   }
 
   private RatingRates rates(

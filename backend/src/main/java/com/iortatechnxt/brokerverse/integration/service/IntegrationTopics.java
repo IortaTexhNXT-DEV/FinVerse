@@ -83,7 +83,7 @@ public class IntegrationTopics {
     return new IntegrationTopic(
         INVOICE_BOOKED,
         List.of(TYPE_INVOICE_BOOKED),
-        "Booked invoices (BRNB.027): premium components, commission, shares; key invoice number");
+        "Booked invoices: premium components, commission, shares; key invoice number");
   }
 
   /**
@@ -122,7 +122,7 @@ public class IntegrationTopics {
     return new IntegrationTopic(
         REMITTANCE_BATCH_STATUS,
         List.of(TYPE_REMITTANCE_BATCH_STATUS),
-        "Stage changes of remittance batches (RMTID.019/036); key batch number");
+        "Stage changes of remittance batches; key batch number");
   }
 
   /**
@@ -135,7 +135,7 @@ public class IntegrationTopics {
     return new IntegrationTopic(
         DISBURSEMENT_STATUS,
         List.of(TYPE_DISBURSEMENT_STATUS),
-        "Status of payment requests, DV stages and instruments (DIS 2.8, 3.26); key request number");
+        "Status of payment requests, DV stages and instruments; key request number");
   }
 
   /**
@@ -161,7 +161,7 @@ public class IntegrationTopics {
     return new IntegrationTopic(
         PRODUCT_VERSION_RELEASED,
         List.of(TYPE_PRODUCT_VERSION_RELEASED),
-        "Package versions validated and released (PMADD06, BRPM.015); key product code");
+        "Package versions validated and released; key product code");
   }
 
   /**

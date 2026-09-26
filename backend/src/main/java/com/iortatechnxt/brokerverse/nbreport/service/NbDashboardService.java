@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbreport.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbreport.domain.UnitLevel;
 import com.iortatechnxt.brokerverse.nbreport.service.NbDashboard.Booked;
 import com.iortatechnxt.brokerverse.nbreport.service.NbDashboard.StageAgeing;
@@ -47,7 +48,9 @@ public class NbDashboardService {
       "select count(*) from wf_case_history h join wf_case c on c.id = h.case_id"
           + " where c.company_id = :company and c.workflow_code in ('NB_QUOTATION', 'NB_PROPOSAL')"
           + " and h.to_stage = 'SENT_TO_CLIENT'"
-          + " and cast(h.occurred_at at time zone 'Asia/Manila' as date) between :from and :to";
+          + " and cast(h.occurred_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to";
 
   private static final String AWAITING_CLIENT =
       "select (select count(*) from quo_quotation where company_id = :company and status = :sent)"
@@ -73,7 +76,8 @@ public class NbDashboardService {
           + " from bkg_invoice where company_id = :company and status = 'BOOKED'"
           + " and booking_date between :from and :to";
 
-  private static final String CREATED = " and cast(created_at at time zone 'Asia/Manila' as date)";
+  private static final String CREATED =
+      " and cast(created_at at time zone '" + BusinessClock.zoneId() + "' as date)";
 
   private static final String FUNNEL =
       "with q as (select status from quo_quotation where company_id = :company"

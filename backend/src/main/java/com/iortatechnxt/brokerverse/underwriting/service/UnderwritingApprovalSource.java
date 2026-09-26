@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.approval.service.MasterRecordApprovals.Recor
 import com.iortatechnxt.brokerverse.approval.service.MasterRecordApprovals.Scope;
 import com.iortatechnxt.brokerverse.approval.service.PendingApproval;
 import com.iortatechnxt.brokerverse.approval.service.PendingApprovalSource;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.underwriting.domain.ApprovalWorkflow;
 import com.iortatechnxt.brokerverse.underwriting.domain.Endorsement;
 import com.iortatechnxt.brokerverse.underwriting.domain.EndorsementRepository;
@@ -83,7 +84,7 @@ public class UnderwritingApprovalSource implements PendingApprovalSource {
     }
     List<PendingApproval> items = new ArrayList<>();
     Predicate<Premium> withinLimit = authority.inboxFilter(viewer);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     items.addAll(policies(viewer, withinLimit, today));
     items.addAll(endorsements(viewer, withinLimit, today));
     items.addAll(quotations(viewer, withinLimit, today));

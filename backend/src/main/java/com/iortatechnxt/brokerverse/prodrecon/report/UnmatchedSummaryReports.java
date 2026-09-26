@@ -35,7 +35,7 @@ public class UnmatchedSummaryReports {
         ReconReportSupport.metadata(
             "PRC-UNMATCHED-LOC",
             "Unmatched Accounts per Location",
-            "Unmatched accounts per insurer, disposition and BDOI location (PRCID.036)"),
+            "Unmatched accounts per insurer, disposition and BDOI location"),
         "select c.insurer_code as insurer, "
             + DISPOSITION
             + ", coalesce(b.name, 'Not booked') as location"
@@ -65,8 +65,7 @@ public class UnmatchedSummaryReports {
         ReconReportSupport.metadata(
             "PRC-UNMATCHED-AO",
             "Unmatched Accounts per Marketing AO / AB",
-            "Unmatched booked and pre-booked accounts per insurer, disposition and AO / AB"
-                + " (PRCID.037)"),
+            "Unmatched booked and pre-booked accounts per insurer, disposition and AO / AB"),
         "select c.insurer_code as insurer, "
             + DISPOSITION
             + ", "
@@ -96,7 +95,7 @@ public class UnmatchedSummaryReports {
         ReconReportSupport.metadata(
             "PRC-DISPOSITION",
             "Summary per Disposition",
-            "Unmatched accounts per disposition, insurer and Marketing AO / AB (PRCID.039)"),
+            "Unmatched accounts per disposition, insurer and Marketing AO / AB"),
         "select "
             + DISPOSITION
             + ", c.insurer_code as insurer, "

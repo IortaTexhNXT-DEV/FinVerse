@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.commission.domain.IncentiveRunLineRepository
 import com.iortatechnxt.brokerverse.commission.domain.IncentiveScheme;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.service.BookRates;
 import com.iortatechnxt.brokerverse.opsledger.service.port.DisbursementGateway;
@@ -111,7 +112,7 @@ public class IncentivePosting {
             .filter(l -> l.getIncentive().signum() > 0)
             .toList();
     List<String> refs = new ArrayList<>();
-    Context ctx = new Context(run, company.getBaseCurrency(), branchId, LocalDate.now(clock));
+    Context ctx = new Context(run, company.getBaseCurrency(), branchId, BusinessClock.today(clock));
     group(earned, IncentiveRunLine::getInsurerCode)
         .forEach(
             (insurer, amount) ->

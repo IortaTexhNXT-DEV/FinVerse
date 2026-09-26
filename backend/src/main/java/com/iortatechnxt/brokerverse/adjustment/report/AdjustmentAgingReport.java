@@ -47,8 +47,7 @@ public class AdjustmentAgingReport implements ReportDefinition {
     return ReportMetadata.operations(
         CODE,
         "Adjustment Transaction Aging",
-        "Days from request to completion of endorsement requests (ADJID.021; layout to confirm,"
-            + " OQ42)",
+        "Days from request to completion of endorsement requests",
         AdjustmentReportSupport.period("MONTH_START"));
   }
 

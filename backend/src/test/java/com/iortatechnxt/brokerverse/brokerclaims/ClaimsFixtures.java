@@ -27,6 +27,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimSource;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.LossDetails;
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.service.InsurerClaimService.NewLine;
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.ClaimLocationService.LocationPick;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
@@ -34,6 +35,7 @@ import com.iortatechnxt.brokerverse.remittance.RemittanceFixtures;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,7 +106,7 @@ public class ClaimsFixtures {
 
   /** Start of the test covers: two months ago, so that a loss of this week is covered. */
   public static LocalDate coverFrom() {
-    return LocalDate.now().minusMonths(2);
+    return BusinessClock.today(Clock.systemUTC()).minusMonths(2);
   }
 
   /** A booked motor cover paid via BDOI, its invoice still unpaid. */
@@ -211,7 +213,7 @@ public class ClaimsFixtures {
 
   /** Loss data of a loss two days ago reported yesterday. */
   public static LossDetails.Loss loss(String nature) {
-    LocalDate today = LocalDate.now();
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     return new LossDetails.Loss(
         today.minusDays(2), today.minusDays(1), nature, nature, "Test loss", "EDSA", null, null);
   }

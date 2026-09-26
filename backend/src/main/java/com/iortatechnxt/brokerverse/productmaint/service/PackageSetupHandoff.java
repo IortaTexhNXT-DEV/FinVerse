@@ -196,10 +196,7 @@ public class PackageSetupHandoff {
 
   private PackageRequest withMbs(Long id) {
     return requests.inStage(
-        id,
-        RequestStage.WITH_MBS,
-        "PKG_NOT_WITH_MBS",
-        "MBS receives signed-off requirements only (BRPM.015)");
+        id, RequestStage.WITH_MBS, "PKG_NOT_WITH_MBS", "MBS receives signed-off requirements only");
   }
 
   private PackageSpec.Origin origin(PackageRequest p, SetupInput input) {

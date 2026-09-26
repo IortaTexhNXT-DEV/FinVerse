@@ -443,7 +443,7 @@ class ScreeningMatchingIT {
     JobOutcome outcome = job.execute(LocalDate.of(2026, 10, 3));
     assertThat(outcome.message()).contains("screening run(s)");
     assertThat(job.name()).isEqualTo(PeriodicScreeningJob.JOB_NAME);
-    assertThat(job.description()).contains("SNSRP-602");
+    assertThat(job.description()).contains("watchlist entries");
     assertThat(job.cron()).isNotBlank();
   }
 }

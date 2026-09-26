@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.nbadmin.report;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportCategory;
@@ -42,7 +43,7 @@ final class UamReportSupport {
   static final String ALL = "ALL";
 
   /** Business time zone of BDOI. */
-  static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  static final ZoneId MANILA = BusinessClock.zone();
 
   /** Text of an absent value in the from / to columns (sample D). */
   static final String NULL_TEXT = "Null";
@@ -149,7 +150,7 @@ final class UamReportSupport {
    */
   static LocalDate asOf(ReportParameters p, Clock clock) {
     LocalDate asOf = p.date(AS_OF);
-    if (asOf.isAfter(LocalDate.now(clock.withZone(MANILA)))) {
+    if (asOf.isAfter(BusinessClock.today(clock))) {
       throw new BusinessRuleException("AS_OF_IN_FUTURE", "The as-of date cannot be in the future");
     }
     return asOf;

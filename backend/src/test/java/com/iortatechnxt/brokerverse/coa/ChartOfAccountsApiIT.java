@@ -4,11 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.Json;
 import com.iortatechnxt.brokerverse.support.TestData;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -99,7 +100,7 @@ class ChartOfAccountsApiIT {
     api.doPost("checker", ACCOUNTS + "/" + id + "/unfreeze", null)
         .andExpect(jsonPath("$.frozen").value(false));
     api.doPost("checker", ACCOUNTS + "/" + id + "/close", null)
-        .andExpect(jsonPath("$.closedOn").value(LocalDate.now().toString()));
+        .andExpect(jsonPath("$.closedOn").value(BusinessClock.today(Clock.systemUTC()).toString()));
     api.doGet("auditor", ACCOUNTS + "/" + id).andExpect(jsonPath("$.code").value(code));
     api.doGet("auditor", ACCOUNTS + "?companyId=" + data.company().getId() + "&q=" + code)
         .andExpect(jsonPath("$[0].code").value(code));
@@ -144,7 +145,7 @@ class ChartOfAccountsApiIT {
             "journalType",
             "MANUAL",
             "valueDate",
-            LocalDate.now().toString(),
+            BusinessClock.today(Clock.systemUTC()).toString(),
             "currency",
             "PHP",
             "narration",

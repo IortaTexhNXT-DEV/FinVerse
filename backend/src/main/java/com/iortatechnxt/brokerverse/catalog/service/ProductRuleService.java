@@ -13,9 +13,9 @@ import com.iortatechnxt.brokerverse.catalog.domain.RuleScope;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -206,7 +206,7 @@ public class ProductRuleService {
   public DocumentRule createDocumentRule(
       RuleScope scope, String scopeCode, String documentType, boolean required) {
     requireScope(scope, scopeCode);
-    lovs.requireValid("DOCUMENT_TYPE", documentType, LocalDate.now(clock));
+    lovs.requireValid("DOCUMENT_TYPE", documentType, BusinessClock.today(clock));
     if (documentRules
         .findByScopeAndScopeCodeAndDocumentType(scope, scopeCode, documentType)
         .isPresent()) {

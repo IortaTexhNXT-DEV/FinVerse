@@ -40,7 +40,7 @@ public class SlaMonitorJob implements ManagedJob {
   @Override
   public String description() {
     return "Sends the SLA reminders, flags and escalates the SLA breaches and reminds of missing"
-        + " documents of the open screening cases (SNSRP-405, 802)";
+        + " documents of the open screening cases";
   }
 
   @Override

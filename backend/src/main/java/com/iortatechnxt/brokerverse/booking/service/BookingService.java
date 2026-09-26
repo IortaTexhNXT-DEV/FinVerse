@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.booking.domain.QueueEntry;
 import com.iortatechnxt.brokerverse.booking.domain.QueueEntryRepository;
 import com.iortatechnxt.brokerverse.booking.domain.QueueStatus;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -86,7 +87,8 @@ public class BookingService {
   public BookedInvoice book(String arn, BookingOptions options, BookingSource source) {
     Account account = requireBookable(arn);
     String billingNo = checkBillingNo(account, options.insurerBillingNo());
-    LocalDate date = options.bookingDate() == null ? LocalDate.now(clock) : options.bookingDate();
+    LocalDate date =
+        options.bookingDate() == null ? BusinessClock.today(clock) : options.bookingDate();
     List<InvoiceDraft> drafts = builder.drafts(account, options, date);
     for (InvoiceDraft later : drafts.subList(1, drafts.size())) {
       invoices.save(BookedInvoice.draft(later));
@@ -131,7 +133,7 @@ public class BookingService {
               + invoice.getArn()
               + " is not due for booking");
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     return booker.book(invoice, businessDate.isAfter(today) ? today : businessDate, source);
   }
 
@@ -165,8 +167,7 @@ public class BookingService {
     Account account = accounts.requireByArn(arn);
     if (invoices.existsByArnAndTransactionNo(arn, InvoiceBuilder.ORIGINAL)
         || account.getStatus() == AccountStatus.BOOKED) {
-      throw new BusinessRuleException(
-          "DUPLICATE_BOOKING", "Account " + arn + " is already booked (BRNB.076)");
+      throw new BusinessRuleException("DUPLICATE_BOOKING", "Account " + arn + " is already booked");
     }
     if (account.getStatus() != AccountStatus.POLICY_ISSUED) {
       throw new BusinessRuleException(

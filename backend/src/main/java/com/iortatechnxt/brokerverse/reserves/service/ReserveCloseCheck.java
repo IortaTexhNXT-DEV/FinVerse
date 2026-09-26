@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Period-end checklist control "Actuarial reserves posted": the valuation run of the month must be
- * posted. Companies that do not use actuarial reserving (no reserve parameters and no run) pass
- * with "not applicable".
+ * posted. Companies that do not use actuarial reserving (no reserve parameters and no run, as every
+ * BDOI company) get no checklist row.
  */
 @Component
 @Transactional(readOnly = true)
@@ -43,8 +43,7 @@ public class ReserveCloseCheck implements PeriodEndCheckProvider {
       Long companyId, LocalDate periodStart, LocalDate periodEnd) {
     Optional<ValuationRun> run = runs.forMonth(companyId, periodEnd);
     if (run.isEmpty() && parameters.list(companyId).isEmpty() && runs.list(companyId).isEmpty()) {
-      return List.of(
-          CheckItem.of(CODE, LABEL, true, "Not applicable: actuarial reserving is not set up"));
+      return List.of();
     }
     boolean posted = run.map(r -> r.getStatus() == RunStatus.POSTED).orElse(false);
     String detail =

@@ -63,7 +63,7 @@ public class UprMovementReport implements ReportDefinition {
             ParameterSpec.required(ReserveReportSupport.COMPANY, "Company", ParameterType.COMPANY),
             ParameterSpec.required(ReserveReportSupport.DATE, "Valuation Date", ParameterType.DATE)
                 .withDefault("TODAY")),
-        Permission.REPORT_FINANCIAL);
+        Permission.RESERVE_VIEW);
   }
 
   @Override

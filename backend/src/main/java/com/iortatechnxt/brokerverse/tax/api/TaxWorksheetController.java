@@ -59,7 +59,7 @@ public class TaxWorksheetController {
    * @return worksheet
    */
   @GetMapping("/worksheets/{kind}")
-  @PreAuthorize(TaxAccess.VIEW)
+  @PreAuthorize(TaxAccess.WORKSHEET_VIEW)
   public WorksheetResponse worksheet(
       @PathVariable WorksheetKind kind,
       @RequestParam Long companyId,

@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Approval inbox source: valuation runs waiting for approval (checkers with PERIOD_END_RUN) and
+ * Approval inbox source: valuation runs waiting for approval (checkers with RESERVE_APPROVE) and
  * reserve parameters / takaful settings pending authorization (MASTER_AUTHORIZE).
  */
 @Component
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReserveApprovalSource implements PendingApprovalSource {
 
   private static final String MODULE = "RESERVES";
-  private static final String APPROVER = "PERIOD_END_RUN";
+  private static final String APPROVER = "RESERVE_APPROVE";
 
   private final ValuationRunRepository runs;
   private final MasterRecordApprovals records;

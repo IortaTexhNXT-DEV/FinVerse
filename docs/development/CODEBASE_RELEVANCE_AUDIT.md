@@ -12,6 +12,9 @@ records:
 **This audit changes no code.** The recommendations need a decision from the project lead, and the reinsurance items
 also need BDOI's phase 2 scope.
 
+**Status.** Step 1 (hide) is done in the backend with migration V1064 and seed V1961; see section 4.1. The code
+removal (steps 2-6) is still open.
+
 Audit date: 26-Sep-2026, on commit `61b1df8`. Sizes are counted as files / lines under
 `backend/src/main/java/com/iortatechnxt/brokerverse/<package>`, `backend/src/test/...` and `frontend/src/features/<feature>`.
 
@@ -95,9 +98,8 @@ modules themselves.
   - the seed ledger loses the insurer policy journals, which changes the seed balances behind the finance screenshots
     (GL journals, finance dashboard, trial balance). Re-capture the screenshots after removal.
 - **Action.**
-  1. Now: set `BROKERVERSE_JOB_QUOTATION_EXPIRY_CRON` to empty in the BDOI deployment (no code change), or change the
-     default to empty.
-  2. Now: exclude the insurer permissions from the User Access permission catalogue (R1).
+  1. **Done (V1064):** the default of `BROKERVERSE_JOB_QUOTATION_EXPIRY_CRON` is `-` (off).
+  2. **Done (V1064):** the insurer permissions are excluded from the User Access permission catalogue (R1).
   3. Then remove the backend package, `features/underwriting`, `api/underwriting.ts`, the menu entry, the help entry
      and the tests, together with A2-A4 and after T1.
   4. Tables: keep V100 / V101 applied. Add `V102__drop_insurer_underwriting.sql` (owner range V100-V199) that drops
@@ -171,7 +173,9 @@ modules themselves.
 - **Action.**
   1. **Now:** remove `reservesModule` from `NAV_GROUPS`. Give the reserve screens and reports a dedicated permission
      (for example `RESERVE_VIEW`), held by no BDOI role, instead of `REPORT_FINANCIAL` / `MASTER_VIEW` /
-     `PERIOD_END_RUN`.
+     `PERIOD_END_RUN`. **Backend done (V1064):** `RESERVE_VIEW` (screens and the 7 reports) and `RESERVE_APPROVE`
+     (valuation approval, posting, cancellation, parameter authorization), held by no BDOI role; the period-end
+     checklist has no reserves row when reserving is not set up. The menu entry is a web client change.
   2. Then remove the package, `features/reserves`, `api/reserves.ts` and the tests.
   3. Keep V420 / V421 applied; add `V422__drop_actuarial_reserves.sql` to drop the `rsv_*` tables and the job parameter.
 - **Note.** The applied migration `V420` has a comment that points to the removed guide `docs/modules/ACTUARIAL_RESERVES.md`.
@@ -205,7 +209,7 @@ modules themselves.
   `V961__seed_intercompany_group_and_average_rates.sql`.
 - **Risk.** Low-medium: the seed subsidiary `FVS` may appear in company pickers and in the FX revaluation seed.
 - **Action.**
-  1. Now: move the 5 reports to `CONSOLIDATION_RUN`.
+  1. **Done (V1064):** the 5 reports and the read endpoints require `CONSOLIDATION_RUN`, which no BDOI role holds.
   2. Remove after FRBS confirms the Appendix A pack. Keep `budget`.
   3. Add `V601__drop_consolidation.sql` for the `con_*` / `ic_*` tables. Keep V600.
 
@@ -225,7 +229,8 @@ modules themselves.
 - **Risk.** Medium. The VAT and EWT worksheets must keep their other sources. Confirm with FRBS that BDOI files no
   premium tax or DST (the insurer files them).
 - **Action.**
-  1. Hide the premium-tax, DST and insurer IC screens and reports now, with a dedicated permission.
+  1. **Done (V1064):** the premium-tax / LGT / FST and DST worksheets, the insurer IC schedules and their reports
+     require the dedicated permission `INSURER_TAX_VIEW` (with `TAX_VIEW`), which no BDOI role holds.
   2. After confirmation, remove `PremiumTaxSource` and the premium branches of the three worksheet builders. This
      unblocks A1.
   3. Add a V704 migration only if a tax table becomes unused.
@@ -254,10 +259,9 @@ modules themselves.
   stories. The integration tests use them through `AsUser` (Developer Guide section 8). Several BDOI screenshots are
   also taken as `fmanager`.
 - **Action.**
-  1. Add a non-seed migration in the User Access range (for example `V1064__hide_insurer_roles_and_permissions.sql`)
-     that sets the three insurer roles inactive and removes the insurer permissions from `sec_role_permission` of
-     every role except the seed profile's. Alternatively, exclude the values from the permission catalogue in
-     `AccessMatrixService` / `RolePermissionChangeValidator`.
+  1. **Done:** `V1064__hide_insurer_roles_and_permissions.sql` sets the three insurer roles inactive and removes the
+     insurer permissions from every other role, and the permission catalogue excludes them (section 4.1). The
+     seed profile keeps the insurer stories through the seed-only roles `SIT_INS_*` (seed V1961).
   2. Keep the SIT/UAT users until the tests of A1-A6 are removed.
 
 ### P1 / P2. Overlaps to confirm with BDOI (keep for now)
@@ -285,6 +289,23 @@ modules themselves.
 | 5 | Remove `reinsurance` (A3) at phase 2 design; drop migration V302 | M | Low |
 | 6 | Remove `consolidation` (A6) after FRBS confirms the report pack; drop migration V601 | S | Low-medium |
 | 7 | Decide P1 / P2 with Comptrollership and Operations | - | - |
+
+### 4.1 Step 1 as built (backend)
+
+| Area | What changed |
+|---|---|
+| Permissions | `Permission.isInsurerOnly()` flags `POLICY_VIEW`, `POLICY_MAINTAIN`, `POLICY_AUTHORIZE`, `CLAIM_VIEW`, `CLAIM_MAINTAIN`, `CLAIM_AUTHORIZE`, `REINSURANCE_VIEW`, `REINSURANCE_MAINTAIN`, `REINSURANCE_AUTHORIZE`, `RESERVE_PREPARE`, `CONSOLIDATION_RUN` and the new `RESERVE_VIEW`, `RESERVE_APPROVE`, `INSURER_TAX_VIEW` |
+| Grants (V1064) | The insurer-only permissions are withdrawn from every role (`FIN_ADMIN`, `FIN_MANAGER`, `ACCOUNTANT`, `AUTHORIZER`, `BRANCH_FINANCE`, `AUDITOR`, `READ_ONLY` and every BDOI role, FRBS and Disbursement included), one access change log row per role |
+| Roles (V1064) | `UNDERWRITER`, `CLAIMS_OFFICER`, `RI_OFFICER` inactive (they keep their permissions and members but grant nothing) |
+| User Access screens | `/admin/permissions`, the access matrix (both views and the export), role-permission and group-profile requests, the group profile report and the role lists (`/admin/roles`, `/nbadmin/roles`) exclude the insurer-only permissions and the roles holding one; a direct role edit refuses them (`PERMISSION_NOT_OFFERED`) |
+| Reserves | Screens and 7 reports need `RESERVE_VIEW`; approval, posting, cancellation and parameter authorization need `RESERVE_APPROVE`; the approval inbox uses `RESERVE_APPROVE`; the period-end checklist shows no reserves row while reserving is not set up |
+| Consolidation | 5 reports and the read endpoints need `CONSOLIDATION_RUN` |
+| Tax | Premium tax / LGT / FST and DST worksheets, the IC schedules endpoint and the reports `TAX-PREMTAX`, `TAX-DST-2000`, `IC-PREM-LOB`, `IC-LOSS-LOB`, `IC-COMM-LOB`, `IC-RESERVES`, `IC-RBC`, `IC-NETWORTH`, `IC-INVEST` need `INSURER_TAX_VIEW` |
+| Jobs | `QUOTATION_EXPIRY` off by default (`-`), like `RESERVE_VALUATION` and `RI_ALLOCATION` |
+| Seed (V1961) | Seed-only roles `SIT_INS_<role>` give the SIT/UAT users the insurer access they had before, so the insurer seed runners and tests keep running until the removal waves |
+| Test | `nbadmin/service/InsurerSuiteHiddenIT` |
+
+Still open in step 1: the web client (menu entries of `NAV_GROUPS` and the D1 widgets).
 
 In total about 42,700 lines of main code (A1-A6), 7,600 of tests and 11,300 of UI, plus the API clients `underwriting.ts`,
 `claims.ts`, `reinsurance.ts`, `reserves.ts` and `consolidation.ts` (about 1,350 lines).

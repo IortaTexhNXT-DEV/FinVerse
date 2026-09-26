@@ -156,7 +156,7 @@ class QuotationAndOpenCoverIT {
     assertThat(outcome.message()).contains("expired as of " + lapsed).contains("FVI: ");
     assertThat(quotations.get(scheduled.getId()).getStatus()).isEqualTo(QuotationStatus.EXPIRED);
     assertThat(expiryJob.name()).isEqualTo(QuotationExpiryJob.JOB_NAME);
-    assertThat(expiryJob.cron()).isEqualTo("0 45 0 * * *");
+    assertThat(expiryJob.cron()).isEqualTo("-"); // insurer suite: off by default (V1064)
 
     Quotation manual = as.run("uw", () -> quotations.create(quotationRequest(motor, "100", 7)));
     as.run("uw", () -> quotations.submit(manual.getId()));

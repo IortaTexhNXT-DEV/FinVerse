@@ -66,7 +66,7 @@ public class AccessMatrixService {
         actions.list(null).stream()
             .collect(Collectors.groupingBy(PermissionAction::permission, Collectors.toList()));
     List<AccessMatrix.PermissionRow> rows = new ArrayList<>();
-    for (Permission p : Permission.values()) {
+    for (Permission p : Permission.offered()) {
       Set<String> granted = new TreeSet<>();
       roles.stream()
           .filter(r -> r.getPermissions().contains(p))

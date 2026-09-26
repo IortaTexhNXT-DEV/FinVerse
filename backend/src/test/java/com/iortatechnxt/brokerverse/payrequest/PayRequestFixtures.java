@@ -59,7 +59,7 @@ public class PayRequestFixtures {
     this.as = as;
   }
 
-  /** The demo company. */
+  /** The seed company. */
   public Long company() {
     return ledger.company();
   }

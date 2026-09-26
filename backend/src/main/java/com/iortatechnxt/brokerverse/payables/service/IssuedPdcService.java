@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Register of post-dated cheques issued, and their accounting.
  *
- * <p>Accounting treatment (demo rules in V950; configurable per company):
+ * <p>Accounting treatment (seed rules in V950; configurable per company):
  *
  * <ol>
  *   <li><b>Issue</b> (approval of a PDC payment voucher, voucher date): the party's payment event

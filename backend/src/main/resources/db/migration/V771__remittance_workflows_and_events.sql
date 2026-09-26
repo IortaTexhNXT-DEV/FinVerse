@@ -4,7 +4,7 @@
 --   * OPS_HOLD: Marketing hold requests (MKTID.002-007, RMTID.021);
 --   * OPS_SPECIAL_REMIT: special remittance requests (MKTID.009, RMTID.030/033);
 --   * accounting events OPS_REMITTANCE (OPERATIONS_DESIGN 5 row 12) and OPS_REMIT_INCENTIVE
---     (row 13); the rules are configured by Comptrollership (OQ07), demo rules in V992;
+--     (row 13); the rules are configured by Comptrollership (OQ07), seed rules in V992;
 --   * templates of the remittance schedule and payment request notes (RMTID.011, OQ42).
 -- =====================================================================================
 

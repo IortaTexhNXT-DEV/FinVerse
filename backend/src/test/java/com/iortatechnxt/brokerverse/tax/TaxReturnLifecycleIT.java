@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Returns lifecycle DRAFT → FILED → PAID with the remittance posting that clears the tax payable,
  * four-eyes filing, cancellation and duplicate protection. Uses September 2026 monthly periods,
- * which the demo data never prepares.
+ * which the seed data never prepares.
  */
 @IntegrationTest
 class TaxReturnLifecycleIT {

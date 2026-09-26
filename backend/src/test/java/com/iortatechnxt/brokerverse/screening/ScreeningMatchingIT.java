@@ -116,7 +116,7 @@ class ScreeningMatchingIT {
 
   @Test
   void aNewClientWithAListedNameIsMatchedAndTaggedOnRegistration() {
-    Client c = fx.prospect(fx.demoCompany(), person("Juan", "Dela Cruz", someBirthDate()));
+    Client c = fx.prospect(fx.seedCompany(), person("Juan", "Dela Cruz", someBirthDate()));
 
     ScreeningRun run = lastRun(c.getCode(), ScreeningTrigger.CLIENT_REGISTERED);
     assertThat(run.getStatus()).isEqualTo(ScreeningRunStatus.SUCCESS);
@@ -186,7 +186,7 @@ class ScreeningMatchingIT {
 
   @Test
   void anIdentityChangeAndAnAccountSubmissionScreenTheClient() {
-    Client c = fx.prospect(fx.demoCompany(), person(word(), word(), someBirthDate()));
+    Client c = fx.prospect(fx.seedCompany(), person(word(), word(), someBirthDate()));
     assertThat(matchesOf(c.getId())).isEmpty();
     String first = word();
     String last = word();
@@ -220,7 +220,7 @@ class ScreeningMatchingIT {
     String last = word();
     LocalDate birth = someBirthDate();
     Long entryId = fx.listed(first + " " + last, birth);
-    Client c = fx.prospect(fx.demoCompany(), person(first, last, birth));
+    Client c = fx.prospect(fx.seedCompany(), person(first, last, birth));
     ScreeningMatch match = matchesOf(c.getId()).get(0);
     Long matchId = match.getId();
 
@@ -283,7 +283,7 @@ class ScreeningMatchingIT {
     String first = word();
     String last = word();
     fx.listed(first + " " + last, null);
-    Client c = fx.prospect(fx.demoCompany(), person(first, last, null));
+    Client c = fx.prospect(fx.seedCompany(), person(first, last, null));
     ScreeningMatch match = matchesOf(c.getId()).get(0);
     MatchDecision confirmed =
         as(INVESTIGATOR, () -> decisions.confirm(match.getId(), 424242L, "Same person"));
@@ -304,7 +304,7 @@ class ScreeningMatchingIT {
 
   @Test
   void aManualRiskChangeNeedsJustificationEvidenceAndAValidRating() {
-    Client c = fx.prospect(fx.demoCompany(), person(word(), word(), someBirthDate()));
+    Client c = fx.prospect(fx.seedCompany(), person(word(), word(), someBirthDate()));
     Long file =
         as(
                 INVESTIGATOR,

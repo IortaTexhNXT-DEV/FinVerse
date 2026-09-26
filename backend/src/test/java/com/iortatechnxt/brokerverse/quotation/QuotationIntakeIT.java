@@ -160,7 +160,7 @@ class QuotationIntakeIT {
                         "EMAIL",
                         null,
                         null,
-                        "CL-DEMO-A001",
+                        "CL-2026-900001",
                         null,
                         null,
                         null,
@@ -190,7 +190,7 @@ class QuotationIntakeIT {
             List.of(
                 row(
                     "Client Code",
-                    "CL-DEMO-A001",
+                    "CL-2026-900001",
                     "Period From",
                     "2026-11-01",
                     "Period To",

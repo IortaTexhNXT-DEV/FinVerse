@@ -53,7 +53,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * Versioned screening configuration (SNSRP-101-109; FR-SS-010 to 019): draft, save with the FRS
  * validations, submit with the before / after difference, approve (ACTIVE from the effective date,
  * the previous version SUPERSEDED on that date), reject, withdraw, four eyes, the approval inbox,
- * and the {@link ActiveConfig} port over the demo configuration.
+ * and the {@link ActiveConfig} port over the seed configuration.
  */
 @IntegrationTest
 class ScreeningConfigIT {
@@ -372,7 +372,7 @@ class ScreeningConfigIT {
   }
 
   @Test
-  void theDemoConfigurationIsActiveForTheDemoCompany() {
+  void theSeedConfigurationIsActiveForTheSeedCompany() {
     Long fvi = jdbc.queryForObject("select id from org_company where code = 'FVI'", Long.class);
     LocalDate day = LocalDate.of(2026, 6, 30);
     MatchCriteria match = activeConfig.matchCriteria(fvi, day).orElseThrow();

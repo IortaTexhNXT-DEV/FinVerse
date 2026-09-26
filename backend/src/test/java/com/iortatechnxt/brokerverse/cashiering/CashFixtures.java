@@ -62,7 +62,7 @@ public class CashFixtures {
     this.tx = tx;
   }
 
-  /** The demo company. */
+  /** The seed company. */
   public Long company() {
     return booking.company();
   }

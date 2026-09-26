@@ -86,7 +86,7 @@ export const COMMISSION_HELP: HelpSection = {
         'Fixed Amount per Policy: each policy earns the amount of the highest minimum basic premium it meets.',
       ],
       controls: [
-        'The demo schemes have no tiers until the targets and amounts are confirmed.',
+        'In SIT/UAT the schemes have no tiers until the targets and amounts are confirmed.',
         'A Branch beneficiary passes the incentive on to the branches through a disbursement request.',
       ],
     },

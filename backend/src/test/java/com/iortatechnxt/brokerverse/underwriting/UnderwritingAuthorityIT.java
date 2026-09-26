@@ -36,7 +36,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 /**
  * Authorization limit on underwriting approvals: an approver with a limit of 50,000.00 (base
  * currency, PHP) can neither approve nor see in My Approvals a policy, endorsement or quotation
- * whose gross premium at 100 % is above it; an approver without a limit (the demo "fmanager") can.
+ * whose gross premium at 100 % is above it; an approver without a limit (the seed "fmanager") can.
  */
 @IntegrationTest
 class UnderwritingAuthorityIT {

@@ -65,7 +65,7 @@ class QuotationIT {
 
   @Test
   void createdQuotationHasNumbersPremiumTemplateVersionAndWorkCase() {
-    Client client = fx.client("CL-DEMO-A001");
+    Client client = fx.client("CL-2026-900001");
     Quotation q = fx.create(client);
     assertThat(q.getQuotationNo()).matches("QT-\\d{4}-\\d{6}");
     assertThat(q.getArn()).matches("ARN-\\d{4}-\\d{6}");
@@ -104,7 +104,7 @@ class QuotationIT {
 
   @Test
   void approvalIsFourEyesAndARevisionOpensANewVersionWithADiff() {
-    Quotation q = fx.create(fx.client("CL-DEMO-A001"));
+    Quotation q = fx.create(fx.client("CL-2026-900001"));
     as.run("ao", () -> quotations.submit(q.getId(), null));
     assertThatThrownBy(() -> as.run("ao", () -> quotations.approve(q.getId(), null)))
         .extracting("code")
@@ -161,7 +161,7 @@ class QuotationIT {
 
   @Test
   void approvedQuotationIsSentProtectedAcceptedAndConvertedIntoAccountsPerGroup() {
-    Client client = fx.client("CL-DEMO-A001");
+    Client client = fx.client("CL-2026-900001");
     Quotation q =
         as.run(
             "ao",
@@ -254,7 +254,7 @@ class QuotationIT {
 
   @Test
   void batchSendGroupsApprovedQuotationsByClientAndRefusesOthers() {
-    Client client = fx.client("CL-DEMO-A002");
+    Client client = fx.client("CL-2026-900002");
     Quotation a = approved(fx.create(client));
     Quotation b = approved(fx.create(client));
     Quotation draft = fx.create(client);
@@ -277,7 +277,7 @@ class QuotationIT {
 
   @Test
   void submissionNeedsItemsAndAPremium() {
-    Client client = fx.client("CL-DEMO-A001");
+    Client client = fx.client("CL-2026-900001");
     Quotation empty =
         as.run("ao", () -> quotations.create(fx.company(), motor(client.getId(), false)));
     assertThat(empty.getGrossPremium()).isNull();

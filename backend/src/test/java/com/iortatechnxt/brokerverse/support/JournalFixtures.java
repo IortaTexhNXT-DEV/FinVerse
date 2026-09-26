@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
-/** Creates manual journals in the demo company for platform feature tests. */
+/** Creates manual journals in the seed company for platform feature tests. */
 @Component
 public class JournalFixtures {
 
@@ -40,7 +40,7 @@ public class JournalFixtures {
     this.data = data;
   }
 
-  /** Net base-currency balance (debit positive) of a demo company account, all branches. */
+  /** Net base-currency balance (debit positive) of a seed company account, all branches. */
   public BigDecimal balance(String accountCode, LocalDate asOf) {
     Long company = data.company().getId();
     return ledger.netBalance(company, accounts.getByCode(company, accountCode).getId(), null, asOf);

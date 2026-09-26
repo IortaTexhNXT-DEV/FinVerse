@@ -30,9 +30,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * Builds reinsurance test data in the demo company. Every test class works in its own underwriting
+ * Builds reinsurance test data in the seed company. Every test class works in its own underwriting
  * year (policies whose period starts in that year are approved in the open 2026 periods), so its
- * treaty programme never collides with the demo programme (2026) or another test class.
+ * treaty programme never collides with the seed programme (2026) or another test class.
  */
 @Component
 public class RiFixtures {

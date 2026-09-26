@@ -27,7 +27,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @IntegrationTest
 class PersonaMenusIT {
 
-  /** The read the screen makes when it opens ({c} = the demo company). */
+  /** The read the screen makes when it opens ({c} = the seed company). */
   private static final Map<String, String> SCREEN_READS =
       Map.ofEntries(
           Map.entry("/screening", "/api/v1/screening/cases/tiles?companyId={c}"),
@@ -80,22 +80,22 @@ class PersonaMenusIT {
     assertThat(personas).hasSize(16);
     for (Persona p : personas.values()) {
       assertThat(p.inScope(granted(p.role()))).as(p.role()).isEqualTo(p.permissions());
-      JsonNode me = api.read(api.doGet(p.demoUser(), "/api/v1/auth/me"));
-      assertThat(me.get("roles").size()).as(p.demoUser()).isEqualTo(1);
+      JsonNode me = api.read(api.doGet(p.seedUser(), "/api/v1/auth/me"));
+      assertThat(me.get("roles").size()).as(p.seedUser()).isEqualTo(1);
       assertThat(me.get("roles").get(0).asText()).isEqualTo(p.role());
       Set<String> permissions = new TreeSet<>();
       me.get("permissions").forEach(n -> permissions.add(n.asText()));
-      assertThat(p.inScope(permissions)).as(p.demoUser()).isEqualTo(p.permissions());
+      assertThat(p.inScope(permissions)).as(p.seedUser()).isEqualTo(p.permissions());
     }
   }
 
   @Test
-  void everyScreenOfAPersonaOpensForItsDemoUser() throws Exception {
+  void everyScreenOfAPersonaOpensForItsSeedUser() throws Exception {
     String company = data.company().getId().toString();
     for (Persona p : PersonaMenus.load().values()) {
       for (String screen : p.screens()) {
         assertThat(SCREEN_READS).as(screen).containsKey(screen);
-        api.doGet(p.demoUser(), SCREEN_READS.get(screen).replace("{c}", company))
+        api.doGet(p.seedUser(), SCREEN_READS.get(screen).replace("{c}", company))
             .andExpect(status().isOk());
       }
     }

@@ -75,7 +75,7 @@ public class CollectionsFixtures {
     }
   }
 
-  /** The demo company. */
+  /** The seed company. */
   public Long company() {
     return ops.company();
   }

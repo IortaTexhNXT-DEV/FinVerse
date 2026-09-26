@@ -41,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
  * the booked average rate and the foreign currency amount is put back at the CLOSING rate, both in
  * the foreign currency bucket of the account, so the foreign currency balance is unchanged and the
  * base balance becomes FC × closing rate. The difference goes to the unrealized FX gain/loss
- * account (demo chart: 4602) on the same branch. Idempotent per period: posting a period that was
+ * account (seed chart: 4602) on the same branch. Idempotent per period: posting a period that was
  * already revalued returns the existing run.
  */
 @Service

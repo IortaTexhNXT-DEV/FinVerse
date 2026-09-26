@@ -37,8 +37,8 @@ class ScreeningMatchingApiIT {
     String first = word();
     String last = word();
     fx.listed(first + " " + last, null);
-    Client c = fx.prospect(fx.demoCompany(), person(first, last, null));
-    Long company = fx.demoCompany();
+    Client c = fx.prospect(fx.seedCompany(), person(first, last, null));
+    Long company = fx.seedCompany();
     Long matchId =
         jdbc.queryForObject(
             "select max(id) from scr_match where client_id = ?", Long.class, c.getId());

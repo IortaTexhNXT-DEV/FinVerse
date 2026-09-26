@@ -87,7 +87,7 @@ public class ReceivablesFixtures {
 
   /**
    * Creates and authorizes a new agent with no open items, for tests whose FIFO allocation must not
-   * pick up items that other test classes left on the shared demo intermediaries.
+   * pick up items that other test classes left on the shared seed intermediaries.
    *
    * @return party code
    */

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Test data of the screening configuration and watchlists: an isolated company per test (the
- * configuration is per company) and test list sources, so tests never touch the demo versions and
+ * configuration is per company) and test list sources, so tests never touch the seed versions and
  * sources and pass in any order.
  */
 @Component

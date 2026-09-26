@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
-import com.iortatechnxt.brokerverse.reinsurance.demo.ReinsuranceDemoData;
-import com.iortatechnxt.brokerverse.reinsurance.demo.ReinsuranceStatementsDemoData;
 import com.iortatechnxt.brokerverse.reinsurance.domain.FacStatus;
 import com.iortatechnxt.brokerverse.reinsurance.domain.SoaStatus;
+import com.iortatechnxt.brokerverse.reinsurance.seed.ReinsuranceSeedData;
+import com.iortatechnxt.brokerverse.reinsurance.seed.ReinsuranceStatementsSeedData;
 import com.iortatechnxt.brokerverse.reinsurance.service.AllocationRunService;
 import com.iortatechnxt.brokerverse.reinsurance.service.ClaimRecoveryService;
 import com.iortatechnxt.brokerverse.reinsurance.service.FacPlacementService;
@@ -20,9 +20,9 @@ import com.iortatechnxt.brokerverse.report.core.RowKind;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
-import com.iortatechnxt.brokerverse.underwriting.demo.DemoUserContext;
-import com.iortatechnxt.brokerverse.underwriting.demo.UnderwritingDemoData;
 import com.iortatechnxt.brokerverse.underwriting.domain.PolicyRepository;
+import com.iortatechnxt.brokerverse.underwriting.seed.SeedUserContext;
+import com.iortatechnxt.brokerverse.underwriting.seed.UnderwritingSeedData;
 import com.iortatechnxt.brokerverse.underwriting.service.EndorsementService;
 import com.iortatechnxt.brokerverse.underwriting.service.OpenCoverService;
 import com.iortatechnxt.brokerverse.underwriting.service.PolicyApprovalService;
@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 /**
- * Runs the reinsurance demo loader over the underwriting demo portfolio and every reinsurance
+ * Runs the reinsurance seed loader over the underwriting seed portfolio and every reinsurance
  * report on it, exported to PDF, XLSX and CSV.
  */
 @IntegrationTest
@@ -68,22 +68,22 @@ class ReinsuranceReportsIT {
   @Autowired private EndorsementService endorsements;
   @Autowired private QuotationService quotations;
   @Autowired private OpenCoverService openCovers;
-  @Autowired private DemoUserContext users;
+  @Autowired private SeedUserContext users;
   @Autowired private TreatyService treaties;
   @Autowired private AllocationRunService allocation;
   @Autowired private FacPlacementService placements;
   @Autowired private ClaimRecoveryService claims;
   @Autowired private SoaService statements;
 
-  private ReinsuranceDemoData loader() {
-    return new ReinsuranceDemoData(organization, treaties, allocation, placements, claims, users);
+  private ReinsuranceSeedData loader() {
+    return new ReinsuranceSeedData(organization, treaties, allocation, placements, claims, users);
   }
 
   @BeforeEach
-  void loadDemoDataOnce() {
+  void loadSeedDataOnce() {
     synchronized (ReinsuranceReportsIT.class) {
       if (!loaded) {
-        new UnderwritingDemoData(
+        new UnderwritingSeedData(
                 organization,
                 policyRepository,
                 products,
@@ -95,7 +95,7 @@ class ReinsuranceReportsIT {
                 users)
             .load(data.company().getId());
         loader().load(data.company().getId());
-        new ReinsuranceStatementsDemoData(organization, treaties, statements, users)
+        new ReinsuranceStatementsSeedData(organization, treaties, statements, users)
             .load(data.company().getId());
         loaded = true;
       }
@@ -118,7 +118,7 @@ class ReinsuranceReportsIT {
   }
 
   @Test
-  void demoProgrammeIsLoadedOnce() {
+  void seedProgrammeIsLoadedOnce() {
     Long company = data.company().getId();
     int before = treaties.list(company).size();
     assertThat(before).isGreaterThanOrEqualTo(5);

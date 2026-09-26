@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.stereotype.Component;
 
-/** Account test data: unique vehicles and locations, demo clients, documents. */
+/** Account test data: unique vehicles and locations, seed clients, documents. */
 @Component
 public class AccountFixtures {
 
@@ -55,7 +55,7 @@ public class AccountFixtures {
     return Long.toString(SEQ.incrementAndGet() * 7919 + System.nanoTime() % 1000, 36).toUpperCase();
   }
 
-  /** A confirmed demo client (V983). */
+  /** A confirmed seed client (V983). */
   Client confirmed(String code) {
     return clients.requireByCode(company(), code);
   }

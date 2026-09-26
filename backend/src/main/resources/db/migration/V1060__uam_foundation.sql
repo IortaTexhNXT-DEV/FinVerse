@@ -19,7 +19,7 @@
 --   the implementation flow): UAM_DIRECT_ROLE_EDIT = true (the Roles screen still edits directly,
 --   every direct edit is audited and raises UAM_DIRECT_ROLE_EDIT) and UAM_ROLE_APPLY_ON_APPROVAL =
 --   true (approved role-permission requests apply at once, as PMADD05 does today; UQ03).
---   The schema extensions are V1061; the request lifecycle is V1062 (U1-A), demo users V1960.
+--   The schema extensions are V1061; the request lifecycle is V1062 (U1-A), SIT/UAT users V1960.
 --   Runs after V790 / V791 (nba_access_request), V755 (sec_permission_action) and V1000
 --   (LOGIN_MAX_FAILED_ATTEMPTS) on a fresh database.
 -- =====================================================================================

@@ -29,7 +29,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
- * Sanction Screening (BRD-10) end to end through the HTTP API with the demo users (wave S2): the
+ * Sanction Screening (BRD-10) end to end through the HTTP API with the SIT/UAT users (wave S2): the
  * Compliance Officer lists an invented name and the checker approves it; the account officer
  * registers a client with that name, which screens the client, records the match, tags the client
  * for watchlist review and opens the case; the UCC assigns it, the investigator completes the
@@ -331,7 +331,7 @@ class ScreeningEndToEndApiIT {
             BASE + "/str/" + strId,
             Json.of(
                 "values", Map.of("NARRATIVE", "Cash premium from a listed person"),
-                "reasonCodes", List.of("DEMO01"),
+                "reasonCodes", List.of("RSN01"),
                 "transactions",
                     List.of(
                         Json.of(

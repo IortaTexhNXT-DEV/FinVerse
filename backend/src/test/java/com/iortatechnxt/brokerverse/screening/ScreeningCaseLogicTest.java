@@ -54,8 +54,7 @@ class ScreeningCaseLogicTest {
         List.of(
             new StrLayout.Column(2, "SUBJECT_NAME", null, "Subject", 10, "RIGHT", null),
             new StrLayout.Column(1, "STR_NO", null, "STR No.", 6, "LEFT", null),
-            new StrLayout.Column(
-                3, "REASON_CODE", null, "Reason", 4, null, Map.of("DEMO01", "R01")),
+            new StrLayout.Column(3, "REASON_CODE", null, "Reason", 4, null, Map.of("RSN01", "R01")),
             new StrLayout.Column(4, null, "BDOI", "Entity", 4, null, null)));
   }
 
@@ -66,7 +65,7 @@ class ScreeningCaseLogicTest {
             layout(StrFormat.CSV),
             List.of(
                 Map.of(
-                    "STR_NO", "S1", "SUBJECT_NAME", "Cruz; Juan \"JD\"", "REASON_CODE", "DEMO01")));
+                    "STR_NO", "S1", "SUBJECT_NAME", "Cruz; Juan \"JD\"", "REASON_CODE", "RSN01")));
     assertThat(new String(file, StandardCharsets.UTF_8))
         .isEqualTo("STR No.;Subject;Reason;Entity\r\nS1;\"Cruz; Juan \"\"JD\"\"\";R01;BDOI\r\n");
     assertThat(StrFileWriter.extension(layout(StrFormat.CSV))).isEqualTo("csv");

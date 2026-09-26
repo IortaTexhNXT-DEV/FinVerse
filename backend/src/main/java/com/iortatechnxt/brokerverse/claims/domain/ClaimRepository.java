@@ -62,7 +62,7 @@ public interface ClaimRepository
   List<Claim> findByPolicyIds(@Param("policyIds") Collection<Long> policyIds);
 
   /**
-   * Counts the claims of a company (demo data idempotency).
+   * Counts the claims of a company (seed data idempotency).
    *
    * @param companyId company
    * @return count

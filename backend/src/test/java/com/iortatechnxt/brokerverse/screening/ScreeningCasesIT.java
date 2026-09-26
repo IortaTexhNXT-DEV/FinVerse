@@ -191,7 +191,7 @@ class ScreeningCasesIT {
                     COMPLIANCE,
                     () ->
                         strs.save(
-                            str.getId(), new StrEdit(Map.of(), Set.of("DEMO01"), List.of(zero)))))
+                            str.getId(), new StrEdit(Map.of(), Set.of("RSN01"), List.of(zero)))))
         .hasMessage("The amount must be greater than 0");
     Line receipt =
         new Line(
@@ -208,7 +208,7 @@ class ScreeningCasesIT {
                 str.getId(),
                 new StrEdit(
                     Map.of("NARRATIVE", "Cash premium from a listed person"),
-                    Set.of("DEMO01"),
+                    Set.of("RSN01"),
                     List.of(receipt))));
     assertThat(strs.gaps(str.getId())).isEmpty();
     SuspiciousTransactionReport ready = fx.as(COMPLIANCE, () -> strs.markReady(str.getId()));

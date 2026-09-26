@@ -6,7 +6,7 @@ import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
 import org.springframework.stereotype.Component;
 
-/** Lookup helpers for the demo data set loaded in tests. */
+/** Lookup helpers for the seed data set loaded in tests. */
 @Component
 public class TestData {
 

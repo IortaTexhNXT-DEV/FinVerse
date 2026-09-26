@@ -30,7 +30,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
- * Product Maintenance foundation (V755, V998): roles and grants of the demo personas, workflow
+ * Product Maintenance foundation (V755, V998): roles and grants of the seed personas, workflow
  * PM_PACKAGE_REQUEST, lists of values, parameters and the job cron.
  */
 @IntegrationTest
@@ -57,7 +57,7 @@ class ProductMaintenanceFoundationIT {
   }
 
   @Test
-  void demoPersonasHoldTheirProductMaintenancePermissions() {
+  void seedPersonasHoldTheirProductMaintenancePermissions() {
     assertThat(authorities("ao")).contains("PKG_REQUEST", "PRODUCT_VIEW");
     assertThat(authorities("mkttl")).contains("PKG_REQUEST_APPROVE", "PKG_REPORT_VIEW");
     assertThat(authorities("tsu")).contains("PKG_NEGOTIATE", "PKG_ADVISORY");

@@ -300,7 +300,7 @@ insert into bkg_si_type (code, name, recipient, trigger_type, owner_permission, 
     ('INTERNAL', 'Internal service invoice', 'INTERNAL', 'MANUAL', 'BOOKING_PROCESS',
      'SERVICE_INVOICE_NOTE', now(), 'SYSTEM');
 
--- ---------- Accounting event (rules are configured by Comptrollership; demo rule V988) --
+-- ---------- Accounting event (rules are configured by Comptrollership; seed rule V988) --
 insert into acc_event_type (code, name, category, journal_type, description, amount_components) values
  ('BROKER_BOOKING', 'Broker booking', 'PREMIUM', 'PREMIUM',
   'Booked invoice, endorsement or cancellation of a placed account (BRNB.027/076/081). Premium receivable '

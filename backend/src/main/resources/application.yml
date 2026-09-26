@@ -318,10 +318,10 @@ logging:
     console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%thread] %logger{36} - %replace(%msg){'[\\r\\n]', '_'}%n"
 
 ---
-# Local development / demo profile: loads demo data (company, branches, COA, users).
+# Local development / seed profile: loads seed data (company, branches, COA, users).
 spring:
   config:
     activate:
-      on-profile: demo
+      on-profile: seed
   flyway:
-    locations: classpath:db/migration,classpath:db/demo
+    locations: classpath:db/migration,classpath:db/seed

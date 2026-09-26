@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 /**
  * Creates fresh, authorized parties for tests whose assertions depend on a party having no other
  * open items. Integration tests share one database and run in any order, so tests must not assume
- * that shared demo parties (C-000201, A-0002, ...) are untouched by other test classes.
+ * that shared seed parties (C-000201, A-0002, ...) are untouched by other test classes.
  */
 @Component
 public class TestParties {

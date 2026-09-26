@@ -16,7 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 /**
  * HTTP contract of screening cases, STRs and compliance reports (wave S1-C): the case list with its
  * tabs and filters, the tiles, the case page and its tabs, the client's cases, the high-risk list,
- * the STR register and extractions, and the permission of each endpoint (demo cases of V1952).
+ * the STR register and extractions, and the permission of each endpoint (seed cases of V1952).
  */
 @IntegrationTest
 class ScreeningCasesApiIT {
@@ -30,14 +30,14 @@ class ScreeningCasesApiIT {
   @Autowired private TestData data;
   @Autowired private JdbcTemplate jdbc;
 
-  private Long demoCase(String caseNo) {
+  private Long seedCase(String caseNo) {
     return jdbc.queryForObject("select id from scr_case where case_no = ?", Long.class, caseNo);
   }
 
   @Test
   void casesAndTheirTabsAreServedOverHttp() throws Exception {
     Long company = data.company().getId();
-    Long investigation = demoCase("SCR-2026-000002");
+    Long investigation = seedCase("SCR-2026-000002");
     api.doGet(OUTSIDER, BASE + "/cases?companyId=" + company).andExpect(status().isForbidden());
     api.doGet(UCC, BASE + "/cases?companyId=" + company + "&tab=ALL&q=SCR-2026-000002")
         .andExpect(status().isOk())
@@ -69,7 +69,7 @@ class ScreeningCasesApiIT {
     api.doGet(UCC, BASE + "/cases/" + investigation + "/documents").andExpect(status().isOk());
     api.doGet(UCC, BASE + "/cases/" + investigation + "/review")
         .andExpect(status().is2xxSuccessful());
-    api.doGet(UCC, BASE + "/cases/" + demoCase("SCR-2026-000006") + "/votes")
+    api.doGet(UCC, BASE + "/cases/" + seedCase("SCR-2026-000006") + "/votes")
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].member").value("amlcom1"));
     Long clientId =
@@ -92,7 +92,7 @@ class ScreeningCasesApiIT {
         .andExpect(status().isForbidden());
     api.doPost(
             "amlcom1",
-            BASE + "/cases/" + demoCase("SCR-2026-000006") + "/votes",
+            BASE + "/cases/" + seedCase("SCR-2026-000006") + "/votes",
             Map.of("remarks", "x"))
         .andExpect(status().isUnprocessableEntity());
   }
@@ -100,7 +100,7 @@ class ScreeningCasesApiIT {
   @Test
   void strsAndExtractionsAreServedOverHttp() throws Exception {
     Long company = data.company().getId();
-    Long approved = demoCase("SCR-2026-000008");
+    Long approved = seedCase("SCR-2026-000008");
     api.doGet(UCC, BASE + "/str?companyId=" + company).andExpect(status().isForbidden());
     api.doGet(COMPLIANCE, BASE + "/str?companyId=" + company + "&status=EXTRACTED")
         .andExpect(status().isOk())
@@ -109,7 +109,7 @@ class ScreeningCasesApiIT {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.str.status").value("APPROVED"))
         .andExpect(jsonPath("$.transactions.length()").value(1));
-    api.doGet(COMPLIANCE, BASE + "/cases/" + demoCase("SCR-2026-000007") + "/str")
+    api.doGet(COMPLIANCE, BASE + "/cases/" + seedCase("SCR-2026-000007") + "/str")
         .andExpect(status().isNoContent());
     Long strId =
         jdbc.queryForObject("select id from scr_str where str_no = 'STR-2026-000001'", Long.class);

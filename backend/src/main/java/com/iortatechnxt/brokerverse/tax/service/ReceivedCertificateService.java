@@ -42,7 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ReceivedCertificateService {
 
-  /** Accounting event (V890; demo rules V999). */
+  /** Accounting event (V890; seed rules V999). */
   public static final String EVENT = "TAX_CWT_CERT_RECEIVED";
 
   /** Source module of the postings. */

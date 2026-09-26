@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Booking test data: accounts brought to POLICY_ISSUED through the real account services (direct
- * booking with an e-policy), for confirmed demo clients that have a sub-ledger party (V981).
+ * booking with an e-policy), for confirmed seed clients that have a sub-ledger party (V981).
  */
 @Component
 public class BookingFixtures {
@@ -44,7 +44,7 @@ public class BookingFixtures {
   /** End of the test accounts' cover. */
   public static final LocalDate TO = LocalDate.of(2027, 10, 1);
 
-  /** Demo client with a party (CBG). */
+  /** Seed client with a party (CBG). */
   public static final String CLIENT = "CL-2026-000001";
 
   private static final AtomicLong SEQ = new AtomicLong(System.nanoTime() % 1_000_000L);
@@ -74,7 +74,7 @@ public class BookingFixtures {
     this.data = data;
   }
 
-  /** The demo company. */
+  /** The seed company. */
   public Long company() {
     return data.company().getId();
   }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 /**
  * Default transport when no mail server is configured: logs the message and reports it as sent
  * (simulated). Addresses in the reserved {@code .invalid} top-level domain (RFC 2606) are rejected,
- * so failed deliveries can be demonstrated and tested.
+ * so failed deliveries can be shown and tested.
  */
 @Component
 @ConditionalOnProperty(

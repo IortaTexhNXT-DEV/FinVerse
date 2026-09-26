@@ -10,7 +10,7 @@
  * OpsLedgerEvents.DisbursementStatusChanged} (DV stage, instrument status, CANCELLED) for the
  * source modules. Nothing depends on this module. Foundation (wave A0): permissions, roles, LOV
  * types, workflows {@code DISB_VOUCHER}, {@code DISB_FUNDING}, {@code DISB_PAYEE}, {@code
- * DISB_STATUS_EDIT}, event types and parameters in V890, demo accounts, rules and users in V999.
+ * DISB_STATUS_EDIT}, event types and parameters in V890, seed accounts, rules and users in V999.
  * The module itself is built by wave A1-DSB (V891-V893).
  */
 package com.iortatechnxt.brokerverse.disbursement;

@@ -4,6 +4,6 @@ package com.iortatechnxt.brokerverse.opsledger.domain;
 public enum FeedSource {
   /** From booking's {@code InvoiceBooked} event after commit. */
   EVENT,
-  /** Replayed from {@code BookingQueryService} (job, endpoint or demo start-up). */
+  /** Replayed from {@code BookingQueryService} (job, endpoint or seed start-up). */
   REPLAY
 }

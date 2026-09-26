@@ -60,7 +60,7 @@ public interface PolicyRepository
   List<Policy> findByOpenCoverIdOrderById(Long openCoverId);
 
   /**
-   * Counts policies of a company (demo data idempotency).
+   * Counts policies of a company (seed data idempotency).
    *
    * @param companyId company
    * @return count

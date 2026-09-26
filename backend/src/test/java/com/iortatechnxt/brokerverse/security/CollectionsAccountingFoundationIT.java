@@ -24,8 +24,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
  * Foundations of Collections (BRD-4, V1000) and Accounting / Disbursement / ACSL (BRD-5, V890,
- * V999): permissions granted and classified, demo personas, workflows, lists of values with their
- * attributes, event types with demo rules, parameters, alerts, feeds and job crons.
+ * V999): permissions granted and classified, seed personas, workflows, lists of values with their
+ * attributes, event types with seed rules, parameters, alerts, feeds and job crons.
  */
 @IntegrationTest
 class CollectionsAccountingFoundationIT {
@@ -82,7 +82,7 @@ class CollectionsAccountingFoundationIT {
   }
 
   @Test
-  void demoPersonasHoldTheirPermissions() {
+  void seedPersonasHoldTheirPermissions() {
     assertThat(authorities("ao")).contains("CLX_VIEW", "CLX_WORK", "CLX_EXPORT", "PRQ_CREATE");
     assertThat(authorities("mkttl")).contains("CLX_ESCALATION_HANDLE", "CLX_ASSIGN", "PRQ_REVIEW");
     assertThat(authorities("mktcoll"))
@@ -180,7 +180,7 @@ class CollectionsAccountingFoundationIT {
   }
 
   @Test
-  void everyNewEventTypeHasADemoRuleOnExistingAccounts() {
+  void everyNewEventTypeHasASeedRuleOnExistingAccounts() {
     List<String> events =
         List.of(
             "DISB_VOUCHER",

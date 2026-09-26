@@ -98,7 +98,7 @@ export const SCREENING_HELP: HelpSection = {
       controls: [
         'Only committee-approved STRs are extracted; extracting one again needs a reason and is logged as a re-extraction.',
         'The AMLC reference is unique and the filing date cannot be before the extraction or in the future.',
-        'The STR reason list (SCR_STR_REASON) and the AMLC layout are to be supplied by BDOI (SQ09); the demo uses placeholder reasons.',
+        'The STR reason list (SCR_STR_REASON) and the AMLC layout are to be supplied by BDOI (SQ09); SIT/UAT uses placeholder reasons.',
       ],
     },
   ],
@@ -154,7 +154,7 @@ export const SCREENING_SETUP_HELP: HelpSection = {
       controls: [
         'Screening uses active entries only; pending and draft entries have no effect.',
         'Entries are never deleted, only deactivated; one change per entry waits at a time.',
-        'The maker of a change can never approve it. The demo list uses invented names only.',
+        'The maker of a change can never approve it. The SIT/UAT watchlist uses invented names only.',
       ],
     },
     {

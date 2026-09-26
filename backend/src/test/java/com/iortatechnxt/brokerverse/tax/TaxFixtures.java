@@ -7,7 +7,7 @@ import com.iortatechnxt.brokerverse.payables.service.InvoiceCommand;
 import com.iortatechnxt.brokerverse.payables.service.SupplierInvoiceService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.TestData;
-import com.iortatechnxt.brokerverse.tax.demo.TaxDemoMasters;
+import com.iortatechnxt.brokerverse.tax.seed.TaxSeedMasters;
 import com.iortatechnxt.brokerverse.underwriting.UwFixtures;
 import com.iortatechnxt.brokerverse.underwriting.api.dto.PolicyRequest;
 import com.iortatechnxt.brokerverse.underwriting.domain.BusinessType;
@@ -22,14 +22,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * Builds tax scenarios in the demo company FVI through the owning modules' services: a fire policy
+ * Builds tax scenarios in the seed company FVI through the owning modules' services: a fire policy
  * through a broker (VAT, DST, LGT, FST and commission withholding) and a VAT-registered supplier
  * invoice with 2 % EWT.
  */
 @Component
 public class TaxFixtures {
 
-  private final TaxDemoMasters masters;
+  private final TaxSeedMasters masters;
   private final UwFixtures uw;
   private final SupplierInvoiceService invoices;
   private final AsUser as;
@@ -37,7 +37,7 @@ public class TaxFixtures {
   private final JdbcTemplate jdbc;
 
   TaxFixtures(
-      TaxDemoMasters masters,
+      TaxSeedMasters masters,
       UwFixtures uw,
       SupplierInvoiceService invoices,
       AsUser as,

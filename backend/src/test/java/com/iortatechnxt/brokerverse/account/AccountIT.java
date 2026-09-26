@@ -60,11 +60,11 @@ class AccountIT {
 
   @Test
   void createdAccountGetsArnPremiumSalesUnitContactAndWorkCase() {
-    Client client = fx.confirmed("CL-DEMO-A001");
+    Client client = fx.confirmed("CL-2026-900001");
     Account account = motor(client);
     assertThat(account.getArn()).matches("ARN-\\d{4}-\\d{6}");
     assertThat(account.getStatus()).isEqualTo(AccountStatus.DRAFT);
-    assertThat(account.getClientCode()).isEqualTo("CL-DEMO-A001");
+    assertThat(account.getClientCode()).isEqualTo("CL-2026-900001");
     assertThat(account.getLineCode()).isEqualTo("MOTOR");
     assertThat(account.getTotalSumInsured()).isEqualByComparingTo("1000000");
     assertThat(account.getPremium().netPremium()).isEqualByComparingTo("12425.00");
@@ -94,7 +94,7 @@ class AccountIT {
 
   @Test
   void arnFromAQuotationIsKeptAndPremiumTaken() {
-    Client client = fx.confirmed("CL-DEMO-A002");
+    Client client = fx.confirmed("CL-2026-900002");
     String arn = "ARN-2026-7" + String.format("%05d", Math.abs(token().hashCode()) % 100000);
     Account account =
         as.run(
@@ -146,7 +146,7 @@ class AccountIT {
 
   @Test
   void submitNeedsMinimumFieldsDocumentsAndPremiumThenProcessingValidates() {
-    Client client = fx.confirmed("CL-DEMO-A001");
+    Client client = fx.confirmed("CL-2026-900001");
     String id = token();
     RiskItemData noEngine =
         new RiskItemData(
@@ -211,7 +211,7 @@ class AccountIT {
 
   @Test
   void processingReturnsAndMarketingResubmits() {
-    Client client = fx.confirmed("CL-DEMO-A003");
+    Client client = fx.confirmed("CL-2026-900003");
     Account account =
         create(
             "ao2",
@@ -272,7 +272,7 @@ class AccountIT {
         .extracting("code")
         .isEqualTo("CLIENT_NOT_CONFIRMED");
 
-    Client client = fx.confirmed("CL-DEMO-A003");
+    Client client = fx.confirmed("CL-2026-900003");
     Account big =
         create(
             "ao2",
@@ -299,7 +299,7 @@ class AccountIT {
 
   @Test
   void directPaymentAccountsSkipThePaymentGate() {
-    Client client = fx.confirmed("CL-DEMO-A003");
+    Client client = fx.confirmed("CL-2026-900003");
     AccountDraft base =
         draft(
             client.getId(),
@@ -399,7 +399,7 @@ class AccountIT {
 
   @Test
   void preBookedAccountsAreFoundByArnPolicyOrPromissoryNote() {
-    Client client = fx.confirmed("CL-DEMO-A002");
+    Client client = fx.confirmed("CL-2026-900002");
     String pn = "PN-" + token();
     AccountDraft base = draft(client.getId(), "MTR10", "CBG", List.of(vehicle(token(), "700000")));
     AccountDraft withPn =
@@ -437,7 +437,7 @@ class AccountIT {
 
   @Test
   void directBookingNeedsTheIssuedPolicy() {
-    Client client = fx.confirmed("CL-DEMO-A002");
+    Client client = fx.confirmed("CL-2026-900002");
     Account account = motor(client);
     fx.attach(account.getId(), "IDF", "ao");
     as.run("ao", () -> accounts.submit(account.getId(), null));

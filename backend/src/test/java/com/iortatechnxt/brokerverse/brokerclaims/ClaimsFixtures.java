@@ -48,10 +48,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClaimsFixtures {
 
-  /** The demo Claims Officer (Motor HO). */
+  /** The seed Claims Officer (Motor HO). */
   public static final String OFFICER = "clmofficer";
 
-  /** The demo Claims Team Lead. */
+  /** The seed Claims Team Lead. */
   public static final String TL = "clmtl";
 
   /** Lead insurer of the test covers. */
@@ -97,7 +97,7 @@ public class ClaimsFixtures {
     this.as = as;
   }
 
-  /** The demo company. */
+  /** The seed company. */
   public Long company() {
     return booking.company();
   }

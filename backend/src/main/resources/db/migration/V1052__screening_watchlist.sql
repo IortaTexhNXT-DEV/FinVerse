@@ -12,7 +12,7 @@
 --   Design: docs/architecture/SANCTION_SCREENING_DESIGN.md section 4.2. Watchlists are reference
 --   data shared by all companies (no company_id). Screening reads ACTIVE entries only. Transports
 --   other than file upload / file drop are parked (SQ01). The three sources of the BRD are seeded
---   here (they are configuration, not demo data); the demo entries come with db/demo/V1951.
+--   here (they are configuration, not seed data); the seed entries come with db/seed/V1951.
 -- =====================================================================================
 
 create table scr_watchlist_source (

@@ -134,7 +134,7 @@ class NbReportApiIT {
     assertThat(xml)
         .contains("<report code=\"NB-ACC-STATUS\"")
         .contains("<generatedBy>ao</generatedBy>")
-        .contains("BDOI Demo Insurance Brokers, Inc.");
+        .contains("BDO Insurance and Reinsurance Brokers, Inc.");
   }
 
   private static Map<String, Object> target(String unit) {

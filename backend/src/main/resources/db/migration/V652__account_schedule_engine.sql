@@ -14,7 +14,7 @@
 --                            with commentary, Appendix A II-45)
 --
 -- The definitions below are drafts: BDOI has given titles only, so every layout is TO_CONFIRM
--- (AQ05) and the account selectors point at the demo chart until FRBS uploads the real chart
+-- (AQ05) and the account selectors point at the seed chart until FRBS uploads the real chart
 -- (FRBS 2.3.1, AQ01). They are configuration, maintained on the Account Schedules screen; no code
 -- refers to an account code. No foreign key to broking tables (design section 4).
 -- =====================================================================================

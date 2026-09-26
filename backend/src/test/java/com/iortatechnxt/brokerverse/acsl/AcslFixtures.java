@@ -32,7 +32,7 @@ public class AcslFixtures {
     this.journals = journals;
   }
 
-  /** The demo company. */
+  /** The seed company. */
   public Long company() {
     return ledgerFx.company();
   }

@@ -58,7 +58,7 @@ export const NB_REPORTS_HELP: HelpSection = {
       ],
       controls: [
         'A target is identified by its unit and start date; saving the same unit and start again changes it.',
-        'Every change is audited. The demo targets are samples until BDOI gives its targets (Q41).',
+        'Every change is audited. The SIT/UAT targets are placeholders until BDOI gives its targets (Q41).',
       ],
     },
   ],

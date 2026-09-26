@@ -121,7 +121,7 @@ class CommissionApiIT {
     api.doPost(
             HANDLER,
             BASE + "/dp/billings/" + id + "/send",
-            Map.of("to", List.of("billing@insurer-demo.ph")))
+            Map.of("to", List.of("billing@insurer-seed.ph")))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.stage").value(DpBilling.AWAITING));
     api.doGet(HANDLER, BASE + "/dp/billings/" + id + "/file").andExpect(status().isOk());

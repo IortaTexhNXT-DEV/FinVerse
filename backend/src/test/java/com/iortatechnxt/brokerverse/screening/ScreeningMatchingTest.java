@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Pure functions of matching and risk profiling (SNSRP-301, 302; FR-SS-031, 033): normalisation,
  * blocking keys, the three algorithms, the pair matcher with its attribute adjustments, the
- * in-memory entry pool and the safety of the demo watchlist of V1951 against the demo clients.
+ * in-memory entry pool and the safety of the seed watchlist of V1951 against the seed clients.
  */
 class ScreeningMatchingTest {
 
@@ -37,8 +37,8 @@ class ScreeningMatchingTest {
   private static final String INTERNAL = "INTERNAL";
   private static final String FILIPINO = "FILIPINO";
 
-  /** The demo matching criteria of V1950 (FVI version 1). */
-  private static final MatchCriteria DEMO =
+  /** The seed matching criteria of V1950 (FVI version 1). */
+  private static final MatchCriteria SEED =
       new MatchCriteria(
           new ConfigVersionRef(1L, ConfigType.MATCH_CRITERIA, null, 1, LocalDate.of(2026, 1, 1)),
           List.of(
@@ -201,7 +201,7 @@ class ScreeningMatchingTest {
             LocalDate.of(1970, 2, 15),
             "Juanito Dela Cruz");
     PairMatcher.Hit exact =
-        PairMatcher.match(person("Juan", null, "Dela Cruz", null), listed, DEMO).orElseThrow();
+        PairMatcher.match(person("Juan", null, "Dela Cruz", null), listed, SEED).orElseThrow();
     assertThat(exact.rule().algorithm()).isEqualTo(MatchAlgorithm.EXACT);
     assertThat(exact.score()).isEqualByComparingTo("1");
     assertThat(exact.fields()).containsExactly(MatchField.NAME);
@@ -209,33 +209,33 @@ class ScreeningMatchingTest {
 
     PairMatcher.Hit sameBirth =
         PairMatcher.match(
-                person("Juan", "Santos", "Dela Cruz", LocalDate.of(1970, 2, 15)), listed, DEMO)
+                person("Juan", "Santos", "Dela Cruz", LocalDate.of(1970, 2, 15)), listed, SEED)
             .orElseThrow();
     assertThat(sameBirth.fields())
         .containsExactlyInAnyOrder(MatchField.NAME, MatchField.BIRTH_DATE);
     assertThat(sameBirth.score()).isEqualByComparingTo("1");
 
     PairMatcher.Hit otherBirth =
-        PairMatcher.match(person("Juan", null, "Dela Cruz", LocalDate.of(1985, 5, 1)), listed, DEMO)
+        PairMatcher.match(person("Juan", null, "Dela Cruz", LocalDate.of(1985, 5, 1)), listed, SEED)
             .orElseThrow();
     assertThat(otherBirth.rule().algorithm()).isEqualTo(MatchAlgorithm.PHONETIC);
     assertThat(otherBirth.score()).isEqualByComparingTo("0.9");
 
     PairMatcher.Hit alias =
-        PairMatcher.match(person("Juanito", null, "Dela Cruz", null), listed, DEMO).orElseThrow();
+        PairMatcher.match(person("Juanito", null, "Dela Cruz", null), listed, SEED).orElseThrow();
     assertThat(alias.fields()).containsExactly(MatchField.ALIAS);
 
-    assertThat(PairMatcher.match(person("Juana", null, "Cruzado", null), listed, DEMO)).isEmpty();
-    assertThat(PairMatcher.match(corporate("Juan de la Cruz"), listed, DEMO)).isEmpty();
+    assertThat(PairMatcher.match(person("Juana", null, "Cruzado", null), listed, SEED)).isEmpty();
+    assertThat(PairMatcher.match(corporate("Juan de la Cruz"), listed, SEED)).isEmpty();
     ListedEntry adverse = entry("ADVERSE_MEDIA", SubjectType.INDIVIDUAL, "Juan de la Cruz", null);
-    assertThat(PairMatcher.match(person("Juan", null, "Dela Cruz", null), adverse, DEMO)).isEmpty();
+    assertThat(PairMatcher.match(person("Juan", null, "Dela Cruz", null), adverse, SEED)).isEmpty();
   }
 
   @Test
   void anIdSharedOrANationalityRaisesTheScoreWhenTheRuleComparesThem() {
     MatchCriteria withIds =
         new MatchCriteria(
-            DEMO.version(),
+            SEED.version(),
             List.of(
                 new MatchCriteria.Rule(
                     1L,
@@ -330,9 +330,9 @@ class ScreeningMatchingTest {
     assertThat(EntryPool.of(List.of()).isEmpty()).isTrue();
   }
 
-  /** V1951 entries against the demo clients of V981 / V983: only the intended pair matches. */
+  /** V1951 entries against the seed clients of V981 / V983: only the intended pair matches. */
   @Test
-  void theDemoWatchlistMatchesOnlyTheIntendedDemoClient() {
+  void theSeedWatchlistMatchesOnlyTheIntendedSeedClient() {
     List<ListedEntry> entries =
         List.of(
             entry(
@@ -456,14 +456,14 @@ class ScreeningMatchingTest {
             corporate("Metro Dental Clinic Partners"));
     for (ScreeningSubject s : others) {
       for (ListedEntry e : entries) {
-        assertThat(PairMatcher.match(s, e, DEMO))
+        assertThat(PairMatcher.match(s, e, SEED))
             .as(s.names() + " vs " + e.primaryName())
             .isEmpty();
       }
     }
     List<String> hits =
         entries.stream()
-            .filter(e -> PairMatcher.match(intended, e, DEMO).isPresent())
+            .filter(e -> PairMatcher.match(intended, e, SEED).isPresent())
             .map(ListedEntry::primaryName)
             .toList();
     assertThat(hits).containsExactly("Jose Miguel Lopez Reyes");

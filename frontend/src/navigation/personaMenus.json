@@ -9,7 +9,7 @@
       "sharedModules": ["help"],
       "roles": {
         "COMPLIANCE_OFFICER": {
-          "demoUser": "compoff",
+          "seedUser": "compoff",
           "permissions": [
             "ATTACHMENT_VIEW",
             "CLIENT_VIEW",
@@ -38,7 +38,7 @@
           ]
         },
         "COMPLIANCE_CHECKER": {
-          "demoUser": "compchk",
+          "seedUser": "compchk",
           "permissions": [
             "CLIENT_VIEW",
             "REPORT_VIEW",
@@ -60,7 +60,7 @@
           ]
         },
         "UNIT_COMPLIANCE_COORD": {
-          "demoUser": "ucc",
+          "seedUser": "ucc",
           "permissions": [
             "CLIENT_VIEW",
             "REPORT_VIEW",
@@ -79,7 +79,7 @@
           ]
         },
         "SCR_INVESTIGATOR": {
-          "demoUser": "investigator",
+          "seedUser": "investigator",
           "permissions": [
             "ACCOUNT_VIEW",
             "ATTACHMENT_MANAGE",
@@ -100,7 +100,7 @@
           ]
         },
         "SCR_APPROVER": {
-          "demoUser": "scrapprover",
+          "seedUser": "scrapprover",
           "permissions": [
             "CLIENT_VIEW",
             "SCR_CASE_APPROVE",
@@ -118,7 +118,7 @@
           ]
         },
         "AML_COMMITTEE": {
-          "demoUser": "amlcom1",
+          "seedUser": "amlcom1",
           "permissions": ["ATTACHMENT_VIEW", "CLIENT_VIEW", "SCR_COMMITTEE", "SCR_VIEW"],
           "screens": [
             "/screening",
@@ -130,7 +130,7 @@
           ]
         },
         "UAM_REQUESTOR": {
-          "demoUser": "requestor",
+          "seedUser": "requestor",
           "permissions": [
             "BULK_PROCESS",
             "UAM_CANCEL",
@@ -144,7 +144,7 @@
           "screens": ["/user-access/requests", "/user-access/bulk"]
         },
         "UAM_APPROVER": {
-          "demoUser": "uamapprover",
+          "seedUser": "uamapprover",
           "permissions": ["ACCESS_APPROVE", "REPORT_VIEW", "UAM_REPORT_VIEW", "UAM_VIEW"],
           "screens": [
             "/user-access/requests",
@@ -155,7 +155,7 @@
           ]
         },
         "UAM_SECOND_APPROVER": {
-          "demoUser": "secapprover",
+          "seedUser": "secapprover",
           "permissions": ["UAM_SECOND_APPROVE", "UAM_VIEW"],
           "screens": ["/user-access/requests", "/user-access/group-profiles"]
         }
@@ -169,7 +169,7 @@
       "sharedModules": ["help"],
       "roles": {
         "CLM_OFFICER": {
-          "demoUser": "clmofficer",
+          "seedUser": "clmofficer",
           "permissions": [
             "ACCOUNT_VIEW",
             "ATTACHMENT_MANAGE",
@@ -200,7 +200,7 @@
           ]
         },
         "CLM_TL": {
-          "demoUser": "clmtl",
+          "seedUser": "clmtl",
           "permissions": [
             "ACCOUNT_VIEW",
             "ATTACHMENT_MANAGE",
@@ -238,7 +238,7 @@
           ]
         },
         "CLM_TH": {
-          "demoUser": "clmth",
+          "seedUser": "clmth",
           "permissions": [
             "ACCOUNT_VIEW",
             "ATTACHMENT_MANAGE",
@@ -277,7 +277,7 @@
           ]
         },
         "CLM_UH": {
-          "demoUser": "clmuh",
+          "seedUser": "clmuh",
           "permissions": [
             "ACCOUNT_VIEW",
             "ATTACHMENT_VIEW",
@@ -304,7 +304,7 @@
           ]
         },
         "CLM_RISK": {
-          "demoUser": "clmrisk",
+          "seedUser": "clmrisk",
           "permissions": [
             "ACCOUNT_VIEW",
             "ATTACHMENT_VIEW",
@@ -327,13 +327,13 @@
           ]
         },
         "MKT_AO": {
-          "demoUser": "ao",
+          "seedUser": "ao",
           "permissionScope": "BCL_",
           "permissions": ["BCL_REPORT_VIEW"],
           "screens": ["/claims-handling/reports"]
         },
         "MKT_TL": {
-          "demoUser": "mkttl",
+          "seedUser": "mkttl",
           "permissionScope": "BCL_",
           "permissions": ["BCL_REPORT_EXPORT", "BCL_REPORT_VIEW"],
           "screens": ["/claims-handling/reports"]

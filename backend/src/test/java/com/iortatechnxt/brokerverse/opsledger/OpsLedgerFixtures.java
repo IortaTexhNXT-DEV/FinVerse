@@ -34,7 +34,7 @@ public class OpsLedgerFixtures {
     this.as = as;
   }
 
-  /** The demo company. */
+  /** The seed company. */
   public Long company() {
     return booking.company();
   }

@@ -361,7 +361,7 @@ class PackageRequestProcessIT {
                 advisory.getId(),
                 new Advisory.Content(
                     List.of("MARKETING", "OPERATIONS"),
-                    List.of("operations@brokerverse-demo.ph"),
+                    List.of("operations@brokerverse-seed.ph"),
                     "MTR31 renewed",
                     "The MTR31 package is renewed.",
                     null)));

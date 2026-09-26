@@ -58,7 +58,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class StrService {
 
-  /** STR reasons (SQ09; demo codes in V1952). */
+  /** STR reasons (SQ09; seed codes in V1952). */
   static final String REASON_LOV = "SCR_STR_REASON";
 
   /** Key of the transaction gap. */

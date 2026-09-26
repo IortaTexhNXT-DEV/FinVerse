@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 /**
  * Production Statistics (NB-PRODUCTION, BRNB.075): bookings, premium and commission per region,
  * department, team or account officer (the sales organisation stamped on the account) for a date
- * range, against the units' targets pro rata to the period. Targets are demo values until BDOI
+ * range, against the units' targets pro rata to the period. Targets are seed values until BDOI
  * gives the hierarchy and target values (Q41). Filter Business Type (BRID-022.01, shared work item
  * BT0): targets are shown unchanged whatever the filter.
  */

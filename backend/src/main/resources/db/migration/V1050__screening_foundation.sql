@@ -16,7 +16,7 @@
 --   7 (workflow SCR_CASE) and 8 (parameters, LOVs, alerts, notification events). The permissions
 --   are the enum security.domain.Permission; the grants are a proposal until SQ19 is answered (the
 --   Operations Lead role gets its grants when BDOI names it). The screening tables come with S1-A /
---   S1-B / S1-C (V1051-V1055); demo users and data with V1950-V1952.
+--   S1-B / S1-C (V1051-V1055); SIT/UAT users and data with V1950-V1952.
 --   Runs after V801 (crm LOVs, KYC_RISK_RATING / CLIENT_TAG), V790 (retention rules) and V755
 --   (sec_permission_action) on a fresh database; nothing here depends on V1000+.
 -- =====================================================================================

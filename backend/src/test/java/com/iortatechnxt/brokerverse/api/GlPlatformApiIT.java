@@ -81,7 +81,7 @@ class GlPlatformApiIT {
   }
 
   @Test
-  void chartUploadDemoFileLoadsPendingAuthorization() throws Exception {
+  void chartUploadSeedFileLoadsPendingAuthorization() throws Exception {
     Long company = companies.create("TGLU", "PHP").getId();
     mvc.perform(
             org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get(

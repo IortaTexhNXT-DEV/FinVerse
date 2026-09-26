@@ -156,7 +156,7 @@ public class OpsJourneyLater {
                         BookingFixtures.BOOKED_ON),
                     ExtractTrigger.MANUAL));
     Long cycleId = extract.getCycleId();
-    journey.as(RECON, () -> sender.send(extract.getId(), List.of("recon@insurer-demo.ph"), null));
+    journey.as(RECON, () -> sender.send(extract.getId(), List.of("recon@insurer-seed.ph"), null));
     OpsInvoice remitted = journey.invoice(invoiceNo);
     byte[] file =
         ReconFixtures.file(

@@ -1,6 +1,6 @@
 spring:
   flyway:
-    locations: classpath:db/migration,classpath:db/demo
+    locations: classpath:db/migration,classpath:db/seed
 management:
   health:
     redis:

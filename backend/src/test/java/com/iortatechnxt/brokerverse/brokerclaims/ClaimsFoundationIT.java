@@ -33,8 +33,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Foundation of Claims Handling (BRD-7, wave CL0; V1020, V1021, V1920): permissions granted and
- * classified, roles and demo users, workflow BCL_CLAIM, lists of values with their attributes, the
- * status access matrix, handler register, parameters, alerts, notification events, template,
+ * classified, roles and SIT/UAT users, workflow BCL_CLAIM, lists of values with their attributes,
+ * the status access matrix, handler register, parameters, alerts, notification events, template,
  * retention rule, job crons, the report category and the claim mapping.
  */
 @IntegrationTest
@@ -78,7 +78,7 @@ class ClaimsFoundationIT {
   }
 
   @Test
-  void demoUsersCarryTheDesignedRights() {
+  void seedUsersCarryTheDesignedRights() {
     assertThat(authorities("clmofficer"))
         .contains("BCL_VIEW", "BCL_RECORD", "BCL_AUTHORIZE", "BCL_STATUS_UPDATE", "WORK_VIEW")
         .doesNotContain("BCL_CLOSE", "BCL_REOPEN", "BCL_CLAIMANT_OVERRIDE", "BCL_SETUP");

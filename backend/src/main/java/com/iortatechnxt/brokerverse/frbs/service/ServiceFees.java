@@ -17,7 +17,7 @@ public final class ServiceFees {
   /** Workflow of a run (V890). */
   public static final String WORKFLOW = "FRBS_SERVICE_FEE";
 
-  /** Accrual event (V890; demo rule Dr 5614 / Cr 2250 in V999). */
+  /** Accrual event (V890; seed rule Dr 5614 / Cr 2250 in V999). */
   public static final String ACCRUAL_EVENT = "FRBS_SERVICE_FEE_ACCRUE";
 
   /** Amount component of the accrual. */

@@ -53,7 +53,7 @@ function detail(entryVersion?: number): MatchDetail {
         ? null
         : {
             name: 'Juan de la Cruz',
-            reference: 'AML-DEMO-001',
+            reference: 'AML-900001',
             type: 'INDIVIDUAL',
             status: 'ACTIVE',
             birthDate: '1970-02-16',

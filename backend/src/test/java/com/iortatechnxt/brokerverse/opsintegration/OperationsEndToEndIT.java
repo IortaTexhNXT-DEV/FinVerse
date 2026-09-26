@@ -51,13 +51,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The Operations modules working as one system (OPERATIONS_DESIGN section 13, wave O2), through the
- * real services as the demo users and without mocks: booking, over-the-counter payment applied per
- * component, the placement payment gate opened by cashiering, remittance extraction, exclusion and
- * restore, four-eyes approval, the Disbursement queue with the DV, the insurer OR, the production
- * reconciliation cycle, a cancellation after remittance with the AR Insurer and the payments
- * re-applied into unapplied items, a direct payment commission billed and collected with its OR,
- * and a write-off on the minimal balance file. Every step checks the ledger (components, movements,
- * flags and statuses), the journals and the open items (BRQID.004, CSHID.001/020/022,
+ * real services as the SIT/UAT users and without mocks: booking, over-the-counter payment applied
+ * per component, the placement payment gate opened by cashiering, remittance extraction, exclusion
+ * and restore, four-eyes approval, the Disbursement queue with the DV, the insurer OR, the
+ * production reconciliation cycle, a cancellation after remittance with the AR Insurer and the
+ * payments re-applied into unapplied items, a direct payment commission billed and collected with
+ * its OR, and a write-off on the minimal balance file. Every step checks the ledger (components,
+ * movements, flags and statuses), the journals and the open items (BRQID.004, CSHID.001/020/022,
  * RMTID.001-013/019/034/036/038, PRCID.009/026/028, ADJID.009/012/013/026, CMRID.009/010,
  * MKTID.012).
  */

@@ -62,7 +62,7 @@ class QuotationProposalApiIT {
   }
 
   @Test
-  void demoQuotationDetailVersionsDiffAndDocuments() throws Exception {
+  void seedQuotationDetailVersionsDiffAndDocuments() throws Exception {
     Long revised = id("quo_quotation", "quotation_no", "QT-2026-900008");
     String base = "/api/v1/quotations/" + revised;
     api.doGet("ao", base)
@@ -181,7 +181,7 @@ class QuotationProposalApiIT {
   }
 
   @Test
-  void demoProposalReadsAndTsuEndpoints() throws Exception {
+  void seedProposalReadsAndTsuEndpoints() throws Exception {
     Long terms = id("npk_proposal", "prf_no", "PRF-2026-900004");
     String base = "/api/v1/proposals/" + terms;
     api.doGet("ao2", base)

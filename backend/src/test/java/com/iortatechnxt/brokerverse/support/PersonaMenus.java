@@ -31,7 +31,7 @@ public final class PersonaMenus {
    * One role of the file.
    *
    * @param role role code
-   * @param demoUser demo user holding only this role
+   * @param seedUser SIT/UAT user holding only this role
    * @param permissionScope prefix of the listed permissions (a role of another business area whose
    *     other grants the suite does not pin), null when every permission is listed
    * @param permissions permissions granted (those of the scope when a scope is set)
@@ -39,7 +39,7 @@ public final class PersonaMenus {
    */
   public record Persona(
       String role,
-      String demoUser,
+      String seedUser,
       String permissionScope,
       Set<String> permissions,
       List<String> screens) {
@@ -87,7 +87,7 @@ public final class PersonaMenus {
     JsonNode scope = node.get("permissionScope");
     return new Persona(
         role,
-        node.get("demoUser").asText(),
+        node.get("seedUser").asText(),
         scope == null ? null : scope.asText(),
         permissions,
         List.copyOf(screens));

@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-/** Fluent helper for full-stack API tests acting as a named demo user. */
+/** Fluent helper for full-stack API tests acting as a named SIT/UAT user. */
 @Component
 public class Api {
 

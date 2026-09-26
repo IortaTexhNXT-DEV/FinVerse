@@ -68,7 +68,7 @@ class RiskRuleEvaluatorTest {
 
   @Test
   void theFirstRuleByPriorityDecidesAndTrueMatchesComeFirst() {
-    RiskRules demo =
+    RiskRules seed =
         rules(
             List.of(
                 risk(
@@ -84,20 +84,20 @@ class RiskRuleEvaluatorTest {
         List.of(
             new MatchFacts(5L, SANCTION, "POTENTIAL"), new MatchFacts(7L, SANCTION, "TRUE_MATCH"));
     RiskRuleEvaluator.Qualification q =
-        RiskRuleEvaluator.evaluate(demo, CLIENT, matches).orElseThrow();
+        RiskRuleEvaluator.evaluate(seed, CLIENT, matches).orElseThrow();
     assertThat(q.category().code()).isEqualTo("HIGH_SANCTION");
     assertThat(q.matchId()).isEqualTo(7L);
 
     Optional<RiskRuleEvaluator.Qualification> pepTag =
         RiskRuleEvaluator.evaluate(
-            demo,
+            seed,
             new ClientFacts("INDIVIDUAL", FILIPINO, null, null, null, Set.of("PEP")),
             List.of());
     assertThat(pepTag.orElseThrow().category().code()).isEqualTo("PEP");
     assertThat(pepTag.get().matchId()).isNull();
-    assertThat(RiskRuleEvaluator.evaluate(demo, CLIENT, List.of())).isEmpty();
+    assertThat(RiskRuleEvaluator.evaluate(seed, CLIENT, List.of())).isEmpty();
     assertThat(
-            RiskRuleEvaluator.evaluate(demo, CLIENT, List.of(new MatchFacts(9L, PEP, "POTENTIAL")))
+            RiskRuleEvaluator.evaluate(seed, CLIENT, List.of(new MatchFacts(9L, PEP, "POTENTIAL")))
                 .orElseThrow()
                 .rule()
                 .id())

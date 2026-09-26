@@ -3,10 +3,10 @@ package com.iortatechnxt.brokerverse.claims;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.iortatechnxt.brokerverse.claims.demo.ClaimsDemoData;
 import com.iortatechnxt.brokerverse.claims.domain.Claim;
 import com.iortatechnxt.brokerverse.claims.domain.ClaimRepository;
 import com.iortatechnxt.brokerverse.claims.domain.ClaimStatus;
+import com.iortatechnxt.brokerverse.claims.seed.ClaimsSeedData;
 import com.iortatechnxt.brokerverse.claims.service.ClaimLifecycleService;
 import com.iortatechnxt.brokerverse.claims.service.ClaimService;
 import com.iortatechnxt.brokerverse.claims.service.LpoService;
@@ -20,9 +20,9 @@ import com.iortatechnxt.brokerverse.report.core.RowKind;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
-import com.iortatechnxt.brokerverse.underwriting.demo.DemoUserContext;
-import com.iortatechnxt.brokerverse.underwriting.demo.UnderwritingDemoData;
 import com.iortatechnxt.brokerverse.underwriting.domain.PolicyRepository;
+import com.iortatechnxt.brokerverse.underwriting.seed.SeedUserContext;
+import com.iortatechnxt.brokerverse.underwriting.seed.UnderwritingSeedData;
 import com.iortatechnxt.brokerverse.underwriting.service.EndorsementService;
 import com.iortatechnxt.brokerverse.underwriting.service.OpenCoverService;
 import com.iortatechnxt.brokerverse.underwriting.service.PolicyApprovalService;
@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 
-/** Claims demo portfolio and every claims report with its PDF / XLSX / CSV export. */
+/** Claims seed portfolio and every claims report with its PDF / XLSX / CSV export. */
 @IntegrationTest
 class ClaimsReportsIT {
 
@@ -57,7 +57,7 @@ class ClaimsReportsIT {
     "CLM-MOVEMENT"
   };
 
-  private static List<Claim> demoClaims;
+  private static List<Claim> seedClaims;
 
   @Autowired private ReportService reports;
   @Autowired private TestData data;
@@ -69,7 +69,7 @@ class ClaimsReportsIT {
   @Autowired private EndorsementService endorsements;
   @Autowired private QuotationService quotations;
   @Autowired private OpenCoverService openCovers;
-  @Autowired private DemoUserContext users;
+  @Autowired private SeedUserContext users;
   @Autowired private ClaimRepository claimRepository;
   @Autowired private PolicyQueryService policyQuery;
   @Autowired private ClaimService claims;
@@ -79,8 +79,8 @@ class ClaimsReportsIT {
   @Autowired private LpoService lpos;
   @Autowired private ClaimLifecycleService lifecycle;
 
-  private ClaimsDemoData claimsLoader() {
-    return new ClaimsDemoData(
+  private ClaimsSeedData claimsLoader() {
+    return new ClaimsSeedData(
         organization,
         claimRepository,
         policyQuery,
@@ -94,11 +94,11 @@ class ClaimsReportsIT {
   }
 
   @BeforeEach
-  void loadDemoPortfolioOnce() {
+  void loadSeedPortfolioOnce() {
     synchronized (ClaimsReportsIT.class) {
-      if (demoClaims == null) {
+      if (seedClaims == null) {
         Long company = data.company().getId();
-        new UnderwritingDemoData(
+        new UnderwritingSeedData(
                 organization,
                 policyRepository,
                 products,
@@ -109,7 +109,7 @@ class ClaimsReportsIT {
                 openCovers,
                 users)
             .load(company);
-        demoClaims = claimsLoader().load(company);
+        seedClaims = claimsLoader().load(company);
       }
     }
   }
@@ -122,7 +122,7 @@ class ClaimsReportsIT {
     p.put("asOnDate", "2026-09-30");
     p.put(
         "claimNo",
-        demoClaims.stream()
+        seedClaims.stream()
             .filter(c -> c.getStatus() == ClaimStatus.CLOSED)
             .findFirst()
             .orElseThrow()
@@ -138,10 +138,10 @@ class ClaimsReportsIT {
   }
 
   @Test
-  void demoPortfolioCoversEveryStatusAndIsIdempotent() {
-    assertThat(demoClaims).hasSizeBetween(50, 65);
+  void seedPortfolioCoversEveryStatusAndIsIdempotent() {
+    assertThat(seedClaims).hasSizeBetween(50, 65);
     Set<ClaimStatus> statuses =
-        demoClaims.stream().map(Claim::getStatus).collect(Collectors.toSet());
+        seedClaims.stream().map(Claim::getStatus).collect(Collectors.toSet());
     assertThat(statuses)
         .containsAll(
             EnumSet.of(
@@ -151,10 +151,10 @@ class ClaimsReportsIT {
                 ClaimStatus.REOPENED,
                 ClaimStatus.REJECTED,
                 ClaimStatus.WITHDRAWN));
-    assertThat(demoClaims).anyMatch(c -> "USD".equals(c.getCurrency()));
-    assertThat(demoClaims).anyMatch(c -> c.getPolicy().leadsCoinsurance());
-    assertThat(demoClaims).anyMatch(c -> c.getTotals().getRecovered().signum() > 0);
-    assertThat(demoClaims.stream().map(c -> c.getPolicy().getBusinessLine()).distinct().count())
+    assertThat(seedClaims).anyMatch(c -> "USD".equals(c.getCurrency()));
+    assertThat(seedClaims).anyMatch(c -> c.getPolicy().leadsCoinsurance());
+    assertThat(seedClaims).anyMatch(c -> c.getTotals().getRecovered().signum() > 0);
+    assertThat(seedClaims.stream().map(c -> c.getPolicy().getBusinessLine()).distinct().count())
         .isGreaterThanOrEqualTo(6);
     Long company = data.company().getId();
     long before = claimRepository.countByCompanyId(company);

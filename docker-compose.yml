@@ -1,5 +1,5 @@
-# iNXT BrokerVerse – local / demo stack.
-#   docker compose up -d --build        -> http://localhost:8081  (demo users, password Brokerverse@2026)
+# iNXT BrokerVerse – local / seed stack.
+#   docker compose up -d --build        -> http://localhost:8081  (SIT/UAT users of the seed profile)
 # Production: use deploy/ (Kubernetes) or the same images with external PostgreSQL, Redis (AWS
 # ElastiCache), Kafka (Amazon MSK) and secrets. See docs/architecture/PLATFORM_CACHE_AND_EVENTS.md.
 services:
@@ -66,7 +66,7 @@ services:
       kafka:
         condition: service_healthy
     environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-demo}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-seed}
       BROKERVERSE_DB_URL: jdbc:postgresql://db:5432/brokerverse
       BROKERVERSE_DB_USER: brokerverse
       BROKERVERSE_DB_PASSWORD: ${BROKERVERSE_DB_PASSWORD:-brokerverse}

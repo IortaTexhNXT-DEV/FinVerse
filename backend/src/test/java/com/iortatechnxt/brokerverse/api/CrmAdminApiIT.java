@@ -35,14 +35,14 @@ class CrmAdminApiIT {
   @Autowired private ClientRepository clients;
   @Autowired private RetentionRuleRepository rules;
 
-  private Client demo(String prospectCode) {
+  private Client seed(String prospectCode) {
     return clients.findByCode(data.company().getId(), prospectCode).orElseThrow();
   }
 
   private String url(String template) {
     return template
         .replace("{c}", data.company().getId().toString())
-        .replace("{client}", demo("PR-2026-000001").getId().toString())
+        .replace("{client}", seed("PR-2026-000001").getId().toString())
         .replace("{rule}", rules.findAll().get(0).getId().toString());
   }
 
@@ -51,7 +51,7 @@ class CrmAdminApiIT {
     "ao, /api/v1/crm/clients?companyId={c}",
     "ao, /api/v1/crm/clients?companyId={c}&status=CONFIRMED&kycStatus=VERIFIED&bankClient=true",
     "proc, /api/v1/crm/clients?companyId={c}&name=santos&code=cl-2026&clientType=INDIVIDUAL",
-    "ao, /api/v1/crm/clients?companyId={c}&tin=201-555-101-000&idNumber=p5551010a&email=MARIA.santos@demo-client.ph",
+    "ao, /api/v1/crm/clients?companyId={c}&tin=201-555-101-000&idNumber=p5551010a&email=MARIA.santos@seed-client.ph",
     "ao, /api/v1/crm/clients?companyId={c}&mobile=09175550101&marketSegment=CBG&kycDue=true",
     "ao, /api/v1/crm/clients/{client}",
     "ao, /api/v1/crm/clients/{client}/summary",
@@ -82,7 +82,7 @@ class CrmAdminApiIT {
   }
 
   @Test
-  void demoDataShowsTheClientBannerDuplicatesAndOverdueKyc() throws Exception {
+  void seedDataShowsTheClientBannerDuplicatesAndOverdueKyc() throws Exception {
     api.doGet("proc", url("/api/v1/crm/clients/{client}/instructions"))
         .andExpect(jsonPath("$.tags[0].code").value("VIP"))
         .andExpect(jsonPath("$.instructions[0].type").value("COMMUNICATION"));

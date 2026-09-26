@@ -6,8 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimRecordingService;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.PremiumCheckService;
-import com.iortatechnxt.brokerverse.brokerclaims.demo.BrokerClaimsDemoData;
-import com.iortatechnxt.brokerverse.brokerclaims.demo.BrokerClaimsSeedStory;
 import com.iortatechnxt.brokerverse.brokerclaims.diary.service.DiaryService;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.BrokerClaimRepository;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
@@ -18,13 +16,15 @@ import com.iortatechnxt.brokerverse.brokerclaims.insurer.service.InsurerUpdateSe
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.ClaimLocationService.LocationPick;
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.LocationRefBulkHandler;
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.LocationRefService;
+import com.iortatechnxt.brokerverse.brokerclaims.seed.BrokerClaimsSeedData;
+import com.iortatechnxt.brokerverse.brokerclaims.seed.BrokerClaimsSeedStory;
 import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimClosureService;
 import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimFollowUpService;
 import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimStatusService;
 import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
-import com.iortatechnxt.brokerverse.opsledger.demo.DemoUsers;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
+import com.iortatechnxt.brokerverse.opsledger.seed.SeedUsers;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
@@ -42,7 +42,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 /**
  * The Claims bulk uploads (design 9.5; BRCLM.041/042/043): insurer updates found by claim number or
  * by insurer claim number, insurer claim numbers and insurer location references, each row
- * validated before it is applied; and the demo storyline of wave CL1-A run through the services.
+ * validated before it is applied; and the seed storyline of wave CL1-A run through the services.
  */
 @IntegrationTest
 class ClaimsBulkIT {
@@ -218,11 +218,11 @@ class ClaimsBulkIT {
   }
 
   @Test
-  void theDemoStorylineRecordsClaimsThroughTheServices() {
+  void theSeedStorylineRecordsClaimsThroughTheServices() {
     long before = claims.count();
-    DemoUsers seedUsers = new DemoUsers(users);
-    var demo =
-        new BrokerClaimsDemoData(
+    SeedUsers seedUsers = new SeedUsers(users);
+    var seed =
+        new BrokerClaimsSeedData(
             companies,
             claims,
             recording,
@@ -232,7 +232,7 @@ class ClaimsBulkIT {
             seedUsers,
             new BrokerClaimsSeedStory(statuses, closures, followUps, diaries, seedUsers, clock),
             clock);
-    demo.load();
+    seed.load();
     assertThat(claims.count()).isGreaterThan(before);
     assertThat(
             jdbc.queryForList(
@@ -268,6 +268,6 @@ class ClaimsBulkIT {
                     + " where c.arn like 'ARN-2026-9400%'",
                 Long.class))
         .isGreaterThanOrEqualTo(4L);
-    demo.run(new DefaultApplicationArguments());
+    seed.run(new DefaultApplicationArguments());
   }
 }

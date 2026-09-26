@@ -3,7 +3,7 @@ package com.iortatechnxt.brokerverse.messaging.service;
 /**
  * Port that delivers e-mails. {@link SmtpMailTransport} is used when {@code
  * brokerverse.mail.enabled=true}; otherwise {@link SimulatedMailTransport} records the message as
- * sent without contacting any server (demo, test and non-production environments).
+ * sent without contacting any server (seed, test and non-production environments).
  */
 public interface MailTransport {
 

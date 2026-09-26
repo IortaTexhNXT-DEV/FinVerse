@@ -285,7 +285,7 @@ class ApiSmokeIT {
     "clmofficer, /api/v1/broker-claims/diary/mine?companyId={c}&includeDone=true",
     "clmofficer, /api/v1/broker-claims/search?companyId={c}&q=ARN-2026",
     "clmofficer, /api/v1/broker-claims/covers?companyId={c}&q=ARN-2026",
-    "clmrisk, /api/v1/broker-claims/covers?companyId={c}&by=ASSURED&q=Demo",
+    "clmrisk, /api/v1/broker-claims/covers?companyId={c}&by=ASSURED&q=Seed",
     "clmofficer, /api/v1/broker-claims/location-refs?companyId={c}",
     "clmofficer, /api/v1/broker-claims/location-refs?companyId={c}&q=MGIC&page=0&size=5",
     "clmofficer, /api/v1/broker-claims/location-refs/by-cover/ARN-2026-940002?companyId={c}",

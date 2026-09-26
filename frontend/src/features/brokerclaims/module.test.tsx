@@ -5,7 +5,7 @@ import { MODULES, NAV_GROUPS } from '@/navigation/modules';
 import { ClaimsPlaceholder } from './ClaimsPlaceholder';
 import { brokerClaimsModule } from './module';
 
-/** Permissions of the demo Claims Officer clmofficer (V1020 / V1920). */
+/** Permissions of the seed Claims Officer clmofficer (V1020 / V1920). */
 const OFFICER = new Set([
   'BCL_VIEW',
   'BCL_COVER_VIEW',

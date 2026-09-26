@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Product Maintenance (package request) endpoints through the full HTTP stack: every read endpoint
- * on the V997 demo requests, a request created and submitted over HTTP, the permission checks, and
+ * on the V997 seed requests, a request created and submitted over HTTP, the permission checks, and
  * the three reports in every export format.
  */
 @IntegrationTest
@@ -39,7 +39,7 @@ class ProductMaintenanceApiIT {
     return data.company().getId().toString();
   }
 
-  private long demo(String requestNo) throws Exception {
+  private long seed(String requestNo) throws Exception {
     JsonNode page =
         api.read(
             api.doGet("tsu", BASE + "/requests?companyId=" + company() + "&text=" + requestNo)
@@ -62,8 +62,8 @@ class ProductMaintenanceApiIT {
   }
 
   @Test
-  void aDemoRequestIsReadableWithItsRoundsOutputsAndDocuments() throws Exception {
-    long negotiating = demo("PKR-2026-900003");
+  void aSeedRequestIsReadableWithItsRoundsOutputsAndDocuments() throws Exception {
+    long negotiating = seed("PKR-2026-900003");
     String r = BASE + "/requests/" + negotiating;
     api.doGet("ao", r)
         .andExpect(status().isOk())
@@ -83,13 +83,13 @@ class ProductMaintenanceApiIT {
             "/responses/history", "/comparatives", "/requirements", "/advisories", "/form.pdf")) {
       api.doGet("tsu", r + path).andExpect(status().isOk());
     }
-    long released = demo("PKR-2026-900006");
+    long released = seed("PKR-2026-900006");
     api.doGet("mkttl", BASE + "/requests/" + released + "/advisories")
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].status").value("SENT"));
-    api.doGet("mancom", BASE + "/requests/" + demo("PKR-2026-900004") + "/package-slip.pdf")
+    api.doGet("mancom", BASE + "/requests/" + seed("PKR-2026-900004") + "/package-slip.pdf")
         .andExpect(status().isOk());
-    api.doGet("mbs", BASE + "/requests/" + demo("PKR-2026-900005") + "/requirements")
+    api.doGet("mbs", BASE + "/requests/" + seed("PKR-2026-900005") + "/requirements")
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.signoffs[0].decision").value("SIGNED"));
   }

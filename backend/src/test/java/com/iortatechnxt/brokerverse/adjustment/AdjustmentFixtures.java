@@ -32,9 +32,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Adjustment test data: motor invoices booked through booking (and copied to the ledger), requests
- * raised and moved through the real services as the demo users (mktcoll requests, adjust validates
- * and posts, adjtl approves), payments and remittances posted on the ledger as the cashiering and
- * remittance modules would.
+ * raised and moved through the real services as the SIT/UAT users (mktcoll requests, adjust
+ * validates and posts, adjtl approves), payments and remittances posted on the ledger as the
+ * cashiering and remittance modules would.
  */
 @Component
 public class AdjustmentFixtures {
@@ -82,7 +82,7 @@ public class AdjustmentFixtures {
     this.tx = tx;
   }
 
-  /** The demo company. */
+  /** The seed company. */
   public Long company() {
     return ledgerFx.company();
   }

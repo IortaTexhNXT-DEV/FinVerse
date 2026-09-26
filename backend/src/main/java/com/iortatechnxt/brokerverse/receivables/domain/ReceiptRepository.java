@@ -63,7 +63,7 @@ public interface ReceiptRepository
   List<Receipt> findByStatusOrderByIdAsc(ReceiptStatus status);
 
   /**
-   * Counts receipts of a company (demo data idempotency).
+   * Counts receipts of a company (seed data idempotency).
    *
    * @param companyId company
    * @return count

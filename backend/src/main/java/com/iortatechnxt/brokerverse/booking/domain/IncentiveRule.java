@@ -11,7 +11,7 @@ import java.util.Objects;
 /**
  * Incentive eligibility rule (BRNB.107): a booking of the product, market segment and source
  * channel dated within the period is flagged incentive eligible. Blank criteria match any. The
- * qualification rules are parked (Q33): the table ships empty apart from a demo rule.
+ * qualification rules are parked (Q33): the table ships empty apart from a seed rule.
  */
 @Entity
 @Table(name = "bkg_incentive_rule")

@@ -23,7 +23,7 @@
 --   7 (security), 8 (status model, workflow BCL_CLAIM), 9 (parameters, LOVs, alerts, templates,
 --   notification events) and 12.1 (lov_type.owner_permission). The permissions are the enum
 --   security.domain.Permission; the grants are a proposal until OQ48 / CLQ04 / CLQ06 / CLQ15 are
---   answered. The claim tables come with V1021 (CL0) and V1022-V1024 (CL1-A / CL1-B); demo users
+--   answered. The claim tables come with V1021 (CL0) and V1022-V1024 (CL1-A / CL1-B); SIT/UAT users
 --   with V1920. The access-class rows of the document type CLAIM_REPORT are seeded by the
 --   attachment access-class work item (EB V1031), which runs after this migration.
 --   Runs after V750 (LOV), V751 (workflow), V754 (templates), V755 (sec_permission_action), V762

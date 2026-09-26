@@ -3,7 +3,7 @@ import { mayOpen } from './access';
 import { MODULES, NAV_GROUPS } from './modules';
 
 interface Persona {
-  demoUser: string;
+  seedUser: string;
   /** Only the permissions with this prefix are listed (a role of another business area). */
   permissionScope?: string;
   permissions: string[];

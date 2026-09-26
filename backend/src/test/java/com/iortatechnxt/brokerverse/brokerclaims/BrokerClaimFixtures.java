@@ -95,7 +95,7 @@ public class BrokerClaimFixtures {
   }
 
   /**
-   * Inserts a claim and sets its first status as its handler (officers of the demo register).
+   * Inserts a claim and sets its first status as its handler (officers of the seed register).
    *
    * @param spec facts
    * @param status first status

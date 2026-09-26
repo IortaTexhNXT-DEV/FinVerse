@@ -52,7 +52,7 @@ class AccountLifecycleIT {
 
   @Test
   void accountGoesFromPaymentToBookingAndCancellation() {
-    Client client = fx.confirmed("CL-DEMO-A001");
+    Client client = fx.confirmed("CL-2026-900001");
     String arn =
         arnOf(
             awaitingPayment(
@@ -132,7 +132,7 @@ class AccountLifecycleIT {
 
   @Test
   void insurerReturnsCancelledPlacementsAndSystemSteps() {
-    Client client = fx.confirmed("CL-DEMO-A002");
+    Client client = fx.confirmed("CL-2026-900002");
     AccountDraft base =
         draft(
             client.getId(),
@@ -196,7 +196,7 @@ class AccountLifecycleIT {
 
   @Test
   void directlyBookedAccountsOnlyRecordThePolicyNumbers() {
-    Client client = fx.confirmed("CL-DEMO-A001");
+    Client client = fx.confirmed("CL-2026-900001");
     Account account =
         as.run(
             "ao",

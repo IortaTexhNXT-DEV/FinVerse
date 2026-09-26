@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * The Operations journey of an invoice, driven through the real services as the demo users, with
+ * The Operations journey of an invoice, driven through the real services as the SIT/UAT users, with
  * the ledger, journal and open-item checks every step of {@link OperationsEndToEndIT} repeats.
  */
 @Component
@@ -69,7 +69,7 @@ public class OpsJourney {
     this.jdbc = jdbc;
   }
 
-  /** The demo company. */
+  /** The seed company. */
   public Long company() {
     return ledgerFx.company();
   }
@@ -208,12 +208,12 @@ public class OpsJourney {
                 BigDecimal::add));
   }
 
-  /** Runs as a demo user. */
+  /** Runs as a SIT/UAT user. */
   public <T> T as(String user, java.util.function.Supplier<T> work) {
     return as.run(user, work);
   }
 
-  /** Runs in a transaction as a demo user. */
+  /** Runs in a transaction as a SIT/UAT user. */
   public <T> T inTx(String user, java.util.function.Supplier<T> work) {
     return as.run(user, () -> tx.execute(s -> work.get()));
   }

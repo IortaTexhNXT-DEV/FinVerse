@@ -29,7 +29,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Component
 public class DisbursementFixtures {
 
-  /** The demo insurer of the motor fixtures (remittance batches). */
+  /** The seed insurer of the motor fixtures (remittance batches). */
   public static final String INSURER = "INS-MGIC";
 
   private static final AtomicLong DAYS = new AtomicLong(1000 + System.nanoTime() % 20000);
@@ -66,7 +66,7 @@ public class DisbursementFixtures {
     this.as = as;
   }
 
-  /** The demo company. */
+  /** The seed company. */
   public Long company() {
     return ledger.company();
   }
@@ -108,7 +108,7 @@ public class DisbursementFixtures {
         klass,
         name,
         "Makati City",
-        "payee@brokerverse-demo.ph",
+        "payee@brokerverse-seed.ph",
         null,
         mode,
         List.of(mode, DisbursementMode.CHECK, DisbursementMode.CTA).stream().distinct().toList(),

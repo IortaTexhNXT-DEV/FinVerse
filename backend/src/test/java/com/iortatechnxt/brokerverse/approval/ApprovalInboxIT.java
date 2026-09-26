@@ -121,7 +121,7 @@ class ApprovalInboxIT {
               assertThat(i.module()).isEqualTo("MASTER_DATA");
               assertThat(i.link()).isEqualTo("/setup/branches");
             });
-    // Demo supplier pending authorization (V902) is offered too.
+    // Seed supplier pending authorization (V902) is offered too.
     assertThat(references(fmanager)).contains("S-000901");
     assertThat(references(as.run("accountant", () -> inbox.inbox(null))))
         .doesNotContain("APR1", "S-000901");

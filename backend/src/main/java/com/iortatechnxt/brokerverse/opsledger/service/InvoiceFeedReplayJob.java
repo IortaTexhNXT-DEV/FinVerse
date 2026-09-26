@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * {@code OPS_INVOICE_FEED_REPLAY}: copies into the Operations ledger every booked invoice that is
- * missing from it (OPERATIONS_DESIGN section 10). Manual by default; also run at demo start-up.
+ * missing from it (OPERATIONS_DESIGN section 10). Manual by default; also run at seed start-up.
  */
 @Component
 public class InvoiceFeedReplayJob implements ManagedJob {

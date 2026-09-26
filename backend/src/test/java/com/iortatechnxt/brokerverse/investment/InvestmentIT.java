@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Investment life cycle against the demo chart; every test rolls back. */
+/** Investment life cycle against the seed chart; every test rolls back. */
 @IntegrationTest
 @Transactional
 class InvestmentIT {

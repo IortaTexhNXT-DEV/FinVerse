@@ -54,7 +54,7 @@ public class CommissionFixtures {
     this.as = as;
   }
 
-  /** The demo company. */
+  /** The seed company. */
   public Long company() {
     return ledger.company();
   }
@@ -115,6 +115,6 @@ public class CommissionFixtures {
     as.run(HANDLER, () -> intake.confirm(ids));
     DpBilling billing = as.run(HANDLER, () -> billings.prepare(company(), ids)).get(0);
     return as.run(
-        HANDLER, () -> sender.send(billing.getId(), List.of("billing@insurer-demo.ph"), null));
+        HANDLER, () -> sender.send(billing.getId(), List.of("billing@insurer-seed.ph"), null));
   }
 }

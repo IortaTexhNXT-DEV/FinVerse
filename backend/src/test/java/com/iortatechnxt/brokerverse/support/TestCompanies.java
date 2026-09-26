@@ -20,14 +20,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * Creates isolated test companies (copy of the demo chart of accounts and dimensions, one head
- * office branch) so tests of period-end processes do not interfere with each other or the demo
+ * Creates isolated test companies (copy of the seed chart of accounts and dimensions, one head
+ * office branch) so tests of period-end processes do not interfere with each other or the seed
  * company.
  */
 @Component
 public class TestCompanies {
 
-  private static final String DEMO = "FVI";
+  private static final String SEED = "FVI";
 
   private final JdbcTemplate jdbc;
   private final CompanyRepository companies;
@@ -49,7 +49,7 @@ public class TestCompanies {
   }
 
   /**
-   * Creates a company with a head office branch, the demo chart of accounts and dimensions.
+   * Creates a company with a head office branch, the seed chart of accounts and dimensions.
    *
    * @param code unique company code
    * @param baseCurrency base currency
@@ -181,7 +181,7 @@ public class TestCompanies {
   }
 
   private void copyChart(Long targetId) {
-    Long demoId = companies.findByCode(DEMO).orElseThrow().getId();
+    Long seedId = companies.findByCode(SEED).orElseThrow().getId();
     jdbc.update(
         """
         insert into coa_account (company_id, code, name, short_name, account_class, level, parent_id,
@@ -197,7 +197,7 @@ public class TestCompanies {
         from coa_account where company_id = ?
         """,
         targetId,
-        demoId);
+        seedId);
     jdbc.update(
         """
         update coa_account t set parent_id = tp.id
@@ -205,7 +205,7 @@ public class TestCompanies {
         where s.company_id = ? and t.company_id = ? and t.code = s.code
           and tp.company_id = t.company_id and tp.code = sp.code
         """,
-        demoId,
+        seedId,
         targetId);
     jdbc.update(
         """
@@ -214,7 +214,7 @@ public class TestCompanies {
         join coa_account s on s.id = ac.account_id and s.company_id = ?
         join coa_account t on t.code = s.code and t.company_id = ?
         """,
-        demoId,
+        seedId,
         targetId);
     jdbc.update(
         """
@@ -222,6 +222,6 @@ public class TestCompanies {
         select ?, dimension_type, code, name, now(), 'SYSTEM' from dim_value where company_id = ?
         """,
         targetId,
-        demoId);
+        seedId);
   }
 }

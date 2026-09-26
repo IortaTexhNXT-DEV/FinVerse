@@ -27,8 +27,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * Test data of matching and risk profiling: unique clients of the demo company (or of a company of
- * their own with a copy of the demo matching criteria and risk rules) and invented watchlist
+ * Test data of matching and risk profiling: unique clients of the seed company (or of a company of
+ * their own with a copy of the seed matching criteria and risk rules) and invented watchlist
  * entries made ACTIVE through the maker-checker of the watchlist.
  */
 @Component
@@ -88,11 +88,11 @@ public class ScreeningMatchingFixtures {
   }
 
   /**
-   * The demo company FVI (ACTIVE screening configuration of V1950).
+   * The seed company FVI (ACTIVE screening configuration of V1950).
    *
    * @return company id
    */
-  public Long demoCompany() {
+  public Long seedCompany() {
     return data.company().getId();
   }
 
@@ -106,7 +106,7 @@ public class ScreeningMatchingFixtures {
   }
 
   /**
-   * A company of its own with a copy of the demo matching criteria and risk rules.
+   * A company of its own with a copy of the seed matching criteria and risk rules.
    *
    * @return company id
    */
@@ -214,13 +214,13 @@ public class ScreeningMatchingFixtures {
   }
 
   /**
-   * A prospect of the demo company with verified KYC (so it has a KYC review date).
+   * A prospect of the seed company with verified KYC (so it has a KYC review date).
    *
    * @param details details
    * @return the client, reloaded
    */
   Client verified(ClientDetails details) {
-    Client p = prospect(demoCompany(), details);
+    Client p = prospect(seedCompany(), details);
     for (String type : List.of("KYC_FORM", "VALID_ID")) {
       as.run("ao", () -> kyc.upload(p.getId(), type, type.toLowerCase(Locale.ROOT) + ".pdf", PDF));
     }

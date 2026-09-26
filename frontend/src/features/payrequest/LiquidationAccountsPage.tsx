@@ -22,7 +22,7 @@ interface Row {
 /**
  * Accounts of the cash-advance liquidation (event PRQ_CA_LIQUIDATION; AQ02, AQ18): the expense
  * account of each category and the cash account of returned excess, set by Comptrollership. GL
- * accounts are never chosen in code; until BDOI's chart is loaded these are demo accounts.
+ * accounts are never chosen in code; until BDOI's chart is loaded these are seed accounts.
  */
 export default function LiquidationAccountsPage() {
   const companyId = useCompanyId();

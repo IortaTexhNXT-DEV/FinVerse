@@ -13,7 +13,7 @@ import java.time.LocalDate;
 
 /**
  * Production target of a sales unit for a period, in PHP (BRNB.075): booked accounts, premium and
- * commission. The hierarchy and target values are open with BDOI (Q41); the demo data seeds sample
+ * commission. The hierarchy and target values are open with BDOI (Q41); the seed data seeds sample
  * targets only.
  */
 @Entity

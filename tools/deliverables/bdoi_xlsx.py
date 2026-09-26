@@ -374,7 +374,7 @@ class BdoiWorkbook:
         return path
 
 
-def demo(path: str | Path) -> Path:
+def self_test(path: str | Path) -> Path:
     """A small sample workbook that exercises every feature (used by the README and smoke test)."""
     wb = BdoiWorkbook("Fit-Gap Sample", doc_type="Fit-gap workbook", brd="BRD-03", version="1.0",
                       subtitle="BRD-3 Product Maintenance")
@@ -401,4 +401,4 @@ def demo(path: str | Path) -> Path:
 
 if __name__ == "__main__":
     out = Path(sys.argv[1] if len(sys.argv) > 1 else "fitgap-sample.xlsx")
-    print(demo(out))
+    print(self_test(out))

@@ -14,7 +14,7 @@
 --   Design: docs/architecture/SANCTION_SCREENING_DESIGN.md section 4.1. Every rule row belongs to
 --   one version; an ACTIVE version is never edited (the service refuses it), a change is a new
 --   version. TEMPLATE versions are kept per template type (scope); the other types have scope ''.
---   No demo data here: the demo versions come with db/demo/V1950.
+--   No seed data here: the seed versions come with db/seed/V1950.
 -- =====================================================================================
 
 create table scr_config_version (

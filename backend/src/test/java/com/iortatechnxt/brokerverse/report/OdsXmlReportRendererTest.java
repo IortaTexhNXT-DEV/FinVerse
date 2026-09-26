@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 class OdsXmlReportRendererTest {
 
   private static final ReportContext CONTEXT =
-      new ReportContext("Demo Brokers <&>", "tester", Instant.parse("2026-09-24T01:00:00Z"), "");
+      new ReportContext("SIT Brokers <&>", "tester", Instant.parse("2026-09-24T01:00:00Z"), "");
 
   private static ReportResult result() {
     Map<String, Object> cells = new HashMap<>();
@@ -68,7 +68,7 @@ class OdsXmlReportRendererTest {
     }
     assertThat(mimetype).isEqualTo("application/vnd.oasis.opendocument.spreadsheet");
     assertThat(content)
-        .contains("Demo Brokers &lt;&amp;")
+        .contains("SIT Brokers &lt;&amp;")
         .contains("Santos &amp; Co &lt;b")
         .contains("office:value=\"-1234.50\"")
         .contains("office:date-value=\"2026-09-15\"")

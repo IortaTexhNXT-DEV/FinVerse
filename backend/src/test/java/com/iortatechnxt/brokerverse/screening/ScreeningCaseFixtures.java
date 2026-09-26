@@ -62,7 +62,7 @@ public class ScreeningCaseFixtures {
     String first = word();
     String last = word();
     matching.listed(first + " " + last, null);
-    return matching.prospect(matching.demoCompany(), person(first, last, null));
+    return matching.prospect(matching.seedCompany(), person(first, last, null));
   }
 
   /**

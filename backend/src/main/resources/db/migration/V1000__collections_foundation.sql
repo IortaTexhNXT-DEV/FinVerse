@@ -16,7 +16,7 @@
 --   design is this V1000), 6 (security), 7 (workflow) and 8 (parameters, LOVs, alerts,
 --   notification events). The permissions are the enum security.domain.Permission; the grants are
 --   a proposal until OQ48 / CQ23 are answered. The Collections tables come with C1-A / B / C
---   (V1001-V1005); demo users and data with V1900-V1901.
+--   (V1001-V1005); SIT/UAT users and data with V1900-V1901.
 --   The catalog "sales unit head" contract (design section 9) is deferred to wave C1-A.
 --   Runs after V890 (BRD-5 roles ACSL_*) and every V7xx / V8xx migration; references only
 --   platform tables by key and ops_flow_in_feed / report_run by value.

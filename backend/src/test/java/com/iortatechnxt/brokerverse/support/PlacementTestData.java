@@ -27,13 +27,13 @@ import org.springframework.stereotype.Component;
 
 /**
  * Accounts at the placement and issuance stages for tests: each call creates a new account with
- * unique risk identifiers and drives it through the lifecycle as the demo users would.
+ * unique risk identifiers and drives it through the lifecycle as the SIT/UAT users would.
  */
 @Component
 public class PlacementTestData {
 
-  public static final String CBG_CLIENT = "CL-DEMO-A001";
-  public static final String CORPORATE_CLIENT = "CL-DEMO-A003";
+  public static final String CBG_CLIENT = "CL-2026-900001";
+  public static final String CORPORATE_CLIENT = "CL-2026-900003";
 
   private static final AtomicLong SEQ = new AtomicLong(System.nanoTime() % 1_000_000L);
 

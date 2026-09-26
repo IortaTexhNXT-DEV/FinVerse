@@ -47,7 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @IntegrationTest
 class RatingSchemeIT {
 
-  private static final String CLIENT = "CL-DEMO-A001";
+  private static final String CLIENT = "CL-2026-900001";
   private static final BigDecimal NEW_RATE = new BigDecimal("1.75");
 
   @Autowired private PackageFixtures fx;

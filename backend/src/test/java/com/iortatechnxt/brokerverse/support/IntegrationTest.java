@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * Integration test against a real (embedded) PostgreSQL with all migrations and demo data.
+ * Integration test against a real (embedded) PostgreSQL with all migrations and seed data.
  *
  * <p>The database is shared by all tests of the JVM; tests create their own data with unique keys.
  */

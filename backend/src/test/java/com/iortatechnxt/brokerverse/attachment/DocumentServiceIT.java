@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @IntegrationTest
 class DocumentServiceIT {
 
-  private static final byte[] PDF = "%PDF-1.4 demo".getBytes(StandardCharsets.US_ASCII);
+  private static final byte[] PDF = "%PDF-1.4 seed".getBytes(StandardCharsets.US_ASCII);
   private static final byte[] ODS = {'P', 'K', 3, 4, 1, 2, 3};
 
   @Autowired private DocumentService documents;

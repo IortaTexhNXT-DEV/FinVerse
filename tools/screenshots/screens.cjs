@@ -1,6 +1,6 @@
 // BIBS screenshot manifest, in sidebar order. The capture script numbers the files from this order,
 // so add or move a screen here and every file is renumbered on the next run (old files are deleted).
-// Fields: slug (file name), title, user (demo user, password Brokerverse@2026), path (route), and
+// Fields: slug (file name), title, user (SIT/UAT user of the seed profile), path (route), and
 // optional `open` ('first' opens the first record of the list at `path`), `click` (button name regex
 // clicked after loading, e.g. to open a modal or run a report).
 module.exports = [

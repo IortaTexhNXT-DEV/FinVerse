@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
- * The eight compliance reports (SNSRP-901, 903; FR-SS-090, 092): each runs on the demo data with
+ * The eight compliance reports (SNSRP-901, 903; FR-SS-090, 092): each runs on the seed data with
  * its filters and exports to PDF, Excel and CSV (the STR register also to Word); the audit log
  * needs SCR_AUDIT_VIEW and an investigator runs none of them.
  */

@@ -47,7 +47,7 @@ class UnderwritingApiIT {
   @Autowired private UserDetailsService users;
   @Autowired private UwFixtures fx;
 
-  /** Authenticated demo user with a CSRF token (session-style requests need one). */
+  /** Authenticated SIT/UAT user with a CSRF token (session-style requests need one). */
   private RequestPostProcessor as(String username) {
     RequestPostProcessor principal = user(users.loadUserByUsername(username));
     RequestPostProcessor token = csrf();

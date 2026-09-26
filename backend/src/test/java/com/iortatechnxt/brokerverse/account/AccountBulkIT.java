@@ -77,7 +77,7 @@ class AccountBulkIT {
 
   @Test
   void accountsAreCreatedForExistingClientsAndNewProspects() {
-    Client client = fx.confirmed("CL-DEMO-A002");
+    Client client = fx.confirmed("CL-2026-900002");
     Account existing =
         as.run(
             "ao",
@@ -97,7 +97,7 @@ class AccountBulkIT {
             List.of(
                 row(
                     "Client Code",
-                    "CL-DEMO-A002",
+                    "CL-2026-900002",
                     "Period From",
                     "2026-10-01",
                     "Period To",
@@ -143,7 +143,7 @@ class AccountBulkIT {
                     "2024"),
                 row(
                     "Client Code",
-                    "CL-DEMO-A002",
+                    "CL-2026-900002",
                     "Period From",
                     "2026-10-01",
                     "Period To",
@@ -164,7 +164,7 @@ class AccountBulkIT {
                     "2025"),
                 row(
                     "Client Code",
-                    "CL-DEMO-A002",
+                    "CL-2026-900002",
                     "Period From",
                     "2026-10-01",
                     "Period To",
@@ -245,7 +245,7 @@ class AccountBulkIT {
             List.of(
                 row(
                     "Client Code",
-                    "CL-DEMO-A003",
+                    "CL-2026-900003",
                     "Market Segment",
                     "CORBANK",
                     "Period From",
@@ -292,7 +292,7 @@ class AccountBulkIT {
 
   @Test
   void draftsAreUpdatedAndSubmittedByUploadAndFfyIsTaggedBySerialNumber() {
-    Client client = fx.confirmed("CL-DEMO-A001");
+    Client client = fx.confirmed("CL-2026-900001");
     String id = token();
     Account account =
         as.run(

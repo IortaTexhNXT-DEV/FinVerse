@@ -3,7 +3,7 @@
 --   BRNB.012  NB dashboard: the landing page of the broking roles
 --   BRNB.057  saved report variants (the dynamic report builder is parked, Q40)
 --   BRNB.075  production statistics against targets per sales unit and period (targets are
---             demo values until BDOI supplies them, Q41)
+--             seed values until BDOI supplies them, Q41)
 --   BRNB.115  stalled accounts (parameter NB_STALLED_DAYS)
 -- docs/architecture/BROKING_ARCHITECTURE.md section 16.
 -- =====================================================================================

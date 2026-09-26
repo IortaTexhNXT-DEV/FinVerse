@@ -10,7 +10,7 @@
 --   Design: docs/architecture/ACCOUNTING_DISBURSEMENT_DESIGN.md sections 6 (event types), 7
 --   (workflows), 8 (security) and 9 (parameters, alerts, LOV types). The permissions are the enum
 --   security.domain.Permission; the grants follow the role matrices of the BRD (final matrix AQ28).
---   The accounting event types are seeded here (not in V893 / V899 / V772) so that the demo rules of
+--   The accounting event types are seeded here (not in V893 / V899 / V772) so that the seed rules of
 --   V999 can reference them; the modules publish the events. ACSL corrections post as a system
 --   journal with the lines of the correction and need no event type.
 --   References only V1-V754 tables (roles, permissions, LOV, workflow, events), so it is safe on a
@@ -439,7 +439,7 @@ values ('FRBS_SERVICE_FEE', 'COMPUTED', 'submit', 'FOR_APPROVAL', 'Submit for ap
        ('FRBS_SERVICE_FEE', 'APPROVED', 'release', 'RELEASED', 'Tag released', 'SERVICE_FEE_TAG', false, null, 10),
        ('FRBS_SERVICE_FEE', 'RELEASED', 'liquidate', 'LIQUIDATED', 'Tag liquidated', 'SERVICE_FEE_TAG', false, null, 10);
 
--- ---------- Accounting event types (design section 6; demo rules in V999, real rules AQ02) --------
+-- ---------- Accounting event types (design section 6; seed rules in V999, real rules AQ02) --------
 insert into acc_event_type (code, name, category, journal_type, description, amount_components) values
  ('DISB_VOUCHER', 'Disbursement voucher approved', 'PAYMENT', 'PAYMENT',
   'Approved DV (DIS 2.7.6, 2.18.0): the gross is supplied in the component of the DV type (the payable settled), '

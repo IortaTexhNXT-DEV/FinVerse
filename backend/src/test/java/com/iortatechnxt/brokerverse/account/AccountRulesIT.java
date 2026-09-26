@@ -58,7 +58,7 @@ class AccountRulesIT {
 
   @Test
   void motorDuplicatesAreRejectedExceptCtplAgainstComprehensive() {
-    Client client = fx.confirmed("CL-DEMO-A002");
+    Client client = fx.confirmed("CL-2026-900002");
     String id = token();
     Account first =
         create("ao", draft(client.getId(), "MTR10", "CBG", List.of(vehicle(id, "800000"))));
@@ -167,7 +167,7 @@ class AccountRulesIT {
 
   @Test
   void fireDuplicatesNeedTheSameClientLocationAndItem() {
-    Client client = fx.confirmed("CL-DEMO-A001");
+    Client client = fx.confirmed("CL-2026-900001");
     String street = token() + " Mabini Street";
     Account first =
         create(
@@ -191,7 +191,7 @@ class AccountRulesIT {
             "ao",
             draft(client.getId(), "PAR08", "CBG", List.of(location(street, "Contents", "500000"))));
     assertThat(contents.getStatus()).isEqualTo(AccountStatus.DRAFT);
-    Client other = fx.confirmed("CL-DEMO-A002");
+    Client other = fx.confirmed("CL-2026-900002");
     Account otherClient =
         create(
             "ao",
@@ -221,7 +221,7 @@ class AccountRulesIT {
 
   @Test
   void freeFirstYearIsTaggedAndCancelledWithAudit() {
-    Client client = fx.confirmed("CL-DEMO-A001");
+    Client client = fx.confirmed("CL-2026-900001");
     Account account = motor(client);
     as.run("ao", () -> tagging.tagFreeFirstYear(account.getId(), LocalDate.of(2026, 10, 1)));
     Account tagged = queries.get(account.getId());
@@ -284,7 +284,7 @@ class AccountRulesIT {
 
   @Test
   void draftRulesComeFromTheProduct() {
-    Client client = fx.confirmed("CL-DEMO-A003");
+    Client client = fx.confirmed("CL-2026-900003");
     assertThatThrownBy(
             () ->
                 create(

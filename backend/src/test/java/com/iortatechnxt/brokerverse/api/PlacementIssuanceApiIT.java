@@ -22,7 +22,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 
-/** Placement and issuance endpoints through the full HTTP stack, on the V986 / V987 demo data. */
+/** Placement and issuance endpoints through the full HTTP stack, on the V986 / V987 seed data. */
 @IntegrationTest
 class PlacementIssuanceApiIT {
 

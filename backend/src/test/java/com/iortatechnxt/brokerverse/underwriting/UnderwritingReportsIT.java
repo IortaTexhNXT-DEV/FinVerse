@@ -9,12 +9,12 @@ import com.iortatechnxt.brokerverse.report.core.RowKind;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
-import com.iortatechnxt.brokerverse.underwriting.demo.DemoUserContext;
-import com.iortatechnxt.brokerverse.underwriting.demo.UnderwritingDemoData;
 import com.iortatechnxt.brokerverse.underwriting.domain.Policy;
 import com.iortatechnxt.brokerverse.underwriting.domain.PolicyRepository;
 import com.iortatechnxt.brokerverse.underwriting.domain.PolicyStatus;
 import com.iortatechnxt.brokerverse.underwriting.domain.QuotationStatus;
+import com.iortatechnxt.brokerverse.underwriting.seed.SeedUserContext;
+import com.iortatechnxt.brokerverse.underwriting.seed.UnderwritingSeedData;
 import com.iortatechnxt.brokerverse.underwriting.service.EndorsementService;
 import com.iortatechnxt.brokerverse.underwriting.service.OpenCoverService;
 import com.iortatechnxt.brokerverse.underwriting.service.PolicyApprovalService;
@@ -48,7 +48,7 @@ class UnderwritingReportsIT {
     "PGIBR085"
   };
 
-  private static List<Policy> demoPolicies;
+  private static List<Policy> seedPolicies;
 
   @Autowired private ReportService reports;
   @Autowired private TestData data;
@@ -60,10 +60,10 @@ class UnderwritingReportsIT {
   @Autowired private EndorsementService endorsements;
   @Autowired private QuotationService quotations;
   @Autowired private OpenCoverService openCovers;
-  @Autowired private DemoUserContext users;
+  @Autowired private SeedUserContext users;
 
-  private UnderwritingDemoData loader() {
-    return new UnderwritingDemoData(
+  private UnderwritingSeedData loader() {
+    return new UnderwritingSeedData(
         organization,
         policyRepository,
         products,
@@ -76,10 +76,10 @@ class UnderwritingReportsIT {
   }
 
   @BeforeEach
-  void loadDemoPortfolioOnce() {
+  void loadSeedPortfolioOnce() {
     synchronized (UnderwritingReportsIT.class) {
-      if (demoPolicies == null) {
-        demoPolicies = loader().load(data.company().getId());
+      if (seedPolicies == null) {
+        seedPolicies = loader().load(data.company().getId());
       }
     }
   }
@@ -100,10 +100,10 @@ class UnderwritingReportsIT {
   }
 
   @Test
-  void demoPortfolioCoversEveryStatus() {
-    assertThat(demoPolicies).hasSize(150);
-    assertThat(demoPolicies).anyMatch(p -> p.getStatus() == PolicyStatus.PENDING_APPROVAL);
-    assertThat(demoPolicies).anyMatch(p -> p.getStatus() == PolicyStatus.DRAFT);
+  void seedPortfolioCoversEveryStatus() {
+    assertThat(seedPolicies).hasSize(150);
+    assertThat(seedPolicies).anyMatch(p -> p.getStatus() == PolicyStatus.PENDING_APPROVAL);
+    assertThat(seedPolicies).anyMatch(p -> p.getStatus() == PolicyStatus.DRAFT);
     Long company = data.company().getId();
     for (QuotationStatus s : QuotationStatus.values()) {
       assertThat(quotations.search(company, s, null, null)).as("quotations %s", s).isNotEmpty();

@@ -231,7 +231,7 @@ class ScreeningCaseRulesIT {
     assertThat(returned.getStage()).isEqualTo(CaseStage.RETURNED);
     assertThat(returned.getReturnedFrom()).isEqualTo(CaseStage.UNIT_HEAD_APPROVAL);
 
-    // A false positive is closed without approval by the demo route (INVESTIGATION /
+    // A false positive is closed without approval by the seed route (INVESTIGATION /
     // FALSE_POSITIVE).
     fx.as("ucc", () -> assignments.reassign(c.getId(), INVESTIGATOR, "WORKLOAD", null));
     fx.completeReview(c);

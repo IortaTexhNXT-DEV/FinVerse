@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Executive dashboard widgets: exact figures on a company with known postings, zeros on a company
- * without data, and consistency with the headline summary on the demo company.
+ * without data, and consistency with the headline summary on the seed company.
  */
 @IntegrationTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -160,13 +160,13 @@ class ExecutiveDashboardIT {
   }
 
   @Test
-  void demoCompanyWidgetsAreConsistentWithTheHeadlineSummary() {
-    Long demo = data.company().getId();
-    LocalDate today = summary.summary(demo, null).asOf();
-    assertThat(ledger.cash(demo, null, null).total())
-        .isEqualByComparingTo(summary.summary(demo, null).cashPosition());
+  void seedCompanyWidgetsAreConsistentWithTheHeadlineSummary() {
+    Long seed = data.company().getId();
+    LocalDate today = summary.summary(seed, null).asOf();
+    assertThat(ledger.cash(seed, null, null).total())
+        .isEqualByComparingTo(summary.summary(seed, null).cashPosition());
 
-    CollectionsWidget c = operations.collections(demo, null, today);
+    CollectionsWidget c = operations.collections(seed, null, today);
     assertThat(c.receivables())
         .isEqualByComparingTo(
             c.ageing().stream()
@@ -174,13 +174,13 @@ class ExecutiveDashboardIT {
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
     assertThat(c.ageingSlots()).isEqualTo("30/60/90/120");
 
-    PayablesWidget p = ledger.payables(demo, null, today);
+    PayablesWidget p = ledger.payables(seed, null, today);
     assertThat(p.total()).isGreaterThanOrEqualTo(p.dueIn30Days().add(p.overdue()));
     assertThat(p.dueIn30Days()).isGreaterThanOrEqualTo(p.dueIn7Days());
 
-    var workload = as.run("checker", () -> operations.workload(demo));
+    var workload = as.run("checker", () -> operations.workload(seed));
     assertThat(workload.pendingApprovals())
-        .isEqualTo(as.run("checker", () -> inbox.counts(demo)).total());
-    assertThat(ledger.premium(demo, null, today).monthly()).isNotEmpty();
+        .isEqualTo(as.run("checker", () -> inbox.counts(seed)).total());
+    assertThat(ledger.premium(seed, null, today).monthly()).isNotEmpty();
   }
 }

@@ -33,9 +33,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 /**
- * User Access Maintenance (BRD-11) end to end through the HTTP API with the demo users (wave U2):
- * the Requestor enrols a new user as Screening Investigator and the Approver approves; the user
- * signs in with the temporary password, must change it, and holds exactly the investigator's
+ * User Access Maintenance (BRD-11) end to end through the HTTP API with the SIT/UAT users (wave
+ * U2): the Requestor enrols a new user as Screening Investigator and the Approver approves; the
+ * user signs in with the temporary password, must change it, and holds exactly the investigator's
  * permissions (the menu of the web client is built from them); a change of the user's group
  * profiles submitted outside working hours needs the Second Approver; the Business Administrator's
  * group-profile request is implemented by the System Administrator; the deactivation ends the
@@ -257,7 +257,7 @@ class UserAccessEndToEndApiIT {
         .getContentAsString(StandardCharsets.UTF_8);
   }
 
-  /** Creates and submits a request to the demo Approver; returns its id. */
+  /** Creates and submits a request to the seed Approver; returns its id. */
   private long submit(String user, Map<String, Object> body) throws Exception {
     body.put("approvers", List.of(APPROVER));
     return api.read(

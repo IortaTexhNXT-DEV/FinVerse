@@ -114,7 +114,7 @@ class ProposalIT {
 
   @Test
   void aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts() {
-    Long client = clients.requireByCode(company(), "CL-DEMO-A003").getId();
+    Long client = clients.requireByCode(company(), "CL-2026-900003").getId();
     ProposalRequest p =
         as.run("ao", () -> proposals.create(company(), engineering(client, "INS-MGIC")));
     Long id = p.getId();
@@ -270,7 +270,7 @@ class ProposalIT {
 
   @Test
   void packageRisksNeedDocumentsAndATsuReasonAndVoidedPrfsAreRetentionCandidates() {
-    Long client = clients.requireByCode(company(), "CL-DEMO-A001").getId();
+    Long client = clients.requireByCode(company(), "CL-2026-900001").getId();
     String id = Long.toString(System.nanoTime(), 36).toUpperCase();
     ProposalDraft motor =
         new ProposalDraft(

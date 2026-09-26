@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.stereotype.Component;
 
-/** Quotation test data: unique vehicles, demo clients, drafts and documents. */
+/** Quotation test data: unique vehicles, seed clients, drafts and documents. */
 @Component
 public class QuotationFixtures {
 
@@ -62,7 +62,7 @@ public class QuotationFixtures {
     return Long.toString(SEQ.incrementAndGet() * 7907 + System.nanoTime() % 1000, 36).toUpperCase();
   }
 
-  /** A demo client by code. */
+  /** A seed client by code. */
   Client client(String code) {
     return clients.requireByCode(company(), code);
   }

@@ -1,7 +1,7 @@
 -- =====================================================================================
 -- iNXT BrokerVerse - V764 Cashiering reference data (Operations BRD-2)
 --   * Accounting event types of OPERATIONS_DESIGN section 5, rows 1-11 and 14-15. The rules are
---     configured by Comptrollership (OQ07); demo rules are in V991.
+--     configured by Comptrollership (OQ07); seed rules are in V991.
 --   * Workflows OPS_RECEIPT_ACTION (CSHID.001-005, OQ06), OPS_DISPOSITION (CSHID.024/025, OQ15)
 --     and OPS_CWT_2307 (CSHID.026/027, MKTID.010/013, DBMID.001, OQ16).
 --   * Disposition type actions (CSHID.024), minimal balance rules (CSHID.016, OQ11) and the

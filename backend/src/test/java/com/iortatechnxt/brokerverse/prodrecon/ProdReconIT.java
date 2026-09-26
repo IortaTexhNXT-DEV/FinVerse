@@ -119,9 +119,9 @@ class ProdReconIT {
     }
 
     ReconExtract sent =
-        as.run(RECON, () -> sender.send(extract.getId(), List.of("recon@insurer-demo.ph"), null));
+        as.run(RECON, () -> sender.send(extract.getId(), List.of("recon@insurer-seed.ph"), null));
     assertThat(sent.getSentAt()).isNotNull();
-    assertThat(sent.getRecipients()).isEqualTo("recon@insurer-demo.ph");
+    assertThat(sent.getRecipients()).isEqualTo("recon@insurer-seed.ph");
     assertThat(cycles.require(cycleId).getStage()).isIn(ReconCycle.SENT, ReconCycle.RECONCILING);
     assertThat(messages.forRecord(ReconCycleService.ENTITY, cycleId.toString())).isNotEmpty();
 

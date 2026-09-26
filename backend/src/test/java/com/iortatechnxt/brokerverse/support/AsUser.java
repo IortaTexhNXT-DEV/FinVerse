@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
-/** Runs code as a given demo user (for tests that switch between maker and checker). */
+/** Runs code as a given SIT/UAT user (for tests that switch between maker and checker). */
 @Component
 public class AsUser {
 

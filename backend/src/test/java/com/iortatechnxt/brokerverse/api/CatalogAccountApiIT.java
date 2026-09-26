@@ -38,7 +38,7 @@ class CatalogAccountApiIT {
     return data.company().getId().toString();
   }
 
-  private Long demoAccountId(String arn) {
+  private Long seedAccountId(String arn) {
     return jdbc.queryForObject("select id from acc_account where arn = ?", Long.class, arn);
   }
 
@@ -74,7 +74,7 @@ class CatalogAccountApiIT {
   @Test
   @WithUserDetails("ao")
   void accountDetailCheckAndInsurerDetail() throws Exception {
-    Long id = demoAccountId("ARN-2026-900003");
+    Long id = seedAccountId("ARN-2026-900003");
     mvc.perform(get("/api/v1/accounts/" + id))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.arn").value("ARN-2026-900003"))
@@ -136,7 +136,7 @@ class CatalogAccountApiIT {
     String token = Long.toString(System.nanoTime() % 1_000_000_000L, 36).toUpperCase();
     String clientId =
         jdbc.queryForObject(
-                "select id from crm_client where client_code = 'CL-DEMO-A001'", Long.class)
+                "select id from crm_client where client_code = 'CL-2026-900001'", Long.class)
             .toString();
     String body =
         "{\"companyId\":"
@@ -203,13 +203,13 @@ class CatalogAccountApiIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     "{\"records\":[{\"entityType\":\"Account\",\"entityId\":\""
-                        + demoAccountId("ARN-2026-900008")
+                        + seedAccountId("ARN-2026-900008")
                         + "\"}]}"))
         .andExpect(status().isOk());
     mvc.perform(
             get(
                 "/api/v1/attachments?entityType=Account&entityId="
-                    + demoAccountId("ARN-2026-900008")))
+                    + seedAccountId("ARN-2026-900008")))
         .andExpect(jsonPath("$[?(@.id == " + fileId + ")].linked").value(Matchers.contains(true)));
     mvc.perform(get("/api/v1/attachments/zip?ids=" + fileId + "," + secondId + "&name=docs"))
         .andExpect(status().isOk())
@@ -225,7 +225,7 @@ class CatalogAccountApiIT {
   @Test
   @WithUserDetails("ao")
   void fieldErrorsAndPermissionsAreReported() throws Exception {
-    Long draft = demoAccountId("ARN-2026-900001");
+    Long draft = seedAccountId("ARN-2026-900001");
     mvc.perform(
             post("/api/v1/accounts/" + draft + "/submit")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -246,7 +246,7 @@ class CatalogAccountApiIT {
         .andExpect(status().isForbidden());
     mvc.perform(post("/api/v1/catalog/records/PRODUCT/1/authorize"))
         .andExpect(status().isForbidden());
-    Long pa = demoAccountId("ARN-2026-900008");
+    Long pa = seedAccountId("ARN-2026-900008");
     mvc.perform(
             put("/api/v1/accounts/" + pa + "/ffy")
                 .contentType(MediaType.APPLICATION_JSON)

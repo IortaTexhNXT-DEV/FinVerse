@@ -56,7 +56,7 @@ class ChartOfAccountsApiIT {
   /**
    * A new, authorized postable expense account under 5600 used as the parent of the micro accounts
    * created here. Adding a child turns the parent into a heading, so the tests must never attach
-   * children to shared demo accounts that other test classes post to.
+   * children to shared seed accounts that other test classes post to.
    */
   private String testParent() throws Exception {
     String code = uniqueCode("56T");

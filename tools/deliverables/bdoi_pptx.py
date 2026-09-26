@@ -258,7 +258,7 @@ class BdoiDeck:
         return path
 
 
-def demo(path: str | Path, screenshot: str | Path | None = None) -> Path:
+def self_test(path: str | Path, screenshot: str | Path | None = None) -> Path:
     """A sample deck with every layout (used by the README and the smoke test)."""
     deck = BdoiDeck("Product Maintenance walkthrough", version="1.0", date="25 September 2026",
                     subtitle="BRD-3 Product Maintenance: end-to-end by persona")
@@ -286,4 +286,4 @@ def demo(path: str | Path, screenshot: str | Path | None = None) -> Path:
 
 if __name__ == "__main__":
     out = Path(sys.argv[1] if len(sys.argv) > 1 else "deck-sample.pptx")
-    print(demo(out, sys.argv[2] if len(sys.argv) > 2 else None))
+    print(self_test(out, sys.argv[2] if len(sys.argv) > 2 else None))

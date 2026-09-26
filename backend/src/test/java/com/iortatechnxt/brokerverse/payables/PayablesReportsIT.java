@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
-import com.iortatechnxt.brokerverse.payables.service.PayablesDemoData;
-import com.iortatechnxt.brokerverse.payables.service.PayablesDemoDataRunner;
+import com.iortatechnxt.brokerverse.payables.service.PayablesSeedData;
+import com.iortatechnxt.brokerverse.payables.service.PayablesSeedDataRunner;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.report.core.RowKind;
@@ -40,13 +40,13 @@ class PayablesReportsIT {
   };
 
   @Autowired private ReportService reports;
-  @Autowired private PayablesDemoData demoData;
+  @Autowired private PayablesSeedData seedData;
   @Autowired private TestData data;
 
   @BeforeEach
-  void loadDemoData() {
-    new PayablesDemoDataRunner(demoData).run(null);
-    assertThat(demoData.loadIfMissing()).isFalse();
+  void loadSeedData() {
+    new PayablesSeedDataRunner(seedData).run(null);
+    assertThat(seedData.loadIfMissing()).isFalse();
   }
 
   private Map<String, String> params(String... pairs) {
@@ -69,7 +69,7 @@ class PayablesReportsIT {
 
   @Test
   @WithUserDetails("fmanager")
-  void everyPayablesReportRunsOnDemoDataAndExportsInAllFormats() {
+  void everyPayablesReportRunsOnSeedDataAndExportsInAllFormats() {
     for (String code : PERIOD_REPORTS) {
       runAndExport(code, params("fromDate", "2026-01-01", "toDate", "2026-09-30"));
     }
@@ -91,7 +91,7 @@ class PayablesReportsIT {
 
   @Test
   @WithUserDetails("fmanager")
-  void creditorAgeingSupportsOptionsAndShowsDemoSuppliers() {
+  void creditorAgeingSupportsOptionsAndShowsSeedSuppliers() {
     ReportResult summary =
         reports.run(
             "FIN-AP-AGE-SUM",

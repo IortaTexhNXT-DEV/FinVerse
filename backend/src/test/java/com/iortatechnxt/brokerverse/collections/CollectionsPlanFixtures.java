@@ -56,7 +56,7 @@ public class CollectionsPlanFixtures {
     this.tx = tx;
   }
 
-  /** The demo company. */
+  /** The seed company. */
   public Long company() {
     return ledgerFx.company();
   }

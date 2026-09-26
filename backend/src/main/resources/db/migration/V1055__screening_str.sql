@@ -8,7 +8,7 @@
 --                the report archive (StrFileSink, SQ16); the AMLC filing reference (unique) is
 --                recorded afterwards (scr_str_extraction, scr_str_extraction_item)
 --   Design: docs/architecture/SANCTION_SCREENING_DESIGN.md section 4.4. The AMLC layout itself is
---   parked (SQ09): extraction uses the STR_LAYOUT version in force (placeholder in the demo).
+--   parked (SQ09): extraction uses the STR_LAYOUT version in force (placeholder in the seed).
 -- =====================================================================================
 
 create table scr_str_extraction (

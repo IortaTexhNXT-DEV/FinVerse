@@ -25,7 +25,7 @@ const row = (arn: string, status: string): WorkbenchRow => ({
   accountId: 1,
   arn,
   clientId: 1,
-  clientCode: 'CL-DEMO-A001',
+  clientCode: 'CL-2026-900001',
   clientName: `Client ${arn}`,
   status,
   productCode: 'PAR01',

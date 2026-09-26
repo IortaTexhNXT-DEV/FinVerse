@@ -533,3 +533,123 @@ contracts listed here.
   runs only; a notice for applied feed runs waits for the recipients of SQ01.
 - The validation of the e-mail addresses when SCR_INGEST_ALERT_RECIPIENTS is saved belongs to the parameter screen
   (platform); the digest skips invalid addresses.
+
+## 18. S1-B matching and risk profiling: as built
+
+What wave S1-B built on S0 and S1-A, and where it details or differs from sections 3-11. S1-C builds on the contracts
+of 18.1.
+
+- **Packages.** `screening.matching` (`domain`, `service`, `api`) and `screening.risk` (`domain`, `service`, `api`).
+  `screening.common` is unchanged: the guards of the new endpoints are literal `hasAuthority(...)` expressions.
+- **Migrations.** `V1053__screening_matching.sql`: `scr_screening_run` (run number `SCN-yyyy-nnnnnn`, trigger,
+  reference, scope, full rescreen flag, MATCH_CRITERIA and RISK_RULES version, counts of clients, entries, matches, risk
+  changes and cases, status, job run), `scr_match` (unique client, entry, entry version and MATCH_CRITERIA version;
+  client and entry names, source, list type, rule, score numeric(5,4), algorithm, matched fields, case-threshold flag,
+  status, case id without a foreign key, decision), `scr_match_suppression` (unique client, entry, entry version) and
+  `scr_client_risk_profile` (insert-only by trigger; a MANUAL row needs a justification and evidence). Demo
+  `V1951__demo_screening_watchlist.sql`: 25 invented entries (10 AML advisory, 8 NLDS PEP, 7 internal, one of them
+  delisted) with aliases, one FAILED ingestion run with three failed records, and one PERIODIC run of FVI with a
+  potential match of CL-2026-000002 (Jose Miguel Lopez Reyes, already HIGH with WATCHLIST_REVIEW in V981, so no risk
+  row). The test data TD-SS-03 name "Maria Santos Reyes" is not used: it would match the demo client Maria Clara Reyes
+  Santos (CL-2026-000001) that many tests use; the PEP example is "Marietta Sandoval Reyna". `ScreeningMatchingTest`
+  checks that no other demo client of V981 / V983 matches a V1951 entry.
+- **Matching (4.3, SNSRP-301).** `NameNormaliser` (upper case, accents of Latin letters removed, titles and company forms
+  dropped, particles joined to the next word: "Juan de la Cruz" and "Juan Dela Cruz" both give `JUAN DELACRUZ`),
+  `NameKeys` (TOKEN, PHONETIC = Double Metaphone codes of each token, EXACT = sorted tokens), `NameScorer` (EXACT 1 or 0
+  on the sorted tokens; PHONETIC = Dice coefficient of the tokens agreeing by a Double Metaphone code; FUZZY =
+  Jaro-Winkler of the sorted names or, for names with the same number of words, the average best token similarity if
+  higher) and `PairMatcher`: per rule of the entry's list and subject type, the best name score over the client's names
+  (full name, first + last name, display name) and the entry's primary name and first + last name (NAME) or aliases
+  (ALIAS, when the rule compares aliases); then, where the rule compares them and both sides hold them, birth date +0.05
+  / -0.10, nationality +0.02 / -0.05 and a shared ID number +0.10 (compared with the client's TIN and ID number). The
+  best hit over the rules wins (ties: the earlier rule, EXACT first in the demo), so the FR-SS-031 example "Juan Dela
+  Cruz" / "Juan de la Cruz" is an EXACT match of score 1 (FRS note in the report). Individual clients are compared with
+  INDIVIDUAL entries only, corporate clients with ENTITY entries.
+- **Blocking keys (`scr_name_key`).** Written only by `NameKeyIndex`. ENTRY keys hold the entry's own names, ALIAS keys
+  its aliases, both with the entry id as subject id. Entry keys are rebuilt on `WatchlistEntriesChanged` (removed when
+  the entry is no longer ACTIVE) and built before each run for ACTIVE entries that have none (entries loaded by a
+  migration). Client keys are rebuilt on registration and identity change and built by the batch for clients without
+  keys. Candidates share a PHONETIC or EXACT key.
+- **Triggers (SNSRP-602, 303).** `ScreeningTriggers` listens after commit and screens in a new transaction; a failure is
+  logged and never reaches the business transaction: `ClientRegistered` (CLIENT_REGISTERED, reference = code),
+  `ClientIdentityChanged` (CLIENT_CHANGED), `account.service.AccountStatusChanged` to SUBMITTED (ACCOUNT_SUBMITTED,
+  reference = ARN; also a resubmission) and `WatchlistEntriesChanged` (LIST_CHANGE, reference = the event cause: the
+  entry keys are rebuilt, then the in-scope clients sharing a key are screened against the changed ACTIVE entries, one
+  run per company). A single client is screened against the whole ACTIVE list.
+- **Batch (`SCR_PERIODIC_SCREENING`: `PeriodicScreeningJob`, `BatchScreening.periodic`).** Per company with clients in
+  the statuses of `SCR_SCREENING_SCOPE`: the whole ACTIVE list on day `SCR_FULL_RESCREEN_DAY` or when no PERIODIC run
+  succeeded before, otherwise the entries whose keys were rebuilt since the last successful PERIODIC run; clients are
+  read by pages of 200; one transaction per company. Inactive clients are never in scope.
+- **Idempotence and suppression (FR-SS-030 R1, FR-SS-031 R2 / R3, SQ12).** A pair already recorded for the entry version
+  and MATCH_CRITERIA version records nothing; a pair suppressed as a false positive for the entry version is skipped; a
+  new entry version (entry changed through maker-checker) is matched again.
+- **No configuration.** Without an ACTIVE MATCH_CRITERIA version on the day no run starts and `SCR_NO_ACTIVE_CONFIG` is
+  raised (dedup key `SCR_NO_ACTIVE_CONFIG:<companyId>`). Without RISK_RULES the matches are recorded and no rule is
+  evaluated.
+- **Risk profiling (SNSRP-302, FR-SS-033).** `RiskRuleEvaluator` (pure) takes the rules by priority; a MATCH_LIST_TYPE /
+  MATCH_STATUS rule holds on one live match (POTENTIAL or TRUE_MATCH, TRUE_MATCH tried first), a client-attribute rule on
+  the client (PEP = the client carries the PEP tag; NATIONALITY, OCCUPATION, SOURCE_OF_FUNDS, CLIENT_TYPE,
+  MARKET_SEGMENT from the client master). **Combinations (17.2, SQ03):** the MATCH_STATUS rules of a category that also
+  has other rules qualify those rules: "SANCTION and TRUE_MATCH" is category X with MATCH_LIST_TYPE EQ SANCTION and
+  MATCH_STATUS EQ TRUE_MATCH, which qualifies once the match is confirmed; a category with MATCH_STATUS rules only
+  qualifies on any match in that status. `RiskProfiler` applies the qualifying category through
+  `ClientRiskService.applyRiskProfile` (source RULE, reason "Risk category X (rule n)", reference "SCN-..., match m"):
+  the rating only when it ranks higher than the client's (sort order of `KYC_RISK_RATING`; a rule never lowers a rating,
+  FR-SS-033 R2) and the category's tags that are valid `CLIENT_TAG` codes and not yet active; nothing is written when
+  nothing changes; each change is a `RiskProfileEntry` row with the rule, match, run and the KYC review date after the
+  change. Single-client triggers evaluate every screened client; batch and list-change runs evaluate the clients with a
+  new match.
+- **Manual change (SNSRP-304, FR-SS-035).** `RiskOverrideService.override`: rating mandatory and valid, tags valid,
+  justification up to 2000 characters, at least one existing evidence attachment; source MANUAL. "Mark False Positive"
+  (`MatchDecisionService.markFalsePositive`): justification mandatory; the evidence is the given attachment ids or,
+  when none are given, the attachments of the match (entity type `ScreeningMatch`); the match becomes FALSE_POSITIVE,
+  the pair is suppressed and, with a rating or tags (needs SCR_RISK_TAG), the profile is corrected by hand. Decisions on
+  matches are audited on entity `ScreeningMatch`.
+- **API.** `/api/v1/screening`: `GET matches?companyId&status&listType&minScore&maxScore&q&uncased&page&size`,
+  `GET matches/{id}` (client and entry side by side), `POST matches/{id}/false-positive`,
+  `POST matches/{id}/open-case` (SCR_INVESTIGATE), `GET clients/{clientId}/matches`,
+  `POST clients/{clientId}/screen` (trigger MANUAL, SCR_INVESTIGATE; 204 when no run), `GET runs?companyId&trigger`,
+  `GET runs/{id}`, `GET runs/{id}/matches` (SCR_VIEW); `GET | POST clients/{clientId}/risk-profile` (SCR_VIEW /
+  SCR_RISK_TAG).
+- **Screens** (`features/screening/matches`, routes in `module.ts`, help in `SCREENING_HELP`): `/screening/matches`
+  Matches (status tabs Potential / True Matches / False Positives / All, search, filters on list type, score range and
+  "not yet in a case"; the match dialog with the side-by-side comparison, Open Case, and Mark False Positive with the
+  evidence upload and the optional rating / Watchlist Review correction) and `/screening/runs` Screening Runs (run log
+  with the matches of each run). `StatusBadge` knows POTENTIAL (warning), TRUE_MATCH (danger), FALSE_POSITIVE and
+  SUCCESS (success).
+
+### 18.1 Contracts for S1-C
+
+- Result types (`screening.matching.service`): `ScreeningResult(runId, runNo, companyId, trigger, reference,
+  matchVersionId, riskVersionId, clientsScreened, entriesScreened, matches, riskOutcomes)` with `matchesOf(clientId)`,
+  `outcomeOf(clientId)` and `caseMatches()`; `ScreenedMatch(matchId, runId, clientId, clientCode, clientName, entryId,
+  entryVersion, entryName, sourceCode, listType, subjectType, score, algorithm, matchedFields, matchRuleId,
+  reachesCaseThreshold, status, caseId)` with `from(ScreeningMatch)`; `screening.risk.service.RiskOutcome(clientId,
+  categoryCode, categoryName, tier, kycRiskRating, riskRating, tagsAdded, caseType, requiresEdd, riskVersionId, ruleId,
+  matchId, profileEntryId, changed)`, returned also when nothing changed, so that a case can still be opened.
+- Event `ScreeningCompleted(ScreeningResult)`, published inside the run's own transaction (listen AFTER_COMMIT): open
+  NAME_MATCH cases for `caseMatches()`, the category's case type for each `RiskOutcome`, and ACCOUNT_APPLICATION for the
+  trigger ACCOUNT_SUBMITTED (reference = ARN). `ScreeningEngine.recordCasesOpened(runId, count)` writes the cases opened
+  to the run log.
+- Port `MatchCaseOpener.open(ScreenedMatch)` returning `OpenedCase(caseId, caseNo, joined)`, implemented by S1-C for
+  "Open Case"; without a bean the action answers `SCR_CASES_NOT_AVAILABLE`.
+- `MatchDecisionService`: `confirm(matchId, caseId, remarks)` (TRUE_MATCH, rules evaluated again, returns
+  `MatchDecision(match, riskOutcome, manualEntryId)`), `markFalsePositive(matchId, FalsePositive)`,
+  `linkToCase(matchIds, caseId)`, `get(matchId)`. `RiskOverrideService.override(clientId, ManualRiskChange)` for
+  "Update Risk Tag" on the case (pass the case's evidence attachment ids and `caseId`) and `history(clientId)`.
+  `ScreeningQueries` (matches, client matches, open potential matches for the home tile, runs).
+  `ScreeningEngine.screenClient(clientId, trigger, reference)`.
+- Error codes: SCR_JUSTIFICATION_REQUIRED, SCR_JUSTIFICATION_TOO_LONG, SCR_EVIDENCE_REQUIRED, SCR_RISK_RATING_INVALID,
+  SCR_RISK_TAG_INVALID, SCR_MATCH_ALREADY_DECIDED, SCR_MATCH_NOT_OPEN, SCR_CASES_NOT_AVAILABLE.
+
+### 18.2 Parked or deferred in S1-B
+
+- Case creation (FR-SS-034), "Update Risk Tag" on the case page and the client Screening tab belong to S1-C (contracts
+  above; the tab reads `clients/{id}/matches` and `clients/{id}/risk-profile`).
+- Screening after commit runs in the request thread: the business save is committed first, but the response waits for
+  the screening (FR-SS-030 R4 "never delays"); an asynchronous executor can be added without a contract change. The runs
+  of a bulk client upload are one run per client, not grouped under the bulk job (FR-SS-030 alternate flow).
+- The weights of birth date, nationality and ID are code constants until BDOI confirms the matching approach (SQ02).
+- The category ranking uses the sort order of `KYC_RISK_RATING`; a category whose rating is not a valid code does not
+  change the rating (logged). Rules only add tags; they never end one.
+- Screening of other parties (beneficial owners, signatories) waits for SQ11.

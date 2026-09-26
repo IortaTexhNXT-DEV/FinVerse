@@ -22,7 +22,6 @@ public final class ObjectKeys {
 
   private static final Pattern NOT_KEY_CHARS = Pattern.compile("[^a-z0-9]+");
   private static final Pattern CAMEL = Pattern.compile("([a-z0-9])([A-Z])");
-  private static final Pattern EDGE_HYPHENS = Pattern.compile("^-+|-+$");
   private static final int MAX_SEGMENT = 40;
 
   private ObjectKeys() {}
@@ -58,10 +57,22 @@ public final class ObjectKeys {
   static String segment(String text) {
     String base = text == null ? "" : CAMEL.matcher(text).replaceAll("$1-$2");
     String clean = NOT_KEY_CHARS.matcher(base.toLowerCase(Locale.ROOT)).replaceAll("-");
-    clean = EDGE_HYPHENS.matcher(clean).replaceAll("");
+    clean = trimHyphens(clean);
     if (clean.isEmpty()) {
       return "x";
     }
     return clean.length() > MAX_SEGMENT ? clean.substring(0, MAX_SEGMENT) : clean;
+  }
+
+  private static String trimHyphens(String text) {
+    int start = 0;
+    int end = text.length();
+    while (start < end && text.charAt(start) == '-') {
+      start++;
+    }
+    while (end > start && text.charAt(end - 1) == '-') {
+      end--;
+    }
+    return text.substring(start, end);
   }
 }

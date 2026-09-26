@@ -172,6 +172,8 @@ class LocalFileStoreTest {
     assertThat(ObjectKeys.segment("  ")).isEqualTo("x");
     assertThat(ObjectKeys.segment(null)).isEqualTo("x");
     assertThat(ObjectKeys.segment("A".repeat(60))).hasSize(40);
+    assertThat(ObjectKeys.segment("--Claim  Docs--")).isEqualTo("claim-docs");
+    assertThat(ObjectKeys.segment("-".repeat(100_000) + "a")).isEqualTo("a");
     assertThat(ObjectRef.isValidKey(key)).isTrue();
   }
 

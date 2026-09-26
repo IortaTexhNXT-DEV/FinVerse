@@ -27,6 +27,10 @@ class BusinessTextTest {
         "Total production per branch (CMRID.014, RMTID.037).|Total production per branch.",
         "Clients due by the date (BRNB.110).|Clients due by the date.",
         "Retired (BRPM.011)|Retired",
+        "Open collection items (BRCLXN.001-012, 045)|Open collection items",
+        "Service invoices issued (BRNB.100/100b)|Service invoices issued",
+        "Versions with the change summary (BRPM.006/007, PMADD06)|Versions with the change summary",
+        "Aging (report, ADJID.021)|Aging (report)",
         "Journal (for approval)|Journal (for approval)",
       })
   void removesReferences(String text, String expected) {

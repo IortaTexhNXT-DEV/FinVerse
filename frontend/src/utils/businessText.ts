@@ -5,15 +5,16 @@
  * BusinessText, as a safety net for messages and catalogue texts received from the API.
  */
 const REFERENCE_PARTS: readonly RegExp[] = [
-  /^[A-Z]{2,6}ID\.\d+([-/]\d+)*( addendum)?( Annex II #\d+)?$/,
-  /^BR[A-Z]{2,4}\.\d+([-/]\d+)*$/,
+  /^[A-Z]{2,6}ID\.\d+[a-z]?([-/]\d+[a-z]?)*( addendum)?( Annex II #\d+)?$/,
+  /^BR[A-Z]{2,4}\.\d+[a-z]?([-/]\d+[a-z]?)*$/,
+  /^[A-Z]{2,4}ADD\d{2}$/,
   /^FRBS \d+\.\d+(\.\d+|\.x)?$/,
   /^Annex II #\d+$/,
   /^OQ\d+(\/OQ\d+)*$/,
   /^[A-Z]{0,3}Q\d{2}$/,
   /^FR-[A-Z]{2}-?\d+$/,
   /^SNSRP-\d+$/,
-  /^\d{3}$/,
+  /^\d{3}[a-z]?([-/]\d{3}[a-z]?)*$/,
   /^(layout to confirm|draft|to confirm)$/,
 ];
 

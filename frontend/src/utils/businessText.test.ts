@@ -20,6 +20,11 @@ describe('businessText', () => {
     ],
     ['Clients due by the date (BRNB.110).', 'Clients due by the date.'],
     ['A match is not raised again (SNSRP-302, 304).', 'A match is not raised again.'],
+    ['Open collection items (BRCLXN.001-012, 045)', 'Open collection items'],
+    [
+      'Versions with the change summary (BRPM.006/007, PMADD06)',
+      'Versions with the change summary',
+    ],
   ])('removes the references of "%s"', (text, expected) => {
     expect(businessText(text)).toBe(expected);
   });

@@ -61,8 +61,14 @@ const KIND_CLASS: Record<ColumnKind, string | undefined> = {
 /** Dates (23-Sep-2026 19:32) and codes (PAY-2026-000010, T-CBG1) that must never wrap. */
 const UNBREAKABLE = /^(\d{2}-[A-Z][a-z]{2}-\d{4}( \d{2}:\d{2})?|[A-Z0-9]+(-[A-Z0-9]+)+)$/;
 
-/** A plain date or code value kept on one line; any other cell content as rendered. */
+/**
+ * A cell's content: an empty value is one muted dash; a plain date or code is kept on one line;
+ * anything else as rendered.
+ */
 function keepTogether(value: ReactNode): ReactNode {
+  if (value === '' || value === null || value === undefined) {
+    return <span className="muted">—</span>;
+  }
   return typeof value === 'string' && UNBREAKABLE.test(value) ? (
     <span className="nowrap">{value}</span>
   ) : (

@@ -117,8 +117,14 @@ Istio ambient mode) can be added at the platform layer without any change to BIB
 | Kubernetes manifests / Helm values: four deployments, HPA, PodDisruptionBudgets, NetworkPolicies (deny by default), IRSA service accounts, ALB ingress annotations (internal, HTTPS backend, WAF ACL) | `deploy/k8s/**` |
 | Documentation: technical and deployment architecture (deliverable 12), BOM (deliverable 4), IER restatement | docs |
 
-### 5.4 Points for BDO IT
+### 5.4 Adopted (BDOI, 26-Sep-2026: "go ahead with the best practices")
 
-1. Confirm the two-path edge (ALB and WAF for users; Apigee X for systems, inbound and outbound).
-2. Confirm TLS on every hop with network policies and no mesh; or state if a zero-trust mTLS mandate applies.
-3. The private connectivity between Apigee X and the BIBS VPC (Private Service Connect, VPN or Interconnect), and the certificate authority to use (ACM Private CA or BDO PKI).
+| # | Decision | Adopted |
+|---|---|---|
+| 1 | Edge | Two paths: internal ALB with AWS WAF for users; Apigee X for system APIs, both inbound to BIBS and outbound from BIBS |
+| 2 | Encryption in the cluster | TLS on every hop, NetworkPolicies denying by default, IRSA, no service mesh. A sidecar-less mesh stays an option if a zero-trust mTLS mandate is issued later |
+| 3 | Apigee X to BIBS connectivity | Private route over BDO's existing network links between Google Cloud (Apigee X) and the AWS VPC (HA VPN or Interconnect / Direct Connect through the BDO backbone), terminating on the internal ALB; no internet path. BDO network team to provide the route and the source ranges used in the WAF and security-group rules |
+| 4 | Certificates | Browser-facing ALB certificate issued under the BDO corporate PKI (or ACM for the BDO domain if the PKI team allows); in-cluster certificates from ACM Private CA through cert-manager with automatic rotation |
+
+These are implemented in build step INF0 (5.3). Only the connectivity details (item 3) and the certificate issuance
+(item 4) need BDO IT to act; no further decision is open.

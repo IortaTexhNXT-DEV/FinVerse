@@ -161,28 +161,37 @@ final class BulkWorkbooks {
         if (row.getStatus() == BulkRowStatus.COMMITTED) {
           continue;
         }
-        String messages = textOf(row.getMessages());
-        Row out = sheet.createRow(r++);
-        Map<String, String> v = values.getOrDefault(row.getId(), Map.of());
-        for (int c = 0; c < columns.size(); c++) {
-          String name = columns.get(c).header();
-          var cell = out.createCell(c);
-          cell.setCellValue(v.getOrDefault(name, ""));
-          if (!messages.isEmpty()
-              && messages.toLowerCase(Locale.ROOT).contains(name.toLowerCase(Locale.ROOT))) {
-            cell.setCellStyle(marked);
-          }
-        }
-        var error = out.createCell(errorColumn);
-        error.setCellValue(messages);
-        if (!messages.isEmpty()) {
-          error.setCellStyle(marked);
-        }
+        errorRow(
+            sheet.createRow(r++), columns, row, values.getOrDefault(row.getId(), Map.of()), marked);
       }
       sheet.createFreezePane(0, 1);
       return bytes(wb);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
+    }
+  }
+
+  /** One rejected row of the error file: its values, then its messages in the Error column. */
+  private static void errorRow(
+      Row out,
+      List<BulkColumn> columns,
+      BulkRowRecord row,
+      Map<String, String> v,
+      CellStyle marked) {
+    String messages = textOf(row.getMessages());
+    String lower = messages.toLowerCase(Locale.ROOT);
+    for (int c = 0; c < columns.size(); c++) {
+      String name = columns.get(c).header();
+      var cell = out.createCell(c);
+      cell.setCellValue(v.getOrDefault(name, ""));
+      if (!messages.isEmpty() && lower.contains(name.toLowerCase(Locale.ROOT))) {
+        cell.setCellStyle(marked);
+      }
+    }
+    var error = out.createCell(columns.size());
+    error.setCellValue(messages);
+    if (!messages.isEmpty()) {
+      error.setCellStyle(marked);
     }
   }
 

@@ -1,0 +1,27 @@
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/seed
+management:
+  health:
+    redis:
+      enabled: false
+brokerverse:
+  security:
+    jwt-secret: test-secret-for-automated-tests-0123456789abcdef
+    login-protection:
+      # MockMvc logs in many times from one address; the limiter has its own tests.
+      max-attempts-per-window: 100000
+  # No Redis or Kafka in the test profile: in-memory cache, database fallbacks, events LOCAL.
+  redis:
+    enabled: false
+  kafka:
+    enabled: false
+  # Local file store under the build folder (document storage, ST0).
+  storage:
+    provider: local
+    local:
+      root: target/storage-files
+      link-secret: test-link-secret-for-local-file-links
+logging:
+  level:
+    root: WARN

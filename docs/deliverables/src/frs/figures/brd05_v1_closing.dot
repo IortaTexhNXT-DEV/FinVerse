@@ -1,0 +1,23 @@
+// BRD-5 Volume 1: month-end sequence (FRS section 5.2; FRBS 2.6.0-2.7.1, 3.4.0-3.5.0).
+digraph acc_close {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.5, ranksep=0.4, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=3.6, height=0.6];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  a [label="Month M open\nall modules post", fillcolor="@WHITE"];
+  b [label="Last day of M, 23:00\nBROKING_BOOKS_CLOSE\n(broking modules refused: BOOKS_CLOSED)", fillcolor="@DIRTY_WHITE"];
+  c [label="FRBS adjustments, accruals,\nrevaluation rate, FX revaluation"];
+  d [label="Scheduled GL close\n(proposal: 2nd banking day of M+1, 17:00)", fillcolor="@AMBER_BG"];
+  e [label="GL_PERIOD_CLOSE\nchecklist, then close", fillcolor="@DIRTY_WHITE"];
+  f [label="Month M CLOSED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  g [label="FAILED\nGL_CLOSE_FAILED, fix and reschedule", fillcolor="@AMBER_BG"];
+  y [label="Year-end close by 15 April,\nverification (nominal = 0, TB difference = 0)", fillcolor="@WHITE", style="rounded,dashed,filled"];
+
+  a -> b -> c -> d -> e -> f;
+  e -> g [style=dashed];
+  g -> d [style=dashed, label=" reschedule"];
+  b -> c [label=" reopen with reason\n (if needed)", style=dotted, constraint=false];
+  f -> y [style=dotted, label=" twelfth month"];
+  { rank=same; f; g; }
+}

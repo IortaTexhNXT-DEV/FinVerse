@@ -1,0 +1,17 @@
+// BRD-13 Cutover Runbook: the cutover weekend (T = Monday 3 January 2028, recommended; times PHT).
+digraph dm_weekend {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.22, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=12, fontcolor="@NEAR_BLACK", width=7.2, height=0.5, margin="0.14,0.05", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2];
+  w1 [label=<<b>Wed T-5 (29 Dec) 17:00</b>   last legacy business day; branches close; GNG-2 done; final RA-sent file>, fillcolor="@AMBER_BG"];
+  f1 [label=<<b>Fri T-3 (31 Dec) 20:00</b>   last legacy EOD; preliminary December TB>, fillcolor="@AMBER_BG"];
+  f2 [label=<<b>Fri T-3 22:00</b>   legacy freeze (business read-only; GL for FY2027 adjustments only); final extracts>, fillcolor="@AMBER_BG"];
+  s1 [label=<<b>Sat T-2 (1 Jan) 02:00</b>   rollback point - production database snapshot>, fillcolor="@DANGER_BG", color="@DANGER"];
+  s2 [label=<<b>Sat T-2 03:00-17:00</b>   intake checks; headers, open invoices, UPP, collection state, provisional GL opening, RA-sent file>, fillcolor="@BG_BLUE"];
+  s3 [label=<<b>Sat T-2 18:00 to Sun 04:00</b>   reconciliation L1-L5; Migration Clearing 0.00; breaks (G5)>, fillcolor="@BG_BLUE"];
+  u1 [label=<<b>Sun T-1 (2 Jan) 06:00-15:00</b>   screening run; P03 resubmissions; business verification (G6); smoke test>, fillcolor="@BG_BLUE"];
+  u2 [label=<<b>Sun T-1 18:00</b>   go / no-go GNG-3 (NO-GO: rollback; legacy reopens Monday)>, fillcolor="@DANGER_BG", color="@DANGER"];
+  m1 [label=<<b>Mon T (3 Jan) 04:00</b>   renewal go-live extraction; 08:00 BIBS open; day-1 renewal queue; 18:00 point of no return>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  w1 -> f1 -> f2 -> s1 -> s2 -> s3 -> u1 -> u2 -> m1;
+}

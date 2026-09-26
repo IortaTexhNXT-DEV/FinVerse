@@ -1,0 +1,37 @@
+// BRD-10: interfaces of Sanction Screening. FRS section 7. Dashed grey = parked seam.
+digraph sc_integration {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.6, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@WHITE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=11, fontcolor="@NEAR_BLACK", width=1.9, height=0.55];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=9.5, fontcolor="@TEXT"];
+
+  src   [label="List files: AML advisory,\nNLDS-PEP (upload / file drop)"];
+  api   [label="List feeds by API,\nNLDS direct", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+  crm   [label="Client master (CRM)"];
+  acct  [label="Accounts (BRD-1)"];
+
+  subgraph cluster_scr {
+    label="Sanction Screening (BIBS)"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=11;
+    style=filled; fillcolor="@BG_BLUE"; color="@BG_BLUE";
+    wl  [label="Watchlist and\ningestion runs", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+    eng [label="Matching engine,\nrisk rules", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+    cs  [label="Cases, reviews,\ncommittee, STR", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+  }
+  notif [label="Notifications, e-mail,\nalerts"];
+  rep   [label="Reports (Compliance)\nand audit trail"];
+  arch  [label="Report archive\n(STR file download)"];
+  fold  [label="Designated STR folder\n(shared drive / SFTP)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+  amlc  [label="AMLC portal\n(manual filing)", color="@MUTED"];
+
+  src -> wl [label="scheduled / upload"];
+  api -> wl [label="parked (SQ01)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+  crm -> eng [label="client registered /\nidentity changed"];
+  acct -> eng [label="account submitted;\nactive policy"];
+  wl -> eng [label="entry changes"];
+  eng -> crm [label="risk rating,\nPEP / watchlist tags"];
+  eng -> cs [label="matches"];
+  cs -> notif; cs -> rep;
+  cs -> arch [label="AMLC file"];
+  arch -> fold [label="parked (SQ16)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+  arch -> amlc [label="filed by CO", style=dashed];
+}

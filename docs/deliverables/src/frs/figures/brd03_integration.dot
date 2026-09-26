@@ -1,0 +1,33 @@
+// BRD-3: interfaces of Product Maintenance. FRS section 7. Dashed grey = parked seam.
+digraph pm_integration {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.6, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@WHITE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=11, fontcolor="@NEAR_BLACK", width=1.9, height=0.55];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=9.5, fontcolor="@TEXT"];
+
+  subgraph cluster_pm {
+    label="Product Maintenance (BIBS)"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=11;
+    style=filled; fillcolor="@BG_BLUE"; color="@BG_BLUE";
+    pm  [label="Package requests\n(productmaint)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+    cat [label="Product catalogue\n(versions, terms,\nincentive criteria)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+  }
+  crm   [label="Client master (CRM)"];
+  mail  [label="E-mail outbox\n(protected PDF / XLSX)"];
+  notif [label="In-app notifications\nand alerts"];
+  docs  [label="Document templates\nand attachments"];
+  nb    [label="Quotation, account,\nbooking (BRD-1)"];
+  ops   [label="Operations: adjustment,\ncommission (BRD-2)"];
+  rnw   [label="Renewal (BRD-6)"];
+  feed  [label="Other BDOI systems\n(product master feed)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+  ins   [label="Insurers (e-mail)", color="@MUTED"];
+
+  crm -> pm [label="client look-up"];
+  pm -> cat [label="set-up draft version,\nretire product"];
+  cat -> pm [label="released / returned /\nexpired events"];
+  pm -> mail; mail -> ins [label="QS, advisory"];
+  pm -> notif; pm -> docs;
+  cat -> nb [label="scheme version,\nrating, criteria codes"];
+  cat -> ops [label="version for re-rating,\ncriteria codes"];
+  cat -> rnw [label="version of the\nexpiring account"];
+  pm -> feed [label="ProductMasterFeed\n(parked, PQ16)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+}

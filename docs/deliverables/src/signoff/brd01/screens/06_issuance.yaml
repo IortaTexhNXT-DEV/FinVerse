@@ -1,0 +1,160 @@
+# Screen specifications of BRD-1 New Business: issuance and e-policy.
+area: Issuance and e-policy
+screens:
+  - id: SCR-NB-23
+    title: Issuance Workbench
+    route: /issuance
+    purpose: >-
+      From the placed account to the issued policy: accounts awaiting their e-policy, e-policies whose extracted data
+      waits for review, confirmed e-policies ready to send, and mortgaged accounts without an Insurance Advice.
+    entry:
+      - NB Dashboard figures
+      - Account record › Policy tab
+    shots:
+      - {state: list, user: proc, caption: "Issuance Workbench, Placed – Awaiting Policy tab"}
+      - {state: review, user: proc, tab: "Policy Received – Review Extraction", caption: "Policy Received – Review Extraction tab"}
+    fields:
+      - "Tiles and tabs | Placed – Awaiting Policy / Policy Received – Review Extraction / Ready to Dispatch / IA to Generate | Tile and tab | Counts | - | Accounts and e-policies | Placed – Awaiting Policy | - | A tile opens its tab | -"
+      - "Search | Search Proposal No. | Text | ARN or client | N | - | Blank | - | Contains search | -"
+      - "List | Select | Check box | Shown on Ready to Dispatch and IA to Generate | N | - | Not ticked | - | - | -"
+      - "List | Name / Client Code | Column | Client name (opens the account placement) and code | - | Client master | - | Read only | - | -"
+      - "List | Proposal No. | Column | The account's ARN | - | Account | - | Read only | - | -"
+      - "List | Status | Column | Account stage or e-policy status | - | Workflow NB_ACCOUNT, e-policy | - | Read only | - | -"
+      - "List | Product Line | Column | Line, product and insurer | - | Product catalogue | - | Read only | - | -"
+      - "List | Policy No. | Column | Policy number(s) | - | Account | - | Read only | - | -"
+      - "List | E-policy / Mortgagee / Upload E-policy | Column | File name and time received (review, dispatch); mortgagee bank (IA to Generate); upload link (awaiting policy) | - | E-policy, account | - | Read only | - | -"
+    actions:
+      - "Upload E-policies | EPOLICY_MANAGE | Always | Opens E-policy Upload | - | -"
+      - "Upload E-policy (row) | EPOLICY_MANAGE | Placed – Awaiting Policy | Opens E-policy Upload with the ARN filled in | - | -"
+      - "Generate Insurance Advice | EPOLICY_MANAGE | IA to Generate, at least one row selected | Generates the Insurance Advice of each selected mortgaged account; the outcome of each is listed | Unchanged | -"
+      - "Send E-policies | EPOLICY_SEND | Ready to Dispatch, at least one row selected | Asks for an optional password hint and sends each e-policy to the account contact, encrypted | Unchanged (e-policy dispatched) | E-mail to each client and the password e-mail"
+    rules:
+      - "Only confirmed e-policies are sent (FR-NB-105)."
+      - "The Insurance Advice is generated for mortgaged accounts only, by the trigger in parameter IA_TRIGGER (on policy issue by default) or by hand (FR-NB-103)."
+    outcome: Processing sees every account waiting for a policy, a review or a dispatch.
+    frs: [FR-NB-100, FR-NB-101, FR-NB-102, FR-NB-103, FR-NB-105]
+    tests: [ISSWB]
+
+  - id: SCR-NB-24
+    title: E-policy Upload
+    route: /issuance/upload
+    purpose: >-
+      Stores the e-policies received from the insurers on their accounts: one e-policy matched by the ARN, the policy
+      number or the ARN in the file, or up to 50 at once with a match review. Each stored file opens an extraction review.
+    entry:
+      - Issuance Workbench › Upload E-policies, or Upload E-policy on a row
+    shots:
+      - {state: empty, user: proc, caption: "E-policy Upload: single and bulk"}
+      - {state: bulk, user: proc, fill: epolicy_bulk, caption: "Bulk upload match review"}
+    fields:
+      - "Single E-policy | E-policy PDF | File | .pdf | Y | - | - | - | A PDF file | -"
+      - "Single E-policy | Account (ARN) | Text | ARN-yyyy-nnnnnn | N | Accounts | The ARN of the row, when opened from the workbench | - | Found from the file name or the document when empty; the account is placed | No account found for <file>: choose the account (ARN) / Account <ARN> is <status>; an e-policy is received once placed"
+      - "Single E-policy | Policy number | Text | - | N | Accounts | Blank | - | Finds an account already issued | -"
+      - "Bulk Upload | E-policy PDFs | File (several) | .pdf, up to 50 files named after their ARN | Y | - | - | - | 1 to 50 files | Upload between 1 and 50 e-policies at a time"
+      - "Match review | File, Account, Matched By, Detail | Table | Account editable with an Include tick while in review | - | Upload batch | Matched account | Upload in review | The account is placed | This upload is <status>"
+    actions:
+      - "Upload and Review | EPOLICY_MANAGE | A file chosen | Stores the e-policy on the account and opens the extraction review | Unchanged (e-policy received) | In-app notice to review the extraction"
+      - "Upload and Match | EPOLICY_MANAGE | Files chosen | Uploads the files and matches each to its account | - | -"
+      - "Confirm Upload / Discard | EPOLICY_MANAGE | Upload in review | Stores the included files as e-policies of their accounts, or discards the upload | - | In-app notice per e-policy to review"
+    rules:
+      - "Each file is stored as the account's e-policy document and triggers the extraction review (FR-NB-100, FR-NB-102)."
+      - "Reading the insurers' mailbox or SFTP for e-policies waits for the channel specification; e-policies are uploaded by Processing (FR-NB-100)."
+    outcome: The e-policy is stored on its account and its data is ready for review.
+    frs: [FR-NB-100, FR-NB-102]
+    tests: [EPUP]
+
+  - id: SCR-NB-25
+    title: Extraction Review
+    route: /issuance/epolicies/:id
+    parent: /issuance
+    purpose: >-
+      The values read from the e-policy next to the account values, the differences to check, and the confirmation
+      that records the policy number(s) on the account and moves it to policy issued.
+    entry:
+      - Issuance Workbench › Policy Received – Review Extraction › e-policy file
+      - E-policy Upload › after the upload, or Review extraction in the match review
+      - The in-app notice E-policy to review
+    shots:
+      - {state: review, user: proc, open_epolicy: review, caption: "Extraction Review with the differences to check"}
+    fields:
+      - "Header | ARN, status | Display | E-policy Received, Review, Confirmed or Rejected | - | E-policy | - | Read only | - | -"
+      - "Extraction note | Extraction | Banner | How the data was read, or why it was not | - | Extraction patterns | - | Read only | - | -"
+      - "Differences | Check before confirming | Warning list | Each value that differs from the account | - | Extraction and account | - | Read only | - | -"
+      - "Comparison | Policy number(s), Period start, Period end, Premium | Table | Extracted from the e-policy; On the account; differences highlighted | - | E-policy, account | - | Read only | - | -"
+      - "Confirm Policy | Policy number (one per policy year) | Text | Up to 60 characters; one per year of a multi-year account | Y | Extracted value | The extracted number(s) | E-policy received or in review | One number per year, all different | Enter one policy number per policy year. / The policy numbers must be different."
+      - "Confirm Policy | Issue date | Date | dd-MMM-yyyy; today when empty | N | - | Today | E-policy received or in review | - | -"
+      - "Reject dialog | Reason | Drop-down | - | Y | List of values EPOLICY_REJECT_REASON | Blank | E-policy received or in review | - | -"
+    actions:
+      - "Download E-policy | Every user of the screen | Always | Downloads the PDF | - | -"
+      - "Open Account | Every user of the screen | Always | Opens the account placement | - | -"
+      - "Extract Again | EPOLICY_MANAGE | E-policy received or in review | Reads the PDF again with the insurer's patterns | Unchanged | -"
+      - "Confirm Policy | EPOLICY_MANAGE | E-policy received or in review; policy numbers complete | Records the policy numbers and issue date on the account | Policy issued (e-policy Confirmed) | Workflow notice; Insurance Advice generated when IA_TRIGGER is on policy issue"
+      - "Reject | EPOLICY_MANAGE | E-policy received or in review | Asks for the reject reason and remarks | Unchanged (e-policy Rejected) | -"
+    rules:
+      - "A multi-year account needs one policy number per policy year (FR-NB-101, FR-NB-114)."
+      - "Extraction reads the text of the PDF; scanned policies are completed by hand until OCR is available (FR-NB-101)."
+    outcome: The policy is issued on the account and can be booked and sent to the client.
+    frs: [FR-NB-101, FR-NB-102, FR-NB-114]
+    tests: [EXTR]
+
+  - id: SCR-NB-26
+    title: Insurance Advice
+    route: /issuance/insurance-advice
+    purpose: >-
+      The register of Insurance Advices of mortgaged accounts: search by IA number, ARN or client; download the PDF;
+      generate for given accounts; send one or several to the mortgagee bank, password protected.
+    entry:
+      - Issuance Workbench › IA to Generate
+      - Account record › Policy tab
+    shots:
+      - {state: list, user: proc, caption: "Insurance Advice register"}
+      - {state: send, user: proc, select: first_advice, click: "^send selected$", caption: "Send Insurance Advice dialog"}
+    fields:
+      - "Search | Search IA No., ARN or client | Text | - | N | - | Blank | - | Contains search | -"
+      - "List | Select | Check box | - | N | - | Not ticked | - | 1 to 50 advices per send | Select between 1 and 50 Insurance Advices"
+      - "List | IA No. | Column | IA-yyyy-nnnnnn | - | Numbering | - | Read only | - | -"
+      - "List | Insured / Proposal No. | Column | Client name and ARN | - | Account | - | Read only | - | -"
+      - "List | Mortgagee | Column | Mortgagee bank | - | List of values MORTGAGEE_BANK | - | Read only | - | -"
+      - "List | Policy No. | Column | Policy number or 'to follow' | - | Account | - | Read only | - | -"
+      - "List | Generated | Column | Trigger and time | - | Insurance Advice | - | Read only | - | -"
+      - "List | Status / Last Sent | Column | Generated or Sent; time and recipient of the last send | - | Insurance Advice, outbound messages | - | Read only | - | -"
+      - "Generate dialog | Accounts (ARN) | Text area | ARNs separated by commas or new lines | Y | Accounts | Blank | - | The account has a mortgagee and is placed or issued | Account <ARN> has no mortgagee bank: no Insurance Advice / Account <ARN> is <status>; it must be placed first"
+      - "Send dialog | To | Text | The mortgagee bank unit; several addresses separated by commas | Y | - | Blank | - | At least one valid address | Enter at least one recipient"
+      - "Send dialog | Cc, Password hint | Text | - | N | - | Blank | - | - | -"
+    actions:
+      - "Generate Insurance Advice | EPOLICY_MANAGE | Always | Opens the generate dialog; the outcome of each ARN is listed | Unchanged | -"
+      - "Send Selected | EPOLICY_MANAGE, EPOLICY_SEND or ACCOUNT_MAINTAIN | At least one advice selected | Sends one e-mail per advice with the PDF encrypted; the password follows separately | Unchanged (advice Sent) | E-mail to the mortgagee bank and the password e-mail"
+      - "PDF | Every user of the screen | Always | Downloads the advice | - | -"
+    rules:
+      - "The advice is generated from the Insurance Advice template (FR-NB-103, FR-NB-104)."
+      - "Documents that leave BIBS are password protected (FR-NB-013)."
+    outcome: The mortgagee bank receives the Insurance Advice of each mortgaged account.
+    frs: [FR-NB-103, FR-NB-104]
+    tests: [IA]
+
+  - id: SCR-NB-27
+    title: E-policy Dispatch
+    route: /issuance/dispatch
+    purpose: >-
+      Sends the confirmed e-policies to the clients, one by one or in a batch, encrypted with the password in a separate
+      e-mail; the Dispatch Report lists every e-policy e-mail with its outcome.
+    entry:
+      - Issuance Workbench › Ready to Dispatch
+    shots:
+      - {state: list, user: epol, caption: "E-policy Dispatch, Ready to Dispatch tab"}
+      - {state: report, user: epol, tab: "Dispatch Report", caption: "Dispatch Report tab"}
+    fields:
+      - "Tabs | Ready to Dispatch / Dispatch Report | Tab | - | - | Fixed | Ready to Dispatch | - | - | -"
+      - "Ready to Dispatch | Name / Client Code, Proposal No., Policy No., E-policy | Column | - | - | Confirmed e-policies not yet sent | - | Read only | - | -"
+      - "Send dialog | To, Cc, Subject, Message | Text | As on Send via Email | To, Subject and Message Y | The account contact e-mail and the EPOLICY_EMAIL template | Proposed by the system | Confirmed e-policy | A recipient is known or entered | Account <ARN> has no contact e-mail: enter the recipient"
+      - "Send dialog | Password hint | Text | Up to 300 characters | N | Parameter EPOLICY_PASSWORD_HINT | The configured hint | Confirmed e-policy | - | -"
+      - "Dispatch Report | Queued, Proposal No., To, Subject, Outcome, Delivered | Column | Outcome Queued, Sent or Failed with the error | - | Outbound messages | - | Read only | - | -"
+    actions:
+      - "Send (row) | EPOLICY_SEND | Ready to Dispatch | Opens the send dialog for the e-policy | Unchanged (e-policy Dispatched) | E-mail to the client and the password e-mail"
+      - "Send Selected | EPOLICY_SEND | At least one e-policy selected | Asks for an optional hint and sends each e-policy; the outcome of each is listed | Unchanged | E-mail to each client and the password e-mail"
+    rules:
+      - "The e-policy is sent only after its policy data is confirmed (FR-NB-105)."
+      - "Failed e-mails are retried up to MAIL_MAX_ATTEMPTS (3) and reported with their reason (FR-NB-106)."
+    outcome: The client receives the e-policy; the dispatch report proves each delivery.
+    frs: [FR-NB-105, FR-NB-106]
+    tests: [DISPATCH]

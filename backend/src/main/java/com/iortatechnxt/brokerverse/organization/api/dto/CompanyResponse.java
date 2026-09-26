@@ -1,0 +1,63 @@
+package com.iortatechnxt.brokerverse.organization.api.dto;
+
+import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
+import com.iortatechnxt.brokerverse.organization.domain.Company;
+
+/**
+ * Company view.
+ *
+ * @param id id
+ * @param code code
+ * @param name name
+ * @param baseCurrency base currency
+ * @param taxId tax id
+ * @param address address
+ * @param fiscalYearStartMonth fiscal year start month
+ * @param backValueDays back value days
+ * @param forwardValueDays forward value days
+ * @param retainedEarningsAccount retained earnings account code
+ * @param recordStatus maker-checker status
+ * @param createdBy creator
+ * @param maker user who created or last maintained the record (unchanged by authorization)
+ * @param authorizedBy checker
+ */
+public record CompanyResponse(
+    Long id,
+    String code,
+    String name,
+    String baseCurrency,
+    String taxId,
+    String address,
+    int fiscalYearStartMonth,
+    int backValueDays,
+    int forwardValueDays,
+    String retainedEarningsAccount,
+    RecordStatus recordStatus,
+    String createdBy,
+    String maker,
+    String authorizedBy) {
+
+  /**
+   * Maps an entity.
+   *
+   * @param c company
+   * @return response
+   */
+  public static CompanyResponse from(Company c) {
+    return new CompanyResponse(
+        c.getId(),
+        c.getCode(),
+        c.getName(),
+        c.getBaseCurrency(),
+        c.getTaxId(),
+        c.getAddress(),
+        c.getFiscalYearStartMonth(),
+        c.getBackValueDays(),
+        c.getForwardValueDays(),
+        c.getRetainedEarningsAccount(),
+        c.getRecordStatus(),
+        c.getCreatedBy(),
+        c.getMaker(),
+        c.getAuthorizedBy());
+  }
+}

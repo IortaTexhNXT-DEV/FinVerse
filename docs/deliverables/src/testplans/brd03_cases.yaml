@@ -1,0 +1,2592 @@
+# Test plan BRD-3 Product Maintenance - test data file.
+# Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/testplans/brd03_cases.yaml
+# Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
+# Messages and codes are the ones BIBS returns (backend/src/main); button and tab labels are the
+# labels on the screens (workflow labels of V755, frontend/src/features/productmaint and catalog).
+
+meta:
+  brd: BRD-03
+  name: Product Maintenance
+  code: PM
+  frs: FRS_BRD03_PRODUCT_MAINTENANCE.md
+  summary: TP_BRD03_PRODUCT_MAINTENANCE.md
+  version: "1.0"
+  date: 25 September 2026
+  built: true
+
+personas:
+  MKT_AO: {name: Marketing AO, user: ao, short: MKT AO}
+  MKT_TL: {name: Marketing TL / TH / UH, user: mkttl, short: MKT TL}
+  TSU: {name: TSU Officer, user: tsu}
+  TSU_TL: {name: TSU Team Lead, user: tsulead, short: TSU TL}
+  TSU_HEAD: {name: TSU Head, user: tsuhead, short: TSU Head}
+  MBS: {name: Marketing Business Services, user: mbs}
+  MANCOM: {name: ManCom member, user: mancom, short: ManCom}
+  BUSINESS_ADMIN: {name: Business Administrator, user: badmin, short: Bus. Admin}
+  NB_APPROVER: {name: New Business approver, user: approver, short: NB Appr.}
+  SYSADMIN: {name: System Administrator, user: admin}
+  AUDITOR: {name: Auditor, user: auditor, short: Audit.}
+  SYSTEM: {name: BIBS scheduled job or event, user: "-"}
+
+screens:
+  LOGIN: Login page
+  HOME: Product Maintenance > Product Maintenance Home
+  REQS: Product Maintenance > Package Requests
+  NEWREQ: Product Maintenance > Package Requests > New Package Request
+  REQ: Product Maintenance > Package Requests > Package Request page (workflow panel)
+  DETAILS: Product Maintenance > Package Requests > Package Request page > Details tab
+  NEG: Product Maintenance > Package Requests > Package Request page > Negotiation tab
+  COMP: Product Maintenance > Package Requests > Package Request page > Comparative tab
+  REQM: Product Maintenance > Package Requests > Package Request page > Requirements & Sign-off tab
+  SETUP: Product Maintenance > Package Requests > Package Request page > Set-up tab
+  ADV: Product Maintenance > Package Requests > Package Request page > Advisories tab
+  DOCS: Product Maintenance > Package Requests > Package Request page > Documents tab
+  EMAILS: Product Maintenance > Package Requests > Package Request page > E-mails tab
+  HIST: Product Maintenance > Package Requests > Package Request page > History tab
+  TSUWB: Product Maintenance > TSU Workbench
+  EXPIRY: Product Maintenance > Package Expiry
+  PRODUCTS: Product Maintenance > Products
+  PRODUCT: Product Maintenance > Products > Product page
+  VERSIONS: Product Maintenance > Products > Product page > Versions tab
+  VERSION: Product Maintenance > Products > Product page > Versions tab > Package Version
+  RULES: Product Maintenance > Products > Product page > Field Rules & Documents tab
+  VALQ: Product Maintenance > Validation Queue
+  COVCL: Product Maintenance > Coverages & Clauses
+  INCENT: Product Maintenance > Incentive Criteria
+  CALC: Product Maintenance > Premium Calculator
+  QUOTE: Quotation / Proposal > New Quotation
+  APPROVALS: My Approvals
+  ACCREQ: Broking Setup > Access Requests
+  MATRIX: Broking Setup > User Access Matrix
+  REPORTS: Reports > Report Centre (category New Business)
+  NOTIF: Notifications (bell icon in the page header)
+  AUDIT: Administration > Audit Trail
+  PARAMS: Administration > System Parameters
+  JOBS: Administration > Scheduled Jobs
+  TEMPLATES: Broking Setup > Document Templates
+  MESSAGES: Broking Setup > Outbound Messages
+  BOOKING: Booking > Booking Workbench > Booked Invoice
+  API: API call with the user's token (tester tool, for example Postman)
+
+data:
+  - id: TD-PM-01
+    name: SIT/UAT users and roles
+    content: ao and ao2 (MKT_AO), mkttl (MKT_TL), tsu (TSU), tsulead (TSU and TSU_TL), tsuhead (TSU_HEAD), mbs and mbs2 (MBS), mancom (MANCOM), badmin (BUSINESS_ADMIN), approver (NB_APPROVER), admin (SYSADMIN), auditor (AUDITOR). The SIT/UAT password is issued by the test lead.
+    source: Seeds V980 (broking users), V998 (Product Maintenance users), V900 (admin, auditor); roles and grants V755
+  - id: TD-PM-02
+    name: Draft NEW generic request
+    content: PKR-2026-900001 SME Motor Fleet Programme, NEW, generic, line MOTOR, cover type COMPREHENSIVE, target insurers INS-MGIC, INS-LAC, INS-MPI, stage DRAFT, maker ao
+    source: Seed V997
+  - id: TD-PM-03
+    name: AMEND request in TSU review
+    content: PKR-2026-900002 AMEND MTR10 (lower deductible), generic, submitted by ao, approved by mkttl, stage FOR_TSU_REVIEW
+    source: Seed V997
+  - id: TD-PM-04
+    name: Client-specific request in negotiation
+    content: PKR-2026-900003 NEW client-specific property package for Pacific Harbor Logistics Inc. (CL-2026-000003), submitted by ao2, stage NEGOTIATION, round 1 closed (approved with changes, counter-proposal, decline), round 2 sent
+    source: Seed V997
+  - id: TD-PM-05
+    name: UPDATE request at ManCom
+    content: PKR-2026-900004 UPDATE MTR12 (roadside assistance), requirements submitted by tsu, stage FOR_MANCOM
+    source: Seed V997
+  - id: TD-PM-06
+    name: RENEW request with MBS
+    content: PKR-2026-900005 RENEW MTR15 on unchanged terms, no negotiation, signed off, stage WITH_MBS
+    source: Seed V997
+  - id: TD-PM-07
+    name: Released AMEND request
+    content: PKR-2026-900006 AMEND PAR08 home fire programme, RELEASED as version 2, advisory sent
+    source: Seed V997
+  - id: TD-PM-08
+    name: Draft package version
+    content: MTR12 version 2 DRAFT made by mbs, rate 1.25 %, minimum premium PHP 5,500, commission 15 %, two panel insurers, effective in 30 days
+    source: Seed V996
+  - id: TD-PM-09
+    name: Active incentive criterion
+    content: CPC2 (seed), type CAMPAIGN, value basis RATE 1.00, on Motor and Property packages, ACTIVE
+    source: Seed V996
+  - id: TD-PM-10
+    name: Package ending in 45 days
+    content: PAR25 version 1, package end date = load date + 45 days, no open renewal request
+    source: Seed V996
+  - id: TD-PM-11
+    name: Catalogue and insurer panel
+    content: Lines MOTOR, PROPERTY, LIABILITY; cover types COMPREHENSIVE, ALL_RISK, CGL; packages MTR10, MTR12, MTR15, PAR08, PAR25; insurers INS-MGIC, INS-LAC, INS-VMI, INS-MPI with placement e-mail addresses; client CL-2026-000003
+    source: Seeds V981 (clients), V982 (catalogue), V996 (versions)
+  - id: TD-PM-12
+    name: New CGL request keyed in the test
+    content: NEW, generic, title "UAT CGL Programme <date>", line LIABILITY, cover type CGL, reason New programme for a market segment, coverage CGL_BI included, package end 31-Dec-2027, target insurers INS-MGIC and INS-LAC
+    source: Keyed in by the tester (same values as ProductMaintenanceApiIT)
+  - id: TD-PM-13
+    name: Documents to upload
+    content: Signed package slip (PDF, 1 page, under 5 MB); insurer reply letter (PDF); signed ManCom sheet (PDF); one file of a type the platform refuses (.exe renamed as .pdf is not used; use a .exe file)
+    source: Test document folder of the test lead (no client data)
+  - id: TD-PM-14
+    name: Masked quotation data
+    content: A client with KYC complete and a Motor item (vehicle value PHP 1,500,000) for quotations on MTR12 and MTR10
+    source: Seeds V981 and V984; for UAT a masked copy of production-like data
+
+scenarios:
+  - id: SC-PM-01
+    persona: SYSADMIN
+    title: Access, roles and audit. Users log in, see only the Product Maintenance screens of their role, and every action leaves an audit trail; role changes go through an approved access request.
+    pre: SIT/UAT users of TD-PM-01 are active; the audit trail is empty for the test period.
+  - id: SC-PM-02
+    persona: MBS
+    title: Product structure and master data. MBS maintains coverages, clauses, field rules and insurer terms under maker-checker; documents are generated from shared templates.
+    pre: Catalogue data of TD-PM-11; badmin available as authoriser.
+  - id: SC-PM-03
+    persona: MKT_AO
+    title: Package request and approvals. Marketing raises a package request; the Marketing approver, the TSU TL and the TSU Head approve it under four-eyes rules.
+    pre: Requests TD-PM-02 and TD-PM-03; a fresh request TD-PM-12.
+  - id: SC-PM-04
+    persona: TSU
+    title: Negotiation and comparative tables. TSU sends quotation slips, records insurer outcomes over two rounds, makes the terms final and produces the comparative master and a client view; Marketing reviews client-specific terms.
+    pre: Request TD-PM-04 in NEGOTIATION, or TD-PM-12 approved by the TSU Head.
+  - id: SC-PM-05
+    persona: TSU
+    title: Sign-off, set-up and release. TSU submits the requirements pack, ManCom signs off, MBS sets up the version, the validator releases it and TSU sends the advisory; a RETIRE request retires a package.
+    pre: Requests TD-PM-05, TD-PM-06 and TD-PM-07; version TD-PM-08.
+  - id: SC-PM-06
+    persona: MKT_AO
+    title: Versions and pricing. A new package version is released while the old one keeps selling; new business is priced on the version in force; deviations need a rate exception; expired packages are archived.
+    pre: Version TD-PM-08; quotation data TD-PM-14.
+  - id: SC-PM-07
+    persona: TSU
+    title: Expiry, renewal and monitoring. The expiry monitor alerts TSU and MBS, TSU drafts renewal requests, and the home page, reports and notifications show the state of every request.
+    pre: Package TD-PM-10; requests TD-PM-02 to TD-PM-07.
+  - id: SC-PM-08
+    persona: MBS
+    title: Incentive criteria. MBS maintains CPC2 and other criteria on the products matrix under maker-checker; booking stamps the matched codes; retired products flag their criteria.
+    pre: Criterion TD-PM-09; badmin available as authoriser.
+
+frs:
+  FR-PM-001:
+    scenario: SC-PM-01
+    persona: MKT_AO
+    screen: LOGIN
+    data: [TD-PM-01]
+    conditions:
+      - A user with valid credentials and a Product Maintenance role logs in and sees the Product Maintenance menu section.
+      - Wrong credentials are refused and no session is created.
+      - The account locks after the configured number of failed attempts and the System Administrator unlocks it.
+      - Log-ins and failed attempts are recorded in the audit trail.
+    cases:
+      - c: 1
+        type: Positive
+        title: Marketing AO logs in and sees the Product Maintenance section
+        steps:
+          - Open the BIBS URL.
+          - Enter user ID ao and The SIT/UAT password; click Sign in.
+          - Open the side menu.
+        expected: The home page opens. The menu shows the section Product Maintenance with Product Maintenance Home, Package Requests, Products, Coverages & Clauses and Incentive Criteria.
+        auto: ApiSmokeIT#loginReturnsTokenAndWrongPasswordIsRejected
+      - c: 1
+        type: Positive
+        persona: TSU_HEAD
+        title: TSU Head logs in and sees the TSU screens
+        steps:
+          - Log in as tsuhead.
+          - Open the side menu, section Product Maintenance.
+        expected: The section lists Product Maintenance Home, Package Requests, TSU Workbench, Package Expiry, Products, Validation Queue, Coverages & Clauses and Incentive Criteria.
+      - c: 2
+        type: Negative
+        title: Log-in with a wrong password is refused
+        steps:
+          - Enter user ID ao and a wrong password; click Sign in.
+        expected: The Login page stays open and no session starts.
+        msg: [Invalid user name or password, AUTHENTICATION_FAILED]
+        auto: ApiSmokeIT#loginReturnsTokenAndWrongPasswordIsRejected
+      - c: 3
+        type: Boundary
+        neg: true
+        title: The account locks at the configured number of failed attempts
+        pre: Administration > System Parameters shows LOGIN_MAX_FAILED_ATTEMPTS (3 as delivered).
+        steps:
+          - Enter user ID ao2 with a wrong password as many times as the threshold.
+          - Enter the correct password.
+        expected: The last wrong attempt locks the account; the correct password is then refused until the System Administrator unlocks the user in Administration > Users.
+        msg: [Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
+        auto: LoginLockoutTest#theAccountLocksAtTheConfiguredThreshold; UserAdminApiIT#userLifecycleLockoutUnlockAndPasswordReset
+      - c: 3
+        type: Boundary
+        title: One attempt below the threshold does not lock the account
+        steps:
+          - Enter user ID ao2 with a wrong password (threshold minus 1) times.
+          - Enter the correct password.
+        expected: The log-in succeeds; the failed-attempt counter resets.
+        auto: LoginLockoutTest#theDefaultThresholdIsFive
+      - c: 4
+        type: Positive
+        persona: AUDITOR
+        screen: AUDIT
+        title: Successful and failed log-ins appear in the audit trail
+        pre: Cases TC-PM-001.1-01 and TC-PM-001.2-01 ran today.
+        steps:
+          - Log in as auditor and open Administration > Audit Trail.
+          - Filter on today's date and the users ao and ao2.
+        expected: Each successful and failed log-in shows the user, time and source address.
+        auto: LogoutIT#logoutRevokesTheTokenAndIsAudited
+
+  FR-PM-002:
+    scenario: SC-PM-01
+    persona: MKT_AO
+    screen: REQS
+    data: [TD-PM-01]
+    conditions:
+      - The menu shows only the screens the user's roles allow.
+      - A direct link or API call without the permission is refused and logged.
+      - A four-eyes rule refuses the action even when the role holds the permission.
+      - The User Access Matrix shows the areas each role may view, create, amend and approve and exports both views to Excel.
+    cases:
+      - c: 1
+        type: Security-access
+        neg: false
+        title: Marketing AO does not see the TSU and validation screens
+        steps:
+          - Log in as ao and open the side menu.
+        expected: Product Maintenance Home, Package Requests and the catalogue screens are shown; TSU Workbench, Package Expiry and Validation Queue are not in the menu.
+        auto: ProductMaintenanceFoundationIT#seedPersonasHoldTheirProductMaintenancePermissions
+      - c: 2
+        type: Security-access
+        screen: VALQ
+        title: Direct link to the Validation Queue without PRODUCT_VALIDATE
+        steps:
+          - Log in as ao.
+          - Type the address /catalog/validation in the browser.
+        expected: The page shows "You do not have access to this screen. Contact your administrator if you need it." No queue data is loaded.
+        auto: CatalogProductMaintenanceApiIT#permissionsFollowTheActionMatrix
+      - c: 2
+        type: Security-access
+        screen: API
+        title: Approval API called by a user without the approval permission
+        steps:
+          - Log in as ao and take the token.
+          - Call POST /api/v1/product-maintenance/requests/{id}/approve for a request in FOR_MKT_APPROVAL.
+          - Log in as auditor and open Administration > Audit Trail.
+        expected: The call returns HTTP 403 and the request does not move. The refused call is logged with user, endpoint and time.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
+        auto: ProductMaintenanceApiIT#permissionsAreEnforced
+      - c: 3
+        type: Negative
+        persona: MKT_TL
+        screen: REQ
+        title: A Marketing TL cannot approve a request the TL submitted
+        pre: mkttl creates and submits a request (TD-PM-12).
+        steps:
+          - Log in as mkttl and open the request.
+          - Click Approve and send to TSU.
+        expected: BIBS refuses the approval although MKT_TL holds PKG_REQUEST_APPROVE; the request stays in FOR_MKT_APPROVAL.
+        msg: [A package request is approved by someone other than its maker, PKG_FOUR_EYES]
+        data: [TD-PM-12]
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 4
+        type: Report-output
+        persona: BUSINESS_ADMIN
+        screen: MATRIX
+        title: User Access Matrix by action class, exported to Excel
+        steps:
+          - Log in as badmin and open Broking Setup > User Access Matrix.
+          - Choose the view By Action and the area PACKAGE_REQUEST.
+          - Switch to the view By Permission.
+          - Click Export to Excel in each view.
+        expected: The By Action view shows, per role, VIEW / CREATE / AMEND / APPROVE for the area (for example MKT_AO has CREATE on PACKAGE_REQUEST, MKT_TL has APPROVE). Both views download as .xlsx with the same content as the screen, and the export is audited.
+        auto: RolePermissionRequestIT#matrixShowsActionClassesByPermissionAndByAction
+      - c: 4
+        type: Security-access
+        screen: MATRIX
+        title: A Marketing AO cannot open the User Access Matrix
+        steps:
+          - Log in as ao and type the address /broking-setup/access-matrix.
+        expected: The screen is not in the menu and the direct link shows the no-access page.
+        auto: AccessRequestIT#accessMatrixListsRolesAgainstPermissions
+
+  FR-PM-003:
+    scenario: SC-PM-01
+    persona: BUSINESS_ADMIN
+    screen: ACCREQ
+    data: [TD-PM-01]
+    conditions:
+      - A role change takes effect only after another user approves the request.
+      - The requester cannot approve the own request, and an empty change is refused.
+      - A rejected request leaves the role unchanged.
+      - The role history shows who requested, approved and applied each change.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Add PKG_REPORT_VIEW to MKT_AO through an approved request
+        steps:
+          - Log in as badmin; open Broking Setup > Access Requests; click New Request.
+          - Choose type Modify role permissions, role MKT_AO, permission to add PKG_REPORT_VIEW, justification "AO needs package reports".
+          - Submit. Log in as ao and check the Reports list.
+          - Log in as approver; open the request and click Approve.
+          - Log in as ao again and open Reports.
+        expected: Before approval ao has no package reports. After approval the role holds PKG_REPORT_VIEW and ao sees the Package Status Update Report.
+        auto: RolePermissionRequestIT#approvedChangeAddsAndRemovesPermissionsOfTheRole
+      - c: 2
+        type: Negative
+        title: The requester cannot approve the own role change
+        pre: A test user holding ACCESS_REQUEST and ACCESS_APPROVE (set up by the test lead for this case) submitted a Modify role permissions request.
+        steps:
+          - As that user, open the request and click Approve.
+        expected: The approval is refused; the request stays pending.
+        msg: [A request cannot be decided by the user who submitted it, ACCESS_FOUR_EYES]
+        auto: RolePermissionRequestIT#approvedChangeAddsAndRemovesPermissionsOfTheRole
+      - c: 2
+        type: Negative
+        title: A request without any permission to add or remove is refused
+        steps:
+          - New Request, type Modify role permissions, role MKT_AO; leave both permission lists empty; enter a justification; submit.
+        expected: The form marks the permission lists and the request is not submitted.
+        msg: [Grant or withdraw at least one permission]
+        auto: accessRequest.test.ts
+      - c: 2
+        type: Negative
+        title: A request that changes nothing is refused
+        steps:
+          - New Request, type Modify role permissions, role MKT_AO; add PKG_REQUEST (already granted); justification; submit.
+        expected: The request is not saved.
+        msg: ["The request does not change the permissions of role {MKT_AO}", ACCESS_NO_PERMISSION_CHANGE]
+        auto: RolePermissionRequestIT#invalidChangesAreRefused
+      - c: 3
+        type: Negative
+        persona: NB_APPROVER
+        title: A rejected role change leaves the role as it was
+        pre: badmin submitted a request to remove PRODUCT_VIEW from AUDITOR.
+        steps:
+          - Log in as approver; open the request; click Reject and enter the reason "Auditor keeps read access".
+          - Open Broking Setup > User Access Matrix for AUDITOR.
+        expected: The request shows Rejected with the reason; AUDITOR still holds PRODUCT_VIEW; badmin is notified of the decision.
+        auto: AccessRequestIT#createdUserIsAppliedOnApprovalWithATemporaryPassword
+      - c: 4
+        type: Positive
+        persona: AUDITOR
+        screen: AUDIT
+        title: Role change history shows requester, approver and applied change
+        pre: TC-PM-003.1-01 is done.
+        steps:
+          - Open the approved request in Access Requests (read only), then Administration > Audit Trail filtered on role MKT_AO.
+        expected: The request shows requester badmin, approver approver, dates and the permissions added; the audit trail holds the request, the decision and the applied change with users and times.
+        auto: RolePermissionRequestIT#roleChangeIsRequestedAndReadOverHttp
+
+  FR-PM-004:
+    scenario: SC-PM-02
+    persona: TSU
+    screen: EMAILS
+    data: [TD-PM-04, TD-PM-11]
+    conditions:
+      - A document e-mailed outside BIBS is a protected file and its password goes in a separate e-mail.
+      - Each e-mail is logged with recipient, time, subject, attachment name and SHA-256 hash; a failed send can be resent.
+      - A user without Product Maintenance permissions cannot open the request's documents.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: The quotation slip reaches the insurer as a protected PDF with the password separately
+        pre: A round of TD-PM-12 is approved by tsulead and sent (TC-PM-030.2-01).
+        steps:
+          - Open the test mailbox of INS-MGIC.
+          - Open the QS attachment without a password, then with the password from the second e-mail.
+        expected: Two e-mails arrive for the insurer. The first carries the QS PDF, which asks for a password; the second carries the password only. The PDF opens with it.
+        auto: MessagingIT#protectedAttachmentsAreEncryptedAndThePasswordFollowsSeparately
+      - c: 2
+        type: Positive
+        title: The E-mails tab logs each send with the attachment hash
+        steps:
+          - Open the request, E-mails tab.
+        expected: One row per e-mail with recipient, time, subject, attachment name, SHA-256 hash and status Sent; the password e-mails are listed without the password text.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 2
+        type: Negative
+        screen: MESSAGES
+        title: A failed delivery shows Failed and is resent
+        pre: The test mail relay refuses the address of one insurer (test lead sets a bad address on INS-MPI).
+        steps:
+          - Send a QS to INS-MPI.
+          - Open the E-mails tab; open Broking Setup > Outbound Messages and resend the failed message after correcting the address.
+        expected: The send shows Failed after the retries; the resend is logged as a new attempt with status Sent.
+        auto: MessagingIT#failedDeliveriesAreRetriedThenMarkedFailedAndCanBeResent
+      - c: 3
+        type: Security-access
+        screen: DOCS
+        title: A user without Product Maintenance permissions cannot open the documents
+        pre: A user holding only a non-broking role (for example a GL user of the finance seed) exists.
+        steps:
+          - Log in as that user and open /product-maintenance/requests/{id} of TD-PM-04.
+          - Call GET .../requests/{id}/form.pdf with the user's token.
+        expected: The page shows the no-access message; the download returns HTTP 403.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
+
+  FR-PM-005:
+    scenario: SC-PM-01
+    persona: TSU_HEAD
+    screen: HIST
+    data: [TD-PM-07]
+    conditions:
+      - The History tab of a released request lists every step from submission to release with user and time.
+      - A changed insurer response keeps its earlier values in the response history.
+      - No screen or API edits or deletes audit rows.
+    cases:
+      - c: 1
+        type: Positive
+        title: History of a released request from submission to release
+        steps:
+          - Open PKR-2026-900006, History tab.
+        expected: The list shows submit, approve, recommend, approve for negotiation, terms final, release or skip, submit requirements, sign off, set up and version released, each with user and time, in time order.
+      - c: 2
+        type: Positive
+        screen: NEG
+        data: [TD-PM-04]
+        title: A corrected insurer response shows both values
+        steps:
+          - Open PKR-2026-900003, Negotiation tab, round 2, response of INS-MGIC; save rate 0.30.
+          - Edit the same response to rate 0.32 and save.
+          - Open the response history.
+        expected: The history shows 0.30 and then 0.32 with the user and time of each save.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 3
+        type: Negative
+        persona: SYSADMIN
+        screen: AUDIT
+        title: The audit trail cannot be edited or deleted
+        steps:
+          - Log in as admin; open Administration > Audit Trail and look for edit or delete actions on a row.
+          - Ask the DBA in the test environment to run an UPDATE and a DELETE on the audit table.
+        expected: The screen has no edit or delete action. The database refuses the UPDATE, DELETE and TRUNCATE.
+        auto: AuditTrailImmutabilityIT#updateDeleteAndTruncateAreRejected
+
+  FR-PM-010:
+    scenario: SC-PM-02
+    persona: MBS
+    screen: COVCL
+    data: [TD-PM-11]
+    conditions:
+      - A new coverage or product is usable only after another user authorises it.
+      - A packaged product cannot be saved without its cover type, and a subtype cannot have subtypes.
+      - A risk code that breaks its line's naming pattern is refused.
+      - The maker cannot authorise the own record; a rejected record stays unusable.
+    cases:
+      - c: 1
+        type: Workflow
+        title: New Motor coverage is pending until badmin authorises it
+        steps:
+          - Log in as mbs; open Coverages & Clauses; click New Coverage.
+          - Line MOTOR, code UAT_ROADSIDE, name "Roadside assistance (UAT)", kind Extension; save.
+          - Open the draft version MTR12 v2 and look for the coverage in the coverage list.
+          - Log in as badmin; open My Approvals; authorise the coverage.
+          - As mbs, open MTR12 v2 again.
+        expected: After saving, the coverage shows Pending authorisation and is not offered on the version. After authorisation it is Active and can be added to the version.
+        data: [TD-PM-08, TD-PM-11]
+        auto: CatalogProductMaintenanceApiIT#coveragesClausesIncentivesAndExceptionsAreMaintainedOverHttp
+      - c: 2
+        type: Negative
+        screen: PRODUCTS
+        title: A packaged product without cover type is refused
+        steps:
+          - Products > New Product; line MOTOR, code MTR91, tick Packaged; leave Cover type blank; save.
+        expected: The product is not saved.
+        msg: [A package needs its cover type (PMADD01), PACKAGE_HIERARCHY_INCOMPLETE]
+        auto: CatalogVersionIT#aSubmittedVersionIsReturnedAndACompleteHierarchyIsRequired
+      - c: 2
+        type: Negative
+        screen: PRODUCTS
+        title: A subtype under a subtype is refused
+        steps:
+          - Create a cover type under the existing subtype of COMPREHENSIVE (cover type level 3).
+        expected: BIBS refuses the record.
+        msg: [A subtype cannot have subtypes (Type > Subtype only), COVER_TYPE_DEPTH]
+      - c: 3
+        type: Negative
+        screen: PRODUCTS
+        title: A risk code outside the line pattern is refused
+        pre: The line MOTOR has the code pattern ^MTR\d{2}$ (set by the test lead).
+        steps:
+          - New Product on line MOTOR with code MOTOR-X1 and cover type COMPREHENSIVE; save.
+        expected: The product is not saved.
+        msg: [Risk code MOTOR-X1 does not follow the naming convention of MOTOR, PRODUCT_CODE_PATTERN]
+      - c: 3
+        type: Boundary
+        screen: PRODUCTS
+        title: A risk code that matches the pattern is accepted
+        steps:
+          - New Product on line MOTOR with code MTR93, cover type COMPREHENSIVE, Packaged ticked; save.
+        expected: The product is saved as Pending authorisation.
+      - c: 4
+        type: Negative
+        screen: APPROVALS
+        title: The maker cannot authorise the own coverage
+        steps:
+          - As mbs, open My Approvals and try to authorise UAT_ROADSIDE (before badmin does).
+        expected: The record is not offered to its maker; a direct call to authorise is refused.
+        msg: [A record cannot be authorized by the user who maintained it, MAKER_CHECKER_VIOLATION]
+        auto: CatalogIT#productsAreMakerCheckerAndListedInTheInbox
+      - c: 4
+        type: Negative
+        persona: BUSINESS_ADMIN
+        screen: APPROVALS
+        title: A rejected coverage stays unusable and the maker can correct it
+        steps:
+          - Create coverage UAT_REJECT as mbs.
+          - As badmin, reject it with reason "Wrong line".
+          - As mbs, open the coverage.
+        expected: The coverage shows Rejected with the reason and is not offered on package versions; mbs can edit and resubmit it.
+
+  FR-PM-011:
+    scenario: SC-PM-02
+    persona: MBS
+    screen: COVCL
+    data: [TD-PM-11]
+    conditions:
+      - A clause is selectable in insurer terms only after authorisation and within its effective dates.
+      - An end-dated clause stays readable on the versions that used it and is never deleted.
+      - A clause without wording or with an end date before its start date is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: New warranty is selectable after authorisation
+        steps:
+          - Coverages & Clauses > Clauses > New Clause; code UAT_W01, kind Warranty, line MOTOR, title "Garage warranty", effective from today, wording "Warranted that the vehicle is garaged overnight."; save.
+          - Open MTR12 v2, Insurer Terms of INS-MGIC, coverage OD_THEFT, Clauses list.
+          - As badmin, authorise UAT_W01 in My Approvals; reopen the Clauses list as mbs.
+        expected: Before authorisation UAT_W01 is not in the list; after authorisation it is.
+        data: [TD-PM-08]
+        auto: CatalogProductMaintenanceApiIT#coveragesClausesIncentivesAndExceptionsAreMaintainedOverHttp
+      - c: 1
+        type: Boundary
+        title: A clause effective from next month is not offered today
+        steps:
+          - Create and authorise clause UAT_W02 effective from the first day of next month.
+          - Open the Clauses list of MTR12 v2 (version effective in 30 days) and of a version effective today.
+        expected: UAT_W02 is offered only on a version whose effective date is on or after the clause start date.
+      - c: 2
+        type: Positive
+        screen: VERSION
+        title: An end-dated clause stays readable on the version that used it
+        steps:
+          - End-date clause UAT_W01 to today (effective to = today) and have it authorised.
+          - Open the released version that used it.
+        expected: The version still shows UAT_W01 with its wording; the clause list shows it as ended; there is no Delete action.
+      - c: 3
+        type: Negative
+        title: A clause without wording is refused
+        steps:
+          - New Clause with code UAT_W03 and title but no wording; save.
+        expected: The form marks Wording and does not save.
+        msg: [Enter the wording]
+        auto: productMaintenanceForms.test.ts#checks the mandatory fields
+      - c: 3
+        type: Negative
+        title: Effective to before effective from is refused
+        steps:
+          - New Clause UAT_W04, effective from 01-Nov-2026, effective to 31-Oct-2026; save.
+        expected: The clause is not saved.
+        msg: [The effective-to date is before the effective-from date, EFFECTIVITY_INVALID]
+
+  FR-PM-012:
+    scenario: SC-PM-02
+    persona: MBS
+    screen: RULES
+    data: [TD-PM-11, TD-PM-14]
+    conditions:
+      - A presence rule stops submission of a quotation or account without the field and names the field.
+      - A range rule refuses a value outside the range and accepts the limits.
+      - The most specific scope applies in addition to the wider ones.
+      - An incomplete rule or an unsafe pattern is refused when the rule is saved.
+    cases:
+      - c: 1
+        type: Negative
+        brd: [BRPM.004]
+        persona: MKT_AO
+        screen: QUOTE
+        title: Motor account without plate number is refused and names the field
+        pre: MBS added and badmin authorised a Line-scope rule on MOTOR, target Item, field Plate number, check Presence.
+        steps:
+          - Log in as ao; create a quotation on MTR12 with one vehicle without plate number; submit.
+        expected: Submission is refused; the plate number field of the vehicle is marked and the message names the item and the field.
+        msg: ["Item {1}: {Plate number} is required"]
+        auto: CatalogIT#minimumFieldMatrixAppliesTheNarrowestScope
+      - c: 1
+        type: Positive
+        brd: [BRPM.003]
+        title: MBS sets up a presence rule for a line without IT
+        steps:
+          - Open product MTR12, Field Rules & Documents tab; click New Rule.
+          - Scope Line, line MOTOR, target Item, field Plate number, check type Presence; save.
+          - As badmin, authorise the rule.
+        expected: The rule is listed with status Active for the line MOTOR.
+        auto: CatalogIT#minimumFieldMatrixAppliesTheNarrowestScope
+      - c: 2
+        type: Boundary
+        brd: [BRPM.004]
+        persona: MKT_AO
+        screen: QUOTE
+        title: Range rule accepts the limits and refuses the value outside
+        pre: An authorised Range rule on MOTOR, field Year of manufacture, minimum 2011, maximum 2027.
+        steps:
+          - Quote a vehicle with year 2011; then with 2027; then with 2010.
+        expected: 2011 and 2027 are accepted; 2010 is refused with the field named.
+        msg: ["{Year of manufacture} must be between 2011 and 2027"]
+        neg: true
+        auto: CatalogVersionIT#typedFieldRulesCheckTheGivenValues
+      - c: 3
+        type: Positive
+        brd: [BRPM.003, BRPM.004]
+        persona: MKT_AO
+        screen: QUOTE
+        title: Product rule applies on top of the line rule
+        pre: Line rule of TC-PM-012.1-02 and a Product-scope rule on MTR12 requiring Chassis number.
+        steps:
+          - Quote MTR12 with neither plate nor chassis number; submit.
+          - Quote MTR10 with neither; submit.
+        expected: MTR12 lists both missing fields; MTR10 lists only Plate number.
+        auto: CatalogIT#minimumFieldMatrixAppliesTheNarrowestScope
+      - c: 4
+        type: Negative
+        brd: [BRPM.003]
+        title: A Range rule without limits is refused
+        steps:
+          - New Rule, check type Range, leave minimum and maximum empty; save.
+        expected: The rule is not saved.
+        msg: [Complete the parameters of the RANGE rule, FIELD_RULE_INCOMPLETE]
+        auto: CatalogVersionIT#typedFieldRulesCheckTheGivenValues
+      - c: 4
+        type: Negative
+        brd: [BRPM.003]
+        title: An unsafe pattern is refused
+        steps:
+          - New Rule, check type Pattern, pattern (a+)+\1; save.
+        expected: The rule is not saved.
+        msg: [Complete the parameters of the PATTERN rule, FIELD_RULE_INCOMPLETE]
+
+  FR-PM-013:
+    scenario: SC-PM-02
+    persona: TSU
+    screen: DOCS
+    data: [TD-PM-04, TD-PM-05]
+    conditions:
+      - A Motor document shows the Motor coverages and a property document the property coverages from one shared template.
+      - Each generated document records the template version used, and a regenerated file shows the stored values.
+      - A missing template is reported instead of producing an empty document.
+    cases:
+      - c: 1
+        type: Upload-download
+        screen: NEG
+        title: QS of a Motor and of a property request use the line sections
+        steps:
+          - Open PKR-2026-900004 (MTR12) and download the request form and the package slip.
+          - Open PKR-2026-900003 (property), Negotiation tab, round 2; download the QS PDF.
+        expected: The MTR12 documents list the Motor coverages and deductibles (OD_THEFT, EXCESS_BI, PD); the property QS lists Fire and Lightning, Earthquake, Typhoon and Flood, Riot and Strike with their deductibles.
+        auto: ProductMaintenanceApiIT#aSeedRequestIsReadableWithItsRoundsOutputsAndDocuments
+      - c: 2
+        type: Positive
+        persona: SYSADMIN
+        screen: TEMPLATES
+        title: Generated document records its template version
+        steps:
+          - As admin, open Broking Setup > Document Templates, template PKG_QUOTATION_SLIP; note the current version.
+          - As tsu, open the Documents tab of PKR-2026-900003 and the QS record.
+        expected: The document record shows template PKG_QUOTATION_SLIP and the version noted; downloading it twice gives identical files.
+        auto: DocTemplateServiceIT#mergesTheVersionInForceOnTheDate
+      - c: 3
+        type: Negative
+        persona: SYSADMIN
+        screen: TEMPLATES
+        title: No active template of the type
+        pre: In the test environment only, admin end-dates template PKG_SLIP.
+        steps:
+          - As tsu, download the package slip of PKR-2026-900004.
+          - Restore the template afterwards.
+        expected: No file is produced; the message names the template.
+        msg: ["{Document template} not found: PKG_SLIP", NOT_FOUND]
+
+  FR-PM-014:
+    scenario: SC-PM-02
+    persona: MBS
+    screen: VERSION
+    data: [TD-PM-08]
+    conditions:
+      - MBS keeps different deductibles for two insurers on the same coverage without IT.
+      - A version whose insurer lacks a term for an included coverage, or whose shares do not total 100, cannot be submitted.
+      - A quotation with an insurer outside the package panel is refused.
+      - The rate, minimum premium, commission and TSI limit of a package change only through a version.
+    cases:
+      - c: 1
+        type: Positive
+        title: Two insurers with different deductibles on OD_THEFT
+        steps:
+          - Open MTR12 version 2 (DRAFT), Insurer Terms section.
+          - For INS-MGIC set OD_THEFT deductible PHP 2,000; for the second panel insurer set PHP 3,000; save.
+        expected: Both terms are saved and shown per insurer; the package slip preview lists both deductibles.
+        auto: productMaintenanceForms.test.ts#reads a version and writes the API body with one term per insurer and coverage
+      - c: 2
+        type: Negative
+        title: Submission refused when an insurer lacks a term for an included coverage
+        steps:
+          - On MTR12 v2 delete the PD term of INS-MGIC; click Submit for Validation.
+        expected: The version stays DRAFT.
+        msg: [Insurer INS-MGIC has no terms for coverage PD, PACKAGE_INSURER_TERMS_MISSING]
+        auto: CatalogVersionIT#aPackageVersionIsDraftedValidatedAndReleased
+      - c: 2
+        type: Boundary
+        neg: true
+        title: Co-insurance shares of 60 and 39 are refused
+        steps:
+          - Set INS-MGIC Lead share 60 and the second insurer Participant share 39; submit.
+        expected: Submission is refused. With 60 and 40 it is accepted.
+        msg: [The co-insurance shares must add up to 100%, PACKAGE_SHARES_INVALID]
+      - c: 3
+        type: Negative
+        persona: MKT_AO
+        screen: QUOTE
+        data: [TD-PM-14]
+        title: Quotation on MTR10 with an insurer outside the panel
+        steps:
+          - Log in as ao; New Quotation on MTR10; choose insurer INS-MPI (not on the panel); rate the quotation.
+        expected: The quotation is refused for that insurer.
+        msg: [Insurer INS-MPI is not on the panel of MTR10 version 1, INSURER_NOT_ON_PACKAGE]
+        auto: RatingSchemeIT#anItemRateOtherThanTheSchemeNeedsAnExceptionAndThePanelIsEnforced
+      - c: 4
+        type: Negative
+        screen: PRODUCT
+        title: Direct edit of the package rate on the product is refused
+        steps:
+          - Open product MTR10; click Edit; change the rate; save.
+        expected: The change is refused and the user is sent to the Versions tab.
+        msg: ["The rate, minimum premium, commission and TSI limit of package MTR10 change through a new version (Versions tab)", PRODUCT_FIELD_VERSIONED]
+        auto: CatalogVersionIT#aReleasedSuccessorSupersedesAndTheCommercialColumnsFollowTheVersions
+
+  FR-PM-020:
+    scenario: SC-PM-03
+    persona: MKT_AO
+    screen: NEWREQ
+    data: [TD-PM-12]
+    conditions:
+      - A complete NEW request receives a PKR number and moves to FOR_MKT_APPROVAL on submission.
+      - Submission with missing mandatory items is refused and names each missing item.
+      - An AMEND, UPDATE, RENEW or REACTIVATE request opens with the current version's terms pre-filled.
+      - A client-specific request without a client cannot be saved.
+      - Dates, amounts and the request type are validated; a draft can be voided with a reason.
+    cases:
+      - c: 1
+        type: Positive
+        title: Marketing AO submits a complete NEW generic request
+        steps:
+          - Log in as ao; Package Requests; click New Package Request.
+          - Type New package, scope Generic programme, name "UAT CGL Programme", line LIABILITY, cover type CGL, reason New programme for a market segment.
+          - Requested terms - add coverage CGL_BI (included), package end 31-Dec-2027, target insurers INS-MGIC and INS-LAC; attach the request form.
+          - Click Save; note the number; click Submit for approval.
+        expected: On save the request gets a number PKR-2026-nnnnnn and stage DRAFT. On submission it moves to FOR_MKT_APPROVAL, the milestone Submitted shows ao and the time, and mkttl receives a notification.
+        auto: ProductMaintenanceApiIT#aRequestIsCreatedAndSubmittedOverHttp; PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 2
+        type: Negative
+        title: Save without package name
+        steps:
+          - New Package Request; fill every field except the package or programme name; click Save.
+        expected: Nothing is saved; the name field is marked.
+        msg: [Enter the package or programme name, PKG_REQUEST_INCOMPLETE]
+        auto: packageRequest.test.ts#validates the mandatory fields
+      - c: 2
+        type: Negative
+        title: NEW request without cover type
+        steps:
+          - New Package Request, type New package, line LIABILITY, no cover type; click Save.
+        expected: Nothing is saved.
+        msg: [Select the cover type, PKG_REQUEST_INCOMPLETE]
+        auto: packageRequest.test.ts#validates the mandatory fields
+      - c: 2
+        type: Negative
+        title: Submission without target insurers and end date names both items
+        steps:
+          - Save a NEW request with name, line, cover type and reason only.
+          - Click Submit for approval.
+        expected: The request stays in DRAFT and the message lists the missing requested terms, package end date and target insurer.
+        msg: ["Complete the request: <items>", PKG_REQUEST_INCOMPLETE]
+        auto: packageRequest.test.ts#lists the gaps of the submission and builds the API body
+      - c: 3
+        type: Positive
+        title: AMEND request pre-fills the terms of the current version
+        data: [TD-PM-11]
+        steps:
+          - New Package Request, type Amend package terms, line MOTOR, package product MTR10.
+        expected: The requested terms show the coverages, deductibles, rate scheme and insurers of the MTR10 version in force; they can be changed before saving.
+        auto: PackageLogicTest#proposedTermsBecomeAPackageSpecAndAVersionPrefillsTerms
+      - c: 3
+        type: Negative
+        title: AMEND request without package product
+        steps:
+          - New Package Request, type Amend package terms, line MOTOR, no package product; Save.
+        expected: Nothing is saved.
+        msg: [Select the package product of the AMEND request, PKG_REQUEST_INCOMPLETE]
+      - c: 4
+        type: Negative
+        title: Client-specific request without client
+        steps:
+          - New Package Request, type Amend package terms, scope Client-specific package, package MTR34, no client; Save.
+        expected: Nothing is saved.
+        msg: [Select the client of the client-specific package (PQ14), PKG_REQUEST_INCOMPLETE]
+        auto: PackageRequestProcessIT#aClientSpecificPackageGoesThroughMarketingReviewAndReturns
+      - c: 5
+        type: Negative
+        title: Package end date before the start date
+        steps:
+          - On a draft, set package start 01-Jan-2027 and package end 31-Dec-2026; Save.
+        expected: The draft is not saved.
+        msg: [The package end date must be after its start date, PKG_DATES_INVALID]
+      - c: 5
+        type: Boundary
+        neg: true
+        title: Negative requested rate
+        steps:
+          - On a draft, enter requested rate % -0.01; Save. Then enter 0.00; Save.
+        expected: -0.01 is refused; 0.00 is accepted.
+        msg: [Rates and amounts cannot be negative, PKG_AMOUNT_NEGATIVE]
+      - c: 5
+        type: Negative
+        screen: API
+        title: The type of a saved request cannot change
+        steps:
+          - Call PUT .../requests/{id} on the saved draft of TC-PM-020.1-01 with type AMEND.
+        expected: The update is refused; the type stays NEW. On the screen the Request type field is read-only after the first save.
+        msg: [The type of a request cannot change, PKG_TYPE_FIXED]
+      - c: 5
+        type: Workflow
+        screen: REQ
+        data: [TD-PM-02]
+        title: Void a draft with a reason
+        steps:
+          - Open PKR-2026-900001 as ao; click Void; select reason Duplicate record; confirm.
+        expected: The request closes as VOIDED and shows in the Closed tab with the reason; it can no longer be edited.
+
+  FR-PM-021:
+    scenario: SC-PM-03
+    persona: MKT_TL
+    screen: REQ
+    data: [TD-PM-12]
+    conditions:
+      - The requester cannot approve the own request.
+      - An approved request moves to FOR_TSU_REVIEW and appears in the TSU Review tab.
+      - A returned request is back in DRAFT with the reason visible; a return needs a reason.
+    cases:
+      - c: 1
+        type: Negative
+        persona: MKT_AO
+        title: The submitter cannot approve the request
+        pre: ao submitted the request of TC-PM-020.1-01.
+        steps:
+          - As ao, open the request.
+          - Call POST .../requests/{id}/approve with ao's token.
+        expected: No approve button is shown to ao; the API call is refused with HTTP 403 and the request stays in FOR_MKT_APPROVAL.
+        auto: ProductMaintenanceApiIT#aRequestIsCreatedAndSubmittedOverHttp
+      - c: 2
+        type: Workflow
+        title: Marketing TL approves and sends to TSU
+        steps:
+          - Log in as mkttl; Package Requests, For Approval tab; open the request.
+          - Click Approve and send to TSU with comment "OK for TSU".
+          - Open the TSU Review tab.
+        expected: The request is in FOR_TSU_REVIEW and listed in the TSU Review tab; the history shows the approval by mkttl with the comment.
+        auto: ProductMaintenanceApiIT#aRequestIsCreatedAndSubmittedOverHttp
+      - c: 3
+        type: Workflow
+        title: Return to requester with a reason
+        steps:
+          - As mkttl open a request in FOR_MKT_APPROVAL; click Return to requester; select Incomplete or incorrect details; comment "add the loss history"; confirm.
+          - As ao open the request.
+        expected: The request is back in DRAFT; the reason and comment are shown on the request and ao is notified.
+        auto: PackageRequestProcessIT#aClientSpecificPackageGoesThroughMarketingReviewAndReturns
+      - c: 3
+        type: Negative
+        title: Return without a reason
+        steps:
+          - Click Return to requester and confirm without choosing a reason.
+        expected: The return is refused.
+        msg: ["Select a reason for 'Return to requester'", WORKFLOW_REASON_REQUIRED]
+        auto: WorkflowServiceIT#accountMovesThroughTheStagesWithPermissionChecksHistoryAndNotifications
+      - c: 3
+        type: Negative
+        persona: MBS
+        title: Another user cannot edit the returned draft
+        pre: The request of TC-PM-021.3-01 is back in DRAFT.
+        steps:
+          - As mbs call PUT .../requests/{id} with the same body.
+        expected: The update is refused.
+        msg: [Request PKR-2026-nnnnnn cannot be changed while DRAFT, PKG_REQUEST_NOT_EDITABLE]
+        auto: PackageRequestProcessIT#aClientSpecificPackageGoesThroughMarketingReviewAndReturns
+
+  FR-PM-022:
+    scenario: SC-PM-03
+    persona: TSU_TL
+    screen: TSUWB
+    data: [TD-PM-03]
+    conditions:
+      - The request cannot reach the TSU Head without a recommendation.
+      - The TSU Head sees the recommendation text on the request.
+      - The TSU TL can correct the request in FOR_TSU_REVIEW or return it to the requester.
+    cases:
+      - c: 1
+        type: Negative
+        title: Recommend with a blank recommendation
+        steps:
+          - Log in as tsulead; TSU Workbench; open PKR-2026-900002.
+          - Click Recommend for approval; leave the text blank (spaces only); confirm.
+        expected: The request stays in FOR_TSU_REVIEW.
+        msg: [Write the recommendation for the TSU Head, PKG_RECOMMENDATION_REQUIRED]
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 1
+        type: Workflow
+        title: TSU TL recommends the request
+        steps:
+          - Click Recommend for approval; write "Recommend two panel insurers"; confirm.
+        expected: The request moves to FOR_TSU_APPROVAL; the TSU Head queue shows it; tsuhead is notified.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 2
+        type: Positive
+        persona: TSU_HEAD
+        screen: DETAILS
+        title: TSU Head reads the recommendation
+        steps:
+          - Log in as tsuhead; open PKR-2026-900002.
+        expected: The milestone TSU recommendation shows the text, tsulead and the time.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 3
+        type: Positive
+        title: TSU TL corrects the request before recommending
+        steps:
+          - Open a request in FOR_TSU_REVIEW; click Edit; change the requested deductible of OWN_DAMAGE; save.
+        expected: The change is saved and recorded in the history with tsulead as user; the stage does not change.
+      - c: 3
+        type: Workflow
+        title: TSU TL returns the request to the requester
+        steps:
+          - Click Return to requester; reason Missing supporting documents; confirm.
+        expected: The request is back in DRAFT with the reason; ao is notified.
+
+  FR-PM-023:
+    scenario: SC-PM-03
+    persona: TSU_HEAD
+    screen: TSUWB
+    data: [TD-PM-12]
+    conditions:
+      - The recommender cannot give the TSU Head approval.
+      - After approval of a negotiated request, round 1 exists with the target insurers.
+      - A request without negotiation (for example RETIRE) goes to FOR_MANCOM without a round.
+    cases:
+      - c: 1
+        type: Negative
+        persona: TSU_TL
+        title: The recommender cannot approve
+        pre: tsulead recommended the request; tsulead also holds PKG_TSU_APPROVE in the test set-up (test lead grants it for this case only).
+        steps:
+          - As tsulead click Approve for negotiation.
+        expected: The approval is refused and the request stays in FOR_TSU_APPROVAL.
+        msg: [The TSU Head approval is given by someone other than the recommender, PKG_FOUR_EYES]
+        auto: PackageRequestProcessIT#aClientSpecificPackageGoesThroughMarketingReviewAndReturns
+      - c: 2
+        type: Workflow
+        screen: NEG
+        title: Approval opens round 1 with the target insurers
+        steps:
+          - As tsuhead open the recommended request of TD-PM-12; click Approve for negotiation.
+          - Open the Negotiation tab.
+        expected: The request is in NEGOTIATION; round 1 exists in preparation with INS-MGIC and INS-LAC.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 3
+        type: Workflow
+        title: A RETIRE request goes to ManCom without negotiation
+        pre: A RETIRE request on MTR32 recommended by tsulead.
+        steps:
+          - As tsuhead click Approve without negotiation.
+        expected: The request moves to FOR_MANCOM; the Negotiation tab has no round; mancom is notified.
+        auto: PackageRequestProcessIT#aRetireRequestRetiresThePackageWithAnAdvisoryDraft
+      - c: 3
+        type: Negative
+        persona: TSU_HEAD
+        title: Approve for negotiation is not offered on a request without negotiation
+        pre: A RENEW request with Negotiation required unticked, recommended.
+        steps:
+          - As tsuhead open the request and look at the actions; call the workflow action approve through the API.
+        expected: Only Approve without negotiation and Return to requester are offered; the API call ends in FOR_MANCOM, not in NEGOTIATION.
+        neg: true
+        auto: PackageRequestProcessIT#anAdvisoryIsBlockedWithoutItsDocumentsAndARenewalNeedsNoNegotiation
+
+  FR-PM-024:
+    scenario: SC-PM-03
+    persona: TSU_TL
+    screen: REQS
+    data: [TD-PM-02, TD-PM-03, TD-PM-04, TD-PM-05, TD-PM-06, TD-PM-07]
+    conditions:
+      - Requests are listed by stage tab with type, client, line, reason, stage age and assignee, and can be searched and filtered.
+      - The owners of a stage are notified when a request enters it.
+      - A TL assigns requests to an officer and an officer can claim a request.
+      - A user without view permission cannot list requests.
+    cases:
+      - c: 1
+        type: Positive
+        title: Tabs and columns of the request list
+        steps:
+          - Log in as tsulead; Package Requests; open each tab from Drafts to Closed.
+        expected: PKR-2026-900002 is in TSU Review with type AMEND, programme, line MOTOR, reason Market competitiveness and days in stage; 900003 in Negotiation; 900004 in ManCom; 900005 in With MBS; 900006 in Released.
+        auto: packageRequest.test.ts#maps tabs to stages and back
+      - c: 1
+        type: Positive
+        title: Search by number, filter by type and Mine only
+        steps:
+          - Search "900003"; clear; filter Type = Renew package; clear; tick Mine only as ao.
+        expected: Each filter returns only the matching requests (900003; 900005; the requests created by ao).
+        auto: ProductMaintenanceApiIT#listEndpointsRespondOk
+      - c: 2
+        type: Positive
+        screen: NOTIF
+        title: TSU TL is notified when a request enters FOR_TSU_REVIEW
+        steps:
+          - As mkttl approve a submitted request.
+          - As tsulead open the notification bell.
+        expected: A notification names the request number and the stage For TSU review and opens the request.
+        auto: WorkflowServiceIT#accountMovesThroughTheStagesWithPermissionChecksHistoryAndNotifications
+      - c: 3
+        type: Workflow
+        screen: TSUWB
+        title: Bulk assign requests to an officer
+        steps:
+          - As tsulead select two requests in the Negotiation queue; click Assign; choose tsu.
+        expected: Both requests show tsu as assignee; the assignment is recorded on each work case.
+        auto: WorkflowServiceIT#queuesShowOnlyTheStagesOfTheUsersTeamAndSupportClaimAndAssignment
+      - c: 3
+        type: Workflow
+        screen: TSUWB
+        persona: TSU
+        title: An officer claims an unassigned request
+        steps:
+          - As tsu open an unassigned request in the TSU Workbench; click Claim.
+        expected: tsu becomes the assignee.
+      - c: 4
+        type: Security-access
+        screen: API
+        title: A user without PRODUCT_VIEW or PKG_REPORT_VIEW cannot list requests
+        steps:
+          - Call GET /api/v1/product-maintenance/requests?companyId=... with the token of a user without either permission.
+        expected: HTTP 403; the menu of that user has no Product Maintenance section.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
+
+  FR-PM-030:
+    scenario: SC-PM-04
+    persona: TSU
+    screen: NEG
+    data: [TD-PM-12, TD-PM-11]
+    conditions:
+      - The preparer cannot approve the own quotation slip.
+      - An approved QS is numbered, e-mailed to each insurer as a protected PDF and listed on the E-mails tab.
+      - The officer sees the send status and resends to one insurer.
+      - After the ManCom sign-off the QS cannot be edited or resent; a sent round cannot be edited.
+      - A QS needs at least one insurer.
+    cases:
+      - c: 1
+        type: Negative
+        title: The preparer cannot approve the own QS
+        steps:
+          - As tsu open round 1; select INS-MGIC and INS-LAC; click Submit for approval.
+          - As tsu click Approve and send.
+        expected: The QS gets a number PQS-2026-nnnnnn and status For approval; tsu's approval is refused.
+        msg: [The quotation slip is approved by a TL or a co-officer, QS_FOUR_EYES]
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 2
+        type: Workflow
+        persona: TSU_TL
+        title: TSU TL approves and the QS goes to each insurer
+        steps:
+          - As tsulead open round 1; review the QS PDF; click Approve and send.
+          - Open the E-mails tab.
+        expected: Round 1 is SENT with a reply due date of send date + 5 days; two protected QS e-mails and two password e-mails are logged; each insurer has a Pending response.
+        auto: ProductMaintenanceApiIT#aRequestIsCreatedAndSubmittedOverHttp; PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 3
+        type: Positive
+        title: Resend the QS to one insurer
+        steps:
+          - On the sent round, click Resend on INS-LAC.
+        expected: One more QS e-mail to INS-LAC is logged; the send count of INS-LAC shows 2.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 3
+        type: Negative
+        title: Resend on a closed round is refused
+        pre: Round 1 is closed by a revision (round 2 open).
+        steps:
+          - Open round 1 and call resend for INS-LAC.
+        expected: The resend is refused.
+        msg: ["Only the slip of an open, sent round can be resent", QS_NOT_RESENDABLE]
+      - c: 4
+        type: Negative
+        data: [TD-PM-06]
+        title: QS locked after ManCom sign-off
+        steps:
+          - Open PKR-2026-900005 (signed off) or a signed-off request with rounds; try to edit the insurers of the last round or resend.
+        expected: The round shows Locked; edit and resend are refused.
+        msg: [The slips are locked since the ManCom sign-off, QS_LOCKED]
+      - c: 4
+        type: Negative
+        title: A sent round cannot be edited
+        steps:
+          - On a sent round, change the insurers and save.
+        expected: The change is refused and the user is told to revise in a new round.
+        msg: ["Round 1 was sent: revise the slip in a new round", QS_ALREADY_SENT]
+      - c: 5
+        type: Negative
+        title: QS without insurer
+        steps:
+          - On a round in preparation remove all insurers; click Submit for approval.
+        expected: The QS is not submitted.
+        msg: [Select at least one insurer for the quotation slip, QS_NO_INSURER]
+
+  FR-PM-031:
+    scenario: SC-PM-04
+    persona: TSU
+    screen: NEG
+    data: [TD-PM-04, TD-PM-13]
+    conditions:
+      - TSU records each outcome of the list, with rate and terms per coverage and the insurer's reply attached.
+      - An offer without a rate or with a negative amount is refused.
+      - The response history shows every earlier value with user and time.
+    cases:
+      - c: 1
+        type: Positive
+        title: Approved with changes for one insurer and Declined for another
+        steps:
+          - Open PKR-2026-900003, round 2, response of INS-MGIC; outcome Approved with changes, rate 0.34, EARTHQUAKE deductible "3% of value at risk"; attach the insurer reply; save.
+          - Response of INS-LAC; outcome Declined; remarks "No capacity"; save.
+        expected: Both responses are saved with their outcomes; the insurer reply is stored as document type PKG_INSURER_RESPONSE; the comparative of round 2 lists INS-MGIC first.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 1
+        type: Positive
+        title: No response recorded after the due date
+        steps:
+          - Response of the third insurer; outcome No response; save.
+        expected: The response is saved without a rate; the round shows no pending insurer.
+        auto: PackageLogicTest#theComparativePutsOffersFirstCheapestFirstAndSelectsFieldsAndInsurers
+      - c: 2
+        type: Negative
+        title: Counter-proposal without a rate
+        steps:
+          - Outcome Counter-proposal; leave Rate % empty; save.
+        expected: The response is not saved.
+        msg: ["Enter the rate offered by {Luzon Assurance Co.} (COUNTER_PROPOSAL)", PKG_RESPONSE_RATE_REQUIRED]
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 2
+        type: Negative
+        title: Negative minimum premium
+        steps:
+          - Outcome Accepted as requested, rate 0.30, minimum premium -1; save.
+        expected: The response is not saved.
+        msg: [Rates and amounts cannot be negative, PKG_AMOUNT_NEGATIVE]
+      - c: 2
+        type: Negative
+        title: Response keyed in a closed round
+        steps:
+          - Open round 1 of PKR-2026-900003 (closed) and edit a response.
+        expected: The change is refused.
+        msg: ["Round 1 is closed: key in the latest round", PKG_ROUND_CLOSED]
+      - c: 3
+        type: Positive
+        title: Response history keeps every earlier value
+        steps:
+          - Change the INS-MGIC rate from 0.34 to 0.33 and save; open the response history.
+        expected: The history lists 0.34 and 0.33 with user tsu and the times.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+
+  FR-PM-032:
+    scenario: SC-PM-04
+    persona: TSU
+    screen: NEG
+    data: [TD-PM-04]
+    conditions:
+      - A request negotiated in two rounds shows both rounds, their QS numbers and the responses of each.
+      - The next round opens by default without the insurers that declined.
+      - A request closed as not proceeded shows the reason and cannot be reopened.
+      - A round is revised only after its QS was sent; not proceeded needs a reason.
+    cases:
+      - c: 1
+        type: Positive
+        title: Two rounds with their QS numbers and responses
+        steps:
+          - Open PKR-2026-900003, Negotiation tab.
+        expected: Rounds 1 (closed) and 2 (sent) are listed, each with its PQS number, insurers and responses; round 1 shows the three responses.
+        auto: ProductMaintenanceApiIT#aSeedRequestIsReadableWithItsRoundsOutputsAndDocuments
+      - c: 2
+        type: Workflow
+        title: Revise opens round n+1 without the declined insurer
+        pre: Request of TD-PM-12 with round 1 sent, INS-LAC Declined and INS-MGIC Approved with changes.
+        steps:
+          - Click Revise quotation slip; write "Match the lower rate"; confirm.
+        expected: Round 1 closes; round 2 opens with INS-MGIC only; the request stays in NEGOTIATION.
+        data: [TD-PM-12]
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 3
+        type: Workflow
+        persona: TSU_HEAD
+        title: Close as not proceeded with a reason
+        pre: A request in NEGOTIATION created for this case.
+        steps:
+          - Click Not proceeded; reason Declined by the insurers; comment; confirm.
+          - Look for any action to reopen the request.
+        expected: The request is NOT_PROCEEDED in the Closed tab with the reason; no action is offered; the requester is notified.
+      - c: 4
+        type: Negative
+        title: Revise before the QS is sent
+        steps:
+          - On a round in preparation, click Revise quotation slip.
+        expected: The revision is refused.
+        msg: [Send the slip of round 1 before revising it, QS_NOT_SENT]
+      - c: 4
+        type: Negative
+        title: Not proceeded without a reason
+        steps:
+          - Click Not proceeded and confirm without a reason.
+        expected: The request stays in NEGOTIATION.
+        msg: ["Select a reason for 'Not proceeded'", WORKFLOW_REASON_REQUIRED]
+
+  FR-PM-033:
+    scenario: SC-PM-04
+    persona: TSU
+    screen: NEG
+    data: [TD-PM-12]
+    conditions:
+      - Terms Final is refused while an insurer of the latest round is Pending.
+      - Only insurers that offered terms can be chosen, and shares total 100.
+      - After Terms Final the request shows the proposed terms and a current comparative master.
+    cases:
+      - c: 1
+        type: Negative
+        title: Terms Final with a pending insurer
+        pre: Round 1 sent; INS-MGIC keyed in, INS-LAC still Pending.
+        steps:
+          - Click Terms final; choose INS-MGIC; confirm.
+        expected: Terms Final is refused and the pending insurer is named.
+        msg: ["Every insurer of round 1 needs an outcome before the terms are final (INS-LAC pending)", NEGOTIATION_INCOMPLETE]
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 2
+        type: Negative
+        title: Choose an insurer that declined
+        steps:
+          - Round 2 - INS-MGIC Accepted as requested, INS-LAC Declined; click Terms final; choose INS-LAC.
+        expected: Refused.
+        msg: [INS-LAC did not offer terms in this round, PKG_INSURER_NOT_OFFERED]
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 2
+        type: Negative
+        title: No insurer chosen
+        steps:
+          - Click Terms final; untick every insurer; confirm.
+        expected: Refused.
+        msg: ["Choose the insurer(s) whose terms the package takes", NEGOTIATION_INCOMPLETE]
+      - c: 2
+        type: Boundary
+        neg: true
+        title: Shares of two chosen insurers total 90
+        steps:
+          - Choose two offering insurers as Lead 50 and Participant 40; confirm. Repeat with 50 and 50.
+        expected: 50 + 40 is refused; 50 + 50 is accepted.
+        msg: [Co-insurance shares must be given for every insurer and total 100, PKG_SHARES_INVALID]
+      - c: 3
+        type: Workflow
+        title: Terms final moves the request to TERMS_REVIEW with a master
+        steps:
+          - Choose INS-MGIC as Panel; comment "final"; confirm.
+          - Open the Details and Comparative tabs.
+        expected: The request is in TERMS_REVIEW; Chosen insurers shows INS-MGIC; Proposed terms are shown; the Comparative tab lists one current MASTER with a 64-character SHA-256 hash.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+
+  FR-PM-034:
+    scenario: SC-PM-04
+    persona: TSU
+    screen: COMP
+    data: [TD-PM-04]
+    conditions:
+      - A request has one current master listing every insurer of the latest round with its terms.
+      - A new compilation supersedes the previous master, which stays downloadable.
+      - Marketing opens the master read only.
+      - A master cannot be compiled before the QS of the round is sent.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Master lists the three insurers of round 1
+        steps:
+          - Open PKR-2026-900003; Comparative tab; download the current master as PDF and Excel.
+        expected: One column per insurer with outcome, rate, minimum premium, coverages, deductibles, conditions, valid until and remarks; offers are listed first, cheapest first; the lowest rate is marked; PDF and Excel show the same values.
+        auto: PackageLogicTest#theComparativePutsOffersFirstCheapestFirstAndSelectsFieldsAndInsurers
+      - c: 2
+        type: Positive
+        title: Recompiling supersedes the previous master
+        steps:
+          - Click Compile master; open Stored outputs.
+        expected: The new master is Current; the previous one shows Superseded and still downloads with its original content and hash.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 3
+        type: Security-access
+        neg: false
+        persona: MKT_AO
+        title: Marketing sees the master without compile or generate buttons
+        steps:
+          - Log in as ao2; open PKR-2026-900003, Comparative tab.
+        expected: The master is shown and downloads; Compile master and Generate client view are not shown.
+      - c: 3
+        type: Security-access
+        persona: MKT_AO
+        screen: API
+        title: Marketing cannot compile a master through the API
+        steps:
+          - Call POST .../requests/{id}/comparatives/master with ao2's token.
+        expected: HTTP 403; no new output.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
+      - c: 4
+        type: Negative
+        data: [TD-PM-12]
+        title: Compile before the QS is sent
+        steps:
+          - On a request whose round 1 is in preparation, click Compile master.
+        expected: No master is produced.
+        msg: [Send the quotation slip of round 1 first, COMPARATIVE_NO_TERMS]
+
+  FR-PM-035:
+    scenario: SC-PM-04
+    persona: TSU
+    screen: COMP
+    data: [TD-PM-04]
+    conditions:
+      - A client view shows only the chosen fields and insurers, with the master's values.
+      - The client view names the master it was derived from.
+      - A view needs a current master, a title, a field and an insurer.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Client view without one insurer and without Remarks
+        steps:
+          - Click Generate client view; title "Pacific Harbor options"; tick every field except Remarks; tick INS-MGIC and INS-VMI only; generate.
+          - Download the PDF and the Excel file.
+        expected: The files show two insurer columns and no Remarks row; each value equals the master.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 2
+        type: Positive
+        title: The view lists its master
+        steps:
+          - Open the stored outputs.
+        expected: The client view shows kind CLIENT, the selection and the master it comes from.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 3
+        type: Negative
+        title: Client view without a title
+        steps:
+          - Generate client view with an empty title.
+        expected: Nothing is generated.
+        msg: [Enter the title of the view, COMPARATIVE_TITLE_REQUIRED]
+      - c: 3
+        type: Negative
+        title: Client view without an insurer
+        steps:
+          - Generate client view with a title and fields but no insurer ticked.
+        expected: Nothing is generated.
+        msg: [Select at least one insurer of the master, COMPARATIVE_NO_INSURER]
+      - c: 3
+        type: Negative
+        data: [TD-PM-12]
+        title: Client view before a master exists
+        steps:
+          - On a request with a sent round and no master, call POST .../comparatives with a title and fields.
+        expected: Nothing is generated.
+        msg: [Compile the comparative master first, COMPARATIVE_NO_MASTER]
+
+  FR-PM-036:
+    scenario: SC-PM-04
+    persona: TSU_HEAD
+    screen: REQ
+    data: [TD-PM-04, TD-PM-12]
+    conditions:
+      - A client-specific package cannot skip the Marketing review.
+      - A generic programme goes straight to requirements and cannot be released to Marketing.
+      - Marketing accepts the terms or requests changes with a reason, which returns the request to NEGOTIATION.
+    cases:
+      - c: 1
+        type: Negative
+        title: Skip review on a client-specific package
+        pre: PKR-2026-900003 after Terms final (TERMS_REVIEW).
+        steps:
+          - As tsuhead call the action Proceed to requirements (generic package) through the API.
+        expected: Refused; on screen the action is not offered for a client-specific package.
+        msg: [Marketing reviews the terms of a client-specific package, PKG_SCOPE_CLIENT]
+        auto: PackageRequestProcessIT#aClientSpecificPackageGoesThroughMarketingReviewAndReturns
+      - c: 1
+        type: Workflow
+        title: Release terms to Marketing
+        steps:
+          - Click Release terms to Marketing with comment "for the client".
+        expected: The request is in FOR_MKT_REVIEW; ao2 (requester) is notified.
+        auto: PackageRequestProcessIT#aClientSpecificPackageGoesThroughMarketingReviewAndReturns
+      - c: 2
+        type: Negative
+        title: Release a generic programme to Marketing
+        pre: Request of TD-PM-12 in TERMS_REVIEW.
+        steps:
+          - Call the action Release terms to Marketing.
+        expected: Refused.
+        msg: [A generic programme goes straight to the requirements, PKG_SCOPE_GENERIC]
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 2
+        type: Workflow
+        title: Proceed to requirements for a generic programme
+        steps:
+          - Click Proceed to requirements (generic package).
+        expected: The request moves to REQUIREMENTS_PREP.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 3
+        type: Workflow
+        persona: MKT_AO
+        title: Marketing requests changes, then accepts the revised terms
+        steps:
+          - As ao2 open the request in FOR_MKT_REVIEW; click Request changes; reason Additional insurer requirements; comment "client wants a lower rate".
+          - As tsu make the terms final again; as tsuhead release to Marketing.
+          - As ao2 click Accept terms with comment "client agrees".
+        expected: After Request changes the request is in NEGOTIATION with the reason shown; after Accept terms it is in REQUIREMENTS_PREP.
+        auto: PackageRequestProcessIT#aClientSpecificPackageGoesThroughMarketingReviewAndReturns
+      - c: 3
+        type: Negative
+        persona: MKT_AO
+        title: Request changes without a reason
+        steps:
+          - Click Request changes and confirm without a reason.
+        expected: The request stays in FOR_MKT_REVIEW.
+        msg: ["Select a reason for 'Request changes'", WORKFLOW_REASON_REQUIRED]
+
+  FR-PM-040:
+    scenario: SC-PM-05
+    persona: TSU
+    screen: REQM
+    data: [TD-PM-12, TD-PM-13]
+    conditions:
+      - Submission without a signed package slip or another pack item is refused and names every missing item.
+      - A complete pack moves the request to FOR_MANCOM and notifies ManCom.
+      - The package end date must be after the effective date.
+    cases:
+      - c: 1
+        type: Negative
+        title: Submit requirements with an empty pack
+        pre: Request of TD-PM-12 in REQUIREMENTS_PREP.
+        steps:
+          - Click Submit requirements for ManCom sign-off.
+        expected: Refused; the message lists every missing item (scheme rate or rate per insurer, computation basis, dates, signed package slip).
+        msg: ["Complete the requirements: <missing items>", REQUIREMENTS_INCOMPLETE]
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 1
+        type: Negative
+        title: Only the signed package slip is missing
+        steps:
+          - Enter scheme rate 0.34, minimum premium 15,000, commission 10, TSI limit 50,000,000, computation basis "Contract value x 0.34%", effective from, package start and end; save.
+          - Click Submit requirements for ManCom sign-off.
+        expected: Refused; the Missing list shows only the signed package slip (document PKG_SLIP_SIGNED).
+        msg: ["Complete the requirements: {the signed package slip (document PKG_SLIP_SIGNED)}", REQUIREMENTS_INCOMPLETE]
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 2
+        type: Upload-download
+        title: Download the slip, upload the signed copy and submit
+        steps:
+          - Download the package slip PDF; upload the signed slip of TD-PM-13 as PKG_SLIP_SIGNED.
+          - Click Submit requirements for ManCom sign-off with comment "pack complete".
+        expected: The package slip shows the rate scheme, insurers and coverages; after upload the checklist is complete; the request is in FOR_MANCOM and mancom is notified.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 3
+        type: Negative
+        title: Package end date before the effective date
+        steps:
+          - Set effective from 01-Jan-2027 and package end 31-Dec-2026; save.
+        expected: Not saved.
+        msg: [The package end date must be after the effective date, PKG_DATES_INVALID]
+      - c: 3
+        type: Negative
+        title: Requirements edited outside REQUIREMENTS_PREP
+        data: [TD-PM-05]
+        steps:
+          - On PKR-2026-900004 (FOR_MANCOM) call PUT .../requirements.
+        expected: Refused.
+        msg: [The requirements are prepared after the terms are accepted, PKG_NOT_IN_REQUIREMENTS]
+
+  FR-PM-041:
+    scenario: SC-PM-05
+    persona: MANCOM
+    screen: REQM
+    data: [TD-PM-05, TD-PM-13]
+    conditions:
+      - The requirements reach MBS only after the ManCom sign-off.
+      - After sign-off the QS of every round is locked.
+      - Without an uploaded sheet the request carries a generated MANCOM_SIGNOFF document.
+      - The member who submitted the requirements cannot sign them off; a return needs a reason.
+    cases:
+      - c: 1
+        type: Workflow
+        title: ManCom signs off with an uploaded sheet
+        steps:
+          - Log in as mancom; open PKR-2026-900004; Requirements & Sign-off tab.
+          - Upload the signed ManCom sheet; click Sign off and send to MBS with comment "signed".
+        expected: The request is in WITH_MBS; the decision SIGNED shows mancom, time and the sheet; mbs is notified.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory; ProductMaintenanceApiIT#aSeedRequestIsReadableWithItsRoundsOutputsAndDocuments
+      - c: 1
+        type: Negative
+        persona: TSU
+        screen: API
+        title: The request cannot go to MBS without the sign-off
+        steps:
+          - As tsu call POST .../requests/{id}/signoff on PKR-2026-900004.
+          - As mbs call POST .../requests/{id}/setup on the same request before sign-off.
+        expected: Both calls are refused with HTTP 403; the request stays in FOR_MANCOM.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
+        auto: ProductMaintenanceApiIT#permissionsAreEnforced
+      - c: 2
+        type: Negative
+        persona: TSU
+        screen: NEG
+        title: Slips are locked after sign-off
+        steps:
+          - As tsu open the Negotiation tab of the signed-off request; try to resend a QS.
+        expected: Every round shows Locked; the resend is refused.
+        msg: [The slips are locked since the ManCom sign-off, QS_LOCKED]
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 3
+        type: Positive
+        data: [TD-PM-12]
+        title: Sign-off without upload attaches a generated record
+        steps:
+          - Sign off a request without uploading a sheet; open the Documents tab.
+        expected: A MANCOM_SIGNOFF document with the sign-off reference MC-<request number> is attached.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 4
+        type: Negative
+        title: The submitter of the requirements cannot sign off
+        pre: A test user holds TSU and MANCOM (test lead sets it up for this case) and submitted the requirements.
+        steps:
+          - As that user click Sign off and send to MBS.
+        expected: Refused.
+        msg: [ManCom signs off requirements submitted by someone else, PKG_FOUR_EYES]
+      - c: 4
+        type: Workflow
+        title: ManCom returns the pack to TSU
+        steps:
+          - Click Return to TSU; reason Missing supporting documents; confirm.
+        expected: The request is in REQUIREMENTS_PREP; a RETURNED decision is recorded; tsu is notified.
+
+  FR-PM-042:
+    scenario: SC-PM-05
+    persona: MBS
+    screen: SETUP
+    data: [TD-PM-06]
+    conditions:
+      - MBS cannot set up a package before the ManCom sign-off.
+      - Set-up creates a draft version whose terms equal the signed-off proposed terms.
+      - Incomplete requirements returned by MBS reach TSU with the reason.
+      - A second draft for the same product and a risk code outside the line pattern are refused.
+    cases:
+      - c: 1
+        type: Negative
+        screen: API
+        data: [TD-PM-05]
+        title: Set-up before sign-off
+        steps:
+          - As mbs call POST .../requests/{id}/setup on PKR-2026-900004 (FOR_MANCOM).
+        expected: Refused; the request stays in FOR_MANCOM.
+        msg: [MBS receives signed-off requirements only (BRPM.015), PKG_NOT_WITH_MBS]
+      - c: 2
+        type: Workflow
+        title: Set up the RENEW version of MTR15
+        steps:
+          - Open PKR-2026-900005 (WITH_MBS); click Set up package version; change summary "Renewal term"; confirm.
+          - Open the linked version from the Set-up tab.
+        expected: The request moves to FOR_VALIDATION; the draft version of MTR15 has the rate scheme, dates, coverages and insurers of the signed-off terms and shows the request number and ManCom reference as origin.
+        auto: PackageRequestProcessIT#anAdvisoryIsBlockedWithoutItsDocumentsAndARenewalNeedsNoNegotiation; PackageLogicTest#proposedTermsBecomeAPackageSpecAndAVersionPrefillsTerms
+      - c: 2
+        type: Positive
+        data: [TD-PM-12]
+        title: NEW request - MBS gives the risk code and name
+        steps:
+          - On the signed-off NEW request of TD-PM-12, click Set up package version; risk code LIA41, product name "UAT CGL Programme", change summary; confirm.
+        expected: Product LIA41 is created pending and version 1 is a draft linked to the request.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 3
+        type: Workflow
+        title: Return incomplete requirements to TSU
+        steps:
+          - Click Return incomplete requirements to TSU; reason Incomplete or incorrect details; comment "computation basis missing".
+        expected: The request is in REQUIREMENTS_PREP; tsu is notified and sees the reason.
+      - c: 3
+        type: Negative
+        title: Return without a reason
+        steps:
+          - Click Return incomplete requirements to TSU without a reason.
+        expected: Refused.
+        msg: ["Select a reason for 'Return incomplete requirements to TSU'", WORKFLOW_REASON_REQUIRED]
+      - c: 4
+        type: Negative
+        data: [TD-PM-04, TD-PM-08]
+        title: Second draft for MTR12
+        steps:
+          - Signed-off UPDATE request on MTR12 while MTR12 v2 is still DRAFT; click Set up package version.
+        expected: Refused.
+        msg: [Product MTR12 already has a version being set up, VERSION_IN_PROGRESS]
+        auto: CatalogVersionIT#aPackageVersionIsDraftedValidatedAndReleased
+      - c: 4
+        type: Negative
+        data: [TD-PM-12]
+        title: Risk code outside the line pattern at set-up
+        steps:
+          - Set up the NEW request with risk code CGL-X (line LIABILITY has a pattern).
+        expected: Refused.
+        msg: [Risk code CGL-X does not follow the naming convention of LIABILITY, PRODUCT_CODE_PATTERN]
+
+  FR-PM-043:
+    scenario: SC-PM-05
+    persona: TSU_HEAD
+    screen: VALQ
+    data: [TD-PM-08]
+    conditions:
+      - The MBS user who set up or submitted the version cannot validate it.
+      - A released version prices new quotations from its effective date and not before.
+      - A returned version is editable again and the request is back with MBS.
+      - An incomplete version cannot be submitted, and Validate and Release needs every checklist item.
+    cases:
+      - c: 1
+        type: Negative
+        persona: MBS
+        screen: API
+        title: MBS cannot validate the version it made
+        steps:
+          - As mbs submit MTR12 v2 for validation.
+          - As mbs call POST /api/v1/catalog/products/MTR12/versions/2/validate.
+        expected: HTTP 403 (mbs does not hold PRODUCT_VALIDATE); the version stays FOR_VALIDATION.
+        auto: CatalogProductMaintenanceApiIT#permissionsFollowTheActionMatrix
+      - c: 1
+        type: Negative
+        persona: BUSINESS_ADMIN
+        title: A validator who submitted the version cannot validate it
+        pre: badmin also holds PRODUCT_MAINTAIN for this case and submitted the version.
+        steps:
+          - As badmin click Validate and release.
+        expected: Refused.
+        msg: [A package version is validated by someone other than its maker and submitter, MAKER_CHECKER_VIOLATION]
+        auto: CatalogIT#productsAreMakerCheckerAndListedInTheInbox
+      - c: 2
+        type: Workflow
+        title: TSU Head validates and releases MTR12 v2
+        steps:
+          - Open MTR12 v2 from the Validation Queue; tick every checklist item; review the test premium.
+          - Click Validate and release.
+          - Open the Versions tab of MTR12.
+        expected: Version 2 is RELEASED from its effective date; version 1 ends the day before; the checklist, tsuhead and the time are recorded; the linked request is RELEASED and an advisory draft exists.
+        auto: CatalogVersionIT#aPackageVersionIsDraftedValidatedAndReleased; PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 2
+        type: Boundary
+        persona: MKT_AO
+        screen: QUOTE
+        data: [TD-PM-14]
+        title: A quotation before the effective date uses the old version
+        steps:
+          - Before the release, quote MTR12; after the release but before its effective date, quote MTR12 again.
+        expected: Both quotations show "Priced on version 1"; from the effective date new quotations show version 2.
+        auto: RatingSchemeIT#newBusinessUsesTheCurrentVersionAndAnOldOneOnlyWithAnException
+      - c: 3
+        type: Workflow
+        title: Return to MBS with a reason
+        steps:
+          - Open a version FOR_VALIDATION; click Return to MBS; reason "Deductible missing"; confirm.
+        expected: The version is DRAFT and editable; the request is back in WITH_MBS; mbs is notified.
+        auto: CatalogVersionIT#aSubmittedVersionIsReturnedAndACompleteHierarchyIsRequired; PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
+      - c: 3
+        type: Negative
+        title: Return without a reason
+        steps:
+          - Click Return to MBS and leave the reason empty.
+        expected: Refused.
+        msg: [Enter the reason of the return, REASON_REQUIRED]
+      - c: 4
+        type: Negative
+        persona: MBS
+        screen: VERSION
+        title: Submit a version without any rate
+        steps:
+          - On a draft clear the package rate and every insurer rate; click Submit for validation.
+        expected: Refused.
+        msg: [Enter the package rate or a rate for every insurer, PACKAGE_RATE_MISSING]
+      - c: 4
+        type: Negative
+        persona: MBS
+        screen: VERSION
+        title: Submit a version without a basic coverage
+        steps:
+          - Untick every basic coverage of the draft; submit.
+        expected: Refused.
+        msg: [The package needs its cover type and at least one included basic coverage (PMADD01), PACKAGE_HIERARCHY_INCOMPLETE]
+        auto: CatalogVersionIT#aSubmittedVersionIsReturnedAndACompleteHierarchyIsRequired
+      - c: 4
+        type: Negative
+        screen: VERSION
+        title: Validate and release stays disabled until the checklist is complete
+        steps:
+          - Open a version FOR_VALIDATION; tick all checklist items but one.
+        expected: Validate and release is disabled; it is enabled once the last item is ticked.
+
+  FR-PM-044:
+    scenario: SC-PM-05
+    persona: TSU
+    screen: ADV
+    data: [TD-PM-06, TD-PM-13]
+    conditions:
+      - An advisory cannot be sent while a supporting document is missing.
+      - A sent advisory reaches each selected group in BIBS and the given e-mail addresses, lists its documents and is stored as a PDF.
+      - The advisory type follows the request type, and an advisory is sent once.
+      - Subject, text and at least one recipient group are required.
+    cases:
+      - c: 1
+        type: Negative
+        title: Send a renewal advisory without the signed slip
+        pre: MTR15 of PKR-2026-900005 released (TC-PM-042.2-01 and a validation).
+        steps:
+          - Open the Advisories tab; the draft type is RENEWAL; click Send.
+        expected: Refused; the missing document is named.
+        msg: ["Attach the supporting documents before sending: <documents>", ADVISORY_DOCUMENTS_MISSING]
+        auto: PackageRequestProcessIT#anAdvisoryIsBlockedWithoutItsDocumentsAndARenewalNeedsNoNegotiation
+      - c: 2
+        type: Workflow
+        title: Send the advisory to Marketing and Operations
+        steps:
+          - Upload the signed package slip.
+          - Edit the advisory - groups Marketing and Operations, e-mail operations@brokerverse-seed.ph, subject "MTR15 renewed", text; save.
+          - Click Send. As ao open the notification bell.
+        expected: The advisory is SENT; ao and the Operations users have an in-app notification; one protected e-mail is logged; the advisory PDF is stored on the request and lists the signed slip and the ManCom sign-off.
+        auto: PackageRequestProcessIT#anAdvisoryIsBlockedWithoutItsDocumentsAndARenewalNeedsNoNegotiation
+      - c: 3
+        type: Positive
+        data: [TD-PM-07]
+        title: Advisory type per request type
+        steps:
+          - Open the advisories of PKR-2026-900006 (AMEND), of the released NEW request of TD-PM-12 and of a retired package.
+        expected: PACKAGE_UPDATED for the AMEND, PACKAGE_READY for the NEW, RETIREMENT for the retired package.
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory; PackageRequestProcessIT#aRetireRequestRetiresThePackageWithAnAdvisoryDraft
+      - c: 3
+        type: Negative
+        title: Send the same advisory twice
+        steps:
+          - Call send again on the sent advisory.
+        expected: Refused.
+        msg: [The advisory was already sent, ADVISORY_ALREADY_SENT]
+        auto: PackageRequestProcessIT#anAdvisoryIsBlockedWithoutItsDocumentsAndARenewalNeedsNoNegotiation
+      - c: 4
+        type: Negative
+        title: Advisory without subject
+        steps:
+          - Clear the subject; save.
+        expected: Not saved.
+        msg: [Enter the subject and the text, ADVISORY_CONTENT_REQUIRED]
+      - c: 4
+        type: Negative
+        title: Advisory without recipient group
+        steps:
+          - Untick every group; save.
+        expected: Not saved.
+        msg: [Select at least one recipient group, ADVISORY_NO_RECIPIENT]
+      - c: 1
+        type: Security-access
+        persona: MKT_AO
+        screen: API
+        title: Marketing cannot send an advisory
+        steps:
+          - Call POST /api/v1/product-maintenance/advisories/{aid}/send with ao's token.
+        expected: HTTP 403.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
+        auto: ProductMaintenanceApiIT#permissionsAreEnforced
+
+  FR-PM-045:
+    scenario: SC-PM-05
+    persona: MBS
+    screen: SETUP
+    data: [TD-PM-11]
+    conditions:
+      - A RETIRE request retires the product at the MBS step; other request types cannot retire.
+      - After retirement a new quotation on the product is refused.
+      - The retired product and its versions stay searchable for users with PRODUCT_ARCHIVE_VIEW.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Retire MTR32 through a RETIRE request
+        pre: RETIRE request on MTR32 signed off by mancom (WITH_MBS).
+        steps:
+          - Click Retire package; comment "retired"; confirm.
+        expected: The request closes as RETIRED; product MTR32 is RETIRED; a RETIREMENT advisory draft exists with the ManCom sign-off attached.
+        auto: PackageRequestProcessIT#aRetireRequestRetiresThePackageWithAnAdvisoryDraft
+      - c: 1
+        type: Negative
+        title: Set up a version on a RETIRE request
+        steps:
+          - On the RETIRE request click Set up package version (API).
+        expected: Refused.
+        msg: [A RETIRE request retires the package instead, PKG_REQUEST_TYPE_MISMATCH]
+        auto: PackageRequestProcessIT#aRetireRequestRetiresThePackageWithAnAdvisoryDraft
+      - c: 1
+        type: Negative
+        data: [TD-PM-06]
+        title: Retire on a RENEW request
+        steps:
+          - On PKR-2026-900005 call POST .../requests/{id}/retire.
+        expected: Refused.
+        msg: [Only a RETIRE request retires the package, PKG_REQUEST_TYPE_MISMATCH]
+      - c: 2
+        type: Negative
+        persona: MKT_AO
+        screen: QUOTE
+        data: [TD-PM-14]
+        title: Quotation on a retired product
+        steps:
+          - New Quotation on MTR32.
+        expected: The product is not offered; a direct rating call is refused.
+        msg: [Product MTR32 is RETIRED and cannot be sold, PRODUCT_NOT_SELLABLE]
+        auto: CatalogVersionIT#packagesExpireAndRetireWithoutBeingDeleted
+      - c: 3
+        type: Positive
+        persona: AUDITOR
+        screen: PRODUCTS
+        title: Auditor finds the retired product and its versions
+        steps:
+          - Log in as auditor; Products; filter Retired; open MTR32.
+        expected: MTR32 is listed with tag Retired; all versions, terms and the request history open read only.
+        auto: CatalogVersionIT#packagesExpireAndRetireWithoutBeingDeleted
+
+  FR-PM-050:
+    scenario: SC-PM-06
+    persona: MBS
+    screen: VERSIONS
+    data: [TD-PM-11]
+    conditions:
+      - A rate change creates version n+1 and version n stays in force until n+1 takes effect.
+      - The Versions tab shows every version with status and effective dates and compares two versions.
+      - A versioned field cannot be edited on the product and a second draft is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: New Version on MTR10 copies the version in force
+        steps:
+          - Open product MTR10; Versions tab; click New Version.
+          - Change the package rate; save; submit; have tsuhead validate and release it.
+        expected: The draft is a copy of the version in force effective tomorrow; after release the old version ends today and the new one is in force from tomorrow.
+        auto: CatalogVersionIT#aReleasedSuccessorSupersedesAndTheCommercialColumnsFollowTheVersions
+      - c: 2
+        type: Positive
+        title: Timeline and comparison of two versions
+        steps:
+          - On MTR10, Versions tab, select versions 1 and 2; click Compare.
+        expected: The timeline lists each version with status (Superseded, Released), effective from and to; the comparison shows the changed rate.
+      - c: 3
+        type: Negative
+        screen: PRODUCT
+        title: Edit the minimum premium on the product
+        steps:
+          - Open MTR10; Edit; change the minimum premium; save.
+        expected: Refused.
+        msg: ["The rate, minimum premium, commission and TSI limit of package MTR10 change through a new version (Versions tab)", PRODUCT_FIELD_VERSIONED]
+        auto: CatalogVersionIT#aReleasedSuccessorSupersedesAndTheCommercialColumnsFollowTheVersions
+      - c: 3
+        type: Negative
+        data: [TD-PM-08]
+        title: Second New Version while a draft exists
+        steps:
+          - On MTR12 (draft v2 exists) click New Version.
+        expected: Refused.
+        msg: [Product MTR12 already has a version being set up, VERSION_IN_PROGRESS]
+        auto: CatalogVersionIT#aPackageVersionIsDraftedValidatedAndReleased
+      - c: 3
+        type: Security-access
+        persona: TSU_HEAD
+        screen: API
+        title: A user without PRODUCT_MAINTAIN cannot create a version
+        steps:
+          - As tsuhead call POST /api/v1/catalog/products/MTR12/versions.
+        expected: HTTP 403.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
+        auto: CatalogProductMaintenanceApiIT#permissionsFollowTheActionMatrix
+
+  FR-PM-051:
+    scenario: SC-PM-06
+    persona: MKT_AO
+    screen: QUOTE
+    data: [TD-PM-14]
+    conditions:
+      - New business is priced on the version in force on the transaction date, whatever the period start.
+      - A manual rate different from the scheme is refused without an approved exception and accepted with one.
+      - The quotation, account and invoice carry the version number that priced them.
+      - A product without a version in force, expired or retired, cannot be sold.
+    cases:
+      - c: 1
+        type: Positive
+        title: Period start before the new version's effective date
+        pre: MTR10 version 2 released and in force today (TC-PM-050.1-01).
+        steps:
+          - New Quotation on MTR10 with period start 30 days ago; rate it.
+        expected: The quotation shows "Priced on version 2" with the version 2 rate.
+        auto: RatingSchemeIT#newBusinessUsesTheCurrentVersionAndAnOldOneOnlyWithAnException
+      - c: 2
+        type: Negative
+        title: Manual item rate different from the scheme without exception
+        steps:
+          - On the quotation change the item rate to 2.50 %; submit.
+        expected: Submission is refused.
+        msg: ["Package MTR10 is priced on the current rate scheme: {rate 2.50%} needs an approved rate exception", RATE_SCHEME_NOT_CURRENT]
+        auto: RatingSchemeIT#anItemRateOtherThanTheSchemeNeedsAnExceptionAndThePanelIsEnforced
+      - c: 2
+        type: Workflow
+        title: Rate exception approved, then submission accepted
+        steps:
+          - Click Request Rate Exception; rate 2.50, reason "Loyal client"; submit.
+          - As approver open My Approvals; approve the exception.
+          - As ao submit the quotation again.
+        expected: The exception gets a reference number; after approval the quotation is submitted and shows the exception reference.
+        auto: RatingSchemeIT#quotationAndAccountsCarryTheVersionAndSubmissionNeedsTheException; CatalogProductMaintenanceApiIT#coveragesClausesIncentivesAndExceptionsAreMaintainedOverHttp
+      - c: 2
+        type: Negative
+        title: Rate exception with a past validity date
+        steps:
+          - Request Rate Exception with validity date yesterday.
+        expected: Refused.
+        msg: [The validity date cannot be in the past, RATE_EXCEPTION_VALIDITY_PAST]
+      - c: 3
+        type: Positive
+        screen: BOOKING
+        title: Version number on quotation, account and invoice
+        steps:
+          - Accept the quotation, create the account and book the invoice (BRD-1 flow).
+          - Open the quotation, the account and the booked invoice.
+        expected: All three show the MTR10 version that priced the quotation.
+        auto: RatingSchemeIT#quotationAndAccountsCarryTheVersionAndSubmissionNeedsTheException
+      - c: 4
+        type: Negative
+        title: Quotation on a package with no version in force
+        pre: A packaged product whose only version is effective next month.
+        steps:
+          - Quote the product today.
+        expected: Refused.
+        msg: ["Package <code> has no released version in force on <date>", PRODUCT_NOT_SELLABLE]
+      - c: 1
+        type: Positive
+        screen: CALC
+        title: Renewal and endorsement keep the version of the original account
+        steps:
+          - In the Premium Calculator choose purpose Renewal for an account sold on MTR10 version 1.
+        expected: The premium uses version 1, not the version in force.
+        auto: RatingSchemeIT#renewalsAndEndorsementsUseTheirOwnVersion
+
+  FR-PM-052:
+    scenario: SC-PM-06
+    persona: MBS
+    screen: PRODUCTS
+    data: [TD-PM-10]
+    conditions:
+      - A package past its end date without renewal is tagged Expired and cannot be sold.
+      - Its versions, documents and request history remain retrievable by authorised users.
+      - A Marketing AO does not see expired packages.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: SYSTEM
+        screen: JOBS
+        title: Daily job expires a package whose end date passed
+        pre: In the test environment the end date of PAR25 is set to yesterday.
+        steps:
+          - Run the job PACKAGE_VERSION_LIFECYCLE from Administration > Scheduled Jobs.
+          - As mbs filter Products by Expired.
+        expected: PAR25 and its version are EXPIRED and tagged Expired; PKG_NEGOTIATE and PRODUCT_MAINTAIN holders are notified.
+        auto: CatalogVersionIT#packagesExpireAndRetireWithoutBeingDeleted
+      - c: 1
+        type: Negative
+        persona: MKT_AO
+        screen: QUOTE
+        title: Quotation on an expired package
+        steps:
+          - Quote PAR25.
+        expected: Refused.
+        msg: [Product PAR25 is EXPIRED and cannot be sold, PRODUCT_NOT_SELLABLE]
+        auto: CatalogVersionIT#packagesExpireAndRetireWithoutBeingDeleted
+      - c: 2
+        type: Positive
+        persona: AUDITOR
+        title: Expired package history stays retrievable
+        steps:
+          - As auditor open PAR25 from the Expired filter; open its versions and a past request.
+        expected: All versions, terms, documents and the request history open read only.
+      - c: 3
+        type: Security-access
+        persona: MKT_AO
+        screen: API
+        title: Marketing AO cannot list expired packages
+        steps:
+          - As ao open Products (no Expired filter shown); call GET /api/v1/catalog/products?lifecycle=EXPIRED.
+        expected: The filter is not offered; the call returns HTTP 403.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
+        auto: CatalogProductMaintenanceApiIT#permissionsFollowTheActionMatrix
+
+  FR-PM-060:
+    scenario: SC-PM-07
+    persona: TSU
+    screen: EXPIRY
+    data: [TD-PM-10]
+    conditions:
+      - A package ending in 45 days appears in the Expiring tab with 45 days left.
+      - The alert is raised once at each threshold (60, 30 and 7 days), never twice.
+      - The list is exported for a date range and the days filter is validated.
+    cases:
+      - c: 1
+        type: Positive
+        title: PAR25 in the Expiring tab
+        steps:
+          - As tsu open Package Expiry; Packages ending within (days) 60.
+        expected: PAR25 is listed with days left 45, its end date, anniversary and Renewal request None.
+        auto: packageRequest.test.ts#splits the expiry list and colours the urgency; PackageLogicTest#theExpiryBucketAndTheNextTermFollowTheParameters
+      - c: 1
+        type: Boundary
+        title: Days filter at 44 and 45
+        steps:
+          - Set Packages ending within 44; then 45.
+        expected: With 44 PAR25 is not listed; with 45 it is.
+      - c: 2
+        type: Positive
+        persona: SYSTEM
+        screen: JOBS
+        title: Expiry alert raised once per threshold
+        pre: PACKAGE_EXPIRY_NOTICE_DAYS 60, PACKAGE_EXPIRY_REMINDER_DAYS 30,7.
+        steps:
+          - Run PACKAGE_EXPIRY_MONITOR twice on the same day.
+          - As tsu and mbs open the notification bell.
+        expected: One PACKAGE_EXPIRING alert for PAR25 at the 60-day threshold; the second run raises nothing new.
+        auto: PackageExpiryIT#theMonitorAlertsAndDraftsOneRenewalRequestPrefilledFromTheVersion
+      - c: 3
+        type: Report-output
+        title: Generate Expiry List for a date range
+        steps:
+          - Click Generate Expiry List; from today to today + 90 days; generate.
+        expected: The file lists the released packages ending in the range with product, version, end date, days left and renewal request.
+      - c: 3
+        type: Boundary
+        neg: true
+        title: Days filter outside 1-365
+        steps:
+          - Enter 0; then 366.
+        expected: Both values are refused on the field; 1 and 365 are accepted.
+      - c: 1
+        type: Security-access
+        persona: MKT_AO
+        screen: API
+        title: Marketing AO cannot open Package Expiry
+        steps:
+          - As ao call GET /api/v1/product-maintenance/expiry.
+        expected: HTTP 403; the screen is not in ao's menu.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
+        auto: ProductMaintenanceApiIT#permissionsAreEnforced
+
+  FR-PM-061:
+    scenario: SC-PM-07
+    persona: TSU
+    screen: EXPIRY
+    data: [TD-PM-10]
+    conditions:
+      - A generated renewal request has the terms of the current version and the next term's dates.
+      - A package with an open renewal request cannot get a second one.
+      - Generating needs at least one selected package.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Generate a renewal request for PAR25
+        steps:
+          - Tick PAR25; click Generate Renewal Request.
+          - Open the new request.
+        expected: A RENEW request in DRAFT is created and its number shown; terms equal PAR25 version 1; package start = old end + 1 day with the same term length.
+        auto: PackageExpiryIT#theMonitorAlertsAndDraftsOneRenewalRequestPrefilledFromTheVersion
+      - c: 2
+        type: Negative
+        title: Second renewal request for the same package
+        steps:
+          - Tick PAR25 again (now in Renewal in Progress); click Generate Renewal Request.
+        expected: No second request is created; PAR25 shows the open request and its stage.
+        auto: PackageExpiryIT#theMonitorAlertsAndDraftsOneRenewalRequestPrefilledFromTheVersion
+      - c: 3
+        type: Negative
+        title: Generate with no package selected
+        steps:
+          - Untick all; click Generate Renewal Request (API call with an empty list).
+        expected: Refused.
+        msg: [Select the packages to renew, PKG_RENEWAL_NONE]
+      - c: 1
+        type: Positive
+        persona: SYSTEM
+        screen: PARAMS
+        title: Automatic drafting when PACKAGE_RENEWAL_AUTODRAFT is on
+        steps:
+          - Set PACKAGE_RENEWAL_AUTODRAFT true; run PACKAGE_EXPIRY_MONITOR.
+        expected: One RENEW request is drafted for each package at the notice period that has none.
+        auto: PackageExpiryIT#theMonitorAlertsAndDraftsOneRenewalRequestPrefilledFromTheVersion
+
+  FR-PM-070:
+    scenario: SC-PM-07
+    persona: TSU_HEAD
+    screen: HOME
+    data: [TD-PM-02, TD-PM-03, TD-PM-04, TD-PM-10]
+    conditions:
+      - A request past its stage SLA is counted in a red tile, and amber from 80 % of the SLA.
+      - A tile opens its filtered list, which exports to Excel.
+      - Counts follow the user's access.
+    cases:
+      - c: 1
+        type: Positive
+        title: Red tile for a request past its SLA
+        steps:
+          - Open Product Maintenance Home.
+        expected: PKR-2026-900002 (FOR_TSU_REVIEW since 21-Sep, SLA 24 hours) is counted in a red tile.
+        auto: packageRequest.test.ts#builds the home tiles with SLA counts
+      - c: 1
+        type: Boundary
+        title: Amber at 80 % of the SLA
+        pre: A request enters FOR_MKT_APPROVAL (SLA 24 hours); the test waits 19 hours 12 minutes, or the stage entry time is moved in the test database.
+        steps:
+          - Open the home page after 80 % of the SLA and again before 100 %.
+        expected: The request is counted amber at 80 % and red after 24 hours.
+        auto: packageRequest.test.ts#classifies SLA and stage age
+      - c: 2
+        type: Report-output
+        title: Expiring in 30 days tile opens the filtered list
+        steps:
+          - Click the tile Expiring in 60 days; export the list.
+        expected: Package Expiry opens filtered to 60 days with PAR25; the export is an Excel file with the same rows.
+      - c: 3
+        type: Security-access
+        persona: MKT_AO
+        title: Counts follow the user's access
+        steps:
+          - Log in as ao and open Product Maintenance Home.
+        expected: The tiles show only the stages ao can see; no Versions for validation tile.
+        auto: ProductMaintenanceApiIT#listEndpointsRespondOk
+      - c: 3
+        type: Security-access
+        screen: API
+        title: A user without view permission cannot read the counts
+        steps:
+          - Call GET /api/v1/product-maintenance/counts with the token of a user without PRODUCT_VIEW and PKG_REPORT_VIEW.
+        expected: HTTP 403.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
+
+  FR-PM-071:
+    scenario: SC-PM-07
+    persona: TSU_HEAD
+    screen: REPORTS
+    data: [TD-PM-07, TD-PM-10]
+    conditions:
+      - The Package Status Update Report for one request number shows only that request.
+      - The three reports export to PDF, Excel, ODS and CSV with the same rows and can be saved as variants.
+      - A user without PKG_REPORT_VIEW cannot run the reports; parameters are validated.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Package Status Update Report for PKR-2026-900006
+        steps:
+          - Run PM-PKG-STATUS with Request No. pkr-2026-900006.
+        expected: One row for PKR-2026-900006 with type AMEND, stage RELEASED, version 2, rate, insurers and the last action; the parameters print in the header.
+        auto: ProductMaintenanceApiIT#theProductMaintenanceReportsRunAndExportInEveryFormat
+      - c: 2
+        type: Report-output
+        title: Export the three reports in every format
+        steps:
+          - Run PM-PKG-STATUS (all), PM-PKG-EXPIRY (within 400 days) and PM-VERSION-HISTORY (all); export each to PDF, XLSX, ODS and CSV.
+        expected: Each export opens and holds the same rows as the screen.
+        auto: ProductMaintenanceApiIT#theProductMaintenanceReportsRunAndExportInEveryFormat
+      - c: 2
+        type: Positive
+        title: Save a variant of the expiry report
+        steps:
+          - Set Ending Within 90; Save as variant "Next quarter"; reopen the report and load the variant.
+        expected: The variant restores the parameter; the run is logged with user, parameters and time.
+        auto: NbReportApiIT#aVariantIsSavedListedAndDeleted
+      - c: 3
+        type: Security-access
+        persona: MKT_AO
+        title: Marketing AO cannot run the package reports
+        steps:
+          - As ao open Reports; look for the three reports; call the run endpoint of PM-PKG-STATUS.
+        expected: The reports are not listed; the call returns HTTP 403.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
+      - c: 3
+        type: Negative
+        title: Days parameter not a whole number
+        steps:
+          - Run PM-PKG-EXPIRY with Ending Within "abc".
+        expected: The run does not start.
+        msg: ["{Ending Within (days)} has an invalid value 'abc'", INVALID_REPORT_PARAMETERS]
+        auto: ReportParametersTest
+
+  FR-PM-072:
+    scenario: SC-PM-07
+    persona: TSU_TL
+    screen: NOTIF
+    data: [TD-PM-12]
+    conditions:
+      - The owners of a stage are notified on entry, return, SLA breach, release, expiry and advisory, per their preferences.
+      - A release writes a product master feed log entry with product, version and effective date.
+    cases:
+      - c: 1
+        type: Positive
+        title: Notification on entry to FOR_TSU_REVIEW
+        steps:
+          - As mkttl approve a submitted request; as tsulead open the bell.
+        expected: One notification for the request; clicking it opens the request.
+        auto: MessagingIT#notificationsArePerUserAndCanBeMarkedRead
+      - c: 1
+        type: Positive
+        persona: TSU
+        screen: MESSAGES
+        title: E-mail copy when the preference is set
+        steps:
+          - As tsu set the preference for stage entry to in-app and e-mail (Operations > Notification Settings); trigger a stage entry for tsu.
+        expected: tsu receives the in-app notification and an e-mail; with in-app only, no e-mail is sent.
+        auto: OperationsFoundationApiIT#notificationPreferencesAreKeptPerUser
+      - c: 2
+        type: Positive
+        persona: SYSADMIN
+        screen: AUDIT
+        title: Release logged by the product master feed
+        steps:
+          - Release a version (TC-PM-043.2-01); open the application log or Integration Events for the feed entry.
+        expected: One entry with product, version and effective date; no external transport is called (PQ16).
+      - c: 1
+        type: Negative
+        persona: MKT_AO
+        title: A user who is not a stage owner is not notified
+        steps:
+          - As ao open the bell after the request of TC-PM-072.1-01 entered FOR_TSU_REVIEW.
+        expected: ao, who is not an owner of FOR_TSU_REVIEW, has no notification for that stage entry.
+        auto: WorkflowServiceIT#queuesShowOnlyTheStagesOfTheUsersTeamAndSupportClaimAndAssignment
+
+  FR-PM-073:
+    scenario: SC-PM-07
+    persona: TSU
+    screen: REQ
+    data: [TD-PM-05, TD-PM-02]
+    conditions:
+      - A request cannot move past a stage without its checks and approvals, even through the API.
+      - A request past its stage SLA raises an SLA alert to the stage owners.
+      - Only the transitions of the workflow are possible.
+    cases:
+      - c: 1
+        type: Negative
+        persona: MBS
+        screen: API
+        title: MBS set-up without the ManCom sign-off through the API
+        steps:
+          - As mbs call POST .../requests/{id}/setup on PKR-2026-900004 (FOR_MANCOM).
+        expected: Refused; the request stays in FOR_MANCOM.
+        msg: [MBS receives signed-off requirements only (BRPM.015), PKG_NOT_WITH_MBS]
+      - c: 1
+        type: Security-access
+        screen: API
+        title: A user without the stage permission cannot move the case
+        steps:
+          - As tsu call the workflow action approve on a request in FOR_MKT_APPROVAL.
+        expected: Refused.
+        msg: ["You are not allowed to 'Approve and send to TSU'", WORKFLOW_ACTION_NOT_PERMITTED]
+        auto: ProductMaintenanceFoundationIT#requestCaseMovesThroughTheApprovalChain
+      - c: 2
+        type: Positive
+        persona: SYSTEM
+        screen: NOTIF
+        title: SLA alert to the stage owners
+        steps:
+          - Leave PKR-2026-900002 in FOR_TSU_REVIEW beyond 24 hours; let the SLA check run; as tsulead open the bell.
+        expected: tsulead has an SLA alert for PKR-2026-900002; the request is red on the home page.
+        auto: PackageExpiryIT#theSlaParametersAreCopiedIntoTheWorkflowStages
+      - c: 3
+        type: Negative
+        screen: API
+        title: Action not allowed in the stage
+        steps:
+          - Call the workflow action terms_final on PKR-2026-900001 (DRAFT).
+        expected: Refused.
+        msg: ["'terms_final' is not allowed while PKR-2026-900001 is in stage {Draft request}", WORKFLOW_TRANSITION_NOT_ALLOWED]
+        auto: ProductMaintenanceFoundationIT#workflowIsSeededWithOwnersAndValidTransitions
+      - c: 2
+        type: Positive
+        persona: SYSADMIN
+        screen: PARAMS
+        title: A changed SLA parameter reaches the stage
+        steps:
+          - Set PKG_SLA_NEGOTIATION to 96; run the daily job; open a request in NEGOTIATION.
+        expected: The due time of the stage uses 96 hours.
+        auto: PackageExpiryIT#theSlaParametersAreCopiedIntoTheWorkflowStages
+
+  FR-PM-080:
+    scenario: SC-PM-08
+    persona: MBS
+    screen: INCENT
+    data: [TD-PM-09, TD-PM-11]
+    conditions:
+      - A criterion is active only after another user authorises it.
+      - A criterion on an inactive product, without products or value, with invalid rule parameters or an overlapping period cannot be saved.
+      - An amended active criterion stays active until its successor is authorised, with no gap; deactivation end-dates it.
+      - The history shows every earlier version of the criterion.
+    cases:
+      - c: 1
+        type: Workflow
+        title: New criterion authorised by badmin
+        steps:
+          - Click New Criterion; code UAT1, name "UAT campaign", type Sales campaign (seed), value basis Fixed amount, value 500, effective from today; products MTR12; save.
+          - As badmin authorise it in My Approvals.
+        expected: Saved as Pending authorisation; after authorisation Active.
+        auto: CatalogProductMaintenanceApiIT#coveragesClausesIncentivesAndExceptionsAreMaintainedOverHttp; IncentiveCriteriaIT#criteriaAreValidatedAuthorisedAmendedAndDeactivated
+      - c: 1
+        type: Negative
+        screen: APPROVALS
+        title: The maker cannot authorise the criterion
+        steps:
+          - As mbs open My Approvals.
+        expected: UAT1 is not offered to mbs; a direct authorise call is refused.
+        msg: [A record cannot be authorized by the user who maintained it, MAKER_CHECKER_VIOLATION]
+        auto: IncentiveCriteriaIT#criteriaAreValidatedAuthorisedAmendedAndDeactivated
+      - c: 2
+        type: Negative
+        title: Criterion without products
+        steps:
+          - New Criterion with every attribute but no product; save.
+        expected: Not saved.
+        msg: [Select at least one product of the products matrix, INCENTIVE_PRODUCTS_REQUIRED]
+        auto: IncentiveCriteriaIT#criteriaAreValidatedAuthorisedAmendedAndDeactivated
+      - c: 2
+        type: Negative
+        title: Criterion on a retired product
+        steps:
+          - New Criterion on product MTR32 (retired in TC-PM-045.1-01).
+        expected: Not saved.
+        msg: [Product MTR32 is not an active product of the matrix, INCENTIVE_PRODUCT_NOT_ACTIVE]
+      - c: 2
+        type: Negative
+        title: Rate criterion without value
+        steps:
+          - Value basis Rate, value empty; save.
+        expected: Not saved.
+        msg: [Enter the value of the incentive criterion, INCENTIVE_VALUE_REQUIRED]
+        auto: productMaintenanceForms.test.ts#requires products, a value and logical dates
+      - c: 2
+        type: Negative
+        title: Rule parameters not valid JSON
+        steps:
+          - Value basis Rule, rule parameters "{minimumPremium 5000"; save.
+        expected: Not saved.
+        msg: [The rule parameters must be valid JSON, INCENTIVE_RULE_PARAMS_INVALID]
+      - c: 2
+        type: Negative
+        title: Overlapping period for the same code
+        steps:
+          - New Criterion with code CPC2 effective from today.
+        expected: Not saved.
+        msg: [Criterion CPC2 already covers part of this period, INCENTIVE_PERIOD_OVERLAP]
+        auto: IncentiveCriteriaIT#criteriaAreValidatedAuthorisedAmendedAndDeactivated
+      - c: 3
+        type: Workflow
+        title: Amend CPC2 through a successor
+        steps:
+          - Open CPC2; click Amend; value 1.25, effective from next month; save.
+          - Check CPC2 before authorisation; authorise as badmin; check again.
+        expected: Before authorisation the old row stays Active; after authorisation the old row ends the day before the successor starts and the successor is Active.
+        auto: IncentiveCriteriaIT#criteriaAreValidatedAuthorisedAmendedAndDeactivated
+      - c: 3
+        type: Negative
+        title: Direct edit of an active criterion
+        steps:
+          - Call PUT /api/v1/catalog/incentive-criteria/{id} on the active CPC2.
+        expected: Refused.
+        msg: [An active criterion is changed by amending it (successor), INCENTIVE_ACTIVE_LOCKED]
+      - c: 3
+        type: Workflow
+        title: Deactivate a criterion
+        steps:
+          - Open UAT1; click Deactivate; confirm.
+        expected: UAT1 is Inactive with today as end date.
+        auto: CatalogProductMaintenanceApiIT#coveragesClausesIncentivesAndExceptionsAreMaintainedOverHttp
+      - c: 4
+        type: Positive
+        title: History of CPC2
+        steps:
+          - Open CPC2; History.
+        expected: Every version of CPC2 is listed with its values, dates, maker and authoriser, linked to its successor.
+        auto: CatalogProductMaintenanceApiIT#coveragesClausesIncentivesAndExceptionsAreMaintainedOverHttp
+
+  FR-PM-081:
+    scenario: SC-PM-08
+    persona: MBS
+    screen: BOOKING
+    data: [TD-PM-09, TD-PM-14]
+    conditions:
+      - An invoice on a product covered by CPC2 carries CPC2 and the incentive flag.
+      - Retiring or expiring the product raises INCENTIVE_PRODUCT_INACTIVE for its criteria without deleting them.
+      - The former booking incentive rules are read-only.
+    cases:
+      - c: 1
+        type: Positive
+        title: Booked invoice on MTR12 carries CPC2
+        steps:
+          - Book an invoice on MTR12 that meets CPC2 (premium above PHP 5,000).
+          - Open the booked invoice.
+        expected: The invoice shows criteria code CPC2 and the incentive flag.
+        auto: IncentiveCriteriaIT#bookingStampsTheMatchedCriteriaCodes
+      - c: 1
+        type: Negative
+        title: Invoice on a product outside CPC2 has no code
+        steps:
+          - Book an invoice on a non-package product.
+        expected: No criteria code and no incentive flag.
+        auto: IncentiveCriteriaIT#bookingStampsTheMatchedCriteriaCodes
+      - c: 2
+        type: Positive
+        screen: NOTIF
+        title: Retirement flags the criteria of the product
+        pre: A criterion active on MTR32 before its retirement.
+        steps:
+          - Retire MTR32 (TC-PM-045.1-01); as mbs open the bell and Incentive Criteria.
+        expected: Alert INCENTIVE_PRODUCT_INACTIVE names the criterion and MTR32; the criterion is still listed.
+        auto: IncentiveCriteriaIT#criteriaOfAPackageThatIsNoLongerSoldAreFlagged
+      - c: 3
+        type: Negative
+        persona: BUSINESS_ADMIN
+        screen: BOOKING
+        title: Former booking incentive rule cannot be changed
+        steps:
+          - Open Booking > Booking Setup, incentive rules; try to edit a rule.
+        expected: Refused.
+        msg: [Incentive rules are maintained in Product Maintenance > Incentive Criteria, INCENTIVE_RULES_FROZEN]
+        auto: IncentiveCriteriaIT#bookingStampsTheMatchedCriteriaCodes
+
+access:
+  - action: Create and submit a package request
+    screen: NEWREQ
+    permission: PKG_REQUEST
+    allow: [MKT_AO, MKT_TL, TSU]
+    deny: [MBS, MANCOM, AUDITOR]
+    allowed: New Package Request is shown; the draft is saved and submitted.
+    denied: New Package Request is not shown; POST /requests returns HTTP 403 (ACCESS_DENIED).
+    auto: ProductMaintenanceApiIT#permissionsAreEnforced
+  - action: Approve a package request (Marketing)
+    screen: REQ
+    permission: PKG_REQUEST_APPROVE
+    allow: [MKT_TL]
+    deny: [MKT_AO, TSU, TSU_HEAD]
+    denied: Approve and send to TSU is not shown; the API call returns HTTP 403.
+    auto: ProductMaintenanceApiIT#aRequestIsCreatedAndSubmittedOverHttp
+  - action: Recommend a request (TSU TL)
+    screen: TSUWB
+    permission: PKG_TSU_RECOMMEND
+    allow: [TSU_TL]
+    deny: [TSU, TSU_HEAD, MKT_TL]
+    denied: Recommend for approval is not shown; the API call returns HTTP 403.
+  - action: Approve a request (TSU Head)
+    screen: TSUWB
+    permission: PKG_TSU_APPROVE
+    allow: [TSU_HEAD]
+    deny: [TSU, TSU_TL, MKT_TL]
+    denied: Approve for negotiation is not shown; the API call returns HTTP 403.
+  - action: Prepare quotation slips and key in responses
+    screen: NEG
+    permission: PKG_NEGOTIATE
+    allow: [TSU, TSU_TL]
+    deny: [MKT_AO, MKT_TL, MBS]
+    denied: The Negotiation tab is read only; round and response calls return HTTP 403.
+  - action: Approve a quotation slip
+    screen: NEG
+    permission: PKG_QS_APPROVE
+    allow: [TSU_TL]
+    deny: [TSU, TSU_HEAD]
+    denied: Approve and send is not shown; the API call returns HTTP 403.
+    auto: ProductMaintenanceApiIT#aRequestIsCreatedAndSubmittedOverHttp
+  - action: ManCom sign-off
+    screen: REQM
+    permission: PKG_MANCOM_SIGNOFF
+    allow: [MANCOM]
+    deny: [TSU, TSU_HEAD, MBS]
+    denied: Sign off and send to MBS is not shown; POST /signoff returns HTTP 403.
+    auto: ProductMaintenanceApiIT#permissionsAreEnforced
+  - action: Set up or retire a package (MBS)
+    screen: SETUP
+    permission: PRODUCT_MAINTAIN
+    allow: [MBS]
+    deny: [TSU, TSU_HEAD, BUSINESS_ADMIN]
+    denied: Set up package version is not shown; POST /setup returns HTTP 403.
+    auto: ProductMaintenanceApiIT#permissionsAreEnforced
+  - action: Validate and release a package version
+    screen: VALQ
+    permission: PRODUCT_VALIDATE
+    allow: [TSU_HEAD, BUSINESS_ADMIN]
+    deny: [MBS, MKT_AO, TSU]
+    denied: Validation Queue is not in the menu; POST /validate returns HTTP 403.
+    auto: CatalogProductMaintenanceApiIT#permissionsFollowTheActionMatrix
+  - action: Send a package advisory
+    screen: ADV
+    permission: PKG_ADVISORY
+    allow: [TSU, TSU_TL]
+    deny: [MKT_AO, MBS]
+    denied: Send is not shown; POST /advisories/{aid}/send returns HTTP 403.
+    auto: ProductMaintenanceApiIT#permissionsAreEnforced
+  - action: Open Package Expiry and generate renewal requests
+    screen: EXPIRY
+    permission: PKG_NEGOTIATE, PRODUCT_MAINTAIN or PKG_REPORT_VIEW
+    allow: [TSU, MBS, TSU_HEAD]
+    deny: [MKT_AO]
+    denied: Package Expiry is not in the menu; GET /expiry returns HTTP 403.
+    auto: ProductMaintenanceApiIT#permissionsAreEnforced
+  - action: View expired and retired packages
+    screen: PRODUCTS
+    permission: PRODUCT_ARCHIVE_VIEW
+    allow: [MBS, TSU_HEAD, BUSINESS_ADMIN, AUDITOR]
+    deny: [MKT_AO, TSU]
+    denied: The Expired and Retired filters are not shown; ?lifecycle=EXPIRED returns HTTP 403.
+    auto: CatalogProductMaintenanceApiIT#permissionsFollowTheActionMatrix
+  - action: Maintain coverages, clauses and field rules
+    screen: COVCL
+    permission: PRODUCT_MAINTAIN
+    allow: [MBS]
+    deny: [MKT_AO, TSU_HEAD]
+    denied: New buttons are not shown; POST /catalog/coverages returns HTTP 403.
+    auto: CatalogProductMaintenanceApiIT#permissionsFollowTheActionMatrix
+  - action: Authorise product masters, criteria and rate exceptions
+    screen: APPROVALS
+    permission: PRODUCT_AUTHORIZE
+    allow: [BUSINESS_ADMIN, NB_APPROVER]
+    deny: [MBS, TSU_HEAD]
+    denied: The records are not offered in My Approvals; the authorise call returns HTTP 403.
+  - action: Maintain incentive criteria
+    screen: INCENT
+    permission: INCENTIVE_CRITERIA_MAINTAIN
+    allow: [MBS]
+    deny: [MKT_AO, TSU]
+    denied: New Criterion is not shown; the screen is read only.
+  - action: Run the package reports
+    screen: REPORTS
+    permission: PKG_REPORT_VIEW
+    allow: [MKT_TL, TSU_HEAD, MBS, AUDITOR]
+    deny: [MKT_AO, TSU]
+    denied: The three reports are not listed; the run call returns HTTP 403.
+
+findings:
+  - fr: FR-PM-002
+    issue: The FRS gives the no-access text as "You do not have access to this page". The built screen shows "You do not have access to this screen. Contact your administrator if you need it." (frontend/src/auth/RequireAuth.tsx).
+    proposal: Change the FRS text to the built wording in v1.1; the cases use the built wording.
+  - fr: FR-PM-034
+    issue: 'The FRS validation "Compile with no response - There are no responses to compare" has no code and no such message in BIBS. The build refuses the compilation before the QS of the round is sent with COMPARATIVE_NO_TERMS ("Send the quotation slip of round n first"); a sent round with only Pending responses compiles a master of Pending rows.'
+    proposal: State in the FRS which case is refused (QS not sent) and whether a master of Pending rows is acceptable; the cases test COMPARATIVE_NO_TERMS.
+  - fr: FR-PM-035
+    issue: 'The FRS asks for "Select at least one field and one insurer". The build checks the insurer (COMPARATIVE_NO_INSURER) and the title; an empty field selection is not refused with its own message.'
+    proposal: Confirm whether an empty field list is refused; if so add the check and its message to the FRS; until then only the insurer and title checks are tested.
+  - fr: FR-PM-071
+    issue: 'The message "Enter a whole number of days" in the FRS has no match in the code; the report engine validates parameter types with its own messages (ReportParametersTest).'
+    proposal: Quote the report engine's parameter message in the FRS; TC-PM-071.3-02 records the actual text at first run.
+  - fr: FR-PM-073
+    issue: 'The FRS gives "The action <action> is not allowed in stage <stage>" without a code. The build returns WORKFLOW_TRANSITION_NOT_ALLOWED with "''<action>'' is not allowed while <reference> is in stage <stage name>".'
+    proposal: Add the code and the built wording to the FRS.
+  - fr: FR-PM-012
+    issue: 'Acceptance criterion 3 ("The field list per line is set up by MBS as each package is set up (content Q02)") depends on BDOI content that is not yet given, so it cannot be tested as written. The unsafe-pattern message "The pattern is not a valid expression" differs from the build ("The risk-code pattern is not a valid regular expression", CODE_PATTERN_INVALID, for line patterns).'
+    proposal: Replace criterion 3 with a testable statement (MBS adds a field rule for a line without IT) and align the pattern message with the build.
+  - fr: FR-PM-001
+    issue: 'The FRS messages "Invalid user ID or password" and "Your account is locked. Contact the System Administrator" differ from the build ("Invalid user name or password", "Account is locked. Contact your administrator.", code AUTHENTICATION_FAILED). The threshold is given only as "configured"; the build reads LOGIN_MAX_FAILED_ATTEMPTS (3 as delivered). The log-in endpoint also rate-limits (LOGIN_RATE_LIMITED, HTTP 429), which the FRS does not mention.'
+    proposal: Quote the built messages and code, name the parameter and its value, and add the rate limit to FR-PM-001.
+  - fr: FR-PM-021
+    issue: Button labels in the FRS are in title case ("Approve and Send to TSU", "Sign Off and Send to MBS"); the screens use the workflow labels in sentence case ("Approve and send to TSU", "Sign off and send to MBS").
+    proposal: Use the screen labels in FRS v1.1 so testers and users read the same words.

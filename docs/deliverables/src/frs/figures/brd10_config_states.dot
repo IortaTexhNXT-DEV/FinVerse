@@ -1,0 +1,32 @@
+// BRD-10: maker-checker states of configuration versions (left) and watchlist changes (right). FRS section 5.3; SNSRP-101-109, 203, 204.
+digraph sc_config {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.5, ranksep=0.45, bgcolor="white", pad=0.2];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=11, fontcolor="@NEAR_BLACK", width=2.0, height=0.5];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=9, fontcolor="@TEXT"];
+
+  subgraph cluster_cfg {
+    label="Configuration version"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=11;
+    style=rounded; color="@HEADER_BLUE";
+    C_DRAFT      [label="DRAFT\n(editable by maker)"];
+    C_PENDING    [label="PENDING\n(in My Approvals)"];
+    C_ACTIVE     [label="ACTIVE\n(from effective date)", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    C_REJECTED   [label="REJECTED\n(reason kept)", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+    C_SUPERSEDED [label="SUPERSEDED\n(read-only)", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+    C_DRAFT -> C_PENDING [label="submit (CO)"];
+    C_PENDING -> C_ACTIVE [label="approve\n(Checker, not maker)"];
+    C_PENDING -> C_REJECTED [label="reject (reason)", style=dashed];
+    C_ACTIVE -> C_SUPERSEDED [label="next version\neffective"];
+  }
+  subgraph cluster_list {
+    label="Watchlist change"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=11;
+    style=rounded; color="@HEADER_BLUE";
+    W_PENDING  [label="PENDING\n(entry unchanged)"];
+    W_APPROVED [label="APPROVED\n(entry ACTIVE / INACTIVE)", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    W_REJECTED [label="REJECTED\n(remarks logged)", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+    W_DELTA    [label="Delta screening\nof the entry", fillcolor="@WHITE", color="@MUTED"];
+    W_PENDING -> W_APPROVED [label="approve (Checker)"];
+    W_PENDING -> W_REJECTED [label="reject (remarks)", style=dashed];
+    W_APPROVED -> W_DELTA [label="triggers", style=dashed];
+  }
+}

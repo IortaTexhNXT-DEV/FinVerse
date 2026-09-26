@@ -1,0 +1,34 @@
+# Voluntary disruptions (node drains, cluster upgrades) keep the user-facing workloads serving.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: bibs-web
+spec:
+  minAvailable: 1
+  selector: { matchLabels: { app.kubernetes.io/name: bibs-web } }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: bibs-frontend
+spec:
+  minAvailable: 1
+  selector: { matchLabels: { app.kubernetes.io/name: bibs-frontend } }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: bibs-integration
+spec:
+  minAvailable: 1
+  selector: { matchLabels: { app.kubernetes.io/name: bibs-integration } }
+---
+# One jobs pod may always be evicted (a single replica must not block a drain); a job interrupted
+# by the eviction runs again on its next schedule or from the job monitor.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: bibs-jobs
+spec:
+  maxUnavailable: 1
+  selector: { matchLabels: { app.kubernetes.io/name: bibs-jobs } }

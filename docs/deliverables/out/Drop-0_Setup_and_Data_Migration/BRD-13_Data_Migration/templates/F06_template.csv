@@ -1,0 +1,1 @@
+record_type,reference,warehouse_no,check_no,bank_code,check_branch,check_date,currency,amount,legacy_client_no,payor_name,legacy_invoice_no,status,remarks

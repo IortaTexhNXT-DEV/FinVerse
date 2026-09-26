@@ -1,0 +1,238 @@
+# Screen specifications of BRD-1 New Business: booking, endorsements, cancellation and service invoices.
+area: Booking
+screens:
+  - id: SCR-NB-28
+    title: Booking Workbench
+    route: /booking
+    purpose: >-
+      Books issued accounts one by one or in batches: accounts ready to book, the queue of the end-of-day batch, the
+      accounts booked and the failures. Accounts sent from the Placement Workbench arrive selected.
+    entry:
+      - Placement Workbench › For Booking (the accounts are handed over and selected)
+      - Account record › Placement and booking
+    shots:
+      - {state: list, user: proc, caption: "Booking Workbench, Ready to Book tab"}
+      - {state: queued, user: proc, tab: "Queued for Batch", caption: "Queued for Batch tab with Confirm Batch and Cancel Batch"}
+      - {state: booknow, user: proc, select: first_ready, click: "^book now$", caption: "Book Now dialog"}
+    fields:
+      - "Tiles | Ready to Book / Queued for Batch / Booked Today / Failed | Tile | Counts; Failed is an alert | - | Booking queue | - | - | A tile opens its tab | -"
+      - "Tabs | Ready to Book / Queued for Batch / Booked Account / Failed | Tab | - | - | Fixed | Ready to Book | - | - | -"
+      - "Handed-over banner | [Accounts sent from placement] | Banner | The ARNs sent by the Placement Workbench | - | Placement Workbench | - | - | - | <n> account(s) sent from placement for booking: <ARNs>. They are selected on this page when listed."
+      - "Search | Search Proposal No. | Text | ARN or client | N | - | Blank | - | Contains search | -"
+      - "Filters | Product line | Drop-down | All product lines, or one | N | Product lines (BRD-3) | All product lines | - | - | -"
+      - "List | Select | Check box | - | N | - | Not ticked (handed-over accounts ticked) | - | - | -"
+      - "List | Name / Client Code, Proposal No. (ARN), Invoice No., Status, Product Line, Department, Booking Date | Column | - | - | Accounts, booking queue | - | Read only | - | -"
+      - "Book Now / Confirm Batch dialog | Booking date | Date | dd-MMM-yyyy, not in the future | Y | - | Today | - | Its accounting period must be open; not in the future | The booking date <date> is in the future"
+      - "Edit queued dialog | Booking date | Date | dd-MMM-yyyy; blank = the batch date | N | - | Blank | Queued | Not in the future | The booking date <date> is in the future"
+      - "Edit queued dialog | Cost center | Text | Blank = the account's cost center | N | Sales organisation cost centers | Blank | Queued | - | -"
+    actions:
+      - "Batch Runs | Every user of the screen | Always | Opens Batch Runs | - | -"
+      - "Upload Bookings | BOOKING_PROCESS and BULK_PROCESS | Always | Opens the Upload Bookings upload | - | -"
+      - "Add All to Batch | BOOKING_PROCESS | Accounts handed over from placement | Queues the handed-over accounts | Unchanged (queued) | -"
+      - "Add to Batch | BOOKING_PROCESS | Ready to Book or Failed, rows selected | Queues the accounts for the end-of-day batch | Unchanged (queued) | -"
+      - "Book Now | BOOKING_PROCESS | Rows selected (not on Booked Account) | Asks for the booking date and books each account on its own; the run is listed in Batch Runs | Booked | Service invoice e-mails per the service invoice types"
+      - "Confirm Batch | BOOKING_PROCESS | Queued for Batch, rows selected | Asks for the booking date and books the selected queued accounts; accounts with their own date keep it | Booked | As Book Now"
+      - "Cancel Batch | BOOKING_PROCESS | Queued for Batch | Asks for confirmation and removes every queued account from the batch | Unchanged (back to Ready to Book) | -"
+      - "Edit / Remove (row) | BOOKING_PROCESS | Queued for Batch | Changes the booking date and cost center of a queued account, or removes it from the queue | Unchanged | -"
+      - "Open a row | Every user of the screen | Always | Opens the Pre-booking Confirmation (ready) or the booked invoice (booked) | - | -"
+    rules:
+      - "An account is booked once only; a second booking is refused (FR-NB-112)."
+      - "The BOOKING_BATCH job books the queue every day at 20:00 PHT and the later policy years of multi-year accounts when they start (FR-NB-111, FR-NB-114)."
+      - "Accounts matching an enabled auto-book rule are queued automatically when their policy is issued (FR-NB-112)."
+      - "Each account of a batch is booked on its own: one failure does not stop the others; failures are listed with their reason (FR-NB-111)."
+    outcome: The issued accounts are booked with their invoice, GL entry and service invoice.
+    frs: [FR-NB-110, FR-NB-111, FR-NB-112, FR-NB-114]
+    tests: [BOOKWB]
+
+  - id: SCR-NB-29
+    title: Pre-booking Confirmation
+    route: /booking/book/:arn
+    parent: /booking
+    purpose: >-
+      The invoice an account will be booked with before anything is posted: premium components, commission,
+      withholding tax, flags, the policy years of a multi-year account, and the journal the accounting rules will post.
+    entry:
+      - Booking Workbench › open a Ready to Book row
+    shots:
+      - {state: record, user: proc, open_booking: first_ready, caption: "Pre-booking Confirmation with the invoice and the journal preview"}
+    fields:
+      - "Summary | Proposal No. (ARN), Client, Insurer, Period, Product, Status | Display | - | - | Account | - | Read only | - | -"
+      - "Booking options | Booking date | Date | dd-MMM-yyyy, not in the future | Y | - | Today | Policy issued | Its accounting period must be open | Enter a booking date that is not in the future"
+      - "Booking options | Cost center | Text | Up to 20 characters, upper case; blank = the account's cost center | Cond.: when the account has none | Sales organisation | Blank | Policy issued | A cost center is needed for every booking | Enter the cost center of account <ARN> (BRNB.108)"
+      - "Booking options | Insurer billing no. | Text | Up to 60 characters | Cond.: Employee Benefits lines (HMO, GLI, GPA) | - | Blank | Policy issued | Unique per insurer | Enter the insurer billing number / Billing number <no> of <insurer> is already on invoice <invoice>"
+      - "Booking options | Client withholds 2% creditable tax (CWT) | Check box | - | N | - | Not ticked | Policy issued | - | -"
+      - "Invoice | Cost center, flags (Direct payment, CWT 2%, Incentive eligible, New Business / Renewal) | Display | - | - | Booking rules, incentive criteria (BRD-3) | Computed | Read only | - | -"
+      - "Invoice | Premium | Table | Basic premium, documentary stamp tax, premium tax / VAT, local government tax, fire service tax, other charges, gross premium | - | Premium computation | Computed | Read only | - | -"
+      - "Invoice | Commission | Table | Commission (rate), VAT on commission, withholding tax (BOOKING_WTAX_RATE), net commission | - | Commission rates, parameters | Computed | Read only | - | -"
+      - "Invoice | Policy years | Table | Policy Year, Policy No., Period, Gross Premium, Booked Now or Scheduled (multi-year only) | - | Account | Computed | Read only | - | -"
+      - "Journal preview | Journal | Table | Insurer, account, party, debit, credit | - | Accounting rules (BRD-5) | Computed | Read only | - | -"
+    actions:
+      - "Update Preview | BOOKING_PROCESS | An option changed | Recomputes the invoice and journal with the options | - | -"
+      - "Book Account | BOOKING_PROCESS | Preview shown and not changed since | Books the account: invoice, GL entry and service invoices in one step | Booked | Service invoice e-mails; booked invoice handed to Operations (BRD-2)"
+      - "Cancel | Every user of the screen | Always | Returns to the workbench without booking | - | -"
+    rules:
+      - "Nothing is posted until Book Account (FR-NB-110)."
+      - "Every booking carries its cost center and business type (New Business or Renewal) (FR-NB-119)."
+      - "The incentive eligibility flag comes from the incentive criteria of Product Maintenance (FR-NB-118)."
+      - "A multi-year account books year 1 now and schedules the later years (FR-NB-114)."
+    outcome: The account is booked; its invoice is available to Operations, Collections and Accounting.
+    frs: [FR-NB-110, FR-NB-113, FR-NB-114, FR-NB-117, FR-NB-118, FR-NB-119]
+    tests: [PREBOOK]
+
+  - id: SCR-NB-30
+    title: Booked Invoice
+    route: /booking/invoices/:id
+    parent: /booking
+    also: [/booking/invoices/no/:invoiceNo]
+    purpose: >-
+      One booked invoice with its references (invoice, ARN, endorsement, root invoice) and tabs for premium and
+      commission, journal, open items, service invoices, endorsements and the invoices of the account. Endorsements and
+      the cancellation of the booking start here.
+    entry:
+      - Booking Workbench › Booked Account › open a row
+      - Endorsements, Service Invoices and Batch Runs › invoice number
+    shots:
+      - {state: record, user: proc, open_invoice: first, caption: "Booked Invoice, Premium & Commission tab"}
+      - {state: cancel, user: adjust, open_invoice: first, click: "^cancel booking$", caption: "Cancel Booking dialog"}
+    fields:
+      - "Header | Invoice, ARN, Endorsement, Root Invoice | Reference | - | - | Booking | - | Read only | - | -"
+      - "Summary | Client, Insurer(s), Period, Booked, Gross premium, Cost center, Insurer billing no. | Display | - | - | Booking | - | Read only | - | -"
+      - "Tabs | Premium & Commission / Journal / Open Items / Service Invoices / Endorsements / Invoices of the Account | Tab | - | - | Fixed | Premium & Commission | - | - | -"
+      - "Open Items tab | Item, Party, Direction, Document, Due, Amount, Outstanding, Status | Column | Receivable from the client, payable to the insurer, commission | - | Sub-ledgers (BRD-5) | - | Read only | - | -"
+      - "Service Invoices tab | Service Invoice No., Kind, Type, Recipient, Invoice No., Issue Date, Net, E-mail | Column | - | - | Service invoices | - | Read only | - | -"
+      - "Endorsements tab | Endorsement No., ARN, Type, Effective, Description, Invoice No., By | Column | Invoice No. or Not financial | - | Endorsements | - | Read only | - | -"
+      - "Invoices of the Account tab | Invoice No., Kind, Policy Year, Policy No., Period, Gross, Status | Column | Not yet numbered for scheduled years | - | Booking | - | Read only | - | -"
+      - "Cancel Booking dialog | Cancellation | Drop-down | Flat (from inception); Flat, retaining DST; Partial (unexpired term) | Y | Fixed list | Flat | Booked | - | -"
+      - "Cancel Booking dialog | Return basis | Drop-down | Pro-rata (days); Short period (table) | Y for a partial cancellation | Fixed list | Pro-rata | Booked | A short-period rate must exist for the months | No short-period rate is set up for <n> month(s)"
+      - "Cancel Booking dialog | Cancellation date | Date | dd-MMM-yyyy, within a booked policy year | Y | - | Blank | Booked | Within a booked policy year | Enter the cancellation date / The effective date <date> is not within a booked policy year of <ARN>"
+      - "Cancel Booking dialog | Reason | Drop-down | - | Y | List of values CANCELLATION_REASON | Blank | Booked | - | Choose the reason"
+      - "Cancel Booking dialog | Description | Text area | - | Y | - | Blank | Booked | Not blank | Describe the cancellation"
+    actions:
+      - "New Endorsement | BOOKING_PROCESS or BOOKING_ADJUST | Invoice booked and not a cancellation | Opens New Endorsement for the ARN | - | -"
+      - "Cancel Booking | BOOKING_ADJUST | Invoice booked and not a cancellation | Opens the dialog with the return premium preview; posts the cancellation invoice and its journal | Cancelled | Workflow notice; the cancellation is handed to Operations"
+    rules:
+      - "A cancellation returns premium; the return cannot exceed the premium in force of the policy year (FR-NB-116)."
+      - "Cancellation and negative endorsements are posted by the Adjustment role only (FR-NB-115, FR-NB-116)."
+    outcome: The booking, its endorsements and cancellation are visible with their GL effect.
+    frs: [FR-NB-110, FR-NB-115, FR-NB-116, FR-NB-117]
+    tests: [INVOICE]
+
+  - id: SCR-NB-31
+    title: Endorsements and New Endorsement
+    route: /booking/endorsements
+    also: [/booking/endorsements/new]
+    purpose: >-
+      The list of positive, negative and non-financial endorsements and cancellations of booked accounts, and the entry
+      of a new endorsement rated for the remaining term, with the invoice and journal previews as the user types.
+    entry:
+      - Booked Invoice › New Endorsement (the ARN is carried over)
+    shots:
+      - {state: list, user: adjust, caption: "Endorsements list"}
+      - {state: new, user: adjust, open_endorsement: booked_account, caption: "New Endorsement with the invoice and journal preview"}
+    fields:
+      - "List | Endorsement No., ARN, Type, Effective, Description, Invoice No., By | Column | - | - | Endorsements | - | Read only | - | -"
+      - "New Endorsement | Type | Drop-down | Positive (additional premium) for BOOKING_PROCESS; Negative (return premium) for BOOKING_ADJUST; Non-financial | Y | Fixed list by permission | The first type the user may post | Booked account | The sign of the premium change follows the type | A positive endorsement must add premium / A negative endorsement or cancellation must return premium"
+      - "New Endorsement | Effective date | Date | dd-MMM-yyyy, within a booked policy year | Y | - | Blank | Booked account | Within a booked policy year | Enter the effective date"
+      - "New Endorsement | Booking date | Date | dd-MMM-yyyy, not in the future; blank = today | N | - | Today | Booked account | Its accounting period must be open | -"
+      - "New Endorsement | Premium basis | Drop-down | Pro-rata (days); Short period (table) | Y (financial) | Fixed list | Pro-rata | Booked account | - | -"
+      - "New Endorsement | Sum insured change | Amount | Negative for a reduction | Y (financial) | - | Blank | Booked account | Not zero; positive for Positive, negative for Negative | Enter the change of the sum insured / A positive endorsement increases the sum insured / A negative endorsement reduces the sum insured (enter a minus)"
+      - "New Endorsement | Premium rate (%) | Number | 4 decimals; blank = product rate | N | Product rate | Blank | Booked account | Zero or more | Enter a rate of zero or more, or leave it blank"
+      - "New Endorsement | Description | Text area | - | Y | - | Blank | Booked account | Not blank | Describe the change"
+      - "New Endorsement | Invoice preview, Journal preview | Display | Premium, commission and journal of the policy year | - | Premium computation, accounting rules | Computed | Read only | The return cannot exceed the premium in force | The return premium exceeds the premium in force of policy year <n>"
+    actions:
+      - "Post Endorsement | BOOKING_PROCESS (positive, non-financial) or BOOKING_ADJUST (negative, non-financial) | Form valid and an ARN given | Posts the endorsement; a financial one is booked as an endorsement invoice with its journal | Unchanged (account stays booked) | Handed to Operations (financial endorsements)"
+    rules:
+      - "Endorsements are invoices on a booked account; the account's status does not change (FR-NB-115)."
+      - "Premium is rated for the remaining term of the policy year on the chosen basis (FR-NB-115)."
+    outcome: The endorsement is booked with its premium and GL effect, or recorded as non-financial.
+    frs: [FR-NB-115]
+    tests: [ENDTS, NEWENDT]
+
+  - id: SCR-NB-32
+    title: Service Invoices
+    route: /booking/service-invoices
+    also: [/booking/service-invoices/:id]
+    purpose: >-
+      Commission invoices to insurers and internal service invoices with their credits and e-mail dispatch; one service
+      invoice opens with its lines, e-mails, resend and credit.
+    entry:
+      - Booked Invoice › Service Invoices tab
+    shots:
+      - {state: list, user: proc, caption: "Service Invoices"}
+      - {state: record, user: proc, open: first, caption: "Service invoice record"}
+    fields:
+      - "Tabs | All / Service Invoices / Credits | Tab | - | - | Fixed | All | - | - | -"
+      - "Search | Search Service Invoice No., invoice, ARN or recipient | Text | - | N | - | Blank | - | Contains search | -"
+      - "List | Service Invoice No., Issue Date, Kind, Type, Booked Invoice, ARN, Recipient, Net, Dispatch | Column | - | - | Service invoices | - | Read only | - | -"
+      - "Record | Service invoice, Invoice, ARN | Reference | - | - | Service invoice | - | Read only | - | -"
+      - "Record | Recipient, Billing e-mail, Issue date, Template, Owner, Credit of | Display | - | - | Service invoice types, insurer master | - | Read only | - | -"
+      - "Record | Lines | Display | Brokerage commission, VAT on commission, less withholding tax, net amount | - | Booking | - | Read only | - | -"
+      - "Record | [E-mail dispatch problem] | Banner | Shown when the e-mail failed | - | Outbound messages | - | Read only | - | E-mail: <reason>"
+      - "Credit dialog | Commission to credit / VAT to credit | Amount | Blank = all still open | N | - | Blank | Issued service invoice (not a credit) | Not more than open | Service invoice <no> has <commission> commission and <VAT> VAT left to credit"
+      - "Credit dialog | Reason | Text | - | Y | - | Blank | Issued service invoice | - | -"
+    actions:
+      - "Open a row | Every user of the screen | Always | Opens the service invoice | - | -"
+      - "Download PDF | Every user of the screen | Always | Downloads the service invoice; a Word copy is offered after the download | - | -"
+      - "Send via Email | Every user of the screen | Always | Sends the service invoice e-mail again to the billing e-mail | Unchanged | E-mail to the recipient"
+      - "Credit | BOOKING_ADJUST | Service invoice not a credit, amount left | Issues a credit note for the amounts | Unchanged (credit issued) | E-mail to the insurer"
+    rules:
+      - "Service invoices are issued automatically at booking by the active service invoice types; the owner team is notified of the dispatch (FR-NB-117)."
+      - "Service invoices of the early remittance incentive type are issued automatically only (FR-NB-117)."
+    outcome: Insurers receive their commission service invoices; credits are traceable to the original.
+    frs: [FR-NB-117]
+    tests: [SINV]
+
+  - id: SCR-NB-33
+    title: Batch Runs
+    route: /booking/batch-runs
+    also: [/booking/batch-runs/:runNo]
+    purpose: The booking batches with their per-account results; a batch can partly succeed.
+    entry:
+      - Booking Workbench › Batch Runs
+    shots:
+      - {state: list, user: proc, caption: "Batch Runs"}
+    fields:
+      - "List | Run No., Started by, Business Date, Started, Booked, Failed, Status | Column | - | - | Batch runs | - | Read only | - | -"
+      - "Run | Accounts, Booked, Failed, Finished | Figure | - | - | Batch run | - | Read only | - | -"
+      - "Run | Results | Table | Proposal No. (ARN), Result, Invoice No., Reason | - | Batch run | - | Read only | - | -"
+    actions:
+      - "Open a row | Every user of the screen | Always | Opens the run with its results | - | -"
+    rules:
+      - "Scheduled, manual and upload runs are all listed (FR-NB-111)."
+    outcome: Processing sees what each batch booked and why an account failed.
+    frs: [FR-NB-111]
+    tests: [BATCH]
+
+  - id: SCR-NB-34
+    title: Booking Setup
+    route: /booking/setup
+    purpose: >-
+      Which accounts are booked automatically (auto-book rules), which bookings are incentive eligible (incentive rules,
+      read only), and which service invoices are issued (service invoice types).
+    entry:
+      - Placement & Booking › Booking › Booking Setup
+    shots:
+      - {state: list, user: proc, caption: "Booking Setup, Auto-book Rules tab"}
+    fields:
+      - "Tabs | Auto-book Rules / Incentive Rules / Service Invoice Types | Tab | - | - | Fixed | Auto-book Rules | - | - | -"
+      - "Auto-book Rules | Product, Market Segment, Description, Status | Column | Any when blank | - | Auto-book rules | - | Read only | - | -"
+      - "Auto-book rule dialog | Product / Market segment | Drop-down | Blank = every product / segment | N | Products, MARKET_SEGMENT | Blank | Always | - | -"
+      - "Auto-book rule dialog | Description | Text | - | Y | - | Blank | Always | Not blank | Describe the rule"
+      - "Auto-book rule dialog | Enabled | Check box | - | N | - | Ticked | Always | - | -"
+      - "Incentive Rules | Product, Segment, Channel, Booked, Description, Status | Column | Read only; the criteria are maintained in Product Maintenance › Incentive Criteria | - | Frozen booking incentive rules | - | Read only | Changes are refused | Incentive rules are maintained in Product Maintenance > Incentive Criteria"
+      - "Service Invoice Types | Code, Name, Recipient, Trigger, Owner, Template, Status | Column | - | - | Service invoice types | - | Read only | - | -"
+      - "Service invoice type dialog | Code | Text | 2-40 capitals, digits or _ | Y | - | Blank | New type | Format and unique | Use 2-40 capitals, digits or _ / Service invoice type already exists: <code>"
+      - "Service invoice type dialog | Name | Text | - | Y | - | Blank | Always | Not blank | Name the type"
+      - "Service invoice type dialog | Recipient | Drop-down | Insurer (e-mailed), Internal | Y | Fixed list | Insurer | Always | - | -"
+      - "Service invoice type dialog | Trigger | Drop-down | On booking, On endorsement, Manual, On early incentive (remittance) | Y | Fixed list | On booking | Always | - | -"
+      - "Service invoice type dialog | Owner team (permission), Owner user | Text | Its holders are notified of the dispatch | N | Permissions, users | Blank | Always | - | -"
+      - "Service invoice type dialog | Document template | Drop-down | - | Y | Document templates | Blank | Always | Chosen | Choose the template"
+      - "Service invoice type dialog | Active | Check box | - | N | - | Ticked | Always | - | -"
+    actions:
+      - "New Rule / New Type, open a row | MASTER_MAINTAIN (auto-book rules and types) | Always | Opens the dialog; Save stores the rule or type (audited) | - | -"
+    rules:
+      - "Auto-book rules queue matching accounts for the batch when their policy is issued (FR-NB-112)."
+      - "Incentive eligibility is decided by the incentive criteria of Product Maintenance (BRD-3); the booking incentive rules are kept for reference (FR-NB-118)."
+    outcome: The Business Administrator controls automatic booking and service invoicing without a release.
+    frs: [FR-NB-112, FR-NB-117, FR-NB-118]
+    tests: [BOOKSETUP]

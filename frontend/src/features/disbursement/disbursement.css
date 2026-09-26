@@ -1,0 +1,108 @@
+/* Disbursement screens (BRD-5). Colours and spacing come from the design tokens. */
+
+.dsb-muted {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.dsb-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-3);
+  align-items: end;
+}
+
+.dsb-form-wide {
+  grid-column: 1 / -1;
+}
+
+.dsb-lines input,
+.dsb-lines select {
+  width: 100%;
+  min-width: 90px;
+}
+
+.dsb-balance {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--brand-blue-050);
+}
+
+.dsb-balance strong {
+  color: var(--color-heading);
+}
+
+.dsb-missing {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--brand-gold);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.dsb-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dsb-timeline li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border-left: 4px solid var(--brand-blue);
+  background: var(--color-surface);
+}
+
+.dsb-outputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.dsb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.dsb-intro {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+}
+
+.dsb-reports {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dsb-reports li {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.dsb-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}

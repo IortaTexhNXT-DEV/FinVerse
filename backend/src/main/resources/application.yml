@@ -1,0 +1,450 @@
+# ======================================================================================
+# iNXT BrokerVerse - application configuration
+# Every environment specific value is overridable through environment variables
+# (see docs/operations/CONFIGURATION.md). Secrets MUST come from the environment.
+# ======================================================================================
+spring:
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${MAIL_SMTP_AUTH:true}
+      mail.smtp.starttls.enable: ${MAIL_SMTP_STARTTLS:true}
+      mail.smtp.connectiontimeout: 10000
+      mail.smtp.timeout: 20000
+  application:
+    name: brokerverse
+  datasource:
+    url: ${BROKERVERSE_DB_URL:jdbc:postgresql://localhost:5432/brokerverse}
+    username: ${BROKERVERSE_DB_USER:brokerverse}
+    # No default: the seed profile has a local value; production must set it (ProductionSafeguards).
+    password: ${BROKERVERSE_DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: ${BROKERVERSE_DB_POOL_SIZE:20}
+      connection-timeout: 30000
+      # ---- TLS to PostgreSQL (INF0): verify-full against the RDS CA bundle outside dev/test/seed;
+      # an sslmode in BROKERVERSE_DB_URL takes precedence. See CONFIGURATION.md "Encryption in transit".
+      data-source-properties:
+        sslmode: ${BROKERVERSE_DB_SSL_MODE:verify-full}
+        sslrootcert: ${BROKERVERSE_DB_SSL_ROOT_CERT:/etc/bibs/rds-ca/global-bundle.pem}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+          batch_size: 50
+        order_inserts: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    # Migrations are numbered in per-module ranges (see DEVELOPER_GUIDE "Migrations"), so a new
+    # migration of one module can have a lower version than one already applied by another.
+    out-of-order: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+  threads:
+    virtual:
+      enabled: true
+  # ---- Redis 7 (caches, job locks, token denylist, shared counters); brokerverse.redis.enabled ----
+  data:
+    redis:
+      client-type: lettuce
+      host: ${BROKERVERSE_REDIS_HOST:localhost}
+      port: ${BROKERVERSE_REDIS_PORT:6379}
+      username: ${BROKERVERSE_REDIS_USERNAME:}
+      password: ${BROKERVERSE_REDIS_PASSWORD:}
+      database: ${BROKERVERSE_REDIS_DATABASE:0}
+      timeout: ${BROKERVERSE_REDIS_TIMEOUT:2s}
+      connect-timeout: ${BROKERVERSE_REDIS_CONNECT_TIMEOUT:5s}
+      ssl:
+        # AWS ElastiCache with in-transit encryption: on by default, off in the dev/test/seed profiles.
+        enabled: ${BROKERVERSE_REDIS_TLS:true}
+      repositories:
+        enabled: false
+  # ---- Apache Kafka 3.6+ (integration events); brokerverse.kafka.enabled ----
+  kafka:
+    bootstrap-servers: ${BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    client-id: ${BROKERVERSE_KAFKA_CLIENT_ID:brokerverse}
+    properties:
+      # SASL_SSL with SCRAM-SHA-512 on Amazon MSK by default; PLAINTEXT in the dev/test/seed profiles.
+      security.protocol: ${BROKERVERSE_KAFKA_SECURITY_PROTOCOL:SASL_SSL}
+      sasl.mechanism: ${BROKERVERSE_KAFKA_SASL_MECHANISM:SCRAM-SHA-512}
+      sasl.jaas.config: ${BROKERVERSE_KAFKA_SASL_JAAS_CONFIG:}
+      # Topics are created by the application (KafkaAdmin), never implicitly by a client.
+      allow.auto.create.topics: false
+    producer:
+      acks: all
+      retries: 2147483647
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+        delivery.timeout.ms: ${BROKERVERSE_KAFKA_DELIVERY_TIMEOUT_MS:30000}
+        request.timeout.ms: 15000
+        max.block.ms: ${BROKERVERSE_KAFKA_MAX_BLOCK_MS:15000}
+    consumer:
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      properties:
+        isolation.level: read_committed
+    admin:
+      # Do not refuse to start when the broker is briefly unreachable; topics are created later.
+      fail-fast: false
+      auto-create: ${BROKERVERSE_KAFKA_CREATE_TOPICS:true}
+  # PEM certificate and key of the HTTPS listener, e.g. file:/etc/bibs/tls/tls.crt and tls.key
+  # (cert-manager secret mounted in the pod); reloaded on rotation when HTTPS is on.
+  ssl:
+    bundle:
+      pem:
+        server:
+          reload-on-update: ${BROKERVERSE_SERVER_SSL_ENABLED:false}
+          keystore:
+            certificate: ${BROKERVERSE_SERVER_SSL_CERTIFICATE:}
+            private-key: ${BROKERVERSE_SERVER_SSL_PRIVATE_KEY:}
+  servlet:
+    multipart:
+      # Must be >= brokerverse.attachments.max-size and brokerverse.storage.max-upload-size (the
+      # services apply the business limits).
+      max-file-size: ${BROKERVERSE_UPLOAD_MAX_FILE_SIZE:25MB}
+      max-request-size: ${BROKERVERSE_UPLOAD_MAX_REQUEST_SIZE:26MB}
+
+server:
+  port: ${BROKERVERSE_PORT:8080}
+  # ---- HTTPS from a mounted certificate (INF0): on in the Kubernetes deployments, off in dev/test ----
+  ssl:
+    enabled: ${BROKERVERSE_SERVER_SSL_ENABLED:false}
+    bundle: server
+    enabled-protocols: TLSv1.3,TLSv1.2
+  shutdown: graceful
+  error:
+    include-stacktrace: never
+    include-message: never
+  compression:
+    enabled: true
+
+brokerverse:
+  # Kind of environment: local, sit, uat, training, preprod or production. "production" (or the prod
+  # profile) turns on the start-up safeguards: no seed profile, every required secret present.
+  environment: ${BROKERVERSE_ENVIRONMENT:local}
+  # ---- Workload role of the instance (INF0), ARCHITECTURE_OPTION_DECISION.md section 2 ----
+  runtime:
+    # web: user screens and APIs; jobs: schedulers and batch jobs; integration: outbox relay, Kafka
+    # consumers, inbound files and /integration/**; all: everything (dev, test, seed stacks).
+    role: ${BROKERVERSE_RUNTIME_ROLE:all}
+  # ---- API gateway (Apigee X) tokens of /integration/** (INF0), IntegrationSecurityConfig ----
+  integration:
+    security:
+      jwk-set-uri: ${BROKERVERSE_INTEGRATION_JWK_SET_URI:}
+      issuer: ${BROKERVERSE_INTEGRATION_ISSUER:}
+      audiences: ${BROKERVERSE_INTEGRATION_AUDIENCES:}
+      scope-claim: ${BROKERVERSE_INTEGRATION_SCOPE_CLAIM:scope}
+      jws-algorithms: ${BROKERVERSE_INTEGRATION_JWS_ALGORITHMS:RS256}
+      clock-skew: ${BROKERVERSE_INTEGRATION_CLOCK_SKEW:PT60S}
+      # One rule per API: path pattern and the scopes the token must all carry. A path without a
+      # rule is refused. Add rules with BROKERVERSE_INTEGRATION_SECURITY_APIS_<NAME>_PATH / _SCOPES.
+      apis:
+        ping:
+          path: /integration/v1/ping
+          scopes: ${BROKERVERSE_INTEGRATION_PING_SCOPES:}
+  security:
+    # Supplied via BROKERVERSE_JWT_SECRET (>= 32 random bytes); only the seed and test profiles carry
+    # a local value. Production refuses to start without it (ProductionSafeguards).
+    jwt-secret: ${BROKERVERSE_JWT_SECRET:}
+    token-validity: ${BROKERVERSE_TOKEN_VALIDITY:PT8H}
+    allowed-origins: ${BROKERVERSE_ALLOWED_ORIGINS:http://localhost:5173}
+    # Failed logins that lock an account when the business parameter LOGIN_MAX_FAILED_ATTEMPTS is missing.
+    max-failed-attempts: ${BROKERVERSE_MAX_FAILED_ATTEMPTS:5}
+    login-protection:
+      # Login requests accepted per client address and window (HTTP 429 above), shared by all pods.
+      max-attempts-per-window: ${BROKERVERSE_LOGIN_RATE_LIMIT:20}
+      rate-limit-window: ${BROKERVERSE_LOGIN_RATE_WINDOW:PT1M}
+      # Life of the shared failed-login counter of a user (the user record stays the reference).
+      failed-attempt-window: ${BROKERVERSE_LOGIN_FAILURE_WINDOW:P1D}
+  attachments:
+    max-size: ${BROKERVERSE_ATTACHMENT_MAX_SIZE:10MB}
+  # ---- Document storage (build step ST0), docs/architecture/DOCUMENT_STORAGE_DECISION.md ----
+  storage:
+    # s3 (every shared environment; the local store is refused in production) or local (file system).
+    provider: ${BROKERVERSE_STORAGE_PROVIDER:local}
+    region: ${BROKERVERSE_STORAGE_REGION:ap-southeast-1}
+    # Only for an S3-compatible service in tests; leave empty for AWS (VPC gateway endpoint).
+    endpoint: ${BROKERVERSE_STORAGE_ENDPOINT:}
+    path-style-access: ${BROKERVERSE_STORAGE_PATH_STYLE:false}
+    buckets:
+      documents: ${BROKERVERSE_STORAGE_BUCKET_DOCUMENTS:}
+      reports: ${BROKERVERSE_STORAGE_BUCKET_REPORTS:}
+      inbound: ${BROKERVERSE_STORAGE_BUCKET_INBOUND:}
+      migration: ${BROKERVERSE_STORAGE_BUCKET_MIGRATION:}
+    # ARNs of the BDOI-owned customer-managed KMS keys (SSE-KMS), one per bucket class.
+    kms-keys:
+      documents: ${BROKERVERSE_STORAGE_KMS_DOCUMENTS:}
+      reports: ${BROKERVERSE_STORAGE_KMS_REPORTS:}
+      inbound: ${BROKERVERSE_STORAGE_KMS_INBOUND:}
+      migration: ${BROKERVERSE_STORAGE_KMS_MIGRATION:}
+    local:
+      root: ${BROKERVERSE_STORAGE_LOCAL_ROOT:${java.io.tmpdir}/brokerverse-files}
+      link-secret: ${BROKERVERSE_STORAGE_LOCAL_LINK_SECRET:}
+      scan-status: ${BROKERVERSE_STORAGE_LOCAL_SCAN_STATUS:NO_THREATS_FOUND}
+    # Files through the application; larger bulk files go by presigned PUT to the inbound bucket.
+    max-upload-size: ${BROKERVERSE_STORAGE_MAX_UPLOAD_SIZE:25MB}
+    # Fallback of the parameter FILE_LINK_TTL_SECONDS (presigned link validity).
+    link-ttl: ${BROKERVERSE_STORAGE_LINK_TTL:PT5M}
+    orphan-age: ${BROKERVERSE_STORAGE_ORPHAN_AGE:PT24H}
+    deleted-grace: ${BROKERVERSE_STORAGE_DELETED_GRACE:P30D}
+    scan-tag: ${BROKERVERSE_STORAGE_SCAN_TAG:GuardDutyMalwareScanStatus}
+    jobs:
+      scan-results-cron: ${BROKERVERSE_JOB_FILE_SCAN_RESULTS_CRON:0 */5 * * * *}
+      orphan-cron: ${BROKERVERSE_JOB_FILE_ORPHAN_CRON:0 10 2 * * *}
+      retention-cron: ${BROKERVERSE_JOB_FILE_RETENTION_CRON:0 40 2 * * *}
+      ecm-archive-cron: ${BROKERVERSE_JOB_FILE_ECM_ARCHIVE_CRON:0 */15 * * * *}
+  # ---- Platform cache and events, docs/architecture/PLATFORM_CACHE_AND_EVENTS.md ----
+  redis:
+    # true: Redis for caches, job locks, token denylist and shared counters (spring.data.redis.*);
+    # false: in-memory cache, PostgreSQL advisory job locks and the V34 tables.
+    enabled: ${BROKERVERSE_REDIS_ENABLED:true}
+    key-prefix: ${BROKERVERSE_REDIS_KEY_PREFIX:bv:}
+  cache:
+    # Per-cache time to live (ISO-8601), overriding the defaults of the declarations.
+    ttl:
+      lov-values: ${BROKERVERSE_CACHE_TTL_LOV:PT1H}
+      system-parameters: ${BROKERVERSE_CACHE_TTL_PARAMETERS:PT15M}
+      security-role-permissions: ${BROKERVERSE_CACHE_TTL_ROLE_PERMISSIONS:PT15M}
+      catalog-product-versions: ${BROKERVERSE_CACHE_TTL_CATALOG:PT1H}
+      organization-units: ${BROKERVERSE_CACHE_TTL_ORGANIZATION:PT1H}
+    # Entries per cache of the in-memory fallback.
+    maximum-size: ${BROKERVERSE_CACHE_MAX_SIZE:10000}
+  kafka:
+    # true: the outbox is relayed to Kafka (spring.kafka.*) and the consumers run;
+    # false: events are recorded as delivered in-process (LOCAL) and e-mails go out after commit.
+    enabled: ${BROKERVERSE_KAFKA_ENABLED:true}
+    partitions: ${BROKERVERSE_KAFKA_PARTITIONS:3}
+    replication-factor: ${BROKERVERSE_KAFKA_REPLICATION_FACTOR:1}
+    consumer-group-prefix: ${BROKERVERSE_KAFKA_GROUP_PREFIX:bibs}
+    relay-batch-size: ${BROKERVERSE_KAFKA_RELAY_BATCH_SIZE:200}
+    relay-max-attempts: ${BROKERVERSE_KAFKA_RELAY_MAX_ATTEMPTS:10}
+    relay-retry-backoff: ${BROKERVERSE_KAFKA_RELAY_RETRY_BACKOFF:PT30S}
+    send-timeout: ${BROKERVERSE_KAFKA_SEND_TIMEOUT:PT30S}
+    consumer-retries: ${BROKERVERSE_KAFKA_CONSUMER_RETRIES:3}
+    consumer-retry-backoff: ${BROKERVERSE_KAFKA_CONSUMER_RETRY_BACKOFF:PT2S}
+    outbox-retention: ${BROKERVERSE_KAFKA_OUTBOX_RETENTION:P30D}
+    archive-retention: ${BROKERVERSE_KAFKA_ARCHIVE_RETENTION:P400D}
+  mail:
+    # true = deliver through the SMTP server configured with spring.mail.* (MAIL_HOST ...);
+    # false = simulated delivery (outbox and send log only). See docs/operations/CONFIGURATION.md.
+    enabled: ${BROKERVERSE_MAIL_ENABLED:false}
+    dispatch-on-commit: ${BROKERVERSE_MAIL_DISPATCH_ON_COMMIT:true}
+  jobs:
+    # Spring cron (sec min hour day month weekday), UTC; "-" disables the schedule.
+    recurring-journals-cron: ${BROKERVERSE_JOB_RECURRING_CRON:0 0 1 * * *}
+    alert-checks-cron: ${BROKERVERSE_JOB_ALERTS_CRON:0 30 1 * * *}
+    # Monthly reserve valuation (previous month); disabled by default.
+    reserve-valuation-cron: ${BROKERVERSE_JOB_RESERVE_VALUATION_CRON:-}
+    # Batch RI allocation run (cedes approved transactions of the year to date not yet ceded); off by default.
+    ri-allocation-cron: ${BROKERVERSE_JOB_RI_ALLOCATION_CRON:-}
+    # Post-dated cheques issued whose cheque date is reached become DUE (status only).
+    pdc-issued-due-cron: ${BROKERVERSE_JOB_PDC_ISSUED_DUE_CRON:0 15 0 * * *}
+    # Insurer underwriting quotations (draft, pending, approved) past their validity become EXPIRED;
+    # insurer suite, not used by BIBS: disabled by default (V1064, CODEBASE_RELEVANCE_AUDIT.md A1).
+    quotation-expiry-cron: ${BROKERVERSE_JOB_QUOTATION_EXPIRY_CRON:-}
+    # Outbox relay: delivers queued e-mails and retries failed attempts.
+    mail-dispatch-cron: ${BROKERVERSE_JOB_MAIL_DISPATCH_CRON:0 */2 * * * *}
+    # ---- Platform: job lock, integration events, shared state (PLATFORM_CACHE_AND_EVENTS.md) ----
+    # Lease of the Redis job lock, renewed every third of it while the job runs.
+    lock-lease: ${BROKERVERSE_JOB_LOCK_LEASE:PT2M}
+    # Integration event outbox: sends what the after-commit relay left and the due retries.
+    event-outbox-relay-cron: ${BROKERVERSE_JOB_EVENT_OUTBOX_RELAY_CRON:0 * * * * *}
+    # Deletes delivered outbox rows, old archived events and resolved dead letters.
+    event-housekeeping-cron: ${BROKERVERSE_JOB_EVENT_HOUSEKEEPING_CRON:0 50 0 * * *}
+    # Deletes expired revoked tokens and counters of the database fallback of Redis.
+    shared-state-cleanup-cron: ${BROKERVERSE_JOB_SHARED_STATE_CLEANUP_CRON:0 40 0 * * *}
+    # Monthly KYC review (BRNB.110): expires overdue KYC and notifies Account Officers.
+    kyc-review-due-cron: ${BROKERVERSE_JOB_KYC_REVIEW_DUE_CRON:0 0 2 1 * *}
+    # Monthly data retention review (BRNB.106): counts eligible records; never deletes.
+    retention-review-cron: ${BROKERVERSE_JOB_RETENTION_REVIEW_CRON:0 0 3 2 * *}
+    # Hourly: applies payments confirmed by the payment confirmation sources (BRNB.067/068).
+    payment-confirmation-sweep-cron: ${BROKERVERSE_JOB_PAYMENT_CONFIRMATION_SWEEP_CRON:0 0 * * * *}
+    # Daily hold cover expiry monitor (BRNB.103): alerts Processing, expires lapsed hold covers.
+    hold-cover-expiry-cron: ${BROKERVERSE_JOB_HOLD_COVER_EXPIRY_CRON:0 30 0 * * *}
+    # Quotation requests of source systems (HLS, BRNB.023): manual until an interface exists (Q11).
+    quotation-request-intake-cron: ${BROKERVERSE_JOB_QUOTATION_REQUEST_INTAKE_CRON:-}
+    # End-of-day booking batch (BRNB.036): queued accounts and started multi-year policy years (20:00 PHT).
+    booking-batch-cron: ${BROKERVERSE_JOB_BOOKING_BATCH_CRON:0 0 12 * * *}
+    # ---- Operations (BRD-2), docs/architecture/OPERATIONS_DESIGN.md section 10 ----
+    # Copies booked invoices missing from the Operations invoice ledger (the feed listener copies new ones).
+    ops-invoice-feed-replay-cron: ${BROKERVERSE_JOB_OPS_INVOICE_FEED_REPLAY_CRON:-}
+    # Cashiering: re-match payments waiting for a pre-booked account (CSHID.020), every 2 hours.
+    prebooked-rematch-cron: ${BROKERVERSE_JOB_PREBOOKED_REMATCH_CRON:0 0 */2 * * *}
+    # Cashiering: automatic matching of uploaded payments (CSHID.008), hourly.
+    payment-automatch-cron: ${BROKERVERSE_JOB_PAYMENT_AUTOMATCH_CRON:0 30 * * * *}
+    # Cashiering: warehoused post-dated checks reaching maturity (CSHID.008 item 4), daily 00:30.
+    pdc-maturity-cron: ${BROKERVERSE_JOB_PDC_MATURITY_CRON:0 30 0 * * *}
+    # Cashiering: minimal balance sweep of premium receivables (CSHID.016), daily 20:00 UTC.
+    minimal-balance-sweep-cron: ${BROKERVERSE_JOB_MINIMAL_BALANCE_SWEEP_CRON:0 0 20 * * *}
+    # Remittance: scheduled extraction (RMTID.001/003/005), off-peak 12:00 UTC (20:00 PHT).
+    remittance-extraction-cron: ${BROKERVERSE_JOB_REMITTANCE_EXTRACTION_CRON:0 0 12 * * *}
+    # Remittance: expired holds released (RMTID.021), daily 00:15.
+    hold-expiry-cron: ${BROKERVERSE_JOB_HOLD_EXPIRY_CRON:0 15 0 * * *}
+    # Production reconciliation: production register extraction per insurer schedule (PRCID.001), daily check 01:00.
+    production-extract-cron: ${BROKERVERSE_JOB_PRODUCTION_EXTRACT_CRON:0 0 1 * * *}
+    # Production reconciliation: automatic matching (PRCID.025); manual until the frequency is known (OQ30).
+    recon-automatch-cron: ${BROKERVERSE_JOB_RECON_AUTOMATCH_CRON:-}
+    # Adjustment: daily adjustment report (ADJID.016), 10:00 UTC (18:00 PHT).
+    adj-daily-report-cron: ${BROKERVERSE_JOB_ADJ_DAILY_REPORT_CRON:0 0 10 * * *}
+    # Commission: insurer feedback SLA on direct payment billings (CMRID.011), daily 01:30.
+    dp-feedback-sla-cron: ${BROKERVERSE_JOB_DP_FEEDBACK_SLA_CRON:0 30 1 * * *}
+    # ---- Product Maintenance (BRD-3), docs/architecture/PRODUCT_MAINTENANCE_DESIGN.md section 8 ----
+    # Package expiry monitor (BRPM.006/017): supersedes / expires package versions, raises
+    # PACKAGE_EXPIRING and drafts renewal requests; daily 17:00 UTC = 01:00 PHT.
+    package-expiry-cron: ${BROKERVERSE_JOB_PACKAGE_EXPIRY_CRON:0 0 17 * * *}
+    # ---- Collections (BRD-4), docs/architecture/COLLECTIONS_DESIGN.md section 8 (PHT = UTC+8) ----
+    # Incremental worklist refresh from the invoice ledger after the 22:00 PHT EOD (BRCLXN.001-015, 052, 053).
+    clx-daily-refresh-cron: ${BROKERVERSE_JOB_CLX_DAILY_REFRESH_CRON:0 15 14 * * *}
+    # Promises due yesterday or earlier evaluated (BRCLXN.055), 22:45 PHT.
+    clx-promise-check-cron: ${BROKERVERSE_JOB_CLX_PROMISE_CHECK_CRON:0 45 14 * * *}
+    # Escalation rules applied, one case per account, rule and period (BRCLXN.049), 23:00 PHT.
+    clx-escalation-cron: ${BROKERVERSE_JOB_CLX_ESCALATION_CRON:0 0 15 * * *}
+    # Outstanding PR list and full production report (BRCLXN.045), 22:30 PHT.
+    clx-daily-files-cron: ${BROKERVERSE_JOB_CLX_DAILY_FILES_CRON:0 30 14 * * *}
+    # "For application to invoice" text file of the previous day (BRCLXN.041/042), 05:00 PHT.
+    clx-application-file-cron: ${BROKERVERSE_JOB_CLX_APPLICATION_FILE_CRON:0 0 21 * * *}
+    # Weekly DP PR / PR 2307 for reversal per unit and branch (BRCLXN.028/029), Friday 22:30 PHT.
+    clx-weekly-files-cron: ${BROKERVERSE_JOB_CLX_WEEKLY_FILES_CRON:0 30 14 * * FRI}
+    # Monthly DP PR / PR 2307 for reversal (BRCLXN.024-027): daily check 05:00 PHT, generates on the first working day.
+    clx-monthly-files-cron: ${BROKERVERSE_JOB_CLX_MONTHLY_FILES_CRON:0 0 21 * * *}
+    # ---- Accounting, Disbursement, ACSL (BRD-5), docs/architecture/ACCOUNTING_DISBURSEMENT_DESIGN.md section 9 ----
+    # Accrual auto-reversal on the "reverse on" date (FRBS 2.8.1), 00:05 PHT.
+    journal-auto-reversal-cron: ${BROKERVERSE_JOB_JOURNAL_AUTO_REVERSAL_CRON:0 5 16 * * *}
+    # Scheduled month-end / year-end close per acc_period_close_schedule (FRBS 2.6.0), checked every 15 minutes.
+    gl-period-close-cron: ${BROKERVERSE_JOB_GL_PERIOD_CLOSE_CRON:0 */15 * * * *}
+    # Broking books close on the last day of the month at BROKING_CLOSE_TIME (FRBS 3.4.0/3.4.1), 23:00 PHT.
+    broking-books-close-cron: ${BROKERVERSE_JOB_BROKING_BOOKS_CLOSE_CRON:0 0 15 L * *}
+    # BOOK rate of the month from the previous month-end revaluation rate (OQ08, AQ03), 1st of the month 00:30 PHT.
+    book-rate-from-closing-cron: ${BROKERVERSE_JOB_BOOK_RATE_FROM_CLOSING_CRON:0 30 16 L * *}
+    # Printed or released checks older than DISB_STALE_DAYS become stale (DIS 3.26.2), 00:20 PHT.
+    disb-check-stale-cron: ${BROKERVERSE_JOB_DISB_CHECK_STALE_CRON:0 20 16 * * *}
+    # End-of-day e-mail confirmations and reports: started by each EOD run; no schedule by default (DIS 2.7.12, 3.28.0).
+    disb-eod-confirmation-cron: ${BROKERVERSE_JOB_DISB_EOD_CONFIRMATION_CRON:-}
+    disb-eod-reports-cron: ${BROKERVERSE_JOB_DISB_EOD_REPORTS_CRON:-}
+    # Daily GL-SL reconciliation of the control accounts (ACSL 2.13.2), 20:00 PHT.
+    acsl-gl-sl-recon-cron: ${BROKERVERSE_JOB_ACSL_GL_SL_RECON_CRON:0 0 12 * * *}
+    # ---- Sanction Screening (BRD-10), docs/architecture/SANCTION_SCREENING_DESIGN.md section 8 (PHT = UTC+8) ----
+    # Watchlist ingestion of every active source through its WatchlistFeed (SNSRP-201), 01:00 PHT.
+    scr-watchlist-ingest-cron: ${BROKERVERSE_JOB_SCR_WATCHLIST_INGEST_CRON:0 0 17 * * *}
+    # Delta screening of the in-scope clients; full rescreen on SCR_FULL_RESCREEN_DAY (SNSRP-301), 01:30 PHT.
+    scr-periodic-screening-cron: ${BROKERVERSE_JOB_SCR_PERIODIC_SCREENING_CRON:0 30 17 * * *}
+    # Case SLA reminders, breaches and escalations; missing-document reminders (SNSRP-405, 802), hourly.
+    scr-sla-monitor-cron: ${BROKERVERSE_JOB_SCR_SLA_MONITOR_CRON:0 0 * * * *}
+    # Digest of failed watchlist records to SCR_INGEST_ALERT_RECIPIENTS (SNSRP-202), 07:00 PHT Monday to Friday.
+    scr-ingest-error-digest-cron: ${BROKERVERSE_JOB_SCR_INGEST_ERROR_DIGEST_CRON:0 0 23 * * SUN-THU}
+    # ---- User Access Maintenance (BRD-11), docs/architecture/USER_ACCESS_DESIGN.md section 8 ----
+    # Applies SCHEDULED access requests whose effective date is reached (UAM-NFR-14), 00:05 PHT.
+    uam-effective-changes-cron: ${BROKERVERSE_JOB_UAM_EFFECTIVE_CHANGES_CRON:0 5 16 * * *}
+    # LOCAL sign-in: notifies users whose password expires within 7 days (UAM-NFR-36), 06:00 PHT.
+    password-expiry-notice-cron: ${BROKERVERSE_JOB_PASSWORD_EXPIRY_NOTICE_CRON:0 0 22 * * *}
+    # ---- Claims Handling (BRD-7), docs/architecture/CLAIMS_BROKING_DESIGN.md section 9.1 (PHT = UTC+8) ----
+    # Re-check of the premium of open, unauthorised claims (BRCLM.001), 05:30 PHT.
+    bcl-premium-recheck-cron: ${BROKERVERSE_JOB_BCL_PREMIUM_RECHECK_CRON:0 30 21 * * *}
+    # Follow-up and diary reminders to the handlers; BCL_FOLLOW_UP_OVERDUE (BRCLM.019/022/034), 06:00 PHT.
+    bcl-follow-up-due-cron: ${BROKERVERSE_JOB_BCL_FOLLOW_UP_DUE_CRON:0 0 22 * * *}
+    # BCL_CLAIM_PAST_DUE for outstanding claims older than BCL_PAST_DUE_DAYS (p.43), 06:00 PHT.
+    bcl-ageing-alerts-cron: ${BROKERVERSE_JOB_BCL_AGEING_ALERTS_CRON:0 0 22 * * *}
+    # ---- Employee Benefits (BRD-8), docs/architecture/EMPLOYEE_BENEFITS_DESIGN.md section 8.1 (PHT = UTC+8) ----
+    # Opens renewal cycles EB_RA_LEAD_DAYS before expiry, sends the RA and the reminders (BRID-001/002), 06:00 PHT.
+    eb-renewal-advice-cron: ${BROKERVERSE_JOB_EB_RENEWAL_ADVICE_CRON:0 0 22 * * *}
+    # Follow-ups of overdue tracked items, escalation after EB_FOLLOWUP_MAX (BRID-030), 07:00 PHT.
+    eb-item-followup-cron: ${BROKERVERSE_JOB_EB_ITEM_FOLLOWUP_CRON:0 0 23 * * *}
+
+management:
+  health:
+    redis:
+      # Reported only when Redis is in use (a disabled Redis must not take readiness down).
+      enabled: ${BROKERVERSE_REDIS_ENABLED:true}
+    mail:
+      # The SMTP check is meaningful only when real delivery is on; with simulated delivery it would
+      # report DOWN and take the whole health endpoint (load balancer checks) down with it.
+      enabled: ${BROKERVERSE_MAIL_ENABLED:false}
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: iNXT BrokerVerse
+    vendor: IortaTechNXT
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    root: INFO
+    com.iortatechnxt.brokerverse: INFO
+  pattern:
+    # %replace neutralises CR/LF in messages (log forging protection, see spotbugs-exclude.xml).
+    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%thread] %logger{36} - %replace(%msg){'[\\r\\n]', '_'}%n"
+
+---
+# Seed profile (local development, SIT, UAT and training): loads the seed data (company, branches,
+# chart of accounts, SIT/UAT users). Refused in production by ProductionSafeguards.
+spring:
+  config:
+    activate:
+      on-profile: seed
+  flyway:
+    locations: classpath:db/migration,classpath:db/seed
+  datasource:
+    password: ${BROKERVERSE_DB_PASSWORD:brokerverse}
+brokerverse:
+  security:
+    # Local value for seed stacks only; set BROKERVERSE_JWT_SECRET in every shared environment.
+    jwt-secret: ${BROKERVERSE_JWT_SECRET:seed-profile-local-signing-key-0123456789abcdef}
+
+---
+# Local transports for development, automated tests and seed stacks (INF0): plaintext PostgreSQL,
+# Redis and Kafka unless the environment asks for TLS. Every other profile keeps the TLS defaults.
+spring:
+  config:
+    activate:
+      on-profile: "dev | test | seed"
+  datasource:
+    hikari:
+      data-source-properties:
+        sslmode: ${BROKERVERSE_DB_SSL_MODE:prefer}
+  data:
+    redis:
+      ssl:
+        enabled: ${BROKERVERSE_REDIS_TLS:false}
+  kafka:
+    properties:
+      security.protocol: ${BROKERVERSE_KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+
+---
+# Production profile: no defaults for connection settings or secrets. ProductionSafeguards refuses
+# the start when one is missing or when the seed profile is active as well.
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${BROKERVERSE_DB_URL:}
+    username: ${BROKERVERSE_DB_USER:}
+  mail:
+    host: ${MAIL_HOST:}
+brokerverse:
+  environment: production

@@ -1,0 +1,95 @@
+# iNXT BrokerVerse – local / seed stack.
+#   docker compose up -d --build        -> http://localhost:8081  (SIT/UAT users of the seed profile)
+# Production: use deploy/ (Kubernetes) or the same images with external PostgreSQL, Redis (AWS
+# ElastiCache), Kafka (Amazon MSK) and secrets. See docs/architecture/PLATFORM_CACHE_AND_EVENTS.md.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: brokerverse
+      POSTGRES_USER: brokerverse
+      POSTGRES_PASSWORD: ${BROKERVERSE_DB_PASSWORD:-brokerverse}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U brokerverse -d brokerverse"]
+      interval: 5s
+      retries: 20
+    ports:
+      - "5433:5432"
+
+  # Redis 7: reference-data cache, cluster-wide job locks, token denylist, shared counters.
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 20
+    ports:
+      - "6379:6379"
+
+  # Apache Kafka 3.9 in KRaft mode (no ZooKeeper): integration events. Topics are created by the
+  # application (auto-creation off, as on Amazon MSK). Host clients use localhost:29092.
+  kafka:
+    image: apache/kafka:3.9.1
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,HOST://:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,HOST:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null"]
+      interval: 10s
+      retries: 20
+    ports:
+      - "29092:29092"
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-seed}
+      BROKERVERSE_DB_URL: jdbc:postgresql://db:5432/brokerverse
+      BROKERVERSE_DB_USER: brokerverse
+      BROKERVERSE_DB_PASSWORD: ${BROKERVERSE_DB_PASSWORD:-brokerverse}
+      BROKERVERSE_JWT_SECRET: ${BROKERVERSE_JWT_SECRET:-change-me-local-only-0123456789abcdefghij}
+      BROKERVERSE_ALLOWED_ORIGINS: http://localhost:8081
+      BROKERVERSE_ADMIN_INITIAL_PASSWORD: ${BROKERVERSE_ADMIN_INITIAL_PASSWORD:-}
+      BROKERVERSE_REDIS_ENABLED: ${BROKERVERSE_REDIS_ENABLED:-true}
+      BROKERVERSE_REDIS_HOST: redis
+      BROKERVERSE_REDIS_PORT: "6379"
+      BROKERVERSE_KAFKA_ENABLED: ${BROKERVERSE_KAFKA_ENABLED:-true}
+      BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    environment:
+      BROKERVERSE_BACKEND_HOST: backend
+    ports:
+      - "8081:8080"
+
+volumes:
+  db-data:
+  kafka-data:

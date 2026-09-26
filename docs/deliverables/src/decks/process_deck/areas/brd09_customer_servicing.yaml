@@ -1,0 +1,133 @@
+# BRD-9 Customer Servicing Facility: chapter 9 of the business process deck.
+# Sources: "Customer Servicing Facility.PDF" p.3-5 (current and envisioned), p.13-14 (NFR), e-mail clarification p.17;
+# FRS BRD-9 sections 2, 5, 9; cross-BRD questions XQ02, XQ04, XQ05; discrepancy register (DCR-098, 100-104, 143).
+id: brd09
+key: csf
+num: 9
+title: Customer Servicing Facility
+short: Customer Servicing
+brd: BRD-9
+scope: 'Contact centre search, servicing view, contact updates, document resends'
+status: DESIGNED
+status_text: Designed, not yet built; FRS v1.0 issued for review
+department: Contact Center Management / Alternative Distribution
+roles:
+  - BDO Insure Contact Center Agent
+  - Contact Center Supervisor; BDO Contact Center personnel
+  - Contact Center Management, leads and heads
+  - System Administrator
+  - Callers (clients) and the fulfilment units
+figures:
+  - ['144,400', 'access, retrieval and search transactions a year (p.13-14)']
+  - ['24', 'concurrent agents, supervisors and personnel']
+  - ['< 3 s', 'retrieval, update and search; 5 s documents']
+  - ['06-22', 'use 06:00-22:00; availability 99.9%']
+sources:
+  - BRD-9 p.3-5 (current and envisioned); e-mail clarification p.17
+  - BRCSF-001-011
+  - FRS BRD-9 v1.0, sections 2 and 5
+chevrons: [Sign in, Search, Servicing view, Verify caller, Update contact, Resend, Documents, Audit]
+notes:
+  glance: >-
+    The BDO-Insure Front-End System was built by BDO IT for the contact centre agents. It shows full account details
+    only for CBG accounts, lets agents update contact details only, has servers at end of life and no role-based access
+    control (BRD-9 p.4). In BIBS the CSF reads the BIBS modules through their query services and stores only its own
+    records. It has no approval workflow: every action is immediate and logged. It is designed. Note: the printed e-mail
+    in the pack carries meeting credentials; circulate a redacted copy (DCR-098).
+  pains: The six points are the current-process rows of FRS BRD-9 section 2.1, from the BRD (p.3-5, p.17).
+  after: The usage table gives the volumes and response times (p.13-14).
+  gaps: The write-back to QPS and EBIX (DCR-104) decides how long two systems of record coexist.
+asis:
+  caption: 'Contact centre servicing today (BRD-9 p.4)'
+  notes: >-
+    Today the agent searches the Front-End on a limited set of keys. Full account details show for CBG accounts only;
+    for non-CBG accounts the agent sees only contact details, account number and expiry date. Every agent has the same
+    rights. Contact updates are written into QPS or EBIX. Renewal advice and e-policy resends are handled outside the
+    tool by the fulfilment units, and management has no audit report. The servers have reached end of life.
+  cols: 5
+  lanes:
+    - {id: cli, label: Caller (client), kind: external}
+    - {id: agt, label: Contact centre agent}
+    - {id: ful, label: 'Fulfilment units'}
+    - {id: sys, label: 'Front-End over QPS, EBIX', kind: system}
+  steps:
+    - {id: a1, lane: cli, col: 1, text: Calls the contact centre, kind: external}
+    - {id: a2, lane: agt, col: 1, text: Searches on a few keys, pain: [2]}
+    - {id: a3, lane: sys, col: 2, text: Full details for CBG accounts only, kind: legacy, pain: [1]}
+    - {id: a4, lane: agt, col: 2, text: Same rights for every agent, pain: [3]}
+    - {id: a5, lane: sys, col: 3, text: Contact update keyed in QPS or EBIX, kind: legacy, pain: [4]}
+    - {id: a6, lane: ful, col: 4, text: RA or e-policy resent by another unit, pain: [5]}
+    - {id: a7, lane: cli, col: 5, text: Receives the document by e-mail, kind: external}
+    - {id: a8, lane: sys, col: 5, text: No audit report; servers end of life, kind: legacy, pain: [6]}
+  edges:
+    - [a1, a2]
+    - [a2, a3]
+    - [a3, a4]
+    - [a4, a5]
+    - [a5, a6, dashed, e-mail]
+    - [a6, a7, dashed]
+    - [a5, a8]
+pains:
+  - {n: 1, title: Full details for CBG accounts only, text: 'Non-CBG accounts show contact details, account number and expiry date only.', ref: 'BRD-9 p.4; BRCSF-002, 005'}
+  - {n: 2, title: Limited search keys, text: 'Agents cannot search by every key the caller gives.', ref: 'BRD-9 p.17 (e-mail); BRCSF-003'}
+  - {n: 3, title: No role-based access, text: 'Agents, supervisors and management have the same rights.', ref: 'BRD-9 p.4'}
+  - {n: 4, title: Updates written in QPS or EBIX, text: 'Contact details are changed in the legacy systems.', ref: 'BRD-9 p.3-5; BRCSF-004'}
+  - {n: 5, title: Resends outside the tool, text: 'RA and e-policy resends are handled by other units.', ref: 'BRD-9 p.17 (e-mail item 9); BRCSF-006'}
+  - {n: 6, title: No audit report; ageing servers, text: 'Management has no audit trail of agent actions; servers at end of life.', ref: 'BRD-9 p.4; BRCSF-010, 011'}
+tobe:
+  caption: 'Servicing contact in BIBS: no approval workflow, every action immediate and logged (FRS BRD-9 section 2.2)'
+  notes: >-
+    In BIBS the agent signs in to the Customer Search. One search box takes the name, client ID, account number, PN
+    number or application number, and results group by client. The servicing view shows the client summary, every
+    account (CBG and non-CBG) with its CSF status, payments of the last 12 months, RAs, e-policies and documents. Before
+    an update the agent completes the verification checklist; only contact fields change, with a reason, in the BIBS
+    client master. The agent resends the RA or the e-policy to the registered e-mail, password protected, with the
+    password sent separately. The contact change is queued for QPS and EBIX while they coexist (parked seam, CSQ01).
+    Management prints or saves the audit trail and agent activity in PDF or Excel.
+  cols: 5
+  lanes:
+    - {id: cli, label: Caller (client), kind: external}
+    - {id: agt, label: Contact centre agent}
+    - {id: sup, label: 'Supervisor, management'}
+    - {id: bibs, label: BIBS (automatic), kind: bibs}
+    - {id: leg, label: 'QPS, EBIX (coexisting)', kind: system}
+  steps:
+    - {id: b1, lane: cli, col: 1, text: Calls the contact centre, kind: external}
+    - {id: b2, lane: agt, col: 1, text: 'One search: name, ID, account, PN'}
+    - {id: b3, lane: bibs, col: 2, text: 'All accounts, 12 months payments, RAs', kind: auto}
+    - {id: b4, lane: agt, col: 3, text: Caller verified; contact changed with reason}
+    - {id: b5, lane: bibs, col: 3, text: Client master updated and logged, kind: auto}
+    - {id: b6, lane: leg, col: 4, text: Write-back queued (parked), kind: parked}
+    - {id: b7, lane: agt, col: 4, text: RA or e-policy resent}
+    - {id: b8, lane: cli, col: 5, text: 'Protected file; password apart', kind: external}
+    - {id: b9, lane: sup, col: 5, text: 'Audit trail, agent activity (PDF, Excel)'}
+  edges:
+    - [b1, b2]
+    - [b2, b3]
+    - [b3, b4]
+    - [b4, b5]
+    - [b5, b6, dashed]
+    - [b5, b7]
+    - [b7, b8, dashed, e-mail]
+    - [b7, b9]
+after:
+  - {n: 1, bibs: 'Every account of the client, CBG and non-CBG, with status and payments', measure: 'All segments'}
+  - {n: 2, bibs: 'One search box for name, client ID, account number, PN number and application number', measure: '< 3 s search'}
+  - {n: 3, bibs: 'Agent, supervisor and management roles with separate rights to update, resend and upload', measure: 'Role-based access'}
+  - {n: 4, bibs: 'Update made once in the BIBS client master after verifying the caller; write-back seam for QPS / EBIX', measure: 'Verification before change'}
+  - {n: 5, bibs: 'Agent views, downloads and resends the RA and e-policy to the registered e-mail, protected', measure: 'Resend in one call'}
+  - {n: 6, bibs: 'Every change and agent action logged; audit trail in PDF or Excel', measure: 'Full audit trail'}
+gaps:
+  - {sev: High, gap: Write-back to QPS and EBIX, impact: Two systems of record while they coexist, owner: 'Contact Center Management, BDO IT', decision: 'Until when are QPS / EBIX kept? Write back or not?', ref: 'DCR-104, CSQ01'}
+  - {sev: High, gap: Agents in the BDO directory, impact: Sign-in of contact centre agents, owner: 'BDO ITIO', decision: 'Are agents in EUA? Local sign-in meanwhile?', ref: 'DCR-143'}
+  - {sev: High, gap: Backup every 15 minutes or 4 hours, impact: Backup and recovery design of the platform, owner: 'BDO IT', decision: 'Is RPO 15 minutes BIBS-wide?', ref: 'DCR-102'}
+  - {sev: Medium, gap: 'Statuses Pending, Awaiting, Booked, Open / Closed', impact: What the agent tells the caller, owner: Contact Center Management, decision: Define each status and its source, ref: 'DCR-101'}
+  - {sev: Medium, gap: Two contact centre roles, impact: 'Renewal follow-up role and CSF roles', owner: 'Contact Center, RMEL', decision: 'Same people? One role or two?', ref: 'XQ02'}
+  - {sev: Medium, gap: Documents agents may see, impact: Confidential claim and renewal documents, owner: 'Contact Center, Compliance', decision: Confidentiality matrix per document type, ref: 'XQ04, XQ05'}
+best:
+  - {practice: Single client view, status: BIBS, bibs: 'All accounts, payments, RAs, e-policies and documents of the client on one screen.', bdoi: 'Retire the Front-End once the data are in BIBS.'}
+  - {practice: Verify the caller before any change, status: BIBS, bibs: 'Verification checklist before a contact update; only contact fields change.', bdoi: 'Approve the verification questions.'}
+  - {practice: Protected delivery of documents, status: BIBS, bibs: 'Resend to the registered e-mail only, password protected, password sent separately.', bdoi: 'Agree the password convention (DCR-153).'}
+  - {practice: Least-privilege roles, status: BIBS, bibs: 'Separate rights to update, resend and upload for agents, supervisors and management.', bdoi: 'Approve the role matrix (DCR-121).'}
+  - {practice: Quality review of agent actions, status: BIBS, bibs: 'Agent activity and contact-change reports for supervisors.', bdoi: 'Set a sampling routine for supervisors.'}
+  - {practice: First-contact resolution KPI, status: ADOPT, bibs: 'Actions logged per contact.', bdoi: 'Track first-contact resolution and repeat calls per reason.'}

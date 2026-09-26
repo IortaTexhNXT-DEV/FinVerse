@@ -1,0 +1,202 @@
+# Screen specifications of BRD-1 New Business: package quotations and quotation requests.
+area: Package quotation
+screens:
+  - id: SCR-NB-05
+    title: Quotations
+    route: /quotations
+    purpose: >-
+      The work list of package quotations from draft to acceptance, with status tabs, quick filters and a search by
+      Proposal No., ARN or client. Approved quotations are selected here and sent in one batch, one e-mail per client.
+    entry:
+      - Client record › Quotation tab
+      - The quotation links of My Work and the NB Dashboard
+    shots:
+      - {state: list, user: ao, caption: "Quotations work list, Drafts tab"}
+      - {state: review, user: mkttl, path: "/quotations?tab=review", caption: "For Review tab as seen by the approver"}
+    fields:
+      - "Quick filters | My Drafts / For Review / Sent / Accepted / Expiring | Toggle buttons | - | - | Fixed | None | - | Each selects a tab; My Drafts shows the user's own drafts; Expiring shows approved and sent quotations whose validity ends within QUOTATION_EXPIRING_DAYS (7) | -"
+      - "Tabs | Drafts / For Review / Sent to Client / Accepted / Not Proceeded | Tab | - | - | Fixed | Drafts | - | For Review also lists approved quotations; Accepted also lists converted ones; Not Proceeded also lists voided ones | -"
+      - "Search | Search Proposal No. | Text | Proposal No., ARN or client | N | - | Blank | - | Contains search | -"
+      - "Filters | Only My Drafts / Expiring within 7 days | Check box | - | N | - | Not ticked | - | Same as the quick filters | -"
+      - "List | Select | Check box | One per row, plus select all | N | - | Not ticked | Shown to QUOTE_MAINTAIN | Only approved quotations are sent in the batch | -"
+      - "List | Proposal No. | Column | QT-yyyy-nnnnnn with its version (v1, v2...) | - | Numbering | - | Read only | - | -"
+      - "List | ARN | Column | ARN-yyyy-nnnnnn, copy chip | - | Numbering | - | Read only | - | -"
+      - "List | Client | Column | Name and code | - | Client master | - | Read only | - | -"
+      - "List | Product | Column | Product code | - | Product catalogue (BRD-3) | - | Read only | - | -"
+      - "List | Insurer | Column | Insurer code or To be advised | - | Insurer master | - | Read only | - | -"
+      - "List | Gross Premium | Column | Amount, 2 decimals | - | Premium computation | - | Read only | - | -"
+      - "List | Valid Until | Column | dd-MMM-yyyy; days left or Expired when 7 days or less remain on an approved or sent quotation | - | Quotation | - | Read only | - | -"
+      - "List | Status | Column | Status badge; Direct Payment badge when paid directly to the insurer | - | Workflow NB_QUOTATION | - | Read only | - | -"
+    actions:
+      - "Request Inbox | QUOTE_MAINTAIN | Always | Opens Quotation Requests | - | -"
+      - "Bulk Upload | QUOTE_MAINTAIN and BULK_PROCESS | Always | Opens the Bulk Quotations upload | - | -"
+      - "New Quotation | QUOTE_MAINTAIN | Always | Opens the New Quotation wizard | - | -"
+      - "Send via Email (n) | QUOTE_MAINTAIN | At least one approved quotation selected | Opens the batch send dialog: the list of quotations and an optional password hint; Send n Quotation(s) sends one e-mail per client with the protected PDF and Excel of each quotation, and the password in a separate e-mail | Sent to client | E-mail to each client and the password e-mail"
+      - "Open a row | Every user of the screen | Always | Opens the quotation record | - | -"
+    rules:
+      - "Only approved quotations are sent; a quotation of a client without an e-mail address is refused with the list of problems (FR-NB-044)."
+      - "A batch send groups the quotations of the same client into one e-mail (FR-NB-044)."
+    outcome: Marketing sees every quotation by stage and sends the approved ones in one step.
+    frs: [FR-NB-010, FR-NB-042, FR-NB-044]
+    tests: [QTS]
+
+  - id: SCR-NB-06
+    title: New Quotation and Edit Quotation
+    route: /quotations/new
+    also: [/quotations/:id/edit]
+    purpose: >-
+      A five-step wizard that builds a package quotation for a client or prospect: client, product and terms, risk
+      items with their risk groups, the premium computed live with the rates in force, and a review before submission
+      for approval. A change after submission opens the next version.
+    entry:
+      - Quotations › New Quotation
+      - Client record › Generate Quotation (the client is chosen)
+      - Quotation Requests › Create Quotation (client, product, segment and channel are carried over)
+      - Quotation record › Edit (draft only)
+    shots:
+      - {state: empty, user: ao, caption: "New Quotation, step 1 Client"}
+      - {state: terms, user: ao, fill: quotation_terms, caption: "Step 2 Product & Terms"}
+      - {state: items, user: ao, fill: quotation_items, caption: "Step 3 Risk Items with the live premium"}
+      - {state: error, user: ao, fill: quotation_no_items, click: "^next$", caption: "Message when the user leaves Risk Items without an item"}
+    fields:
+      - "1. Client | Client or prospect | Look-up | Type 2 or more characters of a code or name; shows the status | Y | Client master (prospects allowed) | From the client page or request, when opened from there | Draft (fixed once saved) | A client or prospect is chosen | Select the client or prospect"
+      - "1. Client | Market segment | Drop-down | - | N | List of values MARKET_SEGMENT | The client's segment | Draft | The product must be offered to the segment | Product <code> is not offered to segment <segment>"
+      - "1. Client | Source channel | Drop-down | - | N | List of values SOURCE_CHANNEL | E-mail, or the request's channel | Draft | - | -"
+      - "2. Product & Terms | Product | Drop-down | Code – name; (non-package) marked | Y | Active products of the segment (BRD-3 catalogue) | Blank, or the request's product | Draft (fixed once saved) | The product cannot change after the first save | Select the product / The product of a quotation cannot change"
+      - "2. Product & Terms | Insurer | Drop-down | - | N | Active insurers (Insurer master) | To be advised | Draft | - | -"
+      - "2. Product & Terms | Insurer branch (LGT) | Drop-down | - | N | Branches of the insurer | Select | Draft (after an insurer is chosen) | The branch sets the local government tax rate | -"
+      - "2. Product & Terms | Period from | Date | dd-MMM-yyyy | N | - | Today | Draft | - | -"
+      - "2. Product & Terms | Period to | Date | dd-MMM-yyyy | N | - | One year after Period from | Draft | After Period from | The period end must be after the period start"
+      - "2. Product & Terms | Valid until | Date | dd-MMM-yyyy | N | - | Blank = today plus QUOTATION_VALIDITY_DAYS (30) | Draft | Not in the past, on save and on submission | The validity date cannot be in the past / The validity date has passed: change it before submitting"
+      - "2. Product & Terms | Rating basis | Drop-down | Annual, Pro-rata (days), Short period (table) | N | Fixed list | Annual | Draft | - | -"
+      - "2. Product & Terms | Premium paid directly to the insurer | Check box | - | N (shown for products eligible for direct payment) | Product flag | Not ticked | Draft | The product allows direct payment | Product <code> cannot be paid directly to the insurer"
+      - "2. Product & Terms | Remarks | Text | Up to 2,000 characters | N | - | Blank | Draft | - | -"
+      - "3. Risk Items | Vehicle: Plate no., Conduction sticker, Engine no., Chassis no. | Text | Upper case; plate and sticker up to 20, engine and chassis up to 40 characters | Cond.: plate no. or conduction sticker per vehicle; others per the product's field rules | - | Blank | Draft | Product field rules (BRD-3) | Complete the mandatory fields of <product>: <fields>"
+      - "3. Risk Items | Vehicle: Make, Model, Year model, Body type, Colour, Seats | Text / Number / Drop-down | Year 1900-2100; seats 1-100; body type from VEHICLE_BODY_TYPE | Cond.: per the product's field rules | List of values VEHICLE_BODY_TYPE | Blank | Draft | Product field rules | -"
+      - "3. Risk Items | Location: Address, City, Province, Occupancy, Construction class | Text / Drop-down | Address up to 300 characters | Address Y for a location; others per the field rules | Lists OCCUPANCY, CONSTRUCTION_CLASS | Blank | Draft | Product field rules | -"
+      - "3. Risk Items | Location: Insured items (description, sum insured) | Table | Description up to 200 characters; up to 50 items | N | - | None | Draft | Each row has a description and a sum insured | -"
+      - "3. Risk Items | Person: Name, Birth date, Relationship | Text / Date | Name up to 200 characters | Name Y for a person | - | Blank | Draft | - | -"
+      - "3. Risk Items | Description | Text | Up to 300 characters | N | - | Blank | Draft | - | -"
+      - "3. Risk Items | Sum insured | Amount | 0 or more | Y to rate the premium | - | Blank | Draft | Every item is given a sum insured | Enter the sum insured of every item"
+      - "3. Risk Items | Rate % (non-motor) | Number | 0 to 100, 4 decimals | N | Product rate (BRD-3) | Blank = product default | Draft | A rate different from the package scheme rate needs an approved rate exception | An item rate differs from the scheme rate: submission needs an approved rate exception."
+      - "3. Risk Items | Excess BI limit, PD limit (motor) | Amount | 0 or more | N | Motor limits | Blank | Draft | - | -"
+      - "3. Risk Items | Item n: risk group | Number | 1-99 | N (shown with 2 or more items) | - | 1 | Draft | Items of the same group become one account | -"
+      - "4. Premium | Live premium | Display | Rating basis, net premium, DST, premium tax, VAT, FST, LGT, total charges, gross premium, commission | - | Rates and taxes (Appendix A) | Computed | Read only | Not rated until every item has a sum insured | Not rated yet: give every item a sum insured (and a rate when the product has no default rate)."
+      - "4. Premium | TSU routing notice | Banner | - | - | TSU routing rules | - | Read only | Shown when a TSU rule applies | TSU routing applies: <reason>. Consider a Proposal Request (PRF) for TSU to price the risk with the insurers."
+      - "5. Review | Summary | Display | Client, product, insurer, period, valid until, risk items, accounts (risk groups), direct payment | - | - | - | Read only | - | -"
+    actions:
+      - "Save Draft | QUOTE_MAINTAIN | Client and product chosen | Saves the draft; the first save gives the Proposal No. (QT-yyyy-nnnnnn) and the ARN | Draft | -"
+      - "Next / Back | Every user of the screen | Always | Moves between steps; Next checks the step first | - | -"
+      - "Submit for Review | QUOTE_MAINTAIN | Step 5, client and product chosen | Saves, checks items, premium and validity, freezes the version and sends it for approval | For review | Workflow notice"
+    rules:
+      - "A prospect is enough to quote; the client must be confirmed before accounts are created (FR-NB-041, FR-NB-045)."
+      - "The premium is computed on the server with the rates and taxes in force (Appendix A) and stored with the version (FR-NB-041, FR-NB-062)."
+      - "The quotation keeps one ARN from the first save to the invoice (FR-NB-047)."
+      - "Each submission freezes its version; a later change opens version n+1 (FR-NB-042)."
+      - "A TSU routing rule is shown as a notice; the risk can be moved to a PRF (FR-NB-005)."
+    outcome: The quotation is priced, numbered and waiting for the approver in the For Review tab.
+    frs: [FR-NB-041, FR-NB-042, FR-NB-047, FR-NB-005, FR-NB-062]
+    tests: [NEWQT]
+
+  - id: SCR-NB-07
+    title: Quotation record
+    route: /quotations/:id
+    parent: /quotations
+    purpose: >-
+      One quotation with its Proposal No., ARN, status and version selector, the client's instructions, the rate
+      scheme panel, the workflow panel with the business actions, and tabs for details, items and premium, versions and
+      their differences, documents, e-mails and history.
+    entry:
+      - Quotations › open a row
+      - Client record › Quotation tab
+      - My Work and notification links
+    shots:
+      - {state: record, user: ao, open: first, caption: "Quotation record, Details tab"}
+      - {state: items, user: ao, open: first, tab: "Items & Premium", caption: "Items & Premium tab"}
+      - {state: approval, user: mkttl, path: "/quotations?tab=review", open: first, caption: "Quotation for review as seen by the approver (Approve, Return To Maker)"}
+      - {state: send, user: ao, open: approved, click: "^send via email$", caption: "Send via Email dialog of an approved quotation"}
+    fields:
+      - "Header | Version | Drop-down | v1 ... vn, current marked | N | Quotation versions | Current version | Always | - | -"
+      - "Summary | Client, Product, Insurer, Period, Valid until, Gross premium | Display | - | - | Quotation | - | Read only | - | -"
+      - "Summary | Direct Payment / TSU Rule Applies tags | Tag | - | - | Quotation | - | Read only | - | -"
+      - "Rate scheme panel | Priced on package version n | Banner | Shown when an item rate differs from the scheme rate or a rate exception exists | - | Package versions (BRD-3) | - | Read only | Submission needs an approved rate exception when a rate differs | The quotation is priced on version <n> of <product>; version <m> is current: save the quotation again to re-price it"
+      - "Details tab | Quotation | Display | Proposal No., ARN, client, client e-mail, product, segment, channel, insurer and branch, period, valid until, premium payment, remarks | - | Quotation | - | Read only | - | -"
+      - "Details tab | Control | Display | Intake template, version (open or submitted), created, submitted, approved, sent, accepted, accepted risk groups, accounts | - | Quotation | - | Read only | - | -"
+      - "Items & Premium tab | Risk items | Table | #, Risk Group, Risk, Sum Insured, Rate %, Premium | - | Quotation version | - | Read only | - | -"
+      - "Items & Premium tab | Premium | Display | Appendix A breakdown | - | Premium computation | - | Read only | - | -"
+      - "Versions tab | Versions | Table | Version, State, Sum Insured, Gross Premium, Submitted | - | Quotation versions | - | Read only | - | -"
+      - "Versions tab | Compare versions (From, To) | Drop-down | Changed terms and item changes with the gross premium difference | N | Quotation versions | Previous and current | Always | - | -"
+      - "Documents tab | Documents | Documents panel | See Common screen elements | - | Documents | - | See Common screen elements | - | -"
+      - "E-mails tab | E-mails | Table | Sent and queued e-mails of the quotation with their outcome | - | Outbound messages | - | Read only | - | -"
+      - "History tab | History | Timeline | Stage, action, user, time, reason and comment | - | Workflow history | - | Read only | - | -"
+      - "Send via Email dialog | To, Cc, Subject, Message | Text | Separate several addresses with commas | To, Subject and Message Y | Client e-mail; standard subject and text | Client e-mail, Insurance quotation <Proposal No.> – <product>, standard text | Approved | At least one valid address | Enter at least one recipient / Invalid e-mail address: <address>"
+      - "Send via Email dialog | Password hint for the recipient | Text | Free text | N | - | Blank | Approved | - | -"
+      - "Record Acceptance dialog | Client's acceptance e-mail | File | .eml, .msg or PDF | Cond.: unless already attached | - | - | Sent to client | The acceptance e-mail is attached before acceptance is recorded | Attach the client's acceptance e-mail (document type Client acceptance e-mail) first"
+      - "Record Acceptance dialog | Risk groups accepted | Check boxes | One per risk group; shown with 2 or more groups | Y (at least one) | Quotation risk groups | All groups | Sent to client | Only the offered groups | The quotation offers risk groups <groups> only"
+      - "Record Acceptance dialog | Comment | Text area | Up to 1,000 characters | N | - | Blank | Sent to client | - | -"
+      - "Rate exception dialog | Item rate %, Valid until, Reason | Number / Date / Text | Rate 0-100 | Rate and reason Y | - | First item rate; the quotation validity | Draft | Rate between 0 and 100; reason given | Enter the item rate between 0 and 100 / Explain why the scheme rate cannot be used"
+    actions:
+      - "PDF / Excel | Every user of the screen | Always | Downloads the quotation letter (PDF) or schedule (Excel) of the current version | - | -"
+      - "Edit | QUOTE_MAINTAIN | Draft | Opens the wizard on the draft | - | -"
+      - "Submit for review | QUOTE_MAINTAIN | Draft | See New Quotation | For review | Workflow notice"
+      - "Approve | QUOTE_APPROVE; not the maker or the submitter | For review | Asks for an optional comment and approves the version | Approved | Workflow notice to the maker"
+      - "Return To Maker | QUOTE_APPROVE | For review | Asks for the return reason and a comment | Draft | Workflow notice to the maker with the comment"
+      - "Send via Email | QUOTE_MAINTAIN | Approved | Opens the Send via Email dialog; sends the protected PDF and Excel and the password e-mail | Sent to client | E-mail to the client and the password e-mail"
+      - "Revise (new version) | QUOTE_MAINTAIN | Approved or sent to client | Reopens the quotation as a draft; the next save is version n+1 | Draft | Workflow notice"
+      - "Record acceptance | QUOTE_MAINTAIN | Sent to client | Opens the Record Acceptance dialog; stores the e-mail and the accepted risk groups | Accepted | Workflow notice"
+      - "Client Declined | QUOTE_MAINTAIN | Sent to client | Asks for a comment | Not proceeded | Workflow notice"
+      - "Create accounts | QUOTE_MAINTAIN | Accepted; the client is confirmed | Creates one draft account per accepted risk group, all under the quotation's ARN | Converted | Workflow notice"
+      - "Void | QUOTE_MAINTAIN (and QUOTE_APPROVE for review) | Draft or for review | Asks for the void reason and a comment; the record is kept | Voided | Workflow notice"
+      - "Request Rate Exception | QUOTE_MAINTAIN | Draft with an item rate that differs from the scheme rate | Sends a rate exception request to My Approvals (Product Maintenance) | Unchanged | Pending item in My Approvals"
+    rules:
+      - "The maker and the submitter never approve their own quotation (FR-NB-043)."
+      - "Documents that leave BIBS are password protected; the password follows in a separate e-mail (FR-NB-013, FR-NB-044)."
+      - "Accounts are created only for a confirmed client and only for the accepted risk groups (FR-NB-045)."
+      - "Void keeps the record with its reason; nothing is deleted (FR-NB-012)."
+    outcome: The accepted quotation is converted into draft accounts under its ARN, ready for Marketing to complete and submit to Processing.
+    frs: [FR-NB-042, FR-NB-043, FR-NB-044, FR-NB-045, FR-NB-012, FR-NB-013, FR-NB-014]
+    tests: [QT]
+
+  - id: SCR-NB-08
+    title: Quotation Requests
+    route: /quotations/requests
+    purpose: >-
+      The inbox of quotation requests received by e-mail, bulk upload or a source system. Marketing captures an e-mailed
+      request with the e-mail attached, creates the prospect when the requester is not a client, and opens the
+      quotation wizard with the request's details.
+    entry:
+      - Quotations › Request Inbox
+    shots:
+      - {state: list, user: ao, caption: "Quotation Requests, To Quote tab"}
+      - {state: capture, user: ao, click: "^capture request$", caption: "Capture Quotation Request dialog"}
+    fields:
+      - "Tabs | To Quote / Quoted / Closed | Tab | - | - | Fixed | To Quote | - | - | -"
+      - "Search | Search Request No. | Text | Request No., prospect or cover | N | - | Blank | - | Contains search | -"
+      - "List | Request No. | Column | REQ-yyyy-nnnnnn and the time received | - | Numbering (QUOTATION_REQUEST_PREFIX) | - | Read only | - | -"
+      - "List | Channel | Column | Channel and source reference | - | List of values SOURCE_CHANNEL | - | Read only | - | -"
+      - "List | Client / Prospect | Column | Prospect name, or the client | - | Request | - | Read only | - | -"
+      - "List | Product | Column | Requested product | - | Product catalogue | - | Read only | - | -"
+      - "List | Requested Cover | Column | Text | - | Request | - | Read only | - | -"
+      - "List | Status | Column | New, Quoted, Closed with the close reason | - | Request | - | Read only | - | -"
+      - "Capture dialog | Channel | Drop-down | - | Y | List of values SOURCE_CHANNEL | E-mail | New | - | -"
+      - "Capture dialog | Source reference | Text | E-mail subject or source-system reference, up to 60 characters | N | - | Blank | New | A reference already received on the same channel is refused | Request <reference> of <channel> was already received"
+      - "Capture dialog | Existing client | Look-up | Code or name | Cond.: the client or the prospect name | Client master | Blank | New | A client or a prospect name is given | Choose the client or give the prospect name"
+      - "Capture dialog | Prospect name | Text | 'Last, First' for a person; up to 250 characters | Cond.: when no client is chosen | - | Blank | New (disabled when a client is chosen) | - | -"
+      - "Capture dialog | Prospect e-mail | Text | name@domain | N | - | Blank | New | Valid e-mail format | Enter a valid e-mail address"
+      - "Capture dialog | Prospect mobile | Text | Up to 30 characters | N | - | Blank | New | - | -"
+      - "Capture dialog | Requested product | Drop-down | - | N | Active products | Not specified | New | - | -"
+      - "Capture dialog | Market segment | Drop-down | - | N | List of values MARKET_SEGMENT | Blank | New | - | -"
+      - "Capture dialog | Requested cover | Text area | Up to 2,000 characters | Y | - | Blank | New | Not blank | Describe the requested cover"
+      - "Capture dialog | Request e-mail | File | .eml, .msg or PDF | N | - | - | New | Stored as document type Request e-mail | -"
+    actions:
+      - "Capture Request | QUOTE_MAINTAIN | Always | Opens the capture dialog; Save Request numbers the request | New | -"
+      - "Create Prospect | QUOTE_MAINTAIN | New request without a client | Creates a prospect from the request's details | New (with a prospect) | -"
+      - "Create Quotation | QUOTE_MAINTAIN | New request with a client or prospect | Opens the New Quotation wizard with the client, product, segment and channel of the request | Quoted once the quotation is saved | -"
+      - "Close | QUOTE_MAINTAIN | New request | Asks for a comment used as the close reason | Closed | -"
+      - "Open Quotation | Every user of the screen | Quoted request | Opens the quotation | - | -"
+    rules:
+      - "Requests from HLS and other source systems arrive in the same inbox through the upload of the extract; the direct interface waits for the interface specification (FR-NB-040)."
+      - "The same source reference on the same channel is not accepted twice (FR-NB-040)."
+    outcome: Every request is numbered and traced to its quotation, or closed with a reason.
+    frs: [FR-NB-040]
+    tests: [QREQ]

@@ -1,0 +1,26 @@
+/* Sign-in pages: forgot password, reset link and the forced password change (BRD-11 FR-UA-005). */
+.login-card .btn.login-link {
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-info);
+  font-size: 14px;
+  justify-self: end;
+}
+
+.login-card .btn.login-link:hover {
+  text-decoration: underline;
+}
+
+.login-links {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.login-notice {
+  margin: 0;
+  text-align: center;
+  color: var(--color-text-muted);
+}

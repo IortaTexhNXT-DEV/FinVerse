@@ -1,0 +1,23 @@
+// BRD-12: workflow SBM_IAAF (FRS section 5.3; BRIDSP-05-07). Each approval moves the IAAF to the next level of the matrix.
+digraph sp_iaaf {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.8, ranksep=0.45, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=14, fontcolor="@NEAR_BLACK", width=2.8, height=0.6];
+  edge  [color="@MUTED", arrowsize=0.7, fontname="Arial", fontsize=12, fontcolor="@TEXT"];
+
+  DRAFT        [label="DRAFT\nPolicy Reviewer"];
+  CANCELLED    [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  FOR_APPROVAL [label="FOR_APPROVAL (level 1 to n)\nIAAF_APPROVE holder;\napproval moves to the next level"];
+  RETURNED     [label="RETURNED\nPolicy Reviewer"];
+  APPROVED     [label="APPROVED\nsignatures stamped"];
+  ISSUED       [label="ISSUED\nsent to bank counterpart", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+
+  DRAFT -> CANCELLED [label=" cancel", style=dotted];
+  DRAFT -> FOR_APPROVAL [label=" submit"];
+  FOR_APPROVAL -> RETURNED [label=" return\n (reason)", style=dashed];
+  RETURNED -> FOR_APPROVAL [label=" resubmit", style=dashed, constraint=false];
+  FOR_APPROVAL -> APPROVED [label=" approve (last level)"];
+  APPROVED -> ISSUED [label=" send"];
+  { rank=same; DRAFT; CANCELLED; }
+  { rank=same; FOR_APPROVAL; RETURNED; }
+}

@@ -1,0 +1,155 @@
+/*
+ * Quotation / Proposal and Non-Package Management screens (quotation and nonpackage modules).
+ * Colours come from tokens.css only.
+ */
+
+/* Work list toolbar (every work list): search box and Search, Filters, then the bulk actions on
+   the right, all on one line and vertically centred */
+.worklist-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.worklist-toolbar .field {
+  min-width: 260px;
+}
+
+.worklist-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.worklist-search .input {
+  width: 340px;
+  max-width: 100%;
+}
+
+.worklist-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.worklist-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface-alt);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.worklist-filters > form {
+  flex: 1 1 100%;
+}
+
+.select-cell {
+  width: 36px;
+}
+
+/* Record summary card: codes, name, status, then icon + label / value facts */
+.record-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.record-summary-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.record-summary-head h2 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 18px;
+  color: var(--color-heading);
+}
+
+.fact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+
+.fact {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.fact svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--brand-blue);
+}
+
+.fact-label {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.fact-value {
+  display: block;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+/* Version diff */
+.diff-added {
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+.diff-removed {
+  color: var(--color-danger);
+  text-decoration: line-through;
+}
+
+.diff-changed {
+  color: var(--color-warning);
+  font-weight: 700;
+}
+
+/* Live premium of the quotation wizard */
+.premium-total {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--brand-navy);
+}
+
+/* Free-form sections of a PRF */
+.risk-section {
+  padding: var(--space-3) var(--space-4);
+  border-left: 4px solid var(--brand-blue-050);
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-sm);
+}
+
+.risk-section h3 {
+  margin: 0 0 var(--space-1);
+  font-size: 14px;
+  color: var(--brand-navy);
+}
+
+.risk-section p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.insurer-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-2);
+}

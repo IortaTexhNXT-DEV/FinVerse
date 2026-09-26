@@ -1,0 +1,137 @@
+// Refreshes docs/design/screenshots from the running seed profile: deletes every old image, captures the
+// screens listed in screens.cjs (numbered in manifest order) and rewrites the README index.
+// Usage: BASE=http://localhost:5173 node tools/screenshots/capture.cjs
+// Needs the seed profile running (backend + Vite) and Playwright; see tools/screenshots/README.md.
+const fs = require('fs');
+const path = require('path');
+
+const PLAYWRIGHT = process.env.PLAYWRIGHT_MODULE || 'playwright';
+const { chromium } = require(PLAYWRIGHT);
+const SCREENS = require('./screens.cjs');
+
+const ROOT = path.resolve(__dirname, '../..');
+const OUT = path.join(ROOT, 'docs/design/screenshots');
+const BASE = process.env.BASE || 'http://localhost:5173';
+// Backend base URL (not proxied by Vite): used to wait until the seed start-up runners have finished.
+const API = process.env.API || 'http://localhost:8080';
+const READY_TIMEOUT_MS = 20 * 60 * 1000;
+// Password of the SIT/UAT users, from the seed configuration (never stored in this tool).
+const PASSWORD = process.env.SEED_PASSWORD;
+if (!PASSWORD) {
+  console.error('Set SEED_PASSWORD to the password of the SIT/UAT users of the seed profile.');
+  process.exit(2);
+}
+const VIEWPORT = { width: 1600, height: 1000 };
+
+async function settle(page) {
+  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForTimeout(1000);
+}
+
+async function signIn(browser, user) {
+  const page = await (await browser.newContext({ viewport: VIEWPORT })).newPage();
+  page.setDefaultTimeout(30000);
+  await page.goto(`${BASE}/login`);
+  if (user) {
+    await page.getByLabel('User ID').fill(user);
+    await page.getByLabel('Password').fill(PASSWORD);
+    await page.getByRole('button', { name: /^login$/i }).click();
+    await page.waitForURL((u) => !u.pathname.startsWith('/login'), { timeout: 30000 }).catch(() => {
+      throw new Error(`sign-in of ${user} failed (check BROKERVERSE_ALLOWED_ORIGINS includes ${BASE})`);
+    });
+  }
+  return page;
+}
+
+async function openFirstRecord(page) {
+  const link = page.locator('table tbody tr a').first();
+  if ((await link.count()) > 0) {
+    await link.click();
+  } else {
+    await page.locator('table tbody tr').first().click().catch(() => {});
+  }
+  await settle(page);
+}
+
+async function capture(page, screen, file) {
+  await page.goto(BASE + screen.path);
+  await settle(page);
+  if (screen.open === 'first') {
+    await openFirstRecord(page);
+  }
+  if (screen.click) {
+    await page.getByRole('button', { name: new RegExp(screen.click, 'i') }).first().click().catch(() => {});
+    await settle(page);
+  }
+  await page.screenshot({ path: path.join(OUT, file) });
+  return new URL(page.url()).pathname;
+}
+
+function writeIndex(rows) {
+  const lines = [
+    '# BIBS screenshots',
+    '',
+    'Captured with `tools/screenshots/capture.cjs` from the seed profile (company FVI "BDO',
+    'Insurance and Reinsurance Brokers, Inc."), in sidebar order, at 1600 x 1000. The folder is wiped and recaptured on every',
+    'run, so it only holds the current screens. Signed in as the SIT/UAT user in',
+    'brackets.',
+    '',
+    ...rows.map((r) => `- [\`${r.file}\`](${r.file}): ${r.title} (${r.user ?? '-'}, \`${r.url}\`)`),
+    '',
+  ];
+  fs.writeFileSync(path.join(OUT, 'README.md'), lines.join('\n'));
+}
+
+// "Started" is logged before the seed ApplicationRunners (booking, ledger replay, Operations seed data)
+// run; readiness turns UP only after them, so screens are captured with the complete seed data.
+async function waitUntilReady() {
+  const deadline = Date.now() + READY_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    const status = await fetch(`${API}/actuator/health/readiness`)
+      .then((r) => r.json())
+      .then((b) => b.status)
+      .catch(() => 'DOWN');
+    if (status === 'UP') {
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 5000));
+  }
+  throw new Error(`backend at ${API} not ready after ${READY_TIMEOUT_MS / 60000} minutes`);
+}
+
+(async () => {
+  await waitUntilReady();
+  fs.mkdirSync(OUT, { recursive: true });
+  fs.readdirSync(OUT)
+    .filter((f) => f.endsWith('.png') || f === 'index.json')
+    .forEach((f) => fs.unlinkSync(path.join(OUT, f)));
+  const browser = await chromium.launch(
+    process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {},
+  );
+  const pages = new Map();
+  const rows = [];
+  const failed = [];
+  for (const [i, screen] of SCREENS.entries()) {
+    const file = `${String(i + 1).padStart(2, '0')}-${screen.slug}.png`;
+    try {
+      const key = screen.user ?? '-';
+      if (!pages.has(key)) {
+        pages.set(key, await signIn(browser, screen.user));
+      }
+      const url = await capture(pages.get(key), screen, file);
+      rows.push({ file, title: screen.title, user: screen.user, url });
+      console.log('captured', file, url);
+    } catch (e) {
+      failed.push(`${file}: ${e.message.split('\n')[0]}`);
+    }
+  }
+  await browser.close();
+  writeIndex(rows);
+  if (failed.length > 0) {
+    console.error(`Failed screens:\n${failed.join('\n')}`);
+    process.exit(1);
+  }
+})().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

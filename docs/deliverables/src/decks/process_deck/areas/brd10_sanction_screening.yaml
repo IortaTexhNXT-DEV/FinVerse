@@ -1,0 +1,150 @@
+# BRD-10 Sanction Screening and Risk Profiling: chapter 10 of the business process deck.
+# Sources: "Sanction Screening and Risk Profiling BRD.pdf" p.4-5 (benefits), p.6-7 (current process, image pages
+# rendered and read), p.8 (to-be), p.22-25 (NFR); FRS BRD-10 sections 2, 5, 9; discrepancy register (DCR-107-112).
+id: brd10
+key: sanc
+num: 10
+title: Sanction Screening
+brd: BRD-10
+scope: 'Sanction and PEP screening, risk profiling, case review, escalation, STR'
+status: DESIGNED
+status_text: Designed, not yet built; FRS v1.0 issued for review
+department: Compliance (Chief Compliance Officer)
+roles:
+  - Compliance Officer and Compliance Checker
+  - Unit Compliance Coordinator; Investigators (287)
+  - Approver (Unit Head, 8)
+  - AML Committee (5 members)
+  - Operations Lead; Auditor
+figures:
+  - ['64 h', 'a month freed for Compliance (p.4-5)']
+  - ['4 h > 1 h', 'case cycle time, current to target (p.4-5)']
+  - ['10 min', 'saved per case on name screening (p.4-5)']
+  - ['300', 'list records a day at most (10 to 300; p.22-25)']
+sources:
+  - BRD-10 p.6-7 (current process, rendered from images), p.8 (to-be)
+  - SNSRP-101 to 706
+  - FRS BRD-10 v1.0, sections 2 and 5
+chevrons: [Configure, List intake, Matching, Risk tagging, Case, Investigation, Approval, STR]
+notes:
+  glance: >-
+    BDOI screens clients by hand today. The BRD asks for one in-system workflow with configurable criteria and
+    matrices, a list updated on a schedule, automated matching, risk tagging and case creation, review templates, routing
+    to approvers, escalation to Compliance and the AML Committee, STR preparation and extraction, and immutable audit
+    logs. The benefits on p.4-5 are the only quantified targets in the twelve BRDs. The module is designed.
+  pains: 'The nine points are the current-process rows of FRS BRD-10 section 2.1, read from the image pages of the BRD (p.6-7).'
+  after: 'The measures are BDOI''s own benefit targets (p.4-5).'
+  gaps: >-
+    Whether an open match blocks business (DCR-112) is the key compliance decision; BIBS warns by banner and has the
+    block behind a parameter, off by default. Filing on the AMLC portal stays manual; BIBS extracts the committee-approved
+    STRs in the AMLC format and records the reference.
+asis:
+  caption: 'Name screening and risk profiling today (BRD-10 p.6-7)'
+  notes: >-
+    Today the risk-profile category is cascaded by memo. The AML unit sends sanctioned names by e-mail advisory;
+    Compliance consolidates them and publishes them on SharePoint. Investigators match the names against new and
+    existing clients by hand, tag the client risk profile by hand, fill review templates outside the system and route
+    them by e-mail for review and approval. PEP lists are prepared every quarter by Marketing and validated in NLDS, to
+    which one person has access. There is no Enhanced Due Diligence for PEPs. The STR is prepared by hand and filed on
+    the AMLC portal.
+  cols: 6
+  lanes:
+    - {id: cmp, label: Compliance}
+    - {id: inv, label: Investigators}
+    - {id: apr, label: 'Approvers, AML Committee'}
+    - {id: amlc, label: AMLC, kind: external}
+    - {id: sys, label: 'E-mail, SharePoint, NLDS', kind: system}
+  steps:
+    - {id: a1, lane: cmp, col: 1, text: Risk category cascaded by memo, pain: [1]}
+    - {id: a2, lane: sys, col: 1, text: Sanctioned names by e-mail advisory, kind: legacy, pain: [2]}
+    - {id: a3, lane: cmp, col: 2, text: Names consolidated on SharePoint, pain: [3]}
+    - {id: a4, lane: sys, col: 3, text: 'PEP list quarterly; NLDS, one user', kind: legacy, pain: [8]}
+    - {id: a5, lane: inv, col: 3, text: Names matched by hand, pain: [4]}
+    - {id: a6, lane: inv, col: 4, text: Risk tag and template by hand, pain: [5, 6]}
+    - {id: a7, lane: apr, col: 5, text: Review and approval by e-mail, pain: [7]}
+    - {id: a8, lane: cmp, col: 6, text: STR prepared by hand, pain: [9]}
+    - {id: a9, lane: amlc, col: 6, text: STR filed on the AMLC portal, kind: external}
+  edges:
+    - [a1, a3]
+    - [a2, a3, dashed]
+    - [a3, a5]
+    - [a4, a5, dashed]
+    - [a5, a6]
+    - [a6, a7, dashed, e-mail]
+    - [a7, a8, dashed]
+    - [a8, a9]
+pains:
+  - {n: 1, title: Risk category by memo, text: 'The risk-profile category is cascaded by memo.', ref: 'BRD-10 p.6'}
+  - {n: 2, title: Sanctioned names by e-mail, text: 'The AML unit sends names by e-mail advisory.', ref: 'BRD-10 p.6'}
+  - {n: 3, title: List kept on SharePoint, text: 'Compliance consolidates and publishes the names on SharePoint.', ref: 'BRD-10 p.6'}
+  - {n: 4, title: Matching by hand, text: 'Names are matched against new and existing clients manually.', ref: 'BRD-10 p.6'}
+  - {n: 5, title: Risk profile tagged by hand, text: 'The client risk profile is tagged manually.', ref: 'BRD-10 p.6'}
+  - {n: 6, title: Templates outside the system, text: 'Review templates are filled outside the system and e-mailed.', ref: 'BRD-10 p.6'}
+  - {n: 7, title: Routing by e-mail, text: 'Review and approval items are routed by e-mail.', ref: 'BRD-10 p.6'}
+  - {n: 8, title: PEP list quarterly; one NLDS user, text: 'PEP lists prepared by Marketing AOs; no EDD for PEPs.', ref: 'BRD-10 p.7'}
+  - {n: 9, title: STR by hand, text: 'The STR is prepared manually and filed on the AMLC portal.', ref: 'BRD-10 p.6'}
+tobe:
+  caption: 'To-be screening in BIBS: case workflow SCR_CASE (FRS BRD-10 sections 2.2 and 5)'
+  notes: >-
+    In BIBS Compliance maintains the risk categories, rules, matrices, templates and dispositions; a checker approves
+    each version. List files load on a schedule or by upload, and every run is logged. BIBS matches every new client,
+    every identity change, every account application, every list change and the whole client base in a batch window,
+    with exact, phonetic and fuzzy rules, and sets the risk rating and the PEP / watchlist tags. A case opens and is
+    assigned by the assignment matrix. The Investigator completes the review template, uploads the KYC documents and
+    submits. BIBS validates the case and routes it by the approval matrix to the Unit Head, Compliance and the AML
+    Committee. The STR is prefilled from the case and the committee-approved STRs are extracted in the AMLC format; the
+    AMLC reference is recorded after portal filing.
+  cols: 7
+  lanes:
+    - {id: cmp, label: 'Compliance Officer, Checker'}
+    - {id: inv, label: Investigator}
+    - {id: apr, label: 'Unit Head, AML Committee'}
+    - {id: amlc, label: AMLC, kind: external}
+    - {id: bibs, label: BIBS (automatic), kind: bibs}
+  steps:
+    - {id: b1, lane: cmp, col: 1, text: 'Rules, matrices, lists approved'}
+    - {id: b2, lane: bibs, col: 1, text: List files loaded; runs logged, kind: auto}
+    - {id: b3, lane: bibs, col: 2, text: Matching on every trigger; risk tags, kind: auto}
+    - {id: b4, lane: bibs, col: 3, text: Case opened and assigned, kind: auto}
+    - {id: b5, lane: inv, col: 3, text: 'Template, KYC documents, disposition'}
+    - {id: b6, lane: bibs, col: 4, text: Checked; routed by the matrix, kind: auto}
+    - {id: b7, lane: apr, col: 4, text: Unit Head approves or returns}
+    - {id: b8, lane: cmp, col: 5, text: BU escalation review}
+    - {id: b9, lane: apr, col: 6, text: AML Committee decides}
+    - {id: b10, lane: cmp, col: 6, text: STR prefilled; AMLC-format extract}
+    - {id: b11, lane: amlc, col: 7, text: Filed on the portal; reference kept, kind: external}
+  edges:
+    - [b1, b2]
+    - [b2, b3]
+    - [b3, b4]
+    - [b4, b5]
+    - [b5, b6]
+    - [b6, b7]
+    - [b7, b8]
+    - [b8, b9]
+    - [b9, b10]
+    - [b10, b11, dashed, manual filing]
+after:
+  - {n: 1, bibs: 'Risk categories and rules maintained in BIBS; a checker approves each version', measure: 'Maker-checker on rules'}
+  - {n: 2, bibs: 'List files loaded on a schedule or uploaded; every run logged, failed records reported', measure: '10-300 records a day'}
+  - {n: 3, bibs: 'Watchlist held in BIBS by source; manual additions through maker-checker', measure: 'One list'}
+  - {n: 4, bibs: 'Every new client, application, list change and the client base in a batch window', measure: '10 min saved per case'}
+  - {n: 5, bibs: 'Risk rules set the rating and PEP / watchlist tags; override with evidence', measure: 'Tags by rule'}
+  - {n: 6, bibs: 'Review template completed on the case with the KYC documents', measure: 'Case cycle 4 h > 1 h'}
+  - {n: 7, bibs: 'Case validated and routed by the approval matrix to UH, Compliance and AML Committee', measure: '64 h a month freed'}
+  - {n: 8, bibs: 'PEP entries in the watchlist; PEP clients get a case and, where required, an EDD review', measure: 'EDD for PEPs'}
+  - {n: 9, bibs: 'STR prefilled from the case; approved STRs extracted in the AMLC format', measure: 'Reference recorded'}
+gaps:
+  - {sev: High, gap: Open match blocks or warns, impact: Business with a possible sanctioned party, owner: Chief Compliance Officer, decision: 'Block or warn on quotation, placement, booking, renewal', ref: 'DCR-112'}
+  - {sev: Medium, gap: PEP source for individual clients, impact: PEP coverage, owner: Compliance, decision: Which list screens individuals, ref: 'DCR-109'}
+  - {sev: Medium, gap: AML Committee decision rule, impact: When a case is final, owner: Compliance, decision: 'Any member, majority, all, or a quorum', ref: 'DCR-108'}
+  - {sev: Medium, gap: Adverse media and EDD template, impact: Scope of the review, owner: Compliance, decision: 'Adverse media in scope? EDD fields', ref: 'DCR-111'}
+  - {sev: Medium, gap: 287 concurrent investigators, impact: Load target and role design, owner: Compliance, decision: 'Who the investigators are; real concurrency', ref: 'DCR-110'}
+  - {sev: Parked, gap: AMLC portal filing, impact: Filing stays manual, owner: Compliance, decision: Keep manual filing with the extract, ref: 'SNSRP-706'}
+best:
+  - {practice: Screening on every trigger, status: BIBS, bibs: 'New client, identity change, account application, list change and a monthly full re-screen.', bdoi: 'Confirm the screening scope and batch window.'}
+  - {practice: Maker-checker on rules and lists, status: BIBS, bibs: 'Criteria, matrices and manual list entries are approved by the Compliance Checker.', bdoi: 'Name the checker and a back-up.'}
+  - {practice: Risk-based due diligence for PEPs, status: PARTLY, bibs: 'PEP and high-risk cases; EDD case type when the category requires it.', bdoi: 'Give the EDD template and the PEP source (DCR-109, 111).'}
+  - {practice: Clear escalation to the AML Committee, status: BIBS, bibs: 'Approval and escalation matrices route cases to UH, Compliance and the committee.', bdoi: 'Set the committee decision rule (DCR-108).'}
+  - {practice: Timely STR filing with AMLC, status: PARTLY, bibs: 'STR prefilled, completeness check, AMLC-format extract, reference recorded.', bdoi: 'Keep a filing calendar and monitor it on the STR report.'}
+  - {practice: Immutable audit trail, status: BIBS, bibs: 'Every run, match, decision and override logged, insert-only.', bdoi: 'Agree the retention of screening records (DCR-136).'}

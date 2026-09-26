@@ -1,0 +1,1828 @@
+# Test plan BRD-8 Employee Benefits - test data file.
+# Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/testplans/brd08_cases.yaml
+# Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
+# Employee Benefits and the partner portal are designed and not built: messages are the FRS texts (no
+# codes), screen paths are those of the build design (docs/architecture/EMPLOYEE_BENEFITS_DESIGN.md) and
+# there is no automation reference. Where a check reuses a platform message that exists today (attachment
+# rules, client duplicate, workflow reason), the case quotes the text BIBS shows and a finding records the
+# FRS difference.
+
+meta:
+  brd: BRD-08
+  name: Employee Benefits
+  code: EB
+  frs: FRS_BRD08_EMPLOYEE_BENEFITS.md
+  summary: TP_BRD08_EMPLOYEE_BENEFITS.md
+  version: "1.0"
+  date: 25 September 2026
+  built: false
+
+personas:
+  EB_AO: {name: Marketing AO (Employee Benefits), short: EB AO}
+  EB_TL: {name: Marketing TL / UH (Employee Benefits), short: EB TL}
+  EB_MANAGEMENT: {name: BDOI Management (threshold approver), short: EB Mgmt}
+  EB_PROCESSOR: {name: Processing (Employee Benefits), short: EB Proc.}
+  EB_PROC_SUPERVISOR: {name: Processing Supervisor, short: Proc. Sup.}
+  EB_COLLECTION: {name: Collection (Employee Benefits), short: EB Coll.}
+  BUSINESS_ADMIN: {name: Business Administrator, short: Bus. Admin}
+  AUDITOR: {name: Auditor, short: Audit.}
+  INSURER_USER: {name: Insurer portal user, short: Insurer}
+  CLIENT_HR: {name: Client HR portal user, short: Client HR}
+  NON_EB_USER: {name: BIBS user without an EB role (for example a Renewal AO), short: No EB role}
+  SYSTEM: {name: BIBS scheduled job or event}
+
+screens:
+  HOME: Employee Benefits > EB Home
+  PROGRAMMES: Employee Benefits > Programmes
+  NEWPROG: Employee Benefits > Programmes > New Programme
+  PROGRAMME: Employee Benefits > Programmes > Programme page
+  CYCLE: Employee Benefits > Programme page > Cycle tab
+  DOCS: Employee Benefits > Programme page > Documents tab
+  BOR: Employee Benefits > Programme page > BOR tab
+  FRANCHISE: Employee Benefits > Programme page > Franchise tab
+  TOR: Employee Benefits > Programme page > TOR tab
+  SUBMISSIONS: Employee Benefits > Programme page > Submissions
+  PROPOSALS: Employee Benefits > Programme page > Proposals tab
+  COMPARATIVE: Employee Benefits > Programme page > Comparative page
+  REVISIONS: Employee Benefits > Programme page > Revisions
+  MEMBERS: Employee Benefits > Programme page > Members tab
+  HIST: Employee Benefits > Programme page > History tab
+  MEMBERCHG: Employee Benefits > Member Changes
+  SOAREG: Employee Benefits > SOA Register
+  PENDING: Employee Benefits > Pending Items
+  PORTALUP: Employee Benefits > Portal Uploads (review queue)
+  EBSETUP: Employee Benefits > EB Setup
+  CLIENT: CRM > Clients > Client page
+  ACCOUNT: Accounts > Account page (BRD-1)
+  BOOK: Booking > Book Account (BRD-1)
+  CASHIER: Cashiering > Receipts (BRD-2)
+  ADJUST: Operations > Adjustments > Endorsement requests (BRD-2)
+  ACCREQ: Setup & Administration > User Access Requests (user type External)
+  PORTALUSERS: Setup & Administration > Portal Users
+  REPORTS: Reports > Report Centre (category Employee Benefits)
+  APPROVALS: My Approvals
+  NOTIF: Notifications (bell icon in the page header)
+  MAILBOX: Test mailbox of the client HR contact or insurer (SIT mail relay)
+  PLOGIN: Partner portal > Sign-in
+  PHOME: Partner portal > Home (tasks)
+  PRFP: Partner portal > Requests for Proposal
+  PFRAN: Partner portal > Franchise Requests
+  PMC: Partner portal > Member Changes
+  PSOA: Partner portal > SOA and Policy Forms
+  PPROG: Partner portal > Programmes (client HR)
+  PMEMBERS: Partner portal > Members (client HR)
+  PUPLOADS: Partner portal > Uploads (client HR)
+  PCOMP: Partner portal > Comparative (client HR)
+  API: API call with the user's token (tester tool, for example Postman)
+
+data:
+  - id: TD-EB-01
+    name: Internal test users
+    content: eb.ao1 and eb.ao2 (EB_AO), eb.tl (EB_TL), eb.mgmt (EB_MANAGEMENT), eb.proc (EB_PROCESSOR), eb.sup (EB_PROC_SUPERVISOR), eb.coll (EB_COLLECTION), eb.badmin and eb.badmin2 (BUSINESS_ADMIN), eb.auditor (AUDITOR). Each user holds only the listed role unless a case says otherwise.
+    source: Created by the test lead on SIT through approved access requests (BRD-11); grants of FRS section 3.3
+  - id: TD-EB-02
+    name: Portal users
+    content: ins.a (INSURER_USER of INS-A, the incumbent), ins.b (INSURER_USER of INS-B), hr.acme (CLIENT_HR of ACME Test Corp), hr.beta (CLIENT_HR of Beta Test Inc.); e-mails on the test mailbox domain
+    source: Provisioned through User Access requests of user type External in SC-EB-02; invitation links opened by the tester
+  - id: TD-EB-03
+    name: Programmes and cycles
+    content: "EBP-2026-000010 ACME Test Corp, team SM, lines HMO (INS-A, 250 members) and GLI (INS-A), flagged for renewal, HR contact receives RA, expiry = business date + 135 days; EBP-2026-000011 Beta Test Inc., HMO, not flagged for renewal; prospect Gamma Test Ltd. for a new-business cycle"
+    source: Clients and programmes keyed in on SIT by eb.ao1; HMO and GLI products and INS-A, INS-B, INS-C set up as panel insurers in Product Maintenance
+  - id: TD-EB-04
+    name: Documents
+    content: Signed BOR (PDF); blank BOR (PDF); TOR (Word); master list (Excel, 250 rows) and a version with a missing birth date on row 12 and a duplicate employee number; unnamed master list; utilization report; master list as CSV; an .exe file; an 11 MB PDF
+    source: Test document folder of the test lead; masked names and birth dates only
+  - id: TD-EB-05
+    name: Insurers and franchise
+    content: INS-A incumbent, INS-B and INS-C target insurers with portal users (INS-C without), claims-free test mailboxes
+    source: Insurer master on SIT; franchise states created in SC-EB-04
+  - id: TD-EB-06
+    name: Threshold rules
+    content: "Rule 1 all lines, annual premium >= PHP 20,000,000, approver EB_THRESHOLD_APPROVE; rule 2 HMO, TSI >= PHP 500,000,000 (seed values, EBQ11)"
+    source: Keyed in EB Setup by eb.badmin and authorised by eb.badmin2
+  - id: TD-EB-07
+    name: Proposals and SOA
+    content: "Three insurer proposals for EBP-2026-000010 (INS-A annual premium PHP 21,500,000, INS-B PHP 19,800,000, INS-C PHP 20,300,000); SOA-INSA-2027-001 (PDF) for the booked HMO invoice; a corrupted Excel SOA"
+    source: Entered through the portal by ins.a and ins.b, and by eb.ao1 for INS-C
+  - id: TD-EB-08
+    name: Member changes
+    content: "New hire EMP-0251; deletion of EMP-0100; deletion of EMP-9999 (not on the roster); plan change of EMP-0040 effective within the policy period; a direct billing PDF from INS-A"
+    source: Keyed in by hr.acme in the portal or by eb.ao1
+
+scenarios:
+  - id: SC-EB-01
+    persona: BUSINESS_ADMIN
+    title: Access, documents and audit. Internal users see only their EB screens and documents by department; every key action is logged and versioned; files leave BDOI protected.
+    pre: Users TD-EB-01; documents TD-EB-04.
+  - id: SC-EB-02
+    persona: INSURER_USER
+    title: Partner portal. Portal users are provisioned through User Access requests, sign in to a separate realm, see only their own party, and every upload is staged, scanned and validated before it takes effect.
+    pre: Portal users TD-EB-02 requested by eb.ao1.
+  - id: SC-EB-03
+    persona: EB_AO
+    title: Programme and renewal start. The AO captures the client and programme; the job sends the RA; the client gives feedback and receives the incumbent's indicative proposal.
+    pre: Programmes TD-EB-03.
+  - id: SC-EB-04
+    persona: EB_AO
+    title: BOR, franchise and TOR. The AO uploads documents and the BOR, requests franchise, advises the client, submits the required documents and distributes the TOR to insurers with approved franchise.
+    pre: A renewal cycle of EBP-2026-000010 that remarkets; insurers TD-EB-05.
+  - id: SC-EB-05
+    persona: EB_AO
+    title: Proposals to placement. Insurers submit proposals; the AO validates them, builds the comparative; the signatory and Management approve; the client comments, asks for revisions and confirms; the AO triggers placement.
+    pre: Proposals TD-EB-07; threshold rules TD-EB-06.
+  - id: SC-EB-06
+    persona: EB_PROCESSOR
+    title: Processing and servicing. Processing places, books with the billing number check, validates and releases the SOA; members and member changes are maintained and billed; contracts, cards and billing are followed up.
+    pre: Accounts created by the placement trigger; member changes TD-EB-08.
+  - id: SC-EB-07
+    persona: EB_TL
+    title: Reports and monitoring. EB reports, the business type filter, Word export, the TAT report and EB Home.
+    pre: Cycles in every stage from the earlier scenarios.
+
+frs:
+  FR-EB-001:
+    scenario: SC-EB-01
+    persona: EB_COLLECTION
+    screen: SOAREG
+    data: [TD-EB-01]
+    conditions:
+      - Each EB screen, action and report requires its permission; menus show only what the user's roles allow.
+      - A direct call without the permission is refused (HTTP 403) and logged.
+      - Insurer and client HR users never reach the core BIBS screens or API.
+    cases:
+      - c: 1
+        type: Security-access
+        neg: false
+        brd: [BRID-023]
+        title: Collection opens the SOA register without the approval action
+        steps:
+          - Log in as eb.coll; open the SOA Register and a comparative.
+        expected: The register opens; the comparative has no Approve or Return action.
+      - c: 1
+        type: Security-access
+        neg: false
+        persona: EB_PROCESSOR
+        screen: ACCOUNT
+        brd: [BRID-023]
+        title: Processing downloads a policy form
+        steps:
+          - As eb.proc open an EB account, Documents; download the policy form.
+        expected: The file downloads without error.
+      - c: 2
+        type: Security-access
+        persona: NON_EB_USER
+        screen: REPORTS
+        brd: [BRID-023]
+        title: User without EB_REPORT_VIEW cannot run EB reports
+        steps:
+          - As a Renewal AO (no EB role) open Reports; call the EB-PRODUCTION run endpoint.
+        expected: The Employee Benefits category is not listed; the call returns HTTP 403 and is logged with user, endpoint and time.
+        msg: [You are not permitted to perform this action]
+      - c: 3
+        type: Security-access
+        persona: INSURER_USER
+        screen: API
+        brd: [BRID-005]
+        title: Portal token refused by the core API
+        steps:
+          - With ins.a's portal token call GET /api/v1/accounts.
+        expected: The call is refused; no data is returned.
+
+  FR-EB-002:
+    scenario: SC-EB-01
+    persona: EB_AO
+    screen: MEMBERCHG
+    data: [TD-EB-04, TD-EB-08]
+    conditions:
+      - Every EB document is linked to client, programme or policy and transaction and carries a process tag; an upload without tag or transaction is refused.
+      - Lists and downloads show only the documents whose access class includes the user's department.
+      - Platform file rules apply (type, empty file).
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Direct billing on a member change is visible to Processing and Collection
+        steps:
+          - Upload the INS-A direct billing on the member change of EMP-0251 with type EB_DIRECT_BILLING and process Endorsement.
+          - As eb.proc and eb.coll open the member change documents.
+        expected: Both see and open the document; it is linked to the client, the policy and the member change.
+      - c: 2
+        type: Security-access
+        persona: EB_COLLECTION
+        screen: DOCS
+        title: Utilization report hidden from Collection
+        steps:
+          - As eb.coll open the Documents tab of EBP-2026-000010.
+        expected: The utilization report (Marketing only) is not listed; a direct download call is refused and logged.
+      - c: 1
+        type: Negative
+        screen: DOCS
+        title: Upload without a process tag
+        steps:
+          - Upload the TOR with Process blank.
+        expected: The upload is refused.
+        msg: [Select the process of the document]
+      - c: 3
+        type: Negative
+        screen: DOCS
+        title: Empty file and .exe file
+        steps:
+          - Upload an empty PDF; then the .exe file of TD-EB-04.
+        expected: Both are refused.
+        msg: [The file is empty]
+
+  FR-EB-003:
+    scenario: SC-EB-01
+    persona: EB_AO
+    screen: HIST
+    data: [TD-EB-03, TD-EB-07]
+    conditions:
+      - The History tab lists the RA, feedback, proposals, validations, sign-off, approvals, confirmation, placement trigger and portal actions with user or portal user and time.
+      - TOR, BOR, proposals, comparatives and rosters are versioned; a change creates version n+1 and the differences are shown.
+      - Audit and version rows cannot be changed.
+    cases:
+      - c: 1
+        type: Positive
+        title: History of a placed cycle
+        steps:
+          - Open EBP-2026-000010 after SC-EB-05, History tab.
+        expected: RA, proposals, comparative sign-off, confirmation and placement trigger are listed with user and time; portal actions show the portal user with the prefix portal and the insurer or client.
+      - c: 2
+        type: Positive
+        screen: PROPOSALS
+        title: Revised proposal shows version 2 and the differences
+        steps:
+          - Open the INS-B proposal after its revision; Versions; compare 1 and 2.
+        expected: Version 2 is current; the changed items are highlighted.
+      - c: 3
+        type: Security-access
+        screen: API
+        title: History and versions cannot be changed
+        steps:
+          - Look for edit on the History tab and on version 1; call PUT on version 1.
+        expected: No edit exists; the call is refused.
+
+  FR-EB-004:
+    scenario: SC-EB-01
+    persona: EB_AO
+    screen: TOR
+    data: [TD-EB-04]
+    conditions:
+      - EB files sent outside BDOI (PDF, Excel, Word) are password protected, one or several at a time, and the password is sent in a separate e-mail.
+      - A file type that cannot be protected is refused for sending; an invalid recipient address is refused.
+    cases:
+      - c: 1
+        type: Upload-download
+        screen: MAILBOX
+        title: TOR sent as Word arrives protected
+        steps:
+          - Send the TOR (Word) and the utilization report to INS-B; open the INS-B mailbox.
+        expected: Both files arrive password protected; the password arrives in a separate e-mail; both e-mails are logged with attachment names and hash.
+      - c: 2
+        type: Negative
+        title: CSV master list refused for sending
+        steps:
+          - Select the CSV master list and send it to INS-B.
+        expected: Nothing is sent.
+        msg: ["{masterlist.csv} cannot be password protected. Send it as PDF, Excel or Word"]
+      - c: 2
+        type: Negative
+        title: Invalid recipient address
+        steps:
+          - Send to "hr@acme" as an extra recipient.
+        expected: Nothing is sent.
+        msg: ["Invalid e-mail address: {hr@acme}"]
+
+  FR-EB-010:
+    scenario: SC-EB-02
+    persona: INSURER_USER
+    screen: PLOGIN
+    data: [TD-EB-02]
+    conditions:
+      - A portal user signs in with e-mail, password and, when on, an e-mail one-time code, and sees only the tasks of the bound insurer or client.
+      - The core API refuses portal tokens; a record of another party answers not found and is logged.
+      - Three failed sign-ins lock the portal user and raise PORTAL_LOGIN_LOCKED; a wrong code is refused.
+      - An idle portal session ends after PORTAL_SESSION_MINUTES.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRID-005, BRID-005.02]
+        title: Insurer user signs in and sees own requests only
+        steps:
+          - Sign in as ins.b with password and the one-time code from the mailbox.
+        expected: The portal home lists INS-B's open tasks only.
+      - c: 2
+        type: Security-access
+        screen: API
+        brd: [BRID-005.01]
+        title: Record of another insurer
+        steps:
+          - As ins.b call the portal endpoint of an INS-A request.
+        expected: The answer is not found; the attempt is logged.
+      - c: 3
+        type: Boundary
+        neg: true
+        brd: [BRID-005]
+        title: Third failed sign-in locks the portal user
+        steps:
+          - Sign in as ins.b with a wrong password three times, then the right one.
+        expected: The user is locked; the administrators get PORTAL_LOGIN_LOCKED.
+        msg: [Your portal access is locked. Contact your BDOI account officer]
+      - c: 3
+        type: Negative
+        brd: [BRID-005]
+        title: Wrong one-time code
+        steps:
+          - Sign in as hr.acme with the right password and a wrong code.
+        expected: No session starts.
+        msg: [The code is not valid. Request a new code]
+      - c: 4
+        type: Positive
+        persona: CLIENT_HR
+        screen: PHOME
+        brd: [BRID-014]
+        title: Idle portal session ends
+        steps:
+          - Sign in as hr.acme; stay idle 15 minutes; click Programmes.
+        expected: The sign-in page opens.
+
+  FR-EB-011:
+    scenario: SC-EB-02
+    persona: EB_AO
+    screen: ACCREQ
+    data: [TD-EB-01, TD-EB-02]
+    conditions:
+      - A portal user exists only after a User Access request of type External is approved by someone other than the requester.
+      - The invitation e-mail has a link valid 72 hours and no password; the user sets the password through it.
+      - A portal user is bound to one insurer or client and sees no other party's data.
+      - A duplicate e-mail or an unknown party is refused; disable blocks the user at once.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRID-005]
+        title: Request and approve an insurer portal user
+        steps:
+          - As eb.ao1 raise a Create request, user type External, party kind Insurer, party INS-B, role INSURER_USER, approver eb.badmin.
+          - As eb.badmin approve it.
+        expected: The portal user is created as INVITED and the invitation is e-mailed; the request history shows requester, approver and times.
+      - c: 1
+        type: Security-access
+        brd: [BRID-005]
+        title: Requester cannot approve
+        steps:
+          - As eb.ao1 (given PORTAL_USER_APPROVE for the test) pick the own request.
+        expected: The approval is refused.
+        msg: [An access request is approved by someone other than the requester]
+      - c: 2
+        type: Positive
+        screen: MAILBOX
+        brd: [BRID-014]
+        title: Invitation contains a link and no password
+        steps:
+          - Open the invitation of hr.acme; set a password through the link.
+        expected: The e-mail has the link and no password; the user can sign in after setting it.
+      - c: 3
+        type: Security-access
+        persona: CLIENT_HR
+        screen: PPROG
+        brd: [BRID-014]
+        title: Client A user cannot see client B
+        steps:
+          - Sign in as hr.acme; search Beta Test Inc.; open a Beta programme by address.
+        expected: Only ACME programmes are listed; the Beta address answers not found.
+      - c: 4
+        type: Negative
+        brd: [BRID-005]
+        title: E-mail already used by a portal user
+        steps:
+          - Raise a Create request with ins.a's e-mail.
+        expected: The request is refused.
+        msg: ["{ins.a@test.bdoi.local} already has a portal user"]
+      - c: 4
+        type: Workflow
+        persona: BUSINESS_ADMIN
+        screen: PORTALUSERS
+        brd: [BRID-014]
+        title: Disable request blocks at once
+        steps:
+          - Approve a Disable request for hr.beta; sign in as hr.beta.
+        expected: The sign-in is refused at once.
+
+  FR-EB-012:
+    scenario: SC-EB-02
+    persona: INSURER_USER
+    screen: PRFP
+    data: [TD-EB-04]
+    conditions:
+      - An upload is made against an open task and is linked automatically to its client, policy or transaction.
+      - Uploads are staged (RECEIVED), scanned and checked, and take effect only after validation.
+      - A file of a type not allowed, too large, with content not matching its type or infected is refused; no upload without an open task.
+    cases:
+      - c: 1
+        type: Upload-download
+        brd: [BRID-005.01]
+        title: Proposal upload linked without selection
+        steps:
+          - As ins.b open the request of EBP-2026-000010; upload the proposal PDF.
+        expected: The upload is linked to the request, cycle and client without any selection by the insurer; it is RECEIVED; the reviewer is notified.
+      - c: 2
+        type: Negative
+        persona: CLIENT_HR
+        screen: PUPLOADS
+        brd: [BRID-014]
+        title: Staged master list does not change the roster
+        steps:
+          - As hr.acme upload the master list; as eb.ao1 open Members before validation.
+        expected: The roster is unchanged until the AO validates the upload.
+      - c: 3
+        type: Negative
+        brd: [BRID-005.01]
+        title: Executable file refused
+        steps:
+          - Upload the .exe file on the request.
+        expected: Nothing is staged.
+        msg: ["Only these file types are allowed: {pdf, docx, xlsx, jpg, png}"]
+      - c: 3
+        type: Boundary
+        neg: true
+        brd: [BRID-005.01]
+        title: 11 MB file above the 10 MB limit
+        steps:
+          - Upload the 11 MB PDF.
+        expected: Nothing is staged; a 10 MB file is accepted.
+        msg: ["The file exceeds the maximum size of {10} MB"]
+      - c: 3
+        type: Negative
+        screen: PHOME
+        brd: [BRID-014]
+        title: No upload without an open task
+        steps:
+          - As ins.b look for an upload on a closed request.
+        expected: No upload is offered.
+
+  FR-EB-013:
+    scenario: SC-EB-02
+    persona: EB_AO
+    screen: PORTALUP
+    data: [TD-EB-04, TD-EB-07]
+    conditions:
+      - Staged uploads appear in the queue of the department that owns the target (AO, Processing, Collection).
+      - Validate attaches the file and applies its data; a validated proposal counts in the comparative, a staged one does not.
+      - Reject needs a reason, which the portal user sees; re-mapping is allowed only to a target of the same party.
+    cases:
+      - c: 1
+        type: Positive
+        persona: EB_PROCESSOR
+        brd: [BRID-005.03]
+        title: Policy form goes to the Processing queue
+        steps:
+          - As ins.a upload a policy form; open Portal Uploads as eb.proc and as eb.ao1.
+        expected: The policy form is in the Processing queue and not in the AO's.
+      - c: 2
+        type: Workflow
+        brd: [BRID-005.03]
+        title: Validate a proposal
+        steps:
+          - Open the INS-B proposal upload; Validate; open the comparative build list.
+        expected: The file becomes an attachment of the request; the proposal counts in the comparative.
+      - c: 3
+        type: Negative
+        brd: [BRID-005.03]
+        title: Reject without a reason
+        steps:
+          - Reject an upload with the reason blank.
+        expected: The upload stays RECEIVED.
+        msg: ["Select a reason for 'reject'"]
+      - c: 3
+        type: Workflow
+        brd: [BRID-005.01]
+        title: Rejected upload shows the reason to the insurer
+        steps:
+          - Reject with reason "Unreadable scan"; as ins.b open the task.
+        expected: The task shows the rejection and the reason.
+      - c: 3
+        type: Negative
+        brd: [BRID-005.01]
+        title: Re-map to another party's target
+        steps:
+          - Re-map an INS-B upload to an INS-C request.
+        expected: The re-map is refused.
+        msg: [The upload can only be linked to a record of the same party]
+
+  FR-EB-014:
+    scenario: SC-EB-02
+    persona: INSURER_USER
+    screen: PRFP
+    data: [TD-EB-07]
+    conditions:
+      - The insurer home lists open tasks with due dates; a request shows the TOR, documents and a proposal form with one line per TOR item.
+      - Every TOR item needs an offered value or a deviation remark, and every plan a premium; the proposal is stored as SUBMITTED and the AO notified.
+      - A proposal is submitted only against an open request; the insurer may save a draft or decline with a reason.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRID-005.02]
+        title: Proposal form with one line per TOR item
+        steps:
+          - As ins.b open the request; download the TOR and documents; open the proposal form.
+        expected: One line per TOR item per line and plan; premium per plan, annual premium, TSI, capability factors and validity date are asked.
+      - c: 2
+        type: Workflow
+        brd: [BRID-005.02]
+        title: Submit a complete proposal
+        steps:
+          - Answer every item (one as deviation with remark); enter premiums; attach the proposal; Submit.
+        expected: The proposal is SUBMITTED; eb.ao1 is notified.
+      - c: 2
+        type: Negative
+        brd: [BRID-005.02]
+        title: Unanswered TOR item
+        steps:
+          - Leave item "Room and board limit" blank; Submit.
+        expected: The submission is refused.
+        msg: ["Answer every TOR item ({Room and board limit}) or mark a deviation"]
+      - c: 3
+        type: Negative
+        brd: [BRID-005]
+        title: Request closed or past due
+        steps:
+          - Submit on a request past its due date.
+        expected: The submission is refused.
+        msg: [This request is closed. Contact the BDOI account officer]
+      - c: 3
+        type: Workflow
+        brd: [BRID-005]
+        title: Decline a request
+        steps:
+          - As ins.a decline another request with a reason.
+        expected: The request is DECLINED; the AO is notified.
+
+  FR-EB-015:
+    scenario: SC-EB-02
+    persona: CLIENT_HR
+    screen: PPROG
+    data: [TD-EB-03, TD-EB-04]
+    conditions:
+      - The client HR user sees only its company's programmes, roster, renewal advices and released documents, and every download is logged.
+      - The master list template maps and validates every row; a file with errors names each row and nothing is staged.
+      - Client HR users view and upload only; they cannot change policy data.
+    cases:
+      - c: 1
+        type: Positive
+        screen: PMEMBERS
+        brd: [BRID-014]
+        title: Roster of the own company
+        steps:
+          - Open Members; download the RA from Programmes.
+          - As eb.badmin open the portal download log.
+        expected: The ACME roster is listed and no other company; the RA download appears in the log.
+      - c: 2
+        type: Negative
+        screen: PUPLOADS
+        brd: [BRID-014]
+        title: Master list with a missing birth date on row 12
+        steps:
+          - Upload the master list version with the error.
+        expected: Row 12 is named; nothing is staged.
+        msg: ["Row {12}: {Birth date} {is required}"]
+      - c: 2
+        type: Upload-download
+        screen: PUPLOADS
+        brd: [BRID-014]
+        title: Valid master list staged
+        steps:
+          - Upload the correct master list.
+        expected: A staged roster version is created and the AO is notified.
+      - c: 3
+        type: Security-access
+        screen: PCOMP
+        brd: [BRID-011]
+        title: No change to policy data
+        steps:
+          - Look for edit actions on the programme and roster.
+        expected: The programme and roster are read only; comments are offered on the comparative only.
+
+  FR-EB-020:
+    scenario: SC-EB-03
+    persona: EB_AO
+    screen: CLIENT
+    data: [TD-EB-03]
+    conditions:
+      - A new EB client is captured as a prospect and found by the prospect filter; after onboarding it is confirmed.
+      - A second record with the same identifiers is refused; the name is mandatory.
+    cases:
+      - c: 1
+        type: Positive
+        title: Create the prospect Gamma Test Ltd.
+        steps:
+          - Search Gamma; none found; create the prospect with the required fields.
+          - Search with the filter Prospect.
+        expected: The prospect is saved and listed by the filter.
+      - c: 2
+        type: Negative
+        title: Duplicate client
+        steps:
+          - Create a second client with the identifiers of ACME Test Corp.
+        expected: The record is refused and the existing client is shown.
+        msg: ["This client already exists: {ACME Test Corp}"]
+      - c: 2
+        type: Negative
+        title: Name blank
+        steps:
+          - Save a prospect without a name.
+        expected: The record is refused.
+        msg: ["Enter the {client name}"]
+
+  FR-EB-021:
+    scenario: SC-EB-03
+    persona: EB_AO
+    screen: NEWPROG
+    data: [TD-EB-03]
+    conditions:
+      - A programme with lines, team, funding, HR contacts and renewal flag is saved with an EBP number.
+      - Each cycle carries the business type, which passes to the accounts created from it.
+      - A programme without a line or HR contact, a cycle without a business type or a second open cycle for the same year is refused.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRID-006]
+        title: Programme with HMO and GLI lines
+        steps:
+          - From the client page click New Programme; add HMO and GLI, team SM, funding Employer, one HR contact receiving RA; Save.
+        expected: The programme is saved with EBP-yyyy-nnnnnn.
+      - c: 2
+        type: Workflow
+        screen: ACCOUNT
+        brd: [BRID-022.01]
+        title: Renewal cycle creates RENEWAL accounts
+        steps:
+          - Follow the renewal cycle of EBP-2026-000010 to the placement trigger; open the created accounts.
+        expected: Each account has business type RENEWAL and refers to the expiring ARN.
+      - c: 3
+        type: Negative
+        brd: [BRID-022.01]
+        title: Cycle without business type
+        steps:
+          - Open a new cycle with the business type blank; Save.
+        expected: The cycle is not saved; business type is marked mandatory.
+      - c: 3
+        type: Negative
+        brd: [BRID-006]
+        title: Programme without HR contact
+        steps:
+          - Save a programme with no HR contact.
+        expected: The programme is not saved.
+        msg: [Add at least one HR contact]
+      - c: 3
+        type: Negative
+        brd: [BRID-022.01]
+        title: Second open cycle for the same year
+        steps:
+          - Open another cycle for 2027 on EBP-2026-000010.
+        expected: The cycle is refused.
+        msg: ["Programme {EBP-2026-000010} already has an open cycle for {2027}"]
+
+  FR-EB-022:
+    scenario: SC-EB-03
+    persona: SYSTEM
+    screen: PROGRAMMES
+    data: [TD-EB-03]
+    conditions:
+      - The daily job opens a renewal cycle and sends the RA, protected, to the HR contacts of each flagged programme at EB_RA_LEAD_DAYS; the cycle moves to RA_SENT.
+      - The RA is stored as RENEWAL_ADVICE linked to programme, ARN and client; reminders follow at the reminder days.
+      - No RA goes to a programme without the flag or contact; the AO gets EB_RA_NOT_SENT; a manual send to an ineligible programme is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        screen: MAILBOX
+        title: Programme expiring in 135 days receives the RA
+        steps:
+          - Run job EB_RENEWAL_ADVICE; open the HR contact's mailbox and the cycle.
+        expected: The protected RA and the separate password arrive; the cycle is RA_SENT.
+      - c: 2
+        type: Positive
+        screen: CLIENT
+        title: RA listed in the client's documents
+        steps:
+          - Open ACME Test Corp, Documents.
+        expected: The RA is listed as a renewal advice linked to the programme and ARN.
+      - c: 2
+        type: Workflow
+        title: Reminder at 120 days without feedback
+        steps:
+          - Move the business date to 120 days before expiry; run the job.
+        expected: A reminder with the feedback link is sent.
+      - c: 3
+        type: Negative
+        title: Programme without the renewal flag
+        steps:
+          - Run the job at the lead time of EBP-2026-000011.
+        expected: No RA is sent; the AO gets EB_RA_NOT_SENT.
+      - c: 3
+        type: Negative
+        persona: EB_AO
+        title: Manual send to an ineligible programme
+        steps:
+          - In Renewal Due select EBP-2026-000011; Send RA.
+        expected: No RA is sent.
+        msg: ["Programme {EBP-2026-000011} is not flagged for renewal"]
+
+  FR-EB-023:
+    scenario: SC-EB-03
+    persona: EB_AO
+    screen: CYCLE
+    data: [TD-EB-03, TD-EB-04]
+    conditions:
+      - Feedback is recorded as text, files or both, with channel and date; the first feedback moves the cycle to REQUIREMENTS and stops the RA reminders.
+      - Feedback without text or file, or a file of a type not allowed, is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Feedback stops the reminders
+        steps:
+          - Record Feedback, channel E-mail, date received today, text; Save; run the RA job at the next reminder date.
+        expected: BIBS confirms; the cycle is REQUIREMENTS; no reminder is sent.
+      - c: 1
+        type: Positive
+        persona: CLIENT_HR
+        screen: PUPLOADS
+        title: Client gives feedback in the portal
+        steps:
+          - As hr.acme give feedback with a file.
+        expected: The AO is notified; the feedback is on the cycle with channel Portal.
+      - c: 2
+        type: Negative
+        title: Feedback empty
+        steps:
+          - Save Record Feedback with no text and no file.
+        expected: Nothing is saved.
+        msg: [Enter the feedback or attach a file]
+
+  FR-EB-024:
+    scenario: SC-EB-03
+    persona: EB_AO
+    screen: PROPOSALS
+    data: [TD-EB-03]
+    conditions:
+      - For a renewal cycle of a flagged programme the indicative proposal shows the current policy number, coverage and incumbent rates and is sent to the HR contacts.
+      - The action is refused on a new-business cycle and needs the rate of every plan.
+    cases:
+      - c: 1
+        type: Upload-download
+        screen: MAILBOX
+        title: Send the incumbent's indicative proposal
+        steps:
+          - Enter the INS-A rates; Send Indicative Proposal; open the HR mailbox.
+        expected: The letter shows policy number, coverage, incumbent rates, expiry and instructions; it arrives protected and is logged.
+      - c: 2
+        type: Negative
+        title: Not available on a new-business cycle
+        steps:
+          - Open the new-business cycle of Gamma Test Ltd.; call the send endpoint.
+        expected: The action is not offered; the call is refused.
+        msg: [The indicative proposal applies to renewals only]
+      - c: 2
+        type: Negative
+        title: Rate of a plan missing
+        steps:
+          - Leave the rate of plan B blank; send.
+        expected: Nothing is sent.
+        msg: ["Enter the incumbent rate of plan {B}"]
+
+  FR-EB-030:
+    scenario: SC-EB-04
+    persona: EB_AO
+    screen: DOCS
+    data: [TD-EB-04]
+    conditions:
+      - TOR, master list, unnamed master list and utilization are uploaded single or in bulk, registered with cycle, type, process tag, version and source; a new upload of the same type is version n+1.
+      - Request Unnamed Master List creates a portal task and e-mail for the incumbent.
+      - A file type not allowed or a missing document type is refused.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Second master list becomes version 2
+        steps:
+          - Upload the master list; upload it again.
+        expected: The second is version 2; version 1 is marked superseded.
+      - c: 2
+        type: Workflow
+        persona: INSURER_USER
+        screen: PHOME
+        title: Incumbent sees the unnamed master list task
+        steps:
+          - As eb.ao1 click Request Unnamed Master List; as ins.a open the portal home.
+        expected: The task "Upload unnamed master list" is listed and an e-mail was sent.
+      - c: 3
+        type: Negative
+        title: Document type not selected
+        steps:
+          - Upload a file with Document type blank.
+        expected: Nothing is uploaded.
+        msg: [Select the document type]
+
+  FR-EB-031:
+    scenario: SC-EB-04
+    persona: EB_AO
+    screen: BOR
+    data: [TD-EB-04]
+    conditions:
+      - The signed BOR is uploaded (status Uploaded) and validated with the checklist and validity dates; the latest validated version is active.
+      - An invalid BOR is rejected and re-uploaded as version n+1.
+      - Franchise and insurer requests of a new-business or remarketing cycle are refused without a validated BOR.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Upload and validate the BOR
+        steps:
+          - Upload the signed BOR; complete the checklist; valid from and to; Validate.
+        expected: The BOR is Validated and active; the AO is notified.
+      - c: 1
+        type: Negative
+        title: Checklist incomplete
+        steps:
+          - Validate with "Client name matches" unticked.
+        expected: The BOR stays Uploaded.
+        msg: [Complete the BOR checklist before validating]
+      - c: 2
+        type: Workflow
+        title: Rejected BOR re-uploaded as version 2
+        steps:
+          - Reject the blank BOR with a reason; upload the corrected one.
+        expected: The new file is version 2 with status Uploaded.
+      - c: 3
+        type: Negative
+        screen: FRANCHISE
+        title: Franchise request without a validated BOR
+        steps:
+          - On the new-business cycle of Gamma Test Ltd. click Request Franchise.
+        expected: The request is refused.
+        msg: ["Cycle {EBC-2026-000031} has no validated Broker on Record"]
+      - c: 1
+        type: Negative
+        title: BOR in a file type other than PDF or Word
+        steps:
+          - Upload the BOR as a JPG.
+        expected: The upload is refused.
+        msg: [Upload the BOR as PDF or Word]
+
+  FR-EB-032:
+    scenario: SC-EB-04
+    persona: EB_AO
+    screen: FRANCHISE
+    data: [TD-EB-05]
+    conditions:
+      - The AO sends franchise requests with BOR and required documents to selected insurers; the cycle moves to FRANCHISE.
+      - The insurer approves or rejects in the portal (reject with reason), or the AO records an e-mailed decision with the evidence; the AO is notified.
+      - A request without decision after the TAT and grace period expires and raises EB_FRANCHISE_OVERDUE.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRID-026]
+        title: Request franchise from INS-B and INS-C
+        steps:
+          - Select INS-B and INS-C; Request Franchise.
+        expected: The documents are checked; each insurer gets a portal task and a protected e-mail; the cycle is FRANCHISE.
+      - c: 2
+        type: Workflow
+        persona: INSURER_USER
+        screen: PFRAN
+        brd: [BRID-027]
+        title: Insurer approves in the portal
+        steps:
+          - As ins.b open the franchise request; Approve.
+        expected: The request is APPROVED; eb.ao1 is notified.
+      - c: 2
+        type: Negative
+        persona: INSURER_USER
+        screen: PFRAN
+        brd: [BRID-027]
+        title: Reject without a reason
+        steps:
+          - As ins.b reject a request with the reason blank.
+        expected: Nothing is saved.
+        msg: ["Select a reason for 'reject'"]
+      - c: 2
+        type: Negative
+        brd: [BRID-027]
+        title: AO records an e-mailed decision without evidence
+        steps:
+          - Record INS-C's approval without attaching the e-mail.
+        expected: The outcome is not saved.
+        msg: [Attach the insurer's reply]
+      - c: 3
+        type: Workflow
+        screen: NOTIF
+        brd: [BRID-027]
+        title: Request expires after the TAT
+        steps:
+          - Move the date past 5 working days and the grace period; run the job.
+        expected: The request is EXPIRED; eb.ao1 gets EB_FRANCHISE_OVERDUE.
+
+  FR-EB-033:
+    scenario: SC-EB-04
+    persona: EB_AO
+    screen: FRANCHISE
+    data: [TD-EB-05]
+    conditions:
+      - After a decision the AO advises the client from the template; the request shows ADVISED.
+      - An outcome not advised within EB_FRANCHISE_ADVICE_DAYS raises an alert.
+    cases:
+      - c: 1
+        type: Workflow
+        screen: MAILBOX
+        title: Advise the client of the INS-B approval
+        steps:
+          - Click Advise Client on the INS-B request; confirm; open the HR mailbox.
+        expected: The client receives the advice by e-mail and portal notice; the request shows ADVISED.
+      - c: 2
+        type: Boundary
+        neg: true
+        screen: NOTIF
+        title: Outcome not advised within 2 working days
+        steps:
+          - Leave the INS-C outcome unadvised for 3 working days.
+        expected: The AO gets the overdue alert; at 2 working days no alert is raised.
+
+  FR-EB-034:
+    scenario: SC-EB-04
+    persona: EB_AO
+    screen: SUBMISSIONS
+    data: [TD-EB-04, TD-EB-05]
+    conditions:
+      - The checklist per process type and line lists the mandatory documents; a submission with a missing one is refused.
+      - A complete submission goes to the insurer (portal and protected e-mail), is linked to client, policy and transaction, and Processing and Collection are notified and can view it.
+      - Insurers see only the submissions addressed to them.
+    cases:
+      - c: 1
+        type: Negative
+        title: Renewal placement submission without the master list
+        steps:
+          - New Submission; process Renewal placement; insurer INS-A; remove the master list; submit.
+        expected: The submission is refused.
+        msg: ["Add the required document {EB_MASTERLIST} for {Renewal placement}"]
+      - c: 2
+        type: Upload-download
+        persona: EB_PROCESSOR
+        screen: PROGRAMME
+        title: Processing sees the submission
+        steps:
+          - Submit a complete renewal placement submission; as eb.proc open the programme.
+        expected: The submission and its documents are visible; Processing and Collection were notified.
+      - c: 3
+        type: Security-access
+        persona: INSURER_USER
+        screen: PHOME
+        title: Insurer sees only its own submissions
+        steps:
+          - As ins.b open the portal submissions.
+        expected: The INS-A submission is not listed.
+      - c: 1
+        type: Negative
+        title: Insurer not selected
+        steps:
+          - Submit with Insurer blank.
+        expected: Nothing is sent.
+        msg: [Select the insurer]
+
+  FR-EB-035:
+    scenario: SC-EB-04
+    persona: EB_AO
+    screen: TOR
+    data: [TD-EB-04, TD-EB-05]
+    conditions:
+      - The released TOR is sent with the unnamed master list and utilization to the selected insurers with an approved franchise; one request per insurer with the TOR version, documents and due date; the cycle moves to PROPOSALS.
+      - An insurer without an approved franchise cannot be selected; a TOR without items cannot be released.
+      - A TOR changed after release is released as version n+1 and the insurers are notified; each insurer's download is logged.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRID-009, BRID-007]
+        title: TOR to three insurers
+        steps:
+          - Maintain the TOR items; Release TOR; select INS-A, INS-B and INS-C (all approved); Send Requests.
+        expected: Three requests EBR-yyyy-nnnnnn with the same TOR version and due date are created; the cycle is PROPOSALS.
+      - c: 2
+        type: Negative
+        brd: [BRID-009]
+        title: Insurer with a rejected franchise
+        steps:
+          - Try to select an insurer whose franchise was rejected.
+        expected: The insurer cannot be selected; the API call is refused.
+        msg: ["Insurer {INS-D} has no approved franchise for this cycle"]
+      - c: 2
+        type: Negative
+        brd: [BRID-004]
+        title: Remarketing a programme not flagged for renewal
+        steps:
+          - Send requests on a renewal cycle of EBP-2026-000011.
+        expected: Remarketing is not offered for the programme.
+      - c: 3
+        type: Workflow
+        brd: [BRID-007]
+        title: TOR version 2 and download log
+        steps:
+          - Change an item; release version 2; as ins.b download it; open the TOR download log.
+        expected: Open requests show version 2 and the insurers are notified; ins.b's download is logged.
+      - c: 2
+        type: Negative
+        brd: [BRID-009]
+        title: TOR without items
+        steps:
+          - Release a TOR with no items.
+        expected: The release is refused.
+        msg: [Add the TOR items before release]
+
+  FR-EB-040:
+    scenario: SC-EB-05
+    persona: EB_AO
+    screen: PROPOSALS
+    data: [TD-EB-07]
+    conditions:
+      - A submitted proposal counts in the comparative only after the AO validates it.
+      - The AO rejects a proposal with a reason and the insurer is notified and may send a new version.
+      - A proposal entered by the AO needs the insurer's document and shows the source AO.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRID-005.03, BRID-010]
+        title: Validate a submitted proposal
+        steps:
+          - Open the INS-B proposal; check it against the TOR; Validate.
+        expected: The proposal is VALIDATED and is offered to the comparative; the insurer is notified.
+      - c: 1
+        type: Negative
+        screen: COMPARATIVE
+        brd: [BRID-010]
+        title: Submitted proposal not in the comparative
+        steps:
+          - Build the comparative while the INS-A proposal is still SUBMITTED.
+        expected: INS-A is not a column of the comparative.
+      - c: 2
+        type: Negative
+        brd: [BRID-005.03]
+        title: Reject without a reason
+        steps:
+          - Reject a proposal with the reason blank.
+        expected: The proposal stays SUBMITTED.
+        msg: ["Select a reason for 'reject'"]
+      - c: 3
+        type: Negative
+        brd: [BRID-005.02]
+        title: AO entry without the insurer's document
+        steps:
+          - Enter the INS-C proposal on behalf of INS-C without an attachment.
+        expected: The proposal is not saved.
+        msg: [Attach the insurer's proposal document]
+      - c: 3
+        type: Positive
+        brd: [BRID-005.02]
+        title: AO entry with the document
+        steps:
+          - Enter the INS-C proposal with its PDF.
+        expected: The proposal shows source AO and the attached document.
+
+  FR-EB-041:
+    scenario: SC-EB-05
+    persona: EB_AO
+    screen: COMPARATIVE
+    data: [TD-EB-07]
+    conditions:
+      - The comparative is built from the validated proposals with one column per insurer, coverage per TOR item, premiums, exclusions and capability factors, and stored as a snapshot version.
+      - A recommendation per line is required before sign-off; open requests are listed and must be closed or waited for.
+      - The signatory is never the maker; the signed comparative exports to PDF and Excel with the same content.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Comparative of three proposals
+        steps:
+          - Build Comparative with the three validated proposals.
+        expected: One column per insurer; the lowest premium per plan is visible; the snapshot has a version number.
+      - c: 2
+        type: Negative
+        title: Requests still open
+        steps:
+          - Build the comparative while one insurer request is open.
+        expected: BIBS lists the open request.
+        msg: ["{1} insurer requests are still open. Close them or wait for the proposals"]
+      - c: 2
+        type: Negative
+        title: Submit without a recommendation
+        steps:
+          - Submit for Sign-off without marking the recommended proposal of GLI.
+        expected: The submission is refused.
+        msg: [Mark the recommended proposal of each line]
+      - c: 3
+        type: Security-access
+        title: Maker cannot sign off
+        steps:
+          - As eb.ao1 (given EB_COMPARATIVE_APPROVE for the test) approve the own comparative.
+        expected: The approval is refused.
+        msg: [A comparative is signed off by someone other than its maker]
+      - c: 3
+        type: Workflow
+        persona: EB_TL
+        title: Signatory approves; exports match
+        steps:
+          - As eb.tl approve the comparative; export to PDF and Excel.
+        expected: The cycle moves to THRESHOLD_APPROVAL (rule matched) or READY_TO_PRESENT; both exports have the same content.
+
+  FR-EB-042:
+    scenario: SC-EB-05
+    persona: EB_MANAGEMENT
+    screen: APPROVALS
+    data: [TD-EB-06, TD-EB-07]
+    conditions:
+      - When the recommended proposal meets a threshold rule, the cycle waits in THRESHOLD_APPROVAL, the approvers are notified and placement is blocked until approval.
+      - The AO of the cycle never approves the threshold.
+      - Rules are maintained with maker-checker and apply after authorisation without a new build; an amount must be greater than zero.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Recommended premium above the rule waits for Management
+        steps:
+          - Sign off a comparative recommending INS-A (PHP 21,500,000); as eb.mgmt open My Approvals; approve.
+        expected: The cycle waited in THRESHOLD_APPROVAL with eb.mgmt notified; after approval it is READY_TO_PRESENT.
+      - c: 1
+        type: Negative
+        persona: EB_AO
+        screen: PROGRAMME
+        title: Placement blocked while approval is pending
+        steps:
+          - Call Trigger Placement on a cycle in THRESHOLD_APPROVAL.
+        expected: The trigger is refused.
+        msg: ["Cycle {EBC-2026-000030} waits for the threshold approval"]
+      - c: 2
+        type: Security-access
+        persona: EB_AO
+        title: AO of the cycle cannot approve
+        steps:
+          - Give eb.ao1 EB_THRESHOLD_APPROVE for the test; open the item.
+        expected: Approve is refused for the AO of the cycle.
+      - c: 3
+        type: Workflow
+        persona: BUSINESS_ADMIN
+        screen: EBSETUP
+        title: Rule change applies after authorisation
+        steps:
+          - Change rule 1 to PHP 22,000,000; eb.badmin2 authorises; sign off a new comparative at PHP 21,500,000.
+        expected: No threshold approval is needed after the authorised change.
+      - c: 3
+        type: Boundary
+        neg: true
+        persona: BUSINESS_ADMIN
+        screen: EBSETUP
+        title: Rule amount zero
+        steps:
+          - Save a rule with amount 0.
+        expected: The rule is not saved.
+        msg: [Enter an amount greater than zero]
+
+  FR-EB-043:
+    scenario: SC-EB-05
+    persona: EB_AO
+    screen: COMPARATIVE
+    data: [TD-EB-07]
+    conditions:
+      - An approved comparative is published on the client portal and sent protected; the cycle moves to WITH_CLIENT and the HR contacts are notified.
+      - The client HR user reads and downloads it and comments; the AO is notified and replies; an empty comment is refused.
+      - Only an approved comparative can be presented.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Present to Client
+        steps:
+          - Click Present to Client on the approved comparative.
+        expected: The comparative is on the portal and e-mailed protected; the cycle is WITH_CLIENT.
+      - c: 2
+        type: Positive
+        persona: CLIENT_HR
+        screen: PCOMP
+        title: Client reads, downloads and comments
+        steps:
+          - As hr.acme open the comparative; download the PDF; comment "Please confirm dental coverage".
+        expected: The PDF downloads; eb.ao1 is notified of the comment and replies in the thread.
+      - c: 2
+        type: Negative
+        persona: CLIENT_HR
+        screen: PCOMP
+        title: Empty comment
+        steps:
+          - Post an empty comment.
+        expected: Nothing is posted.
+        msg: [Enter your comment]
+      - c: 3
+        type: Negative
+        title: Comparative not yet approved
+        steps:
+          - Call Present to Client on a comparative in FOR_SIGNOFF.
+        expected: The action is not offered; the call is refused.
+
+  FR-EB-044:
+    scenario: SC-EB-05
+    persona: EB_AO
+    screen: REVISIONS
+    data: [TD-EB-07]
+    conditions:
+      - A revision with items is relayed to the selected insurers as portal tasks and e-mails, and each insurer's status is tracked; the cycle moves to REVISION.
+      - A revision without items or without insurers is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Revision relayed to two insurers
+        steps:
+          - Request Revision with item "Add dental benefit PHP 5,000"; select INS-B and INS-C; relay.
+        expected: Two targets are open; each insurer has a task and an e-mail; the cycle is REVISION.
+      - c: 2
+        type: Negative
+        title: Revision without items
+        steps:
+          - Relay a revision with no item.
+        expected: The revision is refused.
+        msg: [Add at least one requested change]
+      - c: 2
+        type: Negative
+        title: No insurer selected
+        steps:
+          - Relay a revision with items and no insurer.
+        expected: Nothing is relayed.
+        msg: [Select the insurers]
+
+  FR-EB-045:
+    scenario: SC-EB-05
+    persona: INSURER_USER
+    screen: PRFP
+    data: [TD-EB-07]
+    conditions:
+      - The revised proposal is version n+1 referencing the revision; the differences are highlighted; the target becomes answered and the AO is notified.
+      - A revised proposal that skips a requested item is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Insurer submits the revised proposal
+        steps:
+          - As ins.b open the revision task; answer the dental item; submit.
+          - As eb.ao1 open the proposal page.
+        expected: Version 2 is stored with the changed items highlighted; the target is answered; eb.ao1 is notified.
+      - c: 2
+        type: Negative
+        title: Requested item not addressed
+        steps:
+          - As ins.c submit the revision without answering the dental item.
+        expected: The submission is refused.
+        msg: ["Answer the requested change {Add dental benefit PHP 5,000}"]
+
+  FR-EB-046:
+    scenario: SC-EB-05
+    persona: EB_AO
+    screen: PROGRAMME
+    data: [TD-EB-07]
+    conditions:
+      - The client's confirmation is recorded with its channel, with evidence unless confirmed in the portal; the threshold rules are re-evaluated.
+      - Trigger Placement creates one draft account per benefit line with the cycle's business type and the placement documents, and notifies Processing and the insurer.
+      - The trigger is refused while a threshold approval or a required placement document is missing.
+      - The cycle becomes PLACED when all its accounts are booked.
+    cases:
+      - c: 1
+        type: Negative
+        brd: [BRID-017]
+        title: E-mail confirmation without evidence
+        steps:
+          - Confirm with channel E-mail and no attachment.
+        expected: The confirmation is not saved.
+        msg: [Attach the client's confirmation]
+      - c: 1
+        type: Positive
+        persona: CLIENT_HR
+        screen: PCOMP
+        brd: [BRID-017]
+        title: Client confirms in the portal
+        steps:
+          - As hr.acme confirm the recommended proposal per line.
+        expected: The cycle is CONFIRMED with channel System and no evidence needed.
+      - c: 2
+        type: Workflow
+        brd: [BRID-019]
+        title: Trigger placement for HMO and GLI
+        steps:
+          - Click Trigger Placement.
+        expected: Two draft accounts are created with the cycle's business type, each with the confirmation, proposal, TOR, master list and BOR linked; Processing and INS-B are notified.
+      - c: 3
+        type: Negative
+        brd: [BRID-019]
+        title: Placement document missing
+        pre: The BOR required for RENEWAL_PLACEMENT is removed from the cycle.
+        steps:
+          - Click Trigger Placement.
+        expected: Nothing is created; the missing document is named.
+        msg: ["Add the required document {EB_BOR} before placement"]
+      - c: 4
+        type: Workflow
+        persona: EB_PROCESSOR
+        screen: BOOK
+        brd: [BRID-019]
+        title: Cycle PLACED when both accounts are booked
+        steps:
+          - Book the HMO and GLI accounts.
+        expected: The cycle is PLACED.
+
+  FR-EB-050:
+    scenario: SC-EB-06
+    persona: EB_PROC_SUPERVISOR
+    screen: MEMBERCHG
+    data: [TD-EB-08]
+    conditions:
+      - Authorised users assign and reassign EB work items with remarks; the assignee is notified.
+      - A return carries a reason and remarks that the maker sees; a return without a reason is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Supervisor reassigns a member change
+        steps:
+          - Select the member change of EMP-0251; reassign to eb.proc with remarks.
+        expected: eb.proc is the assignee and is notified; the case history shows the remarks.
+      - c: 2
+        type: Workflow
+        persona: EB_PROCESSOR
+        title: Processor returns an item to the AO
+        steps:
+          - Return the member change with reason "Missing effective date proof" and remarks.
+        expected: eb.ao1 sees the reason and remarks on the item.
+      - c: 2
+        type: Negative
+        persona: EB_PROCESSOR
+        title: Return without a reason
+        steps:
+          - Return with the reason blank.
+        expected: The return is refused.
+        msg: ["Select a reason for 'return'"]
+
+  FR-EB-051:
+    scenario: SC-EB-06
+    persona: EB_PROCESSOR
+    screen: ACCOUNT
+    data: [TD-EB-07]
+    conditions:
+      - The EB documents linked at the trigger are on the account's Documents tab; the cycle shows the account stages to the AO.
+      - A validated policy form from the portal becomes the account's e-policy; a staged one does not.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRID-019]
+        title: Documents linked at the trigger
+        steps:
+          - Open the HMO account, Documents tab; as eb.ao1 open the cycle.
+        expected: The confirmation, proposal, TOR, master list and BOR are listed; the cycle shows the account stage.
+      - c: 2
+        type: Workflow
+        brd: [BRID-005.01]
+        title: Validated policy form becomes the e-policy
+        steps:
+          - As ins.a upload the policy form; as eb.proc validate it in Portal Uploads.
+        expected: The file is the account's e-policy; the contract tracked item closes.
+      - c: 2
+        type: Negative
+        brd: [BRID-005.01]
+        title: Staged policy form is not the e-policy
+        steps:
+          - Open the account before the validation.
+        expected: No e-policy is attached.
+
+  FR-EB-052:
+    scenario: SC-EB-06
+    persona: EB_PROCESSOR
+    screen: BOOK
+    data: [TD-EB-07]
+    conditions:
+      - The insurer billing number is mandatory when booking an EB product, on screen and in the booking upload.
+      - The combination company, insurer and billing number is unique; a duplicate blocks the booking and names the existing invoice.
+      - The booking audit records user, time and billing number.
+    cases:
+      - c: 1
+        type: Negative
+        title: Booking an HMO account without billing number
+        steps:
+          - Book the HMO account with the billing number blank.
+        expected: The booking is refused.
+        msg: [Enter the insurer billing number]
+      - c: 3
+        type: Positive
+        title: Booking with a billing number
+        steps:
+          - Book with billing number INSA-BILL-7781; open the audit.
+        expected: The account is booked; Processing and the AO are notified; the audit shows user, time and INSA-BILL-7781.
+      - c: 2
+        type: Negative
+        title: Same insurer and billing number again
+        steps:
+          - Book the GLI account with INSA-BILL-7781.
+        expected: The booking is refused.
+        msg: ["Billing number {INSA-BILL-7781} of {INS-A} is already on invoice {INV-2027-000412}"]
+
+  FR-EB-053:
+    scenario: SC-EB-06
+    persona: EB_PROCESSOR
+    screen: SOAREG
+    data: [TD-EB-07]
+    conditions:
+      - An SOA is registered as RECEIVED, validated, linked to the booked invoices and released to the client HR user and Collection.
+      - A duplicate SOA or a corrupted file is refused; a rejection needs a reason.
+      - When an invoice is paid in Cashiering, BIBS shows PAID and notifies the AO and Collection.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: CLIENT_HR
+        screen: PSOA
+        title: Validate and release the SOA
+        steps:
+          - As eb.proc validate SOA-INSA-2027-001, link the HMO invoice, release it; as hr.acme open the portal.
+        expected: The SOA (EBS-yyyy-nnnnnn) is RELEASED and visible to hr.acme; Collection is notified.
+      - c: 2
+        type: Negative
+        title: Same SOA number twice
+        steps:
+          - Register SOA-INSA-2027-001 again for INS-A.
+        expected: The SOA is refused.
+        msg: ["SOA {SOA-INSA-2027-001} of {INS-A} is already registered"]
+      - c: 2
+        type: Negative
+        title: Reject without a reason
+        steps:
+          - Reject an SOA with the reason blank.
+        expected: Nothing is saved.
+        msg: ["Select a reason for 'reject'"]
+      - c: 3
+        type: Workflow
+        persona: EB_COLLECTION
+        screen: CASHIER
+        title: Payment notifies the AO and Collection
+        steps:
+          - Apply the payment of the HMO invoice in Cashiering; open the SOA register.
+        expected: The SOA shows PAID from the ledger; eb.ao1 and eb.coll are notified with the document links.
+
+  FR-EB-054:
+    scenario: SC-EB-06
+    persona: EB_AO
+    screen: MEMBERS
+    data: [TD-EB-04]
+    conditions:
+      - The master list is loaded through the template as a staged version; the AO reviews headcount, additions and removals and accepts it; the accepted version replaces the roster and the earlier stays readable.
+      - A duplicate employee number or a blank mandatory column is refused with the row named.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRID-013]
+        title: Accept a staged roster
+        steps:
+          - Open the staged version from hr.acme; review the differences; Accept Roster.
+        expected: The roster has 250 members; the earlier version stays readable.
+      - c: 2
+        type: Negative
+        brd: [BRID-014]
+        title: Duplicate employee number
+        steps:
+          - Upload the master list version with EMP-0077 twice.
+        expected: Nothing is staged; the row is named.
+        msg: ["Row {78}: employee {EMP-0077} appears twice"]
+      - c: 1
+        type: Security-access
+        persona: CLIENT_HR
+        screen: PMEMBERS
+        brd: [BRID-014]
+        title: Client HR cannot accept a roster
+        steps:
+          - As hr.acme look for Accept Roster.
+        expected: The action is not offered; only the AO accepts.
+
+  FR-EB-055:
+    scenario: SC-EB-06
+    persona: EB_AO
+    screen: MEMBERCHG
+    data: [TD-EB-08]
+    conditions:
+      - Member changes entered by the AO or HR user are validated against the roster, numbered EBM-yyyy-nnnnnn and relayed to the insurer as a task and e-mail.
+      - A validated financial change raises an endorsement request in Operations with the EBM reference.
+      - Deleting a member not on the roster, adding an existing one or an effective date outside the policy period is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: CLIENT_HR
+        screen: PMC
+        brd: [BRID-013]
+        title: New hire relayed to the insurer
+        steps:
+          - As hr.acme add EMP-0251 with plan A; as eb.ao1 relay it; as ins.a open the portal.
+        expected: The change EBM-yyyy-nnnnnn is RELAYED; ins.a has the task.
+      - c: 2
+        type: Workflow
+        persona: EB_PROCESSOR
+        screen: ADJUST
+        brd: [BRID-025]
+        title: Financial change raises an endorsement request
+        steps:
+          - After billing, validate the change as eb.proc; open Operations endorsement requests.
+        expected: An endorsement request with reference EBM-yyyy-nnnnnn exists; the change is CLOSED.
+      - c: 3
+        type: Negative
+        brd: [BRID-013]
+        title: Delete a member not on the roster
+        steps:
+          - Capture the deletion of EMP-9999.
+        expected: The line is refused.
+        msg: ["Employee {EMP-9999} is not on the roster"]
+      - c: 3
+        type: Negative
+        brd: [BRID-013]
+        title: Effective date outside the policy period
+        steps:
+          - Capture the plan change of EMP-0040 effective after the policy end.
+        expected: The line is refused.
+        msg: [The effective date must be within the policy period]
+
+  FR-EB-056:
+    scenario: SC-EB-06
+    persona: EB_AO
+    screen: MEMBERCHG
+    data: [TD-EB-08]
+    conditions:
+      - The direct billing is linked to the member change, endorsement type, client and policy; the change is BILLED and flagged Direct billed; Processing and Collection are notified and Collection opens it.
+      - A billing not linked to a member change is refused.
+    cases:
+      - c: 1
+        type: Upload-download
+        persona: EB_COLLECTION
+        title: Collection opens the direct billing
+        steps:
+          - As eb.ao1 upload the INS-A direct billing on the RELAYED change; as eb.coll open it.
+        expected: The change shows BILLED and "Direct billed"; eb.coll opens the document.
+      - c: 2
+        type: Negative
+        title: Billing without a member change
+        steps:
+          - Upload a direct billing from the programme without selecting the change.
+        expected: The upload is refused.
+        msg: [Select the member change of the billing]
+
+  FR-EB-057:
+    scenario: SC-EB-06
+    persona: SYSTEM
+    screen: PENDING
+    data: [TD-EB-08]
+    conditions:
+      - Tracked items are created automatically (contract after placement, HMO card per added member, billing per member change) with party, status and due date.
+      - The daily job sends a follow-up every EB_FOLLOWUP_DAYS past due and escalates after EB_FOLLOWUP_MAX follow-ups.
+      - Pending Items filters by programme, member, type, party and age; an item is closed only with a date received.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Adding a member creates a pending HMO card
+        steps:
+          - Close the new-hire change of EMP-0251; open Pending Items.
+        expected: A pending HMO card item for EMP-0251 with party INS-A and a due date is listed.
+      - c: 2
+        type: Boundary
+        screen: MAILBOX
+        title: Follow-up at 5 working days past due
+        steps:
+          - Move the date to 5 working days past due; run EB_ITEM_FOLLOWUP.
+        expected: INS-A receives a follow-up e-mail; at 4 working days none is sent; after 3 follow-ups the AO gets EB_ITEM_OVERDUE.
+      - c: 3
+        type: Positive
+        persona: EB_AO
+        title: Filter Pending Items by member
+        steps:
+          - Filter by member EMP-0251.
+        expected: Only EMP-0251's items are listed.
+      - c: 3
+        type: Negative
+        persona: EB_AO
+        title: Close without a date received
+        steps:
+          - Close the HMO card item without the date received.
+        expected: The item stays open.
+        msg: [Enter the date received]
+
+  FR-EB-060:
+    scenario: SC-EB-07
+    persona: EB_TL
+    screen: REPORTS
+    data: [TD-EB-03, TD-EB-07]
+    conditions:
+      - The Production, Renewal, Placement, Pending Items and Franchise reports run on request with their parameters and show the columns of FRS section 6.1.
+      - Reports are viewed, downloaded, printed, e-mailed from the runner and saved as variants.
+      - A date range with the end before the start is refused.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Renewal report
+        steps:
+          - Run EB-RENEWAL for the quarter.
+        expected: EBP-2026-000010 is listed with expiry, RA sent date, status, 3 proposals received, comparative result, client changes and BOR / TOR / remarketing.
+      - c: 1
+        type: Report-output
+        title: Production report filtered by team BDO
+        steps:
+          - Run EB-PRODUCTION with team BDO.
+        expected: Only the BDO team's programmes are listed.
+      - c: 2
+        type: Upload-download
+        screen: MAILBOX
+        title: Share the export by e-mail
+        steps:
+          - Export EB-PLACEMENT to Excel and e-mail it from the runner to eb.mgmt.
+        expected: The file arrives with the rows of the screen; the share is logged.
+      - c: 3
+        type: Negative
+        title: End date before the start date
+        steps:
+          - Run EB-FRANCHISE from 31 March to 1 March.
+        expected: The report does not run.
+        msg: ["{Date to} must not be before {Date from}"]
+
+  FR-EB-061:
+    scenario: SC-EB-07
+    persona: EB_MANAGEMENT
+    screen: REPORTS
+    data: [TD-EB-03]
+    conditions:
+      - The New Business report lists the new client accounts of a period with the columns of the addendum.
+      - The business type filters the EB reports and the BRD-1 booked register, production and placement update reports.
+      - Every report exports to Word with the same rows as the PDF.
+    cases:
+      - c: 1
+        type: Report-output
+        title: New Business report for the month
+        steps:
+          - Run EB-NEW-BUSINESS for the month of the Gamma placement.
+        expected: Gamma Test Ltd. is listed with line, effective date, insurer, premium, commission, AO, business type, date and status.
+      - c: 2
+        type: Report-output
+        title: Production filtered by business type Renewal
+        steps:
+          - Run EB-PRODUCTION and NB-PRODUCTION with business type Renewal.
+        expected: New-business accounts are excluded from both.
+      - c: 3
+        type: Upload-download
+        title: Word export equals the PDF
+        steps:
+          - Export EB-NEW-BUSINESS to Word and PDF.
+        expected: Both have the same rows.
+      - c: 1
+        type: Negative
+        title: Period end before start
+        steps:
+          - Run EB-NEW-BUSINESS with the period end before its start.
+        expected: The report does not run.
+        msg: ["{Period to} must not be before {Period from}"]
+
+  FR-EB-062:
+    scenario: SC-EB-07
+    persona: EB_TL
+    screen: HOME
+    data: [TD-EB-03]
+    conditions:
+      - The TAT report shows per activity, team or AO the days taken and the breaches of the targets of the TAT annex.
+      - EB Home tiles open their lists; alerts warn of overdue franchise decisions, proposals, comparatives, SOA validations and tracked items.
+      - An activity within its target is not a breach.
+    cases:
+      - c: 1
+        type: Report-output
+        screen: REPORTS
+        brd: [TAT annex]
+        title: Franchise decided in 7 working days is a breach
+        steps:
+          - Run EB-TAT for the month.
+        expected: The franchise decision of 7 working days is shown as a breach against the 5-day target.
+      - c: 2
+        type: Positive
+        brd: [BRID-022]
+        title: Tile Portal uploads to review
+        steps:
+          - Click the tile Portal uploads to review.
+        expected: The review queue opens with the staged uploads.
+      - c: 3
+        type: Boundary
+        neg: true
+        screen: REPORTS
+        brd: [TAT annex]
+        title: Franchise decided in 5 working days is not a breach
+        steps:
+          - Run EB-TAT for a franchise decided in 5 working days.
+        expected: No breach is shown.
+      - c: 2
+        type: Security-access
+        persona: INSURER_USER
+        screen: PHOME
+        brd: [BRID-022]
+        title: Portal user cannot open EB Home
+        steps:
+          - As ins.a call the EB Home endpoint.
+        expected: The call is refused.
+
+access:
+  - action: Maker actions of the cycle (RA, BOR, franchise, TOR, proposals, comparative, confirmation, placement trigger)
+    screen: PROGRAMME
+    permission: EB_MARKET
+    allow: [EB_AO]
+    deny: [EB_TL, EB_PROCESSOR, EB_COLLECTION, AUDITOR]
+    denied: The maker buttons are not shown; the calls return HTTP 403.
+  - action: Sign off a comparative
+    screen: COMPARATIVE
+    permission: EB_COMPARATIVE_APPROVE
+    allow: [EB_TL]
+    deny: [EB_AO, EB_MANAGEMENT]
+    denied: Approve and Return are not shown.
+  - action: Approve above the value threshold
+    screen: APPROVALS
+    permission: EB_THRESHOLD_APPROVE
+    allow: [EB_MANAGEMENT]
+    deny: [EB_TL, EB_AO]
+    denied: The item is not offered in My Approvals.
+  - action: Validate member changes, policy forms and SOAs
+    screen: SOAREG
+    permission: EB_PROCESS
+    allow: [EB_PROCESSOR, EB_PROC_SUPERVISOR]
+    deny: [EB_AO, EB_COLLECTION]
+    denied: Validate and Release are not shown.
+  - action: Collection view of SOAs and billing
+    screen: SOAREG
+    permission: EB_COLLECT
+    allow: [EB_COLLECTION]
+    deny: [EB_TL]
+    denied: The Collection acknowledgement is not shown.
+  - action: EB set-up (threshold rules, required documents, parameters)
+    screen: EBSETUP
+    permission: EB_SETUP
+    allow: [BUSINESS_ADMIN]
+    deny: [EB_AO, EB_TL, EB_MANAGEMENT]
+    denied: EB Setup is not in the menu.
+  - action: Run EB reports
+    screen: REPORTS
+    permission: EB_REPORT_VIEW
+    allow: [EB_AO, EB_TL, EB_COLLECTION, AUDITOR]
+    deny: [NON_EB_USER, INSURER_USER]
+    denied: The Employee Benefits category is not listed; the run call returns HTTP 403.
+  - action: Request portal users
+    screen: ACCREQ
+    permission: PORTAL_USER_REQUEST
+    allow: [EB_AO]
+    deny: [EB_TL, EB_PROCESSOR]
+    denied: User type External is not offered.
+  - action: Approve portal user requests
+    screen: APPROVALS
+    permission: PORTAL_USER_APPROVE
+    allow: [BUSINESS_ADMIN]
+    deny: [EB_AO, EB_TL]
+    denied: The request is not offered for decision.
+  - action: Lock and unlock portal users; portal logs
+    screen: PORTALUSERS
+    permission: PORTAL_ADMIN
+    allow: [BUSINESS_ADMIN]
+    deny: [EB_AO, EB_COLLECTION]
+    denied: Portal Users is not in the menu.
+  - action: Assign and reassign EB work
+    screen: MEMBERCHG
+    permission: WORK_ASSIGN
+    allow: [EB_TL, EB_PROC_SUPERVISOR]
+    deny: [EB_PROCESSOR, EB_AO]
+    denied: Assign and Reassign are not shown.
+  - action: Answer requests and franchise in the portal (own insurer only)
+    screen: PRFP
+    permission: Portal role INSURER_USER
+    allow: [INSURER_USER]
+    deny: [CLIENT_HR]
+    denied: The insurer pages are not offered to a client HR user.
+  - action: View the roster and confirm the comparative in the portal (own company only)
+    screen: PPROG
+    permission: Portal role CLIENT_HR
+    allow: [CLIENT_HR]
+    deny: [INSURER_USER]
+    denied: The client pages are not offered to an insurer user.
+
+findings:
+  - fr: FR-EB-012
+    issue: 'The FRS texts of the platform attachment codes differ from what BIBS shows - ATTACHMENT_TYPE_NOT_ALLOWED "The file type is not allowed" (built "Only these file types are allowed - <list>"), ATTACHMENT_TOO_LARGE "The file is larger than the allowed size" (built "The file exceeds the maximum size of <n> MB"), ATTACHMENT_INFECTED "The file failed the virus check" (built "The file was rejected by the malware scan - <detail>"). The same applies to FR-EB-002, 023, 030 and 031.'
+    proposal: Quote the platform texts in FRS v1.1; the cases use them.
+  - fr: FR-EB-020
+    issue: 'The FRS gives CLIENT_DUPLICATE "A client with the same identifiers already exists" and CLIENT_NAME_REQUIRED "Enter the client name"; the client service shows "This client already exists - <client>" and "Enter the <field>".'
+    proposal: Quote the built texts.
+  - fr: FR-EB-004
+    issue: 'EMAIL_ADDRESS_INVALID is given as "Enter a valid e-mail address"; the platform returns "Invalid e-mail address - <address>".'
+    proposal: Quote the platform text.
+  - fr: FR-EB-060
+    issue: 'FR-EB-060 and 061 pair INVALID_REPORT_PARAMETERS with "The end date must be on or after the start date"; the report engine builds "<to> must not be before <from>" from the parameter labels.'
+    proposal: Quote the engine pattern.
+  - fr: FR-EB-010
+    issue: 'Acceptance criterion 3 of FR-EB-010 says "The fourth failed sign-in locks the portal user" while rule R3 says lockout after 3 failed sign-ins (PORTAL_MAX_FAILED_LOGINS = 3). The cases lock at the third failure.'
+    proposal: Align the acceptance criterion with R3 ("the third failed sign-in locks the portal user, and the fourth is refused").
+  - fr: FR-EB-022
+    issue: The RA lead time is 135 days (TAT annex) against the BRD example of 180 days (EBQ02), and who sets the renewal flag is open (EBQ03); the RA timing cases depend on both.
+    proposal: Answer EBQ02 and EBQ03 before UAT.
+  - fr: FR-EB-031
+    issue: The BOR is required for new business and remarketing renewals, while the BRD negative scenario says a BOR uploaded for a renewal is invalid (EBQ05). A renewal that stays with the incumbent has no BOR case.
+    proposal: Answer EBQ05; add a case for a renewal without remarketing once decided.
+  - fr: FR-EB-042
+    issue: The threshold values, measure and approver levels are seed values (EBQ11); the FRS does not say whether "meets" means at or above the amount.
+    proposal: State "at or above" and give the BDOI values; the cases use the seed values.
+  - fr: FR-EB-062
+    issue: 'The TAT annex gives ranges ("1-5 working days"); the FRS parameters hold one value, and the start and stop events are open (EBQ21), so a breach cannot be tested except against the upper value.'
+    proposal: Confirm that the upper value of each range is the target and name the start and stop events.

@@ -1,0 +1,27 @@
+// BRD-5 Volume 2: instrument statuses per mode (disbursement InstrumentStatus). FRS section 5.2.
+digraph v2_instr {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.25, ranksep=0.35, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=11, fontcolor="@NEAR_BLACK", height=0.45];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=9, fontcolor="@TEXT"];
+  subgraph cluster_chk { label="Check"; fontname="Arial"; fontsize=11; color="@HEADER_BLUE";
+    c1 [label="PENDING"]; c2 [label="PRINTED"]; c3 [label="RELEASED"];
+    c4 [label="NEGOTIATED", fillcolor="@SUCCESS_BG", color="@SUCCESS"]; c5 [label="STALE", fillcolor="@AMBER_BG"];
+    c1 -> c2 -> c3 -> c4; c2 -> c5 [style=dotted]; c3 -> c5 [style=dotted, label=" 180 days"]; }
+  subgraph cluster_atd { label="Authority to Debit"; fontname="Arial"; fontsize=11; color="@HEADER_BLUE";
+    a1 [label="PENDING"]; a2 [label="PRINTED"]; a3 [label="EMAILED"]; a4 [label="DEBITED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    a1 -> a2 -> a3 -> a4; }
+  subgraph cluster_cta { label="Credit to account"; fontname="Arial"; fontsize=11; color="@HEADER_BLUE";
+    t1 [label="PENDING"]; t2 [label="EXTRACTED\n(DCTF)"]; t3 [label="CREDITED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    t1 -> t2 -> t3; }
+  subgraph cluster_mc { label="Manager's check / demand draft"; fontname="Arial"; fontsize=11; color="@HEADER_BLUE";
+    m1 [label="PENDING"]; m2 [label="PRINTED"]; m3 [label="RECEIVED"]; m4 [label="RELEASED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    m1 -> m2 -> m3 -> m4; }
+  subgraph cluster_ct { label="Credit ticket / TT"; fontname="Arial"; fontsize=11; color="@HEADER_BLUE";
+    k1 [label="PENDING"]; k2 [label="PRINTED"]; k3 [label="DEBITED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    k1 -> k2 -> k3; }
+  subgraph cluster_ob { label="Online banking"; fontname="Arial"; fontsize=11; color="@HEADER_BLUE";
+    o1 [label="APPROVED"]; o2 [label="DEBITED\n(BOB upload)", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    o1 -> o2; }
+  c1 -> a1 -> t1 -> m1 -> k1 -> o1 [style=invis];
+}

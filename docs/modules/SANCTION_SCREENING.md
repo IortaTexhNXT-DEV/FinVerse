@@ -35,7 +35,7 @@ reference.
 
 ## 2. Personas and roles
 
-| Persona (BRD) | Role | Demo user(s) | What they do |
+| Persona (BRD) | Role | SIT/UAT user(s) | What they do |
 |---|---|---|---|
 | Compliance Officer (maker) | `COMPLIANCE_OFFICER` | `compoff` | Drafts configuration versions, maintains the watchlists and uploads list files, reviews escalated cases (close, return, refer to the committee, require an STR), prepares, extracts and files STRs, re-assigns cases, runs the reports and the audit log |
 | Compliance Officer (checker) | `COMPLIANCE_CHECKER` | `compchk` | Approves or rejects configuration versions and list changes (never their own) |
@@ -46,8 +46,8 @@ reference.
 | Auditor | `AUDITOR` (+ SCR_VIEW, SCR_REPORT_VIEW, SCR_AUDIT_VIEW) | `auditor` | Reads cases, the STR register and the audit log |
 | System Administrator | `SYSADMIN` (+ SCR_VIEW) | `admin` | Runs the jobs from the job monitor |
 
-Four-eyes demo users: `compdual` (maker and checker, to show the refusal of self-approval) and
-`scrdual` (investigator and approver). Password of every demo user: `Brokerverse@2026`.
+Four-eyes SIT/UAT users: `compdual` (maker and checker, to show the refusal of self-approval) and
+`scrdual` (investigator and approver). The password is held in the seed configuration.
 
 The permissions of each role and the menu it sees are pinned by the persona check (client
 requirement 14): [`frontend/src/navigation/personaMenus.json`](../../frontend/src/navigation/personaMenus.json),
@@ -186,12 +186,12 @@ Monitor (`POST /api/v1/system/jobs/{name}/run`).
 | `SCR_CASE_SEQUENCE_PREFIX` | SCR | Case number prefix |
 
 Lists of values: `SCR_DISPOSITION` (parent = stage; "to confirm", SQ06), `SCR_CASE_TYPE`,
-`SCR_LIST_TYPE`, `SCR_REASSIGN_REASON`, `SCR_STR_REASON` (empty until SQ09; demo codes
-DEMO01-03), `SCR_FORM_TYPE`, `SCR_DOCUMENT_TYPE`.
+`SCR_LIST_TYPE`, `SCR_REASSIGN_REASON`, `SCR_STR_REASON` (empty until SQ09; seed codes
+RSN01-03), `SCR_FORM_TYPE`, `SCR_DOCUMENT_TYPE`.
 
 Configuration versions (Compliance Setup): MATCH_CRITERIA, RISK_RULES, APPROVAL_MATRIX,
-ASSIGNMENT_MATRIX, SLA_MATRIX, VALIDATION_RULES, TEMPLATE (per template type), STR_LAYOUT. The demo
-company FVI has version 1 of each (V1950), with demo values only.
+ASSIGNMENT_MATRIX, SLA_MATRIX, VALIDATION_RULES, TEMPLATE (per template type), STR_LAYOUT. The seed
+company FVI has version 1 of each (V1950), with seed values only.
 
 ## 7. Reports (category Compliance, view and export SCR_REPORT_VIEW)
 
@@ -227,7 +227,7 @@ Events consumed: `crm.service.ClientRegistered`, `ClientIdentityChanged`,
 
 | Item | Question | Built now |
 |---|---|---|
-| Production thresholds, categories, matrices, SLA hours | SQ02-SQ04, SQ08 | Configurable versions; demo values |
+| Production thresholds, categories, matrices, SLA hours | SQ02-SQ04, SQ08 | Configurable versions; seed values |
 | Review and STR template field lists, dispositions | SQ05, SQ06 | Template designer; LOV seeds "to confirm" |
 | AMLC STR layout (XLSX / XML) and reason codes | SQ09 | CSV and fixed-width layouts; `SCR_STR_FORMAT_PARKED` for the others |
 | List transports (SFTP, e-mail advisory, API, NLDS) | SQ01 | Upload and staged files |
@@ -239,7 +239,7 @@ Events consumed: `crm.service.ClientRegistered`, `ClientIdentityChanged`,
 | Asynchronous screening after commit | - | Runs in the request thread after commit |
 | Guard against deleting case documents through the generic attachment API | - | Not built |
 | `SCR_CASE_ASSIGNED` notice | - | The platform assignment notice is used |
-| Demo unit heads with SCR_CASE_APPROVE | - | Demo cases use the approvers' queue |
+| Seed unit heads with SCR_CASE_APPROVE | - | Seed cases use the approvers' queue |
 
 ## 10. Troubleshooting (production support)
 

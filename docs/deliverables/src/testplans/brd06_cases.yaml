@@ -131,11 +131,11 @@ data:
   - id: TD-RN-15
     name: Migrated policies of the go-live window and the RA tracker
     content: "Migrated in-force policies (source LEGACY) expiring 3-Jan-2028 (2), 31-Jan-2028 (1), 1-Feb-2028 (1), 31-May-2028 (1) and 1-Jun-2028 (1); one policy expiring 15-Feb-2028 already renewed in legacy (the later term is migrated too). Tracker RN_RA_SENT_JAN.xlsx: RA of the 3-Jan-2028 policies sent on 15-Dec-2027; a row with an unknown legacy reference; a second row for the same policy; a row with an RA date after go-live"
-    source: Loaded by the migration mock on SIT (BRD-13 objects P01, R06); tracker prepared by the test lead from template RNW_RA_ALREADY_SENT (masked)
+    source: Loaded by the trial migration on SIT (BRD-13 objects P01, R06); tracker prepared by the test lead from template RNW_RA_ALREADY_SENT (masked)
   - id: TD-RN-16
     name: Package code map and legacy packages
     content: "PACKAGE code map loaded by the migration: QPS package HOME-01 v2 -> BIBS package version PKG-HOME-2027 (one entry); MOTOR-CLG v1 -> two BIBS versions by sum-insured band (ambiguous); FIRE-OLD v1 not in the map. Migrated policies of TD-RN-15 carry these legacy packages"
-    source: Code map of the migration mock (maintained by MBS / TSU); package versions of the BRD-3 catalogue on SIT
+    source: Code map of the trial migration (maintained by MBS / TSU); package versions of the BRD-3 catalogue on SIT
 
 scenarios:
   - id: SC-RN-01

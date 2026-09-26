@@ -93,7 +93,7 @@ The roles-and-access sheet checks each New Business action against the roles tha
 | Level | What is tested | Who | When |
 |---|---|---|---|
 | Unit and integration (automated) | Rules, validations, workflow transitions, rating, booking entries, permissions and documents of each FR, against a PostgreSQL database; frontend form checks | iorta TechNXT developers | Every change, in CI (`mvn verify`, `npm run verify`) |
-| System test | Every case of the workbook, screen by screen, with the demo data | iorta TechNXT QA | Before UAT, on the SIT environment |
+| System test | Every case of the workbook, screen by screen, with the seed data | iorta TechNXT QA | Before UAT, on the SIT environment |
 | Persona end-to-end | The ten scenarios run from start to finish by the persona that owns each step, including the e-mails in the test mailboxes and the booking journal | iorta TechNXT QA with the BDOI department testers | After the system test passes |
 | User acceptance test (UAT) | The scenarios and the High-priority cases, run by BDOI testers on masked production-like data, including bulk files in BDOI's own volumes | BDOI Marketing, TSU, Processing, Comptrollership and MBS testers | After the entry criteria of section 3 are met |
 
@@ -129,7 +129,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | The build is deployed on SIT with the demo profile (seeds V980 to V989); CI is green on the deployed commit; the test mailboxes for clients and the four demo insurers receive mail; the booking accounting rule of the demo (V988) is active; this plan is reviewed by the iorta TechNXT project manager. |
+| System test | The build is deployed on SIT with the seed profile (seeds V980 to V989); CI is green on the deployed commit; the test mailboxes for clients and the four seed insurers receive mail; the booking accounting rule of the seed (V988) is active; this plan is reviewed by the iorta TechNXT project manager. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical defect; e-mail relay, scheduled jobs (MAIL_DISPATCH, BOOKING_BATCH, HOLD_COVER_EXPIRY, KYC_REVIEW_DUE, PAYMENT_CONFIRMATION_SWEEP) run on SIT. |
 | UAT | FRS BRD-1 v1.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; Comptrollership has confirmed the GL accounts of the booking rule for UAT (OQ07). |
 
@@ -142,7 +142,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 | Persona end-to-end | All ten scenarios passed end to end, including the protected e-mails and a balanced booking journal. |
 | UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High defect; open defects listed with an agreed plan in the UAT sign-off; the sign-off of section 10 is signed. |
 
-**Suspension.** Testing of a scenario stops when a Critical defect blocks it, when the environment or the e-mail relay is down for more than half a day, or when the demo or UAT data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
+**Suspension.** Testing of a scenario stops when a Critical defect blocks it, when the environment or the e-mail relay is down for more than half a day, or when the seed or UAT data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
 
 # Environments and test data
 
@@ -152,18 +152,18 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 | Environment | Use | Data |
 |---|---|---|
 | CI | Automated unit and integration tests on every change | Created by each test; PostgreSQL in a container |
-| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Demo profile seeds (V900-V989); test mailboxes for clients, insurers and users |
-| UAT | Acceptance by BDOI testers | Masked copy of production-like data plus the demo records; no real client names, TINs, addresses, loan or PN numbers, plate or engine numbers, or e-mail addresses |
+| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed profile migrations (V900-V989); test mailboxes for clients, insurers and users |
+| UAT | Acceptance by BDOI testers | Masked copy of production-like data plus the seed records; no real client names, TINs, addresses, loan or PN numbers, plate or engine numbers, or e-mail addresses |
 
 Non-production data is always masked. Client names, TINs, IDs, addresses, e-mail addresses, phone numbers, PN and loan numbers and vehicle identifiers are replaced before data is loaded into SIT or UAT, and client and insurer e-mail addresses point to test mailboxes, so no quotation, slip, e-policy or service invoice can reach a real client or insurer. CLPC billing files produced in UAT are not sent to BDO Unibank.
 
 ## Named data sets
 
-The cases refer to named data sets. Sets TD-NB-01 to TD-NB-10 are provided by the demo seed of the build; TD-NB-11 to TD-NB-14 are prepared by the test lead as the Test Data sheet describes.
+The cases refer to named data sets. Sets TD-NB-01 to TD-NB-10 are provided by the seed of the build; TD-NB-11 to TD-NB-14 are prepared by the test lead as the Test Data sheet describes.
 
 <!-- tp:data -->
 
-Many cases move a demo record to its next stage (for example the validation of ARN-2026-900002). The test lead reloads the demo seed between cycles, and each tester works on the records assigned to them in the test schedule so that two testers do not move the same record.
+Many cases move a seed record to its next stage (for example the validation of ARN-2026-900002). The test lead reloads the seed between cycles, and each tester works on the records assigned to them in the test schedule so that two testers do not move the same record.
 
 # Roles and responsibilities
 
@@ -177,7 +177,7 @@ Many cases move a demo record to its next stage (for example the validation of A
 | BDOI process owner | BDOI Product Owner | Decides on disputed expected results and accepted defects; signs off UAT |
 | UAT coordinator | Business Project Services, BDO Unibank ESG | Plans the UAT sessions; checks traceability to the BRD |
 
-Each BDOI department tests the steps it owns: Marketing the clients, quotations, PRFs and accounts (SC-NB-03, 04, 06); TSU the non-package placement and TSU clearance (SC-NB-05); Processing the payment, placement, issuance and booking (SC-NB-07, 08, 09); Comptrollership the booking entries and service invoices (SC-NB-09); MBS and the Business Administrator the product rules, lists of values and templates (SC-NB-01, 02). The personas and demo users are:
+Each BDOI department tests the steps it owns: Marketing the clients, quotations, PRFs and accounts (SC-NB-03, 04, 06); TSU the non-package placement and TSU clearance (SC-NB-05); Processing the payment, placement, issuance and booking (SC-NB-07, 08, 09); Comptrollership the booking entries and service invoices (SC-NB-09); MBS and the Business Administrator the product rules, lists of values and templates (SC-NB-01, 02). The personas and SIT/UAT users are:
 
 <!-- tp:personas -->
 
@@ -238,8 +238,8 @@ Cases with an automation reference are covered by these existing tests, which ru
 | Risk | Impact | Mitigation |
 |---|---|---|
 | BDOI answers to open questions change expected results (Q04 TSU thresholds, Q05 approval chain, Q07 password convention, Q14 bulk sanitisation, Q23 file types, Q26 placement prerequisites, Q27 hold cover expiry, Q30 advice trigger, Q35 multi-year basis) | Medium | The values are parameters, lists or rules; the affected cases name them and are re-run after the change without a new build |
-| Production GL accounts of the booking entry are not yet given (OQ07) | High | SIT uses the demo booking rule; UAT waits for the Comptrollership accounts (entry criterion) |
-| Demo records are moved by earlier cases | Medium | Reload the demo seed between cycles; assign records to testers in the test schedule |
+| Production GL accounts of the booking entry are not yet given (OQ07) | High | SIT uses the seed booking rule; UAT waits for the Comptrollership accounts (entry criterion) |
+| Seed records are moved by earlier cases | Medium | Reload the seed between cycles; assign records to testers in the test schedule |
 | Test mailboxes or the e-mail relay not reachable from SIT or UAT | High | Check the relay before the cycle; e-mail cases read the Outbound Messages log when the mailbox is down and are re-run later |
 | Time-based cases (idle session, SLA breach, stalled 5 days, hold cover expiry, multi-year year 2, monthly KYC job) need the clock to pass | Medium | The test lead moves stage-entry times and dates in the test database or runs the jobs by hand, as the preconditions describe |
 | Bulk files in BDOI's volumes (thousands of rows) are not tested before UAT | Medium | System test uses the files of TD-NB-11; UAT includes one file per upload type in the expected monthly volume |

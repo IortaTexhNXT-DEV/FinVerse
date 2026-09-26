@@ -8,11 +8,11 @@ digraph dm_cutover {
   edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2];
 
   a1 [label=<<b>Sep-Oct 2026</b><br/><font point-size="10">object decisions (G1),<br/>layouts, code map owners</font>>];
-  a2 [label=<<b>Nov 2026-Mar 2027</b><br/><font point-size="10">build in mock order;<br/>first extracts, profiling</font>>];
-  a3 [label=<<b>Apr 2027: Mock 1 (SIT)</b><br/><font point-size="10">reference data and clients<br/>first; headers, RA file</font>>, fillcolor="@DIRTY_WHITE"];
+  a2 [label=<<b>Nov 2026-Mar 2027</b><br/><font point-size="10">build in trial-migration order;<br/>first extracts, profiling</font>>];
+  a3 [label=<<b>Apr 2027: Trial migration 1 (SIT)</b><br/><font point-size="10">reference data and clients<br/>first; headers, RA file</font>>, fillcolor="@DIRTY_WHITE"];
 
-  b1 [label=<<b>Jul 2027: Mock 2 (SIT)</b><br/><font point-size="10">all objects end to end,<br/>reconciliation L1-L5</font>>, fillcolor="@DIRTY_WHITE"];
-  b2 [label=<<b>Aug and Oct 2027</b><br/><font point-size="10">Mock 3 UAT load, Mock 4<br/>UAT refresh (timed)</font>>, fillcolor="@DIRTY_WHITE"];
+  b1 [label=<<b>Jul 2027: Trial migration 2 (SIT)</b><br/><font point-size="10">all objects end to end,<br/>reconciliation L1-L5</font>>, fillcolor="@DIRTY_WHITE"];
+  b2 [label=<<b>Aug and Oct 2027</b><br/><font point-size="10">Trial migration 3 UAT load, Trial migration 4<br/>UAT refresh (timed)</font>>, fillcolor="@DIRTY_WHITE"];
   b3 [label=<<b>Nov 2027</b><br/><font point-size="10">dress rehearsal, timed,<br/>rollback rehearsed</font>>, fillcolor="@DIRTY_WHITE"];
 
   c1 [label=<<b>20 Dec 2027 (T-14)</b><br/><font point-size="10">production pre-load:<br/>reference, clients, deltas</font>>, fillcolor="@AMBER_BG"];

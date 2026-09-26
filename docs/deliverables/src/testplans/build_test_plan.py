@@ -31,12 +31,12 @@ meta:
   built: true                      # BRDs 1-5: message codes must exist in backend/src/main and
                                    # automation references must exist; false (BRDs 6-12): codes
                                    # and automation references are refused
-personas:                          # role code -> name, the demo user (built BRDs) and an optional
+personas:                          # role code -> name, the SIT/UAT user (built BRDs) and an optional
   MKT_AO: {name: Marketing AO, user: ao, short: MKT AO}   # short column label for the access table
 screens:                           # optional aliases for menu paths; a case may also give the path
   REQ: Product Maintenance > Package Requests > (request) Package Request page
 data:                              # named test data sets
-  - {id: TD-PM-01, name: ..., content: ..., source: "Demo seed V997 (PKR-2026-900003)"}
+  - {id: TD-PM-01, name: ..., content: ..., source: "Seed V997 (PKR-2026-900003)"}
 scenarios:                         # business scenarios (persona end-to-end threads)
   - {id: SC-PM-01, persona: MKT_AO, title: ..., pre: ...}
 frs:                               # one entry per FR of the FRS, in FRS order
@@ -567,7 +567,7 @@ def persona_label(plan: Plan, code: str) -> str:
     p = plan.personas.get(code) or {}
     label = f"{code} – {p.get('name', '')}".strip(" –")
     if p.get("user"):
-        label += f" (demo user {p['user']})"
+        label += f" (SIT/UAT user {p['user']})"
     return label
 
 
@@ -635,7 +635,7 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
         Column("brd", "BRD ID", 12, "BRD requirement ID(s)"),
         Column("title", "Test case", 30, "What the case checks"),
         Column("type", "Type", 13, "Kind of test", values=TYPES),
-        Column("persona", "Persona", 22, "Role code and name (and demo user for built BRDs)"),
+        Column("persona", "Persona", 22, "Role code and name (and SIT/UAT user for built BRDs)"),
         Column("screen", "Screen (menu path)", 26, "Where the tester starts"),
         Column("pre", "Preconditions and test data", 36, "State before the first step and the named data set"),
         Column("steps", "Steps", 52, "Numbered steps"),
@@ -681,7 +681,7 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
         Column("id", "Data set", 11, "Data set ID"),
         Column("name", "Name", 28, "Short name used in the cases"),
         Column("content", "Content", 64, "Records and values in the set"),
-        Column("source", "Source", 40, "Demo seed that provides it (built BRDs) or how to prepare it; "
+        Column("source", "Source", 40, "Seed that provides it (built BRDs) or how to prepare it; "
                "non-production data is masked"),
         Column("n", "Cases", 8, "Number of cases that use it", kind="number"),
     ], rows=data_rows, description="Named test data sets; UAT uses masked copies of production-like data")
@@ -811,7 +811,7 @@ def placeholder(plan: Plan, name: str) -> list[str]:
             if plan.built:
                 row.append(p.get("user", "-") or "-")
             rows.append(row + [n])
-        headers = ["Role", "Persona"] + (["Demo user"] if plan.built else []) + ["Cases"]
+        headers = ["Role", "Persona"] + (["SIT/UAT user"] if plan.built else []) + ["Cases"]
         widths = "3.4,8,2.6,1.6" if plan.built else "3.6,10.4,1.6"
         return _table(f'widths={widths} caption="Personas used by the cases" size=8.5', headers, rows)
     if name == "access":

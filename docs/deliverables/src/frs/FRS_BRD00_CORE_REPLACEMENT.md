@@ -1041,7 +1041,7 @@ screens: All screens and documents
 api: "-"
 description:
   - Screens use the BDO Insure colours (Header Blue, CTA Blue, Yellow), logo and typography of the UX guidelines; documents, reports and exports carry the logo, blue table headers and the "Confidential" footer. A screen-by-screen alignment pass against the BDOI UX design (deliverable 18) is made before FRS v1.1.
-  - BDO's prescribed icons and illustrations are used when BDOI supplies them (CRQ17). The persona journeys are demonstrated with the end-to-end persona deck (deliverable 7).
+  - BDO's prescribed icons and illustrations are used when BDOI supplies them (CRQ17). The persona journeys are shown with the end-to-end persona deck (deliverable 7).
 preconditions:
   - None.
 main_flow:
@@ -1159,7 +1159,7 @@ Phase 1 keeps these seams open so that the phase 2 module can reuse them: party 
 | A-CR-02 | "Non-Package Management" (capability 4) is the non-package placement of New Business | CRQ02 |
 | A-CR-03 | "Delete" of a prospect or a user means deactivation, with purge under the retention rules | CRQ05 |
 | A-CR-04 | Reinsurance is phase 2; the insurer-side reinsurance module is not used for BDOI | Section 6 |
-| A-CR-05 | BR-178 to BR-183 are vendor-qualification items; they are met by the design system, the alignment pass and the persona demonstrations | XC-14 to XC-16 |
+| A-CR-05 | BR-178 to BR-183 are vendor-qualification items; they are met by the design system, the alignment pass and the persona walk-throughs | XC-14 to XC-16 |
 | A-CR-06 | The MIS field catalogue names existing data; users do not add database fields | CRQ09 |
 
 ## Dependencies
@@ -1420,7 +1420,7 @@ Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that 
 | XC-12 | BIR standard books (sales, purchase, cash receipts, cash disbursements, general journal) (p.17) | BR-084 | BRD-5 FRBS 3.2.0 | FR-CR-040; FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 | FIT |
 | XC-13 | Invoice Master List across workflows (p.23) | BR-175 | None (BRCLXN.001, ACSL 2.16.0 related) | FR-CR-090; FR-CL-010, FR-AS-026 | CHANGE |
 | XC-14 | BDO brand colours, logos, icons and design system (p.23) | BR-178, BR-179, BR-180 | None | FR-CR-092 | CHANGE |
-| XC-15 | Identified user journeys and customisable interaction flows (with a demo) (p.23) | BR-181, BR-182 | None | FR-CR-001 | FIT |
+| XC-15 | Identified user journeys and customisable interaction flows (with a walkthrough) (p.23) | BR-181, BR-182 | None | FR-CR-001 | FIT |
 | XC-16 | Vendor uses Figma for design execution (p.23) | BR-183 | None | - | OUT |
 | XC-17 | Regulatory compliance: BIR and Insurance Commission reportorial requirements (p.4) | - | BRD-5 FRBS 3.2.0 | FR-CR-040; FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 | CHANGE |
 | XC-18 | Retail and wholesale business (p.4) | - | BRD-1 BRNB.001 | FR-CR-001; FR-NB-001 | FIT |

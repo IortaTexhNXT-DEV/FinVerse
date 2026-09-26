@@ -26,7 +26,7 @@ control:
     author: iorta TechNXT Solution Architect
     reviewer: iorta TechNXT Project Manager
     approver: "Head, Comptrollership (pending)"
-    change: "With the Strategy v1.1 (BDOI timeline, go-live January 2028; four mocks). L5 compares each legacy control account with the opening detail; sign of a Migration Clearing difference corrected in the worked example; cohort completeness of the carried RMEL cohorts (P03); package remapping samples"
+    change: "With the Strategy v1.1 (BDOI timeline, go-live January 2028; four trial migrations). L5 compares each legacy control account with the opening detail; sign of a Migration Clearing difference corrected in the worked example; cohort completeness of the carried RMEL cohorts (P03); package remapping samples"
   - version: "1.2"
     date: 26 Sep 2026
     author: iorta TechNXT Solution Architect
@@ -43,7 +43,7 @@ distribution:
 
 # Purpose and scope
 
-BRID 1.1b asks that, after cutover, "all data objects and items are reconcilable from source to target" from the generated data migration reports (BRD p.7). This document states how each object is reconciled, what BDOI verifies on the BIBS screens, how breaks are handled, which evidence is kept, and the forms that BDOI signs. It applies to every mock, the dress rehearsal and the production cutover, to the FY2027 true-ups after go-live, and to the archive loads before decommissioning.
+BRID 1.1b asks that, after cutover, "all data objects and items are reconcilable from source to target" from the generated data migration reports (BRD p.7). This document states how each object is reconciled, what BDOI verifies on the BIBS screens, how breaks are handled, which evidence is kept, and the forms that BDOI signs. It applies to every trial migration, the dress rehearsal and the production cutover, to the FY2027 true-ups after go-live, and to the archive loads before decommissioning.
 
 It completes the Data Migration Strategy and Approach (section 6.10) and FRS BRD-13 (FR-DM-020 to FR-DM-024, FR-DM-003). Account codes are not named: the legacy control accounts and the Migration Clearing account are assigned by Comptrollership (DMQ18, register DCR-197).
 
@@ -208,7 +208,7 @@ The forms below are signed in the Migration Console (gates G5 and G6) and printe
 
 ```keyvalues
 Object and name: "..........  ...................................................."
-Cycle and environment: "Mock 1 / Mock 2 / Mock 3 / Mock 4 / Dress rehearsal / Production     Environment: ................"
+Cycle and environment: "Trial migration 1 / Trial migration 2 / Trial migration 3 / Trial migration 4 / Dress rehearsal / Production     Environment: ................"
 Batch numbers (MGB-): "........................................................................"
 Extract numbers (MGX-) and as-of: "........................................................................"
 Code map versions used: "........................................................................"

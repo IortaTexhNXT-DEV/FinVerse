@@ -5,7 +5,7 @@ are for local development only.
 
 | Variable | Required in prod | Default | Purpose |
 |---|---|---|---|
-| `SPRING_PROFILES_ACTIVE` | yes | – | `prod` in production. `demo` loads demo data (never in production). |
+| `SPRING_PROFILES_ACTIVE` | yes | – | `prod` in production. `seed` loads seed data (never in production). |
 | `BROKERVERSE_DB_URL` | yes | `jdbc:postgresql://localhost:5432/brokerverse` | JDBC URL (use `sslmode=require`). |
 | `BROKERVERSE_DB_USER` | yes | `brokerverse` | Database user (owner of the schema; Flyway migrates on start). |
 | `BROKERVERSE_DB_PASSWORD` | yes | `brokerverse` | Database password (from secret store). |
@@ -30,7 +30,7 @@ are for local development only.
 | `BROKERVERSE_JOB_MAIL_DISPATCH_CRON` | no | `0 */2 * * * *` | Spring cron (UTC) of `MAIL_DISPATCH`: delivers queued e-mails and retries failed attempts (up to the `MAIL_MAX_ATTEMPTS` business parameter). |
 | `BROKERVERSE_JOB_PAYMENT_CONFIRMATION_SWEEP_CRON` | no | `0 0 * * * *` | Spring cron (UTC) of `PAYMENT_CONFIRMATION_SWEEP` (hourly): asks every payment confirmation source (today the confirmed payment reports) about the accounts awaiting payment and opens their payment gate. |
 | `BROKERVERSE_JOB_HOLD_COVER_EXPIRY_CRON` | no | `0 30 0 * * *` | Spring cron (UTC) of `HOLD_COVER_EXPIRY` (daily, BRNB.072/103): notifies the holders of `PLACEMENT_MANAGE` of hold covers expiring within `HOLD_COVER_ALERT_DAYS` and expires the lapsed ones. |
-| `BROKERVERSE_JOB_OPS_INVOICE_FEED_REPLAY_CRON` | no | `-` (off) | Spring cron (UTC) of `OPS_INVOICE_FEED_REPLAY` (Operations, `opsledger`): copies into the Operations invoice ledger every booked invoice missing from it, as a logged `OPS_INVOICE_FEED` run. New bookings are copied by the feed listener; the job (or *Operations › Interfaces › Replay*) recovers gaps. Demo start-up runs it once. |
+| `BROKERVERSE_JOB_OPS_INVOICE_FEED_REPLAY_CRON` | no | `-` (off) | Spring cron (UTC) of `OPS_INVOICE_FEED_REPLAY` (Operations, `opsledger`): copies into the Operations invoice ledger every booked invoice missing from it, as a logged `OPS_INVOICE_FEED` run. New bookings are copied by the feed listener; the job (or *Operations › Interfaces › Replay*) recovers gaps. Seed start-up runs it once. |
 | `BROKERVERSE_JOB_PREBOOKED_REMATCH_CRON` | no | `0 0 */2 * * *` | Spring cron (UTC) of `PREBOOKED_REMATCH` (cashiering, CSHID.020): re-matches payments waiting for a pre-booked account; also started by an invoice entering the ledger. Property `brokerverse.jobs.prebooked-rematch-cron`. |
 | `BROKERVERSE_JOB_PAYMENT_AUTOMATCH_CRON` | no | `0 30 * * * *` | Spring cron (UTC) of `PAYMENT_AUTOMATCH` (cashiering, CSHID.008 item 3): automatic matching of uploaded payments, hourly and after each upload. Property `brokerverse.jobs.payment-automatch-cron`. |
 | `BROKERVERSE_JOB_PDC_MATURITY_CRON` | no | `0 30 0 * * *` | Spring cron (UTC) of `PDC_MATURITY` (cashiering, CSHID.008 item 4e): warehoused post-dated checks reaching maturity become payments. Property `brokerverse.jobs.pdc-maturity-cron`. |
@@ -74,7 +74,7 @@ are for local development only.
 | `BROKERVERSE_JOB_EVENT_HOUSEKEEPING_CRON` | no | `0 50 0 * * *` | Spring cron (UTC) of `EVENT_HOUSEKEEPING` (platform, daily): deletes delivered outbox rows older than `BROKERVERSE_KAFKA_OUTBOX_RETENTION`, archived events and resolved dead letters older than `BROKERVERSE_KAFKA_ARCHIVE_RETENTION`. Property `brokerverse.jobs.event-housekeeping-cron`. |
 | `BROKERVERSE_JOB_SHARED_STATE_CLEANUP_CRON` | no | `0 40 0 * * *` | Spring cron (UTC) of `SHARED_STATE_CLEANUP` (platform, daily): deletes expired rows of `sec_revoked_token` and `sys_shared_counter` (database fallback of Redis). Property `brokerverse.jobs.shared-state-cleanup-cron`. |
 | `BROKERVERSE_JOB_LOCK_LEASE` | no | `PT2M` | Lease of the Redis job lock, renewed every third of it while the job runs; an instance that dies frees the lock after at most one lease. Property `brokerverse.jobs.lock-lease`. |
-| `BROKERVERSE_MAIL_ENABLED` | no | `false` | `true` delivers e-mails through the SMTP server below; `false` records them in the outbox as *simulated* (demo, test, UAT without mail). Addresses ending in `.invalid` are always rejected by the simulated transport. |
+| `BROKERVERSE_MAIL_ENABLED` | no | `false` | `true` delivers e-mails through the SMTP server below; `false` records them in the outbox as *simulated* (seed, test, UAT without mail). Addresses ending in `.invalid` are always rejected by the simulated transport. |
 | `BROKERVERSE_MAIL_DISPATCH_ON_COMMIT` | no | `true` | Deliver right after the business transaction commits; `false` leaves delivery to the `MAIL_DISPATCH` job only. |
 | `MAIL_HOST` / `MAIL_PORT` | when mail enabled | `localhost` / `587` | SMTP server. |
 | `MAIL_USERNAME` / `MAIL_PASSWORD` | when the server requires it | — | SMTP credentials (secret: supply from the vault, never in files). |

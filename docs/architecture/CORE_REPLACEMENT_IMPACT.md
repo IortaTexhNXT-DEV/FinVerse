@@ -25,7 +25,7 @@ for every role; 429 concurrent users; 5 / 15-year retention) that the performanc
 
 | Dimension | Impact |
 |---|---|
-| Build | Seven work items without an owning BRD (section 7, waves CR-W1 to CR-W5, Flyway V1090-V1096, demo V1990-V1991). Two parked items belong to other ranges: claims cheque custody (Claims V1026-V1029, CRQ03) and CSF cases (CSF V1043-V1049, CRQ04) |
+| Build | Seven work items without an owning BRD (section 7, waves CR-W1 to CR-W5, Flyway V1090-V1096, seed V1990-V1991). Two parked items belong to other ranges: claims cheque custody (Claims V1026-V1029, CRQ03) and CSF cases (CSF V1043-V1049, CRQ04) |
 | Design | New sections for `dashboard` (role home), `report` (layouts, subscriptions), `audit` (field-level change log), `catalog` (insurer page, MIS field catalogue), `booking` (insurer invoice batch), `opsledger` (Invoice Master List view). No change to the business workflows of BRD-1 to BRD-5 |
 | Code | Additive: new tables, services and screens; one Hibernate listener in `audit` (pattern of `integration/service/EntityChangeCapture.java`); report runner extensions in `frontend/src/features/reports`. No existing contract changes |
 | Screens | New: Role Home, Master Data Change Log, MIS Fields, Insurer page (tabs), Report Subscriptions, Report Layout panel, Insurer Invoice Batches. Changed: report runner (columns, grouping, chart, schedule button), Invoice Ledger (Invoice Master List view) |
@@ -199,7 +199,7 @@ Hosting appendix: migration staging data is purged within 5 days and non-product
 
 ## 8. Proposed build waves for the gaps
 
-Flyway range V1090-V1099 (Core Replacement platform items); demo V1990-V1999. Each wave touches shared files, so it
+Flyway range V1090-V1099 (Core Replacement platform items); seed V1990-V1999. Each wave touches shared files, so it
 runs as a foundation wave in the order of `BDOI_CROSS_BRD_DECISIONS.md` §6.1 P5 (one at a time, `Permission.java`
 first).
 
@@ -208,9 +208,9 @@ first).
 | CR-W0 | Permissions (`ROLE_HOME_ADMIN`, `REPORT_SUBSCRIBE`, `REPORT_SUBSCRIBE_ADMIN`, `MDC_VIEW`, `MIS_FIELD_MAINTAIN`, `INSURER_BATCH_VIEW`), parameters, job registrations | V1090 | `security/domain/Permission.java`, `application.yml`, `docs/operations/CONFIGURATION.md` | - |
 | CR-W1 | Master data change log (4.3) and MIS field catalogue (4.4) | V1091, V1092 | `audit`, `catalog`; report `ADM-MASTER-CHANGES`; screens in Broking Setup | CR-W0; answers CRQ07, CRQ09 (defaults until then) |
 | CR-W2 | Report layout in variants and report subscriptions (4.2) | V1093 | `report`, `nbreport` (variant table), `messaging`; `frontend/src/features/reports` | CR-W0, CR-W1 (MIS fields in the layout panel) |
-| CR-W3 | Role home dashboards (4.1) | V1094; demo V1990 (widget sets of the demo roles) | `dashboard`; widget contributors in each module; `navigation/modules.ts` | CR-W0; CRQ06 for final widget sets |
+| CR-W3 | Role home dashboards (4.1) | V1094; seed V1990 (widget sets of the seed roles) | `dashboard`; widget contributors in each module; `navigation/modules.ts` | CR-W0; CRQ06 for final widget sets |
 | CR-W4 | Insurer page (4.5) | V1095 | `catalog`, `remittance` (read), `party` | CR-W1 (change log); CRQ08 |
-| CR-W5 | Invoice Master List view (4.8) and insurer invoice batch (4.9) | V1096; demo V1991 | `opsledger`, `booking` | CRQ13, CRQ18 (SFTP adapter parked) |
+| CR-W5 | Invoice Master List view (4.8) and insurer invoice batch (4.9) | V1096; seed V1991 | `opsledger`, `booking` | CRQ13, CRQ18 (SFTP adapter parked) |
 | - | Reserved: V1097-V1099 for answers to CRQ06-CRQ13 | V1097-V1099 | - | - |
 
 Not in these waves: claims cheque custody (Claims range, CRQ03), CSF cases (CSF range, CRQ04), client feeds (Data
@@ -223,7 +223,7 @@ Applied on 26 September 2026 in the consolidation with the Data Migration analys
 
 | Document | Edit |
 |---|---|
-| `docs/development/DEVELOPER_GUIDE.md` §4 | Add the range "Core Replacement platform items V1090-V1099 (demo V1990-V1999)" to the V1000-V1899 and V1900-V1999 rows; §11 add this document to the list of designs |
+| `docs/development/DEVELOPER_GUIDE.md` §4 | Add the range "Core Replacement platform items V1090-V1099 (seed V1990-V1999)" to the V1000-V1899 and V1900-V1999 rows; §11 add this document to the list of designs |
 | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` | Add the umbrella to the BRD table; §5 add conflicts CF-01 (CSF cases) and CF-02 (claims cheques) as XQ12 and XQ13; §3 record the partial answers to XQ08, Q39, Q40, PQ19 |
 | `docs/requirements/BDOI_CSF_BRD_SPEC.md` §10 | Reference CRQ04 next to CSF-EM10 |
 | `docs/requirements/BDOI_CLM_BRD_SPEC.md` §11 | Reference CRQ03 next to CLQ10 |

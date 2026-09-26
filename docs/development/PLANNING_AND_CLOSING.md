@@ -3,7 +3,7 @@
 Modules `budget`, `consolidation` and `closing` (backend) and `features/budget`,
 `features/consolidation`, `features/closing` (frontend, menu section "Planning & Closing").
 Migrations `V400` (FX revaluation, year-end) and `V600` (budgets, inter-company, consolidation);
-demo data `V960`/`V961` plus the start-up runner `closing.demo.PlanningDemoData` (`demo` profile,
+seed data `V960`/`V961` plus the start-up runner `closing.seed.PlanningSeedData` (`seed` profile,
 `@Order(60)`, idempotent).
 
 ## Budgets (`/api/v1/budgets`, permission `BUDGET_MANAGE`)
@@ -99,9 +99,9 @@ demo data `V960`/`V961` plus the start-up runner `closing.demo.PlanningDemoData`
 - The closing journal is dated the last day of the year, so an income statement run to that date
   that includes `CLOSING` journals shows zero; budget actuals exclude them.
 
-## Demo data
+## Seed data
 
-FVS "BDOI Demo Insurance Brokers (Singapore) Pte. Ltd." (USD, named in V989) with a copy of the demo chart, FY2026 and monthly
+FVS "BDO Insurance and Reinsurance Brokers (Singapore) Pte. Ltd." (USD, named in V989) with a copy of the seed chart, FY2026 and monthly
 journals; FVI owns 80 % (group `FVGRP`, investment 1506 vs capital 3100); management fees FVI → FVS
 March–August with one settlement (IC accounts 1607 / 2510); FVI FY2026 approved budget; FVI FX
 revaluations July and August with auto-reversal; a consolidation run as of 31 August 2026.

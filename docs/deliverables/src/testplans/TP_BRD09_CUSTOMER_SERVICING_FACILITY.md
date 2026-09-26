@@ -148,14 +148,14 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 | Environment | Use | Data |
 |---|---|---|
 | CI | Automated unit and integration tests on every change | Created by each test; PostgreSQL in a container |
-| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Demo profile seeds, the planned CSF demo seed V1940, and the data sets of section 4.2; test mailboxes |
+| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed profile migrations, the planned CSF seed V1940, and the data sets of section 4.2; test mailboxes |
 | UAT | Acceptance by Contact Center testers | Masked copy of production-like data plus the test clients; no real client names, TINs, addresses, e-mail addresses or phone numbers |
 
 Non-production data is always masked. Client names, government IDs, addresses, e-mail addresses and phone numbers are replaced before data is loaded into SIT or UAT. The registered e-mail of every test client points to a test mailbox, so no renewal advice or e-policy resent during testing can reach a real client.
 
 ## Named data sets
 
-The cases refer to named data sets. The CSF has no demo seed yet; the build design plans V1940 with the demo users and a status map. Until then the test lead prepares each set on SIT as its source column says.
+The cases refer to named data sets. The CSF has no seed yet; the build design plans V1940 with the SIT/UAT users and a status map. Until then the test lead prepares each set on SIT as its source column says.
 
 <!-- tp:data -->
 

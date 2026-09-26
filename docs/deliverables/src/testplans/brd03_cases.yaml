@@ -70,49 +70,49 @@ screens:
 
 data:
   - id: TD-PM-01
-    name: Demo users and roles
-    content: ao and ao2 (MKT_AO), mkttl (MKT_TL), tsu (TSU), tsulead (TSU and TSU_TL), tsuhead (TSU_HEAD), mbs and mbs2 (MBS), mancom (MANCOM), badmin (BUSINESS_ADMIN), approver (NB_APPROVER), admin (SYSADMIN), auditor (AUDITOR). The demo password is issued by the test lead.
-    source: Demo seeds V980 (broking users), V998 (Product Maintenance users), V900 (admin, auditor); roles and grants V755
+    name: SIT/UAT users and roles
+    content: ao and ao2 (MKT_AO), mkttl (MKT_TL), tsu (TSU), tsulead (TSU and TSU_TL), tsuhead (TSU_HEAD), mbs and mbs2 (MBS), mancom (MANCOM), badmin (BUSINESS_ADMIN), approver (NB_APPROVER), admin (SYSADMIN), auditor (AUDITOR). The SIT/UAT password is issued by the test lead.
+    source: Seeds V980 (broking users), V998 (Product Maintenance users), V900 (admin, auditor); roles and grants V755
   - id: TD-PM-02
     name: Draft NEW generic request
     content: PKR-2026-900001 SME Motor Fleet Programme, NEW, generic, line MOTOR, cover type COMPREHENSIVE, target insurers INS-MGIC, INS-LAC, INS-MPI, stage DRAFT, maker ao
-    source: Demo seed V997
+    source: Seed V997
   - id: TD-PM-03
     name: AMEND request in TSU review
     content: PKR-2026-900002 AMEND MTR10 (lower deductible), generic, submitted by ao, approved by mkttl, stage FOR_TSU_REVIEW
-    source: Demo seed V997
+    source: Seed V997
   - id: TD-PM-04
     name: Client-specific request in negotiation
     content: PKR-2026-900003 NEW client-specific property package for Pacific Harbor Logistics Inc. (CL-2026-000003), submitted by ao2, stage NEGOTIATION, round 1 closed (approved with changes, counter-proposal, decline), round 2 sent
-    source: Demo seed V997
+    source: Seed V997
   - id: TD-PM-05
     name: UPDATE request at ManCom
     content: PKR-2026-900004 UPDATE MTR12 (roadside assistance), requirements submitted by tsu, stage FOR_MANCOM
-    source: Demo seed V997
+    source: Seed V997
   - id: TD-PM-06
     name: RENEW request with MBS
     content: PKR-2026-900005 RENEW MTR15 on unchanged terms, no negotiation, signed off, stage WITH_MBS
-    source: Demo seed V997
+    source: Seed V997
   - id: TD-PM-07
     name: Released AMEND request
     content: PKR-2026-900006 AMEND PAR08 home fire programme, RELEASED as version 2, advisory sent
-    source: Demo seed V997
+    source: Seed V997
   - id: TD-PM-08
     name: Draft package version
     content: MTR12 version 2 DRAFT made by mbs, rate 1.25 %, minimum premium PHP 5,500, commission 15 %, two panel insurers, effective in 30 days
-    source: Demo seed V996
+    source: Seed V996
   - id: TD-PM-09
     name: Active incentive criterion
-    content: CPC2 (demo), type CAMPAIGN, value basis RATE 1.00, on Motor and Property packages, ACTIVE
-    source: Demo seed V996
+    content: CPC2 (seed), type CAMPAIGN, value basis RATE 1.00, on Motor and Property packages, ACTIVE
+    source: Seed V996
   - id: TD-PM-10
     name: Package ending in 45 days
     content: PAR25 version 1, package end date = load date + 45 days, no open renewal request
-    source: Demo seed V996
+    source: Seed V996
   - id: TD-PM-11
     name: Catalogue and insurer panel
     content: Lines MOTOR, PROPERTY, LIABILITY; cover types COMPREHENSIVE, ALL_RISK, CGL; packages MTR10, MTR12, MTR15, PAR08, PAR25; insurers INS-MGIC, INS-LAC, INS-VMI, INS-MPI with placement e-mail addresses; client CL-2026-000003
-    source: Demo seeds V981 (clients), V982 (catalogue), V996 (versions)
+    source: Seeds V981 (clients), V982 (catalogue), V996 (versions)
   - id: TD-PM-12
     name: New CGL request keyed in the test
     content: NEW, generic, title "UAT CGL Programme <date>", line LIABILITY, cover type CGL, reason New programme for a market segment, coverage CGL_BI included, package end 31-Dec-2027, target insurers INS-MGIC and INS-LAC
@@ -124,13 +124,13 @@ data:
   - id: TD-PM-14
     name: Masked quotation data
     content: A client with KYC complete and a Motor item (vehicle value PHP 1,500,000) for quotations on MTR12 and MTR10
-    source: Demo seeds V981 and V984; for UAT a masked copy of production-like data
+    source: Seeds V981 and V984; for UAT a masked copy of production-like data
 
 scenarios:
   - id: SC-PM-01
     persona: SYSADMIN
     title: Access, roles and audit. Users log in, see only the Product Maintenance screens of their role, and every action leaves an audit trail; role changes go through an approved access request.
-    pre: Demo users of TD-PM-01 are active; the audit trail is empty for the test period.
+    pre: SIT/UAT users of TD-PM-01 are active; the audit trail is empty for the test period.
   - id: SC-PM-02
     persona: MBS
     title: Product structure and master data. MBS maintains coverages, clauses, field rules and insurer terms under maker-checker; documents are generated from shared templates.
@@ -177,7 +177,7 @@ frs:
         title: Marketing AO logs in and sees the Product Maintenance section
         steps:
           - Open the BIBS URL.
-          - Enter user ID ao and the demo password; click Sign in.
+          - Enter user ID ao and The SIT/UAT password; click Sign in.
           - Open the side menu.
         expected: The home page opens. The menu shows the section Product Maintenance with Product Maintenance Home, Package Requests, Products, Coverages & Clauses and Incentive Criteria.
         auto: ApiSmokeIT#loginReturnsTokenAndWrongPasswordIsRejected
@@ -246,7 +246,7 @@ frs:
         steps:
           - Log in as ao and open the side menu.
         expected: Product Maintenance Home, Package Requests and the catalogue screens are shown; TSU Workbench, Package Expiry and Validation Queue are not in the menu.
-        auto: ProductMaintenanceFoundationIT#demoPersonasHoldTheirProductMaintenancePermissions
+        auto: ProductMaintenanceFoundationIT#seedPersonasHoldTheirProductMaintenancePermissions
       - c: 2
         type: Security-access
         screen: VALQ
@@ -409,7 +409,7 @@ frs:
         type: Security-access
         screen: DOCS
         title: A user without Product Maintenance permissions cannot open the documents
-        pre: A user holding only a non-broking role (for example a GL user of the finance demo) exists.
+        pre: A user holding only a non-broking role (for example a GL user of the finance seed) exists.
         steps:
           - Log in as that user and open /product-maintenance/requests/{id} of TD-PM-04.
           - Call GET .../requests/{id}/form.pdf with the user's token.
@@ -675,7 +675,7 @@ frs:
           - Open PKR-2026-900004 (MTR12) and download the request form and the package slip.
           - Open PKR-2026-900003 (property), Negotiation tab, round 2; download the QS PDF.
         expected: The MTR12 documents list the Motor coverages and deductibles (OD_THEFT, EXCESS_BI, PD); the property QS lists Fire and Lightning, Earthquake, Typhoon and Flood, Riot and Strike with their deductibles.
-        auto: ProductMaintenanceApiIT#aDemoRequestIsReadableWithItsRoundsOutputsAndDocuments
+        auto: ProductMaintenanceApiIT#aSeedRequestIsReadableWithItsRoundsOutputsAndDocuments
       - c: 2
         type: Positive
         persona: SYSADMIN
@@ -1207,7 +1207,7 @@ frs:
         steps:
           - Open PKR-2026-900003, Negotiation tab.
         expected: Rounds 1 (closed) and 2 (sent) are listed, each with its PQS number, insurers and responses; round 1 shows the three responses.
-        auto: ProductMaintenanceApiIT#aDemoRequestIsReadableWithItsRoundsOutputsAndDocuments
+        auto: ProductMaintenanceApiIT#aSeedRequestIsReadableWithItsRoundsOutputsAndDocuments
       - c: 2
         type: Workflow
         title: Revise opens round n+1 without the declined insurer
@@ -1522,7 +1522,7 @@ frs:
           - Log in as mancom; open PKR-2026-900004; Requirements & Sign-off tab.
           - Upload the signed ManCom sheet; click Sign off and send to MBS with comment "signed".
         expected: The request is in WITH_MBS; the decision SIGNED shows mancom, time and the sheet; mbs is notified.
-        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory; ProductMaintenanceApiIT#aDemoRequestIsReadableWithItsRoundsOutputsAndDocuments
+        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory; ProductMaintenanceApiIT#aSeedRequestIsReadableWithItsRoundsOutputsAndDocuments
       - c: 1
         type: Negative
         persona: TSU
@@ -1750,7 +1750,7 @@ frs:
         title: Send the advisory to Marketing and Operations
         steps:
           - Upload the signed package slip.
-          - Edit the advisory - groups Marketing and Operations, e-mail operations@brokerverse-demo.ph, subject "MTR15 renewed", text; save.
+          - Edit the advisory - groups Marketing and Operations, e-mail operations@brokerverse-seed.ph, subject "MTR15 renewed", text; save.
           - Click Send. As ao open the notification bell.
         expected: The advisory is SENT; ao and the Operations users have an in-app notification; one protected e-mail is logged; the advisory PDF is stored on the request and lists the signed slip and the ManCom sign-off.
         auto: PackageRequestProcessIT#anAdvisoryIsBlockedWithoutItsDocumentsAndARenewalNeedsNoNegotiation
@@ -2330,7 +2330,7 @@ frs:
         type: Workflow
         title: New criterion authorised by badmin
         steps:
-          - Click New Criterion; code UAT1, name "UAT campaign", type Sales campaign (demo), value basis Fixed amount, value 500, effective from today; products MTR12; save.
+          - Click New Criterion; code UAT1, name "UAT campaign", type Sales campaign (seed), value basis Fixed amount, value 500, effective from today; products MTR12; save.
           - As badmin authorise it in My Approvals.
         expected: Saved as Pending authorisation; after authorisation Active.
         auto: CatalogProductMaintenanceApiIT#coveragesClausesIncentivesAndExceptionsAreMaintainedOverHttp; IncentiveCriteriaIT#criteriaAreValidatedAuthorisedAmendedAndDeactivated

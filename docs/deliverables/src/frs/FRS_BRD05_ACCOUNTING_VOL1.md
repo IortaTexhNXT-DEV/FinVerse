@@ -136,7 +136,7 @@ Each FR in section 4 has the same parts:
 Every BRD-5 row carries the priority **Must have** in the BRD. API paths start with `/api/v1`.
 
 > [!NOTE]
-> The real chart of accounts, the accounting rules, the report layouts and several rates are BDOI data that have not been given (AQ01-AQ07, AQ20, AQ26). BIBS holds them as configuration with demo values, so a BDOI answer does not need a new build.
+> The real chart of accounts, the accounting rules, the report layouts and several rates are BDOI data that have not been given (AQ01-AQ07, AQ20, AQ26). BIBS holds them as configuration with seed values, so a BDOI answer does not need a new build.
 
 <!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R4)" status=Class -->
 | Class | Meaning |
@@ -160,7 +160,7 @@ Every BRD-5 row carries the priority **Must have** in the BRD. API paths start w
 | FRBS 2.8.1 | The reversal posts in the GL and the sub-ledger | The reversal posts in the GL; manual journals record no sub-ledger open items, so there is none to reverse | - |
 | FRBS 3.4.0-3.4.1 | Close the broking books automatically | The broking books close on the last day of the month at 23:00 Manila; the list of pending broking items is empty until the broking modules report them | AQ04 |
 | FRBS 3.5.0 | Revalue daily ("previous date versus current date") | Revaluation runs per period at the CLOSING rate with automatic reversal; daily revaluation only if BDOI confirms | AQ03 |
-| FRBS 3.1.2 | Early incentives as Other Income | The incentive component posts to its own account; moving 4130 under Other Income is a chart change for FRBS (not done in the demo chart) | AQ01 |
+| FRBS 3.1.2 | Early incentives as Other Income | The incentive component posts to its own account; moving 4130 under Other Income is a chart change for FRBS (not done in the seed chart) | AQ01 |
 | FRBS 3.2.0 | Reports and schedules; board schedules in Word | Schedules export to Excel, PDF, ODS and CSV; there is no Word renderer in the report platform, so the GARD, subsidiaries and Mancom schedules flagged "Word requested" are issued in PDF and Excel | Gap G1 |
 | FRBS 3.2.0 | 138 Appendix A reports | 28 schedule definitions and 58 report-pack entries are delivered with draft layouts; lease, DTA, ECL and placement data are not in BIBS; payroll outputs are out of scope | AQ05, AQ06 |
 | FRBS 3.2.0 (VII) | BIR books and forms | Worksheets and loose-leaf books; they are not eFPS, DAT or CAS files | AQ07 |
@@ -398,7 +398,7 @@ main_flow:
 rules:
   - [R1, "A child account has the class of its parent; sub and micro accounts need a parent.", Fixed, "-"]
   - [R2, "An account with postings cannot become a heading.", Fixed, "-"]
-  - [R3, "BDOI's own chart is loaded at go-live by upload (FR-AC-012); the demo chart is a placeholder (AQ01).", Configurable, Chart of accounts]
+  - [R3, "BDOI's own chart is loaded at go-live by upload (FR-AC-012); the seed chart is a placeholder (AQ01).", Configurable, Chart of accounts]
 validations:
   - [Parent class differs, "Child account class must match parent <code>", CLASS_MISMATCH]
   - [Level not allowed under the parent, "A <level> account cannot be placed under a <level>", INVALID_TIER]
@@ -682,7 +682,7 @@ alternate_flows:
   - No rule or missing account role. The event is recorded FAILED in the event log for re-processing; the alert of the module is raised.
   - Broking books closed. Events of the broking modules for a closed month are refused (FR-AC-042).
 rules:
-  - [R1, "Posting rules are configuration maintained by Comptrollership; the real rules replace the demo rules (AQ02, OQ07).", Configurable, Accounting rules]
+  - [R1, "Posting rules are configuration maintained by Comptrollership; the real rules replace the seed rules (AQ02, OQ07).", Configurable, Accounting rules]
   - [R2, "A posted journal is immutable; corrections are reversals and new entries.", Fixed, "-"]
 validations:
   - [No rule for the event, "No active accounting rule for event <type> (line of business <lob>, currency <ccy>)", NO_ACCOUNTING_RULE]
@@ -1311,7 +1311,7 @@ priority: Must have
 fit: CONFIGURE
 screens: Accounting rules; Chart of Accounts
 api: Event OPS_REMIT_INCENTIVE (component INCENTIVE_INCOME)
-description: The early-remittance incentive posts through its own event component, separate from commission and premium, to the incentive income account (demo 4130), so the commission accounts are not touched. Comptrollership maps the component to an Other Income account of the BDOI chart. The source remittance batch is kept on the entry. CPC2 incentives use their own account (demo 4131, Volume 2 FR-DS-090).
+description: The early-remittance incentive posts through its own event component, separate from commission and premium, to the incentive income account (seed 4130), so the commission accounts are not touched. Comptrollership maps the component to an Other Income account of the BDOI chart. The source remittance batch is kept on the entry. CPC2 incentives use their own account (seed 4131, Volume 2 FR-DS-090).
 preconditions:
   - "The Other Income account exists in the chart."
 main_flow:
@@ -1319,7 +1319,7 @@ main_flow:
   - The engine posts the incentive component to the incentive income account.
 rules:
   - [R1, "The incentive account is chosen by the rule, not by code.", Configurable, Accounting rules]
-  - [R2, "Moving the demo account 4130 under Other Income (4700) is a chart change for FRBS, not done in the demo (AQ01).", Configurable, Chart of accounts]
+  - [R2, "Moving the seed account 4130 under Other Income (4700) is a chart change for FRBS, not done in the seed data (AQ01).", Configurable, Chart of accounts]
 validations: []
 notifications:
   - "None."
@@ -1388,7 +1388,7 @@ main_flow:
 alternate_flows:
   - New schedule. The TL creates a definition with its selector, grouping, figures and ageing.
 rules:
-  - [R1, "Account selectors point at the demo chart until BDOI's chart is uploaded (AQ01).", Configurable, Schedule definitions]
+  - [R1, "Account selectors point at the seed chart until BDOI's chart is uploaded (AQ01).", Configurable, Schedule definitions]
   - [R2, "Only a balance schedule can be aged; up to 8 buckets.", Fixed, "-"]
 validations:
   - [No accounts selected, List at least one account prefix or report group, SCHEDULE_ACCOUNTS]
@@ -1670,10 +1670,10 @@ SLA hours: COMPUTED 48, FOR_APPROVAL 24.
 
 ## Accounting events of BRD-5
 
-Every posting of BRD-5 is a business event with components and account roles; the accounts come from the rules maintained by Comptrollership. The entries below are the demo rules; the real ones are BDOI's (AQ02, OQ07).
+Every posting of BRD-5 is a business event with components and account roles; the accounts come from the rules maintained by Comptrollership. The entries below are the seed rules; the real ones are BDOI's (AQ02, OQ07).
 
-<!-- table: widths=0.8,4.2,4.4,5.4,1.8 caption="Accounting events and demo entries" size=8 -->
-| # | Transaction | Event (source reference) | Demo entry | Build |
+<!-- table: widths=0.8,4.2,4.4,5.4,1.8 caption="Accounting events and seed entries" size=8 -->
+| # | Transaction | Event (source reference) | Seed entry | Build |
 |---|---|---|---|---|
 | 1 | DV approved - remittance to insurer | DISB_VOUCHER REMITTANCE (DV:<no>) | Dr 2211 due to insurer for disbursement / Cr paying bank, or 2241 checks outstanding for checks | Built |
 | 2 | DV approved - refund to client | DISB_VOUCHER REFUND | Dr 2216 refund payable / Cr paying account | Built |
@@ -1894,7 +1894,7 @@ Figure 6 shows the interfaces of Accounting. The general ledger is inside BIBS: 
 | ID | Assumption | Related |
 |---|---|---|
 | A-AC-01 | The general ledger of BDOI is kept in BIBS; there is no accounting interface to another system | OQ01 |
-| A-AC-02 | BDOI's chart and accounting rules are loaded as configuration at go-live; the demo chart is a placeholder | AQ01, AQ02 |
+| A-AC-02 | BDOI's chart and accounting rules are loaded as configuration at go-live; the seed chart is a placeholder | AQ01, AQ02 |
 | A-AC-03 | The monthly revaluation rate is the month-end CLOSING rate and becomes the next month's BOOK rate | AQ03, OQ08 |
 | A-AC-04 | "Broking books" are the postings of the broking modules; "GL books" the whole ledger closed by FRBS | AQ04 |
 | A-AC-05 | The service fee is 2.5% (CBG) or 1% (IBG) of fully paid commission net of the insurer's withholding tax | AQ20 |

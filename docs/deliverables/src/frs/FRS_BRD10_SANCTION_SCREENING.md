@@ -130,7 +130,7 @@ Each FR in section 4 has the same parts:
 - **Notifications**, **audit** and numbered **acceptance criteria**. The acceptance criteria are the basis of the test cases of the BRD-10 test plan.
 
 > [!NOTE]
-> Thresholds, SLA hours, template fields, dispositions and routing rules shown as "default" or "demo" are placeholders until BDOI answers the open questions in section 10.3. They are configuration entered by Compliance, so a changed answer does not need a new build.
+> Thresholds, SLA hours, template fields, dispositions and routing rules shown as "default" or "seed" are placeholders until BDOI answers the open questions in section 10.3. They are configuration entered by Compliance, so a changed answer does not need a new build.
 
 <!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R2)" status=Class -->
 | Class | Meaning |
@@ -381,7 +381,7 @@ screens: Configuration Versions (tab Matching Criteria)
 api: Configuration type MATCH_CRITERIA
 description:
   - The matching criteria control screening quality. For each list type (SANCTION, PEP, INTERNAL, ADVERSE_MEDIA) and subject type (individual or entity) the Compliance Officer sets the algorithms used - exact, phonetic (Double Metaphone) and fuzzy (Jaro-Winkler) - their thresholds, the fields compared and the minimum score that opens a case.
-  - The BRD gives no values. The build delivers demo thresholds; Compliance enters the production values before go-live (SQ02).
+  - The BRD gives no values. The build delivers seed thresholds; Compliance enters the production values before go-live (SQ02).
 preconditions:
   - "The user has SCR_CONFIG_MAINTAIN; a draft of type MATCH_CRITERIA is open (FR-SS-010)."
 main_flow:
@@ -608,7 +608,7 @@ api: Configuration type TEMPLATE (template types KYC_REVIEW, TRANSACTION_REVIEW,
 description:
   - Review templates give every reviewer the same format. A template has a code, a type (KYC review, transaction review, EDD), sections and fields. Each field has a label, data type (text, long text, number, amount, date, list, check box, attachment), mandatory flag, list type, help text and order.
   - The Compliance Officer designs the fields on the template designer and previews the form. A new template version is approved like any configuration and applies to reviews started after its effective date; a review in progress keeps the version it started with (SNSRP-104 AC2).
-  - The field lists of the three templates are supplied by BDOI (SQ05). The build delivers demo templates.
+  - The field lists of the three templates are supplied by BDOI (SQ05). The build delivers seed templates.
 preconditions:
   - "The user has SCR_CONFIG_MAINTAIN."
 main_flow:

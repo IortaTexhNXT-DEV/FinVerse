@@ -30,13 +30,13 @@ Java paths are relative to `backend/src/main/java/com/iortatechnxt/brokerverse/`
    (versioned templates), `attachment`, `report`, `alert` and `lov` are used as they are. The negotiation part
    follows the `nonpackage` implementation (QS, responses with history, comparative table) and adds rounds,
    exception outcomes and configurable outputs (PMADD03/04). `nonpackage` itself is not changed in this build (PQ05).
-6. **Parked means seam, not fake.** Product master synchronisation to other BDOI systems (BRPM.022, PQ16), package
+6. **Parked means seam, not simulation.** Product master synchronisation to other BDOI systems (BRPM.022, PQ16), package
    formulas beyond Appendix A (PQ12) and renewal of accounts (Renewal BRD) each get a port or a documented
    parameter. Nothing is simulated.
 
 ## 2. Modules
 
-| Module | Purpose | BRD IDs | Depends on | Flyway (demo) |
+| Module | Purpose | BRD IDs | Depends on | Flyway (seed) |
 |---|---|---|---|---|
 | `catalog` (extended) | Hierarchy (subtype, coverage / peril, naming pattern), clause library, product versions with rate scheme, coverages and insurer terms, validation checkpoint and release, expiry / archive, rate-scheme exceptions, field-rule types, incentive criteria; contracts for rating, set-up and incentives | PMADD01/02/06/07/08, BRPM.003/004/006/007 | party, lov, dimension, audit, approval (unchanged), plus `alert` for the expiry and incentive alerts. Still no dependency on `workflow`, `messaging` or `docgen` | V813-V815 (V996) |
 | `productmaint` (new) | Package request lifecycle: request form, Marketing and TSU approvals, negotiation rounds and outcomes, QS, comparative outputs (master / client), requirements pack, ManCom sign-off, MBS hand-off, release follow-up, advisories, expiry monitor and renewal requests, package status report, Product Maintenance home | BRPM.005/008-019/021/022, PMADD03/04 | catalog, crm (client look-up), workflow, messaging, docgen, attachment, report, alert, lov, system, audit | V816-V819 (V997) |
@@ -78,7 +78,7 @@ Java paths are relative to `backend/src/main/java/com/iortatechnxt/brokerverse/`
 ## 3. Flyway allocation
 
 Constraints: V750-V759 broking foundation (V750-V754 used), V760-V789 Operations, V810-V819 catalog (V810-V812
-used), V9xx demo (V980-V989 NB, V990-V995 Operations). Flyway runs with `out-of-order: true`. None of the versions
+used), V9xx seed (V980-V989 NB, V990-V995 Operations). Flyway runs with `out-of-order: true`. None of the versions
 below is used on any branch.
 
 | Version | Owner (wave) | Content |
@@ -93,12 +93,12 @@ below is used on any branch.
 | `V821__account_product_version.sql` | P1-A | `acc_account.product_version_no`, `rate_override_ref` (account's own range) |
 | `V831__quotation_product_version.sql` | P1-A | `quo_quotation.product_version_no`, `rate_override_ref` (quotation's own range) |
 | `V871__booking_incentive_criteria.sql` | P1-A | `bkg_invoice.incentive_criteria` (comma-separated codes) and `product_version_no`; one-time copy of `bkg_incentive_rule` rows into `cat_incentive_criteria` (type MIGRATED, status PENDING_AUTHORIZATION); `bkg_incentive_rule` frozen (read-only in the API) |
-| `V996__demo_product_versions.sql` | P1-A | Demo: version 2 DRAFT of one MTR package, coverages and insurer terms for two panel insurers, one incentive criterion "CPC2 (demo)" on MTR / PAR packages |
-| `V997__demo_package_requests.sql` | P1-B | Demo: package requests at each stage (draft, TSU review, negotiation with two rounds and an "approved with changes" response, ManCom, with MBS, released with advisory), one package expiring in 45 days |
+| `V996__seed_product_versions.sql` | P1-A | Seed: version 2 DRAFT of one MTR package, coverages and insurer terms for two panel insurers, one incentive criterion "CPC2 (seed)" on MTR / PAR packages |
+| `V997__seed_package_requests.sql` | P1-B | Seed: package requests at each stage (draft, TSU review, negotiation with two rounds and an "approved with changes" response, ManCom, with MBS, released with advisory), one package expiring in 45 days |
 
 Why V821, V831 and V871: the new columns belong to tables created in V820 / V830 / V870. On a fresh database any
-version below V820 would run before those tables exist, and the demo range must stay for demo data. Each change is
-therefore made in the owning module's own free range, by the P1-A agent, as a small additive migration.
+version below V820 would run before those tables exist, and the seed range must stay for seed data. Each change is
+therefore made in the owning module's own free range, by the P1-A team, as a small additive migration.
 
 Rules:
 - **No foreign keys from V755 to catalog tables** (V755 runs before V810 on a fresh database).
@@ -106,7 +106,7 @@ Rules:
   insurer codes and ARNs as plain values (crm V800 exists, but `pm_request.client_code` stays a plain value like
   the other broking modules).
 - The Developer Guide range table gets: "V755 Product Maintenance foundation; V813-V819 catalog extensions and
-  Product Maintenance (`productmaint` V816-V819); demo V996-V997".
+  Product Maintenance (`productmaint` V816-V819); seed V996-V997".
 
 ## 4. Entities (key fields)
 
@@ -276,9 +276,9 @@ authorized_at`. Rates are percentages (12.5 = 12.5 %).
 
 MBS set-up uses PRODUCT_MAINTAIN (the `setup` action of the request and the version editor).
 
-### 6.2 Roles (V755) and demo users (V996 / V997, password `Brokerverse@2026`)
+### 6.2 Roles (V755) and SIT/UAT users (V996 / V997)
 
-| Role | Persona | Main permissions | Demo user |
+| Role | Persona | Main permissions | SIT/UAT user |
 |---|---|---|---|
 | `MKT_AO` (existing) | Marketing AO | PKG_REQUEST, PRODUCT_VIEW | `ao` |
 | `MKT_TL` (existing) | Marketing TL / TH / UH | PKG_REQUEST_APPROVE, PRODUCT_VIEW, PKG_REPORT_VIEW | `mkttl` |
@@ -402,7 +402,7 @@ from the `workflow` module unchanged.
   `incentiveCriteria` (additive fields; `opsledger` ignores unknown fields until it uses them).
 - `EndorsementPostingService` / `EndorsementCalculator` pass `purpose = ENDORSEMENT` and the original account's
   version to rating.
-- **Operations contract asks** (for the O1 agents, no code in this build):
+- **Operations contract asks** (for the O1 teams, no code in this build):
   - `adjustment` (ADJID.008 / 014): re-rate with `purpose = ENDORSEMENT, schemeVersion = account.productVersionNo`.
   - `commission` (O1-D, CMRID.003 / 005 / 006): `cmr_incentive_scheme.criteria_code` references
     `cat_incentive_criteria.code` for product eligibility, instead of product lists of its own (OQ39).
@@ -443,7 +443,7 @@ from the `workflow` module unchanged.
 
 ## 11. Screens: **Product Maintenance** (group Client & Policy)
 
-The catalog section "Products & Insurers" is renamed **Product Maintenance**, matching the BDOI prototype
+The catalog section "Products & Insurers" is renamed **Product Maintenance**, matching the BDOI UX design
 (`docs/design/BDO_UX_GUIDELINES.md` section 3). It keeps its position in `navigation/modules.ts` (Client & Policy,
 after Adjustment). Screens follow the broking patterns: `WorklistToolbar`, status tabs in a flush card,
 `RecordSummary`, `WorkflowPanel`, `StatusBadge`, gold flag chips (`.tag`) and `EmptyState`.
@@ -459,7 +459,7 @@ after Adjustment). Screens follow the broking patterns: `WorklistToolbar`, statu
 | Product page | `/catalog/products/:code` (kept) | PRODUCT_VIEW | `RecordSummary` (code, name, line > type > subtype, lifecycle pill, flags Package / Client-specific), tabs Versions (timeline, compare two versions), Coverages, Insurer Terms (insurer x coverage matrix), Field Rules, Documents, Incentives, History |
 | Version editor | `/catalog/products/:code/versions/:n` | PRODUCT_MAINTAIN (edit) / PRODUCT_VALIDATE (validate) | Draft form with sections Rate Scheme, Dates, Coverages, Insurers, Insurer Terms; "Submit for Validation"; for the validator a checklist panel with the test premium and Validate / Return |
 | Validation Queue | `/catalog/validation` | PRODUCT_VALIDATE | Versions FOR_VALIDATION with age |
-| Package Expiry | `/product-maintenance/expiry` | PKG_NEGOTIATE or PRODUCT_MAINTAIN | Tabs Expiring / Renewal in Progress / Expired; bulk **Generate Renewal Request**; dialog "Generate Expiry List" with a date range (prototype pattern) |
+| Package Expiry | `/product-maintenance/expiry` | PKG_NEGOTIATE or PRODUCT_MAINTAIN | Tabs Expiring / Renewal in Progress / Expired; bulk **Generate Renewal Request**; dialog "Generate Expiry List" with a date range (UX design pattern) |
 | Coverages & Clauses | `/catalog/coverages` | PRODUCT_VIEW | Coverage / peril list per line, clause library with wording |
 | Incentive Criteria | `/catalog/incentives` | PRODUCT_VIEW / INCENTIVE_CRITERIA_MAINTAIN | List with effective dates and status pill; editor with product-matrix picker (active products only) and history of successors |
 | Insurers, Rates & Taxes, Sales Organisation, Premium Calculator | existing | existing | Premium Calculator shows the scheme version; the rest is unchanged |
@@ -469,20 +469,20 @@ Frontend folders: `features/catalog/**` (extended by P1-A) and `features/product
 
 ## 12. Build-wave plan
 
-Prerequisite: none blocking. BRD-1 is complete. Operations agents work in V760-V789 and in their own packages; the
+Prerequisite: none blocking. BRD-1 is complete. Operations teams work in V760-V789 and in their own packages; the
 only shared edits are the Permission enum, navigation and help registry, which P0 does in one short pass.
 
-| Wave | Agent | Scope | Files owned | Exit criteria |
+| Wave | Team | Scope | Files owned | Exit criteria |
 |---|---|---|---|---|
-| **P0** (1 agent, short) | PM foundation | All PM permissions (Permission enum), V755 (roles, grants, `sec_permission_action`, LOV types, workflow PM_PACKAGE_REQUEST, parameters); `nbadmin` action-class matrix view and MODIFY_ROLE_PERMISSIONS access request (PMADD05); catalog **contract stubs** published as interfaces and records (`PackageSetupService`, `PackageSpec`, `VersionRef`, `ProductVersionQueryService`, the four events, `RatingQuery.Purpose`) so P1-B compiles; navigation rename and PM route placeholders; help sections pre-registered; the job cron in `application.yml`; Developer Guide range row | `security/domain/Permission.java`, `V755__*`, `nbadmin/**` (small), `catalog/service/version/*` (interfaces and records only), `frontend/src/navigation/modules.ts`, `frontend/src/help/helpContent.ts`, `features/catalog/module.ts` (section rename), `application.yml`, `docs/development/DEVELOPER_GUIDE.md` | `mvn verify` green; the matrix shows actions; interfaces compile |
-| **P1-A** (parallel) | Catalog and consumers | Everything in sections 4.1-4.3, 5 and 9.1-9.4: hierarchy, clauses, field-rule types, versions and release, rate-scheme exceptions, expiry state changes, incentive criteria; the rating contract; quotation / account / booking changes; catalog screens (Products, Product page, Version editor, Validation Queue, Coverages & Clauses, Incentive Criteria, calculator version) and the quotation rate-exception dialog; demo V996 | `catalog/**` (implementing the P0 interfaces), `V813-V815`, `V821`, `V831`, `V871`, `V996`, `quotation/service/QuotationPricing.java`, `QuotationService.java`, `QuotationContent*`, `account/service/AccountPricing.java`, `AccountService.java`, `NewAccount.java`, `booking/service/BookingRuleService.java`, `InvoiceBuilder.java`, `Endorsement*.java`, `features/catalog/**`, `features/quotations/**` (dialog only), their tests (`CatalogVersionIT`, `IncentiveCriteriaIT`, `RatingSchemeIT`) | A package version drafted -> validated -> released; NB refuses an old version without an exception; quotation / account / invoice carry the version; booking stamps criteria codes; existing IT suites green |
-| **P1-B** (parallel) | Product Maintenance process | `productmaint` complete: request, approvals, negotiation rounds and outcomes, QS send / resend, comparative master / client outputs, requirements and ManCom sign-off, MBS set-up call, release listener, advisories, expiry monitor and renewal requests, reports PM-PKG-STATUS / PM-PKG-EXPIRY / PM-VERSION-HISTORY, home and counts; screens; demo V997. Uses a stub `PackageSetupService` (`@ConditionalOnMissingBean`) until P1-A merges | `productmaint/**`, `V816-V817`, `V997`, `features/productmaint/**`, `ProductMaintenanceApiIT` | A request runs from draft to RELEASED with the stub; advisory blocked without documents; expiry job drafts renewal requests |
-| **P2** (1 agent, short) | Integration and documentation | Remove the stub; E2E test (request -> negotiation (2 rounds) -> ManCom -> MBS set-up -> validation -> release -> quotation on version 2 -> account -> booking with criteria codes -> endorsement on version 1 for an old account); NB Dashboard tile; `nbreport` version columns; module guide `docs/modules/PRODUCT_MAINTENANCE.md`; new section 17 in BROKING_ARCHITECTURE.md; traceability rows for BRPM / PMADD; fit/gap workbook data | tests, `nbreport/**` (small), docs | Full `mvn verify` / `npm run verify`; walkthrough with the demo users |
+| **P0** (1 team, short) | PM foundation | All PM permissions (Permission enum), V755 (roles, grants, `sec_permission_action`, LOV types, workflow PM_PACKAGE_REQUEST, parameters); `nbadmin` action-class matrix view and MODIFY_ROLE_PERMISSIONS access request (PMADD05); catalog **contract stubs** published as interfaces and records (`PackageSetupService`, `PackageSpec`, `VersionRef`, `ProductVersionQueryService`, the four events, `RatingQuery.Purpose`) so P1-B compiles; navigation rename and PM route placeholders; help sections pre-registered; the job cron in `application.yml`; Developer Guide range row | `security/domain/Permission.java`, `V755__*`, `nbadmin/**` (small), `catalog/service/version/*` (interfaces and records only), `frontend/src/navigation/modules.ts`, `frontend/src/help/helpContent.ts`, `features/catalog/module.ts` (section rename), `application.yml`, `docs/development/DEVELOPER_GUIDE.md` | `mvn verify` green; the matrix shows actions; interfaces compile |
+| **P1-A** (parallel) | Catalog and consumers | Everything in sections 4.1-4.3, 5 and 9.1-9.4: hierarchy, clauses, field-rule types, versions and release, rate-scheme exceptions, expiry state changes, incentive criteria; the rating contract; quotation / account / booking changes; catalog screens (Products, Product page, Version editor, Validation Queue, Coverages & Clauses, Incentive Criteria, calculator version) and the quotation rate-exception dialog; seed V996 | `catalog/**` (implementing the P0 interfaces), `V813-V815`, `V821`, `V831`, `V871`, `V996`, `quotation/service/QuotationPricing.java`, `QuotationService.java`, `QuotationContent*`, `account/service/AccountPricing.java`, `AccountService.java`, `NewAccount.java`, `booking/service/BookingRuleService.java`, `InvoiceBuilder.java`, `Endorsement*.java`, `features/catalog/**`, `features/quotations/**` (dialog only), their tests (`CatalogVersionIT`, `IncentiveCriteriaIT`, `RatingSchemeIT`) | A package version drafted -> validated -> released; NB refuses an old version without an exception; quotation / account / invoice carry the version; booking stamps criteria codes; existing IT suites green |
+| **P1-B** (parallel) | Product Maintenance process | `productmaint` complete: request, approvals, negotiation rounds and outcomes, QS send / resend, comparative master / client outputs, requirements and ManCom sign-off, MBS set-up call, release listener, advisories, expiry monitor and renewal requests, reports PM-PKG-STATUS / PM-PKG-EXPIRY / PM-VERSION-HISTORY, home and counts; screens; seed V997. Uses a stub `PackageSetupService` (`@ConditionalOnMissingBean`) until P1-A merges | `productmaint/**`, `V816-V817`, `V997`, `features/productmaint/**`, `ProductMaintenanceApiIT` | A request runs from draft to RELEASED with the stub; advisory blocked without documents; expiry job drafts renewal requests |
+| **P2** (1 team, short) | Integration and documentation | Remove the stub; E2E test (request -> negotiation (2 rounds) -> ManCom -> MBS set-up -> validation -> release -> quotation on version 2 -> account -> booking with criteria codes -> endorsement on version 1 for an old account); NB Dashboard tile; `nbreport` version columns; module guide `docs/modules/PRODUCT_MAINTENANCE.md`; new section 17 in BROKING_ARCHITECTURE.md; traceability rows for BRPM / PMADD; fit/gap workbook data | tests, `nbreport/**` (small), docs | Full `mvn verify` / `npm run verify`; walkthrough with the SIT/UAT users |
 
-**Three agents in total (P0, then P1-A and P1-B in parallel), plus one short P2 pass.** Parallel-work rules (as for
+**Three teams in total (P0, then P1-A and P1-B in parallel), plus one short P2 pass.** Parallel-work rules (as for
 Operations):
-- One Flyway range per agent.
-- No edits to another agent's package.
+- One Flyway range per team.
+- No edits to another team's package.
 - Shared files (Permission enum, navigation, help registry, `application.yml`) are edited only in P0.
 - Each module has its own `*ApiIT` class.
 - Stubs are `@ConditionalOnMissingBean`.
@@ -517,9 +517,9 @@ Operations):
    an IT asserts projection = current version after each release.
 3. **Two incentive stores during the transition** (`bkg_incentive_rule`, `cat_incentive_criteria`). Mitigation: V871
    copies once and freezes the booking table; booking reads only the catalog service.
-4. **Parallel edits to built modules** (quotation, account, booking) by P1-A while Operations agents extend booking
+4. **Parallel edits to built modules** (quotation, account, booking) by P1-A while Operations teams extend booking
    contracts. Mitigation: P1-A's edits are additive (new nullable columns and fields, overloads); announce the
-   `InvoiceBooked` additions to the Operations agents before merging.
+   `InvoiceBooked` additions to the Operations teams before delivery.
 5. **Scope creep into renewals.** BRPM.017 is the renewal of the *package*, not of client policies (Renewal BRD).
    Mitigation: RENEW requests only produce a new catalog version; account renewal stays parked.
 
@@ -530,7 +530,7 @@ What the P0 wave built, and where it differs from or details the sections above.
 - **Migrations.** `V755__product_maintenance_foundation.sql` (roles, grants, `sec_permission_action`, LOV types, workflow,
   parameters). The access-request change of PMADD05 needs `nba_access_request` (V790), which does not exist when V755
   runs on a fresh database, so it is in the broking-administration range: `V791__nbadmin_role_permission_requests.sql`.
-  The demo users of section 6.2 are in `db/demo/V998__demo_product_maintenance_users.sql` (`tsuhead`, `mbs`, `mbs2`,
+  The SIT/UAT users of section 6.2 are in `db/seed/V998__seed_product_maintenance_users.sql` (`tsuhead`, `mbs`, `mbs2`,
   `mancom`; `tsulead` also receives TSU_TL). V996 / V997 stay with P1-A / P1-B.
 - **Additional grants** beyond the table of section 6.2: every new role has WORK_VIEW, ATTACHMENT_VIEW, REPORT_VIEW,
   CLIENT_VIEW and PRODUCT_VIEW; MKT_TL also has PKG_REQUEST (FOR_MKT_REVIEW is a Marketing stage); TSU_TL and
@@ -569,7 +569,7 @@ What the P0 wave built, and where it differs from or details the sections above.
 What the P1-B wave built on the P0 contracts, and where it details or differs from sections 4.4 and 7-11. The module
 depends on `catalog` only through `catalog.service.version` (`PackageSetupService`, `ProductVersionQueryService`,
 the four events) plus the existing public catalog, CRM and platform services; it runs end to end on the stub
-`PackageVersionStubDefaults` until P1-A's implementation is merged.
+`PackageVersionStubDefaults` until P1-A's implementation is delivered.
 
 - **Migrations.** `V816__productmaint.sql`: `pm_request` (with its milestones: submitted, approved, recommended, TSU
   approved, terms final, requirements, set-up, who and when), `pm_negotiation_round` + `pm_round_insurer`,
@@ -580,7 +580,7 @@ the four events) plus the existing public catalog, CRM and platform services; it
   PKG_QUOTATION_SLIP, PKG_COMPARATIVE, PKG_SLIP, PKG_ADVISORY, PKG_RENEWAL_ADVISORY (draft layouts, Q03).
   `V817__productmaint_reports_jobs.sql`: exception code PACKAGE_EXPIRING; parameters `PACKAGE_EXPIRY_REMINDER_DAYS`
   (30,7) and `PKG_ADVISORY_GROUPS`. Reports and the job are beans (no rows). INCENTIVE_PRODUCT_INACTIVE is left to the
-  catalog. Demo `V997`: six requests (draft, TSU review, negotiation in round 2 with "approved with changes", a
+  catalog. Seed `V997`: six requests (draft, TSU review, negotiation in round 2 with "approved with changes", a
   counter-proposal and a decline, ManCom, with MBS, released with a sent advisory). The package expiring in 45 days
   needs a catalog version and belongs to V996 (P1-A).
 - **Terms.** Requested and proposed terms are one JSON record (`PackageTerms`: sections, coverages with limits and
@@ -686,7 +686,7 @@ this note is what the code does.
 | `V815__catalog_incentive_criteria.sql` | `cat_incentive_criteria`, `cat_incentive_criteria_product`, INCENTIVE_TYPE `MIGRATED`, alert code `INCENTIVE_PRODUCT_INACTIVE` |
 | `V821` / `V831` | `acc_account` and `quo_quotation`: `product_version_no`, `rate_override_ref` |
 | `V871__booking_incentive_criteria.sql` | `bkg_invoice.product_version_no`, `incentive_criteria`; one-time copy of `bkg_incentive_rule` into the catalog (code `MIG-<id>`, PENDING_AUTHORIZATION) |
-| `db/demo/V996__demo_product_versions.sql` | MTR12 version 2 DRAFT set up by `mbs` (two panel insurers, terms, clauses), criterion `CPC2 (demo)` ACTIVE on MTR10 (CBG), MTR12, PAR19, PAR25; the demo booking rule copied like V871; PAR25 version 1 ends 45 days after the load date (Package Expiry list) |
+| `db/seed/V996__seed_product_versions.sql` | MTR12 version 2 DRAFT set up by `mbs` (two panel insurers, terms, clauses), criterion `CPC2 (seed)` ACTIVE on MTR10 (CBG), MTR12, PAR19, PAR25; the seed booking rule copied like V871; PAR25 version 1 ends 45 days after the load date (Package Expiry list) |
 
 ### 17.2 Behaviour (differences and details)
 
@@ -778,6 +778,6 @@ and the Vitest suite `productMaintenanceForms.test.ts`. `BookingApiIT` was chang
 
 ### 17.6 Parked
 
-PQ02 (risk-code patterns: column empty), PQ04 (CPC2 content: demo only), PQ09 (final checklist and validator role),
+PQ02 (risk-code patterns: column empty), PQ04 (CPC2 content: seed only), PQ09 (final checklist and validator role),
 PQ10 (manual item rates and statutory rates in the scheme), PQ11 (renewal of accounts on superseded versions: the
 RENEWAL purpose is the seam), BRPM.022 (`ProductMasterFeed` port: not part of this wave).

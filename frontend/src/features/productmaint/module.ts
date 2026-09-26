@@ -71,7 +71,7 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
 
 /**
  * The Product Maintenance sidebar section: the package request screens first, then the catalog
- * screens (one section, BDOI prototype; the same pattern as `withOverviewScreens`).
+ * screens (one section, BDOI UX design; the same pattern as `withOverviewScreens`).
  *
  * @param catalog the catalog module (section "Product Maintenance")
  * @returns the catalog module with the package request screens

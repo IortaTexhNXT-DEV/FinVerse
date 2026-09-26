@@ -50,12 +50,12 @@ screens:
 data:
   - id: TD-CSF-01
     name: Test users per role
-    content: One user per role - agent1 and agent2 (CSF_AGENT), sup1 (CSF_SUPERVISOR), mgmt1 (CSF_MANAGEMENT), the System Administrator, ao (MKT_AO, no CSF role). The build design plans the demo users csfagent, csfagent2, csfsup and csfmgmt for the same roles.
-    source: Created by the test lead through User Access requests on SIT; planned demo seed V1940 of the build design
+    content: One user per role - agent1 and agent2 (CSF_AGENT), sup1 (CSF_SUPERVISOR), mgmt1 (CSF_MANAGEMENT), the System Administrator, ao (MKT_AO, no CSF role). The build design plans the SIT/UAT users csfagent, csfagent2, csfsup and csfmgmt for the same roles.
+    source: Created by the test lead through User Access requests on SIT; planned seed V1940 of the build design
   - id: TD-CSF-02
     name: Client with CBG and non-CBG accounts
     content: Masked client "UAT CSF Client One" with a CBG Motor account booked and in force (policy number, PN number, receipts paid) and a non-CBG Property account awaiting payment; registered e-mail and mobile point to the test mailbox and test phone.
-    source: Prepared by the test lead on SIT from masked demo clients (V981) and accounts keyed in the BRD-1 screens
+    source: Prepared by the test lead on SIT from masked seed clients (V981) and accounts keyed in the BRD-1 screens
   - id: TD-CSF-03
     name: Accounts in each CSF status
     content: "Accounts of one client in stage DRAFT, SUBMITTED, AWAITING_PAYMENT, BOOKED with premium outstanding, BOOKED and paid in force, CANCELLED, and BOOKED with the policy period ended."

@@ -165,7 +165,7 @@ Non-production data is always masked. Client names, TINs, PN numbers, addresses,
 
 ## Named data sets
 
-Renewal is not built, so no demo seed provides the data yet. The test lead prepares each set on SIT as its source column says, mostly by booking policies through BRD-1 with expiry dates relative to the business date. When the module is built, the sets become a demo seed and this column names it.
+Renewal is not built, so no seed provides the data yet. The test lead prepares each set on SIT as its source column says, mostly by booking policies through BRD-1 with expiry dates relative to the business date. When the module is built, the sets become a seed and this column names it.
 
 <!-- tp:data -->
 

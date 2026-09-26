@@ -263,7 +263,7 @@ Parked parts of built or configured requirements:
 | Q38 | GRF / ARF form behaviour | BRNB.096 |
 | Q39 | Archive and purge of retained records | BRNB.106 |
 | Q40 | Dynamic report builder (saved variants delivered) | BRNB.057 |
-| Q41 | Sales hierarchy and target values (demo targets) | BRNB.075 |
+| Q41 | Sales hierarchy and target values (seed targets) | BRNB.075 |
 | Q42 | BDO SSO / Active Directory | BRNB.040 |
 | OQ07 | Real GL accounts of the booking event | BRNB.027 |
 

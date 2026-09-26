@@ -57,7 +57,7 @@ wholesale business; BIR and Insurance Commission reportorial compliance.
 | 2 Renewal | BRD-6 | `BDOI_RN_BRD_SPEC.md` | Designed, not built |
 | 3 Collection Management | BRD-4 | `BDOI_CLXN_BRD_SPEC.md` | Built |
 | 4 Accounting, Disbursement and ACSL | BRD-5 | `BDOI_ACCT_BRD_SPEC.md` | Built |
-| 5 Claims | BRD-7 | `BDOI_CLM_BRD_SPEC.md` | Being built (CL0, CL1-A merged: V1020-V1022) |
+| 5 Claims | BRD-7 | `BDOI_CLM_BRD_SPEC.md` | Being built (CL0, CL1-A delivered: V1020-V1022) |
 | 6 Operations | BRD-2 | `BDOI_OPS_BRD_SPEC.md` | Built |
 | 7 Reinsurance | ReInsurance BRD (32 pages) | none (phase 2) | **Phase 2 - BRD received**; not in the phase 1 build |
 | 8 Customer Service Facility | BRD-9 | `BDOI_CSF_BRD_SPEC.md` | Designed, not built |
@@ -495,7 +495,7 @@ DCR-188). Module paths are under `backend/src/main/java/com/iortatechnxt/brokerv
 | XC-12 | BIR standard books (sales, purchase, cash receipts, cash disbursements, general journal) | 17 | BR-084 | BRD-5 FRBS 3.2.0 | FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 | Built | `tax` BookOfAccountsReport (V703 tax_book_def) | **FIT** | CAS / DAT format open (AQ07). | - |
 | XC-13 | Invoice Master List across workflows | 23 | BR-175 | None (BRCLXN.001, ACSL 2.16.0 related) | FR-CL-010, FR-AS-026 | No BRD | `opsledger` InvoiceLedgerQueryService; Operations > Invoice Ledger | **CHANGE** | Cover number, version number, Marketing / Processing assignees, placement status and approval dates are not all columns of the ledger. | CRQ13 |
 | XC-14 | BDO brand colours, logos, icons and design system | 23 | BR-178, BR-179, BR-180 | None | - | No BRD | BDO_UX_GUIDELINES; brand tokens; screen-alignment pass (deliverable 18) | **CHANGE** | BDO's prescribed icon and illustration set has not been supplied. | CRQ17 |
-| XC-15 | Identified user journeys and customisable interaction flows (with a demo) | 23 | BR-181, BR-182 | None | - | No BRD | Persona deck (deliverable 7); process deck (deliverable 41); `workflow` | **FIT** | - | - |
+| XC-15 | Identified user journeys and customisable interaction flows (with a walkthrough) | 23 | BR-181, BR-182 | None | - | No BRD | Persona deck (deliverable 7); process deck (deliverable 41); `workflow` | **FIT** | - | - |
 | XC-16 | Vendor uses Figma for design execution | 23 | BR-183 | None | - | No BRD | Not a system function | **OUT** | Vendor qualification, answered in the RFI. | - |
 | XC-17 | Regulatory compliance: BIR and Insurance Commission reportorial requirements | 4 | - | BRD-5 FRBS 3.2.0 | FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 | Built | `tax` (BIR forms, 2307, alphalists), IC schedules | **CHANGE** | The IC broker's annual statement layout is open (AQ07). | - |
 | XC-18 | Retail and wholesale business | 4 | - | BRD-1 BRNB.001 | FR-NB-001 | Built | Market segment on sales organisation and accounts | **FIT** | - | - |

@@ -152,7 +152,7 @@ Non-production data is always masked. Client, claimant and third-party names, ad
 
 ## Named data sets
 
-Claims is not built, so no demo seed provides the data yet. The test lead prepares each set on SIT as its source column says; the ageing sets need reported dates in the past, which the test lead sets in the test database. When the module is built, the sets become a demo seed.
+Claims is not built, so no seed provides the data yet. The test lead prepares each set on SIT as its source column says; the ageing sets need reported dates in the past, which the test lead sets in the test database. When the module is built, the sets become a seed data.
 
 <!-- tp:data -->
 

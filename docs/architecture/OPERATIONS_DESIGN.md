@@ -25,10 +25,10 @@ for example `CSHID.020`.
 3. **Sibling modules never call each other.** The five business modules depend on `opsledger` and on the
    platform and BRD-1 modules only. Where one of them needs another's action (issue an OR, re-apply payments,
    create an unapplied item, push to Disbursement), it calls a **port declared in `opsledger`** that the owner
-   module implements. This keeps the graph free of cycles and lets four agents build in parallel.
+   module implements. This keeps the graph free of cycles and lets four teams build in parallel.
 4. **GL accounts are never chosen in code.** Every posting is a `BusinessEvent`, and the rules are configured by
-   Comptrollership (ADJID.011 note). Demo rules are shipped only for the demo chart.
-5. **Parked means seam, not fake.** Collection, Disbursement, Marketing, Claims, insurer channels, bank files and
+   Comptrollership (ADJID.011 note). Seed rules are shipped only for the seed chart.
+5. **Parked means seam, not simulation.** Collection, Disbursement, Marketing, Claims, insurer channels, bank files and
    the shared drive each get a port. The default adapter is a manual upload, an in-app work queue or an
    internal module. No integration is simulated.
 6. **The addendum overrides the main BRD.**
@@ -37,7 +37,7 @@ for example `CSHID.020`.
 
 ## 2. Modules
 
-| Module | Purpose | BRD IDs | Depends on | Flyway (demo) |
+| Module | Purpose | BRD IDs | Depends on | Flyway (seed) |
 |---|---|---|---|---|
 | `opsledger` | Invoice ledger (components, shares, movements), invoice flags and locks, remittance / hold / DP status read model, invoice 360 view, flow-in framework (inbound / outbound feed runs), Operations ports and events, Operations dashboard counts API | BRQID.004/005, RMTID.026/032/038/040, ADJID.027, MKTID.011 (+ read side of all) | booking, account, catalog, crm, subledger, accounting, workflow, messaging, bulk, system, alert, lov | V760-V763 (V990) |
 | `cashiering` | Receipt series; AR and OR (create, cancel, reinstate); payment intake (files, OTC, PDC warehouse, check pick-up); matching engine and component application; unapplied payments and dispositions; minimal-balance sweep; AR Insurance; BIR 2307 intake and reversal; batch printing; Cashiering reports | CSHID.001-027, MKTID.010/013, DBMID.001 | opsledger (+ platform, account, organization, currency, docgen, attachment) | V764-V769 (V991) |
@@ -88,7 +88,7 @@ Events published by `opsledger`, so that siblings react without depending on eac
 
 ### 2.2 Contract asks to BRD-1 modules (being built now)
 
-Operations cannot start before `booking` exposes the items below. Agree them with the booking agent before
+Operations cannot start before `booking` exposes the items below. Agree them with the booking team before
 wave O1.
 
 | Owner | Contract | Needed for |
@@ -104,9 +104,9 @@ wave O1.
 ## 3. Flyway allocation
 
 Constraints: V1-V99 platform, V100-V749 insurer and finance modules, V750-V754 used (W1), V790-V799 `nbadmin`,
-V800-V889 NB modules, V900-V999 demo (NB demo V980-V989). Flyway runs with `out-of-order: true`.
+V800-V889 NB modules, V900-V999 seed (NB seed V980-V989). Flyway runs with `out-of-order: true`.
 
-**Proposal: Operations schema V760-V789, demo V990-V995.**
+**Proposal: Operations schema V760-V789, seed V990-V995.**
 
 | Range | Module | First migrations |
 |---|---|---|
@@ -117,20 +117,20 @@ V800-V889 NB modules, V900-V999 demo (NB demo V980-V989). Flyway runs with `out-
 | V775-V779 | `prodrecon` | `V775__prodrecon.sql` |
 | V780-V784 | `adjustment` | `V780__adjustment.sql` |
 | V785-V789 | `commission` | `V785__commission.sql` |
-| V990-V995 | demo: users and rules (V990), then one per module (V991-V995) | after NB demo V980-V989 |
+| V990-V995 | seed: users and rules (V990), then one per module (V991-V995) | after NB seed V980-V989 |
 
 Rules that make this safe:
 - **No foreign keys from V76x-V78x tables to V8xx tables.** On a fresh database, V760 runs before `booking`
   (V870). Operations stores ARN, invoice no., client code, insurer code and account id as plain values,
   exactly as the architecture already does between `account` and `quotation`. Foreign keys to V1-V754 tables
   are fine: parties, branches, workflow, LOV, attachments, `acc_event_type`.
-- Demo data V990+ runs after the NB demo (V988 booking), so it can seed invoices for booked demo accounts.
+- Seed data V990+ runs after the NB seed (V988 booking), so it can seed invoices for booked seed accounts.
 - The Developer Guide range table gets one new row: "V760-V789 Operations (BRD-2)".
 
 Alternatives rejected:
 - V890-V899 has only 10 versions for 6 modules.
-- V1000+ for the schema would force the Operations demo above V1000 too, because demo must follow the
-  schema. That breaks the "demo = V900-V999" convention.
+- V1000+ for the schema would force the Operations seed above V1000 too, because seed must follow the
+  schema. That breaks the "seed = V900-V999" convention.
 
 ## 4. Entities (key fields)
 
@@ -272,12 +272,12 @@ A legacy invoice is created by the new `opsledger.service.LegacyInvoiceIntake`, 
 
 ## 5. Accounting events and default GL entries
 
-The events below are seeded in `acc_event_type` by each module. **Demo rules only** (V990): the accounts in
-brackets are the demo chart plus new demo accounts. The real accounts come from Comptrollership (OQ07). All
+The events below are seeded in `acc_event_type` by each module. **Seed rules only** (V990): the accounts in
+brackets are the seed chart plus new seed accounts. The real accounts come from Comptrollership (OQ07). All
 events carry `partyCode`, `costCenter` and `businessLine` (risk line), and use the BOOK rate when not in PHP
 (CSHID.012-014). Source references are idempotent keys.
 
-Demo accounts added in V990 (proposed):
+Seed accounts added in V990 (proposed):
 - 1210 Premium Receivable - Clients, with subaccounts by component: DST, premium tax / VAT, LGT, other, basic;
 - 1211 PR - CWT 2307 (PR2307);
 - 1220 Commission Receivable - Insurers;
@@ -340,7 +340,7 @@ invoices and legacy UPP. No new event is added: every posting helper asks the in
 `LedgerContext` and emits the component with the prefix `LG_` when the context is LEGACY (`LG_PR_BASIC` ...
 `LG_PR_OTHER`, `LG_PR2307`, `LG_DTIP`, `LG_COMMISSION`, `LG_COMMISSION_VAT`, `LG_UNREALIZED`, `LG_DEFERRED_VAT`,
 `LG_APPLIED`, `LG_AMOUNT`). Comptrollership adds the `LG_` lines to the rules of events 1-26, routed to the legacy
-control accounts (demo: 1215.x Premium Receivable - Legacy, 1216 PR 2307 - Legacy, 1221 Commission Receivable -
+control accounts (seed: 1215.x Premium Receivable - Legacy, 1216 PR 2307 - Legacy, 1221 Commission Receivable -
 Legacy, 2206 Unapplied Collections - Legacy, 2212 Due to Insurers - Legacy, 2222 / 2223 unrealised commission and
 deferred VAT - Legacy); absent components produce no lines, so the engine does not change. Helpers concerned:
 `CashieringPosting`, `ApplicationService`, `DispositionExecutor`, `CwtPostings`, `MinimalBalanceService`,
@@ -382,9 +382,9 @@ decided with the Operations and Accounting owners.
 | `BIR_CERT_SUBMIT`, `BIR_CERT_ACK` | CMRID.015 (Operations / Comptrollership) |
 | `FLOWIN_MANAGE` | Feed configuration and re-runs (IT) |
 
-### 6.2 Roles (V760) and demo users (V990, password `Brokerverse@2026`)
+### 6.2 Roles (V760) and SIT/UAT users (V990)
 
-| Role | Persona (BRD annex) | Key permissions | Demo user |
+| Role | Persona (BRD annex) | Key permissions | SIT/UAT user |
 |---|---|---|---|
 | `CASHIER` | Cashiering HO (11) / branch (5) | CASH_RECEIPT, CASH_CANCEL, CASH_REINSTATE, CASH_APPLY, CASH_UPLOAD, CASH_DISPOSITION, CASH_PRINT, CWT_PROCESS | `cashier`, `cashbr` (branch: AR only) |
 | `CASHIER_TL` | Cashiering TL / TH | + CASH_APPROVE, CASH_DISPOSITION_APPROVE, CASH_SERIES_MANAGE | `cashtl` |
@@ -677,22 +677,22 @@ Frontend folders:
 Prerequisite: BRD-1 `booking` delivers the contract of section 2.2. Operations can start in parallel with the
 end of BRD-1 W3 if the event record is agreed first.
 
-| Wave | Agent | Scope | Files owned | Exit criteria |
+| Wave | Team | Scope | Files owned | Exit criteria |
 |---|---|---|---|---|
-| **O0** (1 agent, short) | Ops foundation | `opsledger` complete (ledger, feed from booking, flags / locks, invoice 360 API, flow-in framework, ports with default adapters, Disbursement queue, events). The platform extensions: bulk TXT / hash / outcomes / reprocess, report view / export split and archive, BusinessEvent rate, RateType BOOK, notification preferences. **All** Operations permissions, roles and LOV types (V760). Operations nav section + home + invoice 360 UI. Demo users (V990). Developer Guide range row. Pre-registered help sections, crons in `application.yml`, CONFIGURATION.md entries for every O1 job | `opsledger/**`, `V760-V763`, `V990`, `security/domain/Permission.java`, `bulk/**`, `report/**` (small), `accounting/service/BusinessEvent.java`, `currency/domain/RateType.java`, `messaging/**` (small), `frontend/src/features/operations/**`, `navigation/modules.ts`, `help/helpContent.ts`, `application.yml`, docs | Invoice ledger built from demo bookings; ports compile with default adapters; `mvn verify` green |
+| **O0** (1 team, short) | Ops foundation | `opsledger` complete (ledger, feed from booking, flags / locks, invoice 360 API, flow-in framework, ports with default adapters, Disbursement queue, events). The platform extensions: bulk TXT / hash / outcomes / reprocess, report view / export split and archive, BusinessEvent rate, RateType BOOK, notification preferences. **All** Operations permissions, roles and LOV types (V760). Operations nav section + home + invoice 360 UI. SIT/UAT users (V990). Developer Guide range row. Pre-registered help sections, crons in `application.yml`, CONFIGURATION.md entries for every O1 job | `opsledger/**`, `V760-V763`, `V990`, `security/domain/Permission.java`, `bulk/**`, `report/**` (small), `accounting/service/BusinessEvent.java`, `currency/domain/RateType.java`, `messaging/**` (small), `frontend/src/features/operations/**`, `navigation/modules.ts`, `help/helpContent.ts`, `application.yml`, docs | Invoice ledger built from seed bookings; ports compile with default adapters; `mvn verify` green |
 | **O1-A** | Cashiering | Everything in `cashiering` (the largest area: receipts, series, uploads, matching, application, unapplied / dispositions, PDC, pick-up, 2307, minimal balance, printing, 24 reports). Implements `ReceiptIssuer`, `PaymentReapplier`, `UnappliedSink` | `cashiering/**`, `V764-V769`, `V991`, `features/cashiering/**` | AR / OR end to end with postings; upload -> match -> apply -> report |
 | **O1-B** | Remittance | `remittance` including holds, special remittance and incentives; uses `ReceiptIssuer` (a stub bean from O0 until A merges) | `remittance/**`, `V770-V774`, `V992`, `features/remittance/**` | Extraction -> exclusion -> approve -> Disbursement queue -> insurer OR upload |
 | **O1-C** | Adjustment | `adjustment`; uses the booking posting / service-invoice contracts and `PaymentReapplier` | `adjustment/**`, `V780-V784`, `V994`, `features/adjustment/**` | Financial / non-financial / internal requests, batch post, slips, validation list |
-| **O1-D** | Prod recon + Commission | `prodrecon` and `commission` (two small, independent modules; one agent) | `prodrecon/**`, `commission/**`, `V775-V779`, `V785-V789`, `V993`, `V995`, `features/prodrecon/**`, `features/commission/**` | Recon cycle with matching; DP billing to collection, PR reversal, incentive engine (empty rules) |
-| **O2** (1 agent) | Integration and hardening | Cross-module E2E test (booking -> AR -> application -> remittance -> insurer OR -> recon -> cancellation after remittance -> AR Insurer -> DP commission OR), Operations dashboard polish, demo storyline data, module guide `docs/modules/OPERATIONS.md`, fit/gap workbook refresh | tests + docs + demo | Full `mvn verify` / `npm run verify`; walkthrough |
+| **O1-D** | Prod recon + Commission | `prodrecon` and `commission` (two small, independent modules; one team) | `prodrecon/**`, `commission/**`, `V775-V779`, `V785-V789`, `V993`, `V995`, `features/prodrecon/**`, `features/commission/**` | Recon cycle with matching; DP billing to collection, PR reversal, incentive engine (empty rules) |
+| **O2** (1 team) | Integration and hardening | Cross-module E2E test (booking -> AR -> application -> remittance -> insurer OR -> recon -> cancellation after remittance -> AR Insurer -> DP commission OR), Operations dashboard polish, seed storyline data, module guide `docs/modules/OPERATIONS.md`, fit/gap workbook refresh | tests + docs + seed | Full `mvn verify` / `npm run verify`; walkthrough |
 
 Rules for parallel work:
-- One Flyway range per agent.
-- No edits to other agents' packages.
+- One Flyway range per team.
+- No edits to other teams' packages.
 - Shared files (Permission enum, nav, help registry, `application.yml`) are edited **only in O0**.
-- Each module has its own `*ApiIT` smoke class instead of editing the shared `ApiSmokeIT`, which avoids merge
+- Each module has its own `*ApiIT` smoke class instead of editing the shared `ApiSmokeIT`, which avoids edit
   conflicts.
-- Port stubs (default adapters) are `@ConditionalOnMissingBean`, so each O1 agent's tests run without the
+- Port stubs (default adapters) are `@ConditionalOnMissingBean`, so each O1 team's tests run without the
   others.
 
 ## 14. What depends on information BDOI has not given (build the seam, park the content)
@@ -702,7 +702,7 @@ Rules for parallel work:
 | External systems (Collection, Disbursement, Marketing, Claims, Accounting) | BRQID.004/005, CSHID.009/026/027, DBMID.001, RMTID.030/034, CMRID.001/009 | Ports, flow-in framework, in-app queues and uploads | Transports and payloads | OQ01, OQ02, OQ45, OQ46 |
 | Payment file layouts | CSHID.008 | Configurable layout table and five handlers with the BRD field lists | Exact record layouts, encryption | OQ03, OQ04 |
 | Receipt series / BIR ATP | CSHID.001/002/006/015 | Series master | Formats and ATP ranges | OQ05 |
-| GL accounts and default entries | CSHID.012-016, ADJID.011, MKTID.012, remittance | Event types and demo rules | Comptrollership rules | OQ07 |
+| GL accounts and default entries | CSHID.012-016, ADJID.011, MKTID.012, remittance | Event types and seed rules | Comptrollership rules | OQ07 |
 | Exchange-rate table | CSHID.012-014 | Rate type BOOK, 2 decimals | Source and upload of rates | OQ08 |
 | Minimal balance rules | CSHID.016, ADJID.026 | Rule table and parameters | Final thresholds and targets | OQ11 |
 | Remittance schedule, naming, shared drive | RMTID.001/003/005 | Scheduler and repository | Schedule, names, folders | OQ17, OQ18 |

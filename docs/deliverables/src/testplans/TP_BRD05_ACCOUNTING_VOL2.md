@@ -87,7 +87,7 @@ The roles-and-access sheet checks each action against the roles that may and may
 | Level | What is tested | Who | When |
 |---|---|---|---|
 | Unit and integration (automated) | Payees, vouchers, instruments, postings, end of day, funding, requests, validations, liquidations, SOA reconciliation, corrections, deductions and permissions of each FR, against a PostgreSQL database; frontend form checks | iorta TechNXT developers | Every change, in CI (`mvn verify`, `npm run verify`) |
-| System test | Every case of the workbook, screen by screen, with the demo data | iorta TechNXT QA | Before UAT, on the SIT environment |
+| System test | Every case of the workbook, screen by screen, with the seed data | iorta TechNXT QA | Before UAT, on the SIT environment |
 | Persona end-to-end | The ten scenarios run from start to finish by the persona that owns each step | iorta TechNXT QA with the BDOI department testers | After the system test passes |
 | User acceptance test (UAT) | The scenarios and the High-priority cases, run by BDOI testers on masked production-like data | BDOI Disbursement, Marketing, HR and ACSL testers | After the entry criteria of section 3 are met |
 
@@ -123,7 +123,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | The build is deployed on SIT with the demo profile (seeds V900 to V999, V1900 and the demo runners of Operations, Disbursement, FRBS and remittance deductions); CI is green on the deployed commit; the test mailboxes of payees and branches receive mail; this plan is reviewed by the iorta TechNXT project manager. |
+| System test | The build is deployed on SIT with the seed profile (seeds V900 to V999, V1900 and the seed runners of Operations, Disbursement, FRBS and remittance deductions); CI is green on the deployed commit; the test mailboxes of payees and branches receive mail; this plan is reviewed by the iorta TechNXT project manager. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical defect; the Cashiering and Remittance steps used by the scenarios pass in the BRD-2 plan. |
 | UAT | FRS BRD-5 Volume 2 v1.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5, including two Disbursement team leaders and two approvers for the funding cases. |
 
@@ -136,7 +136,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 | Persona end-to-end | All ten scenarios passed end to end; every approved DV of the cycle is regularised or explained in DSB-UNREGULARIZED. |
 | UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High defect; open defects listed with an agreed plan in the UAT sign-off; the sign-off of section 10 is signed. |
 
-**Suspension.** Testing of a scenario stops when a Critical defect blocks it, when a posting failure leaves DVs unregularised that cannot be re-processed, when the environment is down for more than half a day, or when the demo or UAT data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
+**Suspension.** Testing of a scenario stops when a Critical defect blocks it, when a posting failure leaves DVs unregularised that cannot be re-processed, when the environment is down for more than half a day, or when the seed or UAT data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
 
 # Environments and test data
 
@@ -146,18 +146,18 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 | Environment | Use | Data |
 |---|---|---|
 | CI | Automated unit and integration tests on every change | Created by each test; PostgreSQL in a container |
-| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Demo profile seeds and runners (payees, vouchers, end of day, funding, service fee, deductions); test mailboxes for payees and branches |
-| UAT | Acceptance by BDOI testers | Masked copy of production-like payees, requests and balances plus the demo data; no real names, TINs, bank account numbers, check numbers or e-mail addresses |
+| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed profile migrations and runners (payees, vouchers, end of day, funding, service fee, deductions); test mailboxes for payees and branches |
+| UAT | Acceptance by BDOI testers | Masked copy of production-like payees, requests and balances plus the seed data; no real names, TINs, bank account numbers, check numbers or e-mail addresses |
 
 Non-production data is always masked. Payee, client and employee names, TINs, addresses, bank account and check numbers and e-mail addresses are replaced before data is loaded into SIT or UAT, and branch and payee e-mails go to test mailboxes, so no ATD, payment advice or statement can reach a real bank branch or payee. The DCTF produced in testing is never forwarded to TPD.
 
 ## Named data sets
 
-The cases refer to named data sets. The Disbursement data is provided by the demo seeds and runners; Payment Requests have no demo storyline, so TD-DPA-05 is keyed in by the tester; the upload and SOA files are prepared by the test lead.
+The cases refer to named data sets. The Disbursement data is provided by the seeds and runners; Payment Requests have no seed storyline, so TD-DPA-05 is keyed in by the tester; the upload and SOA files are prepared by the test lead.
 
 <!-- tp:data -->
 
-Many cases change the state of a demo DV, payee or deduction. The test lead reloads the demo profile between cycles; cases that change a parameter, an account or a master restore it at the end, as their expected result says.
+Many cases change the state of a seed DV, payee or deduction. The test lead reloads the seed profile between cycles; cases that change a parameter, an account or a master restore it at the end, as their expected result says.
 
 # Roles and responsibilities
 
@@ -171,7 +171,7 @@ Many cases change the state of a demo DV, payee or deduction. The test lead relo
 | BDOI process owner | BDOI Comptrollership Head | Decides on disputed expected results and accepted defects; signs off UAT |
 | UAT coordinator | Business Project Services, BDO Unibank ESG | Plans the UAT sessions; checks traceability to the BRD |
 
-Disbursement tests the payees, vouchers, instruments, end of day, funding and reports (SC-DPA-01 to 05); Remittance the incentives and the invoice family (SC-DPA-06); Marketing and HR the refund and cash-advance requests (SC-DPA-07, 08); ACSL the reconciliations, cases, corrections and deductions (SC-DPA-09, 10). The personas and demo users are:
+Disbursement tests the payees, vouchers, instruments, end of day, funding and reports (SC-DPA-01 to 05); Remittance the incentives and the invoice family (SC-DPA-06); Marketing and HR the refund and cash-advance requests (SC-DPA-07, 08); ACSL the reconciliations, cases, corrections and deductions (SC-DPA-09, 10). The personas and SIT/UAT users are:
 
 <!-- tp:personas -->
 
@@ -235,7 +235,7 @@ Cases with an automation reference are covered by these existing tests, which ru
 | Document layouts and signatories are drafts (AQ14, AQ18) | Medium | The Report-output and Upload-download cases are re-run when the layouts are loaded |
 | Four-eyes cases need combined test users and two users per role | Medium | The test lead creates them before the cycle (entry criterion) and removes them after it |
 | Stale-check and date-driven cases need the clock (180 days, end of day, SLA) | Medium | The test lead moves print dates and business dates in the test database and runs the jobs on demand |
-| Demo DVs, payees and deductions are changed by earlier cases | Medium | Reload the demo profile between cycles; cases that change a master restore it |
+| Seed DVs, payees and deductions are changed by earlier cases | Medium | Reload the seed profile between cycles; cases that change a master restore it |
 | BDOI answers to open questions change expected results (approvers AQ18, role matrix AQ28, deduction sources AQ23, CPC2 base AQ24, stale-check accounting AQ02 / AQ14) | Medium | The values are configuration; the affected cases name the parameter, list or rule and are re-run after the change |
 | BDOI testers are not available in the UAT window | High | Agree named testers per department and dates in the UAT plan (deliverable 30) before UAT starts |
 

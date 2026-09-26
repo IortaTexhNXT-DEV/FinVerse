@@ -29,8 +29,8 @@ milestones:
   - [M1, "Build-shaping decisions (answers that change what is built)", "16 Oct 2026"]
   - [M2, "Owners, stewards, keys and remaining business rules; object decisions signed (gate G1); layouts frozen, version 1 (G2 part 1) - end of requirements and mapping", "30 Oct 2026"]
   - [M3, "First full extracts in the templates, with control files and volumes (profiling, performance sizing)", "29 Jan 2027"]
-  - [M4, "Extracts for Mock 1 (SIT migration starts); reference data and clients first", "9 Apr 2027"]
-  - [M5, "Code maps approved for Mock 2 (G2), including the PACKAGE map", "18 Jun 2027"]
+  - [M4, "Extracts for Trial migration 1 (SIT migration starts); reference data and clients first", "9 Apr 2027"]
+  - [M5, "Code maps approved for Trial migration 2 (G2), including the PACKAGE map", "18 Jun 2027"]
   - [M6, "Cut-over date and window, fallback and decommissioning criteria agreed; Comptrollership confirms the year-end option A (DMQ39)", "1 Oct 2027"]
 
 # --------------------------------------------------------------------------------------------------------------
@@ -370,10 +370,10 @@ objects:
     owner: Head of the Renewal processing team
     steward: Renewal processing team - makers (corrections) and checkers (resubmission approval)
     history: RAs sent before go-live for expiries from T to 31-May-2028
-    delta: One file in every mock; final file with the RAs sent up to T-5; resubmissions of corrected rows until T-1 12:00
+    delta: One file in every trial migration; final file with the RAs sent up to T-5; resubmissions of corrected rows until T-1 12:00
     format: XLSX template (P03_template.xlsx) or CSV
     controls: Row count; count of distinct legacy_policy_ref; sum of proposed_premium per currency
-    due: M4 (Mock 1); final at T-5
+    due: M4 (Trial migration 1); final at T-5
     order: 13
     brd: BRID 12.1
     questions: DMQ26, DMQ37, DMQ38
@@ -1407,7 +1407,7 @@ decisions:
   - [DMQ28, Volumes and quality, "Row counts per object and source, growth to go-live, known quality issues, history depth, extract owner and delta frequency", Register volumes; performance test, M3, BDOI IT, OPEN]
   - [DMQ29, Consolidated NFR, "Name, version and owner of the consolidated NFR; cutover window, load time, retention of migration evidence", NFR targets, M2, Program Manager, OPEN]
   - [DMQ30, Objects not in the BRD, "Open claims, EB programmes, submitted-policy masterlists, payees, open disbursements, PDCs, users - in scope?", "R09, P04, P05, F06, F07", M1, Program Manager, OPEN]
-  - [DMQ31, Rehearsals and test data, "Number of mocks and the dress rehearsal; masked production extracts in SIT / UAT; who masks and approves", Migration cycles, M2, Program Manager; Compliance, OPEN]
+  - [DMQ31, Rehearsals and test data, "Number of trial migrations and the dress rehearsal; masked production extracts in SIT / UAT; who masks and approves", Migration cycles, M2, Program Manager; Compliance, OPEN]
   - [DMQ32, Fallback, "Point of no return; fallback to legacy after go-live; who decides", Runbook rollback, M6, Program Manager, OPEN]
   - [DMQ33, In-flight items at the freeze, "Pending endorsements, un-booked accounts, placements, PDCs, pick-ups and refunds - completed before the freeze, carried or re-keyed", "F06; freeze plan", M2, "Head, Operations", OPEN]
   - [DMQ34, Collection history, "Carry open dispositions, promises, installment plans and collector assignments", F03, M2, "Head, Operations (Collections)", OPEN]

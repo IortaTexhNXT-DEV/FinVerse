@@ -1,7 +1,7 @@
 # Payables & Cash (supplier invoices, payments, PDC issued, petty cash)
 
 Package `com.iortatechnxt.brokerverse.payables`, frontend `src/features/payables`, migrations `V500`
-(schema) and `V950` (demo masters).
+(schema) and `V950` (seed masters).
 
 ## 1. Documents and approval
 

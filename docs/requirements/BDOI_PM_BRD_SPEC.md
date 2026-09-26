@@ -255,7 +255,7 @@ The rows above are kept as asked. The single record with the design impact is
 | Insurers and rates | `cat_insurer`, `cat_insurer_branch`, `cat_commission_rate`, `cat_rate`, `cat_short_period_rate`, `cat_motor_limit` (V811); `catalog/service/RateResolver.java`, `RatingService.java`, `PremiumCalculator.java` | Effective-dated rows, but priced on the period start; no scheme stamp |
 | Maker-checker | `common/domain/AuthorizableEntity.java`; `catalog/service/CatalogApprovalSource.java`, `CatalogKind.java` | Record-level, in place: an edited record is unusable until authorised |
 | Negotiation (non-package) | `nonpackage/service/QuotationSlipService.java`, `InsurerResponseService.java`, `ComparativeTable.java`, `ProposalSlipService.java` | Reference implementation for BRPM.010-014 |
-| Screens | `features/catalog/*` (Products, Product detail, Insurers, Rates & Taxes, Sales Organisation, Premium Calculator), section "Products & Insurers" in the Client & Policy group (`navigation/modules.ts`) | Becomes the "Product Maintenance" section of the UX prototype |
+| Screens | `features/catalog/*` (Products, Product detail, Insurers, Rates & Taxes, Sales Organisation, Premium Calculator), section "Products & Insurers" in the Client & Policy group (`navigation/modules.ts`) | Becomes the "Product Maintenance" section of the UX UX design |
 | Incentive flag | `booking/domain/IncentiveRule.java`, `booking/service/BookingRuleService.java`, `bkg_incentive_rule` (V870) | Replaced by the catalog incentive criteria (PMADD07/08) |
 
 ## 9. Observations on the BRD pack

@@ -48,7 +48,7 @@ Organisation: Claims, Risk Management & Analytics, with a Motor Head Office team
 
 ### As built (wave CL2)
 
-All build waves (CL0, CL1-A, CL1-B) and the integration wave CL2 are merged; the last column of the
+All build waves (CL0, CL1-A, CL1-B) and the integration wave CL2 are delivered; the last column of the
 section 5 tables gives the status of each row and where it is built. Paths are under
 `backend/src/main/java/com/iortatechnxt/brokerverse/brokerclaims/` unless stated; the design
 sections 17 to 19 describe each wave and the module guide is

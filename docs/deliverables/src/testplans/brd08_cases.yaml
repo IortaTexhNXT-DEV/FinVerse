@@ -98,7 +98,7 @@ data:
     source: Insurer master on SIT; franchise states created in SC-EB-04
   - id: TD-EB-06
     name: Threshold rules
-    content: "Rule 1 all lines, annual premium >= PHP 20,000,000, approver EB_THRESHOLD_APPROVE; rule 2 HMO, TSI >= PHP 500,000,000 (demo values, EBQ11)"
+    content: "Rule 1 all lines, annual premium >= PHP 20,000,000, approver EB_THRESHOLD_APPROVE; rule 2 HMO, TSI >= PHP 500,000,000 (seed values, EBQ11)"
     source: Keyed in EB Setup by eb.badmin and authorised by eb.badmin2
   - id: TD-EB-07
     name: Proposals and SOA
@@ -1821,8 +1821,8 @@ findings:
     issue: The BOR is required for new business and remarketing renewals, while the BRD negative scenario says a BOR uploaded for a renewal is invalid (EBQ05). A renewal that stays with the incumbent has no BOR case.
     proposal: Answer EBQ05; add a case for a renewal without remarketing once decided.
   - fr: FR-EB-042
-    issue: The threshold values, measure and approver levels are demo values (EBQ11); the FRS does not say whether "meets" means at or above the amount.
-    proposal: State "at or above" and give the BDOI values; the cases use the demo values.
+    issue: The threshold values, measure and approver levels are seed values (EBQ11); the FRS does not say whether "meets" means at or above the amount.
+    proposal: State "at or above" and give the BDOI values; the cases use the seed values.
   - fr: FR-EB-062
     issue: 'The TAT annex gives ranges ("1-5 working days"); the FRS parameters hold one value, and the start and stop events are open (EBQ21), so a breach cannot be tested except against the upper value.'
     proposal: Confirm that the upper value of each range is the target and name the start and stop events.

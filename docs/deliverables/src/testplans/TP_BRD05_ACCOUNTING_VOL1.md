@@ -64,7 +64,7 @@ The roles-and-access sheet checks each accounting and administration action agai
 ## Out of scope
 
 - Volume 2 of BRD-5 (Disbursement, Payment Requests, ACSL), which has its own test plan. Where a Volume 1 case needs a Disbursement step (the payout of a service-fee line), the step is run as the precondition says and tested in Volume 2.
-- The real chart of accounts, posting rules, schedule layouts and GARD formats of BDOI (AQ01, AQ02, AQ05). The cases run on the demo chart and rules and are re-run when BDOI's data is loaded.
+- The real chart of accounts, posting rules, schedule layouts and GARD formats of BDOI (AQ01, AQ02, AQ05). The cases run on the seed chart and rules and are re-run when BDOI's data is loaded.
 - eFPS, DAT and CAS files for the BIR, and the payroll returns (1601-C, 1604-C, HDMF, SSS, PhilHealth) (AQ06, AQ07).
 - BDO single sign-on and Active Directory (Q42).
 - Daily FX revaluation, unless BDOI confirms it (AQ03).
@@ -90,7 +90,7 @@ The roles-and-access sheet checks each accounting and administration action agai
 | Level | What is tested | Who | When |
 |---|---|---|---|
 | Unit and integration (automated) | Journal controls, chart rules, closing, revaluation, reconciliation, service fee, schedules, BIR outputs and permissions of each FR, against a PostgreSQL database; frontend form checks | iorta TechNXT developers | Every change, in CI (`mvn verify`, `npm run verify`) |
-| System test | Every case of the workbook, screen by screen, with the demo data | iorta TechNXT QA | Before UAT, on the SIT environment |
+| System test | Every case of the workbook, screen by screen, with the seed data | iorta TechNXT QA | Before UAT, on the SIT environment |
 | Persona end-to-end | The nine scenarios run from start to finish by the persona that owns each step | iorta TechNXT QA with the BDOI department testers | After the system test passes |
 | User acceptance test (UAT) | The scenarios and the High-priority cases, run by BDOI testers on masked production-like data | BDOI FRBS and administration testers | After the entry criteria of section 3 are met |
 
@@ -128,9 +128,9 @@ Month-end and year-end cases depend on the date. The test lead sets the SIT cloc
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | The build is deployed on SIT with the demo profile (seeds V900 to V999 and the demo runners of Operations, Disbursement and FRBS); CI is green on the deployed commit; the periods of the current year are open; this plan is reviewed by the iorta TechNXT project manager. |
+| System test | The build is deployed on SIT with the seed profile (seeds V900 to V999 and the seed runners of Operations, Disbursement and FRBS); CI is green on the deployed commit; the periods of the current year are open; this plan is reviewed by the iorta TechNXT project manager. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical defect; the Disbursement steps of the service-fee scenario pass in the Volume 2 plan. |
-| UAT | FRS BRD-5 Volume 1 v1.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; BDOI's chart and rules are loaded, or BDOI accepts the demo chart for UAT (AQ01, AQ02). |
+| UAT | FRS BRD-5 Volume 1 v1.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; BDOI's chart and rules are loaded, or BDOI accepts the seed chart for UAT (AQ01, AQ02). |
 
 ## Exit criteria
 
@@ -141,7 +141,7 @@ Month-end and year-end cases depend on the date. The test lead sets the SIT cloc
 | Persona end-to-end | All nine scenarios passed end to end; the trial balance is balanced after the month-end and year-end scenarios. |
 | UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High defect; open defects listed with an agreed plan in the UAT sign-off; the sign-off of section 10 is signed. |
 
-**Suspension.** Testing of a scenario stops when a Critical defect blocks it, when a period is closed by mistake and cannot be reopened, when the environment is down for more than half a day, or when the demo or UAT data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
+**Suspension.** Testing of a scenario stops when a Critical defect blocks it, when a period is closed by mistake and cannot be reopened, when the environment is down for more than half a day, or when the seed or UAT data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
 
 # Environments and test data
 
@@ -151,18 +151,18 @@ Month-end and year-end cases depend on the date. The test lead sets the SIT cloc
 | Environment | Use | Data |
 |---|---|---|
 | CI | Automated unit and integration tests on every change | Created by each test; PostgreSQL in a container |
-| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Demo profile seeds and runners (chart, rules, bookings, Operations, Disbursement, FRBS); SIT clock adjustable by the test lead |
-| UAT | Acceptance by BDOI testers | Masked copy of production-like balances plus the demo data; no real client, supplier or employee names, TINs, bank account numbers or e-mail addresses |
+| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed profile migrations and runners (chart, rules, bookings, Operations, Disbursement, FRBS); SIT clock adjustable by the test lead |
+| UAT | Acceptance by BDOI testers | Masked copy of production-like balances plus the seed data; no real client, supplier or employee names, TINs, bank account numbers or e-mail addresses |
 
 Non-production data is always masked. Names, TINs, addresses, bank account and check numbers and e-mail addresses are replaced before data is loaded into SIT or UAT. Bank files used in the reconciliation cases are prepared from the masked data, never from real bank statements.
 
 ## Named data sets
 
-The cases refer to named data sets. Most are provided by the demo seeds and runners; TD-AC-04 (the copy with an error), TD-AC-05 and TD-AC-07 (the bank file) are prepared by the tester or the test lead as the case describes.
+The cases refer to named data sets. Most are provided by the seeds and runners; TD-AC-04 (the copy with an error), TD-AC-05 and TD-AC-07 (the bank file) are prepared by the tester or the test lead as the case describes.
 
 <!-- tp:data -->
 
-Month-end cases close periods of the SIT company. The test lead runs them on a copy of the demo company or reloads the demo profile between cycles, because a closed fiscal year cannot be reopened.
+Month-end cases close periods of the SIT company. The test lead runs them on a copy of the seed company or reloads the seed profile between cycles, because a closed fiscal year cannot be reopened.
 
 # Roles and responsibilities
 
@@ -176,7 +176,7 @@ Month-end cases close periods of the SIT company. The test lead runs them on a c
 | BDOI process owner | BDOI Comptrollership Head | Decides on disputed expected results and accepted defects; signs off UAT |
 | UAT coordinator | Business Project Services, BDO Unibank ESG | Plans the UAT sessions; checks traceability to the BRD |
 
-The GL Officers test the entries, reconciliation, service fee and reports (SC-AC-03, 04, 06, 07, 08); the GL Team Lead and Section Head the chart, rates, closing and approvals (SC-AC-02, 05); the Business and System Administrators and the access approvers the administration requests (SC-AC-01, 09). The personas and demo users are:
+The GL Officers test the entries, reconciliation, service fee and reports (SC-AC-03, 04, 06, 07, 08); the GL Team Lead and Section Head the chart, rates, closing and approvals (SC-AC-02, 05); the Business and System Administrators and the access approvers the administration requests (SC-AC-01, 09). The personas and SIT/UAT users are:
 
 <!-- tp:personas -->
 
@@ -238,8 +238,8 @@ Cases with an automation reference are covered by these existing tests, which ru
 <!-- table: widths=5.4,2,7.2 caption="Test risks and mitigations" -->
 | Risk | Impact | Mitigation |
 |---|---|---|
-| BDOI's chart, posting rules and report layouts are not loaded before UAT (AQ01, AQ02, AQ05) | High | The cases run on the demo chart; the report and posting cases are re-run on BDOI's data once loaded, without a new build |
-| Closing a period or a fiscal year on SIT cannot be undone | High | Month-end and year-end cases run on a copy of the demo company or after a reload of the demo profile |
+| BDOI's chart, posting rules and report layouts are not loaded before UAT (AQ01, AQ02, AQ05) | High | The cases run on the seed chart; the report and posting cases are re-run on BDOI's data once loaded, without a new build |
+| Closing a period or a fiscal year on SIT cannot be undone | High | Month-end and year-end cases run on a copy of the seed company or after a reload of the seed profile |
 | Date-driven cases (close schedule, cut-off at 23:00, reverse-on date, year-end deadline) need the clock | Medium | The test lead sets the SIT clock and runs the jobs on demand |
 | The service-fee payout depends on Disbursement (Volume 2) | Medium | The payout steps are run by the Disbursement testers as preconditions; a defect there is triaged with the Volume 2 plan |
 | BDOI answers to open questions change expected results (role matrix AQ28, service-fee rates AQ20, cost-centre rules AQ26, negative-balance accounts AQ30) | Medium | The values are configuration; the affected cases name the rule or parameter and are re-run after the change |

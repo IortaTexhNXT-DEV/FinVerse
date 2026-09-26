@@ -42,7 +42,7 @@ Requirements baseline: [`BDOI_SANC_BRD_SPEC.md`](../requirements/BDOI_SANC_BRD_S
 
 ## 2. Modules
 
-| Module | Purpose | BRD IDs | Depends on | Flyway (demo) |
+| Module | Purpose | BRD IDs | Depends on | Flyway (seed) |
 |---|---|---|---|---|
 | `screening` (new, package `com.iortatechnxt.brokerverse.screening`, tables `scr_*`) | Versioned configuration (criteria, risk rules, matrices, SLA, validation, templates), watchlist sources, entries and ingestion, name keys and matching engine, screening runs and matches, client risk profile history, screening cases (workflow `SCR_CASE`), reviews, documents, committee votes, STRs and extraction, SLA monitor, reports | SNSRP-101-109, 201-204, 301-304, 401-405, 501-502, 601-602, 701-706, 801-802, 901-903 | crm (clients, `ClientRiskService`, `ClientRecordsProvider`), account (read), catalog (sales organisation, unit head), workflow, approval, lov, attachment, messaging, bulk, report, alert, system, audit, security, nbadmin (retention port), organization | V1050-V1055 (V1950-V1952) |
 | `crm` (built) | + `ClientRiskService` (rating + tags + audit + review date); + events `ClientRegistered`, `ClientIdentityChanged` | SNSRP-302, 304, 602 | unchanged | none needed (code only) |
@@ -50,7 +50,7 @@ Requirements baseline: [`BDOI_SANC_BRD_SPEC.md`](../requirements/BDOI_SANC_BRD_S
 | `attachment` (built) | + named naming patterns in `DocumentNamingService` | SNSRP-601 | unchanged | none |
 | `report` (built) | + `ReportCategory.COMPLIANCE`, `ReportMetadata.compliance(...)` | SNSRP-901 | unchanged | none |
 
-Inner layout of `screening` (sub-packages are owned by one build agent each, section 13):
+Inner layout of `screening` (sub-packages are owned by one build team each, section 13):
 
 | Sub-package | Content |
 |---|---|
@@ -78,7 +78,7 @@ The two triggers come from events that screening listens to. crm publishes `Clie
 
 ## 3. Flyway allocation
 
-Allocated range: **schema V1050-V1059, demo V1950-V1959** (Developer Guide: V1000-V1899 for later BRDs, ten versions each; demo V1900-V1999 in the same order). Six schema versions are used and four are kept free.
+Allocated range: **schema V1050-V1059, seed V1950-V1959** (Developer Guide: V1000-V1899 for later BRDs, ten versions each; seed V1900-V1999 in the same order). Six schema versions are used and four are kept free.
 
 | Version | Owner (wave) | Content |
 |---|---|---|
@@ -89,9 +89,9 @@ Allocated range: **schema V1050-V1059, demo V1950-V1959** (Developer Guide: V100
 | `V1054__screening_cases.sql` | S1-C | `scr_case`, `scr_case_event` (insert-only trigger), `scr_case_review`, `scr_case_answer`, `scr_case_document`, `scr_committee_vote` |
 | `V1055__screening_str.sql` | S1-C | `scr_str`, `scr_str_transaction`, `scr_str_extraction` |
 | `V1056-V1059` | - | Kept free (follow-ups; the AMLC layout seed once SQ09 is answered) |
-| `db/demo/V1950__demo_screening_users_config.sql` | S1-A | Demo users (section 6.2), one ACTIVE version of every configuration type (thresholds, three risk categories, routes, SLA, KYC / transaction / EDD / STR templates) and one PENDING draft for `compchk` |
-| `db/demo/V1951__demo_screening_watchlist.sql` | S1-B | Two sources, 25 **fictitious** list entries (clearly invented names; never real listed persons), one failed ingestion run with errors, one completed screening run with potential matches against the demo clients (V981) |
-| `db/demo/V1952__demo_screening_cases.sql` | S1-C | Cases in every stage (new, investigation, returned, unit head approval, compliance review, committee, STR preparation, closed), one committee vote pending, one STR approved and one extracted |
+| `db/seed/V1950__seed_screening_users_config.sql` | S1-A | SIT/UAT users (section 6.2), one ACTIVE version of every configuration type (thresholds, three risk categories, routes, SLA, KYC / transaction / EDD / STR templates) and one PENDING draft for `compchk` |
+| `db/seed/V1951__seed_screening_watchlist.sql` | S1-B | Two sources, 25 **fictitious** list entries (clearly invented names; never real listed persons), one failed ingestion run with errors, one completed screening run with potential matches against the seed clients (V981) |
+| `db/seed/V1952__seed_screening_cases.sql` | S1-C | Cases in every stage (new, investigation, returned, unit head approval, compliance review, committee, STR preparation, closed), one committee vote pending, one STR approved and one extracted |
 
 Rules:
 - Foreign keys only to platform tables (users, branches, workflow, LOV, attachments). Client, account and list references are ids or codes without foreign keys to V8xx tables, as in Operations and Collections.
@@ -175,9 +175,9 @@ None. Screening creates no `BusinessEvent`, no journal and no open item. No `acc
 | `SCR_REPORT_VIEW` | Compliance reports and export (SNSRP-901) | SCREENING / VIEW |
 | `SCR_AUDIT_VIEW` | Screening audit log report (SNSRP-903) | SCREENING / VIEW |
 
-### 6.2 Roles (V1050) and demo users (V1950, password `Brokerverse@2026`)
+### 6.2 Roles (V1050) and SIT/UAT users (V1950)
 
-| Role | Persona (BRD) | Permissions | Demo user |
+| Role | Persona (BRD) | Permissions | SIT/UAT user |
 |---|---|---|---|
 | `COMPLIANCE_OFFICER` (new) | Compliance Officer (maker; BU escalation; STR) | SCR_VIEW, SCR_CONFIG_MAINTAIN, SCR_LIST_MAINTAIN, SCR_COMPLIANCE_REVIEW, SCR_STR_EXTRACT, SCR_CASE_ASSIGN, SCR_REPORT_VIEW, SCR_AUDIT_VIEW, CLIENT_VIEW, ATTACHMENT_VIEW, REPORT_VIEW, WORK_VIEW | `compoff` |
 | `COMPLIANCE_CHECKER` (new) | Compliance Officer (Checker) | SCR_VIEW, SCR_CONFIG_APPROVE, SCR_LIST_APPROVE, SCR_REPORT_VIEW, CLIENT_VIEW, REPORT_VIEW | `compchk` |
@@ -330,35 +330,35 @@ Help: `features/screening/help.ts` (`SCREENING_HELP`), one entry per non-hidden 
 - **Performance.** Matching uses blocking keys (`scr_name_key`, indexed) before scoring. A daily delta covers 10-300 entries against the client base. The full monthly rescreen runs in the batch window (00:00-04:00 is the maintenance window, so jobs run from 01:00 with a guard against 00:00-01:00). Screens meet the 3-5 s target through paged server queries.
 - **Retention.** 5 years online and 5 years archive for cases, documents and list entries (retention rules, section 9). `scr_case_event` and `scr_watchlist_change` are insert-only.
 - **Security.** Four eyes on configuration and list changes. The maker is excluded from approval in both the service and the inbox source.
-- **Name data.** Watchlist data is loaded only from BDOI-supplied files. The demo data uses invented names.
+- **Name data.** Watchlist data is loaded only from BDOI-supplied files. The seed data uses invented names.
 
 ## 13. Build-wave plan
 
 Prerequisites: none beyond the built crm, workflow, lov, attachment and report modules. The unit-head lookup of Collections C1-A is used when present (section 9).
 
-| Wave | Agent | Scope | Files owned | Exit criteria |
+| Wave | Team | Scope | Files owned | Exit criteria |
 |---|---|---|---|---|
-| **S0** (1 agent, short; can be the same agent as U0 of BRD-11, see note) | Screening foundation | Permissions, V1050, the crm / workflow / attachment / report contract changes of section 9, nav registration (stub home), `help.ts`, crons in `application.yml`, Developer Guide range row | `security/domain/Permission.java`, `crm/service/ClientRiskService.java` (new), `crm/service/ClientRegistered.java`, `ClientIdentityChanged.java` (new), `crm/service/ClientService.java` (publish only), `crm/service/ClientBulkHandler.java` (publish only), `crm/domain/Client.java` (`applyRiskRating` only), `workflow/service/WorkflowService.java` (`overrideDue`), `workflow/service/WorkAssignmentService.java` (overload), `attachment/service/DocumentNamingService.java`, `report/core/ReportCategory.java`, `report/core/ReportMetadata.java`, `V1050`, `navigation/modules.ts`, `help/helpContent.ts`, `features/screening/module.ts`, `setupModule.ts`, `help.ts`, `application.yml`, `docs/operations/CONFIGURATION.md` | `mvn verify` green; existing crm / workflow tests unchanged |
-| **S1-A** | Configuration and watchlist | `screening.config`, `screening.watchlist`, approval source (config + list parts), bulk handler, ingestion jobs, setup screens, demo V1950 | `screening/config/**`, `screening/watchlist/**`, `V1051`, `V1052`, `db/demo/V1950`, `features/screening/setup/**` | Draft -> approve -> active with diff; file upload -> run log -> entries PENDING -> approved -> ACTIVE |
-| **S1-B** | Matching and risk | `screening.matching`, `screening.risk`, event listeners, periodic job, matches screen, demo V1951 | `screening/matching/**`, `screening/risk/**`, `V1053`, `db/demo/V1951`, `features/screening/matches/**` | New demo client with a listed name -> run -> match -> risk tag on the client (rating, tag, review date) |
-| **S1-C** | Cases, STR, reports | `screening.cases`, `screening.str`, `screening.report`, SLA monitor, case screens, crm client tab, retention provider, demo V1952 | `screening/cases/**`, `screening/str/**`, `screening/report/**`, `V1054`, `V1055`, `db/demo/V1952`, `features/screening/cases/**`, `features/screening/str/**`, `features/crm/ClientDetailPage.tsx` (tab registration only) | Case -> review -> submit -> unit head -> compliance -> committee -> STR -> extraction -> filed; SLA reminder and breach |
+| **S0** (1 team, short; can be the same team as U0 of BRD-11, see note) | Screening foundation | Permissions, V1050, the crm / workflow / attachment / report contract changes of section 9, nav registration (stub home), `help.ts`, crons in `application.yml`, Developer Guide range row | `security/domain/Permission.java`, `crm/service/ClientRiskService.java` (new), `crm/service/ClientRegistered.java`, `ClientIdentityChanged.java` (new), `crm/service/ClientService.java` (publish only), `crm/service/ClientBulkHandler.java` (publish only), `crm/domain/Client.java` (`applyRiskRating` only), `workflow/service/WorkflowService.java` (`overrideDue`), `workflow/service/WorkAssignmentService.java` (overload), `attachment/service/DocumentNamingService.java`, `report/core/ReportCategory.java`, `report/core/ReportMetadata.java`, `V1050`, `navigation/modules.ts`, `help/helpContent.ts`, `features/screening/module.ts`, `setupModule.ts`, `help.ts`, `application.yml`, `docs/operations/CONFIGURATION.md` | `mvn verify` green; existing crm / workflow tests unchanged |
+| **S1-A** | Configuration and watchlist | `screening.config`, `screening.watchlist`, approval source (config + list parts), bulk handler, ingestion jobs, setup screens, seed V1950 | `screening/config/**`, `screening/watchlist/**`, `V1051`, `V1052`, `db/seed/V1950`, `features/screening/setup/**` | Draft -> approve -> active with diff; file upload -> run log -> entries PENDING -> approved -> ACTIVE |
+| **S1-B** | Matching and risk | `screening.matching`, `screening.risk`, event listeners, periodic job, matches screen, seed V1951 | `screening/matching/**`, `screening/risk/**`, `V1053`, `db/seed/V1951`, `features/screening/matches/**` | New seed client with a listed name -> run -> match -> risk tag on the client (rating, tag, review date) |
+| **S1-C** | Cases, STR, reports | `screening.cases`, `screening.str`, `screening.report`, SLA monitor, case screens, crm client tab, retention provider, seed V1952 | `screening/cases/**`, `screening/str/**`, `screening/report/**`, `V1054`, `V1055`, `db/seed/V1952`, `features/screening/cases/**`, `features/screening/str/**`, `features/crm/ClientDetailPage.tsx` (tab registration only) | Case -> review -> submit -> unit head -> compliance -> committee -> STR -> extraction -> filed; SLA reminder and breach |
 | **S2** | Integration and hardening | E2E and `ApiSmokeIT` entries, module guide `docs/modules/SCREENING.md`, fit/gap refresh | tests + docs | Full `mvn verify` / `npm run verify` |
 
 S1-B starts on S1-A's `ActiveConfig` interface (committed first in S1-A as a stub returning seeded defaults). S1-C starts on the S1-B `ScreeningEngine` result types (the same approach).
 
 Rules for parallel work:
-- One Flyway file set per agent: S0 V1050; S1-A V1051 / V1052 / V1950; S1-B V1053 / V1951; S1-C V1054 / V1055 / V1952.
+- One Flyway file set per team: S0 V1050; S1-A V1051 / V1052 / V1950; S1-B V1053 / V1951; S1-C V1054 / V1055 / V1952.
 - `screening.common` belongs to S1-A. S1-B and S1-C ask S1-A for changes.
 - Shared files (the Permission enum, nav, help registry, `application.yml`, `ReportCategory`) are edited **only in S0**.
-- No agent edits `crm/**`, `workflow/**` or `attachment/**` outside S0. The single exception is the crm client-page tab registration in S1-C, coordinated with the crm owner.
-- Each agent writes its own `*ApiIT` smoke class.
-- Note: BRD-11 (User Access Maintenance) also edits `Permission.java`, the nav and the help registry in its foundation wave U0. Run S0 and U0 as **one foundation agent**, or run them one after the other; never at the same time.
+- No team edits `crm/**`, `workflow/**` or `attachment/**` outside S0. The single exception is the crm client-page tab registration in S1-C, coordinated with the crm owner.
+- Each team writes its own `*ApiIT` smoke class.
+- Note: BRD-11 (User Access Maintenance) also edits `Permission.java`, the nav and the help registry in its foundation wave U0. Run S0 and U0 as **one foundation team**, or run them one after the other; never at the same time.
 
 ## 14. What depends on information BDOI has not given (build the seam, park the content)
 
 | Item | Question | Built now | Parked |
 |---|---|---|---|
-| Thresholds, risk categories, matrices, SLA | SQ02-SQ04, SQ08 | Configurable tables and screens; demo values only | Production values entered by Compliance at go-live |
+| Thresholds, risk categories, matrices, SLA | SQ02-SQ04, SQ08 | Configurable tables and screens; seed values only | Production values entered by Compliance at go-live |
 | Templates and dispositions | SQ05, SQ06 | Template designer; LOV seeds marked "to confirm" | Field lists |
 | STR layout | SQ09 | Configurable layout, placeholder | AMLC format |
 | List transports | SQ01 | File upload and file-drop job | API / NLDS connectors |
@@ -369,18 +369,18 @@ Rules for parallel work:
 1. **Matching quality.** Too many false positives on common Filipino names (e.g. "Santos", "Reyes"). Mitigation: blocking on several tokens plus birth date where available, thresholds per list type, false-positive suppression per entry version, and the "potential matches" screen before a case is opened (a threshold `min_score_for_case`).
 2. **Unknown list formats.** Mitigation: a configurable file layout per source and a manual maker-checker entry path.
 3. **Contract changes in crm and workflow.** Mitigation: small, additive, done in one S0 change set with tests; existing signatures stay.
-4. **Regulatory content in the demo.** Mitigation: invented names only, flagged in the demo migration header.
+4. **Regulatory content in the seed data.** Mitigation: invented names only, flagged in the seed migration header.
 5. **Investigator population.** 287 users may be MKT_AO holders. Mitigation: role grants are additive and the case list is scoped by team.
 
 ## 16. S0 foundation: as built
 
-What the S0 wave built (together with U0 of BRD-11, one foundation agent, because both edit the shared files), and
+What the S0 wave built (together with U0 of BRD-11, one foundation team, because both edit the shared files), and
 where it differs from or details the sections above. S1-A, S1-B and S1-C build on this and compile only against it.
 
 - **Migration `V1050__screening_foundation.sql`.**
   - Roles `COMPLIANCE_OFFICER`, `COMPLIANCE_CHECKER`, `UNIT_COMPLIANCE_COORD`, `SCR_INVESTIGATOR`, `SCR_APPROVER`,
     `AML_COMMITTEE` with the grants of section 6.2; `AUDITOR` + SCR_VIEW, SCR_REPORT_VIEW, SCR_AUDIT_VIEW; `SYSADMIN` +
-    SCR_VIEW. The Operations Lead grant waits for SQ19 (no role is named yet). Demo users come with V1950 (S1-A).
+    SCR_VIEW. The Operations Lead grant waits for SQ19 (no role is named yet). SIT/UAT users come with V1950 (S1-A).
   - `sec_permission_action`: the 14 `SCR_*` permissions in the area `SCREENING` with the action classes of 6.1.
   - LOV types `SCR_DISPOSITION` (parent = stage), `SCR_CASE_TYPE`, `SCR_LIST_TYPE`, `SCR_REASSIGN_REASON`,
     `SCR_STR_REASON` (no values until SQ09), `SCR_FORM_TYPE`, `SCR_DOCUMENT_TYPE` (parent = `DOCUMENT_TYPE` code).
@@ -447,8 +447,8 @@ where it differs from or details the sections above. S1-A, S1-B and S1-C build o
   `0 30 17 * * *` (01:30 PHT), `scr-sla-monitor-cron` `0 0 * * * *`, `scr-ingest-error-digest-cron`
   `0 0 23 * * SUN-THU` (07:00 PHT Monday to Friday). Each job reads its cron with
   `@Value("${brokerverse.jobs.<property>:-}")`.
-- **Flyway left to the build waves.** As section 3: S1-A V1051, V1052, demo V1950; S1-B V1053, demo V1951; S1-C V1054,
-  V1055, demo V1952; V1056-V1059 and V1953-V1959 free.
+- **Flyway left to the build waves.** As section 3: S1-A V1051, V1052, seed V1950; S1-B V1053, seed V1951; S1-C V1054,
+  V1055, seed V1952; V1056-V1059 and V1953-V1959 free.
 - **Parked in S0.** The Operations Lead grants (SQ19), the committee rule and size values (SQ15), the disposition list
   (SQ06), the STR reasons (SQ09) and the ingestion alert recipients (SQ01) are placeholders, as listed in section 14.
   The optional gate `ClientComplianceGate` is not built (SQ07).
@@ -463,8 +463,8 @@ contracts listed here.
   `api.DecisionRequest`: checker remarks). `screening/package-info.java` documents the ownership of the sub-packages.
 - **Migrations.** `V1051__screening_config.sql` (the twelve tables of 4.1), `V1052__screening_watchlist.sql` (the seven
   tables of 4.2, the insert-only trigger of `scr_watchlist_change` once decided, the three BRD sources `AML_ADVISORY`
-  (SANCTION, file, full file), `NLDS_PEP` (PEP, file, delta file) and `INTERNAL` (manual)), demo
-  `V1950__demo_screening_users_config.sql` (users compoff, compchk, compdual (maker and checker, for the four-eyes
+  (SANCTION, file, full file), `NLDS_PEP` (PEP, file, delta file) and `INTERNAL` (manual)), seed
+  `V1950__seed_screening_users_config.sql` (users compoff, compchk, compdual (maker and checker, for the four-eyes
   refusals), ucc, investigator, investigator2, scrapprover, amlcom1, amlcom2; version 1 of every configuration type for
   company FVI, ACTIVE since 2026-01-01; one PENDING SLA_MATRIX v2 made by compoff).
 - **Details of 4.1.** `scr_config_version.scope` holds the template type of a TEMPLATE version (templates are versioned
@@ -546,13 +546,13 @@ of 18.1.
   changes and cases, status, job run), `scr_match` (unique client, entry, entry version and MATCH_CRITERIA version;
   client and entry names, source, list type, rule, score numeric(5,4), algorithm, matched fields, case-threshold flag,
   status, case id without a foreign key, decision), `scr_match_suppression` (unique client, entry, entry version) and
-  `scr_client_risk_profile` (insert-only by trigger; a MANUAL row needs a justification and evidence). Demo
-  `V1951__demo_screening_watchlist.sql`: 25 invented entries (10 AML advisory, 8 NLDS PEP, 7 internal, one of them
+  `scr_client_risk_profile` (insert-only by trigger; a MANUAL row needs a justification and evidence). Seed
+  `V1951__seed_screening_watchlist.sql`: 25 invented entries (10 AML advisory, 8 NLDS PEP, 7 internal, one of them
   delisted) with aliases, one FAILED ingestion run with three failed records, and one PERIODIC run of FVI with a
   potential match of CL-2026-000002 (Jose Miguel Lopez Reyes, already HIGH with WATCHLIST_REVIEW in V981, so no risk
-  row). The test data TD-SS-03 name "Maria Santos Reyes" is not used: it would match the demo client Maria Clara Reyes
+  row). The test data TD-SS-03 name "Maria Santos Reyes" is not used: it would match the seed client Maria Clara Reyes
   Santos (CL-2026-000001) that many tests use; the PEP example is "Marietta Sandoval Reyna". `ScreeningMatchingTest`
-  checks that no other demo client of V981 / V983 matches a V1951 entry.
+  checks that no other seed client of V981 / V983 matches a V1951 entry.
 - **Matching (4.3, SNSRP-301).** `NameNormaliser` (upper case, accents of Latin letters removed, titles and company forms
   dropped, particles joined to the next word: "Juan de la Cruz" and "Juan Dela Cruz" both give `JUAN DELACRUZ`),
   `NameKeys` (TOKEN, PHONETIC = Double Metaphone codes of each token, EXACT = sorted tokens), `NameScorer` (EXACT 1 or 0
@@ -562,7 +562,7 @@ of 18.1.
   (full name, first + last name, display name) and the entry's primary name and first + last name (NAME) or aliases
   (ALIAS, when the rule compares aliases); then, where the rule compares them and both sides hold them, birth date +0.05
   / -0.10, nationality +0.02 / -0.05 and a shared ID number +0.10 (compared with the client's TIN and ID number). The
-  best hit over the rules wins (ties: the earlier rule, EXACT first in the demo), so the FR-SS-031 example "Juan Dela
+  best hit over the rules wins (ties: the earlier rule, EXACT first in the seed data), so the FR-SS-031 example "Juan Dela
   Cruz" / "Juan de la Cruz" is an EXACT match of score 1 (FRS note in the report). Individual clients are compared with
   INDIVIDUAL entries only, corporate clients with ENTITY entries.
 - **Blocking keys (`scr_name_key`).** Written only by `NameKeyIndex`. ENTRY keys hold the entry's own names, ALIAS keys
@@ -672,9 +672,9 @@ What wave S1-C built on S0, S1-A and S1-B (contracts of 18.1), and where it deta
   `scr_committee_vote` are insert-only by trigger. `V1055__screening_str.sql`: `scr_str` (unique case, `STR-yyyy-nnnnnn`,
   unique AMLC reference), `scr_str_field`, `scr_str_transaction` (amount > 0), `scr_str_extraction`
   (`STRX-yyyy-nnnnnn`, period, count, file name, SHA-256, report run, re-extraction reason) and
-  `scr_str_extraction_item`. Demo `V1952__demo_screening_cases.sql`: users amlcom3-5 (AML_COMMITTEE, so the committee of
-  `SCR_COMMITTEE_SIZE` 5 is complete) and scrdual (SCR_INVESTIGATOR + SCR_APPROVER, for the four-eyes demo); STR reasons
-  DEMO01-03 in `SCR_STR_REASON` (demo profile only, the real list is SQ09); ten cases SCR-2026-000001..010, one in every
+  `scr_str_extraction_item`. Seed `V1952__seed_screening_cases.sql`: users amlcom3-5 (AML_COMMITTEE, so the committee of
+  `SCR_COMMITTEE_SIZE` 5 is complete) and scrdual (SCR_INVESTIGATOR + SCR_APPROVER, for the four-eyes seed); STR reasons
+  RSN01-03 in `SCR_STR_REASON` (seed profile only, the real list is SQ09); ten cases SCR-2026-000001..010, one in every
   stage (the case of CL-2026-000002 links the V1951 match; CL-2026-000004 is past its SLA; CL-2026-000006 is at the
   committee with one vote; two STRs APPROVED and EXTRACTED; one case CLOSED) with their workflow, events, votes and STR
   data.
@@ -740,15 +740,15 @@ What wave S1-C built on S0, S1-A and S1-B (contracts of 18.1), and where it deta
 
 ### 19.2 Parked or deferred in S1-C
 
-- The AMLC STR layout (XLSX / XML) and the real STR reasons wait for SQ09; demo reasons DEMO01-03 are seeded in V1952
+- The AMLC STR layout (XLSX / XML) and the real STR reasons wait for SQ09; seed reasons RSN01-03 are seeded in V1952
   only. An STR sent to FOR_APPROVAL without a committee decision cannot be extracted.
-- Invoice and receipt prefill of STR transactions (behind `StrTransactionSource`); the demo extraction has no archived
+- Invoice and receipt prefill of STR transactions (behind `StrTransactionSource`); the seed extraction has no archived
   file.
 - Working-hour SLA calendars: SLA hours are calendar hours.
 - Case documents can still be deleted through the generic attachment API (a platform guard is needed).
 - Accent-insensitive case search.
 - Assignment is announced by the platform assignment notice; `SCR_CASE_ASSIGNED` is not sent separately.
-- The demo unit heads (mkttl, clxuh) lack SCR_CASE_APPROVE, so demo cases fall back to the approvers' queue.
+- The seed unit heads (mkttl, clxuh) lack SCR_CASE_APPROVE, so seed cases fall back to the approvers' queue.
 
 ## 20. S2 integration and hardening: as built
 

@@ -1834,7 +1834,7 @@ main_flow:
 alternate_flows:
   - Remitted after the window. No incentive; the invoice goes to a Normal batch.
 rules:
-  - [R1, "Rates, windows and basis per insurer (demo INS-MGIC Property CBG 2%, 30 days from inception; values from BDOI, OQ23).", Configurable, Incentive Rules]
+  - [R1, "Rates, windows and basis per insurer (seed INS-MGIC Property CBG 2%, 30 days from inception; values from BDOI, OQ23).", Configurable, Incentive Rules]
 validations:
   - [End before start, The rule cannot end before it starts, INCENTIVE_RULE_PERIOD]
   - [No company, Choose the company of the rule, COMPANY_REQUIRED]
@@ -2699,7 +2699,7 @@ alternate_flows:
   - Bulk. The handler selects items and sets the disposition for all.
   - Manual pair or split.
 rules:
-  - [R1, "Company-concerned and disposition lists (values from BDOI, OQ31; demo values delivered).", Configurable, LOV RECON_COMPANY_CONCERNED; LOV RECON_DISPOSITION]
+  - [R1, "Company-concerned and disposition lists (values from BDOI, OQ31; seed values delivered).", Configurable, LOV RECON_COMPANY_CONCERNED; LOV RECON_DISPOSITION]
 validations:
   - [Pair across cycles or wrong sides, Pair a BDOI-only item with an insurer-only item of the same cycle, RECON_PAIR_INVALID]
   - [Split of an unpaired item, Only a paired item can be split, RECON_SPLIT_INVALID]
@@ -3638,7 +3638,7 @@ In the figures, solid arrows are the main path, dashed arrows are returns and op
 
 ## Accounting events
 
-Every Operations posting is a business event; Comptrollership configures the GL rule of each event (maker-checker), and no GL account is chosen in code (OQ07). The entries below are the defaults of the build design with the demo chart of accounts. All events carry the party, cost centre and business line, and are priced at the BOOK rate when not in pesos.
+Every Operations posting is a business event; Comptrollership configures the GL rule of each event (maker-checker), and no GL account is chosen in code (OQ07). The entries below are the defaults of the build design with the seed chart of accounts. All events carry the party, cost centre and business line, and are priced at the BOOK rate when not in pesos.
 
 <!-- table: widths=5.6,3.8,7.2 caption="Operations accounting events and default entries" size=8 -->
 | Event | Transaction | Default entry |
@@ -3861,7 +3861,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | REMIT_EXCLUSION_REASON | Account on hold; Pending negative adjustment; Written off; Check within the holding period or not cleared; Paid AR greater than DTIP; Payment not yet applied and posted; Others |
 | REMIT_RETURN_REASON, HOLD_REASON, DP_FEEDBACK_REASON, ENDORSEMENT_DOC_TYPE | Others only, until BDOI supplies the values (OQ24, OQ32, OQ40) |
 | SPECIAL_REMIT_CONDITION | Claims; Renewal; Installment due; Immediate OR issuance |
-| RECON_COMPANY_CONCERNED, RECON_DISPOSITION | Demo values until BDOI supplies them (OQ31) |
+| RECON_COMPANY_CONCERNED, RECON_DISPOSITION | Seed values until BDOI supplies them (OQ31) |
 | ENDORSEMENT_TYPE | Financial: 8 types; non-financial: 5 types; internal adjustment (ADJID.002, 004) |
 | ENDORSEMENT_REQUEST_TYPE | The 12 request types of Annex V |
 | CANCELLATION_REASON | The 33 reasons of Annex V (shared with BRD-1) |

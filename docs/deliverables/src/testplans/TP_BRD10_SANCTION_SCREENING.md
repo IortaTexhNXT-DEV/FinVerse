@@ -72,7 +72,7 @@ The roles-and-access sheet checks each screening action against the roles that m
 - Filing the STR on the AMLC portal; it stays manual. The cases stop at the extraction file and the recorded AMLC reference.
 - Real-time or API list sources (SQ01); only file and manual sources are tested.
 - The AMLC prescribed STR layout and reason codes (SQ09). The cases test the placeholder layout and test reason codes; they are re-run when BDOI supplies the AMLC content.
-- The production values of thresholds, risk categories, matrices and SLAs (SQ02-SQ08). The cases use the demo configuration; Compliance enters the production values before go-live.
+- The production values of thresholds, risk categories, matrices and SLAs (SQ02-SQ08). The cases use the seed configuration; Compliance enters the production values before go-live.
 - Blocking of business on an open match (SCR_BLOCK_ON_OPEN_MATCH), which is off until SQ07 is answered; the cases check that a tag warns and does not block.
 - Performance and volume testing. The NFRs of FRS section 8 are tested in the BIBS-wide performance test plan (deliverable 28).
 
@@ -132,7 +132,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | Sanction Screening is built and deployed on SIT with its roles, parameters, lists and jobs; the planned demo seeds V1950 to V1952 (invented names only) are loaded; CI is green on the deployed commit; the automated tests of the module exist and pass; screen labels and messages have been compared with this plan and differences recorded; the test mailboxes receive mail. |
+| System test | Sanction Screening is built and deployed on SIT with its roles, parameters, lists and jobs; the planned seeds V1950 to V1952 (invented names only) are loaded; CI is green on the deployed commit; the automated tests of the module exist and pass; screen labels and messages have been compared with this plan and differences recorded; the test mailboxes receive mail. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical defect; five committee users exist; the SLA monitor and ingestion jobs run on SIT. |
 | UAT | FRS BRD-10 v1.0 is signed off or its open comments are agreed; Compliance has entered the configuration to be used in UAT (thresholds, risk categories, matrices, SLAs) through maker-checker; the system test exit criteria are met; the UAT environment holds masked client data and invented list entries (section 4.1); BDOI testers have user IDs with the roles of section 5 and attended the walkthrough. |
 
@@ -155,14 +155,14 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 | Environment | Use | Data |
 |---|---|---|
 | CI | Automated unit and integration tests on every change | Created by each test; PostgreSQL in a container |
-| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Demo profile seeds, the planned screening seeds V1950-V1952 and the data sets of section 4.2; test mailboxes |
+| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed profile migrations, the planned screening seeds V1950-V1952 and the data sets of section 4.2; test mailboxes |
 | UAT | Acceptance by BDOI testers | Masked copy of production-like client data; invented list entries only; no real client names, TINs, IDs, addresses or e-mail addresses |
 
 Non-production data is always masked. Client names, TINs, government IDs, birth dates, addresses and e-mail addresses are replaced before data is loaded into SIT or UAT. Watchlist data on test environments is invented; the official AML advisory and PEP files are never loaded outside production. Notification e-mails point to test mailboxes.
 
 ## Named data sets
 
-The cases refer to named data sets. Sanction Screening has no demo seed yet; the build design plans V1950 (users and configuration), V1951 (watchlist with invented names) and V1952 (cases in every stage). Until they exist the test lead prepares each set on SIT as its source column says.
+The cases refer to named data sets. Sanction Screening has no seed yet; the build design plans V1950 (users and configuration), V1951 (watchlist with invented names) and V1952 (cases in every stage). Until they exist the test lead prepares each set on SIT as its source column says.
 
 <!-- tp:data -->
 

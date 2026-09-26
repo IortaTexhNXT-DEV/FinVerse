@@ -13,12 +13,12 @@ Requirements baseline: [`BDOI_UAM_BRD_SPEC.md`](../requirements/BDOI_UAM_BRD_SPE
 3. **Four eyes, with a named approver.** The requester chooses the approver (BRD 1.00x "select approver from the drop-down"). The requester, and the user the request is about, can never decide it. Risky changes get a second approval (UAM-NFR-40).
 4. **Structured, insert-only evidence.** Every applied change writes one row per attribute into `sec_access_change_log` (from / to, request number, done by). The row is insert-only, with a database trigger as in V26. The audit report (sample D) and the "added / modified / deactivated / reactivated by" columns (samples A-C) are read from this log. `audit_log` keeps its summaries.
 5. **Directory authentication is a port.** BIBS must authenticate Windows IDs against BDO EUA / AD / LDAP (UAM-NFR-11, 17, 33; Q42). The interface is unknown, so `security` gets a `DirectoryAuthenticator` port with a LOCAL default. The lockout, audit and session behaviour stays identical in both modes. **Update 26-Sep-2026:** BDOI named the identity integrations of Drop 0 (`PROGRAMME_ALIGNMENT.md` section 5): sign-in goes through **EIAM on Microsoft Entra ID** (OpenID Connect redirect, not a password bind) and user provisioning may come from **UIDM-ISC**, BDO's identity governance (IGA) tool. Section 10.1 gives the design; both are open with BDOI IT (IQ04, IQ05; register DCR-229, DCR-230).
-6. **Backward compatible.** Existing request types, the endpoints of BROKING_ARCHITECTURE section 8, the PMADD05 role-permission requests and the demo data keep working. The new permissions are granted in the migration to every role that holds `ACCESS_REQUEST` today.
+6. **Backward compatible.** Existing request types, the endpoints of BROKING_ARCHITECTURE section 8, the PMADD05 role-permission requests and the seed data keep working. The new permissions are granted in the migration to every role that holds `ACCESS_REQUEST` today.
 7. **No money.** User access posts no journal and publishes no accounting event.
 
 ## 2. Modules
 
-| Module | Change | BRD | Depends on (unchanged) | Flyway (demo) |
+| Module | Change | BRD | Depends on (unchanged) | Flyway (seed) |
 |---|---|---|---|---|
 | `security` (built) | `AppUser`: + Windows ID, business unit, user level, password dates, must-change flag, last logout. `Role`: + active, description, privilege level. `sec_access_change_log`, `sec_user_session`, `sec_password_history`. `AuthService`: directory port, logout, session log, password age. `UserAdminService`: change log, role (de)activation, password history, direct-edit guard. `effectivePermissions()` skips inactive roles. User ID pattern | 1.002.1.1.1, 1.003.1.1.2, 3.002.3-4, 4.002.x, 4.003.1; UAM-NFR-11-17, 33-37 | audit, system, common | V1060 (grants, parameters), V1061 (schema) |
 | `nbadmin` (built) | Request lifecycle (DRAFT, RETURNED, CANCELLED, SCHEDULED, FOR_IMPLEMENTATION, IMPLEMENTED), types MODIFY_USER / CREATE_ROLE / DEACTIVATE_ROLE / REACTIVATE_ROLE, user type INTERNAL / EXTERNAL (portal users, section 4.4), chosen approver(s), effective date, history, bulk batches, risk rules and second approval, port `ExternalUserProvisioner`, `UAM_EFFECTIVE_CHANGES` job, four reports, screens | 1.002-1.009, 2.002, 3.002, 3.003, 4.003.1; UAM-NFR-14, 38-41 | security, system, approval, messaging, bulk, report, docgen, lov, alert | V1062 (V1960) |
@@ -37,7 +37,7 @@ security ──► audit, system (parameters), common
 
 ## 3. Flyway allocation
 
-Allocated range: **schema V1060-V1069, demo V1960-V1969**. Three schema versions are used and seven are kept free.
+Allocated range: **schema V1060-V1069, seed V1960-V1969**. Three schema versions are used and seven are kept free.
 
 | Version | Owner (wave) | Content |
 |---|---|---|
@@ -45,7 +45,7 @@ Allocated range: **schema V1060-V1069, demo V1960-V1969**. Three schema versions
 | `V1061__security_user_access_extensions.sql` | U0 | `sec_user` + `windows_id` (unique, nullable), `business_unit_code`, `user_level`, `password_changed_at`, `must_change_password`, `last_logout_at`. `sec_role` + `active` (default true), `description`, `privilege_level` (default STANDARD; SYSADMIN = ADMIN). `sec_password_history`, `sec_user_session`, `sec_access_change_log` + insert-only trigger |
 | `V1062__nbadmin_request_lifecycle.sql` | U1-A | `nba_access_request`: new columns (section 4.2, including the external-user columns of section 4.4); check constraints widened to the new statuses, types and user types. `nba_access_request_event`, `nba_access_request_approver`, `nba_access_request_batch`. `sec_access_change_log.subject_type` check widened to EXTERNAL_USER |
 | `V1063-V1069` | - | Kept free (the EUA adapter configuration and a single-session rule if UQ04 / UQ09 require schema) |
-| `db/demo/V1960__demo_user_access.sql` | U1-A | Users `requestor` (UAM_REQUESTOR), `uamapprover` (UAM_APPROVER), `secapprover` (UAM_SECOND_APPROVER). Requests in every status: draft, pending for `uamapprover`, returned, cancelled, scheduled (future date), approved and applied, a bulk batch of three lines, a CREATE_ROLE request FOR_IMPLEMENTATION for `admin`, a privileged change awaiting second approval. Change-log rows for the applied ones |
+| `db/seed/V1960__seed_user_access.sql` | U1-A | Users `requestor` (UAM_REQUESTOR), `uamapprover` (UAM_APPROVER), `secapprover` (UAM_SECOND_APPROVER). Requests in every status: draft, pending for `uamapprover`, returned, cancelled, scheduled (future date), approved and applied, a bulk batch of three lines, a CREATE_ROLE request FOR_IMPLEMENTATION for `admin`, a privileged change awaiting second approval. Change-log rows for the applied ones |
 
 Rules:
 - V1060 / V1061 run after V790 / V791 (`nba_access_request`), V755 (`sec_permission_action`) and V1000 (`LOGIN_MAX_FAILED_ATTEMPTS`) on a fresh database. V1062 runs after V1061.
@@ -128,9 +128,9 @@ None.
 
 The request endpoints check the type-specific permission, **or** `ACCESS_REQUEST` (compatibility).
 
-### 6.2 Roles (V1060) and demo users (V1960, password `Brokerverse@2026`)
+### 6.2 Roles (V1060) and SIT/UAT users (V1960)
 
-| Role | Persona | Permissions | Demo user |
+| Role | Persona | Permissions | SIT/UAT user |
 |---|---|---|---|
 | `UAM_REQUESTOR` (new) | Requestor | UAM_ENROLL, UAM_MODIFY, UAM_DEACTIVATE, UAM_REACTIVATE, UAM_CORRECT, UAM_CANCEL, UAM_VIEW | `requestor` |
 | `UAM_APPROVER` (new) | Approver | ACCESS_APPROVE, UAM_VIEW, UAM_REPORT_VIEW | `uamapprover` |
@@ -291,19 +291,19 @@ Administration > Users and Roles stay for the System Administrator (implementati
 
 ## 13. Build-wave plan
 
-| Wave | Agent | Scope | Files owned | Exit criteria |
+| Wave | Team | Scope | Files owned | Exit criteria |
 |---|---|---|---|---|
-| **U0** (1 agent, short; **the same foundation agent as S0 of BRD-10**, or run after it) | User access foundation | Permissions, `AuditAction.LOGOUT`, security domain extensions, change log writes, role activation and effective permissions, direct role-edit guard, V1060, V1061, nav section registration (stub), crons, Developer Guide range rows | `security/domain/**`, `security/service/UserAdminService.java`, `security/service/UserDirectory.java`, `security/api/UserAdminController.java`, `security/api/dto/UserRequest.java`, `audit/domain/AuditAction.java`, `V1060`, `V1061`, `navigation/modules.ts`, `help/helpContent.ts`, `features/nbadmin/userAccessModule.ts`, `application.yml`, `docs/operations/CONFIGURATION.md` | `mvn verify` green; existing security and nbadmin tests unchanged, plus tests for inactive roles and the change log |
-| **U1-A** | Request lifecycle and screens | `nbadmin` lifecycle, types, user type EXTERNAL and the `ExternalUserProvisioner` port with its refusing default (committed first, for EB E1-A), approvers, second approval, effective-date job, bulk handler, implementation flow, approval source, frontend User Access screens, admin Users / Roles screen changes, demo V1960 | `nbadmin/domain/**`, `nbadmin/service/Access*`, `nbadmin/service/bulk/**`, `nbadmin/api/Access*`, `V1062`, `db/demo/V1960`, `features/nbadmin/**` (except reports), `features/admin/UsersPage.tsx`, `RolesPage.tsx` | Draft -> submit -> return -> correct -> approve -> applied; scheduled -> applied by the job; group profile -> FOR_IMPLEMENTATION -> implemented; bulk batch of 3 |
+| **U0** (1 team, short; **the same foundation team as S0 of BRD-10**, or run after it) | User access foundation | Permissions, `AuditAction.LOGOUT`, security domain extensions, change log writes, role activation and effective permissions, direct role-edit guard, V1060, V1061, nav section registration (stub), crons, Developer Guide range rows | `security/domain/**`, `security/service/UserAdminService.java`, `security/service/UserDirectory.java`, `security/api/UserAdminController.java`, `security/api/dto/UserRequest.java`, `audit/domain/AuditAction.java`, `V1060`, `V1061`, `navigation/modules.ts`, `help/helpContent.ts`, `features/nbadmin/userAccessModule.ts`, `application.yml`, `docs/operations/CONFIGURATION.md` | `mvn verify` green; existing security and nbadmin tests unchanged, plus tests for inactive roles and the change log |
+| **U1-A** | Request lifecycle and screens | `nbadmin` lifecycle, types, user type EXTERNAL and the `ExternalUserProvisioner` port with its refusing default (committed first, for EB E1-A), approvers, second approval, effective-date job, bulk handler, implementation flow, approval source, frontend User Access screens, admin Users / Roles screen changes, seed V1960 | `nbadmin/domain/**`, `nbadmin/service/Access*`, `nbadmin/service/bulk/**`, `nbadmin/api/Access*`, `V1062`, `db/seed/V1960`, `features/nbadmin/**` (except reports), `features/admin/UsersPage.tsx`, `RolesPage.tsx` | Draft -> submit -> return -> correct -> approve -> applied; scheduled -> applied by the job; group profile -> FOR_IMPLEMENTATION -> implemented; bulk batch of 3 |
 | **U1-B** | Authentication, passwords, sessions, reports | Directory port and LOCAL adapter, logout, session log, `jti`, password history / age / forced change / self-service reset, own profile edit, batch-failure e-mail, the five reports | `security/service/Auth*`, `JwtTokenService.java`, `JwtAuthenticationFilter.java`, `security/service/directory/**`, `security/api/AuthController.java`, `system/service/JobFailureListener.java`, `nbadmin/report/**`, `features/profile/**`, `auth/**`, the sign-in page | Logout audited; the audit report shows from / to; password rules enforced; sessions listed |
 | **U2** | Hardening | E2E, `ApiSmokeIT` entries, update of `BROKING_ARCHITECTURE.md` section 8 (by its owner), fit/gap refresh | tests + docs | Full `mvn verify` / `npm run verify` |
 
 Rules for parallel work:
-- One Flyway file set per agent: U0 V1060 / V1061; U1-A V1062 / V1960.
+- One Flyway file set per team: U0 V1060 / V1061; U1-A V1062 / V1960.
 - `security/domain/**` belongs to U0. After U0 merges, U1-B changes only the security service / api files listed for it.
 - U1-A and U1-B both read `UserAdminService`; any change to it after U0 goes through U1-A.
 - Shared files (the Permission enum, nav, help registry, `application.yml`) are edited **only in U0 / S0**.
-- BRD-10 (Sanction Screening) S0 edits the same shared files, so S0 and U0 are **one agent** or run one after the other.
+- BRD-10 (Sanction Screening) S0 edits the same shared files, so S0 and U0 are **one team** or run one after the other.
 
 ## 14. What depends on information BDOI has not given
 
@@ -322,16 +322,16 @@ Rules for parallel work:
 
 1. **Behaviour change for administrators.** SYSADMIN can no longer edit roles directly. Mitigation: the emergency parameter (audited, alert) and a clear "Implement request" flow; announce it in the release notes.
 2. **Directory authentication unknown.** Mitigation: the port and the LOCAL mode; the Windows ID is captured now, so the switch is a configuration change.
-3. **Shared security files.** The two BRD foundations and the Collections / Accounting build agents touch `Permission.java`. Mitigation: one foundation agent, additive changes only, merge early.
+3. **Shared security files.** The two BRD foundations and the Collections / Accounting build teams touch `Permission.java`. Mitigation: one foundation team, additive changes only, deliver early.
 4. **Inactive roles.** A deactivated role could remove rights from active users by surprise. Mitigation: the request shows the members affected, and UQ16 decides whether deactivation is blocked while the role has members.
 
 ## 16. U0 foundation: as built
 
-What the U0 wave built (together with S0 of BRD-10, one foundation agent), and where it differs from or details the
+What the U0 wave built (together with S0 of BRD-10, one foundation team), and where it differs from or details the
 sections above. U1-A and U1-B build on this.
 
 - **Existing behaviour kept by default.** Every designed behaviour change is behind its parameter with today's
-  behaviour as the seed, until BDOI answers and U1-A delivers the implementation flow:
+  behaviour as the seed data, until BDOI answers and U1-A delivers the implementation flow:
   - `UAM_DIRECT_ROLE_EDIT` = **true**: the Roles screen still creates and edits roles directly. Each such edit is
     audited ("Role created / changed directly (emergency path UAM_DIRECT_ROLE_EDIT)") and raises the alert
     `UAM_DIRECT_ROLE_EDIT` (one live alert per role). With false, `POST /admin/roles` and `PUT /admin/roles/{id}` are
@@ -398,7 +398,7 @@ sections above. U1-A and U1-B build on this.
   screens, which stay in Broking Setup until U1-A moves them (old routes redirect).
 - **Jobs.** `brokerverse.jobs.uam-effective-changes-cron` `0 5 16 * * *` (00:05 PHT) and
   `password-expiry-notice-cron` `0 0 22 * * *` (06:00 PHT) in `application.yml` and `CONFIGURATION.md`.
-- **Flyway left to the build waves.** U1-A V1062 and demo V1960; V1063-V1069 and V1961-V1969 free.
+- **Flyway left to the build waves.** U1-A V1062 and seed V1960; V1063-V1069 and V1961-V1969 free.
 
 ## 17. U1-A request lifecycle and screens: as built
 
@@ -451,9 +451,9 @@ What wave U1-A built on the U0 foundation, and where it differs from or details 
   Broking Setup routes redirect. Administration > Users: Windows ID, business unit, user level, status filter,
   "Raise Request" (direct create / edit only while `UAM_DIRECT_ROLE_EDIT` is open); Roles & Permissions: privilege
   level, active flag, "Approved Requests to Implement", read-only matrix unless the emergency path is open.
-- **Demo `V1960__demo_user_access.sql`.** Users `requestor`, `uamapprover`, `secapprover` and subject users
-  a013000101-104; requests AR-DEMO-000001-000008 in every status and the batch BLK-DEMO-000001 of three lines; change
-  log rows of the applied enrolment. It opens `UAM_WORKING_HOURS` to the whole week in the demo and test database
+- **Seed `V1960__seed_user_access.sql`.** Users `requestor`, `uamapprover`, `secapprover` and subject users
+  a013000101-104; requests AR-2026-900001 to 900008 in every status and the batch BLK-2026-900001 of three lines; change
+  log rows of the applied enrolment. It opens `UAM_WORKING_HOURS` to the whole week in the seed and test database
   (the automated tests run at any hour); the delivered value stays 08:00-18:00,MON-FRI in V1060.
 - **Parked / not built.** A scheduled enrolment creates the user with a password that is never shown: the System
   Administrator resets it (the self-service reset is U1-B). Business unit and user level codes are not checked against
@@ -467,7 +467,7 @@ What wave U1-B built on U0 and U1-A, and where it differs from or details sectio
 - **Migration `V1063__security_sign_in_and_passwords.sql`.** `sec_user.mobile_no` (UQ17); `sec_password_reset_token`
   (SHA-256 of the token only, `expires_at`, `used_at`); notification event `PASSWORD_EXPIRY_NOTICE` (sort 670);
   `REPORT_VIEW` for every role holding `UAM_REPORT_VIEW` (UAM_APPROVER had none, so it could not reach the report
-  runner). No demo migration.
+  runner). No seed migration.
 - **Directory port (FR-UA-003; D6).** `security.service.directory`: `DirectoryAuthenticator` (`mode()`,
   `authenticate(userId, char[] password)` returning `DirectoryResult` SUCCESS / INVALID / LOCKED / ERROR with the
   directory's message), the LOCAL adapter `LocalPasswordAuthenticator` (the Spring authentication manager, BCrypt),
@@ -483,7 +483,7 @@ What wave U1-B built on U0 and U1-A, and where it differs from or details sectio
   `PASSWORD_MANAGED_BY_DIRECTORY`). `AuthPasswordService`: own change (`POST /auth/change-password` now goes here;
   `UserAdminService.changeOwnPassword` is left unchanged and unused by the API), the password status, the reset link
   and the expiring passwords. `LoginResponse` + `mustChangePassword`, `passwordChangeReason` (RESET after creation or
-  an administrator reset, EXPIRED past the maximum age; a password without a change date never expires, so the demo
+  an administrator reset, EXPIRED past the maximum age; a password without a change date never expires, so the seed
   users are not forced). The web client shows the forced change before the home page. Passwords set before V1061
   have no `password_changed_at` and never expire until changed once.
 - **"Forgot password?"** `POST /auth/password-reset/request` `{userId}` (202 for every user ID; LOCAL mode, enabled

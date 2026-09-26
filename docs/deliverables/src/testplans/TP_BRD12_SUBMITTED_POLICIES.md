@@ -131,7 +131,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | Submitted Policies is built and deployed on SIT with its roles, user scopes, parameters, lists, jobs and demo rule sets; the planned demo seeds V1970 to V1972 are loaded; CI is green on the deployed commit; the automated tests of the module exist and pass; screen labels and messages have been compared with this plan and differences recorded; the test mailboxes receive mail. |
+| System test | Submitted Policies is built and deployed on SIT with its roles, user scopes, parameters, lists, jobs and seed rule sets; the planned seeds V1970 to V1972 are loaded; CI is green on the deployed commit; the automated tests of the module exist and pass; screen labels and messages have been compared with this plan and differences recorded; the test mailboxes receive mail. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical defect; the Renewal module (or its pending hand-off adapter) is deployed; Collections and Cashiering run on SIT for the handling-fee cases. |
 | UAT | FRS BRD-12 v1.0 is signed off or its open comments are agreed; the answers to SP SQ04 to SQ08 are applied as rule sets, matrices and templates; the system test exit criteria are met; the UAT environment holds masked masterlists (section 4.1); BDOI testers have user IDs with the roles and scopes of section 5 and attended the walkthrough. |
 
@@ -154,14 +154,14 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 | Environment | Use | Data |
 |---|---|---|
 | CI | Automated unit and integration tests on every change | Created by each test; PostgreSQL in a container |
-| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Demo profile seeds, the planned seeds V1970-V1972 and the data sets of section 4.2; test mailboxes |
+| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed profile migrations, the planned seeds V1970-V1972 and the data sets of section 4.2; test mailboxes |
 | UAT | Acceptance by BDOI testers | Masked copies of the segment masterlists and of a LAMD snapshot; no real borrower names, PNs, CIFs, addresses or e-mail addresses |
 
 Non-production data is always masked. Borrower and assured names, PN and loan numbers, CIFs, addresses, e-mail addresses and phone numbers are replaced before data is loaded into SIT or UAT. Bank counterpart, client and insurer e-mail addresses point to test mailboxes, so no letter, IAAF or hold cover request can reach a real party.
 
 ## Named data sets
 
-The cases refer to named data sets. Submitted Policies has no demo seed yet; the build design plans V1970 (users and rules), V1971 (masterlist and LAMD snapshot) and V1972 (reviews, TOR, letters and handling fees). Until they exist the test lead prepares each set on SIT as its source column says.
+The cases refer to named data sets. Submitted Policies has no seed yet; the build design plans V1970 (users and rules), V1971 (masterlist and LAMD snapshot) and V1972 (reviews, TOR, letters and handling fees). Until they exist the test lead prepares each set on SIT as its source column says.
 
 <!-- tp:data -->
 

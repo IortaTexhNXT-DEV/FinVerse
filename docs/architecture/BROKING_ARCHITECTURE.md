@@ -30,7 +30,7 @@ BDOI is an **insurance broker**. Insurers issue the policies.
 Each module is a top-level package under `com.iortatechnxt.brokerverse`, with the usual
 `domain` / `service` / `api` layout. An arrow means "depends on". Cycles are forbidden.
 
-| Module | Owner wave | Purpose | Depends on | Flyway (demo) |
+| Module | Owner wave | Purpose | Depends on | Flyway (seed) |
 |---|---|---|---|---|
 | `lov` | W1 | Lists of values: type, code, label, effectivity, maker-checker (BRNB.083) | common, audit, approval | V750 (V980) |
 | `workflow` | W1 | Stage/transition engine, work cases, status history, queues, assignment, SLA (BRNB.022/080/096/115) | security, messaging | V751 (V980) |
@@ -122,7 +122,7 @@ Business modules never call "upward". The rules for callbacks between modules ar
   `bibs.messaging.notification-requested.v1` and the e-mail dispatch consumer delivers it; the job
   stays the safety net ([`PLATFORM_CACHE_AND_EVENTS.md`](PLATFORM_CACHE_AND_EVENTS.md)).
 - The transport is the `MailTransport` port. By default it is SMTP when `brokerverse.mail.enabled`
-  is set; otherwise messages are recorded as `SENT (simulated)`, so demos and tests never send
+  is set; otherwise messages are recorded as `SENT (simulated)`, so seeds and tests never send
   e-mail.
 - Every attempt is logged with recipient, time, subject and attachment SHA-256 (BRNB.008 send log).
   The outcome (sent or failed, with the reason) is readable per entity, for the dispatch reports.
@@ -215,12 +215,12 @@ endpoint is rate limited per client address (HTTP 429). The permissions of each 
 (`security-role-permissions`) and the cache is cleared by any role change. See
 [`PLATFORM_CACHE_AND_EVENTS.md`](PLATFORM_CACHE_AND_EVENTS.md) §2.3.
 
-Demo users (V980; password `Brokerverse@2026`):
+SIT/UAT users (V980):
 
 | User | Role |
 |---|---|
 | `ao` | MKT_AO |
-| `ao2` | MKT_AO (second maker for four-eyes demos) |
+| `ao2` | MKT_AO (second maker for four-eyes seeds) |
 | `mkttl` | MKT_TL |
 | `tsu`, `tsulead` | TSU |
 | `proc` | PROCESSOR |
@@ -329,8 +329,8 @@ build the external interface itself.
 | OCR / data extraction from documents | Q24 | `issuance` extraction port with a manual review screen |
 | BDO SSO / Active Directory | Q42 (answered by BRD-11: directory sign-in required) | existing JWT login. Planned (USER_ACCESS_DESIGN section 10): `security` port `DirectoryAuthenticator` with `AUTH_MODE` LOCAL / DIRECTORY and the Windows ID on the user; the BDO EUA / LDAP / SSO adapter stays parked until BDO supplies the interface (UQ04), so local sign-in stays. Built so far (U0): parameter `AUTH_MODE` = LOCAL (V1060) and `sec_user.windows_id` (V1061); the port itself comes with U1-B |
 | Product matrix content | Q01, Q02 | minimum-field, document and TSU rule tables configurable (`catalog`); seeds are defaults |
-| Incentive rules | Q33 | `bkg_incentive_rule` table and setup screen; empty in production, one demo rule (V988). A match sets the incentive flag on the invoice |
-| Real GL accounts of the booking event | OQ07 | event type `BROKER_BOOKING` and its components in V870; the rule lines and GL accounts 1210 / 1220 / 2210 / 2220 / 2221 / 4101 exist only in the demo data (V988). Production configures them in Accounting Rules |
+| Incentive rules | Q33 | `bkg_incentive_rule` table and setup screen; empty in production, one seed rule (V988). A match sets the incentive flag on the invoice |
+| Real GL accounts of the booking event | OQ07 | event type `BROKER_BOOKING` and its components in V870; the rule lines and GL accounts 1210 / 1220 / 2210 / 2220 / 2221 / 4101 exist only in the seed data (V988). Production configures them in Accounting Rules |
 | BIR CAS / e-invoicing of service invoices | - | `ServiceInvoiceService.issue` is the seam: numbers, stored PDF and dispatch are local; no transmission to BIR |
 | BDO KYC standard fields | Q16 | configurable KYC checklist |
 | Data ownership register | Q37 | not started |
@@ -344,7 +344,7 @@ build the external interface itself.
 | Forced password change at first sign-in | - | temporary password shown once to the approver; user changes it on My Profile. The flag `sec_user.must_change_password` is set on creation and admin reset (U0, V1061); its enforcement at sign-in is U1-B |
 | TSU routing thresholds | Q04 | `cat_tsu_rule` seeds (non-package, fleet of 5, TSI above 50M) until BDOI confirms |
 | Nominated document naming | Q23 | `<REFERENCE>_<DOCTYPE>_<n>` (`DocumentNamingService.SYNTAX`); named patterns `NamingPattern.DEFAULT` / `SCREENING` (`<FORM_TYPE>_<CLIENT_NAME>_<yyyyMMdd>_<DOCTYPE>_<n>`, SNSRP-601) |
-| Sales organisation and cost centers | Q34, Q41 | `cat_sales_unit` / `cat_sales_officer` tables; demo units only |
+| Sales organisation and cost centers | Q34, Q41 | `cat_sales_unit` / `cat_sales_officer` tables; seed units only |
 | Motor OD factors and BI / PD tables | Q35 | `cat_rate` MOTOR_OD_* and `cat_motor_limit` hold sample values |
 | Premium tax base | Q43 | `cat_rate` PREMIUM_TAX per line (PROPERTY 12%) |
 | Multi-level Marketing approval of a PRF (TL -> TH -> UH) and of quotations | Q05 | one approval stage per document; the approver permission (`PROPOSAL_APPROVE`, `QUOTE_APPROVE`) decides who approves |
@@ -354,7 +354,7 @@ build the external interface itself.
 ## 7. CRM (`crm`): clients
 
 Requirements: BRNB.029, 030, 032, 046-049, 065, 090, 091, 099, 101, 110 (legacy BRD 1.1.5, 1.1.6,
-2.1.5-2.1.7, 1.3.3). Migrations V800 (core), V801; demo V981.
+2.1.5-2.1.7, 1.3.3). Migrations V800 (core), V801; seed V981.
 
 - **Client master.** `Client` holds individuals and corporates with identity (TIN, ID type and
   number), contact and address, market segment, BDO bank client flag and CIF, and a KYC profile
@@ -415,7 +415,7 @@ Screens (section Clients): Clients, New Client, KYC Reviews Due, client page (he
 badges, actions by permission, `WorkflowPanel`, tabs Details / KYC & Documents / Tags &
 Instructions / Linked Records / History).
 
-Demo (V981): 12 clients of company FVI: six confirmed (with authorized parties
+Seed (V981): 12 clients of company FVI: six confirmed (with authorized parties
 `CL-2026-000001..006`; `CL-2026-000002` has an expired KYC), one prospect in KYC review
 (`PR-2026-000007`, for `mkttl` to verify), one verified prospect (`PR-2026-000008`, to confirm),
 three prospects, one dormant since 2019 (`PR-2026-000011`) and one inactive client since 2020
@@ -477,13 +477,13 @@ ACTIVE rows. Rates are effective-dated, and the row in force on the period start
 | `cat_product` | features: package, fleet, market segments, mortgage, direct payment, multi-year and maximum term, FFY, payment gate (PAID / CLIENT_CONFIRMATION), default rate, commission and minimum premium, package TSI limit, TSU involvement | Annex I codes, MTR / PAR packages (TSI limits PAR 20M, MTR 5M) |
 | `cat_field_rule` | minimum-field matrix: scope ALL (`*`) / LINE / PRODUCT, target ACCOUNT / ITEM, field key (`a\|b` = one of) | defaults per line |
 | `cat_document_rule` | documents required before submission | MOTOR → IDF, PERSONAL_ACCIDENT → VALID_ID |
-| `cat_insurer`, `cat_insurer_branch` | insurer panel: party (type INSURER), accreditation, placement channel and e-mails, credit days; branches with LGT rate | demo V982 |
-| `cat_commission_rate` | commission per insurer × product (product blank = all products), effective-dated | demo V982 |
+| `cat_insurer`, `cat_insurer_branch` | insurer panel: party (type INSURER), accreditation, placement channel and e-mails, credit days; branches with LGT rate | seed V982 |
+| `cat_commission_rate` | commission per insurer × product (product blank = all products), effective-dated | seed V982 |
 | `cat_rate` | DST, premium tax, VAT on premium, fire service tax, VAT on commission, motor OD factors; line blank = all lines | DST 12.5, VAT 12 (PROPERTY 0), PTX PROPERTY 12, FST PROPERTY 2, OD 90 / 81 |
 | `cat_short_period_rate` | % of annual premium by months covered | 1-12 months: 20 … 100 |
 | `cat_motor_limit` | BI / PD limit premiums | sample tables |
 | `cat_tsu_rule` | TSU routing criteria: product class, line, fleet units, locations, TSI above, endorsement type, priority | NON_PACKAGE, FLEET_5, TSI_50M |
-| `cat_sales_unit`, `cat_sales_officer` | region → department → team with cost center (inherited), officers per team | demo V982 |
+| `cat_sales_unit`, `cat_sales_officer` | region → department → team with cost center (inherited), officers per team | seed V982 |
 
 Contracts for other modules:
 
@@ -648,7 +648,7 @@ Screens (sidebar **Accounts & Placement**):
 ## 11. Quotations (`quotation`, W3)
 
 Package quotations from request to accounts. Requirements: BRNB.004, 013-015, 020-024, 028,
-041-045, 063, 102 and MKTID.011 (Operations BRD). Migration V830; demo V984.
+041-045, 063, 102 and MKTID.011 (Operations BRD). Migration V830; seed V984.
 
 Tables (V830):
 
@@ -770,7 +770,7 @@ Parked:
 - Multi-level approval beyond one stage (Q05): one `approve` stage with permission `QUOTE_APPROVE`.
 - The "quotation required" endorsement link (ADJID.008) waits for the Operations wave.
 
-Demo (V984): eight quotations of the V981 clients, `QT-2026-900001..008` with ARNs
+Seed (V984): eight quotations of the V981 clients, `QT-2026-900001..008` with ARNs
 `ARN-2026-930001..008`:
 
 - a draft answering request `REQ-2026-900001`;
@@ -787,7 +787,7 @@ Two more requests wait in the inbox.
 ## 12. Non-package proposals (`nonpackage`, W3)
 
 Proposal Request Forms (PRF) priced by TSU with the insurers. Requirements: BRNB.005-010, 013,
-014, 017 and 098 (consumed), and BRD 2.2. Migration V840; demo V985.
+014, 017 and 098 (consumed), and BRD 2.2. Migration V840; seed V985.
 
 Tables (V840):
 
@@ -861,7 +861,7 @@ Screens (sidebar **Non-Package Management**, group Client & Policy):
 - PRF page: tabs Details, Quotation Slip, Insurer Responses (editable grid), Comparative Table,
   Proposal Slip, Documents, E-mails and History.
 
-Demo (V985): five PRFs of the V981 clients, `PRF-2026-900001..005` with ARNs
+Seed (V985): five PRFs of the V981 clients, `PRF-2026-900001..005` with ARNs
 `ARN-2026-920001..005`:
 
 - a draft;
@@ -978,7 +978,7 @@ Screens (sidebar **Placement & Booking**):
 - Account placement page: gate, slip, hold cover and returns.
 - The Placement tab on the account detail page (`PlacementPanel`, mounted with a marked comment).
 
-Demo data (V986):
+Seed data (V986):
 
 - Accounts `ARN-2026-910001` to `910008`.
 - Billing batch `BILL-2026-900001` (closed, with the matched CLPC report `PMT-2026-900001`) and
@@ -1061,7 +1061,7 @@ Screens (sidebar **Policy Issuance**):
 - Dispatch, with the dispatch report.
 - The Policy tab on the account detail page (`PolicyPanel`).
 
-Demo data (V987): three accounts POLICY_ISSUED with confirmed e-policies, one e-policy in review,
+Seed data (V987): three accounts POLICY_ISSUED with confirmed e-policies, one e-policy in review,
 `IA-2026-900001` and `900002` for the mortgaged accounts, and one account dispatched (messaging
 log).
 
@@ -1073,7 +1073,7 @@ Parked:
 ## 15. Booking (`booking`, W3)
 
 Booking turns an issued account (or one flagged for direct booking) into booked invoices with their
-accounting. It covers BRNB.027/036/038/061/076/081/094/100/107/108/111/112. Flyway V870, demo V988.
+accounting. It covers BRNB.027/036/038/061/076/081/094/100/107/108/111/112. Flyway V870, seed V988.
 
 ### 11.1 Booking an account
 
@@ -1231,18 +1231,18 @@ Permissions: `BOOKING_PROCESS` or `BOOKING_ADJUST` to view, `BOOKING_PROCESS` to
 - **Booking Setup**: auto-book rules, incentive rules and service invoice types.
 - **Upload Bookings**: `/bulk/BOOKING_UPLOAD`.
 
-### 11.8 Demo (V988 and `BookingDemoData`)
+### 11.8 Seed (V988 and `BookingSeedData`)
 
-- Demo GL accounts, `BROKER_BOOKING` rule lines, one incentive rule and one auto-book rule.
+- Seed GL accounts, `BROKER_BOOKING` rule lines, one incentive rule and one auto-book rule.
 - Seven issued accounts, `ARN-2026-940001` to `940007`. They include a direct payment account, a
   co-insured account (CGL01, bank segment), a multi-year account (3 years) and one queued `AUTO`.
-- On start-up, `BookingDemoData` books 940001–940004. It posts a positive endorsement on 940001 and
+- On start-up, `BookingSeedData` books 940001–940004. It posts a positive endorsement on 940001 and
   a partial cancellation on 940002.
 
 ## 16. New Business reports and dashboard (`nbreport`, W4)
 
 Requirements: BRNB.011, 012, 031, 037, 057, 075, 078, 115 (and the registers of BRNB.027/100).
-Migration V880; demo V989.
+Migration V880; seed V989.
 
 The module reads the broking tables with constant SQL aggregates (`NbReportJdbc`, named bind
 parameters, the pattern of the executive dashboard). It calls no broking service, so it adds no
@@ -1320,9 +1320,9 @@ MASTER_VIEW), `PUT targets?companyId=` (MASTER_MAINTAIN). The reports run throug
 | Item | Question | Seam |
 |---|---|---|
 | Dynamic report builder | Q40 | saved report variants only |
-| Sales hierarchy and target values | Q41 | `nbr_sales_target` with demo targets (V989); maintained on Production Targets |
+| Sales hierarchy and target values | Q41 | `nbr_sales_target` with seed targets (V989); maintained on Production Targets |
 | Late renewal requests report (BRNB.018) | Q09 (still open after BRD-6) | not built. The Renewal BRD has no such report; proposal: a variant of the Renewal listing `RNW-LISTING` (renewal booked after expiry) once BDOI confirms (RQ29) |
 
-Demo (V989): the demo company becomes "BDOI Demo Insurance Brokers, Inc." (code FVI kept), monthly
+Seed (V989): the seed company becomes "BDO Insurance and Reinsurance Brokers, Inc." (code FVI kept), monthly
 2026 targets for every unit of the V982 sales organisation and a shared variant "SLA breaches - all
 stages" of the Account Status Report.

@@ -95,45 +95,45 @@ screens:
 
 data:
   - id: TD-NB-01
-    name: Demo users and roles
-    content: ao and ao2 (MKT_AO), mkttl (MKT_TL), tsu and tsulead (TSU; two officers for four-eyes), proc (PROCESSOR), proctl (PROCESSING_TL), approver (NB_APPROVER), epol (EPOLICY_SENDER), adjust (ADJUSTMENT), badmin (BUSINESS_ADMIN), admin (SYSADMIN), auditor (AUDITOR). The demo password is issued by the test lead.
-    source: Demo seeds V980 (broking users), V900 (admin, auditor); roles and grants V750
+    name: SIT/UAT users and roles
+    content: ao and ao2 (MKT_AO), mkttl (MKT_TL), tsu and tsulead (TSU; two officers for four-eyes), proc (PROCESSOR), proctl (PROCESSING_TL), approver (NB_APPROVER), epol (EPOLICY_SENDER), adjust (ADJUSTMENT), badmin (BUSINESS_ADMIN), admin (SYSADMIN), auditor (AUDITOR). The SIT/UAT password is issued by the test lead.
+    source: Seeds V980 (broking users), V900 (admin, auditor); roles and grants V750
   - id: TD-NB-02
-    name: Demo clients
+    name: Seed clients
     content: Confirmed clients CL-2026-000001 Santos, Maria Clara Reyes (VIP, e-mail-only instruction), CL-2026-000003 Pacific Harbor Logistics Inc. (VIP, quarterly billing instruction), CL-2026-000004 Luzon Agri-Industrial Corp., CL-2026-000005 Garcia, Antonio Luis Dizon; prospects PR-2026-000007 to 000011 (Bayside Builders Co. is PR-2026-000008); inactive PR-2026-000012; one client with an overdue KYC review
-    source: Demo seed V981
+    source: Seed V981
   - id: TD-NB-03
     name: Catalogue, insurers and TSU rules
     content: Products MTR08, MTR10, MTR15, MTR22 (Motor), CTP01 (CTPL), PAR01, PAR08, PAR13 (Property), CGL01 (Liability), CAR00, CAR11 (Engineering), EEI01, MOP05, PA001; insurers INS-MGIC, INS-LAC, INS-VMI, INS-MPI with branches, LGT and placement e-mail addresses; TSU rules NON_PACKAGE, FLEET_5, TSI_50M
-    source: Demo seed V982 (catalogue, insurers, sales organisation); rates V811
+    source: Seed V982 (catalogue, insurers, sales organisation); rates V811
   - id: TD-NB-04
-    name: Demo quotations and requests
+    name: Seed quotations and requests
     content: QT-2026-900001 DRAFT (MTR10), 900002 FOR_REVIEW (MTR10, maker ao), 900003 APPROVED (PAR01), 900004 SENT_TO_CLIENT (PAR08), 900005 ACCEPTED (MTR22, direct payment), 900006 CONVERTED (CGL01), 900007 NOT_PROCEEDED, 900008 DRAFT revised to version 2; requests REQ-2026-9000nn (two in the inbox)
-    source: Demo seed V984
+    source: Seed V984
   - id: TD-NB-05
-    name: Demo proposal requests (PRF)
+    name: Seed proposal requests (PRF)
     content: PRF-2026-900001 DRAFT (CAR00, Pacific Harbor), 900002 FOR_MKT_APPROVAL (EEI01), 900003 WITH_TSU (CAR00, Bayside Builders), 900004 TERMS_RECEIVED with three responses (two terms, one declined) and its comparative table, 900005 ACCEPTED (EPF05)
-    source: Demo seed V985
+    source: Seed V985
   - id: TD-NB-06
-    name: Demo accounts
+    name: Seed accounts
     content: ARN-2026-900001 DRAFT (MTR10), 900002 and 900003 SUBMITTED, 900004 and 900013 RETURNED_TO_MARKETING, 900005 and 900012 AWAITING_PAYMENT, 900006, 900007, 900010 and 900014 READY_FOR_PLACEMENT, 900008 and 900011 DRAFT, 900009 SUBMITTED (CAR11), 900015 VOIDED
-    source: Demo seed V983
+    source: Seed V983
   - id: TD-NB-07
-    name: Demo placement and billing
+    name: Seed placement and billing
     content: ARN-2026-910001 to 910005 PLACED on slips PL-2026-900001 to 900004 (910001 hold cover confirmed, 910003 hold cover requested and expiring), 910006 and 910007 AWAITING_PAYMENT, 910008 RETURNED_BY_INSURER; billing batches BILL-2026-900001 (closed) and 900002 (generated); payment reports PMT-2026-900001 to 900003 (900003 under review with two unmatched lines)
-    source: Demo seed V986
+    source: Seed V986
   - id: TD-NB-08
-    name: Demo issuance
+    name: Seed issuance
     content: E-policies of ARN-2026-910002, 910004 and 910005 CONFIRMED; 910003 in REVIEW; Insurance Advices IA-2026-900001 and 900002; e-policy of 910005 dispatched
-    source: Demo seed V987
+    source: Seed V987
   - id: TD-NB-09
-    name: Demo booking
-    content: Seven accounts of CL-2026-000001 to 000006 in POLICY_ISSUED; four booked at start-up with one positive endorsement and one partial cancellation; one queued by the demo auto-book rule (PAR08 CBG); two ready to book, one of them multi-year
-    source: Demo seed V988 and the booking demo seeder
+    name: Seed booking
+    content: Seven accounts of CL-2026-000001 to 000006 in POLICY_ISSUED; four booked at start-up with one positive endorsement and one partial cancellation; one queued by the seed auto-book rule (PAR08 CBG); two ready to book, one of them multi-year
+    source: Seed V988 and the booking seed seeder
   - id: TD-NB-10
     name: Report targets and variants
     content: 2026 monthly production targets per region, department, team and AO; one shared variant of the Account Status Report
-    source: Demo seed V989
+    source: Seed V989
   - id: TD-NB-11
     name: Bulk upload files
     content: Files built from the template downloaded in each upload wizard - CLIENT_CREATE (50 rows, 5 existing codes, 1 invalid mobile), QUOTATION_CREATE (30 PAR01 rows), ACCOUNT_CREATE (200 CBG Fire rows with 3 duplicates), FFY_TAGGING, QUOTATION_ACCEPTANCE, BOOKING_UPLOAD; one file with a column removed; one empty file
@@ -145,7 +145,7 @@ data:
   - id: TD-NB-13
     name: E-policy and payment report files
     content: Text e-policy PDFs named by ARN for the placed accounts; a 3-year e-policy with three policy numbers; CLPC payment report (.xlsx) for BILL-2026-900002 with paid and unpaid lines; reference payment report by ARN with one unknown ARN
-    source: Prepared by the test lead in the layouts of the demo files (PlacementFilesTest, EpolicyPdf)
+    source: Prepared by the test lead in the layouts of the seed files (PlacementFilesTest, EpolicyPdf)
   - id: TD-NB-14
     name: New records keyed in the test
     content: Individual prospect "Dela Cruz, Juan Test" (born 12-Mar-1990, TIN 123-456-789-000, mobile 09171234567); corporate prospect "UAT Trading Corp."; Motor item Toyota Vios 2024, plate UAT1234, engine 2NZUAT001, chassis MHFUAT0000000001, value PHP 1,100,000
@@ -155,11 +155,11 @@ scenarios:
   - id: SC-NB-01
     persona: SYSADMIN
     title: Access and administration. Users log in with their role profile and use several tabs; lists of values, access requests and roles change only through maker-checker; the audit log and the retention review are read only.
-    pre: Demo users of TD-NB-01; a second approver available.
+    pre: SIT/UAT users of TD-NB-01; a second approver available.
   - id: SC-NB-02
     persona: BUSINESS_ADMIN
     title: Product rules and common controls. Every product line runs on one workflow with its own fields and validations; TSU routing, stages, queues, void, document protection, approvals before sending, notifications, audit, documents and bulk uploads work the same for every record.
-    pre: Catalogue TD-NB-03; demo records TD-NB-04 to TD-NB-06.
+    pre: Catalogue TD-NB-03; seed records TD-NB-04 to TD-NB-06.
   - id: SC-NB-03
     persona: MKT_AO
     title: Client onboarding. The AO finds or creates a client, avoids duplicates, uploads KYC documents; the TL verifies the KYC and the client is confirmed; tags, instructions, the client 360 view and the KYC review list support servicing.
@@ -191,7 +191,7 @@ scenarios:
   - id: SC-NB-10
     persona: MKT_TL
     title: Monitoring. The NB dashboard, placement update and operational reports show the state of every record; reports print, download in every format and are saved as variants.
-    pre: All demo data; targets and variant TD-NB-10.
+    pre: All seed data; targets and variant TD-NB-10.
 
 frs:
   FR-NB-001:
@@ -1066,7 +1066,7 @@ frs:
         steps:
           - Open CL-2026-000003 Pacific Harbor Logistics Inc.; Linked Records tab.
         expected: The CGL01, MOP05, CAR11, EEI01 and INL01 accounts and the CGL01 quotation are listed with their stages.
-        auto: CrmAdminApiIT#demoDataShowsTheClientBannerDuplicatesAndOverdueKyc
+        auto: CrmAdminApiIT#seedDataShowsTheClientBannerDuplicatesAndOverdueKyc
       - c: 3
         type: Security-access
         persona: BUSINESS_ADMIN
@@ -1392,12 +1392,12 @@ frs:
         steps:
           - Open CL-2026-000001; Linked Records, Quotation and Confirmed Proposals tabs.
         expected: The quotations, accounts and booked invoices of the client are listed, each opening its record.
-        auto: CrmAdminApiIT#demoDataShowsTheClientBannerDuplicatesAndOverdueKyc
+        auto: CrmAdminApiIT#seedDataShowsTheClientBannerDuplicatesAndOverdueKyc
       - c: 2
         type: Negative
         title: Client with an overdue KYC review
         steps:
-          - Open the demo client whose KYC review date has passed.
+          - Open the seed client whose KYC review date has passed.
         expected: The banner shows "KYC expired" next to the client name.
         auto: KycReviewIT#overdueKycExpiresIsListedAndReviewedAgain
 
@@ -1780,7 +1780,7 @@ frs:
         type: Positive
         title: One ARN from quotation to invoice
         steps:
-          - Open QT-2026-900006; follow its account; open the account's slip and invoice (or a booked demo account and its quotation).
+          - Open QT-2026-900006; follow its account; open the account's slip and invoice (or a booked seed account and its quotation).
         expected: The same ARN is shown on the quotation, account, placement slip and invoice.
         auto: AccountIT#arnFromAQuotationIsKeptAndPremiumTaken
       - c: 1
@@ -2077,7 +2077,7 @@ frs:
         steps:
           - Download comparative.xlsx and comparative.pdf.
         expected: Both files contain the same rows and values as the screen.
-        auto: QuotationProposalApiIT#demoProposalReadsAndTsuEndpoints
+        auto: QuotationProposalApiIT#seedProposalReadsAndTsuEndpoints
       - c: 2
         type: Security-access
         persona: MKT_AO
@@ -2086,7 +2086,7 @@ frs:
           - As ao open PRF-2026-900004; call PUT on a response.
         expected: The table is shown read only; the call returns HTTP 403.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
-        auto: QuotationProposalApiIT#demoProposalReadsAndTsuEndpoints
+        auto: QuotationProposalApiIT#seedProposalReadsAndTsuEndpoints
 
   FR-NB-056:
     scenario: SC-NB-05
@@ -3339,7 +3339,7 @@ frs:
         type: Workflow
         title: Book an issued account
         steps:
-          - Booking Workbench, Ready to Book; open a demo account ready to book; enter booking date today and the cost center; click Book.
+          - Booking Workbench, Ready to Book; open a seed account ready to book; enter booking date today and the cost center; click Book.
         expected: The Booked Invoice opens with the invoice number, premium components and commission; the journal is balanced; a service invoice INSURER_COMMISSION is issued; the account is BOOKED.
         auto: BookingServiceIT#bookingPostsBalancedJournalOpenItemsServiceInvoiceAndEvent; BookingApiIT#anAccountIsPreviewedBookedAndReadBack
       - c: 2
@@ -3425,7 +3425,7 @@ frs:
         title: Evening job books the queue
         steps:
           - Run job BOOKING_BATCH; open Batch Runs.
-        expected: The queued demo account is booked by the run.
+        expected: The queued seed account is booked by the run.
         auto: BookingBatchIT#theEndOfDayJobBooksTheQueueAndStartedMultiYearPolicyYears
 
   FR-NB-112:
@@ -3499,7 +3499,7 @@ frs:
         type: Workflow
         title: Book a 3-year account
         steps:
-          - Book the demo multi-year account; open Invoices of the Account.
+          - Book the seed multi-year account; open Invoices of the Account.
         expected: Three invoices NB, NB-Y2, NB-Y3 with three policy numbers; year 1 booked, years 2 and 3 scheduled.
         auto: BookingBatchIT#theEndOfDayJobBooksTheQueueAndStartedMultiYearPolicyYears
       - c: 2
@@ -3684,7 +3684,7 @@ frs:
         type: Positive
         title: Incentive indicator on the invoice
         steps:
-          - Book an account on a Motor package covered by CPC2 (demo); open the invoice and the Booked Accounts Register.
+          - Book an account on a Motor package covered by CPC2 (seed); open the invoice and the Booked Accounts Register.
         expected: Incentive = Yes with code CPC2; the field is read only.
         auto: IncentiveCriteriaIT#bookingStampsTheMatchedCriteriaCodes
       - c: 1
@@ -4301,7 +4301,7 @@ access:
     allow: [TSU]
     deny: [MKT_AO, MKT_TL, PROCESSOR]
     denied: The TSU Workbench is not in the menu; slip and response calls return HTTP 403.
-    auto: QuotationProposalApiIT#demoProposalReadsAndTsuEndpoints
+    auto: QuotationProposalApiIT#seedProposalReadsAndTsuEndpoints
   - action: Create and submit accounts
     screen: NEWACC
     permission: ACCOUNT_MAINTAIN

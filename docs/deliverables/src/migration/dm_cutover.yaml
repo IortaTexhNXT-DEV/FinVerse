@@ -75,8 +75,8 @@ tasks:
   - ["CT-009", "A", "T-24", "", "Users of every persona created and trained; BIBS menus checked per persona (UAT readiness items 1 and 14)", "PM", 40, "CT-006", "User list; training attendance; persona menu check", ""]
   - ["CT-010", "A", "T-21", "", "Communicate the go-live and freeze to branches, insurers and bank channels (autopay files carry the legacy invoice number after go-live)", "PM", 4, "CT-002", "Communications sent (communication plan items 1-6)", ""]
   - ["CT-011", "A", "T-21", "", "Legacy December soft close - accruals and cut-offs, bank reconciliations, sub-ledger to GL reconciliations, known year-end adjustments posted - completed by 20 December 2027 (T-14)", "COMP", 56, "", "Soft-close checklist signed by the Head of Comptrollership on 20 Dec 2027", ""]
-  - ["CT-012", "A", "T-20", "", "Legacy clean-up drives - UPP with no reference, invoices open more than 5 years, duplicate clients flagged in Mock 3, unmapped codes", "STW", 80, "", "Clean-up tracker; counts reduced against Mock 3 profiling", ""]
-  - ["CT-013", "A", "T-20", "", "Renewal processing team ready for the January expiries - staffing plan for January (handlers, overtime, back-up) signed; BIBS Renewal training completed; day-1 priority queue worked on the Mock 4 and dress-rehearsal data; draft RA-sent file from the Excel trackers validated and its rejects reviewed (maker-checker)", "RNW", 16, "CT-009", "Staffing plan signed by the Head of the Renewal processing team; draft P03 validated; rejects corrected and approved", ""]
+  - ["CT-012", "A", "T-20", "", "Legacy clean-up drives - UPP with no reference, invoices open more than 5 years, duplicate clients flagged in Trial migration 3, unmapped codes", "STW", 80, "", "Clean-up tracker; counts reduced against Trial migration 3 profiling", ""]
+  - ["CT-013", "A", "T-20", "", "Renewal processing team ready for the January expiries - staffing plan for January (handlers, overtime, back-up) signed; BIBS Renewal training completed; day-1 priority queue worked on the Trial migration 4 and dress-rehearsal data; draft RA-sent file from the Excel trackers validated and its rejects reviewed (maker-checker)", "RNW", 16, "CT-009", "Staffing plan signed by the Head of the Renewal processing team; draft P03 validated; rejects corrected and approved", ""]
   - ["CT-014", "A", "T-18", "", "SFTP drop or console upload path tested end to end from BDOI IT with a masked file; checksum verified", "BIT", 4, "CT-005", "Test extract accepted and purged", ""]
   - ["CT-015", "A", "T-15", "", "Go / no-go checkpoint GNG-1 (readiness to start the pre-load)", "GNG", 2, "CT-001, CT-004, CT-006, CT-007, CT-008, CT-013, CT-014", "Decision recorded in the console with the GNG-1 criteria", "GNG-1"]
   - ["CT-016", "B", "T-14", "08:00", "Take a production database snapshot before the pre-load", "IDO", 1, "CT-015", "Snapshot ID recorded in the plan", ""]
@@ -84,7 +84,7 @@ tasks:
   - ["CT-018", "B", "T-14", "15:00", "Validate and load reference data R01-R08 (R06 into the Renewal package map); authorise CREATE values in each master", "IOP", 8, "CT-017", "Batches LOADED; MIG-UNMAPPED-CODES empty for R objects", ""]
   - ["CT-019", "B", "T-13", "", "Reconcile and sign off the reference objects (G5, G6)", "DML", 6, "CT-018", "MIG-SIGNOFF-STATUS shows G6 for R01-R08", ""]
   - ["CT-020", "B", "T-13", "", "Load payees R09 if in scope (DMQ30)", "IOP", 4, "CT-019", "Batch SIGNED_OFF", ""]
-  - ["CT-021", "B", "T-12", "", "Extract and send the full client extract C01, C02, C03 (as of the previous EOD)", "BIT", 8, "CT-019", "Files CHECKED; counts against the Mock 4 volumes within 5 percent", ""]
+  - ["CT-021", "B", "T-12", "", "Extract and send the full client extract C01, C02, C03 (as of the previous EOD)", "BIT", 8, "CT-019", "Files CHECKED; counts against the Trial migration 4 volumes within 5 percent", ""]
   - ["CT-022", "B", "T-12", "", "Validate clients; run matching; clear the review queue", "STW", 24, "CT-021", "Review queue empty; MIG-CLIENT-MATCH reviewed", ""]
   - ["CT-023", "B", "T-11", "", "Load clients C01-C03; reconcile L1-L4; business sample checks; sign off (G5, G6)", "IOP", 16, "CT-022", "MIG-RECON-SUMMARY all MATCHED or EXPLAINED; G6 signed", ""]
   - ["CT-024", "B", "T-11", "", "Daily client delta (new and changed clients of the day) from T-11 to T-5 - extract 23:00, load 00:30 (job MIG_CLIENT_DELTA)", "BIT", 1, "CT-023", "Delta batch SIGNED_OFF each morning by 07:00", ""]
@@ -233,7 +233,7 @@ rollback:
   - [RB-5, Reopen legacy, "Set EBIX, QPS and CMS back to read-write; lift the GL restriction; re-enable the legacy batch jobs; confirm the last legacy EOD is intact.", BIT]
   - [RB-6, Re-key, "Operations re-keys in legacy the transactions captured in RB-3, with the BIBS AR numbers voided in the receipt register.", OPS]
   - [RB-7, Communicate, "Send the rollback notice to users, branches, insurers and bank channels (communication plan item 7).", PM]
-  - [RB-8, Review, "Within 2 business days - root cause, new go-live date, which mocks to repeat; purge the production staging of the failed cutover within 5 days.", PM]
+  - [RB-8, Review, "Within 2 business days - root cause, new go-live date, which trial migrations to repeat; purge the production staging of the failed cutover within 5 days.", PM]
 
 communication:
   - [1, "Go-live date, freeze and what changes for each department", "All BDOI users, branch heads", "E-mail from the Program Manager; team briefings", T-21, PM]

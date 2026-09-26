@@ -128,7 +128,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | The BRD-11 change is built and deployed on SIT with its roles, parameters, lists and jobs; the planned demo seed V1960 is loaded; CI is green on the deployed commit; the automated tests exist and pass; screen labels and messages have been compared with this plan and differences recorded; the test mailboxes receive mail. |
+| System test | The BRD-11 change is built and deployed on SIT with its roles, parameters, lists and jobs; the planned seed V1960 is loaded; CI is green on the deployed commit; the automated tests exist and pass; screen labels and messages have been compared with this plan and differences recorded; the test mailboxes receive mail. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical defect; the effective-date and password-expiry jobs run on SIT. |
 | UAT | FRS BRD-11 v1.0 is signed off or its open comments are agreed; the answers to UQ01, UQ02, UQ05 and UQ07 are applied as configuration; the system test exit criteria are met; the UAT environment holds masked user data (section 4.1); BDOI testers have user IDs with the roles of section 5 and attended the walkthrough of the User Access screens. |
 
@@ -151,14 +151,14 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 | Environment | Use | Data |
 |---|---|---|
 | CI | Automated unit and integration tests on every change | Created by each test; PostgreSQL in a container |
-| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Demo profile seeds, the planned seed V1960 and the data sets of section 4.2; directory stub when available; test mailboxes |
+| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed profile migrations, the planned seed V1960 and the data sets of section 4.2; directory stub when available; test mailboxes |
 | UAT | Acceptance by BDOI testers | Masked copy of production-like user data plus the test users; no real names, Windows IDs or e-mail addresses of BDO staff |
 
 Non-production data is always masked. Full names, Windows IDs, e-mail addresses and mobile numbers of users are replaced before data is loaded into SIT or UAT, and user e-mail addresses point to test mailboxes. Test passwords are issued by the test lead and are never real directory passwords.
 
 ## Named data sets
 
-The cases refer to named data sets. The BRD-11 change has no demo seed yet; the build design plans V1960 with the new users and requests in every status. Until it exists the test lead prepares each set on SIT as its source column says.
+The cases refer to named data sets. The BRD-11 change has no seed yet; the build design plans V1960 with the new users and requests in every status. Until it exists the test lead prepares each set on SIT as its source column says.
 
 <!-- tp:data -->
 

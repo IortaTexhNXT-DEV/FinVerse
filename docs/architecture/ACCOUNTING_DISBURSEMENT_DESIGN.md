@@ -23,12 +23,12 @@ class, migration and screen cites its BRD ID in Javadoc or a comment, for exampl
    linked to a single invoice number" (DIS 3.27.2, ACSL 2.16.0) without breaking BIR invoice uniqueness (AQ29).
 5. **Corrections never overwrite.** Posted journals stay immutable; corrections are linked reversing and re-posting
    entries (ACSL 2.9.1), unposted items stay editable (DIS 3.27.0 addendum).
-6. **Parked means seam, not fake.** Bank channels (BOB, TPD / ACA, branch e-mail), insurer SOA formats and payroll are
+6. **Parked means seam, not simulation.** Bank channels (BOB, TPD / ACA, branch e-mail), insurer SOA formats and payroll are
    ports with manual / file adapters (section 13).
 
 ## 2. Modules
 
-| Module | Kind | Purpose | BRD rows | Depends on | Flyway (demo) |
+| Module | Kind | Purpose | BRD rows | Depends on | Flyway (seed) |
 |---|---|---|---|---|---|
 | `disbursement` | **new** | Payee master, requests (gateway / upload / encoded), DV with editable proforma, seven payment modes and instrument statuses, uploads for credited / negotiated, EOD (DCTF, checks, forms, confirmations), account funding, OR / AR and CWT tags, approval posting, cancellation and regularisation, stale / negotiated check entries, Disbursement reports. Implements `DisbursementGateway` | DIS 2.2-3.28 | opsledger (port), payables (bank accounts, cheque books, notification formatter), party, tax, accounting, journal, subledger, workflow, docgen, messaging, attachment, bulk, report, organization | V891-V893 (V999 + runner) |
 | `payrequest` | **new** | Marketing refund requests (RRF) and employee cash-advance requests (RFP), ACSL / Cashiering validation tasks, Marketing and HR approvals, disbursed-check cancellation requests, CA/SA write-back, cash-advance liquidation (if confirmed, AQ18) | MKT 1.2-2.26 | opsledger (port, invoice read), crm, workflow, attachment, docgen, messaging, report | V894-V895 (runner) |
@@ -78,24 +78,24 @@ ON_INCENTIVE), `crm` (payout accounts), `payables` (bank-account status, cheque-
 files, check-number rule), `journal` / `coa` / `period` / `closing` / `currency` / `accounting` / `report` (FRBS),
 `nbadmin` (RETURNED), `party` (payee types), `subledger` (8 ageing slots), `tax` (received certificates, forms, books).
 
-## 3. Chart of accounts: the broker chart and the demo insurer chart
+## 3. Chart of accounts: the broker chart and the seed insurer chart
 
 **What the BRD says.** It gives no chart. FRBS sets up the chart (FRBS 2.3.0), uploads parent / child accounts from a
 file (FRBS 2.3.1) and gets system-generated account numbers with roll-up (FRBS 2.3.2). BDOI's accounts are named only
 through the reports of Appendices A-C (spec section 5). So **the real chart is configuration**, loaded by FRBS through the
 new upload at go-live (AQ01). OQ07 stays open for the entries.
 
-**Does a broker chart replace the demo insurer chart?** Not in the demo company, and not in code:
-- the demo company `FVI` ("BrokerVerse Demo Insurance Corporation", V900) carries an **insurer** chart (UPR, claims
-  reserves, reinsurance, DAC) that the underwriting, claims, reinsurance, reserves and IC demo stories need. Replacing it
-  would break those demos and their tests;
+**Does a broker chart replace the seed insurer chart?** Not in the seed company, and not in code:
+- the seed company `FVI` ("BDO Insurance and Reinsurance Brokers, Inc.", V900) carries an **insurer** chart (UPR, claims
+  reserves, reinsurance, DAC) that the underwriting, claims, reinsurance, reserves and IC seed stories need. Replacing it
+  would break those seeds and their tests;
 - BDOI's production company gets **its own chart by upload** (FRBS 2.3.1), and the accounting rules of every broking,
   Operations and BRD-5 event are re-pointed by Comptrollership (maker-checker rules). No code refers to an account code;
-- the demo broker accounts added by V988 / V990 / V994 are **placeholders** for OQ07. BRD-5 lets us name them the way
-  BDOI does and fill the gaps. V999 (demo) renames and completes them as below; no code change follows because every
+- the seed broker accounts added by V988 / V990 / V994 are **placeholders** for OQ07. BRD-5 lets us name them the way
+  BDOI does and fill the gaps. V999 (seed) renames and completes them as below; no code change follows because every
   module posts through events and roles.
 
-| Demo account (added by) | Used by (events) | BDOI account named in this BRD | V999 action |
+| Seed account (added by) | Used by (events) | BDOI account named in this BRD | V999 action |
 |---|---|---|---|
 | 1210 + 1210.01-.06 PR by component (V988) | `BROKER_BOOKING`, `OPS_PAYMENT_APPLY`, `OPS_WRITE_OFF`, `OPS_MINIMAL_BALANCE_REVERSAL` | Premium Receivable (Peso / Dollar), aging and schedules per currency (ACSL 2.14.3) | Rename "Premium Receivable"; add 1213 PR - USD with the same components if BDOI splits by currency (AQ01); flag `revaluationRequired` on the USD accounts (FRBS 3.5.0) |
 | 1211 PR - CWT 2307 (V990) | `OPS_CWT_RECLASS`, `OPS_CWT_DTIP_OFFSET` | Premiums Receivable 2307 (Appendix A IV-32) | Rename |
@@ -121,22 +121,22 @@ new upload at go-live (AQ01). OQ07 stays open for the entries.
 | 4190 Other Income - Minimal Balance Credits (V994), 6510 Minimal Balance / Write-off (V990) | `OPS_WRITE_OFF` | (not named) | Keep |
 | - | **new** | Service fee expense | Add 5614 (cost centre required) |
 
-A **separate broker demo company** (for example `BDI` with a broker-only chart) was considered and rejected for now: it
-would duplicate every demo migration of V980-V997 for a second company and give no extra coverage. The chart upload
-(FRBS 2.3.1) is demonstrated with a sample file `docs/samples/coa_upload_sample.xlsx` instead.
+A **separate broker seed company** (for example `BDI` with a broker-only chart) was considered and rejected for now: it
+would duplicate every seed migration of V980-V997 for a second company and give no extra coverage. The chart upload
+(FRBS 2.3.1) is shown with a sample file `docs/samples/coa_upload_sample.xlsx` instead.
 
 ## 4. Flyway allocation
 
 > **Allocation decision (integration, 2026-09-25):** confirmed. BRD-5 keeps V890–V899. Collections (BRD-4) moved to
-> V1000–V1009 with demo V1900–V1909. Later BRDs use V1010+ and demo V1910+ (Developer Guide range table).
+> V1000–V1009 with seed V1900–V1909. Later BRDs use V1010+ and seed V1910+ (Developer Guide range table).
 >
-> **Update after the BRD-3 foundation merge:** V998 is taken by the Product Maintenance demo users and V763 by
-> cashiering. BRD-5 therefore uses **demo V999** only (accounts, rules, users; the storyline runs as Java demo
+> **Update after the BRD-3 foundation delivery:** V998 is taken by the Product Maintenance SIT/UAT users and V763 by
+> cashiering. BRD-5 therefore uses **seed V999** only (accounts, rules, users; the storyline runs as Java seed
 > runners) and **V765** for the `opsledger` extension. The references below are already updated.
 
 
 Used today: V1-V27, V100-V101, V200, V300-V301, V400, V420-V421, V500, V550, V600, V650, V660, V670-V671, V700-V701,
-V750-V754, V760-V762, V770-V771, V780, V790, V800-V880 (see `backend/src/main/resources/db/migration`); demo V900-V902,
+V750-V754, V760-V762, V770-V771, V780, V790, V800-V880 (see `backend/src/main/resources/db/migration`); seed V900-V902,
 V910, V920, V930, V940, V950, V955, V960-V961, V965, V970, V975, V980-V990, V992, V994. Claimed by designs not yet built:
 V755, V813-V819, V821, V831, V871, V996-V997 (BRD-3); V766-V769, V772-V779, V781-V789, V991, V993, V995 (Operations
 sub-ranges). Flyway runs with `out-of-order: true`.
@@ -146,8 +146,8 @@ sub-ranges). Flyway runs with `out-of-order: true`.
    platform tables and must run before any broking table on a fresh database.
 2. **The four new modules take V890-V899**, the last free block below V900. They reference V7xx / V8xx tables only by
    plain values (ARN, invoice no., party code), like Operations.
-3. **Demo takes V999** (after the Operations and BRD-3 demo) for accounts, rules and users; each new module seeds its
-   demo transactions with a Java demo runner (`@Order` after `RemittanceDemoData`), as booking and remittance do.
+3. **Seed takes V999** (after the Operations and BRD-3 seed) for accounts, rules and users; each new module seeds its
+   seed transactions with a Java seed runner (`@Order` after `RemittanceSeedData`), as booking and remittance do.
 
 | Version | Owner (wave) | Content |
 |---|---|---|
@@ -178,17 +178,17 @@ sub-ranges). Flyway runs with `out-of-order: true`.
 | `V897__acsl_events_reports.sql` | A1-PRQ | Event `ACSL_CORRECTION`; report definitions metadata |
 | `V898__frbs_service_fee.sql` | A1-FRBS | `frbs_service_fee_rule`, `frbs_service_fee_run`, `frbs_service_fee_line` |
 | `V899__frbs_events.sql` | A1-FRBS | Events `FRBS_SERVICE_FEE_ACCRUE`; report metadata |
-| `V999__demo_acct_chart_rules_users.sql` | A0 | Demo accounts and renames of section 3, demo rules of every new event, demo users of section 6 |
-| `V999__demo_acct_masters.sql` | A1-DSB | Demo payees, bank-account statuses, cheque books, employees, cost-centre rules, statement layouts |
+| `V999__seed_acct_chart_rules_users.sql` | A0 | Seed accounts and renames of section 3, seed rules of every new event, SIT/UAT users of section 6 |
+| `V999__seed_acct_masters.sql` | A1-DSB | Seed payees, bank-account statuses, cheque books, employees, cost-centre rules, statement layouts |
 
 Rules:
 - No foreign keys from V28-V33, V402, V502, V551, V652, V702-V703 to broking tables.
 - V890 references only V1-V754 tables (roles, permissions, LOV, workflow), so it is safe before V800 on a fresh database.
-- The Developer Guide range table gets: "V890-V899 Accounting, Disbursement and ACSL (BRD-5); demo V999".
-- After V999 the demo range is full. The next BRD should open **V1000-V1099 (schema) and V1900-V1999 (demo, `db/demo`)**
+- The Developer Guide range table gets: "V890-V899 Accounting, Disbursement and ACSL (BRD-5); seed V999".
+- After V999 the seed range is full. The next BRD should open **V1000-V1099 (schema) and V1900-V1999 (seed, `db/seed`)**
   and write that convention into the Developer Guide; this BRD does not need it.
-- Alternative rejected: V1000+ now. It would work (`db/demo` is a separate location and ordering is by version), but it
-  would split BRD-5 away from the documented "demo = V900-V999" rule when free versions still exist.
+- Alternative rejected: V1000+ now. It would work (`db/seed` is a separate location and ordering is by version), but it
+  would split BRD-5 away from the documented "seed = V900-V999" rule when free versions still exist.
 
 ## 5. Entities (key fields)
 
@@ -262,10 +262,10 @@ Money `numeric(19,2)`, rates `numeric(19,8)`. All tables have the base audit col
 
 ## 6. Accounting events and default GL entries
 
-Demo rules only (V999); the accounts are the demo chart of section 3. The real rules come from Comptrollership (AQ02).
+Seed rules only (V999); the accounts are the seed chart of section 3. The real rules come from Comptrollership (AQ02).
 USD documents are priced at the BOOK rate (Operations convention). Source references are idempotent keys.
 
-| # | Transaction | Event (source ref) | Default entry (demo) |
+| # | Transaction | Event (source ref) | Default entry (seed) |
 |---|---|---|---|
 | 1 | DV approved - remittance to insurer | `DISB_VOUCHER` type REMITTANCE (`DV:<no>`) | Dr 2211 Due to insurer for disbursement (insurer) / Cr `@PAY_ACCOUNT` (bank, or 2241 for checks) |
 | 2 | DV approved - refund to client | `DISB_VOUCHER` REFUND | Dr 2216 AP refund payable (client) / Cr `@PAY_ACCOUNT` |
@@ -373,11 +373,11 @@ RELEASED / CREDITED / DEBITED / NEGOTIATED -> PAID; REJECTED -> RETURNED; CANCEL
 | `REMIT_DEDUCTION_CONFIRM` | Confirm a remittance deduction (ACSL) |
 | `EMPLOYEE_MAINTAIN` | Employee / cost-centre master (DIS 3.30.1) |
 
-### 8.2 Roles (V890) and demo users (V999, password `Brokerverse@2026`)
+### 8.2 Roles (V890) and SIT/UAT users (V999)
 
 Grants follow the role matrices read from the scanned pages (pp.181, 216-217, 227, 240); final matrix AQ28.
 
-| Role | Persona | Key permissions | Demo user |
+| Role | Persona | Key permissions | SIT/UAT user |
 |---|---|---|---|
 | `FRBS_PROCESSOR` | GL Officer (Processor) | JOURNAL_CREATE, JOURNAL_VIEW, SERVICE_FEE_MANAGE, SERVICE_FEE_TAG, FRBS_REPORT_VIEW / EXPORT | `glofficer` |
 | `FRBS_TL` | GL Team Lead | + JOURNAL_AUTHORIZE, JOURNAL_ASSIGN, PERIOD_MANAGE, PERIOD_END_RUN, GL_CLOSE_SCHEDULE, MASTER_MAINTAIN (chart), COA_UPLOAD, SERVICE_FEE_APPROVE | `gltl` |
@@ -520,7 +520,7 @@ follows; the owners review these changes when the waves run.
 - **Legacy control accounts and clearing.** BRD-13 asks for legacy Premium Receivable, Commission Receivable, DTIP and
   UPP sub-ledgers (BRID 5-8). They are kept as separate control accounts reached through `LG_` amount components on the
   existing events (decision D8 of `BDOI_CROSS_BRD_DECISIONS.md`), plus a migration clearing account that must be 0.00
-  per branch and currency after the opening loads. Real codes come from Comptrollership (AQ01, DMQ18). **Demo code
+  per branch and currency after the opening loads. Real codes come from Comptrollership (AQ01, DMQ18). **Seed code
   clash to resolve before V1982:** the Data Migration design proposes 1221 (Commission Receivable - Legacy) and 2212
   (Due to Insurers - Legacy), which section 3 of this design reserves for the USD commission receivable and USD
   payable to insurers if BDOI splits by currency; one of the two must take other codes.
@@ -568,33 +568,33 @@ Migration documents CMS is the Collection Management System (BDOI_CROSS_BRD_DECI
 ## 14. Build-wave plan
 
 Prerequisites: Operations O0 is built (opsledger, queue, ports). Cashiering (O1-A) and Commission (O1-D) may still be in
-progress: BRD-5 only needs the ports they implement, with default adapters until they merge.
+progress: BRD-5 only needs the ports they implement, with default adapters until they are delivered.
 
-| Wave | Agent | Scope | Files owned | Exit criteria |
+| Wave | Team | Scope | Files owned | Exit criteria |
 |---|---|---|---|---|
-| **A0** (1 agent, short) | Foundation | V890 (all permissions, roles, LOV types, workflows, parameters, alerts); `opsledger` contract (Spec / Status / Type extensions, ports of section 2.2 with default adapters, `root_invoice_no` column and feed, V765); demo accounts / rules / users (V999); navigation entries, help registry, `application.yml` crons, Developer Guide ranges; empty module skeletons with `package-info.java` for `disbursement`, `payrequest`, `acsl`, `frbs` | `security/domain/Permission.java`, `opsledger/**`, `V765`, `V890`, `V999`, `frontend/src/navigation/modules.ts`, `help/helpContent.ts`, `application.yml`, `docs/development/DEVELOPER_GUIDE.md` | Everything compiles; remittance tests green with the extended Spec; `mvn verify` green |
-| **A1-GL** | GL platform | Section 12.1 rows coa, journal, period / closing, currency, accounting (cost-centre rules), organization (employees), report, receivables, subledger, party, nbadmin, approval | those packages; V28-V33, V402, V551, V791; `frontend/src/features/{gl,closing,setup,reports}/**` | FRBS rows of sections B-F pass; chart upload demo file loads |
-| **A1-DSB** | Disbursement | `disbursement` complete; payables changes; V999 masters; demo runner | `disbursement/**`, `payables/**`, V891-V893, V502, V999, `features/disbursement/**` | Remittance batch -> DV auto in FOR_APPROVAL -> approve (posting) -> check print -> negotiated upload; refund DV; cancellation restores the remittance batch; EOD outputs |
+| **A0** (1 team, short) | Foundation | V890 (all permissions, roles, LOV types, workflows, parameters, alerts); `opsledger` contract (Spec / Status / Type extensions, ports of section 2.2 with default adapters, `root_invoice_no` column and feed, V765); seed accounts / rules / users (V999); navigation entries, help registry, `application.yml` crons, Developer Guide ranges; empty module skeletons with `package-info.java` for `disbursement`, `payrequest`, `acsl`, `frbs` | `security/domain/Permission.java`, `opsledger/**`, `V765`, `V890`, `V999`, `frontend/src/navigation/modules.ts`, `help/helpContent.ts`, `application.yml`, `docs/development/DEVELOPER_GUIDE.md` | Everything compiles; remittance tests green with the extended Spec; `mvn verify` green |
+| **A1-GL** | GL platform | Section 12.1 rows coa, journal, period / closing, currency, accounting (cost-centre rules), organization (employees), report, receivables, subledger, party, nbadmin, approval | those packages; V28-V33, V402, V551, V791; `frontend/src/features/{gl,closing,setup,reports}/**` | FRBS rows of sections B-F pass; chart upload seed file loads |
+| **A1-DSB** | Disbursement | `disbursement` complete; payables changes; V999 masters; seed runner | `disbursement/**`, `payables/**`, V891-V893, V502, V999, `features/disbursement/**` | Remittance batch -> DV auto in FOR_APPROVAL -> approve (posting) -> check print -> negotiated upload; refund DV; cancellation restores the remittance batch; EOD outputs |
 | **A1-PRQ** | Requests + ACSL | `payrequest` and `acsl`; crm payout accounts | `payrequest/**`, `acsl/**`, `crm/**` (payout only), V894-V897, V802, `features/payrequest/**`, `features/acsl/**` | RRF with validation -> approval -> DV; SOA upload -> recon report; correction case -> review -> approve -> posted with open items and ops movement |
 | **A1-FRBS** | Reports and tax | `frbs`, `finreport` schedule engine, `tax` additions, service fee | `frbs/**`, `finreport/**`, `tax/**`, V652, V702-V703, V898-V899, `features/frbs/**`, `features/tax/**` | Schedule engine runs the seeded definitions; service-fee run -> payout request -> tags; new BIR outputs |
 | **A1-OPSX** | Operations changes | remittance (cancel feedback, CPC2, SI, deductions), booking (root invoice, SI trigger) | `remittance/**`, `booking/**` (listed files), V772, V872 | Early-incentive SI with 2% WTAX; CPC2 lines; deduction consumed and capped |
-| **A2** (1 agent) | Integration | E2E: booking -> receipt -> remittance -> DV -> negotiated -> SOA recon -> ACSL correction -> month-end close; refund RRF -> DV -> cancellation; module guides `docs/modules/DISBURSEMENT.md`, `ACSL.md`, updates to `OPERATIONS.md`, `PAYABLES_AND_CASH.md`, `PLANNING_AND_CLOSING.md`; workbook refresh | tests, docs, demo | Full `mvn verify` / `npm run verify`; walkthrough |
+| **A2** (1 team) | Integration | E2E: booking -> receipt -> remittance -> DV -> negotiated -> SOA recon -> ACSL correction -> month-end close; refund RRF -> DV -> cancellation; module guides `docs/modules/DISBURSEMENT.md`, `ACSL.md`, updates to `OPERATIONS.md`, `PAYABLES_AND_CASH.md`, `PLANNING_AND_CLOSING.md`; workbook refresh | tests, docs, seed | Full `mvn verify` / `npm run verify`; walkthrough |
 
 Rules for parallel work:
-- One Flyway set per agent (table of section 4); no edits to another agent's packages.
+- One Flyway set per team (table of section 4); no edits to another team's packages.
 - Shared files (Permission enum, navigation, help registry, `application.yml`, V890) are edited **only in A0**.
 - Each module has its own `*ApiIT` smoke class.
-- Ports have default adapters (`@ConditionalOnMissingBean`), so A1 agents test without each other. `payrequest` tests use
+- Ports have default adapters (`@ConditionalOnMissingBean`), so A1 teams test without each other. `payrequest` tests use
   the queue adapter until `disbursement` merges; `acsl` uses the default `PaymentReversalRequester`.
 - A1-OPSX coordinates with A1-DSB on the `DisbursementStatusChanged` values defined by A0 only.
-- Contract asks to the Operations agents O1-A (cashiering) and O1-D (commission) are recorded in section 12.2 and must be
-  agreed before A1 starts; BRD-5 agents do not edit `cashiering/**` or `commission/**`.
+- Contract asks to the Operations teams O1-A (cashiering) and O1-D (commission) are recorded in section 12.2 and must be
+  agreed before A1 starts; BRD-5 teams do not edit `cashiering/**` or `commission/**`.
 
 ## 15. What depends on information BDOI has not given (build the seam, park the content)
 
 | Topic | Requirements | Built now | Parked content | Q |
 |---|---|---|---|---|
-| Real chart and entries | FRBS 2.3.x, DIS 2.7.6, OQ07 | Upload, numbering, events with demo rules | BDOI chart and rules | AQ01, AQ02 |
+| Real chart and entries | FRBS 2.3.x, DIS 2.7.6, OQ07 | Upload, numbering, events with seed rules | BDOI chart and rules | AQ01, AQ02 |
 | Rates | FRBS 2.2.0, 3.5.0 | CLOSING input, BOOK copy job (parameter) | Rate source, daily vs monthly | AQ03 |
 | Close timing | FRBS 2.6.x, 3.4.x | Schedules and cut-off | Agreed times; reopen policy | AQ04 |
 | Report layouts | FRBS 3.2.0 | Schedule engine with draft definitions | GARD / subsidiaries / Mancom layouts; non-GL data | AQ05 |
@@ -623,7 +623,7 @@ Rules for parallel work:
    regularisation result that feeds `DSB-UNREGULARIZED`.
 5. **Dependence on cashiering and commission still in progress.** Mitigation: ports with default adapters; contract asks
    agreed before A1.
-6. **The demo range is full after V999.** Mitigation: convention for V1000+ written into the Developer Guide by A0
+6. **The seed range is full after V999.** Mitigation: convention for V1000+ written into the Developer Guide by A0
    (section 4).
 
 ## 17. A0 foundation: as built
@@ -642,12 +642,12 @@ where it differs from or details the sections above. The A1 waves compile only a
     read); `sec_permission_action` rows for the areas `DISBURSEMENT`, `PAYMENT_REQUESTS` and `ACSL` (the FRBS / GL
     permissions stay unclassified like the finance modules); the LOV types of section 9 with proposed values; the
     workflows of section 7; **the accounting event types** of section 6; parameters and alerts of section 9.
-  - `db/demo/V999__demo_acct_chart_rules_users.sql`: the renames of section 3 (1210, 1211, 1225, 2205, 2210), the new
-    accounts 1610, 1611, 1612, 2217, 2240, 2241, 2250, 2260, 4131, 5614, the demo rules of every event type below and the
-    demo users of section 8.2 (`glofficer`, `gltl`, `glhead`, `disbtl`, `disbtl2`, `disbappr`, `disbappr2`, `mktao`,
+  - `db/seed/V999__seed_acct_chart_rules_users.sql`: the renames of section 3 (1210, 1211, 1225, 2205, 2210), the new
+    accounts 1610, 1611, 1612, 2217, 2240, 2241, 2250, 2260, 4131, 5614, the seed rules of every event type below and the
+    SIT/UAT users of section 8.2 (`glofficer`, `gltl`, `glhead`, `disbtl`, `disbtl2`, `disbappr`, `disbappr2`, `mktao`,
     `mktrev`, `mktappr`, `hrappr`, `acsl`, `acsltl`, `acslhead`).
-- **Event types are seeded in V890, not in V772 / V893 / V899.** The demo rules must be in V999 (A0), so the event
-  types have to exist before it. A1 agents publish these events and must not insert them again:
+- **Event types are seeded in V890, not in V772 / V893 / V899.** The seed rules must be in V999 (A0), so the event
+  types have to exist before it. A1 teams publish these events and must not insert them again:
 
   | Event | Components (amount keys) | Account roles the publisher supplies |
   |---|---|---|
@@ -669,9 +669,9 @@ where it differs from or details the sections above. The A1 waves compile only a
   accounts 1213 / 1221 / 2212 (only if BDOI splits by currency, AQ01); re-pointing the remittance and OR rules to
   `WTAX_COMMISSION` / `WTAX_INCENTIVE` (A1-OPSX changes the events); the BDOI value of `AGEING_BUCKETS`
   (30,90,180,365,730) waits for `AgeingSlots.MAX_SLOTS` = 8 (A1-GL).
-- **Demo data of the A1 waves.** V999 is taken by A0, and Flyway cannot hold two V999 files. A1-DSB seeds its demo
-  masters (payees, bank-account statuses, cheque books, employees, cost-centre rules, layouts) with its Java demo
-  runner, like the demo transactions of every A1 module (section 4 "demo takes V999 ... demo runners").
+- **Seed data of the A1 waves.** V999 is taken by A0, and Flyway cannot hold two V999 files. A1-DSB seeds its seed
+  masters (payees, bank-account statuses, cheque books, employees, cost-centre rules, layouts) with its Java seed
+  runner, like the seed transactions of every A1 module (section 4 "seed takes V999 ... seed runners").
 - **`opsledger` contract (section 12.2).**
   - `DisbursementRequest.Spec` has 16 components (the 9 of BRD-2, then `rfpNo`, `payeeClass`, `disbursementType`,
     `attachmentRefs`, `rootInvoiceNo`, `accountingRefs`, `straightToApproval`); the 9-argument constructor is kept, so
@@ -706,7 +706,7 @@ where it differs from or details the sections above. The A1 waves compile only a
 - **Module skeletons.** `disbursement`, `payrequest`, `acsl` and `frbs` hold only `package-info.java`.
 - **Flyway check.** Every version of section 4 is still free except `V791`, which Product Maintenance used for the
   role-permission change requests (`V791__nbadmin_role_permission_requests.sql`): A1-GL puts the access-request
-  RETURNED status in `V792`. A0 used V765, V890 and demo V999; nothing else of the BRD-5 ranges.
+  RETURNED status in `V792`. A0 used V765, V890 and seed V999; nothing else of the BRD-5 ranges.
 
 ### A1-GL as built
 
@@ -861,9 +861,9 @@ What the A1-DSB wave built for `disbursement` (DIS 2.2-3.28) and where it differ
   `DSB_TT`, `DSB_CHECK`, `DSB_PAYMENT_ADVICE`) and the smallest shared additions the module needed: parameters
   `DISB_NO_PAYEE_ACTION` (HOLD), `DISB_CHECK_SERIES_WARNING` (20), `DISB_CHECK_CLEARING_ACCOUNT` (2241); LOV value
   `DISBURSEMENT_TYPE` / `STALE_REISSUE`; workflow transition `DISB_PAYEE` ACTIVE -`amend`-> FOR_AUTHORIZATION.
-- **No V999 masters.** V999 is A0's; the demo masters and storyline are in the Java runner
-  `disbursement.demo.DisbursementDemoData` (`@Order(97)`, after the Operations runners, each step signed in through
-  `DemoUsers.as`): payees by `disbtl` authorised by `disbappr`; a second remittance batch in review (only when
+- **No V999 masters.** V999 is A0's; the seed masters and storyline are in the Java runner
+  `disbursement.seed.DisbursementSeedData` (`@Order(97)`, after the Operations runners, each step signed in through
+  `SeedUsers.as`): payees by `disbtl` authorised by `disbappr`; a second remittance batch in review (only when
   Operations left more than one, so its storyline keeps a batch in review) approved and paid by check, otherwise an
   e-mailed remittance encoded and left for the approver; a refund by credit to account; a supplier check printed,
   released and negotiated; a supplier request left in process; the end of day; a funding through maker, verifier and
@@ -937,7 +937,7 @@ additions, and where it differs from or details sections 5.4, 6, 7.3, 10 and 12.
     receivable PHP / USD with ageing (#45 / #46), PR 2307, commission receivable, AR-BIR, AR-BIR per insurer, AR
     insurer's refund, AR officers, prepaid, FFE, payable to insurers, A/P refund from insurer, AP others, AP officers,
     stale checks, checks outstanding, service fee payable and expenses per cost centre. Every layout is `TO_CONFIRM`
-    (AQ05). The account selectors point at the demo chart until the real chart is uploaded (AQ01).
+    (AQ05). The account selectors point at the seed chart until the real chart is uploaded (AQ01).
   - `V702__tax_received_certificates.sql`: `tax_certificate_received` (+ `_line`).
   - `V703__tax_books_and_forms.sql`: `tax_book_def` (GJ, PJ, SJ, CRB, CDB, SL) and `tax_form_output_line` (lines of
     0619-F, 1603, 1702-Q and 1702). It also seeds the parameters `TAX_RCIT_RATE` (25), `TAX_FBT_RATE` (35) and
@@ -1019,7 +1019,7 @@ additions, and where it differs from or details sections 5.4, 6, 7.3, 10 and 12.
   - Tax & Statutory (`features/tax`): Certificates Received (register, record, cancel) and BIR Forms & Books (period
     choice, open or export each output).
   - StatusBadge gained COMPUTED, TO_CONFIRM (info) and LIQUIDATED, RECORDED (success).
-- **Demo.** `frbs.demo.FrbsDemoData` (`@Order(98)`, signed in through `DemoUsers.as`):
+- **Seed.** `frbs.seed.FrbsSeedData` (`@Order(98)`, signed in through `SeedUsers.as`):
   - `gltl` adds the cost-centre rule of the accrual;
   - `glofficer` computes the service fee of the month, which `gltl` approves (accrual and payout requests);
   - `disb` records an insurer certificate for the quarter.
@@ -1119,7 +1119,7 @@ What the A1-OPSX wave built in `remittance`, `booking` and the Operations invoic
   documents) in the Remittance section; the batch record's Settlement tab and CPC2 column / totals; the Invoice
   Search filters (assured, account officer, inception dates) and columns; the Invoice 360 Invoice Family tab; the
   booking invoice Root Invoice chip; the `ON_INCENTIVE` trigger on the service invoice types.
-- **Demo.** `remittance.demo.DeductionDemoData` (`@Order(98)`): `acsl` records and submits an INS-LAC deduction
+- **Seed.** `remittance.seed.DeductionSeedData` (`@Order(98)`): `acsl` records and submits an INS-LAC deduction
   that waits for `acsltl`.
 - **Tests.** `RemittanceSettlementIT` (CPC2 posted, SI with 2% WTAX and manual issue refused, deduction consumed,
   capped and applied after the insurer OR, cancelled DV restores the batch and it is sent again),

@@ -70,17 +70,17 @@ screens:
 
 data:
   - id: TD-AC-01
-    name: Demo users and roles
-    content: glofficer (FRBS_PROCESSOR), gltl (FRBS_TL), glhead (FRBS_HEAD), badmin (BUSINESS_ADMIN), admin (SYSADMIN), approver (NB_APPROVER, holds ACCESS_APPROVE), comptrol (COMPTROLLERSHIP), auditor (AUDITOR), disb (DISBURSEMENT), remittl (REMIT_TL). The demo password is issued by the test lead.
-    source: Demo seeds V999 (BRD-5 users), V980, V990, V900; grants V890 and V899
+    name: SIT/UAT users and roles
+    content: glofficer (FRBS_PROCESSOR), gltl (FRBS_TL), glhead (FRBS_HEAD), badmin (BUSINESS_ADMIN), admin (SYSADMIN), approver (NB_APPROVER, holds ACCESS_APPROVE), comptrol (COMPTROLLERSHIP), auditor (AUDITOR), disb (DISBURSEMENT), remittl (REMIT_TL). The SIT/UAT password is issued by the test lead.
+    source: Seeds V999 (BRD-5 users), V980, V990, V900; grants V890 and V899
   - id: TD-AC-02
-    name: Demo chart and posting rules
-    content: Demo chart of company FVI (placeholder for BDOI's chart, AQ01) with 1210 premium receivable, 2211 due to insurer, 2241 checks outstanding, 2250 service fee payable, 4130 incentive income, 4131 CPC2 income, 5614 service fee expense (cost centre required); demo accounting rules of the BRD-5 events
-    source: Demo seeds V900, V901 and V999
+    name: Seed chart and posting rules
+    content: Seed chart of company FVI (placeholder for BDOI's chart, AQ01) with 1210 premium receivable, 2211 due to insurer, 2241 checks outstanding, 2250 service fee payable, 4130 incentive income, 4131 CPC2 income, 5614 service fee expense (cost centre required); seed accounting rules of the BRD-5 events
+    source: Seeds V900, V901 and V999
   - id: TD-AC-03
     name: Currencies and rates
     content: Base currency PHP; USD active with BOOK and CLOSING rates; parameter OPS_BOOK_RATE_SOURCE as delivered
-    source: Demo seed V900 and the currency master
+    source: Seed V900 and the currency master
   - id: TD-AC-04
     name: Chart upload sample file
     content: coa_upload_sample.xlsx with 8 parent and child accounts, among them 1913.01 with short code PRUSDBP (WARN negative-balance policy); a copy with one row whose parent is missing
@@ -90,13 +90,13 @@ data:
     content: A MANUAL journal of 1,000.00 debit and credit on two postable accounts; an ACCRUAL of 5,000.00 dated the month end with reverse-on the first day of the next month; an unbalanced journal (1,000.00 / 900.00)
     source: Keyed in by the tester on New Journal
   - id: TD-AC-06
-    name: Service fee rules and demo run
+    name: Service fee rules and seed run
     content: Rules CBG 2.5 % (segments CBG, RETAIL) and IBG 1 % (COMBANK, CORBANK, INSTITUTIONAL); cost-centre rule of account 5614; a run of the invoices fully paid this month computed by glofficer and approved by gltl, its lines sent to Disbursement
-    source: Migration V898 and demo runner FrbsDemoData
+    source: Migration V898 and seed runner FrbsSeedData
   - id: TD-AC-07
     name: Bank statement layout and file
-    content: The statement layout of a demo bank account; a CSV bank file with check 000123 for 15,000.00 dated two days after the book payment of check 000123, and a deposit in transit left unmatched
-    source: Receivables demo (ReceivablesDemoData) and a file prepared by the test lead
+    content: The statement layout of a seed bank account; a CSV bank file with check 000123 for 15,000.00 dated two days after the book payment of check 000123, and a deposit in transit left unmatched
+    source: Receivables seed (ReceivablesSeedData) and a file prepared by the test lead
   - id: TD-AC-08
     name: Lists of values and access requests
     content: REFUND_REASON and the other lists of FRS section 9.3; a pending access request raised by badmin
@@ -106,15 +106,15 @@ scenarios:
   - id: SC-AC-01
     persona: SYSADMIN
     title: Access and session. FRBS and administration users log in with their own profile, see only their screens and are warned before the idle and forced log-out.
-    pre: Demo users of TD-AC-01.
+    pre: SIT/UAT users of TD-AC-01.
   - id: SC-AC-02
     persona: FRBS_TL
     title: Chart of accounts and rates. The TL maintains and uploads the chart under maker-checker, numbers child accounts and searches them by short code; the Head enters the monthly revaluation rate.
-    pre: Demo chart TD-AC-02; upload file TD-AC-04; rates TD-AC-03.
+    pre: Seed chart TD-AC-02; upload file TD-AC-04; rates TD-AC-03.
   - id: SC-AC-03
     persona: FRBS_PROCESSOR
     title: Reports on demand. FRBS users run, filter, export, print and batch any report they are allowed to see.
-    pre: Posted demo journals of the current year.
+    pre: Posted seed journals of the current year.
   - id: SC-AC-04
     persona: FRBS_PROCESSOR
     title: Posting and manual entries. Events post through the accounting engine; the GL Officer prepares entries that the TL assigns, posts or returns; accruals reverse automatically.
@@ -134,7 +134,7 @@ scenarios:
   - id: SC-AC-08
     persona: FRBS_PROCESSOR
     title: Report pack. The Appendix A reports, account schedules, Mancom and government outputs run and export.
-    pre: Posted demo data of the current year.
+    pre: Posted seed data of the current year.
   - id: SC-AC-09
     persona: BUSINESS_ADMIN
     title: Business and system administration. Lists of values and user and role changes go through requests that another user approves, declines or returns.
@@ -361,7 +361,7 @@ frs:
         steps:
           - Download the template; upload coa_upload_sample.xlsx; commit.
         expected: 8 valid rows, 0 invalid; after commit the 8 accounts are PENDING_AUTHORIZATION; 1913.01 has short code PRUSDBP.
-        auto: GlPlatformApiIT#chartUploadDemoFileLoadsPendingAuthorization
+        auto: GlPlatformApiIT#chartUploadSeedFileLoadsPendingAuthorization
       - c: 2
         type: Negative
         title: Row whose parent is missing
@@ -471,7 +471,7 @@ frs:
         steps:
           - Search the chart for "prusdbp".
         expected: 1913.01 is found (search is case-insensitive).
-        auto: GlPlatformApiIT#chartUploadDemoFileLoadsPendingAuthorization
+        auto: GlPlatformApiIT#chartUploadSeedFileLoadsPendingAuthorization
       - c: 1
         type: Positive
         screen: NEWJ
@@ -1403,7 +1403,7 @@ frs:
         persona: DISBURSEMENT
         title: Paid line shows Released
         steps:
-          - Ask Disbursement to pay a line of the demo run on 5 September.
+          - Ask Disbursement to pay a line of the seed run on 5 September.
           - Open the run.
         expected: The line is RELEASED on 5 September.
         auto: ServiceFeeIT#anApprovedRunIsAccruedPaidReleasedAndLiquidated

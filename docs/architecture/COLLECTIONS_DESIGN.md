@@ -24,7 +24,7 @@ Requirements baseline: [`BDOI_CLXN_BRD_SPEC.md`](../requirements/BDOI_CLXN_BRD_S
    - Collections depends on `opsledger` and on the platform / BRD-1 modules only; it never calls `cashiering` or `commission` directly.
    - It **implements** the existing `CollectionFeed` port, so Cashiering and Commission receive Collections dispositions through the feeds they were already designed to consume.
    - It **calls** two new ports that Cashiering implements (unapplied items).
-   - The graph stays acyclic, and the Cashiering, Commission and Collections agents can work in parallel.
+   - The graph stays acyclic, and the Cashiering, Commission and Collections teams can work in parallel.
 4. **What changes because Collections is in-app.** The `COLLECTION_*` feeds keep their codes, idempotency and run log, but their transport becomes `IN_APP`. Uploads remain possible as a fallback, and nothing is simulated.
 5. **Signed scope first.**
    - BRCLXN.001-060 are baselined.
@@ -33,7 +33,7 @@ Requirements baseline: [`BDOI_CLXN_BRD_SPEC.md`](../requirements/BDOI_CLXN_BRD_S
 
 ## 2. Modules
 
-| Module | Purpose | BRD IDs | Depends on | Flyway (demo) |
+| Module | Purpose | BRD IDs | Depends on | Flyway (seed) |
 |---|---|---|---|---|
 | `collections` (new, package `com.iortatechnxt.brokerverse.collections`, tables `clx_*`) | Collection worklist per invoice (refresh from the ledger), assignment and reassignment, collection efforts, PR collector dispositions (category, owner, Operations action), promises, installment plans, escalation rules and cases, billing statements (SOA), collector dispositions on unapplied payments and application requests, the in-app `CollectionFeed` adapter (outbox / inbox), scheduled files and reports, field-level change log, Collections home | BRCLXN.001-058, 060 | opsledger (query, ports, events), account, booking (read), issuance (read), catalog (sales organisation), crm (client), workflow, messaging, bulk, report, docgen, lov, alert, system, organization | V1000-V1005 (V1900-V1901), see §3 decision |
 | `commission` (Operations, being built) | + CR billing gate on PR confirmation; + receivable type (regular / incentive); + incentive campaigns and service-invoice billing; + commission refunds; + collectible portion on mixed payments | BRCLXN.059, 061-064 | unchanged (opsledger, catalog, booking `ServiceInvoiceService`) | commission range V785-V789 (V995) |
@@ -92,17 +92,17 @@ The port stays (`opsledger/service/port/CollectionFeed.java`). Collections decla
 ## 3. Flyway allocation
 
 > **Allocation decision (integration, 2026-09-25):** V890–V899 went to BRD-5 Accounting / Disbursement, which needs the whole
-> block for four modules. Collections uses **schema V1000–V1009** and **demo V1900–V1909** (Developer Guide range table).
+> block for four modules. Collections uses **schema V1000–V1009** and **seed V1900–V1909** (Developer Guide range table).
 > Mapping of the files below: V890→V1000, V891→V1001, V892→V1002, V893→V1003, V894→V1004, V895→V1005 (V1006–V1009 kept
-> free); demo V1900–V1901 unchanged. Everywhere else in this document, read the V89x numbers through this mapping.
+> free); seed V1900–V1901 unchanged. Everywhere else in this document, read the V89x numbers through this mapping.
 
 
-The Developer Guide ranges and the free versions were checked in `backend/src/main/resources/db/{migration,demo}`:
+The Developer Guide ranges and the free versions were checked in `backend/src/main/resources/db/{migration,seed}`:
 - Schema versions used: V1-V99, V100-V749, V750-V754, V760-V762, V770-V771, V780, V790, V800-V880.
-- Demo versions used: V900-V992 and V994, with V993 / V995 held by Operations.
+- Seed versions used: V900-V992 and V994, with V993 / V995 held by Operations.
 - Product Maintenance claims V755, V813-V817, V821, V831, V871 and V996-V997, and holds V818-V819 for its follow-ups.
 
-**Proposal: schema V890-V895 (V896-V899 kept for follow-ups); demo V1900-V1901.**
+**Proposal: schema V890-V895 (V896-V899 kept for follow-ups); seed V1900-V1901.**
 
 | Version | Owner (wave) | Content |
 |---|---|---|
@@ -113,8 +113,8 @@ The Developer Guide ranges and the free versions were checked in `backend/src/ma
 | `V894__collections_unapplied.sql` | C1-C | `clx_unapplied_disposition`, `clx_application_request` |
 | `V895__collections_files.sql` | C1-A | `clx_scheduled_file` (report code, period, file id, available_from), document template rows (SOA) |
 | `V896-V899` | - | Kept free |
-| `db/demo/V1900__demo_collections.sql` | C1-A | Demo assignment rules, handlers (`clxhandler`, `clxtl`, `clxuh`), items for the booked demo invoices, dispositions of every kind |
-| `db/demo/V1901__demo_collections_plans.sql` | C1-B | Demo installment plan (quarterly), promises (one kept, one broken), an escalation, one SOA |
+| `db/seed/V1900__seed_collections.sql` | C1-A | Seed assignment rules, handlers (`clxhandler`, `clxtl`, `clxuh`), items for the booked seed invoices, dispositions of every kind |
+| `db/seed/V1901__seed_collections_plans.sql` | C1-B | Seed installment plan (quarterly), promises (one kept, one broken), an escalation, one SOA |
 
 Why this range is safe:
 - V890-V899 is the free tail of the "broking business modules" range (V800-V899), where Collections belongs.
@@ -122,13 +122,13 @@ Why this range is safe:
 - The rule "no foreign keys to V8xx" holds anyway: invoice no., ARN, client code and usernames are plain values, as in Operations.
 - Foreign keys go only to V1-V754 tables (users, branches, workflow, LOV, attachments).
 
-Why the demo is at V1900:
-- The V900-V999 demo block is nearly full: V993 / V995 are held by Operations, V996 / V997 by Product Maintenance, and V998 / V999 are the last two free versions.
-- The demo must run after the Operations demo (V990-V995), because it needs demo invoices in the ledger.
-- Proposed convention for the Developer Guide: **"V1900-V1999: demo data of modules added after BRD-3 (`db/demo` only), sub-range per BRD: V1900-V1909 Collections."** V1000-V1899 stay free for future schema ranges of later BRDs (Accounting, Disbursement, ACSL). Every demo version is then above every schema version, so a demo migration never runs before its tables.
+Why the seed is at V1900:
+- The V900-V999 seed block is nearly full: V993 / V995 are held by Operations, V996 / V997 by Product Maintenance, and V998 / V999 are the last two free versions.
+- The seed must run after the Operations seed (V990-V995), because it needs seed invoices in the ledger.
+- Proposed convention for the Developer Guide: **"V1900-V1999: seed data of modules added after BRD-3 (`db/seed` only), sub-range per BRD: V1900-V1909 Collections."** V1000-V1899 stay free for future schema ranges of later BRDs (Accounting, Disbursement, ACSL). Every seed version is then above every schema version, so a seed migration never runs before its tables.
 - V998 / V999 are left to whoever needs a last V9xx slot.
 
-Coordination: the Accounting / Disbursement analysis may also propose V890s. The owner of the Developer Guide range table decides, and the fallback for Collections is V1000-V1009 (schema) with the same demo block.
+Coordination: the Accounting / Disbursement analysis may also propose V890s. The owner of the Developer Guide range table decides, and the fallback for Collections is V1000-V1009 (schema) with the same seed block.
 
 ## 4. Entities (key fields)
 
@@ -181,7 +181,7 @@ Records of Cashiering's unapplied items are **not copied**. The list (034-036) r
 
 ## 5. Accounting events and GL entries
 
-Collections posts **no** accounting event. The table shows where the money effects of Collections actions are posted. The demo rules follow OPERATIONS_DESIGN section 5, and the real accounts come from Comptrollership (OQ07).
+Collections posts **no** accounting event. The table shows where the money effects of Collections actions are posted. The seed rules follow OPERATIONS_DESIGN section 5, and the real accounts come from Comptrollership (OQ07).
 
 | # | Trigger in Collections | Posted by | Event | Default entry |
 |---|---|---|---|---|
@@ -190,7 +190,7 @@ Collections posts **no** accounting event. The table shows where the money effec
 | 3 | Disposition "DP PR for reversal", validated and collection confirmed | commission | `OPS_DP_PR_REVERSAL` (existing #22) | Dr 2210 DTIP / Cr 1210.x |
 | 4 | Partial direct-to-insurer payment confirmed (BRCLXN.064, draft) | commission | `OPS_DP_PR_REVERSAL` with the partial amount | As 3, for the confirmed portion only |
 | 5 | Incentive campaign billed (BRCLXN.061/062, draft) | commission via booking `ServiceInvoiceService` | `OPS_INCENTIVE_BILL` (new) | Dr 1230 Incentive Receivable / Cr 4130 Incentive Income (Other Income), Cr 2504 Output VAT; WTAX on collection: Dr bank + Dr 1602 CWT / Cr 1230 (`OPS_OR_ISSUE` class INCENTIVE) |
-| 6 | Commission refund from a negative adjustment on a billed / collected line (BRCLXN.063, draft) | commission | `OPS_COMMISSION_REFUND` (new) | Dr 4101 Commission Income (or 2220 if unrealized) and Dr 2504 / Cr 2217 Commission Refund Payable - Insurer (new demo account); paid through Disbursement |
+| 6 | Commission refund from a negative adjustment on a billed / collected line (BRCLXN.063, draft) | commission | `OPS_COMMISSION_REFUND` (new) | Dr 4101 Commission Income (or 2220 if unrealized) and Dr 2504 / Cr 2217 Commission Refund Payable - Insurer (new seed account); paid through Disbursement |
 | 7 | Installment plan, SOA, promise, escalation, disposition without Operations action | - | none | Monitoring only (BRCLXN.060: billing creates no receivable) |
 
 Sub-ledger: incentive receivables are open items of the insurer party (type INCENTIVE), apart from commission receivables (BRCLXN.061), and commission refunds are credit items of the insurer (BRCLXN.063).
@@ -214,9 +214,9 @@ Sub-ledger: incentive receivables are open items of the insurer party (type INCE
 | `CLX_REPORT_VIEW` | Scheduled files and Collections reports (view) |
 | `CLX_AUDIT_VIEW` | Audit log view / extract (044) |
 
-### 6.2 Roles (V890) and demo users (V1900, password `Brokerverse@2026`)
+### 6.2 Roles (V890) and SIT/UAT users (V1900)
 
-| Role | Persona (p.43-46) | Key permissions | Demo user |
+| Role | Persona (p.43-46) | Key permissions | SIT/UAT user |
 |---|---|---|---|
 | `MKT_AO` (exists) | Marketing AO | CLX_VIEW, CLX_WORK, CLX_ESCALATE, CLX_UNAPPLIED_WORK, CLX_REPORT_VIEW, CLX_EXPORT | existing AO users |
 | `MKT_TL` (exists) | Marketing Team Lead | + CLX_ESCALATION_HANDLE, CLX_ASSIGN, CLX_BULK_UPDATE, CLX_BILLING | `mkttl` (exists) |
@@ -320,7 +320,7 @@ Notification events:
 | `remittance` (built) | None. Holds and special remittances stay. The Collections account page deep-links to `/remittance/holds?invoice=` | - | - |
 | `adjustment` (built) | None required. Commission deltas are already posted as `ADJUSTED` movements (`CommissionAdjuster`), which Commission reads for BRCLXN.063. Collections shows `PENDING_NEG_ADJ` on the item | - | - |
 | Disbursement queue (built, `opsledger` `DisbursementQueueService`) | None. Refunds (Cashiering) and commission refunds (draft 063) use `DisbursementGateway` as designed | - | - |
-| GL / accounting | Two new event types (draft 061-063) with demo rules; no change for the signed scope | Comptrollership rule sign-off | O1-D |
+| GL / accounting | Two new event types (draft 061-063) with seed rules; no change for the signed scope | Comptrollership rule sign-off | O1-D |
 | `catalog` (built, PM extending) | Unit Head on the sales unit: `cat_sales_unit.head_username` + `SalesOrganisationService.unitHead(companyId, unitCode)` | Migration `V819__catalog_sales_unit_head.sql`: V818-V819 are held by Product Maintenance, so agree with the PM owner. Fallback: `clx_unit_head` in V891 | **Deferred to C1-A** (P1-A is changing `catalog` during C0; section 14) |
 | `security` (built) | Lockout threshold from a parameter (NFR 3 attempts); Collections permissions | `AppUser.MAX_FAILED_ATTEMPTS` becomes `SecurityProperties.maxFailedAttempts` | C0 |
 | `report` (built) | Scheduled file generation with availability: `ReportArchiveService.archiveGenerated(code, params, file, availableFrom)` | Used by the Collections file jobs | C0 |
@@ -393,23 +393,23 @@ Prerequisites:
 - `opsledger` is built;
 - Cashiering (O1-A) and Commission (O1-D) are in progress.
 
-C1-A and C1-B can start as soon as C0 is merged. C1-C needs O1-A to implement the two ports; it builds against the default adapters until then.
+C1-A and C1-B can start as soon as C0 is delivered. C1-C needs O1-A to implement the two ports; it builds against the default adapters until then.
 
-| Wave | Agent | Scope | Files owned | Exit criteria |
+| Wave | Team | Scope | Files owned | Exit criteria |
 |---|---|---|---|---|
-| **C0** (1 agent, short) | Collections foundation | Port additions in `opsledger` (section 9), `CollectionFeedReady` event, Collections permissions in `Permission.java`, V890 (grants, LOVs, parameters, workflow, alert codes, notification events, feed transport update), lockout parameter, report archive "generated" method, catalog unit head (with the PM owner), nav registration `features/collections/module.ts` with a stub home and `help.ts`, crons in `application.yml`, Developer Guide range rows (V890-V899, V1900-V1999) | `opsledger/service/port/**` (new files + `CollectionFeed.java`), `opsledger/service/adapter/OpsPortDefaults.java`, `OpsLedgerEvents.java`, `security/domain/Permission.java`, `security/**` (lockout), `report/core/ReportArchiveService.java`, `catalog/**` (sales unit head only), `V890`, `V819` (agreed), `navigation/modules.ts`, `help/helpContent.ts`, `application.yml`, `docs/development/DEVELOPER_GUIDE.md` | Compiles with default adapters; `mvn verify` green |
-| **C1-A** | Collections core | Worklist + refresh job + balance listener, assignment and rules, PR dispositions, efforts, field-change log, soft lock, `InAppCollectionFeed` (outbox / inbox), scheduled files and the daily / weekly / monthly reports, home, worklist, account page (tabs Summary, Payments, Timeline, Policy, Dispositions, History), client view, files, setup, demo V1900 | `collections/{worklist,disposition,feed,files,audit,home}/**`, `V891`, `V895`, `db/demo/V1900`, `features/collections/**` except the C1-B / C1-C folders | Refresh from demo bookings; dispositions reach the Cashiering / Commission outboxes; files published with availability |
-| **C1-B** | Collections plans and escalation | Installment plans (from policy-year invoices or generated), allocation, promises and `CLX_PROMISE_CHECK`, escalation rules / cases / workflow / job, manual and bulk escalation, bulk update handler, SOA (docgen template), demo V1901 | `collections/{installment,promise,escalation,billing,bulk}/**`, `V892`, `V893`, `db/demo/V1901`, `features/collections/{plans,escalations,billing}/**` | Broken promise -> escalation -> TL; SOA per cycle for a 3-year demo account |
+| **C0** (1 team, short) | Collections foundation | Port additions in `opsledger` (section 9), `CollectionFeedReady` event, Collections permissions in `Permission.java`, V890 (grants, LOVs, parameters, workflow, alert codes, notification events, feed transport update), lockout parameter, report archive "generated" method, catalog unit head (with the PM owner), nav registration `features/collections/module.ts` with a stub home and `help.ts`, crons in `application.yml`, Developer Guide range rows (V890-V899, V1900-V1999) | `opsledger/service/port/**` (new files + `CollectionFeed.java`), `opsledger/service/adapter/OpsPortDefaults.java`, `OpsLedgerEvents.java`, `security/domain/Permission.java`, `security/**` (lockout), `report/core/ReportArchiveService.java`, `catalog/**` (sales unit head only), `V890`, `V819` (agreed), `navigation/modules.ts`, `help/helpContent.ts`, `application.yml`, `docs/development/DEVELOPER_GUIDE.md` | Compiles with default adapters; `mvn verify` green |
+| **C1-A** | Collections core | Worklist + refresh job + balance listener, assignment and rules, PR dispositions, efforts, field-change log, soft lock, `InAppCollectionFeed` (outbox / inbox), scheduled files and the daily / weekly / monthly reports, home, worklist, account page (tabs Summary, Payments, Timeline, Policy, Dispositions, History), client view, files, setup, seed V1900 | `collections/{worklist,disposition,feed,files,audit,home}/**`, `V891`, `V895`, `db/seed/V1900`, `features/collections/**` except the C1-B / C1-C folders | Refresh from seed bookings; dispositions reach the Cashiering / Commission outboxes; files published with availability |
+| **C1-B** | Collections plans and escalation | Installment plans (from policy-year invoices or generated), allocation, promises and `CLX_PROMISE_CHECK`, escalation rules / cases / workflow / job, manual and bulk escalation, bulk update handler, SOA (docgen template), seed V1901 | `collections/{installment,promise,escalation,billing,bulk}/**`, `V892`, `V893`, `db/seed/V1901`, `features/collections/{plans,escalations,billing}/**` | Broken promise -> escalation -> TL; SOA per cycle for a 3-year seed account |
 | **C1-C** | Collections unapplied (after O1-A merges, or against the defaults) | Collector view, dispositions, application request, application text file, history; cashiering-side port implementation reviewed with O1-A | `collections/unapplied/**`, `V894`, `features/collections/unapplied/**` | Request -> Cashiering disposition -> applied -> history |
-| **C1-D** | Commission extensions (in the commission agent's scope) | BRCLXN.059 gate (signed); after CQ01: 061-064 | `commission/**`, commission range | CR SOA blocked without confirmation |
+| **C1-D** | Commission extensions (in the commission team's scope) | BRCLXN.059 gate (signed); after CQ01: 061-064 | `commission/**`, commission range | CR SOA blocked without confirmation |
 | **C2** | Integration and hardening | E2E: booking -> item -> promise broken -> escalation -> payment applied -> item completed; 2307 disposition -> Cashiering tag; DP disposition -> Commission DP item -> returned -> Collections inbox; module guide `docs/modules/COLLECTIONS.md`; fit/gap refresh | tests + docs | Full `mvn verify` / `npm run verify` |
 
 Rules for parallel work:
-- One Flyway file set per agent: C0 V890; C1-A V891 / V895 / V1900; C1-B V892 / V893 / V1901; C1-C V894.
-- Sub-packages are owned by one agent. `collections/common` (item query service, change recorder) belongs to C1-A. C1-B and C1-C use it read-only and ask C1-A for changes.
+- One Flyway file set per team: C0 V890; C1-A V891 / V895 / V1900; C1-B V892 / V893 / V1901; C1-C V894.
+- Sub-packages are owned by one team. `collections/common` (item query service, change recorder) belongs to C1-A. C1-B and C1-C use it read-only and ask C1-A for changes.
 - Shared files (Permission enum, nav, help registry, `application.yml`, `ops_flow_in_feed` rows) are edited **only in C0**.
-- Each agent writes its own `*ApiIT` smoke class.
-- No agent edits `cashiering/**` or `commission/**` except their owners, who implement the ports and consumers listed in section 9.
+- Each team writes its own `*ApiIT` smoke class.
+- No team edits `cashiering/**` or `commission/**` except their owners, who implement the ports and consumers listed in section 9.
 
 ## 13. Risks
 
@@ -463,7 +463,7 @@ differs from or details the sections above. C1-A, C1-B and C1-C build on this an
   `EmptyUnappliedDirectory`), `UnappliedDispositionRequests` (default `HandoffDispositionRequests`, hand-off port
   `UnappliedDispositionRequests`, team `CASH_DISPOSITION`; `status(source, sourceRef)` added so C1-C can poll), and the
   events `CollectionFeedReady` and `UnappliedDispositionChanged` (published by cashiering when it decides a
-  request: ACCEPTED, REJECTED or APPLIED). Cashiering is merged, so the cashiering adapters of the two ports are an open
+  request: ACCEPTED, REJECTED or APPLIED). Cashiering is delivered, so the cashiering adapters of the two ports are an open
   contract ask (C1-C with the cashiering owner, section 12).
 - **Deferred to C1-A: the catalog unit head.** `cat_sales_unit.head_username` and
   `SalesOrganisationService.unitHead(companyId, unitCode)` (section 9, V819) are not built in C0 because the Product
@@ -476,8 +476,8 @@ differs from or details the sections above. C1-A, C1-B and C1-C build on this an
   and into `features/collections/module.ts` and `help.ts` (owned by C1-A; C1-B / C1-C add their screens there).
 - **Jobs.** The crons of section 8 are in `application.yml` (`brokerverse.jobs.clx-*-cron`) and
   `docs/operations/CONFIGURATION.md`; each job reads its cron with `@Value("${brokerverse.jobs.<property>:-}")`.
-- **Flyway left to the build waves.** V1001-V1005 as in section 3 (C1-A V1001 / V1005 / demo V1900, C1-B V1002 / V1003
-  / demo V1901, C1-C V1004); V1006-V1009 free.
+- **Flyway left to the build waves.** V1001-V1005 as in section 3 (C1-A V1001 / V1005 / seed V1900, C1-B V1002 / V1003
+  / seed V1901, C1-C V1004); V1006-V1009 free.
 
 ### C1-A as built
 
@@ -488,16 +488,16 @@ Assignments, Files and Setup. It builds on section 14 and differs from sections 
 - **Flyway.** `V1001__collections_worklist.sql` (`clx_item`, `clx_item_balance`, `clx_assignment`,
   `clx_assignment_rule`, `clx_disposition`, `clx_effort`, `clx_field_change`, `clx_outbox`, `clx_inbox`),
   `V1005__collections_files.sql` (`clx_scheduled_file`; the SOA template is left to C1-B's billing),
-  `V819__catalog_sales_unit_head.sql` (the catalog Unit Head, V819 being free after Product Maintenance merged)
-  and `db/demo/V1900__demo_collections.sql` (users `clxhandler` MKT_COLLECTION, `clxtl` CLX_TL, `clxuh`
-  MKT_SECTION_HEAD, `mkthandler` MKT_HANDLER; Unit Heads; three assignment rules). The demo items, dispositions,
-  reassignment and files are made at start-up by `collections.demo.CollectionsDemoData` (order 97) as those users,
-  because the demo invoices reach the ledger only when the booking and Operations runners have run.
+  `V819__catalog_sales_unit_head.sql` (the catalog Unit Head, V819 being free after Product Maintenance delivered)
+  and `db/seed/V1900__seed_collections.sql` (users `clxhandler` MKT_COLLECTION, `clxtl` CLX_TL, `clxuh`
+  MKT_SECTION_HEAD, `mkthandler` MKT_HANDLER; Unit Heads; three assignment rules). The seed items, dispositions,
+  reassignment and files are made at start-up by `collections.seed.CollectionsSeedData` (order 97) as those users,
+  because the seed invoices reach the ledger only when the booking and Operations runners have run.
 - **Packages.** `collections.common` (item entity and repository, LOV attributes `LovAttributes`, change recorder
   `ChangeRecorder`, parameters `ClxSettings`, the read / edit contract `CollectionItems` and the home port
   `CollectionsWorkCountSource`), `worklist` (refresh, job, balance listener, assignment, rules, edit lock, account
   views), `disposition` (PR dispositions `PrDispositionService`, efforts, timeline), `feed` (outbox, inbox,
-  `InAppCollectionFeed`, stale check), `files` (publication, jobs), `report`, `home`, `setup`, `demo`. The PR
+  `InAppCollectionFeed`, stale check), `files` (publication, jobs), `report`, `home`, `setup`, `seed`. The PR
   disposition entity is `PrDisposition` (`clx_disposition`) because Cashiering already has a `Disposition` bean.
 - **Refresh rules** (`ItemSnapshots`): the total to collect is the six PR components plus PR2307. Above
   `CLX_MIN_BALANCE_THRESHOLD` the item is OPEN; at or below it COMPLETED (a new invoice is not listed); an invoice
@@ -563,7 +563,7 @@ Assignments, Files and Setup. It builds on section 14 and differs from sections 
 ### C1-B as built
 
 Wave C1-B (Collections plans and escalation) built BRCLXN.049-051, 053-055 and 058 / 060 in
-`collections/{installment,promise,escalation,billing,bulk}` and `collections.demo`, without reading the worklist of wave
+`collections/{installment,promise,escalation,billing,bulk}` and `collections.seed`, without reading the worklist of wave
 C1-A: an invoice is a collection account when it is a client receivable of the ledger (not direct payment, not
 cancelled) with a premium balance above `CLX_MIN_BALANCE_THRESHOLD`. The worklist item (`clx_item`) is referenced by its
 plain keys (invoice no., ARN, client code); balances are read from `opsledger` (`InvoiceLedgerQueryService`, and one
@@ -574,7 +574,7 @@ read-only SQL over `ops_invoice` / `ops_invoice_component` in `escalation.servic
 | BRCLXN.053 | `clx_installment_plan` / `clx_installment` (V1002). A plan is `POLICY_YEARS` (every BOOKING policy-year invoice of an ARN, booked in the ledger or still `SCHEDULED` in booking, split in the cycles of the frequency within its coverage year; the gross premium of a booked year, the premium total of a scheduled one), `GENERATED` (the outstanding of one invoice in N equal installments from a first due date) or `MANUAL` (entered installments that must add up to the outstanding). One live plan per invoice and per policy-year account (partial unique indexes). Installment status NOT_DUE / DUE / OVERDUE / PARTIAL / PAID, `overdue_since`; the plan completes when every installment is paid |
 | BRCLXN.054 | `PlanAllocation`: per invoice of the plan, the settled amount (installments total less the ledger outstanding, so payments, reversals, 2307 reclass, DP reversal and write-offs all count) is allocated oldest due first; policy years booked since the plan was made are linked to their invoice first. Run by `CLX_PROMISE_CHECK` for every live plan, on "Refresh Allocation" and before an SOA |
 | BRCLXN.055 | `clx_promise` (V1002): invoice, optional installment, `promised_on` (day of the promise, not in the future), `promised_date`, amount (default the whole outstanding, never above it). A new promise on the same invoice evaluates the expired one or supersedes the running one. `CLX_PROMISE_CHECK` evaluates promises whose date plus `CLX_PROMISE_GRACE_DAYS` is before the business date: KEPT when the payments applied (APPLIED less UNAPPLIED on the PR components, value date from `promised_on` to the deadline) reach the amount or nothing is left to collect, PARTIALLY_KEPT when some was paid, else BROKEN (rule to confirm, CQ16). A broken promise notifies the recorder and the AO (`CLX_PROMISE_BROKEN`) and publishes `PromiseBroken` |
-| BRCLXN.049 | `clx_escalation_rule` (V1003, maker-checker: `CLX_SETUP` maintains, `MASTER_AUTHORIZE` authorizes, inbox source `EscalationApprovalSource`), bases AGING_FROM_BOOKING / AGING_FROM_INCEPTION / NO_COMMITMENT_BY_DAY (no OPEN promise) / BROKEN_PROMISES_COUNT / INSTALLMENT_OVERDUE_DAYS / AMOUNT_OVER, filters segment / sales unit / product line / outstanding range, target TL / UH / SECTION_HEAD / USER, reason, SLA hours, notify, effective dates. Job `CLX_ESCALATION` (`EscalationJob`, cron `clx-escalation-cron`) raises one case per rule, invoice and month (`dedup_key`, and none while one of the rule is open), then closes open cases whose invoices are collected (`auto_close`). `EscalationEngine` also listens to `PromiseBroken` and applies the BROKEN_PROMISES_COUNT rules at once: **a broken promise escalates to the team lead** (demo rule `CLX-BROKEN-PROMISE` → `mkttl`). `EscalationOverdueCheck` (alert job) raises `CLX_ESCALATION_OVERDUE` past the SLA of the case |
+| BRCLXN.049 | `clx_escalation_rule` (V1003, maker-checker: `CLX_SETUP` maintains, `MASTER_AUTHORIZE` authorizes, inbox source `EscalationApprovalSource`), bases AGING_FROM_BOOKING / AGING_FROM_INCEPTION / NO_COMMITMENT_BY_DAY (no OPEN promise) / BROKEN_PROMISES_COUNT / INSTALLMENT_OVERDUE_DAYS / AMOUNT_OVER, filters segment / sales unit / product line / outstanding range, target TL / UH / SECTION_HEAD / USER, reason, SLA hours, notify, effective dates. Job `CLX_ESCALATION` (`EscalationJob`, cron `clx-escalation-cron`) raises one case per rule, invoice and month (`dedup_key`, and none while one of the rule is open), then closes open cases whose invoices are collected (`auto_close`). `EscalationEngine` also listens to `PromiseBroken` and applies the BROKEN_PROMISES_COUNT rules at once: **a broken promise escalates to the team lead** (seed rule `CLX-BROKEN-PROMISE` → `mkttl`). `EscalationOverdueCheck` (alert job) raises `CLX_ESCALATION_OVERDUE` past the SLA of the case |
 | BRCLXN.050 | `clx_escalation` / `clx_escalation_item` (V1003), workflow `CLX_ESCALATION` (V1000): a case starts in RAISED and is routed at once (`route` to WITH_TL for TL / USER, `route_to_head` to WITH_UH for UH / SECTION_HEAD; system action for rules, user action for manual escalations), assigned to the designated user when there is one, else it waits in the stage queue and every `CLX_ESCALATION_HANDLE` holder is notified (`CLX_ESCALATED`, with the AOs of the invoices). Manual escalation groups the selected invoices by ARN, one case per account (`POST /api/v1/collections/bulk/escalate`, `CLX_ESCALATE`). Business actions `escalate_further` (reason `CLX_ESCALATION_REASON`; the case moves to the unit / section head queue), `resolve` (resolution required), `resubmit`; `acknowledge` and `return_to_handler` run from the workflow panel. The stage is mirrored by an `@EventListener` on `WorkCaseTransitioned` |
 | BRCLXN.051 | Bulk update handler `CLX_BULK_UPDATE` (`CollectionsBulkUpdateHandler`, permission `CLX_BULK_UPDATE`): per row a promise, an escalation (Escalate = Y, level, user, reason) and, through the port `WorklistUpdates`, the disposition, effort and remarks; each row validated and committed on its own, the upload number is the `bulk_ref` of every record. In-grid bulk actions `POST /api/v1/collections/bulk/{escalate,promises}` return one outcome per invoice (`ItemResult`) |
 | BRCLXN.058 / 060 | `clx_billing_statement` / `_line` / `clx_billing_document` (V1002), `SOA-<yyyy>` numbers, one live SOA per plan and cycle: the cycle's installment (CURRENT) and every earlier unpaid one (ARREARS) with the allocation of the day; PDF from the docgen template `CLX_SOA` (seeded in V1002, version recorded); billing run for the cycles due in a period; e-mail through the messaging outbox with a password-protected PDF (`SoaDispatch`); cancel to bill the cycle again. An SOA creates no receivable and no CR billing |
@@ -593,9 +593,9 @@ read-only SQL over `ops_invoice` / `ops_invoice_component` in `escalation.servic
   panel), Escalation Rules, Billing Statements (+ statement record). StatusBadge tones added for WITH_TL, WITH_UH,
   RETURNED, DUE, PARTIAL, PARTIALLY_KEPT (review), IN_ACTION, NOT_DUE (in process), RESOLVED, KEPT (done), OVERDUE,
   BROKEN (exception).
-- **Demo.** `db/demo/V1901` seeds the process rules (broken promise → `mkttl`, 45 days from booking → TL, 60th day
+- **Seed.** `db/seed/V1901` seeds the process rules (broken promise → `mkttl`, 45 days from booking → TL, 60th day
   from inception → UH, installment overdue 15 days → TL) and one rule pending authorization (maker `badmin`). The
-  storyline needs booked invoices, so it runs after the Operations demo as `collections.demo.CollectionsPlansDemoData`
+  storyline needs booked invoices, so it runs after the Operations seed as `collections.seed.CollectionsPlansSeedData`
   (order 110): a three-year PAR01 account for CL-2026-000005 issued (`ao`, `proc`) and booked (`proc`), its annual
   policy-year plan with **an SOA for each of its three billing cycles** (the first e-mailed), a quarterly plan for
   ARN-2026-940002, a kept promise on ARN-2026-940004, a running one on the quarterly plan and a broken one on the
@@ -612,13 +612,13 @@ read-only SQL over `ops_invoice` / `ops_invoice_component` in `escalation.servic
   installment terms from the quotation or the account (CQ15: plans are built in Collections); SOA layout, recipient,
   numbering and e-mail (CQ18: template `CLX_SOA` and a reviewed e-mail); the account-page tabs, home tiles and the
   installment refresh inside `CLX_DAILY_REFRESH` belong to C1-A (the promise check allocates the plans meanwhile).
-- **Flyway.** V1002 (plans, installments, promises, statements, SOA template), V1003 (rules, escalations), demo V1901.
+- **Flyway.** V1002 (plans, installments, promises, statements, SOA template), V1003 (rules, escalations), seed V1901.
   `CLX_SOA` is seeded here, not in V1005.
 
 ### C1-C as built
 
 Wave C1-C built the collector side of unapplied payments (BRCLXN.030-042, 047/048) in `collections.unapplied` and,
-because Cashiering is merged and owns the unapplied items, the Cashiering adapters of the four Operations ports it
+because Cashiering is delivered and owns the unapplied items, the Cashiering adapters of the four Operations ports it
 needs, additively in `cashiering`.
 
 | BR ID | As built |
@@ -626,7 +626,7 @@ needs, additively in `cashiering`.
 | BRCLXN.034-036 | `UnappliedWorklistService` reads Cashiering's open items through `UnappliedDirectory` (never copied): payment date and age, payment file (the upload batch reference), transaction no., amount, balance, payment type, payor, bank, check no., payor reference, matched client / invoice, sales unit, the Cashiering tab (UNAPPLIED, MONITORING, FOR_APPROVAL, FOR_REVERSAL, DONE; the "processing stage", CQ11) and the status of the Cashiering disposition or collector request. The account fields of the matched invoice (assured, PR balance, inception, segment, sales unit, unit head, AO, insurer, invoice category, handler) come from the collection item, else the invoice ledger. Filters: text, client, unit, tab, payment dates and age run in Cashiering; market segment and collector disposition (`NONE` = none yet) run in Collections over at most 2,000 items |
 | BRCLXN.031/033, 037-040 | `clx_unapplied_disposition` (V1004), append-only: only active `CLX_UPP_DISPOSITION` values; the attribute `cashiering_action` (APPLY_TO_INVOICE / REFUND / RECLASS / TRANSFER / NONE) decides whether a request is sent. The history (`GET /unapplied/{ref}/history`) merges Cashiering's events (`UnappliedDirectory.history`: intake, collector requests and decisions, dispositions, applied / refunded / reclassified / transferred / released, withdrawn, reversed, closed) with the collector dispositions; it stays after the payment is applied or refunded. Each disposition is also a `clx_field_change` row |
 | BRCLXN.047/048 | `requires_invoice` makes the invoice mandatory; it must match `CLX_INVOICE_NO_PATTERN` (EBIX `I########` or BrokerVerse `BI-...`, CQ13) and exist in the invoice ledger of the company (`CLX_INVOICE_REQUIRED`, `CLX_INVOICE_FORMAT`, `CLX_INVOICE_UNKNOWN`); the form checks the same pattern before sending |
-| BRCLXN.030/032 | `clx_application_request` (V1004): the request sent through `UnappliedDispositionRequests` with the key `CLX-UPP-<disposition id>` and the p.60 payment fields as a snapshot. Status SENT / DEFERRED (hand-off) / ACCEPTED / REJECTED / APPLIED, updated by `UnappliedDispositionChanged` (the requester is notified) or by "Check Status" (`POST /unapplied/requests/{id}/refresh`, a poll of the port). Role `UNAPPLIED_HANDLER` (V1000, CQ10) holds `CLX_UNAPPLIED_WORK`; demo user `upphandler` |
+| BRCLXN.030/032 | `clx_application_request` (V1004): the request sent through `UnappliedDispositionRequests` with the key `CLX-UPP-<disposition id>` and the p.60 payment fields as a snapshot. Status SENT / DEFERRED (hand-off) / ACCEPTED / REJECTED / APPLIED, updated by `UnappliedDispositionChanged` (the requester is notified) or by "Check Status" (`POST /unapplied/requests/{id}/refresh`, a poll of the port). Role `UNAPPLIED_HANDLER` (V1000, CQ10) holds `CLX_UNAPPLIED_WORK`; SIT/UAT user `upphandler` |
 | BRCLXN.041/042 | Job `CLX_APPLICATION_FILE` (`ApplicationFileJob`, cron `clx-application-file-cron`, 05:00 PHT) writes, per company, the pipe-delimited text file `FOR_APPLICATION_TO_INVOICE_<yyyyMMdd>_<time>.txt` of the application requests made up to the end of the previous day and not yet listed (payment date, payment file, transaction no., paid amount, currency, payment type, payor, reference no., assured, invoice no., user ID, unapplied reference, request key) through `FileDropPort` into folder `FS04/CLX_APPLICATION_TO_INVOICE` (in-system extract repository until OQ17); each request records the file name. Manual run `POST /unapplied/application-file` (CLX_SETUP or CLX_EXPORT). Report `CLX-APPLICATION-TO-INVOICE` lists the same requests for a period |
 
 - **Cashiering adapters** (V1006 `csh_collector_request`, `csh_refund_validation`, `csh_payment_reversal`; no existing
@@ -669,16 +669,16 @@ needs, additively in `cashiering`.
 - **Home and reports.** `UnappliedWorkCounts` adds the tiles "Unapplied Awaiting Disposition" and "My Requests in
   Cashiering" for `CLX_UNAPPLIED_WORK` users. Reports `CLX-APPLICATION-TO-INVOICE` and `CLX-UNAPPLIED-DISPOSITIONS`
   (`ReportMetadata.collections`).
-- **Demo** (Java runners, no new demo migration): `cashiering.demo.UnappliedDemoPayments` (order 125) receives four
-  unmatched payments as `cashier`; `collections.demo.UnappliedDemoData` (126) creates `upphandler` (role
+- **Seed** (Java runners, no new seed migration): `cashiering.seed.UnappliedSeedPayments` (order 125) receives four
+  unmatched payments as `cashier`; `collections.seed.UnappliedSeedData` (126) creates `upphandler` (role
   UNAPPLIED_HANDLER) and, as the collectors, asks to apply Grace Villanueva's payment to an open invoice outside the
   installment plans, notes "Coordinate further" on Juan Dela Cruz's, asks for the refund of Mega Traders Inc.'s, and
-  writes the day's application file; `cashiering.demo.CollectorRequestDemoData` (127) accepts and processes the
+  writes the day's application file; `cashiering.seed.CollectorRequestSeedData` (127) accepts and processes the
   application as `cashier`. The refund request stays queued; Liza Manalo's payment has no disposition.
 - **Flyway.** V1004 (Collections), V1006 (Cashiering adapters); V1007 is taken by the Data Migration design for the
   legacy item state (`collections_legacy_items`); V1008-V1009 free.
 - **Parked (seam only).** FS04 transport (OQ17: in-system extract repository) and the file layout (CQ12); the
   "Processing Stage", "Business Origin", "Client Code Match" and "System Generated Remarks" definitions (CQ11: the
   Cashiering tab and status are shown); the booker name and names in place of usernames for UH / AO (BRCLXN.036);
-  who the Unapplied Payment Handler is (CQ10: role and demo user only); the real disposition values (CQ08); a REFUND
+  who the Unapplied Payment Handler is (CQ10: role and SIT/UAT user only); the real disposition values (CQ08); a REFUND
   disposition still goes to Disbursement directly, not through a payrequest RRF (OQ15/OQ16).

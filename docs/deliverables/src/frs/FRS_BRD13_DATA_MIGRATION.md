@@ -31,7 +31,7 @@ control:
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Program Manager (pending)
-    change: "Calendar of the BDOI timeline (go-live January 2028); early-renewal concept paper recorded as superseded by the single January 2028 go-live; new FR-DM-034 (package remapping) and FR-DM-124 (renewals of the January-May 2028 expiries); mock-load order in FR-DM-120; layouts and file-name rule in FR-DM-010; test-plan findings in FR-DM-013, 021, 051, 061, 091, 110 and 123; DMQ25 and DMQ26 partly answered, DMQ36-DMQ39 added"
+    change: "Calendar of the BDOI timeline (go-live January 2028); early-renewal concept paper recorded as superseded by the single January 2028 go-live; new FR-DM-034 (package remapping) and FR-DM-124 (renewals of the January-May 2028 expiries); trial-migration load order in FR-DM-120; layouts and file-name rule in FR-DM-010; test-plan findings in FR-DM-013, 021, 051, 061, 091, 110 and 123; DMQ25 and DMQ26 partly answered, DMQ36-DMQ39 added"
   - version: "1.2"
     date: 26 Sep 2026
     author: iorta TechNXT Business Analysis
@@ -123,7 +123,7 @@ Legacy sub-ledger: The GL control accounts and ledger items that hold the legacy
 LOV: List of values
 Opening period: The first GL period of BIBS, January 2028, into which the opening entries and the true-ups post (value date 1 January 2028)
 MIS: Management information fields (market segment, department, unit head, AO, region, area, branch, business origin, customer segment)
-Mock: A rehearsal of the migration on a test environment with masked data
+Trial migration: A rehearsal of the migration on a test environment with masked data
 Layout: The field list of one extract file; an object has one layout or several (R04 and R04B, P01 and P01S, F01, F01S and F01C)
 OTC: Over-the-counter payment at a cashier
 Package remapping: Mapping of a legacy package and version to a BIBS package version, done by the Renewal sanitation check PACKAGE_REMAP with the PACKAGE code map (FR-DM-034)
@@ -218,11 +218,11 @@ A legacy invoice is not re-booked. It enters the BIBS Operations ledger with its
 
 ## Cutover and transition
 
-The cutover follows the BDOI programme timeline (R9, Figure 3): requirements and mapping in September-October 2026, build from November 2026 to March 2027, Mocks 1 and 2 in the SIT migration window (April and July 2027), Mocks 3 and 4 in the UAT migration window (August and October 2027), the dress rehearsal in November 2027, and the production cutover over the year end, with go-live in January 2028 (DMQ25). In every mock, reference data and clients load first. Reference data and clients are pre-loaded in production two weeks before go-live and kept current with daily client deltas. Open items, UPP, policy headers, the renewal advices already sent and the provisional GL opening are loaded once, after the legacy freeze, over the cutover weekend.
+The cutover follows the BDOI programme timeline (R9, Figure 3): requirements and mapping in September-October 2026, build from November 2026 to March 2027, Trial migrations 1 and 2 in the SIT migration window (April and July 2027), Trial migrations 3 and 4 in the UAT migration window (August and October 2027), the dress rehearsal in November 2027, and the production cutover over the year end, with go-live in January 2028 (DMQ25). In every trial migration, reference data and clients load first. Reference data and clients are pre-loaded in production two weeks before go-live and kept current with daily client deltas. Open items, UPP, policy headers, the renewal advices already sent and the provisional GL opening are loaded once, after the legacy freeze, over the cutover weekend.
 
 **Year-end cut-over (DMQ39, recommendation awaiting Comptrollership confirmation).** Go-live is on Monday 3 January 2028, at the year-end boundary (option A). Legacy processes to 31 December 2027 and closes FY2027. BIBS opens with the open items at 31 December and a provisional GL opening trial balance taken from the preliminary December trial balance: balance-sheet accounts only, with the FY2027 result in retained earnings, so that the FY2028 P&L starts at zero (FR-DM-022). After the freeze the legacy GL stays open only for the FY2027 closing and audit adjustments, restricted to Comptrollership, with no new business. Each adjustment reaches BIBS as a controlled opening-balance adjustment journal in the opening period: the first true-up after the legacy year-end close, about mid to late January 2028, and the final one after the audited financial statements, about March-April 2028 (FR-DM-023, FR-DM-024). Comptrollership completes a December soft close by about 20 December 2027. The FY2027 BIR annual returns and the FY2027 audit come from legacy; FY2028 comes from BIBS. Two other options were considered and are not recommended: go-live after the first-quarter close in April 2028 with a migration of the year-to-date P&L (option B), and two sets of books in parallel for the first quarter of 2028 (option C). If BDOI wants more assurance in January, the key January reports are compared with the opening position instead of keeping two books (R3 section 17.7).
 
-The concept paper of 6 September 2026 on an early renewal release (R10) is superseded by the single January 2028 go-live. Of its points, only the mock-load order still applies: the reference data and clients load first in every mock (FR-DM-120). BDOI answered on 26 September 2026 that the renewals of the January-May 2028 expiries are processed in BIBS after go-live (DMQ37) and that legacy packages are remapped at Renewal sanitation (DMQ36).
+The concept paper of 6 September 2026 on an early renewal release (R10) is superseded by the single January 2028 go-live. Of its points, only the trial-migration load order still applies: the reference data and clients load first in every trial migration (FR-DM-120). BDOI answered on 26 September 2026 that the renewals of the January-May 2028 expiries are processed in BIBS after go-live (DMQ37) and that legacy packages are remapped at Renewal sanitation (DMQ36).
 
 ![Migration calendar on the BDOI timeline (BRID 12.1; go-live January 2028)](figures/brd13_cutover_timeline.dot)
 
@@ -443,7 +443,7 @@ screens: Sign-off; Batches
 api: POST /api/v1/migration/batches/{no}/signoff/{gate}
 description:
   - Every object passes seven gates, each recorded with the role, user, decision, comment, time and evidence. The gates are G1 Decision, G2 Mapping, G3 Validation, G4 Load approval, G5 Reconciliation, G6 Object accepted and G7 Go-live.
-  - The Sign-off screen shows the gates per object and environment as a matrix, so the Data Migration Lead sees what is missing before a mock or the cutover.
+  - The Sign-off screen shows the gates per object and environment as a matrix, so the Data Migration Lead sees what is missing before a trial migration or the cutover.
 preconditions:
   - The previous gate of the object or batch is signed.
 main_flow:
@@ -1114,7 +1114,7 @@ main_flow:
   - TSU creates a DRAFT version of set PACKAGE (copied from the approved version or imported from Excel), enters one entry per legacy package and version, with a qualifier where the package splits, and submits it.
   - The Product Owner compares the version with the approved one and approves it (FR-DM-011).
   - The operator loads object R06; BIBS hands the approved version to the Renewal package map and reconciles it (L1-L4).
-  - In each mock BIBS lists the legacy packages of the headers expiring up to 31 May 2028 that have no entry (information report); TSU closes the gaps before the map freeze.
+  - In each trial migration BIBS lists the legacy packages of the headers expiring up to 31 May 2028 that have no entry (information report); TSU closes the gaps before the map freeze.
 alternate_flows:
   - Overlapping qualifiers. The version cannot be submitted until the entries are corrected.
   - Package not resolved at renewal. The candidate goes to the Exception bucket of Renewal.
@@ -1831,8 +1831,8 @@ fit: NEW
 screens: Cutover
 api: GET/POST /api/v1/migration/cutover-plans; .../tasks
 description:
-  - The cutover is run from a plan in the console - tasks with phase, owner role, dependencies, planned and actual times, status and evidence. The same plan structure is used for the four mocks, the dress rehearsal and the production cutover, so timings are measured before go-live. The runbook is an export of the plan.
-  - In every plan the reference data and the client master are loaded and accepted first. They are the prerequisites of renewal testing, which the Drop 1 SIT and UAT run on the mock data (concept paper R10, section VI).
+  - The cutover is run from a plan in the console - tasks with phase, owner role, dependencies, planned and actual times, status and evidence. The same plan structure is used for the four trial migrations, the dress rehearsal and the production cutover, so timings are measured before go-live. The runbook is an export of the plan.
+  - In every plan the reference data and the client master are loaded and accepted first. They are the prerequisites of renewal testing, which the Drop 1 SIT and UAT run on the trial-migration data (concept paper R10, section VI).
 preconditions:
   - The user has MIG_CUTOVER_MANAGE.
 main_flow:
@@ -1841,8 +1841,8 @@ main_flow:
   - BIBS shows progress against the plan and the critical path.
   - At the end the lead records the outcome and timings.
 rules:
-  - [R1, "Calendar (default, BDOI timeline R9) - object decisions and layouts by 30 October 2026; Mocks 1 and 2 in SIT (April and July 2027); Mocks 3 and 4 in UAT (August and October 2027); dress rehearsal November 2027; December soft close in legacy by about 20 December 2027; pre-load of reference data and clients T-14 days; map freeze T-7 days; last legacy business day 29 December 2027; business freeze after the last legacy EOD (31 December 2027 for the recommended go-live of 3 January 2028); go-live renewal extraction at T 04:00; FY2027 true-ups from T+15 to T+120.", Configurable, "Plan template"]
-  - [R4, "Mock-load order - the tasks of objects R01-R07 and C01-C03 come first in every plan, and no policy, open-item or GL load starts before they are accepted (G6).", Fixed, "-"]
+  - [R1, "Calendar (default, BDOI timeline R9) - object decisions and layouts by 30 October 2026; Trial migrations 1 and 2 in SIT (April and July 2027); Trial migrations 3 and 4 in UAT (August and October 2027); dress rehearsal November 2027; December soft close in legacy by about 20 December 2027; pre-load of reference data and clients T-14 days; map freeze T-7 days; last legacy business day 29 December 2027; business freeze after the last legacy EOD (31 December 2027 for the recommended go-live of 3 January 2028); go-live renewal extraction at T 04:00; FY2027 true-ups from T+15 to T+120.", Configurable, "Plan template"]
+  - [R4, "Trial-migration load order - the tasks of objects R01-R07 and C01-C03 come first in every plan, and no policy, open-item or GL load starts before they are accepted (G6).", Fixed, "-"]
   - [R2, "The dress rehearsal must finish within the cutover window with at least 20 percent margin.", Configurable, "Go / no-go criteria"]
   - [R3, "Non-production rehearsals use masked data only.", Fixed, "-"]
 validations:
@@ -1852,9 +1852,9 @@ notifications:
 audit:
   - Every task change is audited.
 acceptance:
-  - A mock plan records planned and actual times per task and per object load.
+  - A trial-migration plan records planned and actual times per task and per object load.
   - The runbook export lists every task with owner and timing.
-  - In a mock plan, the load of P01 cannot start while C01 is not accepted.
+  - In a trial-migration plan, the load of P01 cannot start while C01 is not accepted.
 ```
 
 ```fr
@@ -1966,7 +1966,7 @@ api: LegacyPolicySource (go-live extraction); report MIG-RENEWAL-GOLIVE
 description:
   - The renewals of the policies expiring from go-live to 31 May 2028 are processed in BIBS after go-live; no renewal candidate is carried from legacy (DMQ37, answered 26 September 2026). At go-live, before business opens, BIBS extracts every migrated policy header expiring in this window into the renewal pipeline, prioritised by expiry date, with the January expiries flagged urgent.
   - A renewal advice already sent by hand before go-live is recorded on the candidate from the RA-sent file (FR-DM-125) and is not sent again. A header whose cover has a later term booked in legacy that starts on its expiry is not extracted, because it is already renewed.
-  - The January expiries get days to four weeks instead of 140 days. The day-1 priority queue, a staffing plan for January, and a Renewal team trained and rehearsed on the Mock 4 and dress-rehearsal data before go-live mitigate this (Cutover Runbook).
+  - The January expiries get days to four weeks instead of 140 days. The day-1 priority queue, a staffing plan for January, and a Renewal team trained and rehearsed on the Trial migration 4 and dress-rehearsal data before go-live mitigate this (Cutover Runbook).
 preconditions:
   - The go / no-go decision is GO.
   - The policy headers (P01) include every policy expiring from go-live to 31 May 2028 and every renewal term booked in legacy that starts on or after go-live (FR-DM-040); the RA-sent file is loaded (FR-DM-125).
@@ -2021,7 +2021,7 @@ main_flow:
 alternate_flows:
   - Return. The checker returns the resubmission with a reason; the maker corrects it.
   - Deadline passed. Rows still rejected at the deadline are not loaded; they are listed for the day-1 queue, and the processor checks the tracker before sending an RA for such a policy.
-  - Mocks. The file is sent in every mock from Mock 1; in production once, with the RAs sent up to the last legacy business day.
+  - Trial migrations. The file is sent in every trial migration from Trial migration 1; in production once, with the RAs sent up to the last legacy business day.
 rules:
   - [R1, "Rows are accepted for expiries from the go-live date to MIG_GOLIVE_RENEWAL_TO (default 31 May 2028) whose header is in P01 and was not renewed in legacy.", Configurable, "Parameters MIG_CUTOVER_DATE, MIG_GOLIVE_RENEWAL_TO"]
   - [R2, "The RA date is not after the last legacy business day; an RA date more than 140 days before the expiry is a warning.", Fixed, "-"]
@@ -2266,10 +2266,10 @@ The BRD refers every usage table to "the consolidated NFR requirements for BDO I
 | D-DM-01 | BDOI supplies the data object inventory, owners, volumes and extracts in the agreed layouts | All FRs (DMQ01, DMQ28) |
 | D-DM-02 | Comptrollership sets up the legacy control accounts, Migration Clearing and the legacy rule lines | FR-DM-021, 050-091 (DMQ18) |
 | D-DM-03 | BDOI agrees the client dedupe keys and survivorship | FR-DM-031 (DMQ04) |
-| D-DM-04 | The Renewal module is in SIT for Mock 1 (April 2027) and live at go-live, with the go-live extraction (priority by expiry date, URGENT flag, RA already sent) and the sanitation check PACKAGE_REMAP with the Exception bucket | FR-DM-034, 122, 124, 125 |
+| D-DM-04 | The Renewal module is in SIT for Trial migration 1 (April 2027) and live at go-live, with the go-live extraction (priority by expiry date, URGENT flag, RA already sent) and the sanitation check PACKAGE_REMAP with the Exception bucket | FR-DM-034, 122, 124, 125 |
 | D-DM-05 | BDOI IT keeps the legacy systems read-only with access logging until the archive is loaded | FR-DM-110 (DMQ24) |
 | D-DM-06 | The account business-type change (BT0) is built before the header load | FR-DM-040 |
-| D-DM-07 | TSU maintains the BIBS packages and the PACKAGE map in time for Mock 2 (June 2027) | FR-DM-034 (DMQ36) |
+| D-DM-07 | TSU maintains the BIBS packages and the PACKAGE map in time for Trial migration 2 (June 2027) | FR-DM-034 (DMQ36) |
 | D-DM-08 | The Renewal processing team compiles the RAs already sent from its Excel trackers in the P03 template, reviews the rejects with a maker and a checker, and is staffed and trained for the January expiries | FR-DM-124, 125 (DMQ38) |
 | D-DM-09 | Comptrollership confirms option A by M6 (1 October 2027), completes the December soft close by about 20 December 2027, keeps the FY2027 adjustment register and restricts the legacy GL after the freeze | FR-DM-022 to 024 (DMQ39) |
 | D-DM-10 | The external audit of FY2027 is timed so that the audited financial statements are available by about April 2028 for the final true-up | FR-DM-023, 024 |
@@ -2309,7 +2309,7 @@ The BRD refers every usage table to "the consolidated NFR requirements for BDO I
 | DMQ28 | Volumes, data quality, historic depth, delta frequency | NFR | OPEN |
 | DMQ29 | Consolidated NFR document | NFR | OPEN |
 | DMQ30 | Claims, EB, submitted policies, payees, users in scope | Scope | OPEN |
-| DMQ31 | Number of mocks; masked production data in test | FR-DM-120 | OPEN |
+| DMQ31 | Number of trial migrations; masked production data in test | FR-DM-120 | OPEN |
 | DMQ32 | Point of no return and fallback | FR-DM-121 | OPEN |
 | DMQ33 | In-flight legacy items at the freeze | FR-DM-050, 051 | OPEN |
 | DMQ34 | Collection history and open dispositions | FR-DM-050 | OPEN |
@@ -2352,7 +2352,7 @@ Every BRD-13 requirement is met by at least one FR. The screen and API columns n
 
 API paths start with `/api/v1`.
 
-The concept paper on an early renewal release (R10) is superseded by the single January 2028 go-live. Early migration of the client master and the renewal reference data (section VI) is met by the mock-load order of FR-DM-120. Its RMEL ingestion (Annex C) is replaced by the go-live extraction and the RA-sent file (FR-DM-124, FR-DM-125), and its package remapping question (p.2, Annex B and C) is answered by the remapping at Renewal sanitation (FR-DM-034). No placement or booking happens in BIBS before the January 2028 cut-over, because BIBS is not live before it.
+The concept paper on an early renewal release (R10) is superseded by the single January 2028 go-live. Early migration of the client master and the renewal reference data (section VI) is met by the trial-migration load order of FR-DM-120. Its RMEL ingestion (Annex C) is replaced by the go-live extraction and the RA-sent file (FR-DM-124, FR-DM-125), and its package remapping question (p.2, Annex B and C) is answered by the remapping at Renewal sanitation (FR-DM-034). No placement or booking happens in BIBS before the January 2028 cut-over, because BIBS is not live before it.
 
 # Sign-off
 

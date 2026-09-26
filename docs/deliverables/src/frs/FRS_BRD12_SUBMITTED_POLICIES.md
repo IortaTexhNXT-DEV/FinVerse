@@ -257,7 +257,7 @@ The BRD does not give an access matrix; the roles above are the project's propos
 | SBM_REPORT_VIEW | Y | Y | Y | Y | Y | | | | | |
 | SBM_REPORT_EXPORT | Y | | Y | Y | | | | | | |
 
-"L1" and "L2" are IAAF approval levels of the demo matrix. Placement and Booking users also receive SBM_VIEW.
+"L1" and "L2" are IAAF approval levels of the seed matrix. Placement and Booking users also receive SBM_VIEW.
 
 **Data scope.** Every query, report and export is limited to the user's scope: a list of segments, and for Marketing AOs only the records they handle or whose renewal account they own (BRIDSP-28).
 

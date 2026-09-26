@@ -114,8 +114,8 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
   | V813–V819 | catalog extensions and Product Maintenance (catalog V813–V815, `productmaint` V816–V819); the version columns of account, quotation and booking are V821, V831 and V871 in their own ranges. Planned contract changes of later BRDs in the owners' ranges (V822 built): V822 account business type (work item BT0, shared by Renewal, Employee Benefits and Submitted Policies; built by EB E0), and (designed, not built) V851 placement hold-cover re-assignment and V861 issuance extraction kind (Submitted Policies); see `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
   | V890–V899 | Accounting, Disbursement and ACSL (BRD-5): disbursement V891–V893, payrequest V894–V895, acsl V896–V897, frbs V898–V899, foundation V890 |
   | V1000–V1899 | modules of later BRDs, 10 versions each: Collections (BRD-4) V1000–V1009, Renewal V1010–V1019, broking Claims V1020–V1029, Employee Benefits V1030–V1039, Customer Servicing Facility V1040–V1049, Sanction Screening and Risk Profiling V1050–V1059, User Access Maintenance V1060–V1069, Submitted Policies V1070–V1079, Data Migration (BRD-13) V1080–V1089, Core Replacement platform items (BRD-00 umbrella) V1090–V1099; the next BRD V1100–V1109 and so on. Data Migration uses V1086 (`opsledger`, whose range V760–V763 is full) and V1087 (`acsl`, range full) for the owners; its other owner changes go into the owners' free versions: V766 cashiering, V786 commission, V803 crm, V823 account (after BT0 V822), V873 booking, V1007 collections (designed, not built; see [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md) §24). Core Replacement waves CR-W0 to CR-W5 use V1090–V1096, V1097–V1099 reserved ([`CORE_REPLACEMENT_IMPACT.md`](../architecture/CORE_REPLACEMENT_IMPACT.md) §8) |
-  | V900–V999 | demo data (`db/demo`, loaded only with the `demo` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989, Operations V990–V995, Product Maintenance V996–V998 (V996 catalog versions, V997 package requests, V998 Product Maintenance users), Accounting / Disbursement V999 (reference data and users only; its storyline runs as Java demo runners) (full) |
-  | V1900–V1999 | demo data of the V1000+ modules, 10 versions each in the same order: Collections V1900–V1909, Renewal V1910–V1919, Claims V1920–V1929, Employee Benefits V1930–V1939, Customer Servicing V1940–V1949, Sanctions V1950–V1959, User Access V1960–V1969, Submitted Policies V1970–V1979, Data Migration V1980–V1989, Core Replacement V1990–V1999 (runs after all V9xx demo, so it can build on the Operations and booking demo) |
+  | V900–V999 | seed data (`db/seed`, loaded only with the `seed` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989, Operations V990–V995, Product Maintenance V996–V998 (V996 catalog versions, V997 package requests, V998 Product Maintenance users), Accounting / Disbursement V999 (reference data and users only; its storyline runs as Java seed runners) (full) |
+  | V1900–V1999 | seed data of the V1000+ modules, 10 versions each in the same order: Collections V1900–V1909, Renewal V1910–V1919, Claims V1920–V1929, Employee Benefits V1930–V1939, Customer Servicing V1940–V1949, Sanctions V1950–V1959, User Access V1960–V1969, Submitted Policies V1970–V1979, Data Migration V1980–V1989, Core Replacement V1990–V1999 (runs after all V9xx seed, so it can build on the Operations and booking seed) |
 
   Because each module owns a range, a module can add a migration whose version is lower than one
   another module has already applied (for example a new platform `V27` after underwriting's `V101`).
@@ -132,7 +132,7 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
 
 - Operational modules publish a `BusinessEvent` with an **event type** (table `acc_event_type`),
   amount **components** and optional **account roles** (`@BANK`, `@EXPENSE`…). Add new event types
-  in your module's migration, with demo rules in your demo migration.
+  in your module's migration, with seed rules in your seed migration.
 - Use a unique `sourceReference` per business transaction (e.g. `POLICY:123:ENDT:2`): the engine is
   idempotent on it.
 - Negative component amounts post to the opposite side (refunds, releases).
@@ -212,9 +212,9 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
 
 ## 8. Tests (definition of done)
 
-- Service logic: integration test annotated `@IntegrationTest` (embedded PostgreSQL, demo data) –
-  use `AsUser` to act as demo users (`accountant`, `checker`, `fmanager`, `uw`, `claims`,
-  `reinsurer`, `auditor`; password `Brokerverse@2026`).
+- Service logic: integration test annotated `@IntegrationTest` (embedded PostgreSQL, seed data) –
+  use `AsUser` to act as SIT/UAT users (`accountant`, `checker`, `fmanager`, `uw`, `claims`,
+  `reinsurer`, `auditor`).
 - Every new read endpoint added to `ApiSmokeIT`.
 - Every report exercised in a test that runs it and exports PDF/XLSX/CSV.
 - Pure logic (calculations): plain JUnit tests.
@@ -228,7 +228,7 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
 cd backend
 mvn spotless:apply            # format
 mvn verify                    # format check, compile (-Werror), tests, coverage, checkstyle, PMD, CPD, SpotBugs
-SPRING_PROFILES_ACTIVE=demo mvn spring-boot:run   # needs PostgreSQL on localhost:5432 (docker compose up db)
+SPRING_PROFILES_ACTIVE=seed mvn spring-boot:run   # needs PostgreSQL on localhost:5432 (docker compose up db)
 
 # frontend (Node 22)
 cd frontend
@@ -469,8 +469,8 @@ Cache reference data that is read on hot paths and changed rarely by administrat
 
 ## 11. Module documentation
 
-Every business module has a guide with its business rules, lifecycle, accounting events and demo
-rules, reports, ports, demo data and open points. Update it together with the code.
+Every business module has a guide with its business rules, lifecycle, accounting events and seed
+rules, reports, ports, seed data and open points. Update it together with the code.
 
 | Module | Guide |
 |---|---|
@@ -494,7 +494,7 @@ Modules of later BRDs, **designed, not built** (the design is the guide until th
 code; cross-BRD decisions and the build order are in
 [`BDOI_CROSS_BRD_DECISIONS.md`](../requirements/BDOI_CROSS_BRD_DECISIONS.md)):
 
-| Module (package) | BRD | Flyway (demo) | Design |
+| Module (package) | BRD | Flyway (seed) | Design |
 |---|---|---|---|
 | `renewal` | BRD-6 Renewal | V1010–V1017 (V1910–V1911) | [`RENEWAL_DESIGN.md`](../architecture/RENEWAL_DESIGN.md) |
 | `eb` | BRD-8 Employee Benefits, Drop 2 without the partner portal (being built: foundation E0 V1030, V1031, V1033 done, with the shared work item BT0 V822 and the platform items P2 / P3; E1-B V1034; E1-C V1035, V1036) | V1030, V1031, V1033–V1036 (V1930–V1932) | [`EMPLOYEE_BENEFITS_DESIGN.md`](../architecture/EMPLOYEE_BENEFITS_DESIGN.md) §16 |
@@ -504,8 +504,8 @@ code; cross-BRD decisions and the build order are in
 | `migration` | BRD-13 Data Migration (owner changes V766, V786, V803, V823, V873, V1007, V1086, V1087 in the owners' modules) | V1080–V1087 (V1980–V1982) | [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md) |
 | No new module (`dashboard`, `report`, `audit`, `catalog`, `opsledger`, `booking`) | BRD-00 Core Replacement (umbrella): role home, report layout and subscriptions, master data change log, MIS fields, insurer page, Invoice Master List, insurer invoice batch | V1090–V1096 (V1990–V1991) | [`CORE_REPLACEMENT_IMPACT.md`](../architecture/CORE_REPLACEMENT_IMPACT.md) |
 
-BRD-10 Sanction Screening (`screening`, V1050–V1055, demo V1950–V1952) and BRD-11 User Access Maintenance (no
-module of its own: it extends `security` and `nbadmin`, V1060–V1063, demo V1960) are built; their guides are in the
+BRD-10 Sanction Screening (`screening`, V1050–V1055, seed V1950–V1952) and BRD-11 User Access Maintenance (no
+module of its own: it extends `security` and `nbadmin`, V1060–V1063, seed V1960) are built; their guides are in the
 table above and their designs are [`SANCTION_SCREENING_DESIGN.md`](../architecture/SANCTION_SCREENING_DESIGN.md) and
 [`USER_ACCESS_DESIGN.md`](../architecture/USER_ACCESS_DESIGN.md). BRD-7 Claims Handling (`brokerclaims`, V1020–V1024,
 V1920–V1921; V1025 held for the legacy claims migration, CLQ14) is built (waves CL0, CL1-A, CL1-B and the integration

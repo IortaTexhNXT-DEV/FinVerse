@@ -25,7 +25,7 @@ so each document can be regenerated after every build.
 | 4 | Bill of materials (infrastructure and technology), coding and quality standards | Word + Excel | A | `pom.xml`, `package.json`, deployment files, hosting appendix; the BDOI IER workbook v20 and its comparison with BIBS (item 42, section 6); the architecture option [`ARCHITECTURE_OPTION_DECISION.md`](../architecture/ARCHITECTURE_OPTION_DECISION.md) (BIBS modular monolith with the IER enterprise elements, awaiting BDOI confirmation) |
 | 5 | Fit-gap per module | Excel | B | specs and traceability, updated after build |
 | 6 | Menu, screens, fields and roles workbook for client concurrence | Excel | B | `navigation/modules.ts`, screens, permissions, roles |
-| 7 | End-to-end deck by persona: actor, role, usage, expected outcome, observation, screenshots | PowerPoint | B | demo walkthrough and screenshots |
+| 7 | End-to-end deck by persona: actor, role, usage, expected outcome, observation, screenshots | PowerPoint | B | seed-data walkthrough and screenshots |
 | 8 | Persona-based end-to-end test execution and results | Excel + Word | B | automated and manual runs |
 | 9 | Professional BDO theme on every screen and document; plain, specific wording | all | A + B | UX guidelines, writing standard |
 | 10 | Every function works: CRUD, upload and download (with templates), document prints, schedules, reports; output checked | test evidence | B | test runs and output samples |
@@ -262,4 +262,4 @@ workbook (about 100 findings). Besides those, v1.1 applies these corrections acr
 - BRD-2: the menu section is "Production Reconciliation" (the platform label is corrected with the alignment pass);
 - BRD-5 Volume 1: Lists of Values and Access Requests are under Setup & Administration > Broking Setup.
 - BRD-13: the seven test-plan findings (FR-DM-013, 021, 051, 061, 091, 110, 123); the design gains sub-layouts R04B, P01S,
-  F01S and F01C and the `<LAYOUT>_<SOURCE>_...` file-name rule, and drops the demo account codes that clash with Accounting.
+  F01S and F01C and the `<LAYOUT>_<SOURCE>_...` file-name rule, and drops the seed account codes that clash with Accounting.

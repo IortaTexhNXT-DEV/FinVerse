@@ -22,7 +22,7 @@ of section 3, the ports and columns of section 4, and XQ12-XQ13):
 
 This document holds:
 1. the decisions that settle the conflicts between those designs (section 1);
-2. the changes for documents that are being edited by build agents and are therefore not edited here (section 2);
+2. the changes for documents that are being edited by build teams and are therefore not edited here (section 2);
 3. one table of every earlier question that BRD-6 to BRD-12 answer (section 3);
 4. the overlaps removed from the designs (section 4);
 5. the cross-BRD conflicts that remain, as questions (section 5);
@@ -71,7 +71,7 @@ disagrees):
 
 ## 2. Changes for documents not edited here
 
-Build agents are working on these documents, so they are not changed by this consolidation. Their owners apply the
+Build teams are working on these documents, so they are not changed by this consolidation. Their owners apply the
 items below when they next edit them.
 
 | Document | Item | Source |
@@ -242,7 +242,7 @@ Check after the edits:
 
 | # | Work item | Needed by | Scope | Owner |
 |---|---|---|---|---|
-| **BT0** | **Account business type** (D1) | Renewal, Employee Benefits, Submitted Policies; also Operations (`ops_invoice` column) and ACSL | `V822__account_business_type.sql`: `acc_account.business_type` (required, NEW_BUSINESS / RENEWAL, default NEW_BUSINESS), `renewal_of_ref` varchar(40), origin value SUBMITTED_POLICY. Code: `Account.getBusinessType()`, `AccountResponse`, `AccountSearch` filter, bulk `ACCOUNT_CREATE` optional column; `NewAccount.renewal(...)` and the overload `NewAccount.renewal(..., Integer productVersionNo)` (Renewal); `AccountPricing` rating with `RatingQuery.Purpose.RENEWAL` when the business type is RENEWAL (Renewal); booking `InvoiceBuilder` reads the account's type instead of the hard-coded NEW_BUSINESS (line 129) and `InvoiceBooked.businessType`; the Business Type filter on `NB-BOOKED-REG`, `NB-PRODUCTION`, `NB-PLC-UPDATE`. The existing `NewAccount` factories keep NEW_BUSINESS, so current callers do not change | The first of Submitted Policies S0, Renewal R0 or Employee Benefits E0 to start, as one commit agreed with the account, booking and nbreport owners; the others only check it is merged |
+| **BT0** | **Account business type** (D1) | Renewal, Employee Benefits, Submitted Policies; also Operations (`ops_invoice` column) and ACSL | `V822__account_business_type.sql`: `acc_account.business_type` (required, NEW_BUSINESS / RENEWAL, default NEW_BUSINESS), `renewal_of_ref` varchar(40), origin value SUBMITTED_POLICY. Code: `Account.getBusinessType()`, `AccountResponse`, `AccountSearch` filter, bulk `ACCOUNT_CREATE` optional column; `NewAccount.renewal(...)` and the overload `NewAccount.renewal(..., Integer productVersionNo)` (Renewal); `AccountPricing` rating with `RatingQuery.Purpose.RENEWAL` when the business type is RENEWAL (Renewal); booking `InvoiceBuilder` reads the account's type instead of the hard-coded NEW_BUSINESS (line 129) and `InvoiceBooked.businessType`; the Business Type filter on `NB-BOOKED-REG`, `NB-PRODUCTION`, `NB-PLC-UPDATE`. The existing `NewAccount` factories keep NEW_BUSINESS, so current callers do not change | The first of Submitted Policies S0, Renewal R0 or Employee Benefits E0 to start, as one commit agreed with the account, booking and nbreport owners; the others only check it is delivered |
 | **P2** | **Report DOCX export** | Employee Benefits (BRID-022.01, BRID-007); every report of any build once it exists (EBQ21 asks whether Word export is required beyond EB) | `ExportFormat.DOCX`, `DocxReportRenderer` (Apache POI XWPF); `DocumentProtector` DOCX protection | EB E0 |
 | **P3** | **Attachment access classes** | EB (BRID-025), CSF (CSQ07: agents' lists and downloads), Renewal and Claims (their shared document types), later any module with confidential documents | `att_document_access` (document type, permission), `att_attachment_link.process_tag`; `DocumentService` filters list, download and ZIP; types without a row keep today's behaviour; rows for `RENEWAL_ADVICE` and `CLAIM_REPORT` (XQ04) | EB E0 (V1031), before CSF S1 |
 | **P4** | **`ReportCategory` additions** | All seven builds | `RENEWAL` ("Renewal"), `CLAIMS_HANDLING` ("Claims Handling"), `EMPLOYEE_BENEFITS` ("Employee Benefits"), `CUSTOMER_SERVICE` ("Customer Service"), `COMPLIANCE` ("Compliance"), `SUBMITTED_POLICIES` ("Submitted Policies"); UAM uses the existing `CONTROL`. The `ReportMetadata` factories (`claimsHandling`, `compliance`, `submitted`, ...) and Renewal's `ParameterType.CODE_SET` stay with each build | All six values in one commit by the first foundation wave (6.2, step A2); later foundations add only their factory |
@@ -262,21 +262,21 @@ them: RN-R0, CL-CL0, EB-E0, CSF-S0, SANC-S0, UAM-U0, SP-S0.
 
 | Step | Wave | Why here |
 |---|---|---|
-| A1 | UAM-U0 + SANC-S0 (one foundation agent, as both designs ask) | No dependency on the other new BRDs; both designs require one agent or back-to-back runs. Adds the P4 `ReportCategory` values for all builds. Gives the `DirectoryAuthenticator` port (D6) |
+| A1 | UAM-U0 + SANC-S0 (one foundation team, as both designs ask) | No dependency on the other new BRDs; both designs require one team or back-to-back runs. Adds the P4 `ReportCategory` values for all builds. Gives the `DirectoryAuthenticator` port (D6) |
 | A2 | CL-CL0 | Claims depends only on built modules, and Renewal needs its read API (D4) |
 | A3 | BT0, then EB-E0 | Under this order EB is the first of the three business-type builds to start, so E0 builds BT0 as its first commit; then P2 (DOCX) and P3 (access classes, with the `RENEWAL_ADVICE` / `CLAIM_REPORT` rows) |
 | A4 | CSF-S0 | The CSF design asks for E0 before S0 (shared `attachment` and navigation files) |
-| A5 | RN-R0 | Needs BT0 (merged in A3) |
-| A6 | SP-S0 | Needs BT0; also needs Collections C1 and Operations O1-A (cashiering) for its ports, which are being built by other agents |
+| A5 | RN-R0 | Needs BT0 (delivered in A3) |
+| A6 | SP-S0 | Needs BT0; also needs Collections C1 and Operations O1-A (cashiering) for its ports, which are being built by other teams |
 
-**Phase B: business waves, in parallel once their foundation is merged.**
+**Phase B: business waves, in parallel once their foundation is delivered.**
 - UAM U1-A (commits the `ExternalUserProvisioner` port and the EXTERNAL request type first), U1-B.
 - SANC S1-A, then S1-B, then S1-C (each starts on the previous stub, as designed).
 - CL1-A and CL1-B (CL1-B delivers `ClaimExperienceQueryService`).
 - EB E1-B, E1-C; **E1-A after UAM U1-A** has committed the provisioner port (D7).
 - CSF S1 (after the Operations owner agrees `paymentsOfClient`).
 - RN R1-A to R1-D. The CLAIMS check and the claims part of the Account History tab are complete once CL1-B is
-  merged (D4); before that they report "claims not connected".
+  delivered (D4); before that they report "claims not connected".
 - SP S1-A to S1-D.
 
 **Phase C: dependent and integration waves.**

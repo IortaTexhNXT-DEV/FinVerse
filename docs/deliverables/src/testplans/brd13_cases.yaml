@@ -143,7 +143,7 @@ scenarios:
     pre: Loads of SC-DM-02; TB TD-DM-07.
   - id: SC-DM-04
     persona: STEWARD
-    title: Client master and reference data. Codes are mapped and created, the PACKAGE map is loaded for the Renewal sanitation, legacy clients are matched, deduplicated and created as active clients; reference data and clients load first in every mock.
+    title: Client master and reference data. Codes are mapped and created, the PACKAGE map is loaded for the Renewal sanitation, legacy clients are matched, deduplicated and created as active clients; reference data and clients load first in every trial migration.
     pre: Extracts TD-DM-02 and TD-DM-03.
   - id: SC-DM-05
     persona: CASHIER
@@ -159,8 +159,8 @@ scenarios:
     pre: Archive TD-DM-08.
   - id: SC-DM-08
     persona: PM
-    title: Cutover. A mock plan is run with reference data and clients first, go / no-go is decided on measured criteria, the January-May 2028 expiries are extracted at go-live with the RAs already sent and the later expiries move by RMEL cohort, and legacy systems are decommissioned on the checklist.
-    pre: All objects loaded in a mock.
+    title: Cutover. A trial-migration plan is run with reference data and clients first, go / no-go is decided on measured criteria, the January-May 2028 expiries are extracted at go-live with the RAs already sent and the later expiries move by RMEL cohort, and legacy systems are decommissioned on the checklist.
+    pre: All objects loaded in a trial migration.
   - id: SC-DM-09
     persona: RECON
     title: Year-end cut-over. The provisional GL opening is loaded from the preliminary December trial balance, and the FY2027 closing and audit adjustments reach BIBS in approved true-ups that are reconciled to the legacy trial balance and closed.
@@ -1720,14 +1720,14 @@ frs:
     screen: CUTOVER
     data: [TD-DM-01]
     conditions:
-      - A mock plan records planned and actual times per task and per object load.
+      - A trial-migration plan records planned and actual times per task and per object load.
       - The runbook export lists every task with owner and timing.
       - A task cannot start before its dependency is complete.
-      - In a mock plan the load of P01 cannot start while C01 is not accepted (reference data and clients first).
+      - In a trial-migration plan the load of P01 cannot start while C01 is not accepted (reference data and clients first).
     cases:
       - c: 1
         type: Workflow
-        title: Run a mock plan
+        title: Run a trial-migration plan
         steps:
           - Create a plan of kind MOCK from the template; start and complete the tasks of phase D.
         expected: Actual start and end are recorded per task and per load; progress against the plan is shown.
@@ -1749,7 +1749,7 @@ frs:
         persona: OPERATOR
         screen: BATCH
         title: Header load before the clients are accepted
-        pre: Mock plan with C01 LOADED but G6 not signed.
+        pre: Trial-migration plan with C01 LOADED but G6 not signed.
         steps:
           - Approve and start the load of the P01 batch.
         expected: Refused; after C01 is accepted (G6) the P01 load starts.
@@ -1784,7 +1784,7 @@ frs:
         type: Workflow
         title: NO-GO starts the fallback
         steps:
-          - In a mock plan record NO-GO.
+          - In a trial-migration plan record NO-GO.
         expected: The fallback task starts and its owner is notified.
       - c: 4
         type: Negative
@@ -1835,7 +1835,7 @@ frs:
         screen: RENEWAL
         title: Expiry before go-live not extracted
         steps:
-          - In a mock with MIG_CUTOVER_DATE 3 January 2028, run the Renewal extraction for the business date 10 August 2027 (expiry 28 December 2027).
+          - In a trial migration with MIG_CUTOVER_DATE 3 January 2028, run the Renewal extraction for the business date 10 August 2027 (expiry 28 December 2027).
         expected: No candidate is created from the migrated headers.
         msg: ["Expiry {2027-12-28} is before go-live; the policy renews in legacy"]
 

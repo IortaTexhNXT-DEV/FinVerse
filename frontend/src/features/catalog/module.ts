@@ -13,7 +13,7 @@ import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
- * Product Maintenance (BDOI prototype name of the catalog section, BRD-3): product catalog and
+ * Product Maintenance (BDOI UX design name of the catalog section, BRD-3): product catalog and
  * rules, insurer panel, rates and taxes, sales organisation and the premium calculator
  * (docs/architecture/BROKING_ARCHITECTURE.md, catalog), with the Product Maintenance catalog
  * screens (BRD-3, PRODUCT_MAINTENANCE_DESIGN section 11): package versions and their validation,

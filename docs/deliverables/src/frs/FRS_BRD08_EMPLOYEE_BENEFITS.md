@@ -1173,7 +1173,7 @@ alternate_flows:
   - Return. The approver returns the comparative with a reason.
   - A new rule matches at confirmation. The cycle returns to THRESHOLD_APPROVAL.
 rules:
-  - [R1, "Demo values TSI >= 500M and premium >= 20M are examples; BDOI gives the values and levels (EBQ11).", Configurable, Threshold Rules (EB_SETUP)]
+  - [R1, "Seed values TSI >= 500M and premium >= 20M are examples; BDOI gives the values and levels (EBQ11).", Configurable, Threshold Rules (EB_SETUP)]
   - [R2, "The AO of the cycle never approves the threshold.", Fixed, "-"]
 validations:
   - [Placement triggered while approval pending, "Cycle <no.> waits for the threshold approval", To be assigned at build]

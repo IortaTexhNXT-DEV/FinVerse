@@ -87,7 +87,7 @@ The roles-and-access sheet checks each Product Maintenance action against the ro
 | Level | What is tested | Who | When |
 |---|---|---|---|
 | Unit and integration (automated) | Rules, validations, workflow transitions, permissions and documents of each FR, against a PostgreSQL database; frontend form checks | iorta TechNXT developers | Every change, in CI (`mvn verify`, `npm run verify`) |
-| System test | Every case of the workbook, screen by screen, with the demo data | iorta TechNXT QA | Before UAT, on the SIT environment |
+| System test | Every case of the workbook, screen by screen, with the seed data | iorta TechNXT QA | Before UAT, on the SIT environment |
 | Persona end-to-end | The eight scenarios run from start to finish by the persona that owns each step, with notifications and e-mails checked in the test mailboxes | iorta TechNXT QA with the BDOI department testers | After the system test passes |
 | User acceptance test (UAT) | The scenarios and the High-priority cases, run by BDOI testers on masked production-like data | BDOI MBS, TSU and Marketing testers | After the entry criteria of section 3 are met |
 
@@ -123,7 +123,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | The build is deployed on SIT with the demo profile (seeds V980 to V998); CI is green on the deployed commit; the test mailboxes of the four demo insurers receive mail; this plan is reviewed by the iorta TechNXT project manager. |
+| System test | The build is deployed on SIT with the seed profile (seeds V980 to V998); CI is green on the deployed commit; the test mailboxes of the four seed insurers receive mail; this plan is reviewed by the iorta TechNXT project manager. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical defect; the notification and e-mail relay work on SIT. |
 | UAT | FRS BRD-3 v1.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; the BDOI testers attended the walkthrough of the Product Maintenance screens. |
 
@@ -136,7 +136,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 | Persona end-to-end | All eight scenarios passed end to end with the expected notifications and e-mails. |
 | UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High defect; open defects listed with an agreed plan in the UAT sign-off; the sign-off of section 10 is signed. |
 
-**Suspension.** Testing of a scenario stops when a Critical defect blocks it, when the environment is down for more than half a day, or when the demo or UAT data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
+**Suspension.** Testing of a scenario stops when a Critical defect blocks it, when the environment is down for more than half a day, or when the seed or UAT data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
 
 # Environments and test data
 
@@ -146,18 +146,18 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 | Environment | Use | Data |
 |---|---|---|
 | CI | Automated unit and integration tests on every change | Created by each test; PostgreSQL in a container |
-| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Demo profile seeds (V900-V998); test mailboxes for insurers and users |
-| UAT | Acceptance by BDOI testers | Masked copy of production-like data plus the demo package requests; no real client names, TINs, addresses or e-mail addresses |
+| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed profile migrations (V900-V998); test mailboxes for insurers and users |
+| UAT | Acceptance by BDOI testers | Masked copy of production-like data plus the seed package requests; no real client names, TINs, addresses or e-mail addresses |
 
 Non-production data is always masked. Client names, TINs, addresses, e-mail addresses and phone numbers are replaced before data is loaded into SIT or UAT, and insurer e-mail addresses point to test mailboxes, so no quotation slip or advisory can reach a real insurer or client.
 
 ## Named data sets
 
-The cases refer to named data sets. For BRD-3 every set is provided by the demo seed of the build, so testers do not key in master data before they start; TD-PM-12 and TD-PM-13 are prepared by the tester as the case describes.
+The cases refer to named data sets. For BRD-3 every set is provided by the seed of the build, so testers do not key in master data before they start; TD-PM-12 and TD-PM-13 are prepared by the tester as the case describes.
 
 <!-- tp:data -->
 
-Some cases change the state of a demo request (for example the sign-off of PKR-2026-900004). The test lead reloads the demo seed between cycles, or testers run those cases on a copy made with the TD-PM-12 values.
+Some cases change the state of a seed request (for example the sign-off of PKR-2026-900004). The test lead reloads the seed between cycles, or testers run those cases on a copy made with the TD-PM-12 values.
 
 # Roles and responsibilities
 
@@ -171,7 +171,7 @@ Some cases change the state of a demo request (for example the sign-off of PKR-2
 | BDOI process owner | BDOI Product Owner, MBS | Decides on disputed expected results and accepted defects; signs off UAT |
 | UAT coordinator | Business Project Services, BDO Unibank ESG | Plans the UAT sessions; checks traceability to the BRD |
 
-Each BDOI department tests the steps it owns: Marketing the requests, approvals and review of terms (SC-PM-03, part of SC-PM-04); TSU the review, negotiation, requirements, advisories and expiry (SC-PM-04, 05, 07); MBS the set-up, versions, masters and incentive criteria (SC-PM-02, 05, 06, 08). The personas and demo users are:
+Each BDOI department tests the steps it owns: Marketing the requests, approvals and review of terms (SC-PM-03, part of SC-PM-04); TSU the review, negotiation, requirements, advisories and expiry (SC-PM-04, 05, 07); MBS the set-up, versions, masters and incentive criteria (SC-PM-02, 05, 06, 08). The personas and SIT/UAT users are:
 
 <!-- tp:personas -->
 
@@ -233,7 +233,7 @@ Cases with an automation reference are covered by these existing tests, which ru
 |---|---|---|
 | BDOI answers to open questions change expected results (PQ05 outcomes, PQ07 ManCom quorum, PQ08 SLA and approval chain, PQ09 checklist) | Medium | The values are configuration; the affected cases name the parameter or list, and are re-run after the change without a new build |
 | BDOI document layouts and password convention not yet given (Q03, Q07) | Medium | Documents are tested on the draft layouts; the Upload-download and Report-output cases are re-run when the layouts are loaded |
-| Demo data is changed by earlier cases (for example PKR-2026-900004 signed off) | Medium | Reload the demo seed between cycles; cases that change a demo request are marked in their preconditions |
+| Seed data is changed by earlier cases (for example PKR-2026-900004 signed off) | Medium | Reload the seed between cycles; cases that change a seed request are marked in their preconditions |
 | Test mailboxes of insurers not reachable from SIT or UAT | High | Check the relay before the cycle (entry criterion); QS and advisory cases read the E-mails tab when the mailbox is down and are re-run later |
 | Time-based cases (SLA at 80 %, expiry at 60, 30 and 7 days) need the clock to pass | Medium | The test lead moves stage-entry times and end dates in the test database, as the preconditions describe |
 | Four-eyes cases need a user holding two roles | Low | The test lead creates the combined test users listed in the preconditions and removes them after the cycle |

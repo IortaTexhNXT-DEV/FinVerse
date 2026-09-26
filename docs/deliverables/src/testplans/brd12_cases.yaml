@@ -66,7 +66,7 @@ data:
   - id: TD-SP-01
     name: Test users per role and scope
     content: sbmhandler (SBM_HANDLER, scope CBG Motor), firehandler (SBM_HANDLER, scope CBG Fire), sbmchecker (SBM_CHECKER, IAAF level 1), sanitation (SBM_SANITATION), sbmtl (SBM_TL), polreview (SBM_POLICY_REVIEWER), badmin (SBM_RULE_ADMIN), upphandler (SBM_UPP_HANDLER), ao and ao2 (MKT_AO, own records), mkttl (MKT_TL, IAAF level 2 and rule approval), tsu (TSU), proc (PROCESSOR).
-    source: Planned demo seed V1970 of the build design; firehandler and ao2 created by the test lead with their user scope
+    source: Planned seed V1970 of the build design; firehandler and ao2 created by the test lead with their user scope
   - id: TD-SP-02
     name: Source files
     content: LFS insurance report of 300 CBG Motor rows; the same file again; an LFS file with 5 rows without PN; an LFS file with one row that updates an existing policy (new premium); a CSV without header row; a PDF file.
@@ -82,23 +82,23 @@ data:
   - id: TD-SP-05
     name: LAMD snapshot
     content: PN rows with active non-amortised loans (FFY and generic), fully paid loans, RMU (remedial) and open-market loans; one row without PN.
-    source: Planned demo seed V1971; masked rows added by the test lead
+    source: Planned seed V1971; masked rows added by the test lead
   - id: TD-SP-06
     name: Rules and masters
-    content: Active demo rule sets for sanitation, matching, classification and disposition; SM Group employee list; No Touch list; limit rule for insurer INS-MGIC Motor, maximum vehicle age 10 years; insurer rules by vehicle type (Motor) and different-from-expiring (Fire); letter rules; IAAF matrix (level 1 SBM_CHECKER, level 2 MKT_TL) and TSU matrix for TOR.
-    source: Planned demo seed V1970 of the build design
+    content: Active seed rule sets for sanitation, matching, classification and disposition; SM Group employee list; No Touch list; limit rule for insurer INS-MGIC Motor, maximum vehicle age 10 years; insurer rules by vehicle type (Motor) and different-from-expiring (Fire); letter rules; IAAF matrix (level 1 SBM_CHECKER, level 2 MKT_TL) and TSU matrix for TOR.
+    source: Planned seed V1970 of the build design
   - id: TD-SP-07
     name: Masterlist records
     content: About 60 records over the four segments, NB and RB, including migrated records, with handlers and conversion statuses.
-    source: Planned demo seed V1971 of the build design
+    source: Planned seed V1971 of the build design
   - id: TD-SP-08
     name: Review, TOR and handling-fee data
     content: A Non-CBG Corporate record IN_REVIEW with its documents; a CBG Motor record with a 12-year-old vehicle insured with INS-MGIC; billed handling-fee records with PN and location reference; a CLPC unapplied payment carrying a billed PN; an OTC payment with an unknown location reference; one payment matching two records.
-    source: Planned demo seed V1972; payments keyed in Collections by the test lead
+    source: Planned seed V1972; payments keyed in Collections by the test lead
   - id: TD-SP-09
     name: Renewal candidates
     content: A For Renewal CBG Fire record expiring in 150 days (expiring insurer INS-LAC); a For Renewal CBG Motor record expiring in 120 days; a Non-CBG Retail record of ao; a renewal account with a hold cover request open for 6 days.
-    source: Planned demo seeds V1971-V1972; expiry dates set by the test lead
+    source: Planned seeds V1971-V1972; expiry dates set by the test lead
   - id: TD-SP-10
     name: Parameters and jobs as delivered
     content: "SBM_RENEWAL_LEAD_DAYS CBG_FIRE=150, CBG_MOTOR=120; SBM_MASTERLIST_DAYS_FROM_EXTRACTION 30; SBM_INSURER_ACCEPT_DAYS 5; SBM_HOLD_COVER_UNBOOKED_ALERT_DAYS 5; jobs SBM_PROCESSING 21:30, SBM_EXPIRY_SCAN 22:00, SBM_LETTER_DISPATCH 06:30, SBM_HOLD_COVER_WATCH 07:00 PHT, SBM_HANDLING_FEE_TAGGER every 30 minutes."
@@ -760,7 +760,7 @@ frs:
       - c: 2
         type: Negative
         title: Bucket not eligible
-        pre: A Sold record (not eligible in the demo rules).
+        pre: A Sold record (not eligible in the seed rules).
         steps:
           - Run the expiry scan.
         expected: No hand-off.
@@ -1443,7 +1443,7 @@ findings:
     issue: Bucket precedence and the RMU / FFY conflicts are open (SP SQ05) and the conflicting rules are seeded inactive, so a record that is both FFY and RMU cannot be tested.
     proposal: Answer SP SQ05 and add the precedence to the FRS; a case is added then.
   - fr: FR-SP-032
-    issue: The rule that chooses the Generic or the FFY RA is to be confirmed (SP SQ06); the cases follow the demo rule.
+    issue: The rule that chooses the Generic or the FFY RA is to be confirmed (SP SQ06); the cases follow the seed rule.
     proposal: State the rule in the FRS when SP SQ06 is answered.
   - fr: FR-SP-040
     issue: The FRS keeps one IAAF per policy with links, while the BRD's current process lets one IAAF cover several policies (SP SQ07). The bank counterpart may expect one form.

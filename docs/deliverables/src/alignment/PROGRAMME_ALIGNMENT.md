@@ -140,7 +140,7 @@ The capabilities the paper lists remain in scope for January 2028. The table bel
 | 2. In sanitation | A renewal check proposes the package per candidate; TSU confirms | Handles per-policy cases | Thousands of manual decisions; inconsistent results |
 | **3. Both (recommended)** | Code map at intake for every one-to-one mapping; a renewal sanitation check sends candidates with an unmapped, retired or split package to the Review bucket for TSU; each TSU decision can add a code map version | Deterministic for the bulk, controlled for exceptions | Two places to explain in training |
 
-Recommendation: option 3, owned by TSU (Product Maintenance) with the MBS data steward; the mapping rules are agreed before the first full extract (15 January 2027) and tested with sample RMEL files in Mock 1.
+Recommendation: option 3, owned by TSU (Product Maintenance) with the MBS data steward; the mapping rules are agreed before the first full extract (15 January 2027) and tested with sample RMEL files in Trial migration 1.
 
 **The "R0 early renewal" release.** Not planned (A1). The renewal build follows the drops: Renewal waves R0 to R3 are built in build waves 1 and 2 (November 2026 to February 2027) and tested in SIT and UAT Drop 1.
 
@@ -169,9 +169,9 @@ BDOI has fixed January 2028 but not the day (IQ01). The migration design takes T
 | By 15 Jan 2027 | Interface specifications drafted from the IQ answers | First full migration extracts; interface layouts from BDOI IT |
 | By 26 Feb 2027 | Drop 1 build complete (waves 1 and 2); FRS v1.1 of Drop 2 | FRS sign-off, Drop 2 |
 | By 30 Apr 2027 | Drop 2 build complete; migration tooling complete (31 Mar) | Integration test endpoints for EGL, EDP, insurer channels |
-| Apr - Jul 2027 | Mock 1 and Mock 2 in SIT | Extracts per mock; data steward reviews |
+| Apr - Jul 2027 | Trial migration 1 and Trial migration 2 in SIT | Extracts per trial migration; data steward reviews |
 | By 30 Jul 2027 | UAT readiness statement, UAT plans and sign-off forms; security scan in SIT | UAT users set up through EIAM and UIDM-ISC |
-| Aug - Dec 2027 | UAT support on migrated data (Mock 3 in August, re-load in October) | UAT execution and sign-off per drop |
+| Aug - Dec 2027 | UAT support on migrated data (Trial migration 3 in August, re-load in October) | UAT execution and sign-off per drop |
 | By 1 Oct 2027 | Performance test plan and scripts | Pre-Prod environment, production-sized |
 | Nov 2027 - Jan 2028 | Performance and penetration test fixes; dress rehearsal on Pre-Prod; ORR / PRR evidence by 15 Dec 2027 | Penetration test, ORR / PRR, go / no-go |
 
@@ -239,7 +239,7 @@ The IER Kubernetes sheets size ten `bv-*` services. BIBS runs two deployments. T
 ## Environments, hours and disaster recovery
 
 - **Six environments** are needed: DEV, SIT, UAT, Pre-Prod (dress rehearsal and performance test), PROD and DR. The IER has Kubernetes sheets for DEV, SIT, UAT and PROD only, and its Pre-Prod sheet is titled "UAT ENVIRONMENT" (IQ33).
-- **12 x 5 non-production hours** do not cover the BIBS night jobs (EOD booking and remittance extraction at 20:00, Collections files from 22:15 to 23:00, renewal extraction and screening at 01:00, application file at 05:00). In non-production the schedules are moved into the working window through their environment variables, and extended hours are booked for batch and month-end test cycles, migration mocks (weekend loads) and the dress rehearsal. MSK and ElastiCache cannot be stopped, so only the EKS nodes and RDS instances follow the 12 x 5 hours (IQ27).
+- **12 x 5 non-production hours** do not cover the BIBS night jobs (EOD booking and remittance extraction at 20:00, Collections files from 22:15 to 23:00, renewal extraction and screening at 01:00, application file at 05:00). In non-production the schedules are moved into the working window through their environment variables, and extended hours are booked for batch and month-end test cycles, migration trial migrations (weekend loads) and the dress rehearsal. MSK and ElastiCache cannot be stopped, so only the EKS nodes and RDS instances follow the 12 x 5 hours (IQ27).
 - **RPO 15 minutes and RTO 4 hours** answer register item DCR-135 (the register proposed the same values); RDS point-in-time recovery and the cross-region replica meet the RPO, and S3 replication with replication time control covers the documents.
 - **DR region.** The HW sheet names a cross-region read replica; the diagram names ap-southeast-1 with a warm standby; the hosting appendix places BIBS in ap-southeast-1 with access restricted to personnel in the Philippines. The DR region and data residency must be confirmed (IQ26). At failover the backend is scaled up in DR, Redis is rebuilt (caches refill; revoked tokens are lost until they expire, at most 8 hours) and MSK is recreated; events not yet delivered are resent from the database outbox.
 

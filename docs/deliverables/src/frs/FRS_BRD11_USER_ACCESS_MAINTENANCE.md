@@ -507,7 +507,7 @@ main_flow:
 alternate_flows:
   - In DIRECTORY mode (FR-UA-003) no temporary password is created; the user signs in with the Windows ID.
 rules:
-  - [R1, "User ID pattern (default ^[a-zA-Z][0-9]{9}$, to confirm UQ05); existing service and demo users are exempt.", Configurable, Parameter USER_ID_PATTERN]
+  - [R1, "User ID pattern (default ^[a-zA-Z][0-9]{9}$, to confirm UQ05); existing service and SIT/UAT users are exempt.", Configurable, Parameter USER_ID_PATTERN]
   - [R2, "Windows ID is unique across users.", Fixed, "-"]
   - [R3, "At least one active group profile.", Fixed, "-"]
 validations:

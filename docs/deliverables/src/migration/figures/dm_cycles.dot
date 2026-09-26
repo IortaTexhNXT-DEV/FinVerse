@@ -5,11 +5,11 @@ digraph dm_cycles {
          fontsize=12, fontcolor="@NEAR_BLACK", width=6.8, height=0.58, margin="0.14,0.05", fillcolor="@WHITE"];
   edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2];
   r  [label=<<b>Sep-Oct 2026 - requirements and mapping</b><br/><font point-size="10">decisions by 16 Oct and 30 Oct; object decisions (G1); layouts frozen</font>>, fillcolor="@DIRTY_WHITE"];
-  x  [label=<<b>Nov 2026-Mar 2027 - build; 29 Jan 2027 first full extracts</b><br/><font point-size="10">waves in mock order (DM0, DM1-C first); profiling; draft code maps</font>>, fillcolor="@AMBER_BG"];
-  m1 [label=<<b>19-30 Apr 2027 - Mock 1 (SIT, masked)</b><br/><font point-size="10">reference data and clients first; policy headers; RA-sent file (P03)</font>>, fillcolor="@BG_BLUE"];
-  m2 [label=<<b>5-16 Jul 2027 - Mock 2 (SIT, masked)</b><br/><font point-size="10">all objects end to end; L1-L5; Migration Clearing 0.00</font>>, fillcolor="@BG_BLUE"];
-  m3 [label=<<b>2-13 Aug 2027 - Mock 3 = UAT load (UAT, masked)</b><br/><font point-size="10">business verification on screens; Drop 1 UAT runs on migrated data</font>>, fillcolor="@BG_BLUE"];
-  m4 [label=<<b>4-15 Oct 2027 - Mock 4 = UAT refresh (UAT, masked)</b><br/><font point-size="10">timed cut-over; go-live renewal extraction; test true-up</font>>, fillcolor="@BG_BLUE"];
+  x  [label=<<b>Nov 2026-Mar 2027 - build; 29 Jan 2027 first full extracts</b><br/><font point-size="10">waves in trial-migration order (DM0, DM1-C first); profiling; draft code maps</font>>, fillcolor="@AMBER_BG"];
+  m1 [label=<<b>19-30 Apr 2027 - Trial migration 1 (SIT, masked)</b><br/><font point-size="10">reference data and clients first; policy headers; RA-sent file (P03)</font>>, fillcolor="@BG_BLUE"];
+  m2 [label=<<b>5-16 Jul 2027 - Trial migration 2 (SIT, masked)</b><br/><font point-size="10">all objects end to end; L1-L5; Migration Clearing 0.00</font>>, fillcolor="@BG_BLUE"];
+  m3 [label=<<b>2-13 Aug 2027 - Trial migration 3 = UAT load (UAT, masked)</b><br/><font point-size="10">business verification on screens; Drop 1 UAT runs on migrated data</font>>, fillcolor="@BG_BLUE"];
+  m4 [label=<<b>4-15 Oct 2027 - Trial migration 4 = UAT refresh (UAT, masked)</b><br/><font point-size="10">timed cut-over; go-live renewal extraction; test true-up</font>>, fillcolor="@BG_BLUE"];
   dr [label=<<b>15-26 Nov 2027 - Dress rehearsal (production-sized, masked)</b><br/><font point-size="10">full volume, timed against the window, rollback rehearsed; reserve 6-10 Dec</font>>, fillcolor="@BG_BLUE"];
   pl [label=<<b>20 Dec 2027 (T-14) - production pre-load</b><br/><font point-size="10">reference data and clients; daily client deltas until the freeze</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
   pr [label=<<b>31 Dec 2027 to 3 Jan 2028 - production cutover</b><br/><font point-size="10">freeze, final extracts, open items and provisional GL, go / no-go, go-live</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];

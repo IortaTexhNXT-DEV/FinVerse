@@ -77,7 +77,7 @@ BRD-5 has 277 requirement IDs and is issued in two volumes with a shared cover n
 | Volume 1 | FRBS (Accounting), General Ledger platform, report pack, service fee, business and system administration | FRBS 60, BASAU 25 (85) | FR-AC |
 | Volume 2 (this document) | Disbursement, Payment Requests, ACSL | DIS 111, MKT 36, ACSL 45 (192) | FR-DS, FR-PQ, FR-AS |
 
-The accounting events of BRD-5 and their demo entries, the chart and the posting rules are described in Volume 1 (section 5.5); this volume refers to them.
+The accounting events of BRD-5 and their seed entries, the chart and the posting rules are described in Volume 1 (section 5.5); this volume refers to them.
 
 ## References
 
@@ -1319,7 +1319,7 @@ preconditions:
   - "The check is negotiated or stale."
 main_flow:
   - The upload or the job changes the check status.
-  - BIBS posts the event with its demo rule (Volume 1, section 5.5, rows 8-10).
+  - BIBS posts the event with its seed rule (Volume 1, section 5.5, rows 8-10).
 rules:
   - [R1, "Clearing model on or off.", Configurable, "Parameters DISB_CHECK_CLEARING, DISB_CHECK_CLEARING_ACCOUNT (2241)"]
   - [R2, "Stale-check accounting and re-issue are to be confirmed (AQ02, AQ14).", Configurable, Accounting rules]
@@ -3062,7 +3062,7 @@ The system action *apply* runs when every batch that used the deduction has rece
 
 ## Accounting events of this volume
 
-The events and demo entries are listed in Volume 1, section 5.5 (rows 1-19). The events of this volume are DISB_VOUCHER (by disbursement type), DISB_CHECK_NEGOTIATED, DISB_CHECK_STALE, DISB_FUND_TRANSFER, TAX_CWT_CERT_RECEIVED, OPS_REMIT_CPC2, OPS_REMIT_INCENTIVE, OPS_REMIT_DEDUCTION, the ACSL correction journals (ACS:<no>) and PRQ_CA_LIQUIDATION. The real entries are BDOI data (AQ02).
+The events and seed entries are listed in Volume 1, section 5.5 (rows 1-19). The events of this volume are DISB_VOUCHER (by disbursement type), DISB_CHECK_NEGOTIATED, DISB_CHECK_STALE, DISB_FUND_TRANSFER, TAX_CWT_CERT_RECEIVED, OPS_REMIT_CPC2, OPS_REMIT_INCENTIVE, OPS_REMIT_DEDUCTION, the ACSL correction journals (ACS:<no>) and PRQ_CA_LIQUIDATION. The real entries are BDOI data (AQ02).
 
 # Reports and documents
 

@@ -3397,7 +3397,7 @@ main_flow:
   - "Processing keeps or changes it and books."
 rules:
   - [R1, "Cost center mandatory on every booking.", Fixed, "-"]
-  - [R2, "Cost center source and default rule wait for Q34; the sales organisation holds demo units.", Configurable, Sales Organisation]
+  - [R2, "Cost center source and default rule wait for Q34; the sales organisation holds seed units.", Configurable, Sales Organisation]
 validations:
   - [Cost center missing, "Enter the cost center of account <ARN> (BRNB.108)", COST_CENTER_REQUIRED]
 notifications:
@@ -3490,7 +3490,7 @@ api: "POST /api/v1/reports/{code}/run; GET /api/v1/nb/targets; PUT /api/v1/nb/ta
 description:
   - "The reports of BRNB.075 are in the category New Business of the Report Centre, each with a date range - Successful and Fall-out Accounts per Stage (NB-STAGE-OUTCOME); Account Status Report (NB-ACC-STATUS) with stage age, SLA due and breach, stalled flag and an exceptions filter; Placement Summary (NB-PLC-SUMMARY) with slips sent, resent and failed per insurer and branch; CLPC Billing Report (NB-CLPC-BILLING); Matched and Unmatched Payments (NB-PAY-MATCH); Production Statistics (NB-PRODUCTION) per region, department, team or officer against target. Columns are in section 6.1."
   - "Targets per unit and period (bookings, premium, commission) are maintained on Production Targets and pro-rated by days to the report period."
-  - "**Built behaviour:** the QPS Placement Report is replaced by the Placement Summary (OOS-2). The BRD's production 'per system' is read as per officer; the sales hierarchy and target values wait for Q41 (demo targets delivered)."
+  - "**Built behaviour:** the QPS Placement Report is replaced by the Placement Summary (OOS-2). The BRD's production 'per system' is read as per officer; the sales hierarchy and target values wait for Q41 (seed targets delivered)."
 preconditions:
   - "The user holds the report's permission (section 6.1)."
 main_flow:

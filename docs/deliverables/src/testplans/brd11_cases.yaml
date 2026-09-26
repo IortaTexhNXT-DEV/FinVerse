@@ -54,11 +54,11 @@ data:
   - id: TD-UA-01
     name: Test users per role
     content: requestor and requestor2 (UAM_REQUESTOR), uamapprover and uamapprover2 (UAM_APPROVER), secapprover (UAM_SECOND_APPROVER), badmin (BUSINESS_ADMIN), admin and admin2 (SYSADMIN), approver (NB_APPROVER), auditor (AUDITOR), ao (MKT_AO); a disabled user and a locked user.
-    source: Planned demo seed V1960 (requestor, uamapprover, secapprover) and existing seeds V900 / V980; the others created by the test lead
+    source: Planned seed V1960 (requestor, uamapprover, secapprover) and existing seeds V900 / V980; the others created by the test lead
   - id: TD-UA-02
     name: Requests in every status
     content: A draft, a request pending for uamapprover, a returned request, a cancelled request, a scheduled request with a future date, an approved and applied request, a bulk batch of three lines, a group-profile create request FOR_IMPLEMENTATION, a privileged change waiting for the second approval.
-    source: Planned demo seed V1960 of the build design
+    source: Planned seed V1960 of the build design
   - id: TD-UA-03
     name: Group profiles
     content: UAM_REQUESTOR, UAM_APPROVER, UAM_SECOND_APPROVER (Standard); Marketing Team Lead (MKT_TL) and Processing Team Lead (Standard); SYSADMIN (Admin); a High profile UAT_HIGH; an inactive profile UAT_INACTIVE; profile Marketing Account Officer.

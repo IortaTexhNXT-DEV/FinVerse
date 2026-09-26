@@ -1,7 +1,7 @@
 # BDO Insure UX guidelines for iNXT BrokerVerse
 
 Source: the BDOI UX Design pack (BDO Style Guide, prepared by ITG – User Experience Design, and the
-"BDO Insure – Quotation & Renewal" prototype screens, 2026). A copy is kept at
+"BDO Insure – Quotation & Renewal" screen designs, 2026). A copy is kept at
 `docs/source-documents/BDOI_UXD.docx`.
 
 This page is binding for every BrokerVerse screen. Components read the design tokens in
@@ -49,11 +49,11 @@ This page is binding for every BrokerVerse screen. Components read the design to
 ## 3. Spacing and layout
 
 - **Grid.** An 8 px baseline grid; spacing tokens are `--space-*` (4, 8, 12, 16, 24, 32). Desktop web uses a 12-column grid.
-- **Shell.** Screens follow the prototype:
+- **Shell.** Screens follow the BDOI UX design:
   - a white sidebar with the logo on top and collapsible groups;
   - a white header with context selectors, Notifications (with a red count), and the user's name with the date and time;
   - page content on Dirty White with white cards (radius 12).
-- **Navigation groups.** These follow the BDOI prototype (`frontend/src/navigation/modules.ts`):
+- **Navigation groups.** These follow the BDOI UX design (`frontend/src/navigation/modules.ts`):
   - Dashboard and My Work (always open);
   - **Client & Policy**: Client Management, Sanction Screening, Quotation / Proposal, Accounts, Non-Package Management, Employee Benefits, Placement & Booking, Renewal, Submitted Policies, Product Reconciliation, Adjustment, Customer Service Facility, Product Maintenance, Bulk Processing;
   - **Finance**: Collections, the operations cash modules (cashiering, remittance, commission), Disbursement, Refund & Cash Advance Requests, ACSL and Accounting Reports, then the general ledger, receivables, payables, assets, planning, tax and accounting engine;
@@ -82,7 +82,7 @@ This page is binding for every BrokerVerse screen. Components read the design to
 | Modal | Title with a close ✕, body, and a footer with Cancel (secondary) and the action (primary) on the right |
 | Icons | BDO outline icons in CTA Blue at 16 / 24 / 32 / 48 dp with the same stroke weight. The Lucide outline set is used as the equivalent |
 
-## 5. Screen patterns (from the prototype)
+## 5. Screen patterns (from the BDOI UX design)
 
 - **Work lists.** Examples are Renewal and Placement & Booking.
   - Page title, then a card with status tabs (e.g. For Placement & Booking | Booked Account; Unassigned Disposition | For Renewal | For Quotation | Not for Renewal).
@@ -102,8 +102,8 @@ This page is binding for every BrokerVerse screen. Components read the design to
 
 | # | Observation | Current BrokerVerse design |
 |---|---|---|
-| UX-1 | The prototype's proposal number is `MI-06192026-001` (line prefix + MMDDYYYY + sequence) and its client code is `CC01234567890` | ARN-yyyy-nnnnnn (BRNB.102), PRF-/QS-/PS- per document, client code CL-yyyy-nnnnnn. Numbering formats are configurable, so BDOI to confirm the format per document |
-| UX-2 | Renewal screens (disposition assignment, expiry list, Clean / Review / Exception classification) | **Closed by BRD-6 (Renewal).** The Expiry List with Generate Expiry List, Assign Disposition, Re-assign Officer and the Classification pill Clean / Review / Exception are in the BRD; the prototype tabs are kept, with For Proposal / Lost Business / Exceptions added (RENEWAL_DESIGN section 12) |
+| UX-1 | The BDOI UX design's proposal number is `MI-06192026-001` (line prefix + MMDDYYYY + sequence) and its client code is `CC01234567890` | ARN-yyyy-nnnnnn (BRNB.102), PRF-/QS-/PS- per document, client code CL-yyyy-nnnnnn. Numbering formats are configurable, so BDOI to confirm the format per document |
+| UX-2 | Renewal screens (disposition assignment, expiry list, Clean / Review / Exception classification) | **Closed by BRD-6 (Renewal).** The Expiry List with Generate Expiry List, Assign Disposition, Re-assign Officer and the Classification pill Clean / Review / Exception are in the BRD; the BDOI UX design tabs are kept, with For Proposal / Lost Business / Exceptions added (RENEWAL_DESIGN section 12) |
 | UX-3 | Customer Service Facility and Employee Benefits menu entries | **Closed by BRD-8 (EB) and BRD-9 (CSF).** Sections Employee Benefits and Customer Service Facility in Client & Policy (section 3; EMPLOYEE_BENEFITS_DESIGN section 10, CUSTOMER_SERVICING_DESIGN section 10) |
 | UX-4 | Windows ID sign-in | **Closed by BRD-11 (User Access, Q42).** Directory sign-in (BDO EUA / Windows ID, LDAP / AD / SSO) is required. It is built as a parked port; the User ID and Password sign-in stays until BDO supplies the interface (UQ04) |
 | UX-5 | "Send to TSU" directly from the client record | BrokerVerse routes to TSU from the PRF / quotation (BRNB.098 rules). To confirm whether a client-level TSU request is needed |

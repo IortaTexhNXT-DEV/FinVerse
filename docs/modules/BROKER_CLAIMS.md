@@ -55,7 +55,7 @@ experience.
 | Marketing Team Lead | `MKT_TL` (+ `BCL_REPORT_VIEW`, `BCL_REPORT_EXPORT`) | `mkttl` | - | As the AO, plus export (CLQ15) |
 | System Administrator, Auditor | `SYSADMIN`, `AUDITOR` (+ `BCL_VIEW`, `BCL_REPORT_VIEW`) | `admin`, `auditor` | - | Read access; the administrator runs the jobs |
 
-Password of every SIT/UAT user: `Brokerverse@2026`. The 18 `BCL_*` permissions and the grants per role
+The SIT/UAT password is held in the seed configuration. The 18 `BCL_*` permissions and the grants per role
 are in design section 7. The claims roles also have `WORK_VIEW`, `ATTACHMENT_VIEW`, `REPORT_VIEW`,
 `CLIENT_VIEW`, `ACCOUNT_VIEW` and `OPS_VIEW`. The officer, TL and TH also have `ATTACHMENT_MANAGE`
 and `BULK_PROCESS`.

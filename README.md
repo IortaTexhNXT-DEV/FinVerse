@@ -12,20 +12,20 @@ the BDO Insure visual language.
 | Backend | Java 21, Spring Boot 3.5, PostgreSQL 16, Flyway, JWT, Redis, Kafka |
 | Frontend | React 19, TypeScript, Vite, TanStack Query |
 | Reports | On screen, PDF, Excel, CSV and Word (one engine for all reports) |
-| Quality | Checkstyle, PMD/CPD, SpotBugs + FindSecBugs, ArchUnit, JaCoCo, SonarJS, CodeQL, SonarQube-ready |
+| Quality | Checkstyle, PMD/CPD, SpotBugs + FindSecBugs, ArchUnit, JaCoCo, SonarJS, security code scanning, SonarQube-ready |
 
-## Quick start (demo)
+## Quick start (seed)
 
 ```bash
 docker compose up -d --build
 open http://localhost:8081
 ```
 
-Demo users (password `Brokerverse@2026`) are the BDOI personas, for example `ao` (Marketing account officer), `proc`
+SIT/UAT users are the BDOI personas, for example `ao` (Marketing account officer), `proc`
 (Processing), `tsu` (TSU), `cashier`, `remittl` (Remittance team lead), `clxhandler` (Collections), `disbtl`
 (Disbursement team lead), `gltl` (FRBS / GL team lead), `acsltl` (ACSL team lead) and `badmin` (business
 administrator). The screenshot manifest [`tools/screenshots/screens.cjs`](tools/screenshots/screens.cjs) names the
-demo user of every screen. The demo company is fictitious.
+SIT/UAT user of every screen. The seed company carries the legal name of BDOI; all its records are seed data. The SIT/UAT password is held in the seed configuration and issued by the project team.
 
 ## Documentation
 

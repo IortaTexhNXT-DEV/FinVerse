@@ -91,7 +91,7 @@ The roles-and-access sheet checks each Collections action against the roles that
 | Level | What is tested | Who | When |
 |---|---|---|---|
 | Unit and integration (automated) | Refresh, threshold, dispositions, hand-offs, plans, promises, escalation rules, files and permissions of each FR, against a PostgreSQL database; frontend form checks | iorta TechNXT developers | Every change, in CI (`mvn verify`, `npm run verify`) |
-| System test | Every case of the workbook, screen by screen, with the demo data | iorta TechNXT QA | Before UAT, on the SIT environment |
+| System test | Every case of the workbook, screen by screen, with the seed data | iorta TechNXT QA | Before UAT, on the SIT environment |
 | Persona end-to-end | The nine scenarios run from start to finish by the persona that owns each step, with the Cashiering and Commission steps run by their users | iorta TechNXT QA with the BDOI department testers | After the system test passes |
 | User acceptance test (UAT) | The scenarios and the High-priority cases, run by BDOI testers on masked production-like data | BDOI Marketing, Collection and Operations testers | After the entry criteria of section 3 are met |
 
@@ -129,7 +129,7 @@ Several cases depend on time: the nightly refresh (22:15), the promise check (22
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | The build is deployed on SIT with the demo profile (seeds V980 to V1901 and the Collections demo runners); CI is green on the deployed commit; the Operations demo has booked the demo invoices; the test mailboxes receive mail; this plan is reviewed by the iorta TechNXT project manager. |
+| System test | The build is deployed on SIT with the seed profile (seeds V980 to V1901 and the Collections seed runners); CI is green on the deployed commit; the Operations seed has booked the seed invoices; the test mailboxes receive mail; this plan is reviewed by the iorta TechNXT project manager. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical defect; the Cashiering and Commission screens of BRD-2 pass their own entry criteria. |
 | UAT | FRS BRD-4 v1.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; BDOI has given the disposition values, categories and escalation defaults it wants tested (CQ08, CQ14) or accepts the delivered placeholders. |
 
@@ -142,7 +142,7 @@ Several cases depend on time: the nightly refresh (22:15), the promise check (22
 | Persona end-to-end | All nine scenarios passed end to end, with the hand-offs taken by Cashiering and Commission and the notifications received. |
 | UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High defect; open defects listed with an agreed plan in the UAT sign-off; the sign-off of section 10 is signed. |
 
-**Suspension.** Testing of a scenario stops when a Critical defect blocks it, when a scheduled job fails on SIT and cannot be re-run, when the environment is down for more than half a day, or when the demo or UAT data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
+**Suspension.** Testing of a scenario stops when a Critical defect blocks it, when a scheduled job fails on SIT and cannot be re-run, when the environment is down for more than half a day, or when the seed or UAT data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
 
 # Environments and test data
 
@@ -152,18 +152,18 @@ Several cases depend on time: the nightly refresh (22:15), the promise check (22
 | Environment | Use | Data |
 |---|---|---|
 | CI | Automated unit and integration tests on every change | Created by each test; PostgreSQL in a container |
-| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Demo profile seeds and runners (bookings, Operations, Collections worklist, plans, unapplied payments); test mailboxes |
-| UAT | Acceptance by BDOI testers | Masked copy of production-like receivables plus the demo accounts; no real client names, TINs, addresses, account numbers or e-mail addresses |
+| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed profile migrations and runners (bookings, Operations, Collections worklist, plans, unapplied payments); test mailboxes |
+| UAT | Acceptance by BDOI testers | Masked copy of production-like receivables plus the seed accounts; no real client names, TINs, addresses, account numbers or e-mail addresses |
 
 Non-production data is always masked. Client and payor names, TINs, addresses, bank account and check numbers, e-mail addresses and phone numbers are replaced before data is loaded into SIT or UAT, and statement e-mails go to test mailboxes, so no statement of account can reach a real client.
 
 ## Named data sets
 
-The cases refer to named data sets. For BRD-4 most sets are provided by the demo seeds and the Collections demo runners, so testers do not key in master data before they start; TD-CL-09 and TD-CL-10 are prepared by the tester or the test lead as the case describes.
+The cases refer to named data sets. For BRD-4 most sets are provided by the seeds and the Collections seed runners, so testers do not key in master data before they start; TD-CL-09 and TD-CL-10 are prepared by the tester or the test lead as the case describes.
 
 <!-- tp:data -->
 
-Many cases change the state of a demo account (a disposition, a promise, a plan cancelled). The test lead reloads the demo profile between cycles, or testers run those cases on an invoice booked with the TD-CL-09 values. Cases that change a parameter or a list reset it at the end, as their expected result says.
+Many cases change the state of a seed account (a disposition, a promise, a plan cancelled). The test lead reloads the seed profile between cycles, or testers run those cases on an invoice booked with the TD-CL-09 values. Cases that change a parameter or a list reset it at the end, as their expected result says.
 
 # Roles and responsibilities
 
@@ -177,7 +177,7 @@ Many cases change the state of a demo account (a disposition, a promise, a plan 
 | BDOI process owner | BDOI Marketing Head (Section Heads) | Decides on disputed expected results and accepted defects; signs off UAT |
 | UAT coordinator | Business Project Services, BDO Unibank ESG | Plans the UAT sessions; checks traceability to the BRD |
 
-Each BDOI department tests the steps it owns: Collection Handlers and Team Leads the worklist, dispositions, plans, promises, escalations and statements (SC-CL-02 to 07); Marketing AOs and Team Leads their own accounts, bulk update, assignment and escalation handling (SC-CL-03, 04, 06); Unapplied Payment Handlers and Cashiering the unapplied payments (SC-CL-08); the Section Heads, Commission and Application Support the set-up, files, reports and CR billing (SC-CL-01, 09). The personas and demo users are:
+Each BDOI department tests the steps it owns: Collection Handlers and Team Leads the worklist, dispositions, plans, promises, escalations and statements (SC-CL-02 to 07); Marketing AOs and Team Leads their own accounts, bulk update, assignment and escalation handling (SC-CL-03, 04, 06); Unapplied Payment Handlers and Cashiering the unapplied payments (SC-CL-08); the Section Heads, Commission and Application Support the set-up, files, reports and CR billing (SC-CL-01, 09). The personas and SIT/UAT users are:
 
 <!-- tp:personas -->
 
@@ -244,7 +244,7 @@ Cases with an automation reference are covered by these existing tests, which ru
 | BDOI answers to open questions change expected results (threshold CQ03, disposition values and categories CQ08, escalation defaults CQ14, kept / broken rule CQ16, SOA layout and recipients CQ18) | Medium | The values are configuration; the affected cases name the parameter, list or rule and are re-run after the change without a new build |
 | Time-based cases (nightly jobs, promise dates, file availability, lock expiry, SLA) need the clock to pass | Medium | The test lead runs the jobs on demand and moves dates in the test database, as the preconditions describe |
 | Cashiering does not yet pull the PR 2307 hand-offs (FRS 1.6) | Medium | The cases check the pending item and the CLX_OUTBOX_STALE alert; the 2307 reversal itself is tested through Cashiering's upload in BRD-2 |
-| Demo accounts are changed by earlier cases | Medium | Reload the demo profile between cycles; cases that change a demo account or a parameter say so in their preconditions or expected result |
+| Seed accounts are changed by earlier cases | Medium | Reload the seed profile between cycles; cases that change a seed account or a parameter say so in their preconditions or expected result |
 | The draft addendum rows (BRCLXN.061-064) are not built | Low | Their cases are marked "run when built" and excluded from the exit criteria until BDOI confirms the draft |
 | Test mailboxes not reachable from SIT or UAT | Medium | Check the relay before the cycle; statement cases read the E-mails Sent tab when the mailbox is down and are re-run later |
 | BDOI testers are not available in the UAT window | High | Agree named testers per department and dates in the UAT plan (deliverable 30) before UAT starts |

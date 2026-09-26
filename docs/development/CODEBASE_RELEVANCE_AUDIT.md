@@ -24,10 +24,10 @@ Audit date: 26-Sep-2026, on commit `61b1df8`. Sizes are counted as files / lines
 | A3 | `reinsurance` (treaties, cessions, FAC, RI recoveries, RI SOA) | No in phase 1; the ReInsurance BRD is phase 2 and is a broker model | As A1 (`REINSURANCE_*`) | Hide now; decide at phase 2 (remove, reuse only the SOA layout ideas) | 87 / 10,575 + 9 / 1,822 + 20 / 2,122 | Low |
 | A4 | `reserves` (UPR, DAC, OSLR, IBNR, takaful surplus) | No; BDOI does no reserving (Q44) | **Yes**: Reserve Summary (`REPORT_FINANCIAL`), Reserve Parameters (`MASTER_VIEW`), 7 reserve reports in the Report Centre, run approval (`PERIOD_END_RUN`), a row in the period-end checklist | Hide now (priority); remove | 74 / 7,398 + 10 / 1,505 + 16 / 1,846 | Low |
 | A5 | `insurance` shared kernel (claim movement ports) | No | No | Remove with A2-A4 | 7 / 177 | Low |
-| A6 | `consolidation` (inter-company, consolidation groups, consolidated statements) | No BDOI requirement | **Yes**: 5 consolidation reports in the Report Centre (`REPORT_FINANCIAL`); the screens need `CONSOLIDATION_RUN` (no BDOI role holds it) | Hide the reports now; remove after the BRD-5 report pack is confirmed | 41 / 3,890 + 2 / 425 + 9 / 1,030 | Low-medium (`closing` demo and a test use it) |
+| A6 | `consolidation` (inter-company, consolidation groups, consolidated statements) | No BDOI requirement | **Yes**: 5 consolidation reports in the Report Centre (`REPORT_FINANCIAL`); the screens need `CONSOLIDATION_RUN` (no BDOI role holds it) | Hide the reports now; remove after the BRD-5 report pack is confirmed | 41 / 3,890 + 2 / 425 + 9 / 1,030 | Low-medium (`closing` seed and a test use it) |
 | T1 | Insurer parts of `tax`: premium tax, DST, the insurer IC schedules | No; BDOI uses BIR forms, books, 2307 and `IC-BROKER-ASBO` | **Yes**: Tax & Statutory screens with `TAX_VIEW` (FRBS, Disbursement roles) | Hide the insurer screens and reports; then remove `PremiumTaxSource` | part of `tax` (134 / 13,015) | Medium |
 | D1 | Executive dashboard widgets "gross written premium" and "claims paid and outstanding" | No (insurer KPIs) | **Yes**: home screen `/` with `DASHBOARD_VIEW` | Hide the two widgets; the BRD-00 role home replaces the page | 2 widgets | Low |
-| R1 | Insurer roles and demo users (`UNDERWRITER`, `CLAIMS_OFFICER`, `RI_OFFICER`; `uw`, `claims`, `reinsurer`) | No | Roles exist in every database (V1 / V2 are not demo) | Deactivate the three roles in a new migration; keep the demo users until the tests move | - | Low |
+| R1 | Insurer roles and SIT/UAT users (`UNDERWRITER`, `CLAIMS_OFFICER`, `RI_OFFICER`; `uw`, `claims`, `reinsurer`) | No | Roles exist in every database (V1 / V2 are not seed) | Deactivate the three roles in a new migration; keep the SIT/UAT users until the tests move | - | Low |
 | P1 | `payables` documents (supplier invoices, payment vouchers, PDC issued, petty cash) | **Unsure**: BRD-5 disbursement pays through `disbursement` and `payrequest`; bank accounts and cheque books of `payables` are used | Yes (`JOURNAL_VIEW`: FRBS, ACSL, Comptrollership) | Keep the code; ask Comptrollership, then hide the document screens | - | Medium |
 | P2 | `receivables` receipts, deposits and PDC received | **Unsure**: Operations re-uses the patterns, not the entity (BDOI_OPS_BRD_SPEC, platform table); cashiering issues BDOI's AR / OR | Yes (`JOURNAL_VIEW`) | Keep bank statements and reconciliation (BRD-5, FIT); hide the receipt screens after confirmation | - | Medium |
 
@@ -49,7 +49,7 @@ Audit date: 26-Sep-2026, on commit `61b1df8`. Sizes are counted as files / lines
 | `docs/architecture/CLAIMS_BROKING_DESIGN.md` section 2 and its module-impact table | "Do not extend the insurer-side `claims` module ... no BDOI role receives `CLAIM_VIEW`" |
 | `docs/architecture/CORE_REPLACEMENT_IMPACT.md` §6 | Insurer-side `reinsurance` (treaties, cessions, FAC, `SoaDialog`) "not a broker model. Stay hidden from BDOI roles" |
 | `docs/requirements/BDOI_OPS_BRD_SPEC.md` (platform table) | "Receivables (insurer model): Re-use patterns, not the entity" |
-| `docs/architecture/ACCOUNTING_DISBURSEMENT_DESIGN.md` §3 | The demo company `FVI` keeps an insurer chart "that the underwriting, claims, reinsurance, reserves and IC demo stories need" |
+| `docs/architecture/ACCOUNTING_DISBURSEMENT_DESIGN.md` §3 | The seed company `FVI` keeps an insurer chart "that the underwriting, claims, reinsurance, reserves and IC seed stories need" |
 | `tools/screenshots/screens.cjs` | None of the 143 current BDOI screens is an underwriting, claims, reinsurance, reserves or consolidation screen |
 
 No BDOI module imports these packages. The only production dependency from a kept module into them is
@@ -89,10 +89,10 @@ modules themselves.
 - **Migrations.**
   - Owned: `V100__underwriting.sql`, `V101__endorsement_underwriting_year.sql`.
   - Shared: the event types in `V3`.
-  - Demo: `V910__demo_underwriting_roles.sql`, part of `V901`; the runner `underwriting.demo.UnderwritingDemoData`.
+  - Seed: `V910__seed_underwriting_roles.sql`, part of `V901`; the runner `underwriting.seed.UnderwritingSeedData`.
 - **Risk.** Medium:
   - `tax` must first stop reading insurer premiums (T1);
-  - the demo ledger loses the insurer policy journals, which changes the demo balances behind the finance screenshots
+  - the seed ledger loses the insurer policy journals, which changes the seed balances behind the finance screenshots
     (GL journals, finance dashboard, trial balance). Re-capture the screenshots after removal.
 - **Action.**
   1. Now: set `BROKERVERSE_JOB_QUOTATION_EXPIRY_CRON` to empty in the BDOI deployment (no code change), or change the
@@ -116,8 +116,8 @@ modules themselves.
   `help/helpContent.ts`.
 - **Name clash to keep in mind.** `brokerclaims` uses the bean name `BrokerClaimRepository` because `claims` owns
   `claimRepository` (CLAIMS_BROKING_DESIGN, build notes of CL0). Removing `claims` frees the name; do not rename the broker classes.
-- **Migrations.** `V200__claims.sql` (`clm_*` tables, event type, exception codes); demo `V920__demo_claims.sql` and
-  the runner `claims.demo.ClaimsDemoData`.
+- **Migrations.** `V200__claims.sql` (`clm_*` tables, event type, exception codes); seed `V920__seed_claims.sql` and
+  the runner `claims.seed.ClaimsSeedData`.
 - **Risk.** Low.
 - **Action.**
   1. Remove the backend package, `features/claims`, `api/claims.ts`, the menu entry, the help entry and the tests.
@@ -136,8 +136,8 @@ modules themselves.
   `AUDITOR` roles do, and the User Access catalogue offers it.
 - **Dependants.** None in main code; its tests use `underwriting`.
 - **Migrations.** `V300__reinsurance.sql` and `V301__cession_transaction_underwriting_year.sql` (`ri_*` tables, event
-  types, alert codes `RI_*`); demo `V930__demo_reinsurance.sql` and the runners `ReinsuranceDemoData` and
-  `ReinsuranceStatementsDemoData`.
+  types, alert codes `RI_*`); seed `V930__seed_reinsurance.sql` and the runners `ReinsuranceSeedData` and
+  `ReinsuranceStatementsSeedData`.
 - **Risk.** Low for the code. The phase 2 scope decides whether any layout is reused.
 - **Action.**
   1. Hide now (R1).
@@ -165,8 +165,8 @@ modules themselves.
 - **Dependants.** None in main code (it implements `closing.service.PeriodEndCheckProvider`). It reads
   `underwriting`, `claims` and `reinsurance` through their ports.
 - **Migrations.** `V420__actuarial_reserves.sql` (`rsv_*` tables, events, job parameter) and
-  `V421__reserve_permissions.sql` (grants `RESERVE_PREPARE` to `FIN_MANAGER` and `ACCOUNTANT`); demo
-  `V940__demo_reserve_accounts_and_rules.sql` and the runner `ReservesDemoData`.
+  `V421__reserve_permissions.sql` (grants `RESERVE_PREPARE` to `FIN_MANAGER` and `ACCOUNTANT`); seed
+  `V940__seed_reserve_accounts_and_rules.sql` and the runner `ReservesSeedData`.
 - **Risk.** Low.
 - **Action.**
   1. **Now:** remove `reservesModule` from `NAV_GROUPS`. Give the reserve screens and reports a dedicated permission
@@ -197,13 +197,13 @@ modules themselves.
     `CONSOLIDATION_RUN`, which only `FIN_MANAGER` holds.
   - **The 5 reports require `REPORT_FINANCIAL`** and are listed for the FRBS roles.
 - **Dependants.**
-  - `closing/demo/PlanningDemoData.java` and `DemoSubsidiaryData.java` (demo only).
+  - `closing/seed/PlanningSeedData.java` and `SeedSubsidiaryData.java` (seed only).
   - Tests: `api/PlanningApiIT` and `closing` tests.
   - UI: `features/closing/module.ts` imports `consolidationScreens`.
 - **Migrations.** `V600__budget_intercompany_consolidation.sql`, shared with `budget`, so it must stay (`con_*` and
-  `ic_*` tables). Demo: `V960__demo_group_accounts_and_subsidiary.sql` (a second demo company `FVS`) and
-  `V961__demo_intercompany_group_and_average_rates.sql`.
-- **Risk.** Low-medium: the demo subsidiary `FVS` may appear in company pickers and in the FX revaluation demo.
+  `ic_*` tables). Seed: `V960__seed_group_accounts_and_subsidiary.sql` (a second seed company `FVS`) and
+  `V961__seed_intercompany_group_and_average_rates.sql`.
+- **Risk.** Low-medium: the seed subsidiary `FVS` may appear in company pickers and in the FX revaluation seed.
 - **Action.**
   1. Now: move the 5 reports to `CONSOLIDATION_RUN`.
   2. Remove after FRBS confirms the Appendix A pack. Keep `budget`.
@@ -240,25 +240,25 @@ modules themselves.
 - **Action.** Hide the two widgets. The BRD-00 role home (CORE_REPLACEMENT_IMPACT, V1090+) replaces the page for BDOI
   roles. Low risk.
 
-### R1. Insurer roles, permissions and demo users
+### R1. Insurer roles, permissions and SIT/UAT users
 
 - **Roles.** `sec_role` rows `UNDERWRITER`, `CLAIMS_OFFICER` and `RI_OFFICER`, and their grants, come from `V1` / `V2`
-  (not demo), so they exist in every environment, including BDOI production. The generic finance roles `FIN_ADMIN`,
+  (not seed), so they exist in every environment, including BDOI production. The generic finance roles `FIN_ADMIN`,
   `FIN_MANAGER`, `ACCOUNTANT`, `AUTHORIZER`, `BRANCH_FINANCE`, `AUDITOR` and `READ_ONLY` also carry `POLICY_VIEW`,
   `CLAIM_VIEW` and `REINSURANCE_VIEW`.
 - **Permissions.** `Permission.java` values `POLICY_VIEW`, `POLICY_MAINTAIN`, `POLICY_AUTHORIZE`, `CLAIM_VIEW`,
   `CLAIM_MAINTAIN`, `CLAIM_AUTHORIZE`, `REINSURANCE_VIEW`, `REINSURANCE_MAINTAIN`, `REINSURANCE_AUTHORIZE`,
   `RESERVE_PREPARE` and `CONSOLIDATION_RUN`. The User Access (BRD-11) matrix, the group-profile report and the
   role-permission change requests list every value.
-- **Demo users.** `uw`, `claims` and `reinsurer`, plus `fmanager`, `accountant`, `checker` and `auditor` for the insurer
+- **SIT/UAT users.** `uw`, `claims` and `reinsurer`, plus `fmanager`, `accountant`, `checker` and `auditor` for the insurer
   stories. The integration tests use them through `AsUser` (Developer Guide section 8). Several BDOI screenshots are
   also taken as `fmanager`.
 - **Action.**
-  1. Add a non-demo migration in the User Access range (for example `V1064__hide_insurer_roles_and_permissions.sql`)
+  1. Add a non-seed migration in the User Access range (for example `V1064__hide_insurer_roles_and_permissions.sql`)
      that sets the three insurer roles inactive and removes the insurer permissions from `sec_role_permission` of
-     every role except the demo profile's. Alternatively, exclude the values from the permission catalogue in
+     every role except the seed profile's. Alternatively, exclude the values from the permission catalogue in
      `AccessMatrixService` / `RolePermissionChangeValidator`.
-  2. Keep the demo users until the tests of A1-A6 are removed.
+  2. Keep the SIT/UAT users until the tests of A1-A6 are removed.
 
 ### P1 / P2. Overlaps to confirm with BDOI (keep for now)
 
@@ -280,8 +280,8 @@ modules themselves.
 |---|---|---|---|
 | 1 | Hide: remove `reservesModule`, `underwritingModule`, `claimsModule` and `reinsuranceModule` from `NAV_GROUPS` (the "Claims & Insurance" group keeps `brokerClaimsModule`); dedicated permissions for the reserve, consolidation, premium-tax / DST / insurer IC reports; drop the D1 widgets; empty the `QUOTATION_EXPIRY` cron; exclude the insurer permissions from the User Access catalogue (R1) | S (1-2 days) | Low |
 | 2 | Tax: remove `PremiumTaxSource` and the premium branches (T1) | S | Medium |
-| 3 | Remove `reserves`, `claims`, `insurance` (A4, A2, A5) with their UI, API clients, help, tests and demo runners; drop migrations V201 and V422 | M (2-3 days) | Low |
-| 4 | Remove `underwriting` (A1) and its demo runner; drop migration V102; re-capture the screenshots | M | Medium |
+| 3 | Remove `reserves`, `claims`, `insurance` (A4, A2, A5) with their UI, API clients, help, tests and seed runners; drop migrations V201 and V422 | M (2-3 days) | Low |
+| 4 | Remove `underwriting` (A1) and its seed runner; drop migration V102; re-capture the screenshots | M | Medium |
 | 5 | Remove `reinsurance` (A3) at phase 2 design; drop migration V302 | M | Low |
 | 6 | Remove `consolidation` (A6) after FRBS confirms the report pack; drop migration V601 | S | Low-medium |
 | 7 | Decide P1 / P2 with Comptrollership and Operations | - | - |
@@ -291,9 +291,9 @@ In total about 42,700 lines of main code (A1-A6), 7,600 of tests and 11,300 of U
 
 **Rules for every step:**
 - Never edit or delete an applied Flyway migration (`V100`, `V101`, `V200`, `V300`, `V301`, `V420`, `V421`, `V600`, and
-  the demo `V901`-`V961`).
+  the seed `V901`-`V961`).
 - Add new migrations in the owner's free range; the Developer Guide migration table allows a lower version than one
-  already applied. A demo migration can be dropped only if every demo database is rebuilt from scratch, as the
+  already applied. A seed migration can be dropped only if every seed database is rebuilt from scratch, as the
   screenshot procedure does.
 - Update `ArchitectureTest`, `ApiSmokeIT`, `docs/architecture/ARCHITECTURE.md`, `docs/operations/CONFIGURATION.md`
   and `RUNBOOK.md` (the `reserve-valuation-cron`, `ri-allocation-cron` and `quotation-expiry-cron` settings), and

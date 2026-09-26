@@ -5,9 +5,9 @@ UI section **Assets & Investments** (`frontend/src/features/assets`). Every post
 accounting engine (`AccountingEventPublisher`); GL accounts come from the asset category or the
 investment portfolio as account roles, and from the rules configured per company.
 
-## Accounting events (V660, V670) and demo rules (V965)
+## Accounting events (V660, V670) and seed rules (V965)
 
-| Event | Journal | Components | Demo rule (debit / credit) |
+| Event | Journal | Components | Seed rule (debit / credit) |
 |---|---|---|---|
 | `ASSET_ACQUISITION` | PAYMENT | COST | @ASSET / @SETTLEMENT (bank or supplier payable, party line) |
 | `ASSET_TAKE_ON` | OPENING | COST, ACCUMULATED_DEPRECIATION, NET_BOOK_VALUE | @ASSET / @ACCUM_DEPRECIATION + 3500 |
@@ -38,7 +38,7 @@ investment portfolio as account roles, and from the rules configured per company
   returns the existing run). Months missed (late capitalization) are caught up. One journal per
   branch, category and cost centre, dated at the period end.
 - **Disposal**: depreciation must be run up to the month before the disposal month; gain = proceeds −
-  net book value (positive to 4700, negative to 5613 in the demo rules). When the run of the
+  net book value (positive to 4700, negative to 5613 in the seed rules). When the run of the
   disposal month (or a later one) has already charged the asset, the disposal first reverses that
   charge (an `ASSET_DEPRECIATION` journal with a negative DEPRECIATION component, dated on the
   disposal date: Dr accumulated depreciation / Cr depreciation expense), so the gain or loss uses
@@ -90,9 +90,9 @@ MASTER_AUTHORIZE (checker: authorize, capitalize, approve). Month-end runs: PERI
 Disposals and transfers: ASSET_MANAGE; coupons, maturities, sales and fair value: INVESTMENT_MANAGE
 (both granted to FIN_MANAGER, ACCOUNTANT and AUTHORIZER in V671).
 
-## Demo data (demo profile)
+## Seed data (seed profile)
 
-`FixedAssetDemoData` and `InvestmentDemoData` (`@Order(70)`, idempotent) build 25 assets (16 taken on
+`FixedAssetSeedData` and `InvestmentSeedData` (`@Order(70)`, idempotent) build 25 assets (16 taken on
 at 2026-01-01, 9 acquired in 2026), depreciation runs January–September 2026, one transfer and one
 vehicle sale; and 12 holdings (5 taken on, 7 bought in 2026) with coupons, accrual and amortization
 runs January–September 2026, two maturities, one sale and 30 June fair value updates.

@@ -12,7 +12,7 @@ Requirements baseline: [`BDOI_CLM_BRD_SPEC.md`](../requirements/BDOI_CLM_BRD_SPE
 4. **Operations is reached through the parked port, not by a new call.** Claims implements `opsledger.service.port.ClaimsFeed`, which `remittance` already consumes for the claims special remittance (OQ46). No sibling module calls Claims, and Claims calls no Operations module.
 5. **BDOI statuses are data; the lifecycle is code.** The 18 claim statuses and 10 settlement types are LOVs that the Unit Head maintains; each value maps to a small fixed phase (NEW, IN_PROGRESS, TEMP_CLOSED, CLOSED) that drives the code, as the broking architecture requires (section 3.2: statuses that drive code paths stay enums).
 6. **Every change is history.** Status, reserve, claimant, adjuster, follow-up, insurer updates and location references each keep an immutable history plus an `AuditTrailService` entry (BRCLM.041/042 "auditable").
-7. **Parked means seam, not fake** (Operations principle 5). Insurer channels, legacy migration, SSO and any claim money through BDOI get a seam and a question, not a simulation.
+7. **Parked means seam, not simulation** (Operations principle 5). Insurer channels, legacy migration, SSO and any claim money through BDOI get a seam and a question, not a simulation.
 
 ## 2. Decision: extend the `claims` module or build a broking claims module
 
@@ -28,19 +28,19 @@ Requirements baseline: [`BDOI_CLM_BRD_SPEC.md`](../requirements/BDOI_CLM_BRD_SPE
 | Status model | Enum lifecycle REGISTERED → OPEN → PARTIALLY_SETTLED → CLOSED (`ClaimStatus`) driven by approved documents | 18 BDOI statuses, role / unit restricted, temporary vs permanent closure, 10 settlement types (BRCLM.010-015/035) | A second, parallel status model on the same entity |
 | Structure | One policy, one claimant party, parties from the party master, LPOs for garages | Several locations of the cover (037), several insurers and insurer claim numbers (043), insurer updates (041), insurer location references (042), diary (022) | Most BRD-7 tables are new anyway |
 | Reports | Reports Book codes at the company share in base currency (PGIBR002, 018, 012 …) | BDOI claims list reports with age this stage, follow-up, handler, Marketing team (p.42-44) | No report is reusable as is |
-| Tenancy | Kept for the insurer demo company and the platform; hidden from BDOI roles (Q44) | Visible to BDOI Claims, Risk and Marketing | Mixing them exposes insurer functions to BDOI users |
+| Tenancy | Kept for the insurer seed company and the platform; hidden from BDOI roles (Q44) | Visible to BDOI Claims, Risk and Marketing | Mixing them exposes insurer functions to BDOI users |
 
 ### 2.2 What is reused
 
 - **Nothing from `claims` at code level.** It stays as built, and no BDOI role receives `CLAIM_VIEW`.
-- **Its patterns**: the loss details shape (loss date, notification date, nature, description), the alert dedup keys, the report support style, the demo scenario runner.
+- **Its patterns**: the loss details shape (loss date, notification date, nature, description), the alert dedup keys, the report support style, the seed scenario runner.
 - **The platform**: LOV (with the Collections attribute-table pattern), workflow (queues, assignment, case history), audit, attachments and document naming, messaging (outbox, notifications), docgen, bulk, report framework (view / export split, archive, saved variants), alerts, managed jobs, system parameters, retention framework.
 
 ## 3. Modules and links
 
-| Module | Purpose | BRD IDs | Depends on | Flyway (demo) |
+| Module | Purpose | BRD IDs | Depends on | Flyway (seed) |
 |---|---|---|---|---|
-| `brokerclaims` (new, package `com.iortatechnxt.brokerverse.brokerclaims`, tables `bcl_*`) | Claim case file on a cover; premium check and claims authorization code; locations; insurer claims, reserve and settlement as reported; insurer updates; insurer location references; statuses, settlement types and closure with the role / unit matrix; claimant, adjuster, follow-up, action plan and diary; ageing; reports and data extract; claims home; `ClaimsFeed` adapter; loss experience query for Marketing and Renewal | BRCLM.001-043 | account, booking (read), issuance (read, through account), opsledger (query, events, port), catalog (insurers, sales units), crm (client records port), nbadmin (retention port), workflow, lov, messaging, docgen, attachment, bulk, report, alert, system, audit, security, organization | V1020-V1024 (V1920-V1921 + Java demo runner) |
+| `brokerclaims` (new, package `com.iortatechnxt.brokerverse.brokerclaims`, tables `bcl_*`) | Claim case file on a cover; premium check and claims authorization code; locations; insurer claims, reserve and settlement as reported; insurer updates; insurer location references; statuses, settlement types and closure with the role / unit matrix; claimant, adjuster, follow-up, action plan and diary; ageing; reports and data extract; claims home; `ClaimsFeed` adapter; loss experience query for Marketing and Renewal | BRCLM.001-043 | account, booking (read), issuance (read, through account), opsledger (query, events, port), catalog (insurers, sales units), crm (client records port), nbadmin (retention port), workflow, lov, messaging, docgen, attachment, bulk, report, alert, system, audit, security, organization | V1020-V1024 (V1920-V1921 + Java seed runner) |
 
 No other module is created. Section 12 lists the small changes to existing modules.
 
@@ -78,7 +78,7 @@ No cycle: nothing depends on `brokerclaims` except a future `renewal` module thr
 
 ## 4. Flyway plan
 
-Allocation: **schema V1020-V1029, demo V1920-V1929** (Developer Guide range table: V1000-V1899 for later BRDs, 10 versions each; demo V1900-V1999 in the same order). Five schema versions are used, so one block is enough.
+Allocation: **schema V1020-V1029, seed V1920-V1929** (Developer Guide range table: V1000-V1899 for later BRDs, 10 versions each; seed V1900-V1999 in the same order). Five schema versions are used, so one block is enough.
 
 | Version | Owner (wave) | Content |
 |---|---|---|
@@ -88,14 +88,14 @@ Allocation: **schema V1020-V1029, demo V1920-V1929** (Developer Guide range tabl
 | `V1023__brokerclaims_activity.sql` | CL1-B | `bcl_diary_entry`, `bcl_claim_event` (field-change timeline) |
 | `V1024__brokerclaims_reports.sql` | CL1-B | Report support: indexes for ageing and location queries, shared report variants (Outstanding by insurer, Past due 90) |
 | V1025-V1029 | - | Free. V1025 is held for the legacy claims migration handler if CLQ14 is confirmed. CLQ14 is partially answered by BRD-13 (Data Migration draft): historical claims are not migrated (read-only legacy or archive, record type CLAIM); open claims are not addressed (DMQ30), so V1025 stays held. If open claims are migrated, the Data Migration loader F07 calls the Claims service |
-| `db/demo/V1920__demo_brokerclaims_users.sql` | CL0 | Demo users of section 7.3, their `bcl_handler` units, `BCL_REPORT_VIEW` for the demo Marketing users |
-| `db/demo/V1921__demo_brokerclaims_refs.sql` | CL1-A | Insurer location references for demo property accounts |
-| Java runner `brokerclaims.demo.BrokerClaimsDemoData` | CL1-A, extended by CL1-B | About 20 claims over the booked demo accounts, run through the services (section 14) |
+| `db/seed/V1920__seed_brokerclaims_users.sql` | CL0 | SIT/UAT users of section 7.3, their `bcl_handler` units, `BCL_REPORT_VIEW` for the seed Marketing users |
+| `db/seed/V1921__seed_brokerclaims_refs.sql` | CL1-A | Insurer location references for seed property accounts |
+| Java runner `brokerclaims.seed.BrokerClaimsSeedData` | CL1-A, extended by CL1-B | About 20 claims over the booked seed accounts, run through the services (section 14) |
 
 Rules that make this safe:
 - V1020 runs after V750-V762 (LOV, workflow, security, `ops_*`) and V820 / V870 on a fresh database; all are lower versions.
 - **No foreign keys to `acc_*`, `bkg_*` or `ops_*` tables.** ARN, account id, item no., invoice no., insurer code and usernames are plain values, as in Operations and Collections. Foreign keys go only to `lov_*`, `wf_*`, `sec_*`, `org_branch` and the `bcl_*` tables.
-- Demo V1920+ runs after every V9xx demo and after V1900-V1909 (Collections), so booked demo accounts and ledger invoices exist.
+- Seed V1920+ runs after every V9xx seed and after V1900-V1909 (Collections), so booked seed accounts and ledger invoices exist.
 
 ## 5. Entities (key fields)
 
@@ -193,7 +193,7 @@ Reassignment of claims between handlers uses the existing `WORK_ASSIGN` (workflo
 
 The matrix follows the stakeholder table (p.28). The officer's status rights are limited by the seeded `bcl_status_access` rows until BDOI gives the matrix (CLQ04, CLQ06).
 
-### 7.3 Demo users (V1920, password `Brokerverse@2026`)
+### 7.3 SIT/UAT users (V1920)
 
 | User | Role | Unit |
 |---|---|---|
@@ -205,7 +205,7 @@ The matrix follows the stakeholder table (p.28). The officer's status rights are
 | `clmuh` | CLM_UH | - |
 | `clmrisk` | CLM_RISK | - |
 
-The existing insurer demo user `claims` is unrelated and keeps its insurer roles.
+The existing insurer SIT/UAT user `claims` is unrelated and keeps its insurer roles.
 
 ## 8. Status model and workflow
 
@@ -377,19 +377,19 @@ Outside the module (frontend only, owned by their modules, section 12.2): a **Cl
 
 Prerequisites: BRD-1 `account`, `booking`, `issuance`; Operations `opsledger` and `remittance` (all built). Claims does not wait for Collections or BRD-5.
 
-| Wave | Agent | Scope | Files owned | Exit criteria |
+| Wave | Team | Scope | Files owned | Exit criteria |
 |---|---|---|---|---|
-| **CL0** (1 agent, short) | Foundation | Permissions; V1020 (roles, grants, actions, LOVs + `bcl_lov_attribute`, status matrix, parameters, alerts, notification events, workflow `BCL_CLAIM`, template, retention rule, optional `lov_type.owner_permission`); V1021 (claim tables); `Claim`, `ClaimRepository` and empty embeddables `CoverSnapshot`, `LossDetails`, `ClaimProgress` mapped to the V1021 columns; `ReportCategory` / `ReportMetadata` factory; optional `lov` owner permission; package skeleton; navigation entry and help registration (landing screen); crons; demo users V1920 | `security/domain/Permission.java`, `report/core/ReportCategory.java`, `report/core/ReportMetadata.java`, `lov/**` (owner permission only), `brokerclaims/package-info.java`, `brokerclaims/domain/Claim*.java`, V1020, V1021, V1920, `frontend/src/navigation/modules.ts`, `frontend/src/features/help/helpContent.ts`, `frontend/src/features/brokerclaims/module.ts` (landing), `application.yml`, `docs/operations/CONFIGURATION.md`, Developer Guide range row | `mvn verify` green; the Hibernate schema validates; the landing screen shows for `clmofficer` |
-| **CL1-A** | Claim record and insurers | Cover lookup and snapshot, premium check and authorization, record claim, loss details, claimant, locations, insurer claims and reserve, insurer updates, location references, loss advice e-mail, `InAppClaimsFeed`, ops event listeners, `ClientRecordsProvider`, retention provider, bulk handlers, API, screens Record Claim / Cover Lookup / Location refs, record tabs Details / Locations / Insurers & Updates / Reserve & Settlement (reserve part) / Documents, demo V1921 and `BrokerClaimsDemoData` | `brokerclaims/{cover,claim,insurer,location,feed}/**`, `CoverSnapshot`, `LossDetails`, V1022, V1921, `features/brokerclaims/{record,cover,insurer,location}/**` | Claim on an unpaid cover blocked, authorised after payment; multi-location and multi-insurer claim; special remittance request confirmed through the feed (remittance test) |
+| **CL0** (1 team, short) | Foundation | Permissions; V1020 (roles, grants, actions, LOVs + `bcl_lov_attribute`, status matrix, parameters, alerts, notification events, workflow `BCL_CLAIM`, template, retention rule, optional `lov_type.owner_permission`); V1021 (claim tables); `Claim`, `ClaimRepository` and empty embeddables `CoverSnapshot`, `LossDetails`, `ClaimProgress` mapped to the V1021 columns; `ReportCategory` / `ReportMetadata` factory; optional `lov` owner permission; package skeleton; navigation entry and help registration (landing screen); crons; SIT/UAT users V1920 | `security/domain/Permission.java`, `report/core/ReportCategory.java`, `report/core/ReportMetadata.java`, `lov/**` (owner permission only), `brokerclaims/package-info.java`, `brokerclaims/domain/Claim*.java`, V1020, V1021, V1920, `frontend/src/navigation/modules.ts`, `frontend/src/features/help/helpContent.ts`, `frontend/src/features/brokerclaims/module.ts` (landing), `application.yml`, `docs/operations/CONFIGURATION.md`, Developer Guide range row | `mvn verify` green; the Hibernate schema validates; the landing screen shows for `clmofficer` |
+| **CL1-A** | Claim record and insurers | Cover lookup and snapshot, premium check and authorization, record claim, loss details, claimant, locations, insurer claims and reserve, insurer updates, location references, loss advice e-mail, `InAppClaimsFeed`, ops event listeners, `ClientRecordsProvider`, retention provider, bulk handlers, API, screens Record Claim / Cover Lookup / Location refs, record tabs Details / Locations / Insurers & Updates / Reserve & Settlement (reserve part) / Documents, seed V1921 and `BrokerClaimsSeedData` | `brokerclaims/{cover,claim,insurer,location,feed}/**`, `CoverSnapshot`, `LossDetails`, V1022, V1921, `features/brokerclaims/{record,cover,insurer,location}/**` | Claim on an unpaid cover blocked, authorised after payment; multi-location and multi-insurer claim; special remittance request confirmed through the feed (remittance test) |
 | **CL1-B** | Status, follow-up and reports | Status engine with the matrix, settlement and closure, reopen, workflow, follow-up and action plan, diary, jobs and alerts, setup screens, claims home and worklist, record tabs Diary / History and the status actions, `ClaimExperienceQueryService`, all reports of section 10 | `brokerclaims/{status,diary,report,home,setup}/**`, `ClaimProgress`, V1023, V1024, `features/brokerclaims/{home,worklist,status,diary,setup,reports}/**`, `features/brokerclaims/help.ts` | Status refused outside the matrix; temporary and permanent closure; ageing per status; every report runs and exports XLSX / PDF / CSV |
-| **CL2** (1 agent) | Integration | E2E: book → claim blocked by unpaid premium → cashiering application → authorization → "With BDOI - For Premium Remittance" → special remittance → remittance batch → FULLY_REMITTED notification → settled (LOA) → reports; Marketing report access; module guide `docs/modules/BROKER_CLAIMS.md`; account-page Claims tab (with the account owner); demo storyline completed; migration handler if CLQ14 is answered | tests, docs, demo, `features/accounts` Claims tab (agreed) | Full `mvn verify` / `npm run verify`; walkthrough with the demo users |
+| **CL2** (1 team) | Integration | E2E: book → claim blocked by unpaid premium → cashiering application → authorization → "With BDOI - For Premium Remittance" → special remittance → remittance batch → FULLY_REMITTED notification → settled (LOA) → reports; Marketing report access; module guide `docs/modules/BROKER_CLAIMS.md`; account-page Claims tab (with the account owner); seed storyline completed; migration handler if CLQ14 is answered | tests, docs, seed, `features/accounts` Claims tab (agreed) | Full `mvn verify` / `npm run verify`; walkthrough with the SIT/UAT users |
 
 Rules for parallel work:
-- One Flyway set per agent (section 4); no edits to another agent's packages.
+- One Flyway set per team (section 4); no edits to another team's packages.
 - Shared files (Permission enum, `ReportCategory` / `ReportMetadata`, navigation, help registry, `application.yml`, V1020, V1021) are edited **only in CL0**.
 - `Claim` is owned by CL0; CL1-A owns `CoverSnapshot` and `LossDetails`, CL1-B owns `ClaimProgress`. A business method on `Claim` delegates to the owner's embeddable.
 - `features/brokerclaims/module.ts` is created by CL0 with every route declared and lazy components pointing at placeholder pages; CL1-A and CL1-B replace only their own pages. `help.ts` is owned by CL1-B, and CL1-A sends its entries to CL1-B.
-- Each agent has its own `*ApiIT` smoke class instead of editing the shared `ApiSmokeIT`.
+- Each team has its own `*ApiIT` smoke class instead of editing the shared `ApiSmokeIT`.
 - CL1-A and CL1-B agree the `ClaimStatusChanged` Spring event (claim id, from / to status and phase) in CL0; CL1-A's feed reads the status only through `ClaimProgress` getters.
 
 Effort: CL0 small; CL1-A medium-large (about 35 % of the build); CL1-B medium; CL2 small. The module is about the size of `adjustment`.
@@ -496,7 +496,7 @@ compile only against it.
   description, parameters)` (view BCL_REPORT_VIEW, export BCL_REPORT_EXPORT, archived).
 - **Crons.** `brokerverse.jobs.bcl-premium-recheck-cron` (05:30 PHT), `bcl-follow-up-due-cron` and
   `bcl-ageing-alerts-cron` (06:00 PHT) in `application.yml` and `CONFIGURATION.md`; the jobs come with CL1-A / CL1-B.
-- **Demo `V1920__demo_brokerclaims_users.sql`.** Users of 7.3 (password `Brokerverse@2026`); `clmbranch` has home
+- **Seed `V1920__seed_brokerclaims_users.sql`.** Users of 7.3; `clmbranch` has home
   branch CEB; handler register rows for the five users with a unit.
 - **Frontend.** `features/brokerclaims/module.ts` (`brokerClaimsModule`, first in group Claims & Insurance) declares
   every route of section 11: `/claims-handling` (Claims Home, BCL_VIEW, live landing), `/worklist` (BCL_VIEW),
@@ -507,13 +507,13 @@ compile only against it.
   `setup/ClaimsSetupPage.tsx`, `reports/ClaimsReportsPage.tsx`; shared `ClaimsPlaceholder.tsx` (`CLAIMS_SECTION`
   breadcrumb). Help section `BROKER_CLAIMS_HELP` (id `brokerclaims`) in `features/brokerclaims/help.ts`, registered
   before Underwriting, with one entry per menu route.
-- **Flyway left.** Schema V1022 (CL1-A), V1023-V1024 (CL1-B), V1025 held (CLQ14), V1026-V1029 free; demo V1921
+- **Flyway left.** Schema V1022 (CL1-A), V1023-V1024 (CL1-B), V1025 held (CLQ14), V1026-V1029 free; seed V1921
   (CL1-A), V1922-V1929 free.
 
 ## 18. CL1-A claim record and insurers: as built
 
 What wave CL1-A built on the CL0 foundation, and the contracts CL1-B and CL2 use. Sub-packages `cover`, `claim`,
-`insurer`, `location`, `feed` and `demo` of `brokerclaims`; frontend `features/brokerclaims/{record,cover,insurer,
+`insurer`, `location`, `feed` and `seed` of `brokerclaims`; frontend `features/brokerclaims/{record,cover,insurer,
 location}`.
 
 - **Cover** (`cover.service.CoverService`, read-only). The cover is the account (ARN) and a **policy year of its term,
@@ -592,8 +592,8 @@ location}`.
   Advice, Refresh Cover Data, Use Latest Version), the special remittance link when the status awaits the premium
   remittance, and tabs Details, Locations, Insurers & Updates, Reserve & Settlement, Documents. **CL1-B** adds its
   status actions to `record/ClaimActions.tsx` and its Diary / History tabs to `record/ClaimPage.tsx` (`TABS`).
-- **Demo**: V1921 insurer location references of the booking demo property covers; `BrokerClaimsDemoData`
-  (`@Order(130)`, demo profile, idempotent, `load()` for CL1-B to extend) records a motor claim (authorised when
+- **Seed**: V1921 insurer location references of the booking seed property covers; `BrokerClaimsSeedData`
+  (`@Order(130)`, seed profile, idempotent, `load()` for CL1-B to extend) records a motor claim (authorised when
   paid), a property typhoon claim with location, insurer number, update and reserve, a direct-payment claim and an
   insurer-reported claim.
 - **Parked / open**: meaning of the authorization code (CLQ01); claims mailbox of the insurer (the placement
@@ -653,7 +653,7 @@ What wave CL1-B built on top of section 17 (package `brokerclaims.{status,diary,
   (status, flags, ages, follow-up, adjuster, settlement, action plan) under the summary card,
   `status/ClaimStatusActions` in `record/ClaimActions.tsx` (Change Status, Set Settlement, Override Follow-up Date,
   Assign Adjuster, Reopen) and the Diary and History tabs in `record/ClaimPage.tsx`.
-- **Not built here.** The claim-level demo storyline (status history, diary) extends CL1-A's `BrokerClaimsDemoData`
+- **Not built here.** The claim-level seed storyline (status history, diary) extends CL1-A's `BrokerClaimsSeedData`
   at CL2; the handler register has no maker-checker columns (CL0 table), changes are audited.
 
 ## 20. CL2 integration and hardening: as built
@@ -688,7 +688,7 @@ What the integration wave CL2 added on top of sections 17 to 19. It has no migra
   `features/accounts/AccountDetailPage.tsx` for `BCL_VIEW`). It is read-only: claim number linked to the claim,
   policy year, date of loss, status, phase, currency, paid and outstanding. It reads
   `GET /api/v1/broker-claims/experience?arn=`; the `ClaimExperience` type now declares its `claims`.
-- **Seed storyline** (`demo/BrokerClaimsSeedStory`, called by the Claims seed data runner). Statuses through the
+- **Seed storyline** (`seed/BrokerClaimsSeedStory`, called by the Claims seed data runner). Statuses through the
   matrix, an adjuster, action plans, diary calls, meetings and follow-ups, an overridden follow-up, a temporarily
   closed claim, a claim settled on the LOA and closed, a claim closed within the deductible and reopened, a claim
   waiting for the premium remittance (ARN-2026-940007) and a newly filed liability claim (ARN-2026-940004).

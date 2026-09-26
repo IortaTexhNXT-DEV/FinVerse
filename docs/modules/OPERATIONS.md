@@ -31,7 +31,7 @@ The modules never call each other. They share the ledger (`InvoiceLedgerService`
 
 ### 0.2 The life of an invoice (end to end)
 
-The flow below is the one `OperationsEndToEndIT` walks through with the demo users (section 7.3).
+The flow below is the one `OperationsEndToEndIT` walks through with the SIT/UAT users (section 7.3).
 Each arrow is a real service call; the ledger movement it leaves is in brackets.
 
 ```mermaid
@@ -109,7 +109,7 @@ In words:
 |---|---|---|
 | Invoice ledger | One `ops_invoice` per booked invoice or endorsement, with parties, classification, insurer shares, component balances, flags, lock and statuses; every change is an `ops_invoice_movement` or an `ops_invoice_status_change` | `opsledger.domain`, `InvoiceLedgerService`, `InvoiceLedgerQueryService` |
 | Feed from booking | `booking.service.InvoiceBooked` is recorded after commit, in its own transaction (`InvoiceLedgerFeed`); a failure is a failed record of flow-in feed `OPS_INVOICE_FEED`, raises `OPS_FLOW_IN_FAILED` and does not undo the booking | `InvoiceLedgerFeed`, `InvoiceLedgerWriter` |
-| Replay | Rebuilds the ledger from `BookingQueryService` (invoice, account or company); idempotent per invoice. Job `OPS_INVOICE_FEED_REPLAY` (manual by default), endpoint `POST /api/v1/ops/invoices/replay`. The demo profile replays at start-up (`OpsLedgerDemoReplay`, after `BookingDemoData`) | `InvoiceFeedReplayService`, `InvoiceFeedReplayJob` |
+| Replay | Rebuilds the ledger from `BookingQueryService` (invoice, account or company); idempotent per invoice. Job `OPS_INVOICE_FEED_REPLAY` (manual by default), endpoint `POST /api/v1/ops/invoices/replay`. The seed profile replays at start-up (`OpsLedgerSeedReplay`, after `BookingSeedData`) | `InvoiceFeedReplayService`, `InvoiceFeedReplayJob` |
 | Invoice 360 | Header, components with outstanding balances, movements, related items of the Operations modules (ports), documents, workflow and history | `Invoice360Service`, `GET /api/v1/ops/invoices/{no}` |
 | Operations home | Work tiles per team, filled by `OpsWorkCountSource` beans, plus ledger counts | `OperationsHomeService`, `GET /api/v1/ops/home` |
 | Flow-in framework | Feeds, runs and records with idempotency keys; manual upload is the default transport | `FlowInService`, `FlowInHandler`, `/api/v1/ops/flow-in` |
@@ -252,7 +252,7 @@ transaction.
 - **Roles:** `CASHIER`, `CASHIER_TL`, `REMIT_PROCESSOR`, `REMIT_TL`, `RECON_HANDLER`,
   `ADJUSTMENT_TL`, `COMMREC_HANDLER`, `COMMREC_TL`, `MKT_COLLECTION`, `COMPTROLLERSHIP`,
   `DISBURSEMENT`.
-- **Demo users** (V990, password `Brokerverse@2026`): `cashier`, `cashbr` (Cebu branch), `cashtl`,
+- **SIT/UAT users** (V990): `cashier`, `cashbr` (Cebu branch), `cashtl`,
   `remit`, `remittl`, `recon`, `adjtl`, `commrec`, `commtl`, `mktcoll`, `comptrol`, `disb`.
 - **LOV types**, parameters and alert codes: OPERATIONS_DESIGN section 10. The lists the BRD
   gives are seeded as written. `RECON_COMPANY_CONCERNED`, `RECON_DISPOSITION` and
@@ -264,7 +264,7 @@ transaction.
   `RECON_FEEDBACK_UPLOADED`, `ADJ_REQUEST_STATUS`, `DP_FEEDBACK_OVERDUE`. Send with
   `NotificationService.notifyUser(username, notice, eventCode)` or
   `notifyPermission(permission, notice, eventCode)`, which respect the user's preference.
-- **Demo GL** (V990): 1211, 1225, 1230, 2211, 2215, 2216, 2230, 4110, 4120, 4130, 6510. BOOK rates
+- **Seed GL** (V990): 1211, 1225, 1230, 2211, 2215, 2216, 2230, 4110, 4120, 4130, 6510. BOOK rates
   are the SPOT rates rounded to 2 decimals.
 
 ### 1.8 Jobs
@@ -299,7 +299,7 @@ The Operations modules implement `ManagedJob` and read their cron with
 | `/operations/report-archive` | Report archive | `OPS_REPORT_VIEW` |
 | `/operations/notifications` | Notification settings | `OPS_VIEW` |
 
-The modules follow BDOI's prototype. Product reconciliation (`/prodrecon`) and adjustment
+The modules follow BDOI's UX design. Product reconciliation (`/prodrecon`) and adjustment
 (`/adjustment`) are in *Client & Policy*. Cashiering (`/cashiering`), remittance (`/remittance`) and
 commission receivables (`/commission`) are in *Finance*. The foundation registered each of them as a
 stub home page with a help section, so a module fills in only its own feature folder.
@@ -311,10 +311,10 @@ stub home page with a help section, so a module fills in only its own feature fo
 | Collection system interface | OQ01 | `CollectionFeed` (CSV in the extract repository), `COLLECTION_*` feeds by manual upload |
 | Disbursement system | OQ02 | `DisbursementGateway` and the in-app queue |
 | Marketing and Claims feeds | OQ45, OQ46 | `MarketingFeed` without adapter; `ClaimsFeed` by `brokerclaims.InAppClaimsFeed` |
-| Accounting interface / GL mapping | OQ07 | demo GL only; production configures the Accounting Rules |
+| Accounting interface / GL mapping | OQ07 | seed GL only; production configures the Accounting Rules |
 | Insurer channels (SFTP / API) | - | `InsurerFileInbox`, manual upload |
 | Shared drive | OQ17 | `FileDropPort` to the in-system extract repository |
-| Source of the BOOK rate | OQ08 | `RateType.BOOK` is kept by hand on *Currency Rates* (demo = SPOT rounded) |
+| Source of the BOOK rate | OQ08 | `RateType.BOOK` is kept by hand on *Currency Rates* (seed = SPOT rounded) |
 | Lock reasons and who may lift them | OQ28 | free-text reason, owner module unlocks |
 | Open LOVs | OQ24, OQ31, OQ32, OQ40 | LOV types exist, empty or with "Others" only |
 | Access matrix per role | OQ48 | grants in V760 follow OPERATIONS_DESIGN section 6 |
@@ -322,7 +322,7 @@ stub home page with a help section, so a module fills in only its own feature fo
 
 ## 2. Cashiering (`cashiering`)
 
-Package `com.iortatechnxt.brokerverse.cashiering`, Flyway `V763`-`V764` (demo `V991`), screens in
+Package `com.iortatechnxt.brokerverse.cashiering`, Flyway `V763`-`V764` (seed `V991`), screens in
 `frontend/src/features/cashiering`. Cashiering receives premium and non-premium payments, issues
 acknowledgement receipts (AR) and Head Office official receipts (OR), applies payments to the
 invoice ledger component by component, keeps unapplied payments with their dispositions, and runs
@@ -454,7 +454,7 @@ The `MINIMAL_BALANCE_SWEEP` job, or *Run Sweep Now*, works from the rules in
 
 On the cash path an AR is issued and applied to the withheld 2% instead (*Settle in Cash*).
 
-### 2.6 Accounting events (V764; demo rules V991, OQ07)
+### 2.6 Accounting events (V764; seed rules V991, OQ07)
 
 All 11 events use journal type RECEIPT at the BOOK rate:
 
@@ -466,7 +466,7 @@ All 11 events use journal type RECEIPT at the BOOK rate:
 
 The `@BANK` role account comes from the system parameters `CASH_BANK_ACCOUNT` (check and electronic
 modes) and `CASH_ON_HAND_ACCOUNT` (cash). They are empty in production until BDOI gives the GL
-(OQ07). The demo sets them to 1111 / 1101 and adds GL 4190.
+(OQ07). The seed sets them to 1111 / 1101 and adds GL 4190.
 
 ### 2.7 Jobs
 
@@ -557,16 +557,16 @@ rules for generating, downloading and view-only use are the platform report perm
 | `CollectionFeed` (`PickupFlowInHandler`) | flow-in handler | check pick-up requests from the Collection system (OQ01/OQ13) |
 | `COLLECTION_CWT2307`, `COLLECTION_COMMISSION_PAYMENT` (`CollectionFlowInFeeds`, O2) | flow-in handlers | 2307 tags and commission payment details from Collection, with the checks of the `CWT_TAGS` / `COMMISSION_PAYMENT` uploads and a `Company` column |
 
-### 2.12 Demo
+### 2.12 Seed
 
 `V991` adds:
 
-- GL 4190 and the demo rules of the 11 events;
+- GL 4190 and the seed rules of the 11 events;
 - the series `AR-HO-`, `AR-CEB-` and `OR-HO-`;
 - two check pick-up requests;
 - the bank and cash-on-hand parameters.
 
-At start-up (demo profile, order 91, before remittance) `CashieringDemoData` posts, as `cashier`,
+At start-up (seed profile, order 91, before remittance) `CashieringSeedData` posts, as `cashier`,
 with payments valued a week back so remittance can extract them:
 
 - the booking and endorsement invoices of `ARN-2026-940001` paid in full and a partial payment of
@@ -577,7 +577,7 @@ with payments valued a week back so remittance can extract them:
 - a warehoused PDC;
 - a service-fee OR.
 
-As `mktcoll` it tags a 2307. The demo users are `cashier`, `cashbr` (CEB), `cashtl` (team
+As `mktcoll` it tags a 2307. The SIT/UAT users are `cashier`, `cashbr` (CEB), `cashtl` (team
 leader, approvals), `mktcoll`, `disb` and `approver`.
 
 ### 2.13 Parked (seam only)
@@ -587,7 +587,7 @@ leader, approvals), `mktcoll`, `disb` and `approver`.
 | Bank / channel file layouts (Bills Payment FS01, Trade, CLPC, Direct Credit) | OQ03, OQ04 | `csh_payment_file_layout` per handler (AUTO / DELIMITED / FIXED_WIDTH), changed on *Cashiering Setup* |
 | BIR ATP and receipt series per branch | OQ05 | series master with ATP number and warning level (`RECEIPT_SERIES_LOW`) |
 | Who approves cancellations, reinstatements and which dispositions | OQ06, OQ15 | workflow `OPS_RECEIPT_ACTION` (CASH_APPROVE) and `requires_approval` per disposition type |
-| GL accounts of the Cashiering events, bank / cash-on-hand accounts | OQ07 | event types with demo rules; parameters `CASH_BANK_ACCOUNT` / `CASH_ON_HAND_ACCOUNT` empty in production |
+| GL accounts of the Cashiering events, bank / cash-on-hand accounts | OQ07 | event types with seed rules; parameters `CASH_BANK_ACCOUNT` / `CASH_ON_HAND_ACCOUNT` empty in production |
 | Minimal balance limits, exclusions and targets | OQ11 | `csh_minimal_balance_rule` (PHP 10, CWT / DST / whole premium excluded) |
 | Payments before booking | OQ12 | pre-booked queue, `PREBOOKED_REMATCH`, `PREBOOKED_AGEING`, `PRE:<id>` to the NB payment gate |
 | Collection system (check pick-up, refunds) | OQ01, OQ13 | `CollectionFeed` handler and manual entry; refunds through `DisbursementGateway` |
@@ -626,8 +626,8 @@ leader, approvals), `mktcoll`, `disb` and `approver`.
 Remittance of paid premiums to the insurers, from extraction through the insurer's OR. It also covers
 the Marketing hold and special remittance requests (RMTID.001-025/027-031/033-036/039,
 MKTID.001-007/009). The code is in package `com.iortatechnxt.brokerverse.remittance`, with Flyway
-`V770__remittance.sql` and `V771__remittance_workflows_and_events.sql`. The demo is
-`V992__demo_remittance.sql` plus `remittance.demo.RemittanceDemoData`, and the screens are in
+`V770__remittance.sql` and `V771__remittance_workflows_and_events.sql`. The seed is
+`V992__seed_remittance.sql` plus `remittance.seed.RemittanceSeedData`, and the screens are in
 `frontend/src/features/remittance`.
 
 ### 3.1 Extraction
@@ -799,16 +799,16 @@ MKTID.001-007/009). The code is in package `com.iortatechnxt.brokerverse.remitta
 | `/remittance/dtip` | DTIP status search | `REMIT_PROCESS` |
 | `/remittance/incentive-rules` | Early-remittance incentive rules | `REMIT_APPROVE` |
 
-### 3.9 Demo
+### 3.9 Seed
 
 - V992 seeds:
-  - the demo accounting rules for `OPS_REMITTANCE`: 2210 / 1602 against 1220 / 2211;
+  - the seed accounting rules for `OPS_REMITTANCE`: 2210 / 1602 against 1220 / 2211;
   - the rules for `OPS_REMIT_INCENTIVE`: 2211 against 4130 / 2504;
   - an incentive rule: INS-MGIC, PROPERTY, CBG, 2%, 30 days from inception.
-- `RemittanceDemoData` (profile `demo`, order 92) asks for a hold on ARN-2026-940004, remits the
+- `RemittanceSeedData` (profile `seed`, order 92) asks for a hold on ARN-2026-940004, remits the
   paid invoice of ARN-2026-940001 through approval, DV and insurer OR, and runs a manual
   extraction whose batch waits for review (section 7.4).
-- Demo users are `remit` and `remittl`.
+- SIT/UAT users are `remit` and `remittl`.
 
 ### 3.10 Parked (seam only)
 
@@ -824,7 +824,7 @@ MKTID.001-007/009). The code is in package `com.iortatechnxt.brokerverse.remitta
 | Report layouts, Mall Assurance columns of the Normal schedule | OQ42 | draft layouts |
 | Marketing and Claims feeds | OQ45, OQ46 | `COLLECTION_HOLD` / `COLLECTION_SPECIAL_REMIT` uploads, `ClaimsFeed` `CLAIMS_SPECIAL_REMIT` |
 | Disbursement system, re-sending a returned payment request | OQ02 | `DisbursementGateway` queue; returned requests are notified only |
-| GL accounts | OQ07 | demo rules only |
+| GL accounts | OQ07 | seed rules only |
 | DTIP open-item settlement in the subledger | OQ07 | the ledger REMITTED movement; GL through the event |
 
 ### 3.11 Fit/gap status
@@ -853,7 +853,7 @@ MKTID.001-007/009). The code is in package `com.iortatechnxt.brokerverse.remitta
 
 Endorsement and cancellation requests on booked invoices of the ledger (ADJID.001-026/028,
 MKTID.008). Package `com.iortatechnxt.brokerverse.adjustment`, Flyway `V780__adjustment.sql`,
-demo `V994__demo_adjustment.sql` and `adjustment.demo.AdjustmentDemoData`, screens in
+seed `V994__seed_adjustment.sql` and `adjustment.seed.AdjustmentSeedData`, screens in
 `frontend/src/features/adjustment`.
 
 ### 4.1 Requests
@@ -957,9 +957,9 @@ DRAFT/RETURNED --cancel--> CANCELLED
      insurer's service invoice through booking's **`ServiceInvoiceService`** (ADJID.014);
   6. a **write-off** request clears the premium receivable like the minimal balance file.
 
-### 4.5 Accounting events (V780; demo rules V994, OQ07)
+### 4.5 Accounting events (V780; seed rules V994, OQ07)
 
-| Event | Source reference | Demo entry |
+| Event | Source reference | Seed entry |
 |---|---|---|
 | booking `BROKER_BOOKING` (rows 16, 19) | booking's own, request `ADJ:<request>` | reversal or addition of the booking entry |
 | `OPS_AR_INSURER_SETUP` (row 18) | `ADJ:<request>:ARI:<insurer>` | Dr 1225 AR Insurer / Cr 2210 DTIP (insurer) |
@@ -1039,10 +1039,10 @@ list `ENDORSEMENT_DOC_TYPE` is still open (OQ32).
 | `InvoiceRelatedItems` (section `ADJUSTMENTS`) | SPI implemented | invoice 360 tab: requests raised on the invoice or that booked it |
 | `OpsWorkCountSource` (section `ADJUSTMENT`) | SPI implemented | Operations home tiles: for validation, for approval, for posting, returned, payments to re-apply |
 
-### 4.11 Demo
+### 4.11 Seed
 
-`V994` adds GL 4190 and the demo rules of the three events. At start-up (demo profile, order 93,
-after cashiering and remittance) `AdjustmentDemoData` leaves a request at every stage: on
+`V994` adds GL 4190 and the seed rules of the three events. At start-up (seed profile, order 93,
+after cashiering and remittance) `AdjustmentSeedData` leaves a request at every stage: on
 `ARN-2026-940002` a draft, a request waiting for validation, a returned request and a premium rate
 increase waiting for approval; a flat cancellation of `ARN-2026-940004` ready for the posting
 batch; an internal adjustment of `ARN-2026-940001` posted (section 7.4).
@@ -1051,7 +1051,7 @@ batch; an internal adjustment of `ARN-2026-940001` posted (section 7.4).
 
 | Item | Question | Seam |
 |---|---|---|
-| GL accounts of the Adjustment events and of commission realised at booking | OQ07 | event types with demo rules; production configures the Accounting Rules |
+| GL accounts of the Adjustment events and of commission realised at booking | OQ07 | event types with seed rules; production configures the Accounting Rules |
 | Payment re-application | cashiering (O1-A) | `PaymentReapplier` port; requests wait in AWAITING_REAPPLICATION until it is available |
 | Over-adjustment baseline value | OQ37 | parameter `ADJ_BASELINE_PERCENT` (100) |
 | Minimal balance range, targets and approval | OQ11 | parameter `MIN_BALANCE_FILE_RANGE`, event `OPS_WRITE_OFF` |
@@ -1095,7 +1095,7 @@ batch; an internal adjustment of `ARN-2026-940001` posted (section 7.4).
 
 Production Reconciliation sends each insurer a register of the accounts BDOI booked for it, takes in
 the insurer's answer, matches both sides and follows every difference to closure. Requirements
-PRCID.001-039. Migrations: V775 (schema, workflow, parameters, template) and V993 (demo LOVs and
+PRCID.001-039. Migrations: V775 (schema, workflow, parameters, template) and V993 (seed LOVs and
 schedules).
 
 ### 5.1 Model
@@ -1220,7 +1220,7 @@ the reconciliation items of an invoice.
 | PRCID.005, 011, 012, 013, 020, 034 | Built: extract repository, manual extract, extract lines, filters, extract log. |
 | PRCID.009, 010, 022, 031, 032 | Built: `INSURER_PRODUCTION` upload with separation of accounts not in the original extract, duplicate block, attempts. Insurer channels are parked (upload only). |
 | PRCID.014, 021 | Built on the items: AO, sales unit, segment and product line. The reports filter by insurer and month; a location filter on the items is not built. |
-| PRCID.015, 016, 017, 018, 038, 039 | Built: feedback fields and register variants. The company-concerned and disposition lists are demo values (OQ31). |
+| PRCID.015, 016, 017, 018, 038, 039 | Built: feedback fields and register variants. The company-concerned and disposition lists are seed values (OQ31). |
 | PRCID.019, 023, 033 | Built: unbooked repository with the pre-booked lookup. |
 | PRCID.024, 025, 026, 027, 030 | Built: match on booking, `RECON_AUTOMATCH`, tolerance, criteria, statuses. The keys and the timing are parameters (OQ30). |
 | PRCID.028 | Built: the `EarlyIncentiveRules` port, read from remittance's incentive rules, and the report. The rates are parked (OQ23). |
@@ -1233,7 +1233,7 @@ the reconciliation items of an invoice.
 |---|---|---|
 | Extract frequency, template, naming, password per insurer | OQ29 | `prc_schedule`, `PRODRECON_FILE_PATTERN`, `PRODRECON_COVER_LETTER` |
 | Match keys and automatch time | OQ30 | `RECON_MATCH_KEYS`, `RECON_TOLERANCE`, `recon-automatch-cron` |
-| Company concerned and disposition lists | OQ31 | LOVs `RECON_COMPANY_CONCERNED`, `RECON_DISPOSITION` (demo values in V993) |
+| Company concerned and disposition lists | OQ31 | LOVs `RECON_COMPANY_CONCERNED`, `RECON_DISPOSITION` (seed values in V993) |
 | Early incentive rates and windows | OQ23 | `rem_incentive_rule` read through `opsledger.service.port.EarlyIncentiveRules` |
 | Insurer channels (SFTP / API) and shared drive | OQ17 | Manual upload to `INSURER_PRODUCTION`; `FileDropPort` to the extract repository |
 | Sum insured on the register | - | Not in the Operations ledger; column left out |
@@ -1244,7 +1244,7 @@ Commission Receivables handles direct payment accounts, where the client paid th
 It bills the insurer for BDOI's commission, follows the insurer's answer, collects the commission
 and reverses the premium receivable. It also runs the incentive programmes and tracks BIR
 certificates. Requirements CMRID.001-015 and MKTID.012. Migrations: V785 (schema, workflows, event
-types, parameters) and V995 (demo accounting rules, collection bank, inactive demo schemes).
+types, parameters) and V995 (seed accounting rules, collection bank, inactive seed schemes).
 
 ### 6.1 Model
 
@@ -1383,7 +1383,7 @@ invoice.
 |---|---|
 | CMRID.001 | Built: list upload with the naming check, duplicate block and branch tracker. The folders and the Collection system are parked (OQ38): pull through `CollectionFeed`, upload now. |
 | CMRID.002, 007, 008, 013 | Built: validation rules on the ledger, computed amounts, tags and sanitation. |
-| CMRID.003, 005, 006 | Built: scheme engine, exclusions and posting. The demo schemes have no tiers until BDOI gives targets and amounts (OQ39). |
+| CMRID.003, 005, 006 | Built: scheme engine, exclusions and posting. The seed schemes have no tiers until BDOI gives targets and amounts (OQ39). |
 | CMRID.004, 014 | Built: reports. Final layouts are parked (OQ42); the estimated-item definition is parked (OQ27). |
 | CMRID.009, 012 | Built: billing per insurer with its handler, protected e-mail, answers on screen or by file. The billing and answer formats are parked (OQ38/OQ40). |
 | CMRID.010 | Built: OR request (`ReceiptIssuer`), withholding tax on the collection, certificates and feedback. |
@@ -1397,9 +1397,9 @@ invoice.
 |---|---|---|
 | DP list folders and Collection system transport | OQ38 | `COLLECTION_DP_LIST` upload, `CollectionFeed` pull |
 | Billing and insurer answer formats, insurer channels | OQ38, OQ40 | `DpBillingSender` columns, `INSURER_DP_RESPONSE` layout |
-| Incentive targets, tiers and amounts | OQ39 | Inactive demo schemes without tiers |
+| Incentive targets, tiers and amounts | OQ39 | Inactive seed schemes without tiers |
 | OR issuance for DP collections | OQ41 | `ReceiptIssuer` (default: deferred hand-off) |
-| GL accounts of the DP collection and PR reversal | OQ07 | Demo rules in V995, `DP_PR_REVERSAL_POSTING` off |
+| GL accounts of the DP collection and PR reversal | OQ07 | Seed rules in V995, `DP_PR_REVERSAL_POSTING` off |
 | Branch pass-on payment | OQ02 | `DisbursementGateway` `PASS_ON` request |
 | Co-insurance split of DP commission | - | Lead insurer is the commission party |
 
@@ -1414,7 +1414,7 @@ invoice.
 | Adjustment's `ADJUSTED` movement of a return invoice carries the booking **journal batch** (it carried the return invoice number in the journal field) | `adjustment` (`LedgerEffects`, `AdjustmentPostingService`) | Bug found by the end-to-end test: Invoice 360 and the journal checks follow the movement's journal batch |
 | Home tile labels in Title Case, minor words lowercase ("Batches in Review", "Paid, Not Yet Extracted") | every `OpsWorkCountSource` | BDO UX guideline; guarded by `OperationsSeamsIT` |
 | Invoice 360: `RecordSummary` with reference chips, payment and remittance pills and flag tags; one tab per module (Receipts, Remittances, Adjustments, Reconciliation, Commission) with its record count and an empty state | `features/operations` | BDO UX guideline section 7 |
-| Demo runners in storyline order, each signed in as the demo user whose job it is (`opsledger.demo.DemoUsers`) | all Operations `demo` packages | Real data on every Operations screen after start-up (section 7.4) |
+| Seed runners in storyline order, each signed in as the SIT/UAT user whose job it is (`opsledger.seed.SeedUsers`) | all Operations `seed` packages | Real data on every Operations screen after start-up (section 7.4) |
 
 ### 7.2 Ports and their beans
 
@@ -1451,7 +1451,7 @@ invoice.
 ### 7.3 End-to-end test
 
 `opsintegration.OperationsEndToEndIT` runs the flow of section 0.2 through the real services as
-the demo users, without mocks (`OpsJourney` and `OpsJourneyLater` hold the steps). At each step it
+the SIT/UAT users, without mocks (`OpsJourney` and `OpsJourneyLater` hold the steps). At each step it
 checks the ledger (components, movements, flags, payment and remittance status, lock), the journals
 (every accounting event of the step is posted and balanced, every journal a movement points to
 exists and balances) and the open items (the booking's subledger items, the ledger balances).
@@ -1474,20 +1474,20 @@ exists and balances) and the open items (the booking's subledger items, the ledg
 tiles (count, Title Case label, link to a screen). All data is created by the tests with unique
 keys, so they pass in either order.
 
-### 7.4 Demo storyline (`--spring.profiles.active=demo`, fresh database)
+### 7.4 Seed storyline (`--spring.profiles.active=seed`, fresh database)
 
 | Order | Runner | Signed in as | What it leaves on the screens |
 |---|---|---|---|
-| 80 | `booking.demo.BookingDemoData` (New Business) | - | four booked accounts, a positive endorsement of ARN-2026-940001, a partial cancellation of ARN-2026-940002 |
-| 90 | `OpsLedgerDemoReplay` | admin | the ledger of every booked invoice (replay run on *Interfaces*) |
-| 91 | `CashieringDemoData` | cashier, mktcoll | ARN-2026-940001 booking and endorsement invoices paid (value date a week back), ARN-2026-940004 partly paid, an unmatched payment with a refund for approval, a pre-booked payment (ARN-2026-940005), an excess with a cancellation request, a PDC, a service fee OR, a BIR 2307 tag |
-| 92 | `RemittanceDemoData` | mktcoll, remit, remittl, disb | a hold for approval on ARN-2026-940004; the batch of ARN-2026-940001 approved, paid by DV-DEMO-0001 and closed by the insurer's OR; a manual extraction whose batch (the endorsement) waits for review |
-| 93 | `AdjustmentDemoData` | mktcoll, adjust, adjtl | on ARN-2026-940002 a draft, a request for validation, a returned request and a rate increase for approval; a flat cancellation of ARN-2026-940004 for posting; an internal adjustment of ARN-2026-940001 posted |
-| 94 | `ProdReconDemoData` | recon | the INS-MGIC September register extracted and sent, the insurer's answer uploaded: a match, a premium discrepancy and an unbooked policy |
-| 96 | `CommissionDemoData` | commrec | the direct payment account ARN-2026-940003 listed, confirmed, billed and sent to INS-MGIC |
+| 80 | `booking.seed.BookingSeedData` (New Business) | - | four booked accounts, a positive endorsement of ARN-2026-940001, a partial cancellation of ARN-2026-940002 |
+| 90 | `OpsLedgerSeedReplay` | admin | the ledger of every booked invoice (replay run on *Interfaces*) |
+| 91 | `CashieringSeedData` | cashier, mktcoll | ARN-2026-940001 booking and endorsement invoices paid (value date a week back), ARN-2026-940004 partly paid, an unmatched payment with a refund for approval, a pre-booked payment (ARN-2026-940005), an excess with a cancellation request, a PDC, a service fee OR, a BIR 2307 tag |
+| 92 | `RemittanceSeedData` | mktcoll, remit, remittl, disb | a hold for approval on ARN-2026-940004; the batch of ARN-2026-940001 approved, paid by DV-2026-900001 and closed by the insurer's OR; a manual extraction whose batch (the endorsement) waits for review |
+| 93 | `AdjustmentSeedData` | mktcoll, adjust, adjtl | on ARN-2026-940002 a draft, a request for validation, a returned request and a rate increase for approval; a flat cancellation of ARN-2026-940004 for posting; an internal adjustment of ARN-2026-940001 posted |
+| 94 | `ProdReconSeedData` | recon | the INS-MGIC September register extracted and sent, the insurer's answer uploaded: a match, a premium discrepancy and an unbooked policy |
+| 96 | `CommissionSeedData` | commrec | the direct payment account ARN-2026-940003 listed, confirmed, billed and sent to INS-MGIC |
 
 Each runner checks its own marker and does nothing on a restart; a step that fails is logged and
-skipped. `OperationsDemoDataIT` starts the demo profile on its own database and checks the
+skipped. `OperationsSeedDataIT` starts the seed profile on its own database and checks the
 storyline, the user of each step, the Operations home counts and that running the runners again
 changes nothing.
 
@@ -1502,7 +1502,7 @@ replacement; it is not built in Operations.
 | Collection system interface (check pick-up, 2307 tags, commission payments, holds, special remittance, DP lists, refunds) | OQ01, OQ13, OQ38, OQ45 | `CollectionFeed` (CSV in the extract repository), `COLLECTION_*` flow-in feeds by upload | opsledger, cashiering, remittance, commission | **Superseded by BRD-4**: Collections is a BrokerVerse module; `CollectionFeed` gets its in-app adapter there |
 | Marketing activities MKTID.010/012/013 (2307 and DP PR tagging) | OQ45 | 2307 tagging screen and `CWT_TAGS` / `COLLECTION_CWT2307`; DP list | cashiering, commission | **Superseded by BRD-4** (Collections dispositions); MKTID.001-009/011 stay in Operations as built |
 | Disbursement system, DV numbers and statuses, re-sending returned requests | OQ02 | `DisbursementGateway` and the in-app queue | opsledger, remittance, cashiering, commission | **Superseded by BRD-5**: Disbursement module implements the gateway |
-| GL accounts of every Operations event, bank / cash accounts, subledger settlement of DTIP and PR open items | OQ07 | event types with demo rules; `CASH_BANK_ACCOUNT` / `CASH_ON_HAND_ACCOUNT`; ledger movements | all | **Partly superseded by BRD-5** (GL kept in BIBS; accounts still to be given) |
+| GL accounts of every Operations event, bank / cash accounts, subledger settlement of DTIP and PR open items | OQ07 | event types with seed rules; `CASH_BANK_ACCOUNT` / `CASH_ON_HAND_ACCOUNT`; ledger movements | all | **Partly superseded by BRD-5** (GL kept in BIBS; accounts still to be given) |
 | Marketing and Claims feeds | OQ45, OQ46 | `MarketingFeed` without adapter; `ClaimsFeed` served in-app by `brokerclaims` (BRD-7) | opsledger, remittance | Marketing parked; Claims connected |
 | Insurer channels (SFTP / API) | OQ22, OQ29, OQ38 | `InsurerFileInbox`, manual upload | opsledger, remittance, prodrecon, commission | parked |
 | Shared drive | OQ17 | `FileDropPort` to the extract repository | opsledger, remittance, prodrecon | parked (FS04 named by BRD-4) |
@@ -1521,13 +1521,13 @@ replacement; it is not built in Operations.
 | Early incentive rates and window | OQ23 | `rem_incentive_rule` (read by prodrecon through `EarlyIncentiveRules`) | remittance, prodrecon | parked (rates) |
 | Hold roles, maximum and extensions | OQ24 | `HOLD_REQUEST` / `HOLD_APPROVE`, no maximum | remittance | parked |
 | Extract frequency, template, naming, password per insurer; match keys | OQ29, OQ30 | `prc_schedule`, `PRODRECON_FILE_PATTERN`, `RECON_MATCH_KEYS`, `RECON_TOLERANCE` | prodrecon | parked |
-| Company-concerned and disposition lists; open LOVs | OQ24, OQ31, OQ32, OQ40 | LOV types, demo or "Others" values | all | parked |
+| Company-concerned and disposition lists; open LOVs | OQ24, OQ31, OQ32, OQ40 | LOV types, seed or "Others" values | all | parked |
 | Endorsement numbering, documents, account update by non-financial endorsements | OQ32 | `ENR-`/`ES-` numbers, `ENDORSEMENT_DOC_TYPE`, recorded by booking | adjustment | parked |
 | Package TSI limits, co-insurance | OQ33 | catalog `max_sum_insured`, insurer shares | adjustment | parked |
 | Credit memo on commission decrease; refund basis | OQ34, OQ36 | `ServiceInvoiceService.credit`; basis per request | adjustment | parked |
 | Over-adjustment baseline | OQ37 | `ADJ_BASELINE_PERCENT` | adjustment | parked |
 | DP list folders; billing and answer formats | OQ38, OQ40 | `COLLECTION_DP_LIST` upload, `DpBillingSender` columns, `INSURER_DP_RESPONSE` layout | commission | parked (DP list source superseded by BRD-4) |
-| Incentive targets and amounts | OQ39 | inactive demo schemes | commission | parked |
+| Incentive targets and amounts | OQ39 | inactive seed schemes | commission | parked |
 | OR issuance for DP collections; certificates | OQ41 | `ReceiptIssuer` (cashiering OR); `cmr_certificate` | commission | answered by BRD-5 (one received-certificate register) |
 | Report layouts and ageing buckets | OQ42, OQ43 | draft layouts | all | parked |
 | Search log retention | OQ47 | `csh_search_log` kept | cashiering | parked |

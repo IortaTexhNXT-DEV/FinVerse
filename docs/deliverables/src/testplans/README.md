@@ -29,7 +29,7 @@ The build stops, and prints each problem, when:
 - (built BRDs 1-5) a quoted code does not occur in `backend/src/main` or `frontend/src`, a literal part of a quoted
   message does not occur there, or an automation reference names a test class or method that does not exist;
 - (designed BRDs 6-12) a case quotes a message code or an automation reference;
-- a text uses a filler word of the writing standard or names an AI model.
+- a text uses a filler word of the writing standard or names a restricted tool or vendor.
 
 ## Writing the YAML
 
@@ -64,7 +64,7 @@ the YAML holds only test content.
 | `<!-- tp:brd-coverage -->` | Coverage by BRD ID |
 | `<!-- tp:scenarios -->` | Scenarios with persona and number of cases |
 | `<!-- tp:data -->` | Named data sets and their source |
-| `<!-- tp:personas -->` | Personas, demo users (built BRDs) and number of cases |
+| `<!-- tp:personas -->` | Personas, SIT/UAT users (built BRDs) and number of cases |
 | `<!-- tp:access -->` | Roles-and-access matrix (Y / N per role) |
 | `<!-- tp:automation -->` | Automated test classes referenced and how many cases each covers |
 | `<!-- tp:findings -->` | FRS findings for the FRS owner |

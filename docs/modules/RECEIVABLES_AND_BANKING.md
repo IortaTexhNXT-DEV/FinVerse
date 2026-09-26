@@ -1,7 +1,7 @@
 # Receivables & Banking (collections, PDC received, bank reconciliation)
 
 Package `com.iortatechnxt.brokerverse.receivables`, frontend `src/features/receivables`, migrations
-`V550` (schema) and `V955` (demo rule), demo loader `receivables.demo.ReceivablesDemoData`.
+`V550` (schema) and `V955` (seed rule), seed loader `receivables.seed.ReceivablesSeedData`.
 
 Banks are identified by their **GL bank account code** (postable, active accounts of a bank / cash
 category, e.g. `1111`, `1112`, `1113`): the module keeps no bank master of its own.
@@ -19,7 +19,7 @@ Money not allocated stays **on account**; it can be applied later (`/receipts/{i
 
 ### Accounting (through the accounting engine; the module never picks GL accounts)
 
-| Situation | Event (source reference) | Demo rule |
+| Situation | Event (source reference) | Seed rule |
 |---|---|---|
 | Approval, policyholder / intermediary, applied part | `PREMIUM_RECEIPT` (`RCPT:<id>:APPLIED`) | Dr bank (`@BANK`) / Cr 1201 premiums receivable (party) |
 | Approval, policyholder / intermediary, unapplied part | `PREMIUM_DEPOSIT` (`RCPT:<id>:UNAPPLIED`) | Dr bank / Cr 2205 premium deposits |
@@ -109,23 +109,23 @@ with PDF/Excel export), so the screen, its menu entry and its endpoint
 `GET /api/v1/receivables/party-statement` were removed. `PartyStatementService` remains as the
 engine of the report.
 
-## 6. Demo bank balances and statements (demo profile)
+## 6. Seed bank balances and statements (seed profile)
 
-* **Opening balances.** `journal.demo.OpeningBalanceDemoData` (`@Order(5)`, before every other demo
+* **Opening balances.** `journal.seed.OpeningBalanceSeedData` (`@Order(5)`, before every other seed
   runner, idempotent on its source references) posts one `OPENING` journal per branch dated
   1 January 2026 against 3500 Retained Earnings, the opening-balance account of the fixed asset and
   investment take-on: 1111 BDO Current PHP 150,000,000.00 (head office 145,000,000.00, Cebu
   2,000,000.00, Davao 3,000,000.00) and 1112 BPI Savings PHP 20,000,000.00 (head office); the USD
-  account 1113 is left as it is. Without them 1111 was overdrawn by about 44.6 million after the demo
+  account 1113 is left as it is. Without them 1111 was overdrawn by about 44.6 million after the seed
   investment purchases and supplier payments, and the dashboard cash position was negative. With
   them every bank account is in credit at every month end of 2026, for the company and for each
-  branch (`OpeningBalanceDemoDataIT`).
+  branch (`OpeningBalanceSeedDataIT`).
 * They are system journals posted by the finance manager, like the take-on of fixed assets and
   investments: manual journals (maker-checker) are limited to MANUAL, ADJUSTMENT and ACCRUAL and to
   the company's back-value window, so a 1 January take-on cannot be entered as one. The loader sits
-  in `journal` with its own run-as helper; `underwriting.demo.DemoUserContext` would create the cycle
+  in `journal` with its own run-as helper; `underwriting.seed.SeedUserContext` would create the cycle
   journal → underwriting → accounting → journal.
-* **Statements.** `DemoBankStatements` builds the 1111 statements from the book entries; the
+* **Statements.** `SeedBankStatements` builds the 1111 statements from the book entries; the
   January statement opens with one *BALANCE BROUGHT FORWARD* credit of 150,000,000.00, matched to the
   three branch opening entries by their common reference `OPENING-BANK-2026`, so the statement's
   running balance is the real account balance and the August reconciliation still finalizes with a

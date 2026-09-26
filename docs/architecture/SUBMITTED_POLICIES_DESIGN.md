@@ -18,7 +18,7 @@ Every class, migration and screen cites its BRD ID in Javadoc or a comment, for 
 4. **Reuse the BRD-1 and Operations platform.** Intake = `bulk` handlers and flow-in runs; extraction = the `issuance`
    extraction port; documents = `docgen`; letters and notifications = `messaging`; approvals = `workflow` + approval
    inbox; hold cover = `placement`; unapplied payments = `cashiering` via the `opsledger` ports; reports = `report`.
-5. **Parked means seam, not fake.** LFS, HLS, CIU, SPI, LAMD, IBG / Leasing, the mail house (COG), OCR and a qualified
+5. **Parked means seam, not simulation.** LFS, HLS, CIU, SPI, LAMD, IBG / Leasing, the mail house (COG), OCR and a qualified
    e-signature each get a port whose default adapter is an upload, a manual step or a stamped signature.
 6. **Renewal is a hand-off to the Renewal module.** `submitted` calls its port `RenewalHandOff`; the `renewal` module
    implements it (`SubmittedPolicyRenewalHandOff`, RENEWAL_DESIGN section 2.3) and owns the renewal of submitted
@@ -28,7 +28,7 @@ Every class, migration and screen cites its BRD ID in Javadoc or a comment, for 
 
 ## 2. Modules
 
-| Module | State | Purpose | BRD IDs | Depends on | Flyway (demo) |
+| Module | State | Purpose | BRD IDs | Depends on | Flyway (seed) |
 |---|---|---|---|---|---|
 | `submitted` | **new** | Sources and intake runs, document extraction and confirmation, the Submitted Masterlist and its history, LAMD loan snapshot, rules and processing runs (sanitation, matching, classification, disposition, limits), buckets and tags, IAAF and reviews, TOR, approval matrices, expiry scan, renewal hand-off (port and pending default), non-renewal letters and print batches, handling-fee records and tagger, No Touch billing lists, migration, Submitted Policies reports, dashboard counts | BRIDSP-01-25, 28-31, 33 | account, catalog, crm (read), booking (event), placement (port), opsledger (ports), bulk, workflow, docgen, messaging, attachment, lov, alert, system, report, audit, approval, organization | V1070-V1079 (V1970-V1972) |
 | `placement` | built, **changed** | Hold cover re-assignment; unbooked hold-cover alert facts | BRIDSP-32, 24 | as today | V851 (owner's range V850-V859) |
@@ -43,7 +43,7 @@ Every class, migration and screen cites its BRD ID in Javadoc or a comment, for 
 
 The module is one top-level package `com.iortatechnxt.brokerverse.submitted` with the usual `domain` / `service` / `api`
 layout and sub-packages per area (`intake`, `masterlist`, `processing`, `review`, `renewal`, `fee`, `report`), so that
-four agents can build in parallel (section 14).
+four teams can build in parallel (section 14).
 
 ### 2.1 Dependency graph (arrows = "depends on")
 
@@ -261,13 +261,13 @@ invoice no., insurer and client codes), as in Operations.
 ## 5. Accounting events and GL entries
 
 Masterlist, review, TOR and letters post nothing. Money appears only in the handling fee, the No Touch service fee and
-the renewal booking. Demo rules only (V1970); Comptrollership configures the real accounts (OQ07, SQ13, SQ14).
+the renewal booking. Seed rules only (V1970); Comptrollership configures the real accounts (OQ07, SQ13, SQ14).
 
-| # | Transaction | Event (source ref) | Posted by | Default entry (demo chart) |
+| # | Transaction | Event (source ref) | Posted by | Default entry (seed chart) |
 |---|---|---|---|---|
-| 1 | Handling-fee payment recognised from an unapplied item | `SBM_HANDLING_FEE` (`HF:<id>`) | cashiering (disposition RECOGNIZE_INCOME) | Dr 2205 Unapplied Collections (client) / Cr 4115 Handling Fee Income (new demo account), Cr 2504 Output VAT |
+| 1 | Handling-fee payment recognised from an unapplied item | `SBM_HANDLING_FEE` (`HF:<id>`) | cashiering (disposition RECOGNIZE_INCOME) | Dr 2205 Unapplied Collections (client) / Cr 4115 Handling Fee Income (new seed account), Cr 2504 Output VAT |
 | 2 | OR for the handling fee | `OPS_OR_ISSUE` class HANDLING_FEE (`OR:<no>`) | cashiering via `ReceiptIssuer` | BIR document; no further GL line (income already in 1) |
-| 3 | No Touch service fee billed to the insurer | `SBM_NO_TOUCH_FEE` (`NT:<batch>:<insurer>`) | submitted via booking `ServiceInvoiceService` | Dr 1236 Service Fee Receivable - Insurers (new demo) / Cr 4110 Service Fee Income, Cr 2504 Output VAT |
+| 3 | No Touch service fee billed to the insurer | `SBM_NO_TOUCH_FEE` (`NT:<batch>:<insurer>`) | submitted via booking `ServiceInvoiceService` | Dr 1236 Service Fee Receivable - Insurers (new seed) / Cr 4110 Service Fee Income, Cr 2504 Output VAT |
 | 4 | No Touch fee collected | `OPS_OR_ISSUE` class SERVICE_FEE (existing #15) | cashiering | Dr bank + Dr 1602 CWT (WTax as billed) / Cr 1236 |
 | 5 | Renewal of a submitted policy booked | `BROKER_BOOKING` (existing) with business type RENEWAL | booking | As BRD-1 booking; no new rule |
 
@@ -293,9 +293,9 @@ closes the client's unapplied credit item.
 | `SBM_EXPORT` | Masterlist extract |
 | `SBM_REPORT_VIEW`, `SBM_REPORT_EXPORT` | Submitted Policies reports (view vs export, archived) |
 
-### 6.2 Roles (V1070) and demo users (V1970, password `Brokerverse@2026`)
+### 6.2 Roles (V1070) and SIT/UAT users (V1970)
 
-| Role | Persona (BRD) | Permissions | Demo user |
+| Role | Persona (BRD) | Permissions | SIT/UAT user |
 |---|---|---|---|
 | `SBM_HANDLER` | Submitted Handler (CBG) | VIEW, MAINTAIN, INTAKE, IAAF_PREPARE, TOR_PREPARE, REPORT_VIEW / EXPORT, EXPORT | `sbmhandler` |
 | `SBM_CHECKER` | Submitted Checker | VIEW, IAAF_APPROVE (level 1), REPORT_VIEW | `sbmchecker` |
@@ -377,7 +377,7 @@ Bulk handlers: `SBM_LFS_INSURANCE`, `SBM_HLS_INSURANCE`, `SBM_CIU`, `SBM_SPI`, `
 | `messaging` (built) | Preference catalogue | Register the SBM notification events (data) | submitted, S0 (V1070) |
 | `nbadmin` (built) | Retention | Row in `nba_retention_rule` for record type SUBMITTED_POLICY (5 years online) and a `RetentionCandidateProvider` in `submitted` | submitted, S1-A |
 | `catalog` / `productmaint` (built) | None required | Limits read through `RiskProduct.exceedsPackageLimit`; insurer acceptance limits live in `sbm_limit_rule` until Product Maintenance takes them over (SQ08) | - |
-| GL / accounting | Event types | `SBM_HANDLING_FEE`, `SBM_NO_TOUCH_FEE` in `acc_event_type` (V1070); demo accounts 4115, 1236 and rules (V1970) | submitted |
+| GL / accounting | Event types | `SBM_HANDLING_FEE`, `SBM_NO_TOUCH_FEE` in `acc_event_type` (V1070); seed accounts 4115, 1236 and rules (V1970) | submitted |
 | `frbs` (being built) | Service-fee pack | `FRBS-SERVICE-FEE` should include handling-fee (4115) and No Touch service-fee (4110, SI type SERVICE_FEE_NO_TOUCH) income; no contract change, a column / filter | frbs owner (A1-FRBS) |
 | `nbreport` (built) | Business-type filter (part of BT0) | NB reports include renewal accounts once `business_type` exists; the Business Type parameter on `NB-BOOKED-REG`, `NB-PRODUCTION`, `NB-PLC-UPDATE` is delivered with BT0 | with BT0 |
 | `renewal` (Renewal BRD, designed) | Hand-off | **Implements `RenewalHandOff`** and owns the renewal account, hold cover request and renewal letters of submitted policies (SQ10 closed, decision D2); prints through `MailHouseGateway` | Renewal wave R3 (after S1-D) |
@@ -452,7 +452,7 @@ pills, flag chips (Renewable, FFY, No Touch, Migrated, Insurer approval), tokens
   rules, approval matrices, sources, status map, user scope; links to the LOV maintenance of the SBM LOV types.
 - **Reports**: the SBM reports in the Report Centre (category Submitted Policies), also linked from the group Reports.
 
-## 13. Flyway plan (schema V1070-V1079, demo V1970-V1979)
+## 13. Flyway plan (schema V1070-V1079, seed V1970-V1979)
 
 The allocation fits in one block of ten; seven versions are used and three stay free.
 
@@ -466,9 +466,9 @@ The allocation fits in one block of ten; seven versions are used and three stay 
 | `V1075__sbm_handling_fee_no_touch.sql` | S1-D | `sbm_handling_fee`, `sbm_no_touch_batch`, `sbm_no_touch_line`; SI type `SERVICE_FEE_NO_TOUCH` row in `bkg_si_type` (data only, no DDL on booking tables) |
 | `V1076__sbm_reports_retention.sql` | S2 | Report archive settings, retention rule row, report metadata seeds if any |
 | V1077-V1079 | - | Free |
-| `V1970__demo_sbm_users_rules.sql` | S2 | Demo users, demo accounts 4115 / 1236 and rules, active demo rule sets, limit / insurer / letter rules, approval matrices |
-| `V1971__demo_sbm_masterlist.sql` | S2 | ~60 masterlist records over the four segments (NB / RB, migrated ones), LAMD snapshot, one processing run with fallout |
-| `V1972__demo_sbm_review_renewal.sql` | S2 | IAAFs at each stage, a TOR released, letters and a print batch, handling-fee records; the renewal accounts are created by a Java demo runner after the NB demo (as `BookingDemoData`) |
+| `V1970__seed_sbm_users_rules.sql` | S2 | SIT/UAT users, seed accounts 4115 / 1236 and rules, active seed rule sets, limit / insurer / letter rules, approval matrices |
+| `V1971__seed_sbm_masterlist.sql` | S2 | ~60 masterlist records over the four segments (NB / RB, migrated ones), LAMD snapshot, one processing run with fallout |
+| `V1972__seed_sbm_review_renewal.sql` | S2 | IAAFs at each stage, a TOR released, letters and a print batch, handling-fee records; the renewal accounts are created by a Java seed runner after the NB seed (as `BookingSeedData`) |
 
 Rules: no foreign keys from V107x tables to V8xx tables (plain codes and ARNs); the owner-range changes (V822, V851,
 V861 and the cashiering / collections seeds) are made by those owners in their own ranges. V822 is the shared work
@@ -478,24 +478,24 @@ those builds to start; `submitted` adds no migration of its own on `acc_account`
 ## 14. Build-wave plan
 
 Prerequisites: Collections C1 and Operations O1-A (cashiering) expose `UnappliedDirectory` /
-`UnappliedDispositionRequests` implementations; BRD-5 report platform changes merged.
+`UnappliedDispositionRequests` implementations; BRD-5 report platform changes delivered.
 
-| Wave | Agent | Scope | Files owned | Done when |
+| Wave | Team | Scope | Files owned | Done when |
 |---|---|---|---|---|
-| **S0** (one agent, sequential) | Foundation | `submitted` package skeleton, permissions, `ReportCategory` / factory, V1070; contract PRs to account and booking (BT0 / V822, unless Renewal R0 or Employee Benefits E0 already merged it), placement (V851), issuance (V861), opsledger port change; `RenewalHandOff`, `SubmittedSourceFeed`, `MailHouseGateway`, `SignatureProvider` interfaces | `submitted/package-info.java`, `submitted/service/port/**`, `security/domain/Permission.java`, `report/core/ReportCategory.java`, `ReportMetadata.java`, `account/**` (business type only), `booking/service/InvoiceBuilder.java`, `InvoiceBooked.java`, `placement/service/HoldCoverService.java`, `issuance/service/PolicyDataExtractor.java`, `opsledger/service/port/UnappliedDispositionRequests.java`, V1070, V822, V851, V861 | Build green; existing ITs pass; ports compile with default adapters |
+| **S0** (one team, sequential) | Foundation | `submitted` package skeleton, permissions, `ReportCategory` / factory, V1070; contract changes to account and booking (BT0 / V822, unless Renewal R0 or Employee Benefits E0 already delivered it), placement (V851), issuance (V861), opsledger port change; `RenewalHandOff`, `SubmittedSourceFeed`, `MailHouseGateway`, `SignatureProvider` interfaces | `submitted/package-info.java`, `submitted/service/port/**`, `security/domain/Permission.java`, `report/core/ReportCategory.java`, `ReportMetadata.java`, `account/**` (business type only), `booking/service/InvoiceBuilder.java`, `InvoiceBooked.java`, `placement/service/HoldCoverService.java`, `issuance/service/PolicyDataExtractor.java`, `opsledger/service/port/UnappliedDispositionRequests.java`, V1070, V822, V851, V861 | Build green; existing ITs pass; ports compile with default adapters |
 | **S1-A** (parallel) | Intake & masterlist | Sources, bulk handlers, intake runs, extraction review, manual entry, masterlist, history, scope, migration, retention provider | `submitted/{domain,service,api}/intake/**`, `.../masterlist/**`, V1071, `features/submitted/{masterlist,intake,extraction}/**` | Upload → record; document → confirm; migration with error log |
-| **S1-B** (parallel) | Rules & processing | Rule engine, steps, runs, results, limits, buckets, fallout, SBM_PROCESSING job | `submitted/.../processing/**`, V1072, `features/submitted/{runs,setup/rules}/**` | Seeded rules bucket the demo list; fallout rows with reasons |
+| **S1-B** (parallel) | Rules & processing | Rule engine, steps, runs, results, limits, buckets, fallout, SBM_PROCESSING job | `submitted/.../processing/**`, V1072, `features/submitted/{runs,setup/rules}/**` | Seeded rules bucket the seed list; fallout rows with reasons |
 | **S1-C** (parallel) | Review, IAAF, TOR | Reviews, IAAF, TOR, approval matrix, signatures, approval source, notifications | `submitted/.../review/**`, V1073, `features/submitted/{iaaf,tor}/**` | IAAF and TOR through two levels with the inbox; PDFs |
 | **S1-D** (parallel) | Renewal hand-off, letters, fees | Expiry scan, insurer rules, the PENDING default `RenewalHandOff`, hold-cover watch, non-renewal letters, `MailHouseGateway` and print batches, handling-fee tagger, No Touch billing | `submitted/.../renewal/**`, `.../fee/**`, V1074-V1075, `features/submitted/{renewal,letters,fees,notouch}/**` | Record → hand-off PENDING; with the Renewal adapter (R3): renewal account → hold cover → RA → booked status on the masterlist; handling fee tagged and applied via cashiering |
-| **S2** (one agent) | Reports, home, demo, docs | 20 reports, home and counts, help, demo V1970-V1972 and runner, traceability, module guide `docs/modules/SUBMITTED_POLICIES.md`, Developer Guide range row | `submitted/report/**`, `features/submitted/{home,reports}/**`, `help.ts`, V1076, V1970-V1972, docs | Every report runs and exports in tests; ApiSmokeIT; screenshots |
+| **S2** (one team) | Reports, home, seed, docs | 20 reports, home and counts, help, seed V1970-V1972 and runner, traceability, module guide `docs/modules/SUBMITTED_POLICIES.md`, Developer Guide range row | `submitted/report/**`, `features/submitted/{home,reports}/**`, `help.ts`, V1076, V1970-V1972, docs | Every report runs and exports in tests; ApiSmokeIT; screenshots |
 
 Parallel-work rules:
-- Only S0 edits files outside `submitted/**` and `features/submitted/**`; S1 agents ask S0 (or the owner) for any change
+- Only S0 edits files outside `submitted/**` and `features/submitted/**`; S1 teams ask S0 (or the owner) for any change
   outside.
-- Each S1 agent owns its sub-packages, its migration and its screens; shared domain types (`SbmPolicy`, enums) are
+- Each S1 team owns its sub-packages, its migration and its screens; shared domain types (`SbmPolicy`, enums) are
   created in S0 and changed only by S1-A, by agreement.
 - `features/submitted/module.ts` and `help.ts` are created in S0 with placeholder routes; S2 finalises them.
-- No agent edits another module's migration or range; demo data waits for S2.
+- No team edits another module's migration or range; seed data waits for S2.
 
 ## 15. What depends on information BDOI has not given (build the seam, park the content)
 
@@ -507,7 +507,7 @@ Parallel-work rules:
 | LAMD | 13 | Snapshot upload | Feed and field meaning | SQ06 |
 | IAAF / TOR matrices and templates | 05-07, 16-19 | Matrix tables, placeholder templates, stamped signature | Levels, signatories, layouts, e-signature | SQ07, SQ08 |
 | Letters | 22 | Letter engine, rules, print batches | Templates, lead days, COG | SQ09 |
-| Handling fee / No Touch accounting | 31, RL #164 | Events and demo rules | Accounts, rates, OR / SI rules | SQ13, SQ14, OQ07 |
+| Handling fee / No Touch accounting | 31, RL #164 | Events and seed rules | Accounts, rates, OR / SI rules | SQ13, SQ14, OQ07 |
 | Renewal ownership | 23-26 | Port and PENDING default; Renewal R3 adapter | None: SQ10 closed (Renewal owns it, decision D2) | - |
 
 ## 16. Risks

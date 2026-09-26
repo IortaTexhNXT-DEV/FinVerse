@@ -76,13 +76,13 @@ screens:
 
 data:
   - id: TD-CL-01
-    name: Demo users and roles
-    content: ao (MKT_AO), mkttl (MKT_TL), mkthandler (MKT_HANDLER), clxhandler and mktcoll (MKT_COLLECTION), clxtl (CLX_TL), clxuh (MKT_SECTION_HEAD), upphandler (UNAPPLIED_HANDLER), proc (PROCESSOR), cashier and cashtl (CASHIER, CASHIER_TL), commrec and commtl (Commission), disb (DISBURSEMENT), comptrol (COMPTROLLERSHIP), badmin (BUSINESS_ADMIN), admin (SYSADMIN), auditor (AUDITOR). The demo password is issued by the test lead.
-    source: Demo seeds V980, V990, V1900 (Collections users) and the UnappliedDemoData runner (upphandler); grants V1000
+    name: SIT/UAT users and roles
+    content: ao (MKT_AO), mkttl (MKT_TL), mkthandler (MKT_HANDLER), clxhandler and mktcoll (MKT_COLLECTION), clxtl (CLX_TL), clxuh (MKT_SECTION_HEAD), upphandler (UNAPPLIED_HANDLER), proc (PROCESSOR), cashier and cashtl (CASHIER, CASHIER_TL), commrec and commtl (Commission), disb (DISBURSEMENT), comptrol (COMPTROLLERSHIP), badmin (BUSINESS_ADMIN), admin (SYSADMIN), auditor (AUDITOR). The SIT/UAT password is issued by the test lead.
+    source: Seeds V980, V990, V1900 (Collections users) and the UnappliedSeedData runner (upphandler); grants V1000
   - id: TD-CL-02
-    name: Demo worklist
-    content: The unpaid demo invoices listed by the refresh of clxtl and assigned by the V1900 rules (segment CBG to clxhandler, team T-CORP1 to mkthandler, all others to mktcoll); an effort, dispositions of every kind (Coordinate further, DP PR for reversal, PR 2307 for reversal, For check pick-up, one superseded) and one temporary reassignment recorded
-    source: Demo runner CollectionsDemoData on the demo bookings (V988 and the Operations runners)
+    name: Seed worklist
+    content: The unpaid seed invoices listed by the refresh of clxtl and assigned by the V1900 rules (segment CBG to clxhandler, team T-CORP1 to mkthandler, all others to mktcoll); an effort, dispositions of every kind (Coordinate further, DP PR for reversal, PR 2307 for reversal, For check pick-up, one superseded) and one temporary reassignment recorded
+    source: Seed runner CollectionsSeedData on the seed bookings (V988 and the Operations runners)
   - id: TD-CL-03
     name: Collections parameters as delivered
     content: CLX_MIN_BALANCE_THRESHOLD 10.00; CLX_AGING_BASIS BOOKING; CLX_AGING_BRACKETS 0-30,31-45,46-60,61-90,91-120,121+; CLX_EDIT_LOCK_MINUTES 15 (1-240); CLX_PROMISE_GRACE_DAYS 0 (0-30); CLX_EXPORT_MAX_ROWS 50,000 (100-1,000,000); CLX_INVOICE_NO_PATTERN ^(I\d{8}|BI-.+)$; LOGIN_MAX_FAILED_ATTEMPTS 3
@@ -90,7 +90,7 @@ data:
   - id: TD-CL-04
     name: Sales units and Unit Heads
     content: T-CBG1 headed by mkttl; CBG-NCR, CORP-NCR and VIS headed by clxuh
-    source: Demo seed V1900 (on the sales organisation of V819)
+    source: Seed V1900 (on the sales organisation of V819)
   - id: TD-CL-05
     name: Disposition lists
     content: CLX_PR_DISPOSITION (DP PR for reversal, PR 2307 for reversal, For check pick-up, Cancel account, Coordinate further, Request bank AO assistance, No / missing policy number reserved to PROCESSOR, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD, DP returned by insurer); CLX_UPP_DISPOSITION (For application to invoice, For refund, For reclass, For transfer to other unit, Coordinate further); CLX_EFFORT_CODE
@@ -98,15 +98,15 @@ data:
   - id: TD-CL-06
     name: Escalation rules
     content: CLX-BROKEN-PROMISE (to mkttl), CLX-AGING-45 (TL), CLX-INCEPTION-60 (UH), CLX-INSTALLMENT-15 (TL), all ACTIVE; CLX-AMOUNT-1M pending authorisation, maker badmin
-    source: Demo seed V1901
+    source: Seed V1901
   - id: TD-CL-07
     name: Plans, promises and escalations
     content: Three-year PAR01 account of client CL-2026-000005 (1-Sep-2026 to 1-Sep-2029) with an annual policy-year plan and an SOA per billing cycle; quarterly plan on ARN-2026-940002 with the first installment overdue; promise kept on ARN-2026-940004; broken promise on the three-year account escalated to mkttl
-    source: Demo runner CollectionsPlansDemoData with DemoMultiYearAccount
+    source: Seed runner CollectionsPlansSeedData with SeedMultiYearAccount
   - id: TD-CL-08
     name: Unapplied payments
     content: Payments received without a match - Grace Villanueva (application requested by upphandler, applied by Cashiering), Juan Dela Cruz (Coordinate further), Mega Traders Inc. (refund requested by clxhandler), Liza Manalo (no disposition)
-    source: Demo runners UnappliedDemoPayments, UnappliedDemoData and CollectorRequestDemoData
+    source: Seed runners UnappliedSeedPayments, UnappliedSeedData and CollectorRequestSeedData
   - id: TD-CL-09
     name: Invoice booked for the test
     content: A new Motor policy booked by proc on the test day for a CBG client with a total premium of PHP 25,000.00, no payment
@@ -120,7 +120,7 @@ scenarios:
   - id: SC-CL-01
     persona: SYSADMIN
     title: Access, audit and record lock. Each persona sees only the Collections screens of its role; changes are logged field by field and an account is locked while one user edits it.
-    pre: Demo users of TD-CL-01; demo worklist TD-CL-02.
+    pre: SIT/UAT users of TD-CL-01; seed worklist TD-CL-02.
   - id: SC-CL-02
     persona: MKT_COLLECTION
     title: Worklist and daily refresh. New invoices above the threshold are listed at invoice level, totalled and filtered, refreshed every night and completed when paid.
@@ -175,7 +175,7 @@ frs:
           - Log in as disb and open Finance > Collections > PR Worklist.
           - Open any account of the Open Accounts tab.
         expected: The list and the account open. Record Disposition, Log Effort, Update Remarks and Category and Reassign are not shown.
-        auto: CollectionsAccountingFoundationIT#demoPersonasHoldTheirPermissions
+        auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
       - c: 1
         type: Security-access
         persona: DISBURSEMENT
@@ -193,7 +193,7 @@ frs:
           - Log in as ao and open the side menu, section Collections.
           - Type the address /collections/setup in the browser.
         expected: Collections Setup and Assignments are not in the menu. The direct link shows "You do not have access to this screen. Contact your administrator if you need it."
-        auto: CollectionsAccountingFoundationIT#demoPersonasHoldTheirPermissions
+        auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
       - c: 2
         type: Security-access
         neg: false
@@ -203,7 +203,7 @@ frs:
         steps:
           - Log in as clxuh and open the section Collections.
         expected: Collections Home, PR Worklist, Assignments, Collections Files, Collections Setup and Escalation Rules are in the menu.
-        auto: CollectionsAccountingFoundationIT#demoPersonasHoldTheirPermissions
+        auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
       - c: 3
         type: Positive
         persona: SYSADMIN
@@ -747,7 +747,7 @@ frs:
         steps:
           - Click Refresh now twice in a row.
         expected: The second run creates and completes no account; counts and balances are unchanged.
-        auto: CollectionsDemoDataIT#aSecondStartChangesNothing
+        auto: CollectionsSeedDataIT#aSecondStartChangesNothing
       - c: 4
         type: Positive
         persona: MKT_COLLECTION
@@ -1080,7 +1080,7 @@ frs:
         type: Negative
         screen: API
         title: Account of another company
-        pre: An invoice of the second demo company.
+        pre: An invoice of the second seed company.
         steps:
           - POST a disposition for that invoice with the company FVI.
         expected: The account is refused.
@@ -1329,7 +1329,7 @@ frs:
       - c: 1
         type: Positive
         title: Three-year account with a quarterly frequency
-        pre: A three-year account booked with annual policy-year invoices and no live plan (book one with the TD-CL-07 values if the demo plan exists).
+        pre: A three-year account booked with annual policy-year invoices and no live plan (book one with the TD-CL-07 values if the seed plan exists).
         steps:
           - Click New Installment Plan, basis POLICY_YEARS, the ARN, frequency Quarterly; save.
         expected: The plan has 12 installments, four per coverage year, each within its coverage year.
@@ -1751,7 +1751,7 @@ frs:
         steps:
           - Open the escalations of the three-year account.
         expected: The CLX-BROKEN-PROMISE escalation is WITH_TL for mkttl, raised the night the promise broke.
-        auto: CollectionsPlansDemoDataIT#theBrokenPromiseEscalatedTheAccountToTheTeamLead
+        auto: CollectionsPlansSeedDataIT#theBrokenPromiseEscalatedTheAccountToTheTeamLead
       - c: 3
         type: Workflow
         title: Collected account closes its escalation
@@ -1895,7 +1895,7 @@ frs:
           - Open Billing Statements and filter on client CL-2026-000005.
           - Open each statement and its PDF.
         expected: One SOA per billing cycle; each shows the installment of the cycle with its coverage period, any unpaid earlier installment as arrears, the payments allocated and the amount due; the template version is shown.
-        auto: CollectionsPlansDemoDataIT#theThreeYearAccountHasAStatementPerBillingCycle; CollectionsPlansIT#aThreeYearAccountGetsAStatementOfAccountPerBillingCycle
+        auto: CollectionsPlansSeedDataIT#theThreeYearAccountHasAStatementPerBillingCycle; CollectionsPlansIT#aThreeYearAccountGetsAStatementOfAccountPerBillingCycle
       - c: 2
         type: Positive
         title: Billing run for the next month
@@ -2034,7 +2034,7 @@ frs:
         steps:
           - Search the list for Grace Villanueva's payment.
         expected: It is not in the open tabs (fully applied by Cashiering).
-        auto: CollectionsUnappliedDemoDataIT#theCollectorsDisposedOfTheDemoPaymentsAndCashieringAppliedOne
+        auto: CollectionsUnappliedSeedDataIT#theCollectorsDisposedOfTheSeedPaymentsAndCashieringAppliedOne
 
   FR-CL-071:
     scenario: SC-CL-08
@@ -2118,7 +2118,7 @@ frs:
         steps:
           - Open Juan Dela Cruz's payment, tab Collector Dispositions.
         expected: The disposition Coordinate further of upphandler is listed with its remarks; no request to Cashiering exists.
-        auto: CollectionsUnappliedDemoDataIT#theCollectorsDisposedOfTheDemoPaymentsAndCashieringAppliedOne
+        auto: CollectionsUnappliedSeedDataIT#theCollectorsDisposedOfTheSeedPaymentsAndCashieringAppliedOne
       - c: 2
         type: Negative
         screen: API
@@ -2638,14 +2638,14 @@ access:
     allow: [MKT_AO, MKT_COLLECTION, CASHIER, DISBURSEMENT, COMPTROLLERSHIP, AUDITOR]
     deny: []
     allowed: The worklist and the account open read only for roles without CLX_WORK.
-    auto: CollectionsAccountingFoundationIT#demoPersonasHoldTheirPermissions
+    auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
   - action: Record dispositions, efforts and promises
     screen: WL
     permission: CLX_WORK
     allow: [MKT_AO, MKT_TL, MKT_HANDLER, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD, PROCESSOR]
     deny: [UNAPPLIED_HANDLER, CASHIER, DISBURSEMENT, COMPTROLLERSHIP, AUDITOR]
     denied: Record Disposition and Log Effort are not shown; POST /dispositions returns HTTP 403 (ACCESS_DENIED).
-    auto: CollectionsAccountingFoundationIT#demoPersonasHoldTheirPermissions
+    auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
   - action: Update several accounts at once
     screen: WL
     permission: CLX_BULK_UPDATE
@@ -2690,14 +2690,14 @@ access:
     allow: [MKT_SECTION_HEAD, BUSINESS_ADMIN, SYSADMIN]
     deny: [MKT_TL, MKT_COLLECTION, CLX_TL, CASHIER]
     denied: Collections Setup is not in the menu; PUT /setup/parameters returns HTTP 403.
-    auto: CollectionsAccountingFoundationIT#demoPersonasHoldTheirPermissions
+    auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
   - action: Download files and exports
     screen: FILES
     permission: CLX_EXPORT
     allow: [MKT_AO, MKT_COLLECTION, CLX_TL, CASHIER, DISBURSEMENT]
     deny: [UNAPPLIED_HANDLER, PROCESSOR, COMPTROLLERSHIP]
     denied: The files are listed but the download returns HTTP 403.
-    auto: CollectionsAccountingFoundationIT#demoPersonasHoldTheirPermissions
+    auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
   - action: Run the Collections reports
     screen: REPORTS
     permission: CLX_REPORT_VIEW

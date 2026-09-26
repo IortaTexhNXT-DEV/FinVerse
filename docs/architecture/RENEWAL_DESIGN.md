@@ -2,7 +2,7 @@
 
 Status: **proposal for review**. This design extends `docs/architecture/BROKING_ARCHITECTURE.md`, `OPERATIONS_DESIGN.md`, `PRODUCT_MAINTENANCE_DESIGN.md` and the Developer Guide, which stay binding. It changes them only through the contract changes listed in section 13. The Collections (`COLLECTIONS_DESIGN.md`) and Accounting / Disbursement (`ACCOUNTING_DISBURSEMENT_DESIGN.md`) designs are authoritative for their modules; Renewal only reads from them.
 
-It is aligned with the parallel designs merged on the branch: Submitted Policies (`SUBMITTED_POLICIES_DESIGN.md`, `RenewalHandOff` port and the shared account change V822), Employee Benefits (`EMPLOYEE_BENEFITS_DESIGN.md`, boundary EBQ28) and Claims (`CLAIMS_BROKING_DESIGN.md`, `ClaimExperienceQueryService`, CLQ28). Section 2.3 records the decisions.
+It is aligned with the parallel designs of the same build: Submitted Policies (`SUBMITTED_POLICIES_DESIGN.md`, `RenewalHandOff` port and the shared account change V822), Employee Benefits (`EMPLOYEE_BENEFITS_DESIGN.md`, boundary EBQ28) and Claims (`CLAIMS_BROKING_DESIGN.md`, `ClaimExperienceQueryService`, CLQ28). Section 2.3 records the decisions.
 
 Requirements baseline: [`BDOI_RN_BRD_SPEC.md`](../requirements/BDOI_RN_BRD_SPEC.md). It has 90 rows covering:
 - BRRN.001-040;
@@ -36,7 +36,7 @@ sanitation ([`DATA_MIGRATION_DESIGN.md`](DATA_MIGRATION_DESIGN.md) section 15).
    - After initiation, straight-through processing is allowed only for CLEAN candidates whose matrix rule says AUTO (BRRN.031 / 039).
    - Every stop is visible on the candidate as a failed check.
 5. **Renewal posts no accounting.** The GL effect of a renewal is the BRD-1 booking of the renewal account (`BROKER_BOOKING`), with business type RENEWAL on the invoice (section 5).
-6. **Parked means seam, not fake.**
+6. **Parked means seam, not simulation.**
    - The LAMD channel, insurer channels, legacy EBIX / QPS policies and the mail-domain policy each get a port or an upload.
    - Claims are read from the Claims module's public read API (`brokerclaims.service.ClaimExperienceQueryService`), not through a port of our own (section 2.3).
    - The default adapter is "not connected" or a manual upload.
@@ -44,7 +44,7 @@ sanitation ([`DATA_MIGRATION_DESIGN.md`](DATA_MIGRATION_DESIGN.md) section 15).
 
 ## 2. Modules
 
-| Module | Purpose | BRD IDs | Depends on | Flyway (demo) |
+| Module | Purpose | BRD IDs | Depends on | Flyway (seed) |
 |---|---|---|---|---|
 | `renewal` (new; package `com.iortatechnxt.brokerverse.renewal`; tables `rnw_*`; screens `frontend/src/features/renewal`) | Extraction, candidates, check engine, buckets, decision matrix, initiation, assignment, transfer, disposition, TL review / post, overrides, processing worklist, dispositioned-file upload, insurer batches and responses, LAMD reports, letters (RA / NAL / NFR / NRNS / non-acceptance), acceptance, progression to placement and booking, follow-ups, reports, home, setup | BRRN.001-040, BRD 1.003-1.011, 2.003-2.009, 3.003-3.011, 4.003-4.09, 5.003-5.005 (seeds) | opsledger (read), account, catalog, crm (read), booking (read + queue port), placement (slip and hold-cover services), quotation, nonpackage, adjustment (read), brokerclaims (read), submitted (implements its `RenewalHandOff` port), workflow, lov, bulk, messaging, docgen, attachment, report, alert, system, security, audit, organization | V1010-V1017 (V1910-V1911) |
 | `account` (BRD-1, built) | **Shared change V822** (account owner's range, agreed with Submitted Policies and Employee Benefits): `business_type`, `renewal_of_ref`, `NewAccount.renewal(...)`. Renewal adds only the `renewal_fast_track` transition and the RENEWAL rating purpose | BRRN.033/040, 3.007, 3.008 | unchanged | V822 (account range, shared); V1011 (transition row only) |
@@ -138,13 +138,13 @@ Ports of other modules that `renewal` implements or calls:
   - the list columns "Number of Claims" and "Status of Each Claim";
   - the CLAIMS check and the decision matrix;
   - the Account History tab.
-- `renewal` depends on `brokerclaims` and never the reverse. If `brokerclaims` is not yet merged when R1 is built, the check looks the bean up with `ObjectProvider` and reports INFO "claims not connected".
+- `renewal` depends on `brokerclaims` and never the reverse. If `brokerclaims` is not yet delivered when R1 is built, the check looks the bean up with `ObjectProvider` and reports INFO "claims not connected".
 - The claims part of the Account History tab waits for the Claims build (wave CL1-B, which delivers `ClaimExperienceQueryService`); until then the tab shows "claims not connected" (decision D4).
 - A **total-loss indicator** is not defined by the Claims BRD (CLQ28). The non-renewal reason "Total Loss Claim" (BRD 2.004.4.5) stays a manual reason, and the matrix condition TOTAL_LOSS is parked until CLQ28 is answered.
 
 ## 3. Flyway allocation
 
-Allocated to this BRD: **schema V1010-V1019, demo V1910-V1919** (Developer Guide range table: 10 versions per later BRD). Eight schema versions are used (V1010-V1017), so one block is enough.
+Allocated to this BRD: **schema V1010-V1019, seed V1910-V1919** (Developer Guide range table: 10 versions per later BRD). Eight schema versions are used (V1010-V1017), so one block is enough.
 
 | Version | Owner (wave) | Content |
 |---|---|---|
@@ -157,13 +157,13 @@ Allocated to this BRD: **schema V1010-V1019, demo V1910-V1919** (Developer Guide
 | `V1016__renewal_letters.sql` | R1-D | `rnw_letter`, `rnw_letter_batch`, `rnw_acceptance` |
 | `V1017__renewal_submitted_handoff.sql` | R3 | Templates `RNW_RA_FFY`, `RNW_SFU`; LOV values for the source SUBMITTED_POLICY; parameters of the hand-off |
 | V1018-V1019 | - | Kept free for follow-ups |
-| `db/demo/V1910__demo_renewal_setup.sql` | R0 | Demo users `lamd`, `contactc`, `rnwtl`; non-renewable risk codes; active bucket rule set and decision matrix (demo content); parameters for the demo |
-| `db/demo/V1911__demo_renewal_candidates.sql` | R2 | Candidates at every stage on the booked demo invoices (`ARN-2026-940001..004`, Operations demo invoices). Dates relative to the load date are set by a Java demo runner `RenewalDemoData` (pattern of `BookingDemoData`), because the demo invoices expire about a year after booking |
+| `db/seed/V1910__seed_renewal_setup.sql` | R0 | SIT/UAT users `lamd`, `contactc`, `rnwtl`; non-renewable risk codes; active bucket rule set and decision matrix (seed content); parameters for the seed |
+| `db/seed/V1911__seed_renewal_candidates.sql` | R2 | Candidates at every stage on the booked seed invoices (`ARN-2026-940001..004`, Operations seed invoices). Dates relative to the load date are set by a Java seed runner `RenewalSeedData` (pattern of `BookingSeedData`), because the seed invoices expire about a year after booking |
 
 Why this is safe:
 - V1010+ runs after every V8xx table (including the shared V822) on a fresh database, so V1011 may alter `bkg_queue`, `quo_quotation` and `npk_proposal`. `rnw_*` still stores ARN and invoice no. as plain values, as Operations does.
 - V1011 is additive (nullable columns; the check constraint is widened). Hibernate `validate` requires the entity changes in the same wave (R0).
-- The demo V1910+ runs after the V9xx demo and the Collections demo (V1900-V1909).
+- The seed V1910+ runs after the V9xx seed and the Collections seed (V1900-V1909).
 
 ## 4. Entities (key fields)
 
@@ -250,7 +250,7 @@ Every table has `company_id`, the audit columns of V1 and `version`. Money is `n
 
 Renewal posts **no** business event. The money effects of a renewal are:
 
-| # | Trigger | Posted by | Event | Default entry (demo rules, BROKING_ARCHITECTURE §15) |
+| # | Trigger | Posted by | Event | Default entry (seed rules, BROKING_ARCHITECTURE §15) |
 |---|---|---|---|---|
 | 1 | Renewal account booked (policy issued, from the queue) | booking | `BROKER_BOOKING` (existing), with the invoice fact `businessType = RENEWAL` | As NB: Dr PR by component (client) / Cr DTIP (insurer); Dr commission receivable / Cr unrealized commission and deferred output VAT (`OPS_COMMISSION_REALIZATION`) |
 | 2 | Service invoice on booking | booking `ServiceInvoiceService` | as NB | as NB |
@@ -291,9 +291,9 @@ Consequences:
 
 Multi-tab (function 2) needs no permission; it is the platform behaviour for every user.
 
-### 6.2 Roles (V1010) and demo users (V1910, password `Brokerverse@2026`)
+### 6.2 Roles (V1010) and SIT/UAT users (V1910)
 
-| Role | Persona | Renewal permissions | Demo user |
+| Role | Persona | Renewal permissions | SIT/UAT user |
 |---|---|---|---|
 | `MKT_TL` (exists) | Marketing Team Leader | VIEW, EXTRACT, ASSIGN, REVIEW, OVERRIDE, DISPOSE, RA_GENERATE, RA_SEND, ACCEPT, REPORT_VIEW, EXPORT | `mkttl` (exists), `rnwtl` (second TL, receiving unit for transfers) |
 | `MKT_AO` (exists) | Marketing AO / Admin, Account Broker | VIEW, DISPOSE, ASSIGN (transfer request only; enforced in the service), RA_GENERATE, RA_SEND, ACCEPT, REPORT_VIEW, EXPORT | `ao`, `ao2` (exist) |
@@ -406,7 +406,7 @@ A new result set drives the bucket, so records move between buckets as condition
   - The first rule by priority gives a proposed disposition and AUTO / MANUAL.
   - AUTO on a CLEAN candidate writes a system disposition (source MATRIX) and moves the case on (§7.1).
   - Otherwise the proposal is shown to the AO as the default.
-- Neither the matrix nor the bucket rules ship with production content; demo content is in V1910 (RQ01, RQ24).
+- Neither the matrix nor the bucket rules ship with production content; seed content is in V1910 (RQ01, RQ24).
 
 ## 9. Jobs, parameters, LOVs, alerts, templates, numbers, bulk handlers
 
@@ -534,7 +534,7 @@ The module is `features/renewal/module.ts`, route `/renewal`, listed in `navigat
 | Screen | Route | Permission | Content |
 |---|---|---|---|
 | Renewal Home | `/renewal` | RNW_VIEW | Tiles by stage and bucket, expiring in 30 / 60 / 90 / 140 days, at risk, exceptions, insurer overdue, letters failed; workload per AO / PO (1.009.7, 3.010.7) |
-| Expiry List (prototype "Renewal") | `/renewal/expiry` | RNW_VIEW | Tabs **Unassigned Disposition** / For Renewal / For Quotation / For Proposal / Not for Renewal / Lost Business / Exceptions / All. Toolbar: "Search Renewal Ref / Proposal No.", Filters (`MultiSelectFilter`), bulk actions **Generate Expiry List** (dialog with a date range), **Initiate**, **Assign Disposition**, **Re-assign Officer**, **Transfer**. `GridTable` with a Classification pill (Clean / Review / Exception) and flag chips |
+| Expiry List (BDOI UX design "Renewal") | `/renewal/expiry` | RNW_VIEW | Tabs **Unassigned Disposition** / For Renewal / For Quotation / For Proposal / Not for Renewal / Lost Business / Exceptions / All. Toolbar: "Search Renewal Ref / Proposal No.", Filters (`MultiSelectFilter`), bulk actions **Generate Expiry List** (dialog with a date range), **Initiate**, **Assign Disposition**, **Re-assign Officer**, **Transfer**. `GridTable` with a Classification pill (Clean / Review / Exception) and flag chips |
 | My Dispositions | `/renewal/mine` | RNW_DISPOSE | AO list, all statuses and years (BRRN.011); quick filters Returned to me, Due in 30 days, NRNS |
 | TL Review | `/renewal/review` | RNW_REVIEW | "Review in progress" list; bulk Return / Post; Override outstanding balance (1.011) |
 | Transfers | `/renewal/transfers` | RNW_ASSIGN | Incoming / outgoing requests; accept / decline with remarks |
@@ -548,7 +548,7 @@ The module is `features/renewal/module.ts`, route `/renewal`, listed in `navigat
 | Renewal Reports | `/renewal/reports` | RNW_REPORT_VIEW | The section 11 reports through the Report Centre runner |
 | Renewal Setup | `/renewal/setup` | RNW_SETUP | Non-renewable risk codes, check settings, bucket rule sets, decision matrix (versions, activation by a checker), parameters; links to the LOV maintenance and to the templates |
 
-The crm client page gains a **Renewal** tab (prototype "Client Record Details": Quotation / Confirmed Proposals / **Renewal**) through `RenewalClientRecords implements ClientRecordsProvider`.
+The crm client page gains a **Renewal** tab (BDOI UX design "Client Record Details": Quotation / Confirmed Proposals / **Renewal**) through `RenewalClientRecords implements ClientRecordsProvider`.
 
 ## 13. Impact on built and in-progress modules (contract changes)
 
@@ -610,29 +610,29 @@ renew as is on that package version.
 
 Prerequisites: the BRD-1 modules and Product Maintenance P1-A (RENEWAL purpose) are built, and so is `opsledger`. Collections (C1) and Accounting (A1) run in parallel and do not touch any file below.
 
-| Wave | Agent | Scope | Files owned | Exit criteria |
+| Wave | Team | Scope | Files owned | Exit criteria |
 |---|---|---|---|---|
-| **R0** (1 agent) | Renewal foundation and contracts | Prerequisite: the shared account / booking business-type change V822 (work item BT0) is merged; if Renewal is the first of Submitted Policies, Renewal and Employee Benefits to start, R0 builds BT0 first, as one commit agreed with the account and booking owners. Permissions and roles; V1010 / V1011; the fast-track transition, the RENEWAL rating addition, `QueueSource.RENEWAL`, the quotation and nonpackage `renewalRef` (section 13); `report` `CODE_SET`; `GridTable`, `MultiSelectFilter`; `renewal` package skeleton (package-info and `renewal.service.port` interfaces only; the domain belongs to R1-A); `features/renewal/module.ts` with a stub Home and `help.ts`; crons in `application.yml`; demo V1910 | `security/domain/Permission.java`; `account/service/AccountService.java` (`fastTrackRenewal`), `account/service/AccountPricing.java` (only if the shared change did not include the RENEWAL purpose); `booking/domain/QueueSource.java`; `quotation/service/QuotationService.java` + DTO; `nonpackage/service/*Proposal*Service.java` + DTO; `report/core/ParameterSpec*`; `frontend/src/components/ui/GridTable.tsx`, `frontend/src/components/broking/MultiSelectFilter.tsx`; `navigation/modules.ts`, `features/help/helpContent.ts`; `db/migration/V1010`, `V1011`; `db/demo/V1910`; `application.yml`, `docs/operations/CONFIGURATION.md` | Existing NB tests green; a RENEWAL account books with business type RENEWAL; `mvn verify`, `npm run verify` green |
-| **R1-A** | Candidates, checks, buckets, matrix | Extraction job and on-demand extraction; the go-live extraction job `RNW_GOLIVE_EXTRACTION` with the urgent flag and the `RNW_RA_ALREADY_SENT` upload (section 13.1); `RenewalCheckEngine` and the section 8 checks (including `PACKAGE_REMAP`); bucket rules; decision matrix; initiation; re-evaluation listeners; non-renewable risk codes; Setup screens; Expiry List grid; record page tabs Details / Checks / History; RNW-EXPIRY-LIST, RNW-SANITATION | `renewal/{candidate,extraction,check,rules,setup}/**`, `renewal/report/{ExpiryList,Sanitation}Report.java`, `V1012`, `V1013`, `features/renewal/{expiry,setup,record}/**` | Demo extraction creates candidates; a FAIL never gives CLEAN; the matrix AUTO path disposes a clean candidate |
+| **R0** (1 team) | Renewal foundation and contracts | Prerequisite: the shared account / booking business-type change V822 (work item BT0) is delivered; if Renewal is the first of Submitted Policies, Renewal and Employee Benefits to start, R0 builds BT0 first, as one commit agreed with the account and booking owners. Permissions and roles; V1010 / V1011; the fast-track transition, the RENEWAL rating addition, `QueueSource.RENEWAL`, the quotation and nonpackage `renewalRef` (section 13); `report` `CODE_SET`; `GridTable`, `MultiSelectFilter`; `renewal` package skeleton (package-info and `renewal.service.port` interfaces only; the domain belongs to R1-A); `features/renewal/module.ts` with a stub Home and `help.ts`; crons in `application.yml`; seed V1910 | `security/domain/Permission.java`; `account/service/AccountService.java` (`fastTrackRenewal`), `account/service/AccountPricing.java` (only if the shared change did not include the RENEWAL purpose); `booking/domain/QueueSource.java`; `quotation/service/QuotationService.java` + DTO; `nonpackage/service/*Proposal*Service.java` + DTO; `report/core/ParameterSpec*`; `frontend/src/components/ui/GridTable.tsx`, `frontend/src/components/broking/MultiSelectFilter.tsx`; `navigation/modules.ts`, `features/help/helpContent.ts`; `db/migration/V1010`, `V1011`; `db/seed/V1910`; `application.yml`, `docs/operations/CONFIGURATION.md` | Existing NB tests green; a RENEWAL account books with business type RENEWAL; `mvn verify`, `npm run verify` green |
+| **R1-A** | Candidates, checks, buckets, matrix | Extraction job and on-demand extraction; the go-live extraction job `RNW_GOLIVE_EXTRACTION` with the urgent flag and the `RNW_RA_ALREADY_SENT` upload (section 13.1); `RenewalCheckEngine` and the section 8 checks (including `PACKAGE_REMAP`); bucket rules; decision matrix; initiation; re-evaluation listeners; non-renewable risk codes; Setup screens; Expiry List grid; record page tabs Details / Checks / History; RNW-EXPIRY-LIST, RNW-SANITATION | `renewal/{candidate,extraction,check,rules,setup}/**`, `renewal/report/{ExpiryList,Sanitation}Report.java`, `V1012`, `V1013`, `features/renewal/{expiry,setup,record}/**` | Seed extraction creates candidates; a FAIL never gives CLEAN; the matrix AUTO path disposes a clean candidate |
 | **R1-B** | Marketing: assignment, transfer, disposition, review, NB path | Assignment / re-assignment, transfers, disposition with reasons and history gate, remarks, TL review / return / post, overrides, NB path (quotation / PRF creation with `renewalRef`), client 360 tab, My Dispositions, TL Review, Transfers screens, RNW-DECISIONS | `renewal/{assignment,transfer,disposition,review,nbpath,client}/**`, `renewal/report/DecisionLogReport.java`, `V1014`, `features/renewal/{mine,review,transfers}/**` | Assign -> dispose -> return -> post; NB path creates a quotation whose account is RENEWAL |
 | **R1-C** | Processing, insurer, LAMD | Processing worklist and PO assignment; renewal account creation (`AccountService.createDraft(NewAccount.renewal(...))`) at FOR_PROCESSING; computations tab; dispositioned-file upload with scope (3.004.4); insurer batches (xlsx, protected send) and response upload with matching and progression; LAMD upload and routing; Insurer / LAMD screens; RNW-INSURER-EXTRACT, RNW-LAMD-MATCH | `renewal/{processing,insurer,lamd,upload}/**`, `renewal/report/{InsurerExtract,LamdMatch}Report.java`, `V1015`, `features/renewal/{processing,insurer,lamd}/**` | Insurer Renew As Is moves to RA_READY; mismatch -> EXCEPTION; paid-off PN -> Not for Renewal |
 | **R1-D** | Letters, acceptance, progression | RA / NAL / NFR / NRNS / non-acceptance letters, batch generation and protected send, RA lock and second notice, NRNS and expiry jobs, acceptance (single and bulk), `RenewalProgression` (fast-track, auto placement, booking queue, RENEWED on `InvoiceBooked`), Letters screen, RNW-RA-DISPATCH | `renewal/{letter,acceptance,progression,followup}/**`, `renewal/report/LetterDispatchReport.java`, `V1016`, `features/renewal/{letters,followups}/**` | RA sent -> accepted -> slip sent -> policy issued -> booked RENEWAL -> candidate RENEWED |
 | **R3** | Submitted-policy hand-off (after Submitted Policies S1-D) | `SubmittedPolicyRenewalHandOff` implementing `submitted.service.port.RenewalHandOff`; FFY RA and SFU templates; print channel through `MailHouseGateway`; E2E masterlist record -> candidate -> renewal account -> hold cover -> RA -> booked -> masterlist BOOKED | `renewal/submitted/**`, template rows in a new V1017 | The default hand-off steps aside; no second RA for the same client |
-| **R2** | Reports, home, hardening | RNW-STATUS (variants, 34 counters), RNW-LISTING with the escalation alert, RNW-WORKLOAD, Renewal Home, retention provider, demo V1911 + `RenewalDemoData`, E2E tests, module guide `docs/modules/RENEWAL.md`, traceability | `renewal/{home,report/RenewalStatusReport,…Listing,…Workload,retention,demo}/**`, `db/demo/V1911`, `features/renewal/{home,reports}/**`, `docs/modules/RENEWAL.md` | All reports export in under 20 s on demo volume; `mvn verify` / `npm run verify` green |
+| **R2** | Reports, home, hardening | RNW-STATUS (variants, 34 counters), RNW-LISTING with the escalation alert, RNW-WORKLOAD, Renewal Home, retention provider, seed V1911 + `RenewalSeedData`, E2E tests, module guide `docs/modules/RENEWAL.md`, traceability | `renewal/{home,report/RenewalStatusReport,…Listing,…Workload,retention,seed}/**`, `db/seed/V1911`, `features/renewal/{home,reports}/**`, `docs/modules/RENEWAL.md` | All reports export in under 20 s on seed volume; `mvn verify` / `npm run verify` green |
 
 Rules for parallel work:
-- R0 is merged before R1-A..D start. R1-A..D run in parallel. R2 starts when R1-A and R1-D are merged.
+- R0 is delivered before R1-A..D start. R1-A..D run in parallel. R2 starts when R1-A and R1-D are delivered.
 - One Flyway file per wave: R0 V1010 / V1011 / V1910; R1-A V1012 / V1013; R1-B V1014; R1-C V1015; R1-D V1016; R2 V1911; R3 V1017. Cross-table foreign keys between R1 migrations are forbidden: reference `rnw_candidate(id)` only, which V1012 creates. V1014-V1016 have a higher version than V1012, so they run after it.
 - `renewal/candidate` (entity, repository, `CandidateQueryService`, `CandidateStageListener`) and `renewal/common` (audit helper, scope filter) are owned by R1-A. R1-B..D use them read-only and ask R1-A for changes. R1-A publishes the stubs in its first commit.
-- `RNW_CASE` transitions are all seeded in V1010 (R0). The R1 agents only implement the endpoints of their actions.
+- `RNW_CASE` transitions are all seeded in V1010 (R0). The R1 teams only implement the endpoints of their actions.
 - Shared files (the Permission enum, nav, help registry, `application.yml`, `components/ui`, the account / booking / quotation / nonpackage contracts) are edited **only in R0**.
-- Each agent writes its own `*ApiIT` tests. `ApiSmokeIT` is a shared file: R0 adds the renewal read endpoints listed in section 12 as they are merged, and each R1 agent sends its endpoint list to the R2 agent, who adds the rest.
+- Each team writes its own `*ApiIT` tests. `ApiSmokeIT` is a shared file: R0 adds the renewal read endpoints listed in section 12 as they are delivered, and each R1 team sends its endpoint list to the R2 team, who adds the rest.
 
 ## 15. What depends on information BDOI has not given (build the seam, park the content)
 
 | Item | Question | Built now |
 |---|---|---|
-| Check list and severities; bucket rules; decision matrix content | RQ01, RQ24 | Engine, setup screens, demo content only |
+| Check list and severities; bucket rules; decision matrix content | RQ01, RQ24 | Engine, setup screens, seed content only |
 | Unique reference semantics and file keys | RQ03 | `RNW-<yyyy>` generated; expiring invoice no. as the alternate key |
 | Summary counters (ARF, TSU, Disapproved, Other Bank) | RQ10 | Mapping of section 11; unknown ones return 0 with a "pending definition" note |
 | Letter layouts | RQ26 | Draft templates (versioned, updatable by the Business Admin) |
@@ -645,7 +645,7 @@ Rules for parallel work:
 
 1. **Scope of automation.** STP and automatic placement (BRRN.031/040) could renew a policy the client did not want. Mitigation: automation starts only after explicit initiation (BRRN.021) and client acceptance. A FAIL check blocks every automatic step, and `RNW_AUTO_PLACEMENT` can be switched off.
 2. **Rules content missing** (RQ01/24). Mitigation: with no active matrix, every candidate is MANUAL. The flow works fully manually as in the main BRD.
-3. **Contract changes to built NB modules** (account, booking, quotation, nonpackage). Mitigation: additive columns with defaults, old constructors kept, all edits in one R0 agent, and the NB test suite as the gate.
+3. **Contract changes to built NB modules** (account, booking, quotation, nonpackage). Mitigation: additive columns with defaults, old constructors kept, all edits in one R0 team, and the NB test suite as the gate.
 4. **Volume and "no pagination"** (25,800 per month, one scrollable view). Mitigation: a virtualised grid with keyset chunks and server-side filters; exports as reports.
 5. **Online vs offline disposition** (BRRN.018). Mitigation: both paths write the same `rnw_disposition` with the source recorded. The 3.004.4 "not in file" tag needs a declared scope.
 6. **Claims module timing** (`brokerclaims`). Mitigation: the check reports INFO "claims not connected" while the bean is absent, and the matrix can treat "unknown claims" as MANUAL.

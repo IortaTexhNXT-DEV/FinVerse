@@ -14,7 +14,7 @@ Requirements baseline: [`BDOI_CSF_BRD_SPEC.md`](../requirements/BDOI_CSF_BRD_SPE
 
 ## 2. Modules
 
-| Module | Purpose | BRD IDs | Depends on | Flyway (demo) |
+| Module | Purpose | BRD IDs | Depends on | Flyway (seed) |
 |---|---|---|---|---|
 | `csf` (new, package `com.iortatechnxt.brokerverse.csf`, tables `csf_*`) | Customer search across keys, servicing view (client, accounts with CSF status, payment history, RAs, e-policies, documents), identity verification, contact change requests, RA and e-policy resend, document upload, activity log, legacy contact sync outbox, CSF reports | BRCSF-002-009, CSF-EM07, CSF-EM09 | crm, account, placement (read), issuance, booking (read), opsledger (read), cashiering (read), attachment, messaging, audit, report, lov, system, alert | V1040-V1041 (V1940) |
 | `crm` (built) | + contact-only update contract; + additional contacts (if CSQ15 confirms) | BRCSF-004 | unchanged | V1042 |
@@ -43,7 +43,7 @@ Requirements baseline: [`BDOI_CSF_BRD_SPEC.md`](../requirements/BDOI_CSF_BRD_SPE
 
 ## 3. Flyway allocation
 
-Allocated to Customer Servicing Facility in the Developer Guide: **schema V1040-V1049, demo V1940-V1949.** Three schema versions are used.
+Allocated to Customer Servicing Facility in the Developer Guide: **schema V1040-V1049, seed V1940-V1949.** Three schema versions are used.
 
 | Version | Owner (wave) | Content |
 |---|---|---|
@@ -51,7 +51,7 @@ Allocated to Customer Servicing Facility in the Developer Guide: **schema V1040-
 | `V1041__csf_tables.sql` | S1 | `csf_verification`, `csf_contact_change`, `csf_sync_outbox`, `csf_activity`; indexes for search: `placement` billing item loan application no. (`plc_billing_item(loan_application_no)`), `acc_account_pn(pn_no)` if missing |
 | `V1042__crm_client_contacts.sql` | S1 | `crm_client_contact` (client, type EMAIL / MOBILE / PHONE / ADDRESS, value, primary flag, active, source); built only if CSQ15 confirms "add" means several contacts, otherwise the version stays free |
 | `V1043`-`V1049` | - | Kept free |
-| `db/demo/V1940__demo_csf.sql` | S2 | Demo users `csfagent`, `csfagent2`, `csfsup`, `csfmgmt`; status map; a verified contact change and one refused; activity rows |
+| `db/seed/V1940__seed_csf.sql` | S2 | SIT/UAT users `csfagent`, `csfagent2`, `csfsup`, `csfmgmt`; status map; a verified contact change and one refused; activity rows |
 
 Rules:
 - `csf_*` tables store client code, ARN and invoice no. as plain values; foreign keys only to users and attachments.
@@ -93,9 +93,9 @@ CSF has **no accounting events**, no GL entries and no workflow: every action is
 | `CSF_DOCUMENT_UPLOAD` | Upload documents from the CSF view |
 | `CSF_REPORT_VIEW` | CSF reports |
 
-### 6.2 Roles (V1040) and demo users (V1940, password `Brokerverse@2026`)
+### 6.2 Roles (V1040) and SIT/UAT users (V1940)
 
-| Role | Persona | Permissions | Demo user |
+| Role | Persona | Permissions | SIT/UAT user |
 |---|---|---|---|
 | `CSF_AGENT` | BDO Insure Contact Center Agent | CSF_VIEW, CSF_CONTACT_UPDATE, CSF_RESEND, CSF_DOCUMENT_UPLOAD, ATTACHMENT_VIEW | `csfagent`, `csfagent2` |
 | `CSF_SUPERVISOR` | Contact Center Supervisor / personnel | CSF_AGENT permissions + CSF_RESEND_OTHER, CSF_REPORT_VIEW | `csfsup` |
@@ -172,11 +172,11 @@ PDF and Excel export come from the report framework (BRCSF-011.002).
 
 ## 13. Build-wave plan
 
-| Wave | Agent | Owns (files) | Delivers | Depends on |
+| Wave | Team | Owns (files) | Delivers | Depends on |
 |---|---|---|---|---|
 | S0 | Foundation | `db/migration/V1040__*`; `security/domain/Permission.java` (CSF entries); `attachment/domain/AllowedFileType.java` and its tests; `csf/package-info.java` | Permissions, roles, LOVs, parameters, file types | - |
 | S1 | CSF core | `csf/**`; `db/migration/V1041__*`, `V1042__*`; `crm/service/ClientService.java` (`updateContact` only) and `crm/domain/ContactChange.java`, `ClientContactChanged.java`; `placement/service/PlacementQueryService.java` (one method); `opsledger/service/InvoiceLedgerQueryService.java` (one method, agreed with the Operations owner); `frontend/src/features/csf/**`, `frontend/src/api/csf.ts`, `navigation/modules.ts` (one entry) | Search, servicing view, verification, contact change, resend, documents, reports | S0 |
-| S2 | Integration | `db/demo/V1940__*`, integration tests (`@IntegrationTest` as `csfagent`, `csfmgmt`), `ApiSmokeIT` entries, report export tests, help entries, `docs/modules/CUSTOMER_SERVICING.md` | Demo storyline and definition of done | S1; RA documents appear once the Renewal or EB module stores them (the tab shows "No items to display" until then) |
+| S2 | Integration | `db/seed/V1940__*`, integration tests (`@IntegrationTest` as `csfagent`, `csfmgmt`), `ApiSmokeIT` entries, report export tests, help entries, `docs/modules/CUSTOMER_SERVICING.md` | Seed storyline and definition of done | S1; RA documents appear once the Renewal or EB module stores them (the tab shows "No items to display" until then) |
 
 Parallel-work rules:
 - CSF can be built in parallel with EB. The two touch `Permission.java` (different entries), `attachment` (EB: access classes; CSF: file types, different files) and `navigation/modules.ts` (one line each); merge order E0 then S0 avoids conflicts, and neither edits the other's lines.

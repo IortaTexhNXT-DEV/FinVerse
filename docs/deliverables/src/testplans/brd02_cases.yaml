@@ -101,51 +101,51 @@ screens:
 
 data:
   - id: TD-OP-01
-    name: Demo users and roles
-    content: cashier (CASHIER, Head Office), cashbr (CASHIER, Cebu branch), cashtl (CASHIER_TL), remit (REMIT_PROCESSOR), remittl (REMIT_TL), recon (RECON_HANDLER), adjust (ADJUSTMENT), adjtl (ADJUSTMENT_TL), commrec (COMMREC_HANDLER), commtl (COMMREC_TL), mktcoll (MKT_COLLECTION), mkttl (MKT_TL), comptrol (COMPTROLLERSHIP), disb (DISBURSEMENT), admin (SYSADMIN), auditor (AUDITOR). The demo password is issued by the test lead.
-    source: Demo seeds V990 (Operations users), V980 (adjust, mkttl), V900 (admin, auditor); grants V760
+    name: SIT/UAT users and roles
+    content: cashier (CASHIER, Head Office), cashbr (CASHIER, Cebu branch), cashtl (CASHIER_TL), remit (REMIT_PROCESSOR), remittl (REMIT_TL), recon (RECON_HANDLER), adjust (ADJUSTMENT), adjtl (ADJUSTMENT_TL), commrec (COMMREC_HANDLER), commtl (COMMREC_TL), mktcoll (MKT_COLLECTION), mkttl (MKT_TL), comptrol (COMPTROLLERSHIP), disb (DISBURSEMENT), admin (SYSADMIN), auditor (AUDITOR). The SIT/UAT password is issued by the test lead.
+    source: Seeds V990 (Operations users), V980 (adjust, mkttl), V900 (admin, auditor); grants V760
   - id: TD-OP-02
-    name: Booked demo invoices
+    name: Booked seed invoices
     content: ARN-2026-940001 (Motor; booking and endorsement invoices paid in full; booking invoice remitted with the insurer OR), ARN-2026-940002 (Property; requests at every adjustment stage; gross premium differs in the insurer register), ARN-2026-940003 (direct payment), ARN-2026-940004 (CGL; partly paid; hold request waiting; flat cancellation ready for posting)
-    source: Booking demo data (V988 and BookingDemoData), copied into the invoice ledger by the booking feed
+    source: Booking seed data (V988 and BookingSeedData), copied into the invoice ledger by the booking feed
   - id: TD-OP-03
     name: Cashiering storyline
     content: Receipt series AR-HO, AR-CEB and OR-HO (authorised); a payment without match with a refund disposition for approval; an excess; a pre-booked payment; a post-dated check in the warehouse; a Head Office service fee OR; a receipt cancellation for approval; a BIR 2307 tag; two check pick-up requests from Collection
-    source: Demo seed V991 and CashieringDemoData
+    source: Seed V991 and CashieringSeedData
   - id: TD-OP-04
     name: Remittance storyline
     content: A remitted batch of ARN-2026-940001 with its insurer OR; a batch in review with the endorsement invoice; a hold request of ARN-2026-940004 waiting for approval; a special remittance request; incentive rule INS-MGIC Property CBG 2 % within 30 days of inception
-    source: Demo seed V992 and RemittanceDemoData
+    source: Seed V992 and RemittanceSeedData
   - id: TD-OP-05
     name: Production reconciliation storyline
-    content: September 2026 register of INS-MGIC extracted, sent and answered; cycle RECONCILING with a gross premium discrepancy on ARN-2026-940002 and one insurer policy never booked; monthly schedules on the 5th; demo lists of company concerned and dispositions
-    source: Demo seed V993 and ProdReconDemoData
+    content: September 2026 register of INS-MGIC extracted, sent and answered; cycle RECONCILING with a gross premium discrepancy on ARN-2026-940002 and one insurer policy never booked; monthly schedules on the 5th; seed lists of company concerned and dispositions
+    source: Seed V993 and ProdReconSeedData
   - id: TD-OP-06
     name: Adjustment storyline
     content: On ARN-2026-940002 a descriptive change in draft, an assured change for validation, a cover extension returned for documents and a premium rate increase for approval; a flat cancellation of ARN-2026-940004 for posting; an internal adjustment of ARN-2026-940001 posted
-    source: Demo seed V994 and AdjustmentDemoData
+    source: Seed V994 and AdjustmentSeedData
   - id: TD-OP-07
     name: Commission storyline
     content: DP list HO_DP_20260930 with ARN-2026-940003 confirmed and billed to INS-MGIC (awaiting answer, 10 working days); incentive schemes No Touch, Top Up and Motor Mania inactive without tiers
-    source: Demo seed V995 and CommissionDemoData
+    source: Seed V995 and CommissionSeedData
   - id: TD-OP-08
     name: Operations files
     content: Bills Payment file (20 rows, 2 with unknown invoices); Direct Credit fixed-width file; PDC upload; insurer OR schedule of the remitted batch; insurer production feedback in the register layout; DP lists named HO_DP_20260930.xlsx, CEB_DP_20260930.xlsx and "dp list.xlsx"; insurer DP answer file; minimal balance file with balances of 50.00 and 150.00; endorsement batch request file; hold and special remittance feed files
-    source: Prepared by the test lead from the wizard templates and the layouts of the demo files; masked names
+    source: Prepared by the test lead from the wizard templates and the layouts of the seed files; masked names
   - id: TD-OP-09
     name: USD receipt and BOOK rates
-    content: A USD invoice of a demo client and the BOOK rate of the receipt date (2 decimals)
-    source: Demo seed V990 (BOOK rates from the demo SPOT rates)
+    content: A USD invoice of a seed client and the BOOK rate of the receipt date (2 decimals)
+    source: Seed V990 (BOOK rates from the seed SPOT rates)
   - id: TD-OP-10
     name: Disbursement queue requests
     content: Payment requests created by the remittance approval, the refund disposition and the 2307 batch of the storylines
-    source: Created by the demo storylines above
+    source: Created by the seed storylines above
 
 scenarios:
   - id: SC-OP-01
     persona: AUDITOR
     title: Access and invoice ledger. Users log in and see only their team's sections; every booked invoice is in the ledger with its components, statuses, locks and shares, visible in Invoice 360; batch jobs report their runs and reports respect view and export rights.
-    pre: Demo users TD-OP-01; booked invoices TD-OP-02.
+    pre: SIT/UAT users TD-OP-01; booked invoices TD-OP-02.
   - id: SC-OP-02
     persona: CASHIER
     title: Cashiering. The cashier receives payments and issues ARs and ORs from controlled series, uploads payment files and checks, and has cancellations and reinstatements approved; payments are matched and applied by component and posted.
@@ -585,7 +585,7 @@ frs:
         type: Workflow
         title: OTC payment of an invoice
         steps:
-          - Receive Payment; AR class OTC; invoice of a booked demo account; amount = outstanding; mode cash; preview; post.
+          - Receive Payment; AR class OTC; invoice of a booked seed account; amount = outstanding; mode cash; preview; post.
         expected: An AR with the next number; the payment is applied; the invoice is PAID.
         auto: PaymentApplicationIT#aFullPaymentIsReceiptedMatchedAppliedByComponentAndPosted; CashieringApiIT#aPaymentIsPreviewedReceivedPrintedAndCancelledThroughTheApi
       - c: 2
@@ -807,7 +807,7 @@ frs:
         type: Negative
         title: Same check twice
         steps:
-          - Add the demo PDC again with the same bank and check number.
+          - Add the seed PDC again with the same bank and check number.
         expected: Refused.
         msg: ["Check <bank> <no> is already warehoused", PDC_DUPLICATE]
       - c: 2
@@ -838,7 +838,7 @@ frs:
       - c: 1
         type: Upload-download
         title: Print two ARs due today
-        pre: The two demo requests are due today (dates moved in SIT).
+        pre: The two seed requests are due today (dates moved in SIT).
         steps:
           - Check Pick-up; select today; Print.
         expected: Two ARs with consecutive numbers in one PDF.
@@ -985,7 +985,7 @@ frs:
         screen: BATCH
         title: Commission OR of an approved batch
         steps:
-          - Open the remitted demo batch of ARN-2026-940001.
+          - Open the remitted seed batch of ARN-2026-940001.
         expected: The batch shows one commission OR number issued by Cashiering.
         auto: RemittanceIT#anApprovedBatchIsPostedRemittedAndPushedToDisbursement
       - c: 2
@@ -1025,7 +1025,7 @@ frs:
         type: Workflow
         title: Refund approved and paid
         steps:
-          - Open the demo item with the refund for approval; as cashtl click Approve; as disb pay it in the Disbursement Queue.
+          - Open the seed item with the refund for approval; as cashtl click Approve; as disb pay it in the Disbursement Queue.
         expected: The item is In process after approval and Completed when Disbursement pays.
         auto: UnappliedDispositionIT#aRefundNeedsApprovalAndGoesToDisbursement
       - c: 2
@@ -1058,7 +1058,7 @@ frs:
         title: Tabs by stage
         steps:
           - Open each tab (Unapplied, Monitoring, For Approval, For Reversal, Done).
-        expected: Each demo item is in the tab of its stage.
+        expected: Each seed item is in the tab of its stage.
 
   FR-OP-023:
     scenario: SC-OP-03
@@ -1464,7 +1464,7 @@ frs:
         type: Report-output
         title: Remittance schedule
         steps:
-          - Open the remitted demo batch; Documents; download the schedule.
+          - Open the remitted seed batch; Documents; download the schedule.
         expected: One line per invoice with the columns; the totals equal the batch totals.
         auto: RemittanceOperationsIT#theScheduleAndPaymentRequestAreStoredAndTheScheduleIsSentOnce
       - c: 2
@@ -1642,7 +1642,7 @@ frs:
         type: Positive
         title: Search a batch number
         steps:
-          - Search the number of the remitted demo batch.
+          - Search the number of the remitted seed batch.
         expected: The invoices of that batch.
       - c: 2
         type: Security-access
@@ -1668,7 +1668,7 @@ frs:
         type: Workflow
         title: Approve the special remittance
         steps:
-          - Open the demo request for approval; click Approve special remittance; approve its batch.
+          - Open the seed request for approval; click Approve special remittance; approve its batch.
         expected: A SPECIAL batch with the invoice; the request is Pushed to Disbursement; mktcoll is notified with the request number.
         auto: RemittanceHoldsAndSpecialsIT#aSpecialRemittanceIsValidatedApprovedAndPushedThroughItsOwnBatch
       - c: 2
@@ -1701,7 +1701,7 @@ frs:
         title: Remittance tracker
         steps:
           - Run REM-TRACKER for this month.
-        expected: One row per batch with the columns; the remitted demo batch is listed.
+        expected: One row per batch with the columns; the remitted seed batch is listed.
         auto: RemittanceOperationsIT#everyRemittanceReportRunsAndExports
       - c: 2
         type: Report-output
@@ -1735,7 +1735,7 @@ frs:
         type: Workflow
         title: Flat cancellation raised and submitted
         steps:
-          - New Request; invoice of a paid demo account; type flat cancellation; reason Unit sold; effective date within cover; description; Submit for validation.
+          - New Request; invoice of a paid seed account; type flat cancellation; reason Unit sold; effective date within cover; description; Submit for validation.
         expected: The request is For validation; Invoice 360 shows PENDING_NEG_ADJ and the ADJUSTMENT lock.
         auto: AdjustmentApiIT#aRequestIsRaisedAndMovedOverHttp; AdjustmentRequestIT#anOpenRequestLocksTheInvoiceAgainstRemittanceUntilItEnds
       - c: 2
@@ -1797,7 +1797,7 @@ frs:
         type: Negative
         title: Duplicate flat cancellation
         steps:
-          - Raise a flat cancellation on ARN-2026-940004 with reason Unit sold (the demo one is open).
+          - Raise a flat cancellation on ARN-2026-940004 with reason Unit sold (the seed one is open).
         expected: Refused.
         msg: ["Possible duplicate of <requests> (same invoice, request type, reason and endorsement reference): give the justification to proceed", ADJ_DUPLICATE_REQUEST]
         auto: AdjustmentRequestIT#aDuplicateNeedsAJustificationAndACancellationExcludesOtherChanges
@@ -2137,7 +2137,7 @@ frs:
         title: Requests of an ARN
         steps:
           - Search ARN-2026-940002.
-        expected: The four demo requests are listed; the link opens Invoice 360.
+        expected: The four seed requests are listed; the link opens Invoice 360.
         auto: AdjustmentApiIT#readEndpointsRespond
       - c: 2
         type: Security-access
@@ -2200,7 +2200,7 @@ frs:
         title: Schedule on day 5 over a holiday
         pre: 5 October 2026 is set as a holiday in the calendar of SIT.
         steps:
-          - Keep the demo schedule of INS-MGIC on day 5; run PRODUCTION_EXTRACT for 5 and 6 October (clock moved).
+          - Keep the seed schedule of INS-MGIC on day 5; run PRODUCTION_EXTRACT for 5 and 6 October (clock moved).
         expected: No extract on 5 October; the extract is made on 6 October.
         auto: ProdReconIT#schedulesExtractOnTheirDayAndRollToWorkingDays; InsurerRowParserTest#schedulesRunOnTheirDayAndMovePastEachRun
       - c: 2
@@ -2407,7 +2407,7 @@ frs:
         type: Negative
         title: Policy never booked stays open
         steps:
-          - Look for the demo policy BDOI never booked.
+          - Look for the seed policy BDOI never booked.
         expected: It stays in the open list; report PRC-UNBOOKED lists it.
 
   FR-OP-077:
@@ -2484,7 +2484,7 @@ frs:
         type: Workflow
         title: Close by the last item
         steps:
-          - Set For closure on every open item of the demo cycle.
+          - Set For closure on every open item of the seed cycle.
         expected: The cycle is CLOSED; History lists extract, send, upload and closure with users and times.
         auto: ProdReconIT#cyclesAreAutomatchedValidatedCountedAndClosed
       - c: 2
@@ -2509,7 +2509,7 @@ frs:
         type: Report-output
         title: Summary equals buckets
         steps:
-          - Run PRC-SUMMARY for the demo cycle; compare with the cycle tiles.
+          - Run PRC-SUMMARY for the seed cycle; compare with the cycle tiles.
         expected: Same counts and amounts per bucket.
         auto: ProdReconIT#everyReconciliationReportRunsAndExports
       - c: 2
@@ -2595,7 +2595,7 @@ frs:
         type: Negative
         title: Confirm an account already billed
         steps:
-          - Confirm the billed demo account again.
+          - Confirm the billed seed account again.
         expected: Refused.
         msg: ["Account <invoice> is already <tag>", DP_ITEM_STATE]
 
@@ -2626,7 +2626,7 @@ frs:
         type: Negative
         title: Send a sent billing
         steps:
-          - Send the demo billing again.
+          - Send the seed billing again.
         expected: Refused.
         msg: ["Billing <no> was already sent", DP_BILLING_SENT]
 
@@ -2659,7 +2659,7 @@ frs:
         persona: SYSTEM
         screen: JOBS
         title: Overdue after 10 working days
-        pre: The demo billing sent 11 working days ago (date moved in SIT).
+        pre: The seed billing sent 11 working days ago (date moved in SIT).
         steps:
           - Run DP_FEEDBACK_SLA; open DP Billings and the bell.
         expected: The billing shows overdue; the alert is raised once.
@@ -2687,7 +2687,7 @@ frs:
         type: Workflow
         title: Collect an approved billing
         steps:
-          - Record APPROVED for the demo billing; Collect with bank account 1111 and today's date.
+          - Record APPROVED for the seed billing; Collect with bank account 1111 and today's date.
         expected: The billing is Commission collected then Closed - PR reversed; the OR number is shown; each account has DP_REVERSAL.
         auto: CommissionIT#aBillingIsAnsweredCollectedAndThePremiumReceivableReversed; CommissionApiIT#aDpListIsBilledAnsweredAndCollectedThroughTheApi
       - c: 2
@@ -2856,7 +2856,7 @@ frs:
         type: Workflow
         title: Send the schedule
         steps:
-          - Open the remitted demo batch; Send via Email to the insurer's test mailbox.
+          - Open the remitted seed batch; Send via Email to the insurer's test mailbox.
         expected: The schedule is e-mailed protected; the batch records the send.
         auto: RemittanceOperationsIT#theScheduleAndPaymentRequestAreStoredAndTheScheduleIsSentOnce
       - c: 1
@@ -2890,7 +2890,7 @@ frs:
         type: Workflow
         persona: MKT_TL
         screen: HOLD
-        title: Approve the demo hold
+        title: Approve the seed hold
         steps:
           - As mkttl open the waiting hold of ARN-2026-940004; Approve hold; as remit run the extraction.
         expected: The hold is On hold with number HLD-2026-n; the invoice is UNEXTRACTED_DUE with ON_HOLD.

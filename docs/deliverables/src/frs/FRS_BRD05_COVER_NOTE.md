@@ -73,7 +73,7 @@ Both volumes follow the structure of the reference FRS of BRD-3:
 - **Differences.** Where the delivered behaviour differs from the BRD text, the FR describes the delivered behaviour and a note records the difference; section 1.7 of each volume lists them all.
 - **Parked items.** A function that is built but waits for BDOI data (layouts, accounts, lists) is marked "parked" with its open question. The answer is applied as configuration, without a new build, unless the FR says otherwise.
 - **Gaps.** Requirements not met by the delivered system carry a gap number, listed below.
-- **Cross-references.** A reference to the other volume names the FR and the volume, for example "FR-DS-041, Volume 2". The accounting events of BRD-5 and their demo entries are in Volume 1, section 5.5.
+- **Cross-references.** A reference to the other volume names the FR and the volume, for example "FR-DS-041, Volume 2". The accounting events of BRD-5 and their seed entries are in Volume 1, section 5.5.
 
 # Coverage and references
 

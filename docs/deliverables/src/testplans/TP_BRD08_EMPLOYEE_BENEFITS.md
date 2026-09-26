@@ -152,7 +152,7 @@ Non-production data is always masked. Master lists and rosters hold personal dat
 
 ## Named data sets
 
-EB is not built, so no demo seed provides the data yet. The test lead prepares each set on SIT as its source column says; portal users are provisioned in scenario SC-EB-02 and reused by the later scenarios. When the modules are built, the sets become a demo seed.
+EB is not built, so no seed provides the data yet. The test lead prepares each set on SIT as its source column says; portal users are provisioned in scenario SC-EB-02 and reused by the later scenarios. When the modules are built, the sets become a seed data.
 
 <!-- tp:data -->
 
@@ -228,7 +228,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 |---|---|---|
 | EB and the portal are not built; screen names, labels and messages may change at build | High | The cases name the design's screens and the FRS texts; the test lead updates the workbook from the build before the system test |
 | The portal hosting, multi-factor method and virus scanner are not approved (EBQ13) | High | Run the portal cases on SIT with the e-mail code and the scanner adapter; repeat the security cases in the approved zone before UAT |
-| Open questions change expected results (EBQ02 RA lead time, EBQ05 BOR on renewal, EBQ07 franchise, EBQ11 thresholds) | High | The values are parameters and rules; the cases use the defaults and demo values and are re-run with BDOI's values |
+| Open questions change expected results (EBQ02 RA lead time, EBQ05 BOR on renewal, EBQ07 franchise, EBQ11 thresholds) | High | The values are parameters and rules; the cases use the defaults and seed values and are re-run with BDOI's values |
 | Personal and health-related data in master lists and utilization reports | High | Only masked and synthetic files are used (section 4.1); the test lead checks each file before upload |
 | BDOI testers must act as insurer and client users | Medium | The test lead provisions one portal user per role and party and briefs the testers on the portal |
 | Time-based cases (RA lead time, reminders, franchise TAT, follow-ups) need the clock to pass | Medium | The test lead sets the business date and runs the jobs on demand |

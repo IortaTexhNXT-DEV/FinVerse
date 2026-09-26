@@ -32,7 +32,7 @@ Statuses:
 
 Cross-module coverage: `OperationsEndToEndIT` (booking to insurer OR, reconciliation, cancellation
 after remittance, direct payment commission, minimal balance write-off), `OperationsSeamsIT` and
-`OperationsDemoDataIT` (package `opsintegration`).
+`OperationsSeedDataIT` (package `opsintegration`).
 
 ## Requirements
 
@@ -42,7 +42,7 @@ after remittance, direct payment commission, minimal balance write-off), `Operat
 |---|---|---|---|---|---|---|---|---|
 | BRQID.001 | Access and log in to the system | FIT | Built | `platform` | /login | /api/v1/auth | ApiSmokeIT, UserAdminApiIT | access matrix OQ48 |
 | BRQID.002 | Restrict access to authorised users only | FIT | Built | `platform` | /login | /api/v1/auth | ApiSmokeIT, CommissionApiIT, RemittanceApiIT | access matrix OQ48 |
-| BRQID.003 | After login present Operations functionality prominently on the dashboard; role-based sections (Cashiering, ... | CHANGE | Built | `opsledger` | /operations, section workbenches | GET /api/v1/ops/home | InvoiceLedgerIT, OperationsDemoDataIT, OperationsSeamsIT | tiles with counts and links |
+| BRQID.003 | After login present Operations functionality prominently on the dashboard; role-based sections (Cashiering, ... | CHANGE | Built | `opsledger` | /operations, section workbenches | GET /api/v1/ops/home | InvoiceLedgerIT, OperationsSeedDataIT, OperationsSeamsIT | tiles with counts and links |
 | BRQID.004 | Integrate with other systems / modules to fetch or flow in data (Collection, Accounting, Disbursement, ... | NEW | Superseded by BRD-4/5 | `opsledger` | /operations/interfaces | /api/v1/ops/flow-in | FlowInAndPortsIT, OperationsEndToEndIT, OperationsSeamsIT | ports built; Collection (OQ01) and Disbursement (OQ02) adapters come with BRD-4 / BRD-5; Marketing and Claims parked (OQ45, OQ46) |
 | BRQID.005 | Fetch required data from other systems automatically (real-time or scheduled), validated and mapped, with ... | NEW | Built, seam parked | `opsledger` | /operations/interfaces | /api/v1/ops/flow-in/feeds, runs, records | FlowInAndPortsIT | manual upload transport (OQ01) |
 | BRQID.006 | Batch jobs continue when records fail; failed records logged for review and reprocessing; end-of-run report ... | CHANGE | Built | `platform` | /bulk, /operations/interfaces | /api/v1/bulk | BulkExtensionsIT, CashieringReportsIT, PaymentUploadIT | outcome categories, reprocess |

@@ -77,7 +77,7 @@ priority:
   - [DCR-143, 'Directory sign-in (EIAM, Entra ID) for all users', 'Identity source for every BIBS user; EIAM is a Drop 0 integration (DCR-230).']
   - [DCR-121, 'BIBS-wide user access matrix', 'Every module''s roles and persona tests depend on it.']
   - [DCR-229, 'IGA (UIDM-ISC) against BRD-11 requests', 'Decides whether access requests stay in BIBS.']
-  - [DCR-217, 'Go-live date and migration calendar', 'Fixes T, the freeze weekend and the mock dates.']
+  - [DCR-217, 'Go-live date and migration calendar', 'Fixes T, the freeze weekend and the trial-migration dates.']
   - [DCR-222, 'Architecture in the IER', 'The IER sizes and costs ten microservices, Aurora / Mongo and a portal tenant that BIBS does not have.']
   - [DCR-227, 'Documents in S3 only', 'Build item ST0 / ST1 across every module that stores files.']
   - [DCR-129, 'Renewal of submitted policies: boundary', 'Two BRDs specify the same renewal letters, hold cover and booking.']
@@ -2559,7 +2559,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'BRD-13 asks for legacy sub-ledgers (Premium Receivable, Commission Receivable, DTIP, UPP) and accounting entries on legacy invoices, but not for the GL opening balances those sub-ledgers must agree with, nor for the mapping of the legacy chart. BRD-5 gives no chart either (AQ01).'
-  impact: 'Business: GL and sub-ledgers may not agree at go-live. Build: legacy control accounts, clearing account, OPENING journals (V1087, demo V1982). Test: clearing account at 0.00 is a go / no-go criterion.'
+  impact: 'Business: GL and sub-ledgers may not agree at go-live. Build: legacy control accounts, clearing account, OPENING journals (V1087, seed V1982). Test: clearing account at 0.00 is a go / no-go criterion.'
   modules: 'Accounting; ACSL; Data migration'
   resolution: 'Separate legacy control accounts plus a migration clearing account; the legacy trial balance loaded per branch and currency as OPENING journals; cutover after a legacy month-end close, preferably at year start.'
   question: 'Are the legacy sub-ledgers separate GL control accounts? Is the whole trial balance migrated at cutover, per branch and currency, and what is the end state after run-off?'
@@ -2596,10 +2596,10 @@ items:
   loc: 'BRID 12.1 (p.12)'
   type: Gap / missing detail
   sev: Medium
-  desc: 'The BRD asks for a cutover aligned to RMEL but gives no go-live date or month, freeze length, mock runs, dress rehearsal, go / no-go criteria, point of no return, fallback or hypercare, nor the treatment of transactions in flight at the freeze.'
-  impact: 'Build: cutover plan, go / no-go and runbook in the Migration Console. Business: cutover calendar and freeze. Test: mock runs and dress rehearsal.'
+  desc: 'The BRD asks for a cutover aligned to RMEL but gives no go-live date or month, freeze length, trial migrations, dress rehearsal, go / no-go criteria, point of no return, fallback or hypercare, nor the treatment of transactions in flight at the freeze.'
+  impact: 'Build: cutover plan, go / no-go and runbook in the Migration Console. Business: cutover calendar and freeze. Test: trial migrations and dress rehearsal.'
   modules: 'Data migration'
-  resolution: 'Go-live on the first business day of a month after a legacy month-end close; two mock runs and a dress rehearsal; go / no-go on the reconciliation results; fallback only before the point of no return.'
+  resolution: 'Go-live on the first business day of a month after a legacy month-end close; two trial migrations and a dress rehearsal; go / no-go on the reconciliation results; fallback only before the point of no return.'
   question: 'Please give the go-live month, freeze window, number of rehearsals, fallback rule and the treatment of in-flight items.'
   status: Open
   related: [DMQ25, DMQ31, DMQ32, DMQ33]
@@ -2820,9 +2820,9 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'The go-live day in January 2028 is not fixed; the slide marker sits at the end of January. The migration design takes T as the first business day of a month after a legacy month-end close (Mon 3-Jan-2028, freeze after the EOD of Wed 29-Dec-2027). The transcription of the timeline gives the Drop 1 requirements as Sep-Oct and Drop 2 as Nov-Feb; the bars show Sep-Nov and Dec-Feb. Drop 0 has no bar.'
-  impact: 'Cut-over calendar, year-end close in legacy, GL opening (January stub period if T is later), mock dates.'
+  impact: 'Cut-over calendar, year-end close in legacy, GL opening (January stub period if T is later), trial-migration dates.'
   modules: 'Data migration; Accounting; all'
-  resolution: 'T = Monday 3 January 2028; absolute mock calendar Mock 1 Apr-May, Mock 2 Jun-Jul, Mock 3 Aug, re-load Oct, dress rehearsal Nov-Dec 2027.'
+  resolution: 'T = Monday 3 January 2028; absolute trial-migration calendar Trial migration 1 Apr-May, Trial migration 2 Jun-Jul, Trial migration 3 Aug, re-load Oct, dress rehearsal Nov-Dec 2027.'
   question: 'Which date in January 2028 is the go-live, and does the legacy December / year-end close complete before the final extracts?'
   owner: 'Enterprise Services Group - Business Project Services (Program Manager) with BDOI Comptrollership and Operations'
   status: Open
@@ -2847,7 +2847,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'Legacy package names must be remapped to the BIBS packages for the migrated policy headers (P01), the carried-forward RMEL cohorts (P03) and the package versions (R06). The paper asks for a design decision owner and whether mapping happens during upload or during sanitation. The data requirements workbook has no PACKAGE code map set.'
-  impact: 'Build: code map set and a renewal sanitation check. Test: sample RMEL validation in Mock 1.'
+  impact: 'Build: code map set and a renewal sanitation check. Test: sample RMEL validation in Trial migration 1.'
   modules: 'Data migration; Renewal; Product Maintenance'
   resolution: 'Both: a versioned PACKAGE code map at intake for one-to-one mappings, plus a renewal check that sends unmapped, retired or split packages to Review for TSU; owner TSU with the MBS steward; rules agreed before 15-Jan-2027.'
   question: 'Who owns package remapping, and do you agree to map at intake with a sanitation check for exceptions?'
@@ -2910,10 +2910,10 @@ items:
   related: [IQ33, DCR-222]
 - ref: DCR-224
   brds: [BRD-00]
-  loc: 'IER workbook v20, VDI Requirements (OpenJDK Temurin 17, Node.js 20, Angular), HW & SW Requirements ("RHEL 9.x + PostgreSQL 16 (Amazon RDS)", GitLab Runner), Architecture Diagram (Infra) (GitHub + Jenkins), Architecture Diagram (ArgoCD, Terraform + Crossplane), K8s sheets (Dynatrace)'
+  loc: 'IER workbook v20, VDI Requirements (OpenJDK Temurin 17, Node.js 20, Angular), HW & SW Requirements ("RHEL 9.x + PostgreSQL 16 (Amazon RDS)", GitLab Runner), Architecture Diagram (Infra) (a second CI toolchain named in the IER), Architecture Diagram (ArgoCD, Terraform + Crossplane), K8s sheets (Dynatrace)'
   type: BRD vs platform
   sev: Medium
-  desc: 'The IER names JDK 17, Node 20 and an Angular SPA; BIBS uses Java 21, Node 22 and React 19. RDS rows name "RHEL 9.x" for a managed engine. Three CI/CD toolchains are named (GitLab, GitHub + Jenkins, ArgoCD) and two observability stacks (Dynatrace; CloudWatch, X-Ray, Prometheus, Loki, Grafana). BIBS builds on GitHub Actions and exposes Prometheus metrics.'
+  desc: 'The IER names JDK 17, Node 20 and an Angular SPA; BIBS uses Java 21, Node 22 and React 19. RDS rows name "RHEL 9.x" for a managed engine. Three CI/CD toolchains are named (GitLab, a second CI toolchain named in the IER, ArgoCD) and two observability stacks (Dynatrace; CloudWatch, X-Ray, Prometheus, Loki, Grafana). BIBS builds on the CI pipeline (GitLab CI definition in the delivery) and exposes Prometheus metrics.'
   impact: 'VDI images, pipelines and monitoring set up for the wrong stack.'
   modules: 'Infrastructure; Delivery'
   resolution: 'VDI list: Temurin 21, Maven 3.9, Node 22; RDS rows without an OS; one toolchain and one APM named by BDOI IT.'
@@ -2939,7 +2939,7 @@ items:
   loc: 'IER workbook v20, Assumptions 3 (non-production 12 x 5); BIBS job schedules (application.yml)'
   type: NFR inconsistency
   sev: Medium
-  desc: 'Non-production runs 12 hours a day, 5 days a week. BIBS night jobs run at 20:00, 22:15-23:00, 01:00, 05:00 and 06:00 Philippine time; month-end close, migration mocks (weekend loads) and the dress rehearsal need longer hours. MSK and ElastiCache cannot be stopped.'
+  desc: 'Non-production runs 12 hours a day, 5 days a week. BIBS night jobs run at 20:00, 22:15-23:00, 01:00, 05:00 and 06:00 Philippine time; month-end close, migration trial migrations (weekend loads) and the dress rehearsal need longer hours. MSK and ElastiCache cannot be stopped.'
   impact: 'Batch and month-end tests do not run in SIT / UAT; savings overstated.'
   modules: 'All batch jobs; Data migration'
   resolution: 'Non-production crons moved into the window by environment variables; extended hours booked for batch, month-end and migration cycles.'
@@ -3075,9 +3075,9 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'The concept paper, signed by MANCOM on 06-Sep-2026, proposes an early renewal release on or before 15-Aug-2027 for January-May 2028 expiries, with the client master and all renewal-related reference data migrated before it (section VI, p.2). BDOI decided on 26-Sep-2026 that everything goes live together in January 2028 (drop plan and timeline: go-live January 2028, full migration and cut-over Nov 2027-Jan 2028). The concept paper is therefore superseded, but the January-May 2028 expiries it targeted are exactly the cohorts that are in their renewal cycle in legacy at a January 2028 go-live (T to T + 140 days).'
-  impact: 'Business: renewals of January-May 2028 expiries (about 25,800 accounts a month, umbrella p.44-45). Build: carried RMEL cohorts (layout P03), catch-up extraction in Renewal, no pre-cut-over production load. Test: renewal of a carried legacy policy; mock-load order.'
+  impact: 'Business: renewals of January-May 2028 expiries (about 25,800 accounts a month, umbrella p.44-45). Build: carried RMEL cohorts (layout P03), catch-up extraction in Renewal, no pre-cut-over production load. Test: renewal of a carried legacy policy; trial-migration load order.'
   modules: 'Data migration; Renewal'
-  resolution: 'Concept paper recorded as superseded by the single January 2028 go-live. Kept from it: reference data and clients load first in every mock (prerequisite for renewal testing); RMEL validation and exception handling for the carried January-May 2028 cohorts; the package remapping decision. Proposal for the cohorts: prepared in legacy from August 2027 as today, carried at the freeze with their disposition, placed and booked in BIBS from go-live; catch-up extraction at go-live as the safety net (DATA_MIGRATION_DESIGN section 15.1).'
+  resolution: 'Concept paper recorded as superseded by the single January 2028 go-live. Kept from it: reference data and clients load first in every trial migration (prerequisite for renewal testing); RMEL validation and exception handling for the carried January-May 2028 cohorts; the package remapping decision. Proposal for the cohorts: prepared in legacy from August 2027 as today, carried at the freeze with their disposition, placed and booked in BIBS from go-live; catch-up extraction at go-live as the safety net (DATA_MIGRATION_DESIGN section 15.1).'
   question: 'Are the renewals of the January-May 2028 expiries prepared in legacy and carried into BIBS at the freeze (proposal), or processed in BIBS only after go-live from a catch-up extraction? Confirm that renewals whose new term starts before go-live are placed and booked in legacy before the freeze.'
   owner: 'Marketing and Processing - Renewal (RMEL); Program Manager'
   status: Answered
@@ -3118,9 +3118,9 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'Carrying the January-May 2028 renewals "with their disposition" needs the legacy disposition, RA status, insurer approval and proposed terms per policy. The Renewal BRD says dispositions are made in spreadsheets and communicated by e-mail, and only packaged accounts go through the QPS upload and the RMEL text file (p.42). There is no system source for the disposition part of the carried rows, and the concept paper flags RMEL data quality as a risk that needs validation, exception reporting and review checkpoints.'
-  impact: 'Business: business units must consolidate their disposition files monthly. Build: layout P03 combines the legacy RMEL extract with the disposition file; cohort completeness check. Test: rejected rows in every mock.'
+  impact: 'Business: business units must consolidate their disposition files monthly. Build: layout P03 combines the legacy RMEL extract with the disposition file; cohort completeness check. Test: rejected rows in every trial migration.'
   modules: 'Data migration; Renewal'
-  resolution: 'Proposal: one consolidated disposition template per cohort month from Mock 1, merged with the legacy RMEL extract into P03; rejected rows to the Heads of Retail and Corporate Marketing after every mock; completeness check per month; catch-up extraction at go-live for any header without a carried row.'
+  resolution: 'Proposal: one consolidated disposition template per cohort month from Trial migration 1, merged with the legacy RMEL extract into P03; rejected rows to the Heads of Retail and Corporate Marketing after every trial migration; completeness check per month; catch-up extraction at go-live for any header without a carried row.'
   question: 'Who produces the legacy RMEL extract for the January-May 2028 expiries, where are the dispositions, RA status, insurer approvals and proposed terms kept, will the business units fill one consolidated template per month, and who reviews the rejected rows?'
   owner: 'Marketing and Processing - Renewal (RMEL); BDOI IT'
   status: Answered

@@ -31,7 +31,7 @@ approved request waiting for implementation.
 
 ## 2. Personas and roles
 
-| Persona (BRD) | Role | Demo user | What they do |
+| Persona (BRD) | Role | SIT/UAT user | What they do |
 |---|---|---|---|
 | Requestor | `UAM_REQUESTOR` | `requestor` | Raises, edits, corrects, cancels user requests and bulk files; views own requests |
 | Approver | `UAM_APPROVER` | `uamapprover` | Approves, rejects or returns the requests assigned to them; runs the reports |
@@ -41,8 +41,8 @@ approved request waiting for implementation.
 | Auditor | `AUDITOR` (+ UAM_VIEW, UAM_REPORT_VIEW) | `auditor` | Reads requests and reports |
 | BRD-1 approver | `NB_APPROVER` (ACCESS_APPROVE) | `approver` | Keeps deciding the product-maintenance access requests (PMADD05) |
 
-Subject users of the demo: `a013000101` to `a013000104`; requests AR-DEMO-000001 to 000008 in every
-status and the bulk batch BLK-DEMO-000001 (V1960). Password of the demo users: `Brokerverse@2026`.
+Subject users of the seed data: `a013000101` to `a013000104`; requests AR-2026-900001 to 000008 in every
+status and the bulk batch BLK-2026-900001 (V1960). The password is held in the seed configuration.
 
 Segregation, enforced by the services: the requester and the subject user never decide a request
 (`ACCESS_FOUR_EYES`, `ACCESS_SUBJECT_DECIDES`); the second approver differs from the first
@@ -153,7 +153,7 @@ Every failed job run is also e-mailed to `JOB_FAILURE_RECIPIENTS`.
 | `AUTH_MODE` | LOCAL | LOCAL or DIRECTORY (UQ04) |
 | `USER_ID_PATTERN` | `^[a-zA-Z][0-9]{9}$` | Format of a new user ID (UQ05) |
 | `PASSWORD_HISTORY_COUNT` / `PASSWORD_MIN_AGE_DAYS` / `PASSWORD_MAX_AGE_DAYS` | 8 / 1 / 90 | Password policy (UQ08) |
-| `UAM_WORKING_HOURS` | `08:00-18:00,MON-FRI` (demo and test database: `00:00-24:00,MON-SUN`) | Out-of-hours flag; format `HH:mm-HH:mm,DAY-DAY`; blank or unreadable = always within hours |
+| `UAM_WORKING_HOURS` | `08:00-18:00,MON-FRI` (seed and test database: `00:00-24:00,MON-SUN`) | Out-of-hours flag; format `HH:mm-HH:mm,DAY-DAY`; blank or unreadable = always within hours |
 | `UAM_ANY_APPROVER` | false | Any ACCESS_APPROVE holder may decide, not only the chosen approver (UQ02) |
 | `UAM_DIRECT_ROLE_EDIT` | false | Emergency path: direct role edits, audited with alert `UAM_DIRECT_ROLE_EDIT` |
 | `UAM_ROLE_APPLY_ON_APPROVAL` | false | Group-profile requests apply at approval instead of waiting for implementation (UQ03) |

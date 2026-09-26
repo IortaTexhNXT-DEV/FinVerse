@@ -6,12 +6,12 @@ schedules from **posted** data. It depends on underwriting, payables, party, coa
 journal and the platform modules; no module depends on it (ArchUnit enforces this).
 
 Migrations: `V700__tax_and_statutory.sql` (schema, `TAX_REMITTANCE` event, exception codes,
-parameters), `V701__tax_permissions.sql` (grants); demo `V975__demo_tax_remittance_rule.sql` and the
-`TaxDemoData` runner (`demo` profile, order 95).
+parameters), `V701__tax_permissions.sql` (grants); seed `V975__seed_tax_remittance_rule.sql` and the
+`TaxSeedData` runner (`seed` profile, order 95).
 
 ## 1. Forms covered
 
-| Form | Authority | Frequency / due rule (demo) | Worksheet | Payable cleared (demo) |
+| Form | Authority | Frequency / due rule (seed) | Worksheet | Payable cleared (seed) |
 |---|---|---|---|---|
 | 2550Q Quarterly VAT return | BIR | quarterly, 25th of the month after the quarter | VAT | Dr 2504 output VAT, Cr 1603 input VAT |
 | 0619-E Monthly remittance of EWT | BIR | months 1 and 2 of each quarter, 10th of the next month | EWT | 2508 |
@@ -122,7 +122,7 @@ Premiums, losses and commissions are analysed by the line-of-business dimension 
 
 **RBC (simplified template)**: requirement = Σ line amount × factor (no covariance aggregation of
 the full IC RBC2 framework); available capital = net worth schedule total; ratio = capital /
-requirement × 100 against parameter `IC_RBC_HURDLE_PERCENT` (default 100). Demo factors: FVPL 30 %,
+requirement × 100 against parameter `IC_RBC_HURDLE_PERCENT` (default 100). Seed factors: FVPL 30 %,
 FVOCI 15 %, placements 1 %, insurance receivables 10 %, reinsurance assets 5 %, net premiums 15 %,
 claims reserves 10 %, operational risk 2 % of gross premiums. Reserves and investments are read from
 ledger balances only (no dependency on the reserves or investment modules).
@@ -154,7 +154,7 @@ and appear in the approval inbox.
 6. Due dates are not moved for weekends or holidays (e-filers file on or before the date).
 7. 2307 certificates are computer-generated reproductions of the official layout.
 8. The RDO code is one global parameter (single Philippine company).
-9. Demo ATCs and rates follow RR 11-2018 as understood; commissions use WI515 / WC515 at 10 %.
+9. Seed ATCs and rates follow RR 11-2018 as understood; commissions use WI515 / WC515 at 10 %.
 
 ## 9. Before go-live, the tax officer must
 

@@ -80,37 +80,37 @@ screens:
 
 data:
   - id: TD-DPA-01
-    name: Demo users and roles
-    content: disb (DISBURSEMENT), disbtl and disbtl2 (DISB_TL), disbappr and disbappr2 (DISB_APPROVER), mktao (PRQ_PROCESSOR), mktrev (PRQ_REVIEWER), mktappr (PRQ_APPROVER), hrappr (HR_APPROVER), acsl (ACSL_PROCESSOR), acsltl (ACSL_TL), acslhead (ACSL_HEAD), cashier and cashtl (CASHIER, CASHIER_TL), remittl (REMIT_TL), glofficer (FRBS_PROCESSOR), fmanager (FIN_ADMIN), badmin (BUSINESS_ADMIN), comptrol, admin, auditor. The demo password is issued by the test lead.
-    source: Demo seeds V999 (BRD-5 users), V990, V980, V900; grants V890
+    name: SIT/UAT users and roles
+    content: disb (DISBURSEMENT), disbtl and disbtl2 (DISB_TL), disbappr and disbappr2 (DISB_APPROVER), mktao (PRQ_PROCESSOR), mktrev (PRQ_REVIEWER), mktappr (PRQ_APPROVER), hrappr (HR_APPROVER), acsl (ACSL_PROCESSOR), acsltl (ACSL_TL), acslhead (ACSL_HEAD), cashier and cashtl (CASHIER, CASHIER_TL), remittl (REMIT_TL), glofficer (FRBS_PROCESSOR), fmanager (FIN_ADMIN), badmin (BUSINESS_ADMIN), comptrol, admin, auditor. The SIT/UAT password is issued by the test lead.
+    source: Seeds V999 (BRD-5 users), V990, V980, V900; grants V890
   - id: TD-DPA-02
     name: Disbursement masters
     content: Payees of an insurer, a client and a supplier maintained by disbtl and authorised by disbappr; BDOIR bank accounts with their cheque books; parameters DISB_STALE_DAYS 180, DISB_CHECK_SERIES_WARNING 20, DISB_AUTO_APPROVER_ROUTING REFUND and REMITTANCE, DISB_NO_PAYEE_ACTION HOLD, DISB_CHECK_CLEARING ON (account 2241)
-    source: Migrations V891-V893 and the demo runner DisbursementDemoData
+    source: Migrations V891-V893 and the seed runner DisbursementSeedData
   - id: TD-DPA-03
     name: Disbursement storyline
     content: A remittance DV approved and paid by check (printed and released), a client refund by credit to account approved, a supplier payment by check approved and a second one left In Process, the end of day of the load date with its DCTF, check batch and reports, the deposited-checks file that tags a check Negotiated, a funding through maker, verifier and two approvers
-    source: Demo runner DisbursementDemoData (after the Operations runners)
+    source: Seed runner DisbursementSeedData (after the Operations runners)
   - id: TD-DPA-04
     name: Upload files
     content: Request upload of 20 rows with 3 unknown payees; payee migration file of 100 payees with 2 invalid rows; deposited-checks file (check no., amount, date); credited-accounts file; BOB approvals file; one row with a wrong amount in each
     source: Prepared by the test lead from the templates of Disbursement Uploads
   - id: TD-DPA-05
     name: Payment requests keyed in the test
-    content: A refund request (RRF) of one client with two AR numbers of the cashiering demo, reason Overpayment, credit to account; a refund of a cancelled policy; a cash advance (RFP) for an employee with purpose and amount 5,000.00; documents (PDF and XLSX)
-    source: Keyed in by the tester (no Payment Requests demo storyline)
+    content: A refund request (RRF) of one client with two AR numbers of the cashiering seed, reason Overpayment, credit to account; a refund of a cancelled policy; a cash advance (RFP) for an employee with purpose and amount 5,000.00; documents (PDF and XLSX)
+    source: Keyed in by the tester (no Payment Requests seed storyline)
   - id: TD-DPA-06
     name: ACSL data
     content: An insurer SOA file of 1,200 rows with 3 rows without invoice number in the standard layout; GL-SL control accounts set up for premium receivable; a remittance deduction of INS-LAC (AR insurer's refund) recorded by acsl and waiting for acsltl
-    source: SOA file prepared by the test lead; controls of V896-V897; demo runner DeductionDemoData
+    source: SOA file prepared by the test lead; controls of V896-V897; seed runner DeductionSeedData
   - id: TD-DPA-07
     name: Remittance and incentives
-    content: Remittance batches of the Operations demo; CPC2 incentive criterion (code CPC2, RATE basis) on packaged Motor lines; early-remittance incentive rules; EARLY_INCENTIVE_WTAX_RATE 2 %
-    source: Demo seeds V992, V996 and migration V772
+    content: Remittance batches of the Operations seed; CPC2 incentive criterion (code CPC2, RATE basis) on packaged Motor lines; early-remittance incentive rules; EARLY_INCENTIVE_WTAX_RATE 2 %
+    source: Seeds V992, V996 and migration V772
   - id: TD-DPA-08
     name: Employee master and liquidation accounts
-    content: Demo employees with number, unit, branch and cost centre; the expense-role accounts of PRQ_CA_LIQUIDATION
-    source: Demo seed V999 and the Liquidation Accounts screen
+    content: Seed employees with number, unit, branch and cost centre; the expense-role accounts of PRQ_CA_LIQUIDATION
+    source: Seed V999 and the Liquidation Accounts screen
 
 scenarios:
   - id: SC-DPA-01
@@ -172,7 +172,7 @@ frs:
         steps:
           - Log in as disb and open the group Finance.
         expected: Disbursement (Disbursement Workbench and the processor screens) is shown; ACSL and Refund & Cash Advance Requests are not.
-        auto: CollectionsAccountingFoundationIT#demoPersonasHoldTheirPermissions
+        auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
       - c: 1
         type: Security-access
         persona: PRQ_PROCESSOR
@@ -515,7 +515,7 @@ frs:
         steps:
           - Encode type Payment to supplier, the supplier payee, PHP 25,000.00, purpose, RFP no., expense account and cost centre; attach the invoice PDF; save.
         expected: A DV In Process with the supplier's details and the attachment.
-        auto: DisbursementDemoIT#theStorylineCoversEveryDisbursementScreen; labels.test.ts#validates the encode form
+        auto: DisbursementSeedIT#theStorylineCoversEveryDisbursementScreen; labels.test.ts#validates the encode form
       - c: 2
         type: Negative
         title: Amount zero
@@ -639,7 +639,7 @@ frs:
           - Leave the paying account blank and click Submit.
         expected: The DV is not submitted.
         msg: ["Complete DV {no}: {paying account}", DV_INCOMPLETE]
-        auto: DisbursementDemoIT#theStorylineCoversEveryDisbursementScreen
+        auto: DisbursementSeedIT#theStorylineCoversEveryDisbursementScreen
       - c: 3
         type: Negative
         screen: API
@@ -908,7 +908,7 @@ frs:
           - As disbtl, submit the DV for approval.
         expected: The action is refused.
         msg: [The processor cannot check their own voucher, DV_FOUR_EYES]
-        auto: DisbursementDemoIT#theApproverIsNeverTheProcessorAndOperationsKeepsItsBatchInReview
+        auto: DisbursementSeedIT#theApproverIsNeverTheProcessorAndOperationsKeepsItsBatchInReview
 
   FR-DS-041:
     scenario: SC-DPA-03
@@ -945,7 +945,7 @@ frs:
           - That user approves the DV.
         expected: The approval is refused.
         msg: [The approver of a voucher cannot be its processor or checker, DV_FOUR_EYES]
-        auto: DisbursementDemoIT#theApproverIsNeverTheProcessorAndOperationsKeepsItsBatchInReview
+        auto: DisbursementSeedIT#theApproverIsNeverTheProcessorAndOperationsKeepsItsBatchInReview
       - c: 3
         type: Negative
         screen: API
@@ -3170,7 +3170,7 @@ access:
     allow: [DISB_APPROVER]
     deny: [DISBURSEMENT, DISB_TL]
     denied: Approve, Reject and Cancel approved DV are not shown; POST /vouchers/{id}/approve returns HTTP 403.
-    auto: DisbursementDemoIT#theApproverIsNeverTheProcessorAndOperationsKeepsItsBatchInReview
+    auto: DisbursementSeedIT#theApproverIsNeverTheProcessorAndOperationsKeepsItsBatchInReview
   - action: Maintain payees
     screen: PAYEE
     permission: DISB_PAYEE_MAINTAIN
@@ -3300,7 +3300,7 @@ findings:
     issue: '"A request is declined by returning or cancelling it with a reason" - at For Approval the approver has only Return to reviewer; cancellation is possible only in Draft, Preparing and For review.'
     proposal: State that the approver declines by returning, and who cancels afterwards.
   - fr: FR-PQ-017
-    issue: The FRS names the checker "Marketing / Comptrollership" without the permission that allows posting a liquidation; testers cannot tell which demo user checks.
+    issue: The FRS names the checker "Marketing / Comptrollership" without the permission that allows posting a liquidation; testers cannot tell which SIT/UAT user checks.
     proposal: Name the permission (and role) of the liquidation checker.
   - fr: FR-DS-092
     issue: FR-DS-092 (CPC2 report) and FR-AS-005 (ACSL aging reports) are not built (gaps G4 and G3); their acceptance criterion "to be accepted when built" cannot be tested.
@@ -3312,5 +3312,5 @@ findings:
     issue: The FRS does not say at which number of remaining leaves CHECK_SERIES_LOW is raised (at 20 left or below 20).
     proposal: State the boundary of DISB_CHECK_SERIES_WARNING.
   - fr: FR-AS-020
-    issue: The demo data has one ACSL processor (acsl); re-assigning a correction to "acslproc2" (acceptance criterion) needs a second processor that the demo does not provide.
-    proposal: Add a second ACSL processor to the demo users or change the criterion.
+    issue: The seed data has one ACSL processor (acsl); re-assigning a correction to "acslproc2" (acceptance criterion) needs a second processor that the seed does not provide.
+    proposal: Add a second ACSL processor to the SIT/UAT users or change the criterion.

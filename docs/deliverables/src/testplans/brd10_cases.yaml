@@ -65,15 +65,15 @@ data:
   - id: TD-SS-01
     name: Test users per role
     content: compoff (COMPLIANCE_OFFICER), compchk (COMPLIANCE_CHECKER), ucc (UNIT_COMPLIANCE_COORD), investigator and investigator2 of two teams (SCR_INVESTIGATOR), scrapprover (SCR_APPROVER, Unit Head of the Corbank unit), amlcom1 to amlcom5 (AML_COMMITTEE), opslead (OPS_LEAD), auditor, admin, badmin (BUSINESS_ADMIN), ao (MKT_AO). A combined test user holding SCR_INVESTIGATE and SCR_CASE_APPROVE for the four-eyes cases.
-    source: Planned demo seed V1950 (compoff, compchk, ucc, investigator, scrapprover, amlcom1, amlcom2); the others created by the test lead through User Access requests
+    source: Planned seed V1950 (compoff, compchk, ucc, investigator, scrapprover, amlcom1, amlcom2); the others created by the test lead through User Access requests
   - id: TD-SS-02
     name: Active configuration versions
     content: One ACTIVE version of every type - matching criteria (EXACT, PHONETIC, FUZZY 0.85, case threshold 0.90 for SANCTION individuals), three risk categories (HIGH_SANCTION rating HIGH with tag WATCHLIST_REVIEW, PEP with tag PEP and EDD, STANDARD), approval routes with a Corbank route, assignment matrix with a Retail PEP scenario, SLA matrix, validation rules requiring the KYC form, KYC / transaction / EDD / STR templates and an STR layout; one PENDING draft made by compoff.
-    source: Planned demo seed V1950 of the build design
+    source: Planned seed V1950 of the build design
   - id: TD-SS-03
     name: Watchlist with invented names
     content: Sources AML_ADVISORY (sanction, file), NLDS_PEP (PEP, file) and INTERNAL (manual); 25 invented entries, among them "Juan de la Cruz" (individual, sanction) and "Maria Santos Reyes" (PEP).
-    source: Planned demo seed V1951; invented names only
+    source: Planned seed V1951; invented names only
   - id: TD-SS-04
     name: List files
     content: AML_ADVISORY CSV with 3 new and 1 changed entry; a CSV with 2 bad lines (one without name, one with birth date 31-02-1970); an unreadable (truncated) CSV; the same valid file again; a PDF file for the AML_ADVISORY source; an NLDS_PEP file adding 5 entries.
@@ -81,11 +81,11 @@ data:
   - id: TD-SS-05
     name: Masked clients
     content: Prospect "Juan Dela Cruz" (individual, Retail unit); client "ABC Trading" (entity, Corbank unit) with a booked account; client with a PEP profile and a booked account (Retail unit); client without an active policy; inactive client; a client whose account officer is investigator2.
-    source: Masked demo clients (V981) plus clients keyed in by the test lead on SIT
+    source: Masked seed clients (V981) plus clients keyed in by the test lead on SIT
   - id: TD-SS-06
     name: Cases in every stage
     content: Cases in NEW, INVESTIGATION, RETURNED, UNIT_HEAD_APPROVAL, COMPLIANCE_REVIEW, AML_COMMITTEE (one vote pending), STR_PREPARATION and CLOSED; one STR APPROVED and one EXTRACTED.
-    source: Planned demo seed V1952 of the build design
+    source: Planned seed V1952 of the build design
   - id: TD-SS-07
     name: Case documents
     content: KYC form PDF for "ABC Trading" received 12-May-2026; ID copy (JPG); source-of-funds letter (PDF); an .exe file.

@@ -75,7 +75,7 @@ export const NAV_GROUPS: NavGroup[] = [
       placementModule,
       issuanceModule,
       bookingModule,
-      // Operations (BRD-2), prototype placement: Production Reconciliation and Adjustment here.
+      // Operations (BRD-2), UX design placement: Production Reconciliation and Adjustment here.
       prodreconModule,
       adjustmentModule,
       // Product Maintenance (BRD-3): catalog screens with the package request screens.
@@ -92,7 +92,7 @@ export const NAV_GROUPS: NavGroup[] = [
     modules: [
       // Collections (BRD-4) first, before the Operations cash modules (COLLECTIONS_DESIGN 11).
       collectionsModule,
-      // Operations cash modules (BDOI prototype placement).
+      // Operations cash modules (BDOI UX design placement).
       cashieringModule,
       remittanceModule,
       commissionModule,

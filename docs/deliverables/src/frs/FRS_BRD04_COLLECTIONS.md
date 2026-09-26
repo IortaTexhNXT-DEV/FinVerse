@@ -1564,7 +1564,7 @@ notifications:
 audit:
   - "Each SOA keeps the generating user, time and template version."
 acceptance:
-  - For the three-year demo account with an annual plan, BIBS produces an SOA for each of its three billing cycles.
+  - For the three-year seed account with an annual plan, BIBS produces an SOA for each of its three billing cycles.
   - A second SOA for a billed cycle is refused until the first is cancelled.
   - The SOA shows the coverage period of the installment and any unpaid earlier installment as arrears.
 ```

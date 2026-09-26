@@ -21,6 +21,38 @@ export const SCREENING_HELP: HelpSection = {
         'The risk rating and the PEP / WATCHLIST_REVIEW tags of a client are set only through screening and are kept in the client history and the audit trail (SNSRP-302, 304).',
       ],
     },
+    {
+      name: 'Matches',
+      path: '/screening/matches',
+      summary:
+        'Clients matched against the sanctions, PEP and internal lists, with the score, the algorithm (exact, phonetic or fuzzy) and the fields that matched. Open a match to compare the client and the list entry side by side.',
+      workflow: [
+        'Screening runs by itself when a client is registered or its name, birth date, nationality, TIN or ID changes, when an account is submitted, when a list entry is approved and in the nightly batch (full list once a month).',
+        'The risk rules then tag the client: the rating and the PEP / WATCHLIST_REVIEW tags of the qualifying category are set in the client master and the KYC review comes forward when the rating goes up.',
+        "Open Case starts a screening case for the match, or adds it to the client's open case of the same type.",
+        'Mark False Positive clears the match with a justification and at least one evidence document attached to the match; with SCR_RISK_TAG the rating can be corrected and the Watchlist Review tag ended at the same time.',
+      ],
+      controls: [
+        'The same client, entry version and configuration version never produce a second match.',
+        'A false positive is not raised again for the same entry version; when the entry changes it is matched again (SNSRP-304, SQ12).',
+        'A rule never lowers a rating; only a manual change with evidence does.',
+        'Deciding matches needs SCR_INVESTIGATE; every decision is kept in the audit trail.',
+      ],
+    },
+    {
+      name: 'Screening Runs',
+      path: '/screening/runs',
+      summary:
+        'The log of every screening run: trigger and reference, clients in scope, whether the whole list or only the changed entries were screened, the configuration versions used and the counts.',
+      workflow: [
+        'A run is logged for each registered or changed client, each submitted account, each list change and each batch window (job SCR_PERIODIC_SCREENING, 01:30).',
+        'Open a run to see the matches it recorded.',
+      ],
+      controls: [
+        'The batch screens only the client statuses of parameter SCR_SCREENING_SCOPE (prospects and confirmed clients); inactive clients are never screened.',
+        'Without active matching criteria no run starts and the alert SCR_NO_ACTIVE_CONFIG is raised.',
+      ],
+    },
   ],
 };
 

@@ -52,8 +52,13 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     // accounting reports: service fee and certificates received
     'LIQUIDATED',
     'RECORDED',
+    // sanction screening (runs, cleared matches)
+    'SUCCESS',
+    'FALSE_POSITIVE',
   ],
   warning: [
+    // sanction screening: a match not yet decided
+    'POTENTIAL',
     'PENDING_AUTHORIZATION',
     'PENDING_APPROVAL',
     'CLOSING',
@@ -166,6 +171,8 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'NOT_REQUIRED',
   ],
   danger: [
+    // sanction screening: a confirmed match
+    'TRUE_MATCH',
     'REJECTED',
     'REVERSED',
     'CLOSED',

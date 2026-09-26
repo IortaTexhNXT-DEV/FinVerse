@@ -19,6 +19,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -152,17 +153,18 @@ public class ScreeningMatchController {
    * Screens a client now against the whole list (trigger MANUAL).
    *
    * @param clientId client
-   * @return the run, {@code null} when the client is inactive or no criteria are in force
+   * @return the run; 204 when the client is inactive or no criteria are in force
    */
   @PostMapping("/clients/{clientId}/screen")
   @PreAuthorize(HAS_INVESTIGATE)
-  public RunDto screen(@PathVariable Long clientId) {
+  public ResponseEntity<RunDto> screen(@PathVariable Long clientId) {
     return engine
         .screenClient(clientId, ScreeningTrigger.MANUAL, null)
         .map(ScreeningResult::runId)
         .map(queries::run)
         .map(RunDto::from)
-        .orElse(null);
+        .map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity.noContent().build());
   }
 
   /**

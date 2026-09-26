@@ -1,0 +1,51 @@
+// BRD-13 Data Migration: cutover timeline (FRS section 2.4; BRID 12.1). T = go-live.
+// Colour tokens are replaced by tools/deliverables before rendering. Four rows of three, read left to right.
+digraph dm_cutover {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.45, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=12, fontcolor="@NEAR_BLACK", width=2.3, height=0.85, margin="0.12,0.06", fillcolor="@BG_BLUE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2];
+
+  a1 [label=<<b>T-16 weeks</b><br/><font point-size="10">object decisions (G1),<br/>layouts, data workbook</font>>];
+  a2 [label=<<b>T-14 weeks</b><br/><font point-size="10">first extracts, profiling,<br/>draft code maps</font>>];
+  a3 [label=<<b>T-12 weeks: Mock 1</b><br/><font point-size="10">reference, clients, headers<br/>(masked, SIT)</font>>, fillcolor="@DIRTY_WHITE"];
+
+  b1 [label=<<b>T-9 weeks: Mock 2</b><br/><font point-size="10">all objects end to end,<br/>reconciliation L1-L5</font>>, fillcolor="@DIRTY_WHITE"];
+  b2 [label=<<b>T-6 weeks: Mock 3</b><br/><font point-size="10">UAT load, business<br/>verification</font>>, fillcolor="@DIRTY_WHITE"];
+  b3 [label=<<b>T-3 weeks</b><br/><font point-size="10">dress rehearsal, timed,<br/>rollback rehearsed</font>>, fillcolor="@DIRTY_WHITE"];
+
+  c1 [label=<<b>T-2 weeks</b><br/><font point-size="10">production pre-load:<br/>reference, clients, deltas</font>>, fillcolor="@AMBER_BG"];
+  c2 [label=<<b>T-1 week</b><br/><font point-size="10">code map freeze,<br/>reference change freeze</font>>, fillcolor="@AMBER_BG"];
+  c3 [label=<<b>T-3 days (Friday)</b><br/><font point-size="10">legacy EOD, business freeze,<br/>legacy read-only</font>>, fillcolor="@YELLOW"];
+
+  d1 [label=<<b>T-2 days (Saturday)</b><br/><font point-size="10">final extracts, snapshot,<br/>loads in order</font>>, fillcolor="@YELLOW"];
+  d2 [label=<<b>T-1 day (Sunday)</b><br/><font point-size="10">reconciliation, sign-offs,<br/>go / no-go 18:00</font>>, fillcolor="@YELLOW"];
+  d3 [label=<<b>T and after</b><br/><font point-size="10">go-live, 4 weeks hypercare,<br/>run-off, decommissioning</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+
+  { rank=same; a1; a2; a3; }
+  { rank=same; b1; b2; b3; }
+  { rank=same; c1; c2; c3; }
+  { rank=same; d1; d2; d3; }
+  a1 -> a2 -> a3;
+  b1 -> b2 -> b3;
+  c1 -> c2 -> c3;
+  d1 -> d2 -> d3;
+  a1 -> b1 -> c1 -> d1 [style=invis, weight=10];
+  a2 -> b2 -> c2 -> d2 [style=invis, weight=10];
+  a3 -> b3 -> c3 -> d3 [style=invis, weight=10];
+  a3 -> b1 [constraint=false];
+  b3 -> c1 [constraint=false];
+  c3 -> d1 [constraint=false];
+
+  legend [shape=plaintext, style="", label=<
+    <table border="0" cellborder="1" cellspacing="4" cellpadding="4">
+      <tr>
+        <td bgcolor="@BG_BLUE" color="@HEADER_BLUE"><font point-size="10">Preparation</font></td>
+        <td bgcolor="@DIRTY_WHITE" color="@HEADER_BLUE"><font point-size="10">Rehearsals (masked)</font></td>
+        <td bgcolor="@AMBER_BG" color="@HEADER_BLUE"><font point-size="10">Pre-load</font></td>
+        <td bgcolor="@YELLOW" color="@HEADER_BLUE"><font point-size="10">Cutover weekend</font></td>
+        <td bgcolor="@SUCCESS_BG" color="@SUCCESS"><font point-size="10">Live, run-off</font></td>
+      </tr>
+    </table>>];
+  d2 -> legend [style=invis];
+}

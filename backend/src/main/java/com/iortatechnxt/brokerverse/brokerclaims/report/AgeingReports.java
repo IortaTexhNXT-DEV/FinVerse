@@ -99,7 +99,8 @@ public final class AgeingReports {
           .groupBy(INSURER, "Insurer")
           .rows(rows)
           .presorted()
-          .note("Brackets from parameter BCL_AGEING_BUCKETS; temporarily closed claims keep ageing.")
+          .note(
+              "Brackets from parameter BCL_AGEING_BUCKETS; temporarily closed claims keep ageing.")
           .build();
     }
   }

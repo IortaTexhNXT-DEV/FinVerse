@@ -52,7 +52,7 @@ class ClaimsReportsIT {
           "BCL-DATA-EXTRACT");
 
   @Autowired private ReportService reports;
-  @Autowired private ClaimFixtures fixtures;
+  @Autowired private BrokerClaimFixtures fixtures;
   @Autowired private ClaimClosureService closures;
   @Autowired private AsUser as;
   @Autowired private JdbcTemplate jdbc;
@@ -61,8 +61,8 @@ class ClaimsReportsIT {
     Map<String, String> p = new HashMap<>();
     p.put("companyId", String.valueOf(fixtures.company()));
     p.put("grouping", "CLIENT");
-    p.put("periodFrom", ClaimFixtures.today().minusYears(1).toString());
-    p.put("settledFrom", ClaimFixtures.today().minusDays(40).toString());
+    p.put("periodFrom", BrokerClaimFixtures.today().minusYears(1).toString());
+    p.put("settledFrom", BrokerClaimFixtures.today().minusDays(40).toString());
     if (handler != null) {
       p.put("handler", handler);
     }
@@ -83,9 +83,16 @@ class ClaimsReportsIT {
   @Test
   void everyClaimsReportRunsAndExports() {
     Long claim =
-        fixtures.recorded(fixtures.spec(OFFICER, ClaimFixtures.today().minusDays(20)), "NEW_COMPLETE_DOCS");
-    fixtures.insurerLine(claim, "INS-A", new BigDecimal("60"), "R-" + ClaimFixtures.unique(), BigDecimal.TEN, null);
-    fixtures.location(claim, 1, "LOC-" + ClaimFixtures.unique(), "Makati");
+        fixtures.recorded(
+            fixtures.spec(OFFICER, BrokerClaimFixtures.today().minusDays(20)), "NEW_COMPLETE_DOCS");
+    fixtures.insurerLine(
+        claim,
+        "INS-A",
+        new BigDecimal("60"),
+        "R-" + BrokerClaimFixtures.unique(),
+        BigDecimal.TEN,
+        null);
+    fixtures.location(claim, 1, "LOC-" + BrokerClaimFixtures.unique(), "Makati");
     List<String> catalogue =
         as.run(UH, () -> reports.catalogue()).stream()
             .filter(m -> m.category() == ReportCategory.CLAIMS_HANDLING)
@@ -105,41 +112,74 @@ class ClaimsReportsIT {
   @Test
   void ageingOutstandingPastDueAndSettledFollowTheRules() {
     String handler = "clmofficer2";
-    Long c45 = fixtures.recorded(fixtures.spec(handler, ClaimFixtures.today().minusDays(45)), "NEW_COMPLETE_DOCS");
-    Long c80 = fixtures.recorded(fixtures.spec(handler, ClaimFixtures.today().minusDays(80)), "NEW_COMPLETE_DOCS");
-    Long c95 = fixtures.recorded(fixtures.spec(handler, ClaimFixtures.today().minusDays(95)), "TEMP_CLOSED_WITH_OFFER");
-    Long settled = fixtures.recorded(fixtures.spec(handler, ClaimFixtures.today().minusDays(10)), "NEW_COMPLETE_DOCS");
-    Long denied = fixtures.recorded(fixtures.spec(handler, ClaimFixtures.today().minusDays(10)), "NEW_COMPLETE_DOCS");
+    Long c45 =
+        fixtures.recorded(
+            fixtures.spec(handler, BrokerClaimFixtures.today().minusDays(45)), "NEW_COMPLETE_DOCS");
+    Long c80 =
+        fixtures.recorded(
+            fixtures.spec(handler, BrokerClaimFixtures.today().minusDays(80)), "NEW_COMPLETE_DOCS");
+    Long c95 =
+        fixtures.recorded(
+            fixtures.spec(handler, BrokerClaimFixtures.today().minusDays(95)),
+            "TEMP_CLOSED_WITH_OFFER");
+    Long settled =
+        fixtures.recorded(
+            fixtures.spec(handler, BrokerClaimFixtures.today().minusDays(10)), "NEW_COMPLETE_DOCS");
+    Long denied =
+        fixtures.recorded(
+            fixtures.spec(handler, BrokerClaimFixtures.today().minusDays(10)), "NEW_COMPLETE_DOCS");
     Long company = fixtures.company();
-    as.run(TL, () -> closures.settle(company, settled, new ClaimClosureService.Settlement(
-        "SETTLED_RELEASE_PAPERS", new BigDecimal("85000"), ClaimFixtures.today(), null)));
-    as.run(TL, () -> closures.settle(company, denied, new ClaimClosureService.Settlement(
-        "CLOSED_DENIED", null, null, null)));
+    as.run(
+        TL,
+        () ->
+            closures.settle(
+                company,
+                settled,
+                new ClaimClosureService.Settlement(
+                    "SETTLED_RELEASE_PAPERS",
+                    new BigDecimal("85000"),
+                    BrokerClaimFixtures.today(),
+                    null)));
+    as.run(
+        TL,
+        () ->
+            closures.settle(
+                company,
+                denied,
+                new ClaimClosureService.Settlement("CLOSED_DENIED", null, null, null)));
 
     ReportResult outstanding = as.run(UH, () -> reports.run("BCL-OUTSTANDING", params(handler)));
-    assertThat(column(outstanding, "claim_no")).contains(claimNo(c45), claimNo(c95)).doesNotContain(claimNo(settled));
+    assertThat(column(outstanding, "claim_no"))
+        .contains(claimNo(c45), claimNo(c95))
+        .doesNotContain(claimNo(settled));
 
     ReportResult ageing = as.run(UH, () -> reports.run("BCL-AGEING", params(handler)));
-    assertThat(details(ageing)).filteredOn(r -> r.get("claim_no").equals(claimNo(c45)))
-        .singleElement().satisfies(r -> assertThat(r.get("bucket")).isEqualTo("31-60"));
+    assertThat(details(ageing))
+        .filteredOn(r -> r.get("claim_no").equals(claimNo(c45)))
+        .singleElement()
+        .satisfies(r -> assertThat(r.get("bucket")).isEqualTo("31-60"));
     assertThat(ageing.rows()).anyMatch(r -> r.kind() == RowKind.SUBTOTAL);
 
-    ReportResult pastDue = as.run(UH, () -> reports.run("BCL-OUTSTANDING-PAST-DUE", params(handler)));
+    ReportResult pastDue =
+        as.run(UH, () -> reports.run("BCL-OUTSTANDING-PAST-DUE", params(handler)));
     assertThat(column(pastDue, "claim_no")).contains(claimNo(c95)).doesNotContain(claimNo(c80));
 
     ReportResult settledList = as.run(UH, () -> reports.run("BCL-SETTLED", params(handler)));
-    assertThat(column(settledList, "claim_no")).contains(claimNo(settled)).doesNotContain(claimNo(denied));
+    assertThat(column(settledList, "claim_no"))
+        .contains(claimNo(settled))
+        .doesNotContain(claimNo(denied));
 
     ReportResult byStatus = as.run(UH, () -> reports.run("BCL-AGEING-STATUS", params(handler)));
-    assertThat(byStatus.rows()).anyMatch(r -> r.kind() == RowKind.GROUP_HEADER && r.label().contains("Temporary Closed"));
+    assertThat(byStatus.rows())
+        .anyMatch(r -> r.kind() == RowKind.GROUP_HEADER && r.label().contains("Temporary Closed"));
 
     Map<String, String> future = params(handler);
-    future.put("asOf", ClaimFixtures.today().plusDays(1).toString());
+    future.put("asOf", BrokerClaimFixtures.today().plusDays(1).toString());
     assertThatThrownBy(() -> as.run(UH, () -> reports.run("BCL-AGEING", future)))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessage("The as-of date cannot be in the future");
     Map<String, String> reversed = params(handler);
-    reversed.put("settledTo", ClaimFixtures.today().minusDays(60).toString());
+    reversed.put("settledTo", BrokerClaimFixtures.today().minusDays(60).toString());
     assertThatThrownBy(() -> as.run(UH, () -> reports.run("BCL-SETTLED", reversed)))
         .hasMessageContaining("Date settled to must not be before Date settled from");
 
@@ -154,51 +194,74 @@ class ClaimsReportsIT {
 
   @Test
   void lossExperienceAndLossRatio() {
-    ClaimFixtures.Spec spec = fixtures.spec(OFFICER, ClaimFixtures.today().minusDays(30));
+    BrokerClaimFixtures.Spec spec =
+        fixtures.spec(OFFICER, BrokerClaimFixtures.today().minusDays(30));
     Long open = fixtures.recorded(spec, "NEW_COMPLETE_DOCS");
-    fixtures.insurerLine(open, "INS-A", new BigDecimal("100"), "N-" + ClaimFixtures.unique(),
-        new BigDecimal("100000"), new BigDecimal("60000"));
+    fixtures.insurerLine(
+        open,
+        "INS-A",
+        new BigDecimal("100"),
+        "N-" + BrokerClaimFixtures.unique(),
+        new BigDecimal("100000"),
+        new BigDecimal("60000"));
     Long over = fixtures.recorded(spec.another(), "NEW_COMPLETE_DOCS");
-    fixtures.insurerLine(over, "INS-B", new BigDecimal("100"), "O-" + ClaimFixtures.unique(),
-        new BigDecimal("100000"), new BigDecimal("110000"));
+    fixtures.insurerLine(
+        over,
+        "INS-B",
+        new BigDecimal("100"),
+        "O-" + BrokerClaimFixtures.unique(),
+        new BigDecimal("100000"),
+        new BigDecimal("110000"));
     invoice(spec.arn(), "BOOKING", new BigDecimal("400000"));
     invoice(spec.arn(), "ENDORSEMENT_MINUS", new BigDecimal("-60000"));
 
     Map<String, String> p = params(null);
     p.put("clientCode", spec.client());
     ReportResult experience = as.run(UH, () -> reports.run("BCL-LOSS-EXPERIENCE", p));
-    assertThat(details(experience)).filteredOn(r -> r.get("claim_no").equals(spec.claimNo()))
-        .singleElement().satisfies(r -> {
-          assertThat((BigDecimal) r.get("outstanding")).isEqualByComparingTo("40000");
-          assertThat((BigDecimal) r.get("total")).isEqualByComparingTo("100000");
-        });
-    assertThat(details(experience)).filteredOn(r -> r.get("insurer_code").equals("INS-B"))
-        .singleElement().satisfies(r -> {
-          assertThat((BigDecimal) r.get("outstanding")).isEqualByComparingTo("0");
-          assertThat((BigDecimal) r.get("total")).isEqualByComparingTo("110000");
-        });
+    assertThat(details(experience))
+        .filteredOn(r -> r.get("claim_no").equals(spec.claimNo()))
+        .singleElement()
+        .satisfies(
+            r -> {
+              assertThat((BigDecimal) r.get("outstanding")).isEqualByComparingTo("40000");
+              assertThat((BigDecimal) r.get("total")).isEqualByComparingTo("100000");
+            });
+    assertThat(details(experience))
+        .filteredOn(r -> r.get("insurer_code").equals("INS-B"))
+        .singleElement()
+        .satisfies(
+            r -> {
+              assertThat((BigDecimal) r.get("outstanding")).isEqualByComparingTo("0");
+              assertThat((BigDecimal) r.get("total")).isEqualByComparingTo("110000");
+            });
 
     ReportResult ratio = as.run(UH, () -> reports.run("BCL-LOSS-RATIO", p));
-    assertThat(details(ratio)).singleElement().satisfies(r -> {
-      assertThat((BigDecimal) r.get("premium")).isEqualByComparingTo("340000");
-      assertThat((BigDecimal) r.get("losses")).isEqualByComparingTo("210000");
-      assertThat((BigDecimal) r.get("ratio")).isEqualByComparingTo("61.76");
-    });
+    assertThat(details(ratio))
+        .singleElement()
+        .satisfies(
+            r -> {
+              assertThat((BigDecimal) r.get("premium")).isEqualByComparingTo("340000");
+              assertThat((BigDecimal) r.get("losses")).isEqualByComparingTo("210000");
+              assertThat((BigDecimal) r.get("ratio")).isEqualByComparingTo("61.76");
+            });
     Map<String, String> noGrouping = new HashMap<>(p);
     noGrouping.remove("grouping");
     assertThatThrownBy(() -> as.run(UH, () -> reports.run("BCL-LOSS-RATIO", noGrouping)))
         .hasMessage("Select the grouping");
 
     assertThat(as.run("ao", () -> reports.run("BCL-LOSS-EXPERIENCE", p))).isNotNull();
-    assertThatThrownBy(() -> as.run("ao", () -> reports.export("BCL-LOSS-EXPERIENCE", p, ExportFormat.XLSX)))
+    assertThatThrownBy(
+            () -> as.run("ao", () -> reports.export("BCL-LOSS-EXPERIENCE", p, ExportFormat.XLSX)))
         .isInstanceOf(AccessDeniedException.class);
-    assertThat(as.run("mkttl", () -> reports.export("BCL-LOSS-EXPERIENCE", p, ExportFormat.XLSX)).content())
+    assertThat(
+            as.run("mkttl", () -> reports.export("BCL-LOSS-EXPERIENCE", p, ExportFormat.XLSX))
+                .content())
         .isNotEmpty();
   }
 
   private void invoice(String arn, String kind, BigDecimal premium) {
-    String no = "INV-T-" + ClaimFixtures.unique();
-    LocalDate today = ClaimFixtures.today();
+    String no = "INV-T-" + BrokerClaimFixtures.unique();
+    LocalDate today = BrokerClaimFixtures.today();
     jdbc.update(
         "insert into ops_invoice (company_id, branch_id, invoice_no, root_invoice_no, arn, kind,"
             + " policy_year, client_code, assured_name, insurer_code, currency, booking_date,"
@@ -207,45 +270,62 @@ class ClaimsReportsIT {
             + " values (?, (select id from org_branch where company_id = ? order by id limit 1), ?, ?,"
             + " ?, ?, 2026, 'C', 'Assured', 'INS-A', 'PHP', ?, ?, ?, ?, 0, 0, 0, 'PAID',"
             + " 'FULLY_REMITTED', 'TEST', now(), 'TEST')",
-        fixtures.company(), fixtures.company(), no, no, arn, kind, today, today, today.plusYears(1), premium);
+        fixtures.company(),
+        fixtures.company(),
+        no,
+        no,
+        arn,
+        kind,
+        today,
+        today,
+        today.plusYears(1),
+        premium);
   }
 
   @Test
   void pronLocationsInsurerNumbersExtractAndActivityLog() {
-    String key = "LOC-" + ClaimFixtures.unique();
+    String key = "LOC-" + BrokerClaimFixtures.unique();
     Long first = null;
     for (int i = 0; i < 3; i++) {
-      ClaimFixtures.Spec spec =
-          fixtures.spec(OFFICER, ClaimFixtures.today().minusDays(100L + i)).withCatastrophe(i == 0 ? "FLOOD" : null);
+      BrokerClaimFixtures.Spec spec =
+          fixtures
+              .spec(OFFICER, BrokerClaimFixtures.today().minusDays(100L + i))
+              .withCatastrophe(i == 0 ? "FLOOD" : null);
       Long id = fixtures.recorded(spec, "NEW_COMPLETE_DOCS");
       fixtures.location(id, 1, key, "Pasig");
       first = first == null ? id : first;
     }
     Map<String, String> p = params(null);
-    p.put("periodFrom", ClaimFixtures.today().minusYears(3).toString());
+    p.put("periodFrom", BrokerClaimFixtures.today().minusYears(3).toString());
     ReportResult prone = as.run("clmrisk", () -> reports.run("BCL-PRONE-LOCATIONS", p));
-    assertThat(details(prone)).filteredOn(r -> key.equals(r.get("location_key")))
-        .singleElement().satisfies(r -> assertThat(r.get("prone")).isEqualTo("Yes"));
+    assertThat(details(prone))
+        .filteredOn(r -> key.equals(r.get("location_key")))
+        .singleElement()
+        .satisfies(r -> assertThat(r.get("prone")).isEqualTo("Yes"));
     Map<String, String> flood = new HashMap<>(p);
     flood.put("catastropheCode", "FLOOD");
     assertThat(details(as.run("clmrisk", () -> reports.run("BCL-PRONE-LOCATIONS", flood))))
         .filteredOn(r -> key.equals(r.get("location_key")))
-        .singleElement().satisfies(r -> assertThat(((Number) r.get("claims")).intValue()).isEqualTo(1));
+        .singleElement()
+        .satisfies(r -> assertThat(((Number) r.get("claims")).intValue()).isEqualTo(1));
     Map<String, String> drill = new HashMap<>(p);
     drill.put("locationKey", key);
-    assertThat(details(as.run("clmrisk", () -> reports.run("BCL-PRONE-LOCATIONS", drill)))).hasSize(3);
+    assertThat(details(as.run("clmrisk", () -> reports.run("BCL-PRONE-LOCATIONS", drill))))
+        .hasSize(3);
 
     Long claim = first;
-    String a = "C-INSA-" + ClaimFixtures.unique();
-    String b = "C-INSB-" + ClaimFixtures.unique();
+    String a = "C-INSA-" + BrokerClaimFixtures.unique();
+    String b = "C-INSB-" + BrokerClaimFixtures.unique();
     fixtures.insurerLine(claim, "INS-A", new BigDecimal("60"), a, null, null);
     fixtures.insurerLine(claim, "INS-B", new BigDecimal("40"), b, null, null);
     fixtures.location(claim, 2, key + "-2", "Makati");
     fixtures.location(claim, 3, key + "-3", "Cebu");
     ReportResult numbers = as.run(UH, () -> reports.run("BCL-INSURER-CLAIMS", params(null)));
     String claimNo = claimNo(claim);
-    assertThat(details(numbers)).filteredOn(r -> claimNo.equals(r.get("claim_no")))
-        .extracting(r -> r.get("insurer_claim_no")).containsExactlyInAnyOrder(a, b);
+    assertThat(details(numbers))
+        .filteredOn(r -> claimNo.equals(r.get("claim_no")))
+        .extracting(r -> r.get("insurer_claim_no"))
+        .containsExactlyInAnyOrder(a, b);
 
     Map<String, String> extract = params(null);
     extract.put("handler", OFFICER);
@@ -256,7 +336,7 @@ class ClaimsReportsIT {
 
     Map<String, String> log = params(null);
     log.put("claimNo", claimNo);
-    log.put("periodFrom", ClaimFixtures.today().minusDays(1).toString());
+    log.put("periodFrom", BrokerClaimFixtures.today().minusDays(1).toString());
     ReportResult activity = as.run(UH, () -> reports.run("BCL-ACTIVITY-LOG", log));
     assertThat(column(activity, "activity")).contains("Status");
   }

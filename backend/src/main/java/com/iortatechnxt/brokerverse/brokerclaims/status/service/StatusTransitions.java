@@ -86,8 +86,7 @@ public class StatusTransitions {
     Instant now = clock.instant();
     String by = currentUser.username();
     StatusHistory.Step to =
-        new StatusHistory.Step(
-            claim.getProgress().getStatusCode(), claim.getProgress().getPhase());
+        new StatusHistory.Step(claim.getProgress().getStatusCode(), claim.getProgress().getPhase());
     Integer daysInPrevious =
         statusSinceBefore == null
             ? null
@@ -134,7 +133,11 @@ public class StatusTransitions {
         officer,
         new Notice(
             claim.getClaimNo() + ": " + what,
-            "Claim of " + claim.getCover().getAssuredName() + " (" + claim.getCover().getArn() + ")",
+            "Claim of "
+                + claim.getCover().getAssuredName()
+                + " ("
+                + claim.getCover().getArn()
+                + ")",
             "/claims-handling/" + claim.getId(),
             ClaimCodes.ENTITY_TYPE,
             String.valueOf(claim.getId())),

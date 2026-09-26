@@ -10,14 +10,15 @@ import java.util.Set;
 
 /**
  * Validation of the status and settlement type attributes proposed on Claims Setup (FR-CL-040/043),
- * with the FRS messages: a status needs a phase other than CLOSED (reached only through a settlement
- * type) and the party it waits on; follow-up days are a whole number from 1 to 365 or blank (the
- * parameter applies); a settlement type needs its outcome.
+ * with the FRS messages: a status needs a phase other than CLOSED (reached only through a
+ * settlement type) and the party it waits on; follow-up days are a whole number from 1 to 365 or
+ * blank (the parameter applies); a settlement type needs its outcome.
  */
 final class AttributeRules {
 
   /** Parties a claim waits on (spec 6.1). */
-  static final Set<String> WAITING_ON = Set.of("INSURER", "CLAIMANT", "ASSURED", "ADJUSTER", "BDOI");
+  static final Set<String> WAITING_ON =
+      Set.of("INSURER", "CLAIMANT", "ASSURED", "ADJUSTER", "BDOI");
 
   /** Outcomes of a settlement type (spec 6.2). */
   static final Set<String> OUTCOMES = Set.of("SETTLED", "CLOSED_WITHOUT_PAYMENT");
@@ -94,8 +95,7 @@ final class AttributeRules {
   }
 
   private static BusinessRuleException invalidDays() {
-    return new BusinessRuleException(
-        "BCL_FOLLOW_UP_DAYS_INVALID", "Enter a whole number of days");
+    return new BusinessRuleException("BCL_FOLLOW_UP_DAYS_INVALID", "Enter a whole number of days");
   }
 
   private static boolean isStatusPhase(String phase) {

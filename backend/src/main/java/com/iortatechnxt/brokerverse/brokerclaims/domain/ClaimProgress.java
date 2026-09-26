@@ -153,8 +153,8 @@ public class ClaimProgress {
   }
 
   /**
-   * Closes the claim permanently through a closing settlement type (BRCLM.005/035): it stops
-   * ageing and accepts only diary entries, insurer updates and reopen.
+   * Closes the claim permanently through a closing settlement type (BRCLM.005/035): it stops ageing
+   * and accepts only diary entries, insurer updates and reopen.
    *
    * @param on closure date
    */

@@ -20,7 +20,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  * CL1-A's) with unique numbers and ARNs, then given their first status through the status engine.
  */
 @Component
-public class ClaimFixtures {
+public class BrokerClaimFixtures {
 
   /** Business time zone. */
   public static final ZoneId MANILA = ZoneId.of("Asia/Manila");
@@ -33,7 +33,7 @@ public class ClaimFixtures {
   private final ClaimStatusService statuses;
   private final BrokerClaimRepository claims;
 
-  ClaimFixtures(
+  BrokerClaimFixtures(
       JdbcTemplate jdbc,
       TransactionTemplate tx,
       AsUser as,
@@ -107,7 +107,8 @@ public class ClaimFixtures {
         spec.handler(),
         () ->
             tx.execute(
-                s -> statuses.recordInitialStatus(claims.findById(id).orElseThrow(), status, null)));
+                s ->
+                    statuses.recordInitialStatus(claims.findById(id).orElseThrow(), status, null)));
     return id;
   }
 
@@ -128,7 +129,12 @@ public class ClaimFixtures {
 
   /** Adds an insurer line. */
   public void insurerLine(
-      Long claimId, String insurer, BigDecimal share, String number, BigDecimal reserve, BigDecimal settled) {
+      Long claimId,
+      String insurer,
+      BigDecimal share,
+      String number,
+      BigDecimal reserve,
+      BigDecimal settled) {
     jdbc.update(
         "insert into bcl_insurer_claim (company_id, claim_id, insurer_code, share_pct,"
             + " insurer_claim_no, reported_to_insurer_on, reserve_amount, settled_amount,"
@@ -205,7 +211,15 @@ public class ClaimFixtures {
     /** Another claim (new number) on the same cover. */
     public Spec another() {
       return new Spec(
-          "BCL-T-" + unique(), arn, client, handler, reported, insurer, catastrophe, amount, reserve);
+          "BCL-T-" + unique(),
+          arn,
+          client,
+          handler,
+          reported,
+          insurer,
+          catastrophe,
+          amount,
+          reserve);
     }
 
     /** The same claim with a catastrophe code. */

@@ -150,8 +150,9 @@ public final class LossReports {
           .groupBy("cover", "Cover (ARN / Policy Year)")
           .rows(sql.rows(EXPERIENCE_SQL, args))
           .presorted()
-          .note("Paid = settled amount; O/S = insurer reserve less paid while open, never below"
-              + " zero (CLQ08).")
+          .note(
+              "Paid = settled amount; O/S = insurer reserve less paid while open, never below"
+                  + " zero (CLQ08).")
           .build();
     }
   }
@@ -191,7 +192,9 @@ public final class LossReports {
       String grouping =
           p.optionalText(GROUPING)
               .orElseThrow(
-                  () -> new BusinessRuleException("INVALID_REPORT_PARAMETERS", "Select the grouping"));
+                  () ->
+                      new BusinessRuleException(
+                          "INVALID_REPORT_PARAMETERS", "Select the grouping"));
       Map<String, Object> args = BclReportSql.args(p);
       args.put(ARN, null);
       args.put(POLICY_YEAR, null);
@@ -219,8 +222,9 @@ public final class LossReports {
               ReportColumn.percent("ratio", "Loss Ratio %"))
           .groupBy(GROUP_KEY, groupLabel(grouping))
           .rows(rows)
-          .note("Premium = signed gross premium of the ledger invoices of the cover and policy year"
-              + " (originals, endorsements, cancellations; CLQ20).")
+          .note(
+              "Premium = signed gross premium of the ledger invoices of the cover and policy year"
+                  + " (originals, endorsements, cancellations; CLQ20).")
           .build();
     }
 

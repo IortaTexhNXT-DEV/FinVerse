@@ -20,7 +20,8 @@ class ClaimAgeingTest {
   @Test
   void ageOverallRunsFromTheReportedDateToTodayOrTheClosure() {
     assertThat(ClaimAgeing.ageOverall(MARCH_1, null, LocalDate.of(2026, 3, 31))).isEqualTo(30);
-    assertThat(ClaimAgeing.ageOverall(MARCH_1, LocalDate.of(2026, 3, 15), LocalDate.of(2026, 3, 31)))
+    assertThat(
+            ClaimAgeing.ageOverall(MARCH_1, LocalDate.of(2026, 3, 15), LocalDate.of(2026, 3, 31)))
         .isEqualTo(14);
     assertThat(ClaimAgeing.ageOverall(MARCH_1, null, MARCH_1.minusDays(1))).isZero();
   }
@@ -42,7 +43,8 @@ class ClaimAgeingTest {
     assertThat(ClaimAgeing.bucket(90, BOUNDS)).isEqualTo("61-90");
     assertThat(ClaimAgeing.bucket(95, BOUNDS)).isEqualTo("91-180");
     assertThat(ClaimAgeing.bucket(181, BOUNDS)).isEqualTo("181+");
-    assertThat(ClaimAgeing.buckets(BOUNDS)).containsExactly("0-30", "31-60", "61-90", "91-180", "181+");
+    assertThat(ClaimAgeing.buckets(BOUNDS))
+        .containsExactly("0-30", "31-60", "61-90", "91-180", "181+");
     assertThat(ClaimAgeing.buckets(List.of())).containsExactly("0+");
   }
 

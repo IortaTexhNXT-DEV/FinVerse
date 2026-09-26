@@ -108,39 +108,38 @@ public class ClaimsHomeService {
 
   private static List<Tile> tiles(Map<String, Object> c) {
     return List.of(
-            new Tile("mine", "My Open Claims", count(c, "mine"), false, WORKLIST + "tab=MINE"),
-            new Tile(
-                "dueToday",
-                "Follow-ups Due Today",
-                count(c, "due_today"),
-                false,
-                WORKLIST + "tab=FOLLOW_UPS_DUE"),
-            new Tile(
-                "overdue",
-                "Follow-ups Overdue",
-                count(c, "overdue"),
-                true,
-                WORKLIST + "tab=ALL&flag=OVERDUE"),
-            new Tile(
-                "diary", "My Diary Due", count(c, "diary_due"), true, "/claims-handling/diary"),
-            new Tile(
-                "tempClosed",
-                "Temporarily Closed",
-                count(c, "temp_closed"),
-                false,
-                WORKLIST + "tab=TEMP_CLOSED"),
-            new Tile(
-                "unpaid",
-                "Unpaid Premium",
-                count(c, "unpaid"),
-                true,
-                WORKLIST + "tab=ALL&flag=UNPAID_PREMIUM"),
-            new Tile(
-                "awaiting",
-                "Awaiting Premium Remittance",
-                count(c, "awaiting"),
-                true,
-                WORKLIST + "tab=ALL&flag=AWAITING_REMITTANCE"));
+        new Tile("mine", "My Open Claims", count(c, "mine"), false, WORKLIST + "tab=MINE"),
+        new Tile(
+            "dueToday",
+            "Follow-ups Due Today",
+            count(c, "due_today"),
+            false,
+            WORKLIST + "tab=FOLLOW_UPS_DUE"),
+        new Tile(
+            "overdue",
+            "Follow-ups Overdue",
+            count(c, "overdue"),
+            true,
+            WORKLIST + "tab=ALL&flag=OVERDUE"),
+        new Tile("diary", "My Diary Due", count(c, "diary_due"), true, "/claims-handling/diary"),
+        new Tile(
+            "tempClosed",
+            "Temporarily Closed",
+            count(c, "temp_closed"),
+            false,
+            WORKLIST + "tab=TEMP_CLOSED"),
+        new Tile(
+            "unpaid",
+            "Unpaid Premium",
+            count(c, "unpaid"),
+            true,
+            WORKLIST + "tab=ALL&flag=UNPAID_PREMIUM"),
+        new Tile(
+            "awaiting",
+            "Awaiting Premium Remittance",
+            count(c, "awaiting"),
+            true,
+            WORKLIST + "tab=ALL&flag=AWAITING_REMITTANCE"));
   }
 
   private List<BucketCount> ageing(Map<String, Object> args) {

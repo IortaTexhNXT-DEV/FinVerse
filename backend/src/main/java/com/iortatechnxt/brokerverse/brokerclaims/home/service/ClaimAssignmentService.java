@@ -97,7 +97,8 @@ public class ClaimAssignmentService {
         .map(
             u -> {
               ClaimHandler h = register.get(u.toLowerCase(Locale.ROOT));
-              return new Assignee(u, h == null ? null : h.getUnitCode(), h == null ? null : h.getTeam());
+              return new Assignee(
+                  u, h == null ? null : h.getUnitCode(), h == null ? null : h.getTeam());
             })
         .toList();
   }

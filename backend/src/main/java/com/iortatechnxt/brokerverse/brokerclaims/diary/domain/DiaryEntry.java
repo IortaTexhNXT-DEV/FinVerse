@@ -9,9 +9,9 @@ import java.time.LocalDate;
 
 /**
  * A diary entry of a claim (BRCLM.022, NFR 15.08; FR-CL-052): a call, e-mail, meeting, note or
- * follow-up with its date, optional due date and assignee, and the text; marked done when completed.
- * Entries are never deleted: a wrong entry is marked done with a remark. Closed claims accept
- * diary entries.
+ * follow-up with its date, optional due date and assignee, and the text; marked done when
+ * completed. Entries are never deleted: a wrong entry is marked done with a remark. Closed claims
+ * accept diary entries.
  */
 @Entity
 @Table(name = "bcl_diary_entry")

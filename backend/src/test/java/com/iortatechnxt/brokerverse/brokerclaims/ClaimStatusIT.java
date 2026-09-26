@@ -25,9 +25,10 @@ import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
 
 /**
- * The status engine of wave CL1-B (BRCLM.005/010-015/019-021/027/035; FR-CL-041/042/044/045/050/051):
- * the status access matrix, phases and the workflow stage, temporary and permanent closure, reopen,
- * follow-up and action plan, the history and the {@code ClaimStatusChanged} events.
+ * The status engine of wave CL1-B (BRCLM.005/010-015/019-021/027/035;
+ * FR-CL-041/042/044/045/050/051): the status access matrix, phases and the workflow stage,
+ * temporary and permanent closure, reopen, follow-up and action plan, the history and the {@code
+ * ClaimStatusChanged} events.
  */
 @IntegrationTest
 @RecordApplicationEvents
@@ -37,7 +38,7 @@ class ClaimStatusIT {
   private static final String TL = "clmtl";
   private static final String TH = "clmth";
 
-  @Autowired private ClaimFixtures fixtures;
+  @Autowired private BrokerClaimFixtures fixtures;
   @Autowired private ClaimStatusService statuses;
   @Autowired private ClaimClosureService closures;
   @Autowired private ClaimFollowUpService followUps;
@@ -55,7 +56,7 @@ class ClaimStatusIT {
 
   private Long newClaim() {
     return fixtures.recorded(
-        fixtures.spec(OFFICER, ClaimFixtures.today().minusDays(10)), "NEW_COMPLETE_DOCS");
+        fixtures.spec(OFFICER, BrokerClaimFixtures.today().minusDays(10)), "NEW_COMPLETE_DOCS");
   }
 
   @Test
@@ -65,7 +66,7 @@ class ClaimStatusIT {
     assertThat(stage(id)).isEqualTo("NEW");
     assertThat(fixtures.column(id, "status_code", String.class)).isEqualTo("NEW_COMPLETE_DOCS");
     assertThat(fixtures.column(id, "next_follow_up_date", LocalDate.class))
-        .isEqualTo(ClaimFixtures.today().plusDays(7));
+        .isEqualTo(BrokerClaimFixtures.today().plusDays(7));
     ClaimStatusChanged first =
         events.stream(ClaimStatusChanged.class)
             .filter(e -> e.claimId().equals(id))
@@ -75,10 +76,13 @@ class ClaimStatusIT {
     assertThat(first.fromPhase()).isNull();
     assertThat(first.toPhase()).isEqualTo(ClaimPhase.NEW);
     ClaimProgressQuery.History history = as.run(OFFICER, () -> query.history(company, id));
-    assertThat(history.statusChanges()).singleElement().satisfies(h -> {
-      assertThat(h.fromStatus()).isNull();
-      assertThat(h.toLabel()).startsWith("Newly Filed");
-    });
+    assertThat(history.statusChanges())
+        .singleElement()
+        .satisfies(
+            h -> {
+              assertThat(h.fromStatus()).isNull();
+              assertThat(h.toLabel()).startsWith("Newly Filed");
+            });
   }
 
   @Test
@@ -88,10 +92,13 @@ class ClaimStatusIT {
     List<StatusOption> officer = as.run(OFFICER, () -> statuses.allowedStatuses(company, id));
     assertThat(officer)
         .extracting(StatusOption::code)
-        .containsExactlyInAnyOrder("NEW_INCOMPLETE_DOCS", "TEMP_CLOSED_NO_DOCS", "TEMP_CLOSED_WITH_OFFER");
-    assertThat(as.run(TL, () -> statuses.allowedStatuses(company, id))).hasSizeGreaterThanOrEqualTo(17);
+        .containsExactlyInAnyOrder(
+            "NEW_INCOMPLETE_DOCS", "TEMP_CLOSED_NO_DOCS", "TEMP_CLOSED_WITH_OFFER");
+    assertThat(as.run(TL, () -> statuses.allowedStatuses(company, id)))
+        .hasSizeGreaterThanOrEqualTo(17);
     assertThatThrownBy(
-            () -> as.run(OFFICER, () -> statuses.change(company, id, "INSURER_CHECK_ISSUANCE", null)))
+            () ->
+                as.run(OFFICER, () -> statuses.change(company, id, "INSURER_CHECK_ISSUANCE", null)))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessage("You are not allowed to set the status For Insurer's Issuance of Check");
     assertThatThrownBy(() -> as.run("clmrisk", () -> statuses.allowedStatuses(company, id)))
@@ -105,7 +112,7 @@ class ClaimStatusIT {
   void statusChangesMoveThePhaseKeepHistoryAndRefuseTheWayBackToNew() {
     Long id = newClaim();
     Long company = fixtures.company();
-    fixtures.statusSince(id, ClaimFixtures.today().minusDays(5));
+    fixtures.statusSince(id, BrokerClaimFixtures.today().minusDays(5));
     as.run(TL, () -> statuses.change(company, id, "ADJUSTER_REVIEW", "Adjuster appointed"));
     assertThat(stage(id)).isEqualTo("IN_PROGRESS");
     assertThat(fixtures.column(id, "phase", String.class)).isEqualTo("IN_PROGRESS");
@@ -116,7 +123,8 @@ class ClaimStatusIT {
     assertThat(history.statusChanges()).hasSize(2);
     assertThat(history.statusChanges().get(1).daysInPrevious()).isEqualTo(5);
     assertThat(history.statusChanges().get(1).stamp().remark()).isEqualTo("Adjuster appointed");
-    assertThatThrownBy(() -> as.run(TL, () -> statuses.change(company, id, "NEW_INCOMPLETE_DOCS", null)))
+    assertThatThrownBy(
+            () -> as.run(TL, () -> statuses.change(company, id, "NEW_INCOMPLETE_DOCS", null)))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("has left the newly filed phase");
     assertThat(as.run(TL, () -> statuses.allowedStatuses(company, id)))
@@ -143,16 +151,17 @@ class ClaimStatusIT {
   void followUpOverrideIsKeptAcrossStatusChangesAndTheActionPlanIsVersioned() {
     Long id = newClaim();
     Long company = fixtures.company();
-    LocalDate override = ClaimFixtures.today().plusDays(20);
+    LocalDate override = BrokerClaimFixtures.today().plusDays(20);
     assertThatThrownBy(
             () ->
                 as.run(
                     TL,
                     () ->
                         followUps.overrideFollowUp(
-                            company, id, ClaimFixtures.today().minusDays(1), "OTHER")))
+                            company, id, BrokerClaimFixtures.today().minusDays(1), "OTHER")))
         .hasMessage("The follow-up date cannot be before today");
-    assertThatThrownBy(() -> as.run(TL, () -> followUps.overrideFollowUp(company, id, override, "")))
+    assertThatThrownBy(
+            () -> as.run(TL, () -> followUps.overrideFollowUp(company, id, override, "")))
         .hasMessage("Enter the reason for the change");
     String reason =
         jdbc.queryForObject(
@@ -178,7 +187,8 @@ class ClaimStatusIT {
     assertThat(history.fieldChanges())
         .extracting(f -> f.field().name())
         .containsExactly("FOLLOW_UP", "ACTION_PLAN", "ACTION_PLAN", "ADJUSTER");
-    assertThat(as.run(TL, () -> query.progress(company, id)).followUp().adjusterName()).isNotBlank();
+    assertThat(as.run(TL, () -> query.progress(company, id)).followUp().adjusterName())
+        .isNotBlank();
   }
 
   @Test
@@ -206,7 +216,7 @@ class ClaimStatusIT {
                             new ClaimClosureService.Settlement(
                                 "SETTLED",
                                 BigDecimal.TEN,
-                                ClaimFixtures.today().plusDays(1),
+                                BrokerClaimFixtures.today().plusDays(1),
                                 null))))
         .hasMessage("The date settled cannot be in the future");
     assertThatThrownBy(
@@ -229,11 +239,12 @@ class ClaimStatusIT {
                 new ClaimClosureService.Settlement(
                     "SETTLED_RELEASE_PAPERS",
                     new BigDecimal("85000"),
-                    ClaimFixtures.today().minusDays(1),
+                    BrokerClaimFixtures.today().minusDays(1),
                     "Release papers returned")));
     assertThat(fixtures.column(id, "phase", String.class)).isEqualTo("CLOSED");
     assertThat(fixtures.column(id, "closure_kind", String.class)).isEqualTo("PERMANENT");
-    assertThat(fixtures.column(id, "closed_on", LocalDate.class)).isEqualTo(ClaimFixtures.today());
+    assertThat(fixtures.column(id, "closed_on", LocalDate.class))
+        .isEqualTo(BrokerClaimFixtures.today());
     assertThat(stage(id)).isEqualTo("CLOSED");
     assertThatThrownBy(() -> as.run(TL, () -> statuses.change(company, id, "INSURER_REVIEW", null)))
         .hasMessageEndingWith("is closed. Reopen it before changing the status");
@@ -257,7 +268,10 @@ class ClaimStatusIT {
     assertThat(
             events.stream(ClaimStatusChanged.class)
                 .filter(e -> e.claimId().equals(id))
-                .anyMatch(e -> e.fromPhase() == ClaimPhase.CLOSED && e.toPhase() == ClaimPhase.IN_PROGRESS))
+                .anyMatch(
+                    e ->
+                        e.fromPhase() == ClaimPhase.CLOSED
+                            && e.toPhase() == ClaimPhase.IN_PROGRESS))
         .isTrue();
     ClaimProgressQuery.History history = as.run(TH, () -> query.history(company, id));
     assertThat(history.fieldChanges())
@@ -279,7 +293,7 @@ class ClaimStatusIT {
                 new ClaimClosureService.Settlement(
                     "SETTLED_LOA_REPAIR_SCHEDULE",
                     new BigDecimal("1000"),
-                    ClaimFixtures.today(),
+                    BrokerClaimFixtures.today(),
                     null)));
     assertThat(fixtures.column(id, "phase", String.class)).isEqualTo("NEW");
     as.run(
@@ -291,6 +305,7 @@ class ClaimStatusIT {
                 new ClaimClosureService.Settlement(
                     "CLOSED_DENIED", null, null, "Denied by the insurer")));
     assertThat(fixtures.column(id, "phase", String.class)).isEqualTo("CLOSED");
-    assertThat(fixtures.column(id, "settlement_type_code", String.class)).isEqualTo("CLOSED_DENIED");
+    assertThat(fixtures.column(id, "settlement_type_code", String.class))
+        .isEqualTo("CLOSED_DENIED");
   }
 }

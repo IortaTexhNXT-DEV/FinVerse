@@ -59,7 +59,9 @@ public class ClaimsSetupApprovalSource implements PendingApprovalSource {
                 new RecordFacts(
                     "Claims list attribute",
                     c.getTypeCode() + ":" + c.getCode(),
-                    c.getAttribute() + " = " + (c.getNewValue() == null ? "(none)" : c.getNewValue()),
+                    c.getAttribute()
+                        + " = "
+                        + (c.getNewValue() == null ? "(none)" : c.getNewValue()),
                     null,
                     LINK)));
     return items;

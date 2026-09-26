@@ -66,8 +66,7 @@ public class StatusMatrix {
             .orElseThrow(
                 () ->
                     new BusinessRuleException(
-                        "BCL_UNIT_NOT_SET",
-                        "Your claims unit is not set. Contact the Unit Head"));
+                        "BCL_UNIT_NOT_SET", "Your claims unit is not set. Contact the Unit Head"));
     Set<String> allowed = new LinkedHashSet<>();
     access.findByRoleCodeIn(directory.roleCodes(username)).stream()
         .filter(row -> row.admits(unit))

@@ -49,20 +49,22 @@ class ClaimsSetupIT {
   @Autowired private ClaimStatusService statuses;
   @Autowired private ClaimClosureService closures;
   @Autowired private LovService lovs;
-  @Autowired private ClaimFixtures fixtures;
+  @Autowired private BrokerClaimFixtures fixtures;
   @Autowired private AsUser as;
   @Autowired private JdbcTemplate jdbc;
 
   private final List<Long> created = new ArrayList<>();
 
   private String newValue(String type, String label) {
-    String code = "T_" + ClaimFixtures.unique();
+    String code = "T_" + BrokerClaimFixtures.unique();
     Long id =
         as.run(
                 UH,
                 () ->
                     lovs.create(
-                        type, code, new LovDetails(label, 900, null, LocalDate.of(2020, 1, 1), null)))
+                        type,
+                        code,
+                        new LovDetails(label, 900, null, LocalDate.of(2020, 1, 1), null)))
             .getId();
     as.run(CHECKER, () -> lovs.authorize(id));
     created.add(id);
@@ -71,15 +73,15 @@ class ClaimsSetupIT {
 
   /**
    * Leaves the seeded lists as delivered (other tests count the 18 statuses, the 10 types and their
-   * attributes): the test values are deactivated, their attributes and matrix rows removed.
+   * attributes): the test values are deactivated, their attributes and test matrix rows removed.
    */
   @AfterEach
   void removeTestValues() {
     for (Long id : created) {
-      String code = jdbc.queryForObject("select code from lov_value where id = ?", String.class, id);
+      String code =
+          jdbc.queryForObject("select code from lov_value where id = ?", String.class, id);
       jdbc.update("delete from bcl_lov_attribute where code = ?", code);
-      jdbc.update(
-          "update bcl_status_access set record_status = 'INACTIVE' where status_code = ?", code);
+      jdbc.update("delete from bcl_status_access where status_code = ?", code);
       as.run(UH, () -> lovs.deactivate(id));
     }
     created.clear();
@@ -128,7 +130,9 @@ class ClaimsSetupIT {
             () ->
                 attributes.proposeStatus(
                     status, new StatusAttributes("in_progress", "insurer", "5", false)));
-    assertThat(pending.pending()).containsEntry("phase", "IN_PROGRESS").containsEntry("follow_up_days", "5");
+    assertThat(pending.pending())
+        .containsEntry("phase", "IN_PROGRESS")
+        .containsEntry("follow_up_days", "5");
     assertThat(pending.pendingBy()).isEqualTo(UH);
     assertThat(pending.attributes()).isEmpty();
     assertThat(approvals.pendingFor(ApprovalViewer.system()))
@@ -137,7 +141,9 @@ class ClaimsSetupIT {
         .isInstanceOf(BusinessRuleException.class);
     ValueAttributes applied =
         as.run(CHECKER, () -> attributes.authorize(ClaimCodes.LOV_STATUS, status));
-    assertThat(applied.attributes()).containsEntry("phase", "IN_PROGRESS").containsEntry("follow_up_days", "5");
+    assertThat(applied.attributes())
+        .containsEntry("phase", "IN_PROGRESS")
+        .containsEntry("follow_up_days", "5");
     assertThat(applied.pending()).isEmpty();
 
     StatusAccess row = as.run(UH, () -> matrix.add(status, "CLM_OFFICER", "NON_MOTOR_HO"));
@@ -147,7 +153,8 @@ class ClaimsSetupIT {
     Long company = fixtures.company();
     Long claim =
         fixtures.recorded(
-            fixtures.spec("clmofficer2", ClaimFixtures.today().minusDays(3)), "NEW_COMPLETE_DOCS");
+            fixtures.spec("clmofficer2", BrokerClaimFixtures.today().minusDays(3)),
+            "NEW_COMPLETE_DOCS");
     assertThat(as.run("clmofficer2", () -> statuses.allowedStatuses(company, claim)))
         .extracting(StatusOption::code)
         .doesNotContain(status);
@@ -157,14 +164,15 @@ class ClaimsSetupIT {
         .contains(status);
     Long motorClaim =
         fixtures.recorded(
-            fixtures.spec("clmofficer", ClaimFixtures.today().minusDays(3)), "NEW_COMPLETE_DOCS");
+            fixtures.spec("clmofficer", BrokerClaimFixtures.today().minusDays(3)),
+            "NEW_COMPLETE_DOCS");
     assertThat(as.run("clmofficer", () -> statuses.allowedStatuses(company, motorClaim)))
         .extracting(StatusOption::code)
         .doesNotContain(status);
 
     as.run("clmofficer2", () -> statuses.change(company, claim, status, null));
     assertThat(fixtures.column(claim, "next_follow_up_date", LocalDate.class))
-        .isEqualTo(ClaimFixtures.today().plusDays(5));
+        .isEqualTo(BrokerClaimFixtures.today().plusDays(5));
     as.run(UH, () -> matrix.deactivate(row.getId()));
     assertThat(as.run(UH, () -> matrix.roles()))
         .extracting(r -> r.get("code"))
@@ -178,9 +186,13 @@ class ClaimsSetupIT {
             () ->
                 as.run(
                     UH,
-                    () -> attributes.proposeSettlement(type, new SettlementAttributes(" ", true, true))))
+                    () ->
+                        attributes.proposeSettlement(
+                            type, new SettlementAttributes(" ", true, true))))
         .hasMessage("Set the outcome of the settlement type");
-    as.run(UH, () -> attributes.proposeSettlement(type, new SettlementAttributes("SETTLED", true, true)));
+    as.run(
+        UH,
+        () -> attributes.proposeSettlement(type, new SettlementAttributes("SETTLED", true, true)));
     as.run(CHECKER, () -> attributes.authorize(ClaimCodes.LOV_SETTLEMENT_TYPE, type));
     assertThatThrownBy(
             () ->
@@ -190,15 +202,20 @@ class ClaimsSetupIT {
                         attributes.proposeSettlement(
                             type, new SettlementAttributes("SETTLED", true, true))))
         .isInstanceOf(BusinessRuleException.class);
-    as.run(UH, () -> attributes.proposeSettlement(type, new SettlementAttributes("SETTLED", false, true)));
+    as.run(
+        UH,
+        () -> attributes.proposeSettlement(type, new SettlementAttributes("SETTLED", false, true)));
     as.run(UH, () -> attributes.reject(ClaimCodes.LOV_SETTLEMENT_TYPE, type));
-    as.run(UH, () -> attributes.proposeSettlement(type, new SettlementAttributes("SETTLED", false, true)));
+    as.run(
+        UH,
+        () -> attributes.proposeSettlement(type, new SettlementAttributes("SETTLED", false, true)));
     as.run(CHECKER, () -> attributes.authorize(ClaimCodes.LOV_SETTLEMENT_TYPE, type));
 
     Long company = fixtures.company();
     Long claim =
         fixtures.recorded(
-            fixtures.spec("clmofficer", ClaimFixtures.today().minusDays(2)), "NEW_COMPLETE_DOCS");
+            fixtures.spec("clmofficer", BrokerClaimFixtures.today().minusDays(2)),
+            "NEW_COMPLETE_DOCS");
     as.run(
         "clmtl",
         () ->
@@ -206,7 +223,7 @@ class ClaimsSetupIT {
                 company,
                 claim,
                 new ClaimClosureService.Settlement(
-                    type, new BigDecimal("500"), ClaimFixtures.today(), null)));
+                    type, new BigDecimal("500"), BrokerClaimFixtures.today(), null)));
     assertThat(fixtures.column(claim, "phase", String.class)).isEqualTo("NEW");
     assertThat(fixtures.column(claim, "settlement_type_code", String.class)).isEqualTo(type);
   }
@@ -221,7 +238,9 @@ class ClaimsSetupIT {
         .hasMessage("Select the claims unit");
     assertThatThrownBy(() -> as.run(UH, () -> handlers.save("ao", "MOTOR_HO", null, true)))
         .isInstanceOf(BusinessRuleException.class);
-    assertThat(as.run(UH, () -> handlers.save("clmbranch", "BRANCH_CEBU", "Cebu Claims", true)).getTeam())
+    assertThat(
+            as.run(UH, () -> handlers.save("clmbranch", "BRANCH_CEBU", "Cebu Claims", true))
+                .getTeam())
         .isEqualTo("Cebu Claims");
     assertThat(as.run(UH, () -> handlers.claimsLists()))
         .extracting(t -> t.getCode())

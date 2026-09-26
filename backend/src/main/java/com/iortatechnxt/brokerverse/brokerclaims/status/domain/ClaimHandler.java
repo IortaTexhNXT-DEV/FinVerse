@@ -6,8 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 /**
- * A claims handler of the register (BRCLM.012, NFR p.37; CLAIMS_BROKING_DESIGN 5.3): the unit of the
- * user drives the status access matrix and the default assignment, the team is shown on the
+ * A claims handler of the register (BRCLM.012, NFR p.37; CLAIMS_BROKING_DESIGN 5.3): the unit of
+ * the user drives the status access matrix and the default assignment, the team is shown on the
  * reports. Maintained by the Unit Head on Claims Setup.
  */
 @Entity

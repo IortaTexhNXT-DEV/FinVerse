@@ -90,7 +90,8 @@ public class ClaimClosureService {
     ClaimLookup.requireOpen(claim, "it");
     String type = settlement.typeCode();
     if (type == null || type.isBlank()) {
-      throw new BusinessRuleException("BCL_SETTLEMENT_TYPE_REQUIRED", "Select the type of settlement");
+      throw new BusinessRuleException(
+          "BCL_SETTLEMENT_TYPE_REQUIRED", "Select the type of settlement");
     }
     LocalDate today = ClaimAgeing.today(clock);
     lovs.requireValid(ClaimCodes.LOV_SETTLEMENT_TYPE, type, today);
@@ -158,8 +159,7 @@ public class ClaimClosureService {
       throw new BusinessRuleException(
           "BCL_STATUS_REQUIRED", "Set the status of claim " + claim.getClaimNo() + " first");
     }
-    StatusHistory.Step from =
-        new StatusHistory.Step(progress.getStatusCode(), progress.getPhase());
+    StatusHistory.Step from = new StatusHistory.Step(progress.getStatusCode(), progress.getPhase());
     progress.close(ClaimAgeing.today(clock));
     String remark = settlement.remark();
     transitions.record(

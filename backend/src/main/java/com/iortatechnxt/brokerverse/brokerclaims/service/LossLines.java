@@ -8,7 +8,8 @@ package com.iortatechnxt.brokerverse.brokerclaims.service;
  * insurer):
  *
  * <ul>
- *   <li>reserve = the insurer reserve of the line, else the initial reserve of a claim without lines;
+ *   <li>reserve = the insurer reserve of the line, else the initial reserve of a claim without
+ *       lines;
  *   <li>paid = the settled amount of the line, else the claim settlement amount at the line's share
  *       (equal shares when none is recorded);
  *   <li>O/S = max(reserve - paid, 0) while the claim is outstanding, 0 once closed (CLQ08);

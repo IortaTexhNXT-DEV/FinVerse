@@ -17,9 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * The daily reminders of the Claims jobs (BRCLM.019/022/031/034; CLAIMS_BROKING_DESIGN 9.1-9.2):
  * finds the open claims whose next follow-up date or diary due date is today (notice {@code
- * BCL_FOLLOW_UP_DUE} to the handler or assignee) or has passed (alert {@code BCL_FOLLOW_UP_OVERDUE},
- * one per claim until resolved), and the outstanding claims older than {@code BCL_PAST_DUE_DAYS}
- * (alert {@code BCL_CLAIM_PAST_DUE}, one per claim, with a notice to the handler).
+ * BCL_FOLLOW_UP_DUE} to the handler or assignee) or has passed (alert {@code
+ * BCL_FOLLOW_UP_OVERDUE}, one per claim until resolved), and the outstanding claims older than
+ * {@code BCL_PAST_DUE_DAYS} (alert {@code BCL_CLAIM_PAST_DUE}, one per claim, with a notice to the
+ * handler).
  */
 @Service
 @Transactional

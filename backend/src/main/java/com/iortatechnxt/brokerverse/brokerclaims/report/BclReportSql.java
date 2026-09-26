@@ -152,7 +152,8 @@ public class BclReportSql {
    */
   static List<ParameterSpec> asOfFilters() {
     List<ParameterSpec> specs = filters();
-    specs.add(1, ParameterSpec.required(AS_OF, "As of date", ParameterType.DATE).withDefault("TODAY"));
+    specs.add(
+        1, ParameterSpec.required(AS_OF, "As of date", ParameterType.DATE).withDefault("TODAY"));
     return specs;
   }
 
@@ -168,9 +169,12 @@ public class BclReportSql {
   static List<ParameterSpec> rangeFilters(String from, String to, String label, boolean required) {
     List<ParameterSpec> specs = filters();
     if (required) {
-      specs.add(1, ParameterSpec.required(from, label + " from", ParameterType.DATE)
-          .withDefault("MONTH_START"));
-      specs.add(2, ParameterSpec.required(to, label + " to", ParameterType.DATE).withDefault("TODAY"));
+      specs.add(
+          1,
+          ParameterSpec.required(from, label + " from", ParameterType.DATE)
+              .withDefault("MONTH_START"));
+      specs.add(
+          2, ParameterSpec.required(to, label + " to", ParameterType.DATE).withDefault("TODAY"));
     } else {
       specs.add(1, ParameterSpec.optional(from, label + " from", ParameterType.DATE));
       specs.add(2, ParameterSpec.optional(to, label + " to", ParameterType.DATE));
@@ -194,7 +198,8 @@ public class BclReportSql {
             case DATE -> p.optionalDate(name).orElse(null);
             case COMPANY, BRANCH -> p.optionalLong(name).orElse(null);
             case NUMBER -> p.optionalDecimal(name).map(Number::intValue).orElse(null);
-            default -> p.optionalText(name).map(String::strip).filter(s -> !s.isEmpty()).orElse(null);
+            default ->
+                p.optionalText(name).map(String::strip).filter(s -> !s.isEmpty()).orElse(null);
           };
       args.put(name, value);
     }

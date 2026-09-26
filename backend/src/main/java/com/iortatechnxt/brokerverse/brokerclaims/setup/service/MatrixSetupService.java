@@ -21,9 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The status access matrix on Claims Setup (BRCLM.012/013, FR-CL-041): the Unit Head adds a row
- * (status, role, unit or any unit), another BCL_SETUP user authorizes it before it takes effect, and
- * a row is deactivated, never deleted. The roles offered are those that may record claims or change
- * their status.
+ * (status, role, unit or any unit), another BCL_SETUP user authorizes it before it takes effect,
+ * and a row is deactivated, never deleted. The roles offered are those that may record claims or
+ * change their status.
  */
 @Service
 @Transactional
@@ -145,7 +145,8 @@ public class MatrixSetupService {
 
   private void validate(String statusCode, String roleCode, String unit) {
     if (statusCode == null || statusCode.isBlank() || roleCode == null || roleCode.isBlank()) {
-      throw new BusinessRuleException("BCL_MATRIX_ROW_INCOMPLETE", "Select the status and the role");
+      throw new BusinessRuleException(
+          "BCL_MATRIX_ROW_INCOMPLETE", "Select the status and the role");
     }
     requireValue(ClaimCodes.LOV_STATUS, statusCode);
     if (unit != null) {

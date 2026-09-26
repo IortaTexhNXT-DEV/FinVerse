@@ -30,7 +30,8 @@ class AttributeRulesTest {
             () -> AttributeRules.status(new StatusAttributes("CLOSED", "INSURER", null, false)))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessage("Set the phase of the status");
-    assertThatThrownBy(() -> AttributeRules.status(new StatusAttributes("NEW", "NOBODY", null, false)))
+    assertThatThrownBy(
+            () -> AttributeRules.status(new StatusAttributes("NEW", "NOBODY", null, false)))
         .hasMessage("Select the party the claim waits on");
   }
 
@@ -51,7 +52,8 @@ class AttributeRulesTest {
         .containsEntry("outcome", "SETTLED")
         .containsEntry("closes_claim", "true")
         .containsEntry("requires_settlement_amount", "false");
-    assertThatThrownBy(() -> AttributeRules.settlement(new SettlementAttributes("PAID", true, true)))
+    assertThatThrownBy(
+            () -> AttributeRules.settlement(new SettlementAttributes("PAID", true, true)))
         .hasMessage("Set the outcome of the settlement type");
   }
 

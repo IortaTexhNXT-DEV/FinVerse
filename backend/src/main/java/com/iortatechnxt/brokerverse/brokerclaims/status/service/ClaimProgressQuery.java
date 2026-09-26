@@ -197,7 +197,11 @@ public class ClaimProgressQuery {
    * @param closedOn closure date
    */
   public record SettlementView(
-      String typeCode, String typeLabel, BigDecimal amount, LocalDate dateSettled, LocalDate closedOn) {}
+      String typeCode,
+      String typeLabel,
+      BigDecimal amount,
+      LocalDate dateSettled,
+      LocalDate closedOn) {}
 
   /**
    * Follow-up of a claim.

@@ -38,9 +38,7 @@ public class StatusRules {
    * @param lovs lists of values (labels)
    */
   public StatusRules(
-      ClaimLovAttributeRepository attributes,
-      SystemParameterService parameters,
-      LovService lovs) {
+      ClaimLovAttributeRepository attributes, SystemParameterService parameters, LovService lovs) {
     this.attributes = attributes;
     this.parameters = parameters;
     this.lovs = lovs;

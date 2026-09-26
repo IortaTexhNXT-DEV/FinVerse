@@ -67,9 +67,9 @@ KINDS = {
     "Registers": "Register",
     "Decks": "Deck",
     "Alignment": "Alignment pack",
-    "Change_Management": "Change management",
+    "Change_Management": "Change register",
 }
-NAME_RE = re.compile(r"BIBS_(?P<type>[A-Za-z]+)_(?P<brd>BRD-\d\d)_(?P<name>.+?)_v(?P<ver>\d+\.\d+)\.(?P<ext>\w+)$")
+NAME_RE = re.compile(r"BIBS_(?P<type>[A-Za-z_]+?)_(?P<brd>BRD-\d\d)_(?P<name>.+?)_v(?P<ver>\d+\.\d+)\.(?P<ext>\w+)$")
 
 
 def describe(path: Path, kind: str) -> tuple[str, str, str, str]:
@@ -78,8 +78,9 @@ def describe(path: Path, kind: str) -> tuple[str, str, str, str]:
     if m:
         label = KINDS.get(kind, kind)
         name = m["name"]
-        if kind == "TestPlans":
-            label = "Test plan summary (Word)" if name.endswith("_Summary") else "Test plan workbook (Excel)"
+        if kind in ("TestPlans", "Change_Management"):
+            label = f"{label} summary (Word)" if name.endswith("_Summary") else f"{label} workbook (Excel)"
+            label = label[0].upper() + label[1:]
             name = name.removesuffix("_Summary")
         return name.replace("_", " "), m["brd"], label, m["ver"]
     return path.stem.replace("_", " "), "-", KINDS.get(kind, kind), "-"

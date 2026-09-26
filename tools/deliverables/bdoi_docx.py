@@ -362,6 +362,7 @@ class BdoiDocument:
         self._toc_anchor: Paragraph | None = None
         self._toc_paragraphs: list[Any] = []
         self._first_body_heading = True
+        self._cover_end: Any = None
         self._setup_page(self.doc.sections[0])
         self._setup_styles()
         self._header_footer(self.doc.sections[0])
@@ -602,7 +603,7 @@ class BdoiDocument:
             add_inline(b, v, size=10, colour=brand.NEAR_BLACK, bold=(k == "Classification"))
 
         gap = doc.add_paragraph()
-        gap.paragraph_format.space_before = Pt(150 if len(facts) >= 6 else 180)
+        gap.paragraph_format.space_before = Pt(130 if len(facts) >= 6 else 160)
         gap.paragraph_format.space_after = Pt(0)
         foot = doc.add_paragraph()
         _para_border(foot, "top", 4, brand.BORDER, space=6)
@@ -617,7 +618,10 @@ class BdoiDocument:
         r = note.add_run(f"{brand.PLATFORM}. This document is confidential to {brand.CLIENT} and iorta TechNXT.")
         r.font.size = Pt(7.5)
         r.font.color.rgb = RGBColor.from_string(brand.PLACEHOLDER)
-        self.page_break()
+        # No page-break paragraph here: when Word lays the cover out a little taller than LibreOffice,
+        # such a paragraph lands on page 2 and pushes the front matter to page 3, leaving page 2 blank.
+        # save() gives the first block after the cover "page break before" instead (_break_after_cover).
+        self._cover_end = note._p
 
     def front_heading(self, text: str) -> Paragraph:
         """A heading of the front matter (not numbered, not in the table of contents)."""
@@ -1070,9 +1074,27 @@ class BdoiDocument:
         r.append(fc)
         para._p.append(r)
 
+    def _break_after_cover(self) -> None:
+        """Starts the block after the cover on a new page with "page break before" on its first
+        paragraph (a table gets an empty lead paragraph that carries it). Unlike a break paragraph at
+        the end of the cover, this never leaves an empty page when the cover fills its page."""
+        if self._cover_end is None:
+            return
+        nxt = self._cover_end.getnext()
+        while nxt is not None and nxt.tag == qn("w:bookmarkEnd"):
+            nxt = nxt.getnext()
+        if nxt is None or nxt.tag == qn("w:sectPr"):
+            return
+        if nxt.tag != qn("w:p"):
+            lead = OxmlElement("w:p")
+            nxt.addprevious(lead)
+            nxt = lead
+        Paragraph(nxt, self._cover_end.getparent()).paragraph_format.page_break_before = True
+
     def save(self, path: str | Path) -> Path:
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
+        self._break_after_cover()
         if self._toc_anchor is not None and not self._toc_paragraphs:
             self._write_toc(None)
         props = self.doc.core_properties

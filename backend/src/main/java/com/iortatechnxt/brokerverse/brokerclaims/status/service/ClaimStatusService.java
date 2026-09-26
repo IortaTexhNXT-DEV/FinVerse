@@ -76,8 +76,8 @@ public class ClaimStatusService {
   /**
    * Sets the first status of a claim being recorded (FR-CL-042 R1): called by the recording service
    * of CL1-A inside its transaction, after the claim is saved and its {@code BCL_RECORD} permission
-   * checked (through {@code ClaimRecordedListener}). The recording rules choose the first status
-   * (a newly filed one), so the status access matrix is not applied to it. Opens or aligns the
+   * checked (through {@code ClaimRecordedListener}). The recording rules choose the first status (a
+   * newly filed one), so the status access matrix is not applied to it. Opens or aligns the
    * workflow case in the stage of the status's phase and publishes {@code ClaimStatusChanged} with
    * {@code from = null}.
    *

@@ -611,8 +611,9 @@ What wave CL1-B built on top of section 17 (package `brokerclaims.{status,diary,
   (`BCL-OUTSTANDING-PAST-DUE`), owner `SYSTEM`.
 - **Status engine.** `ClaimProgress` has the mutators (`changeStatus`, `scheduleFollowUp`, `overrideFollowUp`,
   `planNextAction`, `assignAdjuster`, `settle`, `close`, `reopen`); only `brokerclaims.status` calls them.
-  `ClaimStatusService.recordInitialStatus(claim, statusCode, remark)` (called by CL1-A's recording service in its
-  transaction), `change(companyId, claimId, statusCode, remark)`, `allowedStatuses(companyId, claimId)`;
+  `ClaimStatusService.recordInitialStatus(claim, statusCode, remark)`, called by `ClaimRecordedListener` on CL1-A's
+  `ClaimRecorded` inside the recording transaction (default `NEW_INCOMPLETE_DOCS`; the matrix is not applied to the
+  first status, which the recording rules choose), `change(companyId, claimId, statusCode, remark)`, `allowedStatuses(companyId, claimId)`;
   `ClaimClosureService.settle(...)` / `reopen(...)`; `ClaimFollowUpService.overrideFollowUp / planNextAction /
   assignAdjuster`. Every change goes through `StatusTransitions`: `bcl_status_history` row (days in the previous
   status), workflow stage, audit, in-app `BCL_STATUS_CHANGED` to the account officer, then `ClaimStatusChanged`
@@ -635,11 +636,12 @@ What wave CL1-B built on top of section 17 (package `brokerclaims.{status,diary,
   `BCL_CLAIM_PAST_DUE` once per outstanding claim older than `BCL_PAST_DUE_DAYS`, notice to the handler).
   `BCL_PREMIUM_RECHECK` is CL1-A's (premium side).
 - **Reports** (all `ReportMetadata.claimsHandling`, the extract with `BCL_DATA_EXTRACT`): the twelve codes of
-  section 10. The as-of date may not be in the future ("The as-of date cannot be in the future"); ranges use the
+  section 10 (the tests are `BrokerClaimsReportsIT`). The as-of date may not be in the future ("The as-of date cannot be in the future"); ranges use the
   engine message "<to> must not be before <from>". Loss figures come from `brokerclaims.service.LossLines` (paid =
   line settled amount, else the claim settlement amount at the line share; O/S = max(reserve - paid, 0) while open),
   which `ClaimExperienceQueryService.summary(arn, policyYear)` also uses. The activity log adds the entries of every
-  `brokerclaims.report.ClaimActivitySource` bean (port for CL1-A: insurer updates, location reference changes).
+  `brokerclaims.report.ClaimActivitySource` bean; `InsurerActivitySource` contributes the insurer updates, reserve
+  amendments and location reference changes (old and new reference) from the CL1-A tables.
 - **API.** `/api/v1/broker-claims/{id}/progress|history|allowed-statuses|status|settlement|reopen|follow-up|
   action-plan|adjuster|diary`, `/diary/mine`, `/diary/{entryId}/done`, `/home`, `/worklist`, `/assignees`,
   `/reassign`, `/experience?arn=&policyYear=`, `/setup/attributes/{list}`, `/setup/statuses/{code}/attributes`,
@@ -647,8 +649,9 @@ What wave CL1-B built on top of section 17 (package `brokerclaims.{status,diary,
   `/setup/lists`. Every claim call carries `companyId`.
 - **Frontend.** Pages Claims Home, Claims Worklist (reassign with WORK_ASSIGN), My Diary, Claims Setup (Status
   Attributes, Settlement Types, Status Access Matrix, Claims Handler Register, Claims Lists through the list-of-values
-  API with the owner permission) and Claims Reports. Components for the claim record page of CL1-A:
-  `status/ClaimStatusPanel` (status, ages, follow-up, action plan and the status actions), `status/HistoryTab` and
-  `diary/DiaryTab` (props `claimId`, `companyId`).
+  API with the owner permission) and Claims Reports. On the claim record of CL1-A: `status/ClaimStatusPanel`
+  (status, flags, ages, follow-up, adjuster, settlement, action plan) under the summary card,
+  `status/ClaimStatusActions` in `record/ClaimActions.tsx` (Change Status, Set Settlement, Override Follow-up Date,
+  Assign Adjuster, Reopen) and the Diary and History tabs in `record/ClaimPage.tsx`.
 - **Not built here.** The claim-level demo storyline (status history, diary) extends CL1-A's `BrokerClaimsDemoData`
   at CL2; the handler register has no maker-checker columns (CL0 table), changes are audited.

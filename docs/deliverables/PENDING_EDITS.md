@@ -43,3 +43,14 @@ dormant.
 
 When this work is merged into `main`, it is merged as a single squash commit authored by iorta TechNXT, with a plain
 descriptive message. The working branch is deleted afterwards. `main` then carries one clean, reviewed change.
+
+## From Data Migration v1.2 (26-Sep-2026)
+
+- Renewal design and FRS BRD-06: the `PACKAGE_REMAP` sanitation check (reads the R06 package map; Exception bucket for
+  the Renewal processing team) with its message; `LegacyPolicySource.goLiveCandidates` (window to 31-May-2028 via
+  `MIG_GOLIVE_RENEWAL_TO`, URGENT flag to 31-Jan-2028 via `MIG_RENEWAL_URGENT_TO`, advices already sent from P03 not re-sent,
+  daily extraction skips headers that already have a candidate); the Renewal service holding the package map.
+- `tools/deliverables/brand.py`: add `RECOMMENDED` to `STATUS_COLOURS`. `drop_index.py`: skip the `_previews/` folders.
+- Register: DCR-240, 241 and 243 texts to the final answers (no carried cohorts; remapping at sanitation); DCR-242 to
+  answered-with-recommendation.
+- Deliverables README and PROGRAMME_ALIGNMENT: Data Migration set at v1.2 (44 FRs, 181 test cases, objects G03 / G03D).

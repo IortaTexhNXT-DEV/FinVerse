@@ -1,5 +1,5 @@
 // BRD-13 Data Migration: migration calendar on the BDOI timeline (FRS section 2.4; BRID 12.1).
-// Go-live January 2028 (proposed Monday 3 January 2028). Colour tokens are replaced by tools/deliverables before
+// Go-live January 2028 (recommended Monday 3 January 2028, at the year-end boundary). Colour tokens are replaced by tools/deliverables before
 // rendering. Four rows of three, read left to right.
 digraph dm_cutover {
   graph [rankdir=TB, fontname="Arial", nodesep=0.45, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true];
@@ -9,7 +9,7 @@ digraph dm_cutover {
 
   a1 [label=<<b>Sep-Oct 2026</b><br/><font point-size="10">object decisions (G1),<br/>layouts, code map owners</font>>];
   a2 [label=<<b>Nov 2026-Mar 2027</b><br/><font point-size="10">build in mock order;<br/>first extracts, profiling</font>>];
-  a3 [label=<<b>Apr 2027: Mock 1 (SIT)</b><br/><font point-size="10">reference data and clients<br/>first; headers, renewals</font>>, fillcolor="@DIRTY_WHITE"];
+  a3 [label=<<b>Apr 2027: Mock 1 (SIT)</b><br/><font point-size="10">reference data and clients<br/>first; headers, RA file</font>>, fillcolor="@DIRTY_WHITE"];
 
   b1 [label=<<b>Jul 2027: Mock 2 (SIT)</b><br/><font point-size="10">all objects end to end,<br/>reconciliation L1-L5</font>>, fillcolor="@DIRTY_WHITE"];
   b2 [label=<<b>Aug and Oct 2027</b><br/><font point-size="10">Mock 3 UAT load, Mock 4<br/>UAT refresh (timed)</font>>, fillcolor="@DIRTY_WHITE"];
@@ -17,11 +17,11 @@ digraph dm_cutover {
 
   c1 [label=<<b>20 Dec 2027 (T-14)</b><br/><font point-size="10">production pre-load:<br/>reference, clients, deltas</font>>, fillcolor="@AMBER_BG"];
   c2 [label=<<b>27 Dec 2027 (T-7)</b><br/><font point-size="10">code map freeze,<br/>reference change freeze</font>>, fillcolor="@AMBER_BG"];
-  c3 [label=<<b>31 Dec 2027 (T-3)</b><br/><font point-size="10">legacy EOD, year-end close,<br/>freeze, legacy read-only</font>>, fillcolor="@YELLOW"];
+  c3 [label=<<b>31 Dec 2027 (T-3)</b><br/><font point-size="10">legacy EOD, freeze; legacy<br/>GL for FY2027 only</font>>, fillcolor="@YELLOW"];
 
-  d1 [label=<<b>1 Jan 2028 (T-2)</b><br/><font point-size="10">final extracts, snapshot,<br/>loads in order</font>>, fillcolor="@YELLOW"];
+  d1 [label=<<b>1 Jan 2028 (T-2)</b><br/><font point-size="10">final extracts, snapshot,<br/>loads, provisional GL</font>>, fillcolor="@YELLOW"];
   d2 [label=<<b>2 Jan 2028 (T-1)</b><br/><font point-size="10">reconciliation, sign-offs,<br/>go / no-go 18:00</font>>, fillcolor="@YELLOW"];
-  d3 [label=<<b>3 Jan 2028 (T) and after</b><br/><font point-size="10">go-live, hypercare,<br/>run-off, decommissioning</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  d3 [label=<<b>3 Jan 2028 (T) and after</b><br/><font point-size="10">go-live, hypercare,<br/>true-ups to Apr 2028</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
 
   { rank=same; a1; a2; a3; }
   { rank=same; b1; b2; b3; }

@@ -13,7 +13,7 @@
 # type: Text, Code, Date, Timestamp, Amount, Integer, Decimal, Flag. mandatory: Y, N, C (conditional, see rule).
 
 meta:
-  version: "1.1"
+  version: "1.2"
   date: 26 September 2026
   issue_date: 26 Sep 2026
 
@@ -25,13 +25,13 @@ decision_classes:
   - [EXCLUDED, "Not migrated; rebuilt in BIBS or not needed"]
 
 milestones:
-  - [M0, "Pack issued to BDOI (v1.1 on the BDOI programme calendar)", "26 Sep 2026"]
+  - [M0, "Pack issued to BDOI (v1.2 with the BDOI answers to DMQ36-DMQ39)", "26 Sep 2026"]
   - [M1, "Build-shaping decisions (answers that change what is built)", "16 Oct 2026"]
   - [M2, "Owners, stewards, keys and remaining business rules; object decisions signed (gate G1); layouts frozen, version 1 (G2 part 1) - end of requirements and mapping", "30 Oct 2026"]
   - [M3, "First full extracts in the templates, with control files and volumes (profiling, performance sizing)", "29 Jan 2027"]
   - [M4, "Extracts for Mock 1 (SIT migration starts); reference data and clients first", "9 Apr 2027"]
   - [M5, "Code maps approved for Mock 2 (G2), including the PACKAGE map", "18 Jun 2027"]
-  - [M6, "Cut-over date and window, fallback and decommissioning criteria agreed", "1 Oct 2027"]
+  - [M6, "Cut-over date and window, fallback and decommissioning criteria agreed; Comptrollership confirms the year-end option A (DMQ39)", "1 Oct 2027"]
 
 # --------------------------------------------------------------------------------------------------------------
 # Data object register. decision: MIGRATE / CARRY_FORWARD / CONDITIONAL / ARCHIVE / EXCLUDED (proposal; BDOI
@@ -133,23 +133,23 @@ objects:
     bound: A few hundred codes
     layouts: [R05]
   - code: R06
-    name: Packages (active package versions)
+    name: PACKAGE code map (legacy package and version to BIBS package version)
     category: Reference
     decision: MIGRATE
-    rationale: Renewals of packaged policies need the active package version (BRD-3). Legacy packages are remapped to the package names TSU maintains in BIBS through the PACKAGE code map at upload (recommendation, DMQ36).
-    source: QPS
-    target: cat_product_version, cat_package_insurer, cat_package_insurer_term
-    owner: Product Owner, MBS; TSU
-    steward: MBS data steward (to name)
-    history: Active versions only
-    delta: None
+    rationale: Packages are remapped at sanitation in Renewal, not at migration intake (DMQ36, answered 26-Sep-2026). The migration loads the PACKAGE code map as reference data only; the Renewal check PACKAGE_REMAP uses it and sends unmapped packages to the Exception bucket, worked by the Renewal processing team. The BIBS packages themselves are maintained by TSU in Product Maintenance (BRD-3) and are not migrated.
+    source: QPS (legacy packages); TSU (BIBS package versions)
+    target: Renewal package map, through the Renewal service that maintains it (check PACKAGE_REMAP)
+    owner: Product Owner, MBS (approves); TSU (prepares)
+    steward: TSU (to name)
+    history: Legacy packages of in-force policies
+    delta: New map versions until the map freeze (T-7 days)
     format: XLSX or CSV
-    controls: Row count
-    due: M3
+    controls: Row count; count of distinct (legacy_package_code, legacy_package_version)
+    due: M5; final at T-7
     order: 3
-    brd: BRID 3.1
+    brd: BRID 3.1, 12.1
     questions: DMQ08, DMQ36
-    bound: Under 200 packages
+    bound: Under 200 legacy packages
     layouts: [R06]
   - code: R07
     name: Commission rates by insurer and product
@@ -326,19 +326,19 @@ objects:
     name: In-force policy headers
     category: Policy
     decision: CONDITIONAL
-    rationale: Needed to locate active coverage, to endorse legacy invoices (BRID 9) and to renew in BIBS (BRID 12.1); the scope condition is decided by BDOI (DMQ09).
+    rationale: Needed to locate active coverage, to endorse legacy invoices (BRID 9) and to renew in BIBS (BRID 12.1); the scope condition is decided by BDOI (DMQ09). Whatever it is, every policy expiring from T to 31-May-2028 and every renewal term booked in legacy that starts on or after T are in scope, because the go-live renewal extraction works only from the headers (DMQ37). The legacy package is kept as given; it is remapped at Renewal sanitation (DMQ36).
     source: QPS, EBIX
     target: acc_account through AccountService.importLegacy (new)
     owner: Head, Operations
     steward: Operations data steward (to name)
-    history: Policies in force at T (DMQ09)
+    history: Policies in force at T (DMQ09); at least every expiry from T to 31-May-2028 and every booked renewal term starting on or after T
     delta: Single load after the freeze
     format: CSV
     controls: Row count; sum of sum_insured and gross_premium per currency; count of distinct legacy_policy_ref
     due: M3; final at T-2
     order: 7
     brd: BRID 4.1
-    questions: DMQ09, DMQ22, DMQ36
+    questions: DMQ09, DMQ22, DMQ36, DMQ37
     bound: 250,000-310,000 renewable accounts a year (umbrella p.44-45)
     layouts: [P01, P01S]
   - code: P02
@@ -361,23 +361,23 @@ objects:
     bound: To supply
     layouts: [H01]
   - code: P03
-    name: RMEL cohorts January to May 2028 (renewals prepared in legacy, not booked at the freeze)
+    name: Renewal advices already sent before go-live (RA-sent file)
     category: Policy
-    decision: CARRY_FORWARD
-    rationale: Policies expiring from T to T + 140 days (January to May 2028 for a January 2028 go-live) are in their renewal cycle in legacy at the freeze; the renewals not yet booked continue in BIBS Renewal with their disposition and are placed and booked in BIBS (BRID 12.1; DMQ26, DMQ37). The early renewal release of the concept paper is superseded by the single January 2028 go-live.
-    source: Legacy RMEL extract (EBIX, QPS); Marketing disposition files
-    target: mig_legacy_candidate served to Renewal (LegacyPolicySource)
-    owner: Heads, Retail and Corporate Marketing (Renewal)
-    steward: Renewal data steward (to name); TSU for packages
-    history: Expiries from T to T + 140 days (3-Jan to 22-May-2028 for T = 3-Jan-2028)
-    delta: One file per cohort month in the mocks; single final load after the freeze
-    format: CSV or XLSX
-    controls: Row count and count of distinct legacy_policy_ref per rmel_month; sums of expiring and proposed premium per currency
-    due: M3; final at T-2
+    decision: MIGRATE
+    rationale: The January-May 2028 expiries are processed in BIBS after go-live from a go-live extraction of the migrated headers (DMQ37, answered 26-Sep-2026); no renewal candidate is carried. The RAs already sent by hand before go-live, kept in the Excel trackers of the Renewal processing team (DMQ38), are loaded as a small reference file so that BIBS does not send them again.
+    source: Excel RA trackers of the Renewal processing team
+    target: mig_ra_sent, served to Renewal with the header in the go-live extraction (LegacyPolicySource)
+    owner: Head of the Renewal processing team
+    steward: Renewal processing team - makers (corrections) and checkers (resubmission approval)
+    history: RAs sent before go-live for expiries from T to 31-May-2028
+    delta: One file in every mock; final file with the RAs sent up to T-5; resubmissions of corrected rows until T-1 12:00
+    format: XLSX template (P03_template.xlsx) or CSV
+    controls: Row count; count of distinct legacy_policy_ref; sum of proposed_premium per currency
+    due: M4 (Mock 1); final at T-5
     order: 13
     brd: BRID 12.1
-    questions: DMQ26, DMQ36, DMQ37, DMQ38
-    bound: About 25,800 a month (umbrella p.44-45), 5 cohorts
+    questions: DMQ26, DMQ37, DMQ38
+    bound: Small - at most the January-May 2028 expiries with an RA sent before go-live
     layouts: [P03]
   - code: P04
     name: Submitted-policy masterlists
@@ -551,22 +551,22 @@ objects:
     bound: 55 new claims a day (umbrella p.42)
     layouts: []
   - code: G01
-    name: GL opening trial balance per account, branch and currency
+    name: GL trial balance per account, branch and currency (provisional opening; legacy TB at each true-up)
     category: GL
     decision: MIGRATE
-    rationale: The BIBS GL starts from the legacy closing balances; the legacy control-account lines go to Migration Clearing, which the F01 and F02 opening entries clear to 0.00.
+    rationale: At the year-end go-live (DMQ39, option A recommended) the BIBS GL opens from the preliminary December 2027 TB - balance-sheet accounts only, the FY2027 net result to retained earnings, legacy control-account lines to Migration Clearing, which the F01 and F02 opening entries clear to 0.00. The opening is provisional; at each true-up the legacy TB after the adjustments is sent again as reconciliation input (G03).
     source: EBIX GL, ISYS GL
-    target: jnl_batch, jnl_line (SystemJournalService, journal type OPENING)
+    target: jnl_batch, jnl_line (SystemJournalService, journal type OPENING, value date 1-Jan-2028); at a true-up, reconciliation input only
     owner: Head, Comptrollership
     steward: Comptrollership data steward (to name)
-    history: Balances at the last legacy EOD before T (after month-end close)
-    delta: Single load after the freeze
+    history: Preliminary December 2027 TB after the last legacy EOD; the legacy TB at each true-up
+    delta: Single load after the freeze; one TB per true-up (about 18-Jan-2028 and after the audited FS)
     format: XLSX or CSV with control file
     controls: Row count; total debit and total credit per branch and currency (must be equal)
-    due: M3; final at T-2
+    due: M3; final at T-2; at each true-up
     order: 12
     brd: BRID 1.1b, 5.1-8.1
-    questions: DMQ18, DMQ25, DMQ35
+    questions: DMQ18, DMQ25, DMQ35, DMQ39
     bound: A few thousand lines
     layouts: [G01]
   - code: G02
@@ -588,6 +588,25 @@ objects:
     questions: DMQ24
     bound: To supply
     layouts: [H01]
+  - code: G03
+    name: FY2027 opening-balance true-ups (legacy adjustment journals after the freeze and their open-item detail)
+    category: GL
+    decision: MIGRATE
+    rationale: The legacy GL stays open after the freeze only for the FY2027 closing and audit adjustments of Comptrollership (DMQ39). Each adjustment reaches BIBS as a controlled opening-balance adjustment journal in the opening period - after the legacy year-end close and after the audited FS - with approvals, cut-off controls and a reconciliation to the legacy TB.
+    source: EBIX GL, ISYS GL; FY2027 adjustment register of Comptrollership
+    target: jnl_batch, jnl_line (journal type OPENING, reference MIG-TU-<n>); legacy open items through LegacyInvoiceIntake.adjustOpening and UnappliedService.adjustMigratedOpening (new)
+    owner: Head, Comptrollership
+    steward: Comptrollership GL lead (prepares each true-up)
+    history: Legacy journals posted after the freeze, dated in FY2027
+    delta: One set per true-up (true-up 1 about 18-Jan-2028; final after the audited FS, about March-April 2028)
+    format: XLSX or CSV with control file
+    controls: Row count; debit and credit totals per branch and currency; count of distinct legacy_journal_no
+    due: T+16 (true-up 1); T+92 (final)
+    order: 17
+    brd: BRID 1.1b, 5.1-8.1
+    questions: DMQ18, DMQ39
+    bound: Tens to a few hundred journal lines per true-up
+    layouts: [G03, G03D]
   - code: H01
     name: Closed transactions (paid and remitted invoices, receipts, remittances, endorsements, claims, renewal advices, letters)
     category: History
@@ -724,22 +743,20 @@ layouts:
       status | Status in legacy | Code | 20 | Y | Code map STATUS:PRODUCT | As stored in legacy | ACTIVE | cat_product.record_status | Mapped | QPS
       open_item_count | Open invoices and in-force policies using the code (helps the mapping) | Integer | 9 | N | - | Digits | 4211 | - (profiling only) | 0 or more | Legacy query
   R06:
-    title: Packages (active versions)
+    title: PACKAGE code map (legacy package to BIBS package version)
     object: R06
-    key: [package_code, package_version, insurer_code]
-    hash: Count of distinct (package_code, package_version)
+    key: [legacy_package_code, legacy_package_version, qualifier, qualifier_value]
+    hash: Count of distinct (legacy_package_code, legacy_package_version)
     amounts: []
     fields: |
-      package_code | Legacy package code | Code | 20 | Y | - | As stored in legacy | PKG-HOME-01 | Code map PACKAGE to cat_product_version | Exists | QPS package tables
-      package_version | Version number in legacy | Integer | 4 | Y | - | Digits | 3 | cat_product_version version | One active version per package | QPS
-      package_name | Package name | Text | 200 | Y | - | Free text | Home Protect Plus | cat_product_version name | Not blank | QPS
-      risk_code | Product / risk code of the package | Code | 20 | Y | Code map PRODUCT | As stored in legacy | FI-HOME | cat_product_version product | Mapped | QPS
-      insurer_code | Insurer of the package | Code | 30 | Y | Code map INSURER | As stored in legacy | MAL | cat_package_insurer | Mapped | QPS
-      share_pct | Insurer share in percent | Decimal | 9,4 | N | - | Dot decimal | 100.0000 | cat_package_insurer share | Shares of a version add to 100 | QPS
-      premium_rate_pct | Package premium rate in percent | Decimal | 9,6 | N | - | Dot decimal | 0.250000 | cat_package_insurer_term rate | 0 to 100 | QPS
-      commission_rate_pct | Commission rate in percent | Decimal | 9,4 | N | - | Dot decimal | 20.0000 | cat_package_insurer_term commission | 0 to 100 | QPS
-      effective_from | Version valid from | Date | 10 | Y | - | yyyy-MM-dd | 2025-01-01 | cat_product_version effective from | Valid date | QPS
-      effective_to | Version valid to | Date | 10 | N | - | yyyy-MM-dd | - | cat_product_version effective to | Not before effective_from | QPS
+      legacy_package_code | Legacy package code | Code | 20 | Y | - | As stored in legacy | PKG-MC-PRIV | Renewal package map - legacy package | Exists in the legacy package list | QPS package tables
+      legacy_package_version | Version of the legacy package | Integer | 4 | Y | - | Digits | 3 | Renewal package map - legacy version | 0 or more | QPS package tables
+      legacy_package_name | Package name in legacy | Text | 200 | Y | - | Free text | Private Car Package 2027 | Map entry description | Not blank | QPS
+      qualifier | Attribute that splits one legacy package into several BIBS packages | Code | 20 | N | RISK_CODE, INSURER, SI_BAND | Upper case | SI_BAND | Map entry qualifier | In the list; one qualifier per entry | TSU
+      qualifier_value | Value of the qualifier (risk code, insurer code, or sum-insured band as from-to) | Text | 60 | C | - | Code, or from-to amounts with a dot decimal | 0.00-2000000.00 | Map entry qualifier value | Mandatory with a qualifier; bands of one legacy package do not overlap | TSU
+      action | MAP to a BIBS package version, or REJECT (no BIBS package) | Code | 6 | Y | MAP, REJECT | Upper case | MAP | Map entry action | In the list | TSU
+      bibs_package_version | BIBS package version maintained by TSU | Code | 40 | C | Active package versions in Product Maintenance | As in BIBS | MC-PRIVATE-STD v1 | Map entry target (cat_product_version) | Mandatory for MAP; active in Product Maintenance | TSU
+      remarks | Why the entry maps as it does | Text | 250 | N | - | Free text | Sum insured up to 2,000,000.00 | Map entry remarks | - | TSU
   R07:
     title: Commission rates by insurer and product
     object: R07
@@ -890,14 +907,14 @@ layouts:
       legacy_client_no | Client number of the assured | Code | 30 | Y | legacy_client_no of C01 | As stored in legacy | Q-0012345 | acc_account.client_id (through xref) | Client loaded | QPS, EBIX
       assured_name | Assured name as on the policy | Text | 250 | Y | - | Free text | Ana C. Reyes | acc_account.client_name (check) | Not blank | QPS
       risk_code | Product / risk code | Code | 20 | Y | Code map PRODUCT | As stored in legacy | MC-PC-COMP | acc_account.product_code | Mapped | QPS, EBIX
-      package_code | Legacy package of a packaged policy | Code | 20 | C | Code map PACKAGE | As stored in legacy | PKG-MC-PRIV | acc_account.product_version (through PACKAGE) | Mandatory for packaged policies; mapped or loaded without package with a warning (DQ-051) | QPS
-      package_version | Version of the legacy package | Integer | 4 | C | - | Digits | 3 | acc_account.product_version_no | Mandatory with package_code | QPS
+      package_code | Legacy package of a packaged policy | Code | 20 | C | - | As stored in legacy | PKG-MC-PRIV | acc_account.legacy_package_code (new); remapped at Renewal sanitation (PACKAGE_REMAP) | Mandatory for packaged policies; not mapped at load (DMQ36) | QPS
+      package_version | Version of the legacy package | Integer | 4 | C | - | Digits | 3 | acc_account.legacy_package_version (new) | Mandatory with package_code | QPS
       line_code | Line of business | Code | 30 | Y | Code map LINE | As stored in legacy | MOTOR | acc_account.line_code | Mapped; consistent with risk_code | QPS, EBIX
       cover_type_code | Cover type | Code | 30 | N | Code map COVER_TYPE | As stored in legacy | COMP | acc_account.cover_type_code | Mapped | QPS
       business_type | New business or renewal | Code | 2 | Y | NB, RB | Upper case | RB | acc_account business type (BT0) | In the list | QPS
       policy_status | Status of the term in legacy | Code | 20 | Y | Code map STATUS:POLICY | As stored in legacy | ISSUED | acc_account.status BOOKED | Mapped to an in-force status | QPS, EBIX
       inception_date | Period from | Date | 10 | Y | - | yyyy-MM-dd | 2027-03-15 | acc_account.period_from | Valid date | QPS, EBIX
-      expiry_date | Period to | Date | 10 | Y | - | yyyy-MM-dd | 2028-03-15 | acc_account.period_to | After inception_date; on or after the cutover date | QPS, EBIX
+      expiry_date | Period to | Date | 10 | Y | - | yyyy-MM-dd | 2028-03-15 | acc_account.period_to | After inception_date; on or after the cutover date; every expiry to 31-May-2028 present (go-live renewal extraction) | QPS, EBIX
       currency | Policy currency | Code | 3 | Y | ISO 4217 | Upper case | PHP | acc_account.currency | Valid code | QPS, EBIX
       sum_insured | Total sum insured | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 950000.00 | acc_account.total_sum_insured | 0 or more | QPS
       net_premium | Basic premium | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 21375.00 | acc_account.net_premium | 0 or more | QPS, EBIX
@@ -928,39 +945,25 @@ layouts:
       share_pct | Share in percent | Decimal | 9,4 | Y | - | Dot decimal | 100.0000 | Share percent | Above 0; shares of a policy add to 100 | QPS
       lead_flag | Lead insurer | Flag | 1 | Y | Y, N | Y or N | Y | Lead insurer | One lead per policy | QPS
   P03:
-    title: RMEL cohorts January to May 2028 (carried renewals)
+    title: Renewal advices already sent before go-live (RA-sent file)
     object: P03
     key: [legacy_policy_ref]
-    hash: Count of distinct legacy_policy_ref per rmel_month
-    amounts: [expiring_premium, proposed_sum_insured, proposed_premium]
+    hash: Count of distinct legacy_policy_ref
+    amounts: [proposed_premium]
     fields: |
-      legacy_policy_ref | Legacy reference of the expiring policy term | Code | 60 | Y | legacy_policy_ref of P01 | As in P01 | C-2027-004512-01 | mig_legacy_candidate.legacy_ref; account through the P01 cross-reference | Exists in P01 of the same load (DQ-018) | Legacy RMEL extract
-      cover_no | Legacy cover number of the expiring term | Text | 40 | Y | - | As stored in legacy | C-2027-004512 | Candidate cover no. | Equals the cover of the P01 header | Legacy RMEL extract
-      rmel_month | Cohort (expiry month) | Text | 7 | Y | - | yyyy-MM | 2028-01 | mig_legacy_candidate.cohort_month | = month of expiry_date | Legacy RMEL extract
-      expiry_date | Expiry of the expiring term | Date | 10 | Y | - | yyyy-MM-dd | 2028-01-15 | Candidate expiry | From the cutover date T to T + 140 days (DQ-019) | Legacy RMEL extract
-      extraction_date | Date legacy extracted the policy into the RMEL | Date | 10 | Y | - | yyyy-MM-dd | 2027-08-27 | Candidate history | Before the cutover date | Legacy RMEL extract
-      row_source | Where the disposition part of the row comes from | Code | 10 | Y | RMEL, DISPO_FILE | Upper case | DISPO_FILE | Candidate history | In the list | Consolidation by the business unit (DMQ38)
-      currency | Currency of the amounts | Code | 3 | Y | ISO 4217 | Upper case | PHP | Candidate currency | Valid code | Legacy RMEL extract
-      expiring_premium | Gross premium of the expiring term | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 25946.25 | Candidate expiring premium | Equals gross_premium of the P01 header | Legacy RMEL extract
-      expiring_package_code | Legacy package of the expiring term | Code | 20 | C | Code map PACKAGE | As stored in legacy | PKG-MC-PRIV | Candidate expiring package (mapped) | Mandatory for packaged policies; mapped or loaded as UNRESOLVED (DQ-048) | QPS
-      expiring_package_version | Version of the legacy package | Integer | 4 | C | - | Digits | 3 | Candidate expiring package version | Mandatory with expiring_package_code | QPS
-      disposition | Renewal disposition | Code | 40 | Y | Code map STATUS:RENEWAL | As stored in the disposition file | FOR_RENEWAL | Candidate stage and bucket | Mapped | Disposition file
-      disposition_date | Date of the disposition | Date | 10 | Y | - | yyyy-MM-dd | 2027-09-06 | Candidate history | Not after the freeze | Disposition file
-      not_renewal_reason | Reason of a Not for Renewal disposition | Code | 40 | C | Code map LOV:NON_RENEWAL_REASON | As stored in the disposition file | CLIENT_DECLINED | Candidate reason | Mandatory when the disposition is Not for Renewal (DQ-049) | Disposition file
-      handler_user_id | Marketing handler (AO) | Code | 50 | Y | Code map USER | As stored in legacy | mreyes | Candidate handler | Mapped in USER | Disposition file
-      tl_review_status | Team leader review of the disposition | Code | 10 | N | PENDING, POSTED, RETURNED | Upper case | POSTED | Candidate stage | In the list | Disposition file
-      insurer_status | Status with the proposed insurer | Code | 12 | N | NOT_SENT, SENT, RENEW_AS_IS, REVISE, REJECT | Upper case | RENEW_AS_IS | Candidate insurer response (BRRN.035) | In the list | Disposition file
-      proposed_insurer_code | Insurer proposed for the renewal | Code | 30 | N | Code map INSURER | As stored in legacy | MAL | Candidate insurer | Mapped | Disposition file
-      proposed_package_code | Package proposed for the renewal | Code | 20 | N | Code map PACKAGE | As stored in legacy | PKG-MC-PRIV | Candidate proposed package | Mapped or loaded as UNRESOLVED (DQ-048) | Disposition file
-      proposed_sum_insured | Sum insured proposed for the renewal | Amount | 19,2 | N | - | Dot decimal, 2 decimals | 900000.00 | Candidate proposed sum insured | 0 or more | Disposition file
-      proposed_premium | Gross premium proposed for the renewal | Amount | 19,2 | N | - | Dot decimal, 2 decimals | 24650.00 | Candidate proposed premium | 0 or more | Disposition file
-      ra_sent_flag | Renewal advice sent to the client | Flag | 1 | Y | Y, N | Y or N | Y | Candidate RA status (not sent again) | Y or N | Disposition file
-      ra_sent_date | Date the RA was sent | Date | 10 | C | - | yyyy-MM-dd | 2027-10-18 | Candidate RA status | Mandatory when ra_sent_flag is Y (DQ-049) | Disposition file
-      ra_no | Legacy RA reference | Text | 30 | N | - | As printed | RA-2027-018833 | Candidate RA reference | - | Disposition file
-      ffy_flag | Free first year account | Flag | 1 | N | Y, N | Y or N | N | Candidate FFY flag (RA template) | Y or N | QPS
-      submitted_policy_flag | Policy of a submitted-policy masterlist (BRD-12) | Flag | 1 | N | Y, N | Y or N | N | Candidate source SUBMITTED_POLICY | Y or N | Masterlist
-      placement_status | Placement of the renewal at the freeze | Code | 12 | Y | NOT_PLACED, PLACED, BOUND | Upper case | NOT_PLACED | - (check only) | NOT_PLACED; PLACED or BOUND is an in-flight item (DQ-050, DMQ33) | Disposition file
-      remarks | Handler remarks | Text | 500 | N | - | Free text | Client asked for a quote with higher SI | Candidate remarks | - | Disposition file
+      legacy_policy_ref | Legacy reference of the expiring policy term | Code | 60 | Y | legacy_policy_ref of P01 | As in P01 | C-2027-004512-01 | mig_ra_sent.legacy_ref; account through the P01 cross-reference | Exists in P01 of the same load (DQ-018) | Excel RA tracker
+      cover_no | Legacy cover number of the expiring term | Text | 40 | Y | - | As stored in legacy | C-2027-004512 | mig_ra_sent cover no. (check) | Equals the cover of the P01 header | Excel RA tracker
+      expiry_date | Expiry of the expiring term | Date | 10 | Y | - | yyyy-MM-dd | 2028-01-15 | Check against the P01 expiry | Equals the P01 expiry; from T to 31-May-2028 (DQ-019) | Excel RA tracker
+      ra_sent_date | Date the RA was sent | Date | 10 | Y | - | yyyy-MM-dd | 2027-11-16 | Candidate RA sent date (not sent again) | Not after the last legacy business day (DQ-047); warning when more than 140 days before expiry (DQ-048) | Excel RA tracker
+      ra_ref | RA reference, if the tracker gives one | Text | 30 | N | - | As in the tracker | RA-2027-018833 | Candidate RA reference | - | Excel RA tracker
+      ra_channel | How the RA was sent | Code | 10 | Y | EMAIL, COURIER, HAND, OTHER | Upper case | EMAIL | Candidate RA channel | In the list | Excel RA tracker
+      sent_to | Recipient (client name or e-mail address) | Text | 250 | N | - | Free text | ana.reyes@example.com | Candidate RA recipient | Masked outside production | Excel RA tracker
+      proposed_insurer_code | Insurer quoted on the RA | Code | 30 | N | Code map INSURER | As stored in legacy | MAL | Candidate RA quoted insurer | Mapped | Excel RA tracker
+      currency | Currency of the quoted premium | Code | 3 | C | ISO 4217 | Upper case | PHP | Candidate RA currency | Mandatory with proposed_premium | Excel RA tracker
+      proposed_premium | Gross premium quoted on the RA | Amount | 19,2 | N | - | Dot decimal, 2 decimals | 24650.00 | Candidate RA quoted premium | 0 or more | Excel RA tracker
+      sent_by_user_id | Renewal processor who sent the RA | Code | 50 | N | Code map USER | As stored in legacy | mreyes | Candidate RA sender | Mapped in USER | Excel RA tracker
+      tracker_name | Tracker file and sheet the row comes from | Text | 120 | Y | - | File / sheet | Retail RA tracker Jan-2028 / MKT01 | mig_ra_sent tracker (evidence) | Not blank | Excel RA tracker
+      remarks | Remarks of the processor | Text | 500 | N | - | Free text | Client asked for a quote with higher SI | Candidate remarks | - | Excel RA tracker
   F01:
     title: Open legacy invoices - header
     object: F01
@@ -1125,7 +1128,8 @@ layouts:
     hash: Count of rows
     amounts: [debit_fc, credit_fc, debit_php, credit_php]
     fields: |
-      as_of_date | Trial balance date (last legacy EOD before the cutover) | Date | 10 | Y | - | yyyy-MM-dd | 2027-12-31 | Journal reference MIG-TB-<as-of> | One date in the file; = freeze date | EBIX GL, ISYS GL
+      tb_version | Version of the trial balance - PROVISIONAL at cut-over (preliminary December TB), then TU1, TU2 ... and FINAL (audited) at the true-ups | Code | 12 | Y | PROVISIONAL, TU1, TU2, TU3, FINAL | Upper case | PROVISIONAL | Journal reference MIG-TB-<as-of> (PROVISIONAL); true-up reconciliation input (others) | In the list; one version per file | Comptrollership
+      as_of_date | Trial balance date - 31-Dec-2027 for every version; the version says which adjustments it includes | Date | 10 | Y | - | yyyy-MM-dd | 2027-12-31 | Journal reference MIG-TB-<as-of> | One date in the file | EBIX GL, ISYS GL
       branch_code | Branch | Code | 20 | Y | Code map BRANCH | As stored in legacy | MKT01 | jnl_line branch | Mapped | EBIX GL
       currency | Account currency | Code | 3 | Y | ISO 4217 | Upper case | USD | jnl_line currency | Valid code | EBIX GL
       legacy_account_code | Legacy account | Code | 30 | Y | Code map GL_ACCOUNT | As stored in legacy | 1101-02 | jnl_line account (through GL_ACCOUNT; control accounts to Migration Clearing) | Mapped | EBIX GL
@@ -1135,6 +1139,49 @@ layouts:
       debit_php | Debit balance in PHP | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 701562.50 | jnl_line debit (base) | 0 or more | EBIX GL
       credit_php | Credit balance in PHP | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 0.00 | jnl_line credit (base) | 0 or more | EBIX GL
       fx_rate | Rate used for the PHP amount | Decimal | 12,6 | C | - | Dot decimal | 56.125000 | BOOK rate check (DMQ35) | Mandatory when currency is not PHP | EBIX GL
+  G03:
+    title: FY2027 true-up - legacy adjustment journal lines after the freeze
+    object: G03
+    key: [legacy_journal_no, line_no]
+    hash: Count of distinct legacy_journal_no
+    amounts: [debit_fc, credit_fc, debit_php, credit_php]
+    fields: |
+      trueup_no | True-up number - 1 after the legacy year-end close, 2 and 3 for interim true-ups, F for the final one after the audited FS | Code | 2 | Y | 1, 2, 3, F | As listed | 1 | mig_trueup; journal reference MIG-TU-<n> | In the list; one true-up per file | Comptrollership
+      legacy_journal_no | Legacy journal voucher number | Code | 30 | Y | - | As stored in legacy | JV-2027-12-0457 | Journal line description | In the FY2027 adjustment register (DQ-054) | EBIX GL, ISYS GL
+      line_no | Line of the legacy journal | Integer | 4 | Y | - | Digits | 1 | Journal line order | Unique per journal | EBIX GL
+      legacy_journal_date | Value date of the legacy journal | Date | 10 | Y | - | yyyy-MM-dd | 2027-12-31 | Journal line description (the BIBS value date is 1-Jan-2028) | From 1-Jan-2027 to 31-Dec-2027 (DQ-053) | EBIX GL
+      posted_at | When the journal was posted in legacy | Timestamp | 19 | Y | - | yyyy-MM-dd HH:mm:ss | 2028-01-14 10:22:05 | Cut-off evidence | After the freeze (T-3 22:00) (DQ-053) | EBIX GL audit trail
+      adjustment_kind | Year-end closing or audit adjustment | Code | 8 | Y | CLOSING, AUDIT | Upper case | CLOSING | mig_trueup line kind | In the list | Adjustment register
+      register_ref | Reference of the journal in the FY2027 adjustment register | Text | 20 | Y | - | As in the register | ADJ-2027-014 | Cut-off evidence | Exists in the register (DQ-054) | Adjustment register
+      branch_code | Branch | Code | 20 | Y | Code map BRANCH | As stored in legacy | MKT01 | jnl_line branch | Mapped | EBIX GL
+      currency | Account currency | Code | 3 | Y | ISO 4217 | Upper case | PHP | jnl_line currency | Valid code | EBIX GL
+      legacy_account_code | Legacy account | Code | 30 | Y | Code map GL_ACCOUNT | As stored in legacy | 5120-01 | jnl_line account (P&L to retained earnings; legacy control accounts to Migration Clearing) | Mapped; a legacy control account needs G03D detail (DQ-055) | EBIX GL
+      cost_center | Cost centre | Code | 20 | N | Code map COST_CENTER | As stored in legacy | 4100 | jnl_line cost centre | Mapped | EBIX GL
+      debit_fc | Debit in the account currency | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 80000.00 | jnl_line debit (currency) | 0 or more; debit or credit, not both | EBIX GL
+      credit_fc | Credit in the account currency | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 0.00 | jnl_line credit (currency) | 0 or more | EBIX GL
+      debit_php | Debit in PHP | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 80000.00 | jnl_line debit (base) | 0 or more; each journal balances per branch and currency (DQ-052) | EBIX GL
+      credit_php | Credit in PHP | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | 0.00 | jnl_line credit (base) | 0 or more | EBIX GL
+      fx_rate | Rate used for the PHP amount | Decimal | 12,6 | C | - | Dot decimal | 56.125000 | BOOK rate check (DMQ35) | Mandatory when currency is not PHP | EBIX GL
+      description | Journal line description | Text | 250 | Y | - | Free text | Accrual of December 2027 professional fees | jnl_line description | Not blank | EBIX GL
+      prepared_by | Legacy user who prepared the journal | Text | 50 | Y | - | As in legacy | cmp.jdelacruz | Cut-off evidence | On the Comptrollership access list | EBIX GL audit trail
+      approved_by | Legacy user who approved the journal | Text | 50 | Y | - | As in legacy | cmp.head | Cut-off evidence | On the access list; not the preparer (DQ-054) | EBIX GL audit trail
+  G03D:
+    title: FY2027 true-up - open-item detail of the lines on legacy control accounts
+    object: G03
+    key: [legacy_journal_no, line_no, item_ref, component]
+    hash: Count of rows
+    amounts: [amount]
+    fields: |
+      trueup_no | True-up number, as in G03 | Code | 2 | Y | 1, 2, 3, F | As listed | 1 | mig_trueup | Equals the G03 file | Comptrollership
+      legacy_journal_no | Legacy journal of the line | Code | 30 | Y | legacy_journal_no of G03 | As in G03 | JV-2028-AUD-0003 | Detail link | Exists in G03 | Comptrollership
+      line_no | Line of the legacy journal on the legacy control account | Integer | 4 | Y | line_no of G03 | Digits | 2 | Detail link | Exists in G03; the line is on a legacy control account | Comptrollership
+      item_kind | Legacy invoice or legacy UPP | Code | 8 | Y | INVOICE, UPP | Upper case | INVOICE | Target of the adjustment | In the list | Comptrollership
+      item_ref | Legacy invoice number (F01) or UPP reference (F02) | Code | 40 | Y | legacy_invoice_no of F01 or upp_ref of F02 | As in F01 or F02 | I00300002 | ops_invoice or csh_unapplied through the cross-reference | Item loaded (DQ-056) | Comptrollership
+      component | Component adjusted (UPP for an unapplied item) | Code | 20 | Y | BASIC, DST, PREMIUM_TAX_VAT, LGT, FST, OTHER, DTIP, COMMISSION, COMMISSION_VAT, WTAX, PR2307, UNREALIZED, DEFERRED_VAT, UPP | Upper case | BASIC | ops_invoice_component (LedgerComponent) or UPP balance | In the list | Comptrollership
+      movement | Effect on the open item | Code | 12 | Y | ADJUSTED, WRITTEN_OFF | Upper case | WRITTEN_OFF | Movement LEGACY_ADJUSTED or LEGACY_WRITTEN_OFF; event MIG_LEGACY_POSITION_TRUEUP | In the list | Comptrollership
+      currency | Currency of the item | Code | 3 | Y | ISO 4217 | Upper case | PHP | Movement currency | Equals the item currency | Comptrollership
+      amount | Change of the open balance - positive raises it, negative lowers it | Amount | 19,2 | Y | - | Dot decimal, 2 decimals | -3000.00 | Movement amount | Open balance stays within 0 and booked + adjusted (DQ-056); detail per account equals the G03 line (DQ-055) | Comptrollership
+      reason | Reason or audit finding | Text | 250 | Y | - | Free text | Audit finding 7 - uncollectible premium written off | Movement remarks | Not blank | Adjustment register
   H01:
     title: Archive records (closed transactions and history)
     object: H01
@@ -1208,16 +1255,16 @@ map_sets:
   - [LINE, Legacy line of business to BIBS product line, cat_product_line, "Product Owner, MBS", "MBS data steward", "R05, P01, F01", M5]
   - [COVER_TYPE, Legacy cover type to BIBS cover type, cat_cover_type, "Product Owner, MBS", "MBS data steward", "R05, P01", M5]
   - [PRODUCT, Legacy product / risk code to BIBS product code, cat_product, "Product Owner, MBS", "MBS data steward", "R05, R06, R07, P01, F01", M5]
-  - [PACKAGE, "Legacy package and version to the BIBS package version maintained by TSU; conditional entries (risk code, insurer, sum-insured band) where one legacy package splits (DMQ36)", cat_product_version, "Product Owner, MBS (approves); MANCOM confirms the owner", "TSU (prepares)", "R06, P01, P03", M5]
-  - [BRANCH, Legacy branch to BIBS branch, org_branch, "Head, Comptrollership", "Comptrollership data steward", "R02, R03, R11, C01, P01, F01, F02, G01", M5]
+  - [PACKAGE, "Legacy package and version to the BIBS package version maintained by TSU; conditional entries (risk code, insurer, sum-insured band) where one legacy package splits. Loaded as reference data (R06) for the Renewal sanitation check PACKAGE_REMAP; not applied at intake (DMQ36)", "Renewal package map (cat_product_version)", "Product Owner, MBS (approves)", "TSU (prepares)", R06, M5]
+  - [BRANCH, Legacy branch to BIBS branch, org_branch, "Head, Comptrollership", "Comptrollership data steward", "R02, R03, R11, C01, P01, F01, F02, G01, G03", M5]
   - [SALES_UNIT, "Legacy region, department and team to BIBS sales unit", cat_sales_unit, "Heads, Retail and Corporate Marketing", "Marketing data steward", "R03, C01, P01, F01, F02", M5]
   - [AO, Legacy AO code to BIBS account officer, cat_sales_officer, "Heads, Retail and Corporate Marketing", "Marketing data steward", R03, M5]
   - [USER, "Legacy user ID to BIBS username (AO, handler, collector, requester)", BIBS users (User Access), "Unit Head, Analytics and Risk Management", IT security administrator, "R03, C01, P01, P03, F01, F03, F04", M5]
-  - [COST_CENTER, Legacy cost centre to BIBS cost centre, Cost centre master, "Head, Comptrollership", "Comptrollership data steward", "R03, F01, G01", M5]
-  - [GL_ACCOUNT, Legacy GL account to BIBS account (legacy control accounts to Migration Clearing), coa_account, "Head, Comptrollership", "Comptrollership data steward", "R08, G01", M5]
+  - [COST_CENTER, Legacy cost centre to BIBS cost centre, Cost centre master, "Head, Comptrollership", "Comptrollership data steward", "R03, F01, G01, G03", M5]
+  - [GL_ACCOUNT, "Legacy GL account to BIBS account (legacy control accounts to Migration Clearing; lines on P&L accounts post to retained earnings in the opening and the true-ups)", coa_account, "Head, Comptrollership", "Comptrollership data steward", "R08, G01, G03", M5]
   - [BANK, Legacy bank code to BIBS bank list, Bank list (LOV), "Product Owner, Comptrollership - Disbursement", "Disbursement data steward", "R09, C03, P01, F06", M5]
   - [CURRENCY, Legacy currency code to ISO 4217, Currency master, "Head, Comptrollership", "Comptrollership data steward", All amount layouts, M5]
-  - [STATUS:<object>, "Legacy statuses per object to BIBS statuses (CLIENT, KYC, INSURER, PRODUCT, POLICY, RENEWAL for the P03 dispositions, UPP, REMITTANCE, PDC)", Status of the target record, Owner of the object, Steward of the object, "C01, R04, R05, P01, P03, F02, F04, F06", M5]
+  - [STATUS:<object>, "Legacy statuses per object to BIBS statuses (CLIENT, KYC, INSURER, PRODUCT, POLICY, UPP, REMITTANCE, PDC)", Status of the target record, Owner of the object, Steward of the object, "C01, R04, R05, P01, F02, F04, F06", M5]
   - [DISPOSITION_TYPE, Legacy UPP disposition types to BIBS disposition types, csh_disposition_type_rule, Operations - Financial Transactions, "Cashiering data steward", F02, M5]
   - [DISPOSITION_CLX, Legacy collection dispositions to BIBS collection dispositions, Collections disposition list, "Head, Operations (Collections)", "Collections data steward", F03, M5]
   - [DOCUMENT_TYPE, Legacy document types to archive document types, attachment document types, Compliance, "Compliance data steward", H02, Before archive load]
@@ -1233,7 +1280,7 @@ map_example:
   - [MIS:BUSINESS_ORIGIN, QPS, WALKIN, Walk-in, "57", CREATE, WALK_IN, Walk-in, New MIS value; authorised in the LOV master]
   - [PACKAGE, QPS, PKG-MC-PRIV v3, Private Car Package 2027, "18,240", MAP, MC-PRIVATE-STD v1, Private Car Standard, "Conditional entry - sum insured up to 2,000,000.00 (DMQ36)"]
   - [PACKAGE, QPS, PKG-MC-PRIV v3, Private Car Package 2027, "1,115", MAP, MC-PRIVATE-HV v1, Private Car High Value, "Conditional entry - sum insured above 2,000,000.00 (DMQ36)"]
-  - [PACKAGE, QPS, PKG-HOME-01 v2, Home Protect (withdrawn), "96", REJECT, "", "", "No BIBS package; loaded as UNRESOLVED and resolved by TSU in Renewal sanitation"]
+  - [PACKAGE, QPS, PKG-HOME-01 v2, Home Protect (withdrawn), "96", REJECT, "", "", "No BIBS package; at renewal the candidate goes to the Exception bucket (Renewal processing team)"]
 
 # --------------------------------------------------------------------------------------------------------------
 # Data-quality rules catalogue (R3 section 8). [id, layout, columns, kind, rule, severity, message, fixed by]
@@ -1256,8 +1303,8 @@ dq_rules:
   - [DQ-015, P01S, share_pct, CROSS_FIELD, "Shares of a policy add up to 100 and exactly one lead", ERROR, "Insurer shares add up to {x} percent", BDOI data steward]
   - [DQ-016, P01, legacy_client_no, REFERENTIAL, The client is loaded (xref) or in the same load, ERROR, "{parent} {key} is not loaded", iorta (load order) / BDOI (extract)]
   - [DQ-017, P01, "risk_code, line_code", CROSS_FIELD, The product belongs to the line (cat_product.line_code), ERROR, "Product {code} is not in line {line}", Data Steward (code map)]
-  - [DQ-018, P03, legacy_policy_ref, REFERENTIAL, The expiring policy header exists in P01 of the same load, ERROR, "Cover {no} has no migrated header", BDOI IT (extract)]
-  - [DQ-019, P03, expiry_date, CROSS_FIELD, "Expiry from the cutover date T to T + 140 days (3-Jan to 22-May-2028 for T = 3-Jan-2028)", ERROR, "Expiry {date} is outside the carried cohorts", BDOI data steward]
+  - [DQ-018, P03, legacy_policy_ref, REFERENTIAL, The expiring policy header exists in P01 of the same load, ERROR, "Cover {no} has no migrated header", Renewal processing team (maker)]
+  - [DQ-019, P03, expiry_date, CROSS_FIELD, "Expiry equals the P01 expiry and falls from the cutover date T to 31-May-2028 (MIG_GOLIVE_RENEWAL_TO)", ERROR, "Expiry {date} is outside the go-live renewal window or differs from the header", Renewal processing team (maker)]
   - [DQ-020, F01, legacy_invoice_no, UNIQUE, Invoice number unique across EBIX and QPS; a collision is prefixed with the source system (DMQ11), WARNING, "Invoice {no} exists in two source systems; loaded as {source}-{no}", iorta (loader)]
   - [DQ-021, F01, "gross_premium", CROSS_FIELD, Gross premium = sum of the booked amounts of the six premium components in F01C, ERROR, "The premium components add up to {x}; the gross premium is {y}", BDOI IT (extract)]
   - [DQ-022, F01C, "open_balance", BALANCE, "Premium components and PR2307 - open = booked + adjusted - paid - written_off; DTIP, commission, VAT on commission, WTAX - open = booked + adjusted - remitted - written_off", ERROR, "The open balance of {component} does not equal booked + adjusted - paid / remitted - written off", BDOI IT (extract)]
@@ -1285,11 +1332,14 @@ dq_rules:
   - [DQ-044, H01, "record_type, legacy_key", UNIQUE, Key unique per record type, ERROR, "{key} appears twice", BDOI IT (extract)]
   - [DQ-045, H02, "sha256, file_size_bytes", FORMAT, Checksum and size equal the received file, ERROR, "File {name} does not match its checksum", BDOI IT (transfer)]
   - [DQ-046, All, "as_of (control file)", FORMAT, "The data file agrees with its control file - SHA-256, row count, amount totals, hash total (FR-DM-010)", ERROR (extract rejected), "The file has {n} rows; the control file says {m}", BDOI IT (extract)]
-  - [DQ-047, P03 with P01, "legacy_policy_ref, expiry_date", REFERENTIAL, "Not renewed in legacy already - no P01 term of the same cover starts on this expiry", ERROR, "Cover {no} was already renewed in legacy as {ref}", Business unit (disposition file)]
-  - [DQ-048, "P03", "expiring_package_code, proposed_package_code", LOOKUP, "The package maps through the approved PACKAGE map, or the row loads with package UNRESOLVED for Renewal sanitation (DMQ36)", WARNING, "Package {code} of {source} is not mapped; the candidate goes to the Exception bucket", TSU (code map)]
-  - [DQ-049, P03, "ra_sent_date, not_renewal_reason", CROSS_FIELD, "RA date given when the RA was sent; reason given for a Not for Renewal disposition", ERROR, "{field} is mandatory for disposition {disposition}", Business unit (disposition file)]
-  - [DQ-050, P03, placement_status, CROSS_FIELD, "Only renewals not yet placed are carried; a placed or bound renewal not booked at the freeze is an in-flight item (DMQ33)", ERROR, "Cover {no} is {status} but not booked; complete it in legacy or list it for re-keying", "Business unit; Operations"]
-  - [DQ-051, P01, package_code, LOOKUP, "The package of a packaged policy maps through the approved PACKAGE map; if not, the header loads without a package (renewal on the new-business path)", WARNING, "Package {code} of {source} is not mapped; the header is loaded without a package", TSU (code map)]
+  - [DQ-047, P03, ra_sent_date, CROSS_FIELD, The RA date is not after the last legacy business day (T-5), ERROR, "RA date {date} is after the last legacy business day", Renewal processing team (maker)]
+  - [DQ-048, P03, "ra_sent_date, expiry_date", PLAUSIBILITY, The RA date is not more than 140 days before the expiry, WARNING, "RA date {date} is more than 140 days before expiry {expiry}; check the tracker", Renewal processing team (checker)]
+  - [DQ-049, P03 with P01, "legacy_policy_ref, expiry_date", REFERENTIAL, "Not renewed in legacy already - no P01 term of the same cover starts on this expiry", ERROR, "Cover {no} was already renewed in legacy as {ref}; remove the row", Renewal processing team (maker)]
+  - [DQ-052, G03, "debit_php, credit_php, debit_fc, credit_fc", BALANCE, Each legacy journal balances per branch and currency, ERROR, "Journal {no} is out of balance by {amount} in {branch} {currency}", BDOI (Comptrollership)]
+  - [DQ-053, G03, "legacy_journal_date, posted_at", CROSS_FIELD, "Journal dated in FY2027 (1-Jan to 31-Dec-2027) and posted in legacy after the freeze (T-3 22:00)", ERROR, "Journal {no} is dated {date}, outside FY2027", BDOI (Comptrollership)]
+  - [DQ-054, G03, "register_ref, prepared_by, approved_by", REFERENTIAL, "The journal is in the FY2027 adjustment register; preparer and approver are on the Comptrollership access list and are different users", ERROR, "Journal {no} is not in the FY2027 adjustment register", BDOI (Comptrollership)]
+  - [DQ-055, G03 with G03D, "legacy_account_code, amount", BALANCE, "Per legacy journal line on a legacy control account, the G03D detail adds up to the line (branch and currency)", ERROR, "{account} adjustment of {amount} has no matching open-item detail", BDOI (Comptrollership)]
+  - [DQ-056, G03D, "item_ref, component, amount", REFERENTIAL, "The item is loaded (F01 or F02) and the adjustment keeps its open balance within 0 and booked + adjusted", ERROR, "Adjustment of {component} on {item} makes the open balance {amount}", BDOI (Comptrollership)]
 
 # --------------------------------------------------------------------------------------------------------------
 # Open decisions. [id, topic, question (short), blocks, needed by, BDOI owner, status]
@@ -1351,8 +1401,8 @@ decisions:
   - [DMQ22, Endorsement coexistence, "Confirm legacy invoices are endorsed in BIBS from cutover; types; service invoice numbering; renewal uses BIBS values", "P01 condition; DM2-A", M1, "Head, Operations", OPEN]
   - [DMQ23, Legacy change report, "Which changes count; fields, period, frequency, recipients", FR-DM-100 report, M2, Operations - Prod Recon, OPEN]
   - [DMQ24, Read-only legacy or archive, "Per legacy system - read-only (how long, who hosts, access logging) or archived in BIBS before decommissioning; record types, search keys, retention", "H01, H02, C04; DM2-B", M2, Audit / Compliance; BDOI IT, OPEN]
-  - [DMQ25, Cutover date and window, "Go-live month (M1) and exact date (M6); freeze length; last legacy EOD; month-end alignment; blackout dates", "Whole calendar; runbook", "M1 (month), M6 (date)", Program Manager, PARTIAL, "Month answered by the BDOI timeline (26-Sep-2026) - January 2028; full migration and cut-over Nov 2027-Jan 2028. Exact date proposed Monday 3 January 2028 (DMQ39)"]
-  - [DMQ26, RMEL transition, "Cohorts already extracted in legacy carried into BIBS or finished in legacy; first cohort extracted by BIBS; path of legacy renewals", "P03; Renewal build", M1, "Heads, Retail and Corporate Marketing", PARTIAL, "The cohorts concerned are the January-May 2028 expiries (T to T + 140). The concept paper's early renewal release for them is superseded by the single January 2028 go-live (BDOI, 26-Sep-2026); how they are prepared is DMQ37. First cohort extracted by BIBS - expiry T + 141 days"]
+  - [DMQ25, Cutover date and window, "Go-live month (M1) and exact date (M6); freeze length; last legacy EOD; month-end alignment; blackout dates", "Whole calendar; runbook", "M1 (month), M6 (date)", Program Manager, PARTIAL, "Month answered by the BDOI timeline (26-Sep-2026) - January 2028; full migration and cut-over Nov 2027-Jan 2028. Date 3 January 2028 at the year-end boundary recommended with DMQ39; confirmed by Comptrollership at M6"]
+  - [DMQ26, RMEL transition, "Cohorts already extracted in legacy carried into BIBS or finished in legacy; first cohort extracted by BIBS; path of legacy renewals", "P01 scope; Renewal build", M1, "Heads, Retail and Corporate Marketing", ANSWERED, "Answered by DMQ37 (26-Sep-2026) - no cohort is carried; the expiries from T to 31-May-2028 are extracted by BIBS at go-live from the migrated headers; the daily extraction then starts at the expiry of 1-Jun-2028 (extracted 13-Jan-2028)"]
   - [DMQ27, Decommissioning criteria, "Criteria and owner per legacy system; retention of the legacy database", Decommissioning checklists, M6, Program Manager; BDOI IT, OPEN]
   - [DMQ28, Volumes and quality, "Row counts per object and source, growth to go-live, known quality issues, history depth, extract owner and delta frequency", Register volumes; performance test, M3, BDOI IT, OPEN]
   - [DMQ29, Consolidated NFR, "Name, version and owner of the consolidated NFR; cutover window, load time, retention of migration evidence", NFR targets, M2, Program Manager, OPEN]
@@ -1363,7 +1413,7 @@ decisions:
   - [DMQ34, Collection history, "Carry open dispositions, promises, installment plans and collector assignments", F03, M2, "Head, Operations (Collections)", OPEN]
   - [DCR-202, Write-back to legacy, "Confirm that no contact or client update is written back to QPS / EBIX after the freeze (legacy read-only; proposal)", "C01 deltas; CSF ContactSyncGateway", M1, "Product Owner, MBS", OPEN]
   - [DMQ35, Foreign currency, "Rate for the openings of USD invoices and UPP (legacy booking rate or cutover BOOK rate); FX difference at collection", "F01, F02, G01", M2, "Head, Comptrollership", OPEN]
-  - [DMQ36, Package remapping, "Map legacy packages to the BIBS package names at upload through the approved PACKAGE map (proposal, unresolved rows to a Renewal sanitation exception) or during Renewal sanitation per account; owner of the decision and of the map (proposal - TSU prepares, Product Owner MBS approves, MANCOM confirms); legacy packages that split and on which attributes", "R06, P01, P03; PACKAGE map; DM1-C", M1, "Product Owner, MBS; TSU", OPEN]
-  - [DMQ37, January-May 2028 renewals, "Prepared in legacy from August 2027 and carried at the freeze with their disposition, then placed and booked in BIBS (proposal), or processed in BIBS only after go-live from a catch-up extraction; renewals whose new term starts before go-live placed and booked in legacy before the freeze", "P03; Renewal carried candidates and catch-up extraction", M1, "Heads, Retail and Corporate Marketing", OPEN]
-  - [DMQ38, RMEL and disposition sources, "Who produces the legacy RMEL extract; where dispositions, RA status, insurer approvals and proposed terms are kept (spreadsheets, RN BRD p.42); one consolidated disposition template per month; who reviews rejected rows and by when", "P03 layout; Mock 1 data", M2, "Heads, Retail and Corporate Marketing; BDOI IT", OPEN]
-  - [DMQ39, Year-end cut-over, "For T = Monday 3 January 2028 - last legacy business day (29 December?), year-end close complete on 31 December, late 2027 and audit adjustments after go-live, staff and bank channels over the holidays; trial-balance cut-off if a later January date is chosen", "Runbook calendar; G01", M6, Program Manager; Head of Comptrollership, OPEN]
+  - [DMQ36, Package remapping, "At upload (migration intake) or during Renewal sanitation; owner of the decision and of the map; legacy packages that split and on which attributes", "R06, P01; PACKAGE map; Renewal check PACKAGE_REMAP; DM1-C", M1, "Product Owner, MBS; TSU", ANSWERED, "BDOI 26-Sep-2026 - at sanitation in Renewal, not at migration intake. The migration loads the PACKAGE code map as reference data only (R06); P01 keeps the legacy package; the Renewal check PACKAGE_REMAP sends unmapped packages to the Exception bucket, worked by the Renewal processing team"]
+  - [DMQ37, January-May 2028 renewals, "Prepared in legacy and carried at the freeze, or processed in BIBS after go-live", "P01 scope; P03; Renewal go-live extraction", M1, "Heads, Retail and Corporate Marketing", ANSWERED, "BDOI 26-Sep-2026 - processed in BIBS after go-live; no carried candidates. Go-live extraction of every expiry from T to 31-May-2028 from the migrated headers (P01), prioritised by expiry date, January expiries flagged urgent; RAs already sent by hand loaded as a small reference file (P03) and not re-sent"]
+  - [DMQ38, RMEL and disposition sources, "Where the RMEL, dispositions and RAs are kept; who reviews rejected rows", "P03 template and review", M2, "Head of the Renewal processing team", ANSWERED, "BDOI 26-Sep-2026 - RMEL and dispositions are kept in Excel; rejected rows are reviewed by the Renewal processing team, maker and checker. Only the RAs already sent are taken from the trackers (XLSX template, rejection report with correction columns, maker-checker resubmission)"]
+  - [DMQ39, Year-end cut-over, "Go-live at the year-end boundary; last business day; year-end close; late 2027 and audit adjustments after go-live", "Runbook calendar; G01, G03; true-up build (DM1-A)", M6, Program Manager; Head of Comptrollership, RECOMMENDED, "BDOI 26-Sep-2026, recommendation awaiting Comptrollership confirmation - option A - go-live Mon 3-Jan-2028; legacy closes FY2027; provisional opening TB (balance sheet only) from the preliminary December TB; legacy GL open only for FY2027 closing and audit adjustments; true-ups as opening-balance adjustment journals after the legacy close (about mid-late January 2028) and after the audited FS (about March-April 2028); December soft close by about 20-Dec-2027. Options B (April 2028, YTD P&L) and C (two books in Q1 2028) not recommended"]

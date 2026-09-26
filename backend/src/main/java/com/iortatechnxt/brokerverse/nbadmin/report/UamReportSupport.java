@@ -288,6 +288,17 @@ final class UamReportSupport {
    * @return true when it matches
    */
   static boolean matches(String filter, String value) {
-    return filter == null || filter.isBlank() || filter.trim().equalsIgnoreCase(value);
+    return filter == null || filter.isBlank() || same(filter.trim(), value);
+  }
+
+  /**
+   * Whether two codes or user names are the same, ignoring case.
+   *
+   * @param a first, may be null
+   * @param b second, may be null
+   * @return true when both are present and equal ignoring case
+   */
+  static boolean same(String a, String b) {
+    return a != null && b != null && String.CASE_INSENSITIVE_ORDER.compare(a, b) == 0;
   }
 }

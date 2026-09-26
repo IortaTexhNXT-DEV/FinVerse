@@ -177,18 +177,23 @@ public class UserSessionLog {
 
   private static Optional<SessionEndReason> sweepReason(
       UserSession s, AppUser owner, Instant now, Duration idleLimit) {
-    SessionEndReason reason = null;
-    if (owner != null && owner.isLocked()) {
-      reason = SessionEndReason.LOCKED;
-    } else if (owner == null || !owner.isEnabled()) {
-      reason = SessionEndReason.ADMIN_ENDED;
-    } else if (!now.isBefore(s.getExpiresAt())) {
-      reason = SessionEndReason.EXPIRED;
-    } else if (!now.isBefore(s.getLastSeenAt().plus(idleLimit))) {
-      reason = SessionEndReason.IDLE_TIMEOUT;
-    }
+    SessionEndReason reason = reasonToEnd(s, owner, now, idleLimit);
     Instant when = reason == SessionEndReason.EXPIRED ? s.getExpiresAt() : now;
     return reason != null && s.end(when, reason) ? Optional.of(reason) : Optional.empty();
+  }
+
+  private static SessionEndReason reasonToEnd(
+      UserSession s, AppUser owner, Instant now, Duration idleLimit) {
+    if (owner != null && owner.isLocked()) {
+      return SessionEndReason.LOCKED;
+    }
+    if (owner == null || !owner.isEnabled()) {
+      return SessionEndReason.ADMIN_ENDED;
+    }
+    if (!now.isBefore(s.getExpiresAt())) {
+      return SessionEndReason.EXPIRED;
+    }
+    return now.isBefore(s.getLastSeenAt().plus(idleLimit)) ? null : SessionEndReason.IDLE_TIMEOUT;
   }
 
   /**

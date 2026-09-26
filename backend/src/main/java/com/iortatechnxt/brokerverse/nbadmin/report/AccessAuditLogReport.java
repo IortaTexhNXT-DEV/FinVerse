@@ -177,8 +177,7 @@ public class AccessAuditLogReport implements ReportDefinition {
             args)) {
       String code = UamReportSupport.text(c, ACTIVITY);
       boolean profile = PROFILE_ACTIVITIES.contains(code);
-      if ((USER_CHANGES.equals(activity) && profile)
-          || (PROFILE_CHANGES.equals(activity) && !profile)) {
+      if (skipped(activity, profile)) {
         continue;
       }
       String attribute = UamReportSupport.text(c, "attribute");
@@ -192,10 +191,11 @@ public class AccessAuditLogReport implements ReportDefinition {
                   + (PLAIN_ATTRIBUTES.contains(attribute) ? "" : " (" + attribute + ")"),
               roles ? UamReportSupport.roleNames(from, roleNames) : from,
               roles ? UamReportSupport.roleNames(to, roleNames) : to,
-              UamReportSupport.text(c, "done_by"),
-              UamReportSupport.text(c, "approved_by"),
-              UamReportSupport.text(c, "request_no"),
-              UamReportSupport.text(c, SUBJECT)));
+              new Source(
+                  UamReportSupport.text(c, "done_by"),
+                  UamReportSupport.text(c, "approved_by"),
+                  UamReportSupport.text(c, "request_no"),
+                  UamReportSupport.text(c, SUBJECT))));
     }
     return rows;
   }
@@ -224,10 +224,11 @@ public class AccessAuditLogReport implements ReportDefinition {
                         + UamReportSupport.text(e, SUBJECT),
                     UamReportSupport.words(UamReportSupport.text(e, "from_status")),
                     UamReportSupport.words(UamReportSupport.text(e, "to_status")),
-                    UamReportSupport.text(e, "actor"),
-                    null,
-                    UamReportSupport.text(e, "request_no"),
-                    UamReportSupport.text(e, SUBJECT)))
+                    new Source(
+                        UamReportSupport.text(e, "actor"),
+                        null,
+                        UamReportSupport.text(e, "request_no"),
+                        UamReportSupport.text(e, SUBJECT))))
         .toList();
   }
 
@@ -248,39 +249,36 @@ public class AccessAuditLogReport implements ReportDefinition {
                         + UamReportSupport.text(a, "entity_id"),
                     "-",
                     UamReportSupport.text(a, "summary"),
-                    UamReportSupport.text(a, "username"),
-                    null,
-                    null,
-                    UamReportSupport.text(a, "entity_id")))
+                    new Source(
+                        UamReportSupport.text(a, "username"),
+                        null,
+                        null,
+                        UamReportSupport.text(a, "entity_id"))))
         .toList();
   }
 
-  @SuppressWarnings("java:S107") // the columns of sample D and the subject
+  private static boolean skipped(String activity, boolean profile) {
+    return USER_CHANGES.equals(activity) ? profile : PROFILE_CHANGES.equals(activity) && !profile;
+  }
+
   private static Map<String, Object> entry(
-      Object occurred,
-      String activity,
-      String from,
-      String to,
-      String doneBy,
-      String approvedBy,
-      String requestNo,
-      String subject) {
+      Object occurred, String activity, String from, String to, Source source) {
     Map<String, Object> m = new HashMap<>();
     m.put(OCCURRED, UamReportSupport.instant(occurred));
     m.put(ACTIVITY, activity);
     m.put(FROM_COL, from);
     m.put(TO_COL, to);
-    m.put(DONE_BY, doneBy);
-    m.put(APPROVED_BY, approvedBy);
-    m.put(REQUEST_NO, requestNo);
-    m.put(SUBJECT, subject);
+    m.put(DONE_BY, source.doneBy());
+    m.put(APPROVED_BY, source.approvedBy());
+    m.put(REQUEST_NO, source.requestNo());
+    m.put(SUBJECT, source.subject());
     return m;
   }
 
   private static boolean involves(Map<String, Object> row, String user) {
-    return user.equalsIgnoreCase((String) row.get(SUBJECT))
-        || user.equalsIgnoreCase((String) row.get(DONE_BY))
-        || user.equalsIgnoreCase((String) row.get(APPROVED_BY));
+    return UamReportSupport.same(user, (String) row.get(SUBJECT))
+        || UamReportSupport.same(user, (String) row.get(DONE_BY))
+        || UamReportSupport.same(user, (String) row.get(APPROVED_BY));
   }
 
   private static Map<String, Object> display(Map<String, Object> row) {
@@ -304,4 +302,14 @@ public class AccessAuditLogReport implements ReportDefinition {
         });
     return names;
   }
+
+  /**
+   * Who did an activity and where it came from.
+   *
+   * @param doneBy actor
+   * @param approvedBy approver of the request, may be null
+   * @param requestNo request number, may be null
+   * @param subject user or group profile concerned
+   */
+  private record Source(String doneBy, String approvedBy, String requestNo, String subject) {}
 }

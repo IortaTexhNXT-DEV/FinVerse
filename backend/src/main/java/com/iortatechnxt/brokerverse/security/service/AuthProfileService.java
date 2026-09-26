@@ -81,18 +81,7 @@ public class AuthProfileService {
   public AppUser updateContact(String email, String mobileNo) {
     String newEmail = email == null ? "" : email.trim();
     String newMobile = mobileNo == null || mobileNo.isBlank() ? null : mobileNo.trim();
-    Map<String, String> errors = new LinkedHashMap<>();
-    if (newEmail.isEmpty()) {
-      errors.put(EMAIL, "Enter your e-mail address");
-    } else if (newEmail.length() > MAX_EMAIL || !EmailAddresses.isValid(newEmail)) {
-      errors.put(EMAIL, newEmail + " is not a valid e-mail address");
-    }
-    if (newMobile != null && !MOBILE_NO.matcher(newMobile).matches()) {
-      errors.put(MOBILE, "Enter the mobile number with digits only, for example +63 917 123 4567");
-    }
-    if (!errors.isEmpty()) {
-      throw new FieldValidationException("PROFILE_INVALID", "Check the highlighted fields", errors);
-    }
+    validate(newEmail, newMobile);
     AppUser user = me();
     int changed =
         change(user, EMAIL, user.getEmail(), newEmail, user::setEmail)
@@ -101,6 +90,21 @@ public class AuthProfileService {
       audit.record(ENTITY, user.getUsername(), AuditAction.UPDATE, "Updated own contact details");
     }
     return user;
+  }
+
+  private static void validate(String email, String mobile) {
+    Map<String, String> errors = new LinkedHashMap<>();
+    if (email.isEmpty()) {
+      errors.put(EMAIL, "Enter your e-mail address");
+    } else if (email.length() > MAX_EMAIL || !EmailAddresses.isValid(email)) {
+      errors.put(EMAIL, email + " is not a valid e-mail address");
+    }
+    if (mobile != null && !MOBILE_NO.matcher(mobile).matches()) {
+      errors.put(MOBILE, "Enter the mobile number with digits only, for example +63 917 123 4567");
+    }
+    if (!errors.isEmpty()) {
+      throw new FieldValidationException("PROFILE_INVALID", "Check the highlighted fields", errors);
+    }
   }
 
   private int change(

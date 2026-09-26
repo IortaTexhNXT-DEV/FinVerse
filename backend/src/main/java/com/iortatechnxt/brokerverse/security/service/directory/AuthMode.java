@@ -1,7 +1,5 @@
 package com.iortatechnxt.brokerverse.security.service.directory;
 
-import java.util.Locale;
-
 /**
  * Sign-in mode, parameter {@code AUTH_MODE} (UAM-NFR-11, 17, 33; decision D6): LOCAL checks the
  * password held by BrokerVerse; DIRECTORY checks it against the BDO directory (EUA / AD) by Windows
@@ -22,7 +20,8 @@ public enum AuthMode {
    * @return mode
    */
   public static AuthMode of(String value) {
-    return value != null && DIRECTORY.name().equals(value.trim().toUpperCase(Locale.ROOT))
+    return value != null
+            && String.CASE_INSENSITIVE_ORDER.compare(DIRECTORY.name(), value.trim()) == 0
         ? DIRECTORY
         : LOCAL;
   }

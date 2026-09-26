@@ -89,7 +89,8 @@ public class UserAccessReport implements ReportDefinition {
       }
       Set<String> roles = snapshot.rolesAt(user, end);
       String state = status(snapshot.enabledAt(user, end), today && user.locked());
-      if ((profile == null || roles.stream().anyMatch(profile.trim()::equalsIgnoreCase))
+      if ((profile == null
+              || roles.stream().anyMatch(r -> UamReportSupport.same(profile.trim(), r)))
           && (UamReportSupport.ALL.equals(status) || status.equals(state))) {
         rows.add(row(snapshot, user, roles, state, end));
       }

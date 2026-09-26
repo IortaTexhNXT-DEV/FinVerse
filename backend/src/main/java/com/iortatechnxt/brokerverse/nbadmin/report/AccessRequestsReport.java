@@ -115,7 +115,7 @@ public class AccessRequestsReport implements ReportDefinition {
         .build();
   }
 
-  private static List<String> options(Enum<?>[] values) {
+  private static List<String> options(Enum<?>... values) {
     return Stream.concat(Stream.of(UamReportSupport.ALL), Arrays.stream(values).map(Enum::name))
         .toList();
   }

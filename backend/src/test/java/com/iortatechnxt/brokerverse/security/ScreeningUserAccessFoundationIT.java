@@ -205,7 +205,8 @@ class ScreeningUserAccessFoundationIT {
                     + " 'USER_ACCESS')",
                 String.class))
         .contains("SCR_CASE_ASSIGNED", "SCR_NO_POLICY_HIT", "UAM_REQUEST_TO_APPROVE")
-        .hasSize(17);
+        // + PASSWORD_EXPIRY_NOTICE (U1-B, V1063)
+        .hasSize(18);
     assertThat(
             jdbc.queryForList(
                 "select record_type from nba_retention_rule where years_online = 5"

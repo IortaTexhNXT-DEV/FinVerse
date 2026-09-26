@@ -150,13 +150,15 @@ public class AuthPasswordService {
    * @param userId user name
    */
   public void requestReset(String userId) {
-    if (userId == null || userId.isBlank() || policy.mode() != AuthMode.LOCAL) {
-      return;
+    if (userId != null && !userId.isBlank() && policy.mode() == AuthMode.LOCAL) {
+      users
+          .findByUsernameIgnoreCase(userId.trim())
+          .filter(u -> u.isEnabled() && u.getEmail() != null && !u.getEmail().isBlank())
+          .ifPresent(this::issueLink);
     }
-    AppUser user = users.findByUsernameIgnoreCase(userId.trim()).orElse(null);
-    if (user == null || !user.isEnabled() || user.getEmail() == null || user.getEmail().isBlank()) {
-      return;
-    }
+  }
+
+  private void issueLink(AppUser user) {
     Instant now = clock.instant();
     links.findByUsernameIgnoreCaseAndUsedAtIsNull(user.getUsername()).forEach(l -> l.use(now));
     String token = newToken();

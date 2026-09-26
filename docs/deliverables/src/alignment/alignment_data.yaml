@@ -1,0 +1,475 @@
+# Programme alignment data: drops, documents, integrations, infrastructure, questions.
+# Built into the Word document (PROGRAMME_ALIGNMENT.md, placeholders <!-- al:... -->) and the Integration
+# Inventory workbook by build_alignment_pack.py (same folder). Edit this file, then re-run the script.
+#
+# Sources (docs/source-documents/): BDOI_DROP_PLAN.md with the two slides (drop plan, timeline);
+# BDOI_IER_Workbook_v20_iorta.xlsx; Concept Paper - Advance Implementation of Renewal Processing V1.0 (signed).pdf;
+# BDOI answers of 26-Sep-2026 (A1 to A6, recorded in docs/architecture/PROGRAMME_ALIGNMENT.md section 1.2).
+# Status of each BRD: Built, Being built, Designed (not built), Phase 2.
+
+meta:
+  version: '1.0'
+  date: 26 September 2026
+
+# ------------------------------------------------------------------------------------------------------------
+# Drop mapping. One row per line item of the drop plan slide. status: Built / Being built / Designed / Mixed / New.
+drop_items:
+  - {drop: 'Drop 0', num: '0.1', item: 'Accessibility & Login', bdoi_brd: '-', brd: 'BRD-11 UAM; BRD-00 XC-01', frs: 'FR-UA (log-in, session, password); FR-CR', bibs: 'security (JWT log-in, lockout, sessions); Setup & Administration > Users; accessibility statement (deliverable 40)', status: 'Mixed', gap: 'No BRD named. Log-in is built with local passwords; EIAM (Entra ID) sign-in is not built (the DirectoryAuthenticator port is for a password bind, not an OIDC redirect). "Accessibility" may mean WCAG (UAM-NFR-05) or system access.', refs: 'IQ04, IQ24; DCR-214, DCR-230'}
+  - {drop: 'Drop 0', num: '0.2', item: 'Authorization', bdoi_brd: '-', brd: 'BRD-11 UAM', frs: 'FR-UA', bibs: 'security (roles, permissions, persona menus); Setup & Administration > Access Requests', status: 'Built', gap: 'No BRD named. Access requests and approvals are in BIBS (BRD-11); UIDM-ISC (the IGA) may take them over.', refs: 'IQ05; DCR-229'}
+  - {drop: 'Drop 0', num: '0.3', item: 'User Maintenance', bdoi_brd: '-', brd: 'BRD-11 UAM', frs: 'FR-UA', bibs: 'nbadmin (request lifecycle, four eyes, bulk), security (UserAdminService, access change log)', status: 'Built', gap: 'Provisioning by UIDM-ISC conflicts with BRD-11 principle "a request in BIBS is the only way to change access".', refs: 'IQ05; DCR-229'}
+  - {drop: 'Drop 0', num: '0.4', item: 'Data Management (GL accounts, reference tables)', bdoi_brd: '-', brd: 'BRD-00 CORE-17; BRD-5 (chart of accounts); BRD-1 (LOVs); BRD-3; BRD-13 (reference data R01-R09)', frs: 'FR-CR (CORE-17); FR-AC (chart); FR-NB-132 (LOVs)', bibs: 'coa (chart, upload), lov (LOV master with approval), catalog (insurers), dimension; Broking Setup > Lists of Values', status: 'Mixed', gap: 'CORE-17 has no BRD: MIS field definition is NEW (CRQ09), insurer management is CHANGE (one screen). Acceptance criteria not stated.', refs: 'IQ24; DCR-214'}
+  - {drop: 'Drop 0', num: '0.5', item: 'Workflow', bdoi_brd: '-', brd: 'Cross-BRD (every BRD with approvals)', frs: 'Workflow chapters of each FRS', bibs: 'workflow (definitions, queues, SLA timers), approval (My Approvals)', status: 'Built', gap: 'No BRD; accepted through the workflows of each BRD. The BRD-6, 8, 9, 12 and 13 workflows are designed, not built.', refs: 'DCR-214'}
+  - {drop: 'Drop 0', num: '0.6', item: 'Product Maintenance', bdoi_brd: '-', brd: 'BRD-3 PM', frs: 'FR-PM', bibs: 'catalog, productmaint; Client & Policy > Products, Package Requests', status: 'Built', gap: 'None. BRD-3 is also named for Quotation (1.U2).', refs: '-'}
+  - {drop: 'Drop 1 upstream', num: '1.U1', item: 'Client Onboarding', bdoi_brd: 'Data Migration BRD, New Business BRD', brd: 'BRD-1 NB; BRD-13 DM (C01-C03); BRD-10 SANC (onboarding screening)', frs: 'FR-NB (client); FR-DM; FR-SS', bibs: 'crm (Clients), screening (onboarding check); migration (designed)', status: 'Mixed', gap: 'Client onboarding is built; client migration is designed. Screening at onboarding (BRD-10, built) is in no drop.', refs: 'IQ23; DCR-213'}
+  - {drop: 'Drop 1 upstream', num: '1.U2', item: 'Quotation or Proposal', bdoi_brd: 'New Business BRD, Product Maintenance', brd: 'BRD-1 NB (incl. Non-Package); BRD-3 PM', frs: 'FR-NB; FR-PM', bibs: 'quotation, nonpackage; Client & Policy > Quotations, Proposal Requests', status: 'Built', gap: 'Non-Package Management (CORE-04) is not named; read as part of this item.', refs: '-'}
+  - {drop: 'Drop 1 upstream', num: '1.U3', item: 'Account Creation and Maintenance', bdoi_brd: 'New Business BRD, CSF', brd: 'BRD-1 NB; BRD-9 CSF', frs: 'FR-NB; FR-CSF', bibs: 'account (Accounts); csf (designed)', status: 'Mixed', gap: 'Accounts are built; the CSF maintenance functions (contact updates, service requests) are designed, not built. The rest of CSF is in no drop.', refs: 'IQ23; DCR-213'}
+  - {drop: 'Drop 1 upstream', num: '1.U4', item: 'Submitted Policy', bdoi_brd: 'Submitted Policies', brd: 'BRD-12 SP', frs: 'FR-SP', bibs: 'submitted (designed)', status: 'Designed', gap: 'Build needed in wave 1 (Nov-Dec 2026). Sources LFS, HL-LOAS, LMS (LAMD) are integrations.', refs: 'IQ06, IQ07, IQ08'}
+  - {drop: 'Drop 1 upstream', num: '1.U5', item: 'Renewal', bdoi_brd: 'Renewal', brd: 'BRD-6 RN', frs: 'FR-RN', bibs: 'renewal (designed; waves R0-R3)', status: 'Designed', gap: 'Build needed in waves 1-2. The early renewal release is withdrawn (answer A1); legacy RMEL cohorts are carried forward at cut-over (P03).', refs: 'IQ02, IQ03; DCR-218, DCR-219'}
+  - {drop: 'Drop 1 upstream', num: '1.U6', item: 'Placement & ePolicy', bdoi_brd: 'New Business BRD, Renewal BRD, Employee Benefits', brd: 'BRD-1 NB; BRD-6 RN; BRD-8 EB', frs: 'FR-NB; FR-RN; FR-EB', bibs: 'placement, issuance (Placement and Issuance Workbenches); eb (designed)', status: 'Mixed', gap: 'EB placement is in Drop 1 while the EB module is in Drop 2.', refs: 'IQ22; DCR-235'}
+  - {drop: 'Drop 1 upstream', num: '1.U7', item: 'Booking', bdoi_brd: 'New Business BRD, Renewal BRD, Submitted Policies', brd: 'BRD-1 NB; BRD-6; BRD-12', frs: 'FR-NB; FR-RN; FR-SP', bibs: 'booking (Booking Workbench, EOD booking batch)', status: 'Mixed', gap: 'Booking is built; the shared business-type change (V822, BT0) for renewal and submitted policies is designed.', refs: '-'}
+  - {drop: 'Drop 1 upstream', num: '1.U8', item: 'Accounting / GL', bdoi_brd: 'Accounting, Disbursement & ACSL BRD', brd: 'BRD-5 ACCT', frs: 'FR-AC', bibs: 'accounting engine (BROKER_BOOKING events), journal, ledger', status: 'Built', gap: 'Listed again as downstream 1.D5. Read as: upstream = postings of booking; downstream = GL, FRBS and ACSL.', refs: '-'}
+  - {drop: 'Drop 1 upstream', num: '1.U9', item: 'Reports (upstream)', bdoi_brd: 'NB, RN, SP, EB BRDs', brd: 'BRD-1, 6, 12, 8; Report List', frs: 'Report sections of each FRS', bibs: 'nbreport, report (Report Centre); renewal, submitted, eb reports (designed)', status: 'Mixed', gap: 'NB reports built; RN, SP and EB reports designed. The Report List is not split by drop.', refs: 'DCR-235'}
+  - {drop: 'Drop 1 downstream', num: '1.D1', item: 'Disbursement', bdoi_brd: 'Accounting, Disbursement & ACSL BRD', brd: 'BRD-5 ACCT (Vol. 2)', frs: 'FR-DS, FR-PQ', bibs: 'disbursement, payrequest; Finance > Disbursement Workbench', status: 'Built', gap: 'Outward bank channel is CMS / New BOB (a file or host-to-host interface); today BOB approvals are uploaded (DISB_BOB_APPROVED).', refs: 'IQ10'}
+  - {drop: 'Drop 1 downstream', num: '1.D2', item: 'Cashiering (Payments Acceptance and Application)', bdoi_brd: 'Operations BRD (Cashiering Addendum), Data Migration BRD', brd: 'BRD-2 OPS; BRD-13 (legacy UPP, F02)', frs: 'FR-OP (Cashiering); FR-DM', bibs: 'cashiering (payment files PAY_BILLS, PAY_TRADE, PAY_CLPC, PAY_PDC, PAY_DIRECT_CREDIT; automatch; AR / OR)', status: 'Built', gap: 'The "Cashiering Addendum" is not in the BIBS pack. Channels OBPCS, Old BOB, PMS and TFS feed this module.', refs: 'IQ09, IQ10, IQ14, IQ20; DCR-215'}
+  - {drop: 'Drop 1 downstream', num: '1.D3', item: 'Remittance', bdoi_brd: 'Operations BRD (Remittance Addendum), Reinsurance BRD', brd: 'BRD-2 OPS; ReInsurance BRD (phase 2)', frs: 'FR-OP (Remittance)', bibs: 'remittance (extraction, batches, holds, special remittances)', status: 'Built', gap: 'Answer A3: Remittance handles the reinsurance transactions in Drop 1; the reinsurance module is phase 2. Which RI transactions, and the "Remittance Addendum", are not defined.', refs: 'IQ20; DCR-210, DCR-215'}
+  - {drop: 'Drop 1 downstream', num: '1.D4', item: 'Adjustment / Cancellation', bdoi_brd: 'Operations BRD, Accounting BRD', brd: 'BRD-2 OPS; BRD-5', frs: 'FR-OP (Adjustment)', bibs: 'adjustment (Adjustment Workbench)', status: 'Built', gap: 'None.', refs: '-'}
+  - {drop: 'Drop 1 downstream', num: '1.D5', item: 'Accounting / GL', bdoi_brd: 'Accounting, Disbursement & ACSL BRD', brd: 'BRD-5 ACCT (Vol. 1, 2)', frs: 'FR-AC; FR-DS (ACSL)', bibs: 'coa, journal, ledger, period, closing, frbs, acsl', status: 'Built', gap: 'EGL (Drop 2 integration) takes GL data out of BIBS; not built.', refs: 'IQ16'}
+  - {drop: 'Drop 1 downstream', num: '1.D6', item: 'Reports (BIR / Regulatory)', bdoi_brd: 'Accounting BRD, Data Migration BRD', brd: 'BRD-5 ACCT; BRD-13', frs: 'FR-AC (BIR, IC)', bibs: 'tax (BIR forms, 2307, alphalists), finreport, frbs report pack', status: 'Built', gap: 'Legacy-period figures in BIR reports depend on the migration of open items and the GL opening (DMQ18).', refs: '-'}
+  - {drop: 'Drop 1 downstream', num: '1.D7', item: 'Collection of Commission Receivables (Direct Payment)', bdoi_brd: 'Collections BRD Addendum, Operations BRD', brd: 'BRD-2 OPS (CMRID); BRD-4 BRCLXN.059-064', frs: 'FR-OP (Commission / DP); FR-CL', bibs: 'commission (DP billing), collections (DP PR lists)', status: 'Built', gap: 'BRCLXN.061-064 are in the unsigned draft addendum only (CQ01).', refs: '-'}
+  - {drop: 'Drop 2', num: '2.1', item: 'Marketing Collection (extraction)', bdoi_brd: '-', brd: 'BRD-4 CLXN; BRD-2 (MKTID)', frs: 'FR-CL; FR-OP (Marketing Collection items)', bibs: 'collections (worklists, dispositions, daily files), opsledger CollectionFeed', status: 'Built', gap: 'BRD-4 is a BIBS module fed by the Operations ledger; "extraction" is undefined (a feed to a separate CMS application, or the daily files?).', refs: 'IQ21; DCR-212, DCR-221'}
+  - {drop: 'Drop 2', num: '2.2', item: 'Claims', bdoi_brd: '-', brd: 'BRD-7 CLM', frs: 'FR-CM', bibs: 'brokerclaims (Claims Home)', status: 'Being built', gap: 'Built ahead of the drop; open-claims migration (F07) is conditional (CLQ14).', refs: '-'}
+  - {drop: 'Drop 2', num: '2.3', item: 'Production Reconciliation', bdoi_brd: '-', brd: 'BRD-2 OPS (PRCID)', frs: 'FR-OP (Production Reconciliation)', bibs: 'prodrecon (Reconciliation Workbench)', status: 'Built', gap: 'Built with Operations; tested in SIT Drop 2 as BDOI plans. Insurer feedback files are an Insurer System integration.', refs: 'IQ18'}
+  - {drop: 'Drop 2', num: '2.4', item: 'Employee Benefits (no portal feature)', bdoi_brd: '-', brd: 'BRD-8 EB', frs: 'FR-EB', bibs: 'eb (designed); portal module (designed) to be dropped', status: 'Designed', gap: 'BRD-8 BRID-005, 005.01, 014 and the EB design use an insurer / client-HR portal; the IER diagram shows an "EB Insurer Portal" tenant.', refs: 'IQ22; DCR-211'}
+  - {drop: 'Drop 2', num: '2.5', item: 'Other Reports', bdoi_brd: '-', brd: 'Report List; BRD-00 CORE-21', frs: 'FR-CR (reports)', bibs: 'report (Report Centre, 174 definitions)', status: 'Mixed', gap: '"Other" is not defined; propose: every Report List item not owned by a Drop 1 module.', refs: 'DCR-235'}
+
+# ------------------------------------------------------------------------------------------------------------
+# Drop-to-document map (answer A5). The folder restructure follows 'folder'.
+documents:
+  - {doc: 'BRD-00 Core Replacement (umbrella)', kind: 'FRS, spec', file: 'BIBS_FRS_BRD-00_Core_Replacement_v1.0.docx', drop: 'Programme', shared: 'All drops (cross-cutting FR-CR, NFRs)', note: 'Stays at programme level'}
+  - {doc: 'BRD-11 User Access Maintenance', kind: 'FRS, test plan', file: 'BIBS_FRS_BRD-11_*; BIBS_TestPlan_BRD-11_*', drop: 'Drop 0', shared: '-', note: 'Items 0.1-0.3; EIAM and UIDM-ISC change it'}
+  - {doc: 'BRD-3 Product Maintenance', kind: 'FRS, test plan', file: 'BIBS_FRS_BRD-03_*; BIBS_TestPlan_BRD-03_*', drop: 'Drop 0', shared: 'Drop 1 (quotation, 1.U2)', note: 'Item 0.6'}
+  - {doc: 'BRD-13 Data Migration', kind: 'FRS, test plan, migration pack (strategy, workbook, runbook, reconciliation, templates)', file: 'BIBS_FRS_BRD-13_*; BIBS_TestPlan_BRD-13_*; out/Migration/*', drop: 'Drop 0', shared: 'Drop 1 (client onboarding, cashiering, BIR reports) and the migration stream', note: 'Migration has its own timeline row'}
+  - {doc: 'BRD-1 New Business', kind: 'FRS, test plan', file: 'BIBS_FRS_BRD-01_*; BIBS_TestPlan_BRD-01_*', drop: 'Drop 1', shared: '-', note: 'Upstream items 1.U1-1.U3, 1.U6, 1.U7, 1.U9'}
+  - {doc: 'BRD-6 Renewal', kind: 'FRS, test plan', file: 'BIBS_FRS_BRD-06_*; BIBS_TestPlan_BRD-06_*', drop: 'Drop 1', shared: '-', note: 'Upstream 1.U5'}
+  - {doc: 'BRD-12 Submitted Policies', kind: 'FRS, test plan', file: 'BIBS_FRS_BRD-12_*; BIBS_TestPlan_BRD-12_*', drop: 'Drop 1', shared: '-', note: 'Upstream 1.U4'}
+  - {doc: 'BRD-10 Sanction Screening and Risk Profiling', kind: 'FRS, test plan', file: 'BIBS_FRS_BRD-10_*; BIBS_TestPlan_BRD-10_*', drop: 'Drop 1 (proposed)', shared: 'Drop 2 (Bridger Insight XG)', note: 'Not on the slide; proposed with Client Onboarding (IQ23)'}
+  - {doc: 'BRD-9 Customer Servicing Facility', kind: 'FRS, test plan', file: 'BIBS_FRS_BRD-09_*; BIBS_TestPlan_BRD-09_*', drop: 'Drop 1', shared: 'Drop 2 (proposed for the service-request functions)', note: 'Only account maintenance is on the slide (IQ23)'}
+  - {doc: 'BRD-5 Accounting, Disbursement and ACSL', kind: 'FRS (cover note, Vol. 1, Vol. 2), test plans', file: 'BIBS_FRS_BRD-05_*; BIBS_TestPlan_BRD-05_*', drop: 'Drop 1', shared: 'Drop 0 (GL accounts, item 0.4)', note: 'Upstream 1.U8, downstream 1.D1, 1.D5, 1.D6'}
+  - {doc: 'BRD-2 Operations', kind: 'FRS, test plan', file: 'BIBS_FRS_BRD-02_*; BIBS_TestPlan_BRD-02_*', drop: 'Drop 1', shared: 'Drop 2 (Production Reconciliation chapter, 2.3)', note: 'Test plan sheets split by chapter'}
+  - {doc: 'BRD-4 Collections', kind: 'FRS, test plan', file: 'BIBS_FRS_BRD-04_*; BIBS_TestPlan_BRD-04_*', drop: 'Drop 1', shared: 'Drop 2 (Marketing Collection extraction, 2.1)', note: 'DP rows BRCLXN.059-064 in Drop 1 (1.D7); rest per IQ21'}
+  - {doc: 'BRD-7 Claims', kind: 'FRS, test plan', file: 'BIBS_FRS_BRD-07_*; BIBS_TestPlan_BRD-07_*', drop: 'Drop 2', shared: '-', note: '2.2'}
+  - {doc: 'BRD-8 Employee Benefits', kind: 'FRS, test plan', file: 'BIBS_FRS_BRD-08_*; BIBS_TestPlan_BRD-08_*', drop: 'Drop 2', shared: 'Drop 1 (EB placement and reports, 1.U6, 1.U9)', note: 'Portal requirements out (answer, IQ22)'}
+  - {doc: 'Report List as of 27-Apr-2026', kind: 'Report catalogue', file: 'BDOI_REPORT_LIST.md', drop: 'Programme', shared: 'Each report goes with the drop of its owning module', note: 'Split rule: 1.U9, 1.D6, 2.5'}
+  - {doc: 'Discrepancy and clarification register', kind: 'Register (Excel)', file: 'BIBS_Register_BRD-00_Discrepancies_and_Clarifications_*.xlsx', drop: 'Programme', shared: 'Filter column Drop to be added', note: 'DCR-210 to DCR-235 from this document'}
+  - {doc: 'Business process deck', kind: 'PowerPoint', file: 'BIBS_Deck_BRD-00_Business_Process_*.pptx', drop: 'Programme', shared: 'All drops', note: '-'}
+  - {doc: 'Programme alignment and integration inventory (this document)', kind: 'Word, Excel', file: 'BIBS_Alignment_BRD-00_*', drop: 'Programme', shared: 'All drops', note: 'Integration rows carry their drop'}
+  - {doc: 'Bill of materials, technical and deployment architecture (items 4, 12)', kind: 'Word, Excel (to write)', file: '-', drop: 'Drop 0', shared: '-', note: 'Built from section 6 and the IER'}
+  - {doc: 'Security and data-protection mapping (item 26)', kind: 'Word, Excel (to write)', file: '-', drop: 'Drop 0', shared: '-', note: 'EIAM, UIDM-ISC, S3 encryption, masking'}
+  - {doc: 'Interface specifications (one per integration)', kind: 'Word (to write)', file: '-', drop: 'Drop of the integration', shared: '-', note: 'After BDOI IT answers the IQ questions'}
+  - {doc: 'UAT plans and sign-off forms (item 30)', kind: 'Word (to write)', file: '-', drop: 'Per drop', shared: 'End-to-end UAT script is programme level', note: 'UAT runs end to end (answer A1)'}
+  - {doc: 'Performance, penetration test, ORR / PRR evidence (items 28, 37)', kind: 'Word, Excel (to write)', file: '-', drop: 'Programme', shared: '-', note: 'Nov 2027 - Jan 2028'}
+
+# ------------------------------------------------------------------------------------------------------------
+# Integration inventory. fit: FIT / CONFIGURE / CHANGE / NEW / OUT. bdoi = meaning given by BDOI (answer A2);
+# understanding = our reading, to be confirmed. seam = existing port or mechanism in BIBS.
+integrations:
+  - id: INT-01
+    name: EIAM (Entra ID)
+    drop: Drop 0
+    bdoi: Enterprise Identity Access Management, on Microsoft Entra ID
+    understanding: Single sign-on of BDO users. BIBS redirects to Entra ID (OpenID Connect, authorisation code with PKCE) and maps the returned identity to the BIBS user; roles stay in BIBS.
+    direction: Both (browser redirect; tokens to BIBS)
+    data: User identity (UPN or Windows ID, name, e-mail); optional group claims
+    module: security; Setup & Administration > Users
+    seam: 'security.service.directory.DirectoryAuthenticator (password check, LOCAL default; AUTH_MODE); SsoTokenExchange designed, not built (USER_ACCESS_DESIGN section 10)'
+    fit: CHANGE
+    build: 'OIDC log-in (frontend redirect, backend token validation with Spring Security OAuth2), user mapping by sec_user.windows_id or UPN, log-out to Entra, local break-glass administrator; lockout and password rules then sit in Entra ID'
+    open: Protocol and claims, MFA and conditional access, session life against the 30-minute inactivity rule, non-BDO users
+    questions: IQ04
+  - id: INT-02
+    name: UIDM-ISC (IGA)
+    drop: Drop 0
+    bdoi: User ID Maintenance - Identity Security Cloud, the identity governance and administration (IGA) tool
+    understanding: Joiner, mover and leaver provisioning and access certification from the IGA. We read "Identity Security Cloud" as the SailPoint product; to confirm.
+    direction: Inbound (provisioning) and outbound (account and entitlement aggregation)
+    data: User accounts, enable / disable, group profiles (BIBS roles) as entitlements
+    module: security, nbadmin (BRD-11 access requests)
+    seam: 'None for provisioning. nbadmin request lifecycle and UserAdminService apply changes; ExternalUserProvisioner serves portal users only'
+    fit: CHANGE
+    build: 'Provisioning API (SCIM 2.0 Users / Groups, or the connector ISC offers), aggregation export, change-log rows with the ISC request number; decide which BRD-11 request types remain in BIBS'
+    open: Who owns requests and approvals, connector type, entitlement level, certification
+    questions: IQ05
+  - id: INT-03
+    name: LMS
+    drop: Drop 0
+    bdoi: Loans Management System
+    understanding: Bank loan data used by Renewal (paid-off and RMU loans, BRRN.029), Submitted Policies (loan snapshot, PN) and CLPC billing. Probably the source of the "LAMD reports".
+    direction: Inbound
+    data: PN number, loan status (paid-off, RMU), loan release and amortisation for CLPC
+    module: renewal (designed), submitted (designed), placement (CLPC reports), cashiering (PAY_CLPC)
+    seam: 'Bulk handlers RNW_LAMD_REPORT and SBM LAMD upload (designed); PaymentReportService / NB-CLPC-BILLING; PAY_CLPC'
+    fit: CHANGE
+    build: 'Layouts per report; automated transfer if LMS delivers files (SFTP drop to S3) instead of user uploads'
+    open: Which LMS extracts, layouts, frequency, transport
+    questions: IQ06
+  - id: INT-04
+    name: HL-LOAS (HLS / LOAS)
+    drop: Drop 0 (HLS) and Drop 2 (LOAS)
+    bdoi: Home Loan System (Loan Origination and Admin)
+    understanding: One system shown twice on the slide. Origination side sends home-insurance quotation requests (BRNB.023) and the daily HLS insurance report (Submitted Policies, CBG Fire); admin side gives the HLS amortised loan data for CLPC billing.
+    direction: Inbound
+    data: Quotation requests (borrower, property, sum insured, PN); HLS insurance report; amortised loan release
+    module: quotation, submitted (designed), placement (CLPC)
+    seam: 'quotation.service.QuotationRequestSource with job QUOTATION_REQUEST_INTAKE (cron off) and bulk QUOTATION_REQUEST; NB-CLPC-BILLING variants'
+    fit: CHANGE
+    build: 'QuotationRequestSource adapter (file or REST) with source authentication; SP intake handler; CLPC layout'
+    open: One interface or two, formats, frequency, transport
+    questions: IQ07
+  - id: INT-05
+    name: LFS SaaS
+    drop: Not on the slide
+    bdoi: Loan Front-End System (SaaS)
+    understanding: Source of the LFS insurance report for Submitted Policies (BRD-12 p.4-5).
+    direction: Inbound
+    data: Loan-linked policies submitted by borrowers
+    module: submitted (designed)
+    seam: 'Submitted-policy intake handlers (SUBMITTED_POLICIES_DESIGN); Q11 / SP-SQ01'
+    fit: NEW
+    build: 'Intake layout and transfer; part of the SP build'
+    open: Drop, layout, transport
+    questions: IQ08
+  - id: INT-06
+    name: PMS
+    drop: Drop 0
+    bdoi: PDC Management System
+    understanding: Holds the post-dated checks in the warehouse. BIBS Cashiering receives the daily PDC list and matures PDCs on their date (CSHID.008 item 4).
+    direction: Inbound; outbound status to confirm
+    data: PDC number, bank, date, amount, payor, account / invoice reference; possibly deposit, return and pull-out status
+    module: cashiering
+    seam: 'Payment file handler PAY_PDC (layout table, PdcFileHandler); job PDC_MATURITY'
+    fit: CONFIGURE
+    build: 'Layout in the payment-file layout table; an automated transfer if PMS drops files; outbound status feed if required'
+    open: Layout (OQ03), direction, frequency
+    questions: IQ09
+  - id: INT-07
+    name: CMS / New BOB
+    drop: Drop 0
+    bdoi: Cash Management System, outward payments (also called New BOB)
+    understanding: Bank channel for BDOI's outgoing payments (insurer remittances, refunds, supplier and commission payments) from Disbursement; the bank returns the debit status.
+    direction: Outbound (payment instructions); inbound (status, debit confirmation)
+    data: Payee, account, amount, currency, value date, voucher reference; status per transaction
+    module: disbursement
+    seam: 'Payment instruments and EOD outputs (dsb_eod_output); DCTF file; upload DISB_BOB_APPROVED (BobApprovedHandler); BankChannelPort named in the design, not built (AQ09)'
+    fit: CHANGE
+    build: 'Outward payment file in the CMS layout (or host-to-host), status upload or pull, reconciliation to vouchers'
+    open: Layout, host-to-host or upload, cut-off times, approvals in CMS
+    questions: IQ10
+  - id: INT-08
+    name: OBPCS
+    drop: Drop 0
+    bdoi: Online Bills Payment Consolidation System
+    understanding: The consolidated bills-payment collections file (today "Bills Payment FS01") that Cashiering uploads and automatches.
+    direction: Inbound
+    data: Payment date, reference (ARN, invoice, PN), payor, amount, channel
+    module: cashiering
+    seam: 'Payment file handler PAY_BILLS (configurable layout); PAYMENT_AUTOMATCH job'
+    fit: CONFIGURE
+    build: 'Layout; automated transfer if OBPCS drops files'
+    open: Layout, frequency, transport
+    questions: IQ10
+  - id: INT-09
+    name: Old BOB
+    drop: Drop 0
+    bdoi: Old Business Online Banking Collection System; SOA bills payments via funds transfer
+    understanding: Corporate clients pay statements of account by funds transfer; the collection file is applied in Cashiering.
+    direction: Inbound
+    data: Funds-transfer credits with SOA or invoice reference
+    module: cashiering (Direct Credit or a new layout)
+    seam: 'Payment file handler PAY_DIRECT_CREDIT or a new layout row'
+    fit: CONFIGURE
+    build: 'Layout; SOA-to-invoice matching rule if the file carries the SOA number only'
+    open: Layout, SOA reference, frequency
+    questions: IQ10
+  - id: INT-10
+    name: AFTS
+    drop: Drop 0
+    bdoi: Automatic Fund Transfer System (on the slide; not explained in the answers)
+    understanding: Unknown. Possibly auto-debit of client accounts for premium, or automatic transfers for disbursement.
+    direction: To confirm
+    data: To confirm
+    module: cashiering or disbursement
+    seam: 'Payment file handlers; disbursement instruments'
+    fit: CHANGE
+    build: 'To size after the answer'
+    open: Purpose, direction, layout
+    questions: IQ10
+  - id: INT-11
+    name: ICBS
+    drop: Drop 0 (struck through)
+    bdoi: Struck through on the slide
+    understanding: Out of scope (core banking system replaced by the channels above).
+    direction: '-'
+    data: '-'
+    module: '-'
+    seam: '-'
+    fit: OUT
+    build: None
+    open: Confirm out of scope
+    questions: IQ10
+  - id: INT-12
+    name: ECM
+    drop: Drop 0
+    bdoi: Enterprise Content Management
+    understanding: Answer A4 places every BIBS document and attachment in Amazon S3, not in ECM. A remaining ECM role is not stated (source of legacy documents for the archive, or records transfer at end of retention).
+    direction: To confirm (possibly inbound legacy documents only)
+    data: Legacy documents (H02) if ECM holds them
+    module: attachment; migration archive (designed)
+    seam: 'migration ArchiveDocumentStore (designed)'
+    fit: OUT
+    build: None for document storage (S3); archive transfer if ECM holds legacy documents
+    open: Any ECM touch-point left
+    questions: IQ13
+  - id: INT-13
+    name: CCM
+    drop: Drop 0
+    bdoi: Centralized Communications Management, e-mail sending
+    understanding: All outbound BIBS e-mail (renewal advices, protected PDFs, notifications, job-failure mails) goes through CCM.
+    direction: Outbound; delivery status inbound
+    data: Recipient, subject, body, attachments (password-protected PDFs), template id
+    module: messaging
+    seam: 'messaging.service.MailTransport (SmtpMailTransport, SimulatedMailTransport); outbox msg_outbound_message; MAIL_DISPATCH job; DocumentProtector'
+    fit: CONFIGURE
+    build: 'SMTP relay: configuration only. API: a new MailTransport adapter with status callback'
+    open: SMTP or API, attachment limits, volume, bounce feedback, sender domains
+    questions: IQ11
+  - id: INT-14
+    name: M365 Exchange
+    drop: Drop 0
+    bdoi: M365 Exchange
+    understanding: Mailboxes. Candidate uses are reading e-mailed quotation requests (BRNB.041, Q12 parked) and insurer replies, or relaying mail if CCM does not cover a case.
+    direction: Inbound (mailbox reading) and/or outbound
+    data: E-mails and attachments
+    module: quotation (request intake), messaging
+    seam: 'None for mailbox reading (Q12); MailTransport for sending'
+    fit: NEW
+    build: 'Mailbox reader through Microsoft Graph with an application registration, if confirmed'
+    open: Role against CCM, mailboxes, permissions
+    questions: IQ12
+  - id: INT-15
+    name: TFS (manual)
+    drop: Drop 0
+    bdoi: Trade Finance System - client onboarding and payment (manual)
+    understanding: Trade (CIB) clients and their payments; no system interface. Users key the client in BIBS and upload the Trade payment file.
+    direction: Manual inbound
+    data: Trade client details; Trade payment file
+    module: crm, cashiering
+    seam: 'Client onboarding screens; payment file handler PAY_TRADE'
+    fit: FIT
+    build: None (layout confirmation only)
+    open: Which onboarding data, layout of the Trade file
+    questions: IQ14
+  - id: INT-16
+    name: EDP - Data Ingestion (SD 11)
+    drop: Drop 2
+    bdoi: Enterprise Data Platform
+    understanding: BIBS data delivered to the BDO data platform for analytics. "SD 11" is not explained (a data standard or source-delivery specification).
+    direction: Outbound
+    data: To agree (clients, accounts, invoices, receipts, remittances, GL; history and daily changes)
+    module: platform (events, report)
+    seam: 'Kafka integration events bibs.* (9 topics, PLATFORM_CACHE_AND_EVENTS.md); report exports; no bulk data feed'
+    fit: NEW
+    build: 'Daily extracts to an S3 drop per the SD 11 specification, or change-data capture from a read replica; masking rules'
+    open: What SD 11 is, objects, format, frequency, push or pull
+    questions: IQ15
+  - id: INT-17
+    name: EGL
+    drop: Drop 2
+    bdoi: Enterprise General Ledger
+    understanding: The BDO group ledger receives BDOI accounting from the BIBS GL (journal detail or balances) for consolidation.
+    direction: Outbound
+    data: Journals or trial balance by account, branch, cost centre, currency; mapping to EGL accounts
+    module: journal, ledger, coa, finreport
+    seam: 'None as an interface; GL reports (trial balance, GL-SCHEDULE); BDO GARD submission is report exports only (AQ31)'
+    fit: NEW
+    build: 'EGL extract job with the account mapping (code map), control totals and reconciliation report'
+    open: Level of detail, frequency, mapping, layout, transport
+    questions: IQ16
+  - id: INT-18
+    name: CARMS
+    drop: Drop 2
+    bdoi: Not explained in the answers
+    understanding: Unknown.
+    direction: To confirm
+    data: To confirm
+    module: To confirm
+    seam: '-'
+    fit: NEW
+    build: To size after the answer
+    open: Purpose, data, direction
+    questions: IQ17
+  - id: INT-19
+    name: Insurer System
+    drop: Drop 2
+    bdoi: Insurer systems (not detailed)
+    understanding: 'Files exchanged with each insurer today by e-mail: production reports and feedback (PRCID.009), remittance schedules and ORs (RMTID.012), DP billing responses (CMRID.009), renewal responses, SOAs (ACSL 2.2.1), e-policies, claims.'
+    direction: Both
+    data: Per process
+    module: prodrecon, remittance, commission, renewal, acsl, issuance, brokerclaims
+    seam: 'opsledger.service.port.InsurerFileInbox (default: no inbox, uploads on screens); FileDropPort for outgoing extracts'
+    fit: CHANGE
+    build: 'InsurerFileInbox adapter per channel (SFTP to S3, API) and outbound drops'
+    open: Insurers, processes, channel, layouts
+    questions: IQ18
+  - id: INT-20
+    name: Bridger Insight XG (manual)
+    drop: Drop 2
+    bdoi: Bridger Insight XG (screening)
+    understanding: Compliance screens names in Bridger Insight XG by hand and records the result in the BIBS screening case.
+    direction: Manual
+    data: Screening result and evidence
+    module: screening
+    seam: 'Screening cases with evidence attachments; WatchlistFeed for list files (StagedFileWatchlistFeed)'
+    fit: CONFIGURE
+    build: 'Evidence document type and disposition values; a client export for Bridger batch screening if asked'
+    open: Does Bridger replace or complement BIBS list matching
+    questions: IQ19
+
+# Interfaces named in the BRDs but not on the slide (for BDOI to place or confirm).
+other_interfaces:
+  - ['LAMD reports (paid-off, RMU)', 'BRD-6 BRRN.029; BRD-12', 'RNW_LAMD_REPORT and SBM uploads (designed)', 'Covered by LMS (INT-03)?']
+  - ['CLPC loan credits and billing', 'BRD-1 BRNB.067; Report List #65-67', 'PAY_CLPC, NB-CLPC-BILLING', 'Covered by LMS / HL-LOAS?']
+  - ['NLDS PEP list and AML advisory', 'BRD-10 SNSRP-201, p.7', 'WatchlistFeed sources NLDS_PEP, AML_ADVISORY', 'Transport (SQ01)']
+  - ['Mail house (printed letters)', 'BRD-12; BRD-6 letters', 'MailHouseGateway (designed)', 'Channel and layout']
+  - ['BIR eFPS / eBIRForms, CAS books', 'BRD-5 Appendix A VII', 'Export files per form', 'Manual upload by Comptrollership']
+  - ['BDO Unibank GARD submission', 'BRD-5 Appendix A II', 'Report exports', 'AQ31; relation to EGL']
+  - ['Legacy EBIX, QPS, ISYS, Collection Management System (migration sources)', 'BRD-13', 'Migration intake (ExtractInbox, designed)', 'Extract transport (DMQ28)']
+
+# ------------------------------------------------------------------------------------------------------------
+# Infrastructure: IER against BIBS. assessment: Aligned / Mismatch / Gap.
+infra:
+  - {topic: 'Application architecture', ier: 'Diagram sheet: multi-tenant microservices (identity, audit, workflow, document, notification, reference, tenant; client, policy, quotation, cashiering, billing, accounting, product; nb, sp, acc, clxn, rn, clm, ops, pm, eb, rl), Istio + OPA per pod, "no cross-DB transactions"', bibs: 'One Spring Boot 3.5 modular monolith (backend) and one React SPA served by nginx (frontend); modules isolated by ArchUnit; a business record, its journal, ledger and sub-ledger rows commit in one PostgreSQL transaction', assessment: 'Mismatch', change: 'Replace the diagram with the BIBS diagrams of this document; state the modular monolith in the IER', ref: 'DCR-222; IQ25'}
+  - {topic: 'Tenancy', ier: 'Three tenants: BDOI internal ~1,200 users, EB insurer portal ~50 partners, broker / RI network ~200 accounts; tenant_id + RLS per data layer', bibs: 'Single tenant (company_id, branch scope, role scope); no portal (EB portal dropped by answer); RI network is phase 2', assessment: 'Mismatch', change: 'Remove tenants 2 and 3; size for internal users', ref: 'DCR-222, DCR-232'}
+  - {topic: 'Kubernetes workloads', ier: 'Ten services bv-policy-admin-svc, bv-claims-svc, bv-billing-collections-svc, bv-distribution-svc, bv-web-portal, bv-api-gateway, bv-iam-svc, bv-integration-svc, bv-document-svc, bv-batch-notification-svc in namespaces brokerverse-core / -platform', bibs: 'Two deployments: brokerverse-backend (2 replicas, 500m / 1 Gi requests, 2 CPU / 2 Gi limits) and brokerverse-frontend (2 replicas); namespace brokerverse (deploy/k8s/brokerverse.yaml)', assessment: 'Mismatch', change: 'Re-state the K8s sheets with the sizing of section 6.4', ref: 'DCR-223'}
+  - {topic: 'Database', ier: 'HW sheet: "RHEL 9.x + PostgreSQL 16 (Amazon RDS)", Single-AZ DEV / SIT / UAT, Multi-AZ Pre-Prod / PROD; diagram: Aurora and MongoDB per tenant', bibs: 'PostgreSQL 16 with Flyway, JSONB where needed; Amazon RDS Multi-AZ in production (deploy notes); no MongoDB', assessment: 'Aligned (RDS); Mismatch (Aurora, Mongo, "RHEL 9")', change: 'Drop "RHEL 9.x" from RDS rows (managed engine); remove Mongo; RDS PostgreSQL 16 or Aurora PostgreSQL both work', ref: 'DCR-224'}
+  - {topic: 'Cache', ier: 'ElastiCache for Redis 7.x; "(cluster)" in Pre-Prod, PROD', bibs: 'Redis 7 with cluster mode disabled (one shard, primary + replica, TLS, AUTH); the cache clear uses SCAN and the job lock uses scripts on single keys', assessment: 'Mismatch (wording)', change: 'IER: cluster mode disabled, Multi-AZ replica. Code change only if cluster mode enabled is imposed', ref: 'DCR-228; IQ34'}
+  - {topic: 'Event streaming', ier: 'Amazon MSK (Kafka 3.6), 3 brokers in Pre-Prod / PROD / DR; diagram: MSK + EventBridge, Glue Schema Registry, ~80 topics', bibs: 'MSK Kafka 3.6+ with SASL/SCRAM + TLS, 9 topics bibs.* plus .dlt, transactional outbox; no EventBridge, no schema registry', assessment: 'Aligned (MSK); Mismatch (EventBridge, 80 topics)', change: 'IER: 3 brokers kafka.m5.large class, 9 topics x 3 partitions; DEV / SIT with 2 brokers need BROKERVERSE_KAFKA_REPLICATION_FACTOR=2', ref: 'IQ25'}
+  - {topic: 'Documents and files', ier: 'Amazon S3 (document store) + Amazon EFS (shared K8s PV); K8s sheets: "Total PV (GB) EFS" of 21,800 GB (DEV), 32,760 GB (UAT) and 43,600 to 87,200 GB (PROD Y1 to Y5)', bibs: 'File content in PostgreSQL bytea in 13 tables (doc_attachment_content and others); no volume on the pods', assessment: 'Mismatch', change: 'Answer A4 and DOCUMENT_STORAGE_DECISION.md (option C, steps ST0 / ST1): S3 for bytes, PostgreSQL for metadata; no EFS for BIBS. The EFS totals are a formula error (Total PV = max replicas x CPU limit)', ref: 'DCR-227, DCR-223; IQ31'}
+  - {topic: 'Edge and ingress', ier: 'Diagram: CloudFront + WAF, Apigee X (OIDC validation, quotas), Istio ingress mTLS; infra diagram: Route 53 + ALB; K8s sheets: ingress-nginx', bibs: 'Kubernetes Ingress to the nginx frontend, /api proxied to the backend; JWT issued by BIBS; login rate limit in the application', assessment: 'Gap', change: 'Agree one edge: Route 53 + WAF + ALB (AWS Load Balancer Controller) or ingress-nginx; Apigee only if BDO mandates it for internal APIs', ref: 'IQ25'}
+  - {topic: 'Runtime and images', ier: 'VDI: OpenJDK Temurin 17 ("BrokerVerse services build on JDK 17"), Node 20, Angular SPA', bibs: 'Java 21 (Temurin 21 JRE Alpine image), Spring Boot 3.5, Node 22, React 19, Vite 8', assessment: 'Mismatch', change: 'VDI list: Temurin 21, Maven 3.9, Node 22 LTS; no Angular. Base images RHEL UBI 9 only if BDO requires', ref: 'DCR-224; IQ28, IQ29'}
+  - {topic: 'CI / CD', ier: 'HW sheet: GitLab Runner, AWS SSM, kubectl / helm on a bastion; infra diagram: GitHub + Jenkins; diagram: ArgoCD GitOps + Helm, Terraform + Crossplane', bibs: 'GitHub Actions (ci.yml: mvn verify, SonarQube, npm verify); plain Kubernetes manifests; no Helm chart', assessment: 'Gap', change: 'Helm chart (or Kustomize overlays) per environment; pipeline on the BDO toolchain once named', ref: 'IQ29'}
+  - {topic: 'Observability', ier: 'VDI and K8s sheets: Dynatrace (ActiveGate, OneAgent); diagram: CloudWatch, X-Ray, Prometheus, Node Exporter, Loki, Grafana', bibs: 'Actuator health, metrics and /actuator/prometheus; structured logs with CR/LF neutralised; alert catalogue planned (deliverable 38)', assessment: 'Gap', change: 'Choose Dynatrace or Prometheus / Grafana; ship logs to the BDO log platform', ref: 'IQ30'}
+  - {topic: 'Recovery objectives', ier: 'RPO 15 minutes, RTO 4 hours (both diagram sheets); DR standby with async replication, RPO <= 15 min', bibs: 'Register proposal DCR-135: RPO 15 min (continuous WAL archiving), RTO 4 h; RUNBOOK: daily full backup + WAL archiving, quarterly restore test', assessment: 'Aligned', change: 'Record the IER as the BDOI answer to DCR-135 (to confirm by the BRD owners)', ref: 'DCR-135, DCR-225'}
+  - {topic: 'Disaster recovery', ier: 'PROD DR: "cross-region read replica" (HW sheet); diagram: "ap-southeast-1 primary + DR warm-standby"; DR environment at 12 x 7 hours', bibs: 'Hosting appendix: AWS ap-southeast-1; access restricted to personnel in the Philippines', assessment: 'Gap', change: 'Name the DR region and confirm data residency; S3 cross-region replication and MSK / ElastiCache rebuild in DR; DR runbook', ref: 'DCR-225; IQ26'}
+  - {topic: 'Environments', ier: 'DEV, SIT, UAT, Pre-Prod, PROD, DR; K8s sheets only for DEV, SIT, UAT, PROD Y1-Y5; the Pre-Prod sheet is titled "UAT ENVIRONMENT"; environment cost sheets hold template rows (Windows Server, EXACC, ON PREM, 0 CPU)', bibs: 'Needs all six; Pre-Prod for the dress rehearsal and performance tests; DR for the failover test', assessment: 'Gap', change: 'Add Pre-Prod and DR cluster sheets; replace template rows; re-cost', ref: 'DCR-223; IQ33'}
+  - {topic: 'Operating hours', ier: 'Non-production 12 x 5 (260.7 h / month); PROD 24 x 7; DR 12 x 7', bibs: 'Night jobs in PHT: EOD booking and remittance extraction 20:00, Collections 22:15-23:00, renewal extraction 01:00, screening 01:00-01:30, application file 05:00, alerts 06:00', assessment: 'Mismatch', change: 'Non-production crons shifted into the window by environment variables; extended hours for batch, month-end and migration rehearsal cycles; MSK and ElastiCache run 24 x 7 anyway', ref: 'DCR-226; IQ27'}
+  - {topic: 'Sizing basis', ier: 'YoY growth 15 %, 60 months; ~1,200 internal users (diagram)', bibs: 'Umbrella BRD p.42: 1,344 named / 429 concurrent (DCR-166); renewal 25,800 accounts and NB 21,200 bookings a month', assessment: 'Gap', change: 'One user figure for sizing and the performance test', ref: 'DCR-232; IQ32'}
+  - {topic: 'VDI', ier: '15 users: 8 developers (24 months), 4 testers (18), 3 production support (60); 12 x 5', bibs: 'Hosting appendix: access restricted to personnel in the Philippines; migration staging purged within 5 days', assessment: 'Gap', change: 'Confirm who needs VDI and from where; update the software list', ref: 'DCR-231; IQ28'}
+
+# Documents in S3 only (answer A4). Design: docs/architecture/DOCUMENT_STORAGE_DECISION.md (option C, build steps
+# ST0 / ST1). Rows: [area, today, change]. The last rows are the IER changes the decision implies.
+s3_changes:
+  - ['Storage port and metadata (ST0)', 'Each module holds file bytes in its own bytea column', 'FileStore port in common/storage (S3FileStore, LocalFileStore, MinIO test); shared table stored_file (owner, document type, name, size, SHA-256, bucket, key, version id, retention class, legal hold); module tables get stored_file_id']
+  - ['Attachments (all modules)', 'doc_attachment_content.content bytea (V21, AttachmentService)', 'Bytes in bibs-<env>-documents; the attachment record points to stored_file (ST1)']
+  - ['Generated business documents', 'plc_slip_file, iss_insurance_advice, bkg_service_invoice, rem_batch_document, clx_billing_document, csh_print_batch, dsb_eod_output (bytea)', 'Written through FileStore to the documents bucket (ST1); doc_rendition keeps its spec and SHA-256']
+  - ['Report archive and batch files', 'report_run_file, report_batch (bytea); ReportArchiveService', 'bibs-<env>-reports, expiry per report archive setting (default 400 days); users get a link']
+  - ['Operations extracts, e-mail attachments', 'ops_extract_file (FileDropPort), msg_outbound_attachment', 'FileDropPort writes to S3; e-mail attachments and ZIP bundles are read from S3 and streamed (option B path)']
+  - ['Uploads and inbound files', 'bulk_job keeps only the file name; iss_upload_item bytea; watchlist files as attachments', 'bibs-<env>-inbound: quarantine prefix until the malware scan tags the object clean; kept 90 days; large files by presigned PUT']
+  - ['Migration files (designed)', 'mig_extract files; staging purge within 5 days', 'bibs-<env>-migration, expiry after 5 days, migration role only']
+  - ['Access and audit', 'Backend streams the bytes after the permission check', 'Presigned GET valid 5 minutes (FILE_LINK_TTL_SECONDS), issued after the permission check, each issue audited; Content-Disposition attachment, no-store']
+  - ['Security', 'Database encryption at rest', 'SSE-KMS with a customer-managed key per environment; deny non-TLS and unencrypted puts; IRSA role and S3 gateway endpoint; keys without personal data']
+  - ['Retention, legal hold, DR', 'Files follow the database backup', 'Versioning; lifecycle Standard, Standard-IA after 90 days, Glacier Instant Retrieval after 1 year; Object Lock governance mode with legal hold; cross-region replication with replication time control']
+  - ['Existing content', '-', 'One-off copy job per table with SHA-256 check, switch reads, drop the bytea column later (ST1)']
+  - ['IER: new rows', 'IER has "Amazon S3 (document store)" with no size', 'Four buckets per environment; storage estimate per year (to size from the document volumes); KMS keys per environment; S3 gateway endpoint; replication to the DR region; GuardDuty Malware Protection for S3 (or the BDO scanner); Object Lock enabled at bucket creation']
+  - ['IER: rows to remove', 'Amazon EFS (shared K8s PV); efs-csi-controller pods; "Total PV (GB) EFS" column', 'Not used by BIBS for documents; pods are stateless']
+  - ['IER: database size', 'PROD RDS 2,000 GB, sized with documents in mind', 'Re-size RDS without file content once the volumes are known; backups and cross-region replica get smaller']
+
+# Proposed Kubernetes sizing for the BIBS workloads (replaces the bv-* rows of the IER K8s sheets).
+k8s:
+  - ['DEV', 'brokerverse-backend', '1', '2', '500m / 1.5 Gi', '2 / 3 Gi', 'Demo data; jobs run on the single pod']
+  - ['DEV', 'brokerverse-frontend', '1', '2', '50m / 64 Mi', '500m / 256 Mi', 'nginx static files and /api proxy']
+  - ['SIT', 'brokerverse-backend', '2', '3', '500m / 1.5 Gi', '2 / 3 Gi', 'Two pods to test the Redis job lock and cache eviction across pods']
+  - ['SIT', 'brokerverse-frontend', '2', '2', '50m / 64 Mi', '500m / 256 Mi', '-']
+  - ['UAT', 'brokerverse-backend', '2', '4', '1 / 2 Gi', '2 / 4 Gi', 'Migration mock loads run here (Mock 3)']
+  - ['UAT', 'brokerverse-frontend', '2', '3', '50m / 64 Mi', '500m / 256 Mi', '-']
+  - ['Pre-Prod', 'brokerverse-backend', '3', '6', '1 / 2 Gi', '2 / 4 Gi', 'Production-sized; performance test and dress rehearsal']
+  - ['Pre-Prod', 'brokerverse-frontend', '2', '4', '50m / 64 Mi', '500m / 256 Mi', '-']
+  - ['PROD (Y1)', 'brokerverse-backend', '3', '6', '1 / 2 Gi', '2 / 4 Gi', 'HPA on CPU; PodDisruptionBudget minAvailable 2; spread over 3 AZs']
+  - ['PROD (Y1)', 'brokerverse-frontend', '2', '4', '50m / 64 Mi', '500m / 256 Mi', 'PDB minAvailable 1']
+  - ['PROD (Y5)', 'brokerverse-backend', '4', '8', '1 / 2 Gi', '2 / 4 Gi', '15 % growth a year; to be proved by the performance test']
+  - ['DR', 'brokerverse-backend', '0', '6', '1 / 2 Gi', '2 / 4 Gi', 'Scaled up at failover (warm standby); images and configuration kept current']
+
+# ------------------------------------------------------------------------------------------------------------
+# Timeline: BDOI window, what we deliver, and by when.
+timeline:
+  - ['Requirements Drop 1 (with Drop 0 setup)', 'Sep - Nov 2026 (slide bar; the transcription says Sep - Oct)', 'FRS v1.0 of BRD-00, 1, 2, 3, 5, 6, 9, 10, 11, 12, 13 issued 25-26 Sep 2026; register v1.1', 'FRS v1.1 with BDOI comments by 13 Nov 2026; sign-off by 30 Nov 2026; answers to the build-shaping IQ / DCR items by 16 Oct 2026']
+  - ['Requirements / mapping Migration', 'Sep - Nov 2026', 'Migration pack v1.0 issued 26 Sep 2026 (strategy, workbook, runbook, reconciliation)', 'Object decisions (G1) and layouts frozen by 30 Nov 2026; first full extracts by 15 Jan 2027']
+  - ['Requirements Drop 2', 'Dec 2026 - Feb 2027', 'FRS v1.0 of BRD-4, 7, 8 issued; EB FRS to re-issue without the portal', 'Sign-off by 26 Feb 2027; EGL, EDP, CARMS, insurer specifications from BDOI IT by 31 Jan 2027']
+  - ['Build Drop 1 (waves 1 and 2)', 'Nov 2026 - Feb 2027', 'Built: BRD-1, 2, 3, 4, 5, 10, 11. To build: BRD-12 SP, BRD-6 RN, BRD-9 CSF (account maintenance), EIAM, UIDM-ISC, S3 store, bank channel layouts', 'Wave 1 (Nov-Dec): SP, RN foundation, EIAM, S3 store. Wave 2 (Jan-Feb): RN completion, bank channels, changes from signed FRS']
+  - ['Build Migration', 'Nov 2026 - Mar 2027', 'Designed (DM0-DM3)', 'Migration console and loaders by 31 Mar 2027']
+  - ['Build Drop 2 (wave 3)', 'Mar - Apr 2027', 'Claims being built; EB, CSF (rest) designed', 'Claims, EB without portal, CSF, EGL / EDP / insurer adapters, other reports by 30 Apr 2027']
+  - ['SIT Drop 1', 'Jan - Jul 2027', 'Test plans v1.0 for BRD-1 to BRD-13', 'Test plans approved by 18 Dec 2026; SIT environment with S3, MSK, ElastiCache by 4 Jan 2027']
+  - ['SIT Migration', 'Apr - Jul 2027', 'Mocks defined relative to T in the design', 'Mock 1 Apr-May 2027 (reference, clients, headers); Mock 2 Jun-Jul 2027 (all objects, L1-L5)']
+  - ['SIT Drop 2', 'Jul - Sep 2027', '-', 'Drop 2 test plans approved by 30 Jun 2027']
+  - ['UAT Drop 1 (end to end)', 'Aug - Dec 2027', 'UAT readiness programme (deliverables README)', 'UAT readiness statement by 30 Jul 2027; UAT plans and sign-off forms by 16 Jul 2027; UAT runs on migrated, masked data (Mock 3)']
+  - ['UAT Migration', 'Aug - Oct 2027', '-', 'Mock 3 = UAT load in Aug 2027; Mock 4 re-load in Oct 2027 after fixes']
+  - ['UAT Drop 2', 'Oct - Nov 2027', '-', 'Readiness statement for Drop 2 by 30 Sep 2027']
+  - ['Performance / penetration test', 'Nov - Dec 2027', 'Performance plan (item 28); peak 429 concurrent until DCR-166', 'Pre-Prod ready by 1 Oct 2027; an early security scan in SIT (Jun 2027) proposed so findings do not arrive in December']
+  - ['Full migration and cut-over', 'Nov 2027 - Jan 2028', 'Cutover runbook v1.0 (T-30 to T+30)', 'Dress rehearsal on Pre-Prod in Nov - Dec 2027; go / no-go on T-1']
+  - ['ORR / PRR', 'Dec 2027 - Jan 2028', 'Runbook, observability, alerts, error catalogue (items 24, 35, 38)', 'Evidence pack by 15 Dec 2027']
+  - ['Go-live', 'January 2028 (answer A1: all modules together)', '-', 'T to be fixed (IQ01): proposed Mon 3 Jan 2028, legacy freeze after the EOD of Wed 29 Dec 2027']
+
+# ------------------------------------------------------------------------------------------------------------
+# Concept paper capabilities against the BIBS designs (kept for the Jan 2028 scope; the early release is withdrawn).
+concept:
+  - ['Renewal intake and pipeline tracking', 'BRD-6 Renewal Home, Expiry List (RENEWAL_DESIGN section 12)', 'Designed', 'Build waves R0-R2']
+  - ['RMEL extract ingestion and validation', 'RNW_EXTRACTION from the ledger; legacy cohorts through LegacyPolicySource (P03) and RNW_LEGACY_POLICIES', 'Designed', 'P03 layout in the migration workbook']
+  - ['Data sanitation and enrichment', 'Check engine, buckets Clean / Review / Exception (BRRN.020-023)', 'Designed', 'Check content still open (RQ01)']
+  - ['Disposition management', 'Assignment, disposition, TL review (R1-B)', 'Designed', '-']
+  - ['Proposal / quotation generation', 'quotation and nonpackage with renewalRef (R0 contract change)', 'Built (NB) + Designed (link)', '-']
+  - ['Insurer engagement and approval tracking', 'Insurer batches and responses (R1-C)', 'Designed', 'Insurer channel is INT-19']
+  - ['Renewal advice, NAL, NRL', 'Letter engine (R1-D), protected e-mail via CCM', 'Designed', '-']
+  - ['Pre-placement adjustments', 'Account amendment before placement (BRD-1)', 'Built', 'Meaning to confirm']
+  - ['Product / Package Maintenance (TSU)', 'BRD-3 catalog and productmaint', 'Built', '-']
+  - ['Quotation capability for renewals', 'RatingQuery.Purpose.RENEWAL (BT0 / R0)', 'Designed change', '-']
+  - ['Submitted Policy renewal', 'RenewalHandOff implemented by Renewal (R3)', 'Designed', 'After SP build']
+  - ['Free First Year renewal', 'RNW_RA_FFY template; SP FFY buckets', 'Designed', 'Q36 payer open']
+  - ['Early migration of client master and reference data', 'Migration R01-R09, C01-C03 at T-2 weeks', 'Designed', 'No longer early (answer A1)']
+
+# ------------------------------------------------------------------------------------------------------------
+# Open questions for BDOI. priority 1 = answer by 16 Oct 2026 (changes what is built).
+questions:
+  - [IQ01, 1, 'Go-live date', 'Which date in January 2028 is T? We propose Monday 3 January 2028, with the legacy freeze after the EOD of Wednesday 29 December 2027 and the legacy December / year-end close completed in legacy before the final extracts. If T is later in January, the migration rule "first business day of a month after a legacy month-end close" (DMQ25) no longer holds and the GL opening needs a January stub period.', 'Timeline slide; answer A1; DMQ25, DMQ18']
+  - [IQ02, 2, 'Renewals around cut-over', 'With the early renewal release withdrawn, please confirm that (a) legacy extracts, disposes, places and books all renewals up to T, (b) the RMEL cohorts expiring from T to T+140 days are carried forward into BIBS with their disposition (object P03), and (c) renewals expiring between the freeze and T are placed in legacy before the freeze or covered by hold covers.', 'Concept paper (superseded); answer A1; DMQ26']
+  - [IQ03, 2, 'Package remapping', 'Who owns the remapping of legacy package names to BIBS packages, and where does it happen? We recommend a versioned PACKAGE code map applied at migration intake, plus a renewal sanitation check that sends unmapped or retired packages to Review for TSU.', 'Concept paper VII, VIII, Annex C']
+  - [IQ04, 1, 'EIAM (Entra ID)', 'Please confirm OpenID Connect (authorisation code with PKCE) against Entra ID; the claim that identifies the user (UPN, Windows ID or employee number); MFA and conditional access; token and session lifetimes against the 30-minute inactivity rule; whether EIAM replaces EUA (DCR-143); how non-BDO users (if any) sign in; and whether a local break-glass administrator is allowed.', 'Drop plan Drop 0; answer A2; UAM-NFR-11, 17, 19']
+  - [IQ05, 1, 'UIDM-ISC (IGA)', 'Does UIDM-ISC own access requests and approvals, replacing the BRD-11 request workflow in BIBS, or does it only provision approved changes? Which connector (SCIM 2.0, REST, flat file)? Are entitlements the BIBS group profiles (roles) only? Frequency of aggregation and certification; leaver timing.', 'Drop plan Drop 0; answer A2; BRD-11']
+  - [IQ06, 2, 'LMS', 'Which LMS data does BIBS receive (paid-off and RMU loans for renewal, loan snapshot for Submitted Policies, CLPC loan credits), in which layout, how often and by which transport? Is LMS the system behind the LAMD reports?', 'Answer A2; BRRN.029; SP-SQ06']
+  - [IQ07, 2, 'HL-LOAS', 'HLS (Drop 0) and LOAS (Drop 2) are one system: is there one interface or two (quotation requests, HLS insurance report, amortised loan data)? Formats, frequency and transport.', 'Drop plan; answer A2; Q11']
+  - [IQ08, 3, 'LFS SaaS', 'In which drop is the LFS interface, and what is its layout and transport?', 'Answer A2; BRD-12 p.4-5']
+  - [IQ09, 2, 'PMS', 'Layout of the daily PDC list from the PDC Management System; does BIBS also send PDC status (deposited, returned, pulled out) back to PMS? Frequency and transport.', 'Answer A2; OQ03; CSHID.008']
+  - [IQ10, 1, 'Bank channels', 'For CMS / New BOB (outward payments), OBPCS (bills payment), Old BOB (SOA funds transfers) and AFTS: file layouts or APIs, host-to-host or user upload, cut-off times, status and debit confirmation. What is AFTS used for? Is ICBS out of scope (struck through)?', 'Drop plan Drop 0; answer A2; AQ09, OQ03']
+  - [IQ11, 2, 'CCM', 'Does BIBS send through CCM by SMTP relay or by API? Attachment size limit, password-protected PDFs, volume (renewal advice batches), delivery status and bounces, sender addresses.', 'Answer A2']
+  - [IQ12, 3, 'M365 Exchange', 'What does BIBS do with M365 Exchange that CCM does not cover (read the mailboxes of e-mailed quotation requests or insurer replies through Microsoft Graph)?', 'Answer A2; Q12']
+  - [IQ13, 3, 'ECM', 'With documents in S3 only, is there any ECM touch-point left (source of legacy documents for the archive, transfer of records at the end of retention)?', 'Answers A2, A4']
+  - [IQ14, 3, 'TFS', 'Which client onboarding data comes from TFS, and what is the layout of the Trade payment file uploaded to Cashiering?', 'Answer A2; CSHID.008']
+  - [IQ15, 1, 'EDP (SD 11)', 'What is SD 11? Which BIBS data does EDP ingest, at what frequency and in which format (files to S3, change-data capture, events)? Masking of personal data?', 'Drop plan Drop 2; answer A2']
+  - [IQ16, 1, 'EGL', 'Does EGL take journal detail or balances, daily or monthly? Mapping of the BIBS chart to EGL accounts and segments, currency handling, layout and transport, reconciliation owner; relation to the GARD submission (AQ31).', 'Drop plan Drop 2; answer A2']
+  - [IQ17, 2, 'CARMS', 'What is CARMS, and which data flows between it and BIBS in which direction?', 'Drop plan Drop 2']
+  - [IQ18, 2, 'Insurer System', 'Which insurers and which exchanges (production feedback, remittance ORs, DP billing responses, renewal responses, SOAs, e-policies, claims) are in scope, and by which channel (SFTP, API, e-mail)?', 'Drop plan Drop 2; Q06, OQ22']
+  - [IQ19, 3, 'Bridger Insight XG', 'Is Bridger the screening engine (BIBS records its results) or a second check next to BIBS list matching (SNSRP-201, 301)? Is a batch export of clients for Bridger needed?', 'Drop plan Drop 2; answer A2; SQ01']
+  - [IQ20, 1, 'Reinsurance transactions in Remittance', 'Which reinsurance transactions does Remittance handle in Drop 1 (premium received from cedants and remitted to reinsurers, RI claims recoveries), with which accounting? Please send the "Operations BRD (Remittance Addendum)" and "(Cashiering Addendum)" named on the slide.', 'Drop plan 1.D2, 1.D3; answer A3']
+  - [IQ21, 2, 'Marketing Collection (extraction)', 'What is "Marketing Collection (extraction)" in Drop 2? BRD-4 Collections is a BIBS module fed by the Operations ledger; is a separate Collection Management System kept, with an extraction from BIBS?', 'Drop plan 2.1; BRD-4']
+  - [IQ22, 1, 'Employee Benefits without portal', 'Please confirm that insurers and client HR send EB documents by e-mail and BDOI users upload them (BRID-005, 005.01, 014 changed), and that EB placement (Drop 1) uses the NB placement screens.', 'Drop plan 2.4, 1.U6; BRD-8']
+  - [IQ23, 2, 'Unplaced BRDs', 'In which drop are BRD-10 Sanction Screening (we propose Drop 1 with Client Onboarding) and the CSF service-request functions (we propose Drop 2)?', 'Drop plan']
+  - [IQ24, 2, 'Drop 0 items without a BRD', 'Which requirements govern Drop 0 items 1 (Accessibility & Login: sign-in, or WCAG accessibility, or both), 4 (Data Management) and 5 (Workflow)? We propose BRD-11 + EIAM, CORE-17 of the umbrella BRD, and the workflows of each BRD.', 'Drop plan Drop 0']
+  - [IQ25, 1, 'Architecture in the IER', 'Please confirm that the IER describes BIBS as built: one backend (modular monolith) and one frontend on EKS, RDS PostgreSQL 16, ElastiCache Redis 7, MSK Kafka, S3; not the ten bv-* microservices, Aurora / MongoDB, Istio / OPA or EventBridge. Which edge is the BDO standard: ALB + WAF, CloudFront, Apigee X?', 'IER Architecture Diagram, K8s sheets']
+  - [IQ26, 1, 'Disaster recovery', 'Which region hosts DR (the HW sheet says cross-region read replica; the diagram says ap-southeast-1 warm standby)? Does data residency allow a second region? DR drill frequency?', 'IER HW & SW Requirements; hosting appendix; DCR-135']
+  - [IQ27, 2, 'Non-production hours', 'What are the 12 x 5 hours? We need extended hours for batch and month-end test cycles, weekend migration mocks and the dress rehearsal; MSK and ElastiCache cannot be stopped.', 'IER Assumptions 3']
+  - [IQ28, 2, 'VDI and access', 'Does "access restricted to personnel in the Philippines" apply to DEV and SIT with masked data? Which vendor staff need VDI? Software list: Temurin 21, Maven 3.9, Node 22 (not JDK 17, Node 20, Angular).', 'IER VDI Requirements; hosting appendix']
+  - [IQ29, 2, 'CI / CD toolchain', 'Which toolchain applies: GitLab (HW sheet), GitHub + Jenkins (infra diagram) or ArgoCD + Helm (diagram)? Container registry, image base (RHEL UBI or Alpine), SonarQube instance.', 'IER sheets']
+  - [IQ30, 3, 'Observability', 'Dynatrace (VDI, K8s sheets) or CloudWatch, X-Ray, Prometheus, Loki, Grafana (diagram)? Log platform and alert routing.', 'IER sheets']
+  - [IQ31, 1, 'S3 document store', 'Please confirm the five decisions of DOCUMENT_STORAGE_DECISION.md section 5: option C with 5-minute presigned links (or option B, streaming through BIBS); the malware scanning service; Object Lock mode and the records under legal hold; KMS key ownership and rotation; whether ECM receives copies of any record class. Also the bucket account and the DR region for replication.', 'Answer A4; DOCUMENT_STORAGE_DECISION.md']
+  - [IQ32, 2, 'Sizing basis', 'Which user figures size the platform: 1,200 internal users (IER diagram) or 1,344 named / 429 concurrent (umbrella BRD p.42)? Transactions per second per year (IER K8s guideline 3).', 'IER; DCR-166']
+  - [IQ33, 2, 'IER completeness', 'Will BDOI IT add the Pre-Prod and DR cluster sheets, retitle the Pre-Prod sheet (it reads "UAT ENVIRONMENT") and replace the template rows of the environment cost sheets with the sizing of this document?', 'IER Pre-Prod, K8s sheets']
+  - [IQ34, 3, 'ElastiCache mode', 'Please confirm cluster mode disabled (one shard, Multi-AZ replica) for Pre-Prod and PROD; "cluster" in the HW sheet would need a code change.', 'IER HW & SW Requirements']
+  - [IQ35, 2, 'Security testing', 'Who runs the performance and penetration tests of Nov - Dec 2027, and may an earlier scan run in SIT in June 2027?', 'Timeline slide']

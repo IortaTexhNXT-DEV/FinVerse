@@ -1,0 +1,60 @@
+// Programme alignment: the BDOI drops, their items and the BIBS build status of each item.
+digraph al_drop_map {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.18, ranksep=0.12, bgcolor="white", pad=0.12, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=3.1, height=0.36, margin="0.08,0.03", fillcolor="@WHITE"];
+  edge  [style=invis];
+
+  subgraph cluster_d0 {
+    label=<<b>Drop 0 - Setup and Data Migration</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded"; color="@HEADER_BLUE"; margin=8;
+    d01 [label="Accessibility & Login", fillcolor="@BG_BLUE"];
+    d02 [label="Authorization", fillcolor="@SUCCESS_BG"];
+    d03 [label="User Maintenance", fillcolor="@SUCCESS_BG"];
+    d04 [label="Data Management", fillcolor="@BG_BLUE"];
+    d05 [label="Workflow", fillcolor="@SUCCESS_BG"];
+    d06 [label="Product Maintenance", fillcolor="@SUCCESS_BG"];
+    d0m [label="Data Migration (BRD-13)", fillcolor="@AMBER_BG"];
+    d0i [label=<<font point-size="9">EIAM, UIDM-ISC, LMS, HL-LOAS, PMS,<br/>CMS / New BOB, OBPCS, Old BOB, AFTS,<br/>ECM, CCM, M365, TFS (manual)</font>>, fillcolor="@DIRTY_WHITE", color="@MUTED", height=0.7];
+    d01 -> d02 -> d03 -> d04 -> d05 -> d06 -> d0m -> d0i;
+  }
+  subgraph cluster_d1 {
+    label=<<b>Drop 1 - Transactional</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded"; color="@HEADER_BLUE"; margin=8;
+    u1 [label="U1 Client Onboarding", fillcolor="@BG_BLUE"];
+    u2 [label="U2 Quotation or Proposal", fillcolor="@SUCCESS_BG"];
+    u3 [label="U3 Account Creation / Maint.", fillcolor="@BG_BLUE"];
+    u4 [label="U4 Submitted Policy", fillcolor="@AMBER_BG"];
+    u5 [label="U5 Renewal", fillcolor="@AMBER_BG"];
+    u6 [label="U6 Placement & ePolicy", fillcolor="@BG_BLUE"];
+    u7 [label="U7 Booking", fillcolor="@BG_BLUE"];
+    u8 [label="U8 Accounting / GL", fillcolor="@SUCCESS_BG"];
+    u9 [label="U9 Reports (upstream)", fillcolor="@BG_BLUE"];
+    x1 [label="D1 Disbursement", fillcolor="@SUCCESS_BG"];
+    x2 [label="D2 Cashiering", fillcolor="@SUCCESS_BG"];
+    x3 [label="D3 Remittance (+ RI transactions)", fillcolor="@SUCCESS_BG"];
+    x4 [label="D4 Adjustment / Cancellation", fillcolor="@SUCCESS_BG"];
+    x5 [label="D5 Accounting / GL", fillcolor="@SUCCESS_BG"];
+    x6 [label="D6 Reports (BIR / regulatory)", fillcolor="@SUCCESS_BG"];
+    x7 [label="D7 Commission Receivables (DP)", fillcolor="@SUCCESS_BG"];
+    u1 -> u2 -> u3 -> u4 -> u5 -> u6 -> u7 -> u8 -> u9 -> x1 -> x2 -> x3 -> x4 -> x5 -> x6 -> x7;
+  }
+  subgraph cluster_d2 {
+    label=<<b>Drop 2 - Independent</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded"; color="@HEADER_BLUE"; margin=8;
+    i1 [label="Marketing Collection (extraction)", fillcolor="@SUCCESS_BG"];
+    i2 [label="Claims", fillcolor="@YELLOW"];
+    i3 [label="Production Reconciliation", fillcolor="@SUCCESS_BG"];
+    i4 [label="Employee Benefits (no portal)", fillcolor="@AMBER_BG"];
+    i5 [label="Other Reports", fillcolor="@BG_BLUE"];
+    i0 [label=<<font point-size="9">EDP (SD 11), EGL, CARMS,<br/>HL-LOAS, Insurer System,<br/>Bridger Insight XG (manual)</font>>, fillcolor="@DIRTY_WHITE", color="@MUTED", height=0.7];
+    np [label=<<b>Not placed on the slide</b><br/><font point-size="9">BRD-10 Sanction Screening<br/>BRD-9 CSF service requests</font>>, fillcolor="@DANGER_BG", color="@DANGER", height=0.6];
+    i1 -> i2 -> i3 -> i4 -> i5 -> i0 -> np;
+  }
+  subgraph cluster_key {
+    label=<<b>BIBS status</b>>; fontsize=11; fontcolor="@HEADER_BLUE"; style="rounded,dashed"; color="@MUTED"; margin=6;
+    k1 [label="Built", fillcolor="@SUCCESS_BG", width=1.3];
+    k2 [label="Built + designed parts", fillcolor="@BG_BLUE", width=1.3];
+    k3 [label="Being built", fillcolor="@YELLOW", width=1.3];
+    k4 [label="Designed, to build", fillcolor="@AMBER_BG", width=1.3];
+    k1 -> k2 -> k3 -> k4;
+  }
+  { rank=same; d01; u1; i1; k1; }
+}

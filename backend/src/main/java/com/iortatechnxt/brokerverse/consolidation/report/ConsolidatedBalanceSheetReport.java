@@ -40,7 +40,7 @@ public class ConsolidatedBalanceSheetReport extends ConsolidatedStatementReport
         ReportCategory.FINANCIAL_STATEMENTS,
         "Consolidated assets, liabilities and equity of a group after eliminations",
         ConsolidationReportSupport.parameters(),
-        Permission.REPORT_FINANCIAL);
+        Permission.CONSOLIDATION_RUN);
   }
 
   @Override

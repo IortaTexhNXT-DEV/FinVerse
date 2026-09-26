@@ -170,7 +170,8 @@ class PlanningApiIT {
     send(putJson("/api/v1/consolidation/groups/" + groupId, group), MANAGER, 200);
     String runs = "/api/v1/consolidation/groups/" + groupId + "/runs?asOf=2026-05-31";
     long runId = send(post(runs), MANAGER, 201).get("id").asLong();
-    mvc.perform(get("/api/v1/consolidation/runs/" + runId).with(as("auditor")))
+    // Consolidation is read with CONSOLIDATION_RUN only since V1064 (no longer REPORT_FINANCIAL).
+    mvc.perform(get("/api/v1/consolidation/runs/" + runId).with(as(MANAGER)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.trialBalance").isArray());
     send(post("/api/v1/consolidation/runs/" + runId + "/finalize"), MANAGER, 200);

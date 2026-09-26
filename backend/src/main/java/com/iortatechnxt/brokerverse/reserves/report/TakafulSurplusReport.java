@@ -67,7 +67,7 @@ public class TakafulSurplusReport implements ReportDefinition {
             ParameterSpec.optional(ReserveReportSupport.BRANCH, "Branch", ParameterType.BRANCH),
             ParameterSpec.select(
                 STATUS, "Posted / Unposted", List.of("ALL", POSTED, UNPOSTED), "ALL")),
-        Permission.REPORT_FINANCIAL);
+        Permission.RESERVE_VIEW);
   }
 
   @Override

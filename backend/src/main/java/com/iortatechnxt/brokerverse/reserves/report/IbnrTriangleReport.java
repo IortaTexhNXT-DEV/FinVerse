@@ -65,7 +65,7 @@ public class IbnrTriangleReport implements ReportDefinition {
                 BASIS, "Triangle", List.of(PARAMETER, "PAID", "INCURRED"), PARAMETER),
             ParameterSpec.select(
                 PERIOD, "Development Period", List.of(PARAMETER, "YEAR", "QUARTER"), PARAMETER)),
-        Permission.REPORT_FINANCIAL);
+        Permission.RESERVE_VIEW);
   }
 
   @Override

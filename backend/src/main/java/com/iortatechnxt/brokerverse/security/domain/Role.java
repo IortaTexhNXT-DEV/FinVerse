@@ -123,6 +123,16 @@ public class Role extends BaseEntity {
     this.deactivatedAt = null;
   }
 
+  /**
+   * Whether the role holds a permission of the insurer suite: the deactivated insurer roles of V2
+   * and the seed-only insurer story roles. The User Access screens do not list such a role.
+   *
+   * @return true when an insurer-only permission is granted
+   */
+  public boolean holdsInsurerPermission() {
+    return permissions.stream().anyMatch(Permission::isInsurerOnly);
+  }
+
   public boolean isActive() {
     return active;
   }

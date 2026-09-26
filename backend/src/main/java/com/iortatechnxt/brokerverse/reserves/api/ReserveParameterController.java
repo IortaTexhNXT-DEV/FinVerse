@@ -28,9 +28,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/reserves")
 public class ReserveParameterController {
 
-  private static final String VIEW = "hasAnyAuthority('MASTER_VIEW', 'RESERVE_PREPARE')";
-  private static final String MAINTAIN = "hasAuthority('MASTER_MAINTAIN')";
-  private static final String AUTHORIZE = "hasAuthority('MASTER_AUTHORIZE')";
+  private static final String VIEW = "hasAnyAuthority('RESERVE_VIEW', 'RESERVE_PREPARE')";
+  private static final String MAINTAIN =
+      "hasAuthority('MASTER_MAINTAIN') and hasAuthority('RESERVE_PREPARE')";
+  private static final String AUTHORIZE =
+      "hasAuthority('MASTER_AUTHORIZE') and hasAnyAuthority('RESERVE_VIEW', 'RESERVE_APPROVE')";
 
   private final ReserveParameterService parameters;
   private final TakafulSettingService takaful;

@@ -15,10 +15,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Daily expiry of lapsed quotations: every open quotation (draft, pending approval or approved) of
- * every active company whose validity ended before the business date becomes EXPIRED. Each company
- * is expired in its own transaction. The Quotations screen starts the same run for one company
- * ({@link #runFor}); both are recorded in the job monitor under {@value #JOB_NAME}.
+ * Expiry of lapsed insurer quotations: every open quotation (draft, pending approval or approved)
+ * of every active company whose validity ended before the business date becomes EXPIRED. Each
+ * company is expired in its own transaction. The Quotations screen starts the same run for one
+ * company ({@link #runFor}); both are recorded in the job monitor under {@value #JOB_NAME}. The
+ * schedule is disabled by default: the insurer suite is not used by BIBS (V1064).
  */
 @Component
 public class QuotationExpiryJob implements ManagedJob {
@@ -46,7 +47,7 @@ public class QuotationExpiryJob implements ManagedJob {
       OrganizationService organization,
       JobRunService runs,
       Clock clock,
-      @Value("${brokerverse.jobs.quotation-expiry-cron:0 45 0 * * *}") String cron) {
+      @Value("${brokerverse.jobs.quotation-expiry-cron:-}") String cron) {
     this.quotations = quotations;
     this.organization = organization;
     this.runs = runs;

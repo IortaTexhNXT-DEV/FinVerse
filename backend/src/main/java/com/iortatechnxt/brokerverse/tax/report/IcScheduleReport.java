@@ -54,7 +54,7 @@ abstract class IcScheduleReport implements ReportDefinition {
             + (schedule.byLineOfBusiness() ? "period movement by line of business" : "balances")
             + ")",
         List.of(TaxReportSupport.company(), TaxReportSupport.from(), TaxReportSupport.to()),
-        Permission.TAX_VIEW);
+        Permission.INSURER_TAX_VIEW);
   }
 
   @Override

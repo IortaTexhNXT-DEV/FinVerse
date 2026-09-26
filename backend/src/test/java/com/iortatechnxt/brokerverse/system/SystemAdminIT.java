@@ -92,9 +92,10 @@ class SystemAdminIT {
             })
         .anySatisfy(
             s -> {
+              // Insurer suite job, disabled by default (V1064).
               assertThat(s.job().name()).isEqualTo("QUOTATION_EXPIRY");
-              assertThat(s.job().cron()).isEqualTo("0 45 0 * * *");
-              assertThat(s.nextRun()).isNotNull();
+              assertThat(s.job().cron()).isEqualTo(JobRegistry.DISABLED);
+              assertThat(s.nextRun()).isNull();
             });
     assertThat(jobs.nextRun(JobRegistry.DISABLED)).isNull();
     assertThatThrownBy(() -> jobs.run("NO_SUCH_JOB", JobTrigger.MANUAL))

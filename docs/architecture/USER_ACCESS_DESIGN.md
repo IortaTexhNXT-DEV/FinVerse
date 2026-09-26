@@ -37,15 +37,18 @@ security ──► audit, system (parameters), common
 
 ## 3. Flyway allocation
 
-Allocated range: **schema V1060-V1069, seed V1960-V1969**. Three schema versions are used and seven are kept free.
+Allocated range: **schema V1060-V1069, seed V1960-V1969**. Five schema versions are used and five are kept free.
 
 | Version | Owner (wave) | Content |
 |---|---|---|
 | `V1060__uam_foundation.sql` | U0 | Roles `UAM_REQUESTOR`, `UAM_APPROVER`, `UAM_SECOND_APPROVER`. Grants of the new permissions (section 6), including every role that holds `ACCESS_REQUEST` today (BUSINESS_ADMIN, SYSADMIN), for compatibility. `sec_permission_action` rows for the new permissions (area `USER_ACCESS`), plus the missing area / action rows of existing permissions so the group-profile report can show a module for every task (BRD 3.003.2.2). Parameters (section 8). Updated description of `LOGIN_MAX_FAILED_ATTEMPTS` (CQ23 answered: all users). LOV types `UAM_BUSINESS_UNIT`, `UAM_USER_LEVEL`, `UAM_DEACTIVATION_REASON`. Alert codes, notification events |
 | `V1061__security_user_access_extensions.sql` | U0 | `sec_user` + `windows_id` (unique, nullable), `business_unit_code`, `user_level`, `password_changed_at`, `must_change_password`, `last_logout_at`. `sec_role` + `active` (default true), `description`, `privilege_level` (default STANDARD; SYSADMIN = ADMIN). `sec_password_history`, `sec_user_session`, `sec_access_change_log` + insert-only trigger |
 | `V1062__nbadmin_request_lifecycle.sql` | U1-A | `nba_access_request`: new columns (section 4.2, including the external-user columns of section 4.4); check constraints widened to the new statuses, types and user types. `nba_access_request_event`, `nba_access_request_approver`, `nba_access_request_batch`. `sec_access_change_log.subject_type` check widened to EXTERNAL_USER |
-| `V1063-V1069` | - | Kept free (the EUA adapter configuration and a single-session rule if UQ04 / UQ09 require schema) |
+| `V1063__security_sign_in_and_passwords.sql` | U1-B | Sign-in, passwords, sessions and the user access reports (see the migration header) |
+| `V1064__hide_insurer_roles_and_permissions.sql` | Insurer suite hiding | Withdraws the insurer-only permissions (`Permission.isInsurerOnly`: `POLICY_*`, `CLAIM_*`, `REINSURANCE_*`, `RESERVE_*`, `CONSOLIDATION_RUN`, `INSURER_TAX_VIEW`) from every role and deactivates `UNDERWRITER`, `CLAIMS_OFFICER`, `RI_OFFICER`, with access change log rows. The User Access screens neither list nor accept these permissions or the roles holding them ([`CODEBASE_RELEVANCE_AUDIT.md`](../development/CODEBASE_RELEVANCE_AUDIT.md) R1) |
+| `V1065-V1069` | - | Kept free (the EUA adapter configuration and a single-session rule if UQ04 / UQ09 require schema) |
 | `db/seed/V1960__seed_user_access.sql` | U1-A | Users `requestor` (UAM_REQUESTOR), `uamapprover` (UAM_APPROVER), `secapprover` (UAM_SECOND_APPROVER). Requests in every status: draft, pending for `uamapprover`, returned, cancelled, scheduled (future date), approved and applied, a bulk batch of three lines, a CREATE_ROLE request FOR_IMPLEMENTATION for `admin`, a privileged change awaiting second approval. Change-log rows for the applied ones |
+| `db/seed/V1961__seed_insurer_story_roles.sql` | Insurer suite hiding | Seed-only roles `SIT_INS_<role>` that keep the insurer access of the SIT/UAT users (`uw`, `claims`, `reinsurer`, `fmanager`, `accountant`, `checker`, `auditor`) after V1064, until the insurer modules are removed |
 
 Rules:
 - V1060 / V1061 run after V790 / V791 (`nba_access_request`), V755 (`sec_permission_action`) and V1000 (`LOGIN_MAX_FAILED_ATTEMPTS`) on a fresh database. V1062 runs after V1061.

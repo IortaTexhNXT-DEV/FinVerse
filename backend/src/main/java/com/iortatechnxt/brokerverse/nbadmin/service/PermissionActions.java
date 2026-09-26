@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
+import com.iortatechnxt.brokerverse.security.domain.Permission;
 import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -40,13 +41,17 @@ public class PermissionActions {
    * @return action classes in display order
    */
   public List<PermissionAction> list(String area) {
-    return jdbc.query(
-        SQL,
-        (rs, i) ->
-            new PermissionAction(
-                rs.getString("permission"), rs.getString("area"), rs.getString("action")),
-        area,
-        area);
+    return jdbc
+        .query(
+            SQL,
+            (rs, i) ->
+                new PermissionAction(
+                    rs.getString("permission"), rs.getString("area"), rs.getString("action")),
+            area,
+            area)
+        .stream()
+        .filter(a -> Permission.isOffered(a.permission()))
+        .toList();
   }
 
   /**

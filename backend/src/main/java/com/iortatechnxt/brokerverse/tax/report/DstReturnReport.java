@@ -37,7 +37,7 @@ public class DstReturnReport implements ReportDefinition {
         ReportCategory.TAX_STATUTORY,
         "DST on policies and endorsements per month",
         List.of(TaxReportSupport.company(), TaxReportSupport.from(), TaxReportSupport.to()),
-        Permission.TAX_VIEW);
+        Permission.INSURER_TAX_VIEW);
   }
 
   @Override

@@ -152,9 +152,9 @@ class ReservesIT {
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("already exists");
     ApprovalViewer checker =
-        ApprovalViewer.user("fmanager", Set.of("PERIOD_END_RUN", "MASTER_AUTHORIZE"));
+        ApprovalViewer.user("fmanager", Set.of("RESERVE_APPROVE", "MASTER_AUTHORIZE"));
     assertThat(inbox.pendingFor(checker)).anyMatch(i -> i.reference().equals("2026-03"));
-    assertThat(inbox.pendingFor(ApprovalViewer.user("accountant", Set.of("PERIOD_END_RUN"))))
+    assertThat(inbox.pendingFor(ApprovalViewer.user("accountant", Set.of("RESERVE_APPROVE"))))
         .noneMatch(i -> i.reference().equals("2026-03"));
 
     ValuationRun rejected =

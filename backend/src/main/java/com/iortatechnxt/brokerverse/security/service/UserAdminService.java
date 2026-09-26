@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import com.iortatechnxt.brokerverse.security.domain.PasswordHistory;
 import com.iortatechnxt.brokerverse.security.domain.PasswordHistoryRepository;
+import com.iortatechnxt.brokerverse.security.domain.Permission;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
 import com.iortatechnxt.brokerverse.security.domain.SessionEndReason;
@@ -292,13 +293,16 @@ public class UserAdminService {
   }
 
   /**
-   * Lists roles.
+   * Lists the roles of the User Access screens. Roles holding an insurer-only permission (the
+   * deactivated insurer roles, V1064) are not listed.
    *
    * @return roles ordered by code
    */
   @Transactional(readOnly = true)
   public List<Role> listRoles() {
-    return roles.findAll(Sort.by("code"));
+    return roles.findAll(Sort.by("code")).stream()
+        .filter(r -> !r.holdsInsurerPermission())
+        .toList();
   }
 
   /**
@@ -487,6 +491,12 @@ public class UserAdminService {
   }
 
   private static void applyRole(Role role, RoleRequest request) {
+    List<Permission> insurerOnly =
+        request.permissions().stream().filter(Permission::isInsurerOnly).sorted().toList();
+    if (!insurerOnly.isEmpty()) {
+      throw new BusinessRuleException(
+          "PERMISSION_NOT_OFFERED", "Permission(s) not available in BIBS: " + insurerOnly);
+    }
     role.replacePermissions(request.permissions());
     if (request.description() != null) {
       role.setDescription(blankToNull(request.description()));

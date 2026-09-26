@@ -60,7 +60,7 @@ public class IbnrProcessingReport implements ReportDefinition {
         ReportCategory.ACTUARIAL,
         "IBNR per class and product: earned premium base, rate, IBNR and reinsurers' portion",
         params,
-        Permission.REPORT_FINANCIAL);
+        Permission.RESERVE_VIEW);
   }
 
   @Override

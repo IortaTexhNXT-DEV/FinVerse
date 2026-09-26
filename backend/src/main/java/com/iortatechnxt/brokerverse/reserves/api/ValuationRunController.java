@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/v1/reserves/runs")
-@PreAuthorize("hasAnyAuthority('RESERVE_PREPARE', 'PERIOD_END_RUN')")
+@PreAuthorize("hasAnyAuthority('RESERVE_PREPARE', 'RESERVE_APPROVE')")
 public class ValuationRunController {
 
   private static final int MAX_PAGE_SIZE = 200;
@@ -157,7 +157,7 @@ public class ValuationRunController {
    * @return header
    */
   @PostMapping("/{id}/approve")
-  @PreAuthorize("hasAuthority('PERIOD_END_RUN')")
+  @PreAuthorize("hasAuthority('RESERVE_APPROVE')")
   public ValuationRunResponse approve(@PathVariable Long id) {
     return ValuationRunResponse.from(service.approve(id));
   }
@@ -170,7 +170,7 @@ public class ValuationRunController {
    * @return header
    */
   @PostMapping("/{id}/reject")
-  @PreAuthorize("hasAuthority('PERIOD_END_RUN')")
+  @PreAuthorize("hasAuthority('RESERVE_APPROVE')")
   public ValuationRunResponse reject(
       @PathVariable Long id, @Valid @RequestBody ReasonRequest request) {
     return ValuationRunResponse.from(service.reject(id, request.reason()));
@@ -183,7 +183,7 @@ public class ValuationRunController {
    * @return header
    */
   @PostMapping("/{id}/post")
-  @PreAuthorize("hasAuthority('PERIOD_END_RUN')")
+  @PreAuthorize("hasAuthority('RESERVE_APPROVE')")
   public ValuationRunResponse post(@PathVariable Long id) {
     return ValuationRunResponse.from(service.post(id));
   }
@@ -196,7 +196,7 @@ public class ValuationRunController {
    * @return header
    */
   @PostMapping("/{id}/cancel")
-  @PreAuthorize("hasAuthority('PERIOD_END_RUN')")
+  @PreAuthorize("hasAuthority('RESERVE_APPROVE')")
   public ValuationRunResponse cancel(
       @PathVariable Long id, @Valid @RequestBody ReasonRequest request) {
     return ValuationRunResponse.from(service.cancel(id, request.reason()));

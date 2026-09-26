@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class IntercompanyController {
 
   private static final String RUN = "hasAuthority('CONSOLIDATION_RUN')";
-  private static final String VIEW = "hasAnyAuthority('CONSOLIDATION_RUN','REPORT_FINANCIAL')";
+  private static final String VIEW = "hasAuthority('CONSOLIDATION_RUN')";
 
   private final IntercompanyService service;
   private final IntercompanyReconciliationService reconciliation;

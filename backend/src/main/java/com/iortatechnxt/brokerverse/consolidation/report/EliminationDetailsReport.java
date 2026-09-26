@@ -45,7 +45,7 @@ public class EliminationDetailsReport implements ReportDefinition {
         ReportCategory.FINANCIAL_STATEMENTS,
         "Inter-company, investment/equity eliminations and translation adjustments of a run",
         ConsolidationReportSupport.parameters(),
-        Permission.REPORT_FINANCIAL);
+        Permission.CONSOLIDATION_RUN);
   }
 
   @Override

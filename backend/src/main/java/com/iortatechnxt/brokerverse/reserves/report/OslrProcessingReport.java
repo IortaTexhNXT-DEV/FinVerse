@@ -44,7 +44,7 @@ public class OslrProcessingReport implements ReportDefinition {
         ReportCategory.ACTUARIAL,
         "Outstanding loss reserve of open claims per class and product",
         ReserveReportSupport.baseParams("OSLR Processed Date"),
-        Permission.REPORT_FINANCIAL);
+        Permission.RESERVE_VIEW);
   }
 
   @Override

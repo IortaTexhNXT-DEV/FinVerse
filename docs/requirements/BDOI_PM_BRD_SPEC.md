@@ -244,6 +244,7 @@ The rows above are kept as asked. The single record with the design impact is
 | PQ17 | answered | BRD-11 UAM (p.6) | Group-profile (role-permission) changes are approved: the Business Administrator requests, the approver(s) approve, the System Administrator implements (FOR_IMPLEMENTATION, `UAM_ROLE_APPLY_ON_APPROVAL` default false, UQ03). Direct role editing only through the audited emergency parameter `UAM_DIRECT_ROLE_EDIT`. The matrix content itself is still a BDOI deliverable (OQ48) |
 | PQ21 | partial | BRD-8 EB (BRID-007) | TOR, master list and utilization reports sent to insurers are password protected with the password sent separately. Product Maintenance documents and the convention itself (Q07, EBQ09) stay open |
 | PQ18 | open (more data) | BRD-7 to BRD-12 | Each later BRD adds its own NFR and retention set (OQ44); no alignment yet |
+| PQ19 | partial | BRD-00 Core Replacement (capability 4, p.7) | "Non-Package Management" in the umbrella is read as the non-package placement of New Business (PRF, quotation slip, proposal slip), not the maintenance of non-package products, so non-package product maintenance stays out of scope; to be confirmed (CRQ02) |
 
 ## 8. Current capability in brief (what is built today)
 

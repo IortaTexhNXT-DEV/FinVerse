@@ -162,6 +162,22 @@ Money is `numeric(19,2)`, rates are `numeric(19,8)`, and the BOOK rate is stored
   PASS_ON), source ref, payee, amount, status (SENT / ACKNOWLEDGED / DV_ASSIGNED / PAID / RETURNED), dv_no and
   dates.
 
+**Legacy invoices (BRD-13 Data Migration; designed, not built).** An EBIX / QPS invoice still open at cutover is
+carried into `ops_invoice` and processed in BIBS for the rest of its life ([`DATA_MIGRATION_DESIGN.md`](DATA_MIGRATION_DESIGN.md)
+§14.1). Migration **V1086** (Data Migration range, because V760-V763 is full) adds, for the `opsledger` owner:
+- `ops_invoice.origin` (BIBS default / LEGACY), `ledger_context` (NEW / LEGACY; an endorsement invoice whose root is a
+  legacy invoice inherits LEGACY), `source_system` (EBIX / QPS), `legacy_invoice_no`, `legacy_ref` (cover no. and
+  version), `migration_batch_no`, and an index on `legacy_invoice_no`;
+- `feed_source` value MIGRATION;
+- movement types **`LEGACY_PAID`** (APPLIED bucket), **`LEGACY_REMITTED`** (REMITTED), **`LEGACY_ADJUSTED`**
+  (ADJUSTED) and **`LEGACY_WRITTEN_OFF`** (WRITTEN_OFF), posted with the opening BOOKED movement so the component
+  balance equals the open balance at cutover and the balance check still holds;
+- `ops_invoice_origin_snapshot`: the frozen original values, written once by the intake (original value of the
+  legacy change report).
+A legacy invoice is created by the new `opsledger.service.LegacyInvoiceIntake`, not by `InvoiceLedgerWriter.record`
+(which reads the booked invoice). `opsledger` also implements `booking.service.port.LegacyInvoiceSource`
+(`OpsLegacyInvoiceSource`) for endorsements of legacy invoices. These columns are created only by V1086.
+
 ### 4.2 `cashiering`
 
 - `csh_receipt_series`: branch_id, kind (AR / OR), ATP no., prefix, from_no, to_no, next_no, warn_at, active.
@@ -318,6 +334,24 @@ The sub-ledger records:
 - unapplied balances as CREDIT items of the client.
 
 Every event records its `ops_invoice_movement` in the same transaction.
+
+**Legacy components (BRD-13; decision D8 of `BDOI_CROSS_BRD_DECISIONS.md`).** The events above also carry legacy
+invoices and legacy UPP. No new event is added: every posting helper asks the invoice (or the UPP item) for its
+`LedgerContext` and emits the component with the prefix `LG_` when the context is LEGACY (`LG_PR_BASIC` ...
+`LG_PR_OTHER`, `LG_PR2307`, `LG_DTIP`, `LG_COMMISSION`, `LG_COMMISSION_VAT`, `LG_UNREALIZED`, `LG_DEFERRED_VAT`,
+`LG_APPLIED`, `LG_AMOUNT`). Comptrollership adds the `LG_` lines to the rules of events 1-26, routed to the legacy
+control accounts (demo: 1215.x Premium Receivable - Legacy, 1216 PR 2307 - Legacy, 1221 Commission Receivable -
+Legacy, 2206 Unapplied Collections - Legacy, 2212 Due to Insurers - Legacy, 2222 / 2223 unrealised commission and
+deferred VAT - Legacy); absent components produce no lines, so the engine does not change. Helpers concerned:
+`CashieringPosting`, `ApplicationService`, `DispositionExecutor`, `CwtPostings`, `MinimalBalanceService`,
+`RemittancePostings`, `DpPostings`, adjustment `LedgerEffects`, booking `BookingEvents`. For a legacy invoice
+`OPS_DP_PR_REVERSAL` (22) always posts, whatever `DP_PR_REVERSAL_POSTING` says. Opening entries and the migration
+clearing account: [`DATA_MIGRATION_DESIGN.md`](DATA_MIGRATION_DESIGN.md) §14.2.
+
+**Gap noted by the Data Migration analysis.** Operations postings do not settle the `sl_open_item` rows that booking
+records (`booking/service/BookingPosting.java`) for client PR, insurer DTIP and commission receivable, for new or
+legacy invoices. FRBS reports on `sl_open_item` therefore keep showing collected or remitted items as open. To be
+decided with the Operations and Accounting owners.
 
 ## 6. Security
 
@@ -603,7 +637,10 @@ with saved quick filters, empty and loading states, and toasts.
 - **Invoice 360** (opsledger), reachable from everywhere by ARN or invoice no. (ADJID.024, RMTID.026):
   - a component table with booked / applied / remitted / adjusted / balance;
   - status chips: payment, remittance, hold, lock, DP, written-off;
-  - a movement timeline, receipts, batches and adjustments.
+  - a movement timeline, receipts, batches and adjustments;
+  - (BRD-13) no longer requires a booked invoice: for origin LEGACY `Invoice360Service.view` does not call
+    `bookings.byNo`, the booking references are empty, and a legacy block shows the source system, legacy number,
+    legacy reference, migration batch and the frozen snapshot; lists and the header show a LEGACY badge.
 
 Frontend folders:
 - `features/operations` (home + invoice 360), owned by O0;

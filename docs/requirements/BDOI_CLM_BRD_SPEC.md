@@ -331,6 +331,14 @@ Not answered: OQ02-OQ24, OQ26-OQ43, OQ45, OQ47, OQ49, OQ50; Q01-Q36, Q38, Q40, Q
 | CLQ27 | Branch scope | Do branch claims users see only their branch's claims, or all claims? | NFR p.37, BRCLM.003 |
 | CLQ28 | Total loss | The Renewal BRD uses "Total Loss Claim" as a non-renewal reason (RN p.82) and needs the number and status of claims per account (RN p.50, 86). Should Claims record a total-loss indicator (a settlement type, a loss nature or a flag)? | Renewal BRD, BRCLM.014 |
 
+**Answered in part by later BRDs** (single record with the design impact: [`BDOI_CROSS_BRD_DECISIONS.md`](BDOI_CROSS_BRD_DECISIONS.md) section 3):
+- **CLQ13 partial** (BRD-13 Data Migration, BRID 11.1): claims history stays in legacy or the archive; open claims are
+  not mentioned, so `legacy_ref` is needed only if open claims are migrated (DMQ30).
+- **CLQ14 partial** (BRD-13 p.3, BRID 11.1): historical claims are not migrated into BIBS (read-only legacy or archive,
+  record type CLAIM); open claims are not addressed (DMQ30). V1025 stays held.
+- **CLQ10** is asked again by the Core Replacement umbrella BRD (BR-146 to BR-148, unclaimed cheque safekeeping and
+  hand-over to / retrieval from Cashiering): **CRQ03**, cross-BRD conflict **XQ13**.
+
 ## 12. Observations on the BRD pack
 
 - The PDF binds three documents newest first: the workshop addendum (Apr-2026), the renumbering addendum (Dec-2025) and the original BRD (Jan / Mar-2025). The renumbering addendum only replaces FRID-001..036 with BRCLM.001..036; its page header "2 of 9 … 7 of 9" repeats the addendum template.

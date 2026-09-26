@@ -461,6 +461,14 @@ Questions **not** answered by this BRD: OQ01, OQ02, OQ07, OQ45 (Collection, Disb
 | RQ29 | Late renewals | Should the Late Renewal Requests Report (BRNB.018, Q09) be delivered with Renewal as a variant of the listing? | BRNB.018 |
 | RQ30 | Expired package versions | Renewal of an account whose package version is EXPIRED with no current version (`PRODUCT_NOT_SELLABLE` under the RENEWAL purpose): route to the NB path automatically, or keep the old terms with approval? | PQ11, BRRN.035 |
 
+**Answered in part by later BRDs** (single record with the design impact: [`BDOI_CROSS_BRD_DECISIONS.md`](BDOI_CROSS_BRD_DECISIONS.md) section 3):
+- **RQ27 partial** (BRD-13 Data Migration, BRID 4.1, 12.1, p.5): the transition is renewal-driven and aligned to RMEL;
+  in-force headers are migrated when required; renewals recreate clean records in BIBS. `LegacyPolicySource` is
+  implemented by the `migration` module; the transition model for the RMEL cohorts already extracted in legacy is
+  DMQ26.
+- **Letter name.** The Core Replacement umbrella BRD calls the letter "Non-Renewal Letter (NRL)" (p.8); this BRD calls
+  it "Not for Renewal Letter (NFR)". BIBS keeps NFR until **CRQ14** is answered.
+
 ## 11. Observations on the BRD pack
 
 - **Three documents, two addenda with overlapping IDs.** BRRN.001-019 (Addendum 1, Dec 2025) and BRRN.020-040 (Workshop addendum, Apr 2026) continue one numbering. Only Addendum 1 fills the "Source BRD ID" column. BRRN.020-040 are new requirements with no link to the main BRD, so their relation to the persona steps is inferred (section 4).

@@ -51,8 +51,8 @@ so each document can be regenerated after every build.
 | 25 | Installation and deployment guide (environments, configuration, secrets, releases) | Word | B |
 | 26 | Security and data-protection controls mapping (hosting appendix, masking of non-production data, access, audit) | Word + Excel | A + B |
 | 27 | Code quality report (static analysis, coverage, dependency and licence scan) | Excel | B |
-| 28 | Performance and volume test plan and results (against the NFRs of each BRD) | Word + Excel | B |
-| 29 | Data migration approach (legacy EBIX, ISYS, QPS and Excel sources, reconciliation) | Word | A |
+| 28 | Performance and volume test plan and results (against the NFRs of each BRD; the peak case is 429 concurrent sessions, the sum of the user rows of the Core Replacement umbrella BRD p.42, until BDOI answers DCR-166 / CRQ21) | Word + Excel | B |
+| 29 | Data migration approach (legacy EBIX, ISYS, QPS and Excel sources, reconciliation). Sources: the BRD-13 spec [`BDOI_DM_BRD_SPEC.md`](../requirements/BDOI_DM_BRD_SPEC.md), the design [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md), the FRS [`FRS_BRD13_DATA_MIGRATION.md`](src/frs/FRS_BRD13_DATA_MIGRATION.md) and the migration document set in [`src/migration/`](src/migration/); the umbrella BRD's client-migration volumes (BRD-00 p.43) | Word | A |
 | 30 | UAT plan and sign-off forms per BRD | Word | B |
 | 31 | Release notes and open-questions log for BDOI | Word + Excel | B |
 
@@ -127,7 +127,7 @@ BDOI theme and checked against the source data:
 - reports in Excel and PDF; documents and schedules in Word and PDF (item 17);
 - upload and download templates tested from the templates folder (item 20).
 
-**6. Requirement master list with results.** One workbook lists every requirement of all twelve BRDs (the RTM, item 21).
+**6. Requirement master list with results.** One workbook lists every requirement of all the BRDs, BRD-00 to BRD-13 (the RTM, item 21).
 For each requirement it shows:
 - the FR, the screen and the field;
 - the test case, the result on screen, the evidence (screenshot) and the defect, if any;
@@ -143,7 +143,8 @@ Its summary is the UAT readiness statement per module and for the platform.
   message to the code.
 
 **8. Performance and volume** (item 28). BDOI is a volume business (retail and transactions), so the tests cover:
-- load tests at the BRD volumes and peak periods (month end, renewal season, bulk uploads);
+- load tests at the BRD volumes and peak periods (month end, renewal season, bulk uploads), with 429 concurrent
+  sessions as the peak case until DCR-166 is answered (the register proposes sizing for 150 concurrent plus 20% a year);
 - screen response times against the NFRs, batch run times, report generation under load;
 - database growth and archiving.
 
@@ -162,7 +163,8 @@ Its summary is the UAT readiness statement per module and for the platform.
 - monitoring and alerts (item 38), and the runbook (item 24).
 
 **11. Also in scope** (added to the client's list):
-- a data migration dry run with reconciliation of migrated balances (item 29);
+- a data migration dry run with reconciliation of migrated balances (item 29): mock runs and the dress rehearsal of
+  the Data Migration design, with the legacy clearing account at 0.00;
 - browser and screen-size checks and the accessibility statement (item 40);
 - concurrency (two users on the same record);
 - e-mail and notification delivery;
@@ -189,9 +191,9 @@ page previews). Sources: `docs/deliverables/src/`; outputs: `docs/deliverables/o
 
 | # | Document | Status |
 |---|---|---|
-| 1 | FRS, one per BRD (BRD-5 in two volumes with a cover note) | v1.0 issued for BDOI review: `out/FRS/`, 14 Word files |
-| 2 | Discrepancy and clarification register | v1.0: `out/Registers/BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx` |
-| 3 | Test plans, one per FRS volume | v1.0: `out/TestPlans/`, 13 workbooks and 13 Word summaries; builder `src/testplans/build_test_plan.py` |
+| 1 | FRS, one per BRD (BRD-5 in two volumes with a cover note) | v1.0 issued for BDOI review: `out/FRS/`, 16 Word files: the BRD-00 Core Replacement umbrella, BRD-1 to BRD-13 (BRD-13 Data Migration added) and the BRD-5 cover note. The Claims FRS numbers its requirements FR-CM-nnn (renumbered from FR-CL-nnn, which Collections keeps; DCR-188) |
+| 2 | Discrepancy and clarification register | v1.1: `out/Registers/BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.1.xlsx`: 209 items (BRD-00 Core Replacement DCR-163 to DCR-188, BRD-13 Data Migration DCR-189 to DCR-209 added) and 410 questions (CRQ01-CRQ25, DMQ01-DMQ35, XQ12-XQ13 added) |
+| 3 | Test plans, one per FRS volume | v1.0: `out/TestPlans/`, 13 workbooks and 13 Word summaries (BRD-1 to BRD-12); builder `src/testplans/build_test_plan.py`. The Claims plan uses case IDs keyed on FR-CM. Not yet written: BRD-13 Data Migration (and the cross-cutting FR-CR requirements of BRD-00) |
 | 17 | Reports in Excel and PDF; documents and schedules in Word and PDF | Built in the platform (`ExportFormat.DOCX`, document renditions); see Developer Guide 6.1-6.2 |
 | 41 | Business process deck | v1.0: `out/Decks/BIBS_Deck_BRD-00_Business_Process_AsIs_Envisioned_BestPractice_v1.0.pptx` |
 

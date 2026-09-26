@@ -376,7 +376,8 @@ Annex I lists 67 Other Lines risk codes (CAR, CGL, CTP, EEI, EPF, GIP, INL, MOP/
 
 ### 9.1 Answered by later BRDs
 
-The rows above are kept as asked. This section records what the later BRDs (BRD-6 to BRD-12) answer. The single
+The rows above are kept as asked. This section records what the later BRDs (BRD-6 to BRD-12, then BRD-00 Core
+Replacement and BRD-13 Data Migration) answer. The single
 record of every cross-BRD answer, with the design impact, is
 [`BDOI_CROSS_BRD_DECISIONS.md`](BDOI_CROSS_BRD_DECISIONS.md) section 3. Status: **answered**, **partial** (the question
 stays open for the rest) or **open**.
@@ -389,7 +390,7 @@ stays open for the rest) or **open**.
 | Q09 | open | BRD-6 RN (RQ29); BRD-12 SP (Report List #182) | Not answered. The RN reports have no late-renewal-request report; Report List #182 is a *package* late-renewal report (TSU). BRNB.018 stays parked; proposal: a variant of `RNW-LISTING` once BDOI confirms (RQ29) |
 | Q06 | partial | BRD-8 EB (BRID-005, 005.01-005.02, 009) | For EB, insurers use a secure portal or API. Other lines: still e-mail |
 | Q07 | partial | BRD-8 EB (BRID-007) | A standard assigned password or a system-generated one following a defined syntax, sent separately; the convention itself is still missing (EBQ09). BRD-6 needs it for RAs too |
-| Q08 | partial | BRD-9 CSF (p.3 footnote 3) | QPS and EBIX must receive client contact updates during coexistence (`ContactSyncGateway` outbox, CSQ01). Other targets still open |
+| Q08 | partial | BRD-9 CSF (p.3 footnote 3) | QPS and EBIX must receive client contact updates during coexistence (`ContactSyncGateway` outbox, CSQ01). Other targets still open BRD-13 Data Migration (p.5): after cutover legacy is read-only and no feed to QPS / EBIX is required by that BRD (conflicts with the CSF footnote; CSQ01). |
 | Q10 | partial | BRD-6 RN (personas, tabs, 34 counters, BRRN.040) | Renewal stages and statuses (workflow `RNW_CASE`); counter mapping to confirm (RQ10) |
 | Q11 | partial | BRD-12 SP (p.4-5, Report List #138 / #151) | Sources named: LFS insurance report, HLS daily insurance report, CIU report, SPI list, LAMD report, Loan Booking Report, IA masterlist; all Excel today. Layouts and transports still open (SP SQ01) |
 | Q14 | partial | BRD-6 RN (BRRN.020); BRD-12 SP (Report List #151) | Renewal: sanitation is rule-based in the system, criteria "agreed" but not listed (RQ01). Submitted policies: PN vs LAMD match, FFY / employee / No Touch exclusions, loan status, duplicate checks, PN = serial / motor / assured checks |
@@ -402,10 +403,10 @@ stays open for the rest) or **open**.
 | Q28 | partial | BRD-12 SP (Report List #65-67) | Three CLPC billing variants with sample files. Transport and schedule still open |
 | Q31 | partial | BRD-8 EB (BRID-005.01) | For EB, insurers upload policy forms and billing through the portal. Other lines still open |
 | Q36 | partial | BRD-12 SP (BRIDSP-13/14, Report List #156) | At renewal an FFY account gets an FFY-specific RA template; FFY is both a renewal and a non-renewal bucket (SP SQ05). The payer is not stated |
-| Q37 | partial | BRD-7 CLM (BRCLM.007, 039); BRD-9 CSF (p.3, BRCSF-002) | The policy number flows from the policy system to Claims, which must not re-key it; QPS and EBIX are today's systems of record for client contact data during coexistence |
-| Q39 | partial | BRD-7 CLM (p.41); BRD-8 EB (NFR); BRD-9 CSF (NFR); BRD-10 SANC (p.25) | Claims 10 years online / 15 archive; EB 5 / 15; CSF 5 / 15 (backup retention 5 years); screening records 5 / 5. Other record types, and archive vs purge, still open; BRD-11 says "follow QPS" (UQ12) |
-| Q40 | partial | BRD-8 EB (BRID-022 AC9); BRD-12 SP (Report List #74) | "Customise needed reports (date range, client, product type)"; "user-defined filters as needed; export to Excel / PDF; no defined template". Saved variants plus column filters meet it; no query builder |
-| Q44 | answered (for claims) | BRD-7 CLM (BRCLM.023/024) | BDOI records the insurer's reserve and settlement as information only; no reserving, no journal. The insurer-side `claims` module stays hidden from BDOI roles |
+| Q37 | partial | BRD-7 CLM (BRCLM.007, 039); BRD-9 CSF (p.3, BRCSF-002) | The policy number flows from the policy system to Claims, which must not re-key it; QPS and EBIX are today's systems of record for client contact data during coexistence BRD-13 (p.5): from cutover the new Core holds the trusted client master and the governed reference data. |
+| Q39 | partial | BRD-7 CLM (p.41); BRD-8 EB (NFR); BRD-9 CSF (NFR); BRD-10 SANC (p.25) | Claims 10 years online / 15 archive; EB 5 / 15; CSF 5 / 15 (backup retention 5 years); screening records 5 / 5. Other record types, and archive vs purge, still open; BRD-11 says "follow QPS" (UQ12) BRD-00 Core Replacement (p.45): 5 years online and 15 years offline for application, database and audit logs and historical data, the platform default; BRD-7 and the 5 / 5 BRDs remain exceptions (CRQ22). BRD-13 defers to the consolidated NFR. |
+| Q40 | partial | BRD-8 EB (BRID-022 AC9); BRD-12 SP (Report List #74) | "Customise needed reports (date range, client, product type)"; "user-defined filters as needed; export to Excel / PDF; no defined template". Saved variants plus column filters meet it; no query builder BRD-00 (BR-053, BR-054, capability 21) asks for more: customised reports with user-chosen fields, charts and summaries, scheduled or on demand (CRQ11; Core wave CR-W2). |
+| Q44 | answered (for claims) | BRD-7 CLM (BRCLM.023/024) | BDOI records the insurer's reserve and settlement as information only; no reserving, no journal. The insurer-side `claims` module stays hidden from BDOI roles BRD-00 (goal 1, capability 15): Reinsurance is a BDOI business line whose BRD is phase 2; for phase 1 the insurer-side modules stay hidden. |
 | BRNB.085 | extended | BRD-11 UAM (sections A-B) | Access requests gain a Requestor persona, drafts, return, cancel, chosen approver and bulk (`nbadmin` lifecycle) |
 
 Not answered by BRD-6 to BRD-12: Q01-Q05, Q12, Q13, Q16 (BDO CIF; BRD-9 and BRD-10 restate it), Q17, Q19, Q20, Q22,

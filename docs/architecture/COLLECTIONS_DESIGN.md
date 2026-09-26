@@ -329,7 +329,7 @@ Notification events:
 
 | Item | BRD | Seam built now | Question |
 |---|---|---|---|
-| Legacy EBIX / QPS open items and disposition history at go-live | BRCLXN.013-015, 022 | One-time bulk handler `CLX_LEGACY_ITEMS` (invoice no., balance, disposition, remarks, handler) | CQ07 |
+| Legacy EBIX / QPS open items and disposition history at go-live | BRCLXN.013-015, 022 | **Narrowed by BRD-13 (Data Migration).** Open legacy invoices and their balances come from the Operations ledger: the Data Migration intake creates them as `ops_invoice` rows with origin LEGACY, and the normal worklist refresh (`WorklistRefreshService`) turns them into items. `CLX_LEGACY_ITEMS` now carries only the open state: dispositions, promises to pay, installment plans and collector assignments, loaded through a new `collections.legacy.service.LegacyItemStateService` by the migration loader F03 (V1007, [`DATA_MIGRATION_DESIGN.md`](DATA_MIGRATION_DESIGN.md) §14.4 J). History is not migrated (read-only legacy or archive, BRID 11.1). `CLX_INVOICE_NO_PATTERN` keeps accepting EBIX numbers for the run-off (CQ13 answered) | CQ07 (partial), CQ13, DMQ34 |
 | BDOI file server FS04 (application-to-invoice file, report drops) | BRCLXN.041/042, NFR 15.06-15.08 | `FileDropPort` to the in-system extract repository | OQ17, CQ12 |
 | ISYS Marketing Diary | p.40-42 | Read-only panel fed by `MarketingFeed` (adapter absent) or a Collections form | CQ20 |
 | E-mail of SOAs to clients | BRCLXN.058 | `messaging` outbox with a protected PDF | CQ18 |
@@ -675,7 +675,8 @@ needs, additively in `cashiering`.
   installment plans, notes "Coordinate further" on Juan Dela Cruz's, asks for the refund of Mega Traders Inc.'s, and
   writes the day's application file; `cashiering.demo.CollectorRequestDemoData` (127) accepts and processes the
   application as `cashier`. The refund request stays queued; Liza Manalo's payment has no disposition.
-- **Flyway.** V1004 (Collections), V1006 (Cashiering adapters; V1007-V1009 free).
+- **Flyway.** V1004 (Collections), V1006 (Cashiering adapters); V1007 is taken by the Data Migration design for the
+  legacy item state (`collections_legacy_items`); V1008-V1009 free.
 - **Parked (seam only).** FS04 transport (OQ17: in-system extract repository) and the file layout (CQ12); the
   "Processing Stage", "Business Origin", "Client Code Match" and "System Generated Remarks" definitions (CQ11: the
   Cashiering tab and status are shown); the booker name and names in place of usernames for UH / AO (BRCLXN.036);

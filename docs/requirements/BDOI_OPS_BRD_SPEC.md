@@ -669,7 +669,7 @@ BRDs"), to be agreed with the Operations owner.
 | OQ42 | partial | BRD-12 SP (Report List #85-96, #103) | Key fields of Cashiering reports 9-18, 20-21 and Remittance 8 are listed in the Report List (e.g. Daily Cash Reconciliation, Direct Payment). Column alignment is the cashiering / remittance owners' |
 | OQ45 | partial | BRD-12 SP (BRIDSP-31) | The handling-fee disposition of UPP items is a Marketing (NB TL / AO) activity inside BIBS, in the Collections unapplied view. The other MKTID activities still open |
 | OQ46 | partial | BRD-7 CLM (BRCLM.001, 010); BRD-6 RN (BRRN.027/031/034) | Claims implements `ClaimsFeed` (feed `CLAIMS_SPECIAL_REMIT`); no claim money flows through BDOI (CLQ10 open). Renewal also needs the claims per expiring policy and reads `ClaimExperienceQueryService`; the total-loss indicator is open (CLQ28) |
-| OQ44 | open (more data) | BRD-7, BRD-8, BRD-9, BRD-10, BRD-11, BRD-12 | Each BRD adds its own NFR set (hours, availability, RTO / RPO, retention); no alignment yet |
+| OQ44 | open (more data) | BRD-7, BRD-8, BRD-9, BRD-10, BRD-11, BRD-12 | Each BRD adds its own NFR set (hours, availability, RTO / RPO, retention); no alignment yet BRD-00 Core Replacement (p.42-45) adds retention 5 / 15, backup every 4 hours kept 5 years, response under 5 s and users per role (partial answer to XQ08); BRD-13 Data Migration refers to a "consolidated NFR" document that is not in the pack (DMQ29). |
 | OQ48 | open (more data) | BRD-6 to BRD-12 | Personas and role matrices per new area (roles in each design); the BIBS-wide matrix is still a BDOI deliverable |
 
 Not answered by BRD-6 to BRD-12: OQ02, OQ07 and the other OQ items not listed.

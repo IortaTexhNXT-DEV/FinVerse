@@ -240,6 +240,16 @@ The BRD answers **none of the parked Operations items (OQ01, OQ02, OQ07, OQ45)**
 | CSQ15 | Additional contacts | Does "add contact details" mean more than one e-mail / mobile per client (additional contacts with a primary flag)? | BRCSF-004 |
 | CSQ16 | Priorities | "Priority order for servicing (payments vs claims)" and "parameter alignment between the loan system and the insurance system" (e-mail open items): what is expected from CSF? | E-mail topic 11 |
 
+**Answered in part by later BRDs** (single record with the design impact: [`BDOI_CROSS_BRD_DECISIONS.md`](BDOI_CROSS_BRD_DECISIONS.md) section 3):
+- **CSQ01 partial** (BRD-13 Data Migration, p.5, BRID 2.1): after cutover QPS and EBIX are read-only and the new Core is
+  the system of record for the migrated client master; no write-back is required by BRD-13. `LegacyAccountLookup` is
+  implemented by `migration`. The conflict with footnote 3 of this BRD (updates sent to QPS / EBIX) stays open.
+- **CSQ02 partial** (BRD-13 BRID 4.1, 11.1): legacy references are retained and searchable.
+- **CSQ06 partial** (BRD-13 BRID 11.1): legacy RAs stay in read-only legacy or the archive (record type RENEWAL_ADVICE).
+- **CSQ09 / CSF-EM10.** The Core Replacement umbrella BRD asks for case resolution (capability 16, BR-165), while this
+  BRD defers case management: **CRQ04**, cross-BRD conflict **XQ12**. The umbrella also asks to resend e-policies
+  (BR-164) where BRCSF-006 names RAs only (**CRQ16**).
+
 ## 11. Observations on the BRD pack
 
 - The BRD predates BIBS. It describes a front end over QPS and EBIX that writes contact updates back to them. In BIBS the data sources are BrokerVerse modules, so most "integration" becomes reading BIBS data (CSQ01).

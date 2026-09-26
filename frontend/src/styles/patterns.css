@@ -670,8 +670,16 @@ dl.form-grid dd {
 }
 
 .key-facts dt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
   font-size: 12px;
   color: var(--color-text-muted);
+}
+
+.key-facts dt svg {
+  color: var(--brand-blue);
+  flex: none;
 }
 
 .key-facts dd {

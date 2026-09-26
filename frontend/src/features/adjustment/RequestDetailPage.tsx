@@ -30,6 +30,7 @@ import type { EndorsementRequest } from './api';
 import { RequestActions } from './RequestActions';
 import { RequestFlags, RequestStatus } from './RequestParts';
 import { AccountingTab, DetailsTab, HistoryTab, RecomputeTab } from './RequestTabs';
+import { UserName } from '@/components/ui/UserName';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -56,7 +57,7 @@ function facts(r: EndorsementRequest): Fact[] {
         .map(humanize)
         .join(' · '),
     },
-    { icon: User, label: 'Requested By', value: r.createdBy },
+    { icon: User, label: 'Requested By', value: <UserName login={r.createdBy} /> },
     { icon: Hourglass, label: 'Aging', value: `${String(r.agingDays)} day(s)` },
     { icon: CalendarClock, label: 'Batch', value: r.outcome.batchNo ?? '—' },
   ];

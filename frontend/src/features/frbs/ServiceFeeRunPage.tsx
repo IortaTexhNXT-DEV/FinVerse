@@ -25,6 +25,7 @@ import type { ServiceFeeInvoice, ServiceFeeLine, ServiceFeeRun } from './api';
 import { LiquidateDialog, ReleaseDialog } from './LineDialogs';
 import { lineActions, tagProgress, totalsByCurrency } from './serviceFee';
 import './frbs.css';
+import { UserName } from '@/components/ui/UserName';
 
 type TabId = 'lines' | 'invoices';
 type Pending = { kind: 'release' | 'liquidate'; line: ServiceFeeLine } | undefined;
@@ -321,8 +322,8 @@ export default function ServiceFeeRunPage() {
         facts={[
           { icon: FileText, label: 'Invoices', value: String(r.invoiceCount) },
           { icon: Banknote, label: 'Service Fee', value: formatAmount(r.feeTotal) },
-          { icon: User, label: 'Computed By', value: r.createdBy },
-          { icon: CheckCircle2, label: 'Approved By', value: r.approvedBy ?? '—' },
+          { icon: User, label: 'Computed By', value: <UserName login={r.createdBy} /> },
+          { icon: CheckCircle2, label: 'Approved By', value: <UserName login={r.approvedBy} /> },
           {
             icon: CalendarDays,
             label: 'Released / Liquidated',

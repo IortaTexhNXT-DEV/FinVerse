@@ -10,7 +10,6 @@ import com.iortatechnxt.brokerverse.security.service.ChangeAuthority;
 import com.iortatechnxt.brokerverse.security.service.RoleEditGuard;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import jakarta.validation.Valid;
-import java.util.Arrays;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -127,14 +126,14 @@ public class UserAdminController {
   }
 
   /**
-   * Lists all permissions.
+   * Lists the permissions a role can be given (the insurer-only permissions are not offered).
    *
    * @return permissions
    */
   @GetMapping("/permissions")
   @PreAuthorize(ROLES)
   public List<Permission> permissions() {
-    return Arrays.asList(Permission.values());
+    return Permission.offered();
   }
 
   /**

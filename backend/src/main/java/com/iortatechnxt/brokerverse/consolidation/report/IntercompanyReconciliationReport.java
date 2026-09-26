@@ -53,7 +53,7 @@ public class IntercompanyReconciliationReport implements ReportDefinition {
             GlReportSupport.companyParam(),
             GlReportSupport.asOfParam(),
             ParameterSpec.optional(ONLY_MISMATCHES, "Mismatches only", ParameterType.BOOLEAN)),
-        Permission.REPORT_FINANCIAL);
+        Permission.CONSOLIDATION_RUN);
   }
 
   @Override

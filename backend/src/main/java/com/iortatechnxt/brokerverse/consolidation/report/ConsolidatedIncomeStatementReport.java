@@ -38,7 +38,7 @@ public class ConsolidatedIncomeStatementReport extends ConsolidatedStatementRepo
         ReportCategory.FINANCIAL_STATEMENTS,
         "Consolidated income, expenses and net result of a group",
         ConsolidationReportSupport.parameters(),
-        Permission.REPORT_FINANCIAL);
+        Permission.CONSOLIDATION_RUN);
   }
 
   @Override

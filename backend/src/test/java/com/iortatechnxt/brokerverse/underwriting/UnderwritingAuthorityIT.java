@@ -56,7 +56,10 @@ class UnderwritingAuthorityIT {
 
   private String limited;
 
-  /** A fresh underwriting approver (role UNDERWRITER) with an authorization limit. */
+  /**
+   * A fresh underwriting approver with an authorization limit (seed role SIT_INS_UNDERWRITER: the
+   * role UNDERWRITER is inactive since V1064).
+   */
   @BeforeEach
   void createLimitedApprover() {
     limited = "uwlim" + SEQ.incrementAndGet() + System.nanoTime() % 100_000;
@@ -75,7 +78,7 @@ class UnderwritingAuthorityIT {
         """
         insert into sec_user_role (user_id, role_id)
         select u.id, r.id from sec_user u, sec_role r
-        where u.username = ? and r.code = 'UNDERWRITER'
+        where u.username = ? and r.code = 'SIT_INS_UNDERWRITER'
         """,
         limited);
   }

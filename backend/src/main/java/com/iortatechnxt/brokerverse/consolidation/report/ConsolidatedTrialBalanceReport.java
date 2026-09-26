@@ -43,7 +43,7 @@ public class ConsolidatedTrialBalanceReport implements ReportDefinition {
         ReportCategory.FINANCIAL_STATEMENTS,
         "Translated member balances, eliminations and consolidated balances of a group",
         ConsolidationReportSupport.parameters(),
-        Permission.REPORT_FINANCIAL);
+        Permission.CONSOLIDATION_RUN);
   }
 
   @Override

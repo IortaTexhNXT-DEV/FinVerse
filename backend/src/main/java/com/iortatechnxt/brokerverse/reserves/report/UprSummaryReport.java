@@ -78,7 +78,7 @@ public class UprSummaryReport implements ReportDefinition {
         ReportCategory.ACTUARIAL,
         "Earned and unearned premium and commission per policy, gross, treaty and FAC",
         params,
-        Permission.REPORT_FINANCIAL);
+        Permission.RESERVE_VIEW);
   }
 
   @Override

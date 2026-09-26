@@ -48,7 +48,7 @@ public class PremiumTaxReport implements ReportDefinition {
                 TaxType.PREMIUM_TAX.name()),
             TaxReportSupport.from(),
             TaxReportSupport.to()),
-        Permission.TAX_VIEW);
+        Permission.INSURER_TAX_VIEW);
   }
 
   @Override

@@ -101,7 +101,7 @@ public class IcController {
    * @return schedule
    */
   @GetMapping("/schedules/{schedule}")
-  @PreAuthorize(TaxAccess.VIEW)
+  @PreAuthorize(TaxAccess.INSURER_VIEW)
   public IcScheduleResponse schedule(
       @PathVariable IcSchedule schedule,
       @RequestParam Long companyId,

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 /** Reserve read models: technical reserves summary (dashboard) and IBNR development triangles. */
 @RestController
 @RequestMapping("/api/v1/reserves")
-@PreAuthorize("hasAnyAuthority('RESERVE_PREPARE', 'PERIOD_END_RUN', 'REPORT_FINANCIAL')")
+@PreAuthorize("hasAnyAuthority('RESERVE_VIEW', 'RESERVE_PREPARE', 'RESERVE_APPROVE')")
 public class ReserveAnalysisController {
 
   private final ReserveAnalysisService service;

@@ -59,7 +59,11 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
   private static final int MIN_SECRET_LENGTH = 32;
   private static final Pattern PRODUCTION_KIND =
       Pattern.compile(PRODUCTION, Pattern.CASE_INSENSITIVE);
-  private static final String SASL_SSL = "SASL_SSL";
+
+  /** Kafka protocol required in production (Kafka reads the value case-insensitively). */
+  private static final Pattern ENCRYPTED_KAFKA_PROTOCOL =
+      Pattern.compile("SASL_SSL", Pattern.CASE_INSENSITIVE);
+
   private static final String SERVER_BUNDLE = "server";
   private static final Set<String> VERIFYING_SSL_MODES = Set.of("verify-full", "verify-ca");
   private static final Pattern URL_SSL_MODE =
@@ -173,8 +177,9 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
           "BROKERVERSE_REDIS_TLS must be true in production (ElastiCache in-transit encryption)");
     }
     if (enabled(env, "brokerverse.kafka.enabled", true)
-        && !SASL_SSL.equalsIgnoreCase(
-            env.getProperty("spring.kafka.properties.security.protocol", "").trim())) {
+        && !ENCRYPTED_KAFKA_PROTOCOL
+            .matcher(env.getProperty("spring.kafka.properties.security.protocol", "").trim())
+            .matches()) {
       problems.add("BROKERVERSE_KAFKA_SECURITY_PROTOCOL must be SASL_SSL in production");
     }
     if (!enabled(env, "server.ssl.enabled", false)) {

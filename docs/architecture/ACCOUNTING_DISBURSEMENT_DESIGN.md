@@ -549,6 +549,22 @@ follows; the owners review these changes when the waves run.
 | Payee migration from the current system | DIS 2.2.8 | Migration handler with reconciliation report | AQ11 |
 | eFPS / eBIRForms / CAS books | Appendix A VII | Export files per form (as the existing relief CSVs) | AQ07 |
 
+### 13.1 BDOI integration names (drop plan, 26-Sep-2026)
+
+BDOI named the systems behind these seams (`PROGRAMME_ALIGNMENT.md` section 5; all owned by BDOI IT):
+
+| BDOI system | Drop | Seam in BIBS | Change | Question |
+|---|---|---|---|---|
+| **CMS / New BOB** - Cash Management System, outward payments | Drop 0 | `BankChannelPort` (named here, not built); today the approved BOB payments come back by upload (`DISB_BOB_APPROVED`) and the DCTF file is generated for TPD / ACA | CHANGE: a `BankChannelPort` adapter that writes the outward payment file in the CMS layout (or host-to-host), and reads the debit status per transaction back into the disbursement instrument. Insurer remittances, refunds, supplier and commission payments use it | IQ10; register DCR-234 |
+| **OBPCS** - Online Bills Payment Consolidation System | Drop 0 | Cashiering payment file `PAY_BILLS` (BRD-2), not Disbursement | None here | IQ10 |
+| **Old BOB** - Old Business Online Banking Collection System | Drop 0 | Cashiering `PAY_DIRECT_CREDIT` (BRD-2) | None here | IQ10 |
+| **AFTS** - Automatic Fund Transfer System | Drop 0 | Purpose not explained: client auto-debit (Cashiering) or automatic transfers for disbursement | To size | IQ10 |
+| **EGL** - Enterprise General Ledger | Drop 2 | None as an interface; trial balance and GL-SCHEDULE reports; GARD submission by exports (AQ31) | NEW: EGL extract job (journal detail or balances by account, branch, cost centre, currency) through a `GL` code map to the EGL accounts, with control totals and a reconciliation report | IQ16; DCR-233 |
+| **EDP** - Enterprise Data Platform (SD 11) | Drop 2 | Integration events `bibs.*`; report exports | NEW: daily extracts per the SD 11 specification (platform-wide, not only accounting) | IQ15; DCR-233 |
+
+"CMS" on the BDOI slide is the Cash Management System (outward payments). In the Operations, Collections and Data
+Migration documents CMS is the Collection Management System (BDOI_CROSS_BRD_DECISIONS glossary; DCR-221).
+
 ## 14. Build-wave plan
 
 Prerequisites: Operations O0 is built (opsledger, queue, ports). Cashiering (O1-A) and Commission (O1-D) may still be in

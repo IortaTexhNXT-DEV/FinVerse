@@ -12,7 +12,7 @@ meta:
   doc_type: Register
   brd: BRD-00
   name: Discrepancies and Clarifications
-  version: '1.1'
+  version: '1.2'
   date: 26 September 2026
   raised_on: 2026-09-25
 
@@ -74,22 +74,21 @@ status_rule:
 
 # The 15 items BDOI is asked to resolve first: [ref, short title, why first]. Shown on the Summary sheet.
 priority:
-  - [DCR-143, 'Directory sign-in (EUA) for all users', 'Identity source for every BIBS user; the EUA interface is needed before go-live.']
+  - [DCR-143, 'Directory sign-in (EIAM, Entra ID) for all users', 'Identity source for every BIBS user; EIAM is a Drop 0 integration (DCR-230).']
   - [DCR-121, 'BIBS-wide user access matrix', 'Every module''s roles and persona tests depend on it.']
+  - [DCR-229, 'IGA (UIDM-ISC) against BRD-11 requests', 'Decides whether access requests stay in BIBS.']
+  - [DCR-217, 'Go-live date and migration calendar', 'Fixes T, the freeze weekend and the mock dates.']
+  - [DCR-222, 'Architecture in the IER', 'The IER sizes and costs ten microservices, Aurora / Mongo and a portal tenant that BIBS does not have.']
+  - [DCR-227, 'Documents in S3 only', 'Build item ST0 / ST1 across every module that stores files.']
   - [DCR-129, 'Renewal of submitted policies: boundary', 'Two BRDs specify the same renewal letters, hold cover and booking.']
   - [DCR-146, 'One LAMD intake or two', 'Loan status drives both renewal eligibility and submitted-policy buckets.']
-  - [DCR-124, 'Submitted-policy buckets', 'FFY, RMU and Fully Paid are on both the renewal and non-renewal side.']
   - [DCR-062, 'Online vs offline renewal disposition', 'Decides the AO disposition screens and the upload path.']
   - [DCR-063, 'Manual initiation vs straight-through renewal', 'Decides the renewal workflow triggers.']
   - [DCR-037, 'Incentive programmes across four BRDs', 'Incentive income; one model for Product Maintenance, Remittance and Commission.']
-  - [DCR-014, 'Minimal-balance rules', 'Three overlapping GL rules for small balances.']
   - [DCR-015, 'Paid AR above the DTIP balance', 'Remittance to insurers capped or withheld.']
-  - [DCR-005, 'Fire premium tax (PTX 12%)', 'Gross premium on every Fire quotation and invoice.']
   - [DCR-112, 'Sanctions match: block or warn', 'Compliance control on quotation, placement, booking and renewal.']
-  - [DCR-135, 'RPO, RTO and backup frequency', 'Sets backup and DR design for the whole platform.']
   - [DCR-136, 'Retention schedule per record type', 'Legal record keeping and the archive design.']
   - [DCR-157, 'Go-live data migration scope', 'Open items and history from EBIX, ISYS, QPS and Excel at cut-over.']
-
 items:
 # ---------------------------------------------------------------- BRD-1 New Business
 - ref: DCR-001
@@ -245,6 +244,7 @@ items:
   related: [OQ32]
 - ref: DCR-013
   brds: [BRD-02]
+  drop: Drop 1
   loc: 'RMTID.023 (p.62); PRCID.028 (p.85)'
   type: Contradiction within BRD
   sev: High
@@ -317,6 +317,7 @@ items:
   related: [OQ35]
 - ref: DCR-019
   brds: [BRD-02]
+  drop: Drop 1
   loc: 'RMTID.001 (p.49); PRCID.004 (p.79); PRCID.016 (p.82); PRCID.024 / 025; ADJID.025 (p.100)'
   type: Gap / missing detail
   sev: Medium
@@ -577,6 +578,7 @@ items:
   related: [CQ01, CQ19, CQ24]
 - ref: DCR-040
   brds: [BRD-04]
+  drop: Drop 2
   loc: 'Renumbering addendum (p.24-25)'
   type: Document quality
   sev: Low
@@ -589,6 +591,7 @@ items:
   related: []
 - ref: DCR-041
   brds: [BRD-04]
+  drop: Drop 2
   loc: 'BRCLXN.001 (p.26); FRID-001 / RQID-001 (p.47)'
   type: Contradiction within BRD
   sev: High
@@ -601,6 +604,7 @@ items:
   related: [CQ02, CQ03]
 - ref: DCR-042
   brds: [BRD-04]
+  drop: Drop 2
   loc: 'BRCLXN.036 (p.31); FRID-036 (p.49); FRID-039 / 040 (p.49)'
   type: Data / numbering issue
   sev: Low
@@ -613,6 +617,7 @@ items:
   related: [CQ11]
 - ref: DCR-043
   brds: [BRD-04]
+  drop: Drop 2
   loc: 'Stakeholder functions (p.43-46); handwritten caveat on the CMS approval (p.93); handwritten edit of FRID-015 (p.78)'
   type: Contradiction within BRD
   sev: Medium
@@ -651,6 +656,7 @@ items:
   related: [CQ23, UQ09]
 - ref: DCR-046
   brds: [BRD-04]
+  drop: Drop 2
   loc: 'BRCLXN.036 / FRID-036 (p.31, p.49); FRID-041 / 042 (p.32, p.49); report fields (p.59-61)'
   type: BRD vs platform
   sev: Medium
@@ -675,6 +681,7 @@ items:
   related: []
 - ref: DCR-048
   brds: [BRD-04]
+  drop: Drop 2
   loc: 'Signed addendum approval (p.22); CMS BRD sign-off (p.62-65)'
   type: Document quality
   sev: Medium
@@ -1703,6 +1710,7 @@ items:
   related: [Q04]
 - ref: DCR-132
   brds: [RL]
+  drop: Phase 2
   loc: 'Report List #131 / #132 (p.44); #112-115 (p.37-38); #169, #178 (p.54)'
   type: Gap / missing detail
   sev: High
@@ -1751,8 +1759,9 @@ items:
   resolution: 'RPO 15 minutes (continuous WAL archiving) and RTO 4 hours for the whole platform.'
   question: 'Please agree one RPO and RTO for BIBS.'
   owner: 'BIBS Product Owner, with the owners of the BRDs involved'
-  status: Open
-  related: [XQ08, CSQ11, OQ44]
+  status: Answered
+  response: 'The IER workbook v20 (BDOI IT, received 26-Sep-2026) states RPO 15 minutes and RTO 4 hours, the values proposed here. To be confirmed by the BRD owners.'
+  related: [XQ08, CSQ11, OQ44, DCR-225]
 - ref: DCR-136
   brds: [BRD-01, BRD-02, BRD-04, BRD-05, BRD-07, BRD-08, BRD-09, BRD-10, BRD-12, BRD-06, BRD-11, BRD-03]
   loc: 'BRD-1 p.82; BRD-2 p.120; BRD-4 p.58; BRD-5 Addendum 1; BRD-7 p.41; BRD-8 p.54; BRD-9 p.14; BRD-10 p.25; BRD-12 p.14; BRD-6 p.188; BRD-11 p.11; BRD-3 (not stated)'
@@ -2710,6 +2719,414 @@ items:
   status: Open
   related: [DMQ24, DMQ27, CRQ22]
 
+# ---------------------------------------------------------------- Programme alignment (drops, timeline, IER, integrations; 26-Sep-2026)
+- ref: DCR-210
+  brds: [BRD-02, BRD-00]
+  loc: 'Drop plan slide, Drop 1 downstream item 3 (Remittance: "Operations BRD (Remittance Addendum), Reinsurance BRD"); BDOI answer A3 (26-Sep-2026); ReInsurance BRD (phase 2)'
+  type: Ambiguity
+  sev: High
+  desc: 'The drop plan names the Reinsurance BRD for Remittance in Drop 1, while the ReInsurance BRD is phase 2. BDOI answered that Remittance handles the reinsurance transactions in Drop 1 and the reinsurance module is phase 2, but no document says which reinsurance transactions (premium from cedants remitted to reinsurers, RI claim recoveries) or how they are accounted for.'
+  impact: 'Build: counterparties and remittance types in remittance; accounting rules. Test: Drop 1 remittance cases with reinsurance transactions.'
+  modules: 'Remittance; Accounting; Party'
+  resolution: 'Handle the named reinsurance transactions in remittance as remittance types with reinsurer counterparties and their own accounting rules; treaty and facultative processing stays phase 2.'
+  question: 'Which reinsurance transactions does Remittance handle in Drop 1, with which accounting entries? Please supply the Remittance Addendum named on the slide.'
+  owner: 'Operations - Financial Transactions and Processing, with Comptrollership'
+  status: Open
+  related: [IQ20, DCR-215]
+- ref: DCR-211
+  brds: [BRD-08, BRD-00]
+  loc: 'Drop plan slide, Drop 2 item 4 "Employee Benefits (No Portal Feature)"; BRD-8 BRID-005, 005.01, 014; IER Architecture Diagram sheet (tenant "EB Insurer Portal ~50 partners")'
+  type: Conflict between BRDs
+  sev: High
+  desc: 'The drop plan says Employee Benefits has no portal feature. BRD-8 (BRID-005, 005.01, 014) and the answers to Q06 / Q31 have insurers and client HR uploading through a secure portal; the EB design adds a portal module; the IER diagram sizes an EB insurer portal tenant.'
+  impact: 'Build: the portal module and external users are dropped; EB uploads are done by internal users. FRS BRD-8 and its test plan change. IER sizing loses a tenant.'
+  modules: 'Employee Benefits; User Access; Infrastructure'
+  resolution: 'No portal: insurers and client HR send documents by e-mail, EB users upload and validate them; EXTERNAL access requests stay refused.'
+  question: 'Please confirm that the EB portal requirements of BRD-8 (BRID-005, 005.01, 014) are out of scope.'
+  owner: 'Employee Benefits - Marketing, Processing and Collection'
+  status: Open
+  related: [IQ22, Q06, Q31, DCR-235]
+- ref: DCR-212
+  brds: [BRD-04, BRD-02]
+  drop: Drop 2
+  loc: 'Drop plan slide, Drop 2 item 1 "Marketing Collection (extraction)"; BRD-4 (Collection Management System BRD p.35-61)'
+  type: Ambiguity
+  sev: Medium
+  desc: 'Drop 2 lists "Marketing Collection (extraction)". BRD-4 Collections is built as a BIBS module fed by the Operations invoice ledger, replacing the separate Collection Management System that legacy fed nightly. "Extraction" suggests a feed from BIBS to a separate collection application.'
+  impact: 'Build: an outbound extraction only if a separate system remains. Test: which drop tests BRD-4.'
+  modules: 'Collections; Operations'
+  resolution: 'BRD-4 in BIBS replaces the Collection Management System; the item means the Collections daily files; BRD-4 tested in Drop 2 except the DP rows (Drop 1).'
+  question: 'What is "Marketing Collection (extraction)"? Is a separate Collection Management System kept after go-live?'
+  owner: 'Operations - Collections (Head of BDOI Operations)'
+  status: Open
+  related: [IQ21, OQ01, DCR-221]
+- ref: DCR-213
+  brds: [BRD-10, BRD-09, BRD-00]
+  loc: 'Drop plan slide (all drops)'
+  type: Gap / missing detail
+  sev: Medium
+  desc: 'BRD-10 Sanction Screening and Risk Profiling (built) and the Customer Servicing Facility service-request functions of BRD-9 (designed) are not placed in any drop; only "Account Creation and Maintenance (NB, CSF)" names CSF, and Bridger Insight XG appears among the Drop 2 integrations.'
+  impact: 'Planning: requirements sign-off, SIT and UAT slots for two BRDs.'
+  modules: 'Sanction Screening; Customer Servicing'
+  resolution: 'BRD-10 in Drop 1 with Client Onboarding (screening at onboarding); CSF service requests in Drop 2.'
+  question: 'In which drop are BRD-10 and the CSF service-request functions?'
+  owner: 'BIBS Product Owner, with the owners of the BRDs involved'
+  status: Open
+  related: [IQ23]
+- ref: DCR-214
+  brds: [BRD-00, BRD-11, BRD-05]
+  loc: 'Drop plan slide, Drop 0 items 1 (Accessibility & Login), 4 (Data Management), 5 (Workflow): BRD file column empty; BRD-00 CORE-17 (p.11)'
+  type: Gap / missing detail
+  sev: Medium
+  desc: 'Drop 0 items have no BRD. Data Management is umbrella capability CORE-17 (MIS field definition NEW, insurer management CHANGE, no BRD); Workflow is a platform capability; "Accessibility & Login" can mean sign-in (BRD-11, EIAM) or WCAG accessibility (UAM-NFR-05).'
+  impact: 'Test: no acceptance criteria for three Drop 0 items.'
+  modules: 'Setup; User Access; Workflow; Reference data'
+  resolution: 'Acceptance basis: BRD-11 plus EIAM for item 1, CORE-17 of the umbrella BRD for item 4, the workflows of each BRD for item 5; WCAG covered by the accessibility statement.'
+  question: 'Which requirements govern Drop 0 items 1, 4 and 5?'
+  owner: 'Business Project Services (BRD owner) with the BIBS Product Owner'
+  status: Open
+  related: [IQ24, CRQ09]
+- ref: DCR-215
+  brds: [BRD-02, BRD-04]
+  loc: 'Drop plan slide, Drop 1 downstream items 2 and 3 ("Operations BRD (Cashiering Addendum)", "(Remittance Addendum)"), item 7 ("Collections BRD Addendum")'
+  type: Gap / missing detail
+  sev: Medium
+  desc: 'The slide names a Cashiering Addendum and a Remittance Addendum to the Operations BRD. The Operations pack received has only Addendum 1 (RMTID.002, ADJID.014). The Collections addendum is in the pack (BRCLXN.049-060 signed, 061-064 draft).'
+  impact: 'Requirements may exist that are not in the FRS BRD-2.'
+  modules: 'Cashiering; Remittance'
+  resolution: 'BDOI supplies both addenda; FRS BRD-2 v1.1 takes them in.'
+  question: 'Please send the Cashiering and Remittance addenda of the Operations BRD, or confirm that Addendum 1 is meant.'
+  owner: 'Operations - Financial Transactions and Processing'
+  status: Open
+  related: [IQ20, DCR-210, CQ01]
+- ref: DCR-216
+  brds: [BRD-01, BRD-12]
+  drop: Drop 0
+  loc: 'Drop plan slide: HLS in Drop 0, LOAS in Drop 2; BDOI integration list (HL - LOAS = Home Loan System)'
+  type: Ambiguity
+  sev: Low
+  desc: 'HLS (Drop 0) and LOAS (Drop 2) are the same system, HL-LOAS. BIBS uses it for home-insurance quotation requests (BRNB.023), the HLS insurance report of Submitted Policies and the HLS amortised CLPC billing.'
+  impact: 'Planning: one interface specification or two, in which drop.'
+  modules: 'Quotation; Submitted Policies; Placement (CLPC)'
+  resolution: 'One interface specification for HL-LOAS, delivered in Drop 0.'
+  question: 'One interface or two for HL-LOAS, and in which drop?'
+  owner: 'BIBS Product Owner, with the owners of the BRDs involved'
+  status: Open
+  related: [IQ07, Q11]
+- ref: DCR-217
+  brds: [BRD-00, BRD-13]
+  drop: Programme
+  loc: 'Programme timeline slide (go-live marker at the end of January 2028; bars); BDOI_DROP_PLAN.md timeline table; BRD-13 design section 17.2'
+  type: Gap / missing detail
+  sev: High
+  desc: 'The go-live day in January 2028 is not fixed; the slide marker sits at the end of January. The migration design takes T as the first business day of a month after a legacy month-end close (Mon 3-Jan-2028, freeze after the EOD of Wed 29-Dec-2027). The transcription of the timeline gives the Drop 1 requirements as Sep-Oct and Drop 2 as Nov-Feb; the bars show Sep-Nov and Dec-Feb. Drop 0 has no bar.'
+  impact: 'Cut-over calendar, year-end close in legacy, GL opening (January stub period if T is later), mock dates.'
+  modules: 'Data migration; Accounting; all'
+  resolution: 'T = Monday 3 January 2028; absolute mock calendar Mock 1 Apr-May, Mock 2 Jun-Jul, Mock 3 Aug, re-load Oct, dress rehearsal Nov-Dec 2027.'
+  question: 'Which date in January 2028 is the go-live, and does the legacy December / year-end close complete before the final extracts?'
+  owner: 'Enterprise Services Group - Business Project Services (Program Manager) with BDOI Comptrollership and Operations'
+  status: Open
+  related: [IQ01, DMQ25, DMQ18]
+- ref: DCR-218
+  brds: [BRD-06, BRD-00]
+  loc: 'Concept Paper "Advance Implementation of Renewal Processing" V1.0 (p.1-7); BDOI answer A1 (26-Sep-2026)'
+  type: Document quality
+  sev: Medium
+  desc: 'The signed concept paper proposes an early renewal release by 15-Aug-2027 for January-May 2028 expiries, with early migration of the client master and reference data. BDOI answered that all modules go live together in January 2028 and there is no early go-live. The paper still carries a MANCOM decision block.'
+  impact: 'None on the build if the paper is withdrawn; otherwise a separate production release, early client migration and a five-month legacy-to-BIBS client sync.'
+  modules: 'Renewal; Data migration'
+  resolution: 'The paper is recorded as superseded as an operating model; its capabilities stay in scope for January 2028.'
+  question: 'Please confirm that MANCOM will not approve the early release and that the paper is withdrawn.'
+  owner: 'Marketing and Processing - Renewal (RMEL)'
+  status: Answered
+  response: 'BDOI answer of 26-Sep-2026: every module goes live together in January 2028; there is no early go-live.'
+  related: [IQ02, DCR-219]
+- ref: DCR-219
+  brds: [BRD-06, BRD-03, BRD-13]
+  loc: 'Concept paper VII (p.2), VIII (p.2), Annex B (p.5), Annex C (p.6): package remapping'
+  type: Gap / missing detail
+  sev: Medium
+  desc: 'Legacy package names must be remapped to the BIBS packages for the migrated policy headers (P01), the carried-forward RMEL cohorts (P03) and the package versions (R06). The paper asks for a design decision owner and whether mapping happens during upload or during sanitation. The data requirements workbook has no PACKAGE code map set.'
+  impact: 'Build: code map set and a renewal sanitation check. Test: sample RMEL validation in Mock 1.'
+  modules: 'Data migration; Renewal; Product Maintenance'
+  resolution: 'Both: a versioned PACKAGE code map at intake for one-to-one mappings, plus a renewal check that sends unmapped, retired or split packages to Review for TSU; owner TSU with the MBS steward; rules agreed before 15-Jan-2027.'
+  question: 'Who owns package remapping, and do you agree to map at intake with a sanitation check for exceptions?'
+  owner: 'Marketing Business Services (MBS) and TSU'
+  status: Answered
+  response: 'BDOI answer of 26-Sep-2026 (DMQ36): package remapping is done at sanitation, not at upload. The migration loads the legacy package code and the PACKAGE code map only; the Renewal sanitation check PACKAGE_REMAP sends unmapped packages to the Exception bucket for the Renewal processing team.'
+  related: [IQ03, DMQ26]
+- ref: DCR-220
+  brds: [BRD-06, BRD-13]
+  loc: 'Concept paper IV (p.1); BRD-13 BRID 12.1; renewal lead time 140 days (RENEWAL_DESIGN section 9)'
+  type: Gap / missing detail
+  sev: Medium
+  desc: 'Renewals expiring between the legacy freeze and go-live, and the RMEL cohorts expiring from T to T+140 days that legacy has already extracted, need an agreed treatment. With no early release, legacy processes renewals until the freeze.'
+  impact: 'Business: no lapse of cover over the cut-over. Build: P03 carry-forward.'
+  modules: 'Renewal; Data migration; Placement'
+  resolution: 'Legacy places and books all renewals up to the freeze; cohorts T to T+140 days are carried forward with their disposition (P03); expiries in the freeze window are placed before the freeze or held by hold covers.'
+  question: 'Please confirm the renewal treatment across the cut-over.'
+  owner: 'Marketing and Processing - Renewal (RMEL)'
+  status: Answered
+  response: 'BDOI answer of 26-Sep-2026 (DMQ37): renewals expiring January to May 2028 are processed in BIBS after go-live; no renewal candidates are carried from legacy. At go-live BIBS extracts every expiry from go-live to 31-May-2028 into the renewal pipeline, prioritised by expiry date with January expiries flagged urgent; a renewal advice already sent manually before go-live (Excel trackers) is recorded as RA already sent and is not sent again. Renewals whose new term starts before go-live are placed and booked in legacy before the freeze (unchanged).'
+  related: [IQ02, DMQ26]
+- ref: DCR-221
+  brds: [BRD-04, BRD-05, BRD-13]
+  loc: 'Drop plan slide, Drop 0 integration 6 ("CMS - with alternate option of OBPCS"); BDOI integration list (CMS / New BOB = Cash Management System, outward payments); BRD-4 (Collection Management System); BRD-13 sources'
+  type: Ambiguity
+  sev: Medium
+  desc: 'CMS means the Collection Management System in BRD-4, in the BIBS specifications and in the migration source list (objects C01, F02, F03), and the Cash Management System (outward payments) on the drop plan.'
+  impact: 'Wrong system assumed in interface and migration discussions.'
+  modules: 'Collections; Disbursement; Data migration'
+  resolution: 'Write "CMS / New BOB" for the bank channel and "Collection Management System" in full; glossary updated.'
+  question: 'Please confirm that the migration source "CMS" is the Collection Management System.'
+  owner: 'BIBS Product Owner, with the owners of the BRDs involved'
+  status: Open
+  related: [IQ10, DCR-212]
+- ref: DCR-222
+  brds: [BRD-00]
+  loc: 'IER workbook v20, sheet Architecture Diagram (embedded picture "Technical Architecture - Multi-Tenant"), sheets K8S (DEV / SIT / UAT / PROD Y1-Y5)'
+  type: BRD vs platform
+  sev: High
+  desc: 'The IER describes a multi-tenant microservice platform: ten services (bv-policy-admin-svc to bv-batch-notification-svc), three tenants (BDOI ~1,200 users, EB insurer portal ~50 partners, broker / RI network ~200 accounts), Aurora and MongoDB per tenant, Apigee X, Istio + OPA, EventBridge with ~80 topics, and "no cross-DB transactions". BIBS is one modular monolith (Spring Boot 3.5, Java 21) and one React frontend on EKS, with one PostgreSQL database where a business record, its journal, ledger and sub-ledger rows commit in one transaction.'
+  impact: 'Infrastructure sizing and cost; security and network design; the IER diagram would be signed off for a system that is not built.'
+  modules: 'Platform; Infrastructure'
+  resolution: 'Proposed: BIBS modular monolith with IER enterprise elements (edge security, managed AWS services, separate web, jobs and integration workloads), docs/architecture/ARCHITECTURE_OPTION_DECISION.md, awaiting BDOI confirmation. Replace the IER diagrams with the BIBS application and deployment diagrams (alignment document figures 3 and 4); restate the K8s sheets for the BIBS workloads.'
+  question: 'Please confirm that the IER will describe BIBS as built, and name the mandatory edge component (ALB + WAF, CloudFront, Apigee X).'
+  owner: 'BIBS Product Owner with BDO Cloud and Digital Operations Engineering'
+  status: Open
+  related: [IQ25, DCR-223, DCR-232]
+- ref: DCR-223
+  brds: [BRD-00]
+  loc: 'IER workbook v20, sheets K8S (column Q "Total PV (GB) EFS"), Pre-Prod (title), DEV / SIT / UAT / Pre-Prod / PROD / DR (rows), SUMMARY'
+  type: Data / numbering issue
+  sev: High
+  desc: 'Column "Total PV (GB) EFS" computes max replicas x CPU limit (=E*H) instead of max replicas x PV (=E*K), giving 21,800 GB (DEV), 32,760 GB (UAT) and 43,600 to 87,200 GB (PROD Y1-Y5) where the declared PV is 20 GB. There are no K8s sheets for Pre-Prod and DR. The Pre-Prod sheet is titled "UAT ENVIRONMENT". The environment sheets hold template rows (Windows Server, EXACC, ON PREM, 0 CPU), so the SUMMARY (PHP 3.55 million over 5 years) does not cost RDS, MSK, ElastiCache or the EKS nodes. The enterprise discount is 10.5 % in Assumptions and 13 % in SUMMARY.'
+  impact: 'Cost estimate and storage request are not usable.'
+  modules: 'Infrastructure'
+  resolution: 'Proposed: BIBS modular monolith with IER enterprise elements (edge security, managed AWS services, separate web, jobs and integration workloads), docs/architecture/ARCHITECTURE_OPTION_DECISION.md, awaiting BDOI confirmation. BDOI IT corrects the formula (or removes EFS), adds Pre-Prod and DR cluster sheets, fills the environment sheets from the alignment sizing and re-costs.'
+  question: 'Will BDOI IT correct and complete the IER from the BIBS sizing?'
+  owner: 'BDO Cloud and Digital Operations Engineering'
+  status: Open
+  related: [IQ33, DCR-222]
+- ref: DCR-224
+  brds: [BRD-00]
+  loc: 'IER workbook v20, VDI Requirements (OpenJDK Temurin 17, Node.js 20, Angular), HW & SW Requirements ("RHEL 9.x + PostgreSQL 16 (Amazon RDS)", GitLab Runner), Architecture Diagram (Infra) (GitHub + Jenkins), Architecture Diagram (ArgoCD, Terraform + Crossplane), K8s sheets (Dynatrace)'
+  type: BRD vs platform
+  sev: Medium
+  desc: 'The IER names JDK 17, Node 20 and an Angular SPA; BIBS uses Java 21, Node 22 and React 19. RDS rows name "RHEL 9.x" for a managed engine. Three CI/CD toolchains are named (GitLab, GitHub + Jenkins, ArgoCD) and two observability stacks (Dynatrace; CloudWatch, X-Ray, Prometheus, Loki, Grafana). BIBS builds on GitHub Actions and exposes Prometheus metrics.'
+  impact: 'VDI images, pipelines and monitoring set up for the wrong stack.'
+  modules: 'Infrastructure; Delivery'
+  resolution: 'VDI list: Temurin 21, Maven 3.9, Node 22; RDS rows without an OS; one toolchain and one APM named by BDOI IT.'
+  question: 'Which CI/CD toolchain, container registry, image base and APM apply?'
+  owner: 'BDO Cloud and Digital Operations Engineering'
+  status: Open
+  related: [IQ28, IQ29, IQ30]
+- ref: DCR-225
+  brds: [BRD-00]
+  loc: 'IER workbook v20, HW & SW Requirements (PROD DR "cross-region read replica", RPO <= 15 min), Architecture Diagram ("ap-southeast-1 primary + DR warm-standby"), both diagram sheets (RPO 15 min, RTO 4 h), DR sheet (12 x 7); hosting appendix (AWS ap-southeast-1, access from the Philippines)'
+  type: NFR inconsistency
+  sev: High
+  desc: 'The IER sets RPO 15 minutes and RTO 4 hours, which matches the DCR-135 proposal, but the DR location differs between sheets (cross-region replica vs ap-southeast-1 warm standby) and a second region is not covered by the hosting appendix.'
+  impact: 'DR design, S3 replication, data residency, DR test.'
+  modules: 'Platform (backup and DR)'
+  resolution: 'RPO 15 min and RTO 4 h accepted (DCR-135); DR region named by BDOI IT after the data-residency check; RDS cross-region replica, S3 cross-region replication, EKS standby.'
+  question: 'Which region hosts DR, and does data residency allow it?'
+  owner: 'BDO Cloud and Digital Operations Engineering with Compliance'
+  status: Open
+  related: [IQ26, DCR-135]
+- ref: DCR-226
+  brds: [BRD-00]
+  loc: 'IER workbook v20, Assumptions 3 (non-production 12 x 5); BIBS job schedules (application.yml)'
+  type: NFR inconsistency
+  sev: Medium
+  desc: 'Non-production runs 12 hours a day, 5 days a week. BIBS night jobs run at 20:00, 22:15-23:00, 01:00, 05:00 and 06:00 Philippine time; month-end close, migration mocks (weekend loads) and the dress rehearsal need longer hours. MSK and ElastiCache cannot be stopped.'
+  impact: 'Batch and month-end tests do not run in SIT / UAT; savings overstated.'
+  modules: 'All batch jobs; Data migration'
+  resolution: 'Non-production crons moved into the window by environment variables; extended hours booked for batch, month-end and migration cycles.'
+  question: 'What are the 12 x 5 hours, and can extended hours be booked for test cycles?'
+  owner: 'BDO Cloud and Digital Operations Engineering'
+  status: Open
+  related: [IQ27]
+- ref: DCR-227
+  brds: [BRD-00, BRD-13]
+  loc: 'BDOI answer A4 (26-Sep-2026); IER HW & SW Requirements (S3 document store + EFS shared PV); DOCUMENT_STORAGE_DECISION.md'
+  type: BRD vs platform
+  sev: High
+  desc: 'BDOI requires documents and attachments in S3 only. BIBS keeps file bytes in PostgreSQL bytea columns in 13 tables (attachments, slips, advices, service invoices, remittance and billing documents, print batches, EOD outputs, report runs and batches, extracts, e-mail attachments, issuance uploads). The IER also plans EFS for shared volumes, which BIBS does not use.'
+  impact: 'Build items ST0 (storage port, stored_file, presigned links) and ST1 (every module moved, existing bytes copied); IER rows for buckets, KMS, endpoint, replication and malware scanning; EFS removed.'
+  modules: 'Attachments; Documents; Reports; all modules storing files; Infrastructure'
+  resolution: 'Option C of DOCUMENT_STORAGE_DECISION.md: S3 for bytes, PostgreSQL metadata, 5-minute presigned links after the permission check and audit, four buckets per environment, SSE-KMS, Object Lock governance, cross-region replication.'
+  question: 'Please confirm option C and the five decisions of DOCUMENT_STORAGE_DECISION.md section 5.'
+  owner: 'BIBS Product Owner with BDO Cloud and Digital Operations Engineering'
+  status: Answered
+  response: 'BDOI answer of 26-Sep-2026: documents and attachments are stored in an S3 bucket only. Design options still to confirm (IQ31).'
+  related: [IQ31, IQ13, DSQ01, DSQ02, DSQ03, DSQ04, DCR-223]
+- ref: DCR-228
+  brds: [BRD-00]
+  loc: 'IER workbook v20, HW & SW Requirements (Pre-Prod, PROD: "ElastiCache for Redis 7.x (cluster)")'
+  type: BRD vs platform
+  sev: Medium
+  desc: 'The IER asks for ElastiCache "cluster" in Pre-Prod and PROD. BIBS is configured for cluster mode disabled (one shard, primary and replica); the cache clear uses SCAN over one node and the job lock uses scripts on single keys.'
+  impact: 'Cluster mode enabled would need a code and configuration change.'
+  modules: 'Platform (cache, job lock)'
+  resolution: 'ElastiCache Redis 7, cluster mode disabled, Multi-AZ replica.'
+  question: 'Please confirm cluster mode disabled.'
+  owner: 'BDO Cloud and Digital Operations Engineering'
+  status: Open
+  related: [IQ34]
+- ref: DCR-229
+  brds: [BRD-11, BRD-00]
+  loc: 'Drop plan slide, Drop 0 integration 2 (IGA); BDOI integration list (UIDM-ISC); BRD-11 (request and approval of access in the system, p.6)'
+  type: Conflict between BRDs
+  sev: High
+  desc: 'BRD-11 makes an approved request in BIBS the only way to change a user or a group profile. The drop plan adds UIDM-ISC, an identity governance tool that normally owns access requests, approvals, provisioning and certification.'
+  impact: 'Build: provisioning API and aggregation; the BRD-11 request screens may be reduced. Test: joiner / mover / leaver cases.'
+  modules: 'User Access; Security'
+  resolution: 'UIDM-ISC provisions users and group-profile assignments through an API (SCIM 2.0 or its connector) with the ISC request number in the change log; group-profile definitions stay in BIBS under BRD-11.'
+  question: 'Does UIDM-ISC own access requests and approvals? Which connector?'
+  owner: 'UAM process owner (Product Owner) with ITIO'
+  status: Open
+  related: [IQ05, DCR-230]
+- ref: DCR-230
+  brds: [BRD-11, BRD-00]
+  loc: 'Drop plan slide, Drop 0 integration 1 (Entra-ID); BDOI integration list (EIAM); BRD-11 NFR (EUA with the Windows ID, lockout after 3 attempts, p.13-14)'
+  type: Conflict between BRDs
+  sev: High
+  desc: 'BRD-11 asks for authentication of the Windows ID through BDO EUA with a password, and for lockout after 3 invalid attempts in BIBS. The drop plan names EIAM on Entra ID, which is a redirect-based sign-in (OpenID Connect) where the password, MFA and lockout sit in Entra ID. The BIBS directory port checks a password and does not fit a redirect.'
+  impact: 'Build: OIDC sign-in in the frontend and backend, user mapping, break-glass administrator; lockout and password rules move to Entra ID. Test: log-in cases of every BRD.'
+  modules: 'Security; User Access'
+  resolution: 'EIAM OIDC sign-in for all internal users; roles and permissions stay in BIBS; local sign-in kept only for a break-glass administrator.'
+  question: 'Please confirm OIDC against Entra ID, the identifying claim, MFA, session lifetimes and whether EIAM replaces EUA.'
+  owner: 'UAM process owner (Product Owner) with ITIO'
+  status: Open
+  related: [IQ04, DCR-143, Q42, UQ04]
+- ref: DCR-231
+  brds: [BRD-00]
+  loc: 'IER workbook v20, VDI Requirements (8 developers, 4 testers, 3 production support); hosting appendix (access restricted to personnel in the Philippines)'
+  type: Gap / missing detail
+  sev: Medium
+  desc: 'The IER plans 15 VDI users. The hosting appendix restricts access to personnel in the Philippines, without saying whether this applies to DEV and SIT with masked data or to vendor staff outside the Philippines.'
+  impact: 'Delivery model of the build and support teams; VDI count.'
+  modules: 'Delivery; Security'
+  resolution: 'Production and UAT only from the Philippines; DEV and SIT with masked data reachable by named vendor staff through VDI.'
+  question: 'Does the access restriction apply to DEV and SIT with masked data? Which vendor staff need VDI?'
+  owner: 'BDO Cloud and Digital Operations Engineering with Compliance'
+  status: Open
+  related: [IQ28]
+- ref: DCR-232
+  brds: [BRD-00]
+  loc: 'IER workbook v20, Architecture Diagram (tenants ~1,200 users, ~50 partners, ~200 accounts), HW & SW Requirements (growth 15 %); BRD-00 usage table (p.42)'
+  type: NFR inconsistency
+  sev: Medium
+  desc: 'The IER sizes for about 1,200 internal users plus 250 external accounts; the umbrella BRD gives 1,344 named and 429 concurrent users (DCR-166). Neither gives transactions per second, which the IER K8s guideline 3 asks for.'
+  impact: 'Sizing and performance test targets.'
+  modules: 'All'
+  resolution: 'Size and test for 429 concurrent sessions (peak) until BDOI decides; no external users.'
+  question: 'Which user and transaction figures govern sizing?'
+  owner: 'BIBS Product Owner, with the owners of the BRDs involved'
+  status: Open
+  related: [IQ32, DCR-166]
+- ref: DCR-233
+  brds: [BRD-05, BRD-00]
+  drop: Drop 2
+  loc: 'Drop plan slide, Drop 2 integrations 1 (EDP - Data Ingestion (SD 11)) and 2 (Enterprise General Ledger); BDOI integration list'
+  type: Gap / missing detail
+  sev: High
+  desc: 'EDP ingestion and the Enterprise General Ledger are named without specification. No BRD describes what BIBS sends to EGL (journal detail or balances, frequency, account mapping) or what EDP ingests; "SD 11" is not explained. BIBS has no GL or data-platform interface today.'
+  impact: 'Build: two new outbound interfaces in Drop 2 (build Mar-Apr 2027). Test: reconciliation of EGL to the BIBS GL.'
+  modules: 'Accounting (GL); Platform'
+  resolution: 'EGL: daily journal extract with a code map to EGL accounts and control totals; EDP: daily extracts to an S3 drop per SD 11. Final once specified.'
+  question: 'Please provide the EGL and EDP (SD 11) interface specifications by 31-Jan-2027.'
+  owner: 'Comptrollership - FRBS, Disbursement and ACSL, with BDOI IT'
+  status: Open
+  related: [IQ15, IQ16, AQ31]
+- ref: DCR-234
+  brds: [BRD-02, BRD-05]
+  drop: Drop 0
+  loc: 'Drop plan slide, Drop 0 integration 6 (CMS, OBPCS, AFTS, ICBS struck through, BOB); BDOI integration list (CMS / New BOB, OBPCS, Old BOB, PMS)'
+  type: Gap / missing detail
+  sev: Medium
+  desc: 'Bank and payment channels are named without layouts or transport: CMS / New BOB for outward payments, OBPCS for bills payment, Old BOB for SOA funds transfers, PMS for PDCs. AFTS is not explained. BIBS has configurable payment-file handlers (PAY_BILLS, PAY_DIRECT_CREDIT, PAY_PDC, PAY_TRADE, PAY_CLPC) and a BOB approval upload, with layouts still open (OQ03, AQ09).'
+  impact: 'Build: layouts and possibly host-to-host transfer in Drop 0.'
+  modules: 'Cashiering; Disbursement'
+  resolution: 'Layouts configured in the payment-file layout table; CMS / New BOB outward file built in disbursement; automated transfer if BDOI IT offers it.'
+  question: 'Please provide the layouts, transport and cut-off times for CMS / New BOB, OBPCS, Old BOB, PMS and AFTS.'
+  owner: 'Operations - Financial Transactions and Processing, with Comptrollership and BDOI IT'
+  status: Open
+  related: [IQ09, IQ10, OQ03, AQ09]
+- ref: DCR-235
+  brds: [BRD-08, BRD-01, RL]
+  loc: 'Drop plan slide, Drop 1 upstream items 6 (Placement & ePolicy: NB, RN, EB) and 9 (Reports upstream: NB, RN, SP, EB); Drop 2 items 4 (EB) and 5 (Other Reports)'
+  type: Ambiguity
+  sev: Low
+  desc: 'EB placement and EB reports are in Drop 1 while the EB module is in Drop 2. "Other Reports" (Drop 2) is not defined, and the Report List is not split by drop.'
+  impact: 'Test planning; report ownership per drop.'
+  modules: 'Employee Benefits; Reports'
+  resolution: 'EB programmes are placed through the NB placement screens in Drop 1; each Report List item goes with the drop of its owning module; "Other Reports" = the rest.'
+  question: 'Please confirm the split of EB and of the Report List across the drops.'
+  owner: 'BIBS Product Owner, with the owners of the BRDs involved'
+  status: Open
+  related: [IQ22, DCR-211]
+# DCR-236 to DCR-239 are not used (numbers reserved while two analyses ran in parallel).
+# ---------------------------------------------------------------- Data Migration v1.1 (BDOI timeline, early-renewal concept paper)
+- ref: DCR-240
+  brds: [BRD-13, BRD-06, BRD-00]
+  loc: 'Concept Paper - Advance Implementation of Renewal Processing V1.0 (signed 06-Sep-2026) p.1-2, Annex A p.4, Annex D p.7; BDOI drop plan and timeline (received 26-Sep-2026); BRD-13 BRID 12.1 (p.12)'
+  type: Conflict between BRDs
+  sev: High
+  desc: 'The concept paper, signed by MANCOM on 06-Sep-2026, proposes an early renewal release on or before 15-Aug-2027 for January-May 2028 expiries, with the client master and all renewal-related reference data migrated before it (section VI, p.2). BDOI decided on 26-Sep-2026 that everything goes live together in January 2028 (drop plan and timeline: go-live January 2028, full migration and cut-over Nov 2027-Jan 2028). The concept paper is therefore superseded, but the January-May 2028 expiries it targeted are exactly the cohorts that are in their renewal cycle in legacy at a January 2028 go-live (T to T + 140 days).'
+  impact: 'Business: renewals of January-May 2028 expiries (about 25,800 accounts a month, umbrella p.44-45). Build: carried RMEL cohorts (layout P03), catch-up extraction in Renewal, no pre-cut-over production load. Test: renewal of a carried legacy policy; mock-load order.'
+  modules: 'Data migration; Renewal'
+  resolution: 'Concept paper recorded as superseded by the single January 2028 go-live. Kept from it: reference data and clients load first in every mock (prerequisite for renewal testing); RMEL validation and exception handling for the carried January-May 2028 cohorts; the package remapping decision. Proposal for the cohorts: prepared in legacy from August 2027 as today, carried at the freeze with their disposition, placed and booked in BIBS from go-live; catch-up extraction at go-live as the safety net (DATA_MIGRATION_DESIGN section 15.1).'
+  question: 'Are the renewals of the January-May 2028 expiries prepared in legacy and carried into BIBS at the freeze (proposal), or processed in BIBS only after go-live from a catch-up extraction? Confirm that renewals whose new term starts before go-live are placed and booked in legacy before the freeze.'
+  owner: 'Marketing and Processing - Renewal (RMEL); Program Manager'
+  status: Answered
+  response: 'BDOI answer of 26-Sep-2026 (DMQ37): renewals expiring January to May 2028 are processed in BIBS after go-live; no renewal candidates are carried from legacy. At go-live BIBS extracts every expiry from go-live to 31-May-2028 into the renewal pipeline, prioritised by expiry date with January expiries flagged urgent; a renewal advice already sent manually before go-live (Excel trackers) is recorded as RA already sent and is not sent again.'
+  related: [DMQ26, DMQ37, DCR-199, RQ27]
+- ref: DCR-241
+  brds: [BRD-13, BRD-03, BRD-06]
+  loc: 'Concept Paper V1.0 p.2 (section VII, VIII), Annex B p.5, Annex C p.6; BRD-13 BRID 3.1 (p.7)'
+  type: Gap / missing detail
+  sev: High
+  desc: 'The concept paper names package remapping as a key risk: legacy package names must be remapped to the correct BIBS package names, with "a firm design choice, clear ownership, and testing", and asks MANCOM to assign a design decision owner and to decide whether mapping happens during upload processing or during sanitation. The paper is superseded, but the decision is still needed: the in-force headers (P01), the carried renewals (P03) and the package versions (R06) all carry legacy packages, and BRD-13 BRID 3.1 does not say how packages are remapped or by whom.'
+  impact: 'Business: correct package on renewals and endorsements of legacy policies. Build: PACKAGE code map with conditional entries; Renewal sanitation check for unresolved packages. Test: package split by sum-insured band; unresolved package in the Exception bucket.'
+  modules: 'Data migration; Product Maintenance; Renewal'
+  resolution: 'Proposal: remap at upload through an approved PACKAGE code map (maker-checker, gate G2), with conditional entries where one legacy package splits; rows the map cannot resolve load as UNRESOLVED and go to the Renewal Exception bucket, where TSU chooses the package and the choice is added to the next map version. TSU prepares the map, the Product Owner of Marketing Business System approves it, MANCOM confirms the owner.'
+  question: 'Is package remapping done at upload (proposal) or during Renewal sanitation, and who owns the decision and the map? Which legacy packages split into several BIBS packages, and on which attributes?'
+  owner: 'Product Owner, Marketing Business System; TSU'
+  status: Answered
+  response: 'BDOI answer of 26-Sep-2026 (DMQ36): package remapping is done at sanitation, not at upload. The migration loads the legacy package code and the PACKAGE code map only; the Renewal sanitation check PACKAGE_REMAP sends unmapped packages to the Exception bucket for the Renewal processing team.'
+  related: [DMQ36, DMQ08]
+- ref: DCR-242
+  brds: [BRD-13, BRD-00]
+  drop: Programme
+  loc: 'BDOI Programme Timeline (image, go-live marker at the end of the January 2028 column); BRD-13 BRID 12.1 (p.12); DATA_MIGRATION_DESIGN section 17.2'
+  type: Ambiguity
+  sev: Medium
+  desc: 'The timeline sets go-live in January 2028 and draws the marker at the end of the January column. The migration plan proposes Monday 3 January 2028, the first business day after the legacy year-end close, so the opening trial balance is a closed year-end balance and the January expiries can be placed in BIBS on time. That date puts the cut-over over the year-end holidays (24-25 and 30-31 December, 1 January): the last legacy business day would be 29 December and the production load would run on New Year''s Day. A later January date keeps legacy running into January and needs a January cut-off of the trial balance.'
+  impact: 'Business: availability of staff and bank channels over the holidays; year-end closing and audit adjustments. Build: none. Test: dress rehearsal timings.'
+  modules: 'Data migration; Accounting'
+  resolution: 'Proposal: T = Monday 3 January 2028; last legacy business day Wednesday 29 December 2027; legacy EOD and year-end close on 31 December; tasks moved off the holidays in the runbook. Date confirmed at M6 (1-Oct-2027).'
+  question: 'Is go-live on Monday 3 January 2028 (after the legacy year-end close) or later in January? If 3 January: is 29 December the last legacy business day, does the year-end close complete on 31 December, and how are late 2027 and audit adjustments booked after go-live?'
+  owner: 'Program Manager; Head, Comptrollership'
+  status: Open
+  response: 'BDOI answer of 26-Sep-2026 (DMQ39): recommended option A, go-live Monday 3-Jan-2028 at the year-end boundary, provisional GL opening trial balance, legacy GL kept open only for FY2027 closing and audit adjustments, true-ups as opening-balance adjustment journals after the legacy close and after the audited financial statements. Options B (go-live at the end of Q1) and C (two books for Q1) not recommended. Awaiting Comptrollership confirmation.'
+  related: [DMQ25, DMQ39, DMQ18, DCR-200]
+- ref: DCR-243
+  brds: [BRD-13, BRD-06]
+  loc: 'BRD-6 current process (p.42): dispositions in spreadsheets and e-mail; BRD-13 BRID 12.1 (p.12); Concept Paper V1.0 Annex C p.6 (RMEL data quality)'
+  type: Gap / missing detail
+  sev: High
+  desc: 'Carrying the January-May 2028 renewals "with their disposition" needs the legacy disposition, RA status, insurer approval and proposed terms per policy. The Renewal BRD says dispositions are made in spreadsheets and communicated by e-mail, and only packaged accounts go through the QPS upload and the RMEL text file (p.42). There is no system source for the disposition part of the carried rows, and the concept paper flags RMEL data quality as a risk that needs validation, exception reporting and review checkpoints.'
+  impact: 'Business: business units must consolidate their disposition files monthly. Build: layout P03 combines the legacy RMEL extract with the disposition file; cohort completeness check. Test: rejected rows in every mock.'
+  modules: 'Data migration; Renewal'
+  resolution: 'Proposal: one consolidated disposition template per cohort month from Mock 1, merged with the legacy RMEL extract into P03; rejected rows to the Heads of Retail and Corporate Marketing after every mock; completeness check per month; catch-up extraction at go-live for any header without a carried row.'
+  question: 'Who produces the legacy RMEL extract for the January-May 2028 expiries, where are the dispositions, RA status, insurer approvals and proposed terms kept, will the business units fill one consolidated template per month, and who reviews the rejected rows?'
+  owner: 'Marketing and Processing - Renewal (RMEL); BDOI IT'
+  status: Answered
+  response: 'BDOI answer of 26-Sep-2026 (DMQ38): the RMEL and the dispositions are kept in Excel today; rejected rows are reviewed by the Renewal processing team on a maker-checker basis. With no carried candidates, the Excel trackers are used only to record the renewal advices already sent before go-live.'
+  related: [DMQ38, DMQ37, DMQ33]
+
 # ---------------------------------------------------------------- NFR comparison (sheet "NFR comparison")
 # One row per theme; one value per BRD with its page. "conflict: true" highlights the row.
 nfr:
@@ -3034,6 +3451,14 @@ nfr:
 # Questions not listed here are Open. Keys use the qualified IDs (SP-SQnn, SANC-SQnn).
 # Values: [status, answering document and ID, answer in short].
 question_status:
+  DMQ26: [Answered, 'BDOI answer 26-Sep-2026 (DMQ37)', 'No carried cohorts: January-May 2028 expiries are processed in BIBS after go-live from a go-live extraction of every expiry up to 31-May-2028, January expiries flagged urgent; RAs already sent manually before go-live are recorded as sent.']
+  DMQ36: [Answered, 'BDOI answer 26-Sep-2026', 'Remapping at sanitation: the Renewal check PACKAGE_REMAP routes unmapped packages to the Exception bucket for the Renewal processing team; the migration only loads the legacy package code and the PACKAGE code map.']
+  DMQ37: [Answered, 'BDOI answer 26-Sep-2026', 'Option (b): processed in BIBS after go-live. Go-live extraction of every expiry from go-live to 31-May-2028, prioritised by expiry date, January expiries flagged urgent; RA already sent manually before go-live recorded, not re-sent.']
+  DMQ38: [Answered, 'BDOI answer 26-Sep-2026', 'RMEL and dispositions are kept in Excel; rejected rows are reviewed by the Renewal processing team on a maker-checker basis.']
+  DMQ39: [Answered, 'BDOI answer 26-Sep-2026 (recommendation)', 'Option A recommended: go-live 3-Jan-2028 at the year-end boundary, provisional GL opening trial balance, legacy GL open only for FY2027 closing and audit adjustments, true-ups as opening-balance adjustment journals; options B and C not recommended. Awaiting Comptrollership confirmation.']
+  IQ02: [Answered, 'BDOI answer 26-Sep-2026 (DMQ37)', 'January-May 2028 expiries are processed in BIBS after go-live (go-live extraction to 31-May-2028, January expiries urgent); no carry-forward of legacy cohorts.']
+  IQ03: [Answered, 'BDOI answer 26-Sep-2026 (DMQ36)', 'Remapping at Renewal sanitation (check PACKAGE_REMAP, Exception bucket, Renewal processing team).']
+  DMQ25: [Partially answered, 'BDOI timeline and answer A1 (26-Sep-2026)', 'Go-live of all modules together in January 2028; full migration and cut-over Nov 2027 - Jan 2028. Proposed T Monday 3 January 2028 after the legacy year-end close; freeze, window and year-end handling open (DMQ39, DCR-242).']
   Q01: [Partially answered, 'BRD-3 p.12, PMADD01-02', 'The products matrix is maintained in BIBS by MBS / TSU with the hierarchy LOB, subline / type / subtype, coverage / peril. The MTR / PAR matrix files are still not provided.']
   Q05: [Partially answered, 'BRD-3 BRPM.008 / 009 / 012 / 015, PMADD06', 'Package requests: approved by the Marketing TL, TH or UH; TSU TL recommends, TH approves; ManCom sign-off. No amount limits.']
   Q06: [Partially answered, 'BRD-8 BRID-005, 005.01-005.02, 009', 'For EB, insurers use a secure portal or API. Other lines: still e-mail.']

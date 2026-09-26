@@ -8,11 +8,11 @@ doc_code: FRS
 brd: BRD-06
 name: Renewal
 doc_id: BIBS-FRS-BRD-06
-version: "1.0"
-date: 25 September 2026
+version: "1.1"
+date: 26 September 2026
 status: Issued for BDOI review
 header_title: FRS BRD-6 Renewal
-output: FRS/BIBS_FRS_BRD-06_Renewal_v1.0.docx
+output: FRS/BIBS_FRS_BRD-06_Renewal_v1.1.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review; aligned with the cross-BRD decisions D1 to D4
+  - version: "1.1"
+    date: 26 Sep 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Solution Architect
+    approver: BDOI Product Owner (pending)
+    change: "Go-live transition from the BDOI answers of 26-Sep-2026 (DMQ36-DMQ38): go-live extraction of the expiries up to 31 May 2028 with January expiries urgent and the record of renewal advices already sent (FR-RN-016); package remapping at sanitation, check PACKAGE_REMAP (FR-RN-028); early renewal concept paper superseded (single go-live in January 2028)"
 distribution:
   - {name: "Product Owner, Renewal", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Unit Head, Combank and Corbank", role: Approver, organisation: BDOI, purpose: Review and sign-off}
@@ -43,6 +49,8 @@ distribution:
 This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker System, on iNXT BrokerVerse) meets the Renewal business requirements of BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It turns each BRD requirement into functional requirements with actors, flows, rules, validations, screens, fields, notifications, audit and acceptance criteria.
 
 BDOI uses this document to confirm that the system will behave as the business expects. The project team uses it to build the Renewal module, to test it and to prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirements it meets and their BRD pages.
+
+Every module goes live together in January 2028 (BDOI, 26-Sep-2026); the early renewal release of the concept paper *Advance Implementation of Renewal Processing* is superseded. Renewals expiring from go-live to 31 May 2028 are processed in BIBS after go-live (FR-RN-016).
 
 Renewal is **designed and not yet built**. The FRs describe the behaviour of the build design (R5). Screen names and API paths are those of the design and are confirmed at build. Error codes are assigned at build; this document gives the message text only, except where a check reuses a platform code that already exists (section 1.5).
 
@@ -83,6 +91,7 @@ The scope is the renewal of **client policies placed and booked by BDOI**: from 
 | R7 | Submitted Policies build design (`RenewalHandOff`) | current | `docs/architecture/SUBMITTED_POLICIES_DESIGN.md` |
 | R8 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
 | R9 | BRD-1 New Business requirements baseline (shared platform capabilities) | current | `docs/requirements/BDOI_NB_BRD_SPEC.md` |
+| R10 | BRD-13 Data Migration baseline and design (questions DMQ36-DMQ38 answered by BDOI on 26-Sep-2026) | current | `docs/requirements/BDOI_DM_BRD_SPEC.md`; `docs/architecture/DATA_MIGRATION_DESIGN.md` |
 
 Page references in this document ("p.27") are PDF page numbers of the BRD-6 pack (R1 to R3). The main BRD also carries its own page footer ("x of 151"); this document does not use it.
 
@@ -252,6 +261,7 @@ The BRD lists 25 functions that the System Administrator assigns to profiles (6.
 | RNW_REPORT_VIEW, RNW_EXPORT | Renewal reports; exports | 9 |
 | RNW_SETUP | Non-renewable risk codes, check settings, bucket rules, decision matrix, lead days | 23 (rules) |
 | RNW_TEMPLATE_MAINTAIN | Update the renewal templates | 25 |
+| RNW_PACKAGE_REMAP | Choose the BIBS package version of a migrated policy whose legacy package is not mapped (FR-RN-028) | BRRN.020; DMQ36 |
 | ATTACHMENT_MANAGE, LOV_MANAGE, ACCESS_REQUEST (existing) | Acquire documents, maintain LOVs, request user access | 1, 23, 24 |
 
 Function 2 (open the application in several tabs) needs no permission; it is the platform behaviour for every user.
@@ -285,6 +295,7 @@ The table is the role-to-permission matrix proposed in the build design ("Y" = g
 | RNW_EXPORT | Y | Y | Y | | | | | |
 | RNW_SETUP | | | | | Y | | | |
 | RNW_TEMPLATE_MAINTAIN | | | | | Y | | | |
+| RNW_PACKAGE_REMAP | | | Y | Y | | | | |
 | LOV_MANAGE | | | | | Y | | | |
 | Role-permission change requests | | | | | | Y | | |
 
@@ -700,6 +711,56 @@ acceptance:
   - A Non-Mortgage candidate in a bulk selection is refused with the segment message.
 ```
 
+```fr
+id: FR-RN-016
+title: Take over the expiries of the go-live window
+brd:
+  - BRRN.005 (p.24-25)
+  - BRRN.030 (p.8-9)
+actor: Processing TL (runs the go-live extraction from the cut-over runbook); Renewal processing team
+priority: Must have
+fit: NEW
+screens: Renewal Home (extraction runs); Expiry List (Urgent pill); Processing Worklist (Upload RA already sent)
+api: Job RNW_GOLIVE_EXTRACTION; bulk template RNW_RA_ALREADY_SENT
+description:
+  - "At go-live BIBS takes over every renewal that expires from go-live to 31 May 2028. BDOI decided on 26-Sep-2026 that these renewals are processed in BIBS after go-live and that no renewal in progress is carried from the legacy systems (BRD-13 question DMQ37)."
+  - "Once, right after the migration load is signed off, the go-live extraction creates a candidate for every migrated in-force policy expiring in that window. The candidates are ordered by expiry date. Those expiring in January 2028 carry the flag Urgent, which the Expiry List shows as a pill and every worklist sorts first."
+  - "Renewal Advices already sent by hand before go-live are recorded from the Excel trackers of the business units, so BIBS does not send them again. Rejected tracker rows are reviewed by the Renewal processing team on a maker-checker basis (DMQ38)."
+  - "From the next day the daily extraction (FR-RN-010) takes the later expiries; expiries already taken over are not extracted twice."
+preconditions:
+  - "The migrated in-force policies are loaded and signed off (BRD-13 cut-over runbook)."
+  - "The user has RNW_EXTRACT (go-live extraction) or RNW_RA_SEND (tracker upload)."
+main_flow:
+  - "The Processing TL runs job RNW_GOLIVE_EXTRACTION from Administration > Scheduled Jobs."
+  - "BIBS creates one candidate in stage EXTRACTED per migrated policy expiring from go-live to RNW_GOLIVE_EXTRACTION_TO, with source Legacy and the legacy policy reference, flags Urgent those expiring up to RNW_GOLIVE_URGENT_TO, and runs the checks (FR-RN-020, FR-RN-028)."
+  - "A member of the Renewal processing team uploads the tracker of Renewal Advices already sent (legacy policy reference, RA date, RA reference, recipient)."
+  - "BIBS records each matched row as an RA of status Sent with its legacy date. The candidate is not offered for RA generation or sending again; the second notice and the NRNS checkpoint count from the legacy RA date."
+  - "The candidates are initiated as in FR-RN-015 (bulk initiation of the go-live run is allowed)."
+alternate_flows:
+  - "Policy already renewed in legacy (a later term of the same cover is migrated). BIBS skips it and counts it as skipped."
+  - "Tracker row without a matching candidate, or a second row for the same policy. The row is rejected to the upload result. A team member corrects it (maker) and a second member approves the corrected row (checker) before it is applied."
+  - "RA generated for a January expiry fewer than RNW_RA_MIN_NOTICE_DAYS before expiry. The late-RA warning of FR-RN-080 applies."
+rules:
+  - [R1, "Window from the go-live date to 31 May 2028; urgent up to 31 January 2028.", Configurable, "Parameters RNW_GOLIVE_EXTRACTION_TO, RNW_GOLIVE_URGENT_TO"]
+  - [R2, "One candidate per legacy policy reference; the daily extraction skips policies already taken over.", Fixed, "-"]
+  - [R3, "An RA recorded from the tracker is never generated or sent again for the same candidate.", Fixed, "-"]
+  - [R4, "Rejected tracker rows are applied only after a second member of the Renewal processing team approves the correction (maker-checker).", Fixed, "-"]
+  - [R5, "The job runs once; a second run creates nothing new and is recorded with zero new candidates.", Fixed, "-"]
+validations:
+  - ["Tracker row whose legacy policy reference has no candidate", "Row <n>: no renewal candidate for legacy policy <reference>", To be assigned at build]
+  - ["Second tracker row for the same policy", "Row <n>: the Renewal Advice of legacy policy <reference> is already recorded", To be assigned at build]
+  - ["RA date missing or after the go-live date", "Row <n>: enter the date the Renewal Advice was sent (before go-live)", To be assigned at build]
+notifications:
+  - "The Processing TL and the Marketing TLs of the units when the go-live run completes, with the counts per expiry month and the number of urgent candidates."
+audit:
+  - "The go-live run with user, window, counts (read, extracted, urgent, skipped) and time; each tracker row applied with maker, checker, file and row number."
+acceptance:
+  - "After the go-live run every migrated policy expiring from go-live to 31 May 2028 is a candidate exactly once, and the January expiries show Urgent and come first in the lists."
+  - "A candidate whose RA is recorded from the tracker shows the RA as Sent with the legacy date and cannot be sent again."
+  - "A rejected tracker row is applied only after a second team member approves the correction."
+  - "The first daily extraction after go-live creates no second candidate for a policy expiring on 31 May 2028."
+```
+
 ## Sanitation, buckets and rules
 
 ```fr
@@ -1027,6 +1088,46 @@ acceptance:
   - The TL cannot post a candidate while an endorsement request on the expiring invoice is open.
   - After the endorsement is posted, the renewal account shows the endorsed sum insured.
   - The record lists the linked endorsement numbers.
+```
+
+```fr
+id: FR-RN-028
+title: Resolve the package of a migrated policy at sanitation
+brd:
+  - BRRN.020 (p.4)
+actor: System (check PACKAGE_REMAP); Renewal processing team (Processing TL, Processing Officer)
+priority: Must have
+fit: NEW
+screens: Record page (Checks & Bucket, Package panel); Expiry List (bucket Exception)
+api: Check PACKAGE_REMAP; POST /api/v1/renewal/candidates/{ref}/package
+description:
+  - "A migrated policy carries its legacy package code. BDOI decided on 26-Sep-2026 that legacy packages are remapped to the BIBS packages at sanitation, not at the data migration (BRD-13 question DMQ36). The migration only loads the legacy package code and the package code map."
+  - "For each candidate of source Legacy the check PACKAGE_REMAP looks the legacy package up in the code map. When the map gives one active BIBS package version, the check passes and the candidate takes that version. When the package is not in the map, is retired, or maps to several versions, the check fails and the candidate goes to the Exception bucket."
+  - "A member of the Renewal processing team chooses the BIBS package version on the record page and a second member approves the choice (maker-checker). The choice is logged and listed so that the code map can be completed for later candidates."
+preconditions:
+  - "The candidate has source Legacy; the user has RNW_PACKAGE_REMAP."
+main_flow:
+  - "The check runs after the go-live extraction and at every re-evaluation."
+  - "The processor opens a candidate of the Exception bucket with PACKAGE_REMAP failed and chooses the package version with a reason."
+  - "A second processor approves the choice; the check passes and the bucket is recomputed."
+alternate_flows:
+  - "Candidate booked in BIBS. The check is Not applicable."
+  - "The checker rejects the choice. The candidate stays in Exception and the maker is told the reason."
+rules:
+  - [R1, "Only active package versions sellable for renewal can be chosen (PRODUCT_RENEWABLE still applies).", Fixed, "-"]
+  - [R2, "Maker and checker are different users.", Fixed, "-"]
+  - [R3, "A failed PACKAGE_REMAP puts the candidate in the Exception bucket.", Configurable, Bucket rule set (FR-RN-022)]
+validations:
+  - ["No package version chosen, or no reason", "Choose the package version and give the reason", To be assigned at build]
+  - ["Checker is the maker", "The package choice must be approved by another user", To be assigned at build]
+notifications:
+  - "The Processing TL queue when candidates fail PACKAGE_REMAP; the maker when the checker rejects the choice."
+audit:
+  - "Legacy package, chosen version, reason, maker, checker and times; listed in report RNW-PACKAGE-REMAP."
+acceptance:
+  - "A migrated policy whose legacy package maps to one BIBS version passes the check and shows that version."
+  - "A migrated policy with an unmapped package is in the Exception bucket until a processor's choice is approved by a second processor."
+  - "The same user cannot choose and approve the package."
 ```
 
 ## Assignment and transfer (Marketing TL)
@@ -2513,6 +2614,7 @@ Figure 4 shows how a trigger runs the checks, how the bucket rule set turns the 
 | INSURER_USABLE | - | Insurer active and usable | FAIL_EXCEPTION |
 | DUPLICATE_CANDIDATE | BRRN.005 | Another open candidate or live renewal on the same risk | FAIL_EXCEPTION |
 | KYC_DUE | BRRN.028 | Client KYC review within the due window | INFO only, never blocks |
+| PACKAGE_REMAP | BRRN.020; DMQ36 | Legacy package of a migrated policy against the package code map | FAIL_EXCEPTION when unmapped, retired or ambiguous |
 
 ## Insurer batch and letter states
 
@@ -2551,6 +2653,8 @@ Figure 4 shows how a trigger runs the checks, how the bucket rule set turns the 
 | RNW-DECISIONS | Decision log | Dispositions, matrix rule and version, overrides with rationale | BRRN.031, 034; BRD 1.011 |
 | RNW-LAMD-MATCH | LAMD match | LAMD lines matched and unmatched, with the routing | BRRN.029 |
 | RNW-WORKLOAD | Workload | Accounts per AO and PO by stage | BRD 1.009.7, 3.010.7 |
+| RNW-GOLIVE | Go-live extraction | Per expiry month: migrated policies, candidates, urgent, skipped, RA already sent | BRRN.005; DMQ37 |
+| RNW-PACKAGE-REMAP | Package choices | Legacy package, chosen package version, maker and checker | BRRN.020; DMQ36 |
 
 Every report needs RNW_REPORT_VIEW, applies the user's scope, exports to PDF, XLSX, ODS and CSV, has print preview and saved variants, and answers within 20 seconds at 30,000 rows.
 
@@ -2677,7 +2781,8 @@ Figure 6 shows the interfaces of Renewal. Renewal reads the expiring population 
 | E-mail outbox | Out | Protected RA, letters, insurer extract; send log | BRRN.010; BRD 3.009.5 | BUILT |
 | Insurers | In | Response file by upload; no insurer API or SFTP | BRD 3.009.6; BRRN.035 | PARKED |
 | LAMD | In | Paid-off and RMU reports by upload | BRRN.029 | PARKED |
-| Legacy EBIX / QPS | In | One-time load of expiring legacy policies (NB path only) | RQ27 | PARKED |
+| Data migration (BRD-13) | In | Migrated in-force policies for the go-live and daily extraction (NB path only); legacy package codes and the package code map; no renewal carried from legacy (DMQ37) | RQ27; DMQ36, DMQ37 | NEW |
+| Renewal Advice trackers (Excel) | In | RAs sent by hand before go-live, by upload once at go-live | DMQ37, DMQ38 | NEW |
 | Directory sign-in | In | BDO EUA / Windows ID (decision D6) | BRD x.001 | PARKED |
 
 > [!PARKED] Parked seams
@@ -2710,6 +2815,8 @@ The items below are changed in BIBS without a release. Changes are audited.
 |---|---|---|
 | RNW_EXTRACTION_LEAD_DAYS | 140 | Days before expiry at which the job extracts a policy |
 | RNW_EXTRACTION_LEAD_DAYS_BY_SEGMENT | empty | Lead days per segment (segment=days) |
+| RNW_GOLIVE_EXTRACTION_TO | 31 May 2028 | Last expiry date taken by the go-live extraction |
+| RNW_GOLIVE_URGENT_TO | 31 January 2028 | Expiries up to this date are flagged Urgent at go-live |
 | RNW_BULK_INITIATION_SEGMENTS | CLG | Segments initiated in bulk |
 | RNW_CBG_STP_LINES | MOTOR, PROPERTY (CBG) | Lines of the CBG straight-through path |
 | RNW_STP_SKIP_TL_REVIEW | true | AUTO dispositions skip the TL review |
@@ -2820,7 +2927,10 @@ The items below are changed in BIBS without a release. Changes are audited.
 | RQ24 | Initial decision-matrix content; who maintains and approves it | FR-RN-023 | OPEN |
 | RQ25 | Financial-impact tolerance; NB path or explicit acceptance for revised premiums | FR-RN-048, 064 | OPEN |
 | RQ26 | Layouts of the RA, NAL, NFR, reminder, non-acceptance and insurer cover letters | FR-RN-080-083, 111 | OPEN |
-| RQ27 | One-time load of expiring legacy EBIX / QPS policies at go-live | Section 7 | OPEN |
+| RQ27 | One-time load of expiring legacy EBIX / QPS policies at go-live | FR-RN-016; section 7 | PARTIAL |
+| DMQ36 | Package remapping at upload or at sanitation, and its owner (BRD-13) | FR-RN-028 | ANSWERED |
+| DMQ37 | Renewals expiring January to May 2028: carried from legacy or processed in BIBS after go-live (BRD-13) | FR-RN-016 | ANSWERED |
+| DMQ38 | Where the RMEL and dispositions are kept; who reviews rejected rows (BRD-13) | FR-RN-016 | ANSWERED |
 | RQ28 | Availability, maintenance, DR, retention and backup values ("follow QPS") | Section 8 | OPEN |
 | RQ29 | Late Renewal Requests Report (BRNB.018) as a listing variant (XQ09) | FR-RN-102 | OPEN |
 | RQ30 | Renewal of an account whose package version is expired with no current version | FR-RN-063 | OPEN |
@@ -2848,7 +2958,7 @@ Every BRD-6 requirement ID is met by at least one FR or is out of scope by the B
 | BRRN.002 (p.22-23) | FR-RN-011 | Expiry List (Generate Expiry List) | /renewal/candidates?expiryFrom=&expiryTo= |
 | BRRN.003 (p.23) | FR-RN-012 | Expiry List (Filters) | /renewal/candidates (filters) |
 | BRRN.004 (p.23-24) | FR-RN-013 | Expiry List grid | /renewal/candidates |
-| BRRN.005 (p.24-25) | FR-RN-010 | Expiry List; Renewal Home | Job RNW_EXTRACTION |
+| BRRN.005 (p.24-25) | FR-RN-010, FR-RN-016 | Expiry List; Renewal Home | Job RNW_EXTRACTION |
 | BRRN.006 (p.25) | FR-RN-013 | Expiry List (column filters, search) | /renewal/candidates |
 | BRRN.007 (p.25-26) | FR-RN-014 | Expiry List (Export) | Report RNW-EXPIRY-LIST |
 | BRRN.008 (p.26) | FR-RN-014 | Expiry List (Print) | Report RNW-EXPIRY-LIST |
@@ -2863,7 +2973,7 @@ Every BRD-6 requirement ID is met by at least one FR or is out of scope by the B
 | BRRN.017 (p.31) | FR-RN-040 | My Dispositions (name / reference search) | /renewal/candidates |
 | BRRN.018 (p.31) | FR-RN-060 | Processing Worklist (upload) | Bulk RNW_DISPOSITION_UPLOAD |
 | BRRN.019 (p.32-33) | FR-RN-101, FR-RN-103 | Renewal Reports | Report RNW-STATUS |
-| BRRN.020 (p.4) | FR-RN-020 | Record page (Checks & Bucket) | Check engine; RNW-SANITATION |
+| BRRN.020 (p.4) | FR-RN-020, FR-RN-028 | Record page (Checks & Bucket) | Check engine; RNW-SANITATION |
 | BRRN.021 (p.4) | FR-RN-015, FR-RN-004 | Expiry List (Initiate) | /renewal/candidates/initiate |
 | BRRN.022 (p.4) | FR-RN-021, FR-RN-020 | Record page; uploads | Check REFERENCE_MATCH |
 | BRRN.023 (p.4-6) | FR-RN-022, FR-RN-051, FR-RN-112 | Expiry List (pill, Exceptions); record page | /renewal/candidates/{ref}/bucket-override |
@@ -2873,7 +2983,7 @@ Every BRD-6 requirement ID is met by at least one FR or is out of scope by the B
 | BRRN.027 (p.7) | FR-RN-042 | Record page (Account History) | /renewal/candidates/{ref}/account-history |
 | BRRN.028 (p.7-8) | FR-RN-026 | Expiry List (KYC chip) | Check KYC_DUE |
 | BRRN.029 (p.8) | FR-RN-025 | LAMD Reports | Bulk RNW_LAMD_REPORT |
-| BRRN.030 (p.8-9) | FR-RN-010, FR-RN-112 | Renewal Home; Renewal Setup | Job RNW_EXTRACTION |
+| BRRN.030 (p.8-9) | FR-RN-010, FR-RN-016, FR-RN-112 | Renewal Home; Renewal Setup | Job RNW_EXTRACTION |
 | BRRN.031 (p.9-10) | FR-RN-023, FR-RN-051 | Record page; Renewal Setup | Decision matrix |
 | BRRN.032 (p.10) | FR-RN-027 | Record page (Checks, Account History) | Check ENDORSEMENT_PENDING |
 | BRRN.033 (p.10) | FR-RN-048 | Record page (Start NB Path) | /renewal/candidates/{ref}/nb-path |

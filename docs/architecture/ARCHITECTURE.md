@@ -48,6 +48,25 @@ described in [`BROKING_ARCHITECTURE.md`](BROKING_ARCHITECTURE.md) and the design
 Dependency direction is enforced by ArchUnit: operational modules → accounting → journal → ledger;
 no cycles. Cross-module call-backs use ports (interfaces owned by the caller).
 
+## Deployment view (AWS, BDOI IER)
+
+BIBS runs on Amazon EKS in ap-southeast-1 with managed AWS services; the application stays one modular monolith
+([`ARCHITECTURE_OPTION_DECISION.md`](ARCHITECTURE_OPTION_DECISION.md): BIBS modular monolith with the IER enterprise
+elements, awaiting BDOI confirmation, IQ25 / DCR-222).
+
+| Layer | Component |
+|---|---|
+| Edge | Route 53, AWS WAF, Application Load Balancer (or Apigee X if BDO mandates it) in front of the ingress |
+| Workloads | `brokerverse-frontend` (nginx, React SPA) and `brokerverse-backend` (Spring Boot, Java 21), 2 to 8 pods per environment with HPA and PodDisruptionBudget (`deploy/k8s/brokerverse.yaml`; sizing in PROGRAMME_ALIGNMENT section 6.4) |
+| Data | Amazon RDS PostgreSQL 16 Multi-AZ (one database, one transaction per business record), ElastiCache Redis 7 (cluster mode disabled), Amazon MSK (Kafka 3.6, 9 `bibs.*` topics with transactional outbox) |
+| Files | Amazon S3 for every document and attachment (four buckets per environment, SSE-KMS with BDOI keys, Object Lock governance mode, GuardDuty malware scan); PostgreSQL keeps the metadata ([`DOCUMENT_STORAGE_DECISION.md`](DOCUMENT_STORAGE_DECISION.md)) |
+| Identity | EIAM (Microsoft Entra ID, OpenID Connect) for sign-in; UIDM-ISC (IGA) for provisioning (USER_ACCESS_DESIGN section 10.1) |
+| Environments | DEV, SIT, UAT, Pre-Prod, PROD, DR (warm standby in the DR region, RDS cross-region replica, S3 replication); RPO 15 minutes, RTO 4 hours |
+
+The IER-aligned diagrams for BDOI IT are `docs/deliverables/out/Alignment/IER/BIBS_IER_Application_Architecture.png`
+and `BIBS_IER_Infrastructure_Deployment.png` (sources `docs/deliverables/src/alignment/figures/`); the comparison with
+the IER workbook is [`PROGRAMME_ALIGNMENT.md`](PROGRAMME_ALIGNMENT.md) section 6.
+
 ## Key design decisions
 
 1. **Event-driven accounting.** Operational modules publish business events; configurable,

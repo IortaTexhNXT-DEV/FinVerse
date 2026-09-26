@@ -137,9 +137,11 @@ after go-live" and DCR-202); RMEL cohorts ingested from legacy files (the renewa
 RENEWAL_DESIGN principle 2, so the check engine would have read outstanding premium and claims from the RMEL file, not
 live); a progression gate stopping renewal accounts before placement until T. None of this is built now.
 
-What remains:
-- **Renewals around T** (IQ02): unchanged DM design - cohorts T to T+140 days carried forward (object P03, layout P03 in `dm_layouts.yaml`, `renewal.service.port.LegacyPolicySource` implemented by `migration`, DATA_MIGRATION_DESIGN section 15); renewals expiring between the freeze and T placed in legacy or held by hold covers.
-- **Package remapping** (IQ03, DCR-219): recommended hybrid - a versioned `PACKAGE` code map set at migration intake (add to the code-map list of `dm_layouts.yaml`, today it has no PACKAGE set) plus a renewal sanitation check `PACKAGE_MAPPING` (new bean in `renewal.service.check`, RENEWAL_DESIGN section 8.1) that sends unmapped / retired / split packages to Review for TSU; owner TSU with the MBS steward; rules agreed before the first full extract (15-Jan-2027).
+What remains (updated with the BDOI answers to DMQ36-DMQ39 of 26-Sep-2026, which answer IQ02 and IQ03):
+- **Renewals around T - answered (DMQ37):** the January-May 2028 expiries are processed in BIBS after go-live; no candidate is carried from legacy. At go-live Renewal extracts every expiry from go-live to 31-May-2028, January expiries flagged urgent, and records the renewal advices already sent by hand before go-live from the Excel trackers (rejected rows reviewed maker-checker by the Renewal processing team, DMQ38); RENEWAL_DESIGN section 13.1, FRS BRD-6 v1.1 FR-RN-016. The text that follows is the earlier proposal, kept for the record.
+- **Renewals around T** (IQ02, earlier proposal): unchanged DM design - cohorts T to T+140 days carried forward (object P03, layout P03 in `dm_layouts.yaml`, `renewal.service.port.LegacyPolicySource` implemented by `migration`, DATA_MIGRATION_DESIGN section 15); renewals expiring between the freeze and T placed in legacy or held by hold covers.
+- **Package remapping - answered (DMQ36):** at Renewal sanitation, not at upload. The migration loads the legacy package code and the `PACKAGE` code map only; the check is named `PACKAGE_REMAP` in the build (this document called it `PACKAGE_MAPPING`) and sends unmapped packages to the Exception bucket for the Renewal processing team (RENEWAL_DESIGN sections 8.1 and 13.1; FRS BRD-6 v1.1 FR-RN-028).
+- **Package remapping** (IQ03, DCR-219, earlier proposal): recommended hybrid - a versioned `PACKAGE` code map set at migration intake (add to the code-map list of `dm_layouts.yaml`, today it has no PACKAGE set) plus a renewal sanitation check `PACKAGE_MAPPING` (new bean in `renewal.service.check`, RENEWAL_DESIGN section 8.1) that sends unmapped / retired / split packages to Review for TSU; owner TSU with the MBS steward; rules agreed before the first full extract (15-Jan-2027).
 - **"R0 early renewal" release:** not planned. Note the name clash: R0 is also the first Renewal build wave (RENEWAL_DESIGN section 14).
 
 ## 4. Timeline alignment
@@ -264,6 +266,11 @@ Code references for the seams:
 | Sizing basis | YoY growth 15 %, 60 months; ~1,200 internal users (diagram) | Umbrella BRD p.42: 1,344 named / 429 concurrent (DCR-166); renewal 25,800 accounts and NB 21,200 bookings a month | Gap | One user figure for sizing and the performance test | DCR-232; IQ32 |
 | VDI | 15 users: 8 developers (24 months), 4 testers (18), 3 production support (60); 12 x 5 | Hosting appendix: access restricted to personnel in the Philippines; migration staging purged within 5 days | Gap | Confirm who needs VDI and from where; update the software list | DCR-231; IQ28 |
 
+**Architecture option (IQ25, DCR-222, DCR-223).** The recommendation is recorded in
+[`ARCHITECTURE_OPTION_DECISION.md`](ARCHITECTURE_OPTION_DECISION.md): BIBS stays a modular monolith and takes three
+enterprise elements from the IER (edge security, managed AWS services, separate web / jobs / integration workloads);
+awaiting BDOI confirmation. The register carries it as the proposed resolution of DCR-222 and DCR-223.
+
 BIBS references: `deploy/k8s/brokerverse.yaml` (namespace, two deployments, 2 replicas each, backend 500m / 1 Gi requests and 2 / 2 Gi limits, AWS notes for RDS Multi-AZ, ElastiCache cluster mode disabled, MSK SASL/SCRAM port 9096); `backend/Dockerfile` (`eclipse-temurin:21-jre-alpine`), `frontend/Dockerfile` (`node:22-alpine`, `nginx:1.27-alpine`); `backend/src/main/resources/application.yml` (Redis, Kafka, job crons in UTC); `.github/workflows/ci.yml` (Java 21, Node 22, SonarQube); `docs/operations/RUNBOOK.md` section 6 (daily full backup + WAL, quarterly restore test); `docs/architecture/PLATFORM_CACHE_AND_EVENTS.md`.
 
 ### 6.3 Documents in S3 only (A4; design S6)
@@ -321,6 +328,10 @@ Note for S6: section 1 of DOCUMENT_STORAGE_DECISION.md lists `doc_rendition` amo
 DCR-210 to DCR-235 are proposed for the discrepancy register (drop plan, concept paper, IER, integrations).
 
 ## 8. Edits needed to shared documents
+
+Status 26-Sep-2026: applied in the consolidation of this date (register v1.2, BRD-6 FRS and test plan v1.1, BRD-2 and
+BRD-11 FRS v1.1, the designs named below), except the Employee Benefits rows, which wait for the build agent
+(`docs/deliverables/PENDING_EDITS.md`), and the Developer Guide FileStore rule, which follows build step ST0.
 
 | Document | Edit |
 |---|---|

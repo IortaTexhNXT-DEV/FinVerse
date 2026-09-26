@@ -11,6 +11,13 @@ Requirements baseline: [`BDOI_RN_BRD_SPEC.md`](../requirements/BDOI_RN_BRD_SPEC.
 
 Every class, migration and screen cites its BR ID in Javadoc or a comment, for example `BRRN.023` or `BRD 2.004.3`.
 
+**Go-live (26-Sep-2026).** Every module goes live together in January 2028 (BDOI answer A1,
+[`PROGRAMME_ALIGNMENT.md`](PROGRAMME_ALIGNMENT.md) section 3). The early renewal release of the signed concept paper
+*Advance Implementation of Renewal Processing* V1.0 is withdrawn; its capabilities stay in this design. The renewals in
+expiring from go-live to 31 May 2028 are processed in BIBS after go-live (BDOI answers to DMQ36-DMQ38 of 26-Sep-2026):
+section 13.1 describes the go-live extraction, the record of renewal advices already sent and the package remapping at
+sanitation ([`DATA_MIGRATION_DESIGN.md`](DATA_MIGRATION_DESIGN.md) section 15).
+
 ## 1. Design principles
 
 1. **The candidate lives in Renewal, and the renewal becomes an account.**
@@ -75,7 +82,7 @@ The graph stays acyclic, and ArchUnit needs no exception.
 
 | Port | Default adapter | Implemented later by | Purpose |
 |---|---|---|---|
-| `LegacyPolicySource` | Bulk handler `RNW_LEGACY_POLICIES` only (kept as the fallback upload) | `migration` (`MigratedPolicySource`, Data Migration wave DM2-B; stub until R0 exists) from the migrated in-force headers (object P01) and the legacy RMEL cohorts (P03), [`DATA_MIGRATION_DESIGN.md`](DATA_MIGRATION_DESIGN.md) §15 | Expiring policies booked in EBIX / QPS before go-live (RQ27, partially answered by BRD-13 BRID 4.1, 12.1) |
+| `LegacyPolicySource` | Bulk handler `RNW_LEGACY_POLICIES` only (kept as the fallback upload) | `migration` (`MigratedPolicySource`, Data Migration wave DM2-B; stub until R0 exists) from the migrated in-force headers (object P01), [`DATA_MIGRATION_DESIGN.md`](DATA_MIGRATION_DESIGN.md) §15 | Expiring policies booked in EBIX / QPS before go-live (RQ27, partially answered by BRD-13 BRID 4.1, 12.1): the migrated headers for the go-live and daily extraction (`expiringHeaders(from, to)`); no candidates are carried from legacy (DMQ37); section 13.1 |
 | `RecipientPolicy` | Allows every well-formed address, requires `Protection` | Messaging change if BDOI confirms domain / TLS rules (RQ16) | RA negative scenario 6 |
 
 Ports of other modules that `renewal` implements or calls:
@@ -279,6 +286,7 @@ Consequences:
 | `RNW_REPORT_VIEW`, `RNW_EXPORT` | Renewal reports, exports | 9 |
 | `RNW_SETUP` | Non-renewable risk codes, check settings, bucket rules, decision matrix, lead days (activation needs `MASTER_AUTHORIZE`, never the maker) | 23 (LOVs via `LOV_MANAGE`) |
 | `RNW_TEMPLATE_MAINTAIN` | Update the renewal templates | 25 |
+| `RNW_PACKAGE_REMAP` | Choose the BIBS package version of a LEGACY candidate in the Exception bucket (check `PACKAGE_REMAP`); granted to `PROCESSING_TL` and `PROCESSOR` | DMQ36 |
 | existing `ATTACHMENT_MANAGE`, `ACCESS_REQUEST` / `ACCESS_APPROVE`, `LOV_MANAGE` | Acquire documents (1), maintain users (24), maintain LOVs (23) | 1, 23, 24 |
 
 Multi-tab (function 2) needs no permission; it is the platform behaviour for every user.
@@ -381,6 +389,7 @@ Rules:
 | `INSURER_USABLE` | - | `InsurerService.requireUsableInsurer` | FAIL_EXCEPTION |
 | `DUPLICATE_CANDIDATE` | BRRN.005 | Another open candidate or live renewal account on the same risk (`RiskDuplicateService`) | FAIL_EXCEPTION |
 | `KYC_DUE` | BRRN.028 | `Client.kycReviewDue` within `KYC_DUE_WINDOW_DAYS`, scope `RNW_KYC_SEGMENTS` | INFO only, never blocks |
+| `PACKAGE_REMAP` | BRRN.020; BRD-13 BRID 3.1 (DMQ36 answered: remapping at sanitation) | Candidates of source LEGACY: the legacy package code of the migrated header, looked up in the `PACKAGE` code map that the migration loads (DATA_MIGRATION_DESIGN §15.2). One active BIBS package version found: PASS, the candidate takes that version. No entry, a retired package, or several possible versions | FAIL_EXCEPTION: the Renewal processing team chooses the BIBS package version on the record page (maker-checker); the choice is logged. NOT_APPLICABLE for BIBS-booked candidates |
 
 **Re-evaluation.** The checks run again on these events:
 - `InvoiceBooked` and `InvoiceMovementPosted` of the family;
@@ -408,6 +417,7 @@ A new result set drives the bucket, so records move between buckets as condition
 | `RNW_NRNS_LETTERS` | `0 0 22 * * *` (06:00 PHT) | Flag NRNS; queue reminder letters at `RNW_NRNS_REMINDER_DAYS`; non-acceptance letters; second-notice RA candidates | BRRN.025/037, BRD 1.010.2.2 |
 | `RNW_EXPIRY_SWEEP` | `0 15 16 * * *` | Close EXPIRED_UNRENEWED candidates past expiry + `RNW_NON_ACCEPTANCE_DAYS`; notify the owners | BRRN.037 |
 | `RNW_LETTER_BATCH` | `-` (manual, run by the screen through `JobRunService`) | Generate and send letter batches (RA, NAL, NFR) with progress | BRRN.010 |
+| `RNW_GOLIVE_EXTRACTION` | `-` (manual, once at go-live, cut-over runbook) | Extract every migrated header expiring from go-live to `RNW_GOLIVE_EXTRACTION_TO`; flag urgent up to `RNW_GOLIVE_URGENT_TO` (section 13.1) | DMQ37 |
 
 The crons are `brokerverse.jobs.renewal-*-cron` in `application.yml`, documented in `docs/operations/CONFIGURATION.md` (R0).
 
@@ -417,6 +427,8 @@ Parameters (`sys_parameter`, category RENEWAL):
 |---|---|
 | `RNW_EXTRACTION_LEAD_DAYS` | 140 |
 | `RNW_EXTRACTION_LEAD_DAYS_BY_SEGMENT` | empty (CODE_LIST `segment=days`) |
+| `RNW_GOLIVE_EXTRACTION_TO` | 2028-05-31 (DMQ37) |
+| `RNW_GOLIVE_URGENT_TO` | 2028-01-31 |
 | `RNW_BULK_INITIATION_SEGMENTS` | `CLG` |
 | `RNW_CBG_STP_LINES` | `MOTOR,PROPERTY` for segment CBG |
 | `RNW_STP_SKIP_TL_REVIEW` | true |
@@ -470,6 +482,7 @@ Bulk handlers (`BulkImportHandler`):
 - `RNW_INSURER_RESPONSE` (`RNW_INSURER`; BRD 3.009.6, BRRN.035);
 - `RNW_LAMD_REPORT` (`RNW_LAMD_UPLOAD`; BRRN.029);
 - `RNW_LEGACY_POLICIES` (`RNW_EXTRACT`; RQ27);
+- `RNW_RA_ALREADY_SENT` (`RNW_RA_SEND`; DMQ37, DMQ38): renewal advices sent manually before go-live;
 - `RNW_ACCEPTANCE` (`RNW_ACCEPT`; bulk acceptance by e-mail list).
 
 Each handler validates the renewal ref (BRRN.022). Unmatched rows are kept as EXCEPTION lines, never dropped.
@@ -481,7 +494,7 @@ Each handler validates the renewal ref (BRRN.022). Unmatched rows are kept as EX
 | Total-loss indicator | BRD 2.004.4.5, BRRN.034 | Manual non-renewal reason; matrix condition TOTAL_LOSS inactive | CLQ28, RQ13 |
 | LAMD channel (reports from the bank) | BRRN.029/039 | `RNW_LAMD_REPORT` upload; the LAMD role can upload | RQ20 |
 | Insurer channels (renewal files and responses) | BRD 3.009.5/6 | E-mail out (protected), upload in; `InsurerFileInbox` pattern (opsledger) not used until insurer SFTP / API exists | Q06, RQ15 |
-| Legacy EBIX / QPS expiring policies at go-live | p.34, BRRN.005 | `RNW_LEGACY_POLICIES` bulk handler creates candidates with `legacy_ref` and no ARN; they can only take the NB path (no account to renew from). **BRD-13** makes the transition renewal-driven and aligned to RMEL: cohorts expiring before go-live (T) stay in legacy; cohorts T to T + 140 days (`RNW_EXTRACTION_LEAD_DAYS`, already extracted in legacy) are carried forward with their disposition, handler and status and served through `LegacyPolicySource`, and Renewal creates candidates with source LEGACY; later cohorts are extracted by `RNW_EXTRACTION` from the migrated headers. Legacy candidates renew on the **new-business path**, pre-filled from the header (it carries no BIBS rating data), with `renewal_of_ref` = the legacy reference so the migration run-off tracker can link them (DATA_MIGRATION_DESIGN §15) | RQ27 (partial), DMQ26 |
+| Legacy EBIX / QPS expiring policies at go-live | p.34, BRRN.005 | `RNW_LEGACY_POLICIES` bulk handler creates candidates with `legacy_ref` and no ARN; they can only take the NB path (no account to renew from). **BRD-13** makes the transition renewal-driven and aligned to RMEL: expiries before go-live (T) stay in legacy. BDOI answered DMQ37 on 26-Sep-2026: no candidate is carried from legacy; at go-live BIBS extracts every migrated header expiring from T to 31 May 2028 (January expiries flagged urgent) and records the renewal advices already sent manually before go-live; later expiries are extracted by `RNW_EXTRACTION` from the migrated headers (section 13.1). Legacy candidates renew on the **new-business path**, pre-filled from the header (it carries no BIBS rating data), with `renewal_of_ref` = the legacy reference so the migration run-off tracker can link them (DATA_MIGRATION_DESIGN §15) | RQ27 (partial); DMQ26, DMQ37 answered |
 | Mail recipient policy (approved domains, TLS) | BRRN.010 negative 6 | `RecipientPolicy` port in `renewal` with a permissive default; TLS is the SMTP relay configuration | RQ16 |
 | Password convention | BRRN.010, 3.009.5 | `DocumentPasswordPolicy` (messaging), generated passwords | Q07 |
 | BDO CIF KYC data | BRRN.028 | BIBS KYC review date only | Q16, RQ22 |
@@ -500,6 +513,8 @@ Each handler validates the renewal ref (BRRN.022). Unmatched rows are kept as EX
 | `RNW-DECISIONS` | `DecisionLogReport` | Dispositions, matrix rule and version, overrides with rationale | BRRN.031/034, 1.011 |
 | `RNW-LAMD-MATCH` | `LamdMatchReport` | LAMD lines matched / unmatched, routing | BRRN.029 |
 | `RNW-WORKLOAD` | `WorkloadReport` | Accounts per AO / PO by stage | 1.009.7, 3.010.7 |
+| `RNW-GOLIVE` | `GoLiveExtractionReport` | Go-live extraction per expiry month: headers, extracted, urgent, skipped (already renewed in legacy), RA already sent | DMQ37 |
+| `RNW-PACKAGE-REMAP` | `PackageRemapReport` | Package choices on LEGACY candidates: legacy package, chosen BIBS version, maker, checker | DMQ36 |
 
 Every report reads through constant SQL (the `NbReportJdbc` pattern) with named parameters, the criteria of spec 6.2 as `CODE_SET` parameters, and role scope. The target is under 20 s at 30,000 rows.
 
@@ -560,7 +575,36 @@ The crm client page gains a **Renewal** tab (prototype "Client Record Details": 
 | `brokerclaims` (Claims, planned) | None | Renewal calls `ClaimExperienceQueryService.summary(arn, policyYear)`; total-loss indicator is CLQ28 | - |
 | `eb` (Employee Benefits, planned) | None | EB lines excluded from `RNW_EXTRACTION` (`RNW_EXCLUDED_LINES`); RAs stored as `RENEWAL_ADVICE` (EBQ28). An EB query "ARNs of EB cycles" would sharpen the exclusion (optional) | - |
 | `nbreport` (built) | None now | BRNB.018 Late Renewal Requests stays parked (Q09, RQ29); candidate later as a `RNW-LISTING` variant | - |
-| `migration` (BRD-13, designed) | Implements `LegacyPolicySource` | `MigratedPolicySource` in `migration` serves the migrated headers and the RMEL cohort model (DATA_MIGRATION_DESIGN §15); candidates of legacy policies take the NB path; `renewal` does not depend on `migration` | Data Migration DM2-B |
+| `migration` (BRD-13, designed) | Implements `LegacyPolicySource` | `MigratedPolicySource` in `migration` serves the migrated headers for the go-live and daily extraction (DATA_MIGRATION_DESIGN §15; no carried cohorts, DMQ37); candidates of legacy policies take the NB path; `renewal` does not depend on `migration` | Data Migration DM2-B |
+
+### 13.1 Go-live transition: go-live extraction, advices already sent and package remapping (BDOI answers DMQ36-DMQ38)
+
+BDOI answered on 26-Sep-2026 that the renewals expiring from January to May 2028 are **processed in BIBS after
+go-live**: no renewal candidate is carried from legacy (DMQ37; register DCR-240). For the proposed go-live T = Monday
+3 January 2028 (DATA_MIGRATION_DESIGN §17.2) Renewal takes over in three steps, all in `renewal/extraction`
+(wave R1-A):
+
+| Step | When | What Renewal does | Rule |
+|---|---|---|---|
+| Go-live extraction | Once at T, job `RNW_GOLIVE_EXTRACTION` (manual, run by the cut-over runbook after the migration load is signed off) | Asks `LegacyPolicySource.expiringHeaders(T, RNW_GOLIVE_EXTRACTION_TO)` (default 31 May 2028) and creates one candidate in stage EXTRACTED per migrated in-force header, source LEGACY, `legacy_ref` set; runs the checks. Candidates are ordered by expiry date; those expiring before `RNW_GOLIVE_URGENT_TO` (default 31 January 2028) carry the flag **URGENT**, shown as a pill on the Expiry List and first in every worklist. Initiation follows BRRN.021 (bulk initiation of the whole go-live run is allowed with `RNW_EXTRACT`) | One candidate per legacy reference (the duplicate guard of the daily extraction). Run `RNW-GOLIVE` lists extracted, urgent and skipped headers (already renewed in legacy) per expiry month and matches the migrated header count |
+| Renewal advices already sent | At T, after the go-live extraction; upload `RNW_RA_ALREADY_SENT` | The Renewal processing team uploads the Excel trackers of the advices sent manually before go-live (legacy policy reference, RA date, RA reference, recipient). Each matched candidate gets a letter record of kind RA, status SENT, source LEGACY_MANUAL, with the legacy date; **no RA is generated or sent again** for it, and the second-notice and NRNS timers count from that date | Unmatched or duplicate rows are rejected to the upload result; rejected rows are reviewed and re-submitted by the Renewal processing team on a **maker-checker** basis (DMQ38): the maker corrects, a second team member approves the corrected row |
+| Daily extraction | From T + 1 | `RNW_EXTRACTION` as in section 9: booked BIBS invoices and migrated headers (through `LegacyPolicySource`) whose expiry is business date + lead days. Expiries up to 31 May 2028 are already candidates and are skipped by the duplicate guard | Unchanged |
+
+January expiries get only days of lead time: an RA generated fewer than `RNW_RA_MIN_NOTICE_DAYS` before expiry gives the
+late-RA warning of FR-RN-080 (confirmed by the user); hold covers bridge the policies not placed by expiry. Renewals
+whose new term starts before go-live are placed and booked in legacy before the freeze and migrate as in-force headers.
+
+**Package remapping at sanitation (DMQ36).** The migration loads the legacy package code on each header and the
+`PACKAGE` code map (legacy package code and version to BIBS package version), and does not remap in the intake
+(DATA_MIGRATION_DESIGN §15.2). The sanitation check `PACKAGE_REMAP` (section 8.1) resolves the package of each LEGACY
+candidate through the map; an unmapped, retired or ambiguous package puts the candidate in the Exception bucket, where
+the Renewal processing team chooses the BIBS package version on the record page (permission `RNW_PACKAGE_REMAP`,
+maker-checker with `RNW_OVERRIDE`). Each choice is logged and listed in `RNW-PACKAGE-REMAP`, so MBS / TSU can add it to
+the code map for the next candidates. The alignment document calls the same check `PACKAGE_MAPPING`; the name in the
+build is `PACKAGE_REMAP`.
+
+Legacy candidates renew on the NB path pre-filled from the header (risk 7); a candidate whose package is resolved may
+renew as is on that package version.
 
 ## 14. Build-wave plan
 
@@ -569,7 +613,7 @@ Prerequisites: the BRD-1 modules and Product Maintenance P1-A (RENEWAL purpose) 
 | Wave | Agent | Scope | Files owned | Exit criteria |
 |---|---|---|---|---|
 | **R0** (1 agent) | Renewal foundation and contracts | Prerequisite: the shared account / booking business-type change V822 (work item BT0) is merged; if Renewal is the first of Submitted Policies, Renewal and Employee Benefits to start, R0 builds BT0 first, as one commit agreed with the account and booking owners. Permissions and roles; V1010 / V1011; the fast-track transition, the RENEWAL rating addition, `QueueSource.RENEWAL`, the quotation and nonpackage `renewalRef` (section 13); `report` `CODE_SET`; `GridTable`, `MultiSelectFilter`; `renewal` package skeleton (package-info and `renewal.service.port` interfaces only; the domain belongs to R1-A); `features/renewal/module.ts` with a stub Home and `help.ts`; crons in `application.yml`; demo V1910 | `security/domain/Permission.java`; `account/service/AccountService.java` (`fastTrackRenewal`), `account/service/AccountPricing.java` (only if the shared change did not include the RENEWAL purpose); `booking/domain/QueueSource.java`; `quotation/service/QuotationService.java` + DTO; `nonpackage/service/*Proposal*Service.java` + DTO; `report/core/ParameterSpec*`; `frontend/src/components/ui/GridTable.tsx`, `frontend/src/components/broking/MultiSelectFilter.tsx`; `navigation/modules.ts`, `features/help/helpContent.ts`; `db/migration/V1010`, `V1011`; `db/demo/V1910`; `application.yml`, `docs/operations/CONFIGURATION.md` | Existing NB tests green; a RENEWAL account books with business type RENEWAL; `mvn verify`, `npm run verify` green |
-| **R1-A** | Candidates, checks, buckets, matrix | Extraction job and on-demand extraction; `RenewalCheckEngine` and the section 8 checks; bucket rules; decision matrix; initiation; re-evaluation listeners; non-renewable risk codes; Setup screens; Expiry List grid; record page tabs Details / Checks / History; RNW-EXPIRY-LIST, RNW-SANITATION | `renewal/{candidate,extraction,check,rules,setup}/**`, `renewal/report/{ExpiryList,Sanitation}Report.java`, `V1012`, `V1013`, `features/renewal/{expiry,setup,record}/**` | Demo extraction creates candidates; a FAIL never gives CLEAN; the matrix AUTO path disposes a clean candidate |
+| **R1-A** | Candidates, checks, buckets, matrix | Extraction job and on-demand extraction; the go-live extraction job `RNW_GOLIVE_EXTRACTION` with the urgent flag and the `RNW_RA_ALREADY_SENT` upload (section 13.1); `RenewalCheckEngine` and the section 8 checks (including `PACKAGE_REMAP`); bucket rules; decision matrix; initiation; re-evaluation listeners; non-renewable risk codes; Setup screens; Expiry List grid; record page tabs Details / Checks / History; RNW-EXPIRY-LIST, RNW-SANITATION | `renewal/{candidate,extraction,check,rules,setup}/**`, `renewal/report/{ExpiryList,Sanitation}Report.java`, `V1012`, `V1013`, `features/renewal/{expiry,setup,record}/**` | Demo extraction creates candidates; a FAIL never gives CLEAN; the matrix AUTO path disposes a clean candidate |
 | **R1-B** | Marketing: assignment, transfer, disposition, review, NB path | Assignment / re-assignment, transfers, disposition with reasons and history gate, remarks, TL review / return / post, overrides, NB path (quotation / PRF creation with `renewalRef`), client 360 tab, My Dispositions, TL Review, Transfers screens, RNW-DECISIONS | `renewal/{assignment,transfer,disposition,review,nbpath,client}/**`, `renewal/report/DecisionLogReport.java`, `V1014`, `features/renewal/{mine,review,transfers}/**` | Assign -> dispose -> return -> post; NB path creates a quotation whose account is RENEWAL |
 | **R1-C** | Processing, insurer, LAMD | Processing worklist and PO assignment; renewal account creation (`AccountService.createDraft(NewAccount.renewal(...))`) at FOR_PROCESSING; computations tab; dispositioned-file upload with scope (3.004.4); insurer batches (xlsx, protected send) and response upload with matching and progression; LAMD upload and routing; Insurer / LAMD screens; RNW-INSURER-EXTRACT, RNW-LAMD-MATCH | `renewal/{processing,insurer,lamd,upload}/**`, `renewal/report/{InsurerExtract,LamdMatch}Report.java`, `V1015`, `features/renewal/{processing,insurer,lamd}/**` | Insurer Renew As Is moves to RA_READY; mismatch -> EXCEPTION; paid-off PN -> Not for Renewal |
 | **R1-D** | Letters, acceptance, progression | RA / NAL / NFR / NRNS / non-acceptance letters, batch generation and protected send, RA lock and second notice, NRNS and expiry jobs, acceptance (single and bulk), `RenewalProgression` (fast-track, auto placement, booking queue, RENEWED on `InvoiceBooked`), Letters screen, RNW-RA-DISPATCH | `renewal/{letter,acceptance,progression,followup}/**`, `renewal/report/LetterDispatchReport.java`, `V1016`, `features/renewal/{letters,followups}/**` | RA sent -> accepted -> slip sent -> policy issued -> booked RENEWAL -> candidate RENEWED |
@@ -594,7 +638,7 @@ Rules for parallel work:
 | Letter layouts | RQ26 | Draft templates (versioned, updatable by the Business Admin) |
 | Insurer and LAMD file layouts, channels | RQ15, RQ20 | Upload handlers with configurable column mapping |
 | NFRs "follow QPS" | RQ28 | BRD-1 NFR set |
-| Legacy expiring policies | RQ27 | Legacy upload handler, NB path only |
+| Legacy expiring policies | RQ27 (partial); DMQ26, DMQ37 answered | Legacy upload handler, NB path only; go-live extraction to 31 May 2028 and the RA-already-sent upload through `LegacyPolicySource` (section 13.1) once the migration implements it |
 | Total-loss indicator | CLQ28, RQ13 | Manual reason; matrix condition parked |
 
 ## 16. Risks

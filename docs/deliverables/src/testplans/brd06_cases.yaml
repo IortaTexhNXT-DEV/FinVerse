@@ -12,8 +12,8 @@ meta:
   code: RN
   frs: FRS_BRD06_RENEWAL.md
   summary: TP_BRD06_RENEWAL.md
-  version: "1.0"
-  date: 25 September 2026
+  version: "1.1"
+  date: 26 September 2026
   built: false
 
 personas:
@@ -127,6 +127,15 @@ data:
     name: Letter templates
     content: RNW_RA_FIRST version 1 (active) and version 2 (draft with a changed footer); RNW_RA_SECOND, RNW_NAL, RNW_NFR, RNW_NRNS_REMINDER, RNW_NON_ACCEPTANCE drafts
     source: Draft layouts delivered with the build until BDOI provides its own (RQ26)
+
+  - id: TD-RN-15
+    name: Migrated policies of the go-live window and the RA tracker
+    content: "Migrated in-force policies (source LEGACY) expiring 3-Jan-2028 (2), 31-Jan-2028 (1), 1-Feb-2028 (1), 31-May-2028 (1) and 1-Jun-2028 (1); one policy expiring 15-Feb-2028 already renewed in legacy (the later term is migrated too). Tracker RN_RA_SENT_JAN.xlsx: RA of the 3-Jan-2028 policies sent on 15-Dec-2027; a row with an unknown legacy reference; a second row for the same policy; a row with an RA date after go-live"
+    source: Loaded by the migration mock on SIT (BRD-13 objects P01, R06); tracker prepared by the test lead from template RNW_RA_ALREADY_SENT (masked)
+  - id: TD-RN-16
+    name: Package code map and legacy packages
+    content: "PACKAGE code map loaded by the migration: QPS package HOME-01 v2 -> BIBS package version PKG-HOME-2027 (one entry); MOTOR-CLG v1 -> two BIBS versions by sum-insured band (ambiguous); FIRE-OLD v1 not in the map. Migrated policies of TD-RN-15 carry these legacy packages"
+    source: Code map of the migration mock (maintained by MBS / TSU); package versions of the BRD-3 catalogue on SIT
 
 scenarios:
   - id: SC-RN-01
@@ -878,6 +887,82 @@ frs:
         expected: The call is refused and the candidate is unchanged.
         msg: ["Renewal {RNW-2026-000105} is already initiated"]
 
+  FR-RN-016:
+    scenario: SC-RN-02
+    persona: PROCESSING_TL
+    screen: HOME
+    data: [TD-RN-15]
+    conditions:
+      - The go-live extraction creates exactly one candidate for every migrated policy expiring from go-live to 31 May 2028, and none for later expiries or for policies already renewed in legacy.
+      - Candidates expiring up to 31 January 2028 carry the Urgent flag and are listed first.
+      - A tracker row of an RA sent before go-live records the RA as Sent with the legacy date, and the RA cannot be generated or sent again.
+      - Rejected tracker rows are applied only after a second member of the Renewal processing team approves the correction.
+      - The first daily extraction after go-live does not extract again a policy already taken over.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRRN.005]
+        title: Go-live extraction takes the window up to 31 May 2028
+        steps:
+          - As rn.proctl run job RNW_GOLIVE_EXTRACTION from Administration > Scheduled Jobs.
+          - Open Renewal Home, Extraction runs, and report RNW-GOLIVE.
+        expected: One candidate in stage EXTRACTED, source Legacy, per TD-RN-15 policy expiring 3-Jan-2028 to 31-May-2028 (5 candidates); the 1-Jun-2028 policy is not extracted; the policy already renewed in legacy is counted as skipped.
+      - c: 1
+        type: Negative
+        title: A second go-live run creates nothing new
+        steps:
+          - Run RNW_GOLIVE_EXTRACTION again.
+        expected: The run is recorded with zero new candidates; the Expiry List still shows one candidate per policy.
+      - c: 2
+        type: Boundary
+        screen: EXPIRY
+        title: Urgent flag up to 31 January 2028
+        steps:
+          - Open the Expiry List sorted by default.
+        expected: The candidates expiring 3-Jan-2028 and 31-Jan-2028 show the Urgent pill and come first; the 1-Feb-2028 candidate has no Urgent pill.
+      - c: 3
+        type: Upload-download
+        persona: PROCESSOR
+        screen: PROCWL
+        title: Tracker of RAs already sent is recorded
+        steps:
+          - As rn.po1 upload RN_RA_SENT_JAN.xlsx with template RNW_RA_ALREADY_SENT.
+          - Open a 3-Jan-2028 candidate, tab Letters.
+        expected: The RA shows status Sent, source legacy, date 15-Dec-2027; Generate RA and Send are not offered for it.
+      - c: 3
+        type: Negative
+        persona: PROCESSOR
+        screen: PROCWL
+        title: Tracker rows with errors are rejected
+        steps:
+          - Open the result of the RN_RA_SENT_JAN.xlsx upload.
+        expected: "The rows with an unknown reference, a second row for the same policy and an RA date after go-live are rejected with the FRS messages (\"already recorded\", \"enter the date the Renewal Advice was sent (before go-live)\" for the last two); nothing is recorded from them."
+        msg: ["Row {n}: no renewal candidate for legacy policy {reference}"]
+      - c: 4
+        type: Workflow
+        persona: PROCESSOR
+        screen: PROCWL
+        title: Corrected tracker row applied after the checker approves
+        steps:
+          - As rn.po1 correct the rejected unknown-reference row and submit it.
+          - As rn.po2 approve the corrected row.
+        expected: The row is applied only after rn.po2 approves; the audit shows rn.po1 as maker and rn.po2 as checker.
+      - c: 4
+        type: Negative
+        persona: PROCESSOR
+        screen: PROCWL
+        title: The maker cannot approve his own correction
+        steps:
+          - As rn.po1 try to approve the row he corrected.
+        expected: The approval is refused; the row stays rejected.
+      - c: 5
+        type: Negative
+        persona: SYSTEM
+        title: Daily extraction skips policies already taken over
+        steps:
+          - Set the business date to 12-Jan-2028 (the date whose lead days reach 31-May-2028) and run RNW_EXTRACTION.
+        expected: The 31-May-2028 policy is counted as existing; no second candidate is created.
+
   FR-RN-020:
     scenario: SC-RN-03
     persona: MKT_TL
@@ -1332,6 +1417,58 @@ frs:
         steps:
           - Open RNW-2026-000202, tab Account History, section Endorsements.
         expected: END-2026-000450 is listed with source and status at link time.
+
+  FR-RN-028:
+    scenario: SC-RN-03
+    persona: PROCESSOR
+    screen: CHECKS
+    data: [TD-RN-15, TD-RN-16]
+    conditions:
+      - A migrated policy whose legacy package maps to one BIBS package version passes PACKAGE_REMAP and shows that version.
+      - An unmapped or ambiguous legacy package fails PACKAGE_REMAP and puts the candidate in the Exception bucket.
+      - The package chosen by a processor applies only after a second processor approves it; the maker cannot approve.
+      - The check is Not applicable to candidates booked in BIBS.
+    cases:
+      - c: 1
+        type: Positive
+        title: Mapped legacy package resolves
+        steps:
+          - Open the candidate whose legacy package is HOME-01 v2, tab Checks & Bucket.
+        expected: PACKAGE_REMAP is PASS; the Package panel shows PKG-HOME-2027.
+      - c: 2
+        type: Negative
+        title: Unmapped and ambiguous packages go to Exception
+        steps:
+          - Open the candidates with legacy packages FIRE-OLD v1 and MOTOR-CLG v1.
+        expected: PACKAGE_REMAP is FAIL for both, with the detail "not in the code map" and "several package versions"; the bucket is Exception.
+      - c: 3
+        type: Workflow
+        title: Package chosen and approved
+        steps:
+          - As rn.po1 choose the BIBS package version of the FIRE-OLD candidate with a reason and submit.
+          - As rn.po2 approve the choice.
+        expected: The check turns PASS, the bucket is recomputed, and RNW-PACKAGE-REMAP lists the legacy package, chosen version, maker rn.po1 and checker rn.po2.
+      - c: 3
+        type: Negative
+        title: Maker cannot approve his own package choice
+        steps:
+          - As rn.po1 choose a package version for the MOTOR-CLG candidate and try to approve it.
+        expected: The approval is refused.
+        msg: ["The package choice must be approved by another user"]
+      - c: 3
+        type: Negative
+        title: Choice without a reason is refused
+        steps:
+          - As rn.po1 submit a package choice without a reason.
+        expected: The choice is not saved.
+        msg: ["Choose the package version and give the reason"]
+      - c: 4
+        type: Positive
+        data: [TD-RN-02]
+        title: Not applicable to candidates booked in BIBS
+        steps:
+          - Open a TD-RN-02 candidate, tab Checks & Bucket.
+        expected: PACKAGE_REMAP shows Not applicable and does not affect the bucket.
 
   FR-RN-030:
     scenario: SC-RN-04
@@ -3371,6 +3508,12 @@ frs:
         msg: [A failed check cannot give the Clean bucket]
 
 access:
+  - action: Choose the package of a migrated policy (PACKAGE_REMAP)
+    screen: RECORD
+    permission: RNW_PACKAGE_REMAP
+    allow: [PROCESSING_TL, PROCESSOR]
+    deny: [MKT_AO, MKT_TL, LAMD]
+    denied: The Package panel is read only; POST .../package returns HTTP 403.
   - action: Generate the expiry list and initiate candidates
     screen: EXPIRY
     permission: RNW_EXTRACT

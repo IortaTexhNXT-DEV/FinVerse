@@ -35,7 +35,7 @@ export const UNAPPLIED_HELP: HelpScreen[] = [
     ],
     controls: [
       'The requester is notified when Cashiering accepts, rejects or executes a request.',
-      'The job CLX_APPLICATION_FILE writes the daily "For Application To Invoice" text file of the previous day before 06:00; the report CLX-APPLICATION-TO-INVOICE lists the same requests for any period.',
+      'A scheduled job writes the daily "For Application To Invoice" text file of the previous day before 06:00; the report CLX-APPLICATION-TO-INVOICE lists the same requests for any period.',
     ],
   },
 ];

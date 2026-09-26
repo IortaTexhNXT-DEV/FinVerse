@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { FilterChips } from '@/components/ui/FilterChips';
 
 interface WorklistToolbarProps {
-  /** Placeholder and accessible name of the search box (BDO: "Search Proposal No."). */
+  /** Placeholder and accessible name of the search box (e.g. "Search Quotation No."). */
   placeholder?: string;
   /** Initial search text. */
   initial?: string;
@@ -29,7 +29,7 @@ interface ToolbarViewProps extends WorklistToolbarProps {
 const SEARCH_PARAM = 'q';
 
 function ToolbarView({
-  placeholder = 'Search Proposal No.',
+  placeholder = 'Search Reference No.',
   initial = '',
   onSearch,
   filters,

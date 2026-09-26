@@ -52,7 +52,7 @@ export const CRM_HELP: HelpSection = {
         'Open a client, upload the refreshed KYC documents and ask a checker to Verify KYC: the next review date is set again.',
       ],
       controls: [
-        'The monthly KYC_REVIEW_DUE job sets overdue KYC to Expired and notifies the Account Officers of the number of reviews due.',
+        'The monthly scheduled job sets overdue KYC to Expired and notifies the Account Officers of the number of reviews due.',
         'Review cycle by risk rating: KYC_REVIEW_MONTHS (standard, 36) and KYC_REVIEW_MONTHS_HIGH_RISK (12); window KYC_DUE_WINDOW_DAYS (30).',
       ],
     },

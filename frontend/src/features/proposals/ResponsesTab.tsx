@@ -18,6 +18,7 @@ import { formatDate, formatDateTime } from '@/utils/format';
 import { RESPONSE_STAGES } from './proposalList';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { displayNameOf } from '@/api/users';
+import { CellStack } from '@/components/ui/CellStack';
 
 const STATUSES = [
   { value: 'RECEIVED', label: 'Terms received' },
@@ -132,6 +133,12 @@ function ResponseHistory({ proposalId }: Readonly<{ proposalId: number }>) {
     queryKey: ['proposal', proposalId, 'response-history'],
     queryFn: () => proposalsApi.history(proposalId),
   });
+  const responses = useQuery({
+    queryKey: ['proposal', proposalId, 'responses'],
+    queryFn: () => proposalsApi.responses(proposalId),
+  });
+  const insurer = (responseId: number) =>
+    responses.data?.find((r) => r.id === responseId)?.insurerName ?? 'Insurer response';
   return (
     <Card title="Version history" flush>
       <DataTable
@@ -147,8 +154,10 @@ function ResponseHistory({ proposalId }: Readonly<{ proposalId: number }>) {
           },
           {
             key: 'r',
-            header: 'Response / Revision',
-            render: (h) => `#${h.responseId} r${h.revision}`,
+            header: 'Insurer / Revision',
+            render: (h) => (
+              <CellStack main={insurer(h.responseId)} sub={`Revision ${String(h.revision)}`} />
+            ),
           },
           { key: 's', header: 'Status', render: (h) => <StatusBadge status={h.status} /> },
           {

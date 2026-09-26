@@ -1,12 +1,6 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import type {
-  AutoBookRule,
-  IncentiveRule,
-  ServiceInvoiceType,
-  SiRecipient,
-  SiTrigger,
-} from '@/api/booking';
+import type { AutoBookRule, ServiceInvoiceType, SiRecipient, SiTrigger } from '@/api/booking';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
@@ -155,81 +149,6 @@ export function AutoBookRuleDialog({
         label="Enabled"
         checked={rule.enabled}
         onChange={(enabled) => setRule({ ...rule, enabled })}
-      />
-    </SetupModal>
-  );
-}
-
-/** Add or change an incentive eligibility rule (BRNB.107). */
-export function IncentiveRuleDialog({
-  value,
-  busy,
-  error,
-  onSave,
-  onClose,
-}: Readonly<DialogProps<IncentiveRule>>) {
-  const [rule, setRule] = useState(value);
-  const missing = required(rule.description, 'Describe the rule');
-  const noStart = required(rule.periodFrom, 'Enter the first booking date covered');
-  const backwards =
-    rule.periodTo !== undefined && rule.periodTo !== '' && rule.periodTo < rule.periodFrom
-      ? 'The period end is before its start'
-      : undefined;
-  return (
-    <SetupModal
-      title={rule.id === undefined ? 'New Incentive Rule' : 'Edit Incentive Rule'}
-      busy={busy}
-      disabled={[missing, noStart, backwards].some((e) => e !== undefined)}
-      error={error}
-      onSave={() => onSave({ ...rule, periodTo: rule.periodTo === '' ? undefined : rule.periodTo })}
-      onClose={onClose}
-    >
-      <div className="form-grid">
-        <TextField
-          label="Product"
-          hint="Blank: every product."
-          value={rule.productCode}
-          onChange={(v) => setRule({ ...rule, productCode: v.toUpperCase() })}
-        />
-        <TextField
-          label="Market segment"
-          hint="Blank: every segment."
-          value={rule.marketSegment}
-          onChange={(v) => setRule({ ...rule, marketSegment: v.toUpperCase() })}
-        />
-        <TextField
-          label="Source channel"
-          hint="Blank: every channel."
-          value={rule.sourceChannel}
-          onChange={(v) => setRule({ ...rule, sourceChannel: v.toUpperCase() })}
-        />
-        <TextField
-          label="Booked from"
-          type="date"
-          required
-          error={noStart}
-          value={rule.periodFrom}
-          onChange={(periodFrom) => setRule({ ...rule, periodFrom })}
-        />
-        <TextField
-          label="Booked until"
-          type="date"
-          error={backwards}
-          value={rule.periodTo}
-          onChange={(periodTo) => setRule({ ...rule, periodTo })}
-        />
-      </div>
-      <TextField
-        label="Description"
-        required
-        error={missing}
-        value={rule.description}
-        onChange={(v) => setRule({ ...rule, description: v })}
-      />
-      <Check
-        label="Active"
-        checked={rule.active}
-        onChange={(active) => setRule({ ...rule, active })}
       />
     </SetupModal>
   );

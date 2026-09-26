@@ -137,6 +137,7 @@ export default function QuotationsPage() {
       <Card flush>
         <Tabs tabs={QUOTATION_TABS} active={tab} onChange={(t) => choose(t)} />
         <WorklistToolbar
+          placeholder="Search Quotation No., ARN or client"
           onSearch={(text) => {
             setApplied(text);
             setPage(0);

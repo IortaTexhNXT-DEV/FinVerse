@@ -35,7 +35,7 @@ export const BROKING_SETUP_HELP: HelpSection = {
       ],
       controls: [
         'Protected documents are encrypted (PDF AES-256, Excel agile encryption); the password travels in a separate e-mail whose content is never displayed.',
-        'Deliveries are retried automatically (MAIL_MAX_ATTEMPTS) by the MAIL_DISPATCH job.',
+        'Deliveries are retried automatically by a scheduled job.',
         'Without a configured mail server, deliveries are simulated and shown as such.',
       ],
     },

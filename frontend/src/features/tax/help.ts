@@ -87,7 +87,7 @@ export const TAX_HELP: HelpSection = {
         'Recording posts TAX_CWT_CERT_RECEIVED: AR-BIR on commission or on incentives moves to AR-BIR on hand.',
       ],
       controls: [
-        'Disbursement (DISB_TAG) and tax users (TAX_MANAGE) record certificates; a certificate number is recorded once per agent.',
+        'Disbursement and tax users record certificates; a certificate number is recorded once per agent.',
         'Cancelling (TAX_MANAGE, with a reason) reverses the posting. The SAWT and the income tax worksheets read the recorded certificates.',
       ],
     },
@@ -97,7 +97,7 @@ export const TAX_HELP: HelpSection = {
       summary:
         "The 0619-F, 1603, 1702-Q and 1702 worksheets, the monthly and annual alphalists, the SAWT, the BIR books of accounts and the IC Broker's Annual Statement, exported to Excel or PDF for a period.",
       controls: [
-        'Worksheet lines and books are configuration (tax_form_output_line, tax_book_def); rates are system parameters (TAX_RCIT_RATE, TAX_FBT_RATE).',
+        'Worksheet lines and books are configuration (tax_form_output_line, tax_book_def); rates are system parameters.',
         'The outputs are worksheets and loose-leaf books.',
       ],
     },
@@ -113,7 +113,7 @@ export const TAX_HELP: HelpSection = {
       summary:
         'VAT, premium tax and withholding tax codes (ATCs) with their rates and GL accounts, and the BIR, LGU and BFP forms with their frequency, due-date rule and payable account.',
       controls: [
-        'Maker-checker: changes appear in the authorizers’ approval inbox (MASTER_AUTHORIZE).',
+        'Maker-checker: changes appear in the authorizers’ approval inbox.',
         'Forms marked as reminders are shown on the calendar but raise no alerts.',
       ],
     },

@@ -27,7 +27,8 @@ function validity(q: QuotationListItem) {
 export const QUOTATION_COLUMNS: Column<QuotationListItem>[] = [
   {
     key: 'no',
-    header: 'Proposal No.',
+    header: 'Quotation No.',
+    kind: 'code',
     render: (q) => (
       <>
         <strong className="mono">{q.quotationNo}</strong>

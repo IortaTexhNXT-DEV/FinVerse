@@ -5,13 +5,13 @@ export const QUOTATIONS_HELP: HelpSection = {
   id: 'quotations',
   module: 'Quotation / Proposal',
   intro:
-    'Package quotations from the client request to the accounts. Each quotation has a Proposal No. and an Account Reference Number (ARN) that every account created from it carries.',
+    'Package quotations from the client request to the accounts. Each quotation has a Quotation No. and an Account Reference Number (ARN) that every account created from it carries.',
   screens: [
     {
       name: 'Quotations',
       path: '/quotations',
       summary:
-        'Work list of quotations by status (Drafts, For Review, Sent to Client, Accepted, Not Proceeded) with quick filters for your drafts and the quotations expiring soon. Search by Proposal No., ARN or client.',
+        'Work list of quotations by status (Drafts, For Review, Sent to Client, Accepted, Not Proceeded) with quick filters for your drafts and the quotations expiring soon. Search by Quotation No., ARN or client.',
       workflow: [
         'Open a quotation to act on it from the workflow panel.',
         'Select approved quotations (For Review tab) and use Send via Email to send them in one go: each client receives one e-mail with its quotations, the password follows separately.',

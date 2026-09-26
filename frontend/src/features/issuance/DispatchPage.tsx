@@ -148,7 +148,7 @@ function ReadyToDispatch({ companyId }: Readonly<{ companyId: number }>) {
               </span>
             ),
           },
-          { key: 'arn', header: 'Proposal No.', render: (r) => <code>{r.arn}</code> },
+          { key: 'arn', header: 'ARN', kind: 'code', render: (r) => <code>{r.arn}</code> },
           { key: 'policy', header: 'Policy No.', render: (r) => r.policyNumbers.join(', ') },
           { key: 'file', header: 'E-policy', render: (r) => r.epolicyFile ?? '' },
           {
@@ -220,7 +220,12 @@ function DispatchReport() {
             header: 'Queued',
             render: (m) => `${formatDateTime(m.createdAt)} by ${displayNameOf(m.createdBy)}`,
           },
-          { key: 'arn', header: 'Proposal No.', render: (m) => <code>{m.reference ?? ''}</code> },
+          {
+            key: 'arn',
+            header: 'Reference No.',
+            kind: 'code',
+            render: (m) => <code>{m.reference ?? ''}</code>,
+          },
           { key: 'to', header: 'To', render: (m) => m.recipients },
           { key: 'subject', header: 'Subject', render: (m) => m.subject },
           { key: 'status', header: 'Outcome', render: (m) => <StatusBadge status={m.status} /> },

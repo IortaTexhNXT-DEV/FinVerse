@@ -47,7 +47,7 @@ export default function BatchRunDetailPage() {
           rowKey={(row) => row.arn}
           emptyMessage="No items to display"
           columns={[
-            { key: 'arn', header: 'Proposal No. (ARN)', render: (row) => row.arn },
+            { key: 'arn', header: 'ARN', kind: 'code', render: (row) => row.arn },
             {
               key: 'outcome',
               header: 'Result',

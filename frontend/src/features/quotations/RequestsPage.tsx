@@ -21,6 +21,7 @@ import { formatDateTime, humanize } from '@/utils/format';
 import { CaptureRequestDialog } from './CaptureRequestDialog';
 import { quotationLinkOf } from './requestForm';
 import '@/styles/quotation.css';
+import { ClientLabel } from '@/components/broking/ClientLabel';
 
 const TABS: readonly { id: RequestStatus; label: string }[] = [
   { id: 'NEW', label: 'To Quote' },
@@ -188,8 +189,12 @@ export default function RequestsPage() {
             {
               key: 'client',
               header: 'Client / Prospect',
-              render: (r) =>
-                r.prospectName ?? (r.clientId === undefined ? '—' : `Client #${r.clientId}`),
+              render: (r) => {
+                if (r.prospectName !== undefined) {
+                  return r.prospectName;
+                }
+                return r.clientId === undefined ? '—' : <ClientLabel clientId={r.clientId} />;
+              },
             },
             { key: 'product', header: 'Product', render: (r) => r.productCode ?? '—' },
             { key: 'cover', header: 'Requested Cover', render: (r) => r.requestedCover ?? '' },

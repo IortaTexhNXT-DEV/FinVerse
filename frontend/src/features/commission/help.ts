@@ -55,7 +55,7 @@ export const COMMISSION_HELP: HelpSection = {
         'To Collect: Record Collection posts the commission to the bank, reverses the premium receivable of each approved account and requests the official receipt.',
       ],
       controls: [
-        'The DP_FEEDBACK_SLA job alerts the handler when the insurer has not answered by the due date.',
+        'A scheduled job alerts the handler when the insurer has not answered by the due date.',
         'A billing can only be cancelled before it is sent.',
         'The proposed bank account comes from the CMR_DP_COLLECTION_BANK parameter.',
         'The premium receivable reversal is posted to the ledger only when DP_PR_REVERSAL_POSTING is on; the invoice ledger always shows it.',
@@ -79,7 +79,7 @@ export const COMMISSION_HELP: HelpSection = {
       summary:
         'The insurer incentive programmes (No Touch, Top Up, Motor Mania and others) with their period, insurer, segments and tiers.',
       workflow: [
-        'New Scheme or click a scheme (INCENTIVE_MANAGE) to maintain it and its tiers.',
+        'New Scheme or click a scheme to maintain it and its tiers.',
         'Production Target Tiers: the highest target reached gives the rate (and multiplier) applied to every eligible invoice.',
         'Fixed Amount per Policy: each policy earns the amount of the highest minimum basic premium it meets.',
       ],
@@ -95,7 +95,7 @@ export const COMMISSION_HELP: HelpSection = {
         'An incentive scheme computed on the production booked in a period, with the invoices excluded, then posted.',
       workflow: [
         'Compute Incentive: choose an active scheme and the booking period.',
-        'Open a run to review its invoices; the team leader (COMMREC_APPROVE) posts it, or it is cancelled and computed again.',
+        'Open a run to review its invoices; the team leader posts it, or it is cancelled and computed again.',
       ],
       controls: [
         'Negative amounts and erroneous bookings (cancelled or written off) are excluded by the rules of INCENTIVE_EXCLUSION_RULE and raise an alert.',
@@ -108,8 +108,8 @@ export const COMMISSION_HELP: HelpSection = {
       summary:
         'Certificates of the tax the insurers withheld on commission, tagged to the official receipts they cover and submitted to Comptrollership. Open a submission to attach the scan, acknowledge or reject it.',
       workflow: [
-        'Submit Certificate (BIR_CERT_SUBMIT): enter the form, number, period and tax withheld and add the ORs covered.',
-        'Comptrollership (BIR_CERT_ACK) acknowledges or rejects the submission with a reason.',
+        'Submit Certificate: enter the form, number, period and tax withheld and add the ORs covered.',
+        'Comptrollership acknowledges or rejects the submission with a reason.',
         'A rejected submission is corrected and resubmitted.',
       ],
       controls: ['A certificate must cover at least one official receipt.'],

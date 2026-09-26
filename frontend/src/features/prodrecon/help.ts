@@ -24,7 +24,7 @@ export const PRODRECON_HELP: HelpSection = {
         'In a cycle, the Items tab groups the items by bucket: Matched, With Discrepancy, BDOI Only and Insurer Only. Click an item to compare BDOI and insurer values side by side and record the company concerned, instruction, insurer and marketing feedback and disposition.',
         'Pair a BDOI-only item with an insurer line the matcher missed; split a wrong pairing back into its two sides.',
         'Select several items and use Set Disposition to give them the same disposition.',
-        'Run Matching matches again after bookings or corrections; the RECON_AUTOMATCH job does the same every night.',
+        'Run Matching matches again after bookings or corrections; a scheduled job does the same every night.',
         'The cycle closes by itself when every item is matched or ready for closure; Close Cycle closes it earlier with a comment.',
       ],
       controls: [
@@ -41,7 +41,7 @@ export const PRODRECON_HELP: HelpSection = {
         'Registers of booked production extracted for each insurer, by the schedule or with New Extract. Download a register or send it to the insurer.',
       workflow: [
         'New Extract: enter the insurer code and the production month; the register lists the accounts booked for the insurer in the month and opens the cycle of the month if none is open.',
-        'Send (RECON_SEND) e-mails the register as a protected workbook; leave To blank to use the insurer reconciliation contacts.',
+        'Send e-mails the register as a protected workbook; leave To blank to use the insurer reconciliation contacts.',
       ],
       controls: [
         'The file is named <INSURER>_PRODREG_<yyyyMM>_<seq> and only the Remarks and Incentive columns can be edited by the insurer.',
@@ -77,7 +77,7 @@ export const PRODRECON_HELP: HelpSection = {
       name: 'Extract Schedules',
       path: '/prodrecon/schedules',
       summary:
-        'When the PRODUCTION_EXTRACT job extracts each insurer register (monthly on a day of the month or weekly on a weekday) and whether it is sent automatically.',
+        'When a scheduled job extracts each insurer register (monthly on a day of the month or weekly on a weekday) and whether it is sent automatically.',
       controls: [
         'A run day on a holiday or weekend moves to the next working day.',
         'Recipients left blank use the insurer reconciliation contacts.',

@@ -69,7 +69,7 @@ export const OPERATIONS_HELP: HelpSection = {
       ],
       controls: [
         'Each record is processed once per key; a failed record does not stop the run and can be sent again.',
-        'Failed or partial runs raise the OPS_FLOW_IN_FAILED alert and notify the interface administrators.',
+        'Failed or partial runs raise an alert and notify the interface administrators.',
       ],
     },
     {

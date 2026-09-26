@@ -13,7 +13,7 @@ export const CASHIERING_HELP: HelpSection = {
       summary:
         'Work queues of Cashiering (invoices with outstanding premium, partially paid invoices, hand-offs to complete) and the way into the Cashiering screens.',
       controls: [
-        'Receipts, cancellations, reinstatements and dispositions follow maker-checker approval (CASH_APPROVE).',
+        'Receipts, cancellations, reinstatements and dispositions follow maker-checker approval.',
       ],
     },
     {
@@ -25,7 +25,7 @@ export const CASHIERING_HELP: HelpSection = {
         'Several references are applied oldest invoice first.',
         'A 2% CWT client is applied up to 98% of the premium; the 2% waits for the BIR 2307.',
         'An account not booked yet goes to the pre-booked queue; an unknown reference goes to unapplied payments.',
-        'Issue AR and Apply saves the payment, issues the AR and posts the application (OPS_AR_RECEIPT, OPS_PAYMENT_APPLY).',
+        'Issue AR and Apply saves the payment, issues the AR and posts the application.',
       ],
       controls: ['The AR number comes from the active AR series of the branch.'],
     },
@@ -39,7 +39,7 @@ export const CASHIERING_HELP: HelpSection = {
         'Reinstate (full or partial) needs the reason and the encoded fields of the reason group.',
         'The Cancellations and Reinstatements tab lists the requests waiting for approval.',
       ],
-      controls: ['The requester cannot approve their own request (CASH_APPROVE).'],
+      controls: ['The requester cannot approve their own request.'],
     },
     {
       name: 'Unapplied Payments',
@@ -52,9 +52,7 @@ export const CASHIERING_HELP: HelpSection = {
         'Submit Selected and Approve Selected act on the checked items.',
         'A completed disposition can be marked for reversal and reversed on approval.',
       ],
-      controls: [
-        'Dispositions that need approval are processed by a second user (CASH_DISPOSITION_APPROVE).',
-      ],
+      controls: ['Dispositions that need approval are processed by a second user.'],
     },
     {
       name: 'Incoming Requests',
@@ -76,8 +74,8 @@ export const CASHIERING_HELP: HelpSection = {
       name: 'Pre-booked Payments',
       path: '/cashiering/prebooked',
       summary:
-        'Payments received for accounts that are not booked yet, with their age. They are applied automatically once the account is booked (PREBOOKED_REMATCH); Re-match Now tries at once and Release moves an item to unapplied payments.',
-      controls: ['Items waiting too long raise the PREBOOKED_AGEING alert.'],
+        'Payments received for accounts that are not booked yet, with their age. They are applied automatically once the account is booked; Re-match Now tries at once and Release moves an item to unapplied payments.',
+      controls: ['Items waiting too long raise an alert.'],
     },
     {
       name: 'Payment Uploads',
@@ -93,7 +91,7 @@ export const CASHIERING_HELP: HelpSection = {
       name: 'PDC Warehouse',
       path: '/cashiering/pdc',
       summary:
-        'Post-dated checks by maturity month with their PDCW- number. On maturity the check becomes a payment with an AR (PDC_MATURITY); before that it can be returned, replaced or pulled out.',
+        'Post-dated checks by maturity month with their PDCW- number. On maturity the check becomes a payment with an AR; before that it can be returned, replaced or pulled out.',
     },
     {
       name: 'Check Pick-up',
@@ -113,13 +111,11 @@ export const CASHIERING_HELP: HelpSection = {
       summary:
         'Marketing tags the BIR 2307 certificates (or cash) of 2% CWT clients; Cashiering receives them, ticks the CWT-copy checklist and validates them into a report per insurer that is routed to Disbursement and released to the insurer.',
       workflow: [
-        'Validation reclassifies the 2% to PR2307 (OPS_CWT_RECLASS).',
-        'Release to the insurer offsets the PR2307 against the premium due to the insurer (OPS_CWT_DTIP_OFFSET).',
+        'Validation reclassifies the 2% to PR2307.',
+        'Release to the insurer offsets the PR2307 against the premium due to the insurer.',
         'A cash 2307 is settled with an AR instead.',
       ],
-      controls: [
-        'Marketing tags (CWT_TAG), Cashiering validates (CWT_PROCESS), Disbursement releases (DISB_PROCESS).',
-      ],
+      controls: ['Marketing tags, Cashiering validates, Disbursement releases.'],
     },
     {
       name: 'Commission ORs',
@@ -131,7 +127,7 @@ export const CASHIERING_HELP: HelpSection = {
       name: 'Receipt Series',
       path: '/cashiering/series',
       summary:
-        'AR and OR number ranges per branch with their BIR ATP number and the numbers left. A new series is usable once authorized; the RECEIPT_SERIES_LOW alert warns before a series runs out.',
+        'AR and OR number ranges per branch with their BIR ATP number and the numbers left. A new series is usable once authorized; an alert warns before a series runs out.',
       controls: ['A series is created by one user and authorized by another (maker-checker).'],
     },
     {

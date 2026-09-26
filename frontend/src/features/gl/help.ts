@@ -30,7 +30,7 @@ export const GL_HELP: HelpSection = {
         'Enter a manual, adjustment or accrual voucher with any number of debit and credit lines, each with optional cost centre, line of business, reference and narration.',
       workflow: [
         'Save as draft (it may be incomplete or unbalanced), then submit it when balanced; a confirmation shows the totals first.',
-        'Type an account code or its short code; an accrual can carry a “Reverse on” date and is reversed automatically on that date by the JOURNAL_AUTO_REVERSAL job.',
+        'Type an account code or its short code; an accrual can carry a “Reverse on” date and is reversed automatically on that date by a scheduled job.',
         'The journal waits for approval in My Approvals.',
       ],
       controls: [
@@ -45,7 +45,7 @@ export const GL_HELP: HelpSection = {
         'Templates for standing entries and accruals, generated monthly, quarterly or annually on a chosen day (31 = month end).',
       workflow: [
         'Create a balanced template with a start (and optional end) date.',
-        'The RECURRING_JOURNALS job generates due occurrences every night; "Run now" generates them on demand.',
+        'A scheduled job generates due occurrences every night; "Run now" generates them on demand.',
         'Generated journals are drafts, or submitted for approval when auto-submit is on.',
       ],
       controls: [

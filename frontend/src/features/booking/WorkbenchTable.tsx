@@ -89,7 +89,7 @@ export function WorkbenchTable({
     },
     {
       key: 'arn',
-      header: 'Proposal No. (ARN)',
+      header: 'ARN',
       render: (r) => (
         <Link to={rowLink(r)} onClick={(e) => e.stopPropagation()}>
           {r.arn}

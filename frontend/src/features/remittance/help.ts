@@ -20,14 +20,14 @@ export const REMITTANCE_HELP: HelpSection = {
       summary:
         'Runs the extraction now for an insurer and remittance type, or for one invoice, and lists every scheduled and manual run with the tag each invoice received.',
       workflow: [
-        'The REMITTANCE_EXTRACTION job runs off-peak every day; Run Extraction starts one now.',
+        'A scheduled job runs off-peak every day; Run Extraction starts one now.',
         'Paid invoices meeting every criterion are Extracted into a new batch per insurer, type and currency; the others are Due - Not Extracted with their reasons (on hold, pending negative adjustment, written off, check within the holding period, paid AR above DTIP, locked by another team) or Not Yet Due.',
         'Open a run to see its tags; each batch is also stored as an Excel extract in the folder of its remittance type.',
       ],
       controls: [
         'Only applied payments count; a payment is held for REMIT_CHECK_HOLD_DAYS banking days of the branch before it is remitted.',
         'Paid AR above the DTIP balance is excluded or capped as set in REMIT_PAIDAR_OVER_DTIP_MODE.',
-        'A failed run is logged, raises REMIT_EXTRACTION_FAILED and notifies the processors.',
+        'A failed run is logged, raises an alert and notifies the processors.',
       ],
     },
     {
@@ -39,7 +39,7 @@ export const REMITTANCE_HELP: HelpSection = {
         'Review the accounts of a batch; exclude an account with a reason or restore it from the Exclusions panel while the batch is in review.',
         'Preview and Submit shows the accounts kept, the totals and any problem; the schedule and payment request are stored at submission.',
         'The team leader approves: the remittance, the early and CPC2 incentives and the confirmed insurer deductions are posted, the payment request goes to Disbursement straight to its approver and the commission and incentive ORs are requested from Cashiering.',
-        'An early incentive is billed to the insurer with an automatic service invoice carrying the 2% withholding tax (EARLY_INCENTIVE_WTAX_RATE).',
+        'An early incentive is billed to the insurer with an automatic service invoice carrying the 2% withholding tax.',
         'When Disbursement assigns the DV number the invoices become fully or partially remitted; Send Schedule to Insurer e-mails the protected Excel schedule once.',
         'If Disbursement cancels the DV, the postings are reversed and the batch returns to review; approving it again sends a new payment request (reference ending /R2, /R3...).',
         'Return Batch with a reason gives the invoices back, tagged Returned, for the next extraction.',
@@ -74,7 +74,7 @@ export const REMITTANCE_HELP: HelpSection = {
         'New Hold Request (or a Collection hold file) creates the request; submitted requests wait for the approver.',
         'An approved hold flags the invoice; the approver assigns it to a remittance processor.',
         'Extensions and cancellations are requested by Marketing and approved; Release removes the hold at once.',
-        'The HOLD_EXPIRY job releases expired holds and warns the requestor and the processor the day before.',
+        'A scheduled job releases expired holds and warns the requestor and the processor the day before.',
       ],
       controls: [
         'One live hold per invoice; the requestor cannot approve their own request.',

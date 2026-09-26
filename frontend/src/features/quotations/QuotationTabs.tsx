@@ -27,7 +27,7 @@ export function DetailsTab({ quotation: q }: Readonly<{ quotation: Quotation }>)
       <Card title="Quotation">
         <DetailList
           rows={[
-            ['Proposal No.', q.quotationNo],
+            ['Quotation No.', q.quotationNo],
             ['ARN', q.arn],
             ['Client', `${q.clientCode} – ${q.clientName}`],
             ['Client e-mail', q.clientEmail],

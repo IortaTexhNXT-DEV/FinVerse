@@ -117,7 +117,7 @@ export default function GlClosePage() {
         />
       )}
       <p className="muted">
-        <PlayCircle size={14} aria-hidden="true" /> The GL_PERIOD_CLOSE job runs due closes every 15
+        <PlayCircle size={14} aria-hidden="true" /> A scheduled job runs due closes every 15
         minutes; BROKING_BOOKS_CLOSE cuts off the broking books on the last day of the month.
       </p>
       <ScheduleCloseDialog

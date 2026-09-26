@@ -55,7 +55,8 @@ export function WorkbenchTable({
         },
         {
           key: 'arn',
-          header: 'Proposal No.',
+          header: 'ARN',
+          kind: 'code',
           render: (r) => (
             <span>
               <code>{r.arn}</code>

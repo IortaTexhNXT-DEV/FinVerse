@@ -70,7 +70,7 @@ export const UNDERWRITING_HELP: HelpSection = {
         'Create the quotation with its first iteration: sum insured, gross premium, discount, loading and charges.',
         'Submit it; a checker approves or rejects it. A new iteration returns it to draft for renegotiation.',
         'Convert an approved quotation while still valid: a draft policy is created with one risk carrying the quoted figures.',
-        'Expire lapsed quotations (underwriting maintain permission) marks every open quotation of the company whose validity has passed as EXPIRED now and shows how many were expired; the daily QUOTATION_EXPIRY job does the same for every company.',
+        'Expire lapsed quotations (underwriting maintain permission) marks every open quotation of the company whose validity has passed as EXPIRED now and shows how many were expired; the daily scheduled job does the same for every company.',
       ],
       controls: [
         'The user who prepared or submitted a quotation cannot approve or reject it, and the approver’s authorization limit applies to the gross premium at 100 % of the last iteration.',

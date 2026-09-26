@@ -61,7 +61,7 @@ export const PAYABLES_HELP: HelpSection = {
       ],
       controls: [
         'A voucher that would overdraw the box is refused; a replenishment never takes the fund above its imprest.',
-        'Maker-checker on funds (MASTER_AUTHORIZE), vouchers and claims (RECEIPT_PAYMENT_AUTHORIZE).',
+        'Maker-checker on funds, vouchers and claims.',
       ],
     },
     {

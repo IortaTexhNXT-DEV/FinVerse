@@ -26,7 +26,7 @@ export const FRBS_HELP: HelpSection = {
       controls: [
         'A schedule reads the posted ledger of its accounts (code prefixes or report groups) grouped by account, party, document, cost centre, branch or line of business, in base currency or in its own currency.',
         'Ageing is first in first out: the balance is made of the most recent increases. Up to 8 buckets, e.g. 30,90,180,365,730.',
-        'Comments are kept per row and month (FRBS_REPORT_EXPORT); a blank comment removes it. Definitions are maintained with MASTER_MAINTAIN.',
+        'Comments are kept per row and month; a blank comment removes it. Definitions are maintained with MASTER_MAINTAIN.',
       ],
     },
     {
@@ -36,8 +36,8 @@ export const FRBS_HELP: HelpSection = {
         'Service-fee runs by stage. A run takes the invoices fully paid in a period, one line per segment, unit and currency; open a run to submit, approve and tag its lines.',
       controls: [
         "The fee is the rate of the segment on the commission net of the insurer's withholding tax. An invoice is paid in one run only; recomputing or cancelling a computed run frees its invoices.",
-        'The approver (SERVICE_FEE_APPROVE) is never the preparer. Approval accrues each line (FRBS_SERVICE_FEE_ACCRUE: service fee expense with its cost centre / service fee payable) and sends it to Disbursement as a SERVICE_FEE payment request.',
-        "A line is released when Disbursement pays it or when tagged with the credit date, and liquidated with the unit's liquidation report (SERVICE_FEE_TAG). A returned line can be sent again.",
+        'The approver is never the preparer. Approval accrues each line (FRBS_SERVICE_FEE_ACCRUE: service fee expense with its cost centre / service fee payable) and sends it to Disbursement as a SERVICE_FEE payment request.',
+        "A line is released when Disbursement pays it or when tagged with the credit date, and liquidated with the unit's liquidation report. A returned line can be sent again.",
       ],
     },
     {
@@ -46,7 +46,7 @@ export const FRBS_HELP: HelpSection = {
       summary:
         'The rate of each service-fee segment with the market segments it covers, and the payee and cost centre of each sales unit.',
       controls: [
-        'Maintained by the GL team lead (SERVICE_FEE_APPROVE).',
+        'Maintained by the GL team lead.',
         'A unit without a recipient is paid under its own code and charged to its cost centre, else to the cost-centre rules of the accrual.',
       ],
     },

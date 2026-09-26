@@ -60,7 +60,7 @@ export const BOOKING_HELP: HelpSection = {
         'Every booking batch - confirmed by a user, Book Now, the upload or the end-of-day job - with the result of each account.',
       workflow: ['Open a run to see which accounts were booked and why others failed.'],
       controls: [
-        'The end-of-day BOOKING_BATCH job also books the later policy years of multi-year accounts when they start.',
+        'The end-of-day scheduled job also books the later policy years of multi-year accounts when they start.',
       ],
     },
     {

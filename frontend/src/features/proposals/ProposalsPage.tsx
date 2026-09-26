@@ -67,6 +67,7 @@ export default function ProposalsPage() {
           }}
         />
         <WorklistToolbar
+          placeholder="Search PRF No., ARN or client"
           onSearch={(text) => {
             setApplied(text);
             setPage(0);

@@ -103,7 +103,7 @@ export default function InsuranceAdvicePage() {
             { key: 'no', header: 'IA No.', render: (a) => <code>{a.iaNo}</code> },
             {
               key: 'client',
-              header: 'Insured / Proposal No.',
+              header: 'Insured / ARN',
               render: (a) => (
                 <span>
                   <Link to={`/placement/accounts/${a.arn}`}>{a.clientName}</Link>

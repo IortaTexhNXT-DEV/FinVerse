@@ -135,7 +135,7 @@ function AccountSummary({
   return (
     <Card>
       <div className="summary-card">
-        <SummaryFact icon={BadgeCheck} label="Proposal No. (ARN)">
+        <SummaryFact icon={BadgeCheck} label="ARN">
           <ReferenceChip value={arn} />
         </SummaryFact>
         <SummaryFact icon={UserRound} label="Client">

@@ -202,7 +202,7 @@ function MinimalBalance() {
     <>
       <div className="worklist-toolbar">
         <span className="muted">
-          Balances at or below the limits are cleared by the MINIMAL_BALANCE_SWEEP job.
+          Balances at or below the limits are cleared by a scheduled job.
         </span>
         <div className="worklist-actions">
           {can('CASH_APPROVE') && (

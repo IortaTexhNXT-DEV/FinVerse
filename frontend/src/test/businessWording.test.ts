@@ -12,6 +12,7 @@ const FORBIDDEN: readonly [string, RegExp][] = [
   ['open question', /\b(?:OQ\d+|[A-Z]{1,3}Q\d{2}|Q\d{2})\b/],
   ['functional requirement', /\bFR-[A-Z]{2}-?\d/],
   ['screening requirement', /\bSNSRP-\d/],
+  ['job name', /\b[A-Z][A-Z0-9]*_[A-Z0-9_]+ job\b|\bjob [A-Z][A-Z0-9]*_[A-Z0-9_]+/],
   [
     'design note',
     /\blayout to confirm\b|\bparked\b|\bto be confirmed by BDOI\b|\bto confirm with BDOI\b/i,

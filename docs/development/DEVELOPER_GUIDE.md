@@ -147,7 +147,9 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
   module's `report` sub-package (e.g. `underwriting.report.PremiumRegisterReport`).
 - Report codes: GI reports keep the codes of the Reports Book (e.g. `PGIBR015`); finance reports use
   `FIN-…` codes from `docs/requirements/FINANCE_REPORTS_SPEC.md`; GL reports `GL-…`.
-- Declare parameters with `ParameterSpec` (dates default via `TODAY`, `MONTH_START`, `YEAR_START`).
+- Declare parameters with `ParameterSpec` (dates default via `TODAY`, `MONTH_START`, `YEAR_START`, resolved on
+  the Manila business day, `ReportParameters.BUSINESS_ZONE`, as in the browser; tests that compute "today" for a
+  report use `LocalDate.now(ReportParameters.BUSINESS_ZONE)`, never the UTC `LocalDate.now()`).
   The UI builds the parameter form automatically; export is automatic.
 - Use `TabularReportBuilder` for grouped layouts (`groupBy` = Branch > Class > Product…), totals
   are computed for summed columns.

@@ -717,6 +717,15 @@ dl.form-grid dd {
   align-items: start;
 }
 
+.header-user a {
+  display: inline-block;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
 .header-role {
   font-size: 12px;
   max-width: 220px;

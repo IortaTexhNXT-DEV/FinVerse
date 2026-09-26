@@ -94,7 +94,7 @@ function Summary({ batch }: Readonly<{ batch: Batch }>) {
         {
           icon: ReceiptText,
           label: 'Commission / Incentive OR',
-          value: `${r.commissionOrNo ?? humanize(r.commissionOrStatus ?? 'NONE')} / ${r.incentiveOrNo ?? humanize(r.incentiveOrStatus ?? 'NONE')}`,
+          value: `${orText(r.commissionOrNo, r.commissionOrStatus)} / ${orText(r.incentiveOrNo, r.incentiveOrStatus)}`,
         },
       ]}
     />
@@ -220,6 +220,14 @@ function useBatchActions(id: number, done: () => void) {
  * facts, the Process Remittance workflow with its history, the totals strip, the accounts with
  * exclusions and restore, and the schedule and payment request documents.
  */
+/** An official receipt: its number, else its status, else a dash. */
+function orText(no: string | undefined, status: string | undefined): string {
+  if (no !== undefined) {
+    return no;
+  }
+  return status === undefined || status === 'NONE' ? '—' : humanize(status);
+}
+
 export default function BatchDetailPage() {
   const id = Number(useParams().id);
   const { can } = useAuth();

@@ -58,22 +58,26 @@ const KIND_CLASS: Record<ColumnKind, string | undefined> = {
   center: 'center',
 };
 
-/** Dates (23-Sep-2026 19:32) and codes (PAY-2026-000010, T-CBG1) that must never wrap. */
-const UNBREAKABLE = /^(\d{2}-[A-Z][a-z]{2}-\d{4}( \d{2}:\d{2})?|[A-Z0-9]+(-[A-Z0-9]+)+)$/;
+/** Dates (23-Sep-2026, 23-Sep-2026 19:32) and codes (PAY-2026-000010, T-CBG1): never wrapped. */
+const DATE_TEXT = /^\d{2}-[A-Z][a-z]{2}-\d{4}/;
+const CODE_TEXT = /^[A-Z0-9]+(?:-[A-Z0-9]+)+$/;
+
+function unbreakable(text: string): boolean {
+  return text.length <= 24 && (DATE_TEXT.test(text) || CODE_TEXT.test(text));
+}
 
 /**
  * A cell's content: an empty value is one muted dash; a plain date or code is kept on one line;
  * anything else as rendered.
  */
 function keepTogether(value: ReactNode): ReactNode {
+  let content: ReactNode = value;
   if (value === '' || value === null || value === undefined) {
-    return <span className="muted">—</span>;
+    content = <span className="muted">—</span>;
+  } else if (typeof value === 'string' && unbreakable(value)) {
+    content = <span className="nowrap">{value}</span>;
   }
-  return typeof value === 'string' && UNBREAKABLE.test(value) ? (
-    <span className="nowrap">{value}</span>
-  ) : (
-    value
-  );
+  return content;
 }
 
 function cellClass<T>(c: Column<T>): string | undefined {

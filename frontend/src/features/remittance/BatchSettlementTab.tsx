@@ -67,7 +67,7 @@ export function BatchSettlementTab({ batch }: Readonly<{ batch: Batch }>) {
           <dt>Early-incentive service invoice</dt>
           <dd>
             {s.earlySiNo === undefined
-              ? 'None'
+              ? '—'
               : `${s.earlySiNo} · withholding tax ${formatAmount(s.earlySiWtax)}`}
           </dd>
           <dt>Payment request reference</dt>
@@ -78,7 +78,7 @@ export function BatchSettlementTab({ batch }: Readonly<{ batch: Batch }>) {
           <dt>Last cancelled DV</dt>
           <dd>
             {s.cancelledDvNo === undefined
-              ? 'None'
+              ? '—'
               : `${s.cancelledDvNo} · ${s.cancelReason ?? ''} · ${formatDateTime(s.cancelledAt)}`}
           </dd>
         </dl>

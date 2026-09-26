@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { FilterChips } from '@/components/ui/FilterChips';
+import type { ActiveFilter } from '@/components/ui/FilterChips';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { Tabs } from '@/components/ui/Tabs';
@@ -26,6 +27,37 @@ const KINDS: readonly { id: NotificationKind | ''; label: string }[] = [
   { id: 'due', label: 'Due and Reminders' },
   { id: 'info', label: 'Other' },
 ];
+
+/** The notifications of a type and containing a text. */
+function matching(
+  list: readonly AppNotification[],
+  kind: NotificationKind | '',
+  text: string,
+): AppNotification[] {
+  const needle = text.toLowerCase();
+  return list.filter(
+    (n) =>
+      (kind === '' || kindOf(n) === kind) &&
+      (needle === '' || `${n.title} ${n.body ?? ''}`.toLowerCase().includes(needle)),
+  );
+}
+
+/** The active filters as removable chips. */
+function activeFilters(
+  kind: NotificationKind | '',
+  text: string,
+  clear: (key: string) => void,
+): ActiveFilter[] {
+  const chips: ActiveFilter[] = [];
+  if (kind !== '') {
+    const label = KINDS.find((k) => k.id === kind)?.label ?? kind;
+    chips.push({ key: 'type', label: `Type: ${label}`, onRemove: () => clear('type') });
+  }
+  if (text !== '') {
+    chips.push({ key: 'q', label: `Search: ${text}`, onRemove: () => clear('q') });
+  }
+  return chips;
+}
 
 /**
  * All notifications of the signed-in user, grouped by day, with filters kept in the URL (unread
@@ -61,12 +93,7 @@ export default function NotificationsPage() {
       { replace: true },
     );
 
-  const needle = text.toLowerCase();
-  const shown = (list.data?.content ?? []).filter(
-    (n) =>
-      (kind === '' || kindOf(n) === kind) &&
-      (needle === '' || `${n.title} ${n.body ?? ''}`.toLowerCase().includes(needle)),
-  );
+  const shown = matching(list.data?.content ?? [], kind, text);
   const open = (n: AppNotification) => {
     if (!n.read) {
       read.mutate(n.id);
@@ -75,18 +102,7 @@ export default function NotificationsPage() {
       void navigate(n.link);
     }
   };
-  const chips = [
-    ...(kind === ''
-      ? []
-      : [
-          {
-            key: 'type',
-            label: `Type: ${KINDS.find((k) => k.id === kind)?.label ?? kind}`,
-            onRemove: () => set('type', ''),
-          },
-        ]),
-    ...(text === '' ? [] : [{ key: 'q', label: `Search: ${text}`, onRemove: () => set('q', '') }]),
-  ];
+  const chips = activeFilters(kind, text, (key) => set(key, ''));
 
   return (
     <div className="stack">

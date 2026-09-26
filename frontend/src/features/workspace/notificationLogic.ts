@@ -58,7 +58,10 @@ export function relativeTime(iso: string, now = new Date()): string {
     return `${String(hours)} h ago`;
   }
   const days = Math.floor(hours / 24);
-  return days <= 6 ? `${String(days)} day${days === 1 ? '' : 's'} ago` : formatDate(iso);
+  if (days > 6) {
+    return formatDate(iso);
+  }
+  return days === 1 ? '1 day ago' : `${String(days)} days ago`;
 }
 
 const REFERENCE = /\b[A-Z]{2,5}(?:-[A-Z]{2,4})?-\d{4}-\d{6}\b/;

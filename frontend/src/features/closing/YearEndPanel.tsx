@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Lock, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
 import { closingApi } from '@/api/closing';
 import type { ClosingBalance } from '@/api/closing';
 import { useAuth } from '@/auth/authContext';
@@ -17,6 +18,7 @@ import type { VerifiedYearEndClose } from './closeControlsApi';
 import { PeriodSelectors } from './PeriodSelectors';
 import type { usePeriodPicker } from './usePeriodPicker';
 import { UserName } from '@/components/ui/UserName';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 /** Income and expense balances the closing journal will transfer to retained earnings. */
 function ClosingPreview({ companyId, yearId }: Readonly<{ companyId: number; yearId: number }>) {
@@ -163,11 +165,7 @@ export function YearEndPanel({ picker }: Readonly<{ picker: ReturnType<typeof us
       toast.success(`FY ${r.yearCode} closed, net result ${formatAmount(r.netResult)}`);
     },
   });
-  const confirmClose = () => {
-    if (globalThis.confirm(`Close fiscal year ${yearCode}? This cannot be undone.`)) {
-      close.mutate();
-    }
-  };
+  const [confirming, setConfirming] = useState(false);
 
   return (
     <div className="stack">
@@ -179,7 +177,7 @@ export function YearEndPanel({ picker }: Readonly<{ picker: ReturnType<typeof us
             icon={<Lock size={16} />}
             busy={close.isPending}
             disabled={checklist.data?.ready !== true}
-            onClick={confirmClose}
+            onClick={() => setConfirming(true)}
             style={{ alignSelf: 'end' }}
           >
             Close Fiscal Year
@@ -187,6 +185,21 @@ export function YearEndPanel({ picker }: Readonly<{ picker: ReturnType<typeof us
         )}
       </div>
       <ErrorAlert error={checklist.error ?? close.error} />
+      {confirming && (
+        <ConfirmDialog
+          title="Close Fiscal Year"
+          record={`FY ${String(yearCode)}`}
+          effect="The nominal accounts are closed to retained earnings and the year is locked. This cannot be undone."
+          confirmLabel="Close Fiscal Year"
+          destructive
+          busy={close.isPending}
+          onClose={() => setConfirming(false)}
+          onConfirm={() => {
+            setConfirming(false);
+            close.mutate();
+          }}
+        />
+      )}
       {record.data && <VerifiedRecord companyId={companyId} yearId={yearId} record={record.data} />}
       <Card title="Pre-close checklist" flush>
         <ChecklistView checklist={checklist.data} loading={checklist.isLoading} />

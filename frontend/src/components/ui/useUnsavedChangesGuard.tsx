@@ -3,6 +3,19 @@ import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ConfirmDialog } from './ConfirmDialog';
 
+/** The in-app path a plain left click follows, if the click is on such a link. */
+function inAppLink(e: MouseEvent): string | undefined {
+  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) {
+    return undefined;
+  }
+  const anchor = e.target instanceof Element ? e.target.closest('a[href]') : null;
+  const href = anchor?.getAttribute('href');
+  if (!href?.startsWith('/') || anchor?.getAttribute('target') === '_blank') {
+    return undefined;
+  }
+  return href;
+}
+
 /**
  * Unsaved-changes guard of a form: while `dirty`, closing or reloading the tab asks the browser's
  * confirmation, and following an in-app link opens a themed dialog (Leave Page / Go Back).
@@ -20,12 +33,8 @@ export function useUnsavedChangesGuard(dirty: boolean): ReactNode {
       e.preventDefault();
     };
     const click = (e: MouseEvent) => {
-      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) {
-        return;
-      }
-      const anchor = (e.target as Element | null)?.closest?.('a[href]');
-      const href = anchor?.getAttribute('href');
-      if (!href?.startsWith('/') || anchor?.getAttribute('target') === '_blank') {
+      const href = inAppLink(e);
+      if (href === undefined) {
         return;
       }
       e.preventDefault();

@@ -8,6 +8,10 @@ import { LovSelect } from './LovSelect';
 
 interface ActionDialogProps {
   title: string;
+  /** The record the action applies to (reference), named in the dialog. */
+  record?: string;
+  /** What the action does, in business terms. */
+  effect?: string;
   /** List of values of the mandatory reason; omit when no reason is needed. */
   reasonLov?: string;
   confirmLabel: string;
@@ -17,9 +21,17 @@ interface ActionDialogProps {
   onClose: () => void;
 }
 
-/** Confirmation with an optional mandatory reason and a comment (return, void, cancel...). */
+/** Irreversible or destructive actions: the confirming button is the red danger button. */
+const DESTRUCTIVE = /\b(cancel|void|revers|deactivat|delet|reject|declin|terminat|write[- ]off)/i;
+
+/**
+ * Confirmation with an optional mandatory reason and a comment (return, void, cancel...): names
+ * the record and the effect; a destructive action confirms with the red danger button.
+ */
 export function ActionDialog({
   title,
+  record,
+  effect,
   reasonLov,
   confirmLabel,
   busy = false,
@@ -37,11 +49,11 @@ export function ActionDialog({
       onClose={onClose}
       footer={
         <>
-          <Button variant="secondary" onClick={onClose}>
-            Cancel
+          <Button variant="secondary" onClick={onClose} disabled={busy}>
+            Go Back
           </Button>
           <Button
-            variant="accent"
+            variant={DESTRUCTIVE.test(confirmLabel) ? 'danger' : 'accent'}
             busy={busy}
             disabled={missingReason}
             onClick={() =>
@@ -58,6 +70,12 @@ export function ActionDialog({
     >
       <div className="stack">
         <ErrorAlert error={error} />
+        {record !== undefined && (
+          <p className="confirm-record">
+            <strong>{record}</strong>
+          </p>
+        )}
+        {effect !== undefined && <p className="confirm-effect">{effect}</p>}
         {reasonLov && (
           <Field label="Reason" required>
             {(id) => (

@@ -104,7 +104,9 @@ export function BulkUploadWizard({
 
   return (
     <div className="stack">
-      <ErrorAlert error={definition.error ?? upload.error ?? commit.error ?? cancel.error} />
+      <ErrorAlert
+        error={[definition.error, upload.error, commit.error, cancel.error].find(Boolean)}
+      />
       <Card title="1. Template">
         <div className="row">
           <FileSpreadsheet size={20} aria-hidden="true" />
@@ -123,51 +125,19 @@ export function BulkUploadWizard({
         </div>
       </Card>
       {job === null ? (
-        <Card title="2. Upload">
-          <div className="stack">
-            {previous !== null && (
-              <div className="alert" role="status">
-                Upload the corrected error file of {previous.jobNo} ({previous.fileName}).
-              </div>
-            )}
-            {parameterFields}
-            <Field
-              label="File"
-              required
-              hint="Excel (.xlsx), OpenDocument (.ods) or CSV (.csv), first sheet, headers in row 1."
-            >
-              {(id) => (
-                <FileDropZone
-                  id={id}
-                  accept=".xlsx,.ods,.csv"
-                  busy={upload.isPending}
-                  onChange={(files) => setFile(files[0] ?? null)}
-                />
-              )}
-            </Field>
-            <p className="upload-rule muted">
-              Every row is validated before anything is created. Valid rows are processed; rows with
-              errors are left out and returned in the error file to correct and upload again.
-              {definition.data?.blocksDuplicateFiles === true &&
-                ' A file already uploaded is refused.'}
-            </p>
-            <div className="form-actions">
-              <Button
-                variant="accent"
-                icon={<Upload size={16} />}
-                busy={upload.isPending}
-                disabled={file === null || !parametersReady}
-                onClick={() => {
-                  if (file !== null) {
-                    upload.mutate(file);
-                  }
-                }}
-              >
-                Upload and Validate
-              </Button>
-            </div>
-          </div>
-        </Card>
+        <UploadCard
+          previous={previous}
+          parameterFields={parameterFields}
+          busy={upload.isPending}
+          blocksDuplicates={definition.data?.blocksDuplicateFiles === true}
+          ready={file !== null && parametersReady}
+          onFile={setFile}
+          onUpload={() => {
+            if (file !== null) {
+              upload.mutate(file);
+            }
+          }}
+        />
       ) : (
         <JobReview
           job={job}
@@ -188,6 +158,62 @@ export function BulkUploadWizard({
         />
       )}
     </div>
+  );
+}
+
+interface UploadCardProps {
+  previous: BulkJob | null;
+  parameterFields?: ReactNode;
+  busy: boolean;
+  blocksDuplicates: boolean;
+  ready: boolean;
+  onFile: (file: File | null) => void;
+  onUpload: () => void;
+}
+
+/** Step 2: the file, the processing rule and the upload action (bottom right). */
+function UploadCard(p: Readonly<UploadCardProps>) {
+  return (
+    <Card title="2. Upload">
+      <div className="stack">
+        {p.previous !== null && (
+          <div className="alert" role="status">
+            Upload the corrected error file of {p.previous.jobNo} ({p.previous.fileName}).
+          </div>
+        )}
+        {p.parameterFields}
+        <Field
+          label="File"
+          required
+          hint="Excel (.xlsx), OpenDocument (.ods) or CSV (.csv), first sheet, headers in row 1."
+        >
+          {(id) => (
+            <FileDropZone
+              id={id}
+              accept=".xlsx,.ods,.csv"
+              busy={p.busy}
+              onChange={(files) => p.onFile(files[0] ?? null)}
+            />
+          )}
+        </Field>
+        <p className="upload-rule muted">
+          Every row is validated before anything is created. Valid rows are processed; rows with
+          errors are left out and returned in the error file to correct and upload again.
+          {p.blocksDuplicates && ' A file already uploaded is refused.'}
+        </p>
+        <div className="form-actions">
+          <Button
+            variant="accent"
+            icon={<Upload size={16} />}
+            busy={p.busy}
+            disabled={!p.ready}
+            onClick={p.onUpload}
+          >
+            Upload and Validate
+          </Button>
+        </div>
+      </div>
+    </Card>
   );
 }
 

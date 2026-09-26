@@ -12,13 +12,13 @@ roles:
   - [OPS, "Operations (Financial Transactions, Cashiering, Remittance, Collections)", BDOI]
   - [MKT, Marketing (Retail and Corporate) and Renewal handlers, BDOI]
   - [CMP, Compliance and Audit, BDOI]
-  - [BIT, BDOI IT (legacy systems, extracts, network, SFTP), BDOI]
+  - [BIT, "BDOI IT (legacy systems, extracts, network, SFTP)", BDOI]
   - [GNG, "Go / no-go board (Program Manager, heads of Operations, Comptrollership, Marketing, Compliance, IT; iorta Project Manager)", BDOI and iorta TechNXT]
   - [IPM, iorta TechNXT Project Manager, iorta TechNXT]
-  - [IML, iorta TechNXT Migration Lead (loaders, reconciliation, console), iorta TechNXT]
-  - [IOP, iorta TechNXT Migration Operator (intake, validation, loads), iorta TechNXT]
-  - [IDO, iorta TechNXT DevOps (AWS environment, snapshots, access, monitoring), iorta TechNXT]
-  - [IQA, iorta TechNXT QA (smoke tests, defect triage), iorta TechNXT]
+  - [IML, "iorta TechNXT Migration Lead (loaders, reconciliation, console)", iorta TechNXT]
+  - [IOP, "iorta TechNXT Migration Operator (intake, validation, loads)", iorta TechNXT]
+  - [IDO, "iorta TechNXT DevOps (AWS environment, snapshots, access, monitoring)", iorta TechNXT]
+  - [IQA, "iorta TechNXT QA (smoke tests, defect triage)", iorta TechNXT]
 
 phases:
   - [A, Readiness, T-30 to T-15]

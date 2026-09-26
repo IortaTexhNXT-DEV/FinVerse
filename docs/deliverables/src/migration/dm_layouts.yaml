@@ -1303,7 +1303,7 @@ decisions:
   - [DMQ03, Source systems, "Confirm the systems in scope (EBIX, QPS, ISYS, CMS, Excel) and the system of record per object where two hold it", All layouts, M1, BDOI IT, OPEN]
   - [DMQ04, Client dedupe keys, "Agreed keys (is the bank CIF a key?), survivorship per field, who reviews doubtful matches and within what time", C01 matching; DM1-C, M2, "Product Owner, MBS", OPEN]
   - [DMQ05, Client scope, "All clients since 2020, or only those with an in-force policy, open item or activity since a date; prospects; corporate contacts", C01 volumes; filter, M2, "Product Owner, MBS", PARTIAL]
-  - [DMQ06, Screening of migrated clients, One full screening run after the load instead of per client; legacy results archived, C01 load; cutover task CT-P5, M2, Compliance, OPEN]
+  - [DMQ06, Screening of migrated clients, One full screening run after the load instead of per client; legacy results archived, C01 load; cutover task CT-050, M2, Compliance, OPEN]
   - [DMQ07, KYC documents, Migrate as attachments or archive; KYC status and review dates, "C04, H02", M2, Compliance, OPEN]
   - [DMQ08, Code map owners, "Owner and signer per map set; MIS fields required", Gate G2; all map sets, M2, "Product Owner, MBS", OPEN]
   - [DMQ09, In-force header condition, "All in-force policies, or only those with open legacy invoices or that may be endorsed or claimed; the header fields", "P01, P01S; endorsements BRID 9; DM1-C", M1, "Head, Operations", OPEN]

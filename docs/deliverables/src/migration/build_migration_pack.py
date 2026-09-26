@@ -151,7 +151,10 @@ def check(lay: dict[str, Any], cut: dict[str, Any]) -> list[str]:
 def sheet_name(layout: dict[str, Any]) -> str:
     title = layout["title"]
     title = title.replace("Open legacy invoices - ", "Invoices ").replace(" (", " ").replace(")", "")
-    return f"{layout['code']} {title}"[:31]
+    name = f"{layout['code']} {title}"
+    while len(name) > 31:
+        name = name.rsplit(" ", 1)[0]
+    return name
 
 
 def field_columns() -> list[Column]:
@@ -548,7 +551,7 @@ def placeholders(lay: dict[str, Any], cut: dict[str, Any], name: str, opts: dict
             for s in SYSTEMS:
                 key = {"Excel": "Excel", "File shares": "File shares"}.get(s, s)
                 marks.append("Y" if re.search(rf"\b{re.escape(key)}\b", src, re.I) else "")
-            rows.append([o["code"], o["name"][:60] + ("..." if len(o["name"]) > 60 else ""), *marks])
+            rows.append([o["code"], o["name"], *marks])
         return md_table(["Object", "Data object", *SYSTEMS], rows,
                         'widths=1.3,7,1.3,1.3,1.3,1.3,1.3,1.8 caption="Source systems per data object (Y = holds the '
                         'object; system of record per DMQ03)" size=8 bold=first')
@@ -576,7 +579,7 @@ def placeholders(lay: dict[str, Any], cut: dict[str, Any], name: str, opts: dict
         for o in objects:
             if not o["layouts"]:
                 continue
-            rows.append([o["code"], o["name"][:70] + ("..." if len(o["name"]) > 70 else ""), ", ".join(o["layouts"]),
+            rows.append([o["code"], o["name"], ", ".join(o["layouts"]),
                          o["source"], o["controls"], milestone_text(lay, o["due"])])
         return md_table(["Object", "Data object", "Templates", "Source", "Control totals", "Due"], rows,
                         'widths=1.2,5,1.8,2,4,2.6 caption="What BDOI provides per object" size=8 bold=first')
@@ -584,7 +587,7 @@ def placeholders(lay: dict[str, Any], cut: dict[str, Any], name: str, opts: dict
         refs = lay.get("register_refs", {})
         rows = [[d[0], refs.get(d[0], "-"), d[1], d[3], milestone_text(lay, d[4]), d[5]] for d in lay["decisions"]]
         return md_table(["ID", "Register", "Decision", "Blocks", "Needed by", "BDOI owner"], rows,
-                        'widths=1.4,1.8,3.6,4,3.1,2.7 caption="Open decisions, register items (v1.1) and the date each '
+                        'widths=1.7,1.8,3.5,3.9,3,2.7 caption="Open decisions, register items (v1.1) and the date each '
                         'is needed by" size=8 bold=first')
     if name == "milestones":
         return md_table(["Milestone", "What is due", "When"], [list(m) for m in lay["milestones"]],

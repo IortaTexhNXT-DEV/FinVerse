@@ -86,7 +86,7 @@ The open-item objects and the trial balance are loaded from two independent sour
 - the trial balance is loaded as OPENING journals; its lines on the legacy control accounts (premium receivable, PR2307, DTIP, commission receivable, unrealised commission, deferred VAT, unapplied collections) are mapped to Migration Clearing instead of the legacy control accounts, because the opening entries build those balances in detail;
 - when the detail equals the GL, Migration Clearing is 0.00 per branch and currency.
 
-![Migration Clearing nets to zero when the detail equals the legacy GL](figures/dm_clearing.dot){width=13}
+![Migration Clearing nets to zero when the detail equals the legacy GL](figures/dm_clearing.dot){width=15}
 
 **Worked example** (one branch, PHP, one invoice and one UPP item; made-up figures; the unrealised commission follows DMQ13 and is taken here as fully unrealised):
 
@@ -151,6 +151,8 @@ The Migration Lead draws the samples from the loaded batch (random with a fixed 
 
 For each object and cycle the evidence pack holds: the extract numbers with file names, SHA-256 and control totals; the map versions used; MIG-DQ-ISSUES with waivers; MIG-REJECTS; MIG-RECON-SUMMARY and MIG-RECON-DETAIL; MIG-GL-CLEARING for financial objects; the sample list with the check results; and the signed forms of section 9. The pack is exported from the Migration Console and filed in the project records. Staging rows and files are purged within 5 days of sign-off, but counts, hashes, totals, reports and sign-offs are kept (proposed 10 years, DMQ29).
 
+<!-- pagebreak -->
+
 # Sign-off forms
 
 The forms below are signed in the Migration Console (gates G5 and G6) and printed for the project file. One form per object and cycle.
@@ -192,6 +194,8 @@ rows:
   - {name: "", role: "Migration Lead (reconciliation run)", organisation: iorta TechNXT}
 ```
 
+<!-- pagebreak -->
+
 ## Cutover reconciliation summary (go / no-go GNG-3)
 
 ```keyvalues
@@ -224,6 +228,8 @@ rows:
   - {name: "", role: "Program Manager (for the go / no-go board)", organisation: BDO Unibank ESG}
   - {name: "", role: Project Manager, organisation: iorta TechNXT}
 ```
+
+<!-- pagebreak -->
 
 ## Archive reconciliation (before decommissioning)
 

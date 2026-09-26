@@ -335,7 +335,7 @@ A legacy invoice is an invoice booked in EBIX or QPS before go-live that still h
 
 From then on BIBS processes it with the normal screens (Figure 2). The only difference from a BIBS invoice is where its postings go: to the legacy control accounts, so the legacy positions run off visibly and separately from the new business.
 
-![A legacy invoice and the processes that act on it after go-live (BRID 5.1-10.1)](figures/dm_legacy_invoice_flows.dot){width=15}
+![A legacy invoice and the processes that act on it after go-live (BRID 5.1-10.1)](figures/dm_legacy_invoice_flows.dot){width=12}
 
 ## Legacy sub-ledgers
 

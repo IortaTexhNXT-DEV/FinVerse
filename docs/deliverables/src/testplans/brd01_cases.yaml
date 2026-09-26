@@ -10,8 +10,9 @@ meta:
   code: NB
   frs: FRS_BRD01_NEW_BUSINESS.md
   summary: TP_BRD01_NEW_BUSINESS.md
-  version: "1.0"
-  date: 25 September 2026
+  version: "2.0"
+  date: 26 September 2026
+  signoff: ../signoff/brd01/pack.yaml
   built: true
 
 personas:

@@ -1,0 +1,160 @@
+# BRD-1 New Business – Business Sign-off Pack, release set v2.0.
+# Built by docs/deliverables/src/signoff/signoff_pack.py (workbook, checks) and read by the FRS source through
+# ```pack blocks (tools/deliverables/bdoi_docx.py). Schema: docs/deliverables/src/signoff/README.md.
+meta:
+  brd: BRD-01
+  brd_label: BRD-1
+  name: New Business
+  code: NB
+  version: "2.0"
+  date: 26 September 2026
+  status_as_of: 26-Sep-2026
+  release_set: BRD-01 New Business – Business Sign-off Pack
+  frs: FRS_BRD01_NEW_BUSINESS.md
+  test_plan: brd01_cases.yaml
+  screens_dir: screens
+  screenshot_dir: screenshots
+
+# The New Business personas: role code, name, SIT/UAT user of the seed profile.
+personas:
+  MKT_AO: {name: Marketing Account Officer, user: ao}
+  MKT_TL: {name: Marketing TL / TH / UH, user: mkttl}
+  TSU: {name: Technical Support Unit, user: tsu}
+  PROCESSOR: {name: Processing, user: proc}
+  PROCESSING_TL: {name: Processing Team Leader, user: proctl}
+  NB_APPROVER: {name: New Business Approver, user: approver}
+  EPOLICY_SENDER: {name: E-policy Sender, user: epol}
+  ADJUSTMENT: {name: Adjustment, user: adjust}
+  BUSINESS_ADMIN: {name: Business Administrator, user: badmin}
+  SYSADMIN: {name: System Administrator, user: admin}
+  AUDITOR: {name: Auditor, user: auditor}
+
+# Sidebar sections that belong to this BRD (navigation/modules.ts module ids) and the BRD of every other section,
+# used to mark each menu entry of a persona.
+own_sections: [nb-dashboard, workspace, crm, quotations, accounts, proposals, placement, issuance, booking, bulk, nb-reports, broking-setup]
+section_brd:
+  dashboard: Platform
+  nb-dashboard: BRD-1
+  workspace: BRD-1
+  crm: BRD-1
+  screening: BRD-10
+  quotations: BRD-1
+  accounts: BRD-1
+  proposals: BRD-1
+  eb: BRD-8
+  placement: BRD-1
+  issuance: BRD-1
+  booking: BRD-1
+  prodrecon: BRD-2
+  adjustment: BRD-2
+  catalog: BRD-3
+  bulk: BRD-1
+  operations: BRD-2
+  collections: BRD-4
+  cashiering: BRD-2
+  remittance: BRD-2
+  commission: BRD-2 / BRD-4
+  disbursement: BRD-5
+  payrequest: BRD-5
+  acsl: BRD-5
+  frbs: BRD-5
+  gl: BRD-5
+  receivables: BRD-5
+  payables: BRD-5
+  assets: BRD-5
+  planning: BRD-5
+  tax: BRD-5
+  accounting-engine: BRD-5
+  brokerclaims: BRD-7
+  underwriting: Platform
+  claims: Platform
+  reinsurance: Platform
+  reserves: Platform
+  nb-reports: BRD-1
+  reports: Platform
+  broking-setup: BRD-1
+  screening-setup: BRD-10
+  setup: Platform
+  user-access: BRD-11
+  admin: Platform / BRD-11
+  help: Platform
+
+# Screen-flow figure: the links between the screens (list → record → action → next screen).
+flow:
+  - [SCR-NB-46, SCR-NB-37, sign in]
+  - [SCR-NB-37, SCR-NB-38, figures]
+  - [SCR-NB-01, SCR-NB-03, open]
+  - [SCR-NB-01, SCR-NB-02, New Client]
+  - [SCR-NB-02, SCR-NB-03, Open Client]
+  - [SCR-NB-04, SCR-NB-03, open]
+  - [SCR-NB-03, SCR-NB-06, Generate Quotation]
+  - [SCR-NB-08, SCR-NB-06, Create Quotation]
+  - [SCR-NB-05, SCR-NB-07, open]
+  - [SCR-NB-06, SCR-NB-07, Submit for Review]
+  - [SCR-NB-07, SCR-NB-14, Create accounts]
+  - [SCR-NB-09, SCR-NB-11, open]
+  - [SCR-NB-10, SCR-NB-11, Submit for Approval]
+  - [SCR-NB-12, SCR-NB-11, open]
+  - [SCR-NB-11, SCR-NB-14, Create accounts]
+  - [SCR-NB-13, SCR-NB-15, open]
+  - [SCR-NB-14, SCR-NB-15, Submit to Processing]
+  - [SCR-NB-15, SCR-NB-19, Placement tab]
+  - [SCR-NB-18, SCR-NB-19, client name]
+  - [SCR-NB-21, SCR-NB-22, Upload and Match]
+  - [SCR-NB-22, SCR-NB-18, gate opened]
+  - [SCR-NB-18, SCR-NB-20, slips]
+  - [SCR-NB-18, SCR-NB-28, For Booking]
+  - [SCR-NB-19, SCR-NB-23, placed]
+  - [SCR-NB-27, SCR-NB-28, ready to book]
+  - [SCR-NB-23, SCR-NB-24, Upload E-policies]
+  - [SCR-NB-24, SCR-NB-25, Upload and Review]
+  - [SCR-NB-25, SCR-NB-27, Confirm Policy]
+  - [SCR-NB-25, SCR-NB-26, advice on issue]
+  - [SCR-NB-28, SCR-NB-29, open]
+  - [SCR-NB-29, SCR-NB-30, Book Account]
+  - [SCR-NB-30, SCR-NB-31, New Endorsement]
+  - [SCR-NB-30, SCR-NB-32, Service Invoices tab]
+  - [SCR-NB-28, SCR-NB-33, Batch Runs]
+  - [SCR-NB-35, SCR-NB-36, upload type]
+  - [SCR-NB-40, SCR-NB-40, run report]
+
+# Elements shared by many screens, described once.
+common:
+  - name: Page header and company
+    text: >-
+      Every page shows its section and title, a one-line description and its actions on the right. The company in the
+      header decides the records shown; lists and reports are always of that company.
+  - name: Work lists
+    text: >-
+      Lists show status tabs or quick filters, a search box, a Filters button for the advanced filters, and the paged
+      table ("Showing 1 to n of N results"). A row opens its record. Dates show as dd-MMM-yyyy and times as
+      dd-MMM-yyyy HH:mm in Philippine time.
+  - name: Record summary and reference chips
+    text: >-
+      A record opens with its reference (Proposal No., PRF, ARN, invoice), its status badge and the key facts. A
+      reference chip copies the reference and an ARN chip opens the account.
+  - name: Workflow panel
+    text: >-
+      Shows the stage, since when, the due time of the stage (SLA, overdue in red) and the assignee, with the actions
+      the user may take now. Actions that need a reason (return, void, cancel) open a dialog with the mandatory reason
+      from its list of values and an optional comment; the comment is kept in the history and sent with the
+      notification. "Workflow notice" in the action tables means the in-app notice NT-01.
+  - name: Documents panel
+    text: >-
+      Lists the documents of the record (File, Type, Description, Size, Uploaded by, Uploaded, SHA-256), with the
+      upload bar (document type, description, files and the option to name the files after the record's reference),
+      download of one file or a ZIP of the selected files, and removal. Documents linked from related records are
+      marked. File type, size, content and malware checks apply to every upload.
+  - name: Send via Email dialog
+    text: >-
+      Shows the proposed recipients, copy, subject and message, the attachments that will be generated, and the
+      password protection with an optional hint. Protected attachments are encrypted and the password follows in a
+      separate e-mail. The e-mail is queued and its outcome is shown on the record's E-mails tab and in Outbound Messages.
+  - name: Notifications and help
+    text: >-
+      The bell in the header shows the in-app notices with their unread count; a notice opens its record. The Help
+      button of each page explains the screen.
+  - name: Bulk action results
+    text: >-
+      An action run on several selected rows processes each record on its own and lists the outcome of each (done or
+      the message), so one failure does not stop the others.

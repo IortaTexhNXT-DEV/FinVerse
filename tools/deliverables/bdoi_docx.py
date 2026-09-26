@@ -4,11 +4,13 @@ Two ways to use it:
 
 * **Python API.** ``BdoiDocument`` builds a document piece by piece: ``cover()``, ``front_matter()``,
   ``heading()``, ``paragraph()``, ``bullets()``, ``table()``, ``requirement()``, ``callout()``,
-  ``figure()``, ``glossary()``, ``signoff()``. ``save()`` writes the .docx; ``publish()`` also
+  ``figure()``, ``screenshot()`` (with a callout legend; a placeholder until the PNG exists),
+  ``glossary()``, ``signoff()``. ``save()`` writes the .docx; ``publish()`` also
   writes the PDF and fills the table of contents with the real page numbers.
 * **Markdown-like sources.** ``build_markdown(src)`` reads a source under ``docs/deliverables/src``
   (YAML front matter plus the syntax described in ``tools/deliverables/README.md``) and publishes
-  it to ``docs/deliverables/out``.
+  it to ``docs/deliverables/out``. A ```pack block runs a plugin (``render(doc, **block)`` of the .py
+  file it names) that generates content from data kept elsewhere, such as a business sign-off pack.
 
 Layout: US Letter portrait (the BDOI BRDs are Letter), Arial 10.5 pt body, headings in Header Blue
 numbered 1 / 1.1 / 1.1.1, tables with a Header Blue header row, banded #E5F5FF rows and 0.5 pt
@@ -907,6 +909,11 @@ class BdoiDocument:
             add_inline(q, extra, size=9.5)
         self._after_table()
 
+    @property
+    def text_height_cm(self) -> float:
+        s = self.doc.sections[-1]
+        return (s.page_height - s.top_margin - s.bottom_margin) / 360000
+
     def figure(self, path: str | Path, caption: str, width_cm: float | None = None) -> None:
         """A picture (PNG, JPG or a Graphviz .dot source rendered in BDO colours) with a caption."""
         path = Path(path)
@@ -915,13 +922,13 @@ class BdoiDocument:
         if path.suffix == ".dot":
             path = render_dot(path)
         width = width_cm or self.text_width_cm
-        # Keep tall figures on one page: cap the height at 80 % of the page body.
+        # Keep tall figures on one page: cap the height at 80 % of the page body (of the current section).
         try:
             from PIL import Image
 
             with Image.open(path) as im:
                 w, h = im.size
-            max_h = 0.8 * (PAGE_H_CM - 2 * MARGIN_TB_CM)
+            max_h = 0.8 * self.text_height_cm
             if h / w * width > max_h:
                 width = max_h * w / h
         except Exception:  # pragma: no cover - PIL missing
@@ -931,8 +938,96 @@ class BdoiDocument:
         p.paragraph_format.space_before = Pt(4)
         p.paragraph_format.space_after = Pt(0)
         _keep_with_next(p)
-        p.add_run().add_picture(str(path), width=Cm(width))
+        p.add_run().add_picture(str(print_image(path, width)), width=Cm(width))
         self.caption("Figure", caption)
+
+    def screenshot(self, path: str | Path | None, caption: str, legend: Sequence[tuple[Any, str]] | None = None,
+                   width_cm: float | None = None, max_height_ratio: float = 0.62) -> None:
+        """A screenshot with its caption and, optionally, the legend of its numbered callouts.
+
+        The image is embedded as an optimised print copy (see print_image). When the file does not exist yet
+        (screens are captured from the SIT environment at build), a framed placeholder with the caption is
+        written in its place, so the document can be reviewed before the capture.
+        """
+        width = width_cm or self.text_width_cm
+        target = None
+        if path:
+            target = Path(path)
+            if not target.is_absolute():
+                target = (self.base_dir / target).resolve()
+        if target is not None and target.exists():
+            try:
+                from PIL import Image
+
+                with Image.open(target) as im:
+                    w, h = im.size
+                max_h = max_height_ratio * self.text_height_cm
+                if h / w * width > max_h:
+                    width = max_h * w / h
+            except Exception:  # pragma: no cover
+                pass
+            p = self.doc.add_paragraph()
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p.paragraph_format.space_before = Pt(4)
+            p.paragraph_format.space_after = Pt(0)
+            _keep_with_next(p)
+            run = p.add_run().add_picture(str(print_image(target, width)), width=Cm(width))
+            del run
+        else:
+            table = self.doc.add_table(rows=1, cols=1)
+            table.alignment = WD_TABLE_ALIGNMENT.CENTER
+            _table_borders(table, size=6, colour=brand.FIELD_BLUE)
+            _table_fixed(table, [width])
+            cell = table.rows[0].cells[0]
+            _shade(cell, brand.DIRTY_WHITE)
+            _row_height(table.rows[0], min(6.0, width * 0.45))
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+            q = cell.paragraphs[0]
+            q.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            add_inline(q, "Screenshot", size=9, colour=brand.HEADER_BLUE, bold=True)
+            q2 = cell.add_paragraph()
+            q2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            add_inline(q2, caption, size=8.5, colour=brand.MUTED)
+            q3 = cell.add_paragraph()
+            q3.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            add_inline(q3, "Captured from the SIT environment with seed data when the set is built.", size=8,
+                       colour=brand.MUTED)
+            keep_table_together(table)
+        self.caption("Figure", caption)
+        if legend:
+            self.callout_legend(legend)
+
+    def callout_legend(self, items: Sequence[tuple[Any, str]], columns: int = 3) -> Table:
+        """The legend of the numbered callouts of a screenshot: badge number and field, in columns."""
+        items = list(items)
+        per_col = (len(items) + columns - 1) // columns
+        rows = []
+        for r in range(per_col):
+            row: list[Any] = []
+            for c in range(columns):
+                i = c * per_col + r
+                row += [str(items[i][0]), items[i][1]] if i < len(items) else ["", ""]
+            rows.append(row)
+        total = self.text_width_cm
+        widths = [0.8, total / columns - 0.8] * columns
+        table = self.doc.add_table(rows=len(rows), cols=2 * columns)
+        table.alignment = WD_TABLE_ALIGNMENT.CENTER
+        _table_no_borders(table)
+        _table_fixed(table, widths)
+        for ri, values in enumerate(rows):
+            for ci, value in enumerate(values):
+                cell = table.rows[ri].cells[ci]
+                _cell_margins(cell, 20, 20, 60, 60)
+                p = cell.paragraphs[0]
+                p.style = self.doc.styles["BDOI Table"]
+                if ci % 2 == 0 and value:
+                    _shade(cell, brand.HEADER_BLUE)
+                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    add_inline(p, value, size=7.5, colour=brand.WHITE, bold=True)
+                else:
+                    add_inline(p, value, size=7.5)
+        self._after_table()
+        return table
 
     def glossary(self, entries: dict[str, str] | Sequence[tuple[str, str]], caption: str | None = None) -> None:
         items = list(entries.items()) if isinstance(entries, dict) else list(entries)
@@ -1160,6 +1255,46 @@ def _levels(items: Any) -> list[str | tuple[int, str]]:
 def _pad(row: Any, n: int) -> list[Any]:
     row = list(row) if isinstance(row, (list, tuple)) else [row]
     return (row + [""] * n)[:n]
+
+
+PRINT_DPI = 170
+
+
+def print_image(path: Path, width_cm: float, dpi: int = PRINT_DPI) -> Path:
+    """An optimised print copy of a raster image for Word: scaled to the printed width at `dpi` and saved as
+    JPEG (photos and screenshots) or PNG (figures with few colours) in a `_print` folder next to the image,
+    which is not committed. Keeps a document with many screenshots well under 20 MB. Returns the original
+    when it is already small enough or PIL is missing."""
+    try:
+        from PIL import Image
+    except Exception:  # pragma: no cover
+        return path
+    if path.suffix.lower() not in (".png", ".jpg", ".jpeg"):
+        return path
+    target_px = int(width_cm / 2.54 * dpi)
+    out_dir = path.parent / "_print"
+    try:
+        with Image.open(path) as im:
+            w, h = im.size
+            colours = im.convert("RGB").getcolors(maxcolors=256) if w * h < 4_000_000 else None
+            figure_like = colours is not None
+            suffix = ".png" if figure_like else ".jpg"
+            out = out_dir / f"{path.stem}_{target_px}{suffix}"
+            if out.exists() and out.stat().st_mtime >= path.stat().st_mtime:
+                return out
+            if w <= target_px and path.stat().st_size < 250_000:
+                return path
+            out_dir.mkdir(exist_ok=True)
+            img = im.convert("RGB")
+            if w > target_px:
+                img = img.resize((target_px, round(h * target_px / w)), Image.LANCZOS)
+            if figure_like:
+                img.save(out, optimize=True)
+            else:
+                img.save(out, quality=84, optimize=True, progressive=True)
+            return out
+    except OSError:
+        return path
 
 
 def render_dot(src: Path, dpi: int = 200) -> Path:
@@ -1413,6 +1548,13 @@ def _render_block(doc: BdoiDocument, kind: str, text: str) -> None:
     elif kind == "signoff":
         data = yaml.safe_load(text)
         doc.signoff(data.get("rows", []), intro=data.get("intro")) if isinstance(data, dict) else doc.signoff(data)
+    elif kind == "screenshot":  # {file, caption, legend: [[1, label], ...], width}
+        data = yaml.safe_load(text)
+        doc.screenshot(data.get("file"), data.get("caption", ""), legend=[tuple(x) for x in data.get("legend") or []],
+                       width_cm=data.get("width"))
+    elif kind == "pack":  # {plugin: <python file>, render: <name>, ...}: content rendered by a pack plugin
+        data = yaml.safe_load(text) or {}
+        render_plugin(doc, data)
     elif kind == "keyvalues":
         data = yaml.safe_load(text)
         doc.key_values([(str(k), v) for k, v in (data.items() if isinstance(data, dict) else data)], columns=1,
@@ -1430,10 +1572,29 @@ def _render_block(doc: BdoiDocument, kind: str, text: str) -> None:
             add_inline(p, "`" + line + "`" if line.strip() else "")
 
 
+_PLUGINS: dict[Path, Any] = {}
+
+
+def render_plugin(doc: BdoiDocument, spec: dict[str, Any]) -> None:
+    """Runs `render(doc, **spec)` of the plugin module named in spec["plugin"] (a .py path relative to the
+    source). Plugins generate content from data kept elsewhere (for example the sign-off pack of a BRD), so a
+    Markdown source can include tables that are never typed twice."""
+    import importlib.util
+
+    plugin = (doc.base_dir / spec.pop("plugin")).resolve()
+    if plugin not in _PLUGINS:
+        module_spec = importlib.util.spec_from_file_location(f"bdoi_plugin_{plugin.stem}", plugin)
+        module = importlib.util.module_from_spec(module_spec)
+        sys.modules[module_spec.name] = module
+        module_spec.loader.exec_module(module)  # type: ignore[union-attr]
+        _PLUGINS[plugin] = module
+    _PLUGINS[plugin].render(doc, **spec)
+
+
 FR_ROW_WIDTHS = {"rules": 4, "validations": 3, "fields": 5}
 
 
-YAML_BLOCK_KINDS = ("fr", "requirement", "glossary", "table", "signoff")
+YAML_BLOCK_KINDS = ("fr", "requirement", "glossary", "table", "signoff", "screenshot", "pack")
 _QUOTED_OR_STRUCTURED = ("'", '"', "|", ">", "[", "{", "&", "*", "!")
 
 

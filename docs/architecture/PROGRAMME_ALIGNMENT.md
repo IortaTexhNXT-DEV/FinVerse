@@ -81,7 +81,7 @@ file; change the data file and regenerate both.
 | BRD-00 Core Replacement (umbrella) | FRS, spec | BIBS_FRS_BRD-00_Core_Replacement_v1.0.docx | Programme | All drops (cross-cutting FR-CR, NFRs) | Stays at programme level |
 | BRD-11 User Access Maintenance | FRS, test plan | BIBS_FRS_BRD-11_*; BIBS_TestPlan_BRD-11_* | Drop 0 | - | Items 0.1-0.3; EIAM and UIDM-ISC change it |
 | BRD-3 Product Maintenance | FRS, test plan | BIBS_FRS_BRD-03_*; BIBS_TestPlan_BRD-03_* | Drop 0 | Drop 1 (quotation, 1.U2) | Item 0.6 |
-| BRD-13 Data Migration | FRS, test plan, migration pack (strategy, workbook, runbook, reconciliation, templates) | BIBS_FRS_BRD-13_*; BIBS_TestPlan_BRD-13_*; out/Drop-0_Setup_and_Data_Migration/Migration/* | Drop 0 | Drop 1 (client onboarding, cashiering, BIR reports) and the migration stream | Migration has its own timeline row |
+| BRD-13 Data Migration | FRS, test plan, migration pack (strategy, workbook, runbook, reconciliation, templates) | BIBS_FRS_BRD-13_*; BIBS_TestPlan_BRD-13_*; out/Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/* | Drop 0 | Drop 1 (client onboarding, cashiering, BIR reports) and the migration stream | Migration has its own timeline row |
 | BRD-1 New Business | FRS, test plan | BIBS_FRS_BRD-01_*; BIBS_TestPlan_BRD-01_* | Drop 1 | - | Upstream items 1.U1-1.U3, 1.U6, 1.U7, 1.U9 |
 | BRD-6 Renewal | FRS, test plan | BIBS_FRS_BRD-06_*; BIBS_TestPlan_BRD-06_* | Drop 1 | - | Upstream 1.U5 |
 | BRD-12 Submitted Policies | FRS, test plan | BIBS_FRS_BRD-12_*; BIBS_TestPlan_BRD-12_* | Drop 1 | - | Upstream 1.U4 |

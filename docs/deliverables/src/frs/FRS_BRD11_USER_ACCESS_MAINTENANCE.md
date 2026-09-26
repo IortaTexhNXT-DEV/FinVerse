@@ -84,7 +84,7 @@ The BRD was written in April 2025 for the Quotation and Pre-processing System (Q
 | R3 | User Access Maintenance build design | current (proposal for review) | `docs/architecture/USER_ACCESS_DESIGN.md` |
 | R4 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
 | R5 | Built access functions: users, roles and sign-in (`security`); access requests, User Access Matrix, retention (`nbadmin`); screens | as built | `backend/.../security`, `backend/.../nbadmin`, `frontend/src/features/nbadmin`, `frontend/src/features/admin` |
-| R6 | FRS BRD-3 Product Maintenance (role-permission change requests, PMADD05) | v1.0 | `docs/deliverables/out/Drop-0_Setup_and_Data_Migration/FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.pdf` |
+| R6 | FRS BRD-3 Product Maintenance (role-permission change requests, PMADD05) | v1.0 | `docs/deliverables/out/Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.pdf` |
 | R7 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
 
 Page references in this document ("p.8") are pages of the BRD PDF (R1). The BRD has no NFR IDs; the NFR rows carry the analyst's IDs UAM-NFR-01 to UAM-NFR-41 of R2.

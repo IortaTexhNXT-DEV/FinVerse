@@ -8,11 +8,11 @@ doc_code: FRS
 brd: BRD-01
 name: New Business
 doc_id: BIBS-FRS-BRD-01
-version: "1.0"
-date: 25 September 2026
-status: Issued for BDOI review
+version: "2.0"
+date: 26 September 2026
+status: Issued for BDOI business sign-off
 header_title: FRS BRD-1 New Business
-output: FRS/BIBS_FRS_BRD-01_New_Business_v1.0.docx
+output: FRS/BIBS_FRS_BRD-01_New_Business_v2.0.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review; aligned with the as-built screens, codes and the cross-BRD decisions
+  - version: "2.0"
+    date: 26 Sep 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Business sign-off pack: navigation by persona, screen specifications with screenshots, walkthroughs, messages, notifications, document outputs, upload templates, cross-BRD contract, sign-off and change control (chapters 12-20). Status as of 26-Sep-2026. Chapters 1-11 unchanged; FR, BRD and test IDs kept"
 distribution:
   - {name: "Product Owner, BDOI", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: Marketing Business Services and System Support (MBS), role: Business owner, organisation: BDOI, purpose: Review of all FRs}
@@ -44,6 +50,8 @@ distribution:
 This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker System, on iNXT BrokerVerse) meets the New Business business requirements of BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It turns each BRD requirement into functional requirements with actors, flows, rules, validations, screens, fields, notifications, audit and acceptance criteria.
 
 New Business is built. Every FR therefore describes the behaviour of the delivered system, with the error codes, messages, lists of values, parameters, permissions and screen names of the build. Where the built behaviour differs from the BRD, the FR says so in a note and section 10.4 lists every difference.
+
+Version 2.0 is the business sign-off version. Chapters 1 to 11 keep the requirements of version 1.0 with their IDs. Chapters 12 to 19 show the system as the users see it: the menu of each persona, one specification per screen with its fields, actions, rules and messages, three end-to-end walkthroughs, every message and notification, the generated documents, the upload templates and what New Business exchanges with the other BRDs. Chapter 20 states what signing freezes and how a later change is made. The same rows are in the sign-off workbook, where each business unit records its review. Status as of 26-Sep-2026.
 
 BDOI uses this document to confirm that the system behaves as the business expects. The project team uses it to test and to prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
 
@@ -85,7 +93,7 @@ The scope is the New Business process of BDOI as a broker: from the quotation or
 | R3 | New Business requirements traceability (built status, module, screen, API, test per BRD ID) | current | `docs/requirements/BDOI_NB_TRACEABILITY.md` |
 | R4 | Broking (BDOI New Business) architecture | current | `docs/architecture/BROKING_ARCHITECTURE.md` |
 | R5 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R6 | FRS BRD-3 Product Maintenance (package products, versions, incentive criteria) | 1.0, 25-Sep-2026 | `docs/deliverables/out/Drop-0_Setup_and_Data_Migration/FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.pdf` |
+| R6 | FRS BRD-3 Product Maintenance (package products, versions, incentive criteria) | 1.0, 25-Sep-2026 | `docs/deliverables/out/Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.pdf` |
 | R7 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
 
 Page references in this document ("p.49") are pages of the BRD PDF (R1). The Workshop Addendum is cited by its first copy (pp.1-22). A reference to a legacy BRD step ("BRD 2.3.1") is given where no BRNB ID exists.
@@ -4421,9 +4429,218 @@ Every BRD-1 requirement is met by at least one FR. The table lists the 119 rows 
 
 Page numbers are pages of the BRD PDF (R1). The traceability record R3 names the module, API and test class of each row.
 
-# Sign-off
+<!-- landscape -->
 
-By signing, BDOI confirms that this FRS describes the New Business functions it expects in BIBS, accepts the assumptions in section 10.1 and notes the differences in section 10.4. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
+# Navigation
+
+This chapter shows how each New Business user reaches the screens. The menus are those of the build: the sidebar shows a screen only when the user's role holds its permission (section 3.2), so each persona sees a different menu. The tables are generated from the menu definition and the role grants of the build, not typed.
+
+## Screens of New Business
+
+The 46 screens specified in chapter 13, with the menu path and the roles that can open them. A screen without its own menu entry (a record, a wizard, a report) is reached from the screen before it; its path ends with that screen.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../signoff/brd01/pack.yaml
+render: screen-index
+```
+
+## Screen flow
+
+How the screens link: from a list to its record, from a record action to the next screen, and from one area of the process to the next. The walkthroughs of chapter 14 follow these links with real steps.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../signoff/brd01/pack.yaml
+render: flow
+```
+
+<!-- portrait -->
+
+## Menu by persona
+
+For each New Business persona, the SIT and UAT user of the seed data and the sidebar that user sees, section by section. The BRD column shows which BRD owns a section; entries of other BRDs are listed so the business unit sees the whole menu of its users.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../signoff/brd01/pack.yaml
+render: menus
+```
+
+## Common screen elements
+
+Elements that behave the same on every New Business screen are described once here and not repeated in the screen specifications.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../signoff/brd01/pack.yaml
+render: common
+```
+
+<!-- landscape -->
+
+# Screen specifications
+
+One specification per screen, grouped by process area. Each gives:
+
+- **Purpose**, **who can open it** (personas and the permission), **navigation** (menu path and the other ways in) and the related **FRs**;
+- **screenshots** of the SIT environment with seed data; the numbered markers on the first screenshot match the **No.** column of the field table;
+- the **field table**: section of the screen, label as shown, type, length or format, mandatory (Y, N or the condition), source list or master, default, the statuses in which the field can be changed, the validation and the message shown when it fails, word for word;
+- the **actions table**: button, who sees it, when it is enabled, what happens, the resulting status and the notification sent;
+- the **business rules** of the screen with their FRs, the **expected outcome** and the **test cases** of the test plan that run on the screen.
+
+A message in angle brackets (`<ARN>`) is completed by the system with the value shown. "Workflow notice" means the in-app notification NT-01 of chapter 16.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../signoff/brd01/pack.yaml
+render: screens
+```
+
+<!-- portrait -->
+
+# End-to-end walkthroughs
+
+Three walkthroughs follow a case through the screens, persona by persona, with what the user does, what the user sees and the result of each step. They use seed data only. They are the script of the SIT review sessions of the release note.
+
+## WT-A Retail package policy from a new client to booking
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../signoff/brd01/pack.yaml
+render: walkthrough
+id: WT-A
+```
+
+## WT-B Non-package commercial risk through a PRF with insurer quotations
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../signoff/brd01/pack.yaml
+render: walkthrough
+id: WT-B
+```
+
+## WT-C Returns for correction and the messages the user sees
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../signoff/brd01/pack.yaml
+render: walkthrough
+id: WT-C
+```
+
+<!-- landscape -->
+
+# Messages catalogue
+
+Every message a New Business user can see, grouped by the screen or dialog that shows it, with its code, its type and what the user does. The texts are read from the build; a message is never retyped here.
+
+- **Validation**: shown on the screen while the user fills in a field or before the form is sent.
+- **Error**: the system refused the action; nothing was saved. The code is shown under the message as the Reference.
+- **Warning**: the action is possible, but the user should check something first.
+- **Confirmation** and **Information**: the outcome of an action, or a hint on the screen.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../signoff/brd01/pack.yaml
+render: messages
+```
+
+# Notifications catalogue
+
+The in-app notifications and e-mails that New Business sends: what triggers each, who receives it and what it contains. E-mail attachments are password protected where chapter 17 says so; the password follows in a separate e-mail.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../signoff/brd01/pack.yaml
+render: notifications
+```
+
+<!-- portrait -->
+
+# Document outputs
+
+The documents New Business generates, each from a document template maintained on the Document Templates screen (SCR-NB-44), with the BDO Insure letterhead, the "Confidential" footer and page numbers. For each: the template, the format, the screen that produces it, the password protection, where every field comes from and the first page as generated from seed data.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../signoff/brd01/pack.yaml
+render: documents
+```
+
+# Upload screens
+
+The bulk uploads of New Business run in the Bulk upload wizard (SCR-NB-36): download the template, upload the filled file, review every row with its message, then process the valid rows. The user needs the permission BULK_PROCESS and the permission of the upload type. A file holds at most 5,000 rows. Each upload type has the template columns below; the column checks (mandatory, number, date, Y/N) apply to every type, and the row checks listed with each type come on top.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../signoff/brd01/pack.yaml
+render: uploads
+```
+
+<!-- landscape -->
+
+# Cross-BRD dependencies and interface contract
+
+New Business takes its products, screening results and users from other BRDs, and hands its clients, accounts, booked invoices and journals to the BRDs downstream. The contract below lists each exchange: the BRD or system, the direction, what is exchanged, when and how, and who owns the data. Section 7 describes the interfaces with the external systems.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../signoff/brd01/pack.yaml
+render: contract
+```
+
+<!-- portrait -->
+
+# Sign-off and change control
+
+## What is signed
+
+The business sign-off covers the release set BRD-01 New Business v2.0:
+
+<!-- table: widths=6,11.6 caption="Documents of the release set" -->
+| Document | Content |
+|---|---|
+| This FRS v2.0 | Requirements (chapters 1-11) and the business view of the system (chapters 12-19) |
+| Sign-off workbook v2.0 | The screens, fields, actions, rules, messages, notifications, menus, upload templates and contract of this FRS, one row each, with the BU review columns |
+| Test plan v2.0 | The test cases traced to the FRs and to the screens of chapter 13 |
+| Release note | How to review, the review sessions and the dates |
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../signoff/brd01/pack.yaml
+render: counts
+```
+
+## How the review is recorded
+
+Each business unit records its review in the sign-off workbook: Accept, Change requested or Comment on each row of the screen catalogue, field register, business rules and messages, with the comment, the reviewer and the date. The project team answers every Change requested row in the sign-off tracker before sign-off: either the row is corrected in the next version of the set, or the change is raised as a change request (below) and the row is signed as built.
+
+## What signing freezes
+
+Signing this release set freezes, for New Business:
+
+- the screens and their navigation (chapters 12 and 13), the fields with their order, labels, types, mandatory rules, lists and validations;
+- the actions with their conditions and resulting statuses, and the business rules;
+- the messages (chapter 15), the notifications (chapter 16) and the generated documents (chapter 17);
+- the upload templates (chapter 18) and the interface contract with the other BRDs (chapter 19).
+
+Configuration values marked "default" (SLA hours, thresholds, list entries, templates, section 9) are not frozen; the Business Administrator and the System Administrator change them in the system without a change request.
+
+## Change after sign-off
+
+A change to anything frozen is raised in the Change Management Register. The request states the screen, field, rule or message concerned, the reason and the business priority. The project team assesses it, including its effect on the other BRDs through the interface contract of chapter 19, and the owners of every BRD it touches approve it. An approved change is delivered as a new version of this release set (v2.1, v2.2 and so on) with its own release note, and the changed rows are reviewed again.
+
+## As-built status
+
+This FRS describes the system as built on 26-Sep-2026. Where the build differs from the BRD, section 10.4 says so; such a difference is settled through the register or a change request, not by changing the text. At the end of the build, the final as-built refresh re-issues this set with the system as delivered.
+
+<!-- pagebreak -->
+
+## Signatures
+
+By signing, BDOI confirms that this FRS and the sign-off workbook describe the New Business functions, screens and messages it expects in BIBS, accepts the assumptions in section 10.1 and notes the differences in section 10.4. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
 
 ```signoff
 rows:
@@ -4432,6 +4649,7 @@ rows:
   - {name: "", role: "Unit Head, Processing", organisation: BDOI}
   - {name: "", role: "Head, Retail Marketing", organisation: BDOI}
   - {name: "", role: "Unit Head, Combank and Corbank", organisation: BDOI}
+  - {name: "", role: "Head, Technical Support Unit", organisation: BDOI}
   - {name: "", role: "Head, Comptrollership", organisation: BDOI}
   - {name: "", role: "Program Manager, Business Project Services", organisation: BDO Unibank ESG}
   - {name: "", role: Project Manager, organisation: iorta TechNXT}

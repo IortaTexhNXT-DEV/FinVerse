@@ -85,7 +85,7 @@ The scope is the follow-up of **premium receivables (PR)** and **unapplied payme
 | R5 | BDOI Collections (BRD-4) requirements baseline and fit/gap | current | `docs/requirements/BDOI_CLXN_BRD_SPEC.md` |
 | R6 | Collections build design, including section 14 and the as-built notes of waves C1-A, C1-B and C1-C | current | `docs/architecture/COLLECTIONS_DESIGN.md` |
 | R7 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R8 | BRD-2 Operations FRS (Cashiering, Commission Receivables, Remittance) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/FRS/BIBS_FRS_BRD-02_Operations_v1.0.docx` |
+| R8 | BRD-2 Operations FRS (Cashiering, Commission Receivables, Remittance) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/BRD-02_Operations/BIBS_FRS_BRD-02_Operations_v1.0.docx` |
 | R9 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
 
 Page references in this document ("p.26") are pages of the BRD-4 PDF. For BRCLXN.001-048 the first page is the renumbering addendum (R2, the governing wording) and the second page is the FRID table of the CMS BRD (R1), for example "p.26 / 47". For BRCLXN.049-060 the page is the signed addendum (R3); for BRCLXN.061-064 the page is the draft (R4).

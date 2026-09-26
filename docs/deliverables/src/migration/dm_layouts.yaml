@@ -2,7 +2,7 @@
 # rules and open decisions. Read by build_migration_pack.py, which produces:
 #   * the BDOI Data Requirements Workbook (one sheet per layout, plus register, code maps, control totals,
 #     rules and decisions);
-#   * the CSV extract templates in docs/deliverables/out/Drop-0_Setup_and_Data_Migration/Migration/templates/ (header row = field names);
+#   * the CSV extract templates in docs/deliverables/out/Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/templates/ (header row = field names);
 #   * the object tables of the Strategy, Runbook and Reconciliation documents.
 # Sources: docs/requirements/BDOI_DM_BRD_SPEC.md (R2), docs/architecture/DATA_MIGRATION_DESIGN.md (R3) sections 2,
 # 5, 8, 12 and 27; target columns from the Flyway scripts named in each row. Columns marked "(new)" are proposed by

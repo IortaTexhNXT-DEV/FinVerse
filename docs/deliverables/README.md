@@ -35,6 +35,7 @@ so each document can be regenerated after every build.
 | 14 | Persona-based menus: each user sees only their screens | verified in the platform | B | permissions audit and tests |
 | 15 | Notifications and workflows per role | test evidence | B | workflow and notification tests |
 | 16 | Configuration over code: rules, validations and definitions maintained from front-end masters by the System Administrator | gap list and fixes | B | code review of hard-coded rules |
+| 1, 3 | BRD-1 New Business business sign-off pack (release set v2.0) | Drop 1 | FRS v2.0 with screen specifications, sign-off workbook v2.0, test plan v2.0 and release note in `out/Drop-1_Transactional/BRD-01_New_Business/`; source `src/signoff/brd01/`. Screenshots are captured on the SIT environment before issue |
 | 17 | Reports in Excel and PDF; document schedules in Word and PDF | platform change and tests | B | report and docgen modules. Built: `DocxReportRenderer` (layout of the PDF, print options honoured) and DOCX in the API, batches, archive and scheduled files; Word on documents and schedules (`ReportMetadata.asDocument`: GL-SCHEDULE, GL-BVA, FRBS-MANCOM-MARKET, RI-SOA, FIN-AP-VOUCHER); every composed business document downloadable as Word (`doc_rendition`, Word copy offer after each PDF download); templates to and from Word; BDO Insure logo, Header Blue tables, "Confidential" footer and page x of y on PDF, Word and Excel |
 | 18 | Screen-by-screen and field-by-field alignment review | findings and fixes | B | screenshots and review |
 | 19 | API catalogue | Excel + OpenAPI file | B | OpenAPI specification |
@@ -93,6 +94,46 @@ so each document can be regenerated after every build.
 4. Test cases derived from the approved FRS (item 3), traced in the RTM (item 21), then SIT results (item 8) and persona end-to-end tests (items 12 and 13).
 5. NFR evidence (item 37), architecture conformance to the client BOM (item 4, including Redis and Kafka), and the code-quality report (item 27).
 6. UAT per department with sign-off (item 30). Production readiness means the runbook, observability, alerts and error catalogue are in place (items 24, 35 and 38).
+
+## Release and sign-off per BRD
+
+Each BRD is released to BDOI as one **release set** and signed off as one unit by its business unit. The release set
+lives in one folder, `out/<drop folder>/BRD-nn_<Name>/`, and holds the same documents for every BRD:
+
+| Document | Content | Built by |
+|---|---|---|
+| Release note (Word, 2-3 pages) | What the set contains, how to review it, the SIT review sessions, the dates for comments and sign-off, change control after sign-off | `src/signoff/RELEASE_NOTE_<BRD>.md` |
+| FRS v2.0 (Word) | The requirements of v1.x unchanged, plus: navigation (menu by persona, screen-flow diagram); one specification per screen (purpose, who opens it, navigation, screenshots with numbered callouts, field table, actions table, business rules, expected outcome, FR and test links); end-to-end walkthroughs; messages catalogue; notifications; generated documents; upload templates; cross-BRD interface contract; sign-off and change control | `src/frs/` with ```pack blocks read from `src/signoff/<brd>/` |
+| Sign-off workbook (Excel) | Screen catalogue, field register, actions, business rules, messages, notifications, menu by persona, upload templates, cross-BRD contract and the sign-off sheet, with the BU review columns (Accept / Change requested / Comment, comment, reviewer, date) | `src/signoff/signoff_pack.py` |
+| Test plan v2.0 (Excel and Word summary) | The cases of v1.x re-traced to FRS v2.0 and its screens, plus screen cases (one per screen) and message cases | `src/testplans/build_test_plan.py` |
+
+The screen, field, action, message and menu rows are generated from the system as built (menus and role grants,
+server and screen messages, upload templates) through `tools/deliverables/code_facts.py`, and a check refuses a screen
+label, button, route, FR or test link that the code or the FRS does not have. Screenshots are taken on the SIT
+environment with seed data by `tools/screenshots/capture_pack.cjs` from the manifest of the set.
+
+**Proposed release order.** One BRD at a time, so each business unit reviews a complete set: New Business first as the
+pattern for the others, then the BRDs it depends on and the ones that depend on it.
+
+| Wave | BRD release sets | Business owner | Proposed window |
+|---|---|---|---|
+| 1 | BRD-1 New Business | Marketing, TSU, Processing | Review Oct 2026, sign-off by 30-Oct-2026 |
+| 2 | BRD-3 Product Maintenance, BRD-11 User Access Maintenance | Product owner, user access administration | Nov 2026 |
+| 3 | BRD-10 Sanction Screening, BRD-12 Submitted Policies, BRD-6 Renewal, BRD-9 Customer Servicing Facility | Compliance, Marketing, Processing | Nov 2026 |
+| 4 | BRD-2 Operations, BRD-4 Collections, BRD-5 Accounting, Disbursement and ACSL | Operations, Collections, Comptrollership | Nov - Dec 2026 |
+| 5 | BRD-13 Data Migration (after the objects of waves 1-4 are frozen) | Migration working group | Dec 2026 |
+| 6 | BRD-7 Claims, BRD-8 Employee Benefits (Drop 2) | Claims, EB | Dec 2026 - Feb 2027 |
+
+**Design freeze and change control.** Signing a release set freezes, for that BRD, its screens, fields, navigation,
+messages, notifications and interface contract as specified. A later change is raised in the Change Management Register
+(`out/Programme/Change_Management/`), assessed for its effect on the other BRDs through the cross-BRD contract of the
+set, approved by the owners of every BRD it touches, and delivered as a new version of the release set (v2.1, v2.2...)
+with its own release note. Nothing in a signed set changes without such a request.
+
+**The as-built status rule stays.** The sets describe the system as built on their "Status as of" date. Where the build
+differs from the BRD, the FRS says so in "Built behaviour that differs from the BRD" and the difference is resolved
+through the register or a change request, not by editing the text. The final as-built refresh (below) re-issues every
+set at build completion.
 
 ## Document status and the final as-built refresh
 
@@ -209,15 +250,17 @@ defect remains. The readiness statement is then issued for BDOI to approve the m
 ## Toolkit and status
 
 Toolkit: [`tools/deliverables/`](../../tools/deliverables/README.md) (Word, Excel and PowerPoint builders, PDF and
-page previews). Sources: `docs/deliverables/src/`; outputs: `docs/deliverables/out/<drop folder>/<kind>/`, named
-`BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>`.
+page previews). Sources: `docs/deliverables/src/`; outputs: one release-set folder per BRD,
+`docs/deliverables/out/<drop folder>/BRD-nn_<Name>/`, and programme-level items by kind under `out/Programme/<kind>/`;
+files are named `BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>`.
 
 ### Deliverables by drop
 
 BDOI keeps the BRDs, FRS, test plans and other collaterals grouped under its drops (answer A5 of 26-Sep-2026; drop plan
 [`BDOI_DROP_PLAN.md`](../source-documents/BDOI_DROP_PLAN.md); map in
-[`PROGRAMME_ALIGNMENT.md`](../architecture/PROGRAMME_ALIGNMENT.md) section 2.3). Each drop folder has an index
-`README.md` that lists every document with its BRD, version and the BDOI dates of the drop.
+[`PROGRAMME_ALIGNMENT.md`](../architecture/PROGRAMME_ALIGNMENT.md) section 2.3). Inside a drop folder each BRD has its
+release-set folder `BRD-nn_<Name>/` (section "Release and sign-off per BRD"). Each drop folder has an index `README.md`
+that lists every document with its BRD, version and the BDOI dates of the drop.
 
 | Drop folder | BRDs (primary drop) | BDOI dates | Index |
 |---|---|---|---|
@@ -230,20 +273,20 @@ A BRD that spans drops lives in its primary drop, and the index of the other dro
 Production Reconciliation and BRD-4 Marketing Collection extraction (Drop 2), BRD-3 quotation and BRD-8 EB placement and
 reports (Drop 1), BRD-1 client onboarding and BRD-5 GL accounts (Drop 0), BRD-13 legacy invoices (Drop 1), BRD-9 service
 requests and BRD-10 Bridger Insight (Drop 2). The builders take the folder from the drop map in
-`tools/deliverables/brand.py` (`BRD_DROP`), so a rebuild lands in the drop folder; `python
+`tools/deliverables/brand.py` (`BRD_DROP`, `BRD_NAMES`), so a rebuild lands in the BRD's release-set folder; `python
 tools/deliverables/drop_index.py` regenerates the four indexes.
 
 ### Status
 
 | # | Document | Drop | Status |
 |---|---|---|---|
-| 1 | FRS, one per BRD (BRD-5 in two volumes with a cover note) | Drop of each BRD (BRD-00: Programme) | v1.0 issued for BDOI review, BRD-2, BRD-6, BRD-11 and BRD-13 at v1.1 (programme alignment and BDOI answers of 26-Sep-2026): the `FRS/` folder of each drop, 16 Word files: the BRD-00 Core Replacement umbrella, BRD-1 to BRD-13 (BRD-13 Data Migration added) and the BRD-5 cover note. The Claims FRS numbers its requirements FR-CM-nnn (renumbered from FR-CL-nnn, which Collections keeps; DCR-188) |
+| 1 | FRS, one per BRD (BRD-5 in two volumes with a cover note) | Drop of each BRD (BRD-00: Programme) | v1.0 issued for BDOI review, BRD-2, BRD-6, BRD-11 and BRD-13 at v1.1 (programme alignment and BDOI answers of 26-Sep-2026): the release-set folder of each BRD, 16 Word files: the BRD-00 Core Replacement umbrella, BRD-1 to BRD-13 (BRD-13 Data Migration added) and the BRD-5 cover note. The Claims FRS numbers its requirements FR-CM-nnn (renumbered from FR-CL-nnn, which Collections keeps; DCR-188) |
 | 2 | Discrepancy and clarification register | Programme | v1.2: `out/Programme/Registers/BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`: 239 items (programme alignment DCR-210 to DCR-235 and Data Migration v1.1 DCR-240 to DCR-243 added; DCR-236 to DCR-239 not used; DCR-135 answered by the IER) with a Drop column, and 453 questions (IQ01-IQ35 of the programme alignment and DSQ01-DSQ04 of the document storage decision added; DMQ25-DMQ26, DMQ36-DMQ39 answered) |
-| 3 | Test plans, one per FRS volume | Drop of each BRD | v1.0 (BRD-6 and BRD-13 at v1.1): the `TestPlans/` folder of each drop, 14 workbooks and 14 Word summaries (BRD-1 to BRD-13, BRD-5 in two volumes); builder `src/testplans/build_test_plan.py`. The Claims plan uses case IDs keyed on FR-CM. Not yet written: the cross-cutting FR-CR requirements of BRD-00 |
-| 3 | Test plan BRD-13 Data Migration | Drop 0 | v1.1: `out/Drop-0_Setup_and_Data_Migration/TestPlans/BIBS_TestPlan_BRD-13_Data_Migration_v1.1.xlsx` and summary (152 cases) |
+| 3 | Test plans, one per FRS volume | Drop of each BRD | v1.0 (BRD-6 and BRD-13 at v1.1): the release-set folder of each BRD, 14 workbooks and 14 Word summaries (BRD-1 to BRD-13, BRD-5 in two volumes); builder `src/testplans/build_test_plan.py`. The Claims plan uses case IDs keyed on FR-CM. Not yet written: the cross-cutting FR-CR requirements of BRD-00 |
+| 3 | Test plan BRD-13 Data Migration | Drop 0 | v1.1: `out/Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/BIBS_TestPlan_BRD-13_Data_Migration_v1.1.xlsx` and summary (152 cases) |
 | 17 | Reports in Excel and PDF; documents and schedules in Word and PDF | All (platform) | Built in the platform (`ExportFormat.DOCX`, document renditions); see Developer Guide 6.1-6.2 |
-| 20 | Upload and download templates | Drop 0 (migration templates) | Migration extract templates: `out/Drop-0_Setup_and_Data_Migration/Migration/templates/` (27 layouts and the control file). Platform upload and download templates follow after the build |
-| 29 | Data migration (BRD-13) | Drop 0 | v1.1 (BDOI timeline, go-live January 2028): Strategy and Approach (52 pages), Data Requirements Workbook (31 data objects, 27 extract layouts, 352 fields, 51 data-quality rules), Cutover Runbook and Task Plan (75 tasks, T-30 to T+30), Reconciliation Approach and Sign-off, in `out/Drop-0_Setup_and_Data_Migration/Migration/`; FRS BRD-13 v1.1 (80 pages); source `src/migration/` |
+| 20 | Upload and download templates | Drop 0 (migration templates) | Migration extract templates: `out/Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/templates/` (27 layouts and the control file). Platform upload and download templates follow after the build |
+| 29 | Data migration (BRD-13) | Drop 0 | v1.1 (BDOI timeline, go-live January 2028): Strategy and Approach (52 pages), Data Requirements Workbook (31 data objects, 27 extract layouts, 352 fields, 51 data-quality rules), Cutover Runbook and Task Plan (75 tasks, T-30 to T+30), Reconciliation Approach and Sign-off, in `out/Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/`; FRS BRD-13 v1.1 (80 pages); source `src/migration/` |
 | 41 | Business process deck | Programme | v1.0: `out/Programme/Decks/BIBS_Deck_BRD-00_Business_Process_AsIs_Envisioned_BestPractice_v1.0.pptx` |
 | 42 | Programme alignment and integration inventory | Programme | v1.0: `out/Programme/Alignment/BIBS_Alignment_BRD-00_Drops_Integrations_Infrastructure_v1.0.docx`, `BIBS_Alignment_BRD-00_Integration_Inventory_v1.0.xlsx` (20 integrations) and the IER diagrams in `out/Programme/Alignment/IER/`; source `src/alignment/` |
 

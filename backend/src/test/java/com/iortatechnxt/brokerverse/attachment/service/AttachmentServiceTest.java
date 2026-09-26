@@ -84,7 +84,7 @@ class AttachmentServiceTest {
     assertThat(saved.getStoredFileId()).isEqualTo(11L);
     saved.storedIn(null); // an attachment kept in the database before ST1
     when(attachments.findById(7L)).thenReturn(Optional.of(saved));
-    when(contents.findById(7L))
+    when(contents.findById(any()))
         .thenReturn(
             Optional.of(new AttachmentContent(7L, "tampered".getBytes(StandardCharsets.UTF_8))));
     assertThatThrownBy(() -> service.download(7L))

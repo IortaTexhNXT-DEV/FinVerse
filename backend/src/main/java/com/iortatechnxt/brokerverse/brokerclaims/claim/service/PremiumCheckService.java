@@ -20,7 +20,6 @@ import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.time.LocalDate;
-import java.util.Locale;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -196,8 +195,7 @@ public class PremiumCheckService {
   }
 
   private String directPaymentPolicy() {
-    String policy =
-        parameters.text(ClaimCodes.PARAM_AUTH_DP_POLICY, CONFIRM).strip().toUpperCase(Locale.ROOT);
+    String policy = parameters.text(ClaimCodes.PARAM_AUTH_DP_POLICY, CONFIRM).strip();
     return ALLOW.equals(policy) || CONFIRM.equals(policy) ? policy : BLOCK;
   }
 

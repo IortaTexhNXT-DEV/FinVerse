@@ -198,7 +198,7 @@ public record ClaimResponse(
     static Premium from(CoverSnapshot s, ClaimView v) {
       ClaimPremiumStatus now = v.premium().status();
       boolean directAllowed =
-          now == ClaimPremiumStatus.DIRECT_PAYMENT && !"BLOCK".equalsIgnoreCase(v.dpPolicy());
+          now == ClaimPremiumStatus.DIRECT_PAYMENT && !"BLOCK".equals(v.dpPolicy());
       boolean allowed = now == ClaimPremiumStatus.PAID || directAllowed;
       return new Premium(
           s.getPremiumStatus(),

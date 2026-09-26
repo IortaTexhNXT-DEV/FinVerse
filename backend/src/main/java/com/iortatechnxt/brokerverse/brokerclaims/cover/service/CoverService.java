@@ -240,15 +240,13 @@ public class CoverService {
             .filter(Objects::nonNull)
             .findFirst()
             .orElse(null);
-    return stamp == null
-        ? new CoverSnapshot.Sales(null, null, null, null, null, branch)
-        : new CoverSnapshot.Sales(
-            stamp.region(),
-            stamp.department(),
-            stamp.team(),
-            stamp.accountOfficer(),
-            stamp.costCenter(),
-            branch);
+    return new CoverSnapshot.Sales(
+        stamp.region(),
+        stamp.department(),
+        stamp.team(),
+        stamp.accountOfficer(),
+        stamp.costCenter(),
+        branch);
   }
 
   /**

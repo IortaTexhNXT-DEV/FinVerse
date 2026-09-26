@@ -19,7 +19,7 @@ Tick the last column during the UAT readiness review.
 | S6 | Uniform flag chips in their own column or the header flag list | `Tag` | Client header, account flags, PR worklist | `client-record`, `collections-worklist` | Done | ☐ |
 | S7 | Sticky Header Blue table header, zebra rows, hover and selected row | `DataTable`, `patterns.css` | All tables | any list | Done | ☐ |
 | S8 | Column alignment by kind: text left, amounts right with the currency in the header, dates dd-MMM-yyyy, timestamps dd-MMM-yyyy HH:mm, fixed code columns | `Column.kind`, `formatDate`, `formatDateTime` | Unapplied payments, requests to Cashiering; every date on screen | `collections-unapplied`, `collections-unapplied-requests` | Done | ☐ |
-| S9 | Sortable headers where the API sorts; pagination with "Showing x to y of n results" and Rows per Page | `DataTable` `sortKey` / `onSort`, `Pager` `onSize` | Available to every list; lists adopt it with their API sort | any list | Done (component) | ☐ |
+| S9 | Sortable headers where the API sorts; pagination with "Showing x to y of n results" and Rows per Page | `DataTable` `sortKey` / `onSort`, `Pager` `onSize` | Available to every list; no list API takes a sort parameter yet, so the lists keep the server order (the history table sorts on the client) | `client-record` | Done (component) | ☐ |
 | S10 | Skeleton rows while loading; empty state with the next action | `DataTable`, `EmptyState` | All tables | `notifications` | Done | ☐ |
 | S11 | Totals row styling | `DataTable` `footer`, `.row-total` | Reports and statements with totals | `remittance-batch` | Done | ☐ |
 | S12 | One cell = one primary value and at most one muted line; dash for empty; states as neutral pills | `CellStack`, `EmptyCell` | Unapplied payments, PR worklist | `collections-unapplied`, `collections-worklist` | Done | ☐ |
@@ -44,7 +44,7 @@ Tick the last column during the UAT readiness review.
 |---|---|---|---|---|---|---|
 | B1 | Notification panel grouped by day with icon, title, summary, reference chip and relative time; unread styling; mark one or all read; View All | `NotificationBell`, `NotificationItem` | Header of every screen | `notification-panel` | Done | ☐ |
 | B2 | Notifications page with filters kept in the URL | `NotificationsPage` | `/notifications` | `notifications` | Done | ☐ |
-| B3 | A notification opens its record (the link sent by the server) | `NotificationBell` | Header | `notification-panel` | Done | ☐ |
+| B3 | A notification opens its record (the link sent by the server) and, where the link names it, the tab (`?tab=`) | `NotificationBell`, `useTabParam` | Header; client record tabs | `notification-panel` | Done | ☐ |
 | B4 | Inbox and approvals badge counts from the same service as the lists | `HeaderTools` | Header | any | Done | ☐ |
 | B5 | Field errors inline under the field, field outlined | `Field` | All forms | `new-client` | Done | ☐ |
 | B6 | Form error banner listing the errors, each linked to its field | `ErrorAlert` | All forms | — | Done | ☐ |

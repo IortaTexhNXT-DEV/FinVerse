@@ -16,6 +16,7 @@ import { FilterChips } from './FilterChips';
 import { PageHeader } from './PageHeader';
 import { StatusPage } from './StatusPage';
 import { Tabs } from './Tabs';
+import { useTabParam } from './useTabParam';
 import { useUnsavedChangesGuard } from './useUnsavedChangesGuard';
 
 describe('confirmation dialog', () => {
@@ -232,5 +233,41 @@ describe('tabs', () => {
     await userEvent.keyboard('{ArrowRight}');
     expect(screen.getByRole('tab', { name: 'Details' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tab', { name: 'History' })).toHaveAttribute('tabindex', '-1');
+  });
+});
+
+describe('tab in the URL', () => {
+  function RecordTabs() {
+    const [tab, setTab] = useTabParam(['details', 'kyc', 'history'] as const, 'details');
+    const [params] = useSearchParams();
+    return (
+      <>
+        <Tabs
+          tabs={[
+            { id: 'details', label: 'Details' },
+            { id: 'kyc', label: 'KYC' },
+            { id: 'history', label: 'History' },
+          ]}
+          active={tab}
+          onChange={setTab}
+        />
+        <output aria-label="query">{params.toString()}</output>
+      </>
+    );
+  }
+
+  it('opens the tab named in the link and keeps the chosen tab in the URL', async () => {
+    render(
+      <MemoryRouter initialEntries={['/crm/clients/9?tab=history']}>
+        <Routes>
+          <Route path="/crm/clients/:id" element={<RecordTabs />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole('tab', { name: 'History' })).toHaveAttribute('aria-selected', 'true');
+    await userEvent.click(screen.getByRole('tab', { name: 'KYC' }));
+    expect(screen.getByLabelText('query')).toHaveTextContent('tab=kyc');
+    await userEvent.click(screen.getByRole('tab', { name: 'Details' }));
+    expect(screen.getByLabelText('query')).toHaveTextContent('');
   });
 });

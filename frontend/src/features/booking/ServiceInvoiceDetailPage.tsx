@@ -148,7 +148,7 @@ function Facts({ si: s }: Readonly<{ si: ServiceInvoice }>) {
             {s.recipientName} <span className="muted">{s.recipientCode}</span>
           </SummaryFact>
           <SummaryFact icon={Mail} label="Billing e-mail">
-            {s.recipientEmail ?? 'None'}
+            {s.recipientEmail ?? '—'}
           </SummaryFact>
           <SummaryFact icon={CalendarDays} label="Issue date">
             {formatDate(s.issueDate)}

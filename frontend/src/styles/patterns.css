@@ -40,6 +40,15 @@
   white-space: nowrap;
 }
 
+/* References in a cell (links, bold codes, chips) never wrap: PAY-2026-000010 stays on one line */
+.table td > a,
+.table td > strong,
+.table td > code,
+.table td .cell-stack > span:first-child > strong,
+.table td .ref-chip {
+  white-space: nowrap;
+}
+
 .table td.col-datetime,
 .table td.col-date {
   white-space: nowrap;

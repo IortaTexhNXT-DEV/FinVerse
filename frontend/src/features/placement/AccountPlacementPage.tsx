@@ -68,7 +68,7 @@ function Summary({ account, view }: Readonly<{ account: Account; view: Placement
           {slip ? `${slip.displayNo} (${humanize(slip.status)})` : 'Not generated'}
         </Fact>
         <Fact icon={<CalendarClock size={16} aria-hidden="true" />} label="Hold cover">
-          {hold ? `${humanize(hold.status)} until ${hold.expiryDate}` : 'None'}
+          {hold ? `${humanize(hold.status)} until ${hold.expiryDate}` : '—'}
         </Fact>
       </div>
     </Card>

@@ -1,6 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FilePlus2 } from 'lucide-react';
-import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { clientsApi } from '@/api/clients';
 import type { ClientDetail } from '@/api/clients';
@@ -12,6 +11,7 @@ import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
+import { useTabParam } from '@/components/ui/useTabParam';
 import { Tag } from '@/components/ui/Tag';
 import { UserName } from '@/components/ui/UserName';
 import { ClientProposalsTab } from '@/features/proposals/ClientProposalsTab';
@@ -122,7 +122,10 @@ export default function ClientDetailPage() {
   const id = Number(useParams().id);
   const queryClient = useQueryClient();
   const { can } = useAuth();
-  const [tab, setTab] = useState<TabId>('details');
+  const [tab, setTab] = useTabParam<TabId>(
+    TABS.map((t) => t.id),
+    'details',
+  );
   const client = useQuery({ queryKey: ['crm', 'client', id], queryFn: () => clientsApi.get(id) });
 
   if (client.data === undefined) {

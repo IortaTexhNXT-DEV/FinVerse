@@ -101,5 +101,6 @@ public class ClaimLocation extends BaseEntity {
    * @param province province
    * @param locationKey normalised location key
    */
-  public record Place(int itemNo, String address, String city, String province, String locationKey) {}
+  public record Place(
+      int itemNo, String address, String city, String province, String locationKey) {}
 }

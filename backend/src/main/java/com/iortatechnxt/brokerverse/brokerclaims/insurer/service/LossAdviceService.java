@@ -32,9 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
  * The loss advice to the insurers (process p.24-25, NFR 15.14, BRCLM.041; FR-CL-024): the PLA /
  * formal loss advice composed from template {@code BCL_LOSS_ADVICE} for each insurer of the claim,
  * e-mailed to the recipients the officer confirms (the insurer's placement mailboxes are proposed:
- * the insurer master has no claims mailbox yet, CLQ11 / CLQ22) with a send log on the claim, and the
- * generated PDF stored with the claim as document type {@code CLAIM_REPORT}, linked to the account
- * and the client so the contact centre finds it (decision D3, BRCSF-009).
+ * the insurer master has no claims mailbox yet, CLQ11 / CLQ22) with a send log on the claim, and
+ * the generated PDF stored with the claim as document type {@code CLAIM_REPORT}, linked to the
+ * account and the client so the contact centre finds it (decision D3, BRCSF-009).
  */
 @Service
 @Transactional
@@ -99,16 +99,22 @@ public class LossAdviceService {
     List<Draft> drafts = new ArrayList<>();
     for (String code : insurerCodes(all)) {
       InsurerProfile insurer = insurers.requireInsurer(claim.getCompanyId(), code);
-      LossAdviceDocument.Advice advice = document.compose(claim, insurer, all, LocalDate.now(clock));
+      LossAdviceDocument.Advice advice =
+          document.compose(claim, insurer, all, LocalDate.now(clock));
       drafts.add(
-          new Draft(code, insurer.getName(), insurer.getPlacementEmailList(), advice.subject(), advice.body()));
+          new Draft(
+              code,
+              insurer.getName(),
+              insurer.getPlacementEmailList(),
+              advice.subject(),
+              advice.body()));
     }
     return drafts;
   }
 
   /**
-   * E-mails the advice to the chosen insurers, one e-mail each, and stores each generated advice
-   * as a claims report (R2).
+   * E-mails the advice to the chosen insurers, one e-mail each, and stores each generated advice as
+   * a claims report (R2).
    *
    * @param claim claim
    * @param recipients insurers with their recipients
@@ -171,12 +177,18 @@ public class LossAdviceService {
                 r.body() == null || r.body().isBlank() ? advice.body() : r.body(),
                 List.of(new MessageFile(stored.getFileName(), "application/pdf", pdf)),
                 null,
-                new RecordLink(ClaimCodes.ENTITY_TYPE, String.valueOf(claim.getId()), claim.getClaimNo())));
+                new RecordLink(
+                    ClaimCodes.ENTITY_TYPE, String.valueOf(claim.getId()), claim.getClaimNo())));
     audit.record(
         ClaimCodes.ENTITY_TYPE,
         claim.getClaimNo(),
         AuditAction.UPDATE,
-        "Loss advice to " + r.insurerCode() + " (" + String.join(", ", r.to()) + ") as " + stored.getFileName());
+        "Loss advice to "
+            + r.insurerCode()
+            + " ("
+            + String.join(", ", r.to())
+            + ") as "
+            + stored.getFileName());
     return new Sent(r.insurerCode(), queued.messageId(), stored.getId(), stored.getFileName());
   }
 
@@ -196,7 +208,11 @@ public class LossAdviceService {
    * @param body body
    */
   public record Draft(
-      String insurerCode, String insurerName, List<String> suggestedTo, String subject, String body) {
+      String insurerCode,
+      String insurerName,
+      List<String> suggestedTo,
+      String subject,
+      String body) {
 
     /** Defensive copy. */
     public Draft {

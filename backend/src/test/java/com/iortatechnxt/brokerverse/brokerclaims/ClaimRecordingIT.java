@@ -33,10 +33,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * Recording a claim on a cover and its premium check (BRCLM.001/003/004/006/009/016/039; wave
- * CL1-A exit criterion 1): a claim on an unpaid cover is recorded and flagged, the authorization
- * code is refused, and after the premium is paid in Cashiering the claim is authorised; the loss
- * rules, the direct-payment policy, the reported date, claimant and cover refresh.
+ * Recording a claim on a cover and its premium check (BRCLM.001/003/004/006/009/016/039; wave CL1-A
+ * exit criterion 1): a claim on an unpaid cover is recorded and flagged, the authorization code is
+ * refused, and after the premium is paid in Cashiering the claim is authorised; the loss rules, the
+ * direct-payment policy, the reported date, claimant and cover refresh.
  */
 @IntegrationTest
 class ClaimRecordingIT {
@@ -55,7 +55,11 @@ class ClaimRecordingIT {
   /** Collects the {@link ClaimRecorded} events (the contract with the status engine). */
   @Component
   static class RecordedEvents {
-    final List<ClaimRecorded> events = new ArrayList<>();
+    private final List<ClaimRecorded> events = new ArrayList<>();
+
+    List<ClaimRecorded> events() {
+      return events;
+    }
 
     @EventListener
     void on(ClaimRecorded event) {
@@ -82,7 +86,7 @@ class ClaimRecordingIT {
     assertThat(recordedClaim.getCover().getCurrency()).isEqualTo("PHP");
     assertThat(recordedClaim.getCover().getCoverVersionNo()).isZero();
     assertThat(recordedClaim.getLoss().getClaimantName()).isEqualTo(invoice.getAssuredName());
-    assertThat(recorded.events)
+    assertThat(recorded.events())
         .anySatisfy(
             e -> {
               assertThat(e.claimId()).isEqualTo(id);
@@ -96,13 +100,16 @@ class ClaimRecordingIT {
         .isEqualTo(1L);
     assertThat(
             jdbc.queryForObject(
-                "select stage_code from wf_case where entity_type = 'BrokerClaim' and entity_id = ?",
+                "select stage_code from wf_case where entity_type = 'BrokerClaim' and entity_id ="
+                    + " ?",
                 String.class,
                 String.valueOf(id)))
         .isEqualTo("NEW");
     var view = views.view(fx.company(), id);
     assertThat(view.premium().blocking()).isTrue();
-    assertThat(view.premium().unpaid()).extracting(u -> u.invoiceNo()).contains(invoice.getInvoiceNo());
+    assertThat(view.premium().unpaid())
+        .extracting(u -> u.invoiceNo())
+        .contains(invoice.getInvoiceNo());
 
     assertThatThrownBy(() -> as.run(OFFICER, () -> premiums.authorize(fx.company(), id, null)))
         .isInstanceOf(BusinessRuleException.class)
@@ -141,12 +148,22 @@ class ClaimRecordingIT {
     OpsInvoice invoice = fx.motorInvoice();
     String arn = invoice.getArn();
     LocalDate today = LocalDate.now();
-    assertRefused(ClaimsFixtures.request(" ", ClaimsFixtures.loss("MOTOR_OWN_DAMAGE"), List.of(), List.of()), "Select the cover of the claim");
     assertRefused(
-        ClaimsFixtures.request(arn, loss(today.plusDays(1), today.plusDays(1), "MOTOR_OWN_DAMAGE"), List.of(), List.of()),
+        ClaimsFixtures.request(" ", ClaimsFixtures.loss("MOTOR_OWN_DAMAGE"), List.of(), List.of()),
+        "Select the cover of the claim");
+    assertRefused(
+        ClaimsFixtures.request(
+            arn,
+            loss(today.plusDays(1), today.plusDays(1), "MOTOR_OWN_DAMAGE"),
+            List.of(),
+            List.of()),
         "Enter a loss date that is not in the future");
     assertRefused(
-        ClaimsFixtures.request(arn, loss(today.minusDays(3), today.minusDays(4), "MOTOR_OWN_DAMAGE"), List.of(), List.of()),
+        ClaimsFixtures.request(
+            arn,
+            loss(today.minusDays(3), today.minusDays(4), "MOTOR_OWN_DAMAGE"),
+            List.of(),
+            List.of()),
         "The reported date must be between the loss date and today");
     assertRefused(
         ClaimsFixtures.request(arn, loss(today.minusDays(3), today, null), List.of(), List.of()),
@@ -157,13 +174,31 @@ class ClaimRecordingIT {
         ClaimsFixtures.request(arn, beforeCover, List.of(), List.of()),
         "is outside the cover period");
     NewClaim insurerReported =
-        new NewClaim(arn, 1, ClaimSource.INSURER_REPORTED, null, ClaimsFixtures.loss("MOTOR_THEFT"),
-            new LossDetails.Amounts(null, null, null), List.of(), List.of(), false, false);
+        new NewClaim(
+            arn,
+            1,
+            ClaimSource.INSURER_REPORTED,
+            null,
+            ClaimsFixtures.loss("MOTOR_THEFT"),
+            new LossDetails.Amounts(null, null, null),
+            List.of(),
+            List.of(),
+            false,
+            false);
     assertRefused(insurerReported, "insurer's claim number of an insurer-reported claim");
 
     NewClaim confirmed =
-        new NewClaim(arn, 1, ClaimSource.BDOI_NOTICE, "NEW_COMPLETE_DOCS", beforeCover,
-            new LossDetails.Amounts(null, null, null), List.of(), List.of(), true, false);
+        new NewClaim(
+            arn,
+            1,
+            ClaimSource.BDOI_NOTICE,
+            "NEW_COMPLETE_DOCS",
+            beforeCover,
+            new LossDetails.Amounts(null, null, null),
+            List.of(),
+            List.of(),
+            true,
+            false);
     Claim claim = as.run(OFFICER, () -> recording.record(fx.company(), confirmed));
     assertThat(claim.getLoss().getLossDate()).isEqualTo(ClaimsFixtures.coverFrom().minusDays(1));
   }
@@ -187,13 +222,16 @@ class ClaimRecordingIT {
                             company, id, LocalDate.now().plusDays(1), "DATA_CORRECTION", null)))
         .hasMessage("The reported date must be between the loss date and today");
     Claim corrected =
-        as.run(TL, () -> details.correctReportedDate(company, id, earlier, "DATA_CORRECTION", "Typo"));
+        as.run(
+            TL, () -> details.correctReportedDate(company, id, earlier, "DATA_CORRECTION", "Typo"));
     assertThat(corrected.getLoss().getReportedDate()).isEqualTo(earlier);
 
     assertThatThrownBy(() -> as.run(TL, () -> details.overrideClaimant(company, id, " ", "OTHERS")))
         .hasMessage("Enter the claimant's name");
     Claim overridden =
-        as.run(TL, () -> details.overrideClaimant(company, id, "Juan Dela Cruz (third party)", "OTHERS"));
+        as.run(
+            TL,
+            () -> details.overrideClaimant(company, id, "Juan Dela Cruz (third party)", "OTHERS"));
     assertThat(overridden.getLoss().isClaimantOverridden()).isTrue();
     assertThat(overridden.getLoss().getClaimantName()).isEqualTo("Juan Dela Cruz (third party)");
 
@@ -204,7 +242,15 @@ class ClaimRecordingIT {
                 details.amendLoss(
                     company,
                     id,
-                    new LossDetails.Loss(earlier, null, "MOTOR_OWN_DAMAGE", "MOTOR_OWN_DAMAGE", "Hit a post", null, "TYPHOON", "Typhoon Kristine"),
+                    new LossDetails.Loss(
+                        earlier,
+                        null,
+                        "MOTOR_OWN_DAMAGE",
+                        "MOTOR_OWN_DAMAGE",
+                        "Hit a post",
+                        null,
+                        "TYPHOON",
+                        "Typhoon Kristine"),
                     new LossDetails.Amounts(new BigDecimal("80000.00"), null, null)));
     assertThat(amended.getLoss().isCatastrophe()).isTrue();
     assertThatThrownBy(
@@ -215,7 +261,15 @@ class ClaimRecordingIT {
                         details.amendLoss(
                             company,
                             id,
-                            new LossDetails.Loss(earlier, null, "MOTOR_OWN_DAMAGE", "MOTOR_OWN_DAMAGE", "x", null, null, "Kristine"),
+                            new LossDetails.Loss(
+                                earlier,
+                                null,
+                                "MOTOR_OWN_DAMAGE",
+                                "MOTOR_OWN_DAMAGE",
+                                "x",
+                                null,
+                                null,
+                                "Kristine"),
                             new LossDetails.Amounts(null, null, null))))
         .hasMessage("Select the catastrophe code of the event");
 
@@ -232,12 +286,17 @@ class ClaimRecordingIT {
 
     jdbc.update("update bcl_claim set phase = 'CLOSED' where id = ?", id);
     assertThatThrownBy(
-            () -> as.run(TL, () -> details.correctReportedDate(company, id, earlier, "DATA_CORRECTION", null)))
+            () ->
+                as.run(
+                    TL,
+                    () ->
+                        details.correctReportedDate(company, id, earlier, "DATA_CORRECTION", null)))
         .hasMessage("The reported date of a closed claim cannot change");
   }
 
   private static LossDetails.Loss loss(LocalDate lossDate, LocalDate reported, String nature) {
-    return new LossDetails.Loss(lossDate, reported, nature, "MOTOR_OWN_DAMAGE", "Loss", null, null, null);
+    return new LossDetails.Loss(
+        lossDate, reported, nature, "MOTOR_OWN_DAMAGE", "Loss", null, null, null);
   }
 
   private void assertRefused(NewClaim request, String message) {

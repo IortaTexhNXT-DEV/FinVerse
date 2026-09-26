@@ -37,9 +37,7 @@ public class HandlerDirectory {
   public Handler of(String username) {
     List<Handler> found =
         jdbc.query(
-            SQL,
-            (rs, n) -> new Handler(rs.getString(1), rs.getObject(2, Long.class)),
-            username);
+            SQL, (rs, n) -> new Handler(rs.getString(1), rs.getObject(2, Long.class)), username);
     return found.isEmpty() ? new Handler(null, null) : found.get(0);
   }
 

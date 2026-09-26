@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /** The composed views of a cover: the Cover Lookup page and the cover card of Record Claim. */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // holder of nested types
 public final class CoverViews {
 
   private CoverViews() {}

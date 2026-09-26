@@ -169,7 +169,8 @@ public class CoverSnapshot {
    * @return "v&lt;old&gt; -&gt; v&lt;new&gt;"
    */
   public String useVersion(Version version) {
-    String change = label(coverVersionNo, coverVersionRef) + " -> " + label(version.no(), version.ref());
+    String change =
+        label(coverVersionNo, coverVersionRef) + " -> " + label(version.no(), version.ref());
     applyVersion(version);
     return change;
   }
@@ -197,7 +198,8 @@ public class CoverSnapshot {
   public void authorize(String code, String by, Instant at, Long evidenceAttachmentId) {
     if (isAuthorized()) {
       throw new BusinessRuleException(
-          "BCL_ALREADY_AUTHORIZED", "The claim already has authorization code " + authorizationCode);
+          "BCL_ALREADY_AUTHORIZED",
+          "The claim already has authorization code " + authorizationCode);
     }
     this.authorizationCode = code;
     this.authorizedBy = by;

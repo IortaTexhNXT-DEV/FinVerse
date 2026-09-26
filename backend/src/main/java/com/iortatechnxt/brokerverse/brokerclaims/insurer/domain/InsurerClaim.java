@@ -60,7 +60,11 @@ public class InsurerClaim extends BaseEntity {
    * @param reserveAmount initial insurer reserve, may be null
    */
   public InsurerClaim(
-      Long companyId, Long claimId, String insurerCode, BigDecimal sharePct, BigDecimal reserveAmount) {
+      Long companyId,
+      Long claimId,
+      String insurerCode,
+      BigDecimal sharePct,
+      BigDecimal reserveAmount) {
     requireShare(sharePct);
     requireReserve(reserveAmount);
     this.companyId = companyId;
@@ -139,7 +143,8 @@ public class InsurerClaim extends BaseEntity {
 
   private static void requireShare(BigDecimal share) {
     if (share != null && (share.signum() <= 0 || share.compareTo(HUNDRED) > 0)) {
-      throw new BusinessRuleException("BCL_SHARE_RANGE", "The share must be above 0 and at most 100");
+      throw new BusinessRuleException(
+          "BCL_SHARE_RANGE", "The share must be above 0 and at most 100");
     }
   }
 

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Request and response bodies of the insurer side of a claim (BRCLM.018/023/024/041/043). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // holder of nested types
 public final class InsurerDtos {
 
   private InsurerDtos() {}
@@ -244,7 +245,14 @@ public final class InsurerDtos {
      */
     public NewUpdate toUpdate() {
       return new NewUpdate(
-          insurerClaimId, updateDate, source, reference, remarks, attachmentIds, correctsUpdateId, null);
+          insurerClaimId,
+          updateDate,
+          source,
+          reference,
+          remarks,
+          attachmentIds,
+          correctsUpdateId,
+          null);
     }
   }
 
@@ -258,7 +266,11 @@ public final class InsurerDtos {
    * @param body body
    */
   public record AdviceDraftResponse(
-      String insurerCode, String insurerName, List<String> suggestedTo, String subject, String body) {
+      String insurerCode,
+      String insurerName,
+      List<String> suggestedTo,
+      String subject,
+      String body) {
 
     /**
      * Maps a draft.

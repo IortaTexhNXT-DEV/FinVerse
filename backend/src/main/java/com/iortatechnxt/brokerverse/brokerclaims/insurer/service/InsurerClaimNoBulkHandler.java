@@ -61,9 +61,14 @@ public class InsurerClaimNoBulkHandler implements BulkImportHandler {
     return List.of(
         BulkColumn.required(BulkClaimResolver.CLAIM_NO, "BDOI claim number", "BCL-2026-000001"),
         BulkColumn.required(BulkClaimResolver.INSURER, "Insurer code", "INS-MGIC"),
-        BulkColumn.required(BulkClaimResolver.INSURER_CLAIM_NO, "Insurer's claim number", "MGIC-CL-7781"),
+        BulkColumn.required(
+            BulkClaimResolver.INSURER_CLAIM_NO, "Insurer's claim number", "MGIC-CL-7781"),
         new BulkColumn(
-            REPORTED_ON, "Date the loss was reported to the insurer", false, BulkColumn.Type.DATE, "2026-09-20"));
+            REPORTED_ON,
+            "Date the loss was reported to the insurer",
+            false,
+            BulkColumn.Type.DATE,
+            "2026-09-20"));
   }
 
   @Override

@@ -63,7 +63,8 @@ class ClaimInsurersIT {
         () ->
             recording.record(
                 fx.company(),
-                ClaimsFixtures.request(invoice.getArn(), ClaimsFixtures.loss("FIRE"), picks, List.of())));
+                ClaimsFixtures.request(
+                    invoice.getArn(), ClaimsFixtures.loss("FIRE"), picks, List.of())));
   }
 
   private InsurerClaim line(Claim claim, String insurer) {
@@ -91,10 +92,12 @@ class ClaimInsurersIT {
     assertThat(view.insurerCount()).isEqualTo(2);
     assertThat(claims.ofCover(fx.company(), invoice.getArn())).hasSize(1);
 
-    assertThatThrownBy(() -> as.run(OFFICER, () -> locations.link(claim, List.of(new LocationPick(1, null)))))
+    assertThatThrownBy(
+            () -> as.run(OFFICER, () -> locations.link(claim, List.of(new LocationPick(1, null)))))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("is already on this claim");
-    assertThatThrownBy(() -> as.run(OFFICER, () -> locations.link(claim, List.of(new LocationPick(9, null)))))
+    assertThatThrownBy(
+            () -> as.run(OFFICER, () -> locations.link(claim, List.of(new LocationPick(9, null)))))
         .hasMessage("Location 9 is not on the cover " + invoice.getArn());
     as.run(OFFICER, () -> locations.link(claim, List.of(new LocationPick(3, "Fence"))));
     as.run(
@@ -115,22 +118,38 @@ class ClaimInsurersIT {
     InsurerClaim lead = line(claim, LEAD);
     as.run(OFFICER, () -> insurers.number(claim, lead.getId(), number, today, false));
     InsurerClaim co = line(claim, CO_INSURER);
-    as.run(OFFICER, () -> insurers.number(claim, co.getId(), "C-INSB-" + System.nanoTime(), today, false));
+    as.run(
+        OFFICER,
+        () -> insurers.number(claim, co.getId(), "C-INSB-" + System.nanoTime(), today, false));
 
-    assertThatThrownBy(() -> as.run(OFFICER, () -> insurers.number(claim, lead.getId(), number, today, false)))
+    assertThatThrownBy(
+            () -> as.run(OFFICER, () -> insurers.number(claim, lead.getId(), number, today, false)))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessage(
-            "Insurer claim number " + number + " is already recorded for " + LEAD + " on this claim");
+            "Insurer claim number "
+                + number
+                + " is already recorded for "
+                + LEAD
+                + " on this claim");
     assertThatThrownBy(
-            () -> as.run(OFFICER, () -> insurers.number(claim, co.getId(), "X", today.plusDays(1), false)))
+            () ->
+                as.run(
+                    OFFICER,
+                    () -> insurers.number(claim, co.getId(), "X", today.plusDays(1), false)))
         .hasMessageContaining("cannot be in the future");
     assertThatThrownBy(
-            () -> as.run(OFFICER, () -> insurers.add(claim, new NewLine(" ", null, null, null, null), false)))
+            () ->
+                as.run(
+                    OFFICER,
+                    () -> insurers.add(claim, new NewLine(" ", null, null, null, null), false)))
         .hasMessage("Select the insurer");
 
     Claim other = property(fx.propertyInvoice(1), List.of());
     InsurerClaim otherLead = line(other, LEAD);
-    assertThatThrownBy(() -> as.run(OFFICER, () -> insurers.number(other, otherLead.getId(), number, today, false)))
+    assertThatThrownBy(
+            () ->
+                as.run(
+                    OFFICER, () -> insurers.number(other, otherLead.getId(), number, today, false)))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("is already on claim " + claim.getClaimNo());
     as.run(OFFICER, () -> insurers.number(other, otherLead.getId(), number, today, true));
@@ -142,8 +161,14 @@ class ClaimInsurersIT {
         .isEqualTo(1L);
 
     InsurerClaim amended =
-        as.run(TL, () -> insurers.amendReserve(claim, lead.getId(), new BigDecimal("90000.00"), "Adjuster's estimate"));
-    as.run(TL, () -> insurers.amendReserve(claim, lead.getId(), new BigDecimal("120000.00"), "Revised"));
+        as.run(
+            TL,
+            () ->
+                insurers.amendReserve(
+                    claim, lead.getId(), new BigDecimal("90000.00"), "Adjuster's estimate"));
+    as.run(
+        TL,
+        () -> insurers.amendReserve(claim, lead.getId(), new BigDecimal("120000.00"), "Revised"));
     as.run(TL, () -> insurers.amendReserve(claim, co.getId(), BigDecimal.ZERO.setScale(2), "Nil"));
     assertThat(amended.getReserveAmount()).isEqualByComparingTo("90000.00");
     var history = insurers.reserveHistory(List.of(lead.getId()));
@@ -151,10 +176,16 @@ class ClaimInsurersIT {
     assertThat(history.get(0).getPreviousAmount()).isEqualByComparingTo("90000.00");
     assertThat(history.get(0).getNewAmount()).isEqualByComparingTo("120000.00");
     assertThat(history.get(0).getChangedBy()).isEqualTo(TL);
-    assertThat(views.view(fx.company(), claim.getId()).totalReserve()).isEqualByComparingTo("120000.00");
-    assertThatThrownBy(() -> as.run(TL, () -> insurers.amendReserve(claim, lead.getId(), new BigDecimal("-1.00"), "x")))
+    assertThat(views.view(fx.company(), claim.getId()).totalReserve())
+        .isEqualByComparingTo("120000.00");
+    assertThatThrownBy(
+            () ->
+                as.run(
+                    TL,
+                    () -> insurers.amendReserve(claim, lead.getId(), new BigDecimal("-1.00"), "x")))
         .hasMessage("The reserve cannot be negative");
-    assertThatThrownBy(() -> as.run(TL, () -> insurers.amendReserve(claim, lead.getId(), BigDecimal.ONE, " ")))
+    assertThatThrownBy(
+            () -> as.run(TL, () -> insurers.amendReserve(claim, lead.getId(), BigDecimal.ONE, " ")))
         .hasMessage("Enter the reason for the change");
     as.run(TL, () -> insurers.assignAdjuster(claim, co.getId(), "CRAWFORD"));
     assertThat(line(claim, CO_INSURER).getAdjusterCode()).isEqualTo("CRAWFORD");
@@ -181,22 +212,44 @@ class ClaimInsurersIT {
             () ->
                 updates.record(
                     claim,
-                    new NewUpdate(line(claim, LEAD).getId(), today, "EMAIL", "LTR-1", "Adjuster appointed", List.of(file), null, null)));
+                    new NewUpdate(
+                        line(claim, LEAD).getId(),
+                        today,
+                        "EMAIL",
+                        "LTR-1",
+                        "Adjuster appointed",
+                        List.of(file),
+                        null,
+                        null)));
     assertThat(first.getAttachmentIdList()).containsExactly(file);
     assertThatThrownBy(
-            () -> as.run(OFFICER, () -> updates.record(claim, new NewUpdate(null, today, "EMAIL", null, " ", null, null, null))))
+            () ->
+                as.run(
+                    OFFICER,
+                    () ->
+                        updates.record(
+                            claim,
+                            new NewUpdate(null, today, "EMAIL", null, " ", null, null, null))))
         .hasMessage("Enter the remarks");
     assertThatThrownBy(
             () ->
                 as.run(
                     OFFICER,
-                    () -> updates.record(claim, new NewUpdate(null, today.plusDays(1), "EMAIL", null, "x", null, null, null))))
+                    () ->
+                        updates.record(
+                            claim,
+                            new NewUpdate(
+                                null, today.plusDays(1), "EMAIL", null, "x", null, null, null))))
         .hasMessage("Enter an update date that is not in the future");
     jdbc.update("update bcl_claim set phase = 'CLOSED' where id = ?", claim.getId());
     InsurerUpdate correction =
         as.run(
             OFFICER,
-            () -> updates.record(claim, new NewUpdate(null, today, "LETTER", null, "Correction", null, first.getId(), null)));
+            () ->
+                updates.record(
+                    claim,
+                    new NewUpdate(
+                        null, today, "LETTER", null, "Correction", null, first.getId(), null)));
     assertThat(correction.getCorrectsUpdateId()).isEqualTo(first.getId());
     assertThat(updates.ofClaim(claim.getId())).hasSize(2);
   }
@@ -206,23 +259,45 @@ class ClaimInsurersIT {
     OpsInvoice invoice = fx.propertyInvoice(1);
     String arn = invoice.getArn();
     LocalDate start = LocalDate.now().minusMonths(1);
-    LocationRef first = as.run(OFFICER, () -> refs.maintain(fx.company(), new NewRef(arn, 1, LEAD, "A-LOC-0091", start)));
-    as.run(OFFICER, () -> refs.maintain(fx.company(), new NewRef(arn, 1, CO_INSURER, "B-77-12", start)));
-    assertThatThrownBy(() -> as.run(OFFICER, () -> refs.maintain(fx.company(), new NewRef(arn, 1, LEAD, " ", start))))
+    LocationRef first =
+        as.run(
+            OFFICER,
+            () -> refs.maintain(fx.company(), new NewRef(arn, 1, LEAD, "A-LOC-0091", start)));
+    as.run(
+        OFFICER,
+        () -> refs.maintain(fx.company(), new NewRef(arn, 1, CO_INSURER, "B-77-12", start)));
+    assertThatThrownBy(
+            () ->
+                as.run(
+                    OFFICER,
+                    () -> refs.maintain(fx.company(), new NewRef(arn, 1, LEAD, " ", start))))
         .hasMessage("Enter the insurer location reference");
-    assertThatThrownBy(() -> as.run(OFFICER, () -> refs.maintain(fx.company(), new NewRef(arn, 1, LEAD, "A-LOC-0105", start))))
+    assertThatThrownBy(
+            () ->
+                as.run(
+                    OFFICER,
+                    () ->
+                        refs.maintain(fx.company(), new NewRef(arn, 1, LEAD, "A-LOC-0105", start))))
         .hasMessageContaining("The effective date must be after");
     LocalDate next = LocalDate.now().plusMonths(1);
-    as.run(OFFICER, () -> refs.maintain(fx.company(), new NewRef(arn, 1, LEAD, "A-LOC-0105", next)));
+    as.run(
+        OFFICER, () -> refs.maintain(fx.company(), new NewRef(arn, 1, LEAD, "A-LOC-0105", next)));
 
     List<LocationRef> all = refs.ofCover(fx.company(), arn);
     assertThat(all).hasSize(3);
-    assertThat(all.stream().filter(r -> r.getId().equals(first.getId())).findFirst().orElseThrow().getEffectiveTo())
+    assertThat(
+            all.stream()
+                .filter(r -> r.getId().equals(first.getId()))
+                .findFirst()
+                .orElseThrow()
+                .getEffectiveTo())
         .isEqualTo(next.minusDays(1));
     assertThat(refs.validOn(fx.company(), arn, LocalDate.now()))
         .extracting(LocationRef::getInsurerLocationRef)
         .containsExactlyInAnyOrder("A-LOC-0091", "B-77-12");
-    assertThat(refs.search(fx.company(), arn, org.springframework.data.domain.PageRequest.of(0, 10)).getTotalElements())
+    assertThat(
+            refs.search(fx.company(), arn, org.springframework.data.domain.PageRequest.of(0, 10))
+                .getTotalElements())
         .isEqualTo(3);
   }
 
@@ -231,7 +306,15 @@ class ClaimInsurersIT {
     OpsInvoice invoice = fx.propertyInvoice(1);
     Claim claim = property(invoice, List.of(new LocationPick(1, "Roof")));
     as.run(TL, () -> insurers.assignAdjuster(claim, line(claim, LEAD).getId(), "CRAWFORD"));
-    as.run(OFFICER, () -> insurers.number(claim, line(claim, LEAD).getId(), "C-ADV-" + System.nanoTime(), LocalDate.now(), false));
+    as.run(
+        OFFICER,
+        () ->
+            insurers.number(
+                claim,
+                line(claim, LEAD).getId(),
+                "C-ADV-" + System.nanoTime(),
+                LocalDate.now(),
+                false));
 
     var drafts = as.run(OFFICER, () -> advice.drafts(claim));
     assertThat(drafts).hasSize(2);
@@ -242,11 +325,23 @@ class ClaimInsurersIT {
     assertThatThrownBy(() -> as.run(OFFICER, () -> advice.send(claim, List.of())))
         .hasMessage("Select at least one insurer");
     assertThatThrownBy(
-            () -> as.run(OFFICER, () -> advice.send(claim, List.of(new Recipient(CO_INSURER, List.of(), null, null, null)))))
+            () ->
+                as.run(
+                    OFFICER,
+                    () ->
+                        advice.send(
+                            claim,
+                            List.of(new Recipient(CO_INSURER, List.of(), null, null, null)))))
         .hasMessage("Enter the recipient address for " + CO_INSURER);
 
     var sent =
-        as.run(OFFICER, () -> advice.send(claim, List.of(new Recipient(LEAD, List.of("claims@insurer.test"), null, null, null))));
+        as.run(
+            OFFICER,
+            () ->
+                advice.send(
+                    claim,
+                    List.of(
+                        new Recipient(LEAD, List.of("claims@insurer.test"), null, null, null))));
     assertThat(sent).hasSize(1);
     Long attachment = sent.get(0).attachmentId();
     assertThat(
@@ -255,11 +350,14 @@ class ClaimInsurersIT {
         .isEqualTo("CLAIM_REPORT");
     assertThat(
             jdbc.queryForList(
-                "select entity_type from doc_attachment_link where attachment_id = ?", String.class, attachment))
+                "select entity_type from doc_attachment_link where attachment_id = ?",
+                String.class,
+                attachment))
         .containsExactlyInAnyOrder("Account", "Client");
     assertThat(
             jdbc.queryForObject(
-                "select count(*) from msg_outbound where entity_type = 'BrokerClaim' and entity_id = ?",
+                "select count(*) from msg_outbound where entity_type = 'BrokerClaim' and entity_id"
+                    + " = ?",
                 Long.class,
                 String.valueOf(claim.getId())))
         .isEqualTo(1L);

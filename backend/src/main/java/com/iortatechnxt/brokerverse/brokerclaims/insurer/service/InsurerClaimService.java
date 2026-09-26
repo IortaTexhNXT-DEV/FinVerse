@@ -26,9 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The insurers of a claim incident (BRCLM.018/023/024/043; FR-CL-021/031/032): one line per
- * insurer and insurer claim number under one claim reference, the insurer's share, the number and
- * date reported to the insurer (no duplicate for the same insurer and claim, AC6; a warning and the
+ * The insurers of a claim incident (BRCLM.018/023/024/043; FR-CL-021/031/032): one line per insurer
+ * and insurer claim number under one claim reference, the insurer's share, the number and date
+ * reported to the insurer (no duplicate for the same insurer and claim, AC6; a warning and the
  * alert {@code BCL_INSURER_CLAIM_NO_REUSED} when another claim carries it), the insurer reserve
  * with its amendment history (information only, no journal) and the adjuster per line.
  */
@@ -40,6 +40,8 @@ public class InsurerClaimService {
   public static final String REUSED = "BCL_INSURER_CLAIM_NO_REUSED";
 
   private static final String LINE = "InsurerClaim";
+
+  private static final String INSURER = "Insurer ";
 
   private final InsurerClaimRepository lines;
   private final ReserveChangeRepository reserves;
@@ -98,18 +100,20 @@ public class InsurerClaimService {
     if (line.insurerCode() == null || line.insurerCode().isBlank()) {
       throw new BusinessRuleException("BCL_INSURER_REQUIRED", "Select the insurer");
     }
-    String insurer = insurers.requireInsurer(claim.getCompanyId(), line.insurerCode().strip()).getPartyCode();
+    String insurer =
+        insurers.requireInsurer(claim.getCompanyId(), line.insurerCode().strip()).getPartyCode();
     String number = blankToNull(line.insurerClaimNo());
     checkNumber(claim, insurer, number, null, confirmReuse);
     InsurerClaim created =
-        new InsurerClaim(claim.getCompanyId(), claim.getId(), insurer, line.sharePct(), line.reserve());
+        new InsurerClaim(
+            claim.getCompanyId(), claim.getId(), insurer, line.sharePct(), line.reserve());
     created.number(number, line.reportedOn(), LocalDate.now(clock));
     InsurerClaim saved = lines.save(created);
     audit.record(
         ClaimCodes.ENTITY_TYPE,
         claim.getClaimNo(),
         AuditAction.UPDATE,
-        "Insurer " + insurer + " added" + (number == null ? "" : " with claim number " + number));
+        INSURER + insurer + " added" + (number == null ? "" : " with claim number " + number));
     return saved;
   }
 
@@ -129,7 +133,8 @@ public class InsurerClaimService {
     InsurerClaim line = require(claim, lineId);
     String value = blankToNull(number);
     if (value == null) {
-      throw new BusinessRuleException("BCL_INSURER_CLAIM_NO_REQUIRED", "Enter the insurer claim number");
+      throw new BusinessRuleException(
+          "BCL_INSURER_CLAIM_NO_REQUIRED", "Enter the insurer claim number");
     }
     if (line.getInsurerClaimNo() != null) {
       return add(
@@ -141,7 +146,7 @@ public class InsurerClaimService {
         ClaimCodes.ENTITY_TYPE,
         claim.getClaimNo(),
         AuditAction.UPDATE,
-        "Insurer " + line.getInsurerCode() + " claim number " + value);
+        INSURER + line.getInsurerCode() + " claim number " + value);
     return line;
   }
 
@@ -161,7 +166,7 @@ public class InsurerClaimService {
         ClaimCodes.ENTITY_TYPE,
         claim.getClaimNo(),
         AuditAction.UPDATE,
-        "Insurer " + line.getInsurerCode() + " share " + previous + " -> " + share);
+        INSURER + line.getInsurerCode() + " share " + previous + " -> " + share);
     return line;
   }
 
@@ -182,12 +187,24 @@ public class InsurerClaimService {
     BigDecimal previous = line.amendReserve(amount);
     reserves.save(
         new ReserveChange(
-            line.getId(), previous, amount, reason.strip(), currentUser.username(), clock.instant()));
+            line.getId(),
+            previous,
+            amount,
+            reason.strip(),
+            currentUser.username(),
+            clock.instant()));
     audit.record(
         ClaimCodes.ENTITY_TYPE,
         claim.getClaimNo(),
         AuditAction.UPDATE,
-        "Reserve of " + line.getInsurerCode() + " " + previous + " -> " + amount + ": " + reason.strip());
+        "Reserve of "
+            + line.getInsurerCode()
+            + " "
+            + previous
+            + " -> "
+            + amount
+            + ": "
+            + reason.strip());
     return line;
   }
 
@@ -261,12 +278,17 @@ public class InsurerClaimService {
                 .toList()
             : lines.findNumbered(claim.getCompanyId(), insurer, number);
     if (same.stream()
-        .anyMatch(l -> l.getClaimId().equals(claim.getId()) && !Objects.equals(l.getId(), lineId))) {
+        .anyMatch(
+            l -> l.getClaimId().equals(claim.getId()) && !Objects.equals(l.getId(), lineId))) {
       throw new BusinessRuleException(
           "BCL_INSURER_CLAIM_NO_DUPLICATE",
           number == null
-              ? "Insurer " + insurer + " is already on this claim"
-              : "Insurer claim number " + number + " is already recorded for " + insurer + " on this claim");
+              ? INSURER + insurer + " is already on this claim"
+              : "Insurer claim number "
+                  + number
+                  + " is already recorded for "
+                  + insurer
+                  + " on this claim");
     }
     List<String> others =
         same.stream()
@@ -280,8 +302,13 @@ public class InsurerClaimService {
     if (!confirmReuse) {
       throw new BusinessRuleException(
           REUSED,
-          "Insurer claim number " + number + " of " + insurer + " is already on claim "
-              + String.join(", ", others) + ". Confirm to continue");
+          "Insurer claim number "
+              + number
+              + " of "
+              + insurer
+              + " is already on claim "
+              + String.join(", ", others)
+              + ". Confirm to continue");
     }
     alerts.raise(
         REUSED,
@@ -290,8 +317,14 @@ public class InsurerClaimService {
             claim.getBranchId(),
             ClaimCodes.ENTITY_TYPE,
             String.valueOf(claim.getId()),
-            "Insurer claim number " + number + " of " + insurer + " on " + claim.getClaimNo()
-                + " is also on " + String.join(", ", others),
+            "Insurer claim number "
+                + number
+                + " of "
+                + insurer
+                + " on "
+                + claim.getClaimNo()
+                + " is also on "
+                + String.join(", ", others),
             null,
             REUSED + ":" + insurer + ":" + number));
   }

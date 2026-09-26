@@ -80,8 +80,8 @@ public interface BrokerClaimRepository extends JpaRepository<Claim, Long> {
       ClaimPhase phase, Pageable pageable);
 
   /**
-   * Open claims in one of the statuses changed on or after a time (claims special remittance
-   * feed, OQ46).
+   * Open claims in one of the statuses changed on or after a time (claims special remittance feed,
+   * OQ46).
    *
    * @param companyId company
    * @param statuses status codes
@@ -89,8 +89,9 @@ public interface BrokerClaimRepository extends JpaRepository<Claim, Long> {
    * @param since first time
    * @return claims
    */
-  List<Claim> findByCompanyIdAndProgressStatusCodeInAndProgressPhaseNotAndProgressStatusSinceGreaterThanEqual(
-      Long companyId, Collection<String> statuses, ClaimPhase phase, Instant since);
+  List<Claim>
+      findByCompanyIdAndProgressStatusCodeInAndProgressPhaseNotAndProgressStatusSinceGreaterThanEqual(
+          Long companyId, Collection<String> statuses, ClaimPhase phase, Instant since);
 
   /**
    * Claims of a client, newest first (client 360 view, BRCLM.040).
@@ -118,8 +119,8 @@ public interface BrokerClaimRepository extends JpaRepository<Claim, Long> {
       @Param("companyId") Long companyId, @Param("text") String text, Pageable pageable);
 
   /**
-   * Number of claims in the phases whose last change is on or before a time (retention review,
-   * NFR p.41).
+   * Number of claims in the phases whose last change is on or before a time (retention review, NFR
+   * p.41).
    *
    * @param phases phases
    * @param cutoff last activity on or before

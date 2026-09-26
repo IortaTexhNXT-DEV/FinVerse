@@ -81,8 +81,12 @@ public class InAppClaimsFeed implements ClaimsFeed {
     LocalDate from = since == null ? LocalDate.EPOCH : since;
     List<FeedItem> items = new ArrayList<>();
     for (Claim claim :
-        claims.findByCompanyIdAndProgressStatusCodeInAndProgressPhaseNotAndProgressStatusSinceGreaterThanEqual(
-            companyId, awaiting, ClaimPhase.CLOSED, from.atStartOfDay(ZoneOffset.UTC).toInstant())) {
+        claims
+            .findByCompanyIdAndProgressStatusCodeInAndProgressPhaseNotAndProgressStatusSinceGreaterThanEqual(
+                companyId,
+                awaiting,
+                ClaimPhase.CLOSED,
+                from.atStartOfDay(ZoneOffset.UTC).toInstant())) {
       items.addAll(items(claim));
     }
     return items;

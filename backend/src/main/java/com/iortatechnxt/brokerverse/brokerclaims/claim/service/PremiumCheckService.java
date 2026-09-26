@@ -18,9 +18,9 @@ import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Locale;
-import java.time.Clock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +46,7 @@ public class PremiumCheckService {
 
   private static final String CONFIRM = "CONFIRM";
   private static final String ALLOW = "ALLOW";
+  private static final String BLOCK = "BLOCK";
 
   private final CoverService covers;
   private final ClaimQueryService claims;
@@ -124,7 +125,10 @@ public class PremiumCheckService {
           claim.getHandler(),
           new Notice(
               "Premium of claim " + claim.getClaimNo() + " is paid",
-              cover.getArn() + " policy year " + cover.getPolicyYear() + ": the authorization code can be generated",
+              cover.getArn()
+                  + " policy year "
+                  + cover.getPolicyYear()
+                  + ": the authorization code can be generated",
               "/claims-handling/" + claim.getId(),
               ClaimCodes.ENTITY_TYPE,
               String.valueOf(claim.getId())));
@@ -170,9 +174,8 @@ public class PremiumCheckService {
     if (status == ClaimPremiumStatus.PAID) {
       return null;
     }
-    String policy =
-        parameters.text(ClaimCodes.PARAM_AUTH_DP_POLICY, CONFIRM).strip().toUpperCase(Locale.ROOT);
-    if (status != ClaimPremiumStatus.DIRECT_PAYMENT || !(ALLOW.equals(policy) || CONFIRM.equals(policy))) {
+    String policy = directPaymentPolicy();
+    if (status != ClaimPremiumStatus.DIRECT_PAYMENT || BLOCK.equals(policy)) {
       CoverSnapshot cover = claim.getCover();
       throw new BusinessRuleException(
           PREMIUM_UNPAID,
@@ -185,17 +188,23 @@ public class PremiumCheckService {
     if (ALLOW.equals(policy)) {
       return null;
     }
-    if (evidenceAttachmentId == null) {
-      throw new BusinessRuleException(
-          "BCL_DP_EVIDENCE_REQUIRED", "Attach the insurer's payment evidence first");
-    }
-    Attachment file = attachments.get(evidenceAttachmentId);
-    if (!ClaimCodes.ENTITY_TYPE.equals(file.getEntityType())
-        || !String.valueOf(claim.getId()).equals(file.getEntityId())) {
+    if (evidenceAttachmentId == null || !onClaim(claim, evidenceAttachmentId)) {
       throw new BusinessRuleException(
           "BCL_DP_EVIDENCE_REQUIRED", "Attach the insurer's payment evidence first");
     }
     return evidenceAttachmentId;
+  }
+
+  private String directPaymentPolicy() {
+    String policy =
+        parameters.text(ClaimCodes.PARAM_AUTH_DP_POLICY, CONFIRM).strip().toUpperCase(Locale.ROOT);
+    return ALLOW.equals(policy) || CONFIRM.equals(policy) ? policy : BLOCK;
+  }
+
+  private boolean onClaim(Claim claim, Long attachmentId) {
+    Attachment file = attachments.get(attachmentId);
+    return ClaimCodes.ENTITY_TYPE.equals(file.getEntityType())
+        && String.valueOf(claim.getId()).equals(file.getEntityId());
   }
 
   private static boolean becamePaid(ClaimPremiumStatus before, ClaimPremiumStatus now) {

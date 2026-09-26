@@ -34,8 +34,8 @@ import org.springframework.stereotype.Component;
 /**
  * Demo start-up of Claims Handling, wave CL1-A (demo profile only, idempotent), after the booking,
  * Operations and Collections runners: the Claims Officers record claims on the booked demo covers
- * through the real services - a motor claim with the authorization code when its premium is paid,
- * a property claim on a location with its insurer location reference, a typhoon tag, the insurer's
+ * through the real services - a motor claim with the authorization code when its premium is paid, a
+ * property claim on a location with its insurer location reference, a typhoon tag, the insurer's
  * claim number and an insurer update, a claim on a direct-payment cover and an insurer-reported
  * claim; the Team Head amends a reserve. Wave CL1-B extends the storyline with statuses. A step
  * that cannot run (a demo cover missing) is logged and skipped; start-up never fails.
@@ -51,6 +51,7 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
   private static final String HEAD = "clmth";
   private static final String MOTOR = "MOTOR_OWN_DAMAGE";
   private static final String FIRE = "FIRE";
+  private static final int LOSS_DAYS_AGO = 3;
 
   private final CompanyRepository companies;
   private final BrokerClaimRepository claims;
@@ -113,7 +114,14 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
 
   private void motor(Long companyId) {
     Claim claim =
-        record(OFFICER, companyId, "ARN-2026-940001", ClaimSource.BDOI_NOTICE, loss(MOTOR, "Rear-ended at a stoplight on EDSA", "EDSA Guadalupe, Makati"), List.of(), List.of());
+        record(
+            OFFICER,
+            companyId,
+            "ARN-2026-940001",
+            ClaimSource.BDOI_NOTICE,
+            loss(MOTOR, "Rear-ended at a stoplight on EDSA", "EDSA Guadalupe, Makati"),
+            List.of(),
+            List.of());
     try {
       users.as(OFFICER, () -> premiums.authorize(companyId, claim.getId(), null));
     } catch (BusinessRuleException ex) {
@@ -152,14 +160,30 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
             updates.record(
                 claim,
                 new NewUpdate(
-                    line.getId(), today, "EMAIL", "MGIC-ACK-0415", "Claim acknowledged; adjuster to inspect", List.of(), null, null)));
+                    line.getId(),
+                    today,
+                    "EMAIL",
+                    "MGIC-ACK-0415",
+                    "Claim acknowledged; adjuster to inspect",
+                    List.of(),
+                    null,
+                    null)));
     users.as(
         HEAD,
-        () -> insurers.amendReserve(claim, line.getId(), new BigDecimal("250000.00"), "Insurer's initial estimate"));
+        () ->
+            insurers.amendReserve(
+                claim, line.getId(), new BigDecimal("250000.00"), "Insurer's initial estimate"));
   }
 
   private void directPayment(Long companyId) {
-    record(OFFICER, companyId, "ARN-2026-940003", ClaimSource.BDOI_NOTICE, loss(MOTOR, "Side mirror and door damaged in a parking lot", "SM Seaside, Cebu City"), List.of(), List.of());
+    record(
+        OFFICER,
+        companyId,
+        "ARN-2026-940003",
+        ClaimSource.BDOI_NOTICE,
+        loss(MOTOR, "Side mirror and door damaged in a parking lot", "SM Seaside, Cebu City"),
+        List.of(),
+        List.of());
   }
 
   private void insurerReported(Long companyId) {
@@ -170,13 +194,26 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
         ClaimSource.INSURER_REPORTED,
         loss("MOTOR_THEFT", "Vehicle reported stolen by the assured to the insurer", "Quezon City"),
         List.of(),
-        List.of(new NewLine("INS-MGIC", new BigDecimal("100"), "MGIC-CL-2026-0402", LocalDate.now(clock), null)));
+        List.of(
+            new NewLine(
+                "INS-MGIC",
+                new BigDecimal("100"),
+                "MGIC-CL-2026-0402",
+                LocalDate.now(clock),
+                null)));
   }
 
   private LossDetails.Loss loss(String nature, String description, String place) {
     LocalDate today = LocalDate.now(clock);
     return new LossDetails.Loss(
-        today.minusDays(3), today.minusDays(2), nature, nature, description, place, null, null);
+        today.minusDays(LOSS_DAYS_AGO),
+        today.minusDays(2),
+        nature,
+        nature,
+        description,
+        place,
+        null,
+        null);
   }
 
   private Claim record(
@@ -208,7 +245,10 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
   private static void step(String name, Runnable work) {
     try {
       work.run();
-    } catch (BusinessRuleException | ResourceNotFoundException | DataAccessException | IllegalStateException ex) {
+    } catch (BusinessRuleException
+        | ResourceNotFoundException
+        | DataAccessException
+        | IllegalStateException ex) {
       LOG.warn("Claims demo step '{}' skipped: {}", name, ex.getMessage());
     }
   }

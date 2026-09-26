@@ -83,7 +83,9 @@ public class InsurerUpdate extends BaseEntity {
     this.attachmentIds =
         content.attachmentIds().isEmpty()
             ? null
-            : content.attachmentIds().stream().map(String::valueOf).collect(Collectors.joining(SEPARATOR));
+            : content.attachmentIds().stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(SEPARATOR));
     this.correctsUpdateId = content.correctsUpdateId();
     this.uploadRef = content.uploadRef();
     this.recordedBy = recordedBy;

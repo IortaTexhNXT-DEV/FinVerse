@@ -100,7 +100,11 @@ public class CoverController {
   public CoverDetail cover(@PathVariable String arn, @RequestParam Long companyId) {
     Account a = covers.account(companyId, arn);
     audit.recordIndependently(
-        currentUser.username(), "Account", a.getArn(), AuditAction.OPEN, "Cover viewed in Claims Handling");
+        currentUser.username(),
+        "Account",
+        a.getArn(),
+        AuditAction.OPEN,
+        "Cover viewed in Claims Handling");
     return new CoverDetail(
         CoverHit.from(a),
         Math.max(1, a.getTermYears()),

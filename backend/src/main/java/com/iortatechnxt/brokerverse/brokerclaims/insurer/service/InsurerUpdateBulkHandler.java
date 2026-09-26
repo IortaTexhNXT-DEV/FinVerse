@@ -20,10 +20,11 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * Bulk upload {@code BCL_INSURER_UPDATE} of insurer updates, e.g. an insurer's bordereau (BRCLM.041;
- * design 9.5, FR-CL-022): each row names the claim by BDOI claim number, or by insurer and insurer
- * claim number, with the update date, source, reference and remarks. Every row is validated before
- * the file is applied; the handler of each claim is notified of the updates loaded.
+ * Bulk upload {@code BCL_INSURER_UPDATE} of insurer updates, e.g. an insurer's bordereau
+ * (BRCLM.041; design 9.5, FR-CL-022): each row names the claim by BDOI claim number, or by insurer
+ * and insurer claim number, with the update date, source, reference and remarks. Every row is
+ * validated before the file is applied; the handler of each claim is notified of the updates
+ * loaded.
  */
 @Component
 public class InsurerUpdateBulkHandler implements BulkImportHandler {
@@ -76,18 +77,27 @@ public class InsurerUpdateBulkHandler implements BulkImportHandler {
   public List<BulkColumn> columns() {
     return List.of(
         BulkColumn.optional(BulkClaimResolver.CLAIM_NO, "BDOI claim number", "BCL-2026-000001"),
-        BulkColumn.optional(BulkClaimResolver.INSURER, "Insurer code, with the insurer claim number", "INS-MGIC"),
-        BulkColumn.optional(BulkClaimResolver.INSURER_CLAIM_NO, "Insurer's claim number", "MGIC-CL-7781"),
-        new BulkColumn(UPDATE_DATE, "Date of the update, not in the future", true, BulkColumn.Type.DATE, "2026-09-20"),
-        BulkColumn.required(SOURCE, "Source: EMAIL, LETTER, PORTAL, CALL or FILE (BCL_UPDATE_SOURCE)", "EMAIL"),
+        BulkColumn.optional(
+            BulkClaimResolver.INSURER, "Insurer code, with the insurer claim number", "INS-MGIC"),
+        BulkColumn.optional(
+            BulkClaimResolver.INSURER_CLAIM_NO, "Insurer's claim number", "MGIC-CL-7781"),
+        new BulkColumn(
+            UPDATE_DATE,
+            "Date of the update, not in the future",
+            true,
+            BulkColumn.Type.DATE,
+            "2026-09-20"),
+        BulkColumn.required(
+            SOURCE, "Source: EMAIL, LETTER, PORTAL, CALL or FILE (BCL_UPDATE_SOURCE)", "EMAIL"),
         BulkColumn.optional(REFERENCE, "Insurer's reference", "LTR-2026-114"),
         BulkColumn.required(REMARKS, "What the insurer communicated", "Adjuster appointed"));
   }
 
   @Override
   public String instructions() {
-    return "Name the claim by its BDOI claim number, or by the insurer and the insurer claim number."
-        + " Updates are added to the claim timeline and cannot be edited afterwards.";
+    return "Name the claim by its BDOI claim number, or by the insurer and the insurer claim"
+        + " number. Updates are added to the claim timeline and cannot be edited"
+        + " afterwards.";
   }
 
   @Override

@@ -55,7 +55,8 @@ class ClaimsFeedIT {
   private void awaitRemittance(Claim claim) {
     // The status engine is wave CL1-B's: the test sets the status the way it will.
     jdbc.update(
-        "update bcl_claim set status_code = ?, status_since = now(), phase = 'IN_PROGRESS' where id = ?",
+        "update bcl_claim set status_code = ?, status_since = now(), phase = 'IN_PROGRESS' where id"
+            + " = ?",
         REMITTANCE_STATUS,
         claim.getId());
   }
@@ -136,9 +137,11 @@ class ClaimsFeedIT {
 
     assertThat(retention.recordType()).isEqualTo(ClaimCodes.RETENTION_RECORD_TYPE);
     jdbc.update(
-        "update bcl_claim set phase = 'CLOSED', updated_at = now() - interval '12 years' where id = ?",
+        "update bcl_claim set phase = 'CLOSED', updated_at = now() - interval '12 years' where id ="
+            + " ?",
         claim.getId());
-    RetentionCriteria criteria = new RetentionCriteria(Set.of("CLOSED"), LocalDate.now().minusYears(10));
+    RetentionCriteria criteria =
+        new RetentionCriteria(Set.of("CLOSED"), LocalDate.now().minusYears(10));
     assertThat(retention.countEligible(criteria)).isPositive();
     assertThat(retention.eligible(criteria, 500))
         .anySatisfy(c -> assertThat(c.reference()).isEqualTo(claim.getClaimNo()));

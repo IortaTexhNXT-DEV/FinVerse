@@ -19,9 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Insurer location references (BRCLM.042; FR-CL-023): for each insured location of a cover and
- * each insurer, the reference the insurer uses, with effective dates. A new reference end-dates the
- * open one of the same location and insurer the day before it starts; nothing is deleted and every
+ * Insurer location references (BRCLM.042; FR-CL-023): for each insured location of a cover and each
+ * insurer, the reference the insurer uses, with effective dates. A new reference end-dates the open
+ * one of the same location and insurer the day before it starts; nothing is deleted and every
  * change is audited. Maintained on screen (BCL_LOCATION_REF_MAINTAIN) or by the bulk upload {@code
  * BCL_LOCATION_REF}. Where the references come from is open (CLQ18).
  */
@@ -73,8 +73,10 @@ public class LocationRefService {
     if (request.insurerCode() == null || request.insurerCode().isBlank()) {
       throw new BusinessRuleException("BCL_INSURER_REQUIRED", "Select the insurer");
     }
-    String insurer = insurers.requireInsurer(companyId, request.insurerCode().strip()).getPartyCode();
-    LocalDate from = request.effectiveFrom() == null ? LocalDate.now(clock) : request.effectiveFrom();
+    String insurer =
+        insurers.requireInsurer(companyId, request.insurerCode().strip()).getPartyCode();
+    LocalDate from =
+        request.effectiveFrom() == null ? LocalDate.now(clock) : request.effectiveFrom();
     LocationRef created =
         new LocationRef(
             companyId,
@@ -93,7 +95,11 @@ public class LocationRefService {
                   ENTITY,
                   open.getId(),
                   AuditAction.UPDATE,
-                  key(open) + " " + open.getInsurerLocationRef() + " ended " + open.getEffectiveTo());
+                  key(open)
+                      + " "
+                      + open.getInsurerLocationRef()
+                      + " ended "
+                      + open.getEffectiveTo());
             });
     LocationRef saved = refs.save(created);
     audit.record(

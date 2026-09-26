@@ -22,12 +22,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Keeps open claims in step with the Operations ledger (BRCLM.001/039, OQ46;
- * CLAIMS_BROKING_DESIGN 3.1 and 9.4). Each method runs in its own transaction after the ledger
- * change committed: a payment, reversal or cancellation of an invoice re-runs the premium check of
- * the open claims of its cover and policy year; a full remittance tells the handlers of claims
- * awaiting premium remittance ({@code BCL_PREMIUM_REMITTED}); an endorsement booked on the cover
- * tells the handlers of a newer cover version ({@code BCL_NEWER_COVER_VERSION}).
+ * Keeps open claims in step with the Operations ledger (BRCLM.001/039, OQ46; CLAIMS_BROKING_DESIGN
+ * 3.1 and 9.4). Each method runs in its own transaction after the ledger change committed: a
+ * payment, reversal or cancellation of an invoice re-runs the premium check of the open claims of
+ * its cover and policy year; a full remittance tells the handlers of claims awaiting premium
+ * remittance ({@code BCL_PREMIUM_REMITTED}); an endorsement booked on the cover tells the handlers
+ * of a newer cover version ({@code BCL_NEWER_COVER_VERSION}).
  */
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -171,7 +171,8 @@ public class ClaimOperationsSync {
     }
     OpsInvoice i = invoice.get();
     return claims
-        .findByCompanyIdAndCoverArnAndProgressPhaseNot(i.getCompanyId(), i.getArn(), ClaimPhase.CLOSED)
+        .findByCompanyIdAndCoverArnAndProgressPhaseNot(
+            i.getCompanyId(), i.getArn(), ClaimPhase.CLOSED)
         .stream()
         .filter(c -> c.getCover().getPolicyYear() == i.getPolicyYear())
         .toList();

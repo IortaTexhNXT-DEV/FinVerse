@@ -27,6 +27,8 @@ public class BulkClaimResolver {
   /** Column of the insurer claim number. */
   public static final String INSURER_CLAIM_NO = "Insurer Claim No.";
 
+  private static final String NOT_FOUND = "BCL_BULK_CLAIM";
+
   private final BrokerClaimRepository claims;
   private final InsurerClaimRepository lines;
 
@@ -51,17 +53,15 @@ public class BulkClaimResolver {
   public Claim byClaimNo(Long companyId, BulkRow row) {
     String claimNo = row.text(CLAIM_NO);
     if (claimNo == null) {
-      throw new BusinessRuleException("BCL_BULK_CLAIM", "Enter the claim number");
+      throw new BusinessRuleException(NOT_FOUND, "Enter the claim number");
     }
     return claims
         .findByCompanyIdAndClaimNo(companyId, claimNo)
-        .orElseThrow(
-            () -> new BusinessRuleException("BCL_BULK_CLAIM", "No claim found for " + claimNo));
+        .orElseThrow(() -> new BusinessRuleException(NOT_FOUND, "No claim found for " + claimNo));
   }
 
   /**
-   * The claim and insurer line of a row: by claim number, else by insurer and insurer claim
-   * number.
+   * The claim and insurer line of a row: by claim number, else by insurer and insurer claim number.
    *
    * @param companyId company
    * @param row row
@@ -75,13 +75,13 @@ public class BulkClaimResolver {
     String number = row.text(INSURER_CLAIM_NO);
     if (insurer == null || number == null) {
       throw new BusinessRuleException(
-          "BCL_BULK_CLAIM", "Enter the claim number, or the insurer and the insurer claim number");
+          NOT_FOUND, "Enter the claim number, or the insurer and the insurer claim number");
     }
     List<InsurerClaim> found = lines.findNumbered(companyId, insurer, number);
     List<Long> claimIds = found.stream().map(InsurerClaim::getClaimId).distinct().toList();
     if (claimIds.size() != 1) {
       throw new BusinessRuleException(
-          "BCL_BULK_CLAIM",
+          NOT_FOUND,
           claimIds.isEmpty()
               ? "No claim found for " + insurer + " " + number
               : "Several claims carry " + insurer + " " + number + "; enter the claim number");

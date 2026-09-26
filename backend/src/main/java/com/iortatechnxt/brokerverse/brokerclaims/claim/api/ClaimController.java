@@ -121,7 +121,9 @@ public class ClaimController {
   @PutMapping("/{id}/loss")
   @PreAuthorize(RECORD)
   public ClaimResponse amendLoss(
-      @PathVariable Long id, @RequestParam Long companyId, @Valid @RequestBody LossRequest request) {
+      @PathVariable Long id,
+      @RequestParam Long companyId,
+      @Valid @RequestBody LossRequest request) {
     details.amendLoss(companyId, id, request.toLoss(), request.toAmounts());
     return view(companyId, id);
   }

@@ -38,9 +38,9 @@ import org.springframework.transaction.annotation.Transactional;
  * policy year and version at the loss date) and loss data are mandatory; the snapshot copies the
  * policy number, period, sum insured, lead insurer, Marketing unit, AO and branch; the currency is
  * the cover's, else {@code BCL_DEFAULT_CURRENCY}; the claimant is the assured; the premium is
- * checked at once (BRCLM.001, an unpaid cover is saved and flagged); the locations and insurer lines
- * are linked; the workflow case opens in stage NEW in the handler's queue. The first status and the
- * next follow-up date are set by the status engine (wave CL1-B) on {@link ClaimRecorded}.
+ * checked at once (BRCLM.001, an unpaid cover is saved and flagged); the locations and insurer
+ * lines are linked; the workflow case opens in stage NEW in the handler's queue. The first status
+ * and the next follow-up date are set by the status engine (wave CL1-B) on {@link ClaimRecorded}.
  */
 @Service
 @Transactional
@@ -53,7 +53,8 @@ public class ClaimRecordingService {
   public static final String DEFAULT_STATUS = "NEW_INCOMPLETE_DOCS";
 
   private static final List<String> FIRST_STATUSES = List.of("NEW_COMPLETE_DOCS", DEFAULT_STATUS);
-  private static final DateTimeFormatter DAY = DateTimeFormatter.ofPattern("dd-MMM-yyyy", Locale.ENGLISH);
+  private static final DateTimeFormatter DAY =
+      DateTimeFormatter.ofPattern("dd-MMM-yyyy", Locale.ENGLISH);
 
   private final BrokerClaimRepository claims;
   private final CoverService covers;
@@ -131,8 +132,7 @@ public class ClaimRecordingService {
     LocalDate today = LocalDate.now(clock);
     validate(request, today);
     Account account = covers.account(companyId, request.arn());
-    CoverSnapshot cover =
-        covers.snapshot(account, request.policyYear(), request.loss().lossDate());
+    CoverSnapshot cover = covers.snapshot(account, request.policyYear(), request.loss().lossDate());
     LossDetails loss =
         LossDetails.of(request.loss(), request.amounts(), account.getClientName(), today);
     if (!cover.covers(loss.getLossDate()) && !request.confirmOutsidePeriod()) {
@@ -151,7 +151,8 @@ public class ClaimRecordingService {
             new Claim(
                 companyId,
                 numbers.next(ClaimCodes.CLAIM_NO_PREFIX + "-" + today.getYear()),
-                new Claim.Origin(request.source(), username, handler.unitCode(), handler.branchId(), null),
+                new Claim.Origin(
+                    request.source(), username, handler.unitCode(), handler.branchId(), null),
                 cover,
                 loss));
     locations.link(claim, request.locations());
@@ -170,26 +171,29 @@ public class ClaimRecordingService {
   }
 
   private void validate(NewClaim request, LocalDate today) {
-    if (request.arn() == null || request.arn().isBlank()) {
-      throw new BusinessRuleException("BCL_COVER_REQUIRED", "Select the cover of the claim");
-    }
     LossDetails.Loss loss = request.loss();
-    if (blank(loss.lossNature())) {
-      throw new BusinessRuleException("BCL_LOSS_NATURE_REQUIRED", "Select the nature of loss");
+    require(!blank(request.arn()), "BCL_COVER_REQUIRED", "Select the cover of the claim");
+    require(!blank(loss.lossNature()), "BCL_LOSS_NATURE_REQUIRED", "Select the nature of loss");
+    require(!blank(loss.claimType()), "BCL_CLAIM_TYPE_REQUIRED", "Select the claim type");
+    require(
+        !blank(loss.lossDescription()), "BCL_DESCRIPTION_REQUIRED", "Enter the loss description");
+    validateCodes(loss, today);
+    validateSource(request);
+  }
+
+  private static void require(boolean valid, String code, String message) {
+    if (!valid) {
+      throw new BusinessRuleException(code, message);
     }
-    if (blank(loss.claimType())) {
-      throw new BusinessRuleException("BCL_CLAIM_TYPE_REQUIRED", "Select the claim type");
-    }
-    if (blank(loss.lossDescription())) {
-      throw new BusinessRuleException("BCL_DESCRIPTION_REQUIRED", "Enter the loss description");
-    }
+  }
+
+  private void validateCodes(LossDetails.Loss loss, LocalDate today) {
     lovs.requireValid(ClaimCodes.LOV_LOSS_NATURE, loss.lossNature(), today);
     lovs.requireValid(ClaimCodes.LOV_CLAIM_TYPE, loss.claimType(), today);
     lovs.validateOptional(
         ClaimCodes.LOV_CATASTROPHE,
         blank(loss.catastropheCode()) ? null : loss.catastropheCode(),
         today);
-    validateSource(request);
   }
 
   private static void validateSource(NewClaim request) {
@@ -267,7 +271,11 @@ public class ClaimRecordingService {
           cover.getAccountOfficer(),
           new Notice(
               "Claim " + claim.getClaimNo() + " recorded",
-              cover.getAssuredName() + " - " + cover.getArn() + ", loss of " + claim.getLoss().getLossDate(),
+              cover.getAssuredName()
+                  + " - "
+                  + cover.getArn()
+                  + ", loss of "
+                  + claim.getLoss().getLossDate(),
               "/claims-handling/" + claim.getId(),
               ClaimCodes.ENTITY_TYPE,
               String.valueOf(claim.getId())),

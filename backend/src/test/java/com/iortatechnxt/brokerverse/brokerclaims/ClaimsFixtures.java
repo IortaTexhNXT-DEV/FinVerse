@@ -40,10 +40,10 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * Claims Handling test data: covers issued and booked through the real account and booking
- * services (a motor cover, a property cover with several locations and co-insurance shares, a
- * direct-payment cover), payments applied on the ledger as cashiering posts them, and claims
- * recorded through the service as the Claims Officer.
+ * Claims Handling test data: covers issued and booked through the real account and booking services
+ * (a motor cover, a property cover with several locations and co-insurance shares, a direct-payment
+ * cover), payments applied on the ledger as cashiering posts them, and claims recorded through the
+ * service as the Claims Officer.
  */
 @Component
 public class ClaimsFixtures {
@@ -112,7 +112,12 @@ public class ClaimsFixtures {
     Account account =
         booking.issued(
             new BookingFixtures.Spec(
-                "MTR10", "CBG", PaymentArrangement.VIA_BDOI, coverFrom(), coverFrom().plusYears(1), 1));
+                "MTR10",
+                "CBG",
+                PaymentArrangement.VIA_BDOI,
+                coverFrom(),
+                coverFrom().plusYears(1),
+                1));
     return book(account, List.of());
   }
 
@@ -175,7 +180,9 @@ public class ClaimsFixtures {
     as.run("proc", () -> accounts.directBooking(account.getId(), null));
     as.run(
         "proc",
-        () -> lifecycle.recordPolicy(account.getArn(), List.of("FI-" + id), LocalDate.of(2026, 9, 1)));
+        () ->
+            lifecycle.recordPolicy(
+                account.getArn(), List.of("FI-" + id), LocalDate.of(2026, 9, 1)));
     return queries.get(account.getId());
   }
 
@@ -229,7 +236,9 @@ public class ClaimsFixtures {
   public Claim motorClaim(String arn) {
     return as.run(
         OFFICER,
-        () -> recording.record(company(), request(arn, loss("MOTOR_OWN_DAMAGE"), List.of(), List.of())));
+        () ->
+            recording.record(
+                company(), request(arn, loss("MOTOR_OWN_DAMAGE"), List.of(), List.of())));
   }
 
   /** Uploads a PDF to a record and returns its id. */

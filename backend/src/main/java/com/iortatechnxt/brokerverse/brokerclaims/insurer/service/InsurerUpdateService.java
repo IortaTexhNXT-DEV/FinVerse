@@ -83,7 +83,8 @@ public class InsurerUpdateService {
     if (request.correctsUpdateId() != null) {
       updates
           .findByIdAndClaimId(request.correctsUpdateId(), claim.getId())
-          .orElseThrow(() -> new ResourceNotFoundException("InsurerUpdate", request.correctsUpdateId()));
+          .orElseThrow(
+              () -> new ResourceNotFoundException("InsurerUpdate", request.correctsUpdateId()));
     }
     request.attachmentIds().forEach(id -> requireClaimAttachment(claim, id));
     InsurerUpdate saved =
@@ -112,7 +113,9 @@ public class InsurerUpdateService {
             + saved.getSource()
             + (saved.getReference() == null ? "" : ", " + saved.getReference())
             + ")"
-            + (saved.getCorrectsUpdateId() == null ? "" : " correcting update " + saved.getCorrectsUpdateId()));
+            + (saved.getCorrectsUpdateId() == null
+                ? ""
+                : " correcting update " + saved.getCorrectsUpdateId()));
     return saved;
   }
 

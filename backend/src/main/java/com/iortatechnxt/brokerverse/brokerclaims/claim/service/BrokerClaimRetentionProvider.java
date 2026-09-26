@@ -55,7 +55,9 @@ public class BrokerClaimRetentionProvider implements RetentionCandidateProvider 
     if (phases.isEmpty()) {
       return List.of();
     }
-    return claims.retention(phases, cutoff(criteria), PageRequest.of(0, Math.max(1, limit))).stream()
+    return claims
+        .retention(phases, cutoff(criteria), PageRequest.of(0, Math.max(1, limit)))
+        .stream()
         .map(BrokerClaimRetentionProvider::candidate)
         .toList();
   }

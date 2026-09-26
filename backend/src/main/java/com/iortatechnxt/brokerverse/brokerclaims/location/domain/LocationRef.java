@@ -19,7 +19,8 @@ import java.util.Locale;
 @Table(name = "bcl_location_ref")
 public class LocationRef extends BaseEntity {
 
-  private static final DateTimeFormatter DAY = DateTimeFormatter.ofPattern("dd-MMM-yyyy", Locale.ENGLISH);
+  private static final DateTimeFormatter DAY =
+      DateTimeFormatter.ofPattern("dd-MMM-yyyy", Locale.ENGLISH);
 
   @Column(name = "company_id", nullable = false, updatable = false)
   private Long companyId;
@@ -60,7 +61,11 @@ public class LocationRef extends BaseEntity {
    * @param effectiveFrom first day of validity
    */
   public LocationRef(
-      Long companyId, Location location, String insurerCode, String reference, LocalDate effectiveFrom) {
+      Long companyId,
+      Location location,
+      String insurerCode,
+      String reference,
+      LocalDate effectiveFrom) {
     if (reference == null || reference.isBlank()) {
       throw new BusinessRuleException(
           "BCL_LOCATION_REF_REQUIRED", "Enter the insurer location reference");
@@ -86,8 +91,7 @@ public class LocationRef extends BaseEntity {
   public void supersede(LocalDate successorFrom) {
     if (!successorFrom.isAfter(effectiveFrom)) {
       throw new BusinessRuleException(
-          "BCL_EFFECTIVE_DATE",
-          "The effective date must be after " + DAY.format(effectiveFrom));
+          "BCL_EFFECTIVE_DATE", "The effective date must be after " + DAY.format(effectiveFrom));
     }
     this.effectiveTo = successorFrom.minusDays(1);
   }

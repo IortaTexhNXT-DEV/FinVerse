@@ -31,8 +31,19 @@ class ClaimPartsTest {
 
   private static CoverSnapshot.Policy policy(String policyNo) {
     return new CoverSnapshot.Policy(
-        "ARN-1", 1L, 1, policyNo, "PAR01", "PROPERTY", "CL-1", "Acme", "INS-A",
-        LocalDate.of(2026, 1, 1), LocalDate.of(2027, 1, 1), new BigDecimal("1000.00"), "USD");
+        "ARN-1",
+        1L,
+        1,
+        policyNo,
+        "PAR01",
+        "PROPERTY",
+        "CL-1",
+        "Acme",
+        "INS-A",
+        LocalDate.of(2026, 1, 1),
+        LocalDate.of(2027, 1, 1),
+        new BigDecimal("1000.00"),
+        "USD");
   }
 
   private static CoverSnapshot.Sales sales(String ao) {
@@ -44,7 +55,9 @@ class ClaimPartsTest {
     assertThat(PremiumRule.evaluate(List.of()).status()).isEqualTo(ClaimPremiumStatus.NO_INVOICE);
     assertThat(
             PremiumRule.evaluate(
-                    List.of(invoice(PaymentStatus.PAID, false, false), invoice(PaymentStatus.UNPAID, false, false)))
+                    List.of(
+                        invoice(PaymentStatus.PAID, false, false),
+                        invoice(PaymentStatus.UNPAID, false, false)))
                 .status())
         .isEqualTo(ClaimPremiumStatus.UNPAID);
     var partly = PremiumRule.evaluate(List.of(invoice(PaymentStatus.PARTIALLY_PAID, false, false)));
@@ -53,14 +66,20 @@ class ClaimPartsTest {
     assertThat(partly.unpaid()).hasSize(1);
     var cancelled =
         PremiumRule.evaluate(
-            List.of(invoice(PaymentStatus.PAID, false, false), invoice(PaymentStatus.UNPAID, false, true)));
+            List.of(
+                invoice(PaymentStatus.PAID, false, false),
+                invoice(PaymentStatus.UNPAID, false, true)));
     assertThat(cancelled.status()).isEqualTo(ClaimPremiumStatus.PAID);
     assertThat(cancelled.blocking()).isFalse();
-    assertThat(PremiumRule.evaluate(List.of(invoice(PaymentStatus.NOT_APPLICABLE, true, false))).status())
+    assertThat(
+            PremiumRule.evaluate(List.of(invoice(PaymentStatus.NOT_APPLICABLE, true, false)))
+                .status())
         .isEqualTo(ClaimPremiumStatus.DIRECT_PAYMENT);
     assertThat(
             PremiumRule.evaluate(
-                    List.of(invoice(PaymentStatus.PAID, false, false), invoice(PaymentStatus.NOT_APPLICABLE, false, false)))
+                    List.of(
+                        invoice(PaymentStatus.PAID, false, false),
+                        invoice(PaymentStatus.NOT_APPLICABLE, false, false)))
                 .status())
         .isEqualTo(ClaimPremiumStatus.PAID);
   }
@@ -79,7 +98,9 @@ class ClaimPartsTest {
     assertThatThrownBy(
             () ->
                 cover.refresh(
-                    new CoverSnapshot.Policy("ARN-2", 1L, 1, null, null, null, null, null, null, null, null, null, "PHP"),
+                    new CoverSnapshot.Policy(
+                        "ARN-2", 1L, 1, null, null, null, null, null, null, null, null, null,
+                        "PHP"),
                     sales("ao")))
         .isInstanceOf(BusinessRuleException.class);
     assertThat(cover.useVersion(new CoverSnapshot.Version(2, "END-2", TODAY)))
@@ -91,52 +112,66 @@ class ClaimPartsTest {
     assertThat(cover.isAuthorized()).isTrue();
     assertThatThrownBy(() -> cover.authorize("CAC-2026-000002", "clmofficer", NOW, null))
         .isInstanceOf(BusinessRuleException.class);
-    assertThat(CoverSnapshot.of(policy(null), new CoverSnapshot.Version(0, null, null), sales(null)).versionLabel())
+    assertThat(
+            CoverSnapshot.of(policy(null), new CoverSnapshot.Version(0, null, null), sales(null))
+                .versionLabel())
         .isEqualTo("Cover v0");
   }
 
   @Test
   void theLossDetailsKeepTheirDatesClaimantAndCatastropheRules() {
     LossDetails.Loss loss =
-        new LossDetails.Loss(TODAY.minusDays(3), TODAY.minusDays(1), "FIRE", "PROPERTY", "Fire", null, null, null);
+        new LossDetails.Loss(
+            TODAY.minusDays(3), TODAY.minusDays(1), "FIRE", "PROPERTY", "Fire", null, null, null);
     LossDetails.Amounts amounts = new LossDetails.Amounts(BigDecimal.TEN, BigDecimal.ONE, null);
     LossDetails details = LossDetails.of(loss, amounts, "Acme", TODAY);
     assertThat(details.getClaimantName()).isEqualTo("Acme");
     assertThat(details.isCatastrophe()).isFalse();
     assertThat(details.correctReportedDate(TODAY.minusDays(2), "DATA_CORRECTION", TODAY))
         .isEqualTo(TODAY.minusDays(1));
-    assertThatThrownBy(() -> details.correctReportedDate(TODAY.minusDays(9), "DATA_CORRECTION", TODAY))
+    assertThatThrownBy(
+            () -> details.correctReportedDate(TODAY.minusDays(9), "DATA_CORRECTION", TODAY))
         .hasMessage("The reported date must be between the loss date and today");
-    assertThatThrownBy(() -> details.overrideClaimant("X", " ")).hasMessage("Enter the reason for the change");
+    assertThatThrownBy(() -> details.overrideClaimant("X", " "))
+        .hasMessage("Enter the reason for the change");
     assertThat(details.overrideClaimant(" Third Party ", "OTHERS")).isEqualTo("Acme");
     assertThat(details.isClaimantOverridden()).isTrue();
     details.amend(
-        new LossDetails.Loss(TODAY.minusDays(4), null, "FIRE", "PROPERTY", "Fire", "Here", "TYPHOON", "Kristine"),
+        new LossDetails.Loss(
+            TODAY.minusDays(4), null, "FIRE", "PROPERTY", "Fire", "Here", "TYPHOON", "Kristine"),
         amounts,
         TODAY);
     assertThat(details.isCatastrophe()).isTrue();
     assertThat(details.getCatastropheEvent()).isEqualTo("Kristine");
     assertThatThrownBy(
             () ->
-                LossDetails.of(loss, new LossDetails.Amounts(new BigDecimal("-1"), null, null), "Acme", TODAY))
+                LossDetails.of(
+                    loss, new LossDetails.Amounts(new BigDecimal("-1"), null, null), "Acme", TODAY))
         .hasMessage("The claim amount cannot be negative");
     assertThatThrownBy(
             () ->
                 details.amend(
-                    new LossDetails.Loss(TODAY.plusDays(1), null, "FIRE", "PROPERTY", "x", null, null, null), amounts, TODAY))
+                    new LossDetails.Loss(
+                        TODAY.plusDays(1), null, "FIRE", "PROPERTY", "x", null, null, null),
+                    amounts,
+                    TODAY))
         .hasMessage("Enter a loss date that is not in the future");
   }
 
   @Test
   void insurerLinesUpdatesAndReferencesKeepTheirRules() {
-    InsurerClaim line = new InsurerClaim(1L, 2L, "INS-A", new BigDecimal("60"), new BigDecimal("100.00"));
+    InsurerClaim line =
+        new InsurerClaim(1L, 2L, "INS-A", new BigDecimal("60"), new BigDecimal("100.00"));
     line.number(" C-1 ", TODAY, TODAY);
     assertThat(line.getInsurerClaimNo()).isEqualTo("C-1");
-    assertThatThrownBy(() -> line.number("C-2", TODAY.plusDays(1), TODAY)).hasMessage("The date cannot be in the future");
-    assertThatThrownBy(() -> line.changeShare(new BigDecimal("101"))).isInstanceOf(BusinessRuleException.class);
+    assertThatThrownBy(() -> line.number("C-2", TODAY.plusDays(1), TODAY))
+        .hasMessage("The date cannot be in the future");
+    assertThatThrownBy(() -> line.changeShare(new BigDecimal("101")))
+        .isInstanceOf(BusinessRuleException.class);
     assertThat(line.amendReserve(BigDecimal.ZERO)).isEqualByComparingTo("100.00");
     assertThatThrownBy(() -> line.amendReserve(null)).hasMessage("Enter the new reserve");
-    assertThatThrownBy(() -> line.settled(new BigDecimal("-1"))).isInstanceOf(BusinessRuleException.class);
+    assertThatThrownBy(() -> line.settled(new BigDecimal("-1")))
+        .isInstanceOf(BusinessRuleException.class);
     line.settled(BigDecimal.ONE);
     assertThat(line.assignAdjuster("CRAWFORD")).isNull();
     assertThat(line.getSettledAmount()).isEqualByComparingTo("1");
@@ -144,7 +179,8 @@ class ClaimPartsTest {
     InsurerUpdate update =
         new InsurerUpdate(
             2L,
-            new InsurerUpdate.Content(null, TODAY, "EMAIL", " ", " Noted ", List.of(5L, 6L), null, null, TODAY),
+            new InsurerUpdate.Content(
+                null, TODAY, "EMAIL", " ", " Noted ", List.of(5L, 6L), null, null, TODAY),
             "clmofficer",
             NOW);
     assertThat(update.getReference()).isNull();
@@ -154,11 +190,15 @@ class ClaimPartsTest {
     LocationRef ref =
         new LocationRef(1L, new LocationRef.Location(1L, "ARN-1", 1, "k"), "INS-A", " A-1 ", TODAY);
     assertThat(ref.validOn(TODAY)).isTrue();
-    assertThatThrownBy(() -> ref.supersede(TODAY)).hasMessage("The effective date must be after 26-Sep-2026");
+    assertThatThrownBy(() -> ref.supersede(TODAY))
+        .hasMessage("The effective date must be after 26-Sep-2026");
     ref.supersede(TODAY.plusDays(10));
     assertThat(ref.getEffectiveTo()).isEqualTo(TODAY.plusDays(9));
     assertThat(ref.validOn(TODAY.plusDays(10))).isFalse();
-    assertThatThrownBy(() -> new LocationRef(1L, new LocationRef.Location(1L, "ARN-1", 1, "k"), "INS-A", " ", TODAY))
+    assertThatThrownBy(
+            () ->
+                new LocationRef(
+                    1L, new LocationRef.Location(1L, "ARN-1", 1, "k"), "INS-A", " ", TODAY))
         .hasMessage("Enter the insurer location reference");
   }
 }

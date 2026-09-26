@@ -38,8 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
  * keeps; the insurers and shares proposed for a claim; and the premium check of the Operations
  * invoice ledger (BRCLM.001). Claims never changes the account.
  *
- * <p>The cover is the account (ARN) and a policy year of its term (1 = first year), the unit of
- * the invoices and policy numbers (CLQ02).
+ * <p>The cover is the account (ARN) and a policy year of its term (1 = first year), the unit of the
+ * invoices and policy numbers (CLQ02).
  */
 @Service
 @Transactional(readOnly = true)
@@ -98,9 +98,7 @@ public class CoverService {
       throw new BusinessRuleException("BCL_SEARCH_TOO_SHORT", "Enter at least 3 characters");
     }
     if (by == SearchBy.POLICY_NO) {
-      return jdbc
-          .queryForList(POLICY_SQL, String.class, companyId, like(term))
-          .stream()
+      return jdbc.queryForList(POLICY_SQL, String.class, companyId, like(term)).stream()
           .map(accounts::requireByArn)
           .toList();
     }
@@ -109,7 +107,8 @@ public class CoverService {
             companyId, term, null, null, null, null, null, null, null, null, null, null, null, null,
             false);
     return accounts.search(search, PageRequest.of(0, MAX_HITS)).stream()
-        .filter(a -> by != SearchBy.ARN || a.getArn().toLowerCase(Locale.ROOT).contains(lower(term)))
+        .filter(
+            a -> by != SearchBy.ARN || a.getArn().toLowerCase(Locale.ROOT).contains(lower(term)))
         .map(a -> accounts.get(a.getId()))
         .toList();
   }
@@ -192,7 +191,9 @@ public class CoverService {
    */
   public CoverSnapshot snapshot(Account account, int policyYear, LocalDate lossDate) {
     return CoverSnapshot.of(
-        policy(account, policyYear), version(account.getArn(), policyYear, lossDate), sales(account, policyYear));
+        policy(account, policyYear),
+        version(account.getArn(), policyYear, lossDate),
+        sales(account, policyYear));
   }
 
   /**
@@ -312,7 +313,8 @@ public class CoverService {
    * @return result with the invoices not fully paid
    */
   public PremiumCheck premium(String arn, int policyYear) {
-    return PremiumRule.evaluate(invoices(arn, policyYear).stream().map(CoverService::state).toList());
+    return PremiumRule.evaluate(
+        invoices(arn, policyYear).stream().map(CoverService::state).toList());
   }
 
   /**

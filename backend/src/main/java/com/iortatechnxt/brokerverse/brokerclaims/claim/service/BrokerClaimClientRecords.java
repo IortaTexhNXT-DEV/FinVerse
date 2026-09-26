@@ -36,7 +36,8 @@ public class BrokerClaimClientRecords implements ClientRecordsProvider {
   public List<ClientRecord> recordsOf(Long clientId) {
     Client client = clients.get(clientId);
     return claims
-        .findByCompanyIdAndCoverClientCodeOrderByIdDesc(client.getCompanyId(), client.getClientCode())
+        .findByCompanyIdAndCoverClientCodeOrderByIdDesc(
+            client.getCompanyId(), client.getClientCode())
         .stream()
         .map(BrokerClaimClientRecords::record)
         .toList();
@@ -50,7 +51,11 @@ public class BrokerClaimClientRecords implements ClientRecordsProvider {
     return new ClientRecord(
         "Claim",
         c.getClaimNo(),
-        c.getCover().getArn() + " - " + c.getCover().getProductCode() + " - loss " + c.getLoss().getLossDate(),
+        c.getCover().getArn()
+            + " - "
+            + c.getCover().getProductCode()
+            + " - loss "
+            + c.getLoss().getLossDate(),
         status,
         c.getLoss().getReportedDate(),
         "/claims-handling/" + c.getId());

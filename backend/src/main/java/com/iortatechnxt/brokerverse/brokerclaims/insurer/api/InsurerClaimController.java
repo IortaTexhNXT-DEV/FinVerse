@@ -57,7 +57,10 @@ public class InsurerClaimController {
    * @param lovs adjuster labels
    */
   public InsurerClaimController(
-      ClaimQueryService claims, InsurerClaimService lines, InsurerService insurers, LovService lovs) {
+      ClaimQueryService claims,
+      InsurerClaimService lines,
+      InsurerService insurers,
+      LovService lovs) {
     this.claims = claims;
     this.lines = lines;
     this.insurers = insurers;
@@ -132,7 +135,11 @@ public class InsurerClaimController {
       @Valid @RequestBody NumberRequest request) {
     Claim claim = claims.requireOpen(companyId, claimId);
     lines.number(
-        claim, lineId, request.insurerClaimNo(), request.reportedToInsurerOn(), request.confirmReuse());
+        claim,
+        lineId,
+        request.insurerClaimNo(),
+        request.reportedToInsurerOn(),
+        request.confirmReuse());
     return responses(claim);
   }
 
@@ -204,7 +211,8 @@ public class InsurerClaimController {
     Map<String, String> names =
         insurers.insurers(claim.getCompanyId()).stream()
             .collect(
-                Collectors.toMap(InsurerProfile::getPartyCode, InsurerProfile::getName, (a, b) -> a));
+                Collectors.toMap(
+                    InsurerProfile::getPartyCode, InsurerProfile::getName, (a, b) -> a));
     Map<String, String> adjusters = new HashMap<>();
     all.stream()
         .map(InsurerClaim::getAdjusterCode)

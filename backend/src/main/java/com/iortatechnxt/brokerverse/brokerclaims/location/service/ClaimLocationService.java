@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ClaimLocationService {
 
+  private static final String LOCATION = "Location ";
+
   private final ClaimLocationRepository locations;
   private final CoverService covers;
   private final AuditTrailService audit;
@@ -66,17 +68,17 @@ public class ClaimLocationService {
                       .findByClaimIdAndAccountItemNo(claim.getId(), pick.itemNo())
                       .isPresent()) {
                 throw new BusinessRuleException(
-                    "BCL_LOCATION_LINKED",
-                    "Location " + item.label() + " is already on this claim");
+                    "BCL_LOCATION_LINKED", LOCATION + item.label() + " is already on this claim");
               }
               ClaimLocation saved =
                   locations.save(
-                      new ClaimLocation(claim.getId(), place(item), blankToNull(pick.description())));
+                      new ClaimLocation(
+                          claim.getId(), place(item), blankToNull(pick.description())));
               audit.record(
                   ClaimCodes.ENTITY_TYPE,
                   claim.getClaimNo(),
                   AuditAction.UPDATE,
-                  "Location " + item.getItemNo() + " linked: " + item.label());
+                  LOCATION + item.getItemNo() + " linked: " + item.label());
               return saved;
             })
         .toList();
@@ -95,7 +97,7 @@ public class ClaimLocationService {
         ClaimCodes.ENTITY_TYPE,
         claim.getClaimNo(),
         AuditAction.UPDATE,
-        "Location " + itemNo + " removed: " + location.getAddress());
+        LOCATION + itemNo + " removed: " + location.getAddress());
   }
 
   /**
@@ -113,7 +115,7 @@ public class ClaimLocationService {
         ClaimCodes.ENTITY_TYPE,
         claim.getClaimNo(),
         AuditAction.UPDATE,
-        "Location " + itemNo + " damage: " + description);
+        LOCATION + itemNo + " damage: " + description);
     return location;
   }
 
@@ -134,7 +136,7 @@ public class ClaimLocationService {
         .orElseThrow(
             () ->
                 new BusinessRuleException(
-                    "BCL_LOCATION_NOT_LINKED", "Location " + itemNo + " is not on this claim"));
+                    "BCL_LOCATION_NOT_LINKED", LOCATION + itemNo + " is not on this claim"));
   }
 
   private static ClaimLocation.Place place(RiskItem item) {

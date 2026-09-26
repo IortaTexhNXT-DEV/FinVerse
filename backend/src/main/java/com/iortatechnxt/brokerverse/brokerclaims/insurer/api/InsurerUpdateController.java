@@ -94,7 +94,8 @@ public class InsurerUpdateController {
    */
   @GetMapping("/loss-advice")
   @PreAuthorize(RECORD)
-  public List<AdviceDraftResponse> drafts(@PathVariable Long claimId, @RequestParam Long companyId) {
+  public List<AdviceDraftResponse> drafts(
+      @PathVariable Long claimId, @RequestParam Long companyId) {
     return advice.drafts(claims.require(companyId, claimId)).stream()
         .map(AdviceDraftResponse::from)
         .toList();
@@ -117,7 +118,9 @@ public class InsurerUpdateController {
     Claim claim = claims.require(companyId, claimId);
     List<AdviceRecipient> recipients =
         request.recipients() == null ? List.of() : request.recipients();
-    return advice.send(claim, recipients.stream().map(AdviceRecipient::toRecipient).toList()).stream()
+    return advice
+        .send(claim, recipients.stream().map(AdviceRecipient::toRecipient).toList())
+        .stream()
         .map(AdviceSentResponse::from)
         .toList();
   }

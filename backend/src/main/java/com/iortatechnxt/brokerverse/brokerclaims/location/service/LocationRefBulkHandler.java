@@ -62,11 +62,16 @@ public class LocationRefBulkHandler implements BulkImportHandler {
   public List<BulkColumn> columns() {
     return List.of(
         BulkColumn.required(ARN, "Account reference number of the cover", "ARN-2026-940002"),
-        new BulkColumn(ITEM_NO, "Item number of the location on the cover", true, BulkColumn.Type.NUMBER, "1"),
+        new BulkColumn(
+            ITEM_NO, "Item number of the location on the cover", true, BulkColumn.Type.NUMBER, "1"),
         BulkColumn.required(INSURER, "Insurer code", "INS-MGIC"),
         BulkColumn.required(REFERENCE, "The insurer's reference of the location", "MGIC-LOC-0091"),
         new BulkColumn(
-            EFFECTIVE_FROM, "First day the reference applies", true, BulkColumn.Type.DATE, "2026-09-01"));
+            EFFECTIVE_FROM,
+            "First day the reference applies",
+            true,
+            BulkColumn.Type.DATE,
+            "2026-09-01"));
   }
 
   @Override
@@ -97,6 +102,10 @@ public class LocationRefBulkHandler implements BulkImportHandler {
                 row.text(INSURER),
                 row.text(REFERENCE),
                 row.date(EFFECTIVE_FROM)));
-    return saved.getArn() + " item " + saved.getAccountItemNo() + " " + saved.getInsurerLocationRef();
+    return saved.getArn()
+        + " item "
+        + saved.getAccountItemNo()
+        + " "
+        + saved.getInsurerLocationRef();
   }
 }

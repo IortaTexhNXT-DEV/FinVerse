@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /** Response bodies of the Cover Lookup and the cover card of Record Claim (BRCLM.002/003/039). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // holder of nested types
 public final class CoverDtos {
 
   private CoverDtos() {}
@@ -236,7 +237,8 @@ public final class CoverDtos {
      * @return dto
      */
     public static UnpaidDto from(InvoiceState s) {
-      return new UnpaidDto(s.invoiceNo(), s.kind(), s.paymentStatus().name(), s.balance(), s.currency());
+      return new UnpaidDto(
+          s.invoiceNo(), s.kind(), s.paymentStatus().name(), s.balance(), s.currency());
     }
   }
 
@@ -256,7 +258,8 @@ public final class CoverDtos {
      * @return dto
      */
     public static PremiumDto from(PremiumCheck c) {
-      return new PremiumDto(c.status(), c.blocking(), c.unpaid().stream().map(UnpaidDto::from).toList());
+      return new PremiumDto(
+          c.status(), c.blocking(), c.unpaid().stream().map(UnpaidDto::from).toList());
     }
   }
 

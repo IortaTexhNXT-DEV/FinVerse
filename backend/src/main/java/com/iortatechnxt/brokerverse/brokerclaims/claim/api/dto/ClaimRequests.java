@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /** Request bodies of the claim record (FR-CL-011/012/030/033). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // holder of nested types
 public final class ClaimRequests {
 
   private ClaimRequests() {}
@@ -112,7 +113,9 @@ public final class ClaimRequests {
           initialStatus,
           loss.toLoss(),
           loss.toAmounts(),
-          locations == null ? List.of() : locations.stream().map(LocationPickRequest::toPick).toList(),
+          locations == null
+              ? List.of()
+              : locations.stream().map(LocationPickRequest::toPick).toList(),
           insurers == null ? List.of() : insurers.stream().map(InsurerLineRequest::toLine).toList(),
           confirmOutsidePeriod,
           confirmReuse);

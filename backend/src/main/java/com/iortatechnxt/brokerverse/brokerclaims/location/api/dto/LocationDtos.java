@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /** Request and response bodies of the claim locations and insurer location references. */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // holder of nested types
 public final class LocationDtos {
 
   private LocationDtos() {}

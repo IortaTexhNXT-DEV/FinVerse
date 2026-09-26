@@ -27,8 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * The claim record as the screen shows it (BRCLM.001/016/037/039/043; design 11): the claim with
  * its live premium check and the invoices not fully paid, the latest cover version, the flags
- * (unpaid premium, awaiting premium remittance, newer cover version, multi-location,
- * multi-insurer, CAT, claimant overridden), the total insurer reserve and the labels of its codes.
+ * (unpaid premium, awaiting premium remittance, newer cover version, multi-location, multi-insurer,
+ * CAT, claimant overridden), the total insurer reserve and the labels of its codes.
  */
 @Service
 @Transactional(readOnly = true)

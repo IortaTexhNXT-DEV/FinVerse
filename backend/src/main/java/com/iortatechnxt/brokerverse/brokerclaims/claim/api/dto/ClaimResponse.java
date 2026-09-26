@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The claim record (design 11): identity, cover snapshot, premium check and authorization, loss
- * and claimant, progress (read-only here, owned by the status engine), flags and totals.
+ * The claim record (design 11): identity, cover snapshot, premium check and authorization, loss and
+ * claimant, progress (read-only here, owned by the status engine), flags and totals.
  *
  * @param id claim id
  * @param claimNo claim number

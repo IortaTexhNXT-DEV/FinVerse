@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RolePermissionChange;
+import com.iortatechnxt.brokerverse.nbadmin.service.AccessImplementationService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessMatrix;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessMatrixService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
@@ -36,6 +37,7 @@ import org.springframework.data.domain.Pageable;
 class RolePermissionRequestIT {
 
   @Autowired private AccessRequestService requests;
+  @Autowired private AccessImplementationService implementations;
   @Autowired private AccessMatrixService matrix;
   @Autowired private UserAdminService userAdmin;
   @Autowired private RoleRepository roles;
@@ -93,7 +95,13 @@ class RolePermissionRequestIT {
         .extracting("code")
         .isEqualTo("ACCESS_FOUR_EYES");
 
-    as.run("approver", () -> requests.approve(request.getId(), "ok"));
+    // UAM_ROLE_APPLY_ON_APPROVAL = false (UQ03): the approved change waits for the System
+    // Administrator, who implements it (BRD-11 p.6).
+    assertThat(
+            as.run("approver", () -> requests.approve(request.getId(), "ok")).request().getStatus())
+        .isEqualTo(AccessRequestStatus.FOR_IMPLEMENTATION);
+    assertThat(permissionsOf(role)).contains(Permission.AUDIT_VIEW);
+    as.run("admin", () -> implementations.implement(request.getId()));
     assertThat(permissionsOf(role))
         .containsExactlyInAnyOrder(Permission.REPORT_VIEW, Permission.PRODUCT_VIEW);
     assertThat(
@@ -101,7 +109,7 @@ class RolePermissionRequestIT {
                 "badmin",
                 () ->
                     requests.search(
-                        AccessRequestStatus.APPROVED,
+                        AccessRequestStatus.IMPLEMENTED,
                         AccessRequestType.MODIFY_ROLE_PERMISSIONS,
                         role.toLowerCase(Locale.ROOT),
                         Pageable.unpaged())))

@@ -1,36 +1,31 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
-import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
-import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
-import com.iortatechnxt.brokerverse.messaging.domain.Notice;
-import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
+import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestAction;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
+import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestEvent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestRepository;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
-import com.iortatechnxt.brokerverse.nbadmin.domain.RolePermissionChange;
-import jakarta.persistence.criteria.Predicate;
 import java.time.Clock;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * User access requests (BRNB.085, BRD 3.3.5 / 3.4.2) and role-permission change requests (PMADD05):
- * the Business Administrator submits, the Approver approves (not the requester) and the approval
- * applies the change through {@link AccessChangeApplier}; or rejects with a comment. Both steps are
- * audited and notified.
+ * User access requests (BRNB.085; BRD 1.002-1.009, 3.002) and role-permission change requests
+ * (PMADD05): the requester saves a draft, edits it and submits it to the approver(s) of their
+ * choice; the decisions are taken by {@link AccessDecisionService}, the return, correction and
+ * cancellation by {@link AccessRequestReturnService}. Each step is kept in the request history and
+ * the audit trail, and notified (USER_ACCESS_DESIGN section 4.3).
  */
 @Service
 @Transactional
@@ -40,14 +35,18 @@ public class AccessRequestService {
   public static final String ENTITY = "AccessRequest";
 
   /** Frontend route of the access requests screen. */
-  public static final String SCREEN = "/broking-setup/access-requests";
+  public static final String SCREEN = "/user-access/requests";
 
   private final AccessRequestRepository requests;
   private final AccessRequestValidator validator;
-  private final AccessChangeApplier applier;
+  private final AccessApprovers approvers;
+  private final AccessRiskRules risks;
+  private final AccessRequestHistory history;
+  private final AccessRequestNotifier notifier;
+  private final AccessRequestVisibility visibility;
+  private final AccessDecisionService decisions;
+  private final AccessRequestPermissions permissions;
   private final DocumentNumberService numbers;
-  private final NotificationService notifications;
-  private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
 
@@ -55,95 +54,178 @@ public class AccessRequestService {
    * Creates the service.
    *
    * @param requests requests
-   * @param validator request validation
-   * @param applier applies approved changes
+   * @param validator request checks
+   * @param approvers approver checks
+   * @param risks risk rules (second approval)
+   * @param history request history and audit trail
+   * @param notifier notifications
+   * @param visibility who sees which request
+   * @param decisions approval and rejection
+   * @param permissions request functions of the current user
    * @param numbers document numbers
-   * @param notifications in-app notifications
-   * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
    */
   public AccessRequestService(
       AccessRequestRepository requests,
       AccessRequestValidator validator,
-      AccessChangeApplier applier,
+      AccessApprovers approvers,
+      AccessRiskRules risks,
+      AccessRequestHistory history,
+      AccessRequestNotifier notifier,
+      AccessRequestVisibility visibility,
+      AccessDecisionService decisions,
+      AccessRequestPermissions permissions,
       DocumentNumberService numbers,
-      NotificationService notifications,
-      AuditTrailService audit,
       CurrentUser currentUser,
       Clock clock) {
     this.requests = requests;
     this.validator = validator;
-    this.applier = applier;
+    this.approvers = approvers;
+    this.risks = risks;
+    this.history = history;
+    this.notifier = notifier;
+    this.visibility = visibility;
+    this.decisions = decisions;
+    this.permissions = permissions;
     this.numbers = numbers;
-    this.notifications = notifications;
-    this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
   }
 
   /**
-   * Submits a request for approval.
+   * Creates and submits a request in one step (the compatible submission of BRNB.085 and PMADD05):
+   * any holder of the approval right may decide it.
    *
    * @param content what is requested
    * @return the pending request
    */
   public AccessRequest submit(AccessRequestContent content) {
-    AccessRequestContent clean = validator.validate(content);
-    requireNoPendingRequest(clean);
+    return create(content, false, null);
+  }
+
+  /**
+   * Creates a request: saved as a draft (light checks), or submitted at once to the chosen
+   * approvers (full checks; FR-UA-010).
+   *
+   * @param content what is requested
+   * @param draft true to save a draft
+   * @param chosenApprovers approvers in order; null for the compatible one-step submission
+   * @return the draft or pending request
+   */
+  public AccessRequest create(
+      AccessRequestContent content, boolean draft, List<String> chosenApprovers) {
+    permissions.requireRequestPermission(content);
+    AccessRequestContent clean =
+        draft ? validator.validateDraft(content) : validator.validate(content);
+    return create(clean, draft, chosenApprovers, null);
+  }
+
+  /**
+   * Creates a validated request, as a line of a bulk batch when a batch is given.
+   *
+   * @param clean validated content
+   * @param draft true to save a draft
+   * @param chosenApprovers approvers in order; null for the compatible one-step submission
+   * @param batchId bulk batch, null for none
+   * @return the request
+   */
+  AccessRequest create(
+      AccessRequestContent clean, boolean draft, List<String> chosenApprovers, Long batchId) {
     String no = numbers.next("AR-" + LocalDate.now(clock).getYear());
-    AccessRequest saved = requests.save(new AccessRequest(no, clean));
-    audit.record(
-        ENTITY, no, AuditAction.SUBMIT, describe(saved) + " - " + saved.getJustification());
-    notifications.notifyPermission(
-        "ACCESS_APPROVE",
-        new Notice(
-            "Access request " + no + " to approve",
-            describe(saved),
-            link(saved),
-            ENTITY,
-            String.valueOf(saved.getId())));
+    AccessRequest saved = requests.save(new AccessRequest(no, clean, batchId));
+    history.record(saved, AccessRequestAction.SAVE, null, clean.justification());
+    if (!draft) {
+      submitSaved(saved, chosenApprovers, AccessRequestAction.SUBMIT, null);
+    }
     return saved;
   }
 
   /**
-   * Approves a request and applies the change (four eyes: not the requester).
+   * Edits a draft, or corrects a returned request (BRD 1.002.1.2, 1.006.1; creator only).
    *
    * @param id request
-   * @param comment optional comment
-   * @return the decision, with the temporary password of a created user (shown once)
+   * @param content new content
+   * @return the request
    */
-  public Decision approve(Long id, String comment) {
-    AccessRequest request = decide(id, true, comment);
-    String temporaryPassword = applier.apply(request);
-    audit.record(
-        ENTITY,
-        request.getRequestNo(),
-        AuditAction.AUTHORIZE,
-        "Approved and applied: " + describe(request) + note(comment));
-    notifyRequester(request, "approved");
-    return new Decision(request, temporaryPassword);
+  public AccessRequest edit(Long id, AccessRequestContent content) {
+    AccessRequest r = requireCreator(get(id), "edit");
+    permissions.requireCorrectionRight(r);
+    AccessRequestContent clean = validator.validateDraft(content);
+    AccessRequestStatus from = r.getStatus();
+    r.edit(clean);
+    history.record(r, AccessRequestAction.EDIT, from, null);
+    return r;
   }
 
   /**
-   * Rejects a request with a comment.
+   * Submits a draft, or resubmits a corrected request, to the chosen approvers after the full
+   * checks (BRD 1.002.1.4, 1.006.1.5; FR-UA-010, FR-UA-016).
+   *
+   * @param id request
+   * @param chosenApprovers approvers in order; null lets any approver decide (compatibility of the
+   *     one-step submission and of its correction)
+   * @param remarks remarks; the correction remark is mandatory on a resubmission
+   * @return the pending request
+   */
+  public AccessRequest submit(Long id, List<String> chosenApprovers, String remarks) {
+    AccessRequest r = requireCreator(get(id), "submit");
+    boolean resubmission = r.getStatus() == AccessRequestStatus.RETURNED;
+    if (resubmission) {
+      permissions.requireCorrectionRight(r);
+      if (remarks == null || remarks.isBlank()) {
+        throw new BusinessRuleException(
+            "ACCESS_CORRECTION_REMARKS", "Enter the correction remarks");
+      }
+    }
+    permissions.requireRequestPermission(r.content());
+    r.edit(validator.validateSubmission(r.content(), r.getId()));
+    submitSaved(
+        r,
+        chosenApprovers,
+        resubmission ? AccessRequestAction.RESUBMIT : AccessRequestAction.SUBMIT,
+        remarks == null || remarks.isBlank() ? null : remarks.trim());
+    return r;
+  }
+
+  /**
+   * Submits a saved request (also the lines of a bulk batch).
+   *
+   * @param r request (draft or returned)
+   * @param chosenApprovers approvers in order; null lets any approver decide (compatibility)
+   * @param action SUBMIT or RESUBMIT
+   * @param remarks remarks for the history
+   */
+  void submitSaved(
+      AccessRequest r, List<String> chosenApprovers, AccessRequestAction action, String remarks) {
+    List<String> names =
+        chosenApprovers == null ? List.of() : approvers.validate(chosenApprovers, r.content());
+    AccessRequestStatus from = r.getStatus();
+    r.submit(names, risks.evaluate(r.content()), currentUser.username(), clock.instant());
+    history.record(r, action, from, remarks == null ? r.getJustification() : remarks);
+    notifier.toApprove(r, AccessApprovers.approvalPermission(r.getUserType()));
+  }
+
+  /**
+   * Approves a request (see {@link AccessDecisionService#approve}).
+   *
+   * @param id request
+   * @param comment optional comment
+   * @return the decision
+   */
+  public Decision approve(Long id, String comment) {
+    return decisions.approve(id, comment);
+  }
+
+  /**
+   * Rejects a request (see {@link AccessDecisionService#reject}).
    *
    * @param id request
    * @param comment reason (mandatory)
    * @return the decision
    */
   public Decision reject(Long id, String comment) {
-    if (comment == null || comment.isBlank()) {
-      throw new BusinessRuleException("ACCESS_REJECT_REASON", "Enter the reason of the rejection");
-    }
-    AccessRequest request = decide(id, false, comment);
-    audit.record(
-        ENTITY,
-        request.getRequestNo(),
-        AuditAction.REJECT,
-        "Rejected: " + describe(request) + note(comment));
-    notifyRequester(request, "rejected");
-    return new Decision(request, null);
+    return decisions.reject(id, comment);
   }
 
   /**
@@ -160,7 +242,7 @@ public class AccessRequestService {
   }
 
   /**
-   * One request.
+   * One request (no visibility check: internal use).
    *
    * @param id id
    * @return request
@@ -171,7 +253,45 @@ public class AccessRequestService {
   }
 
   /**
-   * Requests matching the filter, newest first by the pageable sort.
+   * One request the current user may see (FR-UA-018; a draft only its creator).
+   *
+   * @param id id
+   * @return request
+   */
+  @Transactional(readOnly = true)
+  public AccessRequest view(Long id) {
+    AccessRequest r = get(id);
+    if (!visibility.canSee(r)) {
+      throw new AccessDeniedException("You are not permitted to open request " + r.getRequestNo());
+    }
+    return r;
+  }
+
+  /**
+   * History of a request the current user may see (BRD 1.008; FR-UA-018).
+   *
+   * @param id request
+   * @return events, oldest first
+   */
+  @Transactional(readOnly = true)
+  public List<AccessRequestEvent> history(Long id) {
+    return history.of(view(id).getId());
+  }
+
+  /**
+   * Work list of the current user (FR-UA-017, FR-UA-018).
+   *
+   * @param search tab and filters
+   * @param pageable page
+   * @return requests
+   */
+  @Transactional(readOnly = true)
+  public Page<AccessRequest> search(AccessRequestSearch search, Pageable pageable) {
+    return requests.findAll(visibility.specification(search), pageable);
+  }
+
+  /**
+   * Requests matching the filter, for internal use (no visibility check).
    *
    * @param status status, null for all
    * @param type request type, null for all
@@ -182,73 +302,33 @@ public class AccessRequestService {
   @Transactional(readOnly = true)
   public Page<AccessRequest> search(
       AccessRequestStatus status, AccessRequestType type, String text, Pageable pageable) {
-    Specification<AccessRequest> spec =
-        (root, query, cb) -> {
-          List<Predicate> p = new ArrayList<>();
-          if (status != null) {
-            p.add(cb.equal(root.get("status"), status));
-          }
-          if (type != null) {
-            p.add(cb.equal(root.get("requestType"), type));
-          }
-          if (text != null && !text.isBlank()) {
-            String like = "%" + text.trim().toLowerCase(Locale.ROOT) + "%";
-            p.add(
-                cb.or(
-                    cb.like(cb.lower(root.get("username")), like),
-                    cb.like(cb.lower(root.get("roleCode")), like),
-                    cb.like(cb.lower(root.get("requestNo")), like)));
-          }
-          return cb.and(p.toArray(Predicate[]::new));
-        };
-    return requests.findAll(spec, pageable);
+    return requests.findAll(
+        visibility.specification(
+            new AccessRequestSearch(
+                AccessRequestSearch.Scope.ALL, status, type, text, null, null, null, null, null)),
+        pageable);
   }
 
   /**
-   * Pending requests (approval inbox).
+   * Requests waiting for a decision or an implementation (approval inbox).
    *
-   * @return pending requests, oldest first
+   * @return requests, oldest first
    */
   @Transactional(readOnly = true)
   public List<AccessRequest> pending() {
-    return requests.findByStatusOrderByIdAsc(AccessRequestStatus.PENDING);
+    return requests.findByStatusInOrderByIdAsc(
+        List.of(
+            AccessRequestStatus.PENDING,
+            AccessRequestStatus.PENDING_SECOND,
+            AccessRequestStatus.FOR_IMPLEMENTATION));
   }
 
-  private void requireNoPendingRequest(AccessRequestContent clean) {
-    RolePermissionChange change = clean.permissionChange();
-    boolean pending =
-        change == null
-            ? requests.existsByUsernameIgnoreCaseAndStatus(
-                clean.username(), AccessRequestStatus.PENDING)
-            : requests.existsByRoleCodeAndStatus(change.roleCode(), AccessRequestStatus.PENDING);
-    if (pending) {
-      String subject = change == null ? "user " + clean.username() : "role " + change.roleCode();
+  private AccessRequest requireCreator(AccessRequest r, String what) {
+    if (!CurrentUser.sameUser(currentUser.username(), r.getCreatedBy())) {
       throw new BusinessRuleException(
-          "ACCESS_REQUEST_PENDING",
-          "A request for " + subject + " is already waiting for approval");
+          "ACCESS_NOT_REQUESTER", "Only the creator can " + what + " request " + r.getRequestNo());
     }
-  }
-
-  private AccessRequest decide(Long id, boolean approved, String comment) {
-    AccessRequest request = get(id);
-    String approver = currentUser.username();
-    if (CurrentUser.sameUser(approver, request.getCreatedBy())) {
-      throw new BusinessRuleException(
-          "ACCESS_FOUR_EYES", "A request cannot be decided by the user who submitted it");
-    }
-    request.decide(approved, approver, clock.instant(), blankToNull(comment));
-    return request;
-  }
-
-  void notifyRequester(AccessRequest request, String outcome) {
-    notifications.notifyUser(
-        request.getCreatedBy(),
-        new Notice(
-            "Access request " + request.getRequestNo() + " " + outcome,
-            describe(request) + note(request.getDecisionComment()),
-            link(request),
-            ENTITY,
-            String.valueOf(request.getId())));
+    return r;
   }
 
   /**
@@ -258,36 +338,21 @@ public class AccessRequestService {
    * @return description
    */
   public static String describe(AccessRequest r) {
-    return switch (r.getRequestType()) {
-      case CREATE_USER -> "Create user " + r.getUsername() + " with roles " + r.roles();
-      case MODIFY_ROLES -> "Change roles of " + r.getUsername() + " to " + r.roles();
-      case DISABLE_USER -> "Disable user " + r.getUsername();
-      case ENABLE_USER -> "Enable user " + r.getUsername();
-      case MODIFY_ROLE_PERMISSIONS -> describePermissions(r.permissionChange());
-    };
+    return AccessRequestDescriptions.describe(r);
   }
 
-  private static String describePermissions(RolePermissionChange c) {
-    List<String> parts = new ArrayList<>();
-    if (!c.added().isEmpty()) {
-      parts.add("add " + c.added());
-    }
-    if (!c.removed().isEmpty()) {
-      parts.add("remove " + c.removed());
-    }
-    return "Change permissions of role " + c.roleCode() + ": " + String.join("; ", parts);
-  }
-
+  /**
+   * Link to the request detail.
+   *
+   * @param r request
+   * @return frontend route
+   */
   static String link(AccessRequest r) {
-    return SCREEN + "?id=" + r.getId();
+    return SCREEN + "/" + r.getId();
   }
 
   static String note(String comment) {
     return comment == null || comment.isBlank() ? "" : " (" + comment + ")";
-  }
-
-  private static String blankToNull(String value) {
-    return value == null || value.isBlank() ? null : value.trim();
   }
 
   /**

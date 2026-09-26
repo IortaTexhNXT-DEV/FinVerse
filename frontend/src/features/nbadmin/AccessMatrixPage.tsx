@@ -138,7 +138,7 @@ export default function AccessMatrixPage() {
   return (
     <div className="stack">
       <PageHeader
-        section="Broking Setup"
+        section="User Access"
         title="User Access Matrix"
         description="Roles and the functions they grant, by permission or by area and action class (view only, create, amend, approve). Changes to roles go through access requests."
         actions={

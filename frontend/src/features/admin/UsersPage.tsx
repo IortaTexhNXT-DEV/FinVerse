@@ -1,9 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { Plus, UserCheck } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { adminApi } from '@/api/admin';
+import { nbadminApi } from '@/api/nbadmin';
 import type { UserInput } from '@/api/admin';
 import type { UserProfile } from '@/api/types';
+import { useAuth } from '@/auth/authContext';
+import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
@@ -25,18 +29,41 @@ function statusOf(u: UserProfile): string {
   if (u.locked) {
     return 'LOCKED';
   }
-  return u.enabled ? 'ACTIVE' : 'INACTIVE';
+  return u.enabled ? 'ACTIVE' : 'DISABLED';
+}
+
+const STATUS_FILTERS = ['ACTIVE', 'DISABLED', 'LOCKED'] as const;
+
+function matches(u: UserProfile, text: string, status: string): boolean {
+  const needle = text.toLowerCase();
+  const found =
+    needle === '' ||
+    u.username.toLowerCase().includes(needle) ||
+    u.fullName.toLowerCase().includes(needle) ||
+    (u.windowsId ?? '').toLowerCase().includes(needle);
+  return found && (status === '' || statusOf(u) === status);
 }
 
 const EMPTY: UserInput = { username: '', fullName: '', email: '', roleCodes: [], enabled: true };
 
-/** User administration: roles, authorization limits, lockout and password reset. */
+/**
+ * User administration (FR-UA-052): users with their Windows ID, business unit, user level and
+ * status, unlock and password reset. Creating and changing users is done through access requests
+ * ("Raise Request"); the direct edit stays for the System Administrator in an emergency
+ * (UAM_DIRECT_ROLE_EDIT).
+ */
 export default function UsersPage() {
   const toast = useToast();
+  const navigate = useNavigate();
+  const { can } = useAuth();
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<Editing | null>(null);
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState('');
   const users = useQuery({ queryKey: ['users'], queryFn: adminApi.users });
   const roles = useQuery({ queryKey: ['roles'], queryFn: adminApi.roles });
+  const settings = useQuery({ queryKey: ['nbadmin', 'settings'], queryFn: nbadminApi.settings });
+  const direct = settings.data?.directRoleEdit === true && can('USER_MANAGE');
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['users'] });
   const save = useMutation({
@@ -87,28 +114,65 @@ export default function UsersPage() {
       <PageHeader
         section="Administration"
         title="Users"
-        description="Accounts lock after five failed sign-ins. Authorization limits cap the journal value a user may approve."
+        description="Accounts lock after three failed sign-ins. Users are enrolled and changed through access requests; unlock and password reset stay here."
         actions={
-          <Button
-            variant="accent"
-            icon={<Plus size={16} />}
-            onClick={() => setEditing({ user: EMPTY, password: '' })}
-          >
-            New User
-          </Button>
+          <>
+            <Button
+              variant="secondary"
+              icon={<UserCheck size={16} />}
+              onClick={() => void navigate('/user-access/requests/new')}
+            >
+              Raise Request
+            </Button>
+            {direct && (
+              <Button
+                variant="accent"
+                icon={<Plus size={16} />}
+                onClick={() => setEditing({ user: EMPTY, password: '' })}
+              >
+                New User (Emergency)
+              </Button>
+            )}
+          </>
         }
       />
       <ErrorAlert error={unlock.error} />
       <Card flush>
+        <WorklistToolbar
+          placeholder="Search User ID, Name or Windows ID"
+          onSearch={setText}
+          extra={
+            <select
+              className="select"
+              aria-label="Status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="">All statuses</option>
+              {STATUS_FILTERS.map((s) => (
+                <option key={s} value={s}>
+                  {s.charAt(0) + s.slice(1).toLowerCase()}
+                </option>
+              ))}
+            </select>
+          }
+        />
         <DataTable<UserProfile>
           loading={users.isLoading}
-          rows={users.data ?? []}
+          rows={(users.data ?? []).filter((u) => matches(u, text, status))}
           rowKey={(u) => u.id}
-          onRowClick={edit}
+          onRowClick={(u) =>
+            direct
+              ? edit(u)
+              : void navigate(`/user-access/requests/new?type=MODIFY_USER&user=${u.username}`)
+          }
           columns={[
-            { key: 'u', header: 'User Name', render: (u) => <strong>{u.username}</strong> },
+            { key: 'u', header: 'User ID', render: (u) => <strong>{u.username}</strong> },
+            { key: 'w', header: 'Windows ID', render: (u) => u.windowsId ?? '' },
             { key: 'n', header: 'Full Name', render: (u) => u.fullName },
-            { key: 'r', header: 'Roles', render: (u) => u.roles.join(', ') },
+            { key: 'r', header: 'Group Profiles', render: (u) => u.roles.join(', ') },
+            { key: 'bu', header: 'Business Unit', render: (u) => u.businessUnitCode ?? '' },
+            { key: 'lv', header: 'User Level', render: (u) => u.userLevel ?? '' },
             {
               key: 'l',
               header: 'Authorization Limit',

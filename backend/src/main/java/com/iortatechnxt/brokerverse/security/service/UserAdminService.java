@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,7 @@ public class UserAdminService {
   private final CurrentUser currentUser;
   private final AccessChangeRecorder changes;
   private final PasswordHistoryRepository passwordHistory;
+  private final ApplicationEventPublisher events;
   private final Clock clock;
 
   /**
@@ -72,6 +74,7 @@ public class UserAdminService {
    * @param currentUser current user
    * @param changes access change log
    * @param passwordHistory password history
+   * @param events event publisher ({@link RoleChangedOnRequest})
    * @param clock clock
    */
   public UserAdminService(
@@ -82,6 +85,7 @@ public class UserAdminService {
       CurrentUser currentUser,
       AccessChangeRecorder changes,
       PasswordHistoryRepository passwordHistory,
+      ApplicationEventPublisher events,
       Clock clock) {
     this.users = users;
     this.roles = roles;
@@ -90,6 +94,7 @@ public class UserAdminService {
     this.currentUser = currentUser;
     this.changes = changes;
     this.passwordHistory = passwordHistory;
+    this.events = events;
     this.clock = clock;
   }
 
@@ -332,6 +337,7 @@ public class UserAdminService {
         saved.getCode(),
         AuditAction.CREATE,
         "Created role " + request.permissions() + requestText(authority));
+    roleChanged(saved, authority);
     return saved;
   }
 
@@ -372,6 +378,7 @@ public class UserAdminService {
         role.getCode(),
         AuditAction.UPDATE,
         "Permissions " + request.permissions() + requestText(authority));
+    roleChanged(role, authority);
     return role;
   }
 
@@ -389,6 +396,7 @@ public class UserAdminService {
     recordActivation(role, AccessChangeActivity.DEACTIVATE_ROLE, authority);
     audit.record(
         ROLE, role.getCode(), AuditAction.DEACTIVATE, "Deactivated role" + requestText(authority));
+    roleChanged(role, authority);
     return role;
   }
 
@@ -406,6 +414,7 @@ public class UserAdminService {
     recordActivation(role, AccessChangeActivity.REACTIVATE_ROLE, authority);
     audit.record(
         ROLE, role.getCode(), AuditAction.UPDATE, "Reactivated role" + requestText(authority));
+    roleChanged(role, authority);
     return role;
   }
 
@@ -476,6 +485,13 @@ public class UserAdminService {
 
   private static String blankToNull(String value) {
     return value == null || value.isBlank() ? null : value.strip();
+  }
+
+  private void roleChanged(Role role, ChangeAuthority authority) {
+    if (!authority.isDirect()) {
+      events.publishEvent(
+          new RoleChangedOnRequest(authority.requestNo(), role.getCode(), currentUser.username()));
+    }
   }
 
   private static String requestText(ChangeAuthority authority) {

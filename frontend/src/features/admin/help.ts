@@ -10,19 +10,30 @@ export const ADMIN_HELP: HelpSection = {
       name: 'Users',
       path: '/admin/users',
       summary:
-        'User accounts with their roles, status, last sign-in and authorization limit: the base-currency amount a user may approve on journals, payments and claims (blank = unlimited).',
+        'User accounts with their Windows ID, group profiles, business unit, user level, status (Active, Disabled, Locked), last sign-in and authorization limit: the base-currency amount a user may approve on journals, payments and claims (blank = unlimited).',
+      workflow: [
+        'Search by user ID, name or Windows ID and filter by status.',
+        'Raise Request opens a new access request; a row opens a Modify user request for that user. Users are enrolled and changed only through approved requests.',
+      ],
       controls: [
-        'Accounts lock after five failed sign-ins; an administrator unlocks them or resets the password.',
-        'Every change to a user is recorded in the audit trail.',
+        'Accounts lock after three failed sign-ins; an administrator unlocks them or resets the password.',
+        'The direct create and edit of users is kept for the System Administrator while the emergency path UAM_DIRECT_ROLE_EDIT is open.',
+        'Every change to a user is recorded in the audit trail and the access change log.',
       ],
     },
     {
       name: 'Roles & Permissions',
       path: '/admin/roles',
       summary:
-        'The permissions of each role. Keep makers, checkers, administrators and auditors in different roles (segregation of duties).',
-      workflow: ['Tick or clear permissions in the matrix, then save the role.'],
-      controls: ['Every permission change is recorded in the audit trail.'],
+        'The permissions of each group profile (role) with its privilege level and active flag. Keep makers, checkers, administrators and auditors in different roles (segregation of duties).',
+      workflow: [
+        'Approved Requests to Implement lists the approved group-profile requests: Implement Request applies the approved change and the request becomes IMPLEMENTED.',
+        'While the emergency path UAM_DIRECT_ROLE_EDIT is open, tick or clear permissions in the matrix and save the role.',
+      ],
+      controls: [
+        'A profile changes only by implementing an approved request; the implementer is never the requester.',
+        'Every direct edit is audited and raises the UAM_DIRECT_ROLE_EDIT alert; every change is in the access change log.',
+      ],
     },
     {
       name: 'Audit Trail',

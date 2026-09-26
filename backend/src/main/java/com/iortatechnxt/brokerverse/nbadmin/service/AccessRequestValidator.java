@@ -2,112 +2,204 @@ package com.iortatechnxt.brokerverse.nbadmin.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
+import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestRepository;
+import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
-import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
-import com.iortatechnxt.brokerverse.security.domain.Role;
-import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
+import com.iortatechnxt.brokerverse.nbadmin.domain.ExternalParty;
+import com.iortatechnxt.brokerverse.nbadmin.service.ExternalUserProvisioner.ExternalUserAction;
+import java.time.Clock;
+import java.time.LocalDate;
+import java.util.EnumSet;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Checks a user access request before it is submitted: the user must not exist for a creation and
- * must exist for any other request, roles must exist, and a creation needs a full name.
- * Role-permission changes (PMADD05) are checked by {@link RolePermissionChangeValidator}.
+ * Checks an access request (FR-UA-010): light checks (formats only) when a draft is saved, full
+ * checks on submission and again at approval. Internal users are checked by {@link
+ * UserRequestValidator}, group profiles by {@link GroupProfileRequestValidator}, external (portal)
+ * users by the port {@link ExternalUserProvisioner} (decision D7).
  */
 @Component
+@Transactional(readOnly = true)
 public class AccessRequestValidator {
 
-  private static final Pattern USERNAME = Pattern.compile("[a-zA-Z0-9._-]{3,50}");
+  private static final Set<AccessRequestType> EXTERNAL_TYPES =
+      EnumSet.of(
+          AccessRequestType.CREATE_USER,
+          AccessRequestType.DISABLE_USER,
+          AccessRequestType.ENABLE_USER);
 
-  private final AppUserRepository users;
-  private final RoleRepository roles;
-  private final RolePermissionChangeValidator permissionChanges;
+  private final UserRequestValidator users;
+  private final GroupProfileRequestValidator groupProfiles;
+  private final ExternalUserProvisioner externalUsers;
+  private final AccessRequestRepository requests;
+  private final Clock clock;
 
   /**
    * Creates the validator.
    *
-   * @param users users
-   * @param roles roles
-   * @param permissionChanges role-permission change checks (PMADD05)
+   * @param users internal user checks
+   * @param groupProfiles group-profile checks
+   * @param externalUsers external (portal) users (port)
+   * @param requests requests (one open request per user or role)
+   * @param clock clock
    */
   public AccessRequestValidator(
-      AppUserRepository users,
-      RoleRepository roles,
-      RolePermissionChangeValidator permissionChanges) {
+      UserRequestValidator users,
+      GroupProfileRequestValidator groupProfiles,
+      ExternalUserProvisioner externalUsers,
+      AccessRequestRepository requests,
+      Clock clock) {
     this.users = users;
-    this.roles = roles;
-    this.permissionChanges = permissionChanges;
+    this.groupProfiles = groupProfiles;
+    this.externalUsers = externalUsers;
+    this.requests = requests;
+    this.clock = clock;
   }
 
   /**
-   * Validates and normalises a request.
+   * Full checks of a request about to be submitted (the one-step submission of PMADD05 too).
    *
    * @param c request content
    * @return normalised content
    */
   public AccessRequestContent validate(AccessRequestContent c) {
-    if (c.type() == AccessRequestType.MODIFY_ROLE_PERMISSIONS) {
-      return permissionChanges.validate(c);
-    }
-    String username = c.username() == null ? "" : c.username().trim();
-    if (!USERNAME.matcher(username).matches()) {
-      throw new BusinessRuleException(
-          "ACCESS_USERNAME",
-          "The user name has 3 to 50 letters, digits, dots, dashes or underscores");
-    }
-    requireUserState(c, username);
-    Set<String> roleCodes = requireRoles(c);
-    return new AccessRequestContent(
-        c.type(),
-        username,
-        trimmed(c.fullName()),
-        trimmed(c.email()),
-        roleCodes,
-        c.homeBranchId(),
-        c.justification().trim());
+    AccessRequestContent clean = check(c);
+    requireNoOpenRequest(clean, null);
+    return clean;
   }
 
-  private void requireUserState(AccessRequestContent c, String username) {
-    boolean exists = users.existsByUsernameIgnoreCase(username);
-    if (c.type() != AccessRequestType.CREATE_USER) {
-      if (!exists) {
-        throw new BusinessRuleException(
-            "ACCESS_UNKNOWN_USER", "User " + username + " does not exist");
+  /**
+   * Full checks on submission of a saved request: as {@link #validate} but the request itself does
+   * not count as another open request.
+   *
+   * @param c request content
+   * @param requestId the request
+   * @return normalised content
+   */
+  public AccessRequestContent validateSubmission(AccessRequestContent c, Long requestId) {
+    AccessRequestContent clean = check(c);
+    requireNoOpenRequest(clean, requestId);
+    return clean;
+  }
+
+  /**
+   * Checks the change again at approval (FR-UA-031 R3): the user or role may have changed since
+   * submission.
+   *
+   * @param c request content
+   * @return normalised content
+   */
+  public AccessRequestContent recheck(AccessRequestContent c) {
+    return check(c);
+  }
+
+  /**
+   * Light checks of a draft: the subject is named in a valid format (BRD 1.002.1.2).
+   *
+   * @param c request content
+   * @return content with trimmed remarks
+   */
+  public AccessRequestContent validateDraft(AccessRequestContent c) {
+    if (c.type() == null) {
+      throw new BusinessRuleException("ACCESS_TYPE", "Choose the type of request");
+    }
+    if (c.type().isGroupProfile()) {
+      if (c.roleCode() == null || c.roleCode().isBlank()) {
+        throw new BusinessRuleException("ACCESS_ROLE", "Select the role to change");
       }
+    } else {
+      UserRequestValidator.requireUsername(c.username());
+    }
+    requireEffectiveDate(c);
+    return c.withJustification(trimmed(c.justification()));
+  }
+
+  private AccessRequestContent check(AccessRequestContent c) {
+    if (c.justification() == null || c.justification().isBlank()) {
+      throw new BusinessRuleException("ACCESS_JUSTIFICATION", "Enter the justification");
+    }
+    requireEffectiveDate(c);
+    AccessRequestContent trimmedContent = c.withJustification(c.justification().trim());
+    if (c.type().isGroupProfile()) {
+      return groupProfiles.validate(trimmedContent);
+    }
+    if (c.external() != null) {
+      return external(trimmedContent);
+    }
+    return users.validate(trimmedContent);
+  }
+
+  private AccessRequestContent external(AccessRequestContent c) {
+    ExternalParty party = c.external();
+    if (!EXTERNAL_TYPES.contains(c.type())) {
+      throw new BusinessRuleException(
+          "ACCESS_EXTERNAL_TYPE", "External users are created, disabled or enabled only");
+    }
+    if (party.kind() == null || party.code() == null) {
+      throw new BusinessRuleException(
+          "ACCESS_EXTERNAL_PARTY", "Select the insurer or client of the external user");
+    }
+    String username = UserRequestValidator.requireUsername(c.username());
+    externalUsers.validate(
+        action(c.type()),
+        new ExternalUserAccount(
+            null,
+            username,
+            c.fullName(),
+            c.email(),
+            party.kind(),
+            party.code(),
+            party.portalRole(),
+            null));
+    return c;
+  }
+
+  /**
+   * The provisioner action of an external request.
+   *
+   * @param type CREATE_USER, DISABLE_USER or ENABLE_USER
+   * @return action
+   */
+  static ExternalUserAction action(AccessRequestType type) {
+    return switch (type) {
+      case DISABLE_USER -> ExternalUserAction.DISABLE;
+      case ENABLE_USER -> ExternalUserAction.ENABLE;
+      default -> ExternalUserAction.CREATE;
+    };
+  }
+
+  private void requireEffectiveDate(AccessRequestContent c) {
+    if (c.effectiveFrom() == null) {
       return;
     }
-    requireNew(username, exists);
-    if (c.fullName() == null || c.fullName().isBlank()) {
-      throw new BusinessRuleException("ACCESS_FULL_NAME", "Enter the full name of the new user");
+    if (c.type().isGroupProfile()) {
+      throw new BusinessRuleException(
+          "ACCESS_EFFECTIVE_DATE_USER_ONLY",
+          "An effective date applies to user requests; group profiles are implemented");
+    }
+    if (c.effectiveFrom().isBefore(LocalDate.now(clock))) {
+      throw new BusinessRuleException(
+          "ACCESS_EFFECTIVE_DATE", "The effective date cannot be before today");
     }
   }
 
-  private static void requireNew(String username, boolean exists) {
-    if (exists) {
-      throw new BusinessRuleException("ACCESS_USER_EXISTS", "User " + username + " already exists");
+  private void requireNoOpenRequest(AccessRequestContent clean, Long requestId) {
+    Long self = requestId == null ? Long.valueOf(-1L) : requestId;
+    boolean groupProfile = clean.type().isGroupProfile();
+    boolean open =
+        groupProfile
+            ? requests.existsByRoleCodeAndStatusInAndIdNot(
+                clean.roleCode(), AccessRequestStatus.OPEN, self)
+            : requests.existsByUsernameIgnoreCaseAndStatusInAndIdNot(
+                clean.username(), AccessRequestStatus.OPEN, self);
+    if (open) {
+      String subject = groupProfile ? "role " + clean.roleCode() : "user " + clean.username();
+      throw new BusinessRuleException(
+          "ACCESS_REQUEST_PENDING",
+          "A request for " + subject + " is already waiting for approval");
     }
-  }
-
-  private Set<String> requireRoles(AccessRequestContent c) {
-    boolean needsRoles =
-        c.type() == AccessRequestType.CREATE_USER || c.type() == AccessRequestType.MODIFY_ROLES;
-    if (!needsRoles) {
-      return Set.of();
-    }
-    if (c.roleCodes().isEmpty()) {
-      throw new BusinessRuleException("ACCESS_ROLES", "Select at least one role");
-    }
-    Set<String> known =
-        roles.findByCodeIn(c.roleCodes()).stream().map(Role::getCode).collect(Collectors.toSet());
-    Set<String> unknown = new TreeSet<>(c.roleCodes());
-    unknown.removeAll(known);
-    if (!unknown.isEmpty()) {
-      throw new BusinessRuleException("ACCESS_UNKNOWN_ROLE", "Unknown role(s): " + unknown);
-    }
-    return new TreeSet<>(c.roleCodes());
   }
 
   private static String trimmed(String value) {

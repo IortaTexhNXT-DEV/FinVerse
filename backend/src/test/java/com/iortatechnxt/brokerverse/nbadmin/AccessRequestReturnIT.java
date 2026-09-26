@@ -46,7 +46,7 @@ class AccessRequestReturnIT {
 
   @Test
   void returnedRequestIsResubmittedAndApprovedInBulk() {
-    String name = "r" + System.nanoTime();
+    String name = AccessRequestIT.username();
     AccessRequest created = submit(AccessRequestType.CREATE_USER, name);
     as.run("approver", () -> requests.approve(created.getId(), null));
     AccessRequest request = submit(AccessRequestType.MODIFY_ROLES, name);
@@ -73,7 +73,7 @@ class AccessRequestReturnIT {
     assertThat(again.getStatus()).isEqualTo(AccessRequestStatus.PENDING);
     assertThat(again.getJustification()).contains("HR memo 12");
 
-    String other = "n" + System.nanoTime();
+    String other = AccessRequestIT.username();
     AccessRequest newUser = submit(AccessRequestType.CREATE_USER, other);
     List<Outcome> outcomes =
         as.run(

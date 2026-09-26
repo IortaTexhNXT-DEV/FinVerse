@@ -2,11 +2,14 @@ package com.iortatechnxt.brokerverse.nbadmin.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
+import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
+import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedRole;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RolePermissionChange;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -46,15 +49,7 @@ public class RolePermissionChangeValidator {
    */
   public AccessRequestContent validate(AccessRequestContent c) {
     RolePermissionChange change = c.permissionChange();
-    if (change == null || change.roleCode() == null || change.roleCode().isBlank()) {
-      throw new BusinessRuleException("ACCESS_ROLE", "Select the role to change");
-    }
-    String code = change.roleCode().trim();
-    Role role =
-        roles
-            .findByCode(code)
-            .orElseThrow(
-                () -> new BusinessRuleException("ACCESS_UNKNOWN_ROLE", "Unknown role(s): " + code));
+    Role role = requireRole(change);
     requireKnown(change.added());
     requireKnown(change.removed());
     Set<String> overlap = new TreeSet<>(change.added());
@@ -70,17 +65,57 @@ public class RolePermissionChangeValidator {
     Set<String> removed = new TreeSet<>(change.removed());
     removed.retainAll(current);
     RolePermissionChange effective = new RolePermissionChange(role.getCode(), added, removed);
-    if (effective.isEmpty()) {
+    RequestedRole data = roleDataChange(role, c.role());
+    if (effective.isEmpty() && data == null) {
       throw new BusinessRuleException(
           "ACCESS_NO_PERMISSION_CHANGE",
           "The request does not change the permissions of role " + role.getCode());
     }
     requireStorable(added);
     requireStorable(removed);
-    return AccessRequestContent.rolePermissions(effective, c.justification().trim());
+    return AccessRequestContent.groupProfile(
+        AccessRequestType.MODIFY_ROLE_PERMISSIONS, effective, data, c.justification());
   }
 
-  private static void requireKnown(Set<String> permissions) {
+  private Role requireRole(RolePermissionChange change) {
+    if (change == null || change.roleCode() == null || change.roleCode().isBlank()) {
+      throw new BusinessRuleException("ACCESS_ROLE", "Select the role to change");
+    }
+    String code = change.roleCode().trim();
+    return roles
+        .findByCode(code)
+        .orElseThrow(
+            () -> new BusinessRuleException("ACCESS_UNKNOWN_ROLE", "Unknown role(s): " + code));
+  }
+
+  /**
+   * The name, description and level a change sets, when any differs from the role (BRD 3.002.2).
+   *
+   * @param role the role today
+   * @param requested requested data, null for none
+   * @return requested data, or null when it changes nothing
+   */
+  private static RequestedRole roleDataChange(Role role, RequestedRole requested) {
+    if (requested == null) {
+      return null;
+    }
+    boolean changes =
+        differs(requested.name(), role.getName())
+            || differs(requested.description(), role.getDescription())
+            || differs(requested.privilegeLevel(), role.getPrivilegeLevel());
+    return changes ? requested : null;
+  }
+
+  private static boolean differs(Object requested, Object current) {
+    return requested != null && !Objects.equals(requested, current);
+  }
+
+  /**
+   * Checks that every permission is known.
+   *
+   * @param permissions permission codes
+   */
+  static void requireKnown(Set<String> permissions) {
     Set<String> unknown = new TreeSet<>(permissions);
     unknown.removeAll(KNOWN);
     if (!unknown.isEmpty()) {
@@ -89,7 +124,12 @@ public class RolePermissionChangeValidator {
     }
   }
 
-  private static void requireStorable(Set<String> permissions) {
+  /**
+   * Checks that a permission list fits the request.
+   *
+   * @param permissions permission codes
+   */
+  static void requireStorable(Set<String> permissions) {
     if (String.join(",", permissions).length() > MAX_LIST_LENGTH) {
       throw new BusinessRuleException(
           "ACCESS_PERMISSION_LIST_TOO_LONG", "Split the change into several requests");

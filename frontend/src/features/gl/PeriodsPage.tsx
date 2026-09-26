@@ -17,6 +17,7 @@ import { PeriodActionDialog } from './PeriodActionDialog';
 import type { PendingPeriodAction } from './PeriodActionDialog';
 import { PERIOD_ACTIONS } from './periodActions';
 import type { PeriodAction } from './periodActions';
+import { displayNameOf } from '@/api/users';
 
 /** Financial calendar and period status console (open, soft close, close, reopen). */
 export default function PeriodsPage() {
@@ -119,7 +120,7 @@ export default function PeriodsPage() {
               header: 'Last Change',
               render: (p) =>
                 p.statusChangedBy
-                  ? `${p.statusChangedBy} · ${formatDateTime(p.statusChangedAt)}`
+                  ? `${displayNameOf(p.statusChangedBy)} · ${formatDateTime(p.statusChangedAt)}`
                   : '',
             },
             { key: 'r', header: 'Reason', render: (p) => p.statusReason ?? '' },

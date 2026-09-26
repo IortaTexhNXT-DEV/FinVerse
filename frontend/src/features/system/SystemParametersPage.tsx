@@ -13,6 +13,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
+import { displayNameOf } from '@/api/users';
 
 type Tab = 'parameters' | 'configuration';
 
@@ -113,7 +114,9 @@ export default function SystemParametersPage() {
                 key: 'u',
                 header: 'Last Changed',
                 render: (p) =>
-                  p.updatedBy === undefined ? '' : `${p.updatedBy}, ${formatDateTime(p.updatedAt)}`,
+                  p.updatedBy === undefined
+                    ? ''
+                    : `${displayNameOf(p.updatedBy)}, ${formatDateTime(p.updatedAt)}`,
               },
             ]}
           />

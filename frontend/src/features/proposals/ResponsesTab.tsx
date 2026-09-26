@@ -17,6 +17,7 @@ import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormContr
 import { formatDate, formatDateTime } from '@/utils/format';
 import { RESPONSE_STAGES } from './proposalList';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { displayNameOf } from '@/api/users';
 
 const STATUSES = [
   { value: 'RECEIVED', label: 'Terms received' },
@@ -142,7 +143,7 @@ function ResponseHistory({ proposalId }: Readonly<{ proposalId: number }>) {
           {
             key: 'w',
             header: 'Changed',
-            render: (h) => `${h.changedBy} ${formatDateTime(h.changedAt)}`,
+            render: (h) => `${displayNameOf(h.changedBy)} ${formatDateTime(h.changedAt)}`,
           },
           {
             key: 'r',

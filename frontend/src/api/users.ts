@@ -48,6 +48,17 @@ export function setUserDirectory(entries: DirectoryEntry[]): void {
   listeners.forEach((l) => l());
 }
 
+/**
+ * Display name of a login id for texts built outside a component (toasts, joined lines); falls
+ * back to the login id while the directory is not loaded.
+ */
+export function displayNameOf(login: string | null | undefined): string {
+  if (!login) {
+    return '';
+  }
+  return directory.get(login.toLowerCase())?.displayName ?? login;
+}
+
 export const userDirectory = {
   subscribe: (listener: () => void): (() => void) => {
     listeners.add(listener);

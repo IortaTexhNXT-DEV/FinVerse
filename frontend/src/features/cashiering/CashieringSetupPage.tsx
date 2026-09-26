@@ -18,6 +18,7 @@ import { formatDateTime, humanize } from '@/utils/format';
 import { CodeSelect, TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { Layout, MinimalBalanceRule } from './cashieringApi';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'layouts', label: 'Payment File Layouts' },
@@ -122,7 +123,8 @@ function Layouts() {
     {
       key: 'upd',
       header: 'Last Changed',
-      render: (l) => (l.updatedBy ? `${l.updatedBy} · ${formatDateTime(l.updatedAt)}` : ''),
+      render: (l) =>
+        l.updatedBy ? `${displayNameOf(l.updatedBy)} · ${formatDateTime(l.updatedAt)}` : '',
     },
     {
       key: 'edit',

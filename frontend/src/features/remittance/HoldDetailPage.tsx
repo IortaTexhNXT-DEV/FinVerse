@@ -20,6 +20,7 @@ import type { Hold } from './api';
 import { AssignDialog, ExtendDialog } from './HoldDialogs';
 import { joinParts } from './remittanceLabels';
 import './remittance.css';
+import { displayNameOf } from '@/api/users';
 
 const ENTITY = 'RemittanceHold';
 
@@ -84,7 +85,7 @@ function Summary({ hold }: Readonly<{ hold: Hold }>) {
         {
           icon: UserRound,
           label: 'Requested / Approved By',
-          value: `${hold.requestedBy} / ${hold.approvedBy ?? '—'}`,
+          value: `${displayNameOf(hold.requestedBy)} / ${hold.approvedBy ?? '—'}`,
         },
         { icon: UserRound, label: 'Processor', value: hold.assignedProcessor ?? 'Unassigned' },
       ]}

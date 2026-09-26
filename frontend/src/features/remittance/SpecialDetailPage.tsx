@@ -18,6 +18,7 @@ import { remittanceApi } from './api';
 import type { Special } from './api';
 import { joinParts } from './remittanceLabels';
 import './remittance.css';
+import { displayNameOf } from '@/api/users';
 
 const ENTITY = 'SpecialRemittance';
 
@@ -46,7 +47,7 @@ function Summary({ special }: Readonly<{ special: Special }>) {
         {
           icon: UserRound,
           label: 'Requested / Approved By',
-          value: `${special.requestedBy} / ${special.approvedBy ?? '—'}`,
+          value: `${displayNameOf(special.requestedBy)} / ${special.approvedBy ?? '—'}`,
         },
         { icon: ClipboardCheck, label: 'Validation', value: special.validationNote ?? '—' },
         {

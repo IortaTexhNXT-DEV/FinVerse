@@ -21,6 +21,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import './operations.css';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'OPEN', label: 'Open Hand-offs' },
@@ -159,7 +160,7 @@ function Extracts() {
     {
       key: 'at',
       header: 'Stored',
-      render: (f) => `${formatDateTime(f.createdAt)} · ${f.createdBy}`,
+      render: (f) => `${formatDateTime(f.createdAt)} · ${displayNameOf(f.createdBy)}`,
     },
     {
       key: 'dl',

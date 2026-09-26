@@ -20,6 +20,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import { DispatchManyDialog } from './IssuanceBulkBar';
 import { rowKeyOf } from './issuanceLogic';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'ready', label: 'Ready to Dispatch' },
@@ -217,7 +218,7 @@ function DispatchReport() {
           {
             key: 'when',
             header: 'Queued',
-            render: (m) => `${formatDateTime(m.createdAt)} by ${m.createdBy}`,
+            render: (m) => `${formatDateTime(m.createdAt)} by ${displayNameOf(m.createdBy)}`,
           },
           { key: 'arn', header: 'Proposal No.', render: (m) => <code>{m.reference ?? ''}</code> },
           { key: 'to', header: 'To', render: (m) => m.recipients },

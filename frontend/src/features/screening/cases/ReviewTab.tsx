@@ -14,6 +14,7 @@ import { formatDateTime } from '@/utils/format';
 import { casesApi } from './api';
 import type { CaseDetail, CaseDocument, TemplateField } from './api';
 import { fieldError, missingFields, sections } from './caseLogic';
+import { UserName } from '@/components/ui/UserName';
 
 interface InputProps {
   field: TemplateField;
@@ -152,7 +153,8 @@ export function ReviewTab({ detail }: Readonly<{ detail: CaseDetail }>) {
         <ErrorAlert error={save.error} />
         {form.submittedAt && (
           <p className="muted">
-            Submitted by {form.submittedBy} on {formatDateTime(form.submittedAt)}.
+            Submitted by <UserName login={form.submittedBy} /> on {formatDateTime(form.submittedAt)}
+            .
           </p>
         )}
         {Object.keys(missing).length > 0 && (

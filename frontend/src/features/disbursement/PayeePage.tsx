@@ -30,6 +30,7 @@ import {
 } from './payeeForm';
 import type { PayeeForm } from './payeeForm';
 import './disbursement.css';
+import { displayNameOf } from '@/api/users';
 
 const ENTITY = 'DisbursementPayee';
 const ACTIONS: Record<string, string> = {
@@ -40,9 +41,9 @@ const ACTIONS: Record<string, string> = {
 };
 
 function payeeDescription(p: Payee): string {
-  const parts = [`Payee ${p.summary.payeeCode}`, `created by ${p.createdBy}`];
+  const parts = [`Payee ${p.summary.payeeCode}`, `created by ${displayNameOf(p.createdBy)}`];
   if (p.updatedBy !== undefined) {
-    parts.push(`last changed by ${p.updatedBy}`);
+    parts.push(`last changed by ${displayNameOf(p.updatedBy)}`);
   }
   return parts.join(' · ');
 }

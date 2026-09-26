@@ -17,6 +17,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { DetailList } from '@/features/catalog/DetailList';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { PremiumCard } from './PremiumBreakdown';
+import { displayNameOf } from '@/api/users';
 
 /** Details: client, product, terms and the workflow facts of the quotation. */
 export function DetailsTab({ quotation: q }: Readonly<{ quotation: Quotation }>) {
@@ -49,12 +50,17 @@ export function DetailsTab({ quotation: q }: Readonly<{ quotation: Quotation }>)
           rows={[
             ['Intake template', q.templateVersion],
             ['Version', `${q.currentVersion}${q.versionOpen ? ' (open)' : ' (submitted)'}`],
-            ['Created', `${q.createdBy} ${formatDateTime(q.createdAt)}`],
+            ['Created', `${displayNameOf(q.createdBy)} ${formatDateTime(q.createdAt)}`],
             [
               'Submitted',
-              q.submittedBy ? `${q.submittedBy} ${formatDateTime(q.submittedAt)}` : '—',
+              q.submittedBy
+                ? `${displayNameOf(q.submittedBy)} ${formatDateTime(q.submittedAt)}`
+                : '—',
             ],
-            ['Approved', q.approvedBy ? `${q.approvedBy} ${formatDateTime(q.approvedAt)}` : '—'],
+            [
+              'Approved',
+              q.approvedBy ? `${displayNameOf(q.approvedBy)} ${formatDateTime(q.approvedAt)}` : '—',
+            ],
             ['Sent to client', formatDateTime(q.sentAt) || '—'],
             ['Accepted', formatDateTime(q.acceptedAt) || '—'],
             ['Accepted risk groups', q.acceptedGroups.join(', ') || '—'],
@@ -226,7 +232,8 @@ export function VersionsTab({
             {
               key: 'b',
               header: 'Submitted',
-              render: (v) => (v.frozenBy ? `${v.frozenBy} ${formatDateTime(v.frozenAt)}` : '—'),
+              render: (v) =>
+                v.frozenBy ? `${displayNameOf(v.frozenBy)} ${formatDateTime(v.frozenAt)}` : '—',
             },
           ]}
         />

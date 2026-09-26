@@ -14,6 +14,8 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
 import { ConfirmPolicyCard } from './ConfirmPolicyCard';
+import { UserName } from '@/components/ui/UserName';
+import { displayNameOf } from '@/api/users';
 
 interface Row {
   field: string;
@@ -111,7 +113,7 @@ export default function ExtractionReviewPage() {
         backTo="/issuance"
         section="Policy Issuance · Extraction Review"
         title={r.account.clientName}
-        description={`${r.epolicy.fileName} · received ${formatDateTime(r.epolicy.createdAt)} by ${r.epolicy.createdBy} · matched by ${humanize(r.epolicy.matchMethod)}`}
+        description={`${r.epolicy.fileName} · received ${formatDateTime(r.epolicy.createdAt)} by ${displayNameOf(r.epolicy.createdBy)} · matched by ${humanize(r.epolicy.matchMethod)}`}
         actions={
           <>
             <ReferenceChip label="ARN" value={r.account.arn} />
@@ -149,14 +151,15 @@ export default function ExtractionReviewPage() {
       {open && can('EPOLICY_MANAGE') && <ConfirmPolicyCard key={r.epolicy.id} review={r} />}
       {r.epolicy.status === 'CONFIRMED' && (
         <div className="alert success" role="status">
-          Policy {r.epolicy.policyNumbers.join(', ')} confirmed by {r.epolicy.reviewedBy} on{' '}
-          {formatDateTime(r.epolicy.reviewedAt)}; the account is{' '}
-          {humanize(r.account.status).toLowerCase()}.
+          Policy {r.epolicy.policyNumbers.join(', ')} confirmed by{' '}
+          <UserName login={r.epolicy.reviewedBy} /> on {formatDateTime(r.epolicy.reviewedAt)}; the
+          account is {humanize(r.account.status).toLowerCase()}.
         </div>
       )}
       {r.epolicy.status === 'REJECTED' && (
         <div className="alert danger" role="status">
-          Rejected by {r.epolicy.reviewedBy}: {humanize(r.epolicy.rejectReason ?? '')}
+          Rejected by <UserName login={r.epolicy.reviewedBy} />:{' '}
+          {humanize(r.epolicy.rejectReason ?? '')}
         </div>
       )}
     </div>

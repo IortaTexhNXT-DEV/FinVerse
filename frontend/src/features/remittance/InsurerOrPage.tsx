@@ -17,6 +17,7 @@ import type { AccountHit, FeedRecord, FeedRun, OrUpload } from './api';
 import { TemplateButton, UploadForm } from './RemittanceParts';
 import { OR_TEMPLATE } from './remittanceLabels';
 import './remittance.css';
+import { displayNameOf } from '@/api/users';
 
 const UPDATED: Column<AccountHit>[] = [
   {
@@ -62,7 +63,7 @@ const RUNS: Column<FeedRun>[] = [
   {
     key: 'at',
     header: 'Uploaded',
-    render: (r) => `${formatDateTime(r.startedAt)} · ${r.createdBy}`,
+    render: (r) => `${formatDateTime(r.startedAt)} · ${displayNameOf(r.createdBy)}`,
   },
 ];
 

@@ -16,6 +16,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import { BillingBatches } from './BillingBatches';
 import { UploadReportDialog } from './UploadReportDialog';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'batches', label: 'Billing Batches' },
@@ -57,7 +58,7 @@ function ReportsTable({ companyId }: Readonly<{ companyId: number }>) {
           {
             key: 'by',
             header: 'Uploaded',
-            render: (r) => `${formatDateTime(r.createdAt)} by ${r.createdBy}`,
+            render: (r) => `${formatDateTime(r.createdAt)} by ${displayNameOf(r.createdBy)}`,
           },
         ]}
       />

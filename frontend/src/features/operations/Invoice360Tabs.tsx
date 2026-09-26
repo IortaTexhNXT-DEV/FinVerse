@@ -15,6 +15,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
 import { componentLabel, premiumTotals, visibleComponents } from './opsLabels';
+import { displayNameOf } from '@/api/users';
 
 const COMPONENT_COLUMNS: Column<InvoiceComponentRow>[] = [
   { key: 'c', header: 'Component', render: (r) => componentLabel(r.component) },
@@ -56,7 +57,11 @@ const MOVEMENT_COLUMNS: Column<Movement>[] = [
     header: 'Documents',
     render: (m) => [m.arNo, m.orNo, m.batchNo, m.journalBatchNo].filter(Boolean).join(' · '),
   },
-  { key: 'u', header: 'Posted', render: (m) => `${formatDateTime(m.postedAt)} · ${m.postedBy}` },
+  {
+    key: 'u',
+    header: 'Posted',
+    render: (m) => `${formatDateTime(m.postedAt)} · ${displayNameOf(m.postedBy)}`,
+  },
 ];
 
 const HISTORY_COLUMNS: Column<StatusChange>[] = [

@@ -16,6 +16,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate, formatDateTime, today } from '@/utils/format';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { displayNameOf } from '@/api/users';
 
 /**
  * Document templates (BRNB.004): the texts merged into quotations, slips, insurance advice and
@@ -118,7 +119,7 @@ export default function DocumentTemplatesPage() {
                 {
                   key: 'by',
                   header: 'Created',
-                  render: (v) => `${v.createdBy} · ${formatDateTime(v.createdAt)}`,
+                  render: (v) => `${displayNameOf(v.createdBy)} · ${formatDateTime(v.createdAt)}`,
                 },
                 {
                   key: 'word',

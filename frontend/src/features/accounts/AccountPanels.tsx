@@ -10,6 +10,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { DetailList } from '@/features/catalog/DetailList';
 import type { DetailRow } from '@/features/catalog/DetailList';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { displayNameOf } from '@/api/users';
 
 function detailRows(a: Account): DetailRow[] {
   return [
@@ -35,7 +36,7 @@ function detailRows(a: Account): DetailRow[] {
       [a.sales.region, a.sales.department, a.sales.team].filter(Boolean).join(' / ') || '—',
     ],
     ['Cost center', a.sales.costCenter],
-    ['Created', `${a.createdBy} ${formatDateTime(a.createdAt)}`],
+    ['Created', `${displayNameOf(a.createdBy)} ${formatDateTime(a.createdAt)}`],
   ];
 }
 

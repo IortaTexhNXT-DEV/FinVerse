@@ -24,6 +24,7 @@ import { deductionsApi } from './deductionsApi';
 import type { Deduction } from './deductionsApi';
 import { stagesOf } from './remittanceLabels';
 import './remittance.css';
+import { UserName } from '@/components/ui/UserName';
 
 const COLUMNS: Column<Deduction>[] = [
   {
@@ -32,7 +33,9 @@ const COLUMNS: Column<Deduction>[] = [
     render: (d) => (
       <>
         <strong>{d.deductionNo}</strong>
-        <div className="remit-muted">{d.createdBy}</div>
+        <div className="remit-muted">
+          <UserName login={d.createdBy} />
+        </div>
       </>
     ),
   },

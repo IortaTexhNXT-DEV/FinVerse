@@ -14,6 +14,7 @@ import type { MatchDetail } from './api';
 import { FalsePositiveDialog } from './FalsePositiveDialog';
 import { comparisonRows, entryChanged, isOpen, matchedText, scoreText } from './matchLogic';
 import type { ComparisonRow } from './matchLogic';
+import { displayNameOf } from '@/api/users';
 
 function checkOf(row: ComparisonRow) {
   return row.same === undefined ? null : (
@@ -47,7 +48,7 @@ function Summary({ detail }: Readonly<{ detail: MatchDetail }>) {
       {m.decidedBy !== undefined && m.decidedBy !== null && (
         <>
           <dt>Decided</dt>
-          <dd>{`${m.decidedBy} ${formatDateTime(m.decidedAt)}`}</dd>
+          <dd>{`${displayNameOf(m.decidedBy)} ${formatDateTime(m.decidedAt)}`}</dd>
           <dt>Justification</dt>
           <dd>{m.decisionRemarks ?? '—'}</dd>
         </>

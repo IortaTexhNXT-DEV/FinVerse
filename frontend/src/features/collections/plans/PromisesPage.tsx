@@ -26,6 +26,7 @@ import { PROMISE_TABS, statusesOf } from './labels';
 import { PromiseDialog } from './PlanDialogs';
 import { ReasonDialog } from './Parts';
 import { usePromiseSave } from './usePromiseSave';
+import { UserName } from '@/components/ui/UserName';
 
 const COLUMNS: Column<PaymentPromise>[] = [
   {
@@ -58,7 +59,7 @@ const COLUMNS: Column<PaymentPromise>[] = [
     header: 'Recorded By',
     render: (p) => (
       <>
-        {p.recordedBy}
+        <UserName login={p.recordedBy} />
         {p.bulkRef !== undefined && <div className="muted">{p.bulkRef}</div>}
       </>
     ),

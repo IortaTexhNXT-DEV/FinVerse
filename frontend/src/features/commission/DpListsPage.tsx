@@ -20,6 +20,7 @@ import { formatDate, formatDateTime, humanize, today } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { DpList, Submission } from './commissionApi';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'lists', label: 'Lists Received' },
@@ -48,7 +49,7 @@ const LIST_COLUMNS: Column<DpList>[] = [
   {
     key: 'at',
     header: 'Taken In',
-    render: (l) => `${formatDateTime(l.createdAt)} · ${l.createdBy}`,
+    render: (l) => `${formatDateTime(l.createdAt)} · ${displayNameOf(l.createdBy)}`,
   },
 ];
 

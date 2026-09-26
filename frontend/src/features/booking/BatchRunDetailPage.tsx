@@ -9,6 +9,7 @@ import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { displayNameOf } from '@/api/users';
 
 /** One booking batch run (BRNB.036): the outcome of every account, with the failure reasons. */
 export default function BatchRunDetailPage() {
@@ -31,7 +32,7 @@ export default function BatchRunDetailPage() {
         section="Booking · Batch Run"
         backTo="/booking/batch-runs"
         title={r.runNo}
-        description={`${humanize(r.trigger)} run by ${r.startedBy} on ${formatDateTime(r.startedAt)}, business date ${formatDate(r.businessDate)}`}
+        description={`${humanize(r.trigger)} run by ${displayNameOf(r.startedBy)} on ${formatDateTime(r.startedAt)}, business date ${formatDate(r.businessDate)}`}
       />
       <div className="grid-4">
         <Kpi label="Accounts" value={r.rows.length} />

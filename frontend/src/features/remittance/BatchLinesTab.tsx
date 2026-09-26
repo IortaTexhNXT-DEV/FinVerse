@@ -17,6 +17,7 @@ import type { Batch, BatchLine } from './api';
 import { ExcludeDialog } from './BatchDialogs';
 import { isExcluded } from './remittanceLabels';
 import './remittance.css';
+import { UserName } from '@/components/ui/UserName';
 
 function amountColumn(
   key: string,
@@ -90,7 +91,7 @@ function ExclusionsPanel({
             <span className="remit-muted">{l.exclusion.comment}</span>
           )}
           <span className="remit-muted">
-            {l.exclusion?.excludedBy} · {formatDateTime(l.exclusion?.excludedAt)}
+            <UserName login={l.exclusion?.excludedBy} /> · {formatDateTime(l.exclusion?.excludedAt)}
           </span>
           {canRestore && (
             <div>

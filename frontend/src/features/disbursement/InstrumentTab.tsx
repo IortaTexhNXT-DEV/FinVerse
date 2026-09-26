@@ -21,6 +21,7 @@ import { INSTRUMENT_ACTION_LABELS, MODE_LABELS, instrumentActions } from './labe
 import type { InstrumentAction } from './labels';
 import { DialogFooter, TextDialog } from './VoucherDialogs';
 import './disbursement.css';
+import { UserName } from '@/components/ui/UserName';
 
 const PROMPTS: Partial<
   Record<InstrumentAction, { field: string; required: boolean; hint?: string }>
@@ -136,8 +137,8 @@ function PendingEdit({ edit, onChanged }: Readonly<{ edit: StatusEdit; onChanged
   return (
     <div className="stack">
       <p>
-        {humanize(edit.fromStatus)} to {humanize(edit.toStatus)} requested by {edit.requestedBy}:{' '}
-        {edit.reason}
+        {humanize(edit.fromStatus)} to {humanize(edit.toStatus)} requested by{' '}
+        <UserName login={edit.requestedBy} />: {edit.reason}
       </p>
       <ErrorAlert error={approve.error} />
       <WorkflowPanel

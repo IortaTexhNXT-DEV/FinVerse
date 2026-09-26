@@ -8,6 +8,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { collectionsApi } from './api';
 import { validity } from './collectionsLogic';
+import { displayNameOf } from '@/api/users';
 
 /** Dispositions (append-only), efforts and hand-offs to Operations (BRCLXN.016-023). */
 export function DispositionsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
@@ -36,7 +37,7 @@ export function DispositionsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) 
             {
               key: 'b',
               header: 'Encoded By',
-              render: (d) => `${d.createdBy} · ${formatDateTime(d.createdAt)}`,
+              render: (d) => `${displayNameOf(d.createdBy)} · ${formatDateTime(d.createdAt)}`,
             },
             {
               key: 's',

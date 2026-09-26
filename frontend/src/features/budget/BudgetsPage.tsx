@@ -17,6 +17,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
+import { displayNameOf } from '@/api/users';
 
 type Action = 'submit' | 'approve' | 'reject';
 
@@ -24,12 +25,12 @@ const EDITABLE = new Set(['DRAFT', 'REJECTED']);
 
 function workflow(b: Budget): string {
   if (b.approvedBy) {
-    return `Approved by ${b.approvedBy} · ${formatDateTime(b.approvedAt)}`;
+    return `Approved by ${displayNameOf(b.approvedBy)} · ${formatDateTime(b.approvedAt)}`;
   }
   if (b.rejectionReason) {
     return `Rejected: ${b.rejectionReason}`;
   }
-  return b.submittedBy ? `Submitted by ${b.submittedBy}` : '';
+  return b.submittedBy ? `Submitted by ${displayNameOf(b.submittedBy)}` : '';
 }
 
 /** Budget versions of the company: create, open the grid, submit, approve or reject. */

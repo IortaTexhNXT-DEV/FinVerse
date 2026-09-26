@@ -7,6 +7,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
+import { displayNameOf } from '@/api/users';
 
 interface AssignDialogProps {
   item: WorkItem;
@@ -27,7 +28,9 @@ export function AssignDialog({ item, onClose, onDone }: Readonly<AssignDialogPro
     onSuccess: async (updated) => {
       await onDone();
       toast.success(
-        updated.assignee ? `Assigned to ${updated.assignee}` : 'Returned to the team queue',
+        updated.assignee
+          ? `Assigned to ${displayNameOf(updated.assignee)}`
+          : 'Returned to the team queue',
       );
       onClose();
     },

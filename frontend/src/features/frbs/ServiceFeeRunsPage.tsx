@@ -24,6 +24,7 @@ import type { ServiceFeeRun, StageCounts } from './api';
 import { RUN_TABS, periodErrors, tabOf } from './serviceFee';
 import type { RunTab } from './serviceFee';
 import './frbs.css';
+import { UserName } from '@/components/ui/UserName';
 
 const COLUMNS: Column<ServiceFeeRun>[] = [
   {
@@ -32,7 +33,9 @@ const COLUMNS: Column<ServiceFeeRun>[] = [
     render: (r) => (
       <>
         <strong>{r.runNo}</strong>
-        <span className="cell-sub">Computed by {r.createdBy}</span>
+        <span className="cell-sub">
+          Computed by <UserName login={r.createdBy} />
+        </span>
       </>
     ),
   },

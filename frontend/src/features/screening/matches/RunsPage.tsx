@@ -14,6 +14,7 @@ import { formatDateTime, humanize } from '@/utils/format';
 import { screeningMatchesApi } from './api';
 import type { ScreeningMatch, ScreeningRun, ScreeningTrigger } from './api';
 import { TRIGGERS, matchedText, scoreText } from './matchLogic';
+import { UserName } from '@/components/ui/UserName';
 
 function RunDialog({ run, onClose }: Readonly<{ run: ScreeningRun; onClose: () => void }>) {
   const navigate = useNavigate();
@@ -60,7 +61,8 @@ function RunDialog({ run, onClose }: Readonly<{ run: ScreeningRun; onClose: () =
           </dd>
           <dt>Time</dt>
           <dd>
-            {formatDateTime(run.startedAt)} – {formatDateTime(run.endedAt)} by {run.createdBy}
+            {formatDateTime(run.startedAt)} – {formatDateTime(run.endedAt)} by{' '}
+            <UserName login={run.createdBy} />
           </dd>
           {run.error && (
             <>

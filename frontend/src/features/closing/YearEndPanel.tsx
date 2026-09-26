@@ -16,6 +16,7 @@ import { closeControlsApi } from './closeControlsApi';
 import type { VerifiedYearEndClose } from './closeControlsApi';
 import { PeriodSelectors } from './PeriodSelectors';
 import type { usePeriodPicker } from './usePeriodPicker';
+import { UserName } from '@/components/ui/UserName';
 
 /** Income and expense balances the closing journal will transfer to retained earnings. */
 function ClosingPreview({ companyId, yearId }: Readonly<{ companyId: number; yearId: number }>) {
@@ -75,9 +76,9 @@ function CloseRecord({
   return (
     <div className="stack">
       <div className="alert success">
-        FY {record.yearCode} closed by {record.closedBy} on {formatDateTime(record.closedAt)}: net
-        result {formatAmount(record.netResult)} transferred to {record.retainedEarningsAccount}{' '}
-        (journals {record.closingBatches}).
+        FY {record.yearCode} closed by <UserName login={record.closedBy} /> on{' '}
+        {formatDateTime(record.closedAt)}: net result {formatAmount(record.netResult)} transferred
+        to {record.retainedEarningsAccount} (journals {record.closingBatches}).
       </div>
       <div className={verified ? 'alert info' : 'alert warning'} role="status">
         Post-close verification: {verificationText(record)}

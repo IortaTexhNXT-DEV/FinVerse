@@ -21,6 +21,7 @@ import { DetailList } from '@/features/catalog/DetailList';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { DocumentChecklist, InsurerChoices } from './ProposalFormParts';
 import { SLIP_EDIT_STAGES, slipSent } from './proposalList';
+import { displayNameOf } from '@/api/users';
 
 function useDownload() {
   return useMutation({
@@ -296,7 +297,7 @@ export function ProposalSlipTab({ proposal: p }: Readonly<{ proposal: Proposal }
             {
               key: 'u',
               header: 'Archived',
-              render: (a) => `${a.uploadedBy} ${formatDateTime(a.uploadedAt)}`,
+              render: (a) => `${displayNameOf(a.uploadedBy)} ${formatDateTime(a.uploadedAt)}`,
             },
             {
               key: 'x',

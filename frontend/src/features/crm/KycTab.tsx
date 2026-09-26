@@ -13,6 +13,7 @@ import { Field } from '@/components/ui/Field';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime } from '@/utils/format';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { displayNameOf } from '@/api/users';
 
 function ChecklistItems({ checklist }: Readonly<{ checklist: KycChecklist }>) {
   if (checklist.items.length === 0) {
@@ -38,7 +39,10 @@ function ChecklistItems({ checklist }: Readonly<{ checklist: KycChecklist }>) {
             <span className="checklist-files muted">
               {done
                 ? item.documents
-                    .map((d) => `${d.fileName} · ${d.uploadedBy} · ${formatDateTime(d.uploadedAt)}`)
+                    .map(
+                      (d) =>
+                        `${d.fileName} · ${displayNameOf(d.uploadedBy)} · ${formatDateTime(d.uploadedAt)}`,
+                    )
                     .join('; ')
                 : 'Not uploaded yet'}
             </span>

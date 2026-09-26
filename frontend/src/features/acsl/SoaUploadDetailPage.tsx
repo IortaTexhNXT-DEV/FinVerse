@@ -20,6 +20,7 @@ import type { SoaTab } from './acsl';
 import { acslApi } from './api';
 import type { LogRow, ReconBucket, ReconRow, RunView, SoaUpload } from './api';
 import './acsl.css';
+import { displayNameOf } from '@/api/users';
 
 function Variance({ value }: Readonly<{ value?: number }>) {
   if (value === undefined) {
@@ -135,7 +136,7 @@ function Counts({ u }: Readonly<{ u: SoaUpload }>) {
       title={u.run ? `Reconciliation run ${String(u.run.runNo)}` : 'Not reconciled yet'}
       actions={
         u.run && (
-          <span className="cell-sub">{`${u.run.runBy} · ${formatDateTime(u.run.runAt)}`}</span>
+          <span className="cell-sub">{`${displayNameOf(u.run.runBy)} · ${formatDateTime(u.run.runAt)}`}</span>
         )
       }
     >

@@ -20,6 +20,7 @@ import { disbursementApi } from './api';
 import type { EodRun } from './api';
 import { DialogFooter } from './VoucherDialogs';
 import './disbursement.css';
+import { displayNameOf } from '@/api/users';
 
 const COLUMNS: Column<EodRun>[] = [
   { key: 'no', header: 'Run', render: (r) => r.runNo },
@@ -29,7 +30,11 @@ const COLUMNS: Column<EodRun>[] = [
   { key: 'credits', header: 'Credits', numeric: true, render: (r) => r.credits },
   { key: 'forms', header: 'Forms', numeric: true, render: (r) => r.forms },
   { key: 'emails', header: 'Confirmations', numeric: true, render: (r) => r.emails },
-  { key: 'by', header: 'Run By', render: (r) => `${r.runBy} · ${formatDateTime(r.runAt)}` },
+  {
+    key: 'by',
+    header: 'Run By',
+    render: (r) => `${displayNameOf(r.runBy)} · ${formatDateTime(r.runAt)}`,
+  },
   { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
 ];
 

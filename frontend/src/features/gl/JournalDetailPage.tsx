@@ -13,6 +13,7 @@ import { formatDate, formatDateTime } from '@/utils/format';
 import { JournalActions } from './JournalActions';
 import type { FrbsJournal } from './glPlatformApi';
 import { journalSource } from './journalSource';
+import { UserName } from '@/components/ui/UserName';
 
 function Summary({ journal: j }: Readonly<{ journal: Journal }>) {
   const source = journalSource(j);
@@ -89,7 +90,9 @@ function AuditPanel({ journal }: Readonly<{ journal: FrbsJournal }>) {
         <ControlFacts journal={journal} />
         {journal.rejectionReason !== undefined && (
           <div>
-            <dt className="muted">Returned by {journal.rejectedBy}</dt>
+            <dt className="muted">
+              Returned by <UserName login={journal.rejectedBy} />
+            </dt>
             <dd style={{ margin: 0 }}>{journal.rejectionReason}</dd>
           </div>
         )}

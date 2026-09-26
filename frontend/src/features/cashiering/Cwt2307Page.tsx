@@ -19,6 +19,7 @@ import { formatDateTime, humanize } from '@/utils/format';
 import { cashieringApi } from './cashieringApi';
 import type { CwtBatch, CwtTag } from './cashieringApi';
 import { CwtTagDialog } from './CwtTagDialog';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'tagged', label: 'Tagged by Marketing' },
@@ -70,7 +71,11 @@ const TAG_COLUMNS: Column<CwtTag>[] = [
       </span>
     ),
   },
-  { key: 'by', header: 'Tagged', render: (t) => `${t.taggedBy} · ${formatDateTime(t.taggedAt)}` },
+  {
+    key: 'by',
+    header: 'Tagged',
+    render: (t) => `${displayNameOf(t.taggedBy)} · ${formatDateTime(t.taggedAt)}`,
+  },
   { key: 'stage', header: 'Stage', render: (t) => <StatusBadge status={t.stage} /> },
 ];
 

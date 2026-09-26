@@ -10,6 +10,7 @@ import { claimsSetupApi, STATUS_LIST } from './api';
 import type { ValueAttributes } from './api';
 import { SettlementAttributesDialog, StatusAttributesDialog } from './AttributeDialogs';
 import { describeSettlement, describeStatus } from './setupLogic';
+import { displayNameOf } from '@/api/users';
 
 /**
  * Status or settlement type attributes on Claims Setup (FR-CM-040/043): each value with its
@@ -69,7 +70,9 @@ export function AttributesTab({ list }: Readonly<{ list: string }>) {
             key: 'pending',
             header: 'Pending Change',
             render: (v) =>
-              v.pendingBy === undefined ? '' : `${describe(v.pending)} (by ${v.pendingBy})`,
+              v.pendingBy === undefined
+                ? ''
+                : `${describe(v.pending)} (by ${displayNameOf(v.pendingBy)})`,
           },
           {
             key: 'act',

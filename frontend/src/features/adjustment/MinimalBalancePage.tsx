@@ -12,6 +12,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import { adjustmentApi } from './api';
 import type { WriteOff } from './api';
+import { displayNameOf } from '@/api/users';
 
 const COLUMNS: Column<WriteOff>[] = [
   { key: 'file', header: 'File', render: (w) => w.fileRef },
@@ -45,7 +46,7 @@ const COLUMNS: Column<WriteOff>[] = [
   {
     key: 'at',
     header: 'Processed',
-    render: (w) => `${formatDateTime(w.createdAt)} · ${w.createdBy}`,
+    render: (w) => `${formatDateTime(w.createdAt)} · ${displayNameOf(w.createdBy)}`,
   },
 ];
 

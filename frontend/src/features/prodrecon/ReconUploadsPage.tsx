@@ -20,6 +20,7 @@ import { prodreconApi } from './prodreconApi';
 import type { ReconUpload } from './prodreconApi';
 import { monthLabel } from './prodreconLogic';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { displayNameOf } from '@/api/users';
 
 const COLUMNS: Column<ReconUpload>[] = [
   {
@@ -43,7 +44,7 @@ const COLUMNS: Column<ReconUpload>[] = [
   {
     key: 'at',
     header: 'Uploaded',
-    render: (u) => `${formatDateTime(u.createdAt)} · ${u.createdBy}`,
+    render: (u) => `${formatDateTime(u.createdAt)} · ${displayNameOf(u.createdBy)}`,
   },
   { key: 'status', header: 'Status', render: (u) => <StatusBadge status={u.status} /> },
 ];

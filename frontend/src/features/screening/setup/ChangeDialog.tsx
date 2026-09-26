@@ -13,6 +13,7 @@ import type { WatchlistChange } from './api';
 import { RemarksDialog } from './RemarksDialog';
 import { compareValues } from './watchlistLogic';
 import type { ValueLine } from './watchlistLogic';
+import { displayNameOf } from '@/api/users';
 
 /**
  * A watchlist change for the checker (FR-SS-023): the full entry with the before and after values,
@@ -72,13 +73,13 @@ export function ChangeDialog({
             <StatusBadge status={change.status} />
           </dd>
           <dt>Maker</dt>
-          <dd>{`${change.createdBy} ${formatDateTime(change.createdAt)}`}</dd>
+          <dd>{`${displayNameOf(change.createdBy)} ${formatDateTime(change.createdAt)}`}</dd>
           <dt>Maker Remarks</dt>
           <dd>{change.makerRemarks}</dd>
           {change.decidedBy !== undefined && (
             <>
               <dt>Checker</dt>
-              <dd>{`${change.decidedBy} ${formatDateTime(change.decidedAt)}`}</dd>
+              <dd>{`${displayNameOf(change.decidedBy)} ${formatDateTime(change.decidedAt)}`}</dd>
               <dt>Checker Remarks</dt>
               <dd>{change.decisionRemarks ?? '—'}</dd>
             </>

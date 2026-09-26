@@ -19,6 +19,7 @@ import {
   TakafulTable,
   TotalsTable,
 } from './RunTables';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'summary', label: 'By line of business' },
@@ -31,18 +32,20 @@ const TABS = [
 type TabId = (typeof TABS)[number]['id'];
 
 function trail(run: ValuationRun): string {
-  const parts = [`Calculated ${formatDateTime(run.calculatedAt)} by ${run.preparedBy}`];
+  const parts = [
+    `Calculated ${formatDateTime(run.calculatedAt)} by ${displayNameOf(run.preparedBy)}`,
+  ];
   if (run.submittedBy) {
-    parts.push(`submitted by ${run.submittedBy}`);
+    parts.push(`submitted by ${displayNameOf(run.submittedBy)}`);
   }
   if (run.approvedBy) {
-    parts.push(`approved by ${run.approvedBy}`);
+    parts.push(`approved by ${displayNameOf(run.approvedBy)}`);
   }
   if (run.postedBy) {
-    parts.push(`posted by ${run.postedBy} (${run.journalCount} journals)`);
+    parts.push(`posted by ${displayNameOf(run.postedBy)} (${run.journalCount} journals)`);
   }
   if (run.cancelledBy) {
-    parts.push(`cancelled by ${run.cancelledBy}: ${run.cancelReason ?? ''}`);
+    parts.push(`cancelled by ${displayNameOf(run.cancelledBy)}: ${run.cancelReason ?? ''}`);
   }
   return parts.join(' · ');
 }

@@ -12,6 +12,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime } from '@/utils/format';
+import { displayNameOf } from '@/api/users';
 
 /** Duration of a run in seconds ('' while running). */
 function duration(run: JobRun): string {
@@ -132,7 +133,11 @@ export default function ScheduledJobsPage() {
             { key: 'j', header: 'Job', render: (r) => r.jobName },
             { key: 't', header: 'Started', render: (r) => formatDateTime(r.startedAt) },
             { key: 'd', header: 'Duration', numeric: true, render: duration },
-            { key: 'g', header: 'Trigger', render: (r) => `${r.trigger} (${r.triggeredBy})` },
+            {
+              key: 'g',
+              header: 'Trigger',
+              render: (r) => `${r.trigger} (${displayNameOf(r.triggeredBy)})`,
+            },
             { key: 's', header: 'Status', render: (r) => <RunStatus run={r} /> },
             { key: 'i', header: 'Items', numeric: true, render: (r) => r.itemsProcessed },
             { key: 'm', header: 'Message', render: (r) => r.message ?? '' },

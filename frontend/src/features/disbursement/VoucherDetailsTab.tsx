@@ -14,6 +14,7 @@ import type { Mode, TermsInput, Voucher } from './api';
 import { termsErrors } from './forms';
 import { MODE_LABELS, MODES } from './labels';
 import './disbursement.css';
+import { UserName } from '@/components/ui/UserName';
 
 function termsOf(v: Voucher): TermsInput {
   return {
@@ -62,7 +63,7 @@ function ReadOnly({ voucher }: Readonly<{ voucher: Voucher }>) {
         <>
           <dt>Cancellation</dt>
           <dd>
-            {voucher.cancelReason} ({voucher.cancelledBy})
+            {voucher.cancelReason} (<UserName login={voucher.cancelledBy} />)
           </dd>
         </>
       )}

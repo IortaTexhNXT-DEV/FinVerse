@@ -17,6 +17,7 @@ import { periodOf } from './assetMath';
 import { TextInput } from './FormControls';
 import { summarize } from './runSummary';
 import { useAssetLookups } from './useAssetLookups';
+import { displayNameOf } from '@/api/users';
 
 /** Monthly depreciation: preview the charge of a period, then post it once (idempotent). */
 export default function DepreciationRunPage() {
@@ -73,7 +74,9 @@ export default function DepreciationRunPage() {
           <Kpi
             label="Status"
             value={<StatusBadge status={summary.status} />}
-            hint={summary.postedBy === undefined ? 'Preview' : `by ${summary.postedBy}`}
+            hint={
+              summary.postedBy === undefined ? 'Preview' : `by ${displayNameOf(summary.postedBy)}`
+            }
           />
         </div>
       </Card>

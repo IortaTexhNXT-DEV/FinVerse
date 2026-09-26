@@ -9,6 +9,7 @@ import { cashieringApi } from './cashieringApi';
 import { TextField } from './CashFields';
 import type { AcceptBody, AcceptForm, CollectorRequest, RefundValidation } from './requestsApi';
 import { DEFAULT_TYPE, acceptBody, acceptErrors, requestsApi } from './requestsApi';
+import { UserName } from '@/components/ui/UserName';
 
 /** Dialogs of the requests Cashiering receives (wave C1-C). */
 
@@ -81,7 +82,8 @@ export function AcceptRequestDialog({
         <p className="muted">
           {humanize(request.action)} of {request.unappliedRef}
           {request.invoiceNo === undefined ? '' : ` to ${request.invoiceNo}`}, balance{' '}
-          {request.currency} {formatAmount(request.balance)}, requested by {request.requestedBy}
+          {request.currency} {formatAmount(request.balance)}, requested by{' '}
+          <UserName login={request.requestedBy} />
         </p>
         <Field label="Disposition Type" required>
           {(id) => (

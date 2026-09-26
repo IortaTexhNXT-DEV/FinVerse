@@ -16,6 +16,7 @@ import { uploadErrors } from './caseLogic';
 import type { UploadForm } from './caseLogic';
 import { LovField, StepDialog } from './StepDialog';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { UserName } from '@/components/ui/UserName';
 
 function UploadDialog({
   detail,
@@ -164,7 +165,9 @@ export function DocumentsTab({ detail }: Readonly<{ detail: CaseDetail }>) {
             render: (d) => (
               <>
                 {formatDateTime(d.createdAt)}
-                <span className="cell-sub">{d.createdBy}</span>
+                <span className="cell-sub">
+                  <UserName login={d.createdBy} />
+                </span>
               </>
             ),
           },

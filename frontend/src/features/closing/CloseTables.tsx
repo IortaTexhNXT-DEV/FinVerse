@@ -6,6 +6,7 @@ import { Kpi } from '@/components/ui/Kpi';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDateTime } from '@/utils/format';
 import type { BooksCutoff, CloseSchedule, CloseSettings } from './closeControlsApi';
+import { displayNameOf } from '@/api/users';
 
 /** Close settings and the number of scheduled closes (AQ04). */
 export function CloseSettingsKpis({
@@ -77,7 +78,9 @@ export function SchedulesCard(p: Readonly<SchedulesProps>) {
 }
 
 function reopened(b: BooksCutoff): string {
-  return b.unlockedBy === undefined ? '' : `${b.unlockedBy} ${formatDateTime(b.unlockedAt)}`;
+  return b.unlockedBy === undefined
+    ? ''
+    : `${displayNameOf(b.unlockedBy)} ${formatDateTime(b.unlockedAt)}`;
 }
 
 interface BooksProps {

@@ -63,7 +63,7 @@ elements, awaiting BDOI confirmation, IQ25 / DCR-222).
 | Identity | EIAM (Microsoft Entra ID, OpenID Connect) for sign-in; UIDM-ISC (IGA) for provisioning (USER_ACCESS_DESIGN section 10.1) |
 | Environments | DEV, SIT, UAT, Pre-Prod, PROD, DR (warm standby in the DR region, RDS cross-region replica, S3 replication); RPO 15 minutes, RTO 4 hours |
 
-The IER-aligned diagrams for BDOI IT are `docs/deliverables/out/Alignment/IER/BIBS_IER_Application_Architecture.png`
+The IER-aligned diagrams for BDOI IT are `docs/deliverables/out/Programme/Alignment/IER/BIBS_IER_Application_Architecture.png`
 and `BIBS_IER_Infrastructure_Deployment.png` (sources `docs/deliverables/src/alignment/figures/`); the comparison with
 the IER workbook is [`PROGRAMME_ALIGNMENT.md`](PROGRAMME_ALIGNMENT.md) section 6.
 

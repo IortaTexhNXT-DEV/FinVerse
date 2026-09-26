@@ -9,7 +9,7 @@
 
 Command line::
 
-    python tools/deliverables/render.py docs/deliverables/out/FRS/X.docx --previews
+    python tools/deliverables/render.py docs/deliverables/out/Drop-1_Transactional/FRS/X.docx --previews
     python tools/deliverables/render.py some.pdf --previews --dpi 110 --pages 3-8
 """
 

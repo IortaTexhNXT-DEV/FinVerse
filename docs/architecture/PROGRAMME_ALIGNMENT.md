@@ -1,7 +1,7 @@
 # BIBS programme alignment: BDOI drops, timeline, integrations and infrastructure
 
 Status: **analysis for BDOI review, 26-Sep-2026.** Client document built from the same data:
-`docs/deliverables/out/Alignment/BIBS_Alignment_BRD-00_Drops_Integrations_Infrastructure_v1.0.docx` and
+`docs/deliverables/out/Programme/Alignment/BIBS_Alignment_BRD-00_Drops_Integrations_Infrastructure_v1.0.docx` and
 `BIBS_Alignment_BRD-00_Integration_Inventory_v1.0.xlsx` (source `docs/deliverables/src/alignment/`, data file
 `alignment_data.yaml`, builder `build_alignment_pack.py`). The tables of sections 2 to 6 are generated from that data
 file; change the data file and regenerate both.
@@ -26,7 +26,7 @@ file; change the data file and regenerate both.
 - **A3** Remittance handles the reinsurance transactions in Drop 1; the reinsurance module is phase 2.
 - **A4** Documents and attachments live in S3 only (design: S6).
 - **A5** BRDs, FRS, test plans and collaterals are grouped under the drops (section 2.3).
-- **A6** BDOI supplies the IER architecture diagrams: produced as `docs/deliverables/out/Alignment/IER/BIBS_IER_Application_Architecture.png` and `BIBS_IER_Infrastructure_Deployment.png` (sources `docs/deliverables/src/alignment/figures/al_application_architecture.dot`, `al_deployment.dot`, rendered at 300 dpi).
+- **A6** BDOI supplies the IER architecture diagrams: produced as `docs/deliverables/out/Programme/Alignment/IER/BIBS_IER_Application_Architecture.png` and `BIBS_IER_Infrastructure_Deployment.png` (sources `docs/deliverables/src/alignment/figures/al_application_architecture.dot`, `al_deployment.dot`, rendered at 300 dpi).
 
 ## 2. Drop mapping
 
@@ -81,7 +81,7 @@ file; change the data file and regenerate both.
 | BRD-00 Core Replacement (umbrella) | FRS, spec | BIBS_FRS_BRD-00_Core_Replacement_v1.0.docx | Programme | All drops (cross-cutting FR-CR, NFRs) | Stays at programme level |
 | BRD-11 User Access Maintenance | FRS, test plan | BIBS_FRS_BRD-11_*; BIBS_TestPlan_BRD-11_* | Drop 0 | - | Items 0.1-0.3; EIAM and UIDM-ISC change it |
 | BRD-3 Product Maintenance | FRS, test plan | BIBS_FRS_BRD-03_*; BIBS_TestPlan_BRD-03_* | Drop 0 | Drop 1 (quotation, 1.U2) | Item 0.6 |
-| BRD-13 Data Migration | FRS, test plan, migration pack (strategy, workbook, runbook, reconciliation, templates) | BIBS_FRS_BRD-13_*; BIBS_TestPlan_BRD-13_*; out/Migration/* | Drop 0 | Drop 1 (client onboarding, cashiering, BIR reports) and the migration stream | Migration has its own timeline row |
+| BRD-13 Data Migration | FRS, test plan, migration pack (strategy, workbook, runbook, reconciliation, templates) | BIBS_FRS_BRD-13_*; BIBS_TestPlan_BRD-13_*; out/Drop-0_Setup_and_Data_Migration/Migration/* | Drop 0 | Drop 1 (client onboarding, cashiering, BIR reports) and the migration stream | Migration has its own timeline row |
 | BRD-1 New Business | FRS, test plan | BIBS_FRS_BRD-01_*; BIBS_TestPlan_BRD-01_* | Drop 1 | - | Upstream items 1.U1-1.U3, 1.U6, 1.U7, 1.U9 |
 | BRD-6 Renewal | FRS, test plan | BIBS_FRS_BRD-06_*; BIBS_TestPlan_BRD-06_* | Drop 1 | - | Upstream 1.U5 |
 | BRD-12 Submitted Policies | FRS, test plan | BIBS_FRS_BRD-12_*; BIBS_TestPlan_BRD-12_* | Drop 1 | - | Upstream 1.U4 |
@@ -102,10 +102,12 @@ file; change the data file and regenerate both.
 | UAT plans and sign-off forms (item 30) | Word (to write) | - | Per drop | End-to-end UAT script is programme level | UAT runs end to end (answer A1) |
 | Performance, penetration test, ORR / PRR evidence (items 28, 37) | Word, Excel (to write) | - | Programme | - | Nov 2027 - Jan 2028 |
 
-Proposed folders under `docs/deliverables/out/` (and the same under `src/`): `Programme/`, `Drop0_Setup_and_Migration/`,
-`Drop1_Transactional/`, `Drop2_Independent/`; the existing `FRS/`, `TestPlans/`, `Migration/`, `Registers/`, `Decks/`
-content moves by the "Drop (folder)" column; shared documents stay in one folder and are referenced from the others
-(no copies). The register gains a Drop column.
+Folders as built (26-Sep-2026) under `docs/deliverables/out/`: `Drop-0_Setup_and_Data_Migration/`,
+`Drop-1_Transactional/`, `Drop-2_Independent/` and `Programme/`, each with `FRS/`, `TestPlans/`, `Migration/`,
+`Registers/`, `Decks/` or `Alignment/` as applicable and an index `README.md` (BRD, version, BDOI dates of the drop).
+Documents moved by the "Drop (folder)" column; a document shared with another drop stays in its primary drop and the
+index of the other drop points to it (no copies). The drop map is `tools/deliverables/brand.py` (`BRD_DROP`,
+`DROP_SHARED`), used by every builder. Sources stay in `src/<kind>/`. The register has a Drop column (v1.2).
 
 ## 3. Early renewal concept paper (superseded)
 
@@ -330,7 +332,7 @@ DCR-210 to DCR-235 are proposed for the discrepancy register (drop plan, concept
 ## 8. Edits needed to shared documents
 
 Status 26-Sep-2026: applied in the consolidation of this date (register v1.2, BRD-6 FRS and test plan v1.1, BRD-2 and
-BRD-11 FRS v1.1, the designs named below), except the Employee Benefits rows, which wait for the build agent
+BRD-11 FRS v1.1, the designs named below), except the Employee Benefits rows, which wait for the Employee Benefits build team
 (`docs/deliverables/PENDING_EDITS.md`), and the Developer Guide FileStore rule, which follows build step ST0.
 
 | Document | Edit |

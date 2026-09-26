@@ -4,7 +4,7 @@
 # BRD-13 is designed, not built: the expected results quote the message text of the FRS and the build design
 # (docs/architecture/DATA_MIGRATION_DESIGN.md) without codes, and no case names an automated test. Screen paths
 # follow section 22 of the build design (sidebar section Data Migration). Test data are masked extracts in the
-# layouts of the BDOI Data Requirements Workbook (docs/deliverables/out/Migration). Account names only: the legacy
+# layouts of the BDOI Data Requirements Workbook (docs/deliverables/out/Drop-0_Setup_and_Data_Migration/Migration). Account names only: the legacy
 # control accounts and Migration Clearing are assigned by Comptrollership (DMQ18).
 
 meta:

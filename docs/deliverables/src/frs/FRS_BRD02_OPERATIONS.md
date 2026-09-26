@@ -87,7 +87,7 @@ Operations takes over every invoice booked in New Business (BRD-1) and follows i
 | R5 | Operations build design | current | `docs/architecture/OPERATIONS_DESIGN.md` |
 | R6 | Operations module guide (as built) | current | `docs/modules/OPERATIONS.md` |
 | R7 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R8 | FRS BRD-1 New Business and FRS BRD-3 Product Maintenance (booking, catalogue, shared platform) | v1.0 | `docs/deliverables/out/FRS/` |
+| R8 | FRS BRD-1 New Business and FRS BRD-3 Product Maintenance (booking, catalogue, shared platform) | v1.0 | `docs/deliverables/out/*/FRS/` |
 
 Page references in this document ("p.23") are pages of the BRD-2 PDF (R1, R2). The annex pages 121-132 are scanned; the report and endorsement slip lists of the annex are quoted from those pages.
 

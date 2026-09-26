@@ -63,7 +63,7 @@ disagrees):
 - **D3, access classes.** `RENEWAL_ADVICE` and `CLAIM_REPORT`, and their access-class rows, are seeded by EB V1031
   with `on conflict do nothing`. V1010 (Renewal) and V1020 (Claims) seed the document types themselves the same way,
   because V1020 runs before V1031 on a fresh database.
-- **D7, dormant (26-Sep-2026).** The BDOI drop plan places "Employee Benefits (no portal feature)" in Drop 2 (DCR-211, IQ22): no `portal` module is built, so there are no external users; the EXTERNAL request type stays refused by the built default adapter. The EB design, FRS and test plan are updated by the EB build agent (`docs/deliverables/PENDING_EDITS.md`).
+- **D7, dormant (26-Sep-2026).** The BDOI drop plan places "Employee Benefits (no portal feature)" in Drop 2 (DCR-211, IQ22): no `portal` module is built, so there are no external users; the EXTERNAL request type stays refused by the built default adapter. The EB design, FRS and test plan are updated by the EB build team (`docs/deliverables/PENDING_EDITS.md`).
 - **D7, permissions.** EB's `PORTAL_USER_REQUEST` and `PORTAL_USER_APPROVE` become the type-specific permissions of
   EXTERNAL requests in the UAM flow; the UAM segregation rules apply. Lock / unlock and the portal logs stay in
   `portal` (`PORTAL_ADMIN`).

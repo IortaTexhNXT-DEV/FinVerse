@@ -8,7 +8,7 @@ Inputs
     (read at build time, so the question list follows the source documents);
   * tools/deliverables/brand.py BRD_DROP: the default Drop of an item.
 
-Outputs (docs/deliverables/out/Registers/)
+Outputs (docs/deliverables/out/Programme/Registers/, from tools/deliverables/brand.py)
   * BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v<version>.xlsx
     (Cover, README, Summary, Register, Open questions, NFR comparison);
   * BIBS_Register_BRD-00_Discrepancies_and_Clarifications_Summary_v<version>.pdf (the Summary sheet).
@@ -47,7 +47,7 @@ from bdoi_xlsx import BORDER, HEADER_FILL, HEADER_ROW, BdoiWorkbook, Column, _Sh
 
 DATA = HERE / "discrepancy_register.yaml"
 REQ = REPO / "docs" / "requirements"
-OUT = REPO / "docs" / "deliverables" / "out" / "Registers"
+OUT = brand.out_dir("BRD-00", "Registers")  # Programme/Registers (brand.BRD_DROP)
 
 TYPES = ["Contradiction within BRD", "Conflict between BRDs", "Gap / missing detail", "Ambiguity",
          "BRD vs platform", "NFR inconsistency", "Data / numbering issue", "Document quality"]

@@ -13,7 +13,7 @@ Inputs (this folder)
                       Word sources in the bdoi_docx format; lines <!-- dm:<name> [opt=value] --> are
                       replaced by tables built from the YAML files (list in PLACEHOLDERS below).
 
-Outputs (docs/deliverables/out/Migration)
+Outputs (docs/deliverables/out/Drop-0_Setup_and_Data_Migration/Migration, from tools/deliverables/brand.py)
   * BIBS_Migration_BRD-13_Data_Requirements_Workbook_v<version>.xlsx
   * templates/<LAYOUT>_template.csv (header row = field names of the workbook), CONTROL_template.ctl.csv and
     README.md
@@ -40,7 +40,7 @@ import brand  # noqa: E402
 from bdoi_docx import BdoiDocument, lint_source, load_source, meta_from, output_path, render_body  # noqa: E402
 from bdoi_xlsx import BdoiWorkbook, Column  # noqa: E402
 
-OUT = brand.OUT_DIR / "Migration"
+OUT = brand.out_dir("BRD-13", "Migration")  # Drop-0_Setup_and_Data_Migration/Migration (brand.BRD_DROP)
 TEMPLATES = OUT / "templates"
 DOCS = ["DM_STRATEGY_AND_APPROACH.md", "DM_RECONCILIATION_AND_SIGNOFF.md", "DM_CUTOVER_RUNBOOK.md"]
 FIELD_KEYS = ["name", "description", "type", "length", "mandatory", "values", "format", "example", "target", "rule",

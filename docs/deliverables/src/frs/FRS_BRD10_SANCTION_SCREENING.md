@@ -80,7 +80,7 @@ The scope is the screening of BDOI clients against sanctions and politically exp
 | R4 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
 | R5 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
 | R6 | BRD-1 New Business requirements baseline (client master, KYC review, shared platform) | current | `docs/requirements/BDOI_NB_BRD_SPEC.md` |
-| R7 | FRS BRD-11 User Access Maintenance (roles, sign-in, session policy) | v1.0 | `docs/deliverables/out/FRS/BIBS_FRS_BRD-11_User_Access_Maintenance_v1.0.pdf` |
+| R7 | FRS BRD-11 User Access Maintenance (roles, sign-in, session policy) | v1.0 | `docs/deliverables/out/Drop-0_Setup_and_Data_Migration/FRS/BIBS_FRS_BRD-11_User_Access_Maintenance_v1.0.pdf` |
 
 Page references in this document ("p.14") are pages of the BRD-10 PDF (R1). The requirement table is printed as images on pp.10-21; it was read from the page images.
 

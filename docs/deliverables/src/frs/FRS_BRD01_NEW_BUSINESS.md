@@ -85,7 +85,7 @@ The scope is the New Business process of BDOI as a broker: from the quotation or
 | R3 | New Business requirements traceability (built status, module, screen, API, test per BRD ID) | current | `docs/requirements/BDOI_NB_TRACEABILITY.md` |
 | R4 | Broking (BDOI New Business) architecture | current | `docs/architecture/BROKING_ARCHITECTURE.md` |
 | R5 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R6 | FRS BRD-3 Product Maintenance (package products, versions, incentive criteria) | 1.0, 25-Sep-2026 | `docs/deliverables/out/FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.pdf` |
+| R6 | FRS BRD-3 Product Maintenance (package products, versions, incentive criteria) | 1.0, 25-Sep-2026 | `docs/deliverables/out/Drop-0_Setup_and_Data_Migration/FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.pdf` |
 | R7 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
 
 Page references in this document ("p.49") are pages of the BRD PDF (R1). The Workshop Addendum is cited by its first copy (pp.1-22). A reference to a legacy BRD step ("BRD 2.3.1") is given where no BRNB ID exists.

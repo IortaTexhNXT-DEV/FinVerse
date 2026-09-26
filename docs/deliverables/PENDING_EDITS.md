@@ -1,10 +1,10 @@
-# Pending edits to documents owned by build agents
+# Pending edits to documents being edited by the build teams
 
 Status as of 26-Sep-2026. The programme alignment and the BDOI answers of 26-Sep-2026 were consolidated into the shared
 documents on that date (register v1.2; FRS and test plan BRD-6 v1.1; FRS BRD-2 and BRD-11 v1.1; the Renewal, User
 Access, Operations, Accounting and Disbursement designs; ARCHITECTURE.md; the cross-BRD decisions). The documents below
-are being edited by the Employee Benefits and Claims build agents, so the edits they need are listed here and applied
-when those agents hand the documents back. Delete each row when it is applied.
+are being edited by the Employee Benefits and Claims build teams, so the edits they need are listed here and applied
+when those teams hand the documents back. Delete each row when it is applied.
 
 ## Employee Benefits: no portal (BDOI drop plan item 2.4, treated as decided)
 
@@ -36,5 +36,5 @@ dormant.
 | `docs/development/DEVELOPER_GUIDE.md` | FileStore rule: no bytea column for file content; files go through `common/storage` `FileStore` and `stored_file` (DOCUMENT_STORAGE_DECISION section 4) | When build step ST0 lands (not in the code on 26-Sep-2026) |
 | `docs/deliverables/src/alignment/PROGRAMME_ALIGNMENT.md`, `alignment_data.yaml` (client document v1.1) | IQ02 and IQ03 answered (DMQ37, DMQ36); the renewal check is named `PACKAGE_REMAP`; the link to `ARCHITECTURE_OPTION_DECISION.md` at IQ25 / DCR-222 / DCR-223; the drop folders as built (`out/Drop-0_Setup_and_Data_Migration/`, `out/Drop-1_Transactional/`, `out/Drop-2_Independent/`, `out/Programme/`); "Status as of" date | Next alignment pack issue |
 | `docs/deliverables/src/migration/build_migration_pack.py` | Example file name `F01C_EBIX_20270226_01.csv` in the workbook README and the templates README: use a December 2027 date for a January 2028 go-live | Next migration pack issue |
-| Data Migration documents (DATA_MIGRATION_DESIGN section 15, dm_layouts.yaml object P03, FRS BRD-13, test plan BRD-13, migration pack) | BDOI answers DMQ36-DMQ39: no carried RMEL cohorts (P03), remapping at sanitation (the PACKAGE map is loaded only), RMEL and dispositions in Excel, year-end option A | Separate Data Migration agent (in progress) |
+| Data Migration documents (DATA_MIGRATION_DESIGN section 15, dm_layouts.yaml object P03, FRS BRD-13, test plan BRD-13, migration pack) | BDOI answers DMQ36-DMQ39: no carried RMEL cohorts (P03), remapping at sanitation (the PACKAGE map is loaded only), RMEL and dispositions in Excel, year-end option A | Data Migration team (in progress) |
 | Test plan summaries BRD-2 and BRD-11 | Reference FRS v1.1 and register v1.2 | Next test plan issue |

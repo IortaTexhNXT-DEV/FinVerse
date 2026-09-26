@@ -209,20 +209,45 @@ defect remains. The readiness statement is then issued for BDOI to approve the m
 ## Toolkit and status
 
 Toolkit: [`tools/deliverables/`](../../tools/deliverables/README.md) (Word, Excel and PowerPoint builders, PDF and
-page previews). Sources: `docs/deliverables/src/`; outputs: `docs/deliverables/out/`, named
+page previews). Sources: `docs/deliverables/src/`; outputs: `docs/deliverables/out/<drop folder>/<kind>/`, named
 `BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>`.
 
-| # | Document | Status |
-|---|---|---|
-| 1 | FRS, one per BRD (BRD-5 in two volumes with a cover note) | v1.0 issued for BDOI review, BRD-2, BRD-6, BRD-11 and BRD-13 at v1.1 (programme alignment and BDOI answers of 26-Sep-2026): `out/FRS/`, 16 Word files: the BRD-00 Core Replacement umbrella, BRD-1 to BRD-13 (BRD-13 Data Migration added) and the BRD-5 cover note. The Claims FRS numbers its requirements FR-CM-nnn (renumbered from FR-CL-nnn, which Collections keeps; DCR-188) |
-| 2 | Discrepancy and clarification register | v1.2: `out/Registers/BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`: 239 items (programme alignment DCR-210 to DCR-235 and Data Migration v1.1 DCR-240 to DCR-243 added; DCR-236 to DCR-239 not used; DCR-135 answered by the IER) with a Drop column, and 453 questions (IQ01-IQ35 of the programme alignment and DSQ01-DSQ04 of the document storage decision added; DMQ25-DMQ26, DMQ36-DMQ39 answered) |
-| 3 | Test plans, one per FRS volume | v1.0 (BRD-6 and BRD-13 at v1.1): `out/TestPlans/`, 14 workbooks and 14 Word summaries (BRD-1 to BRD-13, BRD-5 in two volumes); builder `src/testplans/build_test_plan.py`. The Claims plan uses case IDs keyed on FR-CM. Not yet written: the cross-cutting FR-CR requirements of BRD-00 |
-| 17 | Reports in Excel and PDF; documents and schedules in Word and PDF | Built in the platform (`ExportFormat.DOCX`, document renditions); see Developer Guide 6.1-6.2 |
-| 41 | Business process deck | v1.0: `out/Decks/BIBS_Deck_BRD-00_Business_Process_AsIs_Envisioned_BestPractice_v1.0.pptx` |
-| 29 | Data migration (BRD-13) | v1.1 (BDOI timeline, go-live January 2028): Strategy and Approach (52 pages), Data Requirements Workbook (31 data objects, 27 extract layouts, 352 fields, 51 data-quality rules), Cutover Runbook and Task Plan (75 tasks, T-30 to T+30), Reconciliation Approach and Sign-off, in `out/Migration/`; FRS BRD-13 v1.1 (80 pages); source `src/migration/` |
-| 20 | Upload and download templates | Migration extract templates: `out/Migration/templates/` (27 layouts and the control file). Platform upload and download templates follow after the build |
-| 3 | Test plan BRD-13 Data Migration | v1.1: `out/TestPlans/BIBS_TestPlan_BRD-13_Data_Migration_v1.1.xlsx` and summary (152 cases) |
-| 42 | Programme alignment and integration inventory | v1.0: `out/Alignment/BIBS_Alignment_BRD-00_Drops_Integrations_Infrastructure_v1.0.docx`, `BIBS_Alignment_BRD-00_Integration_Inventory_v1.0.xlsx` (20 integrations) and the IER diagrams in `out/Alignment/IER/`; source `src/alignment/` |
+### Deliverables by drop
+
+BDOI keeps the BRDs, FRS, test plans and other collaterals grouped under its drops (answer A5 of 26-Sep-2026; drop plan
+[`BDOI_DROP_PLAN.md`](../source-documents/BDOI_DROP_PLAN.md); map in
+[`PROGRAMME_ALIGNMENT.md`](../architecture/PROGRAMME_ALIGNMENT.md) section 2.3). Each drop folder has an index
+`README.md` that lists every document with its BRD, version and the BDOI dates of the drop.
+
+| Drop folder | BRDs (primary drop) | BDOI dates | Index |
+|---|---|---|---|
+| `out/Drop-0_Setup_and_Data_Migration/` | BRD-3 Product Maintenance, BRD-11 User Access Maintenance, BRD-13 Data Migration (FRS, test plan, migration pack and templates) | Setup with the Drop 1 requirements; migration requirements Sep - Nov 2026, build Nov 2026 - Mar 2027, SIT Apr - Jul 2027, UAT Aug - Oct 2027, cut-over Nov 2027 - Jan 2028 | [README](out/Drop-0_Setup_and_Data_Migration/README.md) |
+| `out/Drop-1_Transactional/` | BRD-1, BRD-2, BRD-4, BRD-5 (three documents), BRD-6, BRD-9, BRD-10 (proposed), BRD-12 | Requirements Sep - Nov 2026, build Nov 2026 - Feb 2027, SIT Jan - Jul 2027, UAT Aug - Dec 2027 | [README](out/Drop-1_Transactional/README.md) |
+| `out/Drop-2_Independent/` | BRD-7 Claims, BRD-8 Employee Benefits | Requirements Dec 2026 - Feb 2027, build Mar - Apr 2027, SIT Jul - Sep 2027, UAT Oct - Nov 2027 | [README](out/Drop-2_Independent/README.md) |
+| `out/Programme/` | BRD-00: umbrella FRS, register, process deck, alignment pack and IER diagrams; UAT readiness | Performance and penetration test Nov - Dec 2027, ORR / PRR Dec 2027 - Jan 2028, go-live January 2028 | [README](out/Programme/README.md) |
+
+A BRD that spans drops lives in its primary drop, and the index of the other drop points to it (no copies): BRD-2
+Production Reconciliation and BRD-4 Marketing Collection extraction (Drop 2), BRD-3 quotation and BRD-8 EB placement and
+reports (Drop 1), BRD-1 client onboarding and BRD-5 GL accounts (Drop 0), BRD-13 legacy invoices (Drop 1), BRD-9 service
+requests and BRD-10 Bridger Insight (Drop 2). The builders take the folder from the drop map in
+`tools/deliverables/brand.py` (`BRD_DROP`), so a rebuild lands in the drop folder; `python
+tools/deliverables/drop_index.py` regenerates the four indexes.
+
+### Status
+
+| # | Document | Drop | Status |
+|---|---|---|---|
+| 1 | FRS, one per BRD (BRD-5 in two volumes with a cover note) | Drop of each BRD (BRD-00: Programme) | v1.0 issued for BDOI review, BRD-2, BRD-6, BRD-11 and BRD-13 at v1.1 (programme alignment and BDOI answers of 26-Sep-2026): the `FRS/` folder of each drop, 16 Word files: the BRD-00 Core Replacement umbrella, BRD-1 to BRD-13 (BRD-13 Data Migration added) and the BRD-5 cover note. The Claims FRS numbers its requirements FR-CM-nnn (renumbered from FR-CL-nnn, which Collections keeps; DCR-188) |
+| 2 | Discrepancy and clarification register | Programme | v1.2: `out/Programme/Registers/BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`: 239 items (programme alignment DCR-210 to DCR-235 and Data Migration v1.1 DCR-240 to DCR-243 added; DCR-236 to DCR-239 not used; DCR-135 answered by the IER) with a Drop column, and 453 questions (IQ01-IQ35 of the programme alignment and DSQ01-DSQ04 of the document storage decision added; DMQ25-DMQ26, DMQ36-DMQ39 answered) |
+| 3 | Test plans, one per FRS volume | Drop of each BRD | v1.0 (BRD-6 and BRD-13 at v1.1): the `TestPlans/` folder of each drop, 14 workbooks and 14 Word summaries (BRD-1 to BRD-13, BRD-5 in two volumes); builder `src/testplans/build_test_plan.py`. The Claims plan uses case IDs keyed on FR-CM. Not yet written: the cross-cutting FR-CR requirements of BRD-00 |
+| 3 | Test plan BRD-13 Data Migration | Drop 0 | v1.1: `out/Drop-0_Setup_and_Data_Migration/TestPlans/BIBS_TestPlan_BRD-13_Data_Migration_v1.1.xlsx` and summary (152 cases) |
+| 17 | Reports in Excel and PDF; documents and schedules in Word and PDF | All (platform) | Built in the platform (`ExportFormat.DOCX`, document renditions); see Developer Guide 6.1-6.2 |
+| 20 | Upload and download templates | Drop 0 (migration templates) | Migration extract templates: `out/Drop-0_Setup_and_Data_Migration/Migration/templates/` (27 layouts and the control file). Platform upload and download templates follow after the build |
+| 29 | Data migration (BRD-13) | Drop 0 | v1.1 (BDOI timeline, go-live January 2028): Strategy and Approach (52 pages), Data Requirements Workbook (31 data objects, 27 extract layouts, 352 fields, 51 data-quality rules), Cutover Runbook and Task Plan (75 tasks, T-30 to T+30), Reconciliation Approach and Sign-off, in `out/Drop-0_Setup_and_Data_Migration/Migration/`; FRS BRD-13 v1.1 (80 pages); source `src/migration/` |
+| 41 | Business process deck | Programme | v1.0: `out/Programme/Decks/BIBS_Deck_BRD-00_Business_Process_AsIs_Envisioned_BestPractice_v1.0.pptx` |
+| 42 | Programme alignment and integration inventory | Programme | v1.0: `out/Programme/Alignment/BIBS_Alignment_BRD-00_Drops_Integrations_Infrastructure_v1.0.docx`, `BIBS_Alignment_BRD-00_Integration_Inventory_v1.0.xlsx` (20 integrations) and the IER diagrams in `out/Programme/Alignment/IER/`; source `src/alignment/` |
+
+Edits still owed to documents that the build teams are editing: [`PENDING_EDITS.md`](PENDING_EDITS.md).
 
 ### Carried into FRS v1.1
 

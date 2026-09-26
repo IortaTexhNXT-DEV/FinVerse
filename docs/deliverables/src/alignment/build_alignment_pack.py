@@ -12,7 +12,7 @@ Inputs (this folder)
                               tables built from the YAML file (list in placeholders() below);
   * figures/*.dot             drop map, integration context, application and deployment diagrams.
 
-Outputs (docs/deliverables/out/Alignment)
+Outputs (docs/deliverables/out/Programme/Alignment, from tools/deliverables/brand.py)
   * BIBS_Alignment_BRD-00_Drops_Integrations_Infrastructure_v<version>.docx
   * BIBS_Alignment_BRD-00_Integration_Inventory_v<version>.xlsx
   * IER/BIBS_IER_Application_Architecture.png and IER/BIBS_IER_Infrastructure_Deployment.png, for the
@@ -39,7 +39,7 @@ import brand  # noqa: E402
 from bdoi_docx import BdoiDocument, lint_source, load_source, meta_from, output_path, render_body  # noqa: E402
 from bdoi_xlsx import BdoiWorkbook, Column  # noqa: E402
 
-OUT = brand.OUT_DIR / "Alignment"
+OUT = brand.out_dir("BRD-00", "Alignment")  # Programme/Alignment (brand.BRD_DROP)
 DOC = "PROGRAMME_ALIGNMENT.md"
 PLACEHOLDER = re.compile(r"^<!--\s*al:(\w+)\s*(.*?)-->\s*$")
 FITS = ["FIT", "CONFIGURE", "CHANGE", "NEW", "OUT"]
@@ -274,7 +274,7 @@ def build_workbook(d: dict[str, Any]) -> Path:
 # ------------------------------------------------------------------------------------------------ IER diagrams
 
 def ier_pngs() -> list[Path]:
-    """Renders the two IER diagrams at 300 dpi into out/Alignment/IER (for pasting into the IER workbook)."""
+    """Renders the two IER diagrams at 300 dpi into out/Programme/Alignment/IER (for pasting into the IER workbook)."""
     dot = shutil.which("dot")
     target = OUT / "IER"
     target.mkdir(parents=True, exist_ok=True)

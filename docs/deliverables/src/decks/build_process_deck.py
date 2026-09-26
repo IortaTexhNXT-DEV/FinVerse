@@ -40,7 +40,7 @@ import process_figures as pf  # noqa: E402
 
 DATA = HERE / "process_deck"
 FIG = HERE / "figures"
-OUT = brand.OUT_DIR / "Decks" / brand.output_name(
+OUT = brand.out_dir("BRD-00", "Decks") / brand.output_name(
     "Deck", "BRD-00", "Business Process AsIs Envisioned BestPractice", "1.0", "pptx")
 
 CONTENT_W = W - 2 * MARGIN

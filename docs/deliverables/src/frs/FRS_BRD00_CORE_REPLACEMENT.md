@@ -74,9 +74,9 @@ The function FRS (BRD-1 to BRD-12) remain the specifications of the business pro
 | R1 | BDOI Core Replacement BRD (48 pages) | v1.0, approved 21-Nov to 1-Dec-2025 | `docs/source-documents/00 - BRD BDOI Core Replacement v01.pdf` |
 | R2 | Core Replacement requirements baseline and fit/gap (rows CORE-nn.mm, XC-nn; questions CRQnn) | current | `docs/requirements/BDOI_CORE_BRD_SPEC.md` |
 | R3 | Core Replacement impact on BIBS (design proposals, build waves) | current | `docs/architecture/CORE_REPLACEMENT_IMPACT.md` |
-| R4 | FRS BRD-1 to BRD-12 (BRD-5 in two volumes) | v1.0 | `docs/deliverables/out/FRS/` |
+| R4 | FRS BRD-1 to BRD-12 (BRD-5 in two volumes) | v1.0 | `docs/deliverables/out/*/FRS/` |
 | R5 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R6 | BRD discrepancy and clarification register | v1.0 | `docs/deliverables/out/Registers/` |
+| R6 | BRD discrepancy and clarification register | v1.0 | `docs/deliverables/out/Programme/Registers/` |
 | R7 | ReInsurance BRD (phase 2) | 11-Mar-2025 | `docs/source-documents/ReInsurance (Phase 2).PDF` |
 | R8 | Data Migration BRD | draft v0.01 | `docs/source-documents/BRD - Data Migration - draft V0.01.pdf` |
 | R9 | BDO UX guidelines and BDOI UX design | current | `docs/design/BDO_UX_GUIDELINES.md`; `docs/source-documents/BDOI_UXD.docx` |

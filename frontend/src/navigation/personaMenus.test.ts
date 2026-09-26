@@ -45,7 +45,8 @@ describe('persona menus of BRD-10 and BRD-11', () => {
       .filter((s) => s.hidden !== true)
       .map((s) => s.path);
     const granted = new Set(roles.flatMap(([, p]) => p.screens));
-    expect([...granted].sort()).toEqual([...sectionScreens].sort());
+    const byPath = (a: string, b: string) => a.localeCompare(b);
+    expect([...granted].sort(byPath)).toEqual([...sectionScreens].sort(byPath));
   });
 
   it.each(roles)('%s sees exactly its screens of the three sections', (_code, persona) => {

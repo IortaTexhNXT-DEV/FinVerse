@@ -490,3 +490,24 @@ What wave U1-B built on U0 and U1-A, and where it differs from or details sectio
   log is ready); an IdP-specific "Forgot password?" (hidden only by the server's no-op in DIRECTORY mode: the login
   page cannot know the mode before sign-in); rate limiting of the reset request beyond the withdrawal of older
   links.
+
+## 19. U2 integration and hardening: as built
+
+- **End to end over HTTP.** `api/UserAccessEndToEndApiIT`: the Requestor enrols a user as SCR_INVESTIGATOR and the
+  Approver approves (temporary password); the user signs in, must change the password, and `/auth/me` returns exactly
+  the investigator's permissions; a group-profile change of the user submitted outside `UAM_WORKING_HOURS` gets the
+  OUTSIDE_HOURS flag and needs the Second Approver; the Business Administrator's CREATE_ROLE request is implemented by
+  the System Administrator; the deactivation ends the user's sessions at once; UAM-AUDIT-LOG shows the profile change
+  with its from / to values, approver and request number.
+- **Smoke.** `ApiSmokeIT.screeningAndUserAccessListsRespondOk` covers the list reads of `/nbadmin` per persona.
+- **Persona menus (client requirement 14).** Shared with BRD-10: `frontend/src/navigation/personaMenus.json`,
+  `navigation/personaMenus.test.ts`, `security/PersonaMenusIT`.
+- **Fixes.**
+  - `UserAdminService.updateUser` ends every open session of a user who becomes disabled (end reason ADMIN_ENDED).
+    Before, the sessions stayed open (and the user "Online") until the token was used again or the 15-minute sweep.
+  - The User Access Matrix was in the menu of every UAM_VIEW holder, but its endpoint refuses the Requestor and the
+    Second Approver (403). The menu entry now follows the endpoint's permissions (ACCESS_REQUEST, ACCESS_APPROVE,
+    ROLE_MANAGE, AUDIT_VIEW). Whether requestors should read the matrix is for BDOI to decide; opening it means adding
+    UAM_VIEW to `AccessMatrixController`.
+- **Guide.** [`docs/modules/USER_ACCESS.md`](../modules/USER_ACCESS.md) (with production-support troubleshooting); the
+  as-built status per BRD ID is in `BDOI_UAM_BRD_SPEC.md`.

@@ -1,0 +1,151 @@
+{
+  "description": "Client requirement 14 (persona menus) for BRD-10 Sanction Screening and BRD-11 User Access Maintenance. For each role: the permissions the database grants (V1050, V1060, V1062, V1063) and the menu screens of the Sanction Screening, Compliance Setup and User Access sections it must see - no more, no less. Checked by navigation/personaMenus.test.ts (the menu of navigation/modules.ts) and by the backend PersonaMenusIT (the grants in the database, and every listed screen answers its demo user).",
+  "sections": ["screening", "screening-setup", "user-access"],
+  "roles": {
+    "COMPLIANCE_OFFICER": {
+      "demoUser": "compoff",
+      "permissions": [
+        "ATTACHMENT_VIEW",
+        "CLIENT_VIEW",
+        "REPORT_VIEW",
+        "SCR_AUDIT_VIEW",
+        "SCR_CASE_ASSIGN",
+        "SCR_COMPLIANCE_REVIEW",
+        "SCR_CONFIG_MAINTAIN",
+        "SCR_LIST_MAINTAIN",
+        "SCR_REPORT_VIEW",
+        "SCR_STR_EXTRACT",
+        "SCR_VIEW",
+        "WORK_VIEW"
+      ],
+      "screens": [
+        "/screening",
+        "/screening/cases",
+        "/screening/matches",
+        "/screening/runs",
+        "/screening/high-risk",
+        "/screening/str",
+        "/screening-setup/config",
+        "/screening-setup/templates",
+        "/screening-setup/watchlist",
+        "/screening-setup/sources"
+      ]
+    },
+    "COMPLIANCE_CHECKER": {
+      "demoUser": "compchk",
+      "permissions": [
+        "CLIENT_VIEW",
+        "REPORT_VIEW",
+        "SCR_CONFIG_APPROVE",
+        "SCR_LIST_APPROVE",
+        "SCR_REPORT_VIEW",
+        "SCR_VIEW"
+      ],
+      "screens": [
+        "/screening",
+        "/screening/cases",
+        "/screening/matches",
+        "/screening/runs",
+        "/screening/high-risk",
+        "/screening-setup/config",
+        "/screening-setup/templates",
+        "/screening-setup/watchlist",
+        "/screening-setup/sources"
+      ]
+    },
+    "UNIT_COMPLIANCE_COORD": {
+      "demoUser": "ucc",
+      "permissions": [
+        "CLIENT_VIEW",
+        "REPORT_VIEW",
+        "SCR_CASE_ASSIGN",
+        "SCR_REPORT_VIEW",
+        "SCR_VIEW",
+        "WORK_VIEW"
+      ],
+      "screens": [
+        "/screening",
+        "/screening/cases",
+        "/screening/matches",
+        "/screening/runs",
+        "/screening/high-risk",
+        "/screening-setup/watchlist"
+      ]
+    },
+    "SCR_INVESTIGATOR": {
+      "demoUser": "investigator",
+      "permissions": [
+        "ACCOUNT_VIEW",
+        "ATTACHMENT_MANAGE",
+        "ATTACHMENT_VIEW",
+        "CLIENT_VIEW",
+        "SCR_INVESTIGATE",
+        "SCR_RISK_TAG",
+        "SCR_VIEW",
+        "WORK_VIEW"
+      ],
+      "screens": [
+        "/screening",
+        "/screening/cases",
+        "/screening/matches",
+        "/screening/runs",
+        "/screening/high-risk",
+        "/screening-setup/watchlist"
+      ]
+    },
+    "SCR_APPROVER": {
+      "demoUser": "scrapprover",
+      "permissions": ["CLIENT_VIEW", "SCR_CASE_APPROVE", "SCR_CASE_ASSIGN", "SCR_VIEW", "WORK_VIEW"],
+      "screens": [
+        "/screening",
+        "/screening/cases",
+        "/screening/matches",
+        "/screening/runs",
+        "/screening/high-risk",
+        "/screening-setup/watchlist"
+      ]
+    },
+    "AML_COMMITTEE": {
+      "demoUser": "amlcom1",
+      "permissions": ["ATTACHMENT_VIEW", "CLIENT_VIEW", "SCR_COMMITTEE", "SCR_VIEW"],
+      "screens": [
+        "/screening",
+        "/screening/cases",
+        "/screening/matches",
+        "/screening/runs",
+        "/screening/high-risk",
+        "/screening-setup/watchlist"
+      ]
+    },
+    "UAM_REQUESTOR": {
+      "demoUser": "requestor",
+      "permissions": [
+        "BULK_PROCESS",
+        "UAM_CANCEL",
+        "UAM_CORRECT",
+        "UAM_DEACTIVATE",
+        "UAM_ENROLL",
+        "UAM_MODIFY",
+        "UAM_REACTIVATE",
+        "UAM_VIEW"
+      ],
+      "screens": ["/user-access/requests", "/user-access/bulk"]
+    },
+    "UAM_APPROVER": {
+      "demoUser": "uamapprover",
+      "permissions": ["ACCESS_APPROVE", "REPORT_VIEW", "UAM_REPORT_VIEW", "UAM_VIEW"],
+      "screens": [
+        "/user-access/requests",
+        "/user-access/group-profiles",
+        "/user-access/bulk",
+        "/user-access/matrix",
+        "/user-access/reports"
+      ]
+    },
+    "UAM_SECOND_APPROVER": {
+      "demoUser": "secapprover",
+      "permissions": ["UAM_SECOND_APPROVE", "UAM_VIEW"],
+      "screens": ["/user-access/requests", "/user-access/group-profiles"]
+    }
+  }
+}

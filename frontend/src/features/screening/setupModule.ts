@@ -41,7 +41,8 @@ export const screeningSetupModule: FeatureModule = {
       label: 'List Sources and Runs',
       icon: UploadCloud,
       permission: 'SCR_LIST_MAINTAIN',
-      alsoPermissions: ['SCR_LIST_APPROVE', 'SCR_VIEW'],
+      // The list maker and checker only (design 11.2); SCR_VIEW alone showed it to every persona.
+      alsoPermissions: ['SCR_LIST_APPROVE'],
       component: lazy(() => import('./setup/SourcesPage')),
     },
   ],

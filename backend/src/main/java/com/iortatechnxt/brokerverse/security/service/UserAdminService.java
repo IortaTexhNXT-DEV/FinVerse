@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.security.domain.PasswordHistory;
 import com.iortatechnxt.brokerverse.security.domain.PasswordHistoryRepository;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
+import com.iortatechnxt.brokerverse.security.domain.SessionEndReason;
 import com.iortatechnxt.brokerverse.security.service.AccessChangeRecorder.Subject;
 import java.time.Clock;
 import java.time.Instant;
@@ -62,6 +63,7 @@ public class UserAdminService {
   private final AccessChangeRecorder changes;
   private final PasswordHistoryRepository passwordHistory;
   private final ApplicationEventPublisher events;
+  private final UserSessionLog sessions;
   private final Clock clock;
 
   /**
@@ -75,6 +77,7 @@ public class UserAdminService {
    * @param changes access change log
    * @param passwordHistory password history
    * @param events event publisher ({@link RoleChangedOnRequest})
+   * @param sessions session log (a disabled user's sessions end at once)
    * @param clock clock
    */
   public UserAdminService(
@@ -86,6 +89,7 @@ public class UserAdminService {
       AccessChangeRecorder changes,
       PasswordHistoryRepository passwordHistory,
       ApplicationEventPublisher events,
+      UserSessionLog sessions,
       Clock clock) {
     this.users = users;
     this.roles = roles;
@@ -95,6 +99,7 @@ public class UserAdminService {
     this.changes = changes;
     this.passwordHistory = passwordHistory;
     this.events = events;
+    this.sessions = sessions;
     this.clock = clock;
   }
 
@@ -190,8 +195,14 @@ public class UserAdminService {
       throw new BusinessRuleException("SELF_ROLE_CHANGE", "You cannot change your own roles");
     }
     Map<String, String> before = UserAttributes.of(user);
+    boolean wasEnabled = user.isEnabled();
     user.setFullName(request.fullName());
     apply(user, request);
+    if (wasEnabled && !user.isEnabled()) {
+      // A deactivated user is signed out everywhere at once (BRD 1.004; UAM-NFR-35), not only at
+      // the next request or the session sweep, so the session list and "Online" are right.
+      sessions.endAll(user.getUsername(), SessionEndReason.ADMIN_ENDED);
+    }
     changes.recordDifferences(
         new Subject(
             AccessSubjectType.USER,

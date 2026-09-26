@@ -470,6 +470,8 @@ rules, reports, ports, demo data and open points. Update it together with the co
 | Planning & Closing | [`docs/development/PLANNING_AND_CLOSING.md`](PLANNING_AND_CLOSING.md) |
 | Actuarial Reserves | [`docs/modules/ACTUARIAL_RESERVES.md`](../modules/ACTUARIAL_RESERVES.md) |
 | Tax & Statutory | [`docs/modules/TAX_AND_STATUTORY.md`](../modules/TAX_AND_STATUTORY.md) |
+| Sanction Screening (BRD-10) | [`docs/modules/SANCTION_SCREENING.md`](../modules/SANCTION_SCREENING.md) |
+| User Access Maintenance (BRD-11) | [`docs/modules/USER_ACCESS.md`](../modules/USER_ACCESS.md) |
 | Broking (BDOI New Business) | [`docs/architecture/BROKING_ARCHITECTURE.md`](../architecture/BROKING_ARCHITECTURE.md) |
 
 Modules of later BRDs, **designed, not built** (the design is the guide until the module guide is written with the
@@ -483,10 +485,11 @@ code; cross-BRD decisions and the build order are in
 | `eb` | BRD-8 Employee Benefits | V1030, V1031, V1033–V1036 (V1930–V1932) | [`EMPLOYEE_BENEFITS_DESIGN.md`](../architecture/EMPLOYEE_BENEFITS_DESIGN.md) |
 | `portal` (platform) | BRD-8 Employee Benefits | V1032 | [`EMPLOYEE_BENEFITS_DESIGN.md`](../architecture/EMPLOYEE_BENEFITS_DESIGN.md) |
 | `csf` | BRD-9 Customer Servicing Facility | V1040–V1042 (V1940) | [`CUSTOMER_SERVICING_DESIGN.md`](../architecture/CUSTOMER_SERVICING_DESIGN.md) |
-| `screening` | BRD-10 Sanction Screening and Risk Profiling | V1050–V1055 (V1950–V1952) | [`SANCTION_SCREENING_DESIGN.md`](../architecture/SANCTION_SCREENING_DESIGN.md) |
 | `submitted` | BRD-12 Submitted Policies | V1070–V1076 (V1970–V1972) | [`SUBMITTED_POLICIES_DESIGN.md`](../architecture/SUBMITTED_POLICIES_DESIGN.md) |
 | `migration` | BRD-13 Data Migration (owner changes V766, V786, V803, V823, V873, V1007, V1086, V1087 in the owners' modules) | V1080–V1087 (V1980–V1982) | [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md) |
 | No new module (`dashboard`, `report`, `audit`, `catalog`, `opsledger`, `booking`) | BRD-00 Core Replacement (umbrella): role home, report layout and subscriptions, master data change log, MIS fields, insurer page, Invoice Master List, insurer invoice batch | V1090–V1096 (V1990–V1991) | [`CORE_REPLACEMENT_IMPACT.md`](../architecture/CORE_REPLACEMENT_IMPACT.md) |
 
-BRD-11 User Access Maintenance adds no module: it extends `security` and `nbadmin` (V1060–V1062, demo V1960;
-[`USER_ACCESS_DESIGN.md`](../architecture/USER_ACCESS_DESIGN.md)).
+BRD-10 Sanction Screening (`screening`, V1050–V1055, demo V1950–V1952) and BRD-11 User Access Maintenance (no
+module of its own: it extends `security` and `nbadmin`, V1060–V1063, demo V1960) are built; their guides are in the
+table above and their designs are [`SANCTION_SCREENING_DESIGN.md`](../architecture/SANCTION_SCREENING_DESIGN.md) and
+[`USER_ACCESS_DESIGN.md`](../architecture/USER_ACCESS_DESIGN.md).

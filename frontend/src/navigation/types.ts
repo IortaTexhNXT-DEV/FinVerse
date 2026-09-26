@@ -10,6 +10,11 @@ export interface ScreenDef {
   permission?: string;
   /** Other permissions that also open the screen (e.g. the checker of a maker screen). */
   alsoPermissions?: string[];
+  /**
+   * Permissions the user must hold as well (all of them), e.g. INSURER_TAX_VIEW on the insurer tax
+   * worksheets, which no BDOI role holds.
+   */
+  requiresAll?: string[];
   component: LazyExoticComponent<ComponentType>;
   /** Detail/edit screens reached from a list are not shown in the menu. */
   hidden?: boolean;

@@ -32,6 +32,7 @@ function GuardedScreen({ screen }: Readonly<{ screen: ScreenDef }>) {
     <RequirePermission
       permission={screen.permission}
       alsoPermissions={screen.alsoPermissions}
+      requiresAll={screen.requiresAll}
       fallbackTo={fallback}
     >
       <Screen />

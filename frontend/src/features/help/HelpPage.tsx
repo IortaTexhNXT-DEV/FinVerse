@@ -2,8 +2,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { useAuth } from '@/auth/authContext';
+import { mayOpen } from '@/navigation/access';
+import { MODULES } from '@/navigation/modules';
 import { searchHelp } from './helpContent';
-import type { HelpScreen } from './helpContent';
+import type { HelpScreen, HelpSection } from './helpContent';
 
 function ScreenHelp({ screen }: Readonly<{ screen: HelpScreen }>) {
   return (
@@ -41,10 +44,26 @@ function ScreenHelp({ screen }: Readonly<{ screen: HelpScreen }>) {
   );
 }
 
-/** In-app help: purpose, workflow and controls of every screen, searchable. */
+const SCREENS = new Map(MODULES.flatMap((m) => m.screens).map((s) => [s.path, s]));
+
+/** The help of the screens the user may open (no topic leads to a screen refused to the user). */
+function openable(sections: HelpSection[], can: (p: string) => boolean): HelpSection[] {
+  return sections
+    .map((section) => ({
+      ...section,
+      screens: section.screens.filter((h) => {
+        const screen = h.path === undefined ? undefined : SCREENS.get(h.path);
+        return screen === undefined || mayOpen(screen, can);
+      }),
+    }))
+    .filter((section) => section.screens.length > 0);
+}
+
+/** In-app help: purpose, workflow and controls of every screen the user may open, searchable. */
 export default function HelpPage() {
   const [term, setTerm] = useState('');
-  const sections = searchHelp(term);
+  const { can } = useAuth();
+  const sections = openable(searchHelp(term), can);
   return (
     <div className="stack">
       <PageHeader

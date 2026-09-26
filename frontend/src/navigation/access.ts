@@ -1,10 +1,16 @@
 import type { ScreenDef } from './types';
 
-/** Whether a user may open a screen: it needs no permission, or the user holds one of them. */
+/**
+ * Whether a user may open a screen: it needs no permission, or the user holds one of them, and
+ * the user holds every permission of `requiresAll`.
+ */
 export function mayOpen(
-  screen: Pick<ScreenDef, 'permission' | 'alsoPermissions'>,
+  screen: Pick<ScreenDef, 'permission' | 'alsoPermissions' | 'requiresAll'>,
   can: (permission: string) => boolean,
 ): boolean {
+  if (!(screen.requiresAll ?? []).every(can)) {
+    return false;
+  }
   if (screen.permission === undefined) {
     return true;
   }

@@ -6,6 +6,12 @@ import type { ScreenDef } from './types';
 describe('screen access', () => {
   const can = (p: string) => p === 'ACCESS_APPROVE';
 
+  it('needs every permission of requiresAll (the insurer tax screens need INSURER_TAX_VIEW)', () => {
+    const insurerTax = { permission: 'TAX_VIEW', requiresAll: ['INSURER_TAX_VIEW'] };
+    expect(mayOpen(insurerTax, (p) => p === 'TAX_VIEW')).toBe(false);
+    expect(mayOpen(insurerTax, (p) => ['TAX_VIEW', 'INSURER_TAX_VIEW'].includes(p))).toBe(true);
+  });
+
   it('opens screens without permission, with the permission or with an alternative', () => {
     expect(mayOpen({}, can)).toBe(true);
     expect(mayOpen({ permission: 'ACCESS_APPROVE' }, can)).toBe(true);

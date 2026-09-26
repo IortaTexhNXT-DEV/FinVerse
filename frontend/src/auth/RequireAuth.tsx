@@ -35,16 +35,18 @@ export function RequireAuth({ children }: Readonly<{ children: ReactNode }>) {
 export function RequirePermission({
   permission,
   alsoPermissions,
+  requiresAll,
   fallbackTo,
   children,
 }: Readonly<{
   permission?: string;
   alsoPermissions?: string[];
+  requiresAll?: string[];
   fallbackTo?: string;
   children: ReactNode;
 }>) {
   const { can } = useAuth();
-  if (!mayOpen({ permission, alsoPermissions }, can)) {
+  if (!mayOpen({ permission, alsoPermissions, requiresAll }, can)) {
     if (fallbackTo !== undefined) {
       return <Navigate to={fallbackTo} replace />;
     }

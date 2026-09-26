@@ -29,6 +29,7 @@ import type { Preselection, QuotationForm, QuotationStep } from './quotationForm
 import { ClientStep, ItemsStep, TermsStep } from './QuotationSteps';
 import type { QuotationStepProps } from './QuotationSteps';
 import '@/styles/quotation.css';
+import { useUnsavedChangesGuard } from '@/components/ui/useUnsavedChangesGuard';
 
 function numberParam(value: string | null): number | undefined {
   return value === null || value === '' ? undefined : Number(value);
@@ -184,6 +185,9 @@ function Wizard({ initial }: Readonly<{ initial: QuotationForm }>) {
   };
   const saved = form.id !== undefined;
   const props = { form, set, errors, saved };
+  const leaveGuard = useUnsavedChangesGuard(
+    !saved && JSON.stringify(form) !== JSON.stringify(initial),
+  );
   return (
     <div className="stack">
       <PageHeader
@@ -212,6 +216,7 @@ function Wizard({ initial }: Readonly<{ initial: QuotationForm }>) {
         onChange={go}
       />
       <ErrorAlert error={save.error ?? submit.error} />
+      {leaveGuard}
       <Card title={QUOTATION_STEPS[index]?.label}>
         <StepBody step={step} props={props} detail={detail.data} />
       </Card>

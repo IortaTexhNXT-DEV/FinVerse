@@ -22,6 +22,7 @@ import {
   validateClient,
 } from './clientForm';
 import type { ClientForm } from './clientForm';
+import { useUnsavedChangesGuard } from '@/components/ui/useUnsavedChangesGuard';
 
 function Saved({ client, onAnother }: Readonly<{ client: ClientDetail; onAnother: () => void }>) {
   const navigate = useNavigate();
@@ -58,9 +59,10 @@ function ClientEditor({ existing }: Readonly<{ existing?: ClientDetail }>) {
   const navigate = useNavigate();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState<ClientForm>(() =>
+  const [initial] = useState<ClientForm>(() =>
     existing === undefined ? EMPTY_CLIENT_FORM : fromClient(existing),
   );
+  const [form, setForm] = useState<ClientForm>(initial);
   const [submitted, setSubmitted] = useState(false);
   const [blocked, setBlocked] = useState(false);
   const [created, setCreated] = useState<ClientDetail | null>(null);
@@ -84,6 +86,9 @@ function ClientEditor({ existing }: Readonly<{ existing?: ClientDetail }>) {
       }
     },
   });
+  const leaveGuard = useUnsavedChangesGuard(
+    created === null && !save.isSuccess && JSON.stringify(form) !== JSON.stringify(initial),
+  );
   const submit = () => {
     setSubmitted(true);
     if (Object.keys(validateClient(form, today())).length === 0 && !blocked) {
@@ -139,7 +144,10 @@ function ClientEditor({ existing }: Readonly<{ existing?: ClientDetail }>) {
             Correct the highlighted fields before saving.
           </div>
         )}
-        <div className="row">
+        <div className="form-actions">
+          <Button variant="secondary" onClick={() => void navigate(-1)}>
+            Cancel
+          </Button>
           <Button
             type="submit"
             variant="accent"
@@ -147,12 +155,10 @@ function ClientEditor({ existing }: Readonly<{ existing?: ClientDetail }>) {
             busy={save.isPending}
             disabled={blocked}
           >
-            {editId === undefined ? 'Save as prospect' : 'Save changes'}
-          </Button>
-          <Button variant="secondary" onClick={() => void navigate(-1)}>
-            Cancel
+            {editId === undefined ? 'Save as Prospect' : 'Save Changes'}
           </Button>
         </div>
+        {leaveGuard}
       </form>
     </div>
   );

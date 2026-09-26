@@ -221,11 +221,73 @@ const TONES = new Map<string, Tone>(
 );
 
 /**
+ * Agreed short forms of the long status labels, so every pill keeps one size and never wraps. The
+ * full label is always in the tooltip.
+ */
+const SHORT_LABELS: Record<string, string> = {
+  RETURNED_TO_MARKETING: 'Returned to Mktg',
+  RETURNED_BY_INSURER: 'Insurer Returned',
+  ACCEPTED_AS_REQUESTED: 'Accepted as Req.',
+  APPROVED_WITH_CHANGES: 'Appr. with Changes',
+  PENDING_AUTHORIZATION: 'Pending Auth.',
+  PLACEMENT_CANCELLED: 'Plcmt Cancelled',
+  EXCLUDED_CANCELLED: 'Excl. Cancelled',
+  REQUIREMENTS_PREP: 'Reqts Prep',
+  UNIT_HEAD_APPROVAL: 'Unit Head Appr.',
+  FOR_MKT_APPROVAL: 'For Mktg Approval',
+  FOR_TSU_APPROVAL: 'For TSU Approval',
+  FOR_AUTHORIZATION: 'For Authorization',
+  FOR_DEACTIVATION: 'For Deactivation',
+  FOR_REACTIVATION: 'For Reactivation',
+  STR_PREPARATION: 'STR Preparation',
+  READY_FOR_PLACEMENT: 'For Placement',
+  REVERSAL_FAILED: 'Reversal Failed',
+  PARTIALLY_PAID: 'Partially Paid',
+  PARTIALLY_KEPT: 'Partially Kept',
+  SKIPPED_LOCKED: 'Skipped',
+};
+
+/** Longest label shown in full; longer labels use the short form or are cut with an ellipsis. */
+export const BADGE_MAX_CHARS = 18;
+
+export type BadgeTone = Tone;
+
+/** Colour tone of a status code (empty for an unknown status: neutral Header Blue). */
+export function statusTone(status: string): Tone | '' {
+  return TONES.get(status) ?? '';
+}
+
+/** Label shown in the pill: the agreed short form of a long status, else the humanized status. */
+export function statusShortLabel(status: string, label?: string): string {
+  const full = label ?? humanize(status);
+  if (full.length <= BADGE_MAX_CHARS) {
+    return full;
+  }
+  return SHORT_LABELS[status] ?? full;
+}
+
+interface StatusBadgeProps {
+  /** Status code (LOCKED, SUCCEEDED, RETURNED_TO_MARKETING…); picks the tone and the label. */
+  status: string;
+  /** Label to show instead of the humanized code (e.g. a workflow stage name). */
+  label?: string;
+  /** Tone to use instead of the status's own tone. */
+  tone?: Tone;
+}
+
+/**
  * Colour-coded, outlined status pill (BDO): green approved or done, yellow waiting for review or
  * approval, blue in process, red exception or rejected; unknown statuses render in the neutral
- * Header Blue tone.
+ * Header Blue tone. Every pill has one height, one font and a fixed minimum width; inside a table
+ * cell it takes the column's width, so all pills of a column are the same size. Long labels use the
+ * agreed short form, with the full label in the tooltip; the pill never wraps.
  */
-export function StatusBadge({ status }: Readonly<{ status: string }>) {
-  const tone = TONES.get(status) ?? '';
-  return <span className={`badge ${tone}`}>{humanize(status)}</span>;
+export function StatusBadge({ status, label, tone }: Readonly<StatusBadgeProps>) {
+  const full = label ?? humanize(status);
+  const shown = statusShortLabel(status, label);
+  return (
+    <span className={`badge ${tone ?? statusTone(status)}`} title={full}>
+      {shown}
+    </span>
+  );
 }

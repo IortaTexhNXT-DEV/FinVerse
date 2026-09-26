@@ -7,7 +7,7 @@ import type { DownloadedFile } from '@/api/client';
 import { PROPOSAL_ENTITY, proposalsApi } from '@/api/proposals';
 import type { ComparativeRow, Proposal } from '@/api/proposals';
 import { workflowApi } from '@/api/workflow';
-import { StageTimeline } from '@/components/broking/StageTimeline';
+import { HistoryTable } from '@/components/broking/HistoryTable';
 import { workflowKey } from '@/components/broking/workflowKey';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
@@ -326,7 +326,10 @@ export function HistoryTab({ proposalId }: Readonly<{ proposalId: number }>) {
   });
   return (
     <Card title="History">
-      <StageTimeline history={detail.data?.history ?? []} />
+      <HistoryTable
+        history={detail.data?.history ?? []}
+        terminal={detail.data?.stageTerminal}
+      />
     </Card>
   );
 }

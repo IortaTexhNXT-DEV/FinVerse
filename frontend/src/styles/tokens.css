@@ -58,5 +58,15 @@
   --control-height-sm: 32px;
   --header-height: 72px;
   --sidebar-width: 272px;
+  /* Status pills and flag chips: one size everywhere */
+  --badge-min-width: 112px;
+  --badge-max-width: 176px;
+  --tag-min-width: 88px;
+  /* Fixed width of code and reference columns (ARN, CL, PAY… numbers) */
+  --code-col-width: 168px;
+  /* Tables scroll inside their card so the header row stays visible */
+  --table-max-height: 70vh;
+  /* Label column of definition grids */
+  --def-label-width: 168px;
   --focus-ring: 0 0 0 3px rgba(0, 114, 216, 0.35);
 }

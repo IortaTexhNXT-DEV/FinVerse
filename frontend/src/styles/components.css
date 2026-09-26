@@ -615,38 +615,70 @@
 }
 
 /* ---------- Badges / alerts -------------------------------------------------------------- */
+/*
+ * Status pills (BDO): one height, one font size and weight, centred text and a fixed minimum width.
+ * Long labels are cut with an ellipsis (the full label is in the tooltip); a pill never wraps.
+ */
 .badge {
   display: inline-block;
-  padding: 3px 12px;
+  box-sizing: border-box;
+  height: 24px;
+  min-width: var(--badge-min-width);
+  max-width: var(--badge-max-width);
+  padding: 0 10px;
   border-radius: var(--radius-sm);
   border: 1px solid currentColor;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 22px;
+  text-align: center;
   background: var(--color-surface);
   color: var(--brand-navy);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* In a table cell a pill on its own takes the column's width: every pill of a column is one size. */
+.table td > .badge:only-child,
+.table td > .badge-pair > .badge {
+  display: block;
+  width: 100%;
+}
+
+/* Two statuses of one record (e.g. Unapplied and a Queued request): two aligned pills. */
+.badge-pair {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }
 
 .badge.success {
   color: var(--color-success);
+  background: var(--color-success-bg);
 }
 
 .badge.danger {
   color: var(--color-danger);
+  background: var(--color-danger-bg);
 }
 
 .badge.warning {
   color: var(--color-warning);
   border-color: var(--brand-gold);
+  background: var(--color-warning-bg);
 }
 
 .badge.neutral {
   color: var(--color-text-muted);
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-alt);
 }
 
 /* In process (e.g. "Ready for Placement"): CTA Blue outline (BDO status pill colours) */
 .badge.info {
   color: var(--brand-blue);
+  background: var(--color-info-bg);
 }
 
 .badge,
@@ -659,18 +691,45 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);
+  align-items: center;
 }
 
 .tag {
   display: inline-block;
-  padding: 2px 8px;
+  box-sizing: border-box;
+  height: 22px;
+  min-width: var(--tag-min-width);
+  max-width: var(--badge-max-width);
+  padding: 0 8px;
   border-radius: 4px;
   background: var(--brand-gold-050);
   border: 1px solid var(--brand-gold);
   color: var(--color-heading);
   font-size: 12px;
   font-weight: 700;
+  line-height: 20px;
+  text-align: center;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tag.neutral {
+  background: var(--color-surface-alt);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.tag.info {
+  background: var(--brand-blue-050);
+  border-color: var(--brand-field-blue);
+  color: var(--brand-navy);
+}
+
+.tag.danger {
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
 }
 
 .alert {

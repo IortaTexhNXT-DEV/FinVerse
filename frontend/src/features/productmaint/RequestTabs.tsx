@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { PACKAGE_REQUEST_ENTITY, productMaintApi } from '@/api/productmaint';
 import type { PackageRequest, ResponseHistory } from '@/api/productmaint';
 import { workflowApi } from '@/api/workflow';
-import { StageTimeline } from '@/components/broking/StageTimeline';
+import { HistoryTable } from '@/components/broking/HistoryTable';
 import { workflowKey } from '@/components/broking/workflowKey';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
@@ -131,7 +131,10 @@ export function HistoryTab({ requestId }: Readonly<{ requestId: number }>) {
     <div className="stack">
       <ErrorAlert error={detail.error ?? history.error} />
       <Card title="Status history">
-        <StageTimeline history={detail.data?.history ?? []} />
+        <HistoryTable
+        history={detail.data?.history ?? []}
+        terminal={detail.data?.stageTerminal}
+      />
       </Card>
       <Card title="Insurer response revisions" flush>
         <DataTable<ResponseHistory>

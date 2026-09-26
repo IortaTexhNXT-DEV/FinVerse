@@ -7,7 +7,7 @@ import type {
   QuotationItemView,
 } from '@/api/quotations';
 import { workflowApi } from '@/api/workflow';
-import { StageTimeline } from '@/components/broking/StageTimeline';
+import { HistoryTable } from '@/components/broking/HistoryTable';
 import { workflowKey } from '@/components/broking/workflowKey';
 import { Amount } from '@/components/ui/Amount';
 import { Card } from '@/components/ui/Card';
@@ -270,7 +270,10 @@ export function HistoryTab({ entityId }: Readonly<{ entityId: number }>) {
   });
   return (
     <Card title="History">
-      <StageTimeline history={detail.data?.history ?? []} />
+      <HistoryTable
+        history={detail.data?.history ?? []}
+        terminal={detail.data?.stageTerminal}
+      />
     </Card>
   );
 }

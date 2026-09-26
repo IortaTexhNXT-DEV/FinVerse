@@ -10,13 +10,25 @@ interface PagerProps {
   /** Plural noun of the rows; kept for callers, the BDO wording is always "results". */
   noun?: string;
   onPage: (page: number) => void;
+  /** Changes the rows per page; shows the rows-per-page selector when given. */
+  onSize?: (size: number) => void;
 }
+
+/** Rows-per-page choices of the pagination bar. */
+export const PAGE_SIZES = [10, 20, 50, 100] as const;
 
 /**
  * BDO Insure table pager: "Showing 1 to n of N results" on the left and numbered pages with
  * previous / next on the right. Hidden when there is nothing to page.
  */
-export function Pager({ page, totalPages, total, size, onPage }: Readonly<PagerProps>) {
+export function Pager({
+  page,
+  totalPages,
+  total,
+  size,
+  onPage,
+  onSize,
+}: Readonly<PagerProps>) {
   if (total <= 0 || totalPages <= 0) {
     return null;
   }
@@ -25,6 +37,22 @@ export function Pager({ page, totalPages, total, size, onPage }: Readonly<PagerP
     <nav className="pagination" aria-label="Pages">
       <span className="pagination-summary">{showingText(page, pageSize, total)}</span>
       <div className="spacer" />
+      {onSize !== undefined && (
+        <label className="page-size">
+          Rows per page
+          <select
+            className="select"
+            value={pageSize}
+            onChange={(e) => onSize(Number(e.target.value))}
+          >
+            {PAGE_SIZES.map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <button
         type="button"
         className="page-button"
@@ -70,10 +98,12 @@ export function PageFooter({
   data,
   noun,
   onPage,
+  onSize,
 }: Readonly<{
   data: { page: number; size?: number; totalPages: number; totalElements: number } | undefined;
   noun?: string;
   onPage: (page: number) => void;
+  onSize?: (size: number) => void;
 }>) {
   if (data === undefined) {
     return null;
@@ -86,6 +116,7 @@ export function PageFooter({
       size={data.size}
       noun={noun}
       onPage={onPage}
+      onSize={onSize}
     />
   );
 }

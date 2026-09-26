@@ -13,7 +13,7 @@ meta:
   code: DM
   frs: FRS_BRD13_DATA_MIGRATION.md
   summary: TP_BRD13_DATA_MIGRATION.md
-  version: "1.1"
+  version: "1.2"
   date: 26 September 2026
   built: false
 
@@ -37,6 +37,9 @@ personas:
   PRC: {name: Prod Recon Analyst, short: Prod Recon}
   AUDIT: {name: Audit / Compliance User (Legacy Inquiry), short: Inquiry}
   ACCESS_REV: {name: Compliance reviewer (access log), short: Log rev.}
+  GL_LEAD: {name: Comptrollership GL lead (true-up preparer), short: GL lead}
+  RNW_MAKER: {name: Renewal processing team - maker, short: RNW maker}
+  RNW_CHECKER: {name: Renewal processing team - checker, short: RNW checker}
   SYSTEM: {name: BIBS scheduled job or event}
 
 screens:
@@ -75,25 +78,27 @@ screens:
   ACSL: Accounting > ACSL GL to Sub-ledger Reconciliation
   JOURNAL: Accounting > Journal inquiry
   DISBQ: Disbursement > Payment requests
+  TRUEUPS: Data Migration > True-ups
+  RESUB: Data Migration > Batches > (batch) Resubmissions tab
   API: API call with the user's token (tester tool, for example Postman)
 
 data:
   - id: TD-DM-01
     name: Test users per migration role
     content: miglead (DATA_MIGRATION_LEAD), migsteward (DATA_STEWARD), migowner and migowner2 (DATA_OWNER), migops (MIGRATION_OPERATOR), migrecon (MIGRATION_RECON_APPROVER), miggonogo (MIGRATION_GONOGO), legacyaudit (LEGACY_INQUIRY), legacyrev (LEGACY_ACCESS_REVIEWER), topmgmt (TOP_MANAGEMENT_APPROVER), plus the built Operations users (cashier, cashiertl, commrectl, remit, adjuster, adjtl, reconhandler, ao).
-    source: Planned demo seed V1980 of the build design; existing Operations demo users
+    source: Planned seed data V1980 of the build design; existing Operations SIT/UAT users
   - id: TD-DM-02
     name: Reference extracts
-    content: R01 (MARKET_SEGMENT with 12 values, one unmapped code OLD-RET and one CREATE value WALKIN), R04 and R04B (insurers and branches, one unmapped code), R05 (products), R06 (packages) with a PACKAGE map version mapping PKG-MC-PRIV v3 to MC-PRIVATE-STD v1 up to a sum insured of 2,000,000.00 and to MC-PRIVATE-HV v1 above, and PKG-HOME-01 v2 without a BIBS package (REJECT), R08 (GL account map), R11 (receipt series).
-    source: Masked sample extracts in backend/src/main/resources/demo/migration/ (build wave DM3) prepared by the test lead in the workbook layouts
+    content: R01 (MARKET_SEGMENT with 12 values, one unmapped code OLD-RET and one CREATE value WALKIN), R04 and R04B (insurers and branches, one unmapped code), R05 (products), R06 (the PACKAGE map, 120 entries) mapping PKG-MC-PRIV v3 to MC-PRIVATE-STD v1 up to a sum insured of 2,000,000.00 and to MC-PRIVATE-HV v1 above, and PKG-HOME-01 v2 without a BIBS package (REJECT), R08 (GL account map), R11 (receipt series).
+    source: Masked test extracts in backend/src/main/resources/db/seed/migration/ (build wave DM3) prepared by the test lead in the workbook layouts
   - id: TD-DM-03
     name: Client extracts
     content: C01 and C02 from QPS (600 clients) and EBIX (400 clients) with 40 exact duplicates on TIN, 15 pairs with similar names and the same birth date, 5 clients already in BIBS, 3 rows without birth date; a client delta file of the next day with 10 new and 5 changed clients.
     source: Masked extracts prepared by the test lead
   - id: TD-DM-04
-    name: Policy header and RMEL cohort extracts
-    content: "P01 and P01S with 300 in-force headers (20 with two insurers, one with shares adding to 90; C-2027-004512-01 on PKG-MC-PRIV v3 with sum insured 950,000.00 expiring 15-Jan-2028, C-2027-004513-01 on the same package with 2,500,000.00, one header on PKG-HOME-01 v2; C-2027-004600-02, the legacy renewal term of C-2027-004600-01). P03 with 60 carried renewals expiring from 3-Jan to 22-May-2028 (T = 3-Jan-2028) - C-2027-004512-01 For Renewal with RA sent 18-Oct-2027; one row without a header (C-2027-009999); one row expiring 30-May-2028; C-2027-004600-01 already renewed in legacy; C-2027-004700-01 PLACED but not booked; one row on PKG-HOME-01 v2; one row with RA sent and no RA date. Three headers expiring in the window have no P03 row." 
-    source: Masked extracts prepared by the test lead
+    name: Policy header and RA-sent extracts
+    content: "P01 and P01S with 300 in-force headers (20 with two insurers, one with shares adding to 90; C-2027-004512-01 on PKG-MC-PRIV v3 with sum insured 950,000.00 expiring 15-Jan-2028; C-2027-004513-01 on the same package with 2,500,000.00; one header on PKG-HOME-01 v2 and one on PKG-XYZ-09 v1 without a map entry; C-2027-004600-02, the legacy renewal term of C-2027-004600-01; 412 headers expiring in May 2028, one on 31-May-2028 and one on 1-Jun-2028). P03 (P03_EXCEL_20271229_01.xlsx) with 45 RAs already sent - C-2027-004512-01 sent on 16-Nov-2027 by e-mail; one row for C-2027-009999 (no header); one row expiring 15-Jun-2028; one row with RA date 30-Dec-2027; one row with RA date 150 days before its expiry; one row for C-2027-004600-01 (renewed in legacy)."
+    source: Masked extracts prepared by the test lead with the Renewal processing team
   - id: TD-DM-05
     name: Open legacy invoices
     content: F01, F01S, F01C with 1,000 invoices - I00123456 (basic 20,000.00, paid 10,000.00, open 10,000.00), invoices paid in full and not remitted, direct-payment invoices with open PR, invoices with PR2307 balance, 20 USD invoices, one invoice whose components do not add up to its gross premium, one invoice number used in EBIX and QPS; control file with totals per component and currency.
@@ -104,7 +109,11 @@ data:
     source: Masked extracts prepared by the test lead
   - id: TD-DM-07
     name: GL trial balance
-    content: G01 per branch and currency, balanced, whose legacy control-account lines equal the F01 and F02 detail; a second version with one control line 3,000.00 higher; two F01 variants for branch MKT01 - one without I00300001 (paid in full, not remitted - DTIP 5,000.00 and commission receivable 800.00 open) and one without I00300002 (unpaid - premium receivable 3,000.00, DTIP 3,000.00, commission receivable 480.00 unrealised).
+    content: G01 per branch and currency, balanced, whose legacy control-account lines equal the F01 and F02 detail; a second version with one control line 3,000.00 higher; the P&L accounts of MKT01 netting to a FY2027 income of 1,250,000.00; a version of MKT01 PHP out of balance by 100.00; two F01 variants for branch MKT01 - one without I00300001 (paid in full, not remitted - DTIP 5,000.00 and commission receivable 800.00 open) and one without I00300002 (unpaid - premium receivable 3,000.00, DTIP 3,000.00, commission receivable 480.00 unrealised).
+    source: Prepared by the test lead with Comptrollership
+  - id: TD-DM-11
+    name: FY2027 true-up extracts
+    content: "True-up 1 for branch MKT01 - G01 version TU1 (legacy TB after the close); G03 with JV-2027-12-0457 (accrual of professional fees 80,000.00, register ADJ-2027-014) and JV-2028-AUD-0003 (audit write-off of the 3,000.00 premium receivable of I00300002, dated 31-Dec-2027); G03D with the write-off detail on I00300002 basic; the legacy journal listing since the freeze. Variants - a journal dated 5-Jan-2028; a journal without a register reference; a control-account line without detail; a listing with JV-2028-AUD-0009 not in the register; a G03 missing an accrual line of 12,000.00; a final true-up (version FINAL) for January 2028 closed."
     source: Prepared by the test lead with Comptrollership
   - id: TD-DM-08
     name: Archive extracts
@@ -112,12 +121,12 @@ data:
     source: Masked extracts prepared by the test lead
   - id: TD-DM-09
     name: Configuration for the tests
-    content: "Parameters as delivered - MIG_ENVIRONMENT_CLASS NON_PRODUCTION, MIG_STAGING_RETENTION_DAYS 5, MIG_CHUNK_SIZE 500, MIG_PARTITIONS 4, MIG_AMOUNT_TOLERANCE 0.00, MIG_MAX_ERROR_RATE_MASTER 0.5, MIG_MAX_ERROR_RATE_FINANCIAL 0, MIG_CLIENT_MATCH_AUTO 90, MIG_CLIENT_MATCH_REVIEW 60, MIG_ARCHIVE_EXPORT_MAX_ROWS 1000, MIG_ACCESS_EXPORT_ALERT_ROWS 5000; legacy control accounts, Migration Clearing and LG_ rule lines set up on the test chart."
-    source: Configuration delivered with the build (FRS section 9); demo V1982
+    content: "Parameters as delivered - MIG_ENVIRONMENT_CLASS NON_PRODUCTION, MIG_STAGING_RETENTION_DAYS 5, MIG_CHUNK_SIZE 500, MIG_PARTITIONS 4, MIG_AMOUNT_TOLERANCE 0.00, MIG_MAX_ERROR_RATE_MASTER 0.5, MIG_MAX_ERROR_RATE_FINANCIAL 0, MIG_CLIENT_MATCH_AUTO 90, MIG_CLIENT_MATCH_REVIEW 60, MIG_ARCHIVE_EXPORT_MAX_ROWS 1000, MIG_ACCESS_EXPORT_ALERT_ROWS 5000, MIG_OPENING_VALUE_DATE 1 January 2028, MIG_GOLIVE_RENEWAL_TO 31 May 2028, MIG_RENEWAL_URGENT_TO 31 January 2028, MIG_RESUBMIT_DEADLINE T-1 12:00; legacy control accounts, Migration Clearing and LG_ rule lines set up on the test chart."
+    source: Configuration delivered with the build (FRS section 9); seed data V1982
   - id: TD-DM-10
     name: New BIBS invoices and payments
     content: BIBS invoice BI-2028-000150 with 2,000.00 open; a Direct Credit payment file with one row carrying EBIX reference I00123457 and one row for a BIBS invoice; an approved client payout account.
-    source: Built Operations demo data; payment file prepared by the test lead
+    source: Built Operations seed data; payment file prepared by the test lead
 
 scenarios:
   - id: SC-DM-01
@@ -134,7 +143,7 @@ scenarios:
     pre: Loads of SC-DM-02; TB TD-DM-07.
   - id: SC-DM-04
     persona: STEWARD
-    title: Client master and reference data. Codes are mapped and created, legacy packages are remapped to the BIBS packages, legacy clients are matched, deduplicated and created as active clients; reference data and clients load first in every mock.
+    title: Client master and reference data. Codes are mapped and created, the PACKAGE map is loaded for the Renewal sanitation, legacy clients are matched, deduplicated and created as active clients; reference data and clients load first in every mock.
     pre: Extracts TD-DM-02 and TD-DM-03.
   - id: SC-DM-05
     persona: CASHIER
@@ -150,8 +159,12 @@ scenarios:
     pre: Archive TD-DM-08.
   - id: SC-DM-08
     persona: PM
-    title: Cutover. A mock plan is run with reference data and clients first, go / no-go is decided on measured criteria, the renewals of the January-May 2028 expiries are carried and the later cohorts move by RMEL cohort, and legacy systems are decommissioned on the checklist.
+    title: Cutover. A mock plan is run with reference data and clients first, go / no-go is decided on measured criteria, the January-May 2028 expiries are extracted at go-live with the RAs already sent and the later expiries move by RMEL cohort, and legacy systems are decommissioned on the checklist.
     pre: All objects loaded in a mock.
+  - id: SC-DM-09
+    persona: RECON
+    title: Year-end cut-over. The provisional GL opening is loaded from the preliminary December trial balance, and the FY2027 closing and audit adjustments reach BIBS in approved true-ups that are reconciled to the legacy trial balance and closed.
+    pre: Trial balance TD-DM-07; true-up extracts TD-DM-11.
 
 frs:
   FR-DM-001:
@@ -660,6 +673,177 @@ frs:
         expected: Migration Clearing is 0.00 for MKT01 PHP, but the per-account comparison shows Premium Receivable - Legacy 3,000.00 debit and DTIP - Legacy 3,000.00 credit higher in the trial balance than in the detail, and 480.00 on each commission account; the GL level cannot be signed.
         msg: ["{Premium Receivable - Legacy} differs from the opening detail by {3,000.00} in {MKT01} {PHP}"]
 
+  FR-DM-022:
+    scenario: SC-DM-09
+    persona: RECON
+    screen: BATCH
+    data: [TD-DM-07, TD-DM-09]
+    conditions:
+      - After the load of a branch, its balance-sheet accounts in BIBS equal the legacy preliminary trial balance and its P&L accounts are 0.00 at 1 January 2028.
+      - A legacy trial balance with a FY2027 net income of 1,250,000.00 in a branch gives a credit of 1,250,000.00 to retained earnings in that branch.
+      - The load cannot be approved while the preliminary trial balance is not signed.
+      - The opening journals show the flag PROVISIONAL until the true-ups are closed.
+      - A trial balance out of balance in a branch and currency is refused.
+    cases:
+      - c: 1
+        type: Positive
+        persona: OPERATOR
+        screen: JOURNAL
+        title: Provisional opening of a branch
+        pre: G01 version PROVISIONAL of branch MKT01 signed by Comptrollership; G01 loaded after F01 and F02.
+        steps:
+          - Open Journal inquiry for reference MIG-TB-2027-12-31 of MKT01 PHP; run the trial balance of MKT01 at 1 January 2028.
+        expected: One OPENING journal per branch and currency with value date 1 January 2028; balance-sheet accounts equal the preliminary trial balance; every P&L account is 0.00; Migration Clearing 0.00.
+      - c: 2
+        type: Positive
+        screen: JOURNAL
+        title: FY2027 result on retained earnings
+        steps:
+          - In the G01 of MKT01, the P&L accounts net to an income of 1,250,000.00; open the retained earnings account of MKT01.
+        expected: Retained earnings has a credit of 1,250,000.00 from the opening journal; each P&L line shows its mapped account in the line description.
+      - c: 3
+        type: Negative
+        persona: DML
+        title: Load before the trial balance is signed
+        pre: G01 validated; the preliminary trial balance not yet signed.
+        steps:
+          - Click Approve Load on the G01 batch.
+        expected: Refused.
+        msg: [The preliminary trial balance is not signed by Comptrollership]
+      - c: 4
+        type: Positive
+        screen: JOURNAL
+        title: Opening marked provisional
+        steps:
+          - Open the opening journal of MKT01 before the closure of the true-ups.
+        expected: The journal shows the flag PROVISIONAL.
+      - c: 5
+        type: Negative
+        persona: OPERATOR
+        screen: ISSUES
+        title: Trial balance out of balance
+        steps:
+          - Validate a G01 file whose MKT01 PHP debits exceed the credits by 100.00.
+        expected: The batch cannot be approved for load.
+        msg: ["The trial balance of {MKT01} {PHP} is out of balance by {100.00}"]
+
+  FR-DM-023:
+    scenario: SC-DM-09
+    persona: GL_LEAD
+    screen: TRUEUPS
+    data: [TD-DM-11]
+    conditions:
+      - True-up 1 with a FY2027 accrual of 80,000.00 (Dr expense, Cr accrued expenses) posts, after approval, a journal MIG-TU-1 dated 1 January 2028 with Dr retained earnings 80,000.00 and Cr accrued expenses 80,000.00; the FY2028 P&L does not change.
+      - An audit write-off of 3,000.00 of premium receivable on legacy invoice I00300002, sent with its detail line, reduces the open basic premium of the invoice and Premium Receivable - Legacy by 3,000.00 and leaves Migration Clearing at 0.00.
+      - A journal dated 5 January 2028, or a journal not in the register, stops the validation with its message.
+      - The GL lead who prepared a true-up cannot approve it.
+      - With January 2028 closed, the final true-up posts after Comptrollership reopens the period, and the period is closed again the same day.
+      - A line on a legacy control account without its open-item detail stops the validation.
+      - Posting the same true-up twice creates no second journal.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Prepare, approve and post true-up 1
+        steps:
+          - Validate the true-up 1 batch (G01 TU1, G03, G03D) and Submit as the GL lead.
+          - As the Head of Comptrollership open the true-up in My Approvals and Approve.
+          - Open Journal inquiry for MIG-TU-1; run the January 2028 P&L.
+        expected: MIG-TU-1 posted as an OPENING journal dated 1 January 2028 - Dr retained earnings 80,000.00, Cr accrued expenses 80,000.00; the January 2028 P&L shows no amount from the true-up.
+      - c: 2
+        type: Positive
+        screen: INV360
+        title: Write-off with open-item detail
+        steps:
+          - After the posting of true-up 1, open Invoice 360 of I00300002; run MIG-GL-CLEARING for MKT01.
+        expected: Movement Legacy written off of 3,000.00 on basic premium; open balance 0.00; Premium Receivable - Legacy 3,000.00 lower; Migration Clearing 0.00; the change appears in PRC-LEGACY-CHANGES as a FY2027 true-up.
+      - c: 3
+        type: Negative
+        persona: OPERATOR
+        screen: ISSUES
+        title: Journal outside FY2027 or not in the register
+        steps:
+          - Validate a G03 file with journal JV-2028-01-0005 dated 5 January 2028 and a journal JV-2027-12-0999 without a register reference.
+        expected: "Both journals are errors. The second shows \"Journal {JV-2027-12-0999} is not in the FY2027 adjustment register\"."
+        msg: ["Journal {JV-2028-01-0005} is dated {2028-01-05}, outside FY2027"]
+      - c: 4
+        type: Security-access
+        title: Preparer approves own true-up
+        pre: The GL lead was also given MIG_TRUEUP_APPROVE for this test.
+        steps:
+          - As the GL lead who submitted true-up 1, click Approve.
+        expected: Refused; the true-up stays for approval.
+        msg: [A record cannot be authorized by the user who maintained it]
+      - c: 5
+        type: Workflow
+        persona: RECON
+        title: Final true-up into a closed January
+        pre: January 2028 CLOSED; final true-up approved.
+        steps:
+          - Reopen January 2028 with a reason; let BIBS post MIG-TU-F; close January 2028.
+        expected: The journals post with value date 1 January 2028; the period shows REOPENED and CLOSED on the same day with the reason in its audit trail.
+      - c: 6
+        type: Negative
+        persona: OPERATOR
+        screen: ISSUES
+        title: Control-account line without detail
+        steps:
+          - Validate a G03 file with a 1,500.00 credit to Premium Receivable - Legacy and no G03D line for it.
+        expected: The line is an error; the true-up cannot be submitted.
+        msg: ["{Premium Receivable - Legacy} adjustment of {1,500.00} has no matching open-item detail"]
+      - c: 7
+        type: Boundary
+        persona: SYSTEM
+        screen: JOURNAL
+        title: Posting twice
+        neg: true
+        steps:
+          - Run the posting job MIG_TRUEUP_POST again for true-up 1.
+        expected: No second journal; the existing MIG-TU-1 is returned.
+
+  FR-DM-024:
+    scenario: SC-DM-09
+    persona: RECON
+    screen: TRUEUPS
+    data: [TD-DM-11]
+    conditions:
+      - For true-up 1, MIG-TRUEUP-RECON shows each account's true-up equal to the change of the legacy trial balance, the BIBS opening equal to the legacy post-close trial balance, and Migration Clearing 0.00.
+      - A legacy journal that is in the legacy journal listing but not in the register stops the sign-off with the message.
+      - After the final true-up is signed and the closure recorded, a new true-up cannot be created and the opening journals are no longer marked PROVISIONAL.
+      - A true-up with a break cannot be signed.
+    cases:
+      - c: 1
+        type: Report-output
+        screen: REPORTS
+        title: True-up reconciliation
+        steps:
+          - Run MIG-TRUEUP-RECON for true-up 1; export to Excel and PDF.
+        expected: Cut-off, movement, balance, clearing and opening-period checks all MET; accrued expenses and retained earnings differ from the provisional opening by exactly the true-up; the export matches the screen.
+      - c: 2
+        type: Negative
+        title: Legacy journal missing from the register
+        pre: The legacy journal listing of true-up 1 contains JV-2028-AUD-0009, which is not in the register or in G03.
+        steps:
+          - Run the reconciliation and click Sign.
+        expected: The cut-off check is a BREAK; alert MIG_TRUEUP_BREAK; sign-off refused.
+        msg: ["Legacy journal {JV-2028-AUD-0009} posted on {2028-01-17} is not in the adjustment register or the true-up"]
+      - c: 3
+        type: Workflow
+        persona: PM
+        title: Close the true-ups
+        pre: Final true-up signed; legacy GL locked.
+        steps:
+          - Record the closure of the true-ups; try to create a new true-up; open the opening journal of MKT01.
+        expected: Closure recorded with the two signatures; the new true-up is refused; the opening journal is no longer marked PROVISIONAL.
+        msg: [The FY2027 true-ups are closed]
+      - c: 4
+        type: Negative
+        title: Sign with a movement break
+        pre: G03 of true-up 1 misses one accrual line of 12,000.00 that is in the legacy TB change.
+        steps:
+          - Run the reconciliation and click Sign.
+        expected: The movement check is a BREAK for accrued expenses; sign-off refused.
+        msg: ["Check {Movement} is not met"]
+
   FR-DM-030:
     scenario: SC-DM-04
     persona: STEWARD
@@ -802,48 +986,54 @@ frs:
     screen: MAPS
     data: [TD-DM-02, TD-DM-04]
     conditions:
-      - A legacy package with one entry for a sum insured up to 2,000,000.00 and one above maps a header of 950,000.00 to the first BIBS package and a header of 2,500,000.00 to the second.
-      - A carried renewal whose legacy package has no entry loads with package UNRESOLVED and appears in the Renewal Exception bucket.
+      - An approved PACKAGE version with 120 entries loads into the Renewal package map and reconciles with 120 entries.
+      - At renewal, a candidate on a legacy package with one entry for a sum insured up to 2,000,000.00 and one above gets the first BIBS package for a sum insured of 950,000.00 and the second for 2,500,000.00.
+      - A candidate whose legacy package has a REJECT entry is in the Exception bucket.
       - A version with two entries of the same legacy package whose sum-insured bands overlap cannot be submitted.
-      - A header whose package is not mapped loads without a package and with the warning.
+      - A header on a legacy package without an entry loads with no warning and keeps its legacy package.
       - The PACKAGE map is prepared by TSU and approved by the Product Owner, never by the preparer.
     cases:
       - c: 1
         type: Positive
         persona: OPERATOR
         screen: BATCH
-        title: Conditional entries by sum-insured band
-        pre: PACKAGE version with PKG-MC-PRIV v3 mapped to MC-PRIVATE-STD v1 up to 2,000,000.00 and to MC-PRIVATE-HV v1 above, approved.
+        title: PACKAGE map loaded as reference data
+        pre: PACKAGE version with 120 entries approved, including PKG-MC-PRIV v3 split at a sum insured of 2,000,000.00.
         steps:
-          - Validate and load P01 with header C-2027-004512-01 (sum insured 950,000.00) and C-2027-004513-01 (2,500,000.00), both on PKG-MC-PRIV v3.
-          - Open both accounts in Account search.
-        expected: C-2027-004512-01 has package MC-PRIVATE-STD v1 and C-2027-004513-01 MC-PRIVATE-HV v1; the batch records the PACKAGE version it used.
+          - Validate and load object R06; run MIG-RECON-SUMMARY for the batch.
+        expected: 120 entries in the Renewal package map; L1-L4 MATCHED; the batch records the PACKAGE version it loaded.
       - c: 2
-        type: Negative
-        persona: OPERATOR
-        screen: ISSUES
-        title: Unresolved package on a carried renewal
+        type: Positive
+        persona: SYSTEM
+        screen: RENEWAL
+        title: Split resolved at Renewal sanitation
         steps:
-          - Validate P03 with a row on PKG-HOME-01 v2 (entry REJECT, no BIBS package).
-        expected: The row is a WARNING, not INVALID; after the load the candidate carries package UNRESOLVED and, at go-live, is in the Exception bucket of Renewal.
-        msg: ["Package {PKG-HOME-01} of {QPS} is not mapped; the candidate goes to the Exception bucket"]
+          - After the go-live extraction, open the candidates of C-2027-004512-01 (sum insured 950,000.00) and C-2027-004513-01 (2,500,000.00), both on PKG-MC-PRIV v3.
+        expected: The sanitation check PACKAGE_REMAP gives MC-PRIVATE-STD v1 to the first and MC-PRIVATE-HV v1 to the second; neither is in the Exception bucket.
       - c: 3
+        type: Negative
+        persona: SYSTEM
+        screen: RENEWAL
+        title: Rejected package in the Exception bucket
+        steps:
+          - After the go-live extraction, open the candidate of the header on PKG-HOME-01 v2 (entry REJECT).
+        expected: The candidate is in the Exception bucket for the Renewal processing team, which chooses the package or the new-business path.
+      - c: 4
         type: Negative
         title: Overlapping sum-insured bands
         steps:
           - In a DRAFT PACKAGE version add a second entry for PKG-MC-PRIV v3 with band 1,500,000.00 to 3,000,000.00; Submit.
         expected: The version stays DRAFT.
         msg: ["Legacy package {PKG-MC-PRIV} has overlapping entries for {sum-insured band}"]
-      - c: 4
-        type: Negative
+      - c: 5
+        type: Positive
         persona: OPERATOR
         screen: ISSUES
-        title: Header with an unmapped package
+        title: Header keeps its legacy package
         steps:
-          - Validate and load P01 with one packaged header on PKG-HOME-01 v2.
-        expected: The header loads with a WARNING and without a package; it renews on the new-business path.
-        msg: ["Package {PKG-HOME-01} of {QPS} is not mapped; the header is loaded without a package"]
-      - c: 5
+          - Validate and load P01 with a packaged header on PKG-XYZ-09 v1, which has no entry in the map.
+        expected: No issue is raised for the package; the account shows legacy package PKG-XYZ-09 version 1.
+      - c: 6
         type: Security-access
         title: Preparer approves own PACKAGE version
         pre: migsteward (TSU role in the test) submitted the version and was also given MIG_MAPPING_APPROVE for this test.
@@ -861,6 +1051,8 @@ frs:
       - A migrated in-force policy is found by its policy number and shows status, dates, insurer and line, linked to the correct client.
       - A migrated header has no quotation or placement and cannot be booked again.
       - Headers with expiry before inception or shares not adding to 100 are INVALID.
+      - A packaged header shows the legacy package and version as sent, with no warning.
+      - The P01 reconciliation against the legacy in-force list shows every policy expiring from go-live to 31 May 2028.
     cases:
       - c: 1
         type: Positive
@@ -884,6 +1076,21 @@ frs:
           - Validate P01 with one expiry before inception and P01S with shares adding to 90.
         expected: "Both rows INVALID. The second check shows \"Insurer shares add up to 90 percent\"."
         msg: ["The expiry date is before the inception date"]
+      - c: 4
+        type: Positive
+        screen: ACCOUNTS
+        title: Legacy package kept as sent
+        steps:
+          - Open the account of C-2027-004512-01 (PKG-MC-PRIV v3).
+        expected: Legacy package PKG-MC-PRIV version 3 shown on the account; no package warning in the batch.
+      - c: 5
+        type: Report-output
+        persona: RECON
+        screen: RECONC
+        title: Expiries to 31 May 2028 complete
+        steps:
+          - Run MIG-RECON-DETAIL of P01 against the legacy in-force list for the expiries from 3 January to 31 May 2028.
+        expected: Every legacy policy expiring in the window is a migrated header, including the renewal term C-2027-004600-02 booked in legacy.
 
   FR-DM-041:
     scenario: SC-DM-06
@@ -1534,9 +1741,9 @@ frs:
         type: Negative
         title: Start before dependency
         steps:
-          - Start CT-042 while CT-041 is not complete.
+          - Start CT-045 while CT-044 is not complete.
         expected: Refused.
-        msg: ["Task {CT-042} depends on {CT-041}, which is not complete"]
+        msg: ["Task {CT-045} depends on {CT-044}, which is not complete"]
       - c: 4
         type: Negative
         persona: OPERATOR
@@ -1557,6 +1764,7 @@ frs:
       - GO cannot be recorded while Migration Clearing is not 0.00.
       - The decision record shows each criterion value at the time of the decision.
       - NO-GO starts the fallback task.
+      - GO cannot be recorded while the preliminary trial balance is not signed as the provisional opening.
     cases:
       - c: 1
         type: Negative
@@ -1578,6 +1786,14 @@ frs:
         steps:
           - In a mock plan record NO-GO.
         expected: The fallback task starts and its owner is notified.
+      - c: 4
+        type: Negative
+        title: GO without the signed provisional opening
+        pre: All other criteria met; the preliminary trial balance not signed by Comptrollership.
+        steps:
+          - Click GO.
+        expected: Refused.
+        msg: ["Criterion {Provisional opening signed} is not met"]
 
   FR-DM-122:
     scenario: SC-DM-08
@@ -1585,19 +1801,19 @@ frs:
     screen: RUNOFF
     data: [TD-DM-04]
     conditions:
-      - A legacy policy expiring 60 days after go-live appears in BIBS Renewal with the disposition it had in legacy.
+      - A legacy policy expiring 60 days after go-live appears in BIBS Renewal at go-live from the go-live extraction.
       - A legacy policy expiring 200 days after go-live is extracted by BIBS at 140 days before expiry.
       - The run-off report shows renewed, not renewed and open counts per expiry month.
-      - A cohort row without a header is INVALID.
+      - A policy expiring before go-live is not extracted by BIBS; it renews in legacy.
     cases:
       - c: 1
         type: Positive
         persona: MKT_AO
         screen: RENEWAL
-        title: Carried cohort in Renewal
+        title: Expiry within the window at go-live
         steps:
-          - Open the candidates with source LEGACY; open the policy expiring at T+60.
-        expected: Candidate with the legacy disposition, handler and remarks.
+          - After the go-live extraction, open the candidate of the policy expiring at T+60.
+        expected: Candidate with source LEGACY at the first stage, pre-filled from the migrated header.
       - c: 2
         type: Positive
         persona: SYSTEM
@@ -1615,13 +1831,13 @@ frs:
         expected: Per expiry month - in force at go-live, renewed, not renewed, lapsed, open.
       - c: 4
         type: Negative
-        persona: OPERATOR
-        screen: ISSUES
-        title: Cohort row without header
+        persona: SYSTEM
+        screen: RENEWAL
+        title: Expiry before go-live not extracted
         steps:
-          - Validate P03 with the row whose cover is not in P01.
-        expected: INVALID.
-        msg: ["Cover {C-2026-009999} has no migrated header"]
+          - In a mock with MIG_CUTOVER_DATE 3 January 2028, run the Renewal extraction for the business date 10 August 2027 (expiry 28 December 2027).
+        expected: No candidate is created from the migrated headers.
+        msg: ["Expiry {2027-12-28} is before go-live; the policy renews in legacy"]
 
   FR-DM-123:
     scenario: SC-DM-08
@@ -1632,6 +1848,7 @@ frs:
       - A system cannot be marked decommissioned while its archive reconciliation is open.
       - The legacy context cannot be closed while a legacy UPP has a balance.
       - A system is decommissioned when every criterion is met and signed.
+      - EBIX cannot be marked decommissioned while the final true-up is not signed.
     cases:
       - c: 1
         type: Negative
@@ -1653,56 +1870,140 @@ frs:
         steps:
           - Attach evidence to each criterion of a test system; sign as system owner, Compliance and Comptrollership.
         expected: The system is marked decommissioned with the three signatures and dates.
+      - c: 4
+        type: Negative
+        title: Final true-up not signed
+        pre: Every other EBIX criterion met; the final true-up posted but not signed.
+        steps:
+          - Sign the EBIX checklist as system owner.
+        expected: Refused.
+        msg: ["Criterion {Final true-up reconciled} is not met"]
 
   FR-DM-124:
     scenario: SC-DM-08
-    persona: OPERATOR
-    screen: ISSUES
+    persona: SYSTEM
+    screen: RENEWAL
     data: [TD-DM-04]
     conditions:
-      - A renewal of a policy expiring on 15 January 2028, disposition For Renewal, RA sent on 18 October 2027, appears at go-live in BIBS Renewal in the For Renewal stage with the RA date and no new RA is sent.
-      - A row whose cover was already renewed in legacy is rejected, and the new term is found as a migrated header.
-      - For each expiry month the completeness check balances, and a header without a P03 row becomes a catch-up candidate at go-live.
-      - A row whose renewal is placed but not booked is rejected with the in-flight message.
-      - A row without a migrated header, outside the carried window, or with an RA sent but no RA date is rejected.
+      - At go-live the header C-2027-004512-01, expiring on 15 January 2028, is a candidate flagged URGENT among the January expiries at the top of the worklist in expiry-date order; its RA sent on 16 November 2027 is recorded and no RA is queued for it.
+      - A header expiring on 31 May 2028 is extracted at go-live; a header expiring on 1 June 2028 is not, and the daily extraction takes it on 13 January 2028.
+      - The header C-2027-004600-01, whose renewal term C-2027-004600-02 was booked in legacy, is not extracted.
+      - For each month January to May 2028 MIG-RENEWAL-GOLIVE balances.
+      - A rerun of the go-live extraction creates no duplicate candidate.
     cases:
       - c: 1
         type: Positive
-        persona: MKT_AO
-        screen: RENEWAL
-        title: Carried renewal at go-live
+        persona: RNW_MAKER
+        title: Day-1 worklist with urgent January expiries
         steps:
-          - After the P03 load and go-live, open the candidates with source LEGACY; open C-2027-004512-01 (expiry 15-Jan-2028).
-        expected: Stage For Renewal; handler, proposed insurer and premium from the disposition file; RA sent 18-Oct-2027 recorded; no RA is queued for sending.
+          - After the go-live extraction at T 04:00, open the Renewal worklist sorted by priority; open C-2027-004512-01.
+        expected: The January expiries come first, flagged URGENT, earliest expiry first; C-2027-004512-01 shows the RA sent on 16 November 2027 by e-mail with its reference; no RA is queued for it.
       - c: 2
+        type: Boundary
+        title: Window end 31 May 2028
+        steps:
+          - After the go-live extraction, search the candidates of the headers expiring on 31 May 2028 and 1 June 2028; set the business date to 13 January 2028 and run the daily extraction.
+        expected: The 31 May header is a candidate from the go-live extraction; the 1 June header has no candidate until the daily extraction of 13 January 2028 creates it.
+      - c: 3
         type: Negative
         title: Already renewed in legacy
         steps:
-          - Validate P03 with the row of C-2027-004600-01, whose renewal term C-2027-004600-02 starting on its expiry is in P01.
-        expected: The row is INVALID; account search finds C-2027-004600-02 as a migrated header.
-        msg: ["Cover {C-2027-004600} was already renewed in legacy as {C-2027-004600-02}"]
-      - c: 3
-        type: Report-output
-        persona: RECON
-        screen: RECONC
-        title: Cohort completeness per month
-        steps:
-          - After the P03 load open MIG-RECON-DETAIL of P03; then, at go-live, open the Renewal candidates of the three headers without a P03 row.
-        expected: For each month January to May 2028 the P01 headers expiring in the window equal the P03 rows plus the renewals booked in legacy plus the rejected rows; the three headers are listed and become catch-up candidates at the first stage.
+          - After the go-live extraction, search the candidates of cover C-2027-004600.
+        expected: No candidate for C-2027-004600-01; the renewal term C-2027-004600-02 is found as a migrated header.
       - c: 4
-        type: Negative
-        title: Placed but not booked
+        type: Report-output
+        persona: DML
+        screen: REPORTS
+        title: Extraction check per month
         steps:
-          - Validate P03 with the row of C-2027-004700-01, placement status PLACED.
-        expected: The row is INVALID and appears on the in-flight list.
-        msg: ["Cover {C-2027-004700} is {PLACED} but not booked; complete it in legacy or list it for re-keying"]
+          - Run MIG-RENEWAL-GOLIVE after the go-live extraction.
+        expected: For each month January to May 2028, headers expiring = candidates + renewed in legacy; RA-sent rows loaded = candidates with the RA already sent; January candidates all URGENT; no break.
       - c: 5
         type: Negative
-        title: Header missing, expiry outside the window, RA date missing
+        title: Rerun creates no duplicate
         steps:
-          - Validate P03 with a row whose cover C-2027-009999 is not in P01, a row expiring on 30-May-2028, and a row with RA sent Y and no RA date.
-        expected: "The three rows are INVALID. The second shows \"Expiry {2028-05-30} is outside the carried cohorts\"; the third \"{ra_sent_date} is mandatory for disposition {FOR_RENEWAL}\"."
+          - Run the go-live extraction a second time; count the candidates of January 2028.
+        expected: The count does not change; no header has two candidates.
+      - c: 4
+        type: Negative
+        persona: DML
+        screen: REPORTS
+        title: Header missing from the extraction
+        pre: Test variant with MIG_GOLIVE_RENEWAL_TO set by mistake to 30 April 2028.
+        steps:
+          - Run MIG-RENEWAL-GOLIVE.
+        expected: May 2028 shows a break; alert MIG_RECON_BREAK to the Renewal processing team and the Data Migration Lead.
+        msg: ["{2028-05} - {412} headers expiring, {0} candidates, {0} renewed in legacy"]
+
+  FR-DM-125:
+    scenario: SC-DM-08
+    persona: RNW_MAKER
+    screen: ISSUES
+    data: [TD-DM-04]
+    conditions:
+      - A file with the RA of C-2027-004512-01 sent on 16 November 2027 by e-mail loads, and at go-live the candidate shows the RA as already sent.
+      - A row whose cover C-2027-009999 has no header, a row expiring on 15 June 2028 and a row with an RA date of 30 December 2027 are rejected with their messages and appear in the rejection report with the correction columns.
+      - A resubmission prepared and approved by the same user is refused; approved by the checker, it loads as a rerun batch.
+      - A row still rejected at the deadline is not loaded and is listed for the day-1 queue.
+      - An RA date more than 140 days before the expiry is a warning, and the row loads.
+      - A row whose cover was already renewed in legacy is rejected.
+    cases:
+      - c: 1
+        type: Upload-download
+        persona: OPERATOR
+        screen: EXTRACTS
+        title: Excel RA-sent file loads
+        steps:
+          - Upload P03_EXCEL_20271229_01.xlsx (from P03_template.xlsx) with its control file; validate and load the batch.
+        expected: The file passes the intake checks; the valid rows load; C-2027-004512-01 is stored with RA date 16 November 2027, channel EMAIL and its tracker name.
+      - c: 2
+        type: Negative
+        title: Rejected rows and the rejection report
+        steps:
+          - Validate P03 with a row for C-2027-009999, a row expiring on 15 June 2028 and a row with an RA date of 30 December 2027; download MIG-REJECTS of P03.
+        expected: "The three rows are INVALID with \"Expiry {2028-06-15} is outside the go-live renewal window or differs from the header\" and \"RA date {2027-12-30} is after the last legacy business day\" for the second and third; the Excel report has the columns Correction, Corrected by and date, and Checked by."
         msg: ["Cover {C-2027-009999} has no migrated header"]
+      - c: 3
+        type: Security-access
+        title: Maker approves own resubmission
+        pre: The maker was also given MIG_RESUBMIT_APPROVE for this test.
+        steps:
+          - Prepare the resubmission with the corrected rows; as the same user click Approve.
+        expected: Refused; the resubmission stays PREPARED.
+        msg: [A record cannot be authorized by the user who maintained it]
+      - c: 3
+        type: Workflow
+        persona: RNW_CHECKER
+        screen: RESUB
+        title: Checker approves the resubmission
+        steps:
+          - Open the resubmission prepared by the maker; compare each correction with the tracker; Approve; as the operator load the rerun batch.
+        expected: The resubmission is APPROVED with the checker's name; the rerun batch loads the corrected rows and reconciles as part of the parent batch.
+      - c: 4
+        type: Negative
+        persona: RNW_CHECKER
+        screen: RESUB
+        title: Deadline passed
+        pre: Production plan; MIG_RESUBMIT_DEADLINE T-1 12:00 passed; one row still rejected.
+        steps:
+          - Submit a resubmission at T-1 13:00; open the day-1 list.
+        expected: Refused; the row is not loaded and is on the list for the day-1 queue.
+        msg: ["Resubmissions closed at {2028-01-02 12:00}"]
+      - c: 5
+        type: Positive
+        persona: OPERATOR
+        title: Early RA date is a warning
+        steps:
+          - Validate P03 with a row whose RA date is 150 days before its expiry.
+        expected: The row is a WARNING and loads.
+        msg: ["RA date {2027-08-18} is more than 140 days before expiry {2028-01-15}; check the tracker"]
+      - c: 6
+        type: Negative
+        title: Cover already renewed in legacy
+        steps:
+          - Validate P03 with a row for C-2027-004600-01, whose renewal term C-2027-004600-02 is in P01.
+        expected: The row is INVALID.
+        msg: ["Cover {C-2027-004600} was already renewed in legacy as {C-2027-004600-02}; remove the row"]
 
 access:
   - action: View the Migration Console
@@ -1778,10 +2079,29 @@ access:
     deny: [CASHIER, ACCT]
     denied: Approve is not shown; the call returns HTTP 403.
 
+  - action: Prepare a FY2027 true-up
+    screen: TRUEUPS
+    permission: MIG_TRUEUP_PREPARE
+    allow: [GL_LEAD]
+    deny: [OPERATOR, DML]
+    denied: Submit is not shown; the call returns HTTP 403.
+  - action: Approve a FY2027 true-up
+    screen: APPROVALS
+    permission: MIG_TRUEUP_APPROVE
+    allow: [RECON]
+    deny: [GL_LEAD, DML]
+    denied: The true-up is not offered in My Approvals; the call returns HTTP 403.
+  - action: Approve a resubmission of corrected P03 rows
+    screen: RESUB
+    permission: MIG_RESUBMIT_APPROVE
+    allow: [RNW_CHECKER]
+    deny: [RNW_MAKER, OPERATOR]
+    denied: Approve is not shown; the call returns HTTP 403.
+
 findings:
-  - fr: FR-DM-124
-    issue: The carried candidates are created "in the stage mapped from the legacy disposition", but the FRS does not list the target Renewal stages of the STATUS:RENEWAL map; the case assumes For Renewal maps to the For Renewal stage.
-    proposal: List the STATUS:RENEWAL entries (legacy disposition to Renewal stage and bucket) in FRS v1.2 once DMQ38 gives the legacy disposition values.
   - fr: FR-DM-034
-    issue: The FRS does not say which Renewal check routes a candidate with package UNRESOLVED to the Exception bucket, nor its message; the case checks the bucket only.
-    proposal: Name the Renewal sanitation check (PACKAGE_REMAP in the build design section 15.2) and quote its message in the Renewal FRS and in FRS BRD-13 v1.2.
+    issue: The Exception-bucket route and its message belong to the Renewal sanitation check PACKAGE_REMAP, which the Renewal FRS does not yet describe; case TC-DM-034.3 checks the bucket only.
+    proposal: Describe PACKAGE_REMAP (reads the PACKAGE map loaded by R06; unmapped, REJECT or unmatched qualifier to the Exception bucket, worked by the Renewal processing team) with its message in the Renewal FRS, and quote it here in the next issue.
+  - fr: FR-DM-124
+    issue: The URGENT flag, the priority order and the RA already sent are Renewal candidate attributes; the Renewal FRS does not yet list them, so the cases check them on the worklist only.
+    proposal: Add the go-live extraction (window to 31 May 2028, URGENT to 31 January 2028, RA already sent from P03) to the Renewal FRS.

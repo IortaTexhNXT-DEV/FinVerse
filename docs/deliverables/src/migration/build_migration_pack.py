@@ -15,8 +15,8 @@ Inputs (this folder)
 
 Outputs (docs/deliverables/out/Drop-0_Setup_and_Data_Migration/Migration, from tools/deliverables/brand.py)
   * BIBS_Migration_BRD-13_Data_Requirements_Workbook_v<version>.xlsx
-  * templates/<LAYOUT>_template.csv (header row = field names of the workbook), CONTROL_template.ctl.csv and
-    README.md
+  * templates/<LAYOUT>_template.csv (header row = field names of the workbook), the Excel template
+    P03_template.xlsx for the Renewal processing team, CONTROL_template.ctl.csv and README.md
   * BIBS_Migration_BRD-13_Cutover_Task_Plan_v<version>.xlsx
   * the three Word documents named in the "output" of their front matter.
 """
@@ -149,10 +149,10 @@ def check(lay: dict[str, Any], cut: dict[str, Any]) -> list[str]:
 # ------------------------------------------------------------------------------------------------ workbook
 
 SHORT = {"R01": "LOV and MIS values", "R02": "Branches", "R03": "Sales organisation", "R05": "Products and risk codes",
-         "R06": "Packages", "R07": "Commission rates", "R08": "GL account map", "R11": "Receipt series",
+         "R06": "PACKAGE map", "R07": "Commission rates", "R08": "GL account map", "R11": "Receipt series",
          "C02": "Client addresses", "C03": "Payout accounts", "P01": "Policy headers", "P01S": "Policy shares",
-         "P03": "RMEL cohorts", "F01": "Invoice header", "F01S": "Invoice shares", "F01C": "Invoice components",
-         "F02": "UPP", "F06": "PDCs pick-ups refunds", "G01": "GL trial balance", "H01": "Archive records",
+         "P03": "RA already sent", "F01": "Invoice header", "F01S": "Invoice shares", "F01C": "Invoice components",
+         "F02": "UPP", "F06": "PDCs pick-ups refunds", "G01": "GL trial balance", "G03": "True-up journals", "G03D": "True-up item detail", "H01": "Archive records",
          "H02": "Archive documents"}
 
 
@@ -263,7 +263,7 @@ def build_workbook(lay: dict[str, Any]) -> Path:
     wb.sheet("Object Register", register_columns(), register_rows(lay),
              description="One row per data object with the proposed decision (BRID 1.1a); BDOI fills the volumes")
     contract = [
-        ("File name", "<LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv (or .xlsx), for example F01C_EBIX_20270226_01.csv; "
+        ("File name", "<LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv (or .xlsx), for example F01C_EBIX_20271231_01.csv; "
          "the date is the as-of date; nn is the sequence of that day"),
         ("One file per", "Layout, source system and extract (as-of date and sequence)"),
         ("CSV", "UTF-8 without BOM; comma separator; RFC 4180 quoting (double quotes around values that contain a "
@@ -359,12 +359,13 @@ def build_workbook(lay: dict[str, Any]) -> Path:
                          "rejected or waived, financial objects 0")
     refs = lay.get("register_refs", {})
     cols = [Column("id", "ID", 9, "Question (DMQ##) or register ID (DCR-nnn)"),
-            Column("register", "Register", 12, "Item of the BRD discrepancy and clarification register v1.1"),
+            Column("register", "Register", 12, "Item of the BRD discrepancy and clarification register v1.2"),
             Column("topic", "Topic", 22, "Subject"),
             Column("question", "Decision needed", 60, "What BDOI decides"),
             Column("blocks", "Blocks", 28, "Objects, gates or build waves that wait for the answer"),
             Column("due", "Needed by", 20, "Milestone and date"), Column("owner", "BDOI owner", 22, "Who answers"),
-            Column("status", "Status", 11, "OPEN, PARTIAL, ANSWERED", values=["OPEN", "PARTIAL", "ANSWERED"],
+            Column("status", "Status", 13, "OPEN, PARTIAL, ANSWERED, RECOMMENDED (answered with a recommendation that BDOI still confirms)",
+                   values=["OPEN", "PARTIAL", "ANSWERED", "RECOMMENDED"],
                    status=True),
             Column("answer", "Answer", 40, "BDOI answer and date")]
     wb.sheet("Open Decisions", cols, [dict(zip(["id", "topic", "question", "blocks", "due", "owner", "status",
@@ -381,6 +382,68 @@ def build_workbook(lay: dict[str, Any]) -> Path:
     return wb.save(OUT / brand.output_name("Migration", "BRD-13", "Data Requirements Workbook", m["version"], "xlsx"))
 
 
+XLSX_TEMPLATES = {"P03": "RA_SENT"}  # layouts that business teams fill in Excel (DMQ38): layout -> first sheet name
+
+
+def write_xlsx_template(layout: dict[str, Any], sheet: str, path: Path) -> Path:
+    """Excel template of one layout: header in row 1 of the first sheet, lists on coded columns, text cells for
+    dates, no merged cells or formulas (file contract), and a second sheet with the field instructions."""
+    from openpyxl import Workbook
+    from openpyxl.styles import Alignment, Font
+    from openpyxl.utils import get_column_letter
+    from openpyxl.worksheet.datavalidation import DataValidation
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = sheet
+    fields = layout["fields"]
+    ws.append([f["name"] for f in fields])
+    for i, f in enumerate(fields, start=1):
+        col = get_column_letter(i)
+        ws.cell(row=1, column=i).font = Font(bold=True)
+        ws.column_dimensions[col].width = max(14, len(f["name"]) + 3)
+        if f["type"] in ("Date", "Timestamp", "Code", "Text"):
+            for r in range(2, 2001):
+                ws.cell(row=r, column=i).number_format = "@"
+        if f["type"] == "Code" and re.fullmatch(r"[A-Z_]+(, [A-Z_]+)+", f["values"]):
+            dv = DataValidation(type="list", formula1='"' + f["values"].replace(", ", ",") + '"', allow_blank=True,
+                                showErrorMessage=True, errorTitle=f["name"],
+                                error=f"Allowed values: {f['values']}")
+            ws.add_data_validation(dv)
+            dv.add(f"{col}2:{col}2000")
+    ws.freeze_panes = "A2"
+    ins = wb.create_sheet("Instructions")
+    intro = [
+        f"{layout['code']} - {layout['title']}",
+        f"Fill the sheet {sheet}: one row per record under the header in row 1; do not rename, move or delete the "
+        "header cells; no merged cells, formulas or colours with a meaning.",
+        "Dates as yyyy-MM-dd text (for example 2027-11-16); amounts with a dot decimal and 2 decimals; codes exactly "
+        "as in legacy.",
+        f"Name the file {layout['code']}_EXCEL_<yyyyMMdd>_<nn>.xlsx (as-of date, sequence of the day) and send it with "
+        "its control file (CONTROL_template.ctl.csv) through the Migration Console upload.",
+        "Rejected rows come back in the rejection report (MIG-REJECTS) with correction columns: the maker corrects "
+        "them and sends a resubmission file with the corrected rows only; the checker approves it in the console.",
+        "",
+    ]
+    for line in intro:
+        ins.append([line])
+    header = ["Field", "Description", "Type", "Length", "Mandatory", "Allowed values", "Format", "Example", "Rule"]
+    ins.append(header)
+    for c in range(1, len(header) + 1):
+        ins.cell(row=len(intro) + 1, column=c).font = Font(bold=True)
+    for f in fields:
+        ins.append([f["name"], f["description"], f["type"], f["length"], f["mandatory"], f["values"], f["format"],
+                    f["example"], f["rule"]])
+    for col, width in zip("ABCDEFGHI", [22, 48, 10, 8, 10, 28, 22, 22, 48]):
+        ins.column_dimensions[col].width = width
+    for row in ins.iter_rows(min_row=len(intro) + 2):
+        for cell in row:
+            cell.alignment = Alignment(wrap_text=True, vertical="top")
+    ins.cell(row=1, column=1).font = Font(bold=True)
+    wb.save(path)
+    return path
+
+
 def write_templates(lay: dict[str, Any]) -> list[Path]:
     TEMPLATES.mkdir(parents=True, exist_ok=True)
     written = []
@@ -390,6 +453,8 @@ def write_templates(lay: dict[str, Any]) -> list[Path]:
         csv.writer(buf, lineterminator="\r\n").writerow([f["name"] for f in layout["fields"]])
         path.write_bytes(buf.getvalue().encode("utf-8"))
         written.append(path)
+    for code, sheet in XLSX_TEMPLATES.items():
+        written.append(write_xlsx_template(lay["layouts"][code], sheet, TEMPLATES / f"{code}_template.xlsx"))
     path = TEMPLATES / "CONTROL_template.ctl.csv"
     buf = io.StringIO()
     csv.writer(buf, lineterminator="\r\n").writerow([f["name"] for f in lay["control"]["fields"]])
@@ -411,7 +476,7 @@ def write_templates(lay: dict[str, Any]) -> list[Path]:
         "How to use a template:",
         "",
         "1. Copy the template and name the copy `<LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv`, for example "
-        "`F01C_EBIX_20270226_01.csv` (as-of date, sequence of the day).",
+        "`F01C_EBIX_20271231_01.csv` (as-of date, sequence of the day).",
         "2. Write one row per record under the header: UTF-8 without BOM, comma separator, RFC 4180 quoting, "
         "dates yyyy-MM-dd, amounts with a dot decimal and 2 decimals, codes exactly as stored in legacy.",
         "3. Produce the control file `<data file name>.ctl.csv` from `CONTROL_template.ctl.csv`: row count, hash "
@@ -424,6 +489,12 @@ def write_templates(lay: dict[str, Any]) -> list[Path]:
     for code, layout in lay["layouts"].items():
         o = objects[layout["object"]]
         lines.append(f"| `{code}_template.csv` | {layout['title']} | {o['code']} | {CLASS_LABEL[o['decision']]} | "
+                     f"{o['source']} | {len(layout['fields'])} | {', '.join(layout['key'])} |")
+    for code in XLSX_TEMPLATES:
+        layout = lay["layouts"][code]
+        o = objects[layout["object"]]
+        lines.append(f"| `{code}_template.xlsx` | {layout['title']} (Excel template for the business team, "
+                     f"with lists and an instructions sheet) | {o['code']} | {CLASS_LABEL[o['decision']]} | "
                      f"{o['source']} | {len(layout['fields'])} | {', '.join(layout['key'])} |")
     lines.append(f"| `CONTROL_template.ctl.csv` | Control file | all | - | - | {len(lay['control']['fields'])} | "
                  "data_file, measure, column_name, currency, filter |")
@@ -447,8 +518,8 @@ def build_task_plan(lay: dict[str, Any], cut: dict[str, Any]) -> Path:
                       subtitle="BRD-13 Data Migration - production cutover from T-30 to hypercare exit")
     wb.legend = [("DONE", "Task completed and verified"), ("IN PROGRESS", "Task running"),
                  ("BLOCKED", "Task cannot start or finish"), ("N/A", "Not needed in this cutover")]
-    wb.cover_notes = ["T = go-live: January 2028 (BDOI timeline), proposed Monday 3 January 2028 after the legacy "
-                      "year-end close (DMQ25, DMQ39). Days are calendar days; times are Philippine time; the sheet "
+    wb.cover_notes = ["T = go-live: January 2028 (BDOI timeline), recommended Monday 3 January 2028 at the year-end "
+                      "boundary (DMQ25; DMQ39 option A, awaiting Comptrollership confirmation). Days are calendar days; times are Philippine time; the sheet "
                       "Calendar gives the date of each relative day.",
                       "The same plan is loaded in the Migration Console (plan kind PRODUCTION); the console "
                       "records actual times and evidence (FR-DM-120)."]
@@ -480,10 +551,10 @@ def build_task_plan(lay: dict[str, Any], cut: dict[str, Any]) -> Path:
                         Column("when", "When", 26, "Days")],
              [dict(zip(["code", "name", "when"], p)) for p in cut["phases"]], description="Cutover phases")
     wb.sheet("Calendar", [Column("day", "Day", 10, "Day relative to go-live (T)"),
-                          Column("date", "Date (T = 3-Jan-2028)", 20, "Calendar date for the proposed go-live"),
+                          Column("date", "Date (T = 3-Jan-2028)", 20, "Calendar date for the recommended go-live"),
                           Column("note", "Note", 70, "Holiday or year-end note")],
              [dict(zip(["day", "date", "note"], c)) for c in cut["calendar"]],
-             description="Relative days mapped to the calendar of the proposed go-live (DMQ25, DMQ39)")
+             description="Relative days mapped to the calendar of the recommended go-live (DMQ25, DMQ39)")
     rows = []
     for c in cut["checkpoints"]:
         for i, crit in enumerate(c["criteria"], start=1):
@@ -601,10 +672,10 @@ def placeholders(lay: dict[str, Any], cut: dict[str, Any], name: str, opts: dict
                         'widths=1.2,5,1.8,2,4,2.6 caption="What BDOI provides per object" size=8 bold=first')
     if name == "decisions":
         refs = lay.get("register_refs", {})
-        rows = [[d[0], refs.get(d[0], "-"), d[1], d[3], milestone_text(lay, d[4]), d[5]] for d in lay["decisions"]]
-        return md_table(["ID", "Register", "Decision", "Blocks", "Needed by", "BDOI owner"], rows,
-                        'widths=1.7,1.8,3.5,3.9,3,2.7 caption="Open decisions, register items (v1.1) and the date each '
-                        'is needed by" size=8 bold=first')
+        rows = [[d[0], refs.get(d[0], "-"), d[1], d[3], milestone_text(lay, d[4]), d[5], d[6]] for d in lay["decisions"]]
+        return md_table(["ID", "Register", "Decision", "Blocks", "Needed by", "BDOI owner", "Status"], rows,
+                        'widths=1.5,1.6,3,3.4,2.7,2.6,2.8 caption="Decisions, register items (v1.2) and the date '
+                        'each is needed by" size=8 bold=first status=Status')
     if name == "milestones":
         return md_table(["Milestone", "What is due", "When"], [list(m) for m in lay["milestones"]],
                         'widths=1.8,10.8,4 caption="Milestones of BDOI inputs" bold=first')
@@ -676,7 +747,7 @@ def placeholders(lay: dict[str, Any], cut: dict[str, Any], name: str, opts: dict
         return out
     if name == "calendar":
         return md_table(["Day", "Date (T = 3-Jan-2028)", "Note"], [list(c) for c in cut["calendar"]],
-                        'widths=1.6,4,11 caption="Relative days on the calendar of the proposed go-live" size=8.5 '
+                        'widths=1.6,4,11 caption="Relative days on the calendar of the recommended go-live" size=8.5 '
                         'bold=first')
     if name == "role-legend":
         return md_table(["Code", "Role"], [[k, v] for k, v in roles.items()],

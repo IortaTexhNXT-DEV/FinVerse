@@ -1,12 +1,12 @@
 # BRD-13 Data Migration - extract templates
 
-Version 1.1, 26 September 2026. BDO Insurance and Reinsurance Brokers, Inc. (BDOI) - BIBS. Prepared by iorta TechNXT. Confidential - BDOI.
+Version 1.2, 26 September 2026. BDO Insurance and Reinsurance Brokers, Inc. (BDOI) - BIBS. Prepared by iorta TechNXT. Confidential - BDOI.
 
-One CSV template per extract layout. Each file holds only the header row: the field names exactly as in the layout sheet of the BDOI Data Requirements Workbook (`../BIBS_Migration_BRD-13_Data_Requirements_Workbook_v1.1.xlsx`), which gives the type, length, mandatory flag, allowed values, format, example, BIBS target and validation rule of every field.
+One CSV template per extract layout. Each file holds only the header row: the field names exactly as in the layout sheet of the BDOI Data Requirements Workbook (`../BIBS_Migration_BRD-13_Data_Requirements_Workbook_v1.2.xlsx`), which gives the type, length, mandatory flag, allowed values, format, example, BIBS target and validation rule of every field.
 
 How to use a template:
 
-1. Copy the template and name the copy `<LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv`, for example `F01C_EBIX_20270226_01.csv` (as-of date, sequence of the day).
+1. Copy the template and name the copy `<LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv`, for example `F01C_EBIX_20271231_01.csv` (as-of date, sequence of the day).
 2. Write one row per record under the header: UTF-8 without BOM, comma separator, RFC 4180 quoting, dates yyyy-MM-dd, amounts with a dot decimal and 2 decimals, codes exactly as stored in legacy.
 3. Produce the control file `<data file name>.ctl.csv` from `CONTROL_template.ctl.csv`: row count, hash total of the key, amount totals per column and currency, SHA-256 of the data file.
 4. Send both files through the Migration Console upload or the agreed SFTP drop. Never by e-mail.
@@ -19,7 +19,7 @@ How to use a template:
 | `R04_template.csv` | Insurers | R04 | Migrate | QPS, EBIX | 10 | insurer_code |
 | `R04B_template.csv` | Insurer branches | R04 | Migrate | QPS, EBIX | 7 | insurer_code, branch_code |
 | `R05_template.csv` | Product lines, cover types, products and risk codes | R05 | Migrate | QPS, EBIX | 9 | risk_code |
-| `R06_template.csv` | Packages (active versions) | R06 | Migrate | QPS | 10 | package_code, package_version, insurer_code |
+| `R06_template.csv` | PACKAGE code map (legacy package to BIBS package version) | R06 | Migrate | QPS (legacy packages); TSU (BIBS package versions) | 8 | legacy_package_code, legacy_package_version, qualifier, qualifier_value |
 | `R07_template.csv` | Commission rates by insurer and product | R07 | Migrate | QPS, EBIX | 5 | insurer_code, risk_code, effective_from |
 | `R08_template.csv` | Chart of accounts mapping | R08 | Migrate | EBIX, ISYS GL | 8 | legacy_account_code |
 | `R09_template.csv` | Payees | R09 | Conditional | EBIX, Disbursement files | 11 | payee_code |
@@ -29,7 +29,7 @@ How to use a template:
 | `C03_template.csv` | Client payout accounts | C03 | Migrate | EBIX | 6 | legacy_client_no, account_no |
 | `P01_template.csv` | In-force policy headers | P01 | Conditional | QPS, EBIX | 31 | legacy_policy_ref |
 | `P01S_template.csv` | Policy insurer shares | P01 | Conditional | QPS, EBIX | 6 | legacy_policy_ref, share_seq |
-| `P03_template.csv` | RMEL cohorts January to May 2028 (carried renewals) | P03 | Carry forward | Legacy RMEL extract (EBIX, QPS); Marketing disposition files | 27 | legacy_policy_ref |
+| `P03_template.csv` | Renewal advices already sent before go-live (RA-sent file) | P03 | Migrate | Excel RA trackers of the Renewal processing team | 13 | legacy_policy_ref |
 | `F01_template.csv` | Open legacy invoices - header | F01 | Carry forward | EBIX, QPS | 38 | legacy_invoice_no |
 | `F01S_template.csv` | Open legacy invoices - insurer shares | F01 | Carry forward | EBIX, QPS | 5 | legacy_invoice_no, share_seq |
 | `F01C_template.csv` | Open legacy invoices - components and positions | F01 | Carry forward | EBIX, QPS | 8 | legacy_invoice_no, component |
@@ -37,9 +37,12 @@ How to use a template:
 | `F03_template.csv` | Open collection state | F03 | Carry forward | CMS | 12 | legacy_invoice_no, record_type, seq_no |
 | `F04_template.csv` | Remittance in flight | F04 | Conditional | EBIX | 10 | legacy_batch_no, legacy_invoice_no |
 | `F06_template.csv` | PDCs, check pick-ups and refunds in process | F06 | Conditional | EBIX | 14 | record_type, reference |
-| `G01_template.csv` | GL opening trial balance | G01 | Migrate | EBIX GL, ISYS GL | 10 | branch_code, currency, legacy_account_code, cost_center |
+| `G01_template.csv` | GL opening trial balance | G01 | Migrate | EBIX GL, ISYS GL | 11 | branch_code, currency, legacy_account_code, cost_center |
+| `G03_template.csv` | FY2027 true-up - legacy adjustment journal lines after the freeze | G03 | Migrate | EBIX GL, ISYS GL; FY2027 adjustment register of Comptrollership | 19 | legacy_journal_no, line_no |
+| `G03D_template.csv` | FY2027 true-up - open-item detail of the lines on legacy control accounts | G03 | Migrate | EBIX GL, ISYS GL; FY2027 adjustment register of Comptrollership | 10 | legacy_journal_no, line_no, item_ref, component |
 | `H01_template.csv` | Archive records (closed transactions and history) | H01 | Archive | EBIX, QPS, ISYS | 15 | record_type, legacy_key |
 | `H02_template.csv` | Archive documents index | H02 | Archive | File shares, EBIX | 8 | record_type, legacy_key, file_name |
+| `P03_template.xlsx` | Renewal advices already sent before go-live (RA-sent file) (Excel template for the business team, with lists and an instructions sheet) | P03 | Migrate | Excel RA trackers of the Renewal processing team | 13 | legacy_policy_ref |
 | `CONTROL_template.ctl.csv` | Control file | all | - | - | 12 | data_file, measure, column_name, currency, filter |
 
 Objects without a template:

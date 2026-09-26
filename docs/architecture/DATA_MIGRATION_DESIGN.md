@@ -940,8 +940,8 @@ is a batch of object G03:
    lines since the previous true-up (G03), the open-item detail of the lines on legacy control accounts (G03D) and the
    legacy journal listing since the freeze (control input of C4).
 2. BIBS validates: every journal dated in FY2027, posted after the freeze, in the register, balanced per branch and
-   currency; every account mapped (`GL_ACCOUNT`: P&L accounts to retained earnings, legacy control accounts to LGC-CLR
-   with G03D detail); detail lines on loaded items and within their balances.
+   currency; every account mapped through `GL_ACCOUNT` (a line whose mapped account is a P&L account posts to retained
+   earnings; a line on a legacy control account posts to LGC-CLR and needs its G03D detail); detail lines on loaded items and within their balances.
 3. The Comptrollership GL lead prepares the true-up (`MIG_TRUEUP_PREPARE`); the Head of Comptrollership approves it
    (`MIG_TRUEUP_APPROVE`, gate G4 of G03).
 4. `TrueUpLoader` posts the **opening-balance adjustment journal** per branch and currency through

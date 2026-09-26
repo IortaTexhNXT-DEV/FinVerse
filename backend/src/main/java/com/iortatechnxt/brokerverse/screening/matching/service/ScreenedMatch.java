@@ -4,14 +4,15 @@ import com.iortatechnxt.brokerverse.screening.config.domain.MatchAlgorithm;
 import com.iortatechnxt.brokerverse.screening.config.domain.MatchField;
 import com.iortatechnxt.brokerverse.screening.config.domain.SubjectType;
 import com.iortatechnxt.brokerverse.screening.matching.domain.MatchStatus;
+import com.iortatechnxt.brokerverse.screening.matching.domain.ScreeningMatch;
 import java.math.BigDecimal;
 import java.util.Set;
 
 /**
  * One match of a client against a watchlist entry as the {@link ScreeningEngine} recorded it
  * (SNSRP-301, FR-SS-031): the pair, the entry version, the best score and its algorithm, the fields
- * that matched, and whether the score reaches the case threshold of the matching rule (FR-SS-034:
- * a NAME_MATCH case opens or the match joins the open case). Stable contract for the case wave.
+ * that matched, and whether the score reaches the case threshold of the matching rule (FR-SS-034: a
+ * NAME_MATCH case opens or the match joins the open case). Stable contract for the case wave.
  *
  * @param matchId the match ({@code scr_match.id})
  * @param runId the run that recorded it
@@ -55,5 +56,33 @@ public record ScreenedMatch(
   /** Defensive copy. */
   public ScreenedMatch {
     matchedFields = matchedFields == null ? Set.of() : Set.copyOf(matchedFields);
+  }
+
+  /**
+   * Maps a stored match.
+   *
+   * @param m the match
+   * @return the record
+   */
+  public static ScreenedMatch from(ScreeningMatch m) {
+    return new ScreenedMatch(
+        m.getId(),
+        m.getRunId(),
+        m.getClientId(),
+        m.getClientCode(),
+        m.getClientName(),
+        m.getEntryId(),
+        m.getEntryVersion(),
+        m.getEntryName(),
+        m.getSourceCode(),
+        m.getListType(),
+        m.getSubjectType(),
+        m.getScore(),
+        m.getAlgorithm(),
+        m.fields(),
+        m.getMatchRuleId(),
+        m.isCaseThreshold(),
+        m.getStatus(),
+        m.getCaseId());
   }
 }

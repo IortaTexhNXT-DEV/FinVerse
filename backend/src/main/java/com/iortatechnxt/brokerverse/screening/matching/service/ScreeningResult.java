@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The result of one screening run of the {@link ScreeningEngine} (SNSRP-301, 302, 602; FR-SS-030
- * to 033): the run log identity and counts, the matches recorded by the run and the risk outcome
- * of each client concerned. Published with {@link ScreeningCompleted}; the case wave opens cases
- * from it (FR-SS-034). Stable contract for the case wave.
+ * The result of one screening run of the {@link ScreeningEngine} (SNSRP-301, 302, 602; FR-SS-030 to
+ * 033): the run log identity and counts, the matches recorded by the run and the risk outcome of
+ * each client concerned. Published with {@link ScreeningCompleted}; the case wave opens cases from
+ * it (FR-SS-034). Stable contract for the case wave.
  *
  * @param runId the run ({@code scr_screening_run.id})
  * @param runNo the run number (SCN-yyyy-nnnnnn)

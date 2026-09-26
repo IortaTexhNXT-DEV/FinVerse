@@ -15,6 +15,7 @@ import { ErrorAlert } from './ErrorAlert';
 import { FilterChips } from './FilterChips';
 import { PageHeader } from './PageHeader';
 import { StatusPage } from './StatusPage';
+import { Tabs } from './Tabs';
 import { useUnsavedChangesGuard } from './useUnsavedChangesGuard';
 
 describe('confirmation dialog', () => {
@@ -200,5 +201,36 @@ describe('notifications', () => {
     );
     expect(kindOf({ title: 'Quotation returned to you' })).toBe('returned');
     expect(kindOf({ title: 'Account assigned to you' })).toBe('assigned');
+  });
+});
+
+describe('tabs', () => {
+  function Strip() {
+    const [tab, setTab] = useState<'a' | 'b' | 'c'>('a');
+    return (
+      <Tabs
+        tabs={[
+          { id: 'a', label: 'Details' },
+          { id: 'b', label: 'Documents', count: 3 },
+          { id: 'c', label: 'History' },
+        ]}
+        active={tab}
+        onChange={setTab}
+      />
+    );
+  }
+
+  it('shows counts and moves with the arrow keys, Home and End', async () => {
+    render(<Strip />);
+    expect(screen.getByLabelText('3 items')).toHaveTextContent('3');
+    await userEvent.click(screen.getByRole('tab', { name: 'Details' }));
+    await userEvent.keyboard('{ArrowRight}');
+    expect(screen.getByRole('tab', { name: /Documents/ })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: /Documents/ })).toHaveFocus();
+    await userEvent.keyboard('{End}');
+    expect(screen.getByRole('tab', { name: 'History' })).toHaveAttribute('aria-selected', 'true');
+    await userEvent.keyboard('{ArrowRight}');
+    expect(screen.getByRole('tab', { name: 'Details' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: 'History' })).toHaveAttribute('tabindex', '-1');
   });
 });

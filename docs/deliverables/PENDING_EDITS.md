@@ -38,3 +38,8 @@ dormant.
 | `docs/deliverables/src/migration/build_migration_pack.py` | Example file name `F01C_EBIX_20270226_01.csv` in the workbook README and the templates README: use a December 2027 date for a January 2028 go-live | Next migration pack issue |
 | Data Migration documents (DATA_MIGRATION_DESIGN section 15, dm_layouts.yaml object P03, FRS BRD-13, test plan BRD-13, migration pack) | BDOI answers DMQ36-DMQ39: no carried RMEL cohorts (P03), remapping at sanitation (the PACKAGE map is loaded only), RMEL and dispositions in Excel, year-end option A | Data Migration team (in progress) |
 | Test plan summaries BRD-2 and BRD-11 | Reference FRS v1.1 and register v1.2 | Next test plan issue |
+
+## Merge policy (BDOI, 26-Sep-2026)
+
+When this work is merged into `main`, it is merged as a single squash commit authored by iorta TechNXT, with a plain
+descriptive message. The working branch is deleted afterwards. `main` then carries one clean, reviewed change.

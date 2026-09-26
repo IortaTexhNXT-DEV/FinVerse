@@ -421,15 +421,18 @@ sub-ledger is the set of party postings on a control account plus the operationa
 reconciliation, `acsl_glsl_control`). The design keeps **separate legacy control accounts** so the legacy positions
 run off visibly, and routes postings to them by **amount component**, not by a new event:
 
+`LGC-DTIP`, `LGC-COMM` and `LGC-CLR` are placeholders: Comptrollership assigns the account codes (DMQ18, DCR-197). The first
+draft used 1221 and 2212, which the Accounting design already uses for USD commission receivable and USD payable to insurers.
+
 | Legacy component | Replaces (new) | Proposed legacy control account (demo chart) | Party |
 |---|---|---|---|
 | `LG_PR_BASIC`, `LG_PR_DST`, `LG_PR_PTX_VAT`, `LG_PR_LGT`, `LG_PR_FST`, `LG_PR_OTHER` | `PR_*` | 1215.01-.06 Premium Receivable - Legacy | client |
 | `LG_PR2307` | `PR2307` | 1216 PR 2307 - Legacy | client |
-| `LG_DTIP` | `DTIP` | 2212 Due to Insurers - Legacy | insurer |
-| `LG_COMMISSION`, `LG_COMMISSION_VAT` | `COMMISSION`, `COMMISSION_VAT` | 1221 Commission Receivable - Legacy | insurer |
+| `LG_DTIP` | `DTIP` | LGC-DTIP (Due to Insurers - Legacy; code assigned by Comptrollership, DMQ18) | insurer |
+| `LG_COMMISSION`, `LG_COMMISSION_VAT` | `COMMISSION`, `COMMISSION_VAT` | LGC-COMM (Commission Receivable - Legacy; code assigned by Comptrollership, DMQ18) | insurer |
 | `LG_UNREALIZED` , `LG_DEFERRED_VAT` | `UNREALIZED`, `DEFERRED_VAT` (realisation lines) | 2222 Unrealized Commission - Legacy, 2223 Deferred Output VAT - Legacy | insurer |
 | `LG_APPLIED`, `LG_AMOUNT` (UPP side) | `APPLIED`, `AMOUNT` | 2206 Unapplied Collections - Legacy | client |
-| `CLEARING` | - | 1999 Migration Clearing | none |
+| `CLEARING` | - | LGC-CLR Migration Clearing | none |
 
 - A shared helper `opsledger.domain.LedgerContext` (NEW with prefix "", LEGACY with prefix "LG_") gives
   `component(String base)`. Every posting helper asks the invoice (or the UPP item) for its context:
@@ -454,11 +457,11 @@ run off visibly, and routes postings to them by **amount component**, not by a n
 
 | Event | When | Entry (demo rules) |
 |---|---|---|
-| `MIG_LEGACY_INVOICE_OPENING` (source ref `MIG:INV:<invoice>`) | F01, per invoice | Dr 1215.x open PR by component (client); Dr 1216 open PR2307 (client); Cr 2212 open DTIP (insurer); Dr 1221 open commission and VAT (insurer); Cr 2222 unrealised commission and Cr 2223 deferred VAT still open (DMQ13); balancing line to 1999 Migration Clearing |
-| `MIG_UPP_OPENING` (`MIG:UPP:<ref>`) | F02, per item | Dr 1999 / Cr 2206 (client) |
-| GL opening trial balance (system journal type OPENING, source `MIGRATION`, reference `MIG-TB-<asof>`) | G01, per branch and currency | Every balance-sheet account of the legacy TB mapped through `GL_ACCOUNT`; the lines of the legacy control accounts that F01 and F02 build in detail are mapped to 1999 instead; P&L balances follow DMQ18 (year-start cutover recommended) |
+| `MIG_LEGACY_INVOICE_OPENING` (source ref `MIG:INV:<invoice>`) | F01, per invoice | Dr 1215.x open PR by component (client); Dr 1216 open PR2307 (client); Cr LGC-DTIP open DTIP (insurer); Dr LGC-COMM open commission and VAT (insurer); Cr 2222 unrealised commission and Cr 2223 deferred VAT still open (DMQ13); balancing line to LGC-CLR Migration Clearing |
+| `MIG_UPP_OPENING` (`MIG:UPP:<ref>`) | F02, per item | Dr LGC-CLR / Cr 2206 (client) |
+| GL opening trial balance (system journal type OPENING, source `MIGRATION`, reference `MIG-TB-<asof>`) | G01, per branch and currency | Every balance-sheet account of the legacy TB mapped through `GL_ACCOUNT`; the lines of the legacy control accounts that F01 and F02 build in detail are mapped to LGC-CLR instead; P&L balances follow DMQ18 (year-start cutover recommended) |
 
-**Control:** after F01, F02 and G01, 1999 Migration Clearing is 0.00 per branch and currency (L5, alert
+**Control:** after F01, F02 and G01, LGC-CLR Migration Clearing is 0.00 per branch and currency (L5, alert
 `MIG_CLEARING_NOT_ZERO`). A non-zero balance means the detail and the trial balance disagree; it is a go / no-go
 criterion.
 
@@ -512,17 +515,17 @@ DMQ16); the item closes; reversal only by a new approved batch of type REVERSAL.
 Lines come from an upload (template: invoice no., amount, reason) or from the Collections "DP PR for Reversal" tags of
 legacy invoices. Each line in its own transaction: DP_REVERSAL movements on PR and DTIP as today, and for legacy
 invoices `OPS_DP_PR_REVERSAL` **always** posts, whatever `DP_PR_REVERSAL_POSTING` says (legacy PR is in the GL
-through the opening entry): Dr 2212 / Cr 1215.x; the commission receivable treatment (DP commission billing or
-reversal against 1221) follows DMQ19. Run report with posted and failed lines.
+through the opening entry): Dr LGC-DTIP / Cr 1215.x; the commission receivable treatment (DP commission billing or
+reversal against LGC-COMM) follows DMQ19. Run report with posted and failed lines.
 
 **F. PR2307 batch reversal (BRID 7.2).** `cashiering` gets `csh_pr2307_reversal_batch` / lines (V766), same workflow
 pattern (`OPS_PR2307_REVERSAL`). Legacy PR2307 balances were loaded on the PR2307 component; the run posts
-`OPS_CWT_DTIP_OFFSET` with `LG_DTIP`, `LG_PR2307` (Dr 2212 / Cr 1216), or first `OPS_CWT_RECLASS` when the balance
+`OPS_CWT_DTIP_OFFSET` with `LG_DTIP`, `LG_PR2307` (Dr LGC-DTIP / Cr 1216), or first `OPS_CWT_RECLASS` when the balance
 is still on PR (Dr 1216 / Cr 1215.x); commission receivable effect per DMQ20.
 
 **G. Remittance (BRID 8.1).** No extraction change: legacy invoices with paid AR (from `LEGACY_PAID` or later
 applications) and open DTIP are extracted with the new ones. `RemittancePostings` builds `OPS_REMITTANCE` per line with
-the invoice's context: Dr 2212 (paid AR part) + Dr 1602 CWT / Cr 1221 (commission and VAT) / Cr 2211 due to insurer
+the invoice's context: Dr LGC-DTIP (paid AR part) + Dr 1602 CWT / Cr LGC-COMM (commission and VAT) / Cr 2211 due to insurer
 for disbursement. The commission OR per settlement batch is issued through `ReceiptIssuer` as today; the schedule
 shows the legacy invoice number and the source system; reports get an "invoice origin" filter.
 
@@ -559,7 +562,7 @@ through a new collections service `LegacyItemStateService` (the designed `CLX_LE
 "for reversal" tags of legacy invoices feed E and F.
 
 **K. Commission.** DP billing and DP commission collection on legacy invoices post with the context
-(`OPS_DP_COMMISSION_COLLECT`: Cr 1221). Incentive runs (No Touch, Top Up, Motor Mania) exclude legacy invoices unless
+(`OPS_DP_COMMISSION_COLLECT`: Cr LGC-COMM). Incentive runs (No Touch, Top Up, Motor Mania) exclude legacy invoices unless
 BDOI decides otherwise (parameter `CMR_INCENTIVE_INCLUDE_LEGACY`, default false).
 
 **L. Minimal balances and write-offs.** The minimal balance sweep (CSHID.016) and the 10-100 write-off file (ADJID.026)
@@ -768,18 +771,18 @@ Event types are seeded in V1080 (`acc_event_type`); demo rules in V1982. Real ac
 
 | # | Transaction | Event (source ref) | Default entry (demo chart) |
 |---|---|---|---|
-| M1 | Legacy invoice opening | `MIG_LEGACY_INVOICE_OPENING` (`MIG:INV:<invoice>`) | Dr 1215.x (client) open PR; Dr 1216 open PR2307; Cr 2212 (insurer) open DTIP; Dr 1221 (insurer) open commission and VAT; Cr 2222 / 2223 unrealised commission and deferred VAT still open; balance to 1999 |
-| M2 | Legacy UPP opening | `MIG_UPP_OPENING` (`MIG:UPP:<ref>`) | Dr 1999 / Cr 2206 (client) |
-| M3 | GL opening TB | System journal OPENING (`MIG-TB-<asof>-<branch>-<ccy>`) | Mapped balances; legacy control lines to 1999 |
+| M1 | Legacy invoice opening | `MIG_LEGACY_INVOICE_OPENING` (`MIG:INV:<invoice>`) | Dr 1215.x (client) open PR; Dr 1216 open PR2307; Cr LGC-DTIP (insurer) open DTIP; Dr LGC-COMM (insurer) open commission and VAT; Cr 2222 / 2223 unrealised commission and deferred VAT still open; balance to LGC-CLR |
+| M2 | Legacy UPP opening | `MIG_UPP_OPENING` (`MIG:UPP:<ref>`) | Dr LGC-CLR / Cr 2206 (client) |
+| M3 | GL opening TB | System journal OPENING (`MIG-TB-<asof>-<branch>-<ccy>`) | Mapped balances; legacy control lines to LGC-CLR |
 | M4 | Rollback of an opening (pre-sign-off only) | same event, negative, `...:RB` | Reverses M1 / M2 |
 | O2 | Payment applied (legacy invoice or legacy UPP) | `OPS_PAYMENT_APPLY` with `LG_` components | Section 14.4 B |
 | O8 | UPP refund (legacy) | `OPS_UNAPPLIED_REFUND` with `LG_AMOUNT` | Dr 2206 / Cr 2216 |
 | O8b | UPP reclass to other income | `OPS_UNAPPLIED_TO_INCOME` (new) (`UIR:<batch>:<item>`) | Dr 2206 or 2205 / Cr 4190 |
-| O4 | PR2307 legacy reversal | `OPS_CWT_DTIP_OFFSET` with `LG_DTIP`, `LG_PR2307` | Dr 2212 / Cr 1216 |
-| O22 | DPPR legacy reversal | `OPS_DP_PR_REVERSAL` with `LG_` (always posted for LEGACY) | Dr 2212 / Cr 1215.x; commission per DMQ19 |
-| O12 | Remittance of a legacy invoice | `OPS_REMITTANCE` with `LG_DTIP`, `LG_COMMISSION`, `LG_COMMISSION_VAT` | Dr 2212 + Dr 1602 / Cr 1221 / Cr 2211 |
+| O4 | PR2307 legacy reversal | `OPS_CWT_DTIP_OFFSET` with `LG_DTIP`, `LG_PR2307` | Dr LGC-DTIP / Cr 1216 |
+| O22 | DPPR legacy reversal | `OPS_DP_PR_REVERSAL` with `LG_` (always posted for LEGACY) | Dr LGC-DTIP / Cr 1215.x; commission per DMQ19 |
+| O12 | Remittance of a legacy invoice | `OPS_REMITTANCE` with `LG_DTIP`, `LG_COMMISSION`, `LG_COMMISSION_VAT` | Dr LGC-DTIP + Dr 1602 / Cr LGC-COMM / Cr 2211 |
 | O19 | Endorsement of a legacy invoice | `BROKER_BOOKING` with `LG_` components | As booking row 0 on the legacy accounts |
-| O18 | Negative endorsement after remittance | `OPS_AR_INSURER_SETUP` with `LG_DTIP` | Dr 1225 / Cr 2212 |
+| O18 | Negative endorsement after remittance | `OPS_AR_INSURER_SETUP` with `LG_DTIP` | Dr 1225 / Cr LGC-DTIP |
 | O21 | Write-off / minimal balance on a legacy invoice | `OPS_WRITE_OFF`, `OPS_MINIMAL_BALANCE_REVERSAL` with `LG_` | Dr 6510 / Cr 1215.x |
 
 ## 20. Jobs, parameters and alerts
@@ -824,7 +827,7 @@ Workflows (V1080 unless noted): `MIG_OBJECT_DECISION`, `MIG_MAP_VERSION`, `MIG_B
 | `MIG-REJECTS` | Rejected and invalid rows with messages | 1.1b |
 | `MIG-BATCH-LOG` | Batches with timings and counts | 1.1b |
 | `MIG-RECON-SUMMARY`, `MIG-RECON-DETAIL` | Reconciliation L1-L5, breaks and explanations | 1.1b |
-| `MIG-GL-CLEARING` | 1999 balance per branch and currency; legacy control vs sub-ledger | 1.1b |
+| `MIG-GL-CLEARING` | LGC-CLR balance per branch and currency; legacy control vs sub-ledger | 1.1b |
 | `MIG-CLIENT-MATCH` | Clusters, scores, decisions, survivors | 2.1 |
 | `MIG-SIGNOFF-STATUS` | Gates per object and batch | 1.1a |
 | `MIG-CUTOVER-STATUS`, `MIG-GONOGO` | Tasks and criteria | 12.1 |
@@ -892,7 +895,7 @@ versions of this range, as Collections did with V1006 for cashiering.
 | V1007 `collections_legacy_items` | collections | legacy state tables of `CLX_LEGACY_ITEMS` |
 | V1980 `demo_migration_users` | migration demo | Demo users and roles of 18.2 |
 | V1981 `demo_migration_setup` | migration demo | Demo object register, map sets with approved versions, layouts, rules |
-| V1982 `demo_migration_gl` | migration demo | Demo accounts 1215.x, 1216, 1221, 2206, 2212, 2222, 2223, 1999, 4190 and the `LG_` lines on the demo rules of the Operations and booking events |
+| V1982 `demo_migration_gl` | migration demo | Demo accounts for the legacy controls (LGC-*; codes to be taken from the unused range once Comptrollership answers DMQ18, not 1221 or 2212, which Accounting uses for USD balances) and 1215.x, 1216, 2206, 2222, 2223, 4190 and the `LG_` lines on the demo rules of the Operations and booking events |
 
 No foreign keys from `mig_*` to V8xx tables (targets are held as plain values), so V1080-V1085 are safe on a fresh
 database. V1086 alters V761 tables and V1087 V896 tables, which run earlier. The demo storyline (legacy invoices, UPP,
@@ -950,7 +953,7 @@ Per data object: the fields are the layout columns (published in the data requir
 | R05 Products / risk codes | QPS, EBIX | Product Owner, MBS | line, cover type, risk code, name, packaged flag, status | CSV | to supply | code fits the line pattern; every code of an open item mapped | current and codes used by in-force policies | none |
 | R06 Packages | QPS | Product Owner, MBS; TSU | package code, version, insurers, rates, effective dates | XLSX | to supply | active version per package | active | none |
 | R07 Commission rates | QPS, EBIX | Head of Operations | insurer, product, rate, effective dates | CSV | to supply | rate 0-100; no overlap | current | none |
-| R08 GL account map | EBIX, ISYS GL | Head of Comptrollership; FRBS / ACSL PO | legacy account, description, BIBS account, legacy control flag | XLSX | to supply | every TB account mapped; legacy controls to 1999 | current chart | none |
+| R08 GL account map | EBIX, ISYS GL | Head of Comptrollership; FRBS / ACSL PO | legacy account, description, BIBS account, legacy control flag | XLSX | to supply | every TB account mapped; legacy controls to LGC-CLR | current chart | none |
 | R09 Payees | EBIX / Disbursement | Comptrollership - Disbursement PO | payee code, name, TIN, address, bank, account no., mode | CSV | to supply | as `DISB_PAYEE_MIGRATION` | active payees | none |
 | R11 Receipt series | EBIX | Operations - Financial Transactions | branch, kind AR / OR, ATP no., from, to, next no. | CSV | to supply | next no. within range | current | at freeze |
 | C01-C02 Clients | QPS, EBIX, CMS | Product Owner, MBS; Heads of Marketing | legacy client no., type, names, birth / registration date, TIN, ID type and no., CIF, e-mail, mobile, addresses, segment, AO, KYC status and dates, last update | CSV | to supply | mandatory identity fields; formats; duplicates resolved | 2020 to present (umbrella p.43), scope per DMQ05 | daily until freeze |

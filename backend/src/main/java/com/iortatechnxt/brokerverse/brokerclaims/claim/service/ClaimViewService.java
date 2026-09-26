@@ -99,20 +99,22 @@ public class ClaimViewService {
             .map(InsurerClaim::getReserveAmount)
             .filter(Objects::nonNull)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
+    List<String> unremitted =
+        covers.invoices(cover.getArn(), cover.getPolicyYear()).stream()
+            .filter(i -> !i.isCancelled() && !SETTLED.contains(i.getRemittanceStatus()))
+            .map(OpsInvoice::getInvoiceNo)
+            .toList();
     return new ClaimView(
         claim,
         premium,
         latest,
-        awaiting,
+        awaiting && !unremitted.isEmpty(),
         locations.ofClaim(claim.getId()).size(),
         (int) lines.stream().map(InsurerClaim::getInsurerCode).distinct().count(),
         reserve,
         labels(claim),
         parameters.text(ClaimCodes.PARAM_AUTH_DP_POLICY, "CONFIRM"),
-        covers.invoices(cover.getArn(), cover.getPolicyYear()).stream()
-            .filter(i -> !i.isCancelled() && !SETTLED.contains(i.getRemittanceStatus()))
-            .map(OpsInvoice::getInvoiceNo)
-            .toList());
+        unremitted);
   }
 
   private Map<String, String> labels(Claim claim) {
@@ -140,7 +142,9 @@ public class ClaimViewService {
    * @param claim claim
    * @param premium live premium check
    * @param latestVersionNo latest cover version of the policy year
-   * @param awaitingRemittance the status waits for the premium remittance
+   * @param awaitingRemittance the status waits for the premium remittance and an invoice of the
+   *     cover and policy year is not yet fully remitted (the flag drops once the premium is
+   *     remitted, wave CL2)
    * @param locationCount linked locations
    * @param insurerCount distinct insurers
    * @param totalReserve sum of the insurer reserves

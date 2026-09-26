@@ -16,6 +16,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
+import { AccountClaimsPanel } from '@/features/brokerclaims/account/AccountClaimsPanel';
 import { PolicyPanel } from '@/features/issuance/PolicyPanel';
 import { PlacementPanel } from '@/features/placement/PlacementPanel';
 import { formatAmount, formatDate } from '@/utils/format';
@@ -35,6 +36,8 @@ const TABS = [
   // Placement and issuance tabs: mounted here until the account page offers an extension point.
   { id: 'placement', label: 'Placement' },
   { id: 'policy', label: 'Policy' },
+  // Claims Handling (BRD-7, wave CL2): read-only list of the account's claims, with BCL_VIEW.
+  { id: 'claims', label: 'Claims' },
   { id: 'history', label: 'History' },
 ] as const;
 
@@ -112,6 +115,8 @@ function TabBody({ tab, account }: Readonly<{ tab: TabId; account: Account }>) {
       return <PlacementPanel arn={account.arn} />;
     case 'policy':
       return <PolicyPanel arn={account.arn} />;
+    case 'claims':
+      return <AccountClaimsPanel arn={account.arn} />;
     default:
       return <HistoryPanel accountId={account.id} />;
   }
@@ -119,8 +124,8 @@ function TabBody({ tab, account }: Readonly<{ tab: TabId; account: Account }>) {
 
 /**
  * One account (BRNB.050): status and work case with the actions the user may take, readiness
- * check while it is open for changes, and tabs for details, items, premium, documents, e-mails
- * and history.
+ * check while it is open for changes, and tabs for details, items, premium, documents, e-mails,
+ * placement, policy, claims (BCL_VIEW) and history.
  */
 export default function AccountDetailPage() {
   const id = Number(useParams().id);
@@ -137,6 +142,7 @@ export default function AccountDetailPage() {
   }
   const a = account.data;
   const editable = EDITABLE.has(a.status) && can('ACCOUNT_MAINTAIN');
+  const tabs = can('BCL_VIEW') ? TABS : TABS.filter((t) => t.id !== 'claims');
   return (
     <div className="stack">
       <PageHeader
@@ -171,7 +177,7 @@ export default function AccountDetailPage() {
         renderBusinessActions={(actions) => <AccountActions account={a} actions={actions} />}
       />
       {EDITABLE.has(a.status) && <AccountCheckPanel accountId={a.id} />}
-      <Tabs tabs={TABS} active={tab} onChange={setTab} />
+      <Tabs tabs={tabs} active={tab} onChange={setTab} />
       <TabBody tab={tab} account={a} />
     </div>
   );

@@ -655,3 +655,44 @@ What wave CL1-B built on top of section 17 (package `brokerclaims.{status,diary,
   Assign Adjuster, Reopen) and the Diary and History tabs in `record/ClaimPage.tsx`.
 - **Not built here.** The claim-level demo storyline (status history, diary) extends CL1-A's `BrokerClaimsDemoData`
   at CL2; the handler register has no maker-checker columns (CL0 table), changes are audited.
+
+## 20. CL2 integration and hardening: as built
+
+What the integration wave CL2 added on top of sections 17 to 19. It has no migration. The module guide is
+[`docs/modules/BROKER_CLAIMS.md`](../modules/BROKER_CLAIMS.md), and the as-built status per BRCLM row is in
+`docs/requirements/BDOI_CLM_BRD_SPEC.md`.
+
+- **End to end through HTTP** (`api/ClaimsEndToEndApiIT`, SIT/UAT users). The path is:
+  - an issued motor account is booked by Processing;
+  - the Claims Officer records a claim on the unpaid cover (flag, alert `BCL_UNPAID_PREMIUM_CLAIM`,
+    `BCL_PREMIUM_UNPAID`);
+  - the cashier's over-the-counter payment is applied; the after-commit re-check turns the claim PAID and notifies
+    the handler; the authorization code is generated once;
+  - the Team Lead sets "With BDOI - For Premium Remittance";
+  - Marketing Collections' CLAIMS special remittance is confirmed through the claims feed and approved; the batch is
+    submitted and approved, and the Disbursement DV makes it FULLY_REMITTED; the handler gets the "remitted" notice;
+  - the matrix refuses the officer's in-progress status and any way back to NEW; a temporary closure is resumed;
+  - the officer cannot settle; the Team Lead settles on the LOA and closes; the Team Lead cannot reopen, the Team
+    Head reopens with a reason, and the claim is settled again;
+  - the outstanding, settled, ageing, loss ratio and activity log reports follow each step; Marketing reads the
+    loss experience and not the claim.
+- **Smoke.** `ApiSmokeIT#claimsHandlingListsRespondOk` calls every Claims list read as the persona of its screen.
+- **Persona menus.** The shared fixture `frontend/src/navigation/personaMenus.json` is now a list of **suites**
+  (`sections`, `sharedGroups`, `sharedModules`, `roles`). Suite BRD-7 pins `CLM_OFFICER`, `CLM_TL`, `CLM_TH`,
+  `CLM_UH`, `CLM_RISK` exactly, and `MKT_AO` / `MKT_TL` on their `BCL_*` grants (`permissionScope`). The Claims
+  roles see only Claims Handling plus the shared Home, Client & Policy, Operations and Reports groups. No listed
+  role sees the insurer-side Claims module. Marketing sees the Claims reports without the data extract, and only the
+  Team Lead may export. The tests are `navigation/personaMenus.test.ts`, `security/PersonaMenusIT` and
+  `support/PersonaMenus`.
+- **Account page Claims tab** (`features/brokerclaims/account/AccountClaimsPanel.tsx`, mounted in
+  `features/accounts/AccountDetailPage.tsx` for `BCL_VIEW`). It is read-only: claim number linked to the claim,
+  policy year, date of loss, status, phase, currency, paid and outstanding. It reads
+  `GET /api/v1/broker-claims/experience?arn=`; the `ClaimExperience` type now declares its `claims`.
+- **Seed storyline** (`demo/BrokerClaimsSeedStory`, called by the Claims seed data runner). Statuses through the
+  matrix, an adjuster, action plans, diary calls, meetings and follow-ups, an overridden follow-up, a temporarily
+  closed claim, a claim settled on the LOA and closed, a claim closed within the deductible and reopened, a claim
+  waiting for the premium remittance (ARN-2026-940007) and a newly filed liability claim (ARN-2026-940004).
+- **Defect fixed.** The claim's *Awaiting premium remittance* flag (and the special remittance link) stayed on after
+  the premium was fully remitted. `ClaimViewService` now sets it only while an invoice of the cover and policy year
+  is not fully remitted. The home tile and the worklist filter still count the claims in the status (the handler's
+  to-do list).

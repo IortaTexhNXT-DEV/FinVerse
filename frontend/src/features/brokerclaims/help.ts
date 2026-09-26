@@ -65,7 +65,10 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
       path: '/claims-handling/covers',
       summary:
         'Read-only view of any cover of the company: account, policy years and policy numbers, items and locations, endorsements (cover versions), invoices with their payment and remittance status, the claims of the cover and the insurer location references (BRCLM.002, 003, 042).',
-      workflow: ['Record Claim on the cover opens Record Claim with the cover selected.'],
+      workflow: [
+        'Record Claim on the cover opens Record Claim with the cover selected.',
+        'The account page (Accounts & Placement) also has a Claims tab for holders of BCL_VIEW: the claims of the account with policy year, loss date, status, paid and outstanding amounts, each linked to its claim record. It is read-only.',
+      ],
       controls: [
         'Needs BCL_COVER_VIEW; nothing on the cover can be changed here. Search texts need at least 3 characters; there is no branch or portfolio restriction (CLQ27).',
         'Opening a cover is logged in the audit trail of the account.',

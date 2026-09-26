@@ -265,6 +265,52 @@ class ApiSmokeIT {
         .andExpect(status().isOk());
   }
 
+  /**
+   * The list reads of Claims Handling (BRD-7), each as the persona whose screen makes it (wave
+   * CL2); the record reads of one claim are in {@code ClaimsHandlingApiIT} and {@code
+   * ClaimsStatusReportsApiIT}.
+   */
+  @ParameterizedTest
+  @CsvSource({
+    "clmofficer, /api/v1/broker-claims/home?companyId={c}",
+    "clmofficer, /api/v1/broker-claims/worklist?companyId={c}",
+    "clmofficer, /api/v1/broker-claims/worklist?companyId={c}&tab=MINE&q=BCL",
+    "clmofficer, /api/v1/broker-claims/worklist?companyId={c}&tab=TEMP_CLOSED",
+    "clmofficer, /api/v1/broker-claims/worklist?companyId={c}&tab=CLOSED&status=INSURER_LOA_ISSUANCE",
+    "clmofficer, /api/v1/broker-claims/worklist?companyId={c}&tab=FOLLOW_UPS_DUE",
+    "clmtl, /api/v1/broker-claims/worklist?companyId={c}&tab=ALL&flag=UNPAID_PREMIUM",
+    "clmtl, /api/v1/broker-claims/worklist?companyId={c}&flag=AWAITING_REMITTANCE&page=1&size=5",
+    "auditor, /api/v1/broker-claims/worklist?companyId={c}&flag=OVERDUE",
+    "clmofficer, /api/v1/broker-claims/diary/mine?companyId={c}",
+    "clmofficer, /api/v1/broker-claims/diary/mine?companyId={c}&includeDone=true",
+    "clmofficer, /api/v1/broker-claims/search?companyId={c}&q=ARN-2026",
+    "clmofficer, /api/v1/broker-claims/covers?companyId={c}&q=ARN-2026",
+    "clmrisk, /api/v1/broker-claims/covers?companyId={c}&by=ASSURED&q=Demo",
+    "clmofficer, /api/v1/broker-claims/location-refs?companyId={c}",
+    "clmofficer, /api/v1/broker-claims/location-refs?companyId={c}&q=MGIC&page=0&size=5",
+    "clmofficer, /api/v1/broker-claims/location-refs/by-cover/ARN-2026-940002?companyId={c}",
+    "clmofficer, /api/v1/broker-claims/assignees",
+    "clmuh, /api/v1/broker-claims/assignees",
+    "ao, /api/v1/broker-claims/experience?arn=ARN-2026-940001",
+    "mkttl, /api/v1/broker-claims/experience?arn=ARN-2026-940001&policyYear=1",
+    "clmuh, /api/v1/broker-claims/setup/attributes/BCL_CLAIM_STATUS",
+    "clmuh, /api/v1/broker-claims/setup/attributes/BCL_SETTLEMENT_TYPE",
+    "clmuh, /api/v1/broker-claims/setup/matrix",
+    "clmuh, /api/v1/broker-claims/setup/matrix/roles",
+    "clmuh, /api/v1/broker-claims/setup/handlers",
+    "clmuh, /api/v1/broker-claims/setup/users",
+    "clmuh, /api/v1/broker-claims/setup/lists",
+    "clmuh, /api/v1/lov/BCL_ADJUSTER/values",
+    "clmrisk, /api/v1/reports",
+    "ao, /api/v1/reports",
+  })
+  void claimsHandlingListsRespondOk(String user, String url) throws Exception {
+    mvc.perform(
+            get(url.replace("{c}", data.company().getId().toString()))
+                .with(user(users.loadUserByUsername(user))))
+        .andExpect(status().isOk());
+  }
+
   @ParameterizedTest
   @ValueSource(
       strings = {

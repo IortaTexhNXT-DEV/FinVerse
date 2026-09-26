@@ -1,151 +1,344 @@
 {
-  "description": "Client requirement 14 (persona menus) for BRD-10 Sanction Screening and BRD-11 User Access Maintenance. For each role: the permissions the database grants (V1050, V1060, V1062, V1063) and the menu screens of the Sanction Screening, Compliance Setup and User Access sections it must see - no more, no less. Checked by navigation/personaMenus.test.ts (the menu of navigation/modules.ts) and by the backend PersonaMenusIT (the grants in the database, and every listed screen answers its demo user).",
-  "sections": ["screening", "screening-setup", "user-access"],
-  "roles": {
-    "COMPLIANCE_OFFICER": {
-      "demoUser": "compoff",
-      "permissions": [
-        "ATTACHMENT_VIEW",
-        "CLIENT_VIEW",
-        "REPORT_VIEW",
-        "SCR_AUDIT_VIEW",
-        "SCR_CASE_ASSIGN",
-        "SCR_COMPLIANCE_REVIEW",
-        "SCR_CONFIG_MAINTAIN",
-        "SCR_LIST_MAINTAIN",
-        "SCR_REPORT_VIEW",
-        "SCR_STR_EXTRACT",
-        "SCR_VIEW",
-        "WORK_VIEW"
-      ],
-      "screens": [
-        "/screening",
-        "/screening/cases",
-        "/screening/matches",
-        "/screening/runs",
-        "/screening/high-risk",
-        "/screening/str",
-        "/screening-setup/config",
-        "/screening-setup/templates",
-        "/screening-setup/watchlist",
-        "/screening-setup/sources"
-      ]
+  "description": "Client requirement 14 (persona menus): for each role of a suite, the permissions the database grants and the menu screens of the suite's sections it must see - no more, no less - and, outside those sections, only screens of the suite's shared groups and modules. A role with a permissionScope belongs to another business area (Marketing) and reaches the suite through a few grants: only its permissions with that prefix are compared and only the suite's sections are checked. Checked by navigation/personaMenus.test.ts (the menu of navigation/modules.ts) and by the backend PersonaMenusIT (the grants in the database, and every listed screen answers its SIT/UAT user).",
+  "suites": [
+    {
+      "id": "BRD-10/11",
+      "description": "Sanction Screening and User Access Maintenance (V1050, V1060, V1062, V1063)",
+      "sections": ["screening", "screening-setup", "user-access"],
+      "sharedGroups": ["home", "client-policy", "reports"],
+      "sharedModules": ["help"],
+      "roles": {
+        "COMPLIANCE_OFFICER": {
+          "demoUser": "compoff",
+          "permissions": [
+            "ATTACHMENT_VIEW",
+            "CLIENT_VIEW",
+            "REPORT_VIEW",
+            "SCR_AUDIT_VIEW",
+            "SCR_CASE_ASSIGN",
+            "SCR_COMPLIANCE_REVIEW",
+            "SCR_CONFIG_MAINTAIN",
+            "SCR_LIST_MAINTAIN",
+            "SCR_REPORT_VIEW",
+            "SCR_STR_EXTRACT",
+            "SCR_VIEW",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/screening",
+            "/screening/cases",
+            "/screening/matches",
+            "/screening/runs",
+            "/screening/high-risk",
+            "/screening/str",
+            "/screening-setup/config",
+            "/screening-setup/templates",
+            "/screening-setup/watchlist",
+            "/screening-setup/sources"
+          ]
+        },
+        "COMPLIANCE_CHECKER": {
+          "demoUser": "compchk",
+          "permissions": [
+            "CLIENT_VIEW",
+            "REPORT_VIEW",
+            "SCR_CONFIG_APPROVE",
+            "SCR_LIST_APPROVE",
+            "SCR_REPORT_VIEW",
+            "SCR_VIEW"
+          ],
+          "screens": [
+            "/screening",
+            "/screening/cases",
+            "/screening/matches",
+            "/screening/runs",
+            "/screening/high-risk",
+            "/screening-setup/config",
+            "/screening-setup/templates",
+            "/screening-setup/watchlist",
+            "/screening-setup/sources"
+          ]
+        },
+        "UNIT_COMPLIANCE_COORD": {
+          "demoUser": "ucc",
+          "permissions": [
+            "CLIENT_VIEW",
+            "REPORT_VIEW",
+            "SCR_CASE_ASSIGN",
+            "SCR_REPORT_VIEW",
+            "SCR_VIEW",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/screening",
+            "/screening/cases",
+            "/screening/matches",
+            "/screening/runs",
+            "/screening/high-risk",
+            "/screening-setup/watchlist"
+          ]
+        },
+        "SCR_INVESTIGATOR": {
+          "demoUser": "investigator",
+          "permissions": [
+            "ACCOUNT_VIEW",
+            "ATTACHMENT_MANAGE",
+            "ATTACHMENT_VIEW",
+            "CLIENT_VIEW",
+            "SCR_INVESTIGATE",
+            "SCR_RISK_TAG",
+            "SCR_VIEW",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/screening",
+            "/screening/cases",
+            "/screening/matches",
+            "/screening/runs",
+            "/screening/high-risk",
+            "/screening-setup/watchlist"
+          ]
+        },
+        "SCR_APPROVER": {
+          "demoUser": "scrapprover",
+          "permissions": [
+            "CLIENT_VIEW",
+            "SCR_CASE_APPROVE",
+            "SCR_CASE_ASSIGN",
+            "SCR_VIEW",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/screening",
+            "/screening/cases",
+            "/screening/matches",
+            "/screening/runs",
+            "/screening/high-risk",
+            "/screening-setup/watchlist"
+          ]
+        },
+        "AML_COMMITTEE": {
+          "demoUser": "amlcom1",
+          "permissions": ["ATTACHMENT_VIEW", "CLIENT_VIEW", "SCR_COMMITTEE", "SCR_VIEW"],
+          "screens": [
+            "/screening",
+            "/screening/cases",
+            "/screening/matches",
+            "/screening/runs",
+            "/screening/high-risk",
+            "/screening-setup/watchlist"
+          ]
+        },
+        "UAM_REQUESTOR": {
+          "demoUser": "requestor",
+          "permissions": [
+            "BULK_PROCESS",
+            "UAM_CANCEL",
+            "UAM_CORRECT",
+            "UAM_DEACTIVATE",
+            "UAM_ENROLL",
+            "UAM_MODIFY",
+            "UAM_REACTIVATE",
+            "UAM_VIEW"
+          ],
+          "screens": ["/user-access/requests", "/user-access/bulk"]
+        },
+        "UAM_APPROVER": {
+          "demoUser": "uamapprover",
+          "permissions": ["ACCESS_APPROVE", "REPORT_VIEW", "UAM_REPORT_VIEW", "UAM_VIEW"],
+          "screens": [
+            "/user-access/requests",
+            "/user-access/group-profiles",
+            "/user-access/bulk",
+            "/user-access/matrix",
+            "/user-access/reports"
+          ]
+        },
+        "UAM_SECOND_APPROVER": {
+          "demoUser": "secapprover",
+          "permissions": ["UAM_SECOND_APPROVE", "UAM_VIEW"],
+          "screens": ["/user-access/requests", "/user-access/group-profiles"]
+        }
+      }
     },
-    "COMPLIANCE_CHECKER": {
-      "demoUser": "compchk",
-      "permissions": [
-        "CLIENT_VIEW",
-        "REPORT_VIEW",
-        "SCR_CONFIG_APPROVE",
-        "SCR_LIST_APPROVE",
-        "SCR_REPORT_VIEW",
-        "SCR_VIEW"
-      ],
-      "screens": [
-        "/screening",
-        "/screening/cases",
-        "/screening/matches",
-        "/screening/runs",
-        "/screening/high-risk",
-        "/screening-setup/config",
-        "/screening-setup/templates",
-        "/screening-setup/watchlist",
-        "/screening-setup/sources"
-      ]
-    },
-    "UNIT_COMPLIANCE_COORD": {
-      "demoUser": "ucc",
-      "permissions": [
-        "CLIENT_VIEW",
-        "REPORT_VIEW",
-        "SCR_CASE_ASSIGN",
-        "SCR_REPORT_VIEW",
-        "SCR_VIEW",
-        "WORK_VIEW"
-      ],
-      "screens": [
-        "/screening",
-        "/screening/cases",
-        "/screening/matches",
-        "/screening/runs",
-        "/screening/high-risk",
-        "/screening-setup/watchlist"
-      ]
-    },
-    "SCR_INVESTIGATOR": {
-      "demoUser": "investigator",
-      "permissions": [
-        "ACCOUNT_VIEW",
-        "ATTACHMENT_MANAGE",
-        "ATTACHMENT_VIEW",
-        "CLIENT_VIEW",
-        "SCR_INVESTIGATE",
-        "SCR_RISK_TAG",
-        "SCR_VIEW",
-        "WORK_VIEW"
-      ],
-      "screens": [
-        "/screening",
-        "/screening/cases",
-        "/screening/matches",
-        "/screening/runs",
-        "/screening/high-risk",
-        "/screening-setup/watchlist"
-      ]
-    },
-    "SCR_APPROVER": {
-      "demoUser": "scrapprover",
-      "permissions": ["CLIENT_VIEW", "SCR_CASE_APPROVE", "SCR_CASE_ASSIGN", "SCR_VIEW", "WORK_VIEW"],
-      "screens": [
-        "/screening",
-        "/screening/cases",
-        "/screening/matches",
-        "/screening/runs",
-        "/screening/high-risk",
-        "/screening-setup/watchlist"
-      ]
-    },
-    "AML_COMMITTEE": {
-      "demoUser": "amlcom1",
-      "permissions": ["ATTACHMENT_VIEW", "CLIENT_VIEW", "SCR_COMMITTEE", "SCR_VIEW"],
-      "screens": [
-        "/screening",
-        "/screening/cases",
-        "/screening/matches",
-        "/screening/runs",
-        "/screening/high-risk",
-        "/screening-setup/watchlist"
-      ]
-    },
-    "UAM_REQUESTOR": {
-      "demoUser": "requestor",
-      "permissions": [
-        "BULK_PROCESS",
-        "UAM_CANCEL",
-        "UAM_CORRECT",
-        "UAM_DEACTIVATE",
-        "UAM_ENROLL",
-        "UAM_MODIFY",
-        "UAM_REACTIVATE",
-        "UAM_VIEW"
-      ],
-      "screens": ["/user-access/requests", "/user-access/bulk"]
-    },
-    "UAM_APPROVER": {
-      "demoUser": "uamapprover",
-      "permissions": ["ACCESS_APPROVE", "REPORT_VIEW", "UAM_REPORT_VIEW", "UAM_VIEW"],
-      "screens": [
-        "/user-access/requests",
-        "/user-access/group-profiles",
-        "/user-access/bulk",
-        "/user-access/matrix",
-        "/user-access/reports"
-      ]
-    },
-    "UAM_SECOND_APPROVER": {
-      "demoUser": "secapprover",
-      "permissions": ["UAM_SECOND_APPROVE", "UAM_VIEW"],
-      "screens": ["/user-access/requests", "/user-access/group-profiles"]
+    {
+      "id": "BRD-7",
+      "description": "Claims Handling (V1020, V1920; CLAIMS_BROKING_DESIGN 7.2) and the Marketing report access (BRCLM.040, CLQ15)",
+      "sections": ["brokerclaims"],
+      "sharedGroups": ["home", "client-policy", "operations", "reports"],
+      "sharedModules": ["help"],
+      "roles": {
+        "CLM_OFFICER": {
+          "demoUser": "clmofficer",
+          "permissions": [
+            "ACCOUNT_VIEW",
+            "ATTACHMENT_MANAGE",
+            "ATTACHMENT_VIEW",
+            "BCL_ACTION_PLAN",
+            "BCL_AUTHORIZE",
+            "BCL_COVER_VIEW",
+            "BCL_LOCATION_REF_MAINTAIN",
+            "BCL_RECORD",
+            "BCL_REPORT_EXPORT",
+            "BCL_REPORT_VIEW",
+            "BCL_STATUS_UPDATE",
+            "BCL_VIEW",
+            "BULK_PROCESS",
+            "CLIENT_VIEW",
+            "OPS_VIEW",
+            "REPORT_VIEW",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/claims-handling",
+            "/claims-handling/worklist",
+            "/claims-handling/new",
+            "/claims-handling/covers",
+            "/claims-handling/diary",
+            "/claims-handling/location-refs",
+            "/claims-handling/reports"
+          ]
+        },
+        "CLM_TL": {
+          "demoUser": "clmtl",
+          "permissions": [
+            "ACCOUNT_VIEW",
+            "ATTACHMENT_MANAGE",
+            "ATTACHMENT_VIEW",
+            "BCL_ACTION_PLAN",
+            "BCL_ADJUSTER_ASSIGN",
+            "BCL_AUTHORIZE",
+            "BCL_CLAIMANT_OVERRIDE",
+            "BCL_CLOSE",
+            "BCL_COVER_VIEW",
+            "BCL_FOLLOW_UP_OVERRIDE",
+            "BCL_LOCATION_REF_MAINTAIN",
+            "BCL_RECORD",
+            "BCL_REPORT_EXPORT",
+            "BCL_REPORT_VIEW",
+            "BCL_RESERVE_AMEND",
+            "BCL_SETTLEMENT_UPDATE",
+            "BCL_STATUS_UPDATE",
+            "BCL_VIEW",
+            "BULK_PROCESS",
+            "CLIENT_VIEW",
+            "OPS_VIEW",
+            "REPORT_VIEW",
+            "WORK_ASSIGN",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/claims-handling",
+            "/claims-handling/worklist",
+            "/claims-handling/new",
+            "/claims-handling/covers",
+            "/claims-handling/diary",
+            "/claims-handling/location-refs",
+            "/claims-handling/reports"
+          ]
+        },
+        "CLM_TH": {
+          "demoUser": "clmth",
+          "permissions": [
+            "ACCOUNT_VIEW",
+            "ATTACHMENT_MANAGE",
+            "ATTACHMENT_VIEW",
+            "BCL_ACTION_PLAN",
+            "BCL_ADJUSTER_ASSIGN",
+            "BCL_AUTHORIZE",
+            "BCL_CLAIMANT_OVERRIDE",
+            "BCL_CLOSE",
+            "BCL_COVER_VIEW",
+            "BCL_FOLLOW_UP_OVERRIDE",
+            "BCL_LOCATION_REF_MAINTAIN",
+            "BCL_RECORD",
+            "BCL_REOPEN",
+            "BCL_REPORT_EXPORT",
+            "BCL_REPORT_VIEW",
+            "BCL_RESERVE_AMEND",
+            "BCL_SETTLEMENT_UPDATE",
+            "BCL_STATUS_UPDATE",
+            "BCL_VIEW",
+            "BULK_PROCESS",
+            "CLIENT_VIEW",
+            "OPS_VIEW",
+            "REPORT_VIEW",
+            "WORK_ASSIGN",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/claims-handling",
+            "/claims-handling/worklist",
+            "/claims-handling/new",
+            "/claims-handling/covers",
+            "/claims-handling/diary",
+            "/claims-handling/location-refs",
+            "/claims-handling/reports"
+          ]
+        },
+        "CLM_UH": {
+          "demoUser": "clmuh",
+          "permissions": [
+            "ACCOUNT_VIEW",
+            "ATTACHMENT_VIEW",
+            "BCL_COVER_VIEW",
+            "BCL_DATA_EXTRACT",
+            "BCL_REOPEN",
+            "BCL_REPORT_EXPORT",
+            "BCL_REPORT_VIEW",
+            "BCL_SETUP",
+            "BCL_VIEW",
+            "CLIENT_VIEW",
+            "OPS_VIEW",
+            "REPORT_VIEW",
+            "WORK_ASSIGN",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/claims-handling",
+            "/claims-handling/worklist",
+            "/claims-handling/covers",
+            "/claims-handling/diary",
+            "/claims-handling/reports",
+            "/claims-handling/setup"
+          ]
+        },
+        "CLM_RISK": {
+          "demoUser": "clmrisk",
+          "permissions": [
+            "ACCOUNT_VIEW",
+            "ATTACHMENT_VIEW",
+            "BCL_COVER_VIEW",
+            "BCL_DATA_EXTRACT",
+            "BCL_REPORT_EXPORT",
+            "BCL_REPORT_VIEW",
+            "BCL_VIEW",
+            "CLIENT_VIEW",
+            "OPS_VIEW",
+            "REPORT_VIEW",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/claims-handling",
+            "/claims-handling/worklist",
+            "/claims-handling/covers",
+            "/claims-handling/diary",
+            "/claims-handling/reports"
+          ]
+        },
+        "MKT_AO": {
+          "demoUser": "ao",
+          "permissionScope": "BCL_",
+          "permissions": ["BCL_REPORT_VIEW"],
+          "screens": ["/claims-handling/reports"]
+        },
+        "MKT_TL": {
+          "demoUser": "mkttl",
+          "permissionScope": "BCL_",
+          "permissions": ["BCL_REPORT_EXPORT", "BCL_REPORT_VIEW"],
+          "screens": ["/claims-handling/reports"]
+        }
+      }
     }
-  }
+  ]
 }

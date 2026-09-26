@@ -78,6 +78,20 @@ export interface Assignee {
   team?: string;
 }
 
+/** One claim of a cover's loss experience (newest loss first). */
+export interface ClaimExperienceLine {
+  claimId: number;
+  claimNo: string;
+  policyYear: number;
+  lossDate: string;
+  statusCode?: string;
+  statusLabel?: string;
+  phase: string;
+  currency: string;
+  paid: number;
+  outstanding: number;
+}
+
 export interface ClaimExperience {
   arn: string;
   policyYear?: number;
@@ -87,6 +101,7 @@ export interface ClaimExperience {
   outstanding: number;
   total: number;
   statuses: Record<string, number>;
+  claims: ClaimExperienceLine[];
 }
 
 export const claimsHomeApi = {

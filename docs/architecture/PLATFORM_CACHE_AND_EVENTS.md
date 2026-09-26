@@ -181,6 +181,7 @@ the consumers have moved; additive fields do not change the version.
 | `bibs.catalog.product-version-released.v1` | `catalog.product-version.released` | product code | `ProductVersionReleased` (`WorkflowAndCatalogEventAdapter`) | product, version, effective from, request no., validator |
 | `bibs.crm.client-changed.v1` | `crm.client.registered`, `crm.client.changed` | client id | `crm.domain.Client` insert / update (entity capture) | id, prospect / client code, type, display name, status, KYC status, segment, party, changed fields |
 | `bibs.messaging.notification-requested.v1` | `messaging.notification.requested` | message id | `messaging.service.MessageQueuedEvent` (`MessagingEventAdapter`) | message id, purpose, record type / id, reference |
+| `bibs.storage.ecm-archive-requested.v1` | `storage.record.ecm-archive-requested` | `stored-file:<id>` | `FILE_ECM_ARCHIVE` job (`storage.service.StorageHousekeeping`; DOCUMENT_STORAGE_DECISION decision 5) | stored file id, record class, document type, owner type / id, content type, size, SHA-256, bucket, key, version, final time (no file name) |
 
 Every topic has a dead-letter topic `<topic>.dlt`. The adapters listen with
 `@TransactionalEventListener(phase = BEFORE_COMMIT, fallbackExecution = true)`; the source modules are

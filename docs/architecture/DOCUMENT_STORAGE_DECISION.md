@@ -2,6 +2,7 @@
 
 Status: **Approved by BDOI, 26-Sep-2026** (option C, GuardDuty, governance and legal hold per the DOA, BDOI-owned keys,
 ECM for records management). BDOI instruction: "documents and attachments live in an S3 bucket only".
+Build step ST0 is built (section 6); the module moves of ST1 follow the plan of section 7.
 
 ## 1. What is stored today
 
@@ -110,3 +111,78 @@ e-mail attachments, and ZIP bundles that are built on the fly.
 | DSQ02 | ECM interface specification: API, authentication, metadata schema, record classes, acknowledgement and error handling |
 | DSQ03 | The DOA roles allowed to place and release legal holds and to authorise a governance bypass |
 | DSQ04 | Key policy details: key administrators, rotation period, and whether imported key material is required |
+
+## 6. As built: ST0 foundation (26-Sep-2026)
+
+ST0 is in the code. No module table has moved yet: the `bytea` columns stay until ST1 (section 7).
+
+**Components.**
+
+| Part | Where | What it does |
+|---|---|---|
+| Port | `common.storage.FileStore` | `put`, `get`, `presignedGet`, `presignedPut`, `delete`, `copy`, `exists`, `metadata`, plus `list` (orphan reconciliation) and `legalHold` (Object Lock) |
+| S3 adapter | `common.storage.S3FileStore` | AWS SDK v2 on the JDK HTTP client. Every put and copy uses SSE-KMS with the key ARN of its bucket class (`brokerverse.storage.kms-keys.*`, bucket keys on) and carries its SHA-256 checksum, which S3 verifies. Download links force `Content-Disposition: attachment` and `Cache-Control: no-store`; upload links sign the encryption and checksum headers. Credentials come from the default chain (IRSA on EKS) |
+| Local adapter | `common.storage.LocalFileStore` | File system, for developer machines, automated tests and seed stacks. Marks every object clean (`NO_THREATS_FOUND`). Its links are application URLs (`/api/v1/files/local-content`) with an HMAC-signed token (object, method, expiry). Refused when `brokerverse.environment=production` |
+| Selection | `common.storage.StorageConfiguration` | `brokerverse.storage.provider` = `s3` or `local`. With `s3` the start is refused without the bucket and KMS key of the documents, reports and inbound classes |
+| Object keys | `common.storage.ObjectKeys` | `<company>/<entity-type>/<yyyy>/<mm>/<uuid>`; `incoming/` (presigned uploads) and `quarantine/` prefixes. The file name is never part of a key |
+| Metadata | `storage` module, table `stored_file` (V1100) | Section 3 columns plus scan status and result, legal hold (reason, placed by, approved by, time), final time, ECM status and reference, soft delete and purge time |
+| Record classes | `sto_record_class` (V1100, V1101) | Parameterised: bucket class, retention record type (mapped to `nba_retention_rule`: the longest active rule, years online plus years in archive), fallback period, "under legal hold", "archive to ECM", active. Changed by the DOA approvers only (`PUT /api/v1/files/record-classes/{code}`, audited) |
+| Storing | `storage.service.StoredFileService` | Size (25 MB through the application), type by extension confirmed by the file signature, SHA-256 (compared with a checksum the sender declares), object first, then the row, scan result, audit entry. `read` re-checks the SHA-256 for streaming flows |
+| Owner permission SPI | `storage.service.FileOwnerAccess` | The owning module decides `mayRead` / `mayStore` for its owner types. Owner types without a resolver are refused |
+| Download link | `GET /api/v1/files/{id}/link` | Owner permission, then scan state (only clean files), then a link valid for `FILE_LINK_TTL_SECONDS` (default 300). Each issue and each refusal is audited with user, file, time and client address |
+| Inbound upload | `POST /api/v1/files/inbound-uploads`, `POST /api/v1/files/{id}/upload-complete` | Presigned PUT into `incoming/` of the inbound bucket for large bulk files. The SHA-256 is declared up front and signed into the link |
+| Malware scan | `storage.service.FileScanService` | Reads the tag `GuardDutyMalwareScanStatus`. `NO_THREATS_FOUND` makes the file downloadable. Any other result moves the object to `quarantine/`, marks the row `QUARANTINED` and calls `FileQuarantineListener`: an in-app notification (event `FILE_QUARANTINED`) to the uploader and to the holders of `FILE_QUARANTINE_VIEW`, plus the alert `FILE_QUARANTINED`. A file without a result stays `PENDING` and cannot be downloaded |
+| Legal hold | `storage.service.LegalHoldService` | Controlled action: `FILE_LEGAL_HOLD_REQUEST` requests PLACE or RELEASE with a reason; another user with `FILE_LEGAL_HOLD_APPROVE` approves or rejects it (approval inbox item). The approval sets or clears the Object Lock legal hold and records requester, approver and reason. Files of a class "under legal hold" get their hold when their scan is clean. Held files cannot be deleted and are never removed by the retention job |
+| Jobs | `FILE_SCAN_RESULTS` (every 5 minutes), `FILE_ORPHAN_RECONCILIATION` (daily), `FILE_RETENTION` (daily), `FILE_ECM_ARCHIVE` (every 15 minutes) | Read pending scan results; delete objects older than 24 hours that have no row (held objects are kept); remove the objects of files past retention or soft-deleted for longer than 30 days, and close announced uploads never confirmed (held files are counted, not removed); publish final records of the "archive to ECM" classes |
+| ECM publisher | topic `bibs.storage.ecm-archive-requested.v1` | Through the integration outbox, outside the user's transaction. The payload carries identifiers and object facts only; the file name stays in the row. The ECM adapter that consumes it waits for DSQ02 and then calls `StoredFileService.recordEcmReference` |
+
+**Roles and permissions (V1101).** `RECORDS_HOLD_OFFICER` (`FILE_LEGAL_HOLD_REQUEST`), `RECORDS_HOLD_APPROVER`
+(`FILE_LEGAL_HOLD_APPROVE`) and `INFOSEC_OFFICER` (`FILE_QUARANTINE_VIEW`, `AUDIT_VIEW`). The auditor also holds
+`FILE_QUARANTINE_VIEW`. When BDOI answers DSQ03, administrators grant the legal hold permissions to the DOA roles it
+names. Seed users: `holdofficer`, `holdapprover` and `infosec` (V1109, seed data only).
+
+**Tests.**
+- `LocalFileStoreTest` covers the local adapter and its links: expiry, tampering, wrong method and checksum.
+- `S3FileStoreTest` runs the S3 adapter through the real AWS SDK against an in-process S3 REST service. No container
+  runtime is available on the build hosts, so the MinIO container test is replaced by this service. Object Lock,
+  bucket policies and GuardDuty itself are verified in the DEV account.
+- `StoredFileIT` covers upload, link and download, permission refused, the checksum, type and integrity checks,
+  inbound upload with a pending and a quarantined scan, and the record classes with the retention mapping.
+- `StorageJobsIT` covers legal hold, class holds, retention delete, deleted and abandoned files, orphan clean-up and
+  the ECM publisher.
+
+**Still to do.**
+- The ECM adapter (DSQ02).
+- The DOA role names (DSQ03).
+- The buckets, keys, IRSA role, VPC endpoint, replication, Object Lock and GuardDuty per environment (BDOI IT,
+  section 4).
+- The module moves of ST1.
+
+## 7. ST1 plan per table
+
+Each table is moved in the owner's Flyway range, in three steps:
+1. Add a nullable `stored_file_id` and write new files through `StoredFileService.store`.
+2. Copy the existing bytes with a one-off system job that stores each file, checks the SHA-256 and sets
+   `stored_file_id`. Reads then switch to a presigned link (downloads) or `StoredFileService.read` (streamed flows).
+3. After the reconciliation report of the copy is signed off, a later migration drops the `bytea` column.
+
+Each owning module also adds a `FileOwnerAccess` bean for its owner types, which reuses the permission of today's
+download endpoint.
+
+| Table (migration) | Module | Record class | Download after ST1 |
+|---|---|---|---|
+| `doc_attachment_content` (V21) | attachment | `GENERAL_DOCUMENT`; screening, STR, KYC, claim and payment-request documents by document type | Link. The document access classes (V1031) become the `FileOwnerAccess` of `attachment`. ZIP bundles are streamed |
+| `report_batch` (V32), `report_run_file` (V762) | report | `REPORT_OUTPUT` (reports bucket) | Link. Report jobs write straight to S3 |
+| `msg_outbound_attachment` (V753) | messaging | Class of the attached record | Streamed: password-protected e-mail attachments are read with `read` |
+| `ops_extract_file` (V761) | opsledger | `WORKING_FILE` | Link |
+| `csh_print_batch` (V763) | cashiering | `OFFICIAL_RECEIPT` (receipt prints) | Link |
+| `rem_batch_document` (V770) | remittance | `GENERAL_DOCUMENT` | Link |
+| `plc_slip_file` (V850) | placement | `POLICY_DOCUMENT` (slips) | Link |
+| `iss_upload_item` (V860) | issuance | `INBOUND_FILE` | Link |
+| `iss_insurance_advice` (V860) | issuance | `POLICY_DOCUMENT` | Link |
+| `bkg_service_invoice` (V870) | booking | `STATEMENT_OF_ACCOUNT` | Link |
+| `dsb_eod_output` (V892) | disbursement | `WORKING_FILE` (bank files) | Link |
+| `clx_billing_document` (V1002) | collections | `STATEMENT_OF_ACCOUNT` | Link |
+
+`doc_rendition` (V756) keeps only the specification and the SHA-256, so it does not move. Watchlist feeds and bank or
+insurer files that arrive in bulk use the inbound presigned upload.

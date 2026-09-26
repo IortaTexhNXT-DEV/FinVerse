@@ -160,7 +160,7 @@ class KafkaEventsIT extends PlatformServicesSupport {
 
     api.doGet(ADMIN, "/api/v1/admin/events/topics")
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.length()").value(9))
+        .andExpect(jsonPath("$.length()").value(10))
         .andExpect(jsonPath("$[0].kafkaEnabled").value(true));
     api.doPost(ADMIN, "/api/v1/admin/events/outbox/" + id + "/retry", null)
         .andExpect(status().isNoContent());

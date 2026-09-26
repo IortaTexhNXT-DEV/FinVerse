@@ -94,9 +94,10 @@ spring:
       auto-create: ${BROKERVERSE_KAFKA_CREATE_TOPICS:true}
   servlet:
     multipart:
-      # Must be >= brokerverse.attachments.max-size (the service applies the business limit).
-      max-file-size: ${BROKERVERSE_UPLOAD_MAX_FILE_SIZE:20MB}
-      max-request-size: ${BROKERVERSE_UPLOAD_MAX_REQUEST_SIZE:21MB}
+      # Must be >= brokerverse.attachments.max-size and brokerverse.storage.max-upload-size (the
+      # services apply the business limits).
+      max-file-size: ${BROKERVERSE_UPLOAD_MAX_FILE_SIZE:25MB}
+      max-request-size: ${BROKERVERSE_UPLOAD_MAX_REQUEST_SIZE:26MB}
 
 server:
   port: ${BROKERVERSE_PORT:8080}
@@ -127,6 +128,41 @@ brokerverse:
       failed-attempt-window: ${BROKERVERSE_LOGIN_FAILURE_WINDOW:P1D}
   attachments:
     max-size: ${BROKERVERSE_ATTACHMENT_MAX_SIZE:10MB}
+  # ---- Document storage (build step ST0), docs/architecture/DOCUMENT_STORAGE_DECISION.md ----
+  storage:
+    # s3 (every shared environment; the local store is refused in production) or local (file system).
+    provider: ${BROKERVERSE_STORAGE_PROVIDER:local}
+    region: ${BROKERVERSE_STORAGE_REGION:ap-southeast-1}
+    # Only for an S3-compatible service in tests; leave empty for AWS (VPC gateway endpoint).
+    endpoint: ${BROKERVERSE_STORAGE_ENDPOINT:}
+    path-style-access: ${BROKERVERSE_STORAGE_PATH_STYLE:false}
+    buckets:
+      documents: ${BROKERVERSE_STORAGE_BUCKET_DOCUMENTS:}
+      reports: ${BROKERVERSE_STORAGE_BUCKET_REPORTS:}
+      inbound: ${BROKERVERSE_STORAGE_BUCKET_INBOUND:}
+      migration: ${BROKERVERSE_STORAGE_BUCKET_MIGRATION:}
+    # ARNs of the BDOI-owned customer-managed KMS keys (SSE-KMS), one per bucket class.
+    kms-keys:
+      documents: ${BROKERVERSE_STORAGE_KMS_DOCUMENTS:}
+      reports: ${BROKERVERSE_STORAGE_KMS_REPORTS:}
+      inbound: ${BROKERVERSE_STORAGE_KMS_INBOUND:}
+      migration: ${BROKERVERSE_STORAGE_KMS_MIGRATION:}
+    local:
+      root: ${BROKERVERSE_STORAGE_LOCAL_ROOT:${java.io.tmpdir}/brokerverse-files}
+      link-secret: ${BROKERVERSE_STORAGE_LOCAL_LINK_SECRET:}
+      scan-status: ${BROKERVERSE_STORAGE_LOCAL_SCAN_STATUS:NO_THREATS_FOUND}
+    # Files through the application; larger bulk files go by presigned PUT to the inbound bucket.
+    max-upload-size: ${BROKERVERSE_STORAGE_MAX_UPLOAD_SIZE:25MB}
+    # Fallback of the parameter FILE_LINK_TTL_SECONDS (presigned link validity).
+    link-ttl: ${BROKERVERSE_STORAGE_LINK_TTL:PT5M}
+    orphan-age: ${BROKERVERSE_STORAGE_ORPHAN_AGE:PT24H}
+    deleted-grace: ${BROKERVERSE_STORAGE_DELETED_GRACE:P30D}
+    scan-tag: ${BROKERVERSE_STORAGE_SCAN_TAG:GuardDutyMalwareScanStatus}
+    jobs:
+      scan-results-cron: ${BROKERVERSE_JOB_FILE_SCAN_RESULTS_CRON:0 */5 * * * *}
+      orphan-cron: ${BROKERVERSE_JOB_FILE_ORPHAN_CRON:0 10 2 * * *}
+      retention-cron: ${BROKERVERSE_JOB_FILE_RETENTION_CRON:0 40 2 * * *}
+      ecm-archive-cron: ${BROKERVERSE_JOB_FILE_ECM_ARCHIVE_CRON:0 */15 * * * *}
   # ---- Platform cache and events, docs/architecture/PLATFORM_CACHE_AND_EVENTS.md ----
   redis:
     # true: Redis for caches, job locks, token denylist and shared counters (spring.data.redis.*);

@@ -33,7 +33,6 @@ dormant.
 
 | Document | Edit | When |
 |---|---|---|
-| `docs/development/DEVELOPER_GUIDE.md` | FileStore rule: no bytea column for file content; files go through `common/storage` `FileStore` and `stored_file` (DOCUMENT_STORAGE_DECISION section 4) | When build step ST0 lands (not in the code on 26-Sep-2026) |
 | `docs/deliverables/src/alignment/PROGRAMME_ALIGNMENT.md`, `alignment_data.yaml` (client document v1.1) | IQ02 and IQ03 answered (DMQ37, DMQ36); the renewal check is named `PACKAGE_REMAP`; the link to `ARCHITECTURE_OPTION_DECISION.md` at IQ25 / DCR-222 / DCR-223; the drop folders as built (`out/Drop-0_Setup_and_Data_Migration/`, `out/Drop-1_Transactional/`, `out/Drop-2_Independent/`, `out/Programme/`); "Status as of" date | Next alignment pack issue |
 | `docs/deliverables/src/migration/build_migration_pack.py` | Example file name `F01C_EBIX_20270226_01.csv` in the workbook README and the templates README: use a December 2027 date for a January 2028 go-live | Next migration pack issue |
 | Data Migration documents (DATA_MIGRATION_DESIGN section 15, dm_layouts.yaml object P03, FRS BRD-13, test plan BRD-13, migration pack) | BDOI answers DMQ36-DMQ39: no carried RMEL cohorts (P03), remapping at sanitation (the PACKAGE map is loaded only), RMEL and dispositions in Excel, year-end option A | Data Migration team (in progress) |

@@ -31,6 +31,7 @@
     <zonky.embedded-pg.version>2.1.0</zonky.embedded-pg.version>
     <archunit.version>1.4.1</archunit.version>
     <jedis-mock.version>1.1.19</jedis-mock.version>
+    <awssdk.version>2.55.6</awssdk.version>
     <surefire.runOrder>alphabetical</surefire.runOrder>
 
     <!-- Quality tooling versions -->
@@ -161,6 +162,46 @@
       <groupId>com.google.re2j</groupId>
       <artifactId>re2j</artifactId>
       <version>${re2j.version}</version>
+    </dependency>
+
+    <!-- Document storage (common.storage S3FileStore): Amazon S3 with SSE-KMS and presigned links;
+         STS for the IAM role of the service account (web identity). Synchronous clients only, on the
+         JDK HTTP client (url-connection-client): Apache HttpClient 5 on the classpath would change the
+         HTTP client Spring picks for the application's own REST clients. -->
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>s3</artifactId>
+      <version>${awssdk.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>software.amazon.awssdk</groupId>
+          <artifactId>netty-nio-client</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>software.amazon.awssdk</groupId>
+          <artifactId>apache5-client</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>sts</artifactId>
+      <version>${awssdk.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>software.amazon.awssdk</groupId>
+          <artifactId>netty-nio-client</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>software.amazon.awssdk</groupId>
+          <artifactId>apache5-client</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>url-connection-client</artifactId>
+      <version>${awssdk.version}</version>
     </dependency>
 
     <!-- Metrics -->

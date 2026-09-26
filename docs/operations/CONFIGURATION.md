@@ -162,6 +162,43 @@ every problem in one message, when:
 The base `application.yml` holds no password or signing key. Only the `seed` profile (local stacks, SIT, UAT and
 training) and the automated tests carry local values, and the `seed` profile is refused in production.
 
+## Document storage (S3, build step ST0)
+
+Design and as-built description: [`DOCUMENT_STORAGE_DECISION.md`](../architecture/DOCUMENT_STORAGE_DECISION.md)
+sections 3 to 6. File content lives in S3. BIBS keeps the metadata (`stored_file`) and issues short-lived presigned
+links. All properties are under `brokerverse.storage.*`.
+
+| Variable | Required in prod | Default | Purpose |
+|---|---|---|---|
+| `BROKERVERSE_STORAGE_PROVIDER` | yes (`s3`) | `local` | `brokerverse.storage.provider`. `s3`: Amazon S3 with SSE-KMS; the start is refused without the bucket and KMS key of the documents, reports and inbound classes. `local`: file system for developer machines, automated tests and seed stacks; refused when `BROKERVERSE_ENVIRONMENT=production`. |
+| `BROKERVERSE_STORAGE_REGION` | yes | `ap-southeast-1` | `brokerverse.storage.region`: AWS region of the buckets. It must be an approved region: Singapore for the Philippine data; the DR region depends on DSQ01. |
+| `BROKERVERSE_STORAGE_BUCKET_DOCUMENTS` | with `s3` | – | `brokerverse.storage.buckets.documents`, e.g. `bibs-prod-documents`. Versioning, Object Lock (governance mode) and GuardDuty on the upload prefix. |
+| `BROKERVERSE_STORAGE_BUCKET_REPORTS` | with `s3` | – | `brokerverse.storage.buckets.reports` (report runs, scheduled files, batch ZIPs). |
+| `BROKERVERSE_STORAGE_BUCKET_INBOUND` | with `s3` | – | `brokerverse.storage.buckets.inbound` (bulk and bank or insurer files; GuardDuty enabled). |
+| `BROKERVERSE_STORAGE_BUCKET_MIGRATION` | no | – | `brokerverse.storage.buckets.migration` (migration extracts; expire after 5 days; migration role only). |
+| `BROKERVERSE_STORAGE_KMS_DOCUMENTS` / `_REPORTS` / `_INBOUND` / `_MIGRATION` | with `s3` (the first three) | – | `brokerverse.storage.kms-keys.*`: ARN of the BDOI-owned customer-managed KMS key of each bucket class (SSE-KMS, bucket keys on). The key policy gives the BIBS service role encrypt, decrypt and generate-data-key only. Imported key material or an external key store needs no change to BIBS. |
+| `BROKERVERSE_STORAGE_ENDPOINT` | no (empty on AWS) | – | `brokerverse.storage.endpoint`: an S3-compatible endpoint for tests only. On AWS traffic goes through the S3 VPC gateway endpoint without an override. |
+| `BROKERVERSE_STORAGE_PATH_STYLE` | no | `false` | `brokerverse.storage.path-style-access` (S3-compatible services). |
+| `BROKERVERSE_STORAGE_LOCAL_ROOT` | no | `<tmp>/brokerverse-files` | `brokerverse.storage.local.root`: folder of the local store. |
+| `BROKERVERSE_STORAGE_LOCAL_LINK_SECRET` | no | random per start | `brokerverse.storage.local.link-secret`: key that signs the links of the local store. Set it when several instances share one local folder. |
+| `BROKERVERSE_STORAGE_LOCAL_SCAN_STATUS` | no | `NO_THREATS_FOUND` | `brokerverse.storage.local.scan-status`: scan result the local store gives every object (it marks files clean). |
+| `BROKERVERSE_STORAGE_MAX_UPLOAD_SIZE` | no | `25MB` | `brokerverse.storage.max-upload-size`: largest file accepted through the application. Larger bulk files go by presigned PUT (up to 5 GB). `BROKERVERSE_UPLOAD_MAX_FILE_SIZE` / `BROKERVERSE_UPLOAD_MAX_REQUEST_SIZE` (`spring.servlet.multipart.*`, now `25MB` / `26MB`) and the ingress body limit must allow it. |
+| `BROKERVERSE_STORAGE_LINK_TTL` | no | `PT5M` | `brokerverse.storage.link-ttl`: fallback for the business parameter `FILE_LINK_TTL_SECONDS` (seeded 300, range 30-3600, *Administration › Parameters*), which sets the validity of presigned links. |
+| `BROKERVERSE_STORAGE_ORPHAN_AGE` | no | `PT24H` | `brokerverse.storage.orphan-age`: objects without a metadata row older than this are deleted by `FILE_ORPHAN_RECONCILIATION`. Announced uploads not confirmed within it are closed. |
+| `BROKERVERSE_STORAGE_DELETED_GRACE` | no | `P30D` | `brokerverse.storage.deleted-grace`: time between the soft delete of a file and the removal of its object by `FILE_RETENTION`. |
+| `BROKERVERSE_STORAGE_SCAN_TAG` | no | `GuardDutyMalwareScanStatus` | `brokerverse.storage.scan-tag`: object tag with the malware scan result. Only `NO_THREATS_FOUND` is accepted. |
+| `BROKERVERSE_JOB_FILE_SCAN_RESULTS_CRON` | no | `0 */5 * * * *` | Spring cron (UTC) of `FILE_SCAN_RESULTS` (every 5 minutes): reads the scan results of pending files and quarantines infected ones (notification to the uploader and to `FILE_QUARANTINE_VIEW`, alert `FILE_QUARANTINED`). Property `brokerverse.storage.jobs.scan-results-cron`. |
+| `BROKERVERSE_JOB_FILE_ORPHAN_CRON` | no | `0 10 2 * * *` | Spring cron (UTC) of `FILE_ORPHAN_RECONCILIATION` (daily): deletes objects that have had no row for 24 hours and are not under legal hold. Property `brokerverse.storage.jobs.orphan-cron`. |
+| `BROKERVERSE_JOB_FILE_RETENTION_CRON` | no | `0 40 2 * * *` | Spring cron (UTC) of `FILE_RETENTION` (daily): removes the objects of files past retention (record class mapped to the retention rules) or deleted longer than the grace period. Files under legal hold are kept and counted. Property `brokerverse.storage.jobs.retention-cron`. |
+| `BROKERVERSE_JOB_FILE_ECM_ARCHIVE_CRON` | no | `0 */15 * * * *` | Spring cron (UTC) of `FILE_ECM_ARCHIVE` (every 15 minutes): publishes final records of the "archive to ECM" classes to `bibs.storage.ecm-archive-requested.v1`. Property `brokerverse.storage.jobs.ecm-archive-cron`. |
+
+Credentials are never configured. On EKS the pod uses the IAM role of its service account (IRSA) through the AWS
+default credential chain. For the S3 adapter's own test on a developer machine, the standard `AWS_*` variables can
+be used.
+
+The storage users of the seed data (`holdofficer`, `holdapprover`, `infosec`) are in `db/seed/V1109`, which is in
+the document storage range V1100-V1109.
+
 ## Seed data (SIT, UAT and training)
 
 The `seed` profile adds the Flyway location `classpath:db/seed` (versions V900-V999 and V1900-V1999) and the seed

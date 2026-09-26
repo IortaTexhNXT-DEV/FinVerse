@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 export interface AcceptanceInput {
   file?: File;
@@ -65,14 +66,7 @@ export function AcceptanceDialog({
           label="Client's acceptance e-mail"
           hint="Upload the e-mail (.eml, .msg or PDF); leave empty when it is already attached."
         >
-          {(id) => (
-            <input
-              id={id}
-              className="input"
-              type="file"
-              onChange={(e) => setFile(e.target.files?.[0])}
-            />
-          )}
+          {(id) => <FileDropZone id={id} onChange={(files) => setFile(files[0])} />}
         </Field>
         {groups.length > 1 && (
           <fieldset className="stack">

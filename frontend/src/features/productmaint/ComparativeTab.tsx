@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { TextInput } from '@/features/assets/FormControls';
 import { formatDateTime } from '@/utils/format';
 import { COMPARATIVE_FIELDS } from './packageRequest';
+import { displayNameOf } from '@/api/users';
 
 function orDash(value: string | undefined): string {
   return value === undefined || value === '' ? '—' : value;
@@ -156,7 +157,7 @@ function OutputsCard({
     {
       key: 'by',
       header: 'Generated',
-      render: (o) => `${o.generatedBy} · ${formatDateTime(o.generatedAt)}`,
+      render: (o) => `${displayNameOf(o.generatedBy)} · ${formatDateTime(o.generatedAt)}`,
     },
     {
       key: 'hash',

@@ -15,7 +15,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId, useWorkspace } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
+import { formatDate, humanize } from '@/utils/format';
 import { AssignJournalsDialog } from './AssignJournalsDialog';
 import { ConfirmPostingDialog } from './ConfirmPostingDialog';
 import { JournalFiltersCard } from './JournalFiltersCard';
@@ -153,7 +153,7 @@ export default function JournalsPage() {
             ),
             { key: 'no', header: 'Batch No.', render: (j) => <strong>{j.batchNo}</strong> },
             { key: 'date', header: 'Value Date', render: (j) => formatDate(j.valueDate) },
-            { key: 'type', header: 'Type', render: (j) => j.journalType },
+            { key: 'type', header: 'Type', render: (j) => humanize(j.journalType) },
             { key: 'nar', header: 'Narration', render: (j) => j.narration },
             { key: 'by', header: 'Inputter', render: (j) => j.createdBy },
             { key: 'to', header: 'Assigned To', render: (j) => j.assignedTo ?? '' },

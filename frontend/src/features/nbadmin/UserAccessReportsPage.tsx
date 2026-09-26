@@ -15,7 +15,7 @@ export default function UserAccessReportsPage() {
       <PageHeader
         section="User Access"
         title="User Access Reports"
-        description="Who has which access, who granted it and every access activity; each report opens in the report runner with PDF, Excel and CSV exports."
+        description="Who has which access, who granted it and every access activity."
       />
       <Card title="Reports">
         <ul className="uam-reports">
@@ -28,7 +28,7 @@ export default function UserAccessReportsPage() {
                 </h3>
                 <p className="uam-report-text">{r.text}</p>
                 <div className="uam-report-meta">
-                  {r.code} · {r.brd} · Parameters: {r.parameters}
+                  {r.code} · Parameters: {r.parameters}
                 </div>
               </div>
             </li>

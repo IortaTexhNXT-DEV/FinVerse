@@ -175,7 +175,7 @@ export default function ReceiptsPage() {
       <PageHeader
         section="Cashiering"
         title="Receipts"
-        description="Acknowledgement receipts (AR) and Head Office official receipts (OR): search, open, print, cancel and reinstate."
+        description="Acknowledgement receipts (AR) and Head Office official receipts (OR)."
         actions={
           can('CASH_RECEIPT') && (
             <Button

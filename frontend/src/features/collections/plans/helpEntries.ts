@@ -16,9 +16,9 @@ export const PLAN_HELP: HelpScreen[] = [
       'Refresh Allocation applies the latest ledger payments at once; the nightly promise check does it for every live plan.',
     ],
     controls: [
-      'Payments are allocated from the invoice ledger, oldest due installment first (BRCLXN.054).',
+      'Payments are allocated from the invoice ledger, oldest due installment first.',
       'An installment past its due date and not fully paid is flagged Overdue and can escalate the account.',
-      'One live plan per invoice or account; a plan changes neither the booking nor the GL (BRCLXN.060).',
+      'One live plan per invoice or account; a plan changes neither the booking nor the GL.',
       'Creating and cancelling plans needs CLX_BILLING.',
     ],
   },
@@ -40,9 +40,9 @@ export const PLAN_HELP: HelpScreen[] = [
       'Select open promises and Withdraw Promise when the client withdraws them.',
     ],
     controls: [
-      'Kept when the promised amount was paid in time or nothing is left to collect; partially kept when some of it was paid; otherwise broken (BRCLXN.055).',
+      'Kept when the promised amount was paid in time or nothing is left to collect; partially kept when some of it was paid; otherwise broken.',
       'A new promise on the same invoice replaces the running one.',
-      'A broken promise notifies the collector and escalates the account through the broken-promise rules (BRCLXN.049).',
+      'A broken promise notifies the collector and escalates the account through the broken-promise rules.',
     ],
   },
 ];

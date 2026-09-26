@@ -66,10 +66,10 @@ export function PlacementPanel({ arn }: Readonly<{ arn: string }>) {
         <dd>
           {hold
             ? `${humanize(hold.status)}, ${formatDate(hold.startDate)} to ${formatDate(hold.expiryDate)}`
-            : 'None'}
+            : '—'}
         </dd>
         <dt>Insurer return</dt>
-        <dd>{lastReturn ? returnText(lastReturn) : 'None'}</dd>
+        <dd>{lastReturn ? returnText(lastReturn) : '—'}</dd>
       </dl>
     </Card>
   );

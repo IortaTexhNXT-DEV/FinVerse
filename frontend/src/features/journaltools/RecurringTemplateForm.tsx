@@ -7,6 +7,7 @@ import { lineProblems } from '@/features/gl/journalMath';
 import { humanize } from '@/utils/format';
 import { FREQUENCIES } from './recurringModel';
 import type { TemplateForm } from './recurringModel';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface Props {
   value: TemplateForm;
@@ -134,10 +135,8 @@ function ScheduleFields({ value, onChange }: Readonly<Props>) {
         </Field>
         <Field label="Start date" required>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               value={value.startDate}
               onChange={(e) => set('startDate', e.target.value)}
             />
@@ -145,10 +144,8 @@ function ScheduleFields({ value, onChange }: Readonly<Props>) {
         </Field>
         <Field label="End date" hint="Blank = no end">
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               value={value.endDate ?? ''}
               onChange={(e) => set('endDate', e.target.value)}
             />

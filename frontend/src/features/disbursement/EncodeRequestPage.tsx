@@ -104,7 +104,7 @@ export default function EncodeRequestPage() {
         section="Finance · Disbursement"
         backTo="/disbursement"
         title="Encode Payment Request"
-        description="A payment that does not come from another module; the voucher is created at once when the payee is maintained."
+        description="A payment that does not come from another module."
         actions={
           <Button icon={<Save size={16} />} busy={save.isPending} onClick={submit}>
             Save Request

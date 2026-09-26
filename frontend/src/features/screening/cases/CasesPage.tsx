@@ -35,6 +35,7 @@ import {
   toSearch,
 } from './caseLogic';
 import type { CaseFilters, FilterKey } from './caseLogic';
+import { DateInput } from '@/components/ui/DateInput';
 
 function Select({
   label,
@@ -87,10 +88,8 @@ function FilterBar({
     <div className="worklist-filters form-grid">
       <Field label="Created From">
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            type="date"
-            className="input"
             value={filters.createdFrom ?? ''}
             onChange={(e) => set('createdFrom', e.target.value)}
           />
@@ -98,10 +97,8 @@ function FilterBar({
       </Field>
       <Field label="Created To" error={dateError}>
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            type="date"
-            className="input"
             value={filters.createdTo ?? ''}
             onChange={(e) => set('createdTo', e.target.value)}
           />
@@ -270,7 +267,7 @@ export default function CasesPage() {
       <PageHeader
         section="Client & Policy · Sanction Screening"
         title="Cases"
-        description="Screening cases by stage: investigate, approve, review escalations, decide in committee and prepare STRs. Open a case to work it; filters stay in the address so a list can be shared."
+        description="Screening cases by stage: investigate, approve, review escalations, decide in committee."
       />
       <Tabs tabs={CASE_TABS} active={tab} onChange={(t) => update(t, filters)} />
       <Card flush>

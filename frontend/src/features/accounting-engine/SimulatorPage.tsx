@@ -58,7 +58,7 @@ export default function SimulatorPage() {
       <PageHeader
         section="Accounting Engine"
         title="Rule Simulator"
-        description="Preview the journal an event would generate with the rules in force. Nothing is posted."
+        description="Preview the journal an event would generate with the rules in force."
         actions={
           <Button
             variant="accent"

@@ -18,6 +18,7 @@ import { formatDateTime, humanize } from '@/utils/format';
 import { CodeSelect, TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { Layout, MinimalBalanceRule } from './cashieringApi';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'layouts', label: 'Payment File Layouts' },
@@ -122,7 +123,8 @@ function Layouts() {
     {
       key: 'upd',
       header: 'Last Changed',
-      render: (l) => (l.updatedBy ? `${l.updatedBy} · ${formatDateTime(l.updatedAt)}` : ''),
+      render: (l) =>
+        l.updatedBy ? `${displayNameOf(l.updatedBy)} · ${formatDateTime(l.updatedAt)}` : '',
     },
     {
       key: 'edit',
@@ -137,10 +139,6 @@ function Layouts() {
   ];
   return (
     <>
-      <p className="muted">
-        The bank and channel file layouts are still to be confirmed by BDOI (OQ03/OQ04): the parser
-        reads the configured kind.
-      </p>
       <ErrorAlert error={list.error} />
       <DataTable
         caption="Payment file layouts"
@@ -204,7 +202,7 @@ function MinimalBalance() {
     <>
       <div className="worklist-toolbar">
         <span className="muted">
-          Balances at or below the limits are cleared by the MINIMAL_BALANCE_SWEEP job (CSHID.016).
+          Balances at or below the limits are cleared by a scheduled job.
         </span>
         <div className="worklist-actions">
           {can('CASH_APPROVE') && (

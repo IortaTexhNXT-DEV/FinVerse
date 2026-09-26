@@ -7,6 +7,7 @@ import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import type { Application, ReceiptAction, ReceiptDetail, ReceiptLine } from './cashieringApi';
 import { allocationRows, componentLabel, journalRows } from './cashieringLogic';
 import type { JournalRow, ReceiptTabId } from './cashieringLogic';
+import { displayNameOf } from '@/api/users';
 
 const APPLICATION_COLUMNS: Column<Application>[] = [
   {
@@ -56,12 +57,13 @@ const ACTION_COLUMNS: Column<ReceiptAction>[] = [
   {
     key: 'req',
     header: 'Requested',
-    render: (a) => `${a.requestedBy} · ${formatDateTime(a.requestedAt)}`,
+    render: (a) => `${displayNameOf(a.requestedBy)} · ${formatDateTime(a.requestedAt)}`,
   },
   {
     key: 'appr',
     header: 'Approved',
-    render: (a) => (a.approvedBy ? `${a.approvedBy} · ${formatDateTime(a.approvedAt)}` : ''),
+    render: (a) =>
+      a.approvedBy ? `${displayNameOf(a.approvedBy)} · ${formatDateTime(a.approvedAt)}` : '',
   },
   { key: 'stage', header: 'Status', render: (a) => <StatusBadge status={a.stage} /> },
 ];

@@ -123,7 +123,7 @@ export default function ConfigVersionsPage() {
       <PageHeader
         section="Setup & Administration · Compliance Setup"
         title="Configuration Versions"
-        description="Matching criteria, risk rules, approval, assignment and SLA matrices, validation rules and the STR layout, each as dated versions: a Compliance Officer drafts and submits, a Compliance Checker approves or rejects."
+        description="Matching criteria, risk rules, matrices and validation rules, as dated versions."
       />
       <Tabs
         tabs={CONFIG_TYPES.map((t) => ({ id: t.type, label: t.label }))}

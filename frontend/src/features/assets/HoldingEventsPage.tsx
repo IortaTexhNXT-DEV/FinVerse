@@ -76,7 +76,7 @@ export default function HoldingEventsPage() {
       <PageHeader
         section="Assets & Investments"
         title="Maturities & Sales"
-        description="Held investments ordered by maturity. Record coupons received, redemptions at maturity, sales (realized gain or loss) and fair value updates of FVOCI / FVPL holdings."
+        description="Held investments ordered by maturity."
       />
       <ErrorAlert error={holdings.error ?? history.error} />
       <Card flush>

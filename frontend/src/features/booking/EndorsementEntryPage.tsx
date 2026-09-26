@@ -15,6 +15,7 @@ import { today } from '@/utils/format';
 import { JournalLines, PremiumTables } from './BookingParts';
 import { endorsementErrors, endorsementRequest, isValid, labelOf } from './bookingForm';
 import type { EndorsementForm, FieldErrors } from './bookingForm';
+import { DateInput } from '@/components/ui/DateInput';
 
 const BASES: PeriodBasis[] = ['PRO_RATA', 'SHORT_PERIOD'];
 
@@ -176,10 +177,8 @@ export default function EndorsementEntryPage() {
           </Field>
           <Field label="Effective date" required error={errors.effectiveDate}>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 value={form.effectiveDate}
                 onChange={(e) => setForm({ ...form, effectiveDate: e.target.value })}
               />
@@ -187,10 +186,8 @@ export default function EndorsementEntryPage() {
           </Field>
           <Field label="Booking date" hint="Blank: today. Its accounting period must be open.">
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 max={today()}
                 value={form.bookingDate}
                 onChange={(e) => setForm({ ...form, bookingDate: e.target.value })}

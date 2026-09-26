@@ -19,6 +19,7 @@ import { formatDate, formatDateTime } from '@/utils/format';
 import { CertificateDialog } from './CertificateDialog';
 import { commissionApi } from './commissionApi';
 import type { Certificate, CertificateInput } from './commissionApi';
+import { displayNameOf } from '@/api/users';
 
 type StageTab = 'SUBMITTED' | 'REJECTED' | 'ACKNOWLEDGED';
 
@@ -58,7 +59,7 @@ const COLUMNS: Column<Certificate>[] = [
   {
     key: 'at',
     header: 'Submitted',
-    render: (c) => `${formatDateTime(c.createdAt)} · ${c.createdBy}`,
+    render: (c) => `${formatDateTime(c.createdAt)} · ${displayNameOf(c.createdBy)}`,
   },
   { key: 'stage', header: 'Status', render: (c) => <StatusBadge status={c.stage} /> },
 ];

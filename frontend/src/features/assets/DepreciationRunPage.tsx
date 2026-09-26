@@ -17,6 +17,7 @@ import { periodOf } from './assetMath';
 import { TextInput } from './FormControls';
 import { summarize } from './runSummary';
 import { useAssetLookups } from './useAssetLookups';
+import { displayNameOf } from '@/api/users';
 
 /** Monthly depreciation: preview the charge of a period, then post it once (idempotent). */
 export default function DepreciationRunPage() {
@@ -51,7 +52,7 @@ export default function DepreciationRunPage() {
       <PageHeader
         section="Assets & Investments"
         title="Depreciation Run"
-        description="Charges every capitalized asset up to the period end (catching up missed months) with one journal per branch, category and cost centre. A period is posted only once."
+        description="Monthly depreciation of every capitalized asset up to the period end."
         actions={
           can('PERIOD_END_RUN') && (
             <Button
@@ -73,7 +74,9 @@ export default function DepreciationRunPage() {
           <Kpi
             label="Status"
             value={<StatusBadge status={summary.status} />}
-            hint={summary.postedBy === undefined ? 'Preview' : `by ${summary.postedBy}`}
+            hint={
+              summary.postedBy === undefined ? 'Preview' : `by ${displayNameOf(summary.postedBy)}`
+            }
           />
         </div>
       </Card>

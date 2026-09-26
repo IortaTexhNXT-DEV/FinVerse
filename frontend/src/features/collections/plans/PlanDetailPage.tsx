@@ -21,6 +21,7 @@ import { PlanTabsCard } from './PlanTabs';
 import { ReasonDialog, RecordLoading } from './Parts';
 import { usePlanActions } from './usePlanActions';
 import { usePromiseSave } from './usePromiseSave';
+import { displayNameOf } from '@/api/users';
 
 function Summary({ plan }: Readonly<{ plan: Plan }>) {
   return (
@@ -46,7 +47,7 @@ function Summary({ plan }: Readonly<{ plan: Plan }>) {
         {
           icon: UserRound,
           label: 'Created By',
-          value: `${plan.createdBy}, ${formatDateTime(plan.createdAt)}`,
+          value: `${displayNameOf(plan.createdBy)}, ${formatDateTime(plan.createdAt)}`,
         },
       ]}
     />

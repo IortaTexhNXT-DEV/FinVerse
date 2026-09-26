@@ -42,7 +42,7 @@ export default function ClaimRecoveriesPage() {
       <PageHeader
         section="Reinsurance"
         title="Claims Recoveries"
-        description="Every posted claim movement with the reinsurers' share: reserve shares, recoveries due on payments (open items on the reinsurers), salvage shared back and excess of loss recoveries."
+        description="Every posted claim movement with the reinsurers' share."
         actions={
           can('REINSURANCE_MAINTAIN') && (
             <Button

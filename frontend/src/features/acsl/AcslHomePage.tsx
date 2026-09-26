@@ -22,6 +22,7 @@ import type { CaseTab } from './acsl';
 import { acslApi } from './api';
 import type { AcslCase, CaseType, Counts, CaseStage } from './api';
 import { NewCaseDialog } from './NewCaseDialog';
+import { UserName } from '@/components/ui/UserName';
 
 const COLUMNS: Column<AcslCase>[] = [
   {
@@ -57,7 +58,7 @@ const COLUMNS: Column<AcslCase>[] = [
     header: 'Requested By',
     render: (c) => (
       <>
-        {c.requestedBy}
+        <UserName login={c.requestedBy} />
         <span className="cell-sub">{c.requesterRef ?? ''}</span>
       </>
     ),
@@ -110,7 +111,7 @@ export default function AcslHomePage() {
       <PageHeader
         section="Finance · ACSL"
         title="ACSL Cases"
-        description="Account investigations, analysis requests from Marketing, AR refund applications and payment reversals, from receipt to result."
+        description="Account investigations, analysis requests, AR refunds and payment reversals."
         actions={
           can('ACSL_PROCESS') && (
             <Button

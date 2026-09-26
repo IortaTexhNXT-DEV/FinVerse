@@ -14,6 +14,7 @@ import { DetailList } from '@/features/catalog/DetailList';
 import type { DetailRow } from '@/features/catalog/DetailList';
 import { formatDate, formatDateTime, today } from '@/utils/format';
 import { useAccountRefresh } from './useAccountRefresh';
+import { displayNameOf } from '@/api/users';
 
 type Dialog = 'ffy' | 'ffy-cancel' | 'tsu' | null;
 
@@ -34,7 +35,7 @@ function tsuText(a: Account): string {
     return 'Not required';
   }
   return a.tsu.clearedBy
-    ? `Cleared by ${a.tsu.clearedBy} ${formatDateTime(a.tsu.clearedAt)}`
+    ? `Cleared by ${displayNameOf(a.tsu.clearedBy)} ${formatDateTime(a.tsu.clearedAt)}`
     : `Required (${a.tsu.rule ?? ''})`;
 }
 

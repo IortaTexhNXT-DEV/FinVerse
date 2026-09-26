@@ -21,6 +21,7 @@ import { GatePanel } from './GatePanel';
 import { HoldCoverPanel } from './HoldCoverPanel';
 import { PlacementActions } from './PlacementActions';
 import { SlipActions } from './SlipActions';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'gate', label: 'Payment Gate' },
@@ -67,7 +68,7 @@ function Summary({ account, view }: Readonly<{ account: Account; view: Placement
           {slip ? `${slip.displayNo} (${humanize(slip.status)})` : 'Not generated'}
         </Fact>
         <Fact icon={<CalendarClock size={16} aria-hidden="true" />} label="Hold cover">
-          {hold ? `${humanize(hold.status)} until ${hold.expiryDate}` : 'None'}
+          {hold ? `${humanize(hold.status)} until ${hold.expiryDate}` : '—'}
         </Fact>
       </div>
     </Card>
@@ -118,7 +119,7 @@ function ReturnsTable({ returns }: Readonly<{ returns: InsurerReturn[] }>) {
           {
             key: 'when',
             header: 'Returned',
-            render: (r) => `${formatDateTime(r.createdAt)} by ${r.createdBy}`,
+            render: (r) => `${formatDateTime(r.createdAt)} by ${displayNameOf(r.createdBy)}`,
           },
           { key: 'reason', header: 'Reason', render: (r) => humanize(r.reasonCode) },
           { key: 'remarks', header: 'Insurer Remarks', render: (r) => r.remarks ?? '—' },

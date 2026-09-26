@@ -52,7 +52,7 @@ export default function IssuanceWorkbenchPage() {
       <PageHeader
         section="Policy Issuance"
         title="Issuance Workbench"
-        description="From the placed account to the issued policy: receive and review e-policies, update the policy numbers, generate Insurance Advices and send e-policies to clients."
+        description="From the placed account to the issued policy."
         actions={
           can('EPOLICY_MANAGE') && (
             <Link className="btn btn-primary" to="/issuance/upload">

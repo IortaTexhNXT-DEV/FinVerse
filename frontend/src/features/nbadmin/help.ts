@@ -24,7 +24,7 @@ export const NBADMIN_HELP_SCREENS: HelpScreen[] = [
     summary:
       'Retention rules by record type and status (5 years online, 15 years archive) and the records eligible at the latest review, with a drill-down list.',
     workflow: [
-      'Run review now counts the eligible records of every active rule; the RETENTION_REVIEW job does it every month.',
+      'Run review now counts the eligible records of every active rule; a scheduled job does it every month.',
       'Records opens the list of eligible records; Edit changes the years, statuses, action or activation of a rule.',
     ],
     controls: [
@@ -51,12 +51,12 @@ export const USER_ACCESS_HELP: HelpSection = {
         'New Request: choose the type, the user and the new data or group profiles, an optional effective date, the approver and the remarks. Save Draft keeps it for later (only you see it); Submit runs the full checks and notifies the approver.',
         "The approver opens the request from My Approvals or Assigned to Me and clicks Approve and Apply, Return (remarks mandatory) or Reject (reason mandatory). A new user's temporary password is shown once.",
         'A returned request is corrected with Edit Request and resubmitted with a correction remark; the history keeps every round.',
-        'A request with an effective date is SCHEDULED after approval and applied by the daily job UAM_EFFECTIVE_CHANGES on that date.',
+        'A request with an effective date is SCHEDULED after approval and applied by a daily job on that date.',
         'Cancel Request (reason mandatory) withdraws a draft, pending, returned or scheduled request; the approver is told.',
       ],
       controls: [
         'The requester and the user a request is about never decide it; only the chosen approver decides unless UAM_ANY_APPROVER is true.',
-        'A change that raises a user to a High or Admin group profile, or that is submitted or approved outside UAM_WORKING_HOURS, needs a second approval by another approver (UAM_SECOND_APPROVE).',
+        'A change that raises a user to a High or Admin group profile, or that is submitted or approved outside UAM_WORKING_HOURS, needs a second approval by another approver.',
         'User IDs of new users follow USER_ID_PATTERN; one open request per user; every step is in the history and the audit trail.',
       ],
     },
@@ -72,8 +72,8 @@ export const USER_ACCESS_HELP: HelpSection = {
       ],
       controls: [
         'The implementer is never the requester. A deactivated profile grants nothing to its members until it is reactivated; SYSADMIN cannot be deactivated.',
-        'Roles are edited directly on the Roles screen only through the emergency path UAM_DIRECT_ROLE_EDIT (off by default); every such edit is audited and raises the UAM_DIRECT_ROLE_EDIT alert.',
-        'With UAM_ROLE_APPLY_ON_APPROVAL true the change applies at the last approval (UQ03).',
+        'Roles are edited directly on the Roles screen only through the emergency path UAM_DIRECT_ROLE_EDIT (off by default); every such edit is audited and raises an alert.',
+        'With UAM_ROLE_APPLY_ON_APPROVAL true the change applies at the last approval.',
       ],
     },
     {
@@ -88,7 +88,7 @@ export const USER_ACCESS_HELP: HelpSection = {
       ],
       controls: [
         'Each line follows every rule of a single request (user ID format, one open request per user, four eyes).',
-        'The batch is decided as a whole (UQ10); temporary passwords of new users are shown once to the approver.',
+        'The batch is decided as a whole; temporary passwords of new users are shown once to the approver.',
       ],
     },
     {

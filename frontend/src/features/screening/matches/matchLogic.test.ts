@@ -128,8 +128,8 @@ describe('screening match logic', () => {
     const rows = comparisonRows(detail(2));
     const byLabel = Object.fromEntries(rows.map((r) => [r.label, r]));
     expect(byLabel['Birth Date']).toMatchObject({
-      client: '15-02-1970',
-      entry: '16-02-1970',
+      client: '15-Feb-1970',
+      entry: '16-Feb-1970',
       same: false,
     });
     expect(byLabel.Nationality?.same).toBe(true);

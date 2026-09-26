@@ -19,6 +19,7 @@ import { CASE_TYPE_LABELS } from './acsl';
 import { acslApi, CASE_ENTITY } from './api';
 import type { AcslCase } from './api';
 import { CaseActions } from './CaseActions';
+import { UserName } from '@/components/ui/UserName';
 
 type TabId = 'details' | 'family' | 'documents';
 
@@ -52,7 +53,7 @@ function facts(c: AcslCase): Fact[] {
       label: 'Amount',
       value: amount === undefined ? '—' : `${c.account.currency ?? ''} ${formatAmount(amount)}`,
     },
-    { icon: User, label: 'Requested By', value: c.requestedBy },
+    { icon: User, label: 'Requested By', value: <UserName login={c.requestedBy} /> },
     { icon: CalendarDays, label: 'Received', value: formatDate(c.createdAt) },
   ];
 }

@@ -56,7 +56,7 @@ export default function ReserveParametersPage() {
       <PageHeader
         section="Actuarial Reserves"
         title="Reserve Parameters"
-        description="IBNR method (rate or chain-ladder), margins, ULAE, expected loss ratio and reinsurance commission per line of business. A change is a new record with a later effective date; valuation runs use the authorized record in force at their date."
+        description="IBNR method, margins, ULAE, expected loss ratio and reinsurance commission per line of business."
         actions={
           can('MASTER_MAINTAIN') && (
             <Button

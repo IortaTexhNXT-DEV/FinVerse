@@ -38,7 +38,7 @@ export default function BulkRequestPage() {
       <PageHeader
         section="User Access"
         title="Bulk Request"
-        description="Enrol, modify, deactivate or reactivate many users with one file. Every row is checked as a single request; the batch goes to one approver."
+        description="Enrol, modify, deactivate or reactivate many users with one file."
       />
       {mayUpload && (
         <BulkUploadWizard

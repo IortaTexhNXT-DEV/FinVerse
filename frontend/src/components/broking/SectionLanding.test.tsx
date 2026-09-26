@@ -22,7 +22,7 @@ describe('section landing', () => {
       <SectionLanding
         section="Finance"
         title="ACSL Cases"
-        description="Cases"
+        description="Cases."
         cardTitle="Cases by Stage"
         emptyMessage="No cases"
       >

@@ -5,6 +5,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { today } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface DateDialogProps {
   title: string;
@@ -54,10 +55,8 @@ export function BookingDateDialog({
           hint="The accounting period of this date must be open."
         >
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               max={today()}
               value={date}
               onChange={(e) => setDate(e.target.value)}
@@ -110,17 +109,15 @@ export function QueueEditDialog({ row, busy, error, onSave, onClose }: Readonly<
           error={future ? 'The booking date cannot be in the future' : undefined}
         >
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               max={today()}
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
           )}
         </Field>
-        <Field label="Cost center" hint="Leave blank for the account's cost center (BRNB.108).">
+        <Field label="Cost center" hint="Leave blank for the account's cost center.">
           {(id) => (
             <input
               id={id}

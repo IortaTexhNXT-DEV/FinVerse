@@ -17,6 +17,7 @@ import { useGlLookups } from '@/features/gl/useLookups';
 import { formatAmount, today } from '@/utils/format';
 import { dueDate, invoiceTotals, lineTaxes } from './payablesMath';
 import { usePayablesLookups } from './usePayablesLookups';
+import { DateInput } from '@/components/ui/DateInput';
 
 const emptyLine = (): InvoiceLine => ({
   expenseAccountCode: '',
@@ -84,7 +85,7 @@ export default function InvoiceEntryPage() {
       <PageHeader
         section="Payables & Cash"
         title="New Supplier Invoice"
-        description="Amounts are entered net of VAT. Input VAT 12 % and the supplier's expanded withholding tax are computed per line."
+        description="Amounts are entered net of VAT."
       />
       <ErrorAlert error={save.error} />
       <Card title="Invoice">
@@ -118,25 +119,15 @@ export default function InvoiceEntryPage() {
           </Field>
           <Field label="Invoice date" required>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 value={invoiceDate}
                 onChange={(e) => setInvoiceDate(e.target.value)}
               />
             )}
           </Field>
           <Field label="Due date" hint={`Default ${dueDate(invoiceDate, party?.creditDays ?? 0)}`}>
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="date"
-                value={due}
-                onChange={(e) => setDue(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={due} onChange={(e) => setDue(e.target.value)} />}
           </Field>
           <Field label="Branch">
             {(id) => (

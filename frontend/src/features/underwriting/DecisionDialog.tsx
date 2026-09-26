@@ -4,6 +4,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { today } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 
 export type DecisionMode = 'approve' | 'reject' | null;
 
@@ -63,10 +64,8 @@ export function DecisionDialog({
             hint="Premium, taxes and commission are posted on this date"
           >
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 value={accountingDate}
                 onChange={(e) => setAccountingDate(e.target.value)}
               />

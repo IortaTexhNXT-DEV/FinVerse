@@ -18,6 +18,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatAmount, formatDate, humanize, today } from '@/utils/format';
 import { emptyTarget, formOf, monthRange, targetErrors, toTarget } from './targetForm';
 import type { TargetForm } from './targetForm';
+import { DateInput } from '@/components/ui/DateInput';
 
 const COLUMNS: Column<SalesTarget>[] = [
   { key: 'unit', header: 'Unit', render: (t) => t.unitCode },
@@ -108,10 +109,8 @@ function TargetDialog({
           </Field>
           <Field label="Period From" required>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={form.periodFrom}
                 onChange={(e) => set({ periodFrom: e.target.value })}
               />
@@ -119,10 +118,8 @@ function TargetDialog({
           </Field>
           <Field label="Period To" required error={shown('periodTo')}>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={form.periodTo}
                 onChange={(e) => set({ periodTo: e.target.value })}
               />
@@ -171,7 +168,7 @@ export default function SalesTargetsPage() {
       <PageHeader
         section="Reports"
         title="Production Targets"
-        description="Booking, premium and commission targets per sales unit and month (PHP), used by the NB dashboard and the Production Statistics report."
+        description="Booking, premium and commission targets per sales unit and month, used by the NB dashboard."
         actions={
           maintain && (
             <Button

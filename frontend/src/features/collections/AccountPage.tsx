@@ -21,6 +21,7 @@ import { ACCOUNT_TABS } from './collectionsLogic';
 import type { AccountTabId } from './collectionsLogic';
 import { DetailsDialog, DispositionDialog, EffortDialog } from './WorkDialogs';
 import './collections.css';
+import { UserName } from '@/components/ui/UserName';
 
 function flags(a: Account): string[] {
   const out: string[] = [];
@@ -269,7 +270,7 @@ export default function AccountPage() {
       {lockedByOther && (
         <div className="clx-lock-banner" role="status">
           <Lock size={16} aria-hidden="true" />
-          {a.lock.editingBy} is editing since {formatDateTime(a.lock.since)}
+          <UserName login={a.lock.editingBy} /> is editing since {formatDateTime(a.lock.since)}
         </div>
       )}
       <ErrorAlert error={refresh.error} />

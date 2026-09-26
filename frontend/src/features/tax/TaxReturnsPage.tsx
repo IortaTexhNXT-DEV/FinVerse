@@ -18,6 +18,8 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, today } from '@/utils/format';
 import type { ReturnAction } from './ReturnActionModal';
 import { ReturnActionModal } from './ReturnActionModal';
+import { UserName } from '@/components/ui/UserName';
+import { displayNameOf } from '@/api/users';
 
 const STATUSES: ('' | ReturnStatus)[] = ['', 'DRAFT', 'FILED', 'PAID', 'CANCELLED'];
 
@@ -50,7 +52,7 @@ export default function TaxReturnsPage() {
       <PageHeader
         section="Tax & Statutory"
         title="Tax Returns"
-        description="Returns DRAFT → FILED → PAID. Filing needs a second user; payment posts the remittance clearing the tax payable."
+        description="Returns DRAFT → FILED → PAID."
       />
       <Card>
         <div className="row">
@@ -195,10 +197,10 @@ function ReturnDetail({ id, onClose }: Readonly<{ id: number; onClose: () => voi
       {r !== undefined && (
         <div className="stack">
           <p className="muted">
-            Prepared by {r.preparedBy}
+            Prepared by <UserName login={r.preparedBy} />
             {r.filedBy === undefined
               ? ''
-              : `, filed by ${r.filedBy} on ${formatDate(r.filedOn)} (${r.filingReference ?? ''})`}
+              : `, filed by ${displayNameOf(r.filedBy)} on ${formatDate(r.filedOn)} (${r.filingReference ?? ''})`}
             {r.statusReason === undefined ? '' : ` – ${r.statusReason}`}
           </p>
           <DataTable

@@ -61,7 +61,7 @@ export default function FundingPage() {
       <PageHeader
         section="Finance · Disbursement"
         title="Account Funding"
-        description="Transfers between BDOIR bank accounts: requested, verified and approved by two approvers before the entry posts."
+        description="Transfers between BDOIR bank accounts."
         actions={
           can('DISB_FUNDING_REQUEST') ? (
             <Button

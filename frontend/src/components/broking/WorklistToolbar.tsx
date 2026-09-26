@@ -1,10 +1,12 @@
 import { Search, SlidersHorizontal } from 'lucide-react';
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { useInRouterContext, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
+import { FilterChips } from '@/components/ui/FilterChips';
 
 interface WorklistToolbarProps {
-  /** Placeholder and accessible name of the search box (BDO: "Search Proposal No."). */
+  /** Placeholder and accessible name of the search box (e.g. "Search Quotation No."). */
   placeholder?: string;
   /** Initial search text. */
   initial?: string;
@@ -17,20 +19,41 @@ interface WorklistToolbarProps {
   children?: ReactNode;
 }
 
-/**
- * Work list toolbar of the BDO Insure design: search box with its Search button, the Filters
- * toggle, then the bulk actions right-aligned, on one line.
- */
-export function WorklistToolbar({
-  placeholder = 'Search Proposal No.',
+interface ToolbarViewProps extends WorklistToolbarProps {
+  /** The search kept in the page URL (so Back returns to the same list), when routed. */
+  urlSearch?: string;
+  onUrlSearch?: (text: string) => void;
+}
+
+/** URL parameter of the work list search. */
+const SEARCH_PARAM = 'q';
+
+function ToolbarView({
+  placeholder = 'Search Reference No.',
   initial = '',
   onSearch,
   filters,
   extra,
   children,
-}: Readonly<WorklistToolbarProps>) {
+  urlSearch,
+  onUrlSearch,
+}: Readonly<ToolbarViewProps>) {
   const id = useId();
-  const [text, setText] = useState(initial);
+  const [text, setText] = useState(urlSearch ?? initial);
+  const [active, setActive] = useState(urlSearch ?? '');
+  const restored = useRef(false);
+  const search = (value: string) => {
+    setActive(value);
+    onSearch(value);
+    onUrlSearch?.(value);
+  };
+  useEffect(() => {
+    // A search kept in the URL (Back from a record) is applied once when the list opens.
+    if (!restored.current && urlSearch) {
+      restored.current = true;
+      onSearch(urlSearch);
+    }
+  }, [urlSearch, onSearch]);
   return (
     <div className="worklist-toolbar">
       <form
@@ -38,7 +61,7 @@ export function WorklistToolbar({
         role="search"
         onSubmit={(e) => {
           e.preventDefault();
-          onSearch(text.trim());
+          search(text.trim());
         }}
       >
         <label className="visually-hidden" htmlFor={id}>
@@ -67,6 +90,56 @@ export function WorklistToolbar({
       )}
       {extra}
       {children !== undefined && <div className="worklist-actions">{children}</div>}
+      <FilterChips
+        filters={
+          active === ''
+            ? []
+            : [
+                {
+                  key: 'search',
+                  label: `Search: ${active}`,
+                  onRemove: () => {
+                    setText('');
+                    search('');
+                  },
+                },
+              ]
+        }
+      />
     </div>
   );
+}
+
+/** The toolbar of a routed list: the search is kept in the URL (?q=). */
+function RoutedToolbar(props: Readonly<WorklistToolbarProps>) {
+  const [params, setParams] = useSearchParams();
+  return (
+    <ToolbarView
+      {...props}
+      urlSearch={params.get(SEARCH_PARAM) ?? undefined}
+      onUrlSearch={(text) =>
+        setParams(
+          (current) => {
+            const next = new URLSearchParams(current);
+            if (text === '') {
+              next.delete(SEARCH_PARAM);
+            } else {
+              next.set(SEARCH_PARAM, text);
+            }
+            return next;
+          },
+          { replace: true },
+        )
+      }
+    />
+  );
+}
+
+/**
+ * Work list toolbar of the BDO Insure design: search box with its Search button, the Filters
+ * toggle, then the bulk actions right-aligned, on one line. The active search shows as a
+ * removable chip and is kept in the page URL, so Back from a record returns to the same list.
+ */
+export function WorklistToolbar(props: Readonly<WorklistToolbarProps>) {
+  return useInRouterContext() ? <RoutedToolbar {...props} /> : <ToolbarView {...props} />;
 }

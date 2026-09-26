@@ -29,6 +29,7 @@ import { deductionsApi } from './deductionsApi';
 import type { Deduction, DeductionApplication } from './deductionsApi';
 import { joinParts } from './remittanceLabels';
 import './remittance.css';
+import { displayNameOf } from '@/api/users';
 
 const ENTITY = 'RemittanceDeduction';
 const TABS = [
@@ -86,7 +87,7 @@ function Summary({ d }: Readonly<{ d: Deduction }>) {
         {
           icon: UserRound,
           label: 'Prepared / Confirmed By',
-          value: `${d.createdBy} / ${d.confirmedBy ?? '—'}`,
+          value: `${displayNameOf(d.createdBy)} / ${d.confirmedBy ?? '—'}`,
         },
       ]}
     />

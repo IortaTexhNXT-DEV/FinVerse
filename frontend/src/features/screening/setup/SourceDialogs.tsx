@@ -11,6 +11,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { screeningSetupApi } from './api';
 import type { ListSource, RunDetail } from './api';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 /** Upload List File (FR-SS-020): a CSV or XLSX in the list template, logged as a run at once. */
 export function UploadDialog({
@@ -78,13 +79,7 @@ export function UploadDialog({
           hint="CSV or XLSX in the watchlist template; the changes wait for a Compliance Checker"
         >
           {(id) => (
-            <input
-              id={id}
-              type="file"
-              accept=".csv,.xlsx"
-              className="input"
-              onChange={(e) => setFile(e.target.files?.[0])}
-            />
+            <FileDropZone id={id} accept=".csv,.xlsx" onChange={(files) => setFile(files[0])} />
           )}
         </Field>
       </div>

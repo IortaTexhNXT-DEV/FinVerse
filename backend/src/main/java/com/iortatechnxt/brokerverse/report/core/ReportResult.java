@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.report.core;
 
+import com.iortatechnxt.brokerverse.common.util.BusinessText;
 import java.util.List;
 
 /**
@@ -20,8 +21,14 @@ public record ReportResult(
     List<ReportRow> rows,
     List<String> notes) {
 
-  /** Canonical constructor copying lists. */
+  /**
+   * Canonical constructor copying lists; the title and notes are business texts (requirement
+   * references removed, design notes left out).
+   */
   public ReportResult {
+    title = BusinessText.clean(title);
+    notes =
+        notes.stream().filter(n -> !BusinessText.isDesignNote(n)).map(BusinessText::clean).toList();
     parameterEcho = List.copyOf(parameterEcho);
     columns = List.copyOf(columns);
     rows = List.copyOf(rows);

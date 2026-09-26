@@ -46,7 +46,7 @@ export default function ClaimsSetupPage() {
       <PageHeader
         section={CLAIMS_SECTION}
         title="Claims Setup"
-        description="Status and settlement type attributes, the status access matrix, the claims handler register and the Claims lists; every change waits for another user's authorization."
+        description="Status and settlement type attributes, the status access matrix."
       />
       <Card flush>
         <Tabs tabs={TABS} active={tab} onChange={setTab} />

@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/Card';
 import { Field } from '@/components/ui/Field';
 import { formatTin } from './clientForm';
 import type { ClientForm, ClientFormErrors } from './clientForm';
+import { TypedInput } from '@/components/ui/DateInput';
 
 type TextKey = {
   [K in keyof ClientForm]: ClientForm[K] extends string ? K : never;
@@ -41,7 +42,7 @@ function TextInput({
   return (
     <Field label={label} required={required} error={errors[name]} hint={hint}>
       {(id) => (
-        <input
+        <TypedInput
           id={id}
           className="input"
           type={type}

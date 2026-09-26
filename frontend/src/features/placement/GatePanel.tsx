@@ -13,6 +13,7 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
+import { displayNameOf } from '@/api/users';
 
 function ClientConfirmationDialog({
   gate,
@@ -169,7 +170,7 @@ export function GatePanel({ gate, onChanged }: Readonly<{ gate: Gate; onChanged:
             {
               key: 'by',
               header: 'Recorded',
-              render: (e) => `${e.createdBy}, ${formatDateTime(e.createdAt)}`,
+              render: (e) => `${displayNameOf(e.createdBy)}, ${formatDateTime(e.createdAt)}`,
             },
             {
               key: 'opened',

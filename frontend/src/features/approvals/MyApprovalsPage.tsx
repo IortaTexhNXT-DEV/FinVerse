@@ -36,7 +36,7 @@ export default function MyApprovalsPage() {
       <PageHeader
         section="Overview"
         title="My Approvals"
-        description="Items waiting for your authorization. Your own submissions are never shown here (maker-checker)."
+        description="Items waiting for your authorization."
         actions={
           <>
             <label className="checkbox">

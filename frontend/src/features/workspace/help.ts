@@ -20,7 +20,7 @@ export const WORKSPACE_HELP: HelpSection = {
       controls: [
         'You only see the stages your role works; the stage defines the team (workflow configuration).',
         'Every stage change is recorded with user, time, reason and comment in the record’s status history.',
-        'Items past their stage service level show as overdue and raise the WORK_SLA_BREACH alert in the daily checks.',
+        'Items past their stage service level show as overdue and raise an alert in the daily checks.',
         'A record returned to Marketing goes back to the account officer who created it.',
       ],
     },

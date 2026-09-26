@@ -19,6 +19,7 @@ import { CodeSelect, TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { PrintBatch, ReceiptKind, ReceiptSummary } from './cashieringApi';
 import './cashiering.css';
+import { displayNameOf } from '@/api/users';
 
 const keyOf = (r: ReceiptSummary) => String(r.id);
 
@@ -78,7 +79,7 @@ function Batches({ companyId }: Readonly<{ companyId: number }>) {
     {
       key: 'by',
       header: 'Created',
-      render: (b) => `${b.createdBy} · ${formatDateTime(b.createdAt)}`,
+      render: (b) => `${displayNameOf(b.createdBy)} · ${formatDateTime(b.createdAt)}`,
     },
     { key: 'status', header: 'Status', render: (b) => <StatusBadge status={b.status} /> },
     {

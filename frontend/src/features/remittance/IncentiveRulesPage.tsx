@@ -17,6 +17,7 @@ import { formatDate, today } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { IncentiveRule, IncentiveRuleInput } from './api';
 import './remittance.css';
+import { TypedInput } from '@/components/ui/DateInput';
 
 type Form = Omit<IncentiveRuleInput, 'companyId' | 'rate' | 'windowDays'> & {
   rate: string;
@@ -94,7 +95,7 @@ function TextField({
   return (
     <Field label={label} error={error}>
       {(id) => (
-        <input
+        <TypedInput
           id={id}
           className="input"
           type={type}
@@ -285,7 +286,7 @@ export default function IncentiveRulesPage() {
       <PageHeader
         section="Remittance"
         title="Incentive Rules"
-        description="Early remittance incentives per insurer, product line and segment (rates to be confirmed by BDOI)."
+        description="Early remittance incentives per insurer, product line and segment."
         actions={
           manage ? (
             <Button icon={<Plus size={16} />} onClick={() => setEditing('new')}>

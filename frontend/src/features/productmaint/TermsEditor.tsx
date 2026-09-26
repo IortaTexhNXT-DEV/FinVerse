@@ -247,7 +247,7 @@ function SchemeCard({ terms, onChange, errors }: Readonly<TermsEditorProps>) {
           label="Package end"
           type="date"
           error={errors.packageEndDate}
-          hint="Monitored for expiry and renewal (BRPM.017)."
+          hint="Monitored for expiry and renewal."
           value={d.packageEndDate}
           onChange={(v) => dates({ packageEndDate: date(v) })}
         />

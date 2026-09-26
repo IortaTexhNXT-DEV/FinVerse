@@ -45,7 +45,7 @@ export default function ValuationRunsPage() {
       <PageHeader
         section="Actuarial Reserves"
         title="Valuation Runs"
-        description="Monthly valuation of UPR, DAC / UCR, OSLR, IBNR, ULAE, MfAD and premium deficiency. A run is previewed by the preparer, approved by a checker and posted as movement journals against the previous posted run."
+        description="Monthly valuation of UPR, DAC / UCR, OSLR, IBNR, ULAE, MfAD and premium deficiency."
       />
       {can('RESERVE_PREPARE') && (
         <Card title="New valuation run">

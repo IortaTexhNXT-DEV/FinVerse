@@ -27,6 +27,7 @@ import type { AccessRequestErrors, AccessRequestForm } from './accessRequest';
 import { ApproverPicker } from './ApproverPicker';
 import { GroupProfileFields } from './GroupProfileFields';
 import { UserRequestFields } from './UserRequestFields';
+import { DateInput } from '@/components/ui/DateInput';
 
 type Mode = 'draft' | 'submit';
 
@@ -90,10 +91,8 @@ function TypeFields({
       {!isGroupProfile(form.type) && (
         <Field label="Effective Date" hint="Blank: applies on approval">
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               min={today()}
               value={form.effectiveFrom}
               onChange={(e) => set({ effectiveFrom: e.target.value })}
@@ -246,7 +245,7 @@ function RequestEditor({ id, initial, saved, users, userIdPattern }: Readonly<Ed
         section={`User Access · ${groupProfile ? 'Group Profile Requests' : 'Access Requests'}`}
         backTo={groupProfile ? '/user-access/group-profiles' : '/user-access/requests'}
         title={saved === undefined ? 'New Request' : `Edit ${saved.requestNo}`}
-        description="Save a draft to finish later, or submit it to the approver. Nothing changes until the request is approved."
+        description="Save a draft to finish later, or submit it to the approver."
         actions={
           <EditorActions
             busy={save.isPending ? save.variables : undefined}

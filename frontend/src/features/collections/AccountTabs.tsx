@@ -9,6 +9,9 @@ import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/form
 import { collectionsApi } from './api';
 import type { Account } from './api';
 import { TIMELINE_KINDS } from './collectionsLogic';
+import { CellStack, EmptyCell } from '@/components/ui/CellStack';
+import { Tag } from '@/components/ui/Tag';
+import { UserName } from '@/components/ui/UserName';
 
 function Total({
   label,
@@ -164,25 +167,40 @@ export function TimelineTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
   if (q.data.length === 0) {
     return <EmptyState message="No history yet" />;
   }
+  const rows = q.data.map((e, index) => ({ ...e, index }));
   return (
-    <Card>
-      <ol className="clx-timeline">
-        {q.data.map((e, index) => (
-          <li key={`${e.at}-${index}`}>
-            <span className="clx-muted">{formatDateTime(e.at)}</span>
-            <span className="tag">{TIMELINE_KINDS[e.kind] ?? e.kind}</span>
-            <span>
-              <span className="clx-timeline-title">{e.title}</span>
-              {e.detail !== undefined && <div className="clx-muted">{e.detail}</div>}
-            </span>
-            <span className="clx-muted">
-              {[e.by, e.amount === undefined ? undefined : formatAmount(e.amount)]
-                .filter(Boolean)
-                .join(' · ')}
-            </span>
-          </li>
-        ))}
-      </ol>
+    <Card flush>
+      <DataTable
+        caption="Account history"
+        rows={rows}
+        rowKey={(e) => `${e.at}-${String(e.index)}`}
+        columns={[
+          {
+            key: 'at',
+            header: 'Date and Time',
+            kind: 'datetime',
+            render: (e) => formatDateTime(e.at),
+          },
+          {
+            key: 'kind',
+            header: 'Type',
+            kind: 'status',
+            render: (e) => <Tag tone="info">{TIMELINE_KINDS[e.kind] ?? e.kind}</Tag>,
+          },
+          {
+            key: 'title',
+            header: 'Event',
+            render: (e) => <CellStack main={e.title} sub={e.detail} />,
+          },
+          { key: 'by', header: 'By', render: (e) => <UserName login={e.by} /> },
+          {
+            key: 'amount',
+            header: 'Amount',
+            kind: 'amount',
+            render: (e) => (e.amount === undefined ? <EmptyCell /> : formatAmount(e.amount)),
+          },
+        ]}
+      />
     </Card>
   );
 }
@@ -245,7 +263,6 @@ export function PolicyTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
               ['Period', `${formatDate(p.inceptionDate)} – ${formatDate(p.expiryDate)}`],
               ['Booked', formatDate(p.bookingDate)],
               ['Receipt Date (first AR)', formatDate(p.firstReceiptDate) || '—'],
-              ['Delivery Date', 'To confirm with BDOI (CQ17)'],
             ].map(([label, value]) => (
               <div className="fact" key={label}>
                 <span>

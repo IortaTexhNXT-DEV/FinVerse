@@ -9,6 +9,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, today } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 
 /** Action performed by the modal. */
 export type ReturnAction = 'FILE' | 'PAY' | 'CANCEL';
@@ -85,15 +86,7 @@ export function ReturnActionModal({ action, taxReturn, onClose }: Readonly<Props
       <div className="form-grid">
         {action !== 'CANCEL' && (
           <Field label={action === 'FILE' ? 'Filing date' : 'Payment date'} required>
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={date} onChange={(e) => setDate(e.target.value)} />}
           </Field>
         )}
         {needsBank && (

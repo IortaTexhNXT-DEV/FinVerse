@@ -29,7 +29,7 @@ describe('report table', () => {
     render(<ReportTable result={result(null)} />);
     expect(screen.getAllByRole('columnheader')).toHaveLength(3);
     expect(screen.getByText('Total Stage : Draft')).toHaveAttribute('colspan', '2');
-    expect(screen.getByText('03-09-2026')).toHaveClass('nowrap');
+    expect(screen.getByText('03-Sep-2026')).toHaveClass('nowrap');
     expect(screen.getByText('Stage : Draft')).toHaveAttribute('colspan', '3');
   });
 

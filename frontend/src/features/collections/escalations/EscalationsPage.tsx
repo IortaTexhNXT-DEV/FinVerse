@@ -95,7 +95,7 @@ export default function EscalationsPage() {
       <PageHeader
         section="Finance · Collections"
         title="Escalations"
-        description="Accounts escalated to the team lead or the unit / section head, by rule or by hand, until they are resolved or collected."
+        description="Accounts escalated to the team lead or the unit / section head, by rule or by hand."
         actions={
           can('CLX_ESCALATE') ? (
             <Button

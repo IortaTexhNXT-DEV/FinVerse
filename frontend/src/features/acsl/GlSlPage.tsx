@@ -18,6 +18,7 @@ import { acslApi } from './api';
 import type { GlSlRow, GlSlRun } from './api';
 import { GlSlControlsCard } from './GlSlControlsCard';
 import './acsl.css';
+import { DateInput } from '@/components/ui/DateInput';
 
 const RUN_COLUMNS: Column<GlSlRun>[] = [
   {
@@ -108,22 +109,14 @@ export default function GlSlPage() {
       <PageHeader
         section="Finance · ACSL"
         title="GL-SL Reconciliation"
-        description="Compares the balance of each control account in the general ledger with its sub-ledger; runs every night and on demand."
+        description="Compares the balance of each control account in the general ledger with its sub-ledger."
       />
       <ErrorAlert error={runs.error ?? run.error} />
       {can('ACSL_PROCESS') && (
         <Card title="Run Now">
           <div className="form-grid">
             <Field label="As Of" hint="Leave empty for today">
-              {(id) => (
-                <input
-                  id={id}
-                  className="input"
-                  type="date"
-                  value={asOf}
-                  onChange={(e) => setAsOf(e.target.value)}
-                />
-              )}
+              {(id) => <DateInput id={id} value={asOf} onChange={(e) => setAsOf(e.target.value)} />}
             </Field>
           </div>
           <Button

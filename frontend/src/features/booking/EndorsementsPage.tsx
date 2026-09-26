@@ -25,7 +25,7 @@ export default function EndorsementsPage() {
       <PageHeader
         section="Booking"
         title="Endorsements"
-        description="Positive, negative and non-financial endorsements and cancellations of booked accounts. Open a booked invoice to enter a new one."
+        description="Positive, negative and non-financial endorsements and cancellations of booked accounts."
       />
       <ErrorAlert error={rows.error} />
       <Card flush>

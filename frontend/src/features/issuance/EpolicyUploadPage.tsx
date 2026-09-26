@@ -11,6 +11,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { BulkEpolicyUpload } from './BulkEpolicyUpload';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 function SingleEpolicyUpload({
   companyId,
@@ -36,19 +37,15 @@ function SingleEpolicyUpload({
         <div className="form-grid">
           <Field label="E-policy PDF" required>
             {(id) => (
-              <input
+              <FileDropZone
                 id={id}
-                type="file"
-                className="input"
                 accept=".pdf"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                busy={receive.isPending}
+                onChange={(files) => setFile(files[0] ?? null)}
               />
             )}
           </Field>
-          <Field
-            label="Account (ARN)"
-            hint="Optional: found from the file name or the document when empty."
-          >
+          <Field label="Account (ARN)" hint="Found from the file name or the document when empty.">
             {(id) => (
               <input
                 id={id}
@@ -58,7 +55,7 @@ function SingleEpolicyUpload({
               />
             )}
           </Field>
-          <Field label="Policy number" hint="Optional: finds an account already issued.">
+          <Field label="Policy Number" hint="Finds an account already issued.">
             {(id) => (
               <input
                 id={id}
@@ -69,8 +66,7 @@ function SingleEpolicyUpload({
             )}
           </Field>
         </div>
-        <div className="row">
-          <span className="spacer" />
+        <div className="form-actions">
           <Button
             variant="primary"
             icon={<Upload size={16} />}
@@ -89,8 +85,7 @@ function SingleEpolicyUpload({
 /**
  * E-policy upload (BRNB.073): one e-policy matched by the ARN chosen, the policy number or the ARN
  * in the file, or many at once with a match review. Each file is stored as the account's EPOLICY
- * document and opens an extraction review (document trigger, BRNB.105). Reading the insurers'
- * mailbox or SFTP is not built yet (Q31).
+ * document and opens an extraction review (document trigger, BRNB.105).
  */
 export default function EpolicyUploadPage() {
   const companyId = useCompanyId();
@@ -101,7 +96,7 @@ export default function EpolicyUploadPage() {
         backTo="/issuance"
         section="Policy Issuance"
         title="E-policy Upload"
-        description="Store the e-policies received from the insurers on their accounts; the policy data is extracted for review."
+        description="E-policies received from the insurers, stored on their accounts."
       />
       <SingleEpolicyUpload companyId={companyId} initialArn={params.get('arn') ?? ''} />
       <BulkEpolicyUpload companyId={companyId} />

@@ -14,6 +14,7 @@ import { Kpi } from '@/components/ui/Kpi';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 interface BulkUploadWizardProps {
   handler: string;
@@ -52,6 +53,8 @@ export function BulkUploadWizard({
   const queryClient = useQueryClient();
   const [file, setFile] = useState<File | null>(null);
   const [job, setJob] = useState<BulkJob | null>(null);
+  /** The upload a corrected file replaces (re-upload of the error file). */
+  const [previous, setPrevious] = useState<BulkJob | null>(null);
   const [filter, setFilter] = useState<BulkRowStatus | ''>('');
   const definition = useQuery({
     queryKey: ['bulk', 'handler', handler],
@@ -90,7 +93,8 @@ export function BulkUploadWizard({
     const f = await fetchFile();
     saveFile(f.blob, f.fileName);
   };
-  const reset = () => {
+  const reset = (corrects: BulkJob | null = null) => {
+    setPrevious(corrects);
     setJob(null);
     setFile(null);
     upload.reset();
@@ -100,7 +104,9 @@ export function BulkUploadWizard({
 
   return (
     <div className="stack">
-      <ErrorAlert error={definition.error ?? upload.error ?? commit.error ?? cancel.error} />
+      <ErrorAlert
+        error={[definition.error, upload.error, commit.error, cancel.error].find(Boolean)}
+      />
       <Card title="1. Template">
         <div className="row">
           <FileSpreadsheet size={20} aria-hidden="true" />
@@ -119,44 +125,23 @@ export function BulkUploadWizard({
         </div>
       </Card>
       {job === null ? (
-        <Card title="2. Upload">
-          <div className="stack">
-            {parameterFields}
-            <Field
-              label="File"
-              required
-              hint="Excel (.xlsx), OpenDocument (.ods) or CSV (.csv), first sheet, headers in row 1."
-            >
-              {(id) => (
-                <input
-                  id={id}
-                  type="file"
-                  className="input"
-                  accept=".xlsx,.ods,.csv"
-                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                />
-              )}
-            </Field>
-            <div className="row">
-              <Button
-                variant="accent"
-                icon={<Upload size={16} />}
-                busy={upload.isPending}
-                disabled={file === null || !parametersReady}
-                onClick={() => {
-                  if (file !== null) {
-                    upload.mutate(file);
-                  }
-                }}
-              >
-                Upload and Validate
-              </Button>
-            </div>
-          </div>
-        </Card>
+        <UploadCard
+          previous={previous}
+          parameterFields={parameterFields}
+          busy={upload.isPending}
+          blocksDuplicates={definition.data?.blocksDuplicateFiles === true}
+          ready={file !== null && parametersReady}
+          onFile={setFile}
+          onUpload={() => {
+            if (file !== null) {
+              upload.mutate(file);
+            }
+          }}
+        />
       ) : (
         <JobReview
           job={job}
+          previous={previous}
           rows={rows.data?.content ?? []}
           loading={rows.isLoading}
           filter={filter}
@@ -167,15 +152,74 @@ export function BulkUploadWizard({
           onCommit={() => commit.mutate()}
           onCancel={() => cancel.mutate()}
           onReport={() => void download(() => bulkApi.report(job.id))}
-          onReset={reset}
+          onErrorFile={() => void download(() => bulkApi.errorFile(job.id))}
+          onReset={() => reset()}
+          onCorrect={() => reset(job)}
         />
       )}
     </div>
   );
 }
 
+interface UploadCardProps {
+  previous: BulkJob | null;
+  parameterFields?: ReactNode;
+  busy: boolean;
+  blocksDuplicates: boolean;
+  ready: boolean;
+  onFile: (file: File | null) => void;
+  onUpload: () => void;
+}
+
+/** Step 2: the file, the processing rule and the upload action (bottom right). */
+function UploadCard(p: Readonly<UploadCardProps>) {
+  return (
+    <Card title="2. Upload">
+      <div className="stack">
+        {p.previous !== null && (
+          <div className="alert" role="status">
+            Upload the corrected error file of {p.previous.jobNo} ({p.previous.fileName}).
+          </div>
+        )}
+        {p.parameterFields}
+        <Field
+          label="File"
+          required
+          hint="Excel (.xlsx), OpenDocument (.ods) or CSV (.csv), first sheet, headers in row 1."
+        >
+          {(id) => (
+            <FileDropZone
+              id={id}
+              accept=".xlsx,.ods,.csv"
+              busy={p.busy}
+              onChange={(files) => p.onFile(files[0] ?? null)}
+            />
+          )}
+        </Field>
+        <p className="upload-rule muted">
+          Every row is validated before anything is created. Valid rows are processed; rows with
+          errors are left out and returned in the error file to correct and upload again.
+          {p.blocksDuplicates && ' A file already uploaded is refused.'}
+        </p>
+        <div className="form-actions">
+          <Button
+            variant="accent"
+            icon={<Upload size={16} />}
+            busy={p.busy}
+            disabled={!p.ready}
+            onClick={p.onUpload}
+          >
+            Upload and Validate
+          </Button>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 interface JobReviewProps {
   job: BulkJob;
+  previous: BulkJob | null;
   rows: BulkRow[];
   loading: boolean;
   filter: BulkRowStatus | '';
@@ -186,7 +230,9 @@ interface JobReviewProps {
   onCommit: () => void;
   onCancel: () => void;
   onReport: () => void;
+  onErrorFile: () => void;
   onReset: () => void;
+  onCorrect: () => void;
 }
 
 function JobReview(p: Readonly<JobReviewProps>) {
@@ -199,10 +245,11 @@ function JobReview(p: Readonly<JobReviewProps>) {
       actions={<StatusBadge status={job.status} />}
     >
       <div className="stack">
+        {p.previous !== null && <span className="muted">Corrected file of {p.previous.jobNo}</span>}
         <div className="grid-4">
-          <Kpi label="Rows" value={job.totalRows} />
+          <Kpi label="Rows Read" value={job.totalRows} />
           <Kpi label="Valid" value={job.validRows} accent />
-          <Kpi label="Invalid" value={job.invalidRows} />
+          <Kpi label="Rejected" value={job.invalidRows} />
           <Kpi
             label={open ? 'To process' : 'Processed / failed'}
             value={open ? job.validRows : `${job.committedRows} / ${job.failedRows}`}
@@ -233,6 +280,16 @@ function JobReview(p: Readonly<JobReviewProps>) {
           <Button variant="secondary" icon={<Download size={16} />} onClick={p.onReport}>
             Result Report
           </Button>
+          {job.invalidRows + job.failedRows > 0 && (
+            <>
+              <Button variant="secondary" icon={<Download size={16} />} onClick={p.onErrorFile}>
+                Download Error File
+              </Button>
+              <Button variant="ghost" icon={<Upload size={16} />} onClick={p.onCorrect}>
+                Upload Corrected File
+              </Button>
+            </>
+          )}
           {!open && (
             <Button variant="ghost" onClick={p.onReset}>
               Upload Another File

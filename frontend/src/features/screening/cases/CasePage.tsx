@@ -41,6 +41,7 @@ import { stageLabel } from './caseLogic';
 import { DecisionsTab, MatchesTab, TimelineTab } from './CaseTabs';
 import { DocumentsTab } from './DocumentsTab';
 import { ReviewTab } from './ReviewTab';
+import { UserName } from '@/components/ui/UserName';
 
 type TabId = 'matches' | 'review' | 'documents' | 'decisions' | 'str' | 'timeline';
 
@@ -126,7 +127,11 @@ function Summary({ detail }: Readonly<{ detail: CaseDetail }>) {
           label: 'Marketing Unit / Unit Head',
           value: `${c.marketingUnit ?? '—'} / ${c.unitHead ?? '—'}`,
         },
-        { icon: UserCheck, label: 'Assignee', value: c.assignee ?? 'Stage queue' },
+        {
+          icon: UserCheck,
+          label: 'Assignee',
+          value: <UserName login={c.assignee} empty="Stage queue" />,
+        },
         { icon: Users, label: 'Investigator', value: detail.investigator ?? '—' },
         { icon: CalendarClock, label: 'Created', value: formatDateTime(c.createdAt) },
         { icon: AlarmClock, label: 'Due', value: c.dueAt ? formatDateTime(c.dueAt) : '—' },

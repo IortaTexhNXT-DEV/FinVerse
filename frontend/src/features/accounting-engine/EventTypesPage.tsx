@@ -24,7 +24,7 @@ export default function EventTypesPage() {
       <PageHeader
         section="Accounting Engine"
         title="Event Types"
-        description="Business events published by the operational modules. Each needs at least one authorized rule for the company before it can post."
+        description="Business events published by the operational modules."
       />
       <Card>
         <div className="form-grid">

@@ -1,10 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from '@/auth/AuthProvider';
 import { useAuth } from '@/auth/authContext';
 import { RequireAuth, RequirePermission } from '@/auth/RequireAuth';
 import { AppShell } from '@/components/layout/AppShell';
+import { StatusPage } from '@/components/ui/StatusPage';
 import { ToastProvider } from '@/components/ui/ToastProvider';
 import { WorkspaceProvider } from '@/context/WorkspaceProvider';
 import { landingPath } from '@/navigation/access';
@@ -31,6 +32,7 @@ function GuardedScreen({ screen }: Readonly<{ screen: ScreenDef }>) {
     <RequirePermission
       permission={screen.permission}
       alsoPermissions={screen.alsoPermissions}
+      requiresAll={screen.requiresAll}
       fallbackTo={fallback}
     >
       <Screen />
@@ -61,7 +63,7 @@ export function App() {
                   {screens.map((s) => (
                     <Route key={s.path} path={s.path} element={<GuardedScreen screen={s} />} />
                   ))}
-                  <Route path="*" element={<Navigate to="/" replace />} />
+                  <Route path="*" element={<StatusPage kind="notFound" />} />
                 </Route>
               </Routes>
             </Suspense>

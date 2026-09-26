@@ -20,6 +20,7 @@ import { remittanceApi } from './api';
 import type { ExtractionRun, InvoiceTag, RemittanceType } from './api';
 import { TAG_LABELS, TYPE_LABELS } from './remittanceLabels';
 import './remittance.css';
+import { UserName } from '@/components/ui/UserName';
 
 const TAG_COLUMNS: Column<InvoiceTag>[] = [
   { key: 'inv', header: 'Invoice No.', render: (t) => t.invoiceNo },
@@ -181,7 +182,9 @@ const RUN_COLUMNS: Column<ExtractionRun>[] = [
     render: (r) => (
       <>
         {formatDateTime(r.startedAt)}
-        <div className="remit-muted">{r.createdBy}</div>
+        <div className="remit-muted">
+          <UserName login={r.createdBy} />
+        </div>
       </>
     ),
   },
@@ -207,7 +210,7 @@ export default function ExtractionPage() {
       <PageHeader
         section="Remittance"
         title="Extraction"
-        description="Extract the paid and cleared premium due to insurers into remittance batches, per insurer and type or per invoice."
+        description="Extract the paid and cleared premium due to insurers into remittance batches, per insurer."
       />
       {can('REMIT_EXTRACT') && <RunForm companyId={companyId} />}
       <ErrorAlert error={runs.error} />

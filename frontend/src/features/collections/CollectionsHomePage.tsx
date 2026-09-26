@@ -85,7 +85,7 @@ export default function CollectionsHomePage() {
       <PageHeader
         section="Finance · Collections"
         title="Collections Home"
-        description="Outstanding premium receivables to follow up: your accounts, assignments, direct payments returned by insurers and the files of the day."
+        description="Outstanding premium receivables to follow up."
         actions={
           can('CLX_VIEW') ? (
             <Button

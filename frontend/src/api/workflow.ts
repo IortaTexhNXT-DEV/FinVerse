@@ -95,6 +95,7 @@ export const WORKFLOW_NAMES: Record<string, string> = {
   ACSL_CORRECTION: 'ACSL correction entries',
   REM_DEDUCTION: 'Remittance deductions',
   FRBS_SERVICE_FEE: 'Service fee runs',
+  SCR_CASE: 'Screening cases',
 };
 
 /** Workflow engine: My Work queues, record workflow panel, generic actions, assignment. */

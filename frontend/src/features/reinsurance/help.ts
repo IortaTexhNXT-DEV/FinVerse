@@ -32,7 +32,7 @@ export const REINSURANCE_HELP: HelpSection = {
       ],
       controls: [
         'Posting publishes RI_PREMIUM_CEDED and records the amounts due to each reinsurer.',
-        'A risk above treaty capacity raises the RI_TREATY_CAPACITY alert.',
+        'A risk above treaty capacity raises an alert.',
       ],
     },
     {
@@ -43,7 +43,7 @@ export const REINSURANCE_HELP: HelpSection = {
         'Record the reinsurers and their shares, then submit the slip.',
         'A different user approves it (premium ceded to the participants); the slip is then closed.',
       ],
-      controls: ['Slips left unplaced beyond the threshold raise the RI_FAC_UNPLACED alert.'],
+      controls: ['Slips left unplaced beyond the threshold raise an alert.'],
     },
     {
       name: 'Claims Recoveries',
@@ -61,9 +61,7 @@ export const REINSURANCE_HELP: HelpSection = {
         'Generate the quarter (regenerate while pending); a checker approves it.',
         'Settle the approved statement: the balance is paid or received and the open items are matched.',
       ],
-      controls: [
-        'Approval posts levy, reserves retained / released and interest (RI_SOA_ADJUSTMENT).',
-      ],
+      controls: ['Approval posts levy, reserves retained / released and interest.'],
     },
   ],
 };

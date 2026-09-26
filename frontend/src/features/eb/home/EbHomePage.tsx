@@ -19,7 +19,7 @@ export default function EbHomePage() {
       <PageHeader
         section={EB_SECTION}
         title="EB Home"
-        description="Employee Benefits at a glance: renewal advices due, franchise and proposals outstanding, comparatives to sign off or approve, programmes with the client, member changes and overdue pending items."
+        description="Employee Benefits at a glance."
         actions={
           <>
             <Button
@@ -51,8 +51,7 @@ export default function EbHomePage() {
       </div>
       <Card title="My Work">
         <p className="muted">
-          EB cycles, franchise requests, member changes and SOAs assigned to you appear in My Work
-          and open their programme.
+          EB cycles, franchise requests, member changes and SOAs assigned to you.
         </p>
       </Card>
     </div>

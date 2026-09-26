@@ -17,10 +17,13 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
 import { CaptureRequestDialog } from './CaptureRequestDialog';
 import { quotationLinkOf } from './requestForm';
 import '@/styles/quotation.css';
+import { ClientLabel } from '@/components/broking/ClientLabel';
+import { LovLabel } from '@/components/broking/LovLabel';
+import { CellStack } from '@/components/ui/CellStack';
 
 const TABS: readonly { id: RequestStatus; label: string }[] = [
   { id: 'NEW', label: 'To Quote' },
@@ -122,7 +125,7 @@ export default function RequestsPage() {
         backTo="/quotations"
         section="Quotation / Proposal"
         title="Quotation Requests"
-        description="Requests received by e-mail, upload or source system, waiting to be quoted. Capture an e-mailed request with the e-mail attached."
+        description="Requests received by e-mail, upload or source system, waiting to be quoted."
         actions={
           canMaintain && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => setCapturing(true)}>
@@ -183,13 +186,22 @@ export default function RequestsPage() {
             {
               key: 'channel',
               header: 'Channel',
-              render: (r) => [humanize(r.channel), r.externalRef].filter(Boolean).join(' · '),
+              render: (r) => (
+                <CellStack
+                  main={<LovLabel type="SOURCE_CHANNEL" code={r.channel} />}
+                  sub={r.externalRef}
+                />
+              ),
             },
             {
               key: 'client',
               header: 'Client / Prospect',
               render: (r) =>
-                r.prospectName ?? (r.clientId === undefined ? '—' : `Client #${r.clientId}`),
+                r.prospectName === undefined && r.clientId !== undefined ? (
+                  <ClientLabel clientId={r.clientId} />
+                ) : (
+                  <span>{r.prospectName ?? '—'}</span>
+                ),
             },
             { key: 'product', header: 'Product', render: (r) => r.productCode ?? '—' },
             { key: 'cover', header: 'Requested Cover', render: (r) => r.requestedCover ?? '' },
@@ -233,10 +245,16 @@ export default function RequestsPage() {
         <ActionDialog
           title={`Close ${closing.requestNo}`}
           confirmLabel="Close Request"
+          commentRequired
+          commentLabel="Reason for Closing"
           busy={close.isPending}
           error={close.error}
           onClose={() => setClosing(null)}
-          onConfirm={(note) => close.mutate({ r: closing, reason: note.comment ?? 'Closed' })}
+          onConfirm={(note) => {
+            if (note.comment) {
+              close.mutate({ r: closing, reason: note.comment });
+            }
+          }}
         />
       )}
     </div>

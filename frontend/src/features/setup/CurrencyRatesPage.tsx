@@ -12,6 +12,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate, today } from '@/utils/format';
 import { RevaluationRatesCard } from './RevaluationRatesCard';
+import { DateInput } from '@/components/ui/DateInput';
 
 const RATE_TYPES: RateType[] = ['SPOT', 'CLOSING', 'AVERAGE', 'BUDGET', 'BOOK'];
 
@@ -46,7 +47,7 @@ export default function CurrencyRatesPage() {
       <PageHeader
         section="Setup"
         title="Currencies & Exchange Rates"
-        description="Rates are base-currency units per one unit of foreign currency. The monthly revaluation rate is the month-end CLOSING rate."
+        description="Rates are base-currency units per one unit of foreign currency."
       />
       <RevaluationRatesCard currencies={(currencies.data ?? []).filter((c) => c.active)} />
       {can('MASTER_MAINTAIN') && (
@@ -85,10 +86,8 @@ export default function CurrencyRatesPage() {
             </Field>
             <Field label="Effective date" required>
               {(id) => (
-                <input
+                <DateInput
                   id={id}
-                  className="input"
-                  type="date"
                   value={form.effectiveDate}
                   onChange={(e) => setForm({ ...form, effectiveDate: e.target.value })}
                 />
@@ -122,9 +121,7 @@ export default function CurrencyRatesPage() {
         title="Rates in force"
         flush
         actions={
-          <input
-            className="input"
-            type="date"
+          <DateInput
             aria-label="Rate date"
             value={date}
             onChange={(e) => setDate(e.target.value)}

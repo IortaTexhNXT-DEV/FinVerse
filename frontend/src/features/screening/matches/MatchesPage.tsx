@@ -203,7 +203,7 @@ export default function MatchesPage() {
       <PageHeader
         section="Client & Policy · Sanction Screening"
         title="Matches"
-        description="Clients matched against the sanctions, PEP and internal lists. Compare each potential match with the list entry, then open a case or clear it as a false positive with evidence."
+        description="Clients matched against the sanctions, PEP and internal lists."
       />
       <Tabs tabs={MATCH_TABS} active={tab} onChange={setTab} />
       <MatchList

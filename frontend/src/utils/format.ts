@@ -85,19 +85,66 @@ export function formatCompact(value: number): string {
   return `${(value / unit[0]).toFixed(1)}${unit[1]}`;
 }
 
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** Time zone of every displayed timestamp: BDO Insure operates in the Philippines. */
+const DISPLAY_TIME_ZONE = 'Asia/Manila';
+
+const timestampParts = new Intl.DateTimeFormat('en-GB', {
+  timeZone: DISPLAY_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+});
+
+/** A calendar date (ISO yyyy-MM-dd, or the date part of a timestamp) as dd-MMM-yyyy: 23-Sep-2026. */
 export function formatDate(iso: string | null | undefined): string {
   if (!iso) {
     return '';
   }
   const [year, month, day] = iso.slice(0, 10).split('-');
-  return `${day ?? ''}-${month ?? ''}-${year ?? ''}`;
+  const name = MONTHS[Number(month) - 1];
+  if (!year || !day || name === undefined) {
+    return iso;
+  }
+  return `${day}-${name}-${year}`;
 }
 
+/** A timestamp as dd-MMM-yyyy HH:mm in Philippine time: 25-Sep-2026 19:32. */
 export function formatDateTime(iso: string | null | undefined): string {
   if (!iso) {
     return '';
   }
-  return new Date(iso).toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' });
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return iso;
+  }
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    timestampParts.formatToParts(date).find((p) => p.type === type)?.value ?? '';
+  const month = MONTHS[Number(part('month')) - 1] ?? '';
+  return `${part('day')}-${month}-${part('year')} ${part('hour')}:${part('minute')}`;
+}
+
+/** Whole days elapsed between two timestamps, for "duration in stage" columns. */
+export function formatDuration(fromIso: string, toIso: string | null | undefined): string {
+  const start = new Date(fromIso).getTime();
+  const end = toIso ? new Date(toIso).getTime() : Date.now();
+  if (Number.isNaN(start) || Number.isNaN(end) || end < start) {
+    return '';
+  }
+  const minutes = Math.floor((end - start) / 60000);
+  if (minutes < 60) {
+    return `${String(minutes)}m`;
+  }
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) {
+    return `${String(hours)}h ${String(minutes % 60)}m`;
+  }
+  const days = Math.floor(hours / 24);
+  return `${String(days)}d ${String(hours % 24)}h`;
 }
 
 export function today(): string {

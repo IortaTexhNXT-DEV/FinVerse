@@ -63,7 +63,7 @@ export default function MyWorkPage() {
       <PageHeader
         section="My Work"
         title="My Work"
-        description="Items waiting for your team, oldest due first. Claim an item to work it; overdue items are past their stage service level."
+        description="Items waiting for your team, oldest due first."
       />
       <ErrorAlert error={counts.error ?? queue.error ?? claim.error} />
       <WorkSummary counts={stageCounts} onFilter={setFilter} />

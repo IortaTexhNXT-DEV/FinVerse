@@ -95,7 +95,7 @@ export default function OperationsHomePage() {
       <PageHeader
         section="Operations"
         title="Operations Home"
-        description="Work waiting for your Operations teams, counted live from the invoice ledger. Open a tile to see the list behind it."
+        description="Work waiting for your Operations teams, counted live from the invoice ledger."
       />
       <ErrorAlert error={home.error} />
       <InvoiceFinder />

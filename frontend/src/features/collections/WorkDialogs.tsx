@@ -9,6 +9,7 @@ import { today } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { DispositionInput, EffortInput, ReassignInput } from './api';
 import { cleanDetails, detailFields, dispositionErrors, handoffText } from './collectionsLogic';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface DialogProps {
   /** Accounts the action applies to. */
@@ -342,10 +343,8 @@ export function ReassignDialog({
           {form.kind === 'TEMPORARY' && (
             <Field label="Until" required error={errors.validTo}>
               {(id) => (
-                <input
+                <DateInput
                   id={id}
-                  className="input"
-                  type="date"
                   value={form.validTo}
                   onChange={(e) => setForm({ ...form, validTo: e.target.value })}
                 />

@@ -7,6 +7,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { today } from '@/utils/format';
 import { instructionErrors } from './instructionRules';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface InstructionDialogProps {
   initial?: ClientInstruction;
@@ -86,10 +87,8 @@ export function InstructionDialog({
         <div className="grid-2">
           <Field label="Effective from" required error={errors.effectiveFrom}>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 value={form.effectiveFrom}
                 onChange={(e) => set({ effectiveFrom: e.target.value })}
               />
@@ -101,10 +100,8 @@ export function InstructionDialog({
             hint="Blank = until further notice"
           >
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 value={form.effectiveTo ?? ''}
                 onChange={(e) => set({ effectiveTo: e.target.value })}
               />

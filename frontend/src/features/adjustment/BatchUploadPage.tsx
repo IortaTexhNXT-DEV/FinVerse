@@ -14,7 +14,7 @@ export default function BatchUploadPage() {
         backTo="/adjustment"
         section="Client & Policy · Adjustment"
         title="Batch Request Upload"
-        description="Upload cancellation and adjustment requests for many invoices at once; each valid row is raised and submitted for validation."
+        description="Upload cancellation and adjustment requests for many invoices at once."
       />
       <BulkUploadWizard
         handler="ADJ_BATCH"

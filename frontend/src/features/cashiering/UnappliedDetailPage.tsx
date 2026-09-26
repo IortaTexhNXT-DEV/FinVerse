@@ -20,6 +20,7 @@ import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { cashieringApi } from './cashieringApi';
 import type { Disposition, DispositionBody, UnappliedItem } from './cashieringApi';
 import { DispositionForm } from './DispositionForm';
+import { displayNameOf } from '@/api/users';
 
 const ENTITY = 'Unapplied';
 
@@ -34,12 +35,13 @@ const HISTORY: Column<Disposition>[] = [
   {
     key: 'req',
     header: 'Requested',
-    render: (d) => `${d.requestedBy} · ${formatDateTime(d.requestedAt)}`,
+    render: (d) => `${displayNameOf(d.requestedBy)} · ${formatDateTime(d.requestedAt)}`,
   },
   {
     key: 'appr',
     header: 'Approved',
-    render: (d) => (d.approvedBy ? `${d.approvedBy} · ${formatDateTime(d.approvedAt)}` : ''),
+    render: (d) =>
+      d.approvedBy ? `${displayNameOf(d.approvedBy)} · ${formatDateTime(d.approvedAt)}` : '',
   },
   {
     key: 'doc',

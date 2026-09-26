@@ -14,6 +14,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { SelectInput, TextInput } from '@/features/assets/FormControls';
 import { requestErrors } from './requestForm';
 import type { RequestForm } from './requestForm';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 const EMPTY: RequestForm = {
   channel: 'EMAIL',
@@ -183,14 +184,7 @@ export function CaptureRequestDialog({
           )}
         </Field>
         <Field label="Request e-mail" hint="Attach the e-mail received (.eml, .msg or PDF).">
-          {(id) => (
-            <input
-              id={id}
-              className="input"
-              type="file"
-              onChange={(e) => setFile(e.target.files?.[0])}
-            />
-          )}
+          {(id) => <FileDropZone id={id} onChange={(files) => setFile(files[0])} />}
         </Field>
       </div>
     </Modal>

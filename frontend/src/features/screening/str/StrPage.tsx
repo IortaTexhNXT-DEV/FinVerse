@@ -18,6 +18,7 @@ import { formatDate, formatDateTime } from '@/utils/format';
 import { strApi } from './api';
 import type { StrExtraction, StrRow, StrStatus } from './api';
 import { ExtractDialog } from './StrDialogs';
+import { UserName } from '@/components/ui/UserName';
 
 type RegisterTab = StrStatus | 'ALL';
 
@@ -77,7 +78,7 @@ function Extractions({ canDownload }: Readonly<{ canDownload: boolean }>) {
               <>
                 {formatDateTime(x.extractedAt)}
                 <span className="cell-sub">
-                  {x.extractedBy}
+                  <UserName login={x.extractedBy} />
                   {x.reExtraction ? ` · re-extraction: ${x.reason ?? ''}` : ''}
                 </span>
               </>
@@ -131,7 +132,7 @@ export default function StrPage() {
       <PageHeader
         section="Client & Policy · Sanction Screening"
         title="STR"
-        description="Suspicious transaction reports prepared from the screening cases: extract the AML Committee-approved STRs in the AMLC format and record the AMLC reference after filing on the portal."
+        description="Suspicious transaction reports prepared from the screening cases."
         actions={
           canExtract ? (
             <Button

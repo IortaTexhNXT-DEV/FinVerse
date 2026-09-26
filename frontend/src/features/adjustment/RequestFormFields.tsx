@@ -4,6 +4,7 @@ import { Field } from '@/components/ui/Field';
 import type { RefundBasis } from './api';
 import { AMOUNT_FIELDS, classOfType, modeOf } from './requestForm';
 import type { FieldErrors, Mode, RequestForm } from './requestForm';
+import { DateInput as BibsDateInput } from '@/components/ui/DateInput';
 
 interface FieldsProps {
   form: RequestForm;
@@ -18,15 +19,7 @@ function DateInput({
   value,
   onChange,
 }: Readonly<{ id: string; value: string; onChange: (v: string) => void }>) {
-  return (
-    <input
-      id={id}
-      className="input"
-      type="date"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    />
-  );
+  return <BibsDateInput id={id} value={value} onChange={(e) => onChange(e.target.value)} />;
 }
 
 function NumberInput({
@@ -198,7 +191,7 @@ export function RequestFormFields({ form, errors, onChange }: Readonly<FieldsPro
             />
           )}
         </Field>
-        <Field label="Insurer Endorsement Ref." hint="Checked for duplicates (ADJID.023).">
+        <Field label="Insurer Endorsement Ref." hint="Checked for duplicates.">
           {(id) => (
             <input
               id={id}

@@ -9,6 +9,7 @@ import { StepDialog, TextField } from '../cases/StepDialog';
 import { strApi } from './api';
 import type { StrExtraction, StrRow } from './api';
 import { extractionPeriodError, filingErrors, monthStart } from './strLogic';
+import { DateInput } from '@/components/ui/DateInput';
 
 /**
  * Record Filing (SNSRP-706; FR-SS-072): the AMLC reference (unique) and the filing date, not before
@@ -63,10 +64,8 @@ export function FilingDialog({
       </Field>
       <Field label="Filing Date" required error={errors.filedOn}>
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            type="date"
-            className="input"
             max={today()}
             value={filedOn}
             onChange={(e) => setFiledOn(e.target.value)}
@@ -115,10 +114,8 @@ export function ExtractDialog({
       <div className="form-grid">
         <Field label="Committee Decision From" required>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              type="date"
-              className="input"
               value={from}
               onChange={(e) => {
                 setFrom(e.target.value);
@@ -129,10 +126,8 @@ export function ExtractDialog({
         </Field>
         <Field label="Committee Decision To" required error={periodError}>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              type="date"
-              className="input"
               value={to}
               onChange={(e) => {
                 setTo(e.target.value);

@@ -25,6 +25,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatAmount, formatCompact, today } from '@/utils/format';
 import { MONTH_LABELS, sum, utilizationLevel } from './budgetMath';
+import { DateInput } from '@/components/ui/DateInput';
 
 const CHART_ACCOUNTS = 10;
 const LEVEL_BADGE = { over: 'danger', warning: 'warning', ok: 'success', none: 'neutral' };
@@ -91,15 +92,7 @@ export default function BudgetVsActualPage() {
       <Card>
         <div className="form-grid">
           <Field label="As of date">
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="date"
-                value={asOf}
-                onChange={(e) => setAsOf(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={asOf} onChange={(e) => setAsOf(e.target.value)} />}
           </Field>
           <Field label="Alert threshold %">
             {(id) => (

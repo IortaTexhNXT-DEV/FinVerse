@@ -19,6 +19,9 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, formatDateTime, humanize, today } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { DpList, Submission } from './commissionApi';
+import { FileDropZone } from '@/components/ui/FileDropZone';
+import { displayNameOf } from '@/api/users';
+import { DateInput } from '@/components/ui/DateInput';
 
 const TABS = [
   { id: 'lists', label: 'Lists Received' },
@@ -47,7 +50,7 @@ const LIST_COLUMNS: Column<DpList>[] = [
   {
     key: 'at',
     header: 'Taken In',
-    render: (l) => `${formatDateTime(l.createdAt)} · ${l.createdBy}`,
+    render: (l) => `${formatDateTime(l.createdAt)} · ${displayNameOf(l.createdBy)}`,
   },
 ];
 
@@ -95,13 +98,7 @@ function UploadDialog({
           hint="xlsx or csv named <Branch>_DP_<yyyyMMdd>, e.g. HO_DP_20260930.xlsx, with Invoice No., Policy No., Insurer, Premium and Remarks columns"
         >
           {(id) => (
-            <input
-              id={id}
-              type="file"
-              className="input"
-              accept=".xlsx,.csv"
-              onChange={(e) => setFile(e.target.files?.[0])}
-            />
+            <FileDropZone id={id} accept=".xlsx,.csv" onChange={(files) => setFile(files[0])} />
           )}
         </Field>
       </div>
@@ -121,26 +118,10 @@ function Tracker({ companyId }: Readonly<{ companyId: number }>) {
     <div className="stack">
       <div className="row">
         <Field label="From">
-          {(id) => (
-            <input
-              id={id}
-              type="date"
-              className="input"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-            />
-          )}
+          {(id) => <DateInput id={id} value={from} onChange={(e) => setFrom(e.target.value)} />}
         </Field>
         <Field label="To">
-          {(id) => (
-            <input
-              id={id}
-              type="date"
-              className="input"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-            />
-          )}
+          {(id) => <DateInput id={id} value={to} onChange={(e) => setTo(e.target.value)} />}
         </Field>
       </div>
       <ErrorAlert error={tracker.error} />

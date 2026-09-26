@@ -9,6 +9,7 @@ import { today } from '@/utils/format';
 import type { Answer, DpBilling, DpItem } from './commissionApi';
 import { answersOf, answersProblem } from './commissionLogic';
 import type { Decision } from './commissionLogic';
+import { DateInput } from '@/components/ui/DateInput';
 
 function splitAddresses(value: string): string[] {
   return value
@@ -246,10 +247,8 @@ export function CollectDialog({
         <div className="form-grid">
           <Field label="Collection Date" required>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={receiptDate}
                 onChange={(e) => setReceiptDate(e.target.value)}
               />

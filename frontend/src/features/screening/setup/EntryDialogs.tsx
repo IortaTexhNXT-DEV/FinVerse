@@ -14,6 +14,8 @@ import { screeningSetupApi } from './api';
 import type { EntryDetail, EntryRequest, ListSource, WatchlistChange, WatchlistEntry } from './api';
 import { RemarksDialog } from './RemarksDialog';
 import { aliasesText, entryErrors, parseAliases, requestOf } from './watchlistLogic';
+import { displayNameOf } from '@/api/users';
+import { DateInput } from '@/components/ui/DateInput';
 
 type TextKey = 'primaryName' | 'firstName' | 'lastName' | 'nationality' | 'idNumbers';
 type DateKey = 'birthDate' | 'listedOn' | 'delistedOn';
@@ -62,10 +64,8 @@ export function EntryFormDialog({ entry, aliases, sources, onClose }: Readonly<F
   const date = (key: DateKey, label: string) => (
     <Field label={label}>
       {(id) => (
-        <input
+        <DateInput
           id={id}
-          type="date"
-          className="input"
           value={request[key] ?? ''}
           onChange={(e) => set({ [key]: e.target.value || undefined })}
         />
@@ -217,7 +217,9 @@ function EntryFacts({ detail }: Readonly<{ detail: EntryDetail }>) {
 }
 
 function checkerText(c: WatchlistChange): string {
-  return c.decidedBy === undefined ? '—' : `${c.decidedBy} ${formatDateTime(c.decidedAt)}`;
+  return c.decidedBy === undefined
+    ? '—'
+    : `${displayNameOf(c.decidedBy)} ${formatDateTime(c.decidedAt)}`;
 }
 
 function HistoryTable({
@@ -238,7 +240,7 @@ function HistoryTable({
         {
           key: 'maker',
           header: 'Maker',
-          render: (c) => `${c.createdBy} ${formatDateTime(c.createdAt)}`,
+          render: (c) => `${displayNameOf(c.createdBy)} ${formatDateTime(c.createdAt)}`,
         },
         { key: 'checker', header: 'Checker', render: checkerText },
         { key: 'remarks', header: 'Remarks', render: (c) => c.decisionRemarks ?? c.makerRemarks },

@@ -67,7 +67,7 @@ export default function InvestmentRunsPage() {
       <PageHeader
         section="Assets & Investments"
         title="Accrual & Amortization"
-        description="Month-end investment income: one journal per holding, valued at the period end. Each run is posted once per period."
+        description="Month-end investment income: one journal per holding, valued at the period end."
         actions={
           can('PERIOD_END_RUN') && (
             <Button

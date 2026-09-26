@@ -13,6 +13,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { today } from '@/utils/format';
 import { PostingConfirmation } from './PostingConfirmation';
 import type { PostingStep } from './PostingConfirmation';
+import { DateInput } from '@/components/ui/DateInput';
 
 type Dialog = 'reject' | 'reverse' | PostingStep | null;
 
@@ -168,10 +169,8 @@ export function JournalActions({ journal }: Readonly<{ journal: Journal }>) {
           {dialog === 'reverse' && (
             <Field label="Reversal value date" required>
               {(fid) => (
-                <input
+                <DateInput
                   id={fid}
-                  className="input"
-                  type="date"
                   value={reversalDate}
                   onChange={(e) => setReversalDate(e.target.value)}
                 />

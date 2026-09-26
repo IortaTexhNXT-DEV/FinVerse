@@ -98,6 +98,22 @@ class BulkServiceIT {
       assertThat(report.getSheet("Rows").getRow(3).getCell(1).getStringCellValue())
           .isEqualTo("INVALID");
     }
+
+    // Error file: the five rows not processed, in the template layout with an Error column last
+    // and the named cells highlighted, ready to correct and upload again.
+    try (XSSFWorkbook errors =
+        new XSSFWorkbook(new ByteArrayInputStream(bulk.errorFile(job.getId())))) {
+      var sheet = errors.getSheet("Data");
+      assertThat(sheet.getPhysicalNumberOfRows()).isEqualTo(6);
+      assertThat(sheet.getRow(0).getCell(0).getStringCellValue()).isEqualTo("Plate No");
+      assertThat(sheet.getRow(0).getCell(5).getStringCellValue()).isEqualTo("Error");
+      var missingPlate = sheet.getRow(3);
+      assertThat(missingPlate.getCell(5).getStringCellValue()).contains("Plate No is mandatory");
+      assertThat(missingPlate.getCell(0).getCellStyle().getFillPattern())
+          .isEqualTo(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND);
+      assertThat(missingPlate.getCell(1).getCellStyle().getFillPattern())
+          .isEqualTo(org.apache.poi.ss.usermodel.FillPatternType.NO_FILL);
+    }
   }
 
   @Test
@@ -187,14 +203,14 @@ class BulkServiceIT {
             + "<table:table-row>"
             + cell("ODS1")
             + "<table:table-cell office:value-type=\"float\" office:value=\"1500.00\">"
-            + "<text:p>1,500.00</text:p></table:table-cell>"
-            + "<table:table-cell office:value-type=\"date\" office:date-value=\"2026-11-30T00:00:00\">"
-            + "<text:p>30/11/2026</text:p></table:table-cell>"
-            + "<table:table-cell table:number-columns-repeated=\"1020\"/></table:table-row>"
-            + "<table:table-row>"
+            + "<text:p>1,500.00</text:p></table:table-cell><table:table-cell"
+            + " office:value-type=\"date\" office:date-value=\"2026-11-30T00:00:00\">"
+            + "<text:p>30/11/2026</text:p></table:table-cell><table:table-cell"
+            + " table:number-columns-repeated=\"1020\"/></table:table-row><table:table-row>"
             + cell("ODS2")
-            + "<table:table-cell office:value-type=\"float\" office:value=\"2\"><text:p>2</text:p></table:table-cell>"
-            + "<table:table-cell table:number-columns-repeated=\"2\"/>"
+            + "<table:table-cell office:value-type=\"float\""
+            + " office:value=\"2\"><text:p>2</text:p></table:table-cell><table:table-cell"
+            + " table:number-columns-repeated=\"2\"/>"
             + cell("fourth column")
             + "</table:table-row>"
             + "<table:table-row table:number-rows-repeated=\"1048570\">"

@@ -41,7 +41,7 @@ export default function ProposalsPage() {
       <PageHeader
         section="Non-Package Management"
         title="Proposal Requests"
-        description="Non-package risks priced by TSU with the insurers: PRF, quotation slip, insurer terms, comparative table and proposal slip."
+        description="Non-package risks priced by TSU with the insurers."
         actions={
           <>
             {(can('TSU_PROCESS') || can('TSU_APPROVE')) && (
@@ -67,6 +67,7 @@ export default function ProposalsPage() {
           }}
         />
         <WorklistToolbar
+          placeholder="Search PRF No., ARN or client"
           onSearch={(text) => {
             setApplied(text);
             setPage(0);

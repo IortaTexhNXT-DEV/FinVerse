@@ -57,7 +57,7 @@ export default function TsuWorkbenchPage() {
       <PageHeader
         section="Non-Package Management"
         title="TSU Workbench"
-        description="Proposal requests waiting for the Technical Services Unit, oldest due first. Claim a PRF to prepare its quotation slip, key in the insurer terms and prepare the proposal slip."
+        description="Proposal requests waiting for the Technical Services Unit, oldest due first."
       />
       <ErrorAlert error={counts.error ?? queue.error ?? claim.error} />
       <StageTiles counts={stageCounts} filters={filters} onFilter={setFilter} />

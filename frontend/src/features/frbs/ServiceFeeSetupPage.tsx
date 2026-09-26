@@ -99,7 +99,7 @@ export default function ServiceFeeSetupPage() {
         backTo="/frbs/service-fee"
         section="Finance · Accounting Reports"
         title="Service Fee Rates and Recipients"
-        description="Rates per service-fee segment and the payee and cost centre of each sales unit (to confirm with BDOI, AQ20)."
+        description="Service-fee rates per segment and the payee and cost centre of each sales unit."
       />
       <ErrorAlert error={rules.error ?? recipients.error} />
       <Card

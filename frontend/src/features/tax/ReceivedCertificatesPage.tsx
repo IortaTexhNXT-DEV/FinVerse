@@ -128,7 +128,7 @@ export default function ReceivedCertificatesPage() {
       <PageHeader
         section="Tax & Statutory"
         title="Certificates Received"
-        description="BIR 2307 certificates of the insurers on commission and incentives: recorded, posted to AR-BIR on hand and listed in the SAWT."
+        description="BIR 2307 certificates of the insurers on commission and incentives."
         actions={
           (can('TAX_MANAGE') || can('DISB_TAG')) && (
             <Button icon={<FilePlus2 size={16} />} onClick={() => setRecording(true)}>

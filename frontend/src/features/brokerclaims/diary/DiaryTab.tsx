@@ -12,6 +12,7 @@ import { formatDate, formatDateTime } from '@/utils/format';
 import { diaryApi, mayComplete } from './api';
 import type { DiaryEntry, DiaryInput } from './api';
 import { DiaryDialog } from './DiaryDialog';
+import { UserName } from '@/components/ui/UserName';
 
 /**
  * Diary tab of a claim (BRCLM.022, FR-CM-052): calls, e-mails, meetings, notes and follow-ups with
@@ -75,7 +76,7 @@ export function DiaryTab({ claimId, companyId }: Readonly<{ claimId: number; com
                 <StatusBadge status="OPEN" />
               ) : (
                 <span title={e.doneRemark}>
-                  Done {formatDateTime(e.doneAt)} by {e.doneBy}
+                  Done {formatDateTime(e.doneAt)} by <UserName login={e.doneBy} />
                 </span>
               ),
           },

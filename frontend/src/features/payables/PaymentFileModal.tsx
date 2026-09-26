@@ -9,6 +9,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { today } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface PaymentFileModalProps {
   open: boolean;
@@ -73,26 +74,10 @@ export function PaymentFileModal({ open, banks, onClose }: Readonly<PaymentFileM
           )}
         </Field>
         <Field label="From" required>
-          {(id) => (
-            <input
-              id={id}
-              className="input"
-              type="date"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-            />
-          )}
+          {(id) => <DateInput id={id} value={from} onChange={(e) => setFrom(e.target.value)} />}
         </Field>
         <Field label="To" required>
-          {(id) => (
-            <input
-              id={id}
-              className="input"
-              type="date"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-            />
-          )}
+          {(id) => <DateInput id={id} value={to} onChange={(e) => setTo(e.target.value)} />}
         </Field>
         <Field label="Include cheques and PDCs (positive pay)">
           {(id) => (

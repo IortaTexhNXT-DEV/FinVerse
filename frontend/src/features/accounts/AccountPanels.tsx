@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ACCOUNT_ENTITY } from '@/api/accounts';
 import type { Account, AccountItem } from '@/api/accounts';
 import { workflowApi } from '@/api/workflow';
-import { StageTimeline } from '@/components/broking/StageTimeline';
+import { HistoryTable } from '@/components/broking/HistoryTable';
 import { workflowKey } from '@/components/broking/workflowKey';
 import { Amount } from '@/components/ui/Amount';
 import { Card } from '@/components/ui/Card';
@@ -10,6 +10,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { DetailList } from '@/features/catalog/DetailList';
 import type { DetailRow } from '@/features/catalog/DetailList';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { displayNameOf } from '@/api/users';
 
 function detailRows(a: Account): DetailRow[] {
   return [
@@ -35,7 +36,7 @@ function detailRows(a: Account): DetailRow[] {
       [a.sales.region, a.sales.department, a.sales.team].filter(Boolean).join(' / ') || '—',
     ],
     ['Cost center', a.sales.costCenter],
-    ['Created', `${a.createdBy} ${formatDateTime(a.createdAt)}`],
+    ['Created', `${displayNameOf(a.createdBy)} ${formatDateTime(a.createdAt)}`],
   ];
 }
 
@@ -120,7 +121,7 @@ export function HistoryPanel({ accountId }: Readonly<{ accountId: number }>) {
   });
   return (
     <Card title="History">
-      <StageTimeline history={detail.data?.history ?? []} />
+      <HistoryTable history={detail.data?.history ?? []} terminal={detail.data?.stageTerminal} />
     </Card>
   );
 }

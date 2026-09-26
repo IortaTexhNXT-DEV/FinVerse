@@ -5,13 +5,13 @@ export const QUOTATIONS_HELP: HelpSection = {
   id: 'quotations',
   module: 'Quotation / Proposal',
   intro:
-    'Package quotations from the client request to the accounts. Each quotation has a Proposal No. and an Account Reference Number (ARN) that every account created from it carries.',
+    'Package quotations from the client request to the accounts. Each quotation has a Quotation No. and an Account Reference Number (ARN) that every account created from it carries.',
   screens: [
     {
       name: 'Quotations',
       path: '/quotations',
       summary:
-        'Work list of quotations by status (Drafts, For Review, Sent to Client, Accepted, Not Proceeded) with quick filters for your drafts and the quotations expiring soon. Search by Proposal No., ARN or client.',
+        'Work list of quotations by status (Drafts, For Review, Sent to Client, Accepted, Not Proceeded) with quick filters for your drafts and the quotations expiring soon. Search by Quotation No., ARN or client.',
       workflow: [
         'Open a quotation to act on it from the workflow panel.',
         'Select approved quotations (For Review tab) and use Send via Email to send them in one go: each client receives one e-mail with its quotations, the password follows separately.',
@@ -35,7 +35,7 @@ export const QUOTATIONS_HELP: HelpSection = {
         'Save Draft keeps the quotation open; Submit for Review sends it to the approver.',
       ],
       controls: [
-        'The premium is computed by the server with the rates in force (Appendix A) and, for a package, the rate scheme of its current version.',
+        'The premium is computed by the server with the rates in force and, for a package, the rate scheme of its current version.',
         'When a TSU routing rule applies (fleet, total sum insured, non-package risk) the wizard says so: consider a Proposal Request.',
         'The intake template version in force is stamped on the quotation.',
       ],
@@ -52,7 +52,7 @@ export const QUOTATIONS_HELP: HelpSection = {
       ],
       controls: [
         'A request from a source system is recorded once per source reference.',
-        'Reading the shared mailbox and the HLS interface wait for BDOI (Q11, Q12); requests are captured or uploaded meanwhile.',
+        'Requests are captured on screen or uploaded.',
       ],
     },
   ],

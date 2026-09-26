@@ -16,6 +16,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import { BillingBatches } from './BillingBatches';
 import { UploadReportDialog } from './UploadReportDialog';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'batches', label: 'Billing Batches' },
@@ -57,7 +58,7 @@ function ReportsTable({ companyId }: Readonly<{ companyId: number }>) {
           {
             key: 'by',
             header: 'Uploaded',
-            render: (r) => `${formatDateTime(r.createdAt)} by ${r.createdBy}`,
+            render: (r) => `${formatDateTime(r.createdAt)} by ${displayNameOf(r.createdBy)}`,
           },
         ]}
       />
@@ -89,7 +90,7 @@ export default function BillingPage() {
       <PageHeader
         section="Placement & Booking"
         title="CLPC Billing"
-        description="Billing file of the CBG Fire accounts awaiting payment and payment report matching. The file is exchanged with CLPC outside the system."
+        description="Billing file of the CBG Fire accounts awaiting payment and payment report matching."
         actions={
           <Button variant="primary" icon={<Upload size={16} />} onClick={() => setUploading({})}>
             Upload Payment Report

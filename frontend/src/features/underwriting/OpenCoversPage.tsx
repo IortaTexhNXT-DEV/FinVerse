@@ -76,7 +76,7 @@ export default function OpenCoversPage() {
       <PageHeader
         section="Underwriting"
         title="Open covers"
-        description="Marine cargo open covers with limits per shipment and per year; open one to declare shipments (certificates)."
+        description="Marine cargo open covers with limits per shipment and per year."
         actions={
           can('POLICY_MAINTAIN') && (
             <Button

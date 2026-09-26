@@ -55,7 +55,7 @@ export const CATALOG_HELP: HelpSection = {
         'Package versions list their coverages and, per insurer and coverage, the clauses that apply.',
       ],
       controls: [
-        'Coverages and clauses are authorized by another user (PRODUCT_AUTHORIZE) before a version can use them.',
+        'Coverages and clauses are authorized by another user before a version can use them.',
         'A package version cannot be submitted without an included basic coverage.',
       ],
     },
@@ -70,7 +70,7 @@ export const CATALOG_HELP: HelpSection = {
         'Deactivate a criterion to stop it; it stays in the History tab.',
       ],
       controls: [
-        'Every criterion and amendment is authorized by another user (PRODUCT_AUTHORIZE) and audited.',
+        'Every criterion and amendment is authorized by another user and audited.',
         'Overlapping periods of the same code are refused.',
         'Booking stamps the codes of the criteria an invoice matches; criteria of a package that expires or is retired raise an alert for review.',
       ],
@@ -87,7 +87,7 @@ export const CATALOG_HELP: HelpSection = {
       controls: [
         'Insurer, branches and rates are authorized by another user before use.',
         'Commission rates are effective-dated: the rate in force on the period start applies; otherwise the product default.',
-        'Only e-mail placement is available; SFTP and API channels are parked.',
+        'Placement is sent by e-mail.',
       ],
     },
     {

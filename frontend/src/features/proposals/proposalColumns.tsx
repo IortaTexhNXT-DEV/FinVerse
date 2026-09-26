@@ -9,7 +9,8 @@ import { formatDate } from '@/utils/format';
 export const PROPOSAL_COLUMNS: Column<ProposalListItem>[] = [
   {
     key: 'no',
-    header: 'Proposal No.',
+    header: 'PRF No.',
+    kind: 'code',
     render: (p) => (
       <>
         <strong className="mono">{p.prfNo}</strong>

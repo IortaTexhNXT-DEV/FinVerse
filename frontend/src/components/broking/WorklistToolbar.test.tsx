@@ -11,7 +11,7 @@ describe('work list toolbar', () => {
         <button type="button">Book Now</button>
       </WorklistToolbar>,
     );
-    await userEvent.type(screen.getByLabelText('Search Proposal No.'), '  ARN-1 ');
+    await userEvent.type(screen.getByLabelText('Search Reference No.'), '  ARN-1 ');
     await userEvent.click(screen.getByRole('button', { name: 'Search' }));
     expect(onSearch).toHaveBeenCalledWith('ARN-1');
     await userEvent.click(screen.getByRole('button', { name: 'Filters' }));

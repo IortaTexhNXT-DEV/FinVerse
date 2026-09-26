@@ -8,6 +8,7 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, humanize } from '@/utils/format';
 import type { DpItem } from './commissionApi';
+import { displayNameOf } from '@/api/users';
 
 /** A reason asked before an action (exclusion, cancellation). */
 export function ReasonDialog({
@@ -104,7 +105,7 @@ type Mode = 'view' | 'reinstate';
 function progressOf(item: DpItem): string {
   const f = item.feedback;
   const parts = [
-    f.confirmedBy ? `Confirmed by ${f.confirmedBy}` : '',
+    f.confirmedBy ? `Confirmed by ${displayNameOf(f.confirmedBy)}` : '',
     f.feedbackReason ? `Insurer: ${humanize(f.feedbackReason)} ${f.feedbackComment ?? ''}` : '',
     f.collectedOn ? `Collected ${formatDate(f.collectedOn)} (OR ${f.orNo ?? 'to follow'})` : '',
     f.returnedRef ? `Returned to collection as ${f.returnedRef}` : '',

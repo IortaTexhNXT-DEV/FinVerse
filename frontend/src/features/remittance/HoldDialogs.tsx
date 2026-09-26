@@ -7,6 +7,7 @@ import { Modal } from '@/components/ui/Modal';
 import { today } from '@/utils/format';
 import type { HoldInput } from './api';
 import { holdFormErrors } from './remittanceLabels';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface DialogProps {
   busy: boolean;
@@ -98,10 +99,8 @@ export function NewHoldDialog({
         </Field>
         <Field label="Hold Until" required error={errors.holdUntil}>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               value={form.holdUntil}
               onChange={(e) => set('holdUntil', e.target.value)}
             />
@@ -165,10 +164,8 @@ export function ExtendDialog({
         <ErrorAlert error={error} />
         <Field label="New Hold Until" required error={invalid}>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               value={until}
               onChange={(e) => {
                 setUntil(e.target.value);

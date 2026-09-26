@@ -53,7 +53,7 @@ export default function InsuranceAdvicePage() {
       <PageHeader
         section="Policy Issuance"
         title="Insurance Advice"
-        description="Insurance Advices of mortgaged accounts, generated on policy issue (or placement) from the Insurance Advice template, sent to the mortgagee bank password protected."
+        description="Insurance Advices of mortgaged accounts."
         actions={
           can('EPOLICY_MANAGE') && (
             <Button
@@ -103,7 +103,7 @@ export default function InsuranceAdvicePage() {
             { key: 'no', header: 'IA No.', render: (a) => <code>{a.iaNo}</code> },
             {
               key: 'client',
-              header: 'Insured / Proposal No.',
+              header: 'Insured / ARN',
               render: (a) => (
                 <span>
                   <Link to={`/placement/accounts/${a.arn}`}>{a.clientName}</Link>

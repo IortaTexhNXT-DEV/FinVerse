@@ -18,6 +18,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatBytes } from '@/utils/files';
 import { checkUploadFile, invalidRows, previewCsv, summarize } from './uploadHelpers';
 import type { CsvPreview } from './uploadHelpers';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 type Mode = 'VALIDATE' | 'IMPORT';
 
@@ -154,7 +155,7 @@ export default function JournalUploadPage() {
       <PageHeader
         section="General Ledger"
         title="Journal Upload"
-        description="Upload many vouchers at once from CSV or Excel. Each voucher is validated and created as a draft on its own; invalid vouchers are reported and skipped."
+        description="Upload many vouchers at once from CSV or Excel."
         actions={
           <>
             <Button
@@ -178,13 +179,7 @@ export default function JournalUploadPage() {
         <div className="stack">
           <Field label="Upload file (.csv or .xlsx, max 5 MB)" required>
             {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="file"
-                accept=".csv,.xlsx"
-                onChange={(e) => choose(e.target.files?.[0])}
-              />
+              <FileDropZone id={id} accept=".csv,.xlsx" onChange={(files) => choose(files[0])} />
             )}
           </Field>
           {file !== null && (

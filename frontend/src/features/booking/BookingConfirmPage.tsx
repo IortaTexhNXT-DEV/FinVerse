@@ -18,6 +18,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDate, today } from '@/utils/format';
 import { JournalLines, PremiumTables, SummaryFact } from './BookingParts';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface Options {
   bookingDate: string;
@@ -49,10 +50,8 @@ function OptionsForm({
         error={future ? 'Enter a booking date that is not in the future' : undefined}
       >
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            className="input"
-            type="date"
             max={today()}
             value={value.bookingDate}
             onChange={(e) => onChange({ ...value, bookingDate: e.target.value })}
@@ -136,7 +135,7 @@ function AccountSummary({
   return (
     <Card>
       <div className="summary-card">
-        <SummaryFact icon={BadgeCheck} label="Proposal No. (ARN)">
+        <SummaryFact icon={BadgeCheck} label="ARN">
           <ReferenceChip value={arn} />
         </SummaryFact>
         <SummaryFact icon={UserRound} label="Client">

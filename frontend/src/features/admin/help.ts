@@ -32,7 +32,7 @@ export const ADMIN_HELP: HelpSection = {
       ],
       controls: [
         'A profile changes only by implementing an approved request; the implementer is never the requester.',
-        'Every direct edit is audited and raises the UAM_DIRECT_ROLE_EDIT alert; every change is in the access change log.',
+        'Every direct edit is audited and raises an alert; every change is in the access change log.',
       ],
     },
     {

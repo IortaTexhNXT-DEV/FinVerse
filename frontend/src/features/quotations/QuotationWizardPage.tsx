@@ -29,6 +29,7 @@ import type { Preselection, QuotationForm, QuotationStep } from './quotationForm
 import { ClientStep, ItemsStep, TermsStep } from './QuotationSteps';
 import type { QuotationStepProps } from './QuotationSteps';
 import '@/styles/quotation.css';
+import { useUnsavedChangesGuard } from '@/components/ui/useUnsavedChangesGuard';
 
 function numberParam(value: string | null): number | undefined {
   return value === null || value === '' ? undefined : Number(value);
@@ -107,12 +108,7 @@ function StepBody({
     case 'items':
       return <ItemsStep {...props} detail={detail} />;
     case 'premium':
-      return (
-        <p className="muted">
-          The premium below is computed by the server with the catalog rates (Appendix A) and is
-          stored with the version when you save.
-        </p>
-      );
+      return null;
     default:
       return <ReviewStep form={props.form} />;
   }
@@ -189,13 +185,16 @@ function Wizard({ initial }: Readonly<{ initial: QuotationForm }>) {
   };
   const saved = form.id !== undefined;
   const props = { form, set, errors, saved };
+  const leaveGuard = useUnsavedChangesGuard(
+    !saved && JSON.stringify(form) !== JSON.stringify(initial),
+  );
   return (
     <div className="stack">
       <PageHeader
         backTo="/quotations"
         section="Quotation / Proposal"
         title={saved ? `Quotation ${form.quotationNo ?? ''}` : 'New Quotation'}
-        description="Client or prospect, product and terms, risk items, then the premium computed live with the rates in force."
+        description="Client or prospect, product and terms, risk items, then the premium computed live."
         actions={
           <>
             {form.arn && <ReferenceChip label="ARN" value={form.arn} />}
@@ -217,6 +216,7 @@ function Wizard({ initial }: Readonly<{ initial: QuotationForm }>) {
         onChange={go}
       />
       <ErrorAlert error={save.error ?? submit.error} />
+      {leaveGuard}
       <Card title={QUOTATION_STEPS[index]?.label}>
         <StepBody step={step} props={props} detail={detail.data} />
       </Card>

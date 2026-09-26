@@ -1,6 +1,8 @@
 import { ChevronLeft } from 'lucide-react';
+import { useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { BRAND } from '@/branding';
 
 interface PageHeaderProps {
   title: string;
@@ -11,7 +13,41 @@ interface PageHeaderProps {
   backTo?: string;
 }
 
-/** Standard page heading: back arrow, module breadcrumb, title, description and page actions. */
+/** The browser tab title of a screen: "Unapplied Payments · BIBS". */
+function documentTitle(title: string): string {
+  return title ? `${title} · ${BRAND.product}` : BRAND.product;
+}
+
+/**
+ * Back arrow: returns to the previous page of the session (the list with its filters and search),
+ * or opens the parent list when the page was opened directly.
+ */
+function BackLink({ to }: Readonly<{ to: string }>) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const hasHistory = location.key !== 'default';
+  return (
+    <Link
+      to={to}
+      className="page-back"
+      aria-label="Back"
+      onClick={(e) => {
+        if (hasHistory) {
+          e.preventDefault();
+          void navigate(-1);
+        }
+      }}
+    >
+      <ChevronLeft size={28} aria-hidden="true" />
+    </Link>
+  );
+}
+
+/**
+ * Standard page heading: back arrow, module breadcrumb, title, one short business line and the
+ * page actions (secondary, primary, then the destructive action separated). Sets the browser tab
+ * title.
+ */
 export function PageHeader({
   title,
   section,
@@ -19,17 +55,16 @@ export function PageHeader({
   actions,
   backTo,
 }: Readonly<PageHeaderProps>) {
+  useEffect(() => {
+    document.title = documentTitle(title);
+  }, [title]);
   return (
     <div className="page-header">
-      {backTo !== undefined && (
-        <Link to={backTo} className="page-back" aria-label="Back">
-          <ChevronLeft size={28} aria-hidden="true" />
-        </Link>
-      )}
+      {backTo !== undefined && <BackLink to={backTo} />}
       <div>
         {section !== undefined && <div className="breadcrumb">{section}</div>}
         <h1>{title}</h1>
-        {description !== undefined && <p>{description}</p>}
+        {description !== undefined && <p title={description}>{description}</p>}
       </div>
       <div className="spacer" />
       {actions !== undefined && <div className="row">{actions}</div>}

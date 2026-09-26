@@ -13,6 +13,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
+import { displayNameOf } from '@/api/users';
 
 type Tab = 'parameters' | 'configuration';
 
@@ -92,7 +93,7 @@ export default function SystemParametersPage() {
       <PageHeader
         section="Administration"
         title="System Parameters"
-        description="Business parameters used across modules. Changes take effect immediately and are recorded in the audit trail."
+        description="Business parameters used across modules."
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'configuration' && <ConfigurationTable />}
@@ -113,7 +114,9 @@ export default function SystemParametersPage() {
                 key: 'u',
                 header: 'Last Changed',
                 render: (p) =>
-                  p.updatedBy === undefined ? '' : `${p.updatedBy}, ${formatDateTime(p.updatedAt)}`,
+                  p.updatedBy === undefined
+                    ? ''
+                    : `${displayNameOf(p.updatedBy)}, ${formatDateTime(p.updatedAt)}`,
               },
             ]}
           />

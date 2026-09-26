@@ -17,6 +17,7 @@ import { screeningSetupApi } from './api';
 import type { ChangeStatus, EntryStatus, ListSource, WatchlistChange, WatchlistEntry } from './api';
 import { ChangeDialog } from './ChangeDialog';
 import { EntryDetailDialog, EntryFormDialog } from './EntryDialogs';
+import { displayNameOf } from '@/api/users';
 
 type TabId = 'ENTRIES' | ChangeStatus;
 
@@ -141,7 +142,7 @@ function ChangesTab({
           {
             key: 'maker',
             header: 'Maker',
-            render: (c) => `${c.createdBy} ${formatDateTime(c.createdAt)}`,
+            render: (c) => `${displayNameOf(c.createdBy)} ${formatDateTime(c.createdAt)}`,
           },
           { key: 'remarks', header: 'Remarks', render: (c) => c.makerRemarks },
           { key: 'status', header: 'Status', render: (c) => <StatusBadge status={c.status} /> },
@@ -185,7 +186,7 @@ export default function WatchlistPage() {
       <PageHeader
         section="Setup & Administration · Compliance Setup"
         title="Watchlist"
-        description="Sanctioned names, PEPs and internal watchlist entries. Manual additions, changes and deactivations wait for a Compliance Checker; screening uses active entries only."
+        description="Sanctioned names, PEPs and internal watchlist entries."
         actions={
           can('SCR_LIST_MAINTAIN') && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => setAdding(true)}>

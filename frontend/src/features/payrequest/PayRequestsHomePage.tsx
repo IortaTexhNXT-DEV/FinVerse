@@ -23,6 +23,7 @@ import { payRequestApi } from './api';
 import type { PayRequest, RequestKind, RequestSummary, StageCounts } from './api';
 import { KIND_LABELS, STAGE_TABS, tabOf } from './requestForm';
 import type { StageTab } from './requestForm';
+import { DateInput } from '@/components/ui/DateInput';
 
 const keyOf = (r: RequestSummary) => String(r.id);
 
@@ -157,10 +158,8 @@ function Filters({
       </Field>
       <Field label="Request Date From">
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            type="date"
-            className="input"
             value={from}
             onChange={(e) => onChange({ kind, from: e.target.value, to })}
           />
@@ -168,10 +167,8 @@ function Filters({
       </Field>
       <Field label="Request Date To">
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            type="date"
-            className="input"
             value={to}
             onChange={(e) => onChange({ kind, from, to: e.target.value })}
           />
@@ -237,7 +234,7 @@ export default function PayRequestsHomePage() {
       <PageHeader
         section="Finance · Refund & Cash Advance Requests"
         title="Refund & Cash Advance Requests"
-        description="Client refunds, employee cash advances and disbursed-check cancellations, from preparation to payment."
+        description="Client refunds, employee cash advances and disbursed-check cancellations."
         actions={
           can('PRQ_CREATE') && (
             <>

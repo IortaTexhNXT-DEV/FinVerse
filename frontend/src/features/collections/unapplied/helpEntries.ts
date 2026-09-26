@@ -17,10 +17,10 @@ export const UNAPPLIED_HELP: HelpScreen[] = [
       'Open a payment to see its account, dispositions, requests and history.',
     ],
     controls: [
-      'Only active values of the Unapplied Payment Disposition list can be chosen (BRCLXN.037-039).',
-      '"For application to invoice" needs an invoice number in the format of CLX_INVOICE_NO_PATTERN that exists in the invoice ledger (BRCLXN.047/048).',
+      'Only active values of the Unapplied Payment Disposition list can be chosen.',
+      '"For application to invoice" needs an invoice number in the format of CLX_INVOICE_NO_PATTERN that exists in the invoice ledger.',
       'A value with a Cashiering action sends a request to Cashiering, which accepts or rejects it and applies, refunds, reclassifies or transfers the payment with its own approvals.',
-      'Dispositions are never deleted; the history stays after the payment is applied or refunded (BRCLXN.040).',
+      'Dispositions are never deleted; the history stays after the payment is applied or refunded.',
       'Recording dispositions needs CLX_UNAPPLIED_WORK (Collection Handler, Unapplied Payment Handler, AO).',
     ],
   },
@@ -35,7 +35,7 @@ export const UNAPPLIED_HELP: HelpScreen[] = [
     ],
     controls: [
       'The requester is notified when Cashiering accepts, rejects or executes a request.',
-      'The job CLX_APPLICATION_FILE writes the daily "For Application To Invoice" text file of the previous day before 06:00 (BRCLXN.041/042); the report CLX-APPLICATION-TO-INVOICE lists the same requests for any period.',
+      'A scheduled job writes the daily "For Application To Invoice" text file of the previous day before 06:00; the report CLX-APPLICATION-TO-INVOICE lists the same requests for any period.',
     ],
   },
 ];

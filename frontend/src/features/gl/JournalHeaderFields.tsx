@@ -2,6 +2,7 @@ import type { ManualJournalType } from '@/api/gl';
 import { Field } from '@/components/ui/Field';
 import { useWorkspace } from '@/context/workspaceContext';
 import type { JournalHeaderValues } from './journalForm';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface Props {
   value: JournalHeaderValues;
@@ -52,10 +53,8 @@ export function JournalHeaderFields({ value, onChange }: Readonly<Props>) {
         </Field>
         <Field label="Value date" required>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               value={value.valueDate}
               onChange={(e) => set('valueDate', e.target.value)}
             />
@@ -82,10 +81,8 @@ export function JournalHeaderFields({ value, onChange }: Readonly<Props>) {
           }
         >
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               min={value.valueDate}
               value={value.reverseOn}
               onChange={(e) => set('reverseOn', e.target.value)}

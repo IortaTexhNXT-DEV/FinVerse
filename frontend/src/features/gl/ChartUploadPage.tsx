@@ -18,6 +18,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import { NumberingPanel } from './NumberingPanel';
 import { glPlatformApi } from './glPlatformApi';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 type Tab = 'upload' | 'numbering' | 'history';
 
@@ -53,7 +54,7 @@ export default function ChartUploadPage() {
         section="General Ledger"
         backTo="/gl/accounts"
         title="Chart Upload & Numbering"
-        description="Load parent and child accounts from a file and set how child account numbers are generated. Every account waits for authorization."
+        description="Load parent and child accounts from a file and set how child account numbers are generated."
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'upload' && <UploadPanel />}
@@ -109,8 +110,7 @@ function UploadPanel() {
           <FileSpreadsheet size={20} aria-hidden="true" />
           <span>
             One row per account, parents before their children. Leave the account code blank to use
-            the parent&apos;s numbering scheme. A sample file is in
-            docs/samples/coa_upload_sample.xlsx.
+            the parent&apos;s numbering scheme.
           </span>
           <span className="spacer" />
           <Button
@@ -131,12 +131,10 @@ function UploadPanel() {
               hint="Excel (.xlsx), OpenDocument (.ods) or CSV, headers in row 1."
             >
               {(id) => (
-                <input
+                <FileDropZone
                   id={id}
-                  type="file"
-                  className="input"
                   accept=".xlsx,.ods,.csv"
-                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                  onChange={(files) => setFile(files[0] ?? null)}
                 />
               )}
             </Field>

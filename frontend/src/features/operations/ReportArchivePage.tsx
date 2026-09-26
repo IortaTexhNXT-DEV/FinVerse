@@ -16,6 +16,7 @@ import { formatDateTime } from '@/utils/format';
 import { orUndefined } from './invoiceSearch';
 import { fileAvailable, runStatus } from './reportRuns';
 import './operations.css';
+import { displayNameOf } from '@/api/users';
 
 /** Download button of an archived file, or the time from which a scheduled file is available. */
 function FileCell({ run, onDownload }: Readonly<{ run: ReportRun; onDownload: () => void }>) {
@@ -69,7 +70,7 @@ export default function ReportArchivePage() {
     {
       key: 'by',
       header: 'Generated',
-      render: (r) => `${formatDateTime(r.createdAt)} · ${r.createdBy}`,
+      render: (r) => `${formatDateTime(r.createdAt)} · ${displayNameOf(r.createdBy)}`,
     },
     {
       key: 'file',

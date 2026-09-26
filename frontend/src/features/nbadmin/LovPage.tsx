@@ -134,7 +134,7 @@ export default function LovPage() {
       <PageHeader
         section="Broking Setup"
         title="Lists of Values"
-        description="Coded values used on broking screens (segments, reasons, document types, tags...). Changes take effect from their date once authorized by a checker."
+        description="Coded values used on the broking screens."
       />
       <ErrorAlert error={types.error} />
       <div className="split">

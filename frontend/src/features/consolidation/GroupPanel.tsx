@@ -3,6 +3,7 @@ import type { ConsolidationGroup } from '@/api/consolidation';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Field } from '@/components/ui/Field';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface Props {
   groups: ConsolidationGroup[];
@@ -45,13 +46,7 @@ export function GroupPanel(props: Readonly<Props>) {
         </Field>
         <Field label="As of date">
           {(id) => (
-            <input
-              id={id}
-              className="input"
-              type="date"
-              value={asOf}
-              onChange={(e) => props.onAsOf(e.target.value)}
-            />
+            <DateInput id={id} value={asOf} onChange={(e) => props.onAsOf(e.target.value)} />
           )}
         </Field>
         {canRun && (

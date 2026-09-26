@@ -45,7 +45,7 @@ export default function FacPlacementsPage() {
       <PageHeader
         section="Reinsurance"
         title="Facultative Placements"
-        description="Sum insured beyond treaty capacity. Record the reinsurers on the slip and submit it; a checker approves the placement, which cedes the premium to them."
+        description="Sum insured beyond treaty capacity."
       />
       <Tabs tabs={TABS} active={filter} onChange={setFilter} />
       <ErrorAlert error={list.error} />

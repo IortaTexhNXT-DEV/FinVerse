@@ -17,11 +17,10 @@ import { VersionWorkbench } from './VersionWorkbench';
 type TemplateType = (typeof TEMPLATE_TYPES)[number];
 
 const DESCRIPTIONS: Record<TemplateType, string> = {
-  KYC_REVIEW:
-    'The KYC review an investigator completes on a name-match or high-risk case (SNSRP-104, 501).',
-  TRANSACTION_REVIEW: 'The review of a suspicious transaction (SNSRP-104, 501).',
-  EDD: 'Enhanced due diligence of high-risk and PEP clients with an active policy (SNSRP-104, 303).',
-  STR: 'The fields of the suspicious transaction report and the case data that prefills them (SNSRP-105, 705).',
+  KYC_REVIEW: 'The KYC review an investigator completes on a name-match or high-risk case.',
+  TRANSACTION_REVIEW: 'The review of a suspicious transaction.',
+  EDD: 'Enhanced due diligence of high-risk and PEP clients with an active policy.',
+  STR: 'The fields of the suspicious transaction report and the case data that prefills them.',
 };
 
 function controlOf(field: ConfigRow, id: string) {
@@ -141,7 +140,7 @@ export default function TemplatesPage() {
       <PageHeader
         section="Setup & Administration · Compliance Setup"
         title="Templates"
-        description="Review and STR templates: sections, fields, mandatory flags and lists of values, with a preview of the form. Each change is a new version approved by a Compliance Checker."
+        description="Review and STR templates: sections, fields, mandatory flags and lists of values."
       />
       <Tabs
         tabs={TEMPLATE_TYPES.map((t) => ({ id: t, label: humanize(t) }))}

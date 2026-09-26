@@ -34,8 +34,8 @@ export const ISSUANCE_HELP: HelpSection = {
       ],
       controls: [
         'Only placed or issued accounts receive e-policies.',
-        'Reading the insurers mailbox or SFTP is not built yet (Q31): files are uploaded.',
-        'Extraction reads the PDF text with the insurer patterns; scanned policies are completed by hand (OCR, Q24).',
+        'E-policies received from insurers are uploaded here.',
+        'Extraction reads the PDF text with the insurer patterns; scanned policies are completed by hand.',
       ],
     },
     {
@@ -50,7 +50,7 @@ export const ISSUANCE_HELP: HelpSection = {
       ],
       controls: [
         'Only accounts with a mortgagee bank get an Insurance Advice.',
-        'Every generation, download and send is audited; the recipient is confirmed with BDOI (Q30).',
+        'Every generation, download and send is audited.',
       ],
     },
     {
@@ -65,7 +65,7 @@ export const ISSUANCE_HELP: HelpSection = {
       ],
       controls: [
         'Only confirmed e-policies can be sent (E-policy Sender role).',
-        'The BDOI password convention is pending (Q07): passwords are generated.',
+        'Passwords are generated.',
       ],
     },
   ],

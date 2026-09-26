@@ -21,7 +21,7 @@ export default function PeriodEndPage() {
       <PageHeader
         section="Planning & Closing"
         title="Period-End & Year-End"
-        description="Automatic closing controls with pass/fail results. Monthly: soft close, revalue, close. Year-end: close income and expenses to retained earnings and open the next year."
+        description="Automatic closing controls with pass/fail results."
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'period' ? <PeriodEndPanel picker={picker} /> : <YearEndPanel picker={picker} />}

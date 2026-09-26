@@ -44,7 +44,7 @@ const DATES: InputSpec[] = [
     key: 'packageEndDate',
     label: 'Package End',
     type: 'date',
-    hint: 'Expiry monitoring (BRPM.017)',
+    hint: 'Expiry monitoring',
   },
   { key: 'anniversaryDate', label: 'Anniversary', type: 'date' },
 ];

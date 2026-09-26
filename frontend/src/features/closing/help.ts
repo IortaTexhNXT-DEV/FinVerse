@@ -19,7 +19,7 @@ export const PLANNING_HELP: HelpSection = {
       ],
       controls: [
         'The submitter can never approve (maker-checker); submitted versions appear in My Approvals.',
-        'Needs BUDGET_MANAGE. Only the latest approved version is used for monitoring.',
+        'Only the latest approved version is used for monitoring.',
       ],
     },
     {
@@ -45,7 +45,7 @@ export const PLANNING_HELP: HelpSection = {
       ],
       controls: [
         'Both journals post in one transaction, or neither does. Only active relationships transact.',
-        'Base amounts use the SPOT rate of the value date. Needs CONSOLIDATION_RUN.',
+        'Base amounts use the SPOT rate of the value date. ',
       ],
     },
     {
@@ -74,7 +74,7 @@ export const PLANNING_HELP: HelpSection = {
       ],
       controls: [
         'Each period is revalued once; posting again returns the existing run.',
-        'A missing CLOSING rate blocks posting. Needs PERIOD_END_RUN.',
+        'A missing CLOSING rate blocks posting. ',
       ],
     },
     {
@@ -91,18 +91,18 @@ export const PLANNING_HELP: HelpSection = {
         'Unreconciled items: the book entries and bank statement lines of every bank account not yet matched up to the period end (the items of the BRS and the un-reconciled entries reports). They show as a warning to review and do not block the close, because deposits in transit and unpresented cheques are normal at a period end.',
         'A closed fiscal year cannot be reopened.',
         'Soft close and close need PERIOD_MANAGE; the year-end close needs YEAR_END_CLOSE.',
-        'After the year-end close the verification shows the nominal balances and the trial balance difference as of the year end; both must be zero (FRBS 2.7.1). The YEAR_END_CLOSE_DUE alert warns when the previous year is still open near the 15 April deadline.',
+        'After the year-end close the verification shows the nominal balances and the trial balance difference as of the year end; both must be zero. The YEAR_END_CLOSE_DUE alert warns when the previous year is still open near the 15 April deadline.',
       ],
     },
     {
       name: 'GL Close & Cut-Off',
       path: '/planning/gl-close',
       summary:
-        'Scheduled month-end close of the previous month (FRBS 2.6.0 / 2.6.1) and the cut-off of the broking books at month end (FRBS 3.4.0 / 3.4.1).',
+        'Scheduled month-end close of the previous month and the cut-off of the broking books at month end.',
       workflow: [
-        'Schedule Close: pick the period and the date and time (proposed: the 2nd banking day of the next month, 17:00 Manila). The GL_PERIOD_CLOSE job runs the checklist then and closes the period; Close Now does it at once.',
-        'A failed close is recorded with the blocking checklist items and raises GL_CLOSE_FAILED; fix them and schedule again.',
-        'Broking books: the BROKING_BOOKS_CLOSE job closes them on the last day of the month at BROKING_CLOSE_TIME; the GL Team Lead can close them earlier or reopen them with a reason.',
+        'Schedule Close: pick the period and the date and time (proposed: the 2nd banking day of the next month, 17:00 Manila). A scheduled job runs the checklist then and closes the period; Close Now does it at once.',
+        'A failed close is recorded with the blocking checklist items and raises an alert; fix them and schedule again.',
+        'Broking books: a scheduled job closes them on the last day of the month at BROKING_CLOSE_TIME; the GL Team Lead can close them earlier or reopen them with a reason.',
       ],
       controls: [
         'With CLOSE_ONLY_PREVIOUS_MONTH on, only the month before the close date can be closed.',

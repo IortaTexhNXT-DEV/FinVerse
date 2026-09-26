@@ -19,6 +19,7 @@ import { formatDateTime, humanize } from '@/utils/format';
 import { cashieringApi } from './cashieringApi';
 import type { CwtBatch, CwtTag } from './cashieringApi';
 import { CwtTagDialog } from './CwtTagDialog';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'tagged', label: 'Tagged by Marketing' },
@@ -70,7 +71,11 @@ const TAG_COLUMNS: Column<CwtTag>[] = [
       </span>
     ),
   },
-  { key: 'by', header: 'Tagged', render: (t) => `${t.taggedBy} · ${formatDateTime(t.taggedAt)}` },
+  {
+    key: 'by',
+    header: 'Tagged',
+    render: (t) => `${displayNameOf(t.taggedBy)} · ${formatDateTime(t.taggedAt)}`,
+  },
   { key: 'stage', header: 'Stage', render: (t) => <StatusBadge status={t.stage} /> },
 ];
 
@@ -209,7 +214,7 @@ export default function Cwt2307Page() {
       <PageHeader
         section="Cashiering"
         title="BIR 2307"
-        description="Creditable withholding tax certificates of 2% CWT clients: tagging, validation, report and routing to the insurer."
+        description="Creditable withholding tax certificates of 2% CWT clients."
         actions={
           can('CWT_TAG') && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => setTagging(true)}>

@@ -14,7 +14,7 @@ export const reservesModule: FeatureModule = {
       path: '/reserves/summary',
       label: 'Reserve Summary',
       icon: ChartColumn,
-      permission: 'REPORT_FINANCIAL',
+      permission: 'RESERVE_VIEW',
       component: lazy(() => import('./ReserveDashboardPage')),
     },
     {
@@ -43,7 +43,7 @@ export const reservesModule: FeatureModule = {
       path: '/reserves/parameters',
       label: 'Reserve Parameters',
       icon: SlidersHorizontal,
-      permission: 'MASTER_VIEW',
+      permission: 'RESERVE_VIEW',
       component: lazy(() => import('./ReserveParametersPage')),
     },
   ],

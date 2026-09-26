@@ -54,7 +54,7 @@ export default function TriangleViewerPage() {
       <PageHeader
         section="Actuarial Reserves"
         title="IBNR Triangles"
-        description="Claims development by accident period and development age from the posted claim movements; chain-ladder factors (volume weighted), ultimates and IBNR = ultimate − incurred. Blank options use the line's reserve parameters."
+        description="Claims development by accident period and development age from the posted claim movements."
         actions={
           <Button
             variant="secondary"

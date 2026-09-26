@@ -10,6 +10,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { useToast } from '@/components/ui/toastContext';
 import { numbersError, proposedNumbers } from './issuanceLogic';
+import { DateInput } from '@/components/ui/DateInput';
 
 /**
  * Confirmation of the extracted policy data (BRNB.074/104): one policy number per policy year
@@ -107,10 +108,8 @@ export function ConfirmPolicyCard({ review }: Readonly<{ review: Review }>) {
           ))}
           <Field label="Issue date" hint="Today when left empty.">
             {(fid) => (
-              <input
+              <DateInput
                 id={fid}
-                type="date"
-                className="input"
                 value={issueDate}
                 onChange={(e) => setIssueDate(e.target.value)}
               />

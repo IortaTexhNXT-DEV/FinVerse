@@ -19,6 +19,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDate, humanize, today } from '@/utils/format';
 import { pdcActions } from './receivablesMath';
 import { useReceivablesLookups } from './useReceivablesLookups';
+import { DateInput } from '@/components/ui/DateInput';
 
 const TABS = [
   { id: 'held', label: 'On hand & due' },
@@ -121,15 +122,7 @@ export default function PdcPage() {
       <Card>
         <div className="form-grid">
           <Field label="As of / banking date">
-            {(id) => (
-              <input
-                id={id}
-                type="date"
-                className="input"
-                value={asOf}
-                onChange={(e) => setAsOf(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={asOf} onChange={(e) => setAsOf(e.target.value)} />}
           </Field>
         </div>
       </Card>

@@ -159,7 +159,7 @@ export default function InvoiceSearchPage() {
       <PageHeader
         section="Operations"
         title="Invoice Search"
-        description="Booked invoices and endorsements in the Operations ledger with their outstanding premium, payment and remittance status."
+        description="Booked invoices and endorsements in the Operations ledger with their outstanding premium."
       />
       <ErrorAlert error={rows.error} />
       <Card>

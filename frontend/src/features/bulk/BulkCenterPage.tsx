@@ -14,6 +14,7 @@ import { Pager } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
+import { displayNameOf } from '@/api/users';
 
 /**
  * Bulk Processing: the upload types you may use (bulk quotations, accounts, client updates,
@@ -38,7 +39,7 @@ export default function BulkCenterPage() {
       <PageHeader
         section="Bulk Processing"
         title="Bulk Processing"
-        description="Create or update many records from one file. Download the template, upload the filled file, review every row, then process the valid rows."
+        description="Create or update many records from one file."
       />
       <ErrorAlert error={handlers.error ?? jobs.error} />
       <HandlerTiles handlers={handlers.data} />
@@ -69,7 +70,7 @@ export default function BulkCenterPage() {
             {
               key: 'by',
               header: 'Uploaded',
-              render: (j) => `${j.createdBy} · ${formatDateTime(j.createdAt)}`,
+              render: (j) => `${displayNameOf(j.createdBy)} · ${formatDateTime(j.createdAt)}`,
             },
             {
               key: 'report',

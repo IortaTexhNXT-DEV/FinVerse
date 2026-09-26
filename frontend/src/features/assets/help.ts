@@ -13,7 +13,7 @@ export const ASSETS_HELP: HelpSection = {
       summary:
         'Classes of property and equipment with their GL accounts (asset, accumulated depreciation, depreciation expense) and default depreciation policy: method, useful life and residual value.',
       controls: [
-        'Maker-checker: a new or changed category must be authorized by another user (MASTER_AUTHORIZE) before assets use it.',
+        'Maker-checker: a new or changed category must be authorized by another user before assets use it.',
       ],
     },
     {
@@ -23,8 +23,8 @@ export const ASSETS_HELP: HelpSection = {
         'Property and equipment with cost, accumulated depreciation and net book value. Register, capitalize, dispose of or transfer assets.',
       workflow: [
         'The maker registers the asset; a different user capitalizes it, which posts ASSET_ACQUISITION on the capitalization date.',
-        'Assets acquired before go-live are registered as take-on: their opening accumulated depreciation is posted against retained earnings (ASSET_TAKE_ON).',
-        'Dispose of an asset: gain or loss = proceeds − net book value (ASSET_DISPOSAL).',
+        'Assets acquired before go-live are registered as take-on: their opening accumulated depreciation is posted against retained earnings.',
+        'Dispose of an asset: gain or loss = proceeds − net book value.',
         'Transfer to another branch: two balanced journals through inter-branch clearing; the asset keeps depreciating at the receiving branch.',
       ],
       controls: [
@@ -63,11 +63,9 @@ export const ASSETS_HELP: HelpSection = {
         'Time deposits, treasury bills, bonds and equities with face value, cost, coupon terms, day count and maturity.',
       workflow: [
         'The maker records the holding; a checker approves it, which posts the purchase (clean price plus purchased accrued interest, INVESTMENT_PURCHASE).',
-        'Holdings bought before go-live are taken on at their carrying amount against retained earnings (INVESTMENT_TAKE_ON).',
+        'Holdings bought before go-live are taken on at their carrying amount against retained earnings.',
       ],
-      controls: [
-        'The approver must differ from the maker (MASTER_AUTHORIZE); the approval appears in My Approvals.',
-      ],
+      controls: ['The approver must differ from the maker; the approval appears in My Approvals.'],
     },
     {
       name: 'Accrual & Amortization',

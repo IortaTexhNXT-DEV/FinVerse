@@ -20,6 +20,8 @@ import { EMPTY_FUNDING, bankLabel, fundingErrors, fundingFormOf, fundingInputOf 
 import type { FundingForm } from './forms';
 import { TextDialog } from './VoucherDialogs';
 import './disbursement.css';
+import { displayNameOf } from '@/api/users';
+import { DateInput } from '@/components/ui/DateInput';
 
 const ENTITY = 'DisbursementFunding';
 
@@ -87,10 +89,8 @@ function FundingFields({
       </Field>
       <Field label="Value Date" required error={errors.valueDate}>
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            type="date"
-            className="input"
             disabled={disabled}
             value={form.valueDate}
             onChange={(e) => onChange({ valueDate: e.target.value })}
@@ -179,9 +179,9 @@ function TransferCard({
 }
 
 function describe(f: Funding): string {
-  const parts = [`Requested by ${f.createdBy}`];
+  const parts = [`Requested by ${displayNameOf(f.createdBy)}`];
   if (f.verifiedBy !== undefined) {
-    parts.push(`verified by ${f.verifiedBy}`);
+    parts.push(`verified by ${displayNameOf(f.verifiedBy)}`);
   }
   if (f.journalNo !== undefined) {
     parts.push(`journal ${f.journalNo}`);

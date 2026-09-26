@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Card } from '@/components/ui/Card';
+import { isEmptyValue } from '@/utils/presentation';
 
 /** One fact of a record summary: icon, label and value. */
 export interface Fact {
@@ -20,29 +21,32 @@ interface RecordSummaryProps {
 }
 
 /**
- * Summary card of a record page (BDO Insure Record Details pattern): name, codes and status, then
- * key facts with their icons.
+ * Summary card of a record page (BDO Insure Record Details pattern, same layout as
+ * `RecordHeader`): name, codes and status, flags, then the key facts in four columns with their
+ * icons; an empty fact shows a muted dash.
  */
 export function RecordSummary({ title, chips, flags, facts }: Readonly<RecordSummaryProps>) {
   return (
-    <Card>
-      <div className="record-summary">
-        <div className="record-summary-head">
+    <Card className="record-header-card">
+      <div className="record-header">
+        <div className="record-header-top">
           <h2>{title}</h2>
           {chips}
           {flags ? <span className="tag-list">{flags}</span> : null}
         </div>
-        <div className="fact-grid">
+        <dl className="key-facts">
           {facts.map(({ icon: Icon, label, value }) => (
-            <div className="fact" key={label}>
-              <Icon size={20} aria-hidden="true" />
-              <span>
-                <span className="fact-label">{label}</span>
-                <span className="fact-value">{value ?? '—'}</span>
-              </span>
+            <div className="key-fact" key={label}>
+              <dt>
+                <Icon size={14} aria-hidden="true" />
+                {label}
+              </dt>
+              <dd>
+                {isEmptyValue(value) || value === '—' ? <span className="muted">—</span> : value}
+              </dd>
             </div>
           ))}
-        </div>
+        </dl>
       </div>
     </Card>
   );

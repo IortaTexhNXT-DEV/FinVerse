@@ -13,6 +13,7 @@ import { formatDate, today } from '@/utils/format';
 import { BrsView } from './BrsView';
 import { MatchWorkbench } from './MatchWorkbench';
 import { bankOptions, useReceivablesLookups } from './useReceivablesLookups';
+import { DateInput } from '@/components/ui/DateInput';
 
 const TABS = [
   { id: 'match', label: 'Match workbench' },
@@ -63,15 +64,7 @@ export default function BankReconciliationPage() {
             )}
           </Field>
           <Field label="Statement date (as of)" required>
-            {(id) => (
-              <input
-                id={id}
-                type="date"
-                className="input"
-                value={asOf}
-                onChange={(e) => setAsOf(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={asOf} onChange={(e) => setAsOf(e.target.value)} />}
           </Field>
         </div>
       </Card>

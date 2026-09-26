@@ -12,6 +12,7 @@ import { Field } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { humanize } from '@/utils/format';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 function ArnCell({
   batch,
@@ -80,19 +81,20 @@ export function BulkEpolicyUpload({ companyId }: Readonly<{ companyId: number }>
     <Card title="Bulk Upload">
       <div className="stack">
         <ErrorAlert error={upload.error ?? confirm.error ?? discard.error} />
-        <div className="row">
+        <div className="form-grid">
           <Field label="E-policy PDFs" hint="Up to 50 files; name each file after its ARN.">
             {(id) => (
-              <input
+              <FileDropZone
                 id={id}
-                type="file"
-                className="input"
                 accept=".pdf"
                 multiple
-                onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
+                busy={upload.isPending}
+                onChange={(chosen) => setFiles(chosen)}
               />
             )}
           </Field>
+        </div>
+        <div className="form-actions">
           <Button
             variant="primary"
             icon={<Upload size={16} />}

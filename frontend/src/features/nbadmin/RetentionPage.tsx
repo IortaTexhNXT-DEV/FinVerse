@@ -15,10 +15,10 @@ import { formatDateTime, humanize } from '@/utils/format';
 import { EligibleDialog, RuleDialog } from './RetentionDialogs';
 
 function eligibleText(r: RetentionRule): string {
-  if (!r.providerAvailable) {
-    return 'Module not yet reporting';
+  if (!r.providerAvailable || r.lastEligibleCount === undefined) {
+    return '';
   }
-  return r.lastEligibleCount === undefined ? 'Not reviewed yet' : String(r.lastEligibleCount);
+  return String(r.lastEligibleCount);
 }
 
 /**
@@ -49,7 +49,7 @@ export default function RetentionPage() {
       <PageHeader
         section="Broking Setup"
         title="Data Retention"
-        description="Retention periods by record type and status and the records that have become eligible. The RETENTION_REVIEW job counts them every month."
+        description="Retention periods by record type and status and the records that have become eligible."
         actions={
           maintain && (
             <Button
@@ -63,9 +63,8 @@ export default function RetentionPage() {
           )
         }
       />
-      <div className="alert warning" role="note">
-        Records are only counted and listed. Archiving and purging are not performed until the
-        archive storage and backup policy are decided; no data is ever deleted by this screen.
+      <div className="alert" role="note">
+        Eligible records are counted and listed here; this screen never deletes data.
       </div>
       <ErrorAlert error={rules.error ?? run.error} />
       <Card flush>

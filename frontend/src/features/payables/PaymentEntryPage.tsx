@@ -17,6 +17,7 @@ import { formatDate, humanize, today } from '@/utils/format';
 import { checkSelection } from './payablesMath';
 import type { Selection } from './payablesMath';
 import { PAYEE_TYPES, usePayablesLookups } from './usePayablesLookups';
+import { DateInput } from '@/components/ui/DateInput';
 
 const MODES: PaymentMode[] = ['CHEQUE', 'BANK_TRANSFER', 'PDC'];
 const CATEGORIES: ('' | PaymentCategory)[] = [
@@ -94,7 +95,7 @@ export default function PaymentEntryPage() {
       <PageHeader
         section="Payables & Cash"
         title="New Payment"
-        description="Select the payee's open items to settle. The accounting event follows the payee and documents (supplier, commission, claim, reinsurance, refund)."
+        description="Select the payee's open items to settle."
       />
       <ErrorAlert error={save.error ?? items.error} />
       <Card title="Payee and bank">
@@ -169,10 +170,8 @@ export default function PaymentEntryPage() {
           </Field>
           <Field label="Payment date" required>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 value={voucherDate}
                 onChange={(e) => setVoucherDate(e.target.value)}
               />
@@ -181,10 +180,8 @@ export default function PaymentEntryPage() {
           {mode === 'PDC' && (
             <Field label="Cheque date (post-dated)" required>
               {(id) => (
-                <input
+                <DateInput
                   id={id}
-                  className="input"
-                  type="date"
                   value={chequeDate}
                   onChange={(e) => setChequeDate(e.target.value)}
                 />

@@ -65,7 +65,7 @@ export default function PortfoliosPage() {
       <PageHeader
         section="Assets & Investments"
         title="Investment Portfolios"
-        description="Each portfolio fixes the PFRS 9 classification and the GL accounts its holdings post to. FVOCI changes go to the equity reserve, FVPL changes to profit or loss."
+        description="Each portfolio fixes the PFRS 9 classification and the GL accounts its holdings post to."
         actions={
           can('MASTER_MAINTAIN') && (
             <Button

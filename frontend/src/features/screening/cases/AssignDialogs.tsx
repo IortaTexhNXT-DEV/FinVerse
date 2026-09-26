@@ -6,6 +6,7 @@ import { casesApi } from './api';
 import type { CaseRow } from './api';
 import type { CaseDialogProps } from './CaseDialogs';
 import { LovField, StepDialog, TextField } from './StepDialog';
+import { displayNameOf } from '@/api/users';
 
 const OTHERS = 'OTHERS';
 
@@ -159,7 +160,7 @@ export function BulkReassignDialog({
       if (failed > 0) {
         toast.error(`${done} case(s) re-assigned; ${failed} refused (not eligible in their stage)`);
       } else {
-        toast.success(`${done} case(s) re-assigned to ${form.assignee}`);
+        toast.success(`${done} case(s) re-assigned to ${displayNameOf(form.assignee)}`);
       }
       onDone();
     },

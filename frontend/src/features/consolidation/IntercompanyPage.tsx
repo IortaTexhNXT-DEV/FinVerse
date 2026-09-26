@@ -17,6 +17,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId, useWorkspace } from '@/context/workspaceContext';
 import { formatDate, today } from '@/utils/format';
 import { IcTransactionForm } from './IcTransactionForm';
+import { DateInput } from '@/components/ui/DateInput';
 
 const ACCOUNT_FIELDS = [
   ['aDueFromAccount', 'Due-from account (this company)'],
@@ -82,7 +83,7 @@ export default function IntercompanyPage() {
       <PageHeader
         section="Planning & Closing"
         title="Inter-company"
-        description="Due-to / due-from relationships between group companies. A transaction posts mirror journals in both companies with one IC reference."
+        description="Due-to / due-from relationships between group companies."
         actions={
           manage && (
             <Button variant="secondary" icon={<Plus size={16} />} onClick={() => setAdding(true)}>
@@ -140,9 +141,7 @@ export default function IntercompanyPage() {
         title="Reconciliation (transaction currency)"
         flush
         actions={
-          <input
-            className="input"
-            type="date"
+          <DateInput
             aria-label="Reconciliation date"
             value={asOf}
             onChange={(e) => setAsOf(e.target.value)}

@@ -76,7 +76,7 @@ export default function InstallmentsDuePage() {
       <PageHeader
         section="Finance · Collections"
         title="Installments Due"
-        description="Unpaid installments of the live plans falling due up to today, oldest first. Payments are allocated nightly from the invoice ledger."
+        description="Unpaid installments of the live plans falling due up to today, oldest first."
       />
       <ErrorAlert error={rows.error} />
       <Card flush>

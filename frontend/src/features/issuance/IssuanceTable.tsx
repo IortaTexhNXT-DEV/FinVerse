@@ -65,7 +65,7 @@ export function IssuanceTable({
         </span>
       ),
     },
-    { key: 'arn', header: 'Proposal No.', render: (r) => <code>{r.arn}</code> },
+    { key: 'arn', header: 'ARN', kind: 'code', render: (r) => <code>{r.arn}</code> },
     {
       key: 'status',
       header: 'Status',

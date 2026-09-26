@@ -111,7 +111,7 @@ function serviceInvoiceText(r: Recompute): string | undefined {
     si.action === 'ISSUE'
       ? 'A service invoice will be issued'
       : 'The service invoice will be credited';
-  return `${verb} for commission ${formatAmount(si.commission)} and VAT ${formatAmount(si.vat)} (ADJID.014).`;
+  return `${verb} for commission ${formatAmount(si.commission)} and VAT ${formatAmount(si.vat)}.`;
 }
 
 /** What the request does to the service invoice, the payments and the remittance of the invoice. */
@@ -135,7 +135,7 @@ export function RecomputeNotes({ recompute }: Readonly<{ recompute: Recompute }>
   }
   if (recompute.quotationRequired) {
     notes.push({
-      text: 'The new sum insured exceeds the package limit: Marketing prepares a quotation (ADJID.008).',
+      text: 'The new sum insured exceeds the package limit: Marketing prepares a quotation.',
       warn: true,
     });
   }

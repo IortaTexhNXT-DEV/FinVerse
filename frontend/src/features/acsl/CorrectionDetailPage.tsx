@@ -23,6 +23,7 @@ import { CorrectionLinesCard } from './CorrectionLinesCard';
 import { FormDialog } from './FormDialog';
 import type { DialogField } from './FormDialog';
 import { OriginalLinesCard } from './OriginalLinesCard';
+import { UserName } from '@/components/ui/UserName';
 
 function fieldsOf(action: CorrectionAction): DialogField[] {
   return action === 'assign'
@@ -93,7 +94,7 @@ function facts(c: Correction): Fact[] {
     { icon: FileText, label: 'Invoice', value: c.invoiceNo ?? '—' },
     { icon: BookOpen, label: 'Journal Corrected', value: c.originalBatchNo ?? '—' },
     { icon: Banknote, label: 'Total', value: `${c.currency} ${formatAmount(c.totalDebit)}` },
-    { icon: User, label: 'Raised By', value: c.createdBy },
+    { icon: User, label: 'Raised By', value: <UserName login={c.createdBy} /> },
     { icon: CalendarDays, label: 'Raised', value: formatDate(c.createdAt) },
   ];
 }

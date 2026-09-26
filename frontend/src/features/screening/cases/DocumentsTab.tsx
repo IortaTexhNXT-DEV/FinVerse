@@ -15,6 +15,9 @@ import type { CaseDetail, CaseDocument } from './api';
 import { uploadErrors } from './caseLogic';
 import type { UploadForm } from './caseLogic';
 import { LovField, StepDialog } from './StepDialog';
+import { FileDropZone } from '@/components/ui/FileDropZone';
+import { UserName } from '@/components/ui/UserName';
+import { DateInput } from '@/components/ui/DateInput';
 
 function UploadDialog({
   detail,
@@ -60,12 +63,7 @@ function UploadDialog({
       </p>
       <Field label="File" required error={errors.file}>
         {(id) => (
-          <input
-            id={id}
-            type="file"
-            className="input"
-            onChange={(e) => setForm({ ...form, file: e.target.files?.[0] })}
-          />
+          <FileDropZone id={id} onChange={(files) => setForm({ ...form, file: files[0] })} />
         )}
       </Field>
       <div className="form-grid">
@@ -85,10 +83,8 @@ function UploadDialog({
         />
         <Field label="Date Received" required error={errors.dateReceived}>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              type="date"
-              className="input"
               max={today()}
               value={form.dateReceived}
               onChange={(e) => setForm({ ...form, dateReceived: e.target.value })}
@@ -168,7 +164,9 @@ export function DocumentsTab({ detail }: Readonly<{ detail: CaseDetail }>) {
             render: (d) => (
               <>
                 {formatDateTime(d.createdAt)}
-                <span className="cell-sub">{d.createdBy}</span>
+                <span className="cell-sub">
+                  <UserName login={d.createdBy} />
+                </span>
               </>
             ),
           },

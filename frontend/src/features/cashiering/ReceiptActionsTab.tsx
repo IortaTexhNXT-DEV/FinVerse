@@ -13,6 +13,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { cashieringApi } from './cashieringApi';
 import type { ReceiptAction } from './cashieringApi';
+import { UserName } from '@/components/ui/UserName';
 
 const OPEN_STAGES = ['REQUESTED', 'FOR_APPROVAL'];
 
@@ -56,7 +57,7 @@ export function ReceiptActionsTab({ companyId }: Readonly<{ companyId: number }>
       header: 'Requested',
       render: (a) => (
         <>
-          {a.requestedBy}
+          <UserName login={a.requestedBy} />
           <span className="cell-sub">{formatDateTime(a.requestedAt)}</span>
         </>
       ),

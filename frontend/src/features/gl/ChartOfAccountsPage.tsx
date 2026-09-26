@@ -69,7 +69,7 @@ export default function ChartOfAccountsPage() {
       <PageHeader
         section="General Ledger"
         title="Chart of Accounts"
-        description="Main, Sub and Micro GL heads. Changes require authorization by a second user; accounts are never deleted."
+        description="Main, Sub and Micro GL heads."
         actions={
           <>
             {can('COA_UPLOAD') && (

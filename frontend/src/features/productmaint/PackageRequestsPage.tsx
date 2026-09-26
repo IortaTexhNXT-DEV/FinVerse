@@ -64,7 +64,7 @@ export default function PackageRequestsPage() {
       <PageHeader
         section="Product Maintenance"
         title="Package Requests"
-        description="Requests to create, amend, renew or retire packages: approvals, insurer negotiation, ManCom sign-off, MBS set-up and release."
+        description="Requests to create, amend, renew or retire packages."
         actions={
           <>
             <Link className="btn btn-secondary" to="/product-maintenance/expiry">

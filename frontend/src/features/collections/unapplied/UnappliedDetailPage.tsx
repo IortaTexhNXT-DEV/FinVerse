@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
+import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
@@ -69,21 +70,18 @@ const HISTORY_COLUMNS: Column<HistoryEvent>[] = [
 
 function Facts({ row }: Readonly<{ row: UnappliedRow }>) {
   return (
-    <dl className="detail-list">
-      {paymentFacts(row).map(([label, value]) => (
-        <div key={label} style={{ display: 'contents' }}>
-          <dt>{label}</dt>
-          <dd>{value ?? '—'}</dd>
-        </div>
-      ))}
-    </dl>
+    <DefinitionGrid
+      columns={2}
+      collapseEmpty
+      label="Payment and account"
+      items={paymentFacts(row).map(([label, value]) => ({ label, value }))}
+    />
   );
 }
 
 function Summary({ row }: Readonly<{ row: UnappliedRow }>) {
   const status = cashieringStatus(row.cashieringStatus);
-  const disposition =
-    row.dispositionCode === undefined ? 'None yet' : humanize(row.dispositionCode);
+  const disposition = row.dispositionCode === undefined ? '—' : humanize(row.dispositionCode);
   return (
     <RecordSummary
       title={row.payor ?? 'Unknown payor'}

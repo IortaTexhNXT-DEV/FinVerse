@@ -100,7 +100,7 @@ export default function CorrectionsPage() {
       <PageHeader
         section="Finance · ACSL"
         title="Correction Entries"
-        description="Linked correction entries that reverse a wrong posting and post the right one, reviewed and approved before they reach the ledger."
+        description="Correction entries that reverse a wrong posting and post the right one."
         actions={
           can('ACSL_ASSIGN') && (
             <Button

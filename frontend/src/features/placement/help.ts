@@ -36,7 +36,7 @@ export const PLACEMENT_HELP: HelpSection = {
       ],
       controls: [
         'The first send records the placement of the accounts; later sends are resends.',
-        'Insurer SFTP or API channels are not available yet (Q06): an insurer set up for them is refused.',
+        'Slips are sent to insurers by e-mail.',
       ],
     },
     {
@@ -50,7 +50,7 @@ export const PLACEMENT_HELP: HelpSection = {
         'Match an unmatched or ambiguous line to its account by hand, then confirm: the payment gate opens for every matched, paid account.',
       ],
       controls: [
-        'The file transfer to and from CLPC is not built yet (Q28): files are downloaded and uploaded.',
+        'CLPC files are downloaded and uploaded on this screen.',
         'Placement records only the gate decision and its evidence; receipts belong to Cashiering.',
         'An account reported unpaid can be billed again on a later batch.',
       ],

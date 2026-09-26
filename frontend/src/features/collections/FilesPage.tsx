@@ -21,6 +21,8 @@ import { collectionsApi } from './api';
 import type { ScheduledFile } from './api';
 import { reportTitle } from './collectionsLogic';
 import './collections.css';
+import { displayNameOf } from '@/api/users';
+import { DateInput } from '@/components/ui/DateInput';
 
 type FileTab = '' | 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'ON_REQUEST';
 
@@ -85,15 +87,7 @@ function GenerateDialog({
             )}
           </Field>
           <Field label="Business Date" required>
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={date} onChange={(e) => setDate(e.target.value)} />}
           </Field>
         </div>
       </div>
@@ -152,7 +146,7 @@ export default function FilesPage() {
     {
       key: 'c',
       header: 'Published',
-      render: (f) => `${formatDateTime(f.createdAt)} · ${f.createdBy}`,
+      render: (f) => `${formatDateTime(f.createdAt)} · ${displayNameOf(f.createdBy)}`,
     },
     {
       key: 'a',

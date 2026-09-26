@@ -1,4 +1,4 @@
-import { ListTodo } from 'lucide-react';
+import { Bell, ListTodo } from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -13,6 +13,13 @@ export const workspaceModule: FeatureModule = {
       icon: ListTodo,
       permission: 'WORK_VIEW',
       component: lazy(() => import('./MyWorkPage')),
+    },
+    {
+      path: '/notifications',
+      label: 'Notifications',
+      icon: Bell,
+      hidden: true,
+      component: lazy(() => import('./NotificationsPage')),
     },
   ],
 };

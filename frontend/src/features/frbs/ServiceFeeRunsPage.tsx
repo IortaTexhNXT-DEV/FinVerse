@@ -24,6 +24,8 @@ import type { ServiceFeeRun, StageCounts } from './api';
 import { RUN_TABS, periodErrors, tabOf } from './serviceFee';
 import type { RunTab } from './serviceFee';
 import './frbs.css';
+import { UserName } from '@/components/ui/UserName';
+import { DateInput } from '@/components/ui/DateInput';
 
 const COLUMNS: Column<ServiceFeeRun>[] = [
   {
@@ -32,7 +34,9 @@ const COLUMNS: Column<ServiceFeeRun>[] = [
     render: (r) => (
       <>
         <strong>{r.runNo}</strong>
-        <span className="cell-sub">Computed by {r.createdBy}</span>
+        <span className="cell-sub">
+          Computed by <UserName login={r.createdBy} />
+        </span>
       </>
     ),
   },
@@ -105,26 +109,10 @@ function ComputeDialog({
         </p>
         <div className="frbs-form">
           <Field label="Fully Paid From" required error={errors.from}>
-            {(id) => (
-              <input
-                id={id}
-                type="date"
-                className="input"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={from} onChange={(e) => setFrom(e.target.value)} />}
           </Field>
           <Field label="Fully Paid To" required error={errors.to}>
-            {(id) => (
-              <input
-                id={id}
-                type="date"
-                className="input"
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={to} onChange={(e) => setTo(e.target.value)} />}
           </Field>
         </div>
       </div>
@@ -163,7 +151,7 @@ export default function ServiceFeeRunsPage() {
       <PageHeader
         section="Finance · Accounting Reports"
         title="Service Fee Runs"
-        description="The referrers' share of fully paid commission: computed, approved, paid through Disbursement, then released and liquidated by the units."
+        description="The referrers' share of fully paid commission."
         actions={
           <>
             <Link className="btn btn-secondary" to="/frbs/service-fee/setup">

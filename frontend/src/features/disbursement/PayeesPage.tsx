@@ -128,7 +128,7 @@ export default function PayeesPage() {
       <PageHeader
         section="Finance · Disbursement"
         title="Payees"
-        description="Payees with their bank accounts and allowed payment modes; new payees and changes are authorised by the team leader."
+        description="Payees with their bank accounts and allowed payment modes."
         actions={
           can('DISB_PAYEE_MAINTAIN') ? (
             <Button

@@ -21,6 +21,9 @@ import { INSTRUMENT_ACTION_LABELS, MODE_LABELS, instrumentActions } from './labe
 import type { InstrumentAction } from './labels';
 import { DialogFooter, TextDialog } from './VoucherDialogs';
 import './disbursement.css';
+import { UserName } from '@/components/ui/UserName';
+import { CellStack } from '@/components/ui/CellStack';
+import { DataTable } from '@/components/ui/DataTable';
 
 const PROMPTS: Partial<
   Record<InstrumentAction, { field: string; required: boolean; hint?: string }>
@@ -136,8 +139,8 @@ function PendingEdit({ edit, onChanged }: Readonly<{ edit: StatusEdit; onChanged
   return (
     <div className="stack">
       <p>
-        {humanize(edit.fromStatus)} to {humanize(edit.toStatus)} requested by {edit.requestedBy}:{' '}
-        {edit.reason}
+        {humanize(edit.fromStatus)} to {humanize(edit.toStatus)} requested by{' '}
+        <UserName login={edit.requestedBy} />: {edit.reason}
       </p>
       <ErrorAlert error={approve.error} />
       <WorkflowPanel
@@ -162,10 +165,40 @@ function hasForm(i: Instrument): boolean {
   return i.mode !== 'CTA' && i.mode !== 'ONLINE_BANKING' && i.status !== 'PENDING';
 }
 
-function historyNote(e: Instrument['history'][number]): string {
-  return [humanize(e.source), e.by, e.note, e.fileRef]
-    .filter((x) => x !== undefined && x !== '')
-    .join(' · ');
+type HistoryEvent = Instrument['history'][number];
+
+/** Status history of an instrument as a table, newest first (BDO: histories are tables). */
+function InstrumentHistory({ history }: Readonly<{ history: HistoryEvent[] }>) {
+  const rows = [...history].sort((a, b) => b.at.localeCompare(a.at));
+  return (
+    <DataTable<HistoryEvent>
+      caption="Status history"
+      rows={rows}
+      rowKey={(e) => `${e.at}-${e.toStatus}`}
+      emptyMessage="No history recorded"
+      columns={[
+        {
+          key: 'status',
+          header: 'Status',
+          kind: 'status',
+          render: (e) => <StatusBadge status={e.toStatus} />,
+        },
+        { key: 'source', header: 'Source', render: (e) => humanize(e.source) },
+        { key: 'by', header: 'By', render: (e) => <UserName login={e.by} /> },
+        {
+          key: 'at',
+          header: 'Date and Time',
+          kind: 'datetime',
+          render: (e) => formatDateTime(e.at),
+        },
+        {
+          key: 'note',
+          header: 'Remarks',
+          render: (e) => <CellStack main={e.note} sub={e.fileRef} />,
+        },
+      ]}
+    />
+  );
 }
 
 function InstrumentFacts({ instrument: i }: Readonly<{ instrument: Instrument }>) {
@@ -186,15 +219,7 @@ function InstrumentFacts({ instrument: i }: Readonly<{ instrument: Instrument }>
         <dd>{i.releasedTo ?? '—'}</dd>
       </dl>
       <h3>Status History</h3>
-      <ol className="dsb-timeline" aria-label="Status history">
-        {i.history.map((e) => (
-          <li key={`${e.at}-${e.toStatus}`}>
-            <StatusBadge status={e.toStatus} />
-            <span>{formatDateTime(e.at)}</span>
-            <span className="dsb-muted">{historyNote(e)}</span>
-          </li>
-        ))}
-      </ol>
+      <InstrumentHistory history={i.history} />
     </>
   );
 }

@@ -44,7 +44,7 @@ export const NB_REPORTS_HELP: HelpSection = {
       controls: [
         'Each report is offered only to the roles allowed to see its data (for example billing reports to Processing, production statistics to team leaders).',
         'Every run and download is recorded in the audit trail.',
-        'Custom report building is not available yet (BDOI question Q40); saved variants cover the recurring views.',
+        'Saved variants keep the recurring views.',
       ],
     },
     {
@@ -58,7 +58,7 @@ export const NB_REPORTS_HELP: HelpSection = {
       ],
       controls: [
         'A target is identified by its unit and start date; saving the same unit and start again changes it.',
-        'Every change is audited. The SIT/UAT targets are placeholders until BDOI gives its targets (Q41).',
+        'Every change is audited.',
       ],
     },
   ],

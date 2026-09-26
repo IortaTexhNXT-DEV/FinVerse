@@ -41,7 +41,7 @@ export default function InsurersPage() {
       <PageHeader
         section="Product Maintenance"
         title="Insurers"
-        description="The insurer panel: accreditation, placement channel and e-mails, branches with their local government tax, and commission rates."
+        description="The insurer panel: accreditation, placement channel and e-mails, branches."
         actions={
           can('MASTER_MAINTAIN') && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => setCreating(true)}>

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 /**
  * Uploads a payment report (BRNB.067/068): a CLPC report answering a billing batch (matched by PN
@@ -105,12 +106,10 @@ export function UploadReportDialog({
           hint="Columns: PN No. / Loan Application No. (CLPC) or ARN, Status (PAID / UNPAID), Amount, Payment Date."
         >
           {(id) => (
-            <input
+            <FileDropZone
               id={id}
-              type="file"
-              className="input"
               accept=".xlsx,.csv,.ods"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              onChange={(files) => setFile(files[0] ?? null)}
             />
           )}
         </Field>

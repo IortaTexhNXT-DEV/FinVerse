@@ -20,6 +20,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import { DispatchManyDialog } from './IssuanceBulkBar';
 import { rowKeyOf } from './issuanceLogic';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'ready', label: 'Ready to Dispatch' },
@@ -147,7 +148,7 @@ function ReadyToDispatch({ companyId }: Readonly<{ companyId: number }>) {
               </span>
             ),
           },
-          { key: 'arn', header: 'Proposal No.', render: (r) => <code>{r.arn}</code> },
+          { key: 'arn', header: 'ARN', kind: 'code', render: (r) => <code>{r.arn}</code> },
           { key: 'policy', header: 'Policy No.', render: (r) => r.policyNumbers.join(', ') },
           { key: 'file', header: 'E-policy', render: (r) => r.epolicyFile ?? '' },
           {
@@ -217,9 +218,14 @@ function DispatchReport() {
           {
             key: 'when',
             header: 'Queued',
-            render: (m) => `${formatDateTime(m.createdAt)} by ${m.createdBy}`,
+            render: (m) => `${formatDateTime(m.createdAt)} by ${displayNameOf(m.createdBy)}`,
           },
-          { key: 'arn', header: 'Proposal No.', render: (m) => <code>{m.reference ?? ''}</code> },
+          {
+            key: 'arn',
+            header: 'Reference No.',
+            kind: 'code',
+            render: (m) => <code>{m.reference ?? ''}</code>,
+          },
           { key: 'to', header: 'To', render: (m) => m.recipients },
           { key: 'subject', header: 'Subject', render: (m) => m.subject },
           { key: 'status', header: 'Outcome', render: (m) => <StatusBadge status={m.status} /> },
@@ -248,7 +254,7 @@ export default function DispatchPage() {
       <PageHeader
         section="Policy Issuance"
         title="E-policy Dispatch"
-        description="Send the e-policies to the clients, encrypted; the password follows in a separate e-mail. The report shows each delivery and its outcome."
+        description="Send the e-policies to the clients, encrypted; the password follows in a separate e-mail."
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'ready' ? <ReadyToDispatch companyId={companyId} /> : <DispatchReport />}

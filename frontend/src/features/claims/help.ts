@@ -28,7 +28,7 @@ export const CLAIMS_HELP: HelpSection = {
         'First notification of loss: look the policy up, check it is in force at the date of loss, record the loss and the parties, and submit initial reserves.',
       controls: [
         'The claim currency is the policy currency.',
-        'A report more than the threshold days after the loss raises LATE_CLAIM_NOTIFICATION.',
+        'A report more than the threshold days after the loss raises an alert.',
       ],
     },
     {
@@ -42,7 +42,7 @@ export const CLAIMS_HELP: HelpSection = {
       ],
       controls: [
         'Maker and checker must differ; reserve increases and settlements are limited by the checker authorization limit.',
-        'A settlement becomes a claim payable (CLAIM_SETTLEMENT) paid by a payment voucher in Payables.',
+        'A settlement becomes a claim payable paid by a payment voucher in Payables.',
         'Reserves at or above the threshold raise LARGE_CLAIM_RESERVE.',
       ],
     },

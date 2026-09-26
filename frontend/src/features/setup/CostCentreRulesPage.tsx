@@ -18,6 +18,7 @@ import { formatDateTime } from '@/utils/format';
 import { frbsSetupApi } from './frbsSetupApi';
 import type { CostCenterRule, CostCenterRuleInput } from './frbsSetupApi';
 import { ruleCriteria, ruleProblems } from './setupForms';
+import { displayNameOf } from '@/api/users';
 
 const blank = (companyId: number, priority: number): CostCenterRuleInput => ({
   companyId,
@@ -83,7 +84,7 @@ export default function CostCentreRulesPage() {
       <PageHeader
         section="Setup"
         title="Cost-Centre Rules"
-        description="Standard rules that give generated journal lines their cost centre, evaluated from the lowest priority number."
+        description="Standard rules that give generated journal lines their cost centre."
         actions={
           maintainer && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => open(null)}>
@@ -114,7 +115,7 @@ export default function CostCentreRulesPage() {
             {
               key: 'u',
               header: 'Maintained',
-              render: (r) => `${r.updatedBy} ${formatDateTime(r.updatedAt)}`,
+              render: (r) => `${displayNameOf(r.updatedBy)} ${formatDateTime(r.updatedAt)}`,
             },
           ]}
         />

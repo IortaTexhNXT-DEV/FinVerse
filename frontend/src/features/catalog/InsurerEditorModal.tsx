@@ -9,11 +9,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormControls';
 import { splitEmails } from './insurerForm';
 
-const CHANNELS = [
-  { value: 'EMAIL', label: 'E-mail' },
-  { value: 'SFTP', label: 'SFTP (not yet available)' },
-  { value: 'API', label: 'API (not yet available)' },
-];
+const CHANNELS = [{ value: 'EMAIL', label: 'E-mail' }];
 
 type InsurerForm = Omit<InsurerInput, 'defaultCreditDays' | 'placementEmails'> & {
   defaultCreditDays?: number;

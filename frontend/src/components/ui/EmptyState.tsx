@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 /** Table-and-magnifier illustration used by the BDO Insure empty states. */
 function EmptyIllustration() {
   return (
@@ -32,12 +34,19 @@ function EmptyIllustration() {
   );
 }
 
-/** Empty list or search result: illustration and message (BDO Insure pattern). */
-export function EmptyState({ message = 'No items to display' }: Readonly<{ message?: string }>) {
+/**
+ * Empty list or search result: illustration, message and, where there is one, the next action
+ * (BDO Insure pattern).
+ */
+export function EmptyState({
+  message = 'No items to display',
+  action,
+}: Readonly<{ message?: string; action?: ReactNode }>) {
   return (
     <div className="empty-state">
       <EmptyIllustration />
       <span>{message}</span>
+      {action}
     </div>
   );
 }

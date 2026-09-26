@@ -120,7 +120,7 @@ export default function FrbsHomePage() {
       <PageHeader
         section="Finance · Accounting Reports"
         title="Report Pack"
-        description="The BDOI Comptrollership report pack of Appendix A: open a report with its parameters or export it to Excel or PDF for the month to date; board schedules also to Word."
+        description="The Comptrollership report pack, on screen or exported to Excel, PDF or Word."
         actions={
           <>
             <Link className="btn btn-secondary" to="/reports">

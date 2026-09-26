@@ -17,7 +17,7 @@ export default function AcceptanceBulkPage() {
         backTo="/quotations"
         section="Quotation / Proposal"
         title="Bulk Quotation Acceptance"
-        description="Upload the ARNs of the quotations your clients accepted; the uploaded list is kept as the acceptance evidence."
+        description="Upload the ARNs of the quotations your clients accepted."
         actions={<Link to="/bulk/QUOTATION_CREATE">Bulk quotations</Link>}
       />
       <BulkUploadWizard

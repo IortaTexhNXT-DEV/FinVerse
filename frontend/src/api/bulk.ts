@@ -18,6 +18,8 @@ export interface BulkHandler {
   title: string;
   columns: BulkColumn[];
   instructions: string;
+  /** Whether an identical earlier file is refused. */
+  blocksDuplicateFiles?: boolean;
 }
 
 export interface BulkJob {
@@ -67,4 +69,6 @@ export const bulkApi = {
   commit: (id: number) => api.post<BulkJob>(`/bulk/jobs/${id}/commit`),
   cancel: (id: number) => api.post<BulkJob>(`/bulk/jobs/${id}/cancel`),
   report: (id: number) => api.getFile(`/bulk/jobs/${id}/report`),
+  /** The rows not processed, in the template layout with an Error column, to correct and re-upload. */
+  errorFile: (id: number) => api.getFile(`/bulk/jobs/${id}/error-file`),
 };

@@ -16,10 +16,10 @@ export const ESCALATION_HELP: HelpScreen[] = [
       'A returned escalation is resubmitted by the handler once the instruction is done.',
     ],
     controls: [
-      'Rules escalate an account once per rule and month; the job CLX_ESCALATION runs every night after the promise check.',
+      'Rules escalate an account once per rule and month; a scheduled job runs every night after the promise check.',
       'An escalation whose invoices are collected is closed automatically.',
       'Each stage has the SLA of its rule; past it the alert CLX_ESCALATION_OVERDUE is raised.',
-      'The target and the account officers are notified (CLX_ESCALATED). Escalating needs CLX_ESCALATE; acting on escalations needs CLX_ESCALATION_HANDLE.',
+      'The target and the account officers are notified. Escalating needs CLX_ESCALATE; acting on escalations needs CLX_ESCALATION_HANDLE.',
     ],
   },
   {
@@ -34,7 +34,7 @@ export const ESCALATION_HELP: HelpScreen[] = [
     ],
     controls: [
       'Maker-checker: the maker cannot authorize the rule; pending rules appear in My Approvals.',
-      'The defaults of the process (45 days, 60th day from inception, broken promise to the team lead) are to be confirmed by BDOI (CQ14).',
+      'The defaults of the process: 45 days, 60th day from inception, broken promise to the team lead.',
     ],
   },
 ];

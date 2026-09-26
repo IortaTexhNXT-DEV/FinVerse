@@ -10,6 +10,7 @@ import { humanize } from '@/utils/format';
 import type { ReceiptForm } from './receiptForm';
 import { hasParty, isCheque } from './receiptForm';
 import { bankOptions } from './useReceivablesLookups';
+import { DateInput } from '@/components/ui/DateInput';
 
 const PAYER_TYPES: PayerType[] = ['POLICYHOLDER', 'INTERMEDIARY', 'REINSURER', 'OTHER'];
 const MODES: ReceiptMode[] = ['CHEQUE', 'BANK_TRANSFER', 'CASH', 'CARD', 'PDC'];
@@ -81,10 +82,8 @@ function ChequeFields({ form, set }: Readonly<Pick<FieldsProps, 'form' | 'set'>>
     <>
       <Field label={form.mode === 'PDC' ? 'Cheque (due) date' : 'Cheque date'} required>
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            type="date"
-            className="input"
             value={form.instrumentDate}
             onChange={(e) => set({ instrumentDate: e.target.value })}
           />
@@ -117,10 +116,8 @@ export function ReceiptFormFields({
     <div className="form-grid">
       <Field label="Receipt date" required>
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            type="date"
-            className="input"
             value={form.receiptDate}
             onChange={(e) => set({ receiptDate: e.target.value })}
           />

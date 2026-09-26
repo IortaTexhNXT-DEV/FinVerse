@@ -103,7 +103,10 @@ class AccountScheduleIT {
       }
       assertThat(buckets).isEqualByComparingTo((BigDecimal) row.cells().get("closing"));
     }
-    assertThat(r.notes()).contains("Layout not yet confirmed by Financial Reporting");
+    // Business wording: the layout note reads plainly, without its reference.
+    assertThat(r.notes())
+        .contains("Layout not yet confirmed by Financial Reporting")
+        .noneMatch(n -> n.contains("AQ05"));
   }
 
   @Test

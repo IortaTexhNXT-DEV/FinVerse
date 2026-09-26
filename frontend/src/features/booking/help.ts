@@ -60,7 +60,7 @@ export const BOOKING_HELP: HelpSection = {
         'Every booking batch - confirmed by a user, Book Now, the upload or the end-of-day job - with the result of each account.',
       workflow: ['Open a run to see which accounts were booked and why others failed.'],
       controls: [
-        'The end-of-day BOOKING_BATCH job also books the later policy years of multi-year accounts when they start.',
+        'The end-of-day scheduled job also books the later policy years of multi-year accounts when they start.',
       ],
     },
     {
@@ -71,7 +71,7 @@ export const BOOKING_HELP: HelpSection = {
       workflow: ['Add or change a rule or type; click a row to edit it.'],
       controls: [
         'Only Business Administrators maintain the setup; every change is audited.',
-        "Incentive rules are pending BDOI's qualification criteria (Q33).",
+        'Incentive rules hold the qualification criteria per insurer and product.',
       ],
     },
   ],

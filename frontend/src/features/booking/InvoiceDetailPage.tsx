@@ -33,6 +33,7 @@ import {
   ScheduleTab,
   ServiceInvoicesTab,
 } from './InvoiceTabs';
+import { UserName } from '@/components/ui/UserName';
 
 const TABS = [
   { id: 'premium', label: 'Premium & Commission' },
@@ -94,7 +95,11 @@ function Summary({ invoice: i }: Readonly<{ invoice: BookedInvoice }>) {
           </SummaryFact>
           <SummaryFact icon={ReceiptText} label="Booked">
             {formatDate(i.bookingDate)}{' '}
-            {i.bookedBy && <span className="muted">by {i.bookedBy}</span>}
+            {i.bookedBy && (
+              <span className="muted">
+                by <UserName login={i.bookedBy} />
+              </span>
+            )}
           </SummaryFact>
           <SummaryFact icon={Wallet} label="Gross premium">
             {i.currency} {formatAmount(i.premium.total)}

@@ -1,3 +1,6 @@
+/** Rows-per-page choices of the pagination bar. */
+export const PAGE_SIZES = [10, 20, 50, 100] as const;
+
 /** "Showing 1 to 20 of 57 results" for a zero-based page. */
 export function showingText(page: number, size: number, total: number): string {
   const from = Math.min(total, page * size + 1);

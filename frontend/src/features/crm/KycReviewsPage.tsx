@@ -19,6 +19,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 
 type Filters = Omit<KycReviewFilters, 'companyId'>;
 
@@ -53,10 +54,8 @@ function FilterBar({
       <div className="form-grid">
         <Field label="Due by" hint="Blank = overdue and due within the review window">
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               value={filters.dueBy ?? ''}
               onChange={(e) => set({ dueBy: e.target.value || undefined })}
             />
@@ -133,7 +132,7 @@ export default function KycReviewsPage() {
       <PageHeader
         section="Clients"
         title="KYC Reviews Due"
-        description="Clients whose periodic KYC review is overdue or coming due. The monthly KYC_REVIEW_DUE job expires overdue KYC and notifies the Account Officers."
+        description="Clients whose periodic KYC review is overdue or coming due."
         actions={
           <div className="row no-print">
             <Button

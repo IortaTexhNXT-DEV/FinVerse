@@ -12,6 +12,8 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime } from '@/utils/format';
+import { FileDropZone } from '@/components/ui/FileDropZone';
+import { displayNameOf } from '@/api/users';
 
 function ChecklistItems({ checklist }: Readonly<{ checklist: KycChecklist }>) {
   if (checklist.items.length === 0) {
@@ -37,7 +39,10 @@ function ChecklistItems({ checklist }: Readonly<{ checklist: KycChecklist }>) {
             <span className="checklist-files muted">
               {done
                 ? item.documents
-                    .map((d) => `${d.fileName} · ${d.uploadedBy} · ${formatDateTime(d.uploadedAt)}`)
+                    .map(
+                      (d) =>
+                        `${d.fileName} · ${displayNameOf(d.uploadedBy)} · ${formatDateTime(d.uploadedAt)}`,
+                    )
                     .join('; ')
                 : 'Not uploaded yet'}
             </span>
@@ -88,13 +93,7 @@ function UploadForm({ clientId }: Readonly<{ clientId: number }>) {
         </Field>
         <Field label="File" required hint="PDF, image or office document">
           {(id) => (
-            <input
-              key={inputKey}
-              id={id}
-              className="input"
-              type="file"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            />
+            <FileDropZone key={inputKey} id={id} onChange={(files) => setFile(files[0] ?? null)} />
           )}
         </Field>
       </div>

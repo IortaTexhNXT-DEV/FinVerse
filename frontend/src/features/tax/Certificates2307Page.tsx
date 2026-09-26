@@ -17,6 +17,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime, today } from '@/utils/format';
 import { defaultChoice, quarterOf } from './taxPeriods';
+import { displayNameOf } from '@/api/users';
 
 /** BIR Form 2307: batch generation per quarter, the certificate register and PDF downloads. */
 export default function Certificates2307Page() {
@@ -133,7 +134,7 @@ export default function Certificates2307Page() {
             {
               key: 'u',
               header: 'Issued',
-              render: (b) => `${b.createdBy} ${formatDateTime(b.createdAt)}`,
+              render: (b) => `${displayNameOf(b.createdBy)} ${formatDateTime(b.createdAt)}`,
             },
             {
               key: 'x',

@@ -6,6 +6,7 @@ import { useAuth } from '@/auth/authContext';
 import { selectionColumn, useRowSelection } from '@/components/broking/rowSelection';
 import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Button } from '@/components/ui/Button';
+import { CellStack, EmptyCell } from '@/components/ui/CellStack';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
@@ -14,9 +15,11 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
+import { Tag } from '@/components/ui/Tag';
+import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount, formatDate } from '@/utils/format';
+import { formatAmount, formatDate, humanize } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { CollectionItem, DispositionInput, EffortInput, ReassignInput } from './api';
 import { WORKLIST_TABS, filtersFromSearch, tabFromSearch, worklistQuery } from './collectionsLogic';
@@ -24,6 +27,26 @@ import type { WorklistFilters, WorklistTab } from './collectionsLogic';
 import { DispositionDialog, EffortDialog, ReassignDialog } from './WorkDialogs';
 import { FilterPanel, TotalsCard } from './WorklistParts';
 import './collections.css';
+
+/** The disposition's label (never its code) as a tag, with the category on the muted line. */
+function DispositionCell({ code, category }: Readonly<{ code?: string; category?: string }>) {
+  const rules = useQuery({
+    queryKey: ['collections', 'disposition-rules'],
+    queryFn: collectionsApi.dispositionRules,
+    staleTime: 5 * 60_000,
+    enabled: code !== undefined,
+  });
+  if (code === undefined) {
+    return <EmptyCell />;
+  }
+  const label = rules.data?.find((r) => r.code === code)?.label ?? humanize(code);
+  return (
+    <CellStack
+      main={<Tag tone="info">{label}</Tag>}
+      sub={category === undefined ? undefined : `Category ${category}`}
+    />
+  );
+}
 
 const COLUMNS: Column<CollectionItem>[] = [
   {
@@ -64,16 +87,15 @@ const COLUMNS: Column<CollectionItem>[] = [
     numeric: true,
     render: (i) => `${i.currency} ${formatAmount(i.netOutstanding)}`,
   },
-  { key: 'handler', header: 'Handler', render: (i) => i.currentHandler ?? 'Unassigned' },
+  {
+    key: 'handler',
+    header: 'Handler',
+    render: (i) => <UserName login={i.currentHandler} empty="Unassigned" />,
+  },
   {
     key: 'disp',
     header: 'Disposition',
-    render: (i) => (
-      <>
-        {i.dispositionCode ?? '—'}
-        {i.category !== undefined && <span className="tag">Cat. {i.category}</span>}
-      </>
-    ),
+    render: (i) => <DispositionCell code={i.dispositionCode} category={i.category} />,
   },
   { key: 'status', header: 'Status', render: (i) => <StatusBadge status={i.status} /> },
 ];
@@ -229,7 +251,7 @@ export default function WorklistPage() {
         section="Finance · Collections"
         backTo="/collections"
         title="PR Worklist"
-        description="Invoices with outstanding premium receivable above the threshold, refreshed nightly from the invoice ledger."
+        description="Invoices with outstanding premium receivable above the threshold."
         actions={
           can('CLX_EXPORT') ? (
             <Button

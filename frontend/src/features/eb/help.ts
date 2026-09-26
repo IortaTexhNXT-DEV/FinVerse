@@ -65,7 +65,7 @@ export const EB_HELP: HelpSection = {
       path: '/eb/setup',
       summary:
         'Value threshold rules that send a comparative to BDOI Management, the required documents per process and benefit line, and the EB parameters (renewal advice lead time, reminders, turn-around times).',
-      controls: ['Needs EB_SETUP; each change waits for another user to authorize it.'],
+      controls: ['Each change waits for another user to authorize it.'],
     },
   ],
 };

@@ -54,7 +54,7 @@ export default function ExceptionCodesPage() {
       <PageHeader
         section="Administration"
         title="Exception Codes"
-        description="Conditions monitored by the alert engine. Thresholds apply immediately to postings and to the next daily check."
+        description="Conditions monitored by the alert engine."
       />
       <ErrorAlert error={codes.error} />
       <Card flush>

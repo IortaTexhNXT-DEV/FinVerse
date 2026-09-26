@@ -24,6 +24,7 @@ import { CERTIFICATE_ENTITY, commissionApi } from './commissionApi';
 import type { Certificate, OrLink } from './commissionApi';
 import { receiptsTotal } from './commissionLogic';
 import { ReasonDialog } from './DpItemDialogs';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'receipts', label: 'Official Receipts' },
@@ -73,12 +74,14 @@ function Summary({ cert: c }: Readonly<{ cert: Certificate }>) {
         {
           icon: UserRound,
           label: 'Submitted',
-          value: `${formatDateTime(c.createdAt)} · ${c.createdBy}`,
+          value: `${formatDateTime(c.createdAt)} · ${displayNameOf(c.createdBy)}`,
         },
         {
           icon: Building2,
           label: 'Decision',
-          value: c.decidedBy ? `${c.decidedBy} · ${formatDateTime(c.decidedAt)}` : 'Pending',
+          value: c.decidedBy
+            ? `${displayNameOf(c.decidedBy)} · ${formatDateTime(c.decidedAt)}`
+            : 'Pending',
         },
       ]}
     />

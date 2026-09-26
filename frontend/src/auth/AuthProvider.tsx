@@ -9,6 +9,7 @@ import type { SharedSession } from '@/session/tabSync';
 import { AuthContext } from './authContext';
 import type { SignOutReason } from './authContext';
 import { useServerKeepAlive } from './useServerKeepAlive';
+import { loadUserDirectory, resetUserDirectory } from '@/api/users';
 
 /** How long a new tab waits for an open tab to share its session (BRNB.082). */
 const HANDSHAKE_MS = 400;
@@ -40,6 +41,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
 
   const signOutHere = useCallback(() => {
     tokenStore.clear();
+    resetUserDirectory();
     setUser(null);
     setPasswordChange(null);
   }, []);
@@ -64,6 +66,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
       const profile = await api.get<UserProfile>('/auth/me');
       setPasswordChange(await dueChange(profile));
       setUser(profile);
+      void loadUserDirectory();
     } catch {
       signOutHere();
     }
@@ -108,6 +111,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
       result.mustChangePassword === true ? (result.passwordChangeReason ?? 'RESET') : null,
     );
     setUser(result.user);
+    void loadUserDirectory();
     tabSession().announceLogin({ token: result.accessToken, expiresAt: result.expiresAt });
   }, []);
 

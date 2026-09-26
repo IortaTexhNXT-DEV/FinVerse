@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { today } from '@/utils/format';
 import { canDecide } from './claimWorkflow';
+import { DateInput } from '@/components/ui/DateInput';
 
 type Mode = 'approve' | 'reject' | null;
 
@@ -86,15 +87,7 @@ export function DocumentActions({ kind, documentId, label, approval, onDone }: R
           <ErrorAlert error={decide.error} />
           {approving ? (
             <Field label="Accounting date" required hint="The movement is posted on this date">
-              {(id) => (
-                <input
-                  id={id}
-                  className="input"
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                />
-              )}
+              {(id) => <DateInput id={id} value={date} onChange={(e) => setDate(e.target.value)} />}
             </Field>
           ) : (
             <Field label="Reason" required>

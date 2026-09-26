@@ -25,8 +25,8 @@ export const DISBURSEMENT_HELP: HelpSection = {
       summary:
         'The payee master with bank accounts and allowed modes, and the payee requests raised by other units or by unmatched payment requests.',
       controls: [
-        'New payees, changes, deactivation and reactivation are authorised by a user other than the maker (DISB_PAYEE).',
-        'Bank account numbers are masked unless the user may view them in full (DISB_PAYEE_VIEW_FULL). A payee used by a DV cannot be deleted.',
+        'New payees, changes, deactivation and reactivation are authorised by a user other than the maker.',
+        'Bank account numbers are masked unless the user may view them in full. A payee used by a DV cannot be deleted.',
       ],
     },
     {

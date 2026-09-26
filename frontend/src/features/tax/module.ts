@@ -15,6 +15,8 @@ import {
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
+/** Insurer tax worksheets and IC schedules: no BDOI role holds it (V1064). */
+const INSURER_TAX = 'INSURER_TAX_VIEW';
 const VIEW = 'TAX_VIEW';
 
 /** Tax & Statutory: BIR / LGU / BFP returns, 2307 certificates and Insurance Commission schedules. */
@@ -48,6 +50,7 @@ export const taxModule: FeatureModule = {
       label: 'Documentary Stamp Tax',
       icon: Stamp,
       permission: VIEW,
+      requiresAll: [INSURER_TAX],
       component: lazy(() => import('./DstWorksheetPage')),
     },
     {
@@ -55,6 +58,7 @@ export const taxModule: FeatureModule = {
       label: 'Premium Tax, LGT & FST',
       icon: Landmark,
       permission: VIEW,
+      requiresAll: [INSURER_TAX],
       component: lazy(() => import('./PremiumTaxWorksheetPage')),
     },
     {
@@ -91,6 +95,7 @@ export const taxModule: FeatureModule = {
       label: 'IC Schedules',
       icon: BookOpenCheck,
       permission: VIEW,
+      requiresAll: [INSURER_TAX],
       component: lazy(() => import('./IcSchedulesPage')),
     },
     {

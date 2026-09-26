@@ -9,6 +9,7 @@ import { today } from '@/utils/format';
 import { claimsHomeApi } from '../home/api';
 import { validateDiary } from './api';
 import type { DiaryForm, DiaryInput } from './api';
+import { DateInput } from '@/components/ui/DateInput';
 
 /** Add Diary Entry: type, date, due date, assignee and text (FR-CM-052). */
 export function DiaryDialog({
@@ -81,10 +82,8 @@ export function DiaryDialog({
           </Field>
           <Field label="Date" required>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 value={form.entryDate}
                 onChange={(e) => set('entryDate', e.target.value)}
               />
@@ -92,10 +91,8 @@ export function DiaryDialog({
           </Field>
           <Field label="Due date" error={errors.dueDate}>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 min={form.entryDate}
                 value={form.dueDate}
                 onChange={(e) => set('dueDate', e.target.value)}

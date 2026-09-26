@@ -19,6 +19,7 @@ import { formatDate, formatDateTime, humanize, today } from '@/utils/format';
 import { DateReasonModal } from './DateReasonModal';
 import { daysBetween } from './payablesMath';
 import { usePayablesLookups } from './usePayablesLookups';
+import { displayNameOf } from '@/api/users';
 
 type View = 'OUTSTANDING' | 'SETTLED' | 'ALL';
 type Action = 'present' | 'clear' | 'cancel' | 'replace';
@@ -121,7 +122,7 @@ export default function PdcIssuedPage() {
       <PageHeader
         section="Payables & Cash"
         title="PDC Issued Register"
-        description="Post-dated cheques issued: the liability sits in PDC clearing until the cheque is presented."
+        description="Post-dated cheques issued."
         actions={
           <Button
             variant="secondary"
@@ -227,7 +228,7 @@ export default function PdcIssuedPage() {
             {
               key: 'u',
               header: 'By',
-              render: (e) => `${e.createdBy} · ${formatDateTime(e.createdAt)}`,
+              render: (e) => `${displayNameOf(e.createdBy)} · ${formatDateTime(e.createdAt)}`,
             },
           ]}
         />

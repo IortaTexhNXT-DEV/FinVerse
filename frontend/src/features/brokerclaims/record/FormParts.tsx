@@ -1,6 +1,7 @@
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
+import { TypedInput } from '@/components/ui/DateInput';
 
 /** Shared form pieces of the Claims Handling screens and dialogs. */
 
@@ -53,7 +54,7 @@ export function InputField({
   return (
     <Field label={label} required={required} error={error} hint={hint}>
       {(id) => (
-        <input
+        <TypedInput
           id={id}
           className="input"
           type={type}

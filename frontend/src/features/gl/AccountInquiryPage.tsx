@@ -11,8 +11,9 @@ import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useWorkspace } from '@/context/workspaceContext';
 import { dateRangeError } from '@/utils/dateRange';
-import { formatAmount, formatDate, today } from '@/utils/format';
+import { formatAmount, formatDate, humanize, today } from '@/utils/format';
 import { useGlLookups } from './useLookups';
+import { DateInput } from '@/components/ui/DateInput';
 
 /** GL inquiry: account statement with opening, running and closing balance and drill-down. */
 export default function AccountInquiryPage() {
@@ -61,22 +62,12 @@ export default function AccountInquiryPage() {
             )}
           </Field>
           <Field label="From">
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="date"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={from} onChange={(e) => setFrom(e.target.value)} />}
           </Field>
           <Field label="To" error={rangeError}>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 aria-invalid={rangeError !== undefined}
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
@@ -106,7 +97,7 @@ export default function AccountInquiryPage() {
               columns={[
                 { key: 'd', header: 'Date', render: (l) => formatDate(l.valueDate) },
                 { key: 'b', header: 'Batch', render: (l) => l.batchNo },
-                { key: 't', header: 'Type', render: (l) => l.journalType },
+                { key: 't', header: 'Type', render: (l) => humanize(l.journalType) },
                 { key: 'n', header: 'Narration', render: (l) => l.narration ?? '' },
                 { key: 'r', header: 'Reference', render: (l) => l.reference ?? '' },
                 {

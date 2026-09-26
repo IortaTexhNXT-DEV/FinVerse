@@ -57,7 +57,7 @@ export default function PackageTsuWorkbenchPage() {
       <PageHeader
         section="Product Maintenance"
         title="TSU Workbench"
-        description="Package requests waiting for the Technical Services Unit: review and recommendation, approval, negotiation with the insurers, terms review and requirements."
+        description="Package requests waiting for the Technical Services Unit."
       />
       <ErrorAlert error={counts.error ?? queue.error ?? claim.error} />
       <StageTiles counts={stageCounts} filters={filters} onFilter={setFilter} />

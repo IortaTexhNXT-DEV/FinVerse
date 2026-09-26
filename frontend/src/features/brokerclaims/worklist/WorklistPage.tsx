@@ -118,7 +118,7 @@ export default function WorklistPage() {
         section={CLAIMS_SECTION}
         backTo="/claims-handling"
         title="Claims Worklist"
-        description="Every claim you may see, by tab; search by claim number, insurer claim number, ARN, policy number or assured."
+        description="Every claim you may see, by tab."
       />
       <ErrorAlert error={rows.error} />
       <Card flush>

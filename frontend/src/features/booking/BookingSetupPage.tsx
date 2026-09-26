@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { bookingApi } from '@/api/booking';
 import type { AutoBookRule, IncentiveRule, ServiceInvoiceType } from '@/api/booking';
 import { useAuth } from '@/auth/authContext';
@@ -13,8 +14,8 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, humanize, today } from '@/utils/format';
-import { AutoBookRuleDialog, IncentiveRuleDialog, ServiceInvoiceTypeDialog } from './SetupDialogs';
+import { formatDate, humanize } from '@/utils/format';
+import { AutoBookRuleDialog, ServiceInvoiceTypeDialog } from './SetupDialogs';
 
 type TabId = 'auto' | 'incentive' | 'types';
 
@@ -94,40 +95,34 @@ function AutoBookTab({ companyId, canEdit }: Readonly<{ companyId: number; canEd
   );
 }
 
-function IncentiveTab({ companyId, canEdit }: Readonly<{ companyId: number; canEdit: boolean }>) {
-  const [editing, setEditing] = useState<IncentiveRule | null>(null);
+/**
+ * Incentive rules of booking, read only: they are frozen and maintained in Product Maintenance >
+ * Incentive Criteria (the server refuses changes with INCENTIVE_RULES_FROZEN), so the screen
+ * offers no New Rule or edit.
+ */
+function IncentiveTab({ companyId }: Readonly<{ companyId: number }>) {
   const rules = useQuery({
     queryKey: ['booking', 'setup', 'incentive', companyId],
     queryFn: () => bookingApi.incentiveRules(companyId),
   });
-  const saved = useSaved('Incentive rule saved', () => setEditing(null));
-  const save = useMutation({
-    mutationFn: (rule: IncentiveRule) => bookingApi.saveIncentiveRule(companyId, rule),
-    onSuccess: saved,
-  });
   return (
     <Card
-      title="Incentive rules"
+      title="Incentive Rules"
       flush
       actions={
-        canEdit && (
-          <Button
-            icon={<Plus size={16} />}
-            onClick={() => setEditing({ periodFrom: today(), active: true, description: '' })}
-          >
-            New Rule
-          </Button>
-        )
+        <Link className="btn btn-secondary btn-sm" to="/catalog/incentives">
+          Open Incentive Criteria
+        </Link>
       }
     >
+      <p className="card-note muted">Maintained in Product Maintenance › Incentive Criteria.</p>
       <ErrorAlert error={rules.error} />
       <DataTable<IncentiveRule>
         caption="Incentive rules"
         loading={rules.isLoading}
         rows={rules.data ?? []}
         rowKey={(r) => r.id ?? 0}
-        onRowClick={canEdit ? setEditing : undefined}
-        emptyMessage="No incentive rule (the qualification rules are pending, Q33)."
+        emptyMessage="No incentive rules"
         columns={[
           { key: 'product', header: 'Product', render: (r) => r.productCode ?? ANY },
           { key: 'segment', header: 'Segment', render: (r) => r.marketSegment ?? ANY },
@@ -139,18 +134,9 @@ function IncentiveTab({ companyId, canEdit }: Readonly<{ companyId: number; canE
               `${formatDate(r.periodFrom)} – ${r.periodTo ? formatDate(r.periodTo) : 'open'}`,
           },
           { key: 'description', header: 'Description', render: (r) => r.description },
-          { key: 'active', header: 'Status', render: (r) => onOff(r.active) },
+          { key: 'active', header: 'Status', kind: 'status', render: (r) => onOff(r.active) },
         ]}
       />
-      {editing && (
-        <IncentiveRuleDialog
-          value={editing}
-          busy={save.isPending}
-          error={save.error}
-          onSave={(r) => save.mutate(r)}
-          onClose={() => setEditing(null)}
-        />
-      )}
     </Card>
   );
 }
@@ -233,11 +219,11 @@ export default function BookingSetupPage() {
       <PageHeader
         section="Booking"
         title="Booking Setup"
-        description="Which accounts are booked automatically, which bookings are incentive eligible and which service invoices are issued."
+        description="Which accounts are booked automatically, which bookings are incentive eligible."
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'auto' && <AutoBookTab companyId={companyId} canEdit={canEdit} />}
-      {tab === 'incentive' && <IncentiveTab companyId={companyId} canEdit={canEdit} />}
+      {tab === 'incentive' && <IncentiveTab companyId={companyId} />}
       {tab === 'types' && <TypesTab canEdit={canEdit} />}
     </div>
   );

@@ -8,6 +8,8 @@ module.exports = [
   // Home
   { slug: 'nb-dashboard', title: 'New Business Dashboard (landing page)', user: 'mkttl', path: '/nb/dashboard' },
   { slug: 'my-work', title: 'My Work', user: 'ao', path: '/my-work' },
+  { slug: 'notification-panel', title: 'Notification panel (header bell)', user: 'ao', path: '/my-work', click: '^Notifications' },
+  { slug: 'notifications', title: 'Notifications page', user: 'ao', path: '/notifications' },
   // Client & Policy
   { slug: 'clients', title: 'Clients work list', user: 'ao', path: '/crm/clients' },
   { slug: 'client-record', title: 'Client record', user: 'ao', path: '/crm/clients', open: 'first' },
@@ -84,8 +86,8 @@ module.exports = [
   { slug: 'collections-escalations', title: 'Escalations', user: 'mkttl', path: '/collections/escalations' },
   { slug: 'collections-escalation', title: 'Escalation record', user: 'mkttl', path: '/collections/escalations', open: 'first' },
   { slug: 'collections-billing', title: 'Billing Statements', user: 'mktcoll', path: '/collections/billing' },
-  { slug: 'collections-unapplied', title: 'Unapplied Payments (collector)', user: 'upphandler', path: '/collections/unapplied?tab=ALL' },
-  { slug: 'collections-unapplied-record', title: 'Unapplied Payment (collector record)', user: 'upphandler', path: '/collections/unapplied?tab=ALL', open: 'first' },
+  { slug: 'collections-unapplied', title: 'Unapplied Payments (collector)', user: 'clxhandler', path: '/collections/unapplied?tab=ALL' },
+  { slug: 'collections-unapplied-record', title: 'Unapplied Payment (collector record)', user: 'clxhandler', path: '/collections/unapplied?tab=ALL', open: 'first' },
   { slug: 'collections-unapplied-requests', title: 'Requests to Cashiering', user: 'clxhandler', path: '/collections/unapplied/requests' },
   { slug: 'cashiering-workbench', title: 'Cashiering Workbench', user: 'cashier', path: '/cashiering' },
   { slug: 'receive-payment', title: 'Receive Payment', user: 'cashier', path: '/cashiering/receive' },
@@ -133,6 +135,7 @@ module.exports = [
   { slug: 'frbs-service-fee', title: 'Service Fee Runs', user: 'gltl', path: '/frbs/service-fee' },
   { slug: 'frbs-service-fee-run', title: 'Service Fee Run record', user: 'gltl', path: '/frbs/service-fee', open: 'first' },
   { slug: 'finance-dashboard', title: 'Finance executive dashboard', user: 'fmanager', path: '/' },
+  { slug: 'dashboard-bdoi-role', title: 'Home dashboard of a BDOI role (no insurer widgets)', user: 'disbappr', path: '/' },
   { slug: 'gl-journals', title: 'GL Journals', user: 'fmanager', path: '/gl/journals' },
   { slug: 'gl-chart-upload', title: 'Chart Upload & Numbering (GL Team Lead)', user: 'gltl', path: '/gl/accounts/upload' },
   { slug: 'gl-close', title: 'GL Close & Cut-Off (GL Team Lead)', user: 'gltl', path: '/planning/gl-close' },
@@ -153,4 +156,6 @@ module.exports = [
   { slug: 'message-log', title: 'Message Log', user: 'badmin', path: '/broking-setup/messages' },
   { slug: 'employees', title: 'Employees', user: 'fmanager', path: '/setup/employees' },
   { slug: 'cost-centre-rules', title: 'Cost-Centre Rules', user: 'fmanager', path: '/setup/cost-centre-rules' },
+  // Themed pages
+  { slug: 'page-not-found', title: 'Page not found (404)', user: 'ao', path: '/no-such-page' },
 ];

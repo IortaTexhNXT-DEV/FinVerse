@@ -1,17 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BellDot } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { messagingApi } from '@/api/messaging';
 import type { AppNotification } from '@/api/messaging';
-import { formatDateTime } from '@/utils/format';
+import { NotificationItem } from '@/features/workspace/NotificationItem';
+import { groupByDay } from '@/features/workspace/notificationLogic';
 
 const REFRESH_MS = 60_000;
 
 /**
  * Header bell with the signed-in user's notifications (BRNB.015): returned requests, work
- * assigned, status changes of the user's records. Opening a notification marks it read and
- * navigates to the record.
+ * assigned, status changes of the user's records. The panel groups them by day, each with its
+ * icon, title, summary, record reference and relative time; opening one marks it read and goes
+ * to the record. Mark one or all as read, and View All opens the notifications page.
  */
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
@@ -41,8 +43,17 @@ export function NotificationBell() {
         setOpen(false);
       }
     };
+    const escape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+      }
+    };
     document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('mousedown', close);
+      document.removeEventListener('keydown', escape);
+    };
   }, [open]);
 
   const unread = count.data?.unread ?? 0;
@@ -55,6 +66,7 @@ export function NotificationBell() {
       void navigate(n.link);
     }
   };
+  const groups = groupByDay(list.data?.content ?? []);
 
   return (
     <div className="notification-bell" ref={panel}>
@@ -86,24 +98,32 @@ export function NotificationBell() {
               Mark All Read
             </button>
           </div>
-          <ul className="notification-list">
-            {(list.data?.content ?? []).map((n) => (
-              <li key={n.id}>
-                <button
-                  type="button"
-                  className={n.read ? 'notification-item' : 'notification-item unread'}
-                  onClick={() => openItem(n)}
-                >
-                  <span className="notification-title">{n.title}</span>
-                  {n.body && <span className="notification-body">{n.body}</span>}
-                  <span className="notification-time">{formatDateTime(n.createdAt)}</span>
-                </button>
-              </li>
+          <div className="notification-scroll">
+            {list.isLoading && <div className="skeleton-line wide" />}
+            {groups.map((g) => (
+              <section key={g.label} aria-label={g.label}>
+                <h3 className="notification-day">{g.label}</h3>
+                <ul className="notification-list">
+                  {g.items.map((n) => (
+                    <NotificationItem
+                      key={n.id}
+                      notification={n}
+                      onOpen={openItem}
+                      onMarkRead={(x) => read.mutate(x.id)}
+                    />
+                  ))}
+                </ul>
+              </section>
             ))}
             {list.data?.content.length === 0 && (
-              <li className="muted notification-empty">You are all caught up.</li>
+              <p className="muted notification-empty">No notifications. You are all caught up.</p>
             )}
-          </ul>
+          </div>
+          <div className="notification-foot">
+            <Link to="/notifications" onClick={() => setOpen(false)}>
+              View All Notifications
+            </Link>
+          </div>
         </div>
       )}
     </div>

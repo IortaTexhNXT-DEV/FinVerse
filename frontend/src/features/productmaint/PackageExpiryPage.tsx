@@ -96,7 +96,7 @@ function ExpiryListDialog({
       <NumberInput
         label="Packages ending within (days)"
         step="1"
-        hint="From today; the monitor alerts at 60, 30 and 7 days (PACKAGE_EXPIRY_NOTICE_DAYS)."
+        hint="From today; the monitor alerts at 60, 30 and 7 days."
         value={days}
         onChange={setDays}
       />

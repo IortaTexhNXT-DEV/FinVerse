@@ -142,7 +142,7 @@ export default function InterfacesPage() {
       <PageHeader
         section="Operations"
         title="Interfaces"
-        description="Feeds with Collection, Disbursement, insurers and booking: schedules, uploads and the log of every run."
+        description="Feeds with Collection, Disbursement, insurers and booking."
         actions={
           <Button
             variant="secondary"

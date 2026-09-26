@@ -13,6 +13,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
 import { ReportTable } from '@/features/reports/ReportTable';
 import { today } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 
 /** Insurance Commission schedules and the report that renders each one. */
 const IC_SCHEDULES = [
@@ -54,7 +55,7 @@ export default function IcSchedulesPage() {
       <PageHeader
         section="Tax & Statutory"
         title="IC Statutory Schedules"
-        description="Annual statement and quarterly report schedules of the Insurance Commission, built from posted ledger balances."
+        description="Annual statement and quarterly report schedules of the Insurance Commission."
         actions={FORMATS.map((f) => (
           <Button
             key={f}
@@ -72,26 +73,10 @@ export default function IcSchedulesPage() {
       <Card>
         <div className="row">
           <Field label="From (movements)">
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="date"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={from} onChange={(e) => setFrom(e.target.value)} />}
           </Field>
           <Field label="To / as of">
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="date"
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={to} onChange={(e) => setTo(e.target.value)} />}
           </Field>
         </div>
       </Card>

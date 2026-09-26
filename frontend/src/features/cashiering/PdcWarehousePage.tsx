@@ -94,7 +94,7 @@ export default function PdcWarehousePage() {
       <PageHeader
         section="Cashiering"
         title="PDC Warehouse"
-        description="Post-dated checks by maturity month. Matured checks become payments with an AR automatically."
+        description="Post-dated checks by maturity month."
         actions={
           upload && (
             <>

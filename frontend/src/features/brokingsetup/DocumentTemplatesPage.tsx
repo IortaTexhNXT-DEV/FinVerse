@@ -15,6 +15,9 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate, formatDateTime, today } from '@/utils/format';
+import { FileDropZone } from '@/components/ui/FileDropZone';
+import { displayNameOf } from '@/api/users';
+import { DateInput } from '@/components/ui/DateInput';
 
 /**
  * Document templates (BRNB.004): the texts merged into quotations, slips, insurance advice and
@@ -43,7 +46,7 @@ export default function DocumentTemplatesPage() {
       <PageHeader
         section="Broking Setup"
         title="Document Templates"
-        description="Texts of generated documents with {{placeholders}} filled from the record. Changes take effect from the chosen date."
+        description="Texts of generated documents with {{placeholders}} filled from the record."
         actions={
           canEdit &&
           latest && (
@@ -117,7 +120,7 @@ export default function DocumentTemplatesPage() {
                 {
                   key: 'by',
                   header: 'Created',
-                  render: (v) => `${v.createdBy} · ${formatDateTime(v.createdAt)}`,
+                  render: (v) => `${displayNameOf(v.createdBy)} · ${formatDateTime(v.createdAt)}`,
                 },
                 {
                   key: 'word',
@@ -198,14 +201,12 @@ function NewVersionDialog({
           hint="A .docx file: the first paragraph is the title, the others the text. Review it below before saving."
         >
           {(id) => (
-            <input
+            <FileDropZone
               id={id}
-              type="file"
-              className="input"
               accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               disabled={load.isPending}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
+              onChange={(files) => {
+                const file = files[0];
                 if (file !== undefined) {
                   load.mutate(file);
                 }
@@ -226,10 +227,8 @@ function NewVersionDialog({
         </Field>
         <Field label="Effective from" required>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              type="date"
-              className="input"
               value={effectiveFrom}
               onChange={(e) => setEffectiveFrom(e.target.value)}
             />

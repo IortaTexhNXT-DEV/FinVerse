@@ -156,7 +156,7 @@ export default function PremiumCalculatorPage() {
       <PageHeader
         section="Product Maintenance"
         title="Premium Calculator"
-        description="Rate a product with the charges in force: for a quotation, a new account or an endorsement over the remaining term."
+        description="Rate a product with the charges in force."
       />
       <Card title="Cover">
         <div className="form-grid">

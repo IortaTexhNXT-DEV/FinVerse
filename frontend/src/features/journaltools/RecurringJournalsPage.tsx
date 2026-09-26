@@ -119,7 +119,7 @@ export default function RecurringJournalsPage() {
       <PageHeader
         section="General Ledger"
         title="Recurring Journals"
-        description="Standing and accrual journals generated automatically on schedule as drafts (or submitted for approval). Accruals can reverse on the first day of the next period."
+        description="Standing and accrual journals generated automatically on schedule as drafts."
         actions={
           canCreate && (
             <Button

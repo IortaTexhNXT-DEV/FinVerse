@@ -20,6 +20,8 @@ import { disbursementApi } from './api';
 import type { EodRun } from './api';
 import { DialogFooter } from './VoucherDialogs';
 import './disbursement.css';
+import { displayNameOf } from '@/api/users';
+import { DateInput } from '@/components/ui/DateInput';
 
 const COLUMNS: Column<EodRun>[] = [
   { key: 'no', header: 'Run', render: (r) => r.runNo },
@@ -29,7 +31,11 @@ const COLUMNS: Column<EodRun>[] = [
   { key: 'credits', header: 'Credits', numeric: true, render: (r) => r.credits },
   { key: 'forms', header: 'Forms', numeric: true, render: (r) => r.forms },
   { key: 'emails', header: 'Confirmations', numeric: true, render: (r) => r.emails },
-  { key: 'by', header: 'Run By', render: (r) => `${r.runBy} · ${formatDateTime(r.runAt)}` },
+  {
+    key: 'by',
+    header: 'Run By',
+    render: (r) => `${displayNameOf(r.runBy)} · ${formatDateTime(r.runAt)}`,
+  },
   { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
 ];
 
@@ -117,15 +123,7 @@ function RunDialog({
           produced.
         </p>
         <Field label="Business Date" required>
-          {(id) => (
-            <input
-              id={id}
-              type="date"
-              className="input"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          )}
+          {(id) => <DateInput id={id} value={date} onChange={(e) => setDate(e.target.value)} />}
         </Field>
       </div>
     </Modal>
@@ -159,7 +157,7 @@ export default function EodPage() {
       <PageHeader
         section="Finance · Disbursement"
         title="End of Day"
-        description="Checks, credit files, bank forms and reports of the approved vouchers of a day, and the payment confirmations."
+        description="Checks, credit files, bank forms and reports of the approved vouchers of a day."
         actions={
           can('DISB_EOD') ? (
             <Button variant="accent" icon={<Play size={16} />} onClick={() => setRunning(true)}>

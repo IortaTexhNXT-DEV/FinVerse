@@ -21,6 +21,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import './operations.css';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'OPEN', label: 'Open Hand-offs' },
@@ -159,7 +160,7 @@ function Extracts() {
     {
       key: 'at',
       header: 'Stored',
-      render: (f) => `${formatDateTime(f.createdAt)} · ${f.createdBy}`,
+      render: (f) => `${formatDateTime(f.createdAt)} · ${displayNameOf(f.createdBy)}`,
     },
     {
       key: 'dl',
@@ -204,7 +205,7 @@ export default function HandoffsPage() {
       <PageHeader
         section="Operations"
         title="Hand-offs and Extracts"
-        description="Work to complete by hand while an Operations module is not active, and the files Operations produced for other teams."
+        description="Work to complete by hand while an Operations module is not active."
       />
       <Card>
         <div className="stack">

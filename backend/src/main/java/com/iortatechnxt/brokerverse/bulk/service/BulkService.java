@@ -389,6 +389,22 @@ public class BulkService {
         job, registry.get(job.getHandlerCode()).columns(), all, values, outcomes(jobId));
   }
 
+  /**
+   * The error file of a job: the rows not processed, in the template layout with an Error column
+   * and the offending cells highlighted, to correct and upload again.
+   *
+   * @param jobId job
+   * @return xlsx bytes
+   */
+  @Transactional(readOnly = true)
+  public byte[] errorFile(Long jobId) {
+    BulkJob job = job(jobId);
+    List<BulkRowRecord> all = rows.findByJobIdOrderByRowNo(jobId);
+    Map<Long, Map<String, String>> values = new HashMap<>();
+    all.forEach(r -> values.put(r.getId(), store.read(r.getData())));
+    return BulkWorkbooks.errorFile(registry.get(job.getHandlerCode()).columns(), all, values);
+  }
+
   private BulkJob requireOpen(Long jobId) {
     BulkJob job = job(jobId);
     job.requireValidated();

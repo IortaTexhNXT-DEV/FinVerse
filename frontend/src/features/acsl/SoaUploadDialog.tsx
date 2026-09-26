@@ -8,6 +8,8 @@ import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { acslApi } from './api';
+import { FileDropZone } from '@/components/ui/FileDropZone';
+import { DateInput } from '@/components/ui/DateInput';
 
 type Key = 'insurer' | 'from' | 'to' | 'file';
 
@@ -97,26 +99,10 @@ export function SoaUploadDialog({ onClose }: Readonly<{ onClose: () => void }>) 
         </Field>
         <div className="form-grid">
           <Field label="Period From" required error={errors.from}>
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="date"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={from} onChange={(e) => setFrom(e.target.value)} />}
           </Field>
           <Field label="Period To" required error={errors.to}>
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="date"
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={to} onChange={(e) => setTo(e.target.value)} />}
           </Field>
         </div>
         <Field
@@ -126,12 +112,10 @@ export function SoaUploadDialog({ onClose }: Readonly<{ onClose: () => void }>) 
           hint={layout ? `Columns: ${layout.headers.join(', ')}` : 'CSV, Excel, ODS or text'}
         >
           {(id) => (
-            <input
+            <FileDropZone
               id={id}
-              className="input"
-              type="file"
               accept=".csv,.xlsx,.ods,.txt"
-              onChange={(e) => setFile(e.target.files?.[0])}
+              onChange={(files) => setFile(files[0])}
             />
           )}
         </Field>

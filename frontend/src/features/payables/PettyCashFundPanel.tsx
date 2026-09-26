@@ -15,6 +15,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useGlLookups } from '@/features/gl/useLookups';
 import { formatDate, today } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 
 type Tab = 'vouchers' | 'claims';
 const TABS: { id: Tab; label: string }[] = [
@@ -210,10 +211,8 @@ export function PettyCashFundPanel({ fund }: Readonly<{ fund: Fund }>) {
           <div className="form-grid">
             <Field label="Date" required>
               {(id) => (
-                <input
+                <DateInput
                   id={id}
-                  className="input"
-                  type="date"
                   value={form.date}
                   onChange={(e) => setForm({ ...form, date: e.target.value })}
                 />

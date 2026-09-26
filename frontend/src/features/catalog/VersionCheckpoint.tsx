@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/Card';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime } from '@/utils/format';
 import { VALIDATION_CHECKLIST } from './versionForm';
+import { UserName } from '@/components/ui/UserName';
 
 /** The checklist confirmed at validation, from its JSON. */
 function confirmedItems(json: string | undefined): string[] {
@@ -61,7 +62,11 @@ export function VersionCheckpoint({ detail }: Readonly<{ detail: VersionDetail }
     return (
       <Card title="Validation">
         <p>
-          Validated by <strong>{s.validatedBy}</strong> on {formatDateTime(s.validatedAt)}
+          Validated by{' '}
+          <strong>
+            <UserName login={s.validatedBy} />
+          </strong>{' '}
+          on {formatDateTime(s.validatedAt)}
           {detail.testPremium !== undefined && (
             <>
               {' '}

@@ -53,7 +53,7 @@ export const PACKAGE_REQUEST_HELP_SCREENS: readonly HelpScreen[] = [
       'Released packages by package end date with their renewal status (Expiring, Renewal in Progress, Expired). Generate Expiry List changes the look-ahead.',
     workflow: [
       'Select packages and use Generate Renewal Request: a RENEW request is drafted with the terms of the version in force and the next term dates.',
-      'The daily PACKAGE_EXPIRY_MONITOR job alerts TSU and MBS at the notice period and again at 30 and 7 days, and drafts renewal requests itself when PACKAGE_RENEWAL_AUTODRAFT is on.',
+      'The daily scheduled job alerts TSU and MBS at the notice period and again at 30 and 7 days, and drafts renewal requests itself when PACKAGE_RENEWAL_AUTODRAFT is on.',
     ],
     controls: [
       'A package with an open renewal request is never renewed twice.',

@@ -247,7 +247,7 @@ const MATCH_TYPE: TypeSpec = {
   type: 'MATCH_CRITERIA',
   label: 'Matching Criteria',
   description:
-    'Algorithms, thresholds, fields compared and the case threshold per list and subject type (SNSRP-101).',
+    'Algorithms, thresholds, fields compared and the case threshold per list and subject type.',
   tables: [MATCH],
 };
 
@@ -257,39 +257,38 @@ export const CONFIG_TYPES: readonly TypeSpec[] = [
     type: 'RISK_RULES',
     label: 'Risk Rules',
     description:
-      'Risk categories with the rating and tags they set, and the rules that assign them (SNSRP-102).',
+      'Risk categories with the rating and tags they set, and the rules that assign them.',
     tables: [CATEGORIES, RULES],
   },
   {
     type: 'APPROVAL_MATRIX',
     label: 'Approval Matrix',
     description:
-      'Where a submitted case goes and who approves it; routes from Compliance review form the escalation matrix (SNSRP-103, 703).',
+      'Where a submitted case goes and who approves it; routes from Compliance review form the escalation matrix.',
     tables: [ROUTES],
   },
   {
     type: 'ASSIGNMENT_MATRIX',
     label: 'Assignment Matrix',
-    description: 'Which team or user receives a new case, by scenario (SNSRP-106).',
+    description: 'Which team or user receives a new case, by scenario.',
     tables: [ASSIGNMENTS],
   },
   {
     type: 'SLA_MATRIX',
     label: 'SLA Matrix',
-    description: 'Turnaround per stage, reminder lead time and escalation role (SNSRP-108).',
+    description: 'Turnaround per stage, reminder lead time and escalation role.',
     tables: [SLA],
   },
   {
     type: 'VALIDATION_RULES',
     label: 'Validation Rules',
-    description: 'Checks a dispositioned case must pass before it is routed (SNSRP-701, 802).',
+    description: 'Checks a dispositioned case must pass before it is routed.',
     tables: [CHECKS],
   },
   {
     type: 'STR_LAYOUT',
     label: 'STR Layout',
-    description:
-      'Columns of the STR extraction file; the AMLC format is entered when BDOI supplies it (SNSRP-105, 706).',
+    description: 'Columns of the STR extraction file in the AMLC format.',
     tables: [COLUMNS],
   },
 ];

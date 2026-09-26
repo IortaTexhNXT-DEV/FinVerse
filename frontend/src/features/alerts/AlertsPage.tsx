@@ -71,7 +71,7 @@ export default function AlertsPage() {
       <PageHeader
         section="Overview"
         title="Alerts"
-        description="Exceptions raised by the control rules. Acknowledge an alert when you take it over and resolve it with a comment."
+        description="Exceptions raised by the control rules."
         actions={
           canManage && (
             <Button

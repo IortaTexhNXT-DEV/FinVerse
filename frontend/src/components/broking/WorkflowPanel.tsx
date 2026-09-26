@@ -3,14 +3,15 @@ import { AlarmClock, UserCheck } from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { workflowApi } from '@/api/workflow';
-import type { ActionNote, WorkAction } from '@/api/workflow';
+import type { ActionNote, WorkAction, WorkItem } from '@/api/workflow';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime, titleCase } from '@/utils/format';
+import { formatDateTime, humanize, titleCase } from '@/utils/format';
 import { ActionDialog } from './ActionDialog';
-import { StageTimeline } from './StageTimeline';
+import { HistoryTable } from './HistoryTable';
 import { workflowKey } from './workflowKey';
 
 interface WorkflowPanelProps {
@@ -27,10 +28,65 @@ interface WorkflowPanelProps {
   showHistory?: boolean;
 }
 
+/** Stage, in stage since, due time and assignee of a record, as a labelled strip. */
+function StatusStrip({ item, terminal }: Readonly<{ item: WorkItem; terminal: boolean }>) {
+  const stageTerminal = terminal;
+  return (
+    <dl className="status-strip">
+      <div>
+        <dt>Stage</dt>
+        <dd className="workflow-stage">
+          <StatusBadge status={item.stageCode} />
+          {titleCase(item.stageName) !== humanize(item.stageCode) && (
+            <span className="workflow-stage-name">{titleCase(item.stageName)}</span>
+          )}
+        </dd>
+      </div>
+      <div>
+        <dt>In Stage Since</dt>
+        <dd className="nowrap">{formatDateTime(item.stageEnteredAt)}</dd>
+      </div>
+      {!stageTerminal && (
+        <div>
+          <dt>Due</dt>
+          <dd className={item.overdue ? 'nowrap workflow-overdue' : 'nowrap'}>
+            {item.dueAt ? (
+              <>
+                <AlarmClock size={14} aria-hidden="true" /> {formatDateTime(item.dueAt)}
+                {item.overdue && (
+                  <>
+                    {' '}
+                    <StatusBadge status="OVERDUE" />
+                  </>
+                )}
+              </>
+            ) : (
+              <span className="muted">—</span>
+            )}
+          </dd>
+        </div>
+      )}
+      <div>
+        <dt>Assigned To</dt>
+        <dd>
+          {item.assignee ? (
+            <>
+              <UserCheck size={14} aria-hidden="true" /> <UserName login={item.assignee} />
+            </>
+          ) : (
+            <span className="muted">—</span>
+          )}
+        </dd>
+      </div>
+    </dl>
+  );
+}
+
 /**
- * Where a record stands (BRNB.022/115): stage, since when, due time (SLA), assignee, the
- * actions the current user may take, and the status history. Generic actions (return, void,
- * decline) run here with their reason; business actions are supplied by the page.
+ * Where a record stands (BRNB.022/115) as a structured status panel: stage, in stage since, due
+ * time (SLA), assignee, the actions the current user may take, and the status history table.
+ * Generic actions (return, void, decline) run here with their reason; business actions are
+ * supplied by the page.
  */
 export function WorkflowPanel({
   entityType,
@@ -60,7 +116,12 @@ export function WorkflowPanel({
   });
 
   if (detail.isLoading) {
-    return <div className="workflow-panel muted">Loading status…</div>;
+    return (
+      <div className="workflow-panel" aria-busy="true">
+        <div className="skeleton-line wide" />
+        <div className="skeleton-line" />
+      </div>
+    );
   }
   if (!detail.data) {
     return <ErrorAlert error={detail.error} />;
@@ -71,28 +132,7 @@ export function WorkflowPanel({
   return (
     <section className="workflow-panel" aria-label="Workflow status">
       <div className="workflow-head">
-        <div>
-          <div className="workflow-stage">
-            <StatusBadge status={item.stageCode} />
-            <span className="workflow-stage-name">{titleCase(item.stageName)}</span>
-          </div>
-          <div className="workflow-meta muted">
-            Since {formatDateTime(item.stageEnteredAt)}
-            {item.dueAt && !stageTerminal && (
-              <span className={item.overdue ? 'workflow-overdue' : ''}>
-                {' '}
-                · <AlarmClock size={12} aria-hidden="true" /> due {formatDateTime(item.dueAt)}
-                {item.overdue && ' (overdue)'}
-              </span>
-            )}
-            {item.assignee && (
-              <span>
-                {' '}
-                · <UserCheck size={12} aria-hidden="true" /> {item.assignee}
-              </span>
-            )}
-          </div>
-        </div>
+        <StatusStrip item={item} terminal={stageTerminal} />
         <div className="row workflow-actions">
           {renderBusinessActions?.(business)}
           {generic.map((a) => (
@@ -102,10 +142,12 @@ export function WorkflowPanel({
           ))}
         </div>
       </div>
-      {showHistory && <StageTimeline history={history} />}
+      {showHistory && <HistoryTable history={history} terminal={stageTerminal} />}
       {pending && (
         <ActionDialog
           title={titleCase(pending.label)}
+          record={item.reference}
+          effect={`The record moves to ${titleCase(pending.toStageName ?? pending.toStage)}.`}
           reasonLov={pending.reasonLov}
           confirmLabel={titleCase(pending.label)}
           busy={act.isPending}

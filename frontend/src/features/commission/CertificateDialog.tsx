@@ -9,6 +9,7 @@ import { formatAmount } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { Certificate, CertificateInput, OrLink } from './commissionApi';
 import { certificateProblem, receiptsTotal } from './commissionLogic';
+import { DateInput } from '@/components/ui/DateInput';
 
 function blank(companyId: number): CertificateInput {
   return {
@@ -191,10 +192,8 @@ export function CertificateDialog({
           </Field>
           <Field label="Period From" required>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={form.periodFrom}
                 onChange={(e) => set({ periodFrom: e.target.value })}
               />
@@ -202,10 +201,8 @@ export function CertificateDialog({
           </Field>
           <Field label="Period To" required>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={form.periodTo}
                 onChange={(e) => set({ periodTo: e.target.value })}
               />

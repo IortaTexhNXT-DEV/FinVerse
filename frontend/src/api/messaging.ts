@@ -57,8 +57,10 @@ export const messagingApi = {
       `/messages/by-record${toQuery({ entityType, entityId: String(entityId) })}`,
     ),
   retry: (id: number) => api.post<OutboundMessage>(`/messages/${id}/retry`),
-  notifications: (unreadOnly = false) =>
-    api.get<PageResponse<AppNotification>>(`/notifications${toQuery({ unreadOnly, size: 20 })}`),
+  notifications: (unreadOnly = false, page = 0) =>
+    api.get<PageResponse<AppNotification>>(
+      `/notifications${toQuery({ unreadOnly, page, size: 20 })}`,
+    ),
   unreadCount: () => api.get<{ unread: number }>('/notifications/unread-count'),
   markRead: (id: number) => api.post<AppNotification>(`/notifications/${id}/read`),
   markAllRead: () => api.post<{ updated: number }>('/notifications/read-all'),

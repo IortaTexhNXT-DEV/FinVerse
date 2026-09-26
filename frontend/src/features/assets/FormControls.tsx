@@ -1,5 +1,6 @@
 import { Field } from '@/components/ui/Field';
 import type { Option } from './options';
+import { TypedInput } from '@/components/ui/DateInput';
 
 interface BaseProps {
   label: string;
@@ -31,7 +32,7 @@ export function TextInput({
   return (
     <Field label={label} required={required} error={error} hint={hint}>
       {(id) => (
-        <input
+        <TypedInput
           id={id}
           className="input"
           type={type}

@@ -32,7 +32,7 @@ function dueState(d: DiaryItem): string {
 }
 
 /**
- * My Diary (BRCLM.022/034, FR-CL-052): the diary entries assigned to the signed-in user across the
+ * My Diary (BRCLM.022/034, FR-CM-052): the diary entries assigned to the signed-in user across the
  * claims, overdue and due first; each opens its claim, and the user marks them done.
  */
 export default function DiaryPage() {

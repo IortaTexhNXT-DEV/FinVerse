@@ -1,7 +1,7 @@
 import { api } from '@/api/client';
 import type { RecordStatus } from '@/api/types';
 
-/** Claims Setup (BRCLM.010/012/014; FR-CL-040/041/043): /api/v1/broker-claims/setup. */
+/** Claims Setup (BRCLM.010/012/014; FR-CM-040/041/043): /api/v1/broker-claims/setup. */
 
 export const STATUS_LIST = 'BCL_CLAIM_STATUS';
 export const SETTLEMENT_LIST = 'BCL_SETTLEMENT_TYPE';

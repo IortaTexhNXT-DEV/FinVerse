@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The status access matrix applied to a user (BRCLM.012/013, FR-CL-041): a status may be selected
+ * The status access matrix applied to a user (BRCLM.012/013, FR-CM-041): a status may be selected
  * when an active row matches one of the user's roles and the user's claims unit (or any unit). The
  * unit comes from the claims handler register; a user outside the register sets no status. The
  * check runs in the service, so a direct API call outside the matrix is refused as well.

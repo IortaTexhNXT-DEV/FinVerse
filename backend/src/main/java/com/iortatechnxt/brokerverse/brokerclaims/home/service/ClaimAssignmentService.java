@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Reassignment of claims between handlers (NFR p.37, FR-CL-055): a TL, TH or UH ({@code
+ * Reassignment of claims between handlers (NFR p.37, FR-CM-055): a TL, TH or UH ({@code
  * WORK_ASSIGN}) hands one claim or a selection to another user who may record claims; the claim
  * takes the new handler's unit from the register, the workflow case follows, the change is kept in
  * the claim timeline, and the new handler is notified once ({@code BCL_CLAIM_ASSIGNED}).

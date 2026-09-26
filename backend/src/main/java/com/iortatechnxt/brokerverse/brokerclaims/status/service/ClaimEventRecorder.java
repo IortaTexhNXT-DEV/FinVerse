@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Keeps every change of a tracked claim field twice (FR-CL-003): a row of the claim timeline
+ * Keeps every change of a tracked claim field twice (FR-CM-003): a row of the claim timeline
  * ({@code bcl_claim_event}) and an audit entry, in the caller's transaction. Public contract of the
  * module: CL1-A records the reported date, claimant, cover version and authorization code changes
  * through {@link #record}.

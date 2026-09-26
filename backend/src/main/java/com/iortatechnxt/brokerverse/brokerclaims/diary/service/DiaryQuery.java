@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * My Diary (BRCLM.022/034, FR-CL-052): the diary entries assigned to the signed-in user across the
+ * My Diary (BRCLM.022/034, FR-CM-052): the diary entries assigned to the signed-in user across the
  * claims of the company, open entries first by due date (overdue and due today on top), with the
  * claim number and assured.
  */

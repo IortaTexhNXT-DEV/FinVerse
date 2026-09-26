@@ -95,7 +95,7 @@ public class ClaimProgress {
 
   /**
    * Sets the next follow-up date computed at a status change (BRCLM.019). An override is kept until
-   * its date passes (FR-CL-050 R2); a passed override gives way to the computed date.
+   * its date passes (FR-CM-050 R2); a passed override gives way to the computed date.
    *
    * @param computed date computed from the status follow-up days
    * @param today business date

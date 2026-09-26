@@ -11,7 +11,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** Claim ages and ageing buckets (BRCLM.025/027, FR-CL-053) and the workflow actions per phase. */
+/** Claim ages and ageing buckets (BRCLM.025/027, FR-CM-053) and the workflow actions per phase. */
 class ClaimAgeingTest {
 
   private static final LocalDate MARCH_1 = LocalDate.of(2026, 3, 1);

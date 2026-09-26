@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Composes the loss advice of one insurer from template {@code BCL_LOSS_ADVICE} (process p.24-25;
- * FR-CL-024): assured, policy / reference number, date and place of loss (the linked locations of a
+ * FR-CM-024): assured, policy / reference number, date and place of loss (the linked locations of a
  * property claim), nature and description, initial loss reserve, assigned adjuster and the
  * insurer's claim numbers known so far. The template wording is a draft until BDOI gives its layout
  * (CLQ22).

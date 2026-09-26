@@ -6,7 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 /**
- * A proposed value of an attribute of a status or settlement type (BRCLM.010/014, FR-CL-040/043):
+ * A proposed value of an attribute of a status or settlement type (BRCLM.010/014, FR-CM-040/043):
  * it waits for another BCL_SETUP user to authorize it, then applies to {@code bcl_lov_attribute}. A
  * null value removes the attribute (e.g. blank follow-up days = parameter). A newer proposal for
  * the same value supersedes a pending one (deactivated).

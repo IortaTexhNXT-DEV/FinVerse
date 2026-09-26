@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-/** Request bodies of the claim record (FR-CL-011/012/030/033). */
+/** Request bodies of the claim record (FR-CM-011/012/030/033). */
 @SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // holder of nested types
 public final class ClaimRequests {
 
@@ -123,7 +123,7 @@ public final class ClaimRequests {
   }
 
   /**
-   * A reported date correction (FR-CL-012).
+   * A reported date correction (FR-CM-012).
    *
    * @param reportedDate new date
    * @param reason reason ({@code BCL_OVERRIDE_REASON})
@@ -133,7 +133,7 @@ public final class ClaimRequests {
       @NotNull LocalDate reportedDate, String reason, @Size(max = 500) String remark) {}
 
   /**
-   * A claimant override (FR-CL-030).
+   * A claimant override (FR-CM-030).
    *
    * @param claimantName claimant
    * @param reason reason ({@code BCL_OVERRIDE_REASON})
@@ -141,7 +141,7 @@ public final class ClaimRequests {
   public record ClaimantRequest(@Size(max = 200) String claimantName, String reason) {}
 
   /**
-   * The claims authorization code (FR-CL-016).
+   * The claims authorization code (FR-CM-016).
    *
    * @param evidenceAttachmentId insurer payment evidence of a direct-payment cover
    */

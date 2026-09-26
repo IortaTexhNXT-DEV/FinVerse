@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * The claim record (BRCLM.001/003/004/006/016/036/039; FR-CL-011..016/030/033): record a claim on a
+ * The claim record (BRCLM.001/003/004/006/016/036/039; FR-CM-011..016/030/033): record a claim on a
  * cover ({@code BCL_RECORD}), read it ({@code BCL_VIEW}), change its loss data, correct the
  * reported date ({@code BCL_STATUS_UPDATE}), override the claimant ({@code BCL_CLAIMANT_OVERRIDE}),
  * refresh the cover data, use the latest cover version, re-check the premium and generate the

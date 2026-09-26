@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Changes to the cover snapshot and loss details of an open claim (BRCLM.004/006/016/036/039;
- * FR-CL-012/014/015/030/033): loss data (BCL_RECORD), reported date correction with a reason
+ * FR-CM-012/014/015/030/033): loss data (BCL_RECORD), reported date correction with a reason
  * (BCL_STATUS_UPDATE), claimant override with a reason (BCL_CLAIMANT_OVERRIDE), refresh of the
  * cover data from the account and switch to the latest cover version. Every change is audited with
  * the old and new values; policy data itself is never edited by Claims.
@@ -84,7 +84,7 @@ public class ClaimDetailsService {
   }
 
   /**
-   * Corrects the reported date of an open claim (BRCLM.004, FR-CL-012; BCL_STATUS_UPDATE).
+   * Corrects the reported date of an open claim (BRCLM.004, FR-CM-012; BCL_STATUS_UPDATE).
    *
    * @param companyId company
    * @param claimId claim
@@ -114,7 +114,7 @@ public class ClaimDetailsService {
   }
 
   /**
-   * Overrides the claimant's name (BRCLM.006, FR-CL-030; BCL_CLAIMANT_OVERRIDE).
+   * Overrides the claimant's name (BRCLM.006, FR-CM-030; BCL_CLAIMANT_OVERRIDE).
    *
    * @param companyId company
    * @param claimId claim
@@ -138,7 +138,7 @@ public class ClaimDetailsService {
 
   /**
    * Reloads the policy number, sum insured, Marketing unit, AO and branch from the account
-   * (BRCLM.016 "Refresh Cover Data"; FR-CL-013 policy number filled once issued).
+   * (BRCLM.016 "Refresh Cover Data"; FR-CM-013 policy number filled once issued).
    *
    * @param companyId company
    * @param claimId claim

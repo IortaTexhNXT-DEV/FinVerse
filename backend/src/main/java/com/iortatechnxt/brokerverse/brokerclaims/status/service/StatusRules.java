@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The behaviour of the BDOI statuses and settlement types, read from their attributes in {@code
- * bcl_lov_attribute} (BRCLM.010/014, FR-CL-040/043; CLAIMS_BROKING_DESIGN 5.3): the phase a status
+ * bcl_lov_attribute} (BRCLM.010/014, FR-CM-040/043; CLAIMS_BROKING_DESIGN 5.3): the phase a status
  * belongs to, its follow-up days (else parameter {@code BCL_FOLLOW_UP_DAYS}), whether it awaits the
  * premium remittance, and the outcome, closure and amount rules of a settlement type. Nothing
  * business-specific is coded: the Unit Head changes the attributes on Claims Setup.
@@ -46,7 +46,7 @@ public class StatusRules {
 
   /**
    * The phase of a status; a status without a phase (or with phase CLOSED, which only a settlement
-   * type reaches) cannot be set (FR-CL-040 R1).
+   * type reaches) cannot be set (FR-CM-040 R1).
    *
    * @param statusCode status
    * @return phase NEW, IN_PROGRESS or TEMP_CLOSED
@@ -77,7 +77,7 @@ public class StatusRules {
   }
 
   /**
-   * Days from a status change to the next follow-up (BRCLM.019, FR-CL-050 R1).
+   * Days from a status change to the next follow-up (BRCLM.019, FR-CM-050 R1).
    *
    * @param statusCode status
    * @return the status's follow-up days, else {@code BCL_FOLLOW_UP_DAYS}
@@ -119,7 +119,7 @@ public class StatusRules {
   }
 
   /**
-   * The rule of a settlement type (FR-CL-043/044); a type without an outcome cannot be used.
+   * The rule of a settlement type (FR-CM-043/044); a type without an outcome cannot be used.
    *
    * @param typeCode settlement type
    * @return outcome, closure and amount flags

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Read side of the status engine for the claim record (FR-CL-003/042/053): where the claim stands
+ * Read side of the status engine for the claim record (FR-CM-003/042/053): where the claim stands
  * with its ages computed on read, and its History tab (status changes with the days spent in each
  * earlier status, and the field changes of the claim timeline).
  */

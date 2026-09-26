@@ -10,7 +10,7 @@ import { claimsHomeApi } from '../home/api';
 import { validateDiary } from './api';
 import type { DiaryForm, DiaryInput } from './api';
 
-/** Add Diary Entry: type, date, due date, assignee and text (FR-CL-052). */
+/** Add Diary Entry: type, date, due date, assignee and text (FR-CM-052). */
 export function DiaryDialog({
   busy,
   error,

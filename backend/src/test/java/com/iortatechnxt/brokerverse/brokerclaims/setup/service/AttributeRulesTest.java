@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-/** Validation of the status and settlement type attributes (FR-CL-040/043) and the loss ratio. */
+/** Validation of the status and settlement type attributes (FR-CM-040/043) and the loss ratio. */
 class AttributeRulesTest {
 
   @Test

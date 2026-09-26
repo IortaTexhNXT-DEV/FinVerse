@@ -31,7 +31,7 @@ function Settlement({ claim }: Readonly<{ claim: Claim }>) {
 }
 
 /**
- * Reserve & Settlement tab of a claim (BRCLM.023/024/029; FR-CL-032): the insurer reserve and
+ * Reserve & Settlement tab of a claim (BRCLM.023/024/029; FR-CM-032): the insurer reserve and
  * settled amount per insurer line with the claim total, Amend Reserve (BCL_RESERVE_AMEND) and the
  * reserve history; the settlement recorded on the claim. Information only: nothing is posted.
  */

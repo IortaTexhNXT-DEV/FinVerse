@@ -6,7 +6,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { claimsHomeApi } from '../home/api';
 
-/** Reassign the selected claims to another handler (NFR p.37, FR-CL-055; WORK_ASSIGN). */
+/** Reassign the selected claims to another handler (NFR p.37, FR-CM-055; WORK_ASSIGN). */
 export function ReassignDialog({
   count,
   busy,

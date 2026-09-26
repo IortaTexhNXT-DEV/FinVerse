@@ -135,7 +135,7 @@ function ConfirmModal({
 }
 
 /**
- * Record Claim (BRCLM.001/003/004/006/009/016/037/039/041/043; FR-CL-011): find the cover, check
+ * Record Claim (BRCLM.001/003/004/006/009/016/037/039/041/043; FR-CM-011): find the cover, check
  * the cover card and premium, pick the locations, enter the loss and confirm the insurers. The claim
  * gets its BCL number, phase NEW and the handler's queue; an unpaid cover is recorded and flagged.
  */

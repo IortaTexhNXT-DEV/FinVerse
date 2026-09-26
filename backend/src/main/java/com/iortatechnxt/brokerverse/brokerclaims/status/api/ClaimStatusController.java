@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Status actions and History of a claim (BRCLM.005/010-021/027/035; FR-CL-041-045/050/051/053):
+ * Status actions and History of a claim (BRCLM.005/010-021/027/035; FR-CM-041-045/050/051/053):
  * every call names the company of the claim, so a claim of another company is "not found".
  */
 @RestController

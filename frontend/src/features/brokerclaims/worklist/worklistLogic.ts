@@ -1,6 +1,6 @@
 import type { WorklistFlag, WorklistQuery, WorklistTab } from '../home/api';
 
-/** Tabs of the Claims worklist (FR-CL-055); "All" is reached from the home tiles. */
+/** Tabs of the Claims worklist (FR-CM-055); "All" is reached from the home tiles. */
 export const WORKLIST_TABS: readonly { id: WorklistTab; label: string }[] = [
   { id: 'MINE', label: 'My Claims' },
   { id: 'OPEN', label: 'Open' },

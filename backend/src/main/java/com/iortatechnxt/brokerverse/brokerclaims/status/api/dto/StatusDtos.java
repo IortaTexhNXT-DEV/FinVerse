@@ -8,7 +8,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimClosureServ
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-/** Requests and responses of the claim status actions (FR-CL-042/044/045/050/051). */
+/** Requests and responses of the claim status actions (FR-CM-042/044/045/050/051). */
 @SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class StatusDtos {
 

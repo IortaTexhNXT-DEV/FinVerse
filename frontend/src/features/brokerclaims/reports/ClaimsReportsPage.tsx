@@ -13,7 +13,7 @@ import { CLAIMS_SECTION } from '../ClaimsPlaceholder';
 export const CLAIMS_CATEGORY = 'CLAIMS_HANDLING';
 
 /**
- * Claims Handling reports (BRCLM.026-034/038/040-043; FR-CL-060-066): the Report Centre filtered to
+ * Claims Handling reports (BRCLM.026-034/038/040-043; FR-CM-060-066): the Report Centre filtered to
  * the Claims Handling category. Each report runs on screen with BCL_REPORT_VIEW and downloads in
  * Excel, PDF or CSV with BCL_REPORT_EXPORT; the data extract needs BCL_DATA_EXTRACT.
  */

@@ -70,7 +70,7 @@ const COLUMNS: Column<WorklistRow>[] = [
 ];
 
 /**
- * Claims worklist (BRCLM.034/043, FR-CL-055): the tabs My Claims, Open, Temporarily Closed, Closed
+ * Claims worklist (BRCLM.034/043, FR-CM-055): the tabs My Claims, Open, Temporarily Closed, Closed
  * and Follow-ups Due, search by claim number, insurer claim number, ARN, policy number or assured,
  * the home tile filters, and the bulk reassignment of the selected claims (WORK_ASSIGN).
  */

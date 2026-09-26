@@ -15,7 +15,7 @@ function statusText(label: string | undefined, phase: StatusChange['toPhase'] | 
 }
 
 /**
- * History tab of a claim (FR-CL-003/042/053): every status change with the days spent in the
+ * History tab of a claim (FR-CM-003/042/053): every status change with the days spent in the
  * previous status, user, time and remark, and every change of a tracked field (follow-up date,
  * action plan, settlement, adjuster, handler, and the CL1-A fields) with old and new values. The
  * rows are append-only; nothing can be edited here.

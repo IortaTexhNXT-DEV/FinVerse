@@ -164,7 +164,7 @@ export function RefsTable({ rows }: Readonly<{ rows: LocationRef[] }>) {
   );
 }
 
-/** The read-only tabs of a cover (FR-CL-010). */
+/** The read-only tabs of a cover (FR-CM-010). */
 export function CoverTabs({ cover }: Readonly<{ cover: CoverDetail }>) {
   const [tab, setTab] = useState<TabId>('years');
   return (

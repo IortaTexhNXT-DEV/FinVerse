@@ -35,7 +35,7 @@ function TabContent({ tab }: Readonly<{ tab: SetupTab }>) {
 }
 
 /**
- * Claims Setup (BRCLM.010/012/014/017/036; FR-CL-040/041/043): status and settlement type
+ * Claims Setup (BRCLM.010/012/014/017/036; FR-CM-040/041/043): status and settlement type
  * attributes, the status access matrix, the claims handler register and the Claims lists, maintained
  * by the Unit Head (BCL_SETUP) and authorized by another user.
  */

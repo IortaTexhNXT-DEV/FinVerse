@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Claim reads shared by the Claims services (BRCLM.041/043; FR-CL-002 R3): a claim is found only
+ * Claim reads shared by the Claims services (BRCLM.041/043; FR-CM-002 R3): a claim is found only
  * within its company, so a reference of another company answers "not found"; a permanently closed
  * claim refuses changes other than insurer updates, diary entries and reopen (design 5.1).
  */

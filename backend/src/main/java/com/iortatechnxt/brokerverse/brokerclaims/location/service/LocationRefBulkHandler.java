@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Bulk upload {@code BCL_LOCATION_REF} of insurer location references (BRCLM.042; design 9.5,
- * FR-CL-023): ARN, location item number, insurer, insurer location reference and effective date.
+ * FR-CM-023): ARN, location item number, insurer, insurer location reference and effective date.
  * Each row becomes the current reference of its location and insurer, ending the previous one.
  */
 @Component

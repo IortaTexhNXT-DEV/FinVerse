@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The claims handler register and the Claims lists on Claims Setup (BRCLM.012/017/036, NFR p.37,
- * FR-CL-041): the Unit Head registers each claims user's unit and team (the unit drives the status
+ * FR-CM-041): the Unit Head registers each claims user's unit and team (the unit drives the status
  * access matrix) and maintains the values of the lists whose owner permission is BCL_SETUP
  * (statuses, settlement types, adjusters, catastrophe codes, units and the others) through the
  * list-of-values API. Register changes are audited.

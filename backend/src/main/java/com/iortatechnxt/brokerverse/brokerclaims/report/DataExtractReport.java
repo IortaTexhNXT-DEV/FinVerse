@@ -14,7 +14,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * Claims Data Extract (BRCLM.033, FR-CL-064): a flat extract with every claim field, one row per
+ * Claims Data Extract (BRCLM.033, FR-CM-064): a flat extract with every claim field, one row per
  * claim, insurer line and location (a claim with two insurers and three locations gives six rows),
  * for analysis outside BIBS. Viewed and exported with {@code BCL_DATA_EXTRACT} only; saved report
  * variants keep the parameter sets.

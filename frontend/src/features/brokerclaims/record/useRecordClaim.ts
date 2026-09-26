@@ -12,13 +12,13 @@ import { linesFromShares, toRecordInput } from './recordInput';
 import type { ClaimForm, ClaimFormErrors } from './recordLogic';
 import { claimFormErrors, emptyClaimForm } from './recordLogic';
 
-/** Error codes the user may confirm to go on (FR-CL-011, FR-CL-021). */
+/** Error codes the user may confirm to go on (FR-CM-011, FR-CM-021). */
 const CONFIRMABLE = new Set(['BCL_LOSS_OUTSIDE_COVER', 'BCL_INSURER_CLAIM_NO_REUSED']);
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
- * State and actions of Record Claim (FR-CL-011): the form, locations and insurer lines, the cover
+ * State and actions of Record Claim (FR-CM-011): the form, locations and insurer lines, the cover
  * card of the chosen policy year and loss date, the save with the confirmations BIBS may ask for
  * (loss date outside the cover period, insurer claim number already on another claim).
  */

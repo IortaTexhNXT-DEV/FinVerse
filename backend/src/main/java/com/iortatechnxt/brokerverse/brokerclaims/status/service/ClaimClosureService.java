@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Settlement, permanent closure and reopen of a claim (BRCLM.005/014/015/029/035, FR-CL-044/045;
+ * Settlement, permanent closure and reopen of a claim (BRCLM.005/014/015/029/035, FR-CM-044/045;
  * CLAIMS_BROKING_DESIGN 8.1). The requested type of settlement is set by a TL / TH; a type that
  * needs it requires the settlement amount and the date settled (not in the future); a type that
  * closes the claim also needs {@code BCL_CLOSE} and closes it permanently (phase CLOSED, closure
@@ -78,7 +78,7 @@ public class ClaimClosureService {
   }
 
   /**
-   * Sets or changes the requested type of settlement (FR-CL-044); a closing type closes the claim.
+   * Sets or changes the requested type of settlement (FR-CM-044); a closing type closes the claim.
    *
    * @param companyId company
    * @param claimId claim
@@ -117,7 +117,7 @@ public class ClaimClosureService {
   }
 
   /**
-   * Reopens a permanently closed claim (FR-CL-045).
+   * Reopens a permanently closed claim (FR-CM-045).
    *
    * @param companyId company
    * @param claimId claim

@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * The locations of a claim (BRCLM.037/042; FR-CL-020): list with the insurer references valid
+ * The locations of a claim (BRCLM.037/042; FR-CM-020): list with the insurer references valid
  * today, link locations of the cover, describe and remove them ({@code BCL_RECORD}).
  */
 @RestController

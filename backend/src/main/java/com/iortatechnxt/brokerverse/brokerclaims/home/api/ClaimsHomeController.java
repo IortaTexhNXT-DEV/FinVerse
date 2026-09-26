@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Claims home, worklist and reassignment (NFR 15.03, BRCLM.034/043, FR-CL-055), and the loss
- * experience of a cover for the account page and Marketing (BRCLM.040, FR-CL-065).
+ * Claims home, worklist and reassignment (NFR 15.03, BRCLM.034/043, FR-CM-055), and the loss
+ * experience of a cover for the account page and Marketing (BRCLM.040, FR-CM-065).
  */
 @RestController
 @RequestMapping("/api/v1/broker-claims")

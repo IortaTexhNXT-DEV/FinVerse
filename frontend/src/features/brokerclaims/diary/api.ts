@@ -67,7 +67,7 @@ export interface DiaryForm {
   text: string;
 }
 
-/** Field errors of a diary entry (FR-CL-052). */
+/** Field errors of a diary entry (FR-CM-052). */
 export function validateDiary(form: DiaryForm): Partial<Record<keyof DiaryForm, string>> {
   const errors: Partial<Record<keyof DiaryForm, string>> = {};
   if (form.entryType === '') {

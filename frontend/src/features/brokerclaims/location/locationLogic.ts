@@ -1,4 +1,4 @@
-/** Pure rules of the insurer location references (FR-CL-023). */
+/** Pure rules of the insurer location references (FR-CM-023). */
 
 export interface RefErrors {
   arn?: string;

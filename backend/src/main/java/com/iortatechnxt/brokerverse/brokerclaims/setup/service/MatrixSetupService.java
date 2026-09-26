@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The status access matrix on Claims Setup (BRCLM.012/013, FR-CL-041): the Unit Head adds a row
+ * The status access matrix on Claims Setup (BRCLM.012/013, FR-CM-041): the Unit Head adds a row
  * (status, role, unit or any unit), another BCL_SETUP user authorizes it before it takes effect,
  * and a row is deactivated, never deleted. The roles offered are those that may record claims or
  * change their status.

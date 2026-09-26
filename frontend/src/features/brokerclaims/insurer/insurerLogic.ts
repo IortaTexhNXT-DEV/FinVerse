@@ -1,14 +1,14 @@
 import { ApiError } from '@/api/client';
 import type { InsurerLine } from './api';
 
-/** Pure rules of the insurer side of a claim (FR-CL-021/022/024/032). */
+/** Pure rules of the insurer side of a claim (FR-CM-021/022/024/032). */
 
-/** Whether the last save was refused because the number is on another claim (FR-CL-021). */
+/** Whether the last save was refused because the number is on another claim (FR-CM-021). */
 export function isReuse(error: unknown): boolean {
   return error instanceof ApiError && error.code === 'BCL_INSURER_CLAIM_NO_REUSED';
 }
 
-/** Total insurer reserve of a claim: the sum of its lines (FR-CL-032 R1). */
+/** Total insurer reserve of a claim: the sum of its lines (FR-CM-032 R1). */
 export function totalReserve(lines: InsurerLine[]): number {
   return lines.reduce((sum, l) => sum + (l.reserveAmount ?? 0), 0);
 }
@@ -19,7 +19,7 @@ export interface UpdateErrors {
   remarks?: string;
 }
 
-/** Errors of an insurer update (FR-CL-022). */
+/** Errors of an insurer update (FR-CM-022). */
 export function updateErrors(
   date: string,
   source: string,
@@ -52,7 +52,7 @@ export function isEmail(address: string): boolean {
   return local !== '' && labels.length > 1 && labels.every((l) => l !== '');
 }
 
-/** Errors of the advice recipients; empty when the advice can be sent (FR-CL-024). */
+/** Errors of the advice recipients; empty when the advice can be sent (FR-CM-024). */
 export function adviceErrors(selected: string[], to: Record<string, string>): string[] {
   if (selected.length === 0) {
     return ['Select at least one insurer'];

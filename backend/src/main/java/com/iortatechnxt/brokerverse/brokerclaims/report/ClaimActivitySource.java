@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * A contributor to the Claims Activity Log (BRCLM.041/042, NFR 15.08; FR-CL-066): the report lists
+ * A contributor to the Claims Activity Log (BRCLM.041/042, NFR 15.08; FR-CM-066): the report lists
  * the status changes, field changes and diary entries of the claims itself and adds the activities
  * of every bean implementing this port. Wave CL1-A contributes the insurer updates ({@code
  * bcl_insurer_update}) and the insurer location reference changes ({@code bcl_location_ref}) with

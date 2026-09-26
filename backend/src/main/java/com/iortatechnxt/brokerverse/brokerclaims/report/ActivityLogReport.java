@@ -25,7 +25,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * Claims Activity Log (BRCLM.041/042, NFR 15.08; FR-CL-066): status changes, field changes and
+ * Claims Activity Log (BRCLM.041/042, NFR 15.08; FR-CM-066): status changes, field changes and
  * diary entries of the claims, and the activities of the {@link ClaimActivitySource} contributors
  * (insurer updates and location reference changes, CL1-A), with user and time, oldest first. The
  * report reads the history tables only; nothing is edited from it.

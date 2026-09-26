@@ -11,8 +11,8 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
- * The work registers of Claims Handling: Pending Actions per handler (BRCLM.034, FR-CL-061) and the
- * Insurer Claim Numbers register (BRCLM.043 AC5, FR-CL-066).
+ * The work registers of Claims Handling: Pending Actions per handler (BRCLM.034, FR-CM-061) and the
+ * Insurer Claim Numbers register (BRCLM.043 AC5, FR-CM-066).
  */
 public final class WorkReports {
 

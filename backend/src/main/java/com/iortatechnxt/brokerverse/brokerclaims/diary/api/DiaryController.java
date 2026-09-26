@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/** The claims diary: the Diary tab of a claim and My Diary (BRCLM.022/034; FR-CL-052). */
+/** The claims diary: the Diary tab of a claim and My Diary (BRCLM.022/034; FR-CM-052). */
 @RestController
 @RequestMapping("/api/v1/broker-claims")
 public class DiaryController {

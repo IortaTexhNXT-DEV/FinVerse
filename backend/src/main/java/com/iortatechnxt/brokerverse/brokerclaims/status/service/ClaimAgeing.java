@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Claim dates and ages (BRCLM.025/027, FR-CL-053; CLAIMS_BROKING_DESIGN 8.1): business dates are
+ * Claim dates and ages (BRCLM.025/027, FR-CM-053; CLAIMS_BROKING_DESIGN 8.1): business dates are
  * Philippine dates; ages are calendar days computed on read. Age overall runs from the reported
  * date (day zero) to the as-of date, or to the closure date of a closed claim; age this stage runs
  * from the day the current status was set. Temporarily closed claims keep ageing (CLQ06). The

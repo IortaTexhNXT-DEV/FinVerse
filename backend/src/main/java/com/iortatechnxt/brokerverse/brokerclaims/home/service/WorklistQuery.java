@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The Claims worklist (BRCLM.034/043, FR-CL-055): the claims of a company in the tabs My Claims,
+ * The Claims worklist (BRCLM.034/043, FR-CM-055): the claims of a company in the tabs My Claims,
  * Open, Temporarily Closed, Closed and Follow-ups Due, filtered by a home tile (overdue follow-up,
  * unpaid premium, awaiting premium remittance, status) and searched by claim number, insurer claim
  * number, ARN, policy number or assured. Ages are computed on read.

@@ -14,7 +14,7 @@ import type { DiaryEntry, DiaryInput } from './api';
 import { DiaryDialog } from './DiaryDialog';
 
 /**
- * Diary tab of a claim (BRCLM.022, FR-CL-052): calls, e-mails, meetings, notes and follow-ups with
+ * Diary tab of a claim (BRCLM.022, FR-CM-052): calls, e-mails, meetings, notes and follow-ups with
  * due date and assignee; the assignee or author marks an entry done. Closed claims accept entries;
  * nothing is deleted. Mounted by the claim record page (wave CL1-A).
  */

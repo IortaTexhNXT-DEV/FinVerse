@@ -2,7 +2,7 @@ import type { CoverItem } from '../cover/api';
 import type { LocationPick } from './api';
 
 /**
- * Picker of the insured locations of a claim (BRCLM.037; FR-CL-020): only the locations of the
+ * Picker of the insured locations of a claim (BRCLM.037; FR-CM-020): only the locations of the
  * claim's cover, each ticked once, with the damage at that location.
  */
 export function LocationPicker({

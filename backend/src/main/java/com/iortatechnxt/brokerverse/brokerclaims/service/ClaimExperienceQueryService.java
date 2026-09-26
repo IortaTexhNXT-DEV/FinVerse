@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The loss experience of a cover (BRCLM.030/040, FR-CL-062/065; CLAIMS_BROKING_DESIGN 3.1 and 12.2,
+ * The loss experience of a cover (BRCLM.030/040, FR-CM-062/065; CLAIMS_BROKING_DESIGN 3.1 and 12.2,
  * decision D4): claim count, open claims, the status of each claim, paid, outstanding and total,
  * for an account (ARN) and optionally one policy year. Public read API of {@code brokerclaims}:
  * Renewal (With Claim Y/N, number and status of claims, the CLAIMS check, the Account History tab)

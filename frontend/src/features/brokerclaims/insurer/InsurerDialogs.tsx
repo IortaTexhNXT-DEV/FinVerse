@@ -109,7 +109,7 @@ export function AddInsurerDialog({
   );
 }
 
-/** Add Insurer Claim Number on a line (BRCLM.043, FR-CL-021). */
+/** Add Insurer Claim Number on a line (BRCLM.043, FR-CM-021). */
 export function NumberDialog({
   line,
   busy,
@@ -178,7 +178,7 @@ export function NumberDialog({
   );
 }
 
-/** Assign Adjuster to an insurer line (BRCLM.018, FR-CL-031; BCL_ADJUSTER_ASSIGN). */
+/** Assign Adjuster to an insurer line (BRCLM.018, FR-CM-031; BCL_ADJUSTER_ASSIGN). */
 export function AdjusterDialog({
   line,
   busy,
@@ -222,7 +222,7 @@ export function AdjusterDialog({
   );
 }
 
-/** Amend Reserve of an insurer line (BRCLM.023/024, FR-CL-032; BCL_RESERVE_AMEND). */
+/** Amend Reserve of an insurer line (BRCLM.023/024, FR-CM-032; BCL_RESERVE_AMEND). */
 export function ReserveDialog({
   line,
   currency,

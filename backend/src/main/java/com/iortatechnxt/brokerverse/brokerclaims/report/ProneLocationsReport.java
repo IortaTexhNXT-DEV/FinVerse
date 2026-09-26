@@ -18,7 +18,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
- * Claims by Location / Claims-prone Locations (BRCLM.038, FR-CL-063; CLQ16): per location key, city
+ * Claims by Location / Claims-prone Locations (BRCLM.038, FR-CM-063; CLQ16): per location key, city
  * and province the number of claims with a loss in the period, paid and outstanding; a location is
  * claims-prone with at least {@code BCL_PRONE_MIN_CLAIMS} claims in the last {@code
  * BCL_PRONE_YEARS} years of the period. Filters: catastrophe code and product line. With a location

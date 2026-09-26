@@ -20,7 +20,7 @@ public final class CoverViews {
   private CoverViews() {}
 
   /**
-   * A cover read-only (BRCLM.002/003/042; FR-CL-010).
+   * A cover read-only (BRCLM.002/003/042; FR-CM-010).
    *
    * @param header account facts
    * @param termYears policy years of the term

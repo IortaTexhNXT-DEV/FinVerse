@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The diary of the claims handlers (BRCLM.022/034, NFR 15.08; FR-CL-052): entries per claim with
+ * The diary of the claims handlers (BRCLM.022/034, NFR 15.08; FR-CM-052): entries per claim with
  * type, date, optional due date and assignee (a claims user; default the author), text up to 2,000
  * characters, marked done by the assignee or the author. An entry assigned to someone else notifies
  * that user. Entries are never deleted; closed claims accept them.

@@ -39,7 +39,7 @@ function Footer({
   );
 }
 
-/** Status attributes: phase, waiting party, follow-up days, awaiting remittance (FR-CL-040). */
+/** Status attributes: phase, waiting party, follow-up days, awaiting remittance (FR-CM-040). */
 export function StatusAttributesDialog({
   value,
   busy,
@@ -129,7 +129,7 @@ export function StatusAttributesDialog({
   );
 }
 
-/** Settlement type attributes: outcome, closes the claim, amount required (FR-CL-043). */
+/** Settlement type attributes: outcome, closes the claim, amount required (FR-CM-043). */
 export function SettlementAttributesDialog({
   value,
   busy,

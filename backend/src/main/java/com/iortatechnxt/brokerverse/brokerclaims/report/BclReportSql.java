@@ -207,7 +207,7 @@ public class BclReportSql {
   }
 
   /**
-   * The as-of date of a report, refused in the future (FR-CL-060).
+   * The as-of date of a report, refused in the future (FR-CM-060).
    *
    * @param p parameters
    * @return as-of date

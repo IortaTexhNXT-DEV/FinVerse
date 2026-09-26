@@ -29,7 +29,7 @@ export type StatusAction =
 
 /**
  * The status actions offered on a claim: each needs its permission, and a permanently closed claim
- * offers only Reopen (FR-CL-045).
+ * offers only Reopen (FR-CM-045).
  */
 export function statusActions(
   phase: ClaimPhase,
@@ -88,7 +88,7 @@ export function validateSettlement(
   return errors;
 }
 
-/** Field errors of Override Follow-up Date (FR-CL-050). */
+/** Field errors of Override Follow-up Date (FR-CM-050). */
 export function validateFollowUp(
   date: string,
   reasonCode: string,

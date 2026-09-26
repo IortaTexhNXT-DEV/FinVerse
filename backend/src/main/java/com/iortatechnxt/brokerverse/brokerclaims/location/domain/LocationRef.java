@@ -13,7 +13,7 @@ import java.util.Locale;
  * The reference an insurer uses for an insured location of a cover (BRCLM.042;
  * CLAIMS_BROKING_DESIGN 5.2), valid from a date. A new reference end-dates the open one the day
  * before its own start, so the mapping history stays and is auditable; nothing is deleted
- * (FR-CL-023 R1/R2).
+ * (FR-CM-023 R1/R2).
  */
 @Entity
 @Table(name = "bcl_location_ref")

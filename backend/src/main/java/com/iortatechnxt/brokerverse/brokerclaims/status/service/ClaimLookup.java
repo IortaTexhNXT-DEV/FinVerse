@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Finds the claim of a request within its company (FR-CL-002 R3: a claim of another company is "not
+ * Finds the claim of a request within its company (FR-CM-002 R3: a claim of another company is "not
  * found") and guards the closed claims (design 5.1: a CLOSED claim accepts only diary entries,
  * insurer updates and reopen).
  */

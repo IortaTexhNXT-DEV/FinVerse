@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Status and settlement type attributes on Claims Setup (BRCLM.010/014, FR-CL-040/043): the Unit
+ * Status and settlement type attributes on Claims Setup (BRCLM.010/014, FR-CM-040/043): the Unit
  * Head proposes the attributes of a value (validated here with the FRS messages), another BCL_SETUP
  * user authorizes them and they apply to {@code bcl_lov_attribute} without a new build. The values
  * themselves are maintained through the list-of-values API under the owner permission BCL_SETUP.
@@ -91,7 +91,7 @@ public class AttributeSetupService {
   }
 
   /**
-   * Proposes the attributes of a status (FR-CL-040).
+   * Proposes the attributes of a status (FR-CM-040).
    *
    * @param code status
    * @param proposal phase, waiting party, follow-up days and awaiting remittance flag
@@ -103,7 +103,7 @@ public class AttributeSetupService {
   }
 
   /**
-   * Proposes the attributes of a settlement type (FR-CL-043).
+   * Proposes the attributes of a settlement type (FR-CM-043).
    *
    * @param code settlement type
    * @param proposal outcome, closure and amount flags

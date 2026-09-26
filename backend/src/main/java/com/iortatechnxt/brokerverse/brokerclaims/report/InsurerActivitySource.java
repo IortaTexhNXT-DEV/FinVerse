@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * The insurer side of the Claims Activity Log (BRCLM.023/041/042, FR-CL-066): insurer updates,
+ * The insurer side of the Claims Activity Log (BRCLM.023/041/042, FR-CM-066): insurer updates,
  * insurer reserve amendments and insurer location reference changes (old and new reference) of the
  * period, read from the tables of wave CL1-A ({@code bcl_insurer_update}, {@code
  * bcl_reserve_change}, {@code bcl_location_ref}).

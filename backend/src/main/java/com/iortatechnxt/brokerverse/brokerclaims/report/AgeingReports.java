@@ -16,7 +16,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
- * The claims ageing reports (BRCLM.025-028, p.43; FR-CL-060): outstanding claims with the age
+ * The claims ageing reports (BRCLM.025-028, p.43; FR-CM-060): outstanding claims with the age
  * overall and the bucket of {@code BCL_AGEING_BUCKETS}, totals per bucket and insurer; and the
  * ageing per status, grouped by status then insurer, with the age this stage and the time spent in
  * each earlier status (status history).

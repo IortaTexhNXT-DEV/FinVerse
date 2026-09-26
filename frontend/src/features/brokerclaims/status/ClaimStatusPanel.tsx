@@ -110,7 +110,7 @@ function ActionPlan({
 }
 
 /**
- * Status, follow-up and settlement of a claim (FR-CL-042/050/051/053): the status pill and flags,
+ * Status, follow-up and settlement of a claim (FR-CM-042/050/051/053): the status pill and flags,
  * phase, ages, next follow-up, adjuster and settlement, and the next action plan (editable with
  * BCL_ACTION_PLAN while the claim is open). The status actions are {@link ClaimStatusActions}.
  */

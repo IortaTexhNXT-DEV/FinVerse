@@ -18,7 +18,7 @@ interface DialogProps {
 
 const REASON_REQUIRED = 'Enter the reason for the change';
 
-/** Correct Reported Date (BRCLM.004, FR-CL-012; BCL_STATUS_UPDATE). */
+/** Correct Reported Date (BRCLM.004, FR-CM-012; BCL_STATUS_UPDATE). */
 export function ReportedDateDialog({
   claim,
   busy,
@@ -76,7 +76,7 @@ export function ReportedDateDialog({
   );
 }
 
-/** Override Claimant (BRCLM.006, FR-CL-030; BCL_CLAIMANT_OVERRIDE). */
+/** Override Claimant (BRCLM.006, FR-CM-030; BCL_CLAIMANT_OVERRIDE). */
 export function ClaimantDialog({
   claim,
   busy,
@@ -128,7 +128,7 @@ export function ClaimantDialog({
 }
 
 /**
- * Generate Authorization Code (BRCLM.001, FR-CL-016; BCL_AUTHORIZE). On a direct-payment cover
+ * Generate Authorization Code (BRCLM.001, FR-CM-016; BCL_AUTHORIZE). On a direct-payment cover
  * under BCL_AUTH_DP_POLICY = CONFIRM the insurer's payment evidence, attached to the claim first,
  * is chosen here.
  */

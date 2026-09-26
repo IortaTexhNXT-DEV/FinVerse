@@ -53,7 +53,7 @@ function DraftRow({
 }
 
 /**
- * Send Loss Advice (process p.24-25, FR-CL-024): the advice of each insurer composed from template
+ * Send Loss Advice (process p.24-25, FR-CM-024): the advice of each insurer composed from template
  * BCL_LOSS_ADVICE, previewed, then e-mailed to the recipients confirmed for each insurer; each sent
  * advice is kept as a claims report on the claim, the account and the client.
  */

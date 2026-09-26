@@ -110,7 +110,7 @@ function PanelDialog({
 }
 
 /**
- * The status actions of a claim for the page header of the claim record (FR-CL-041-045/050):
+ * The status actions of a claim for the page header of the claim record (FR-CM-041-045/050):
  * Change Status, Set Settlement, Override Follow-up Date, Assign Adjuster and Reopen, as the
  * user's rights and the claim's phase allow (a closed claim offers only Reopen).
  */

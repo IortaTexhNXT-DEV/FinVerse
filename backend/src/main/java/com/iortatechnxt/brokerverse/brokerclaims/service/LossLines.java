@@ -1,7 +1,7 @@
 package com.iortatechnxt.brokerverse.brokerclaims.service;
 
 /**
- * The loss figures of a claim per insurer line (BRCLM.030/032, FR-CL-062; CLAIMS_BROKING_DESIGN
+ * The loss figures of a claim per insurer line (BRCLM.030/032, FR-CM-062; CLAIMS_BROKING_DESIGN
  * 10): one SQL shared by the Loss Experience and Loss Ratio reports and {@link
  * ClaimExperienceQueryService}, so Renewal, the account page and the reports show the same figures
  * (decision D4). Per claim and insurer line (a claim without insurer lines is one line of its lead

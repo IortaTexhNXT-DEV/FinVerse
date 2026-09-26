@@ -12,7 +12,7 @@ import { SettlementAttributesDialog, StatusAttributesDialog } from './AttributeD
 import { describeSettlement, describeStatus } from './setupLogic';
 
 /**
- * Status or settlement type attributes on Claims Setup (FR-CL-040/043): each value with its
+ * Status or settlement type attributes on Claims Setup (FR-CM-040/043): each value with its
  * current attributes and a pending proposal; the Unit Head proposes, another user authorizes.
  */
 export function AttributesTab({ list }: Readonly<{ list: string }>) {

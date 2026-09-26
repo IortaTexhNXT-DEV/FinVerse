@@ -10,7 +10,7 @@ import java.time.Instant;
 /**
  * One amendment of an insurer reserve (BRCLM.023/024; CLAIMS_BROKING_DESIGN 5.2): previous and new
  * amount, reason, user and time. Insert-only; the reserve is information only and produces no
- * journal (FR-CL-032 R2).
+ * journal (FR-CM-032 R2).
  */
 @Entity
 @Table(name = "bcl_reserve_change")

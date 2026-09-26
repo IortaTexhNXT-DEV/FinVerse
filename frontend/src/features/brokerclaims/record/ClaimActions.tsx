@@ -15,7 +15,7 @@ import { authorizationBlock } from './recordLogic';
 type Dialog = 'authorize' | 'advice';
 
 /**
- * Page actions of a claim (BRCLM.001/016/039, FR-CL-014/015/016/024): Generate Authorization Code
+ * Page actions of a claim (BRCLM.001/016/039, FR-CM-014/015/016/024): Generate Authorization Code
  * (disabled while the premium is not paid), Send Loss Advice, Refresh Cover Data and Use Latest
  * Version when a newer cover version exists, and the status actions of wave CL1-B (Change Status,
  * Set Settlement, Override Follow-up Date, Assign Adjuster, Reopen).

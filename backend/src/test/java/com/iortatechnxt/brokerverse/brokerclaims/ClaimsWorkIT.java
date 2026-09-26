@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Follow-up and work of wave CL1-B (BRCLM.019/022/025/034/043, FR-CL-052/054/055/062): the diary
+ * Follow-up and work of wave CL1-B (BRCLM.019/022/025/034/043, FR-CM-052/054/055/062): the diary
  * and My Diary, the worklist tabs and search, reassignment, the Claims home, the follow-up and
  * ageing jobs, and the loss experience served to Renewal and the account page.
  */

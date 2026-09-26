@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Validation of the status and settlement type attributes proposed on Claims Setup (FR-CL-040/043),
+ * Validation of the status and settlement type attributes proposed on Claims Setup (FR-CM-040/043),
  * with the FRS messages: a status needs a phase other than CLOSED (reached only through a
  * settlement type) and the party it waits on; follow-up days are a whole number from 1 to 365 or
  * blank (the parameter applies); a settlement type needs its outcome.

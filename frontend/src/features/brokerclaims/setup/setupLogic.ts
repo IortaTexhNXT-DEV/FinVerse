@@ -43,7 +43,7 @@ export function settlementForm(value: ValueAttributes): SettlementAttributesInpu
   };
 }
 
-/** Field errors of the status attributes (FR-CL-040). */
+/** Field errors of the status attributes (FR-CM-040). */
 export function validateStatusForm(
   form: StatusAttributesInput,
 ): Partial<Record<keyof StatusAttributesInput, string>> {
@@ -61,7 +61,7 @@ export function validateStatusForm(
   return errors;
 }
 
-/** Field errors of the settlement attributes (FR-CL-043). */
+/** Field errors of the settlement attributes (FR-CM-043). */
 export function validateSettlementForm(
   form: SettlementAttributesInput,
 ): Partial<Record<keyof SettlementAttributesInput, string>> {

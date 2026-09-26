@@ -35,7 +35,7 @@ function Footer({
   );
 }
 
-/** Change Status: the statuses the matrix allows, with a remark (FR-CL-041/042). */
+/** Change Status: the statuses the matrix allows, with a remark (FR-CM-041/042). */
 export function ChangeStatusDialog({
   claimId,
   companyId,
@@ -113,7 +113,7 @@ export function ChangeStatusDialog({
   );
 }
 
-/** Set Settlement: type, amount and date settled; a closing type closes the claim (FR-CL-044). */
+/** Set Settlement: type, amount and date settled; a closing type closes the claim (FR-CM-044). */
 export function SettlementDialog({
   busy,
   error,
@@ -205,7 +205,7 @@ export function SettlementDialog({
   );
 }
 
-/** Override Follow-up Date with a reason (FR-CL-050). */
+/** Override Follow-up Date with a reason (FR-CM-050). */
 export function FollowUpDialog({
   busy,
   error,

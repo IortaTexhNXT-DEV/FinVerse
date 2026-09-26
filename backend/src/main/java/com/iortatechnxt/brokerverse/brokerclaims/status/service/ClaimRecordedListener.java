@@ -6,7 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 /**
- * Sets the first status of a claim when it is recorded (BRCLM.010/019, FR-CL-042 R1; contract of
+ * Sets the first status of a claim when it is recorded (BRCLM.010/019, FR-CM-042 R1; contract of
  * wave CL1-A, design section 18): on {@link ClaimRecorded}, inside the recording transaction, the
  * status chosen at recording (default {@code NEW_INCOMPLETE_DOCS}) is set, the next follow-up date
  * computed, the workflow case aligned and {@code ClaimStatusChanged} published with {@code from =

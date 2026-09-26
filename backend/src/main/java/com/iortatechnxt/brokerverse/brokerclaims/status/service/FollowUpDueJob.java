@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * {@code BCL_FOLLOW_UP_DUE} (BRCLM.019/022/034, FR-CL-054; cron {@code
+ * {@code BCL_FOLLOW_UP_DUE} (BRCLM.019/022/034, FR-CM-054; cron {@code
  * brokerverse.jobs.bcl-follow-up-due-cron}, 06:00 Manila): notifies each handler of the claims
  * whose next follow-up date is today and each assignee of the diary entries due today ({@code
  * BCL_FOLLOW_UP_DUE}), and raises {@code BCL_FOLLOW_UP_OVERDUE} once per claim for past dates. Each

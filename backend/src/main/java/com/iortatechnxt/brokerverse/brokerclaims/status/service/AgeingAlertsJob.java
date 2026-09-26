@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * {@code BCL_AGEING_ALERTS} (BRCLM.031, p.43, FR-CL-061 R2; cron {@code
+ * {@code BCL_AGEING_ALERTS} (BRCLM.031, p.43, FR-CM-061 R2; cron {@code
  * brokerverse.jobs.bcl-ageing-alerts-cron}, 06:00 Manila): raises {@code BCL_CLAIM_PAST_DUE} for
  * every outstanding claim (temporarily closed included, CLQ06) older than {@code BCL_PAST_DUE_DAYS}
  * from its reported date, once per claim, and tells the handler.

@@ -26,7 +26,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
- * The Claims Handling reports of design section 10 (BRCLM.026-034/038/040-043; FR-CL-060-066):
+ * The Claims Handling reports of design section 10 (BRCLM.026-034/038/040-043; FR-CM-060-066):
  * every report runs and exports to Excel, PDF and CSV; the ageing buckets, past due threshold,
  * settled outcome, loss figures, loss ratio, claims-prone flag, extract rows and the view / export
  * rights follow the FRS.

@@ -159,7 +159,7 @@ function Facts({ claim }: Readonly<{ claim: Claim }>) {
 }
 
 /**
- * Details tab of a claim (BRCLM.004/006/036; FR-CL-011/012/030/033): the loss, the claimant and the
+ * Details tab of a claim (BRCLM.004/006/036; FR-CM-011/012/030/033): the loss, the claimant and the
  * cover snapshot, with Change Loss Details (BCL_RECORD), Correct Reported Date
  * (BCL_STATUS_UPDATE) and Override Claimant (BCL_CLAIMANT_OVERRIDE) on an open claim.
  */

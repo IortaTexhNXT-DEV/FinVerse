@@ -7,7 +7,7 @@ import com.iortatechnxt.brokerverse.lov.domain.LovType;
 import java.time.Instant;
 import java.util.function.UnaryOperator;
 
-/** Requests and responses of Claims Setup (FR-CL-040/041/043). */
+/** Requests and responses of Claims Setup (FR-CM-040/041/043). */
 @SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class SetupDtos {
 

@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The status engine of a claim (BRCLM.010-013/019/027/035, FR-CL-041/042/045/050;
+ * The status engine of a claim (BRCLM.010-013/019/027/035, FR-CM-041/042/045/050;
  * CLAIMS_BROKING_DESIGN 8.1). A status must be effective, have a phase and be allowed by the status
  * access matrix for the user's roles and claims unit. Each change writes the status history,
  * restarts "age this stage", recomputes the next follow-up date unless an override is still ahead,
@@ -74,7 +74,7 @@ public class ClaimStatusService {
   }
 
   /**
-   * Sets the first status of a claim being recorded (FR-CL-042 R1): called by the recording service
+   * Sets the first status of a claim being recorded (FR-CM-042 R1): called by the recording service
    * of CL1-A inside its transaction, after the claim is saved and its {@code BCL_RECORD} permission
    * checked (through {@code ClaimRecordedListener}). The recording rules choose the first status (a
    * newly filed one), so the status access matrix is not applied to it. Opens or aligns the
@@ -96,7 +96,7 @@ public class ClaimStatusService {
   }
 
   /**
-   * Changes the status of a claim (FR-CL-042).
+   * Changes the status of a claim (FR-CM-042).
    *
    * @param companyId company
    * @param claimId claim
@@ -116,7 +116,7 @@ public class ClaimStatusService {
   }
 
   /**
-   * The statuses the current user may set on a claim (FR-CL-041: the Change Status drop-down).
+   * The statuses the current user may set on a claim (FR-CM-041: the Change Status drop-down).
    *
    * @param companyId company
    * @param claimId claim

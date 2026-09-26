@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * The premium check of a cover from the payment status of its invoices (BRCLM.001;
- * CLAIMS_BROKING_DESIGN 8.3): cancelled invoices are excluded (FR-CL-016 R3); none left gives
+ * CLAIMS_BROKING_DESIGN 8.3): cancelled invoices are excluded (FR-CM-016 R3); none left gives
  * NO_INVOICE; any unpaid invoice gives UNPAID; else any partly paid gives PARTIALLY_PAID; when
  * every invoice is a direct payment to the insurer the result is DIRECT_PAYMENT; otherwise PAID
  * (return invoices without a client receivable do not count against it).

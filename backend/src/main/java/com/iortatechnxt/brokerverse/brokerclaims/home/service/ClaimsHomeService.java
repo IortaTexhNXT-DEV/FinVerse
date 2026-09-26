@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Claims home (NFR 15.03, BRCLM.025/034; FR-CL-055): the work tiles of the signed-in user (my open
+ * Claims home (NFR 15.03, BRCLM.025/034; FR-CM-055): the work tiles of the signed-in user (my open
  * claims, follow-ups due today and overdue, my diary due, temporarily closed, unpaid premium,
  * awaiting premium remittance), the open claims by status and phase and the ageing buckets of the
  * outstanding claims ({@code BCL_AGEING_BUCKETS}). Each tile opens the worklist filtered.

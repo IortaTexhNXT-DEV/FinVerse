@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 /**
  * Claims of the broking claims module (BRCLM.041/043). Every read is scoped to the company, so a
- * claim reference of another company is never found (NFR access control, FR-CL-002 R3). The build
+ * claim reference of another company is never found (NFR access control, FR-CM-002 R3). The build
  * waves add their own finders here. Named after the entity name {@code BrokerClaim}: the
  * insurer-side {@code claims} module owns the bean {@code claimRepository}.
  */

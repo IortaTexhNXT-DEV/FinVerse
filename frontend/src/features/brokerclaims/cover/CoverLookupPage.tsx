@@ -61,7 +61,7 @@ function CoverSummary({ cover }: Readonly<{ cover: CoverDetail }>) {
 }
 
 /**
- * Cover Lookup (BRCLM.002/003/042; FR-CL-010): any cover of the company, read-only - account,
+ * Cover Lookup (BRCLM.002/003/042; FR-CM-010): any cover of the company, read-only - account,
  * policy years and numbers, items and locations, endorsements, invoices with their payment and
  * remittance status, the claims of the cover and the insurer location references. Record Claim is
  * the only action.

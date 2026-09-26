@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Follow-up of an open claim (BRCLM.018-021, FR-CL-050/051): the override of the next follow-up
+ * Follow-up of an open claim (BRCLM.018-021, FR-CM-050/051): the override of the next follow-up
  * date with a reason (TL / TH), the next action plan summary (officers, TL, TH; up to 2,000
  * characters, every version kept) and the adjuster / appraiser of the claim (TL / TH). Each change
  * is kept in the claim timeline and the audit trail.
@@ -48,7 +48,7 @@ public class ClaimFollowUpService {
   }
 
   /**
-   * Overrides the next follow-up date (FR-CL-050); the override is kept across status changes until
+   * Overrides the next follow-up date (FR-CM-050); the override is kept across status changes until
    * its date passes.
    *
    * @param companyId company
@@ -84,7 +84,7 @@ public class ClaimFollowUpService {
   }
 
   /**
-   * Encodes the next action plan summary (FR-CL-051).
+   * Encodes the next action plan summary (FR-CM-051).
    *
    * @param companyId company
    * @param claimId claim

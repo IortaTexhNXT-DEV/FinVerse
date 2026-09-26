@@ -14,7 +14,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * My Approvals source of Claims Setup (FR-CL-040/041/043: pending values appear in the authoriser's
+ * My Approvals source of Claims Setup (FR-CM-040/041/043: pending values appear in the authoriser's
  * My Approvals): status access matrix rows and status / settlement attribute changes waiting for
  * another BCL_SETUP user; the maker never sees his own.
  */

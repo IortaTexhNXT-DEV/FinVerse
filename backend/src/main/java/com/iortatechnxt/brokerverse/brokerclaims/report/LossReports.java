@@ -20,7 +20,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
- * The loss reports (BRCLM.030/032/040, p.43-44; FR-CL-062/065): the Loss Experience per claim and
+ * The loss reports (BRCLM.030/032/040, p.43-44; FR-CM-062/065): the Loss Experience per claim and
  * insurer line grouped by client and cover, and the Loss Ratio per cover and policy year (losses =
  * paid + O/S over the signed gross premium of the ledger invoices of the cover and year x 100),
  * grouped by client, product line or insurer. The figures come from {@link LossLines}, which also

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * A communication received from an insurer about a claim (BRCLM.041; CLAIMS_BROKING_DESIGN 5.2):
  * date, source ({@code BCL_UPDATE_SOURCE}), the insurer's reference, remarks and the attachments
  * that carry the insurer's document, optionally tied to one insurer line. Insert-only: a wrong
- * update is never edited; a correcting update refers to it (FR-CL-022).
+ * update is never edited; a correcting update refers to it (FR-CM-022).
  */
 @Entity
 @Table(name = "bcl_insurer_update")

@@ -13,7 +13,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
- * The Claims lists of the BRD report list (p.42-43; BRCLM.029/031, FR-CL-061): outstanding claims,
+ * The Claims lists of the BRD report list (p.42-43; BRCLM.029/031, FR-CM-061): outstanding claims,
  * outstanding claims past due, and settled claims.
  */
 public final class ClaimListReports {

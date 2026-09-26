@@ -111,7 +111,7 @@ function AddRowDialog({
 }
 
 /**
- * Status access matrix (BRCLM.012/013, FR-CL-041): which roles in which units may select each
+ * Status access matrix (BRCLM.012/013, FR-CM-041): which roles in which units may select each
  * status; a new row takes effect once another user authorizes it; rows are deactivated, never
  * deleted.
  */

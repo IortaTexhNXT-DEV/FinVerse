@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Claims Setup (BRCLM.010/012/014/017/036; FR-CL-040/041/043): status and settlement type
+ * Claims Setup (BRCLM.010/012/014/017/036; FR-CM-040/041/043): status and settlement type
  * attributes, the status access matrix and the claims handler register, maintained by the Unit Head
  * (BCL_SETUP) under maker-checker; and the Claims lists maintained through the list-of-values API
  * with the owner permission BCL_SETUP.

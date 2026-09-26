@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.function.UnaryOperator;
 
-/** Requests and responses of the claims diary (FR-CL-052). */
+/** Requests and responses of the claims diary (FR-CM-052). */
 @SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class DiaryDtos {
 

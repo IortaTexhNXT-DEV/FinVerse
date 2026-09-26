@@ -53,7 +53,7 @@ function AgeingChart({ buckets }: Readonly<{ buckets: BucketCount[] }>) {
 }
 
 /**
- * Claims home (NFR 15.03, BRCLM.025/034; FR-CL-055): the handler's work tiles (open claims,
+ * Claims home (NFR 15.03, BRCLM.025/034; FR-CM-055): the handler's work tiles (open claims,
  * follow-ups due and overdue, diary due, temporarily closed, unpaid premium, awaiting premium
  * remittance) that open the worklist filtered, the open claims by status and the ageing buckets.
  */

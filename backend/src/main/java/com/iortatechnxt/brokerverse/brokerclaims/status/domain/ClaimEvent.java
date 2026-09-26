@@ -10,7 +10,7 @@ import java.time.Instant;
 
 /**
  * One change of a tracked field of a claim with its old and new value, reason, user and time
- * (CLAIMS_BROKING_DESIGN 5.2; FR-CL-003: every version kept). Insert-only.
+ * (CLAIMS_BROKING_DESIGN 5.2; FR-CM-003: every version kept). Insert-only.
  */
 @Entity
 @Table(name = "bcl_claim_event")

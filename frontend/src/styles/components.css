@@ -41,6 +41,10 @@
 
 .header-context .select {
   min-width: 200px;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .header-context {

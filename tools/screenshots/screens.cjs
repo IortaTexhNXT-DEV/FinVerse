@@ -8,6 +8,8 @@ module.exports = [
   // Home
   { slug: 'nb-dashboard', title: 'New Business Dashboard (landing page)', user: 'mkttl', path: '/nb/dashboard' },
   { slug: 'my-work', title: 'My Work', user: 'ao', path: '/my-work' },
+  { slug: 'notification-panel', title: 'Notification panel (header bell)', user: 'ao', path: '/my-work', click: '^Notifications' },
+  { slug: 'notifications', title: 'Notifications page', user: 'ao', path: '/notifications' },
   // Client & Policy
   { slug: 'clients', title: 'Clients work list', user: 'ao', path: '/crm/clients' },
   { slug: 'client-record', title: 'Client record', user: 'ao', path: '/crm/clients', open: 'first' },
@@ -153,4 +155,6 @@ module.exports = [
   { slug: 'message-log', title: 'Message Log', user: 'badmin', path: '/broking-setup/messages' },
   { slug: 'employees', title: 'Employees', user: 'fmanager', path: '/setup/employees' },
   { slug: 'cost-centre-rules', title: 'Cost-Centre Rules', user: 'fmanager', path: '/setup/cost-centre-rules' },
+  // Themed pages
+  { slug: 'page-not-found', title: 'Page not found (404)', user: 'ao', path: '/no-such-page' },
 ];

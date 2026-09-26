@@ -6,7 +6,10 @@ import { parseDateText } from '@/utils/dateText';
 
 type DateInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>;
 
-const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+/** Sets an input's value the way the browser does, so React sees the change event. */
+function setNativeValue(el: HTMLInputElement, value: string): void {
+  Reflect.set(HTMLInputElement.prototype, 'value', value, el);
+}
 
 /**
  * The one date picker of BIBS: a date typed and shown as dd-MMM-yyyy (23-Sep-2026; 23/09/2026 and
@@ -36,10 +39,10 @@ export function DateInput({
 
   const emit = (next: string) => {
     const el = native.current;
-    if (el === null || valueSetter === undefined || el.value === next) {
+    if (el === null || el.value === next) {
       return;
     }
-    valueSetter.call(el, next);
+    setNativeValue(el, next);
     el.dispatchEvent(new Event('input', { bubbles: true }));
   };
 

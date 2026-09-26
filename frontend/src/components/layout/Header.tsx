@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/auth/authContext';
 import { useWorkspace } from '@/context/workspaceContext';
 import { HeaderTools } from './HeaderTools';
+import { shortCompanyName } from './companyName';
 
 function initials(name: string): string {
   return name
@@ -26,13 +27,14 @@ export function Header() {
         </label>
         <select
           id="company-select"
-          className="select"
+          className="select company-select"
+          title={company === undefined ? undefined : `${company.code} – ${company.name}`}
           value={company?.id ?? ''}
           onChange={(e) => setCompanyId(Number(e.target.value))}
         >
           {companies.map((c) => (
             <option key={c.id} value={c.id}>
-              {c.code} – {c.name}
+              {c.code} – {shortCompanyName(c.name)}
             </option>
           ))}
         </select>

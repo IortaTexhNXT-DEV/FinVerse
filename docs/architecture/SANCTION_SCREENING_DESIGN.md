@@ -653,3 +653,99 @@ of 18.1.
 - The category ranking uses the sort order of `KYC_RISK_RATING`; a category whose rating is not a valid code does not
   change the rating (logged). Rules only add tags; they never end one.
 - Screening of other parties (beneficial owners, signatories) waits for SQ11.
+
+## 19. S1-C cases, STR and reports: as built
+
+What wave S1-C built on S0, S1-A and S1-B (contracts of 18.1), and where it details or differs from sections 3-11.
+
+- **Packages.** `screening.cases` (`domain`, `service`, `api`), `screening.str` (`domain`, `service`, `api`) and
+  `screening.report`. The S1-B packages are unchanged; cases use `MatchDecisionService`, `RiskOverrideService` and
+  `ScreeningQueries` only.
+- **Migrations.** `V1054__screening_cases.sql`: `scr_case` (case number `SCR-yyyy-nnnnnn` from the S0 sequence prefix,
+  client facts at opening, trigger and reference, case type, risk category, review template type, active-policy flag,
+  marketing unit / unit head / account officer / team, stage, status OPEN / CLOSED, stage entry time, assignee,
+  investigator, returned from / by, round, committee round, disposition, the investigator's own disposition,
+  recommendation, STR flag, committee decision, SLA due / remind-at / lead hours / escalation role, reminded, breached,
+  escalated-to, document reminder day, the six configuration version ids in force at opening and the `wf_case`), a
+  partial unique index on (client, case type) for OPEN cases, and `scr_case_event`, `scr_case_review`,
+  `scr_case_answer`, `scr_case_document`, `scr_committee_vote` (unique case, round, member). `scr_case_event` and
+  `scr_committee_vote` are insert-only by trigger. `V1055__screening_str.sql`: `scr_str` (unique case, `STR-yyyy-nnnnnn`,
+  unique AMLC reference), `scr_str_field`, `scr_str_transaction` (amount > 0), `scr_str_extraction`
+  (`STRX-yyyy-nnnnnn`, period, count, file name, SHA-256, report run, re-extraction reason) and
+  `scr_str_extraction_item`. Demo `V1952__demo_screening_cases.sql`: users amlcom3-5 (AML_COMMITTEE, so the committee of
+  `SCR_COMMITTEE_SIZE` 5 is complete) and scrdual (SCR_INVESTIGATOR + SCR_APPROVER, for the four-eyes demo); STR reasons
+  DEMO01-03 in `SCR_STR_REASON` (demo profile only, the real list is SQ09); ten cases SCR-2026-000001..010, one in every
+  stage (the case of CL-2026-000002 links the V1951 match; CL-2026-000004 is past its SLA; CL-2026-000006 is at the
+  committee with one vote; two STRs APPROVED and EXTRACTED; one case CLOSED) with their workflow, events, votes and STR
+  data.
+- **Opening (FR-SS-034, SNSRP-401).** `CaseTriggers` listens to `ScreeningCompleted` after commit and opens in a new
+  transaction (a failure is logged, never raised): NAME_MATCH for `caseMatches()` not yet in a case, the category's case
+  type for each `RiskOutcome` with a case type (a PEP category that requires EDD keeps type PEP and uses the EDD
+  template; a MONITOR category sends a notice and opens no case), and ACCOUNT_APPLICATION for ACCOUNT_SUBMITTED when the
+  client has a case match or an outcome; then `ScreeningEngine.recordCasesOpened`. `CaseOpeningService` implements
+  `MatchCaseOpener` (Open Case) and `openOrJoin(client, OpenSpec)`: an open case of the same client and type is joined
+  (the matches are linked, event MATCH_ADDED), otherwise a case is created with the template of the matrix
+  (NAME_MATCH / PEP / HIGH_RISK use KYC_REVIEW, EDD uses EDD, ACCOUNT_APPLICATION uses TRANSACTION_REVIEW), the workflow
+  SCR_CASE is started as SYSTEM, the investigator is picked by the assignment matrix (ROUND_ROBIN, LEAST_OPEN or NONE =
+  stage queue) and the SLA of the stage is applied.
+- **Stages.** `CaseMover` moves the workflow (`transition` for a user, `systemTransition` for the system) and
+  `CaseStageMirror` mirrors `WorkCaseTransitioned` into the case. Submit (investigator; mandatory review fields and the
+  documents of the VALIDATION_RULES must be complete; NEED_MORE_INFO returns the case to the account officer),
+  Resubmit (after a return, with the investigator's disposition), unit head approve / disapprove (routed by the
+  APPROVAL_ROUTE matrix: UNIT_HEAD, USER or ROLE; the investigator can never approve), Compliance outcome (close, return,
+  refer to committee, require STR), committee votes (`CommitteeRule`: rule `SCR_COMMITTEE_RULE`, quorum
+  `SCR_COMMITTEE_SIZE`; a tie or no majority opens a new round), STR preparation, STR extraction, filing (closes the
+  case) and Re-open (Compliance, back to COMPLIANCE_REVIEW with a reason). Re-assign goes through
+  `WorkAssignmentService.assign` with a reason of `SCR_REASSIGN_REASON` and eligible users of the stage.
+- **SLA (SNSRP-405, 802).** `CaseSla` applies the SLA matrix row of the stage and case type with
+  `WorkflowService.overrideDue` (due, lead hours for the reminder, escalation role). Job `SCR_SLA_MONITOR`
+  (`brokerverse.jobs.scr-sla-monitor-cron`, hourly) sends `SCR_SLA_REMINDER` once at remind-at, and on breach raises the
+  alert `SCR_SLA_BREACH`, sends `SCR_SLA_ESCALATION` to the escalation role and marks the case breached; it also sends
+  the daily `SCR_DOCUMENT_REMINDER` for missing documents. Hours are calendar hours.
+- **STR (SNSRP-705, 706).** `StrService.prepare` prefills the subject from the client and the transactions from the
+  client's accounts (`StrTransactionSource` port); save, `gaps` and `markReady` (reason codes of `SCR_STR_REASON`, the
+  mandatory STR template fields and at least one transaction). `StrExtractionService` lists and extracts the
+  committee-approved STRs of a period (committee decision date, Manila days) to one file (`StrFileWriter`: CSV and
+  FIXED; XLSX / XML answer `SCR_STR_FORMAT_PARKED`) archived through `StrFileSink` under report SCR-STR-REGISTER with
+  its SHA-256; a re-extraction needs a reason. `StrFilingService.file` records the unique AMLC reference and filing date
+  (not before the extraction, not in the future); the STR becomes FILED and the case closes. `StrDocumentService` renders
+  the STR as PDF or Word.
+- **Platform hooks.** `CaseApprovalSource` (My Approvals: unit-head cases assigned to the viewer or in the approvers'
+  queue, never the viewer's own investigation; committee cases the viewer has not voted on in the round),
+  `CaseRetentionProvider` (record type SCREENING_CASE, closed cases), `SlaMonitorJob` (ManagedJob).
+- **Reports** (`ReportMetadata.compliance`, Excel and PDF): SCR-CASE-STATUS, SCR-SLA-BREACHES, SCR-AUDIT-LOG
+  (SCR_AUDIT_VIEW), SCR-HIGH-RISK-CLIENTS, SCR-PEP-CLIENTS, SCR-SANCTIONED-NAMES, SCR-INGEST-ERRORS and SCR-STR-REGISTER
+  (also Word).
+- **API.** `/api/v1/screening`: `GET cases`, `cases/tiles`, `cases/{id}`, `cases/{id}/timeline|matches|votes|review|
+  documents`, `PUT cases/{id}/review`, `POST cases/{id}/documents`, `GET clients/{id}/cases`; actions
+  `POST cases/{id}/submit|resubmit|decision|outcome|votes|reopen|reassign|risk-tag`, `GET cases/{id}/eligible-assignees`,
+  `POST cases/{id}/matches/{mid}/confirm|false-positive`; `GET high-risk-clients`; STR `GET str`,
+  `GET|POST cases/{id}/str`, `PUT str/{id}`, `POST str/{id}/ready`, `GET str/{id}/document`,
+  `POST extractions/preview`, `POST|GET extractions`, `GET extractions/{id}/file`, `POST str/{id}/filing`.
+- **Screens** (`features/screening/cases`, `features/screening/str`; routes in `module.ts`, help in `SCREENING_HELP` in
+  sidebar order): Screening Home (tiles per stage, due today, breached, potential matches, last run), `/screening/cases`
+  (tabs My Cases / Team / For Approval / Committee / STR / Closed / All, filters in the address),
+  `/screening/cases/:id` (summary with SLA badge, workflow panel with the stage actions, tabs Matches, Review, Documents,
+  Decisions, STR, Timeline), `/screening/high-risk` and `/screening/str` (register and extractions). The client page has
+  a Screening tab (SCR_VIEW) with the client's cases, matches and risk-profile history.
+
+### 19.1 Contracts for later waves
+
+- `CaseOpeningService.openOrJoin(Client, OpenSpec)` returning `Opened(screeningCase, created)`, and `MatchCaseOpener`.
+- `CaseQueries.ofClient(clientId)`, `tiles(companyId)`; `StrService.ofCase(caseId)`.
+- Ports `StrTransactionSource` (add invoice / receipt lines when Finance exposes them) and `StrFileSink`, and
+  `ActivePolicyQuery` (active-policy flag of a client).
+- Event types of `scr_case_event` and the notification codes SCR_CASE_FOR_APPROVAL, SCR_CASE_RETURNED,
+  SCR_COMMITTEE_REVIEW, SCR_SLA_REMINDER, SCR_SLA_ESCALATION, SCR_DOCUMENT_REMINDER; alert SCR_SLA_BREACH.
+
+### 19.2 Parked or deferred in S1-C
+
+- The AMLC STR layout (XLSX / XML) and the real STR reasons wait for SQ09; demo reasons DEMO01-03 are seeded in V1952
+  only. An STR sent to FOR_APPROVAL without a committee decision cannot be extracted.
+- Invoice and receipt prefill of STR transactions (behind `StrTransactionSource`); the demo extraction has no archived
+  file.
+- Working-hour SLA calendars: SLA hours are calendar hours.
+- Case documents can still be deleted through the generic attachment API (a platform guard is needed).
+- Accent-insensitive case search.
+- Assignment is announced by the platform assignment notice; `SCR_CASE_ASSIGNED` is not sent separately.
+- The demo unit heads (mkttl, clxuh) lack SCR_CASE_APPROVE, so demo cases fall back to the approvers' queue.

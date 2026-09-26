@@ -55,10 +55,17 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     // sanction screening (runs, cleared matches)
     'SUCCESS',
     'FALSE_POSITIVE',
+    // sanction screening cases: SLA on time, STR filed with the AMLC
+    'ON_TIME',
+    'FILED',
   ],
   warning: [
-    // sanction screening: a match not yet decided
+    // sanction screening: a match not yet decided; cases waiting for a decision
     'POTENTIAL',
+    'DUE_SOON',
+    'UNIT_HEAD_APPROVAL',
+    'COMPLIANCE_REVIEW',
+    'AML_COMMITTEE',
     'PENDING_AUTHORIZATION',
     'PENDING_APPROVAL',
     'CLOSING',
@@ -108,6 +115,10 @@ const TONE_GROUPS: Record<Tone, string[]> = {
   ],
   // BDO style guide: blue pills for records moving through processing ("Account for Placement").
   info: [
+    // sanction screening cases in process
+    'INVESTIGATION',
+    'STR_PREPARATION',
+    'STR_EXTRACTION',
     'SUBMITTED',
     'AWAITING_PAYMENT',
     'READY_FOR_PLACEMENT',
@@ -171,8 +182,9 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'NOT_REQUIRED',
   ],
   danger: [
-    // sanction screening: a confirmed match
+    // sanction screening: a confirmed match, a case past its SLA
     'TRUE_MATCH',
+    'BREACHED',
     'REJECTED',
     'REVERSED',
     'CLOSED',

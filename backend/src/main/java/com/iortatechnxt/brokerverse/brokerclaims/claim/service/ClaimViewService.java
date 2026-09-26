@@ -37,7 +37,7 @@ public class ClaimViewService {
   private static final Set<RemittanceStatus> SETTLED =
       Set.of(RemittanceStatus.FULLY_REMITTED, RemittanceStatus.NOT_APPLICABLE);
 
-  private final ClaimQueryService claims;
+  private final BrokerClaimQueryService claims;
   private final CoverService covers;
   private final ClaimLocationService locations;
   private final InsurerClaimService insurers;
@@ -57,7 +57,7 @@ public class ClaimViewService {
    * @param parameters direct-payment policy
    */
   public ClaimViewService(
-      ClaimQueryService claims,
+      BrokerClaimQueryService claims,
       CoverService covers,
       ClaimLocationService locations,
       InsurerClaimService insurers,

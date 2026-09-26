@@ -49,7 +49,7 @@ public class PremiumCheckService {
   private static final String BLOCK = "BLOCK";
 
   private final CoverService covers;
-  private final ClaimQueryService claims;
+  private final BrokerClaimQueryService claims;
   private final AttachmentService attachments;
   private final DocumentNumberService numbers;
   private final SystemParameterService parameters;
@@ -76,7 +76,7 @@ public class PremiumCheckService {
   @SuppressWarnings("java:S107") // constructor injection
   public PremiumCheckService(
       CoverService covers,
-      ClaimQueryService claims,
+      BrokerClaimQueryService claims,
       AttachmentService attachments,
       DocumentNumberService numbers,
       SystemParameterService parameters,

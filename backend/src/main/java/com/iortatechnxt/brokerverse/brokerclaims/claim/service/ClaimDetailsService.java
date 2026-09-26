@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ClaimDetailsService {
 
-  private final ClaimQueryService claims;
+  private final BrokerClaimQueryService claims;
   private final CoverService covers;
   private final LovService lovs;
   private final AuditTrailService audit;
@@ -43,7 +43,7 @@ public class ClaimDetailsService {
    * @param clock clock
    */
   public ClaimDetailsService(
-      ClaimQueryService claims,
+      BrokerClaimQueryService claims,
       CoverService covers,
       LovService lovs,
       AuditTrailService audit,

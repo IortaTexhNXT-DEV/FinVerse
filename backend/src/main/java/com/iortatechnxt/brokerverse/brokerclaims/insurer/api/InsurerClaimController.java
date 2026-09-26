@@ -1,6 +1,6 @@
 package com.iortatechnxt.brokerverse.brokerclaims.insurer.api;
 
-import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimQueryService;
+import com.iortatechnxt.brokerverse.brokerclaims.claim.service.BrokerClaimQueryService;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimCodes;
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.api.dto.InsurerDtos.AdjusterRequest;
@@ -43,7 +43,7 @@ public class InsurerClaimController {
 
   private static final String RECORD = "hasAuthority('BCL_RECORD')";
 
-  private final ClaimQueryService claims;
+  private final BrokerClaimQueryService claims;
   private final InsurerClaimService lines;
   private final InsurerService insurers;
   private final LovService lovs;
@@ -57,7 +57,7 @@ public class InsurerClaimController {
    * @param lovs adjuster labels
    */
   public InsurerClaimController(
-      ClaimQueryService claims,
+      BrokerClaimQueryService claims,
       InsurerClaimService lines,
       InsurerService insurers,
       LovService lovs) {

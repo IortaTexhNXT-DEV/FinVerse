@@ -1,6 +1,6 @@
 package com.iortatechnxt.brokerverse.brokerclaims.insurer.api;
 
-import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimQueryService;
+import com.iortatechnxt.brokerverse.brokerclaims.claim.service.BrokerClaimQueryService;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.api.dto.InsurerDtos.AdviceDraftResponse;
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.api.dto.InsurerDtos.AdviceRecipient;
@@ -33,7 +33,7 @@ public class InsurerUpdateController {
 
   private static final String RECORD = "hasAuthority('BCL_RECORD')";
 
-  private final ClaimQueryService claims;
+  private final BrokerClaimQueryService claims;
   private final InsurerUpdateService updates;
   private final LossAdviceService advice;
 
@@ -45,7 +45,7 @@ public class InsurerUpdateController {
    * @param advice loss advice
    */
   public InsurerUpdateController(
-      ClaimQueryService claims, InsurerUpdateService updates, LossAdviceService advice) {
+      BrokerClaimQueryService claims, InsurerUpdateService updates, LossAdviceService advice) {
     this.claims = claims;
     this.updates = updates;
     this.advice = advice;

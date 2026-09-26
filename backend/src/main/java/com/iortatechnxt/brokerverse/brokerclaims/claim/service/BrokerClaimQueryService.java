@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
-public class ClaimQueryService {
+public class BrokerClaimQueryService {
 
   private static final int MAX_HITS = 50;
 
@@ -29,7 +29,7 @@ public class ClaimQueryService {
    *
    * @param claims claims
    */
-  public ClaimQueryService(BrokerClaimRepository claims) {
+  public BrokerClaimQueryService(BrokerClaimRepository claims) {
     this.claims = claims;
   }
 

@@ -14,7 +14,7 @@ import java.time.Instant;
  */
 @Entity
 @Table(name = "bcl_reserve_change")
-public class ReserveChange extends BaseEntity {
+public class InsurerReserveChange extends BaseEntity {
 
   @Column(name = "insurer_claim_id", nullable = false, updatable = false)
   private Long insurerClaimId;
@@ -34,7 +34,7 @@ public class ReserveChange extends BaseEntity {
   @Column(name = "changed_at", nullable = false, updatable = false)
   private Instant changedAt;
 
-  protected ReserveChange() {}
+  protected InsurerReserveChange() {}
 
   /**
    * Records an amendment.
@@ -46,7 +46,7 @@ public class ReserveChange extends BaseEntity {
    * @param changedBy user
    * @param changedAt time
    */
-  public ReserveChange(
+  public InsurerReserveChange(
       Long insurerClaimId,
       BigDecimal previousAmount,
       BigDecimal newAmount,

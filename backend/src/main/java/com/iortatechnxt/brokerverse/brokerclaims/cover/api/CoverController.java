@@ -3,7 +3,7 @@ package com.iortatechnxt.brokerverse.brokerclaims.cover.api;
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
-import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimQueryService;
+import com.iortatechnxt.brokerverse.brokerclaims.claim.service.BrokerClaimQueryService;
 import com.iortatechnxt.brokerverse.brokerclaims.cover.api.dto.CoverDtos.CoverClaimDto;
 import com.iortatechnxt.brokerverse.brokerclaims.cover.api.dto.CoverDtos.CoverHit;
 import com.iortatechnxt.brokerverse.brokerclaims.cover.api.dto.CoverDtos.EndorsementDto;
@@ -44,7 +44,7 @@ public class CoverController {
   private static final String LOOKUP = "hasAnyAuthority('BCL_COVER_VIEW', 'BCL_RECORD')";
 
   private final CoverService covers;
-  private final ClaimQueryService claims;
+  private final BrokerClaimQueryService claims;
   private final LocationRefService refs;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
@@ -60,7 +60,7 @@ public class CoverController {
    */
   public CoverController(
       CoverService covers,
-      ClaimQueryService claims,
+      BrokerClaimQueryService claims,
       LocationRefService refs,
       AuditTrailService audit,
       CurrentUser currentUser) {

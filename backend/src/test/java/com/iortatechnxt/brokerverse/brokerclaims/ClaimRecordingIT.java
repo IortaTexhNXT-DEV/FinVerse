@@ -5,8 +5,8 @@ import static com.iortatechnxt.brokerverse.brokerclaims.ClaimsFixtures.TL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.iortatechnxt.brokerverse.brokerclaims.claim.service.BrokerClaimQueryService;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimDetailsService;
-import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimQueryService;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimRecorded;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimRecordingService;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimRecordingService.NewClaim;
@@ -44,7 +44,7 @@ class ClaimRecordingIT {
   @Autowired private ClaimsFixtures fx;
   @Autowired private ClaimRecordingService recording;
   @Autowired private PremiumCheckService premiums;
-  @Autowired private ClaimQueryService claims;
+  @Autowired private BrokerClaimQueryService claims;
   @Autowired private ClaimViewService views;
   @Autowired private ClaimDetailsService details;
   @Autowired private PremiumRecheckJob recheck;

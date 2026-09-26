@@ -6,8 +6,8 @@ import com.iortatechnxt.brokerverse.brokerclaims.claim.api.dto.ClaimRequests.Los
 import com.iortatechnxt.brokerverse.brokerclaims.claim.api.dto.ClaimRequests.RecordClaimRequest;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.api.dto.ClaimRequests.ReportedDateRequest;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.api.dto.ClaimResponse;
+import com.iortatechnxt.brokerverse.brokerclaims.claim.service.BrokerClaimQueryService;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimDetailsService;
-import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimQueryService;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimRecordingService;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimViewService;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.PremiumCheckService;
@@ -37,13 +37,13 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/v1/broker-claims")
-public class ClaimController {
+public class BrokerClaimController {
 
   private static final String RECORD = "hasAuthority('BCL_RECORD')";
 
   private final ClaimRecordingService recording;
   private final ClaimViewService views;
-  private final ClaimQueryService claims;
+  private final BrokerClaimQueryService claims;
   private final ClaimDetailsService details;
   private final PremiumCheckService premiums;
 
@@ -56,10 +56,10 @@ public class ClaimController {
    * @param details detail changes
    * @param premiums premium check and authorization
    */
-  public ClaimController(
+  public BrokerClaimController(
       ClaimRecordingService recording,
       ClaimViewService views,
-      ClaimQueryService claims,
+      BrokerClaimQueryService claims,
       ClaimDetailsService details,
       PremiumCheckService premiums) {
     this.recording = recording;

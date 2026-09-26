@@ -9,8 +9,8 @@ import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimCodes;
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.domain.InsurerClaim;
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.domain.InsurerClaimRepository;
-import com.iortatechnxt.brokerverse.brokerclaims.insurer.domain.ReserveChange;
-import com.iortatechnxt.brokerverse.brokerclaims.insurer.domain.ReserveChangeRepository;
+import com.iortatechnxt.brokerverse.brokerclaims.insurer.domain.InsurerReserveChange;
+import com.iortatechnxt.brokerverse.brokerclaims.insurer.domain.InsurerReserveChangeRepository;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
@@ -44,7 +44,7 @@ public class InsurerClaimService {
   private static final String INSURER = "Insurer ";
 
   private final InsurerClaimRepository lines;
-  private final ReserveChangeRepository reserves;
+  private final InsurerReserveChangeRepository reserves;
   private final BrokerClaimRepository claims;
   private final InsurerService insurers;
   private final LovService lovs;
@@ -69,7 +69,7 @@ public class InsurerClaimService {
   @SuppressWarnings("java:S107") // constructor injection
   public InsurerClaimService(
       InsurerClaimRepository lines,
-      ReserveChangeRepository reserves,
+      InsurerReserveChangeRepository reserves,
       BrokerClaimRepository claims,
       InsurerService insurers,
       LovService lovs,
@@ -186,7 +186,7 @@ public class InsurerClaimService {
     }
     BigDecimal previous = line.amendReserve(amount);
     reserves.save(
-        new ReserveChange(
+        new InsurerReserveChange(
             line.getId(),
             previous,
             amount,
@@ -249,7 +249,7 @@ public class InsurerClaimService {
    * @return amendments, newest first
    */
   @Transactional(readOnly = true)
-  public List<ReserveChange> reserveHistory(Collection<Long> lineIds) {
+  public List<InsurerReserveChange> reserveHistory(Collection<Long> lineIds) {
     return lineIds.isEmpty()
         ? List.of()
         : reserves.findByInsurerClaimIdInOrderByChangedAtDescIdDesc(lineIds);

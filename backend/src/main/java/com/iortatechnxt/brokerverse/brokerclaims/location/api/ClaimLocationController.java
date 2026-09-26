@@ -1,6 +1,6 @@
 package com.iortatechnxt.brokerverse.brokerclaims.location.api;
 
-import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimQueryService;
+import com.iortatechnxt.brokerverse.brokerclaims.claim.service.BrokerClaimQueryService;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
 import com.iortatechnxt.brokerverse.brokerclaims.location.api.dto.LocationDtos.ClaimLocationResponse;
 import com.iortatechnxt.brokerverse.brokerclaims.location.api.dto.LocationDtos.DescribeRequest;
@@ -34,7 +34,7 @@ public class ClaimLocationController {
 
   private static final String RECORD = "hasAuthority('BCL_RECORD')";
 
-  private final ClaimQueryService claims;
+  private final BrokerClaimQueryService claims;
   private final ClaimLocationService locations;
   private final LocationRefService refs;
   private final Clock clock;
@@ -48,7 +48,7 @@ public class ClaimLocationController {
    * @param clock clock
    */
   public ClaimLocationController(
-      ClaimQueryService claims,
+      BrokerClaimQueryService claims,
       ClaimLocationService locations,
       LocationRefService refs,
       Clock clock) {

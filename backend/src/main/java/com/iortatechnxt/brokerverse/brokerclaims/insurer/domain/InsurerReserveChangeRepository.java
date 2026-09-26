@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /** Insurer reserve history (BRCLM.023/024); insert-only. */
-public interface ReserveChangeRepository extends JpaRepository<ReserveChange, Long> {
+public interface InsurerReserveChangeRepository extends JpaRepository<InsurerReserveChange, Long> {
 
   /**
    * The reserve history of insurer lines, newest first.
@@ -13,6 +13,6 @@ public interface ReserveChangeRepository extends JpaRepository<ReserveChange, Lo
    * @param insurerClaimIds insurer lines
    * @return amendments
    */
-  List<ReserveChange> findByInsurerClaimIdInOrderByChangedAtDescIdDesc(
+  List<InsurerReserveChange> findByInsurerClaimIdInOrderByChangedAtDescIdDesc(
       Collection<Long> insurerClaimIds);
 }

@@ -1,8 +1,8 @@
 package com.iortatechnxt.brokerverse.brokerclaims.insurer.api.dto;
 
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.domain.InsurerClaim;
+import com.iortatechnxt.brokerverse.brokerclaims.insurer.domain.InsurerReserveChange;
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.domain.InsurerUpdate;
-import com.iortatechnxt.brokerverse.brokerclaims.insurer.domain.ReserveChange;
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.service.InsurerClaimService.NewLine;
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.service.InsurerUpdateService.NewUpdate;
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.service.LossAdviceService.Draft;
@@ -98,7 +98,7 @@ public final class InsurerDtos {
      * @param r amendment
      * @return response
      */
-    public static ReserveChangeResponse from(ReserveChange r) {
+    public static ReserveChangeResponse from(InsurerReserveChange r) {
       return new ReserveChangeResponse(
           r.getId(),
           r.getInsurerClaimId(),

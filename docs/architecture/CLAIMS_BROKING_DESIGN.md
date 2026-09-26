@@ -559,7 +559,7 @@ location}`.
   effective date must be after <dd-MMM-yyyy>"); `validOn(company, arn, date)` feeds every claim location.
 - **Insurers** (`insurer.service.InsurerClaimService`, entity `InsurerClaim` on `bcl_insurer_claim`): `add`, `number`
   (a line that already has a number keeps it; the new number becomes a further line of the insurer),
-  `changeShare`, `amendReserve` (`ReserveChange` history, V1022; no journal), `assignAdjuster` (per insurer line).
+  `changeShare`, `amendReserve` (`InsurerReserveChange` history on `bcl_reserve_change`, V1022; no journal), `assignAdjuster` (per insurer line).
   Duplicates on the claim are refused (`BCL_INSURER_CLAIM_NO_DUPLICATE`); a number found on another claim is
   `BCL_INSURER_CLAIM_NO_REUSED` until confirmed, then raises the alert. **For CL1-B:** `InsurerClaim.settled(amount)`
   records the settled amount of a line; the claim-level adjuster (`ClaimProgress.adjusterCode`) stays CL1-B's.

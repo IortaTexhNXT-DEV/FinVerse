@@ -1,20 +1,25 @@
 import type { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
+import { StatusPage } from '@/components/ui/StatusPage';
 import { mayOpen } from '@/navigation/access';
 import { useAuth } from './authContext';
 import { ForcedPasswordChange } from './ForcedPasswordChange';
 
 /**
- * Redirects anonymous users to the login page; a user whose password must be changed first
+ * Redirects anonymous users to the login page, remembering the page so the user returns to it
+ * after signing in again (session expiry); a user whose password must be changed first
  * (administrator reset, first use or expiry; UAM-NFR-36) sees the password change instead.
  */
 export function RequireAuth({ children }: Readonly<{ children: ReactNode }>) {
   const { user, loading, passwordChange } = useAuth();
+  const location = useLocation();
   if (loading) {
     return <span className="spinner" aria-label="Loading" />;
   }
   if (user === null) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}` }} />
+    );
   }
   return passwordChange === null ? (
     <>{children}</>
@@ -43,11 +48,7 @@ export function RequirePermission({
     if (fallbackTo !== undefined) {
       return <Navigate to={fallbackTo} replace />;
     }
-    return (
-      <div className="alert warning" role="alert">
-        You do not have access to this screen. Contact your administrator if you need it.
-      </div>
-    );
+    return <StatusPage kind="forbidden" />;
   }
   return <>{children}</>;
 }

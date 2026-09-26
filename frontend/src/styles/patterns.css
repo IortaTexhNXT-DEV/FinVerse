@@ -699,6 +699,69 @@ dl.form-grid dd {
   text-overflow: ellipsis;
 }
 
+/* ---------- 403 / 404 pages ------------------------------------------------------------ */
+.status-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 560px;
+  margin: var(--space-6) auto;
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--brand-gold);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.status-page svg {
+  color: var(--brand-blue);
+}
+
+.status-page h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.status-page p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+/* Active search and filters of a work list toolbar, on their own line */
+.worklist-toolbar .filter-chips {
+  flex-basis: 100%;
+  margin-top: 0;
+}
+
+.link-button.inline {
+  padding: 0;
+  font-size: inherit;
+}
+
+.confirm-record {
+  margin: 0;
+  color: var(--color-heading);
+}
+
+.upload-rule {
+  margin: 0;
+  font-size: 13px;
+}
+
+.dropzone-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+/* A drop zone takes two columns of a form grid */
+.form-grid > .field:has(.dropzone) {
+  grid-column: span 2;
+}
+
 /* ---------- Print: the BDO print layout -------------------------------------------------- */
 @media print {
   @page {

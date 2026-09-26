@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { authApi } from '@/api/auth';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -66,6 +66,8 @@ function ForgotPassword({ onBack, onSent }: Readonly<{ onBack: () => void; onSen
  */
 export default function LoginPage() {
   const { user, login } = useAuth();
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from;
   const [mode, setMode] = useState<Mode>('signin');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -73,7 +75,7 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
 
   if (user !== null) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={from?.startsWith('/') === true ? from : '/'} replace />;
   }
 
   const submit = () => {

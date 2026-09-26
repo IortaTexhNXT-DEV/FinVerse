@@ -50,7 +50,9 @@ export default function EbHomePage() {
         ))}
       </div>
       <Card title="My Work">
-        <p className="muted">EB cycles, franchise requests, member changes and SOAs assigned to you.</p>
+        <p className="muted">
+          EB cycles, franchise requests, member changes and SOAs assigned to you.
+        </p>
       </Card>
     </div>
   );

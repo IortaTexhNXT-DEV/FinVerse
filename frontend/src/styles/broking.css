@@ -221,24 +221,49 @@
 .notification-panel {
   position: absolute;
   right: 0;
-  top: calc(100% + 6px);
-  width: 360px;
-  max-height: 440px;
-  overflow: auto;
+  top: calc(100% + 8px);
+  z-index: 30;
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
-  z-index: 50;
 }
 
-.notification-head {
+.notification-head,
+.notification-foot {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-border);
-  color: var(--color-text);
+}
+
+.notification-foot {
+  border-top: 1px solid var(--color-border);
+  border-bottom: 0;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.notification-scroll {
+  overflow: auto;
+  padding: 0 0 var(--space-2);
+}
+
+.notification-day {
+  margin: 0;
+  padding: var(--space-2) var(--space-4) var(--space-1);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  background: var(--color-surface-alt);
 }
 
 .notification-list {
@@ -247,48 +272,126 @@
   padding: 0;
 }
 
-.notification-item {
+.notification-row {
   display: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: 2px;
-  padding: var(--space-3) var(--space-4);
-  border: 0;
+  align-items: flex-start;
   border-bottom: 1px solid var(--color-border);
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-  font: inherit;
-  color: var(--color-text);
 }
 
-.notification-item.unread {
+.notification-row.unread {
   background: var(--brand-blue-050);
-  border-left: 3px solid var(--brand-gold);
+}
+
+.notification-item {
+  display: flex;
+  gap: var(--space-3);
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
 }
 
 .notification-item:hover,
 .notification-item:focus-visible {
-  background: var(--color-surface-alt);
+  background: #cfeaff;
+}
+
+.notification-icon {
+  flex: none;
+  margin-top: 2px;
+  color: var(--brand-blue);
+}
+
+.notification-icon.returned {
+  color: var(--color-danger);
+}
+
+.notification-icon.approved {
+  color: var(--color-success);
+}
+
+.notification-icon.due {
+  color: var(--color-warning);
+}
+
+.notification-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .notification-title {
-  font-weight: 600;
-  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.notification-row.unread .notification-title::after {
+  content: '';
 }
 
 .notification-body {
+  font-size: 13px;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notification-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   font-size: 12px;
   color: var(--color-text-muted);
 }
 
-.notification-time {
+.notification-ref {
+  padding: 0 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+  color: var(--brand-navy);
+  font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--color-text-muted);
+}
+
+.notification-mark {
+  flex: none;
+  margin: var(--space-3) var(--space-3) 0 0;
+  padding: 6px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.notification-mark:hover,
+.notification-mark:focus-visible {
+  background: rgba(0, 114, 216, 0.12);
+}
+
+.unread-dot {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--brand-blue);
 }
 
 .notification-empty {
-  padding: var(--space-4);
+  padding: var(--space-5) var(--space-4);
+  margin: 0;
+  text-align: center;
+}
+
+.notification-page {
+  padding-bottom: var(--space-2);
 }
 
 /* Two-column master / detail layout */

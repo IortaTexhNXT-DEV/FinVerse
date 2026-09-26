@@ -18,7 +18,7 @@ Example::
         Column("id", "ID", 10, "Register row identifier"),
         Column("status", "Status", 14, "Resolution status", values=["OPEN", "ANSWERED", "CLOSED"], status=True),
     ], rows=[{"id": "PQ01", "status": "OPEN"}])
-    wb.save("docs/deliverables/out/Registers/BIBS_Register_BRD-03_Discrepancies_v1.0.xlsx")
+    wb.save(brand.out_path("BRD-03", "Registers", "BIBS_Register_BRD-03_Discrepancies_v1.0.xlsx"))
 """
 
 from __future__ import annotations

@@ -3,10 +3,12 @@
 Inputs
   * discrepancy_register.yaml (this folder): register items, NFR comparison, owners, rules,
     open-question status and grouping;
-  * the "Open questions" tables of the specs in docs/requirements/ and the XQ table of
-    BDOI_CROSS_BRD_DECISIONS.md (read at build time, so the question list follows the specs).
+  * the "Open questions" tables of the specs in docs/requirements/, of the programme alignment and the
+    document storage decision in docs/architecture/, and the XQ table of BDOI_CROSS_BRD_DECISIONS.md
+    (read at build time, so the question list follows the source documents);
+  * tools/deliverables/brand.py BRD_DROP: the default Drop of an item.
 
-Outputs (docs/deliverables/out/Registers/)
+Outputs (docs/deliverables/out/Programme/Registers/, from tools/deliverables/brand.py)
   * BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v<version>.xlsx
     (Cover, README, Summary, Register, Open questions, NFR comparison);
   * BIBS_Register_BRD-00_Discrepancies_and_Clarifications_Summary_v<version>.pdf (the Summary sheet).
@@ -45,12 +47,13 @@ from bdoi_xlsx import BORDER, HEADER_FILL, HEADER_ROW, BdoiWorkbook, Column, _Sh
 
 DATA = HERE / "discrepancy_register.yaml"
 REQ = REPO / "docs" / "requirements"
-OUT = REPO / "docs" / "deliverables" / "out" / "Registers"
+OUT = brand.out_dir("BRD-00", "Registers")  # Programme/Registers (brand.BRD_DROP)
 
 TYPES = ["Contradiction within BRD", "Conflict between BRDs", "Gap / missing detail", "Ambiguity",
          "BRD vs platform", "NFR inconsistency", "Data / numbering issue", "Document quality"]
 SEVERITIES = ["High", "Medium", "Low"]
 STATUSES = ["Open", "Answered", "Closed"]
+DROPS = brand.DROP_ORDER
 Q_STATUSES = ["Open", "Partially answered", "Answered"]
 SEV_COLOURS = {"High": (brand.DANGER_BG, brand.DANGER), "Medium": (brand.AMBER_BG, brand.AMBER),
                "Low": (brand.DIRTY_WHITE, brand.MUTED)}
@@ -71,6 +74,9 @@ QUESTION_SOURCES = [
     ("BRD-11", "BDOI_UAM_BRD_SPEC.md", "## 9. Open questions", ""),
     ("BRD-12", "BDOI_SP_BRD_SPEC.md", "## 10. New open questions", "SP-"),
     ("BRD-13", "BDOI_DM_BRD_SPEC.md", "## 7. Open questions for BDOI (Data Migration)", ""),
+    ("BRD-00", "../architecture/PROGRAMME_ALIGNMENT.md", "## 9. Open questions for BDOI (programme, integrations, infrastructure)", ""),
+    # Two-column table (Ref | Question): the fifth value is the topic of every row.
+    ("BRD-00", "../architecture/DOCUMENT_STORAGE_DECISION.md", "### Open points for BDOI IT", "", "Document storage (S3)"),
 ]
 CROSS_SOURCE = ("CROSS", "BDOI_CROSS_BRD_DECISIONS.md", "## 5. Remaining cross-BRD conflicts")
 
@@ -99,10 +105,14 @@ def table_rows(path: Path, heading: str) -> list[list[str]]:
 
 def load_questions(data: dict) -> list[dict]:
     questions = []
-    for brd, fname, heading, prefix in QUESTION_SOURCES:
+    for brd, fname, heading, prefix, *topic in QUESTION_SOURCES:
         for cells in table_rows(REQ / fname, heading):
             qid = clean(cells[0])
             if not re.fullmatch(r"[A-Z]+\d+", qid):
+                continue
+            if topic:  # Ref | Question
+                questions.append({"id": prefix + qid, "brd": data["brds"][brd]["short"], "topic": topic[0],
+                                  "question": clean(cells[1]), "source": f"{Path(fname).name} {heading.lstrip('# ')}"})
                 continue
             questions.append({"id": prefix + qid, "brd": data["brds"][brd]["short"], "topic": clean(cells[1]),
                               "question": clean(cells[2]), "source": clean(cells[3]) if len(cells) > 3 else ""})
@@ -125,7 +135,8 @@ def load_questions(data: dict) -> list[dict]:
     item_links: dict[str, list[str]] = {}
     for item in data["items"]:
         for q in item.get("related", []):
-            item_links.setdefault(q, []).append(item["ref"])
+            if not q.startswith("DCR-"):  # related register items are shown on the Register only
+                item_links.setdefault(q, []).append(item["ref"])
     ids = {q["id"] for q in questions}
     for q in questions:
         st = status.get(q["id"])
@@ -145,12 +156,14 @@ def load_questions(data: dict) -> list[dict]:
 def load() -> dict:
     data = yaml.safe_load(DATA.read_text(encoding="utf-8"))
     refs = [i["ref"] for i in data["items"]]
-    expected = [f"DCR-{n:03d}" for n in range(1, len(refs) + 1)]
-    if refs != expected:
-        raise SystemExit("Register refs must run DCR-001 upwards without gaps")
+    numbers = [int(r[4:]) if re.fullmatch(r"DCR-\d{3}", r) else -1 for r in refs]
+    if refs[0] != "DCR-001" or any(b <= a for a, b in zip(numbers, numbers[1:])) or min(numbers) < 0:
+        raise SystemExit("Register refs must run DCR-001 upwards (unused numbers are allowed, never reused)")
     for item in data["items"]:
         if item["type"] not in TYPES or item["sev"] not in SEVERITIES or item["status"] not in STATUSES:
             raise SystemExit(f"{item['ref']}: invalid type, severity or status")
+        if item.get("drop") and item["drop"] not in brand.DROP_ORDER:
+            raise SystemExit(f"{item['ref']}: invalid drop {item['drop']}")
         for b in item["brds"]:
             if b not in data["brds"]:
                 raise SystemExit(f"{item['ref']}: unknown BRD {b}")
@@ -162,6 +175,15 @@ def owner_of(item: dict, data: dict) -> str:
         return item["owner"]
     brds = item["brds"]
     return data["owners"][brds[0]] if len(brds) == 1 else data["owners"]["CROSS"]
+
+
+def drop_of(item: dict) -> str:
+    """Drop in which the item is resolved: the item's own value, else the earliest primary drop of its BRDs
+    (brand.BRD_DROP); items on the umbrella BRD or the Report List alone are programme level."""
+    if item.get("drop"):
+        return item["drop"]
+    drops = [brand.drop_of(b) for b in item["brds"] if b not in ("BRD-00", "RL")]
+    return min(drops, key=brand.DROP_ORDER.index) if drops else "Programme"
 
 
 def brd_label(item: dict, data: dict) -> str:
@@ -233,6 +255,7 @@ def colour_rule(ws, rng: str, value: str, fill: str, font: str) -> None:
 REGISTER_COLUMNS = [
     Column("ref", "Ref", 10, "Register reference DCR-nnn. Stable: a new item gets the next number."),
     Column("brds", "BRD(s) involved", 15, "BRDs the item involves (BRD-n and short name; Report List where relevant). Several BRDs are separated by semicolons."),
+    Column("drop", "Drop", 11, "BDOI drop in which the item is resolved: Drop 0 (setup and data migration), Drop 1 (transactional), Drop 2 (independent), Programme (platform-wide) or Phase 2 (outside the January 2028 scope). Default: the earliest drop of the BRDs involved.", values=DROPS),
     Column("loc", "BRD ID / section / page", 26, "Requirement ID, section and PDF page of the source file in docs/source-documents, for each BRD involved."),
     Column("type", "Type", 16, "Kind of issue (definitions below).", values=TYPES),
     Column("desc", "Description", 50, "What the BRD says, with the conflicting statements quoted briefly."),
@@ -246,7 +269,7 @@ REGISTER_COLUMNS = [
     Column("status", "Status", 12, "Open, Answered or Closed (rule below).", values=STATUSES, status=True),
     Column("response", "BDOI response", 32, "BDOI's answer, or the signed BDOI document that answers the item."),
     Column("resolved", "Resolution date", 12, "Date the item was Closed.", kind="date"),
-    Column("related", "Related question IDs", 18, "Open-question IDs of the specs (CRQ, Q, OQ, PQ, CQ, AQ, RQ, CLQ, EBQ, CSQ, SP-SQ, SANC-SQ, UQ, DMQ, XQ); see the Open questions sheet."),
+    Column("related", "Related question IDs", 18, "Open-question IDs of the specs (CRQ, Q, OQ, PQ, CQ, AQ, RQ, CLQ, EBQ, CSQ, SP-SQ, SANC-SQ, UQ, DMQ, IQ, DSQ, XQ; see the Open questions sheet) and related register items (DCR)."),
 ]
 
 QUESTION_COLUMNS = [
@@ -268,7 +291,7 @@ def build_register_rows(data: dict) -> list[dict]:
     rows = []
     for item in data["items"]:
         rows.append({
-            "ref": item["ref"], "brds": brd_label(item, data), "loc": item["loc"], "type": item["type"],
+            "ref": item["ref"], "brds": brd_label(item, data), "drop": drop_of(item), "loc": item["loc"], "type": item["type"],
             "desc": item["desc"], "impact": item["impact"], "sev": item["sev"], "modules": item["modules"],
             "resolution": item["resolution"], "question": item["question"], "owner": owner_of(item, data),
             "raised": item.get("raised", raised), "status": item["status"], "response": item.get("response", ""),
@@ -369,7 +392,8 @@ def write_summary(ws, data: dict, questions: list[dict], live: bool, register_ti
     ws["B1"] = "Summary"
     ws["B1"].font = _font(14, True, brand.HEADER_BLUE)
     ws["B2"] = (f"{data['meta']['title']}, version {data['meta']['version']}, {data['meta']['date']}. "
-                f"{len(items)} register items; {len(questions)} open questions from {len(QUESTION_SOURCES)} BRD specs and the cross-BRD decisions.")
+                f"{len(items)} register items; {len(questions)} open questions from the BRD specs, the programme alignment, "
+                f"the document storage decision and the cross-BRD decisions.")
     ws["B2"].font = _font(9, False, brand.MUTED)
     for c in "BCDEFGH":
         ws[f"{c}3"].border = Border(bottom=Side(style="thin", color=brand.YELLOW))
@@ -440,7 +464,22 @@ def write_summary(ws, data: dict, questions: list[dict], live: bool, register_ti
           count([("brds", "*;*"), ("status", "Open")], sum(1 for x in multi if x["status"] == "Open"))], bold=True)
     row += 2
 
-    # 3. By type
+    # 3. By drop
+    row = title(row, "Items by drop", "Drop in which the item is resolved (column Drop of the Register).")
+    header(row, ["Drop", "High", "Medium", "Low", "Total", "Open"])
+    row += 1
+    top = row
+    for i, d in enumerate(DROPS):
+        mine = [x for x in items if drop_of(x) == d]
+        vals = [count([("drop", d), ("sev", s)], sum(1 for x in mine if x["sev"] == s)) for s in SEVERITIES]
+        line(row, [brand.DROPS[d]["title"] if d in brand.DROPS else "Phase 2 (outside the January 2028 scope)"] + vals +
+             [total_formula(row, "C", "E") if live else len(mine),
+              count([("drop", d), ("status", "Open")], sum(1 for x in mine if x["status"] == "Open"))],
+             band=i % 2 == 1)
+        row += 1
+    row += 1
+
+    # 4. By type
     row = title(row, "Items by type")
     header(row, ["Type", "High", "Medium", "Low", "Total", "Open"])
     row += 1
@@ -458,7 +497,7 @@ def write_summary(ws, data: dict, questions: list[dict], live: bool, register_ti
     line(row, ["Total"] + tots, bold=True)
     row += 2
 
-    # 4. Open questions
+    # 5. Open questions
     row = title(row, "Open questions", "From the Open questions sheet (status as recorded in the data file).")
     header(row, ["Status", "Questions", "", "", "", ""])
     ws.merge_cells(start_row=row, start_column=3, end_row=row, end_column=7)
@@ -473,7 +512,7 @@ def write_summary(ws, data: dict, questions: list[dict], live: bool, register_ti
     line(row, ["Total", len(questions)], bold=True)
     row += 2
 
-    # 5. Resolve first
+    # 6. Resolve first
     row = title(row, "Resolve first", "The 15 items that most affect the build, money or compliance, in the order proposed for resolution.")
     header(row, ["Item", "Ref", "Severity", "Status", "BRD(s)", "", "Why first"])
     ws.merge_cells(start_row=row, start_column=6, end_row=row, end_column=7)
@@ -533,6 +572,13 @@ def build(make_pdf: bool = True, previews: bool = False) -> Path:
         ("Sources", [(b["short"], f"{b['name']}: docs/source-documents/{b['file']}; baseline docs/requirements/{b['spec']}")
                      for b in data["brds"].values()] + [
             ("Cross-BRD", "docs/requirements/BDOI_CROSS_BRD_DECISIONS.md (decisions D1-D8, questions XQ01-XQ13)"),
+            ("Programme", "docs/architecture/PROGRAMME_ALIGNMENT.md (BDOI drop plan, timeline, IER workbook v20, integrations; "
+                          "questions IQ01-IQ35) and docs/architecture/DOCUMENT_STORAGE_DECISION.md (questions DSQ01-DSQ04)"),
+            ("Drop", "Drop in which the item is resolved: the item's own value, else the earliest primary drop of the BRDs "
+                     "involved (Drop 0 BRD-3, 11, 13; Drop 1 BRD-1, 2, 4, 5, 6, 9, 10, 12; Drop 2 BRD-7, 8; umbrella BRD and "
+                     "Report List alone: Programme). Items about Production Reconciliation or Marketing Collection go to Drop 2; "
+                     "items outside the January 2028 scope to Phase 2."),
+            ("Numbering", "DCR numbers are never reused. DCR-236 to DCR-239 are not used."),
             ("Method", "Each item was checked against the source page (text layer, or the rendered page for scanned pages) and cites it. "
                        "Items come from the observations, NFR and open-question sections of the specs, the cross-BRD decisions, "
                        "the Report List, and a comparison with BIBS as built or designed."),
@@ -543,7 +589,7 @@ def build(make_pdf: bool = True, previews: bool = False) -> Path:
     summary_ws = wb.custom_sheet("Summary", "Counts by BRD, type and severity; status pivot; items to resolve first")
     rows = build_register_rows(data)
     reg = wb.sheet("Register", REGISTER_COLUMNS, rows,
-                   description="One row per discrepancy, conflict, gap or clarification. Filter on BRD, type, severity or status.")
+                   description="One row per discrepancy, conflict, gap or clarification. Filter on BRD, drop, type, severity or status.")
     style_register(reg, len(rows))
     fit_rows(reg, REGISTER_COLUMNS, len(rows))
     reg.page_setup.paperSize = reg.PAPERSIZE_A3

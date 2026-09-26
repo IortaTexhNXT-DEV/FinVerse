@@ -1,7 +1,7 @@
 # BIBS programme alignment: BDOI drops, timeline, integrations and infrastructure
 
 Status: **analysis for BDOI review, 26-Sep-2026.** Client document built from the same data:
-`docs/deliverables/out/Alignment/BIBS_Alignment_BRD-00_Drops_Integrations_Infrastructure_v1.0.docx` and
+`docs/deliverables/out/Programme/Alignment/BIBS_Alignment_BRD-00_Drops_Integrations_Infrastructure_v1.0.docx` and
 `BIBS_Alignment_BRD-00_Integration_Inventory_v1.0.xlsx` (source `docs/deliverables/src/alignment/`, data file
 `alignment_data.yaml`, builder `build_alignment_pack.py`). The tables of sections 2 to 6 are generated from that data
 file; change the data file and regenerate both.
@@ -26,7 +26,7 @@ file; change the data file and regenerate both.
 - **A3** Remittance handles the reinsurance transactions in Drop 1; the reinsurance module is phase 2.
 - **A4** Documents and attachments live in S3 only (design: S6).
 - **A5** BRDs, FRS, test plans and collaterals are grouped under the drops (section 2.3).
-- **A6** BDOI supplies the IER architecture diagrams: produced as `docs/deliverables/out/Alignment/IER/BIBS_IER_Application_Architecture.png` and `BIBS_IER_Infrastructure_Deployment.png` (sources `docs/deliverables/src/alignment/figures/al_application_architecture.dot`, `al_deployment.dot`, rendered at 300 dpi).
+- **A6** BDOI supplies the IER architecture diagrams: produced as `docs/deliverables/out/Programme/Alignment/IER/BIBS_IER_Application_Architecture.png` and `BIBS_IER_Infrastructure_Deployment.png` (sources `docs/deliverables/src/alignment/figures/al_application_architecture.dot`, `al_deployment.dot`, rendered at 300 dpi).
 
 ## 2. Drop mapping
 
@@ -81,7 +81,7 @@ file; change the data file and regenerate both.
 | BRD-00 Core Replacement (umbrella) | FRS, spec | BIBS_FRS_BRD-00_Core_Replacement_v1.0.docx | Programme | All drops (cross-cutting FR-CR, NFRs) | Stays at programme level |
 | BRD-11 User Access Maintenance | FRS, test plan | BIBS_FRS_BRD-11_*; BIBS_TestPlan_BRD-11_* | Drop 0 | - | Items 0.1-0.3; EIAM and UIDM-ISC change it |
 | BRD-3 Product Maintenance | FRS, test plan | BIBS_FRS_BRD-03_*; BIBS_TestPlan_BRD-03_* | Drop 0 | Drop 1 (quotation, 1.U2) | Item 0.6 |
-| BRD-13 Data Migration | FRS, test plan, migration pack (strategy, workbook, runbook, reconciliation, templates) | BIBS_FRS_BRD-13_*; BIBS_TestPlan_BRD-13_*; out/Migration/* | Drop 0 | Drop 1 (client onboarding, cashiering, BIR reports) and the migration stream | Migration has its own timeline row |
+| BRD-13 Data Migration | FRS, test plan, migration pack (strategy, workbook, runbook, reconciliation, templates) | BIBS_FRS_BRD-13_*; BIBS_TestPlan_BRD-13_*; out/Drop-0_Setup_and_Data_Migration/Migration/* | Drop 0 | Drop 1 (client onboarding, cashiering, BIR reports) and the migration stream | Migration has its own timeline row |
 | BRD-1 New Business | FRS, test plan | BIBS_FRS_BRD-01_*; BIBS_TestPlan_BRD-01_* | Drop 1 | - | Upstream items 1.U1-1.U3, 1.U6, 1.U7, 1.U9 |
 | BRD-6 Renewal | FRS, test plan | BIBS_FRS_BRD-06_*; BIBS_TestPlan_BRD-06_* | Drop 1 | - | Upstream 1.U5 |
 | BRD-12 Submitted Policies | FRS, test plan | BIBS_FRS_BRD-12_*; BIBS_TestPlan_BRD-12_* | Drop 1 | - | Upstream 1.U4 |
@@ -102,10 +102,12 @@ file; change the data file and regenerate both.
 | UAT plans and sign-off forms (item 30) | Word (to write) | - | Per drop | End-to-end UAT script is programme level | UAT runs end to end (answer A1) |
 | Performance, penetration test, ORR / PRR evidence (items 28, 37) | Word, Excel (to write) | - | Programme | - | Nov 2027 - Jan 2028 |
 
-Proposed folders under `docs/deliverables/out/` (and the same under `src/`): `Programme/`, `Drop0_Setup_and_Migration/`,
-`Drop1_Transactional/`, `Drop2_Independent/`; the existing `FRS/`, `TestPlans/`, `Migration/`, `Registers/`, `Decks/`
-content moves by the "Drop (folder)" column; shared documents stay in one folder and are referenced from the others
-(no copies). The register gains a Drop column.
+Folders as built (26-Sep-2026) under `docs/deliverables/out/`: `Drop-0_Setup_and_Data_Migration/`,
+`Drop-1_Transactional/`, `Drop-2_Independent/` and `Programme/`, each with `FRS/`, `TestPlans/`, `Migration/`,
+`Registers/`, `Decks/` or `Alignment/` as applicable and an index `README.md` (BRD, version, BDOI dates of the drop).
+Documents moved by the "Drop (folder)" column; a document shared with another drop stays in its primary drop and the
+index of the other drop points to it (no copies). The drop map is `tools/deliverables/brand.py` (`BRD_DROP`,
+`DROP_SHARED`), used by every builder. Sources stay in `src/<kind>/`. The register has a Drop column (v1.2).
 
 ## 3. Early renewal concept paper (superseded)
 
@@ -137,9 +139,11 @@ after go-live" and DCR-202); RMEL cohorts ingested from legacy files (the renewa
 RENEWAL_DESIGN principle 2, so the check engine would have read outstanding premium and claims from the RMEL file, not
 live); a progression gate stopping renewal accounts before placement until T. None of this is built now.
 
-What remains:
-- **Renewals around T** (IQ02): unchanged DM design - cohorts T to T+140 days carried forward (object P03, layout P03 in `dm_layouts.yaml`, `renewal.service.port.LegacyPolicySource` implemented by `migration`, DATA_MIGRATION_DESIGN section 15); renewals expiring between the freeze and T placed in legacy or held by hold covers.
-- **Package remapping** (IQ03, DCR-219): recommended hybrid - a versioned `PACKAGE` code map set at migration intake (add to the code-map list of `dm_layouts.yaml`, today it has no PACKAGE set) plus a renewal sanitation check `PACKAGE_MAPPING` (new bean in `renewal.service.check`, RENEWAL_DESIGN section 8.1) that sends unmapped / retired / split packages to Review for TSU; owner TSU with the MBS steward; rules agreed before the first full extract (15-Jan-2027).
+What remains (updated with the BDOI answers to DMQ36-DMQ39 of 26-Sep-2026, which answer IQ02 and IQ03):
+- **Renewals around T - answered (DMQ37):** the January-May 2028 expiries are processed in BIBS after go-live; no candidate is carried from legacy. At go-live Renewal extracts every expiry from go-live to 31-May-2028, January expiries flagged urgent, and records the renewal advices already sent by hand before go-live from the Excel trackers (rejected rows reviewed maker-checker by the Renewal processing team, DMQ38); RENEWAL_DESIGN section 13.1, FRS BRD-6 v1.1 FR-RN-016. The text that follows is the earlier proposal, kept for the record.
+- **Renewals around T** (IQ02, earlier proposal): unchanged DM design - cohorts T to T+140 days carried forward (object P03, layout P03 in `dm_layouts.yaml`, `renewal.service.port.LegacyPolicySource` implemented by `migration`, DATA_MIGRATION_DESIGN section 15); renewals expiring between the freeze and T placed in legacy or held by hold covers.
+- **Package remapping - answered (DMQ36):** at Renewal sanitation, not at upload. The migration loads the legacy package code and the `PACKAGE` code map only; the check is named `PACKAGE_REMAP` in the build (this document called it `PACKAGE_MAPPING`) and sends unmapped packages to the Exception bucket for the Renewal processing team (RENEWAL_DESIGN sections 8.1 and 13.1; FRS BRD-6 v1.1 FR-RN-028).
+- **Package remapping** (IQ03, DCR-219, earlier proposal): recommended hybrid - a versioned `PACKAGE` code map set at migration intake (add to the code-map list of `dm_layouts.yaml`, today it has no PACKAGE set) plus a renewal sanitation check `PACKAGE_MAPPING` (new bean in `renewal.service.check`, RENEWAL_DESIGN section 8.1) that sends unmapped / retired / split packages to Review for TSU; owner TSU with the MBS steward; rules agreed before the first full extract (15-Jan-2027).
 - **"R0 early renewal" release:** not planned. Note the name clash: R0 is also the first Renewal build wave (RENEWAL_DESIGN section 14).
 
 ## 4. Timeline alignment
@@ -264,6 +268,11 @@ Code references for the seams:
 | Sizing basis | YoY growth 15 %, 60 months; ~1,200 internal users (diagram) | Umbrella BRD p.42: 1,344 named / 429 concurrent (DCR-166); renewal 25,800 accounts and NB 21,200 bookings a month | Gap | One user figure for sizing and the performance test | DCR-232; IQ32 |
 | VDI | 15 users: 8 developers (24 months), 4 testers (18), 3 production support (60); 12 x 5 | Hosting appendix: access restricted to personnel in the Philippines; migration staging purged within 5 days | Gap | Confirm who needs VDI and from where; update the software list | DCR-231; IQ28 |
 
+**Architecture option (IQ25, DCR-222, DCR-223).** The recommendation is recorded in
+[`ARCHITECTURE_OPTION_DECISION.md`](ARCHITECTURE_OPTION_DECISION.md): BIBS stays a modular monolith and takes three
+enterprise elements from the IER (edge security, managed AWS services, separate web / jobs / integration workloads);
+awaiting BDOI confirmation. The register carries it as the proposed resolution of DCR-222 and DCR-223.
+
 BIBS references: `deploy/k8s/brokerverse.yaml` (namespace, two deployments, 2 replicas each, backend 500m / 1 Gi requests and 2 / 2 Gi limits, AWS notes for RDS Multi-AZ, ElastiCache cluster mode disabled, MSK SASL/SCRAM port 9096); `backend/Dockerfile` (`eclipse-temurin:21-jre-alpine`), `frontend/Dockerfile` (`node:22-alpine`, `nginx:1.27-alpine`); `backend/src/main/resources/application.yml` (Redis, Kafka, job crons in UTC); `.github/workflows/ci.yml` (Java 21, Node 22, SonarQube); `docs/operations/RUNBOOK.md` section 6 (daily full backup + WAL, quarterly restore test); `docs/architecture/PLATFORM_CACHE_AND_EVENTS.md`.
 
 ### 6.3 Documents in S3 only (A4; design S6)
@@ -321,6 +330,10 @@ Note for S6: section 1 of DOCUMENT_STORAGE_DECISION.md lists `doc_rendition` amo
 DCR-210 to DCR-235 are proposed for the discrepancy register (drop plan, concept paper, IER, integrations).
 
 ## 8. Edits needed to shared documents
+
+Status 26-Sep-2026: applied in the consolidation of this date (register v1.2, BRD-6 FRS and test plan v1.1, BRD-2 and
+BRD-11 FRS v1.1, the designs named below), except the Employee Benefits rows, which wait for the Employee Benefits build team
+(`docs/deliverables/PENDING_EDITS.md`), and the Developer Guide FileStore rule, which follows build step ST0.
 
 | Document | Edit |
 |---|---|

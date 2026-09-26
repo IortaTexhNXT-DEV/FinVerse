@@ -6,7 +6,7 @@ repository.
 
 | File | Purpose |
 |---|---|
-| `brand.py` | Colours (Header Blue #004EA8, CTA Blue #0072D8, Yellow #FDB913, Background Blue #E5F5FF, border #C2C2C1), logos, client and system names, status colours, `output_name()` |
+| `brand.py` | Colours (Header Blue #004EA8, CTA Blue #0072D8, Yellow #FDB913, Background Blue #E5F5FF, border #C2C2C1), logos, client and system names, status colours, `output_name()`; the **drop map** (`DROPS`, `BRD_DROP`, `DROP_SHARED`, `out_dir()`, `out_path()`) that places every output in its BDOI drop folder |
 | `bdoi_docx.py` | Word builder: Python API (`BdoiDocument`) and the Markdown-like source format (`build_markdown`, CLI) |
 | `bdoi_xlsx.py` | Excel builder (`BdoiWorkbook`, `Column`) |
 | `bdoi_pptx.py` | PowerPoint builder, 16:9 (`BdoiDeck`) |
@@ -34,7 +34,7 @@ python tools/deliverables/bdoi_docx.py docs/deliverables/src/frs/FRS_BRD03_PRODU
 python tools/deliverables/bdoi_docx.py docs/deliverables/src/frs/FRS_BRD03_PRODUCT_MAINTENANCE.md --keep-pdf
 
 # any Office file: PDF plus previews
-python tools/deliverables/render.py docs/deliverables/out/FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx --previews
+python tools/deliverables/render.py docs/deliverables/out/Drop-0_Setup_and_Data_Migration/FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx --previews
 ```
 
 Word and Excel files are the masters and are the only outputs kept in `docs/deliverables/out/`; PDFs are produced
@@ -51,7 +51,13 @@ header tables, empty pages and figure legibility.
 
 - **Sources** live in `docs/deliverables/src/<kind>/` (for example `src/frs/FRS_BRD03_PRODUCT_MAINTENANCE.md`),
   figures in `src/<kind>/figures/`.
-- **Outputs** go to `docs/deliverables/out/<DocType>/` and are committed with their PDF.
+- **Outputs** go to `docs/deliverables/out/<drop folder>/<DocType>/`, grouped by BDOI drop (answer A5 of 26-Sep-2026):
+  `Drop-0_Setup_and_Data_Migration/`, `Drop-1_Transactional/`, `Drop-2_Independent/` and `Programme/` (BRD-00
+  documents: umbrella FRS, register, process deck, alignment pack). The drop of a BRD is `brand.BRD_DROP`, the only
+  drop map of the toolkit; every builder takes its folder from `brand.out_dir(brd, kind)`, so a rebuild lands in the
+  drop folder. A BRD that spans drops lives in its primary drop and is listed in the other drop's index
+  (`brand.DROP_SHARED`); nothing is copied. After a build or a move, regenerate the index `README.md` of every drop
+  folder with `python tools/deliverables/drop_index.py`. Only Word, Excel and PowerPoint masters are committed.
 - **File names**: `BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>`, for example
   `BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx` (`brand.output_name("FRS", "BRD-03", "Product Maintenance", "1.0", "docx")`).
   Pack-wide documents use `BRD-00`.
@@ -80,7 +86,7 @@ version: "1.0"
 date: 25 September 2026
 status: Issued for BDOI review
 header_title: FRS BRD-3 Product Maintenance    # running header
-output: FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx   # under docs/deliverables/out
+output: FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx   # <kind>/<file>; placed in out/<drop of brd>/
 h1_page_break: true                            # each chapter on a new page (default)
 control:                                       # document control table
   - {version: "1.0", date: 25 Sep 2026, author: ..., reviewer: ..., approver: ..., change: ...}
@@ -158,7 +164,7 @@ doc.figure("figures/flow.dot", "Flow")
 doc.requirement({...})            # same keys as the fr block
 doc.glossary({"TSU": "Technical Support Unit"})
 doc.signoff([{"role": "Product Owner", "organisation": "BDOI"}])
-doc.publish("docs/deliverables/out/DMA/BIBS_DMA_BRD-00_Data_Migration_Approach_v1.0.docx")
+doc.publish(brand.out_path("BRD-13", "Migration", "BIBS_Migration_BRD-13_Data_Migration_Approach_v1.0.docx"))
 ```
 
 Excel (`python tools/deliverables/bdoi_xlsx.py out.xlsx` builds a sample):
@@ -171,7 +177,7 @@ wb.sheet("Fit-Gap", [
     Column("id", "BRD ID", 12, "Requirement ID and page"),
     Column("fit", "Fit", 12, "Fit class", values=["FIT", "CONFIGURE", "CHANGE", "NEW", "OUT"], status=True),
 ], rows=[{"id": "BRPM.001", "fit": "FIT"}], description="One row per BRD requirement")
-wb.save("docs/deliverables/out/FitGap/BIBS_FitGap_BRD-03_Product_Maintenance_v1.0.xlsx")
+wb.save(brand.out_path("BRD-03", "FitGap", "BIBS_FitGap_BRD-03_Product_Maintenance_v1.0.xlsx"))
 ```
 
 Each data sheet gets a title band, Header Blue header row (row 4), frozen panes, auto-filter, wrapped text,
@@ -189,5 +195,5 @@ deck.two_column("Roles and screens", "Personas", [...], "Screens", [...])
 deck.screenshot("Submit the request", "tools/screenshots/out/x.png", caption="...", persona="Marketing AO",
                 action="...", expected="...", observation="...")
 deck.table("SLA", ["Stage", "Hours", "Status"], [["Negotiation", "120", "PASS"]], widths=[4, 1, 1])
-deck.save("docs/deliverables/out/Deck/BIBS_Deck_BRD-03_Product_Maintenance_v1.0.pptx")
+deck.save(brand.out_path("BRD-03", "Decks", "BIBS_Deck_BRD-03_Product_Maintenance_v1.0.pptx"))
 ```

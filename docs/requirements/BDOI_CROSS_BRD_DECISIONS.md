@@ -27,6 +27,7 @@ This document holds:
 4. the overlaps removed from the designs (section 4);
 5. the cross-BRD conflicts that remain, as questions (section 5);
 6. the prerequisite work items that more than one build needs, and the recommended build order (section 6).
+7. a glossary of names that mean different things in BDOI's programme documents and in the specs (section 7).
 
 **Question IDs.** Submitted Policies (SQ01-SQ25) and Sanction Screening (SQ01-SQ20) use the same prefix. In this
 document they are written **SP SQnn** and **SANC SQnn** (see XQ07). Other prefixes are unique: Q / BRNB (BRD-1),
@@ -63,6 +64,7 @@ disagrees):
 - **D3, access classes.** `RENEWAL_ADVICE` and `CLAIM_REPORT`, and their access-class rows, are seeded by EB V1031
   with `on conflict do nothing`. V1010 (Renewal) and V1020 (Claims) seed the document types themselves the same way,
   because V1020 runs before V1031 on a fresh database.
+- **D7, dormant (26-Sep-2026).** The BDOI drop plan places "Employee Benefits (no portal feature)" in Drop 2 (DCR-211, IQ22): no `portal` module is built, so there are no external users; the EXTERNAL request type stays refused by the built default adapter. The EB design, FRS and test plan are updated by the EB build team (`docs/deliverables/PENDING_EDITS.md`).
 - **D7, permissions.** EB's `PORTAL_USER_REQUEST` and `PORTAL_USER_APPROVE` become the type-specific permissions of
   EXTERNAL requests in the UAM flow; the UAM segregation rules apply. Lock / unlock and the portal logs stay in
   `portal` (`PORTAL_ADMIN`).
@@ -279,3 +281,16 @@ them: RN-R0, CL-CL0, EB-E0, CSF-S0, SANC-S0, UAM-U0, SP-S0.
 
 Order of the BRDs in short: **BRD-11 with BRD-10, then BRD-7, BRD-8, BRD-9 (core), BRD-6 and BRD-12, with the
 Renewal hand-off (R3) and CSF integration last.**
+
+## 7. Glossary of names used differently (added 26-Sep-2026)
+
+The BDOI drop plan and integration list of 26-Sep-2026 (`docs/source-documents/BDOI_DROP_PLAN.md`) use some names that
+already have another meaning in the specs. Read them as follows.
+
+| Name | In the BDOI drop plan and integration list | In the specs and designs | Rule |
+|---|---|---|---|
+| **CMS** | **Cash Management System** (also "New BOB"): BDO's channel for BDOI's **outward payments** (Drop 0 integration; Disbursement, BRD-5) | **Collection Management System**: the collections BRD and module (BDOI_CLXN_BRD_SPEC.md, `collections`), the Operations feeds, and the Data Migration source value `CMS` (objects C01, F02, F03) | Write "CMS (Cash Management System)" or "CMS / New BOB" for the bank channel, and "Collection Management System" or "Collections" for BRD-4. Register DCR-221 |
+| **BOB** | Old BOB = Old Business Online Banking **Collection** System (SOA bills payments by funds transfer, into Cashiering); New BOB = CMS above (outward payments) | BDO Business Online Banking for disbursement funding and the `DISB_BOB_APPROVED` upload (BRD-5) | Name Old BOB or New BOB explicitly |
+| **R0** | "R0 early renewal" release of the superseded concept paper | First Renewal build wave (RENEWAL_DESIGN section 14) | R0 means the build wave only; the early release is withdrawn |
+| **HLS / LOAS** | One system, HL-LOAS (Home Loan System, Loan Origination and Admin), shown in Drop 0 (HLS) and Drop 2 (LOAS) | HLS insurance report (Submitted Policies), CLPC billing | One integration, two data flows (register DCR-216) |
+| **EUA** | Replaced by EIAM (Enterprise Identity Access Management on Microsoft Entra ID) | BRD-11 NFR: EUA with the Windows ID | Target sign-in is EIAM with OpenID Connect (USER_ACCESS_DESIGN section 10.1; DCR-230) |

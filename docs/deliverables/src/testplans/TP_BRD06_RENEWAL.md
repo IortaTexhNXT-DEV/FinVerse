@@ -8,8 +8,8 @@ doc_code: TestPlan
 brd: BRD-06
 name: Renewal Summary
 doc_id: BIBS-TP-BRD-06
-version: "1.0"
-date: 25 September 2026
+version: "1.1"
+date: 26 September 2026
 status: Issued for BDOI review
 header_title: Test Plan BRD-6 Renewal
 h1_page_break: false
@@ -19,13 +19,19 @@ control:
     author: iorta TechNXT QA
     reviewer: iorta TechNXT Business Analysis
     approver: ""
-    change: Internal draft from FRS BRD-6 v1.0 and the Renewal build design
+    change: Internal draft from FRS BRD-6 v1.1 and the Renewal build design
   - version: "1.0"
     date: 25 Sep 2026
     author: iorta TechNXT QA
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review, with the Excel workbook of the same version
+  - version: "1.1"
+    date: 26 Sep 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Business Analysis
+    approver: BDOI Product Owner (pending)
+    change: "FRS BRD-6 v1.1: cases for the go-live extraction and the RAs already sent (FR-RN-016) and the package remapping at sanitation (FR-RN-028); test data TD-RN-15, TD-RN-16"
 distribution:
   - {name: "Product Owner, Renewal", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Unit Head, Combank and Corbank", role: Approver, organisation: BDOI, purpose: Review and sign-off}
@@ -41,13 +47,13 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-6 Renewal in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-06_Renewal_v1.0.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-6 Renewal in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-06_Renewal_v1.1.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-6 v1.0 and to the BRD requirement IDs (BRRN.nnn and the persona line IDs 1.001 to 6.002) that the FR meets. Renewal is **designed and not yet built**. The expected results therefore quote the message texts of the FRS without codes, the screen paths are those of the build design, and no case names an automated test yet. Where a Renewal check reuses a message that the platform already shows (log-in, bulk upload, account completeness), the case quotes the text BIBS shows today and a finding records the difference from the FRS (section 9).
+Every case traces to a functional requirement (FR) of FRS BRD-6 v1.1 and to the BRD requirement IDs (BRRN.nnn and the persona line IDs 1.001 to 6.002) that the FR meets. Renewal is **designed and not yet built**. The expected results therefore quote the message texts of the FRS without codes, the screen paths are those of the build design, and no case names an automated test yet. Where a Renewal check reuses a message that the platform already shows (log-in, bulk upload, account completeness), the case quotes the text BIBS shows today and a finding records the difference from the FRS (section 9).
 
 ## Scope
 
-In scope are all 54 FRs of FRS BRD-6 v1.0 and every BRD ID they trace to:
+In scope are all 56 FRs of FRS BRD-6 v1.1 and every BRD ID they trace to:
 
 - log-in, sessions, tabs, roles, data scope, profiles and the audit trail (FR-RN-001 to 004);
 - extraction at the lead days and for any range, filters, the scrollable list, export, print and initiation (FR-RN-010 to 015);
@@ -77,12 +83,12 @@ The main BRD repeats most capabilities once per persona. The FRS traces its 1,03
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-6 Renewal (`BIBS_FRS_BRD-06_Renewal_v1.0.docx`) | 1.0, 25 Sep 2026 |
+| R1 | Functional Requirements Specification BRD-6 Renewal (`BIBS_FRS_BRD-06_Renewal_v1.1.docx`) | 1.1, 26 Sep 2026 |
 | R2 | Renewal BRD pack: Workshop addendum, Addendum 1 and RMEL Phase 2 BRD (`docs/source-documents/Renewal (RN) BRD.pdf`) | BRD v1.0 9-May-2025; addenda 18-Nov-2025 and 8-Apr-2026 |
-| R3 | Test plan workbook BRD-6 (`BIBS_TestPlan_BRD-06_Renewal_v1.0.xlsx`) | 1.0 |
+| R3 | Test plan workbook BRD-6 (`BIBS_TestPlan_BRD-06_Renewal_v1.1.xlsx`) | 1.1 |
 | R4 | Renewal build design (`docs/architecture/RENEWAL_DESIGN.md`) | current |
 | R5 | Cross-BRD decisions (`docs/requirements/BDOI_CROSS_BRD_DECISIONS.md`) | current |
-| R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |
+| R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`) | 1.2 |
 
 # Test approach
 
@@ -131,7 +137,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 |---|---|
 | System test | The Renewal module is deployed on SIT with its jobs (RNW_EXTRACTION, RNW_REEVALUATE, RNW_NRNS_LETTERS, RNW_EXPIRY_SWEEP); the shared change BT0 (business type on the account) is deployed; CI is green on the deployed commit; the data sets of section 4.2 are loaded; the test mailboxes of clients and insurers receive mail; the developers have added the automation references to the workbook. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical defect; notifications and the e-mail relay work on SIT; the Submitted Policies hand-off (BRD-12) is deployed for SC-RN-10. |
-| UAT | FRS BRD-6 v1.0 is signed off or its open comments are agreed; the open questions that change expected results (RQ01, RQ08, RQ10, RQ15, RQ24) are answered or their test values agreed; the system test exit criteria are met; the UAT environment holds masked data; BDOI testers have user IDs with the roles of section 5. |
+| UAT | FRS BRD-6 v1.1 is signed off or its open comments are agreed; the open questions that change expected results (RQ01, RQ08, RQ10, RQ15, RQ24) are answered or their test values agreed; the system test exit criteria are met; the UAT environment holds masked data; BDOI testers have user IDs with the roles of section 5. |
 
 ## Exit criteria
 

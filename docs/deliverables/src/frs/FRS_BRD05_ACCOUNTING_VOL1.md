@@ -90,8 +90,8 @@ Each volume has its own traceability chapter. Cross-references to the other volu
 | R4 | BDOI Accounting, Disbursement and ACSL (BRD-5) requirements baseline and fit/gap | current | `docs/requirements/BDOI_ACCT_BRD_SPEC.md` |
 | R5 | Accounting, Disbursement and ACSL build design, including section 17 and the as-built notes A1-GL, A1-PRQ, A1-DSB, A1-FRBS | current | `docs/architecture/ACCOUNTING_DISBURSEMENT_DESIGN.md` |
 | R6 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R7 | BRD-5 FRS Volume 2 (Disbursement, Payment Requests, ACSL) | v1.0 | `docs/deliverables/out/FRS/BIBS_FRS_BRD-05_Accounting_Disbursement_ACSL_Vol2_v1.0.docx` |
-| R8 | BRD-2 Operations FRS (receipts, remittance, commission) | v1.0 | `docs/deliverables/out/FRS/BIBS_FRS_BRD-02_Operations_v1.0.docx` |
+| R7 | BRD-5 FRS Volume 2 (Disbursement, Payment Requests, ACSL) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/FRS/BIBS_FRS_BRD-05_Accounting_Disbursement_ACSL_Vol2_v1.0.docx` |
+| R8 | BRD-2 Operations FRS (receipts, remittance, commission) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/FRS/BIBS_FRS_BRD-02_Operations_v1.0.docx` |
 
 Page references ("p.51") are pages of the BRD-5 PDF. "Add.1" is Addendum 1 (pp.28-39) and "Add.2" is the Workshop Addendum (pp.1-15). The BRD numbers the Accounting access rows "BRD 1.1.0-1.1.3"; this FRS writes them FRBS 1.1.0-1.1.3. The second row numbered FRBS 3.6.0 (item q, p.66) is written FRBS 3.6.0b.
 

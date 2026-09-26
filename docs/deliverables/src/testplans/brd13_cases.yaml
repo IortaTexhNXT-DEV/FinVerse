@@ -1,0 +1,1656 @@
+# Test plan BRD-13 Data Migration - test data file.
+# Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/testplans/brd13_cases.yaml
+# Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
+# BRD-13 is designed, not built: the expected results quote the message text of the FRS and the build design
+# (docs/architecture/DATA_MIGRATION_DESIGN.md) without codes, and no case names an automated test. Screen paths
+# follow section 22 of the build design (sidebar section Data Migration). Test data are masked extracts in the
+# layouts of the BDOI Data Requirements Workbook (docs/deliverables/out/Migration). Account names only: the legacy
+# control accounts and Migration Clearing are assigned by Comptrollership (DMQ18).
+
+meta:
+  brd: BRD-13
+  name: Data Migration
+  code: DM
+  frs: FRS_BRD13_DATA_MIGRATION.md
+  summary: TP_BRD13_DATA_MIGRATION.md
+  version: "1.0"
+  date: 26 September 2026
+  built: false
+
+personas:
+  DML: {name: Data Migration Lead, short: DM Lead}
+  STEWARD: {name: Data Steward, short: Steward}
+  OWNER: {name: Data owner (business owner of the object), short: Owner}
+  OPERATOR: {name: Migration Operator, short: Operator}
+  RECON: {name: Reconciliation approver (Comptrollership), short: Recon}
+  GONOGO: {name: Go / no-go board member, short: Go / no-go}
+  PM: {name: Program Manager, short: PM}
+  MKT_AO: {name: Marketing User (AO), short: MKT AO}
+  OPS_USER: {name: Operations User (Adjustment processor), short: Ops}
+  ADJ_TL: {name: Adjustment TL, short: Adj TL}
+  CASHIER: {name: Cashiering User, short: Cashier}
+  CASHIER_TL: {name: Cashiering TL, short: Cash TL}
+  TOPMGMT: {name: Finance Approver (top management), short: Top mgmt}
+  ACCT: {name: Accounting User, short: Acct}
+  COMMREC_TL: {name: Commission TL, short: Comm TL}
+  REMIT: {name: Remittance User, short: Remit}
+  PRC: {name: Prod Recon Analyst, short: Prod Recon}
+  AUDIT: {name: Audit / Compliance User (Legacy Inquiry), short: Inquiry}
+  ACCESS_REV: {name: Compliance reviewer (access log), short: Log rev.}
+  SYSTEM: {name: BIBS scheduled job or event}
+
+screens:
+  HOME: Data Migration > Migration Home
+  OBJ: Data Migration > Data Objects
+  OBJDEC: Data Migration > Data Objects > (object) Decision tab
+  MAPS: Data Migration > Code Maps
+  UNMAPPED: Data Migration > Code Maps > Unmapped tab
+  LAYOUTS: Data Migration > Layouts and Rules
+  EXTRACTS: Data Migration > Extracts
+  BATCH: Data Migration > Batches > (batch) Batch page
+  ISSUES: Data Migration > Batches > (batch) Issues tab
+  MATCH: Data Migration > Client Matching
+  RECONC: Data Migration > Reconciliation
+  RECGL: Data Migration > Reconciliation > GL tab
+  SIGNOFF: Data Migration > Sign-off
+  CUTOVER: Data Migration > Cutover
+  GONOGO: Data Migration > Cutover > Go / No-go tab
+  RUNOFF: Data Migration > Run-off and Decommissioning
+  INQUIRY: Inquiry > Legacy Inquiry
+  ACCLOG: Inquiry > Legacy Inquiry > Access Log
+  APPROVALS: My Approvals
+  CLIENTS: Clients > Client search
+  ACCOUNTS: Accounts > Account search
+  INV360: Operations > Invoices > Invoice 360
+  UNAPPLIED: Cashiering > Unapplied Payments
+  PAYMENT: Cashiering > Receive Payment (OTC)
+  PAYUPLOAD: Cashiering > Payment Uploads
+  RECLASS: Cashiering > UPP Income Reclassification
+  PR2307REV: Cashiering > PR2307 Legacy Reversal
+  DPPRREV: Commission > DPPR Legacy Reversal
+  REMEXTRACT: Remittance > Extraction workbench
+  ENDORSE: Adjustment > New Endorsement Request
+  RENEWAL: Renewal > Renewal candidates
+  REPORTS: Reports > Report Centre
+  ACSL: Accounting > ACSL GL to Sub-ledger Reconciliation
+  JOURNAL: Accounting > Journal inquiry
+  DISBQ: Disbursement > Payment requests
+  API: API call with the user's token (tester tool, for example Postman)
+
+data:
+  - id: TD-DM-01
+    name: Test users per migration role
+    content: miglead (DATA_MIGRATION_LEAD), migsteward (DATA_STEWARD), migowner and migowner2 (DATA_OWNER), migops (MIGRATION_OPERATOR), migrecon (MIGRATION_RECON_APPROVER), miggonogo (MIGRATION_GONOGO), legacyaudit (LEGACY_INQUIRY), legacyrev (LEGACY_ACCESS_REVIEWER), topmgmt (TOP_MANAGEMENT_APPROVER), plus the built Operations users (cashier, cashiertl, commrectl, remit, adjuster, adjtl, reconhandler, ao).
+    source: Planned demo seed V1980 of the build design; existing Operations demo users
+  - id: TD-DM-02
+    name: Reference extracts
+    content: R01 (MARKET_SEGMENT with 12 values, one unmapped code OLD-RET and one CREATE value WALKIN), R04 (insurers, one unmapped code), R05 (products), R08 (GL account map), R11 (receipt series).
+    source: Masked sample extracts in backend/src/main/resources/demo/migration/ (build wave DM3) prepared by the test lead in the workbook layouts
+  - id: TD-DM-03
+    name: Client extracts
+    content: C01 and C02 from QPS (600 clients) and EBIX (400 clients) with 40 exact duplicates on TIN, 15 pairs with similar names and the same birth date, 5 clients already in BIBS, 3 rows without birth date; a client delta file of the next day with 10 new and 5 changed clients.
+    source: Masked extracts prepared by the test lead
+  - id: TD-DM-04
+    name: Policy header and RMEL extracts
+    content: P01 and P01S with 300 in-force headers (20 with two insurers, one with shares adding to 90); P03 with 60 candidates expiring from T to T+140 and one row without a header.
+    source: Masked extracts prepared by the test lead
+  - id: TD-DM-05
+    name: Open legacy invoices
+    content: F01, F01S, F01C with 1,000 invoices - I00123456 (basic 20,000.00, paid 10,000.00, open 10,000.00), invoices paid in full and not remitted, direct-payment invoices with open PR, invoices with PR2307 balance, 20 USD invoices, one invoice whose components do not add up to its gross premium, one invoice number used in EBIX and QPS; control file with totals per component and currency.
+    source: Masked extracts prepared by the test lead with Comptrollership
+  - id: TD-DM-06
+    name: Legacy UPP
+    content: F02 with 200 items - a 5,000.00 item quoting legacy invoice I00200001 (3,000.00 open) and new invoice BI-2027-000150 (2,000.00 open); a 1,500.00 item older than 2 years; items without references; one item with a refund in progress.
+    source: Masked extracts prepared by the test lead
+  - id: TD-DM-07
+    name: GL trial balance
+    content: G01 per branch and currency, balanced, whose legacy control-account lines equal the F01 and F02 detail; a second version with one control line 3,000.00 higher.
+    source: Prepared by the test lead with Comptrollership
+  - id: TD-DM-08
+    name: Archive extracts
+    content: H01 with 500 records over the record types (a closed 2022 invoice I00098765) and H02 with 50 documents and their SHA-256.
+    source: Masked extracts prepared by the test lead
+  - id: TD-DM-09
+    name: Configuration for the tests
+    content: "Parameters as delivered - MIG_ENVIRONMENT_CLASS NON_PRODUCTION, MIG_STAGING_RETENTION_DAYS 5, MIG_CHUNK_SIZE 500, MIG_PARTITIONS 4, MIG_AMOUNT_TOLERANCE 0.00, MIG_MAX_ERROR_RATE_MASTER 0.5, MIG_MAX_ERROR_RATE_FINANCIAL 0, MIG_CLIENT_MATCH_AUTO 90, MIG_CLIENT_MATCH_REVIEW 60, MIG_ARCHIVE_EXPORT_MAX_ROWS 1000, MIG_ACCESS_EXPORT_ALERT_ROWS 5000; legacy control accounts, Migration Clearing and LG_ rule lines set up on the test chart."
+    source: Configuration delivered with the build (FRS section 9); demo V1982
+  - id: TD-DM-10
+    name: New BIBS invoices and payments
+    content: BIBS invoice BI-2027-000150 with 2,000.00 open; a Direct Credit payment file with one row carrying EBIX reference I00123457 and one row for a BIBS invoice; an approved client payout account.
+    source: Built Operations demo data; payment file prepared by the test lead
+
+scenarios:
+  - id: SC-DM-01
+    persona: DML
+    title: Governance. The Data Migration Lead registers the objects, the owners decide their class, and every object passes the sign-off gates in order.
+    pre: Users TD-DM-01.
+  - id: SC-DM-02
+    persona: OPERATOR
+    title: Intake to load. Extracts are received with control files, staged, mapped, validated, loaded through the BIBS services, rerun and rolled back.
+    pre: Reference TD-DM-02 and invoice TD-DM-05 extracts.
+  - id: SC-DM-03
+    persona: RECON
+    title: Reconciliation. Each object is reconciled at L1-L4 and the financial objects at L5; Migration Clearing nets to zero.
+    pre: Loads of SC-DM-02; TB TD-DM-07.
+  - id: SC-DM-04
+    persona: STEWARD
+    title: Client master and reference data. Codes are mapped and created; legacy clients are matched, deduplicated and created as active clients.
+    pre: Extracts TD-DM-02 and TD-DM-03.
+  - id: SC-DM-05
+    persona: CASHIER
+    title: Legacy open items. Legacy invoices and UPP are processed with the BIBS screens - OTC, autopay, automatch, dispositions, refund and reclassification to income.
+    pre: Invoices TD-DM-05, UPP TD-DM-06, payments TD-DM-10.
+  - id: SC-DM-06
+    persona: ACCT
+    title: Reversals, remittance and endorsements on legacy invoices, and the Prod Recon change report.
+    pre: Invoices TD-DM-05; headers TD-DM-04.
+  - id: SC-DM-07
+    persona: AUDIT
+    title: History. Archived records are searched in Legacy Inquiry and every access is logged and reviewed.
+    pre: Archive TD-DM-08.
+  - id: SC-DM-08
+    persona: PM
+    title: Cutover. A mock plan is run, go / no-go is decided on measured criteria, renewals move by RMEL cohort and legacy systems are decommissioned on the checklist.
+    pre: All objects loaded in a mock.
+
+frs:
+  FR-DM-001:
+    scenario: SC-DM-01
+    persona: DML
+    screen: OBJ
+    data: [TD-DM-01]
+    conditions:
+      - A new object is saved as PROPOSED with its four criteria and shown in the register.
+      - An object cannot be given a load order before an object it depends on.
+      - An Excluded object stays in the register and cannot be loaded.
+      - An object code is unique and the rationale is mandatory.
+    cases:
+      - c: 1
+        type: Positive
+        title: Register the client master object
+        steps:
+          - Click New Object; enter code C01, name, category Client, source systems QPS and EBIX, target, owner migowner, steward migsteward.
+          - Enter the four criteria (Day-1 need Yes, compliance need Yes, archival option No, data trust Medium), proposed class Migrate, load order 5, rationale; Save.
+        expected: C01 is listed with status PROPOSED, its criteria, owner and steward; the audit shows the creation.
+      - c: 2
+        type: Negative
+        title: Load order before a dependency
+        steps:
+          - Open P01; set Depends on C01 and load order 4; Save.
+        expected: Not saved.
+        msg: [The load order must follow the objects this object depends on]
+      - c: 3
+        type: Negative
+        screen: BATCH
+        title: Excluded object cannot be loaded
+        steps:
+          - After R10 is DECIDED as Excluded, open Batches, New Batch and look for R10 in the object list.
+        expected: R10 is not offered; the register still lists R10 as Excluded.
+      - c: 4
+        type: Negative
+        title: Duplicate code and missing rationale
+        steps:
+          - Create a second object with code C01; Save.
+          - Create object X99 without a rationale; Save.
+        expected: "Both are refused. The second check shows \"Enter the rationale for the proposed class\"."
+        msg: ["This object code already exists"]
+
+  FR-DM-002:
+    scenario: SC-DM-01
+    persona: DML
+    screen: OBJDEC
+    data: [TD-DM-01]
+    conditions:
+      - A decision approved by the business owner sets the object to DECIDED with the approved class.
+      - The submitter cannot approve their own decision.
+      - A returned decision goes back to PROPOSED and needs a reason.
+      - A class change from Migrate to Excluded is refused while a batch of the object is loaded.
+      - The report MIG-DECISIONS lists every decision with its approver.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Submit and approve the decision of C01
+        steps:
+          - As miglead click Submit Decision on C01.
+          - As migowner open My Approvals, open C01 and click Approve.
+        expected: C01 moves FOR_DECISION then DECIDED with class Migrate; miglead is notified of the approval.
+      - c: 2
+        type: Security-access
+        title: Submitter approves own decision
+        persona: OWNER
+        pre: A user holding both DATA_MIGRATION_LEAD and DATA_OWNER submitted the decision.
+        steps:
+          - As that user click Approve.
+        expected: Refused; the decision stays FOR_DECISION.
+        msg: [A record cannot be authorized by the user who maintained it]
+      - c: 3
+        type: Negative
+        persona: OWNER
+        screen: APPROVALS
+        title: Return without a reason
+        steps:
+          - Click Return on a submitted decision without a reason; then enter a reason and Return.
+        expected: The first attempt is refused; the second returns the object to PROPOSED.
+        msg: [Enter the reason for the return]
+      - c: 4
+        type: Negative
+        title: Change class with loaded data
+        pre: A batch of R01 is LOADED and not rolled back.
+        steps:
+          - Submit a new decision for R01 with class Excluded.
+        expected: Refused.
+        msg: [Roll back the loaded batches before changing the class of this object]
+      - c: 5
+        type: Report-output
+        screen: REPORTS
+        title: Decision history report
+        steps:
+          - Run MIG-DECISIONS for the test period; export to Excel.
+        expected: Every decision is listed with class, criteria, submitter, approver and dates; the Excel file has the same rows.
+
+  FR-DM-003:
+    scenario: SC-DM-01
+    persona: DML
+    screen: SIGNOFF
+    data: [TD-DM-01]
+    conditions:
+      - An object reaches G6 only after G1-G5 are signed in order.
+      - The operator of a batch cannot sign its reconciliation; one person cannot sign two gates of the same batch.
+      - G5 cannot be signed while a break is open.
+      - The Sign-off screen shows per object and environment which gates are signed, by whom and when.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Sign G1 to G6 of R01 in order
+        steps:
+          - Sign G1 and G2 as migowner, G3 as migsteward, G4 as miglead, G5 as migrecon, G6 as migowner2 and miglead.
+        expected: Each gate is recorded with role, user, time and comment; R01 shows ACCEPTED for SIT.
+      - c: 1
+        type: Negative
+        title: Sign G6 before G5
+        steps:
+          - On a batch whose G5 is not signed, try to sign G6.
+        expected: Refused.
+        msg: [Sign the previous gate first]
+      - c: 2
+        type: Security-access
+        persona: OPERATOR
+        title: Operator signs the reconciliation of own batch
+        pre: migops ran the batch and was given MIG_RECON_SIGNOFF for this test.
+        steps:
+          - As migops sign G5 of the batch.
+        expected: Refused.
+        msg: [A record cannot be authorized by the user who maintained it]
+      - c: 3
+        type: Negative
+        persona: RECON
+        title: Sign G5 with an open break
+        steps:
+          - Open a reconciliation with one BREAK without explanation; click Sign.
+        expected: Refused.
+        msg: [Explain and approve every break before signing the reconciliation]
+      - c: 4
+        type: Report-output
+        title: Gate matrix
+        steps:
+          - Open Sign-off; filter environment SIT.
+        expected: One row per object with G1-G7; signed gates show user and date; MIG-SIGNOFF-STATUS gives the same content.
+
+  FR-DM-010:
+    scenario: SC-DM-02
+    persona: OPERATOR
+    screen: EXTRACTS
+    data: [TD-DM-02, TD-DM-05]
+    conditions:
+      - A file whose rows, amounts and hash total agree with its control file is staged and numbered MGX-yyyy-nnnnnn.
+      - A file with one row fewer than the control count, a wrong checksum, a wrong header, a wrong amount total or a wrong hash total is rejected and nothing is staged.
+      - The same file sent twice and a delta with an earlier as-of date are refused.
+      - In a non-production environment staged client names and TINs are masked, always the same way; in production they are not.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Upload F01C with its control file
+        steps:
+          - Choose object F01, source EBIX, mode FULL; upload F01C_EBIX_20270226_01.csv and its .ctl.csv.
+        expected: The extract gets an MGX number, status STAGED, and shows the row count and the totals per component and currency of the control file.
+      - c: 2
+        type: Negative
+        title: One row missing
+        steps:
+          - Upload a data file with one row deleted and the original control file.
+        expected: REJECTED; nothing staged; alert to the Data Migration Lead.
+        msg: ["The file has {999} rows; the control file says {1000}"]
+      - c: 2
+        type: Negative
+        title: Checksum and header mismatch
+        steps:
+          - Upload a file edited after the control file was made; then a file with column open_balance renamed.
+        expected: "Both REJECTED. The second check shows \"The file columns do not match layout version 1: missing open_balance, extra open_bal\"."
+        msg: ["The file does not match the checksum in the control file"]
+      - c: 2
+        type: Negative
+        title: Amount and hash totals mismatch
+        steps:
+          - Upload a file with one open_balance changed by 1.00 and its checksum recomputed; then a file with one invoice number changed.
+        expected: "Both REJECTED with the difference. The second check shows \"The hash total of the key column does not match the control file\"."
+        msg: ["The total of {open_balance} in {PHP} is {x}; the control file says {y}"]
+      - c: 3
+        type: Negative
+        title: Duplicate file and out-of-order delta
+        steps:
+          - Upload the accepted file of case 1 again.
+          - Upload a C01 delta with as-of date one day before the last C01 extract.
+        expected: "Both refused. The second check shows \"The as-of date is earlier than the last extract of this object\"."
+        msg: ["This file was already received as extract {MGX-2027-000001}"]
+      - c: 4
+        type: Positive
+        screen: ISSUES
+        data: [TD-DM-03, TD-DM-09]
+        title: Masking outside production
+        steps:
+          - Upload C01 twice in SIT under two different file names with one row changed; open the staged rows.
+        expected: Names, TIN, e-mail, mobile and birth date are masked; the same client has the same masked values in both extracts; amounts and codes are unchanged.
+
+  FR-DM-011:
+    scenario: SC-DM-04
+    persona: STEWARD
+    screen: MAPS
+    data: [TD-DM-02]
+    conditions:
+      - An approved version supersedes the previous one and is used by the next validated batch.
+      - A version mapping to a BIBS code that does not exist cannot be approved.
+      - A legacy code mapped twice in one version is refused.
+      - The approver is never the submitter.
+      - Each batch shows the map versions it used.
+    cases:
+      - c: 1
+        type: Workflow
+        title: New version of INSURER approved
+        steps:
+          - Create a DRAFT copied from the approved version; add MAL of QPS mapped to INS-MAL; Submit.
+          - As migowner compare with the approved version and Approve.
+        expected: Version 2 is APPROVED and version 1 SUPERSEDED; the comparison showed one added entry.
+      - c: 2
+        type: Negative
+        persona: OWNER
+        title: Target code does not exist
+        steps:
+          - Submit a version mapping XYZ to INS-NOPE; as migowner Approve.
+        expected: Not approved.
+        msg: ["Target code {INS-NOPE} does not exist in {INSURER}"]
+      - c: 3
+        type: Negative
+        title: Same legacy code twice
+        steps:
+          - Add MAL of QPS twice in a DRAFT; Save.
+        expected: Refused.
+        msg: ["Legacy code {MAL} of {QPS} is mapped twice"]
+      - c: 4
+        type: Security-access
+        title: Submitter approves own version
+        pre: migsteward also holds MIG_MAPPING_APPROVE for this test.
+        steps:
+          - Submit a version and Approve it as the same user.
+        expected: Refused.
+        msg: [A record cannot be authorized by the user who maintained it]
+      - c: 5
+        type: Upload-download
+        screen: BATCH
+        title: Map versions on the batch and Excel round trip
+        steps:
+          - Export the INSURER set to Excel, add one entry, import it as a DRAFT.
+          - Validate an R04 batch; open the batch page.
+        expected: The import creates a DRAFT with the new entry; the batch lists the set versions it used.
+
+  FR-DM-012:
+    scenario: SC-DM-04
+    persona: STEWARD
+    screen: UNMAPPED
+    data: [TD-DM-02]
+    conditions:
+      - A staged row whose insurer code is not mapped appears in MIG-UNMAPPED-CODES with its legacy key.
+      - The load of that batch cannot be approved until the code is mapped and the batch validated again.
+      - The report exports to Excel and PDF.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Unmapped insurer listed
+        steps:
+          - Validate the R04 batch with one unmapped insurer code; open the Unmapped tab.
+        expected: The code is listed with set INSURER, source, row count and sample keys; alert to the steward.
+      - c: 2
+        type: Negative
+        persona: DML
+        screen: BATCH
+        title: Approve load with unmapped codes
+        steps:
+          - Click Approve Load on that batch.
+        expected: Refused.
+        msg: ["The batch has {1} unmapped codes; map them before approving the load"]
+      - c: 2
+        type: Positive
+        title: Code mapped and batch revalidated
+        steps:
+          - Add the code in a new version; approve it; validate the batch again.
+        expected: The code disappears from the report; Approve Load is possible.
+      - c: 3
+        type: Report-output
+        screen: REPORTS
+        title: Export the report
+        steps:
+          - Run MIG-UNMAPPED-CODES; export to Excel and to PDF.
+        expected: Both files hold the same rows as the screen.
+
+  FR-DM-013:
+    scenario: SC-DM-02
+    persona: OPERATOR
+    screen: ISSUES
+    data: [TD-DM-05, TD-DM-03]
+    conditions:
+      - A legacy invoice whose components do not add up to its gross premium is INVALID with that message.
+      - A waived row shows the waiver reason and the data owner who approved it.
+      - A batch of open invoices with one INVALID row cannot be approved for load unless the row is excluded by the data owner.
+      - Master data can be approved for load with at most 0.5 percent of rows rejected or waived.
+    cases:
+      - c: 1
+        type: Negative
+        title: Components do not add up
+        steps:
+          - Validate the F01 batch; open the Issues tab filtered on ERROR.
+        expected: The invoice is INVALID.
+        msg: ["The premium components add up to {x}; the gross premium is {y}"]
+      - c: 1
+        type: Negative
+        data: [TD-DM-03]
+        title: Mandatory and format errors on clients
+        steps:
+          - Validate the C01 batch with 3 rows without birth date and one TIN of 5 digits.
+        expected: "The rows are INVALID with their messages. The second check shows \"TIN 12345 is not a valid TIN\"."
+        msg: ["{Birth date} is mandatory"]
+      - c: 2
+        type: Workflow
+        persona: OWNER
+        data: [TD-DM-03]
+        title: Waive a client row
+        steps:
+          - As migsteward propose a waiver of one client row; as migowner approve it with reason Obsolete record.
+        expected: The row shows WAIVED with the reason and migowner as approver.
+      - c: 3
+        type: Negative
+        persona: DML
+        screen: BATCH
+        title: Approve F01 load with one INVALID row
+        steps:
+          - Click Approve Load on the F01 batch.
+        expected: Refused while the row is INVALID; after migowner excludes it with a manual-entry plan, approval is possible.
+        msg: ["{0.1} percent of rows have errors; the limit for this object is {0} percent"]
+      - c: 4
+        type: Boundary
+        persona: DML
+        screen: BATCH
+        data: [TD-DM-03, TD-DM-09]
+        title: Master data error rate at the limit
+        steps:
+          - Validate a C01 batch of 1,000 rows with 5 invalid rows (0.5 percent); Approve Load.
+          - Validate a batch of 1,000 rows with 6 invalid rows (0.6 percent); Approve Load.
+        expected: The first is approved; the second is refused with the rate and the limit.
+
+  FR-DM-014:
+    scenario: SC-DM-02
+    persona: OPERATOR
+    screen: BATCH
+    data: [TD-DM-02, TD-DM-03]
+    conditions:
+      - Loading the same batch twice creates no duplicate; the second run marks the rows SKIPPED.
+      - A client created by a load is found in client search and has a cross-reference to its legacy key.
+      - The batch page shows staged, loaded, skipped, rejected and excluded counts that add up.
+      - An object loads only after the objects it depends on are accepted, and the approver of the load is not the operator.
+    cases:
+      - c: 1
+        type: Positive
+        title: Load R01 twice
+        steps:
+          - As miglead Approve Load; as migops click Load; after completion run Load again.
+        expected: First run LOADED; second run marks every row SKIPPED; no LOV value is duplicated.
+      - c: 2
+        type: Positive
+        screen: CLIENTS
+        title: Loaded client found by legacy number
+        steps:
+          - After the C01 load, search client search with legacy number Q-0012345.
+        expected: The BIBS client opens; it shows source QPS and legacy number Q-0012345.
+      - c: 3
+        type: Report-output
+        title: Counts add up
+        steps:
+          - Open the batch page of the C01 load; run MIG-BATCH-LOG.
+        expected: loaded + skipped + rejected + excluded = staged; the log lists each step with counts and times.
+      - c: 4
+        type: Negative
+        title: Dependency not accepted
+        steps:
+          - Approve and load a P01 batch while C01 is not accepted (G6) in the environment.
+        expected: Refused.
+        msg: ["Object {C01} must be accepted before this object can load"]
+      - c: 4
+        type: Security-access
+        persona: DML
+        title: Operator approves own load
+        pre: migops is given MIG_LOAD_APPROVE for this test.
+        steps:
+          - As migops approve the load of the batch migops will run.
+        expected: Refused.
+        msg: [A record cannot be authorized by the user who maintained it]
+
+  FR-DM-015:
+    scenario: SC-DM-02
+    persona: DML
+    screen: BATCH
+    data: [TD-DM-03, TD-DM-05]
+    conditions:
+      - A rerun batch loads only the previously rejected rows and its counts are added to the parent batch reconciliation.
+      - A rollback of a client batch without later activity leaves no active migrated client of that batch.
+      - A rollback is refused when a payment was applied to a legacy invoice of the batch.
+      - The approver of a rollback is not the requester.
+    cases:
+      - c: 1
+        type: Positive
+        title: Rerun rejected clients
+        steps:
+          - Fix the 3 rejected rows at source; upload the new extract; click Rerun Rejects; approve and load.
+        expected: A child batch with 3 rows loads them; the parent reconciliation shows the combined counts.
+      - c: 2
+        type: Workflow
+        persona: RECON
+        title: Roll back a client batch
+        steps:
+          - As miglead click Request Rollback with a reason; as migrecon approve.
+        expected: The batch is ROLLED_BACK; no client of the batch is active; the log lists each undone record.
+      - c: 3
+        type: Negative
+        title: Rollback after a payment
+        steps:
+          - Apply an OTC payment to one invoice of the F01 batch; request the rollback of F01.
+        expected: Refused.
+        msg: ["{1} records were changed after the load and cannot be rolled back"]
+      - c: 4
+        type: Security-access
+        title: Requester approves own rollback
+        pre: miglead is given MIG_ROLLBACK_APPROVE for this test.
+        steps:
+          - Request and approve the same rollback as miglead.
+        expected: Refused.
+        msg: [A record cannot be authorized by the user who maintained it]
+
+  FR-DM-020:
+    scenario: SC-DM-03
+    persona: RECON
+    screen: RECONC
+    data: [TD-DM-05]
+    conditions:
+      - For a batch of 1,000 open invoices loaded without rejects, L1 shows 1,000 at every stage and L2 shows 0.00 difference per currency.
+      - A field changed in BIBS after the load appears as an L4 break on the next reconciliation.
+      - The reconciliation cannot be signed while a break has no approved explanation.
+      - MIG-RECON-SUMMARY and MIG-RECON-DETAIL export to Excel and PDF.
+    cases:
+      - c: 1
+        type: Positive
+        title: F01 reconciled L1-L3
+        steps:
+          - After the F01 load open Reconciliation for the batch.
+        expected: L1 1,000 received, staged, loaded; L2 0.00 difference per component and currency (PHP, USD); L3 hash equal; all MATCHED.
+      - c: 2
+        type: Negative
+        title: Field changed after load
+        steps:
+          - Change the due date of one migrated invoice through a test correction; click Reconcile.
+        expected: L4 shows one BREAK on due_date with the staged and BIBS values.
+      - c: 3
+        type: Negative
+        title: Sign with an unexplained break
+        steps:
+          - Click Sign with the L4 break open.
+          - As migsteward explain the break (reason Legacy data error); as migrecon approve; Sign.
+        expected: The first Sign is refused; after the approved explanation G5 is signed.
+        msg: [Explain and approve every break before signing the reconciliation]
+      - c: 4
+        type: Report-output
+        screen: REPORTS
+        title: Export reconciliation reports
+        steps:
+          - Run MIG-RECON-SUMMARY and MIG-RECON-DETAIL for the batch; export each to Excel and PDF.
+        expected: The files match the screen, including the break and its explanation.
+
+  FR-DM-021:
+    scenario: SC-DM-03
+    persona: RECON
+    screen: RECGL
+    data: [TD-DM-05, TD-DM-06, TD-DM-07]
+    conditions:
+      - After the loads of open invoices, UPP and the trial balance of a branch, Migration Clearing is 0.00 in PHP and USD.
+      - The ACSL reconciliation of the legacy Premium Receivable account against the legacy invoices shows no difference.
+      - An open invoice missing from the load shows as a Migration Clearing difference equal to its open balance, and the GL level cannot be signed.
+    cases:
+      - c: 1
+        type: Positive
+        title: Migration Clearing nets to zero
+        steps:
+          - Load F01, F02 and G01 for branch MKT01; run MIG-GL-CLEARING.
+        expected: Migration Clearing 0.00 in PHP and in USD for MKT01.
+      - c: 2
+        type: Positive
+        screen: ACSL
+        title: Legacy control account against its sub-ledger
+        steps:
+          - Run the ACSL GL to Sub-ledger Reconciliation with ledger context LEGACY for Premium Receivable - Legacy.
+        expected: No difference; the new Premium Receivable account reconciles to the BIBS invoices only.
+      - c: 3
+        type: Negative
+        title: Missing invoice
+        steps:
+          - Exclude one invoice with 3,000.00 open from the F01 load; load G01; run MIG-GL-CLEARING; try to sign the GL level.
+        expected: Migration Clearing shows 3,000.00 for MKT01 PHP; alert to Comptrollership; sign-off refused.
+        msg: ["Migration Clearing is {3,000.00} in {MKT01} {PHP}; it must be zero"]
+
+  FR-DM-030:
+    scenario: SC-DM-04
+    persona: STEWARD
+    screen: BATCH
+    data: [TD-DM-02]
+    conditions:
+      - A legacy LOV value marked CREATE becomes an authorised BIBS value after the master authorisation, and the batch reconciles.
+      - A client batch using a segment that is not yet authorised cannot be approved for load.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Create a missing LOV value
+        steps:
+          - Load R01 with WALKIN marked CREATE; as the LOV authoriser authorise WALK_IN in My Approvals; reconcile.
+        expected: WALK_IN is active in the LOV master; R01 reconciles with 1 created value.
+      - c: 2
+        type: Negative
+        persona: DML
+        title: Client batch with an unauthorised segment
+        steps:
+          - Before WALK_IN is authorised, validate a C01 batch using it and click Approve Load.
+        expected: Refused.
+        msg: ["Code {WALK_IN} of {MIS:BUSINESS_ORIGIN} does not exist or is not authorised"]
+
+  FR-DM-031:
+    scenario: SC-DM-04
+    persona: STEWARD
+    screen: MATCH
+    data: [TD-DM-03, TD-DM-09]
+    conditions:
+      - Two legacy clients with the same TIN from EBIX and QPS become one BIBS client with both legacy keys in the cross-reference.
+      - Two legacy clients with similar names and the same birth date but different IDs go to the review queue.
+      - The client batch cannot load while a pair is open in the review queue.
+      - Survivorship takes per field the first non-blank value by source priority and keeps the losing values.
+    cases:
+      - c: 1
+        type: Positive
+        title: Exact TIN match merges
+        steps:
+          - Validate C01 of QPS and EBIX together; open MIG-CLIENT-MATCH.
+        expected: The 40 TIN pairs are merged automatically (score 100); each cluster has both legacy numbers.
+      - c: 2
+        type: Positive
+        title: Similar names go to review
+        steps:
+          - Open the review queue.
+        expected: The 15 similar-name pairs are listed with the matching keys and a score between 60 and 89.
+      - c: 3
+        type: Negative
+        persona: DML
+        screen: BATCH
+        title: Load with open review pairs
+        steps:
+          - Click Approve Load with 15 pairs open.
+        expected: Refused; after the steward decides every pair, approval is possible.
+        msg: ["{15} client pairs are waiting for review"]
+      - c: 4
+        type: Positive
+        title: Survivorship preview
+        steps:
+          - Open a merged cluster where QPS has an e-mail and EBIX has a different e-mail and a blank mobile.
+        expected: The survivor takes the QPS e-mail and the non-blank mobile; the EBIX e-mail is kept as a losing value.
+
+  FR-DM-032:
+    scenario: SC-DM-04
+    persona: SYSTEM
+    screen: CLIENTS
+    data: [TD-DM-03]
+    conditions:
+      - A migrated client is active (confirmed) and can be selected on a new quotation without re-encoding.
+      - No screening case is created during the load; after the full run, hits appear in the screening queue.
+      - A client changed in legacy the day before the freeze is updated in BIBS by the delta batch.
+      - A load row that hard-matches an existing client without a match decision is refused.
+    cases:
+      - c: 1
+        type: Positive
+        persona: MKT_AO
+        title: Migrated client used on a quotation
+        steps:
+          - As ao create a quotation and select a migrated client.
+        expected: The client is selectable with identity, contacts and segment; no onboarding workflow started.
+      - c: 2
+        type: Positive
+        persona: OPERATOR
+        title: Screening after the load
+        steps:
+          - Load C01; open the screening queue; start the full screening run; open the queue again.
+        expected: No case during the load; after the run the hits of the migrated base are in the queue.
+      - c: 3
+        type: Positive
+        persona: OPERATOR
+        screen: BATCH
+        title: Daily delta updates a client
+        steps:
+          - Load the next-day delta of 10 new and 5 changed clients.
+        expected: 10 clients created after matching; 5 updated in the fields of the delta layout; each change audited with the batch number.
+      - c: 4
+        type: Negative
+        persona: OPERATOR
+        screen: BATCH
+        title: Hard duplicate at load
+        steps:
+          - Load a C01 row whose TIN equals a BIBS client created after validation.
+        expected: The row is REJECTED.
+        msg: [This client matches an existing client on TIN or ID; decide the match first]
+
+  FR-DM-033:
+    scenario: SC-DM-04
+    persona: MKT_AO
+    screen: CLIENTS
+    data: [TD-DM-03]
+    conditions:
+      - Searching an EBIX client number opens the BIBS client created from it.
+      - The client page shows the source systems and legacy numbers of the cluster.
+      - A legacy reference not in BIBS says so.
+    cases:
+      - c: 1
+        type: Positive
+        title: Search by EBIX number
+        steps:
+          - Search E-0098765.
+        expected: The BIBS client created from it opens.
+      - c: 2
+        type: Positive
+        title: Legacy numbers on the client page
+        steps:
+          - Open a merged client.
+        expected: The page lists QPS and EBIX with their legacy numbers, read only.
+      - c: 3
+        type: Negative
+        title: Unknown legacy reference
+        steps:
+          - Search Q-9999999.
+        expected: No record found; for a user with LEGACY_INQUIRY_VIEW the archive search is offered.
+        msg: [No BIBS record has this legacy reference]
+
+  FR-DM-040:
+    scenario: SC-DM-02
+    persona: OPERATOR
+    screen: BATCH
+    data: [TD-DM-04]
+    conditions:
+      - A migrated in-force policy is found by its policy number and shows status, dates, insurer and line, linked to the correct client.
+      - A migrated header has no quotation or placement and cannot be booked again.
+      - Headers with expiry before inception or shares not adding to 100 are INVALID.
+    cases:
+      - c: 1
+        type: Positive
+        screen: ACCOUNTS
+        title: Header loaded and found
+        steps:
+          - Load P01 and P01S; search MC-PC-26-0012345.
+        expected: Account with origin MIGRATED, status BOOKED, dates, insurer shares and line; linked to client Q-0012345.
+      - c: 2
+        type: Negative
+        screen: ACCOUNTS
+        title: Header cannot be booked again
+        steps:
+          - Open the migrated account; look for Book or placement actions.
+        expected: No quotation, placement or booking action is offered.
+      - c: 3
+        type: Negative
+        screen: ISSUES
+        title: Invalid headers
+        steps:
+          - Validate P01 with one expiry before inception and P01S with shares adding to 90.
+        expected: "Both rows INVALID. The second check shows \"Insurer shares add up to 90 percent\"."
+        msg: ["The expiry date is before the inception date"]
+
+  FR-DM-041:
+    scenario: SC-DM-06
+    persona: OPS_USER
+    screen: ACCOUNTS
+    data: [TD-DM-04, TD-DM-05]
+    conditions:
+      - A migrated policy shows status, inception and expiry, insurer and line, and its client.
+      - Its legacy invoices are listed with their open balances.
+      - A search without a match says so.
+    cases:
+      - c: 1
+        type: Positive
+        title: Policy by legacy reference
+        steps:
+          - Search C-2026-004512-01.
+        expected: The header shows the LEGACY badge, source system, legacy reference, dates, insurer and line, client.
+      - c: 2
+        type: Positive
+        title: Legacy invoices on the policy
+        steps:
+          - Open the Invoices tab; open I00123456.
+        expected: I00123456 is listed with 10,000.00 open and opens in Invoice 360.
+      - c: 3
+        type: Negative
+        title: No match
+        steps:
+          - Search policy XX-000.
+        expected: No result.
+        msg: [No policy matches the search]
+
+  FR-DM-050:
+    scenario: SC-DM-05
+    persona: OPERATOR
+    screen: INV360
+    data: [TD-DM-05]
+    conditions:
+      - A legacy invoice with PR 10,000.00 of which 4,000.00 was paid shows booked 10,000.00, applied 4,000.00 and balance 6,000.00 in Invoice 360, with the LEGACY badge.
+      - A legacy invoice paid in full before cutover and not remitted is offered for remittance and not for collection.
+      - Invoice 360 of a legacy invoice shows the source system, legacy number and original values.
+      - An invoice number used in two source systems is loaded with the source prefix; an open balance outside the booked amount is INVALID.
+    cases:
+      - c: 1
+        type: Positive
+        title: Balances in Invoice 360
+        steps:
+          - Open the invoice with basic 10,000.00 and 4,000.00 paid.
+        expected: Booked 10,000.00, applied 4,000.00, balance 6,000.00; LEGACY badge.
+      - c: 2
+        type: Positive
+        persona: REMIT
+        screen: REMEXTRACT
+        title: Fully paid invoice goes to remittance
+        steps:
+          - Run the extraction for the insurer of a fully paid, unremitted legacy invoice; check the Collections worklist.
+        expected: The invoice is in the extraction with its full net due; it is not a Collections item.
+      - c: 3
+        type: Positive
+        title: Legacy block
+        steps:
+          - Open I00123456 in Invoice 360.
+        expected: Source EBIX, legacy number, legacy reference, batch and original values per component.
+      - c: 4
+        type: Negative
+        screen: ISSUES
+        title: Collision and balance outside booked
+        steps:
+          - Validate F01 with the number used in EBIX and QPS and one component with open above booked.
+        expected: The collision loads as QPS-<number> with the original kept as legacy number; the component row is INVALID.
+        msg: ["The open balance of {BASIC} is outside the booked amount"]
+
+  FR-DM-051:
+    scenario: SC-DM-05
+    persona: CASHIER
+    screen: UNAPPLIED
+    data: [TD-DM-06]
+    conditions:
+      - A migrated UPP shows amount, balance, legacy AR, reference and status in the workbench.
+      - The UPP legacy control account equals the total of the migrated UPP balances.
+      - An item whose balance is above its amount is INVALID.
+    cases:
+      - c: 1
+        type: Positive
+        title: Migrated UPP in the workbench
+        steps:
+          - Filter origin MIGRATED; open the 5,000.00 item.
+        expected: Amount, balance, legacy AR and date, references, tab from the legacy status; LEGACY badge; no BIBS AR issued.
+      - c: 2
+        type: Positive
+        persona: RECON
+        screen: ACSL
+        title: UPP legacy account equals the items
+        steps:
+          - Run the ACSL reconciliation of Unapplied Collections - Legacy.
+        expected: The account equals the total of the migrated balances.
+      - c: 3
+        type: Negative
+        persona: OPERATOR
+        screen: ISSUES
+        title: Balance above amount
+        steps:
+          - Validate F02 with one balance 5,100.00 on an amount of 5,000.00.
+        expected: The row is INVALID.
+        msg: [The balance is more than the amount received]
+
+  FR-DM-052:
+    scenario: SC-DM-05
+    persona: CASHIER
+    screen: UNAPPLIED
+    data: [TD-DM-06, TD-DM-10]
+    conditions:
+      - A migrated UPP of 5,000.00 referring to a legacy invoice with 3,000.00 open and a new invoice with 2,000.00 open is applied to both and closes; the legacy sub-ledger is credited 3,000.00 and the new PR 2,000.00.
+      - The journal of each application shows the UPP legacy account on the debit side.
+      - A migrated UPP without a matching invoice stays in the Unapplied tab.
+      - Matching on an item without any reference is refused with its message.
+    cases:
+      - c: 1
+        type: Positive
+        title: Mixed UPP automatch
+        steps:
+          - Click Run Matching.
+        expected: The item is applied 3,000.00 to I00200001 and 2,000.00 to BI-2027-000150 and closes; both invoices are paid.
+      - c: 2
+        type: Positive
+        screen: JOURNAL
+        title: Journal of the applications
+        steps:
+          - Open the journals of the two applications.
+        expected: Dr Unapplied Collections - Legacy / Cr Premium Receivable - Legacy 3,000.00; Dr Unapplied Collections - Legacy / Cr Premium Receivable 2,000.00.
+      - c: 3
+        type: Negative
+        title: No matching invoice
+        steps:
+          - Run matching with an item quoting an unknown invoice.
+        expected: The item stays in the Unapplied tab with its balance.
+      - c: 4
+        type: Negative
+        title: Item without reference
+        steps:
+          - Select an item without references; click Match.
+        expected: Not matched.
+        msg: [This item has no reference to match; apply it through a disposition]
+
+  FR-DM-053:
+    scenario: SC-DM-05
+    persona: CASHIER
+    screen: UNAPPLIED
+    data: [TD-DM-06]
+    conditions:
+      - A legacy UPP applied to another legacy invoice credits the PR legacy sub-ledger and debits the UPP legacy sub-ledger.
+      - The disposition is refused when the amount is above the balance or the target invoice is not in the ledger.
+    cases:
+      - c: 1
+        type: Positive
+        title: Apply to another legacy invoice
+        steps:
+          - Open a legacy UPP; choose Apply to other invoice; target a legacy invoice; enter 1,000.00; confirm.
+        expected: The preview shows the component split; after confirmation the invoice balance and the item balance fall by 1,000.00; journal Dr UPP legacy / Cr PR legacy.
+      - c: 2
+        type: Negative
+        title: Amount above the balance
+        steps:
+          - Enter an amount 1.00 above the item balance.
+        expected: Refused.
+        msg: ["The amount must be above zero and at most the balance {5,000.00}"]
+      - c: 2
+        type: Negative
+        title: Unknown target invoice
+        steps:
+          - Enter invoice I99999999.
+        expected: Refused.
+        msg: ["Invoice {I99999999} is not in the Operations ledger"]
+
+  FR-DM-054:
+    scenario: SC-DM-05
+    persona: CASHIER
+    screen: UNAPPLIED
+    data: [TD-DM-06, TD-DM-10]
+    conditions:
+      - An approved refund of 1,500.00 from a legacy UPP reduces the UPP legacy sub-ledger by 1,500.00 and appears in the Disbursement queue.
+      - A refund is reversed only after Disbursement returned the request.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Refund a legacy UPP
+        steps:
+          - Choose Refund, 1,500.00, submit; as cashiertl approve; open the Disbursement queue.
+        expected: The refund posts Dr Unapplied Collections - Legacy / Cr Refund Payable 1,500.00; the payment request is in the queue.
+      - c: 2
+        type: Negative
+        title: Reverse a refund not returned
+        steps:
+          - Click Reverse on the refund while the request is with Disbursement.
+        expected: Refused.
+        msg: [A refund is reversed only after Disbursement returned the request]
+
+  FR-DM-055:
+    scenario: SC-DM-05
+    persona: CASHIER
+    screen: RECLASS
+    data: [TD-DM-06]
+    conditions:
+      - A batch executes only after the Cashiering TL and top management approve it.
+      - On execution, the UPP legacy sub-ledger decreases and other income increases by the batch total, and the items are closed.
+      - A batch returned by top management does not post.
+      - An item with a disposition in progress cannot be added, and the maker cannot approve.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Two approvals
+        steps:
+          - Create batch UIR with the 1,500.00 item, reason Unclaimed after follow-up; submit; as cashiertl approve; as topmgmt approve in My Approvals.
+        expected: The batch goes DRAFT, FOR_TL_APPROVAL, FOR_TOP_MANAGEMENT, EXECUTED; nothing posts before the second approval.
+      - c: 2
+        type: Positive
+        screen: JOURNAL
+        title: Posting of the executed batch
+        steps:
+          - Open the journal of the batch; open the item.
+        expected: Dr Unapplied Collections - Legacy / Cr Other Income 1,500.00; the item is closed.
+      - c: 3
+        type: Negative
+        persona: TOPMGMT
+        screen: APPROVALS
+        title: Returned by top management
+        steps:
+          - Return a batch with a reason.
+        expected: The batch goes back to DRAFT; no journal.
+      - c: 4
+        type: Negative
+        title: Item with a disposition in progress
+        steps:
+          - Add the item that has a refund in progress.
+        expected: Refused.
+        msg: ["Item {UPP-2026-004399} has a disposition in progress"]
+      - c: 4
+        type: Security-access
+        persona: CASHIER_TL
+        title: Maker approves own batch
+        pre: The Cashiering TL created the batch.
+        steps:
+          - As the same TL approve it.
+        expected: Refused.
+        msg: [A record cannot be authorized by the user who maintained it]
+
+  FR-DM-060:
+    scenario: SC-DM-05
+    persona: CASHIER
+    screen: PAYMENT
+    data: [TD-DM-05]
+    conditions:
+      - An OTC payment of 6,000.00 on a legacy invoice with 6,000.00 open issues an AR, brings the balance to 0.00 and credits the PR legacy sub-ledger.
+      - The receipt is listed in the Cash Receipts Book report for the day.
+      - An unknown reference is refused.
+    cases:
+      - c: 1
+        type: Positive
+        title: OTC payment on a legacy invoice
+        steps:
+          - Enter the legacy invoice number; check the preview; enter 6,000.00 cash; confirm.
+        expected: A BIBS AR is issued; the invoice balance is 0.00; journal Dr Unapplied Collections / Cr Premium Receivable - Legacy 6,000.00.
+      - c: 2
+        type: Report-output
+        screen: REPORTS
+        title: Cash Receipts Book
+        steps:
+          - Run TAX-BOOK-CRB for the day.
+        expected: The AR of case 1 is listed.
+      - c: 3
+        type: Negative
+        title: Unknown reference
+        steps:
+          - Enter I88888888.
+        expected: No invoice found.
+        msg: ["No invoice matches {I88888888}"]
+
+  FR-DM-061:
+    scenario: SC-DM-05
+    persona: CASHIER
+    screen: PAYUPLOAD
+    data: [TD-DM-10]
+    conditions:
+      - A Direct Credit row with an EBIX invoice reference is applied to the legacy invoice and credits the PR legacy sub-ledger.
+      - A file with rows for legacy and new invoices posts each application to the right sub-ledger.
+      - An invalid row is reported and does not stop the others.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Direct Credit row with EBIX reference
+        steps:
+          - Upload the Direct Credit file.
+        expected: The row with I00123457 is applied to the legacy invoice; AR issued.
+      - c: 2
+        type: Positive
+        screen: JOURNAL
+        title: Mixed file postings
+        steps:
+          - Open the journals of the two applications of the file.
+        expected: The legacy row credits Premium Receivable - Legacy; the BIBS row credits Premium Receivable.
+      - c: 3
+        type: Negative
+        title: Invalid row in the file
+        steps:
+          - Upload a file with one row without amount.
+        expected: The row is listed as failed with the handler message; the other rows are applied.
+
+  FR-DM-070:
+    scenario: SC-DM-06
+    persona: ACCT
+    screen: DPPRREV
+    data: [TD-DM-05]
+    conditions:
+      - An approved batch of 20 DPPR legacy invoices reverses each open premium receivable and reduces the PR and DTIP legacy sub-ledgers by the same total.
+      - A line whose balance changed after the upload fails alone and is reported.
+      - A non-legacy invoice or an amount above the open PR is refused, and the maker cannot approve.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: COMMREC_TL
+        title: Approve and run a DPPR batch
+        steps:
+          - As the accounting user upload 20 direct-payment legacy invoices; submit; as commrectl approve.
+        expected: 20 lines posted; Dr DTIP - Legacy / Cr Premium Receivable - Legacy per line; run report with 20 posted.
+      - c: 2
+        type: Negative
+        title: Balance changed after upload
+        steps:
+          - Upload the batch; apply a payment to one invoice; approve the batch.
+        expected: That line fails and is reported; the other 19 post.
+      - c: 3
+        type: Negative
+        title: Invalid lines
+        steps:
+          - Upload a line with BIBS invoice BI-2027-000150 and a line with an amount above the open PR.
+        expected: "Both lines refused at validation. The second check shows \"The reversal of 9,000.00 is more than the open premium receivable 8,000.00\"."
+        msg: ["Invoice {BI-2027-000150} is not a legacy invoice"]
+      - c: 3
+        type: Security-access
+        title: Maker approves own batch
+        pre: The maker also holds LEGACY_REVERSAL_APPROVE for this test.
+        steps:
+          - Approve the own batch.
+        expected: Refused.
+        msg: [A record cannot be authorized by the user who maintained it]
+
+  FR-DM-071:
+    scenario: SC-DM-06
+    persona: ACCT
+    screen: PR2307REV
+    data: [TD-DM-05]
+    conditions:
+      - An approved PR2307 batch brings the PR2307 legacy balance of each line to 0.00 and reduces DTIP legacy by the same amount.
+      - An invoice without PR2307 balance is refused, and the maker cannot approve.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: CASHIER_TL
+        title: PR2307 batch
+        steps:
+          - Create the batch from the PR 2307 for Reversal tags; submit; as cashiertl approve.
+        expected: Each line's PR2307 legacy balance is 0.00; Dr DTIP - Legacy / Cr PR 2307 - Legacy.
+      - c: 2
+        type: Negative
+        title: No PR2307 balance
+        steps:
+          - Add I00123456, which has no PR2307 balance.
+        expected: Refused.
+        msg: ["Invoice {I00123456} has no PR2307 balance to reverse"]
+      - c: 2
+        type: Security-access
+        title: Maker approves own batch
+        pre: The maker also holds LEGACY_REVERSAL_APPROVE for this test.
+        steps:
+          - Approve the own batch.
+        expected: Refused.
+        msg: [A record cannot be authorized by the user who maintained it]
+
+  FR-DM-080:
+    scenario: SC-DM-06
+    persona: REMIT
+    screen: REMEXTRACT
+    data: [TD-DM-05]
+    conditions:
+      - A legacy invoice fully paid before cutover and not remitted appears in the next extraction for its insurer with its full net due.
+      - A legacy invoice remitted in legacy does not appear.
+      - The approved batch reduces DTIP legacy for legacy lines and DTIP for new lines; the schedule shows the legacy invoice number.
+    cases:
+      - c: 1
+        type: Positive
+        title: Paid legacy invoice extracted
+        steps:
+          - Run the extraction for the insurer of I00123456 after its OTC payment.
+        expected: Paid AR 23,050.00; net due 18,970.00.
+      - c: 2
+        type: Negative
+        title: Remitted legacy invoice not extracted
+        steps:
+          - Run the extraction for an insurer with a legacy invoice remitted in legacy.
+        expected: The invoice is not in the extraction.
+      - c: 3
+        type: Workflow
+        screen: JOURNAL
+        title: Batch postings and schedule
+        steps:
+          - Create and approve a batch with one legacy and one new line; open the journal and the schedule.
+        expected: Legacy line Dr DTIP - Legacy, Cr Commission Receivable - Legacy; new line on the new accounts; the schedule shows the legacy invoice number and source EBIX.
+
+  FR-DM-090:
+    scenario: SC-DM-06
+    persona: OPS_USER
+    screen: ENDORSE
+    data: [TD-DM-04, TD-DM-05]
+    conditions:
+      - An additional premium of 2,000.00 on a legacy invoice books an endorsement invoice with the legacy invoice as parent and increases the PR and DTIP legacy sub-ledgers.
+      - The service invoice is issued for the commission increase.
+      - The account shows the increased premium and sum insured.
+      - A legacy invoice without a migrated header cannot be endorsed.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: ADJ_TL
+        title: Positive endorsement
+        steps:
+          - Raise an additional-premium request on I00123456 for basic 2,000.00; validate; as adjtl approve; post the batch.
+        expected: Endorsement invoice BI-... with parent I00123456 and ledger context LEGACY; Premium Receivable - Legacy and DTIP - Legacy increase.
+      - c: 2
+        type: Report-output
+        title: Service invoice
+        steps:
+          - Open the documents of the endorsement.
+        expected: A service invoice for the commission increase refers to the endorsement number.
+      - c: 3
+        type: Positive
+        screen: ACCOUNTS
+        title: Account updated
+        steps:
+          - Open the migrated account.
+        expected: Premium and sum insured include the endorsement.
+      - c: 4
+        type: Negative
+        title: No migrated header
+        steps:
+          - Raise a request on a legacy invoice whose policy has no header.
+        expected: Refused.
+        msg: ["Invoice {I00200001} has no migrated policy header; it cannot be endorsed in BIBS"]
+
+  FR-DM-091:
+    scenario: SC-DM-06
+    persona: OPS_USER
+    screen: ENDORSE
+    data: [TD-DM-04, TD-DM-05]
+    conditions:
+      - A return premium of 1,000.00 on a legacy invoice with 1,000.00 open reduces the PR and DTIP legacy balances by 1,000.00.
+      - After the endorsement the account premium is the net premium used by Renewal.
+      - A decrease above the original premium is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: ADJ_TL
+        title: Return premium
+        steps:
+          - Raise a return-premium request of 1,000.00; approve; post.
+        expected: Return invoice in context LEGACY; PR and DTIP legacy balances fall by 1,000.00; service invoice credit refers to the legacy service invoice.
+      - c: 2
+        type: Positive
+        screen: RENEWAL
+        title: Net premium for renewal
+        steps:
+          - Open the renewal candidate of the policy.
+        expected: The expiring premium is the net premium after the endorsement.
+      - c: 3
+        type: Negative
+        title: Over-adjustment
+        steps:
+          - Raise a decrease larger than the original premium.
+        expected: Refused with the over-adjustment message of the Adjustment module (ADJID.028).
+
+  FR-DM-092:
+    scenario: SC-DM-06
+    persona: OPS_USER
+    screen: ENDORSE
+    data: [TD-DM-04]
+    conditions:
+      - An approved address change of a migrated policy is shown on the account and in the renewal candidate.
+      - No journal is posted.
+      - A financial field changed under a non-financial type is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: ADJ_TL
+        title: Address change
+        steps:
+          - Raise a non-financial request changing the address; approve.
+        expected: The account and the renewal candidate show the new address; the endorsement is recorded with old and new values.
+      - c: 2
+        type: Positive
+        screen: JOURNAL
+        title: No posting
+        steps:
+          - Search journals for the endorsement number.
+        expected: No journal.
+      - c: 3
+        type: Negative
+        title: Financial field under a non-financial type
+        steps:
+          - Change the sum insured in a non-financial request.
+        expected: Refused as the Adjustment module refuses it.
+
+  FR-DM-100:
+    scenario: SC-DM-06
+    persona: PRC
+    screen: REPORTS
+    data: [TD-DM-05]
+    conditions:
+      - After a positive endorsement of 2,000.00 on a legacy invoice with original premium 10,000.00, the report shows original 10,000.00, updated 12,000.00 and delta 2,000.00 with the endorsement number.
+      - The report exports to Excel with the same rows.
+      - A user without RECON_PROCESS cannot run it.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Legacy change report
+        pre: A 2,000.00 endorsement posted on an invoice with basic 10,000.00.
+        steps:
+          - Run PRC-LEGACY-CHANGES for the period.
+        expected: One line - basic original 10,000.00, updated 12,000.00, delta 2,000.00, endorsement number, date and user.
+      - c: 2
+        type: Report-output
+        title: Excel export
+        steps:
+          - Export to Excel.
+        expected: Same rows and values.
+      - c: 3
+        type: Security-access
+        persona: CASHIER
+        title: Report refused without permission
+        steps:
+          - As cashier open the report.
+        expected: Not in the report list; the call returns HTTP 403.
+
+  FR-DM-110:
+    scenario: SC-DM-07
+    persona: AUDIT
+    screen: INQUIRY
+    data: [TD-DM-08]
+    conditions:
+      - A closed legacy invoice of 2022 is found by its invoice number and opens read only with its documents.
+      - An export above the row limit is refused.
+      - A search needs at least one criterion and, when configured, a reason.
+    cases:
+      - c: 1
+        type: Positive
+        title: Find a 2022 invoice
+        steps:
+          - Enter reason Audit request; search invoice I00098765; open it and its document.
+        expected: The record opens read only with labelled columns; the document opens; no edit action.
+      - c: 2
+        type: Boundary
+        neg: true
+        title: Export above 1,000 rows
+        steps:
+          - Search record type INVOICE with 1,200 results; Export.
+        expected: The export is refused; an export of a search with 1,000 results works.
+      - c: 3
+        type: Negative
+        title: No criterion and no reason
+        steps:
+          - Click Search without criteria; then search without a reason.
+        expected: "Both refused. The second check shows \"Enter the reason for this inquiry\"."
+        msg: ["Enter at least one search criterion"]
+
+  FR-DM-111:
+    scenario: SC-DM-07
+    persona: ACCESS_REV
+    screen: ACCLOG
+    data: [TD-DM-08]
+    conditions:
+      - A search in Legacy Inquiry creates a log entry with the user, criteria and result count.
+      - No user can edit or delete a log entry.
+      - A user without LEGACY_ACCESS_LOG_VIEW cannot open the log.
+    cases:
+      - c: 1
+        type: Positive
+        title: Search is logged
+        steps:
+          - After TC-DM-110.1-01 open the access log filtered on legacyaudit.
+        expected: Entries for the search, view and document download with criteria, record keys, result count and reason.
+      - c: 2
+        type: Negative
+        persona: SYSTEM
+        screen: API
+        title: Log cannot be changed
+        steps:
+          - Try to update and delete a log entry through the API as an administrator.
+        expected: No edit or delete action exists; both calls are refused.
+      - c: 3
+        type: Security-access
+        persona: AUDIT
+        title: Log refused to the inquiry role
+        steps:
+          - As legacyaudit open the access log URL.
+        expected: Refused.
+        msg: [You are not permitted to perform this action]
+
+  FR-DM-120:
+    scenario: SC-DM-08
+    persona: DML
+    screen: CUTOVER
+    data: [TD-DM-01]
+    conditions:
+      - A mock plan records planned and actual times per task and per object load.
+      - The runbook export lists every task with owner and timing.
+      - A task cannot start before its dependency is complete.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Run a mock plan
+        steps:
+          - Create a plan of kind MOCK from the template; start and complete the tasks of phase D.
+        expected: Actual start and end are recorded per task and per load; progress against the plan is shown.
+      - c: 2
+        type: Upload-download
+        title: Runbook export
+        steps:
+          - Export the plan to Excel and Word.
+        expected: Every task with phase, owner role, planned and actual times.
+      - c: 3
+        type: Negative
+        title: Start before dependency
+        steps:
+          - Start CT-042 while CT-041 is not complete.
+        expected: Refused.
+        msg: ["Task {CT-042} depends on {CT-041}, which is not complete"]
+
+  FR-DM-121:
+    scenario: SC-DM-08
+    persona: GONOGO
+    screen: GONOGO
+    data: [TD-DM-07]
+    conditions:
+      - GO cannot be recorded while Migration Clearing is not 0.00.
+      - The decision record shows each criterion value at the time of the decision.
+      - NO-GO starts the fallback task.
+    cases:
+      - c: 1
+        type: Negative
+        title: GO with clearing not zero
+        pre: TB version with one control line 3,000.00 higher loaded.
+        steps:
+          - Click GO.
+        expected: Refused.
+        msg: ["Criterion {Migration Clearing} is not met"]
+      - c: 2
+        type: Positive
+        title: GO recorded with values
+        steps:
+          - With all criteria met click GO with a comment; open the decision record.
+        expected: The record shows every criterion with its value and status and the board member.
+      - c: 3
+        type: Workflow
+        title: NO-GO starts the fallback
+        steps:
+          - In a mock plan record NO-GO.
+        expected: The fallback task starts and its owner is notified.
+
+  FR-DM-122:
+    scenario: SC-DM-08
+    persona: PM
+    screen: RUNOFF
+    data: [TD-DM-04]
+    conditions:
+      - A legacy policy expiring 60 days after go-live appears in BIBS Renewal with the disposition it had in legacy.
+      - A legacy policy expiring 200 days after go-live is extracted by BIBS at 140 days before expiry.
+      - The run-off report shows renewed, not renewed and open counts per expiry month.
+      - A cohort row without a header is INVALID.
+    cases:
+      - c: 1
+        type: Positive
+        persona: MKT_AO
+        screen: RENEWAL
+        title: Carried cohort in Renewal
+        steps:
+          - Open the candidates with source LEGACY; open the policy expiring at T+60.
+        expected: Candidate with the legacy disposition, handler and remarks.
+      - c: 2
+        type: Positive
+        persona: SYSTEM
+        screen: RENEWAL
+        title: Later expiry extracted by BIBS
+        steps:
+          - Set the business date to expiry - 140 days for the T+200 policy; run the Renewal extraction.
+        expected: A candidate is created from the migrated header.
+      - c: 3
+        type: Report-output
+        screen: REPORTS
+        title: Run-off report
+        steps:
+          - Run MIG-RUNOFF.
+        expected: Per expiry month - in force at go-live, renewed, not renewed, lapsed, open.
+      - c: 4
+        type: Negative
+        persona: OPERATOR
+        screen: ISSUES
+        title: Cohort row without header
+        steps:
+          - Validate P03 with the row whose cover is not in P01.
+        expected: INVALID.
+        msg: ["Cover {C-2026-009999} has no migrated header"]
+
+  FR-DM-123:
+    scenario: SC-DM-08
+    persona: PM
+    screen: RUNOFF
+    data: [TD-DM-06, TD-DM-08]
+    conditions:
+      - A system cannot be marked decommissioned while its archive reconciliation is open.
+      - The legacy context cannot be closed while a legacy UPP has a balance.
+      - A system is decommissioned when every criterion is met and signed.
+    cases:
+      - c: 1
+        type: Negative
+        title: Archive reconciliation open
+        steps:
+          - Open the EBIX checklist with the archive reconciliation not signed; sign as system owner.
+        expected: Refused.
+        msg: ["Criterion {Archive reconciled} is not met"]
+      - c: 2
+        type: Negative
+        title: Close the legacy context with a UPP balance
+        steps:
+          - Open the Legacy context checklist with one legacy UPP open; sign.
+        expected: Refused.
+      - c: 3
+        type: Workflow
+        title: Decommission a system
+        steps:
+          - Attach evidence to each criterion of a test system; sign as system owner, Compliance and Comptrollership.
+        expected: The system is marked decommissioned with the three signatures and dates.
+
+access:
+  - action: View the Migration Console
+    screen: HOME
+    permission: MIG_VIEW
+    allow: [DML, STEWARD, OWNER, OPERATOR, RECON, GONOGO]
+    deny: [CASHIER, MKT_AO, AUDIT]
+    denied: Data Migration is not in the menu; GET /api/v1/migration/objects returns HTTP 403.
+  - action: Maintain objects and submit decisions
+    screen: OBJ
+    permission: MIG_OBJECT_MANAGE
+    allow: [DML]
+    deny: [STEWARD, OWNER, OPERATOR]
+    denied: New Object and Submit Decision are not shown; the call returns HTTP 403.
+  - action: Approve decisions and map versions
+    screen: APPROVALS
+    permission: MIG_DECISION_APPROVE / MIG_MAPPING_APPROVE
+    allow: [OWNER]
+    deny: [DML, STEWARD, OPERATOR]
+    denied: The item is not offered in My Approvals; the call returns HTTP 403.
+  - action: Edit code maps and resolve issues
+    screen: MAPS
+    permission: MIG_MAPPING_EDIT / MIG_DQ_RESOLVE
+    allow: [STEWARD]
+    deny: [OPERATOR, RECON]
+    denied: The maps are read only; the call returns HTTP 403.
+  - action: Upload extracts and run loads
+    screen: EXTRACTS
+    permission: MIG_INTAKE / MIG_LOAD_RUN
+    allow: [OPERATOR]
+    deny: [STEWARD, OWNER, RECON]
+    denied: Upload and Load are not shown; the call returns HTTP 403.
+  - action: Approve a load
+    screen: BATCH
+    permission: MIG_LOAD_APPROVE
+    allow: [DML]
+    deny: [OPERATOR, STEWARD]
+    denied: Approve Load is not shown; the call returns HTTP 403.
+  - action: Sign a reconciliation and approve rollbacks
+    screen: RECONC
+    permission: MIG_RECON_SIGNOFF / MIG_ROLLBACK_APPROVE
+    allow: [RECON]
+    deny: [DML, OPERATOR, STEWARD]
+    denied: Sign and Approve are not shown; the call returns HTTP 403.
+  - action: Decide go / no-go
+    screen: GONOGO
+    permission: MIG_GONOGO_DECIDE
+    allow: [GONOGO]
+    deny: [DML, RECON]
+    denied: GO and NO-GO are not shown; the call returns HTTP 403.
+  - action: Search the legacy archive
+    screen: INQUIRY
+    permission: LEGACY_INQUIRY_VIEW
+    allow: [AUDIT]
+    deny: [CASHIER, OPERATOR]
+    denied: Legacy Inquiry is not in the menu; the call returns HTTP 403.
+  - action: Review the legacy access log
+    screen: ACCLOG
+    permission: LEGACY_ACCESS_LOG_VIEW
+    allow: [ACCESS_REV]
+    deny: [AUDIT, DML]
+    denied: Access Log is not shown; the call returns HTTP 403.
+  - action: Approve UPP reclassification to income (second level)
+    screen: APPROVALS
+    permission: CASH_UPP_INCOME_APPROVE
+    allow: [TOPMGMT]
+    deny: [CASHIER, CASHIER_TL]
+    denied: The batch is not offered at the top-management stage; the call returns HTTP 403.
+  - action: Approve DPPR and PR2307 legacy reversal batches
+    screen: APPROVALS
+    permission: LEGACY_REVERSAL_APPROVE
+    allow: [CASHIER_TL, COMMREC_TL]
+    deny: [CASHIER, ACCT]
+    denied: Approve is not shown; the call returns HTTP 403.
+
+findings:
+  - fr: FR-DM-013
+    issue: The validation message for an error rate above the threshold is tested on a financial object whose limit is 0 percent; the FRS does not say whether the rate counts excluded rows. The case assumes excluded rows are not errors.
+    proposal: State in FR-DM-013 R2 that rows excluded by the data owner are not counted in the error rate.
+  - fr: FR-DM-021
+    issue: 'Acceptance 3 ("an open invoice missing from the load shows as a Migration Clearing difference") needs a trial balance that includes the missing invoice; the sign of the difference is not stated.'
+    proposal: State that the difference is a credit on Migration Clearing equal to the open premium receivable of the missing invoice (debit for a missing DTIP-only invoice).
+  - fr: FR-DM-051
+    issue: The alternate flow offers "the configured option" to issue a BIBS AR without cash posting, but no parameter names it; the case follows the default (no AR) of DMQ14.
+    proposal: Name the parameter (for example MIG_UPP_ISSUE_AR) or remove the option when DMQ14 is answered.
+  - fr: FR-DM-091
+    issue: The over-adjustment check refers to ADJID.028 without quoting the message, so the case cannot quote it.
+    proposal: Quote the Adjustment module message in FR-DM-091 at build (FRS v1.1).
+  - fr: FR-DM-110
+    issue: R2 limits exports to MIG_ARCHIVE_EXPORT_MAX_ROWS but no message text is given for the refused export.
+    proposal: Add the message, for example "The export is limited to {1,000} rows; narrow the search".
+  - fr: FR-DM-123
+    issue: The checklist criteria are templates maintained by the Program Manager; the criterion names used in messages ("Archive reconciled") depend on the template.
+    proposal: Fix the default criterion names in the FRS (Cutover Runbook section 9 gives them).
+  - fr: FR-DM-061
+    issue: The FRS does not say whether a payment row carrying a QPS invoice number is matched before DMQ11 gives the QPS format.
+    proposal: Add the QPS number pattern to the matcher and to CLX_INVOICE_NO_PATTERN when DMQ11 is answered; until then QPS invoices are matched by ARN, policy or PN.

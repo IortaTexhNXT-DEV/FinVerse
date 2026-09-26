@@ -1,4 +1,5 @@
 import { DataTable } from '@/components/ui/DataTable';
+import { TypedInput } from '@/components/ui/DateInput';
 
 /** An insurer line as typed on Record Claim. */
 export interface LineDraft {
@@ -21,7 +22,7 @@ export function InsurerLinesEditor({
   const set = (index: number, key: keyof LineDraft, value: string) =>
     onChange(lines.map((l, i) => (i === index ? { ...l, [key]: value } : l)));
   const input = (index: number, key: keyof LineDraft, label: string, type = 'text') => (
-    <input
+    <TypedInput
       aria-label={`${label} of ${lines[index]?.insurerCode ?? ''}`}
       className="input"
       type={type}

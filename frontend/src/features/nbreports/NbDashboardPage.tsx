@@ -27,6 +27,7 @@ import {
   total,
 } from './dashboardData';
 import './nbreports.css';
+import { DateInput } from '@/components/ui/DateInput';
 
 function Tiles({ d }: Readonly<{ d: NbDashboard }>) {
   const newRequests = d.requests.find((r) => r.group === 'REQUEST' && r.code === 'NEW');
@@ -205,10 +206,8 @@ export default function NbDashboardPage() {
           <>
             <Field label="As of">
               {(id) => (
-                <input
+                <DateInput
                   id={id}
-                  type="date"
-                  className="input"
                   value={asOf}
                   max={today()}
                   onChange={(e) => setAsOf(e.target.value || today())}

@@ -7,6 +7,7 @@ import { Field } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, formatDateTime, today } from '@/utils/format';
 import type { ConfigChange, ConfigContent, ConfigVersion } from './api';
+import { DateInput } from '@/components/ui/DateInput';
 
 /** Building blocks of the configuration version workbench (FR-SS-010, 019). */
 
@@ -167,10 +168,8 @@ export function VersionHeaderCard({ version, draft, onDraft, actions }: Readonly
       <div className="form-grid">
         <Field label="Effective From" required hint="Today or later">
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              type="date"
-              className="input"
               disabled={draft === undefined}
               min={today()}
               value={draft?.effectiveFrom ?? version.effectiveFrom}

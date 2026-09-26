@@ -35,6 +35,7 @@ import {
   toSearch,
 } from './caseLogic';
 import type { CaseFilters, FilterKey } from './caseLogic';
+import { DateInput } from '@/components/ui/DateInput';
 
 function Select({
   label,
@@ -87,10 +88,8 @@ function FilterBar({
     <div className="worklist-filters form-grid">
       <Field label="Created From">
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            type="date"
-            className="input"
             value={filters.createdFrom ?? ''}
             onChange={(e) => set('createdFrom', e.target.value)}
           />
@@ -98,10 +97,8 @@ function FilterBar({
       </Field>
       <Field label="Created To" error={dateError}>
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            type="date"
-            className="input"
             value={filters.createdTo ?? ''}
             onChange={(e) => set('createdTo', e.target.value)}
           />

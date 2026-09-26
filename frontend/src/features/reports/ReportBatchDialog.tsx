@@ -15,6 +15,7 @@ import { FORMAT_LABELS } from './exportFormats';
 import { PrintOptionsFields } from './PrintOptionsFields';
 import { DEFAULT_PRINT, downloadBatch, reportOptionsApi } from './reportOptions';
 import type { PrintOptions, ReportBatch, ReportBatchItem } from './reportOptions';
+import { DateInput } from '@/components/ui/DateInput';
 
 const FORMATS: ExportFormat[] = ['XLSX', 'PDF', 'DOCX', 'ODS', 'CSV'];
 const MAX_REPORTS = 30;
@@ -110,10 +111,8 @@ export function ReportBatchDialog({ open, entries, onClose }: Readonly<Props>) {
         <div className="form-grid">
           <Field label="From">
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 value={dates.fromDate}
                 onChange={(e) => setDates({ ...dates, fromDate: e.target.value })}
               />
@@ -121,10 +120,8 @@ export function ReportBatchDialog({ open, entries, onClose }: Readonly<Props>) {
           </Field>
           <Field label="To / as of">
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 value={dates.toDate}
                 onChange={(e) => setDates({ ...dates, toDate: e.target.value })}
               />

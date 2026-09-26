@@ -14,6 +14,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
 import { useWorkspace } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 
 const WEEKDAY = new Intl.DateTimeFormat('en-PH', { weekday: 'long', timeZone: 'UTC' });
 
@@ -126,10 +127,8 @@ export default function HolidaysPage() {
           <div className="form-grid">
             <Field label="Date" required>
               {(id) => (
-                <input
+                <DateInput
                   id={id}
-                  className="input"
-                  type="date"
                   value={form.holidayDate}
                   onChange={(e) => setForm({ ...form, holidayDate: e.target.value })}
                 />

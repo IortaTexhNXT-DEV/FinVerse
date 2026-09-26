@@ -4,6 +4,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { today } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 
 export interface DateReasonValue {
   date: string;
@@ -65,10 +66,8 @@ export function DateReasonModal({
         {withDate && (
           <Field label="Effective date" required>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 value={value.date}
                 onChange={(e) => setValue({ ...value, date: e.target.value })}
               />
@@ -78,10 +77,8 @@ export function DateReasonModal({
         {withChequeDate && (
           <Field label="New cheque date" required>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 value={value.chequeDate}
                 onChange={(e) => setValue({ ...value, chequeDate: e.target.value })}
               />

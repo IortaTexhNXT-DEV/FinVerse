@@ -8,6 +8,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { useToast } from '@/components/ui/toastContext';
 import { today } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface Props {
   companies: Company[];
@@ -101,10 +102,8 @@ export function IcTransactionForm({ companies, companyId }: Readonly<Props>) {
         {companySelect('Debtor (due-to)', debtor, (v) => set({ debtorCompanyId: v }))}
         <Field label="Value date" required>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               value={form.valueDate}
               onChange={(e) => set({ valueDate: e.target.value })}
             />

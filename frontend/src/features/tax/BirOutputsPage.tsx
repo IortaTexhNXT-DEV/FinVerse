@@ -17,6 +17,7 @@ import { DEFAULT_PRINT, reportOptionsApi } from '@/features/reports/reportOption
 import { today } from '@/utils/format';
 import { BIR_OUTPUT_GROUPS, initialChoice, outputParams, periodLabel } from './birOutputs';
 import type { BirOutput, PeriodChoice } from './birOutputs';
+import { DateInput } from '@/components/ui/DateInput';
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => String(i + 1));
 
@@ -77,10 +78,8 @@ function PeriodFields({
       </Field>
       <Field label="Books From">
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            type="date"
-            className="input"
             value={choice.from}
             onChange={(e) => onChange({ from: e.target.value })}
           />
@@ -88,13 +87,7 @@ function PeriodFields({
       </Field>
       <Field label="Books To">
         {(id) => (
-          <input
-            id={id}
-            type="date"
-            className="input"
-            value={choice.to}
-            onChange={(e) => onChange({ to: e.target.value })}
-          />
+          <DateInput id={id} value={choice.to} onChange={(e) => onChange({ to: e.target.value })} />
         )}
       </Field>
       <Field label="Ledger Account Class">

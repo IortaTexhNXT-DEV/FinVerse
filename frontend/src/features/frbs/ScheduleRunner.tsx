@@ -19,6 +19,7 @@ import type { Schedule } from './api';
 import { ScheduleCommentary } from './ScheduleCommentary';
 import { groupByFamily, packFormats, runnerErrors, scheduleParams } from './schedules';
 import type { RunnerErrors } from './schedules';
+import { DateInput } from '@/components/ui/DateInput';
 
 const REPORT = 'GL-SCHEDULE';
 
@@ -76,15 +77,7 @@ function DateField({
 }>) {
   return (
     <Field label={label} required={required} error={error} hint={hint}>
-      {(id) => (
-        <input
-          id={id}
-          type="date"
-          className="input"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        />
-      )}
+      {(id) => <DateInput id={id} value={value} onChange={(e) => onChange(e.target.value)} />}
     </Field>
   );
 }

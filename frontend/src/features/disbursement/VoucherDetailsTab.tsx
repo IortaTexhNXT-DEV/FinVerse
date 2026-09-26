@@ -15,6 +15,7 @@ import { termsErrors } from './forms';
 import { MODE_LABELS, MODES } from './labels';
 import './disbursement.css';
 import { UserName } from '@/components/ui/UserName';
+import { DateInput } from '@/components/ui/DateInput';
 
 function termsOf(v: Voucher): TermsInput {
   return {
@@ -211,10 +212,8 @@ export function VoucherDetailsTab({
           </Field>
           <Field label="Value Date" required error={shown('valueDate')}>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={terms.valueDate}
                 onChange={(e) => set({ valueDate: e.target.value })}
               />

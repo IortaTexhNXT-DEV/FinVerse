@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { JournalFilters } from '@/api/gl';
 import { Card } from '@/components/ui/Card';
 import { Field } from '@/components/ui/Field';
+import { DateInput } from '@/components/ui/DateInput';
 
 /** Filters of the journal list, including the entries assigned to the user (FRBS 2.5.1). */
 export type ListFilters = Omit<JournalFilters, 'companyId'> & { assignedTo?: string };
@@ -48,10 +49,8 @@ export function JournalFiltersCard({ filters, username, onChange, actions }: Rea
         </Field>
         <Field label="From">
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               value={filters.fromDate ?? ''}
               onChange={(e) => onChange({ fromDate: e.target.value })}
             />
@@ -59,10 +58,8 @@ export function JournalFiltersCard({ filters, username, onChange, actions }: Rea
         </Field>
         <Field label="To">
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               value={filters.toDate ?? ''}
               onChange={(e) => onChange({ toDate: e.target.value })}
             />

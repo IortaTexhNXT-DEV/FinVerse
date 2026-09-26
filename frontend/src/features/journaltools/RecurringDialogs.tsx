@@ -13,6 +13,7 @@ import { RecurringHistory } from './RecurringHistory';
 import { RecurringTemplateForm } from './RecurringTemplateForm';
 import { templateProblems, toTemplateInput } from './recurringModel';
 import type { TemplateForm } from './recurringModel';
+import { DateInput } from '@/components/ui/DateInput';
 
 function RunResult({ result }: Readonly<{ result: GenerationResult }>) {
   const tone = result.errors.length === 0 ? 'success' : 'warning';
@@ -127,13 +128,7 @@ export function RunDialog({
         </p>
         <Field label="Run date" required>
           {(id) => (
-            <input
-              id={id}
-              className="input"
-              type="date"
-              value={runDate}
-              onChange={(e) => setRunDate(e.target.value)}
-            />
+            <DateInput id={id} value={runDate} onChange={(e) => setRunDate(e.target.value)} />
           )}
         </Field>
         <ErrorAlert error={run.error} />

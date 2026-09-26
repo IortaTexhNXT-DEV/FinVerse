@@ -10,6 +10,7 @@ import { claimStatusApi } from './api';
 import type { SettlementInput } from './api';
 import { PHASE_LABELS, validateFollowUp, validateSettlement } from './statusLogic';
 import type { SettlementForm } from './statusLogic';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface DialogProps {
   busy: boolean;
@@ -177,10 +178,8 @@ export function SettlementDialog({
           </Field>
           <Field label="Date settled" error={errors.dateSettled}>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 max={today()}
                 value={form.dateSettled}
                 onChange={(e) => set('dateSettled', e.target.value)}
@@ -233,10 +232,8 @@ export function FollowUpDialog({
         <ErrorAlert error={error} />
         <Field label="Next follow-up date" required error={errors.date}>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               min={today()}
               value={date}
               onChange={(e) => setDate(e.target.value)}

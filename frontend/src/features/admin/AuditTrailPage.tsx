@@ -10,6 +10,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { formatDateTime, today } from '@/utils/format';
 import { AuditExportButtons } from './AuditExportButtons';
+import { DateInput } from '@/components/ui/DateInput';
 
 /** Audit trail inquiry: originator, modifier and authorizer activity with timestamps. */
 export default function AuditTrailPage() {
@@ -36,10 +37,8 @@ export default function AuditTrailPage() {
         <div className="form-grid">
           <Field label="From">
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 value={filters.from}
                 onChange={(e) => set({ from: e.target.value })}
               />
@@ -47,13 +46,7 @@ export default function AuditTrailPage() {
           </Field>
           <Field label="To">
             {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="date"
-                value={filters.to}
-                onChange={(e) => set({ to: e.target.value })}
-              />
+              <DateInput id={id} value={filters.to} onChange={(e) => set({ to: e.target.value })} />
             )}
           </Field>
           <Field label="User">

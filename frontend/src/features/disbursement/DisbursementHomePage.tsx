@@ -25,6 +25,7 @@ import type { WorkbenchTab } from './labels';
 import { REQUEST_COLUMNS, VOUCHER_COLUMNS } from './columns';
 import { RequestDialog } from './WorkbenchParts';
 import './disbursement.css';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface Filters {
   type: string;
@@ -77,10 +78,8 @@ function FilterPanel({
         <>
           <Field label="Received From">
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={filters.from}
                 onChange={(e) => onChange({ ...filters, from: e.target.value })}
               />
@@ -88,10 +87,8 @@ function FilterPanel({
           </Field>
           <Field label="Received To">
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={filters.to}
                 onChange={(e) => onChange({ ...filters, to: e.target.value })}
               />

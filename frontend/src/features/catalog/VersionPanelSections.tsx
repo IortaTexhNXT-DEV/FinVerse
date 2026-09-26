@@ -10,6 +10,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { useCompanyId } from '@/context/workspaceContext';
 import type { CoverageRow, InsurerRow, VersionForm } from './versionForm';
 import { syncTerms } from './versionForm';
+import { TypedInput } from '@/components/ui/DateInput';
 
 interface Props {
   form: VersionForm;
@@ -36,7 +37,7 @@ function CellInput({
   type?: 'number' | 'text';
 }>) {
   return (
-    <input
+    <TypedInput
       className="input"
       aria-label={label}
       type={type}

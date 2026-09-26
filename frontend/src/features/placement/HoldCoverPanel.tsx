@@ -12,6 +12,7 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 
 type Mode = 'request' | 'confirm' | 'decline';
 
@@ -88,10 +89,8 @@ function HoldCoverDialog({
             hint="Today when left empty."
           >
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={values.date}
                 onChange={(e) => set({ date: e.target.value })}
               />
@@ -114,10 +113,8 @@ function HoldCoverDialog({
         {mode === 'confirm' && (
           <Field label="Expires on" hint="The requested expiry when left empty.">
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={values.expiry}
                 onChange={(e) => set({ expiry: e.target.value })}
               />

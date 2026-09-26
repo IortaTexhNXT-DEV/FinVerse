@@ -2,6 +2,7 @@ import type { EventType, RuleInput } from '@/api/accounting';
 import { Field } from '@/components/ui/Field';
 import { useGlLookups } from '@/features/gl/useLookups';
 import { components } from './ruleModel';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface Props {
   rule: RuleInput;
@@ -107,10 +108,8 @@ export function RuleHeaderFields({
       </Field>
       <Field label="Effective from" required>
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            className="input"
-            type="date"
             disabled={readOnly}
             value={rule.effectiveFrom}
             onChange={(e) => set({ effectiveFrom: e.target.value })}
@@ -119,10 +118,8 @@ export function RuleHeaderFields({
       </Field>
       <Field label="Effective to">
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            className="input"
-            type="date"
             disabled={readOnly}
             value={rule.effectiveTo ?? ''}
             onChange={(e) => set({ effectiveTo: e.target.value || undefined })}

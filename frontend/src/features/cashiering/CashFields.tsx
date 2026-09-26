@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Field } from '@/components/ui/Field';
 import { humanize } from '@/utils/format';
+import { TypedInput } from '@/components/ui/DateInput';
 
 interface TextFieldProps {
   label: string;
@@ -29,7 +30,7 @@ export function TextField({
   return (
     <Field label={label} required={required} error={error} hint={hint}>
       {(id) => (
-        <input
+        <TypedInput
           id={id}
           className="input"
           type={type}

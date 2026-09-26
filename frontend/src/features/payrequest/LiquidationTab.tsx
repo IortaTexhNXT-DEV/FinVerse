@@ -15,6 +15,7 @@ import { payRequestApi } from './api';
 import type { LiquidationView, PayRequest } from './api';
 import { dayTotal, daysErrors, expenseInputs } from './requestForm';
 import type { DayDraft, FieldErrors } from './requestForm';
+import { DateInput } from '@/components/ui/DateInput';
 
 const EXPENSES = [
   ['perDiem', 'Per Diem'],
@@ -83,9 +84,7 @@ function DaysTable({
           {days.map((d, i) => (
             <tr key={`day-${String(i)}`}>
               <td>
-                <input
-                  type="date"
-                  className="input"
+                <DateInput
                   aria-label={`Date ${String(i + 1)}`}
                   disabled={!editable}
                   value={d.fieldworkDate}

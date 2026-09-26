@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDate, humanize, today } from '@/utils/format';
 import { round2 } from './receivablesMath';
 import { bankOptions, useReceivablesLookups } from './useReceivablesLookups';
+import { DateInput } from '@/components/ui/DateInput';
 
 /**
  * Cheques and cash received but not yet banked, grouped on deposit (pay-in) slips per bank account;
@@ -116,13 +117,7 @@ export default function DepositsPage() {
           </Field>
           <Field label="Slip date">
             {(id) => (
-              <input
-                id={id}
-                type="date"
-                className="input"
-                value={slipDate}
-                onChange={(e) => setSlipDate(e.target.value)}
-              />
+              <DateInput id={id} value={slipDate} onChange={(e) => setSlipDate(e.target.value)} />
             )}
           </Field>
         </div>

@@ -397,6 +397,56 @@ dl.form-grid dd {
   background: rgba(0, 78, 168, 0.12);
 }
 
+/* ---------- Date picker (dd-MMM-yyyy) --------------------------------------------------- */
+.date-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 150px;
+}
+
+.date-input .input {
+  padding-right: 40px;
+}
+
+.date-input-button {
+  position: absolute;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--brand-blue);
+  cursor: pointer;
+}
+
+.date-input-button:hover:not(:disabled) {
+  background: var(--brand-blue-050);
+}
+
+.date-input-button:disabled {
+  color: var(--color-placeholder);
+  cursor: default;
+}
+
+/* The native date input only hosts the calendar; it sits under the button, invisible */
+.date-input-native {
+  position: absolute;
+  right: 4px;
+  bottom: 0;
+  width: 32px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  border: 0;
+  padding: 0;
+}
+
 /* ---------- Field label info tooltip ----------------------------------------------------- */
 .label-row {
   display: inline-flex;

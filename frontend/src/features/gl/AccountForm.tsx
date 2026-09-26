@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { AccountClass, AccountLevel, SubLedgerType } from '@/api/gl';
 import { Field } from '@/components/ui/Field';
 import type { FrbsAccountRequest, NegativeBalancePolicy } from './glPlatformApi';
+import { DateInput } from '@/components/ui/DateInput';
 
 const CLASSES: AccountClass[] = ['ASSET', 'LIABILITY', 'EQUITY', 'INCOME', 'EXPENSE', 'MEMORANDUM'];
 const LEVELS: AccountLevel[] = ['GROUP', 'MAIN', 'SUB', 'MICRO'];
@@ -174,10 +175,8 @@ export function AccountForm({ value, editing, onChange }: Readonly<Props>) {
         </Field>
         <Field label="Opened on" required>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               disabled={editing}
               value={value.openedOn}
               onChange={(e) => set('openedOn', e.target.value)}

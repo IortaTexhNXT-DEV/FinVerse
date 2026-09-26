@@ -16,6 +16,7 @@ import { disbursementApi } from './api';
 import type { Tag, Voucher } from './api';
 import { DialogFooter } from './VoucherDialogs';
 import './disbursement.css';
+import { DateInput } from '@/components/ui/DateInput';
 
 const COLUMNS: Column<Tag>[] = [
   { key: 'kind', header: 'Tag', render: (t) => (t.kind === 'OR_AR' ? 'OR / AR' : 'CWT') },
@@ -134,10 +135,8 @@ function TagDialog({
           {kind === 'receipt' ? (
             <Field label="Receipt Date" required>
               {(id) => (
-                <input
+                <DateInput
                   id={id}
-                  type="date"
-                  className="input"
                   value={form.date}
                   onChange={(e) => set({ date: e.target.value })}
                 />
@@ -147,10 +146,8 @@ function TagDialog({
             <>
               <Field label="Period From" required>
                 {(id) => (
-                  <input
+                  <DateInput
                     id={id}
-                    type="date"
-                    className="input"
                     value={form.from}
                     onChange={(e) => set({ from: e.target.value })}
                   />
@@ -158,10 +155,8 @@ function TagDialog({
               </Field>
               <Field label="Period To" required>
                 {(id) => (
-                  <input
+                  <DateInput
                     id={id}
-                    type="date"
-                    className="input"
                     value={form.to}
                     onChange={(e) => set({ to: e.target.value })}
                   />
@@ -174,13 +169,7 @@ function TagDialog({
             required
           >
             {(id) => (
-              <input
-                id={id}
-                type="date"
-                className="input"
-                value={form.on}
-                onChange={(e) => set({ on: e.target.value })}
-              />
+              <DateInput id={id} value={form.on} onChange={(e) => set({ on: e.target.value })} />
             )}
           </Field>
           <Field label="Amount" required={kind === 'cwt'}>

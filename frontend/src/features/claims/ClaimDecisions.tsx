@@ -9,6 +9,7 @@ import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { today } from '@/utils/format';
 import type { ClaimActions } from './claimWorkflow';
+import { DateInput } from '@/components/ui/DateInput';
 
 type Decision = 'close' | 'reopen' | 'repudiate' | 'withdraw';
 
@@ -108,13 +109,7 @@ export function ClaimDecisions({
             {decision !== 'reopen' && (
               <Field label="Accounting date" required>
                 {(id) => (
-                  <input
-                    id={id}
-                    className="input"
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                  />
+                  <DateInput id={id} value={date} onChange={(e) => setDate(e.target.value)} />
                 )}
               </Field>
             )}

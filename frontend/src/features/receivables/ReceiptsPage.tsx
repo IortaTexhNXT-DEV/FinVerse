@@ -16,6 +16,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, humanize } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 
 const STATUSES = ['', 'PENDING_APPROVAL', 'APPROVED', 'REJECTED', 'CANCELLED', 'BOUNCED'];
 const MODES = ['', 'CASH', 'CHEQUE', 'BANK_TRANSFER', 'CARD', 'PDC'];
@@ -117,10 +118,8 @@ export default function ReceiptsPage() {
           </Field>
           <Field label="From">
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={filters.from ?? ''}
                 onChange={(e) => set({ from: e.target.value })}
               />
@@ -128,10 +127,8 @@ export default function ReceiptsPage() {
           </Field>
           <Field label="To">
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={filters.to ?? ''}
                 onChange={(e) => set({ to: e.target.value })}
               />

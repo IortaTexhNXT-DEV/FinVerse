@@ -11,6 +11,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, today } from '@/utils/format';
 import { cancellationErrors, cancellationRequest, isValid, labelOf } from './bookingForm';
 import type { CancellationForm } from './bookingForm';
+import { DateInput } from '@/components/ui/DateInput';
 
 const KINDS: CancellationKind[] = ['FLAT', 'FLAT_RETAIN_DST', 'PARTIAL'];
 const BASES: PeriodBasis[] = ['PRO_RATA', 'SHORT_PERIOD'];
@@ -123,10 +124,8 @@ export function CancellationDialog({
         <div className="form-grid">
           <Field label="Cancellation date" required error={errors.effectiveDate}>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 value={form.effectiveDate}
                 onChange={(e) => setForm({ ...form, effectiveDate: e.target.value })}
               />

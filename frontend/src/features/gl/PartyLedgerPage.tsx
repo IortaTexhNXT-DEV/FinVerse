@@ -15,6 +15,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, humanize, today } from '@/utils/format';
 import { AgeingStrip, StatementKpis } from './PartyStatementParts';
 import { daysOverdue, statementLines, summarize } from './partyStatement';
+import { DateInput } from '@/components/ui/DateInput';
 
 function columns(asOf: string): Column<OpenItem>[] {
   return [
@@ -123,15 +124,7 @@ export default function PartyLedgerPage() {
             )}
           </Field>
           <Field label="As of">
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="date"
-                value={asOf}
-                onChange={(e) => setAsOf(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={asOf} onChange={(e) => setAsOf(e.target.value)} />}
           </Field>
           <label className="checkbox">
             <input

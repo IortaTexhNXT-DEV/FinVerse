@@ -21,6 +21,7 @@ import type { EodRun } from './api';
 import { DialogFooter } from './VoucherDialogs';
 import './disbursement.css';
 import { displayNameOf } from '@/api/users';
+import { DateInput } from '@/components/ui/DateInput';
 
 const COLUMNS: Column<EodRun>[] = [
   { key: 'no', header: 'Run', render: (r) => r.runNo },
@@ -122,15 +123,7 @@ function RunDialog({
           produced.
         </p>
         <Field label="Business Date" required>
-          {(id) => (
-            <input
-              id={id}
-              type="date"
-              className="input"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          )}
+          {(id) => <DateInput id={id} value={date} onChange={(e) => setDate(e.target.value)} />}
         </Field>
       </div>
     </Modal>

@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useWorkspace } from '@/context/workspaceContext';
 import { formatDate, today } from '@/utils/format';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { DateInput } from '@/components/ui/DateInput';
 
 type BranchForm = Partial<Branch>;
 
@@ -142,10 +143,8 @@ export default function BranchesPage() {
               ))}
               <Field label="Date of opening" required>
                 {(id) => (
-                  <input
+                  <DateInput
                     id={id}
-                    className="input"
-                    type="date"
                     disabled={form.id !== undefined}
                     value={form.openingDate ?? ''}
                     onChange={(e) => setForm({ ...form, openingDate: e.target.value })}

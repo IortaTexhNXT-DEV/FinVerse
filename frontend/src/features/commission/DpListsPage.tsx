@@ -21,6 +21,7 @@ import { commissionApi } from './commissionApi';
 import type { DpList, Submission } from './commissionApi';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { displayNameOf } from '@/api/users';
+import { DateInput } from '@/components/ui/DateInput';
 
 const TABS = [
   { id: 'lists', label: 'Lists Received' },
@@ -117,26 +118,10 @@ function Tracker({ companyId }: Readonly<{ companyId: number }>) {
     <div className="stack">
       <div className="row">
         <Field label="From">
-          {(id) => (
-            <input
-              id={id}
-              type="date"
-              className="input"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-            />
-          )}
+          {(id) => <DateInput id={id} value={from} onChange={(e) => setFrom(e.target.value)} />}
         </Field>
         <Field label="To">
-          {(id) => (
-            <input
-              id={id}
-              type="date"
-              className="input"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-            />
-          )}
+          {(id) => <DateInput id={id} value={to} onChange={(e) => setTo(e.target.value)} />}
         </Field>
       </div>
       <ErrorAlert error={tracker.error} />

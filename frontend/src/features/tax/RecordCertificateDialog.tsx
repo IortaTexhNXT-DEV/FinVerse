@@ -13,6 +13,7 @@ import type {
   CertificateKind,
   ReceivedCertificate,
 } from './receivedCertificates';
+import { TypedInput } from '@/components/ui/DateInput';
 
 type Line = CertificateDraft['lines'][number];
 
@@ -113,7 +114,7 @@ function Text({
   return (
     <Field label={label} required={required} error={error}>
       {(id) => (
-        <input
+        <TypedInput
           id={id}
           type={type}
           className="input"

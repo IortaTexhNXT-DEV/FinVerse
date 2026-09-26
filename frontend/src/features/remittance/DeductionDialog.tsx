@@ -7,6 +7,7 @@ import { Modal } from '@/components/ui/Modal';
 import { today } from '@/utils/format';
 import { EMPTY_DEDUCTION, deductionErrors } from './deductionForm';
 import type { DeductionErrors, DeductionForm } from './deductionForm';
+import { TypedInput } from '@/components/ui/DateInput';
 
 const CURRENCIES = ['PHP', 'USD'];
 
@@ -36,7 +37,7 @@ function TextField({
   return (
     <Field label={label} required={required} error={errors[field]} hint={hint}>
       {(id) => (
-        <input
+        <TypedInput
           id={id}
           className="input"
           type={type}

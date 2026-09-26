@@ -17,6 +17,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDate, formatDateTime, today } from '@/utils/format';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { displayNameOf } from '@/api/users';
+import { DateInput } from '@/components/ui/DateInput';
 
 /**
  * Document templates (BRNB.004): the texts merged into quotations, slips, insurance advice and
@@ -226,10 +227,8 @@ function NewVersionDialog({
         </Field>
         <Field label="Effective from" required>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              type="date"
-              className="input"
               value={effectiveFrom}
               onChange={(e) => setEffectiveFrom(e.target.value)}
             />

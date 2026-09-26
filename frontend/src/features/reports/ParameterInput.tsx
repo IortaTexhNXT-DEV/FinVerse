@@ -2,6 +2,7 @@ import type { ParameterSpec } from '@/api/reports';
 import { Field } from '@/components/ui/Field';
 import { useWorkspace } from '@/context/workspaceContext';
 import { humanize } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface Props {
   spec: ParameterSpec;
@@ -32,15 +33,7 @@ export function ParameterInput({ spec, value, onChange, error }: Readonly<Props>
       {(id) => {
         switch (spec.type) {
           case 'DATE':
-            return (
-              <input
-                id={id}
-                className="input"
-                type="date"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-              />
-            );
+            return <DateInput id={id} value={value} onChange={(e) => onChange(e.target.value)} />;
           case 'NUMBER':
             return (
               <input

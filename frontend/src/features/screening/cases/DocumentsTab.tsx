@@ -17,6 +17,7 @@ import type { UploadForm } from './caseLogic';
 import { LovField, StepDialog } from './StepDialog';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { UserName } from '@/components/ui/UserName';
+import { DateInput } from '@/components/ui/DateInput';
 
 function UploadDialog({
   detail,
@@ -82,10 +83,8 @@ function UploadDialog({
         />
         <Field label="Date Received" required error={errors.dateReceived}>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              type="date"
-              className="input"
               max={today()}
               value={form.dateReceived}
               onChange={(e) => setForm({ ...form, dateReceived: e.target.value })}

@@ -13,6 +13,7 @@ import { useWorkspace } from '@/context/workspaceContext';
 import { dateRangeError } from '@/utils/dateRange';
 import { formatAmount, formatDate, today } from '@/utils/format';
 import { useGlLookups } from './useLookups';
+import { DateInput } from '@/components/ui/DateInput';
 
 /** GL inquiry: account statement with opening, running and closing balance and drill-down. */
 export default function AccountInquiryPage() {
@@ -61,22 +62,12 @@ export default function AccountInquiryPage() {
             )}
           </Field>
           <Field label="From">
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="date"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={from} onChange={(e) => setFrom(e.target.value)} />}
           </Field>
           <Field label="To" error={rangeError}>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 aria-invalid={rangeError !== undefined}
                 value={to}
                 onChange={(e) => setTo(e.target.value)}

@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 
 interface ExceptionForm {
   rate: string;
@@ -106,10 +107,8 @@ export function RateExceptionDialog({
         </Field>
         <Field label="Valid until">
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               value={form.validUntil}
               onChange={(e) => setForm({ ...form, validUntil: e.target.value })}
             />

@@ -18,6 +18,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatAmount, formatDate, humanize, today } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { IncentiveRun, RunLine, Scheme } from './commissionApi';
+import { DateInput } from '@/components/ui/DateInput';
 
 const LINE_COLUMNS: Column<RunLine>[] = [
   { key: 'invoice', header: 'Invoice No.', render: (l) => <strong>{l.invoiceNo}</strong> },
@@ -133,26 +134,10 @@ function ComputeDialog({
         </Field>
         <div className="form-grid">
           <Field label="Booked From" required>
-            {(id) => (
-              <input
-                id={id}
-                type="date"
-                className="input"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={from} onChange={(e) => setFrom(e.target.value)} />}
           </Field>
           <Field label="Booked To" required>
-            {(id) => (
-              <input
-                id={id}
-                type="date"
-                className="input"
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={to} onChange={(e) => setTo(e.target.value)} />}
           </Field>
         </div>
       </div>

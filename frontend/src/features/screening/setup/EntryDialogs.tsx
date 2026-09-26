@@ -15,6 +15,7 @@ import type { EntryDetail, EntryRequest, ListSource, WatchlistChange, WatchlistE
 import { RemarksDialog } from './RemarksDialog';
 import { aliasesText, entryErrors, parseAliases, requestOf } from './watchlistLogic';
 import { displayNameOf } from '@/api/users';
+import { DateInput } from '@/components/ui/DateInput';
 
 type TextKey = 'primaryName' | 'firstName' | 'lastName' | 'nationality' | 'idNumbers';
 type DateKey = 'birthDate' | 'listedOn' | 'delistedOn';
@@ -63,10 +64,8 @@ export function EntryFormDialog({ entry, aliases, sources, onClose }: Readonly<F
   const date = (key: DateKey, label: string) => (
     <Field label={label}>
       {(id) => (
-        <input
+        <DateInput
           id={id}
-          type="date"
-          className="input"
           value={request[key] ?? ''}
           onChange={(e) => set({ [key]: e.target.value || undefined })}
         />

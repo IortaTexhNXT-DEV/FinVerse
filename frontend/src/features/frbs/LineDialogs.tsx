@@ -8,6 +8,7 @@ import { formatAmount, today } from '@/utils/format';
 import { frbsApi } from './api';
 import type { ServiceFeeLine } from './api';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { DateInput } from '@/components/ui/DateInput';
 
 function dateError(value: string, now: string, label: string): string | undefined {
   if (value === '') {
@@ -60,15 +61,7 @@ export function ReleaseDialog({
           {line.payeeName}: {line.amounts.currency} {formatAmount(line.amounts.fee)}
         </p>
         <Field label="Released On" required error={error} hint="Date the recipient was credited">
-          {(id) => (
-            <input
-              id={id}
-              type="date"
-              className="input"
-              value={on}
-              onChange={(e) => setOn(e.target.value)}
-            />
-          )}
+          {(id) => <DateInput id={id} value={on} onChange={(e) => setOn(e.target.value)} />}
         </Field>
       </div>
     </Modal>
@@ -123,15 +116,7 @@ export function LiquidateDialog({
         </p>
         <div className="frbs-form">
           <Field label="Liquidated On" required error={dateMessage}>
-            {(id) => (
-              <input
-                id={id}
-                type="date"
-                className="input"
-                value={on}
-                onChange={(e) => setOn(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={on} onChange={(e) => setOn(e.target.value)} />}
           </Field>
           <Field
             label="Liquidation Report"

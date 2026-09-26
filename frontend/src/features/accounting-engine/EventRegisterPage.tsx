@@ -16,6 +16,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatAmount, formatDate, formatDateTime, today } from '@/utils/format';
 import { parseAmounts } from './ruleModel';
 import { useAccountingLookups } from './useAccountingLookups';
+import { DateInput } from '@/components/ui/DateInput';
 
 type Filters = Omit<EventFilters, 'companyId'>;
 
@@ -99,10 +100,8 @@ export default function EventRegisterPage() {
           </Field>
           <Field label="Value date from">
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                className="input"
-                type="date"
                 value={filters.from}
                 onChange={(e) => set({ from: e.target.value })}
               />
@@ -110,13 +109,7 @@ export default function EventRegisterPage() {
           </Field>
           <Field label="Value date to">
             {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="date"
-                value={filters.to}
-                onChange={(e) => set({ to: e.target.value })}
-              />
+              <DateInput id={id} value={filters.to} onChange={(e) => set({ to: e.target.value })} />
             )}
           </Field>
         </div>

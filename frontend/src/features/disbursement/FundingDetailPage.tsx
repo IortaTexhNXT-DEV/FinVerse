@@ -21,6 +21,7 @@ import type { FundingForm } from './forms';
 import { TextDialog } from './VoucherDialogs';
 import './disbursement.css';
 import { displayNameOf } from '@/api/users';
+import { DateInput } from '@/components/ui/DateInput';
 
 const ENTITY = 'DisbursementFunding';
 
@@ -88,10 +89,8 @@ function FundingFields({
       </Field>
       <Field label="Value Date" required error={errors.valueDate}>
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            type="date"
-            className="input"
             disabled={disabled}
             value={form.valueDate}
             onChange={(e) => onChange({ valueDate: e.target.value })}

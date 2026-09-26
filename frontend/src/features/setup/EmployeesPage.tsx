@@ -21,6 +21,7 @@ import { frbsSetupApi } from './frbsSetupApi';
 import type { Employee, EmployeeInput } from './frbsSetupApi';
 import { employeeInput, employeeProblems, newEmployee } from './setupForms';
 import type { FieldErrors } from './setupForms';
+import { DateInput } from '@/components/ui/DateInput';
 
 /**
  * Employee master with cost centres (DIS 3.30.1): used for employee payments and cash advances
@@ -270,10 +271,8 @@ function EmployeeFields({
       </Field>
       <Field label="Hired on">
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            className="input"
-            type="date"
             value={form.hiredOn ?? ''}
             onChange={(e) => onChange({ hiredOn: e.target.value || undefined })}
           />
@@ -281,10 +280,8 @@ function EmployeeFields({
       </Field>
       <Field label="Separated on" error={errors.separatedOn} hint="Makes the employee inactive">
         {(id) => (
-          <input
+          <DateInput
             id={id}
-            className="input"
-            type="date"
             value={form.separatedOn ?? ''}
             onChange={(e) => onChange({ separatedOn: e.target.value || undefined })}
           />

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
+import { TypedInput } from '@/components/ui/DateInput';
 
 interface TextProps {
   label: string;
@@ -25,7 +26,7 @@ export function TextField({
   return (
     <Field label={label} required={required} hint={hint}>
       {(id) => (
-        <input
+        <TypedInput
           id={id}
           className="input"
           type={type}

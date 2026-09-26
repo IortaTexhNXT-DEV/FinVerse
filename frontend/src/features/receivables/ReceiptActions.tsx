@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { humanize, today } from '@/utils/format';
 import { applicationSummary, receiptActions } from './receivablesMath';
+import { DateInput } from '@/components/ui/DateInput';
 
 type Dialog = 'reject' | 'cancel' | 'bounce' | null;
 
@@ -124,15 +125,7 @@ export function ReceiptActions({ receipt }: Readonly<{ receipt: Receipt }>) {
             </p>
           )}
           <Field label="Date" required>
-            {(id) => (
-              <input
-                id={id}
-                type="date"
-                className="input"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={date} onChange={(e) => setDate(e.target.value)} />}
           </Field>
           <Field label="Reason" required>
             {(id) => (

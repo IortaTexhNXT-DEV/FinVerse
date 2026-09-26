@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
+import { TypedInput } from '@/components/ui/DateInput';
 
 /** Shared pieces of the Collections plans, escalation and billing dialogs. */
 
@@ -60,7 +61,7 @@ export function InputField({
   return (
     <Field label={label} required={required} error={error} hint={hint}>
       {(id) => (
-        <input
+        <TypedInput
           id={id}
           className="input"
           type={type}

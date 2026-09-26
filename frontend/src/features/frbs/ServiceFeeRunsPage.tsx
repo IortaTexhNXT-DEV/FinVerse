@@ -25,6 +25,7 @@ import { RUN_TABS, periodErrors, tabOf } from './serviceFee';
 import type { RunTab } from './serviceFee';
 import './frbs.css';
 import { UserName } from '@/components/ui/UserName';
+import { DateInput } from '@/components/ui/DateInput';
 
 const COLUMNS: Column<ServiceFeeRun>[] = [
   {
@@ -108,26 +109,10 @@ function ComputeDialog({
         </p>
         <div className="frbs-form">
           <Field label="Fully Paid From" required error={errors.from}>
-            {(id) => (
-              <input
-                id={id}
-                type="date"
-                className="input"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={from} onChange={(e) => setFrom(e.target.value)} />}
           </Field>
           <Field label="Fully Paid To" required error={errors.to}>
-            {(id) => (
-              <input
-                id={id}
-                type="date"
-                className="input"
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-              />
-            )}
+            {(id) => <DateInput id={id} value={to} onChange={(e) => setTo(e.target.value)} />}
           </Field>
         </div>
       </div>

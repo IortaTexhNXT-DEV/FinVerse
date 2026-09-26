@@ -27,6 +27,7 @@ import type { AccessRequestErrors, AccessRequestForm } from './accessRequest';
 import { ApproverPicker } from './ApproverPicker';
 import { GroupProfileFields } from './GroupProfileFields';
 import { UserRequestFields } from './UserRequestFields';
+import { DateInput } from '@/components/ui/DateInput';
 
 type Mode = 'draft' | 'submit';
 
@@ -90,10 +91,8 @@ function TypeFields({
       {!isGroupProfile(form.type) && (
         <Field label="Effective Date" hint="Blank: applies on approval">
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              className="input"
-              type="date"
               min={today()}
               value={form.effectiveFrom}
               onChange={(e) => set({ effectiveFrom: e.target.value })}

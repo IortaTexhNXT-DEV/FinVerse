@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
+import { TypedInput } from '@/components/ui/DateInput';
 
 interface DialogProps<T> {
   value: T;
@@ -81,7 +82,7 @@ function TextField({
   return (
     <Field label={label} hint={hint} error={error} required={required}>
       {(id) => (
-        <input
+        <TypedInput
           id={id}
           className="input"
           type={type}

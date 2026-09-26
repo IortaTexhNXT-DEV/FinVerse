@@ -9,6 +9,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { frbsApi } from './api';
 import type { RecipientBody, RuleBody, ServiceFeeRecipient, ServiceFeeRule } from './api';
 import { ruleErrors } from './serviceFee';
+import { DateInput } from '@/components/ui/DateInput';
 
 /** Adds or changes a service-fee rate (FRBS 2.10.0; values AQ20). */
 export function RuleDialog({
@@ -106,10 +107,8 @@ export function RuleDialog({
           </Field>
           <Field label="Effective From" required>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={body.effectiveFrom}
                 onChange={(e) => setBody({ ...body, effectiveFrom: e.target.value })}
               />
@@ -117,10 +116,8 @@ export function RuleDialog({
           </Field>
           <Field label="Effective To" error={errors.effectiveTo}>
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={body.effectiveTo ?? ''}
                 onChange={(e) => setBody({ ...body, effectiveTo: e.target.value || undefined })}
               />

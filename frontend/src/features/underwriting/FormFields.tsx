@@ -1,4 +1,5 @@
 import { Field } from '@/components/ui/Field';
+import { DateInput } from '@/components/ui/DateInput';
 
 /** Compact labelled inputs used by the underwriting forms (built on the UI kit Field). */
 
@@ -69,10 +70,8 @@ export function DateField({
   return (
     <Field label={label} required={required}>
       {(id) => (
-        <input
+        <DateInput
           id={id}
-          className="input"
-          type="date"
           disabled={disabled}
           value={value ?? ''}
           onChange={(e) => onChange(e.target.value)}

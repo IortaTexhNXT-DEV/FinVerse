@@ -14,6 +14,7 @@ import type {
   SchemeType,
 } from './commissionApi';
 import { schemeProblem } from './commissionLogic';
+import { DateInput } from '@/components/ui/DateInput';
 
 const NEW_TERMS: SchemeTerms = {
   name: '',
@@ -186,10 +187,8 @@ function DateField({
   return (
     <Field label={label}>
       {(id) => (
-        <input
+        <DateInput
           id={id}
-          type="date"
-          className="input"
           value={value ?? ''}
           onChange={(e) => onChange(e.target.value || undefined)}
         />

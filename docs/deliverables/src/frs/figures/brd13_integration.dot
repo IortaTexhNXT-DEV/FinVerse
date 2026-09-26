@@ -1,0 +1,42 @@
+// BRD-13 Data Migration: interfaces of the migration module (FRS section 7). Dashed = parked seam or link only.
+// Colour tokens are replaced by tools/deliverables before rendering. Targets in rows of three.
+digraph dm_integration {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.45, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true, compound=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=12, fontcolor="@NEAR_BLACK", width=2.3, height=0.75, margin="0.12,0.06", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2, fontname="Arial", fontsize=10, fontcolor="@MUTED"];
+
+  src  [label=<<b>BDOI extracts</b><br/><font point-size="10">EBIX, QPS, ISYS, Excel, CMS</font>>, fillcolor="@DIRTY_WHITE"];
+  sftp [label=<<b>SFTP drop</b><br/><font point-size="10">parked seam</font>>, style="rounded,dashed,filled", color="@MUTED"];
+  up   [label=<<b>Console upload</b><br/><font point-size="10">data and control files</font>>];
+  mig  [label=<<b>Migration module</b><br/><font point-size="10">intake, staging, maps, rules,<br/>loads, reconciliation, sign-off</font>>, fillcolor="@BG_BLUE"];
+
+  subgraph cluster_targets {
+    label=<<b>BIBS services and ports</b>>; fontname="Arial"; fontsize=11; fontcolor="@HEADER_BLUE";
+    style="rounded,dashed"; color="@HEADER_BLUE"; margin=14;
+    ref [label=<<b>Reference masters</b><br/><font point-size="10">LOV, catalogue, sales org</font>>];
+    crm [label=<<b>Client master</b><br/><font point-size="10">crm, screening run</font>>];
+    acc [label=<<b>Accounts</b><br/><font point-size="10">policy headers</font>>];
+    ops [label=<<b>Operations ledger</b><br/><font point-size="10">legacy invoices, UPP</font>>];
+    gl  [label=<<b>GL</b><br/><font point-size="10">opening entries, trial balance</font>>];
+    rnw [label=<<b>Renewal</b><br/><font point-size="10">legacy policy source</font>>];
+    csf [label=<<b>Customer Servicing</b><br/><font point-size="10">legacy account lookup</font>>];
+    arc [label=<<b>Legacy archive</b><br/><font point-size="10">inquiry, access log</font>>, fillcolor="@AMBER_BG"];
+    { rank=same; ref; crm; acc; }
+    { rank=same; ops; gl; rnw; }
+    { rank=same; csf; arc; }
+    ref -> ops [style=invis]; crm -> gl [style=invis]; acc -> rnw [style=invis];
+    ops -> csf [style=invis]; gl -> arc [style=invis];
+  }
+
+  ro  [label=<<b>Legacy read-only</b><br/><font point-size="10">link only</font>>, style="rounded,dashed,filled", color="@MUTED"];
+
+  { rank=same; src; sftp; }
+  { rank=same; up; mig; }
+  src -> up;
+  src -> sftp [style=dashed, color="@MUTED"];
+  up -> mig;
+  sftp -> mig [style=dashed, color="@MUTED"];
+  mig -> crm [lhead=cluster_targets];
+  arc -> ro [style=dashed, color="@MUTED", dir=none];
+}

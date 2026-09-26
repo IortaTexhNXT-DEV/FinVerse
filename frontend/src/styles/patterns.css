@@ -741,6 +741,14 @@ dl.form-grid dd {
   color: #fff;
 }
 
+/* A short note at the top of a flush card */
+.card-note {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  font-size: 13px;
+  border-bottom: 1px solid var(--color-border);
+}
+
 /* ---------- Report catalogue cards ------------------------------------------------------- */
 .report-card .report-code {
   display: block;

@@ -9,7 +9,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime, titleCase } from '@/utils/format';
+import { formatDateTime, humanize, titleCase } from '@/utils/format';
 import { ActionDialog } from './ActionDialog';
 import { HistoryTable } from './HistoryTable';
 import { workflowKey } from './workflowKey';
@@ -37,7 +37,9 @@ function StatusStrip({ item, terminal }: Readonly<{ item: WorkItem; terminal: bo
         <dt>Stage</dt>
         <dd className="workflow-stage">
           <StatusBadge status={item.stageCode} />
-          <span className="workflow-stage-name">{titleCase(item.stageName)}</span>
+          {titleCase(item.stageName) !== humanize(item.stageCode) && (
+            <span className="workflow-stage-name">{titleCase(item.stageName)}</span>
+          )}
         </dd>
       </div>
       <div>

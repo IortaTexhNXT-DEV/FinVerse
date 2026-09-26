@@ -58,6 +58,18 @@ const KIND_CLASS: Record<ColumnKind, string | undefined> = {
   center: 'center',
 };
 
+/** Dates (23-Sep-2026 19:32) and codes (PAY-2026-000010, T-CBG1) that must never wrap. */
+const UNBREAKABLE = /^(\d{2}-[A-Z][a-z]{2}-\d{4}( \d{2}:\d{2})?|[A-Z0-9]+(-[A-Z0-9]+)+)$/;
+
+/** A plain date or code value kept on one line; any other cell content as rendered. */
+function keepTogether(value: ReactNode): ReactNode {
+  return typeof value === 'string' && UNBREAKABLE.test(value) ? (
+    <span className="nowrap">{value}</span>
+  ) : (
+    value
+  );
+}
+
 function cellClass<T>(c: Column<T>): string | undefined {
   if (c.numeric) {
     return 'num';
@@ -172,7 +184,7 @@ function TableBody<T>({
           >
             {columns.map((c) => (
               <td key={c.key} className={cellClass(c)}>
-                {c.render(row)}
+                {keepTogether(c.render(row))}
               </td>
             ))}
           </tr>

@@ -58,7 +58,6 @@ function Header({ client: c }: Readonly<{ client: ClientDetail }>) {
   const filled = fields.filter((v) => v !== undefined && v !== null && v !== '').length;
   return (
     <RecordHeader
-      title={c.displayName}
       chips={
         <>
           <ReferenceChip label="Prospect" value={c.prospectCode} />

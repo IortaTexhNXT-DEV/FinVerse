@@ -49,6 +49,11 @@
   white-space: nowrap;
 }
 
+/* Labels and dispositions in cells may be longer than a status pill */
+.table td .tag {
+  max-width: 240px;
+}
+
 .table td.col-datetime,
 .table td.col-date {
   white-space: nowrap;

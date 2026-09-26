@@ -189,12 +189,12 @@ export default function RequestsPage() {
             {
               key: 'client',
               header: 'Client / Prospect',
-              render: (r) => {
-                if (r.prospectName !== undefined) {
-                  return r.prospectName;
-                }
-                return r.clientId === undefined ? '—' : <ClientLabel clientId={r.clientId} />;
-              },
+              render: (r) =>
+                r.prospectName === undefined && r.clientId !== undefined ? (
+                  <ClientLabel clientId={r.clientId} />
+                ) : (
+                  <span>{r.prospectName ?? '—'}</span>
+                ),
             },
             { key: 'product', header: 'Product', render: (r) => r.productCode ?? '—' },
             { key: 'cover', header: 'Requested Cover', render: (r) => r.requestedCover ?? '' },

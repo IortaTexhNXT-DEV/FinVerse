@@ -13,8 +13,8 @@ export interface HeaderStatus {
 }
 
 interface RecordHeaderProps {
-  /** Record name (client, account, claim...). */
-  title: string;
+  /** Record name (client, account, claim...); omit when the page title already shows it. */
+  title?: string;
   /** Reference chips (codes with copy buttons). */
   chips?: ReactNode;
   /** The record status, then other labelled statuses (KYC, request state). */
@@ -43,7 +43,7 @@ export function Completeness({ filled, total }: Readonly<{ filled: number; total
       >
         <span style={{ width: `${String(pct)}%` }} />
       </span>
-      {filled} of {total} Required Fields
+      Profile {filled} of {total} Fields
     </span>
   );
 }
@@ -66,7 +66,7 @@ export function RecordHeader({
     <Card className="record-header-card">
       <div className="record-header">
         <div className="record-header-top">
-          <h2>{title}</h2>
+          {title !== undefined && <h2>{title}</h2>}
           {chips}
           {status !== undefined && <StatusBadge status={status} />}
           {statuses.map((s) => (

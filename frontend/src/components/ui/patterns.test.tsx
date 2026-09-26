@@ -242,7 +242,8 @@ describe('DataTable conventions', () => {
         }
       />,
     );
-    expect(screen.getByText('PAY-2026-000010')).toHaveClass('col-code');
+    expect(screen.getByText('PAY-2026-000010')).toHaveClass('nowrap');
+    expect(screen.getByText('PAY-2026-000010').closest('td')).toHaveClass('col-code');
     expect(screen.getAllByText('1,200.00')[0]).toHaveClass('num');
     expect(screen.getByRole('columnheader', { name: /reference/i })).toHaveAttribute(
       'aria-sort',

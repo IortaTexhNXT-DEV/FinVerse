@@ -1,0 +1,277 @@
+# Messages catalogue of BRD-1 New Business: sources, places and the fix the user makes.
+# The message texts are read from the code by tools/deliverables/code_facts.py at every build (never typed here).
+# This file says where each message appears (by the class or file that raises it) and what the user does.
+sources:
+  backend_packages: [crm, quotation, nonpackage, account, placement, issuance, booking, bulk, attachment, workflow, lov, nbreport, docgen, messaging]
+  backend_classes_extra: [RetentionRule, RetentionService, ReportParameters, ReportVariantService]
+  exclude_classes: [ClientPayoutAccounts, ClientRiskService, ClientController, AccessRequestService, PartyService,
+                    DocRenditionController, NotificationPreferenceService, BulkController, ProposalTsuController]
+  bulk_handlers: [ClientBulkHandler, QuotationRequestBulkHandler, QuotationCreateBulkHandler, QuotationAcceptanceBulkHandler,
+                  AccountCreateBulkHandler, AccountUpdateBulkHandler, FfyTaggingBulkHandler, BookingUploadHandler]
+  frontend_dirs: [features/crm, features/quotations, features/proposals, features/accounts, features/placement,
+                  features/issuance, features/booking, features/bulk, features/workspace, features/nbreports,
+                  features/approvals, features/brokingsetup, features/nbadmin/LovPage.tsx, features/nbadmin/LovValueDialog.tsx,
+                  features/nbadmin/lovForm.ts, features/nbadmin/RetentionPage.tsx, features/nbadmin/RetentionDialogs.tsx,
+                  features/reports/ReportRunnerPage.tsx, features/reports/ReportVariants.tsx, features/reports/reportParams.ts,
+                  components/broking, components/attachments]
+
+# Where a message appears: the first rule whose pattern matches the class (backend) or file (frontend) wins.
+places:
+  - [ "^(ClientRules|ClientValidator|DuplicateCheckService|ClientService|Client|clientForm|ClientFormPage|DuplicateWarnings)$", "New Client and Edit Client (SCR-NB-02)" ]
+  - [ "^(ClientOnboardingService|KycDocumentService|KycTab|ClientActionsBar|ClientDetailPage)$", "Client record: KYC & Documents tab and onboarding actions (SCR-NB-03)" ]
+  - [ "^(ClientNotesService|ClientInstruction|NotesTab|InstructionDialog|instructionRules)$", "Client record: Tags & Instructions tab (SCR-NB-03)" ]
+  - [ "^(Client360Service|LinkedRecordsTab|ClientHistoryTab)$", "Client record: Linked Records tab (SCR-NB-03)" ]
+  - [ "^(KycReviewsPage)$", "KYC Reviews Due (SCR-NB-04)" ]
+  - [ "^(ClientsPage|ClientSearchPanel)$", "Clients (SCR-NB-01)" ]
+  - [ "^(QuotationRequest|QuotationRequestService|RequestsPage|CaptureRequestDialog|requestForm)$", "Quotation Requests (SCR-NB-08)" ]
+  - [ "^(QuotationDispatchService|BatchSendDialog|QuotationsPage)$", "Quotations: Send via Email (SCR-NB-05) and Quotation record (SCR-NB-07)" ]
+  - [ "^(QuotationAcceptanceService|AcceptanceDialog)$", "Quotation record: Record acceptance, Create accounts (SCR-NB-07)" ]
+  - [ "^(QuotationService|QuotationRules|QuotationPricing|QuotationProspects|QuotationVersion|quotationForm|QuotationWizardPage|QuotationSteps|PremiumBreakdown)$", "New Quotation and Edit Quotation (SCR-NB-06); Quotation record actions (SCR-NB-07)" ]
+  - [ "^(QuotationActions|QuotationDetailPage|QuotationTabs|RateExceptionDialog)$", "Quotation record (SCR-NB-07)" ]
+  - [ "^(ProposalService|ProposalRules|ProposalFormPage|ProposalFormParts|proposalForm)$", "New Proposal Request and PRF record (SCR-NB-10, SCR-NB-11)" ]
+  - [ "^(QuotationSlipService|InsurerResponseService|ProposalSlipService|ProposalAcceptanceService|ProposalActions|ProposalDetailPage|ProposalTabs|ResponsesTab|SlipDialog)$", "PRF record: slips, insurer responses, acceptance (SCR-NB-11)" ]
+  - [ "^(TsuWorkbenchPage|ProposalsPage)$", "Proposal Requests and TSU Workbench (SCR-NB-09, SCR-NB-12)" ]
+  - [ "^(AccountTaggingService|AccountTagsCard)$", "Account record: Tags (SCR-NB-15)" ]
+  - [ "^(AccountService|AccountLifecycleService|AccountActions|AccountDetailPage|AccountPanels)$", "Account record: workflow actions (SCR-NB-15)" ]
+  - [ "^(Account|AccountRules|AccountTerms|AccountChecks|AccountPricing|AccountClassification|RiskDuplicateService|accountForm|accountChecks|AccountWizardPage|WizardSteps|RiskItemsStep|AccountCheckPanel|PremiumSummary)$", "New Account and Edit Account (SCR-NB-14)" ]
+  - [ "^(AccountsPage|AccountTable|FfyRegisterPage|DirectPaymentPage)$", "Accounts, FFY Register, Direct Payment (SCR-NB-13, SCR-NB-16, SCR-NB-17)" ]
+  - [ "^(PaymentGateService|GatePanel)$", "Account Placement: Payment Gate (SCR-NB-19)" ]
+  - [ "^(HoldCover|HoldCoverService|HoldCoverPanel)$", "Account Placement: Hold Cover (SCR-NB-19)" ]
+  - [ "^(InsurerReturnService|PlacementActions|AccountPlacementPage|PlacementPanel)$", "Account Placement (SCR-NB-19)" ]
+  - [ "^(PlacementSlip|PlacementSlipService|SlipPrerequisites|InsurerDirectory|PlacementBatchService|PlacementAccounts|SlipsPage|SlipActions|GenerateSlipsDialog|WorkbenchBulkBar|PlacementWorkbenchPage|WorkbenchTable|placementLogic)$", "Placement Workbench and Placement Slips (SCR-NB-18, SCR-NB-20)" ]
+  - [ "^(BillingService|BillingPage|BillingBatches|UploadReportDialog)$", "CLPC Billing (SCR-NB-21)" ]
+  - [ "^(PaymentReport|PaymentReportService|PaymentReportParser|PaymentReportPage)$", "CLPC Billing upload and Payment Report (SCR-NB-21, SCR-NB-22)" ]
+  - [ "^(EpolicyService|UploadBatch|EpolicyUploadService|EpolicyUploadPage|BulkEpolicyUpload)$", "E-policy Upload (SCR-NB-24)" ]
+  - [ "^(Epolicy|ExtractionReviewPage|ConfirmPolicyCard|issuanceLogic)$", "Extraction Review (SCR-NB-25)" ]
+  - [ "^(InsuranceAdviceService|AdviceDispatchService|InsuranceAdvicePage|AdviceDialogs)$", "Insurance Advice (SCR-NB-26); Issuance Workbench (SCR-NB-23)" ]
+  - [ "^(EpolicyDispatchService|DispatchPage|IssuanceBulkBar|IssuanceBatchService)$", "E-policy Dispatch (SCR-NB-27); Issuance Workbench (SCR-NB-23)" ]
+  - [ "^(IssuanceWorkbenchPage|IssuanceTable)$", "Issuance Workbench (SCR-NB-23)" ]
+  - [ "^(BookingQueueService|QueueEntry|BookingWorkbenchPage|WorkbenchDialogs|WorkbenchToolbar|WorkbenchFilters|bookingForm|BatchRunsPage|BatchRunDetailPage)$", "Booking Workbench and Batch Runs (SCR-NB-28, SCR-NB-33)" ]
+  - [ "^(BookingService|InvoiceBooker|InvoiceBuilder|BookingPosting|BookingSettings|BookedInvoice|InsurerBillingNumbers|BookingConfirmPage|BookingParts)$", "Pre-booking Confirmation and booking (SCR-NB-29, SCR-NB-28)" ]
+  - [ "^(EndorsementPostingService|EndorsementCalculator|EndorsementEntryPage|EndorsementsPage|CancellationDialog|InvoiceDetailPage|InvoiceTabs)$", "New Endorsement and Cancel Booking (SCR-NB-31, SCR-NB-30)" ]
+  - [ "^(ServiceInvoiceService|ServiceInvoiceRegister|ServiceInvoicesPage|ServiceInvoiceDetailPage)$", "Service Invoices (SCR-NB-32)" ]
+  - [ "^(ServiceInvoiceTypeService|BookingRuleService|IncentiveRule|BookingSetupPage|SetupDialogs)$", "Booking Setup (SCR-NB-34)" ]
+  - [ "BulkHandler$|^(BookingUploadHandler|AccountBulkSupport|BulkService|BulkJob|BulkFileReader|BulkHandlerRegistry|OdsTableReader|TextTableReader|BulkRowValidator|BulkUploadWizard|BulkCenterPage|BulkUploadPage|QuotationBulkPage|AcceptanceBulkPage|AccountBulkPage|BookingUploadPage)$", "Bulk upload wizard (SCR-NB-36) and its result file" ]
+  - [ "^(AttachmentService|DocumentService|Attachments|AttachmentUploadBar)$", "Documents tab of every record (Common screen elements)" ]
+  - [ "^(WorkflowService|WorkflowDefinitions|WorkflowPanel|ActionDialog)$", "Workflow panel of every record (Common screen elements)" ]
+  - [ "^(WorkAssignmentService|MyWorkPage|QueueTable|QueueToolbar|AssignDialog|WorkTiles)$", "My Work and TSU Workbench (SCR-NB-38, SCR-NB-12)" ]
+  - [ "^(MessageService|OutboundMessage|DocumentProtector|SendEmailDialog|SentMessages|OutboundMessagesPage)$", "Send via Email dialogs and Outbound Messages (Common screen elements, SCR-NB-45)" ]
+  - [ "^(LovService|LovValue|LovPage|LovValueDialog|LovValuesTable|lovForm)$", "Lists of Values (SCR-NB-42); any list field" ]
+  - [ "^(SalesTarget|SalesTargetsPage|targetForm)$", "Production Targets (SCR-NB-41)" ]
+  - [ "^(ReportVariantService|ReportParameters|ReportRunnerPage|ReportVariants|reportParams|NbReportsPage)$", "New Business Reports (SCR-NB-40)" ]
+  - [ "^(NbDashboardPage|DashboardParts|DashboardCharts)$", "NB Dashboard (SCR-NB-37)" ]
+  - [ "^(MyApprovalsPage)$", "My Approvals (SCR-NB-39)" ]
+  - [ "^(DocTemplateService|TemplateWordFile|DocumentRenditionService|DocumentTemplatesPage|WordCopyOffer)$", "Document Templates (SCR-NB-44); Word copy of a document" ]
+  - [ "^(RetentionRule|RetentionService|RetentionPage|RetentionDialogs)$", "Data Retention (SCR-NB-43)" ]
+  - [ "^(ReferenceChip|useFileDownload|ItemResultsDialog|ClientPicker|InstructionsBanner|SectionLanding|WorklistToolbar)$", "Every screen (Common screen elements)" ]
+
+# The fix the user makes. Messages that tell the user what to do ("Enter ...", "Select ...") are their own fix and are
+# not repeated here. Keys are message codes; frontend messages without a code use their text.
+fixes:
+  CLIENT_TYPE_LOCKED: Keep the client type; a confirmed client of the wrong type is deactivated and created again.
+  CLIENT_INACTIVE: Choose an active client; an inactive client is not changed or quoted.
+  INSTRUCTION_ENDED: Add a new instruction instead of changing the ended one.
+  INSTRUCTION_DATES: Correct the Effective to date so that it is on or after Effective from.
+  INFO_INCOMPLETE: Complete the listed client fields on Edit Client.
+  KYC_EXPIRED: Upload the current KYC documents and ask a verifier to record the periodic KYC review.
+  MISSING_PARTY: Report it to the System Administrator; the sub-ledger party is created when the client is confirmed.
+  PARTY_NOT_FOUND: Report it to the System Administrator with the party code.
+  PARTY_INACTIVE: Ask Accounting to reactivate the party, or report it to the System Administrator.
+  CLIENT_TAG_EXISTS: No action; the tag is already on the client.
+  KYC_FOUR_EYES: Ask another user with the KYC verification permission to verify it.
+  KYC_NOT_VERIFIED: Submit the KYC and have it verified before confirming the client.
+  CLIENT_BIRTH_DATE: Enter a birth date before today.
+  CLIENT_UNDER_AGE: Check the birth date; a minor cannot be the policyholder.
+  CLIENT_NOT_CONFIRMED: Complete the onboarding of the client (KYC submitted, verified and client confirmed) and try again.
+  LOV_VALUE_INVALID: Choose a value that is in force today; ask the Business Administrator if the value is missing.
+  CLIENT_DUPLICATE: Open the existing client instead of creating a new one.
+  QUOTATION_REQUEST_CLOSED: No action; the request was already quoted or closed.
+  QUOTATION_VERSION_FROZEN: Use Revise (new version) to change a submitted quotation.
+  ACCEPTANCE_GROUP_INVALID: Write the accepted risk groups as numbers separated by ';', for example 1;2.
+  ACCEPTANCE_GROUP_UNKNOWN: Choose only risk groups that the quotation offers.
+  QUOTATION_BATCH_INVALID: Correct the listed quotations (approved, client e-mail on file) or leave them out of the batch.
+  QUOTATION_NOT_APPROVED: Submit the quotation and have it approved before sending it.
+  RATE_SCHEME_NOT_CURRENT: Save the quotation or account again to price it on the current package version, or request a rate exception.
+  QUOTATION_REQUEST_DUPLICATE: No action; the request is already in the inbox.
+  QUOTATION_REQUEST_HAS_CLIENT: Use Create Quotation; the request already has a client.
+  SEGMENT_NOT_ALLOWED: Choose a product offered to the client's segment, or correct the market segment.
+  DIRECT_PAYMENT_NOT_ELIGIBLE: Untick direct payment; the product is paid through BDOI.
+  QUOTATION_PERIOD_INVALID: Correct the period so that it ends after it starts.
+  RATING_BASIS_INVALID: Choose Annual, Pro-rata or Short period.
+  QUOTATION_VALIDITY_PAST: Enter a validity date from today on, or leave it blank.
+  QUOTATION_NOT_EDITABLE: Only a draft is changed; use Revise (new version) on an approved or sent quotation.
+  QUOTATION_PRODUCT_FIXED: Create a new quotation for another product.
+  QUOTATION_NOT_RATED: Enter the sum insured of every item, and the rate where the product has no default rate.
+  QUOTATION_EXPIRED: Change the validity date to today or later and submit again.
+  QUOTATION_FOUR_EYES: Ask another approver to approve the quotation.
+  UPLOAD_FAILED: Upload the file again; if it still fails, save it again as PDF.
+  TERMS_NONE: Key in at least one insurer's terms before closing the request for terms.
+  TERMS_PENDING: Wait for the insurers, or tick "Close the request although some insurers have not answered".
+  RESPONSES_CLOSED: Send the quotation slip to the insurers first.
+  PROPOSAL_TERMS_MISSING: Key in the terms of the chosen insurer, or choose an insurer with terms.
+  PRF_PERIOD_INVALID: Correct the period so that it ends after it starts.
+  PRF_NOT_EDITABLE: Ask the stage owner to return the PRF, then change it.
+  PRF_PRODUCT_FIXED: Create a new PRF for another product.
+  PRF_NOT_NEEDED: Create a package quotation instead of a PRF.
+  PRF_FOUR_EYES: Ask another Marketing TL, TH or UH to approve the PRF.
+  PS_TERMS_MISSING: Choose an insurer whose terms are recorded.
+  PS_FOUR_EYES: Ask another TSU officer to approve the slip.
+  PS_NOT_PREPARED: Submit the proposal slip first.
+  QS_CLOSED: No action; the insurers of a submitted slip are fixed. Return the slip for correction to change them.
+  QS_FOUR_EYES: Ask another TSU officer to approve the slip.
+  INSURER_NO_EMAIL: Ask the Business Administrator to enter the insurer's placement e-mail address, or leave the insurer out.
+  QS_NOT_PREPARED: Submit the quotation slip first.
+  ACCOUNT_TERM_INVALID: Enter a term of 2 years or more, or untick Multi-year.
+  BULK_BUSINESS_TYPE_INVALID: Write NEW_BUSINESS or RENEWAL in the Business Type column.
+  PLACEMENT_INSURER_MISMATCH: Correct the insurer on the account or use a slip of the account's insurer.
+  POLICY_NUMBERS_MISMATCH: Enter one policy number per policy year.
+  ACCOUNT_STATUS_INVALID: Refresh the account; it has moved on and the action no longer applies.
+  ARN_INVALID: Write the ARN as ARN-yyyy-nnnnnn.
+  ARN_IN_USE: Use another ARN, or open the account that has it.
+  ACCOUNT_NOT_EDITABLE: Only a draft or a returned account is changed; ask Processing to return it.
+  TSU_CLEARANCE_REQUIRED: Ask TSU to record its clearance on the account, then validate it.
+  TSU_CLEARANCE_CLOSED: No action; the account is already validated.
+  FFY_NOT_ELIGIBLE: Leave Free First Year blank; the product is not FFY eligible.
+  FFY_NOT_TAGGED: No action; the account has no Free First Year tag.
+  PAYMENT_ARRANGEMENT_LOCKED: No action; the payment arrangement cannot change once the payment gate is passed.
+  ACCOUNT_NOT_ACTIVE: No action; the account is booked, cancelled or voided.
+  ACCOUNT_PERIOD_INVALID: Correct the period so that it ends after it starts.
+  MULTI_YEAR_NOT_ALLOWED: Reduce the term to the product's maximum.
+  MORTGAGE_NOT_APPLICABLE: Leave the mortgagee fields blank for this product.
+  ACCOUNT_OTHER_COMPANY: Select the company of the account in the page header, or remove the row.
+  FFY_ACTION_INVALID: Write TAG or CANCEL in the Action column.
+  FFY_VEHICLE_NOT_UNIQUE: Use the chassis or engine number, which identifies one account.
+  DUPLICATE_ACCOUNT: Open the existing account instead of creating a new one.
+  HOLD_COVER_DATES: Correct the expiry date so that it is after the start.
+  HOLD_COVER_CLOSED: No action; the hold cover is already confirmed, declined or expired.
+  PAYMENT_REPORT_CLOSED: No action; the report was already confirmed or discarded.
+  SLIP_SUPERSEDED: Send the latest version of the slip.
+  BILLING_NOTHING_TO_BILL: No action; every CBG Fire account awaiting payment is billed.
+  BILLING_NOT_CANDIDATE: Select only CBG Fire accounts awaiting payment that are not yet billed.
+  HOLD_COVER_NOT_ALLOWED: Request the hold cover while the account is ready for placement, placed or returned by the insurer.
+  HOLD_COVER_OPEN: No action; record the confirmation or decline of the open hold cover.
+  HOLD_COVER_NONE: No action; there is no open hold cover to decline.
+  PLACEMENT_CHANNEL_PARKED: Ask the Business Administrator to set the insurer to e-mail placement.
+  GATE_REQUIRES_PAYMENT: Upload the payment report that shows the payment and confirm the matches.
+  GATE_NOT_DIRECT_PAYMENT: Record the client confirmation or match the payment instead.
+  ACCOUNT_NOT_AWAITING_PAYMENT: Refresh the account; its payment gate is already open or it has moved on.
+  PAYMENT_REPORT_LAYOUT: Add the missing reference column to the file and upload it again.
+  PAYMENT_REPORT_EMPTY: Upload the report with its payment lines.
+  PAYMENT_REPORT_VALUE: Correct the amount or date on the row (dates as yyyy-mm-dd) and upload the file again.
+  BILLING_BATCH_CLOSED: Choose an open billing batch.
+  PAYMENT_LINE_MATCHED: No action; the row is already matched.
+  SLIP_PREREQUISITES_UNMET: Resolve the listed prerequisites of each account, then generate the slips.
+  NOT_READY_FOR_PLACEMENT: Wait until the account is ready for placement.
+  PAYMENT_NOT_CONFIRMED: Record the client confirmation or match the payment first.
+  TSU_NOT_CLEARED: Ask TSU to record its clearance on the account.
+  DOCUMENTS_MISSING: Upload the listed documents on the account.
+  EPOLICY_REVIEWED: No action; the e-policy was already confirmed or rejected.
+  EPOLICY_UPLOAD_CLOSED: No action; the upload was already confirmed or discarded.
+  EPOLICY_NO_RECIPIENT: Enter the recipient's e-mail address, or add the contact e-mail on the account.
+  EPOLICY_ACCOUNT_NOT_FOUND: Enter the account's ARN, or name the file after the ARN.
+  EPOLICY_ACCOUNT_STATUS: Upload the e-policy once the account is placed.
+  IA_NOT_MORTGAGED: No action; an Insurance Advice is for mortgaged accounts only.
+  IA_ACCOUNT_STATUS: Generate the advice once the account is placed.
+  INVOICE_ALREADY_BOOKED: No action; the invoice is already booked.
+  INCENTIVE_PERIOD_INVALID: Correct the period so that the end is not before the start.
+  QUEUE_ENTRY_CLOSED: Refresh the list; the account was booked or removed from the queue.
+  CLIENT_PARTY_MISSING: Report it to the System Administrator; the client's sub-ledger party is missing.
+  INSURER_PARTY_MISSING: Report it to the System Administrator; the insurer's sub-ledger party is missing.
+  BOOKING_DATE_FUTURE: Enter a booking date of today or earlier.
+  BATCH_EMPTY: Select accounts, or add accounts to the batch first.
+  INCENTIVE_RULES_FROZEN: Maintain incentive criteria in Product Maintenance › Incentive Criteria.
+  INVOICE_NOT_FOUND: Refresh the account and try again.
+  POLICY_YEAR_NOT_DUE: No action; the policy year is booked by the batch when it starts.
+  DUPLICATE_BOOKING: No action; the account is already booked.
+  ACCOUNT_NOT_BOOKABLE: Wait until the policy is issued (e-policy confirmed) or use direct booking.
+  BOOKING_BRANCH_MISSING: Report it to the System Administrator.
+  SHORT_PERIOD_RATE_MISSING: Ask the Business Administrator to set up the short-period rate, or use Pro-rata.
+  ENDORSEMENT_SIGN_MISMATCH: Enter a sum insured change that matches the endorsement type.
+  RETURN_EXCEEDS_PREMIUM: Reduce the return; it cannot exceed the premium in force.
+  ENDORSEMENT_DATE_OUTSIDE_TERM: Enter an effective date within a booked policy year.
+  ACCOUNT_NOT_BOOKED: Endorse the account after it is booked.
+  CANCELLATION_KIND_REQUIRED: Choose the cancellation kind for a cancellation only.
+  BILLING_NO_TOO_LONG: Shorten the insurer billing number to 60 characters.
+  BILLING_NO_DUPLICATE: Check the billing number with the insurer; each number is used once per insurer.
+  PREMIUM_NOT_RATED: Complete the sum insured and rates on the account.
+  ACCOUNT_INSURER_MISSING: Choose the insurer on the account.
+  ACCOUNT_PERIOD_MISSING: Enter the period of cover on the account.
+  INSURER_SHARES_INVALID: Correct the insurer shares so that they add up to 100% with the lead insurer.
+  SERVICE_INVOICE_AUTOMATIC_ONLY: No action; these service invoices are issued automatically.
+  CREDIT_OF_CREDIT: Credit the original service invoice.
+  CREDIT_EXCEEDS_INVOICE: Reduce the credit to the amounts left.
+  SERVICE_INVOICE_TYPE_INACTIVE: Ask the Business Administrator to reactivate the type.
+  DUPLICATE: Use another code; the code already exists.
+  BULK_PARAMETERS_INVALID: Choose the parameters on screen again (product, segment) and upload.
+  BULK_FILE_UNREADABLE: Save the file again as Excel (.xlsx) from the downloaded template and upload it.
+  BULK_FILE_EMPTY: Use the downloaded template and fill at least one row.
+  BULK_NOT_PERMITTED: Ask for the permission of this upload type.
+  BULK_FILE_TOO_LARGE: Split the file into files of 5,000 rows or fewer.
+  BULK_DUPLICATE_FILE: No action; open the earlier upload. To load corrected rows, upload a new file.
+  BULK_TEMPLATE_MISMATCH: Download the current template and copy the data into it.
+  BULK_TEXT_LAYOUT: Use the Excel template, or a text file with a header line.
+  ATTACHMENT_EMPTY: Choose the file again; it has no content.
+  ATTACHMENT_TOO_LARGE: Reduce the file size (for example scan at a lower resolution) and upload again.
+  ATTACHMENT_TYPE_NOT_ALLOWED: Save the document in one of the listed file types.
+  ATTACHMENT_CONTENT_MISMATCH: Save the file with the extension of its real type.
+  ATTACHMENT_INTEGRITY_FAILURE: Report it to the System Administrator; the stored file is damaged.
+  ATTACHMENT_INFECTED: Do not upload the file; ask the sender for a clean copy.
+  INVALID_ATTACHMENT_TARGET: Refresh the record and upload again.
+  DOCUMENT_REFERENCE_REQUIRED: Save the record first so that it has its reference.
+  WORK_CLAIM_NOT_ALLOWED: Ask the team leader to assign the item to you.
+  WORK_ASSIGNEE_NOT_ELIGIBLE: Choose a user of the team that works the stage.
+  WORK_CASE_CLOSED: No action; the item is closed.
+  WORKFLOW_TRANSITION_NOT_ALLOWED: Refresh the record; it is in another stage.
+  WORKFLOW_ACTION_NOT_PERMITTED: Ask a user with the stage's permission to do the action.
+  WORKFLOW_ACTION_NOT_GENERIC: Use the button of the record screen.
+  WORKFLOW_REASON_REQUIRED: Select the reason in the dialog.
+  LOV_EFFECTIVITY_INVALID: Correct the effective-to date.
+  LOV_NOT_MAINTAINABLE: No action; the list is maintained by the system.
+  TARGET_PERIOD_INVALID: Correct the period so that the end is not before the start.
+  TARGET_NEGATIVE: Enter zero or a positive target.
+  REPORT_NOT_AVAILABLE: Ask for the report's permission.
+  VARIANT_NOT_OWNER: No action; ask the owner of the variant to delete it.
+  DOCUMENT_WORD_UNAVAILABLE: Download the PDF.
+  TEMPLATE_WORD_INVALID: Load a Word (.docx) file with the title in the first paragraph and the text below it.
+  DOCUMENT_PROTECTION_FAILED: Send the document again; report the message if it persists.
+  DOCUMENT_NOT_PROTECTABLE: Send the document as PDF, Excel or Word.
+  EMAIL_TOO_MANY_RECIPIENTS: Send to fewer recipients.
+  EMAIL_ADDRESS_INVALID: Correct the e-mail address.
+  MESSAGE_NOT_FAILED: No action; the message was sent or is still queued.
+  NOT_FOUND: Refresh the screen; the record was changed or removed. Report the message with its reference if it persists.
+  VALIDATION_FAILED: Correct the fields listed under the message.
+  CONCURRENT_MODIFICATION: Reload the record; another user changed it. Enter the change again.
+  ACCESS_DENIED: Ask for the permission; the menu shows only the screens of your role.
+  INTERNAL_ERROR: Report the message with its reference to the System Administrator.
+  # Messages that state a condition: the correction the user makes.
+  CLIENT_NOT_PROSPECT: No action; the client is already confirmed or is not in the prospect stage.
+  RESPONSE_NOT_RECEIVED: Record the insurer's terms first (response Terms received), then recommend it.
+  ACCOUNT_RENEWAL_OF_NOT_RENEWAL: Clear the policy renewed, or set the account type to Renewal.
+  MALFORMED_REQUEST: Reload the screen and try again; if it persists, report it with the time to the system administrator.
+  UPLOAD_TOO_LARGE: Reduce the file (split it or scan at a lower resolution) and upload it again.
+  "An individual policyholder must be at least <minimum age> years old": Correct the birth date, or record the client as a corporate or through a guardian.
+  "Possible duplicates. Check that these are different clients: <list>": Open the listed clients; continue only when the new client is a different person or company.
+  "The birth date must be in the past": Correct the birth date.
+  "This client already exists. Open the existing record instead of creating a duplicate: <list>": Open the existing client instead of creating a new one.
+  "Client information incomplete: <missing fields>. Complete it before submitting the KYC.": Edit the client and complete the listed fields.
+  "The end date must not be before the start date": Correct the start or end date.
+  "Linkage and data gaps <list>": Complete the linked records listed (for example the missing mortgagee or account).
+  "TSU routing applies: <tsu reason>. Consider a Proposal Request (PRF) for TSU to price the risk with the insurers.": Raise a Proposal Request instead of a quotation, or change the product, sum insured or item that triggers TSU.
+  "The period end must be after the period start": Correct the period dates.
+  "Duplicate risks: <list>": Remove the duplicate risk item, or open the account that already covers it.
+  "Not ready to submit: <list>": Complete the items listed, then submit.
+  "These risks are already on account <list> — open the existing account instead of creating a new one.": Open the existing account instead of creating a new one.
+  "Rejected by <reviewed by>: <reject reason>": Ask the insurer for a corrected e-policy and upload it again.
+  "The policy numbers must be different.": Enter different policy numbers for the two policies.
+  "A negative endorsement reduces the sum insured (enter a minus)": Enter the sum insured change with a minus sign.
+  "A positive endorsement increases the sum insured": Enter the sum insured change as a positive amount.
+  "E-mail: <dispatch error>": Correct the recipient's e-mail address, then Send Again.
+  "The period end must not be before the start": Correct the period dates.
+  "<Column> '<value>' is not a valid <number, date (yyyy-mm-dd), Y/N value>": Correct the value in the file in the format of the column and upload the file again.
+  "<Column> is mandatory": Fill in the column in the file and upload the file again.
+  "<quotation no> is <status>, not sent to the client": Remove the row; only a quotation sent to the client can be accepted.
+  "Account <arn> belongs to another company": Remove the row, or upload it under the company of the account.
+  "Client Type must be INDIVIDUAL or CORPORATE": Enter INDIVIDUAL or CORPORATE in Client Type.
+  "Client code <code> does not exist": Correct the client code, or leave it blank to create a new client.
+  "The booking date <date> is in the future": Enter today's or an earlier booking date.
+  "The row matches several clients: <details>": Enter the client code of the intended client in the row.

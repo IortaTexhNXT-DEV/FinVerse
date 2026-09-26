@@ -12,14 +12,18 @@ Written by `python tools/deliverables/drop_index.py` from the files of this fold
 
 ## Documents in this drop
 
+One folder per BRD release set (`BRD-nn_<Name>/`): its FRS, sign-off workbook, test plan, release note and
+any other document of the BRD, released and signed off together (deliverables README, "Release and sign-off
+per BRD").
+
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
-| Claims | BRD-07 | FRS | 1.0 | [`FRS/BIBS_FRS_BRD-07_Claims_v1.0.docx`](FRS/BIBS_FRS_BRD-07_Claims_v1.0.docx) |
-| Claims | BRD-07 | Test plan summary (Word) | 1.0 | [`TestPlans/BIBS_TestPlan_BRD-07_Claims_Summary_v1.0.docx`](TestPlans/BIBS_TestPlan_BRD-07_Claims_Summary_v1.0.docx) |
-| Claims | BRD-07 | Test plan workbook (Excel) | 1.0 | [`TestPlans/BIBS_TestPlan_BRD-07_Claims_v1.0.xlsx`](TestPlans/BIBS_TestPlan_BRD-07_Claims_v1.0.xlsx) |
-| Employee Benefits | BRD-08 | FRS | 1.0 | [`FRS/BIBS_FRS_BRD-08_Employee_Benefits_v1.0.docx`](FRS/BIBS_FRS_BRD-08_Employee_Benefits_v1.0.docx) |
-| Employee Benefits | BRD-08 | Test plan summary (Word) | 1.0 | [`TestPlans/BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.0.docx`](TestPlans/BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.0.docx) |
-| Employee Benefits | BRD-08 | Test plan workbook (Excel) | 1.0 | [`TestPlans/BIBS_TestPlan_BRD-08_Employee_Benefits_v1.0.xlsx`](TestPlans/BIBS_TestPlan_BRD-08_Employee_Benefits_v1.0.xlsx) |
+| Claims | BRD-07 | FRS | 1.0 | [`BRD-07_Claims/BIBS_FRS_BRD-07_Claims_v1.0.docx`](BRD-07_Claims/BIBS_FRS_BRD-07_Claims_v1.0.docx) |
+| Claims | BRD-07 | Test plan summary (Word) | 1.0 | [`BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_Summary_v1.0.docx`](BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_Summary_v1.0.docx) |
+| Claims | BRD-07 | Test plan workbook (Excel) | 1.0 | [`BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_v1.0.xlsx`](BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_v1.0.xlsx) |
+| Employee Benefits | BRD-08 | FRS | 1.0 | [`BRD-08_Employee_Benefits/BIBS_FRS_BRD-08_Employee_Benefits_v1.0.docx`](BRD-08_Employee_Benefits/BIBS_FRS_BRD-08_Employee_Benefits_v1.0.docx) |
+| Employee Benefits | BRD-08 | Test plan summary (Word) | 1.0 | [`BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.0.docx`](BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.0.docx) |
+| Employee Benefits | BRD-08 | Test plan workbook (Excel) | 1.0 | [`BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_v1.0.xlsx`](BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_v1.0.xlsx) |
 
 ## Also part of this drop (documents kept in their primary drop)
 
@@ -27,10 +31,10 @@ A BRD that spans drops lives in the folder of its primary drop; nothing is copie
 
 | BRD | Part in this drop | Documents (in the primary drop folder) |
 |---|---|---|
-| BRD-02 | Production Reconciliation chapter of the FRS and its test plan sheet (item 2.3) | [`BIBS_FRS_BRD-02_Operations_v1.1.docx`](../Drop-1_Transactional/FRS/BIBS_FRS_BRD-02_Operations_v1.1.docx)<br>[`BIBS_TestPlan_BRD-02_Operations_Summary_v1.0.docx`](../Drop-1_Transactional/TestPlans/BIBS_TestPlan_BRD-02_Operations_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx`](../Drop-1_Transactional/TestPlans/BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx) |
-| BRD-04 | Marketing Collection extraction: worklists, dispositions, daily files (item 2.1) | [`BIBS_FRS_BRD-04_Collections_v1.0.docx`](../Drop-1_Transactional/FRS/BIBS_FRS_BRD-04_Collections_v1.0.docx)<br>[`BIBS_TestPlan_BRD-04_Collections_Summary_v1.0.docx`](../Drop-1_Transactional/TestPlans/BIBS_TestPlan_BRD-04_Collections_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-04_Collections_v1.0.xlsx`](../Drop-1_Transactional/TestPlans/BIBS_TestPlan_BRD-04_Collections_v1.0.xlsx) |
-| BRD-09 | Service-request functions (proposed, IQ23) | [`BIBS_FRS_BRD-09_Customer_Servicing_Facility_v1.0.docx`](../Drop-1_Transactional/FRS/BIBS_FRS_BRD-09_Customer_Servicing_Facility_v1.0.docx)<br>[`BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_Summary_v1.0.docx`](../Drop-1_Transactional/TestPlans/BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_v1.0.xlsx`](../Drop-1_Transactional/TestPlans/BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_v1.0.xlsx) |
-| BRD-10 | Bridger Insight XG integration | [`BIBS_FRS_BRD-10_Sanction_Screening_v1.0.docx`](../Drop-1_Transactional/FRS/BIBS_FRS_BRD-10_Sanction_Screening_v1.0.docx)<br>[`BIBS_TestPlan_BRD-10_Sanction_Screening_Summary_v1.0.docx`](../Drop-1_Transactional/TestPlans/BIBS_TestPlan_BRD-10_Sanction_Screening_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-10_Sanction_Screening_v1.0.xlsx`](../Drop-1_Transactional/TestPlans/BIBS_TestPlan_BRD-10_Sanction_Screening_v1.0.xlsx) |
+| BRD-02 | Production Reconciliation chapter of the FRS and its test plan sheet (item 2.3) | [`BIBS_FRS_BRD-02_Operations_v1.1.docx`](../Drop-1_Transactional/BRD-02_Operations/BIBS_FRS_BRD-02_Operations_v1.1.docx)<br>[`BIBS_TestPlan_BRD-02_Operations_Summary_v1.0.docx`](../Drop-1_Transactional/BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx`](../Drop-1_Transactional/BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx) |
+| BRD-04 | Marketing Collection extraction: worklists, dispositions, daily files (item 2.1) | [`BIBS_FRS_BRD-04_Collections_v1.0.docx`](../Drop-1_Transactional/BRD-04_Collections/BIBS_FRS_BRD-04_Collections_v1.0.docx)<br>[`BIBS_TestPlan_BRD-04_Collections_Summary_v1.0.docx`](../Drop-1_Transactional/BRD-04_Collections/BIBS_TestPlan_BRD-04_Collections_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-04_Collections_v1.0.xlsx`](../Drop-1_Transactional/BRD-04_Collections/BIBS_TestPlan_BRD-04_Collections_v1.0.xlsx) |
+| BRD-09 | Service-request functions (proposed, IQ23) | [`BIBS_FRS_BRD-09_Customer_Servicing_Facility_v1.0.docx`](../Drop-1_Transactional/BRD-09_Customer_Servicing_Facility/BIBS_FRS_BRD-09_Customer_Servicing_Facility_v1.0.docx)<br>[`BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_Summary_v1.0.docx`](../Drop-1_Transactional/BRD-09_Customer_Servicing_Facility/BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_v1.0.xlsx`](../Drop-1_Transactional/BRD-09_Customer_Servicing_Facility/BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_v1.0.xlsx) |
+| BRD-10 | Bridger Insight XG integration | [`BIBS_FRS_BRD-10_Sanction_Screening_v1.0.docx`](../Drop-1_Transactional/BRD-10_Sanction_Screening/BIBS_FRS_BRD-10_Sanction_Screening_v1.0.docx)<br>[`BIBS_TestPlan_BRD-10_Sanction_Screening_Summary_v1.0.docx`](../Drop-1_Transactional/BRD-10_Sanction_Screening/BIBS_TestPlan_BRD-10_Sanction_Screening_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-10_Sanction_Screening_v1.0.xlsx`](../Drop-1_Transactional/BRD-10_Sanction_Screening/BIBS_TestPlan_BRD-10_Sanction_Screening_v1.0.xlsx) |
 
 ## Still to write
 

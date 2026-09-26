@@ -1,0 +1,94 @@
+digraph flow {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.2, ranksep=0.35, bgcolor="white", newrank=true, compound=true];
+  node [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", fontname="Arial", fontsize=10, fontcolor="@NEAR_BLACK", margin="0.12,0.06"];
+  edge [color="@CTA_BLUE", fontname="Arial", fontsize=8, fontcolor="@MUTED", arrowsize=0.6];
+  subgraph "cluster_Client onboarding and KYC" { label="Client onboarding and KYC"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-NB-01" [label="Clients\nSCR-NB-01"];
+    "SCR-NB-02" [label="New Client and Edit Client\nSCR-NB-02"];
+    "SCR-NB-03" [label="Client record\nSCR-NB-03"];
+    "SCR-NB-04" [label="KYC Reviews Due\nSCR-NB-04"];
+  }
+  subgraph "cluster_Package quotation" { label="Package quotation"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-NB-05" [label="Quotations\nSCR-NB-05"];
+    "SCR-NB-06" [label="New Quotation and Edit Quotation\nSCR-NB-06"];
+    "SCR-NB-07" [label="Quotation record\nSCR-NB-07"];
+    "SCR-NB-08" [label="Quotation Requests\nSCR-NB-08"];
+  }
+  subgraph "cluster_Non-package placement (PRF)" { label="Non-package placement (PRF)"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-NB-09" [label="Proposal Requests\nSCR-NB-09"];
+    "SCR-NB-10" [label="New Proposal Request and Edit Proposal Request\nSCR-NB-10"];
+    "SCR-NB-11" [label="Proposal Request record\nSCR-NB-11"];
+    "SCR-NB-12" [label="TSU Workbench\nSCR-NB-12"];
+  }
+  subgraph "cluster_Account" { label="Account"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-NB-13" [label="Accounts\nSCR-NB-13"];
+    "SCR-NB-14" [label="New Account and Edit Account\nSCR-NB-14"];
+    "SCR-NB-15" [label="Account record\nSCR-NB-15"];
+  }
+  subgraph "cluster_Payment confirmation, placement and hold cover" { label="Payment confirmation, placement and hold cover"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-NB-18" [label="Placement Workbench\nSCR-NB-18"];
+    "SCR-NB-19" [label="Account Placement\nSCR-NB-19"];
+    "SCR-NB-20" [label="Placement Slips\nSCR-NB-20"];
+    "SCR-NB-21" [label="CLPC Billing\nSCR-NB-21"];
+    "SCR-NB-22" [label="Payment Report\nSCR-NB-22"];
+  }
+  subgraph "cluster_Issuance and e-policy" { label="Issuance and e-policy"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-NB-23" [label="Issuance Workbench\nSCR-NB-23"];
+    "SCR-NB-24" [label="E-policy Upload\nSCR-NB-24"];
+    "SCR-NB-25" [label="Extraction Review\nSCR-NB-25"];
+    "SCR-NB-26" [label="Insurance Advice\nSCR-NB-26"];
+    "SCR-NB-27" [label="E-policy Dispatch\nSCR-NB-27"];
+  }
+  subgraph "cluster_Booking" { label="Booking"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-NB-28" [label="Booking Workbench\nSCR-NB-28"];
+    "SCR-NB-29" [label="Pre-booking Confirmation\nSCR-NB-29"];
+    "SCR-NB-30" [label="Booked Invoice\nSCR-NB-30"];
+    "SCR-NB-31" [label="Endorsements and New Endorsement\nSCR-NB-31"];
+    "SCR-NB-32" [label="Service Invoices\nSCR-NB-32"];
+    "SCR-NB-33" [label="Batch Runs\nSCR-NB-33"];
+  }
+  subgraph "cluster_Bulk uploads, work, reports and administration" { label="Bulk uploads, work, reports and administration"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-NB-35" [label="Bulk Uploads\nSCR-NB-35"];
+    "SCR-NB-36" [label="Bulk upload wizard\nSCR-NB-36"];
+    "SCR-NB-37" [label="NB Dashboard\nSCR-NB-37"];
+    "SCR-NB-38" [label="My Work\nSCR-NB-38"];
+    "SCR-NB-40" [label="New Business Reports\nSCR-NB-40"];
+    "SCR-NB-46" [label="Sign in\nSCR-NB-46"];
+  }
+  "SCR-NB-46" -> "SCR-NB-37" [label="sign in"];
+  "SCR-NB-37" -> "SCR-NB-38" [label="figures"];
+  "SCR-NB-01" -> "SCR-NB-03" [label="open"];
+  "SCR-NB-01" -> "SCR-NB-02" [label="New Client"];
+  "SCR-NB-02" -> "SCR-NB-03" [label="Open Client"];
+  "SCR-NB-04" -> "SCR-NB-03" [label="open"];
+  "SCR-NB-03" -> "SCR-NB-06" [label="Generate Quotation"];
+  "SCR-NB-08" -> "SCR-NB-06" [label="Create Quotation"];
+  "SCR-NB-05" -> "SCR-NB-07" [label="open"];
+  "SCR-NB-06" -> "SCR-NB-07" [label="Submit for Review"];
+  "SCR-NB-07" -> "SCR-NB-14" [label="Create accounts"];
+  "SCR-NB-09" -> "SCR-NB-11" [label="open"];
+  "SCR-NB-10" -> "SCR-NB-11" [label="Submit for Approval"];
+  "SCR-NB-12" -> "SCR-NB-11" [label="open"];
+  "SCR-NB-11" -> "SCR-NB-14" [label="Create accounts"];
+  "SCR-NB-13" -> "SCR-NB-15" [label="open"];
+  "SCR-NB-14" -> "SCR-NB-15" [label="Submit to Processing"];
+  "SCR-NB-15" -> "SCR-NB-19" [label="Placement tab"];
+  "SCR-NB-18" -> "SCR-NB-19" [label="client name"];
+  "SCR-NB-21" -> "SCR-NB-22" [label="Upload and Match"];
+  "SCR-NB-22" -> "SCR-NB-18" [label="gate opened"];
+  "SCR-NB-18" -> "SCR-NB-20" [label="slips"];
+  "SCR-NB-18" -> "SCR-NB-28" [label="For Booking"];
+  "SCR-NB-19" -> "SCR-NB-23" [label="placed"];
+  "SCR-NB-27" -> "SCR-NB-28" [label="ready to book"];
+  "SCR-NB-23" -> "SCR-NB-24" [label="Upload E-policies"];
+  "SCR-NB-24" -> "SCR-NB-25" [label="Upload and Review"];
+  "SCR-NB-25" -> "SCR-NB-27" [label="Confirm Policy"];
+  "SCR-NB-25" -> "SCR-NB-26" [label="advice on issue"];
+  "SCR-NB-28" -> "SCR-NB-29" [label="open"];
+  "SCR-NB-29" -> "SCR-NB-30" [label="Book Account"];
+  "SCR-NB-30" -> "SCR-NB-31" [label="New Endorsement"];
+  "SCR-NB-30" -> "SCR-NB-32" [label="Service Invoices tab"];
+  "SCR-NB-28" -> "SCR-NB-33" [label="Batch Runs"];
+  "SCR-NB-35" -> "SCR-NB-36" [label="upload type"];
+  "SCR-NB-40" -> "SCR-NB-40" [label="run report"];
+}

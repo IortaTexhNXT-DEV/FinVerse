@@ -1,9 +1,11 @@
 """Writes the index README.md of each drop folder under docs/deliverables/out/.
 
-BDOI groups the BRDs, FRS, test plans and other collaterals under its drops (answer A5 of 26-Sep-2026). The folders
-and the BRD-to-drop map are in brand.py (DROPS, BRD_DROP, DROP_SHARED). This script lists every file of each drop
-folder with its BRD, kind and version, the BDOI dates of the drop, the parts of BRDs that live in another drop, and the
-documents still to write. Run it after a build or a move:
+BDOI groups the BRDs, FRS, test plans and other collaterals under its drops (answer A5 of 26-Sep-2026). Inside a drop
+folder every BRD has one release-set folder (BRD-nn_<Name>/) with all its documents; programme-level items stay grouped
+by kind under Programme/. The folders and the BRD-to-drop map are in brand.py (DROPS, BRD_DROP, BRD_NAMES,
+DROP_SHARED). This script lists every file of each drop folder by BRD release set with its kind and version, the BDOI
+dates of the drop, the parts of BRDs that live in another drop, and the documents still to write. Run it after a build
+or a move:
 
     python tools/deliverables/drop_index.py
 """
@@ -63,22 +65,31 @@ TO_WRITE = {
 KINDS = {
     "FRS": "FRS",
     "TestPlans": "Test plan",
+    "TestPlan": "Test plan",
+    "Signoff": "Sign-off workbook (Excel)",
+    "ReleaseNote": "Release note",
     "Migration": "Migration pack",
     "Registers": "Register",
+    "Register": "Register",
     "Decks": "Deck",
+    "Deck": "Deck",
     "Alignment": "Alignment pack",
     "Change_Management": "Change register",
+    "Change_Register": "Change register",
 }
+# Order of the kinds inside a release set.
+KIND_ORDER = ["ReleaseNote", "FRS", "Signoff", "TestPlan", "Migration"]
 NAME_RE = re.compile(r"BIBS_(?P<type>[A-Za-z_]+?)_(?P<brd>BRD-\d\d)_(?P<name>.+?)_v(?P<ver>\d+\.\d+)\.(?P<ext>\w+)$")
 
 
-def describe(path: Path, kind: str) -> tuple[str, str, str, str]:
-    """(document, BRD, kind, version) of an output file."""
+def describe(path: Path, kind: str | None = None) -> tuple[str, str, str, str]:
+    """(document, BRD, kind, version) of an output file; the kind comes from the file name when not given."""
     m = NAME_RE.match(path.name)
     if m:
+        kind = kind or m["type"]
         label = KINDS.get(kind, kind)
         name = m["name"]
-        if kind in ("TestPlans", "Change_Management"):
+        if kind in ("TestPlans", "TestPlan", "Change_Management", "Change_Register"):
             label = f"{label} summary (Word)" if name.endswith("_Summary") else f"{label} workbook (Excel)"
             label = label[0].upper() + label[1:]
             name = name.removesuffix("_Summary")
@@ -87,7 +98,10 @@ def describe(path: Path, kind: str) -> tuple[str, str, str, str]:
 
 
 def brd_sort(row: tuple[str, str, str, str, str]) -> tuple:
-    return (row[1], row[0], row[2])
+    m = NAME_RE.match(row[4].rsplit("/", 1)[-1])
+    kind = m["type"] if m else "~"
+    order = KIND_ORDER.index(kind) if kind in KIND_ORDER else len(KIND_ORDER)
+    return (row[1], order, row[0], row[2], row[3])
 
 
 def is_listed(path: Path, root: Path) -> bool:
@@ -106,7 +120,8 @@ def write_index(key: str) -> Path:
     root = brand.OUT_DIR / drop["folder"]
     rows = []
     for kind_dir in sorted(p for p in root.iterdir() if p.is_dir() and not p.name.startswith(("_", "."))):
-        kind = kind_dir.name
+        # A BRD release-set folder (BRD-nn_Name) takes the kind from each file name; Programme keeps kind folders.
+        kind = None if kind_dir.name.startswith("BRD-") else kind_dir.name
         for f in sorted(kind_dir.rglob("*")):
             if not is_listed(f, root):
                 continue
@@ -138,6 +153,10 @@ def write_index(key: str) -> Path:
         "",
         "## Documents in this drop",
         "",
+        "One folder per BRD release set (`BRD-nn_<Name>/`): its FRS, sign-off workbook, test plan, release note and",
+        "any other document of the BRD, released and signed off together (deliverables README, \"Release and sign-off",
+        "per BRD\").",
+        "",
         "| Document | BRD | Kind | Version | File |",
         "|---|---|---|---|---|",
     ]
@@ -156,8 +175,9 @@ def write_index(key: str) -> Path:
         ]
         for b, what in shared_here:
             home = brand.DROPS[brand.drop_of(b)]["folder"]
-            files = sorted(f for kind in ("FRS", "TestPlans") for f in (brand.OUT_DIR / home / kind).glob(f"BIBS_*_{b}_*"))
-            links = "<br>".join(f"[`{f.name}`](../{home}/{f.parent.name}/{f.name})" for f in files)
+            folder = brand.out_dir(b, "FRS")
+            files = sorted(f for f in folder.glob(f"BIBS_*_{b}_*") if f.name.startswith(("BIBS_FRS_", "BIBS_TestPlan_")))
+            links = "<br>".join(f"[`{f.name}`](../{home}/{folder.name}/{f.name})" for f in files)
             lines.append(f"| {b} | {what} | {links or f'[{home}/](../{home}/README.md)'} |")
     lines += ["", "## Still to write", "", "| Document | BRD | Note |", "|---|---|---|"]
     for doc, brd, note in TO_WRITE[key]:

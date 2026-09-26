@@ -1,0 +1,196 @@
+# Screen specifications of BRD-1 New Business: accounts.
+area: Account
+screens:
+  - id: SCR-NB-13
+    title: Accounts
+    route: /accounts
+    purpose: >-
+      The work list of New Business accounts from draft to booking, with quick tabs for the user's drafts, accounts
+      returned to the user, accounts awaiting payment, Free First Year and direct payment, a search by ARN, client code
+      or name, and advanced filters on PN number, vehicle identifiers, location, product, insurer, status, business type
+      and period.
+    entry:
+      - NB Dashboard figures open the list filtered on their status
+      - Client record › Linked Records tab
+    shots:
+      - {state: list, user: ao, caption: "Accounts work list, All tab"}
+      - {state: returned, user: ao, tab: "Returned to Me", caption: "Returned to Me tab"}
+      - {state: filters, user: ao, click: "^filters$", caption: "Accounts with the advanced filters open"}
+    fields:
+      - "Tabs | All / My Drafts / Returned to Me / Awaiting Payment / FFY / Direct Payment | Tab | - | - | Fixed | All | - | My Drafts and Returned to Me show the user's own accounts | -"
+      - "Search | Search ARN, client code or name | Text | Free text | N | - | Blank | - | Contains search | -"
+      - "Filters | PN Number | Text | - | N | - | Blank | - | Exact match on a PN number of the account | -"
+      - "Filters | Plate, Conduction, Engine or Chassis | Text | - | N | - | Blank | - | Match on any vehicle identifier | -"
+      - "Filters | Location of Risk | Text | - | N | - | Blank | - | Contains search on the risk address | -"
+      - "Filters | Product | Text | Upper case | N | - | Blank | - | Product code | -"
+      - "Filters | Insurer | Text | Upper case | N | - | Blank | - | Insurer code | -"
+      - "Filters | Status | Drop-down | Any status and every account stage | N | Workflow NB_ACCOUNT | Any status | - | - | -"
+      - "Filters | Business Type | Drop-down | New Business, Renewal | N | Fixed list | New business and renewal | - | - | -"
+      - "Filters | Starts On or After / Starts On or Before | Date | dd-MMM-yyyy | N | - | Blank | - | Period start within the range | -"
+      - "Filters | Include Voided | Check box | - | N | - | Not ticked | - | Voided accounts are hidden unless ticked | -"
+      - "List | ARN | Column | ARN-yyyy-nnnnnn, copy chip | - | Numbering | - | Read only | - | -"
+      - "List | Client | Column | Name and client code, or Prospect | - | Client master | - | Read only | - | -"
+      - "List | Product / Insurer / Period / Gross Premium | Column | Period dd-MMM-yyyy – dd-MMM-yyyy | - | Account | - | Read only | - | -"
+      - "List | Status | Column | Stage badge | - | Workflow NB_ACCOUNT | - | Read only | - | -"
+      - "List | Flags | Column | FFY, Direct Payment | - | Account tags | - | Read only | - | -"
+      - "List | Officer | Column | Account Officer | - | Sales organisation | - | Read only | - | -"
+    actions:
+      - "Bulk Upload | ACCOUNT_MAINTAIN and BULK_PROCESS | Always | Opens the Bulk Account Creation upload | - | -"
+      - "New Account | ACCOUNT_MAINTAIN | Always | Opens the New Account wizard | - | -"
+      - "Filters / Apply Filters / Clear Filters | Every user of the screen | Always | Shows, applies or clears the advanced filters | - | -"
+      - "Open a row | Every user of the screen | Always | Opens the account record | - | -"
+    rules:
+      - "Voided accounts are kept and hidden from the standard list (FR-NB-012)."
+      - "Returned accounts are listed under Returned to Me for the Account Officer who owns them (FR-NB-067)."
+    outcome: Marketing and Processing find any account and see the ones waiting for them.
+    frs: [FR-NB-060, FR-NB-067]
+    tests: [ACCOUNTS]
+
+  - id: SCR-NB-14
+    title: New Account and Edit Account
+    route: /accounts/new
+    also: [/accounts/:id/edit]
+    purpose: >-
+      A six-step wizard for one account: client, product, period and payment, risk items, contact and premium, then a
+      review with the completeness check, the premium, the documents and the submission to Processing. The draft is
+      saved every 30 seconds once the client and product are chosen; risks already on a live account are refused with
+      the existing ARN.
+    entry:
+      - Accounts › New Account
+      - Account record › Edit Account (draft or returned to Marketing)
+      - Quotation or PRF › Create accounts (the accounts open in draft with their data)
+    shots:
+      - {state: empty, user: ao, caption: "New Account, step 1 Client"}
+      - {state: period, user: ao, fill: account_period, caption: "Step 3 Period & payment"}
+      - {state: review, user: ao, open: draft_account, step: "Review & submit", caption: "Step 6 Review & submit with the completeness check"}
+      - {state: duplicate, user: ao, fill: account_duplicate, caption: "Duplicate risk refused with the existing ARN"}
+    fields:
+      - "1. Client | Client | Look-up | Code or name; shows the status | Y | Client master (a prospect allowed for a draft) | - | Draft (fixed once saved) | A client is chosen; it must be confirmed before Processing validates the account | Choose the client. / Client <code> is not yet confirmed (onboarding and KYC incomplete)"
+      - "2. Product | Market segment | Drop-down | - | N | List of values MARKET_SEGMENT | The client's segment | Draft; returned to Marketing | The product must be offered to the segment | Product <code> is not offered to segment <segment>"
+      - "2. Product | Product | Drop-down | Code – name | Y | Active products of the segment | Select | Draft (fixed once saved) | - | Choose the product."
+      - "2. Product | Source channel | Drop-down | - | N | List of values SOURCE_CHANNEL | Blank | Draft; returned to Marketing | - | -"
+      - "2. Product | Insurer | Drop-down | - | N | Active insurers | To be chosen by Processing | Draft; returned to Marketing | Needed before placement | Choose the insurer and branch on the account before placement"
+      - "2. Product | Insurer branch | Drop-down | - | N | Branches of the insurer | Select | Draft; returned to Marketing | Sets the local government tax | -"
+      - "3. Period & payment | Period from / Period to | Date | dd-MMM-yyyy | Y | - | Today / one year later | Draft; returned to Marketing | The end is after the start | The period must end after it starts."
+      - "3. Period & payment | Multi-year / Term (years) | Check box / Number | Term 2 up to the product maximum | N (shown for multi-year products) | Product flag | Not ticked / 1 | Draft; returned to Marketing | A multi-year account has a term of 2 years or more, within the product's maximum | A multi-year account needs a term of at least 2 years / Product <code> allows a term of up to <n> year(s)"
+      - "3. Period & payment | Currency | Text | Three-letter code, upper case | N | - | PHP | Draft; returned to Marketing | Three letters | -"
+      - "3. Period & payment | Payment | Drop-down | Premium paid through BDOI; Direct payment to the insurer | N | Fixed list; direct payment only for eligible products | Premium paid through BDOI | Draft; returned to Marketing (locked once the payment gate is passed) | The product allows direct payment | Product <code> cannot be paid directly to the insurer"
+      - "3. Period & payment | Mortgagee bank | Drop-down | - | N (shown for products with a mortgagee) | List of values MORTGAGEE_BANK | Blank | Draft; returned to Marketing | Only for products that carry a mortgagee | Product <code> carries no mortgagee"
+      - "3. Period & payment | Loan application no. | Text | Up to 40 characters | N (mortgage products) | - | Blank | Draft; returned to Marketing | - | -"
+      - "3. Period & payment | PN numbers | Text | Separated by commas; up to 20 numbers of 40 characters | N (mortgage products) | - | Blank | Draft; returned to Marketing | - | -"
+      - "3. Period & payment | Free First Year from | Date | dd-MMM-yyyy; blank if not FFY | N (shown for FFY products) | - | Blank | Draft; returned to Marketing | Only for FFY-eligible products | Product <code> is not Free First Year eligible"
+      - "4. Risk items | [Vehicle, location, person or item fields] | As on New Quotation | As on New Quotation | Plate no. or conduction sticker per vehicle; address per location; name per person; others per the product's field rules | As on New Quotation | Blank | Draft; returned to Marketing | Product field rules and the duplicate check | Vehicle <n>: enter the plate number or conduction sticker. / Location <n>: enter the address. / Person <n>: enter the name. / Add at least one risk item."
+      - "5. Contact & premium | Contact person | Text | Up to 200 characters | N | Client master | The client's name | Draft; returned to Marketing | - | -"
+      - "5. Contact & premium | E-mail | Text | name@domain, up to 120 characters | N | Client master | The client's e-mail | Draft; returned to Marketing | Valid e-mail | -"
+      - "5. Contact & premium | Mobile | Text | Up to 30 characters | N | Client master | The client's mobile | Draft; returned to Marketing | - | -"
+      - "5. Contact & premium | Mailing address | Text | Up to 300 characters | N | Client master | The client's address | Draft; returned to Marketing | - | -"
+      - "5. Contact & premium | Rating basis | Drop-down | Annual, Pro-rata (days), Short period (table) | N | Fixed list | Annual | Draft; returned to Marketing | - | -"
+      - "5. Contact & premium | Commission % override | Number | 0 to 100 | N | Insurer / product commission rate | Blank = insurer or product rate | Draft; returned to Marketing | - | -"
+      - "6. Review & submit | Completeness check | Panel | Complete, or the list of missing fields and documents; duplicate risks with the existing ARN | - | Product field and document rules; duplicate keys | - | Read only | Mandatory fields, mandatory documents, rated premium, no duplicate risk | Complete the mandatory fields of <product>: <fields> / Upload the mandatory documents: <documents> / Compute the premium (sum insured and rate of every item) first / Duplicate of existing account <ARN>: <detail>"
+      - "6. Review & submit | Premium | Display | Appendix A breakdown with VAT on commission | - | Premium computation | - | Read only | - | Not rated yet: enter the sum insured and period of every item."
+      - "6. Review & submit | Documents | Documents panel | See Common screen elements | - | Documents | - | Draft; returned to Marketing | - | -"
+    actions:
+      - "Save Draft | ACCOUNT_MAINTAIN | Client and product chosen | Saves the draft (also every 30 seconds); the first save gives the ARN | Draft | -"
+      - "Next / Back | Every user of the screen | Always | Moves between steps; Next checks the step; moving to Review saves the draft | - | -"
+      - "Submit to Processing | ACCOUNT_MAINTAIN | Review step of a saved draft; check complete | Saves and submits the account to Processing | Submitted | Workflow notice"
+      - "Resubmit to Processing | ACCOUNT_MAINTAIN | Review step of an account returned to Marketing | Saves and resubmits the account | Submitted | Workflow notice"
+    rules:
+      - "A draft may use a prospect; Processing validates only an account of a confirmed client (FR-NB-061, FR-NB-064)."
+      - "The premium is computed with the rates and taxes in force (Appendix A) each time the account is saved (FR-NB-062)."
+      - "A risk already insured on a live account (same vehicle identifiers, or same location for Fire) is refused with the existing ARN (FR-NB-063)."
+      - "Accounts created from a quotation or PRF keep its ARN; one quotation's risk groups share one ARN with a suffix (FR-NB-047)."
+    outcome: The account is complete, rated and submitted to Processing under its ARN.
+    frs: [FR-NB-061, FR-NB-062, FR-NB-063, FR-NB-064, FR-NB-066, FR-NB-068, FR-NB-069]
+    tests: [NEWACC]
+
+  - id: SCR-NB-15
+    title: Account record
+    route: /accounts/:id
+    parent: /accounts
+    also: [/accounts/by-arn/:arn]
+    purpose: >-
+      One account with its ARN and stage, the workflow panel with the actions of the current stage, the completeness
+      check while the account is open for changes, the tags (Free First Year, direct payment, TSU clearance) and tabs
+      for details, risk items, premium, documents, e-mails, placement, policy, claims and history.
+    entry:
+      - Accounts › open a row
+      - Any ARN chip or ARN link (opens the account by ARN)
+      - FFY Register and Direct Payment › open a row
+    shots:
+      - {state: record, user: ao, open: first, caption: "Account record, Details tab with the tags"}
+      - {state: processing, user: proc, open: submitted_account, caption: "Submitted account as seen by Processing (Validate, Direct booking, Return To Marketing)"}
+      - {state: return, user: proc, open: submitted_account, click: "^return to marketing$", caption: "Return To Marketing dialog with the mandatory reason"}
+    fields:
+      - "Summary | Client, Product, Insurer, Period, Gross Premium, Account Officer | Display | - | - | Account | - | Read only | - | -"
+      - "Summary | Renewal / FFY / Direct Payment tags | Tag | Renewal shows the policy it renews | - | Account | - | Read only | - | -"
+      - "Completeness check | [Complete or not ready] | Panel | As on the wizard's review step | - | Product rules | - | Read only (draft or returned to Marketing) | - | Not ready to submit: <lines>"
+      - "Details tab | Tags: Free First Year, Direct payment, TSU review | Display | FFY period or cancellation; direct payment and who tagged it; TSU Not required, Required (rule) or Cleared by (user, time) | - | Account tags | - | Read only (changed through the tag buttons) | - | -"
+      - "Details tab | FFY start (dialog) | Date | dd-MMM-yyyy | Y | - | The period start | Account not booked, cancelled or voided | The product is FFY eligible | Enter the Free First Year start / Product <code> is not Free First Year eligible"
+      - "Details tab | Cancel FFY reason (dialog) | Drop-down | - | Y | List of values FFY_CANCEL_REASON | Blank | FFY account not booked, cancelled or voided | - | Select a reason"
+      - "Details tab | Account | Display | Client, product, segment, source, insurer, period, term, total sum insured, mortgagee bank, loan application, PN numbers, quotation / proposal, contact, account officer, sales unit, cost center, created | - | Account | - | Read only | - | -"
+      - "Details tab | Placement and booking | Display | Payment, placement slip, placed, hold cover, policy numbers, e-policy received, booking, direct booking | - | Placement, issuance, booking | - | Read only | - | -"
+      - "Risk Items tab | Risk items | Table | #, Kind, Risk, Description, Sum Insured, Rate %, Premium | - | Account items | - | Read only | - | -"
+      - "Premium tab | Premium | Display | Appendix A breakdown with VAT on commission | - | Premium computation | - | Read only | - | -"
+      - "Documents tab | Documents | Documents panel | See Common screen elements | - | Documents | - | See Common screen elements | - | -"
+      - "E-mails tab | E-mails | Table | Messages sent for the account | - | Outbound messages | - | Read only | - | -"
+      - "Placement tab | Placement | Display | Payment gate, placement slip, hold cover, insurer return | - | Placement | - | Read only | - | -"
+      - "Policy tab | Policy | Display | E-policy, policy numbers, Insurance Advice | - | Issuance | - | Read only | - | -"
+      - "Claims tab | Claims of the account | Table | Shown to users with the claims permission | - | Claims Handling (BRD-7) | - | Read only | - | -"
+      - "History tab | History | Timeline | Stage, action, user, time, reason and comment | - | Workflow history | - | Read only | - | -"
+    actions:
+      - "Edit Account | ACCOUNT_MAINTAIN | Draft or returned to Marketing | Opens the wizard | - | -"
+      - "Submit to Processing / Resubmit to Processing | ACCOUNT_MAINTAIN | Draft / returned to Marketing | Asks for an optional comment and submits the account | Submitted | Workflow notice"
+      - "Validate | ACCOUNT_PROCESS | Submitted; client confirmed; TSU clearance given when required | Validates the account; the payment gate of its segment starts | Awaiting payment (or Ready for placement when the gate opens at once) | Workflow notice to the Account Officer"
+      - "Direct booking (policy already issued) | ACCOUNT_PROCESS or PLACEMENT_MANAGE | Submitted or ready for placement; the issued policy is attached | Skips placement and sends the account to booking | Policy issued | Workflow notice"
+      - "Return To Marketing | ACCOUNT_PROCESS (BILLING_MANAGE, PLACEMENT_MANAGE in their stages) | Submitted, awaiting payment, ready for placement, returned by insurer | Asks for the return reason and a comment | Returned to Marketing | Workflow notice to the Account Officer with the comment"
+      - "Void | ACCOUNT_MAINTAIN (and ACCOUNT_PROCESS when submitted) | Draft, submitted, returned to Marketing | Asks for the void reason and a comment | Voided | Workflow notice"
+      - "Tag FFY / Cancel FFY | ACCOUNT_MAINTAIN | Account not booked, cancelled or voided | Tags the account Free First Year from a date, or cancels the tag with a reason | Unchanged | -"
+      - "Tag direct payment / Pay through BDOI | ACCOUNT_MAINTAIN | Account not booked, cancelled or voided; payment gate not passed | Switches the payment arrangement | Unchanged | -"
+      - "Record TSU Clearance | TSU_PROCESS | TSU review required and not cleared; before validation | Records the TSU clearance with a comment | Unchanged | -"
+    rules:
+      - "Processing validates only when the client is confirmed and, where a TSU rule applies, TSU has cleared the account (FR-NB-064, FR-NB-005)."
+      - "The payment gate depends on the segment and line: CBG Fire and Motor must be paid; Other Lines need a client confirmation; direct payment accounts are released on validation (FR-NB-092)."
+      - "A returned account shows the return reason and comment in its history and in the Account Officer's Returned to Me tab (FR-NB-067)."
+      - "Direct booking needs the issued policy attached (policy copy or e-policy) (FR-NB-113)."
+    outcome: The account moves through validation, payment, placement, issuance and booking, with every step in its history.
+    frs: [FR-NB-060, FR-NB-064, FR-NB-067, FR-NB-068, FR-NB-069, FR-NB-113, FR-NB-012]
+    tests: [ACC]
+
+  - id: SCR-NB-16
+    title: FFY Register
+    route: /accounts/ffy
+    purpose: The register of accounts tagged Free First Year, with the FFY start and end.
+    entry:
+      - Accounts › FFY tab (same accounts)
+    shots:
+      - {state: list, user: ao, caption: "FFY Register"}
+    fields:
+      - "List | ARN, Client, Product, Insurer, Period, Gross Premium, Status, Flags | Column | As on Accounts | - | Account | - | Read only | - | -"
+      - "List | FFY Start / FFY End | Column | dd-MMM-yyyy | - | Account FFY tag | - | Read only | - | -"
+      - "List | Officer | Column | Account Officer | - | Sales organisation | - | Read only | - | -"
+    actions:
+      - "Open a row | Every user of the screen | Always | Opens the account, where the FFY is cancelled with a reason | - | -"
+    rules:
+      - "FFY accounts can also be tagged and cancelled in bulk with the FFY tagging upload (FR-NB-068)."
+    outcome: Marketing keeps the list of FFY accounts for the bank and the renewal hand-off.
+    frs: [FR-NB-068]
+    tests: [FFY]
+
+  - id: SCR-NB-17
+    title: Direct Payment
+    route: /accounts/direct-payment
+    purpose: The accounts whose premium the client pays directly to the insurer; they skip BDOI collection and are released for placement on validation.
+    entry:
+      - Accounts › Direct Payment tab (same accounts)
+    shots:
+      - {state: list, user: ao, caption: "Direct Payment Accounts"}
+    fields:
+      - "List | ARN, Client, Product, Insurer, Period, Gross Premium, Status, Flags, Officer | Column | As on Accounts | - | Account | - | Read only | - | -"
+    actions:
+      - "Open a row | Every user of the screen | Always | Opens the account | - | -"
+    rules:
+      - "Only products flagged eligible for direct payment can be tagged (FR-NB-069)."
+      - "Direct payment accounts are handed to Collections (BRD-4) for the commission receivable (FR-NB-069)."
+    outcome: The direct-payment book is visible in one list.
+    frs: [FR-NB-069]
+    tests: [DIRPAY]

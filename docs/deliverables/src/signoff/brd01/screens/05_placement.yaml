@@ -1,0 +1,181 @@
+# Screen specifications of BRD-1 New Business: payment confirmation, placement and hold cover.
+area: Payment confirmation, placement and hold cover
+screens:
+  - id: SCR-NB-18
+    title: Placement Workbench
+    route: /placement
+    purpose: >-
+      Processing's view of the accounts from payment to placement: tiles for awaiting payment, ready for placement,
+      placed, returned by insurer and hold covers expiring; status tabs; and the bulk actions For Placement (generate
+      slips), Send Slips, For Booking, Cancel Placement and Reactivate, enabled by the row selection.
+    entry:
+      - NB Dashboard figures
+      - Account record › Placement tab
+    shots:
+      - {state: list, user: proc, caption: "Placement Workbench, For Placement & Booking tab"}
+      - {state: generate, user: proc, select: ready_for_placement, click: "^for placement$", caption: "Generate Placement Slips dialog with the prerequisites of the selected accounts"}
+      - {state: cancelled, user: proc, tab: "Cancelled Placement", caption: "Cancelled Placement tab with Reactivate"}
+    fields:
+      - "Tiles | Awaiting Payment / Ready for Placement / Placed / Returned by Insurer / Hold Cover Expiring | Tile | Counts; the last two are alerts | - | Accounts | - | - | A tile opens its tab | -"
+      - "Tabs | For Placement & Booking / Booked Account / Awaiting Payment / Returned by Insurer / Hold Cover Expiring / Cancelled Placement | Tab | - | - | Fixed | For Placement & Booking | - | - | -"
+      - "Search | Search Proposal No. | Text | ARN or client | N | - | Blank | - | Contains search | -"
+      - "List | Select | Check box | One per row, plus select all | N | - | Not ticked | - | A bulk action is enabled only when every selected row is eligible | -"
+      - "List | Name / Client Code | Column | Client name (opens the account placement) and code | - | Client master | - | Read only | - | -"
+      - "List | Proposal No. | Column | The account's ARN and its current slip | - | Account, placement slip | - | Read only | - | -"
+      - "List | Status | Column | Stage badge; hold cover status and expiry | - | Workflow NB_ACCOUNT, hold cover | - | Read only | - | -"
+      - "List | Product Line | Column | Line, product and insurer | - | Product catalogue | - | Read only | - | -"
+      - "List | Department | Column | Sales department | - | Sales organisation | - | Read only | - | -"
+      - "List | Gross Premium | Column | Amount | - | Premium computation | - | Read only | - | -"
+      - "Generate Placement Slips dialog | Placement prerequisites | Table | Proposal No., Insurer, Prerequisites: valid, or the unmet prerequisites | - | Placement prerequisites | - | Read only | Payment gate open, documents complete, TSU cleared, insurer and branch reachable by e-mail | Placement prerequisites not met - <problems>"
+    actions:
+      - "CLPC Billing | BILLING_MANAGE | Always | Opens CLPC Billing | - | -"
+      - "For Placement | PLACEMENT_MANAGE | Selected accounts all ready for placement | Opens Generate Placement Slips; Generate Slips creates one slip per insurer branch as PDF and Excel | Unchanged until the slip is sent | -"
+      - "Send Slips | PLACEMENT_MANAGE | Selected accounts all have a slip generated and not sent | E-mails each slip to its insurer branch's placement address; the outcome of each account is listed | Placed | E-mail to the insurer"
+      - "For Booking | BOOKING_PROCESS | Selected accounts all have their policy issued | Opens the Booking Workbench with the accounts chosen | - | -"
+      - "Cancel Placement | PLACEMENT_MANAGE | Selected accounts ready for placement, placed or returned by insurer | Asks for the cancellation reason and a comment; the outcome of each account is listed | Placement cancelled | Workflow notice"
+      - "Reactivate | PLACEMENT_MANAGE or ACCOUNT_MAINTAIN | Selected accounts with the placement cancelled | Asks for a comment; the outcome of each account is listed | Ready for placement | Workflow notice"
+    rules:
+      - "A placement slip is generated only when every prerequisite of the account is met (FR-NB-080)."
+      - "One slip is generated per insurer branch; the accounts of the same branch share it (FR-NB-080)."
+      - "Each account of a bulk action is processed on its own; a failure does not stop the others (FR-NB-085, FR-NB-086)."
+    outcome: Processing places the accounts with the insurers in batches and follows returns and hold covers.
+    frs: [FR-NB-080, FR-NB-081, FR-NB-084, FR-NB-085, FR-NB-086]
+    tests: [PLWB]
+
+  - id: SCR-NB-19
+    title: Account Placement
+    route: /placement/accounts/:arn
+    parent: /placement
+    purpose: >-
+      The placement of one account: summary with the payment gate, slip and hold cover; the workflow panel with the
+      placement actions; and tabs for the payment gate with its evidence, the placement slips, the hold cover and the
+      insurer returns.
+    entry:
+      - Placement Workbench › client name
+      - Placement Slips › account ARN
+    shots:
+      - {state: gate, user: proc, open: awaiting_payment_other_lines, caption: "Account Placement, Payment Gate tab of an Other Lines account"}
+      - {state: hold, user: proc, open: placed_with_hold_cover, tab: "Hold Cover", caption: "Hold Cover tab"}
+      - {state: confirm, user: proc, open: awaiting_payment_other_lines, click: "^record client confirmation$", caption: "Record Client Confirmation dialog"}
+    fields:
+      - "Summary | Product, Insurer, Gross premium, Payment gate, Placement slip, Hold cover | Display | Gate Open or Waiting with its rule | - | Account, placement | - | Read only | - | -"
+      - "Payment Gate tab | Rule, Gate, Segment / line | Display | Payment matched, Client confirmation or Direct payment, with the rule description | - | Payment gate rules | - | Read only | - | -"
+      - "Payment Gate tab | Evidence | Table | Evidence, Source, Detail, Amount, Recorded, Opened Gate | - | Payment evidence | - | Read only | - | -"
+      - "Client confirmation dialog | Confirmation channel | Drop-down | - | Y | List of values CLIENT_CONFIRMATION_CHANNEL | Blank | Awaiting payment; rule is client confirmation | An active value; the account's rule is not payment matched | Account <ARN> must be paid: match its payment from a payment report"
+      - "Client confirmation dialog | Remarks | Text area | Up to 500 characters | N | - | Blank | Awaiting payment | - | -"
+      - "Placement Slips tab | Placement slips | Table | Slip, Status, Insurer, Sent, actions | - | Placement slips | - | Read only | - | -"
+      - "Hold Cover tab | Hold covers | Table | Status, Insurer, Period, Insurer Reference, Confirmed On, Expiry Alert | - | Hold covers | - | Read only | - | -"
+      - "Hold cover dialog | Hold cover starts on / Confirmed on | Date | dd-MMM-yyyy; today when empty | N | - | Today | Ready for placement, placed, returned by insurer | The expiry is not before the start | The hold cover cannot expire before it starts (<date>)"
+      - "Hold cover dialog | Insurer reference | Text | Up to 60 characters | Y to record a confirmation | - | Blank | Any stage | Needed for a confirmation | Enter the insurer's reference"
+      - "Hold cover dialog | Expires on | Date | dd-MMM-yyyy; the requested expiry when empty | N | Parameter HOLD_COVER_DAYS (30) | Start plus 30 days | Any stage | - | -"
+      - "Insurer Returns tab | Insurer returns | Table | Returned, Reason, Insurer Remarks, Slip, Resolution | - | Insurer returns | - | Read only | - | -"
+    actions:
+      - "Open Account | Every user of the screen | Always | Opens the account record | - | -"
+      - "Record Client Confirmation / Release Direct Payment | BILLING_MANAGE | Awaiting payment; the rule is client confirmation or direct payment | Records the evidence and opens the payment gate | Ready for placement | Workflow notice"
+      - "Generate Placement Slip | PLACEMENT_MANAGE | Ready for placement | Opens Generate Placement Slips for this account | Unchanged | -"
+      - "Send / Resend, Regenerate, PDF, Excel (slip) | PLACEMENT_MANAGE (downloads: every user) | As on Placement Slips | As on Placement Slips | Placed (first send) | E-mail to the insurer"
+      - "Request Hold Cover | PLACEMENT_MANAGE | Ready for placement, placed or returned by insurer; no open hold cover | E-mails the hold cover request (PDF) to the insurer branch's placement address | Unchanged (hold cover Requested) | E-mail to the insurer"
+      - "Record Confirmation | PLACEMENT_MANAGE or ACCOUNT_MAINTAIN | Always | Records the insurer's confirmation, reference and expiry (creates the hold cover when none was requested) | Unchanged (hold cover Confirmed) | -"
+      - "Record Decline | PLACEMENT_MANAGE or ACCOUNT_MAINTAIN | Hold cover requested or confirmed | Records the insurer's decline | Unchanged (hold cover Declined) | -"
+      - "Record Insurer Return | PLACEMENT_MANAGE | Placed | Asks for the return reason and the insurer's remarks | Returned by insurer | Workflow notice"
+      - "Resubmit for Placement | PLACEMENT_MANAGE | Returned by insurer | Asks for a comment; the corrected account goes back to placement (a new slip version follows) | Ready for placement | Workflow notice"
+      - "Return To Marketing | PLACEMENT_MANAGE | Ready for placement or returned by insurer | Asks for the return reason and a comment | Returned to Marketing | Workflow notice to the Account Officer"
+      - "Cancel Placement / Reactivate | PLACEMENT_MANAGE (Reactivate also ACCOUNT_MAINTAIN) | As on the workbench | As on the workbench | Placement cancelled / Ready for placement | Workflow notice"
+    rules:
+      - "The payment gate rule is chosen by segment and line; CBG Fire and Motor must be paid (payment matched); Other Lines need a client confirmation; direct payment accounts are released at validation (FR-NB-092)."
+      - "A hold cover is requested for HOLD_COVER_DAYS (30); the HOLD_COVER_EXPIRY job alerts Processing HOLD_COVER_ALERT_DAYS (5) before expiry and expires it (FR-NB-082, FR-NB-083)."
+      - "A slip resent after a return is a new version; the old version is kept as superseded (FR-NB-081, FR-NB-084)."
+    outcome: The account is placed with the insurer, with the payment evidence, the slip sent and any hold cover on record.
+    frs: [FR-NB-080, FR-NB-081, FR-NB-082, FR-NB-083, FR-NB-084, FR-NB-085, FR-NB-086, FR-NB-092]
+    tests: [ACCPL]
+
+  - id: SCR-NB-20
+    title: Placement Slips
+    route: /placement/slips
+    purpose: >-
+      Every placement slip version by insurer branch with its accounts: download the PDF and Excel files, send or
+      resend the slip to the insurer's placement mailbox and regenerate it after a return.
+    entry:
+      - Account Placement › Placement Slips tab
+    shots:
+      - {state: list, user: proc, caption: "Placement Slips, All Slips tab"}
+      - {state: send, user: proc, open_slip: generated, click: "^send$", caption: "Send placement slip dialog"}
+    fields:
+      - "Tabs | All Slips / To Send / Sent / Superseded | Tab | - | - | Fixed | All Slips | - | - | -"
+      - "List | Slip | Column | PL-yyyy-nnnnnn with its version | - | Numbering | - | Read only | - | -"
+      - "List | Status | Column | Generated, Sent, Superseded | - | Placement slip | - | Read only | - | -"
+      - "List | Insurer / Branch | Column | Codes | - | Insurer master | - | Read only | - | -"
+      - "List | Accounts | Column | ARNs, each opening the account placement | - | Placement slip | - | Read only | - | -"
+      - "List | Sent | Column | Time sent, recipients and number of sends | - | Outbound messages | - | Read only | - | -"
+      - "Send dialog | To, Cc, Subject, Message | Text | As on Send via Email | To, Subject and Message Y | Insurer branch placement e-mail and standard text | Proposed by the system | Generated or sent slip | At least one valid address; the slip is not superseded | Slip <slip> v<version> was replaced by a new version"
+      - "Send dialog | Password-protect the attachments | Check box | Optional for insurers | N | - | Ticked | Generated or sent slip | - | -"
+    actions:
+      - "PDF / Excel | Every user of the screen | Always | Downloads the slip file | - | -"
+      - "Send / Resend | PLACEMENT_MANAGE | Slip not superseded | Opens the send dialog and e-mails the slip; the first send places the accounts | Placed (first send) | E-mail to the insurer (and the password e-mail when protected)"
+      - "Regenerate | PLACEMENT_MANAGE | Sent slip | Generates the next version from the current account data; the old version becomes superseded | Unchanged | -"
+    rules:
+      - "The send log of each slip is kept with the message and its outcome (FR-NB-081)."
+      - "Insurers have no access to BIBS; slips reach them by e-mail only (FR-NB-081)."
+    outcome: Every slip sent to an insurer is traceable by version, recipient and time.
+    frs: [FR-NB-080, FR-NB-081]
+    tests: [SLIPS]
+
+  - id: SCR-NB-21
+    title: CLPC Billing
+    route: /placement/billing
+    purpose: >-
+      Billing of the CBG Fire accounts awaiting payment: create a billing batch, download the billing file for CLPC in
+      Excel or OpenDocument, and upload the payment report returned by CLPC or a payment report of the other segments.
+    entry:
+      - Placement Workbench › CLPC Billing
+    shots:
+      - {state: list, user: proc, caption: "CLPC Billing, Billing Batches tab"}
+      - {state: upload, user: proc, click: "^upload payment report$", caption: "Upload Payment Report dialog"}
+    fields:
+      - "Tabs | Billing Batches / Payment Reports | Tab | - | - | Fixed | Billing Batches | - | - | -"
+      - "CBG Fire Awaiting Payment | Reference, Borrower, PN No., Loan Application No., Premium | Column | - | - | Accounts | - | Read only | - | Every CBG Fire account awaiting payment is billed."
+      - "CBG Fire Awaiting Payment | Select | Check box | - | N | - | Not ticked | - | Only CBG Fire accounts awaiting payment and not yet billed | Not CBG Fire accounts awaiting payment, or already billed: <ARNs>"
+      - "Billing Batches | Batch, Billing Date, Status, Accounts, Total Premium | Column | BILL-yyyy-nnnnnn | - | Billing batches | - | Read only | - | -"
+      - "Payment Reports | Report, Kind, File, Status, Matched / Unpaid / Unmatched / Ambiguous, Uploaded | Column | PMT-yyyy-nnnnnn | - | Payment reports | - | Read only | - | -"
+      - "Upload dialog | Report | Drop-down | CLPC payment report (CBG Fire, PN / loan application no.); Payment report of other segments (ARN) | Y | Fixed list | CLPC | - | - | -"
+      - "Upload dialog | Billing batch | Drop-down | Open batches | Y for a CLPC report | Billing batches | The batch chosen from the list | - | The batch is open | Choose the CLPC billing batch the report answers / Billing batch <batch> is closed"
+      - "Upload dialog | File | File | .xlsx, .csv or .ods; columns PN No. / Loan Application No. (CLPC) or ARN, Status (PAID / UNPAID), Amount, Payment Date | Y | - | - | - | The reference column exists; amounts and dates are valid | The CLPC report needs a 'PN No.' or 'Loan Application No.' column / Row <n>: '<value>' is not an amount / Row <n>: '<value>' is not a date (yyyy-mm-dd)"
+    actions:
+      - "Bill Selected (n) / Bill All | BILLING_MANAGE | At least one account to bill | Creates a billing batch with the selected (or all) accounts | Unchanged (billed) | -"
+      - "Excel / ODS | BILLING_MANAGE | Always | Downloads the billing file of the batch | - | -"
+      - "Upload Payment Report / Upload Report | BILLING_MANAGE | Always / open batch | Opens the upload dialog; Upload and Match reads the file, matches each line and opens the match review | - | -"
+    rules:
+      - "The billing file uses the ARN in place of the QPS reference number (FR-NB-090)."
+      - "The file is exchanged with CLPC outside BIBS until the CLPC transfer is specified (FR-NB-090)."
+    outcome: CLPC receives the billing file and its payment report is matched back to the accounts.
+    frs: [FR-NB-090, FR-NB-091]
+    tests: [BILLING]
+
+  - id: SCR-NB-22
+    title: Payment Report
+    route: /placement/billing/reports/:id
+    parent: /placement/billing
+    purpose: >-
+      The match review of an uploaded payment report: lines matched, unpaid, unmatched and ambiguous. Processing
+      matches an unmatched or ambiguous line to an account by hand and confirms the report, which opens the payment gate
+      of every matched, paid account.
+    entry:
+      - CLPC Billing › Payment Reports › open a report
+      - Opened automatically after an upload
+    shots:
+      - {state: review, user: proc, open_report: review, caption: "Payment Report match review"}
+      - {state: match, user: proc, open_report: review, tab: "Unmatched", click: "^match$", caption: "Match Row dialog"}
+    fields:
+      - "Tiles | Matched / Unpaid / Unmatched / Ambiguous | Tile | Counts | - | Report lines | - | - | A tile opens its tab | -"
+      - "Lines | Row, Reported Reference, Paid, Amount, Payment Date, Account, Detail | Column | - | - | Report lines | - | Read only | - | -"
+      - "Match Row dialog | Account (ARN) | Drop-down or Text | The candidate ARNs of an ambiguous line, otherwise an ARN | Y | Accounts awaiting payment | First candidate | Report in review | The account is awaiting payment and the line is not already matched | Row <n> is already matched to <ARN> / <ARN> is <status>, not awaiting payment"
+    actions:
+      - "Match | BILLING_MANAGE | Report in review; unmatched or ambiguous line | Matches the line to the chosen account | Unchanged | -"
+      - "Confirm Matches | BILLING_MANAGE | Report in review | Opens the payment gate of every matched, paid account; each outcome is shown on its line | Ready for placement for each account opened | Workflow notice per account"
+      - "Discard | BILLING_MANAGE | Report in review | Discards the report without opening any gate | - | -"
+    rules:
+      - "A payment already recorded for the same source and reference is not applied twice (FR-NB-091)."
+      - "The hourly PAYMENT_CONFIRMATION_SWEEP opens the gate of payments confirmed by Cashiering (BRD-2) as well (FR-NB-091, FR-NB-092)."
+    outcome: The paid accounts are released for placement with their payment evidence.
+    frs: [FR-NB-091, FR-NB-092]
+    tests: [BILLING]

@@ -106,7 +106,8 @@ def rgb(hex_value: str) -> tuple[int, int, int]:
 # --------------------------------------------------------------------------- drops
 # BDOI groups the BRDs, FRS, test plans and other collaterals under its drops (answer A5 of 26-Sep-2026;
 # docs/source-documents/BDOI_DROP_PLAN.md; docs/architecture/PROGRAMME_ALIGNMENT.md section 2.3). This is the only
-# drop map of the toolkit: the builders place their outputs with out_dir() / out_path(), and the register takes the
+# drop map of the toolkit: the builders place their outputs with out_dir() / out_path() (one release-set folder per
+# BRD inside its drop folder), and the register takes the
 # default Drop of an item from it. A BRD that spans drops lives in its primary drop; the index README of the other
 # drop points to it (DROP_SHARED), so no file is copied.
 
@@ -177,13 +178,47 @@ def drop_of(brd: str) -> str:
     return BRD_DROP.get(brd, "Programme")
 
 
+# Name of each BRD as used in its release-set folder and file names.
+BRD_NAMES: dict[str, str] = {
+    "BRD-01": "New Business",
+    "BRD-02": "Operations",
+    "BRD-03": "Product Maintenance",
+    "BRD-04": "Collections",
+    "BRD-05": "Accounting Disbursement ACSL",
+    "BRD-06": "Renewal",
+    "BRD-07": "Claims",
+    "BRD-08": "Employee Benefits",
+    "BRD-09": "Customer Servicing Facility",
+    "BRD-10": "Sanction Screening",
+    "BRD-11": "User Access Maintenance",
+    "BRD-12": "Submitted Policies",
+    "BRD-13": "Data Migration",
+}
+
+
+def brd_folder(brd: str) -> str:
+    """Release-set folder name of a BRD: BRD-nn_<Name> (for example BRD-01_New_Business)."""
+    name = BRD_NAMES.get(brd, "")
+    safe = "_".join(part for part in name.replace("&", "and").replace("/", " ").split() if part)
+    return f"{brd}_{safe}" if safe else brd
+
+
 def out_dir(brd: str, kind: str) -> Path:
-    """Output folder of a document kind (FRS, TestPlans, Migration, Registers, Decks, Alignment) of a BRD."""
-    return OUT_DIR / DROPS[drop_of(brd)]["folder"] / kind
+    """Output folder of a document of a BRD.
+
+    Every BRD has one release-set folder in its primary drop, holding all its documents (FRS, test plan, sign-off
+    workbook, release note, migration pack): out/<drop folder>/<BRD-nn_Name>/. The kind (FRS, TestPlans, Signoff,
+    Migration...) is part of the file name, not of the folder. Programme-level items (BRD-00) stay grouped by kind:
+    out/Programme/<kind>/.
+    """
+    drop = drop_of(brd)
+    if drop == "Programme":
+        return OUT_DIR / DROPS[drop]["folder"] / kind
+    return OUT_DIR / DROPS[drop]["folder"] / brd_folder(brd)
 
 
 def out_path(brd: str, kind: str, filename: str) -> Path:
-    """Full output path of a client-pack file, in the drop folder of its BRD."""
+    """Full output path of a client-pack file, in the release-set folder of its BRD (see out_dir)."""
     return out_dir(brd, kind) / filename
 
 

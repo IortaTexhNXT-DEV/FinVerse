@@ -1,0 +1,161 @@
+# Cross-BRD dependencies and interface contract of BRD-1 New Business.
+# direction: In = New Business takes it from the other BRD or system; Out = New Business hands it over.
+# Columns: id | party | direction | what | when / how | owner of the data | NB screens | FR
+contract:
+  - id: IC-01
+    party: BRD-3 Product Maintenance
+    direction: In
+    what: Product lines, cover types and products with their flags (package, direct payment eligible, FFY eligible, multi-year and maximum term, mortgagee applicable, fleet)
+    how: Read when a quotation, PRF or account is created or saved; only active products of the segment are offered
+    owner: MBS (Product Maintenance, with authorisation)
+    screens: New Quotation, New Proposal Request, New Account, bulk uploads
+    frs: [FR-NB-001, FR-NB-002]
+  - id: IC-02
+    party: BRD-3 Product Maintenance
+    direction: In
+    what: Package versions with their rate scheme, rate exceptions approved for a transaction, rates and taxes, short-period table, motor limits
+    how: Read at every premium computation (Appendix A); a quotation or account priced on an old version is re-priced or needs an approved rate exception
+    owner: MBS; the approver of the rate exception
+    screens: New Quotation, Quotation record (rate scheme panel), New Account, New Endorsement
+    frs: [FR-NB-062, FR-NB-041]
+  - id: IC-03
+    party: BRD-3 Product Maintenance
+    direction: In
+    what: Field rules and mandatory documents per product, TSU routing rules, incentive criteria
+    how: Field and document rules are checked at submission; TSU rules decide the PRF route and TSU clearance; incentive criteria set the incentive flag at booking
+    owner: Business Administrator and MBS (authorised)
+    screens: New Account (review), New Proposal Request (checklist), Pre-booking Confirmation
+    frs: [FR-NB-002, FR-NB-003, FR-NB-005, FR-NB-118]
+  - id: IC-04
+    party: BRD-10 Sanction Screening
+    direction: Out
+    what: New clients, changes of a client's identity and accounts submitted to Processing
+    how: Each event starts a screening of the client after it is saved (triggers CLIENT_REGISTERED, CLIENT_CHANGED, ACCOUNT_SUBMITTED); New Business work is not stopped while the screening runs
+    owner: Compliance (BRD-10)
+    screens: Client record (Screening tab for compliance users)
+    frs: [FR-NB-031, FR-NB-032, FR-NB-064]
+  - id: IC-05
+    party: BRD-10 Sanction Screening
+    direction: In
+    what: The client's risk profile set by screening and risk profiling (KYC risk rating) and the tags Politically exposed person and Watchlist review
+    how: Written on the client through the client service; a High rating brings the next KYC review forward; the tags show in the client's instructions banner with their history
+    owner: Compliance (BRD-10)
+    screens: Client record, KYC Reviews Due
+    frs: [FR-NB-038]
+  - id: IC-06
+    party: BRD-11 User Access Maintenance
+    direction: In
+    what: Users, roles, permissions and the persona menus; sign-in, password, lock-out and session rules; access requests and their approval
+    how: Every screen and action checks the user's permissions; the menus of section Navigation follow the grants
+    owner: System Administrator, access approvers (BRD-11)
+    screens: Every screen; Sign in
+    frs: [FR-NB-130, FR-NB-131, FR-NB-134, FR-NB-135]
+  - id: IC-07
+    party: BRD-2 Operations
+    direction: Out
+    what: Every booked invoice (booking, endorsement, cancellation) with its premium components, commission, DTIP, insurer shares and parties
+    how: Copied to the Operations invoice ledger when the booking is committed (event InvoiceBooked); a copy that fails is listed in Operations › Interfaces for replay
+    owner: Processing (booking); Operations after hand-off
+    screens: Booking Workbench, Pre-booking Confirmation, Booked Invoice, New Endorsement
+    frs: [FR-NB-110, FR-NB-115, FR-NB-116]
+  - id: IC-08
+    party: BRD-2 Operations
+    direction: In
+    what: Payment confirmations of Cashiering receipts for accounts awaiting payment
+    how: The hourly PAYMENT_CONFIRMATION_SWEEP opens the payment gate of confirmed payments, with the receipt as evidence
+    owner: Cashiering (BRD-2)
+    screens: Account Placement (Payment Gate evidence)
+    frs: [FR-NB-091, FR-NB-092]
+  - id: IC-09
+    party: BRD-4 Collections
+    direction: Out
+    what: Premium receivables of booked invoices (through the Operations invoice ledger) and the direct-payment accounts whose commission BDOI collects from the insurer
+    how: The Collections worklist reads the invoice ledger; direct-payment bookings carry the Direct payment flag
+    owner: Collections (BRD-4)
+    screens: Pre-booking Confirmation (flags), Direct Payment
+    frs: [FR-NB-069, FR-NB-110]
+  - id: IC-10
+    party: BRD-5 Accounting, Disbursement and ACSL
+    direction: Out
+    what: The GL journal of each booking, endorsement and cancellation (event BROKER_BOOKING), the sub-ledger open items, service invoices and the cost center dimension
+    how: Posted in the same transaction as the booking by the accounting rules; the journal preview shows it before posting
+    owner: Comptrollership (GL accounts and rules)
+    screens: Pre-booking Confirmation (journal preview), Booked Invoice (Journal and Open Items tabs), Service Invoices
+    frs: [FR-NB-110, FR-NB-117, FR-NB-119]
+  - id: IC-11
+    party: BRD-6 Renewal
+    direction: Out
+    what: Booked New Business accounts, their policy years, FFY tag and expiry, as the source of renewal candidates
+    how: Renewal reads the account and its policies; a renewal account is created with business type Renewal and the policy it renews
+    owner: Renewal team (BRD-6)
+    screens: Accounts (Business Type filter), Account record (Renewal tag)
+    frs: [FR-NB-068, FR-NB-119]
+  - id: IC-12
+    party: BRD-6 Renewal
+    direction: In
+    what: Renewals that take the New Business path (For Quotation, For Proposal) and renewal accounts to place and book
+    how: The quotation or PRF follows the New Business flow; its accounts are created as Renewal; placement, issuance and booking use the New Business screens
+    owner: Renewal team; Processing for placement and booking
+    screens: Quotations, Proposal Requests, Placement Workbench, Booking Workbench
+    frs: [FR-NB-041, FR-NB-050, FR-NB-080, FR-NB-110]
+  - id: IC-13
+    party: BRD-9 Customer Servicing Facility
+    direction: Out
+    what: Client master and contacts, accounts with ARN and PN numbers, loan application numbers, policy numbers and e-policies
+    how: Read by the CSF screens; an e-policy is resent through the same dispatch service
+    owner: New Business (data); CSF (service requests)
+    screens: Client record, Account record, E-policy Dispatch
+    frs: [FR-NB-030, FR-NB-060, FR-NB-105]
+  - id: IC-14
+    party: BRD-12 Submitted Policies
+    direction: Out
+    what: Placement and booking of the submitted policies converted to accounts
+    how: The accounts follow the payment gate, placement slip and booking of New Business
+    owner: Submitted Policies team; Processing
+    screens: Placement Workbench, Booking Workbench
+    frs: [FR-NB-080, FR-NB-110]
+  - id: IC-15
+    party: BRD-13 Data Migration
+    direction: In
+    what: Legacy clients (C01-C03), accounts and policies, open invoices loaded into the New Business structures at cut-over
+    how: Migrated through the migration loads with the same validation rules; migrated clients keep their legacy references
+    owner: Data Migration team
+    screens: Clients, Accounts, Booked Invoice
+    frs: [FR-NB-020, FR-NB-030, FR-NB-060]
+  - id: IC-16
+    party: Insurers (external)
+    direction: Out / In
+    what: Quotation slips, placement slips, hold cover requests and service invoices by e-mail; insurer terms, confirmations and e-policies received by e-mail and keyed in or uploaded
+    how: E-mail to the insurer branch placement address; SFTP or API channels wait for the channel specification; insurers have no access to BIBS
+    owner: Insurer master (Business Administrator)
+    screens: PRF record, Placement Slips, Account Placement, E-policy Upload, Service Invoices
+    frs: [FR-NB-053, FR-NB-081, FR-NB-082, FR-NB-100, FR-NB-117]
+  - id: IC-17
+    party: CLPC (BDO Unibank)
+    direction: Out / In
+    what: CBG Fire billing file out; payment report back
+    how: Downloaded and uploaded by Processing until the CLPC transfer is specified
+    owner: Processing
+    screens: CLPC Billing, Payment Report
+    frs: [FR-NB-090, FR-NB-091]
+  - id: IC-18
+    party: HLS and other source systems (BDO Unibank)
+    direction: In
+    what: Quotation requests and bulk quotations or accounts
+    how: Upload of the extract (Quotation requests, Bulk quotations, Bulk account creation) until the direct interface is specified
+    owner: Marketing
+    screens: Quotation Requests, Bulk upload wizard
+    frs: [FR-NB-040, FR-NB-046, FR-NB-065]
+  - id: IC-19
+    party: Clients and mortgagee banks (external)
+    direction: Out
+    what: Quotations, proposals, e-policies and Insurance Advices by e-mail, password protected, with the password in a separate e-mail
+    how: E-mail from BIBS; delivery outcome in Outbound Messages
+    owner: Marketing, E-policy Sender, Processing
+    screens: Quotation record, PRF record, E-policy Dispatch, Insurance Advice
+    frs: [FR-NB-013, FR-NB-044, FR-NB-057, FR-NB-104, FR-NB-105]
+change_rule: >-
+  This contract is part of the signed BRD-1 set. A later change in BRD-2, BRD-3, BRD-4, BRD-5, BRD-6, BRD-9, BRD-10,
+  BRD-11, BRD-12 or BRD-13, or in an external interface, that changes what New Business takes or hands over as listed
+  here is raised as a change request against this signed set through the Change Management Register, with its effort
+  in man-days, before it is built.

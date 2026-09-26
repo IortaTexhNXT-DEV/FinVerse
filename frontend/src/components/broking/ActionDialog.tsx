@@ -14,6 +14,10 @@ interface ActionDialogProps {
   effect?: string;
   /** List of values of the mandatory reason; omit when no reason is needed. */
   reasonLov?: string;
+  /** The comment must be entered (e.g. the reason for closing a request). */
+  commentRequired?: boolean;
+  /** Label of the comment field (default "Comment"). */
+  commentLabel?: string;
   confirmLabel: string;
   busy?: boolean;
   error?: unknown;
@@ -33,6 +37,8 @@ export function ActionDialog({
   record,
   effect,
   reasonLov,
+  commentRequired = false,
+  commentLabel = 'Comment',
   confirmLabel,
   busy = false,
   error,
@@ -41,7 +47,8 @@ export function ActionDialog({
 }: Readonly<ActionDialogProps>) {
   const [reasonCode, setReasonCode] = useState('');
   const [comment, setComment] = useState('');
-  const missingReason = reasonLov !== undefined && reasonCode === '';
+  const missingReason =
+    (reasonLov !== undefined && reasonCode === '') || (commentRequired && comment.trim() === '');
   return (
     <Modal
       open
@@ -89,10 +96,15 @@ export function ActionDialog({
             )}
           </Field>
         )}
-        <Field label="Comment" hint="Shown in the status history and sent with the notification.">
+        <Field
+          label={commentLabel}
+          required={commentRequired}
+          hint="Shown in the status history and sent with the notification."
+        >
           {(id) => (
             <textarea
               id={id}
+              required={commentRequired}
               className="textarea"
               rows={3}
               maxLength={1000}

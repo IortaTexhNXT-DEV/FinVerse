@@ -238,10 +238,16 @@ export default function RequestsPage() {
         <ActionDialog
           title={`Close ${closing.requestNo}`}
           confirmLabel="Close Request"
+          commentRequired
+          commentLabel="Reason for Closing"
           busy={close.isPending}
           error={close.error}
           onClose={() => setClosing(null)}
-          onConfirm={(note) => close.mutate({ r: closing, reason: note.comment ?? 'Closed' })}
+          onConfirm={(note) => {
+            if (note.comment) {
+              close.mutate({ r: closing, reason: note.comment });
+            }
+          }}
         />
       )}
     </div>

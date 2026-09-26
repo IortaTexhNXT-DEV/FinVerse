@@ -1,0 +1,27 @@
+# BDOI drop plan and programme timeline (received 26-Sep-2026)
+
+Transcribed from the BDOI slides (`BDOI Drop Plan - modules and integrations.webp`, `BDOI Programme Timeline.webp`).
+
+## Drops
+
+| Drop | Module / functionality | BRD file | Integrations |
+|---|---|---|---|
+| **Drop 0 - Setup & Data Migration** | Setup: 1 Accessibility & Login; 2 Authorization; 3 User Maintenance; 4 Data Management (GL accounts, reference tables); 5 Workflow; 6 Product Maintenance | - | Entra-ID; IGA; LMS; HLS; PMS; CMS (alternate OBPCS), Automatic Fund Transfer System (AFTS), ICBS (struck through on the slide), Business Online Banking (BOB); ECM (content management); CCM (e-mail sending); M365; Trade Finance System (manual) |
+| **Drop 1 - Transactional, upstream (product inherent)** | 1 Client Onboarding (Data Migration, NB); 2 Quotation or Proposal (NB, PM); 3 Account Creation and Maintenance (NB, CSF); 4 Submitted Policy (SP); 5 Renewal (RN); 6 Placement & ePolicy (NB, RN, EB); 7 Booking (NB, RN, SP); 8 Accounting / GL (ACCT); 9 Reports upstream (NB, RN, SP, EB) | as listed | (Drop 0 list) |
+| **Drop 1 - Transactional, downstream (product agnostic)** | 1 Disbursement (ACCT); 2 Cashiering (Operations Cashiering addendum, Data Migration); 3 Remittance (Operations Remittance addendum, Reinsurance); 4 Adjustment / Cancellation (Operations, ACCT); 5 Accounting / GL (ACCT); 6 Reports BIR / regulatory (ACCT, Data Migration); 7 Collection of Commission Receivables - Direct Payment (Collections addendum, Operations) | as listed | (Drop 0 list) |
+| **Drop 2 - Independent** | 1 Marketing Collection (extraction); 2 Claims; 3 Production Reconciliation; 4 Employee Benefits (no portal feature); 5 Other Reports | - | EDP - Data Ingestion (SD 11); Enterprise General Ledger (Ent GL); CARMS; Loan Origination and Admin System (LOAS); Insurer System; Bridger Insight (manual) |
+
+## Timeline (months numbered from Jul 2026 = 4)
+
+| Stream | Drop 1 | Migration | Drop 2 |
+|---|---|---|---|
+| Requirements / design | Sep - Oct 2026 | Requirements / mapping Sep - Oct 2026 | Nov 2026 - Feb 2027 |
+| Build | Nov 2026 - Feb 2027 | Nov 2026 - Mar 2027 | Mar - Apr 2027 |
+| SIT | Jan - Jul 2027 | SIT migration Apr - Jul 2027 | Jul - Sep 2027 |
+| UAT | Aug - Dec 2027 (end to end) | UAT migration Aug - Oct 2027 | Oct - Nov 2027 |
+| ORR / PRR | Full migration and cut-over Nov 2027 - Jan 2028; performance / penetration test Nov - Dec 2027; ORR / PRR Dec 2027 - Jan 2028 | | |
+| **Go-live** | **January 2028** | | |
+
+Notes on the slide: requirements and build run in three waves (1 setup and upstream, 2 downstream, 3 independent modules), about two months of build per wave.
+
+Related: `Concept Paper - Advance Implementation of Renewal Processing V1.0 (signed).pdf` (early renewal release by 15-Aug-2027 for January-May 2028 expiries; no placement or booking before the January 2028 cut-over) and `BDOI_IER_Workbook_v20_iorta.xlsx` (infrastructure estimate: architecture, HW / SW, VDI, Kubernetes sizing per environment).

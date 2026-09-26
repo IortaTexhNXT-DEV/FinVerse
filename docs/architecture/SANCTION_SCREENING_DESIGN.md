@@ -749,3 +749,24 @@ What wave S1-C built on S0, S1-A and S1-B (contracts of 18.1), and where it deta
 - Accent-insensitive case search.
 - Assignment is announced by the platform assignment notice; `SCR_CASE_ASSIGNED` is not sent separately.
 - The demo unit heads (mkttl, clxuh) lack SCR_CASE_APPROVE, so demo cases fall back to the approvers' queue.
+
+## 20. S2 integration and hardening: as built
+
+- **End to end over HTTP.** `api/ScreeningEndToEndApiIT`: the maker lists an invented name and the checker approves it;
+  `ao` registers a client with that name (`POST /crm/clients`), which screens it, records the match, tags the client
+  (HIGH, WATCHLIST_REVIEW) and opens the case; the UCC re-assigns it, the investigator saves the review, uploads the KYC
+  form and submits; the unit head concurs, Compliance escalates, three committee members approve the STR, Compliance
+  prepares, marks ready, extracts (`GET /str/extractions/{id}/file`) and files it; the client's Screening tab and the
+  reports SCR-CASE-STATUS, SCR-STR-REGISTER and SCR-HIGH-RISK-CLIENTS show the result. A second test runs
+  `SCR_SLA_MONITOR` from the job monitor for the reminder and the breach (alert, SLA filter, SCR-SLA-BREACHES).
+- **Smoke.** `ApiSmokeIT.screeningAndUserAccessListsRespondOk` calls every list read of the module as the persona whose
+  screen makes it.
+- **Persona menus (client requirement 14).** `frontend/src/navigation/personaMenus.json` lists, per BRD-10 / BRD-11 role,
+  the granted permissions and the screens of the Sanction Screening, Compliance Setup and User Access sections;
+  `navigation/personaMenus.test.ts` checks the menu of `modules.ts` against it (and that no role reaches Finance, Claims
+  or Administration screens), `security/PersonaMenusIT` checks the grants in the database and one read per screen.
+- **Fix.** "List Sources and Runs" was in the menu of every SCR_VIEW holder (investigators, approvers, committee
+  members, UCC); it is now shown to the list maker and checker only (SCR_LIST_MAINTAIN, SCR_LIST_APPROVE, section 11.2).
+  The read endpoints are unchanged.
+- **Guide.** [`docs/modules/SANCTION_SCREENING.md`](../modules/SANCTION_SCREENING.md) (with production-support
+  troubleshooting); the as-built status per SNSRP ID is in `BDOI_SANC_BRD_SPEC.md`.

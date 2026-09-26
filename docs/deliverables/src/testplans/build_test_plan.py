@@ -28,6 +28,11 @@ meta:
   summary: TP_BRD03_PRODUCT_MAINTENANCE.md # Word summary source in this folder
   version: "1.0"
   date: 25 September 2026
+  signoff: ../signoff/brd01/pack.yaml   # optional: the business sign-off pack of the BRD (src/signoff). Adds
+                                   # one Screen case per screen (TC-<code>-SCR-nn) and one Message case per
+                                   # screen or dialog of the messages catalogue (TC-<code>-MSG-nn), a Screen ID
+                                   # on every case (from the test aliases of the screens), the Screens sheet and
+                                   # the <!-- tp:screens --> table
   built: true                      # BRDs 1-5: message codes must exist in backend/src/main and
                                    # automation references must exist; false (BRDs 6-12): codes
                                    # and automation references are refused
@@ -84,7 +89,7 @@ case, every condition at least one case, and every BRD ID of the FRS at least on
 
 Placeholders in the Word summary (a line on its own): <!-- tp:counts -->, <!-- tp:coverage -->
 (per FR), <!-- tp:brd-coverage -->, <!-- tp:scenarios -->, <!-- tp:data -->, <!-- tp:personas -->,
-<!-- tp:access -->, <!-- tp:automation -->, <!-- tp:findings -->.
+<!-- tp:access -->, <!-- tp:automation -->, <!-- tp:findings -->, <!-- tp:screens --> (with meta.signoff).
 """
 
 from __future__ import annotations
@@ -109,8 +114,9 @@ from bdoi_xlsx import BdoiWorkbook, Column  # noqa: E402
 
 FRS_DIR = REPO / "docs" / "deliverables" / "src" / "frs"
 
-TYPES = ["Positive", "Negative", "Boundary", "Security-access", "Workflow", "Report-output", "Upload-download"]
-NEGATIVE_TYPES = {"Negative", "Security-access"}
+TYPES = ["Positive", "Negative", "Boundary", "Security-access", "Workflow", "Report-output", "Upload-download",
+         "Screen", "Message"]
+NEGATIVE_TYPES = {"Negative", "Security-access", "Message"}
 PRIORITIES = ["High", "Medium", "Low"]
 STATUSES = ["Not run", "Pass", "Fail", "Blocked", "N/A"]
 PRIORITY_OF = {"must have": "High", "should have": "Medium", "could have": "Low", "nice to have": "Low"}
@@ -152,6 +158,7 @@ class Case:
     auto: str
     data: list[str] = field(default_factory=list)
     raw_messages: list[str] = field(default_factory=list)
+    screen_id: str = ""
 
 
 @dataclass
@@ -167,6 +174,7 @@ class Plan:
     cases: list[Case] = field(default_factory=list)
     access: list[dict[str, Any]] = field(default_factory=list)
     findings: list[dict[str, Any]] = field(default_factory=list)
+    signoff: Any = None  # the sign-off Pack (src/signoff/signoff_pack.py) when meta.signoff is set
     errors: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
 
@@ -358,6 +366,8 @@ def load(path: Path) -> Plan:
         for row in cond_rows:
             if not row["cases"]:
                 plan.errors.append(f"{row['id']}: condition has no test case")
+    if meta.get("signoff"):
+        _add_signoff_cases(plan)
     for i, a in enumerate(plan.access, start=1):
         a["id"] = f"AC-{code}-{i:02d}"
         a["screen"] = plan.screens.get(a.get("screen", ""), a.get("screen", ""))
@@ -373,6 +383,87 @@ def load(path: Path) -> Plan:
         _check_messages(plan)
         _check_automation(plan)
     return plan
+
+
+def _add_signoff_cases(plan: Plan) -> None:
+    """Screen and message cases from the business sign-off pack of the BRD, and the Screen ID of every case."""
+    sys.path.insert(0, str(REPO / "docs" / "deliverables" / "src" / "signoff"))
+    import signoff_pack  # noqa: E402
+
+    pack = signoff_pack.Pack(HERE / plan.meta["signoff"])
+    plan.signoff = pack
+    code = plan.meta["code"]
+    by_path: dict[str, str] = {}
+    for scr in pack.screens:
+        for alias in scr.get("tests") or []:
+            if alias not in plan.screens:
+                plan.errors.append(f"{scr.id}: test screen alias {alias} is not in screens")
+            by_path.setdefault(plan.screens.get(alias, alias), scr.id)
+    for c in plan.cases:
+        c.screen_id = by_path.get(c.screen, "")
+
+    def first_fr(scr: Any) -> tuple[str, list[str]]:
+        for fr in scr.get("frs") or []:
+            if fr in plan.frs:
+                return fr, list(plan.frs[fr].brd)
+        return "", []
+
+    def persona_of(scr: Any) -> str:
+        roles = [r for r in pack.personas_of(scr) if r in plan.personas]
+        return roles[0] if roles else next(iter(plan.personas))
+
+    def user(role: str) -> str:
+        return (plan.personas.get(role) or {}).get("user", "-")
+
+    for n, scr in enumerate(pack.screens, start=1):
+        fr, brd = first_fr(scr)
+        role = persona_of(scr)
+        fields = "; ".join(f"{f['no']} {f['label']} ({f['type']}, mandatory {f['mandatory']})" for f in scr.fields)
+        actions = "; ".join(a["button"] for a in scr.actions)
+        steps = [f"Sign in as {user(role)}.", f"Open {pack.menu_path(scr)}."]
+        steps += [f"Compare the screen with {scr.id} in the FRS: the fields, their order, labels, types, mandatory "
+                  "markers, defaults and lists."]
+        if scr.actions:
+            steps.append("Check the buttons offered to the persona and when each is enabled.")
+        if any(f["message"] not in ("-", "") for f in scr.fields):
+            steps.append("Leave one mandatory field blank or enter an invalid value, and save.")
+        expected = [f"The screen matches {scr.id} {scr.title} of the FRS."]
+        if fields:
+            expected.append(f"Fields in this order: {fields}.")
+        if actions:
+            expected.append(f"Actions: {actions}.")
+        if len(steps) > 4:
+            expected.append("The message of the field table is shown word for word and nothing is saved.")
+        case = Case(id=f"TC-{code}-SCR-{n:02d}", cond="-", fr=fr, brd=brd, scenario="",
+                    title=f"Screen {scr.id} {scr.title} matches the signed specification", type="Screen",
+                    negative=False, persona=role, screen=pack.menu_path(scr), pre="Seed data of the SIT environment.",
+                    steps="\n".join(f"{i}. {t}" for i, t in enumerate(steps, start=1)),
+                    expected="\n".join(expected), priority="High", auto="", screen_id=scr.id)
+        plan.cases.append(case)
+
+    groups: "OrderedDict[str, list[dict[str, str]]]" = OrderedDict()
+    for m in pack.messages:
+        if m["kind"] in ("Error", "Validation", "Warning"):
+            groups.setdefault(m["where"], []).append(m)
+    for n, (where, msgs) in enumerate(groups.items(), start=1):
+        ids = re.findall(r"SCR-[A-Z]+-\d+", where)
+        scr = pack.by_id.get(ids[0]) if ids else None
+        role = persona_of(scr) if scr else next(iter(plan.personas))
+        fr, brd = first_fr(scr) if scr else ("", [])
+        screen = pack.menu_path(scr) if scr else "Any New Business record"
+        listed = "\n".join(f"{m['id']}: \"{m['text']}\"" + (f" ({m['code']})" if m["code"] != "-" else "")
+                           for m in msgs)
+        steps = [f"Sign in as {user(role)}.", f"Open {screen}.",
+                 "For each message listed, create the condition described in the messages catalogue of the FRS "
+                 "(chapter 15) and run the action."]
+        case = Case(id=f"TC-{code}-MSG-{n:02d}", cond="-", fr=fr, brd=brd, scenario="",
+                    title=f"Messages of {where}", type="Message", negative=True, persona=role, screen=screen,
+                    pre="Seed data of the SIT environment.",
+                    steps="\n".join(f"{i}. {t}" for i, t in enumerate(steps, start=1)),
+                    expected="Each message is shown word for word, with its code as the Reference for a server "
+                             "message, and nothing is saved:\n" + listed,
+                    priority="Medium", auto="", screen_id=scr.id if scr else "")
+        plan.cases.append(case)
 
 
 def _check_coverage(plan: Plan) -> None:
@@ -637,6 +728,8 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
         Column("type", "Type", 13, "Kind of test", values=TYPES),
         Column("persona", "Persona", 22, "Role code and name (and SIT/UAT user for built BRDs)"),
         Column("screen", "Screen (menu path)", 26, "Where the tester starts"),
+    ] + ([Column("screen_id", "Screen ID", 12, "Screen of the FRS screen specifications (business sign-off pack)")]
+         if plan.signoff else []) + [
         Column("pre", "Preconditions and test data", 36, "State before the first step and the named data set"),
         Column("steps", "Steps", 52, "Numbered steps"),
         Column("expected", "Expected result", 50,
@@ -651,7 +744,8 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
         Column("defect", "Defect ID", 12, "Defect raised when the case fails"),
     ], rows=[{
         "id": c.id, "scenario": c.scenario, "fr": c.fr, "brd": ", ".join(c.brd), "title": c.title,
-        "type": c.type, "persona": persona_label(plan, c.persona), "screen": c.screen, "pre": c.pre,
+        "type": c.type, "persona": persona_label(plan, c.persona), "screen": c.screen, "screen_id": c.screen_id,
+        "pre": c.pre,
         "steps": c.steps, "expected": c.expected, "priority": c.priority, "auto": c.auto, "status": "Not run",
     } for c in plan.cases], description="Test cases with steps and expected results; execution columns start blank")
 
@@ -671,6 +765,18 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
         Column("result", "Coverage", 11, "Covered: at least one positive and one negative case (FR) or one case "
                "(BRD ID); GAP otherwise", values=["Covered", "GAP"], status=True),
     ], rows=cov, description="Every FR and every BRD ID with its count of positive and negative cases")
+
+    if plan.signoff:
+        wb.sheet("Screens", [
+            Column("id", "Screen ID", 12, "Screen of the FRS screen specifications"),
+            Column("title", "Screen", 28, "Screen name"),
+            Column("menu", "Menu path", 40, "Where the screen is"),
+            Column("n", "Cases", 8, "Test cases run on the screen", kind="number"),
+            Column("cases", "Test cases", 70, "IDs of the cases"),
+        ], rows=[{"id": sc.id, "title": sc.title, "menu": plan.signoff.menu_path(sc),
+                  "n": len(ids), "cases": ", ".join(ids)}
+                 for sc in plan.signoff.screens for ids in [[c.id for c in plan.cases if c.screen_id == sc.id]]],
+            description="Every screen of the FRS with the test cases that run on it")
 
     data_rows = []
     for d in plan.data:
@@ -842,6 +948,15 @@ def placeholder(plan: Plan, name: str) -> list[str]:
                 for i, f in enumerate(plan.findings, start=1)]
         return _table('widths=1.8,2.2,7.2,5.8 caption="FRS findings for the FRS owner" size=8.5',
                       ["ID", "FR", "Finding", "Proposed resolution"], rows)
+    if name == "screens":
+        if not plan.signoff:
+            raise ValueError("tp:screens needs meta.signoff")
+        rows = []
+        for sc in plan.signoff.screens:
+            cases = [c for c in plan.cases if c.screen_id == sc.id]
+            rows.append([sc.id, sc.title, len(cases), sum(1 for c in cases if c.type == "Message")])
+        return _paired('widths=2,5,1.2,1.2 caption="Test cases per screen (all cases, of which message cases)" '
+                       'size=7.5', ["Screen", "Name", "Cases", "Msg."], rows, min_rows=30)
     raise ValueError(f"unknown placeholder tp:{name}")
 
 

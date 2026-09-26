@@ -1,0 +1,336 @@
+# Screen specifications of BRD-1 New Business: bulk uploads, work and monitoring, reports, administration.
+area: Bulk uploads, work, reports and administration
+screens:
+  - id: SCR-NB-35
+    title: Bulk Uploads
+    route: /bulk
+    purpose: >-
+      The upload centre: one tile per upload type the user may use and the list of recent uploads with their row counts
+      and result report.
+    entry:
+      - Bulk Upload buttons of Clients, Quotations and Accounts
+    shots:
+      - {state: list, user: ao, caption: "Bulk Uploads centre"}
+    fields:
+      - "Upload types | Upload type tiles | Tile | One per upload type the user may use | - | Upload types (section Upload screens) | - | - | Each type also checks its own permission | You are not allowed to use '<type>'"
+      - "Recent uploads | Upload, Type, File, Status, Rows, Valid, Processed, Failed, Uploaded | Column | Upload number BLK-yyyy-nnnnnn | - | Upload jobs | - | Read only | - | -"
+    actions:
+      - "Upload type tile | BULK_PROCESS and the type's permission | Always | Opens the upload wizard of the type | - | -"
+      - "Result Report (row) | BULK_PROCESS | Always | Downloads the result file of the upload: every row with its status and messages | - | -"
+    rules:
+      - "Every upload type has a template, row validation, a result file and re-upload; see the Upload screens section (FR-NB-019)."
+    outcome: The user starts any bulk upload from one place and finds past uploads.
+    frs: [FR-NB-019]
+    tests: [BULK]
+
+  - id: SCR-NB-36
+    title: Bulk upload wizard
+    route: /bulk/:handler
+    parent: /bulk
+    also: [/bulk/QUOTATION_CREATE, /bulk/QUOTATION_ACCEPTANCE, /bulk/ACCOUNT_CREATE, /bulk/BOOKING_UPLOAD]
+    purpose: >-
+      The same three steps for every upload type: 1. download the current template, 2. upload the filled file (with the
+      type's parameters, such as the product), 3. review every row, process the valid rows, download the result file
+      and upload another file.
+    entry:
+      - Bulk Uploads › upload type tile
+      - Clients, Quotations, Accounts and Booking Workbench › Bulk Upload / Upload Bookings
+    shots:
+      - {state: empty, user: ao, path: "/bulk/ACCOUNT_CREATE", caption: "Bulk Account Creation: template and upload steps"}
+      - {state: review, user: ao, path: "/bulk/CLIENT_CREATE", upload: client_create_file, caption: "Review step with valid and invalid rows"}
+    fields:
+      - "1. Template | Download Template | Button | Excel template with the headers, a description row per column and an example | - | Upload type | - | - | Keep the headers unchanged | The file does not follow the current template; missing column(s): <columns>"
+      - "2. Upload | Product | Drop-down | Code – name (quotation and account creation) | Y for those types | Active products | Select | - | - | Choose the product of the upload"
+      - "2. Upload | Default market segment | Drop-down | - | N | List of values MARKET_SEGMENT | Blank | - | Applies to rows without a segment | -"
+      - "2. Upload | Submit complete accounts to Processing | Check box | Account creation only | N | - | Not ticked | - | - | -"
+      - "2. Upload | Create accounts | Check box | Quotation acceptance only | N | - | Not ticked | - | Accounts are created for confirmed clients | -"
+      - "2. Upload | File | File | Excel (.xlsx), OpenDocument (.ods) or CSV (.csv), first sheet, headers in row 1; up to BULK_MAX_ROWS (5,000) data rows | Y | - | - | - | Readable file with data rows, not uploaded before | Upload an Excel (.xlsx), OpenDocument (.ods), CSV (.csv) or text (.txt) file / The file has no data rows / The file has <n> rows; the maximum is 5000 / This file was already uploaded as <upload> (<file>)"
+      - "3. Review | Rows, Valid, Invalid, To process | Figure | Counts | - | Upload job | - | Read only | - | -"
+      - "3. Review | [Row filter] | Drop-down | All rows, Invalid, Valid, Committed, Failed | N | Fixed list | All rows | - | - | -"
+      - "3. Review | Rows | Table | Row, Status, the first five columns, Messages / Reference | - | Upload rows | - | Read only | Each row is checked against the column rules and the type's business rules | <Column> is mandatory / <Column> '<value>' is not a valid <number, date (yyyy-mm-dd), Y/N value>"
+    actions:
+      - "Download Template | BULK_PROCESS and the type's permission | Always | Downloads the current template of the type | - | -"
+      - "Upload and Validate | As above | File chosen and parameters complete | Reads and validates every row; nothing is saved yet | Upload Validated | -"
+      - "Process n Valid Row(s) | As above | Validated upload with valid rows | Saves each valid row on its own (a failure does not stop the others); invalid rows are left out | Upload Committed | -"
+      - "Discard Upload | As above | Validated upload | Discards the upload; nothing is saved | Upload Cancelled | -"
+      - "Result Report | As above | Always | Downloads the result file: every row with its status, messages and the reference created | - | -"
+      - "Upload Another File | As above | Upload processed | Starts again from step 2; corrected rows are uploaded as a new file | - | -"
+    rules:
+      - "The same file is not accepted twice (FR-NB-019)."
+      - "Rows are committed one by one; the result file is the error file to correct and re-upload (FR-NB-019)."
+      - "Each upload type applies the same business rules as the screen it replaces, including duplicate checks (FR-NB-035, FR-NB-046, FR-NB-065)."
+    outcome: Many records are created or changed in one step, with a result file for every row.
+    frs: [FR-NB-019, FR-NB-035, FR-NB-045, FR-NB-046, FR-NB-065, FR-NB-068, FR-NB-111]
+    tests: [BULK]
+
+  - id: SCR-NB-37
+    title: NB Dashboard
+    route: /nb/dashboard
+    purpose: >-
+      The landing page of the New Business roles: headline tiles, requests and accounts by status, the quotation to
+      booking funnel, the ageing of open accounts by stage and production against target by team. Every figure opens
+      its filtered list.
+    entry:
+      - Home › NB Dashboard (landing page after sign-in)
+    shots:
+      - {state: list, user: mkttl, caption: "New Business Dashboard"}
+    fields:
+      - "Header | As of | Date | dd-MMM-yyyy, not after today | N | - | Today | - | - | -"
+      - "Tiles | New Requests / Quotations Sent This Month / Overdue (SLA Breaches) / Booked This Month | Figure | Count with a hint (awaiting client, premium and commission booked) | - | Requests, quotations, work items, bookings | - | Read only | - | -"
+      - "Charts | Requests by Status / Accounts by Stage / Quotation to Booking Funnel (Year to Date) / Ageing of Open Accounts by Stage | Chart | A bar opens the filtered list | - | Workflows | - | Read only | - | -"
+      - "Production | Production vs Target by Team (This Month) | Chart and table | Team, Bookings / Target, Premium (PHP), Target (PHP), Achievement | - | Bookings, production targets | - | Read only | - | No bookings or targets this month"
+    actions:
+      - "New Business Reports | Every user of the screen | Always | Opens New Business Reports | - | -"
+      - "Production Statistics | WORK_ASSIGN | Always | Opens the Production Statistics report | - | -"
+      - "[A figure or bar] | Every user of the screen | Always | Opens the list filtered on it (Accounts, Quotations, My Work) | - | -"
+    rules:
+      - "Overdue counts the work items past their stage SLA (FR-NB-120)."
+    outcome: Every role sees the state of New Business on sign-in.
+    frs: [FR-NB-120, FR-NB-122]
+    tests: [NBDASH]
+
+  - id: SCR-NB-38
+    title: My Work
+    route: /my-work
+    purpose: >-
+      The queues of the stages the user's team works, with assigned-to-me, open, overdue and queue counts; the user
+      claims items from the team queue and opens them to act; a team leader assigns or re-assigns them.
+    entry:
+      - Home › My Work
+      - Notification links
+    shots:
+      - {state: list, user: ao, caption: "My Work, All my queues"}
+      - {state: assign, user: mkttl, click: "^assign$", caption: "Assign dialog of a team leader"}
+    fields:
+      - "Summary | Assigned to me / Open in my queues / Overdue / Queues I work | Figure | Counts; a figure filters the list | - | Work items | - | Read only | - | -"
+      - "Stage tiles | [One tile per stage of each workflow the user works] | Tile | Open and overdue counts | - | Workflows NB_CLIENT, NB_QUOTATION, NB_PROPOSAL, NB_ACCOUNT | - | - | - | -"
+      - "Toolbar | Assigned to me / Team queue / All my queues | Tab | - | - | Fixed | All my queues | - | - | -"
+      - "Toolbar | Overdue only | Check box | - | N | - | Not ticked | - | - | -"
+      - "Toolbar | Reference or name | Text | - | N | - | Blank | - | Contains search | -"
+      - "List | Reference, Description, Stage, From, In Stage, Due, Assignee | Column | Due in red when overdue; Unassigned | - | Work items | - | Read only | - | Nothing waiting here."
+      - "Assign dialog | Assignee | Drop-down | Users of the team that works the stage, or Team queue (unassigned) | N | Users holding the stage's permission | The current assignee | Open item | Only a user of the stage's team | <user> does not work this queue"
+    actions:
+      - "Claim | Holder of the stage's permission | Unassigned item | Assigns the item to the user | Unchanged | -"
+      - "Assign | WORK_ASSIGN | Open item | Assigns the item or returns it to the team queue | Unchanged | In-app notice to the new assignee"
+      - "Clear Stage Filter | Every user of the screen | A stage filter is set | Clears the stage filter | - | -"
+      - "Open a row | Every user of the screen | Always | Opens the record | - | -"
+    rules:
+      - "Items are listed oldest due first; overdue items are past their stage SLA (FR-NB-011)."
+      - "A user only claims items of the stages its permissions own (FR-NB-011)."
+    outcome: Every user knows what to work next and team leaders balance the load.
+    frs: [FR-NB-011, FR-NB-010]
+    tests: [MYWORK]
+
+  - id: SCR-NB-39
+    title: My Approvals
+    route: /approvals
+    purpose: >-
+      Items waiting for the user's authorization from every module that registers an approval inbox (lists of values,
+      masters, rate exceptions, access requests), oldest first. The user's own submissions are never shown.
+    entry:
+      - Home › My Approvals
+    shots:
+      - {state: list, user: approver, caption: "My Approvals"}
+    fields:
+      - "Header | All companies | Check box | - | N | - | Not ticked (company of the page header) | - | - | -"
+      - "Summary | Waiting for you | Figure | Count | - | Approval inboxes | - | Read only | - | -"
+      - "Module filter | [One chip per module] | Toggle | - | N | - | All | - | - | -"
+      - "List | Module, Type, Reference, Description, Amount, Submitted by, Submitted, Age (days) | Column | - | - | Approval inboxes | - | Read only | - | -"
+    actions:
+      - "Open a row | Every user of the screen | Always | Opens the record where it is approved | - | -"
+    rules:
+      - "Maker-checker: a submission is never approved by its maker (FR-NB-133)."
+    outcome: The approver sees and clears every pending request in one place.
+    frs: [FR-NB-133]
+    tests: [APPROVALS]
+
+  - id: SCR-NB-40
+    title: New Business Reports
+    route: /nb/reports
+    also: [/reports/:code]
+    purpose: >-
+      The New Business reports the user may run, grouped by process step. A report runs on screen with its parameters
+      and saved variants, prints with the chosen paper and orientation, and downloads in PDF, Excel, ODS, CSV or XML.
+    entry:
+      - Reports › New Business Reports
+      - NB Dashboard › New Business Reports
+    shots:
+      - {state: list, user: mkttl, caption: "New Business Reports"}
+      - {state: run, user: mkttl, path: "/reports/NB-ACC-STATUS", click: "^run report$", caption: "Account Status Report run on screen"}
+    fields:
+      - "Report groups | Accounts and Workflow / Placement / Billing and Payments / Issuance / Booking and Production | Card | One link per report with code and description | - | Report catalogue | - | Read only | - | No New Business report is available to your role"
+      - "Report | Saved Variant | Drop-down | The user's variants and shared ones (shared by <user>) | N | Report variants | — None — | - | - | -"
+      - "Report | Variant Name (Save Variant) | Text | - | Y | - | Blank | - | - | Enter a name"
+      - "Report | Parameters | Per report | Company from the page header; date range from the start of the month to today; report-specific parameters (see Reports) | Per parameter | Report definition | Start of month to today | - | Required parameters; To not before From | <parameter> is required / <To> must not be before <From>"
+      - "Report | Paper, Orientation, Width | Drop-down | A4 and other sizes; Automatic (by width), Portrait, Landscape; Fit to page width, Natural column widths | N | Fixed lists | A4, Automatic, Fit to page width | - | - | -"
+    actions:
+      - "Run Report | REPORT_VIEW and the report's permission | Parameters valid | Runs the report on screen | - | -"
+      - "Print | As above | Parameters valid | Opens the PDF for printing with the report header | - | -"
+      - "PDF / Excel / ODS / CSV / XML | As above | Parameters valid | Downloads the report | - | -"
+      - "Save Variant / Delete Variant | As above | Always / own variant | Saves the parameters under a name (optionally shared) or deletes the user's own variant | - | -"
+      - "Report Centre | REPORT_VIEW | Always | Opens the Report Centre | - | -"
+    rules:
+      - "Each report also checks its own permission (FR-NB-123)."
+      - "Only the user who saved a variant may delete it (FR-NB-123)."
+    outcome: Monitoring and reconciliation reports come from the system, not from spreadsheets.
+    frs: [FR-NB-121, FR-NB-122, FR-NB-123, FR-NB-124, FR-NB-125]
+    tests: [NBREP]
+
+  - id: SCR-NB-41
+    title: Production Targets
+    route: /nb/targets
+    purpose: Booking, premium and commission targets per sales unit and month, used by the NB Dashboard and the Production Statistics report.
+    entry:
+      - Reports › Production Targets
+    shots:
+      - {state: list, user: badmin, caption: "Production Targets"}
+    fields:
+      - "Tabs | Region / Department / Team / Officer | Tab | Sales unit level | - | Fixed | Region | - | - | -"
+      - "Toolbar | Month | Month | yyyy-MM | N | - | Current month | - | - | -"
+      - "List | Unit, Period, Bookings, Premium (PHP), Commission (PHP) | Column | - | - | Production targets | - | Read only | - | -"
+      - "Target dialog | Unit Code | Text | Sales unit code, or the officer's username | Y | Sales organisation | Blank | Always | - | Enter the unit code or the officer username"
+      - "Target dialog | Period From / Period To | Date | dd-MMM-yyyy | Y | - | The month | Always | The end is not before the start | Enter the period / The period end must not be before the start"
+      - "Target dialog | Target Bookings, Target Premium (PHP), Target Commission (PHP) | Number / Amount | 0 or more | Y | - | Blank | Always | Not negative | Targets cannot be negative"
+    actions:
+      - "Add Target / open a row | MASTER_MAINTAIN | Always | Opens the target dialog; Save stores the target (audited) | - | -"
+    rules:
+      - "The sales hierarchy and the targets are maintained by the business; the seed targets are replaced by BDOI's targets (FR-NB-122)."
+    outcome: Production is measured against the targets BDOI sets.
+    frs: [FR-NB-122]
+    tests: [TARGETS]
+
+  - id: SCR-NB-42
+    title: Lists of Values
+    route: /broking-setup/lists
+    purpose: >-
+      The coded values used on the New Business screens (segments, reasons, document types, tags...). A change takes
+      effect from its date once a checker authorises it; values are deactivated, never deleted.
+    entry:
+      - Setup & Administration › Broking Setup › Lists of Values
+      - My Approvals (pending values)
+    shots:
+      - {state: list, user: badmin, caption: "Lists of Values"}
+      - {state: new, user: badmin, click: "^new value$", caption: "New value dialog"}
+    fields:
+      - "Lists | List names | List | One entry per list | - | List types | The first list | - | - | -"
+      - "Values | Code, Label, Order, Parent, Effective, Status, Maker / Checker | Column | Status From a future date, In force, Ended, Pending authorization, Inactive | - | List values | - | Read only | - | -"
+      - "Value dialog | Code | Text | Capital letters, digits and _, up to 40 | Y | - | Blank | New value | Format; unique in the list | Use capital letters, digits and _ (up to 40) / <list> already exists: <code>"
+      - "Value dialog | Label | Text | - | Y | - | Blank | Always | Not blank | Enter the label"
+      - "Value dialog | Sort order | Number | Whole number | Y | - | Next number | Always | A whole number | Enter a whole number"
+      - "Value dialog | Parent value | Text | For dependent lists only | N | Parent list | Blank | Always | - | -"
+      - "Value dialog | Effective from | Date | dd-MMM-yyyy | Y | - | Today | Always | - | Enter the first valid date"
+      - "Value dialog | Effective to | Date | dd-MMM-yyyy; blank = no end date | N | - | Blank | Always | Not before Effective from | Must not be before the first valid date"
+    actions:
+      - "New Value | LOV_MANAGE | List maintained by the business | Opens the value dialog; Save stores the value pending authorization | Pending authorization | Pending item in My Approvals"
+      - "Edit / Deactivate | LOV_MANAGE | Value not inactive | Changes the value (pending authorization) or deactivates it | Pending authorization / Inactive | -"
+      - "Authorize | MASTER_AUTHORIZE; not the maker | Value pending authorization | Authorises the value | In force from its date | -"
+    rules:
+      - "Lists maintained by the system cannot be changed (FR-NB-132)."
+      - "A value is never authorised by its maker (FR-NB-132)."
+    outcome: The business maintains its lists without a release, under maker-checker.
+    frs: [FR-NB-132]
+    tests: [LOV]
+
+  - id: SCR-NB-43
+    title: Data Retention
+    route: /broking-setup/retention
+    purpose: Retention periods by record type and status and the number of records that have become eligible; the monthly review counts them.
+    entry:
+      - Setup & Administration › Broking Setup › Data Retention
+    shots:
+      - {state: list, user: approver, caption: "Data Retention"}
+    fields:
+      - "List | Record Type, Statuses, Years Online, Years Archive, Action, Rule, Last Review, Eligible Records | Column | Eligible: Not reviewed yet, Module not yet reporting, or a count | - | Retention rules | - | Read only | - | -"
+      - "Rule dialog | Statuses | Text | Comma separated, e.g. NOT_PROCEEDED,VOIDED | Y | Record statuses | As set | Always | At least one status | Enter at least one status"
+      - "Rule dialog | Years online | Number | 1 to 50 | Y | - | 5 | Always | 1 to 50 | Between 1 and 50 years"
+      - "Rule dialog | Years in archive | Number | 0 to 50 | Y | - | 15 | Always | 0 to 50 | Between 0 and 50 years"
+      - "Rule dialog | Action | Drop-down | Review, Archive | N | Fixed list | Review | Always | - | -"
+      - "Rule dialog | Active | Check box | - | N | - | Ticked | Always | - | -"
+      - "Rule dialog | Description | Text | - | Y | - | As set | Always | Not blank | Enter a description"
+      - "Eligible records dialog | Reference, Description, Status, Last Activity | Column | - | - | Records of the type | - | Read only | - | -"
+    actions:
+      - "Run Review Now | MASTER_MAINTAIN | Always | Counts the eligible records of every active rule | - | -"
+      - "Records (row) | Every user of the screen | Always | Lists the eligible records | - | -"
+      - "Edit (row) | MASTER_MAINTAIN | Always | Opens the rule dialog | - | -"
+    rules:
+      - "Archive and purge wait for BDOI's retention decision per record type; the rules count eligible records meanwhile (FR-NB-137)."
+    outcome: BDOI sees which records its retention policy makes eligible.
+    frs: [FR-NB-137]
+    tests: [RETENTION]
+
+  - id: SCR-NB-44
+    title: Document Templates
+    route: /broking-setup/templates
+    purpose: >-
+      The texts of the generated documents with placeholders filled from the record, in versions that take effect from a
+      chosen date; a version can be loaded from Word and downloaded as Word.
+    entry:
+      - Setup & Administration › Broking Setup › Document Templates
+    shots:
+      - {state: list, user: approver, caption: "Document Templates"}
+    fields:
+      - "Templates | Template list | List | One per document (quotation letter, slips, hold cover request, Insurance Advice, e-policy e-mail, service invoice note...) | - | Document templates | The first template | - | - | -"
+      - "Template | Current version | Display | Title and text with {{placeholders}} | - | Template versions | - | Read only | - | -"
+      - "Version history | Version, Title, Effective from, Status, Created | Column | - | - | Template versions | - | Read only | - | -"
+      - "New version dialog | Load from Word | File | A .docx: the first paragraph is the title, the others the text | N | - | - | Always | A Word document with a title and text | The file is not a Word (.docx) document / The Word file needs the title in its first paragraph and the text below it"
+      - "New version dialog | Title | Text | - | Y | - | The current title | Always | Not blank | -"
+      - "New version dialog | Effective from | Date | dd-MMM-yyyy | Y | - | Today | Always | - | -"
+      - "New version dialog | Text | Text area | Keep the {{placeholders}} of the current version | Y | - | The current text | Always | Not blank | Enter the template text"
+    actions:
+      - "New Version | MASTER_MAINTAIN or LOV_MANAGE | Always | Opens the new version dialog; Save stores the version effective from its date | - | -"
+      - "[Download icon of a version (as Word)] | Every user of the screen | Always | Downloads the version as Word | - | -"
+    rules:
+      - "Documents use the template version in force on their date (FR-NB-004)."
+      - "BDOI's own layouts replace the delivered texts when provided (FR-NB-004)."
+    outcome: The business changes document wording without a release.
+    frs: [FR-NB-004]
+    tests: [TEMPLATES]
+
+  - id: SCR-NB-45
+    title: Outbound Messages
+    route: /broking-setup/messages
+    purpose: >-
+      Every e-mail sent by BIBS (quotations, slips, placements, e-policies, invoices and their separate password
+      e-mails) with its status, attempts and reason; a failed e-mail is resent from here.
+    entry:
+      - Setup & Administration › Broking Setup › Outbound Messages
+    shots:
+      - {state: list, user: badmin, caption: "Outbound Messages"}
+    fields:
+      - "Filters | Status | Drop-down | All, Queued, Sent, Failed | N | Fixed list | All | - | - | -"
+      - "Filters | Recipient, subject or reference | Text | - | N | - | Blank | - | Contains search | -"
+      - "List | Queued, Purpose, Reference, To, Subject (lock when protected), Status, Attempts, Reason | Column | - | - | Outbound messages | - | Read only | - | -"
+      - "Message dialog | Subject, recipients, body, attachments | Display | - | - | Outbound message | - | Read only | - | -"
+    actions:
+      - "Open a row | MESSAGE_VIEW | Always | Shows the message | - | -"
+      - "Send Again | MESSAGE_VIEW | Failed message | Queues the message again | Queued | E-mail resent"
+    rules:
+      - "The MAIL_DISPATCH job sends queued e-mails every 2 minutes and retries up to MAIL_MAX_ATTEMPTS (3) (FR-NB-013, FR-NB-015)."
+      - "Only a failed message can be resent (FR-NB-013)."
+    outcome: Support sees whether every document reached its recipient.
+    frs: [FR-NB-013, FR-NB-015]
+    tests: [MESSAGES]
+
+  - id: SCR-NB-46
+    title: Sign in
+    route: /login
+    public: true
+    purpose: >-
+      Sign-in with the user ID and password of the user's BIBS profile; the user lands on the NB Dashboard or My Work.
+      Log-in, lock-out, password and session rules are those of BRD-11 User Access Maintenance.
+    entry:
+      - The BIBS address; any page opened without a session
+    shots:
+      - {state: empty, user: null, caption: "Sign in"}
+    fields:
+      - "Sign in | User ID | Text | - | Y | User profile | Blank | - | - | -"
+      - "Sign in | Password | Password | - | Y | - | Blank | - | Locked after LOGIN_MAX_FAILED_ATTEMPTS (3) failures | As stated in the BRD-11 pack"
+    actions:
+      - "Login | Every user | User ID entered | Signs in; the landing page is the NB Dashboard for the broking roles | - | -"
+      - "Forgot Password | Every user | Always | Starts the password reset of BRD-11 | - | -"
+    rules:
+      - "The session ends after SESSION_TIMEOUT_MINUTES (30) without activity, with a warning before (FR-NB-130)."
+      - "BIBS can be open in several browser tabs; signing out in one signs out all (FR-NB-131)."
+    outcome: The user reaches the screens of its role only.
+    frs: [FR-NB-130, FR-NB-131]
+    tests: [LOGIN]

@@ -90,9 +90,9 @@ The accounting events of BRD-5 and their seed entries, the chart and the posting
 | R4 | BDOI Accounting, Disbursement and ACSL (BRD-5) requirements baseline and fit/gap | current | `docs/requirements/BDOI_ACCT_BRD_SPEC.md` |
 | R5 | Accounting, Disbursement and ACSL build design, including section 17 and the as-built notes A1-GL, A1-PRQ, A1-DSB, A1-FRBS, A1-OPSX | current | `docs/architecture/ACCOUNTING_DISBURSEMENT_DESIGN.md` |
 | R6 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R7 | BRD-5 FRS Volume 1 (FRBS and Accounting) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/FRS/BIBS_FRS_BRD-05_Accounting_Disbursement_ACSL_Vol1_v1.0.docx` |
-| R8 | BRD-2 Operations FRS (remittance, cashiering, commission) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/FRS/BIBS_FRS_BRD-02_Operations_v1.0.docx` |
-| R9 | BRD-4 Collections FRS (collector requests to Cashiering) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/FRS/BIBS_FRS_BRD-04_Collections_v1.0.docx` |
+| R7 | BRD-5 FRS Volume 1 (FRBS and Accounting) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/BRD-05_Accounting_Disbursement_ACSL/BIBS_FRS_BRD-05_Accounting_Disbursement_ACSL_Vol1_v1.0.docx` |
+| R8 | BRD-2 Operations FRS (remittance, cashiering, commission) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/BRD-02_Operations/BIBS_FRS_BRD-02_Operations_v1.0.docx` |
+| R9 | BRD-4 Collections FRS (collector requests to Cashiering) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/BRD-04_Collections/BIBS_FRS_BRD-04_Collections_v1.0.docx` |
 
 Page references ("p.69") are pages of the BRD-5 PDF; "Add.1" is Addendum 1 (pp.28-39) and "Add.2" the Workshop Addendum (pp.1-15). The BRD numbers the Disbursement access rows "BRD 1.1.0-1.1.3"; this FRS writes them DIS 1.1.0-1.1.3. Duplicate numbers renamed by Addendum 1 are used in their new form (DIS 2.17.4, DIS 2.24.2, ACSL 2.5.5); the second row printed "DIS 3.30.1" (headcount report) is written DIS 3.30.2.
 

@@ -6,11 +6,13 @@ repository.
 
 | File | Purpose |
 |---|---|
-| `brand.py` | Colours (Header Blue #004EA8, CTA Blue #0072D8, Yellow #FDB913, Background Blue #E5F5FF, border #C2C2C1), logos, client and system names, status colours, `output_name()`; the **drop map** (`DROPS`, `BRD_DROP`, `DROP_SHARED`, `out_dir()`, `out_path()`) that places every output in its BDOI drop folder |
+| `brand.py` | Colours (Header Blue #004EA8, CTA Blue #0072D8, Yellow #FDB913, Background Blue #E5F5FF, border #C2C2C1), logos, client and system names, status colours, `output_name()`; the **drop map** (`DROPS`, `BRD_DROP`, `BRD_NAMES`, `DROP_SHARED`, `out_dir()`, `out_path()`, `brd_folder()`) that places every output in the release-set folder of its BRD inside its BDOI drop folder |
 | `bdoi_docx.py` | Word builder: Python API (`BdoiDocument`) and the Markdown-like source format (`build_markdown`, CLI) |
 | `bdoi_xlsx.py` | Excel builder (`BdoiWorkbook`, `Column`) |
 | `bdoi_pptx.py` | PowerPoint builder, 16:9 (`BdoiDeck`) |
 | `render.py` | PDF conversion with LibreOffice and page PNG previews / contact sheets |
+| `code_facts.py` | Facts read from the code for the documents: sidebar menus and screens (`frontend_menu`, `menu_for`, `menu_path`), role grants replayed from the migrations (`role_grants`), workflow stages and actions (`workflows`), server messages (`backend_messages`, `platform_messages`), screen messages (`frontend_messages`), upload templates (`bulk_templates`). `python tools/deliverables/code_facts.py --self-check`; `--menu ROLE`, `--messages PKG...`, `--ui DIR...` print them |
+| `drop_index.py` | Writes the index `README.md` of every drop folder |
 
 ## Set-up
 
@@ -34,7 +36,7 @@ python tools/deliverables/bdoi_docx.py docs/deliverables/src/frs/FRS_BRD03_PRODU
 python tools/deliverables/bdoi_docx.py docs/deliverables/src/frs/FRS_BRD03_PRODUCT_MAINTENANCE.md --keep-pdf
 
 # any Office file: PDF plus previews
-python tools/deliverables/render.py docs/deliverables/out/Drop-0_Setup_and_Data_Migration/FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx --previews
+python tools/deliverables/render.py docs/deliverables/out/Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx --previews
 ```
 
 Word and Excel files are the masters and are the only outputs kept in `docs/deliverables/out/`; PDFs are produced
@@ -51,11 +53,12 @@ header tables, empty pages and figure legibility.
 
 - **Sources** live in `docs/deliverables/src/<kind>/` (for example `src/frs/FRS_BRD03_PRODUCT_MAINTENANCE.md`),
   figures in `src/<kind>/figures/`.
-- **Outputs** go to `docs/deliverables/out/<drop folder>/<DocType>/`, grouped by BDOI drop (answer A5 of 26-Sep-2026):
-  `Drop-0_Setup_and_Data_Migration/`, `Drop-1_Transactional/`, `Drop-2_Independent/` and `Programme/` (BRD-00
-  documents: umbrella FRS, register, process deck, alignment pack). The drop of a BRD is `brand.BRD_DROP`, the only
-  drop map of the toolkit; every builder takes its folder from `brand.out_dir(brd, kind)`, so a rebuild lands in the
-  drop folder. A BRD that spans drops lives in its primary drop and is listed in the other drop's index
+- **Outputs** go to one release-set folder per BRD, `docs/deliverables/out/<drop folder>/BRD-nn_<Name>/`, grouped by
+  BDOI drop (answer A5 of 26-Sep-2026): `Drop-0_Setup_and_Data_Migration/`, `Drop-1_Transactional/`,
+  `Drop-2_Independent/`. Programme-level documents (BRD-00: umbrella FRS, register, process deck, alignment pack, change
+  register) stay by kind under `Programme/<kind>/`. The drop of a BRD is `brand.BRD_DROP` and its folder name
+  `brand.brd_folder()` (from `brand.BRD_NAMES`), the only drop map of the toolkit; every builder takes its folder from
+  `brand.out_dir(brd, kind)`, so a rebuild lands in the BRD's release-set folder (the kind is in the file name). A BRD that spans drops lives in its primary drop and is listed in the other drop's index
   (`brand.DROP_SHARED`); nothing is copied. After a build or a move, regenerate the index `README.md` of every drop
   folder with `python tools/deliverables/drop_index.py`. Only Word, Excel and PowerPoint masters are committed.
 - **File names**: `BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>`, for example
@@ -86,7 +89,7 @@ version: "1.0"
 date: 25 September 2026
 status: Issued for BDOI review
 header_title: FRS BRD-3 Product Maintenance    # running header
-output: FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx   # <kind>/<file>; placed in out/<drop of brd>/
+output: FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx   # <kind>/<file>; placed by brand.out_path(brd, kind)
 h1_page_break: true                            # each chapter on a new page (default)
 control:                                       # document control table
   - {version: "1.0", date: 25 Sep 2026, author: ..., reviewer: ..., approver: ..., change: ...}
@@ -112,6 +115,8 @@ The builder adds the cover, document control, distribution list and table of con
 | ```` ```signoff ```` YAML `rows: [{name, role, organisation}]` | Sign-off table with signing rows |
 | ```` ```table ```` YAML `{headers, rows, widths, caption, status}` | Table with list cells (bullets inside a cell) |
 | ```` ```keyvalues ```` YAML mapping | Label / value table |
+| ```` ```screenshot ```` YAML `{path, caption, legend, width}` | Screenshot with caption and a numbered callout legend; a framed placeholder when the PNG is not captured yet |
+| ```` ```pack ```` YAML `{plugin, ...}` | Content generated by a plugin: `render(doc, **block)` of the `.py` file named in `plugin` (relative to the source), for example the screen specifications of the business sign-off pack (`src/signoff/signoff_pack.py`) |
 
 ### Functional requirement block
 
@@ -161,6 +166,7 @@ doc.heading("Introduction"); doc.paragraph("Plain text with **bold**.")
 doc.table(["ID", "Item", "Fit"], [["X1", "Row", "FIT"]], widths=[2, 10, 2], caption="Items", status_cols=[2])
 doc.callout("Parked until BDOI answers Q08.", kind="parked")
 doc.figure("figures/flow.dot", "Flow")
+doc.screenshot("screens/scr-01.png", "Clients list", legend=[(1, "Search"), (2, "Filters")])   # placeholder if missing
 doc.requirement({...})            # same keys as the fr block
 doc.glossary({"TSU": "Technical Support Unit"})
 doc.signoff([{"role": "Product Owner", "organisation": "BDOI"}])

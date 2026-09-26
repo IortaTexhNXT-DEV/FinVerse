@@ -8,9 +8,9 @@ doc_code: TestPlan
 brd: BRD-01
 name: New Business Summary
 doc_id: BIBS-TP-BRD-01
-version: "1.0"
-date: 25 September 2026
-status: Issued for BDOI review
+version: "2.0"
+date: 26 September 2026
+status: Issued for BDOI business sign-off
 header_title: Test Plan BRD-1 New Business
 h1_page_break: false
 control:
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review, with the Excel workbook of the same version
+  - version: "2.0"
+    date: 26 Sep 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Release set v2.0: cases re-traced to FRS v2.0 and its screen specifications (Screen ID on every case, Screens sheet); one screen case per screen and one message case per screen or dialog of the messages catalogue added. Status as of 26-Sep-2026"
 distribution:
   - {name: "Product Owner, BDOI", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Retail, Commercial, Corporate and Institutional Marketing", role: Business tester, organisation: BDOI, purpose: "Clients, quotations, PRFs, accounts"}
@@ -117,10 +123,12 @@ Automated tests do not replace the system test. They show that a rule holds afte
 | Workflow | A stage transition, return or closure of NB_CLIENT, NB_QUOTATION, NB_PROPOSAL or NB_ACCOUNT |
 | Report-output | Reports, registers, comparative tables and exports; content checked against the screen |
 | Upload-download | Bulk uploads, documents, e-policies, billing and payment files, downloads and protected e-mails |
+| Screen | The screen matches its specification in FRS v2.0 chapter 13: fields, order, labels, mandatory markers, defaults, lists and buttons (TC-NB-SCR-nn, one per screen) |
+| Message | Every error, validation and warning message of one screen or dialog, word for word with its code (TC-NB-MSG-nn, from the messages catalogue of FRS v2.0 chapter 15) |
 
 ## Reading the workbook
 
-The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Test Data, Roles and Access and FRS Findings. Case IDs carry their condition: TC-NB-061.3-01 is the first case of condition 3 of FR-NB-061. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Defect ID.
+The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Screens, Test Data, Roles and Access and FRS Findings. Case IDs carry their condition: TC-NB-061.3-01 is the first case of condition 3 of FR-NB-061. The Screen ID column of Test Cases links each case to the screen specification of FRS v2.0 (SCR-NB-01 to SCR-NB-46); the Screens sheet lists the cases of each screen. Screen and message cases are numbered TC-NB-SCR-nn and TC-NB-MSG-nn and trace to the first FR of their screen. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Defect ID.
 
 # Entry and exit criteria
 
@@ -220,6 +228,12 @@ Every FR has at least one positive and one negative case, and every BRD ID is co
 
 <!-- tp:scenarios -->
 
+## Coverage by screen
+
+Every screen of the FRS v2.0 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
+
+<!-- tp:screens -->
+
 ## Roles and access
 
 The table shows the actions checked per role. Each Y and N is one row of the Roles and Access sheet.
@@ -248,7 +262,7 @@ Cases with an automation reference are covered by these existing tests, which ru
 
 # FRS findings
 
-Writing the cases showed the points below, where the FRS is ambiguous, cannot be tested as written, or differs from the build. The cases use the built behaviour; the FRS owner decides the correction for FRS v1.1.
+Writing the cases showed the points below, where the FRS is ambiguous, cannot be tested as written, or differs from the build. The cases use the built behaviour; the FRS owner decides the correction in the FRS.
 
 <!-- tp:findings -->
 

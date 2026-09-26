@@ -18,11 +18,8 @@ import { showsInsurerWidgets } from './insurerWidgets';
 import { WorkloadWidget } from './widgets/WorkloadWidget';
 
 /** The insurer KPI widgets (premium, claims), shown to insurer roles only. */
-function InsurerWidgets({
-  allowed,
-  roles,
-}: Readonly<{ allowed: boolean; roles: readonly string[] | undefined }>) {
-  if (!allowed || !showsInsurerWidgets(roles)) {
+function InsurerWidgets({ allowed }: Readonly<{ allowed: boolean }>) {
+  if (!allowed) {
     return null;
   }
   return (
@@ -60,7 +57,7 @@ function positionLine(d: { asOf: string } | undefined, ccy: string): string {
  * Executive finance dashboard: headline KPIs of the ledger, then one widget per area
  * (collections, payables, cash, budget). Every widget loads on its own and shows a message
  * instead of a chart when it has no data. The insurer premium and claims widgets are hidden for
- * every BDOI role (they show insurer KPIs).
+ * every BDOI role (insurer KPIs, shown only with an insurer-only permission).
  */
 export default function DashboardPage() {
   const companyId = useCompanyId();
@@ -94,7 +91,7 @@ export default function DashboardPage() {
         <WorkloadWidget enabled={allowed} />
       </div>
       <div className="grid-2">
-        <InsurerWidgets allowed={allowed} roles={user?.roles} />
+        <InsurerWidgets allowed={allowed && showsInsurerWidgets(can)} />
         <CollectionsWidget enabled={allowed} />
         <PayablesWidget enabled={allowed} />
         <CashWidget enabled={allowed} />

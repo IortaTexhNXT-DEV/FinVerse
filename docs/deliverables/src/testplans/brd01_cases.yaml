@@ -129,7 +129,7 @@ data:
   - id: TD-NB-09
     name: Seed booking
     content: Seven accounts of CL-2026-000001 to 000006 in POLICY_ISSUED; four booked at start-up with one positive endorsement and one partial cancellation; one queued by the seed auto-book rule (PAR08 CBG); two ready to book, one of them multi-year
-    source: Seed V988 and the booking seed seeder
+    source: Seed V988 and the booking seed runner (BookingSeedData)
   - id: TD-NB-10
     name: Report targets and variants
     content: 2026 monthly production targets per region, department, team and AO; one shared variant of the Account Status Report

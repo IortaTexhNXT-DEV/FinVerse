@@ -2939,7 +2939,7 @@ items:
   loc: 'IER workbook v20, Assumptions 3 (non-production 12 x 5); BIBS job schedules (application.yml)'
   type: NFR inconsistency
   sev: Medium
-  desc: 'Non-production runs 12 hours a day, 5 days a week. BIBS night jobs run at 20:00, 22:15-23:00, 01:00, 05:00 and 06:00 Philippine time; month-end close, migration trial migrations (weekend loads) and the dress rehearsal need longer hours. MSK and ElastiCache cannot be stopped.'
+  desc: 'Non-production runs 12 hours a day, 5 days a week. BIBS night jobs run at 20:00, 22:15-23:00, 01:00, 05:00 and 06:00 Philippine time; month-end close, trial migrations (weekend loads) and the dress rehearsal need longer hours. MSK and ElastiCache cannot be stopped.'
   impact: 'Batch and month-end tests do not run in SIT / UAT; savings overstated.'
   modules: 'All batch jobs; Data migration'
   resolution: 'Non-production crons moved into the window by environment variables; extended hours booked for batch, month-end and migration cycles.'

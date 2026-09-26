@@ -460,19 +460,20 @@ rules, reports, ports, demo data and open points. Update it together with the co
 
 | Module | Guide |
 |---|---|
-| Underwriting | [`docs/modules/UNDERWRITING.md`](../modules/UNDERWRITING.md) |
-| Claims | [`docs/modules/CLAIMS.md`](../modules/CLAIMS.md) |
-| Reinsurance | [`docs/modules/REINSURANCE.md`](../modules/REINSURANCE.md) |
 | Receivables & Banking | [`docs/modules/RECEIVABLES_AND_BANKING.md`](../modules/RECEIVABLES_AND_BANKING.md) |
 | Payables & Cash | [`docs/modules/PAYABLES_AND_CASH.md`](../modules/PAYABLES_AND_CASH.md) |
 | Assets & Investments | [`docs/modules/ASSETS_AND_INVESTMENTS.md`](../modules/ASSETS_AND_INVESTMENTS.md) |
 | Operations (BRD-2) | [`docs/modules/OPERATIONS.md`](../modules/OPERATIONS.md) |
 | Planning & Closing | [`docs/development/PLANNING_AND_CLOSING.md`](PLANNING_AND_CLOSING.md) |
-| Actuarial Reserves | [`docs/modules/ACTUARIAL_RESERVES.md`](../modules/ACTUARIAL_RESERVES.md) |
 | Tax & Statutory | [`docs/modules/TAX_AND_STATUTORY.md`](../modules/TAX_AND_STATUTORY.md) |
 | Sanction Screening (BRD-10) | [`docs/modules/SANCTION_SCREENING.md`](../modules/SANCTION_SCREENING.md) |
 | User Access Maintenance (BRD-11) | [`docs/modules/USER_ACCESS.md`](../modules/USER_ACCESS.md) |
 | Broking (BDOI New Business) | [`docs/architecture/BROKING_ARCHITECTURE.md`](../architecture/BROKING_ARCHITECTURE.md) |
+
+The insurer-side modules of the original finance suite (`underwriting`, `claims`, `reinsurance`, `reserves`, the
+`insurance` kernel and `consolidation`) are not used by any BDOI process and stay hidden from BDOI roles. Their guides
+were removed; the inventory, the evidence and the recommended action per module are in
+[`CODEBASE_RELEVANCE_AUDIT.md`](CODEBASE_RELEVANCE_AUDIT.md), which also names the commit that still holds the old guides.
 
 Modules of later BRDs, **designed, not built** (the design is the guide until the module guide is written with the
 code; cross-BRD decisions and the build order are in

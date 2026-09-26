@@ -1,7 +1,8 @@
 # BRD-13 Data Migration - single source of the production cutover plan (BRID 12.1; R3 section 17).
 # Read by build_migration_pack.py for the Cutover Task Plan workbook and the task tables of the Cutover Runbook.
-# T = go-live, the first business day (Monday) of a month after a legacy month-end close (DMQ25).
-# Days are calendar days. Times are Philippine time (PHT). Durations are elapsed hours.
+# T = go-live. BDOI timeline: January 2028 (DMQ25); proposed Monday 3 January 2028, the first business day after the
+# legacy year-end close (DMQ39). Days are calendar days. Times are Philippine time (PHT). Durations are elapsed hours.
+# Tasks that would fall on the year-end holidays are placed on the nearest working day (section calendar).
 
 roles:
   - [PM, BDOI Program Manager (ESG - Business Project Services), BDOI]
@@ -21,13 +22,35 @@ roles:
   - [IQA, "iorta TechNXT QA (smoke tests, defect triage)", iorta TechNXT]
 
 phases:
-  - [A, Readiness, T-30 to T-15]
-  - [B, Pre-load and daily deltas, T-14 to T-4]
-  - [C, Legacy freeze and final extracts, "T-3 (Friday)"]
-  - [D, Production load, "T-2 (Saturday)"]
-  - [E, "Reconciliation, verification and go / no-go", "T-1 (Sunday)"]
-  - [F, Go-live, "T (Monday)"]
-  - [G, Hypercare, T+1 to the first month-end close]
+  - [A, Readiness, "T-30 to T-15 (4 to 19 Dec 2027)"]
+  - [B, Pre-load and daily deltas, "T-14 to T-4 (20 to 30 Dec 2027)"]
+  - [C, Legacy freeze and final extracts, "T-3 (Friday 31 Dec 2027)"]
+  - [D, Production load, "T-2 (Saturday 1 Jan 2028)"]
+  - [E, "Reconciliation, verification and go / no-go", "T-1 (Sunday 2 Jan 2028)"]
+  - [F, Go-live, "T (Monday 3 Jan 2028)"]
+  - [G, Hypercare, "T+1 to the first month-end close (January 2028)"]
+
+# [day, date for T = Monday 3 January 2028, note]. Holidays are the usual Philippine ones; BDOI confirms them against
+# the 2027 and 2028 proclamations (DMQ39).
+calendar:
+  - [T-30, "Sat 4 Dec 2027", "Dress rehearsal (15-26 Nov 2027) already done; reserve slot 6-10 Dec 2027 if its exit criteria were missed"]
+  - [T-26, "Wed 8 Dec 2027", "Feast of the Immaculate Conception (special non-working day) - the Comptrollership set-up (CT-007) is planned from T-25"]
+  - [T-21, "Mon 13 Dec 2027", "Communications to branches, insurers and bank channels"]
+  - [T-15, "Sun 19 Dec 2027", "GNG-1 (board meets on Friday 17 December if preferred)"]
+  - [T-14, "Mon 20 Dec 2027", "Production pre-load of reference data starts"]
+  - [T-12, "Wed 22 Dec 2027", "Client extract; completion drives for remittance batches and in-flight items (moved from T-9, Christmas Day)"]
+  - [T-11, "Thu 23 Dec 2027", "Client load and sign-off; daily client deltas start (moved from T-10, Christmas Eve)"]
+  - [T-10, "Fri 24 Dec 2027", "Christmas Eve (special non-working day) - no task planned"]
+  - [T-9, "Sat 25 Dec 2027", "Christmas Day - no task planned"]
+  - [T-7, "Mon 27 Dec 2027", "Code map freeze; legacy reference-data change freeze"]
+  - [T-5, "Wed 29 Dec 2027", "Last legacy business day; GNG-2 (moved from T-4, Rizal Day); freeze announcement"]
+  - [T-4, "Thu 30 Dec 2027", "Rizal Day (regular holiday) - no task planned"]
+  - [T-3, "Fri 31 Dec 2027", "Last day of the year (special non-working day) - legacy EOD and year-end close; business freeze 22:00; final extracts"]
+  - [T-2, "Sat 1 Jan 2028", "New Year's Day - production load (cut-over team on duty)"]
+  - [T-1, "Sun 2 Jan 2028", "Reconciliation, verification, GNG-3 at 18:00"]
+  - [T, "Mon 3 Jan 2028", "Go-live 08:00; carried RMEL candidates in Renewal; point of no return 18:00"]
+  - [T+1, "Tue 4 Jan 2028", "Hypercare; Renewal catch-up extraction and first daily extraction"]
+  - [T+30, "Wed 2 Feb 2028", "First month-end close (January 2028) completed; hypercare exit decision"]
 
 # [id, phase, day, time, task, owner, hours, predecessors, verification, checkpoint]
 tasks:
@@ -37,7 +60,7 @@ tasks:
   - [CT-004, A, T-28, "", "Freeze the production cutover plan in the Migration Console (plan kind PRODUCTION, tasks and owners from this list)", IML, 4, CT-002, MIG-CUTOVER-STATUS shows the plan with every task owned, ""]
   - [CT-005, A, T-28, "", "Production environment ready - BIBS release of the go-live build deployed, MIG_ENVIRONMENT_CLASS = PRODUCTION, MIG_CUTOVER_DATE = T, jobs scheduled", IDO, 8, "", Deployment record; parameter screen; job list, ""]
   - [CT-006, A, T-27, "", "Grant the migration roles in production (DATA_MIGRATION_LEAD, DATA_STEWARD, DATA_OWNER, MIGRATION_OPERATOR, MIGRATION_RECON_APPROVER, MIGRATION_GONOGO) through User Access requests; check PH-only network access", IDO, 8, CT-005, User Access approvals; access test from an allowed and a blocked location, ""]
-  - [CT-007, A, T-26, "", "Comptrollership sets up in production the legacy control accounts, Migration Clearing and the LG_ accounting rule lines (DMQ18), through maker-checker", COMP, 16, CT-005, Chart and accounting rules approved; test posting in the dress rehearsal environment matched, ""]
+  - [CT-007, A, T-25, "", "Comptrollership sets up in production the legacy control accounts, Migration Clearing and the LG_ accounting rule lines (DMQ18), through maker-checker", COMP, 16, CT-005, Chart and accounting rules approved; test posting in the dress rehearsal environment matched, ""]
   - [CT-008, A, T-25, "", "Approve the final code map versions for production (all sets); record versions in the plan", OWN, 16, "", MIG-MAP-VERSIONS lists one APPROVED version per set, ""]
   - [CT-009, A, T-24, "", "Users of every persona created and trained; BIBS menus checked per persona (UAT readiness items 1 and 14)", PM, 40, CT-006, User list; training attendance; persona menu check, ""]
   - [CT-010, A, T-21, "", "Communicate the go-live and freeze to branches, insurers and bank channels (autopay files carry the legacy invoice number after go-live)", PM, 4, CT-002, Communications sent (communication plan items 1-4), ""]
@@ -49,20 +72,20 @@ tasks:
   - [CT-016, B, T-14, "15:00", "Validate and load reference data R01-R08; authorise CREATE values in each master", IOP, 8, CT-015, Batches LOADED; MIG-UNMAPPED-CODES empty for R objects, ""]
   - [CT-017, B, T-13, "", "Reconcile and sign off the reference objects (G5, G6)", DML, 6, CT-016, MIG-SIGNOFF-STATUS shows G6 for R01-R08, ""]
   - [CT-018, B, T-13, "", "Load payees R09 if in scope (DMQ30)", IOP, 4, CT-017, Batch SIGNED_OFF, ""]
-  - [CT-019, B, T-12, "", "Extract and send the full client extract C01, C02, C03 (as of the previous EOD)", BIT, 8, CT-017, Files CHECKED; counts against the Mock 3 volumes within 5 percent, ""]
+  - [CT-019, B, T-12, "", "Extract and send the full client extract C01, C02, C03 (as of the previous EOD)", BIT, 8, CT-017, Files CHECKED; counts against the Mock 4 volumes within 5 percent, ""]
   - [CT-020, B, T-12, "", "Validate clients; run matching; clear the review queue", STW, 24, CT-019, Review queue empty; MIG-CLIENT-MATCH reviewed, ""]
-  - [CT-021, B, T-10, "", "Load clients C01-C03; reconcile L1-L4; business sample checks; sign off (G5, G6)", IOP, 16, CT-020, "MIG-RECON-SUMMARY all MATCHED or EXPLAINED; G6 signed", ""]
-  - [CT-022, B, T-10, "", "Daily client delta (new and changed clients of the day) from T-10 to T-4 - extract 23:00, load 00:30 (job MIG_CLIENT_DELTA)", BIT, 1, CT-021, Delta batch SIGNED_OFF each morning by 07:00, ""]
-  - [CT-023, B, T-9, "", "Complete legacy remittance batches in process, or tag the holds and special remittances that carry forward (DMQ21)", OPS, 40, "", List of carried items for F04 agreed by Operations - Remittance, ""]
-  - [CT-024, B, T-9, "", "Complete in-flight legacy items where possible - pending endorsements, un-booked accounts, check pick-ups, refunds (DMQ33)", OPS, 40, "", In-flight list reduced; the rest listed for carry-forward or re-keying, ""]
+  - [CT-021, B, T-11, "", "Load clients C01-C03; reconcile L1-L4; business sample checks; sign off (G5, G6)", IOP, 16, CT-020, "MIG-RECON-SUMMARY all MATCHED or EXPLAINED; G6 signed", ""]
+  - [CT-022, B, T-11, "", "Daily client delta (new and changed clients of the day) from T-11 to T-5 - extract 23:00, load 00:30 (job MIG_CLIENT_DELTA)", BIT, 1, CT-021, Delta batch SIGNED_OFF each morning by 07:00, ""]
+  - [CT-023, B, T-12, "", "Complete legacy remittance batches in process, or tag the holds and special remittances that carry forward (DMQ21)", OPS, 40, "", List of carried items for F04 agreed by Operations - Remittance, ""]
+  - [CT-024, B, T-12, "", "Complete in-flight legacy items where possible - pending endorsements, un-booked accounts, placed or bound renewals not yet booked, check pick-ups, refunds (DMQ33)", OPS, 40, "", In-flight list reduced; the rest listed for carry-forward or re-keying, ""]
   - [CT-025, B, T-7, "", "Code map freeze - no new legacy code without a change request and a map version", OWN, 1, CT-017, Freeze notice sent; change log opened, ""]
   - [CT-026, B, T-7, "", "Legacy reference-data change freeze in EBIX and QPS (insurers, products, AOs, branches)", BIT, 1, CT-025, Maintenance screens locked or change log reviewed daily, ""]
   - [CT-027, B, T-7, "", "Dry run of the final extract jobs on the current day's data (timing and control files)", BIT, 6, CT-015, Extract timings within the plan; control files correct, ""]
-  - [CT-028, B, T-5, "", "Confirm the RMEL cohorts to carry (expiry T to T+140) with Marketing; freeze new legacy RMEL extractions", MKT, 4, "", Cohort list and counts per month agreed, ""]
-  - [CT-029, B, T-4, "", "Go / no-go checkpoint GNG-2 (enter the legacy freeze)", GNG, 2, "CT-021, CT-022, CT-023, CT-024, CT-027, CT-028", Decision recorded with the GNG-2 criteria, GNG-2]
-  - [CT-030, B, T-4, "", "Announce the freeze and the Monday opening to all users, branches and insurers", PM, 1, CT-029, Communication plan item 5 sent, ""]
-  - [CT-031, C, T-3, "17:00", "Last legacy business transactions; cashiers deposit and close; UPP of the day recorded", OPS, 3, CT-029, Branch close checklist from every branch, ""]
-  - [CT-032, C, T-3, "20:00", "Last legacy EOD and month-end close (EBIX, QPS, ISYS, CMS)", BIT, 2, CT-031, EOD logs complete without error, ""]
+  - [CT-028, B, T-5, "", "Confirm with Marketing the RMEL cohorts to carry (expiries 3-Jan to 22-May-2028) and the consolidated disposition files; list the renewals placed but not booked (in-flight); stop new legacy RMEL extractions", MKT, 4, "", Cohort list and counts per month agreed; disposition files complete, ""]
+  - [CT-029, B, T-5, "", "Go / no-go checkpoint GNG-2 (enter the legacy freeze)", GNG, 2, "CT-021, CT-022, CT-023, CT-024, CT-027, CT-028", Decision recorded with the GNG-2 criteria, GNG-2]
+  - [CT-030, B, T-5, "", "Announce the freeze and the Monday opening to all users, branches and insurers", PM, 1, CT-029, Communication plan item 5 sent, ""]
+  - [CT-031, B, T-5, "17:00", "Last legacy business day - last business transactions; cashiers deposit and close; UPP of the day recorded (30 and 31 December are holidays, DMQ39)", OPS, 3, CT-029, Branch close checklist from every branch, ""]
+  - [CT-032, C, T-3, "20:00", "Last legacy EOD and year-end close (EBIX, QPS, ISYS, CMS)", BIT, 2, CT-031, EOD logs complete without error, ""]
   - [CT-033, C, T-3, "22:00", "Legacy business freeze - EBIX, QPS, CMS set to read-only for business users; batch jobs that post are disabled", BIT, 1, CT-032, Test posting refused in each legacy system; job list shows disabled jobs, FREEZE]
   - [CT-034, C, T-3, "22:15", "Final client delta (last changes of the day) extracted and loaded", IOP, 2, CT-033, Last delta batch SIGNED_OFF, ""]
   - [CT-035, C, T-3, "22:30", "Final extracts after the EOD - P01, P01S, P03, F01, F01S, F01C, F02, F03, F04, F06, R11 (final numbers), G01 trial balance", BIT, 5, CT-033, Every file and control file in the intake; SHA-256 recorded, ""]
@@ -76,7 +99,7 @@ tasks:
   - [CT-043, D, T-2, "09:00", "Validate and load UPP F02 with opening entries MIG_UPP_OPENING", IOP, 3, "CT-038, CT-021", Batch LOADED without rejects, ""]
   - [CT-044, D, T-2, "14:00", "Load collection state F03, remittance items F04, PDCs and pick-ups F06", IOP, 3, CT-042, Batches LOADED, ""]
   - [CT-045, D, T-2, "15:00", "Load the GL opening trial balance G01 (OPENING journals per branch and currency)", IOP, 2, "CT-036, CT-042, CT-043", Journals posted; TB in BIBS equals the legacy TB, ""]
-  - [CT-046, D, T-2, "16:00", "Load RMEL cohorts P03 and make them available to Renewal", IOP, 2, CT-040, Candidates visible in Renewal with source LEGACY, ""]
+  - [CT-046, D, T-2, "16:00", "Validate and load the RMEL cohorts P03 (January-May 2028); run the cohort completeness check", IOP, 2, CT-040, "Batch LOADED; P03 rows + headers renewed in legacy + rejected rows = P01 headers expiring T to T+140 per month; headers without a P03 row listed for the catch-up extraction", ""]
   - [CT-047, D, T-2, "17:00", "Update the receipt series R11 to the final next numbers", IOP, 1, CT-038, Next AR / OR numbers = legacy last used + 1 per branch, ""]
   - [CT-048, D, T-2, "18:00", "Reconcile L1-L4 of every financial object; run L5 - Migration Clearing per branch and currency, legacy control accounts vs sub-ledgers (ACSL, context LEGACY)", IML, 4, "CT-044, CT-045", MIG-GL-CLEARING shows 0.00 per branch and currency, ""]
   - [CT-049, D, T-2, "22:00", "Explain or fix every break (rerun batches); reconciliation approver signs G5 per object", COMP, 6, CT-048, MIG-RECON-SUMMARY all MATCHED or EXPLAINED with approval, ""]
@@ -100,7 +123,7 @@ tasks:
   - [CT-067, G, T+2, "", "First remittance extraction with legacy invoices for the main insurers; compare with the legacy remittance pattern", OPS, 4, CT-064, Schedules show legacy invoice numbers; OPS_REMITTANCE posts to DTIP legacy, ""]
   - [CT-068, G, T+3, "", "First Collections worklist refresh with legacy invoices; collectors confirm carried promises and assignments", OPS, 2, CT-064, Worklist counts agree with F03, ""]
   - [CT-069, G, T+5, "", "Staging purge - payloads and intake files of the signed-off production batches deleted within 5 days (MIG_STAGING_PURGE)", IDO, 1, CT-055, No staging payload older than 5 days after sign-off; purge log, ""]
-  - [CT-070, G, T+5, "", "Check the daily Renewal extraction from the migrated headers (policies expiring at business date + 140 days) - first runs", MKT, 2, CT-046, Candidates created with source LEGACY, ""]
+  - [CT-070, G, T+1, "", "Renewal - carried candidates created with source LEGACY in their stage; catch-up extraction of the headers expiring T to T+140 without a carried candidate; first daily extraction (expiry T+141)", MKT, 2, CT-046, "Carried and catch-up candidate counts equal the completeness check; first placements of January expiries under way", ""]
   - [CT-071, G, T+7, "", "Week-1 review with the board - defects, volumes, performance, user feedback", GNG, 2, CT-065, Minutes; actions, ""]
   - [CT-072, G, T+10, "", "First DPPR or PR2307 legacy reversal batch (if any) approved and posted", COMP, 4, CT-064, Run report; legacy sub-ledgers reduced by the batch total, ""]
   - [CT-073, G, T+14, "", "Hypercare mid-point review against the exit criteria", GNG, 2, CT-071, Criteria status recorded, CHECKPOINT]
@@ -126,14 +149,14 @@ checkpoints:
       - Transfer path (SFTP or console) tested
       - No open Critical defect of the migration or of a Day-1 module
   - id: GNG-2
-    when: T-4
+    when: T-5
     decision: Enter the legacy freeze on T-3
     criteria:
       - Reference data and clients loaded and accepted (G6) in production; daily deltas running
       - Client review queue empty
       - Final extract jobs timed within the window (dry run)
       - In-flight items and remittance batches closed or listed for carry-forward
-      - RMEL cohorts to carry confirmed
+      - RMEL cohorts to carry (January-May 2028) confirmed; disposition files complete
       - Communications sent; branches and insurers informed
   - id: GNG-3
     when: T-1 18:00
@@ -172,7 +195,7 @@ communication:
   - [2, "Payments after go-live - legacy invoice numbers stay valid; new invoices are BI- numbers", "Insurers, BDO bank channels (bills payment, CLPC, direct credit), corporate clients", "Letter / e-mail from Operations", T-21, OPS]
   - [3, Freeze of reference data and the change request route, "Product, Marketing and Operations maintainers", E-mail from the Data Migration Lead, T-8, DML]
   - [4, Training schedule and log-in instructions, All BIBS users per persona, "E-mail; training calendar", T-20, PM]
-  - [5, "Legacy freeze at T-3 22:00; BIBS opens T 08:00; what to do with urgent items during the weekend", "All users, branches, insurers", "E-mail; branch notice", T-4, PM]
+  - [5, "Last legacy business day T-5 (29 December); legacy freeze at T-3 22:00; BIBS opens T 08:00; what to do with urgent items over the holidays", "All users, branches, insurers", "E-mail; branch notice", T-5, PM]
   - [6, "Go-live confirmed; support channels and hypercare contacts", All users, "E-mail; intranet", T-1 19:00, PM]
   - [7, "Rollback notice (only if NO-GO) - legacy stays in use; next steps", "All users, branches, insurers, bank channels", "E-mail; phone tree for branch heads", T-1 on NO-GO, PM]
   - [8, "Daily hypercare status", "Go / no-go board, department heads", Daily report and bridge call 17:00, T to hypercare exit, IPM]
@@ -198,36 +221,37 @@ hypercare_exit:
 
 decommissioning:
   EBIX:
-    - Final extracts reconciled and signed off (F01, F02, F03, F04, F06, G01, C01)
-    - Archive objects H01, H02 and G02 of EBIX loaded and reconciled (counts and hash totals per record type against legacy)
-    - Legacy Inquiry verified by Audit / Compliance on samples of each record type
-    - No open legacy invoice or legacy UPP that needs an EBIX document; the legacy context in BIBS may still be open
+    - Final extracts reconciled - F01, F02, F03, F04, F06, G01 and C01 signed off
+    - Archive reconciled - archive objects H01, H02 and G02 of EBIX loaded and reconciled (counts and hash totals per record type against legacy)
+    - Legacy Inquiry verified - by Audit / Compliance on samples of each record type
+    - No open item needs the system - no open legacy invoice or legacy UPP needs an EBIX document; the legacy context in BIBS may still be open
     - Claims tail covered - no open claim that needs EBIX (DMQ27, DMQ30)
-    - Read-only access logs exported to the archive
-    - Database backup retained per the retention decision (DMQ27); retention obligations covered (5 years online, 15 years archive, umbrella p.45)
-    - Sign-off by the EBIX system owner, Compliance and Comptrollership
+    - Access logs archived - read-only access logs exported to the archive
+    - Retention covered - database backup retained per the retention decision (DMQ27); retention obligations covered (5 years online, 15 years archive, umbrella p.45)
+    - Owners signed - EBIX system owner, Compliance and Comptrollership
   QPS:
-    - Final extracts reconciled and signed off (C01, P01, P03, R objects)
-    - Last QPS-issued policy expired and its renewal decided (run-off tracker shows no open cohort), or the policy is archived
-    - Archive objects of QPS loaded and reconciled
-    - Legacy Inquiry verified by Audit / Compliance
-    - Read-only access logs exported; database backup retained per DMQ27
-    - Sign-off by the QPS system owner, Compliance and the Heads of Marketing
+    - Final extracts reconciled - C01, P01, P03 and the R objects signed off
+    - No open item needs the system - last QPS-issued policy expired and its renewal decided (run-off tracker shows no open cohort), or the policy is archived
+    - Archive reconciled - archive objects of QPS loaded and reconciled
+    - Legacy Inquiry verified - by Audit / Compliance
+    - Access logs archived - read-only access logs exported to the archive
+    - Retention covered - database backup retained per DMQ27
+    - Owners signed - QPS system owner, Compliance and the Heads of Marketing
   ISYS:
-    - Claims and ACSL reports and the Marketing Diary no longer needed (replaced by BIBS reports)
-    - GL history (G02) and closed claims (H01 CLAIM) archived and reconciled
-    - Sign-off by the ISYS system owner, Claims and Comptrollership
+    - No open item needs the system - claims and ACSL reports and the Marketing Diary replaced by BIBS reports
+    - Archive reconciled - GL history (G02) and closed claims (H01 CLAIM) archived and reconciled
+    - Owners signed - ISYS system owner, Claims and Comptrollership
   CMS:
-    - Collection state F03 and UPP F02 reconciled and signed off
-    - Disposition history archived (H01) if required by DMQ34
-    - Sign-off by the Head of Operations (Collections) and BDOI IT
+    - Final extracts reconciled - collection state F03 and UPP F02 reconciled and signed off
+    - Archive reconciled - disposition history archived (H01) if required by DMQ34
+    - Owners signed - Head of Operations (Collections) and BDOI IT
   Excel masterlists and file shares:
-    - Submitted-policy masterlists migrated (P04) or archived
-    - KYC documents and legacy documents (C04, H02) archived with checksums
-    - Folders set to read-only, then removed per the retention decision
-    - Sign-off by the owning department and Compliance
+    - Final extracts reconciled - submitted-policy masterlists migrated (P04) or archived
+    - Archive reconciled - KYC documents and legacy documents (C04, H02) archived with checksums
+    - Retention covered - folders set to read-only, then removed per the retention decision
+    - Owners signed - owning department and Compliance
   Legacy context in BIBS:
-    - No open legacy invoice (paid, reversed, written off or reclassified)
-    - No legacy UPP with a balance
-    - Legacy control accounts and Migration Clearing at 0.00
-    - Comptrollership decides whether the legacy accounts are closed in the chart
+    - No open legacy invoice - every legacy invoice paid, reversed, written off or reclassified
+    - No legacy UPP balance - every legacy UPP applied, refunded or reclassified
+    - Legacy accounts at zero - legacy control accounts and Migration Clearing at 0.00
+    - Chart decision recorded - Comptrollership decides whether the legacy accounts are closed in the chart

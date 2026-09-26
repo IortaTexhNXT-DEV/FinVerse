@@ -3,7 +3,20 @@
 Status: **proposal for review; not built.** It extends `docs/architecture/BROKING_ARCHITECTURE.md`,
 `docs/architecture/OPERATIONS_DESIGN.md` and the Developer Guide, and it does not change them. Requirements baseline:
 [`BDOI_DM_BRD_SPEC.md`](../requirements/BDOI_DM_BRD_SPEC.md) (23 requirement rows BRID 1.1a-12.1, fit/gap and questions
-DMQ01-DMQ35). Every class, migration and screen cites its BRD ID in Javadoc or a comment, for example `BRID 5.2`.
+DMQ01-DMQ39). Every class, migration and screen cites its BRD ID in Javadoc or a comment, for example `BRID 5.2`.
+
+**Programme inputs of 26-Sep-2026** (commit ce42d3f). The BDOI drop plan and timeline
+(`docs/source-documents/BDOI_DROP_PLAN.md`) set the migration calendar: requirements and mapping Sep-Oct 2026, build
+Nov 2026-Mar 2027, SIT migration Apr-Jul 2027, UAT migration Aug-Oct 2027, full migration and cut-over Nov 2027-Jan
+2028 (performance and penetration test Nov-Dec 2027, ORR / PRR Dec 2027-Jan 2028), go-live January 2028 (DMQ25,
+section 17.2). The signed concept paper *Advance Implementation of Renewal Processing* V1.0 (06-Sep-2026; "CP")
+proposed an early renewal release by 15-Aug-2027 with the client master and reference data migrated ahead of it. BDOI
+decided on 26-Sep-2026 that everything goes live together in January 2028, so the concept paper is **superseded** and
+there is one production cut-over (register DCR-240). Three points of it still apply and are designed here: the client
+master and the renewal reference data are the first objects of every mock, because renewal testing needs them (CP
+section VI; section 2, mock-load order); the RMEL cohorts of the January-May 2028 expiries, which are the first months
+renewed in BIBS (section 15.1; DMQ26, DMQ37, DMQ38); and the package remapping decision (CP Annex B and C; section 15.2;
+DMQ36).
 
 This design is also the input of four later deliverables: the Data Migration Strategy and Approach (deliverables item
 29), the BDOI data requirements workbook, the cutover runbook and the migration test plan. Sections 2, 5-13 and 17
@@ -51,7 +64,7 @@ confirms object by object. Class: M = MIGRATE, CF = CARRY_FORWARD, A = ARCHIVE, 
 | R03 | Sales organisation: units, unit heads, account officers | QPS, EBIX | M | `catalog` `SalesUnit`, `SalesOfficer` services | 3.1 | 2 |
 | R04 | Insurers, insurer branches and their parties | QPS, EBIX | M (map, create missing) | `catalog.service.InsurerService`, `party.service.PartyService` | 3.1 | 2 |
 | R05 | Product lines, cover types, products / risk codes | QPS, EBIX | M (map, create missing) | `catalog.service.ProductCatalogService` | 3.1 | 3 |
-| R06 | Packages (active package versions) | QPS | M | `catalog` product versions (BRD-3) | 3.1 | 3 |
+| R06 | Packages (active package versions); legacy packages remapped to the BIBS package names (section 15.2) | QPS | M (DMQ36) | `catalog` product versions (BRD-3) | 3.1 | 3 |
 | R07 | Commission rates of active insurer x product | QPS, EBIX | M (DMQ30) | `catalog` commission rates | 3.1 | 3 |
 | R08 | Chart of accounts mapping (legacy GL account to BIBS account) | EBIX, ISYS | M (map only) | code map GL_ACCOUNT; chart configured by Comptrollership | 5-8, AQ01 | 3 |
 | R09 | Payees | EBIX / Disbursement files | M (DMQ30) | `disbursement` `PayeeMigrationHandler` service | AQ11 | 4 |
@@ -64,7 +77,7 @@ confirms object by object. Class: M = MIGRATE, CF = CARRY_FORWARD, A = ARCHIVE, 
 | C05 | Screening results and risk ratings | Excel / Compliance | X (full screening run after C01) | `screening` periodic run | 2.1 | after 5 |
 | P01 | In-force policy headers | QPS, EBIX | C (BRID 4.1; DMQ09) | `account.service.AccountService.importLegacy` (new) | 4.1 | 7 |
 | P02 | Expired policies and their history | QPS, EBIX | A | archive | 11.1 | 16 |
-| P03 | RMEL cohorts already extracted in legacy (renewal candidates in disposition) | RMEL files, QPS | CF (DMQ26) | `renewal.service.port.LegacyPolicySource` (implemented here) | 12.1 | 13 |
+| P03 | RMEL cohorts of the expiries T to T + 140 days (January to May 2028 for a January 2028 go-live), with the disposition prepared in legacy (section 15.1) | RMEL extract (EBIX, QPS), Marketing disposition files | CF (DMQ26, DMQ37, DMQ38) | `renewal.service.port.LegacyPolicySource` (implemented here) | 12.1 | 13 |
 | P04 | Submitted-policy masterlists | Excel | M (DMQ30, SP SQ16) | `submitted` `SBM_MIGRATION` service | BRIDSP-33 | 14 |
 | P05 | Employee Benefits programmes | EBIX | M (DMQ30) | `eb` `EB_PROGRAMME_LOAD` service | - | 14 |
 | F01 | Open legacy invoices: PR outstanding, paid not remitted, commission receivable, PR2307; with components and insurer shares | EBIX, QPS | CF | `opsledger.service.LegacyInvoiceIntake` (new) + opening event | 5-10 | 8 |
@@ -81,6 +94,18 @@ confirms object by object. Class: M = MIGRATE, CF = CARRY_FORWARD, A = ARCHIVE, 
 
 Load order: a lower number loads first; objects with the same number have no dependency on each other. An object
 loads only when the objects it depends on are signed off for the same environment (gate G6, section 13).
+
+**Layouts per object.** An extract file holds one layout. Most objects have one layout with the object's code; three
+have sub-layouts that are sent as separate files with the same as-of date and joined on the key by the loader: R04
+(insurers) and R04B (insurer branches); P01 (policy header) and P01S (insurer shares of the policy); F01 (invoice
+header), F01S (insurer shares of the invoice) and F01C (components with their buckets). The file name starts with the
+layout code, not the object code (section 5.1). Layouts, fields and control totals are published in the BDOI Data
+Requirements Workbook.
+
+**Mock-load order.** Reference data (R01-R07) and the client master (C01-C03) load first in every mock and are
+accepted (G6) before any policy, open item or RMEL cohort loads. Besides the dependency rule, this gives the SIT and
+UAT of the Drop 1 modules, Renewal first, migrated clients and reference data to test with from the first mock, which
+is the prerequisite the concept paper states for renewal (CP section VI, p.2; section 17.4).
 
 ## 3. Module `migration`
 
@@ -155,13 +180,13 @@ Every transition is audited; the batch keeps a step log (`mig_batch_log`).
 
 | Item | Rule |
 |---|---|
-| One file per | data object, source system, extract (as-of date and sequence) |
-| Name | `<OBJECT>_<SOURCE>_<yyyyMMdd>_<nn>.csv` or `.xlsx`, e.g. `F01_EBIX_20270226_01.csv` |
+| One file per | layout, source system, extract (as-of date and sequence); an object with sub-layouts (R04 / R04B, P01 / P01S, F01 / F01S / F01C) sends one file per layout with the same as-of date |
+| Name | `<LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv` or `.xlsx`, e.g. `F01C_EBIX_20271231_01.csv` (layout code, not object code; the date is the as-of date, nn the sequence of that day) |
 | Format | CSV: UTF-8 without BOM, comma separator, RFC 4180 quoting, one header row with the layout column names. XLSX: first sheet, header in row 1, no merged cells, no formulas |
 | Values | Dates `yyyy-MM-dd`; timestamps `yyyy-MM-dd HH:mm:ss` Philippine time; amounts with a dot decimal, 2 decimals, no thousands separator, minus sign for negatives; currency ISO 4217; codes exactly as in legacy (BIBS maps them); blank = no value |
 | Control file | `<same name>.ctl.csv` with: object, source system, as-of date and time, extraction time, extracted by, row count, per amount column and currency the sum, hash total of the key column (sum of the numeric part or count of distinct keys, as the layout says), SHA-256 of the data file |
 | Delivery | Console upload or the SFTP drop (seam `ExtractInbox`); never e-mail; the file lands in the intake bucket (encrypted, lifecycle 5 days) |
-| Layout version | Each object has a layout (`mig_layout`, `mig_layout_column`: name, type, length, mandatory, format, description); a file whose header does not match the current layout version is rejected |
+| Layout version | Each layout (`mig_layout` with its object; `mig_layout_column`: name, type, length, mandatory, format, description) has versions; a file whose header does not match the current layout version is rejected. A batch of an object takes one checked extract of each of its layouts with the same as-of date |
 
 ### 5.2 Intake checks (extract status CHECKED or REJECTED)
 
@@ -238,7 +263,9 @@ batch VALIDATE step on every staged row and records `mig_issue` rows.
 
 Object thresholds, parameters per object class: `MIG_MAX_ERROR_RATE_MASTER` (default 0.5 %: master data may be
 signed off with waived rows) and `MIG_MAX_ERROR_RATE_FINANCIAL` (default 0: every open item and UPP must load, or be
-explicitly excluded by the business owner with a manual entry plan).
+explicitly excluded by the business owner with a manual entry plan). The error rate is (INVALID rows not waived +
+waived rows) / (staged rows - EXCLUDED rows): rows the data owner excluded from the batch are neither errors nor part
+of the base, so a financial batch whose failing rows are all excluded has a rate of 0.
 
 ## 9. Client matching, dedupe and the client master (BRID 2.1)
 
@@ -292,12 +319,12 @@ batch - new clients", "client modification reporting"). A changed client that is
 | Object | Loader | Service called |
 |---|---|---|
 | R01 | `LovLoader` | `LovService` create + authorise (maker-checker done by the Data Steward in the console) |
-| R03-R07 | `SalesOrgLoader`, `InsurerLoader`, `ProductLoader`, `PackageLoader`, `CommissionRateLoader` | the `catalog` services |
+| R03-R07 (R04 with R04B) | `SalesOrgLoader`, `InsurerLoader` (insurer, then its branches), `ProductLoader`, `PackageLoader`, `CommissionRateLoader` | the `catalog` services |
 | R09 | `PayeeLoader` | the service behind `DISB_PAYEE_MIGRATION` |
 | C01-C03 | `ClientLoader` | `ClientOnboardingService.registerMigrated`, `ClientPayoutAccounts` |
-| P01 | `PolicyHeaderLoader` | `AccountService.importLegacy` |
-| P03 | `RmelCohortLoader` | stores `mig_legacy_candidate` rows; served to Renewal through `LegacyPolicySource` |
-| F01 | `LegacyInvoiceLoader` | `opsledger` `LegacyInvoiceIntake.record` + `AccountingEventPublisher` (`MIG_LEGACY_INVOICE_OPENING`) + `OpenItemService.record` |
+| P01 (P01, P01S) | `PolicyHeaderLoader` | `AccountService.importLegacy` |
+| P03 | `RmelCohortLoader` | stores `mig_legacy_candidate` rows linked to the migrated header (P01); served to Renewal through `LegacyPolicySource` (section 15.1) |
+| F01 (F01, F01S, F01C) | `LegacyInvoiceLoader` | `opsledger` `LegacyInvoiceIntake.record` + `AccountingEventPublisher` (`MIG_LEGACY_INVOICE_OPENING`) + `OpenItemService.record` |
 | F02 | `UppLoader` | `UnappliedService.createMigrated` + `MIG_UPP_OPENING` |
 | F03 | `CollectionStateLoader` | `collections` legacy-state service (`CLX_LEGACY_ITEMS`) |
 | G01 | `GlOpeningLoader` | `SystemJournalService.post` with `JournalType.OPENING` |
@@ -336,11 +363,22 @@ staged value, target value, difference, tolerance, status MATCHED / BREAK / EXPL
 | L2 Amount | sum per amount column and currency (open PR by component, DTIP, commission, UPP balance, TB debit and credit) | control totals | staged sum; target sum read from BIBS (ledger components by origin LEGACY and batch, `csh_unapplied`, journals) | difference within `MIG_AMOUNT_TOLERANCE` (0.00) |
 | L3 Hash | hash total of the key; SHA-256 per row | control file; staging | xref keys | equal |
 | L4 Field | every mapped column of every loaded row | staged mapped payload | `MigrationLoader.readBack` | equal; differences listed per field |
-| L5 GL | migration clearing account per branch and currency; legacy control accounts vs legacy sub-ledgers | - | GL balances; ACSL GL-SL recon with context LEGACY | clearing = 0.00; control = sub-ledger |
+| L5 GL | migration clearing account per branch and currency, analysed per legacy control account (trial balance line against the opening detail posted to that account); legacy control accounts vs legacy sub-ledgers | trial balance (G01) | opening entries of F01 / F02; GL balances; ACSL GL-SL recon with context LEGACY | clearing = 0.00; per control account TB line = detail; control = sub-ledger |
 
 Reports: `MIG-RECON-SUMMARY` (object x level with status), `MIG-RECON-DETAIL` (lines and breaks), `MIG-REJECTS`
 (rejected and invalid rows with issues), `MIG-GL-CLEARING`, all in Excel and PDF. A reconciliation with a BREAK
 cannot be signed off until each break is EXPLAINED with an approved explanation.
+
+**Sign of a clearing difference.** The trial balance puts each legacy control-account line on Migration Clearing with
+the sign it has in the TB; each opening entry puts the balancing line of its detail on Migration Clearing with the
+opposite sign. A difference therefore has the sign of the trial balance. An invoice missing from F01 leaves a
+**debit** on Migration Clearing equal to its net receivable position (open PR + open PR2307 + open commission
+receivable - open DTIP - unrealised commission - deferred VAT) when that is positive, and a **credit** when it is
+negative: for example a credit of the open DTIP less the commission receivable for an invoice paid in full and not
+remitted. A UPP item missing from F02 leaves a credit equal to its balance. An unpaid invoice whose receivable and DTIP
+are about equal nets to about zero, so `MIG-GL-CLEARING` also compares, per branch, currency and legacy control
+account, the TB line with the opening detail posted to that account: the missing invoice then shows as a debit
+difference on Premium Receivable - Legacy and a credit difference on DTIP - Legacy even when the net is zero.
 
 ## 13. Sign-off gates per object (BRID 1.1a, 1.1b)
 
@@ -461,23 +499,28 @@ draft used 1221 and 2212, which the Accounting design already uses for USD commi
 | `MIG_UPP_OPENING` (`MIG:UPP:<ref>`) | F02, per item | Dr LGC-CLR / Cr 2206 (client) |
 | GL opening trial balance (system journal type OPENING, source `MIGRATION`, reference `MIG-TB-<asof>`) | G01, per branch and currency | Every balance-sheet account of the legacy TB mapped through `GL_ACCOUNT`; the lines of the legacy control accounts that F01 and F02 build in detail are mapped to LGC-CLR instead; P&L balances follow DMQ18 (year-start cutover recommended) |
 
-**Control:** after F01, F02 and G01, LGC-CLR Migration Clearing is 0.00 per branch and currency (L5, alert
-`MIG_CLEARING_NOT_ZERO`). A non-zero balance means the detail and the trial balance disagree; it is a go / no-go
-criterion.
+**Control:** after F01, F02 and G01, LGC-CLR Migration Clearing is 0.00 per branch and currency, and per legacy control
+account the TB line equals the opening detail (L5, section 12; alert `MIG_CLEARING_NOT_ZERO`). A non-zero balance means
+the detail and the trial balance disagree; it is a go / no-go criterion.
 
 ### 14.3 Legacy UPP
 
 `csh_unapplied` (V766) gets `ledger_context`, `source_system`, `legacy_ar_no`, `legacy_ar_date`, `match_refs`
 (comma-separated invoice / cover / PN / bank references) and origin MIGRATED. `UnappliedService.createMigrated`
 creates the item in the stage mapped from the legacy status (UNAPPLIED, MONITORING, FOR_APPROVAL; a legacy disposition
-in progress keeps its type and details). No BIBS AR is issued for it (DMQ14); the legacy AR number is shown. The
-item's money is on 2206 through `MIG_UPP_OPENING`.
+in progress keeps its type and details). No BIBS AR is issued for it (DMQ14); the legacy AR number is shown. If BDOI
+answers DMQ14 with an acknowledgment, parameter `MIG_UPP_ISSUE_AR` (default false) makes the loader issue a BIBS AR
+through `ReceiptIssuer` without a cash posting, referring to the legacy AR number. The item's money is on 2206 through
+`MIG_UPP_OPENING`.
 
 ### 14.4 Flows on legacy invoices, per built module
 
 **A. Cashiering: OTC and autopay (BRID 6.1, 6.2).** The payment matcher reads `ops_invoice` by invoice number, ARN,
 policy or PN (`PaymentMatcher.invoices`), so a legacy invoice number keyed at the counter or carried in a payment file
 (including the Direct Credit `EBIX_RefNo`) finds the legacy invoice; the matcher also tries `legacy_invoice_no`. The
+matcher recognises a legacy invoice number by the patterns of parameter `MIG_LEGACY_INVOICE_NO_PATTERN` (default
+the EBIX pattern `^I\d{8}$`); the QPS pattern is added to it and to `CLX_INVOICE_NO_PATTERN` when DMQ11 gives the QPS
+format. Until then a payment for a QPS invoice is matched by ARN, policy number or PN, or stays unapplied. The
 AR is issued as today (`OPS_AR_RECEIPT`, Dr bank / Cr 2205 unapplied collections new), and the application posts
 `OPS_PAYMENT_APPLY` with `APPLIED` (new cash) and `LG_PR_*` (legacy invoice): Dr 2205 / Cr 1215.x. The Cash Receipts
 Book (`TAX-BOOK-CRB`) lists the receipt as for any other.
@@ -585,31 +628,99 @@ apply to legacy invoices with `LG_` components.
 | `collections` | `LegacyItemStateService` (designed `CLX_LEGACY_ITEMS`); LEGACY badge; origin filter on CLX reports | `collections/worklist/**`, new `collections/legacy/service/LegacyItemStateService.java` | V1007 | S | CQ07 |
 | `acsl` | `acsl_glsl_control.ledger_context`; filter in `GlSlQueries.OPS_LEDGER_SQL` | `acsl/service/GlSlQueries.java`, `GlSlReconciliationService.java` | V1087 (range V890-V899 is full) | S | 1.1b |
 | `finreport` | Optional: age legacy PR by invoice date (DMQ18) | `finreport/service/ScheduleQueries.java` | - | S | - |
-| `renewal` (designed) | `LegacyPolicySource` implemented by `migration` (`MigratedPolicySource`) from P01 / P03; the bulk handler stays as fallback | RENEWAL_DESIGN 2.2 | none | S | 12.1 |
+| `renewal` (designed) | `LegacyPolicySource` implemented by `migration` (`MigratedPolicySource`) from P01 / P03; the bulk handler stays as fallback; carried candidates created at T in the stage mapped from the legacy disposition, RA already sent recorded; catch-up extraction at T of headers expiring T to T + 140 days without a carried candidate; sanitation check `PACKAGE_REMAP` (section 15.1, 15.2) | RENEWAL_DESIGN 2.2, 8 | none | S | 12.1 |
 | `csf` (designed) | `LegacyAccountLookup` implemented by `migration` (`XrefLegacyAccountLookup`) | CUSTOMER_SERVICING_DESIGN 2 | none | S | 11.1 |
 | `brokerclaims` | None now; V1025 stays held for CLQ14 / DMQ30 | - | V1025 (Claims) | - | - |
 
 ## 15. In-force policy headers and the renewal-driven transition (BRID 4.1, 12.1)
 
 **Header.** `AccountService.importLegacy(ImportedAccount)` creates an account with origin MIGRATED, status BOOKED,
-`legacy_ref` and `source_system`, client from the xref, product / line / risk code, insurer and shares, policy no.,
+`legacy_ref` and `source_system`, client from the xref, product / line / risk code, package version (through the
+PACKAGE map, section 15.2), insurer and shares, policy no.,
 inception and expiry, sum insured, currency, payment arrangement (DP), PN numbers, AO, unit, branch, business type
 (NEW_BUSINESS / RENEWAL, BT0). It creates no quotation, placement, issuance or invoice, and publishes `AccountImported`.
 Account search finds it by ARN, policy no., legacy reference and client. Legacy invoices of the policy link to it
 (`ops_invoice.arn`, `account_id`).
 
-**RMEL cohorts.** A cohort is an expiry month. At go-live (T), the cohorts with expiry up to T + 140 days (the Renewal
-lead time, `RNW_EXTRACTION_LEAD_DAYS`) have already been extracted in legacy. Proposed transition model (DMQ26):
+**RMEL cohorts.** A cohort is an expiry month. BIBS Renewal extracts a policy 140 days before expiry
+(`RNW_EXTRACTION_LEAD_DAYS`), so at go-live (T) the policies expiring from T to T + 140 days are already in their
+renewal cycle in legacy. For the proposed T of Monday 3 January 2028 (section 17.2) these are the expiries of
+3 January to 22 May 2028: the **January to May 2028 cohorts** that the superseded concept paper wanted to process in
+BIBS from August 2027. Proposed transition model (DMQ26 partly answered, DMQ37):
 
 | Cohort | Treatment |
 |---|---|
-| Expiry before T | Renewed or lapsed in legacy; renewals booked in legacy before the freeze; nothing carried except open items |
-| Expiry T to T + 140 days (RMEL already extracted in legacy) | Carried forward (P03): each candidate with its disposition, handler and status loaded as a `mig_legacy_candidate` and served to Renewal through `LegacyPolicySource`; Renewal creates candidates with source LEGACY and continues the process in BIBS |
-| Expiry after T + 140 days | Extracted by BIBS: `RNW_EXTRACTION` asks `LegacyPolicySource` for migrated headers expiring at business date + lead days |
+| Expiry before T (up to 2-Jan-2028) | Renewed or lapsed in legacy; a renewal whose new term starts before T is placed and booked in legacy before the freeze and migrates as an in-force header (P01) with its open invoice (F01) |
+| Expiry T to T + 140 days (3-Jan to 22-May-2028) | Prepared in legacy from August 2027 as today (legacy RMEL extraction, dispositions in the Marketing files, quotations, RAs); at the freeze every renewal not yet booked is carried forward (P03) with its disposition, handler, RA status and proposed terms, served to Renewal through `LegacyPolicySource`, and placed and booked in BIBS from T (section 15.1) |
+| Expiry after T + 140 days (from 23-May-2028) | Extracted by BIBS: `RNW_EXTRACTION` asks `LegacyPolicySource` for migrated headers expiring at business date + lead days; the first run after go-live (T + 1) takes the expiry T + 141 |
 
 A legacy candidate renews on the new-business path pre-filled from the header (Renewal risk 7), because the header
-carries no BIBS rating data; the renewal account has `renewal_of_ref` = the legacy reference, so the run-off tracker
-can link it.
+carries no BIBS rating data; a packaged policy whose package is mapped (section 15.2) can renew as is on the mapped
+package version. The renewal account has `renewal_of_ref` = the legacy reference, so the run-off tracker can link it.
+
+### 15.1 RMEL cohorts of January to May 2028 (object P03)
+
+**Options for the January-May 2028 expiries (DMQ37).**
+
+| Option | What happens | For | Against |
+|---|---|---|---|
+| (a) Prepared in legacy, carried at cut-over (proposal) | Legacy RMEL and the Marketing disposition files as today from August 2027; at the freeze the renewals not yet booked are carried with their disposition (P03); placement and booking in BIBS from T | Every January expiry has its full lead time; users keep the current process until go-live; one cut-over | The dispositions live in spreadsheets and e-mail (RN BRD p.42) and must be consolidated into P03 (DMQ38); placements of the first weeks run under hypercare |
+| (b) Processed in BIBS after go-live | No renewal work in legacy for these expiries; at T Renewal runs one catch-up extraction of all headers expiring T to T + 140 days | One process from the start | January expiries get days instead of 140 days; RAs and insurer approvals late; peak workload at go-live |
+
+The proposal is (a), with the catch-up extraction of (b) as the safety net: at T Renewal extracts every migrated header
+expiring from T to T + 140 days that has no carried candidate (for example a row rejected in P03), so no expiry is
+missed; such a candidate starts at the first stage.
+
+**Content of P03.** One row per expiring legacy policy term, keyed by the `legacy_policy_ref` of its P01 header: cohort
+month, source of the row (legacy RMEL extract or Marketing disposition file), expiring and proposed package, disposition
+and its date, handler and TL review, RA sent, RA date and number, insurer approval status, proposed insurer, sum insured
+and premium, FFY and submitted-policy flags, placement status, remarks. The legacy RMEL extract gives the policy part;
+the disposition part comes from the files the business units keep (DMQ38).
+
+**Validation** (rules DQ-018, DQ-019, DQ-047 to DQ-050 of the workbook):
+
+| Check | Severity | Handling |
+|---|---|---|
+| The expiring term is in P01 of the same load | ERROR | Fixed in the extract |
+| Expiry from T to T + 140 days | ERROR | Row outside the carried cohorts |
+| Not renewed in legacy already (no P01 term of the same cover whose inception is this expiry) | ERROR | Duplicate renewal; the legacy renewal wins; row dropped |
+| Disposition, handler and proposed insurer mapped (STATUS:RENEWAL, USER, INSURER) | ERROR | Code map |
+| Expiring and proposed package mapped (PACKAGE, section 15.2) | WARNING | Loaded as UNRESOLVED; resolved in Renewal sanitation |
+| RA date given when the RA was sent; reason given when Not for Renewal | ERROR | Fixed in the disposition file |
+| Placement status NOT_PLACED (a renewal placed but not booked at the freeze is an in-flight item, DMQ33) | ERROR | In-flight list; completed in legacy or re-keyed |
+
+**Cohort completeness** (reconciliation of P03, not a row rule): per expiry month, the P01 headers expiring from T to
+T + 140 days equal the P03 rows plus the headers already renewed in legacy plus the rows rejected. `MIG-RECON-DETAIL`
+lists the headers without a P03 row; they are the catch-up candidates.
+
+**Exception handling.** ERROR rows are not loaded; `MIG-REJECTS` of P03 goes to the Heads of Retail and Corporate
+Marketing (data owners) at every mock, and the profiling after Mock 1 gives the error classes to fix in the
+disposition files. In production, rejected rows are fixed before GNG-3 or left to the catch-up extraction.
+
+**Load.** `RmelCohortLoader` stores `mig_legacy_candidate` (legacy reference, migrated account, cohort month,
+disposition, handler, RA data, proposed terms, mapped package or UNRESOLVED). At T `MigratedPolicySource` serves the
+carried candidates to Renewal in one run; Renewal creates them with source LEGACY in the stage mapped from the
+legacy disposition, records an RA already sent (it is not sent again), and they can be placed and booked from T.
+
+### 15.2 Package remapping (DMQ36; CP Annex B and C)
+
+Legacy packages (QPS package code and version) must be mapped to the package names that TSU maintains in BIBS
+(BRD-3). The map is used by R06 (package versions), P01 (the package of each in-force header) and P03 (expiring and
+proposed package). The concept paper asked MANCOM to name the owner of this design choice and to decide whether the
+mapping happens "during upload processing or during sanitation" (CP p.2, Annex B, Annex C).
+
+| | At upload (migration intake) | During sanitation (Renewal checks) |
+|---|---|---|
+| How | Code map set PACKAGE (legacy package code and version to BIBS package version), approved at G2; applied in staging to R06, P01 and P03; conditional entries where one legacy package splits into several BIBS packages (qualifiers risk code, insurer, sum-insured band) | Candidates keep the legacy package; a sanitation check (BRRN.020) sends unmapped or ambiguous packages to the Exception bucket; the processor chooses the BIBS package per candidate |
+| For | One versioned, approved map used for headers and renewals alike; unmapped packages reported before load (`MIG-UNMAPPED-CODES`) in every mock; reconciled field by field (L4); tested before go-live | Handles cases that need judgement per account; never blocks a load |
+| Against | The map must be complete at the map freeze; ambiguous splits need qualifier rules | Choices per account are not versioned or approved; one legacy package can end up mapped two ways; P01 headers still need a map at load; the work lands on renewal users in the first weeks after go-live; harder to audit |
+
+**Recommendation.** Map at upload. A P03 or P01 row whose package the map cannot resolve is not rejected: it loads
+with package UNRESOLVED and a WARNING, and the Renewal sanitation check `PACKAGE_REMAP` sends the candidate to the
+Exception bucket, where TSU chooses the package. Each such choice is added to the next PACKAGE map version, so the
+exception route shrinks from mock to mock. **Owner:** TSU prepares the map (data steward); the Product Owner of
+Marketing Business System approves its versions (business owner, G2); MANCOM confirms the owner and the approach
+(DMQ36). The Renewal check `PACKAGE_REMAP` is a change to the Renewal design (section 14.5).
 
 **Run-off tracker.** `mig_runoff_cohort` (company, expiry month, source system, headers in force at T and premium,
 renewed in BIBS, not renewed, lapsed, still open) refreshed monthly by `MIG_RUNOFF_SNAPSHOT` from the renewal
@@ -649,24 +760,33 @@ start / end, status), `mig_cutover_task` (plan, sequence, phase, task, owner rol
 actual start / end, status, evidence attachment), `mig_gonogo_criterion` and `mig_gonogo_decision`. The runbook is a
 generated export of the plan (Excel and Word).
 
-### 17.2 Calendar (T = go-live, first business day of a month after a legacy month-end close, DMQ25)
+### 17.2 Calendar (BDOI timeline; go-live January 2028, DMQ25)
+
+T is the go-live date. The BDOI timeline answers the month (January 2028). The proposal is **Monday 3 January 2028**,
+the first business day after the legacy year-end close, so the opening trial balance is a closed year-end balance and
+no P&L balance is carried (DMQ18). The timeline slide draws the go-live marker at the end of the January column; a
+later January date keeps legacy running into January and needs a January cut-off of the trial balance. The holidays
+around the year end (24-25 and 30-31 December, 1 January) fall inside the cut-over window; the exact date, the last
+business day and the handling of late 2027 adjustments are DMQ39.
 
 | When | Step | Objects / checks |
 |---|---|---|
-| T-16 weeks | Object register and decisions (G1); layouts and the data requirements workbook issued to BDOI | all |
-| T-14 weeks | First full extracts; profiling; draft code maps | all M and CF |
-| T-12 weeks | **Mock 1** in SIT (masked): reference data, clients, headers | R, C, P01 |
-| T-9 weeks | **Mock 2** in SIT (masked): all objects end to end, reconciliation L1-L5 | all |
-| T-6 weeks | **Mock 3** = UAT load (masked); business verification on screens; UAT runs on migrated data | all |
-| T-3 weeks | **Dress rehearsal** on the production-sized environment, full-volume extract, timed against the window, rollback rehearsed | all |
-| T-2 weeks | Production pre-load of reference data and clients; daily client deltas from then on | R, C |
-| T-1 week | Code map freeze; legacy reference-data change freeze (new codes only through change control and a map version) | R |
-| T-3 days (Fri) | Legacy business freeze after the legacy EOD (22:00); legacy switched to read-only; last client delta | - |
-| T-2 days (Sat) | Final extracts after EOD: headers, open invoices, UPP, collection state, RMEL cohorts, GL TB; intake checks; database snapshot (rollback point); loads in load order | P, F, G |
-| T-1 day (Sun) | Reconciliation, sign-offs G5 / G6, screening run, business smoke test; go / no-go at 18:00 | all |
-| T (Mon) | BIBS open 08:00; hypercare starts | - |
-| T to T+4 weeks | Hypercare: daily legacy sub-ledger vs GL, clearing 0.00, automatch results, remittance extracts with legacy invoices, exception queues; defect triage twice a day | - |
-| First month-end | First close with legacy control accounts; ACSL recon LEGACY | - |
+| Sep-Oct 2026 (requirements and mapping) | Build-shaping decisions (16-Oct-2026); owners, stewards, keys, object decisions (G1) and layouts frozen, version 1 (G2 part 1) (30-Oct-2026) | all |
+| Nov 2026-Mar 2027 (build) | Build waves in mock order (section 25); first full extracts 29-Jan-2027 for profiling and performance sizing; draft code maps | all M and CF |
+| 19-30 Apr 2027 (SIT migration) | **Mock 1** in SIT (masked): reference data and clients first, then headers and RMEL cohorts | R, C, P01, P03 |
+| 5-16 Jul 2027 (SIT migration) | **Mock 2** in SIT (masked): all objects end to end, reconciliation L1-L5 | all |
+| 2-13 Aug 2027 (UAT migration) | **Mock 3** = UAT load (masked); business verification on screens; the Drop 1 end-to-end UAT (Aug-Dec 2027) runs on migrated data | all |
+| 4-15 Oct 2027 (UAT migration) | **Mock 4** = UAT refresh (masked): fresh extracts, run as a timed cut-over, carried RMEL cohorts of January-May 2028 | all |
+| 15-26 Nov 2027 (full migration and cut-over; performance test) | **Dress rehearsal** on the production-sized environment, full-volume extract, timed against the window, rollback rehearsed; reserve slot 6-10 Dec 2027 | all |
+| 4 Dec 2027 (T-30) | Production cut-over plan starts (Cutover Runbook); ORR / PRR Dec 2027-Jan 2028 | - |
+| 20 Dec 2027 (T-14) | Production pre-load of reference data and clients; daily client deltas from then on | R, C |
+| 27 Dec 2027 (T-7) | Code map freeze; legacy reference-data change freeze (new codes only through change control and a map version) | R |
+| 31 Dec 2027 (T-3, Fri) | Last legacy EOD and year-end close; business freeze 22:00; legacy switched to read-only; last client delta | - |
+| 1 Jan 2028 (T-2, Sat) | Final extracts after EOD: headers, open invoices, UPP, collection state, RMEL cohorts, GL TB; intake checks; database snapshot (rollback point); loads in load order | P, F, G |
+| 2 Jan 2028 (T-1, Sun) | Reconciliation, sign-offs G5 / G6, screening run, business smoke test; go / no-go at 18:00 | all |
+| 3 Jan 2028 (T, Mon) | BIBS open 08:00; carried RMEL candidates in Renewal; hypercare starts | - |
+| T to T+4 weeks | Hypercare: daily legacy sub-ledger vs GL, clearing 0.00, automatch results, remittance extracts with legacy invoices, placements of the carried renewals, exception queues; defect triage twice a day | - |
+| First month-end (January 2028) | First close with legacy control accounts; ACSL recon LEGACY | - |
 | Run-off | Monthly run-off snapshot; archive loads; decommissioning review per legacy system | H |
 
 ### 17.3 Freeze windows and delta loads
@@ -680,7 +800,10 @@ generated export of the plan (Excel and Word).
 
 ### 17.4 Mock runs and dress rehearsal
 
-Each mock is a cutover plan of kind MOCK with the full task list. Exit criteria of a mock: all objects loaded, L1-L5
+Each mock is a cutover plan of kind MOCK with the full task list: two in SIT (Apr and Jul 2027, SIT migration), two in
+UAT (Aug and Oct 2027, UAT migration), then the dress rehearsal (Nov 2027). In every run reference data and clients
+load and are accepted first (mock-load order, section 2), so Renewal and the other Drop 1 modules test on migrated
+clients and reference data as early as possible. Exit criteria of a mock: all objects loaded, L1-L5
 reconciled, defects logged, timings recorded per object. The dress rehearsal must complete within the window with at
 least 20 % margin and must rehearse the rollback (restore of the snapshot).
 
@@ -706,7 +829,10 @@ first business day (DMQ32); fallback after that is not offered, and issues are f
 ### 17.6 Legacy decommissioning
 
 Two milestones, each with a checklist in the console (`mig_decommission_item`: system, criterion, evidence, status,
-signed by):
+signed by). The checklist template gives each criterion a short default name that screens and messages use: Final
+extracts reconciled, Archive reconciled, Legacy Inquiry verified, No open item needs the system, Claims tail covered,
+Access logs archived, Retention covered, Owners signed; for the legacy context: No open legacy invoice, No legacy UPP
+balance, Legacy accounts at zero, Chart decision recorded.
 
 | Milestone | Criteria |
 |---|---|
@@ -803,7 +929,8 @@ Parameters (`sys_parameter`, category DATA_MIGRATION): `MIG_ENVIRONMENT_CLASS` (
 `MIG_MAX_ERROR_RATE_MASTER` (0.5), `MIG_MAX_ERROR_RATE_FINANCIAL` (0), `MIG_CLIENT_MATCH_AUTO` (90),
 `MIG_CLIENT_MATCH_REVIEW` (60), `MIG_INVOICE_NO_COLLISION_PREFIX` (true), `MIG_ARCHIVE_EXPORT_MAX_ROWS` (1000),
 `MIG_ACCESS_EXPORT_ALERT_ROWS` (5000), `MIG_LEGACY_ACCESS_REASON_REQUIRED` (true), `MIG_LEGACY_LINK_EBIX`,
-`MIG_LEGACY_LINK_QPS` (empty), `CMR_INCENTIVE_INCLUDE_LEGACY` (false, V786).
+`MIG_LEGACY_LINK_QPS` (empty), `MIG_UPP_ISSUE_AR` (false; DMQ14), `MIG_LEGACY_INVOICE_NO_PATTERN` (`^I\d{8}$`, the QPS
+pattern added after DMQ11), `CMR_INCENTIVE_INCLUDE_LEGACY` (false, V786).
 
 Alerts (`alt_exception_code`): `MIG_EXTRACT_REJECTED`, `MIG_LOAD_FAILED`, `MIG_RECON_BREAK`, `MIG_UNMAPPED`,
 `MIG_CLEARING_NOT_ZERO`, `MIG_STAGING_PURGE_OVERDUE`, `MIG_LEGACY_ACCESS_UNUSUAL`.
@@ -904,14 +1031,27 @@ a mock batch) runs as a Java demo runner (`migration.demo.LegacyMigrationDemo`) 
 
 ## 25. Build-wave plan
 
+The waves are built in the order the mocks need them (build window Nov 2026-Mar 2027). DM0 and DM1-C, which carry the
+objects of Mock 1 (reference data, clients, headers, RMEL cohorts and the PACKAGE map), come first and are deployed on
+SIT by 9-Apr-2027 for Mock 1 (19-Apr-2027). DM1-A, DM1-B, DM2-A and DM2-B follow and are deployed by 18-Jun-2027 for
+Mock 2 (5-Jul-2027); the DM3 performance harness is ready before the dress rehearsal (Nov 2027).
+
+| Wave | When | Needed by |
+|---|---|---|
+| DM0 | Nov-Dec 2026 | Mock 1 |
+| DM1-C | Dec 2026-Feb 2027 | Mock 1 |
+| DM1-A, DM1-B | Jan-Mar 2027 | Mock 2 |
+| DM2-A, DM2-B | Feb-Mar 2027 | Mock 2 |
+| DM3 | Mar 2027 (E2E), performance harness by Oct 2027 | Mock 2; dress rehearsal |
+
 | Wave | Agent | Scope | Files owned | Exit criteria |
 |---|---|---|---|---|
 | **DM0** (1 agent) | Foundation | Module skeleton; V1080-V1084; object register and decisions; layouts; intake with checks and masking; staging and purge; code maps and unmapped report; rule engine; batch framework (loader SPI, chunking, run log, rerun, rollback framework); reconciliation L1-L4; sign-off gates; console shell and screens of sections 22 (except archive, cutover, run-off); shared files (`Permission.java`, `navigation/modules.ts`, help registry, `application.yml`, CONFIGURATION.md); demo V1980-V1981; a reference-data loader (R01) as the first end-to-end object | `migration/**` (except `archive`, `cutover`), V1080-V1084, V1980-V1981, `features/migration/**` | R01 extract -> load -> recon -> sign-off in the console; ITs green |
 | **DM1-A** | Legacy invoice contract | V1086 and all `opsledger` changes of 14.5; `LegacyInvoiceLoader` (F01) with M1 and open items; `GlOpeningLoader` (G01, M3); L5 reconciliation; V1087 and the ACSL filter; V1982 demo GL | `opsledger/**` (legacy parts), `acsl/service/GlSlQueries.java`, `migration/load/**/LegacyInvoiceLoader*`, `GlOpeningLoader*` | Legacy invoice visible in Invoice 360; clearing 0.00 after F01 + G01 |
 | **DM1-B** | Cashiering, commission, remittance | V766, V786; context components in all Operations postings; migrated UPP (F02, M2); automatch on `match_refs`; income reclass batch with top-management approval; PR2307 and DPPR legacy batches; remittance postings and schedules; CSH reports | `cashiering/**`, `commission/**`, `remittance/**` (legacy parts), `migration/load/**/UppLoader*` | OTC and autopay on a legacy invoice; mixed UPP automatch; remittance batch with legacy lines; reclass executed after two approvals |
-| **DM1-C** | Clients, reference, headers | V803, V823; `registerMigrated`, screening skip, `importLegacy`; loaders R03-R09, C01-C03, P01; client matching and review queue; xref search; `LegacyAccountLookup` | `crm/**`, `account/**`, `screening/matching/service/ScreeningTriggers.java` (legacy parts), `migration/matching/**`, loaders | 10,000 synthetic clients with duplicates matched, reviewed and loaded; headers searchable |
+| **DM1-C** | Clients, reference, headers, RMEL cohorts | V803, V823; `registerMigrated`, screening skip, `importLegacy`; loaders R03-R09, C01-C03, P01, P03; PACKAGE map with conditional entries (section 15.2); client matching and review queue; xref search; `LegacyAccountLookup`; `MigratedPolicySource` (stub until Renewal R0 exists) and cohort completeness check | `crm/**`, `account/**`, `screening/matching/service/ScreeningTriggers.java` (legacy parts), `migration/matching/**`, loaders | 10,000 synthetic clients with duplicates matched, reviewed and loaded; headers searchable; a carried RMEL cohort served through `LegacyPolicySource` |
 | **DM2-A** | Endorsements, prod recon, collections | V873, V1007; booking port and fallback; adjustment on legacy invoices; `PRC-LEGACY-CHANGES`; production extract exclusion; `LegacyItemStateService` and loader F03 | `booking/**`, `adjustment/**`, `prodrecon/**`, `collections/legacy/**` | Positive, negative and non-financial endorsement on a legacy invoice with legacy postings; change report shows original, updated, delta |
-| **DM2-B** | Cutover, run-off, archive | V1085; cutover plan, tasks, go / no-go, runbook export; run-off tracker and `LegacyPolicySource` implementation (stub until Renewal R0 exists); archive loader, Legacy Inquiry, access log, retention providers | `migration/cutover/**`, `migration/archive/**`, `features/migration/cutover/**`, `features/migration/inquiry/**` | Mock plan executed in the console; archive search logged |
+| **DM2-B** | Cutover, run-off, archive | V1085; cutover plan, tasks, go / no-go, runbook export; run-off tracker; archive loader, Legacy Inquiry, access log, retention providers | `migration/cutover/**`, `migration/archive/**`, `features/migration/cutover/**`, `features/migration/inquiry/**` | Mock plan executed in the console; archive search logged |
 | **DM3** (1 agent) | Integration and rehearsal tooling | E2E test (extract -> load -> OTC -> automatch -> remittance -> endorsement -> recon -> sign-off); performance harness with 1,000,000 synthetic client rows and 500,000 invoice rows; demo storyline; module guide `docs/modules/MIGRATION.md` | tests, demo, docs | Full `mvn verify` / `npm run verify`; timings recorded |
 
 Rules for parallel work:
@@ -927,7 +1067,7 @@ Rules for parallel work:
 ## 26. Risks
 
 1. **Legacy data cannot give components or paid / remitted splits** (DMQ12). Mitigation: open-balance mode; split rules
-   as configuration; early profiling at T-14 weeks.
+   as configuration; early profiling of the first full extracts (29-Jan-2027).
 2. **Clearing account not zero at cutover** (detail and TB disagree). Mitigation: reconciliation in every mock; GL TB
    extracted after the same EOD as the detail; break explanations with Comptrollership before go / no-go.
 3. **Duplicate clients merged wrongly.** Mitigation: auto-merge only on hard keys; review queue for the rest; merge
@@ -938,6 +1078,12 @@ Rules for parallel work:
 6. **Real data in test.** Mitigation: masking at intake; unmasked files never leave production; 5-day purge.
 7. **Parallel processing in legacy after the freeze.** Mitigation: legacy read-only at the freeze; any late legacy
    transaction is a reconciliation break.
+8. **Cut-over over the year-end holidays** (T-10 to T-2 fall on 24-Dec-2027 to 1-Jan-2028). Mitigation: date and last
+   business day decided by M6 (DMQ39); roster confirmed at T-29; tasks that fall on a holiday moved in the runbook.
+9. **Carried renewals of January-May 2028 incomplete** (dispositions kept in spreadsheets, DMQ38). Mitigation:
+   consolidated disposition template from Mock 1; cohort completeness check; catch-up extraction at T.
+10. **Package remapping errors** (CP Annex C). Mitigation: map at upload with owner approval (DMQ36); unmapped
+    packages reported in every mock; business verification samples per legacy package; exception route in Renewal.
 
 ## 27. Inputs required from BDOI
 
@@ -959,8 +1105,8 @@ Per data object: the fields are the layout columns (published in the data requir
 | C01-C02 Clients | QPS, EBIX, CMS | Product Owner, MBS; Heads of Marketing | legacy client no., type, names, birth / registration date, TIN, ID type and no., CIF, e-mail, mobile, addresses, segment, AO, KYC status and dates, last update | CSV | to supply | mandatory identity fields; formats; duplicates resolved | 2020 to present (umbrella p.43), scope per DMQ05 | daily until freeze |
 | C03 Payout accounts | EBIX | Comptrollership - Disbursement PO | client no., bank, account no., account name, mode | CSV | to supply | bank code mapped | active | none |
 | C04 KYC documents | QPS, shares | Compliance | client no., document type, file, date | files + CSV index | to supply | file readable; checksum | per retention | none |
-| P01 Policy headers | QPS, EBIX | Head of Operations | cover / policy no., version, client no., product / risk code, line, insurer(s) and shares, inception, expiry, sum insured, premium, currency, AO, unit, branch, PN nos., DP flag, business type, status | CSV | to supply | expiry after inception; client and product mapped; shares 100 % | in force at T (DMQ09) | at freeze |
-| P03 RMEL cohorts | RMEL files, QPS | Heads of Marketing (Renewal) | cover no., expiry, disposition, handler, status, remarks | XLSX | to supply | header exists | cohorts T to T+140 days | at freeze |
+| P01 Policy headers (P01, P01S) | QPS, EBIX | Head of Operations | cover / policy no., version, client no., product / risk code, package and version, line, insurer(s) and shares (P01S), inception, expiry, sum insured, premium, currency, AO, unit, branch, PN nos., DP and FFY flags, business type, status | CSV | to supply | expiry after inception; client, product and package mapped; shares 100 % | in force at T (DMQ09) | at freeze |
+| P03 RMEL cohorts | Legacy RMEL extract (EBIX, QPS); Marketing disposition files | Heads of Retail and Corporate Marketing (Renewal); TSU for packages | expiring policy reference, cohort month, expiring and proposed package, disposition and date, handler, RA sent / date / no., insurer approval, proposed insurer, SI and premium, FFY and submitted flags, placement status, remarks | CSV or XLSX | to supply | header in P01; expiry T to T+140; not renewed in legacy; codes and packages mapped | expiries 3-Jan to 22-May-2028 (T to T+140 for T = 3-Jan-2028) | at freeze (monthly in the mocks) |
 | P04 Submitted masterlists | Excel | CBG / Non-CBG Marketing | as `SBM_MIGRATION` (SUBMITTED_POLICIES_DESIGN) | XLSX | to supply | as SP design | all active (SP SQ16) | none |
 | P05 EB programmes | EBIX | EB Head | as `EB_PROGRAMME_LOAD` | XLSX | to supply | as EB design | active programmes | none |
 | F01 Open legacy invoices | EBIX, QPS | Operations - Financial Transactions; Head of Comptrollership | invoice no., source, kind, parent invoice, cover no. / version, policy no., client no., assured, payor, insurer(s) and shares, currency, booking / inception / expiry / due dates, risk code, line, segment, AO, unit, branch, DP / CWT / incentive flags; per component (basic, DST, PT / VAT, LGT, FST, other, DTIP, commission, VAT, WTAX, PR2307): booked, adjusted, paid, remitted, written off, open; commission realised; last payment date; legacy service invoice no. | CSV + control file | to supply | components add up; open = booked + adjusted - paid / remitted - written off; client, insurer and product mapped; unique invoice no. | every invoice open at T (DMQ10) | at freeze (single load) |

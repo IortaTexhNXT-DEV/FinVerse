@@ -344,7 +344,7 @@ class BdoiDocument:
                            Specification", doc_code="FRS", brd="BRD-03", version="1.0"))
         doc.cover(); doc.front_matter()
         doc.heading("Introduction"); doc.paragraph("...")
-        doc.publish(Path("out/FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx"))
+        doc.publish(brand.out_path("BRD-03", "FRS", "BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx"))
     """
 
     def __init__(self, meta: DocMeta, *, h1_page_break: bool = True, base_dir: Path | None = None):
@@ -1232,12 +1232,22 @@ def meta_from(front: dict[str, Any]) -> DocMeta:
 
 
 def output_path(front: dict[str, Any], src: Path) -> Path:
+    """Output .docx of a source: <out>/<drop folder of the BRD>/<kind>/<file> (brand.out_path).
+
+    The front matter gives either `output: <kind>/<file>` (for example `FRS/BIBS_FRS_BRD-06_Renewal_v1.1.docx`) or
+    `doc_code` (the kind) with `name` and `version`. The drop folder always comes from brand.BRD_DROP, so a document
+    moves with its BRD; an `output` that already starts with a drop folder is taken as it is.
+    """
+    brd = str(front.get("brd", "BRD-00"))
     if front.get("output"):
-        return brand.OUT_DIR / str(front["output"])
-    folder = str(front.get("doc_code", "misc"))
-    name = brand.output_name(folder, str(front.get("brd", "BRD-00")), str(front.get("name", src.stem)),
-                             str(front.get("version", "1.0")), "docx")
-    return brand.OUT_DIR / folder / name
+        rel = Path(str(front["output"]))
+        if rel.parts[0] in {d["folder"] for d in brand.DROPS.values()}:
+            return brand.OUT_DIR / rel
+        kind = rel.parts[0] if len(rel.parts) > 1 else str(front.get("doc_code", "misc"))
+        return brand.out_path(brd, kind, rel.name)
+    kind = str(front.get("doc_code", "misc"))
+    name = brand.output_name(kind, brd, str(front.get("name", src.stem)), str(front.get("version", "1.0")), "docx")
+    return brand.out_path(brd, kind, name)
 
 
 def render_body(doc: BdoiDocument, lines: list[str]) -> None:

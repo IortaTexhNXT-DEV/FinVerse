@@ -102,6 +102,90 @@ def rgb(hex_value: str) -> tuple[int, int, int]:
     return int(hex_value[0:2], 16), int(hex_value[2:4], 16), int(hex_value[4:6], 16)
 
 
+# --------------------------------------------------------------------------- drops
+# BDOI groups the BRDs, FRS, test plans and other collaterals under its drops (answer A5 of 26-Sep-2026;
+# docs/source-documents/BDOI_DROP_PLAN.md; docs/architecture/PROGRAMME_ALIGNMENT.md section 2.3). This is the only
+# drop map of the toolkit: the builders place their outputs with out_dir() / out_path(), and the register takes the
+# default Drop of an item from it. A BRD that spans drops lives in its primary drop; the index README of the other
+# drop points to it (DROP_SHARED), so no file is copied.
+
+# Drop key -> output folder under docs/deliverables/out, title and the BDOI dates of the drop.
+DROPS: dict[str, dict[str, str]] = {
+    "Drop 0": {
+        "folder": "Drop-0_Setup_and_Data_Migration",
+        "title": "Drop 0 - Setup and Data Migration",
+        "dates": "Setup with the Drop 1 requirements (Sep - Nov 2026) and build wave 1; migration requirements and "
+                 "mapping Sep - Nov 2026, build Nov 2026 - Mar 2027, SIT Apr - Jul 2027, UAT Aug - Oct 2027, full "
+                 "migration and cut-over Nov 2027 - Jan 2028",
+    },
+    "Drop 1": {
+        "folder": "Drop-1_Transactional",
+        "title": "Drop 1 - Transactional (upstream and downstream)",
+        "dates": "Requirements Sep - Nov 2026, build Nov 2026 - Feb 2027, SIT Jan - Jul 2027, UAT (end to end) "
+                 "Aug - Dec 2027",
+    },
+    "Drop 2": {
+        "folder": "Drop-2_Independent",
+        "title": "Drop 2 - Independent",
+        "dates": "Requirements Dec 2026 - Feb 2027, build Mar - Apr 2027, SIT Jul - Sep 2027, UAT Oct - Nov 2027",
+    },
+    "Programme": {
+        "folder": "Programme",
+        "title": "Programme (cross-drop)",
+        "dates": "Performance and penetration test Nov - Dec 2027, ORR / PRR Dec 2027 - Jan 2028, go-live of all "
+                 "modules together in January 2028 (proposed Monday 3 January 2028)",
+    },
+}
+
+# Primary drop of each BRD (the folder its documents live in).
+BRD_DROP: dict[str, str] = {
+    "BRD-00": "Programme",  # umbrella BRD, register, process deck, alignment pack
+    "BRD-01": "Drop 1",  # upstream 1.U1-1.U3, 1.U6, 1.U7, 1.U9
+    "BRD-02": "Drop 1",  # downstream 1.D2-1.D4, 1.D7; Production Reconciliation in Drop 2
+    "BRD-03": "Drop 0",  # setup 0.6; quotation 1.U2 in Drop 1
+    "BRD-04": "Drop 1",  # direct-payment commission receivables 1.D7; marketing collection 2.1 in Drop 2
+    "BRD-05": "Drop 1",  # 1.U8, 1.D1, 1.D5, 1.D6; GL accounts 0.4 in Drop 0
+    "BRD-06": "Drop 1",  # 1.U5
+    "BRD-07": "Drop 2",  # 2.2
+    "BRD-08": "Drop 2",  # 2.4; EB placement and reports 1.U6, 1.U9 in Drop 1
+    "BRD-09": "Drop 1",  # account maintenance 1.U3; service requests proposed for Drop 2
+    "BRD-10": "Drop 1",  # proposed with client onboarding (not on the slide, IQ23)
+    "BRD-11": "Drop 0",  # 0.1-0.3
+    "BRD-12": "Drop 1",  # 1.U4
+    "BRD-13": "Drop 0",  # migration stream
+}
+
+# BRDs that span drops: (BRD, other drop, what of it belongs there). Listed in the index of the other drop.
+DROP_SHARED: list[tuple[str, str, str]] = [
+    ("BRD-01", "Drop 0", "Client onboarding is also a migration object (clients C01-C03)"),
+    ("BRD-02", "Drop 2", "Production Reconciliation chapter of the FRS and its test plan sheet (item 2.3)"),
+    ("BRD-03", "Drop 1", "Quotation or proposal with packages (item 1.U2)"),
+    ("BRD-04", "Drop 2", "Marketing Collection extraction: worklists, dispositions, daily files (item 2.1)"),
+    ("BRD-05", "Drop 0", "GL accounts and reference tables (item 0.4)"),
+    ("BRD-08", "Drop 1", "EB placement and ePolicy, EB upstream reports (items 1.U6, 1.U9)"),
+    ("BRD-09", "Drop 2", "Service-request functions (proposed, IQ23)"),
+    ("BRD-10", "Drop 2", "Bridger Insight XG integration"),
+    ("BRD-13", "Drop 1", "Legacy invoices in cashiering, commission and BIR reports (items 1.U1, 1.D2, 1.D6)"),
+]
+
+DROP_ORDER = ["Drop 0", "Drop 1", "Drop 2", "Programme", "Phase 2"]
+
+
+def drop_of(brd: str) -> str:
+    """Primary drop of a BRD code (BRD-nn); anything else is programme level."""
+    return BRD_DROP.get(brd, "Programme")
+
+
+def out_dir(brd: str, kind: str) -> Path:
+    """Output folder of a document kind (FRS, TestPlans, Migration, Registers, Decks, Alignment) of a BRD."""
+    return OUT_DIR / DROPS[drop_of(brd)]["folder"] / kind
+
+
+def out_path(brd: str, kind: str, filename: str) -> Path:
+    """Full output path of a client-pack file, in the drop folder of its BRD."""
+    return out_dir(brd, kind) / filename
+
+
 def output_name(doc_type: str, brd: str, name: str, version: str, ext: str) -> str:
     """File name of a client-pack document: BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>.
 

@@ -10,11 +10,11 @@ doc_code: FRS
 brd: BRD-11
 name: User Access Maintenance
 doc_id: BIBS-FRS-BRD-11
-version: "1.0"
-date: 25 September 2026
+version: "1.1"
+date: 26 September 2026
 status: Issued for BDOI review
 header_title: FRS BRD-11 User Access Maintenance
-output: FRS/BIBS_FRS_BRD-11_User_Access_Maintenance_v1.0.docx
+output: FRS/BIBS_FRS_BRD-11_User_Access_Maintenance_v1.1.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026
@@ -28,6 +28,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review; built access functions as the baseline, BRD changes specified from the design; aligned with the cross-BRD decisions
+  - version: "1.1"
+    date: 26 Sep 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Solution Architect
+    approver: BDOI Product Owner (pending)
+    change: "BDOI Drop 0 integrations of 26-Sep-2026: sign-in through EIAM (Microsoft Entra ID, OpenID Connect) as the target of FR-UA-003; UIDM-ISC (IGA) provisioning against the BIBS request rule, options for BDOI (IQ04, IQ05; register DCR-229, DCR-230); portal users of decision D7 dormant (EB without portal, IQ22)"
 distribution:
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Business Administrators (process owner)", role: Business owner, organisation: BDOI, purpose: Review of all FRs}
@@ -78,7 +84,7 @@ The BRD was written in April 2025 for the Quotation and Pre-processing System (Q
 | R3 | User Access Maintenance build design | current (proposal for review) | `docs/architecture/USER_ACCESS_DESIGN.md` |
 | R4 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
 | R5 | Built access functions: users, roles and sign-in (`security`); access requests, User Access Matrix, retention (`nbadmin`); screens | as built | `backend/.../security`, `backend/.../nbadmin`, `frontend/src/features/nbadmin`, `frontend/src/features/admin` |
-| R6 | FRS BRD-3 Product Maintenance (role-permission change requests, PMADD05) | v1.0 | `docs/deliverables/out/FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.pdf` |
+| R6 | FRS BRD-3 Product Maintenance (role-permission change requests, PMADD05) | v1.0 | `docs/deliverables/out/Drop-0_Setup_and_Data_Migration/FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.pdf` |
 | R7 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
 
 Page references in this document ("p.8") are pages of the BRD PDF (R1). The BRD has no NFR IDs; the NFR rows carry the analyst's IDs UAM-NFR-01 to UAM-NFR-41 of R2.
@@ -328,6 +334,7 @@ description:
   - The BRD asks that the user ID is interfaced with EUA using the Windows ID. BIBS passes the user ID and the entered password; EUA returns whether the log-on succeeded and, on failure, an error message that BIBS shows (p.14). LDAP or Active Directory authentication and single sign-on or LDAP integration are also required (p.13, p.17).
   - BIBS authenticates through a directory port. Parameter AUTH_MODE selects LOCAL (password held in BIBS, today) or DIRECTORY (password checked by EUA; the user is found by the Windows ID). The lock-out, audit and session behaviour are the same in both modes, and BIBS never stores the password in DIRECTORY mode.
   - The EUA protocol, host and messages are not in the BRD (UQ04). BIBS keeps LOCAL mode until BDO supplies them; switching is then configuration (decision D6, R4).
+  - "Target named by BDOI on 26-Sep-2026: sign-in goes through EIAM, BDO's Enterprise Identity Access Management on Microsoft Entra ID, with OpenID Connect. The login page redirects to Entra ID; BIBS validates the returned identity, finds the user by the Windows ID or the user principal name and signs him in with his BIBS roles (AUTH_MODE = OIDC). Password, lock-out and multi-factor rules then belong to Entra ID; the BIBS inactivity warning and log-out stay. A local break-glass administrator keeps LOCAL sign-in, audited. Claims, tenant and session life are open with BDOI IT (IQ04)."
 preconditions:
   - "AUTH_MODE = DIRECTORY; the user has a Windows ID in BIBS (FR-UA-052)."
 main_flow:
@@ -1668,12 +1675,14 @@ Figure 4 shows the interfaces. Every BIBS module reads the effective permissions
 <!-- table: widths=3.8,1.8,7.6,2.8,2.2 caption="Interfaces" status=Status size=8.5 -->
 | Interface | Direction | Content and trigger | BRD | Status |
 |---|---|---|---|---|
+| EIAM (Microsoft Entra ID), Drop 0 | Out / In | OpenID Connect sign-in: redirect to Entra ID, ID token returned and mapped to the BIBS user by Windows ID or user principal name; log-out ends the Entra session. Target of FR-UA-003 (IQ04) | NFR p.13-14, p.17 | NEW |
+| UIDM-ISC (identity governance), Drop 0 | In / Out | Joiner, mover and leaver provisioning and access certification. Options: the IGA provisions user accounts while role changes stay BIBS requests (proposal), the IGA provisions users and roles, or aggregation only (IQ05, DCR-229) | 1.001-1.009 (request rule, p.6) | OPEN |
 | BDO EUA with Windows ID | Out / In | User ID and password passed at log-in; success or failure with message returned | NFR p.14 | PARKED |
 | LDAP / Active Directory | Out / In | Bind authentication, same port | NFR 1.h (p.13) | PARKED |
 | SSO (SAML / OIDC) | In | Identity-provider assertion exchanged for a BIBS session | Other BU NFR 4 (p.17) | PARKED |
 | External ACL | In | Authorisation by an external access-control list | NFR 1.i (p.13) | PARKED |
 | All BIBS modules | Out | Effective permissions of the user (menus, buttons, API checks) | 4.002.2 | BUILT |
-| Portal users (BRD-8 Employee Benefits) | Out | External user requests provisioned on approval (decision D7) | D7 (R4) | DESIGNED |
+| Portal users (BRD-8 Employee Benefits) | Out | External user requests provisioned on approval (decision D7). Dormant: BDOI drops the EB portal (drop plan item 2.4, IQ22); EXTERNAL requests stay refused | D7 (R4) | OUT |
 | Notifications and e-mail | Out | Request, access-change and batch-failure notices | 1.006.1.1, 1.008.1.4, 2.002.1; NFR 10 | BUILT |
 | Bulk upload | In | Template file of access requests | 1.009 | DESIGNED |
 | Remote log server / syslog | Out | Application and error logs | NFR p.14 | PARKED |
@@ -1745,7 +1754,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | SESSION_IDLE_WARNING_MINUTES (exists) | 15 | Inactivity warning |
 | SESSION_TIMEOUT_MINUTES (exists) | 30 | Inactivity sign-out |
 | SESSION_EXPIRY_WARNING_MINUTES (exists) | 30 | Warning before the fixed token expiry |
-| AUTH_MODE | LOCAL | LOCAL or DIRECTORY (EUA) |
+| AUTH_MODE | LOCAL | LOCAL, DIRECTORY (EUA) or OIDC (EIAM, Entra ID; target, IQ04) |
 | USER_ID_PATTERN | ^[a-zA-Z][0-9]{9}$ | User ID format (to confirm, UQ05) |
 | PASSWORD_HISTORY_COUNT | 8 | Previous passwords refused (UQ08) |
 | PASSWORD_MAX_AGE_DAYS | 90 | Password expiry (UQ08) |
@@ -1805,6 +1814,8 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | UQ02 | Which users may be chosen as approver; several approvers in sequence or in parallel, all required | FR-UA-015, 044 | OPEN |
 | UQ03 | Must the System Administrator implement group profiles by hand, or may BIBS apply them on approval | FR-UA-041, 045 | OPEN |
 | UQ04 | EUA interface: protocol, host, Windows ID format, messages; break-glass administrator; password policy with EUA | FR-UA-003 | OPEN |
+| IQ04 | EIAM (Entra ID): tenant and app registration, claims, MFA and conditional access, session life against the 30-minute rule, non-BDO users (programme alignment) | FR-UA-003 | OPEN |
+| IQ05 | UIDM-ISC: which access changes are requested and approved in the IGA and which stay as BIBS requests; connector type; certification (programme alignment) | Section 5, FR-UA-010 to 045 | OPEN |
 | UQ05 | Values of business unit group and user level; user ID format and relation to the Windows ID | FR-UA-011, 052 | OPEN |
 | UQ06 | Effective date: start only or also end (temporary access); cancelling a scheduled request | FR-UA-020 | OPEN |
 | UQ07 | Which profiles are high privilege; working hours; who does the additional review | FR-UA-034 | OPEN |

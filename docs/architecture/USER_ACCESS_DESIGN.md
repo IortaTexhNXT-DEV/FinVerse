@@ -12,7 +12,7 @@ Requirements baseline: [`BDOI_UAM_BRD_SPEC.md`](../requirements/BDOI_UAM_BRD_SPE
    - **Group-profile** requests are applied when the System Administrator implements the approved request (diagram p.6, "System Administrator to create / modify group profile"; UQ03 may simplify this to apply on approval).
 3. **Four eyes, with a named approver.** The requester chooses the approver (BRD 1.00x "select approver from the drop-down"). The requester, and the user the request is about, can never decide it. Risky changes get a second approval (UAM-NFR-40).
 4. **Structured, insert-only evidence.** Every applied change writes one row per attribute into `sec_access_change_log` (from / to, request number, done by). The row is insert-only, with a database trigger as in V26. The audit report (sample D) and the "added / modified / deactivated / reactivated by" columns (samples A-C) are read from this log. `audit_log` keeps its summaries.
-5. **Directory authentication is a port.** BIBS must authenticate Windows IDs against BDO EUA / AD / LDAP (UAM-NFR-11, 17, 33; Q42). The interface is unknown, so `security` gets a `DirectoryAuthenticator` port with a LOCAL default. The lockout, audit and session behaviour stays identical in both modes.
+5. **Directory authentication is a port.** BIBS must authenticate Windows IDs against BDO EUA / AD / LDAP (UAM-NFR-11, 17, 33; Q42). The interface is unknown, so `security` gets a `DirectoryAuthenticator` port with a LOCAL default. The lockout, audit and session behaviour stays identical in both modes. **Update 26-Sep-2026:** BDOI named the identity integrations of Drop 0 (`PROGRAMME_ALIGNMENT.md` section 5): sign-in goes through **EIAM on Microsoft Entra ID** (OpenID Connect redirect, not a password bind) and user provisioning may come from **UIDM-ISC**, BDO's identity governance (IGA) tool. Section 10.1 gives the design; both are open with BDOI IT (IQ04, IQ05; register DCR-229, DCR-230).
 6. **Backward compatible.** Existing request types, the endpoints of BROKING_ARCHITECTURE section 8, the PMADD05 role-permission requests and the demo data keep working. The new permissions are granted in the migration to every role that holds `ACCESS_REQUEST` today.
 7. **No money.** User access posts no journal and publishes no accounting event.
 
@@ -89,6 +89,11 @@ Rules:
 | FOR_IMPLEMENTATION | implement | IMPLEMENTED | System Administrator (ROLE_MANAGE) | Applies through `UserAdminService`; UQ03 |
 
 ### 4.4 External (portal) users (cross-BRD decision D7)
+
+> **26-Sep-2026: dormant.** BDOI's drop plan places "Employee Benefits (no portal feature)" in Drop 2 (register DCR-211,
+> IQ22), so no `portal` module is built and there are no external users. The built default of
+> `ExternalUserProvisioner` keeps refusing EXTERNAL requests (`NbadminPortDefaults`). The rules below stay as the design
+> if a portal is ever added.
 
 Portal users of the Employee Benefits design (insurer and client HR users, EMPLOYEE_BENEFITS_DESIGN section 6.3) are provisioned through these requests as an **external user type**. They are not `sec_user` rows: they live in `portal` (`ptl_user`) and sign in to the separate portal realm.
 
@@ -215,6 +220,39 @@ Notification events:
 | External ACL | UQ14 | `security.service.ExternalAuthorization` (default: none) |
 | Remote log shipping / syslog | UAM-NFR-21 | Platform logging configuration (Logback appender), infrastructure |
 | HR feed (joiners / leavers) | not in the BRD | None; bulk requests cover mass changes |
+| EIAM (Entra ID) sign-in | IQ04; DCR-230 | Section 10.1. Replaces the EUA password bind as the target; `DirectoryAuthenticator` stays for a break-glass local administrator |
+| UIDM-ISC (IGA) provisioning | IQ05; DCR-229 | Section 10.1. None today; `ExternalUserProvisioner` serves portal users only |
+
+### 10.1 EIAM (Entra ID) sign-in and UIDM-ISC (IGA) provisioning (Drop 0 integrations, 26-Sep-2026)
+
+**EIAM sign-in (INT-01).** BDOI's Enterprise Identity Access Management runs on Microsoft Entra ID. BIBS signs BDO
+users in with OpenID Connect (authorisation code with PKCE):
+- the login page redirects to Entra ID; the backend validates the ID token (issuer, audience, signature from the tenant
+  JWKS, nonce) with Spring Security OAuth2 and maps the identity to `sec_user` by `windows_id` or the UPN claim;
+- a user unknown to BIBS, inactive or dormant is refused with the existing messages; roles and permissions stay in BIBS
+  (group claims are not used for authorisation unless BDOI asks, IQ04);
+- BIBS then issues its own JWT as today, so the permission checks, the session log, the idle warning and the 30-minute
+  inactivity log-out (UAM-NFR) are unchanged; log-out also ends the Entra session (front-channel log-out);
+- password, lockout and MFA rules move to Entra ID; `AUTH_MODE` gets the value `OIDC` and the password parameters apply
+  only to the break-glass local administrator (LOCAL mode, audited);
+- the port family becomes `SsoTokenExchange` (designed in section 10, built with EIAM); `DirectoryAuthenticator` stays for
+  the local mode.
+
+Open with BDOI IT (IQ04): tenant and app registration, claims (UPN or Windows ID), MFA and conditional access, token and
+session lifetime against the 30-minute inactivity rule, sign-in of non-BDO users.
+
+**UIDM-ISC provisioning (INT-02).** BDO's IGA tool (read as SailPoint Identity Security Cloud, to confirm) provisions
+joiners, movers and leavers and certifies access. This conflicts with principle 2 ("a request in BIBS is the only way to
+change access"; BRD-11 p.6). Options for BDOI (IQ05, DCR-229):
+
+| Option | Requests and approvals | BIBS build |
+|---|---|---|
+| (a) IGA provisions user accounts, BIBS keeps role requests (proposal) | Create, deactivate and reactivate users come from UIDM-ISC; role (group-profile) and data-scope changes stay as BIBS requests under four eyes | SCIM 2.0 `/Users` endpoint (or the ISC connector) mapped to the `nbadmin` request lifecycle as system requests with the ISC request number; aggregation export of accounts and roles for certification |
+| (b) IGA provisions users and roles | All access changes requested and approved in UIDM-ISC; BIBS applies them | SCIM `/Users` and `/Groups` (roles as entitlements); BIBS requests kept only for the break-glass path |
+| (c) No IGA provisioning | BIBS requests as built; UIDM-ISC only aggregates for certification | Aggregation export only |
+
+Every change applied from the IGA writes `sec_access_change_log` rows as today, with source `IGA` and the ISC reference,
+so the BRD-11 audit reports keep working.
 
 ## 11. Reports and screens
 
@@ -271,7 +309,8 @@ Rules for parallel work:
 
 | Item | Question | Built now | Parked |
 |---|---|---|---|
-| EUA / AD / SSO | Q42, UQ04 | Port, LOCAL mode, `windows_id` field | Adapter |
+| EUA / AD / SSO | Q42, UQ04 | Port, LOCAL mode, `windows_id` field | Adapter; target is EIAM (Entra ID) OIDC, section 10.1 (IQ04) |
+| IGA provisioning (UIDM-ISC) | IQ05, DCR-229 | BIBS requests as built | SCIM endpoint and aggregation export, section 10.1 |
 | Approver population and rules | UQ01, UQ02 | Named approver, eligibility by permission, `UAM_ANY_APPROVER` | Per-unit approver lists |
 | Implementation step for group profiles | UQ03 | FOR_IMPLEMENTATION step; `UAM_ROLE_APPLY_ON_APPROVAL` | - |
 | Risky-change rules | UQ07 | Privilege levels, working-hours parameter, second approval | Final levels per role |

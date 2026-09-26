@@ -9,7 +9,7 @@ BDOI review and sign-off). Both are built from sources in this folder by `build_
 | `TP_BRDnn_<NAME>.md` | Word summary in the `bdoi_docx` source format; `<!-- tp:... -->` lines are filled from the YAML |
 | `build_test_plan.py` | Shared builder; the YAML schema is documented at the top of the file |
 
-Outputs go to `docs/deliverables/out/TestPlans/`:
+Outputs go to `docs/deliverables/out/<drop folder of the BRD>/TestPlans/` (drop map `tools/deliverables/brand.py` `BRD_DROP`):
 `BIBS_TestPlan_BRD-nn_<Name>_v1.0.xlsx` and `BIBS_TestPlan_BRD-nn_<Name>_Summary_v1.0.docx`.
 
 ## Build and check

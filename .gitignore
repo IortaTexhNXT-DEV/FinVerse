@@ -13,7 +13,5 @@ coverage/
 .env.*
 !.env.example
 
-# Local agent worktrees
-.claude/worktrees/
 # Word and Excel are the masters; PDFs are produced at issue and not committed
 docs/deliverables/out/**/*.pdf

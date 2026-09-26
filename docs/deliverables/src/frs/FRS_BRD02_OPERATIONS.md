@@ -8,11 +8,11 @@ doc_code: FRS
 brd: BRD-02
 name: Operations
 doc_id: BIBS-FRS-BRD-02
-version: "1.0"
-date: 25 September 2026
+version: "1.1"
+date: 26 September 2026
 status: Issued for BDOI review
 header_title: FRS BRD-2 Operations
-output: FRS/BIBS_FRS_BRD-02_Operations_v1.0.docx
+output: FRS/BIBS_FRS_BRD-02_Operations_v1.1.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Operations Head (pending)
     change: First issue for BDOI review; aligned with the as-built Operations modules and the cross-BRD decisions
+  - version: "1.1"
+    date: 26 Sep 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Solution Architect
+    approver: BDOI Product Owner (pending)
+    change: "BDOI drop plan and integration names of 26-Sep-2026: payment channels OBPCS, Old BOB, PMS and TFS on the payment-file handlers (FR-OP-015); reinsurance transactions through Remittance in Drop 1, reinsurance module in phase 2 (introduction of the Remittance section); Production Reconciliation tested in Drop 2"
 distribution:
   - {name: "Head, Operations Services", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Cashiering Head Office and Branches", role: Business user, organisation: BDOI, purpose: Review of the Cashiering FRs}
@@ -81,7 +87,7 @@ Operations takes over every invoice booked in New Business (BRD-1) and follows i
 | R5 | Operations build design | current | `docs/architecture/OPERATIONS_DESIGN.md` |
 | R6 | Operations module guide (as built) | current | `docs/modules/OPERATIONS.md` |
 | R7 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R8 | FRS BRD-1 New Business and FRS BRD-3 Product Maintenance (booking, catalogue, shared platform) | v1.0 | `docs/deliverables/out/FRS/` |
+| R8 | FRS BRD-1 New Business and FRS BRD-3 Product Maintenance (booking, catalogue, shared platform) | v1.0 | `docs/deliverables/out/*/FRS/` |
 
 Page references in this document ("p.23") are pages of the BRD-2 PDF (R1, R2). The annex pages 121-132 are scanned; the report and endorsement slip lists of the annex are quoted from those pages.
 
@@ -923,6 +929,7 @@ screens: Payment Uploads (Bulk Upload wizard, run summary); Cashiering Setup (la
 api: /api/v1/bulk (handlers PAY_BILLS, PAY_TRADE, PAY_CLPC, PAY_DIRECT_CREDIT, PAY_PDC); GET / PUT .../layouts/{code}
 description:
   - "The cashier uploads the payment files of the channels: Bills Payment (TXT FS01 from IT-DCO), Trade (TXT from CIB), CLPC (Excel), Direct Credit (TXT FS01/04) and the PDC list (Excel). Each row becomes a payment with its AR, is matched and applied (FR-OP-018), and the run summary shows applied, unapplied, pre-booked, excess and failed rows (FR-OP-008)."
+  - "BDOI named the channel systems on 26-Sep-2026 (Drop 0 integrations): Bills Payment is the OBPCS file (Online Bills Payment Consolidation System); Direct Credit carries the Old BOB funds-transfer collections of statements of account (or a layout of its own); the PDC list comes from PMS (PDC Management System); Trade payments come from TFS (Trade Finance System) by manual upload. The purpose of AFTS (Automatic Fund Transfer System) is not yet explained (IQ10). Outgoing payments through CMS / New BOB belong to Disbursement (BRD-5)."
   - Each uploaded file is stored read-only with its SHA-256; the same file cannot be uploaded twice. Unmatched payments go to the unapplied premium bucket.
   - The layout of each handler is kept in Cashiering Setup (AUTO for Excel / CSV / detected TXT, DELIMITED with a separator, or FIXED_WIDTH as Header:start:length). Until BDOI gives the bank layouts, the delimited layouts use the BRD field names (section 9.2).
 preconditions:
@@ -1473,6 +1480,8 @@ acceptance:
 ## Remittance
 
 Remittance extracts what clients paid, groups it into batches per insurer and type, gets the batches approved, asks Disbursement to pay the insurer and records the insurer's OR. API paths of this section are under `/api/v1/remittance`.
+
+**Reinsurance transactions (BDOI answer of 26-Sep-2026).** Remittance handles the reinsurance transactions in Drop 1; the reinsurance module is phase 2. A reinsurer or reinsurance broker is set up as a counterparty and its payable follows the extraction, batch, hold, approval and payment steps of this section, with the same accounting. Which reinsurance transactions are in scope and the "Remittance Addendum" named in the drop plan are not yet defined (IQ20); no treaty or cession processing is in Drop 1.
 
 ```fr
 id: FR-OP-030
@@ -2416,6 +2425,8 @@ acceptance:
 ## Production Reconciliation
 
 Production Reconciliation sends each insurer a register of the accounts BDOI booked with it, takes in the insurer's answer, matches both sides and follows every difference to closure. The work is organised in cycles: one open cycle per insurer and production month (workflow OPS_RECON, section 5). API paths of this section are under `/api/v1/prodrecon`.
+
+BDOI places Production Reconciliation in **Drop 2** (drop plan of 26-Sep-2026): it is built with Operations and is tested and signed off in the Drop 2 SIT and UAT. The deliverables index of Drop 2 points to this chapter.
 
 ```fr
 id: FR-OP-070
@@ -3785,6 +3796,7 @@ Figure 12 shows the interfaces of Operations. The modules exchange data only thr
 | COLLECTION_DP_RETURNED, COLLECTION_REFUND | Out | Rejected DP accounts; refunds | CMRID.009; CSHID.024 | BUILT |
 | DISBURSEMENT_REQUEST / _STATUS | Out / In | Payment requests; DV and status (in-app queue) | RMTID.034; DBMID.001 | SUPERSEDED |
 | Shared drive (FileDropPort) | Out | Extract files | RMTID.001; PRCID.005 | PARKED |
+| OBPCS, Old BOB, PMS, TFS (BDOI channels, Drop 0) | In (upload) | Bills payment, SOA funds-transfer, PDC and Trade payment files on the handlers PAY_BILLS, PAY_DIRECT_CREDIT, PAY_PDC, PAY_TRADE | CSHID.008 | CONFIGURE |
 | MarketingFeed, ClaimsFeed | In | Marketing data; claims for special remittance | BRQID.004; MKTID.009 | PARKED |
 
 SUPERSEDED means built as a seam in Operations, with the replacement designed in BRD-4 Collections or BRD-5 Accounting and Disbursement (R4). PARKED means the transport waits for BDOI's specification (OQ17, OQ45, OQ46).
@@ -3926,6 +3938,8 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | OQ01 | Systems of BRQID.004 (Collection, Accounting, Disbursement, Marketing, Claims): interface, data, frequency | FR-OP-130 | PARTIAL |
 | OQ02 | Disbursement: payload, DV numbers and statuses | FR-OP-120 | ANSWERED |
 | OQ03 / OQ04 | Payment file layouts; file encryption | FR-OP-015 | OPEN |
+| IQ09 / IQ10 / IQ14 | PMS, OBPCS, Old BOB, AFTS and TFS: layouts, direction, frequency and transport (programme alignment) | FR-OP-015 | OPEN |
+| IQ20 | Reinsurance transactions handled by Remittance in Drop 1; the Cashiering and Remittance addenda named in the drop plan (programme alignment) | FR-OP-030 to 041 | OPEN |
 | OQ05 | Receipt series and BIR ATP | FR-OP-010 | OPEN |
 | OQ06 | Approvers of cancellations and reinstatements | FR-OP-013, 014 | OPEN |
 | OQ07 | Chart of accounts and default entries | FR-OP-027; section 5.3 | PARTIAL |

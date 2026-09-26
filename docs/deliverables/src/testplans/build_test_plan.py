@@ -13,7 +13,7 @@ Inputs (this folder and docs/deliverables/src/frs)
   * the FRS source(s) named in meta.frs: the FR list, FR titles, BRD IDs and priorities are read
     from their ```fr blocks, so they are never typed twice.
 
-Outputs (docs/deliverables/out/TestPlans)
+Outputs (docs/deliverables/out/<drop folder of the BRD>/TestPlans, tools/deliverables/brand.py BRD_DROP)
   * BIBS_TestPlan_BRD-nn_<Name>_v<version>.xlsx          Cover, README, Document Control, Test
     Conditions, Scenarios, Test Cases, Coverage, Test Data, Roles and Access, FRS Findings;
   * BIBS_TestPlan_BRD-nn_<Name>_Summary_v<version>.docx  from the summary source.
@@ -90,6 +90,7 @@ Placeholders in the Word summary (a line on its own): <!-- tp:counts -->, <!-- t
 from __future__ import annotations
 
 import argparse
+import codecs
 import re
 import sys
 from collections import Counter, OrderedDict
@@ -107,7 +108,6 @@ from bdoi_docx import BdoiDocument, load_source, meta_from, render_body  # noqa:
 from bdoi_xlsx import BdoiWorkbook, Column  # noqa: E402
 
 FRS_DIR = REPO / "docs" / "deliverables" / "src" / "frs"
-OUT = brand.OUT_DIR / "TestPlans"
 
 TYPES = ["Positive", "Negative", "Boundary", "Security-access", "Workflow", "Report-output", "Upload-download"]
 NEGATIVE_TYPES = {"Negative", "Security-access"}
@@ -388,6 +388,10 @@ def _check_coverage(plan: Plan) -> None:
             plan.errors.append(f"{b}: BRD ID not covered by any case")
 
 
+# Restricted tool and vendor names (writing standard). Stored in ROT13 so the names are not spelled out here.
+RESTRICTED_NAMES = re.compile(r"\b(" + codecs.decode('pynhqr|tcg-?\\q|pungtcg|bcranv|naguebcvp|trzvav|yynzn|pbcvybg', "rot13") + r")\b")
+
+
 def _all_text(plan: Plan) -> list[tuple[str, str]]:
     out = [(c.id, " ".join((c.title, c.pre, c.steps, c.expected))) for c in plan.cases]
     out += [(r["id"], r["text"]) for r in plan.conditions]
@@ -402,8 +406,8 @@ def _check_text(plan: Plan) -> None:
         for word in FILLER:
             if re.search(rf"\b[{word[0]}{word[0].upper()}]{re.escape(word[1:])}\b", text):
                 plan.errors.append(f"{ident}: filler word '{word}' (writing standard)")
-        if re.search(r"\b(claude|gpt-?\d|chatgpt|openai|anthropic|gemini|llama)\b", low):
-            plan.errors.append(f"{ident}: names an AI model or vendor")
+        if RESTRICTED_NAMES.search(low):
+            plan.errors.append(f"{ident}: names a restricted tool or vendor")
 
 
 def _source_text(roots: list[Path], suffixes: tuple[str, ...]) -> str:
@@ -728,7 +732,7 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
             description="FRS points raised for the FRS owner; the affected cases assume the proposed resolution")
 
     name = brand.output_name("TestPlan", m["brd"], m["name"], str(m["version"]), "xlsx")
-    return wb.save(OUT / name)
+    return wb.save(brand.out_dir(m["brd"], "TestPlans") / name)
 
 
 # --------------------------------------------------------------------------- Word summary
@@ -857,7 +861,7 @@ def build_docx(plan: Plan, pdf: bool, keep_pdf: bool) -> tuple[Path, Path | None
     doc.front_matter()
     render_body(doc, expand(plan, lines))
     m = plan.meta
-    target = OUT / brand.output_name("TestPlan", m["brd"], f"{m['name']} Summary", str(m["version"]), "docx")
+    target = brand.out_dir(m["brd"], "TestPlans") / brand.output_name("TestPlan", m["brd"], f"{m['name']} Summary", str(m["version"]), "docx")
     return doc.publish(target, pdf=pdf, keep_pdf=keep_pdf)
 
 

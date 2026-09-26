@@ -494,6 +494,31 @@ SUBMITTED(BIR_CERT_SUBMIT) --acknowledge(BIR_CERT_ACK)--> ACKNOWLEDGED ; SUBMITT
 | Comptrollership exchange-rate table | CSHID.012-014 | Rate type BOOK maintained in the currency master (upload) | OQ08 |
 | Bank clearing status for checks | RMTID.017/018 | Cleared = bank reconciliation match or manual clear with reason | OQ20 |
 
+**BDOI channel names (Drop 0 integrations, 26-Sep-2026; `PROGRAMME_ALIGNMENT.md` section 5).** The payment-file
+handlers of section 9 carry these channels; each is a layout row of the handler, confirmed with BDOI IT (IQ09, IQ10,
+IQ14, register DCR-234):
+
+| BDOI system | Handler | Note |
+|---|---|---|
+| OBPCS - Online Bills Payment Consolidation System (today "Bills Payment FS01") | `PAY_BILLS` | Consolidated bills-payment collections; automatch as today (INT-08) |
+| Old BOB - Old Business Online Banking Collection System (SOA bills payments by funds transfer) | `PAY_DIRECT_CREDIT`, or a new layout row | SOA-to-invoice matching if the file carries the SOA number only (INT-09) |
+| PMS - PDC Management System | `PAY_PDC` | Daily PDC list; maturity job `PDC_MATURITY` (INT-06) |
+| TFS - Trade Finance System (manual) | `PAY_TRADE` | Trade client payments; no system interface (INT-15) |
+| CLPC billing (HL-LOAS amortised loans) | `PAY_CLPC` | Admin side of HL-LOAS (INT-04) |
+| AFTS - Automatic Fund Transfer System | to confirm | Purpose not explained (IQ10) |
+| CMS / New BOB - Cash Management System, outward payments | Disbursement, not Cashiering | ACCOUNTING_DISBURSEMENT_DESIGN section 13 (INT-07) |
+
+"CMS" on the BDOI slide means Cash Management System; in the Operations and Collections specs CMS is the Collection
+Management System (BDOI_CROSS_BRD_DECISIONS glossary).
+
+**Reinsurance transactions through Remittance (Drop 1; BDOI answer A3).** The reinsurance module is phase 2
+(`ReInsurance (Phase 2).PDF`). Until then the reinsurance transactions of Drop 1 go through `remittance`: a reinsurer or
+reinsurance broker is a counterparty of party type REINSURER / RI_BROKER, and its payable is extracted, batched, held
+and paid like an insurer remittance (types NORMAL_PHP / NORMAL_USD / SPECIAL), with the same GL events. Which
+reinsurance transactions (facultative placements, premium to reinsurers, commission from reinsurers) and their
+accounting are not defined, nor is the "Remittance Addendum" named on the slide (IQ20; register DCR-210, DCR-215). No
+treaty or cession logic is built in Drop 1.
+
 ## 9. Bulk handlers (`bulk.service.BulkImportHandler`)
 
 | Code | Module | Permission | Purpose |

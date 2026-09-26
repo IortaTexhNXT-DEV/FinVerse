@@ -22,7 +22,7 @@ so each document can be regenerated after every build.
 | 1 | Functional Requirements Specification (FRS), one per BRD | Word | A | BRD, spec, design |
 | 2 | BRD discrepancy, conflict, impact and clarification register | Excel | A | specs (observations and questions), cross-BRD decisions |
 | 3 | Test plan per BRD: test conditions, scenarios, positive and negative test cases | Excel + Word summary | A | FRS |
-| 4 | Bill of materials (infrastructure and technology), coding and quality standards | Word + Excel | A | `pom.xml`, `package.json`, deployment files, hosting appendix |
+| 4 | Bill of materials (infrastructure and technology), coding and quality standards | Word + Excel | A | `pom.xml`, `package.json`, deployment files, hosting appendix; the BDOI IER workbook v20 and its comparison with BIBS (item 42, section 6); the architecture option [`ARCHITECTURE_OPTION_DECISION.md`](../architecture/ARCHITECTURE_OPTION_DECISION.md) (BIBS modular monolith with the IER enterprise elements, awaiting BDOI confirmation) |
 | 5 | Fit-gap per module | Excel | B | specs and traceability, updated after build |
 | 6 | Menu, screens, fields and roles workbook for client concurrence | Excel | B | `navigation/modules.ts`, screens, permissions, roles |
 | 7 | End-to-end deck by persona: actor, role, usage, expected outcome, observation, screenshots | PowerPoint | B | demo walkthrough and screenshots |
@@ -30,7 +30,7 @@ so each document can be regenerated after every build.
 | 9 | Professional BDO theme on every screen and document; plain, specific wording | all | A + B | UX guidelines, writing standard |
 | 10 | Every function works: CRUD, upload and download (with templates), document prints, schedules, reports; output checked | test evidence | B | test runs and output samples |
 | 11 | Data dictionary | Excel | B | database schema, entity Javadoc |
-| 12 | Technical and deployment architecture, with diagrams | Word | A (refreshed in B) | code, deployment files, hosting appendix |
+| 12 | Technical and deployment architecture, with diagrams | Word | A (refreshed in B) | code, deployment files, hosting appendix; the IER-aligned diagrams and Kubernetes sizing of item 42; [`ARCHITECTURE_OPTION_DECISION.md`](../architecture/ARCHITECTURE_OPTION_DECISION.md); deployment view in [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) |
 | 13 | Persona-based manual end-to-end test: where each persona gets stuck | Excel + findings report | B | manual run with data entry |
 | 14 | Persona-based menus: each user sees only their screens | verified in the platform | B | permissions audit and tests |
 | 15 | Notifications and workflows per role | test evidence | B | workflow and notification tests |
@@ -49,9 +49,9 @@ so each document can be regenerated after every build.
 | 23 | System administration and configuration guide (masters, parameters, roles, jobs) | Word | B |
 | 24 | Operations and production support runbook (L1 / L2 / L3, incident playbooks, logs, jobs, restart and recovery) | Word | B |
 | 25 | Installation and deployment guide (environments, configuration, secrets, releases) | Word | B |
-| 26 | Security and data-protection controls mapping (hosting appendix, masking of non-production data, access, audit) | Word + Excel | A + B |
+| 26 | Security and data-protection controls mapping (hosting appendix, masking of non-production data, access, audit; EIAM and UIDM-ISC, S3 encryption with BDOI keys, Object Lock and legal hold from item 42 and [`DOCUMENT_STORAGE_DECISION.md`](../architecture/DOCUMENT_STORAGE_DECISION.md)) | Word + Excel | A + B |
 | 27 | Code quality report (static analysis, coverage, dependency and licence scan) | Excel | B |
-| 28 | Performance and volume test plan and results (against the NFRs of each BRD; the peak case is 429 concurrent sessions, the sum of the user rows of the Core Replacement umbrella BRD p.42, until BDOI answers DCR-166 / CRQ21) | Word + Excel | B |
+| 28 | Performance and volume test plan and results (against the NFRs of each BRD; the peak case is 429 concurrent sessions, the sum of the user rows of the Core Replacement umbrella BRD p.42, until BDOI answers DCR-166 / CRQ21; the environments and Kubernetes sizing follow the IER workbook as corrected in item 42, section 6.4, and the test runs on Pre-Prod in Nov - Dec 2027) | Word + Excel | B |
 | 29 | Data migration approach (legacy EBIX, ISYS, QPS and Excel sources, reconciliation). Sources: the BRD-13 spec [`BDOI_DM_BRD_SPEC.md`](../requirements/BDOI_DM_BRD_SPEC.md), the design [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md), the FRS [`FRS_BRD13_DATA_MIGRATION.md`](src/frs/FRS_BRD13_DATA_MIGRATION.md) and the migration document set in [`src/migration/`](src/migration/); the umbrella BRD's client-migration volumes (BRD-00 p.43) | Word | A |
 | 30 | UAT plan and sign-off forms per BRD | Word | B |
 | 31 | Release notes and open-questions log for BDOI | Word + Excel | B |
@@ -70,6 +70,7 @@ so each document can be regenerated after every build.
 | 39 | Training material per department (quick-reference cards and walkthroughs), derived from the user manuals | Word + PowerPoint | B |
 | 40 | Accessibility and browser support statement (WCAG 2.1 AA checks on the main screens) | Word | B |
 | 41 | Business process deck: As-Is, Envisioned (BIBS), gaps and best practice per business area, plus the holistic enterprise view (current, envisioned, best practice) | PowerPoint | A (refreshed in B) |
+| 42 | Programme alignment: BDOI drops, timeline, integrations and infrastructure (Word), with the integration inventory (Excel) and the IER-aligned architecture diagrams. Analysis [`PROGRAMME_ALIGNMENT.md`](../architecture/PROGRAMME_ALIGNMENT.md); source `src/alignment/` | Word + Excel + PNG | A |
 
 ## FRS with annotated screenshots (FRS v1.1)
 
@@ -93,7 +94,24 @@ so each document can be regenerated after every build.
 5. NFR evidence (item 37), architecture conformance to the client BOM (item 4, including Redis and Kafka), and the code-quality report (item 27).
 6. UAT per department with sign-off (item 30). Production readiness means the runbook, observability, alerts and error catalogue are in place (items 24, 35 and 38).
 
+## Document status and the final as-built refresh
+
+Every status marker in the documents reflects the date shown on the document and is **provisional until the platform
+is complete**: Built, Built with parked item, Designed, Not built; the fit classes (FIT, CONFIGURE, CHANGE, NEW, OUT);
+the "as built" sections of the designs; the automation references of the test plans; and every count. Each document's
+cover or document-control table carries "Status as of <date>".
+
+When the end-to-end build is finished, one **final as-built refresh** brings every document to the real state of the
+platform: the specs, designs, FRS, test plans, register, alignment pack, migration pack, module guides and the RTM. Each
+document's version is bumped and the superseded versions are deleted from `out/`, so only current documents remain and
+nobody refers to an old one. The refresh is step 12 of the UAT readiness programme below and comes before the readiness
+statement.
+
 ## UAT readiness programme (after the end-to-end build)
+
+BDOI dates: UAT readiness statement for Drop 1 (end to end) by **30-Jul-2027** (UAT Aug - Dec 2027), for Drop 2 by
+**30-Sep-2027** (UAT Oct - Nov 2027); UAT plans and sign-off forms (item 30) by 16-Jul-2027; UAT runs on migrated, masked
+data from Mock 3 (Aug 2027). Source: item 42, section 4.
 
 The platform goes to BDOI UAT only when every item below is complete and evidenced. Each step is run through the
 screens with data keyed field by field, not only through automated tests. Every result is recorded against the
@@ -172,6 +190,11 @@ Its summary is the UAT readiness statement per module and for the platform.
 - a defect triage and retest cycle with severity rules;
 - UAT entry and exit criteria and the sign-off forms (item 30).
 
+**12. Final as-built refresh of the document set** (section "Document status and the final as-built refresh"). Every
+spec, design, FRS, test plan, register, alignment pack, migration pack, module guide and the RTM is updated to the
+platform as built, re-issued with a new version and "Status as of" date, and the superseded versions are deleted. The
+readiness statement cites only these versions.
+
 **Exit.** Every requirement has been tested and passed, or has an agreed disposition with BDOI; no open Critical or High
 defect remains. The readiness statement is then issued for BDOI to approve the move into UAT.
 
@@ -186,19 +209,45 @@ defect remains. The readiness statement is then issued for BDOI to approve the m
 ## Toolkit and status
 
 Toolkit: [`tools/deliverables/`](../../tools/deliverables/README.md) (Word, Excel and PowerPoint builders, PDF and
-page previews). Sources: `docs/deliverables/src/`; outputs: `docs/deliverables/out/`, named
+page previews). Sources: `docs/deliverables/src/`; outputs: `docs/deliverables/out/<drop folder>/<kind>/`, named
 `BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>`.
 
-| # | Document | Status |
-|---|---|---|
-| 1 | FRS, one per BRD (BRD-5 in two volumes with a cover note) | v1.0 issued for BDOI review: `out/FRS/`, 16 Word files: the BRD-00 Core Replacement umbrella, BRD-1 to BRD-13 (BRD-13 Data Migration added) and the BRD-5 cover note. The Claims FRS numbers its requirements FR-CM-nnn (renumbered from FR-CL-nnn, which Collections keeps; DCR-188) |
-| 2 | Discrepancy and clarification register | v1.1: `out/Registers/BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.1.xlsx`: 209 items (BRD-00 Core Replacement DCR-163 to DCR-188, BRD-13 Data Migration DCR-189 to DCR-209 added) and 410 questions (CRQ01-CRQ25, DMQ01-DMQ35, XQ12-XQ13 added) |
-| 3 | Test plans, one per FRS volume | v1.0: `out/TestPlans/`, 14 workbooks and 14 Word summaries (BRD-1 to BRD-13, BRD-5 in two volumes); builder `src/testplans/build_test_plan.py`. The Claims plan uses case IDs keyed on FR-CM. Not yet written: the cross-cutting FR-CR requirements of BRD-00 |
-| 17 | Reports in Excel and PDF; documents and schedules in Word and PDF | Built in the platform (`ExportFormat.DOCX`, document renditions); see Developer Guide 6.1-6.2 |
-| 41 | Business process deck | v1.0: `out/Decks/BIBS_Deck_BRD-00_Business_Process_AsIs_Envisioned_BestPractice_v1.0.pptx` |
-| 29 | Data migration (BRD-13) | v1.0: Strategy and Approach (47 pages), Data Requirements Workbook (31 data objects, 27 extract layouts, 335 fields, 46 data-quality rules), Cutover Runbook and Task Plan (75 tasks, T-30 to T+30), Reconciliation Approach and Sign-off, in `out/Migration/`; source `src/migration/` |
-| 20 | Upload and download templates | Migration extract templates: `out/Migration/templates/` (27 layouts and the control file). Platform upload and download templates follow after the build |
-| 3 | Test plan BRD-13 Data Migration | v1.0: `out/TestPlans/BIBS_TestPlan_BRD-13_Data_Migration_v1.0.xlsx` and summary (138 cases) |
+### Deliverables by drop
+
+BDOI keeps the BRDs, FRS, test plans and other collaterals grouped under its drops (answer A5 of 26-Sep-2026; drop plan
+[`BDOI_DROP_PLAN.md`](../source-documents/BDOI_DROP_PLAN.md); map in
+[`PROGRAMME_ALIGNMENT.md`](../architecture/PROGRAMME_ALIGNMENT.md) section 2.3). Each drop folder has an index
+`README.md` that lists every document with its BRD, version and the BDOI dates of the drop.
+
+| Drop folder | BRDs (primary drop) | BDOI dates | Index |
+|---|---|---|---|
+| `out/Drop-0_Setup_and_Data_Migration/` | BRD-3 Product Maintenance, BRD-11 User Access Maintenance, BRD-13 Data Migration (FRS, test plan, migration pack and templates) | Setup with the Drop 1 requirements; migration requirements Sep - Nov 2026, build Nov 2026 - Mar 2027, SIT Apr - Jul 2027, UAT Aug - Oct 2027, cut-over Nov 2027 - Jan 2028 | [README](out/Drop-0_Setup_and_Data_Migration/README.md) |
+| `out/Drop-1_Transactional/` | BRD-1, BRD-2, BRD-4, BRD-5 (three documents), BRD-6, BRD-9, BRD-10 (proposed), BRD-12 | Requirements Sep - Nov 2026, build Nov 2026 - Feb 2027, SIT Jan - Jul 2027, UAT Aug - Dec 2027 | [README](out/Drop-1_Transactional/README.md) |
+| `out/Drop-2_Independent/` | BRD-7 Claims, BRD-8 Employee Benefits | Requirements Dec 2026 - Feb 2027, build Mar - Apr 2027, SIT Jul - Sep 2027, UAT Oct - Nov 2027 | [README](out/Drop-2_Independent/README.md) |
+| `out/Programme/` | BRD-00: umbrella FRS, register, process deck, alignment pack and IER diagrams; UAT readiness | Performance and penetration test Nov - Dec 2027, ORR / PRR Dec 2027 - Jan 2028, go-live January 2028 | [README](out/Programme/README.md) |
+
+A BRD that spans drops lives in its primary drop, and the index of the other drop points to it (no copies): BRD-2
+Production Reconciliation and BRD-4 Marketing Collection extraction (Drop 2), BRD-3 quotation and BRD-8 EB placement and
+reports (Drop 1), BRD-1 client onboarding and BRD-5 GL accounts (Drop 0), BRD-13 legacy invoices (Drop 1), BRD-9 service
+requests and BRD-10 Bridger Insight (Drop 2). The builders take the folder from the drop map in
+`tools/deliverables/brand.py` (`BRD_DROP`), so a rebuild lands in the drop folder; `python
+tools/deliverables/drop_index.py` regenerates the four indexes.
+
+### Status
+
+| # | Document | Drop | Status |
+|---|---|---|---|
+| 1 | FRS, one per BRD (BRD-5 in two volumes with a cover note) | Drop of each BRD (BRD-00: Programme) | v1.0 issued for BDOI review, BRD-2, BRD-6, BRD-11 and BRD-13 at v1.1 (programme alignment and BDOI answers of 26-Sep-2026): the `FRS/` folder of each drop, 16 Word files: the BRD-00 Core Replacement umbrella, BRD-1 to BRD-13 (BRD-13 Data Migration added) and the BRD-5 cover note. The Claims FRS numbers its requirements FR-CM-nnn (renumbered from FR-CL-nnn, which Collections keeps; DCR-188) |
+| 2 | Discrepancy and clarification register | Programme | v1.2: `out/Programme/Registers/BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`: 239 items (programme alignment DCR-210 to DCR-235 and Data Migration v1.1 DCR-240 to DCR-243 added; DCR-236 to DCR-239 not used; DCR-135 answered by the IER) with a Drop column, and 453 questions (IQ01-IQ35 of the programme alignment and DSQ01-DSQ04 of the document storage decision added; DMQ25-DMQ26, DMQ36-DMQ39 answered) |
+| 3 | Test plans, one per FRS volume | Drop of each BRD | v1.0 (BRD-6 and BRD-13 at v1.1): the `TestPlans/` folder of each drop, 14 workbooks and 14 Word summaries (BRD-1 to BRD-13, BRD-5 in two volumes); builder `src/testplans/build_test_plan.py`. The Claims plan uses case IDs keyed on FR-CM. Not yet written: the cross-cutting FR-CR requirements of BRD-00 |
+| 3 | Test plan BRD-13 Data Migration | Drop 0 | v1.1: `out/Drop-0_Setup_and_Data_Migration/TestPlans/BIBS_TestPlan_BRD-13_Data_Migration_v1.1.xlsx` and summary (152 cases) |
+| 17 | Reports in Excel and PDF; documents and schedules in Word and PDF | All (platform) | Built in the platform (`ExportFormat.DOCX`, document renditions); see Developer Guide 6.1-6.2 |
+| 20 | Upload and download templates | Drop 0 (migration templates) | Migration extract templates: `out/Drop-0_Setup_and_Data_Migration/Migration/templates/` (27 layouts and the control file). Platform upload and download templates follow after the build |
+| 29 | Data migration (BRD-13) | Drop 0 | v1.1 (BDOI timeline, go-live January 2028): Strategy and Approach (52 pages), Data Requirements Workbook (31 data objects, 27 extract layouts, 352 fields, 51 data-quality rules), Cutover Runbook and Task Plan (75 tasks, T-30 to T+30), Reconciliation Approach and Sign-off, in `out/Drop-0_Setup_and_Data_Migration/Migration/`; FRS BRD-13 v1.1 (80 pages); source `src/migration/` |
+| 41 | Business process deck | Programme | v1.0: `out/Programme/Decks/BIBS_Deck_BRD-00_Business_Process_AsIs_Envisioned_BestPractice_v1.0.pptx` |
+| 42 | Programme alignment and integration inventory | Programme | v1.0: `out/Programme/Alignment/BIBS_Alignment_BRD-00_Drops_Integrations_Infrastructure_v1.0.docx`, `BIBS_Alignment_BRD-00_Integration_Inventory_v1.0.xlsx` (20 integrations) and the IER diagrams in `out/Programme/Alignment/IER/`; source `src/alignment/` |
+
+Edits still owed to documents that the build teams are editing: [`PENDING_EDITS.md`](PENDING_EDITS.md).
 
 ### Carried into FRS v1.1
 

@@ -1,6 +1,5 @@
 package com.iortatechnxt.brokerverse.screening.matching.domain;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -54,34 +53,20 @@ public interface ScreeningMatchRepository extends JpaRepository<ScreeningMatch, 
   /**
    * Searches the matches of a company (Matches screen, FR-SS-032).
    *
-   * @param companyId company
-   * @param status status, {@code null} for all
-   * @param listType list type, {@code null} for all
-   * @param minScore lowest score, {@code null} for no bound
-   * @param maxScore highest score, {@code null} for no bound
-   * @param like lower-case pattern on the client name or code or the entry name, {@code %} for all
-   * @param uncased true for matches not yet in a case only
+   * @param f criteria
    * @param pageable page
    * @return matches
    */
   @Query(
-      "select m from ScreeningMatch m where m.companyId = :companyId"
-          + " and (:status is null or m.status = :status)"
-          + " and (:listType is null or m.listType = :listType)"
-          + " and (:minScore is null or m.score >= :minScore)"
-          + " and (:maxScore is null or m.score <= :maxScore)"
-          + " and (lower(m.clientName) like :like or lower(m.clientCode) like :like"
-          + " or lower(m.entryName) like :like)"
-          + " and (:uncased = false or m.caseId is null)")
-  Page<ScreeningMatch> search(
-      @Param("companyId") Long companyId,
-      @Param("status") MatchStatus status,
-      @Param("listType") String listType,
-      @Param("minScore") BigDecimal minScore,
-      @Param("maxScore") BigDecimal maxScore,
-      @Param("like") String like,
-      @Param("uncased") boolean uncased,
-      Pageable pageable);
+      "select m from ScreeningMatch m where m.companyId = :#{#f.companyId()}"
+          + " and (:#{#f.status()} is null or m.status = :#{#f.status()})"
+          + " and (:#{#f.listType()} is null or m.listType = :#{#f.listType()})"
+          + " and (:#{#f.minScore()} is null or m.score >= :#{#f.minScore()})"
+          + " and (:#{#f.maxScore()} is null or m.score <= :#{#f.maxScore()})"
+          + " and (lower(m.clientName) like :#{#f.like()} or lower(m.clientCode) like :#{#f.like()}"
+          + " or lower(m.entryName) like :#{#f.like()})"
+          + " and (:#{#f.uncased()} = false or m.caseId is null)")
+  Page<ScreeningMatch> search(@Param("f") MatchSearch f, Pageable pageable);
 
   /**
    * Counts the matches of a company in a status not yet in a case (Screening Home tile).

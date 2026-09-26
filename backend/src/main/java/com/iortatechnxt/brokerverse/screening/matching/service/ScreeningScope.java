@@ -51,7 +51,7 @@ public class ScreeningScope {
     List<ClientStatus> statuses = new ArrayList<>();
     for (String item : parameters.items(PARAMETER)) {
       for (ClientStatus s : ClientStatus.values()) {
-        if (s.name().equalsIgnoreCase(item.trim()) && s != ClientStatus.INACTIVE) {
+        if (s.name().equals(item.trim()) && s != ClientStatus.INACTIVE) {
           statuses.add(s);
         }
       }

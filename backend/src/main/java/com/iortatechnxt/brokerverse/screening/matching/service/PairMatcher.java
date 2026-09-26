@@ -103,26 +103,43 @@ public final class PairMatcher {
       ListedEntry entry,
       MatchCriteria.Rule rule,
       Set<MatchField> fields) {
-    double delta = 0;
-    if (rule.fields().contains(MatchField.BIRTH_DATE)
-        && subject.birthDate() != null
-        && entry.birthDate() != null) {
-      boolean same = subject.birthDate().equals(entry.birthDate());
-      delta += same ? BIRTH_DATE_BONUS : -BIRTH_DATE_PENALTY;
-      addIf(fields, same, MatchField.BIRTH_DATE);
-    }
-    if (rule.fields().contains(MatchField.NATIONALITY)
-        && present(subject.nationality())
-        && present(entry.nationality())) {
-      boolean same = normal(subject.nationality()).equals(normal(entry.nationality()));
-      delta += same ? NATIONALITY_BONUS : -NATIONALITY_PENALTY;
-      addIf(fields, same, MatchField.NATIONALITY);
-    }
+    double delta =
+        birthDate(subject, entry, rule, fields) + nationality(subject, entry, rule, fields);
     if (rule.fields().contains(MatchField.ID) && sharesId(subject, entry)) {
       delta += ID_BONUS;
       fields.add(MatchField.ID);
     }
     return delta;
+  }
+
+  private static double birthDate(
+      ScreeningSubject subject,
+      ListedEntry entry,
+      MatchCriteria.Rule rule,
+      Set<MatchField> fields) {
+    if (!rule.fields().contains(MatchField.BIRTH_DATE)
+        || subject.birthDate() == null
+        || entry.birthDate() == null) {
+      return 0;
+    }
+    boolean same = subject.birthDate().equals(entry.birthDate());
+    addIf(fields, same, MatchField.BIRTH_DATE);
+    return same ? BIRTH_DATE_BONUS : -BIRTH_DATE_PENALTY;
+  }
+
+  private static double nationality(
+      ScreeningSubject subject,
+      ListedEntry entry,
+      MatchCriteria.Rule rule,
+      Set<MatchField> fields) {
+    if (!rule.fields().contains(MatchField.NATIONALITY)
+        || !present(subject.nationality())
+        || !present(entry.nationality())) {
+      return 0;
+    }
+    boolean same = normal(subject.nationality()).equals(normal(entry.nationality()));
+    addIf(fields, same, MatchField.NATIONALITY);
+    return same ? NATIONALITY_BONUS : -NATIONALITY_PENALTY;
   }
 
   private static void addIf(Set<MatchField> fields, boolean condition, MatchField field) {

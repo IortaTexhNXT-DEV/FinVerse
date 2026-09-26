@@ -110,21 +110,17 @@ public class ScreeningTriggers {
    */
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void onEntriesChanged(WatchlistEntriesChanged event) {
-    List<ListedEntry> active =
-        safely("list " + event.cause(), () -> batch.rekeyEntries(event.entryIds()));
-    if (active == null || active.isEmpty()) {
-      return;
-    }
+    String what = "list " + event.cause();
+    List<ListedEntry> active = safely(what, () -> batch.rekeyEntries(event.entryIds()));
     Map<Long, List<Long>> candidates =
-        safely("list " + event.cause(), () -> batch.candidatesByCompany(active));
-    if (candidates == null) {
-      return;
+        active == null || active.isEmpty()
+            ? Map.of()
+            : safely(what, () -> batch.candidatesByCompany(active));
+    if (candidates != null) {
+      candidates.forEach(
+          (companyId, clientIds) ->
+              safely(what, () -> batch.screenChange(companyId, clientIds, active, event.cause())));
     }
-    candidates.forEach(
-        (companyId, clientIds) ->
-            safely(
-                "list " + event.cause(),
-                () -> batch.screenChange(companyId, clientIds, active, event.cause())));
   }
 
   private <T> T safely(String what, Supplier<T> work) {

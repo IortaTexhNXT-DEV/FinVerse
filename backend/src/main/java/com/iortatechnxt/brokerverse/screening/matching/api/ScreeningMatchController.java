@@ -4,20 +4,18 @@ import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.screening.matching.api.dto.FalsePositiveRequest;
 import com.iortatechnxt.brokerverse.screening.matching.api.dto.MatchDetail;
+import com.iortatechnxt.brokerverse.screening.matching.api.dto.MatchQuery;
 import com.iortatechnxt.brokerverse.screening.matching.api.dto.MatchRow;
 import com.iortatechnxt.brokerverse.screening.matching.api.dto.RunDto;
-import com.iortatechnxt.brokerverse.screening.matching.domain.MatchStatus;
 import com.iortatechnxt.brokerverse.screening.matching.domain.ScreeningMatch;
 import com.iortatechnxt.brokerverse.screening.matching.domain.ScreeningTrigger;
 import com.iortatechnxt.brokerverse.screening.matching.service.MatchCaseOpener;
 import com.iortatechnxt.brokerverse.screening.matching.service.MatchDecisionService;
 import com.iortatechnxt.brokerverse.screening.matching.service.ScreeningEngine;
 import com.iortatechnxt.brokerverse.screening.matching.service.ScreeningQueries;
-import com.iortatechnxt.brokerverse.screening.matching.service.ScreeningQueries.MatchFilter;
 import com.iortatechnxt.brokerverse.screening.matching.service.ScreeningResult;
 import com.iortatechnxt.brokerverse.screening.watchlist.service.WatchlistDirectory;
 import jakarta.validation.Valid;
-import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -78,36 +76,19 @@ public class ScreeningMatchController {
   /**
    * Searches matches (Matches screen, FR-SS-032), highest score first.
    *
-   * @param companyId company
-   * @param status status
-   * @param listType list type
-   * @param minScore lowest score
-   * @param maxScore highest score
-   * @param q client name or code, or entry name
-   * @param uncased only matches not yet in a case
-   * @param page page
-   * @param size size
+   * @param query company, filters and page
    * @return matches
    */
   @GetMapping("/matches")
   @PreAuthorize(HAS_VIEW)
-  public PageResponse<MatchRow> matches(
-      @RequestParam Long companyId,
-      @RequestParam(required = false) MatchStatus status,
-      @RequestParam(required = false) String listType,
-      @RequestParam(required = false) BigDecimal minScore,
-      @RequestParam(required = false) BigDecimal maxScore,
-      @RequestParam(required = false) String q,
-      @RequestParam(defaultValue = "false") boolean uncased,
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "25") int size) {
+  public PageResponse<MatchRow> matches(@Valid MatchQuery query) {
     return PageResponse.of(
         queries.matches(
-            companyId,
-            new MatchFilter(status, listType, minScore, maxScore, q, uncased),
+            query.companyId(),
+            query.filter(),
             PageRequest.of(
-                page,
-                Math.min(size, MAX_PAGE),
+                query.pageNumber(),
+                query.pageSize(MAX_PAGE),
                 Sort.by(Sort.Order.desc("score"), Sort.Order.desc("id")))),
         MatchRow::from);
   }

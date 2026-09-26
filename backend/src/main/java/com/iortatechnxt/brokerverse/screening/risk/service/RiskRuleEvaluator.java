@@ -4,9 +4,12 @@ import com.iortatechnxt.brokerverse.screening.config.domain.RiskAttribute;
 import com.iortatechnxt.brokerverse.screening.config.service.RiskRules;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Evaluates the risk rules of a configuration version for one client (SNSRP-102, 302; FR-SS-012 R1,
@@ -40,6 +43,16 @@ public final class RiskRuleEvaluator {
   public static final String PEP_TAG = "PEP";
 
   private static final String TRUE_MATCH = "TRUE_MATCH";
+
+  private static final Map<RiskAttribute, Function<ClientFacts, String>> CLIENT_ATTRIBUTES =
+      new EnumMap<>(
+          Map.of(
+              RiskAttribute.PEP, c -> c.tags().contains(PEP_TAG) ? TRUE : FALSE,
+              RiskAttribute.NATIONALITY, ClientFacts::nationality,
+              RiskAttribute.OCCUPATION, ClientFacts::occupation,
+              RiskAttribute.SOURCE_OF_FUNDS, ClientFacts::sourceOfFunds,
+              RiskAttribute.CLIENT_TYPE, ClientFacts::clientType,
+              RiskAttribute.MARKET_SEGMENT, ClientFacts::marketSegment));
 
   private RiskRuleEvaluator() {}
 
@@ -126,16 +139,8 @@ public final class RiskRuleEvaluator {
   }
 
   private static Set<String> clientValues(RiskAttribute attribute, ClientFacts client) {
-    String value =
-        switch (attribute) {
-          case PEP -> client.tags().contains(PEP_TAG) ? TRUE : FALSE;
-          case NATIONALITY -> client.nationality();
-          case OCCUPATION -> client.occupation();
-          case SOURCE_OF_FUNDS -> client.sourceOfFunds();
-          case CLIENT_TYPE -> client.clientType();
-          case MARKET_SEGMENT -> client.marketSegment();
-          default -> null;
-        };
+    Function<ClientFacts, String> reader = CLIENT_ATTRIBUTES.get(attribute);
+    String value = reader == null ? null : reader.apply(client);
     return value == null || value.isBlank() ? Set.of() : Set.of(value);
   }
 

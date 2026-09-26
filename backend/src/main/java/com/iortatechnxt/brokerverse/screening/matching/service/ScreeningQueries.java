@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.screening.matching.service;
 
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.screening.matching.domain.MatchSearch;
 import com.iortatechnxt.brokerverse.screening.matching.domain.MatchStatus;
 import com.iortatechnxt.brokerverse.screening.matching.domain.ScreeningMatch;
 import com.iortatechnxt.brokerverse.screening.matching.domain.ScreeningMatchRepository;
@@ -48,13 +49,14 @@ public class ScreeningQueries {
   public Page<ScreeningMatch> matches(Long companyId, MatchFilter filter, Pageable pageable) {
     String text = filter.text() == null ? "" : filter.text().trim().toLowerCase(Locale.ROOT);
     return matches.search(
-        companyId,
-        filter.status(),
-        blankToNull(filter.listType()),
-        filter.minScore(),
-        filter.maxScore(),
-        "%" + text + "%",
-        filter.uncased(),
+        new MatchSearch(
+            companyId,
+            filter.status(),
+            blankToNull(filter.listType()),
+            filter.minScore(),
+            filter.maxScore(),
+            "%" + text + "%",
+            filter.uncased()),
         pageable);
   }
 

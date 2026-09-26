@@ -131,6 +131,18 @@ public class RiskOverrideService {
   }
 
   private void validate(ManualRiskChange change) {
+    validateText(change);
+    if (change.riskRating() == null || !codes(RATING_LIST).contains(change.riskRating())) {
+      throw new BusinessRuleException("SCR_RISK_RATING_INVALID", "Select a valid risk rating");
+    }
+    Set<String> tags = codes(TAG_LIST);
+    if (!Stream.concat(change.addTags().stream(), change.removeTags().stream())
+        .allMatch(tags::contains)) {
+      throw new BusinessRuleException("SCR_RISK_TAG_INVALID", "Select valid client tags");
+    }
+  }
+
+  private static void validateText(ManualRiskChange change) {
     if (change.justification() == null || change.justification().isBlank()) {
       throw new BusinessRuleException(
           "SCR_JUSTIFICATION_REQUIRED", "Enter the justification of the change");
@@ -142,14 +154,6 @@ public class RiskOverrideService {
     if (change.evidenceAttachmentIds().isEmpty()) {
       throw new BusinessRuleException(
           "SCR_EVIDENCE_REQUIRED", "Attach at least one evidence document");
-    }
-    if (change.riskRating() == null || !codes(RATING_LIST).contains(change.riskRating())) {
-      throw new BusinessRuleException("SCR_RISK_RATING_INVALID", "Select a valid risk rating");
-    }
-    Set<String> tags = codes(TAG_LIST);
-    if (!Stream.concat(change.addTags().stream(), change.removeTags().stream())
-        .allMatch(tags::contains)) {
-      throw new BusinessRuleException("SCR_RISK_TAG_INVALID", "Select valid client tags");
     }
   }
 

@@ -165,6 +165,35 @@ public class MatchDecisionService {
       throw new AccessDeniedException("Changing the risk profile needs " + RISK_TAG);
     }
     ScreeningMatch match = get(matchId);
+    List<Long> evidence = evidence(matchId, request);
+    String justification = request.justification().trim();
+    match.clear(currentUser.username(), clock.instant(), justification);
+    suppress(match, justification, evidence, request.caseId());
+    audit.record(
+        MATCH_ENTITY,
+        matchId,
+        AuditAction.UPDATE,
+        describe(match, "false positive: " + justification));
+    Long entryId =
+        request.changesProfile()
+            ? overrides
+                .override(
+                    match.getClientId(),
+                    new ManualRiskChange(
+                        request.riskRating(),
+                        request.addTags(),
+                        request.removeTags(),
+                        justification,
+                        evidence,
+                        matchId,
+                        request.caseId(),
+                        MATCH_PREFIX + matchId))
+                .getId()
+            : null;
+    return new MatchDecision(ScreenedMatch.from(match), null, entryId);
+  }
+
+  private List<Long> evidence(Long matchId, FalsePositive request) {
     List<Long> evidence =
         request.evidenceAttachmentIds().isEmpty()
             ? attachments.list(new AttachmentTarget(MATCH_ENTITY, String.valueOf(matchId))).stream()
@@ -175,8 +204,11 @@ public class MatchDecisionService {
       throw new BusinessRuleException(
           "SCR_EVIDENCE_REQUIRED", "Attach at least one evidence document");
     }
-    String justification = request.justification().trim();
-    match.clear(currentUser.username(), clock.instant(), justification);
+    return evidence;
+  }
+
+  private void suppress(
+      ScreeningMatch match, String justification, List<Long> evidence, Long caseId) {
     if (!suppressions.existsByClientIdAndEntryIdAndEntryVersion(
         match.getClientId(), match.getEntryId(), match.getEntryVersion())) {
       suppressions.save(
@@ -184,31 +216,8 @@ public class MatchDecisionService {
               match,
               justification,
               evidence.stream().map(String::valueOf).collect(Collectors.joining(",")),
-              request.caseId()));
+              caseId));
     }
-    audit.record(
-        MATCH_ENTITY,
-        matchId,
-        AuditAction.UPDATE,
-        describe(match, "false positive: " + justification));
-    Long entryId = null;
-    if (request.changesProfile()) {
-      entryId =
-          overrides
-              .override(
-                  match.getClientId(),
-                  new ManualRiskChange(
-                      request.riskRating(),
-                      request.addTags(),
-                      request.removeTags(),
-                      justification,
-                      evidence,
-                      matchId,
-                      request.caseId(),
-                      MATCH_PREFIX + matchId))
-              .getId();
-    }
-    return new MatchDecision(ScreenedMatch.from(match), null, entryId);
   }
 
   /**

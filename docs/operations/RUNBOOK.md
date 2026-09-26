@@ -28,7 +28,7 @@ apply, for example, V27 on a database already at V975. `flyway_schema_history` r
 
 ## 3. Releases
 
-- CI (`.github/workflows/ci.yml`) must be green: all quality gates and tests.
+- The CI pipeline (`.gitlab-ci.yml`) must be green: all quality gates and tests.
 - Deploy with a rolling update (`maxUnavailable: 0`). New migrations are backward compatible with
   the previous release by rule (expand → migrate → contract across releases).
 - Rollback: redeploy the previous image. Never roll back a database migration by hand; fix

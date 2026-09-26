@@ -14,7 +14,7 @@
 | Transport & headers | TLS at ingress; CSP, X-Frame-Options, Referrer-Policy, nosniff; CORS allow-list | nginx.conf, `SecurityConfig` |
 | Secrets | Only from environment/secret store; no default admin credentials in production | `AdminBootstrap`, CONFIGURATION.md |
 | Logging | CR/LF neutralised (log forging); no passwords in logs (`toString` masked) | application.yml, DTOs |
-| Static analysis | SpotBugs + FindSecBugs, CodeQL, SonarJS | CI |
+| Static analysis | SpotBugs + FindSecBugs, SAST, SonarJS | CI pipeline |
 | Containers | Non-root runtime user, health checks, minimal JRE / nginx alpine images | Dockerfiles |
 
 Reporting a vulnerability: contact the IortaTechNXT security team; do not open public issues.

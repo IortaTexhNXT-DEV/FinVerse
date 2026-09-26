@@ -5,12 +5,13 @@ are for local development only.
 
 | Variable | Required in prod | Default | Purpose |
 |---|---|---|---|
-| `SPRING_PROFILES_ACTIVE` | yes | – | `prod` in production. `seed` loads seed data (never in production). |
-| `BROKERVERSE_DB_URL` | yes | `jdbc:postgresql://localhost:5432/brokerverse` | JDBC URL (use `sslmode=require`). |
-| `BROKERVERSE_DB_USER` | yes | `brokerverse` | Database user (owner of the schema; Flyway migrates on start). |
-| `BROKERVERSE_DB_PASSWORD` | yes | `brokerverse` | Database password (from secret store). |
+| `SPRING_PROFILES_ACTIVE` | yes | – | `prod` in production. `seed` loads the seed data of SIT, UAT and training (never in production: the start is refused, see "Production start-up safeguards"). |
+| `BROKERVERSE_ENVIRONMENT` | yes | `local` (`seed` with the seed profile) | `brokerverse.environment`: `local`, `sit`, `uat`, `training`, `preprod` or `production`. `production` (set by the `prod` profile) turns on the start-up safeguards. |
+| `BROKERVERSE_DB_URL` | yes | `jdbc:postgresql://localhost:5432/brokerverse`; none with `prod` | JDBC URL (use `sslmode=require`). |
+| `BROKERVERSE_DB_USER` | yes | `brokerverse`; none with `prod` | Database user (owner of the schema; Flyway migrates on start). |
+| `BROKERVERSE_DB_PASSWORD` | yes | none (a local value with the `seed` profile only) | Database password (from secret store). |
 | `BROKERVERSE_DB_POOL_SIZE` | no | `20` | Hikari maximum pool size per instance. |
-| `BROKERVERSE_JWT_SECRET` | yes | dev value | HMAC key for access tokens, ≥ 32 random characters. Rotating it signs everyone out. |
+| `BROKERVERSE_JWT_SECRET` | yes | none (a local value with the `seed` and test profiles only) | HMAC key for access tokens, ≥ 32 random characters. Rotating it signs everyone out. |
 | `BROKERVERSE_TOKEN_VALIDITY` | no | `PT8H` | Access token lifetime (ISO-8601 duration). |
 | `BROKERVERSE_ALLOWED_ORIGINS` | yes | `http://localhost:5173` | Comma separated browser origins allowed by CORS. |
 | `BROKERVERSE_MAX_FAILED_ATTEMPTS` | no | `5` | Consecutive failed logins that lock an account when the business parameter `LOGIN_MAX_FAILED_ATTEMPTS` is missing. The parameter (seeded with 3, BDOI NFR, CQ23) wins; administrators change it on *Administration › Parameters*. Property `brokerverse.security.max-failed-attempts`. |
@@ -76,8 +77,8 @@ are for local development only.
 | `BROKERVERSE_JOB_LOCK_LEASE` | no | `PT2M` | Lease of the Redis job lock, renewed every third of it while the job runs; an instance that dies frees the lock after at most one lease. Property `brokerverse.jobs.lock-lease`. |
 | `BROKERVERSE_MAIL_ENABLED` | no | `false` | `true` delivers e-mails through the SMTP server below; `false` records them in the outbox as *simulated* (seed, test, UAT without mail). Addresses ending in `.invalid` are always rejected by the simulated transport. |
 | `BROKERVERSE_MAIL_DISPATCH_ON_COMMIT` | no | `true` | Deliver right after the business transaction commits; `false` leaves delivery to the `MAIL_DISPATCH` job only. |
-| `MAIL_HOST` / `MAIL_PORT` | when mail enabled | `localhost` / `587` | SMTP server. |
-| `MAIL_USERNAME` / `MAIL_PASSWORD` | when the server requires it | — | SMTP credentials (secret: supply from the vault, never in files). |
+| `MAIL_HOST` / `MAIL_PORT` | when mail enabled | `localhost` (none with `prod`) / `587` | SMTP server. |
+| `MAIL_USERNAME` / `MAIL_PASSWORD` | when the server requires it (always in production with mail enabled and `MAIL_SMTP_AUTH`) | — | SMTP credentials (secret: supply from the vault, never in files). |
 | `MAIL_SMTP_AUTH` / `MAIL_SMTP_STARTTLS` | no | `true` / `true` | SMTP authentication and STARTTLS. |
 | `BROKERVERSE_BACKEND_HOST` (frontend container) | yes | `backend` | Host name of the backend service for the `/api` proxy. |
 
@@ -94,7 +95,7 @@ environment must use the same settings.
 | `BROKERVERSE_REDIS_ENABLED` | yes (`true`) | `true` | `brokerverse.redis.enabled`. `true`: Redis holds the reference-data cache, the job locks, the token denylist and the shared counters; `false`: in-memory cache (per instance, bounded by the time to live), PostgreSQL advisory job locks, tables `sec_revoked_token` / `sys_shared_counter`. Also switches the Redis health check (`management.health.redis.enabled`). |
 | `BROKERVERSE_REDIS_HOST` / `BROKERVERSE_REDIS_PORT` | when enabled | `localhost` / `6379` | `spring.data.redis.host` / `port`. On AWS: the ElastiCache (Redis 7) primary endpoint. |
 | `BROKERVERSE_REDIS_USERNAME` | no | – | `spring.data.redis.username` (ElastiCache RBAC user; blank = default user). |
-| `BROKERVERSE_REDIS_PASSWORD` | when the server requires it | – | `spring.data.redis.password` (ElastiCache AUTH token or RBAC password). **Secret**: from the vault. |
+| `BROKERVERSE_REDIS_PASSWORD` | when the server requires it; always in production with Redis enabled | – | `spring.data.redis.password` (ElastiCache AUTH token or RBAC password). **Secret**: from the vault. |
 | `BROKERVERSE_REDIS_TLS` | yes on AWS | `false` | `spring.data.redis.ssl.enabled`: `true` with ElastiCache in-transit encryption. |
 | `BROKERVERSE_REDIS_DATABASE` | no | `0` | `spring.data.redis.database`. |
 | `BROKERVERSE_REDIS_TIMEOUT` / `BROKERVERSE_REDIS_CONNECT_TIMEOUT` | no | `2s` / `5s` | Command and connect time-outs. |
@@ -112,7 +113,7 @@ environment must use the same settings.
 | `BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS` | when enabled | `localhost:9092` | `spring.kafka.bootstrap-servers`. On AWS: the Amazon MSK bootstrap brokers (SASL/SCRAM port 9096 or TLS port 9094). |
 | `BROKERVERSE_KAFKA_SECURITY_PROTOCOL` | yes on AWS | `PLAINTEXT` | `spring.kafka.properties.security.protocol`: `SASL_SSL` on MSK with SASL/SCRAM, `SSL` with TLS only. |
 | `BROKERVERSE_KAFKA_SASL_MECHANISM` | with SASL | `SCRAM-SHA-512` | `spring.kafka.properties.sasl.mechanism`. |
-| `BROKERVERSE_KAFKA_SASL_JAAS_CONFIG` | with SASL | – | `spring.kafka.properties.sasl.jaas.config`, e.g. `org.apache.kafka.common.security.scram.ScramLoginModule required username="…" password="…";` (MSK secret in AWS Secrets Manager). **Secret**. |
+| `BROKERVERSE_KAFKA_SASL_JAAS_CONFIG` | with SASL; always in production with Kafka enabled | – | `spring.kafka.properties.sasl.jaas.config`, e.g. `org.apache.kafka.common.security.scram.ScramLoginModule required username="…" password="…";` (MSK secret in AWS Secrets Manager). **Secret**. |
 | `BROKERVERSE_KAFKA_CLIENT_ID` | no | `brokerverse` | `spring.kafka.client-id`. |
 | `BROKERVERSE_KAFKA_CREATE_TOPICS` | no | `true` | `spring.kafka.admin.auto-create`: the application creates missing topics (and their `.dlt` topics) at start-up with the partitions and replication factor below. Broker-side auto-creation is off (`allow.auto.create.topics=false` on every client; `auto.create.topics.enable=false` on MSK). Set `false` when the topics are provisioned by infrastructure code. |
 | `BROKERVERSE_KAFKA_PARTITIONS` | no | `3` | `brokerverse.kafka.partitions` of each topic created. |
@@ -140,3 +141,41 @@ the business date of a scheduled run is the UTC date.
 Dashboard KPI mapping (optional, `application.yml` or env `BROKERVERSE_DASHBOARD_CASH_GROUPS_0` …):
 `brokerverse.dashboard.cash-groups`, `receivable-groups`, `reserve-groups` list chart-of-accounts
 statement lines (`report_group`) used for the cash, receivables and technical reserve tiles.
+
+## Production start-up safeguards
+
+`ProductionSafeguards` (package `config`, registered in `META-INF/spring.factories`) checks the resolved
+configuration before any bean is created. A production start is one with the `prod` profile or with
+`BROKERVERSE_ENVIRONMENT=production`; the `prod` profile sets `production` itself. BIBS refuses to start, and lists
+every problem in one message, when:
+
+- the `seed` profile is active in production (seed data never loads in production);
+- `BROKERVERSE_DB_URL`, `BROKERVERSE_DB_USER` or `BROKERVERSE_DB_PASSWORD` is missing (the `prod` profile has no
+  defaults for them);
+- `BROKERVERSE_JWT_SECRET` is missing, shorter than 32 characters or a development value;
+- mail delivery is on (`BROKERVERSE_MAIL_ENABLED=true`) and `MAIL_HOST`, or with SMTP authentication
+  `MAIL_USERNAME` / `MAIL_PASSWORD`, is missing;
+- Redis is on (`BROKERVERSE_REDIS_ENABLED`, default `true`) and `BROKERVERSE_REDIS_PASSWORD` is missing;
+- Kafka is on (`BROKERVERSE_KAFKA_ENABLED`, default `true`) and the protocol is not SASL or
+  `BROKERVERSE_KAFKA_SASL_JAAS_CONFIG` is missing.
+
+The base `application.yml` holds no password or signing key. Only the `seed` profile (local stacks, SIT, UAT and
+training) and the automated tests carry local values, and the `seed` profile is refused in production.
+
+## Seed data (SIT, UAT and training)
+
+The `seed` profile adds the Flyway location `classpath:db/seed` (versions V900-V999 and V1900-V1999) and the seed
+start-up runners (`*.seed` packages, `*SeedData` classes). It creates the seed company FVI under the client's legal
+name, BDO Insurance and Reinsurance Brokers, Inc., its branches, chart of accounts, seed records and the SIT/UAT
+users. Seed record numbers are plain sequence numbers in the 9000xx range (for example `CL-2026-900001`,
+`AR-2026-900001`). The SIT/UAT password is held in the seed configuration and issued by the project team; it is not
+written in the client documents.
+
+- **Not yet applied anywhere.** The seed migrations were renamed to `db/seed/V9xx__seed_*.sql` and
+  `V19xx__seed_*.sql` (with their record codes and names) before any environment applied them, so no Flyway history
+  refers to the former names. A database created from an earlier local build is dropped and recreated; `flyway
+  repair` is not needed on SIT, UAT or production.
+- **Comment-only edits of schema migrations.** The same change reworded comments of some `db/migration` files
+  (V652, V764, V771, V870, V880, V890, V1000, V1020, V1050-V1052, V1055, V1060). No SQL statement changed, but the Flyway
+  checksums did: a database migrated by an earlier build runs `flyway repair` once (or is recreated) before the
+  next start.

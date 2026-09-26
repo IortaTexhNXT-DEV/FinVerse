@@ -33,7 +33,8 @@ justification next to the exclusion (see `backend/quality/*.xml`).
 ## Real SonarQube / SonarCloud
 
 `backend/pom.xml` and `frontend/sonar-project.properties` carry the project keys. CI runs the scanner
-automatically when the repository secret `SONAR_TOKEN` (and optionally variable `SONAR_HOST_URL`)
+automatically when the CI variable `SONAR_TOKEN` (and optionally variable `SONAR_HOST_URL`)
 is set, and waits for the SonarQube quality gate.
 
-CodeQL (`.github/workflows/codeql.yml`) adds GitHub's semantic security analysis for both languages.
+The CI pipeline also runs static application security testing (SAST) of the Java and TypeScript code on every
+pipeline and weekly (`.gitlab-ci.yml`, stage `security`).

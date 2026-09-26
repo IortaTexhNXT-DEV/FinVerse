@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.screening.risk.service;
 
 import com.iortatechnxt.brokerverse.attachment.service.AttachmentService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientRiskProfile;
 import com.iortatechnxt.brokerverse.crm.service.ClientRiskService;
@@ -13,7 +14,6 @@ import com.iortatechnxt.brokerverse.screening.risk.domain.RiskProfileEntry;
 import com.iortatechnxt.brokerverse.screening.risk.domain.RiskProfileEntryRepository;
 import com.iortatechnxt.brokerverse.screening.risk.domain.RiskSource;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -158,7 +158,7 @@ public class RiskOverrideService {
   }
 
   private Set<String> codes(String list) {
-    return lovs.activeValues(list, LocalDate.now(clock)).stream()
+    return lovs.activeValues(list, BusinessClock.today(clock)).stream()
         .map(LovValue::getCode)
         .collect(Collectors.toSet());
   }

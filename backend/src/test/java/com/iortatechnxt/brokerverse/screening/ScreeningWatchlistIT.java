@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.approval.service.ApprovalViewer;
 import com.iortatechnxt.brokerverse.approval.service.PendingApproval;
 import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.screening.config.domain.SubjectType;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.AliasType;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.ChangeStatus;
@@ -118,7 +119,7 @@ class ScreeningWatchlistIT {
     as(CHECKER, () -> decisions.approve(add.getId(), null));
     WatchlistEntry active = watchlists.entry(entry.getId());
     assertThat(active.getStatus()).isEqualTo(EntryStatus.ACTIVE);
-    assertThat(active.getEffectiveFrom()).isEqualTo(LocalDate.now(clock));
+    assertThat(active.getEffectiveFrom()).isEqualTo(BusinessClock.today(clock));
     assertThat(active.getEntryVersion()).isEqualTo(1);
     ListedEntry listed = directory.entry(entry.getId()).orElseThrow();
     assertThat(listed.aliases()).containsExactly(name + " Alias");
@@ -141,7 +142,7 @@ class ScreeningWatchlistIT {
     as(CHECKER, () -> decisions.approve(off.getId(), "ok"));
     WatchlistEntry inactive = watchlists.entry(entry.getId());
     assertThat(inactive.getStatus()).isEqualTo(EntryStatus.INACTIVE);
-    assertThat(inactive.getDelistedOn()).isEqualTo(LocalDate.now(clock));
+    assertThat(inactive.getDelistedOn()).isEqualTo(BusinessClock.today(clock));
     assertThat(watchlists.history(entry.getId())).hasSize(3);
     assertThat(
             jdbc.queryForObject(
@@ -263,7 +264,7 @@ class ScreeningWatchlistIT {
                     u + "-1,INDIVIDUAL,Juan Invented Cruz " + u + ",,,,,,,,,",
                     u + "-2,INDIVIDUAL,Ana Invented Luna " + u + ",,,,,,,,,",
                     u + "-3,ENTITY,Invented Shipping " + u + ",,,,,,,,,")));
-    JobOutcome outcome = job.execute(LocalDate.now(clock));
+    JobOutcome outcome = job.execute(BusinessClock.today(clock));
     assertThat(outcome.message()).contains("list run(s)");
     IngestionRun first = latestRun(source);
     assertThat(first.getTrigger()).isEqualTo(IngestionTrigger.SCHEDULED);
@@ -284,7 +285,7 @@ class ScreeningWatchlistIT {
                 csv(
                     u + "-1,INDIVIDUAL,Juan Invented Cruz " + u + ",,,,,,,,,",
                     u + "-2,INDIVIDUAL,Ana Invented Luna Changed " + u + ",,,,,,,,,")));
-    job.execute(LocalDate.now(clock));
+    job.execute(BusinessClock.today(clock));
     IngestionRun second = latestRun(source);
     assertThat(second.getUpdated()).isEqualTo(1);
     assertThat(second.getDelisted()).isEqualTo(1);
@@ -299,7 +300,7 @@ class ScreeningWatchlistIT {
     assertThat(delisted.get("status")).isEqualTo("INACTIVE");
     assertThat(delisted.get("delisted_on")).isNotNull();
 
-    job.execute(LocalDate.now(clock));
+    job.execute(BusinessClock.today(clock));
     IngestionRun none = latestRun(source);
     assertThat(none.getStatus()).isEqualTo(RunStatus.FAILED);
     assertThat(none.getError()).isEqualTo("No list file was received for source " + source);
@@ -309,7 +310,7 @@ class ScreeningWatchlistIT {
         () ->
             listFiles.stage(
                 source, "broken.csv", "no,header\n1,2\n".getBytes(StandardCharsets.UTF_8)));
-    job.execute(LocalDate.now(clock));
+    job.execute(BusinessClock.today(clock));
     IngestionRun broken = latestRun(source);
     assertThat(broken.getStatus()).isEqualTo(RunStatus.FAILED);
     assertThat(broken.getError()).contains("missing column(s)");
@@ -351,7 +352,7 @@ class ScreeningWatchlistIT {
   @Test
   void theBulkHandlerChecksAndSubmitsListRecords() {
     String u = fx.unique();
-    BulkContext context = new BulkContext(1L, "BLK-T-" + u, LocalDate.now(clock), Map.of());
+    BulkContext context = new BulkContext(1L, "BLK-T-" + u, BusinessClock.today(clock), Map.of());
     assertThat(handler.columns()).hasSize(12);
     assertThat(handler.validate(new BulkRow(2, Map.of("Reference", u)), context))
         .containsExactly("Line 2: name is missing");

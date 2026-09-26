@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.frbs.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -11,9 +12,9 @@ import com.iortatechnxt.brokerverse.report.core.TabularReportBuilder;
 import java.sql.Date;
 import java.sql.ResultSetMetaData;
 import java.sql.Timestamp;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.Year;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -35,8 +36,6 @@ public final class FrbsSqlReport implements ReportDefinition {
   static final String FROM = "from";
   static final String TO = "to";
   static final String YEAR = "year";
-
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
 
   private final ReportMetadata metadata;
   private final Spec spec;
@@ -68,7 +67,7 @@ public final class FrbsSqlReport implements ReportDefinition {
       default ->
           params.add(
               ParameterSpec.required(YEAR, "Year", ParameterType.NUMBER)
-                  .withDefault(String.valueOf(LocalDate.now(MANILA).getYear())));
+                  .withDefault(BusinessClock.currentYear(Clock.systemUTC()).toString()));
     }
     ReportMetadata m = ReportMetadata.frbs(spec.code(), spec.title(), spec.description(), params);
     this.metadata = document ? m.asDocument() : m;
@@ -134,7 +133,7 @@ public final class FrbsSqlReport implements ReportDefinition {
 
   private static Object toLocal(Object value) {
     return switch (value) {
-      case Timestamp t -> t.toInstant().atZone(MANILA).toLocalDate();
+      case Timestamp t -> BusinessClock.dateOf(t.toInstant());
       case Date d -> d.toLocalDate();
       case null, default -> value;
     };

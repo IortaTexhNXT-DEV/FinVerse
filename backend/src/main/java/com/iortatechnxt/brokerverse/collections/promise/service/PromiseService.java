@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.collections.promise.domain.PaymentPromiseRep
 import com.iortatechnxt.brokerverse.collections.promise.domain.PromiseStatus;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
@@ -165,7 +166,7 @@ public class PromiseService {
           "CLX_PROMISE_NOTHING_DUE",
           "Invoice " + invoice.getInvoiceNo() + " has nothing to collect");
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     Terms terms = terms(input, outstanding, today);
     requireInstallmentOf(input.installmentId(), invoice.getInvoiceNo());
     closeRunning(invoice.getInvoiceNo(), today);

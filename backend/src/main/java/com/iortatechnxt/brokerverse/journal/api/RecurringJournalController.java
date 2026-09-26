@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.journal.api;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.api.dto.RecurringTemplateRequest;
 import com.iortatechnxt.brokerverse.journal.api.dto.RecurringTemplateResponse;
 import com.iortatechnxt.brokerverse.journal.domain.RecurringJournalTemplate;
@@ -133,7 +134,7 @@ public class RecurringJournalController {
       @PathVariable Long id,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
           LocalDate date) {
-    return service.runTemplate(id, date != null ? date : LocalDate.now(clock));
+    return service.runTemplate(id, date != null ? date : BusinessClock.today(clock));
   }
 
   /**

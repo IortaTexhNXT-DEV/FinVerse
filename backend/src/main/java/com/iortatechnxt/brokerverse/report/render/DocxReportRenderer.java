@@ -4,12 +4,12 @@ import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.office.BrandedDocx;
 import com.iortatechnxt.brokerverse.common.office.BrandedDocx.Page;
 import com.iortatechnxt.brokerverse.common.office.BrandedDocx.TextStyle;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.ReportRow;
 import com.iortatechnxt.brokerverse.report.core.RowKind;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ public class DocxReportRenderer implements ReportRenderer {
   private static final long LEGAL_HEIGHT = 20_160;
   private static final long MARGIN = 28L * BrandedDocx.TWIPS_PER_POINT;
   private static final DateTimeFormatter STAMP =
-      DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withZone(ZoneId.of("Asia/Manila"));
+      DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withZone(BusinessClock.zone());
 
   @Override
   public ExportFormat format() {

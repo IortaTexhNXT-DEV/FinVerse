@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.collections.files.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -19,7 +20,7 @@ import java.util.function.Predicate;
 public final class FilePeriods {
 
   /** Philippine time. */
-  public static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  public static final ZoneId MANILA = BusinessClock.zone();
 
   private static final LocalTime OFFICE_OPENS = LocalTime.of(8, 0);
   private static final int WEEK_DAYS = 7;

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.approval.service.ApprovalViewer;
 import com.iortatechnxt.brokerverse.common.exception.FieldValidationException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientRiskService;
 import com.iortatechnxt.brokerverse.report.domain.ReportRun.RunFile;
@@ -33,6 +34,7 @@ import com.iortatechnxt.brokerverse.screening.str.service.StrService.StrEdit;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -184,7 +186,13 @@ class ScreeningCasesIT {
     assertThat(strs.values(str.getId())).containsEntry("SUBJECT_NAME", client.getDisplayName());
     assertThat(strs.gaps(str.getId())).containsKeys(StrService.TRANSACTIONS, StrService.REASONS);
     Line zero =
-        new Line("OR-1", LocalDate.now(), BigDecimal.ZERO.setScale(2), "PHP", "RECEIPT", null);
+        new Line(
+            "OR-1",
+            BusinessClock.today(Clock.systemUTC()),
+            BigDecimal.ZERO.setScale(2),
+            "PHP",
+            "RECEIPT",
+            null);
     assertThatThrownBy(
             () ->
                 fx.as(
@@ -196,7 +204,7 @@ class ScreeningCasesIT {
     Line receipt =
         new Line(
             "OR-" + c.getId(),
-            LocalDate.now(),
+            BusinessClock.today(Clock.systemUTC()),
             new BigDecimal("50000.00"),
             "PHP",
             "RECEIPT",
@@ -216,7 +224,7 @@ class ScreeningCasesIT {
     assertThat(fx.reload(c).getStage()).isEqualTo(CaseStage.STR_EXTRACTION);
 
     // Extraction of the committee-approved STRs of today, then the AMLC filing closes the case.
-    LocalDate today = LocalDate.now(MANILA);
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     StrExtraction extraction =
         fx.as(
             COMPLIANCE, () -> extractions.extract(fx.reload(c).getCompanyId(), today, today, null));

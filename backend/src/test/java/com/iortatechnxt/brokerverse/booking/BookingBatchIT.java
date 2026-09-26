@@ -29,8 +29,10 @@ import com.iortatechnxt.brokerverse.booking.service.BookingWorkbenchService.Row;
 import com.iortatechnxt.brokerverse.booking.service.BookingWorkbenchService.Tab;
 import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -143,7 +145,12 @@ class BookingBatchIT {
         .extracting("code")
         .isEqualTo("INVALID_DIMENSION");
     assertThatThrownBy(
-            () -> as.run("proc", () -> queue.edit(ed.getId(), LocalDate.now().plusDays(5), null)))
+            () ->
+                as.run(
+                    "proc",
+                    () ->
+                        queue.edit(
+                            ed.getId(), BusinessClock.today(Clock.systemUTC()).plusDays(5), null)))
         .extracting("code")
         .isEqualTo("BOOKING_DATE_FUTURE");
     as.run("proc", () -> queue.remove(ee.getId()));

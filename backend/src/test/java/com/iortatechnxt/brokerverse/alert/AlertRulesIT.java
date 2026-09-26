@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.alert.service.AlertDailyJob;
 import com.iortatechnxt.brokerverse.alert.service.AlertService;
 import com.iortatechnxt.brokerverse.alert.service.AlertService.AlertSearch;
 import com.iortatechnxt.brokerverse.alert.service.AlertService.CodeSettings;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
@@ -28,6 +29,7 @@ import com.iortatechnxt.brokerverse.system.domain.JobTrigger;
 import com.iortatechnxt.brokerverse.system.service.JobRegistry;
 import com.iortatechnxt.brokerverse.system.service.JobRunService;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -70,7 +72,8 @@ class AlertRulesIT {
   @Test
   void postingRulesRaiseLargeBackDatedAndWeekendAlerts() {
     JournalBatch large =
-        journals.posted(journals.request("5603", "1111", "1500000.00", LocalDate.now()));
+        journals.posted(
+            journals.request("5603", "1111", "1500000.00", BusinessClock.today(Clock.systemUTC())));
     assertThat(alertsFor("LARGE_JOURNAL", large.getBatchNo()))
         .singleElement()
         .satisfies(
@@ -81,10 +84,13 @@ class AlertRulesIT {
             });
 
     JournalBatch backDated =
-        journals.posted(journals.request("5603", "1111", "10.00", LocalDate.now().minusDays(10)));
+        journals.posted(
+            journals.request(
+                "5603", "1111", "10.00", BusinessClock.today(Clock.systemUTC()).minusDays(10)));
     assertThat(alertsFor("BACK_DATED_POSTING", backDated.getBatchNo())).hasSize(1);
 
-    LocalDate saturday = LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.SATURDAY));
+    LocalDate saturday =
+        BusinessClock.today(Clock.systemUTC()).with(TemporalAdjusters.previous(DayOfWeek.SATURDAY));
     JournalBatch weekend = journals.posted(journals.request("5603", "1111", "10.00", saturday));
     assertThat(alertsFor("WEEKEND_POSTING", weekend.getBatchNo())).hasSize(1);
     assertThat(alertsFor("LARGE_JOURNAL", weekend.getBatchNo())).isEmpty();
@@ -94,7 +100,7 @@ class AlertRulesIT {
   void dailyChecksAreDeduplicatedAndReRaisedAfterResolution() {
     // Other test classes post to these accounts too: size the journal so that, whatever their
     // balances are, petty cash ends in credit and the suspense account is not cleared.
-    LocalDate today = LocalDate.now();
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     BigDecimal amount = journals.balance("1102", today).max(BigDecimal.ZERO).add(ALERT_AMOUNT);
     if (journals.balance("1606", today).add(amount).signum() == 0) {
       amount = amount.add(BigDecimal.ONE);
@@ -128,7 +134,8 @@ class AlertRulesIT {
   @Test
   void pendingApprovalAgeingUsesTheThresholdDays() {
     JournalBatch pending =
-        journals.submitted(journals.request("5603", "1111", "77.00", LocalDate.now()));
+        journals.submitted(
+            journals.request("5603", "1111", "77.00", BusinessClock.today(Clock.systemUTC())));
     try {
       alerts.configure(
           "PENDING_APPROVAL_AGEING", new CodeSettings(AlertSeverity.MEDIUM, null, 0, true));

@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.domain.DocTemplate;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
@@ -20,7 +21,6 @@ import com.iortatechnxt.brokerverse.productmaint.domain.NegotiationRound;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageRequest;
 import com.iortatechnxt.brokerverse.productmaint.service.ComparativeTable.Selection;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -231,7 +231,8 @@ public class ComparativeService {
   }
 
   private String templateVersion() {
-    DocTemplate t = templates.current(PackageDocuments.COMPARATIVE_TEMPLATE, LocalDate.now(clock));
+    DocTemplate t =
+        templates.current(PackageDocuments.COMPARATIVE_TEMPLATE, BusinessClock.today(clock));
     return t.getCode() + " v" + t.getVersionNo();
   }
 }

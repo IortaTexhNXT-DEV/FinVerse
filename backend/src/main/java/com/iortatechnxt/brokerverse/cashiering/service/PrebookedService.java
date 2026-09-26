@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied.UnappliedSpec;
 import com.iortatechnxt.brokerverse.cashiering.service.ApplicationService.ApplyOptions;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import java.math.BigDecimal;
@@ -206,7 +207,7 @@ public class PrebookedService {
             money,
             new Application.Origin(
                 ar.getId(), null, ApplicationSource.PREBOOKED, "PRE:" + item.getId()),
-            new ApplyOptions(LocalDate.now(clock), false, ar.getReceiptNo()));
+            new ApplyOptions(BusinessClock.today(clock), false, ar.getReceiptNo()));
     BigDecimal applied =
         made.stream().map(Application::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
     BigDecimal excess = money.subtract(applied);

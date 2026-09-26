@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.underwriting.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.system.domain.JobRun;
@@ -93,7 +94,7 @@ public class QuotationExpiryJob implements ManagedJob {
    * @return number of quotations expired
    */
   public int runFor(Long companyId, LocalDate asOf) {
-    LocalDate date = asOf != null ? asOf : LocalDate.now(clock);
+    LocalDate date = asOf != null ? asOf : BusinessClock.today(clock);
     String company = organization.getCompany(companyId).getCode();
     JobRun run =
         runs.execute(

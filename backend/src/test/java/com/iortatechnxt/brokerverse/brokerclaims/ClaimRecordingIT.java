@@ -18,10 +18,12 @@ import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimPremiumStatus;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimSource;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.LossDetails;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -104,7 +106,8 @@ class ClaimRecordingIT {
     assertThatThrownBy(() -> as.run(OFFICER, () -> premiums.authorize(fx.company(), id, null)))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("already has authorization code");
-    assertThat(recheck.execute(LocalDate.now()).message()).contains("re-checked");
+    assertThat(recheck.execute(BusinessClock.today(Clock.systemUTC())).message())
+        .contains("re-checked");
   }
 
   @Test
@@ -128,7 +131,7 @@ class ClaimRecordingIT {
   void theLossRulesAreCheckedWithTheFrsMessages() {
     OpsInvoice invoice = fx.motorInvoice();
     String arn = invoice.getArn();
-    LocalDate today = LocalDate.now();
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     assertRefused(
         ClaimsFixtures.request(" ", ClaimsFixtures.loss("MOTOR_OWN_DAMAGE"), List.of(), List.of()),
         "Select the cover of the claim");
@@ -189,7 +192,7 @@ class ClaimRecordingIT {
     OpsInvoice invoice = fx.motorInvoice();
     Long id = fx.motorClaim(invoice.getArn()).getId();
     Long company = fx.company();
-    LocalDate earlier = LocalDate.now().minusDays(2);
+    LocalDate earlier = BusinessClock.today(Clock.systemUTC()).minusDays(2);
 
     assertThatThrownBy(
             () -> as.run(TL, () -> details.correctReportedDate(company, id, earlier, " ", null)))
@@ -200,7 +203,11 @@ class ClaimRecordingIT {
                     TL,
                     () ->
                         details.correctReportedDate(
-                            company, id, LocalDate.now().plusDays(1), "DATA_CORRECTION", null)))
+                            company,
+                            id,
+                            BusinessClock.today(Clock.systemUTC()).plusDays(1),
+                            "DATA_CORRECTION",
+                            null)))
         .hasMessage("The reported date must be between the loss date and today");
     Claim corrected =
         as.run(

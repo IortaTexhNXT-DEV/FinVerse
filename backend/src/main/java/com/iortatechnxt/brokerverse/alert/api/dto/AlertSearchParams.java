@@ -3,9 +3,9 @@ package com.iortatechnxt.brokerverse.alert.api.dto;
 import com.iortatechnxt.brokerverse.alert.domain.AlertSeverity;
 import com.iortatechnxt.brokerverse.alert.domain.AlertStatus;
 import com.iortatechnxt.brokerverse.alert.service.AlertService.AlertSearch;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -39,7 +39,7 @@ public record AlertSearchParams(
         severity,
         code == null || code.isBlank() ? null : code.strip(),
         companyId,
-        from == null ? Instant.EPOCH : from.atStartOfDay().toInstant(ZoneOffset.UTC),
-        to == null ? OPEN_END : to.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC));
+        from == null ? Instant.EPOCH : BusinessClock.startOf(from),
+        to == null ? OPEN_END : BusinessClock.startOf(to.plusDays(1)));
   }
 }

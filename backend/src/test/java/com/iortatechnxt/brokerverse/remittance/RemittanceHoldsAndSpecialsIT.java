@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.RemittanceStatus;
 import com.iortatechnxt.brokerverse.remittance.domain.HoldRequest;
@@ -24,6 +25,7 @@ import com.iortatechnxt.brokerverse.remittance.service.SpecialRemittanceService;
 import com.iortatechnxt.brokerverse.remittance.service.SpecialRemittanceService.NewRequest;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import java.time.Clock;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,12 +63,12 @@ class RemittanceHoldsAndSpecialsIT {
   @Test
   void anApprovedHoldKeepsTheInvoiceOutOfExtractionUntilItExpires() {
     OpsInvoice paid = fx.paidInvoice();
-    HoldRequest requested = hold(paid, LocalDate.now().plusDays(10));
+    HoldRequest requested = hold(paid, BusinessClock.today(Clock.systemUTC()).plusDays(10));
     assertThat(requested.getRequestNo()).startsWith("HLD-");
     assertThat(requested.getStage()).isEqualTo(HoldStage.FOR_APPROVAL);
     assertThat(fx.reload(paid.getInvoiceNo()).getRemittanceStatus())
         .isEqualTo(RemittanceStatus.REQUESTED_FOR_HOLD);
-    assertThatThrownBy(() -> hold(paid, LocalDate.now().plusDays(5)))
+    assertThatThrownBy(() -> hold(paid, BusinessClock.today(Clock.systemUTC()).plusDays(5)))
         .isInstanceOf(BusinessRuleException.class);
     Long id = requested.getId();
     assertThatThrownBy(() -> as.run(MKTCOLL, () -> holds.approve(id, null)))
@@ -92,7 +94,7 @@ class RemittanceHoldsAndSpecialsIT {
         .isEqualTo("remit");
     assertThatThrownBy(() -> as.run(MKTTL, () -> holds.assign(id, "ao")))
         .isInstanceOf(BusinessRuleException.class);
-    LocalDate later = LocalDate.now().plusDays(20);
+    LocalDate later = BusinessClock.today(Clock.systemUTC()).plusDays(20);
     as.run(MKTCOLL, () -> holds.extend(id, later, "Still disputed"));
     HoldRequest extended = as.run(MKTTL, () -> holds.decideExtension(id, true, "OK"));
     assertThat(extended.getHoldUntil()).isEqualTo(later);
@@ -101,9 +103,9 @@ class RemittanceHoldsAndSpecialsIT {
 
     jdbc.update(
         "update rem_hold_request set hold_until = ? where id = ?",
-        LocalDate.now().minusDays(1),
+        BusinessClock.today(Clock.systemUTC()).minusDays(1),
         id);
-    expiry.execute(LocalDate.now());
+    expiry.execute(BusinessClock.today(Clock.systemUTC()));
     assertThat(as.run(MKTTL, () -> holds.get(id)).getStage()).isEqualTo(HoldStage.RELEASED);
     assertThat(fx.reload(paid.getInvoiceNo()).isHoldFlag()).isFalse();
     fx.extract(paid.getInvoiceNo());
@@ -113,7 +115,7 @@ class RemittanceHoldsAndSpecialsIT {
   @Test
   void holdsAreRejectedCancelledReleasedAndWarnedBeforeExpiry() {
     OpsInvoice first = fx.paidInvoice();
-    Long rejected = hold(first, LocalDate.now().plusDays(3)).getId();
+    Long rejected = hold(first, BusinessClock.today(Clock.systemUTC()).plusDays(3)).getId();
     assertThat(as.run(MKTTL, () -> holds.reject(rejected, "Not needed")).getStage())
         .isEqualTo(HoldStage.REJECTED);
     assertThat(fx.reload(first.getInvoiceNo()).getRemittanceStatus())
@@ -126,13 +128,18 @@ class RemittanceHoldsAndSpecialsIT {
                     holds.create(
                         fx.company(),
                         first.getInvoiceNo(),
-                        new Terms("OTHERS", null, LocalDate.now().plusDays(2)),
+                        new Terms(
+                            "OTHERS", null, BusinessClock.today(Clock.systemUTC()).plusDays(2)),
                         false,
                         RequestSource.SCREEN))
             .getId();
     as.run(
         MKTCOLL,
-        () -> holds.update(draft, new Terms("OTHERS", "Changed", LocalDate.now().plusDays(4))));
+        () ->
+            holds.update(
+                draft,
+                new Terms(
+                    "OTHERS", "Changed", BusinessClock.today(Clock.systemUTC()).plusDays(4))));
     assertThat(as.run(MKTCOLL, () -> holds.cancel(draft)).getStage())
         .isEqualTo(HoldStage.CANCELLED);
     assertThatThrownBy(
@@ -143,15 +150,15 @@ class RemittanceHoldsAndSpecialsIT {
                         holds.create(
                             fx.company(),
                             first.getInvoiceNo(),
-                            new Terms("OTHERS", null, LocalDate.now()),
+                            new Terms("OTHERS", null, BusinessClock.today(Clock.systemUTC())),
                             false,
                             RequestSource.SCREEN)))
         .isInstanceOf(BusinessRuleException.class);
 
     OpsInvoice second = fx.paidInvoice();
-    Long cancelled = hold(second, LocalDate.now().plusDays(1)).getId();
+    Long cancelled = hold(second, BusinessClock.today(Clock.systemUTC()).plusDays(1)).getId();
     as.run(MKTTL, () -> holds.approve(cancelled, null));
-    expiry.execute(LocalDate.now());
+    expiry.execute(BusinessClock.today(Clock.systemUTC()));
     assertThat(as.run(MKTTL, () -> holds.get(cancelled)).isExpiryNotified()).isTrue();
     assertThat(
             jdbc.queryForObject(
@@ -166,9 +173,11 @@ class RemittanceHoldsAndSpecialsIT {
     assertThat(fx.reload(second.getInvoiceNo()).isHoldFlag()).isFalse();
 
     OpsInvoice third = fx.paidInvoice();
-    Long released = hold(third, LocalDate.now().plusDays(9)).getId();
+    Long released = hold(third, BusinessClock.today(Clock.systemUTC()).plusDays(9)).getId();
     as.run(MKTTL, () -> holds.approve(released, null));
-    as.run(MKTCOLL, () -> holds.extend(released, LocalDate.now().plusDays(12), null));
+    as.run(
+        MKTCOLL,
+        () -> holds.extend(released, BusinessClock.today(Clock.systemUTC()).plusDays(12), null));
     as.run(MKTTL, () -> holds.decideExtension(released, false, "No"));
     assertThat(as.run(MKTTL, () -> holds.get(released)).getExtensionCount()).isZero();
     assertThat(as.run(MKTCOLL, () -> holds.release(released, "Paid")).getStage())

@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.issuance.domain.Epolicy;
 import com.iortatechnxt.brokerverse.issuance.domain.Epolicy.ReceivedDocument;
 import com.iortatechnxt.brokerverse.issuance.domain.EpolicyRepository;
@@ -197,7 +198,7 @@ public class EpolicyService {
           "EPOLICY_REVIEWED",
           "The e-policy " + epolicy.getFileName() + " is already " + epolicy.getStatus());
     }
-    LocalDate date = issueDate == null ? LocalDate.now(clock) : issueDate;
+    LocalDate date = issueDate == null ? BusinessClock.today(clock) : issueDate;
     Account account = lifecycle.recordPolicy(epolicy.getArn(), policyNumbers, date);
     epolicy.confirm(account.getPolicyNumbers(), date, currentUser.username(), clock.instant());
     audit.record(
@@ -221,7 +222,7 @@ public class EpolicyService {
    */
   public Epolicy reject(Long id, String reasonCode, String remarks) {
     Epolicy epolicy = get(id);
-    lovs.requireValid(REJECT_LOV, reasonCode, LocalDate.now(clock));
+    lovs.requireValid(REJECT_LOV, reasonCode, BusinessClock.today(clock));
     epolicy.reject(reasonCode, currentUser.username(), clock.instant());
     audit.record(
         ENTITY,

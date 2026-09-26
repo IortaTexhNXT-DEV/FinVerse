@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.domain.ReportBatch;
 import com.iortatechnxt.brokerverse.report.domain.ReportBatch.BatchSpec;
 import com.iortatechnxt.brokerverse.report.domain.ReportBatchRepository;
@@ -18,7 +19,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +128,7 @@ public class ReportBatchService {
   private ReportBatch newBatch(BatchRequest request, ExportFormat format, Long companyId) {
     PrintOptions print = request.print();
     return new ReportBatch(
-        tx.execute(s -> numbers.next("RB-" + LocalDate.now(clock).getYear())),
+        tx.execute(s -> numbers.next("RB-" + BusinessClock.today(clock).getYear())),
         companyId,
         new BatchSpec(
             format.name(),

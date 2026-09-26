@@ -58,8 +58,7 @@ public class GroupProfileReport implements ReportDefinition {
     return UamReportSupport.metadata(
         CODE,
         "User Group Profile Report",
-        "Modules and tasks each group profile can access, with its created and modified dates"
-            + " (BRD 3.003.2)",
+        "Modules and tasks each group profile can access, with its created and modified dates",
         List.of(
             UamReportSupport.groupProfileParam(),
             ParameterSpec.optional(AREA, "Module (area code)", ParameterType.TEXT),

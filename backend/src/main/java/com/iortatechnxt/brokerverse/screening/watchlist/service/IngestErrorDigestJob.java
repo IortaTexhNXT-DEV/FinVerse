@@ -40,7 +40,7 @@ public class IngestErrorDigestJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "E-mails the records that failed watchlist ingestion to the recipients (SNSRP-202)";
+    return "E-mails the records that failed watchlist ingestion to the recipients";
   }
 
   @Override

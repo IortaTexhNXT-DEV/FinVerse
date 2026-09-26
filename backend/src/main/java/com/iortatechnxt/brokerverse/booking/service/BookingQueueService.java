@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.booking.service.BatchBookingRunner.BatchItem
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.dimension.domain.DimensionType;
 import com.iortatechnxt.brokerverse.dimension.service.DimensionService;
 import java.time.Clock;
@@ -156,7 +157,7 @@ public class BookingQueueService {
    */
   public QueueEntry edit(Long id, LocalDate bookingDate, String costCenter) {
     QueueEntry entry = require(id);
-    if (bookingDate != null && bookingDate.isAfter(LocalDate.now(clock))) {
+    if (bookingDate != null && bookingDate.isAfter(BusinessClock.today(clock))) {
       throw new BusinessRuleException(
           "BOOKING_DATE_FUTURE", "The booking date " + bookingDate + " is in the future");
     }
@@ -252,7 +253,7 @@ public class BookingQueueService {
   }
 
   private LocalDate dateOf(LocalDate date) {
-    return date == null ? LocalDate.now(clock) : date;
+    return date == null ? BusinessClock.today(clock) : date;
   }
 
   private QueueEntry require(Long id) {

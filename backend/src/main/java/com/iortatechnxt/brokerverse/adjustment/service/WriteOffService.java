@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.adjustment.domain.WriteOffAction;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.opsledger.domain.InvoiceFlag;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
@@ -19,7 +20,6 @@ import com.iortatechnxt.brokerverse.opsledger.service.MovementRequest.DocumentRe
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
@@ -201,7 +201,7 @@ public class WriteOffService {
     JournalBatch journal =
         events.post(
             invoice,
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             new AdjustmentEvents.Spec(
                 AdjustmentEvents.WRITE_OFF,
                 sourceRef,

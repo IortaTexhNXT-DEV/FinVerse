@@ -12,11 +12,12 @@ import com.iortatechnxt.brokerverse.cashiering.domain.PdcItem;
 import com.iortatechnxt.brokerverse.cashiering.service.CommissionOrService;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentFileLayouts;
 import com.iortatechnxt.brokerverse.cashiering.service.PdcWarehouseService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -121,7 +122,7 @@ class PaymentUploadIT {
             + ",CHK"
             + tag
             + ",BDO,Makati,"
-            + LocalDate.now()
+            + BusinessClock.today(Clock.systemUTC())
             + ",500.00,CBG\n";
     BulkJob job = upload("cashier", "PAY_PDC", "pdc-" + tag + ".csv", csv);
     assertThat(job.getCommittedRows()).isEqualTo(1);
@@ -132,11 +133,16 @@ class PaymentUploadIT {
             .orElseThrow();
     assertThat(item.getWarehouseNo()).startsWith("PDCW-");
 
-    int matured = as.run("cashier", () -> pdcs.mature(LocalDate.now()));
+    int matured = as.run("cashier", () -> pdcs.mature(BusinessClock.today(Clock.systemUTC())));
     assertThat(matured).isPositive();
     PdcItem after =
         pdcs
-            .list(fx.company(), null, LocalDate.now(), LocalDate.now(), Pageable.ofSize(500))
+            .list(
+                fx.company(),
+                null,
+                BusinessClock.today(Clock.systemUTC()),
+                BusinessClock.today(Clock.systemUTC()),
+                Pageable.ofSize(500))
             .stream()
             .filter(p -> p.getId().equals(item.getId()))
             .findFirst()

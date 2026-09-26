@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.adjustment.domain.EndorsementRequest;
 import com.iortatechnxt.brokerverse.adjustment.domain.EndorsementRequestRepository;
 import com.iortatechnxt.brokerverse.adjustment.service.DocText;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
@@ -42,7 +43,7 @@ public class AdjustmentReportSupport {
   /** Requester / processor filter. */
   public static final String USER = "user";
 
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  private static final ZoneId MANILA = BusinessClock.zone();
 
   private final EndorsementRequestRepository requests;
 

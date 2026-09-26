@@ -84,7 +84,7 @@ public final class WorkReports {
       return ReportMetadata.claimsHandling(
           PENDING,
           "Pending Actions",
-          "Follow-ups due or overdue and open diary entries due, per handler (BRCLM.034)",
+          "Follow-ups due or overdue and open diary entries due, per handler",
           BclReportSql.asOfFilters());
     }
 
@@ -128,8 +128,7 @@ public final class WorkReports {
       return ReportMetadata.claimsHandling(
           INSURER_CLAIMS,
           "Insurer Claim Numbers",
-          "Every insurer claim number under its BDOI claim with share, reserve and settled amount"
-              + " (BRCLM.043)",
+          "Every insurer claim number under its BDOI claim with share, reserve and settled amount",
           BclReportSql.rangeFilters("reportedFrom", "reportedTo", "Date reported", false));
     }
 

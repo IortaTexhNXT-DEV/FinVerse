@@ -56,7 +56,7 @@ public class ReconAutomatchJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Re-matches the insurer production of the open reconciliation cycles (PRCID.025)";
+    return "Re-matches the insurer production of the open reconciliation cycles";
   }
 
   @Override

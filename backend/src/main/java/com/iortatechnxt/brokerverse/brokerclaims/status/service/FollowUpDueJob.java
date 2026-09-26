@@ -44,8 +44,7 @@ public class FollowUpDueJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Reminds claims handlers of follow-ups and diary entries due; flags overdue ones"
-        + " (BRCLM.019/022/034)";
+    return "Reminds claims handlers of follow-ups and diary entries due; flags overdue ones";
   }
 
   @Override

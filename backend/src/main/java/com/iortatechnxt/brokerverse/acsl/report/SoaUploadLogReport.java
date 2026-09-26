@@ -43,7 +43,7 @@ public class SoaUploadLogReport implements ReportDefinition {
     return ReportMetadata.acsl(
         CODE,
         "SOA Upload Log",
-        "Every row of an insurer SOA upload, loaded or failed with the reason (ACSL 2.4.0)",
+        "Every row of an insurer SOA upload, loaded or failed with the reason",
         List.of(
             ParameterSpec.required("companyId", "Company", ParameterType.COMPANY),
             ParameterSpec.required(SoaReconReport.UPLOAD, "SOA Upload No.", ParameterType.TEXT)));

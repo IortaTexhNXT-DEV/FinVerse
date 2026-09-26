@@ -38,6 +38,7 @@ import com.iortatechnxt.brokerverse.commission.service.IncentivePosting;
 import com.iortatechnxt.brokerverse.commission.service.IncentiveRunService;
 import com.iortatechnxt.brokerverse.commission.service.IncentiveSchemeService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInEnums;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
@@ -53,6 +54,7 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -174,7 +176,7 @@ class CommissionIT {
     OpsInvoice dp = fx.directPayment();
     DpBilling billing = fx.billed(List.of(dp));
     assertThat(billing.getStage()).isEqualTo(DpBilling.AWAITING);
-    assertThat(billing.getSlaDue()).isAfter(LocalDate.now().plusDays(9));
+    assertThat(billing.getSlaDue()).isAfter(BusinessClock.today(Clock.systemUTC()).plusDays(9));
     DpItem item = billings.itemsOf(billing.getId()).get(0);
     assertThat(item.getTag()).isEqualTo(DpTag.BILLED);
 

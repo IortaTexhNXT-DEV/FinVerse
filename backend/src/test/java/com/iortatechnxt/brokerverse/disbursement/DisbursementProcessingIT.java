@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
 import com.iortatechnxt.brokerverse.coa.domain.BalanceSide;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.CwtDirection;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.DisbursementMode;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.FundingStage;
@@ -51,7 +52,7 @@ import com.iortatechnxt.brokerverse.payables.service.BankAccountQueryService;
 import com.iortatechnxt.brokerverse.payables.service.BankAccountService;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,7 +172,7 @@ class DisbursementProcessingIT {
                         null,
                         new BigDecimal("20.00"),
                         "Supplies",
-                        LocalDate.now(),
+                        BusinessClock.today(Clock.systemUTC()),
                         null,
                         null)));
     assertThat(withEwt.getNet()).isEqualByComparingTo("980.00");
@@ -242,8 +243,8 @@ class DisbursementProcessingIT {
                 v.getId(),
                 new ReceiptTag(
                     "OR-" + BookingFixtures.token(),
-                    LocalDate.now(),
-                    LocalDate.now(),
+                    BusinessClock.today(Clock.systemUTC()),
+                    BusinessClock.today(Clock.systemUTC()),
                     null,
                     null)));
     fx.as(
@@ -254,9 +255,9 @@ class DisbursementProcessingIT {
                 new CwtTag(
                     CwtDirection.RELEASED,
                     "2307-" + BookingFixtures.token(),
-                    LocalDate.now().minusMonths(2),
-                    LocalDate.now(),
-                    LocalDate.now(),
+                    BusinessClock.today(Clock.systemUTC()).minusMonths(2),
+                    BusinessClock.today(Clock.systemUTC()),
+                    BusinessClock.today(Clock.systemUTC()),
                     new BigDecimal("20.00"),
                     null,
                     null)));
@@ -264,9 +265,9 @@ class DisbursementProcessingIT {
 
     jdbc.update(
         "update dsb_instrument set printed_on = ? where id = ?",
-        LocalDate.now().minusDays(200),
+        BusinessClock.today(Clock.systemUTC()).minusDays(200),
         check.getId());
-    staleJob.execute(LocalDate.now());
+    staleJob.execute(BusinessClock.today(Clock.systemUTC()));
     assertThat(fx.as(PROCESSOR, () -> instruments.forVoucher(v.getId())).getStatus())
         .isEqualTo(InstrumentStatus.STALE);
     IntakeRequest reissue = fx.as(PROCESSOR, () -> instrumentActions.reissue(v.getId()));
@@ -312,7 +313,7 @@ class DisbursementProcessingIT {
                         new BigDecimal("1000.00"),
                         "PHP",
                         "Weekly funding",
-                        LocalDate.now(),
+                        BusinessClock.today(Clock.systemUTC()),
                         null)));
     fx.as(LEADER, () -> funding.submit(f.getId()));
     assertThatThrownBy(() -> fx.as(LEADER, () -> funding.verify(f.getId(), null)))
@@ -349,7 +350,9 @@ class DisbursementProcessingIT {
     ChequeBook book =
         fx.as(
             LEADER,
-            () -> bankService.addChequeBook(bpi.getId(), first, first + 49, LocalDate.now()));
+            () ->
+                bankService.addChequeBook(
+                    bpi.getId(), first, first + 49, BusinessClock.today(Clock.systemUTC())));
     ChequeBook edited =
         fx.as(LEADER, () -> bankService.editChequeBook(book.getId(), first + 1, first + 50));
     assertThat(edited.getPreviousRange()).isEqualTo(first + "-" + (first + 49));

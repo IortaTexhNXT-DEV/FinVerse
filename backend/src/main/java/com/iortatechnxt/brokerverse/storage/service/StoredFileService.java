@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.common.storage.ObjectKeys;
 import com.iortatechnxt.brokerverse.common.storage.ObjectRef;
 import com.iortatechnxt.brokerverse.common.storage.StorageProperties;
 import com.iortatechnxt.brokerverse.common.storage.StoredObject;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.Sha256;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
@@ -22,7 +23,6 @@ import com.iortatechnxt.brokerverse.storage.domain.StoredFileRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -310,12 +310,12 @@ public class StoredFileService {
   }
 
   /**
-   * The storage date (UTC).
+   * The business date of the storage (retention dates).
    *
    * @return date
    */
   public LocalDate today() {
-    return LocalDate.ofInstant(clock.instant(), ZoneOffset.UTC);
+    return BusinessClock.today(clock);
   }
 
   private StoredObject write(ObjectRef ref, byte[] content, String contentType, String sha256) {

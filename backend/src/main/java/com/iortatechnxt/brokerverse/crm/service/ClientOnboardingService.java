@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientStatus;
 import com.iortatechnxt.brokerverse.crm.domain.KycStatus;
@@ -113,7 +114,7 @@ public class ClientOnboardingService {
           "KYC_FOUR_EYES", "The KYC must be verified by a user other than its maker");
     }
     kyc.requireComplete(client, "verify the KYC");
-    LocalDate due = reviewPolicy.nextReview(client.getRiskRating(), LocalDate.now(clock));
+    LocalDate due = reviewPolicy.nextReview(client.getRiskRating(), BusinessClock.today(clock));
     String action = client.getStatus() == ClientStatus.CONFIRMED ? "review_kyc" : "verify_kyc";
     workflow.act(client, action, TransitionNote.comment(comment));
     client.verifyKyc(checker, clock.instant(), due);
@@ -143,7 +144,7 @@ public class ClientOnboardingService {
         client.getId(),
         "confirmation of " + client.getCode());
     workflow.act(client, "confirm", TransitionNote.comment(comment));
-    String code = numbers.next("CL-" + LocalDate.now(clock).getYear());
+    String code = numbers.next("CL-" + BusinessClock.today(clock).getYear());
     String partyCode = parties.openParty(client, code);
     client.confirm(code, partyCode, currentUser.username(), clock.instant());
     workflow.describe(client);

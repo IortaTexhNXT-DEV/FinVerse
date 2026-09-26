@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.report.render;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
@@ -10,7 +11,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class OdsReportRenderer implements ReportRenderer {
   private static final String CELL = "table-cell";
   private static final String ROW = "table-row";
   private static final DateTimeFormatter STAMP =
-      DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withZone(ZoneId.of("Asia/Manila"));
+      DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withZone(BusinessClock.zone());
 
   @Override
   public ExportFormat format() {

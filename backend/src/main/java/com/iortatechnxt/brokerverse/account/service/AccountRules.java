@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.catalog.service.RatingQuery;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
@@ -107,7 +108,7 @@ public class AccountRules {
     }
     RiskProduct product =
         catalog.requireSellable(
-            draft.productCode(), RatingQuery.Purpose.NEW_BUSINESS, LocalDate.now(clock));
+            draft.productCode(), RatingQuery.Purpose.NEW_BUSINESS, BusinessClock.today(clock));
     ProductLine line = catalog.requireLine(product.getLineCode());
     AccountTerms.check(product, draft);
     checkCodes(draft);
@@ -132,7 +133,7 @@ public class AccountRules {
   }
 
   private void checkCodes(AccountDraft draft) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     lovs.validateOptional("MARKET_SEGMENT", draft.marketSegment(), today);
     lovs.validateOptional("SOURCE_CHANNEL", draft.sourceChannel(), today);
     if (draft.mortgage() != null) {

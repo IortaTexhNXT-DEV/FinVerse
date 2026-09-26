@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.remittance.service;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
@@ -133,7 +134,7 @@ public class BatchCancellation {
    * @param reason cancellation reason
    */
   public void restore(RemittanceBatch batch, String dvNo, String reason) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     Long branchId = null;
     for (BatchLine line : batch.included()) {
       OpsInvoice invoice = ledger.require(line.getInvoiceNo());

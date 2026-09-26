@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.quotation.service;
 
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.quotation.domain.Quotation;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationContent;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationRepository;
@@ -59,7 +60,8 @@ public class QuotationQueryService {
    * @return today plus the expiring window
    */
   public LocalDate expiringLimit() {
-    return LocalDate.now(clock).plusDays(parameters.intValue(EXPIRING_DAYS, DEFAULT_EXPIRING));
+    return BusinessClock.today(clock)
+        .plusDays(parameters.intValue(EXPIRING_DAYS, DEFAULT_EXPIRING));
   }
 
   /**

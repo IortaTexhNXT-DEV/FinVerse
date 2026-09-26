@@ -13,13 +13,13 @@ import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedRepository;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -331,14 +331,14 @@ public class DispositionService {
   }
 
   private DispositionTypeRule rule(String typeCode) {
-    lovs.requireValid(LOV, typeCode, LocalDate.now(clock));
+    lovs.requireValid(LOV, typeCode, BusinessClock.today(clock));
     return rules
         .findById(typeCode)
         .orElseThrow(
             () ->
                 new BusinessRuleException(
                     "DISPOSITION_TYPE_NOT_CONFIGURED",
-                    "Disposition type " + typeCode + " has no processing rule (OQ15)"));
+                    "Disposition type " + typeCode + " has no processing rule"));
   }
 
   private Disposition current(Unapplied item) {

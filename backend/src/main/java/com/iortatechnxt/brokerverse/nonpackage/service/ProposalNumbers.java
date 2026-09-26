@@ -1,9 +1,9 @@
 package com.iortatechnxt.brokerverse.nonpackage.service;
 
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
-import java.time.LocalDate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -65,11 +65,11 @@ public class ProposalNumbers {
    * @return ARN-yyyy-nnnnnn
    */
   public String arn() {
-    return numbers.next("ARN-" + LocalDate.now(clock).getYear());
+    return numbers.next("ARN-" + BusinessClock.today(clock).getYear());
   }
 
   private String series(String parameter, String fallback) {
     return numbers.next(
-        parameters.text(parameter, fallback) + "-" + LocalDate.now(clock).getYear());
+        parameters.text(parameter, fallback) + "-" + BusinessClock.today(clock).getYear());
   }
 }

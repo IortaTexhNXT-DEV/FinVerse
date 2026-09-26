@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.cashiering.report;
 
 import com.iortatechnxt.brokerverse.cashiering.report.SqlReport.Spec;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import java.util.List;
@@ -16,6 +17,10 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
  */
 @Configuration(proxyBeanMethods = false)
 public class CashieringControlReports {
+
+  /** Business date of a timestamp within the report period. */
+  private static final String BUSINESS_DAY_IN_PERIOD =
+      "at time zone '" + BusinessClock.zoneId() + "' as date) between :from and :to";
 
   private static final String AMOUNT = "amount";
   private static final String AMOUNT_LABEL = "Amount";
@@ -38,16 +43,21 @@ public class CashieringControlReports {
 
   private static final String ADVANCE =
       "select p.first_seen as payment_date, r.receipt_no as ar_no, p.arn, p.reference, p.amount,"
-          + " p.status, p.rematch_count, cast(p.resolved_at as date) as resolved_on, p.remarks"
+          + " p.status, p.rematch_count, cast(p.resolved_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) as resolved_on, p.remarks"
           + " from csh_prebooked p join csh_receipt r on r.id = p.receipt_id"
           + " where p.company_id = :company and p.first_seen between :from and :to"
           + " order by p.first_seen, p.id";
 
   private static final String REVERSALS =
-      "select cast(a.reversed_at as date) as reversed_on, r.receipt_no, a.invoice_no, a.amount,"
+      "select cast(a.reversed_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) as reversed_on, r.receipt_no, a.invoice_no, a.amount,"
           + " a.source, a.reversal_ref, a.reversal_reason from csh_application a"
           + " left join csh_receipt r on r.id = a.receipt_id where a.company_id = :company"
-          + " and a.status = 'REVERSED' and cast(a.reversed_at as date) between :from and :to"
+          + " and a.status = 'REVERSED' and cast(a.reversed_at "
+          + BUSINESS_DAY_IN_PERIOD
           + " order by a.reversed_at, a.id";
 
   private static final String DIRECT_PAYMENT =
@@ -57,30 +67,46 @@ public class CashieringControlReports {
           + " and i.booking_date between :from and :to order by i.booking_date, i.invoice_no";
 
   private static final String REINSTATEMENTS =
-      "select cast(x.created_at as date) as requested_on, cast(x.approved_at as date) as posted_on,"
+      "select cast(x.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) as requested_on, cast(x.approved_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) as posted_on,"
           + " x.transaction_no, r.receipt_no, x.action, x.reason_code, x.amount, x.invoice_no,"
           + " x.document_no, x.payor_name, x.account_officer, x.stage, x.created_by as requested_by,"
           + " x.approved_by, x.journal_batch_no from csh_receipt_action x"
           + " join csh_receipt r on r.id = x.receipt_id where x.company_id = :company"
-          + " and x.action <> 'CANCEL' and cast(x.created_at as date) between :from and :to";
+          + " and x.action <> 'CANCEL' and cast(x.created_at "
+          + BUSINESS_DAY_IN_PERIOD;
 
   private static final String REAPPLICATIONS =
-      "select cast(ra.created_at as date) as reapplied_on, ra.invoice_no, ra.source_module,"
+      "select cast(ra.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) as reapplied_on, ra.invoice_no, ra.source_module,"
           + " ra.source_ref, ra.unapplied, ra.excess, ra.receipt_nos, ra.unapplied_ref, ra.reason"
           + " from csh_reapplication ra where ra.company_id = :company"
-          + " and cast(ra.created_at as date) between :from and :to order by ra.created_at, ra.id";
+          + " and cast(ra.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to order by ra.created_at, ra.id";
 
   private static final String COP =
-      "select c.receipt_no as ar_no, c.policy_no, c.requesting_unit, cast(c.issued_at as date)"
+      "select c.receipt_no as ar_no, c.policy_no, c.requesting_unit, cast(c.issued_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date)"
           + " as issued_on, c.issued_by, 1 as cnt from csh_certificate_of_payment c"
-          + " where c.company_id = :company and cast(c.issued_at as date) between :from and :to"
+          + " where c.company_id = :company and cast(c.issued_at "
+          + BUSINESS_DAY_IN_PERIOD
           + " order by c.issued_at, c.id";
 
   private static final String CWT_TAGS =
-      "select cast(t.created_at as date) as tagged_on, t.reference, t.invoice_no, t.client_code,"
+      "select cast(t.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) as tagged_on, t.reference, t.invoice_no, t.client_code,"
           + " t.insurer_code, t.path, t.certificate_no, t.amount, t.stage, t.receipt_no"
           + " from csh_cwt_tag t where t.company_id = :company"
-          + " and cast(t.created_at as date) between :from and :to order by t.created_at, t.id";
+          + " and cast(t.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to order by t.created_at, t.id";
 
   private static final String AR_OUTSTANDING =
       "select i.client_code, i.assured_name, i.invoice_no, i.booking_date,"
@@ -107,14 +133,16 @@ public class CashieringControlReports {
           + " sum(p.amount) as amount, sum(p.applied_amount) as applied_amount,"
           + " sum(p.unapplied_amount) as unapplied_amount from csh_payment p"
           + " where p.company_id = :company and p.batch_ref is not null"
-          + " and cast(p.created_at as date) between :from and :to"
+          + " and cast(p.created_at "
+          + BUSINESS_DAY_IN_PERIOD
           + " group by p.batch_ref, p.channel order by p.batch_ref";
 
   private static final String CWT_TXN =
       "select b.batch_no, t.reference, t.invoice_no, t.client_code, t.insurer_code, t.certificate_no,"
           + " t.period_from, t.period_to, t.amount, t.stage, t.reclass_journal_no, t.offset_journal_no,"
           + " b.disbursement_request_no from csh_cwt_tag t join csh_cwt_batch b on b.id = t.batch_id"
-          + " where t.company_id = :company and cast(b.created_at as date) between :from and :to"
+          + " where t.company_id = :company and cast(b.created_at "
+          + BUSINESS_DAY_IN_PERIOD
           + " order by b.batch_no, t.reference";
 
   /**
@@ -129,7 +157,7 @@ public class CashieringControlReports {
         jdbc,
         "CSH-DAILY-CASH-REC",
         "Daily Cash Reconciliation",
-        "Receipts per day, kind and mode with collections, cancellations and applications (Annex II #13, draft)",
+        "Receipts per day, kind and mode with collections, cancellations and applications",
         DAILY_CASH,
         List.of(
             ReportColumn.text("kind", "Kind"),
@@ -155,7 +183,7 @@ public class CashieringControlReports {
         jdbc,
         "CSH-ADVANCE-PAYMENT",
         "Advance Payment Transactions (Auto-Credit)",
-        "Payments received before booking and their automatic application (CSHID.020, Annex II #14, draft)",
+        "Payments received before booking and their automatic application",
         ADVANCE,
         List.of(
             ReportColumn.date("payment_date", "Payment Date"),
@@ -181,7 +209,7 @@ public class CashieringControlReports {
         jdbc,
         "CSH-PAYMENT-REVERSAL",
         "Payment Reversals",
-        "Applications reversed by cancellation, re-application or disposition (Annex II #15, draft)",
+        "Applications reversed by cancellation, re-application or disposition",
         REVERSALS,
         List.of(
             ReportColumn.date("reversed_on", "Reversed On"),
@@ -205,7 +233,7 @@ public class CashieringControlReports {
         jdbc,
         "CSH-DIRECT-PAYMENT",
         "Direct Payment Accounts",
-        "Invoices paid directly to the insurer with the commission to collect (Annex II #16, draft)",
+        "Invoices paid directly to the insurer with the commission to collect",
         DIRECT_PAYMENT,
         List.of(
             ReportColumn.date("booking_date", "Booking Date"),
@@ -231,7 +259,7 @@ public class CashieringControlReports {
         jdbc,
         "CSH-REINSTATEMENT-MON",
         "Reinstatement Monitoring",
-        "Reinstatement requests in every stage (CSHID.004/005, Annex II #17, draft)",
+        "Reinstatement requests in every stage",
         REINSTATEMENTS + " order by x.created_at, x.id",
         reinstatementColumns(),
         "stage",
@@ -250,7 +278,7 @@ public class CashieringControlReports {
         jdbc,
         "CSH-REINSTATEMENT",
         "Reinstatements",
-        "Reinstatements posted with the encoded fields (CSHID.013, Annex II #20, draft)",
+        "Reinstatements posted with the encoded fields",
         REINSTATEMENTS + " and x.stage = 'POSTED' order by x.approved_at, x.id",
         reinstatementColumns());
   }
@@ -284,7 +312,7 @@ public class CashieringControlReports {
         jdbc,
         "CSH-REAPPLICATION",
         "Re-Application",
-        "Payments re-applied after endorsements (ADJID.009/012/013, Annex II #18, draft)",
+        "Payments re-applied after endorsements",
         REAPPLICATIONS,
         List.of(
             ReportColumn.date("reapplied_on", "Re-applied On"),
@@ -310,7 +338,7 @@ public class CashieringControlReports {
         new Spec(
             "CSH-CERT-OF-PAYMENT",
             "Certification of Payment",
-            "Certificates of Payment issued (CSHID.023 Annex II #19)",
+            "Certificates of Payment issued",
             COP,
             List.of(
                 ReportColumn.text("ar_no", "AR Number"),
@@ -337,7 +365,7 @@ public class CashieringControlReports {
         jdbc,
         "CSH-CWT",
         "CWT",
-        "BIR 2307 tags and their status (CSHID.026, Annex II #21, draft)",
+        "BIR 2307 tags and their status",
         CWT_TAGS,
         List.of(
             ReportColumn.date("tagged_on", "Tagged On"),
@@ -375,7 +403,7 @@ public class CashieringControlReports {
                 ReportColumn.amount("outstanding", "Outstanding")),
             "client_code",
             "Client",
-            "Ageing buckets 0-30 / 31-60 / 61-90 / 91-120 / over 120 days to be confirmed (OQ43)."),
+            "Ageing buckets 0-30 / 31-60 / 61-90 / 91-120 / over 120 days."),
         jdbc);
   }
 
@@ -391,7 +419,7 @@ public class CashieringControlReports {
         new Spec(
             "CSH-BATCH-RUN",
             "Payment Batch Run Report",
-            "Payment uploads with applied, excess, pre-booked, unapplied and failed records (BRQID.006)",
+            "Payment uploads with applied, excess, pre-booked, unapplied and failed records",
             BATCH_RUN,
             List.of(
                 ReportColumn.text("batch_ref", "Upload Job"),
@@ -424,7 +452,7 @@ public class CashieringControlReports {
         new Spec(
             "CSH-2307-TXN",
             "BIR 2307 Transaction Report",
-            "Validated 2307 certificates per batch with the reclass and DTIP offset journals (CSHID.027)",
+            "Validated 2307 certificates per batch with the reclass and DTIP offset journals",
             CWT_TXN,
             List.of(
                 ReportColumn.text("reference", REFERENCE_LABEL),
@@ -462,7 +490,7 @@ public class CashieringControlReports {
             columns,
             group.length > 0 ? group[0] : null,
             group.length > 1 ? group[1] : null,
-            SqlReport.DRAFT),
+            null),
         jdbc);
   }
 }

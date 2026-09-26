@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.collections.worklist.service.WorklistFilter.
 import com.iortatechnxt.brokerverse.collections.worklist.service.WorklistQueryService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.organization.domain.Branch;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import java.time.Clock;
@@ -50,7 +51,9 @@ public class CollectionFiles {
           + " from clx_disposition d join clx_item i on i.id = d.item_id"
           + " left join org_branch b on b.id = i.branch_id"
           + " where d.company_id = :companyId and d.ops_action = :action"
-          + " and cast(d.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+          + " and cast(d.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to"
           + " order by 1, 3";
   private static final DateTimeFormatter EXPORT_KEY = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
   private static final Map<String, String> REVERSALS =
@@ -191,7 +194,7 @@ public class CollectionFiles {
           "CLX_EXPORT_TOO_LARGE",
           rows + " accounts exceed the export limit of " + cap + "; narrow the filters");
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     String key = "E" + clock.instant().atZone(FilePeriods.MANILA).format(EXPORT_KEY);
     Map<String, String> p = params(companyId, null, blank(salesUnit));
     if (blank(segment) != null) {

@@ -4,13 +4,13 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseEventType;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseStage;
 import com.iortatechnxt.brokerverse.screening.cases.domain.ScreeningCase;
 import com.iortatechnxt.brokerverse.screening.cases.domain.ScreeningCaseRepository;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -142,7 +142,7 @@ public class CaseAssignmentService {
       throw new BusinessRuleException(
           "SCR_REASSIGN_REASON_REQUIRED", "Select the reason for the re-assignment");
     }
-    lovs.requireValid(CaseCodes.REASSIGN_LOV, reasonCode, LocalDate.now(clock));
+    lovs.requireValid(CaseCodes.REASSIGN_LOV, reasonCode, BusinessClock.today(clock));
     if (OTHERS.equals(reasonCode) && (comment == null || comment.isBlank())) {
       throw new BusinessRuleException(
           "SCR_REASSIGN_COMMENT_REQUIRED", "Enter a comment for reason Others");

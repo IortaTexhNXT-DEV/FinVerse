@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.screening.cases.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.domain.LovValue;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseDocument;
@@ -10,7 +11,6 @@ import com.iortatechnxt.brokerverse.screening.config.domain.ValidationKind;
 import com.iortatechnxt.brokerverse.screening.config.service.ActiveConfig;
 import com.iortatechnxt.brokerverse.screening.config.service.ValidationRules;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -141,7 +141,7 @@ public class CaseValidator {
    */
   public boolean allowed(CaseStage stage, String disposition) {
     return disposition != null
-        && lovs.activeValues(CaseCodes.DISPOSITION_LOV, LocalDate.now(clock)).stream()
+        && lovs.activeValues(CaseCodes.DISPOSITION_LOV, BusinessClock.today(clock)).stream()
             .anyMatch(
                 v -> v.getCode().equals(disposition) && stage.name().equals(v.getParentCode()));
   }
@@ -177,7 +177,7 @@ public class CaseValidator {
   }
 
   private String label(String list, String code) {
-    return lovs.activeValues(list, LocalDate.now(clock)).stream()
+    return lovs.activeValues(list, BusinessClock.today(clock)).stream()
         .filter(v -> v.getCode().equals(code))
         .map(LovValue::getLabel)
         .findFirst()

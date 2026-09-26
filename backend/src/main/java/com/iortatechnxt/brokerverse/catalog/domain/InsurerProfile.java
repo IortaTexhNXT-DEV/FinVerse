@@ -80,7 +80,7 @@ public class InsurerProfile extends AuthorizableEntity implements CatalogRecord 
     if (d.placementChannel() != PlacementChannel.EMAIL) {
       throw new BusinessRuleException(
           "PLACEMENT_CHANNEL_PARKED",
-          "Only e-mail placement is available; SFTP and API channels await BDOI (Q06)");
+          "Only e-mail placement is available; choose the e-mail placement channel");
     }
     if (d.defaultCreditDays() < 0 || d.defaultCreditDays() > MAX_CREDIT_DAYS) {
       throw new BusinessRuleException(

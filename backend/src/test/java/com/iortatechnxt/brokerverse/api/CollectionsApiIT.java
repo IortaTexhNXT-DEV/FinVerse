@@ -6,9 +6,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
 import com.iortatechnxt.brokerverse.collections.CollectionsFixtures;
 import com.iortatechnxt.brokerverse.collections.common.domain.CollectionItem;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -117,7 +118,7 @@ class CollectionsApiIT {
                 "Pick up Monday",
                 "details",
                 Map.of(
-                    "pickupDate", LocalDate.now().plusDays(3).toString(),
+                    "pickupDate", BusinessClock.today(Clock.systemUTC()).plusDays(3).toString(),
                     "pickupAddress", "Makati",
                     "amount", "2500")))
         .andExpect(status().isOk())
@@ -226,13 +227,13 @@ class CollectionsApiIT {
     api.doPost(
             "clxuh",
             BASE + "/files/generate" + company(),
-            Map.of("frequency", "DAILY", "date", LocalDate.now().toString()))
+            Map.of("frequency", "DAILY", "date", BusinessClock.today(Clock.systemUTC()).toString()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].reportCode").value("CLX-OUTSTANDING-PR"));
     api.doPost(
             "clxhandler",
             BASE + "/files/generate" + company(),
-            Map.of("frequency", "DAILY", "date", LocalDate.now().toString()))
+            Map.of("frequency", "DAILY", "date", BusinessClock.today(Clock.systemUTC()).toString()))
         .andExpect(status().isForbidden());
     api.doGet("cashier", BASE + "/files" + company() + "&frequency=DAILY&frequency=ON_REQUEST")
         .andExpect(status().isOk())

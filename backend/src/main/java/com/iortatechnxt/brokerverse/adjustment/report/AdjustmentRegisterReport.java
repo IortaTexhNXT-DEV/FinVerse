@@ -54,8 +54,7 @@ public class AdjustmentRegisterReport implements ReportDefinition {
     return ReportMetadata.operations(
         CODE,
         "Adjustment Report",
-        "Endorsement requests with type, amount and reason by account, segment, AO and risk type"
-            + " (ADJID.019; layout to confirm, OQ42)",
+        "Endorsement requests with type, amount and reason by account, segment, AO and risk type",
         specs);
   }
 

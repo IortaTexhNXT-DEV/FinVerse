@@ -48,7 +48,7 @@ public class PremiumRecheckJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Re-checks the premium of open claims without an authorization code (BRCLM.001)";
+    return "Re-checks the premium of open claims without an authorization code";
   }
 
   @Override

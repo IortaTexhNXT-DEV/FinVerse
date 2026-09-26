@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.closing.domain.PeriodCloseSchedule;
 import com.iortatechnxt.brokerverse.closing.domain.PeriodCloseScheduleRepository;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.organization.domain.Holiday;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.period.domain.AccountingPeriod;
@@ -50,7 +51,7 @@ public class PeriodCloseScheduleService {
   public static final String FAILED_ALERT = "GL_CLOSE_FAILED";
 
   /** Business time zone of BDOI. */
-  public static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  public static final ZoneId MANILA = BusinessClock.zone();
 
   private static final String ENTITY = "PeriodCloseSchedule";
   private static final LocalTime DEFAULT_TIME = LocalTime.of(17, 0);

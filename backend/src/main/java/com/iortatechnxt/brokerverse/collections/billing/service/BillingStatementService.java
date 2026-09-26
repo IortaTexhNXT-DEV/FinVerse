@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.collections.installment.service.PlanAllocati
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -166,7 +167,7 @@ public class BillingStatementService {
                       + " is billed by "
                       + s.getSoaNo());
             });
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     if (plan.isActive()) {
       allocation.allocate(plan, today);
     }

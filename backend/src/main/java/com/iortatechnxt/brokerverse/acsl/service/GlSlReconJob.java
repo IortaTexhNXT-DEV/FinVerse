@@ -48,7 +48,7 @@ public class GlSlReconJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Reconciles the general ledger with the sub-ledgers per control account (ACSL 2.13.2)";
+    return "Reconciles the general ledger with the sub-ledgers per control account";
   }
 
   @Override

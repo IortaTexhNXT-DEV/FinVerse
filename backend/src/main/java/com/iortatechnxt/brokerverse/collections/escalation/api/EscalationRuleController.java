@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.collections.escalation.api.dto.EscalationDto
 import com.iortatechnxt.brokerverse.collections.escalation.service.EscalationEngine;
 import com.iortatechnxt.brokerverse.collections.escalation.service.EscalationRuleService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -130,7 +131,7 @@ public class EscalationRuleController {
       @PathVariable Long id,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
           LocalDate asOf) {
-    return engine.matches(rules.get(id), asOf == null ? LocalDate.now(clock) : asOf).stream()
+    return engine.matches(rules.get(id), asOf == null ? BusinessClock.today(clock) : asOf).stream()
         .limit(MAX_PREVIEW)
         .map(MatchResponse::from)
         .toList();

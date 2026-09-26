@@ -8,13 +8,13 @@ import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedRepository;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import com.iortatechnxt.brokerverse.workflow.service.StartCase;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,7 +85,10 @@ public class UnappliedService {
     Unapplied item =
         items.save(
             new Unapplied(
-                companyId, branchId, numbers.next("UNP-" + LocalDate.now(clock).getYear()), spec));
+                companyId,
+                branchId,
+                numbers.next("UNP-" + BusinessClock.today(clock).getYear()),
+                spec));
     workflow.start(
         new StartCase(
             companyId,

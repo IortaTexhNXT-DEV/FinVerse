@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkImportHandler;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.time.Clock;
@@ -112,7 +113,7 @@ public class QuotationRequestBulkHandler implements BulkImportHandler {
   public List<String> validate(BulkRow row, BulkContext context) {
     return support.check(
         () -> {
-          LocalDate today = LocalDate.now(clock);
+          LocalDate today = BusinessClock.today(clock);
           lovs.requireValid("SOURCE_CHANNEL", channel(row), today);
           lovs.validateOptional("MARKET_SEGMENT", row.text(SEGMENT), today);
           if (row.text(CLIENT) != null) {

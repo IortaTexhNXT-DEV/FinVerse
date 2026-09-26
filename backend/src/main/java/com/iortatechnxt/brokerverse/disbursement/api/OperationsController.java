@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.disbursement.api;
 
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.BankResponse;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.BankStatusRequest;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.BookRequest;
@@ -15,7 +16,6 @@ import com.iortatechnxt.brokerverse.payables.service.BankAccountQueryService;
 import com.iortatechnxt.brokerverse.payables.service.BankAccountService;
 import jakarta.validation.Valid;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -192,7 +192,7 @@ public class OperationsController {
         id,
         body.firstNo(),
         body.lastNo(),
-        body.receivedOn() == null ? LocalDate.now(clock) : body.receivedOn());
+        body.receivedOn() == null ? BusinessClock.today(clock) : body.receivedOn());
     return bank(banks.get(id));
   }
 

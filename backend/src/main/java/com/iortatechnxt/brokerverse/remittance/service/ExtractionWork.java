@@ -324,8 +324,8 @@ public class ExtractionWork {
                 + invoice.getInvoiceNo()
                 + " is above its DTIP balance"
                 + (decision.reasons().contains(RemittanceRules.PAID_AR_OVER_DTIP)
-                    ? " - excluded (RMTID.014)"
-                    : " - capped at the DTIP (RMTID.014)"),
+                    ? " - excluded"
+                    : " - capped at the DTIP"),
             decision.remittable(),
             OVER_DTIP_ALERT + ":" + invoice.getInvoiceNo()));
   }

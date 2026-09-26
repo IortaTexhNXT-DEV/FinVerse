@@ -74,7 +74,7 @@ public final class AgeingReports {
       return ReportMetadata.claimsHandling(
           AGEING,
           "Claims Aging",
-          "Outstanding claims by age bracket from the reported date, per insurer (BRCLM.026)",
+          "Outstanding claims by age bracket from the reported date, per insurer",
           BclReportSql.asOfFilters());
     }
 
@@ -126,7 +126,7 @@ public final class AgeingReports {
           AGEING_STATUS,
           "Claims Aging per Status",
           "Outstanding claims grouped by status and insurer with the age this stage and the days"
-              + " spent in earlier statuses (BRCLM.028)",
+              + " spent in earlier statuses",
           BclReportSql.asOfFilters());
     }
 
@@ -152,7 +152,7 @@ public final class AgeingReports {
           .groupBy("status", "Claim Status")
           .groupBy(INSURER, "Insurer")
           .rows(rows)
-          .note("Age this stage = days since the current status was set (BRCLM.027).")
+          .note("Age this stage = days since the current status was set.")
           .build();
     }
   }

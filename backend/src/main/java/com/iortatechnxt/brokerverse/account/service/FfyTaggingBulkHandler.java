@@ -8,9 +8,9 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkImportHandler;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -118,7 +118,7 @@ public class FfyTaggingBulkHandler implements BulkImportHandler {
         () -> {
           Account account = account(row, context);
           if (cancel(row)) {
-            lovs.requireValid("FFY_CANCEL_REASON", row.text(REASON), LocalDate.now(clock));
+            lovs.requireValid("FFY_CANCEL_REASON", row.text(REASON), BusinessClock.today(clock));
             return account.getFreeFirstYear().active()
                 ? List.of()
                 : List.of("Account " + account.getArn() + " is not tagged Free First Year");

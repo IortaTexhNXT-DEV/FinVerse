@@ -23,13 +23,13 @@ import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimFollowUpSer
 import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimStatusService;
 import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.seed.SeedUsers;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +69,10 @@ class ClaimsBulkIT {
 
   private BulkContext context() {
     return new BulkContext(
-        fx.company(), "BLK-TEST-" + System.nanoTime(), LocalDate.now(), Map.of());
+        fx.company(),
+        "BLK-TEST-" + System.nanoTime(),
+        BusinessClock.today(Clock.systemUTC()),
+        Map.of());
   }
 
   private static BulkRow row(int no, String... pairs) {
@@ -100,7 +103,7 @@ class ClaimsBulkIT {
     Claim claim = property(fx.propertyInvoice(1));
     String number = "UPL-" + System.nanoTime();
     BulkContext ctx = context();
-    String today = LocalDate.now().toString();
+    String today = BusinessClock.today(Clock.systemUTC()).toString();
 
     BulkRow numberRow =
         row(

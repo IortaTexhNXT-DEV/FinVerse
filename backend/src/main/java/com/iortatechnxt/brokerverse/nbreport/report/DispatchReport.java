@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbreport.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
@@ -37,7 +38,9 @@ public class DispatchReport implements ReportDefinition {
           + " o.created_by as sender"
           + " from msg_outbound o"
           + " where o.company_id = :company and o.purpose in ('EPOLICY', 'INSURANCE_ADVICE')"
-          + " and cast(o.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+          + " and cast(o.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to"
           + " and (cast(:document as varchar) is null or o.purpose = :document)"
           + " and (cast(:outcome as varchar) is null or o.status = :outcome)"
           + " order by o.status desc, o.created_at, o.id";
@@ -58,8 +61,7 @@ public class DispatchReport implements ReportDefinition {
     return NbReportSupport.metadata(
         CODE,
         "Insurance Advice and E-policy Dispatch",
-        "E-policies and Insurance Advices sent or failed with the reason, by date range"
-            + " (BRNB.078)",
+        "E-policies and Insurance Advices sent or failed with the reason, by date range",
         Permission.ACCOUNT_VIEW,
         true,
         ParameterSpec.select(

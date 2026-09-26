@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestRepository;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
@@ -8,7 +9,6 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.nbadmin.domain.ExternalParty;
 import com.iortatechnxt.brokerverse.nbadmin.service.ExternalUserProvisioner.ExternalUserAction;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.Set;
 import org.springframework.stereotype.Component;
@@ -179,7 +179,7 @@ public class AccessRequestValidator {
           "ACCESS_EFFECTIVE_DATE_USER_ONLY",
           "An effective date applies to user requests; group profiles are implemented");
     }
-    if (c.effectiveFrom().isBefore(LocalDate.now(clock))) {
+    if (c.effectiveFrom().isBefore(BusinessClock.today(clock))) {
       throw new BusinessRuleException(
           "ACCESS_EFFECTIVE_DATE", "The effective date cannot be before today");
     }

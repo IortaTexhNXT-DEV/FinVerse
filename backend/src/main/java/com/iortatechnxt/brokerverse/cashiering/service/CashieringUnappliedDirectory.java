@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.cashiering.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedDirectory;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,7 +31,9 @@ public class CashieringUnappliedDirectory implements UnappliedDirectory {
   private static final String SELECT =
       "select * from (select u.id, u.reference, u.company_id, u.currency, u.amount, u.balance,"
           + " u.client_code, u.invoice_no, u.sales_unit, u.payor_name,"
-          + " coalesce(p.value_date, r.receipt_date, cast(u.created_at as date)) as payment_date,"
+          + " coalesce(p.value_date, r.receipt_date, cast(u.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date)) as payment_date,"
           + " p.batch_ref, coalesce(p.payment_no, r.receipt_no) as transaction_no,"
           + " coalesce(p.payment_mode, r.payment_mode) as payment_type,"
           + " coalesce(p.check_bank, r.check_bank) as bank_code,"

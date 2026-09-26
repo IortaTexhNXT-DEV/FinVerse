@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.location.service.ClaimLocationS
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
@@ -129,7 +130,7 @@ public class ClaimRecordingService {
    * @return the claim
    */
   public Claim record(Long companyId, NewClaim request) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     validate(request, today);
     Account account = covers.account(companyId, request.arn());
     CoverSnapshot cover = covers.snapshot(account, request.policyYear(), request.loss().lossDate());
@@ -209,7 +210,7 @@ public class ClaimRecordingService {
     }
     if (request.source() == ClaimSource.MIGRATED) {
       throw new BusinessRuleException(
-          "BCL_SOURCE_NOT_ALLOWED", "Migrated claims come from the legacy migration only (CLQ14)");
+          "BCL_SOURCE_NOT_ALLOWED", "Migrated claims come from the legacy migration only");
     }
   }
 

@@ -16,12 +16,14 @@ import com.iortatechnxt.brokerverse.acsl.service.GlSlReconJob;
 import com.iortatechnxt.brokerverse.acsl.service.GlSlReconciliationService;
 import com.iortatechnxt.brokerverse.acsl.service.SoaUploadService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -175,7 +177,8 @@ class AcslSoaIT {
                     new GlSlControl.Setting(SlSource.OPS_LEDGER, null, null, null, true)))
         .isInstanceOf(BusinessRuleException.class);
 
-    GlSlRun run = as.run("acsl", () -> glsl.run(fx.company(), LocalDate.now()));
+    GlSlRun run =
+        as.run("acsl", () -> glsl.run(fx.company(), BusinessClock.today(Clock.systemUTC())));
     assertThat(run.getAccounts()).isPositive();
     List<GlSlRecon> rows = glsl.rows(run.getId());
     assertThat(rows)
@@ -187,21 +190,25 @@ class AcslSoaIT {
                   .isEqualByComparingTo(r.getGlBalance().subtract(r.getSlBalance()));
             })
         .anySatisfy(r -> assertThat(r.getSource()).isEqualTo(SlSource.PARTY_LEDGER));
-    assertThat(glsl.latest(fx.company(), LocalDate.now())).isPresent();
+    assertThat(glsl.latest(fx.company(), BusinessClock.today(Clock.systemUTC()))).isPresent();
     assertThat(glsl.runs(fx.company())).isNotEmpty();
     assertThat(glsl.controls(fx.company())).hasSizeGreaterThanOrEqualTo(2);
 
     assertThat(job.name()).isEqualTo("ACSL_GL_SL_RECON");
-    assertThat(job.execute(LocalDate.now()).itemsProcessed()).isPositive();
+    assertThat(job.execute(BusinessClock.today(Clock.systemUTC())).itemsProcessed()).isPositive();
     Map<String, String> params =
-        Map.of("companyId", String.valueOf(fx.company()), "asOf", LocalDate.now().toString());
+        Map.of(
+            "companyId",
+            String.valueOf(fx.company()),
+            "asOf",
+            BusinessClock.today(Clock.systemUTC()).toString());
     assertThat(as.run("acslhead", () -> reports.run("ACSL-GL-SL-RECON", params)).code())
         .isEqualTo("ACSL-GL-SL-RECON");
     Map<String, String> booked =
         Map.of(
             "companyId", String.valueOf(fx.company()),
-            "from", LocalDate.now().minusYears(1).toString(),
-            "to", LocalDate.now().plusDays(1).toString());
+            "from", BusinessClock.today(Clock.systemUTC()).minusYears(1).toString(),
+            "to", BusinessClock.today(Clock.systemUTC()).plusDays(1).toString());
     assertThat(
             as.run(
                 "acsl",

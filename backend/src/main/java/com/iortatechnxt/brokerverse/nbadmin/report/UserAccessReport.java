@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.report.UserAccessHistory.Change;
 import com.iortatechnxt.brokerverse.nbadmin.report.UserAccessHistory.Snapshot;
 import com.iortatechnxt.brokerverse.nbadmin.report.UserAccessHistory.UserRow;
@@ -61,7 +62,7 @@ public class UserAccessReport implements ReportDefinition {
         CODE,
         "User Access Report",
         "Users with their group profiles and who created, modified, deactivated or reactivated"
-            + " them, as of a date (BRD 3.003.1)",
+            + " them, as of a date",
         List.of(
             UamReportSupport.asOfParam(),
             ParameterSpec.optional(UNIT, "Business Unit Group", ParameterType.TEXT),
@@ -77,7 +78,7 @@ public class UserAccessReport implements ReportDefinition {
   public ReportResult generate(ReportParameters p) {
     LocalDate asOf = UamReportSupport.asOf(p, clock);
     Instant end = UamReportSupport.endOf(asOf);
-    boolean today = asOf.equals(LocalDate.now(clock.withZone(UamReportSupport.MANILA)));
+    boolean today = asOf.equals(BusinessClock.today(clock));
     String unit = p.optionalText(UNIT).orElse(null);
     String status = p.text(STATUS);
     String profile = p.optionalText(UamReportSupport.GROUP_PROFILE).orElse(null);

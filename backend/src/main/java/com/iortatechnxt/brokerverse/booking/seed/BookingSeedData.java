@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.booking.service.BookingService;
 import com.iortatechnxt.brokerverse.booking.service.EndorsementPosting;
 import com.iortatechnxt.brokerverse.booking.service.EndorsementPostingService;
 import com.iortatechnxt.brokerverse.catalog.service.PeriodBasis;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -120,7 +121,7 @@ public class BookingSeedData implements ApplicationRunner {
   }
 
   private LocalDate date(LocalDate wanted) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     return wanted.isAfter(today) ? today : wanted;
   }
 }

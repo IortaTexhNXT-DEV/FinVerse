@@ -4,6 +4,7 @@ import static com.iortatechnxt.brokerverse.screening.ScreeningMatchingFixtures.p
 import static com.iortatechnxt.brokerverse.screening.ScreeningMatchingFixtures.word;
 
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseDocument.DocumentMeta;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseStatus;
@@ -14,7 +15,7 @@ import com.iortatechnxt.brokerverse.screening.cases.service.CaseAssignmentServic
 import com.iortatechnxt.brokerverse.screening.cases.service.CaseDocumentService;
 import com.iortatechnxt.brokerverse.screening.cases.service.CaseReviewService;
 import com.iortatechnxt.brokerverse.support.AsUser;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.Map;
 import java.util.function.Supplier;
 import org.springframework.stereotype.Component;
@@ -160,7 +161,11 @@ public class ScreeningCaseFixtures {
         () ->
             documents.upload(
                 reload(c),
-                new DocumentMeta("KYC_REVIEW", "KYC_FORM", LocalDate.now().minusDays(1), "Branch"),
+                new DocumentMeta(
+                    "KYC_REVIEW",
+                    "KYC_FORM",
+                    BusinessClock.today(Clock.systemUTC()).minusDays(1),
+                    "Branch"),
                 "kyc form.pdf",
                 ScreeningMatchingFixtures.PDF));
   }

@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientInstruction;
 import com.iortatechnxt.brokerverse.crm.domain.ClientInstructionRepository;
@@ -84,7 +85,7 @@ public class ClientNotesService {
   @Transactional(readOnly = true)
   public ClientBanner banner(Long clientId) {
     Client client = clients.get(clientId);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     List<ClientBanner.Tag> activeTags =
         tags.findByClientIdAndActiveTrueOrderByTagCode(clientId).stream()
             .map(t -> new ClientBanner.Tag(t.getTagCode(), lovs.label(TAG_LIST, t.getTagCode())))
@@ -130,7 +131,7 @@ public class ClientNotesService {
    */
   public ClientTag addTag(Long clientId, String tagCode) {
     Client client = clients.requireUsable(clientId);
-    lovs.requireValid(TAG_LIST, tagCode, LocalDate.now(clock));
+    lovs.requireValid(TAG_LIST, tagCode, BusinessClock.today(clock));
     if (tags.findByClientIdAndTagCodeAndActiveTrue(clientId, tagCode).isPresent()) {
       throw new BusinessRuleException(
           "CLIENT_TAG_EXISTS", "The client is already tagged " + lovs.label(TAG_LIST, tagCode));
@@ -225,7 +226,7 @@ public class ClientNotesService {
   }
 
   private void validate(InstructionContent content) {
-    lovs.requireValid(INSTRUCTION_LIST, content.type(), LocalDate.now(clock));
+    lovs.requireValid(INSTRUCTION_LIST, content.type(), BusinessClock.today(clock));
     if (content.text() == null || content.text().isBlank()) {
       throw new BusinessRuleException("INSTRUCTION_TEXT_REQUIRED", "Enter the instruction");
     }

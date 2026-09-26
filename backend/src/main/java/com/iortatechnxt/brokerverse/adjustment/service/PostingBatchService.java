@@ -11,10 +11,10 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -91,7 +91,7 @@ public class PostingBatchService {
     if (distinct.isEmpty()) {
       throw new BusinessRuleException("ADJ_BATCH_EMPTY", "Select the requests to post");
     }
-    String batchNo = tx.execute(s -> numbers.next("VB-" + LocalDate.now(clock).getYear()));
+    String batchNo = tx.execute(s -> numbers.next("VB-" + BusinessClock.today(clock).getYear()));
     PostingBatch batch = new PostingBatch(companyId, batchNo, remarks);
     for (Long id : distinct) {
       batch.add(postOne(companyId, id, batchNo));

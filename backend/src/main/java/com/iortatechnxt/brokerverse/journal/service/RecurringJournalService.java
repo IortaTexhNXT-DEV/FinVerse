@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.api.dto.RecurringTemplateRequest;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatchRepository;
@@ -278,7 +279,7 @@ public class RecurringJournalService {
             r.companyId(),
             r.branchId(),
             r.journalType(),
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             r.startDate(),
             r.currency(),
             r.narration(),

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.productmaint.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -19,7 +20,6 @@ import com.iortatechnxt.brokerverse.productmaint.domain.PackageTerms.CoverageTer
 import com.iortatechnxt.brokerverse.productmaint.domain.Signoff;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -99,7 +99,7 @@ public class PackageDocuments {
     MergedText text =
         templates.merge(
             FORM_TEMPLATE,
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             Map.of(
                 REFERENCE,
                 p.getRequestNo(),
@@ -125,7 +125,7 @@ public class PackageDocuments {
     MergedText text =
         templates.merge(
             QS_TEMPLATE,
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             Map.of(
                 REFERENCE,
                 r.getQsNo(),
@@ -161,7 +161,7 @@ public class PackageDocuments {
     MergedText text =
         templates.merge(
             COMPARATIVE_TEMPLATE,
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             Map.of(
                 REFERENCE,
                 p.getRequestNo(),
@@ -211,7 +211,7 @@ public class PackageDocuments {
     MergedText text =
         templates.merge(
             SLIP_TEMPLATE,
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             Map.of(REFERENCE, p.getRequestNo(), TITLE, p.getTitle()));
     List<Section> sections = new ArrayList<>();
     sections.add(new Text(null, text.text()));

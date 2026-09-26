@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.party.domain.Party;
 import com.iortatechnxt.brokerverse.party.domain.PartyType;
 import com.iortatechnxt.brokerverse.party.service.PartyService;
@@ -18,6 +19,7 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
 import com.iortatechnxt.brokerverse.support.TestParties;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -62,12 +64,21 @@ class OpenItemIT {
         "accountant",
         () -> {
           OpenItem older =
-              item(client, ItemDirection.DEBIT, "300.00", LocalDate.now().minusDays(40));
+              item(
+                  client,
+                  ItemDirection.DEBIT,
+                  "300.00",
+                  BusinessClock.today(Clock.systemUTC()).minusDays(40));
           OpenItem newer =
-              item(client, ItemDirection.DEBIT, "500.00", LocalDate.now().minusDays(5));
-          OpenItem receipt = item(client, ItemDirection.CREDIT, "600.00", LocalDate.now());
+              item(
+                  client,
+                  ItemDirection.DEBIT,
+                  "500.00",
+                  BusinessClock.today(Clock.systemUTC()).minusDays(5));
+          OpenItem receipt =
+              item(client, ItemDirection.CREDIT, "600.00", BusinessClock.today(Clock.systemUTC()));
 
-          openItems.allocateFifo(receipt.getId(), LocalDate.now());
+          openItems.allocateFifo(receipt.getId(), BusinessClock.today(Clock.systemUTC()));
 
           assertThat(openItems.get(older.getId()).getStatus()).isEqualTo(OpenItemStatus.SETTLED);
           assertThat(openItems.get(newer.getId()).outstanding()).isEqualByComparingTo("200.00");
@@ -76,7 +87,7 @@ class OpenItemIT {
           var rows =
               ageing.age(
                   data.company().getId(),
-                  LocalDate.now(),
+                  BusinessClock.today(Clock.systemUTC()),
                   AgeingService.DEFAULT_BUCKETS,
                   i -> i.getPartyCode().equals(client.getCode()));
           assertThat(rows)
@@ -96,14 +107,17 @@ class OpenItemIT {
                   parties.getByCode(data.company().getId(), "C-000101"),
                   ItemDirection.DEBIT,
                   "10.00",
-                  LocalDate.now());
+                  BusinessClock.today(Clock.systemUTC()));
           OpenItem b =
               item(
                   parties.getByCode(data.company().getId(), "C-000102"),
                   ItemDirection.CREDIT,
                   "10.00",
-                  LocalDate.now());
-          assertThatThrownBy(() -> openItems.match(a.getId(), b.getId(), null, LocalDate.now()))
+                  BusinessClock.today(Clock.systemUTC()));
+          assertThatThrownBy(
+                  () ->
+                      openItems.match(
+                          a.getId(), b.getId(), null, BusinessClock.today(Clock.systemUTC())))
               .isInstanceOf(BusinessRuleException.class);
           return null;
         });
@@ -115,12 +129,17 @@ class OpenItemIT {
         "accountant",
         () -> {
           Party client = parties.getByCode(data.company().getId(), "C-000204");
-          OpenItem d = item(client, ItemDirection.DEBIT, "10.00", LocalDate.now());
-          OpenItem c = item(client, ItemDirection.CREDIT, "50.00", LocalDate.now());
+          OpenItem d =
+              item(client, ItemDirection.DEBIT, "10.00", BusinessClock.today(Clock.systemUTC()));
+          OpenItem c =
+              item(client, ItemDirection.CREDIT, "50.00", BusinessClock.today(Clock.systemUTC()));
           assertThatThrownBy(
                   () ->
                       openItems.match(
-                          d.getId(), c.getId(), new BigDecimal("20.00"), LocalDate.now()))
+                          d.getId(),
+                          c.getId(),
+                          new BigDecimal("20.00"),
+                          BusinessClock.today(Clock.systemUTC())))
               .isInstanceOf(BusinessRuleException.class);
           return null;
         });

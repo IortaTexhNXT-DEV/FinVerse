@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.remittance.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.service.port.InvoiceRelatedItems;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLine;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLineRepository;
@@ -27,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class RemittanceRelatedItems implements InvoiceRelatedItems {
 
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  private static final ZoneId MANILA = BusinessClock.zone();
 
   private final BatchLineRepository lines;
   private final HoldRequestRepository holds;
@@ -124,6 +125,6 @@ public class RemittanceRelatedItems implements InvoiceRelatedItems {
   }
 
   private static LocalDate date(Instant at) {
-    return at == null ? null : LocalDate.ofInstant(at, MANILA);
+    return at == null ? null : BusinessClock.dateOf(at);
   }
 }

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.approval.service.ApprovalInboxService;
 import com.iortatechnxt.brokerverse.approval.service.PendingApproval;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.NotificationRepository;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestAction;
@@ -30,6 +31,7 @@ import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -167,7 +169,7 @@ class UserAccessLifecycleIT {
   @Test
   void scheduledChangeIsAppliedByTheJobOnItsDate() {
     AppUser user = newUser();
-    LocalDate tomorrow = LocalDate.now().plusDays(2);
+    LocalDate tomorrow = BusinessClock.today(Clock.systemUTC()).plusDays(2);
     AccessRequest request =
         as.run(
             REQUESTOR,
@@ -289,7 +291,8 @@ class UserAccessLifecycleIT {
     assertCode(enrol("ab"), "ACCESS_USERNAME");
     assertCode(enrol("abc" + name), "ACCESS_USER_ID_FORMAT");
     assertCode(
-        enrol(AccessRequestIT.username()).withEffectiveFrom(LocalDate.now().minusDays(3)),
+        enrol(AccessRequestIT.username())
+            .withEffectiveFrom(BusinessClock.today(Clock.systemUTC()).minusDays(3)),
         "ACCESS_EFFECTIVE_DATE");
     assertCode(
         enrol(AccessRequestIT.username())

@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.payrequest.domain.ExpenseValues;
 import com.iortatechnxt.brokerverse.payrequest.domain.Liquidation;
@@ -20,7 +21,6 @@ import com.iortatechnxt.brokerverse.payrequest.domain.RequestKind;
 import com.iortatechnxt.brokerverse.payrequest.domain.RequestStage;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -114,7 +114,7 @@ public class LiquidationService {
                     liquidations.save(
                         new Liquidation(
                             requestId,
-                            numbers.next("LIQ-" + LocalDate.now(clock).getYear()),
+                            numbers.next("LIQ-" + BusinessClock.today(clock).getYear()),
                             advance.getAmount())));
     if (liquidation.getStatus() != LiquidationStatus.DRAFT) {
       throw new BusinessRuleException(
@@ -185,7 +185,7 @@ public class LiquidationService {
                 EVENT,
                 advance.getCompanyId(),
                 advance.getBranchId(),
-                LocalDate.now(clock),
+                BusinessClock.today(clock),
                 advance.getContent().currency(),
                 PayRequests.MODULE,
                 "LIQ:" + liquidation.getLiquidationNo(),

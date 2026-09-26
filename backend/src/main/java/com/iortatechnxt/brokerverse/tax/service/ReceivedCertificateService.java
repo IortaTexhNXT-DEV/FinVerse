@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.organization.domain.Branch;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.tax.domain.ReceivedCertificate;
@@ -179,7 +180,7 @@ public class ReceivedCertificateService {
     String batch =
         c.getJournalBatchNo() == null
             ? null
-            : post(c, BigDecimal.ONE.negate(), "CRT:" + id + ":CANCEL", LocalDate.now(clock));
+            : post(c, BigDecimal.ONE.negate(), "CRT:" + id + ":CANCEL", BusinessClock.today(clock));
     c.cancel(reason.strip(), batch);
     audit.record(ENTITY, id, AuditAction.REVERSE, "Cancelled: " + reason.strip());
     return c;
@@ -229,7 +230,7 @@ public class ReceivedCertificateService {
       throw new BusinessRuleException(
           "CERTIFICATE_PERIOD", "Give the period covered: its end is after its start");
     }
-    if (f.receivedOn() == null || f.receivedOn().isAfter(LocalDate.now(clock))) {
+    if (f.receivedOn() == null || f.receivedOn().isAfter(BusinessClock.today(clock))) {
       throw new BusinessRuleException(
           "CERTIFICATE_RECEIVED_ON", "Give the date received, not in the future");
     }

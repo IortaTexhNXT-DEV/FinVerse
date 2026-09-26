@@ -6,10 +6,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.iortatechnxt.brokerverse.cashiering.CashFixtures;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -109,7 +110,7 @@ class CashieringApiIT {
                         "amount",
                         500,
                         "paymentDate",
-                        LocalDate.now().toString(),
+                        BusinessClock.today(Clock.systemUTC()).toString(),
                         "mode",
                         "CASH"))
                 .andExpect(status().isOk())
@@ -172,7 +173,7 @@ class CashieringApiIT {
                         "amount",
                         60,
                         "paymentDate",
-                        LocalDate.now().toString(),
+                        BusinessClock.today(Clock.systemUTC()).toString(),
                         "mode",
                         "CASH"))
                 .andExpect(status().isOk()));

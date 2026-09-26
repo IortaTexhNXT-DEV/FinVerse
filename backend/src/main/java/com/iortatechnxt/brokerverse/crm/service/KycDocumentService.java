@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.attachment.service.AttachmentService;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientStatus;
 import com.iortatechnxt.brokerverse.crm.domain.ClientType;
@@ -85,7 +86,7 @@ public class KycDocumentService {
     if (client.getStatus() == ClientStatus.INACTIVE) {
       throw new BusinessRuleException("CLIENT_INACTIVE", "The client is inactive");
     }
-    LovValue type = lovs.requireValid(DOCUMENT_TYPE, documentType, LocalDate.now(clock));
+    LovValue type = lovs.requireValid(DOCUMENT_TYPE, documentType, BusinessClock.today(clock));
     Attachment stored =
         attachments.upload(target(client), fileName, content, "KYC: " + type.getLabel());
     documents.save(new KycDocument(clientId, documentType, stored.getId()));
@@ -119,7 +120,7 @@ public class KycDocumentService {
    */
   @Transactional(readOnly = true)
   public KycChecklist checklist(Client client) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     Map<Long, Attachment> live =
         attachments.list(target(client)).stream()
             .collect(Collectors.toMap(Attachment::getId, Function.identity()));

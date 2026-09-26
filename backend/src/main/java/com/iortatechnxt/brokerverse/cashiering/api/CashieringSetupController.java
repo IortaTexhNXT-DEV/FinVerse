@@ -12,9 +12,9 @@ import com.iortatechnxt.brokerverse.cashiering.service.MinimalBalanceService;
 import com.iortatechnxt.brokerverse.cashiering.service.MinimalBalanceService.Sweep;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentFileLayouts;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSeriesService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -178,7 +178,7 @@ public class CashieringSetupController {
   @PostMapping("/minimal-balance/sweep")
   @PreAuthorize(CashAccess.APPROVE)
   public Sweep sweep() {
-    return minimal.sweep(LocalDate.now(clock));
+    return minimal.sweep(BusinessClock.today(clock));
   }
 
   /**

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.api;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.RetentionEligibleResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.RetentionRuleRequest;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.RetentionRuleResponse;
@@ -103,7 +104,7 @@ public class RetentionController {
   @PostMapping("/review")
   @PreAuthorize(MAINTAIN)
   public List<RetentionRuleResponse> review() {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     jobRuns.execute(job.name(), JobTrigger.MANUAL, () -> job.execute(today));
     return rules();
   }

@@ -3,11 +3,12 @@ package com.iortatechnxt.brokerverse.journal;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.Json;
 import com.iortatechnxt.brokerverse.support.TestData;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ class JournalApiIT {
         "journalType",
         "MANUAL",
         "valueDate",
-        LocalDate.now().toString(),
+        BusinessClock.today(Clock.systemUTC()).toString(),
         "currency",
         "PHP",
         "narration",
@@ -75,7 +76,10 @@ class JournalApiIT {
 
     long copyId =
         api.read(
-                api.doPost("accountant", JOURNALS + id + "/copy?valueDate=" + LocalDate.now(), null)
+                api.doPost(
+                        "accountant",
+                        JOURNALS + id + "/copy?valueDate=" + BusinessClock.today(Clock.systemUTC()),
+                        null)
                     .andExpect(jsonPath("$.status").value("DRAFT")))
             .get("id")
             .asLong();
@@ -87,14 +91,22 @@ class JournalApiIT {
                 api.doPost(
                         "fmanager",
                         JOURNALS + id + "/reverse",
-                        Json.of("reversalDate", LocalDate.now().toString(), "reason", "Duplicate"))
+                        Json.of(
+                            "reversalDate",
+                            BusinessClock.today(Clock.systemUTC()).toString(),
+                            "reason",
+                            "Duplicate"))
                     .andExpect(jsonPath("$.journalType").value("REVERSAL")))
             .get("id")
             .asLong();
     api.doPost(
             "fmanager",
             JOURNALS + id + "/reverse",
-            Json.of("reversalDate", LocalDate.now().toString(), "reason", "Again"))
+            Json.of(
+                "reversalDate",
+                BusinessClock.today(Clock.systemUTC()).toString(),
+                "reason",
+                "Again"))
         .andExpect(jsonPath("$.code").value("REVERSAL_PENDING"));
     api.doPost("checker", JOURNALS + reversalId + "/approve", null)
         .andExpect(jsonPath("$.status").value("POSTED"));
@@ -113,7 +125,7 @@ class JournalApiIT {
             "/api/v1/ledger/accounts/"
                 + accountId
                 + "/statement?from=2026-01-01&to="
-                + LocalDate.now())
+                + BusinessClock.today(Clock.systemUTC()))
         .andExpect(jsonPath("$.accountCode").value("5604"))
         .andExpect(jsonPath("$.lines.length()").isNumber());
   }

@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.FieldValidationException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.lov.domain.LovValue;
@@ -151,7 +152,7 @@ public class StrService {
       return existing.get();
     }
     access.requireActor(c, "prepare the STR", EnumSet.of(CaseStage.STR_PREPARATION));
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     Client client = clients.get(c.getClientId());
     Optional<ReviewTemplate> template = config.template(c.getCompanyId(), TemplateType.STR, today);
     SuspiciousTransactionReport str =
@@ -295,7 +296,7 @@ public class StrService {
 
   private void validate(StrEdit edit) {
     Set<String> reasons =
-        lovs.activeValues(REASON_LOV, LocalDate.now(clock)).stream()
+        lovs.activeValues(REASON_LOV, BusinessClock.today(clock)).stream()
             .map(LovValue::getCode)
             .collect(Collectors.toSet());
     for (String code : edit.reasonCodes()) {

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.tax.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -53,7 +54,7 @@ final class TaxReportSupport {
 
   static ParameterSpec year(Clock clock) {
     return ParameterSpec.required(YEAR, "Year", ParameterType.NUMBER)
-        .withDefault(String.valueOf(LocalDate.now(clock).getYear()));
+        .withDefault(String.valueOf(BusinessClock.today(clock).getYear()));
   }
 
   static ParameterSpec quarter(Clock clock) {
@@ -61,7 +62,7 @@ final class TaxReportSupport {
         QUARTER,
         "Quarter",
         List.of("1", "2", "3", "4"),
-        String.valueOf(TaxPeriod.quarterNumber(LocalDate.now(clock))));
+        String.valueOf(TaxPeriod.quarterNumber(BusinessClock.today(clock))));
   }
 
   static ParameterSpec month(Clock clock) {
@@ -69,7 +70,7 @@ final class TaxReportSupport {
         MONTH,
         "Month",
         Arrays.stream(Month.values()).map(m -> String.valueOf(m.getValue())).toList(),
-        String.valueOf(LocalDate.now(clock).getMonthValue()));
+        String.valueOf(BusinessClock.today(clock).getMonthValue()));
   }
 
   static TaxPeriod monthPeriod(ReportParameters p) {

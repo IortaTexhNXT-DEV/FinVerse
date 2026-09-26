@@ -25,10 +25,12 @@ import com.iortatechnxt.brokerverse.brokerclaims.location.service.ClaimLocationS
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.LocationRefService;
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.LocationRefService.NewRef;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -113,7 +115,7 @@ class ClaimInsurersIT {
   void insurerClaimNumbersAreUniquePerInsurerAndWarnedAcrossClaims() {
     OpsInvoice invoice = fx.propertyInvoice(1);
     Claim claim = property(invoice, List.of(new LocationPick(1, null)));
-    LocalDate today = LocalDate.now();
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     String number = "C-INSA-" + System.nanoTime();
     InsurerClaim lead = line(claim, LEAD);
     as.run(OFFICER, () -> insurers.number(claim, lead.getId(), number, today, false));
@@ -204,7 +206,7 @@ class ClaimInsurersIT {
   void insurerUpdatesAreInsertOnlyAndAllowedOnClosedClaims() {
     OpsInvoice invoice = fx.propertyInvoice(1);
     Claim claim = property(invoice, List.of());
-    LocalDate today = LocalDate.now();
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     Long file = fx.attach("BrokerClaim", claim.getId(), "OTHERS");
     InsurerUpdate first =
         as.run(
@@ -258,7 +260,7 @@ class ClaimInsurersIT {
   void insurerLocationReferencesKeepTheirHistory() {
     OpsInvoice invoice = fx.propertyInvoice(1);
     String arn = invoice.getArn();
-    LocalDate start = LocalDate.now().minusMonths(1);
+    LocalDate start = BusinessClock.today(Clock.systemUTC()).minusMonths(1);
     LocationRef first =
         as.run(
             OFFICER,
@@ -279,7 +281,7 @@ class ClaimInsurersIT {
                     () ->
                         refs.maintain(fx.company(), new NewRef(arn, 1, LEAD, "A-LOC-0105", start))))
         .hasMessageContaining("The effective date must be after");
-    LocalDate next = LocalDate.now().plusMonths(1);
+    LocalDate next = BusinessClock.today(Clock.systemUTC()).plusMonths(1);
     as.run(
         OFFICER, () -> refs.maintain(fx.company(), new NewRef(arn, 1, LEAD, "A-LOC-0105", next)));
 
@@ -292,7 +294,7 @@ class ClaimInsurersIT {
                 .orElseThrow()
                 .getEffectiveTo())
         .isEqualTo(next.minusDays(1));
-    assertThat(refs.validOn(fx.company(), arn, LocalDate.now()))
+    assertThat(refs.validOn(fx.company(), arn, BusinessClock.today(Clock.systemUTC())))
         .extracting(LocationRef::getInsurerLocationRef)
         .containsExactlyInAnyOrder("A-LOC-0091", "B-77-12");
     assertThat(
@@ -313,7 +315,7 @@ class ClaimInsurersIT {
                 claim,
                 line(claim, LEAD).getId(),
                 "C-ADV-" + System.nanoTime(),
-                LocalDate.now(),
+                BusinessClock.today(Clock.systemUTC()),
                 false));
 
     var drafts = as.run(OFFICER, () -> advice.drafts(claim));

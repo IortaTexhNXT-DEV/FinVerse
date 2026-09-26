@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.alert.service.AlertService.AlertSearch;
 import com.iortatechnxt.brokerverse.coa.domain.BalanceSide;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalLineRequest;
 import com.iortatechnxt.brokerverse.journal.api.dto.RecurringTemplateRequest;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
@@ -31,6 +32,7 @@ import com.iortatechnxt.brokerverse.support.TestData;
 import com.iortatechnxt.brokerverse.system.domain.JobRunStatus;
 import com.iortatechnxt.brokerverse.system.service.JobRunService;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -155,7 +157,7 @@ class RecurringJournalIT {
 
   @Test
   void autoSubmitSendsTheJournalForApproval() {
-    LocalDate today = LocalDate.now();
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     RecurringJournalTemplate t =
         create(
             request(

@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.DispositionService;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.IntakeResult;
 import com.iortatechnxt.brokerverse.cashiering.service.UnappliedService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.PaymentStatus;
 import com.iortatechnxt.brokerverse.opsledger.service.OpsLedgerEvents.PaymentReversalCompleted;
@@ -39,7 +40,7 @@ import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedDispositionR
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,14 +105,20 @@ class CashieringAdaptersIT {
     UnappliedView view = directory.find(item.getReference()).orElseThrow();
     assertThat(view.companyId()).isEqualTo(fx.company());
     assertThat(view.balance()).isEqualByComparingTo("275.00");
-    assertThat(view.paymentDate()).isEqualTo(LocalDate.now());
+    assertThat(view.paymentDate()).isEqualTo(BusinessClock.today(Clock.systemUTC()));
     assertThat(view.paymentType()).isEqualTo("CASH");
     assertThat(view.transactionNo()).isNotBlank();
     assertThat(view.cashieringTab()).isEqualTo("UNAPPLIED");
     assertThat(view.dispositionStatus()).isNull();
 
     UnappliedFilter byText =
-        new UnappliedFilter(item.getReference(), null, null, "UNAPPLIED", LocalDate.now(), null);
+        new UnappliedFilter(
+            item.getReference(),
+            null,
+            null,
+            "UNAPPLIED",
+            BusinessClock.today(Clock.systemUTC()),
+            null);
     assertThat(directory.open(fx.company(), byText, PageRequest.of(0, 5)))
         .extracting(UnappliedView::unappliedRef)
         .containsExactly(item.getReference());
@@ -335,7 +342,7 @@ class CashieringAdaptersIT {
             receiptNo,
             "PHP",
             new BigDecimal("150.00"),
-            LocalDate.now(),
+            BusinessClock.today(Clock.systemUTC()),
             "Applied to the wrong invoice",
             new PaymentReversalRequester.Source("ACSL", caseNo, "acsl"));
     var ticket = as.run("acsl", () -> reversalPort.request(request));

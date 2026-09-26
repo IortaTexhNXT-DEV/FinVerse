@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.Inta
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.IntakeTarget;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.service.port.CollectionFeed;
 import com.iortatechnxt.brokerverse.opsledger.service.port.FeedItem;
 import java.math.BigDecimal;
@@ -144,7 +145,7 @@ public class PickupService {
    * @return receipt ids of the ARs issued
    */
   public List<Long> printArs(Collection<Long> ids) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     List<Long> receipts = new ArrayList<>();
     for (PickupRequest r : requests.findByIdInOrderByIdAsc(ids)) {
       if (r.getStatus() != PickupStatus.FOR_PICKUP || r.getPickupDate().isAfter(today)) {

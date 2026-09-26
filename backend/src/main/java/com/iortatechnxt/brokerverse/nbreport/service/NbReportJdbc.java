@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbreport.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -23,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NbReportJdbc {
 
   /** Business time zone of BDOI (dates of timestamps). */
-  public static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  public static final ZoneId MANILA = BusinessClock.zone();
 
   private final NamedParameterJdbcTemplate jdbc;
 

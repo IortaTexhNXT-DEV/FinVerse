@@ -26,7 +26,7 @@ public class ProductMasterFeedDefaults {
   public ProductMasterFeed loggingProductMasterFeed() {
     return change ->
         LOG.info(
-            "Product master change {} {} v{} from {} (no synchronisation target configured, PQ16)",
+            "Product master change {} {} v{} from {} (no synchronisation target configured)",
             change.kind(),
             change.productCode(),
             change.versionNo(),

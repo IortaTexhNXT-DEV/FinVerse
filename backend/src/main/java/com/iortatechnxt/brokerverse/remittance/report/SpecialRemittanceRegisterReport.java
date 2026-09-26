@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.remittance.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
@@ -33,7 +34,9 @@ public class SpecialRemittanceRegisterReport implements ReportDefinition {
           + " as integer) as approval_age"
           + " from rem_special_request s left join rem_batch b on b.batch_no = s.batch_no"
           + " where s.company_id = :companyId"
-          + " and cast(s.created_at at time zone 'Asia/Manila' as date) between :from and :to"
+          + " and cast(s.created_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) between :from and :to"
           + " and (cast(:insurer as varchar) is null or s.insurer_code = :insurer)"
           + " order by s.id";
 
@@ -53,7 +56,7 @@ public class SpecialRemittanceRegisterReport implements ReportDefinition {
     return RemittanceReportSql.metadata(
         CODE,
         "Special Remittance Register",
-        "Special remittance requests with requestor, processor and ages (RMTID.030/039)",
+        "Special remittance requests with requestor, processor and ages",
         true);
   }
 

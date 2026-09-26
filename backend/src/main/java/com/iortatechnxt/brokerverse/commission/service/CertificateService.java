@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
@@ -20,7 +21,6 @@ import com.iortatechnxt.brokerverse.workflow.service.WorkCaseTransitioned;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.context.event.EventListener;
@@ -99,7 +99,7 @@ public class CertificateService {
         submissions.save(
             new CertificateSubmission(
                 companyId,
-                numbers.next("BCS-" + LocalDate.now(clock).getYear()),
+                numbers.next("BCS-" + BusinessClock.today(clock).getYear()),
                 insurer,
                 certificate));
     workflow.start(
@@ -181,7 +181,7 @@ public class CertificateService {
   private static void validate(Certificate c) {
     if (c.receipts().isEmpty()) {
       throw new BusinessRuleException(
-          "CERT_NO_OR", "Tag the certificate to at least one official receipt (CMRID.015)");
+          "CERT_NO_OR", "Tag the certificate to at least one official receipt");
     }
     if (c.periodTo().isBefore(c.periodFrom())) {
       throw new BusinessRuleException(

@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RetentionRule;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RetentionRuleRepository;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RetentionRun;
@@ -121,7 +122,7 @@ public class RetentionService {
   @Transactional(readOnly = true)
   public DrillDown eligible(Long id, int limit) {
     RetentionRule rule = get(id);
-    LocalDate cutoff = rule.cutoff(LocalDate.now(clock));
+    LocalDate cutoff = rule.cutoff(BusinessClock.today(clock));
     Optional<RetentionCandidateProvider> provider =
         Optional.ofNullable(providers.get(rule.getRecordType()));
     List<RetentionCandidate> records =

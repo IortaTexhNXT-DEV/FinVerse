@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.cashiering;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
@@ -9,7 +10,7 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.system.service.ManagedJob;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +94,7 @@ class CashieringReportsIT {
       ManagedJob job = jobs.stream().filter(j -> j.name().equals(name)).findFirst().orElseThrow();
       assertThat(job.cron()).isNotBlank();
       assertThat(job.description()).isNotBlank();
-      assertThat(job.execute(LocalDate.now()).message()).isNotBlank();
+      assertThat(job.execute(BusinessClock.today(Clock.systemUTC())).message()).isNotBlank();
     }
   }
 }

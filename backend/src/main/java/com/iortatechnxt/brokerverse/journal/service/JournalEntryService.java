@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalRequest;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatchRepository;
@@ -244,7 +245,7 @@ public class JournalEntryService {
             source.getCompanyId(),
             source.getBranchId(),
             type,
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             valueDate,
             source.getCurrency(),
             source.getNarration(),
@@ -281,7 +282,7 @@ public class JournalEntryService {
         r.companyId(),
         r.branchId(),
         r.journalType(),
-        LocalDate.now(clock),
+        BusinessClock.today(clock),
         r.valueDate(),
         r.currency(),
         r.narration(),

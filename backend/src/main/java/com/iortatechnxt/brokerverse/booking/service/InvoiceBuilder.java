@@ -226,8 +226,7 @@ public class InvoiceBuilder {
     }
     if (center == null) {
       throw new BusinessRuleException(
-          "COST_CENTER_REQUIRED",
-          "Enter the cost center of account " + account.getArn() + " (BRNB.108)");
+          "COST_CENTER_REQUIRED", "Enter the cost center of account " + account.getArn());
     }
     dimensions.validateOptional(account.getCompanyId(), DimensionType.COST_CENTER, center);
     return center;

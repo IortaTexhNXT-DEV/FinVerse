@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.MergedText;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
@@ -27,7 +28,6 @@ import com.iortatechnxt.brokerverse.placement.service.SlipPrerequisites.Unmet;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -154,7 +154,7 @@ public class PlacementSlipService {
                     a -> new SlipInsurer(a.getInsurerCode(), a.getInsurerBranch()),
                     LinkedHashMap::new,
                     Collectors.toList()));
-    String prefix = "PL-" + LocalDate.now(clock).getYear();
+    String prefix = "PL-" + BusinessClock.today(clock).getYear();
     return groups.entrySet().stream()
         .map(
             g ->
@@ -214,7 +214,7 @@ public class PlacementSlipService {
     MergedText text =
         templates.merge(
             TEMPLATE,
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             Map.of("reference", number.slipNo(), "insurerName", address.insurerName()));
     PlacementSlip slip =
         slips.save(

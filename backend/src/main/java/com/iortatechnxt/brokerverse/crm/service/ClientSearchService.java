@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.crm.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientRepository;
 import com.iortatechnxt.brokerverse.crm.domain.DuplicateKeys;
@@ -55,7 +56,7 @@ public class ClientSearchService {
   }
 
   private Specification<Client> specification(ClientSearch s) {
-    LocalDate horizon = reviewPolicy.dueHorizon(LocalDate.now(clock));
+    LocalDate horizon = reviewPolicy.dueHorizon(BusinessClock.today(clock));
     return (root, query, cb) -> {
       List<Predicate> p = new ArrayList<>();
       p.add(cb.equal(root.get("companyId"), s.companyId()));

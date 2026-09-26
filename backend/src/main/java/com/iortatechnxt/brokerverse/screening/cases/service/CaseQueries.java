@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.screening.cases.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseStage;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CommitteeVote;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CommitteeVoteRepository;
@@ -12,7 +13,6 @@ import com.iortatechnxt.brokerverse.screening.watchlist.domain.IngestionRun;
 import com.iortatechnxt.brokerverse.screening.watchlist.service.ListFileService;
 import java.time.Clock;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
@@ -211,10 +211,7 @@ public class CaseQueries {
     }
     Instant now = clock.instant();
     Instant endOfDay =
-        LocalDate.now(clock.withZone(CaseSpecs.MANILA))
-            .plusDays(1)
-            .atStartOfDay(CaseSpecs.MANILA)
-            .toInstant();
+        BusinessClock.today(clock).plusDays(1).atStartOfDay(CaseSpecs.MANILA).toInstant();
     Optional<IngestionRun> lastRun =
         listFiles.runs(null, PageRequest.of(0, 1)).stream().findFirst();
     return new Tiles(

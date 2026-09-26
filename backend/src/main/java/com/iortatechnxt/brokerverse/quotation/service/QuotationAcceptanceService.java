@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.catalog.service.PeriodBasis;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.catalog.service.RatingQuery;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.quotation.domain.Quotation;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationContent;
@@ -23,7 +24,6 @@ import com.iortatechnxt.brokerverse.quotation.domain.QuotationItem;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -159,7 +159,7 @@ public class QuotationAcceptanceService {
     QuotationContent content = versions.current(q);
     RiskProduct product =
         catalog.requireSellable(
-            q.getProductCode(), RatingQuery.Purpose.NEW_BUSINESS, LocalDate.now(clock));
+            q.getProductCode(), RatingQuery.Purpose.NEW_BUSINESS, BusinessClock.today(clock));
     List<Integer> groups = q.getAcceptedGroupList();
     if (groups.isEmpty()) {
       throw new BusinessRuleException(

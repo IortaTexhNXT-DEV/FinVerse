@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQueryS
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionView;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageRequest;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageRequestRepository;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageTerms;
@@ -112,7 +113,7 @@ public class PackageExpiryService {
   @Transactional(readOnly = true)
   public List<ExpiringPackage> expiring(
       ProductVersionQueryService source, Long companyId, int withinDays) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     return source.packagesExpiring(companyId, Math.max(0, withinDays)).stream()
         .map(
             v ->

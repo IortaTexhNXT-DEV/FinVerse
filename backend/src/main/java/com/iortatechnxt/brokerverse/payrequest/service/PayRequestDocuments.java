@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.payrequest.service;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -95,7 +96,7 @@ public class PayRequestDocuments {
           "PRQ_NO_FORM", "A check cancellation has no request form; print the paid request's");
     }
     boolean refund = r.getKind() == RequestKind.REFUND;
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     MergedText intro = templates.merge(refund ? "PRQ_RRF" : "PRQ_RFP", today, values(r));
     List<DocumentSpec.Section> sections =
         refund
@@ -137,7 +138,7 @@ public class PayRequestDocuments {
     values.put("cashAdvanced", l.getCashAdvanced().toPlainString());
     values.put("totalExpenses", l.getTotalExpenses().toPlainString());
     values.put("overShort", l.getOverShort().toPlainString());
-    MergedText intro = templates.merge("PRQ_LIQUIDATION", LocalDate.now(clock), values);
+    MergedText intro = templates.merge("PRQ_LIQUIDATION", BusinessClock.today(clock), values);
     DocumentSpec spec =
         new DocumentSpec(
             organization.getCompany(r.getCompanyId()).getName(),

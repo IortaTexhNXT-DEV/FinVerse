@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.frbs.service;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.frbs.domain.FrbsEnums.LineStatus;
 import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeLine;
 import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeLine.Ticket;
@@ -11,7 +12,6 @@ import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeRunRepository;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest.Status;
 import com.iortatechnxt.brokerverse.opsledger.service.OpsLedgerEvents.DisbursementStatusChanged;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -83,7 +83,7 @@ public class ServiceFeeFeedback {
         new Ticket(event.requestNo(), event.status().name(), event.dvNo(), event.reason());
     if (event.status() == Status.PAID && line.getStatus() == LineStatus.SENT) {
       line.track(ticket);
-      line.release(LocalDate.now(clock.withZone(ServiceFeeBase.MANILA)), ServiceFees.SYSTEM);
+      line.release(BusinessClock.today(clock), ServiceFees.SYSTEM);
     } else if (event.status() == Status.RETURNED || event.status() == Status.CANCELLED) {
       line.returned(ticket);
     } else {

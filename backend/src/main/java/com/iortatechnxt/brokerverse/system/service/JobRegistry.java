@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.system.service;
 
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.system.domain.JobRun;
 import com.iortatechnxt.brokerverse.system.domain.JobTrigger;
 import java.time.Clock;
@@ -67,7 +68,7 @@ public class JobRegistry {
    */
   public JobRun run(String name, JobTrigger trigger) {
     ManagedJob job = require(name);
-    LocalDate businessDate = LocalDate.now(clock);
+    LocalDate businessDate = BusinessClock.today(clock);
     return runs.execute(job.name(), trigger, () -> job.execute(businessDate));
   }
 

@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.approval.service.BulkApprovalService.Item;
 import com.iortatechnxt.brokerverse.approval.service.BulkApprovalService.Outcome;
 import com.iortatechnxt.brokerverse.coa.domain.BalanceSide;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalLineRequest;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalRequest;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
@@ -26,6 +27,7 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestCompanies;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -66,7 +68,7 @@ class JournalFrbsControlsIT {
         company,
         branch,
         JournalType.ACCRUAL,
-        LocalDate.now(),
+        BusinessClock.today(Clock.systemUTC()),
         "PHP",
         "Accrued rent",
         "ACR-" + UUID.randomUUID().toString().substring(0, 8),
@@ -95,7 +97,7 @@ class JournalFrbsControlsIT {
 
   @Test
   void accrualIsReversedAutomaticallyOnItsReversalDate() {
-    LocalDate today = LocalDate.now();
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     Long company = data.company().getId();
     Long branch = data.branch("HO").getId();
     JournalBatch accrual = submitted(rent(company, branch, "1234.00", today.plusDays(1)));
@@ -174,7 +176,7 @@ class JournalFrbsControlsIT {
 
   @Test
   void negativeBalanceControlBlocksOrWarnsAndShortCodesResolve() {
-    LocalDate today = LocalDate.now();
+    LocalDate today = BusinessClock.today(Clock.systemUTC());
     Long company = companies.create("TGLJ", "PHP").getId();
     companies.openYear(company, today.getYear());
     Long branch = companies.headOffice(company);
@@ -224,7 +226,7 @@ class JournalFrbsControlsIT {
                             company,
                             branch,
                             JournalType.ADJUSTMENT,
-                            LocalDate.now(),
+                            BusinessClock.today(Clock.systemUTC()),
                             "PHP",
                             "Correction of " + original.getBatchNo(),
                             "ACS-TEST",

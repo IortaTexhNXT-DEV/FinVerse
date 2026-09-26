@@ -9,9 +9,9 @@ import com.iortatechnxt.brokerverse.brokerclaims.location.api.dto.LocationDtos.L
 import com.iortatechnxt.brokerverse.brokerclaims.location.domain.LocationRef;
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.ClaimLocationService;
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.LocationRefService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -131,7 +131,7 @@ public class ClaimLocationController {
 
   private List<ClaimLocationResponse> responses(Claim claim) {
     List<LocationRef> valid =
-        refs.validOn(claim.getCompanyId(), claim.getCover().getArn(), LocalDate.now(clock));
+        refs.validOn(claim.getCompanyId(), claim.getCover().getArn(), BusinessClock.today(clock));
     return locations.ofClaim(claim.getId()).stream()
         .map(l -> ClaimLocationResponse.from(l, valid))
         .toList();

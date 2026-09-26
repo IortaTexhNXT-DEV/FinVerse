@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.report.AccessAuditLogReport;
 import com.iortatechnxt.brokerverse.nbadmin.report.AccessRequestsReport;
 import com.iortatechnxt.brokerverse.nbadmin.report.GroupMembersReport;
@@ -23,8 +24,8 @@ import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import java.time.Clock;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +59,7 @@ class UserAccessReportsIT {
   @Autowired private ObjectMapper json;
 
   private static String today() {
-    return LocalDate.now(ZoneId.of("Asia/Manila")).toString();
+    return BusinessClock.today(Clock.systemUTC()).toString();
   }
 
   private ReportResult run(String code, Map<String, String> params) {

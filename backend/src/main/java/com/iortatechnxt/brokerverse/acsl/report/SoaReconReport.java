@@ -58,7 +58,7 @@ public class SoaReconReport implements ReportDefinition {
     return ReportMetadata.acsl(
         CODE,
         "SOA Reconciliation",
-        "Insurer statement of account reconciled per invoice against BDOI's books (ACSL 2.14.1)",
+        "Insurer statement of account reconciled per invoice against BDOI's books",
         List.of(
             ParameterSpec.required("companyId", "Company", ParameterType.COMPANY),
             ParameterSpec.required(UPLOAD, "SOA Upload No.", ParameterType.TEXT),

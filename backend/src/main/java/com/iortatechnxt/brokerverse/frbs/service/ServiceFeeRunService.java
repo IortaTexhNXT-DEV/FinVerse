@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.frbs.domain.FrbsEnums.RunStage;
 import com.iortatechnxt.brokerverse.frbs.domain.PaidInvoice;
 import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeItem;
@@ -102,7 +103,7 @@ public class ServiceFeeRunService {
    * @return run in stage COMPUTED
    */
   public ServiceFeeRun compute(Long companyId, LocalDate from, LocalDate to) {
-    LocalDate today = LocalDate.now(clock.withZone(ServiceFeeBase.MANILA));
+    LocalDate today = BusinessClock.today(clock);
     if (from == null || to == null || to.isBefore(from) || to.isAfter(today)) {
       throw new BusinessRuleException(
           "SERVICE_FEE_PERIOD", "Give a period that ends on or before today and after it starts");

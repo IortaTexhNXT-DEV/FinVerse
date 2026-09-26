@@ -1,10 +1,10 @@
 package com.iortatechnxt.brokerverse.nonpackage.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientRecord;
 import com.iortatechnxt.brokerverse.crm.service.ClientRecordsProvider;
 import com.iortatechnxt.brokerverse.nonpackage.domain.ProposalRequest;
 import com.iortatechnxt.brokerverse.nonpackage.domain.ProposalRequestRepository;
-import java.time.ZoneOffset;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +39,7 @@ public class ProposalClientRecords implements ClientRecordsProvider {
         p.getPrfNo(),
         p.getArn() + " - " + p.getProductCode() + " - " + insurer,
         p.getStatus().name(),
-        p.getCreatedAt().atZone(ZoneOffset.UTC).toLocalDate(),
+        BusinessClock.dateOf(p.getCreatedAt()),
         "/proposals/" + p.getId());
   }
 }

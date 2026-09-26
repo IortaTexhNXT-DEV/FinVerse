@@ -12,9 +12,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,7 +146,10 @@ class AdminScreensApiIT {
         {"companyId": %d, "branchId": %d, "eventType": "MISC_RECEIPT", "valueDate": "%s",
          "currency": "PHP", "amounts": {"AMOUNT": 1500.00}, "accounts": {"BANK": "1111"}}
         """
-            .formatted(data.company().getId(), data.branch("HO").getId(), LocalDate.now());
+            .formatted(
+                data.company().getId(),
+                data.branch("HO").getId(),
+                BusinessClock.today(Clock.systemUTC()));
     mvc.perform(
             post("/api/v1/accounting/simulate")
                 .with(as("fmanager"))
@@ -186,7 +190,7 @@ class AdminScreensApiIT {
             get("/api/v1/subledger/ageing")
                 .with(as("accountant"))
                 .param("companyId", data.company().getId().toString())
-                .param("asOf", LocalDate.now().toString())
+                .param("asOf", BusinessClock.today(Clock.systemUTC()).toString())
                 .param("partyCode", "C-000201"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.buckets.length()").value(7));
@@ -199,7 +203,9 @@ class AdminScreensApiIT {
         {"companyId": "%d", "month": "%d", "year": "%d"}
         """
             .formatted(
-                data.company().getId(), LocalDate.now().getMonthValue(), LocalDate.now().getYear());
+                data.company().getId(),
+                BusinessClock.today(Clock.systemUTC()).getMonthValue(),
+                BusinessClock.today(Clock.systemUTC()).getYear());
     mvc.perform(
             post("/api/v1/reports/FIN-TB-MAIN/run")
                 .with(as("accountant"))

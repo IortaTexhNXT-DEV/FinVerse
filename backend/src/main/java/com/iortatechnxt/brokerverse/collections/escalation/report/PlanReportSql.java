@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.collections.escalation.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
@@ -35,10 +36,7 @@ public class PlanReportSql {
   /** Period end. */
   static final String TO = "to";
 
-  /** Note on draft layouts. */
-  static final String DRAFT_NOTE = "Draft layout - fields to confirm with BDOI (CQ22).";
-
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  private static final ZoneId MANILA = BusinessClock.zone();
 
   private final NamedParameterJdbcTemplate jdbc;
 

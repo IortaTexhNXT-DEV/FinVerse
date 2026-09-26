@@ -63,9 +63,7 @@ public final class PayeeAlphalistReport implements ReportDefinition {
         ReportCategory.TAX_STATUTORY,
         annual
             ? "Payees subject to expanded withholding in the year with income and tax withheld"
-                + " (FRBS 3.2.0, App. A VII)"
-            : "Payees subject to expanded withholding in the month with income and tax withheld"
-                + " (FRBS 3.2.0, App. A VII)",
+            : "Payees subject to expanded withholding in the month with income and tax withheld",
         params,
         Permission.TAX_VIEW);
   }
@@ -119,7 +117,7 @@ public final class PayeeAlphalistReport implements ReportDefinition {
             ReportColumn.amount(TaxReportSupport.TAX, "Tax withheld"))
         .rows(rows)
         .presorted()
-        .note(period.label() + "; format and DAT channel to confirm (AQ07).")
+        .note(period.label())
         .build();
   }
 }

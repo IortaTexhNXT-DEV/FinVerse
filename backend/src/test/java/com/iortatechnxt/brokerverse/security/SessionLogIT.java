@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.security.api.dto.UserRequest;
 import com.iortatechnxt.brokerverse.security.domain.SessionEndReason;
 import com.iortatechnxt.brokerverse.security.domain.UserSession;
@@ -19,7 +20,7 @@ import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.jayway.jsonpath.JsonPath;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -130,7 +131,7 @@ class SessionLogIT {
             + " last_seen_at = now() - interval '9 hour', expires_at = now() - interval '2 hour'"
             + " where session_id = ?",
         expired);
-    sweep.execute(LocalDate.now());
+    sweep.execute(BusinessClock.today(Clock.systemUTC()));
     assertThat(session(idle).getEndReason()).isEqualTo(SessionEndReason.IDLE_TIMEOUT);
     assertThat(session(expired).getEndReason()).isEqualTo(SessionEndReason.EXPIRED);
     assertThat(session(active).getEndedAt()).isNull();

@@ -3,11 +3,11 @@ package com.iortatechnxt.brokerverse.screening.str.service;
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.AccountStatus;
 import com.iortatechnxt.brokerverse.account.service.AccountQueryService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.screening.str.domain.StrTransaction.Line;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -56,8 +56,7 @@ public class AccountStrTransactions implements StrTransactionSource {
 
   private static Line line(Account a) {
     LocalDate date =
-        Objects.requireNonNullElse(
-            a.getPeriodFrom(), LocalDate.ofInstant(a.getCreatedAt(), ZoneOffset.UTC));
+        Objects.requireNonNullElse(a.getPeriodFrom(), BusinessClock.dateOf(a.getCreatedAt()));
     return new Line(
         a.getArn(),
         date,

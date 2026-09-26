@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.collections.worklist.service.WorklistQuerySe
 import com.iortatechnxt.brokerverse.collections.worklist.service.WorklistRefreshService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.seed.SeedUsers;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
@@ -109,7 +110,7 @@ public class CollectionsSeedData implements ApplicationRunner {
 
   @Override
   public void run(ApplicationArguments args) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     for (Company company : companies.findAll()) {
       Long id = company.getId();
       var outcome = users.as(LEAD, () -> refresh.refreshAll(id, today));

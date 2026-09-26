@@ -14,13 +14,13 @@ import com.iortatechnxt.brokerverse.brokerclaims.insurer.domain.InsurerClaim;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage.RecordLink;
 import com.iortatechnxt.brokerverse.messaging.service.MessageService;
 import com.iortatechnxt.brokerverse.messaging.service.OutboundEmail;
 import com.iortatechnxt.brokerverse.messaging.service.QueuedEmail;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -100,7 +100,7 @@ public class LossAdviceService {
     for (String code : insurerCodes(all)) {
       InsurerProfile insurer = insurers.requireInsurer(claim.getCompanyId(), code);
       LossAdviceDocument.Advice advice =
-          document.compose(claim, insurer, all, LocalDate.now(clock));
+          document.compose(claim, insurer, all, BusinessClock.today(clock));
       drafts.add(
           new Draft(
               code,
@@ -147,7 +147,8 @@ public class LossAdviceService {
   private Sent sendOne(
       Claim claim, List<InsurerClaim> all, Recipient r, Long accountId, Long clientId) {
     InsurerProfile insurer = insurers.requireInsurer(claim.getCompanyId(), r.insurerCode());
-    LossAdviceDocument.Advice advice = document.compose(claim, insurer, all, LocalDate.now(clock));
+    LossAdviceDocument.Advice advice =
+        document.compose(claim, insurer, all, BusinessClock.today(clock));
     byte[] pdf = document.pdf(claim, advice);
     String fileName = claim.getClaimNo() + "_LOSS_ADVICE_" + r.insurerCode() + ".pdf";
     Attachment stored =

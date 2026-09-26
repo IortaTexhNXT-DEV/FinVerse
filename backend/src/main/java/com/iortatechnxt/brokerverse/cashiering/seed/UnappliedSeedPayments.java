@@ -8,11 +8,11 @@ import com.iortatechnxt.brokerverse.cashiering.domain.PaymentRepository;
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringSettings;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.IntakeTarget;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.seed.SeedUsers;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -108,7 +108,9 @@ public class UnappliedSeedPayments implements ApplicationRunner {
               new PaymentIntake.Payor(null, PAYORS.get(i)),
               null,
               new PaymentIntake.Money(
-                  new BigDecimal(AMOUNTS.get(i)), "PHP", LocalDate.now(clock).minusDays(AGE_DAYS)),
+                  new BigDecimal(AMOUNTS.get(i)),
+                  "PHP",
+                  BusinessClock.today(clock).minusDays(AGE_DAYS)),
               PaymentIntake.Tender.of(PaymentMode.CASH)));
     }
   }

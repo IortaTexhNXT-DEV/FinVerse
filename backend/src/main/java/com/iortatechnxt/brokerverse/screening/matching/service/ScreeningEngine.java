@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.screening.matching.service;
 import com.iortatechnxt.brokerverse.alert.domain.AlertFacts;
 import com.iortatechnxt.brokerverse.alert.service.AlertService;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientStatus;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
@@ -147,7 +148,7 @@ public class ScreeningEngine {
    * @return the run context, empty when no criteria are in force
    */
   public Optional<ScreeningRunContext> start(Long companyId, RunStart start) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     Optional<ConfigVersionRef> criteria =
         config.activeVersion(companyId, ConfigType.MATCH_CRITERIA, null, today);
     if (criteria.isEmpty()) {

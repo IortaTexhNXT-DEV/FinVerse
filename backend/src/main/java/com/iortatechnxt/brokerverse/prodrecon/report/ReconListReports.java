@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.prodrecon.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
 import java.util.List;
@@ -31,7 +32,7 @@ public class ReconListReports {
         ReconReportSupport.metadata(
             "PRC-UNBOOKED",
             "Unbooked Accounts and Status",
-            "Insurer production without a BDOI booking and its resolution (PRCID.019)"),
+            "Insurer production without a BDOI booking and its resolution"),
         "select c.insurer_code as insurer, "
             + MONTH
             + ", i.ins_reference_no as reference, i.ins_policy_no as policy,"
@@ -67,14 +68,18 @@ public class ReconListReports {
         ReconReportSupport.metadata(
             "PRC-EXTRACT-LOG",
             "Production Register Extraction Log",
-            "Extracts with item count, extraction and sending timestamps (PRCID.005/034)"),
+            "Extracts with item count, extraction and sending timestamps"),
         "select c.insurer_code as insurer, "
             + MONTH
             + ", e.extract_no, e.trigger_type as trigger, e.booking_from, e.booking_to,"
             + " e.file_name, e.row_count, e.new_count,"
-            + " to_char(e.created_at at time zone 'Asia/Manila', 'YYYY-MM-DD HH24:MI') as extracted,"
+            + " to_char(e.created_at at time zone '"
+            + BusinessClock.zoneId()
+            + "', 'YYYY-MM-DD HH24:MI') as extracted,"
             + " e.created_by,"
-            + " to_char(e.sent_at at time zone 'Asia/Manila', 'YYYY-MM-DD HH24:MI') as sent,"
+            + " to_char(e.sent_at at time zone '"
+            + BusinessClock.zoneId()
+            + "', 'YYYY-MM-DD HH24:MI') as sent,"
             + " e.recipients"
             + " from prc_extract e join prc_cycle c on c.id = e.cycle_id"
             + " where c.company_id = :companyId and c.production_month between :from and :to"
@@ -109,8 +114,7 @@ public class ReconListReports {
         ReconReportSupport.metadata(
             "PRC-UNMATCHED-FEEDBACK",
             "Unmatched Accounts with Feedback and Disposition",
-            "Unmatched and discrepant accounts with company concerned, feedback and disposition"
-                + " (PRCID.038)"),
+            "Unmatched and discrepant accounts with company concerned, feedback and disposition"),
         "select c.insurer_code as insurer, "
             + MONTH
             + ", coalesce(i.invoice_no, i.ins_reference_no) as reference,"

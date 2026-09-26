@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.collections.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportCategory;
@@ -39,7 +40,9 @@ public final class ActivityReports {
             + " a.reason, a.assigned_by, a.bulk_ref, a.reverted_at"
             + " from clx_assignment a join clx_item i on i.id = a.item_id"
             + " where a.company_id = :companyId"
-            + " and cast(a.created_at at time zone 'Asia/Manila' as date)"
+            + " and cast(a.created_at at time zone '"
+            + BusinessClock.zoneId()
+            + "' as date)"
             + PERIOD
             + ClxReportSql.ITEM_FILTERS
             + " order by a.id";
@@ -60,7 +63,7 @@ public final class ActivityReports {
       return ClxReportSql.metadata(
           REASSIGNMENTS,
           "Collection Reassignments",
-          "Assignments and reassignments of collection accounts in the period (BRCLXN.052)",
+          "Assignments and reassignments of collection accounts in the period",
           true);
     }
 
@@ -101,7 +104,9 @@ public final class ActivityReports {
         "select c.changed_at, c.username, c.source_ip, c.entity, c.entity_id, c.field,"
             + " c.old_value, c.new_value, c.bulk_ref from clx_field_change c"
             + " where c.company_id = :companyId"
-            + " and cast(c.changed_at at time zone 'Asia/Manila' as date)"
+            + " and cast(c.changed_at at time zone '"
+            + BusinessClock.zoneId()
+            + "' as date)"
             + PERIOD
             + " and (cast(:user as varchar) is null or c.username = :user)"
             + " order by c.id";
@@ -123,7 +128,7 @@ public final class ActivityReports {
           AUDIT_LOG,
           "Collections Audit Log",
           ReportCategory.COLLECTIONS,
-          "Field changes of the Collections records with from / to values (BRCLXN.043/044)",
+          "Field changes of the Collections records with from / to values",
           List.of(
               ParameterSpec.required(ClxReportSql.COMPANY, "Company", ParameterType.COMPANY),
               ParameterSpec.required(ClxReportSql.FROM, "From", ParameterType.DATE)

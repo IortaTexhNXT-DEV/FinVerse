@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.screening.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -62,7 +63,9 @@ public final class ListReports {
             + " concat_ws(' / ', cast(e.birth_date as varchar), e.nationality) as birth_nationality,"
             + " e.listed_on, e.delisted_on, e.status,"
             + " (select w.change_type || ' ' || coalesce(r.run_no, 'manual') || ' '"
-            + " || to_char(coalesce(w.decided_at, w.created_at) at time zone 'Asia/Manila', 'YYYY-MM-DD')"
+            + " || to_char(coalesce(w.decided_at, w.created_at) at time zone '"
+            + BusinessClock.zoneId()
+            + "', 'YYYY-MM-DD')"
             + " from scr_watchlist_change w left join scr_ingestion_run r on r.id = w.run_id"
             + " where w.entry_id = e.id order by w.id desc limit 1) as last_change"
             + " from scr_watchlist_entry e join scr_watchlist_source s on s.id = e.source_id"
@@ -97,7 +100,7 @@ public final class ListReports {
       return ReportMetadata.compliance(
           SANCTIONED_NAMES,
           "List of Sanctioned Names",
-          "Watchlist entries by source and list type, listed or delisted in the period (p.6)",
+          "Watchlist entries by source and list type, listed or delisted in the period",
           params);
     }
 
@@ -118,7 +121,6 @@ public final class ListReports {
           .rows(sql.rows(SQL, args(p, SOURCE, LIST_TYPE, "status")))
           .presorted()
           .withoutGrandTotal()
-          .note(ScrReportSql.LAYOUT_NOTE)
           .build();
     }
   }
@@ -128,7 +130,9 @@ public final class ListReports {
   public static class IngestErrors implements ReportDefinition {
 
     private static final String SQL =
-        "select cast(r.started_at at time zone 'Asia/Manila' as date) as run_date, r.run_no,"
+        "select cast(r.started_at at time zone '"
+            + BusinessClock.zoneId()
+            + "' as date) as run_date, r.run_no,"
             + " s.code || ' - ' || s.name as source, r.file_name, x.line_no,"
             + " left(x.raw_record, 200) as raw_record, x.reason"
             + " from scr_ingestion_error x join scr_ingestion_run r on r.id = x.run_id"
@@ -137,8 +141,8 @@ public final class ListReports {
             + " and (cast(:source as varchar) is null or s.code = :source)"
             + String.format(
                 OPTIONAL_PERIOD,
-                "cast(r.started_at at time zone 'Asia/Manila' as date)",
-                "cast(r.started_at at time zone 'Asia/Manila' as date)")
+                "cast(r.started_at at time zone '" + BusinessClock.zoneId() + "' as date)",
+                "cast(r.started_at at time zone '" + BusinessClock.zoneId() + "' as date)")
             + " order by r.run_no, x.line_no";
 
     private final ScrReportSql sql;
@@ -161,7 +165,7 @@ public final class ListReports {
       return ReportMetadata.compliance(
           INGEST_ERRORS,
           "Unsuccessful Ingestion Records",
-          "Watchlist records that failed ingestion, by run and line (SNSRP-202)",
+          "Watchlist records that failed ingestion, by run and line",
           params);
     }
 
@@ -179,7 +183,6 @@ public final class ListReports {
           .rows(sql.rows(SQL, args(p, "runNo", SOURCE)))
           .presorted()
           .withoutGrandTotal()
-          .note(ScrReportSql.LAYOUT_NOTE)
           .build();
     }
   }

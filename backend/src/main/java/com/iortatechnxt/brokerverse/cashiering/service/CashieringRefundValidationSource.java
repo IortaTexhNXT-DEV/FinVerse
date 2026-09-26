@@ -13,12 +13,12 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.opsledger.service.OpsLedgerEvents.RefundValidationCompleted;
 import com.iortatechnxt.brokerverse.opsledger.service.port.RefundValidationSource;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -111,7 +111,7 @@ public class CashieringRefundValidationSource implements RefundValidationSource 
     RefundCheck task =
         checks.save(
             new RefundCheck(
-                numbers.next("RVL-" + LocalDate.now(clock).getYear()),
+                numbers.next("RVL-" + BusinessClock.today(clock).getYear()),
                 new RefundCheck.Spec(
                     request.companyId(),
                     request.source().module(),

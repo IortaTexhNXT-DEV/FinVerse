@@ -18,6 +18,7 @@ import com.iortatechnxt.brokerverse.booking.domain.BookedInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.BookingSource;
 import com.iortatechnxt.brokerverse.booking.service.BookingOptions;
 import com.iortatechnxt.brokerverse.booking.service.BookingService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.opsledger.seed.SeedUsers;
 import java.math.BigDecimal;
@@ -129,7 +130,9 @@ public class SeedMultiYearAccount {
         PROCESSOR,
         () ->
             booking.book(
-                arn, BookingOptions.of(LocalDate.now(clock), null), BookingSource.INDIVIDUAL));
+                arn,
+                BookingOptions.of(BusinessClock.today(clock), null),
+                BookingSource.INDIVIDUAL));
   }
 
   private void attach(Long accountId, String documentType) {

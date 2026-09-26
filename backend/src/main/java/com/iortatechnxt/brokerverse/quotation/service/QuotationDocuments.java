@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.quotation.service;
 
 import com.iortatechnxt.brokerverse.account.domain.AccountPremium;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -104,7 +105,7 @@ public class QuotationDocuments {
   }
 
   private byte[] pdf(Quotation q, QuotationContent c) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     MergedText letter =
         templates.merge(
             QuotationService.TEMPLATE,

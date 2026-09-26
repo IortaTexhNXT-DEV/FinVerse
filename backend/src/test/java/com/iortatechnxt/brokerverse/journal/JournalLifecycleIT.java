@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.iortatechnxt.brokerverse.coa.domain.BalanceSide;
 import com.iortatechnxt.brokerverse.coa.service.ChartOfAccountsService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalLineRequest;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalRequest;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
@@ -17,7 +18,7 @@ import com.iortatechnxt.brokerverse.ledger.service.LedgerQueryService;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
@@ -55,7 +56,7 @@ class JournalLifecycleIT {
         company,
         branch,
         JournalType.MANUAL,
-        LocalDate.now(),
+        BusinessClock.today(Clock.systemUTC()),
         "PHP",
         "Office rent for the month",
         "INV-100",
@@ -90,7 +91,8 @@ class JournalLifecycleIT {
   void makerCheckerPostsBalancedJournalToLedger() {
     Long company = data.company().getId();
     Long rentAccount = accounts.getByCode(company, "5603").getId();
-    BigDecimal before = ledger.netBalance(company, rentAccount, null, LocalDate.now());
+    BigDecimal before =
+        ledger.netBalance(company, rentAccount, null, BusinessClock.today(Clock.systemUTC()));
 
     JournalBatch draft = as("accountant", () -> journals.createDraft(expenseJournal("15000.00")));
     assertThat(draft.getStatus()).isEqualTo(JournalStatus.DRAFT);
@@ -103,7 +105,8 @@ class JournalLifecycleIT {
     JournalBatch posted = as("checker", () -> authorization.approve(draft.getId()));
     assertThat(posted.getStatus()).isEqualTo(JournalStatus.POSTED);
     assertThat(posted.getAuthorizedBy()).isEqualTo("checker");
-    assertThat(ledger.netBalance(company, rentAccount, null, LocalDate.now()))
+    assertThat(
+            ledger.netBalance(company, rentAccount, null, BusinessClock.today(Clock.systemUTC())))
         .isEqualByComparingTo(before.add(new BigDecimal("15000.00")));
   }
 
@@ -111,7 +114,8 @@ class JournalLifecycleIT {
   void reversalRestoresBalancesAndMarksOriginal() {
     Long company = data.company().getId();
     Long bank = accounts.getByCode(company, "1111").getId();
-    BigDecimal before = ledger.netBalance(company, bank, null, LocalDate.now());
+    BigDecimal before =
+        ledger.netBalance(company, bank, null, BusinessClock.today(Clock.systemUTC()));
 
     JournalBatch draft = as("accountant", () -> journals.createDraft(expenseJournal("2500.00")));
     as("accountant", () -> journals.submit(draft.getId()));
@@ -120,18 +124,22 @@ class JournalLifecycleIT {
     JournalBatch reversal =
         as(
             "accountant",
-            () -> authorization.reverse(draft.getId(), LocalDate.now(), "Duplicate entry"));
+            () ->
+                authorization.reverse(
+                    draft.getId(), BusinessClock.today(Clock.systemUTC()), "Duplicate entry"));
     assertThat(reversal.getStatus()).isEqualTo(JournalStatus.PENDING_APPROVAL);
     as("checker", () -> authorization.approve(reversal.getId()));
 
     assertThat(journals.get(draft.getId()).getStatus()).isEqualTo(JournalStatus.REVERSED);
-    assertThat(ledger.netBalance(company, bank, null, LocalDate.now()))
+    assertThat(ledger.netBalance(company, bank, null, BusinessClock.today(Clock.systemUTC())))
         .isEqualByComparingTo(before);
     assertThatThrownBy(
             () ->
                 as(
                     "accountant",
-                    () -> authorization.reverse(draft.getId(), LocalDate.now(), "again")))
+                    () ->
+                        authorization.reverse(
+                            draft.getId(), BusinessClock.today(Clock.systemUTC()), "again")))
         .isInstanceOf(BusinessRuleException.class);
   }
 

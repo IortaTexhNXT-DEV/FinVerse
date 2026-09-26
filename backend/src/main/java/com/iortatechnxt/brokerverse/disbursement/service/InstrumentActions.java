@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.alert.domain.AlertFacts;
 import com.iortatechnxt.brokerverse.alert.service.AlertService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.DisbursementMode;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.EventSource;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.InstrumentStatus;
@@ -111,7 +112,7 @@ public class InstrumentActions {
       throw new BusinessRuleException(
           "DISB_NO_FORM", i.getMode() + " has no printed form; it is processed by file");
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     String number =
         i.getMode() == DisbursementMode.CHECK
             ? checkNo(i)

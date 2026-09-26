@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.report.domain.ReportRun;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
@@ -16,7 +17,7 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,10 @@ class ReportWordExportIT {
 
   private Map<String, String> params() {
     return Map.of(
-        "companyId", data.company().getId().toString(), "asOf", LocalDate.now().toString());
+        "companyId",
+        data.company().getId().toString(),
+        "asOf",
+        BusinessClock.today(Clock.systemUTC()).toString());
   }
 
   @Test

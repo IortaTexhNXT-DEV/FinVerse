@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.remittance.service;
 
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -204,7 +205,7 @@ public class BatchDocuments {
     MergedText text =
         templates.merge(
             SCHEDULE,
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             Map.of(
                 "reference", batch.getBatchNo(),
                 "insurerName", insurerName(batch),
@@ -248,7 +249,7 @@ public class BatchDocuments {
     MergedText text =
         templates.merge(
             PAYMENT_REQUEST,
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             Map.of(
                 "reference", batch.getBatchNo(),
                 "insurerName", insurerName(batch),

@@ -53,7 +53,7 @@ public class SawtReport implements ReportDefinition {
         "Summary Alphalist of Withholding Taxes (SAWT)",
         ReportCategory.TAX_STATUTORY,
         "Creditable taxes withheld from BDOI per withholding agent and ATC, from the certificates"
-            + " received (FRBS 3.2.0, App. A VII)",
+            + " received",
         List.of(
             TaxReportSupport.company(),
             TaxReportSupport.year(clock),
@@ -115,8 +115,7 @@ public class SawtReport implements ReportDefinition {
         .note(
             "Quarter "
                 + quarter.label()
-                + "; certificates whose period covered ends in the quarter; DAT format to confirm"
-                + " (AQ07).")
+                + "; certificates whose period covered ends in the quarter.")
         .build();
   }
 }

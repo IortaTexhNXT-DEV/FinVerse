@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.Money;
 import com.iortatechnxt.brokerverse.currency.domain.RateType;
 import com.iortatechnxt.brokerverse.currency.service.CurrencyService;
@@ -178,6 +179,6 @@ public class ClaimSupport {
    * @return date
    */
   public LocalDate dateOrToday(LocalDate date) {
-    return date != null ? date : LocalDate.now(clock);
+    return date != null ? date : BusinessClock.today(clock);
   }
 }

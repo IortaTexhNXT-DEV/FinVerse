@@ -53,7 +53,7 @@ public class GroupMembersReport implements ReportDefinition {
     return UamReportSupport.metadata(
         CODE,
         "Group Profile Membership",
-        "Members of each group profile with who added them and when (BRD 3.003.3)",
+        "Members of each group profile with who added them and when",
         List.of(UamReportSupport.groupProfileParam(), UamReportSupport.asOfParam()));
   }
 

@@ -9,13 +9,13 @@ import com.iortatechnxt.brokerverse.commission.domain.DpItem;
 import com.iortatechnxt.brokerverse.commission.domain.DpItemRepository;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.opsledger.service.port.CollectionFeed;
 import com.iortatechnxt.brokerverse.opsledger.service.port.FeedItem;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -123,7 +123,7 @@ public class DpFeedbackService {
         throw new BusinessRuleException(
             "DP_REASON_REQUIRED", "Give the insurer's reason for rejecting " + item.getInvoiceNo());
       }
-      lovs.requireValid(REASONS, a.reason(), LocalDate.now(clock));
+      lovs.requireValid(REASONS, a.reason(), BusinessClock.today(clock));
     }
     item.answered(a.approved(), blank(a.reason()), blank(a.comment()), clock.instant());
     audit.record(

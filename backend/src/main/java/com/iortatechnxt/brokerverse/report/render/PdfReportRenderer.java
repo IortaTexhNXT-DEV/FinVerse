@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.report.render;
 
 import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.office.PdfBrandFooter;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
@@ -19,7 +20,6 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -57,7 +57,7 @@ public class PdfReportRenderer implements ReportRenderer {
   private static final float NATURAL_POINTS_PER_WEIGHT = 40f;
   private static final Color GRID = BrandAssets.color(BrandAssets.GRID);
   private static final DateTimeFormatter STAMP =
-      DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withZone(ZoneId.of("Asia/Manila"));
+      DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withZone(BusinessClock.zone());
 
   private static final Font TITLE = new Font(Font.HELVETICA, 13, Font.BOLD, BRAND_NAVY);
   private static final Font COMPANY = new Font(Font.HELVETICA, 10, Font.BOLD, BRAND_BLUE);

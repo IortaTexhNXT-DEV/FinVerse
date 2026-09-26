@@ -47,8 +47,7 @@ final class ReinstatementRules {
     List<String> missing = f == null ? List.of("reinstatement details") : missing(f, premium);
     if (!missing.isEmpty()) {
       throw new BusinessRuleException(
-          "REINSTATEMENT_FIELDS_REQUIRED",
-          "Enter the " + String.join(", ", missing) + " (CSHID.005)");
+          "REINSTATEMENT_FIELDS_REQUIRED", "Enter the " + String.join(", ", missing));
     }
   }
 

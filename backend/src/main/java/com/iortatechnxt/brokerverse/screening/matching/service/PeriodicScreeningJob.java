@@ -54,7 +54,7 @@ public class PeriodicScreeningJob implements ManagedJob {
   @Override
   public String description() {
     return "Screens the clients in scope against the changed watchlist entries (monthly: the whole"
-        + " list) and logs each run (SNSRP-602)";
+        + " list) and logs each run";
   }
 
   @Override

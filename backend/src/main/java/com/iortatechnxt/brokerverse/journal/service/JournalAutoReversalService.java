@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatchRepository;
 import com.iortatechnxt.brokerverse.journal.domain.JournalHeader;
@@ -117,7 +118,7 @@ public class JournalAutoReversalService {
             original.getCompanyId(),
             original.getBranchId(),
             JournalType.REVERSAL,
-            LocalDate.now(clock),
+            BusinessClock.today(clock),
             original.getReverseOn(),
             original.getCurrency(),
             "Automatic reversal of " + original.getBatchNo(),

@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.collections.common.domain.CollectionItem;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -56,7 +57,7 @@ public class DispositionSupport {
    * @return today
    */
   public LocalDate today() {
-    return LocalDate.now(clock);
+    return BusinessClock.today(clock);
   }
 
   /**

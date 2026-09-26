@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.CwtTagRepository;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.RemittanceStatus;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
@@ -21,7 +22,6 @@ import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -127,7 +127,7 @@ public class CwtService {
     CwtTag tag =
         tags.save(
             new CwtTag(
-                numbers.next("CWT-" + LocalDate.now(clock).getYear()),
+                numbers.next("CWT-" + BusinessClock.today(clock).getYear()),
                 new TaggedInvoice(
                     companyId,
                     invoiceNo,
@@ -243,7 +243,7 @@ public class CwtService {
         batches.save(
             new CwtBatch(
                 companyId,
-                numbers.next("CWB-" + LocalDate.now(clock).getYear()),
+                numbers.next("CWB-" + BusinessClock.today(clock).getYear()),
                 insurer,
                 selected.size(),
                 total));
@@ -376,8 +376,7 @@ public class CwtService {
     requireStage(t, VALIDATING);
     if (!t.getCompanyId().equals(companyId) || !t.getInsurerCode().equals(insurer)) {
       throw new BusinessRuleException(
-          "CWT_BATCH_ONE_INSURER",
-          "A 2307 batch holds the certificates of one insurer (CSHID.027)");
+          "CWT_BATCH_ONE_INSURER", "A 2307 batch holds the certificates of one insurer");
     }
     if (t.getPath() != CwtPath.CERTIFICATE) {
       throw new BusinessRuleException(

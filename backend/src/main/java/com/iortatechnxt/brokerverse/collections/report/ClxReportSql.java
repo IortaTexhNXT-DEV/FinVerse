@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.collections.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
@@ -48,10 +49,6 @@ public class ClxReportSql {
   /** Invoicing branch filter. */
   public static final String BRANCH = "branchId";
 
-  /** Note on the draft layouts. */
-  static final String DRAFT_NOTE =
-      "Layout of BRD p.59-61 with the fields BrokerVerse holds; legacy fields to map (CQ22).";
-
   /** Item columns selected by the item reports. */
   static final String ITEM_SELECT =
       "select i.client_code, i.assured_name, i.invoice_no, i.policy_no, i.arn, i.booking_date,"
@@ -72,7 +69,7 @@ public class ClxReportSql {
           + " and (cast(:salesUnit as varchar) is null or i.sales_unit = :salesUnit)"
           + " and (cast(:branchId as bigint) is null or i.branch_id = :branchId)";
 
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  private static final ZoneId MANILA = BusinessClock.zone();
 
   private final NamedParameterJdbcTemplate jdbc;
 

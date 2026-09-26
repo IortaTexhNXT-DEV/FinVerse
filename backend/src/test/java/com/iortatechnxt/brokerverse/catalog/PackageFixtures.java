@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.catalog.service.version.PackageSetupService;
 import com.iortatechnxt.brokerverse.catalog.service.version.PackageSpec;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionService;
 import com.iortatechnxt.brokerverse.catalog.service.version.VersionRef;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.math.BigDecimal;
@@ -60,7 +61,7 @@ public class PackageFixtures {
 
   /** Today. */
   public LocalDate today() {
-    return LocalDate.now(clock);
+    return BusinessClock.today(clock);
   }
 
   /** The company. */

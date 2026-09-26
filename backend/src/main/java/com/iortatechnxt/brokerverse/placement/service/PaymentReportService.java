@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.placement.domain.BillingBatch;
 import com.iortatechnxt.brokerverse.placement.domain.BillingBatchRepository;
 import com.iortatechnxt.brokerverse.placement.domain.BillingBatchStatus;
@@ -22,7 +23,6 @@ import com.iortatechnxt.brokerverse.placement.domain.PaymentReportLine.MatchedAc
 import com.iortatechnxt.brokerverse.placement.domain.PaymentReportRepository;
 import com.iortatechnxt.brokerverse.placement.domain.ReportedPayment;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -105,7 +105,7 @@ public class PaymentReportService {
     PaymentReport report =
         new PaymentReport(
             upload.companyId(),
-            numbers.next("PMT-" + LocalDate.now(clock).getYear()),
+            numbers.next("PMT-" + BusinessClock.today(clock).getYear()),
             upload.kind(),
             batch == null ? null : batch.getId(),
             upload.fileName());

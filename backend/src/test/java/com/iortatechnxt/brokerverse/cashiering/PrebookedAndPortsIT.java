@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.PrebookedRepository;
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringPaymentConfirmationSource;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.IntakeResult;
 import com.iortatechnxt.brokerverse.cashiering.service.PrebookedService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
@@ -26,7 +27,7 @@ import com.iortatechnxt.brokerverse.placement.service.ConfirmedPayment;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -93,7 +94,10 @@ class PrebookedAndPortsIT {
     as.run("cashier", () -> prebooked.release(waiting.getId(), "Account will not be booked"));
     assertThat(items.findById(waiting.getId()).orElseThrow().getStatus())
         .isEqualTo(Prebooked.RELEASED);
-    assertThat(as.run("cashier", () -> prebooked.rematchAll(LocalDate.now().plusDays(30))))
+    assertThat(
+            as.run(
+                "cashier",
+                () -> prebooked.rematchAll(BusinessClock.today(Clock.systemUTC()).plusDays(30))))
         .isNotNegative();
   }
 
@@ -114,7 +118,7 @@ class PrebookedAndPortsIT {
                               MovementType.ADJUSTED,
                               "ADJUSTMENT",
                               ref,
-                              LocalDate.now(),
+                              BusinessClock.today(Clock.systemUTC()),
                               Map.of(LedgerComponent.BASIC, new BigDecimal("-1000.00")),
                               null,
                               "Decrease of TSI"));
@@ -123,7 +127,7 @@ class PrebookedAndPortsIT {
                               invoice.getInvoiceNo(),
                               "ADJUSTMENT",
                               ref,
-                              LocalDate.now(),
+                              BusinessClock.today(Clock.systemUTC()),
                               "Decrease"));
                     }));
     assertThat(result.excess()).isEqualByComparingTo("1000.00");
@@ -137,7 +141,11 @@ class PrebookedAndPortsIT {
             () ->
                 reapplier.reapply(
                     new ReapplyRequest(
-                        invoice.getInvoiceNo(), "ADJUSTMENT", ref, LocalDate.now(), "Decrease")));
+                        invoice.getInvoiceNo(),
+                        "ADJUSTMENT",
+                        ref,
+                        BusinessClock.today(Clock.systemUTC()),
+                        "Decrease")));
     assertThat(again.unappliedRef()).isEqualTo(result.unappliedRef());
 
     OpsInvoice unpaid = fx.motorInvoice();
@@ -145,7 +153,11 @@ class PrebookedAndPortsIT {
             reapplier
                 .reapply(
                     new ReapplyRequest(
-                        unpaid.getInvoiceNo(), "ADJUSTMENT", ref, LocalDate.now(), "None"))
+                        unpaid.getInvoiceNo(),
+                        "ADJUSTMENT",
+                        ref,
+                        BusinessClock.today(Clock.systemUTC()),
+                        "None"))
                 .excess())
         .isZero();
   }
@@ -159,7 +171,7 @@ class PrebookedAndPortsIT {
             "COMMISSION",
             new ReceiptIssuer.Payee("INS-MGIC", "MGIC Insurance"),
             "PHP",
-            LocalDate.now(),
+            BusinessClock.today(Clock.systemUTC()),
             List.of(
                 new ReceiptIssuer.ReceiptLine(
                     "BI-X",

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.adjustment.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -14,7 +15,7 @@ public final class DocText {
   /** Placeholder of an empty value. */
   public static final String NONE = "-";
 
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  private static final ZoneId MANILA = BusinessClock.zone();
 
   private DocText() {}
 

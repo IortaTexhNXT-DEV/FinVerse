@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
 import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedRepository;
 import com.iortatechnxt.brokerverse.cashiering.service.DispositionService;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.IntakeResult;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
@@ -44,7 +45,7 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.PlacementTestData;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,7 +168,7 @@ class OperationsEndToEndIT {
             extraction.run(
                 journey.company(),
                 new Scope(ExtractionTrigger.MANUAL_INVOICE, null, null, invoiceNo),
-                LocalDate.now()));
+                BusinessClock.today(Clock.systemUTC())));
     assertThat(tags.findFirstByInvoiceNoOrderByIdDesc(invoiceNo))
         .hasValueSatisfying(t -> assertThat(t.getTag()).isEqualTo(ExtractionTag.EXTRACTED));
     OpsInvoice locked = journey.invoice(invoiceNo);

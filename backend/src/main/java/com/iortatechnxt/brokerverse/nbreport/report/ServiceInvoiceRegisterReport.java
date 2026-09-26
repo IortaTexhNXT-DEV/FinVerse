@@ -51,7 +51,7 @@ public class ServiceInvoiceRegisterReport implements ReportDefinition {
     return NbReportSupport.metadata(
         CODE,
         "Service Invoice Register",
-        "Service invoices and credits issued, with their dispatch outcome (BRNB.100/100b)",
+        "Service invoices and credits issued, with their dispatch outcome",
         Permission.BOOKING_PROCESS,
         true,
         ParameterSpec.select(

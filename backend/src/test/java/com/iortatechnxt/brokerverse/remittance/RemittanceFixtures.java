@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.booking.BookingFixtures;
 import com.iortatechnxt.brokerverse.booking.domain.BookingSource;
 import com.iortatechnxt.brokerverse.booking.service.BookingOptions;
 import com.iortatechnxt.brokerverse.booking.service.BookingService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.OpsLedgerFixtures;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
@@ -24,6 +25,7 @@ import com.iortatechnxt.brokerverse.remittance.service.BatchService;
 import com.iortatechnxt.brokerverse.remittance.service.ExtractionService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.EnumMap;
 import java.util.List;
@@ -150,7 +152,7 @@ public class RemittanceFixtures {
             extraction.run(
                 company(),
                 new Scope(ExtractionTrigger.MANUAL_INVOICE, null, null, invoiceNo),
-                LocalDate.now()));
+                BusinessClock.today(Clock.systemUTC())));
   }
 
   /** The latest batch line of an invoice. */

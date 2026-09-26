@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.dashboard.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.period.domain.FiscalYear;
 import com.iortatechnxt.brokerverse.period.service.PeriodService;
 import java.time.Clock;
@@ -37,7 +38,7 @@ public class DashboardCalendar {
    * @return reference date
    */
   public LocalDate dateOrToday(LocalDate asOf) {
-    return asOf != null ? asOf : LocalDate.now(clock);
+    return asOf != null ? asOf : BusinessClock.today(clock);
   }
 
   /**

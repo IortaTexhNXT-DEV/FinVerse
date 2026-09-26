@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.commission.domain.DpItem;
 import com.iortatechnxt.brokerverse.commission.domain.DpItemRepository;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
@@ -123,7 +124,8 @@ public class DpCollectionService {
     approved.forEach(this::requireDirectPayment);
     IssuedReceipt or = receipt(billing, approved, request);
     billing.receipt(or.receiptNo(), or.status().name());
-    LocalDate date = request.receiptDate() == null ? LocalDate.now(clock) : request.receiptDate();
+    LocalDate date =
+        request.receiptDate() == null ? BusinessClock.today(clock) : request.receiptDate();
     for (DpItem item : approved) {
       postings.collect(
           item, new DpPostings.Collection(date, bank, or.receiptNo(), billing.getBillingNo()));
@@ -165,7 +167,7 @@ public class DpCollectionService {
             "COMMISSION",
             new ReceiptIssuer.Payee(billing.getInsurerCode(), billing.getInsurerCode()),
             currency(approved),
-            request.receiptDate() == null ? LocalDate.now(clock) : request.receiptDate(),
+            request.receiptDate() == null ? BusinessClock.today(clock) : request.receiptDate(),
             lines,
             new ReceiptIssuer.Source(
                 DpIntakeService.MODULE,
@@ -190,7 +192,7 @@ public class DpCollectionService {
           "Invoice "
               + item.getInvoiceNo()
               + " is not tagged direct payment by Marketing: its premium receivable cannot be"
-              + " reversed (MKTID.012)");
+              + " reversed");
     }
   }
 
@@ -213,7 +215,7 @@ public class DpCollectionService {
   public DpItem reverse(Long itemId) {
     DpItem item = require(itemId);
     requireDirectPayment(item);
-    reverse(item, LocalDate.now(clock));
+    reverse(item, BusinessClock.today(clock));
     return item;
   }
 
@@ -231,10 +233,10 @@ public class DpCollectionService {
       throw new BusinessRuleException(
           "DP_REINSTATE_REASON", "Choose a direct payment reinstatement reason");
     }
-    lovs.requireValid("REINSTATEMENT_REASON", reasonCode, LocalDate.now(clock));
+    lovs.requireValid("REINSTATEMENT_REASON", reasonCode, BusinessClock.today(clock));
     int reversal = item.getReversalCount();
     int seq = item.reinstated();
-    String batch = postings.reinstatePremium(item, reversal, seq, LocalDate.now(clock));
+    String batch = postings.reinstatePremium(item, reversal, seq, BusinessClock.today(clock));
     if ("DP_CANCELLATION".equals(reasonCode) && item.getCollectedAmount() != null) {
       var handle =
           unapplied.create(

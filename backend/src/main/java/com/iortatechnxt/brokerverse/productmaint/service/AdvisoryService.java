@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Field;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Fields;
@@ -188,7 +189,7 @@ public class AdvisoryService {
     values.put("effectiveFrom", String.valueOf(terms.dates().effectiveFrom()));
     values.put("reference", p.getRequestNo());
     String template = type == Type.RENEWAL ? "PKG_RENEWAL_ADVISORY" : "PKG_ADVISORY";
-    return templates.merge(template, LocalDate.now(clock), values);
+    return templates.merge(template, BusinessClock.today(clock), values);
   }
 
   /**
@@ -222,7 +223,7 @@ public class AdvisoryService {
    */
   public Advisory update(Long advisoryId, Content content) {
     Advisory a = draft(advisoryId);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     if (content.groups().isEmpty()) {
       throw new BusinessRuleException(
           "ADVISORY_NO_RECIPIENT", "Select at least one recipient group");

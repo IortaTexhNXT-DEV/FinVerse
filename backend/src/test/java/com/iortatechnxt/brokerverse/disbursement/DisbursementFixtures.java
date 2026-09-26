@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.disbursement;
 
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.DisbursementMode;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeSource;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.RequestSource;
@@ -18,6 +19,7 @@ import com.iortatechnxt.brokerverse.disbursement.service.VoucherService;
 import com.iortatechnxt.brokerverse.opsledger.OpsLedgerFixtures;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -177,6 +179,6 @@ public class DisbursementFixtures {
 
   /** A business date no other test uses (end of day runs once per date). */
   public static LocalDate uniqueDate() {
-    return LocalDate.now().plusDays(DAYS.incrementAndGet());
+    return BusinessClock.today(Clock.systemUTC()).plusDays(DAYS.incrementAndGet());
   }
 }

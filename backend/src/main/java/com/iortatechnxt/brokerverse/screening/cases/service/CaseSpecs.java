@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.screening.cases.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseStage;
 import com.iortatechnxt.brokerverse.screening.cases.domain.CaseStatus;
 import com.iortatechnxt.brokerverse.screening.cases.domain.ScreeningCase;
@@ -21,7 +22,7 @@ import org.springframework.data.jpa.domain.Specification;
 final class CaseSpecs {
 
   /** Philippine time, the business calendar of the case list. */
-  static final ZoneId MANILA = ZoneId.of("Asia/Manila");
+  static final ZoneId MANILA = BusinessClock.zone();
 
   private static final String STAGE = "stage";
   private static final String STATUS = "status";

@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.collections.installment.service.InstallmentS
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import java.math.BigDecimal;
@@ -303,7 +304,7 @@ public class InstallmentPlanService {
    */
   public InstallmentPlan refresh(Long id) {
     InstallmentPlan plan = get(id);
-    allocation.allocate(plan, LocalDate.now(clock));
+    allocation.allocate(plan, BusinessClock.today(clock));
     return plan;
   }
 
@@ -371,7 +372,7 @@ public class InstallmentPlanService {
   }
 
   private BillingFrequency frequency(String code) {
-    lovs.requireValid(BillingFrequency.LOV, code, LocalDate.now(clock));
+    lovs.requireValid(BillingFrequency.LOV, code, BusinessClock.today(clock));
     return BillingFrequency.of(code);
   }
 
@@ -379,7 +380,7 @@ public class InstallmentPlanService {
       OpsInvoice invoice, String invoiceNo, String frequency, PlanSource source, String remarks) {
     return new Header(
         invoice.getCompanyId(),
-        numbers.next("IPL-" + LocalDate.now(clock).getYear()),
+        numbers.next("IPL-" + BusinessClock.today(clock).getYear()),
         invoice.getArn(),
         invoiceNo,
         invoice.getClientCode(),
@@ -392,7 +393,7 @@ public class InstallmentPlanService {
 
   private InstallmentPlan save(Header header, List<Installment.Terms> terms, String summary) {
     InstallmentPlan plan = plans.save(InstallmentPlan.create(header, terms));
-    allocation.allocate(plan, LocalDate.now(clock));
+    allocation.allocate(plan, BusinessClock.today(clock));
     audit.record(
         ENTITY,
         plan.getPlanNo(),

@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.prodrecon.service;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconCycle;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconEnums.ReconStatus;
@@ -178,7 +179,7 @@ public class ReconItemService {
   }
 
   private void validate(Feedback f) {
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     lovs.validateOptional(COMPANY_CONCERNED, blankToNull(f.companyConcerned()), today);
     lovs.validateOptional(DISPOSITION, blankToNull(f.disposition()), today);
   }

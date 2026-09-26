@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -159,7 +160,7 @@ public class CatalogPackageSetupService implements PackageSetupService {
     PackageSpec copy =
         PackageVersionMapper.specOf(
             companyId, base, new PackageSpec.Origin(null, null, changeSummary));
-    LocalDate tomorrow = LocalDate.now(clock).plusDays(1);
+    LocalDate tomorrow = BusinessClock.today(clock).plusDays(1);
     PackageSpec.PackageDates d = copy.dates();
     PackageSpec spec =
         new PackageSpec(
@@ -187,11 +188,7 @@ public class CatalogPackageSetupService implements PackageSetupService {
           PRODUCT + productCode + " is " + product.getLifecycleStatus() + " already");
     }
     product.changeLifecycle(ProductLifecycle.RETIRED);
-    audit.record(
-        PRODUCT.strip(),
-        productCode,
-        AuditAction.UPDATE,
-        "Retired (BRPM.011)" + originText(origin));
+    audit.record(PRODUCT.strip(), productCode, AuditAction.UPDATE, "Retired" + originText(origin));
     incentives.productInactive(productCode, "retired");
   }
 

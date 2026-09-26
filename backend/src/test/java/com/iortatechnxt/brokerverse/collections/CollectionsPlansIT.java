@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.collections.installment.domain.PlanEnums.Pla
 import com.iortatechnxt.brokerverse.collections.installment.domain.PlanEnums.PlanStatus;
 import com.iortatechnxt.brokerverse.collections.installment.service.InstallmentPlanService;
 import com.iortatechnxt.brokerverse.collections.installment.service.InstallmentPlanService.ManualEntry;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.service.MessageService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.support.AsUser;
@@ -22,6 +23,7 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -88,7 +90,12 @@ class CollectionsPlansIT {
                     HANDLER,
                     () ->
                         plans.generate(
-                            company, year1.getInvoiceNo(), "QUARTERLY", LocalDate.now(), 4, null)))
+                            company,
+                            year1.getInvoiceNo(),
+                            "QUARTERLY",
+                            BusinessClock.today(Clock.systemUTC()),
+                            4,
+                            null)))
         .extracting("code")
         .isEqualTo("CLX_PLAN_EXISTS");
 
@@ -150,7 +157,7 @@ class CollectionsPlansIT {
         .isEqualTo("CLX_SOA_RECIPIENT");
     assertThat(as.run(HANDLER, () -> dispatch.clientEmail(again.getId()))).isNotNull();
 
-    fx.pay(year1.getInvoiceNo(), "1000.00", LocalDate.now());
+    fx.pay(year1.getInvoiceNo(), "1000.00", BusinessClock.today(Clock.systemUTC()));
     InstallmentPlan refreshed = as.run(HANDLER, () -> plans.refresh(plan.getId()));
     assertThat(refreshed.installment(1).getPaidAmount()).isEqualByComparingTo("1000.00");
     assertThat(refreshed.getPaidTotal()).isEqualByComparingTo("1000.00");
@@ -180,7 +187,10 @@ class CollectionsPlansIT {
     assertThat(plan.installment(1).getStatus()).isEqualTo(InstallmentStatus.OVERDUE);
 
     BigDecimal first = plan.installment(1).getAmount();
-    fx.pay(invoice.getInvoiceNo(), first.add(d("100.00")).toPlainString(), LocalDate.now());
+    fx.pay(
+        invoice.getInvoiceNo(),
+        first.add(d("100.00")).toPlainString(),
+        BusinessClock.today(Clock.systemUTC()));
     InstallmentPlan allocated = as.run(HANDLER, () -> plans.refresh(plan.getId()));
     assertThat(allocated.installment(1).getStatus()).isEqualTo(InstallmentStatus.PAID);
     assertThat(allocated.installment(2).getPaidAmount()).isEqualByComparingTo("100.00");
@@ -222,7 +232,7 @@ class CollectionsPlansIT {
     as.run(
         HANDLER,
         () -> {
-          plans.refresh(plan.getId(), LocalDate.now());
+          plans.refresh(plan.getId(), BusinessClock.today(Clock.systemUTC()));
           return plan.getId();
         });
 
@@ -242,7 +252,8 @@ class CollectionsPlansIT {
                             company,
                             invoice.getInvoiceNo(),
                             "MONTHLY",
-                            List.of(new ManualEntry(LocalDate.now(), d("1.00"))),
+                            List.of(
+                                new ManualEntry(BusinessClock.today(Clock.systemUTC()), d("1.00"))),
                             null)))
         .extracting("code")
         .isEqualTo("CLX_PLAN_TOTAL_MISMATCH");
@@ -256,8 +267,10 @@ class CollectionsPlansIT {
                             invoice.getInvoiceNo(),
                             "MONTHLY",
                             List.of(
-                                new ManualEntry(LocalDate.now(), d("1.00")),
-                                new ManualEntry(LocalDate.now().minusDays(1), d("1.00"))),
+                                new ManualEntry(BusinessClock.today(Clock.systemUTC()), d("1.00")),
+                                new ManualEntry(
+                                    BusinessClock.today(Clock.systemUTC()).minusDays(1),
+                                    d("1.00"))),
                             null)))
         .extracting("code")
         .isEqualTo("CLX_PLAN_ENTRY_INVALID");
@@ -271,11 +284,14 @@ class CollectionsPlansIT {
                     invoice.getInvoiceNo(),
                     "MONTHLY",
                     List.of(
-                        new ManualEntry(LocalDate.now().plusDays(30), half),
-                        new ManualEntry(LocalDate.now().plusDays(60), left.subtract(half))),
+                        new ManualEntry(BusinessClock.today(Clock.systemUTC()).plusDays(30), half),
+                        new ManualEntry(
+                            BusinessClock.today(Clock.systemUTC()).plusDays(60),
+                            left.subtract(half))),
                     "agreed by phone"));
     assertThat(manual.getSource()).isEqualTo(PlanSource.MANUAL);
-    assertThat(manual.installment(1).getCycleTo()).isEqualTo(LocalDate.now().plusDays(59));
+    assertThat(manual.installment(1).getCycleTo())
+        .isEqualTo(BusinessClock.today(Clock.systemUTC()).plusDays(59));
   }
 
   @Test
@@ -288,7 +304,12 @@ class CollectionsPlansIT {
                     HANDLER,
                     () ->
                         plans.generate(
-                            company, direct.getInvoiceNo(), "QUARTERLY", LocalDate.now(), 2, null)))
+                            company,
+                            direct.getInvoiceNo(),
+                            "QUARTERLY",
+                            BusinessClock.today(Clock.systemUTC()),
+                            2,
+                            null)))
         .extracting("code")
         .isEqualTo("CLX_INVOICE_NOT_COLLECTIBLE");
     assertThatThrownBy(
@@ -297,18 +318,28 @@ class CollectionsPlansIT {
                     HANDLER,
                     () ->
                         plans.generate(
-                            company, "BI-NONE-1", "QUARTERLY", LocalDate.now(), 2, null)))
+                            company,
+                            "BI-NONE-1",
+                            "QUARTERLY",
+                            BusinessClock.today(Clock.systemUTC()),
+                            2,
+                            null)))
         .extracting("code")
         .isEqualTo("CLX_INVOICE_UNKNOWN");
     OpsInvoice paid = fx.motorInvoice();
-    fx.payInFull(paid.getInvoiceNo(), LocalDate.now());
+    fx.payInFull(paid.getInvoiceNo(), BusinessClock.today(Clock.systemUTC()));
     assertThatThrownBy(
             () ->
                 as.run(
                     HANDLER,
                     () ->
                         plans.generate(
-                            company, paid.getInvoiceNo(), "QUARTERLY", LocalDate.now(), 2, null)))
+                            company,
+                            paid.getInvoiceNo(),
+                            "QUARTERLY",
+                            BusinessClock.today(Clock.systemUTC()),
+                            2,
+                            null)))
         .extracting("code")
         .isEqualTo("CLX_PLAN_NOTHING_DUE");
     assertThatThrownBy(

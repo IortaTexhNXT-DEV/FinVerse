@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.RiskProductRepository;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -313,7 +314,7 @@ public class ProductCatalogService {
     requireLine(details.lineCode());
     if (details.packaged() && details.coverTypeCode() == null) {
       throw new BusinessRuleException(
-          "PACKAGE_HIERARCHY_INCOMPLETE", "A package needs its cover type (PMADD01)");
+          "PACKAGE_HIERARCHY_INCOMPLETE", "A package needs its cover type");
     }
     if (details.coverTypeCode() != null
         && coverTypes
@@ -323,7 +324,7 @@ public class ProductCatalogService {
           "COVER_TYPE_INVALID",
           "Cover type " + details.coverTypeCode() + " does not belong to " + details.lineCode());
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     if (details.marketSegments() != null) {
       details.marketSegments().forEach(s -> lovs.requireValid("MARKET_SEGMENT", s, today));
     }

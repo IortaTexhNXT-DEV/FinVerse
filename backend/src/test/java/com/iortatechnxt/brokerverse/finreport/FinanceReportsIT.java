@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.ReportRow;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
@@ -12,7 +13,7 @@ import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Clock;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +66,7 @@ class FinanceReportsIT {
   private Map<String, String> params(String... keyValues) {
     Map<String, String> m = new HashMap<>();
     m.put("companyId", data.company().getId().toString());
-    m.put("fromDate", LocalDate.now().withDayOfYear(1).toString());
+    m.put("fromDate", BusinessClock.today(Clock.systemUTC()).withDayOfYear(1).toString());
     for (int i = 0; i + 1 < keyValues.length; i += 2) {
       m.put(keyValues[i], keyValues[i + 1]);
     }

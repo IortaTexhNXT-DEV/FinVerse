@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimCodes;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.CoverSnapshot;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.LossDetails;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -68,7 +69,7 @@ public class ClaimDetailsService {
   public Claim amendLoss(
       Long companyId, Long claimId, LossDetails.Loss loss, LossDetails.Amounts amounts) {
     Claim claim = claims.requireOpen(companyId, claimId);
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     lovs.requireValid(ClaimCodes.LOV_LOSS_NATURE, loss.lossNature(), today);
     lovs.requireValid(ClaimCodes.LOV_CLAIM_TYPE, loss.claimType(), today);
     lovs.validateOptional(ClaimCodes.LOV_CATASTROPHE, blankToNull(loss.catastropheCode()), today);
@@ -100,7 +101,7 @@ public class ClaimDetailsService {
       throw new BusinessRuleException(
           "BCL_CLAIM_CLOSED", "The reported date of a closed claim cannot change");
     }
-    LocalDate today = LocalDate.now(clock);
+    LocalDate today = BusinessClock.today(clock);
     if (reason != null && !reason.isBlank()) {
       lovs.requireValid(ClaimCodes.LOV_OVERRIDE_REASON, reason, today);
     }
@@ -125,7 +126,7 @@ public class ClaimDetailsService {
   public Claim overrideClaimant(Long companyId, Long claimId, String name, String reason) {
     Claim claim = claims.requireOpen(companyId, claimId);
     if (reason != null && !reason.isBlank()) {
-      lovs.requireValid(ClaimCodes.LOV_OVERRIDE_REASON, reason, LocalDate.now(clock));
+      lovs.requireValid(ClaimCodes.LOV_OVERRIDE_REASON, reason, BusinessClock.today(clock));
     }
     String previous = claim.getLoss().overrideClaimant(name, reason);
     audit.record(

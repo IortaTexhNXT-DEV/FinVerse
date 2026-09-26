@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimCodes;
 import com.iortatechnxt.brokerverse.brokerclaims.feed.service.InAppClaimsFeed;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.nbadmin.service.RetentionCriteria;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
@@ -22,6 +23,7 @@ import com.iortatechnxt.brokerverse.remittance.service.SpecialRemittanceService;
 import com.iortatechnxt.brokerverse.remittance.service.SpecialRemittanceService.NewRequest;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -141,11 +143,13 @@ class ClaimsFeedIT {
             + " ?",
         claim.getId());
     RetentionCriteria criteria =
-        new RetentionCriteria(Set.of("CLOSED"), LocalDate.now().minusYears(10));
+        new RetentionCriteria(
+            Set.of("CLOSED"), BusinessClock.today(Clock.systemUTC()).minusYears(10));
     assertThat(retention.countEligible(criteria)).isPositive();
     assertThat(retention.eligible(criteria, 500))
         .anySatisfy(c -> assertThat(c.reference()).isEqualTo(claim.getClaimNo()));
-    RetentionCriteria none = new RetentionCriteria(Set.of("ACTIVE"), LocalDate.now());
+    RetentionCriteria none =
+        new RetentionCriteria(Set.of("ACTIVE"), BusinessClock.today(Clock.systemUTC()));
     assertThat(retention.countEligible(none)).isZero();
     assertThat(retention.eligible(none, 10)).isEmpty();
   }

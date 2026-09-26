@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -21,7 +22,7 @@ import java.util.Set;
 public record WorkingHours(LocalTime start, LocalTime end, Set<DayOfWeek> days) {
 
   /** Time zone of BDOI. */
-  public static final ZoneId ZONE = ZoneId.of("Asia/Manila");
+  public static final ZoneId ZONE = BusinessClock.zone();
 
   /** Always within working hours. */
   public static final WorkingHours ALWAYS =

@@ -2,7 +2,7 @@
 
 Source: *Annexure 2(b) Reports Book – Finance* (PREMIA 11, v1.0, 125 pages). This is the
 traceability baseline for building the Finance reports in iNXT BrokerVerse. Companion documents:
-`GL_FUNCTIONAL_SPEC.md` (core GL) and `REPORTS_BOOK_SPEC.md` (GI reports).
+`GL_FUNCTIONAL_SPEC.md` (core GL) and, for BDOI, `BDOI_ACCT_BRD_SPEC.md` (BRD-5, FRBS Appendix A report pack).
 
 How to read this file:
 - **FIN code**: the BrokerVerse report code (stable and short). **Src ID**: the PREMIA report ID printed

@@ -3,7 +3,7 @@
 ## Context
 
 ```
- Users (finance, underwriting, claims, reinsurance, auditors)
+ Users (BDOI personas: Marketing, TSU, Processing, Operations, Collections, Accounting, Compliance, admin)
         │ HTTPS
         ▼
  ┌──────────────────┐  /api  ┌─────────────────────────────┐   JDBC   ┌──────────────┐
@@ -13,6 +13,11 @@
 ```
 
 ## Backend modules
+
+This table lists the platform modules of the original finance suite. The BDOI broking modules (BRD-1 to BRD-13) are
+described in [`BROKING_ARCHITECTURE.md`](BROKING_ARCHITECTURE.md) and the design of each BRD. Modules marked
+*insurer-side* are not used by any BDOI process and are hidden from BDOI roles; see
+[`CODEBASE_RELEVANCE_AUDIT.md`](../development/CODEBASE_RELEVANCE_AUDIT.md).
 
 | Module | Responsibility |
 |---|---|
@@ -31,14 +36,14 @@
 | `accounting` | Event-driven accounting engine: event catalogue, rules, simulator, event register |
 | `report` | Report framework, renderers (PDF/XLSX/CSV), GL & financial statement reports |
 | `dashboard` | Executive KPIs |
-| `underwriting` | Products, quotations, policies, endorsements, open covers, UW reports |
-| `claims` | Claims, estimates, settlements, recoveries, LPOs, claims reports |
-| `reinsurance` | Treaties, cessions, facultative, RI claims recoveries, statements of account |
-| `reserves` | UPR, DAC, IBNR, OSLR and surplus processing |
+| `underwriting` | *Insurer-side.* Products, quotations, policies, endorsements, open covers, UW reports |
+| `claims` | *Insurer-side* (BDOI claims are in `brokerclaims`). Claims, estimates, settlements, recoveries, LPOs, claims reports |
+| `reinsurance` | *Insurer-side* (the BDOI ReInsurance BRD is phase 2). Treaties, cessions, facultative, RI claims recoveries, statements of account |
+| `reserves` | *Insurer-side.* UPR, DAC, IBNR, OSLR and surplus processing |
 | `payables` | Bank accounts, supplier invoices, payment vouchers, PDC issued, petty cash |
 | `receivables` | Receipts, cheques & deposits, PDC received, bank reconciliation |
 | `finreport` | Finance / MIS report book |
-| `budget`, `consolidation`, `closing` | Budgets, inter-company & consolidation, FX revaluation, year-end |
+| `budget`, `consolidation`, `closing` | Budgets, inter-company & consolidation (*not used by BDOI*), FX revaluation, period close, year-end |
 
 Dependency direction is enforced by ArchUnit: operational modules → accounting → journal → ledger;
 no cycles. Cross-module call-backs use ports (interfaces owned by the caller).
@@ -60,6 +65,7 @@ no cycles. Cross-module call-backs use ports (interfaces owned by the caller).
 
 ## Requirements traceability
 
-- `docs/requirements/GL_FUNCTIONAL_SPEC.md` – GL functional baseline (Premia GL documents).
-- `docs/requirements/REPORTS_BOOK_SPEC.md` – GI reports (Annexure 2(c)).
+- `docs/requirements/BDOI_*_BRD_SPEC.md` – the BDOI requirements per BRD; `BDOI_ACCT_BRD_SPEC.md` (BRD-5) is the
+  baseline of the GL, sub-ledger, tax and finance reports for BDOI.
+- `docs/requirements/GL_FUNCTIONAL_SPEC.md` – GL functional baseline of the original suite (Premia GL documents).
 - `docs/requirements/FINANCE_REPORTS_SPEC.md` – finance reports (Annexure 2(b)).

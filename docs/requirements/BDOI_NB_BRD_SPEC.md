@@ -2,7 +2,7 @@
 
 Client: BDO Insurance and Reinsurance Brokers, Inc. (BDOI), Philippines. Platform: iNXT BrokerVerse.
 
-Status: **for BDOI concurrence - no build started.** The review workbook with concurrence columns is `iNXT_BrokerVerse_BDOI_BRD1_New_Business_Fit_Gap.xlsx`, and this file is generated from the same data.
+Status: **baseline of the BRD-1 build.** This file was first issued for BDOI concurrence before the build, with a fit/gap review workbook generated from the same data. That workbook is superseded by the FRS ([`FRS_BRD01_NEW_BUSINESS.md`](../deliverables/src/frs/FRS_BRD01_NEW_BUSINESS.md), issued as `docs/deliverables/out/FRS/BIBS_FRS_BRD-01_New_Business_v1.0.docx`), the discrepancy and clarification register (`docs/deliverables/out/Registers/`) and the as-built status per BR ID in [`BDOI_NB_TRACEABILITY.md`](BDOI_NB_TRACEABILITY.md).
 
 ## 1. Source documents
 

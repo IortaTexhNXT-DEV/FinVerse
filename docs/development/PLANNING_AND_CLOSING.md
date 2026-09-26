@@ -81,7 +81,8 @@ demo data `V960`/`V961` plus the start-up runner `closing.demo.PlanningDemoData`
   depends on receivables, so no neutral kernel package is needed (unlike the insurance kernel).
   Other modules append their own period-end controls through the port
   `closing.service.PeriodEndCheckProvider` (e.g. actuarial reserves: "Actuarial reserves valued and
-  posted", see `docs/modules/ACTUARIAL_RESERVES.md`).
+  posted"; it reports "Not applicable" while reserving is not set up, as for BDOI; the insurer-side `reserves`
+  module is listed in `CODEBASE_RELEVANCE_AUDIT.md`).
 - **Year-end close** (`YEAR_END_CLOSE`): requires every period CLOSED or CLOSING with the final
   period in CLOSING (it receives the closing journal), no pending journals, a balanced TB, the
   final period revalued (or nothing to revalue) and a valid company retained earnings account;

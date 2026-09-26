@@ -20,7 +20,7 @@ Requirements baseline: [`BDOI_CLM_BRD_SPEC.md`](../requirements/BDOI_CLM_BRD_SPE
 
 ### 2.1 Why
 
-| Aspect | Insurer-side `claims` (built, `docs/modules/CLAIMS.md`) | What BDOI needs (BRD-7) | Consequence of extending |
+| Aspect | Insurer-side `claims` (built, package `claims`; see `docs/development/CODEBASE_RELEVANCE_AUDIT.md`) | What BDOI needs (BRD-7) | Consequence of extending |
 |---|---|---|---|
 | Whose claim | The company's own liability at its share (`ClaimPolicy.sharePct`, coinsurance leader) | The client's claim against one or more insurers; BDOI has no share | Every amount and report would need a "broker mode" |
 | Money | Reserve changes, settlements and recoveries are maker-checker documents posted through the accounting engine (`CLAIM_RESERVE`, `CLAIM_SETTLEMENT`, `CLAIM_RECOVERY`, `CLAIM_COINSURANCE`) and paid through payables (`CLAIM_PAYMENT`, open items) | Insurer reserve and settlement are information only (BRCLM.023/029/030); no journal, no payable | The posting paths would have to be switched off by flag in `ReserveService`, `SettlementService`, `RecoveryService`, `ClaimPostingService`: a correctness risk in a built, tested module |

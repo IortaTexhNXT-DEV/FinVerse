@@ -73,7 +73,7 @@ export default function IcMappingPage() {
       <PageHeader
         section="Tax & Statutory"
         title="IC Schedule Mapping"
-        description="Which ledger accounts feed each Insurance Commission schedule line; the sign and RBC factors are parameters."
+        description="Which ledger accounts feed each Insurance Commission schedule line."
         actions={
           can('TAX_MANAGE') && (
             <Button

@@ -53,7 +53,7 @@ export default function PartiesPage() {
       <PageHeader
         section="Setup"
         title="Business Partners"
-        description="Policyholders, agents, brokers, reinsurers, coinsurers and suppliers used as sub-ledger parties. Changes need authorization."
+        description="Policyholders, agents, brokers, reinsurers, coinsurers and suppliers used as sub-ledger parties."
         actions={
           maintain && (
             <Button

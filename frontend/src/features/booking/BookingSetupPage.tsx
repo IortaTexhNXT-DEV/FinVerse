@@ -233,7 +233,7 @@ export default function BookingSetupPage() {
       <PageHeader
         section="Booking"
         title="Booking Setup"
-        description="Which accounts are booked automatically, which bookings are incentive eligible and which service invoices are issued."
+        description="Which accounts are booked automatically, which bookings are incentive eligible."
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'auto' && <AutoBookTab companyId={companyId} canEdit={canEdit} />}

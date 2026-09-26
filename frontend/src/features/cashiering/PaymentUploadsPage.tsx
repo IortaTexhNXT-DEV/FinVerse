@@ -116,7 +116,7 @@ export default function PaymentUploadsPage() {
       <PageHeader
         section="Cashiering"
         title="Payment Uploads"
-        description="Upload a payment file of a bank or channel: every row becomes a payment with its AR and is matched at once."
+        description="Upload a payment file of a bank or channel."
       />
       <Card flush>
         <Tabs

@@ -128,7 +128,7 @@ export default function InsurerOrPage() {
       <PageHeader
         section="Remittance"
         title="Insurer OR Upload"
-        description="Upload the remittance schedules returned by the insurers with their official receipts, and review the exceptions."
+        description="Upload the remittance schedules returned by the insurers with their official receipts."
         actions={<TemplateButton name="insurer-or-template.csv" content={OR_TEMPLATE} />}
       />
       <ErrorAlert error={upload.error ?? open.error ?? runs.error} />

@@ -122,7 +122,7 @@ export default function PdcIssuedPage() {
       <PageHeader
         section="Payables & Cash"
         title="PDC Issued Register"
-        description="Post-dated cheques issued: the liability sits in PDC clearing until the cheque is presented."
+        description="Post-dated cheques issued."
         actions={
           <Button
             variant="secondary"

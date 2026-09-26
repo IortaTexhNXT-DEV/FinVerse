@@ -180,7 +180,7 @@ export default function BatchesPage() {
       <PageHeader
         section="Remittance"
         title="Remittance Batches"
-        description="Process Remittance: review, submit, approve and follow the batches to Disbursement and the insurer OR."
+        description="Process Remittance: review, submit, approve and follow the batches to Disbursement."
       />
       <ErrorAlert error={rows.error ?? bulk.error} />
       <Card flush>

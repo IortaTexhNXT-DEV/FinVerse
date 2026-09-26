@@ -82,7 +82,7 @@ export default function PlansPage() {
       <PageHeader
         section="Finance · Collections"
         title="Installment Plans"
-        description="Billing cycles of multi-year and installment accounts, with the payments allocated from the invoice ledger."
+        description="Billing cycles of multi-year and installment accounts."
         actions={
           can('CLX_BILLING') ? (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => setCreating(true)}>

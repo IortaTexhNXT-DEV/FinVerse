@@ -54,7 +54,7 @@ export default function ChartUploadPage() {
         section="General Ledger"
         backTo="/gl/accounts"
         title="Chart Upload & Numbering"
-        description="Load parent and child accounts from a file and set how child account numbers are generated. Every account waits for authorization."
+        description="Load parent and child accounts from a file and set how child account numbers are generated."
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'upload' && <UploadPanel />}

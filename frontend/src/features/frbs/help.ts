@@ -11,7 +11,7 @@ export const FRBS_HELP: HelpSection = {
       name: 'Report Pack',
       path: '/frbs',
       summary:
-        'Every report of the pack by Appendix A group, opened in its runner or exported at once to Excel or PDF for the month to date.',
+        'Every report of the pack by group, opened in its runner or exported at once to Excel or PDF for the month to date.',
       controls: [
         'Viewing needs FRBS_REPORT_VIEW and exporting FRBS_REPORT_EXPORT; every run and export is kept in the report archive.',
         'Government reports need TAX_VIEW (granted to the FRBS roles). Several reports at once: Report Centre, Report Batch (ZIP or one merged PDF).',

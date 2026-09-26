@@ -80,7 +80,7 @@ function Form({ initial }: Readonly<{ initial: RequestForm }>) {
         backTo="/product-maintenance/requests"
         section="Product Maintenance · Package Requests"
         title={saved ? `Package Request ${form.requestNo ?? ''}` : 'New Package Request'}
-        description="Describe the package, the requested terms and the insurers to approach, then submit the request for Marketing approval."
+        description="Describe the package, the requested terms and the insurers to approach."
         actions={
           <>
             {form.type !== 'NEW' && form.productCode !== '' && (

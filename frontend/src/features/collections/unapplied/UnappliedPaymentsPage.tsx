@@ -87,7 +87,7 @@ export default function UnappliedPaymentsPage() {
       <PageHeader
         section="Finance · Collections"
         title="Unapplied Payments"
-        description="Payments Cashiering could not apply, as of today. Document their disposition or ask Cashiering to apply, refund, reclass or transfer them."
+        description="Payments Cashiering could not apply, as of today."
         actions={
           <Button
             variant="secondary"

@@ -90,7 +90,7 @@ export default function BillingPage() {
       <PageHeader
         section="Placement & Booking"
         title="CLPC Billing"
-        description="Billing file of the CBG Fire accounts awaiting payment and payment report matching. The file is exchanged with CLPC outside the system."
+        description="Billing file of the CBG Fire accounts awaiting payment and payment report matching."
         actions={
           <Button variant="primary" icon={<Upload size={16} />} onClick={() => setUploading({})}>
             Upload Payment Report

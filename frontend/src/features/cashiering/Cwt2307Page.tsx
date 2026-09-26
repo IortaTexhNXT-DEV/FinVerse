@@ -214,7 +214,7 @@ export default function Cwt2307Page() {
       <PageHeader
         section="Cashiering"
         title="BIR 2307"
-        description="Creditable withholding tax certificates of 2% CWT clients: tagging, validation, report and routing to the insurer."
+        description="Creditable withholding tax certificates of 2% CWT clients."
         actions={
           can('CWT_TAG') && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => setTagging(true)}>

@@ -25,7 +25,7 @@ export default function ScreeningHomePage() {
     <SectionLanding
       section="Client & Policy"
       title="Screening Home"
-      description="Sanction and PEP screening of clients: open cases by stage, SLA due and breached, potential matches to review and the status of the last watchlist run."
+      description="Sanction and PEP screening of clients."
       cardTitle="Screening Work"
       emptyMessage="No screening cases to show yet"
     >

@@ -238,7 +238,7 @@ export default function BookingWorkbenchPage() {
       <PageHeader
         section="Booking"
         title="Booking Workbench"
-        description="Book issued accounts individually or in batches; follow the queue, the booked accounts and the failures."
+        description="Book issued accounts individually or in batches."
         actions={<HeaderLinks upload={can('BOOKING_PROCESS') && can('BULK_PROCESS')} />}
       />
       <ErrorAlert

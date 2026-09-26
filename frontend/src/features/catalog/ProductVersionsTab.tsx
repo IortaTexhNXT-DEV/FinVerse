@@ -59,10 +59,6 @@ function NewVersionModal({ code, onClose }: Readonly<{ code: string; onClose: ()
         </>
       }
     >
-      <p className="muted">
-        The draft copies the version in force and sells from tomorrow once validated; the current
-        version keeps selling meanwhile.
-      </p>
       <ErrorAlert error={create.error} />
       <Field
         label="What changes"

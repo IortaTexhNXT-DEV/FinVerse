@@ -22,7 +22,7 @@ export default function NbReportsPage() {
       <PageHeader
         section="Reports"
         title="New Business Reports"
-        description="Operational reports from quotation to booking. Run a report on screen, save your filters as a variant, print it or download it in PDF, Excel, ODS, CSV or XML."
+        description="Operational reports from quotation to booking."
         actions={
           <Link className="btn btn-secondary" to="/reports">
             <FileBarChart2 size={16} aria-hidden="true" /> Report Centre

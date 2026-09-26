@@ -249,7 +249,7 @@ export default function DispatchPage() {
       <PageHeader
         section="Policy Issuance"
         title="E-policy Dispatch"
-        description="Send the e-policies to the clients, encrypted; the password follows in a separate e-mail. The report shows each delivery and its outcome."
+        description="Send the e-policies to the clients, encrypted; the password follows in a separate e-mail."
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'ready' ? <ReadyToDispatch companyId={companyId} /> : <DispatchReport />}

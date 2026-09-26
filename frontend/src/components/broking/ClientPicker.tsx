@@ -66,7 +66,7 @@ export function ClientPicker({
       <input
         id={id}
         className="input"
-        placeholder="Type a client code or name…"
+        placeholder="Search client code or name"
         value={term}
         disabled={disabled}
         autoComplete="off"

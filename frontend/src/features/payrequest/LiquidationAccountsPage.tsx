@@ -86,7 +86,7 @@ export default function LiquidationAccountsPage() {
       <PageHeader
         section="Finance · Refund & Cash Advance Requests"
         title="Liquidation Accounts"
-        description="The GL accounts a cash-advance liquidation posts to, by expense category, and the cash account of returned excess."
+        description="The GL accounts a cash-advance liquidation posts to, by expense category."
       />
       <ErrorAlert error={accounts.error ?? save.error} />
       <Card flush>

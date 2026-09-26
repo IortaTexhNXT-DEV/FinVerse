@@ -105,7 +105,7 @@ export default function AssetRegisterPage() {
       <PageHeader
         section="Assets & Investments"
         title="Fixed Asset Register"
-        description="Property and equipment with cost, accumulated depreciation and net book value. New assets are capitalized by a checker."
+        description="Property and equipment with cost, accumulated depreciation and net book value."
         actions={
           can('MASTER_MAINTAIN') && (
             <Button

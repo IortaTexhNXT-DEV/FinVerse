@@ -237,7 +237,7 @@ export default function PayRequestsHomePage() {
       <PageHeader
         section="Finance · Refund & Cash Advance Requests"
         title="Refund & Cash Advance Requests"
-        description="Client refunds, employee cash advances and disbursed-check cancellations, from preparation to payment."
+        description="Client refunds, employee cash advances and disbursed-check cancellations."
         actions={
           can('PRQ_CREATE') && (
             <>

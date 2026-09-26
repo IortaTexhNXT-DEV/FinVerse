@@ -229,7 +229,7 @@ export default function WorklistPage() {
         section="Finance · Collections"
         backTo="/collections"
         title="PR Worklist"
-        description="Invoices with outstanding premium receivable above the threshold, refreshed nightly from the invoice ledger."
+        description="Invoices with outstanding premium receivable above the threshold."
         actions={
           can('CLX_EXPORT') ? (
             <Button

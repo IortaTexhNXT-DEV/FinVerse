@@ -65,7 +65,7 @@ export default function InvestmentsPage() {
       <PageHeader
         section="Assets & Investments"
         title="Investments"
-        description="Time deposits, treasury bills, bonds and equities. New holdings post their purchase when a checker approves them."
+        description="Time deposits, treasury bills, bonds and equities."
         actions={
           can('MASTER_MAINTAIN') && (
             <Button

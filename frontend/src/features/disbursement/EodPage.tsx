@@ -164,7 +164,7 @@ export default function EodPage() {
       <PageHeader
         section="Finance · Disbursement"
         title="End of Day"
-        description="Checks, credit files, bank forms and reports of the approved vouchers of a day, and the payment confirmations."
+        description="Checks, credit files, bank forms and reports of the approved vouchers of a day."
         actions={
           can('DISB_EOD') ? (
             <Button variant="accent" icon={<Play size={16} />} onClick={() => setRunning(true)}>

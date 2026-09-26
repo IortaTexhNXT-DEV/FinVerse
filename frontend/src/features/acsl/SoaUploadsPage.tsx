@@ -77,7 +77,7 @@ export default function SoaUploadsPage() {
       <PageHeader
         section="Finance · ACSL"
         title="Insurer SOA Reconciliation"
-        description="Upload an insurer's statement of account and reconcile every line with the books: outstanding, for remittance, remitted, cancelled, direct billed or not found."
+        description="Upload an insurer's statement of account and reconcile every line with the books."
         actions={
           can('ACSL_UPLOAD') && (
             <Button

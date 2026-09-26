@@ -66,7 +66,7 @@ export default function ScheduledJobsPage() {
       <PageHeader
         section="Administration"
         title="Scheduled Jobs"
-        description="Background jobs, their schedules (UTC) and execution history. Failed runs raise a JOB_FAILURE alert."
+        description="Background jobs, their schedules (UTC) and execution history."
         actions={
           <Button
             variant="secondary"

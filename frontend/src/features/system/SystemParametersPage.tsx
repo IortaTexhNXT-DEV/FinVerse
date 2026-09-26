@@ -93,7 +93,7 @@ export default function SystemParametersPage() {
       <PageHeader
         section="Administration"
         title="System Parameters"
-        description="Business parameters used across modules. Changes take effect immediately and are recorded in the audit trail."
+        description="Business parameters used across modules."
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'configuration' && <ConfigurationTable />}

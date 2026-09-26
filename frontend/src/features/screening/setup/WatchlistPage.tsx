@@ -186,7 +186,7 @@ export default function WatchlistPage() {
       <PageHeader
         section="Setup & Administration · Compliance Setup"
         title="Watchlist"
-        description="Sanctioned names, PEPs and internal watchlist entries. Manual additions, changes and deactivations wait for a Compliance Checker; screening uses active entries only."
+        description="Sanctioned names, PEPs and internal watchlist entries."
         actions={
           can('SCR_LIST_MAINTAIN') && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => setAdding(true)}>

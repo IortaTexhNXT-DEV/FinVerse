@@ -113,7 +113,7 @@ export default function SetupPage() {
         section="Finance · Collections"
         backTo="/collections"
         title="Collections Setup"
-        description="Listing threshold, aging, exports, disposition rules and Unit Heads. Disposition values are maintained on the LOV screen."
+        description="Listing threshold, aging, exports, disposition rules and Unit Heads."
         actions={
           <Button
             icon={<RefreshCw size={16} />}

@@ -82,7 +82,7 @@ export default function EmployeesPage() {
       <PageHeader
         section="Setup"
         title="Employees"
-        description="Employees with their branch and cost centre, used by Disbursement and for the headcount per cost centre."
+        description="Employees with their branch and cost centre, used by Disbursement."
         actions={
           can('EMPLOYEE_MAINTAIN') && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => open(null)}>

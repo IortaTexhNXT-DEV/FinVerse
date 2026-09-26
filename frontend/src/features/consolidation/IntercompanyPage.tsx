@@ -82,7 +82,7 @@ export default function IntercompanyPage() {
       <PageHeader
         section="Planning & Closing"
         title="Inter-company"
-        description="Due-to / due-from relationships between group companies. A transaction posts mirror journals in both companies with one IC reference."
+        description="Due-to / due-from relationships between group companies."
         actions={
           manage && (
             <Button variant="secondary" icon={<Plus size={16} />} onClick={() => setAdding(true)}>

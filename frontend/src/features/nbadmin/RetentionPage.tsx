@@ -49,7 +49,7 @@ export default function RetentionPage() {
       <PageHeader
         section="Broking Setup"
         title="Data Retention"
-        description="Retention periods by record type and status and the records that have become eligible. The RETENTION_REVIEW job counts them every month."
+        description="Retention periods by record type and status and the records that have become eligible."
         actions={
           maintain && (
             <Button

@@ -155,7 +155,7 @@ export default function JournalUploadPage() {
       <PageHeader
         section="General Ledger"
         title="Journal Upload"
-        description="Upload many vouchers at once from CSV or Excel. Each voucher is validated and created as a draft on its own; invalid vouchers are reported and skipped."
+        description="Upload many vouchers at once from CSV or Excel."
         actions={
           <>
             <Button

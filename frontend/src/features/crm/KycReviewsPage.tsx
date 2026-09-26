@@ -133,7 +133,7 @@ export default function KycReviewsPage() {
       <PageHeader
         section="Clients"
         title="KYC Reviews Due"
-        description="Clients whose periodic KYC review is overdue or coming due. The monthly KYC_REVIEW_DUE job expires overdue KYC and notifies the Account Officers."
+        description="Clients whose periodic KYC review is overdue or coming due."
         actions={
           <div className="row no-print">
             <Button

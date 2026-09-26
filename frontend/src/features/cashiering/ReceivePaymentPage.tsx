@@ -137,7 +137,7 @@ export default function ReceivePaymentPage() {
       <PageHeader
         section="Cashiering"
         title="Receive Payment"
-        description="Over-the-counter payment: match it to the booked invoices, check the application by component and issue the acknowledgement receipt."
+        description="Over-the-counter payment: match it to the booked invoices."
         backTo="/cashiering"
       />
       <ErrorAlert error={save.error} />

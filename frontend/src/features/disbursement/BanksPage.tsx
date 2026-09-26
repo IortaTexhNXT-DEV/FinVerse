@@ -235,7 +235,7 @@ export default function BanksPage() {
       <PageHeader
         section="Finance · Disbursement"
         title="Bank Accounts and Checks"
-        description="Paying bank accounts, their status and check series; status changes are authorised by the approver."
+        description="Paying bank accounts, their status and check series."
       />
       <ErrorAlert error={banks.error ?? status.error ?? authorize.error} />
       <Card flush>

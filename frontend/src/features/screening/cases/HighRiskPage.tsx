@@ -67,7 +67,7 @@ export default function HighRiskPage() {
       <PageHeader
         section="Client & Policy · Sanction Screening"
         title="High-risk Clients"
-        description="Clients rated high risk or tagged PEP or Watchlist Review, with their risk category, open screening case, active policy and marketing unit."
+        description="Clients rated high risk or tagged PEP or Watchlist Review."
         actions={
           can('SCR_REPORT_VIEW') && can('REPORT_VIEW') ? (
             <ExportButtons formats={['XLSX', 'PDF']} pending={pending} onExport={exportTo} />

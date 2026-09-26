@@ -132,7 +132,7 @@ export default function StrPage() {
       <PageHeader
         section="Client & Policy · Sanction Screening"
         title="STR"
-        description="Suspicious transaction reports prepared from the screening cases: extract the AML Committee-approved STRs in the AMLC format and record the AMLC reference after filing on the portal."
+        description="Suspicious transaction reports prepared from the screening cases."
         actions={
           canExtract ? (
             <Button

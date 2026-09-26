@@ -209,7 +209,7 @@ export default function PostingBatchesPage() {
         backTo="/adjustment"
         section="Client & Policy · Adjustment"
         title="Posting Batches"
-        description="Review the requests ready for posting, return those that do not qualify and post the others as one validation batch."
+        description="Review the requests ready for posting, return those that do not qualify."
       />
       <Card flush>
         <div className="work-tabs">

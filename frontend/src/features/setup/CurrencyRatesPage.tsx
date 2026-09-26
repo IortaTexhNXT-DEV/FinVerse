@@ -46,7 +46,7 @@ export default function CurrencyRatesPage() {
       <PageHeader
         section="Setup"
         title="Currencies & Exchange Rates"
-        description="Rates are base-currency units per one unit of foreign currency. The monthly revaluation rate is the month-end CLOSING rate."
+        description="Rates are base-currency units per one unit of foreign currency."
       />
       <RevaluationRatesCard currencies={(currencies.data ?? []).filter((c) => c.active)} />
       {can('MASTER_MAINTAIN') && (

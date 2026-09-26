@@ -136,7 +136,7 @@ export default function PaymentVouchersPage() {
       <PageHeader
         section="Payables & Cash"
         title="Payment Vouchers"
-        description="Pay open payables of suppliers, intermediaries, claimants, reinsurers and policyholders by cheque, transfer or PDC."
+        description="Pay open payables of suppliers, intermediaries, claimants, reinsurers."
         actions={
           can('RECEIPT_PAYMENT_MAINTAIN') && (
             <Button

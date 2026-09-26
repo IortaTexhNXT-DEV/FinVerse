@@ -25,7 +25,7 @@ export default function ClaimsReportsPage() {
       <PageHeader
         section={CLAIMS_SECTION}
         title="Claims Reports"
-        description="Outstanding and past due claims, settled claims, ageing overall and per status, loss experience and loss ratio, pending actions, claims-prone locations, insurer claim numbers, the activity log and the data extract."
+        description="Outstanding and past due claims, settled claims, ageing overall and per status."
       />
       <ErrorAlert error={catalogue.error} />
       {catalogue.isLoading && <span className="spinner" aria-label="Loading" />}

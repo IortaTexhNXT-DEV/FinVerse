@@ -167,7 +167,7 @@ export default function RolesPage() {
       <PageHeader
         section="Administration"
         title="Roles & Permissions"
-        description="Group profiles and the permissions they grant. A profile changes only by implementing an approved group-profile request."
+        description="Group profiles and the permissions they grant."
       />
       {direct && (
         <div className="alert warning" role="status">

@@ -63,7 +63,7 @@ export default function UploadsPage() {
       <PageHeader
         section="Finance · Disbursement"
         title="Disbursement Uploads"
-        description="Upload payment requests, bank confirmations, online banking approvals and payees; valid rows are committed after review."
+        description="Upload payment requests, bank confirmations, online banking approvals and payees."
       />
       {current === undefined ? (
         <Card>You may not upload disbursement files.</Card>

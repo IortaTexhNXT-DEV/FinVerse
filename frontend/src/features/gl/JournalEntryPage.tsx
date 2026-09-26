@@ -107,7 +107,7 @@ function JournalForm({
       <PageHeader
         section="General Ledger"
         title={draftId === undefined ? 'New Journal Voucher' : 'Edit Journal Voucher'}
-        description="Enter a balanced voucher. Drafts can be saved incomplete; submission sends it to an authorizer."
+        description="Enter a balanced voucher."
         actions={
           <>
             <Button

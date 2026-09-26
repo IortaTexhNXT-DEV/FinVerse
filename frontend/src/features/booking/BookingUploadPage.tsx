@@ -16,7 +16,7 @@ export default function BookingUploadPage() {
         section="Booking"
         backTo="/booking"
         title="Upload Bookings"
-        description="Download the template, list the accounts to book (ARN, optional booking date and cost center) and upload it."
+        description="Download the template, list the accounts to book and upload it."
         actions={<Link to="/bulk">All upload types</Link>}
       />
       <BulkUploadWizard

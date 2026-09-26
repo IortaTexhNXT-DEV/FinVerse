@@ -35,7 +35,7 @@ export default function ConsolidationPage() {
       <PageHeader
         section="Planning & Closing"
         title="Consolidation"
-        description="Translate members (balance sheet at closing, P&L at average rate, CTA to equity), eliminate inter-company balances and investment against equity."
+        description="Translate members, eliminate inter-company balances and investment against equity."
         actions={
           <Button
             variant="secondary"

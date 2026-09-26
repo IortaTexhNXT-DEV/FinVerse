@@ -132,7 +132,7 @@ export default function UsersPage() {
       <PageHeader
         section="Administration"
         title="Users"
-        description="Accounts lock after three failed sign-ins. Users are enrolled and changed through access requests; unlock and password reset stay here."
+        description="Accounts lock after three failed sign-ins."
         actions={
           <>
             <Button

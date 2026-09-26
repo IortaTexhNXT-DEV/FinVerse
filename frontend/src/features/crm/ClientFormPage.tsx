@@ -111,7 +111,7 @@ function ClientEditor({ existing }: Readonly<{ existing?: ClientDetail }>) {
       <PageHeader
         section="Clients"
         title={existing === undefined ? 'New client' : `Edit ${existing.code}`}
-        description="Only the client type and name are needed to save a prospect; complete the rest before submitting the KYC. Duplicates are checked as you type."
+        description="Only the client type and name are needed to save a prospect."
       />
       <ErrorAlert error={save.error} />
       <form

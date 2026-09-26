@@ -63,7 +63,7 @@ export default function BranchesPage() {
       <PageHeader
         section="Setup"
         title="Branches"
-        description="Branches, offices and customer centres. New and changed branches must be authorized before use."
+        description="Branches, offices and customer centres."
         actions={
           can('MASTER_MAINTAIN') && (
             <Button

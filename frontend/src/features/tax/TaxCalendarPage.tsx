@@ -48,7 +48,7 @@ export default function TaxCalendarPage() {
       <PageHeader
         section="Tax & Statutory"
         title="Tax Calendar"
-        description="BIR, LGU and BFP filing obligations with due dates. Alerts are raised for returns due soon and overdue."
+        description="BIR, LGU and BFP filing obligations with due dates."
       />
       <Card>
         <div className="row">

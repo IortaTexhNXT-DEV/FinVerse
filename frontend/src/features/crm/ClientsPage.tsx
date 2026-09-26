@@ -50,7 +50,7 @@ export default function ClientsPage() {
       <PageHeader
         section="Clients"
         title="Clients"
-        description="Prospects and confirmed clients: search by code, name, TIN, ID, e-mail or mobile and open the complete client record."
+        description="Prospects and confirmed clients."
         actions={
           <>
             {can('BULK_PROCESS') && can('CLIENT_MAINTAIN') && (

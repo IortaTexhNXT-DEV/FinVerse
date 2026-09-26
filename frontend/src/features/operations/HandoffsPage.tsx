@@ -205,7 +205,7 @@ export default function HandoffsPage() {
       <PageHeader
         section="Operations"
         title="Hand-offs and Extracts"
-        description="Work to complete by hand while an Operations module is not active, and the files Operations produced for other teams."
+        description="Work to complete by hand while an Operations module is not active."
       />
       <Card>
         <div className="stack">

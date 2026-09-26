@@ -52,7 +52,7 @@ export default function TaxReturnsPage() {
       <PageHeader
         section="Tax & Statutory"
         title="Tax Returns"
-        description="Returns DRAFT → FILED → PAID. Filing needs a second user; payment posts the remittance clearing the tax payable."
+        description="Returns DRAFT → FILED → PAID."
       />
       <Card>
         <div className="row">

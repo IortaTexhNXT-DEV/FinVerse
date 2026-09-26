@@ -33,7 +33,7 @@ export default function ProductMaintenanceHomePage() {
       <PageHeader
         section="Product Maintenance"
         title="Product Maintenance Home"
-        description="Where every package request stands, which packages end soon and what waits for validation or an advisory."
+        description="Where every package request stands, which packages end soon."
         actions={
           can('PKG_REQUEST') && (
             <Link className="btn btn-accent" to="/product-maintenance/requests/new">

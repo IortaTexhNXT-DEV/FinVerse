@@ -270,7 +270,7 @@ export default function CasesPage() {
       <PageHeader
         section="Client & Policy · Sanction Screening"
         title="Cases"
-        description="Screening cases by stage: investigate, approve, review escalations, decide in committee and prepare STRs. Open a case to work it; filters stay in the address so a list can be shared."
+        description="Screening cases by stage: investigate, approve, review escalations, decide in committee."
       />
       <Tabs tabs={CASE_TABS} active={tab} onChange={(t) => update(t, filters)} />
       <Card flush>

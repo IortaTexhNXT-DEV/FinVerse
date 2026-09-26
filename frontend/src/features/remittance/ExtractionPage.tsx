@@ -210,7 +210,7 @@ export default function ExtractionPage() {
       <PageHeader
         section="Remittance"
         title="Extraction"
-        description="Extract the paid and cleared premium due to insurers into remittance batches, per insurer and type or per invoice."
+        description="Extract the paid and cleared premium due to insurers into remittance batches, per insurer."
       />
       {can('REMIT_EXTRACT') && <RunForm companyId={companyId} />}
       <ErrorAlert error={runs.error} />

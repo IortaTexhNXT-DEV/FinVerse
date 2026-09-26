@@ -22,7 +22,7 @@ export default function LposPage() {
       <PageHeader
         section="Claims"
         title="Local purchase orders"
-        description="Repair orders issued to garages under motor claims. Issue new LPOs from the claim."
+        description="Repair orders issued to garages under motor claims."
       />
       <ErrorAlert error={lpos.error} />
       <Card flush>

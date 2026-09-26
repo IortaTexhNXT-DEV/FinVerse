@@ -166,7 +166,7 @@ export default function ServiceFeeRunsPage() {
       <PageHeader
         section="Finance · Accounting Reports"
         title="Service Fee Runs"
-        description="The referrers' share of fully paid commission: computed, approved, paid through Disbursement, then released and liquidated by the units."
+        description="The referrers' share of fully paid commission."
         actions={
           <>
             <Link className="btn btn-secondary" to="/frbs/service-fee/setup">

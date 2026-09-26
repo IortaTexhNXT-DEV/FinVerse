@@ -45,7 +45,7 @@ export default function DocumentTemplatesPage() {
       <PageHeader
         section="Broking Setup"
         title="Document Templates"
-        description="Texts of generated documents with {{placeholders}} filled from the record. Changes take effect from the chosen date."
+        description="Texts of generated documents with {{placeholders}} filled from the record."
         actions={
           canEdit &&
           latest && (

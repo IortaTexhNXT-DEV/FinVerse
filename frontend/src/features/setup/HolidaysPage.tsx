@@ -55,7 +55,7 @@ export default function HolidaysPage() {
       <PageHeader
         section="Setup"
         title="Holiday Calendar"
-        description="Public and company holidays. Leave the branch empty for a company-wide holiday."
+        description="Public and company holidays."
         actions={
           <>
             <label className="visually-hidden" htmlFor="holiday-year">

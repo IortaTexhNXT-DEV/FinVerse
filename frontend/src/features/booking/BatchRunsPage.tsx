@@ -32,7 +32,7 @@ export default function BatchRunsPage() {
       <PageHeader
         section="Booking"
         title="Batch Runs"
-        description="Booking batches with their per-account results; each account is booked on its own, so a batch can partly succeed."
+        description="Booking batches with their per-account results."
       />
       <ErrorAlert error={runs.error} />
       <Card flush>

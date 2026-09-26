@@ -56,7 +56,7 @@ export default function RulesPage() {
       <PageHeader
         section="Accounting Engine"
         title="Accounting Rules"
-        description="Which GL accounts each business event posts to. The engine picks the matching authorized rule with the lowest priority number."
+        description="Which GL accounts each business event posts to."
         actions={
           can('ACCOUNTING_RULE_MANAGE') && (
             <Button

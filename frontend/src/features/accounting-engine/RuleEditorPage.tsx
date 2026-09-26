@@ -57,7 +57,7 @@ function RuleEditor({ existing, initial }: Readonly<EditorProps>) {
       <PageHeader
         section="Accounting Engine"
         title={existing === undefined ? 'New accounting rule' : existing.name}
-        description="Conditions select the rule for an event; the lines give the Dr/Cr account and the amount component posted on each side."
+        description="Conditions select the rule for an event."
         actions={
           <>
             {existing !== undefined && <StatusBadge status={existing.recordStatus} />}

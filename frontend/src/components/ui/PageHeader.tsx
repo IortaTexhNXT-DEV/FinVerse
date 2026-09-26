@@ -29,7 +29,7 @@ export function PageHeader({
       <div>
         {section !== undefined && <div className="breadcrumb">{section}</div>}
         <h1>{title}</h1>
-        {description !== undefined && <p>{description}</p>}
+        {description !== undefined && <p title={description}>{description}</p>}
       </div>
       <div className="spacer" />
       {actions !== undefined && <div className="row">{actions}</div>}

@@ -129,7 +129,7 @@ export default function BudgetsPage() {
       <PageHeader
         section="Planning & Closing"
         title="Budgets"
-        description="Budget versions by fiscal year. A version is prepared, submitted and approved by a different user; the latest approved version drives Budget vs Actual."
+        description="Budget versions by fiscal year."
         actions={
           <Button variant="accent" icon={<Plus size={16} />} onClick={() => setCreating(true)}>
             New Version

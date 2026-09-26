@@ -54,7 +54,7 @@ export default function IcSchedulesPage() {
       <PageHeader
         section="Tax & Statutory"
         title="IC Statutory Schedules"
-        description="Annual statement and quarterly report schedules of the Insurance Commission, built from posted ledger balances."
+        description="Annual statement and quarterly report schedules of the Insurance Commission."
         actions={FORMATS.map((f) => (
           <Button
             key={f}

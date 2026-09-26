@@ -152,7 +152,7 @@ export default function RecordClaimPage() {
       <PageHeader
         section={CLAIMS_SECTION}
         title="Record Claim"
-        description="Find the cover by ARN, policy number or assured, check the premium, then record the loss, the locations and the insurers."
+        description="Find the cover, check the premium and record the loss."
         backTo={arn === '' ? '/claims-handling' : '/claims-handling/new'}
         actions={
           d ? (

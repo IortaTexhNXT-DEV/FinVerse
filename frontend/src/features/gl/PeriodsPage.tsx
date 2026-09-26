@@ -71,7 +71,7 @@ export default function PeriodsPage() {
       <PageHeader
         section="General Ledger"
         title="Financial Periods"
-        description="Only OPEN periods accept normal postings. CLOSING allows system and adjustment journals; CLOSED blocks all postings."
+        description="Only OPEN periods accept normal postings."
         actions={
           can('PERIOD_MANAGE') && (
             <Button

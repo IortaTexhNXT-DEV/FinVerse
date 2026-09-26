@@ -246,7 +246,7 @@ function RequestEditor({ id, initial, saved, users, userIdPattern }: Readonly<Ed
         section={`User Access · ${groupProfile ? 'Group Profile Requests' : 'Access Requests'}`}
         backTo={groupProfile ? '/user-access/group-profiles' : '/user-access/requests'}
         title={saved === undefined ? 'New Request' : `Edit ${saved.requestNo}`}
-        description="Save a draft to finish later, or submit it to the approver. Nothing changes until the request is approved."
+        description="Save a draft to finish later, or submit it to the approver."
         actions={
           <EditorActions
             busy={save.isPending ? save.variables : undefined}

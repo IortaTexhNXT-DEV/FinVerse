@@ -130,7 +130,7 @@ export default function BillingStatementsPage() {
       <PageHeader
         section="Finance · Collections"
         title="Billing Statements"
-        description="Statements of account per billing cycle of multi-year and installment accounts. Billing is monitoring only: it creates no receivable."
+        description="Statements of account per billing cycle of multi-year and installment accounts."
         actions={
           can('CLX_BILLING') ? (
             <Button

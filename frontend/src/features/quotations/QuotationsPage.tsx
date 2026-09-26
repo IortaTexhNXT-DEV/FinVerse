@@ -102,7 +102,7 @@ export default function QuotationsPage() {
       <PageHeader
         section="Quotation / Proposal"
         title="Quotations"
-        description="Package quotations from draft to acceptance. Approved quotations can be sent to clients one by one or in a batch."
+        description="Package quotations from draft to acceptance."
         actions={
           can('QUOTE_MAINTAIN') && (
             <>

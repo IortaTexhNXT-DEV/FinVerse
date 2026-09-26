@@ -36,7 +36,7 @@ export default function SoaPage() {
       <PageHeader
         section="Reinsurance"
         title="Statements of Account"
-        description="Quarterly income and outgo per treaty participant; the balance is placed on the smaller side. Approval posts levy, reserves and interest; settlement pays or receives the balance and matches the reinsurer's open items."
+        description="Quarterly income and outgo per treaty participant."
       />
       {can('REINSURANCE_MAINTAIN') && (
         <GenerateCard

@@ -140,7 +140,7 @@ export default function TemplatesPage() {
       <PageHeader
         section="Setup & Administration · Compliance Setup"
         title="Templates"
-        description="Review and STR templates: sections, fields, mandatory flags and lists of values, with a preview of the form. Each change is a new version approved by a Compliance Checker."
+        description="Review and STR templates: sections, fields, mandatory flags and lists of values."
       />
       <Tabs
         tabs={TEMPLATE_TYPES.map((t) => ({ id: t, label: humanize(t) }))}

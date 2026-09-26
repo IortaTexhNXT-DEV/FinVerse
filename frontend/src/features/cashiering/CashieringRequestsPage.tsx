@@ -48,7 +48,7 @@ export default function CashieringRequestsPage() {
       <PageHeader
         section="Finance · Cashiering"
         title="Incoming Requests"
-        description="What Collections, Payment Requests and ACSL ask of Cashiering: dispositions of unapplied payments, refund validations and payment reversals."
+        description="What Collections, Payment Requests and ACSL ask of Cashiering."
       />
       <Card flush>
         <div>

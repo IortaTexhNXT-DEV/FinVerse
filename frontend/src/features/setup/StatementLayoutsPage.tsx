@@ -80,7 +80,7 @@ export default function StatementLayoutsPage() {
       <PageHeader
         section="Setup"
         title="Bank Statement Layouts"
-        description="Map the columns of each bank's spreadsheet export, then import statements to reconcile them automatically."
+        description="Map the columns of each bank's spreadsheet export."
         actions={
           <>
             <Button

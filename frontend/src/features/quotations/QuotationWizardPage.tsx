@@ -107,12 +107,7 @@ function StepBody({
     case 'items':
       return <ItemsStep {...props} detail={detail} />;
     case 'premium':
-      return (
-        <p className="muted">
-          The premium below is computed by the server with the catalog rates (Appendix A) and is
-          stored with the version when you save.
-        </p>
-      );
+      return null;
     default:
       return <ReviewStep form={props.form} />;
   }
@@ -195,7 +190,7 @@ function Wizard({ initial }: Readonly<{ initial: QuotationForm }>) {
         backTo="/quotations"
         section="Quotation / Proposal"
         title={saved ? `Quotation ${form.quotationNo ?? ''}` : 'New Quotation'}
-        description="Client or prospect, product and terms, risk items, then the premium computed live with the rates in force."
+        description="Client or prospect, product and terms, risk items, then the premium computed live."
         actions={
           <>
             {form.arn && <ReferenceChip label="ARN" value={form.arn} />}

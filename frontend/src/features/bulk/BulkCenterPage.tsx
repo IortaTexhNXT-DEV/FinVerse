@@ -39,7 +39,7 @@ export default function BulkCenterPage() {
       <PageHeader
         section="Bulk Processing"
         title="Bulk Processing"
-        description="Create or update many records from one file. Download the template, upload the filled file, review every row, then process the valid rows."
+        description="Create or update many records from one file."
       />
       <ErrorAlert error={handlers.error ?? jobs.error} />
       <HandlerTiles handlers={handlers.data} />

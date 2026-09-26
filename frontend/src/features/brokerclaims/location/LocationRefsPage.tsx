@@ -169,7 +169,7 @@ export default function LocationRefsPage() {
       <PageHeader
         section={CLAIMS_SECTION}
         title="Insurer Location References"
-        description="The reference each insurer uses for an insured location of a cover, with its effective dates. Both references show on every claim location."
+        description="The reference each insurer uses for an insured location of a cover, with its effective dates."
         actions={
           <Button variant="accent" icon={<Plus size={16} />} onClick={() => setAdding(true)}>
             New Reference

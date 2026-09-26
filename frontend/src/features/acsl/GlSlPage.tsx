@@ -108,7 +108,7 @@ export default function GlSlPage() {
       <PageHeader
         section="Finance · ACSL"
         title="GL-SL Reconciliation"
-        description="Compares the balance of each control account in the general ledger with its sub-ledger; runs every night and on demand."
+        description="Compares the balance of each control account in the general ledger with its sub-ledger."
       />
       <ErrorAlert error={runs.error ?? run.error} />
       {can('ACSL_PROCESS') && (

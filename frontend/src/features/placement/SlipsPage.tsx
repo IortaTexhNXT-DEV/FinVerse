@@ -45,7 +45,7 @@ export default function SlipsPage() {
       <PageHeader
         section="Placement & Booking"
         title="Placement Slips"
-        description="Slips PL-yyyy per insurer branch, as PDF and Excel. Sending a slip places its accounts with the insurer; a returned placement gets a new slip version."
+        description="Slips PL-yyyy per insurer branch, as PDF and Excel."
       />
       <ErrorAlert error={slips.error} />
       <Card flush>

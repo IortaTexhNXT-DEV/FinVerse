@@ -86,7 +86,7 @@ export default function ProductsPage() {
       <PageHeader
         section="Underwriting"
         title="Products"
-        description="Classes of business with commission, UPR basis and tax rates (DST, VAT, LGT, FST, premium tax). Changes need authorization."
+        description="Classes of business with commission, UPR basis and tax rates."
         actions={
           can('POLICY_MAINTAIN') && (
             <Button

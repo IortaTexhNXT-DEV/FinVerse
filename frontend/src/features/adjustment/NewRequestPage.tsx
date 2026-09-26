@@ -223,7 +223,7 @@ export default function NewRequestPage() {
         section="Client & Policy · Adjustment"
         backTo={editing ? `/adjustment/requests/${id}` : '/adjustment'}
         title={title}
-        description="Raise an endorsement or cancellation on booked invoices; one request is created per invoice."
+        description="Raise an endorsement or cancellation on booked invoices."
       />
       <ErrorAlert error={existing.error} />
       {editing && existing.data === undefined ? (

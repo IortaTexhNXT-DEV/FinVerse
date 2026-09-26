@@ -143,7 +143,7 @@ export default function RatesPage() {
       <PageHeader
         section="Product Maintenance"
         title="Rates & Taxes"
-        description="Statutory charges and rating tables applied by the premium calculator. The rate in force on the period start is used."
+        description="Statutory charges and rating tables applied by the premium calculator."
         actions={
           can('MASTER_MAINTAIN') && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => setAdding(true)}>

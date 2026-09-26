@@ -170,7 +170,7 @@ function Form({ initial }: Readonly<{ initial: ProposalForm }>) {
         backTo="/proposals"
         section="Non-Package Management"
         title={saved ? `PRF ${form.prfNo ?? ''}` : 'New Proposal Request'}
-        description="Complete risk details, the requested insurers and the mandatory documents, then submit the PRF for Marketing approval."
+        description="Complete risk details, the requested insurers and the mandatory documents."
         actions={
           <>
             <Button

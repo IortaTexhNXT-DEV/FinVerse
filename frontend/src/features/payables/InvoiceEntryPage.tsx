@@ -84,7 +84,7 @@ export default function InvoiceEntryPage() {
       <PageHeader
         section="Payables & Cash"
         title="New Supplier Invoice"
-        description="Amounts are entered net of VAT. Input VAT 12 % and the supplier's expanded withholding tax are computed per line."
+        description="Amounts are entered net of VAT."
       />
       <ErrorAlert error={save.error} />
       <Card title="Invoice">

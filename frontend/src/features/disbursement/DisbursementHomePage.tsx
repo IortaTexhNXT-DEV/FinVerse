@@ -265,7 +265,7 @@ export default function DisbursementHomePage() {
       <PageHeader
         section="Finance"
         title="Disbursement Workbench"
-        description="Payment requests and disbursement vouchers by stage: system requests, in process, for review, for approval, approved and cancelled."
+        description="Payment requests and disbursement vouchers by stage."
         actions={
           can('DISB_PROCESS') ? (
             <Button

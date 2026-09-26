@@ -114,7 +114,7 @@ export default function RunsPage() {
       <PageHeader
         section="Client & Policy · Sanction Screening"
         title="Screening Runs"
-        description="Every screening run with its trigger, the clients and list entries screened, the configuration used and the matches, risk changes and cases it produced."
+        description="Every screening run with its trigger, the clients and list entries screened."
       />
       <Card flush>
         <div className="worklist-filters">

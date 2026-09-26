@@ -94,7 +94,7 @@ export default function PaymentEntryPage() {
       <PageHeader
         section="Payables & Cash"
         title="New Payment"
-        description="Select the payee's open items to settle. The accounting event follows the payee and documents (supplier, commission, claim, reinsurance, refund)."
+        description="Select the payee's open items to settle."
       />
       <ErrorAlert error={save.error ?? items.error} />
       <Card title="Payee and bank">

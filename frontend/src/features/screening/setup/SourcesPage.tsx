@@ -49,7 +49,7 @@ export default function SourcesPage() {
       <PageHeader
         section="Setup & Administration · Compliance Setup"
         title="List Sources and Runs"
-        description="Sources of the sanctions, PEP and internal lists, the list file template and the log of every ingestion run with its failed records."
+        description="Sources of the sanctions, PEP and internal lists, the list file template."
         actions={
           maintain && (
             <>

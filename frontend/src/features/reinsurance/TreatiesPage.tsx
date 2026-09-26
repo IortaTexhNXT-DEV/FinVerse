@@ -55,7 +55,7 @@ export default function TreatiesPage() {
       <PageHeader
         section="Reinsurance"
         title="Treaties"
-        description="Quota share, surplus and excess of loss treaties per class and underwriting year, with participants and layers. Changes need authorization."
+        description="Quota share, surplus and excess of loss treaties per class and underwriting year."
         actions={
           can('REINSURANCE_MAINTAIN') && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={newTreaty}>

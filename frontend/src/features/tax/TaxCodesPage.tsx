@@ -46,7 +46,7 @@ export default function TaxCodesPage() {
       <PageHeader
         section="Tax & Statutory"
         title="Tax Codes & Forms"
-        description="VAT, premium taxes and withholding ATCs with rates and GL accounts; BIR, LGU and BFP forms with due-date rules. Changes need authorization."
+        description="VAT, premium taxes and withholding ATCs with rates and GL accounts."
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'codes' ? <TaxCodesPanel /> : <TaxFormsPanel />}

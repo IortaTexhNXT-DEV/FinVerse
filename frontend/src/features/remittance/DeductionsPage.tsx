@@ -103,7 +103,7 @@ export default function DeductionsPage() {
       <PageHeader
         section="Remittance"
         title="Remittance Deductions"
-        description="Amounts the insurer confirmed, deducted from its next remittance batches and capped at what each batch pays."
+        description="Amounts the insurer confirmed, deducted from its next remittance batches."
         actions={
           can('ACSL_PROCESS') ? (
             <Button icon={<Plus size={16} />} onClick={() => setCreating(true)}>

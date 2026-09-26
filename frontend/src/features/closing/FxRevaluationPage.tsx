@@ -62,7 +62,7 @@ export default function FxRevaluationPage() {
       <PageHeader
         section="Planning & Closing"
         title="FX Revaluation"
-        description="Foreign currency balances of revaluation accounts are restated at the CLOSING rate; the difference is posted to unrealized FX gain/loss (4602). Each period is revalued once."
+        description="Foreign currency balances of revaluation accounts are restated at the CLOSING rate."
         actions={
           <Button
             variant="secondary"

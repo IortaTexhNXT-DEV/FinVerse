@@ -82,7 +82,7 @@ export default function CoverLookupPage() {
       <PageHeader
         section={CLAIMS_SECTION}
         title="Cover Lookup"
-        description="Check the policy coverages of any cover: account, policy years, locations, endorsements, invoices with their premium status, claims and insurer location references. Nothing can be changed here."
+        description="Check the policy coverages of any cover."
         backTo={arn === '' ? undefined : '/claims-handling/covers'}
         actions={
           arn !== '' && can('BCL_RECORD') ? (

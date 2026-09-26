@@ -62,7 +62,7 @@ export default function EventRegisterPage() {
       <PageHeader
         section="Accounting Engine"
         title="Event Register"
-        description="Business events processed by the accounting engine. Failed events show why no journal was posted."
+        description="Business events processed by the accounting engine."
       />
       <Card>
         <div className="form-grid">

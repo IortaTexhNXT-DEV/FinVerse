@@ -71,7 +71,7 @@ export default function ClaimsHomePage() {
       <PageHeader
         section={CLAIMS_SECTION}
         title="Claims Home"
-        description="Your claims at a glance: open claims, follow-ups due today and overdue, claims by status, ageing and claims waiting on premium."
+        description="Your open claims, follow-ups due and claims by status."
         actions={
           <>
             <Button

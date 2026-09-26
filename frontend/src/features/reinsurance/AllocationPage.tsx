@@ -49,7 +49,7 @@ export default function AllocationPage() {
       <PageHeader
         section="Reinsurance"
         title="RI Allocation"
-        description="Cedes approved policies and endorsements not yet ceded: retention first, then quota share, surplus lines and the facultative remainder. Endorsements and refunds follow the proportions in force."
+        description="Cedes approved policies and endorsements not yet ceded."
       />
       <Card title="Allocation run">
         <ErrorAlert error={preview.error ?? post.error} />

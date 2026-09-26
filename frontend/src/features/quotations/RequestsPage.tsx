@@ -122,7 +122,7 @@ export default function RequestsPage() {
         backTo="/quotations"
         section="Quotation / Proposal"
         title="Quotation Requests"
-        description="Requests received by e-mail, upload or source system, waiting to be quoted. Capture an e-mailed request with the e-mail attached."
+        description="Requests received by e-mail, upload or source system, waiting to be quoted."
         actions={
           canMaintain && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => setCapturing(true)}>

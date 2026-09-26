@@ -72,7 +72,7 @@ export default function UnappliedRequestsPage() {
         section="Finance · Collections · Unapplied Payments"
         backTo="/collections/unapplied"
         title="Requests to Cashiering"
-        description="Applications, refunds, reclasses and transfers asked of Cashiering on unapplied payments, with where each one stands."
+        description="Applications, refunds, reclasses and transfers asked of Cashiering on unapplied payments."
       />
       <ErrorAlert error={rows.error ?? refresh.error} />
       <Card flush>

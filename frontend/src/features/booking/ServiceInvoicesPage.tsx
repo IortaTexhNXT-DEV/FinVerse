@@ -40,7 +40,7 @@ export default function ServiceInvoicesPage() {
       <PageHeader
         section="Booking"
         title="Service Invoices"
-        description="Commission invoices to insurers and internal service invoices, with their credits and e-mail dispatch."
+        description="Commission invoices to insurers and internal service invoices, with their credits."
       />
       <ErrorAlert error={rows.error} />
       <Card>

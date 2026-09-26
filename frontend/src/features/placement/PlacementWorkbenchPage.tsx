@@ -54,7 +54,7 @@ export default function PlacementWorkbenchPage() {
       <PageHeader
         section="Placement & Booking"
         title="Placement Workbench"
-        description="Accounts from payment to placement with the insurer: generate and send placement slips, follow hold covers and insurer returns, and hand issued policies to booking."
+        description="Accounts from payment to placement with the insurer."
         actions={
           can('BILLING_MANAGE') && (
             <Link className="btn btn-secondary" to="/placement/billing">

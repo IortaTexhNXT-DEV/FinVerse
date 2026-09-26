@@ -52,7 +52,7 @@ export default function DepreciationRunPage() {
       <PageHeader
         section="Assets & Investments"
         title="Depreciation Run"
-        description="Charges every capitalized asset up to the period end (catching up missed months) with one journal per branch, category and cost centre. A period is posted only once."
+        description="Monthly depreciation of every capitalized asset up to the period end."
         actions={
           can('PERIOD_END_RUN') && (
             <Button

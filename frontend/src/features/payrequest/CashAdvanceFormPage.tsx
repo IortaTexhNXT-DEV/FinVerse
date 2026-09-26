@@ -116,7 +116,7 @@ export default function CashAdvanceFormPage() {
         title={
           editId === undefined ? 'New Cash Advance' : `Change ${existing.data?.requestNo ?? ''}`
         }
-        description="Request for Payment of an employee cash advance, approved by Marketing and HR before Disbursement pays it."
+        description="Request for Payment of an employee cash advance, approved by Marketing."
         actions={
           <>
             <Button variant="secondary" onClick={() => void navigate('/payment-requests')}>

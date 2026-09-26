@@ -53,7 +53,7 @@ export default function InsuranceAdvicePage() {
       <PageHeader
         section="Policy Issuance"
         title="Insurance Advice"
-        description="Insurance Advices of mortgaged accounts, generated on policy issue (or placement) from the Insurance Advice template, sent to the mortgagee bank password protected."
+        description="Insurance Advices of mortgaged accounts."
         actions={
           can('EPOLICY_MANAGE') && (
             <Button

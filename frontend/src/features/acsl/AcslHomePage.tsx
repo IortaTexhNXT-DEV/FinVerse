@@ -111,7 +111,7 @@ export default function AcslHomePage() {
       <PageHeader
         section="Finance · ACSL"
         title="ACSL Cases"
-        description="Account investigations, analysis requests from Marketing, AR refund applications and payment reversals, from receipt to result."
+        description="Account investigations, analysis requests, AR refunds and payment reversals."
         actions={
           can('ACSL_PROCESS') && (
             <Button

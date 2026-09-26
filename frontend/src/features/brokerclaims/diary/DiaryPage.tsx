@@ -59,7 +59,7 @@ export default function DiaryPage() {
       <PageHeader
         section={CLAIMS_SECTION}
         title="My Diary"
-        description="Your calls, e-mails, meetings, notes and follow-ups across claims; overdue and due entries first."
+        description="Your calls, e-mails, meetings, notes and follow-ups across claims."
       />
       <ErrorAlert error={rows.error ?? done.error} />
       <Card flush>

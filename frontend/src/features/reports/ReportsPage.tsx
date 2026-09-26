@@ -90,7 +90,7 @@ export default function ReportsPage() {
       <PageHeader
         section="Reports"
         title="Report Centre"
-        description="Run any report on screen, print it or download it as Excel, PDF, ODS, CSV or XML (documents and schedules also as Word); download or print several at once as a batch."
+        description="Run any report on screen, print it or download it as Excel, PDF, ODS, CSV or XML."
         actions={
           <>
             <input

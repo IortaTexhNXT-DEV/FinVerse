@@ -95,7 +95,7 @@ export default function SchedulesPage() {
         backTo="/frbs"
         section="Finance · Accounting Reports"
         title="Account Schedules"
-        description="GARD, subsidiaries and ageing schedules of the report pack, run from their definitions and exported to Excel or PDF."
+        description="GARD, subsidiaries and ageing schedules of the report pack, run from their definitions."
         actions={
           maintain && (
             <Button icon={<Plus size={16} />} onClick={() => setEditing('new')}>

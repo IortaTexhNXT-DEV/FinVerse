@@ -29,7 +29,7 @@ export default function AuditTrailPage() {
       <PageHeader
         section="Administration"
         title="Audit Trail"
-        description="Every financial and non-financial action, who performed it and when. Records cannot be changed."
+        description="Every financial and non-financial action, who performed it and when."
         actions={<AuditExportButtons filters={filters} />}
       />
       <Card>

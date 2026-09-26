@@ -35,7 +35,7 @@ export const QUOTATIONS_HELP: HelpSection = {
         'Save Draft keeps the quotation open; Submit for Review sends it to the approver.',
       ],
       controls: [
-        'The premium is computed by the server with the rates in force (Appendix A) and, for a package, the rate scheme of its current version.',
+        'The premium is computed by the server with the rates in force and, for a package, the rate scheme of its current version.',
         'When a TSU routing rule applies (fleet, total sum insured, non-package risk) the wizard says so: consider a Proposal Request.',
         'The intake template version in force is stamped on the quotation.',
       ],

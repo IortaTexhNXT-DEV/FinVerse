@@ -171,7 +171,7 @@ export default function SalesTargetsPage() {
       <PageHeader
         section="Reports"
         title="Production Targets"
-        description="Booking, premium and commission targets per sales unit and month (PHP), used by the NB dashboard and the Production Statistics report."
+        description="Booking, premium and commission targets per sales unit and month, used by the NB dashboard."
         actions={
           maintain && (
             <Button

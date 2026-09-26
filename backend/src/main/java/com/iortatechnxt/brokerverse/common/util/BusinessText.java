@@ -16,9 +16,10 @@ public final class BusinessText {
   /** One reference inside a parenthesis: "ADJID.021", "BRCLXN.001-012", "045", "PMADD06". */
   private static final List<Pattern> REFERENCE_PARTS =
       List.of(
-          Pattern.compile(
-              "[A-Z]{2,6}ID\\.\\d+[a-z]?(?:[-/]\\d+[a-z]?)*(?: addendum)?(?: Annex II #\\d+)?"),
-          Pattern.compile("BR[A-Z]{2,4}\\.\\d+[a-z]?(?:[-/]\\d+[a-z]?)*"),
+          Pattern.compile("[A-Z]{2,6}ID\\.\\d[\\da-z/-]*"),
+          Pattern.compile("[A-Z]{2,6}ID\\.\\d[\\da-z/-]* addendum"),
+          Pattern.compile("[A-Z]{2,6}ID\\.\\d[\\da-z/-]* Annex II #\\d{1,2}"),
+          Pattern.compile("BR[A-Z]{2,4}\\.\\d[\\da-z/-]*"),
           Pattern.compile("FRBS \\d+\\.\\d+(?:\\.\\d+|\\.x)?"),
           Pattern.compile("Annex II #\\d+"),
           Pattern.compile("OQ\\d+(?:/OQ\\d+)*"),
@@ -26,8 +27,9 @@ public final class BusinessText {
           Pattern.compile("[A-Z]{2,4}ADD\\d{2}"),
           Pattern.compile("FR-[A-Z]{2}-?\\d+"),
           Pattern.compile("SNSRP-\\d+"),
-          Pattern.compile("(?:[A-Z][a-z]+ )?summary \\d+\\.[a-z0-9]+"),
-          Pattern.compile("\\d{3}[a-z]?(?:[-/]\\d{3}[a-z]?)*"));
+          Pattern.compile("[A-Z]?[a-z]* ?summary \\d+\\.[\\da-z]+"),
+          Pattern.compile("\\d{3}[a-z]?"),
+          Pattern.compile("\\d{3}[a-z]?[-/][\\da-z/-]*"));
 
   /** Design notes that may stand next to references inside a parenthesis. */
   private static final Pattern NOTE_PART =

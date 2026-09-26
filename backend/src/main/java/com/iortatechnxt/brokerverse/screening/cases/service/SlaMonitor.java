@@ -84,18 +84,41 @@ public class SlaMonitor {
         cases.findByStatusAndStageInAndDueAtIsNotNullOrderByDueAtAsc(CaseStatus.OPEN, MONITORED)) {
       boolean late = !now.isBefore(c.getDueAt());
       boolean inLead = c.getRemindAt() != null && !now.isBefore(c.getRemindAt());
-      if (late && !c.isBreached()) {
-        breach(c, now);
-        breaches++;
-      } else if (!late && inLead && c.getRemindedAt() == null) {
-        remind(c, now);
-        reminders++;
+      switch (step(c, late, inLead)) {
+        case BREACH -> {
+          breach(c, now);
+          breaches++;
+        }
+        case REMIND -> {
+          remind(c, now);
+          reminders++;
+        }
+        default -> {
+          // nothing due for this case
+        }
       }
-      if ((late || inLead) && !today.equals(c.getDocumentRemindedOn()) && documents(c, today)) {
+      if ((late || inLead) && documentsDue(c, today)) {
         documents++;
       }
     }
     return new Result(reminders, breaches, documents);
+  }
+
+  private enum Step {
+    NONE,
+    REMIND,
+    BREACH
+  }
+
+  private static Step step(ScreeningCase c, boolean late, boolean inLead) {
+    if (late) {
+      return c.isBreached() ? Step.NONE : Step.BREACH;
+    }
+    return inLead && c.getRemindedAt() == null ? Step.REMIND : Step.NONE;
+  }
+
+  private boolean documentsDue(ScreeningCase c, LocalDate today) {
+    return !today.equals(c.getDocumentRemindedOn()) && documents(c, today);
   }
 
   private void remind(ScreeningCase c, Instant now) {

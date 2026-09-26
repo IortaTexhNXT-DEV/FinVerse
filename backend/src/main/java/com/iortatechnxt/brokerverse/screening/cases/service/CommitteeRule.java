@@ -1,7 +1,6 @@
 package com.iortatechnxt.brokerverse.screening.cases.service;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -24,7 +23,7 @@ public final class CommitteeRule {
   /**
    * Decides a round from its votes.
    *
-   * @param rule ANY, MAJORITY or ALL (unknown values count as MAJORITY)
+   * @param rule ANY, MAJORITY or ALL, as coded (unknown values count as MAJORITY)
    * @param size committee size (at least 1)
    * @param votes the decisions so far, in order
    * @return the decision, {@value #NO_MAJORITY}, or empty while the round is open
@@ -34,7 +33,7 @@ public final class CommitteeRule {
       return Optional.empty();
     }
     int members = Math.max(1, size);
-    String kind = rule == null ? "" : rule.strip().toUpperCase(Locale.ROOT);
+    String kind = rule == null ? "" : rule.strip();
     Map<String, Long> counts =
         votes.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     return switch (kind) {

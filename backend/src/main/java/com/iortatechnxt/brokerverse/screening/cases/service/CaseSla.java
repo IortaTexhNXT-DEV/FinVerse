@@ -55,21 +55,23 @@ public class CaseSla {
   public void apply(ScreeningCase c) {
     if (c.getStage() == CaseStage.CLOSED || c.getStage() == CaseStage.NEW) {
       c.applySla(null, null, null);
-      return;
+    } else {
+      rule(c).ifPresentOrElse(r -> applyRule(c, r), () -> applyDefault(c));
     }
-    Optional<SlaMatrix.Rule> rule = rule(c);
-    if (rule.isPresent()) {
-      SlaMatrix.Rule r = rule.get();
-      Instant due = c.getStageEnteredAt().plus(Duration.ofHours(r.slaHours()));
-      c.applySla(due, r.reminderLeadHours(), r.escalateToRole());
-      if (c.getWorkCaseId() != null) {
-        workflow.overrideDue(
-            c.getWorkCaseId(),
-            due,
-            "SLA matrix: " + r.slaHours() + " hours for " + c.getStage() + " (row " + r.id() + ")");
-      }
-      return;
+  }
+
+  private void applyRule(ScreeningCase c, SlaMatrix.Rule r) {
+    Instant due = c.getStageEnteredAt().plus(Duration.ofHours(r.slaHours()));
+    c.applySla(due, r.reminderLeadHours(), r.escalateToRole());
+    if (c.getWorkCaseId() != null) {
+      workflow.overrideDue(
+          c.getWorkCaseId(),
+          due,
+          "SLA matrix: " + r.slaHours() + " hours for " + c.getStage() + " (row " + r.id() + ")");
     }
+  }
+
+  private void applyDefault(ScreeningCase c) {
     Instant defaultDue =
         c.getWorkCaseId() == null ? null : workViews.get(c.getWorkCaseId()).getDueAt();
     c.applySla(defaultDue, DEFAULT_LEAD_HOURS, DEFAULT_ESCALATION_ROLE);

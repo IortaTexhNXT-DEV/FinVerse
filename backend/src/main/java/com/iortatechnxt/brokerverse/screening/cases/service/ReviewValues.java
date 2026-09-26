@@ -6,7 +6,7 @@ import com.iortatechnxt.brokerverse.screening.config.service.ReviewTemplate.Fiel
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -23,6 +23,10 @@ final class ReviewValues {
   private static final String TRUE = "TRUE";
   private static final String FALSE = "FALSE";
 
+  /** The accepted spellings of a checkbox value. */
+  private static final Map<String, String> CHECKBOX_VALUES =
+      Map.of(TRUE, TRUE, "true", TRUE, "True", TRUE, FALSE, FALSE, "false", FALSE, "False", FALSE);
+
   private ReviewValues() {}
 
   /**
@@ -37,14 +41,14 @@ final class ReviewValues {
     if (raw == null || raw.isBlank()) {
       return Parsed.ok(AnswerValue.BLANK);
     }
-    String value = raw.strip();
+    return parseValue(field, raw.strip(), listCodes);
+  }
+
+  private static Parsed parseValue(Field field, String value, Set<String> listCodes) {
     return switch (field.dataType()) {
       case NUMBER, AMOUNT -> number(field, value);
       case DATE -> date(field, value);
-      case LOV ->
-          listCodes.contains(value)
-              ? Parsed.ok(text(value))
-              : Parsed.error(field.label() + " must be a value of the list");
+      case LOV -> listValue(field, value, listCodes);
       case CHECKBOX -> checkbox(field, value);
       case ATTACHMENT -> attachment(field, value);
       default ->
@@ -52,6 +56,12 @@ final class ReviewValues {
               ? Parsed.error(field.label() + " is limited to " + MAX_TEXT + " characters")
               : Parsed.ok(text(value));
     };
+  }
+
+  private static Parsed listValue(Field field, String value, Set<String> listCodes) {
+    return listCodes.contains(value)
+        ? Parsed.ok(text(value))
+        : Parsed.error(field.label() + " must be a value of the list");
   }
 
   private static Parsed number(Field field, String value) {
@@ -74,8 +84,8 @@ final class ReviewValues {
   }
 
   private static Parsed checkbox(Field field, String value) {
-    String flag = value.toUpperCase(Locale.ROOT);
-    if (!TRUE.equals(flag) && !FALSE.equals(flag)) {
+    String flag = CHECKBOX_VALUES.get(value);
+    if (flag == null) {
       return Parsed.error(field.label() + " must be ticked or not");
     }
     return Parsed.ok(text(flag));

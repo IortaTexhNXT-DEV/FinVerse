@@ -6,7 +6,7 @@ import com.iortatechnxt.brokerverse.account.service.AccountQueryService;
 import com.iortatechnxt.brokerverse.catalog.service.SalesOrganisationService;
 import com.iortatechnxt.brokerverse.catalog.service.SalesOrganisationService.SalesAssignment;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
-import com.iortatechnxt.brokerverse.screening.cases.domain.ScreeningCase.CaseClient;
+import com.iortatechnxt.brokerverse.screening.cases.domain.CaseClient;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Component;

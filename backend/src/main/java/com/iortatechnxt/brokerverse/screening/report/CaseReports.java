@@ -23,6 +23,8 @@ import org.springframework.stereotype.Component;
  */
 public final class CaseReports {
 
+  private static final String STAGE_LABEL = "Stage";
+
   /** Case status monitoring. */
   public static final String CASE_STATUS = "SCR-CASE-STATUS";
 
@@ -103,7 +105,7 @@ public final class CaseReports {
               ReportColumn.text(CASE_NO, "Case No."),
               ReportColumn.text("client", "Client"),
               ReportColumn.text("case_type", "Case Type / Risk Category"),
-              ReportColumn.text(STAGE, "Stage"),
+              ReportColumn.text(STAGE, STAGE_LABEL),
               ReportColumn.text(ASSIGNEE, "Assignee"),
               ReportColumn.date("created", "Created"),
               ScrReportSql.number("days_in_stage", "Days in Stage"),
@@ -111,7 +113,7 @@ public final class CaseReports {
               ReportColumn.text("sla_state", "SLA State"),
               ReportColumn.text("disposition", "Disposition"),
               ReportColumn.text("unit", "Marketing Unit / Unit Head"))
-          .groupBy(STAGE, "Stage")
+          .groupBy(STAGE, STAGE_LABEL)
           .rows(sql.rows(SQL, args))
           .presorted()
           .withoutGrandTotal()
@@ -173,7 +175,7 @@ public final class CaseReports {
               ReportColumn.text("occurred_at", "Date / Time"),
               ReportColumn.text("event", "Event"),
               ReportColumn.text(CASE_NO, "Case No."),
-              ReportColumn.text(STAGE, "Stage"),
+              ReportColumn.text(STAGE, STAGE_LABEL),
               ReportColumn.text(ASSIGNEE, "Assignee"),
               ReportColumn.text(REMARKS, "SLA / Due"),
               ReportColumn.text("notified", "Notified / Escalated To"))

@@ -182,6 +182,20 @@ public class StrExtractionService {
                 List.of(batchNo, "Period " + from + " to " + to, selected.size() + " STR(s)"),
                 selected.size()));
     extraction.archived(delivered.reportRunId());
+    markExtracted(selected, extraction, text, now);
+    audit.record(
+        "ScreeningStrExtraction",
+        batchNo,
+        AuditAction.EXPORT,
+        auditText(text, selected.size(), extraction, delivered.location()));
+    return extraction;
+  }
+
+  private void markExtracted(
+      List<SuspiciousTransactionReport> selected,
+      StrExtraction extraction,
+      String reason,
+      Instant now) {
     for (SuspiciousTransactionReport str : selected) {
       str.extracted(extraction.getId(), now);
       cases
@@ -191,26 +205,25 @@ public class StrExtractionService {
                   timeline.record(
                       c,
                       CaseEventType.STR_EXTRACTED,
-                      EventFacts.change(null, batchNo, null, text)));
+                      EventFacts.change(null, extraction.getBatchNo(), null, reason)));
     }
-    audit.record(
-        "ScreeningStrExtraction",
-        batchNo,
-        AuditAction.EXPORT,
-        (text == null ? "Extracted " : "Re-extracted (" + text + ") ")
-            + selected.size()
-            + " STR(s) of "
-            + from
-            + " to "
-            + to
-            + " to "
-            + fileName
-            + ", SHA-256 "
-            + extraction.getSha256()
-            + " ("
-            + delivered.location()
-            + ")");
-    return extraction;
+  }
+
+  private static String auditText(
+      String reason, int count, StrExtraction extraction, String location) {
+    return (reason == null ? "Extracted " : "Re-extracted (" + reason + ") ")
+        + count
+        + " STR(s) of "
+        + extraction.getPeriodFrom()
+        + " to "
+        + extraction.getPeriodTo()
+        + " to "
+        + extraction.getFileName()
+        + ", SHA-256 "
+        + extraction.getSha256()
+        + " ("
+        + location
+        + ")";
   }
 
   private Map<String, String> row(SuspiciousTransactionReport str) {

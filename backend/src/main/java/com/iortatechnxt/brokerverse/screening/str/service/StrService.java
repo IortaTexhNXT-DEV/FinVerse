@@ -177,8 +177,7 @@ public class StrService {
                             new StrField(str.getId(), f.code(), prefill.get(f.prefillSource())))));
     timeline.record(
         c, CaseEventType.STR_PREPARED, EventFacts.change(null, str.getStrNo(), null, null));
-    audit.record(
-        CaseCodes.ENTITY, c.getCaseNo(), AuditAction.CREATE, "STR " + str.getStrNo() + " prepared");
+    audit.record(CaseCodes.ENTITY, c.getCaseNo(), AuditAction.CREATE, label(str) + " prepared");
     return str;
   }
 
@@ -290,8 +289,7 @@ public class StrService {
     transactions.deleteAll(transactions.findByStrIdOrderByIdAsc(strId));
     transactions.flush();
     edit.transactions().forEach(l -> transactions.save(new StrTransaction(strId, l)));
-    audit.record(
-        CaseCodes.ENTITY, c.getCaseNo(), AuditAction.UPDATE, "STR " + str.getStrNo() + " saved");
+    audit.record(CaseCodes.ENTITY, c.getCaseNo(), AuditAction.UPDATE, label(str) + " saved");
     return str;
   }
 
@@ -306,16 +304,22 @@ public class StrService {
             "SCR_STR_REASON_INVALID", "'" + code + "' is not an STR reason code");
       }
     }
-    for (Line line : edit.transactions()) {
-      if (line.amount() == null || line.amount().signum() <= 0) {
-        throw new BusinessRuleException(
-            "SCR_STR_AMOUNT_INVALID", "The amount must be greater than 0");
-      }
-      if (blank(line.reference()) || line.date() == null || blank(line.currency())) {
-        throw new BusinessRuleException(
-            "SCR_STR_TRANSACTION_INCOMPLETE",
-            "Enter the reference, date and currency of each transaction");
-      }
+    edit.transactions().forEach(StrService::validate);
+  }
+
+  private static String label(SuspiciousTransactionReport str) {
+    return "STR " + str.getStrNo();
+  }
+
+  private static void validate(Line line) {
+    if (line.amount() == null || line.amount().signum() <= 0) {
+      throw new BusinessRuleException(
+          "SCR_STR_AMOUNT_INVALID", "The amount must be greater than 0");
+    }
+    if (blank(line.reference()) || line.date() == null || blank(line.currency())) {
+      throw new BusinessRuleException(
+          "SCR_STR_TRANSACTION_INCOMPLETE",
+          "Enter the reference, date and currency of each transaction");
     }
   }
 
@@ -367,8 +371,7 @@ public class StrService {
         access.user(),
         clock.instant(),
         APPROVE_STR.equals(c.getCommitteeDecision()) ? c.getCommitteeDecidedAt() : null);
-    mover.act(
-        c, "str_ready", TransitionNote.comment("STR " + str.getStrNo() + " " + str.getStatus()));
+    mover.act(c, "str_ready", TransitionNote.comment(label(str) + " " + str.getStatus()));
     timeline.record(
         c,
         CaseEventType.STR_READY,
@@ -383,12 +386,9 @@ public class StrService {
         c,
         CaseCodes.STR_EXTRACT,
         CaseCodes.EVENT_FOR_APPROVAL,
-        "STR " + str.getStrNo() + " ready for extraction");
+        label(str) + " ready for extraction");
     audit.record(
-        CaseCodes.ENTITY,
-        c.getCaseNo(),
-        AuditAction.SUBMIT,
-        "STR " + str.getStrNo() + " " + str.getStatus());
+        CaseCodes.ENTITY, c.getCaseNo(), AuditAction.SUBMIT, label(str) + " " + str.getStatus());
     return str;
   }
 

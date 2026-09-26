@@ -110,7 +110,7 @@ public final class StrFileWriter {
       return value.substring(0, width);
     }
     String blanks = " ".repeat(width - value.length());
-    return LEFT.equalsIgnoreCase(column.pad()) ? blanks + value : value + blanks;
+    return LEFT.equals(column.pad()) ? blanks + value : value + blanks;
   }
 
   private static String quote(String value, String delimiter) {

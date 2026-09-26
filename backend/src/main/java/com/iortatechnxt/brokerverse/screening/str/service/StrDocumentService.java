@@ -29,6 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class StrDocumentService {
 
+  /** The index of the amount column of the transactions table (right-aligned). */
+  private static final int AMOUNT_COLUMN = 4;
+
   private final StrService strs;
   private final ScreeningCaseRepository cases;
   private final CaseDocumentService documents;
@@ -105,7 +108,7 @@ public class StrDocumentService {
             "Transactions",
             List.of("Reference", "Date", "Type", "Currency", "Amount", "Description"),
             strs.transactions(str.getId()).stream().map(StrDocumentService::row).toList(),
-            List.of(4)));
+            List.of(AMOUNT_COLUMN)));
     sections.add(
         new DocumentSpec.Table(
             "Attachments",

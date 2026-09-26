@@ -12,6 +12,7 @@ import java.util.Set;
  * The request bodies of the case actions (FR-SS-043, 050-052, 061-064, 035). Mandatory fields are
  * checked by the services with the FRS messages.
  */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // holder of nested types
 public final class CaseRequests {
 
   private static final int TEXT = 4000;

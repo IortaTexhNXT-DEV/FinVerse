@@ -35,6 +35,8 @@ public final class ClientReports {
   private static final String CLIENT_CODE = "client_code";
   private static final String NAME = "display_name";
   private static final String UNIT = "unit";
+  private static final String RISK_CATEGORY = "riskCategory";
+  private static final String CLIENT_TYPE = "clientType";
 
   /** The latest risk-profile change of a client on or before the as-of date. */
   static final String LAST_PROFILE =
@@ -110,10 +112,10 @@ public final class ClientReports {
     public ReportMetadata metadata() {
       List<ParameterSpec> params = new ArrayList<>(base());
       params.add(ParameterSpec.optional(ScrReportSql.HEAD, "Unit Head", ParameterType.TEXT));
-      params.add(ParameterSpec.optional("riskCategory", "Risk Category", ParameterType.TEXT));
+      params.add(ParameterSpec.optional(RISK_CATEGORY, "Risk Category", ParameterType.TEXT));
       params.add(
           new ParameterSpec(
-              "clientType",
+              CLIENT_TYPE,
               "Client Type",
               ParameterType.SELECT,
               false,
@@ -138,16 +140,16 @@ public final class ClientReports {
       args.put(AS_OF, filter.asOf());
       args.put(ScrReportSql.UNIT, filter.marketingUnit());
       args.put(ScrReportSql.HEAD, filter.unitHead());
-      args.put("riskCategory", filter.riskCategory());
-      args.put("clientType", filter.clientType());
+      args.put(RISK_CATEGORY, filter.riskCategory());
+      args.put(CLIENT_TYPE, filter.clientType());
       return sql.rows(SQL, args);
     }
 
     @Override
     public ReportResult generate(ReportParameters p) {
       Map<String, Object> args = args(p);
-      args.put("riskCategory", ScrReportSql.text(p, "riskCategory"));
-      args.put("clientType", ScrReportSql.text(p, "clientType"));
+      args.put(RISK_CATEGORY, ScrReportSql.text(p, RISK_CATEGORY));
+      args.put(CLIENT_TYPE, ScrReportSql.text(p, CLIENT_TYPE));
       return TabularReportBuilder.of(p)
           .columns(
               ReportColumn.text(CLIENT_CODE, "Client Code"),

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 /** The DTOs of the STR screens (SNSRP-705, 706; FR-SS-070 to 072). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // holder of nested types
 public final class StrDtos {
 
   private StrDtos() {}

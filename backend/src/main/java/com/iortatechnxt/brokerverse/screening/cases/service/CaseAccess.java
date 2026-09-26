@@ -98,13 +98,7 @@ public class CaseAccess {
    */
   public void requireActor(ScreeningCase c, String action, Set<CaseStage> stages) {
     if (!stages.contains(c.getStage())) {
-      if (CurrentUser.sameUser(c.getInvestigator(), user())
-          && !c.getStage().isInvestigation()
-          && stages.stream().anyMatch(CaseStage::isInvestigation)) {
-        throw noLongerYours(c);
-      }
-      throw new BusinessRuleException(
-          NOT_ALLOWED, "The action " + action + " is not allowed in stage " + c.getStage());
+      throw wrongStage(c, action, stages);
     }
     requirePermission(ownerOf(c.getStage()));
     if (c.getAssignee() != null && !CurrentUser.sameUser(c.getAssignee(), user())) {
@@ -112,6 +106,16 @@ public class CaseAccess {
           "SCR_CASE_ASSIGNED_ELSEWHERE",
           "Case " + c.getCaseNo() + " is assigned to " + c.getAssignee());
     }
+  }
+
+  private BusinessRuleException wrongStage(ScreeningCase c, String action, Set<CaseStage> stages) {
+    if (CurrentUser.sameUser(c.getInvestigator(), user())
+        && !c.getStage().isInvestigation()
+        && stages.stream().anyMatch(CaseStage::isInvestigation)) {
+      return noLongerYours(c);
+    }
+    return new BusinessRuleException(
+        NOT_ALLOWED, "The action " + action + " is not allowed in stage " + c.getStage());
   }
 
   /**

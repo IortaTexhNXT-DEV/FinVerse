@@ -935,3 +935,14 @@ dl.form-grid dd {
     display: none;
   }
 }
+
+/* A KPI value that opens its list: same size and colour as the other tiles' values */
+.kpi-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.kpi-link:hover,
+.kpi-link:focus-visible {
+  text-decoration: underline;
+}

@@ -1,6 +1,5 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { dashboardApi } from '@/api/dashboard';
-import { Button } from '@/components/ui/Button';
 import { Kpi } from '@/components/ui/Kpi';
 import { humanize } from '@/utils/format';
 import { useWidget } from './widgetSupport';
@@ -12,7 +11,6 @@ function moduleSummary(byModule: Record<string, number>): string {
 
 /** Open alerts of the company and the signed-in user's approval inbox, as KPI tiles. */
 export function WorkloadWidget({ enabled }: Readonly<{ enabled: boolean }>) {
-  const navigate = useNavigate();
   const q = useWidget('workload', (companyId) => dashboardApi.workload(companyId), enabled);
   const d = q.data;
   if (d === undefined) {
@@ -23,13 +21,9 @@ export function WorkloadWidget({ enabled }: Readonly<{ enabled: boolean }>) {
       <Kpi
         label="Pending approvals"
         value={
-          <Button
-            variant="ghost"
-            aria-label="Open my approvals"
-            onClick={() => void navigate('/approvals')}
-          >
+          <Link className="kpi-link" to="/approvals" aria-label="Open my approvals">
             {d.pendingApprovals}
-          </Button>
+          </Link>
         }
         hint={moduleSummary(d.approvalsByModule)}
         accent={d.pendingApprovals > 0}
@@ -37,13 +31,9 @@ export function WorkloadWidget({ enabled }: Readonly<{ enabled: boolean }>) {
       <Kpi
         label="Open alerts"
         value={
-          <Button
-            variant="ghost"
-            aria-label="Open the alerts"
-            onClick={() => void navigate('/alerts')}
-          >
+          <Link className="kpi-link" to="/alerts" aria-label="Open the alerts">
             {d.openAlerts}
-          </Button>
+          </Link>
         }
         hint="Open or acknowledged exceptions"
         accent={d.openAlerts > 0}

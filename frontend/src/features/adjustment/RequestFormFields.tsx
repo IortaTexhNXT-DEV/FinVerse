@@ -198,7 +198,7 @@ export function RequestFormFields({ form, errors, onChange }: Readonly<FieldsPro
             />
           )}
         </Field>
-        <Field label="Insurer Endorsement Ref." hint="Checked for duplicates (ADJID.023).">
+        <Field label="Insurer Endorsement Ref." hint="Checked for duplicates.">
           {(id) => (
             <input
               id={id}

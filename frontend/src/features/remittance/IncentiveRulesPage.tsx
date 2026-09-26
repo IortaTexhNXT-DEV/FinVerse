@@ -285,7 +285,7 @@ export default function IncentiveRulesPage() {
       <PageHeader
         section="Remittance"
         title="Incentive Rules"
-        description="Early remittance incentives per insurer, product line and segment (rates to be confirmed by BDOI)."
+        description="Early remittance incentives per insurer, product line and segment."
         actions={
           manage ? (
             <Button icon={<Plus size={16} />} onClick={() => setEditing('new')}>

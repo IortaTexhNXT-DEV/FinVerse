@@ -13,7 +13,7 @@ export const REMITTANCE_HELP: HelpSection = {
       summary:
         'Work queues of Remittance (batches in review and for approval, batches awaiting the insurer OR, holds and special remittances for approval, paid invoices not yet extracted, invoices on hold or locked) and the way into the Remittance screens.',
       controls: [
-        'Batch amounts cannot be edited; invoices can only be excluded with a reason (RMTID.002 addendum).',
+        'Batch amounts cannot be edited; invoices can only be excluded with a reason.',
       ],
     },
     {
@@ -28,7 +28,7 @@ export const REMITTANCE_HELP: HelpSection = {
       ],
       controls: [
         'Only applied payments count; a payment is held for REMIT_CHECK_HOLD_DAYS banking days of the branch before it is remitted.',
-        'Paid AR above the DTIP balance is excluded or capped as set in REMIT_PAIDAR_OVER_DTIP_MODE (decision pending, OQ19).',
+        'Paid AR above the DTIP balance is excluded or capped as set in REMIT_PAIDAR_OVER_DTIP_MODE.',
         'A failed run is logged, raises REMIT_EXTRACTION_FAILED and notifies the processors.',
       ],
     },
@@ -94,7 +94,7 @@ export const REMITTANCE_HELP: HelpSection = {
       ],
       controls: [
         'The requestor cannot approve their own request; every change is notified to the requestor.',
-        'The claims condition is confirmed by the Claims system once connected (OQ46).',
+        'The claims condition is confirmed by the Claims system once connected.',
       ],
     },
     {
@@ -130,7 +130,7 @@ export const REMITTANCE_HELP: HelpSection = {
         'Early remittance incentive rules per insurer, product line and segment: rate on the basic premium and window after inception or booking.',
       controls: [
         'Invoices matching an active rule within its window go to With Incentives batches; the incentive is deducted from the payment and an incentive OR is requested.',
-        'Rates are to be confirmed by BDOI (OQ23); only the Remittance team leader maintains the rules.',
+        'Only the Remittance team leader maintains the rules.',
       ],
     },
   ],

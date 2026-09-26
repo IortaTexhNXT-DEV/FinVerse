@@ -52,7 +52,7 @@ export const QUOTATIONS_HELP: HelpSection = {
       ],
       controls: [
         'A request from a source system is recorded once per source reference.',
-        'Reading the shared mailbox and the HLS interface wait for BDOI (Q11, Q12); requests are captured or uploaded meanwhile.',
+        'Requests are captured on screen or uploaded.',
       ],
     },
   ],

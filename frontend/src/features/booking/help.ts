@@ -71,7 +71,7 @@ export const BOOKING_HELP: HelpSection = {
       workflow: ['Add or change a rule or type; click a row to edit it.'],
       controls: [
         'Only Business Administrators maintain the setup; every change is audited.',
-        "Incentive rules are pending BDOI's qualification criteria (Q33).",
+        'Incentive rules hold the qualification criteria per insurer and product.',
       ],
     },
   ],

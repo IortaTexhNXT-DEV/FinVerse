@@ -4,11 +4,13 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.FieldValidationException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.util.BusinessText;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -35,6 +37,9 @@ public class GlobalExceptionHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
   private static final String CODE = "code";
+
+  /** Logging context key of the request's correlation id (set by the correlation id filter). */
+  private static final String CORRELATION_KEY = "correlationId";
 
   /**
    * Handles business rule violations.
@@ -206,9 +211,18 @@ public class GlobalExceptionHandler {
     return pd;
   }
 
+  /**
+   * Builds a problem: the detail is a business text (requirement references removed) and the
+   * response carries the request's correlation id, so the user can quote the error code and the
+   * reference to support.
+   */
   private static ProblemDetail problem(HttpStatus status, String code, String detail) {
-    ProblemDetail pd = ProblemDetail.forStatusAndDetail(status, detail);
+    ProblemDetail pd = ProblemDetail.forStatusAndDetail(status, BusinessText.clean(detail));
     pd.setProperty(CODE, code);
+    String correlationId = MDC.get(CORRELATION_KEY);
+    if (correlationId != null) {
+      pd.setProperty("correlationId", correlationId);
+    }
     return pd;
   }
 }

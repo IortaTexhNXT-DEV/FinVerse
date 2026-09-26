@@ -15,19 +15,57 @@ export interface ProblemDetail {
   status?: number;
   code?: string;
   errors?: Record<string, string>;
+  /** Correlation id of the request, quoted to support. */
+  correlationId?: string;
+  /** Reference of an unexpected error in the server log. */
+  reference?: string;
+}
+
+/** Status of a request that never reached the server (network down, server stopped). */
+export const NETWORK_STATUS = 0;
+
+/**
+ * Business-language message of a failed request without a detail from the server: never an HTTP
+ * code, a stack trace or raw JSON.
+ */
+export function defaultErrorMessage(status: number): string {
+  if (status === NETWORK_STATUS) {
+    return 'The system could not be reached. Check your connection and try again.';
+  }
+  if (status === 403) {
+    return 'You do not have access to this function.';
+  }
+  if (status === 404) {
+    return 'The record or page was not found.';
+  }
+  if (status === 409) {
+    return 'The record was changed by another user. Reload it and try again.';
+  }
+  if (status >= 500) {
+    return 'The system could not complete the request. Try again; if it continues, contact support with the reference below.';
+  }
+  return 'The request could not be completed.';
 }
 
 export class ApiError extends Error {
   readonly status: number;
   readonly code: string;
   readonly fieldErrors: Record<string, string>;
+  /** Reference for support: the correlation id or the server log reference. */
+  readonly reference?: string;
 
   constructor(status: number, problem: ProblemDetail) {
-    super(problem.detail ?? problem.title ?? `Request failed (${status})`);
+    super(problem.detail ?? defaultErrorMessage(status));
     this.name = 'ApiError';
     this.status = status;
-    this.code = problem.code ?? 'UNKNOWN';
+    this.code = problem.code ?? (status === NETWORK_STATUS ? 'NETWORK_ERROR' : 'UNKNOWN');
     this.fieldErrors = problem.errors ?? {};
+    this.reference = problem.reference ?? problem.correlationId;
+  }
+
+  /** Whether trying again may help (network or server failure). */
+  get retryable(): boolean {
+    return this.status === NETWORK_STATUS || this.status >= 500;
   }
 }
 
@@ -92,13 +130,19 @@ async function send(method: string, path: string, body?: unknown): Promise<Respo
   } else if (body !== undefined) {
     payload = JSON.stringify(body);
   }
-  const response = await fetch(`/api/v1${path}`, { method, headers, body: payload });
+  let response: Response;
+  try {
+    response = await fetch(`/api/v1${path}`, { method, headers, body: payload });
+  } catch {
+    throw new ApiError(NETWORK_STATUS, {});
+  }
   if (response.status === 401 && token) {
     tokenStore.clear();
     unauthorizedHandler?.();
   }
   if (!response.ok) {
     const problem = (await response.json().catch(() => ({}))) as ProblemDetail;
+    problem.correlationId ??= response.headers.get('X-Correlation-Id') ?? undefined;
     throw new ApiError(response.status, problem);
   }
   return response;

@@ -89,7 +89,7 @@ function QuotationLink({
           <Field
             label="Quotation No."
             required
-            hint="The quotation Marketing prepared for the TSI increase (ADJID.008)."
+            hint="The quotation Marketing prepared for the TSI increase."
           >
             {(id) => (
               <input

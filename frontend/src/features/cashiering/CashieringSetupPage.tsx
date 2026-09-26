@@ -137,10 +137,6 @@ function Layouts() {
   ];
   return (
     <>
-      <p className="muted">
-        The bank and channel file layouts are still to be confirmed by BDOI (OQ03/OQ04): the parser
-        reads the configured kind.
-      </p>
       <ErrorAlert error={list.error} />
       <DataTable
         caption="Payment file layouts"
@@ -204,7 +200,7 @@ function MinimalBalance() {
     <>
       <div className="worklist-toolbar">
         <span className="muted">
-          Balances at or below the limits are cleared by the MINIMAL_BALANCE_SWEEP job (CSHID.016).
+          Balances at or below the limits are cleared by the MINIMAL_BALANCE_SWEEP job.
         </span>
         <div className="worklist-actions">
           {can('CASH_APPROVE') && (

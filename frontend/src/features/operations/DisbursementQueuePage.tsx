@@ -188,7 +188,7 @@ export default function DisbursementQueuePage() {
       <PageHeader
         section="Operations"
         title="Disbursement Queue"
-        description="Payment requests sent by the Operations teams, worked here until the Disbursement system is connected."
+        description="Payment requests sent by the Operations teams."
       />
       <ErrorAlert error={rows.error ?? act.error} />
       <Card>

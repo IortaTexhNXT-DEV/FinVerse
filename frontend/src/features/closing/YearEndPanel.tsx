@@ -80,7 +80,7 @@ function CloseRecord({
         (journals {record.closingBatches}).
       </div>
       <div className={verified ? 'alert info' : 'alert warning'} role="status">
-        Post-close verification (FRBS 2.7.1): {verificationText(record)}
+        Post-close verification: {verificationText(record)}
         {onVerify !== undefined && (
           <>
             {' '}

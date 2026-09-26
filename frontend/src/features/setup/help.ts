@@ -28,7 +28,7 @@ export const SETUP_HELP: HelpSection = {
       summary:
         'Currencies and exchange rates by type (SPOT, CLOSING, AVERAGE, BUDGET) and date, quoted as base-currency units per one unit of foreign currency.',
       workflow: [
-        'Monthly revaluation rates (FRBS 2.2.0): the GL Team Head enters the month-end rate per currency; it is the CLOSING rate of the last day of the month.',
+        'Monthly revaluation rates: the GL Team Head enters the month-end rate per currency; it is the CLOSING rate of the last day of the month.',
         'The BOOK_RATE_FROM_CLOSING job copies it as the Operations BOOK rate of the next month (parameter OPS_BOOK_RATE_SOURCE); Copy to BOOK does it on demand.',
       ],
       controls: [
@@ -69,7 +69,7 @@ export const SETUP_HELP: HelpSection = {
       name: 'Cost-Centre Rules',
       path: '/setup/cost-centre-rules',
       summary:
-        'Standard rules that give generated journal lines their cost centre (FRBS 3.1.1): by source module, event type, branch, party and GL account, evaluated from the lowest priority.',
+        'Standard rules that give generated journal lines their cost centre: by source module, event type, branch, party and GL account, evaluated from the lowest priority.',
       workflow: [
         'Only lines of accounts that require a cost centre and have none are filled.',
         'When no rule matches, the posting is stopped, logged as FAILED in the event register and the COST_CENTER_MISSING alert is raised.',
@@ -80,7 +80,7 @@ export const SETUP_HELP: HelpSection = {
       name: 'Bank Statement Layouts',
       path: '/setup/statement-layouts',
       summary:
-        'Column layout of each bank account’s spreadsheet statement (FRBS 3.3.1) and the cheque number and amount matching rule (FRBS 3.3.2).',
+        'Column layout of each bank account’s spreadsheet statement and the cheque number and amount matching rule.',
       workflow: [
         'Map the date, description, cheque / reference and amount columns (one signed amount, or withdrawals and deposits) and the date pattern.',
         'Import Statement reads the .xlsx / .ods / .csv file with that layout and runs the automatic reconciliation at once.',

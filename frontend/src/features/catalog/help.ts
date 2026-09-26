@@ -87,7 +87,7 @@ export const CATALOG_HELP: HelpSection = {
       controls: [
         'Insurer, branches and rates are authorized by another user before use.',
         'Commission rates are effective-dated: the rate in force on the period start applies; otherwise the product default.',
-        'Only e-mail placement is available; SFTP and API channels are parked.',
+        'Placement is sent by e-mail.',
       ],
     },
     {

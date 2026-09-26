@@ -28,7 +28,7 @@ export default function UserAccessReportsPage() {
                 </h3>
                 <p className="uam-report-text">{r.text}</p>
                 <div className="uam-report-meta">
-                  {r.code} · {r.brd} · Parameters: {r.parameters}
+                  {r.code} · Parameters: {r.parameters}
                 </div>
               </div>
             </li>

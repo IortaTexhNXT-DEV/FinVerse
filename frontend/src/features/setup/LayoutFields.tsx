@@ -74,7 +74,7 @@ export function LayoutFields({ form, banks, errors, onChange }: Readonly<Props>)
           checked={form.chequeNumberFirst}
           onChange={(e) => onChange({ chequeNumberFirst: e.target.checked })}
         />
-        Match cheque number and amount first (FRBS 3.3.2), then the standard rules
+        Match cheque number and amount first, then the standard rules
       </label>
     </div>
   );

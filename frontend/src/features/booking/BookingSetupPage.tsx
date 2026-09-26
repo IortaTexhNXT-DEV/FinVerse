@@ -127,7 +127,7 @@ function IncentiveTab({ companyId, canEdit }: Readonly<{ companyId: number; canE
         rows={rules.data ?? []}
         rowKey={(r) => r.id ?? 0}
         onRowClick={canEdit ? setEditing : undefined}
-        emptyMessage="No incentive rule (the qualification rules are pending, Q33)."
+        emptyMessage="No incentive rules"
         columns={[
           { key: 'product', header: 'Product', render: (r) => r.productCode ?? ANY },
           { key: 'segment', header: 'Segment', render: (r) => r.marketSegment ?? ANY },

@@ -547,9 +547,26 @@
 }
 
 /* ---------- Report catalogue cards ------------------------------------------------------- */
+.report-card .report-code {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--brand-navy);
+  margin: 2px 0;
+}
+
+/* ---------- Error banner reference and retry --------------------------------------------- */
+.alert-reference {
+  font-size: 12px;
+  margin-top: var(--space-1);
+}
+
+.alert .btn {
+  margin-top: var(--space-2);
+}
 .report-card .report-desc {
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

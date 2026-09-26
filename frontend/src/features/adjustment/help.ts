@@ -17,8 +17,8 @@ export const ADJUSTMENT_HELP: HelpSection = {
         'The Operations home tiles open the workbench on the matching tab.',
       ],
       controls: [
-        'An invoice locked by Remittance cannot be adjusted until it is released (ADJID.001, RMTID.040).',
-        'Aging runs from submission to completion (ADJID.021).',
+        'An invoice locked by Remittance cannot be adjusted until it is released.',
+        'Aging runs from submission to completion.',
       ],
     },
     {
@@ -33,10 +33,10 @@ export const ADJUSTMENT_HELP: HelpSection = {
         'Save as draft or submit for validation; supporting documents are attached on the request page.',
       ],
       controls: [
-        'A possible duplicate (same invoice, request type, reason and endorsement reference) needs a justification (ADJID.023).',
-        'Cumulative adjustments above the baseline of the original premium need a justification and raise ADJ_OVER_BASELINE (ADJID.028).',
+        'A possible duplicate (same invoice, request type, reason and endorsement reference) needs a justification.',
+        'Cumulative adjustments above the baseline of the original premium need a justification and raise ADJ_OVER_BASELINE.',
         'A cancellation cannot be combined with another open financial request on the same invoice.',
-        'A TSI increase above the package limit needs the quotation prepared by Marketing (ADJID.008).',
+        'A TSI increase above the package limit needs the quotation prepared by Marketing.',
       ],
     },
     {
@@ -45,7 +45,7 @@ export const ADJUSTMENT_HELP: HelpSection = {
       summary:
         'Requests ready for posting and the validation batches posted, with the outcome of each request.',
       workflow: [
-        'Select the requests that do not qualify and Return Selected with a reason: they go back to the requester (ADJID.005/007).',
+        'Select the requests that do not qualify and Return Selected with a reason: they go back to the requester.',
         'Select the others and Post Selected: they are posted together as one validation batch (VB number).',
         'Open a batch to see which requests were posted, which wait for the payments to be re-applied, and why others failed.',
       ],
@@ -59,7 +59,7 @@ export const ADJUSTMENT_HELP: HelpSection = {
       name: 'Batch Request Upload',
       path: '/adjustment/upload',
       summary:
-        'Upload of cancellation and adjustment requests for many invoices, one request per row (ADJID.006).',
+        'Upload of cancellation and adjustment requests for many invoices, one request per row.',
       workflow: [
         'Download the template, fill one row per request with the codes of the lists, upload and review each row, then commit the valid rows.',
         'Each committed row is raised and submitted for validation.',
@@ -72,14 +72,14 @@ export const ADJUSTMENT_HELP: HelpSection = {
       name: 'Minimal Balance File',
       path: '/adjustment/minimal-balance',
       summary:
-        'Write-off (debit) or credit (overpayment) of premium receivable balances from 10.00 to 100.00 listed in a file (ADJID.026).',
+        'Write-off (debit) or credit (overpayment) of premium receivable balances from 10.00 to 100.00 listed in a file.',
       workflow: [
         'Upload the file of invoices with their balances; rows whose invoice and balance match the ledger are processed.',
         'Processed balances are listed with their journal; the Minimal Balance Write-off Summary report gives the totals per file.',
       ],
       controls: [
         'Only balances within MIN_BALANCE_FILE_RANGE are processed; the same file cannot be uploaded twice and an invoice is written off once.',
-        'The GL accounts of the write-off are configured by Comptrollership (OQ07, OQ11).',
+        'The GL accounts of the write-off are configured by Comptrollership.',
       ],
     },
   ],

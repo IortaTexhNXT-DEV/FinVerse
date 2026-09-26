@@ -109,8 +109,7 @@ function UploadPanel() {
           <FileSpreadsheet size={20} aria-hidden="true" />
           <span>
             One row per account, parents before their children. Leave the account code blank to use
-            the parent&apos;s numbering scheme. A sample file is in
-            docs/samples/coa_upload_sample.xlsx.
+            the parent&apos;s numbering scheme.
           </span>
           <span className="spacer" />
           <Button

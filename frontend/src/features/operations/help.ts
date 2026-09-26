@@ -17,7 +17,7 @@ export const OPERATIONS_HELP: HelpSection = {
         'Use Open on a card to go to the team workbench.',
       ],
       controls: [
-        'You see only the sections of your role (BRQID.003).',
+        'You see only the sections of your role.',
         'Application links are maintained as the list of values OPS_EXTERNAL_LINK ("Name|https://address").',
       ],
     },
@@ -33,7 +33,7 @@ export const OPERATIONS_HELP: HelpSection = {
       ],
       controls: [
         'Balances are booked + adjusted - applied + reversed - remitted - written off, per component.',
-        'A locked invoice can only receive payments until the module holding the lock releases it (RMTID.040).',
+        'A locked invoice can only receive payments until the module holding the lock releases it.',
         'Direct payment invoices have no client receivable: payment and remittance status are Not Applicable.',
       ],
     },
@@ -41,7 +41,7 @@ export const OPERATIONS_HELP: HelpSection = {
       name: 'Disbursement Queue',
       path: '/operations/disbursements',
       summary:
-        'Payment requests sent by Remittance, Cashiering and Commission (remittances, refunds, BIR 2307 reports, incentive pass-on), worked here until the Disbursement system is connected (OQ02).',
+        'Payment requests sent by Remittance, Cashiering and Commission (remittances, refunds, BIR 2307 reports, incentive pass-on).',
       workflow: [
         'Acknowledge a request, assign its DV number, then mark it paid; or return it with a reason.',
       ],
@@ -62,7 +62,7 @@ export const OPERATIONS_HELP: HelpSection = {
       name: 'Interfaces',
       path: '/operations/interfaces',
       summary:
-        'Feeds with Collection, Disbursement, insurers and Booking: transport, schedule, activation, file uploads and the log of every run with the outcome of each record (BRQID.004/005/006).',
+        'Feeds with Collection, Disbursement, insurers and Booking: transport, schedule, activation, file uploads and the log of every run with the outcome of each record.',
       workflow: [
         'Configure a feed schedule or deactivate it; upload a file for a feed whose module processes uploads.',
         'Open a run to see accepted, duplicate and failed records. Replay Booked Invoices copies invoices missing from the ledger.',
@@ -76,14 +76,14 @@ export const OPERATIONS_HELP: HelpSection = {
       name: 'Report Archive',
       path: '/operations/report-archive',
       summary:
-        'Operations reports run on screen or exported, with parameters, time and user (CSHID.017/018).',
+        'Operations reports run on screen or exported, with parameters, time and user.',
       controls: ['Viewing needs OPS_REPORT_VIEW; downloading or printing needs OPS_REPORT_EXPORT.'],
     },
     {
       name: 'Notification Settings',
       path: '/operations/notifications',
       summary:
-        'Choose, per Operations event, whether you receive the in-app notification and the e-mail (RMTID.034).',
+        'Choose, per Operations event, whether you receive the in-app notification and the e-mail.',
     },
   ],
 };

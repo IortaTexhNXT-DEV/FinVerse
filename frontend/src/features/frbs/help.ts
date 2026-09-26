@@ -5,7 +5,7 @@ export const FRBS_HELP: HelpSection = {
   id: 'frbs',
   module: 'Accounting Reports',
   intro:
-    'The BDOI report pack groups the Comptrollership reports of Appendix A (end of day, GARD, subsidiaries, schedules and ageing, Mancom, service fee, government). Schedules are configuration run by one engine; the service fee pays the referrers their share of fully paid commission.',
+    'The BDOI report pack groups the Comptrollership reports (end of day, GARD, subsidiaries, schedules and ageing, Mancom, service fee, government). Schedules are configuration run by one engine; the service fee pays the referrers their share of fully paid commission.',
   screens: [
     {
       name: 'Report Pack',
@@ -26,7 +26,7 @@ export const FRBS_HELP: HelpSection = {
       controls: [
         'A schedule reads the posted ledger of its accounts (code prefixes or report groups) grouped by account, party, document, cost centre, branch or line of business, in base currency or in its own currency.',
         'Ageing is first in first out: the balance is made of the most recent increases. Up to 8 buckets, e.g. 30,90,180,365,730.',
-        'Comments are kept per row and month (FRBS_REPORT_EXPORT); a blank comment removes it. Definitions are maintained with MASTER_MAINTAIN; drafts stay "to confirm" until BDOI confirms the layout (AQ05).',
+        'Comments are kept per row and month (FRBS_REPORT_EXPORT); a blank comment removes it. Definitions are maintained with MASTER_MAINTAIN.',
       ],
     },
     {
@@ -46,8 +46,8 @@ export const FRBS_HELP: HelpSection = {
       summary:
         'The rate of each service-fee segment with the market segments it covers, and the payee and cost centre of each sales unit.',
       controls: [
-        'Maintained by the GL team lead (SERVICE_FEE_APPROVE); values are proposals until BDOI confirms them (AQ20).',
-        'A unit without a recipient is paid under its own code and charged to its cost centre, else to the cost-centre rules of the accrual (FRBS 3.1.1).',
+        'Maintained by the GL team lead (SERVICE_FEE_APPROVE).',
+        'A unit without a recipient is paid under its own code and charged to its cost centre, else to the cost-centre rules of the accrual.',
       ],
     },
   ],

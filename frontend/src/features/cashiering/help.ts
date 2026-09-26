@@ -86,7 +86,7 @@ export const CASHIERING_HELP: HelpSection = {
         'Upload a Bills Payment, Trade, CLPC, Direct Credit or PDC file. Each accepted row becomes a payment with its AR and is matched at once; the run summary counts the applied, unapplied, pre-booked, excess and failed rows.',
       controls: [
         'The same file cannot be uploaded twice.',
-        'The bank file layouts are configured in Cashiering Setup until BDOI confirms them.',
+        'The bank file layouts are configured in Cashiering Setup.',
       ],
     },
     {

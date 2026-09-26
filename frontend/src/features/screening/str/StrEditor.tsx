@@ -33,7 +33,7 @@ export function ReasonCodes({
     <fieldset className="stack">
       <legend>Reason Codes</legend>
       {(options.data ?? []).length === 0 && (
-        <p className="muted">No STR reason code is configured yet (AMLC codes pending, SQ09).</p>
+        <p className="muted">No STR reason code is configured.</p>
       )}
       {(options.data ?? []).map((o) => (
         <label key={o.code} className="checkbox">

@@ -53,8 +53,8 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
         'On the claim record: Details (loss, claimant), Locations (with the insurer location references), Insurers & Updates, Reserve & Settlement and Documents (loss advice and claims reports). Generate Authorization Code, Send Loss Advice, Refresh Cover Data and Use Latest Version are the page actions.',
       ],
       controls: [
-        'Needs BCL_RECORD. Policy data comes from the account and is never re-keyed (BRCLM.007, 039).',
-        'A claim on unpaid or partly paid premium is recorded, flagged Unpaid premium and raises BCL_UNPAID_PREMIUM_CLAIM; the authorization code (BCL_AUTHORIZE) is issued only when the premium is paid, or on a direct-payment cover under BCL_AUTH_DP_POLICY (CONFIRM: attach the insurer payment evidence first) (BRCLM.001).',
+        'Needs BCL_RECORD. Policy data comes from the account and is never re-keyed.',
+        'A claim on unpaid or partly paid premium is recorded, flagged Unpaid premium and raises BCL_UNPAID_PREMIUM_CLAIM; the authorization code (BCL_AUTHORIZE) is issued only when the premium is paid, or on a direct-payment cover under BCL_AUTH_DP_POLICY (CONFIRM: attach the insurer payment evidence first).',
         'The reported date is corrected with BCL_STATUS_UPDATE and a reason, the claimant overridden with BCL_CLAIMANT_OVERRIDE, the reserve amended with BCL_RESERVE_AMEND and the adjuster of an insurer line set with BCL_ADJUSTER_ASSIGN; every change is kept in the claim history.',
         'The claim currency is the cover currency, else BCL_DEFAULT_CURRENCY.',
       ],
@@ -64,13 +64,13 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
       name: 'Cover Lookup',
       path: '/claims-handling/covers',
       summary:
-        'Read-only view of any cover of the company: account, policy years and policy numbers, items and locations, endorsements (cover versions), invoices with their payment and remittance status, the claims of the cover and the insurer location references (BRCLM.002, 003, 042).',
+        'Read-only view of any cover of the company: account, policy years and policy numbers, items and locations, endorsements (cover versions), invoices with their payment and remittance status, the claims of the cover and the insurer location references.',
       workflow: [
         'Record Claim on the cover opens Record Claim with the cover selected.',
         'The account page (Accounts & Placement) also has a Claims tab for holders of BCL_VIEW: the claims of the account with policy year, loss date, status, paid and outstanding amounts, each linked to its claim record. It is read-only.',
       ],
       controls: [
-        'Needs BCL_COVER_VIEW; nothing on the cover can be changed here. Search texts need at least 3 characters; there is no branch or portfolio restriction (CLQ27).',
+        'Needs BCL_COVER_VIEW; nothing on the cover can be changed here. Search texts need at least 3 characters; there is no branch or portfolio restriction.',
         'Opening a cover is logged in the audit trail of the account.',
       ],
     },
@@ -78,7 +78,7 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
       name: 'My Diary',
       path: '/claims-handling/diary',
       summary:
-        'Your calls, e-mails, meetings, notes and follow-ups across claims, with the entries due today and overdue (BRCLM.022).',
+        'Your calls, e-mails, meetings, notes and follow-ups across claims, with the entries due today and overdue.',
       workflow: [
         'Add Diary Entry on a claim records a call, e-mail, meeting, note or follow-up with an optional due date and assignee; an entry assigned to someone else notifies that user.',
         'The assignee or the author marks an entry done; entries are never deleted, and closed claims accept entries.',
@@ -92,7 +92,7 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
       name: 'Insurer Location References',
       path: '/claims-handling/location-refs',
       summary:
-        'The reference each insurer uses for a location of a cover, with its effective dates; maintained here or by the bulk upload BCL_LOCATION_REF (BRCLM.042). Every claim location shows the references valid today.',
+        'The reference each insurer uses for a location of a cover, with its effective dates; maintained here or by the bulk upload BCL_LOCATION_REF. Every claim location shows the references valid today.',
       controls: [
         'Needs BCL_LOCATION_REF_MAINTAIN; a new reference ends the current one of the location and insurer the day before it starts, and both stay in the history. Insurer claim numbers and insurer updates also load by bulk upload (BCL_INSURER_CLAIM_NO, BCL_INSURER_UPDATE, BCL_RECORD).',
       ],
@@ -110,7 +110,7 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
       ],
       controls: [
         'Running a report on screen needs BCL_REPORT_VIEW, downloading it (Excel, PDF, CSV) BCL_REPORT_EXPORT; the data extract needs BCL_DATA_EXTRACT.',
-        'Marketing users see the reports only, never the claims themselves (BRCLM.040).',
+        'Marketing users see the reports only, never the claims themselves.',
       ],
     },
     {

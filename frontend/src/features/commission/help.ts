@@ -13,7 +13,7 @@ export const COMMISSION_HELP: HelpSection = {
       summary:
         'Work queues of Commission Receivables (direct payment accounts to confirm and bill, billings waiting for the insurer or overdue, approved billings to collect, certificates to acknowledge) and the way into the commission screens.',
       controls: [
-        'Insurer feedback is due within CMR_FEEDBACK_WORKING_DAYS (10) working days (CMRID.011).',
+        'Insurer feedback is due within CMR_FEEDBACK_WORKING_DAYS (10) working days.',
       ],
     },
     {

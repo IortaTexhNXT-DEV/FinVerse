@@ -245,7 +245,6 @@ export function PolicyTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
               ['Period', `${formatDate(p.inceptionDate)} – ${formatDate(p.expiryDate)}`],
               ['Booked', formatDate(p.bookingDate)],
               ['Receipt Date (first AR)', formatDate(p.firstReceiptDate) || '—'],
-              ['Delivery Date', 'To confirm with BDOI (CQ17)'],
             ].map(([label, value]) => (
               <div className="fact" key={label}>
                 <span>

@@ -29,7 +29,7 @@ function Justifications({
           <Field
             label={`Possible duplicate of ${recompute.duplicates.join(', ')}`}
             required
-            hint="Same invoice, request type, reason and endorsement reference (ADJID.023). Give the justification to proceed."
+            hint="Same invoice, request type, reason and endorsement reference. Give the justification to proceed."
           >
             {(id) => (
               <input
@@ -46,7 +46,7 @@ function Justifications({
           <Field
             label={`Cumulative adjustments ${formatAmount(recompute.baseline.adjustedAfter)} exceed ${String(recompute.baseline.limitPercent)}% of the original premium ${formatAmount(recompute.baseline.originalPremium)}`}
             required
-            hint="Review the previous adjustments of the invoice (ADJID.028) and justify the request."
+            hint="Review the previous adjustments of the invoice and justify the request."
           >
             {(id) => (
               <input

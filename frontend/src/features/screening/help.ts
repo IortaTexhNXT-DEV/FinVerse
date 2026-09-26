@@ -18,7 +18,7 @@ export const SCREENING_HELP: HelpSection = {
       ],
       controls: [
         'You see screening work only with SCR_VIEW; each stage needs its own permission (SCR_INVESTIGATE, SCR_CASE_APPROVE, SCR_COMPLIANCE_REVIEW, SCR_COMMITTEE, SCR_STR_EXTRACT).',
-        'The risk rating and the PEP / WATCHLIST_REVIEW tags of a client are set only through screening and are kept in the client history and the audit trail (SNSRP-302, 304).',
+        'The risk rating and the PEP / WATCHLIST_REVIEW tags of a client are set only through screening and are kept in the client history and the audit trail.',
       ],
     },
     {
@@ -53,7 +53,7 @@ export const SCREENING_HELP: HelpSection = {
       ],
       controls: [
         'The same client, entry version and configuration version never produce a second match.',
-        'A false positive is not raised again for the same entry version; when the entry changes it is matched again (SNSRP-304, SQ12).',
+        'A false positive is not raised again for the same entry version; when the entry changes it is matched again.',
         'A rule never lowers a rating; only a manual change with evidence does.',
         'Deciding matches needs SCR_INVESTIGATE; every decision is kept in the audit trail.',
       ],
@@ -98,7 +98,7 @@ export const SCREENING_HELP: HelpSection = {
       controls: [
         'Only committee-approved STRs are extracted; extracting one again needs a reason and is logged as a re-extraction.',
         'The AMLC reference is unique and the filing date cannot be before the extraction or in the future.',
-        'The STR reason list (SCR_STR_REASON) and the AMLC layout are to be supplied by BDOI (SQ09); SIT/UAT uses placeholder reasons.',
+        'The STR reasons come from the SCR_STR_REASON list, maintained in List of Values.',
       ],
     },
   ],
@@ -121,8 +121,8 @@ export const SCREENING_SETUP_HELP: HelpSection = {
         'A Compliance Checker (SCR_CONFIG_APPROVE) approves or rejects it from My Approvals; the approved version becomes active on its date.',
       ],
       controls: [
-        'An active version never changes; a change is always a new version, and a case keeps the version it started with (SNSRP-104).',
-        'The maker of a version can never approve it (SNSRP-109).',
+        'An active version never changes; a change is always a new version, and a case keeps the version it started with.',
+        'The maker of a version can never approve it.',
         'Without an active matching version a screening trigger raises SCR_NO_ACTIVE_CONFIG.',
         'Only one draft or pending version exists per type; New Draft opens it. The effective date is today or later, and a draft that changes nothing cannot be submitted.',
         'Changes lists every rule and attribute with its value before and after, against the version in force; the list is kept with the version when it is submitted.',
@@ -135,11 +135,11 @@ export const SCREENING_SETUP_HELP: HelpSection = {
         'The KYC review, transaction review, EDD and STR templates: sections, fields, data types, lists of values, mandatory flags and help texts, with a preview of the form.',
       workflow: [
         'Open the template type, click New Draft, add or change fields, check the preview and submit the version for approval.',
-        'A Compliance Checker approves it; reviews and STRs started after its effective date use it, those already started keep their version (SNSRP-104, 105).',
+        'A Compliance Checker approves it; reviews and STRs started after its effective date use it, those already started keep their version.',
       ],
       controls: [
         'Every field needs a label and a code of capitals, digits and underscores; a list field needs its list of values.',
-        'A template needs at least one mandatory field. The AMLC STR format is parked until BDOI supplies it (SQ09).',
+        'A template needs at least one mandatory field.',
       ],
     },
     {
@@ -148,8 +148,8 @@ export const SCREENING_SETUP_HELP: HelpSection = {
       summary:
         'The sanctioned names, PEPs and internal watchlist entries by source and status, with their aliases and change history.',
       workflow: [
-        'A Compliance Officer adds an entry, changes it or deactivates it with a reason; the change waits in Pending Changes (SNSRP-203).',
-        'A Compliance Checker compares the before and after values and approves or rejects with remarks; an approved entry is active from today and screened (SNSRP-204).',
+        'A Compliance Officer adds an entry, changes it or deactivates it with a reason; the change waits in Pending Changes.',
+        'A Compliance Checker compares the before and after values and approves or rejects with remarks; an approved entry is active from today and screened.',
       ],
       controls: [
         'Screening uses active entries only; pending and draft entries have no effect.',
@@ -165,12 +165,12 @@ export const SCREENING_SETUP_HELP: HelpSection = {
       workflow: [
         'The job SCR_WATCHLIST_INGEST (01:00) reads the file staged on each file source and applies the official list at once; a source without a new file gets a FAILED run.',
         'Upload List File logs a run at once; its additions, updates and delistings wait for a Compliance Checker, who can approve them all from the run.',
-        'SCR_INGEST_ERROR_DIGEST (07:00, Monday to Friday) e-mails the failed records to SCR_INGEST_ALERT_RECIPIENTS (SNSRP-202).',
+        'SCR_INGEST_ERROR_DIGEST (07:00, Monday to Friday) e-mails the failed records to SCR_INGEST_ALERT_RECIPIENTS.',
       ],
       controls: [
         'A file is CSV or XLSX in the template; each failed line is kept with its reason and a FAILED or PARTIAL run raises SCR_INGEST_FAILED.',
         'A reference already on the list is updated, never duplicated; on a full-file source the entries missing from the file are delisted.',
-        'API and NLDS transports are parked until BDOI names them (SQ01).',
+        'Lists are loaded by file upload.',
       ],
     },
   ],

@@ -120,7 +120,7 @@ export function QueueEditDialog({ row, busy, error, onSave, onClose }: Readonly<
             />
           )}
         </Field>
-        <Field label="Cost center" hint="Leave blank for the account's cost center (BRNB.108).">
+        <Field label="Cost center" hint="Leave blank for the account's cost center.">
           {(id) => (
             <input
               id={id}

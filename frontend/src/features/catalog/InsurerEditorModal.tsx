@@ -11,8 +11,6 @@ import { splitEmails } from './insurerForm';
 
 const CHANNELS = [
   { value: 'EMAIL', label: 'E-mail' },
-  { value: 'SFTP', label: 'SFTP (not yet available)' },
-  { value: 'API', label: 'API (not yet available)' },
 ];
 
 type InsurerForm = Omit<InsurerInput, 'defaultCreditDays' | 'placementEmails'> & {

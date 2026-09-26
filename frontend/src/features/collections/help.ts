@@ -17,7 +17,7 @@ export const COLLECTIONS_HELP: HelpSection = {
       summary:
         'Your collection work as tiles - your open accounts, unassigned accounts, direct payments returned by insurers, credit balances, files ready and the tiles of the other Collections screens - and the open amounts per aging bracket, for all segments or one.',
       controls: [
-        'An invoice enters the worklist when its net outstanding premium is above CLX_MIN_BALANCE_THRESHOLD (BRCLXN.005).',
+        'An invoice enters the worklist when its net outstanding premium is above CLX_MIN_BALANCE_THRESHOLD.',
         'Aging counts from the booking or inception date (CLX_AGING_BASIS) in the brackets of CLX_AGING_BRACKETS.',
       ],
     },
@@ -27,14 +27,14 @@ export const COLLECTIONS_HELP: HelpSection = {
       summary:
         'One row per invoice with outstanding premium receivable, refreshed nightly from the invoice ledger (CLX_DAILY_REFRESH) and after each payment. Filter by segment, unit, Unit Head, handler, AO, aging bracket, category, disposition, amount, promise and escalation; see the totals by client or account; select accounts to log an effort, record a disposition or reassign them. Open an account for its details.',
       workflow: [
-        'The nightly refresh lists new invoices, updates balances and aging, completes paid accounts and reopens them when the balance comes back (BRCLXN.001-015, 022).',
-        'New accounts are assigned by the assignment rules, else to their account officer (BRCLXN.052).',
+        'The nightly refresh lists new invoices, updates balances and aging, completes paid accounts and reopens them when the balance comes back.',
+        'New accounts are assigned by the assignment rules, else to their account officer.',
         'A disposition with an Operations action is handed over in the application: check pick-up and BIR 2307 tags to Cashiering, direct payment accounts to Commission.',
       ],
       controls: [
-        'Several accounts at once need CLX_BULK_UPDATE and share one bulk reference (BRCLXN.051).',
+        'Several accounts at once need CLX_BULK_UPDATE and share one bulk reference.',
         'Only active dispositions can be chosen; some are reserved to roles (e.g. "no policy number" to the Processing Unit).',
-        'Negative balances of cancellations are never listed; other credits show on the Credit Balances tab (BRCLXN.010, CQ04).',
+        'Negative balances of cancellations are never listed; other credits show on the Credit Balances tab.',
         'Export to Files produces the Outstanding PR List in the background, capped at CLX_EXPORT_MAX_ROWS, under CLX_EXPORT.',
       ],
     },
@@ -68,8 +68,8 @@ export const COLLECTIONS_HELP: HelpSection = {
       summary:
         'The Collections parameters (threshold, aging basis and brackets, export cap, edit-lock time), the rules of each disposition (category, tagging owner, Operations action, allowed roles, unapplied-payment attributes), the Unit Head of each sales unit and a refresh of the worklist on demand.',
       controls: [
-        'Needs CLX_SETUP; every change is kept in the Collections audit log with the old and new value (BRCLXN.043).',
-        'Disposition values themselves are added and deactivated on the LOV screen with maker-checker (BRCLXN.017).',
+        'Needs CLX_SETUP; every change is kept in the Collections audit log with the old and new value.',
+        'Disposition values themselves are added and deactivated on the LOV screen with maker-checker.',
       ],
     },
   ],

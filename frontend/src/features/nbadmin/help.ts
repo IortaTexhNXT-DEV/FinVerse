@@ -73,7 +73,7 @@ export const USER_ACCESS_HELP: HelpSection = {
       controls: [
         'The implementer is never the requester. A deactivated profile grants nothing to its members until it is reactivated; SYSADMIN cannot be deactivated.',
         'Roles are edited directly on the Roles screen only through the emergency path UAM_DIRECT_ROLE_EDIT (off by default); every such edit is audited and raises the UAM_DIRECT_ROLE_EDIT alert.',
-        'With UAM_ROLE_APPLY_ON_APPROVAL true the change applies at the last approval (UQ03).',
+        'With UAM_ROLE_APPLY_ON_APPROVAL true the change applies at the last approval.',
       ],
     },
     {
@@ -88,7 +88,7 @@ export const USER_ACCESS_HELP: HelpSection = {
       ],
       controls: [
         'Each line follows every rule of a single request (user ID format, one open request per user, four eyes).',
-        'The batch is decided as a whole (UQ10); temporary passwords of new users are shown once to the approver.',
+        'The batch is decided as a whole; temporary passwords of new users are shown once to the approver.',
       ],
     },
     {

@@ -186,7 +186,7 @@ export default function BirOutputsPage() {
       <PageHeader
         section="Tax & Statutory"
         title="BIR Forms and Books"
-        description="Returns and worksheets, alphalists, books of accounts and the IC broker statement, exported to Excel or PDF. BIR file formats are to be confirmed (AQ07)."
+        description="Returns, alphalists, books of accounts and the IC broker statement."
       />
       <ErrorAlert error={exporter.error} />
       <Card title="Period">

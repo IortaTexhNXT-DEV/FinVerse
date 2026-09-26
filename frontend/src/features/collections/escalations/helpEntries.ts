@@ -34,7 +34,7 @@ export const ESCALATION_HELP: HelpScreen[] = [
     ],
     controls: [
       'Maker-checker: the maker cannot authorize the rule; pending rules appear in My Approvals.',
-      'The defaults of the process (45 days, 60th day from inception, broken promise to the team lead) are to be confirmed by BDOI (CQ14).',
+      'The defaults of the process: 45 days, 60th day from inception, broken promise to the team lead.',
     ],
   },
 ];

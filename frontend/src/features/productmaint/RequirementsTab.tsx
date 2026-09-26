@@ -82,7 +82,7 @@ function RequirementsEditor({ request }: Readonly<{ request: PackageRequest }>) 
         <TextInput
           label="Computation basis"
           required
-          hint="How the premium is computed (PQ12)."
+          hint="How the premium is computed."
           value={scheme.ratingBasisNote}
           onChange={(ratingBasisNote) => s({ ratingBasisNote })}
         />

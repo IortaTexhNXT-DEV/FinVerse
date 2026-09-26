@@ -168,7 +168,6 @@ export function AuthorizeDialog({
         <ErrorAlert error={error} />
         <p>
           The claims authorization code of {claim.claimNo} is issued once, on a paid premium check.
-          Its use by BDOI is still to be confirmed (CLQ01).
         </p>
         {needsEvidence && (
           <Field

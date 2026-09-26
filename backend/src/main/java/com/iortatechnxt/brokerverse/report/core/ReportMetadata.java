@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.report.core;
 
+import com.iortatechnxt.brokerverse.common.util.BusinessText;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import java.util.ArrayList;
@@ -39,8 +40,14 @@ public record ReportMetadata(
     boolean archived,
     boolean documentStyle) {
 
-  /** Canonical constructor copying the parameter list; export defaults to the view permission. */
+  /**
+   * Canonical constructor copying the parameter list; export defaults to the view permission. The
+   * title and description are business texts: requirement references in them are removed ({@link
+   * BusinessText}), they stay in the report classes for traceability.
+   */
   public ReportMetadata {
+    title = BusinessText.clean(title);
+    description = BusinessText.clean(description);
     parameters = List.copyOf(parameters);
     exportPermission = exportPermission == null ? permission : exportPermission;
   }

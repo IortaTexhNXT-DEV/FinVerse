@@ -10,8 +10,9 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { businessText } from '@/utils/businessText';
 import { formatDateTime } from '@/utils/format';
-import { FORMAT_LABELS, formatLabel, menuFormats } from './exportFormats';
+import { formatLabel } from './exportFormats';
 import { ReportBatchDialog } from './ReportBatchDialog';
 import { downloadBatch, reportOptionsApi } from './reportOptions';
 import type { ReportBatch } from './reportOptions';
@@ -121,13 +122,9 @@ export default function ReportsPage() {
                 <FileBarChart2 size={20} aria-hidden="true" />
                 <span>
                   <strong>{e.title}</strong>
-                  <span className="muted">
-                    {e.code} · {e.description}
-                  </span>
-                  <span className="muted">
-                    {menuFormats(e, ['XLSX', 'PDF', 'DOCX'])
-                      .map((f) => FORMAT_LABELS[f])
-                      .join(' · ')}
+                  <span className="report-code">{e.code}</span>
+                  <span className="muted report-desc" title={businessText(e.description)}>
+                    {businessText(e.description)}
                   </span>
                 </span>
               </Link>

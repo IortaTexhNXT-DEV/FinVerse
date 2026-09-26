@@ -14,6 +14,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { ClientProposalsTab } from '@/features/proposals/ClientProposalsTab';
 import { ClientQuotationsTab } from '@/features/quotations/ClientQuotationsTab';
+import { ClientScreeningTab } from '@/features/screening/cases/ClientScreeningTab';
 import { humanize } from '@/utils/format';
 import { ClientActionsBar } from './ClientActionsBar';
 import { ClientDetailsTab } from './ClientDetailsTab';
@@ -22,7 +23,8 @@ import { KycTab } from './KycTab';
 import { LinkedRecordsTab } from './LinkedRecordsTab';
 import { NotesTab } from './NotesTab';
 
-type TabId = 'details' | 'kyc' | 'notes' | 'quotations' | 'proposals' | 'records' | 'history';
+type TabId =
+  'details' | 'kyc' | 'notes' | 'quotations' | 'proposals' | 'records' | 'screening' | 'history';
 
 const TABS: readonly { id: TabId; label: string }[] = [
   { id: 'details', label: 'Details' },
@@ -31,6 +33,7 @@ const TABS: readonly { id: TabId; label: string }[] = [
   { id: 'quotations', label: 'Quotation' },
   { id: 'proposals', label: 'Confirmed Proposals' },
   { id: 'records', label: 'Linked Records' },
+  { id: 'screening', label: 'Screening' },
   { id: 'history', label: 'History' },
 ];
 
@@ -68,6 +71,8 @@ function TabContent({ tab, client }: Readonly<{ tab: TabId; client: ClientDetail
       return <ClientProposalsTab clientId={client.id} />;
     case 'records':
       return <LinkedRecordsTab clientId={client.id} />;
+    case 'screening':
+      return <ClientScreeningTab clientId={client.id} />;
     case 'history':
       return <ClientHistoryTab clientId={client.id} />;
     default:
@@ -127,7 +132,11 @@ export default function ClientDetailPage() {
         entityId={c.id}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['crm'] })}
       />
-      <Tabs tabs={TABS} active={tab} onChange={setTab} />
+      <Tabs
+        tabs={TABS.filter((t) => t.id !== 'screening' || can('SCR_VIEW'))}
+        active={tab}
+        onChange={setTab}
+      />
       <TabContent tab={tab} client={c} />
     </div>
   );

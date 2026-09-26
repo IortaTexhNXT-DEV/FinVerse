@@ -171,7 +171,10 @@ class ScreeningUserAccessFoundationIT {
         .extracting(LovValue::getCode)
         .containsExactly(
             "FALSE_POSITIVE", "TRUE_MATCH_REVIEW", "POSSIBLE_MATCH_EDD", "NEED_MORE_INFO");
-    assertThat(lovs.activeValues("SCR_STR_REASON", TODAY)).isEmpty();
+    // SQ09: no AMLC reason code yet; the demo profile seeds placeholder codes DEMO01-03 (V1952).
+    assertThat(lovs.activeValues("SCR_STR_REASON", TODAY))
+        .extracting(LovValue::getCode)
+        .allMatch(code -> code.startsWith("DEMO"));
     assertThat(lovs.activeValues("UAM_BUSINESS_UNIT", TODAY)).isEmpty();
   }
 

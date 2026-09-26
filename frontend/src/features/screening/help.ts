@@ -22,6 +22,25 @@ export const SCREENING_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Cases',
+      path: '/screening/cases',
+      summary:
+        'The screening cases by tab (My Cases, Team, For Approval, Committee, STR, Closed, All) with the stage, assignee and SLA badge; open a case for its matches, review form, documents, decisions, STR and timeline.',
+      workflow: [
+        'A case is opened by itself when screening records a match at or above the case threshold, when a risk rule sets a category that needs a case, or when an account is submitted; a new match joins the open case of the same client and type.',
+        'The investigator (assigned by the assignment matrix) completes the review form, uploads the KYC documents and submits with a disposition; Need More Info sends it back to the account officer.',
+        'The unit head approves or disapproves with a reason; Compliance closes it, returns it to the investigator or refers it to the AML Committee, which decides by majority (rule SCR_COMMITTEE_RULE, size SCR_COMMITTEE_SIZE); a decision to report opens the STR stage.',
+        'The job SCR_SLA_MONITOR sends a reminder before the due time of the stage and, when it passes, raises SCR_SLA_BREACH and escalates to the role of the SLA matrix.',
+        'Re-assign moves a case to another eligible user with a reason (SCR_REASSIGN_REASON); Re-open brings a closed case back to Compliance review with a reason.',
+      ],
+      controls: [
+        'Search needs at least 3 characters; the tab and filters stay in the address so a list can be shared.',
+        'A submission is refused while the mandatory review fields or the documents required by the validation rules are missing.',
+        'The investigator of a case can never approve it at a later stage, and a committee member votes once per round (four-eyes).',
+        'Every step, reason and vote is kept in the case timeline, which cannot be changed.',
+      ],
+    },
+    {
       name: 'Matches',
       path: '/screening/matches',
       summary:
@@ -51,6 +70,35 @@ export const SCREENING_HELP: HelpSection = {
       controls: [
         'The batch screens only the client statuses of parameter SCR_SCREENING_SCOPE (prospects and confirmed clients); inactive clients are never screened.',
         'Without active matching criteria no run starts and the alert SCR_NO_ACTIVE_CONFIG is raised.',
+      ],
+    },
+    {
+      name: 'High-risk Clients',
+      path: '/screening/high-risk',
+      summary:
+        'The clients rated high risk or tagged PEP or Watchlist Review, with their risk category, when and how they were tagged, their open screening case, active policy and marketing unit.',
+      workflow: [
+        'Filter by risk category, marketing unit or client type.',
+        'Export the list to Excel or PDF (report SCR-HIGH-RISK-CLIENTS) with SCR_REPORT_VIEW.',
+      ],
+      controls: [
+        'The list reads the risk profile set by screening; ratings and tags are changed only on a match or a case, with a justification.',
+      ],
+    },
+    {
+      name: 'STR',
+      path: '/screening/str',
+      summary:
+        'The register of suspicious transaction reports by status (Draft, For Approval, Approved, Extracted, Filed), the extraction batches and their files.',
+      workflow: [
+        'Compliance prepares the STR on the STR tab of the case: the reason codes, the template fields and the transactions (prefilled from the client accounts), then marks it ready.',
+        'Extract Approved STRs lists the AML Committee-approved STRs of a period and writes them to one file in the AMLC layout (SCR_STR_EXTRACT); the file is archived with its SHA-256.',
+        'After filing on the AMLC portal, Record Filing on the case stores the AMLC reference and filing date; the STR becomes Filed and the case closes.',
+      ],
+      controls: [
+        'Only committee-approved STRs are extracted; extracting one again needs a reason and is logged as a re-extraction.',
+        'The AMLC reference is unique and the filing date cannot be before the extraction or in the future.',
+        'The STR reason list (SCR_STR_REASON) and the AMLC layout are to be supplied by BDOI (SQ09); the demo uses placeholder reasons.',
       ],
     },
   ],

@@ -1,4 +1,4 @@
-import { History, ShieldAlert, UserSearch } from 'lucide-react';
+import { FileWarning, FolderSearch, History, ShieldAlert, ShieldX, UserSearch } from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -20,6 +20,21 @@ export const screeningModule: FeatureModule = {
       component: lazy(() => import('./ScreeningHomePage')),
     },
     {
+      path: '/screening/cases',
+      label: 'Cases',
+      icon: FolderSearch,
+      permission: 'SCR_VIEW',
+      component: lazy(() => import('./cases/CasesPage')),
+    },
+    {
+      path: '/screening/cases/:id',
+      label: 'Screening Case',
+      icon: FolderSearch,
+      permission: 'SCR_VIEW',
+      hidden: true,
+      component: lazy(() => import('./cases/CasePage')),
+    },
+    {
       path: '/screening/matches',
       label: 'Matches',
       icon: UserSearch,
@@ -32,6 +47,21 @@ export const screeningModule: FeatureModule = {
       icon: History,
       permission: 'SCR_VIEW',
       component: lazy(() => import('./matches/RunsPage')),
+    },
+    {
+      path: '/screening/high-risk',
+      label: 'High-risk Clients',
+      icon: ShieldX,
+      permission: 'SCR_VIEW',
+      component: lazy(() => import('./cases/HighRiskPage')),
+    },
+    {
+      path: '/screening/str',
+      label: 'STR',
+      icon: FileWarning,
+      permission: 'SCR_COMPLIANCE_REVIEW',
+      alsoPermissions: ['SCR_STR_EXTRACT', 'SCR_AUDIT_VIEW'],
+      component: lazy(() => import('./str/StrPage')),
     },
   ],
 };

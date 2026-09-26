@@ -174,7 +174,7 @@ class ScreeningUserAccessFoundationIT {
     // SQ09: no AMLC reason code yet; the seed profile seeds placeholder codes RSN01-03 (V1952).
     assertThat(lovs.activeValues("SCR_STR_REASON", TODAY))
         .extracting(LovValue::getCode)
-        .allMatch(code -> code.startsWith("SEED"));
+        .allMatch(code -> code.startsWith("RSN"));
     assertThat(lovs.activeValues("UAM_BUSINESS_UNIT", TODAY)).isEmpty();
   }
 

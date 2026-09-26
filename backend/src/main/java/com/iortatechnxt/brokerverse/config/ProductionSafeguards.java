@@ -2,7 +2,7 @@ package com.iortatechnxt.brokerverse.config;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.regex.Pattern;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
 import org.springframework.boot.env.EnvironmentPostProcessor;
@@ -45,8 +45,11 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
   public static final String PRODUCTION = "production";
 
   private static final int MIN_SECRET_LENGTH = 32;
-  private static final List<String> DEVELOPMENT_MARKERS =
-      List.of("change-me", "local-", "test-secret", "seed-profile");
+  private static final Pattern PRODUCTION_KIND =
+      Pattern.compile(PRODUCTION, Pattern.CASE_INSENSITIVE);
+  private static final String SASL = "SASL";
+  private static final Pattern DEVELOPMENT_VALUE =
+      Pattern.compile("change-me|local-|test-secret|seed-profile", Pattern.CASE_INSENSITIVE);
 
   @Override
   public void postProcessEnvironment(
@@ -102,7 +105,7 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
   public static boolean isProduction(Environment environment) {
     String kind = environment.getProperty(ENVIRONMENT_PROPERTY, "");
     return environment.acceptsProfiles(Profiles.of(PROD_PROFILE))
-        || PRODUCTION.equals(kind.trim().toLowerCase(Locale.ROOT));
+        || PRODUCTION_KIND.matcher(kind.trim()).matches();
   }
 
   private static void requireSecrets(Environment env, List<String> problems) {
@@ -130,7 +133,7 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
     }
     if (enabled(env, "brokerverse.kafka.enabled", true)) {
       String protocol = env.getProperty("spring.kafka.properties.security.protocol", "");
-      if (!protocol.toUpperCase(Locale.ROOT).startsWith("SASL")) {
+      if (!protocol.regionMatches(true, 0, SASL, 0, SASL.length())) {
         problems.add(
             "BROKERVERSE_KAFKA_SECURITY_PROTOCOL must be SASL_SSL (or SASL_PLAINTEXT) in production");
       }
@@ -154,7 +157,6 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
   }
 
   private static boolean isDevelopmentValue(String secret) {
-    String lower = secret.toLowerCase(Locale.ROOT);
-    return DEVELOPMENT_MARKERS.stream().anyMatch(lower::contains);
+    return DEVELOPMENT_VALUE.matcher(secret).find();
   }
 }

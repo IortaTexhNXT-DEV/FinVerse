@@ -31,7 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Broking document features on top of {@link AttachmentService} (BRNB.026/055/056): document types,
  * several files in one upload, inherited or nominated file names, one file linked to several
- * records (no copy: the file, its checksum and audit trail stay unique) and ZIP download.
+ * records (no copy: the file, its checksum and audit trail stay unique) and ZIP download. Lists,
+ * downloads and ZIP files apply the document access classes (BRID-025, {@link
+ * DocumentAccessPolicy}); uploads and links may carry a process tag.
  */
 @Service
 @Transactional
@@ -49,6 +51,7 @@ public class DocumentService {
   private final DocumentNamingService naming;
   private final LovService lovs;
   private final AuditTrailService audit;
+  private final DocumentAccessPolicy access;
   private final Clock clock;
 
   /**
@@ -60,6 +63,7 @@ public class DocumentService {
    * @param naming file naming
    * @param lovs lists of values (document types)
    * @param audit audit trail
+   * @param access document access classes (BRID-025)
    * @param clock clock
    */
   public DocumentService(
@@ -69,6 +73,7 @@ public class DocumentService {
       DocumentNamingService naming,
       LovService lovs,
       AuditTrailService audit,
+      DocumentAccessPolicy access,
       Clock clock) {
     this.attachments = attachments;
     this.repository = repository;
@@ -76,17 +81,30 @@ public class DocumentService {
     this.naming = naming;
     this.lovs = lovs;
     this.audit = audit;
+    this.access = access;
     this.clock = clock;
   }
 
   /**
-   * Documents of a record: its own files and the files linked to it, oldest first.
+   * Documents of a record the current user may see: its own files and the files linked to it,
+   * oldest first, without the documents whose access class excludes the user (BRID-025).
    *
    * @param target record
    * @return attachments
    */
   @Transactional(readOnly = true)
   public List<Attachment> list(AttachmentTarget target) {
+    return access.visible(all(target));
+  }
+
+  /**
+   * Every document of a record whatever the access classes (mandatory-document checks, naming).
+   *
+   * @param target record
+   * @return attachments, oldest first
+   */
+  @Transactional(readOnly = true)
+  public List<Attachment> all(AttachmentTarget target) {
     List<Attachment> own = attachments.list(target);
     List<Long> linkedIds =
         links.findByEntityTypeAndEntityId(target.entityType(), target.entityId()).stream()
@@ -110,7 +128,7 @@ public class DocumentService {
    */
   @Transactional(readOnly = true)
   public Set<String> documentTypesOf(AttachmentTarget target) {
-    return list(target).stream()
+    return all(target).stream()
         .map(Attachment::getDocumentType)
         .filter(Objects::nonNull)
         .collect(Collectors.toSet());
@@ -128,7 +146,7 @@ public class DocumentService {
       AttachmentTarget target, List<UploadedFile> files, UploadOptions options) {
     String type = requireValid(files, options);
     int sequence =
-        (int) list(target).stream().filter(a -> Objects.equals(type, a.getDocumentType())).count();
+        (int) all(target).stream().filter(a -> Objects.equals(type, a.getDocumentType())).count();
     List<Attachment> saved = new ArrayList<>();
     for (UploadedFile file : files) {
       String name =
@@ -137,6 +155,7 @@ public class DocumentService {
               : file.name();
       Attachment a = attachments.upload(target, name, file.content(), options.description());
       a.classify(type);
+      a.tagProcess(blankToNull(options.processTag()));
       saved.add(a);
     }
     return saved;
@@ -166,6 +185,19 @@ public class DocumentService {
    * @return the file
    */
   public Attachment link(Long attachmentId, List<AttachmentTarget> targets) {
+    return link(attachmentId, targets, null);
+  }
+
+  /**
+   * Links an uploaded file to further records in the context of a process (BRID-025: the link
+   * carries the process tag, e.g. an EB renewal placement).
+   *
+   * @param attachmentId file
+   * @param targets records to link
+   * @param processTag process code of the owning module, null when none
+   * @return the file
+   */
+  public Attachment link(Long attachmentId, List<AttachmentTarget> targets, String processTag) {
     Attachment file = attachments.get(attachmentId);
     for (AttachmentTarget target : targets) {
       boolean own =
@@ -177,7 +209,7 @@ public class DocumentService {
         continue;
       }
       attachments.list(target); // validates the target's type and id
-      links.save(new AttachmentLink(attachmentId, target));
+      links.save(new AttachmentLink(attachmentId, target, blankToNull(processTag)));
       audit.record(
           ENTITY,
           attachmentId,
@@ -226,8 +258,20 @@ public class DocumentService {
   }
 
   /**
+   * Downloads one document the current user may see (access classes, BRID-025); the file is
+   * checksum-verified and its download audited.
+   *
+   * @param id attachment id
+   * @return metadata and bytes
+   */
+  public AttachmentFile download(Long id) {
+    access.requireView(attachments.get(id));
+    return attachments.download(id);
+  }
+
+  /**
    * Several documents in one ZIP file (BRNB.056); each file is checksum-verified and its download
-   * audited.
+   * audited. A document the user may not see refuses the whole ZIP (BRID-025).
    *
    * @param ids attachment ids
    * @return ZIP bytes
@@ -241,7 +285,7 @@ public class DocumentService {
     Set<String> names = new HashSet<>();
     try (ZipOutputStream zip = new ZipOutputStream(bytes)) {
       for (Long id : ids) {
-        AttachmentFile file = attachments.download(id);
+        AttachmentFile file = download(id);
         zip.putNextEntry(new ZipEntry(uniqueName(names, file.metadata().getFileName())));
         zip.write(file.content());
         zip.closeEntry();
@@ -285,7 +329,26 @@ public class DocumentService {
    * @param nominate rename the files with the naming syntax
    * @param reference business reference used in nominated names (ARN...)
    * @param description description of the files
+   * @param processTag process the documents belong to (BRID-025), may be empty
    */
   public record UploadOptions(
-      String documentType, boolean nominate, String reference, String description) {}
+      String documentType,
+      boolean nominate,
+      String reference,
+      String description,
+      String processTag) {
+
+    /**
+     * Options without a process tag.
+     *
+     * @param documentType document type, may be empty
+     * @param nominate rename the files with the naming syntax
+     * @param reference business reference used in nominated names
+     * @param description description of the files
+     */
+    public UploadOptions(
+        String documentType, boolean nominate, String reference, String description) {
+      this(documentType, nominate, reference, description, null);
+    }
+  }
 }

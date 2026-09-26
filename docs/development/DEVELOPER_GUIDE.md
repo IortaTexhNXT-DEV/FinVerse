@@ -111,7 +111,7 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
   | V755 | Product Maintenance (BRD-3) foundation: roles, grants, permission action classes (`sec_permission_action`), LOV types, workflow `PM_PACKAGE_REQUEST`, parameters |
   | V760–V789 | Operations (BRD-2): foundation, invoice ledger and platform extensions V760–V762, then cashiering, remittance, product reconciliation, adjustment and commission receivables in their own sub-ranges |
   | V800–V889 | broking business modules (crm V800s, catalog V810s, account V820s, quotation V830s, non-package V840s, placement V850s, issuance V860s, booking V870s, NB reports V880s) |
-  | V813–V819 | catalog extensions and Product Maintenance (catalog V813–V815, `productmaint` V816–V819); the version columns of account, quotation and booking are V821, V831 and V871 in their own ranges. Planned contract changes of later BRDs in the owners' ranges (designed, not built): V822 account business type (work item BT0, shared by Renewal, Employee Benefits and Submitted Policies), V851 placement hold-cover re-assignment and V861 issuance extraction kind (Submitted Policies); see `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
+  | V813–V819 | catalog extensions and Product Maintenance (catalog V813–V815, `productmaint` V816–V819); the version columns of account, quotation and booking are V821, V831 and V871 in their own ranges. Planned contract changes of later BRDs in the owners' ranges (V822 built): V822 account business type (work item BT0, shared by Renewal, Employee Benefits and Submitted Policies; built by EB E0), and (designed, not built) V851 placement hold-cover re-assignment and V861 issuance extraction kind (Submitted Policies); see `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
   | V890–V899 | Accounting, Disbursement and ACSL (BRD-5): disbursement V891–V893, payrequest V894–V895, acsl V896–V897, frbs V898–V899, foundation V890 |
   | V1000–V1899 | modules of later BRDs, 10 versions each: Collections (BRD-4) V1000–V1009, Renewal V1010–V1019, broking Claims V1020–V1029, Employee Benefits V1030–V1039, Customer Servicing Facility V1040–V1049, Sanction Screening and Risk Profiling V1050–V1059, User Access Maintenance V1060–V1069, Submitted Policies V1070–V1079, Data Migration (BRD-13) V1080–V1089, Core Replacement platform items (BRD-00 umbrella) V1090–V1099; the next BRD V1100–V1109 and so on. Data Migration uses V1086 (`opsledger`, whose range V760–V763 is full) and V1087 (`acsl`, range full) for the owners; its other owner changes go into the owners' free versions: V766 cashiering, V786 commission, V803 crm, V823 account (after BT0 V822), V873 booking, V1007 collections (designed, not built; see [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md) §24). Core Replacement waves CR-W0 to CR-W5 use V1090–V1096, V1097–V1099 reserved ([`CORE_REPLACEMENT_IMPACT.md`](../architecture/CORE_REPLACEMENT_IMPACT.md) §8) |
   | V900–V999 | demo data (`db/demo`, loaded only with the `demo` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989, Operations V990–V995, Product Maintenance V996–V998 (V996 catalog versions, V997 package requests, V998 Product Maintenance users), Accounting / Disbursement V999 (reference data and users only; its storyline runs as Java demo runners) (full) |
@@ -332,7 +332,7 @@ Planned jobs of the later BRDs (designed, not built; names, schedules and cron p
 |---|---|---|
 | `renewal` | `RNW_EXTRACTION`, `RNW_REEVALUATE`, `RNW_NRNS_LETTERS`, `RNW_EXPIRY_SWEEP` (daily); `RNW_LETTER_BATCH` (manual) | `RENEWAL_DESIGN.md` §9 |
 | `brokerclaims` | `BCL_FOLLOW_UP_DUE`, `BCL_PREMIUM_RECHECK`, `BCL_AGEING_ALERTS` (daily; crons `brokerverse.jobs.bcl-*-cron` configured since CL0) | `CLAIMS_BROKING_DESIGN.md` §9.1 |
-| `eb`, `portal` | `EB_RENEWAL_ADVICE`, `EB_ITEM_FOLLOWUP`, `PORTAL_INVITATION_EXPIRY` (daily) | `EMPLOYEE_BENEFITS_DESIGN.md` §8.1 |
+| `eb` | `EB_RENEWAL_ADVICE`, `EB_ITEM_FOLLOWUP` (daily; crons `brokerverse.jobs.eb-*-cron` configured since E0; jobs built by E1-C). `PORTAL_INVITATION_EXPIRY` is parked with the partner portal (BDOI Drop 2 has no portal) | `EMPLOYEE_BENEFITS_DESIGN.md` §8.1, §16 |
 | `csf` | `CSF_LEGACY_SYNC` (every 15 minutes; manual until `CSF_LEGACY_SYNC_ENABLED`) | `CUSTOMER_SERVICING_DESIGN.md` §7 |
 | `screening` | `SCR_WATCHLIST_INGEST`, `SCR_PERIODIC_SCREENING` (daily), `SCR_SLA_MONITOR` (hourly), `SCR_INGEST_ERROR_DIGEST` (working days) | `SANCTION_SCREENING_DESIGN.md` §8 |
 | `security` / `nbadmin` (User Access) | `UAM_EFFECTIVE_CHANGES`, `PASSWORD_EXPIRY_NOTICE` (daily) | `USER_ACCESS_DESIGN.md` §8 |
@@ -354,6 +354,20 @@ Any record can carry documents: frontend `<Attachments entityType="Policy" entit
 stored in PostgreSQL with SHA-256 checksum, type/signature and size checks
 (`brokerverse.attachments.max-size`, default 10 MB) and audit entries. Malware scanning: add a bean
 implementing `attachment.service.VirusScanner`. Permissions `ATTACHMENT_VIEW` / `ATTACHMENT_MANAGE`.
+
+- **Access classes** (BRID-025, cross-BRD work item P3, V1031): `att_document_access` lists, per
+  document type, the permissions that may see documents of the type (with the department:
+  MARKETING, PROCESSING, COLLECTION, CLAIMS, SERVICING, AUDIT). `DocumentService.list`, `download` and
+  `zip` (and the API) apply them through `DocumentAccessPolicy`; a refused download is `403` and an
+  audit entry (REJECT). Types without rows keep the old behaviour; background jobs are not
+  restricted. Internal checks that need every document (mandatory documents) use
+  `DocumentService.all` / `documentTypesOf`. Seeded: the 16 EB types, `RENEWAL_ADVICE` and
+  `CLAIM_REPORT` (final matrix XQ04).
+- **Process tag**: `UploadOptions.processTag` (API parameter `processTag`) on the file and
+  `DocumentService.link(id, targets, processTag)` on each link; free code of the owning module (EB:
+  list `EB_PROCESS_TYPE`).
+- **Word protection**: `messaging.service.DocumentProtector` protects PDF, XLSX and DOCX (Office agile
+  encryption); other types are refused with `DOCUMENT_NOT_PROTECTABLE`.
 
 ### 10.6 Executive dashboard – `dashboard`
 
@@ -482,8 +496,8 @@ code; cross-BRD decisions and the build order are in
 |---|---|---|---|
 | `renewal` | BRD-6 Renewal | V1010–V1017 (V1910–V1911) | [`RENEWAL_DESIGN.md`](../architecture/RENEWAL_DESIGN.md) |
 | `brokerclaims` | BRD-7 Claims (being built: foundation CL0 V1020, V1021, V1920 done; CL1-A V1022, V1921; CL1-B V1023, V1024; V1025 held for the legacy migration, CLQ14) | V1020–V1024 (V1920–V1921) | [`CLAIMS_BROKING_DESIGN.md`](../architecture/CLAIMS_BROKING_DESIGN.md) |
-| `eb` | BRD-8 Employee Benefits | V1030, V1031, V1033–V1036 (V1930–V1932) | [`EMPLOYEE_BENEFITS_DESIGN.md`](../architecture/EMPLOYEE_BENEFITS_DESIGN.md) |
-| `portal` (platform) | BRD-8 Employee Benefits | V1032 | [`EMPLOYEE_BENEFITS_DESIGN.md`](../architecture/EMPLOYEE_BENEFITS_DESIGN.md) |
+| `eb` | BRD-8 Employee Benefits, Drop 2 without the partner portal (being built: foundation E0 V1030, V1031, V1033 done, with the shared work item BT0 V822 and the platform items P2 / P3; E1-B V1034; E1-C V1035, V1036) | V1030, V1031, V1033–V1036 (V1930–V1932) | [`EMPLOYEE_BENEFITS_DESIGN.md`](../architecture/EMPLOYEE_BENEFITS_DESIGN.md) §16 |
+| `portal` (platform) | BRD-8 Employee Benefits partner portal (parked: BDOI Drop 2 is "Employee Benefits (No Portal Feature)"; V1032 stays reserved) | V1032 | [`EMPLOYEE_BENEFITS_DESIGN.md`](../architecture/EMPLOYEE_BENEFITS_DESIGN.md) §16 |
 | `csf` | BRD-9 Customer Servicing Facility | V1040–V1042 (V1940) | [`CUSTOMER_SERVICING_DESIGN.md`](../architecture/CUSTOMER_SERVICING_DESIGN.md) |
 | `submitted` | BRD-12 Submitted Policies | V1070–V1076 (V1970–V1972) | [`SUBMITTED_POLICIES_DESIGN.md`](../architecture/SUBMITTED_POLICIES_DESIGN.md) |
 | `migration` | BRD-13 Data Migration (owner changes V766, V786, V803, V823, V873, V1007, V1086, V1087 in the owners' modules) | V1080–V1087 (V1980–V1982) | [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md) |

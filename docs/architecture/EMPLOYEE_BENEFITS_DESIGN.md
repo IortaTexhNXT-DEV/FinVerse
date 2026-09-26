@@ -355,3 +355,176 @@ Parallel-work rules:
 3. **Boundary with the Renewal BRD.** Two renewal processes could send two RAs to the same client. Mitigation (decided, D3): EB lines excluded from the Renewal lists (EBQ28), one document type `RENEWAL_ADVICE` for every RA.
 4. **Shared platform changes** (attachment access classes, DOCX export, business type on the account) touch every module. Mitigation: they are cross-BRD prerequisite work items (`BDOI_CROSS_BRD_DECISIONS.md` section 6); the business type is BT0 (V822), built once; E0 lands the access classes and DOCX export with defaults that keep today's behaviour.
 5. **Undefined thresholds and TATs.** Mitigation: every value is a parameter or a rule row.
+
+## 16. E0 foundation: as built (BDOI Drop 2, no portal)
+
+What the E0 wave built, and where it details or differs from the sections above. E1-B and E1-C build on this and
+compile only against it.
+
+### 16.1 Scope change: "Employee Benefits (No Portal Feature)"
+
+BDOI's drop plan puts Employee Benefits in Drop 2 **without the partner portal**. Parked with the portal (no seam built;
+the E1-A wave is deferred): the `portal` module and `V1032` (version kept reserved), the portal realm and second filter
+chain (6.3), the portal permissions `PORTAL_USER_REQUEST`, `PORTAL_USER_APPROVE`, `PORTAL_ADMIN` (not added to
+`Permission`: adding `PORTAL_USER_APPROVE` would switch the approver of EXTERNAL User Access requests in
+`nbadmin.service.AccessApprovers`), the ports of 2.2, the workflow `PORTAL_UPLOAD_REVIEW`, the `PORTAL_*` parameters,
+alert codes, reject reasons, notification event and invitation template, the job `PORTAL_INVITATION_EXPIRY`, the portal
+SPA (10.2), the Portal Uploads queue and the Portal Users screen. The `nbadmin` port `ExternalUserProvisioner` keeps its
+refusing default. What changes for the business waves:
+
+| Feature | With the portal (design) | Drop 2 (as-built contract) | Wave |
+|---|---|---|---|
+| Client feedback, master list, utilization, member change requests from client HR | Portal uploads, staged and validated | Received by e-mail; the AO uploads them on the programme or member change with source `CLIENT` (`EbDocumentSource`); the master list through the bulk handler `EB_MASTERLIST` | E1-B, E1-C |
+| Insurer proposals and revisions | Structured portal form, SUBMITTED until validated | The AO enters the proposal (source `AO`, the insurer's e-mail attached as `EML` / `MSG` or PDF) and validates it | E1-B |
+| Franchise decision | Insurer approves or rejects in the portal | The AO records the insurer's decision with the evidence (`EB_FRANCHISE` actions `approve` / `reject`, reason list `EB_FRANCHISE_REJECT_REASON`) | E1-B |
+| Comparative comments and confirmation | Client comments and confirms in the portal (channel SYSTEM) | Channels EMAIL and SIGNED_DOCUMENT only; the AO records the confirmation with its evidence | E1-B |
+| Member change billing, policy forms, SOA | Insurer uploads | Processing or the AO upload them (`EB_DIRECT_BILLING`, `EB_POLICY_FORM`, `EB_SOA`, source `INSURER`) | E1-C |
+| Notices to insurers and clients | Portal inbox and e-mail | E-mail only (the templates of 8.4 say "by e-mail") | E1-B, E1-C |
+| EB Home tile "Portal uploads to review", alert `PORTAL_UPLOAD_WAITING` | Built | Not built | - |
+| `EbUploadTargets`, `EbPortalTasks`, `eb/api/portal/**`, portal demo users | E2 | Not built; E2 keeps the demo storyline and the end-to-end tests of the internal flow | E2 |
+
+### 16.2 Shared work item BT0 (built here)
+
+EB E0 was the first of S0 / R0 / E0 to start, so it built BT0 as section 6.1 of the cross-BRD decisions, in its own
+commit:
+
+- `V822__account_business_type.sql`: `acc_account.business_type` varchar(20) NOT NULL default `NEW_BUSINESS` (check
+  NEW_BUSINESS / RENEWAL), `renewal_of_ref` varchar(40) (check: only a RENEWAL names it), `origin` varchar(30) NOT NULL
+  default `DIRECT` (check QUOTATION, PROPOSAL, DIRECT, SUBMITTED_POLICY, EMPLOYEE_BENEFITS, RENEWAL; existing rows
+  derived from `quotation_ref` / `proposal_ref`); indexes (company, business_type, status) and `renewal_of_ref`.
+- `account.domain`: `BusinessType` (NEW_BUSINESS, RENEWAL), `AccountOrigin` (+ `AccountOrigin.of(Account.Origin)`),
+  embeddable `AccountClassification(businessType, renewalOfRef, origin)` with `newBusiness(origin)` and `renewal()`;
+  `Account.getBusinessType()`, `Account.getClassification()`; `Account.create(..., classification)`.
+- `NewAccount` gains the component `classification` (null = new business of the references' kind). The 6- and
+  8-argument constructors and `NewAccount.direct` are unchanged and create NEW_BUSINESS. New factories:
+  `NewAccount.newBusiness(companyId, AccountOrigin origin, draft, premium, accountOfficer)` (EB new-business cycles use
+  origin `EMPLOYEE_BENEFITS`), `NewAccount.renewal(companyId, AccountOrigin origin, draft, renewalOfRef,
+  accountOfficer)` and the overload `NewAccount.renewal(..., Integer productVersionNo)`; `NewAccount.businessType()`.
+- `AccountService.createDraft`: a RENEWAL request stamps the kept version before rating; `AccountPricing` rates a
+  RENEWAL account with `RatingQuery.Purpose.RENEWAL` and the account's `productVersionNo` (SchemeResolver: that version
+  while RELEASED or SUPERSEDED, else the current one); `requireScheme` uses the same purpose.
+- `AccountResponse` + `businessType`, `renewalOfRef`, `origin`; `AccountSummaryResponse` + `businessType`;
+  `AccountSearch` 16th component `businessType` (the 15-argument constructor stays); `GET /api/v1/accounts?businessType=`.
+- Bulk `ACCOUNT_CREATE`: optional columns `Business Type` (NEW_BUSINESS default or RENEWAL, case-insensitive; error
+  "Business Type must be NEW_BUSINESS or RENEWAL") and `Renewal Of`.
+- Booking: `InvoiceBuilder` uses `booking.domain.BusinessType.of(account.getBusinessType())` for every policy year;
+  `InvoiceBooked` gains the last component `businessType` (NEW_BUSINESS when null; the 27- and 28-argument constructors
+  stay). The integration payload of `BookingEventAdapter` is unchanged (to add when ACSL needs it).
+- `nbreport`: parameter `businessType` (select ALL / NEW_BUSINESS / RENEWAL, label "Business Type") on `NB-BOOKED-REG`
+  (`bkg_invoice.business_type`), `NB-PRODUCTION` (`ProductionService.production(..., String businessType)`; targets
+  unchanged) and `NB-PLC-UPDATE` (`acc_account.business_type`).
+- Frontend: `api/accounts.ts` types `BusinessType` and `AccountOrigin`; filter "Business Type" on the account work
+  list; a "Renewal" tag on the account record.
+
+Renewal R0 and Submitted Policies S0 only check that BT0 is merged. Renewal still adds its fast track,
+`QueueSource.RENEWAL` and the quotation / proposal `renewalRef` (RENEWAL_DESIGN section 13). Submitted Policies uses
+origin `SUBMITTED_POLICY` with `renewal_of_ref` = SBM number.
+
+### 16.3 Platform items P2 / P3 and the booking billing number
+
+- **P2 (DOCX).** Report export in Word was already built (Developer Guide 6.1-6.2). E0 adds DOCX to
+  `messaging.service.DocumentProtector` (Office agile encryption, as XLSX); the refusal message is now
+  "`<file>` cannot be password protected. Send it as PDF, Excel or Word" (FRS FR-EB-004).
+- **P3 (access classes), V1031.** `att_document_access` (document_type, permission, access_class MARKETING, PROCESSING,
+  COLLECTION, CLAIMS, SERVICING or AUDIT; unique type + permission). Entity `DocumentAccess`, component
+  `attachment.service.DocumentAccessPolicy` (`visible`, `mayView`, `requireView`, `rows`). `DocumentService.list`
+  filters; `DocumentService.download(id)` (new; the API download uses it) and `zip` refuse with `AccessDeniedException`
+  (403) and an audit entry (action REJECT, recorded in its own transaction); `DocumentService.all(target)` and
+  `documentTypesOf` stay unfiltered for mandatory-document checks. No authenticated user (jobs) means unrestricted.
+  Process tag: `doc_attachment.process_tag` and `doc_attachment_link.process_tag` (the design's `att_attachment_link` is
+  the existing `doc_attachment_link`); `UploadOptions.processTag` (5th component, 4-argument constructor kept), API
+  parameter `processTag` on upload and batch upload, `LinkRequest.processTag`, `DocumentService.link(id, targets,
+  processTag)`, `AttachmentResponse.processTag`. Rows: MARKETING = EB_MARKET, EB_COMPARATIVE_APPROVE,
+  EB_THRESHOLD_APPROVE; PROCESSING = EB_PROCESS; COLLECTION = EB_COLLECT; AUDIT_VIEW on every EB type; the 16 EB types
+  as spec 6.1; `RENEWAL_ADVICE`: the EB Marketing permissions, `RNW_VIEW`, `ACCOUNT_MAINTAIN`, EB_PROCESS,
+  `ACCOUNT_PROCESS`, `CSF_VIEW`, AUDIT_VIEW; `CLAIM_REPORT`: `BCL_VIEW`, `BCL_REPORT_VIEW`, `CSF_VIEW`, AUDIT_VIEW (final
+  matrix XQ04). `RNW_VIEW` and `CSF_VIEW` take effect when Renewal and CSF grant them.
+- **Billing number (BRID-020).** `bkg_invoice.insurer_billing_no` varchar(60) + unique partial index
+  `uq_bkg_invoice_billing_no` (company_id, insurer_code, insurer_billing_no) where not null. `BookingOptions` 5th
+  component `insurerBillingNo` (+ `withBillingNo`), `BookRequest.insurerBillingNo`, `InvoiceResponse.insurerBillingNo`,
+  `BookedInvoice.recordInsurerBillingNo` / `getInsurerBillingNo` (first-year invoice), component
+  `booking.service.InsurerBillingNumbers`: `BILLING_NO_REQUIRED` "Enter the insurer billing number" for the lines of
+  parameter `BOOKING_BILLING_NO_LINES` (CODE_LIST, default `HMO,GLI,GPA`, category BOOKING), `BILLING_NO_TOO_LONG`,
+  `BILLING_NO_DUPLICATE` "Billing number `<no>` of `<insurer>` is already on invoice `<invoice>`"; notifications to the
+  booker and the account officer (`BOOKING_BILLING_BOOKED`; `BOOKING_BILLING_DUPLICATE` in its own transaction); audit
+  summary ", insurer billing no. `<no>`". `BOOKING_UPLOAD` optional column `Insurer Billing No`. Book Account screen
+  field "Insurer billing no."; the invoice record shows it.
+
+### 16.4 Employee Benefits foundation
+
+- **Permissions** (`security.domain.Permission`): `EB_VIEW`, `EB_MARKET`, `EB_COMPARATIVE_APPROVE`,
+  `EB_THRESHOLD_APPROVE`, `EB_PROCESS`, `EB_COLLECT`, `EB_SETUP`, `EB_REPORT_VIEW` (6.1 without the portal ones).
+- **`V1030__eb_foundation.sql`.** Roles `EB_AO`, `EB_TL`, `EB_MANAGEMENT`, `EB_PROCESSOR`, `EB_PROC_SUPERVISOR`,
+  `EB_COLLECTION`. Every EB role: EB_VIEW, EB_REPORT_VIEW, WORK_VIEW, ATTACHMENT_VIEW, REPORT_VIEW, CLIENT_VIEW,
+  ACCOUNT_VIEW; EB_AO + EB_MARKET, CLIENT_MAINTAIN, ACCOUNT_MAINTAIN, ATTACHMENT_MANAGE, BULK_PROCESS; EB_TL +
+  EB_COMPARATIVE_APPROVE, WORK_ASSIGN; EB_MANAGEMENT + EB_THRESHOLD_APPROVE; EB_PROCESSOR + every `PROCESSOR` grant,
+  EB_PROCESS, ATTACHMENT_MANAGE, BULK_PROCESS; EB_PROC_SUPERVISOR the same + WORK_ASSIGN; EB_COLLECTION + EB_COLLECT,
+  CLX_VIEW, CLX_WORK; BUSINESS_ADMIN + EB_VIEW, EB_REPORT_VIEW, EB_SETUP; SYSADMIN and AUDITOR + EB_VIEW,
+  EB_REPORT_VIEW. Action classes area `EMPLOYEE_BENEFITS`. LOV types (owner permission EB_SETUP): `EB_BENEFIT_LINE`
+  (HMO, GLI, GPA), `EB_TEAM` (BDO, SM, VOLUNTARY, SOLICITED, NEW_BUSINESS), `EB_PROCESS_TYPE` (NB_PLACEMENT,
+  RENEWAL_PLACEMENT, ENDORSEMENT, ADJUSTMENT, FRANCHISE, PROPOSAL), `EB_CAPABILITY_FACTOR` (4), `EB_LOST_REASON` (7),
+  `EB_MEMBER_CHANGE_TYPE` (ADD, DELETE, CHANGE_PLAN, CHANGE_DATA), `EB_TRACKED_ITEM_TYPE` (4),
+  `EB_FRANCHISE_REJECT_REASON` (4), `EB_SOA_REJECT_REASON` (4); the 16 `DOCUMENT_TYPE` values of spec 6.1 (`EB_*`, sort
+  101-116). Parameters (category EMPLOYEE_BENEFITS): those of 8.3 without `PORTAL_*`, with `EB_RA_REMINDER_DAYS` stored
+  ascending `90,105,120` (INTEGER_LIST rule), and the 15 `EB_TAT_*` of spec 6.3 (`EB_TAT_OR` = 5 working days for
+  "weekly"). Alert codes: the six `EB_*` of 8.2. Notification events (module EMPLOYEE_BENEFITS, sort 500-600; module
+  BOOKING 620-630): `EB_FEEDBACK_RECEIVED`, `EB_FRANCHISE_DECIDED`, `EB_PROPOSAL_RECEIVED`, `EB_COMPARATIVE_SIGNOFF`,
+  `EB_THRESHOLD_APPROVAL`, `EB_CLIENT_CONFIRMED`, `EB_PLACEMENT_TRIGGERED`, `EB_MEMBER_CHANGE_BILLED`, `EB_SOA_RELEASED`,
+  `EB_INVOICE_PAID`, `EB_ITEM_ESCALATED`, `BOOKING_BILLING_BOOKED`, `BOOKING_BILLING_DUPLICATE`. Templates v1: the ten
+  `EB_*` of 8.4 (placeholders in `{{...}}`, e-mail wording).
+- **Workflows** (stage.action -> stage; the permission documents the right; EB services call `systemTransition` after
+  their own checks):
+  - `EB_CYCLE`: the 17 stages of `EbCycleStage` (PLACED, CLOSED_LOST, NOT_RENEWED terminal). `OPEN.send_ra` -> RA_SENT,
+    `OPEN.start` -> REQUIREMENTS, `RA_SENT.record_feedback` -> REQUIREMENTS, `REQUIREMENTS.stay_with_incumbent` ->
+    INCUMBENT_TERMS, `REQUIREMENTS.remarket` -> FRANCHISE, `FRANCHISE.release_tor` -> PROPOSALS,
+    `INCUMBENT_TERMS|PROPOSALS|REVISION.build_comparative` -> COMPARATIVE, `COMPARATIVE.submit` -> FOR_SIGNOFF,
+    `FOR_SIGNOFF.approve` -> READY_TO_PRESENT and `FOR_SIGNOFF.approve_to_threshold` -> THRESHOLD_APPROVAL (one action
+    per target stage: the service picks it after evaluating the threshold rules), `FOR_SIGNOFF|THRESHOLD_APPROVAL.return`
+    -> COMPARATIVE, `THRESHOLD_APPROVAL.approve` -> READY_TO_PRESENT, `READY_TO_PRESENT.present` -> WITH_CLIENT,
+    `WITH_CLIENT.request_revision` -> REVISION, `WITH_CLIENT.confirm` -> CONFIRMED, `WITH_CLIENT.reconfirm_threshold`
+    -> THRESHOLD_APPROVAL (7.1: confirm re-evaluates the threshold rules), `CONFIRMED.trigger_placement` ->
+    IN_PLACEMENT, `IN_PLACEMENT.placed` -> PLACED. Generic, with reason list `EB_LOST_REASON`: `close_lost` from every
+    open stage up to CONFIRMED except FOR_SIGNOFF and THRESHOLD_APPROVAL, `not_renewed` from the renewal stages.
+  - `EB_FRANCHISE`: DRAFT, SUBMITTED, APPROVED, REJECTED, EXPIRED (terminal), ADVISED (terminal); `submit`, `approve`,
+    `reject` (reason `EB_FRANCHISE_REJECT_REASON`), `expire`, `advise`.
+  - `EB_MEMBER_CHANGE`: CAPTURED, RELAYED, BILLED, VALIDATED, CLOSED, CANCELLED; `relay`, `bill`, `validate`
+    (EB_PROCESS), `close`; generic `return` (RETURN_REASON) from RELAYED or BILLED to CAPTURED, `cancel` (VOID_REASON).
+  - `EB_SOA`: RECEIVED (SLA 72 h), VALIDATED, RELEASED, REJECTED; `validate`, `reject` (`EB_SOA_REJECT_REASON`),
+    `release`.
+- **`V1033__eb_programmes_cycles.sql` (moved into E0).** So that E1-B and E1-C start in parallel on the same core
+  records, E0 creates `eb_programme`, `eb_programme_line`, `eb_programme_contact`, `eb_cycle` (+ `eb_cycle_account`,
+  the ARNs created at placement; one open cycle per programme and policy year), `eb_document` (source AO, PROCESSING,
+  CLIENT, INSURER, SYSTEM) and `eb_activity_log`. **E1-B puts `eb_renewal_advice`, `eb_feedback` and `eb_bor` into its
+  V1034** with the marketing tables (section 3 listed them in V1033).
+- **Domain `eb.domain`** (contract): entities `EbProgramme` (+ `ClientRef`, `Profile`, `addLine`, `addContact`, `line`,
+  `markStatus`), `EbProgrammeLine` (+ `Data`), `EbProgrammeContact` (+ `Data`), `EbCycle` (business type required,
+  `mirror`, `recordOutcome`, `markRemarketing`, `recordAccount`, `isOpen`), `EbDocument` (+ `Place`, `supersede`,
+  `reject`), `EbActivity` (`release`); enums `EbCycleStage`, `EbCycleOutcome`, `EbProgrammeStatus`, `EbFunding`,
+  `EbContactRole`, `EbDocumentSource`, `EbDocumentStatus`, `TatActivity` (each with its TAT parameter); repositories
+  `EbProgrammeRepository`, `EbCycleRepository` (`findOpen`, `findByAccountArn`), `EbDocumentRepository`,
+  `EbActivityRepository`; constants `EbDocumentTypes` (types, process tags) and `EbCodes` (workflows, entity types
+  `EbProgramme`, `EbCycle`, `EbFranchise`, `EbMemberChange`, `EbSoa`, number prefixes, `series(prefix, year)`); event
+  `EbCycleStageChanged(cycleId, cycleNo, programmeId, from, to, action, reasonCode)`.
+- **Services `eb.service`**: `EbCycleMirror` (mirrors EB_CYCLE on `EbCycle`, publishes `EbCycleStageChanged`) and
+  `EbParameters` (typed readers of every EB parameter, `tatDays(TatActivity)`).
+- **Reports**: `ReportCategory.EMPLOYEE_BENEFITS` ("Employee Benefits") and `ReportMetadata.employeeBenefits(code,
+  title, description, parameters)` (view and export `EB_REPORT_VIEW`, archived; add `.asDocument()` for Word).
+- **Frontend** `features/eb`: section "Employee Benefits" in Client & Policy after Non-Package Management; routes `/eb`
+  (EB Home, landing with the tiles of `home/ebHomeTiles.ts`), `/eb/programmes`, `/eb/programmes/new`,
+  `/eb/programmes/:id` (hidden), `/eb/comparatives/:id` (hidden), `/eb/setup` (placeholders of E1-B),
+  `/eb/member-changes`, `/eb/pending-items`, `/eb/soa` (EB_PROCESS or EB_COLLECT; placeholders of E1-C);
+  `EbPlaceholder` / `EB_SECTION`; help `EB_HELP` registered after Non-Package Management.
+- **Crons**: `brokerverse.jobs.eb-renewal-advice-cron` (06:00 PHT) and `eb-item-followup-cron` (07:00 PHT); the jobs
+  are built by E1-C.
+
+### 16.5 Notes for FRS v1.1
+
+- FR-EB-002: the process tag refusal ("Select the process of the document") is EB's own check (E1-B / E1-C); the
+  platform stores any tag. A refused download is HTTP 403 "You are not permitted to open documents of type `<type>`".
+- FR-EB-004: code `DOCUMENT_NOT_PROTECTABLE`, message as in the FRS.
+- FR-EB-021: code `EB_BUSINESS_TYPE_REQUIRED` ("Select the business type of the cycle"); a second open cycle is refused
+  by the unique index (E1-B maps it to its message).
+- FR-EB-052: codes `BILLING_NO_REQUIRED`, `BILLING_NO_DUPLICATE`, `BILLING_NO_TOO_LONG`; the unique key uses the lead
+  insurer of the invoice (`bkg_invoice.insurer_code`).
+- Screen paths: the portal screens and "Portal Uploads" of the test plan are out of Drop 2; client and insurer
+  documents are uploaded by the EB users.

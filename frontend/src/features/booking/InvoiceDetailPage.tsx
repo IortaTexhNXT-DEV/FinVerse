@@ -102,6 +102,11 @@ function Summary({ invoice: i }: Readonly<{ invoice: BookedInvoice }>) {
           <SummaryFact icon={Landmark} label="Cost center">
             {i.facts.costCenter} <span className="muted">{i.facts.department}</span>
           </SummaryFact>
+          {i.insurerBillingNo && (
+            <SummaryFact icon={ReceiptText} label="Insurer billing no.">
+              {i.insurerBillingNo}
+            </SummaryFact>
+          )}
         </div>
       </div>
     </Card>

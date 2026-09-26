@@ -21,7 +21,8 @@ public enum ReportCategory {
   ACSL("ACSL"),
   FRBS("BDOI Report Pack"),
   COMPLIANCE("Compliance"),
-  CLAIMS_HANDLING("Claims Handling");
+  CLAIMS_HANDLING("Claims Handling"),
+  EMPLOYEE_BENEFITS("Employee Benefits");
 
   private final String label;
 

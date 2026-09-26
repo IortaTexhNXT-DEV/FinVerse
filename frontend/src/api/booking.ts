@@ -119,6 +119,8 @@ export interface BookedInvoice extends InvoiceDraft {
   bookedBy?: string;
   bookedAt?: string;
   journalBatches: string[];
+  /** Insurer billing number (BRID-020). */
+  insurerBillingNo?: string;
 }
 
 export interface PreviewLine {
@@ -168,6 +170,8 @@ export interface BookRequest {
   costCenter?: string;
   cwt2Percent?: boolean;
   shares?: Share[];
+  /** Insurer billing number (BRID-020): required for the lines of BOOKING_BILLING_NO_LINES. */
+  insurerBillingNo?: string;
 }
 
 export interface EnqueueResult {

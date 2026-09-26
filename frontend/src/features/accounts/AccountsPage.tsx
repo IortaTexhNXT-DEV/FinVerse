@@ -14,6 +14,12 @@ import { criteriaOf, EMPTY_PANEL as EMPTY, panelOf, QUICK_TABS } from './account
 import type { QuickFilter, SearchPanelValues as Panel } from './accountForm';
 import { AccountTable } from './AccountTable';
 
+/** Business type filter values (BRNB.097, shared work item BT0). */
+const BUSINESS_TYPE_OPTIONS = [
+  { value: 'NEW_BUSINESS', label: 'New Business' },
+  { value: 'RENEWAL', label: 'Renewal' },
+];
+
 /** The advanced filters of the account work list (BRNB.050 multi-criteria search). */
 function FilterPanel({
   initial,
@@ -59,6 +65,13 @@ function FilterPanel({
           value={panel.status}
           options={enumOptions(ACCOUNT_STATUSES)}
           onChange={(status) => set({ status })}
+        />
+        <SelectInput
+          label="Business Type"
+          blank="New business and renewal"
+          value={panel.businessType}
+          options={BUSINESS_TYPE_OPTIONS}
+          onChange={(businessType) => set({ businessType })}
         />
         <TextInput
           label="Starts On or After"

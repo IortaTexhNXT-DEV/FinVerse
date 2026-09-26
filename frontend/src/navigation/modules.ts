@@ -19,6 +19,7 @@ import { proposalsModule } from '@/features/proposals/module';
 import { quotationsModule } from '@/features/quotations/module';
 import { planningModule } from '@/features/closing/module';
 import { dashboardModule } from '@/features/dashboard/module';
+import { ebModule } from '@/features/eb/module';
 import { disbursementModule } from '@/features/disbursement/module';
 import { frbsModule } from '@/features/frbs/module';
 import { glModule } from '@/features/gl/module';
@@ -69,6 +70,8 @@ export const NAV_GROUPS: NavGroup[] = [
       quotationsModule,
       accountsModule,
       proposalsModule,
+      // Employee Benefits (BRD-8) after Non-Package Management, EMPLOYEE_BENEFITS_DESIGN 10.1.
+      ebModule,
       placementModule,
       issuanceModule,
       bookingModule,

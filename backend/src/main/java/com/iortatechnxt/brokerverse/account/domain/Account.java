@@ -163,10 +163,7 @@ public class Account extends BaseEntity {
     this.arn = arn;
     this.quotationRef = origin.quotationRef();
     this.proposalRef = origin.proposalRef();
-    this.classification =
-        classification == null
-            ? AccountClassification.newBusiness(AccountOrigin.of(origin))
-            : classification;
+    this.classification = Objects.requireNonNull(classification, "classification");
     this.sales = salesStamp;
     this.freeFirstYear = FreeFirstYear.NONE;
     this.tsu = TsuClearance.NONE;
@@ -181,8 +178,7 @@ public class Account extends BaseEntity {
    * @param origin quotation and proposal references
    * @param data account data
    * @param salesStamp sales unit and cost center
-   * @param classification business type, renewal link and origin (BT0); null for new business of
-   *     the origin's kind
+   * @param classification business type, renewal link and origin (BT0)
    * @return the account (not yet saved)
    */
   public static Account create(
@@ -286,7 +282,7 @@ public class Account extends BaseEntity {
   }
 
   public AccountClassification getClassification() {
-    return classification == null ? AccountClassification.newBusiness(null) : classification;
+    return classification;
   }
 
   /**
@@ -513,7 +509,7 @@ public class Account extends BaseEntity {
   }
 
   public AccountPremium getPremium() {
-    return premium == null ? AccountPremium.NONE : premium;
+    return Objects.requireNonNullElse(premium, AccountPremium.NONE);
   }
 
   public PaymentArrangement getPaymentArrangement() {
@@ -550,11 +546,11 @@ public class Account extends BaseEntity {
   }
 
   public FreeFirstYear getFreeFirstYear() {
-    return freeFirstYear == null ? FreeFirstYear.NONE : freeFirstYear;
+    return Objects.requireNonNullElse(freeFirstYear, FreeFirstYear.NONE);
   }
 
   public AccountContact getContact() {
-    return contact == null ? AccountContact.NONE : contact;
+    return Objects.requireNonNullElse(contact, AccountContact.NONE);
   }
 
   public SalesStamp getSales() {
@@ -566,7 +562,7 @@ public class Account extends BaseEntity {
   }
 
   public TsuClearance getTsu() {
-    return tsu == null ? TsuClearance.NONE : tsu;
+    return Objects.requireNonNullElse(tsu, TsuClearance.NONE);
   }
 
   public boolean isDirectBooking() {

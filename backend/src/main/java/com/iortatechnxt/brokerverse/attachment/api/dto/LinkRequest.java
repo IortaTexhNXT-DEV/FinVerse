@@ -11,8 +11,11 @@ import java.util.List;
  * Records a file is linked to.
  *
  * @param records records (entity type and id)
+ * @param processTag process the links are made for (BRID-025), optional
  */
-public record LinkRequest(@NotEmpty @Size(max = 50) List<@Valid LinkedRecord> records) {
+public record LinkRequest(
+    @NotEmpty @Size(max = 50) List<@Valid LinkedRecord> records,
+    @Size(max = 40) String processTag) {
 
   /**
    * A record.

@@ -272,6 +272,11 @@ brokerverse:
     bcl-follow-up-due-cron: ${BROKERVERSE_JOB_BCL_FOLLOW_UP_DUE_CRON:0 0 22 * * *}
     # BCL_CLAIM_PAST_DUE for outstanding claims older than BCL_PAST_DUE_DAYS (p.43), 06:00 PHT.
     bcl-ageing-alerts-cron: ${BROKERVERSE_JOB_BCL_AGEING_ALERTS_CRON:0 0 22 * * *}
+    # ---- Employee Benefits (BRD-8), docs/architecture/EMPLOYEE_BENEFITS_DESIGN.md section 8.1 (PHT = UTC+8) ----
+    # Opens renewal cycles EB_RA_LEAD_DAYS before expiry, sends the RA and the reminders (BRID-001/002), 06:00 PHT.
+    eb-renewal-advice-cron: ${BROKERVERSE_JOB_EB_RENEWAL_ADVICE_CRON:0 0 22 * * *}
+    # Follow-ups of overdue tracked items, escalation after EB_FOLLOWUP_MAX (BRID-030), 07:00 PHT.
+    eb-item-followup-cron: ${BROKERVERSE_JOB_EB_ITEM_FOLLOWUP_CRON:0 0 23 * * *}
 
 management:
   health:

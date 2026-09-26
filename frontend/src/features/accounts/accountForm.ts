@@ -294,6 +294,8 @@ export interface SearchPanelValues {
   periodFrom: string;
   periodTo: string;
   includeVoided: boolean;
+  /** NEW_BUSINESS or RENEWAL (BRNB.097, shared work item BT0); blank for both. */
+  businessType: string;
 }
 
 export const EMPTY_PANEL: SearchPanelValues = {
@@ -307,6 +309,7 @@ export const EMPTY_PANEL: SearchPanelValues = {
   periodFrom: '',
   periodTo: '',
   includeVoided: false,
+  businessType: '',
 };
 
 /** Criteria of the search panel combined with a quick filter (the quick filter's status wins). */

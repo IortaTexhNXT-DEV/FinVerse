@@ -62,6 +62,24 @@ function accountFacts(a: Account): Fact[] {
   ];
 }
 
+/** The flags of the record summary: renewal (BT0), Free First Year, direct payment. */
+function accountFlags(a: Account) {
+  if (!a.freeFirstYear.active && !a.directPayment && a.businessType !== 'RENEWAL') {
+    return undefined;
+  }
+  return (
+    <>
+      {a.businessType === 'RENEWAL' && (
+        <span className="tag" title={a.renewalOfRef ? `Renews ${a.renewalOfRef}` : undefined}>
+          Renewal
+        </span>
+      )}
+      {a.freeFirstYear.active && <span className="tag">FFY</span>}
+      {a.directPayment && <span className="tag">Direct Payment</span>}
+    </>
+  );
+}
+
 function TabBody({ tab, account }: Readonly<{ tab: TabId; account: Account }>) {
   switch (tab) {
     case 'details':
@@ -142,14 +160,7 @@ export default function AccountDetailPage() {
             <StatusBadge status={a.status} />
           </>
         }
-        flags={
-          (a.freeFirstYear.active || a.directPayment) && (
-            <>
-              {a.freeFirstYear.active && <span className="tag">FFY</span>}
-              {a.directPayment && <span className="tag">Direct Payment</span>}
-            </>
-          )
-        }
+        flags={accountFlags(a)}
         facts={accountFacts(a)}
       />
       <WorkflowPanel

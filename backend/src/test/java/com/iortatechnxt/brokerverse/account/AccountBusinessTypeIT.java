@@ -126,6 +126,7 @@ class AccountBusinessTypeIT {
             fx.company(), "BLK-BT0", LocalDate.of(2026, 9, 15), Map.of("product", "MTR10"));
     Map<String, String> cells = new HashMap<>();
     cells.put("Client Code", CLIENT);
+    cells.put("Market Segment", "CBG");
     cells.put("Period From", "2026-10-01");
     cells.put("Period To", "2027-10-01");
     cells.put("Sum Insured", "950000");

@@ -15,13 +15,16 @@ import java.util.List;
  * @param costCenter cost center, null for the account's
  * @param cwt2Percent CWT 2 % flag, null for the default
  * @param shares insurer shares (co-insurance), empty for the account's insurer at 100 %
+ * @param insurerBillingNo insurer billing number (BRID-020): required for the lines of {@code
+ *     BOOKING_BILLING_NO_LINES}, unique per insurer; null when none
  */
 public record BookRequest(
     @NotBlank @Size(max = 30) String arn,
     LocalDate bookingDate,
     @Size(max = 20) String costCenter,
     Boolean cwt2Percent,
-    List<@Valid ShareDto> shares) {
+    List<@Valid ShareDto> shares,
+    @Size(max = 60) String insurerBillingNo) {
 
   /**
    * The booking options.
@@ -33,6 +36,7 @@ public record BookRequest(
         bookingDate,
         costCenter,
         cwt2Percent,
-        shares == null ? List.of() : shares.stream().map(ShareDto::toShare).toList());
+        shares == null ? List.of() : shares.stream().map(ShareDto::toShare).toList(),
+        insurerBillingNo);
   }
 }

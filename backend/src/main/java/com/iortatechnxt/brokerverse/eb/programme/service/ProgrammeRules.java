@@ -55,14 +55,7 @@ public class ProgrammeRules {
    * @param profile name, team, funding, account officer
    */
   public void checkProfile(EbProgramme.Profile profile) {
-    if (profile.name() == null || profile.name().isBlank()) {
-      throw new BusinessRuleException("EB_PROGRAMME_NAME_REQUIRED", "Enter the programme name");
-    }
-    if (profile.name().strip().length() > MAX_NAME) {
-      throw new BusinessRuleException(
-          "EB_PROGRAMME_NAME_TOO_LONG",
-          "The programme name can have at most " + MAX_NAME + " characters");
-    }
+    checkName(profile.name());
     if (profile.teamCode() == null || profile.teamCode().isBlank()) {
       throw new BusinessRuleException("EB_TEAM_REQUIRED", "Select the team");
     }
@@ -74,6 +67,17 @@ public class ProgrammeRules {
       throw new BusinessRuleException(
           "EB_AO_INVALID",
           profile.accountOfficer() + " is not an Employee Benefits account officer");
+    }
+  }
+
+  private static void checkName(String name) {
+    if (name == null || name.isBlank()) {
+      throw new BusinessRuleException("EB_PROGRAMME_NAME_REQUIRED", "Enter the programme name");
+    }
+    if (name.strip().length() > MAX_NAME) {
+      throw new BusinessRuleException(
+          "EB_PROGRAMME_NAME_TOO_LONG",
+          "The programme name can have at most " + MAX_NAME + " characters");
     }
   }
 
@@ -107,17 +111,21 @@ public class ProgrammeRules {
       throw new BusinessRuleException("EB_BENEFIT_LINE_REQUIRED", "Select the benefit line");
     }
     lovs.requireValid(EbCodes.LOV_BENEFIT_LINE, line.benefitLine(), today());
-    if (line.periodFrom() != null
-        && line.periodTo() != null
-        && !line.periodTo().isAfter(line.periodFrom())) {
-      throw new BusinessRuleException(
-          "EB_LINE_PERIOD_INVALID", "The period must end after it starts");
-    }
+    checkPeriod(line);
     if (line.headcount() != null && line.headcount() < 0) {
       throw new BusinessRuleException("EB_HEADCOUNT_INVALID", "The headcount cannot be negative");
     }
     if (line.incumbentInsurer() != null && !line.incumbentInsurer().isBlank()) {
       insurers.requireInsurer(companyId, line.incumbentInsurer());
+    }
+  }
+
+  private static void checkPeriod(EbProgrammeLine.Data line) {
+    if (line.periodFrom() != null
+        && line.periodTo() != null
+        && !line.periodTo().isAfter(line.periodFrom())) {
+      throw new BusinessRuleException(
+          "EB_LINE_PERIOD_INVALID", "The period must end after it starts");
     }
   }
 

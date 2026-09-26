@@ -65,6 +65,8 @@ public class RenewalAdviceService {
 
   private static final String PDF = "application/pdf";
 
+  private static final String PROGRAMME = "Programme ";
+
   private final EbRecords records;
   private final EbCycleRepository cycles;
   private final EbRenewalAdviceRepository advices;
@@ -150,7 +152,7 @@ public class RenewalAdviceService {
                 () ->
                     new BusinessRuleException(
                         "EB_RA_NO_EXPIRY",
-                        "Programme "
+                        PROGRAMME
                             + programme.getProgrammeNo()
                             + " has no benefit line ending on or after today"));
     EbCycle cycle = cycleFor(programme, target, true);
@@ -195,13 +197,13 @@ public class RenewalAdviceService {
 
   private static String refusal(EbProgramme programme) {
     if (!programme.isRenewalEligible()) {
-      return "Programme " + programme.getProgrammeNo() + " is not flagged for renewal";
+      return PROGRAMME + programme.getProgrammeNo() + " is not flagged for renewal";
     }
     if (programme.getStatus() != EbProgrammeStatus.ACTIVE) {
-      return "Programme " + programme.getProgrammeNo() + " has no current business to renew";
+      return PROGRAMME + programme.getProgrammeNo() + " has no current business to renew";
     }
     if (RenewalAdviceLetter.recipients(programme).isEmpty()) {
-      return "Programme "
+      return PROGRAMME
           + programme.getProgrammeNo()
           + " has no HR contact receiving the renewal advice";
     }

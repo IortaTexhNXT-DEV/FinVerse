@@ -6,10 +6,12 @@ import com.iortatechnxt.brokerverse.eb.domain.EbProgramme;
 import com.iortatechnxt.brokerverse.eb.domain.EbProgrammeContact;
 import com.iortatechnxt.brokerverse.eb.domain.EbProgrammeLine;
 import com.iortatechnxt.brokerverse.eb.programme.service.ProgrammeInput;
+import com.iortatechnxt.brokerverse.eb.programme.service.ProgrammeQuery;
 import java.time.LocalDate;
 import java.util.List;
 
 /** Request bodies of the programme API (FR-EB-021, FR-EB-022). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class ProgrammeRequests {
 
   private ProgrammeRequests() {}
@@ -159,6 +161,57 @@ public final class ProgrammeRequests {
    * @param programmeIds programmes
    */
   public record SendRaRequest(List<Long> programmeIds) {}
+
+  /**
+   * Query parameters of the Programmes work list.
+   *
+   * @param tab tab, ALL when empty
+   * @param stage stage of the open cycle
+   * @param ao account officer
+   * @param team team
+   * @param q programme number, client or programme name
+   * @param page page, 0 when empty
+   * @param size page size, 20 when empty (at most 200)
+   */
+  public record ProgrammeFilter(
+      ProgrammeQuery.Tab tab,
+      String stage,
+      String ao,
+      String team,
+      String q,
+      Integer page,
+      Integer size) {
+
+    private static final int DEFAULT_SIZE = 20;
+    private static final int MAX_SIZE = 200;
+
+    /**
+     * The query criteria.
+     *
+     * @return criteria
+     */
+    public ProgrammeQuery.ProgrammeCriteria criteria() {
+      return new ProgrammeQuery.ProgrammeCriteria(tab, stage, ao, team, q);
+    }
+
+    /**
+     * The page asked for.
+     *
+     * @return zero-based page
+     */
+    public int pageNo() {
+      return page == null ? 0 : Math.max(0, page);
+    }
+
+    /**
+     * The page size asked for.
+     *
+     * @return size between 1 and 200
+     */
+    public int pageSize() {
+      return size == null ? DEFAULT_SIZE : Math.clamp(size, 1, MAX_SIZE);
+    }
+  }
 
   private static String blank(String value) {
     return value == null || value.isBlank() ? null : value.strip();

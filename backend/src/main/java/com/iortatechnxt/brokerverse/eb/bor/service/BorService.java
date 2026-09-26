@@ -41,6 +41,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class BorService implements BorGate {
 
+  private static final String BOR_VERSION = "Broker on Record version ";
+
   private static final Set<AllowedFileType> BOR_TYPES =
       Set.of(AllowedFileType.PDF, AllowedFileType.DOC, AllowedFileType.DOCX);
 
@@ -113,7 +115,7 @@ public class BorService implements BorGate {
                     EbDocumentService.placementProcess(cycle),
                     EbDocumentSource.CLIENT,
                     false,
-                    "Broker on Record version " + version),
+                    BOR_VERSION + version),
                 List.of(file))
             .get(0);
     EbBor bor = bors.save(new EbBor(cycle, version, stored.getAttachmentId()));
@@ -121,7 +123,7 @@ public class BorService implements BorGate {
         EbCodes.ENTITY_CYCLE,
         cycle.getCycleNo(),
         AuditAction.CREATE,
-        "Broker on Record version " + version + " uploaded");
+        BOR_VERSION + version + " uploaded");
     return bor;
   }
 
@@ -146,7 +148,7 @@ public class BorService implements BorGate {
         EbCodes.ENTITY_CYCLE,
         cycle.getCycleNo(),
         AuditAction.AUTHORIZE,
-        "Broker on Record version "
+        BOR_VERSION
             + bor.getVersionNo()
             + " validated, valid "
             + checklist.validFrom()
@@ -173,7 +175,7 @@ public class BorService implements BorGate {
         EbCodes.ENTITY_CYCLE,
         cycle.getCycleNo(),
         AuditAction.REJECT,
-        "Broker on Record version " + bor.getVersionNo() + " rejected: " + bor.getRejectReason());
+        BOR_VERSION + bor.getVersionNo() + " rejected: " + bor.getRejectReason());
     tellUploader(bor, cycle, "rejected");
     return bor;
   }

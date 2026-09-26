@@ -84,23 +84,8 @@ public class EbDocumentService {
           "EB_DOCUMENT_TRANSACTION_REQUIRED", "Link the document to its cycle or member change");
     }
     EbCycle cycle = records.openCycle(companyId, cycleId);
-    String type = blankToNull(upload.documentType());
-    if (type == null) {
-      throw new BusinessRuleException("EB_DOCUMENT_TYPE_REQUIRED", "Select the document type");
-    }
-    if (EbDocumentTypes.BOR.equals(type)) {
-      throw new BusinessRuleException(
-          "EB_BOR_ON_BOR_TAB", "Upload the Broker on Record on the BOR tab");
-    }
-    if (!EbDocumentTypes.ALL.contains(type) && !EbDocumentTypes.RENEWAL_ADVICE.equals(type)) {
-      throw new BusinessRuleException(
-          "EB_DOCUMENT_TYPE_INVALID", "Select an Employee Benefits document type");
-    }
-    String process = blankToNull(upload.processType());
-    if (process == null) {
-      throw new BusinessRuleException("EB_PROCESS_REQUIRED", "Select the process of the document");
-    }
-    lovs.requireValid(EbDocumentTypes.PROCESS_TYPE_LOV, process, BusinessClock.today(clock));
+    String type = requireType(upload.documentType());
+    String process = requireProcess(upload.processType());
     EbDocumentSource source = upload.source() == null ? EbDocumentSource.AO : upload.source();
     return store(
         cycle, new Registration(type, process, source, true, upload.description()), upload.files());
@@ -177,6 +162,31 @@ public class EbDocumentService {
             + registration.source()
             + ")");
     return saved;
+  }
+
+  private static String requireType(String documentType) {
+    String type = blankToNull(documentType);
+    if (type == null) {
+      throw new BusinessRuleException("EB_DOCUMENT_TYPE_REQUIRED", "Select the document type");
+    }
+    if (EbDocumentTypes.BOR.equals(type)) {
+      throw new BusinessRuleException(
+          "EB_BOR_ON_BOR_TAB", "Upload the Broker on Record on the BOR tab");
+    }
+    if (!EbDocumentTypes.ALL.contains(type) && !EbDocumentTypes.RENEWAL_ADVICE.equals(type)) {
+      throw new BusinessRuleException(
+          "EB_DOCUMENT_TYPE_INVALID", "Select an Employee Benefits document type");
+    }
+    return type;
+  }
+
+  private String requireProcess(String processType) {
+    String process = blankToNull(processType);
+    if (process == null) {
+      throw new BusinessRuleException("EB_PROCESS_REQUIRED", "Select the process of the document");
+    }
+    lovs.requireValid(EbDocumentTypes.PROCESS_TYPE_LOV, process, BusinessClock.today(clock));
+    return process;
   }
 
   private int nextVersion(EbCycle cycle, Registration registration) {

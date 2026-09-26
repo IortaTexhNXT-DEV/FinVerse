@@ -182,10 +182,12 @@ public class TrackedItemService {
       throw new BusinessRuleException("EB_ITEM_DATE_FUTURE", "The date cannot be after today");
     }
     LocalDate on = change.date() == null ? today : change.date();
-    switch (change.action()) {
-      case RECEIVE -> item.receive(change.date(), change.remarks());
-      case RELEASE -> item.release(on, change.remarks());
-      case CLOSE -> item.close(on, change.receivedOn(), change.remarks());
+    if (change.action() == Action.RECEIVE) {
+      item.receive(change.date(), change.remarks());
+    } else if (change.action() == Action.RELEASE) {
+      item.release(on, change.remarks());
+    } else {
+      item.close(on, change.receivedOn(), change.remarks());
     }
     audit.record(
         EbCodes.ENTITY_TRACKED_ITEM,
@@ -196,14 +198,7 @@ public class TrackedItemService {
   }
 
   private void check(EbTrackedItem.Details details) {
-    if (details.subject() == null || details.subject().isBlank()) {
-      throw new BusinessRuleException("EB_ITEM_SUBJECT_REQUIRED", "Enter what is expected");
-    }
-    if (details.subject().length() > MAX_SUBJECT) {
-      throw new BusinessRuleException(
-          "EB_ITEM_SUBJECT_TOO_LONG",
-          "The description can have at most " + MAX_SUBJECT + " characters");
-    }
+    checkSubject(details.subject());
     if (details.responsible() == null) {
       throw new BusinessRuleException(
           "EB_ITEM_RESPONSIBLE_REQUIRED", "Select who is responsible for the item");
@@ -211,14 +206,28 @@ public class TrackedItemService {
     if (details.dueDate() == null) {
       throw new BusinessRuleException("EB_ITEM_DUE_REQUIRED", "Enter the due date");
     }
-    if (details.recipientEmail() != null && !details.recipientEmail().isBlank()) {
-      boolean valid =
-          Arrays.stream(details.recipientEmail().split(","))
-              .map(String::strip)
-              .allMatch(EmailAddresses::isValid);
-      if (!valid) {
-        throw new BusinessRuleException("EMAIL_ADDRESS_INVALID", "Enter a valid e-mail address");
-      }
+    checkRecipients(details.recipientEmail());
+  }
+
+  private static void checkSubject(String subject) {
+    if (subject == null || subject.isBlank()) {
+      throw new BusinessRuleException("EB_ITEM_SUBJECT_REQUIRED", "Enter what is expected");
+    }
+    if (subject.length() > MAX_SUBJECT) {
+      throw new BusinessRuleException(
+          "EB_ITEM_SUBJECT_TOO_LONG",
+          "The description can have at most " + MAX_SUBJECT + " characters");
+    }
+  }
+
+  private static void checkRecipients(String recipients) {
+    if (recipients == null || recipients.isBlank()) {
+      return;
+    }
+    boolean valid =
+        Arrays.stream(recipients.split(",")).map(String::strip).allMatch(EmailAddresses::isValid);
+    if (!valid) {
+      throw new BusinessRuleException("EMAIL_ADDRESS_INVALID", "Enter a valid e-mail address");
     }
   }
 

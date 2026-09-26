@@ -2,10 +2,10 @@ package com.iortatechnxt.brokerverse.eb.tracked.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.eb.tracked.api.dto.ItemRequests.ItemFilter;
 import com.iortatechnxt.brokerverse.eb.tracked.api.dto.ItemRequests.ItemRequest;
 import com.iortatechnxt.brokerverse.eb.tracked.api.dto.ItemRequests.StatusRequest;
 import com.iortatechnxt.brokerverse.eb.tracked.service.TrackedItemQuery;
-import com.iortatechnxt.brokerverse.eb.tracked.service.TrackedItemQuery.ItemCriteria;
 import com.iortatechnxt.brokerverse.eb.tracked.service.TrackedItemQuery.ItemRow;
 import com.iortatechnxt.brokerverse.eb.tracked.service.TrackedItemService;
 import org.springframework.http.HttpStatus;
@@ -31,7 +31,6 @@ public class TrackedItemController {
 
   private static final String VIEW = "hasAuthority('EB_VIEW')";
   private static final String MAINTAIN = "hasAnyAuthority('EB_MARKET', 'EB_PROCESS')";
-  private static final int MAX_PAGE = 200;
 
   private final TrackedItemService items;
   private final TrackedItemQuery query;
@@ -51,36 +50,14 @@ public class TrackedItemController {
    * The Pending Items list.
    *
    * @param companyId company
-   * @param programmeId programme
-   * @param member employee number or member name
-   * @param type item type
-   * @param responsible INSURER, CLIENT or BDOI
-   * @param status status
-   * @param overdue only pending items past due
-   * @param q programme, client, subject or ARN
-   * @param page page
-   * @param size page size (at most 200)
+   * @param filter programme, member, type, responsible party, status, overdue, search text, page
+   *     and size
    * @return items
    */
   @GetMapping
   @PreAuthorize(VIEW)
-  @SuppressWarnings("java:S107") // one parameter per filter of the list
-  public PageResponse<ItemRow> search(
-      @RequestParam Long companyId,
-      @RequestParam(required = false) Long programmeId,
-      @RequestParam(required = false) String member,
-      @RequestParam(required = false) String type,
-      @RequestParam(required = false) String responsible,
-      @RequestParam(required = false) String status,
-      @RequestParam(defaultValue = "false") boolean overdue,
-      @RequestParam(required = false) String q,
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "20") int size) {
-    return query.search(
-        companyId,
-        new ItemCriteria(programmeId, member, type, responsible, status, overdue, q),
-        Math.max(0, page),
-        Math.clamp(size, 1, MAX_PAGE));
+  public PageResponse<ItemRow> search(@RequestParam Long companyId, ItemFilter filter) {
+    return query.search(companyId, filter.criteria(), filter.pageNo(), filter.pageSize());
   }
 
   /**

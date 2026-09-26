@@ -5,10 +5,10 @@ import com.iortatechnxt.brokerverse.eb.home.service.EbHomeService;
 import com.iortatechnxt.brokerverse.eb.programme.api.dto.ProgrammeRequests.ContactRequest;
 import com.iortatechnxt.brokerverse.eb.programme.api.dto.ProgrammeRequests.LineRequest;
 import com.iortatechnxt.brokerverse.eb.programme.api.dto.ProgrammeRequests.ProfileRequest;
+import com.iortatechnxt.brokerverse.eb.programme.api.dto.ProgrammeRequests.ProgrammeFilter;
 import com.iortatechnxt.brokerverse.eb.programme.api.dto.ProgrammeRequests.ProgrammeRequest;
 import com.iortatechnxt.brokerverse.eb.programme.api.dto.ProgrammeRequests.SendRaRequest;
 import com.iortatechnxt.brokerverse.eb.programme.service.ProgrammeQuery;
-import com.iortatechnxt.brokerverse.eb.programme.service.ProgrammeQuery.ProgrammeCriteria;
 import com.iortatechnxt.brokerverse.eb.programme.service.ProgrammeRow;
 import com.iortatechnxt.brokerverse.eb.programme.service.ProgrammeService;
 import com.iortatechnxt.brokerverse.eb.programme.service.ProgrammeView;
@@ -41,7 +41,6 @@ public class ProgrammeController {
 
   private static final String VIEW = "hasAuthority('EB_VIEW')";
   private static final String MARKET = "hasAuthority('EB_MARKET')";
-  private static final int MAX_PAGE = 200;
 
   private final ProgrammeService programmes;
   private final ProgrammeViewService views;
@@ -87,32 +86,14 @@ public class ProgrammeController {
    * The Programmes work list.
    *
    * @param companyId company
-   * @param tab tab (RENEWAL_DUE, IN_PROGRESS, WITH_CLIENT, IN_PLACEMENT, PLACED, LOST, ALL)
-   * @param stage stage of the open cycle
-   * @param ao account officer
-   * @param team team
-   * @param q programme number, client or programme name
-   * @param page page
-   * @param size page size (at most 200)
+   * @param filter tab (RENEWAL_DUE, IN_PROGRESS, WITH_CLIENT, IN_PLACEMENT, PLACED, LOST, ALL),
+   *     stage, AO, team, search text, page and size
    * @return programmes
    */
   @GetMapping("/programmes")
   @PreAuthorize(VIEW)
-  @SuppressWarnings("java:S107") // one parameter per filter of the work list
-  public PageResponse<ProgrammeRow> search(
-      @RequestParam Long companyId,
-      @RequestParam(defaultValue = "ALL") ProgrammeQuery.Tab tab,
-      @RequestParam(required = false) String stage,
-      @RequestParam(required = false) String ao,
-      @RequestParam(required = false) String team,
-      @RequestParam(required = false) String q,
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "20") int size) {
-    return query.search(
-        companyId,
-        new ProgrammeCriteria(tab, stage, ao, team, q),
-        Math.max(0, page),
-        Math.clamp(size, 1, MAX_PAGE));
+  public PageResponse<ProgrammeRow> search(@RequestParam Long companyId, ProgrammeFilter filter) {
+    return query.search(companyId, filter.criteria(), filter.pageNo(), filter.pageSize());
   }
 
   /**

@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 /** Request and response bodies of the cycle API (FR-EB-021, 023, 031, 046). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class CycleDtos {
 
   private CycleDtos() {}

@@ -68,23 +68,28 @@ public class PlacementProgressListener {
    */
   @EventListener
   public void on(AccountStatusChanged event) {
-    if (event.to() != AccountStatus.BOOKED) {
-      return;
-    }
-    Optional<EbCycle> found = cycles.findByAccountArn(event.arn());
-    if (found.isEmpty() || found.get().getStage() != EbCycleStage.IN_PLACEMENT) {
-      return;
-    }
-    EbCycle cycle = found.get();
+    Optional<EbCycle> found =
+        event.to() == AccountStatus.BOOKED
+            ? cycles
+                .findByAccountArn(event.arn())
+                .filter(c -> c.getStage() == EbCycleStage.IN_PLACEMENT)
+            : Optional.empty();
+    found.ifPresent(cycle -> closeWhenAllBooked(cycle, event.arn()));
+  }
+
+  private void closeWhenAllBooked(EbCycle cycle, String bookedArn) {
     List<Account> accounts = placement.accountsOf(cycle);
     boolean allBooked =
         accounts.size() == cycle.getAccountArns().size()
             && accounts.stream()
                 .allMatch(
-                    a -> a.getArn().equals(event.arn()) || a.getStatus() == AccountStatus.BOOKED);
-    if (!allBooked) {
-      return;
+                    a -> a.getArn().equals(bookedArn) || a.getStatus() == AccountStatus.BOOKED);
+    if (allBooked) {
+      close(cycle, accounts);
     }
+  }
+
+  private void close(EbCycle cycle, List<Account> accounts) {
     EbProgramme programme = records.programmeOf(cycle);
     cycle.recordOutcome(outcome(cycle, programme, accounts), null, null);
     accounts.forEach(a -> takeOver(programme, a));

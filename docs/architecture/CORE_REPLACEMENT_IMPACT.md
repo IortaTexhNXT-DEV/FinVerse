@@ -218,6 +218,9 @@ Migration), Reinsurance (phase 2).
 
 ## 9. Edits needed to shared documents (not made here)
 
+Applied on 26 September 2026 in the consolidation with the Data Migration analysis, except the help entries in
+`helpContent.ts`, which come with the waves.
+
 | Document | Edit |
 |---|---|
 | `docs/development/DEVELOPER_GUIDE.md` §4 | Add the range "Core Replacement platform items V1090-V1099 (demo V1990-V1999)" to the V1000-V1899 and V1900-V1999 rows; §11 add this document to the list of designs |

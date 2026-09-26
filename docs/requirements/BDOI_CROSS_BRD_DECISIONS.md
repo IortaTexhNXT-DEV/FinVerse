@@ -12,6 +12,14 @@ Status: **binding for the builds of BRD-6 to BRD-12**. Seven BRDs were analysed 
 | BRD-11 | User Access Maintenance (UAM) | [`BDOI_UAM_BRD_SPEC.md`](BDOI_UAM_BRD_SPEC.md) | [`USER_ACCESS_DESIGN.md`](../architecture/USER_ACCESS_DESIGN.md) |
 | BRD-12 | Submitted Policies (SP) and the BDOI Report List | [`BDOI_SP_BRD_SPEC.md`](BDOI_SP_BRD_SPEC.md), [`BDOI_REPORT_LIST.md`](BDOI_REPORT_LIST.md) | [`SUBMITTED_POLICIES_DESIGN.md`](../architecture/SUBMITTED_POLICIES_DESIGN.md) |
 
+Two later BRDs were analysed afterwards and are consolidated here as well (decision D8, the BRD-00 and BRD-13 tables
+of section 3, the ports and columns of section 4, and XQ12-XQ13):
+
+| BRD | Area | Spec | Design |
+|---|---|---|---|
+| BRD-00 | BDOI Core Replacement (umbrella over the BRDs; 21 key capabilities) | [`BDOI_CORE_BRD_SPEC.md`](BDOI_CORE_BRD_SPEC.md) | [`CORE_REPLACEMENT_IMPACT.md`](../architecture/CORE_REPLACEMENT_IMPACT.md) |
+| BRD-13 | Data Migration (draft v0.01, unsigned) | [`BDOI_DM_BRD_SPEC.md`](BDOI_DM_BRD_SPEC.md) | [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md) |
+
 This document holds:
 1. the decisions that settle the conflicts between those designs (section 1);
 2. the changes for documents that are being edited by build agents and are therefore not edited here (section 2);
@@ -36,6 +44,7 @@ UX (UX guidelines), XQ (this document).
 | **D5** | **CQ23 (answered by BRD-11).** The lockout after 3 failed attempts applies to all users (`LOGIN_MAX_FAILED_ATTEMPTS` = 3; portal users `PORTAL_MAX_FAILED_LOGINS` = 3). Users may hold several roles, so **no single-role check is built** anywhere. Single session per device is still open (UQ09) | USER_ACCESS_DESIGN §3, §8, §9; section 2 below (Collections) |
 | **D6** | **Q42 (answered by BRD-11).** Sign-in by directory authentication (BDO EUA / Windows ID, LDAP / AD / SSO) is required. It is built as a parked port (`security.service.DirectoryAuthenticator`, `AUTH_MODE` LOCAL / DIRECTORY); local sign-in stays until BDO supplies the interface (UQ04) | USER_ACCESS_DESIGN §1, §10; RENEWAL_DESIGN §10; CLAIMS_BROKING_DESIGN §13; CUSTOMER_SERVICING_DESIGN §12; BROKING_ARCHITECTURE §6; BDO_UX_GUIDELINES §5, §6 (UX-4) |
 | **D7** | **Portal users (EB)** are provisioned through User Access Maintenance requests, as an **external user type** (`nba_access_request.user_type` = EXTERNAL, with party kind, party code and portal role). EB's own `ptl_user_request` is dropped. On approval `nbadmin` calls the port `ExternalUserProvisioner`, implemented by `portal`. The User Access design does not contradict this: it already makes an approved request the only way to change access | USER_ACCESS_DESIGN §2, §3, §4.2, §4.4, §9, §11.2, §13; EMPLOYEE_BENEFITS_DESIGN §3, §4.1, §6.1, §6.3, §10.1, §11, §13 |
+| **D8** | **Legacy invoices post by ledger context (BRD-13).** A legacy invoice is an `ops_invoice` row with origin LEGACY and `ledger_context` LEGACY, created by `opsledger.service.LegacyInvoiceIntake` (not by the booking feed). **Every posting module emits `LG_`-prefixed amount components when the invoice (or the UPP item) is in the LEGACY context**, through the shared helper `opsledger.domain.LedgerContext.component(base)`: cashiering (`CashieringPosting`, `ApplicationService`, `DispositionExecutor`, `CwtPostings`, `MinimalBalanceService`), remittance (`RemittancePostings`), commission (`DpPostings`), adjustment (`LedgerEffects`) and booking (`BookingEvents`, for endorsement invoices whose root is a legacy invoice). No new accounting event is created for legacy flows: Comptrollership adds the `LG_` lines to the existing rules, which route them to the legacy control accounts. `LedgerContext` and the `LG_` names are committed first by wave DM1-A | DATA_MIGRATION_DESIGN §14.2, §14.4, §14.5; OPERATIONS_DESIGN §4.1, §5; ACCOUNTING_DISBURSEMENT_DESIGN (GL-SL ledger context) |
 
 Design choices made while applying the decisions (they follow from a decision; reject them if the decision owner
 disagrees):
@@ -133,6 +142,39 @@ column, in the original specs: `BDOI_NB_BRD_SPEC.md` §9.1, `BDOI_NB_TRACEABILIT
 | EBQ28 | BRD-8 | BRD-6 RN (scope has no group benefits); decision D3 | EB renewals stay in EB; general renewal lists exclude EB lines; one RA document type | answered (boundary) | `RNW_EXCLUDED_LINES`; `RENEWAL_ADVICE`. A shared RA template is not decided (EB and Renewal keep their own) |
 | EBQ13 | BRD-8 | Decision D7 (BRD-11 request flow) | Who creates and approves portal users: UAM requests, external user type | partial | `nba_access_request` user type EXTERNAL; hosting, MFA and IdP still open |
 
+**Answered by BRD-00 (Core Replacement umbrella, `BDOI_CORE_BRD_SPEC.md` §12).**
+
+| Q# | Original BRD | Answering BRD and ID | Answer (short) | Status | Design impact |
+|---|---|---|---|---|---|
+| XQ08 (OQ44, CQ25, AQ27, PQ18) | Cross-BRD | BRD-00, usage tables p.42-45 | Retention 5 years online / 15 years offline; backup every 4 hours kept 5 years; response under 5 s for every role; users per role (1,344 named / 429 concurrent, the sum of the BRD rows). Availability, hours and maintenance still "Refer to BRD" | partial | BRD-00 column in the register NFR comparison; the performance plan tests 429 concurrent sessions as the peak case until CRQ21 / CRQ24 are answered |
+| Q39 | BRD-1 | BRD-00 p.45 | 5 years online and 15 years offline for application, database and audit logs and historical data; BRD-7 (10 / 15) and the 5 / 5 BRDs remain exceptions (CRQ22) | partial | Default 5 / 15 in `nba_retention_rule`; exceptions per record type |
+| Q40 | BRD-1 | BRD-00 BR-053, BR-054, capability 21 | Customised (ad hoc) reports with fields, charts and summaries, scheduled or on demand: more than saved variants (CRQ11) | partial | Report layout in variants and report subscriptions (Core wave CR-W2, V1093) |
+| PQ19 | BRD-3 | BRD-00 capability 4 "Non-Package Management" (p.7) | Read as the non-package placement of New Business (PRF, quotation slip, proposal slip), not maintenance of non-package products (CRQ02) | partial | None until CRQ02 is answered |
+| Q44 | BRD-1 | BRD-00 goal 1, capability 15 | Reinsurance is a BDOI business line; the ReInsurance BRD is phase 2 | answered for phase 1 | Insurer-side `reinsurance` stays hidden from BDOI roles in phase 1 |
+
+**Answered by BRD-13 (Data Migration draft v0.01, `BDOI_DM_BRD_SPEC.md` §6).** The BRD is an unsigned draft; the
+answers hold until it is signed.
+
+| Q# | Original BRD | Answering BRD and ID | Answer (short) | Status | Design impact |
+|---|---|---|---|---|---|
+| CQ13 | BRD-4 | BRD-13 BRID 6.1, 6.2 | Legacy invoices keep being processed in BIBS after cutover, so both invoice-number formats are valid until the legacy invoices run off | answered | `CLX_INVOICE_NO_PATTERN` (V1000) stays; QPS numbers added when their format is known (DMQ11) |
+| CQ07 | BRD-4 | BRD-13 p.3, BRID 5.1, 6.1-6.4, 11.1 | Outstanding receivables and UPP are carried forward and processed in BIBS; history stays read-only or archived. Open dispositions, promises and assignments are not mentioned (DMQ34) | partial | Legacy invoices become Collections items through the worklist refresh; `CLX_LEGACY_ITEMS` narrowed to open dispositions and promises (V1007) |
+| CQ22 | BRD-4 | BRD-13 BRID 6.1 | Legacy invoices keep their legacy identifiers; the field mapping is not given | partial | `ops_invoice.legacy_invoice_no`, `legacy_ref`, `source_system` (V1086) |
+| CLQ13 | BRD-7 | BRD-13 BRID 11.1 | History stays in legacy or the archive; open claims are not mentioned | partial | `bcl_claim.legacy_ref` only if open claims are migrated (DMQ30) |
+| CLQ14 | BRD-7 | BRD-13 p.3, BRID 11.1 | Historical claims are not migrated (read-only legacy or archive); open claims are not addressed | partial | V1025 stays held; archive record type CLAIM |
+| RQ27 | BRD-6 | BRD-13 BRID 4.1, 12.1, p.5 | Renewal-driven transition aligned to RMEL; in-force headers migrated when required; renewals recreate clean records in BIBS | partial | `migration` implements `LegacyPolicySource` from the migrated headers and RMEL cohorts; `RNW_LEGACY_POLICIES` stays as the fallback |
+| CSQ01 | BRD-9 | BRD-13 p.5, BRID 2.1 | Legacy is read-only after cutover; the new Core is the system of record for the migrated client master; no write-back required by this BRD | partial | `ContactSyncGateway` stays NOT_CONFIGURED; `LegacyAccountLookup` implemented by `migration` |
+| CSQ02 | BRD-9 | BRD-13 BRID 4.1, 11.1 | Legacy references are retained | partial | Search by legacy reference through `mig_key_xref` |
+| CSQ06 | BRD-9 | BRD-13 BRID 11.1 | Historical documents stay in read-only legacy or the archive | partial | Archive record type RENEWAL_ADVICE, read through `LegacyAccountLookup` |
+| Q08 | BRD-1 | BRD-13 p.5 | No feed to QPS / EBIX required after cutover (legacy read-only) | partial | None beyond CSQ01 |
+| Q37 | BRD-1 | BRD-13 p.5 | From cutover the new Core holds the trusted client master and the governed reference data | partial | Client and reference masters owned by BIBS from go-live |
+| Q39 | BRD-1 | BRD-13 p.14 (defers to the consolidated NFR) | No value of its own; see the BRD-00 row above | partial | Archive records follow `nba_retention_rule` |
+| AQ01 | BRD-5 | BRD-13 BRID 5-8 | Legacy sub-ledgers for Premium Receivable, Commission Receivable, DTIP and UPP, so the chart needs legacy control accounts; the mapping is not given (DMQ18) | partial | Code map set GL_ACCOUNT; legacy control accounts and a migration clearing account (D8) |
+| OQ44 / XQ08 | BRD-2, cross-BRD | BRD-13 p.13-14 | Refers to "the consolidated NFR requirements for BDO Insure Core Modernization project", which is not in the pack (DMQ29) | partial | Ask for the document |
+
+Still open after BRD-13: **AQ11** (payee migration file; `DISB_PAYEE_MIGRATION` runs under the migration framework as
+object R09) and **SP SQ16** (Excel masterlists; `SBM_MIGRATION` runs as object P04).
+
 **Examined and still open:** Q09 (late renewal requests report; RQ29), Q16 (BDO CIF; restated by BRD-9 and BRD-10),
 OQ44 / CQ25 / AQ27 / PQ18 (NFR alignment: every later BRD adds a variant), OQ02, OQ07 (no BRD-6 to BRD-12 content),
 CLQ28 / RQ13 (total-loss indicator), UQ09 (single session per device), RQ05 (grid without pagination, now UX-6).
@@ -153,18 +195,24 @@ Check after the edits:
 - **Columns.** No two designs create the same column: `acc_account.business_type` / `renewal_of_ref` only in V822;
   `bkg_invoice.insurer_billing_no` only in EB V1031; `quo_quotation.renewal_ref` / `npk_proposal.renewal_ref` only in
   Renewal V1011; `ops_invoice.business_type` only by the Operations owner (requested by Renewal); `sec_user` and
-  `sec_role` columns only in UAM V1061; `nba_access_request` columns only in UAM V1062.
+  `sec_role` columns only in UAM V1061; `nba_access_request` columns only in UAM V1062; the legacy columns of
+  `ops_invoice` (`origin`, `ledger_context`, `source_system`, `legacy_invoice_no`, `legacy_ref`, `migration_batch_no`)
+  only in V1086 (Data Migration, on behalf of the `opsledger` owner); `bkg_invoice.ledger_context` only in V873;
+  `acsl_glsl_control.ledger_context` only in V1087.
 - **Ports.** Each port has one declaring module: `RenewalHandOff`, `MailHouseGateway`, `SubmittedSourceFeed`,
   `SignatureProvider` (`submitted`); `OcrEngine`, `PolicyDataExtractor` (`issuance`); `LegacyPolicySource`,
   `RecipientPolicy` (`renewal`); `ClaimsFeed` (`opsledger`, implemented by `brokerclaims`); `PortalUploadTarget`,
   `PortalTaskSource`, `PortalHomeCounts` (`portal`); `BorValidator` (`eb`); `ContactSyncGateway`,
   `LegacyAccountLookup` (`csf`); `WatchlistFeed`, `StrFileSink`, `ActivePolicyQuery` (`screening`),
   `ClientComplianceGate` (`crm`, only if SANC SQ07 says block); `DirectoryAuthenticator` (`security`);
-  `ExternalUserProvisioner` (`nbadmin`, implemented by `portal`).
+  `ExternalUserProvisioner` (`nbadmin`, implemented by `portal`). After BRD-13: `LegacyInvoiceSource` (`booking`,
+  implemented by `opsledger`); `LegacyPolicySource` (`renewal`) and `LegacyAccountLookup` (`csf`) implemented by
+  `migration`. No module depends on `migration`.
 - **Flyway.** Every design's table matches the Developer Guide ranges: Renewal V1010-V1017 / V1910-V1911, Claims
   V1020-V1024 / V1920-V1921, EB and portal V1030-V1036 / V1930-V1932, CSF V1040-V1042 / V1940, Screening
   V1050-V1055 / V1950-V1952, UAM V1060-V1062 / V1960, SP V1070-V1076 / V1970-V1972; owner-range changes V822 (BT0),
-  V851, V861 (listed in the Developer Guide range table).
+  V851, V861 (listed in the Developer Guide range table); Data Migration V1080-V1089 / V1980-V1989 with owner versions
+  V766, V786, V803, V823, V873, V1007; Core Replacement items V1090-V1099 / V1990-V1999.
 
 ## 5. Remaining cross-BRD conflicts (questions)
 
@@ -181,6 +229,8 @@ Check after the edits:
 | XQ09 | **Late renewal requests report** (BRNB.018, Q09). Neither the RN BRD nor the Report List (#182 is a package report) defines it | RENEWAL_DESIGN §13; BROKING_ARCHITECTURE §16.6 | Is it still needed, and is it a Renewal listing variant? (RQ29) | Variant of `RNW-LISTING` |
 | XQ10 | **Total-loss indicator** (CLQ28, RQ13) | RENEWAL_DESIGN §2.3, §10; CLAIMS_BROKING_DESIGN §12.2 | Should Claims record a total-loss indicator (settlement type, loss nature or flag)? | Manual non-renewal reason until answered (D4) |
 | XQ11 | **Single session per device** (UQ09, rest of CQ23) | USER_ACCESS_DESIGN §4.1, §14 | Does it apply to all users? | Session log built; enforcement parked |
+| XQ12 | **CSF case management** (Core CF-01). The umbrella asks for case resolution, adding and editing case details and status (capability 16, BR-165, p.22); BRD-9 puts case management out of scope, with SharePoint as the interim (CSF-EM10) | CUSTOMER_SERVICING_DESIGN; CORE_REPLACEMENT_IMPACT §5 | Is CSF case resolution in phase 1? (CRQ04) | Out of phase 1 until answered; if in, a CSF case entity in the CSF range (V1043-V1049) |
+| XQ13 | **Claims cheque custody** (Core CF-02). The umbrella asks for safekeeping of unclaimed cheques and hand-over to and retrieval from Cashiering (BR-146 to BR-148, p.21); BRD-7 has no claim money through BDOI | CLAIMS_BROKING_DESIGN §3.1; CORE_REPLACEMENT_IMPACT §5 | Does BDOI hold settlement cheques, which unit keeps them, and what is recorded at hand-over and release? (CRQ03, CLQ10) | Parked; if yes, a cheque custody register in `brokerclaims` (V1026-V1029) using the cashiering cheque hand-over |
 
 ## 6. Prerequisite work items and build order
 

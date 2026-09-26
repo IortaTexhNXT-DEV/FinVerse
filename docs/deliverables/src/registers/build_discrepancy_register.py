@@ -57,6 +57,7 @@ SEV_COLOURS = {"High": (brand.DANGER_BG, brand.DANGER), "Medium": (brand.AMBER_B
 
 # Open-question section of each spec. The prefix qualifies IDs that two specs share (SQ).
 QUESTION_SOURCES = [
+    ("BRD-00", "BDOI_CORE_BRD_SPEC.md", "## 13. New open questions (Core Replacement)", ""),
     ("BRD-01", "BDOI_NB_BRD_SPEC.md", "## 9. Open questions", ""),
     ("BRD-02", "BDOI_OPS_BRD_SPEC.md", "## 10. Open questions", ""),
     ("BRD-03", "BDOI_PM_BRD_SPEC.md", "## 7. Open questions", ""),
@@ -69,6 +70,7 @@ QUESTION_SOURCES = [
     ("BRD-10", "BDOI_SANC_BRD_SPEC.md", "## 10. Open questions", "SANC-"),
     ("BRD-11", "BDOI_UAM_BRD_SPEC.md", "## 9. Open questions", ""),
     ("BRD-12", "BDOI_SP_BRD_SPEC.md", "## 10. New open questions", "SP-"),
+    ("BRD-13", "BDOI_DM_BRD_SPEC.md", "## 7. Open questions for BDOI (Data Migration)", ""),
 ]
 CROSS_SOURCE = ("CROSS", "BDOI_CROSS_BRD_DECISIONS.md", "## 5. Remaining cross-BRD conflicts")
 
@@ -244,7 +246,7 @@ REGISTER_COLUMNS = [
     Column("status", "Status", 12, "Open, Answered or Closed (rule below).", values=STATUSES, status=True),
     Column("response", "BDOI response", 32, "BDOI's answer, or the signed BDOI document that answers the item."),
     Column("resolved", "Resolution date", 12, "Date the item was Closed.", kind="date"),
-    Column("related", "Related question IDs", 18, "Open-question IDs of the specs (Q, OQ, PQ, CQ, AQ, RQ, CLQ, EBQ, CSQ, SP-SQ, SANC-SQ, UQ, XQ); see the Open questions sheet."),
+    Column("related", "Related question IDs", 18, "Open-question IDs of the specs (CRQ, Q, OQ, PQ, CQ, AQ, RQ, CLQ, EBQ, CSQ, SP-SQ, SANC-SQ, UQ, DMQ, XQ); see the Open questions sheet."),
 ]
 
 QUESTION_COLUMNS = [
@@ -367,7 +369,7 @@ def write_summary(ws, data: dict, questions: list[dict], live: bool, register_ti
     ws["B1"] = "Summary"
     ws["B1"].font = _font(14, True, brand.HEADER_BLUE)
     ws["B2"] = (f"{data['meta']['title']}, version {data['meta']['version']}, {data['meta']['date']}. "
-                f"{len(items)} register items; {len(questions)} open questions from 12 BRD specs and the cross-BRD decisions.")
+                f"{len(items)} register items; {len(questions)} open questions from {len(QUESTION_SOURCES)} BRD specs and the cross-BRD decisions.")
     ws["B2"].font = _font(9, False, brand.MUTED)
     for c in "BCDEFGH":
         ws[f"{c}3"].border = Border(bottom=Side(style="thin", color=brand.YELLOW))
@@ -530,7 +532,7 @@ def build(make_pdf: bool = True, previews: bool = False) -> Path:
         ("Status", [(k, v) for k, v in data["status_rule"]]),
         ("Sources", [(b["short"], f"{b['name']}: docs/source-documents/{b['file']}; baseline docs/requirements/{b['spec']}")
                      for b in data["brds"].values()] + [
-            ("Cross-BRD", "docs/requirements/BDOI_CROSS_BRD_DECISIONS.md (decisions D1-D7, questions XQ01-XQ11)"),
+            ("Cross-BRD", "docs/requirements/BDOI_CROSS_BRD_DECISIONS.md (decisions D1-D8, questions XQ01-XQ13)"),
             ("Method", "Each item was checked against the source page (text layer, or the rendered page for scanned pages) and cites it. "
                        "Items come from the observations, NFR and open-question sections of the specs, the cross-BRD decisions, "
                        "the Report List, and a comparison with BIBS as built or designed."),

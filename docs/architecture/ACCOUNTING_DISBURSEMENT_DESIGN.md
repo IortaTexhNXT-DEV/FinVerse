@@ -510,6 +510,30 @@ Help sections are pre-registered by A0 in `help/helpContent.ts`; each feature ow
 | `commission` (planned, O1-D) | `cmr_certificate_submission` uses the `tax_certificate_received` register; Motor Mania pass-on uses the extended `Spec` (type PASS_ON unchanged) | DIS 2.11, OQ41 | Contract ask to O1-D |
 | Disbursement queue (built in opsledger) | Superseded by `disbursement`: the screen `/operations/disbursements` is hidden when the module is active; existing queue rows migrate once into `dsb_request` (status mapping section 7.2) | OQ02 | Migration handled in V891 (insert-select) |
 
+### 12.3 Data Migration (BRD-13; designed, not built)
+
+The Data Migration design ([`DATA_MIGRATION_DESIGN.md`](DATA_MIGRATION_DESIGN.md) §14.2, §19, §24) touches BRD-5 as
+follows; the owners review these changes when the waves run.
+- **GL-SL ledger context (V1087, Data Migration range because V890-V899 is full).** `acsl_glsl_control` gets
+  `ledger_context` (ANY / NEW / LEGACY) and `GlSlQueries` filters `ops_invoice.ledger_context` in the OPS_LEDGER
+  source, so a legacy control account reconciles to the legacy invoices and the new one to the BIBS invoices.
+- **Legacy control accounts and clearing.** BRD-13 asks for legacy Premium Receivable, Commission Receivable, DTIP and
+  UPP sub-ledgers (BRID 5-8). They are kept as separate control accounts reached through `LG_` amount components on the
+  existing events (decision D8 of `BDOI_CROSS_BRD_DECISIONS.md`), plus a migration clearing account that must be 0.00
+  per branch and currency after the opening loads. Real codes come from Comptrollership (AQ01, DMQ18). **Demo code
+  clash to resolve before V1982:** the Data Migration design proposes 1221 (Commission Receivable - Legacy) and 2212
+  (Due to Insurers - Legacy), which section 3 of this design reserves for the USD commission receivable and USD
+  payable to insurers if BDOI splits by currency; one of the two must take other codes.
+- **Trial balance through OPENING journals.** The legacy GL trial balance is loaded per branch and currency as system
+  journals of type `OPENING` (source `MIGRATION`, reference `MIG-TB-<asof>`), mapped through the code map set
+  `GL_ACCOUNT`; the legacy control-account lines built in detail by the invoice and UPP loaders go to the clearing
+  account instead. P&L balances follow DMQ18 (year-start cutover recommended).
+- **Payee migration through the framework.** `DISB_PAYEE_MIGRATION` (built) is called by the migration loader as
+  object R09, so the payee batch gets intake checks, reconciliation and sign-off. AQ11 stays open (BRD-13 does not
+  mention payees).
+- **Ageing.** GL schedules age FIFO on the posting value date (`finreport/service/ScheduleQueries.java`), so legacy PR
+  ages from the cutover date; ageing by invoice date is DMQ18.
+
 ## 13. Integrations to park (seam only)
 
 | Item | BRD | Seam built now | Question |

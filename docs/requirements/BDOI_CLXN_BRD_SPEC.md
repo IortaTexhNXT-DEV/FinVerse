@@ -352,6 +352,16 @@ Questions **not** answered by this BRD: OQ02 (Disbursement, a viewer-only stakeh
 | CQ24 | Incentive campaigns | Relation between the draft campaigns (062) and the early-remittance incentive in remittance batches (RMTID.023 / PRCID.028): the same programme billed by service invoice, or two programmes? | BRCLXN.062, OQ23 |
 | CQ25 | NFR alignment | CLXN hours 06:00-22:00 Mon-Fri and RPO 4 h vs Operations 07:00-18:30 and RPO 24 h vs BRD-1 07:00-22:00 Mon-Sat | NFR, OQ44 |
 
+**Answered in part by later BRDs** (single record with the design impact: [`BDOI_CROSS_BRD_DECISIONS.md`](BDOI_CROSS_BRD_DECISIONS.md) section 3):
+- **CQ13 answered** by BRD-13 Data Migration (BRID 6.1, 6.2): legacy invoices keep being processed in BIBS after
+  cutover, so both BIBS and EBIX invoice numbers are valid until the legacy invoices run off
+  (`CLX_INVOICE_NO_PATTERN` stays; QPS format per DMQ11).
+- **CQ07 partial** (BRD-13 p.3, BRID 5.1, 6.1-6.4, 11.1): outstanding receivables and UPP are carried forward and
+  processed in BIBS; history stays read-only in legacy or in the archive. Open dispositions, promises and collector
+  assignments are not mentioned (DMQ34). The Collections seam `CLX_LEGACY_ITEMS` is narrowed to that open state (V1007).
+- **CQ22 partial** (BRD-13 BRID 6.1): legacy invoices keep their legacy identifiers (`ops_invoice.legacy_invoice_no`,
+  `legacy_ref`, `source_system`); the field mapping is not given.
+
 ## 11. Observations on the BRD pack
 
 - The pack holds **two versions of the workshop addendum**. The signed one (p.13-22) stops at BRCLXN.060. The draft (p.1-12, "of 14", last two pages missing) adds 061-064. The revision logs are identical. Rows 061-064 are therefore unapproved (CQ01).

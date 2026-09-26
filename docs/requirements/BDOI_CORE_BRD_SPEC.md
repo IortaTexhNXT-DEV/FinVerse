@@ -176,8 +176,8 @@ half of "User & Data Management" (p.38).
 
 Columns: **Core BR** = the rows of the BR table (pp.13-25) that restate the bullet; **Covered by** = the BIBS BRD and
 its requirement IDs; **FRS** = the functional requirements of that BRD's FRS that meet it (read from the FRS sources).
-The FRS of BRD-4 Collections and BRD-7 Claims both use the prefix FR-CL (section 14, O9); the "Covered by" column says
-which one is meant. Module paths are under `backend/src/main/java/com/iortatechnxt/brokerverse/`.
+FR-CL is the prefix of BRD-4 Collections; BRD-7 Claims uses FR-CM (renumbered from FR-CL, section 14, O9 and
+DCR-188). Module paths are under `backend/src/main/java/com/iortatechnxt/brokerverse/`.
 
 ### CORE-01 Client Onboarding (p.6; traceability p.30)
 
@@ -378,19 +378,19 @@ which one is meant. Module paths are under `backend/src/main/java/com/iortatechn
 
 | ID | Capability | p. | Core BR | Covered by (BRD and IDs) | FRS | Status | BIBS module and files | Fit | Gap and proposal | Q |
 |---|---|---|---|---|---|---|---|---|---|---|
-| CORE-14.01 | Process claims advice from BDOI Marketing | 10 | BR-141 | BRD-7 BRCLM.003, BRCLM.016 | FR-CL-010, FR-CL-011, FR-CL-015, FR-CL-014 | Being built | `brokerclaims` ClaimRecordingService (CL1-A) | **NEW** | - | - |
-| CORE-14.02 | Process claims advice from client | 10 | BR-141 | BRD-7 BRCLM.003, BRCLM.006 | FR-CL-010, FR-CL-011, FR-CL-015, FR-CL-002 ... | Being built | `brokerclaims` ClaimRecordingService, LossAdviceService | **NEW** | - | - |
-| CORE-14.03 | Process claims advice from insurer | 10 | BR-141 | BRD-7 BRCLM.041, BRCLM.043 | FR-CL-003, FR-CL-011, FR-CL-022, FR-CL-024 ... | Being built | `brokerclaims` InsurerUpdateService, InsurerClaimService (V1022) | **NEW** | - | - |
-| CORE-14.04 | Process LOA from insurer | 10 | BR-142 | BRD-7 BRCLM.014, BRCLM.010 | FR-CL-043, FR-CL-040, FR-CL-046 | Being built | `brokerclaims` settlement type LOV | **NEW** | Repair monitoring after LOA is offline (CLQ05). | - |
-| CORE-14.05 | Process settlement offer from insurer | 10 | BR-143 | BRD-7 BRCLM.010, BRCLM.014 | FR-CL-040, FR-CL-046, FR-CL-043 | Being built | `brokerclaims` claim status | **NEW** | - | - |
-| CORE-14.06 | Tag permanent closure | 10 | BR-144 | BRD-7 BRCLM.035, BRCLM.005 | FR-CL-045, FR-CL-002 | Being built | `brokerclaims` (CL1-B) | **NEW** | - | - |
-| CORE-14.07 | Tag temporary closure | 10 | BR-145 | BRD-7 BRCLM.035 | FR-CL-045 | Being built | `brokerclaims` (CL1-B) | **NEW** | - | - |
+| CORE-14.01 | Process claims advice from BDOI Marketing | 10 | BR-141 | BRD-7 BRCLM.003, BRCLM.016 | FR-CM-010, FR-CM-011, FR-CM-015, FR-CM-014 | Being built | `brokerclaims` ClaimRecordingService (CL1-A) | **NEW** | - | - |
+| CORE-14.02 | Process claims advice from client | 10 | BR-141 | BRD-7 BRCLM.003, BRCLM.006 | FR-CM-010, FR-CM-011, FR-CM-015, FR-CM-002 ... | Being built | `brokerclaims` ClaimRecordingService, LossAdviceService | **NEW** | - | - |
+| CORE-14.03 | Process claims advice from insurer | 10 | BR-141 | BRD-7 BRCLM.041, BRCLM.043 | FR-CM-003, FR-CM-011, FR-CM-022, FR-CM-024 ... | Being built | `brokerclaims` InsurerUpdateService, InsurerClaimService (V1022) | **NEW** | - | - |
+| CORE-14.04 | Process LOA from insurer | 10 | BR-142 | BRD-7 BRCLM.014, BRCLM.010 | FR-CM-043, FR-CM-040, FR-CM-046 | Being built | `brokerclaims` settlement type LOV | **NEW** | Repair monitoring after LOA is offline (CLQ05). | - |
+| CORE-14.05 | Process settlement offer from insurer | 10 | BR-143 | BRD-7 BRCLM.010, BRCLM.014 | FR-CM-040, FR-CM-046, FR-CM-043 | Being built | `brokerclaims` claim status | **NEW** | - | - |
+| CORE-14.06 | Tag permanent closure | 10 | BR-144 | BRD-7 BRCLM.035, BRCLM.005 | FR-CM-045, FR-CM-002 | Being built | `brokerclaims` (CL1-B) | **NEW** | - | - |
+| CORE-14.07 | Tag temporary closure | 10 | BR-145 | BRD-7 BRCLM.035 | FR-CM-045 | Being built | `brokerclaims` (CL1-B) | **NEW** | - | - |
 | CORE-14.08 | Unclaimed checks safekeeping | 10 | BR-146 | BRD-7 | - | Being built | None | **NEW** | BRD-7 has no claim money through BDOI (CLQ10). The Core traceability (p.33) maps it only to status values. | CRQ03 |
 | CORE-14.09 | Handover of settlement checks to Cashiering | 10 | BR-147 | BRD-7 | - | Being built | None; `cashiering` check handling could host it | **NEW** | As CORE-14.08. | CRQ03 |
 | CORE-14.10 | Retrieval of checks from Cashiering for release | 10 | BR-148 | BRD-7 | - | Being built | None | **NEW** | As CORE-14.08. | CRQ03 |
-| CORE-14.11 | Maintain full claims history for audit and compliance | 10 | BR-151 | BRD-7 BRCLM.004, BRCLM.022 | FR-CL-012, FR-CL-052, FR-CL-054 | Being built | `brokerclaims`; `audit` | **NEW** | - | - |
-| CORE-14.12 | Reports and analytics viewing | 10 | BR-149, 152 | BRD-7 BRCLM.026, BRCLM.029, BRCLM.030, BRCLM.031, BRCLM.032 | FR-CL-060, FR-CL-044, FR-CL-061, FR-CL-062 | Being built | `brokerclaims` reports (CL1-B) | **NEW** | - | - |
-| CORE-14.13 | Encode / override the next follow-up date | 10 | BR-150 | BRD-7 BRCLM.019 | FR-CL-002, FR-CL-050, FR-CL-054 | Being built | `brokerclaims` (CL1-B) | **NEW** | - | - |
+| CORE-14.11 | Maintain full claims history for audit and compliance | 10 | BR-151 | BRD-7 BRCLM.004, BRCLM.022 | FR-CM-012, FR-CM-052, FR-CM-054 | Being built | `brokerclaims`; `audit` | **NEW** | - | - |
+| CORE-14.12 | Reports and analytics viewing | 10 | BR-149, 152 | BRD-7 BRCLM.026, BRCLM.029, BRCLM.030, BRCLM.031, BRCLM.032 | FR-CM-060, FR-CM-044, FR-CM-061, FR-CM-062 | Being built | `brokerclaims` reports (CL1-B) | **NEW** | - | - |
+| CORE-14.13 | Encode / override the next follow-up date | 10 | BR-150 | BRD-7 BRCLM.019 | FR-CM-002, FR-CM-050, FR-CM-054 | Being built | `brokerclaims` (CL1-B) | **NEW** | - | - |
 
 ### CORE-15 Reinsurance (p.10-11; traceability p.35)
 
@@ -487,7 +487,7 @@ which one is meant. Module paths are under `backend/src/main/java/com/iortatechn
 | XC-04 | Audit logs and full transaction history | 4-5, 20, 25 | BR-124, BR-129, BR-151, BR-207 | None (BRNB.016, BRNB.086, BRNB.089 related) | FR-NB-016, FR-NB-136 | Built | `audit` AuditTrailService; /admin/audit; AuditTrailReport | **FIT** | - | - |
 | XC-05 | Workflow maintained at the back end; data flows to the next process by rules | 15, 18, 23 | BR-051, BR-101, BR-177, BR-182 | None (BRNB.096, BRNB.022 related) | FR-NB-011, FR-NB-064, FR-NB-010, FR-NB-122 | Built | `workflow` WorkflowService (definitions in tables, e.g. PM_PACKAGE_REQUEST V755); `events` outbox | **CONFIGURE** | Forwarding files to other BDOI systems waits for the target systems (Q08). | - |
 | XC-06 | Batch and individual processing; concurrent users and high-volume bulk uploads | 4, 16 | BR-063 | None (BRNB.064, BRQID.006 related) | FR-NB-019, FR-NB-065, FR-OP-008 | Built | `bulk` framework; job lock (V34) | **FIT** | - | - |
-| XC-07 | Currency selection and multi-currency support | 15, 18 | BR-027, BR-088 | None (BRCLM.009 related) | FR-CL-011 | Built | `currency`; account currency (default PHP); FX revaluation | **FIT** | - | - |
+| XC-07 | Currency selection and multi-currency support | 15, 18 | BR-027, BR-088 | None (BRCLM.009 related) | FR-CM-011 | Built | `currency`; account currency (default PHP); FX revaluation | **FIT** | - | - |
 | XC-08 | 30-day hold cover request, assigned to a role | 14 | BR-034 | BRD-1 BRNB.072, BRNB.103 | FR-NB-082, FR-NB-083 | Built | `placement` HoldCoverService | **FIT** | - | - |
 | XC-09 | Tag direct payment (DP) accounts | 14 | BR-035 | BRD-1 BRNB.114 | FR-NB-069, FR-NB-092 | Built | `account` AccountTaggingService; /accounts/direct-payment | **FIT** | - | - |
 | XC-10 | SOA generated with placement report and Insurance Advice; service invoice to insurer issued with the SOA at booking | 14-15 | BR-039, BR-043 | BRD-1 BRNB.100, BRCLXN.058 | FR-NB-117, FR-CL-060, FR-CL-061 | Built | `booking` ServiceInvoiceTriggers; `collections` BillingStatementService (client SOA per billing cycle) | **CHANGE** | The service invoice is issued at booking; no SOA is issued at booking. | CRQ12 |
@@ -748,6 +748,6 @@ should test 429 concurrent sessions as the peak case.
 | O6 | BR-178 to BR-183 are vendor-qualification questions from the RFI (brand, icons, design system, journeys, Figma), not system requirements | p.23 |
 | O7 | The capability matrix (pp.26-29) differs from the list: it adds "Client Confirmation" and "Maintenance" (account), "Check Renewal Payment", "Receive and Validate File from Stakeholders", "Notification to Stakeholders", "Log Audit, History for Traceability" and "Net Settlement" (Reinsurance), and names the Data Management column "User & Data Management" with "User access and record" | p.26-28 |
 | O8 | Capability 20 (Product Maintenance) restates benefits ("Easier quotation/proposal management", "Works with existing systems") rather than functions | p.12 |
-| O9 | (BIBS documents, found during this analysis) The FRS of BRD-4 Collections and BRD-7 Claims both number their requirements FR-CL-nnn; 28 IDs exist in both documents | FRS sources |
+| O9 | (BIBS documents, found during this analysis) The FRS of BRD-4 Collections and BRD-7 Claims both numbered their requirements FR-CL-nnn; 28 IDs existed in both documents. Claims now uses FR-CM-nnn (DCR-188) | FRS sources |
 | O10 | Availability, demand and peak questions are answered "Refer to BRD"; the only new NFR values are users, response time and retention | p.44-45 |
 | O11 | Approval: one approver on leave without signature, one "sign-off not applicable", four by e-mail (CRQ25) | p.46-48 |

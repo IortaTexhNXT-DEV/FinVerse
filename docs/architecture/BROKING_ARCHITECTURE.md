@@ -297,6 +297,10 @@ PROSPECT/KYC_REVIEW/KYC_VERIFIED/CONFIRMED --deactivate(reason)--> INACTIVE
   - **Broking Setup**
 
   The insurer and finance sections follow.
+
+  Planned by the Core Replacement umbrella BRD (designed, not built; [`CORE_REPLACEMENT_IMPACT.md`](CORE_REPLACEMENT_IMPACT.md)
+  §4, §8): a **Role Home** page made of widgets per role becomes the landing page (wave CR-W3, V1094; widget sets wait
+  for CRQ06), and **Broking Setup** gains **MIS Fields** and **Master Data Change Log** (wave CR-W1, V1091-V1092).
 - Shared broking components (W1, `components/broking`):
   - `StageTimeline`: status history.
   - `WorkflowPanel`: current stage, SLA, assignee and generic actions with a reason dialog.
@@ -1286,6 +1290,8 @@ The screen `/nb/dashboard` (permission WORK_VIEW) is the landing page of the bro
 `navigation/access.landingPath` prefers it before My Work, and V880 withdraws the finance
 `DASHBOARD_VIEW` from MKT_TL, PROCESSING_TL and NB_APPROVER. Every tile and bar opens its filtered
 list (`/accounts?status=`, `/quotations?tab=`, `/booking?tab=BOOKED`, `/reports/NB-ACC-STATUS`).
+When the Role Home of the Core Replacement design is built (CR-W3), `landingPath` prefers the role home and this
+dashboard becomes one of its widget sources.
 
 ### 16.3 Saved report variants (BRNB.057)
 

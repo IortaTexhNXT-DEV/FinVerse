@@ -10,7 +10,7 @@
 meta:
   brd: BRD-07
   name: Claims
-  code: CL
+  code: CM
   frs: FRS_BRD07_CLAIMS.md
   summary: TP_BRD07_CLAIMS.md
   version: "1.0"
@@ -60,83 +60,83 @@ screens:
   API: API call with the user's token (tester tool, for example Postman)
 
 data:
-  - id: TD-CL-01
+  - id: TD-CM-01
     name: Test users per Claims role
     content: cl.officer1 (CLM_OFFICER, unit Motor HO), cl.officer2 (CLM_OFFICER, Non-Motor HO), cl.tl1 (CLM_TL), cl.th1 (CLM_TH), cl.uh1 and cl.uh2 (CLM_UH), cl.risk (CLM_RISK), cl.mktao (MKT_AO), cl.mkttl (MKT_TL), cl.remit (Operations remittance), cl.sysadmin (SYSADMIN), cl.auditor (AUDITOR); cl.officer3 (CLM_OFFICER) is not in the claims handler register
     source: Created by the test lead on SIT through approved access requests (BRD-11); grants of FRS section 3.3
-  - id: TD-CL-02
+  - id: TD-CM-02
     name: Motor cover, premium paid
     content: ARN-2026-000501 Motor own damage and theft, currency PHP, policy year 2026, policy MC-2026-11021 issued, one booked endorsement (version 1), all invoices paid, AO cl.mktao of Retail Marketing 1, branch Makati
     source: Booked and paid through BRD-1 and Cashiering on SIT; masked client
-  - id: TD-CL-03
+  - id: TD-CM-03
     name: Property cover, three locations, two insurers, unpaid endorsement
     content: ARN-2026-000602 Fire and allied perils, currency USD, locations L1 Makati, L2 Pasig, L3 Cebu; insurers INS-A 60 % and INS-B 40 %; original invoice paid, endorsement invoice PHP 18,400 unpaid; one cancelled unpaid invoice
     source: Booked on SIT with two insurer shares; endorsement invoice left unpaid
-  - id: TD-CL-04
+  - id: TD-CM-04
     name: Covers for defaults and edge cases
     content: ARN-2026-000703 without currency (defaults to PHP); ARN-2026-000704 direct-payment account (premium paid to the insurer); ARN-2026-000705 policy not yet issued; ARN-2026-000706 with a second endorsement booked after the loss date
     source: Booked on SIT by the test lead
-  - id: TD-CL-05
+  - id: TD-CM-05
     name: Claims in every phase
     content: "BCL-2026-000101 status 1 (NEW); BCL-2026-000102 status 3 (IN_PROGRESS, 5 days in status 3 then status 8 for 2 days); BCL-2026-000103 status 11 awaiting premium remittance; BCL-2026-000104 status 18 (TEMP_CLOSED); BCL-2026-000105 closed Closed - Denied on 15 March; BCL-2026-000106 settled Settled - Signed Release Papers Returned; claims aged 45, 80 and 95 days for the ageing and past-due cases"
     source: Recorded on SIT by the test lead; reported dates set in the test database for ageing
-  - id: TD-CL-06
+  - id: TD-CM-06
     name: Lists and matrix
     content: The 18 statuses, 10 settlement types, 25 adjusters, 7 catastrophe codes of the FRS; default status access matrix (TL and TH all statuses; officers statuses 1, 2, 17 and 18); claims handler register (Motor HO, Non-Motor HO, branches)
     source: Delivered list values of FRS section 9.2; register keyed in by cl.uh1
-  - id: TD-CL-07
+  - id: TD-CM-07
     name: Upload files
     content: "Insurer claim numbers file (10 rows); insurer updates file of 50 rows with one row whose insurer claim number matches no claim; insurer location references file"
     source: Prepared from the bulk templates BCL_INSURER_UPDATE and BCL_LOCATION_REF by the test lead
-  - id: TD-CL-08
+  - id: TD-CM-08
     name: Loss figures
     content: "Claim with reserve 100,000 and paid 60,000 (O/S 40,000); cover with premium 50,000 and losses 25,000 (loss ratio 50.00 %); location L1 with 3 claims in the last 3 years, one tagged Flood"
     source: Recorded on SIT with reserves and settlements; premiums from the booked invoices
-  - id: TD-CL-09
+  - id: TD-CM-09
     name: Insurer mailboxes
     content: INS-A claims e-mail cl-ins-a@test.bdoi.local; INS-B without a claims e-mail
     source: Insurer master on SIT; mailboxes of the SIT relay
 
 scenarios:
-  - id: SC-CL-01
+  - id: SC-CM-01
     persona: SYSADMIN
     title: Access and audit. Claims users log in, see only the Claims actions of their role, and every change on a claim is kept in its history and the audit trail.
-    pre: Users of TD-CL-01 are active.
-  - id: SC-CL-02
+    pre: Users of TD-CM-01 are active.
+  - id: SC-CM-02
     persona: CLM_OFFICER
     title: Cover and premium. The Claims Officer looks up a cover, records a claim with cover, version, policy number and sales data, and gets the authorization code only when the premium is paid.
-    pre: Covers TD-CL-02 to TD-CL-04.
-  - id: SC-CL-03
+    pre: Covers TD-CM-02 to TD-CM-04.
+  - id: SC-CM-03
     persona: CLM_OFFICER
     title: Locations and insurers. The officer links several locations and insurers to one claim, records insurer claim numbers and updates, maintains insurer location references and sends the loss advice.
-    pre: Cover TD-CL-03; files TD-CL-07; mailboxes TD-CL-09.
-  - id: SC-CL-04
+    pre: Cover TD-CM-03; files TD-CM-07; mailboxes TD-CM-09.
+  - id: SC-CM-04
     persona: CLM_TL
     title: Claim handling. The Team Lead overrides the claimant, assigns adjusters, amends the reserve and tags catastrophes.
-    pre: Open claims of TD-CL-05; lists TD-CL-06.
-  - id: SC-CL-05
+    pre: Open claims of TD-CM-05; lists TD-CM-06.
+  - id: SC-CM-05
     persona: CLM_TL
     title: Status, settlement and closure. Handlers change statuses within the matrix, set the settlement, close temporarily or permanently, reopen, and request the special remittance.
-    pre: Claims TD-CL-05; matrix TD-CL-06.
-  - id: SC-CL-06
+    pre: Claims TD-CM-05; matrix TD-CM-06.
+  - id: SC-CM-06
     persona: CLM_OFFICER
     title: Follow-up and ageing. BIBS computes follow-up dates and ages; handlers keep the action plan and diary and work the follow-ups due from Claims Home.
-    pre: Claims TD-CL-05.
-  - id: SC-CL-07
+    pre: Claims TD-CM-05.
+  - id: SC-CM-07
     persona: CLM_UH
     title: Reports and analytics. Claims users and Marketing run the ageing, outstanding, settled, loss, location and register reports and the data extract within their rights.
-    pre: Claims TD-CL-05 and loss figures TD-CL-08.
-  - id: SC-CL-08
+    pre: Claims TD-CM-05 and loss figures TD-CM-08.
+  - id: SC-CM-08
     persona: CLM_UH
     title: Set-up. The Unit Head maintains statuses, settlement types, adjusters, catastrophe codes and the status matrix under maker-checker.
     pre: cl.uh1 and cl.uh2 available.
 
 frs:
-  FR-CL-001:
-    scenario: SC-CL-01
+  FR-CM-001:
+    scenario: SC-CM-01
     persona: CLM_OFFICER
     screen: LOGIN
-    data: [TD-CL-01]
+    data: [TD-CM-01]
     conditions:
       - A user with a Claims role logs in with a masked password and sees the Claims Handling menu section.
       - Wrong credentials are refused with a plain message and counted.
@@ -190,11 +190,11 @@ frs:
           - As cl.tl1 look for the Audit Trail.
         expected: The successful and failed log-ins and the lock are listed with time and source address; cl.tl1 has no Audit Trail in the menu.
 
-  FR-CL-002:
-    scenario: SC-CL-01
+  FR-CM-002:
+    scenario: SC-CM-01
     persona: CLM_OFFICER
     screen: CLAIM
-    data: [TD-CL-01, TD-CL-05]
+    data: [TD-CM-01, TD-CM-05]
     conditions:
       - Each Claims action is offered only to the roles holding its permission; a direct call without it is refused (HTTP 403) and logged.
       - Marketing roles get the Claims reports only, never claim maintenance.
@@ -260,11 +260,11 @@ frs:
           - As cl.uh1 raise a User Access request adding BCL_DATA_EXTRACT to cl.tl1; cl.sysadmin approves.
         expected: cl.tl1 can run the Claims Data Extract after the approval and not before.
 
-  FR-CL-003:
-    scenario: SC-CL-01
+  FR-CM-003:
+    scenario: SC-CM-01
     persona: CLM_TL
     screen: HIST
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - The History tab lists every change on the claim (status, reserve, claimant, adjuster, follow-up, action plan, version, code, insurer updates, location references) with user and time.
       - Each change writes an audit entry with before and after values.
@@ -293,11 +293,11 @@ frs:
           - Look for edit or delete on the History tab; call PUT and DELETE on a history row.
         expected: No action exists; the calls are refused.
 
-  FR-CL-010:
-    scenario: SC-CL-02
+  FR-CM-010:
+    scenario: SC-CM-02
     persona: CLM_OFFICER
     screen: COVER
-    data: [TD-CL-02, TD-CL-03]
+    data: [TD-CM-02, TD-CM-03]
     conditions:
       - A Claims user finds any cover by ARN, policy number or assured and sees its data read-only (account header, items and locations, endorsements, invoices with payment status, claims, insurer location references).
       - The Cover Lookup offers no edit action on the account.
@@ -347,11 +347,11 @@ frs:
           - As cl.mktao type the Cover Lookup address.
         expected: The no-access page is shown and no cover data is loaded.
 
-  FR-CL-011:
-    scenario: SC-CL-02
+  FR-CM-011:
+    scenario: SC-CM-02
     persona: CLM_OFFICER
     screen: NEWCLAIM
-    data: [TD-CL-02, TD-CL-03, TD-CL-04]
+    data: [TD-CM-02, TD-CM-03, TD-CM-04]
     conditions:
       - A claim cannot be saved without cover number, policy year and cover version.
       - The claim currency is the cover currency, else PHP.
@@ -429,11 +429,11 @@ frs:
         expected: BIBS warns and saves only after the confirmation.
         msg: ["The loss date is outside the cover period {01-Jan-2026} to {31-Dec-2026}. Confirm to continue"]
 
-  FR-CL-012:
-    scenario: SC-CL-02
+  FR-CM-012:
+    scenario: SC-CM-02
     persona: CLM_TL
     screen: DETAILS
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - The reported date is entered at recording and corrected on an open claim only by a BCL_STATUS_UPDATE holder with a reason; the change is in the history.
       - The reported date must be between the loss date and today.
@@ -489,11 +489,11 @@ frs:
         expected: The change is refused.
         msg: [The reported date of a closed claim cannot change]
 
-  FR-CL-013:
-    scenario: SC-CL-02
+  FR-CM-013:
+    scenario: SC-CM-02
     persona: CLM_OFFICER
     screen: CLAIM
-    data: [TD-CL-02, TD-CL-04]
+    data: [TD-CM-02, TD-CM-04]
     conditions:
       - The claim shows the policy number of its policy year without any entry, and the invoice of the cover shows the same number.
       - Claims keeps a copy of the policy number and never edits it.
@@ -533,11 +533,11 @@ frs:
           - Record a claim on ARN-2026-000705; issue the policy in BRD-1; reopen the claim.
         expected: The claim first shows "Policy number pending", then the issued number after the snapshot refresh.
 
-  FR-CL-014:
-    scenario: SC-CL-02
+  FR-CM-014:
+    scenario: SC-CM-02
     persona: CLM_OFFICER
     screen: CLAIM
-    data: [TD-CL-02]
+    data: [TD-CM-02]
     conditions:
       - A new claim shows the Marketing team, AO and branch of the account from the sales stamp at recording.
       - Reports list the stored Marketing Team and Account Officer; Refresh Cover Data reloads changed values and records the change.
@@ -572,11 +572,11 @@ frs:
           - Change the account's AO; run BCL-OUTSTANDING before the refresh.
         expected: The report shows the stored AO, not the new one.
 
-  FR-CL-015:
-    scenario: SC-CL-02
+  FR-CM-015:
+    scenario: SC-CM-02
     persona: CLM_OFFICER
     screen: CLAIM
-    data: [TD-CL-04]
+    data: [TD-CM-04]
     conditions:
       - The claim shows the cover number and version used, the version being the booked endorsements effective on or before the loss date.
       - A later endorsement of the policy year sets the flag Newer cover version and notifies the handler; the handler may switch to the latest version.
@@ -604,11 +604,11 @@ frs:
           - Open the cover panel of the claim.
         expected: The panel is read only.
 
-  FR-CL-016:
-    scenario: SC-CL-02
+  FR-CM-016:
+    scenario: SC-CM-02
     persona: CLM_OFFICER
     screen: CLAIM
-    data: [TD-CL-02, TD-CL-03, TD-CL-04]
+    data: [TD-CM-02, TD-CM-03, TD-CM-04]
     conditions:
       - The premium check reads the invoices of the ARN and policy year (cancelled excluded) and shows PAID, UNPAID, PARTIALLY_PAID, DIRECT_PAYMENT or NO_INVOICE with the unpaid invoices.
       - The authorization code is generated only when the result is PAID; otherwise the button is disabled and the claim shows Unpaid premium.
@@ -678,11 +678,11 @@ frs:
           - Time the cover card from selecting ARN-2026-000602 to the premium result, five times.
         expected: Each answer comes within 5 seconds.
 
-  FR-CL-020:
-    scenario: SC-CL-03
+  FR-CM-020:
+    scenario: SC-CM-03
     persona: CLM_OFFICER
     screen: LOCATIONS
-    data: [TD-CL-03]
+    data: [TD-CM-03]
     conditions:
       - A claim links one or more locations of its own cover and keeps one claim number; two or more show the flag Multi-location.
       - A location of another account, or one already linked, is refused.
@@ -717,17 +717,17 @@ frs:
         expected: L1 shows address, city, province and the INS-A and INS-B references; the removal of L2 is recorded with user and time.
       - c: 1
         type: Negative
-        data: [TD-CL-02]
+        data: [TD-CM-02]
         title: Motor cover shows no picker
         steps:
           - Record a claim on the Motor cover ARN-2026-000501.
         expected: The location picker is not shown; Place of loss is a text field.
 
-  FR-CL-021:
-    scenario: SC-CL-03
+  FR-CM-021:
+    scenario: SC-CM-03
     persona: CLM_OFFICER
     screen: INSURERS
-    data: [TD-CL-03, TD-CL-07]
+    data: [TD-CM-03, TD-CM-07]
     conditions:
       - A claim holds one insurer line per insurer with share, insurer claim number, date reported, reserve, settled amount and adjuster, proposed from the invoice shares; two insurers show Multi-insurer.
       - The same insurer claim number twice for the same insurer and claim is refused; reuse on another claim warns and raises an alert.
@@ -773,14 +773,14 @@ frs:
         screen: BULK
         title: Upload of insurer claim numbers
         steps:
-          - Upload the insurer claim numbers file of TD-CL-07.
+          - Upload the insurer claim numbers file of TD-CM-07.
         expected: All 10 rows are validated before the file is applied; each number appears on its claim line.
 
-  FR-CL-022:
-    scenario: SC-CL-03
+  FR-CM-022:
+    scenario: SC-CM-03
     persona: CLM_OFFICER
     screen: INSURERS
-    data: [TD-CL-07]
+    data: [TD-CM-07]
     conditions:
       - An insurer update with date, source, reference, remarks and attachments appears in the claim timeline, linked to an insurer line when chosen.
       - An update cannot be edited or deleted; a correction is a new update that refers to it.
@@ -804,7 +804,7 @@ frs:
         screen: BULK
         title: 50-row file with one unmatched row
         steps:
-          - Upload the insurer updates file of TD-CL-07.
+          - Upload the insurer updates file of TD-CM-07.
         expected: The file is refused as a whole; no update is applied.
         msg: ["Row {37}: no claim found for {INS-B} {C-INSB-0000}"]
       - c: 3
@@ -822,11 +822,11 @@ frs:
         expected: The first shows "Enter the remarks"; the second is refused.
         msg: [Enter an update date that is not in the future]
 
-  FR-CL-023:
-    scenario: SC-CL-03
+  FR-CM-023:
+    scenario: SC-CM-03
     persona: CLM_OFFICER
     screen: LOCREF
-    data: [TD-CL-03, TD-CL-07]
+    data: [TD-CM-03, TD-CM-07]
     conditions:
       - For each location and insurer BIBS holds one current insurer location reference with effective dates, shown on the claim location.
       - A change end-dates the previous reference and keeps it.
@@ -865,14 +865,14 @@ frs:
         screen: BULK
         title: Load references by upload
         steps:
-          - Upload the insurer location references file of TD-CL-07.
+          - Upload the insurer location references file of TD-CM-07.
         expected: Each row becomes the current reference of its location and insurer.
 
-  FR-CL-024:
-    scenario: SC-CL-03
+  FR-CM-024:
+    scenario: SC-CM-03
     persona: CLM_OFFICER
     screen: CLAIM
-    data: [TD-CL-03, TD-CL-09]
+    data: [TD-CM-03, TD-CM-09]
     conditions:
       - The loss advice is generated from the claim with the PLA / CRF fields, the adjuster and the insurer claim numbers, previewed and e-mailed to each insurer's claims e-mail with a send log.
       - The sent advice is stored as CLAIM_REPORT on the claim, the account and the client.
@@ -925,11 +925,11 @@ frs:
         expected: Nothing is sent.
         msg: [Select at least one insurer]
 
-  FR-CL-030:
-    scenario: SC-CL-04
+  FR-CM-030:
+    scenario: SC-CM-04
     persona: CLM_TL
     screen: DETAILS
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - A new claim shows the assured as claimant.
       - A TL or TH overrides or inputs the claimant with a reason; the claim shows Claimant overridden and the change is kept.
@@ -966,11 +966,11 @@ frs:
           - As cl.officer1 open the claim.
         expected: The action is not shown.
 
-  FR-CL-031:
-    scenario: SC-CL-04
+  FR-CM-031:
+    scenario: SC-CM-04
     persona: CLM_TL
     screen: CLAIM
-    data: [TD-CL-06]
+    data: [TD-CM-06]
     conditions:
       - The adjuster list offers the 25 companies of the BRD.
       - A TL or TH assigns or changes the adjuster of a claim or of one insurer line; each change is kept.
@@ -1034,11 +1034,11 @@ frs:
         expected: The action is not shown; the call returns HTTP 403.
         msg: [You are not permitted to perform this action]
 
-  FR-CL-032:
-    scenario: SC-CL-04
+  FR-CM-032:
+    scenario: SC-CM-04
     persona: CLM_TL
     screen: RESERVE
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - The insurer reserve is held per insurer line, starting from the initial loss reserve; the claim total is the sum of the lines.
       - A TL or TH amends a line with a reason; the history shows previous and new amounts.
@@ -1096,11 +1096,11 @@ frs:
           - As cl.officer1 open Reserve & Settlement.
         expected: Amend Reserve is not shown.
 
-  FR-CL-033:
-    scenario: SC-CL-04
+  FR-CM-033:
+    scenario: SC-CM-04
     persona: CLM_OFFICER
     screen: DETAILS
-    data: [TD-CL-06]
+    data: [TD-CM-06]
     conditions:
       - A claim tagged with a catastrophe code and event name shows the flag CAT.
       - The Unit Head adds a code, selectable after authorisation.
@@ -1131,11 +1131,11 @@ frs:
         expected: Nothing is saved.
         msg: [Select the catastrophe code of the event]
 
-  FR-CL-040:
-    scenario: SC-CL-08
+  FR-CM-040:
+    scenario: SC-CM-08
     persona: CLM_UH
     screen: SETUP
-    data: [TD-CL-06]
+    data: [TD-CM-06]
     conditions:
       - The status list offers the 18 BRD values on a new database, each with phase, waiting party, follow-up days and the awaiting-remittance flag.
       - A new status is selectable only after authorisation and once its phase is set.
@@ -1175,11 +1175,11 @@ frs:
         expected: Both are refused; 365 is accepted.
         msg: [Enter a whole number of days]
 
-  FR-CL-041:
-    scenario: SC-CL-05
+  FR-CM-041:
+    scenario: SC-CM-05
     persona: CLM_OFFICER
     screen: CLAIM
-    data: [TD-CL-06]
+    data: [TD-CM-06]
     conditions:
       - Change Status lists only the statuses the matrix allows for one of the user's roles and the user's unit.
       - A status outside the matrix is refused even when called directly.
@@ -1224,11 +1224,11 @@ frs:
         expected: No status can be set.
         msg: [Your claims unit is not set. Contact the Unit Head]
 
-  FR-CL-042:
-    scenario: SC-CL-05
+  FR-CM-042:
+    scenario: SC-CM-05
     persona: CLM_TL
     screen: CLAIM
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - A status change with a remark writes a status history row (from, to, time, user, remark, days in the previous status), moves the phase, resets age this stage and recomputes the follow-up date.
       - Status 11 lists the unremitted invoices with the link to the special remittance.
@@ -1278,11 +1278,11 @@ frs:
           - Time the save of five status changes.
         expected: Each is saved and shown within 1 minute (NFR 15.06).
 
-  FR-CL-043:
-    scenario: SC-CL-08
+  FR-CM-043:
+    scenario: SC-CM-08
     persona: CLM_UH
     screen: SETUP
-    data: [TD-CL-06]
+    data: [TD-CM-06]
     conditions:
       - The settlement type list offers the 10 BRD values with outcome, closes-the-claim and requires-amount attributes.
       - An attribute change takes effect after authorisation without a new build.
@@ -1311,11 +1311,11 @@ frs:
         expected: Nothing is saved.
         msg: [Set the outcome of the settlement type]
 
-  FR-CL-044:
-    scenario: SC-CL-05
+  FR-CM-044:
+    scenario: SC-CM-05
     persona: CLM_TL
     screen: RESERVE
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - A TL or TH sets or changes the settlement type; a settled type needs amount and date, which feed the settled and loss reports.
       - A closing type also needs BCL_CLOSE and closes the claim.
@@ -1376,11 +1376,11 @@ frs:
           - As cl.officer1 open Reserve & Settlement.
         expected: Set Settlement is not shown.
 
-  FR-CL-045:
-    scenario: SC-CL-05
+  FR-CM-045:
+    scenario: SC-CM-05
     persona: CLM_OFFICER
     screen: CLAIM
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - Status 17 or 18 closes the claim temporarily; it stays in the Temporarily Closed tab and the outstanding reports and keeps ageing; any permitted user resumes it.
       - A closing settlement type by a TL or TH closes the claim permanently; it stops ageing and accepts only diary entries, insurer updates and reopen.
@@ -1450,11 +1450,11 @@ frs:
         expected: The claim stays closed.
         msg: ["Select a reason for 'reopen'"]
 
-  FR-CL-046:
-    scenario: SC-CL-05
+  FR-CM-046:
+    scenario: SC-CM-05
     persona: CLM_OFFICER
     screen: CLAIM
-    data: [TD-CL-03, TD-CL-05]
+    data: [TD-CM-03, TD-CM-05]
     conditions:
       - A claim in a status flagged awaiting premium remittance appears in the CLAIMS_SPECIAL_REMIT feed with its unremitted invoice, and the link opens the special remittance with the invoice and condition CLAIMS.
       - Operations refuses a claims special remittance for an invoice without such a claim.
@@ -1490,11 +1490,11 @@ frs:
           - Process the remittance of the BCL-2026-000103 invoice; as the handler open the bell.
         expected: The handler has BCL_PREMIUM_REMITTED.
 
-  FR-CL-050:
-    scenario: SC-CL-06
+  FR-CM-050:
+    scenario: SC-CM-06
     persona: CLM_TL
     screen: CLAIM
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - The next follow-up date is the status's follow-up days (else BCL_FOLLOW_UP_DAYS) from the change date.
       - A TL or TH overrides the date with a reason; the flag Follow-up overridden is shown and later status changes keep the date until it passes.
@@ -1540,11 +1540,11 @@ frs:
           - As cl.officer1 open the claim.
         expected: Override Follow-up Date is not shown.
 
-  FR-CL-051:
-    scenario: SC-CL-06
+  FR-CM-051:
+    scenario: SC-CM-06
     persona: CLM_OFFICER
     screen: DETAILS
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - The current Next Action Plan Summary appears in the worklist and in the Follow Ups / Remarks column of the outstanding reports.
       - Every saved version is kept in the history.
@@ -1596,11 +1596,11 @@ frs:
           - As cl.auditor open the claim.
         expected: The field is read only.
 
-  FR-CL-052:
-    scenario: SC-CL-06
+  FR-CM-052:
+    scenario: SC-CM-06
     persona: CLM_OFFICER
     screen: DIARY
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - A diary entry assigned to another handler appears in that handler's My Diary, and the assignee is notified.
       - The assignee marks the entry done; entries are not deleted.
@@ -1650,11 +1650,11 @@ frs:
         expected: Nothing is saved.
         msg: [Enter the diary text]
 
-  FR-CL-053:
-    scenario: SC-CL-06
+  FR-CM-053:
+    scenario: SC-CM-06
     persona: CLM_OFFICER
     screen: CLAIM
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - Age overall is the calendar days from the reported date to today, or to the closure date for a closed claim.
       - Age this stage is the days in the current status; the status history gives the days of every earlier status.
@@ -1694,11 +1694,11 @@ frs:
           - Read the age of BCL-2026-000104 on two days.
         expected: Age overall rises by one each day.
 
-  FR-CL-054:
-    scenario: SC-CL-06
+  FR-CM-054:
+    scenario: SC-CM-06
     persona: SYSTEM
     screen: WORKLIST
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - At 06:00 the job notifies each handler of the claims and diary entries due today; they appear in Follow-ups Due.
       - A past-due follow-up raises one BCL_FOLLOW_UP_OVERDUE alert per claim until cleared.
@@ -1730,11 +1730,11 @@ frs:
           - Open Follow-ups Due for a claim due tomorrow.
         expected: The claim is not listed.
 
-  FR-CL-055:
-    scenario: SC-CL-06
+  FR-CM-055:
+    scenario: SC-CM-06
     persona: CLM_OFFICER
     screen: HOME
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - Claims Home shows open claims, follow-ups due and overdue, claims by status and phase, ageing buckets, unpaid covers and awaiting remittance; each tile opens its filtered list; it loads within 5 seconds.
       - The worklist tabs and the search by claim number, insurer claim number, ARN, policy number and assured work.
@@ -1783,11 +1783,11 @@ frs:
           - As cl.officer1 select claims.
         expected: Reassign is not shown.
 
-  FR-CL-060:
-    scenario: SC-CL-07
+  FR-CM-060:
+    scenario: SC-CM-07
     persona: CLM_UH
     screen: REPORTS
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - BCL-AGEING lists outstanding claims with age overall and bucket and totals per bucket and insurer; BCL-AGEING-STATUS groups by status and insurer with age this stage.
       - Export in Excel, PDF or CSV needs BCL_REPORT_EXPORT; the file is named <Report>_<date of extraction>.
@@ -1836,11 +1836,11 @@ frs:
           - Run BCL-AGEING for all claims of the test company.
         expected: The result is shown within 5 minutes.
 
-  FR-CL-061:
-    scenario: SC-CL-07
+  FR-CM-061:
+    scenario: SC-CM-07
     persona: CLM_UH
     screen: REPORTS
-    data: [TD-CL-05]
+    data: [TD-CM-05]
     conditions:
       - BCL-OUTSTANDING lists every claim in phase NEW, IN_PROGRESS or TEMP_CLOSED with the BRD columns and the insurer claim numbers.
       - BCL-OUTSTANDING-PAST-DUE keeps the claims older than BCL_PAST_DUE_DAYS; the daily job raises BCL_CLAIM_PAST_DUE.
@@ -1899,11 +1899,11 @@ frs:
         expected: The report does not run.
         msg: ["{Date settled to} must not be before {Date settled from}"]
 
-  FR-CL-062:
-    scenario: SC-CL-07
+  FR-CM-062:
+    scenario: SC-CM-07
     persona: CLM_UH
     screen: REPORTS
-    data: [TD-CL-08]
+    data: [TD-CM-08]
     conditions:
       - The Loss Experience report shows per claim and insurer line paid, O/S (reserve less paid, not below zero) and total.
       - The Loss Ratio report divides the losses by the signed gross premium of the cover and policy year.
@@ -1916,7 +1916,7 @@ frs:
         brd: [BRCLM.030]
         title: Reserve 100,000 and paid 60,000
         steps:
-          - Run BCL-LOSS-EXPERIENCE for the client of TD-CL-08.
+          - Run BCL-LOSS-EXPERIENCE for the client of TD-CM-08.
         expected: The claim shows paid 60,000, O/S 40,000 and total 100,000.
       - c: 1
         priority: High
@@ -1932,7 +1932,7 @@ frs:
         brd: [BRCLM.032]
         title: Loss ratio 50.00 %
         steps:
-          - Run BCL-LOSS-RATIO grouped by client for the cover of TD-CL-08.
+          - Run BCL-LOSS-RATIO grouped by client for the cover of TD-CM-08.
         expected: Premium 50,000, losses 25,000, loss ratio 50.00 %.
       - c: 3
         priority: High
@@ -1953,11 +1953,11 @@ frs:
         expected: The report does not run.
         msg: [Select the grouping]
 
-  FR-CL-063:
-    scenario: SC-CL-07
+  FR-CM-063:
+    scenario: SC-CM-07
     persona: CLM_RISK
     screen: REPORTS
-    data: [TD-CL-08]
+    data: [TD-CM-08]
     conditions:
       - A location with at least BCL_PRONE_MIN_CLAIMS claims in BCL_PRONE_YEARS years is flagged claims-prone.
       - The catastrophe filter lists only the claims with that code; the drill-down lists the claims of a location.
@@ -1983,11 +1983,11 @@ frs:
         expected: The report does not run.
         msg: ["{Period to} must not be before {Period from}"]
 
-  FR-CL-064:
-    scenario: SC-CL-07
+  FR-CM-064:
+    scenario: SC-CM-07
     persona: CLM_RISK
     screen: REPORTS
-    data: [TD-CL-03, TD-CL-08]
+    data: [TD-CM-03, TD-CM-08]
     conditions:
       - The Claims Data Extract gives one row per claim, insurer line and location, downloadable in Excel or CSV.
       - Users save parameter sets as report variants.
@@ -2017,11 +2017,11 @@ frs:
         expected: The report is not listed; the call returns HTTP 403.
         msg: [You are not permitted to perform this action]
 
-  FR-CL-065:
-    scenario: SC-CL-07
+  FR-CM-065:
+    scenario: SC-CM-07
     persona: MKT_AO
     screen: REPORTS
-    data: [TD-CL-08]
+    data: [TD-CM-08]
     conditions:
       - A Marketing AO views the Loss Experience report and the account's loss summary and cannot download.
       - A Marketing TL downloads the report in Excel.
@@ -2055,11 +2055,11 @@ frs:
           - Type the address of a claim record; call GET on the claim.
         expected: The no-access page is shown; the call returns HTTP 403.
 
-  FR-CL-066:
-    scenario: SC-CL-07
+  FR-CM-066:
+    scenario: SC-CM-07
     persona: CLM_UH
     screen: REPORTS
-    data: [TD-CL-03, TD-CL-05]
+    data: [TD-CM-03, TD-CM-05]
     conditions:
       - The Insurer Claim Numbers report lists one row per insurer claim number with the BDOI claim, insurer, share, reserve and settled amount.
       - The Claims Activity Log lists status, field, insurer update, location reference and diary changes with user and time.
@@ -2199,24 +2199,24 @@ access:
     denied: Claims Worklist is not in the menu; a claim address shows the no-access page.
 
 findings:
-  - fr: FR-CL-001
+  - fr: FR-CM-001
     issue: 'The FRS messages "Invalid user ID or password" and "Your account is locked. Contact the System Administrator" differ from the platform log-in ("Invalid user name or password"; "Account is locked. Contact your administrator."). The idle timeout of 15 minutes differs from the BIBS session policy (CLQ24).'
     proposal: Quote the platform texts in FRS v1.1 and close CLQ24; the cases use the platform texts and a 15-minute test setting.
-  - fr: FR-CL-024
+  - fr: FR-CM-024
     issue: 'The FRS pairs EMAIL_ADDRESS_INVALID with "Enter a valid e-mail address"; the platform returns "Invalid e-mail address - <address>" for that code.'
     proposal: Quote the platform text.
-  - fr: FR-CL-060
-    issue: 'FR-CL-060 to 066 pair INVALID_REPORT_PARAMETERS with FRS texts ("The as-of date cannot be in the future", "The end date must be on or after the start date"). The report engine builds its own texts from the parameter labels, for example "<to> must not be before <from>". The future as-of date check does not exist in the engine today.'
-    proposal: Quote the engine texts, and add the as-of date rule to the report definition at build; the range cases use the engine pattern, TC-CL-060.3-01 uses the FRS text.
-  - fr: FR-CL-012
+  - fr: FR-CM-060
+    issue: 'FR-CM-060 to 066 pair INVALID_REPORT_PARAMETERS with FRS texts ("The as-of date cannot be in the future", "The end date must be on or after the start date"). The report engine builds its own texts from the parameter labels, for example "<to> must not be before <from>". The future as-of date check does not exist in the engine today.'
+    proposal: Quote the engine texts, and add the as-of date rule to the report definition at build; the range cases use the engine pattern, TC-CM-060.3-01 uses the FRS text.
+  - fr: FR-CM-012
     issue: 'Acceptance criterion 3 says a Claims Officer without BCL_STATUS_UPDATE cannot correct the date, but the matrix of section 3.3 grants BCL_STATUS_UPDATE to officers (within the matrix). As written every officer can correct the reported date.'
     proposal: State whether the correction needs its own permission or is limited to TL / TH (CLQ03); the case removes the permission from a test role until then.
-  - fr: FR-CL-045
-    issue: The persona table gives reopen to the Team Head (CLM_TH) and the matrix gives BCL_REOPEN to TH and UH, while R1 says "TH / UH reopen (to confirm, CLQ06)". Temporarily closed claims keep ageing "to confirm" (R2 of FR-CL-053), so the ageing and outstanding cases depend on CLQ06.
+  - fr: FR-CM-045
+    issue: The persona table gives reopen to the Team Head (CLM_TH) and the matrix gives BCL_REOPEN to TH and UH, while R1 says "TH / UH reopen (to confirm, CLQ06)". Temporarily closed claims keep ageing "to confirm" (R2 of FR-CM-053), so the ageing and outstanding cases depend on CLQ06.
     proposal: Close CLQ06 before UAT.
-  - fr: FR-CL-043
+  - fr: FR-CM-043
     issue: Two settlement types ("Settled - LOA Issued - For Schedule of Repair", "... Vehicle Under Repair") have "Closes the claim" to confirm (CLQ05), so their closure behaviour cannot be tested yet.
     proposal: Answer CLQ05; the cases treat both as not closing.
-  - fr: FR-CL-016
+  - fr: FR-CM-016
     issue: The meaning of the claims authorization code and any TL / TH override are open (CLQ01); the FRS tests only that the button is disabled while premium is unpaid.
     proposal: Answer CLQ01 before UAT and add the override case if one is agreed.

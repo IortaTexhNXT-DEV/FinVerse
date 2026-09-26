@@ -87,7 +87,7 @@ Allocation: **schema V1020-V1029, demo V1920-V1929** (Developer Guide range tabl
 | `V1022__brokerclaims_insurer.sql` | CL1-A | `bcl_insurer_update`, `bcl_reserve_change`, `bcl_location_ref`, search indexes on insurer claim numbers and location keys |
 | `V1023__brokerclaims_activity.sql` | CL1-B | `bcl_diary_entry`, `bcl_claim_event` (field-change timeline) |
 | `V1024__brokerclaims_reports.sql` | CL1-B | Report support: indexes for ageing and location queries, shared report variants (Outstanding by insurer, Past due 90) |
-| V1025-V1029 | - | Free. V1025 is held for the legacy claims migration handler if CLQ14 is confirmed |
+| V1025-V1029 | - | Free. V1025 is held for the legacy claims migration handler if CLQ14 is confirmed. CLQ14 is partially answered by BRD-13 (Data Migration draft): historical claims are not migrated (read-only legacy or archive, record type CLAIM); open claims are not addressed (DMQ30), so V1025 stays held. If open claims are migrated, the Data Migration loader F07 calls the Claims service |
 | `db/demo/V1920__demo_brokerclaims_users.sql` | CL0 | Demo users of section 7.3, their `bcl_handler` units, `BCL_REPORT_VIEW` for the demo Marketing users |
 | `db/demo/V1921__demo_brokerclaims_refs.sql` | CL1-A | Insurer location references for demo property accounts |
 | Java runner `brokerclaims.demo.BrokerClaimsDemoData` | CL1-A, extended by CL1-B | About 20 claims over the booked demo accounts, run through the services (section 14) |
@@ -366,7 +366,7 @@ Outside the module (frontend only, owned by their modules, section 12.2): a **Cl
 | Item | BRD | Seam built now | Question |
 |---|---|---|---|
 | Insurer channels for claims (portal, API, SFTP bordereaux) | 041, 043 | E-mail loss advice with send log; manual recording and bulk upload of insurer updates and claim numbers | CLQ17 |
-| Legacy EBIX / ISYS claims and policies | 007, 038, p.23 | `source = MIGRATED`, `legacy_ref`; migration handler slot V1025 | CLQ14 |
+| Legacy EBIX / ISYS claims and policies | 007, 038, p.23 | `source = MIGRATED`, `legacy_ref`; migration handler slot V1025. BRD-13: history stays in legacy or the archive; open claims wait for DMQ30 | CLQ14 (partial), CLQ13 (partial) |
 | BDO SSO / Active Directory (Windows credentials) | NFR 1.01 | Q42 answered by BRD-11: directory sign-in is required and is built as the parked `security` port `DirectoryAuthenticator` (USER_ACCESS_DESIGN section 10); local sign-in stays until BDO supplies the EUA interface | UQ04 |
 | Shared drive for report files | NFR 15.09-15.13 | Report archive in-app (`report_run`); `FileDropPort` if BDOI confirms the drive | CLQ21, OQ17 |
 | Claim proceeds through BDOI | status 12 | None; flow described in sections 3.1 and 6 | CLQ10 |
@@ -533,7 +533,7 @@ location}`.
   `confirmOutsidePeriod`. Number `BCL-<yyyy>-nnnnnn`; handler = current user, unit and branch from `bcl_handler` and
   `sec_user.home_branch_id` (`HandlerDirectory`); locations and insurer lines linked; premium checked (alert
   `BCL_UNPAID_PREMIUM_CLAIM:<id>`); workflow case `BCL_CLAIM` started in `NEW` (assigned to the recorder); audit
-  `CREATE`; in-app notice `BCL_CLAIM_ASSIGNED` to the account officer (FR-CL-011).
+  `CREATE`; in-app notice `BCL_CLAIM_ASSIGNED` to the account officer (FR-CM-011).
 - **Contract to CL1-B: `claim.service.ClaimRecorded`** `(claimId, companyId, claimNo, initialStatus, recordedBy,
   recordedAt)`, published inside the recording transaction after everything is saved. The status engine listens
   (`@EventListener`), sets the first status and the next follow-up date and publishes `ClaimStatusChanged`. Until

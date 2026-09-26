@@ -147,7 +147,7 @@ Figure 1 shows the flow of the umbrella BRD (p.26) with the BIBS BRD of each ste
 | 2 Renewal | BRD-6, FR-RN | OPEN | Designed, not built |
 | 3 Collection Management | BRD-4, FR-CL (BRD-4) | BUILT | Capability 7 |
 | 4 Accounting, Disbursement and ACSL | BRD-5, FR-AC / FR-DS / FR-AS | BUILT | Capability 8 |
-| 5 Claims | BRD-7, FR-CL (BRD-7) | IN PROGRESS | Claim recording and insurer updates merged |
+| 5 Claims | BRD-7, FR-CM (BRD-7) | IN PROGRESS | Claim recording and insurer updates merged |
 | 6 Operations | BRD-2, FR-OP | BUILT | Capabilities 9-13 |
 | 7 Reinsurance | ReInsurance BRD | PARKED | Phase 2 - BRD received |
 | 8 Customer Service Facility | BRD-9, FR-CSF | OPEN | Designed, not built |
@@ -1209,7 +1209,7 @@ Phase 1 keeps these seams open so that the phase 2 module can reuse them: party 
 
 # Traceability
 
-Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that specifies it and the FR that meets it. "Covered by" gives the BIBS BRD and its requirement IDs; FR IDs without a prefix note belong to the FRS of that BRD. BRD-4 Collections and BRD-7 Claims both number their FRs FR-CL-nnn; the "Covered by" column says which is meant. Reinsurance rows are "Phase 2".
+Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that specifies it and the FR that meets it. "Covered by" gives the BIBS BRD and its requirement IDs; FR IDs without a prefix note belong to the FRS of that BRD. FR-CL-nnn are the FRs of BRD-4 Collections; BRD-7 Claims numbers its FRs FR-CM-nnn (renumbered from FR-CL-nnn, DCR-188). Reinsurance rows are "Phase 2".
 
 <!-- table: widths=1.7,6.2,2.4,5.4,4.4,2.0 caption="Traceability of the umbrella BRD" status=Fit size=7 -->
 | ID | Capability (Core BRD page) | Core BR | Covered by | FR | Fit |
@@ -1344,19 +1344,19 @@ Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that 
 | CORE-13.06 | Risk mitigation and error handling (p.10) | BR-135 | BRD-2 CMRID.008 | FR-OP-091, FR-OP-093 | FIT |
 | CORE-13.07 | Collection of commission receivables (direct payment) (p.10) | BR-052, BR-136, BR-137, BR-140 | BRD-2 CMRID.002, CMRID.004 | FR-OP-091, FR-OP-098 | FIT |
 | CORE-13.08 | Auto-match reversals (p.10) | BR-138, BR-139 | BRD-2 CMRID.007, CSHID.027 | FR-OP-091, FR-OP-026 | FIT |
-| CORE-14.01 | Process claims advice from BDOI Marketing (p.10) | BR-141 | BRD-7 BRCLM.003, BRCLM.016 | FR-CL-010, FR-CL-011, FR-CL-015, FR-CL-014 | NEW |
-| CORE-14.02 | Process claims advice from client (p.10) | BR-141 | BRD-7 BRCLM.003, BRCLM.006 | FR-CL-010, FR-CL-011, FR-CL-015, FR-CL-002 ... | NEW |
-| CORE-14.03 | Process claims advice from insurer (p.10) | BR-141 | BRD-7 BRCLM.041, BRCLM.043 | FR-CL-003, FR-CL-011, FR-CL-022, FR-CL-024 ... | NEW |
-| CORE-14.04 | Process LOA from insurer (p.10) | BR-142 | BRD-7 BRCLM.014, BRCLM.010 | FR-CL-043, FR-CL-040, FR-CL-046 | NEW |
-| CORE-14.05 | Process settlement offer from insurer (p.10) | BR-143 | BRD-7 BRCLM.010, BRCLM.014 | FR-CL-040, FR-CL-046, FR-CL-043 | NEW |
-| CORE-14.06 | Tag permanent closure (p.10) | BR-144 | BRD-7 BRCLM.035, BRCLM.005 | FR-CL-045, FR-CL-002 | NEW |
-| CORE-14.07 | Tag temporary closure (p.10) | BR-145 | BRD-7 BRCLM.035 | FR-CL-045 | NEW |
+| CORE-14.01 | Process claims advice from BDOI Marketing (p.10) | BR-141 | BRD-7 BRCLM.003, BRCLM.016 | FR-CM-010, FR-CM-011, FR-CM-015, FR-CM-014 | NEW |
+| CORE-14.02 | Process claims advice from client (p.10) | BR-141 | BRD-7 BRCLM.003, BRCLM.006 | FR-CM-010, FR-CM-011, FR-CM-015, FR-CM-002 ... | NEW |
+| CORE-14.03 | Process claims advice from insurer (p.10) | BR-141 | BRD-7 BRCLM.041, BRCLM.043 | FR-CM-003, FR-CM-011, FR-CM-022, FR-CM-024 ... | NEW |
+| CORE-14.04 | Process LOA from insurer (p.10) | BR-142 | BRD-7 BRCLM.014, BRCLM.010 | FR-CM-043, FR-CM-040, FR-CM-046 | NEW |
+| CORE-14.05 | Process settlement offer from insurer (p.10) | BR-143 | BRD-7 BRCLM.010, BRCLM.014 | FR-CM-040, FR-CM-046, FR-CM-043 | NEW |
+| CORE-14.06 | Tag permanent closure (p.10) | BR-144 | BRD-7 BRCLM.035, BRCLM.005 | FR-CM-045, FR-CM-002 | NEW |
+| CORE-14.07 | Tag temporary closure (p.10) | BR-145 | BRD-7 BRCLM.035 | FR-CM-045 | NEW |
 | CORE-14.08 | Unclaimed checks safekeeping (p.10) | BR-146 | BRD-7 | Gap G2 (CRQ03) | NEW |
 | CORE-14.09 | Handover of settlement checks to Cashiering (p.10) | BR-147 | BRD-7 | Gap G2 (CRQ03) | NEW |
 | CORE-14.10 | Retrieval of checks from Cashiering for release (p.10) | BR-148 | BRD-7 | Gap G2 (CRQ03) | NEW |
-| CORE-14.11 | Maintain full claims history for audit and compliance (p.10) | BR-151 | BRD-7 BRCLM.004, BRCLM.022 | FR-CL-012, FR-CL-052, FR-CL-054 | NEW |
-| CORE-14.12 | Reports and analytics viewing (p.10) | BR-149, BR-152 | BRD-7 BRCLM.026, BRCLM.029, BRCLM.030, BRCLM.031, BRCLM.032 | FR-CL-060, FR-CL-044, FR-CL-061, FR-CL-062 | NEW |
-| CORE-14.13 | Encode / override the next follow-up date (p.10) | BR-150 | BRD-7 BRCLM.019 | FR-CL-002, FR-CL-050, FR-CL-054 | NEW |
+| CORE-14.11 | Maintain full claims history for audit and compliance (p.10) | BR-151 | BRD-7 BRCLM.004, BRCLM.022 | FR-CM-012, FR-CM-052, FR-CM-054 | NEW |
+| CORE-14.12 | Reports and analytics viewing (p.10) | BR-149, BR-152 | BRD-7 BRCLM.026, BRCLM.029, BRCLM.030, BRCLM.031, BRCLM.032 | FR-CM-060, FR-CM-044, FR-CM-061, FR-CM-062 | NEW |
+| CORE-14.13 | Encode / override the next follow-up date (p.10) | BR-150 | BRD-7 BRCLM.019 | FR-CM-002, FR-CM-050, FR-CM-054 | NEW |
 | CORE-15.01 | Placement request initiation (p.10) | BR-153 | ReInsurance BRD FRID-001-FRID-010 | Phase 2 | OUT |
 | CORE-15.02 | Placement slip management (p.10) | BR-154 | ReInsurance BRD FRID-017-FRID-028 | Phase 2 | OUT |
 | CORE-15.03 | Statement of Account (SOA) generation (p.10) | BR-155, BR-156 | ReInsurance BRD FRID-033-FRID-041 | Phase 2 | OUT |
@@ -1412,7 +1412,7 @@ Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that 
 | XC-04 | Audit logs and full transaction history (p.4-5, p.20, p.25) | BR-124, BR-129, BR-151, BR-207 | None (BRNB.016, BRNB.086, BRNB.089 related) | FR-CR-030; FR-NB-016, FR-NB-136 | FIT |
 | XC-05 | Workflow maintained at the back end; data flows to the next process by rules (p.15, p.18, p.23) | BR-051, BR-101, BR-177, BR-182 | None (BRNB.096, BRNB.022 related) | FR-CR-080; FR-NB-011, FR-NB-064, FR-NB-010, FR-NB-122 | CONFIGURE |
 | XC-06 | Batch and individual processing; concurrent users and high-volume bulk uploads (p.4, p.16) | BR-063 | None (BRNB.064, BRQID.006 related) | FR-CR-083; FR-NB-019, FR-NB-065, FR-OP-008 | FIT |
-| XC-07 | Currency selection and multi-currency support (p.15, p.18) | BR-027, BR-088 | None (BRCLM.009 related) | FR-CR-091; FR-CL-011 | FIT |
+| XC-07 | Currency selection and multi-currency support (p.15, p.18) | BR-027, BR-088 | None (BRCLM.009 related) | FR-CR-091; FR-CM-011 | FIT |
 | XC-08 | 30-day hold cover request, assigned to a role (p.14) | BR-034 | BRD-1 BRNB.072, BRNB.103 | FR-NB-082, FR-NB-083 | FIT |
 | XC-09 | Tag direct payment (DP) accounts (p.14) | BR-035 | BRD-1 BRNB.114 | FR-NB-069, FR-NB-092 | FIT |
 | XC-10 | SOA generated with placement report and Insurance Advice; service invoice to insurer issued with the SOA at booking (p.14-15) | BR-039, BR-043 | BRD-1 BRNB.100, BRCLXN.058 | FR-CR-093; FR-NB-117, FR-CL-060, FR-CL-061 | CHANGE |

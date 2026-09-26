@@ -75,7 +75,7 @@ The graph stays acyclic, and ArchUnit needs no exception.
 
 | Port | Default adapter | Implemented later by | Purpose |
 |---|---|---|---|
-| `LegacyPolicySource` | Bulk handler `RNW_LEGACY_POLICIES` only | Data migration | Expiring policies booked in EBIX / QPS before go-live (RQ27) |
+| `LegacyPolicySource` | Bulk handler `RNW_LEGACY_POLICIES` only (kept as the fallback upload) | `migration` (`MigratedPolicySource`, Data Migration wave DM2-B; stub until R0 exists) from the migrated in-force headers (object P01) and the legacy RMEL cohorts (P03), [`DATA_MIGRATION_DESIGN.md`](DATA_MIGRATION_DESIGN.md) §15 | Expiring policies booked in EBIX / QPS before go-live (RQ27, partially answered by BRD-13 BRID 4.1, 12.1) |
 | `RecipientPolicy` | Allows every well-formed address, requires `Protection` | Messaging change if BDOI confirms domain / TLS rules (RQ16) | RA negative scenario 6 |
 
 Ports of other modules that `renewal` implements or calls:
@@ -481,7 +481,7 @@ Each handler validates the renewal ref (BRRN.022). Unmatched rows are kept as EX
 | Total-loss indicator | BRD 2.004.4.5, BRRN.034 | Manual non-renewal reason; matrix condition TOTAL_LOSS inactive | CLQ28, RQ13 |
 | LAMD channel (reports from the bank) | BRRN.029/039 | `RNW_LAMD_REPORT` upload; the LAMD role can upload | RQ20 |
 | Insurer channels (renewal files and responses) | BRD 3.009.5/6 | E-mail out (protected), upload in; `InsurerFileInbox` pattern (opsledger) not used until insurer SFTP / API exists | Q06, RQ15 |
-| Legacy EBIX / QPS expiring policies at go-live | p.34, BRRN.005 | `RNW_LEGACY_POLICIES` bulk handler creates candidates with `legacy_ref` and no ARN; they can only take the NB path (no account to renew from) | RQ27 |
+| Legacy EBIX / QPS expiring policies at go-live | p.34, BRRN.005 | `RNW_LEGACY_POLICIES` bulk handler creates candidates with `legacy_ref` and no ARN; they can only take the NB path (no account to renew from). **BRD-13** makes the transition renewal-driven and aligned to RMEL: cohorts expiring before go-live (T) stay in legacy; cohorts T to T + 140 days (`RNW_EXTRACTION_LEAD_DAYS`, already extracted in legacy) are carried forward with their disposition, handler and status and served through `LegacyPolicySource`, and Renewal creates candidates with source LEGACY; later cohorts are extracted by `RNW_EXTRACTION` from the migrated headers. Legacy candidates renew on the **new-business path**, pre-filled from the header (it carries no BIBS rating data), with `renewal_of_ref` = the legacy reference so the migration run-off tracker can link them (DATA_MIGRATION_DESIGN §15) | RQ27 (partial), DMQ26 |
 | Mail recipient policy (approved domains, TLS) | BRRN.010 negative 6 | `RecipientPolicy` port in `renewal` with a permissive default; TLS is the SMTP relay configuration | RQ16 |
 | Password convention | BRRN.010, 3.009.5 | `DocumentPasswordPolicy` (messaging), generated passwords | Q07 |
 | BDO CIF KYC data | BRRN.028 | BIBS KYC review date only | Q16, RQ22 |
@@ -560,6 +560,7 @@ The crm client page gains a **Renewal** tab (prototype "Client Record Details": 
 | `brokerclaims` (Claims, planned) | None | Renewal calls `ClaimExperienceQueryService.summary(arn, policyYear)`; total-loss indicator is CLQ28 | - |
 | `eb` (Employee Benefits, planned) | None | EB lines excluded from `RNW_EXTRACTION` (`RNW_EXCLUDED_LINES`); RAs stored as `RENEWAL_ADVICE` (EBQ28). An EB query "ARNs of EB cycles" would sharpen the exclusion (optional) | - |
 | `nbreport` (built) | None now | BRNB.018 Late Renewal Requests stays parked (Q09, RQ29); candidate later as a `RNW-LISTING` variant | - |
+| `migration` (BRD-13, designed) | Implements `LegacyPolicySource` | `MigratedPolicySource` in `migration` serves the migrated headers and the RMEL cohort model (DATA_MIGRATION_DESIGN §15); candidates of legacy policies take the NB path; `renewal` does not depend on `migration` | Data Migration DM2-B |
 
 ## 14. Build-wave plan
 

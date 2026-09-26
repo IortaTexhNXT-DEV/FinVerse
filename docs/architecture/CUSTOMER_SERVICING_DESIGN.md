@@ -39,7 +39,7 @@ Requirements baseline: [`BDOI_CSF_BRD_SPEC.md`](../requirements/BDOI_CSF_BRD_SPE
 | Port | Declared in | Default | Purpose |
 |---|---|---|---|
 | `ContactSyncGateway` | `csf.service.port` | `OutboxContactSyncGateway`: writes `csf_sync_outbox` rows with status `NOT_CONFIGURED`; no transport | Push accepted contact changes to QPS / EBIX while they coexist (CSQ01) |
-| `LegacyAccountLookup` | `csf.service.port` | none (empty result) | Look up accounts that exist only in QPS / EBIX / LOS by PN or application number (CSQ01, CSQ02) |
+| `LegacyAccountLookup` | `csf.service.port` | none (empty result); implemented by `migration` (`XrefLegacyAccountLookup`, BRD-13) from the key cross-reference `mig_key_xref` and the legacy archive ([`DATA_MIGRATION_DESIGN.md`](DATA_MIGRATION_DESIGN.md) §14.5, §16) | Look up accounts that exist only in QPS / EBIX / LOS by PN, application number or legacy reference, and legacy RAs in the archive (CSQ01, CSQ02, CSQ06: partially answered by BRD-13, which makes legacy read-only after cutover) |
 
 ## 3. Flyway allocation
 
@@ -165,7 +165,7 @@ PDF and Excel export come from the report framework (BRCSF-011.002).
 | Item | Seam | Question |
 |---|---|---|
 | QPS / EBIX contact write-back | `ContactSyncGateway` with outbox, status `NOT_CONFIGURED` | CSQ01 |
-| QPS / EBIX / LOS account lookup for non-migrated accounts | `LegacyAccountLookup` (empty default) | CSQ01, CSQ02 |
+| QPS / EBIX / LOS account lookup for non-migrated accounts | `LegacyAccountLookup` (empty default; implemented by `migration` when BRD-13 is built). BRD-13 keeps legacy read-only after cutover and asks for no write-back, so `ContactSyncGateway` stays NOT_CONFIGURED unless BDOI confirms coexistence write-back | CSQ01, CSQ02 (partial) |
 | Legacy RA files (IT text-file RAs) | Upload as `RENEWAL_ADVICE` attachments by a one-time bulk load if needed | CSQ06 |
 | Case management / inquiry logging (SharePoint today) | Out of scope; `csf_activity` is the only log | CSQ09 |
 | BDO SSO / Windows ID | Q42 answered by BRD-11: directory sign-in is required and is built as the parked `security` port `DirectoryAuthenticator` (USER_ACCESS_DESIGN section 10); local user ID and password sign-in (BRCSF-001) stays until BDO supplies the interface | Q42, UQ04 |

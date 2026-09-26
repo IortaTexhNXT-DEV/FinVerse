@@ -704,6 +704,15 @@ Not answered: OQ03-OQ06, OQ09-OQ13, OQ17-OQ22, OQ24-OQ38, OQ40, OQ45-OQ47, OQ49,
 | AQ30 | Negative balances | Which accounts may never be negative; warning or block | FRBS 2.5.4, 2.8.4 |
 | AQ31 | BDO Unibank reporting | Are GARD reports submitted as files to BDO Unibank (format) or as printed reports; reciprocal accounts with BDO | Appendix A II |
 
+**Answered in part by later BRDs** (single record with the design impact: [`BDOI_CROSS_BRD_DECISIONS.md`](BDOI_CROSS_BRD_DECISIONS.md) section 3):
+- **AQ01 partial** (BRD-13 Data Migration, BRID 5-8): the BRD asks for legacy sub-ledgers for Premium Receivable,
+  Commission Receivable, DTIP and UPP, so the chart needs legacy control accounts (and a migration clearing account);
+  the mapping of the current chart is still not given (DMQ18).
+- **AQ11 still open**: BRD-13 does not mention payees; `DISB_PAYEE_MIGRATION` runs under the migration framework as
+  object R09.
+- **AQ27 (NFR)**: the Core Replacement umbrella gives retention 5 / 15 years, backup every 4 hours kept 5 years and
+  response under 5 seconds (p.42-45); see XQ08.
+
 ## 10. Observations on the BRD pack
 
 - The PDF holds **four documents**: the Workshop Addendum (Apr-2026, pp.1-15, scanned landscape tables with one page upside

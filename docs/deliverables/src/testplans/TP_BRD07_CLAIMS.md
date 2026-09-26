@@ -48,13 +48,13 @@ Every case traces to a functional requirement (FR) of FRS BRD-7 v1.0 and to the 
 
 In scope are all 39 FRs of FRS BRD-7 v1.0 and the 52 BRD references they trace to:
 
-- log-in, role-based access and the claim history (FR-CL-001 to 003);
-- the cover lookup, recording a claim, the reported date, policy number, Marketing data, cover version, premium check and authorization code (FR-CL-010 to 016);
-- several locations and insurers per claim, insurer updates, insurer location references and the loss advice (FR-CL-020 to 024);
-- claimant override, adjusters, the insurer reserve and catastrophe codes (FR-CL-030 to 033);
-- statuses and the status matrix, settlement types, temporary and permanent closure, reopen and the claims special remittance (FR-CL-040 to 046);
-- follow-up dates, the action plan, the diary, ageing, pending actions and Claims Home (FR-CL-050 to 055);
-- the ageing, outstanding, settled, pending, loss, location, register and activity reports, the data extract and Marketing access (FR-CL-060 to 066).
+- log-in, role-based access and the claim history (FR-CM-001 to 003);
+- the cover lookup, recording a claim, the reported date, policy number, Marketing data, cover version, premium check and authorization code (FR-CM-010 to 016);
+- several locations and insurers per claim, insurer updates, insurer location references and the loss advice (FR-CM-020 to 024);
+- claimant override, adjusters, the insurer reserve and catastrophe codes (FR-CM-030 to 033);
+- statuses and the status matrix, settlement types, temporary and permanent closure, reopen and the claims special remittance (FR-CM-040 to 046);
+- follow-up dates, the action plan, the diary, ageing, pending actions and Claims Home (FR-CM-050 to 055);
+- the ageing, outstanding, settled, pending, loss, location, register and activity reports, the data extract and Marketing access (FR-CM-060 to 066).
 
 The roles-and-access sheet checks each Claims action against the roles that may and may not perform it (FRS section 3.3).
 
@@ -113,7 +113,7 @@ The automation reference column is blank in this version. When the module is bui
 
 ## Reading the workbook
 
-The workbook has a README sheet that explains every column. Case IDs carry their condition: TC-CL-045.2-01 is the first case of condition 2 of FR-CL-045. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Defect ID.
+The workbook has a README sheet that explains every column. Case IDs carry their condition: TC-CM-045.2-01 is the first case of condition 2 of FR-CM-045. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Defect ID.
 
 # Entry and exit criteria
 
@@ -168,7 +168,7 @@ Claims is not built, so no demo seed provides the data yet. The test lead prepar
 | BDOI process owner | BDOI Product Owner, Claims | Decides on disputed expected results and accepted defects; signs off UAT |
 | UAT coordinator | Business Project Services, BDO Unibank ESG | Plans the UAT sessions; checks traceability to the BRD |
 
-The Claims teams test recording, handling, closure and follow-up (SC-CL-02 to 06); the Unit Head the set-up and reports (SC-CL-07, 08); Marketing the loss information (FR-CL-065); Remittance the special remittance (FR-CL-046). The personas are:
+The Claims teams test recording, handling, closure and follow-up (SC-CM-02 to 06); the Unit Head the set-up and reports (SC-CM-07, 08); Marketing the loss information (FR-CM-065); Remittance the special remittance (FR-CM-046). The personas are:
 
 <!-- tp:personas -->
 
@@ -229,7 +229,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 | Claims is not built; screen names, labels and messages may change at build | High | The cases name the design's screens and the FRS texts; the test lead updates the workbook from the build before the system test |
 | Open questions change expected results (CLQ01 code, CLQ04 matrix and units, CLQ05 closing types, CLQ06 closure rights and ageing, CLQ15 Marketing rights) | High | The matrix, lists and roles are configuration; the cases use the delivered defaults and are re-run with BDOI's values |
 | Ageing and follow-up cases need past dates | Medium | The test lead sets reported and status dates in the test database and runs the jobs on demand |
-| The Remittance feed and the BRD-1 endorsement events are needed by FR-CL-015, 016 and 046 | Medium | Run those cases after the BRD-2 remittance change is deployed; they are marked in their preconditions |
+| The Remittance feed and the BRD-1 endorsement events are needed by FR-CM-015, 016 and 046 | Medium | Run those cases after the BRD-2 remittance change is deployed; they are marked in their preconditions |
 | Insurer test mailboxes not reachable from SIT or UAT | Medium | Check the relay before the cycle; loss advice cases read the send log when the mailbox is down and are re-run later |
 | BDOI Claims testers from the branches are not available in the UAT window | Medium | Agree named testers and dates in the UAT plan (deliverable 30) |
 

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimClosureService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.report.core.ReportCategory;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
@@ -15,7 +16,7 @@ import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,7 @@ class BrokerClaimsReportsIT {
   @Autowired private ClaimClosureService closures;
   @Autowired private AsUser as;
   @Autowired private JdbcTemplate jdbc;
+  @Autowired private ClaimsFixtures ledger;
 
   private Map<String, String> params(String handler) {
     Map<String, String> p = new HashMap<>();
@@ -212,8 +214,13 @@ class BrokerClaimsReportsIT {
         "O-" + BrokerClaimFixtures.unique(),
         new BigDecimal("100000"),
         new BigDecimal("110000"));
-    invoice(spec.arn(), "BOOKING", new BigDecimal("400000"));
-    invoice(spec.arn(), "ENDORSEMENT_MINUS", new BigDecimal("-60000"));
+    OpsInvoice booked = ledger.motorInvoice();
+    jdbc.update(
+        "update bcl_claim set arn = ?, policy_year = ? where id in (?, ?)",
+        booked.getArn(),
+        booked.getPolicyYear(),
+        open,
+        over);
 
     Map<String, String> p = params(null);
     p.put("clientCode", spec.client());
@@ -236,13 +243,16 @@ class BrokerClaimsReportsIT {
             });
 
     ReportResult ratio = as.run(UH, () -> reports.run("BCL-LOSS-RATIO", p));
+    BigDecimal premium = booked.getGrossPremium();
     assertThat(details(ratio))
         .singleElement()
         .satisfies(
             r -> {
-              assertThat((BigDecimal) r.get("premium")).isEqualByComparingTo("340000");
+              assertThat((BigDecimal) r.get("premium")).isEqualByComparingTo(premium);
               assertThat((BigDecimal) r.get("losses")).isEqualByComparingTo("210000");
-              assertThat((BigDecimal) r.get("ratio")).isEqualByComparingTo("61.76");
+              assertThat((BigDecimal) r.get("ratio"))
+                  .isEqualByComparingTo(
+                      new BigDecimal("21000000").divide(premium, 2, RoundingMode.HALF_UP));
             });
     Map<String, String> noGrouping = new HashMap<>(p);
     noGrouping.remove("grouping");
@@ -257,29 +267,6 @@ class BrokerClaimsReportsIT {
             as.run("mkttl", () -> reports.export("BCL-LOSS-EXPERIENCE", p, ExportFormat.XLSX))
                 .content())
         .isNotEmpty();
-  }
-
-  private void invoice(String arn, String kind, BigDecimal premium) {
-    String no = "INV-T-" + BrokerClaimFixtures.unique();
-    LocalDate today = BrokerClaimFixtures.today();
-    jdbc.update(
-        "insert into ops_invoice (company_id, branch_id, invoice_no, root_invoice_no, arn, kind,"
-            + " policy_year, client_code, assured_name, insurer_code, currency, booking_date,"
-            + " inception_date, expiry_date, gross_premium, commission, vat_on_commission, wtax_rate,"
-            + " payment_status, remittance_status, feed_source, created_at, created_by)"
-            + " values (?, (select id from org_branch where company_id = ? order by id limit 1), ?, ?,"
-            + " ?, ?, 2026, 'C', 'Assured', 'INS-A', 'PHP', ?, ?, ?, ?, 0, 0, 0, 'PAID',"
-            + " 'FULLY_REMITTED', 'TEST', now(), 'TEST')",
-        fixtures.company(),
-        fixtures.company(),
-        no,
-        no,
-        arn,
-        kind,
-        today,
-        today,
-        today.plusYears(1),
-        premium);
   }
 
   @Test

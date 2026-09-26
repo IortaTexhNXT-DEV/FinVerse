@@ -23,4 +23,20 @@ public interface EbDocumentRepository extends JpaRepository<EbDocument, Long> {
    */
   List<EbDocument> findByCycleIdAndDocumentTypeOrderByVersionNoDesc(
       Long cycleId, String documentType);
+
+  /**
+   * The register entries of a stored file.
+   *
+   * @param attachmentId stored file
+   * @return entries
+   */
+  List<EbDocument> findByAttachmentId(Long attachmentId);
+
+  /**
+   * The documents of a cycle, oldest first.
+   *
+   * @param cycleId cycle
+   * @return documents
+   */
+  List<EbDocument> findByCycleIdOrderByIdAsc(Long cycleId);
 }

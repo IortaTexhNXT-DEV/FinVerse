@@ -64,6 +64,54 @@ public final class EbCodes {
   /** List of values of the teams. */
   public static final String LOV_TEAM = "EB_TEAM";
 
+  /** Entity type of a tracked item (audit). */
+  public static final String ENTITY_TRACKED_ITEM = "EbTrackedItem";
+
+  /** List of values of the tracked item types. */
+  public static final String LOV_TRACKED_ITEM_TYPE = "EB_TRACKED_ITEM_TYPE";
+
+  /** List of values of the lost / not renewed reasons. */
+  public static final String LOV_LOST_REASON = "EB_LOST_REASON";
+
+  /** Template of the renewal advice (V1030). */
+  public static final String TEMPLATE_RENEWAL_ADVICE = "EB_RENEWAL_ADVICE";
+
+  /** Template of the renewal advice reminder (V1030). */
+  public static final String TEMPLATE_RA_REMINDER = "EB_RA_REMINDER";
+
+  /** Template of the tracked item follow-up (V1030). */
+  public static final String TEMPLATE_ITEM_FOLLOWUP = "EB_ITEM_FOLLOWUP";
+
+  /** Alert: renewal advice not sent inside the lead time (V1030). */
+  public static final String ALERT_RA_NOT_SENT = "EB_RA_NOT_SENT";
+
+  /** Alert: tracked item past due after the follow-ups (V1030). */
+  public static final String ALERT_ITEM_OVERDUE = "EB_ITEM_OVERDUE";
+
+  /** Notification event: client feedback received (V1030). */
+  public static final String EVENT_FEEDBACK_RECEIVED = "EB_FEEDBACK_RECEIVED";
+
+  /** Notification event: accounts of a cycle created for placement (V1030). */
+  public static final String EVENT_PLACEMENT_TRIGGERED = "EB_PLACEMENT_TRIGGERED";
+
+  /** Notification event: tracked item escalated (V1030). */
+  public static final String EVENT_ITEM_ESCALATED = "EB_ITEM_ESCALATED";
+
+  /** Notification event: Broker on Record validated or rejected (V1036). */
+  public static final String EVENT_BOR_DECIDED = "EB_BOR_DECIDED";
+
+  /** Retention record type of a programme (V1036). */
+  public static final String RETENTION_PROGRAMME = "EB_PROGRAMME";
+
+  /** Outbox purpose of the renewal advice and its reminders. */
+  public static final String PURPOSE_RENEWAL_ADVICE = "EB_RENEWAL_ADVICE";
+
+  /** Outbox purpose of the tracked item follow-ups. */
+  public static final String PURPOSE_ITEM_FOLLOWUP = "EB_ITEM_FOLLOWUP";
+
+  /** Front-end route of a programme page (link of notices, cases and alerts). */
+  public static final String PROGRAMME_LINK = "/eb/programmes/";
+
   private EbCodes() {}
 
   /**

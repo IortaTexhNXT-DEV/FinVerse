@@ -7,7 +7,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.BrokerClaimQueryService;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimDetailsService;
-import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimRecorded;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimRecordingService;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimRecordingService.NewClaim;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimViewService;
@@ -24,13 +23,10 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 
 /**
  * Recording a claim on a cover and its premium check (BRCLM.001/003/004/006/009/016/039; wave CL1-A
@@ -48,24 +44,9 @@ class ClaimRecordingIT {
   @Autowired private ClaimViewService views;
   @Autowired private ClaimDetailsService details;
   @Autowired private PremiumRecheckJob recheck;
-  @Autowired private RecordedEvents recorded;
+  @Autowired private ClaimRecordedEvents recorded;
   @Autowired private AsUser as;
   @Autowired private JdbcTemplate jdbc;
-
-  /** Collects the {@link ClaimRecorded} events (the contract with the status engine). */
-  @Component
-  static class RecordedEvents {
-    private final List<ClaimRecorded> events = new ArrayList<>();
-
-    List<ClaimRecorded> events() {
-      return events;
-    }
-
-    @EventListener
-    void on(ClaimRecorded event) {
-      events.add(event);
-    }
-  }
 
   private Claim claim(Long id) {
     return claims.require(fx.company(), id);

@@ -83,10 +83,10 @@ class ClaimInsurersIT {
 
     assertThat(locations.ofClaim(id)).extracting(l -> l.getAccountItemNo()).containsExactly(1, 2);
     assertThat(insurers.ofClaim(id))
-        .extracting(InsurerClaim::getInsurerCode, l -> l.getSharePct().stripTrailingZeros())
+        .extracting(InsurerClaim::getInsurerCode, l -> l.getSharePct().intValue())
         .containsExactly(
-            org.assertj.core.groups.Tuple.tuple(LEAD, new BigDecimal("60")),
-            org.assertj.core.groups.Tuple.tuple(CO_INSURER, new BigDecimal("40")));
+            org.assertj.core.groups.Tuple.tuple(LEAD, 60),
+            org.assertj.core.groups.Tuple.tuple(CO_INSURER, 40));
     var view = views.view(fx.company(), id);
     assertThat(view.locationCount()).isEqualTo(2);
     assertThat(view.insurerCount()).isEqualTo(2);

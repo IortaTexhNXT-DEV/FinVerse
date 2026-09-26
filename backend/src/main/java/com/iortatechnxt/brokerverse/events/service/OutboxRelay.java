@@ -2,6 +2,8 @@ package com.iortatechnxt.brokerverse.events.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iortatechnxt.brokerverse.common.runtime.CurrentRuntimeRole;
+import com.iortatechnxt.brokerverse.common.runtime.Workload;
 import com.iortatechnxt.brokerverse.events.service.OutboxStore.OutboxEntry;
 import com.iortatechnxt.brokerverse.system.service.JobLock;
 import java.nio.charset.StandardCharsets;
@@ -39,6 +41,10 @@ import org.springframework.stereotype.Component;
  * later (at-least-once delivery, consumers deduplicate on the event id).
  *
  * <p>With Kafka disabled the relay marks any pending row as delivered in-process ({@code LOCAL}).
+ *
+ * <p>The relay belongs to the integration workload: on an instance whose runtime role does not run
+ * it (a {@code web} or {@code jobs} instance) the after-commit drain is not started, and the
+ * {@value #JOB_NAME} job of the {@code integration} deployment sends the rows on its next run.
  */
 @Component
 public class OutboxRelay implements DisposableBean {
@@ -58,6 +64,7 @@ public class OutboxRelay implements DisposableBean {
   private final JobLock jobLock;
   private final ObjectMapper mapper;
   private final Clock clock;
+  private final boolean drainsAfterCommit;
   private final AtomicBoolean drainQueued = new AtomicBoolean();
   private final ScheduledExecutorService executor =
       Executors.newSingleThreadScheduledExecutor(
@@ -76,6 +83,7 @@ public class OutboxRelay implements DisposableBean {
    * @param jobLock cluster-wide lock
    * @param mapper JSON mapper (envelopes)
    * @param clock clock
+   * @param role runtime role (the after-commit drain runs with the integration workload only)
    */
   public OutboxRelay(
       OutboxStore store,
@@ -83,21 +91,23 @@ public class OutboxRelay implements DisposableBean {
       ObjectProvider<KafkaTemplate<String, String>> kafka,
       JobLock jobLock,
       ObjectMapper mapper,
-      Clock clock) {
+      Clock clock,
+      CurrentRuntimeRole role) {
     this.store = store;
     this.properties = properties;
     this.kafka = kafka;
     this.jobLock = jobLock;
     this.mapper = mapper;
     this.clock = clock;
+    this.drainsAfterCommit = role.runs(Workload.INTEGRATION);
   }
 
   /**
    * Asks for a drain soon (after a commit that added rows); returns at once. Requests arriving
-   * while one is queued are merged.
+   * while one is queued are merged. Does nothing on an instance without the integration workload.
    */
   public void requestDrain() {
-    if (drainQueued.compareAndSet(false, true)) {
+    if (drainsAfterCommit && drainQueued.compareAndSet(false, true)) {
       executor.execute(() -> drainInBackground(true));
     }
   }

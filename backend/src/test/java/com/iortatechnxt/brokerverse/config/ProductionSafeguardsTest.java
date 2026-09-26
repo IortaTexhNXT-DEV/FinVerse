@@ -24,7 +24,16 @@ class ProductionSafeguardsTest {
         .withProperty("spring.mail.password", "from-the-vault")
         .withProperty("spring.data.redis.password", "auth-token")
         .withProperty("spring.kafka.properties.security.protocol", "SASL_SSL")
-        .withProperty("spring.kafka.properties.sasl.jaas.config", "ScramLoginModule required;");
+        .withProperty("spring.kafka.properties.sasl.jaas.config", "ScramLoginModule required;")
+        .withProperty("spring.datasource.hikari.data-source-properties.sslmode", "verify-full")
+        .withProperty("spring.data.redis.ssl.enabled", "true")
+        .withProperty("server.ssl.enabled", "true")
+        .withProperty("server.ssl.bundle", "server")
+        .withProperty(
+            "spring.ssl.bundle.pem.server.keystore.certificate", "file:/etc/bibs/tls/tls.crt")
+        .withProperty(
+            "spring.ssl.bundle.pem.server.keystore.private-key", "file:/etc/bibs/tls/tls.key")
+        .withProperty("brokerverse.runtime.role", "web");
   }
 
   @Test
@@ -106,8 +115,107 @@ class ProductionSafeguardsTest {
             .withProperty("spring.datasource.password", "from-the-vault")
             .withProperty("brokerverse.security.jwt-secret", KEY)
             .withProperty("brokerverse.redis.enabled", "false")
-            .withProperty("brokerverse.kafka.enabled", "false");
+            .withProperty("brokerverse.kafka.enabled", "false")
+            .withProperty("spring.datasource.hikari.data-source-properties.sslmode", "verify-full")
+            .withProperty("server.ssl.enabled", "true")
+            .withProperty("brokerverse.runtime.role", "jobs");
     env.setActiveProfiles("prod");
+
+    assertThat(ProductionSafeguards.problems(env)).isEmpty();
+  }
+
+  @Test
+  void plaintextTransportsAreRefusedInProduction() {
+    MockEnvironment env =
+        completeProduction()
+            .withProperty("spring.datasource.hikari.data-source-properties.sslmode", "prefer")
+            .withProperty("spring.data.redis.ssl.enabled", "false")
+            .withProperty("spring.kafka.properties.security.protocol", "SASL_PLAINTEXT")
+            .withProperty("server.ssl.enabled", "false");
+
+    assertThat(ProductionSafeguards.problems(env))
+        .hasSize(4)
+        .anySatisfy(p -> assertThat(p).contains("sslmode=verify-full").endsWith("prefer"))
+        .anySatisfy(p -> assertThat(p).startsWith("BROKERVERSE_REDIS_TLS"))
+        .anySatisfy(p -> assertThat(p).startsWith("BROKERVERSE_KAFKA_SECURITY_PROTOCOL"))
+        .anySatisfy(p -> assertThat(p).startsWith("BROKERVERSE_SERVER_SSL_ENABLED"));
+  }
+
+  @Test
+  void httpsNeedsTheMountedCertificateAndKey() {
+    MockEnvironment env =
+        completeProduction()
+            .withProperty("spring.ssl.bundle.pem.server.keystore.certificate", "")
+            .withProperty("spring.ssl.bundle.pem.server.keystore.private-key", " ");
+
+    assertThat(ProductionSafeguards.problems(env))
+        .containsExactly(
+            "BROKERVERSE_SERVER_SSL_CERTIFICATE is not set",
+            "BROKERVERSE_SERVER_SSL_PRIVATE_KEY is not set");
+  }
+
+  @Test
+  void theSslModeOfTheJdbcUrlTakesPrecedence() {
+    MockEnvironment disabledInUrl =
+        completeProduction()
+            .withProperty(
+                "spring.datasource.url",
+                "jdbc:postgresql://db:5432/bibs?ApplicationName=x&sslmode=disable");
+    MockEnvironment verifiedInUrl =
+        completeProduction()
+            .withProperty("spring.datasource.hikari.data-source-properties.sslmode", "")
+            .withProperty(
+                "spring.datasource.url", "jdbc:postgresql://db:5432/bibs?sslmode=VERIFY-CA");
+    MockEnvironment nothing =
+        completeProduction()
+            .withProperty("spring.datasource.hikari.data-source-properties.sslmode", "");
+
+    assertThat(ProductionSafeguards.databaseSslMode(disabledInUrl)).isEqualTo("disable");
+    assertThat(ProductionSafeguards.problems(disabledInUrl))
+        .singleElement()
+        .asString()
+        .endsWith("disable");
+    assertThat(ProductionSafeguards.problems(verifiedInUrl)).isEmpty();
+    assertThat(ProductionSafeguards.databaseSslMode(nothing)).isEqualTo("prefer");
+  }
+
+  @Test
+  void anInstanceServingIntegrationApisNeedsTheGatewayTokenSettings() {
+    MockEnvironment integration =
+        completeProduction().withProperty("brokerverse.runtime.role", "integration");
+    MockEnvironment configured =
+        completeProduction()
+            .withProperty("brokerverse.runtime.role", "INTEGRATION")
+            .withProperty(
+                "brokerverse.integration.security.jwk-set-uri", "https://gateway.bdo.example/jwks")
+            .withProperty("brokerverse.integration.security.issuer", "https://gateway.bdo.example")
+            .withProperty("brokerverse.integration.security.audiences", "bibs");
+
+    assertThat(ProductionSafeguards.problems(integration))
+        .containsExactly(
+            "BROKERVERSE_INTEGRATION_JWK_SET_URI is not set",
+            "BROKERVERSE_INTEGRATION_ISSUER is not set",
+            "BROKERVERSE_INTEGRATION_AUDIENCES is not set");
+    assertThat(ProductionSafeguards.problems(configured)).isEmpty();
+  }
+
+  @Test
+  void anUnknownRuntimeRoleIsReported() {
+    MockEnvironment env = completeProduction().withProperty("brokerverse.runtime.role", "batch");
+
+    assertThat(ProductionSafeguards.problems(env))
+        .singleElement()
+        .asString()
+        .contains("web, jobs, integration or all");
+  }
+
+  @Test
+  void transportChecksDoNotApplyOutsideProduction() {
+    MockEnvironment env =
+        new MockEnvironment()
+            .withProperty("brokerverse.environment", "sit")
+            .withProperty("spring.datasource.hikari.data-source-properties.sslmode", "disable")
+            .withProperty("spring.kafka.properties.security.protocol", "PLAINTEXT");
 
     assertThat(ProductionSafeguards.problems(env)).isEmpty();
   }

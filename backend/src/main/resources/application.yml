@@ -24,6 +24,11 @@ spring:
     hikari:
       maximum-pool-size: ${BROKERVERSE_DB_POOL_SIZE:20}
       connection-timeout: 30000
+      # ---- TLS to PostgreSQL (INF0): verify-full against the RDS CA bundle outside dev/test/seed;
+      # an sslmode in BROKERVERSE_DB_URL takes precedence. See CONFIGURATION.md "Encryption in transit".
+      data-source-properties:
+        sslmode: ${BROKERVERSE_DB_SSL_MODE:verify-full}
+        sslrootcert: ${BROKERVERSE_DB_SSL_ROOT_CERT:/etc/bibs/rds-ca/global-bundle.pem}
   jpa:
     open-in-view: false
     hibernate:
@@ -59,8 +64,8 @@ spring:
       timeout: ${BROKERVERSE_REDIS_TIMEOUT:2s}
       connect-timeout: ${BROKERVERSE_REDIS_CONNECT_TIMEOUT:5s}
       ssl:
-        # true for AWS ElastiCache with in-transit encryption.
-        enabled: ${BROKERVERSE_REDIS_TLS:false}
+        # AWS ElastiCache with in-transit encryption: on by default, off in the dev/test/seed profiles.
+        enabled: ${BROKERVERSE_REDIS_TLS:true}
       repositories:
         enabled: false
   # ---- Apache Kafka 3.6+ (integration events); brokerverse.kafka.enabled ----
@@ -68,8 +73,8 @@ spring:
     bootstrap-servers: ${BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     client-id: ${BROKERVERSE_KAFKA_CLIENT_ID:brokerverse}
     properties:
-      # PLAINTEXT locally; SASL_SSL with SCRAM-SHA-512 on Amazon MSK (see CONFIGURATION.md).
-      security.protocol: ${BROKERVERSE_KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+      # SASL_SSL with SCRAM-SHA-512 on Amazon MSK by default; PLAINTEXT in the dev/test/seed profiles.
+      security.protocol: ${BROKERVERSE_KAFKA_SECURITY_PROTOCOL:SASL_SSL}
       sasl.mechanism: ${BROKERVERSE_KAFKA_SASL_MECHANISM:SCRAM-SHA-512}
       sasl.jaas.config: ${BROKERVERSE_KAFKA_SASL_JAAS_CONFIG:}
       # Topics are created by the application (KafkaAdmin), never implicitly by a client.
@@ -92,6 +97,16 @@ spring:
       # Do not refuse to start when the broker is briefly unreachable; topics are created later.
       fail-fast: false
       auto-create: ${BROKERVERSE_KAFKA_CREATE_TOPICS:true}
+  # PEM certificate and key of the HTTPS listener, e.g. file:/etc/bibs/tls/tls.crt and tls.key
+  # (cert-manager secret mounted in the pod); reloaded on rotation when HTTPS is on.
+  ssl:
+    bundle:
+      pem:
+        server:
+          reload-on-update: ${BROKERVERSE_SERVER_SSL_ENABLED:false}
+          keystore:
+            certificate: ${BROKERVERSE_SERVER_SSL_CERTIFICATE:}
+            private-key: ${BROKERVERSE_SERVER_SSL_PRIVATE_KEY:}
   servlet:
     multipart:
       # Must be >= brokerverse.attachments.max-size (the service applies the business limit).
@@ -100,6 +115,11 @@ spring:
 
 server:
   port: ${BROKERVERSE_PORT:8080}
+  # ---- HTTPS from a mounted certificate (INF0): on in the Kubernetes deployments, off in dev/test ----
+  ssl:
+    enabled: ${BROKERVERSE_SERVER_SSL_ENABLED:false}
+    bundle: server
+    enabled-protocols: TLSv1.3,TLSv1.2
   shutdown: graceful
   error:
     include-stacktrace: never
@@ -111,6 +131,26 @@ brokerverse:
   # Kind of environment: local, sit, uat, training, preprod or production. "production" (or the prod
   # profile) turns on the start-up safeguards: no seed profile, every required secret present.
   environment: ${BROKERVERSE_ENVIRONMENT:local}
+  # ---- Workload role of the instance (INF0), ARCHITECTURE_OPTION_DECISION.md section 2 ----
+  runtime:
+    # web: user screens and APIs; jobs: schedulers and batch jobs; integration: outbox relay, Kafka
+    # consumers, inbound files and /integration/**; all: everything (dev, test, seed stacks).
+    role: ${BROKERVERSE_RUNTIME_ROLE:all}
+  # ---- API gateway (Apigee X) tokens of /integration/** (INF0), IntegrationSecurityConfig ----
+  integration:
+    security:
+      jwk-set-uri: ${BROKERVERSE_INTEGRATION_JWK_SET_URI:}
+      issuer: ${BROKERVERSE_INTEGRATION_ISSUER:}
+      audiences: ${BROKERVERSE_INTEGRATION_AUDIENCES:}
+      scope-claim: ${BROKERVERSE_INTEGRATION_SCOPE_CLAIM:scope}
+      jws-algorithms: ${BROKERVERSE_INTEGRATION_JWS_ALGORITHMS:RS256}
+      clock-skew: ${BROKERVERSE_INTEGRATION_CLOCK_SKEW:PT60S}
+      # One rule per API: path pattern and the scopes the token must all carry. A path without a
+      # rule is refused. Add rules with BROKERVERSE_INTEGRATION_SECURITY_APIS_<NAME>_PATH / _SCOPES.
+      apis:
+        ping:
+          path: /integration/v1/ping
+          scopes: ${BROKERVERSE_INTEGRATION_PING_SCOPES:}
   security:
     # Supplied via BROKERVERSE_JWT_SECRET (>= 32 random bytes); only the seed and test profiles carry
     # a local value. Production refuses to start without it (ProductionSafeguards).
@@ -338,6 +378,25 @@ brokerverse:
   security:
     # Local value for seed stacks only; set BROKERVERSE_JWT_SECRET in every shared environment.
     jwt-secret: ${BROKERVERSE_JWT_SECRET:seed-profile-local-signing-key-0123456789abcdef}
+
+---
+# Local transports for development, automated tests and seed stacks (INF0): plaintext PostgreSQL,
+# Redis and Kafka unless the environment asks for TLS. Every other profile keeps the TLS defaults.
+spring:
+  config:
+    activate:
+      on-profile: "dev | test | seed"
+  datasource:
+    hikari:
+      data-source-properties:
+        sslmode: ${BROKERVERSE_DB_SSL_MODE:prefer}
+  data:
+    redis:
+      ssl:
+        enabled: ${BROKERVERSE_REDIS_TLS:false}
+  kafka:
+    properties:
+      security.protocol: ${BROKERVERSE_KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
 
 ---
 # Production profile: no defaults for connection settings or secrets. ProductionSafeguards refuses

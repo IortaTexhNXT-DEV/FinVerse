@@ -1,0 +1,74 @@
+# bibs-jobs: scheduled and batch jobs (month-end, remittance and renewal extraction, migration loads,
+# report generation). Runtime role "jobs": HTTP limited to the actuator (probes, metrics). The Redis
+# job lock makes every job run once per schedule whatever the number of pods; heavy windows can be
+# scaled on schedule. Not behind the load balancer.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bibs-jobs
+  labels: { app.kubernetes.io/name: bibs-jobs, app.kubernetes.io/component: backend }
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels: { app.kubernetes.io/name: bibs-jobs }
+  strategy:
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: bibs-jobs, app.kubernetes.io/component: backend, bibs/tier: backend }
+    spec:
+      serviceAccountName: bibs-jobs
+      # A running job finishes its current unit of work; the lease of its lock expires otherwise.
+      terminationGracePeriodSeconds: 120
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile: { type: RuntimeDefault }
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector: { matchLabels: { app.kubernetes.io/name: bibs-jobs } }
+      containers:
+        - name: backend
+          image: bibs-backend
+          ports: [{ name: https, containerPort: 8443 }]
+          env:
+            - { name: BROKERVERSE_RUNTIME_ROLE, value: jobs }
+          envFrom:
+            - configMapRef: { name: bibs-backend-config }
+            - secretRef: { name: bibs-backend-secrets }
+          resources:
+            requests: { cpu: "1", memory: "3Gi" }
+            limits: { cpu: "2", memory: "4Gi" }
+          startupProbe:
+            httpGet: { path: /actuator/health/liveness, port: https, scheme: HTTPS }
+            periodSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            httpGet: { path: /actuator/health/readiness, port: https, scheme: HTTPS }
+            periodSeconds: 15
+            failureThreshold: 3
+          livenessProbe:
+            httpGet: { path: /actuator/health/liveness, port: https, scheme: HTTPS }
+            periodSeconds: 30
+            failureThreshold: 4
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          volumeMounts:
+            - { name: tls, mountPath: /etc/bibs/tls, readOnly: true }
+            - { name: rds-ca, mountPath: /etc/bibs/rds-ca, readOnly: true }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: tls
+          secret: { secretName: bibs-jobs-tls }
+        - name: rds-ca
+          configMap: { name: rds-ca-bundle }
+        - name: tmp
+          # Report and extraction files are written here before they go to S3 or the file share.
+          emptyDir: { sizeLimit: 4Gi }

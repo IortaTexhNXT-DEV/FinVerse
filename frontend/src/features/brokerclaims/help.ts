@@ -32,23 +32,36 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
         'Reassigning claims to another handler needs WORK_ASSIGN (Team Lead, Team Head, Unit Head) and notifies the new handler (BCL_CLAIM_ASSIGNED).',
       ],
     },
+    // Wave CL1-A entry (Record Claim and the claim record).
     {
       name: 'Record Claim',
       path: '/claims-handling/new',
       summary:
-        'Find the cover by ARN, policy number or assured; the cover card shows the policy number, cover version, period, premium status with any unpaid invoices, Marketing team and Account Officer. Then pick the locations, record the loss and the insurers.',
+        'Find the cover by ARN, policy number or assured; the cover card shows the policy number, cover version at the loss date, period, sum insured, Marketing team, AO and branch, and the premium check with any unpaid invoices. Then pick the locations, record the loss and confirm the insurers proposed from the invoice shares.',
+      workflow: [
+        'Save gives the claim its number BCL-<yyyy>-nnnnnn, phase New and the first status, and puts it in your queue. The account officer is told in the app.',
+        'A loss date outside the policy year asks for confirmation; an insurer claim number already on another claim asks for confirmation and raises BCL_INSURER_CLAIM_NO_REUSED.',
+        'An insurer-reported claim needs the insurer claim number at recording.',
+        'On the claim record: Details (loss, claimant), Locations (with the insurer location references), Insurers & Updates, Reserve & Settlement and Documents (loss advice and claims reports). Generate Authorization Code, Send Loss Advice, Refresh Cover Data and Use Latest Version are the page actions.',
+      ],
       controls: [
-        'Policy data comes from the account and is never re-keyed (BRCLM.007, 039).',
-        'A claim on unpaid or partly paid premium raises BCL_UNPAID_PREMIUM_CLAIM; the claims authorization code is issued only when the premium is paid (BRCLM.001).',
+        'Needs BCL_RECORD. Policy data comes from the account and is never re-keyed (BRCLM.007, 039).',
+        'A claim on unpaid or partly paid premium is recorded, flagged Unpaid premium and raises BCL_UNPAID_PREMIUM_CLAIM; the authorization code (BCL_AUTHORIZE) is issued only when the premium is paid, or on a direct-payment cover under BCL_AUTH_DP_POLICY (CONFIRM: attach the insurer payment evidence first) (BRCLM.001).',
+        'The reported date is corrected with BCL_STATUS_UPDATE and a reason, the claimant overridden with BCL_CLAIMANT_OVERRIDE, the reserve amended with BCL_RESERVE_AMEND and the adjuster of an insurer line set with BCL_ADJUSTER_ASSIGN; every change is kept in the claim history.',
         'The claim currency is the cover currency, else BCL_DEFAULT_CURRENCY.',
       ],
     },
+    // Wave CL1-A entry.
     {
       name: 'Cover Lookup',
       path: '/claims-handling/covers',
       summary:
-        'Read-only view of a cover: account, endorsements, invoices with their premium status, the claims of the cover and the insurer location references (BRCLM.002, 003, 042).',
-      controls: ['Needs BCL_COVER_VIEW; nothing on the cover can be changed here.'],
+        'Read-only view of any cover of the company: account, policy years and policy numbers, items and locations, endorsements (cover versions), invoices with their payment and remittance status, the claims of the cover and the insurer location references (BRCLM.002, 003, 042).',
+      workflow: ['Record Claim on the cover opens Record Claim with the cover selected.'],
+      controls: [
+        'Needs BCL_COVER_VIEW; nothing on the cover can be changed here. Search texts need at least 3 characters; there is no branch or portfolio restriction (CLQ27).',
+        'Opening a cover is logged in the audit trail of the account.',
+      ],
     },
     {
       name: 'My Diary',
@@ -59,13 +72,14 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
         'The daily job BCL_FOLLOW_UP_DUE (06:00) reminds you of follow-ups and diary entries due today; past dates raise BCL_FOLLOW_UP_OVERDUE.',
       ],
     },
+    // Wave CL1-A entry.
     {
       name: 'Insurer Location References',
       path: '/claims-handling/location-refs',
       summary:
-        'The reference each insurer uses for a location of a cover, with its effective dates; maintained here or by bulk upload (BRCLM.042).',
+        'The reference each insurer uses for a location of a cover, with its effective dates; maintained here or by the bulk upload BCL_LOCATION_REF (BRCLM.042). Every claim location shows the references valid today.',
       controls: [
-        'Needs BCL_LOCATION_REF_MAINTAIN; a change closes the current reference and opens a new one, and both stay in the history.',
+        'Needs BCL_LOCATION_REF_MAINTAIN; a new reference ends the current one of the location and insurer the day before it starts, and both stay in the history. Insurer claim numbers and insurer updates also load by bulk upload (BCL_INSURER_CLAIM_NO, BCL_INSURER_UPDATE, BCL_RECORD).',
       ],
     },
     {

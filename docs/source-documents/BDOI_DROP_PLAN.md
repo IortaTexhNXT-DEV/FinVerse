@@ -25,3 +25,31 @@ Transcribed from the BDOI slides (`BDOI Drop Plan - modules and integrations.web
 Notes on the slide: requirements and build run in three waves (1 setup and upstream, 2 downstream, 3 independent modules), about two months of build per wave.
 
 Related: `Concept Paper - Advance Implementation of Renewal Processing V1.0 (signed).pdf` (early renewal release by 15-Aug-2027 for January-May 2028 expiries; no placement or booking before the January 2028 cut-over) and `BDOI_IER_Workbook_v20_iorta.xlsx` (infrastructure estimate: architecture, HW / SW, VDI, Kubernetes sizing per environment).
+
+## Integration systems (BDOI, 26-Sep-2026; all external touch-points are owned by BDOI IT)
+
+| System | Code |
+|---|---|
+| Enterprise Identity Access Management (Entra-ID) | EIAM |
+| User ID Maintenance - Identity Security Cloud (IGA) | UIDM-ISC |
+| Enterprise Content Management | ECM |
+| Centralized Communications Management (e-mail sending) | CCM |
+| M365 Exchange | M365 |
+| Loans Management System | LMS |
+| Home Loan System (Loan Origination and Admin) | HL - LOAS |
+| Loan Front-End System | LFS SaaS |
+| PDC Management System | PMS |
+| Cash Management System (outward payments) | CMS / New BOB |
+| Online Bills Payment Consolidation System (bills payment) | OBPCS |
+| Old Business Online Banking Collection System (SOA bills payments via funds transfer) | Old BOB |
+| Trade Finance System - client onboarding and payment (manual) | TFS |
+| Enterprise Data Platform | EDP |
+| Enterprise General Ledger | EGL |
+| Bridger Insight XG | BridgerInsight |
+
+## BDOI answers (26-Sep-2026)
+
+- **Go-live:** every module goes live together in January 2028. There is no early go-live; the early renewal concept paper does not change the go-live.
+- **Drops:** they split requirements, build, test and sign-off workload. The platform is built end to end and goes to UAT complete. BRDs, FRS, test plans and other collaterals are grouped under the drops.
+- **Reinsurance:** Remittance handles the reinsurance transactions in Drop 1; the reinsurance module itself is phase 2.
+- **Documents and attachments:** stored in an S3 bucket only.

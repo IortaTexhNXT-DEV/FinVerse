@@ -2,7 +2,10 @@ package com.iortatechnxt.brokerverse.account.service;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.Account.Origin;
+import com.iortatechnxt.brokerverse.account.domain.AccountClassification;
 import com.iortatechnxt.brokerverse.account.domain.AccountData.Mortgage;
+import com.iortatechnxt.brokerverse.account.domain.AccountOrigin;
+import com.iortatechnxt.brokerverse.account.domain.BusinessType;
 import com.iortatechnxt.brokerverse.account.domain.PaymentArrangement;
 import com.iortatechnxt.brokerverse.account.service.AccountBulkSupport.Headers;
 import com.iortatechnxt.brokerverse.account.service.AccountRules.Resolved;
@@ -21,6 +24,7 @@ import com.iortatechnxt.brokerverse.crm.domain.ClientType;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
@@ -126,6 +130,12 @@ public class AccountCreateBulkHandler implements BulkImportHandler {
             false,
             BulkColumn.Type.YES_NO,
             "N"));
+    columns.add(
+        BulkColumn.optional(
+            Headers.BUSINESS_TYPE, "NEW_BUSINESS (default) or RENEWAL (BRNB.097)", "NEW_BUSINESS"));
+    columns.add(
+        BulkColumn.optional(
+            Headers.RENEWAL_OF, "Renewal: expiring ARN or policy reference", "ARN-2025-000123"));
     return columns;
   }
 
@@ -165,6 +175,7 @@ public class AccountCreateBulkHandler implements BulkImportHandler {
     }
     AccountCheck check = checks.checkData(context.companyId(), resolved.data(), product);
     List<String> errors = new ArrayList<>();
+    classification(row);
     check
         .fieldErrors()
         .forEach(
@@ -188,11 +199,37 @@ public class AccountCreateBulkHandler implements BulkImportHandler {
                 new Origin(row.text(Headers.QUOTATION), null),
                 draft(row, context, client.getId()),
                 null,
-                null));
+                null,
+                null,
+                null,
+                classification(row)));
     if (AccountBulkSupport.yes(context.parameter(AccountBulkSupport.SUBMIT))) {
       accounts.submit(account.getId(), "Bulk upload " + context.jobNo());
     }
     return account.getArn();
+  }
+
+  /**
+   * Business type and renewal link of a row (shared work item BT0): NEW_BUSINESS when blank.
+   *
+   * @param row row
+   * @return classification (origin QUOTATION with a quotation reference, else DIRECT)
+   */
+  private static AccountClassification classification(BulkRow row) {
+    String type = row.text(Headers.BUSINESS_TYPE);
+    BusinessType businessType = BusinessType.NEW_BUSINESS;
+    if (type != null) {
+      try {
+        businessType = BusinessType.valueOf(type.strip().toUpperCase(Locale.ROOT));
+      } catch (IllegalArgumentException e) {
+        throw new BusinessRuleException(
+            "BULK_BUSINESS_TYPE_INVALID", "Business Type must be NEW_BUSINESS or RENEWAL", e);
+      }
+    }
+    return new AccountClassification(
+        businessType,
+        row.text(Headers.RENEWAL_OF),
+        AccountOrigin.of(new Origin(row.text(Headers.QUOTATION), null)));
   }
 
   private RiskProduct product(BulkContext context) {

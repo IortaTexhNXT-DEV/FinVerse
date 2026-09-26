@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.booking.service;
 
 import com.iortatechnxt.brokerverse.booking.domain.BookedInvoice;
+import com.iortatechnxt.brokerverse.booking.domain.BusinessType;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
 import com.iortatechnxt.brokerverse.booking.domain.PremiumComponent;
 import java.math.BigDecimal;
@@ -51,6 +52,8 @@ import java.util.Map;
  * @param incentiveCriteria codes of the incentive criteria matched (PMADD07), empty when none
  * @param rootInvoiceNo root of the invoice family (DIS 3.27.2): the invoice itself for an original
  *     booking, else the original invoice; the same value as the ledger's {@code root_invoice_no}
+ * @param businessType New Business or Renewal, from the account (BRNB.097, BRID-022.01; shared work
+ *     item BT0); NEW_BUSINESS when not given
  */
 public record InvoiceBooked(
     String invoiceNo,
@@ -80,14 +83,110 @@ public record InvoiceBooked(
     String lineCode,
     Integer productVersionNo,
     List<String> incentiveCriteria,
-    String rootInvoiceNo) {
+    String rootInvoiceNo,
+    BusinessType businessType) {
 
-  /** Defensive copies. */
+  /** Defensive copies and defaults. */
   public InvoiceBooked {
     shares = List.copyOf(shares);
     components = Map.copyOf(components);
     incentiveCriteria = incentiveCriteria == null ? List.of() : List.copyOf(incentiveCriteria);
     rootInvoiceNo = rootInvoiceNo == null ? invoiceNo : rootInvoiceNo;
+    businessType = businessType == null ? BusinessType.NEW_BUSINESS : businessType;
+  }
+
+  /**
+   * The event without a business type (earlier contract): new business.
+   *
+   * @param invoiceNo invoice number
+   * @param arn Account Reference Number
+   * @param endorsementNo endorsement number
+   * @param clientCode client code
+   * @param shares insurer shares
+   * @param currency currency
+   * @param bookingDate booking date
+   * @param inceptionDate period start
+   * @param expiryDate period end
+   * @param riskCode risk code
+   * @param segment market segment
+   * @param aoUsername account officer
+   * @param salesUnit sales team
+   * @param costCenter cost center
+   * @param components premium by component
+   * @param commission commission
+   * @param vatOnCommission VAT on the commission
+   * @param wtaxRate withholding tax rate
+   * @param directPayment direct payment
+   * @param cwt2Percent client withholds 2 %
+   * @param incentiveEligible incentive eligible
+   * @param kind invoice kind
+   * @param policyNo policy number
+   * @param policyYear policy year
+   * @param lineCode product line
+   * @param productVersionNo package version
+   * @param incentiveCriteria incentive criteria codes
+   * @param rootInvoiceNo root of the invoice family
+   */
+  @SuppressWarnings("java:S107") // event contract
+  public InvoiceBooked(
+      String invoiceNo,
+      String arn,
+      String endorsementNo,
+      String clientCode,
+      List<Share> shares,
+      String currency,
+      LocalDate bookingDate,
+      LocalDate inceptionDate,
+      LocalDate expiryDate,
+      String riskCode,
+      String segment,
+      String aoUsername,
+      String salesUnit,
+      String costCenter,
+      Map<PremiumComponent, BigDecimal> components,
+      BigDecimal commission,
+      BigDecimal vatOnCommission,
+      BigDecimal wtaxRate,
+      boolean directPayment,
+      boolean cwt2Percent,
+      boolean incentiveEligible,
+      InvoiceKind kind,
+      String policyNo,
+      int policyYear,
+      String lineCode,
+      Integer productVersionNo,
+      List<String> incentiveCriteria,
+      String rootInvoiceNo) {
+    this(
+        invoiceNo,
+        arn,
+        endorsementNo,
+        clientCode,
+        shares,
+        currency,
+        bookingDate,
+        inceptionDate,
+        expiryDate,
+        riskCode,
+        segment,
+        aoUsername,
+        salesUnit,
+        costCenter,
+        components,
+        commission,
+        vatOnCommission,
+        wtaxRate,
+        directPayment,
+        cwt2Percent,
+        incentiveEligible,
+        kind,
+        policyNo,
+        policyYear,
+        lineCode,
+        productVersionNo,
+        incentiveCriteria,
+        rootInvoiceNo,
+        null);
   }
 
   /**
@@ -178,6 +277,7 @@ public record InvoiceBooked(
         lineCode,
         productVersionNo,
         incentiveCriteria,
+        null,
         null);
   }
 
@@ -216,7 +316,8 @@ public record InvoiceBooked(
         invoice.getFacts().lineCode(),
         invoice.getFacts().productVersionNo(),
         invoice.getFlags().incentiveCriteriaCodes(),
-        invoice.getRootInvoiceNo());
+        invoice.getRootInvoiceNo(),
+        invoice.getFlags().businessType());
   }
 
   /**

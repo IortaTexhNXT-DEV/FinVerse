@@ -64,6 +64,8 @@ public class AccountBulkSupport {
     static final String QUOTATION = "Quotation Ref";
     static final String FFY_START = "FFY Start";
     static final String DIRECT_PAYMENT = "Direct Payment";
+    static final String BUSINESS_TYPE = "Business Type";
+    static final String RENEWAL_OF = "Renewal Of";
     static final String SUBMIT = "Submit";
     static final String CONTACT_EMAIL = "Contact Email";
     static final String CONTACT_MOBILE = "Contact Mobile";

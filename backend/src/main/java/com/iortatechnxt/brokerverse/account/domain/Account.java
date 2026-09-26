@@ -100,6 +100,8 @@ public class Account extends BaseEntity {
   @Column(name = "rate_override_ref", length = 30)
   private String rateOverrideRef;
 
+  @Embedded private AccountClassification classification;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "payment_arrangement", nullable = false, length = 20)
   private PaymentArrangement paymentArrangement = PaymentArrangement.VIA_BDOI;
@@ -151,11 +153,20 @@ public class Account extends BaseEntity {
 
   protected Account() {}
 
-  private Account(Long companyId, String arn, Origin origin, SalesStamp salesStamp) {
+  private Account(
+      Long companyId,
+      String arn,
+      Origin origin,
+      SalesStamp salesStamp,
+      AccountClassification classification) {
     this.companyId = companyId;
     this.arn = arn;
     this.quotationRef = origin.quotationRef();
     this.proposalRef = origin.proposalRef();
+    this.classification =
+        classification == null
+            ? AccountClassification.newBusiness(AccountOrigin.of(origin))
+            : classification;
     this.sales = salesStamp;
     this.freeFirstYear = FreeFirstYear.NONE;
     this.tsu = TsuClearance.NONE;
@@ -170,11 +181,18 @@ public class Account extends BaseEntity {
    * @param origin quotation and proposal references
    * @param data account data
    * @param salesStamp sales unit and cost center
+   * @param classification business type, renewal link and origin (BT0); null for new business of
+   *     the origin's kind
    * @return the account (not yet saved)
    */
   public static Account create(
-      Long companyId, String arn, Origin origin, AccountData data, SalesStamp salesStamp) {
-    Account account = new Account(companyId, arn, origin, salesStamp);
+      Long companyId,
+      String arn,
+      Origin origin,
+      AccountData data,
+      SalesStamp salesStamp,
+      AccountClassification classification) {
+    Account account = new Account(companyId, arn, origin, salesStamp, classification);
     account.apply(data);
     return account;
   }
@@ -265,6 +283,19 @@ public class Account extends BaseEntity {
 
   public String getRateOverrideRef() {
     return rateOverrideRef;
+  }
+
+  public AccountClassification getClassification() {
+    return classification == null ? AccountClassification.newBusiness(null) : classification;
+  }
+
+  /**
+   * New Business or Renewal (BRNB.097, BT0); booking copies it to the invoice.
+   *
+   * @return business type
+   */
+  public BusinessType getBusinessType() {
+    return getClassification().businessType();
   }
 
   /**

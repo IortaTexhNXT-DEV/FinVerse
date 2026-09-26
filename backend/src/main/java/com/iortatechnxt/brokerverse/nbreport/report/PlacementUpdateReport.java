@@ -16,7 +16,8 @@ import org.springframework.stereotype.Component;
  * Placement Update Report (NB-PLC-UPDATE, BRNB.011), individual and collective: where each account
  * stands with its insurer - stage and since when, placement slip, placement date, hold cover,
  * policy issue and the last insurer return. Collective: every account whose stage changed in the
- * period, grouped by insurer; individual: one ARN regardless of the period.
+ * period, grouped by insurer; individual: one ARN regardless of the period. Filter Business Type
+ * (BRID-022.01, shared work item BT0).
  */
 @Component
 public class PlacementUpdateReport implements ReportDefinition {
@@ -49,6 +50,7 @@ public class PlacementUpdateReport implements ReportDefinition {
           + " and (cast(:insurer as varchar) is null or a.insurer_code = :insurer)"
           + " and (cast(:officer as varchar) is null"
           + " or lower(a.account_officer) = lower(cast(:officer as varchar)))"
+          + " and (cast(:businessType as varchar) is null or a.business_type = :businessType)"
           + " and (cast(:arn as varchar) is not null"
           + " or cast(c.stage_entered_at at time zone 'Asia/Manila' as date) between :from and :to)"
           + " order by 4, a.arn";
@@ -75,7 +77,8 @@ public class PlacementUpdateReport implements ReportDefinition {
         true,
         ParameterSpec.optional(ARN, "ARN (individual report)", ParameterType.TEXT),
         ParameterSpec.optional(INSURER, "Insurer Code", ParameterType.TEXT),
-        ParameterSpec.optional(OFFICER, "Account Officer", ParameterType.TEXT));
+        ParameterSpec.optional(OFFICER, "Account Officer", ParameterType.TEXT),
+        NbReportSupport.businessTypeFilter());
   }
 
   @Override
@@ -84,7 +87,10 @@ public class PlacementUpdateReport implements ReportDefinition {
         NbReportSupport.args(p)
             .with(ARN, NbReportSupport.upper(p, ARN))
             .with(INSURER, NbReportSupport.upper(p, INSURER))
-            .with(OFFICER, p.optionalText(OFFICER).map(String::strip).orElse(null));
+            .with(OFFICER, p.optionalText(OFFICER).map(String::strip).orElse(null))
+            .with(
+                NbReportSupport.BUSINESS_TYPE,
+                NbReportSupport.selected(p, NbReportSupport.BUSINESS_TYPE));
     var rows =
         jdbc.rows(SQL, args.map()).stream()
             .map(r -> NbReportSupport.relabel(r, "hold_cover"))

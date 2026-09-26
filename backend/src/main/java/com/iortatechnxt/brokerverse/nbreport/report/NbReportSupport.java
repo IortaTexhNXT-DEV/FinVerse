@@ -31,6 +31,9 @@ final class NbReportSupport {
   /** "Any" option of the select filters. */
   static final String ALL = "ALL";
 
+  /** Business Type filter (BRID-022.01, BRNB.097; shared work item BT0). */
+  static final String BUSINESS_TYPE = "businessType";
+
   private NbReportSupport() {}
 
   /**
@@ -61,6 +64,16 @@ final class NbReportSupport {
     params.addAll(List.of(extra));
     return new ReportMetadata(
         code, title, ReportCategory.NEW_BUSINESS, description, params, permission);
+  }
+
+  /**
+   * The Business Type filter: all, New Business or Renewal (BRID-022.01).
+   *
+   * @return parameter
+   */
+  static ParameterSpec businessTypeFilter() {
+    return ParameterSpec.select(
+        BUSINESS_TYPE, "Business Type", List.of(ALL, "NEW_BUSINESS", "RENEWAL"), ALL);
   }
 
   /**

@@ -126,7 +126,7 @@ public class InvoiceBuilder {
           InvoiceFlags.withCriteria(
               account.isDirectPayment(),
               cwt2,
-              BusinessType.NEW_BUSINESS,
+              BusinessType.of(account.getBusinessType()),
               rules.incentiveCriteria(account.getCompanyId(), ruleFacts, flagDate));
       drafts.add(
           new InvoiceDraft(

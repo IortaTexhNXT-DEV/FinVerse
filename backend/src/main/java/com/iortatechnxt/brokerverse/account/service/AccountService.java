@@ -113,9 +113,11 @@ public class AccountService {
   /**
    * Creates a draft account and opens its NB_ACCOUNT work case. Contract for the quotation and
    * proposal modules: pass the ARN generated at quotation / PRF creation and the premium already
-   * computed; a direct account gets a new ARN and is rated now (BRNB.102).
+   * computed; a direct account gets a new ARN and is rated now (BRNB.102). The business type,
+   * renewal link and origin kind come from the request (shared work item BT0): NEW_BUSINESS unless
+   * built with {@link NewAccount#renewal}.
    *
-   * @param request company, ARN, origin, data, premium and account officer
+   * @param request company, ARN, origin, data, premium, account officer and classification
    * @return the account in DRAFT
    */
   public Account createDraft(NewAccount request) {
@@ -129,9 +131,16 @@ public class AccountService {
             .map(a -> new SalesStamp(a.region(), a.department(), a.team(), officer, a.costCenter()))
             .orElse(new SalesStamp(null, null, null, officer, null));
     Account account =
-        Account.create(request.companyId(), arn, request.origin(), resolved.data(), stamp);
+        Account.create(
+            request.companyId(),
+            arn,
+            request.origin(),
+            resolved.data(),
+            stamp,
+            request.classification());
     applyTags(account, request.draft(), true);
-    if (request.premium() != null) {
+    if (request.premium() != null || request.classification().renewal()) {
+      // A quotation premium keeps its version; a renewal asks to be rated on the kept version.
       account.stampScheme(request.productVersionNo(), request.rateOverrideRef());
     }
     pricing.price(account, resolved.product(), terms(request.draft()), request.premium());
@@ -153,7 +162,15 @@ public class AccountService {
         ENTITY,
         arn,
         AuditAction.CREATE,
-        "Account for " + saved.getClientName() + ", product " + saved.getProductCode());
+        "Account for "
+            + saved.getClientName()
+            + ", product "
+            + saved.getProductCode()
+            + ", "
+            + saved.getBusinessType()
+            + (saved.getClassification().renewal()
+                ? " of " + saved.getClassification().renewalOfRef()
+                : ""));
     return saved;
   }
 

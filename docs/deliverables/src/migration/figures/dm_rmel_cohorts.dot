@@ -1,12 +1,13 @@
-// BRD-13 Data Migration Strategy: renewal-driven transition by RMEL cohort (BRID 12.1; DMQ26).
+// BRD-13 Data Migration Strategy: renewal-driven transition by RMEL cohort (BRID 12.1; DMQ26, DMQ37).
+// Go-live proposed Monday 3 January 2028; T + 140 days = 22 May 2028.
 digraph dm_rmel {
   graph [rankdir=LR, fontname="Arial", nodesep=0.3, ranksep=0.3, bgcolor="white", pad=0.15];
   node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
-         fontsize=12, fontcolor="@NEAR_BLACK", width=2.1, height=1.6, margin="0.1,0.05", fillcolor="@WHITE"];
+         fontsize=12, fontcolor="@NEAR_BLACK", width=2.2, height=1.75, margin="0.1,0.05", fillcolor="@WHITE"];
   edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2];
-  a [label=<<b>Expiry before T</b><br/><br/><font point-size="11">renewed or lapsed<br/>in legacy before<br/>the freeze; only<br/>open items carried</font>>, fillcolor="@DIRTY_WHITE", color="@MUTED"];
-  b [label=<<b>Expiry T to T+140</b><br/><br/><font point-size="11">RMEL already run<br/>in legacy; carried<br/>(P03) with the<br/>disposition</font>>, fillcolor="@AMBER_BG"];
-  c [label=<<b>Expiry after T+140</b><br/><br/><font point-size="11">extracted by BIBS<br/>Renewal from the<br/>migrated headers<br/>(P01)</font>>, fillcolor="@BG_BLUE"];
+  a [label=<<b>Expiry up to 2 Jan 2028</b><br/><br/><font point-size="11">renewed or lapsed<br/>in legacy; renewals<br/>booked before the<br/>freeze migrate as<br/>headers (P01)</font>>, fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  b [label=<<b>Expiry 3 Jan to 22 May 2028</b><br/><br/><font point-size="11">prepared in legacy<br/>from Aug 2027; not<br/>booked at the freeze:<br/>carried (P03) and<br/>placed in BIBS</font>>, fillcolor="@AMBER_BG"];
+  c [label=<<b>Expiry from 23 May 2028</b><br/><br/><font point-size="11">extracted by BIBS<br/>Renewal from the<br/>migrated headers<br/>(P01), 140 days<br/>before expiry</font>>, fillcolor="@BG_BLUE"];
   d [label=<<b>Run-off complete</b><br/><br/><font point-size="11">last legacy policy<br/>renewed or lapsed;<br/>legacy systems<br/>decommissioned</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
   a -> b -> c -> d;
 }

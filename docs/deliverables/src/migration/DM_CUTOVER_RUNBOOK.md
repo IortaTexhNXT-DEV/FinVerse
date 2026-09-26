@@ -8,11 +8,11 @@ doc_code: Migration
 brd: BRD-13
 name: Cutover Runbook
 doc_id: BIBS-DMC-BRD-13
-version: "1.0"
+version: "1.1"
 date: 26 September 2026
 status: Issued for BDOI review
 header_title: Cutover Runbook BRD-13
-output: Migration/BIBS_Migration_BRD-13_Cutover_Runbook_v1.0.docx
+output: Migration/BIBS_Migration_BRD-13_Cutover_Runbook_v1.1.docx
 h1_page_break: false
 control:
   - version: "1.0"
@@ -21,6 +21,12 @@ control:
     reviewer: iorta TechNXT Solution Architect
     approver: BDOI Program Manager (pending)
     change: First issue; dates are relative to T until BDOI confirms the go-live date (DMQ25); re-issued after the dress rehearsal with named people and measured timings
+  - version: "1.1"
+    date: 26 Sep 2026
+    author: iorta TechNXT Project Manager
+    reviewer: iorta TechNXT Solution Architect
+    approver: BDOI Program Manager (pending)
+    change: "Calendar of the BDOI timeline (go-live January 2028, proposed Monday 3 January 2028) with the relative days mapped to dates; tasks moved off the year-end holidays (GNG-2 and the last business day to T-5, completion drives to T-12, client load to T-11); carried RMEL cohorts of January-May 2028 with the completeness check and the catch-up extraction; default names of the decommissioning criteria. Named people and measured durations follow in version 1.2 after the dress rehearsal"
 distribution:
   - {name: "Program Manager, Business Project Services", role: Approver, organisation: BDO Unibank ESG, purpose: "Owner of the cutover; chair of the go / no-go board"}
   - {name: "Go / no-go board members", role: Approver, organisation: BDOI, purpose: "Checkpoints GNG-1, GNG-2, GNG-3"}
@@ -33,9 +39,10 @@ distribution:
 
 This runbook is the plan of the production cutover of BIBS: from 30 days before go-live (T) to the end of hypercare. It lists every task with its owner, start, duration, predecessors and the evidence that proves it is done; the go / no-go checkpoints with their criteria; the freeze windows; the rollback procedure; the communication plan; the hypercare roster and exit criteria; and the decommissioning checklists of the legacy systems.
 
-- **T** is the go-live date: the first business day (a Monday) of a month, after a legacy month-end close (proposal, DMQ25, register DCR-200). Days are calendar days; times are Philippine time (PHT).
-- The same tasks are in the Cutover Task Plan workbook (`BIBS_Migration_BRD-13_Cutover_Task_Plan_v1.0.xlsx`), where names, actual times and status are recorded, and in the Migration Console as the plan of kind PRODUCTION (FR-DM-120). The console is the record during the cutover; the workbook is the planning and review copy.
-- The plan was rehearsed in three mocks and a dress rehearsal (Strategy chapter 10). This version gives planned durations; version 1.1, issued after the dress rehearsal, gives the measured durations and the named people.
+- **T** is the go-live date. The BDOI timeline sets it in January 2028 (DMQ25); the proposal is **Monday 3 January 2028**, the first business day after the legacy year-end close (DMQ39, register DCR-242). Days are calendar days; times are Philippine time (PHT). Section 3.1 maps the relative days to dates; tasks that would fall on the year-end holidays are placed on the nearest working day.
+- The same tasks are in the Cutover Task Plan workbook (`BIBS_Migration_BRD-13_Cutover_Task_Plan_v1.1.xlsx`), where names, actual times and status are recorded, and in the Migration Console as the plan of kind PRODUCTION (FR-DM-120). The console is the record during the cutover; the workbook is the planning and review copy.
+- The plan is rehearsed in four mocks (April, July, August and October 2027) and a dress rehearsal (November 2027) (Strategy chapter 10). This version gives planned durations; version 1.2, issued after the dress rehearsal, gives the measured durations and the named people.
+- The early renewal release of the concept paper of 6 September 2026 is superseded by the single January 2028 go-live (register DCR-240). The renewals of the January-May 2028 expiries that are not booked in legacy at the freeze are carried into BIBS in this cutover (tasks CT-028, CT-046, CT-070).
 
 # Cutover organisation
 
@@ -56,7 +63,11 @@ This runbook is the plan of the production cutover of BIBS: from 30 days before 
 
 <!-- dm:phases -->
 
-![The cutover weekend (T = Monday go-live; times PHT)](figures/dm_cutover_weekend.dot){width=16}
+## Calendar
+
+<!-- dm:calendar -->
+
+![The cutover weekend (T = Monday 3 January 2028, proposed; times PHT)](figures/dm_cutover_weekend.dot){width=16}
 
 ## Freeze windows
 
@@ -132,13 +143,13 @@ Hypercare runs from go-live to the first month-end close with the legacy control
 
 # Decommissioning checklists
 
-A legacy system is decommissioned only when every item of its checklist is met and signed (FR-DM-123; DMQ27). The legacy context in BIBS closes separately, when the legacy positions have run off.
+A legacy system is decommissioned only when every item of its checklist is met and signed (FR-DM-123; DMQ27). The legacy context in BIBS closes separately, when the legacy positions have run off. The words before the dash are the default criterion names that the Migration Console and its messages use.
 
 <!-- dm:decommissioning -->
 
 # Sign-off {-}
 
-By signing, BDOI approves this runbook as the plan of the production cutover. The go-live date, the named people and the measured durations are added in version 1.1 after the dress rehearsal.
+By signing, BDOI approves this runbook as the plan of the production cutover. The confirmed go-live date (M6), the named people and the measured durations are added in version 1.2 after the dress rehearsal.
 
 ```signoff
 rows:

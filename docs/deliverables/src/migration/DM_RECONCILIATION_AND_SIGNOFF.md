@@ -8,11 +8,11 @@ doc_code: Migration
 brd: BRD-13
 name: Reconciliation Approach and Signoff
 doc_id: BIBS-DMR-BRD-13
-version: "1.0"
+version: "1.1"
 date: 26 September 2026
 status: Issued for BDOI review
 header_title: Migration Reconciliation Approach and Sign-off
-output: Migration/BIBS_Migration_BRD-13_Reconciliation_Approach_and_Signoff_v1.0.docx
+output: Migration/BIBS_Migration_BRD-13_Reconciliation_Approach_and_Signoff_v1.1.docx
 h1_page_break: false
 control:
   - version: "1.0"
@@ -21,6 +21,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: "Head, Comptrollership (pending)"
     change: First issue for BDOI review, with the Data Migration Strategy and Approach v1.0
+  - version: "1.1"
+    date: 26 Sep 2026
+    author: iorta TechNXT Solution Architect
+    reviewer: iorta TechNXT Project Manager
+    approver: "Head, Comptrollership (pending)"
+    change: "With the Strategy v1.1 (BDOI timeline, go-live January 2028; four mocks). L5 compares each legacy control account with the opening detail; sign of a Migration Clearing difference corrected in the worked example; cohort completeness of the carried RMEL cohorts (P03); package remapping samples"
 distribution:
   - {name: "Head, Comptrollership; Product Owner FRBS / ACSL", role: Approver, organisation: BDOI, purpose: "Reconciliation approver for financial objects"}
   - {name: "Data owners of each object", role: Approver, organisation: BDOI, purpose: "Business verification and acceptance (G6)"}
@@ -46,7 +52,7 @@ Five levels are run by BIBS after each load (job MIG_RECONCILE) and on demand. L
 | L2 | Amounts | Per amount column and currency: control total, staged sum, and the value read from BIBS (ledger components of origin LEGACY, unapplied balances, journal lines) | Difference 0.00 (tolerance MIG_AMOUNT_TOLERANCE, default 0.00) at each stage |
 | L3 | Hash totals | Hash total of the key column as the layout defines it; SHA-256 per staged row; count of distinct keys in the cross-reference | Control = staged = cross-reference |
 | L4 | Fields | Every mapped field of every loaded row read back through the owning service and compared with the staged, mapped value | Equal; a difference explained by the code map (mapped value) is not a break |
-| L5 | GL | Migration Clearing balance per branch and currency; each legacy control account against its legacy sub-ledger (ACSL GL-SL reconciliation with ledger context LEGACY) | Migration Clearing 0.00; control account = sub-ledger |
+| L5 | GL | Migration Clearing balance per branch and currency, analysed per legacy control account (trial balance line against the opening detail posted to that account); each legacy control account against its legacy sub-ledger (ACSL GL-SL reconciliation with ledger context LEGACY) | Migration Clearing 0.00; per control account TB line = opening detail; control account = sub-ledger |
 
 **Breaks.** Any difference is a break (status BREAK). A break is fixed by a rerun (new extract, new map version or a corrected row) or explained. An explanation gives a reason from the list MIG_BREAK_REASON (rounding at source, record excluded by the owner, mapping difference, legacy data error, late legacy transaction, other) and a text, and is approved by the reconciliation approver. A reconciliation cannot be signed (gate G5) while a break is open.
 
@@ -65,12 +71,12 @@ The workbook sheet "Control Totals" lists the same measures one per row, with co
 <!-- table: widths=1.2,2.6,3.4,2.6,2.6,4.2 caption="What is reconciled per object" size=8 -->
 | Object | L1 counts | L2 amounts | L3 hash | L4 fields | L5 GL / business check |
 |---|---|---|---|---|---|
-| R01-R08, R11 | Values received, mapped, created, rejected | - | Distinct keys | Created values (name, status, dates) | Unmapped-code report empty; every CREATE value authorised in its master |
+| R01-R08, R11 | Values received, mapped, created, rejected | - | Distinct keys | Created values (name, status, dates) | Unmapped-code report empty; every CREATE value authorised in its master; every legacy package in the PACKAGE map |
 | R09 | Payees received and loaded | - | Distinct payee codes | All loaded fields | Payee list in Disbursement |
 | C01, C02 | Legacy clients received, clusters, merged, new, loaded | - | Distinct legacy client numbers = cross-reference entries | Identity, contact, segment, KYC fields of the survivor | Client review queue empty; each legacy number resolves to one BIBS client |
 | C03 | Accounts received and loaded | - | Distinct (client, account) | All fields | - |
 | P01, P01S | Headers received and loaded; shares | Sum insured, gross and net premium per currency | Distinct legacy policy references | All header fields and shares | Headers linked to their clients and legacy invoices |
-| P03 | Candidates per expiry month | Expiring premium per currency | Distinct references per month | Disposition, handler, dates | Candidates in Renewal with source LEGACY; counts per month equal |
+| P03 | Candidates per expiry month (January-May 2028) | Expiring and proposed premium per currency | Distinct references per month | Disposition, handler, dates, RA, mapped packages | Cohort completeness per month: P01 headers expiring T to T+140 = P03 rows + renewals booked in legacy + rejected rows; candidates in Renewal with source LEGACY; catch-up candidates = headers without a P03 row |
 | F01, F01S, F01C | Invoices, share rows, component rows | Booked, adjusted, paid, remitted, written off and open per component and currency | Distinct invoice numbers | Header fields, shares, every component and bucket | L5 - Premium Receivable, PR2307, DTIP, Commission Receivable (legacy) against the legacy invoices; Migration Clearing 0.00 |
 | F02 | UPP items | Amount and balance per currency | Distinct UPP references | All fields, stage and disposition | L5 - Unapplied Collections (legacy) against the migrated UPP balances |
 | F03 | Rows per record type | Promise and installment amounts | Distinct (invoice, type, seq) | All fields | Worklist items show the carried promises and assignments |
@@ -104,7 +110,12 @@ The open-item objects and the trial balance are loaded from two independent sour
 | G01 trial balance - cash in bank 18,050.00 Dr, mapped to the BIBS bank account | 18,050.00 | | - |
 | **Migration Clearing** | | | **0.00** |
 
-If the extract F01 missed an invoice with 3,000.00 open premium, Migration Clearing would show a credit of 3,000.00 in that branch: the trial balance says 3,000.00 more is receivable than the detail explains. The break is investigated before go / no-go (FR-DM-021 acceptance 3).
+**A missing invoice.** A difference on Migration Clearing has the sign of the trial balance, because the TB puts the legacy control-account lines on Migration Clearing with their own sign and the opening entries put the detail there with the opposite sign. So an invoice missing from F01 leaves a **debit** equal to its net receivable position (open premium receivable, PR2307 and commission receivable, less open DTIP, unrealised commission and deferred VAT) when that is positive, and a **credit** when it is negative (FR-DM-021 acceptance 3). Two cases, made-up figures:
+
+- F01 missed an invoice paid in full and not remitted, with DTIP 5,000.00 open and commission receivable 800.00 (realised on collection): Migration Clearing shows a **credit of 4,200.00** in that branch.
+- F01 missed an unpaid invoice with premium receivable 3,000.00, DTIP 3,000.00, commission receivable 480.00 and the same 480.00 unrealised: Migration Clearing nets to 0.00. The per-account comparison of MIG-GL-CLEARING finds it: the TB is 3,000.00 debit higher than the detail on Premium Receivable - Legacy, 3,000.00 credit higher on DTIP - Legacy, and 480.00 higher on each commission account.
+
+Either break is investigated and fixed or explained before go / no-go.
 
 **Legacy control accounts against sub-ledgers.** After the loads, the ACSL GL to Sub-ledger Reconciliation is run with ledger context LEGACY: each legacy control account must equal the open positions of the legacy invoices (or legacy UPP) behind it. This is criterion 6 of the go / no-go and is repeated daily in hypercare and at every month-end until the legacy context closes.
 
@@ -119,10 +130,10 @@ The Migration Lead draws the samples from the loaded batch (random with a fixed 
 <!-- table: widths=1.6,7.8,7.2 caption="Business verification samples per object" size=8 -->
 | Object | Sample | What is checked on the BIBS screen |
 |---|---|---|
-| R01-R08, R11 | Every CREATE value; 10 mapped values per map set; every receipt series | Value, description and status in the master; next AR / OR number = legacy last used + 1 |
+| R01-R08, R11 | Every CREATE value; 10 mapped values per map set; every legacy package with more than one BIBS target (conditional PACKAGE entries); every receipt series | Value, description and status in the master; the package version chosen for sample headers and renewals of each split; next AR / OR number = legacy last used + 1 |
 | C01-C03 | 30 random clients per source system; 20 merged clusters; 10 decisions of the review queue; 10 corporate clients | Client search by legacy number; name, identity, contacts, segment, AO, KYC status and review date; cluster shows every legacy number |
 | P01 | 30 random headers; 10 with several insurers; 10 expiring within 140 days | Account search by policy and legacy reference; dates, insurer and shares, sum insured, premium, client link, legacy invoices listed |
-| P03 | 20 candidates per carried expiry month | Candidate in Renewal with disposition, handler, RA status and remarks |
+| P03 | 20 candidates per carried expiry month (January-May 2028); every candidate with package UNRESOLVED (up to 30); 10 catch-up candidates | Candidate in Renewal with disposition, handler, RA status, proposed terms, package and remarks; UNRESOLVED candidates in the Exception bucket; catch-up candidates at the first stage |
 | F01 | 20 largest open balances per currency; 30 random; 10 endorsement or cancellation invoices; 10 direct-payment; 10 with 2307; up to 20 foreign-currency | Invoice 360: legacy badge, source, legacy number, original values, booked / paid / remitted / open per component, shares; Collections item for open premium |
 | F02 | 20 largest balances; 20 random; every item with a disposition in progress (up to 30) | Unapplied Payments workbench: legacy AR, amount, balance, tab, references, disposition |
 | F03, F04, F06 | 20 random per object | Promise and assignment on the Collections item; hold or special request in Remittance; PDC in the warehouse list |
@@ -161,7 +172,7 @@ The forms below are signed in the Migration Console (gates G5 and G6) and printe
 
 ```keyvalues
 Object and name: "..........  ...................................................."
-Cycle and environment: "Mock 1 / Mock 2 / Mock 3 / Dress rehearsal / Production     Environment: ................"
+Cycle and environment: "Mock 1 / Mock 2 / Mock 3 / Mock 4 / Dress rehearsal / Production     Environment: ................"
 Batch numbers (MGB-): "........................................................................"
 Extract numbers (MGX-) and as-of: "........................................................................"
 Code map versions used: "........................................................................"

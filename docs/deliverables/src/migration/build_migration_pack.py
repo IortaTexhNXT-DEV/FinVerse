@@ -257,7 +257,8 @@ def build_workbook(lay: dict[str, Any]) -> Path:
         "Each layout sheet is the contract of one extract file; the CSV template of the same code in the "
         "templates folder has exactly these field names as its header row.",
         "Volumes, owners and stewards marked 'to name' or blank are filled by BDOI (DMQ01, DMQ28).",
-        "Sources: BDOI_DM_BRD_SPEC.md and DATA_MIGRATION_DESIGN.md (sections 2, 5, 7, 8, 12, 27).",
+        "Sources: BDOI_DM_BRD_SPEC.md and DATA_MIGRATION_DESIGN.md (sections 2, 5, 7, 8, 12, 15, 17, 27); dates on "
+        "the BDOI programme timeline (go-live January 2028).",
     ]
     wb.sheet("Object Register", register_columns(), register_rows(lay),
              description="One row per data object with the proposed decision (BRID 1.1a); BDOI fills the volumes")
@@ -367,8 +368,9 @@ def build_workbook(lay: dict[str, Any]) -> Path:
                    status=True),
             Column("answer", "Answer", 40, "BDOI answer and date")]
     wb.sheet("Open Decisions", cols, [dict(zip(["id", "topic", "question", "blocks", "due", "owner", "status",
-                                                "register"],
-                                               [*r[:4], milestone_text(lay, r[4]), r[5], r[6], refs.get(r[0], "-")]))
+                                                "register", "answer"],
+                                               [*r[:4], milestone_text(lay, r[4]), r[5], r[6], refs.get(r[0], "-"),
+                                                r[7] if len(r) > 7 else ""]))
                                       for r in lay["decisions"]],
              description="Decisions that block the migration, with the date each is needed by")
     wb.sheet("Milestones", [Column("id", "Milestone", 10, "Milestone ID"), Column("what", "What is due", 60,
@@ -445,8 +447,9 @@ def build_task_plan(lay: dict[str, Any], cut: dict[str, Any]) -> Path:
                       subtitle="BRD-13 Data Migration - production cutover from T-30 to hypercare exit")
     wb.legend = [("DONE", "Task completed and verified"), ("IN PROGRESS", "Task running"),
                  ("BLOCKED", "Task cannot start or finish"), ("N/A", "Not needed in this cutover")]
-    wb.cover_notes = ["T = go-live, the first business day (Monday) of a month after a legacy month-end close. "
-                      "Days are calendar days; times are Philippine time.",
+    wb.cover_notes = ["T = go-live: January 2028 (BDOI timeline), proposed Monday 3 January 2028 after the legacy "
+                      "year-end close (DMQ25, DMQ39). Days are calendar days; times are Philippine time; the sheet "
+                      "Calendar gives the date of each relative day.",
                       "The same plan is loaded in the Migration Console (plan kind PRODUCTION); the console "
                       "records actual times and evidence (FR-DM-120)."]
     roles = {r[0]: r[1] for r in cut["roles"]}
@@ -476,6 +479,11 @@ def build_task_plan(lay: dict[str, Any], cut: dict[str, Any]) -> Path:
     wb.sheet("Phases", [Column("code", "Phase", 8, "Phase code"), Column("name", "Name", 40, "Phase"),
                         Column("when", "When", 26, "Days")],
              [dict(zip(["code", "name", "when"], p)) for p in cut["phases"]], description="Cutover phases")
+    wb.sheet("Calendar", [Column("day", "Day", 10, "Day relative to go-live (T)"),
+                          Column("date", "Date (T = 3-Jan-2028)", 20, "Calendar date for the proposed go-live"),
+                          Column("note", "Note", 70, "Holiday or year-end note")],
+             [dict(zip(["day", "date", "note"], c)) for c in cut["calendar"]],
+             description="Relative days mapped to the calendar of the proposed go-live (DMQ25, DMQ39)")
     rows = []
     for c in cut["checkpoints"]:
         for i, crit in enumerate(c["criteria"], start=1):
@@ -666,6 +674,10 @@ def placeholders(lay: dict[str, Any], cut: dict[str, Any], name: str, opts: dict
             out += md_table(["#", "Criterion"], [[i, c] for i, c in enumerate(items, start=1)],
                             f'widths=0.8,15.8 caption="Decommissioning checklist - {system}" size=8.5')
         return out
+    if name == "calendar":
+        return md_table(["Day", "Date (T = 3-Jan-2028)", "Note"], [list(c) for c in cut["calendar"]],
+                        'widths=1.6,4,11 caption="Relative days on the calendar of the proposed go-live" size=8.5 '
+                        'bold=first')
     if name == "role-legend":
         return md_table(["Code", "Role"], [[k, v] for k, v in roles.items()],
                         'widths=1.6,15 caption="Owner codes" size=8.5 bold=first')

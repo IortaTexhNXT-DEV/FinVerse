@@ -13,7 +13,7 @@ meta:
   code: DM
   frs: FRS_BRD13_DATA_MIGRATION.md
   summary: TP_BRD13_DATA_MIGRATION.md
-  version: "1.0"
+  version: "1.1"
   date: 26 September 2026
   built: false
 
@@ -84,15 +84,15 @@ data:
     source: Planned demo seed V1980 of the build design; existing Operations demo users
   - id: TD-DM-02
     name: Reference extracts
-    content: R01 (MARKET_SEGMENT with 12 values, one unmapped code OLD-RET and one CREATE value WALKIN), R04 (insurers, one unmapped code), R05 (products), R08 (GL account map), R11 (receipt series).
+    content: R01 (MARKET_SEGMENT with 12 values, one unmapped code OLD-RET and one CREATE value WALKIN), R04 and R04B (insurers and branches, one unmapped code), R05 (products), R06 (packages) with a PACKAGE map version mapping PKG-MC-PRIV v3 to MC-PRIVATE-STD v1 up to a sum insured of 2,000,000.00 and to MC-PRIVATE-HV v1 above, and PKG-HOME-01 v2 without a BIBS package (REJECT), R08 (GL account map), R11 (receipt series).
     source: Masked sample extracts in backend/src/main/resources/demo/migration/ (build wave DM3) prepared by the test lead in the workbook layouts
   - id: TD-DM-03
     name: Client extracts
     content: C01 and C02 from QPS (600 clients) and EBIX (400 clients) with 40 exact duplicates on TIN, 15 pairs with similar names and the same birth date, 5 clients already in BIBS, 3 rows without birth date; a client delta file of the next day with 10 new and 5 changed clients.
     source: Masked extracts prepared by the test lead
   - id: TD-DM-04
-    name: Policy header and RMEL extracts
-    content: P01 and P01S with 300 in-force headers (20 with two insurers, one with shares adding to 90); P03 with 60 candidates expiring from T to T+140 and one row without a header.
+    name: Policy header and RMEL cohort extracts
+    content: "P01 and P01S with 300 in-force headers (20 with two insurers, one with shares adding to 90; C-2027-004512-01 on PKG-MC-PRIV v3 with sum insured 950,000.00 expiring 15-Jan-2028, C-2027-004513-01 on the same package with 2,500,000.00, one header on PKG-HOME-01 v2; C-2027-004600-02, the legacy renewal term of C-2027-004600-01). P03 with 60 carried renewals expiring from 3-Jan to 22-May-2028 (T = 3-Jan-2028) - C-2027-004512-01 For Renewal with RA sent 18-Oct-2027; one row without a header (C-2027-009999); one row expiring 30-May-2028; C-2027-004600-01 already renewed in legacy; C-2027-004700-01 PLACED but not booked; one row on PKG-HOME-01 v2; one row with RA sent and no RA date. Three headers expiring in the window have no P03 row." 
     source: Masked extracts prepared by the test lead
   - id: TD-DM-05
     name: Open legacy invoices
@@ -100,11 +100,11 @@ data:
     source: Masked extracts prepared by the test lead with Comptrollership
   - id: TD-DM-06
     name: Legacy UPP
-    content: F02 with 200 items - a 5,000.00 item quoting legacy invoice I00200001 (3,000.00 open) and new invoice BI-2027-000150 (2,000.00 open); a 1,500.00 item older than 2 years; items without references; one item with a refund in progress.
+    content: F02 with 200 items - a 5,000.00 item quoting legacy invoice I00200001 (3,000.00 open) and new invoice BI-2028-000150 (2,000.00 open); a 1,500.00 item older than 2 years; items without references; one item with a refund in progress.
     source: Masked extracts prepared by the test lead
   - id: TD-DM-07
     name: GL trial balance
-    content: G01 per branch and currency, balanced, whose legacy control-account lines equal the F01 and F02 detail; a second version with one control line 3,000.00 higher.
+    content: G01 per branch and currency, balanced, whose legacy control-account lines equal the F01 and F02 detail; a second version with one control line 3,000.00 higher; two F01 variants for branch MKT01 - one without I00300001 (paid in full, not remitted - DTIP 5,000.00 and commission receivable 800.00 open) and one without I00300002 (unpaid - premium receivable 3,000.00, DTIP 3,000.00, commission receivable 480.00 unrealised).
     source: Prepared by the test lead with Comptrollership
   - id: TD-DM-08
     name: Archive extracts
@@ -116,7 +116,7 @@ data:
     source: Configuration delivered with the build (FRS section 9); demo V1982
   - id: TD-DM-10
     name: New BIBS invoices and payments
-    content: BIBS invoice BI-2027-000150 with 2,000.00 open; a Direct Credit payment file with one row carrying EBIX reference I00123457 and one row for a BIBS invoice; an approved client payout account.
+    content: BIBS invoice BI-2028-000150 with 2,000.00 open; a Direct Credit payment file with one row carrying EBIX reference I00123457 and one row for a BIBS invoice; an approved client payout account.
     source: Built Operations demo data; payment file prepared by the test lead
 
 scenarios:
@@ -134,7 +134,7 @@ scenarios:
     pre: Loads of SC-DM-02; TB TD-DM-07.
   - id: SC-DM-04
     persona: STEWARD
-    title: Client master and reference data. Codes are mapped and created; legacy clients are matched, deduplicated and created as active clients.
+    title: Client master and reference data. Codes are mapped and created, legacy packages are remapped to the BIBS packages, legacy clients are matched, deduplicated and created as active clients; reference data and clients load first in every mock.
     pre: Extracts TD-DM-02 and TD-DM-03.
   - id: SC-DM-05
     persona: CASHIER
@@ -150,7 +150,7 @@ scenarios:
     pre: Archive TD-DM-08.
   - id: SC-DM-08
     persona: PM
-    title: Cutover. A mock plan is run, go / no-go is decided on measured criteria, renewals move by RMEL cohort and legacy systems are decommissioned on the checklist.
+    title: Cutover. A mock plan is run with reference data and clients first, go / no-go is decided on measured criteria, the renewals of the January-May 2028 expiries are carried and the later cohorts move by RMEL cohort, and legacy systems are decommissioned on the checklist.
     pre: All objects loaded in a mock.
 
 frs:
@@ -311,7 +311,7 @@ frs:
         type: Upload-download
         title: Upload F01C with its control file
         steps:
-          - Choose object F01, source EBIX, mode FULL; upload F01C_EBIX_20270226_01.csv and its .ctl.csv.
+          - Choose object F01, layout F01C, source EBIX, mode FULL; upload F01C_EBIX_20271231_01.csv and its .ctl.csv.
         expected: The extract gets an MGX number, status STAGED, and shows the row count and the totals per component and currency of the control file.
       - c: 2
         type: Negative
@@ -449,7 +449,7 @@ frs:
     conditions:
       - A legacy invoice whose components do not add up to its gross premium is INVALID with that message.
       - A waived row shows the waiver reason and the data owner who approved it.
-      - A batch of open invoices with one INVALID row cannot be approved for load unless the row is excluded by the data owner.
+      - A batch of open invoices with one INVALID row cannot be approved for load unless the row is excluded by the data owner; excluded rows are not counted in the error rate.
       - Master data can be approved for load with at most 0.5 percent of rows rejected or waived.
     cases:
       - c: 1
@@ -482,7 +482,7 @@ frs:
         title: Approve F01 load with one INVALID row
         steps:
           - Click Approve Load on the F01 batch.
-        expected: Refused while the row is INVALID; after migowner excludes it with a manual-entry plan, approval is possible.
+        expected: Refused while the row is INVALID; after migowner excludes it with a manual-entry plan, the batch shows an error rate of 0 percent (the excluded row is neither an error nor in the base) and approval is possible.
         msg: ["{0.1} percent of rows have errors; the limit for this object is {0} percent"]
       - c: 4
         type: Boundary
@@ -629,7 +629,8 @@ frs:
     conditions:
       - After the loads of open invoices, UPP and the trial balance of a branch, Migration Clearing is 0.00 in PHP and USD.
       - The ACSL reconciliation of the legacy Premium Receivable account against the legacy invoices shows no difference.
-      - An open invoice missing from the load shows as a Migration Clearing difference equal to its open balance, and the GL level cannot be signed.
+      - An invoice missing from the load leaves a Migration Clearing difference with the sign of the trial balance (a credit of 4,200.00 for a paid, not remitted invoice with DTIP 5,000.00 and commission receivable 800.00), and the GL level cannot be signed.
+      - A missing unpaid invoice whose net is zero shows as differences on the legacy control accounts in MIG-GL-CLEARING.
     cases:
       - c: 1
         type: Positive
@@ -646,11 +647,18 @@ frs:
         expected: No difference; the new Premium Receivable account reconciles to the BIBS invoices only.
       - c: 3
         type: Negative
-        title: Missing invoice
+        title: Missing paid, not remitted invoice
         steps:
-          - Exclude one invoice with 3,000.00 open from the F01 load; load G01; run MIG-GL-CLEARING; try to sign the GL level.
-        expected: Migration Clearing shows 3,000.00 for MKT01 PHP; alert to Comptrollership; sign-off refused.
-        msg: ["Migration Clearing is {3,000.00} in {MKT01} {PHP}; it must be zero"]
+          - Load the F01 variant without I00300001 and the matching G01; run MIG-GL-CLEARING; try to sign the GL level.
+        expected: Migration Clearing shows a credit of 4,200.00 for MKT01 PHP (DTIP 5,000.00 credit less commission receivable 800.00 debit, from the trial balance); alert to Comptrollership; sign-off refused.
+        msg: ["Migration Clearing is {4,200.00 credit} in {MKT01} {PHP}; it must be zero"]
+      - c: 4
+        type: Negative
+        title: Missing unpaid invoice with a zero net
+        steps:
+          - Load the F01 variant without I00300002 and the matching G01; run MIG-GL-CLEARING.
+        expected: Migration Clearing is 0.00 for MKT01 PHP, but the per-account comparison shows Premium Receivable - Legacy 3,000.00 debit and DTIP - Legacy 3,000.00 credit higher in the trial balance than in the detail, and 480.00 on each commission account; the GL level cannot be signed.
+        msg: ["{Premium Receivable - Legacy} differs from the opening detail by {3,000.00} in {MKT01} {PHP}"]
 
   FR-DM-030:
     scenario: SC-DM-04
@@ -788,6 +796,62 @@ frs:
         expected: No record found; for a user with LEGACY_INQUIRY_VIEW the archive search is offered.
         msg: [No BIBS record has this legacy reference]
 
+  FR-DM-034:
+    scenario: SC-DM-04
+    persona: STEWARD
+    screen: MAPS
+    data: [TD-DM-02, TD-DM-04]
+    conditions:
+      - A legacy package with one entry for a sum insured up to 2,000,000.00 and one above maps a header of 950,000.00 to the first BIBS package and a header of 2,500,000.00 to the second.
+      - A carried renewal whose legacy package has no entry loads with package UNRESOLVED and appears in the Renewal Exception bucket.
+      - A version with two entries of the same legacy package whose sum-insured bands overlap cannot be submitted.
+      - A header whose package is not mapped loads without a package and with the warning.
+      - The PACKAGE map is prepared by TSU and approved by the Product Owner, never by the preparer.
+    cases:
+      - c: 1
+        type: Positive
+        persona: OPERATOR
+        screen: BATCH
+        title: Conditional entries by sum-insured band
+        pre: PACKAGE version with PKG-MC-PRIV v3 mapped to MC-PRIVATE-STD v1 up to 2,000,000.00 and to MC-PRIVATE-HV v1 above, approved.
+        steps:
+          - Validate and load P01 with header C-2027-004512-01 (sum insured 950,000.00) and C-2027-004513-01 (2,500,000.00), both on PKG-MC-PRIV v3.
+          - Open both accounts in Account search.
+        expected: C-2027-004512-01 has package MC-PRIVATE-STD v1 and C-2027-004513-01 MC-PRIVATE-HV v1; the batch records the PACKAGE version it used.
+      - c: 2
+        type: Negative
+        persona: OPERATOR
+        screen: ISSUES
+        title: Unresolved package on a carried renewal
+        steps:
+          - Validate P03 with a row on PKG-HOME-01 v2 (entry REJECT, no BIBS package).
+        expected: The row is a WARNING, not INVALID; after the load the candidate carries package UNRESOLVED and, at go-live, is in the Exception bucket of Renewal.
+        msg: ["Package {PKG-HOME-01} of {QPS} is not mapped; the candidate goes to the Exception bucket"]
+      - c: 3
+        type: Negative
+        title: Overlapping sum-insured bands
+        steps:
+          - In a DRAFT PACKAGE version add a second entry for PKG-MC-PRIV v3 with band 1,500,000.00 to 3,000,000.00; Submit.
+        expected: The version stays DRAFT.
+        msg: ["Legacy package {PKG-MC-PRIV} has overlapping entries for {sum-insured band}"]
+      - c: 4
+        type: Negative
+        persona: OPERATOR
+        screen: ISSUES
+        title: Header with an unmapped package
+        steps:
+          - Validate and load P01 with one packaged header on PKG-HOME-01 v2.
+        expected: The header loads with a WARNING and without a package; it renews on the new-business path.
+        msg: ["Package {PKG-HOME-01} of {QPS} is not mapped; the header is loaded without a package"]
+      - c: 5
+        type: Security-access
+        title: Preparer approves own PACKAGE version
+        pre: migsteward (TSU role in the test) submitted the version and was also given MIG_MAPPING_APPROVE for this test.
+        steps:
+          - As migsteward click Approve on the submitted PACKAGE version.
+        expected: Refused; migowner (Product Owner) approves it.
+        msg: [A record cannot be authorized by the user who maintained it]
+
   FR-DM-040:
     scenario: SC-DM-02
     persona: OPERATOR
@@ -900,6 +964,7 @@ frs:
       - A migrated UPP shows amount, balance, legacy AR, reference and status in the workbench.
       - The UPP legacy control account equals the total of the migrated UPP balances.
       - An item whose balance is above its amount is INVALID.
+      - With MIG_UPP_ISSUE_AR false no AR is issued at load; with true each migrated UPP gets a BIBS AR that refers to its legacy AR and posts no cash entry.
     cases:
       - c: 1
         type: Positive
@@ -924,6 +989,15 @@ frs:
           - Validate F02 with one balance 5,100.00 on an amount of 5,000.00.
         expected: The row is INVALID.
         msg: [The balance is more than the amount received]
+      - c: 4
+        type: Positive
+        persona: OPERATOR
+        screen: BATCH
+        title: AR for migrated UPP by parameter
+        pre: MIG_UPP_ISSUE_AR set to true in the test environment; a fresh F02 batch.
+        steps:
+          - Load the F02 batch; open the 5,000.00 item and the journal inquiry for its AR.
+        expected: The item shows a BIBS AR that refers to legacy AR of the item; no OPS_AR_RECEIPT cash entry is posted; with the parameter back to false a new batch issues no AR.
 
   FR-DM-052:
     scenario: SC-DM-05
@@ -941,7 +1015,7 @@ frs:
         title: Mixed UPP automatch
         steps:
           - Click Run Matching.
-        expected: The item is applied 3,000.00 to I00200001 and 2,000.00 to BI-2027-000150 and closes; both invoices are paid.
+        expected: The item is applied 3,000.00 to I00200001 and 2,000.00 to BI-2028-000150 and closes; both invoices are paid.
       - c: 2
         type: Positive
         screen: JOURNAL
@@ -1105,6 +1179,7 @@ frs:
       - A Direct Credit row with an EBIX invoice reference is applied to the legacy invoice and credits the PR legacy sub-ledger.
       - A file with rows for legacy and new invoices posts each application to the right sub-ledger.
       - An invalid row is reported and does not stop the others.
+      - Before the QPS pattern is configured, a row that quotes only a QPS invoice number stays unapplied, and a row that also quotes the ARN is applied to the QPS legacy invoice.
     cases:
       - c: 1
         type: Upload-download
@@ -1125,6 +1200,13 @@ frs:
         steps:
           - Upload a file with one row without amount.
         expected: The row is listed as failed with the handler message; the other rows are applied.
+      - c: 4
+        type: Negative
+        title: QPS invoice number without the pattern
+        pre: MIG_LEGACY_INVOICE_NO_PATTERN holds only the EBIX pattern (DMQ11 open); a QPS legacy invoice is loaded.
+        steps:
+          - Upload a bills payment file with one row quoting only the QPS invoice number and one row quoting the QPS invoice number and its ARN.
+        expected: The first row stays unapplied (no match); the second is applied to the QPS legacy invoice through the ARN.
 
   FR-DM-070:
     scenario: SC-DM-06
@@ -1153,9 +1235,9 @@ frs:
         type: Negative
         title: Invalid lines
         steps:
-          - Upload a line with BIBS invoice BI-2027-000150 and a line with an amount above the open PR.
+          - Upload a line with BIBS invoice BI-2028-000150 and a line with an amount above the open PR.
         expected: "Both lines refused at validation. The second check shows \"The reversal of 9,000.00 is more than the open premium receivable 8,000.00\"."
-        msg: ["Invoice {BI-2027-000150} is not a legacy invoice"]
+        msg: ["Invoice {BI-2028-000150} is not a legacy invoice"]
       - c: 3
         type: Security-access
         title: Maker approves own batch
@@ -1274,7 +1356,7 @@ frs:
     conditions:
       - A return premium of 1,000.00 on a legacy invoice with 1,000.00 open reduces the PR and DTIP legacy balances by 1,000.00.
       - After the endorsement the account premium is the net premium used by Renewal.
-      - A decrease above the original premium is refused.
+      - A decrease that takes the cumulative adjustments beyond the baseline of the original premium (taken from the frozen snapshot) is refused without a justification.
     cases:
       - c: 1
         type: Workflow
@@ -1294,8 +1376,9 @@ frs:
         type: Negative
         title: Over-adjustment
         steps:
-          - Raise a decrease larger than the original premium.
-        expected: Refused with the over-adjustment message of the Adjustment module (ADJID.028).
+          - Raise a decrease larger than the original premium of the legacy invoice (23,050.00 in the snapshot of I00123456) without a justification; Submit.
+        expected: Refused; with a justification the request is submitted and the Adjustment TL is alerted.
+        msg: ["Cumulative adjustments of {amount} exceed the baseline of {100}% of the original premium {23,050.00}: review the previous adjustments and give the justification to proceed"]
 
   FR-DM-092:
     scenario: SC-DM-06
@@ -1382,6 +1465,7 @@ frs:
         steps:
           - Search record type INVOICE with 1,200 results; Export.
         expected: The export is refused; an export of a search with 1,000 results works.
+        msg: ["The export is limited to {1,000} rows; narrow the search"]
       - c: 3
         type: Negative
         title: No criterion and no reason
@@ -1432,6 +1516,7 @@ frs:
       - A mock plan records planned and actual times per task and per object load.
       - The runbook export lists every task with owner and timing.
       - A task cannot start before its dependency is complete.
+      - In a mock plan the load of P01 cannot start while C01 is not accepted (reference data and clients first).
     cases:
       - c: 1
         type: Workflow
@@ -1452,6 +1537,16 @@ frs:
           - Start CT-042 while CT-041 is not complete.
         expected: Refused.
         msg: ["Task {CT-042} depends on {CT-041}, which is not complete"]
+      - c: 4
+        type: Negative
+        persona: OPERATOR
+        screen: BATCH
+        title: Header load before the clients are accepted
+        pre: Mock plan with C01 LOADED but G6 not signed.
+        steps:
+          - Approve and start the load of the P01 batch.
+        expected: Refused; after C01 is accepted (G6) the P01 load starts.
+        msg: ["Object {C01} must be accepted before this object can load"]
 
   FR-DM-121:
     scenario: SC-DM-08
@@ -1551,12 +1646,63 @@ frs:
         steps:
           - Open the Legacy context checklist with one legacy UPP open; sign.
         expected: Refused.
+        msg: ["Criterion {No legacy UPP balance} is not met"]
       - c: 3
         type: Workflow
         title: Decommission a system
         steps:
           - Attach evidence to each criterion of a test system; sign as system owner, Compliance and Comptrollership.
         expected: The system is marked decommissioned with the three signatures and dates.
+
+  FR-DM-124:
+    scenario: SC-DM-08
+    persona: OPERATOR
+    screen: ISSUES
+    data: [TD-DM-04]
+    conditions:
+      - A renewal of a policy expiring on 15 January 2028, disposition For Renewal, RA sent on 18 October 2027, appears at go-live in BIBS Renewal in the For Renewal stage with the RA date and no new RA is sent.
+      - A row whose cover was already renewed in legacy is rejected, and the new term is found as a migrated header.
+      - For each expiry month the completeness check balances, and a header without a P03 row becomes a catch-up candidate at go-live.
+      - A row whose renewal is placed but not booked is rejected with the in-flight message.
+      - A row without a migrated header, outside the carried window, or with an RA sent but no RA date is rejected.
+    cases:
+      - c: 1
+        type: Positive
+        persona: MKT_AO
+        screen: RENEWAL
+        title: Carried renewal at go-live
+        steps:
+          - After the P03 load and go-live, open the candidates with source LEGACY; open C-2027-004512-01 (expiry 15-Jan-2028).
+        expected: Stage For Renewal; handler, proposed insurer and premium from the disposition file; RA sent 18-Oct-2027 recorded; no RA is queued for sending.
+      - c: 2
+        type: Negative
+        title: Already renewed in legacy
+        steps:
+          - Validate P03 with the row of C-2027-004600-01, whose renewal term C-2027-004600-02 starting on its expiry is in P01.
+        expected: The row is INVALID; account search finds C-2027-004600-02 as a migrated header.
+        msg: ["Cover {C-2027-004600} was already renewed in legacy as {C-2027-004600-02}"]
+      - c: 3
+        type: Report-output
+        persona: RECON
+        screen: RECONC
+        title: Cohort completeness per month
+        steps:
+          - After the P03 load open MIG-RECON-DETAIL of P03; then, at go-live, open the Renewal candidates of the three headers without a P03 row.
+        expected: For each month January to May 2028 the P01 headers expiring in the window equal the P03 rows plus the renewals booked in legacy plus the rejected rows; the three headers are listed and become catch-up candidates at the first stage.
+      - c: 4
+        type: Negative
+        title: Placed but not booked
+        steps:
+          - Validate P03 with the row of C-2027-004700-01, placement status PLACED.
+        expected: The row is INVALID and appears on the in-flight list.
+        msg: ["Cover {C-2027-004700} is {PLACED} but not booked; complete it in legacy or list it for re-keying"]
+      - c: 5
+        type: Negative
+        title: Header missing, expiry outside the window, RA date missing
+        steps:
+          - Validate P03 with a row whose cover C-2027-009999 is not in P01, a row expiring on 30-May-2028, and a row with RA sent Y and no RA date.
+        expected: "The three rows are INVALID. The second shows \"Expiry {2028-05-30} is outside the carried cohorts\"; the third \"{ra_sent_date} is mandatory for disposition {FOR_RENEWAL}\"."
+        msg: ["Cover {C-2027-009999} has no migrated header"]
 
 access:
   - action: View the Migration Console
@@ -1633,24 +1779,9 @@ access:
     denied: Approve is not shown; the call returns HTTP 403.
 
 findings:
-  - fr: FR-DM-013
-    issue: The validation message for an error rate above the threshold is tested on a financial object whose limit is 0 percent; the FRS does not say whether the rate counts excluded rows. The case assumes excluded rows are not errors.
-    proposal: State in FR-DM-013 R2 that rows excluded by the data owner are not counted in the error rate.
-  - fr: FR-DM-021
-    issue: 'Acceptance 3 ("an open invoice missing from the load shows as a Migration Clearing difference") needs a trial balance that includes the missing invoice; the sign of the difference is not stated.'
-    proposal: State that the difference is a credit on Migration Clearing equal to the open premium receivable of the missing invoice (debit for a missing DTIP-only invoice).
-  - fr: FR-DM-051
-    issue: The alternate flow offers "the configured option" to issue a BIBS AR without cash posting, but no parameter names it; the case follows the default (no AR) of DMQ14.
-    proposal: Name the parameter (for example MIG_UPP_ISSUE_AR) or remove the option when DMQ14 is answered.
-  - fr: FR-DM-091
-    issue: The over-adjustment check refers to ADJID.028 without quoting the message, so the case cannot quote it.
-    proposal: Quote the Adjustment module message in FR-DM-091 at build (FRS v1.1).
-  - fr: FR-DM-110
-    issue: R2 limits exports to MIG_ARCHIVE_EXPORT_MAX_ROWS but no message text is given for the refused export.
-    proposal: Add the message, for example "The export is limited to {1,000} rows; narrow the search".
-  - fr: FR-DM-123
-    issue: The checklist criteria are templates maintained by the Program Manager; the criterion names used in messages ("Archive reconciled") depend on the template.
-    proposal: Fix the default criterion names in the FRS (Cutover Runbook section 9 gives them).
-  - fr: FR-DM-061
-    issue: The FRS does not say whether a payment row carrying a QPS invoice number is matched before DMQ11 gives the QPS format.
-    proposal: Add the QPS number pattern to the matcher and to CLX_INVOICE_NO_PATTERN when DMQ11 is answered; until then QPS invoices are matched by ARN, policy or PN.
+  - fr: FR-DM-124
+    issue: The carried candidates are created "in the stage mapped from the legacy disposition", but the FRS does not list the target Renewal stages of the STATUS:RENEWAL map; the case assumes For Renewal maps to the For Renewal stage.
+    proposal: List the STATUS:RENEWAL entries (legacy disposition to Renewal stage and bucket) in FRS v1.2 once DMQ38 gives the legacy disposition values.
+  - fr: FR-DM-034
+    issue: The FRS does not say which Renewal check routes a candidate with package UNRESOLVED to the Exception bucket, nor its message; the case checks the bucket only.
+    proposal: Name the Renewal sanitation check (PACKAGE_REMAP in the build design section 15.2) and quote its message in the Renewal FRS and in FRS BRD-13 v1.2.

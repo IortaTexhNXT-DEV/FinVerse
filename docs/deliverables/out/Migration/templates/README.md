@@ -1,8 +1,8 @@
 # BRD-13 Data Migration - extract templates
 
-Version 1.0, 26 September 2026. BDO Insurance and Reinsurance Brokers, Inc. (BDOI) - BIBS. Prepared by iorta TechNXT. Confidential - BDOI.
+Version 1.1, 26 September 2026. BDO Insurance and Reinsurance Brokers, Inc. (BDOI) - BIBS. Prepared by iorta TechNXT. Confidential - BDOI.
 
-One CSV template per extract layout. Each file holds only the header row: the field names exactly as in the layout sheet of the BDOI Data Requirements Workbook (`../BIBS_Migration_BRD-13_Data_Requirements_Workbook_v1.0.xlsx`), which gives the type, length, mandatory flag, allowed values, format, example, BIBS target and validation rule of every field.
+One CSV template per extract layout. Each file holds only the header row: the field names exactly as in the layout sheet of the BDOI Data Requirements Workbook (`../BIBS_Migration_BRD-13_Data_Requirements_Workbook_v1.1.xlsx`), which gives the type, length, mandatory flag, allowed values, format, example, BIBS target and validation rule of every field.
 
 How to use a template:
 
@@ -27,9 +27,9 @@ How to use a template:
 | `C01_template.csv` | Client master | C01 | Migrate | QPS, EBIX, CMS | 36 | legacy_client_no |
 | `C02_template.csv` | Client addresses and contacts | C01 | Migrate | QPS, EBIX, CMS | 13 | legacy_client_no, record_type, seq_no |
 | `C03_template.csv` | Client payout accounts | C03 | Migrate | EBIX | 6 | legacy_client_no, account_no |
-| `P01_template.csv` | In-force policy headers | P01 | Conditional | QPS, EBIX | 29 | legacy_policy_ref |
+| `P01_template.csv` | In-force policy headers | P01 | Conditional | QPS, EBIX | 31 | legacy_policy_ref |
 | `P01S_template.csv` | Policy insurer shares | P01 | Conditional | QPS, EBIX | 6 | legacy_policy_ref, share_seq |
-| `P03_template.csv` | RMEL cohorts already extracted in legacy | P03 | Carry forward | RMEL files, QPS | 12 | legacy_policy_ref |
+| `P03_template.csv` | RMEL cohorts January to May 2028 (carried renewals) | P03 | Carry forward | Legacy RMEL extract (EBIX, QPS); Marketing disposition files | 27 | legacy_policy_ref |
 | `F01_template.csv` | Open legacy invoices - header | F01 | Carry forward | EBIX, QPS | 38 | legacy_invoice_no |
 | `F01S_template.csv` | Open legacy invoices - insurer shares | F01 | Carry forward | EBIX, QPS | 5 | legacy_invoice_no, share_seq |
 | `F01C_template.csv` | Open legacy invoices - components and positions | F01 | Carry forward | EBIX, QPS | 8 | legacy_invoice_no, component |

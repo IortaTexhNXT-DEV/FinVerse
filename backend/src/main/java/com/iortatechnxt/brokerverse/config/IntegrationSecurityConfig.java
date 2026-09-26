@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.config;
 import com.iortatechnxt.brokerverse.security.service.IntegrationSecurityProperties;
 import com.iortatechnxt.brokerverse.security.service.IntegrationSecurityProperties.ApiAccess;
 import com.iortatechnxt.brokerverse.security.service.IntegrationTokenDecoder;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authorization.AuthenticatedAuthorizationManager;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationManager;
@@ -72,7 +74,10 @@ public class IntegrationSecurityConfig {
     JwtAuthenticationConverter authentication = new JwtAuthenticationConverter();
     authentication.setJwtGrantedAuthoritiesConverter(scopes);
     http.securityMatcher(INTEGRATION_PATHS)
-        .csrf(AbstractHttpConfigurer::disable)
+        // Gateway calls carry a bearer token and no cookie, so they are exempt from CSRF; any other
+        // request
+        // keeps the CSRF check and is refused before authentication.
+        .csrf(c -> c.ignoringRequestMatchers(IntegrationSecurityConfig::carriesBearerToken))
         .cors(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
@@ -125,5 +130,12 @@ public class IntegrationSecurityConfig {
       manager = AuthorizationManagers.allOf(manager, required);
     }
     return manager;
+  }
+
+  private static final String BEARER = "Bearer ";
+
+  private static boolean carriesBearerToken(HttpServletRequest request) {
+    String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+    return header != null && header.regionMatches(true, 0, BEARER, 0, BEARER.length());
   }
 }

@@ -30,6 +30,8 @@ class BusinessTextTest {
         "Open collection items (BRCLXN.001-012, 045)|Open collection items",
         "Service invoices issued (BRNB.100/100b)|Service invoices issued",
         "Versions with the change summary (BRPM.006/007, PMADD06)|Versions with the change summary",
+        "Excess payments moved to AP overages (Cashiering summary 5.f, CSHID.023 Annex II #4)"
+            + "|Excess payments moved to AP overages",
         "Aging (report, ADJID.021)|Aging (report)",
         "Journal (for approval)|Journal (for approval)",
       })

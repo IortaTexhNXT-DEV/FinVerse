@@ -26,6 +26,7 @@ public final class BusinessText {
           Pattern.compile("[A-Z]{2,4}ADD\\d{2}"),
           Pattern.compile("FR-[A-Z]{2}-?\\d+"),
           Pattern.compile("SNSRP-\\d+"),
+          Pattern.compile("(?:[A-Z][a-z]+ )?summary \\d+\\.[a-z0-9]+"),
           Pattern.compile("\\d{3}[a-z]?(?:[-/]\\d{3}[a-z]?)*"));
 
   /** Design notes that may stand next to references inside a parenthesis. */

@@ -196,6 +196,9 @@ page previews). Sources: `docs/deliverables/src/`; outputs: `docs/deliverables/o
 | 3 | Test plans, one per FRS volume | v1.0: `out/TestPlans/`, 13 workbooks and 13 Word summaries (BRD-1 to BRD-12); builder `src/testplans/build_test_plan.py`. The Claims plan uses case IDs keyed on FR-CM. Not yet written: BRD-13 Data Migration (and the cross-cutting FR-CR requirements of BRD-00) |
 | 17 | Reports in Excel and PDF; documents and schedules in Word and PDF | Built in the platform (`ExportFormat.DOCX`, document renditions); see Developer Guide 6.1-6.2 |
 | 41 | Business process deck | v1.0: `out/Decks/BIBS_Deck_BRD-00_Business_Process_AsIs_Envisioned_BestPractice_v1.0.pptx` |
+| 29 | Data migration (BRD-13) | v1.0: Strategy and Approach (47 pages), Data Requirements Workbook (31 data objects, 27 extract layouts, 335 fields, 46 data-quality rules), Cutover Runbook and Task Plan (75 tasks, T-30 to T+30), Reconciliation Approach and Sign-off, in `out/Migration/`; source `src/migration/` |
+| 20 | Upload and download templates | Migration extract templates: `out/Migration/templates/` (27 layouts and the control file). Platform upload and download templates follow after the build |
+| 3 | Test plan BRD-13 Data Migration | v1.0: `out/TestPlans/BIBS_TestPlan_BRD-13_Data_Migration_v1.0.xlsx` and summary (138 cases) |
 
 ### Carried into FRS v1.1
 
@@ -209,3 +212,5 @@ workbook (about 100 findings). Besides those, v1.1 applies these corrections acr
 - BRD-5 Volume 1 gap G1 (no Word output) is closed: schedules and documents are produced in Word;
 - BRD-2: the menu section is "Production Reconciliation" (the platform label is corrected with the alignment pass);
 - BRD-5 Volume 1: Lists of Values and Access Requests are under Setup & Administration > Broking Setup.
+- BRD-13: the seven test-plan findings (FR-DM-013, 021, 051, 061, 091, 110, 123); the design gains sub-layouts R04B, P01S,
+  F01S and F01C and the `<LAYOUT>_<SOURCE>_...` file-name rule, and drops the demo account codes that clash with Accounting.

@@ -49,7 +49,7 @@ class ScreeningMatchingApiIT {
             BASE
                 + "/matches?companyId="
                 + company
-                + "&status=POTENTIAL&listType=INTERNAL&minScore=0.5&maxScore=1&uncased=true&q="
+                + "&status=POTENTIAL&listType=INTERNAL&minScore=0.5&maxScore=1&uncased=false&q="
                 + last.toLowerCase(java.util.Locale.ROOT))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content.length()").value(1))

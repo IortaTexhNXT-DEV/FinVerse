@@ -47,6 +47,7 @@ create table scr_case (
     round_no               integer       not null default 1,
     committee_round        integer       not null default 0,
     disposition            varchar(40),
+    investigator_disposition varchar(40),
     recommendation         varchar(4000),
     str_required           boolean       not null default false,
     committee_decision     varchar(40),

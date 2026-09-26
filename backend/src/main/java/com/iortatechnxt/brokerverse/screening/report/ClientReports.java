@@ -8,7 +8,9 @@ import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
 import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.TabularReportBuilder;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -124,6 +126,23 @@ public final class ClientReports {
           params);
     }
 
+    /**
+     * The high-risk clients (High-risk Clients screen, FR-SS-045).
+     *
+     * @param filter company, as-of date and filters
+     * @return rows by column key
+     */
+    public List<Map<String, Object>> rows(Filter filter) {
+      Map<String, Object> args = new HashMap<>();
+      args.put(ScrReportSql.COMPANY, filter.companyId());
+      args.put(AS_OF, filter.asOf());
+      args.put(ScrReportSql.UNIT, filter.marketingUnit());
+      args.put(ScrReportSql.HEAD, filter.unitHead());
+      args.put("riskCategory", filter.riskCategory());
+      args.put("clientType", filter.clientType());
+      return sql.rows(SQL, args);
+    }
+
     @Override
     public ReportResult generate(ReportParameters p) {
       Map<String, Object> args = args(p);
@@ -149,6 +168,24 @@ public final class ClientReports {
           .build();
     }
   }
+
+  /**
+   * The filters of the high-risk list.
+   *
+   * @param companyId company
+   * @param asOf as-of date
+   * @param riskCategory risk category, may be null
+   * @param marketingUnit marketing unit, may be null
+   * @param unitHead unit head, may be null
+   * @param clientType INDIVIDUAL or CORPORATE, may be null
+   */
+  public record Filter(
+      Long companyId,
+      LocalDate asOf,
+      String riskCategory,
+      String marketingUnit,
+      String unitHead,
+      String clientType) {}
 
   /** List of Approved PEP Clients (p.7; FRS 6.1.5). */
   @Component

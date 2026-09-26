@@ -26,6 +26,7 @@ import com.iortatechnxt.brokerverse.screening.config.service.ReviewTemplate;
 import com.iortatechnxt.brokerverse.screening.str.domain.StrField;
 import com.iortatechnxt.brokerverse.screening.str.domain.StrFieldRepository;
 import com.iortatechnxt.brokerverse.screening.str.domain.StrRepository;
+import com.iortatechnxt.brokerverse.screening.str.domain.StrStatus;
 import com.iortatechnxt.brokerverse.screening.str.domain.StrTransaction;
 import com.iortatechnxt.brokerverse.screening.str.domain.StrTransaction.Line;
 import com.iortatechnxt.brokerverse.screening.str.domain.StrTransactionRepository;
@@ -40,6 +41,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -199,6 +202,21 @@ public class StrService {
   @Transactional(readOnly = true)
   public Optional<SuspiciousTransactionReport> ofCase(Long caseId) {
     return strs.findByCaseId(caseId);
+  }
+
+  /**
+   * The STR register of a company, newest first.
+   *
+   * @param companyId company
+   * @param status status, null for all
+   * @param pageable page
+   * @return STRs
+   */
+  @Transactional(readOnly = true)
+  public Page<SuspiciousTransactionReport> register(
+      Long companyId, StrStatus status, Pageable pageable) {
+    return strs.register(
+        companyId, status == null ? EnumSet.allOf(StrStatus.class) : EnumSet.of(status), pageable);
   }
 
   /**

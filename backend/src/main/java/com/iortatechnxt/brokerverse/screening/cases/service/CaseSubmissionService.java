@@ -168,7 +168,7 @@ public class CaseSubmissionService {
         CaseChecks.require(response, "SCR_RESPONSE_REQUIRED", "Write your response to the return");
     Decision given =
         new Decision(
-            blank(decision.disposition()) ? c.getDisposition() : decision.disposition(),
+            blank(decision.disposition()) ? c.getInvestigatorDisposition() : decision.disposition(),
             blank(decision.recommendation()) ? c.getRecommendation() : decision.recommendation(),
             decision.strRequired() || c.isStrRequired());
     CaseChecks.requireAllowed(validator, CaseStage.INVESTIGATION, given.disposition());

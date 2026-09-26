@@ -104,6 +104,9 @@ public class ScreeningCase extends BaseEntity {
   @Column(name = "disposition", length = 40)
   private String disposition;
 
+  @Column(name = "investigator_disposition", length = 40)
+  private String investigatorDisposition;
+
   @Column(name = "recommendation", length = MAX_TEXT)
   private String recommendation;
 
@@ -302,6 +305,7 @@ public class ScreeningCase extends BaseEntity {
    */
   public void dispose(String newDisposition, String text, boolean str, String by) {
     this.disposition = newDisposition;
+    this.investigatorDisposition = newDisposition;
     this.recommendation = text;
     this.strRequired = str;
     this.investigator = by;
@@ -482,6 +486,10 @@ public class ScreeningCase extends BaseEntity {
 
   public String getDisposition() {
     return disposition;
+  }
+
+  public String getInvestigatorDisposition() {
+    return investigatorDisposition;
   }
 
   public String getRecommendation() {

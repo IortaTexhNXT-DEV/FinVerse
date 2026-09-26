@@ -2,14 +2,25 @@ import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { mayOpen } from '@/navigation/access';
 import { useAuth } from './authContext';
+import { ForcedPasswordChange } from './ForcedPasswordChange';
 
-/** Redirects anonymous users to the login page. */
+/**
+ * Redirects anonymous users to the login page; a user whose password must be changed first
+ * (administrator reset, first use or expiry; UAM-NFR-36) sees the password change instead.
+ */
 export function RequireAuth({ children }: Readonly<{ children: ReactNode }>) {
-  const { user, loading } = useAuth();
+  const { user, loading, passwordChange } = useAuth();
   if (loading) {
     return <span className="spinner" aria-label="Loading" />;
   }
-  return user === null ? <Navigate to="/login" replace /> : <>{children}</>;
+  if (user === null) {
+    return <Navigate to="/login" replace />;
+  }
+  return passwordChange === null ? (
+    <>{children}</>
+  ) : (
+    <ForcedPasswordChange reason={passwordChange} />
+  );
 }
 
 /**

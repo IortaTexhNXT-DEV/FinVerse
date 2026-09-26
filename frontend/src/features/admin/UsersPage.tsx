@@ -3,6 +3,7 @@ import { Plus, UserCheck } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminApi } from '@/api/admin';
+import { authApi } from '@/api/auth';
 import { nbadminApi } from '@/api/nbadmin';
 import type { UserInput } from '@/api/admin';
 import type { UserProfile } from '@/api/types';
@@ -18,6 +19,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDateTime } from '@/utils/format';
+import { UserSessionsDialog } from './UserSessionsDialog';
 
 interface Editing {
   id?: number;
@@ -25,23 +27,32 @@ interface Editing {
   password: string;
 }
 
-function statusOf(u: UserProfile): string {
+/** Status shown: Locked, Disabled, Online (an open session, UQ13) or Active (FR-UA-052 R1). */
+function statusOf(u: UserProfile, online: ReadonlySet<string> = new Set()): string {
   if (u.locked) {
     return 'LOCKED';
   }
-  return u.enabled ? 'ACTIVE' : 'DISABLED';
+  if (!u.enabled) {
+    return 'DISABLED';
+  }
+  return online.has(u.username.toLowerCase()) ? 'ONLINE' : 'ACTIVE';
 }
 
-const STATUS_FILTERS = ['ACTIVE', 'DISABLED', 'LOCKED'] as const;
+const STATUS_FILTERS = ['ACTIVE', 'ONLINE', 'DISABLED', 'LOCKED'] as const;
 
-function matches(u: UserProfile, text: string, status: string): boolean {
+function matches(
+  u: UserProfile,
+  text: string,
+  status: string,
+  online: ReadonlySet<string>,
+): boolean {
   const needle = text.toLowerCase();
   const found =
     needle === '' ||
     u.username.toLowerCase().includes(needle) ||
     u.fullName.toLowerCase().includes(needle) ||
     (u.windowsId ?? '').toLowerCase().includes(needle);
-  return found && (status === '' || statusOf(u) === status);
+  return found && (status === '' || statusOf(u, online) === status);
 }
 
 const EMPTY: UserInput = { username: '', fullName: '', email: '', roleCodes: [], enabled: true };
@@ -60,7 +71,14 @@ export default function UsersPage() {
   const [editing, setEditing] = useState<Editing | null>(null);
   const [text, setText] = useState('');
   const [status, setStatus] = useState('');
+  const [sessionsOf, setSessionsOf] = useState<string | null>(null);
   const users = useQuery({ queryKey: ['users'], queryFn: adminApi.users });
+  const onlineUsers = useQuery({
+    queryKey: ['online-users'],
+    queryFn: authApi.online,
+    enabled: can('USER_MANAGE'),
+  });
+  const online = new Set((onlineUsers.data ?? []).map((u) => u.toLowerCase()));
   const roles = useQuery({ queryKey: ['roles'], queryFn: adminApi.roles });
   const settings = useQuery({ queryKey: ['nbadmin', 'settings'], queryFn: nbadminApi.settings });
   const direct = settings.data?.directRoleEdit === true && can('USER_MANAGE');
@@ -159,7 +177,7 @@ export default function UsersPage() {
         />
         <DataTable<UserProfile>
           loading={users.isLoading}
-          rows={(users.data ?? []).filter((u) => matches(u, text, status))}
+          rows={(users.data ?? []).filter((u) => matches(u, text, status, online))}
           rowKey={(u) => u.id}
           onRowClick={(u) =>
             direct
@@ -186,28 +204,44 @@ export default function UsersPage() {
             {
               key: 's',
               header: 'Status',
-              render: (u) => <StatusBadge status={statusOf(u)} />,
+              render: (u) => <StatusBadge status={statusOf(u, online)} />,
             },
             {
               key: 'a',
               header: 'Actions',
-              render: (u) =>
-                u.locked && (
+              render: (u) => (
+                <div className="row">
+                  {u.locked && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        unlock.mutate(u.id);
+                      }}
+                    >
+                      Unlock
+                    </Button>
+                  )}
                   <Button
                     size="sm"
-                    variant="secondary"
+                    variant="ghost"
                     onClick={(e) => {
                       e.stopPropagation();
-                      unlock.mutate(u.id);
+                      setSessionsOf(u.username);
                     }}
                   >
-                    Unlock
+                    Sessions
                   </Button>
-                ),
+                </div>
+              ),
             },
           ]}
         />
       </Card>
+      {sessionsOf !== null && (
+        <UserSessionsDialog username={sessionsOf} onClose={() => setSessionsOf(null)} />
+      )}
       <Modal
         title={editing?.id === undefined ? 'New user' : `Edit ${editing.user.username}`}
         open={editing !== null}

@@ -12,6 +12,7 @@ import { MODULES } from '@/navigation/modules';
 import type { ScreenDef } from '@/navigation/types';
 
 const LoginPage = lazy(() => import('@/auth/LoginPage'));
+const ResetPasswordPage = lazy(() => import('@/auth/ResetPasswordPage'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,6 +48,7 @@ export function App() {
             <Suspense fallback={<span className="spinner" aria-label="Loading" />}>
               <Routes>
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route
                   element={
                     <RequireAuth>

@@ -24,6 +24,11 @@ export interface UserProfile {
   windowsId?: string;
   businessUnitCode?: string;
   userLevel?: string;
+  /** Password set by an administrator: to be changed at sign-in (UAM-NFR-36). */
+  mustChangePassword?: boolean;
+  lastLogoutAt?: string;
+  /** Mobile number, maintained by the user on My Profile (UQ17). */
+  mobileNo?: string;
   roles: string[];
   permissions: string[];
 }
@@ -32,6 +37,9 @@ export interface LoginResponse {
   accessToken: string;
   expiresAt: string;
   user: UserProfile;
+  /** The password must be changed before the home page opens (RESET or EXPIRED). */
+  mustChangePassword?: boolean;
+  passwordChangeReason?: 'RESET' | 'EXPIRED';
 }
 
 export interface Company {

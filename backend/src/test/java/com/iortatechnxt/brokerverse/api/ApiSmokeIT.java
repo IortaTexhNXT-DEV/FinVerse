@@ -198,6 +198,12 @@ class ApiSmokeIT {
         "/api/v1/admin/events/archive?correlationId=none",
         "/api/v1/admin/events/dead-letters",
         "/api/v1/admin/events/dead-letters?status=ALL&page=1&size=500",
+        // session log and own password status (BRD-11 U1-B, UAM-NFR-35 / 36)
+        "/api/v1/admin/sessions",
+        "/api/v1/admin/sessions?username=admin&open=true",
+        "/api/v1/admin/sessions/online",
+        "/api/v1/auth/sessions",
+        "/api/v1/auth/password-status",
       })
   @WithUserDetails("admin")
   void platformSupportEndpointsRespondOk(String url) throws Exception {

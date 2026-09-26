@@ -68,7 +68,7 @@ export function Header() {
           <span className="avatar" aria-hidden="true">
             {initials(user.fullName)}
           </span>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={logout}>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={() => logout()}>
             <LogOut size={16} aria-hidden="true" /> Sign out
           </button>
         </div>

@@ -63,7 +63,7 @@ export function SessionTimeoutGuard() {
 
   const onExpired = useCallback(() => {
     toast.error('Your session has ended. Please sign in again.');
-    logout();
+    logout('EXPIRED');
   }, [logout, toast]);
   const expiry = useSessionExpiry(expiryWarning, onExpired);
 
@@ -78,7 +78,7 @@ export function SessionTimeoutGuard() {
         setSecondsLeft(left);
         if (next === 'expired') {
           toast.error(`You were signed out after ${String(timeoutMinutes)} minutes of inactivity.`);
-          logout();
+          logout('IDLE_TIMEOUT');
         }
       },
     });
@@ -122,7 +122,7 @@ export function SessionTimeoutGuard() {
         onClose={stay}
         footer={
           <>
-            <Button variant="secondary" onClick={logout}>
+            <Button variant="secondary" onClick={() => logout()}>
               Sign Out Now
             </Button>
             <Button variant="accent" onClick={stay}>

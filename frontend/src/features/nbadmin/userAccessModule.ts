@@ -1,4 +1,4 @@
-import { FileSpreadsheet, Grid3x3, ShieldCheck, UserCheck } from 'lucide-react';
+import { FileBarChart, FileSpreadsheet, Grid3x3, ShieldCheck, UserCheck } from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -99,6 +99,13 @@ export const userAccessModule: FeatureModule = {
       permission: 'ACCESS_REQUEST',
       alsoPermissions: ['ACCESS_APPROVE', 'ROLE_MANAGE', 'AUDIT_VIEW', 'UAM_VIEW'],
       component: lazy(() => import('./AccessMatrixPage')),
+    },
+    {
+      path: '/user-access/reports',
+      label: 'User Access Reports',
+      icon: FileBarChart,
+      permission: 'UAM_REPORT_VIEW',
+      component: lazy(() => import('./UserAccessReportsPage')),
     },
   ],
 };

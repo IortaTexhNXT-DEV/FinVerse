@@ -60,54 +60,68 @@ public class BclReportSql {
 
   /** Common filters on a claim aliased {@code c}. */
   static final String FILTERS =
-      " and (cast(:branchId as bigint) is null or c.branch_id = :branchId)"
-          + " and (cast(:unitCode as varchar) is null or c.unit_code = :unitCode)"
-          + " and (cast(:handler as varchar) is null or lower(c.handler) = lower(:handler))"
-          + " and (cast(:insurerCode as varchar) is null or c.lead_insurer_code = :insurerCode"
-          + " or exists (select 1 from bcl_insurer_claim f where f.claim_id = c.id"
-          + " and f.insurer_code = :insurerCode))"
-          + " and (cast(:lineCode as varchar) is null or c.line_code = :lineCode)"
-          + " and (cast(:salesTeam as varchar) is null or c.sales_team = :salesTeam)"
-          + " and (cast(:accountOfficer as varchar) is null"
-          + " or lower(c.account_officer) = lower(:accountOfficer))";
+      sql(
+          " and (cast(:branchId as bigint) is null or c.branch_id = :branchId)"
+              + " and (cast(:unitCode as varchar) is null or c.unit_code = :unitCode)"
+              + " and (cast(:handler as varchar) is null or lower(c.handler) = lower(:handler))"
+              + " and (cast(:insurerCode as varchar) is null or c.lead_insurer_code = :insurerCode"
+              + " or exists (select 1 from bcl_insurer_claim f where f.claim_id = c.id"
+              + " and f.insurer_code = :insurerCode))"
+              + " and (cast(:lineCode as varchar) is null or c.line_code = :lineCode)"
+              + " and (cast(:salesTeam as varchar) is null or c.sales_team = :salesTeam)"
+              + " and (cast(:accountOfficer as varchar) is null"
+              + " or lower(c.account_officer) = lower(:accountOfficer))");
 
   /** Insurer names of a claim (the insurer lines, else the lead insurer). */
   static final String INSURERS =
-      "coalesce((select string_agg(coalesce((select i.name from cat_insurer i"
-          + " where i.company_id = c.company_id and i.party_code = x.insurer_code limit 1),"
-          + " x.insurer_code), ', ' order by x.id) from bcl_insurer_claim x"
-          + " where x.claim_id = c.id), (select i.name from cat_insurer i"
-          + " where i.company_id = c.company_id and i.party_code = c.lead_insurer_code limit 1),"
-          + " c.lead_insurer_code)";
+      sql(
+          "coalesce((select string_agg(coalesce((select i.name from cat_insurer i"
+              + " where i.company_id = c.company_id and i.party_code = x.insurer_code limit 1),"
+              + " x.insurer_code), ', ' order by x.id) from bcl_insurer_claim x"
+              + " where x.claim_id = c.id), (select i.name from cat_insurer i"
+              + " where i.company_id = c.company_id and i.party_code = c.lead_insurer_code limit 1),"
+              + " c.lead_insurer_code)");
 
   /** Columns of the claim lists (p.42-43) with the insurer claim numbers. */
   static final String CLAIM_SELECT =
-      "select c.id, c.claim_no, c.claimant_name, c.assured_name, c.arn, c.policy_no,"
-          + " coalesce(ln.label, c.loss_nature) as loss_nature,"
-          + " coalesce(ct.label, c.claim_type) as claim_type, c.loss_date, c.reported_date,"
-          + " c.currency, c.claim_amount, c.deductible, c.status_code,"
-          + " coalesce(s.label, c.status_code) as status, c.phase, c.closure_kind, "
-          + INSURERS
-          + " as insurers, coalesce(c.lead_insurer_code, '') as lead_insurer,"
-          + " (select string_agg(x.insurer_claim_no, ', ' order by x.id) from bcl_insurer_claim x"
-          + " where x.claim_id = c.id and x.insurer_claim_no is not null) as insurer_claim_nos,"
-          + " c.next_action_plan, c.status_since, c.closed_on, c.next_follow_up_date, c.handler,"
-          + " c.sales_team, c.account_officer, c.date_settled, c.settlement_amount,"
-          + " coalesce(st.label, c.settlement_type_code) as settlement_type"
-          + " from bcl_claim c"
-          + " left join lov_value s on s.type_code = 'BCL_CLAIM_STATUS' and s.code = c.status_code"
-          + " left join lov_value ln on ln.type_code = 'BCL_LOSS_NATURE' and ln.code = c.loss_nature"
-          + " left join lov_value ct on ct.type_code = 'BCL_CLAIM_TYPE' and ct.code = c.claim_type"
-          + " left join lov_value st on st.type_code = 'BCL_SETTLEMENT_TYPE'"
-          + " and st.code = c.settlement_type_code"
-          + " where c.company_id = :companyId"
-          + FILTERS;
+      sql(
+          "select c.id, c.claim_no, c.claimant_name, c.assured_name, c.arn, c.policy_no,"
+              + " coalesce(ln.label, c.loss_nature) as loss_nature,"
+              + " coalesce(ct.label, c.claim_type) as claim_type, c.loss_date, c.reported_date,"
+              + " c.currency, c.claim_amount, c.deductible, c.status_code,"
+              + " coalesce(s.label, c.status_code) as status, c.phase, c.closure_kind, "
+              + INSURERS
+              + " as insurers, coalesce(c.lead_insurer_code, '') as lead_insurer,"
+              + " (select string_agg(x.insurer_claim_no, ', ' order by x.id) from bcl_insurer_claim x"
+              + " where x.claim_id = c.id and x.insurer_claim_no is not null) as insurer_claim_nos,"
+              + " c.next_action_plan, c.status_since, c.closed_on, c.next_follow_up_date, c.handler,"
+              + " c.sales_team, c.account_officer, c.date_settled, c.settlement_amount,"
+              + " coalesce(st.label, c.settlement_type_code) as settlement_type"
+              + " from bcl_claim c"
+              + " left join lov_value s on s.type_code = 'BCL_CLAIM_STATUS' and s.code = c.status_code"
+              + " left join lov_value ln on ln.type_code = 'BCL_LOSS_NATURE' and ln.code = c.loss_nature"
+              + " left join lov_value ct on ct.type_code = 'BCL_CLAIM_TYPE' and ct.code = c.claim_type"
+              + " left join lov_value st on st.type_code = 'BCL_SETTLEMENT_TYPE'"
+              + " and st.code = c.settlement_type_code"
+              + " where c.company_id = :companyId"
+              + FILTERS);
 
   /** Claims outstanding on the as-of date (phases NEW, IN_PROGRESS and TEMP_CLOSED). */
   static final String OUTSTANDING_ON =
-      " and c.reported_date <= :asOf and (c.phase <> 'CLOSED' or c.closed_on > :asOf)";
+      sql(" and c.reported_date <= :asOf and (c.phase <> 'CLOSED' or c.closed_on > :asOf)");
 
   private static final int DEFAULT_PAST_DUE = 90;
+
+  /**
+   * Keeps a shared SQL fragment out of the constant pools of the classes that use it (built once
+   * here at class initialisation).
+   *
+   * @param text SQL text
+   * @return the same text
+   */
+  private static String sql(String text) {
+    return text;
+  }
 
   private final NamedParameterJdbcTemplate jdbc;
   private final SystemParameterService parameters;

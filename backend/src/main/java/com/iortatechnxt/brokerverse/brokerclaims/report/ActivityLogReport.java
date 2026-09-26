@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.brokerclaims.report;
 import com.iortatechnxt.brokerverse.brokerclaims.report.ClaimActivitySource.ActivityQuery;
 import com.iortatechnxt.brokerverse.brokerclaims.report.ClaimActivitySource.ClaimActivity;
 import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimAgeing;
+import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -133,7 +134,7 @@ public class ActivityLogReport implements ReportDefinition {
     sources.orderedStream().forEach(s -> activities.addAll(s.activities(query)));
     List<Map<String, Object>> rows =
         activities.stream()
-            .filter(a -> user == null || user.equalsIgnoreCase(a.user()))
+            .filter(a -> user == null || CurrentUser.sameUser(user, a.user()))
             .sorted(Comparator.comparing(ClaimActivity::at))
             .map(ActivityLogReport::row)
             .toList();

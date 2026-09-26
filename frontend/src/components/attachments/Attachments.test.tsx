@@ -30,6 +30,8 @@ function wrap(children: ReactNode) {
     login: () => Promise.resolve(),
     logout: () => undefined,
     can: () => true,
+    passwordChange: null,
+    passwordChanged: () => undefined,
   };
   const toast = { success: vi.fn(), error: vi.fn() };
   return (

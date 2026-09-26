@@ -77,6 +77,9 @@ public class AppUser extends BaseEntity {
   @Column(name = "last_logout_at")
   private Instant lastLogoutAt;
 
+  @Column(name = "mobile_no", length = 30)
+  private String mobileNo;
+
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "sec_user_role",
@@ -271,6 +274,14 @@ public class AppUser extends BaseEntity {
 
   public Instant getLastLogoutAt() {
     return lastLogoutAt;
+  }
+
+  public String getMobileNo() {
+    return mobileNo;
+  }
+
+  public void setMobileNo(String mobileNo) {
+    this.mobileNo = mobileNo;
   }
 
   /**

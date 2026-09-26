@@ -420,3 +420,73 @@ What wave U1-A built on the U0 foundation, and where it differs from or details 
   Administrator resets it (the self-service reset is U1-B). Business unit and user level codes are not checked against
   their lists (empty until UQ05). A deactivation with members is allowed (UQ16). Members of a deactivated or changed
   profile are not notified one by one (the requester is). The five reports are U1-B.
+
+## 18. U1-B sign-in, passwords, sessions and reports: as built
+
+What wave U1-B built on U0 and U1-A, and where it differs from or details sections 4-11.
+
+- **Migration `V1063__security_sign_in_and_passwords.sql`.** `sec_user.mobile_no` (UQ17); `sec_password_reset_token`
+  (SHA-256 of the token only, `expires_at`, `used_at`); notification event `PASSWORD_EXPIRY_NOTICE` (sort 670);
+  `REPORT_VIEW` for every role holding `UAM_REPORT_VIEW` (UAM_APPROVER had none, so it could not reach the report
+  runner). No demo migration.
+- **Directory port (FR-UA-003; D6).** `security.service.directory`: `DirectoryAuthenticator` (`mode()`,
+  `authenticate(userId, char[] password)` returning `DirectoryResult` SUCCESS / INVALID / LOCKED / ERROR with the
+  directory's message), the LOCAL adapter `LocalPasswordAuthenticator` (the Spring authentication manager, BCrypt),
+  `DirectoryAuthenticators` (the adapter of the mode; clears the password array) and `AuthMode` (`AUTH_MODE`). In
+  DIRECTORY mode `AuthService.login` finds the user by `windows_id`; INVALID counts towards the lockout and shows the
+  directory's message, LOCKED is shown as it is, ERROR refuses with `SIGN_IN_UNAVAILABLE` (HTTP 422) and counts
+  nothing. **Parked:** the EUA / LDAP adapter (a bean of the interface with mode DIRECTORY, UQ04); until it exists
+  DIRECTORY mode refuses every sign-in with "Directory sign-in is not available. Contact your administrator."
+- **Passwords (UAM-NFR-31, 36, 37; FR-UA-005).** `AuthPasswordPolicy` (history `PASSWORD_HISTORY_COUNT` plus the
+  current password: `PASSWORD_REUSED` "You used this password recently. Choose another one"; minimum age
+  `PASSWORD_MIN_AGE_DAYS`: `PASSWORD_CHANGED_TOO_SOON` "You changed your password less than a day ago", not after a
+  password set by someone else; maximum age `PASSWORD_MAX_AGE_DAYS`; none of it in DIRECTORY mode:
+  `PASSWORD_MANAGED_BY_DIRECTORY`). `AuthPasswordService`: own change (`POST /auth/change-password` now goes here;
+  `UserAdminService.changeOwnPassword` is left unchanged and unused by the API), the password status, the reset link
+  and the expiring passwords. `LoginResponse` + `mustChangePassword`, `passwordChangeReason` (RESET after creation or
+  an administrator reset, EXPIRED past the maximum age; a password without a change date never expires, so the demo
+  users are not forced). The web client shows the forced change before the home page. Passwords set before V1061
+  have no `password_changed_at` and never expire until changed once.
+- **"Forgot password?"** `POST /auth/password-reset/request` `{userId}` (202 for every user ID; LOCAL mode, enabled
+  users with an e-mail address; older links withdrawn), `POST /auth/password-reset/check` `{token}`,
+  `POST /auth/password-reset/confirm` `{token, newPassword}` (history rule; `RESET_LINK_INVALID`,
+  `RESET_LINK_EXPIRED`). Anonymous and CSRF-exempt like login (`SecurityConfig`). The link is
+  `brokerverse.security.password-reset-url` (default: first allowed origin + `/reset-password`) `?token=`; the event
+  `security.service.PasswordResetRequested` is e-mailed by `nbadmin.service.PasswordNoticeMailer` (purpose
+  PASSWORD_RESET), because `security` does not depend on `messaging`. A reset link does not unlock a locked account.
+- **Password expiry notice.** Job `PASSWORD_EXPIRY_NOTICE` is `nbadmin.service.PasswordExpiryNoticeJob` (same cron
+  property): users whose password expires within 7 days get an in-app notice and an e-mail (event
+  `PASSWORD_EXPIRY_NOTICE`, preferences respected).
+- **Sessions (UAM-NFR-35; FR-UA-002, 004).** `JwtAuthenticationFilter` asks `UserSessionLog.check(jti)` on every
+  request: an ended session is refused (401) even without the denylist, an open one is touched (every 5 minutes); a
+  token of a user found locked or disabled ends its session (LOCKED / ADMIN_ENDED). The third failed login ends the
+  user's open sessions (LOCKED). `POST /auth/logout?reason=IDLE_TIMEOUT|EXPIRED` records the web client's inactivity
+  and end-of-token sign-outs (audit "Logged out after inactivity" / "at the end of the session"). Job
+  `USER_SESSION_SWEEP` (`brokerverse.jobs.user-session-sweep-cron`, every 15 minutes) ends sessions idle longer than
+  `SESSION_TIMEOUT_MINUTES` + 5 minutes, expired, or of locked / disabled users. The web client keeps the server
+  session alive on activity (at most every 4 minutes). Endpoints: `GET /auth/sessions` (own), `GET /admin/sessions`
+  (`username`, `open`, page), `GET /admin/sessions/online`, `POST /admin/sessions/{sessionId}/end` (USER_MANAGE;
+  revokes the token, ADMIN_ENDED, audited as LOGOUT by the administrator; `SESSION_ALREADY_ENDED`).
+- **Own profile (UQ17).** `PUT /auth/me` `{email, mobileNo}` with field errors (`PROFILE_INVALID`); each changed
+  attribute is a MODIFY_USER row of the change log done by the user, without a request. `GET /auth/password-status`.
+  `UserProfileResponse` + `mobileNo`.
+- **Batch failure e-mail (UAM-NFR-25; FR-UA-071).** `messaging.service.JobFailureMailer` implements the port
+  `system.service.JobFailureListener` (a listener in `system` would create a `system` - `messaging` cycle): every
+  failed run is e-mailed to the valid addresses of `JOB_FAILURE_RECIPIENTS` (invalid ones are skipped and logged),
+  purpose JOB_FAILURE, besides the JOB_FAILURE alert.
+- **Reports (`nbadmin.report`, category Control & Audit, view and export `UAM_REPORT_VIEW`, archived).**
+  `UAM-USER-ACCESS`, `UAM-GROUP-PROFILE`, `UAM-GROUP-MEMBERS`, `UAM-AUDIT-LOG`, `UAM-REQUESTS` (section 11.1). The
+  as-of views undo the later rows of the change log (`UserAccessHistory`); "created / modified by" is
+  "approver (request no.)" or the user of a direct change. The audit log merges the change log (activity words of
+  sample D, role codes shown as profile names, "Null" for no value), the request history and, with
+  `includeSignIns`, LOGIN / LOGIN_FAILED / LOGOUT of the audit trail. `AS_OF_IN_FUTURE` "The as-of date cannot be in
+  the future"; `DATE_RANGE_REVERSED` "The end date must be on or after the start date". The group profile report
+  lists the modules in which a profile has at least one task unless a module (area code) is chosen.
+- **Screens.** Sign-in: "Forgot password?", `/reset-password` (public route), the forced change page (in
+  `RequireAuth`). My Profile: contact details, password with its rules and dates (DIRECTORY mode: a notice), recent
+  sessions. Administration > Users: status Online, Sessions dialog with End Session. User Access > User Access
+  Reports (`/user-access/reports`, UAM_REPORT_VIEW) with help entry.
+- **Not built / parked.** The EUA adapter and the SSO exchange (UQ04); the single session per device (UQ09, the
+  log is ready); an IdP-specific "Forgot password?" (hidden only by the server's no-op in DIRECTORY mode: the login
+  page cannot know the mode before sign-in); rate limiting of the reset request beyond the withdrawal of older
+  links.

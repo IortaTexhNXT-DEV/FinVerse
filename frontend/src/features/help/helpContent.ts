@@ -191,8 +191,16 @@ export const HELP_SECTIONS: HelpSection[] = [
       {
         name: 'My Profile',
         path: '/profile',
-        summary: 'Your details, roles, permissions and last sign-in; change your password here.',
+        summary:
+          'Your details, roles and permissions; your e-mail address and mobile number; your password with its rules; and your recent sign-in sessions.',
+        workflow: [
+          'Contact details: change your e-mail address or mobile number and click Save Contact Details (recorded in the access change log).',
+          'Change password: enter the current password and the new one twice; the rules are shown under the fields.',
+          'Recent sessions: your sign-ins with the last activity and how each session ended (log-out, inactivity, end of session, ended by the administrator or account locked).',
+        ],
         controls: [
+          'A new password has at least 10 characters with upper and lower case letters, a digit and a symbol; it must differ from your last PASSWORD_HISTORY_COUNT (8) passwords, cannot be changed again within PASSWORD_MIN_AGE_DAYS (1) and expires after PASSWORD_MAX_AGE_DAYS (90). You are told 7 days before it expires.',
+          'After an administrator reset, on first use or once it has expired, you must change the password before the home page opens. Forgot password? on the login page e-mails a link that works once, within 30 minutes.',
           'You are signed out automatically after the configured period of inactivity (SESSION_TIMEOUT_MINUTES); a warning appears after SESSION_IDLE_WARNING_MINUTES (15) of inactivity.',
           'The session also ends at a fixed time after sign-in; a warning appears SESSION_EXPIRY_WARNING_MINUTES (30) before.',
           'You can work in several tabs: a new tab uses the session of the open tabs, activity in any tab keeps all of them signed in, and signing out in one tab signs out all of them.',

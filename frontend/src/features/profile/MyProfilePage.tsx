@@ -1,109 +1,117 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { KeyRound } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { api } from '@/api/client';
+import { authApi } from '@/api/auth';
+import type { PasswordStatus } from '@/api/auth';
 import { systemApi } from '@/api/system';
 import { useAuth } from '@/auth/authContext';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { ErrorAlert } from '@/components/ui/ErrorAlert';
-import { Field } from '@/components/ui/Field';
+import { PageFooter } from '@/components/ui/Pager';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
 import { useWorkspace } from '@/context/workspaceContext';
 import { formatAmount, formatDateTime, humanize } from '@/utils/format';
-import { passwordProblems } from './passwordRules';
+import { ContactDetailsCard } from './ContactDetailsCard';
+import { PasswordChangeForm } from './PasswordChangeForm';
+import { policyHint } from './passwordRules';
+import { SessionsTable } from './SessionsTable';
 
-interface PasswordForm {
-  current: string;
-  next: string;
-  confirm: string;
-}
+const SESSIONS_PAGE = 10;
 
-const EMPTY: PasswordForm = { current: '', next: '', confirm: '' };
-
-function ChangePassword() {
+function ChangePassword({ status }: Readonly<{ status: PasswordStatus | undefined }>) {
   const toast = useToast();
-  const [form, setForm] = useState<PasswordForm>(EMPTY);
-  const problems = passwordProblems(form.next, form.confirm);
+  const queries = useQueryClient();
   const change = useMutation({
-    mutationFn: (f: PasswordForm) =>
-      api.post<undefined>('/auth/change-password', {
-        currentPassword: f.current,
-        newPassword: f.next,
-      }),
+    mutationFn: ({ current, next }: { current: string; next: string }) =>
+      authApi.changePassword(current, next),
     onSuccess: () => {
-      setForm(EMPTY);
       toast.success('Password changed');
+      void queries.invalidateQueries({ queryKey: ['password-status'] });
     },
   });
-  const fields: [keyof PasswordForm, string, string][] = [
-    ['current', 'Current password', 'current-password'],
-    ['next', 'New password', 'new-password'],
-    ['confirm', 'Confirm new password', 'new-password'],
-  ];
+  if (status?.authMode === 'DIRECTORY') {
+    return (
+      <Card title="Password">
+        <div className="alert">
+          You sign in with your BDO network password. Change it through the BDO directory, not in
+          BrokerVerse.
+        </div>
+      </Card>
+    );
+  }
+  const dates = [
+    status?.passwordChangedAt === undefined
+      ? undefined
+      : `Last changed ${formatDateTime(status.passwordChangedAt)}.`,
+    status?.passwordExpiresAt === undefined
+      ? undefined
+      : `Expires ${formatDateTime(status.passwordExpiresAt)}.`,
+  ].filter((t): t is string => t !== undefined);
   return (
     <Card title="Change password">
       <div className="stack">
-        <ErrorAlert error={change.error} />
-        <div className="form-grid">
-          {fields.map(([key, label, autoComplete]) => (
-            <Field key={key} label={label} required>
-              {(id) => (
-                <input
-                  id={id}
-                  className="input"
-                  type="password"
-                  autoComplete={autoComplete}
-                  value={form[key]}
-                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                />
-              )}
-            </Field>
-          ))}
-        </div>
-        {form.next !== '' && problems.length > 0 && (
-          <ul className="muted">
-            {problems.map((p) => (
-              <li key={p}>{p}</li>
-            ))}
-          </ul>
-        )}
-        <div>
-          <Button
-            variant="accent"
-            icon={<KeyRound size={16} />}
-            busy={change.isPending}
-            disabled={form.current === '' || problems.length > 0}
-            onClick={() => change.mutate(form)}
-          >
-            Change Password
-          </Button>
-        </div>
+        {dates.length > 0 && <p className="muted">{dates.join(' ')}</p>}
+        <PasswordChangeForm
+          requireCurrent
+          grid
+          submitLabel="Change Password"
+          busy={change.isPending}
+          error={change.error}
+          hint={status === undefined ? undefined : policyHint(status) || undefined}
+          onSubmit={(current, next) => change.mutateAsync({ current, next })}
+        />
       </div>
     </Card>
   );
 }
 
-/** The signed-in user's profile: details, roles, permissions, session policy and password. */
+function MySessions() {
+  const [page, setPage] = useState(0);
+  const sessions = useQuery({
+    queryKey: ['my-sessions', page],
+    queryFn: () => authApi.mySessions(page, SESSIONS_PAGE),
+  });
+  return (
+    <Card title="Recent sessions">
+      <div className="stack">
+        <p className="muted">
+          Your sign-ins and how each session ended. If you see a session you do not recognise,
+          change your password and tell your System Administrator.
+        </p>
+        <SessionsTable rows={sessions.data?.content ?? []} loading={sessions.isLoading} />
+        <PageFooter data={sessions.data} noun="sessions" onPage={setPage} />
+      </div>
+    </Card>
+  );
+}
+
+/**
+ * The signed-in user's profile (FR-UA-004, FR-UA-005): details, roles and permissions, contact
+ * details (UQ17), the password with its rules (UAM-NFR-36) and the recent sessions (UAM-NFR-35).
+ */
 export default function MyProfilePage() {
   const { user } = useAuth();
   const { branches } = useWorkspace();
+  const [saved, setSaved] = useState<typeof user>(null);
   const policy = useQuery({ queryKey: ['session-policy'], queryFn: systemApi.sessionPolicy });
+  const status = useQuery({ queryKey: ['password-status'], queryFn: authApi.passwordStatus });
   if (user === null) {
     return null;
   }
-  const home = branches.find((b) => b.id === user.homeBranchId);
+  const profile = saved ?? user;
+  const home = branches.find((b) => b.id === profile.homeBranchId);
   const details: [string, string][] = [
-    ['User name', user.username],
-    ['Full name', user.fullName],
-    ['Email', user.email ?? '—'],
+    ['User name', profile.username],
+    ['Full name', profile.fullName],
+    ['Windows ID', profile.windowsId ?? '—'],
     ['Home branch', home === undefined ? '—' : `${home.code} – ${home.name}`],
     [
       'Authorization limit',
-      user.authorizationLimit === undefined ? 'Unlimited' : formatAmount(user.authorizationLimit),
+      profile.authorizationLimit === undefined
+        ? 'Unlimited'
+        : formatAmount(profile.authorizationLimit),
     ],
-    ['Last sign-in', formatDateTime(user.lastLoginAt) || '—'],
+    ['Last sign-in', formatDateTime(profile.lastLoginAt) || '—'],
+    ['Last sign-out', formatDateTime(profile.lastLogoutAt) || '—'],
     ['Automatic sign-out', `After ${policy.data?.timeoutMinutes ?? 30} minutes of inactivity`],
   ];
   return (
@@ -111,7 +119,7 @@ export default function MyProfilePage() {
       <PageHeader
         section="Account"
         title="My Profile"
-        description="Your account, access rights and password."
+        description="Your account, contact details, access rights, password and sessions."
       />
       <div className="grid-2">
         <Card title="Details">
@@ -124,28 +132,30 @@ export default function MyProfilePage() {
             ))}
           </dl>
         </Card>
-        <Card title="Roles and permissions">
-          <div className="stack">
-            <div className="row">
-              {user.roles.map((r) => (
-                <span key={r} className="badge">
-                  {humanize(r)}
+        <ContactDetailsCard user={profile} onSaved={setSaved} />
+      </div>
+      <Card title="Roles and permissions">
+        <div className="stack">
+          <div className="row">
+            {profile.roles.map((r) => (
+              <span key={r} className="badge">
+                {humanize(r)}
+              </span>
+            ))}
+          </div>
+          <div className="row" style={{ flexWrap: 'wrap' }}>
+            {[...profile.permissions]
+              .sort((a, b) => a.localeCompare(b))
+              .map((p) => (
+                <span key={p} className="badge neutral">
+                  {humanize(p)}
                 </span>
               ))}
-            </div>
-            <div className="row" style={{ flexWrap: 'wrap' }}>
-              {[...user.permissions]
-                .sort((a, b) => a.localeCompare(b))
-                .map((p) => (
-                  <span key={p} className="badge neutral">
-                    {humanize(p)}
-                  </span>
-                ))}
-            </div>
           </div>
-        </Card>
-      </div>
-      <ChangePassword />
+        </div>
+      </Card>
+      <ChangePassword status={status.data} />
+      <MySessions />
     </div>
   );
 }

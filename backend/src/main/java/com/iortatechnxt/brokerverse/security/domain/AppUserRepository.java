@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.domain;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -52,4 +53,22 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
       "select distinct u.username from AppUser u join u.roles r join r.permissions p"
           + " where p = :permission and r.active = true and u.enabled = true and u.locked = false")
   List<String> findUsernamesWithPermission(@Param("permission") Permission permission);
+
+  /**
+   * Finds a user by Windows ID (directory sign-in, AUTH_MODE = DIRECTORY; UAM-NFR-11).
+   *
+   * @param windowsId Windows ID
+   * @return user if present
+   */
+  Optional<AppUser> findByWindowsIdIgnoreCase(String windowsId);
+
+  /**
+   * Enabled users whose password was last changed in a period (password expiry notice, UAM-NFR-36).
+   *
+   * @param from start of the period (inclusive)
+   * @param to end of the period (exclusive)
+   * @return users
+   */
+  List<AppUser> findByEnabledTrueAndPasswordChangedAtGreaterThanEqualAndPasswordChangedAtLessThan(
+      Instant from, Instant to);
 }

@@ -105,5 +105,21 @@ export const USER_ACCESS_HELP: HelpSection = {
         'The export is recorded in the audit trail.',
       ],
     },
+    {
+      name: 'User Access Reports',
+      path: '/user-access/reports',
+      summary:
+        'The five user access reports, each opened in the report runner with PDF, Excel and CSV exports: User Access Report (UAM-USER-ACCESS), User Group Profile Report (UAM-GROUP-PROFILE), Group Profile Membership (UAM-GROUP-MEMBERS), User Access Audit Log (UAM-AUDIT-LOG) and Access Requests (UAM-REQUESTS).',
+      workflow: [
+        'Open a report, set its parameters (as-of date, period, group profile, user...) and click Run; export the result to PDF, Excel or CSV.',
+        'User Access Report and Group Profile Membership show the group profiles held at the end of the as-of date, rebuilt from the access change log.',
+        'User Access Audit Log lists each activity with its from and to values, done by, approved by and request number; tick Include Log-ins and Log-outs to add the sign-in activity of the audit trail.',
+      ],
+      controls: [
+        'Needs UAM_REPORT_VIEW (Approver, Business Administrator, System Administrator, Auditor). Every run and export is kept in the report archive.',
+        'An as-of date in the future and a period ending before it starts are refused.',
+        '"Created by" and "Modified by" show the approver and request number of the access request that applied the change, or the user who made a direct change.',
+      ],
+    },
   ],
 };

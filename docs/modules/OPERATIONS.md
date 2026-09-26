@@ -167,7 +167,7 @@ module's tests.
 | `InsurerFileInbox` | `String transport()`; `List<InboxFile> pending(Long companyId, String insurerCode, String fileType)` | `ManualInsurerFileInbox` (manual upload, empty inbox) | insurer channels |
 | `FileDropPort` | `DroppedFile drop(Long companyId, ExtractFile.Location, DropContent, ExtractFile.Origin)` | `RepositoryFileDrop` (extract repository) | shared drive (OQ17) |
 | `MarketingFeed` | `List<FeedItem> fetch(Long companyId, String feedCode, LocalDate since)` | none (optional bean) | Marketing interface (OQ45) |
-| `ClaimsFeed` | same as `MarketingFeed` | none (optional bean) | Claims BRD (OQ46) |
+| `ClaimsFeed` | same as `MarketingFeed` | `brokerclaims.feed.service.InAppClaimsFeed` (BRD-7, wave CL1-A) | Claims BRD (OQ46) |
 | `EarlyIncentiveRules` | `Optional<Terms> termsFor(Long companyId, Subject)` | no rule | remittance (`RemittanceEarlyIncentiveRules`, O2) |
 | `UnappliedDirectory` (BRD-4) | `Page<UnappliedView> open(Long companyId, UnappliedFilter, Pageable)`; `Optional<UnappliedView> find(String unappliedRef)`; `List<UnappliedEvent> history(String unappliedRef)` | `EmptyUnappliedDirectory` | cashiering (COLLECTIONS_DESIGN 9) |
 | `UnappliedDispositionRequests` (BRD-4) | `DispositionTicket request(DispositionRequest)`; `Optional<DispositionTicket> status(String source, String sourceRef)` | `HandoffDispositionRequests`: `DEFERRED` + hand-off for team `CASH_DISPOSITION` | cashiering |
@@ -196,8 +196,9 @@ Extension points read by the foundation (any number of beans):
 **Planned consumers from later BRDs** (designed, not built; every item is **to be agreed with the Operations owner**,
 and no contract above changes until it is; see `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md`):
 - **Claims** (`brokerclaims`, BRD-7) implements `ClaimsFeed` with `InAppClaimsFeed`, feed `CLAIMS_SPECIAL_REMIT`
-  (CLAIMS_BROKING_DESIGN section 3.1). `SpecialRemittanceService.claimsNote` would then refuse a CLAIMS-condition
-  request without an eligible claim, where today it only adds a note (section 3.5).
+  (CLAIMS_BROKING_DESIGN section 3.1; **built in wave CL1-A**). `SpecialRemittanceService.claimsNote` now refuses a
+  CLAIMS-condition request without an eligible claim (`SPECIAL_REMIT_NOT_ELIGIBLE`) and confirms it otherwise
+  (section 3.5).
 - **Submitted Policies** (`submitted`, BRD-12) needs `UnappliedDispositionRequests.Action.RECOGNIZE_INCOME` with an
   income type (`DispositionRequest.incomeType`) and the cashiering disposition type HANDLING_FEE
   (SUBMITTED_POLICIES_DESIGN section 9).
@@ -309,7 +310,7 @@ stub home page with a help section, so a module fills in only its own feature fo
 |---|---|---|
 | Collection system interface | OQ01 | `CollectionFeed` (CSV in the extract repository), `COLLECTION_*` feeds by manual upload |
 | Disbursement system | OQ02 | `DisbursementGateway` and the in-app queue |
-| Marketing and Claims feeds | OQ45, OQ46 | `MarketingFeed`, `ClaimsFeed` without adapters |
+| Marketing and Claims feeds | OQ45, OQ46 | `MarketingFeed` without adapter; `ClaimsFeed` by `brokerclaims.InAppClaimsFeed` |
 | Accounting interface / GL mapping | OQ07 | demo GL only; production configures the Accounting Rules |
 | Insurer channels (SFTP / API) | - | `InsurerFileInbox`, manual upload |
 | Shared drive | OQ17 | `FileDropPort` to the in-system extract repository |
@@ -736,8 +737,10 @@ MKTID.001-007/009). The code is in package `com.iortatechnxt.brokerverse.remitta
 
 - Request `SPR-<yyyy>` (`rem_special_request`), with a condition from LOV `SPECIAL_REMIT_CONDITION`.
   It is validated on creation: the invoice must be paid, cleared and not on hold.
-  - The claims condition is confirmed through `ClaimsFeed` feed `CLAIMS_SPECIAL_REMIT` when that port
-    is connected. Without it, the request carries a note (OQ46).
+  - The claims condition is confirmed through `ClaimsFeed` feed `CLAIMS_SPECIAL_REMIT` (adapter
+    `brokerclaims.InAppClaimsFeed`, BRD-7): the invoice must belong to the cover and policy year of an open claim
+    whose status carries `awaiting_premium_remittance` ("With BDOI - For Premium Remittance"), else the request
+    is refused (OQ46).
 - Workflow `OPS_SPECIAL_REMIT`:
   - validate;
   - approve, with four-eyes. Approval creates a SPECIAL batch at once, with no processor so that a
@@ -1425,7 +1428,7 @@ invoice.
 | `CollectionFeed` | `ManualCollectionFeed` (default) | parked: Collections module of BRD-4 (OQ01 answered) |
 | `InsurerFileInbox` | `ManualInsurerFileInbox` (default) | parked: insurer channels |
 | `FileDropPort` | `RepositoryFileDrop` (default) | parked: shared drive / FS04 (OQ17) |
-| `MarketingFeed`, `ClaimsFeed` | none | parked (OQ45, OQ46) |
+| `MarketingFeed`, `ClaimsFeed` | `ClaimsFeed`: `brokerclaims.InAppClaimsFeed` (BRD-7); `MarketingFeed`: none | Claims connected; Marketing parked (OQ45) |
 | `placement.service.PaymentConfirmationSource` | `CashieringPaymentConfirmationSource` (`CASHIERING`) next to placement's own report source | - |
 
 `FlowInAndPortsIT` asserts this table. Inbound flow-in feeds and their handlers:
@@ -1500,7 +1503,7 @@ replacement; it is not built in Operations.
 | Marketing activities MKTID.010/012/013 (2307 and DP PR tagging) | OQ45 | 2307 tagging screen and `CWT_TAGS` / `COLLECTION_CWT2307`; DP list | cashiering, commission | **Superseded by BRD-4** (Collections dispositions); MKTID.001-009/011 stay in Operations as built |
 | Disbursement system, DV numbers and statuses, re-sending returned requests | OQ02 | `DisbursementGateway` and the in-app queue | opsledger, remittance, cashiering, commission | **Superseded by BRD-5**: Disbursement module implements the gateway |
 | GL accounts of every Operations event, bank / cash accounts, subledger settlement of DTIP and PR open items | OQ07 | event types with demo rules; `CASH_BANK_ACCOUNT` / `CASH_ON_HAND_ACCOUNT`; ledger movements | all | **Partly superseded by BRD-5** (GL kept in BIBS; accounts still to be given) |
-| Marketing and Claims feeds | OQ45, OQ46 | `MarketingFeed`, `ClaimsFeed` without adapters; special remittance note | opsledger, remittance | parked (Claims BRD) |
+| Marketing and Claims feeds | OQ45, OQ46 | `MarketingFeed` without adapter; `ClaimsFeed` served in-app by `brokerclaims` (BRD-7) | opsledger, remittance | Marketing parked; Claims connected |
 | Insurer channels (SFTP / API) | OQ22, OQ29, OQ38 | `InsurerFileInbox`, manual upload | opsledger, remittance, prodrecon, commission | parked |
 | Shared drive | OQ17 | `FileDropPort` to the extract repository | opsledger, remittance, prodrecon | parked (FS04 named by BRD-4) |
 | BOOK rate source | OQ08 | `RateType.BOOK` kept by hand | opsledger | parked (proposal in BRD-5) |

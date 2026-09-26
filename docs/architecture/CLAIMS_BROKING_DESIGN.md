@@ -510,7 +510,97 @@ compile only against it.
 - **Flyway left.** Schema V1022 (CL1-A), V1023-V1024 (CL1-B), V1025 held (CLQ14), V1026-V1029 free; demo V1921
   (CL1-A), V1922-V1929 free.
 
-## 18. CL1-B status, follow-up and reports: as built
+## 18. CL1-A claim record and insurers: as built
+
+What wave CL1-A built on the CL0 foundation, and the contracts CL1-B and CL2 use. Sub-packages `cover`, `claim`,
+`insurer`, `location`, `feed` and `demo` of `brokerclaims`; frontend `features/brokerclaims/{record,cover,insurer,
+location}`.
+
+- **Cover** (`cover.service.CoverService`, read-only). The cover is the account (ARN) and a **policy year of its term,
+  1 = first year** (the unit of `opsledger` invoices and of `acc_account_policy`), not the calendar year of the FRS
+  test data; the period of year n is `period_from + (n-1)` years to the next anniversary or `period_to`. Search by
+  ARN / assured (`AccountQueryService.search`) or policy number (read-only SQL on `acc_account_policy`), at least 3
+  characters (`BCL_SEARCH_TOO_SHORT`), no branch filter. `snapshot(account, year, lossDate)` builds `CoverSnapshot`
+  (policy number of the year, version = booked endorsements of the year effective on or before the loss date,
+  sales stamp, invoicing branch of the year's first invoice, currency = account currency else
+  `BCL_DEFAULT_CURRENCY`). `premium(arn, year)` runs `PremiumRule` (pure) over the ledger invoices. `shares(account,
+  year)` proposes the insurers from the first live invoice's `OpsInvoiceShare`s, else the lead insurer at 100 %.
+  Opening a cover (`GET /covers/{arn}`) writes an `OPEN` audit entry on the account.
+- **Record** (`claim.service.ClaimRecordingService.record(companyId, NewClaim)`). Validates the cover, loss nature,
+  claim type and description, the LOVs, the dates (`LossDetails` invariants), the first status (`NEW_COMPLETE_DOCS` /
+  `NEW_INCOMPLETE_DOCS`, default `NEW_INCOMPLETE_DOCS`), an insurer-reported claim with an insurer claim number;
+  refuses `MIGRATED` (CLQ14). A loss date outside the policy year is `BCL_LOSS_OUTSIDE_COVER` unless
+  `confirmOutsidePeriod`. Number `BCL-<yyyy>-nnnnnn`; handler = current user, unit and branch from `bcl_handler` and
+  `sec_user.home_branch_id` (`HandlerDirectory`); locations and insurer lines linked; premium checked (alert
+  `BCL_UNPAID_PREMIUM_CLAIM:<id>`); workflow case `BCL_CLAIM` started in `NEW` (assigned to the recorder); audit
+  `CREATE`; in-app notice `BCL_CLAIM_ASSIGNED` to the account officer (FR-CL-011).
+- **Contract to CL1-B: `claim.service.ClaimRecorded`** `(claimId, companyId, claimNo, initialStatus, recordedBy,
+  recordedAt)`, published inside the recording transaction after everything is saved. The status engine listens
+  (`@EventListener`), sets the first status and the next follow-up date and publishes `ClaimStatusChanged`. Until
+  CL1-B lands a recorded claim has phase `NEW` and no status.
+- **Premium and authorization** (`claim.service.PremiumCheckService`): `check(claim)`, `recheck(companyId, id)`,
+  `authorize(companyId, id, evidenceAttachmentId)` (`CAC-<yyyy>-nnnnnn`, once; `BCL_PREMIUM_UNPAID` "The premium of
+  <ARN> <year> is not fully paid. The authorization code cannot be generated"; DIRECT_PAYMENT under
+  `BCL_AUTH_DP_POLICY` ALLOW / CONFIRM (evidence = an attachment of the claim, `BCL_DP_EVIDENCE_REQUIRED`) / BLOCK).
+  The handler gets an in-app notice when a blocking check becomes PAID. `ClaimOperationsSync` +
+  `OperationsListener` (after commit, own transaction): `InvoiceMovementPosted` / `InvoiceFlagChanged` re-check the
+  open claims of the invoice's ARN and year; `RemittanceStatusChanged` to FULLY_REMITTED notifies the handlers of
+  claims in an `awaiting_premium_remittance` status (`BCL_PREMIUM_REMITTED`); `OpsInvoiceBooked` of an endorsement
+  re-checks and notifies `BCL_NEWER_COVER_VERSION`. Job `BCL_PREMIUM_RECHECK` (`PremiumRecheckJob`, cron
+  `bcl-premium-recheck-cron`) re-checks open unauthorised claims.
+- **Details** (`ClaimDetailsService`): `amendLoss` (BCL_RECORD), `correctReportedDate` (BCL_STATUS_UPDATE, reason
+  from `BCL_OVERRIDE_REASON`, refused on a closed claim), `overrideClaimant` (BCL_CLAIMANT_OVERRIDE),
+  `refreshCover` (policy number, sum insured, sales stamp, branch; returns the changes) and `useLatestVersion`.
+  Every change writes an audit entry with old and new values; CL1-B's `bcl_claim_event` timeline may read them.
+- **Locations** (`location.service.ClaimLocationService`, entity `ClaimLocation` on `bcl_claim_location`): link /
+  describe / remove locations of the claim's own cover only (`BCL_LOCATION_NOT_ON_COVER`, `BCL_LOCATION_LINKED`).
+  **Insurer location references** (`LocationRefService`, entity `LocationRef` on `bcl_location_ref`, V1022): one open
+  reference per location and insurer; a new one end-dates the open one the day before (`BCL_EFFECTIVE_DATE` "The
+  effective date must be after <dd-MMM-yyyy>"); `validOn(company, arn, date)` feeds every claim location.
+- **Insurers** (`insurer.service.InsurerClaimService`, entity `InsurerClaim` on `bcl_insurer_claim`): `add`, `number`
+  (a line that already has a number keeps it; the new number becomes a further line of the insurer),
+  `changeShare`, `amendReserve` (`InsurerReserveChange` history on `bcl_reserve_change`, V1022; no journal), `assignAdjuster` (per insurer line).
+  Duplicates on the claim are refused (`BCL_INSURER_CLAIM_NO_DUPLICATE`); a number found on another claim is
+  `BCL_INSURER_CLAIM_NO_REUSED` until confirmed, then raises the alert. **For CL1-B:** `InsurerClaim.settled(amount)`
+  records the settled amount of a line; the claim-level adjuster (`ClaimProgress.adjusterCode`) stays CL1-B's.
+- **Insurer updates** (`InsurerUpdateService`, entity `InsurerUpdate`, V1022, insert-only; allowed on closed claims;
+  a correction refers to the update it corrects) and the **loss advice** (`LossAdviceService` + `LossAdviceDocument`):
+  one advice per insurer from template `BCL_LOSS_ADVICE` (PDF on the company letterhead), e-mailed through
+  `MessageService` (purpose `BCL_LOSS_ADVICE`, record link `BrokerClaim`), stored as document type `CLAIM_REPORT` on
+  the claim (nominated name) and linked to the account and the client (decision D3).
+- **Feed** (`feed.service.InAppClaimsFeed implements ClaimsFeed`): feed `CLAIMS_SPECIAL_REMIT`, one item per
+  non-cancelled invoice of the claim's ARN and year not FULLY_REMITTED / NOT_APPLICABLE, for open claims whose
+  status carries `awaiting_premium_remittance` and `status_since >= since`; fields `claimNo, arn, policyYear, status,
+  handler, statusSince`. The remittance module now refuses a CLAIMS-condition special remittance without such a claim
+  (the remittance test uses another condition for its generic case; `ClaimsFeedIT` covers the claims case).
+- **Providers**: `BrokerClaimClientRecords` (client 360), `BrokerClaimRetentionProvider` (record type
+  `BROKER_CLAIM`, statuses of the rule are claim phases, last activity = `updated_at` else `created_at`).
+- **Bulk handlers**: `BCL_INSURER_UPDATE` (claim no., or insurer + insurer claim no.; update date, source, reference,
+  remarks; handler notified), `BCL_INSURER_CLAIM_NO` (claim no., insurer, number, reported on) and
+  `BCL_LOCATION_REF` (ARN, item no., insurer, reference, effective from). Every row is validated before commit; the
+  bulk framework commits the valid rows only, so "refuse the whole file" is the reviewer's decision on the review
+  screen (FRS v1.1 note).
+- **API** (`/api/v1/broker-claims`, every call takes `companyId`): `GET covers?by&q`, `GET covers/{arn}`,
+  `GET covers/{arn}/claim-draft?policyYear&lossDate`; `POST /` (record), `GET /{id}`, `GET /search?q`,
+  `PUT /{id}/loss`, `POST /{id}/reported-date|claimant|refresh-cover|latest-version|premium-check|authorize`;
+  `GET|POST /{id}/locations`, `PUT|DELETE /{id}/locations/{itemNo}`; `GET|POST /{id}/insurers`,
+  `GET /{id}/insurers/reserve-history`, `POST /{id}/insurers/{line}/number|reserve|adjuster`, `PUT .../share`;
+  `GET|POST /{id}/updates`; `GET|POST /{id}/loss-advice`; `GET|POST location-refs`, `GET location-refs/by-cover/{arn}`.
+- **Screens**: Record Claim (cover search, cover card with premium panel, locations picker, loss, insurers,
+  confirmation dialog), Cover Lookup (read-only tabs), Insurer Location References, and the claim record
+  `ClaimPage` with the summary card and flags, `WorkflowPanel`, actions (Generate Authorization Code, Send Loss
+  Advice, Refresh Cover Data, Use Latest Version), the special remittance link when the status awaits the premium
+  remittance, and tabs Details, Locations, Insurers & Updates, Reserve & Settlement, Documents. **CL1-B** adds its
+  status actions to `record/ClaimActions.tsx` and its Diary / History tabs to `record/ClaimPage.tsx` (`TABS`).
+- **Demo**: V1921 insurer location references of the booking demo property covers; `BrokerClaimsDemoData`
+  (`@Order(130)`, demo profile, idempotent, `load()` for CL1-B to extend) records a motor claim (authorised when
+  paid), a property typhoon claim with location, insurer number, update and reserve, a direct-payment claim and an
+  insurer-reported claim.
+- **Parked / open**: meaning of the authorization code (CLQ01); claims mailbox of the insurer (the placement
+  mailboxes are proposed, CLQ11 / CLQ22); location lists per endorsement (CLQ02); the remittance special form does not
+  read `?invoiceNo=&condition=CLAIMS` yet (UI ask to the remittance owner, section 12.2).
+
+## 19. CL1-B status, follow-up and reports: as built
 
 What wave CL1-B built on top of section 17 (package `brokerclaims.{status,diary,home,setup,report,service}`).
 

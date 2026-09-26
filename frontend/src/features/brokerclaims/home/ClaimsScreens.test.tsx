@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { claimStatusApi } from '../status/api';
 import type { ClaimProgress } from '../status/api';
+import { ClaimStatusActions } from '../status/ClaimStatusActions';
 import { ClaimStatusPanel } from '../status/ClaimStatusPanel';
 import { HistoryTab } from '../status/HistoryTab';
 import { diaryApi } from '../diary/api';
@@ -122,7 +123,12 @@ describe('Claims Handling screens', () => {
           'BCL_ACTION_PLAN',
         ]),
         'clmtl',
-      )(<ClaimStatusPanel claimId={7} companyId={1} />),
+      )(
+        <>
+          <ClaimStatusPanel claimId={7} companyId={1} />
+          <ClaimStatusActions claimId={7} companyId={1} />
+        </>,
+      ),
     );
     expect(await screen.findByText('Follow-up overridden')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Change Status' })).toBeInTheDocument();
@@ -141,7 +147,12 @@ describe('Claims Handling screens', () => {
       claimsWrapper(
         new Set(['BCL_VIEW', 'BCL_STATUS_UPDATE', 'BCL_REOPEN']),
         'clmth',
-      )(<ClaimStatusPanel claimId={7} companyId={1} />),
+      )(
+        <>
+          <ClaimStatusPanel claimId={7} companyId={1} />
+          <ClaimStatusActions claimId={7} companyId={1} />
+        </>,
+      ),
     );
     await user.click(await screen.findByRole('button', { name: 'Reopen' }));
     expect(screen.getByRole('dialog')).toBeInTheDocument();

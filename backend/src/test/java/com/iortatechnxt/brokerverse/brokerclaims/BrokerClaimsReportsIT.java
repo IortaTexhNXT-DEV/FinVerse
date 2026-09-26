@@ -31,7 +31,7 @@ import org.springframework.security.access.AccessDeniedException;
  * rights follow the FRS.
  */
 @IntegrationTest
-class ClaimsReportsIT {
+class BrokerClaimsReportsIT {
 
   private static final String UH = "clmuh";
   private static final String OFFICER = "clmofficer";

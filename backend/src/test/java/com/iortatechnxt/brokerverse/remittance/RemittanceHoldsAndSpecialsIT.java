@@ -198,11 +198,11 @@ class RemittanceHoldsAndSpecialsIT {
             () ->
                 specials.request(
                     fx.company(),
-                    new NewRequest(paid.getInvoiceNo(), "CLAIMS", "Claim payment pending"),
+                    new NewRequest(paid.getInvoiceNo(), "INSTALLMENT_DUE", "Installment due"),
                     RequestSource.SCREEN));
     assertThat(request.getRequestNo()).startsWith("SPR-");
     assertThat(request.getStage()).isEqualTo(SpecialStage.FOR_APPROVAL);
-    assertThat(request.getValidationNote()).contains("not connected");
+    assertThat(request.getValidationNote()).startsWith("Validated");
     Long id = request.getId();
     assertThatThrownBy(
             () ->

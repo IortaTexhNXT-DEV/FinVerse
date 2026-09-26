@@ -46,6 +46,7 @@ class ClaimStatusIT {
   @Autowired private AsUser as;
   @Autowired private JdbcTemplate jdbc;
   @Autowired private ApplicationEvents events;
+  @Autowired private ClaimsFixtures recording;
 
   private String stage(Long claimId) {
     return jdbc.queryForObject(
@@ -307,5 +308,19 @@ class ClaimStatusIT {
     assertThat(fixtures.column(id, "phase", String.class)).isEqualTo("CLOSED");
     assertThat(fixtures.column(id, "settlement_type_code", String.class))
         .isEqualTo("CLOSED_DENIED");
+  }
+
+  @Test
+  void aRecordedClaimGetsItsFirstStatusFromTheRecordingEvent() {
+    Long id = recording.motorClaim(recording.motorInvoice().getArn()).getId();
+    assertThat(fixtures.column(id, "status_code", String.class)).isEqualTo("NEW_INCOMPLETE_DOCS");
+    assertThat(fixtures.column(id, "phase", String.class)).isEqualTo("NEW");
+    assertThat(fixtures.column(id, "next_follow_up_date", LocalDate.class))
+        .isEqualTo(BrokerClaimFixtures.today().plusDays(7));
+    assertThat(stage(id)).isEqualTo("NEW");
+    assertThat(
+            events.stream(ClaimStatusChanged.class)
+                .anyMatch(e -> e.claimId().equals(id) && e.fromStatus() == null))
+        .isTrue();
   }
 }

@@ -76,8 +76,10 @@ public class ClaimStatusService {
   /**
    * Sets the first status of a claim being recorded (FR-CL-042 R1): called by the recording service
    * of CL1-A inside its transaction, after the claim is saved and its {@code BCL_RECORD} permission
-   * checked. Opens the workflow case in the stage of the status's phase and publishes {@code
-   * ClaimStatusChanged} with {@code from = null}.
+   * checked (through {@code ClaimRecordedListener}). The recording rules choose the first status
+   * (a newly filed one), so the status access matrix is not applied to it. Opens or aligns the
+   * workflow case in the stage of the status's phase and publishes {@code ClaimStatusChanged} with
+   * {@code from = null}.
    *
    * @param claim saved claim without a status
    * @param statusCode first status
@@ -89,7 +91,7 @@ public class ClaimStatusService {
       throw new BusinessRuleException(
           "BCL_STATUS_ALREADY_SET", "Claim " + claim.getClaimNo() + " already has a status");
     }
-    apply(claim, statusCode, remark);
+    apply(claim, statusCode, remark, false);
     return claim;
   }
 
@@ -109,7 +111,7 @@ public class ClaimStatusService {
       throw new BusinessRuleException(
           "BCL_STATUS_UNCHANGED", "The claim already has the status " + label(statusCode));
     }
-    apply(claim, statusCode, remark);
+    apply(claim, statusCode, remark, true);
     return claim;
   }
 
@@ -134,7 +136,7 @@ public class ClaimStatusService {
         .toList();
   }
 
-  private void apply(Claim claim, String statusCode, String remark) {
+  private void apply(Claim claim, String statusCode, String remark, boolean checkMatrix) {
     if (statusCode == null || statusCode.isBlank()) {
       throw new BusinessRuleException("BCL_STATUS_REQUIRED", "Select the new status");
     }
@@ -149,7 +151,7 @@ public class ClaimStatusService {
               + claim.getClaimNo()
               + " has left the newly filed phase; set an in-progress or temporary closure status");
     }
-    if (!CurrentUser.SYSTEM.equals(currentUser.username())) {
+    if (checkMatrix && !CurrentUser.SYSTEM.equals(currentUser.username())) {
       matrix.requireAllowed(currentUser.username(), statusCode, status.getLabel());
     }
     StatusHistory.Step from = new StatusHistory.Step(progress.getStatusCode(), current);

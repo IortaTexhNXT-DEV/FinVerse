@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
+import com.iortatechnxt.brokerverse.brokerclaims.feed.service.InAppClaimsFeed;
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringPaymentReapplier;
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringReceiptIssuer;
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringUnappliedSink;
@@ -201,7 +202,8 @@ class FlowInAndPortsIT {
     assertThat(inbox).isInstanceOf(ManualInsurerFileInbox.class);
     assertThat(fileDrop).isInstanceOf(RepositoryFileDrop.class);
     assertThat(marketingFeed.getIfAvailable()).isNull();
-    assertThat(claimsFeed.getIfAvailable()).isNull();
+    // Claims serves the claims special remittance feed in-app (BRD-7, OQ46).
+    assertThat(claimsFeed.getIfAvailable()).isInstanceOf(InAppClaimsFeed.class);
     assertThat(inbox.pending(fx.company(), "INS-MGIC", "PRODUCTION")).isEmpty();
     assertThat(inbox.transport()).isEqualTo("MANUAL_UPLOAD");
     assertThat(collection.pending(fx.company(), "COLLECTION_HOLD")).isEmpty();

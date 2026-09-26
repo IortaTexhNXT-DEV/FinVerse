@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.integration.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.iortatechnxt.brokerverse.common.runtime.ConditionalOnWorkload;
+import com.iortatechnxt.brokerverse.common.runtime.Workload;
 import com.iortatechnxt.brokerverse.events.service.EventEnvelope;
 import com.iortatechnxt.brokerverse.events.service.EventEnvelopeReader;
 import com.iortatechnxt.brokerverse.events.service.EventsProperties;
@@ -16,9 +18,13 @@ import org.springframework.stereotype.Component;
  * MAIL_DISPATCH} job, which keeps retrying). Idempotent: a message already sent is skipped. When
  * Kafka is disabled this consumer does not exist and the mail relay of the messaging module
  * (delivery after commit, then the job) does the work.
+ *
+ * <p>Runs only on instances whose runtime role carries the integration workload ({@code
+ * integration} or {@code all}).
  */
 @Component
 @ConditionalOnProperty(name = EventsProperties.ENABLED_PROPERTY, havingValue = "true")
+@ConditionalOnWorkload(Workload.INTEGRATION)
 public class NotificationDeliveryConsumer {
 
   private final EventEnvelopeReader reader;

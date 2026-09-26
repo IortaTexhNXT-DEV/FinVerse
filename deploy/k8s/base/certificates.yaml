@@ -1,0 +1,67 @@
+# In-cluster certificates (ALB -> pods) from AWS Private CA through cert-manager and the AWS Private
+# CA issuer plugin, renewed automatically. The backend reloads a renewed certificate by itself
+# (spring.ssl.bundle reload-on-update); nginx needs a rollout restart (DEPLOYMENT.md). The overlay
+# sets the Private CA ARN and region.
+apiVersion: awspca.cert-manager.io/v1beta1
+kind: AWSPCAIssuer
+metadata:
+  name: bibs-private-ca
+spec:
+  arn: "arn:aws:acm-pca:<AWS_REGION>:<AWS_ACCOUNT_ID>:certificate-authority/<PRIVATE_CA_ID>"
+  region: "<AWS_REGION>"
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bibs-web-tls
+spec:
+  secretName: bibs-web-tls
+  duration: 2160h
+  renewBefore: 360h
+  privateKey: { algorithm: RSA, size: 2048, rotationPolicy: Always }
+  usages: [server auth]
+  commonName: bibs-web.bibs.svc
+  dnsNames: [bibs-web, bibs-web.bibs.svc, bibs-web.bibs.svc.cluster.local]
+  issuerRef: { group: awspca.cert-manager.io, kind: AWSPCAIssuer, name: bibs-private-ca }
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bibs-jobs-tls
+spec:
+  secretName: bibs-jobs-tls
+  duration: 2160h
+  renewBefore: 360h
+  privateKey: { algorithm: RSA, size: 2048, rotationPolicy: Always }
+  usages: [server auth]
+  commonName: bibs-jobs.bibs.svc
+  dnsNames: [bibs-jobs, bibs-jobs.bibs.svc, bibs-jobs.bibs.svc.cluster.local]
+  issuerRef: { group: awspca.cert-manager.io, kind: AWSPCAIssuer, name: bibs-private-ca }
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bibs-integration-tls
+spec:
+  secretName: bibs-integration-tls
+  duration: 2160h
+  renewBefore: 360h
+  privateKey: { algorithm: RSA, size: 2048, rotationPolicy: Always }
+  usages: [server auth]
+  commonName: bibs-integration.bibs.svc
+  dnsNames: [bibs-integration, bibs-integration.bibs.svc, bibs-integration.bibs.svc.cluster.local]
+  issuerRef: { group: awspca.cert-manager.io, kind: AWSPCAIssuer, name: bibs-private-ca }
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bibs-frontend-tls
+spec:
+  secretName: bibs-frontend-tls
+  duration: 2160h
+  renewBefore: 360h
+  privateKey: { algorithm: RSA, size: 2048, rotationPolicy: Always }
+  usages: [server auth]
+  commonName: bibs-frontend.bibs.svc
+  dnsNames: [bibs-frontend, bibs-frontend.bibs.svc, bibs-frontend.bibs.svc.cluster.local]
+  issuerRef: { group: awspca.cert-manager.io, kind: AWSPCAIssuer, name: bibs-private-ca }

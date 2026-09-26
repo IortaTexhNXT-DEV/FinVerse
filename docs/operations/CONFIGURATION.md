@@ -7,7 +7,7 @@ are for local development only.
 |---|---|---|---|
 | `SPRING_PROFILES_ACTIVE` | yes | – | `prod` in production. `seed` loads the seed data of SIT, UAT and training (never in production: the start is refused, see "Production start-up safeguards"). |
 | `BROKERVERSE_ENVIRONMENT` | yes | `local` (`seed` with the seed profile) | `brokerverse.environment`: `local`, `sit`, `uat`, `training`, `preprod` or `production`. `production` (set by the `prod` profile) turns on the start-up safeguards. |
-| `BROKERVERSE_DB_URL` | yes | `jdbc:postgresql://localhost:5432/brokerverse`; none with `prod` | JDBC URL (use `sslmode=require`). |
+| `BROKERVERSE_DB_URL` | yes | `jdbc:postgresql://localhost:5432/brokerverse`; none with `prod` | JDBC URL. Leave `sslmode` out: `BROKERVERSE_DB_SSL_MODE` applies (an `sslmode` in the URL takes precedence, and a plaintext one is refused in production). |
 | `BROKERVERSE_DB_USER` | yes | `brokerverse`; none with `prod` | Database user (owner of the schema; Flyway migrates on start). |
 | `BROKERVERSE_DB_PASSWORD` | yes | none (a local value with the `seed` profile only) | Database password (from secret store). |
 | `BROKERVERSE_DB_POOL_SIZE` | no | `20` | Hikari maximum pool size per instance. |
@@ -17,7 +17,7 @@ are for local development only.
 | `BROKERVERSE_MAX_FAILED_ATTEMPTS` | no | `5` | Consecutive failed logins that lock an account when the business parameter `LOGIN_MAX_FAILED_ATTEMPTS` is missing. The parameter (seeded with 3, BDOI NFR, CQ23) wins; administrators change it on *Administration › Parameters*. Property `brokerverse.security.max-failed-attempts`. |
 | `BROKERVERSE_ADMIN_USERNAME` | first start | `sysadmin` | Initial administrator (created only when no user exists). |
 | `BROKERVERSE_ADMIN_INITIAL_PASSWORD` | first start | – | Initial administrator password; remove after first login. |
-| `BROKERVERSE_PORT` | no | `8080` | HTTP port. |
+| `BROKERVERSE_PORT` | no | `8080` | Listener port (`8443` in the Kubernetes deployments, where it serves HTTPS). |
 | `BROKERVERSE_JOB_RECURRING_CRON` | no | `0 0 1 * * *` | Spring cron (UTC) of `RECURRING_JOURNALS`: generates the due recurring and accrual journals. |
 | `BROKERVERSE_JOB_ALERTS_CRON` | no | `0 30 1 * * *` | Spring cron (UTC) of `ALERT_DAILY_CHECKS`: evaluates the scheduled exception codes. |
 | `BROKERVERSE_JOB_RESERVE_VALUATION_CRON` | no | `-` (off) | Spring cron (UTC) of the monthly actuarial reserve valuation of the previous month. |
@@ -96,7 +96,7 @@ environment must use the same settings.
 | `BROKERVERSE_REDIS_HOST` / `BROKERVERSE_REDIS_PORT` | when enabled | `localhost` / `6379` | `spring.data.redis.host` / `port`. On AWS: the ElastiCache (Redis 7) primary endpoint. |
 | `BROKERVERSE_REDIS_USERNAME` | no | – | `spring.data.redis.username` (ElastiCache RBAC user; blank = default user). |
 | `BROKERVERSE_REDIS_PASSWORD` | when the server requires it; always in production with Redis enabled | – | `spring.data.redis.password` (ElastiCache AUTH token or RBAC password). **Secret**: from the vault. |
-| `BROKERVERSE_REDIS_TLS` | yes on AWS | `false` | `spring.data.redis.ssl.enabled`: `true` with ElastiCache in-transit encryption. |
+| `BROKERVERSE_REDIS_TLS` | yes (`true`) | `true`; `false` in the `dev`, `test` and `seed` profiles | `spring.data.redis.ssl.enabled`: `true` with ElastiCache in-transit encryption. |
 | `BROKERVERSE_REDIS_DATABASE` | no | `0` | `spring.data.redis.database`. |
 | `BROKERVERSE_REDIS_TIMEOUT` / `BROKERVERSE_REDIS_CONNECT_TIMEOUT` | no | `2s` / `5s` | Command and connect time-outs. |
 | `BROKERVERSE_REDIS_KEY_PREFIX` | no | `bv:` | `brokerverse.redis.key-prefix`: prefix of every key (`bv:cache:…`, `bv:joblock:…`, `bv:session:revoked:…`, `bv:counter:…`); use one per environment when environments share a Redis. |
@@ -111,7 +111,7 @@ environment must use the same settings.
 | `BROKERVERSE_LOGIN_FAILURE_WINDOW` | no | `P1D` | `brokerverse.security.login-protection.failed-attempt-window`: life of the shared failed-login counter of a user. The lockout itself still follows `LOGIN_MAX_FAILED_ATTEMPTS`; `sec_user.failed_attempts` stays the record. |
 | `BROKERVERSE_KAFKA_ENABLED` | yes (`true`) | `true` | `brokerverse.kafka.enabled`. `true`: the outbox is relayed to Kafka and the consumers run (archive, e-mail dispatch, dead-letter recorder); `false`: events are recorded as delivered in-process (`LOCAL`) and e-mails are sent after commit and by `MAIL_DISPATCH`. |
 | `BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS` | when enabled | `localhost:9092` | `spring.kafka.bootstrap-servers`. On AWS: the Amazon MSK bootstrap brokers (SASL/SCRAM port 9096 or TLS port 9094). |
-| `BROKERVERSE_KAFKA_SECURITY_PROTOCOL` | yes on AWS | `PLAINTEXT` | `spring.kafka.properties.security.protocol`: `SASL_SSL` on MSK with SASL/SCRAM, `SSL` with TLS only. |
+| `BROKERVERSE_KAFKA_SECURITY_PROTOCOL` | yes (`SASL_SSL`) | `SASL_SSL`; `PLAINTEXT` in the `dev`, `test` and `seed` profiles | `spring.kafka.properties.security.protocol`: `SASL_SSL` on MSK with SASL/SCRAM (production refuses anything else). |
 | `BROKERVERSE_KAFKA_SASL_MECHANISM` | with SASL | `SCRAM-SHA-512` | `spring.kafka.properties.sasl.mechanism`. |
 | `BROKERVERSE_KAFKA_SASL_JAAS_CONFIG` | with SASL; always in production with Kafka enabled | – | `spring.kafka.properties.sasl.jaas.config`, e.g. `org.apache.kafka.common.security.scram.ScramLoginModule required username="…" password="…";` (MSK secret in AWS Secrets Manager). **Secret**. |
 | `BROKERVERSE_KAFKA_CLIENT_ID` | no | `brokerverse` | `spring.kafka.client-id`. |
@@ -142,6 +142,57 @@ Dashboard KPI mapping (optional, `application.yml` or env `BROKERVERSE_DASHBOARD
 `brokerverse.dashboard.cash-groups`, `receivable-groups`, `reserve-groups` list chart-of-accounts
 statement lines (`report_group`) used for the cash, receivables and technical reserve tiles.
 
+## Runtime role, HTTPS and encryption in transit
+
+Design: [`ARCHITECTURE_OPTION_DECISION.md`](../architecture/ARCHITECTURE_OPTION_DECISION.md) sections 2 and 5;
+deployment of the four workloads: [`DEPLOYMENT.md`](DEPLOYMENT.md).
+
+**Runtime role.** One image runs as `bibs-web`, `bibs-jobs` and `bibs-integration`, each with its own role.
+
+| Role | HTTP | Scheduled jobs | Kafka consumers, outbox relay |
+|---|---|---|---|
+| `web` | user screens and APIs, actuator; `/integration/**` answers 404 | none (no task scheduler) | none; outbox rows wait for the relay of `bibs-integration` |
+| `jobs` | actuator only (health, metrics); everything else 404 | batch jobs (every `ManagedJob` of workload `BATCH`) | none |
+| `integration` | `/integration/**` and actuator | integration jobs: `EVENT_OUTBOX_RELAY`, `SCR_WATCHLIST_INGEST`, `QUOTATION_REQUEST_INTAKE` | consumers on, after-commit relay on |
+| `all` (default) | everything | all | on (when Kafka is enabled) |
+
+Manual runs from *Administration › Scheduled Jobs* execute on the instance that receives the request (a `bibs-web`
+pod); the job lock still keeps one run at a time.
+
+**Encryption in transit.** The defaults of `application.yml` are TLS for every connection; the `dev`, `test` and
+`seed` profiles switch PostgreSQL, Redis and Kafka to plaintext unless the variables below ask otherwise, so a
+seed stack on AWS (UAT) sets them explicitly (the Kubernetes base configuration does).
+
+| Variable | Required in prod | Default | Purpose |
+|---|---|---|---|
+| `BROKERVERSE_RUNTIME_ROLE` | yes | `all` | `brokerverse.runtime.role`: `web`, `jobs`, `integration` or `all` (table above). Any other value stops the start. |
+| `BROKERVERSE_SERVER_SSL_ENABLED` | yes (`true`) | `false` | `server.ssl.enabled`: HTTPS on `BROKERVERSE_PORT` with the PEM bundle `server` (`server.ssl.bundle`), TLS 1.3 and 1.2. The certificate is reloaded when the mounted files change (cert-manager rotation). |
+| `BROKERVERSE_SERVER_SSL_CERTIFICATE` | with HTTPS | – | `spring.ssl.bundle.pem.server.keystore.certificate`, e.g. `file:/etc/bibs/tls/tls.crt` (certificate and chain). |
+| `BROKERVERSE_SERVER_SSL_PRIVATE_KEY` | with HTTPS | – | `spring.ssl.bundle.pem.server.keystore.private-key`, e.g. `file:/etc/bibs/tls/tls.key`. |
+| `BROKERVERSE_DB_SSL_MODE` | yes (`verify-full`) | `verify-full`; `prefer` in the `dev`, `test` and `seed` profiles | PostgreSQL driver `sslmode` (`spring.datasource.hikari.data-source-properties.sslmode`). Amazon RDS with `rds.force_ssl=1`. |
+| `BROKERVERSE_DB_SSL_ROOT_CERT` | with `verify-*` | `/etc/bibs/rds-ca/global-bundle.pem` | PostgreSQL driver `sslrootcert`: the RDS CA bundle (`global-bundle.pem`, mounted from the ConfigMap `rds-ca-bundle`). |
+
+`BROKERVERSE_REDIS_TLS` and `BROKERVERSE_KAFKA_SECURITY_PROTOCOL` are in the Redis and Kafka table above. SMTP uses
+STARTTLS (`MAIL_SMTP_STARTTLS`, default `true`).
+
+**API gateway tokens of `/integration/**`** (`IntegrationSecurityConfig`, a security chain separate from the user
+chain). Only OAuth 2.0 access tokens issued by Apigee X are accepted there, and they are refused on the user APIs; a
+user token issued by BIBS is refused on `/integration/**`. Stateless: no session, no cookie.
+
+| Variable | Required in prod | Default | Purpose |
+|---|---|---|---|
+| `BROKERVERSE_INTEGRATION_JWK_SET_URI` | on `integration` / `all` | – | `brokerverse.integration.security.jwk-set-uri`: HTTPS address of the Apigee JSON Web Key Set. Without it (or issuer / audiences) every `/integration` call is refused. |
+| `BROKERVERSE_INTEGRATION_ISSUER` | on `integration` / `all` | – | Expected `iss` claim. |
+| `BROKERVERSE_INTEGRATION_AUDIENCES` | on `integration` / `all` | – | Comma-separated accepted `aud` values (one must be present). |
+| `BROKERVERSE_INTEGRATION_SCOPE_CLAIM` | no | `scope` | Claim carrying the scopes (space-separated string or list). |
+| `BROKERVERSE_INTEGRATION_JWS_ALGORITHMS` | no | `RS256` | Accepted signature algorithms (asymmetric only). |
+| `BROKERVERSE_INTEGRATION_CLOCK_SKEW` | no | `PT60S` | Tolerance on `exp` / `nbf`. |
+| `BROKERVERSE_INTEGRATION_PING_SCOPES` | no | – (any valid token) | Scopes required by `GET /integration/v1/ping`, the connectivity check of an Apigee proxy (answers the client id and scopes of the token). |
+| `BROKERVERSE_INTEGRATION_SECURITY_APIS_<NAME>_PATH` / `_SCOPES` | per API | – | `brokerverse.integration.security.apis.<name>.path` / `.scopes`: one rule per published API, a path pattern (e.g. `/integration/v1/receipts/**`) and the scopes the token must all carry. A path under `/integration/` without a rule is refused (403); the most specific matching pattern applies. |
+
+Answers: no or invalid token (signature, issuer, audience, expiry) 401 with `WWW-Authenticate: Bearer`; valid token
+without a required scope, or a path without a rule, 403.
+
 ## Production start-up safeguards
 
 `ProductionSafeguards` (package `config`, registered in `META-INF/spring.factories`) checks the resolved
@@ -156,8 +207,14 @@ every problem in one message, when:
 - mail delivery is on (`BROKERVERSE_MAIL_ENABLED=true`) and `MAIL_HOST`, or with SMTP authentication
   `MAIL_USERNAME` / `MAIL_PASSWORD`, is missing;
 - Redis is on (`BROKERVERSE_REDIS_ENABLED`, default `true`) and `BROKERVERSE_REDIS_PASSWORD` is missing;
-- Kafka is on (`BROKERVERSE_KAFKA_ENABLED`, default `true`) and the protocol is not SASL or
-  `BROKERVERSE_KAFKA_SASL_JAAS_CONFIG` is missing.
+- Kafka is on (`BROKERVERSE_KAFKA_ENABLED`, default `true`) and `BROKERVERSE_KAFKA_SASL_JAAS_CONFIG` is missing;
+- a connection could run in plaintext: PostgreSQL `sslmode` (URL or `BROKERVERSE_DB_SSL_MODE`) other than
+  `verify-full` / `verify-ca`, Redis on without TLS (`BROKERVERSE_REDIS_TLS`), Kafka on with a protocol other than
+  `SASL_SSL`, or the HTTP listener without TLS (`BROKERVERSE_SERVER_SSL_ENABLED`, and then
+  `BROKERVERSE_SERVER_SSL_CERTIFICATE` / `_PRIVATE_KEY` missing);
+- the instance serves `/integration/**` (runtime role `integration` or `all`) and `BROKERVERSE_INTEGRATION_JWK_SET_URI`,
+  `BROKERVERSE_INTEGRATION_ISSUER` or `BROKERVERSE_INTEGRATION_AUDIENCES` is missing, or the runtime role is not one
+  of `web`, `jobs`, `integration`, `all`.
 
 The base `application.yml` holds no password or signing key. Only the `seed` profile (local stacks, SIT, UAT and
 training) and the automated tests carry local values, and the `seed` profile is refused in production.

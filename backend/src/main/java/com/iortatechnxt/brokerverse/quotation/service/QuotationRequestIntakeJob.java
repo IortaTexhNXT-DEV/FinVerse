@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.quotation.service;
 
+import com.iortatechnxt.brokerverse.common.runtime.Workload;
 import com.iortatechnxt.brokerverse.system.service.JobOutcome;
 import com.iortatechnxt.brokerverse.system.service.ManagedJob;
 import java.time.LocalDate;
@@ -40,6 +41,16 @@ public class QuotationRequestIntakeJob implements ManagedJob {
   @Override
   public String description() {
     return "Stores the quotation requests received from source systems (HLS) in the request inbox";
+  }
+
+  /**
+   * Takes in the requests of source systems: runs on the integration deployment.
+   *
+   * @return {@link Workload#INTEGRATION}
+   */
+  @Override
+  public Workload workload() {
+    return Workload.INTEGRATION;
   }
 
   @Override

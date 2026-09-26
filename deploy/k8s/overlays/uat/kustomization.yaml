@@ -1,0 +1,43 @@
+# User acceptance test environment (ap-southeast-1), with the seed data (SIT/UAT users) of the seed
+# profile. Transport security is the same as production: the base ConfigMap sets TLS for PostgreSQL,
+# Redis and Kafka explicitly, whatever the profile. Build: kubectl kustomize deploy/k8s/overlays/uat
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+  - environment.yaml
+components:
+  - ../../components/environment
+images:
+  - name: bibs-backend
+    newName: "<ECR_REGISTRY>/bibs-backend"
+    newTag: "<RELEASE_TAG>"
+  - name: bibs-frontend
+    newName: "<ECR_REGISTRY>/bibs-frontend"
+    newTag: "<RELEASE_TAG>"
+patches:
+  - target: { kind: ConfigMap, name: bibs-backend-config }
+    patch: |-
+      - op: replace
+        path: /data/SPRING_PROFILES_ACTIVE
+        value: seed
+      - op: replace
+        path: /data/BROKERVERSE_ENVIRONMENT
+        value: uat
+      - op: replace
+        path: /data/BROKERVERSE_ALLOWED_ORIGINS
+        value: "https://<BIBS_UAT_HOST>"
+      - op: replace
+        path: /data/BROKERVERSE_DB_POOL_SIZE
+        value: "10"
+  - target: { kind: HorizontalPodAutoscaler, name: bibs-web }
+    patch: |-
+      - op: replace
+        path: /spec/maxReplicas
+        value: 4
+  # Smaller pods than production.
+  - target: { kind: Deployment, name: bibs-jobs }
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value: { requests: { cpu: 500m, memory: 2Gi }, limits: { cpu: "2", memory: 3Gi } }

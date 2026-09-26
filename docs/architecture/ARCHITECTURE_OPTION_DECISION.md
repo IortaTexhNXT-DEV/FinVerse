@@ -117,6 +117,8 @@ Istio ambient mode) can be added at the platform layer without any change to BIB
 | Kubernetes manifests / Helm values: four deployments, HPA, PodDisruptionBudgets, NetworkPolicies (deny by default), IRSA service accounts, ALB ingress annotations (internal, HTTPS backend, WAF ACL) | `deploy/k8s/**` |
 | Documentation: technical and deployment architecture (deliverable 12), BOM (deliverable 4), IER restatement | docs |
 
+Status: built (INF0); the as-built notes of each item are in section 5.5.
+
 ### 5.4 Adopted (BDOI, 26-Sep-2026: "go ahead with the best practices")
 
 | # | Decision | Adopted |
@@ -128,3 +130,14 @@ Istio ambient mode) can be added at the platform layer without any change to BIB
 
 These are implemented in build step INF0 (5.3). Only the connectivity details (item 3) and the certificate issuance
 (item 4) need BDO IT to act; no further decision is open.
+
+### 5.5 As built (INF0)
+
+| Item | As built |
+|---|---|
+| Workload role switch | `brokerverse.runtime.role` (`BROKERVERSE_RUNTIME_ROLE`) = `web`, `jobs`, `integration`, `all` (default, for local, test and seed stacks). Package `common.runtime`: `RuntimeRole`, `Workload`, `@ConditionalOnWorkload`. Scheduling is enabled only for roles with scheduled work (`config.SchedulingConfiguration` replaces the global `@EnableScheduling` of `ApplicationConfig`); `JobScheduler` registers a `ManagedJob` only when the role runs its `workload()` (`BATCH` by default; `INTEGRATION` for `EVENT_OUTBOX_RELAY`, `SCR_WATCHLIST_INGEST`, `QUOTATION_REQUEST_INTAKE`). The Kafka consumers are `@ConditionalOnWorkload(INTEGRATION)`; the after-commit outbox drain runs only there. `config.RuntimeRoleRequestFilter` limits HTTP: `web` everything but `/integration/**`, `jobs` the actuator only, `integration` `/integration/**` and the actuator. Tests: `RuntimeRoleContextTest`, `RuntimeRoleRequestFilterTest`, `OutboxRelayRoleTest` |
+| Backend HTTPS, nginx TLS | `server.ssl` with the PEM bundle `server` from the mounted cert-manager secret (`BROKERVERSE_SERVER_SSL_*`), TLS 1.3 / 1.2, reloaded on rotation; off in dev and test (`ServerTlsTest`). nginx TLS listener on 8443 in `deploy/nginx/default.conf.template`, mounted over the frontend image's template in Kubernetes (the image and docker compose are unchanged) |
+| Database, Redis, Kafka TLS | Defaults outside the `dev`, `test`, `seed` profiles: PostgreSQL `sslmode=verify-full` with the RDS CA bundle (`BROKERVERSE_DB_SSL_MODE`, `BROKERVERSE_DB_SSL_ROOT_CERT`), Redis TLS on, Kafka `SASL_SSL`. `ProductionSafeguards` refuses a production start with a plaintext database, Redis or Kafka connection or an HTTP listener without TLS |
+| Apigee token validation | `config.IntegrationSecurityConfig`: a separate, stateless security chain for `/integration/**` validating Apigee-issued OAuth 2.0 JWTs against the configured key set (issuer, audience, validity, asymmetric algorithms only) and the scopes of a per-API rule (`brokerverse.integration.security.apis.*`); paths without a rule are refused. User tokens are refused there and Apigee tokens on the user APIs. Connectivity check `GET /integration/v1/ping`. Test: `IntegrationApiSecurityIT` (locally generated key set) |
+| Kubernetes | `deploy/k8s` Kustomize base with overlays `uat` and `prod`: the four deployments from one backend image, HPA for `bibs-web` and `bibs-frontend`, PodDisruptionBudgets, NetworkPolicies denying by default with the flows of 5.2, IRSA service accounts, internal ALB ingresses (HTTPS backends, WAF ACL, `/integration/*` to `bibs-integration`), probes, resources, zone spread, cert-manager certificates from an AWS Private CA issuer. Replaces `deploy/k8s/brokerverse.yaml`. Deployment guide: `docs/operations/DEPLOYMENT.md` |
+| Documents | CONFIGURATION.md (runtime role, HTTPS, TLS and Apigee keys), DEPLOYMENT.md, RUNBOOK.md, DEVELOPER_GUIDE.md section 10.11. Deliverables 12 and 4 and the IER restatement follow in the deliverables work |

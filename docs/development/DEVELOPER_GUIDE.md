@@ -332,6 +332,12 @@ environment variable and document it in `docs/operations/CONFIGURATION.md`. Jobs
 `FILE_SCAN_RESULTS` (every 5 minutes), `FILE_ORPHAN_RECONCILIATION`, `FILE_RETENTION` (daily) and `FILE_ECM_ARCHIVE`
 (every 15 minutes; crons `brokerverse.storage.jobs.*`). The crons of the Operations jobs built on top of the ledger are already configured (`brokerverse.jobs.prebooked-rematch-cron` … `dp-feedback-sla-cron`, see `docs/modules/OPERATIONS.md`).
 
+**Which deployment runs a job.** `ManagedJob.workload()` defaults to `Workload.BATCH`: the job is scheduled on the
+`bibs-jobs` deployment (runtime role `jobs`) and on `all`. A job that moves data to or from another system (outbox
+relay, inbound files, pulls from source systems) overrides it with `Workload.INTEGRATION` and runs on
+`bibs-integration`: today `EVENT_OUTBOX_RELAY`, `SCR_WATCHLIST_INGEST`, `QUOTATION_REQUEST_INTAKE`. A `web` instance
+has no task scheduler at all (section 10.11).
+
 Planned jobs of the later BRDs (designed, not built; names, schedules and cron properties are in each design):
 
 | Module | Jobs | Design |
@@ -423,7 +429,8 @@ through the **transactional outbox** and Kafka.
    The row commits (or rolls back) with your change; after the commit the relay sends it. The payload
    is a record of plain values: no entities, no personal data beyond identifiers, no secrets.
 3. **Consume** (asynchronous work in this application): a `@KafkaListener` bean
-   `@ConditionalOnProperty(name = EventsProperties.ENABLED_PROPERTY, havingValue = "true")`, group
+   `@ConditionalOnProperty(name = EventsProperties.ENABLED_PROPERTY, havingValue = "true")` and
+   `@ConditionalOnWorkload(Workload.INTEGRATION)` (consumers run only on `bibs-integration`), group
    `${brokerverse.kafka.consumer-group-prefix:bibs}-<purpose>`, reading the envelope with
    `EventEnvelopeReader`. Make it **idempotent** (at-least-once delivery: deduplicate on `eventId` or
    make the action repeatable) and keep a non-Kafka path when the work must also happen with Kafka off
@@ -504,6 +511,33 @@ tables move in build step ST1 (plan in section 7).
   (`POST /api/v1/files/inbound-uploads`, then `/upload-complete`). They are downloadable only after a clean scan.
 - **Tests** run on the local store (`brokerverse.storage.provider=local`, set in `application-test.yml`), which marks
   files clean. `LocalFileStore.markScanResult` simulates other scan results.
+
+### 10.11 Runtime roles, integration APIs and TLS – `common.runtime`, `config`
+
+One image runs as three deployments (`ARCHITECTURE_OPTION_DECISION.md` section 2), selected by
+`brokerverse.runtime.role` (`BROKERVERSE_RUNTIME_ROLE`): `web` (user screens and APIs), `jobs` (scheduled and batch
+jobs, HTTP limited to the actuator), `integration` (outbox relay, Kafka consumers, inbound files, `/integration/**`)
+and `all` (the default for local runs, tests and seed stacks).
+
+- **Never test the role in business code.** Switch a bean with `@ConditionalOnWorkload(Workload.X)`
+  (`common.runtime`); schedule work as a `ManagedJob` with the right `workload()` (10.3). Scheduling itself is on
+  only for roles with the `BATCH` or `INTEGRATION` workload (`config.SchedulingConfiguration`), and
+  `config.RuntimeRoleRequestFilter` answers 404 to the paths a role does not serve.
+- **System-to-system APIs** go under `/integration/v1/...` in an `integration.api` controller. They are protected
+  by the separate chain `config.IntegrationSecurityConfig` (Apigee X OAuth 2.0 tokens: issuer, audience, scopes);
+  add a rule `brokerverse.integration.security.apis.<name>` (path and scopes) in `application.yml` and document it
+  in CONFIGURATION.md, otherwise the path is refused. Do not use `@PreAuthorize` user permissions there: the caller
+  is a system, identified by the token's client id and scopes.
+- **Tests.** `RuntimeRoleContextTest` shows which schedulers, jobs and consumers each role starts;
+  `IntegrationApiSecurityIT` signs gateway tokens with a key set it serves itself (copy its helpers for a new
+  integration API).
+- **TLS.** Outside the `dev`, `test` and `seed` profiles PostgreSQL (`verify-full`), Redis and Kafka (`SASL_SSL`)
+  default to TLS and production refuses plaintext (CONFIGURATION.md "Runtime role, HTTPS and encryption in
+  transit"). Locally nothing changes: the `seed` profile keeps plaintext connections to the compose services.
+  To try HTTPS locally set `BROKERVERSE_SERVER_SSL_ENABLED=true` and point `BROKERVERSE_SERVER_SSL_CERTIFICATE` /
+  `_PRIVATE_KEY` at a PEM certificate and key (`file:...`).
+- **Run one role locally**: `BROKERVERSE_RUNTIME_ROLE=web SPRING_PROFILES_ACTIVE=seed mvn spring-boot:run` (start a
+  second instance with `jobs` or `integration` on another `BROKERVERSE_PORT`).
 
 ## 11. Module documentation
 

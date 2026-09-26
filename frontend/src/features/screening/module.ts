@@ -1,4 +1,4 @@
-import { ShieldAlert } from 'lucide-react';
+import { History, ShieldAlert, UserSearch } from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -18,6 +18,20 @@ export const screeningModule: FeatureModule = {
       icon: ShieldAlert,
       permission: 'SCR_VIEW',
       component: lazy(() => import('./ScreeningHomePage')),
+    },
+    {
+      path: '/screening/matches',
+      label: 'Matches',
+      icon: UserSearch,
+      permission: 'SCR_VIEW',
+      component: lazy(() => import('./matches/MatchesPage')),
+    },
+    {
+      path: '/screening/runs',
+      label: 'Screening Runs',
+      icon: History,
+      permission: 'SCR_VIEW',
+      component: lazy(() => import('./matches/RunsPage')),
     },
   ],
 };

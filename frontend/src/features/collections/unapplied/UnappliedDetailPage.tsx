@@ -82,8 +82,7 @@ function Facts({ row }: Readonly<{ row: UnappliedRow }>) {
 
 function Summary({ row }: Readonly<{ row: UnappliedRow }>) {
   const status = cashieringStatus(row.cashieringStatus);
-  const disposition =
-    row.dispositionCode === undefined ? '—' : humanize(row.dispositionCode);
+  const disposition = row.dispositionCode === undefined ? '—' : humanize(row.dispositionCode);
   return (
     <RecordSummary
       title={row.payor ?? 'Unknown payor'}

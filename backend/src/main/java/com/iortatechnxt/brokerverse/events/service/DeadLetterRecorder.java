@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.events.service;
 
+import com.iortatechnxt.brokerverse.common.runtime.ConditionalOnWorkload;
+import com.iortatechnxt.brokerverse.common.runtime.Workload;
 import com.iortatechnxt.brokerverse.events.service.DeadLetterStore.DeadLetter;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
@@ -15,9 +17,13 @@ import org.springframework.stereotype.Component;
  * Records every message of the dead-letter topics in {@code evt_dead_letter} with the original
  * topic, the failing consumer group and the exception (headers added by the dead-letter publisher),
  * for the support screen and its retry.
+ *
+ * <p>Runs only on instances whose runtime role carries the integration workload ({@code
+ * integration} or {@code all}).
  */
 @Component
 @ConditionalOnProperty(name = EventsProperties.ENABLED_PROPERTY, havingValue = "true")
+@ConditionalOnWorkload(Workload.INTEGRATION)
 public class DeadLetterRecorder {
 
   private final DeadLetterStore store;

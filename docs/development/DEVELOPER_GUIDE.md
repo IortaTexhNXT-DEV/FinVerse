@@ -70,6 +70,7 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
 | Business event for other systems / async work | `events.service.IntegrationEventPublisher.publish(IntegrationEvent)` in your transaction (§10.8) |
 | Cached reference-data lookup | a `cache.service.CacheSpec` bean + `@Cacheable` read method returning records (§10.9) |
 | Company / branch codes and names on hot paths | `organization.service.OrganizationDirectory` (cached records) |
+| File content (documents, reports, uploads) | `storage.service.StoredFileService` over the port `common.storage.FileStore` (S3); never a `bytea` column (§10.10) |
 
 ## 3. Coding conventions (Java)
 
@@ -113,7 +114,8 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
   | V800–V889 | broking business modules (crm V800s, catalog V810s, account V820s, quotation V830s, non-package V840s, placement V850s, issuance V860s, booking V870s, NB reports V880s) |
   | V813–V819 | catalog extensions and Product Maintenance (catalog V813–V815, `productmaint` V816–V819); the version columns of account, quotation and booking are V821, V831 and V871 in their own ranges. Planned contract changes of later BRDs in the owners' ranges (V822 built): V822 account business type (work item BT0, shared by Renewal, Employee Benefits and Submitted Policies; built by EB E0), and (designed, not built) V851 placement hold-cover re-assignment and V861 issuance extraction kind (Submitted Policies); see `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
   | V890–V899 | Accounting, Disbursement and ACSL (BRD-5): disbursement V891–V893, payrequest V894–V895, acsl V896–V897, frbs V898–V899, foundation V890 |
-  | V1000–V1899 | modules of later BRDs, 10 versions each: Collections (BRD-4) V1000–V1009, Renewal V1010–V1019, broking Claims V1020–V1029, Employee Benefits V1030–V1039, Customer Servicing Facility V1040–V1049, Sanction Screening and Risk Profiling V1050–V1059, User Access Maintenance V1060–V1069 (V1060–V1064 used; V1064 hides the insurer suite), Submitted Policies V1070–V1079, Data Migration (BRD-13) V1080–V1089, Core Replacement platform items (BRD-00 umbrella) V1090–V1099; the next BRD V1100–V1109 and so on. Data Migration uses V1086 (`opsledger`, whose range V760–V763 is full) and V1087 (`acsl`, range full) for the owners; its other owner changes go into the owners' free versions: V766 cashiering, V786 commission, V803 crm, V823 account (after BT0 V822), V873 booking, V1007 collections (designed, not built; see [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md) §24). Core Replacement waves CR-W0 to CR-W5 use V1090–V1096, V1097–V1099 reserved ([`CORE_REPLACEMENT_IMPACT.md`](../architecture/CORE_REPLACEMENT_IMPACT.md) §8) |
+  | V1000–V1899 | modules of later BRDs, 10 versions each: Collections (BRD-4) V1000–V1009, Renewal V1010–V1019, broking Claims V1020–V1029, Employee Benefits V1030–V1039, Customer Servicing Facility V1040–V1049, Sanction Screening and Risk Profiling V1050–V1059, User Access Maintenance V1060–V1069 (V1060–V1064 used; V1064 hides the insurer suite), Submitted Policies V1070–V1079, Data Migration (BRD-13) V1080–V1089, Core Replacement platform items (BRD-00 umbrella) V1090–V1099; document storage V1100–V1109 (next row); the next BRD V1110–V1119 and so on. Data Migration uses V1086 (`opsledger`, whose range V760–V763 is full) and V1087 (`acsl`, range full) for the owners; its other owner changes go into the owners' free versions: V766 cashiering, V786 commission, V803 crm, V823 account (after BT0 V822), V873 booking, V1007 collections (designed, not built; see [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md) §24). Core Replacement waves CR-W0 to CR-W5 use V1090–V1096, V1097–V1099 reserved ([`CORE_REPLACEMENT_IMPACT.md`](../architecture/CORE_REPLACEMENT_IMPACT.md) §8) |
+  | V1100–V1109 | document storage (build step ST0, platform `storage` module): V1100 `stored_file`, `sto_record_class`, `sto_legal_hold_request`; V1101 record classes, roles, grants, `FILE_LINK_TTL_SECONDS`, `FILE_QUARANTINED`; seed users V1109 in `db/seed`. The ST1 moves of module `bytea` columns go into the owners' ranges |
   | V900–V999 | seed data (`db/seed`, loaded only with the `seed` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989, Operations V990–V995, Product Maintenance V996–V998 (V996 catalog versions, V997 package requests, V998 Product Maintenance users), Accounting / Disbursement V999 (reference data and users only; its storyline runs as Java seed runners) (full) |
   | V1900–V1999 | seed data of the V1000+ modules, 10 versions each in the same order: Collections V1900–V1909, Renewal V1910–V1919, Claims V1920–V1929, Employee Benefits V1930–V1939, Customer Servicing V1940–V1949, Sanctions V1950–V1959, User Access V1960–V1969 (V1960–V1961 used), Submitted Policies V1970–V1979, Data Migration V1980–V1989, Core Replacement V1990–V1999 (runs after all V9xx seed, so it can build on the Operations and booking seed) |
 
@@ -145,7 +147,9 @@ receivable or payable records an `OpenItem` in the same transaction as its journ
   module's `report` sub-package (e.g. `underwriting.report.PremiumRegisterReport`).
 - Report codes: GI reports keep the codes of the Reports Book (e.g. `PGIBR015`); finance reports use
   `FIN-…` codes from `docs/requirements/FINANCE_REPORTS_SPEC.md`; GL reports `GL-…`.
-- Declare parameters with `ParameterSpec` (dates default via `TODAY`, `MONTH_START`, `YEAR_START`).
+- Declare parameters with `ParameterSpec` (dates default via `TODAY`, `MONTH_START`, `YEAR_START`, resolved on
+  the Manila business day, `ReportParameters.BUSINESS_ZONE`, as in the browser; tests that compute "today" for a
+  report use `LocalDate.now(ReportParameters.BUSINESS_ZONE)`, never the UTC `LocalDate.now()`).
   The UI builds the parameter form automatically; export is automatic.
 - Use `TabularReportBuilder` for grouped layouts (`groupBy` = Branch > Class > Product…), totals
   are computed for summed columns.
@@ -324,7 +328,15 @@ environment variable and document it in `docs/operations/CONFIGURATION.md`. Jobs
 `BOOKING_BATCH` (daily), `PAYMENT_CONFIRMATION_SWEEP` (hourly), `MAIL_DISPATCH` (every two minutes),
 `KYC_REVIEW_DUE`, `RETENTION_REVIEW` (monthly), the platform jobs `EVENT_OUTBOX_RELAY` (every minute),
 `EVENT_HOUSEKEEPING`, `SHARED_STATE_CLEANUP` (daily) and `QUOTATION_EXPIRY`, `RESERVE_VALUATION`, `RI_ALLOCATION` (insurer suite, off since V1064),
-`QUOTATION_REQUEST_INTAKE`, `OPS_INVOICE_FEED_REPLAY` (manual unless scheduled). The crons of the Operations jobs built on top of the ledger are already configured (`brokerverse.jobs.prebooked-rematch-cron` … `dp-feedback-sla-cron`, see `docs/modules/OPERATIONS.md`).
+`QUOTATION_REQUEST_INTAKE`, `OPS_INVOICE_FEED_REPLAY` (manual unless scheduled), the document storage jobs
+`FILE_SCAN_RESULTS` (every 5 minutes), `FILE_ORPHAN_RECONCILIATION`, `FILE_RETENTION` (daily) and `FILE_ECM_ARCHIVE`
+(every 15 minutes; crons `brokerverse.storage.jobs.*`). The crons of the Operations jobs built on top of the ledger are already configured (`brokerverse.jobs.prebooked-rematch-cron` … `dp-feedback-sla-cron`, see `docs/modules/OPERATIONS.md`).
+
+**Which deployment runs a job.** `ManagedJob.workload()` defaults to `Workload.BATCH`: the job is scheduled on the
+`bibs-jobs` deployment (runtime role `jobs`) and on `all`. A job that moves data to or from another system (outbox
+relay, inbound files, pulls from source systems) overrides it with `Workload.INTEGRATION` and runs on
+`bibs-integration`: today `EVENT_OUTBOX_RELAY`, `SCR_WATCHLIST_INGEST`, `QUOTATION_REQUEST_INTAKE`. A `web` instance
+has no task scheduler at all (section 10.11).
 
 Planned jobs of the later BRDs (designed, not built; names, schedules and cron properties are in each design):
 
@@ -351,7 +363,7 @@ parameter with an insert into `sys_parameter` in your migration (type `STRING`, 
 
 Any record can carry documents: frontend `<Attachments entityType="Policy" entityId={policy.id} />`
 (`components/attachments/Attachments`); API `/api/v1/attachments?entityType=&entityId=`. Files are
-stored in PostgreSQL with SHA-256 checksum, type/signature and size checks
+stored in PostgreSQL until build step ST1 moves them to S3 (§10.10), with SHA-256 checksum, type/signature and size checks
 (`brokerverse.attachments.max-size`, default 10 MB) and audit entries. Malware scanning: add a bean
 implementing `attachment.service.VirusScanner`. Permissions `ATTACHMENT_VIEW` / `ATTACHMENT_MANAGE`.
 
@@ -417,7 +429,8 @@ through the **transactional outbox** and Kafka.
    The row commits (or rolls back) with your change; after the commit the relay sends it. The payload
    is a record of plain values: no entities, no personal data beyond identifiers, no secrets.
 3. **Consume** (asynchronous work in this application): a `@KafkaListener` bean
-   `@ConditionalOnProperty(name = EventsProperties.ENABLED_PROPERTY, havingValue = "true")`, group
+   `@ConditionalOnProperty(name = EventsProperties.ENABLED_PROPERTY, havingValue = "true")` and
+   `@ConditionalOnWorkload(Workload.INTEGRATION)` (consumers run only on `bibs-integration`), group
    `${brokerverse.kafka.consumer-group-prefix:bibs}-<purpose>`, reading the envelope with
    `EventEnvelopeReader`. Make it **idempotent** (at-least-once delivery: deduplicate on `eventId` or
    make the action repeatable) and keep a non-Kafka path when the work must also happen with Kafka off
@@ -466,6 +479,65 @@ Cache reference data that is read on hot paths and changed rarely by administrat
 4. Changes made with SQL outside JPA are not seen: say so in your module guide (support flushes with
    `POST /api/v1/admin/caches/{name}/clear`). In tests that change such tables with `JdbcTemplate`,
    clear the cache after the update.
+
+### 10.10 File storage (S3) – `common.storage`, `storage`
+
+**Rule: new code never adds a `bytea` (or `oid`, `@Lob byte[]`) column for file content.** Documents, generated
+files, report outputs and uploads are stored through the port `common.storage.FileStore` with their metadata in
+`stored_file`. The design and the as-built description are in
+[`DOCUMENT_STORAGE_DECISION.md`](../architecture/DOCUMENT_STORAGE_DECISION.md) sections 3 to 7. The existing `bytea`
+tables move in build step ST1 (plan in section 7).
+
+- **Store** with `StoredFileService.store(new StoreRequest(new FileOwner(companyId, "BrokerClaim", id), documentType,
+  recordClass, fileName, bytes, sha256OrNull))`. Keep the returned `stored_file` id on your record (a
+  `stored_file_id` column), not the bytes. The service validates size, type and signature, computes the SHA-256,
+  writes the object (SSE-KMS) and then the row, and audits.
+  - The object is written before the row. If your transaction rolls back, the object becomes an orphan, which
+    `FILE_ORPHAN_RECONCILIATION` deletes.
+- **Record class**: pick one of `sto_record_class` (`GENERAL_DOCUMENT`, `WORKING_FILE`, `POLICY_DOCUMENT`,
+  `OFFICIAL_RECEIPT`, `BIR_FORM`, `STATEMENT_OF_ACCOUNT`, `CLAIM_SETTLEMENT`, `STR`, `REPORT_OUTPUT`,
+  `INBOUND_FILE`, `MIGRATION_EXTRACT`). The class sets the bucket, the retention (mapped to the retention rules), the
+  legal hold from the start and the ECM archiving. A new class is a row in your migration.
+- **Permission**: implement `storage.service.FileOwnerAccess` for your owner types (`mayRead`, `mayStore`), with the
+  same checks as your record's own screens. Without it, the file API refuses every request for your records.
+- **Download**: the client calls `GET /api/v1/files/{id}/link` and opens the presigned URL (valid
+  `FILE_LINK_TTL_SECONDS`, attachment disposition, no-store). Do not stream bytes through your controller. Only flows
+  that must transform the content (password-protected e-mail attachments, ZIP bundles) use
+  `StoredFileService.read`, which re-checks the SHA-256.
+- **Final records**: when your record is signed, issued or filed, call `StoredFileService.markFinal(fileId)`. Files
+  of an "archive to ECM" class are then published by `FILE_ECM_ARCHIVE`.
+- **Delete** with `StoredFileService.delete` (soft; refused under legal hold). Never delete objects yourself.
+- **Large inbound files** (bank, insurer, watchlist, bulk uploads) use the presigned PUT flow
+  (`POST /api/v1/files/inbound-uploads`, then `/upload-complete`). They are downloadable only after a clean scan.
+- **Tests** run on the local store (`brokerverse.storage.provider=local`, set in `application-test.yml`), which marks
+  files clean. `LocalFileStore.markScanResult` simulates other scan results.
+
+### 10.11 Runtime roles, integration APIs and TLS – `common.runtime`, `config`
+
+One image runs as three deployments (`ARCHITECTURE_OPTION_DECISION.md` section 2), selected by
+`brokerverse.runtime.role` (`BROKERVERSE_RUNTIME_ROLE`): `web` (user screens and APIs), `jobs` (scheduled and batch
+jobs, HTTP limited to the actuator), `integration` (outbox relay, Kafka consumers, inbound files, `/integration/**`)
+and `all` (the default for local runs, tests and seed stacks).
+
+- **Never test the role in business code.** Switch a bean with `@ConditionalOnWorkload(Workload.X)`
+  (`common.runtime`); schedule work as a `ManagedJob` with the right `workload()` (10.3). Scheduling itself is on
+  only for roles with the `BATCH` or `INTEGRATION` workload (`config.SchedulingConfiguration`), and
+  `config.RuntimeRoleRequestFilter` answers 404 to the paths a role does not serve.
+- **System-to-system APIs** go under `/integration/v1/...` in an `integration.api` controller. They are protected
+  by the separate chain `config.IntegrationSecurityConfig` (Apigee X OAuth 2.0 tokens: issuer, audience, scopes);
+  add a rule `brokerverse.integration.security.apis.<name>` (path and scopes) in `application.yml` and document it
+  in CONFIGURATION.md, otherwise the path is refused. Do not use `@PreAuthorize` user permissions there: the caller
+  is a system, identified by the token's client id and scopes.
+- **Tests.** `RuntimeRoleContextTest` shows which schedulers, jobs and consumers each role starts;
+  `IntegrationApiSecurityIT` signs gateway tokens with a key set it serves itself (copy its helpers for a new
+  integration API).
+- **TLS.** Outside the `dev`, `test` and `seed` profiles PostgreSQL (`verify-full`), Redis and Kafka (`SASL_SSL`)
+  default to TLS and production refuses plaintext (CONFIGURATION.md "Runtime role, HTTPS and encryption in
+  transit"). Locally nothing changes: the `seed` profile keeps plaintext connections to the compose services.
+  To try HTTPS locally set `BROKERVERSE_SERVER_SSL_ENABLED=true` and point `BROKERVERSE_SERVER_SSL_CERTIFICATE` /
+  `_PRIVATE_KEY` at a PEM certificate and key (`file:...`).
+- **Run one role locally**: `BROKERVERSE_RUNTIME_ROLE=web SPRING_PROFILES_ACTIVE=seed mvn spring-boot:run` (start a
+  second instance with `jobs` or `integration` on another `BROKERVERSE_PORT`).
 
 ## 11. Module documentation
 

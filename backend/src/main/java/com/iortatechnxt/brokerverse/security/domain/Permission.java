@@ -66,6 +66,10 @@ public enum Permission {
   // Platform features: document attachments, alerts, system monitoring
   ATTACHMENT_VIEW,
   ATTACHMENT_MANAGE,
+  // Document storage (V1101): legal hold request and approval (DOA roles), quarantine review.
+  FILE_LEGAL_HOLD_REQUEST,
+  FILE_LEGAL_HOLD_APPROVE,
+  FILE_QUARANTINE_VIEW,
   ALERT_VIEW,
   ALERT_MANAGE,
   SYSTEM_MONITOR,

@@ -265,6 +265,20 @@ class ApiSmokeIT {
         .andExpect(status().isOk());
   }
 
+  /** The read endpoints of the document storage (ST0), each as the persona that uses it. */
+  @ParameterizedTest
+  @CsvSource({
+    "holdofficer, /api/v1/files/record-classes",
+    "auditor, /api/v1/files/record-classes",
+    "holdapprover, /api/v1/files/legal-hold-requests",
+    "infosec, /api/v1/files/quarantined",
+    "infosec, /api/v1/files/quarantined?page=1&size=500",
+    "accountant, /api/v1/files?ownerType=StorageTestRecord&ownerId=SMOKE-1",
+  })
+  void storageReadsRespondOk(String user, String url) throws Exception {
+    mvc.perform(get(url).with(user(users.loadUserByUsername(user)))).andExpect(status().isOk());
+  }
+
   /**
    * The list reads of Claims Handling (BRD-7), each as the persona whose screen makes it (wave
    * CL2); the record reads of one claim are in {@code ClaimsHandlingApiIT} and {@code

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.events.service;
 
+import com.iortatechnxt.brokerverse.common.runtime.Workload;
 import com.iortatechnxt.brokerverse.system.service.JobOutcome;
 import com.iortatechnxt.brokerverse.system.service.ManagedJob;
 import java.time.LocalDate;
@@ -37,6 +38,16 @@ public class OutboxRelayJob implements ManagedJob {
   @Override
   public String description() {
     return "Sends pending integration events of the outbox to Kafka and retries failed sends";
+  }
+
+  /**
+   * Relays the outbox to Kafka: runs on the integration deployment.
+   *
+   * @return {@link Workload#INTEGRATION}
+   */
+  @Override
+  public Workload workload() {
+    return Workload.INTEGRATION;
   }
 
   @Override

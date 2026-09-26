@@ -237,7 +237,7 @@ class IntegrationEventsLocalIT {
     long id = only(key).id();
     api.doGet(ADMIN, "/api/v1/admin/events/topics")
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.length()").value(9))
+        .andExpect(jsonPath("$.length()").value(10))
         .andExpect(jsonPath("$[0].kafkaEnabled").value(false));
     api.doGet(ADMIN, "/api/v1/admin/events/outbox?status=LOCAL&key=" + key)
         .andExpect(status().isOk())

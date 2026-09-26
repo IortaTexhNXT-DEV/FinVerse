@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.screening.watchlist.service;
 
+import com.iortatechnxt.brokerverse.common.runtime.Workload;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.IngestionRun;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.IngestionTrigger;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.RunStatus;
@@ -65,6 +66,16 @@ public class WatchlistIngestJob implements ManagedJob {
   @Override
   public String description() {
     return "Reads the sanctions / PEP list files of the active sources and logs each run (SNSRP-201)";
+  }
+
+  /**
+   * Reads the list files of external sources: runs on the integration deployment.
+   *
+   * @return {@link Workload#INTEGRATION}
+   */
+  @Override
+  public Workload workload() {
+    return Workload.INTEGRATION;
   }
 
   @Override

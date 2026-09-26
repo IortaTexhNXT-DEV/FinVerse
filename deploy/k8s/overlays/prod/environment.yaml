@@ -1,0 +1,24 @@
+# Per-environment values copied into the base by components/environment. Never applied
+# (local-config). Every <...> value comes from BDO IT (DEPLOYMENT.md "Values BDO IT provides").
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bibs-environment
+  annotations:
+    config.kubernetes.io/local-config: "true"
+data:
+  host: "<BIBS_PROD_HOST>"
+  awsRegion: "ap-southeast-1"
+  albCertificateArn: "arn:aws:acm:ap-southeast-1:<AWS_ACCOUNT_ID>:certificate/<ALB_CERTIFICATE_ID>"
+  wafAclArn: "arn:aws:wafv2:ap-southeast-1:<AWS_ACCOUNT_ID>:regional/webacl/<WAF_ACL_NAME>/<WAF_ACL_ID>"
+  # Client networks (Direct Connect / VPN, VDI) and the Apigee X private route, comma-separated.
+  inboundCidrs: "<BDO_CLIENT_CIDRS>,<APIGEE_ROUTE_CIDRS>"
+  webRoleArn: "arn:aws:iam::<AWS_ACCOUNT_ID>:role/bibs-prod-web"
+  jobsRoleArn: "arn:aws:iam::<AWS_ACCOUNT_ID>:role/bibs-prod-jobs"
+  integrationRoleArn: "arn:aws:iam::<AWS_ACCOUNT_ID>:role/bibs-prod-integration"
+  privateCaArn: "arn:aws:acm-pca:ap-southeast-1:<AWS_ACCOUNT_ID>:certificate-authority/<PRIVATE_CA_ID>"
+  # NetworkPolicy ranges (one aggregate CIDR each).
+  loadBalancerCidr: "<ALB_SUBNETS_CIDR>"
+  dataServicesCidr: "<DATA_SUBNETS_CIDR>"
+  awsEndpointsCidr: "<VPC_ENDPOINT_SUBNETS_CIDR>"
+  bdoNetworkCidr: "<BDO_PRIVATE_ROUTE_CIDR>"

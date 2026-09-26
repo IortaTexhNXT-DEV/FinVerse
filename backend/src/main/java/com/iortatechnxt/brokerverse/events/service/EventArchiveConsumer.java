@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.events.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.iortatechnxt.brokerverse.common.runtime.ConditionalOnWorkload;
+import com.iortatechnxt.brokerverse.common.runtime.Workload;
 import java.time.Clock;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -11,9 +13,13 @@ import org.springframework.stereotype.Component;
  * Archives every integration event of every declared topic in {@code evt_archive} (support
  * traceability: what left the application, when, with which correlation id). Idempotent: a
  * redelivered event is stored once. A malformed record goes to the dead-letter topic.
+ *
+ * <p>Runs only on instances whose runtime role carries the integration workload ({@code
+ * integration} or {@code all}).
  */
 @Component
 @ConditionalOnProperty(name = EventsProperties.ENABLED_PROPERTY, havingValue = "true")
+@ConditionalOnWorkload(Workload.INTEGRATION)
 public class EventArchiveConsumer {
 
   private final EventEnvelopeReader reader;

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.system.service;
 
+import com.iortatechnxt.brokerverse.common.runtime.Workload;
 import java.time.LocalDate;
 
 /**
@@ -32,6 +33,18 @@ public interface ManagedJob {
    * @return cron expression
    */
   String cron();
+
+  /**
+   * Workload of the job, which decides the runtime role that schedules it: {@link Workload#BATCH}
+   * (the {@code jobs} deployment) unless the job moves data to or from another system, then {@link
+   * Workload#INTEGRATION} (the {@code integration} deployment). Manual runs from the job monitor
+   * are not affected.
+   *
+   * @return workload
+   */
+  default Workload workload() {
+    return Workload.BATCH;
+  }
 
   /**
    * Executes the job. Runs outside a transaction: open your own per unit of work so one failing

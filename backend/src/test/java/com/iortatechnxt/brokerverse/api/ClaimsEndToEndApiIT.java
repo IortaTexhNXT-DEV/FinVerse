@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.opsledger.domain.RemittanceStatus;
 import com.iortatechnxt.brokerverse.opsledger.service.DisbursementQueueService;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.remittance.RemittanceFixtures;
+import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.time.LocalDate;
@@ -58,6 +59,11 @@ class ClaimsEndToEndApiIT {
   @Autowired private JdbcTemplate jdbc;
 
   private String company;
+
+  /** The business day (Manila), as the application and the report date keywords use it. */
+  private static LocalDate today() {
+    return LocalDate.now(ReportParameters.BUSINESS_ZONE);
+  }
 
   private String c() {
     return "?companyId=" + company;
@@ -126,7 +132,7 @@ class ClaimsEndToEndApiIT {
 
   /** FR-CM-011/016: the claim is recorded, flagged unpaid, alerted and cannot be authorised. */
   private long recordOnTheUnpaidCover(String arn) throws Exception {
-    LocalDate today = LocalDate.now();
+    LocalDate today = today();
     Map<String, Object> loss = new HashMap<>();
     loss.put("lossDate", today.minusDays(3).toString());
     loss.put("reportedDate", today.minusDays(2).toString());
@@ -297,7 +303,7 @@ class ClaimsEndToEndApiIT {
             "amount",
             100000,
             "dateSettled",
-            LocalDate.now().toString(),
+            today().toString(),
             "remark",
             "LOA issued by the insurer");
     api.doPost(OFFICER, claim + "/settlement" + c(), settlement).andExpect(status().isForbidden());
@@ -330,7 +336,7 @@ class ClaimsEndToEndApiIT {
                 "amount",
                 125000,
                 "dateSettled",
-                LocalDate.now().toString()))
+                today().toString()))
         .andExpect(jsonPath("$.phase").value("CLOSED"));
     assertThat(claimNos("BCL-SETTLED")).contains(claimNo);
 
@@ -361,10 +367,10 @@ class ClaimsEndToEndApiIT {
     Map<String, String> params = new HashMap<>(extra);
     params.put("companyId", company);
     params.put("handler", OFFICER);
-    params.put("periodFrom", LocalDate.now().minusDays(1).toString());
-    params.put("periodTo", LocalDate.now().toString());
-    params.put("settledFrom", LocalDate.now().minusDays(1).toString());
-    params.put("settledTo", LocalDate.now().toString());
+    params.put("periodFrom", today().minusDays(1).toString());
+    params.put("periodTo", today().toString());
+    params.put("settledFrom", today().minusDays(1).toString());
+    params.put("settledTo", today().toString());
     return api.read(
         api.doPost(UH, "/api/v1/reports/" + code + "/run", params).andExpect(status().isOk()));
   }

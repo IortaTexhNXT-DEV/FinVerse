@@ -6,11 +6,16 @@ Audience: production deployment and support teams.
 
 | Component | Image | Port | Health |
 |---|---|---|---|
-| Backend (Spring Boot, Java 21) | `brokerverse-backend` | 8080 | `/actuator/health/liveness`, `/actuator/health/readiness` |
-| Frontend (nginx + SPA, proxies `/api`) | `brokerverse-frontend` | 8080 | `/healthz` |
-| PostgreSQL 16 | managed service | 5432 | – |
+| `bibs-web` (Spring Boot, Java 21, role `web`): screens and user APIs | `bibs-backend` | 8443 (HTTPS) | `/actuator/health/liveness`, `/actuator/health/readiness` |
+| `bibs-jobs` (same image, role `jobs`): scheduled and batch jobs | `bibs-backend` | 8443 (actuator only) | same |
+| `bibs-integration` (same image, role `integration`): outbox relay, Kafka consumers, inbound files, `/integration/**` | `bibs-backend` | 8443 (HTTPS) | same |
+| `bibs-frontend` (nginx + SPA) | `bibs-frontend` | 8443 (HTTPS) | `/healthz` |
+| PostgreSQL 16 | managed service | 5432 (TLS) | – |
 
-The backend is stateless (JWT); run ≥ 2 replicas behind the service. Database migrations (Flyway)
+Kubernetes layout, edge and TLS: [`DEPLOYMENT.md`](DEPLOYMENT.md). With `docker compose` one backend container runs
+every role (`all`) over plain HTTP on 8080.
+
+The backend is stateless (JWT); run ≥ 2 `bibs-web` replicas behind the load balancer. Database migrations (Flyway)
 run automatically at start-up; with several replicas, Flyway's lock makes them wait for each other.
 Out-of-order migrations are enabled because versions are allocated in per-module ranges: an upgrade may
 apply, for example, V27 on a database already at V975. `flyway_schema_history` records the actual order.
@@ -18,9 +23,10 @@ apply, for example, V27 on a database already at V975. `flyway_schema_history` r
 ## 2. First installation
 
 1. Create the database and a user owning it.
-2. Create the secret (see `deploy/k8s/brokerverse-secrets.example.yaml`) including
-   `BROKERVERSE_ADMIN_INITIAL_PASSWORD`.
-3. Deploy `deploy/k8s/brokerverse.yaml` (or `docker compose` for a single host).
+2. Create the secret `bibs-backend-secrets` (see `deploy/k8s/base/secrets.example.yaml`) including
+   `BROKERVERSE_ADMIN_INITIAL_PASSWORD`, and the ConfigMap `rds-ca-bundle` (DEPLOYMENT.md).
+3. Deploy the overlay of the environment (`kubectl apply -k deploy/k8s/overlays/<uat|prod>`, DEPLOYMENT.md), or
+   `docker compose` for a single host.
 4. Sign in as `sysadmin`, change the password, remove `BROKERVERSE_ADMIN_INITIAL_PASSWORD`.
 5. Set up in this order (each item is authorized by a second user – maker-checker):
    company → branches → currencies & rates → chart of accounts → dimensions → fiscal year & open

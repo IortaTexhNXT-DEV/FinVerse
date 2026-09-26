@@ -57,7 +57,7 @@ elements, awaiting BDOI confirmation, IQ25 / DCR-222).
 | Layer | Component |
 |---|---|
 | Edge | Route 53, AWS WAF, Application Load Balancer (or Apigee X if BDO mandates it) in front of the ingress |
-| Workloads | `brokerverse-frontend` (nginx, React SPA) and `brokerverse-backend` (Spring Boot, Java 21), 2 to 8 pods per environment with HPA and PodDisruptionBudget (`deploy/k8s/brokerverse.yaml`; sizing in PROGRAMME_ALIGNMENT section 6.4) |
+| Workloads | `bibs-frontend` (nginx, React SPA) and one backend image (Spring Boot, Java 21) run as `bibs-web`, `bibs-jobs` and `bibs-integration` by runtime role, with HPA, PodDisruptionBudgets and NetworkPolicies (`deploy/k8s`, Kustomize base and overlays; `docs/operations/DEPLOYMENT.md`) |
 | Data | Amazon RDS PostgreSQL 16 Multi-AZ (one database, one transaction per business record), ElastiCache Redis 7 (cluster mode disabled), Amazon MSK (Kafka 3.6, 9 `bibs.*` topics with transactional outbox) |
 | Files | Amazon S3 for every document and attachment (four buckets per environment, SSE-KMS with BDOI keys, Object Lock governance mode, GuardDuty malware scan); PostgreSQL keeps the metadata ([`DOCUMENT_STORAGE_DECISION.md`](DOCUMENT_STORAGE_DECISION.md)) |
 | Identity | EIAM (Microsoft Entra ID, OpenID Connect) for sign-in; UIDM-ISC (IGA) for provisioning (USER_ACCESS_DESIGN section 10.1) |

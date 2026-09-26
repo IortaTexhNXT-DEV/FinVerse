@@ -1,0 +1,109 @@
+# Pod network access, deny by default (ARCHITECTURE_OPTION_DECISION.md 5.2). Only these flows are
+# open: load balancer -> bibs-web / bibs-integration / bibs-frontend (8443), monitoring -> backend
+# metrics (8443), backend -> PostgreSQL / Redis / Kafka, backend -> AWS interface endpoints (443),
+# backend -> BDO network through the private route (Apigee X 443, SMTP relay 587), and DNS.
+# Pods never call each other. The address ranges below are replaced per environment from the
+# overlay's network-ranges.yaml (components/network-ranges); the 192.0.2.x values of the base are
+# documentation addresses that match nothing, so an overlay that forgets a range stays closed.
+# Needs NetworkPolicy enforcement on the cluster (VPC CNI network policy agent, or Calico).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+spec:
+  podSelector: {}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: kube-system } }
+          podSelector: { matchLabels: { k8s-app: kube-dns } }
+      ports:
+        - { protocol: UDP, port: 53 }
+        - { protocol: TCP, port: 53 }
+---
+# Internal ALB (target type ip) -> pods. Source: the subnets of the load balancer.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-load-balancer
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values: [bibs-web, bibs-integration, bibs-frontend]
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - ipBlock: { cidr: 192.0.2.1/32 }
+      ports:
+        - { protocol: TCP, port: 8443 }
+---
+# Metrics scraping (Prometheus / CloudWatch agent) from the monitoring namespace.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-monitoring
+spec:
+  podSelector: { matchLabels: { bibs/tier: backend } }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: monitoring } }
+      ports:
+        - { protocol: TCP, port: 8443 }
+---
+# Backend -> RDS PostgreSQL (5432), ElastiCache Redis (6379), MSK SASL/SCRAM (9096) and IAM (9098).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-to-data-services
+spec:
+  podSelector: { matchLabels: { bibs/tier: backend } }
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - ipBlock: { cidr: 192.0.2.2/32 }
+      ports:
+        - { protocol: TCP, port: 5432 }
+        - { protocol: TCP, port: 6379 }
+        - { protocol: TCP, port: 9096 }
+        - { protocol: TCP, port: 9098 }
+---
+# Backend -> AWS interface VPC endpoints (S3, KMS, STS for IRSA, Secrets Manager, CloudWatch Logs).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-to-aws-endpoints
+spec:
+  podSelector: { matchLabels: { bibs/tier: backend } }
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - ipBlock: { cidr: 192.0.2.3/32 }
+      ports:
+        - { protocol: TCP, port: 443 }
+---
+# Backend -> BDO systems over the private route: Apigee X (outbound APIs and its key set, 443) and
+# the SMTP relay of CCM (587, STARTTLS).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-to-bdo-network
+spec:
+  podSelector: { matchLabels: { bibs/tier: backend } }
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - ipBlock: { cidr: 192.0.2.4/32 }
+      ports:
+        - { protocol: TCP, port: 443 }
+        - { protocol: TCP, port: 587 }

@@ -15,12 +15,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
-/** Cross-cutting beans: clock, JPA auditing, configuration properties and OpenAPI metadata. */
+/**
+ * Cross-cutting beans: clock, JPA auditing, configuration properties and OpenAPI metadata.
+ * Scheduling is enabled per runtime role by {@link SchedulingConfiguration}.
+ */
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
-@EnableScheduling
 @EnableConfigurationProperties({SecurityProperties.class, LoginProtectionProperties.class})
 public class ApplicationConfig {
 

@@ -1,0 +1,64 @@
+# Copies the per-environment values of the overlay's ConfigMap "bibs-environment" (environment.yaml,
+# annotated local-config, so it is never applied) into the base resources: host name, ALB
+# certificate, WAF web ACL, allowed source ranges, IRSA role ARNs, Private CA and the network ranges
+# of the NetworkPolicies. An overlay lists its environment.yaml under resources and this component
+# under components.
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+replacements:
+  # ---- Load balancer ----
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.host }
+    targets:
+      - select: { kind: Ingress }
+        fieldPaths: [spec.rules.0.host]
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.albCertificateArn }
+    targets:
+      - select: { kind: Ingress }
+        fieldPaths: ["metadata.annotations.[alb.ingress.kubernetes.io/certificate-arn]"]
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.wafAclArn }
+    targets:
+      - select: { kind: Ingress }
+        fieldPaths: ["metadata.annotations.[alb.ingress.kubernetes.io/wafv2-acl-arn]"]
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.inboundCidrs }
+    targets:
+      - select: { kind: Ingress, name: bibs-users }
+        fieldPaths: ["metadata.annotations.[alb.ingress.kubernetes.io/inbound-cidrs]"]
+  # ---- IRSA ----
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.webRoleArn }
+    targets:
+      - select: { kind: ServiceAccount, name: bibs-web }
+        fieldPaths: ["metadata.annotations.[eks.amazonaws.com/role-arn]"]
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.jobsRoleArn }
+    targets:
+      - select: { kind: ServiceAccount, name: bibs-jobs }
+        fieldPaths: ["metadata.annotations.[eks.amazonaws.com/role-arn]"]
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.integrationRoleArn }
+    targets:
+      - select: { kind: ServiceAccount, name: bibs-integration }
+        fieldPaths: ["metadata.annotations.[eks.amazonaws.com/role-arn]"]
+  # ---- Private CA of the in-cluster certificates ----
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.privateCaArn }
+    targets:
+      - select: { kind: AWSPCAIssuer }
+        fieldPaths: [spec.arn]
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.awsRegion }
+    targets:
+      - select: { kind: AWSPCAIssuer }
+        fieldPaths: [spec.region]
+  # ---- Network ranges of the NetworkPolicies ----
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.loadBalancerCidr }
+    targets:
+      - select: { kind: NetworkPolicy, name: allow-load-balancer }
+        fieldPaths: [spec.ingress.0.from.0.ipBlock.cidr]
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.dataServicesCidr }
+    targets:
+      - select: { kind: NetworkPolicy, name: backend-to-data-services }
+        fieldPaths: [spec.egress.0.to.0.ipBlock.cidr]
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.awsEndpointsCidr }
+    targets:
+      - select: { kind: NetworkPolicy, name: backend-to-aws-endpoints }
+        fieldPaths: [spec.egress.0.to.0.ipBlock.cidr]
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.bdoNetworkCidr }
+    targets:
+      - select: { kind: NetworkPolicy, name: backend-to-bdo-network }
+        fieldPaths: [spec.egress.0.to.0.ipBlock.cidr]

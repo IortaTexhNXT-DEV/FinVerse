@@ -35,6 +35,7 @@ public final class LossReports {
   public static final String RATIO = "BCL-LOSS-RATIO";
 
   private static final String GROUPING = "grouping";
+  private static final int CLIENT_POSITION = 3;
   private static final String LOSS_FROM = "lossFrom";
   private static final String LOSS_TO = "lossTo";
   private static final String CLIENT = "clientCode";
@@ -95,7 +96,7 @@ public final class LossReports {
 
   private static List<ParameterSpec> lossParameters() {
     List<ParameterSpec> params = BclReportSql.rangeFilters(LOSS_FROM, LOSS_TO, "Loss date", false);
-    params.add(3, ParameterSpec.optional(CLIENT, "Client code", ParameterType.TEXT));
+    params.add(CLIENT_POSITION, ParameterSpec.optional(CLIENT, "Client code", ParameterType.TEXT));
     return params;
   }
 

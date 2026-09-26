@@ -85,18 +85,20 @@ public class ClaimWorkflow {
     Optional<WorkCase> found = find(claim);
     if (found.isEmpty()) {
       open(claim);
-      return;
+    } else {
+      move(claim, ClaimPhase.valueOf(found.get().getStageCode()), note);
     }
-    ClaimPhase from = ClaimPhase.valueOf(found.get().getStageCode());
+  }
+
+  private void move(Claim claim, ClaimPhase from, TransitionNote note) {
     ClaimPhase to = claim.getProgress().getPhase();
-    if (from == to) {
-      return;
-    }
-    WorkCase moved =
-        workflow.systemTransition(ClaimCodes.ENTITY_TYPE, key(claim), action(from, to), note);
-    if (to == ClaimPhase.IN_PROGRESS) {
-      // The stage is worked by the claim's handler, not by the case originator.
-      moved.assignTo(claim.getHandler());
+    if (from != to) {
+      WorkCase moved =
+          workflow.systemTransition(ClaimCodes.ENTITY_TYPE, key(claim), action(from, to), note);
+      if (to == ClaimPhase.IN_PROGRESS) {
+        // The stage is worked by the claim's handler, not by the case originator.
+        moved.assignTo(claim.getHandler());
+      }
     }
   }
 

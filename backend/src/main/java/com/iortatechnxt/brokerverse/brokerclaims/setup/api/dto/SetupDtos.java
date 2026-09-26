@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.function.UnaryOperator;
 
 /** Requests and responses of Claims Setup (FR-CL-040/041/043). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class SetupDtos {
 
   private SetupDtos() {}

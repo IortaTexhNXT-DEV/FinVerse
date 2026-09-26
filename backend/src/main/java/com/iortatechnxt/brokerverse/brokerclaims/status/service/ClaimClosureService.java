@@ -174,6 +174,10 @@ public class ClaimClosureService {
       throw new BusinessRuleException(
           "BCL_SETTLEMENT_AMOUNT_REQUIRED", "Enter the settlement amount and the date settled");
     }
+    validateValues(s, today);
+  }
+
+  private static void validateValues(Settlement s, LocalDate today) {
     if (s.amount() != null && s.amount().signum() < 0) {
       throw new BusinessRuleException(
           "BCL_SETTLEMENT_AMOUNT_NEGATIVE", "The settlement amount cannot be negative");

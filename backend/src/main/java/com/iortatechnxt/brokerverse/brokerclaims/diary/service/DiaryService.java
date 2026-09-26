@@ -87,14 +87,7 @@ public class DiaryService {
   public DiaryEntry add(Long companyId, Long claimId, DiaryInput input) {
     Claim claim = lookup.require(companyId, claimId);
     LocalDate today = ClaimAgeing.today(clock);
-    String text = input.text() == null ? "" : input.text().strip();
-    if (text.isEmpty()) {
-      throw new BusinessRuleException("BCL_DIARY_TEXT_REQUIRED", "Enter the diary text");
-    }
-    if (text.length() > MAX_TEXT) {
-      throw new BusinessRuleException(
-          "BCL_DIARY_TEXT_TOO_LONG", "The diary text can have up to 2000 characters");
-    }
+    String text = text(input.text());
     if (input.entryType() == null || input.entryType().isBlank()) {
       throw new BusinessRuleException("BCL_DIARY_TYPE_REQUIRED", "Select the type of entry");
     }
@@ -170,6 +163,18 @@ public class DiaryService {
   @Transactional(readOnly = true)
   public String typeLabel(String type) {
     return lovs.label(ClaimCodes.LOV_DIARY_TYPE, type);
+  }
+
+  private static String text(String entered) {
+    String text = entered == null ? "" : entered.strip();
+    if (text.isEmpty()) {
+      throw new BusinessRuleException("BCL_DIARY_TEXT_REQUIRED", "Enter the diary text");
+    }
+    if (text.length() > MAX_TEXT) {
+      throw new BusinessRuleException(
+          "BCL_DIARY_TEXT_TOO_LONG", "The diary text can have up to 2000 characters");
+    }
+    return text;
   }
 
   private String assignee(String requested) {

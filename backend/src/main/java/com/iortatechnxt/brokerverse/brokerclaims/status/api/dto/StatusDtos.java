@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /** Requests and responses of the claim status actions (FR-CL-042/044/045/050/051). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class StatusDtos {
 
   private StatusDtos() {}

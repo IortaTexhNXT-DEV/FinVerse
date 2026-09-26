@@ -144,24 +144,30 @@ public class ClaimStatusService {
     ClaimPhase phase = rules.phaseOf(statusCode);
     ClaimProgress progress = claim.getProgress();
     ClaimPhase current = progress.getPhase();
-    if (phase == ClaimPhase.NEW && current != ClaimPhase.NEW) {
+    requireForward(claim, phase);
+    if (checkMatrix && !CurrentUser.SYSTEM.equals(currentUser.username())) {
+      matrix.requireAllowed(currentUser.username(), statusCode, status.getLabel());
+    }
+    StatusHistory.Step before =
+        progress.getStatusCode() == null
+            ? new StatusHistory.Step(null, null)
+            : new StatusHistory.Step(progress.getStatusCode(), current);
+    Instant since = progress.getStatusSince();
+    progress.changeStatus(statusCode, phase, clock.instant());
+    LocalDate today = today();
+    progress.scheduleFollowUp(today.plusDays(rules.followUpDays(statusCode)), today);
+    transitions.record(claim, before, since, TransitionNote.comment(remark));
+  }
+
+  /** Workflow BCL_CLAIM has no way back to NEW: a newly filed status is refused once left. */
+  private static void requireForward(Claim claim, ClaimPhase phase) {
+    if (phase == ClaimPhase.NEW && claim.getProgress().getPhase() != ClaimPhase.NEW) {
       throw new BusinessRuleException(
           "BCL_STATUS_BACK_TO_NEW",
           "Claim "
               + claim.getClaimNo()
               + " has left the newly filed phase; set an in-progress or temporary closure status");
     }
-    if (checkMatrix && !CurrentUser.SYSTEM.equals(currentUser.username())) {
-      matrix.requireAllowed(currentUser.username(), statusCode, status.getLabel());
-    }
-    StatusHistory.Step from = new StatusHistory.Step(progress.getStatusCode(), current);
-    StatusHistory.Step before =
-        progress.getStatusCode() == null ? new StatusHistory.Step(null, null) : from;
-    Instant since = progress.getStatusSince();
-    progress.changeStatus(statusCode, phase, clock.instant());
-    LocalDate today = today();
-    progress.scheduleFollowUp(today.plusDays(rules.followUpDays(statusCode)), today);
-    transitions.record(claim, before, since, TransitionNote.comment(remark));
   }
 
   private String label(String statusCode) {

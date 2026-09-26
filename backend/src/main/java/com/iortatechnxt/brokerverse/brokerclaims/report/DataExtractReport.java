@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.TabularReportBuilder;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -82,6 +83,12 @@ public class DataExtractReport implements ReportDefinition {
   }
 
   private static List<ReportColumn> columns() {
+    List<ReportColumn> columns = new ArrayList<>(claimColumns());
+    columns.addAll(lossColumns());
+    return columns;
+  }
+
+  private static List<ReportColumn> claimColumns() {
     return List.of(
         text("claim_no", "Claim Number"),
         text("source", "Source"),
@@ -109,7 +116,11 @@ public class DataExtractReport implements ReportDefinition {
         text("cost_center", "Cost Center"),
         text("currency", "Currency"),
         text("premium_status", "Premium Status"),
-        text("authorization_code", "Authorization Code"),
+        text("authorization_code", "Authorization Code"));
+  }
+
+  private static List<ReportColumn> lossColumns() {
+    return List.of(
         ReportColumn.date("loss_date", "Date of Loss"),
         ReportColumn.date("reported_date", "Date Reported"),
         text("loss_nature", "Nature of Loss"),

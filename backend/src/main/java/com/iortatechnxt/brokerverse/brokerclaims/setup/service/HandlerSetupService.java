@@ -88,12 +88,8 @@ public class HandlerSetupService {
    * @return the handler
    */
   public ClaimHandler save(String username, String unitCode, String team, boolean active) {
-    if (username == null || username.isBlank()) {
-      throw new BusinessRuleException("BCL_HANDLER_REQUIRED", "Select the claims user");
-    }
-    if (unitCode == null || unitCode.isBlank()) {
-      throw new BusinessRuleException("BCL_UNIT_REQUIRED", "Select the claims unit");
-    }
+    requireFilled(username, "BCL_HANDLER_REQUIRED", "Select the claims user");
+    requireFilled(unitCode, "BCL_UNIT_REQUIRED", "Select the claims unit");
     lovs.requireValid(ClaimCodes.LOV_UNIT, unitCode, ClaimAgeing.today(clock));
     String user = username.strip();
     if (claimsUsers().stream().noneMatch(u -> CurrentUser.sameUser(u, user))) {
@@ -111,6 +107,12 @@ public class HandlerSetupService {
         AuditAction.UPDATE,
         "Unit " + unitCode + ", team " + teamName + (active ? ", active" : ", inactive"));
     return handler;
+  }
+
+  private static void requireFilled(String value, String code, String message) {
+    if (value == null || value.isBlank()) {
+      throw new BusinessRuleException(code, message);
+    }
   }
 
   /**

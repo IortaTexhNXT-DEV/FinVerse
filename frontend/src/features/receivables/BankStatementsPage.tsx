@@ -15,6 +15,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDate } from '@/utils/format';
 import { csvPreview } from './receivablesMath';
 import { bankOptions, useReceivablesLookups } from './useReceivablesLookups';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 /**
  * Bank statement import (CSV: date, description, reference, debit, credit, balance - see
@@ -114,12 +115,10 @@ export default function BankStatementsPage() {
             hint="date, description, reference, debit, credit, balance"
           >
             {(id) => (
-              <input
+              <FileDropZone
                 id={id}
-                type="file"
                 accept=".csv,text/csv"
-                className="input"
-                onChange={(e) => void readFile(e.target.files?.[0])}
+                onChange={(files) => void readFile(files[0])}
               />
             )}
           </Field>

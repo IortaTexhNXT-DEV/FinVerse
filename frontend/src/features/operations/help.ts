@@ -75,8 +75,7 @@ export const OPERATIONS_HELP: HelpSection = {
     {
       name: 'Report Archive',
       path: '/operations/report-archive',
-      summary:
-        'Operations reports run on screen or exported, with parameters, time and user.',
+      summary: 'Operations reports run on screen or exported, with parameters, time and user.',
       controls: ['Viewing needs OPS_REPORT_VIEW; downloading or printing needs OPS_REPORT_EXPORT.'],
     },
     {

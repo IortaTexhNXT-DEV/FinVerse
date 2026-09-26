@@ -15,6 +15,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate, formatDateTime, today } from '@/utils/format';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 /**
  * Document templates (BRNB.004): the texts merged into quotations, slips, insurance advice and
@@ -198,14 +199,12 @@ function NewVersionDialog({
           hint="A .docx file: the first paragraph is the title, the others the text. Review it below before saving."
         >
           {(id) => (
-            <input
+            <FileDropZone
               id={id}
-              type="file"
-              className="input"
               accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               disabled={load.isPending}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
+              onChange={(files) => {
+                const file = files[0];
                 if (file !== undefined) {
                   load.mutate(file);
                 }

@@ -14,6 +14,7 @@ import { Kpi } from '@/components/ui/Kpi';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 interface BulkUploadWizardProps {
   handler: string;
@@ -128,12 +129,10 @@ export function BulkUploadWizard({
               hint="Excel (.xlsx), OpenDocument (.ods) or CSV (.csv), first sheet, headers in row 1."
             >
               {(id) => (
-                <input
+                <FileDropZone
                   id={id}
-                  type="file"
-                  className="input"
                   accept=".xlsx,.ods,.csv"
-                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                  onChange={(files) => setFile(files[0] ?? null)}
                 />
               )}
             </Field>

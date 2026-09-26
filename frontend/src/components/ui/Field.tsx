@@ -1,6 +1,7 @@
 import { Info } from 'lucide-react';
 import { useId } from 'react';
 import type { ReactNode } from 'react';
+import { isFormatHint } from '@/utils/presentation';
 
 interface FieldProps {
   label: string;
@@ -15,20 +16,12 @@ interface FieldProps {
   children: (id: string) => ReactNode;
 }
 
-const FORMAT_WORDS =
-  /\b(dd|mm|yyyy|MMM|HH|max(imum)?|min(imum)?|MB|KB|PDF|XLSX?|CSV|TXT|ZIP|JSON|XML|digits?|characters?|chars|format|e\.g\.|%|decimals?)\b|^\d|\.[a-z]{3,4}\b/i;
-
-/** Whether a hint is a short format hint kept visible under the field. */
-export function isFormatHint(hint: string): boolean {
-  return hint.length <= 40 && FORMAT_WORDS.test(hint);
-}
-
-/** Info icon with a tooltip: guidance moved off the screen, still available on hover and focus. */
+/** Info icon with a tooltip: guidance kept off the screen, available on hover and focus. */
 export function InfoTip({ text }: Readonly<{ text: string }>) {
   return (
-    <span className="info-tip" role="img" aria-label={text} title={text} tabIndex={0}>
+    <button type="button" className="info-tip" aria-label={text} title={text}>
       <Info size={14} aria-hidden="true" />
-    </span>
+    </button>
   );
 }
 

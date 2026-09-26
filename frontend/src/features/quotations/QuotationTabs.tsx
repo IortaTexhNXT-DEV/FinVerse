@@ -270,10 +270,7 @@ export function HistoryTab({ entityId }: Readonly<{ entityId: number }>) {
   });
   return (
     <Card title="History">
-      <HistoryTable
-        history={detail.data?.history ?? []}
-        terminal={detail.data?.stageTerminal}
-      />
+      <HistoryTable history={detail.data?.history ?? []} terminal={detail.data?.stageTerminal} />
     </Card>
   );
 }

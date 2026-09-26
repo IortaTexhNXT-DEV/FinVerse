@@ -114,6 +114,22 @@ export function toQuery(params: Record<string, QueryValue>): string {
   return text ? `?${text}` : '';
 }
 
+/** Fetches, turning a request that never reached the server into a network ApiError. */
+async function fetchOrNetworkError(url: string, init: RequestInit): Promise<Response> {
+  try {
+    return await fetch(url, init);
+  } catch {
+    throw new ApiError(NETWORK_STATUS, {});
+  }
+}
+
+/** The ApiError of a failed response, with the correlation id of the request. */
+async function problemOf(response: Response): Promise<ApiError> {
+  const problem = (await response.json().catch(() => ({}))) as ProblemDetail;
+  problem.correlationId ??= response.headers.get('X-Correlation-Id') ?? undefined;
+  return new ApiError(response.status, problem);
+}
+
 async function send(method: string, path: string, body?: unknown): Promise<Response> {
   const headers: Record<string, string> = {};
   const token = tokenStore.get();
@@ -130,20 +146,13 @@ async function send(method: string, path: string, body?: unknown): Promise<Respo
   } else if (body !== undefined) {
     payload = JSON.stringify(body);
   }
-  let response: Response;
-  try {
-    response = await fetch(`/api/v1${path}`, { method, headers, body: payload });
-  } catch {
-    throw new ApiError(NETWORK_STATUS, {});
-  }
+  const response = await fetchOrNetworkError(`/api/v1${path}`, { method, headers, body: payload });
   if (response.status === 401 && token) {
     tokenStore.clear();
     unauthorizedHandler?.();
   }
   if (!response.ok) {
-    const problem = (await response.json().catch(() => ({}))) as ProblemDetail;
-    problem.correlationId ??= response.headers.get('X-Correlation-Id') ?? undefined;
-    throw new ApiError(response.status, problem);
+    throw await problemOf(response);
   }
   return response;
 }

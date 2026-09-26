@@ -17,6 +17,45 @@ import { SummaryCharts, SummaryKpis } from './widgets/SummaryWidgets';
 import { showsInsurerWidgets } from './insurerWidgets';
 import { WorkloadWidget } from './widgets/WorkloadWidget';
 
+/** The insurer KPI widgets (premium, claims), shown to insurer roles only. */
+function InsurerWidgets({
+  allowed,
+  roles,
+}: Readonly<{ allowed: boolean; roles: readonly string[] | undefined }>) {
+  if (!allowed || !showsInsurerWidgets(roles)) {
+    return null;
+  }
+  return (
+    <>
+      <PremiumWidget enabled />
+      <ClaimsWidget enabled />
+    </>
+  );
+}
+
+/** Journals awaiting the user's authorization, as the page's call to action. */
+function PendingJournals({
+  summary,
+  onOpen,
+}: Readonly<{ summary: { pendingJournals: number } | undefined; onOpen: () => void }>) {
+  const count = summary?.pendingJournals ?? 0;
+  if (count <= 0) {
+    return null;
+  }
+  return (
+    <Button variant="accent" onClick={onOpen}>
+      {count} Journal(s) Awaiting Authorization
+    </Button>
+  );
+}
+
+/** "Financial position as of 25-Sep-2026 · amounts in PHP". */
+function positionLine(d: { asOf: string } | undefined, ccy: string): string {
+  return d === undefined
+    ? 'Loading financial position…'
+    : `Financial position as of ${formatDate(d.asOf)} · amounts in ${ccy}`;
+}
+
 /**
  * Executive finance dashboard: headline KPIs of the ledger, then one widget per area
  * (collections, payables, cash, budget). Every widget loads on its own and shows a message
@@ -29,7 +68,6 @@ export default function DashboardPage() {
   const { user, can } = useAuth();
   const navigate = useNavigate();
   const allowed = can('DASHBOARD_VIEW');
-  const insurerKpis = allowed && showsInsurerWidgets(user?.roles);
   const summary = useQuery({
     queryKey: ['dashboard', companyId, branchId],
     queryFn: () => dashboardApi.summary(companyId, branchId),
@@ -43,18 +81,10 @@ export default function DashboardPage() {
       <PageHeader
         section="Dashboard"
         title={`Welcome, ${user?.fullName.split(' ')[0] ?? ''}`}
-        description={
-          d
-            ? `Financial position as of ${formatDate(d.asOf)} · fiscal year from ${formatDate(d.fiscalYearStart)} · amounts in ${ccy}`
-            : 'Loading financial position…'
-        }
+        description={positionLine(d, ccy)}
         actions={
-          can('JOURNAL_AUTHORIZE') &&
-          d !== undefined &&
-          d.pendingJournals > 0 && (
-            <Button variant="accent" onClick={() => void navigate('/gl/journals')}>
-              {d.pendingJournals} journal(s) awaiting authorization
-            </Button>
+          can('JOURNAL_AUTHORIZE') && (
+            <PendingJournals summary={d} onOpen={() => void navigate('/gl/journals')} />
           )
         }
       />
@@ -64,8 +94,7 @@ export default function DashboardPage() {
         <WorkloadWidget enabled={allowed} />
       </div>
       <div className="grid-2">
-        {insurerKpis && <PremiumWidget enabled />}
-        {insurerKpis && <ClaimsWidget enabled />}
+        <InsurerWidgets allowed={allowed} roles={user?.roles} />
         <CollectionsWidget enabled={allowed} />
         <PayablesWidget enabled={allowed} />
         <CashWidget enabled={allowed} />

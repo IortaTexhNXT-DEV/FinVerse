@@ -7,6 +7,7 @@ import { formatAmount } from '@/utils/format';
 import type { Amounts, RemittanceType, Settlement } from './api';
 import { TYPE_LABELS } from './remittanceLabels';
 import './remittance.css';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 /**
  * Totals strip of a batch (RMTID.002 addendum: amounts are read-only), with the CPC2 incentive
@@ -80,13 +81,11 @@ export function UploadForm({
     <div className="remit-form">
       <Field label={label} required error={error} hint="CSV, semicolon or tab separated text">
         {(id) => (
-          <input
+          <FileDropZone
             id={id}
-            className="input"
-            type="file"
             accept=".csv,.txt,text/csv,text/plain"
-            onChange={(e) => {
-              setFile(e.target.files?.[0]);
+            onChange={(files) => {
+              setFile(files[0]);
               setError(undefined);
             }}
           />

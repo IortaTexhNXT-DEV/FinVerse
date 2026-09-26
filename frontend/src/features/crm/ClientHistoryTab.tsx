@@ -4,7 +4,9 @@ import type { ClientHistoryEntry } from '@/api/clients';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
-import { formatDateTime } from '@/utils/format';
+import { Tag } from '@/components/ui/Tag';
+import { UserName } from '@/components/ui/UserName';
+import { formatDateTime, humanize } from '@/utils/format';
 
 /** History (audit trail) of the client under its prospect and client codes, newest first. */
 export function ClientHistoryTab({ clientId }: Readonly<{ clientId: number }>) {
@@ -13,20 +15,26 @@ export function ClientHistoryTab({ clientId }: Readonly<{ clientId: number }>) {
     queryFn: () => clientsApi.history(clientId),
   });
   return (
-    <Card title="Audit history" flush>
+    <Card title="Audit History" flush>
       <ErrorAlert error={history.error} />
       <DataTable<ClientHistoryEntry>
         loading={history.isLoading}
         rows={history.data ?? []}
         rowKey={(h) => h.id}
-        emptyMessage="No history."
+        emptyMessage="No history recorded"
         columns={[
-          { key: 'when', header: 'When', render: (h) => formatDateTime(h.occurredAt) },
-          { key: 'who', header: 'User', render: (h) => h.username },
+          {
+            key: 'when',
+            header: 'Date and Time',
+            kind: 'datetime',
+            render: (h) => formatDateTime(h.occurredAt),
+          },
+          { key: 'who', header: 'User', render: (h) => <UserName login={h.username} withRole /> },
           {
             key: 'action',
             header: 'Action',
-            render: (h) => <span className="badge">{h.action}</span>,
+            kind: 'status',
+            render: (h) => <Tag tone="info">{humanize(h.action)}</Tag>,
           },
           { key: 'summary', header: 'Details', render: (h) => h.summary },
         ]}

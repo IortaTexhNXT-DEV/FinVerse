@@ -18,6 +18,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import { NumberingPanel } from './NumberingPanel';
 import { glPlatformApi } from './glPlatformApi';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 type Tab = 'upload' | 'numbering' | 'history';
 
@@ -130,12 +131,10 @@ function UploadPanel() {
               hint="Excel (.xlsx), OpenDocument (.ods) or CSV, headers in row 1."
             >
               {(id) => (
-                <input
+                <FileDropZone
                   id={id}
-                  type="file"
-                  className="input"
                   accept=".xlsx,.ods,.csv"
-                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                  onChange={(files) => setFile(files[0] ?? null)}
                 />
               )}
             </Field>

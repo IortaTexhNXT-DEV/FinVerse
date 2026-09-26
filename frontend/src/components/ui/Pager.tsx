@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { pageWindow, showingText } from './pagerMath';
+import { PAGE_SIZES, pageWindow, showingText } from './pagerMath';
 
 interface PagerProps {
   page: number;
@@ -14,21 +14,11 @@ interface PagerProps {
   onSize?: (size: number) => void;
 }
 
-/** Rows-per-page choices of the pagination bar. */
-export const PAGE_SIZES = [10, 20, 50, 100] as const;
-
 /**
  * BDO Insure table pager: "Showing 1 to n of N results" on the left and numbered pages with
  * previous / next on the right. Hidden when there is nothing to page.
  */
-export function Pager({
-  page,
-  totalPages,
-  total,
-  size,
-  onPage,
-  onSize,
-}: Readonly<PagerProps>) {
+export function Pager({ page, totalPages, total, size, onPage, onSize }: Readonly<PagerProps>) {
   if (total <= 0 || totalPages <= 0) {
     return null;
   }

@@ -120,10 +120,7 @@ export function HistoryPanel({ accountId }: Readonly<{ accountId: number }>) {
   });
   return (
     <Card title="History">
-      <HistoryTable
-        history={detail.data?.history ?? []}
-        terminal={detail.data?.stageTerminal}
-      />
+      <HistoryTable history={detail.data?.history ?? []} terminal={detail.data?.stageTerminal} />
     </Card>
   );
 }

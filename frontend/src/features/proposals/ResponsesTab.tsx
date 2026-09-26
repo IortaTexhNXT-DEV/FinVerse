@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormControls';
 import { formatDate, formatDateTime } from '@/utils/format';
 import { RESPONSE_STAGES } from './proposalList';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 const STATUSES = [
   { value: 'RECEIVED', label: 'Terms received' },
@@ -117,14 +118,7 @@ function TermsDialog({
             onChange={(remarks) => set({ remarks })}
           />
           <Field label="Response document" hint="The insurer's quotation or e-mail">
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                type="file"
-                onChange={(e) => setFile(e.target.files?.[0])}
-              />
-            )}
+            {(id) => <FileDropZone id={id} onChange={(files) => setFile(files[0])} />}
           </Field>
         </div>
       </div>

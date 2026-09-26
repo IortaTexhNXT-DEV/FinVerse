@@ -19,6 +19,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, formatDateTime } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { DpBilling } from './commissionApi';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 const COLUMNS: Column<DpBilling>[] = [
   { key: 'no', header: 'Billing No.', render: (b) => <strong>{b.billingNo}</strong> },
@@ -70,13 +71,7 @@ function UploadDialog({
           hint="xlsx or csv with the columns Billing No., Invoice No., Decision (Approved / Rejected), Reason and Comment"
         >
           {(id) => (
-            <input
-              id={id}
-              type="file"
-              className="input"
-              accept=".xlsx,.csv"
-              onChange={(e) => setFile(e.target.files?.[0])}
-            />
+            <FileDropZone id={id} accept=".xlsx,.csv" onChange={(files) => setFile(files[0])} />
           )}
         </Field>
       </div>

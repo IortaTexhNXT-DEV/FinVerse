@@ -9,6 +9,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { NumberInput, TextInput } from '@/features/assets/FormControls';
 import { offered } from './packageRequest';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 interface ResponseDialogProps {
   requestId: number;
@@ -131,7 +132,7 @@ export function ResponseDialog({
         />
         <TextInput label="Remarks" value={form.remarks} onChange={(remarks) => set({ remarks })} />
         <Field label="Response document" hint="The insurer's reply (PDF, e-mail or image).">
-          {(id) => <input id={id} type="file" onChange={(e) => setFile(e.target.files?.[0])} />}
+          {(id) => <FileDropZone id={id} onChange={(files) => setFile(files[0])} />}
         </Field>
       </div>
     </Modal>

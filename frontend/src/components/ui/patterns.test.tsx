@@ -2,12 +2,15 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { setUserDirectory } from '@/api/users';
 import type { HistoryEntry } from '@/api/workflow';
-import { HistoryTable, historyRows } from '@/components/broking/HistoryTable';
+import { HistoryTable } from '@/components/broking/HistoryTable';
+import { historyRows } from '@/components/broking/historyRows';
+import { isFormatHint } from '@/utils/presentation';
 import { DataTable } from './DataTable';
 import { DefinitionGrid } from './DefinitionGrid';
-import { Field, isFormatHint } from './Field';
+import { Field } from './Field';
 import { Pager } from './Pager';
-import { StatusBadge, statusShortLabel } from './StatusBadge';
+import { StatusBadge } from './StatusBadge';
+import { statusShortLabel } from './statusTones';
 import { Tag } from './Tag';
 import { UserName } from './UserName';
 
@@ -79,9 +82,11 @@ describe('HistoryTable', () => {
     const table = screen.getByRole('table', { name: 'Status history' });
     const rows = within(table).getAllByRole('row');
     expect(rows).toHaveLength(4);
-    const first = rows[1];
-    expect(first).toBeDefined();
-    const cells = within(first as HTMLElement).getAllByRole('cell');
+    const [, first] = rows;
+    if (first === undefined) {
+      throw new Error('no data row');
+    }
+    const cells = within(first).getAllByRole('cell');
     expect(cells[0]).toHaveTextContent('Approved');
     expect(cells[1]).toHaveTextContent('For Approval');
     expect(cells[2]).toHaveTextContent('Approve');
@@ -96,8 +101,11 @@ describe('HistoryTable', () => {
   it('toggles to oldest first', async () => {
     render(<HistoryTable history={HISTORY} terminal />);
     await userEvent.click(screen.getByRole('button', { name: /newest first/i }));
-    const rows = screen.getAllByRole('row');
-    expect(within(rows[1] as HTMLElement).getAllByRole('cell')[0]).toHaveTextContent('Draft');
+    const [, oldest] = screen.getAllByRole('row');
+    if (oldest === undefined) {
+      throw new Error('no data row');
+    }
+    expect(within(oldest).getAllByRole('cell')[0]).toHaveTextContent('Draft');
     expect(screen.getByRole('columnheader', { name: /date and time/i })).toHaveAttribute(
       'aria-sort',
       'ascending',
@@ -156,14 +164,22 @@ describe('DefinitionGrid', () => {
 
 describe('Field', () => {
   it('keeps a short format hint under the field', () => {
-    render(<Field label="Birth Date" hint="dd-MMM-yyyy">{(id) => <input id={id} />}</Field>);
+    render(
+      <Field label="Birth Date" hint="dd-MMM-yyyy">
+        {(id) => <input id={id} />}
+      </Field>,
+    );
     expect(screen.getByText('dd-MMM-yyyy')).toHaveClass('field-format');
   });
 
   it('moves explanatory guidance to an info tooltip on the label', () => {
     const guidance = 'A prospect is enough to quote; the client must be confirmed first.';
-    render(<Field label="Client" hint={guidance}>{(id) => <input id={id} />}</Field>);
-    expect(screen.getByRole('img', { name: guidance })).toHaveAttribute('title', guidance);
+    render(
+      <Field label="Client" hint={guidance}>
+        {(id) => <input id={id} />}
+      </Field>,
+    );
+    expect(screen.getByRole('button', { name: guidance })).toHaveAttribute('title', guidance);
     expect(screen.getByLabelText('Client')).toBeInTheDocument();
   });
 
@@ -187,7 +203,13 @@ describe('Field', () => {
 
 describe('DataTable conventions', () => {
   const columns = [
-    { key: 'ref', header: 'Reference', kind: 'code' as const, render: (r: Row) => r.ref, sortKey: 'ref' },
+    {
+      key: 'ref',
+      header: 'Reference',
+      kind: 'code' as const,
+      render: (r: Row) => r.ref,
+      sortKey: 'ref',
+    },
     { key: 'amt', header: 'Amount', kind: 'amount' as const, render: (r: Row) => r.amount },
   ];
   interface Row {

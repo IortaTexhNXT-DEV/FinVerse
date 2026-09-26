@@ -326,10 +326,7 @@ export function HistoryTab({ proposalId }: Readonly<{ proposalId: number }>) {
   });
   return (
     <Card title="History">
-      <HistoryTable
-        history={detail.data?.history ?? []}
-        terminal={detail.data?.stageTerminal}
-      />
+      <HistoryTable history={detail.data?.history ?? []} terminal={detail.data?.stageTerminal} />
     </Card>
   );
 }

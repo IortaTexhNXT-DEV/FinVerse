@@ -208,6 +208,81 @@
   text-decoration: underline;
 }
 
+/* The existing detail lists share the definition grid look: one label width, ruled rows */
+.detail-list {
+  grid-template-columns: var(--def-label-width) minmax(0, 1fr);
+  gap: 0 var(--space-3);
+}
+
+.detail-list dt,
+.detail-list dd {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.detail-list dt {
+  font-weight: 400;
+  font-size: 13px;
+}
+
+.detail-list dd {
+  color: var(--color-heading);
+  overflow-wrap: anywhere;
+}
+
+/* Key facts grids (four columns of label over value) */
+dl.form-grid {
+  margin: 0;
+}
+
+dl.form-grid dt {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+dl.form-grid dd {
+  margin: 0;
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+/* ---------- Page and record actions: one order everywhere -------------------------------- */
+/* Secondary actions first, then the primary action; a destructive action is separated and last. */
+.page-header .row > .btn-ghost,
+.record-header-actions > .btn-ghost {
+  order: 1;
+}
+
+.page-header .row > .btn-secondary,
+.record-header-actions > .btn-secondary {
+  order: 2;
+}
+
+.page-header .row > .btn-primary,
+.page-header .row > .btn-accent,
+.record-header-actions > .btn-primary,
+.record-header-actions > .btn-accent {
+  order: 3;
+}
+
+.page-header .row > .btn-danger,
+.record-header-actions > .btn-danger {
+  order: 4;
+  margin-left: var(--space-4);
+  position: relative;
+}
+
+.page-header .row > .btn-danger::before,
+.record-header-actions > .btn-danger::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--space-3));
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: var(--color-border-strong);
+}
+
 /* ---------- Workflow status panel -------------------------------------------------------- */
 .status-strip {
   display: grid;
@@ -515,6 +590,51 @@
 
 .completeness-bar.low > div {
   background: var(--brand-gold);
+}
+
+.labelled-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+}
+
+.completeness-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--color-success);
+}
+
+.completeness-bar.low > span {
+  background: var(--brand-gold);
+}
+
+/* Key facts of a record header: four label-over-value columns */
+.key-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-5);
+  margin: 0;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.key-facts dt {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.key-facts dd {
+  margin: 2px 0 0;
+  color: var(--color-heading);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1100px) {
+  .key-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* Detail sections: one card grid with aligned label / value rows */

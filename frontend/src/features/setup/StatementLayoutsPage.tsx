@@ -17,6 +17,7 @@ import { LayoutFields } from './LayoutFields';
 import { frbsSetupApi } from './frbsSetupApi';
 import type { StatementLayout } from './frbsSetupApi';
 import { layoutProblems } from './setupForms';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 const NEW_LAYOUT: StatementLayout = {
   bankAccountCode: '',
@@ -234,12 +235,10 @@ function ImportStatementDialog({
           hint="Excel (.xlsx), OpenDocument (.ods) or CSV in the layout of the bank account."
         >
           {(id) => (
-            <input
+            <FileDropZone
               id={id}
-              type="file"
-              className="input"
               accept=".xlsx,.ods,.csv"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              onChange={(files) => setFile(files[0] ?? null)}
             />
           )}
         </Field>

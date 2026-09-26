@@ -13,6 +13,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import { orUndefined } from './invoiceSearch';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 const RECORD_COLUMNS: Column<FeedRecord>[] = [
   { key: 'k', header: 'Record', render: (r) => r.idempotencyKey },
@@ -143,12 +144,10 @@ export function FeedUploadDialog({ feed, onClose }: Readonly<{ feed: Feed; onClo
         <ErrorAlert error={upload.error} />
         <Field label="File" required error={error}>
           {(id) => (
-            <input
+            <FileDropZone
               id={id}
-              type="file"
-              className="input"
-              onChange={(e) => {
-                setFile(e.target.files?.[0]);
+              onChange={(files) => {
+                setFile(files[0]);
                 setError(undefined);
               }}
             />

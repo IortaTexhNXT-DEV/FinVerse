@@ -15,6 +15,7 @@ import type { CaseDetail, CaseDocument } from './api';
 import { uploadErrors } from './caseLogic';
 import type { UploadForm } from './caseLogic';
 import { LovField, StepDialog } from './StepDialog';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 function UploadDialog({
   detail,
@@ -60,12 +61,7 @@ function UploadDialog({
       </p>
       <Field label="File" required error={errors.file}>
         {(id) => (
-          <input
-            id={id}
-            type="file"
-            className="input"
-            onChange={(e) => setForm({ ...form, file: e.target.files?.[0] })}
-          />
+          <FileDropZone id={id} onChange={(files) => setForm({ ...form, file: files[0] })} />
         )}
       </Field>
       <div className="form-grid">

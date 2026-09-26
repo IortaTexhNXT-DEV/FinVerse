@@ -131,10 +131,7 @@ export function HistoryTab({ requestId }: Readonly<{ requestId: number }>) {
     <div className="stack">
       <ErrorAlert error={detail.error ?? history.error} />
       <Card title="Status history">
-        <HistoryTable
-        history={detail.data?.history ?? []}
-        terminal={detail.data?.stageTerminal}
-      />
+        <HistoryTable history={detail.data?.history ?? []} terminal={detail.data?.stageTerminal} />
       </Card>
       <Card title="Insurer response revisions" flush>
         <DataTable<ResponseHistory>

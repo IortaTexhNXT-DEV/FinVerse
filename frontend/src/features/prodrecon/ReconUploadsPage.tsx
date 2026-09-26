@@ -19,6 +19,7 @@ import { formatDateTime } from '@/utils/format';
 import { prodreconApi } from './prodreconApi';
 import type { ReconUpload } from './prodreconApi';
 import { monthLabel } from './prodreconLogic';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 const COLUMNS: Column<ReconUpload>[] = [
   {
@@ -83,13 +84,7 @@ function UploadDialog({
           hint="The register returned by the insurer (xlsx or csv), named <INSURER>_PRODREG_<yyyyMM>_<seq>"
         >
           {(id) => (
-            <input
-              id={id}
-              type="file"
-              className="input"
-              accept=".xlsx,.csv"
-              onChange={(e) => setFile(e.target.files?.[0])}
-            />
+            <FileDropZone id={id} accept=".xlsx,.csv" onChange={(files) => setFile(files[0])} />
           )}
         </Field>
       </div>

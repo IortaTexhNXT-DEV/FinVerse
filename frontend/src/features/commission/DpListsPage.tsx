@@ -19,6 +19,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, formatDateTime, humanize, today } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { DpList, Submission } from './commissionApi';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 const TABS = [
   { id: 'lists', label: 'Lists Received' },
@@ -95,13 +96,7 @@ function UploadDialog({
           hint="xlsx or csv named <Branch>_DP_<yyyyMMdd>, e.g. HO_DP_20260930.xlsx, with Invoice No., Policy No., Insurer, Premium and Remarks columns"
         >
           {(id) => (
-            <input
-              id={id}
-              type="file"
-              className="input"
-              accept=".xlsx,.csv"
-              onChange={(e) => setFile(e.target.files?.[0])}
-            />
+            <FileDropZone id={id} accept=".xlsx,.csv" onChange={(files) => setFile(files[0])} />
           )}
         </Field>
       </div>

@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
-import type { ReactNode } from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
 import { EmptyState } from './EmptyState';
 
 /**
@@ -97,6 +97,91 @@ function SortHeader<T>({
   );
 }
 
+type BodyProps<T> = Pick<
+  DataTableProps<T>,
+  'columns' | 'rows' | 'rowKey' | 'onRowClick' | 'emptyMessage' | 'emptyAction' | 'selectedKey'
+> & { loading: boolean; skeletonRows: number };
+
+function SkeletonRows<T>({ columns, count }: Readonly<{ columns: Column<T>[]; count: number }>) {
+  return (
+    <>
+      {Array.from({ length: count }, (_, i) => (
+        <tr key={`skeleton-${String(i)}`} className="skeleton-row" aria-hidden="true">
+          {columns.map((c) => (
+            <td key={c.key}>
+              <div className="skeleton-line" />
+            </td>
+          ))}
+        </tr>
+      ))}
+      <tr className="visually-hidden">
+        <td colSpan={columns.length}>
+          <span className="spinner" aria-label="Loading" />
+        </td>
+      </tr>
+    </>
+  );
+}
+
+function TableBody<T>({
+  columns,
+  rows,
+  rowKey,
+  onRowClick,
+  emptyMessage,
+  emptyAction,
+  loading,
+  selectedKey,
+  skeletonRows,
+}: Readonly<BodyProps<T>>) {
+  if (loading) {
+    return (
+      <tbody>
+        <SkeletonRows columns={columns} count={skeletonRows} />
+      </tbody>
+    );
+  }
+  if (rows.length === 0) {
+    return (
+      <tbody>
+        <tr>
+          <td colSpan={columns.length}>
+            <EmptyState message={emptyMessage} action={emptyAction} />
+          </td>
+        </tr>
+      </tbody>
+    );
+  }
+  const keyDown = (row: T) => (e: KeyboardEvent<HTMLTableRowElement>) => {
+    if (e.key === 'Enter') {
+      onRowClick?.(row);
+    }
+  };
+  return (
+    <tbody>
+      {rows.map((row) => {
+        const key = rowKey(row);
+        return (
+          <tr
+            key={key}
+            className={onRowClick ? 'clickable' : undefined}
+            aria-selected={selectedKey === key || undefined}
+            onClick={onRowClick ? () => onRowClick(row) : undefined}
+            onKeyDown={onRowClick ? keyDown(row) : undefined}
+            tabIndex={onRowClick ? 0 : undefined}
+          >
+            {columns.map((c) => (
+              <td key={c.key} className={cellClass(c)}>
+                {c.render(row)}
+              </td>
+            ))}
+          </tr>
+        );
+      })}
+    </tbody>
+  );
+}
+
 /**
  * Accessible data table (BDO): Header Blue sticky header, zebra rows, row hover and selection,
  * keyboard-operable row click, sortable headers where the API sorts, skeleton rows while loading,
@@ -140,61 +225,17 @@ export function DataTable<T>({
             ))}
           </tr>
         </thead>
-        <tbody>
-          {loading &&
-            Array.from({ length: skeletonRows }, (_, i) => (
-              <tr key={`skeleton-${String(i)}`} className="skeleton-row" aria-hidden="true">
-                {columns.map((c) => (
-                  <td key={c.key}>
-                    <div className="skeleton-line" />
-                  </td>
-                ))}
-              </tr>
-            ))}
-          {loading && (
-            <tr className="visually-hidden">
-              <td colSpan={columns.length}>
-                <span className="spinner" aria-label="Loading" />
-              </td>
-            </tr>
-          )}
-          {!loading && rows.length === 0 && (
-            <tr>
-              <td colSpan={columns.length}>
-                <EmptyState message={emptyMessage} action={emptyAction} />
-              </td>
-            </tr>
-          )}
-          {!loading &&
-            rows.map((row) => {
-              const key = rowKey(row);
-              const selected = selectedKey !== undefined && key === selectedKey;
-              return (
-                <tr
-                  key={key}
-                  className={onRowClick ? 'clickable' : undefined}
-                  aria-selected={selected || undefined}
-                  onClick={onRowClick ? () => onRowClick(row) : undefined}
-                  onKeyDown={
-                    onRowClick
-                      ? (e) => {
-                          if (e.key === 'Enter') {
-                            onRowClick(row);
-                          }
-                        }
-                      : undefined
-                  }
-                  tabIndex={onRowClick ? 0 : undefined}
-                >
-                  {columns.map((c) => (
-                    <td key={c.key} className={cellClass(c)}>
-                      {c.render(row)}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
-        </tbody>
+        <TableBody
+          columns={columns}
+          rows={rows}
+          rowKey={rowKey}
+          onRowClick={onRowClick}
+          emptyMessage={emptyMessage}
+          emptyAction={emptyAction}
+          loading={loading}
+          selectedKey={selectedKey}
+          skeletonRows={skeletonRows}
+        />
         {footer !== undefined && !loading && rows.length > 0 && <tfoot>{footer}</tfoot>}
       </table>
     </div>

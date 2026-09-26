@@ -1,13 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
 import { Copy } from 'lucide-react';
 import { useState } from 'react';
-import type { ChangeEvent } from 'react';
 import { budgetApi } from '@/api/budget';
 import type { Budget } from '@/api/budget';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 interface Props {
   budget: Budget;
@@ -26,8 +26,8 @@ export function BudgetTools({ budget, onUpdated }: Readonly<Props>) {
     mutationFn: () => budgetApi.copyActuals(budget.id, sourceYear, percent),
     onSuccess: (b) => onUpdated(b, `Actuals of ${sourceYear} copied`),
   });
-  const onFile = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const onFile = (files: File[]) => {
+    const file = files[0];
     if (file) {
       void file.text().then((text) => importCsv.mutate(text));
     }
@@ -42,7 +42,7 @@ export function BudgetTools({ budget, onUpdated }: Readonly<Props>) {
           <code>account_code,cost_centre,annual</code> (spread evenly). Replaces all lines.
         </p>
         <Field label="CSV file">
-          {(id) => <input id={id} type="file" accept=".csv,text/csv" onChange={onFile} />}
+          {(id) => <FileDropZone id={id} accept=".csv,text/csv" onChange={onFile} />}
         </Field>
       </Card>
       <Card title="Copy from prior-year actuals">

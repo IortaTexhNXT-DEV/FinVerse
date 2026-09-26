@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
+import { isEmptyValue } from '@/utils/presentation';
 
 /** One label / value pair of a detail block. */
 export interface Definition {
@@ -17,11 +18,6 @@ interface DefinitionGridProps {
   collapseEmpty?: boolean;
   /** Accessible name of the block. */
   label?: string;
-}
-
-/** Whether a value counts as empty: null, undefined, '' or false. */
-export function isEmptyValue(value: ReactNode): boolean {
-  return value === null || value === undefined || value === '' || value === false;
 }
 
 /**

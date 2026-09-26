@@ -7,6 +7,7 @@ import { Modal } from '@/components/ui/Modal';
 import { formatAmount, today } from '@/utils/format';
 import { frbsApi } from './api';
 import type { ServiceFeeLine } from './api';
+import { FileDropZone } from '@/components/ui/FileDropZone';
 
 function dateError(value: string, now: string, label: string): string | undefined {
   if (value === '') {
@@ -138,14 +139,7 @@ export function LiquidateDialog({
             error={fileMessage}
             hint="PDF, image or spreadsheet"
           >
-            {(id) => (
-              <input
-                id={id}
-                type="file"
-                className="input"
-                onChange={(e) => setFile(e.target.files?.[0])}
-              />
-            )}
+            {(id) => <FileDropZone id={id} onChange={(files) => setFile(files[0])} />}
           </Field>
           <div className="frbs-form-wide">
             <Field label="Remarks">

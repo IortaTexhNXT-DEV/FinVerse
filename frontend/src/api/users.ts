@@ -49,15 +49,14 @@ export function setUserDirectory(entries: DirectoryEntry[]): void {
 }
 
 export const userDirectory = {
-  subscribe(listener: () => void): () => void {
+  subscribe: (listener: () => void): (() => void) => {
     listeners.add(listener);
-    return () => listeners.delete(listener);
+    return () => {
+      listeners.delete(listener);
+    };
   },
-  snapshot(): Directory {
-    return directory;
-  },
+  snapshot: (): Directory => directory,
   /** The entry of a login id, if known. */
-  find(login: string | null | undefined): DirectoryEntry | undefined {
-    return login ? directory.get(login.toLowerCase()) : undefined;
-  },
+  find: (login: string | null | undefined): DirectoryEntry | undefined =>
+    login ? directory.get(login.toLowerCase()) : undefined,
 };

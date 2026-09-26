@@ -288,8 +288,7 @@ export const CONFIG_TYPES: readonly TypeSpec[] = [
   {
     type: 'STR_LAYOUT',
     label: 'STR Layout',
-    description:
-      'Columns of the STR extraction file in the AMLC format.',
+    description: 'Columns of the STR extraction file in the AMLC format.',
     tables: [COLUMNS],
   },
 ];

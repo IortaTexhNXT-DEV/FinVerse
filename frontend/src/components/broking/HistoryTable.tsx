@@ -3,8 +3,9 @@ import { useState } from 'react';
 import type { HistoryEntry } from '@/api/workflow';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { useDisplayName, useRoleName } from '@/components/ui/UserName';
-import { formatDateTime, formatDuration, humanize, titleCase } from '@/utils/format';
+import { useDisplayName, useRoleName } from '@/components/ui/useDisplayName';
+import { formatDateTime, humanize, titleCase } from '@/utils/format';
+import { historyRows } from './historyRows';
 
 interface HistoryTableProps {
   /** Status history, oldest first (as the workflow API returns it). */
@@ -13,13 +14,6 @@ interface HistoryTableProps {
   terminal?: boolean;
   /** Accessible name of the table. */
   label?: string;
-}
-
-interface Row {
-  entry: HistoryEntry;
-  /** Time spent in the stage this row entered: until the next change, or until now. */
-  duration: string;
-  order: number;
 }
 
 function stageLabel(code: string | undefined, name: string | undefined): string {
@@ -32,21 +26,6 @@ function stageLabel(code: string | undefined, name: string | undefined): string 
 function remarks(entry: HistoryEntry): string {
   const parts = [entry.reasonCode ? humanize(entry.reasonCode) : '', entry.comment ?? ''];
   return parts.filter((p) => p !== '').join(' · ');
-}
-
-/** Builds the rows with the duration in each stage, oldest first. */
-export function historyRows(history: HistoryEntry[], terminal = false): Row[] {
-  return history.map((entry, i) => {
-    const next = history[i + 1];
-    const isLast = next === undefined;
-    let duration = '';
-    if (!isLast) {
-      duration = formatDuration(entry.occurredAt, next.occurredAt);
-    } else if (!terminal) {
-      duration = formatDuration(entry.occurredAt, undefined);
-    }
-    return { entry, duration, order: i };
-  });
 }
 
 /**
@@ -84,7 +63,9 @@ export function HistoryTable({
                 type="button"
                 className="th-sort"
                 onClick={() => setNewestFirst((v) => !v)}
-                aria-label={newestFirst ? 'Date and time, newest first' : 'Date and time, oldest first'}
+                aria-label={
+                  newestFirst ? 'Date and time, newest first' : 'Date and time, oldest first'
+                }
               >
                 Date and Time <SortIcon size={14} aria-hidden="true" />
               </button>

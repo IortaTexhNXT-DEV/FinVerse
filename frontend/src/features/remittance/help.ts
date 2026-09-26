@@ -12,9 +12,7 @@ export const REMITTANCE_HELP: HelpSection = {
       path: '/remittance',
       summary:
         'Work queues of Remittance (batches in review and for approval, batches awaiting the insurer OR, holds and special remittances for approval, paid invoices not yet extracted, invoices on hold or locked) and the way into the Remittance screens.',
-      controls: [
-        'Batch amounts cannot be edited; invoices can only be excluded with a reason.',
-      ],
+      controls: ['Batch amounts cannot be edited; invoices can only be excluded with a reason.'],
     },
     {
       name: 'Extraction',

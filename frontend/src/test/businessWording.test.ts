@@ -30,11 +30,32 @@ const sources = import.meta.glob<string>('../**/*.{ts,tsx}', {
   eager: true,
 });
 
+/** A line without its line comment (a "//" not inside a URL such as https://). */
+function withoutLineComment(line: string): string {
+  let at = line.indexOf('//');
+  while (at >= 0) {
+    if (at === 0 || line[at - 1] !== ':') {
+      return line.slice(0, at);
+    }
+    at = line.indexOf('//', at + 2);
+  }
+  return line;
+}
+
 /** The source without comments: block and JSX comments, then line comments. */
-export function withoutComments(source: string): string {
-  return source
-    .replace(/\/\*[\s\S]*?\*\//g, (block) => block.replace(/[^\n]/g, ' '))
-    .replace(/(^|[^:'"`\\])\/\/.*$/gm, '$1');
+function withoutComments(source: string): string {
+  const blocks: string[] = [];
+  let rest = source;
+  let start = rest.indexOf('/*');
+  while (start >= 0) {
+    const end = rest.indexOf('*/', start + 2);
+    const stop = end < 0 ? rest.length : end + 2;
+    blocks.push(rest.slice(0, start), rest.slice(start, stop).replace(/[^\n]/g, ' '));
+    rest = rest.slice(stop);
+    start = rest.indexOf('/*');
+  }
+  blocks.push(rest);
+  return blocks.join('').split('\n').map(withoutLineComment).join('\n');
 }
 
 describe('business-user wording', () => {
@@ -65,6 +86,6 @@ describe('business-user wording', () => {
   it('ignores references in comments', () => {
     const code = "// ADJID.021\n/* BRNB.102 */\nconst label = 'Aging';";
     expect(withoutComments(code)).not.toMatch(/ADJID|BRNB/);
-    expect(withoutComments("const url = 'http://host/x';")).toContain('http://host/x');
+    expect(withoutComments("const url = 'https://host/x';")).toContain('https://host/x');
   });
 });

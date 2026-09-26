@@ -12,9 +12,7 @@ export const PRODRECON_HELP: HelpSection = {
       path: '/prodrecon',
       summary:
         'Work queues of Production Reconciliation (registers to send, cycles waiting for the insurer feedback, cycles being reconciled, unbooked accounts) and the way into the reconciliation screens.',
-      controls: [
-        'Differences up to the RECON_TOLERANCE parameter (1.00) count as matched.',
-      ],
+      controls: ['Differences up to the RECON_TOLERANCE parameter (1.00) count as matched.'],
     },
     {
       name: 'Reconciliation Cycles',

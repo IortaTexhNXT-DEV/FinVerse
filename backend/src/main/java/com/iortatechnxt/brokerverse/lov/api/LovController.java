@@ -22,12 +22,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Lists of values: pick lists for every signed-in user, maintenance for administrators. */
+/**
+ * Lists of values: pick lists for every signed-in user, maintenance for administrators ({@code
+ * LOV_MANAGE}, authorized with {@code MASTER_AUTHORIZE}) and, for a list with an owner permission,
+ * for the holders of that permission ({@code LovAccess}).
+ */
 @RestController
 @RequestMapping("/api/v1/lov")
 public class LovController {
 
-  private static final String MANAGE = "hasAuthority('LOV_MANAGE')";
+  private static final String MANAGE_VALUE = "@lovAccess.canMaintainValue(#id)";
 
   private final LovService service;
   private final Clock clock;
@@ -78,7 +82,7 @@ public class LovController {
    * @return values
    */
   @GetMapping("/{type}/values")
-  @PreAuthorize("hasAnyAuthority('LOV_MANAGE', 'MASTER_AUTHORIZE')")
+  @PreAuthorize("@lovAccess.canRead(#type)")
   public List<LovValueResponse> values(@PathVariable String type) {
     return service.values(type).stream().map(LovValueResponse::from).toList();
   }
@@ -92,7 +96,7 @@ public class LovController {
    */
   @PostMapping("/{type}/values")
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize(MANAGE)
+  @PreAuthorize("@lovAccess.canMaintain(#type)")
   public LovValueResponse create(
       @PathVariable String type, @Valid @RequestBody LovValueRequest request) {
     return LovValueResponse.from(service.create(type, request.code(), request.details()));
@@ -106,7 +110,7 @@ public class LovController {
    * @return value
    */
   @PutMapping("/values/{id}")
-  @PreAuthorize(MANAGE)
+  @PreAuthorize(MANAGE_VALUE)
   public LovValueResponse update(
       @PathVariable Long id, @Valid @RequestBody LovValueRequest request) {
     return LovValueResponse.from(service.update(id, request.details()));
@@ -119,7 +123,7 @@ public class LovController {
    * @return value
    */
   @PostMapping("/values/{id}/authorize")
-  @PreAuthorize("hasAuthority('MASTER_AUTHORIZE')")
+  @PreAuthorize("@lovAccess.canAuthorizeValue(#id)")
   public LovValueResponse authorize(@PathVariable Long id) {
     return LovValueResponse.from(service.authorize(id));
   }
@@ -131,7 +135,7 @@ public class LovController {
    * @return value
    */
   @PostMapping("/values/{id}/deactivate")
-  @PreAuthorize(MANAGE)
+  @PreAuthorize(MANAGE_VALUE)
   public LovValueResponse deactivate(@PathVariable Long id) {
     return LovValueResponse.from(service.deactivate(id));
   }

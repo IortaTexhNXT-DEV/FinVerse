@@ -331,7 +331,7 @@ Planned jobs of the later BRDs (designed, not built; names, schedules and cron p
 | Module | Jobs | Design |
 |---|---|---|
 | `renewal` | `RNW_EXTRACTION`, `RNW_REEVALUATE`, `RNW_NRNS_LETTERS`, `RNW_EXPIRY_SWEEP` (daily); `RNW_LETTER_BATCH` (manual) | `RENEWAL_DESIGN.md` §9 |
-| `brokerclaims` | `BCL_FOLLOW_UP_DUE`, `BCL_PREMIUM_RECHECK`, `BCL_AGEING_ALERTS` (daily) | `CLAIMS_BROKING_DESIGN.md` §9.1 |
+| `brokerclaims` | `BCL_FOLLOW_UP_DUE`, `BCL_PREMIUM_RECHECK`, `BCL_AGEING_ALERTS` (daily; crons `brokerverse.jobs.bcl-*-cron` configured since CL0) | `CLAIMS_BROKING_DESIGN.md` §9.1 |
 | `eb`, `portal` | `EB_RENEWAL_ADVICE`, `EB_ITEM_FOLLOWUP`, `PORTAL_INVITATION_EXPIRY` (daily) | `EMPLOYEE_BENEFITS_DESIGN.md` §8.1 |
 | `csf` | `CSF_LEGACY_SYNC` (every 15 minutes; manual until `CSF_LEGACY_SYNC_ENABLED`) | `CUSTOMER_SERVICING_DESIGN.md` §7 |
 | `screening` | `SCR_WATCHLIST_INGEST`, `SCR_PERIODIC_SCREENING` (daily), `SCR_SLA_MONITOR` (hourly), `SCR_INGEST_ERROR_DIGEST` (working days) | `SANCTION_SCREENING_DESIGN.md` §8 |
@@ -479,7 +479,7 @@ code; cross-BRD decisions and the build order are in
 | Module (package) | BRD | Flyway (demo) | Design |
 |---|---|---|---|
 | `renewal` | BRD-6 Renewal | V1010–V1017 (V1910–V1911) | [`RENEWAL_DESIGN.md`](../architecture/RENEWAL_DESIGN.md) |
-| `brokerclaims` | BRD-7 Claims | V1020–V1024 (V1920–V1921) | [`CLAIMS_BROKING_DESIGN.md`](../architecture/CLAIMS_BROKING_DESIGN.md) |
+| `brokerclaims` | BRD-7 Claims (being built: foundation CL0 V1020, V1021, V1920 done; CL1-A V1022, V1921; CL1-B V1023, V1024; V1025 held for the legacy migration, CLQ14) | V1020–V1024 (V1920–V1921) | [`CLAIMS_BROKING_DESIGN.md`](../architecture/CLAIMS_BROKING_DESIGN.md) |
 | `eb` | BRD-8 Employee Benefits | V1030, V1031, V1033–V1036 (V1930–V1932) | [`EMPLOYEE_BENEFITS_DESIGN.md`](../architecture/EMPLOYEE_BENEFITS_DESIGN.md) |
 | `portal` (platform) | BRD-8 Employee Benefits | V1032 | [`EMPLOYEE_BENEFITS_DESIGN.md`](../architecture/EMPLOYEE_BENEFITS_DESIGN.md) |
 | `csf` | BRD-9 Customer Servicing Facility | V1040–V1042 (V1940) | [`CUSTOMER_SERVICING_DESIGN.md`](../architecture/CUSTOMER_SERVICING_DESIGN.md) |

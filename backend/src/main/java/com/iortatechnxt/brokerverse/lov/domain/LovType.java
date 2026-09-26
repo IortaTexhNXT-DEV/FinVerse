@@ -22,6 +22,9 @@ public class LovType extends BaseEntity {
   @Column(nullable = false)
   private boolean maintainable;
 
+  @Column(name = "owner_permission", length = 50)
+  private String ownerPermission;
+
   protected LovType() {}
 
   public String getCode() {
@@ -43,5 +46,16 @@ public class LovType extends BaseEntity {
    */
   public boolean isMaintainable() {
     return maintainable;
+  }
+
+  /**
+   * Permission of the module that owns the list (CLAIMS_BROKING_DESIGN 12.1): its holders may
+   * maintain the values, and authorize another user's change, without the global {@code LOV_MANAGE}
+   * / {@code MASTER_AUTHORIZE} (e.g. {@code BCL_SETUP} for the Claims lists).
+   *
+   * @return permission name, null when only the global permissions apply
+   */
+  public String getOwnerPermission() {
+    return ownerPermission;
   }
 }

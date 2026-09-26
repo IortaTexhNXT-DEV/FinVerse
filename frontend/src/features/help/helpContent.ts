@@ -5,6 +5,7 @@ import { ADJUSTMENT_HELP } from '@/features/adjustment/help';
 import { ADMIN_HELP } from '@/features/admin/help';
 import { ASSETS_HELP } from '@/features/assets/help';
 import { BOOKING_HELP } from '@/features/booking/help';
+import { BROKER_CLAIMS_HELP } from '@/features/brokerclaims/help';
 import { BROKING_SETUP_HELP } from '@/features/brokingsetup/help';
 import { BULK_HELP } from '@/features/bulk/help';
 import { CASHIERING_HELP } from '@/features/cashiering/help';
@@ -140,6 +141,7 @@ export const HELP_SECTIONS: HelpSection[] = [
   PLANNING_HELP,
   TAX_HELP,
   ACCOUNTING_ENGINE_HELP,
+  BROKER_CLAIMS_HELP,
   UNDERWRITING_HELP,
   CLAIMS_HELP,
   REINSURANCE_HELP,

@@ -9,8 +9,10 @@ import com.iortatechnxt.brokerverse.lov.domain.LovType;
  * @param name name
  * @param description description
  * @param maintainable whether business administrators maintain it
+ * @param ownerPermission permission that also maintains the values (null = LOV_MANAGE only)
  */
-public record LovTypeResponse(String code, String name, String description, boolean maintainable) {
+public record LovTypeResponse(
+    String code, String name, String description, boolean maintainable, String ownerPermission) {
 
   /**
    * Maps a type.
@@ -20,6 +22,10 @@ public record LovTypeResponse(String code, String name, String description, bool
    */
   public static LovTypeResponse from(LovType type) {
     return new LovTypeResponse(
-        type.getCode(), type.getName(), type.getDescription(), type.isMaintainable());
+        type.getCode(),
+        type.getName(),
+        type.getDescription(),
+        type.isMaintainable(),
+        type.getOwnerPermission());
   }
 }

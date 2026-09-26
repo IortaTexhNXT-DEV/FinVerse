@@ -298,5 +298,36 @@ public enum Permission {
   // 10. User access reports
   UAM_REPORT_VIEW,
   // Second approval of privileged or out-of-hours changes (UAM-NFR-40)
-  UAM_SECOND_APPROVE
+  UAM_SECOND_APPROVE,
+
+  // Claims Handling (BDOI BRD-7, broking claims). See docs/architecture/CLAIMS_BROKING_DESIGN.md
+  // section 7.1 and V1020. The insurer-side CLAIM_* permissions above stay hidden from BDOI roles.
+  // Claims home, worklist and claim record (read); Cover Lookup (BRCLM.002/003)
+  BCL_VIEW,
+  BCL_COVER_VIEW,
+  // Record a claim, loss details, locations, insurer claim numbers, updates, diary (BRCLM.003/037)
+  BCL_RECORD,
+  // Claims authorization code when the premium is paid (BRCLM.001)
+  BCL_AUTHORIZE,
+  // Status change within the status access matrix, reported date, resume (BRCLM.004/011/035)
+  BCL_STATUS_UPDATE,
+  // Permanent closure (BRCLM.005/035) and reopen of a closed claim (CLQ06)
+  BCL_CLOSE,
+  BCL_REOPEN,
+  // Team Lead / Team Head rights (BRCLM.006/015/018/019/024)
+  BCL_CLAIMANT_OVERRIDE,
+  BCL_SETTLEMENT_UPDATE,
+  BCL_ADJUSTER_ASSIGN,
+  BCL_FOLLOW_UP_OVERRIDE,
+  BCL_RESERVE_AMEND,
+  // Next action plan summary (BRCLM.021)
+  BCL_ACTION_PLAN,
+  // Insurer location references (BRCLM.042)
+  BCL_LOCATION_REF_MAINTAIN,
+  // Status / settlement attributes, status access matrix, handler register, Claims lists (010/012)
+  BCL_SETUP,
+  // Claims Handling reports: on screen, export, flat data extract (BRCLM.026-034/038/040)
+  BCL_REPORT_VIEW,
+  BCL_REPORT_EXPORT,
+  BCL_DATA_EXTRACT
 }

@@ -277,4 +277,29 @@ public record ReportMetadata(
         Permission.FRBS_REPORT_EXPORT,
         true);
   }
+
+  /**
+   * A Claims Handling report of the broking claims module (CLAIMS_BROKING_DESIGN section 10,
+   * BRCLM.026-034/038/040): viewed with {@code BCL_REPORT_VIEW}, exported with {@code
+   * BCL_REPORT_EXPORT}, archived. The data extract ({@code BCL-DATA-EXTRACT}) builds its own
+   * metadata with {@code BCL_DATA_EXTRACT} for both.
+   *
+   * @param code report code (e.g. {@code BCL-OUTSTANDING})
+   * @param title title
+   * @param description one line purpose
+   * @param parameters parameters
+   * @return metadata in the Claims Handling category
+   */
+  public static ReportMetadata claimsHandling(
+      String code, String title, String description, List<ParameterSpec> parameters) {
+    return new ReportMetadata(
+        code,
+        title,
+        ReportCategory.CLAIMS_HANDLING,
+        description,
+        parameters,
+        Permission.BCL_REPORT_VIEW,
+        Permission.BCL_REPORT_EXPORT,
+        true);
+  }
 }

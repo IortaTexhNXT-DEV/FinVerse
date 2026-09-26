@@ -417,3 +417,95 @@ Effort: CL0 small; CL1-A medium-large (about 35 % of the build); CL1-B medium; C
 4. **History for analytics.** Claims-prone and loss-ratio analysis are weak without legacy claims (CLQ14). Mitigation: the migration slot and `source = MIGRATED`; the reports work on BIBS data from day one.
 5. **Cover version semantics** (CLQ02). If BDOI needs location lists as at the loss date, `account` or `adjustment` must version risk items: a change outside this module, to be designed with the BRD-1 / Operations owners.
 6. **Overlap with Renewal and CSF.** Mitigation: one read API (`ClaimExperienceQueryService`) and the client records port; neither module writes claims.
+
+## 17. CL0 foundation: as built
+
+What the CL0 wave built, and where it details or differs from the sections above. CL1-A and CL1-B build on this and
+compile only against it.
+
+- **Permissions.** 18 constants `BCL_*` in `security.domain.Permission` (section 7.1), granted in V1020 as in 7.2. The
+  claims roles also get `WORK_VIEW`, `ATTACHMENT_VIEW`, `REPORT_VIEW`, `CLIENT_VIEW`, `ACCOUNT_VIEW`, `OPS_VIEW`;
+  `CLM_OFFICER`, `CLM_TL`, `CLM_TH` also `ATTACHMENT_MANAGE` (Documents tab) and `BULK_PROCESS` (insurer update, insurer
+  claim number and location reference uploads). `sec_permission_action` area `CLAIMS`: VIEW (view, cover view, report
+  view / export, data extract), CREATE (record, authorize, location refs), AMEND (record, location refs, status update,
+  claimant, settlement, adjuster, follow-up, reserve, action plan, setup), APPROVE (close, reopen).
+- **Migration `V1020__brokerclaims_foundation.sql`.**
+  - Roles `CLM_OFFICER`, `CLM_TL`, `CLM_TH`, `CLM_UH`, `CLM_RISK`; Marketing `MKT_AO` + BCL_REPORT_VIEW, `MKT_TL` +
+    BCL_REPORT_VIEW, BCL_REPORT_EXPORT; `SYSADMIN` and `AUDITOR` + BCL_VIEW, BCL_REPORT_VIEW.
+  - `lov_type.owner_permission` (section 12.1, built): the holders of the owner permission may list, add, change,
+    deactivate and authorize (maker-checker kept) the values of that list through the existing `/api/v1/lov` API, in
+    addition to `LOV_MANAGE` / `MASTER_AUTHORIZE` (kept, so administrators still maintain every list). Bean
+    `lov.service.LovAccess` (`lovAccess`) in the `@PreAuthorize` of `LovController`; `LovTypeResponse.ownerPermission`.
+    Every `BCL_*` list has owner permission `BCL_SETUP`.
+  - LOV types and codes: `BCL_CLAIM_STATUS` (18: `NEW_COMPLETE_DOCS`, `NEW_INCOMPLETE_DOCS`, `ADJUSTER_REVIEW`,
+    `CLAIMANT_OFFER_ACCEPTANCE`, `CLAIMANT_DOCS_SUBMISSION`, `INSURER_CHECK_ISSUANCE`, `INSURER_RELEASE_PAPERS`,
+    `INSURER_REVIEW`, `ADJUSTER_SETTLEMENT_OFFER`, `ASSURED_MEETING`, `BDOI_PREMIUM_REMITTANCE`,
+    `BDOI_CHECK_TRANSMITTAL`, `BDOI_UNDER_REVIEW`, `CLAIMANT_SALVAGE_PULLOUT`, `CLAIMANT_CNR_SUBMISSION`,
+    `INSURER_LOA_ISSUANCE`, `TEMP_CLOSED_NO_DOCS`, `TEMP_CLOSED_WITH_OFFER`, in the order of spec 6.1),
+    `BCL_SETTLEMENT_TYPE` (10: `CLOSED_CANCELLED`, `CLOSED_DENIED`, `CLOSED_WITHIN_DEDUCTIBLE`,
+    `CLOSED_WITHOUT_PAYMENT`, `SETTLED`, `SETTLED_DIRECTLY_FILED`, `SETTLED_LOA_ISSUED`, `SETTLED_LOA_REPAIR_SCHEDULE`,
+    `SETTLED_LOA_UNDER_REPAIR`, `SETTLED_RELEASE_PAPERS`), `BCL_ADJUSTER` (25), `BCL_CATASTROPHE` (7), `BCL_LOSS_NATURE`
+    and `BCL_CLAIM_TYPE` (10 provisional each, CLQ12), `BCL_UNIT` (7), `BCL_UPDATE_SOURCE`, `BCL_DIARY_TYPE`,
+    `BCL_DOCUMENT_TYPE` (parent = `DOCUMENT_TYPE` code, incl. `CLAIM_REPORT`), `BCL_REOPEN_REASON`,
+    `BCL_OVERRIDE_REASON`; platform `DOCUMENT_TYPE` value `CLAIM_REPORT` (on conflict do nothing).
+  - `bcl_lov_attribute` (type, code, attribute, value; FK to `lov_value`): every status has `phase` and `waiting_on`;
+    `BDOI_PREMIUM_REMITTANCE` has `awaiting_premium_remittance = true`; no status has `follow_up_days` yet (parameter
+    `BCL_FOLLOW_UP_DAYS` applies). Every settlement type has `outcome`, `closes_claim`, `requires_settlement_amount`;
+    `SETTLED_LOA_REPAIR_SCHEDULE` and `SETTLED_LOA_UNDER_REPAIR` have `closes_claim = false` until CLQ05.
+  - `bcl_status_access` (status_code, role_code FK `sec_role.code`, unit_code null = any; maker-checker columns of
+    `AuthorizableEntity`; unique status + role + unit): officers the four statuses of phases NEW and TEMP_CLOSED, TL and
+    TH all 18. No company column: the matrix is BDOI-wide.
+  - `bcl_handler` (username unique, unit_code FK `BCL_UNIT`, team, active). No company column.
+  - Parameters (category `CLAIMS_HANDLING`), alert codes and notification events (module `CLAIMS_HANDLING`, event sort
+    orders 400-440) of section 9: the insurer-side module keeps module `CLAIMS`.
+  - Workflow `BCL_CLAIM`: stages `NEW` (initial, owner BCL_RECORD, SLA 24 h), `IN_PROGRESS` (owner BCL_RECORD),
+    `TEMP_CLOSED`, `CLOSED` (none terminal). Transitions (stage.action -> stage, permission): `NEW.progress` ->
+    IN_PROGRESS, `NEW.temp_close` / `IN_PROGRESS.temp_close` -> TEMP_CLOSED (BCL_STATUS_UPDATE), `TEMP_CLOSED.resume` ->
+    IN_PROGRESS (BCL_STATUS_UPDATE), `NEW.close` / `IN_PROGRESS.close` / `TEMP_CLOSED.close` -> CLOSED (BCL_CLOSE),
+    `CLOSED.reopen` -> IN_PROGRESS (BCL_REOPEN, reason list `BCL_REOPEN_REASON`). None is generic. There is no
+    transition back to NEW: the status engine refuses a status of phase NEW once the claim has left it, or keeps the
+    stage (CL1-B decides).
+  - Template `BCL_LOSS_ADVICE` v1 with the placeholders `claimNo`, `assuredName`, `insurerName`, `policyNo`, `arn`,
+    `policyYear`, `lossDate`, `lossPlace`, `lossNature`, `lossDescription`, `currency`, `initialReserve`,
+    `adjusterName`, `insurerClaimNos`, `handlerName`.
+  - Retention rule record type `BROKER_CLAIM` (not `BrokerClaim`: the rule codes are upper snake), statuses `CLOSED`,
+    10 years online + 5 archive (purge after 15, p.41), action REVIEW.
+- **Migration `V1021__brokerclaims_claim.sql`.** `bcl_claim` with every column of 5.1 (NOT NULL: company, claim no.,
+  handler, source, ARN, policy year, currency, loss date, reported date, phase, the two override flags; check reported
+  date >= loss date; unique (company, claim no.) and authorization code), `bcl_claim_location` (unique claim + item
+  no.; `location_key` varchar(400) as on `acc_risk_item`), `bcl_insurer_claim` (company, claim, insurer, share_pct
+  numeric(9,4) as on `ops_invoice_share`, insurer claim no., reported to insurer on, reserve, settled, adjuster; unique
+  claim + insurer + coalesce(number, '') so a line may wait for its number; index company + insurer + number),
+  `bcl_status_history` (insert-only).
+- **Domain `brokerclaims.domain`.** `Claim` (JPA entity name `BrokerClaim`, since `claims.domain.Claim` exists;
+  constructor `Claim(companyId, claimNo, Claim.Origin(source, handler, unitCode, branchId, legacyRef), CoverSnapshot,
+  LossDetails)` starts in phase NEW without status; `assignTo(handler, unitCode)`; `isClosed()`), repository
+  `BrokerClaimRepository` (not `ClaimRepository`: the insurer-side module owns the bean `claimRepository`) with
+  `findByIdAndCompanyId`, `findByCompanyIdAndClaimNo`, `findByCompanyIdAndCoverArnAndCoverPolicyYearOrderByIdDesc`.
+  Embeddables with protected constructors and getters only: `CoverSnapshot` (cover columns **and** the premium check /
+  authorization columns, CL1-A), `LossDetails` (loss **and** claimant columns, CL1-A), `ClaimProgress` (progress
+  columns, CL1-B; package factory `newClaim()`). Enums `ClaimPhase` (`isOutstanding()`, `stageCode()`), `ClaimSource`,
+  `ClaimClosureKind`, `ClaimPremiumStatus`. `ClaimLovAttribute` / `ClaimLovAttributeRepository` (read for all waves;
+  CL1-B adds maintenance). `ClaimCodes`: entity type `BrokerClaim`, workflow, LOV, attribute, parameter, template,
+  number prefixes (`BCL`, `CAC`), module and retention constants.
+- **Event `ClaimStatusChanged`** (`brokerclaims.domain`): `(claimId, companyId, claimNo, fromStatus, toStatus,
+  fromPhase, toPhase, changedBy, changedAt)` with `phaseChanged()`, `entered(ClaimPhase)`, `enteredStatus(code)`.
+  Published by CL1-B's status engine inside the transaction after the history row, also for the first status at
+  recording (from = null), a closure by settlement type and a reopen. CL1-A listens for the feed and notifications.
+- **Report.** `ReportCategory.CLAIMS_HANDLING` ("Claims Handling"); `ReportMetadata.claimsHandling(code, title,
+  description, parameters)` (view BCL_REPORT_VIEW, export BCL_REPORT_EXPORT, archived).
+- **Crons.** `brokerverse.jobs.bcl-premium-recheck-cron` (05:30 PHT), `bcl-follow-up-due-cron` and
+  `bcl-ageing-alerts-cron` (06:00 PHT) in `application.yml` and `CONFIGURATION.md`; the jobs come with CL1-A / CL1-B.
+- **Demo `V1920__demo_brokerclaims_users.sql`.** Users of 7.3 (password `Brokerverse@2026`); `clmbranch` has home
+  branch CEB; handler register rows for the five users with a unit.
+- **Frontend.** `features/brokerclaims/module.ts` (`brokerClaimsModule`, first in group Claims & Insurance) declares
+  every route of section 11: `/claims-handling` (Claims Home, BCL_VIEW, live landing), `/worklist` (BCL_VIEW),
+  `/new` (BCL_RECORD), `/:id` (hidden, BCL_VIEW), `/covers` (BCL_COVER_VIEW), `/diary` (BCL_VIEW), `/location-refs`
+  (BCL_LOCATION_REF_MAINTAIN), `/reports` (BCL_REPORT_VIEW or BCL_DATA_EXTRACT), `/setup` (BCL_SETUP). Placeholder pages
+  per owning wave: CL1-A `record/RecordClaimPage.tsx`, `record/ClaimPage.tsx`, `cover/CoverLookupPage.tsx`,
+  `location/LocationRefsPage.tsx`; CL1-B `home/ClaimsHomePage.tsx`, `worklist/WorklistPage.tsx`, `diary/DiaryPage.tsx`,
+  `setup/ClaimsSetupPage.tsx`, `reports/ClaimsReportsPage.tsx`; shared `ClaimsPlaceholder.tsx` (`CLAIMS_SECTION`
+  breadcrumb). Help section `BROKER_CLAIMS_HELP` (id `brokerclaims`) in `features/brokerclaims/help.ts`, registered
+  before Underwriting, with one entry per menu route.
+- **Flyway left.** Schema V1022 (CL1-A), V1023-V1024 (CL1-B), V1025 held (CLQ14), V1026-V1029 free; demo V1921
+  (CL1-A), V1922-V1929 free.

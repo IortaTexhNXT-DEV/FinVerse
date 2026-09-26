@@ -4,6 +4,7 @@ import { accountsModule } from '@/features/accounts/module';
 import { adjustmentModule } from '@/features/adjustment/module';
 import { adminModule } from '@/features/admin/module';
 import { withOverviewScreens } from '@/features/approvals/module';
+import { brokerClaimsModule } from '@/features/brokerclaims/module';
 import { brokingSetupModule } from '@/features/brokingsetup/module';
 import { cashieringModule } from '@/features/cashiering/module';
 import { catalogModule } from '@/features/catalog/module';
@@ -109,7 +110,14 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     id: 'insurance',
     title: 'Claims & Insurance',
-    modules: [underwritingModule, claimsModule, reinsuranceModule, reservesModule],
+    modules: [
+      // Claims Handling (BRD-7) first, CLAIMS_BROKING_DESIGN section 11.
+      brokerClaimsModule,
+      underwritingModule,
+      claimsModule,
+      reinsuranceModule,
+      reservesModule,
+    ],
   },
   { id: 'reports', title: 'Reports', modules: [nbReportsModule, reportsModule] },
   {

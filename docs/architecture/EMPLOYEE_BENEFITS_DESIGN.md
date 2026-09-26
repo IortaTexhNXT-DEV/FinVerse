@@ -381,7 +381,7 @@ refusing default. What changes for the business waves:
 | Member change billing, policy forms, SOA | Insurer uploads | Processing or the AO upload them (`EB_DIRECT_BILLING`, `EB_POLICY_FORM`, `EB_SOA`, source `INSURER`) | E1-C |
 | Notices to insurers and clients | Portal inbox and e-mail | E-mail only (the templates of 8.4 say "by e-mail") | E1-B, E1-C |
 | EB Home tile "Portal uploads to review", alert `PORTAL_UPLOAD_WAITING` | Built | Not built | - |
-| `EbUploadTargets`, `EbPortalTasks`, `eb/api/portal/**`, portal demo users | E2 | Not built; E2 keeps the demo storyline and the end-to-end tests of the internal flow | E2 |
+| `EbUploadTargets`, `EbPortalTasks`, `eb/api/portal/**`, portal SIT/UAT users | E2 | Not built; E2 keeps the seed-data storyline and the end-to-end tests of the internal flow | E2 |
 
 ### 16.2 Shared work item BT0 (built here)
 

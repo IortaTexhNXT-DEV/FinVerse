@@ -48,7 +48,7 @@ class DocumentAccessIT {
     return Long.toString(System.nanoTime() % 1_000_000_000L);
   }
 
-  /** Runs as an EB user holding the given permissions (EB demo users come with wave E2). */
+  /** Runs as an EB user holding the given permissions (the EB SIT/UAT users come with wave E2). */
   private static <T> T asHolder(String user, Supplier<T> action, String... permissions) {
     SecurityContextHolder.getContext()
         .setAuthentication(

@@ -17,11 +17,13 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
 import { CaptureRequestDialog } from './CaptureRequestDialog';
 import { quotationLinkOf } from './requestForm';
 import '@/styles/quotation.css';
 import { ClientLabel } from '@/components/broking/ClientLabel';
+import { LovLabel } from '@/components/broking/LovLabel';
+import { CellStack } from '@/components/ui/CellStack';
 
 const TABS: readonly { id: RequestStatus; label: string }[] = [
   { id: 'NEW', label: 'To Quote' },
@@ -184,7 +186,12 @@ export default function RequestsPage() {
             {
               key: 'channel',
               header: 'Channel',
-              render: (r) => [humanize(r.channel), r.externalRef].filter(Boolean).join(' · '),
+              render: (r) => (
+                <CellStack
+                  main={<LovLabel type="SOURCE_CHANNEL" code={r.channel} />}
+                  sub={r.externalRef}
+                />
+              ),
             },
             {
               key: 'client',

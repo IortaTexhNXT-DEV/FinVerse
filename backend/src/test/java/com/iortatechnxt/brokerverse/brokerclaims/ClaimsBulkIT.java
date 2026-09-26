@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimRecordingService;
 import com.iortatechnxt.brokerverse.brokerclaims.claim.service.PremiumCheckService;
 import com.iortatechnxt.brokerverse.brokerclaims.demo.BrokerClaimsDemoData;
-import com.iortatechnxt.brokerverse.brokerclaims.demo.BrokerClaimsDemoStory;
+import com.iortatechnxt.brokerverse.brokerclaims.demo.BrokerClaimsSeedStory;
 import com.iortatechnxt.brokerverse.brokerclaims.diary.service.DiaryService;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.BrokerClaimRepository;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
@@ -220,7 +220,7 @@ class ClaimsBulkIT {
   @Test
   void theDemoStorylineRecordsClaimsThroughTheServices() {
     long before = claims.count();
-    DemoUsers demoUsers = new DemoUsers(users);
+    DemoUsers seedUsers = new DemoUsers(users);
     var demo =
         new BrokerClaimsDemoData(
             companies,
@@ -229,8 +229,8 @@ class ClaimsBulkIT {
             premiums,
             insurers,
             updates,
-            demoUsers,
-            new BrokerClaimsDemoStory(statuses, closures, followUps, diaries, demoUsers, clock),
+            seedUsers,
+            new BrokerClaimsSeedStory(statuses, closures, followUps, diaries, seedUsers, clock),
             clock);
     demo.load();
     assertThat(claims.count()).isGreaterThan(before);

@@ -16,17 +16,17 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
- * The claim-level demo storyline of Claims Handling (wave CL2): what the handlers did on the demo
+ * The claim-level seed storyline of Claims Handling (wave CL2): what the handlers did on the demo
  * claims after recording them, through the real status, closure, follow-up and diary services as
- * the demo users of the role / unit matrix - documents completed, an adjuster appointed, an action
- * plan, diary calls, meetings and follow-ups, a follow-up date overridden, a temporary closure, a
- * claim settled on the insurer's LOA and closed, a claim closed within the deductible and reopened
- * with a reason, and a claim waiting for the premium remittance. Called by {@link
+ * the SIT/UAT users of the role / unit matrix - documents completed, an adjuster appointed, an
+ * action plan, diary calls, meetings and follow-ups, a follow-up date overridden, a temporary
+ * closure, a claim settled on the insurer's LOA and closed, a claim closed within the deductible
+ * and reopened with a reason, and a claim waiting for the premium remittance. Called by {@link
  * BrokerClaimsDemoData}.
  */
 @Component
 @Profile("demo")
-public class BrokerClaimsDemoStory {
+public class BrokerClaimsSeedStory {
 
   static final String OFFICER = "clmofficer";
   static final String NON_MOTOR = "clmofficer2";
@@ -50,10 +50,10 @@ public class BrokerClaimsDemoStory {
    * @param closures settlement, closure and reopen
    * @param followUps follow-up, action plan and adjuster
    * @param diaries diary entries
-   * @param users demo sign-in
+   * @param users sign-in of the SIT/UAT users
    * @param clock clock
    */
-  public BrokerClaimsDemoStory(
+  public BrokerClaimsSeedStory(
       ClaimStatusService statuses,
       ClaimClosureService closures,
       ClaimFollowUpService followUps,

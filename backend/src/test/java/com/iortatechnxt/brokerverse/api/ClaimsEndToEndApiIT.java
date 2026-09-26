@@ -28,16 +28,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Claims Handling (BRD-7) end to end through the HTTP API with the demo users (wave CL2, design
+ * Claims Handling (BRD-7) end to end through the HTTP API with the SIT/UAT users (wave CL2, design
  * section 14): an account is booked; a claim recorded on its unpaid cover is blocked and raises the
- * unpaid-premium alert (FR-CM-013); cashiering applies the payment, the premium check turns PAID
- * and the authorization code is generated (FR-CM-014/015); the Team Lead sets "With BDOI - For
- * Premium Remittance"; the special remittance request is confirmed through the claims feed,
+ * unpaid-premium alert (FR-CM-011, FR-CM-016); cashiering applies the payment, the premium check
+ * turns PAID and the authorization code is generated (FR-CM-016); the Team Lead sets "With BDOI -
+ * For Premium Remittance"; the special remittance request is confirmed through the claims feed,
  * approved, batched and paid by the Disbursement DV, and the handler is told the premium is FULLY
  * REMITTED; the status moves through the role / unit matrix, a temporary closure is resumed, the
  * claim is settled (LOA issued) and closed, reopened with a reason and settled again; the
  * outstanding, settled, ageing, loss ratio and activity log reports follow each step
- * (FR-CM-040-046, FR-CM-060-065).
+ * (FR-CM-041-046, FR-CM-052, FR-CM-060-066).
  */
 @IntegrationTest
 class ClaimsEndToEndApiIT {
@@ -124,7 +124,7 @@ class ClaimsEndToEndApiIT {
     return booked.get("invoiceNo").asText();
   }
 
-  /** FR-CM-012/013: the claim is recorded, flagged unpaid, alerted and cannot be authorised. */
+  /** FR-CM-011/016: the claim is recorded, flagged unpaid, alerted and cannot be authorised. */
   private long recordOnTheUnpaidCover(String arn) throws Exception {
     LocalDate today = LocalDate.now();
     Map<String, Object> loss = new HashMap<>();
@@ -257,7 +257,7 @@ class ClaimsEndToEndApiIT {
         .andExpect(jsonPath("$.flags.awaitingPremiumRemittance").value(false));
   }
 
-  /** FR-CM-040-043: the matrix refuses the officer, the temporary closure is resumed. */
+  /** FR-CM-041/042/045: the matrix refuses the officer, the temporary closure is resumed. */
   private void workTheStatusesThroughTheMatrix(String claim) throws Exception {
     api.doPost(OFFICER, claim + "/status" + c(), Map.of("statusCode", "INSURER_LOA_ISSUANCE"))
         .andExpect(status().is4xxClientError())
@@ -286,7 +286,7 @@ class ClaimsEndToEndApiIT {
         .andExpect(status().isCreated());
   }
 
-  /** FR-CM-044-046 and the reports: settled (LOA) and closed, reopened, settled again. */
+  /** FR-CM-044/045 and the reports: settled (LOA) and closed, reopened, settled again. */
   private void settleReopenAndReport(long id, String arn) throws Exception {
     String claim = BASE + "/" + id;
     String claimNo = api.read(api.doGet(OFFICER, claim + c())).get("claimNo").asText();

@@ -21,8 +21,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * Persona menus of BRD-10, BRD-11 and BRD-7 (client requirement 14) on the server side of the
  * shared file {@code frontend/src/navigation/personaMenus.json}: each role holds exactly the
  * permissions the web client's menu is computed from (V1050, V1060, V1062, V1063; Claims V1020),
- * within its permission scope for the Marketing roles, its demo user holds only that role, and
- * every screen the role sees answers its demo user (no menu entry opens on a refusal).
+ * within its permission scope for the Marketing roles, its SIT/UAT user holds only that role, and
+ * every screen the role sees answers its SIT/UAT user (no menu entry opens on a refusal).
  */
 @IntegrationTest
 class PersonaMenusIT {

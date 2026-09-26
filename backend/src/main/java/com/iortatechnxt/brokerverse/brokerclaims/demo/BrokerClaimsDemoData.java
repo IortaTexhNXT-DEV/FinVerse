@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  * property claim on a location with its insurer location reference, a typhoon tag, the insurer's
  * claim number and an insurer update, a claim on a direct-payment cover and an insurer-reported
  * claim; the Team Head amends a reserve. Wave CL2 completes the storyline ({@link
- * BrokerClaimsDemoStory}): statuses through the matrix, an adjuster, action plans, diary entries
+ * BrokerClaimsSeedStory}): statuses through the matrix, an adjuster, action plans, diary entries
  * and follow-ups, a temporarily closed claim, a claim settled on the LOA and closed, a claim closed
  * and reopened, and a claim waiting for the premium remittance. A step that cannot run (a demo
  * cover missing) is logged and skipped; start-up never fails.
@@ -63,7 +63,7 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
   private final InsurerClaimService insurers;
   private final InsurerUpdateService updates;
   private final DemoUsers users;
-  private final BrokerClaimsDemoStory story;
+  private final BrokerClaimsSeedStory story;
   private final Clock clock;
 
   /**
@@ -88,7 +88,7 @@ public class BrokerClaimsDemoData implements ApplicationRunner {
       InsurerClaimService insurers,
       InsurerUpdateService updates,
       DemoUsers users,
-      BrokerClaimsDemoStory story,
+      BrokerClaimsSeedStory story,
       Clock clock) {
     this.companies = companies;
     this.claims = claims;

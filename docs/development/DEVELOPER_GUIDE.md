@@ -472,6 +472,7 @@ rules, reports, ports, demo data and open points. Update it together with the co
 | Tax & Statutory | [`docs/modules/TAX_AND_STATUTORY.md`](../modules/TAX_AND_STATUTORY.md) |
 | Sanction Screening (BRD-10) | [`docs/modules/SANCTION_SCREENING.md`](../modules/SANCTION_SCREENING.md) |
 | User Access Maintenance (BRD-11) | [`docs/modules/USER_ACCESS.md`](../modules/USER_ACCESS.md) |
+| Claims Handling (BRD-7) | [`docs/modules/BROKER_CLAIMS.md`](../modules/BROKER_CLAIMS.md) |
 | Broking (BDOI New Business) | [`docs/architecture/BROKING_ARCHITECTURE.md`](../architecture/BROKING_ARCHITECTURE.md) |
 
 Modules of later BRDs, **designed, not built** (the design is the guide until the module guide is written with the
@@ -481,7 +482,6 @@ code; cross-BRD decisions and the build order are in
 | Module (package) | BRD | Flyway (demo) | Design |
 |---|---|---|---|
 | `renewal` | BRD-6 Renewal | V1010–V1017 (V1910–V1911) | [`RENEWAL_DESIGN.md`](../architecture/RENEWAL_DESIGN.md) |
-| `brokerclaims` | BRD-7 Claims (being built: foundation CL0 V1020, V1021, V1920 done; CL1-A V1022, V1921; CL1-B V1023, V1024; V1025 held for the legacy migration, CLQ14) | V1020–V1024 (V1920–V1921) | [`CLAIMS_BROKING_DESIGN.md`](../architecture/CLAIMS_BROKING_DESIGN.md) |
 | `eb` | BRD-8 Employee Benefits | V1030, V1031, V1033–V1036 (V1930–V1932) | [`EMPLOYEE_BENEFITS_DESIGN.md`](../architecture/EMPLOYEE_BENEFITS_DESIGN.md) |
 | `portal` (platform) | BRD-8 Employee Benefits | V1032 | [`EMPLOYEE_BENEFITS_DESIGN.md`](../architecture/EMPLOYEE_BENEFITS_DESIGN.md) |
 | `csf` | BRD-9 Customer Servicing Facility | V1040–V1042 (V1940) | [`CUSTOMER_SERVICING_DESIGN.md`](../architecture/CUSTOMER_SERVICING_DESIGN.md) |
@@ -492,4 +492,7 @@ code; cross-BRD decisions and the build order are in
 BRD-10 Sanction Screening (`screening`, V1050–V1055, demo V1950–V1952) and BRD-11 User Access Maintenance (no
 module of its own: it extends `security` and `nbadmin`, V1060–V1063, demo V1960) are built; their guides are in the
 table above and their designs are [`SANCTION_SCREENING_DESIGN.md`](../architecture/SANCTION_SCREENING_DESIGN.md) and
-[`USER_ACCESS_DESIGN.md`](../architecture/USER_ACCESS_DESIGN.md).
+[`USER_ACCESS_DESIGN.md`](../architecture/USER_ACCESS_DESIGN.md). BRD-7 Claims Handling (`brokerclaims`, V1020–V1024,
+V1920–V1921; V1025 held for the legacy claims migration, CLQ14) is built (waves CL0, CL1-A, CL1-B and the integration
+wave CL2); its guide is in the table above and its design is
+[`CLAIMS_BROKING_DESIGN.md`](../architecture/CLAIMS_BROKING_DESIGN.md).

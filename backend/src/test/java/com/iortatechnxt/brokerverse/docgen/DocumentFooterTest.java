@@ -50,6 +50,14 @@ class DocumentFooterTest {
   }
 
   @Test
+  void theFooterNeverRepeatsTheVersion() {
+    assertThat(DocumentText.pageFooter(spec("QUOTATION_LETTER v1 | Quotation version 1")))
+        .isEqualTo(
+            "Placement Slip  |  BDO Insurance and Reinsurance Brokers, Inc.  |  Quotation version 1");
+    assertThat(DocumentText.pageFooter(spec("Version 2 | Version 2"))).endsWith("|  Version 2");
+  }
+
+  @Test
   void aTitlePrintedInCapitalsIsWrittenInTitleCaseInTheFooter() {
     DocumentSpec invoice =
         new DocumentSpec("BDOI", "SERVICE INVOICE", "SI-1", List.of(), List.of(), "Version 1");

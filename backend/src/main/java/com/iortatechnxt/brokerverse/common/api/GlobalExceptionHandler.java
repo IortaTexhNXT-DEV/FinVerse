@@ -194,7 +194,9 @@ public class GlobalExceptionHandler {
 
   /**
    * Last-resort handler: logs the failure with a reference the user can quote to support and
-   * returns a generic message (internal details are never exposed to clients).
+   * returns a generic business message. The reference travels in its own {@code reference} field,
+   * never inside the message text, so screens show it apart (behind Details) and the message stays
+   * clean; internal details are never exposed to clients.
    *
    * @param ex exception
    * @return problem detail (500)
@@ -207,7 +209,8 @@ public class GlobalExceptionHandler {
         problem(
             HttpStatus.INTERNAL_SERVER_ERROR,
             "INTERNAL_ERROR",
-            "An unexpected error occurred. Quote reference " + reference + " to support.");
+            "The system could not complete the request. Try again; if it continues, contact support"
+                + " with the reference.");
     pd.setProperty("reference", reference);
     return pd;
   }

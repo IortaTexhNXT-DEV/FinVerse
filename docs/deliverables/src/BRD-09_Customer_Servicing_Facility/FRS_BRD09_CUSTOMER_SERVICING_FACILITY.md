@@ -19,7 +19,7 @@ control:
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Solution Architect
     approver: ""
-    change: Internal draft from the BRD-9 baseline and the Customer Servicing build design
+    change: Internal draft from the BRD-9 baseline
   - version: "1.0"
     date: 25 Sep 2026
     author: iorta TechNXT Business Analysis
@@ -31,9 +31,9 @@ distribution:
   - {name: "Alternative Distribution Head", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: BDO Insure Contact Center Management, role: Business owner, organisation: BDOI, purpose: Review of all FRs}
   - {name: Marketing Business Services and System Support (MBS), role: Business user, organisation: BDOI, purpose: Review of the contact and status rules}
-  - {name: ITG Core Business - Insurance Applications, role: Reviewer, organisation: BDO Unibank, purpose: Review of the legacy coexistence seams}
+  - {name: ITG Core Business - Insurance Applications, role: Reviewer, organisation: BDO Unibank, purpose: Review of the coexistence with the legacy systems}
   - {name: Business Project Services, role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Build, test and UAT preparation"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, test and UAT preparation"}
 ---
 
 # Introduction
@@ -42,9 +42,9 @@ distribution:
 
 This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker System, on iNXT BrokerVerse) meets the Customer Servicing Facility (CSF) business requirements of BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It turns each BRD requirement into functional requirements with actors, flows, rules, validations, screens, fields, notifications, audit and acceptance criteria.
 
-BDOI uses this document to confirm that the system will behave as the business expects. The project team uses it to build, test and prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
+BDOI uses this document to confirm that the system will behave as the business expects. The project team uses it to deliver and test the CSF functions and to prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
 
-The CSF module is designed and not yet built. This FRS is written from the BRD, the requirements baseline (R3) and the build design (R4). Section 1.5 explains what that means for the screen, API and message-code entries.
+This FRS is written from the BRD and the requirements baseline (R3). It describes the proposed behaviour of the CSF screens. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, chapter 12 lists each such point for confirmation.
 
 ## Scope
 
@@ -55,7 +55,7 @@ The CSF replaces the BDO-Insure Front-End System used by the BDO Insure Contact 
 |---|---|---|
 | Access | Log-in with user ID and password, credential validation, role-based access for agents, supervisors and management | BRCSF-001, 1.001, 1.002; p.4 |
 | Search and view | Search by name, client ID, account number, PN number and application number; client information; accounts with their status; payment history | BRCSF-002, 003, 3.001, 005, 5.001, 008; e-mail item 7 |
-| Contact details | Verification of the caller, contact-only update, write-back seam for QPS and EBIX | BRCSF-002, 004 |
+| Contact details | Verification of the caller, contact-only update, write-back to QPS and EBIX while they coexist | BRCSF-002, 004 |
 | Resend and documents | View, download and resend the renewal advice and the e-policy; upload and retrieve documents | BRCSF-006, 6.001, 007, 7.001, 009, 9.001; e-mail item 9 |
 | Audit and backup | Audit trail of client changes, print or save in PDF or Excel, agent activity, backup every 15 minutes | BRCSF-010, 011, 11.001, 11.002 |
 
@@ -64,7 +64,7 @@ The CSF replaces the BDO-Insure Front-End System used by the BDO Insure Contact 
 - Case management and inquiry logging (SharePoint today). The e-mail of 13-Feb-2026 defers it to a future enhancement with its own requirement document (row CSF-EM10, p.17).
 - The open items of the e-mail (priority order for servicing of payments versus claims; parameter alignment between the loan system and the insurance system), which are also future enhancements (p.17; CSQ16).
 - Changes other than contact details (for example civil status); they stay with the fulfilment unit (e-mail topic 3, p.17).
-- The transport of contact updates to QPS and EBIX and the lookup of accounts that exist only there. Both are seams until BDOI specifies the interface (CSQ01).
+- The transport of contact updates to QPS and EBIX and the lookup of accounts that exist only there. Both wait until BDOI specifies the interface (CSQ01).
 
 ## References
 
@@ -110,15 +110,15 @@ Each FR in section 4 has the same parts:
 - **Screens and fields**: label, type, whether mandatory ("Cond." = mandatory when the condition in the Validation column applies), the source list and the validation.
 - **Notifications**, **audit** and numbered **acceptance criteria**. The acceptance criteria are the basis of the test cases of the BRD-9 test plan.
 
-> [!NOTE] Designed, not built
-> Screen names, permissions, parameters and lists come from the build design (R4). API paths and business message codes are fixed when the module is built: the API entry reads "To be assigned at build" and the Code column reads "To be assigned at build". Codes quoted in this document exist in the platform today (for example ACCESS_DENIED). Values marked "default" are placeholders that BDOI confirms through the open questions in section 10.3; they are configuration, so a changed answer does not need a change to the system.
+> [!NOTE]
+> Messages are given with their text; a code is quoted where it is confirmed (for example ACCESS_DENIED), and "To be confirmed" marks the others. Values marked "default" are placeholders that BDOI confirms through the open questions in section 10.3; they are configuration, so a changed answer does not need a change to the system.
 
 
 # Business context and process overview
 
 ## Business context
 
-The BDO-Insure Front-End System was built by BDO IT for the contact centre agents. It shows full insurance account details only for Consumer Banking Group (CBG) accounts; for non-CBG accounts it shows only the contact details, account number and expiry date. Agents can update only client contact details. Its servers have reached end of life, and it has no role-based access control (p.4).
+The BDO-Insure Front-End System of BDO IT serves the contact centre agents today. It shows full insurance account details only for Consumer Banking Group (CBG) accounts; for non-CBG accounts it shows only the contact details, account number and expiry date. Agents can update only client contact details. Its servers have reached end of life, and it has no role-based access control (p.4).
 
 The BRD asks for an application that shows client contact details and account information from the data sources, and that sends contact updates back to them (p.3, p.5). In January 2026 the BRD was clarified with the contact centre and BDO IT: search keys, verification before an update, payment history depth, two more statuses and e-policy resending (p.17).
 
@@ -128,7 +128,7 @@ The BRD asks for an application that shows client contact details and account in
 | 1 | Full account details only for CBG accounts | Every account of the client, CBG and non-CBG, with its status and payments |
 | 2 | Search on a limited set of keys | One search box for name, client ID, account number, PN number and application number |
 | 3 | No role-based access control | Agent, supervisor and management roles with separate rights to update, resend and upload |
-| 4 | Contact updates are written in QPS or EBIX | The update is made once in the BIBS client master after verifying the caller; a write-back seam serves QPS and EBIX while they coexist |
+| 4 | Contact updates are written in QPS or EBIX | The update is made once in the BIBS client master after verifying the caller; a write-back serves QPS and EBIX while they coexist |
 | 5 | RA and e-policy resends are handled outside the tool | The agent views, downloads and resends the RA and the e-policy to the registered e-mail, password protected |
 | 6 | No audit report for management | Every change and agent action is logged; the audit trail prints or saves in PDF or Excel |
 
@@ -145,14 +145,14 @@ The table lists the steps of a servicing contact, and Figure 1 shows them. CSF h
 | 4 | Verify and update contact | Agent | Verification checklist, then contact fields only, with a reason | BRCSF-004 |
 | 5 | Resend | Agent | RA or e-policy to the registered e-mail, protected, password sent separately | BRCSF-006; e-mail item 9 |
 | 6 | Documents | Agent | Retrieve quotations, RAs, claims reports; upload documents to the client or an account | BRCSF-007, 009 |
-| 7 | Legacy sync | System | Contact change queued for QPS and EBIX while they coexist (parked) | p.3; CSQ01 |
+| 7 | Legacy sync | System | Contact change queued for QPS and EBIX while they coexist (on hold) | p.3; CSQ01 |
 | 8 | Audit and reports | Management | Audit trail, contact changes and agent activity in PDF or Excel | BRCSF-010, 011 |
 
 ![Servicing flow of a contact centre agent (BRCSF-001-011)](figures/brd09_process_flow.dot){width=13}
 
 ## Data sources in BIBS
 
-The BRD names QPS and EBIX as the data sources (p.3). In BIBS the data live in the BrokerVerse modules. The CSF reads them through their query services and stores only its own records: contact change requests with their verification, the legacy sync outbox and the agent activity log.
+The BRD names QPS and EBIX as the data sources (p.3). In BIBS the data live in the BIBS modules. The CSF reads them and stores only its own records: contact change requests with their verification, the legacy sync outbox and the agent activity log.
 
 <!-- table: widths=4.4,5,7.2 caption="What the CSF shows and where it comes from" -->
 | Data | Owning module | Used in |
@@ -182,7 +182,7 @@ The BRD asks for differentiated roles for updating records and uploading documen
 
 ## Permissions
 
-<!-- table: widths=5,11.6 caption="CSF permissions (build design R4, section 6.1)" -->
+<!-- table: widths=5,11.6 caption="CSF permissions" -->
 | Permission | Allows |
 |---|---|
 | CSF_VIEW | Customer Search and Servicing View |
@@ -224,7 +224,7 @@ brd: [BRCSF-001 (p.6), BRCSF-001 / 1.001 (p.6-7), BRCSF-001 / 1.002 (p.7)]
 actor: Contact Center Agent; System
 priority: Must have
 screens: Login; Customer Search (landing page)
-description: Agents log in with their BIBS user ID and password on the platform log-in. BIBS validates the credentials and grants access to the CSF screens of the user's roles; the Customer Search opens as the landing page. Wrong credentials are refused. Directory sign-in (Windows ID) is built as a parked port for all BIBS users; local sign-in stays until BDO supplies the interface (decision D6).
+description: Agents log in with their BIBS user ID and password on the platform log-in. BIBS validates the credentials and grants access to the CSF screens of the user's roles; the Customer Search opens as the landing page. Wrong credentials are refused. Directory sign-in (Windows ID) is added for all BIBS users when BDO supplies the interface; the BIBS sign-in applies until then (decision D6).
 preconditions:
   - The user has an active BIBS account with a CSF role.
 main_flow:
@@ -273,7 +273,7 @@ validations:
 notifications:
   - "None."
 audit:
-  - "Refused calls with user, endpoint and time."
+  - "Refused actions with user, function and time."
 acceptance:
   - A CSF Management user does not see the Update Contact action.
   - An agent's direct call to resend to another address is refused with ACCESS_DENIED.
@@ -299,7 +299,7 @@ main_flow:
   - The agent opens a client.
 alternate_flows:
   - No match. BIBS shows "No client found for <criteria>".
-  - PN or application number of an account not in BIBS. The legacy lookup seam returns nothing until QPS, EBIX or LOS are connected (CSQ01, CSQ02).
+  - PN or application number of an account not in BIBS. The lookup of legacy accounts returns nothing until QPS, EBIX or LOS are connected (CSQ01, CSQ02).
 rules:
   - [R1, "Minimum 3 characters for name searches (default).", Configurable, Parameter CSF_SEARCH_MIN_CHARS]
   - [R2, "At most 50 results (default); the agent refines the search beyond that.", Configurable, Parameter CSF_SEARCH_MAX_RESULTS]
@@ -434,7 +434,7 @@ rules:
   - [R4, "Checks and the number required are confirmed under CSQ03.", Configurable, LOV CSF_VERIFY_CHECK]
 validations:
   - [No check performed, Record the result of the verification checks, "-"]
-  - [Verification failed, The caller could not be verified. The contact details cannot be changed, To be assigned at build]
+  - [Verification failed, The caller could not be verified. The contact details cannot be changed, To be confirmed]
 fields_screen: Verification
 fields:
   - [Channel, List, "Yes", Hotline / E-mail / Website, "-"]
@@ -475,8 +475,8 @@ rules:
   - [R2, "Change reasons are maintained.", Configurable, LOV CSF_CHANGE_REASON]
   - [R3, "Whether the contacts of open accounts also change is confirmed under CSQ14; client master only by default.", Configurable, Change request after CSQ14]
 validations:
-  - [No valid verification, Verify the caller before changing the contact details, To be assigned at build]
-  - [Field not updatable, "<field> cannot be changed here. Refer the client to the fulfilment unit", To be assigned at build]
+  - [No valid verification, Verify the caller before changing the contact details, To be confirmed]
+  - [Field not updatable, "<field> cannot be changed here. Refer the client to the fulfilment unit", To be confirmed]
   - [E-mail format invalid, Enter a valid e-mail address, "-"]
   - [Mobile number format invalid, Enter a valid mobile number, "-"]
   - [Reason not selected, Select the reason for the change, "-"]
@@ -526,7 +526,7 @@ acceptance:
 ```
 
 > [!NOTE] Difference from the BRD
-> The BRD describes a front end that reads QPS and EBIX and writes updates back to them. In BIBS the client and account data are in BIBS, so the CSF reads BIBS and the write-back is a seam (CSQ01).
+> The BRD describes a front end that reads QPS and EBIX and writes updates back to them. In BIBS the client and account data are in BIBS, so the CSF reads BIBS and the write-back waits for the interface (CSQ01).
 
 ## Renewal advice, e-policy and documents
 
@@ -554,7 +554,7 @@ rules:
   - [R2, "Another address needs CSF_RESEND_OTHER and a reason (CSQ06).", Configurable, Role grants]
   - [R3, "Legacy RAs are viewable only if loaded as RENEWAL_ADVICE documents (CSQ06).", Fixed, "-"]
 validations:
-  - [No registered e-mail, The client has no registered e-mail. Update the contact details first, To be assigned at build]
+  - [No registered e-mail, The client has no registered e-mail. Update the contact details first, To be confirmed]
   - [Other address without reason, Enter the reason for sending to another address, "-"]
   - [Address invalid, Enter a valid e-mail address, EMAIL_ADDRESS_INVALID]
 fields_screen: Resend
@@ -590,7 +590,7 @@ rules:
   - [R1, "Only the confirmed e-policy of the account (CSQ13).", Fixed, "-"]
   - [R2, "Agents resend without the EPOLICY_SEND permission.", Fixed, "-"]
 validations:
-  - [No confirmed e-policy, The account has no confirmed e-policy, To be assigned at build]
+  - [No confirmed e-policy, The account has no confirmed e-policy, To be confirmed]
 notifications:
   - "The client receives the e-policy and, separately, the password."
 audit:
@@ -769,7 +769,7 @@ main_flow:
   - The daily base backup runs outside the peak hours.
   - A monthly restore test proves the backups.
 rules:
-  - [R1, "Archive interval at most 15 minutes.", Configurable, Database setting archive_timeout]
+  - [R1, "Archive interval at most 15 minutes.", Configurable, Database setting (archive interval)]
   - [R2, "Whether the 15-minute backup is BIBS-wide (RPO 15 minutes) is confirmed under CSQ11 and XQ08.", Configurable, Infrastructure decision]
 validations: []
 notifications:
@@ -854,9 +854,9 @@ The CSF generates no documents. It reads and resends documents of other modules:
 
 # Interfaces and integration
 
-Figure 3 shows the interfaces. The CSF depends on the BIBS modules through their query services; no module depends on the CSF.
+Figure 3 shows the interfaces. The CSF reads the BIBS modules; no module depends on the CSF.
 
-![Interfaces of the Customer Servicing Facility (dashed = parked)](figures/brd09_integration.dot)
+![Interfaces of the Customer Servicing Facility (dashed = on hold)](figures/brd09_integration.dot)
 
 <!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Scope size=8.5 -->
 | Interface | Direction | Content and trigger | BRD | Scope |
@@ -872,7 +872,7 @@ Figure 3 shows the interfaces. The CSF depends on the BIBS modules through their
 | QPS / EBIX / LOS account lookup | In | Accounts not migrated to BIBS by PN or application number | BRCSF-003 | ON HOLD |
 | Case management | - | Inquiry logging and case tracking | CSF-EM10 | OUT |
 
-> [!PARKED] Parked seams
+> [!NOTE] Interfaces on hold
 > The write-back to QPS and EBIX keeps every change in an outbox with status "not configured" (CSQ01); a replay is possible once the interface is specified. The lookup of accounts that exist only in QPS, EBIX or the loan system returns nothing until it is connected (CSQ02).
 
 # Non-functional requirements
@@ -914,11 +914,11 @@ The items below are changed in BIBS without a release. Changes to parameters and
 ## Lists of values
 
 <!-- table: widths=5.4,11.2 caption="Lists of values" size=8.5 -->
-| List | Values delivered |
+| List | Values provided |
 |---|---|
 | CSF_STATUS_MAP | The mapping of section 5.1 |
 | CSF_VERIFY_CHECK | Address; Contact number; E-mail; Insured property (CSQ03) |
-| CSF_CHANGE_REASON | Delivered with generic values (client request, correction, returned mail); BDOI supplies its own |
+| CSF_CHANGE_REASON | Generic values provided (client request, correction, returned mail); BDOI supplies its own |
 | CSF_DOCUMENT_TYPE | Subset of the platform document types for contact centre uploads (CSQ07) |
 
 ## Platform settings
@@ -983,48 +983,51 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | CQ06 | Data scope by segment for the contact centre | Section 3.3 | PARTIAL |
 | Q42 | BDO single sign-on / Windows ID | FR-CSF-001 | ANSWERED |
 
-## Differences between the design and the BRD
-
-<!-- table: widths=3,7,6.6 caption="Recorded differences" size=8.5 -->
-| BRD item | BRD text | FRS and design |
-|---|---|---|
-| BRCSF-002, p.3, p.5 | Retrieve data from QPS and EBIX and send updates back to them | BIBS is the source; the write-back is an outbox seam (FR-CSF-022; CSQ01) |
-| BRCSF-004 | View, add or update contact details | Update after a recorded verification (e-mail topic 5); "add" = additional contacts only if CSQ15 confirms |
-| BRCSF-011 / 11.001 | Backup every 15 minutes, under the audit trail ID | Infrastructure requirement for the whole database (FR-CSF-043); conflicts with the 4-hour backup of the retention table (CSQ11) |
-| BRCSF-001 | User ID and password | Local sign-in; directory sign-in built as a parked port for all BIBS users (decision D6) |
-| CSF-EM10 | Case management | Out of scope per the e-mail of 13-Feb-2026 |
-
 # Traceability
 
-Every BRD-9 requirement row is met by at least one FR, except CSF-EM10, which the e-mail of 13-Feb-2026 defers. The screen column names the main entry point; the last column names the section of the build design (R4). The non-functional requirements (p.13-14) are traced in section 8.
+Every BRD-9 requirement row is met by at least one FR, except CSF-EM10, which the e-mail of 13-Feb-2026 defers. The screen column names the main entry point; the test cases are listed by test condition (TC-CSF-nnn.n). The non-functional requirements (p.13-14) are traced in section 8.
 
-<!-- table: widths=3.2,3.2,5.6,4.6 caption="BRD ID to FR, screen and design" size=8 -->
-| BRD ID | FR | Screen | Design (R4) |
+<!-- table: widths=3.2,3.2,5.6,5.2 caption="BRD ID to FR, screen and test cases" size=8 -->
+| BRD ID | FR | Screen | Test cases |
 |---|---|---|---|
-| BRCSF-001 | FR-CSF-001, FR-CSF-002 | Login | 6 |
-| BRCSF-001 / 1.001 | FR-CSF-001 | Login; Customer Search | 6, 10 |
-| BRCSF-001 / 1.002 | FR-CSF-001 | Login | 6 |
-| BRCSF-002 | FR-CSF-011, FR-CSF-021, FR-CSF-022 | Servicing View | 5, 2.2 |
-| BRCSF-003 | FR-CSF-010 | Customer Search | 5 |
-| BRCSF-003 / 3.001 | FR-CSF-010 | Customer Search | 5 |
-| BRCSF-004 | FR-CSF-020, FR-CSF-021 | Update Contact dialog | 5, 11 |
-| BRCSF-005 | FR-CSF-013 | Payments tab | 5, 11 |
-| BRCSF-005 / 5.001 | FR-CSF-012 | Accounts tab | 5 |
-| CSF-EM07 | FR-CSF-012 | Accounts tab | 5 |
-| BRCSF-006 | FR-CSF-030 | Renewal Advice tab | 5, 11 |
-| BRCSF-006 / 6.001 | FR-CSF-030 | Resend dialog | 5 |
-| CSF-EM09 | FR-CSF-031 | E-policies tab | 5, 11 |
-| BRCSF-007 | FR-CSF-032 | Documents tab (Upload) | 8 |
-| BRCSF-007 / 7.001 | FR-CSF-032 | Documents tab (Upload) | 5 |
-| BRCSF-008 | FR-CSF-011 | Servicing View (summary card) | 5 |
-| BRCSF-009 | FR-CSF-033 | Documents tab | 5, 11 |
-| BRCSF-009 / 9.001 | FR-CSF-033 | Documents tab | 5 |
-| BRCSF-010 | FR-CSF-040, FR-CSF-021, FR-CSF-042 | Contact History; Audit Trail | 1, 5 |
-| BRCSF-011 | FR-CSF-041 | Audit Trail; Reports | 9 |
-| BRCSF-011 / 11.001 | FR-CSF-043 | None (infrastructure) | 8 |
-| BRCSF-011 / 11.002 | FR-CSF-041 | Audit Trail; Reports | 9 |
-| CSF-EM10 | Out of scope (e-mail of 13-Feb-2026) | - | 12 |
+| BRCSF-001 | FR-CSF-001, FR-CSF-002 | Login | TC-CSF-001.1, 001.2, 001.3, 001.4, 001.5, 002.1, 002.2, 002.3 (14 cases) |
+| BRCSF-001 / 1.001 | FR-CSF-001 | Login; Customer Search | TC-CSF-001.1, 001.2, 001.3, 001.4, 001.5 (8 cases) |
+| BRCSF-001 / 1.002 | FR-CSF-001 | Login | TC-CSF-001.1, 001.2, 001.3, 001.4, 001.5 (8 cases) |
+| BRCSF-002 | FR-CSF-011, FR-CSF-021, FR-CSF-022 | Servicing View | TC-CSF-011.1, 011.2, 011.3, 011.4, 011.5, 021.1, 021.2, 021.3, 021.4, 021.5, 021.6, 022.1, 022.2, 022.3, 022.4 (22 cases) |
+| BRCSF-003 | FR-CSF-010 | Customer Search | TC-CSF-010.1, 010.2, 010.3, 010.4, 010.5, 010.6, 010.7, 010.8 (13 cases) |
+| BRCSF-003 / 3.001 | FR-CSF-010 | Customer Search | TC-CSF-010.1, 010.2, 010.3, 010.4, 010.5, 010.6, 010.7, 010.8 (13 cases) |
+| BRCSF-004 | FR-CSF-020, FR-CSF-021 | Update Contact dialog | TC-CSF-020.1, 020.2, 020.3, 020.4, 020.5, 021.1, 021.2, 021.3, 021.4, 021.5, 021.6 (19 cases) |
+| BRCSF-005 | FR-CSF-013 | Payments tab | TC-CSF-013.1, 013.2, 013.3, 013.4, 013.5 (6 cases) |
+| BRCSF-005 / 5.001 | FR-CSF-012 | Accounts tab | TC-CSF-012.1, 012.2, 012.3, 012.4 (5 cases) |
+| CSF-EM07 | FR-CSF-012 | Accounts tab | TC-CSF-012.1, 012.2, 012.3, 012.4 (5 cases) |
+| BRCSF-006 | FR-CSF-030 | Renewal Advice tab | TC-CSF-030.1, 030.2, 030.3, 030.4, 030.5, 030.6 (9 cases) |
+| BRCSF-006 / 6.001 | FR-CSF-030 | Resend dialog | TC-CSF-030.1, 030.2, 030.3, 030.4, 030.5, 030.6 (9 cases) |
+| CSF-EM09 | FR-CSF-031 | E-policies tab | TC-CSF-031.1, 031.2, 031.3 (4 cases) |
+| BRCSF-007 | FR-CSF-032 | Documents tab (Upload) | TC-CSF-032.1, 032.2, 032.3, 032.4, 032.5, 032.6 (11 cases) |
+| BRCSF-007 / 7.001 | FR-CSF-032 | Documents tab (Upload) | TC-CSF-032.1, 032.2, 032.3, 032.4, 032.5, 032.6 (11 cases) |
+| BRCSF-008 | FR-CSF-011 | Servicing View (summary card) | TC-CSF-011.1, 011.2, 011.3, 011.4, 011.5 (6 cases) |
+| BRCSF-009 | FR-CSF-033 | Documents tab | TC-CSF-033.1, 033.2, 033.3, 033.4, 033.5 (6 cases) |
+| BRCSF-009 / 9.001 | FR-CSF-033 | Documents tab | TC-CSF-033.1, 033.2, 033.3, 033.4, 033.5 (6 cases) |
+| BRCSF-010 | FR-CSF-040, FR-CSF-021, FR-CSF-042 | Contact History; Audit Trail | TC-CSF-021.1, 021.2, 021.3, 021.4, 021.5, 021.6, 040.1, 040.2, 040.3, 042.1, 042.2, 042.3, 042.4, 042.5 (18 cases) |
+| BRCSF-011 | FR-CSF-041 | Audit Trail; Reports | TC-CSF-041.1, 041.2, 041.3, 041.4, 041.5 (5 cases) |
+| BRCSF-011 / 11.001 | FR-CSF-043 | None (infrastructure) | TC-CSF-043.1, 043.2, 043.3, 043.4 (4 cases) |
+| BRCSF-011 / 11.002 | FR-CSF-041 | Audit Trail; Reports | TC-CSF-041.1, 041.2, 041.3, 041.4, 041.5 (5 cases) |
+| CSF-EM10 | Out of scope (e-mail of 13-Feb-2026) | - | - |
 
+
+# Proposed business rules and clarifications for confirmation
+
+The table lists each point where the proposed screen or rule differs from the BRD text, fills a gap the BRD leaves open, or needs a decision of BDOI. The open questions of section 10.3 stay open; each item below gives the proposed rule that applies until BDOI answers. BDOI records its decision with the sign-off of this FRS (chapter 13); a decision that changes a screen, field, rule or message is applied in the next version of the FRS.
+
+<!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
+| Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
+|---|---|---|---|---|
+| CLR-CSF-01 | Data source and write-back (BRCSF-002, p.3, p.5; FR-CSF-022) | BIBS is the source of the client and account data. A contact change updates the BIBS client master at once and is kept for QPS and EBIX with the status "not configured"; it is sent when BDOI specifies the interface. | The BRD reads QPS and EBIX and writes updates back to them; how long they stay systems of record is open (CSQ01). | Say until when QPS and EBIX stay systems of record and whether a write-back is needed (CSQ01). |
+| CLR-CSF-02 | Accounts not in BIBS (BRCSF-003; FR-CSF-010) | The search by PN or application number finds the accounts in BIBS; accounts that exist only in QPS, EBIX or the loan system are found once they are connected. | The legacy lookup interface is not specified (CSQ01, CSQ02). | Specify the lookup, or confirm the search in BIBS only (CSQ02). |
+| CLR-CSF-03 | Contact details (BRCSF-004) | Contact details are updated after a recorded verification of the caller; "add" means additional contacts only if BDOI confirms it. | E-mail topic 5 asks for verification; additional contacts are open (CSQ15). | Confirm the verification checks (CSQ03) and additional contacts (CSQ15). |
+| CLR-CSF-04 | Backup every 15 minutes (BRCSF-011 / 11.001; FR-CSF-043) | The database archives its log at least every 15 minutes, as an infrastructure requirement for the whole database. | The 15-minute backup conflicts with the 4-hour backup of the retention table (CSQ11, XQ08). | Confirm the backup interval (CSQ11). |
+| CLR-CSF-05 | Log-in (BRCSF-001; FR-CSF-001) | The BIBS sign-in applies; directory sign-in (Windows ID) is added for all BIBS users when BDO supplies the interface. | Cross-BRD decision D6. | Confirm decision D6. |
+| CLR-CSF-06 | Case management (CSF-EM10) | Out of scope for this phase. | Deferred by the e-mail of 13-Feb-2026. | Confirm the deferral. |
 
 # Sign-off
 

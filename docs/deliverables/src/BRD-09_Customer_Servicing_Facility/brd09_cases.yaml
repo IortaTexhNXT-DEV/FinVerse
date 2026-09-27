@@ -1,9 +1,7 @@
 # Test plan BRD-9 Customer Servicing Facility - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-09_Customer_Servicing_Facility/brd09_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# BRD-9 is designed, not built: the expected results quote the message text of the FRS and the build
-# design (docs/architecture/CUSTOMER_SERVICING_DESIGN.md) without codes, and no case names an automated
-# test. Screen paths follow section 10 of the build design (section Customer Service Facility).
+# The expected results quote the message text of the FRS; screen paths follow the CSF screens of the FRS.
 
 meta:
   brd: BRD-09

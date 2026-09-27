@@ -85,7 +85,7 @@ async function api(user, method, url, body) {
     if (!r.ok) {
       throw new Error(`API sign-in of ${user} failed: ${r.status}`);
     }
-    tokens.set(user, (await r.json()).token);
+    tokens.set(user, (await r.json()).accessToken);
   }
   const headers = { Authorization: `Bearer ${tokens.get(user)}`, Origin: BASE };
   let payload;
@@ -168,8 +168,10 @@ async function clickButton(page, name) {
   await settle(page);
 }
 
+/** Opens a tab (or a tab-like filter button) whose name starts with `name` (a regular expression text). */
 async function openTab(page, name) {
-  const tab = page.getByRole('tab', { name: rx(`^${escapeRx(name)}`) }).first();
+  const re = new RegExp(`^${name}`, 'i');
+  const tab = page.getByRole('tab', { name: re }).or(page.locator('main').getByRole('button', { name: re })).first();
   await tab.waitFor({ state: 'visible', timeout: 15000 });
   await tab.click();
   await settle(page);
@@ -243,7 +245,10 @@ async function drawCallouts(page, callouts) {
       return st.visibility !== 'hidden' && st.display !== 'none' && Number(st.opacity) > 0.05;
     };
     const ownText = (el) => norm([...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(' '));
-    const inChrome = (el) => !!el.closest('nav, aside, header, [data-callout-layer]');
+    // With a dialog open, only the dialog is described.
+    const dialogs = [...document.querySelectorAll('dialog[open], [role=dialog]')].filter((d) => d.getBoundingClientRect().width > 0);
+    const scope = dialogs.length ? dialogs[dialogs.length - 1] : null;
+    const inChrome = (el) => !!el.closest('nav, aside, header, [data-callout-layer]') || (scope !== null && !scope.contains(el));
     const byType = {
       column: ['th', '[role=columnheader]'],
       tab: ['[role=tab]'],
@@ -408,16 +413,27 @@ function optimise(file) {
         page = await pageOf(shot.user);
         await reachState(page, shot, recipe, ctx);
       }
-      await page.evaluate(() => document.activeElement && document.activeElement.blur && document.activeElement.blur());
+      await page.evaluate(() => {
+        if (document.activeElement && document.activeElement.blur) {
+          document.activeElement.blur();
+        }
+        document.querySelectorAll('main').forEach((m) => m.scrollTo(0, 0));
+        window.scrollTo(0, 0);
+      });
       await fitViewport(page, shot.tall);
-      const missing = await drawCallouts(page, calloutsOf[shot.screen]);
+      const missing = shot.state === 'walkthrough' ? [] : await drawCallouts(page, calloutsOf[shot.screen]);
       await page.screenshot({ path: file });
       await clearCallouts(page);
       optimise(file);
-      const placed = (calloutsOf[shot.screen] || []).length - missing.length;
+      const placed = shot.state === 'walkthrough' ? 0 : (calloutsOf[shot.screen] || []).length - missing.length;
       report.push(`${shot.slug}: ${new URL(page.url()).pathname}, ${placed} callouts`);
       console.log('captured', shot.slug, new URL(page.url()).pathname, `${placed} callouts`);
     } catch (e) {
+      // The page as it was when the shot failed, for the person running the capture (not kept in the pack).
+      for (const [user, p] of pages.entries()) {
+        await p.screenshot({ path: path.join(os.tmpdir(), `capture-pack-failed-${shot.slug}-${user}.png`) })
+          .catch(() => {});
+      }
       failed.push(`${shot.slug}: ${String(e.message).split('\n')[0]}`);
       console.log('FAILED', shot.slug, String(e.message).split('\n')[0]);
     }
@@ -455,12 +471,10 @@ async function reachState(page, shot, recipe, ctx) {
     await openFirstRecord(page);
   }
   if (shot.tab) {
-    await openTab(page, shot.tab);
+    await openTab(page, escapeRx(shot.tab));
   }
   if (shot.step) {
-    await page.getByRole('button', { name: rx(escapeRx(shot.step)) }).first().click().catch(() => {});
-    await page.getByText(shot.step, { exact: true }).first().click().catch(() => {});
-    await settle(page);
+    await openTab(page, `\\d+\\. ${escapeRx(shot.step)}`);
   }
   if (shot.fill) {
     const steps = recipe.fills[shot.fill];

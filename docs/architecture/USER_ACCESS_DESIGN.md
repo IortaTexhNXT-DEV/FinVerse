@@ -554,3 +554,26 @@ What wave U1-B built on U0 and U1-A, and where it differs from or details sectio
     UAM_VIEW to `AccessMatrixController`.
 - **Guide.** [`docs/modules/USER_ACCESS.md`](../modules/USER_ACCESS.md) (with production-support troubleshooting); the
   as-built status per BRD ID is in `BDOI_UAM_BRD_SPEC.md`.
+
+## Sign-off controls (V1065, V1102)
+
+- **Separation-of-duties rules** (`nba_sod_rule`, `SodRule`, `SodRuleService`, `/api/v1/nbadmin/sod-rules`):
+  pairs of group profiles one user may not hold, created or deactivated by `UAM_SOD_MAINTAIN` and
+  authorised by `UAM_SOD_AUTHORIZE` (maker-checker, inbox source `SodRuleApprovalSource`). The active
+  rules are checked by `UserRequestValidator` (`ACCESS_SOD_CONFLICT`) on submission, on every bulk line
+  and again at approval.
+- **Second approval of the security parameters** (`system.SecurityParameterApprovals`): a `PUT` of a
+  parameter of category `SECURITY` keeps the value in `sys_parameter.pending_value`; a holder of
+  `SECURITY_PARAMETER_APPROVE` other than the requester approves (`/approve`) or rejects (`/reject`).
+  `SecurityParameterChangeRequested` is notified and listed in the inbox by
+  `nbadmin.SecurityParameterNotices` (`system` does not depend on messaging). `SystemParameterService.update`
+  stays the direct path for internal callers.
+- **Dormant users** (`DormantUserJob`, `UAM_DORMANT_DAYS`, `UAM_DORMANT_NOTICE_DAYS`): a system
+  DISABLE_USER request with reason `DORMANT`, applied by `SYSTEM`; SYSADMIN holders exempt.
+- **Deactivated users** are refused with `DisabledException` ("Your account is deactivated") before the
+  password check; the attempt is audited and not counted towards the lock-out.
+- **Authorisation limit** on CREATE_USER and MODIFY_USER requests (`nba_access_request.authorization_limit`).
+- **Profile members** are told (`UAM_ACCESS_CHANGED`) when a DEACTIVATE_ROLE or REACTIVATE_ROLE request applies.
+- **External users** are offered only while `UAM_EXTERNAL_USERS` is true.
+- The request descriptions and notices use profile and permission names (`AccessRequestDescriber`,
+  `PermissionNames`, frontend `permissionLabel`).

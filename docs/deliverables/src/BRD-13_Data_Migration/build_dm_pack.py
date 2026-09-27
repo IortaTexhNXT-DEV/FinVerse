@@ -433,6 +433,18 @@ def catalogue() -> Catalogue:
     return _CAT
 
 
+def deck_table(source: str) -> tuple[list[str], list[list[str]], list[float]]:
+    """A table of the 01 Guide deck (guide.yaml module_slides with plugin build_dm_pack.py)."""
+    cat = catalogue()
+    if source == "objects":
+        rows: dict[str, list[str]] = {}
+        for o in cat.objects:
+            rows.setdefault(CLASS_LABEL[o["decision"]], []).append(f"{o['code']} {str(o['name']).split(' (')[0]}")
+        return (["Decision (proposed)", "Objects"],
+                [[k, "; ".join(v)] for k, v in rows.items()], [2.6, 10.0])
+    raise ValueError(f"deck table {source}: unknown")
+
+
 def extract_field_names() -> set[str]:
     """The column names of the extract layouts and of the control file (for tools/deliverables/check_pack.py)."""
     return catalogue().field_names

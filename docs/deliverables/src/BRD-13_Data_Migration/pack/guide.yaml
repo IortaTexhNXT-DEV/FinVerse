@@ -9,6 +9,9 @@ meta:
   signoff_date: Fri 30-Oct-2026
   # What the pack holds, on the purpose slide (every set has its own).
   purpose_detail: "Every screen of the Migration Console with numbered fields, the migration catalogue (objects, load templates, code maps, rules, owners), the cut-over plan and the reconciliation sign-off"
+  # The process flow slide (figures/brd13_process_flow.png).
+  process_caption: "The way of every data object: from its decision to its acceptance, with the gates G1 to G6"
+  process_notes: "Each object goes through the same steps in every trial migration, the dress rehearsal and the production cut-over. The gates are signed in the Migration Console; a break sends the batch back to validation with a fix at source, a new code map version or a waiver. Gate G7 is the go / no-go of the whole cut-over."
   # The workbook slide: which sheet is pictured, with which columns, and what the reviewer does.
   workbook_sheet: "C01 Client master"
   workbook_columns: ["No.", "Column", "Description", "Type", "Mandatory", "BU review", "BU comment", "Reviewer", "Review date"]
@@ -139,6 +142,7 @@ module_slides:
     notes: "The approach follows the BRD: a stable Day-1 with clean master data and the open positions carried forward. History is not converted into BIBS transactions."
   - kind: table
     title: "The data objects and their decisions"
+    plugin: build_dm_pack.py
     source: objects
     notes: "The decisions are proposals that each business owner confirms at gate G1 in the Migration Console. Conditional objects wait for BDOI's decision (proposed rule PR-DM-05)."
   - kind: table

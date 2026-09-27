@@ -21,6 +21,7 @@ import { VersionSchemeSection } from './VersionSchemeSection';
 import { VersionTermsSection } from './VersionTermsSection';
 import { formOf, toInput, validateVersionForm } from './versionForm';
 import type { VersionForm } from './versionForm';
+import { UserName } from '@/components/ui/UserName';
 
 const TABS = [
   { id: 'scheme', label: 'Rate Scheme & Dates' },
@@ -48,7 +49,7 @@ function Summary({ detail }: Readonly<{ detail: VersionDetail }>) {
         { icon: CalendarDays, label: 'Effective', value: formatDate(s.effectiveFrom) },
         { icon: CalendarDays, label: 'Package End', value: formatDate(s.packageEndDate) },
         { icon: Percent, label: 'Rate %', value: detail.scheme.defaultRate ?? 'Per insurer' },
-        { icon: UserRound, label: 'Set Up By', value: s.maker },
+        { icon: UserRound, label: 'Set Up By', value: <UserName login={s.maker} /> },
         { icon: FileSignature, label: 'ManCom Ref.', value: detail.mancomSignoffRef },
       ]}
     />

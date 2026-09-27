@@ -133,7 +133,9 @@ public class TermsService {
       PackageInsurerResponse r = byCode.get(c.insurerCode());
       if (r == null || !ComparativeTable.offered(r.getOutcome())) {
         throw new BusinessRuleException(
-            "PKG_INSURER_NOT_OFFERED", c.insurerCode() + " did not offer terms in this round");
+            "PKG_INSURER_NOT_OFFERED",
+            (r == null ? "The insurer chosen" : r.getInsurerName())
+                + " did not offer terms in this round");
       }
       lines.add(
           new InsurerLine(

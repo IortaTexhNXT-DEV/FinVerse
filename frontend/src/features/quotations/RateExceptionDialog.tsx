@@ -10,7 +10,12 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate } from '@/utils/format';
+import { Link } from 'react-router-dom';
+import {
+  exceptionStatus,
+  exceptionSubject,
+  rateExceptionPath,
+} from '@/features/catalog/rateException';
 import { DateInput } from '@/components/ui/DateInput';
 
 interface ExceptionForm {
@@ -173,11 +178,11 @@ export function RateSchemePanel({ quotation }: Readonly<{ quotation: Quotation }
       </div>
       {requested.map((e) => (
         <div className="row" key={e.referenceNo}>
-          <strong>{e.referenceNo}</strong>
-          <span>
-            rate {e.requestedRate ?? '–'}% until {formatDate(e.validUntil)}
-          </span>
-          <StatusBadge status={e.recordStatus} />
+          <Link to={rateExceptionPath(e.referenceNo)}>
+            <strong>{e.referenceNo}</strong>
+          </Link>
+          <span>{exceptionSubject(e)}</span>
+          <StatusBadge status={exceptionStatus(e)} />
         </div>
       ))}
       {open && <RateExceptionDialog quotation={quotation} onClose={() => setOpen(false)} />}

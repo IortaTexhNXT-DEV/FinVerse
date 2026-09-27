@@ -30,7 +30,7 @@ places:
   - [ "^(EffectiveDatedRecord|MotorLimit|ShortPeriodRate|RateTableService|RatesPage|RateModals)$", "Rates & Taxes (SCR-PM-19)" ]
   - [ "^(SalesOrganisationService|SalesOrganisationPage|salesTree)$", "Sales Organisation (SCR-PM-20)" ]
   - [ "^(PremiumCalculator|RatingService|SchemeResolver|PremiumCalculatorPage|CalculatorResult|calculatorForm)$", "Premium Calculator (SCR-PM-21); pricing of quotations and accounts" ]
-  - [ "^(RateSchemeExceptionService|RateExceptionDialog)$", "Quotation: package rate scheme and rate exception (SCR-PM-22)" ]
+  - [ "^(RateSchemeExceptionService|RateOverride|RateExceptionDialog|RateExceptionPage|rateException)$", "Quotation: package rate scheme and rate exception (SCR-PM-22)" ]
   - [ "^(CatalogRecords|RecordActions)$", "Authorize and Deactivate on every product master (Common screen elements)" ]
 
 # The fix the user makes. Messages that tell the user what to do ("Enter ...", "Select ...") are their own fix and are
@@ -88,7 +88,7 @@ fixes:
   PRODUCT_TERM_INVALID: Enter a maximum term between 1 and 10 years.
   LOV_TYPE_UNKNOWN: Enter the code of an existing list of values (Lists of Values screen).
   RULE_SCOPE_INVALID: Choose Applies to All for a rule of every product; the scope code is set by the system.
-  MAKER_CHECKER_VIOLATION: Ask another validator (TSU Head or Business Administrator) to validate the version.
+  MAKER_CHECKER_VIOLATION: Ask another user with the permission to decide it; another validator (TSU Head or Business Administrator) validates a version, another approver decides a rate exception.
   VERSION_NOT_FOR_VALIDATION: Refresh the version; only a version submitted for validation is validated.
   PACKAGE_INSURER_TERMS_MISSING: Open the Insurer Terms tab and complete the terms of the insurer for that coverage.
   PACKAGE_SHARES_INVALID: Correct the shares of the lead and participant insurers so that they total 100%.
@@ -128,6 +128,8 @@ fixes:
   RATE_EXCEPTION_VALIDITY_PAST: Enter a validity date of today or later.
   RATE_EXCEPTION_INCOMPLETE: Enter the item rate the exception is for.
   RATE_SCHEME_NOT_CURRENT: Use the scheme rate of the current version, or request a rate exception and submit once it is approved.
+  RATE_EXCEPTION_REASON_REQUIRED: Write why the exception is rejected; the requester receives it with the notice.
+  RECORD_NOT_PENDING: Refresh the record; it has already been decided by another user.
   # Common
   COMPANY_REQUIRED: Select the company in the page header.
   DUPLICATE: Use another code; the code already exists.

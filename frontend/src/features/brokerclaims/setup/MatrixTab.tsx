@@ -12,6 +12,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { claimsSetupApi } from './api';
 import type { MatrixRow } from './api';
+import { UserName } from '@/components/ui/UserName';
 
 function AddRowDialog({
   busy,
@@ -171,7 +172,7 @@ export function MatrixTab() {
           { key: 'role', header: 'Role', render: (r) => r.roleCode },
           { key: 'unit', header: 'Unit', render: (r) => r.unitCode ?? 'Any unit' },
           { key: 'rec', header: 'Record', render: (r) => <StatusBadge status={r.status} /> },
-          { key: 'maker', header: 'Maker', render: (r) => r.maker ?? '' },
+          { key: 'maker', header: 'Maker', render: (r) => <UserName login={r.maker} empty="" /> },
           {
             key: 'act',
             header: '',

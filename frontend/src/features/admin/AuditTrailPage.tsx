@@ -11,6 +11,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { formatDateTime, today } from '@/utils/format';
 import { AuditExportButtons } from './AuditExportButtons';
 import { DateInput } from '@/components/ui/DateInput';
+import { UserName } from '@/components/ui/UserName';
 
 /** Audit trail inquiry: originator, modifier and authorizer activity with timestamps. */
 export default function AuditTrailPage() {
@@ -80,7 +81,7 @@ export default function AuditTrailPage() {
           rowKey={(a) => a.id}
           columns={[
             { key: 't', header: 'When', render: (a) => formatDateTime(a.occurredAt) },
-            { key: 'u', header: 'User', render: (a) => a.username },
+            { key: 'u', header: 'User', render: (a) => <UserName login={a.username} /> },
             {
               key: 'a',
               header: 'Action',

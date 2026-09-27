@@ -150,7 +150,7 @@ scenarios:
     pre: Request TD-PM-04 in NEGOTIATION, or TD-PM-12 approved by the TSU Head.
   - id: SC-PM-05
     persona: TSU
-    title: Sign-off, set-up and release. TSU submits the requirements pack, ManCom signs off, MBS sets up the version, the validator releases it and TSU sends the advisory; a RETIRE request retires a package.
+    title: Sign-off, set-up and release. TSU submits the requirements pack, ManCom signs off, MBS sets up the version, the validator releases it and TSU sends the advisory; a retirement request retires a package.
     pre: Requests TD-PM-05, TD-PM-06 and TD-PM-07; version TD-PM-08.
   - id: SC-PM-06
     persona: MKT_AO
@@ -973,7 +973,7 @@ frs:
     conditions:
       - The recommender cannot give the TSU Head approval.
       - After approval of a negotiated request, round 1 exists with the target insurers.
-      - A request without negotiation (for example RETIRE) goes to FOR_MANCOM without a round.
+      - A request without negotiation (for example a retirement) goes to ManCom sign-off without a round.
     cases:
       - c: 1
         type: Negative
@@ -996,8 +996,8 @@ frs:
         auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
       - c: 3
         type: Workflow
-        title: A RETIRE request goes to ManCom without negotiation
-        pre: A RETIRE request on MTR32 recommended by tsulead.
+        title: A retirement request goes to ManCom without negotiation
+        pre: A Retire package request on MTR32 recommended by tsulead.
         steps:
           - As tsuhead click Approve without negotiation.
         expected: The request moves to FOR_MANCOM; the Negotiation tab has no round; mancom is notified.
@@ -1006,7 +1006,7 @@ frs:
         type: Negative
         persona: TSU_HEAD
         title: Approve for negotiation is not offered on a request without negotiation
-        pre: A RENEW request with Negotiation required unticked, recommended.
+        pre: A Renew package request with Negotiation required unticked, recommended.
         steps:
           - As tsuhead open the request and look at the actions; call the workflow action approve through the API.
         expected: Only Approve without negotiation and Return to requester are offered; the API call ends in FOR_MANCOM, not in NEGOTIATION.
@@ -1806,34 +1806,34 @@ frs:
     screen: SETUP
     data: [TD-PM-11]
     conditions:
-      - A RETIRE request retires the product at the MBS step; other request types cannot retire.
+      - A retirement request retires the product at the MBS step; other request types cannot retire.
       - After retirement a new quotation on the product is refused.
       - The retired product and its versions stay searchable for users with PRODUCT_ARCHIVE_VIEW.
     cases:
       - c: 1
         type: Workflow
-        title: Retire MTR32 through a RETIRE request
-        pre: RETIRE request on MTR32 signed off by mancom (WITH_MBS).
+        title: Retire MTR32 through a retirement request
+        pre: Retire package request on MTR32 signed off by mancom (With MBS for set-up).
         steps:
           - Click Retire package; comment "retired"; confirm.
         expected: The request closes as RETIRED; product MTR32 is RETIRED; a RETIREMENT advisory draft exists with the ManCom sign-off attached.
         auto: PackageRequestProcessIT#aRetireRequestRetiresThePackageWithAnAdvisoryDraft
       - c: 1
         type: Negative
-        title: Set up a version on a RETIRE request
+        title: Set up a version on a retirement request
         steps:
-          - On the RETIRE request click Set up package version (API).
+          - On the retirement request click Set up package version (API).
         expected: Refused.
         msg: [A retirement request retires the package; it has no version to set up, PKG_REQUEST_TYPE_MISMATCH]
         auto: PackageRequestProcessIT#aRetireRequestRetiresThePackageWithAnAdvisoryDraft
       - c: 1
         type: Negative
         data: [TD-PM-06]
-        title: Retire on a RENEW request
+        title: Retire on a renewal request
         steps:
           - On PKR-2026-900005 call POST .../requests/{id}/retire.
         expected: Refused.
-        msg: [Only a RETIRE request retires the package, PKG_REQUEST_TYPE_MISMATCH]
+        msg: [Only a request to retire the package can retire it, PKG_REQUEST_TYPE_MISMATCH]
       - c: 2
         type: Negative
         persona: MKT_AO
@@ -1940,10 +1940,36 @@ frs:
         title: Rate exception approved, then submission accepted
         steps:
           - Click Request Rate Exception; rate 2.50, reason "Loyal client"; submit.
-          - As approver open My Approvals; approve the exception.
-          - As ao submit the quotation again.
-        expected: The exception gets a reference number; after approval the quotation is submitted and shows the exception reference.
-        auto: RatingSchemeIT#quotationAndAccountsCarryTheVersionAndSubmissionNeedsTheException; CatalogProductMaintenanceApiIT#coveragesClausesIncentivesAndExceptionsAreMaintainedOverHttp
+          - As approver open My Approvals and click the rate exception; the exception record opens.
+          - Check the requested rate against the scheme in force; click Approve, write a comment and confirm.
+          - As ao open the notice, then submit the quotation again.
+        expected: The exception gets a reference number; the record shows Approved with the approver, the date and the comment; the requester is notified; the quotation is submitted and shows the exception reference.
+        auto: RatingSchemeIT#theApproverDecidesTheExceptionOnItsRecordOpenedFromMyApprovals; RatingSchemeIT#quotationAndAccountsCarryTheVersionAndSubmissionNeedsTheException; CatalogProductMaintenanceApiIT#theApproverApprovesOrRejectsAnExceptionOnItsRecordOverHttp
+      - c: 2
+        type: Negative
+        title: Rate exception rejected without a reason
+        steps:
+          - As approver open the pending exception from My Approvals; click Reject and leave the reason blank.
+        expected: The Reject button of the confirmation stays disabled; the server refuses a rejection without a reason.
+        msg: [Enter the reason for the rejection, RATE_EXCEPTION_REASON_REQUIRED]
+        auto: RatingSchemeIT#theApproverDecidesTheExceptionOnItsRecordOpenedFromMyApprovals; CatalogProductMaintenanceApiIT#theApproverApprovesOrRejectsAnExceptionOnItsRecordOverHttp
+      - c: 2
+        type: Workflow
+        title: Rate exception rejected with its reason
+        steps:
+          - As approver open the pending exception; click Reject, write the reason and confirm.
+          - As ao open the quotation and submit it.
+        expected: The record shows Rejected with the reason; the requester is notified with the reason; the submission is still refused.
+        msg: ["Package MTR10 is priced on the current rate scheme: {rate 2.50%} needs an approved rate exception", RATE_SCHEME_NOT_CURRENT]
+        auto: RatingSchemeIT#aRejectedExceptionKeepsItsReasonAndNeverPricesTheTransaction; CatalogProductMaintenanceApiIT#theApproverApprovesOrRejectsAnExceptionOnItsRecordOverHttp
+      - c: 2
+        type: Negative
+        title: The requester cannot decide the exception
+        steps:
+          - As the user who requested the exception, open its record.
+        expected: No Approve or Reject button; a decision sent by the requester is refused.
+        msg: [A rate exception is decided by someone other than its requester, MAKER_CHECKER_VIOLATION]
+        auto: RatingSchemeIT#aRejectedExceptionKeepsItsReasonAndNeverPricesTheTransaction
       - c: 2
         type: Negative
         title: Rate exception with a past validity date

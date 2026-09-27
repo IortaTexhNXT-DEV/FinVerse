@@ -13,11 +13,19 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { TextInput } from '@/features/assets/FormControls';
-import { formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
 import { displayNameOf } from '@/api/users';
-import { LovLabel } from '@/components/broking/LovLabel';
+import { LovLabel, LovLabels } from '@/components/broking/LovLabel';
 
 const GROUPS = ['MARKETING', 'TSU', 'MBS', 'PROCESSING', 'OPERATIONS'];
+
+/** Advisory types as users read them (FR-PM-044). */
+const ADVISORY_TYPES: Record<string, string> = {
+  PACKAGE_READY: 'New package advisory',
+  PACKAGE_UPDATED: 'Package update advisory',
+  RENEWAL: 'Renewal advisory',
+  RETIREMENT: 'Retirement advisory',
+};
 
 function EditDialog({
   advisory,
@@ -76,7 +84,7 @@ function EditDialog({
                     setGroups(groups.includes(g) ? groups.filter((x) => x !== g) : [...groups, g])
                   }
                 />
-                {humanize(g)}
+                <LovLabel type="PKG_ADVISORY_GROUP" code={g} />
               </label>
             ))}
           </div>
@@ -156,7 +164,8 @@ function AdvisoryCard({
       <div className="stack">
         <ErrorAlert error={send.error} />
         <p className="muted">
-          {humanize(advisory.type)} · to {advisory.groups.map(humanize).join(', ')}
+          {ADVISORY_TYPES[advisory.type] ?? advisory.type} · to{' '}
+          <LovLabels type="PKG_ADVISORY_GROUP" codes={advisory.groups} />
           {advisory.sentAt &&
             ` · sent ${formatDateTime(advisory.sentAt)} by ${displayNameOf(advisory.sentBy)}`}
         </p>

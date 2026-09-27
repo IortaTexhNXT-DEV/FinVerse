@@ -148,7 +148,12 @@ export function HistoryTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
             {
               key: 'u',
               header: 'User / Source IP',
-              render: (c) => [c.username, c.sourceIp].filter(Boolean).join(' · '),
+              render: (c) => (
+                <>
+                  <UserName login={c.username} empty="" />
+                  {c.sourceIp && ` · ${c.sourceIp}`}
+                </>
+              ),
             },
             { key: 'b', header: 'Bulk Ref.', render: (c) => c.bulkRef ?? '' },
           ]}

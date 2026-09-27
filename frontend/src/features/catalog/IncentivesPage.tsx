@@ -15,10 +15,11 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, humanize, today } from '@/utils/format';
+import { formatDate, today } from '@/utils/format';
 import { IncentiveEditorModal } from './IncentiveEditorModal';
 import { isCurrent } from './incentiveForm';
 import { RecordActions } from './RecordActions';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 const TABS = [
   { id: 'current', label: 'Current' },
@@ -114,7 +115,11 @@ export default function IncentivesPage() {
             columns={[
               { key: 'c', header: 'Code', render: (c) => <strong>{c.code}</strong> },
               { key: 'n', header: 'Name', render: (c) => c.name },
-              { key: 't', header: 'Type', render: (c) => humanize(c.incentiveType) },
+              {
+                key: 't',
+                header: 'Type',
+                render: (c) => <LovLabel type="INCENTIVE_TYPE" code={c.incentiveType} />,
+              },
               { key: 'v', header: 'Value', render: valueOf },
               {
                 key: 'p',

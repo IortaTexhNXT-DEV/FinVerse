@@ -138,6 +138,23 @@ const opens = {
   },
   released_version: () => '/catalog/products/MTR12/versions/1',
   first_insurer: (ctx) => `/catalog/insurers/${ctx.one("select id from cat_insurer where party_code = 'INS-MGIC' order by id limit 1")}`,
+  // A rate exception of the walkthrough A quotation waiting for approval: the one of step 22 while it is pending,
+  // otherwise a second request of the Account Officer on the same quotation (seed values).
+  rate_exception_pending: async (ctx) => {
+    const pending = ctx.sql("select reference_no from cat_rate_scheme_exception where product_code = 'MTR30' and record_status = 'PENDING_AUTHORIZATION' order by id desc limit 1")[0];
+    if (pending) {
+      return `/catalog/rate-exceptions/${pending[0]}`;
+    }
+    const q = ctx.sql("select quotation_no from quo_quotation where product_code = 'MTR30' order by id desc limit 1")[0];
+    if (!q) {
+      throw new Error('run walkthrough A up to step 22 first: no quotation of MTR30');
+    }
+    const created = await ctx.api('ao', 'POST', '/catalog/rate-scheme-exceptions', {
+      productCode: 'MTR30', requestedRate: 1.05, transactionRef: q[0],
+      reason: 'Fleet grows to 40 vehicles at renewal of the client programme (seed data).',
+    });
+    return `/catalog/rate-exceptions/${created.referenceNo}`;
+  },
   quotation_deviation: (ctx) => {
     // The quotation of walkthrough A (package MTR30 with an item rate other than the scheme rate).
     const row = ctx.sql("select id from quo_quotation where product_code = 'MTR30' and status = 'DRAFT' order by id desc limit 1")[0];
@@ -172,7 +189,34 @@ const docs = {
   },
 };
 
+// ------------------------------------------------------------------ callout scopes
+
+// Where the callout of a field goes when the same text is on several parts of the page (capture_pack.cjs): the rate
+// scheme panel of the quotation, the Request Rate Exception dialog (its "Valid until", not the quotation's), the
+// exception record and its Approve and Reject confirmations. A field outside its scope gets no badge in that state.
+const panel = { within: '.alert[role=status]', title: 'Priced on package version' };
+const requestDialog = { within: 'dialog[open]', title: 'Request Rate Exception' };
+const record = { within: 'main', title: 'Product Maintenance · Rate Exception' };
+const callouts = {
+  'SCR-PM-22': {
+    1: { ...panel, target: 'span' },
+    2: { ...panel, target: 'a[href*="/catalog/rate-exceptions/"]' },
+    3: requestDialog,
+    4: requestDialog,
+    5: requestDialog,
+    6: record,
+    7: record,
+    8: record,
+    9: record,
+    10: record,
+    11: record,
+    12: record,
+    13: { within: 'dialog[open]', title: 'Approve Rate Exception' },
+    14: { within: 'dialog[open]', title: 'Reject Rate Exception' },
+  },
+};
+
 module.exports = {
-  opens, fills, selects: {}, uploads: {}, after: {}, custom: {}, walkthrough: walkthrough.steps, documents: docs,
+  opens, fills, selects: {}, uploads: {}, after: {}, custom: {}, walkthrough: walkthrough.steps, documents: docs, callouts,
   prepare: walkthrough.prepare, render,
 };

@@ -15,7 +15,7 @@ import { Field } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { InsurerChoices } from '@/features/proposals/ProposalFormParts';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { formatAmount, formatDate, formatDateTime } from '@/utils/format';
 import { ResponseDialog } from './ResponseDialog';
 import { displayNameOf } from '@/api/users';
 
@@ -83,7 +83,12 @@ function responseColumns(
     { key: 'insurer', header: 'Insurer', render: (r) => <strong>{r.insurerName}</strong> },
     { key: 'outcome', header: 'Outcome', render: (r) => <StatusBadge status={r.outcome} /> },
     { key: 'rate', header: 'Rate %', numeric: true, render: (r) => r.rate ?? '—' },
-    { key: 'min', header: 'Minimum', numeric: true, render: (r) => r.minimumPremium ?? '—' },
+    {
+      key: 'min',
+      header: 'Minimum',
+      numeric: true,
+      render: (r) => (r.minimumPremium === undefined ? '—' : formatAmount(r.minimumPremium)),
+    },
     { key: 'conditions', header: 'Conditions', render: (r) => r.conditions ?? '—' },
     { key: 'valid', header: 'Valid Until', render: (r) => formatDate(r.validUntil) },
     { key: 'rev', header: 'Rev.', numeric: true, render: (r) => r.revision },
@@ -114,7 +119,8 @@ function roundTitle(round: NegotiationRound): string {
 }
 
 function roundNote(round: NegotiationRound): string {
-  const parts = [round.qsNotes ?? 'Terms as requested.'];
+  const note = round.qsNotes?.trim() ?? 'Terms as requested.';
+  const parts = [/[.!?]$/.test(note) ? note : `${note}.`];
   if (round.replyDue !== undefined) {
     parts.push(`Reply by ${formatDate(round.replyDue)}.`);
   }
@@ -210,6 +216,7 @@ function RoundCard({ request, round, onChanged }: Readonly<RoundProps>) {
           requestId={request.id}
           response={editing}
           requested={request.requestedTerms.coverages}
+          lineCode={request.lineCode}
           onClose={() => setEditing(null)}
           onSaved={() => {
             setEditing(null);

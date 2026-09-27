@@ -12,12 +12,13 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, humanize } from '@/utils/format';
+import { formatDate } from '@/utils/format';
 import { DetailList } from './DetailList';
 import { InsurerEditorModal } from './InsurerEditorModal';
 import { BranchModal, CommissionModal } from './InsurerRatesModals';
 import { RecordActions } from './RecordActions';
 import { UserName } from '@/components/ui/UserName';
+import { placementChannelLabel } from './insurerForm';
 
 type Dialog = 'edit' | 'branch' | 'commission' | null;
 
@@ -32,10 +33,10 @@ function Profile({ detail }: Readonly<{ detail: InsurerDetail }>) {
         ['Short name', i.shortName],
         ['IC accreditation', i.accreditationNo],
         ['Accredited until', formatDate(i.accreditedUntil)],
-        ['Placement channel', humanize(i.placementChannel)],
+        ['Placement channel', placementChannelLabel(i.placementChannel)],
         ['Placement e-mails', i.placementEmails.join(', ')],
         ['Credit days', i.defaultCreditDays],
-        ['Maker', i.maker],
+        ['Maker', <UserName key="maker" login={i.maker} />],
         ['Authorized by', <UserName key="a" login={i.authorizedBy} />],
       ]}
     />

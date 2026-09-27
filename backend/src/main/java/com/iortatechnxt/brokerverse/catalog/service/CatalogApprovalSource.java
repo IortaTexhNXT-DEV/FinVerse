@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.approval.service.MasterRecordApprovals.Scope
 import com.iortatechnxt.brokerverse.approval.service.PendingApproval;
 import com.iortatechnxt.brokerverse.approval.service.PendingApprovalSource;
 import com.iortatechnxt.brokerverse.catalog.domain.CatalogRecord;
+import com.iortatechnxt.brokerverse.catalog.domain.RateOverride;
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
 import java.util.Arrays;
 import java.util.List;
@@ -60,8 +61,18 @@ public class CatalogApprovalSource implements PendingApprovalSource {
                     r.catalogReference(),
                     r.catalogDescription(),
                     r.catalogCompanyId(),
-                    kind.link())
+                    link(kind, r))
                 : new RecordFacts(
                     kind.label(), String.valueOf(e.getId()), null, null, kind.link()));
+  }
+
+  /**
+   * The route that opens a pending record: the exception record for a rate-scheme exception (where
+   * it is approved or rejected), otherwise the screen of the kind.
+   */
+  static String link(CatalogKind kind, CatalogRecord record) {
+    return record instanceof RateOverride exception
+        ? RateExceptionDecisions.LINK + exception.getReferenceNo()
+        : kind.link();
   }
 }

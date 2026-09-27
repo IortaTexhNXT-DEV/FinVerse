@@ -90,6 +90,7 @@ below is used on any branch.
 | `V816__productmaint.sql` | P1-B | `pm_request` and children, negotiation, comparative outputs, sign-off, advisories; `DOCUMENT_TYPE` values; document templates |
 | `V817__productmaint_reports_jobs.sql` | P1-B | Report definition PM-PKG-STATUS, jobs PACKAGE_EXPIRY_MONITOR, alert types, parameters |
 | V818-V819 | - | Kept free (follow-ups) |
+| `V1120__catalog_rate_exception_decision.sql` | Sign-off fixes | Decision of a rate-scheme exception on its record (`decided_by`, `decided_at`, `decision_comment`); V1120-V1129 are the Product Maintenance extensions once V813-V819 are full |
 | `V821__account_product_version.sql` | P1-A | `acc_account.product_version_no`, `rate_override_ref` (account's own range) |
 | `V831__quotation_product_version.sql` | P1-A | `quo_quotation.product_version_no`, `rate_override_ref` (quotation's own range) |
 | `V871__booking_incentive_criteria.sql` | P1-A | `bkg_invoice.incentive_criteria` (comma-separated codes) and `product_version_no`; one-time copy of `bkg_incentive_rule` rows into `cat_incentive_criteria` (type MIGRATED, status PENDING_AUTHORIZATION); `bkg_incentive_rule` frozen (read-only in the API) |
@@ -425,7 +426,7 @@ from the `workflow` module unchanged.
   - `products/{code}/versions` (GET list, POST new draft), `products/{code}/versions/{n}` (GET, PUT draft),
     `.../coverages`, `.../insurers`, `.../insurer-terms` (PUT, draft only), `.../submit`, `.../validate`
     (PRODUCT_VALIDATE), `.../return`;
-  - `rate-scheme-exceptions` (GET, POST; decide via My Approvals);
+  - `rate-scheme-exceptions` (GET, POST; `GET /{reference}` the exception record opened from My Approvals, `POST /{reference}/approve` with an optional comment and `POST /{reference}/reject` with the reason, by a PRODUCT_AUTHORIZE holder other than the requester);
   - `incentive-criteria` (GET, POST, PUT = amend, `/{id}/deactivate`; INCENTIVE_CRITERIA_MAINTAIN);
   - `rating/quote` (request / response additions of section 9.1).
 - `/api/v1/product-maintenance` (`productmaint`):

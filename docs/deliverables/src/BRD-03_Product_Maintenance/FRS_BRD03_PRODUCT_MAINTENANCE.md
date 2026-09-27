@@ -850,7 +850,7 @@ audit:
 acceptance:
   - The recommender cannot give the TSU Head approval.
   - After approval of a NEW request, round 1 exists with the target insurers.
-  - A RETIRE request goes to FOR_MANCOM without a negotiation round.
+  - A retirement request goes to ManCom sign-off without a negotiation round.
 ```
 
 ```fr
@@ -875,7 +875,7 @@ alternate_flows:
   - A TL selects several requests and assigns them to an officer.
 rules:
   - [R1, "Stage owners are notified on stage entry.", Fixed, "-"]
-  - [R2, "\"Deletion\" of a product is a RETIRE request; nothing is physically deleted.", Fixed, "-"]
+  - [R2, "\"Deletion\" of a product is a retirement request; nothing is physically deleted.", Fixed, "-"]
 validations: []
 fields_screen: Package Requests (filters)
 fields:
@@ -1365,7 +1365,7 @@ priority: Must have
 fit: NEW
 screens: Package Request page (Advisories tab)
 api: GET .../requests/{id}/advisories; PUT /advisories/{aid}; POST /advisories/{aid}/send
-description: On release BIBS drafts the advisory automatically, of type PACKAGE_READY for NEW and REACTIVATE, RENEWAL for RENEW, PACKAGE_UPDATED otherwise, and RETIREMENT for a retired package. The user checks the recipients, subject and text and sends it. Sending is blocked until the supporting documents are on the request. Recipients receive an in-app notification, and e-mail addresses given on the advisory receive the protected advisory PDF.
+description: On release BIBS drafts the advisory automatically, a new package advisory for a new or reactivated package, a renewal advisory for a renewal, a package update advisory otherwise, and a retirement advisory for a retired package. The user checks the recipients, subject and text and sends it. Sending is blocked until the supporting documents are on the request. Recipients receive an in-app notification, and e-mail addresses given on the advisory receive the protected advisory PDF.
 preconditions:
   - "An advisory draft exists; the user has PKG_ADVISORY."
 main_flow:
@@ -1406,18 +1406,18 @@ priority: Must have
 fit: CHANGE
 screens: New Package Request (type RETIRE); Package Request page (Set-up tab)
 api: POST .../requests/{id}/retire
-description: A package is removed from sale through a RETIRE request, which follows the approvals and ManCom sign-off without negotiation. At the MBS step, MBS retires the product instead of setting up a version. The product and all its versions stay readable; nothing is deleted. Active incentive criteria on the product are flagged for review.
+description: A package is removed from sale through a retirement request (request type Retire package), which follows the approvals and ManCom sign-off without negotiation. At the MBS step, MBS retires the product instead of setting up a version. The product and all its versions stay readable; nothing is deleted. Active incentive criteria on the product are flagged for review.
 preconditions:
-  - "A RETIRE request is in WITH_MBS."
+  - "A retirement request is at the stage With MBS for set-up."
 main_flow:
   - MBS clicks **Retire Package**.
   - BIBS sets the product to RETIRED, closes the request as RETIRED and drafts the retirement advisory.
 rules:
-  - [R1, "Only a RETIRE request retires a package; other types cannot.", Fixed, "-"]
+  - [R1, "Only a retirement request retires a package; other types cannot.", Fixed, "-"]
   - [R2, "A retired product cannot be sold to new business.", Fixed, "-"]
 validations:
-  - [Retire on another request type, Only a RETIRE request retires the package, PKG_REQUEST_TYPE_MISMATCH]
-  - [Set-up on a RETIRE request, A RETIRE request retires the package instead, PKG_REQUEST_TYPE_MISMATCH]
+  - [Retire on another request type, Only a request to retire the package can retire it, PKG_REQUEST_TYPE_MISMATCH]
+  - [Set-up on a retirement request, A retirement request retires the package; it has no version to set up, PKG_REQUEST_TYPE_MISMATCH]
   - [Quotation on a retired product, "Product <code> is RETIRED and cannot be sold", PRODUCT_NOT_SELLABLE]
 notifications:
   - "Retirement advisory; incentive review alert INCENTIVE_PRODUCT_INACTIVE to the incentive maintainers."
@@ -1481,8 +1481,8 @@ brd: [BRPM.007 (p.17-18)]
 actor: System; Marketing (quotation user); Business Administrator (exception approval)
 priority: Must have
 fit: CHANGE
-screens: Quotation (rate scheme panel, Request Rate Exception); Premium Calculator; My Approvals
-api: POST /api/v1/catalog/rating/quote; POST /api/v1/catalog/rate-scheme-exceptions
+screens: Quotation (rate scheme panel, Request Rate Exception); rate exception record; Premium Calculator; My Approvals
+api: POST /api/v1/catalog/rating/quote; POST /api/v1/catalog/rate-scheme-exceptions; GET /api/v1/catalog/rate-scheme-exceptions/{reference}; POST .../{reference}/approve and /reject
 description:
   - A new-business quotation or account on a package is priced on the version in force on the transaction date, whatever the period start, so an outdated rate cannot be selected. The version number is stored on the quotation, the account and the invoice.
   - An item rate different from the scheme (or panel insurer) rate, or the use of a version that is not current, needs an approved rate-scheme exception. Without it, submission is refused. Renewals and endorsements use the version of the original account (BRD-6 and BRD-1 contracts).
@@ -1493,7 +1493,7 @@ main_flow:
   - The user submits the quotation; BIBS checks the scheme.
   - The quotation, the accounts created from it and the invoice carry the version number.
 alternate_flows:
-  - Non-current rate. The user clicks **Request Rate Exception** with the reason; a PRODUCT_AUTHORIZE holder decides it in My Approvals. With the approved exception the quotation is submitted and the exception reference is stored.
+  - Non-current rate. The user clicks **Request Rate Exception** with the reason. The approver (PRODUCT_AUTHORIZE, not the requester) opens the exception record from My Approvals, compares the requested rate or version with the scheme in force, and clicks **Approve** (optional comment) or **Reject** (reason required). The requester is notified of the decision. With the approved exception the quotation is submitted and the exception reference is stored.
   - Version changed while the quotation was a draft. Submission is refused; the user reprices on the current version.
 rules:
   - [R1, "New business uses the version in force on the transaction date.", Fixed, "-"]
@@ -1501,21 +1501,28 @@ rules:
   - [R3, "Exceptions expire after 30 days (default).", Fixed, "-"]
   - [R4, "Packages migrated as version 1 keep manual item rates until BDOI answers PQ10.", Configurable, Version flag manual rate allowed (PQ10)]
   - [R5, "Statutory rates (DST, VAT, premium tax, LGT) keep their own effective dates (PQ10).", Fixed, "-"]
+  - [R6, "An exception is approved or rejected by a holder of the approval permission other than its requester; a rejection needs its reason, and the decision stays on the exception.", Fixed, "-"]
 validations:
   - [Deviating rate without exception, "Package <code> is priced on the current rate scheme: rate <n>% needs an approved rate exception", RATE_SCHEME_NOT_CURRENT]
+  - [Rejection without a reason, Enter the reason for the rejection, RATE_EXCEPTION_REASON_REQUIRED]
+  - [Decision by the requester, A rate exception is decided by someone other than its requester, MAKER_CHECKER_VIOLATION]
+  - [Exception already decided, Rate exception <reference> is already decided, RECORD_NOT_PENDING]
   - [Product expired or retired, "Product <code> is <status> and cannot be sold", PRODUCT_NOT_SELLABLE]
   - [No version in force, "Package <code> has no released version in force on <date>", PRODUCT_NOT_SELLABLE]
-fields_screen: Request Rate Exception
+fields_screen: Request Rate Exception; Approve and Reject on the exception record
 fields:
   - [Requested rate or version, Number, "Yes", "-", Different from the current scheme]
   - [Reason, Text, "Yes", "-", "-"]
+  - [Approval comment, Text, "No", "-", "Up to 1,000 characters"]
+  - [Rejection reason, Text, "Yes", "-", "Up to 1,000 characters"]
 notifications:
   - "Authorisers of rate exceptions in My Approvals; requester on decision."
 audit:
-  - "Exception request and decision; the version used by each transaction."
+  - "Exception request and decision (approver, date and time, comment or reason); the version used by each transaction."
 acceptance:
   - A quotation with a period start before the new version's effective date is priced on the new version.
   - Submission with a manual rate different from the scheme is refused without an approved exception and accepted with one.
+  - The approver approves or rejects the exception on its record opened from My Approvals; the requester cannot decide it and a rejection needs its reason.
   - The quotation, account and invoice show the version number that priced them.
 ```
 
@@ -1571,7 +1578,7 @@ main_flow:
 rules:
   - [R1, "First alert 60 days before the end date (default).", Configurable, Parameter PACKAGE_EXPIRY_NOTICE_DAYS]
   - [R2, "Reminders at 30 and 7 days (default).", Configurable, Parameter PACKAGE_EXPIRY_REMINDER_DAYS]
-  - [R3, "Automatic drafting of RENEW requests off by default.", Configurable, Parameter PACKAGE_RENEWAL_AUTODRAFT]
+  - [R3, "Automatic drafting of renewal requests off by default.", Configurable, Parameter PACKAGE_RENEWAL_AUTODRAFT]
   - [R4, "Job time 01:00 PHT.", Configurable, Job schedule (System Administrator)]
 validations: []
 fields_screen: Package Expiry
@@ -1596,7 +1603,7 @@ priority: Must have
 fit: NEW
 screens: Package Expiry (bulk Generate Renewal Request); Package Request page
 api: POST /api/v1/product-maintenance/expiry/renewal-requests
-description: The TSU Officer selects expiring packages and clicks **Generate Renewal Request**. BIBS drafts one RENEW request per package, pre-filled from the current version, with the next term's dates (start = old end + 1 day, same length). The request follows the normal workflow; negotiation is optional. MBS accepts or returns the renewal documentation at the WITH_MBS step, and the renewal advisory is FR-PM-044.
+description: The TSU Officer selects expiring packages and clicks **Generate Renewal Request**. BIBS drafts one renewal request (Renew package) per package, pre-filled from the current version, with the next term's dates (start = old end + 1 day, same length). The request follows the normal workflow; negotiation is optional. MBS accepts or returns the renewal documentation at the With MBS for set-up step, and the renewal advisory is FR-PM-044.
 preconditions:
   - "The packages are released and have no open RENEW or REACTIVATE request."
 main_flow:
@@ -2031,7 +2038,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | PKG_QS_REPLY_DAYS | 5 | Days insurers have to reply to a QS (1-60) |
 | PACKAGE_EXPIRY_NOTICE_DAYS | 60 | Days before the package end date of the first expiry alert (1-365) |
 | PACKAGE_EXPIRY_REMINDER_DAYS | 30,7 | Days of the further expiry reminders |
-| PACKAGE_RENEWAL_AUTODRAFT | false | The expiry monitor drafts RENEW requests at the notice period |
+| PACKAGE_RENEWAL_AUTODRAFT | false | The expiry monitor drafts renewal requests at the notice period |
 | PKG_ADVISORY_GROUPS | MARKETING, TSU, MBS, OPERATIONS | Default recipient groups of an advisory |
 | PKG_SLA_MKT_APPROVAL | 24 | SLA hours of the Marketing approval |
 | PKG_SLA_TSU_REVIEW | 24 | SLA hours of the TSU TL review |

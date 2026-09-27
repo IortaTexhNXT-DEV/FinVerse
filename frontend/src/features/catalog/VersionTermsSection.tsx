@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import type { TermRow, VersionForm } from './versionForm';
 import { syncTerms } from './versionForm';
+import { CoverageName, InsurerName } from '@/components/broking/LovLabel';
 
 interface Props {
   form: VersionForm;
@@ -53,8 +54,20 @@ export function VersionTermsSection({ form, lineCode, readOnly, onChange }: Read
         rowKey={keyOf}
         emptyMessage="Add insurers and included coverages to maintain their terms."
         columns={[
-          { key: 'i', header: 'Insurer', render: (t) => <strong>{t.insurerCode}</strong> },
-          { key: 'c', header: 'Coverage', render: (t) => t.coverageCode },
+          {
+            key: 'i',
+            header: 'Insurer',
+            render: (t) => (
+              <strong>
+                <InsurerName code={t.insurerCode} />
+              </strong>
+            ),
+          },
+          {
+            key: 'c',
+            header: 'Coverage',
+            render: (t) => <CoverageName line={lineCode} code={t.coverageCode} />,
+          },
           {
             key: 'n',
             header: 'Covered',

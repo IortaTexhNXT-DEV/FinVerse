@@ -53,7 +53,8 @@ public class PackageRequests {
   public PackageRequest inStage(Long id, RequestStage stage, String code, String message) {
     PackageRequest p = get(id);
     if (p.getStatus() != stage) {
-      throw new BusinessRuleException(code, message + " (request is " + p.getStatus() + ")");
+      throw new BusinessRuleException(
+          code, message + " (the request is at the stage " + p.getStatus().label() + ")");
     }
     return p;
   }

@@ -18,6 +18,7 @@ import type { Rule, RuleInput, RuleMatch } from './api';
 import { escalationsApi } from './api';
 import { RuleDialog } from './EscalationDialogs';
 import { describeRule } from './labels';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 const MATCH_COLUMNS: Column<RuleMatch>[] = [
   { key: 'inv', header: 'Invoice No.', render: (m) => <strong>{m.invoiceNo}</strong> },
@@ -114,7 +115,11 @@ export default function EscalationRulesPage() {
     },
     { key: 'what', header: 'Escalates When', render: (r) => describeRule(r) },
     { key: 'segment', header: 'Segment', render: (r) => r.segment ?? 'All' },
-    { key: 'reason', header: 'Reason', render: (r) => humanize(r.reasonCode) },
+    {
+      key: 'reason',
+      header: 'Reason',
+      render: (r) => <LovLabel type="CLX_ESCALATION_REASON" code={r.reasonCode} />,
+    },
     { key: 'sla', header: 'SLA (h)', numeric: true, render: (r) => r.slaHours },
     { key: 'from', header: 'Effective', render: (r) => formatDate(r.effectiveFrom) },
     { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.recordStatus} /> },

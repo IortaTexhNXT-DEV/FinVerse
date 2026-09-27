@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.RateOverrideRepository;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQueryService;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionView;
+import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
@@ -150,7 +151,12 @@ public class RateSchemeExceptionService {
   public RateOverride approve(String reference, String comment) {
     requireDecider();
     RateOverride e = require(reference);
-    if (CurrentUser.sameUser(e.getMaker(), deciding.currentUser().username())) {
+    if (e.getRecordStatus() != RecordStatus.PENDING_AUTHORIZATION) {
+      throw new BusinessRuleException(
+          "RECORD_NOT_PENDING", "Rate exception " + reference + " is already decided");
+    }
+    // The requester is the creator: an exception is never changed, only decided.
+    if (CurrentUser.sameUser(e.getCreatedBy(), deciding.currentUser().username())) {
       throw new BusinessRuleException(
           "MAKER_CHECKER_VIOLATION",
           "A rate exception is decided by someone other than its requester");

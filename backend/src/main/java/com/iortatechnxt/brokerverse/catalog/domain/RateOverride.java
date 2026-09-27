@@ -106,7 +106,7 @@ public class RateOverride extends AuthorizableEntity implements CatalogRecord {
       throw new BusinessRuleException(
           "RECORD_NOT_PENDING", "Rate exception " + referenceNo + " is already decided");
     }
-    if (Objects.equals(getMaker(), approver)) {
+    if (Objects.equals(getCreatedBy(), approver)) {
       throw new BusinessRuleException(OWN_REQUEST, OWN_REQUEST_TEXT);
     }
     deactivate();

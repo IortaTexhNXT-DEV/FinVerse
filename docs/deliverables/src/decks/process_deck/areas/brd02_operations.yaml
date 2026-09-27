@@ -7,8 +7,8 @@ num: 2
 title: Operations
 brd: BRD-2
 scope: 'Cashiering, Remittance, Production Reconciliation, Adjustment, Commission / Direct Payment'
-status: BUILT
-status_text: Built; FRS v1.0 issued for review
+status: FRS ISSUED
+status_text: FRS v1.0 issued for review
 department: Operations, Financial Transactions and Processing
 roles:
   - Cashier, HO (11) and branches (5); Cashiering TL / TH
@@ -31,7 +31,7 @@ notes:
   glance: >-
     Operations takes over every invoice booked in New Business and follows its money until the insurer is paid, the
     insurer's official receipt is recorded and every difference is closed. BDOI collects premium on behalf of insurers
-    and remits it net of its commission (BRD-2 p.11). The modules are built; FRS BRD-2 describes the delivered screens.
+    and remits it net of its commission (BRD-2 p.11). FRS BRD-2 describes the screens.
     The BRD gives users and response times but no transaction volumes (OQ44). The annex names 11 head-office and 5 branch
     cashiers, 4 remittance processors, 4 reconciliation handlers and 6 adjustment processors, plus team leads.
   pains: The six points are the six "current process" items of the BRD (p.11), in the same order.
@@ -39,8 +39,8 @@ notes:
     The BRD states the target (unified operations, scheduled extraction, auto-matching, validated entries, tracking)
     without turnaround targets; the measures are the controls BIBS adds.
   gaps: >-
-    Most Operations gaps are rules that the BRD states twice or leaves open. BIBS builds a documented default behind a
-    parameter, so the answer is a configuration change (FRS BRD-2 section 1.6).
+    Most Operations gaps are rules that the BRD states twice or leaves open. BIBS proposes a documented default behind a
+    parameter, so the answer is a configuration change (FRS BRD-2 chapter 12).
 asis:
   caption: 'Payment to insurer today (BRD-2 p.11)'
   notes: >-
@@ -141,11 +141,11 @@ gaps:
   - {sev: High, gap: Paid AR above the DTIP balance, impact: Remittance capped or withheld, owner: Operations, decision: 'Remit the DTIP balance or exclude the account', ref: DCR-015}
   - {sev: High, gap: CWT 2307 cash payments without entries, impact: GL entries for CWT unclear, owner: Comptrollership, decision: 'Give the entries and when Dr DTIP / Cr PR2307 posts', ref: DCR-028}
   - {sev: High, gap: CLPC payments and endorsements also in BRD-1, impact: Two payment intakes and two endorsement paths, owner: 'Operations and NB', decision: Confirm Cashiering and Adjustment as owners, ref: DCR-027}
-  - {sev: Parked, gap: 'Insurer report pick-up; Collection and Disbursement links', impact: 'Uploads and in-app queue until BRD-4 / BRD-5 are built', owner: 'Insurers, BDO IT', decision: 'Mailbox or SFTP channel per insurer', ref: 'OQ29, OQ01, OQ02'}
+  - {sev: Parked, gap: 'Insurer report pick-up; Collection and Disbursement links', impact: 'Uploads and in-app queue until BRD-4 / BRD-5 replace them', owner: 'Insurers, BDO IT', decision: 'Mailbox or SFTP channel per insurer', ref: 'OQ29, OQ01, OQ02'}
 best:
   - {practice: Automated bank and insurer reconciliation, status: BIBS, bibs: 'Bank files uploaded and matched; insurer feedback matched within 1.00; duplicate files refused.', bdoi: 'Give the bank file layouts and an OR tolerance (OQ03, OQ22).'}
   - {practice: Premium remittance discipline, status: BIBS, bibs: 'Only paid, cleared (3 banking days) and eligible premium is batched; holds need a reason.', bdoi: 'Agree a remittance calendar per insurer and the DTIP rule (DCR-015).'}
   - {practice: Maker-checker and segregation of duties, status: BIBS, bibs: 'Batch approval, receipt cancellation and endorsements need a TL / TH who is not the maker.', bdoi: 'Set approver limits per team.'}
   - {practice: Unapplied cash under ageing control, status: PARTLY, bibs: 'Unapplied workbench with disposition, approval and reversal.', bdoi: 'One small-balance rule and write-off authority (DCR-014).'}
-  - {practice: Commission receivable follow-up, status: PARTLY, bibs: 'DP billing per insurer with a 10-working-day SLA; incentive scheme engine built.', bdoi: 'Give incentive targets and amounts so the schemes can go live (OQ39).'}
+  - {practice: Commission receivable follow-up, status: PARTLY, bibs: 'DP billing per insurer with a 10-working-day SLA; incentive schemes set up in Commission.', bdoi: 'Give incentive targets and amounts so the schemes can go live (OQ39).'}
   - {practice: Controlled receipt series, status: BIBS, bibs: 'AR and OR numbered from controlled series per branch; cancellations approved.', bdoi: 'Confirm OR per batch or per payment for BIR purposes (OQ49).'}

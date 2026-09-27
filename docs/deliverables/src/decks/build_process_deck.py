@@ -47,10 +47,9 @@ CONTENT_W = W - 2 * MARGIN
 TOP = Inches(1.4)
 
 STATUS = {  # status chip: (label, fill, font)
-    "BUILT": ("Built", brand.SUCCESS_BG, brand.SUCCESS),
-    "IN BUILD": ("In build", brand.AMBER_BG, brand.AMBER),
-    "DESIGNED": ("Designed", brand.BG_BLUE, brand.HEADER_BLUE),
-    "PARTLY BUILT": ("Partly built", brand.AMBER_BG, brand.AMBER),
+    "FRS ISSUED": ("FRS for review", brand.BG_BLUE, brand.HEADER_BLUE),
+    "REVIEW": ("BDOI review", brand.AMBER_BG, brand.AMBER),
+    "SIGN-OFF": ("Sign-off", brand.SUCCESS_BG, brand.SUCCESS),
 }
 SEVERITY = {  # gap severity: (fill, font)
     "High": (brand.DANGER_BG, brand.DANGER),
@@ -331,7 +330,7 @@ class ProcessDeck(BdoiDeck):
         x = MARGIN + 2 * (colw + Inches(0.2))
         self.box(s, x, y0, colw, hh, brand.WHITE, brand.BORDER)
         self.box(s, x, y0, colw, Inches(0.45), brand.HEADER_BLUE, radius=False)
-        self._text(s, x + Inches(0.12), y0, colw, Inches(0.45), "BRD and build status", size=14, bold=True,
+        self._text(s, x + Inches(0.12), y0, colw, Inches(0.45), "BRD and FRS status", size=14, bold=True,
                    colour=brand.WHITE, anchor=MSO_ANCHOR.MIDDLE)
         label, fill, font = STATUS[a["status"]]
         self.chip(s, x + Inches(0.12), y0 + Inches(0.58), label, fill, font, w=Inches(1.5), h=Inches(0.36),
@@ -401,7 +400,7 @@ class ProcessDeck(BdoiDeck):
     def gaps(self, a: dict | None, title: str | None = None, rows_in: list | None = None,
              notes: str = "") -> None:
         rows_in = rows_in if rows_in is not None else a["gaps"]
-        title = title or f"{a['num']}. {_short(a)}: gaps to close"
+        title = title or f"{a['num']}. {_short(a)}: open points"
         s = self.page(title)
         headers = ["Level", "Gap", "Impact", "Owner", "Decision needed", "Ref"]
         rows, fills = [], {}
@@ -511,7 +510,7 @@ class ProcessDeck(BdoiDeck):
                         size=12, row_h=Inches(0.36), fills=fills)
         self.para(s, MARGIN + Inches(8.45), TOP, CONTENT_W - Inches(8.45), Inches(5.3), notes.split("\n"),
                   size=12, space=6)
-        self.notes(notes + "\nSource: docs/deliverables/src/registers/discrepancy_register.yaml. An item "
+        self.notes(notes + "\nSource: the BRD discrepancy and clarification register. An item "
                            "that touches several BRDs is counted under each of them.")
 
     def roadmap(self, title: str, r: dict) -> None:
@@ -637,16 +636,12 @@ def value_chain_spec(m: dict) -> dict:
     for i, st in enumerate(stages):
         row, k = divmod(i, 6)
         col = k if row == 0 else 5 - k
-        status = st["status"].lower()
-        kind = "vc_build" if "in build" in status else ("vc_designed" if status == "designed" else "vc_built")
         nodes.append({"id": f"v{i}", "x": 2 + col * gx, "y": 14 + row * 172, "w": w, "h": h, "text": st["text"],
-                      "sub": [st["owner"], "BIBS: " + st["module"], f"({st['status']})"], "kind": kind,
+                      "sub": [st["owner"], "BIBS: " + st["module"]], "kind": "vc_built",
                       "size": 13})
     for i in range(len(stages) - 1):
         edges.append({"a": f"v{i}", "b": f"v{i + 1}", "width": 2.0})
-    return {"nodes": nodes, "edges": edges,
-            "legend": [["vc_built", "Built (at least in part)"], ["vc_build", "In build"],
-                       ["vc_designed", "Designed, not yet built"]]}
+    return {"nodes": nodes, "edges": edges}
 
 
 def holistic_figures(h: dict, areas: list[dict]) -> dict[str, Path]:

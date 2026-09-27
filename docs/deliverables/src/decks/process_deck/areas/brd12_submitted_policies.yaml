@@ -8,8 +8,8 @@ num: 12
 title: Submitted Policies
 brd: BRD-12
 scope: 'Policies submitted by bank clients: masterlist, sanitation, review, IAAF, renewal hand-off'
-status: DESIGNED
-status_text: Designed, not yet built; FRS v1.0 issued for review
+status: FRS ISSUED
+status_text: FRS v1.0 issued for review
 department: CBG and Non-CBG Marketing - Submitted Policies
 roles:
   - Submitted Handler and Submitted Checker (CBG)
@@ -32,7 +32,7 @@ notes:
     Submitted policies are policies that bank clients (CBG Motor, CBG Fire, Non-CBG Corporate and Branches, Non-CBG
     Retail) placed outside BDOI and submitted to the bank. BDOI keeps them on a masterlist, reviews their adequacy, and
     at expiry converts them to BDOI-placed renewals. In BIBS the renewal from the hand-off on belongs to the Renewal
-    module (decision D2). The module is designed; the build needs BT0, Collections and Cashiering for its ports.
+    module (decision D2). It uses the business type BT0 and the Collections and Cashiering hand-offs.
   pains: The eight points are the current-process rows of FRS BRD-12 section 2.1, read from the image pages of the BRD (p.4-7).
   after: The usage table gives the volumes and the 2-second response target (p.13-14), the tightest in the twelve BRDs.
   gaps: The bucket list (DCR-124) and the LAMD intake (DCR-146) decide which submitted policies are renewed.
@@ -92,7 +92,7 @@ tobe:
     signatures. A limit breach produces a TOR approved by the TSU matrix and handed to the AO. The expiry scan hands
     renewable policies to the Renewal module, which creates the account, requests the 30-day hold cover and sends the
     letters. Handling-fee payments are tagged in the Unapplied Payment List by PN or location reference. The source
-    feeds, OCR, qualified e-signature and COG transport are parked ports (upload, manual entry, stamped signature,
+    feeds, OCR, qualified e-signature and COG transfer are on hold (upload, manual entry, stamped signature,
     print batch).
   cols: 7
   lanes:
@@ -145,6 +145,6 @@ best:
   - {practice: Automated matching with bank loan data, status: BIBS, bibs: 'LAMD matching by PN in the processing run; fallout with reason codes.', bdoi: 'One LAMD report and owner (DCR-146).'}
   - {practice: Rules owned by the business, status: BIBS, bibs: 'Sanitation, bucket and insurer-assignment rules maintained by a rule administrator.', bdoi: 'Give the bucket precedence (DCR-124).'}
   - {practice: Adequacy review with an approval matrix, status: BIBS, bibs: 'Policy reviews and IAAF routed by the matrix.', bdoi: 'Approve the IAAF matrix (DCR-125).'}
-  - {practice: Digital signature, status: PARTLY, bibs: 'Stamped signature image today; e-signature port parked.', bdoi: 'Choose a qualified e-signature service.'}
+  - {practice: Digital signature, status: PARTLY, bibs: 'Stamped signature image; qualified e-signature on hold.', bdoi: 'Choose a qualified e-signature service.'}
   - {practice: One masterlist, status: BIBS, bibs: 'One record per policy with history, handler and conversion status.', bdoi: 'Migrate the Excel masterlists with reconciliation (BRIDSP-33).'}
   - {practice: Conversion KPI, status: ADOPT, bibs: 'Masterlist shows BOOKED when the renewal books; persistency report for submitted accounts.', bdoi: 'Set conversion targets per segment.'}

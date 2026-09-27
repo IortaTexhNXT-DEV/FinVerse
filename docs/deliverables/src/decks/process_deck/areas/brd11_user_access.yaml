@@ -8,8 +8,8 @@ title: User Access Maintenance
 short: User Access
 brd: BRD-11
 scope: 'User access requests, approvals, group profiles, access reports'
-status: PARTLY BUILT
-status_text: 'Baseline built (users, roles, access requests); BRD-11 changes designed'
+status: FRS ISSUED
+status_text: FRS v1.0 issued for review
 department: UAM process owner (Product Owner) with BDO ITIO
 roles:
   - Requestor (14 users)
@@ -21,7 +21,7 @@ figures:
   - ['10', 'access transactions a month on average (p.11)']
   - ['14', 'requestors, 5 concurrent; 8 approvers']
   - ['10 s', 'response; reports 20 s (p.11)']
-  - ['3', 'failed sign-ins lock the account (built, D5)']
+  - ['3', 'failed sign-ins lock the account (D5)']
 sources:
   - BRD-11 p.5-6 (current, envisioned, two process diagrams)
   - BRD 1.002-4.003; NFR p.11-18
@@ -30,11 +30,11 @@ chevrons: [Draft, Submit, Risk check, Decide, Correct, Apply, Group profile, Rep
 notes:
   glance: >-
     Today BDOI coordinates every QPS access request with IT, which causes delays (BRD-11 p.5). The BRD asks for a module
-    in which the business unit manages permissions, roles and access levels itself, with self-service requests. Part of
-    it is built: users, roles, permissions, sign-in with lock-out after 3 attempts, the session policy (warning at 15
+    in which the business unit manages permissions, roles and access levels itself, with self-service requests. BIBS
+    provides users, roles, permissions, sign-in with lock-out after 3 attempts, the session policy (warning at 15
     minutes, sign-out at 30), access requests under four eyes and the User Access Matrix. BRD-11 adds drafts, returns,
     chosen approvers, effective dates, bulk, second approval, group-profile requests and four reports. Directory sign-in
-    (EUA) is a parked port until BDO supplies the interface (decision D6).
+    (EUA) is added when BDO supplies the interface (decision D6).
   pains: The five points are the current-process rows of the BRD (p.5).
   after: The volumes are small (p.11); the value is control and speed, not throughput.
   gaps: >-
@@ -81,7 +81,7 @@ tobe:
     the change on approval or on the effective date, logs the from / to values and notifies the requester and the
     affected user. Group profiles are requested by the Business Administrator, approved in order and implemented by the
     System Administrator. Four reports and a structured audit log show who has which access, since when and who changed
-    it. Sign-in by the BDO directory (EUA) is a parked port.
+    it. Sign-in by the BDO directory (EUA) is on hold until BDO supplies the interface.
   cols: 6
   lanes:
     - {id: req, label: Requestor}

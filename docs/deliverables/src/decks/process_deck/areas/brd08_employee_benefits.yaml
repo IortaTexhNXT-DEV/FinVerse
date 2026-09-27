@@ -8,8 +8,8 @@ num: 8
 title: Employee Benefits
 brd: BRD-8
 scope: 'Group benefit programmes: renewal advice to placement, member servicing, partner portal'
-status: DESIGNED
-status_text: 'Designed with the partner portal; FRS v1.0 issued for review'
+status: FRS ISSUED
+status_text: FRS v1.0 issued for review
 department: 'Employee Benefits: Marketing, Processing and Collection'
 roles:
   - EB Marketing AO and TL / UH (five EB teams)
@@ -32,7 +32,7 @@ notes:
     Business comes from five EB teams: BDO (captive bank group accounts), SM, Voluntary, Solicited and New Business.
     Renewals dominate. Insurers and client HR users are the first external users of BIBS: they work in the partner
     portal, and nothing they upload takes effect before BDOI validates it. Portal users are provisioned through User
-    Access Maintenance as external users (decision D7). Employee Benefits is designed.
+    Access Maintenance as external users (decision D7).
   pains: The seven points are the current-process rows of FRS BRD-8 section 2.1, from the addendum (Add. p.3).
   after: The BRD asks for automatic renewal advices, one repository, secure access and standard comparatives (Add. p.4-5); it gives no turnaround target.
   gaps: 'Member lists and utilization reports are health-related personal data: DCR-094 is the main compliance gap.'
@@ -83,7 +83,7 @@ tobe:
     In BIBS a daily job sends the renewal advice 135 days before expiry (default), with reminders and a feedback
     request. Client HR users upload the master list, utilization and the signed BOR in the partner portal; the AO
     validates every upload before it takes effect. Target insurers approve the franchise in the portal; the TOR and the
-    unnamed master list are released to them, and they submit proposals on a structured form. BIBS builds the comparative
+    unnamed master list are released to them, and they submit proposals on a structured form. BIBS compiles the comparative
     from the validated proposals; sign-off and the value-threshold approval are workflow steps. The client's
     confirmation creates one account per benefit line and notifies Processing, who place, issue and book on the BRD-1
     spine and release the SOA. Member changes, direct billing, contracts, HMO cards and SOAs are tracked items with
@@ -101,7 +101,7 @@ tobe:
     - {id: b3, lane: mkt, col: 2, text: AO validates every upload}
     - {id: b4, lane: mkt, col: 3, text: Franchise and TOR released}
     - {id: b5, lane: ins, col: 4, text: Proposal on the portal form, kind: external}
-    - {id: b6, lane: bibs, col: 4, text: Comparative built; threshold check, kind: auto}
+    - {id: b6, lane: bibs, col: 4, text: Comparative compiled; threshold check, kind: auto}
     - {id: b7, lane: cli, col: 5, text: Client confirms in the portal, kind: external}
     - {id: b8, lane: bibs, col: 5, text: One account per benefit line, kind: auto}
     - {id: b9, lane: prc, col: 6, text: 'Placement to booking; SOA released'}
@@ -120,7 +120,7 @@ after:
   - {n: 1, bibs: 'Daily job sends the RA 135 days before expiry, with reminders and a feedback request', measure: 'About 4,150 renewals a year'}
   - {n: 2, bibs: 'Every document registered with cycle, type, process and version; outbound files protected', measure: 'One repository'}
   - {n: 3, bibs: 'Insurers and client HR work in the partner portal; uploads take effect after BDOI validation', measure: 'Validation before use'}
-  - {n: 4, bibs: 'Comparative built from the validated proposals; sign-off and threshold approval in the workflow', measure: 'No re-keying'}
+  - {n: 4, bibs: 'Comparative compiled from the validated proposals; sign-off and threshold approval in the workflow', measure: 'No re-keying'}
   - {n: 5, bibs: 'Client confirmation creates one account per benefit line and notifies Processing', measure: 'Hand-off in the system'}
   - {n: 6, bibs: 'Member changes, direct billing, contracts, HMO cards and SOAs are tracked items with follow-ups', measure: 'Automatic follow-ups'}
   - {n: 7, bibs: 'Production, Renewal, Placement, New Business and TAT reports with a business type filter', measure: 'Live reports'}

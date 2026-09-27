@@ -8,8 +8,8 @@ title: Customer Servicing Facility
 short: Customer Servicing
 brd: BRD-9
 scope: 'Contact centre search, servicing view, contact updates, document resends'
-status: DESIGNED
-status_text: Designed, not yet built; FRS v1.0 issued for review
+status: FRS ISSUED
+status_text: FRS v1.0 issued for review
 department: Contact Center Management / Alternative Distribution
 roles:
   - BDO Insure Contact Center Agent
@@ -29,10 +29,10 @@ sources:
 chevrons: [Sign in, Search, Servicing view, Verify caller, Update contact, Resend, Documents, Audit]
 notes:
   glance: >-
-    The BDO-Insure Front-End System was built by BDO IT for the contact centre agents. It shows full account details
+    The BDO-Insure Front-End System of BDO IT serves the contact centre agents. It shows full account details
     only for CBG accounts, lets agents update contact details only, has servers at end of life and no role-based access
     control (BRD-9 p.4). In BIBS the CSF reads the BIBS modules through their query services and stores only its own
-    records. It has no approval workflow: every action is immediate and logged. It is designed. Note: the printed e-mail
+    records. It has no approval workflow: every action is immediate and logged. Note: the printed e-mail
     in the pack carries meeting credentials; circulate a redacted copy (DCR-098).
   pains: The six points are the current-process rows of FRS BRD-9 section 2.1, from the BRD (p.3-5, p.17).
   after: The usage table gives the volumes and response times (p.13-14).
@@ -82,7 +82,7 @@ tobe:
     account (CBG and non-CBG) with its CSF status, payments of the last 12 months, RAs, e-policies and documents. Before
     an update the agent completes the verification checklist; only contact fields change, with a reason, in the BIBS
     client master. The agent resends the RA or the e-policy to the registered e-mail, password protected, with the
-    password sent separately. The contact change is queued for QPS and EBIX while they coexist (parked seam, CSQ01).
+    password sent separately. The contact change is queued for QPS and EBIX while they coexist (on hold, CSQ01).
     Management prints or saves the audit trail and agent activity in PDF or Excel.
   cols: 5
   lanes:
@@ -114,7 +114,7 @@ after:
   - {n: 1, bibs: 'Every account of the client, CBG and non-CBG, with status and payments', measure: 'All segments'}
   - {n: 2, bibs: 'One search box for name, client ID, account number, PN number and application number', measure: '< 3 s search'}
   - {n: 3, bibs: 'Agent, supervisor and management roles with separate rights to update, resend and upload', measure: 'Role-based access'}
-  - {n: 4, bibs: 'Update made once in the BIBS client master after verifying the caller; write-back seam for QPS / EBIX', measure: 'Verification before change'}
+  - {n: 4, bibs: 'Update made once in the BIBS client master after verifying the caller; write-back to QPS / EBIX while they coexist', measure: 'Verification before change'}
   - {n: 5, bibs: 'Agent views, downloads and resends the RA and e-policy to the registered e-mail, protected', measure: 'Resend in one call'}
   - {n: 6, bibs: 'Every change and agent action logged; audit trail in PDF or Excel', measure: 'Full audit trail'}
 gaps:

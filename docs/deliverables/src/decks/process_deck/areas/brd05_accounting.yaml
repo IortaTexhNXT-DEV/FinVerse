@@ -1,8 +1,8 @@
 # BRD-5 Accounting, Disbursement, Accounting Controls and Subsidiary Ledger (ACSL), and financial reporting.
 # Sources: "Accounting, Disbursement, and Accounting Controls and Subsidiary Ledger BRD.zip" (one PDF of 267 pages):
 # current process p.44-45, envisioned process p.46-48, NFR p.133-139, Addendum 1 p.37, Appendix A p.142-144;
-# requirements baseline BDOI_ACCT_BRD_SPEC.md sections 2, 3, 7, 9; build design ACCOUNTING_DISBURSEMENT_DESIGN.md;
-# discrepancy register (DCR-037, 052, 054, 058, 157). No FRS yet.
+# requirements baseline sections 2, 3, 7, 9; FRS BRD-5 v1.0 (two volumes);
+# discrepancy register (DCR-037, 052, 054, 058, 157).
 id: brd05
 key: acct
 num: 5
@@ -10,8 +10,8 @@ title: Accounting and Disbursement
 short: Accounting
 brd: BRD-5
 scope: 'Accounting (FRBS), Disbursement, ACSL, Marketing refund and cash-advance requests, financial reports'
-status: IN BUILD
-status_text: 'GL platform built; Disbursement, ACSL, FRBS reports in build'
+status: FRS ISSUED
+status_text: FRS v1.0 issued for review (two volumes)
 department: 'Comptrollership: FRBS (GL team), Disbursement, ACSL'
 roles:
   - FRBS officer, TL, TH (Accounting, 5 users)
@@ -27,16 +27,16 @@ figures:
 sources:
   - BRD-5 p.44-45 (current process), p.46-48 (envisioned)
   - FRBS, DIS, MKT, ACSL, BASAU requirements; Addenda 1 and 2
-  - Requirements baseline BDOI_ACCT_BRD_SPEC.md; design ACCOUNTING_DISBURSEMENT_DESIGN.md
+  - Requirements baseline; FRS BRD-5 v1.0, volumes 1 and 2
 chevrons: [Request, Voucher, Approval, Payment, Status and CWT, Posting, Reconciliation, Close and report]
 notes:
   glance: >-
     BDOI handles two kinds of money: trust money (premium collected for insurers and remitted net of commission) and its
     own income (commission, service fee, profit share, incentives). BRD-2 covers the front of the cycle; BRD-5 covers
-    the back office of Comptrollership. Most of the accounting core already exists in BIBS (chart, journals, accounting
-    engine, sub-ledger, periods, FX revaluation, year-end, bank reconciliation, BIR returns and 2307). The large new
-    build is Disbursement, then ACSL reconciliation and correction, the Marketing request flow and the BDOI report
-    pack. There is no FRS yet; this chapter uses the requirements baseline and the design.
+    the back office of Comptrollership. BIBS covers the accounting core (chart, journals, accounting
+    engine, sub-ledger, periods, FX revaluation, year-end, bank reconciliation, BIR returns and 2307), Disbursement,
+    ACSL reconciliation and correction, the Marketing request flow and the BDOI report pack. FRS BRD-5 v1.0
+    describes the screens in two volumes.
   pains: 'The points are the lettered current-process items of the BRD (A = Accounting, B = Disbursement, B.2 = Marketing requests, C = ACSL), p.44-45.'
   after: 'The BRD gives response times and yearly volumes; it states no turnaround targets. The measures are the controls BIBS adds.'
   gaps: 'The invoice-number question (DCR-058, AQ29) decides how ACSL links booking, adjustment and cancellation.'
@@ -88,7 +88,7 @@ pains:
   - {n: 8, title: IT needed for input and closing, text: 'Input reports and the closing of the broking books depend on IT support.', ref: 'BRD-5 p.44, A a; p.45, C a'}
   - {n: 9, title: Reconciliation and reports by hand, text: 'Output reports are generated and reconciliations performed manually.', ref: 'BRD-5 p.44, A b-c'}
 tobe:
-  caption: 'Disbursement, accounting and ACSL in BIBS (design ACCOUNTING_DISBURSEMENT_DESIGN; BRD-5 p.46-48)'
+  caption: 'Disbursement, accounting and ACSL in BIBS (FRS BRD-5; BRD-5 p.46-48)'
   notes: >-
     In BIBS refund and cash-advance requests are raised on the RRF / RFP with documents and approved in the workflow,
     then routed to Disbursement. Disbursement receives requests from the other modules, by upload or by encoding; BIBS

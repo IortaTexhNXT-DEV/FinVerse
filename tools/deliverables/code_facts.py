@@ -379,7 +379,7 @@ def role_grants(include_seed: bool = True) -> dict[str, set[str]]:
     temp: dict[str, list[str]] = {}  # temporary permission lists of a migration (insert into tmp_x values ...)
     for f in files:
         text = re.sub(r"--[^\n]*", "", f.read_text(encoding="utf-8"))
-        # Function bodies ($$ ... $$, for example a trigger that repeats the grants of the same migration) are
+        # Function bodies ($$ ... $$, for example the immutability triggers) are
         # not grant statements of their own.
         text = re.sub(r"\$\$.*?\$\$", "$$ $$", text, flags=re.S)
         for stmt in text.split(";"):
@@ -503,7 +503,7 @@ def workflows(codes: Iterable[str] | None = None) -> dict[str, dict[str, list[di
                    key=_version)
     for f in files:
         text = re.sub(r"--[^\n]*", "", f.read_text(encoding="utf-8"))
-        # Function bodies ($$ ... $$, for example a trigger that repeats the grants of the same migration) are
+        # Function bodies ($$ ... $$, for example the immutability triggers) are
         # not grant statements of their own.
         text = re.sub(r"\$\$.*?\$\$", "$$ $$", text, flags=re.S)
         for stmt in text.split(";"):

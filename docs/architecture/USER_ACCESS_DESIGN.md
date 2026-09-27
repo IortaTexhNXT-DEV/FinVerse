@@ -555,7 +555,7 @@ What wave U1-B built on U0 and U1-A, and where it differs from or details sectio
 - **Guide.** [`docs/modules/USER_ACCESS.md`](../modules/USER_ACCESS.md) (with production-support troubleshooting); the
   as-built status per BRD ID is in `BDOI_UAM_BRD_SPEC.md`.
 
-## Sign-off controls (V1065, V1066)
+## Sign-off controls (V1065, V1130)
 
 - **Separation-of-duties rules** (`nba_sod_rule`, `SodRule`, `SodRuleService`, `/api/v1/nbadmin/sod-rules`):
   pairs of group profiles one user may not hold, created or deactivated by `UAM_SOD_MAINTAIN` and

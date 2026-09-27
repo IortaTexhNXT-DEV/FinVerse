@@ -68,7 +68,7 @@ public class ContactChangesReport implements ReportDefinition {
     return ReportMetadata.customerService(
         CODE,
         "Contact Changes",
-        "Client contact changes with the values before and after, the caller verification, agent, reason and legacy sync status",
+        "Contact changes with old and new values, verification, agent, reason and sync status",
         CsfReportSupport.parameters(
             ParameterSpec.optional(CsfReportSupport.CLIENT, "Client code", ParameterType.TEXT)));
   }

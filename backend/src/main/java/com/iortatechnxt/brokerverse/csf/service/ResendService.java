@@ -189,7 +189,7 @@ public class ResendService {
   private String recipient(Client client, ResendRequest request) {
     String registered = blankToNull(client.getEmail());
     String asked = blankToNull(request.recipient());
-    if (asked == null || asked.equalsIgnoreCase(registered)) {
+    if (asked == null || asked.equals(registered)) {
       if (registered == null) {
         throw new BusinessRuleException(
             "CSF_NO_REGISTERED_EMAIL",
@@ -197,25 +197,26 @@ public class ResendService {
       }
       return registered;
     }
+    requireOtherAllowed(asked, request.reason());
+    return asked;
+  }
+
+  private void requireOtherAllowed(String asked, String reason) {
     if (!support.currentUser().hasAuthority(RESEND_OTHER)) {
       throw new AccessDeniedException("You are not permitted to perform this action");
     }
-    if (blankToNull(request.reason()) == null) {
+    if (blankToNull(reason) == null) {
       throw new BusinessRuleException(
           "CSF_RESEND_REASON_REQUIRED", "Enter the reason for sending to another address");
     }
     if (!EmailAddresses.isValid(asked)) {
       throw new BusinessRuleException("EMAIL_ADDRESS_INVALID", "Enter a valid e-mail address");
     }
-    return asked;
   }
 
   private void done(
       Client client, ActivityAction action, String document, String to, String reason) {
-    String other =
-        to.equalsIgnoreCase(String.valueOf(client.getEmail()))
-            ? ""
-            : " (another address: " + reason.strip() + ")";
+    String other = to.equals(client.getEmail()) ? "" : " (another address: " + reason.strip() + ")";
     support
         .audit()
         .record(

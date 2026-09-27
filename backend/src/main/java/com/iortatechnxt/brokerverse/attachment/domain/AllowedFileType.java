@@ -94,7 +94,9 @@ public enum AllowedFileType {
       case CSV, EML, TXT -> isText(content);
       case HEIC -> Signatures.isHeif(content);
       case TIFF -> startsWith(content, signature) || startsWith(content, Signatures.TIFF_BIG);
-      case WEBP -> startsWith(content, signature) && Signatures.at(content, 8, Signatures.WEBP);
+      case WEBP ->
+          startsWith(content, signature)
+              && Signatures.at(content, Signatures.BRAND_OFFSET, Signatures.WEBP);
       default -> startsWith(content, signature);
     };
   }
@@ -141,7 +143,7 @@ public enum AllowedFileType {
     static final List<String> HEIF_BRANDS = List.of("heic", "heix", "heif", "mif1", "msf1", "hevc");
 
     private static final int FTYP_OFFSET = 4;
-    private static final int BRAND_OFFSET = 8;
+    static final int BRAND_OFFSET = 8;
     private static final int BRAND_LENGTH = 4;
 
     private Signatures() {}

@@ -161,22 +161,7 @@ public class CsfDocumentService {
    */
   public DocumentView upload(Long companyId, Long clientId, Upload upload) {
     Client client = clients.require(companyId, clientId);
-    if (upload.file() == null || upload.file().content() == null) {
-      throw new BusinessRuleException("CSF_FILE_REQUIRED", "Choose the file to upload");
-    }
-    if (upload.documentType() == null || upload.documentType().isBlank()) {
-      throw new BusinessRuleException("CSF_DOCUMENT_TYPE_REQUIRED", "Select the document type");
-    }
-    boolean allowed =
-        support
-            .lovs()
-            .activeValues(CsfCodes.LOV_DOCUMENT_TYPE, BusinessClock.today(support.clock()))
-            .stream()
-            .anyMatch(v -> v.getCode().equals(upload.documentType()));
-    if (!allowed) {
-      throw new BusinessRuleException(
-          "CSF_DOCUMENT_TYPE_NOT_ALLOWED", "This document type cannot be uploaded here");
-    }
+    requireUploadable(upload);
     Owner owner =
         upload.accountId() == null
             ? new Owner(
@@ -206,6 +191,25 @@ public class CsfDocumentService {
                     + saved.getSha256()
                     + ")"));
     return view(saved, owner);
+  }
+
+  private void requireUploadable(Upload upload) {
+    if (upload.file() == null || upload.file().content() == null) {
+      throw new BusinessRuleException("CSF_FILE_REQUIRED", "Choose the file to upload");
+    }
+    if (upload.documentType() == null || upload.documentType().isBlank()) {
+      throw new BusinessRuleException("CSF_DOCUMENT_TYPE_REQUIRED", "Select the document type");
+    }
+    boolean allowed =
+        support
+            .lovs()
+            .activeValues(CsfCodes.LOV_DOCUMENT_TYPE, BusinessClock.today(support.clock()))
+            .stream()
+            .anyMatch(v -> v.getCode().equals(upload.documentType()));
+    if (!allowed) {
+      throw new BusinessRuleException(
+          "CSF_DOCUMENT_TYPE_NOT_ALLOWED", "This document type cannot be uploaded here");
+    }
   }
 
   private Owner accountOwner(Client client, Long accountId) {

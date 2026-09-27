@@ -1,7 +1,6 @@
 package com.iortatechnxt.brokerverse.csf.service;
 
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
-import java.util.Locale;
 import org.springframework.stereotype.Component;
 
 /**
@@ -71,12 +70,7 @@ public class CsfParameters {
    * @return true when enabled
    */
   public boolean legacySyncEnabled() {
-    return "true"
-        .equals(
-            parameters
-                .text(CsfCodes.LEGACY_SYNC_ENABLED, "false")
-                .strip()
-                .toLowerCase(Locale.ROOT));
+    return Boolean.parseBoolean(parameters.text(CsfCodes.LEGACY_SYNC_ENABLED, "false").strip());
   }
 
   /**

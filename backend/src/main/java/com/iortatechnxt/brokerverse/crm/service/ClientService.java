@@ -202,16 +202,17 @@ public class ClientService {
         ENTITY,
         client.getProspectCode(),
         AuditAction.UPDATE,
-        "Contact of "
-            + client.getCode()
-            + " changed by "
-            + change.source()
-            + " "
-            + nz(change.reference())
-            + " ("
-            + nz(change.reason())
-            + "): "
-            + describe(changed));
+        cut(
+            "Contact of "
+                + client.getCode()
+                + " changed by "
+                + change.source()
+                + " "
+                + nz(change.reference())
+                + " ("
+                + nz(change.reason())
+                + "): "
+                + describe(changed)));
     events.publishEvent(
         new ClientContactChanged(
             client.getCompanyId(),

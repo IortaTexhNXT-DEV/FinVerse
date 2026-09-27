@@ -94,9 +94,12 @@ public class CsfSeedData implements ApplicationRunner {
     Company company = companies.findByCode("FVI").orElse(null);
     Client client =
         company == null ? null : clients.findByCode(company.getId(), CLIENT_CODE).orElse(null);
-    if (client == null) {
-      return;
+    if (client != null) {
+      attachAdvice(company, client);
     }
+  }
+
+  private void attachAdvice(Company company, Client client) {
     AttachmentTarget clientTarget =
         new AttachmentTarget(CsfCodes.ENTITY_CLIENT, String.valueOf(client.getId()));
     boolean present =
@@ -104,10 +107,13 @@ public class CsfSeedData implements ApplicationRunner {
             .map(Attachment::getDocumentType)
             .anyMatch(CsfCodes.DOC_RENEWAL_ADVICE::equals);
     List<Account> owned = accounts.byClient(client.getId());
-    if (present || owned.isEmpty()) {
-      return;
+    if (!present && !owned.isEmpty()) {
+      store(company, client, clientTarget, owned.get(owned.size() - 1));
     }
-    Account account = owned.get(owned.size() - 1);
+  }
+
+  private void store(
+      Company company, Client client, AttachmentTarget clientTarget, Account account) {
     LocalDate today = BusinessClock.today(clock);
     byte[] pdf = composer.pdf(spec(company, client, account, today));
     Attachment ra =

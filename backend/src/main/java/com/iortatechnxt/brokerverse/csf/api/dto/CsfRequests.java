@@ -14,12 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Request bodies of the Customer Servicing Facility API. */
-public final class CsfRequests {
-
-  private static final int REMARKS = 500;
-  private static final int VALUE = 300;
-
-  private CsfRequests() {}
+public interface CsfRequests {
 
   /**
    * A caller verification (FR-CSF-020).
@@ -28,10 +23,10 @@ public final class CsfRequests {
    * @param checks checks with their outcome
    * @param remarks remarks
    */
-  public record Verify(
+  record Verify(
       @NotBlank String channel,
       @NotNull @Valid List<Check> checks,
-      @Size(max = REMARKS) String remarks) {
+      @Size(max = RequestLimits.REMARKS) String remarks) {
 
     /**
      * The service request.
@@ -52,7 +47,7 @@ public final class CsfRequests {
    * @param code check (list CSF_VERIFY_CHECK)
    * @param matched answer matched
    */
-  public record Check(@NotBlank String code, boolean matched) {}
+  record Check(@NotBlank String code, boolean matched) {}
 
   /**
    * A contact change (FR-CSF-021): a null value keeps the field, a blank value clears it.
@@ -63,11 +58,11 @@ public final class CsfRequests {
    * @param values new value by field (EMAIL, MOBILE, PHONE, ADDRESS_LINE, CITY, PROVINCE,
    *     POSTAL_CODE)
    */
-  public record Change(
+  record Change(
       Long verificationId,
       String reasonCode,
-      @Size(max = REMARKS) String remarks,
-      Map<String, @Size(max = VALUE) String> values) {
+      @Size(max = RequestLimits.REMARKS) String remarks,
+      Map<String, @Size(max = RequestLimits.VALUE) String> values) {
 
     /**
      * The service request.
@@ -90,10 +85,10 @@ public final class CsfRequests {
    * @param fields value asked for by field (list CSF_REFERRAL_FIELD)
    * @param remarks remarks
    */
-  public record Referral(
+  record Referral(
       @NotBlank String channel,
-      @NotNull Map<String, @Size(max = VALUE) String> fields,
-      @Size(max = REMARKS) String remarks) {
+      @NotNull Map<String, @Size(max = RequestLimits.VALUE) String> fields,
+      @Size(max = RequestLimits.REMARKS) String remarks) {
 
     /**
      * The service request.
@@ -112,10 +107,10 @@ public final class CsfRequests {
    * @param recipient another address, empty for the registered e-mail
    * @param reason reason for another address
    */
-  public record Resend(
+  record Resend(
       @NotNull Long documentId,
-      @Size(max = VALUE) String recipient,
-      @Size(max = REMARKS) String reason) {
+      @Size(max = RequestLimits.VALUE) String recipient,
+      @Size(max = RequestLimits.REMARKS) String reason) {
 
     /**
      * The service request.

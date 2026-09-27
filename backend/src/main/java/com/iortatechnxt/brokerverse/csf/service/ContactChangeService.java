@@ -123,18 +123,7 @@ public class ContactChangeService {
     String no = nextNumber();
     List<FieldChange> changed =
         clientMaster.updateContact(
-            clientId,
-            new ContactChange(
-                request.values().get("EMAIL"),
-                request.values().get("MOBILE"),
-                request.values().get("PHONE"),
-                request.values().get("ADDRESS_LINE"),
-                request.values().get("CITY"),
-                request.values().get("PROVINCE"),
-                request.values().get("POSTAL_CODE"),
-                CsfCodes.SOURCE,
-                support.lovs().label(CsfCodes.LOV_CHANGE_REASON, request.reasonCode()),
-                no + " verification " + verification.getId()));
+            clientId, contactChange(request, no + " verification " + verification.getId()));
     if (changed.isEmpty()) {
       throw new BusinessRuleException("CSF_NO_CHANGE", "Change at least one contact detail");
     }
@@ -165,6 +154,21 @@ public class ContactChangeService {
             ActivityAction.CONTACT_CHANGE,
             new CsfActivity.Subject(client.getId(), client.getCode(), no, "Applied"));
     return views.of(List.of(saved)).get(0);
+  }
+
+  private ContactChange contactChange(ChangeRequest request, String reference) {
+    Map<String, String> v = request.values();
+    return new ContactChange(
+        v.get("EMAIL"),
+        v.get("MOBILE"),
+        v.get("PHONE"),
+        v.get("ADDRESS_LINE"),
+        v.get("CITY"),
+        v.get("PROVINCE"),
+        v.get("POSTAL_CODE"),
+        CsfCodes.SOURCE,
+        support.lovs().label(CsfCodes.LOV_CHANGE_REASON, request.reasonCode()),
+        reference);
   }
 
   private static String bankCifOf(Client client) {

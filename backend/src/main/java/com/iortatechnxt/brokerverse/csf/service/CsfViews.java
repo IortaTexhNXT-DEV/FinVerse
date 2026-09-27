@@ -10,9 +10,7 @@ import java.util.List;
  * What the Customer Servicing Facility screens show, as plain values read inside the service
  * transaction (FR-CSF-010 to 013, 021, 030 to 033). The API serialises them as they are.
  */
-public final class CsfViews {
-
-  private CsfViews() {}
+public interface CsfViews {
 
   /**
    * The client summary card (FR-CSF-011; BRCSF-002, 008).
@@ -31,7 +29,7 @@ public final class CsfViews {
    * @param accounts number of accounts
    * @param verification the caller verification still valid, null when none
    */
-  public record ClientSummary(
+  record ClientSummary(
       Long id,
       String code,
       String prospectCode,
@@ -57,7 +55,7 @@ public final class CsfViews {
    * @param province province
    * @param postalCode postal code
    */
-  public record Contact(
+  record Contact(
       String email,
       String mobile,
       String phone,
@@ -90,7 +88,7 @@ public final class CsfViews {
    * @param ffy Free First Year tagged
    * @param directPayment paid directly to the insurer
    */
-  public record AccountLine(
+  record AccountLine(
       Long id,
       String arn,
       String productCode,
@@ -132,7 +130,7 @@ public final class CsfViews {
    * @param city city
    * @param accounts matching accounts
    */
-  public record ClientHitView(
+  record ClientHitView(
       Long id,
       String code,
       String name,
@@ -159,7 +157,7 @@ public final class CsfViews {
    * @param clients clients found
    * @param legacy accounts found only in the legacy systems
    */
-  public record SearchView(
+  record SearchView(
       String keyType,
       String value,
       boolean truncated,
@@ -182,7 +180,7 @@ public final class CsfViews {
    * @param clientName client name
    * @param description description
    */
-  public record LegacyAccountView(
+  record LegacyAccountView(
       String source, String reference, String clientName, String description) {}
 
   /**
@@ -197,7 +195,7 @@ public final class CsfViews {
    * @param amount amount applied (negative for a reversal)
    * @param applications invoices paid
    */
-  public record PaymentView(
+  record PaymentView(
       String receiptNo,
       String orNo,
       String arNo,
@@ -222,7 +220,7 @@ public final class CsfViews {
    * @param invoiceBalance current premium balance of the invoice
    * @param invoicePaymentStatus current payment status of the invoice
    */
-  public record ApplicationView(
+  record ApplicationView(
       String invoiceNo,
       String arn,
       BigDecimal amount,
@@ -236,7 +234,7 @@ public final class CsfViews {
    * @param months months shown
    * @param payments payments, newest first
    */
-  public record PaymentHistory(LocalDate from, int months, List<PaymentView> payments) {
+  record PaymentHistory(LocalDate from, int months, List<PaymentView> payments) {
 
     /** Defensive copy. */
     public PaymentHistory {
@@ -257,7 +255,7 @@ public final class CsfViews {
    * @param recordType Client, Account or Quotation
    * @param reference client code, ARN or quotation number
    */
-  public record DocumentView(
+  record DocumentView(
       Long id,
       String fileName,
       String documentType,
@@ -282,7 +280,7 @@ public final class CsfViews {
    * @param lastSentAt last sending
    * @param resendable confirmed, so it may be resent
    */
-  public record EpolicyView(
+  record EpolicyView(
       Long id,
       String arn,
       String fileName,
@@ -313,7 +311,7 @@ public final class CsfViews {
    * @param validUntil end of validity of a pass
    * @param agent agent
    */
-  public record VerificationView(
+  record VerificationView(
       Long id,
       String channel,
       String result,
@@ -336,7 +334,7 @@ public final class CsfViews {
    * @param code check (list CSF_VERIFY_CHECK)
    * @param matched answer matched
    */
-  public record CheckView(String code, boolean matched) {}
+  record CheckView(String code, boolean matched) {}
 
   /**
    * A contact change, refused change or referral (FR-CSF-021, 022; Contact History).
@@ -358,7 +356,7 @@ public final class CsfViews {
    * @param handoffStatus state of the Operations hand-off of a referral
    * @param fields field rows
    */
-  public record ChangeView(
+  record ChangeView(
       Long id,
       String changeNo,
       Long clientId,
@@ -389,7 +387,7 @@ public final class CsfViews {
    * @param oldValue value before
    * @param newValue value after or asked for
    */
-  public record FieldView(String field, String oldValue, String newValue) {}
+  record FieldView(String field, String oldValue, String newValue) {}
 
   /**
    * The e-mail a resend will send (Resend dialog preview, FR-CSF-030, 031).
@@ -400,7 +398,7 @@ public final class CsfViews {
    * @param body body
    * @param otherAllowed the user may send to another address
    */
-  public record ResendPreview(
+  record ResendPreview(
       String documentName,
       String registeredEmail,
       String subject,
@@ -414,5 +412,5 @@ public final class CsfViews {
    * @param messageId outbox message, null for an e-policy (sent by Issuance)
    * @param documentName document
    */
-  public record ResendResult(String recipient, Long messageId, String documentName) {}
+  record ResendResult(String recipient, Long messageId, String documentName) {}
 }

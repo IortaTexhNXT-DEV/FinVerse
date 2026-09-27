@@ -98,22 +98,11 @@ public class CustomerSearchService {
           case PN_NO -> group(byPn(companyId, text, max));
           case APPLICATION_NO -> group(byApplication(companyId, text));
         };
-    List<LegacyAccount> legacyHits =
-        hits.isEmpty() && key != SearchKey.NAME && key != SearchKey.CLIENT_ID
-            ? legacy.find(companyId, key.name(), text)
-            : List.of();
+    List<LegacyAccount> legacyHits = legacyOf(companyId, key, text, hits.isEmpty());
     boolean truncated = hits.size() > max;
     List<ClientHitView> found =
         hits.entrySet().stream().limit(max).map(e -> hit(e.getKey(), e.getValue())).toList();
-    ClientHitView single = found.size() == 1 ? found.get(0) : null;
-    activity.record(
-        companyId,
-        ActivityAction.SEARCH,
-        new CsfActivity.Subject(
-            single == null ? null : single.id(),
-            single == null ? null : single.code(),
-            null,
-            key.label() + ": " + text + " (" + found.size() + (truncated ? "+" : "") + " found)"));
+    log(companyId, key, text, found, truncated);
     return new SearchView(
         key.name(),
         text,
@@ -126,6 +115,24 @@ public class CustomerSearchService {
                     new LegacyAccountView(
                         l.source(), l.reference(), l.clientName(), l.description()))
             .toList());
+  }
+
+  private List<LegacyAccount> legacyOf(Long companyId, SearchKey key, String text, boolean none) {
+    boolean accountKey = key != SearchKey.NAME && key != SearchKey.CLIENT_ID;
+    return none && accountKey ? legacy.find(companyId, key.name(), text) : List.of();
+  }
+
+  private void log(
+      Long companyId, SearchKey key, String text, List<ClientHitView> found, boolean truncated) {
+    ClientHitView single = found.size() == 1 ? found.get(0) : null;
+    activity.record(
+        companyId,
+        ActivityAction.SEARCH,
+        new CsfActivity.Subject(
+            single == null ? null : single.id(),
+            single == null ? null : single.code(),
+            null,
+            key.label() + ": " + text + " (" + found.size() + (truncated ? "+" : "") + " found)"));
   }
 
   private ClientHitView hit(Long clientId, List<Account> matched) {

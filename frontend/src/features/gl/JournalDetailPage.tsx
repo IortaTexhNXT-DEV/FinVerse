@@ -14,6 +14,7 @@ import { JournalActions } from './JournalActions';
 import type { FrbsJournal } from './glPlatformApi';
 import { journalSource } from './journalSource';
 import { UserName } from '@/components/ui/UserName';
+import { displayNameOf } from '@/api/users';
 
 function Summary({ journal: j }: Readonly<{ journal: Journal }>) {
   const source = journalSource(j);
@@ -46,7 +47,10 @@ function Summary({ journal: j }: Readonly<{ journal: Journal }>) {
 function ControlFacts({ journal: j }: Readonly<{ journal: FrbsJournal }>) {
   const facts: [string, string][] = [];
   if (j.assignedTo !== undefined) {
-    facts.push(['Assigned to', `${j.assignedTo} (by ${j.assignedBy ?? '—'})`]);
+    facts.push([
+      'Assigned to',
+      `${displayNameOf(j.assignedTo)} (by ${displayNameOf(j.assignedBy) || '—'})`,
+    ]);
   }
   if (j.reverseOn !== undefined) {
     facts.push(['Automatic reversal on', formatDate(j.reverseOn)]);
@@ -83,7 +87,7 @@ function AuditPanel({ journal }: Readonly<{ journal: FrbsJournal }>) {
           <div key={label}>
             <dt className="muted">{label}</dt>
             <dd style={{ margin: 0, fontWeight: 600 }}>
-              {who ?? '—'} <span className="muted">{formatDateTime(when)}</span>
+              <UserName login={who} /> <span className="muted">{formatDateTime(when)}</span>
             </dd>
           </div>
         ))}

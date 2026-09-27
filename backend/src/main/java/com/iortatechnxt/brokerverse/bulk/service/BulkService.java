@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.Sha256;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class BulkService {
   private final AuditTrailService audit;
   private final BulkRowStore store;
   private final TransactionTemplate tx;
+  private final UserDirectory users;
   private final Clock clock;
 
   /**
@@ -62,6 +64,7 @@ public class BulkService {
    * @param audit audit trail
    * @param store stored rows (values, commit of one row, outcomes)
    * @param txManager transaction manager
+   * @param users user names (result report)
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // constructor injection
@@ -75,6 +78,7 @@ public class BulkService {
       AuditTrailService audit,
       BulkRowStore store,
       PlatformTransactionManager txManager,
+      UserDirectory users,
       Clock clock) {
     this.registry = registry;
     this.reader = reader;
@@ -85,6 +89,7 @@ public class BulkService {
     this.audit = audit;
     this.store = store;
     this.tx = new TransactionTemplate(txManager);
+    this.users = users;
     this.clock = clock;
   }
 
@@ -386,7 +391,12 @@ public class BulkService {
     Map<Long, Map<String, String>> values = new HashMap<>();
     all.forEach(r -> values.put(r.getId(), store.read(r.getData())));
     return BulkWorkbooks.report(
-        job, registry.get(job.getHandlerCode()).columns(), all, values, outcomes(jobId));
+        job,
+        registry.get(job.getHandlerCode()).columns(),
+        all,
+        values,
+        outcomes(jobId),
+        users.displayName(job.getCreatedBy()));
   }
 
   /**
@@ -402,7 +412,7 @@ public class BulkService {
     List<BulkRowRecord> all = rows.findByJobIdOrderByRowNo(jobId);
     Map<Long, Map<String, String>> values = new HashMap<>();
     all.forEach(r -> values.put(r.getId(), store.read(r.getData())));
-    return BulkWorkbooks.errorFile(registry.get(job.getHandlerCode()).columns(), all, values);
+    return BulkErrorFile.write(registry.get(job.getHandlerCode()).columns(), all, values);
   }
 
   private BulkJob requireOpen(Long jobId) {

@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Field;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Fields;
@@ -186,7 +187,7 @@ public class AdvisoryService {
     values.put("productCode", p.getTargetProductCode());
     values.put("productName", p.getTitle());
     values.put("versionNo", String.valueOf(versionNo));
-    values.put("effectiveFrom", String.valueOf(terms.dates().effectiveFrom()));
+    values.put("effectiveFrom", DisplayFormat.date(terms.dates().effectiveFrom()));
     values.put("reference", p.getRequestNo());
     String template = type == Type.RENEWAL ? "PKG_RENEWAL_ADVISORY" : "PKG_ADVISORY";
     return templates.merge(template, BusinessClock.today(clock), values);

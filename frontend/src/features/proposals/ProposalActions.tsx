@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/toastContext';
 import { AcceptanceDialog } from '@/features/quotations/AcceptanceDialog';
 import type { AcceptanceInput } from '@/features/quotations/AcceptanceDialog';
-import { humanize } from '@/utils/format';
+import { statusPhrase } from '@/utils/format';
 import { SlipDialog } from './SlipDialog';
 import type { SlipInput } from './SlipDialog';
 
@@ -82,7 +82,7 @@ export function ProposalActions({
     await queryClient.invalidateQueries({ queryKey: ['proposals'] });
     await queryClient.invalidateQueries({ queryKey: ['proposal', p.id] });
     await queryClient.invalidateQueries({ queryKey: workflowKey(PROPOSAL_ENTITY, p.id) });
-    toast.success(`${label}: ${p.prfNo} is now ${humanize(p.status).toLowerCase()}`);
+    toast.success(`${label}: ${p.prfNo} is now ${statusPhrase(p.status)}`);
   };
   const simple = useMutation({
     mutationFn: ({ action, note }: { action: WorkAction; note: ActionNote }) =>

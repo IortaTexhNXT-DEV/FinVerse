@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -101,7 +102,7 @@ public class AccountTaggingService {
         AccountService.ENTITY,
         account.getArn(),
         AuditAction.UPDATE,
-        "Free First Year " + ffy.start() + " to " + ffy.end());
+        "Free First Year " + DisplayFormat.period(ffy.start(), ffy.end()));
     return account;
   }
 
@@ -185,7 +186,8 @@ public class AccountTaggingService {
   private static void requireLive(Account account) {
     if (RiskDuplicateService.CLOSED.contains(account.getStatus())) {
       throw new BusinessRuleException(
-          "ACCOUNT_NOT_ACTIVE", "Account " + account.getArn() + " is " + account.getStatus());
+          "ACCOUNT_NOT_ACTIVE",
+          "Account " + account.getArn() + " is " + DisplayFormat.words(account.getStatus()));
     }
   }
 }

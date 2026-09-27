@@ -16,6 +16,8 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
+import { UserName } from '@/components/ui/UserName';
+import { displayNameOf } from '@/api/users';
 
 function roleHeader(r: Role): string {
   const level = r.privilegeLevel ? ` · ${humanize(r.privilegeLevel)}` : '';
@@ -61,11 +63,11 @@ function ToImplement() {
             render: (r) => <strong className="mono">{r.requestNo}</strong>,
           },
           { key: 'c', header: 'Change', render: (r) => r.summary },
-          { key: 'b', header: 'Requested By', render: (r) => r.requestedBy },
+          { key: 'b', header: 'Requested By', render: (r) => <UserName login={r.requestedBy} /> },
           {
             key: 'd',
             header: 'Approved',
-            render: (r) => `${r.decidedBy ?? ''} · ${formatDateTime(r.decidedAt)}`,
+            render: (r) => `${displayNameOf(r.decidedBy)} · ${formatDateTime(r.decidedAt)}`,
           },
           {
             key: 'a',
@@ -114,7 +116,9 @@ function ToImplement() {
               <dt>Permissions removed</dt>
               <dd className="mono">{chosen.permissionsRemoved.join(', ') || '—'}</dd>
               <dt>Approved by</dt>
-              <dd>{chosen.decidedBy}</dd>
+              <dd>
+                <UserName login={chosen.decidedBy} />
+              </dd>
             </dl>
           </div>
         </Modal>

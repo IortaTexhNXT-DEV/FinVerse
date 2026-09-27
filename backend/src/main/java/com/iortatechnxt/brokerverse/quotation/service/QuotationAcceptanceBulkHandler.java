@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkImportHandler;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.quotation.domain.Quotation;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationStatus;
@@ -116,7 +117,11 @@ public class QuotationAcceptanceBulkHandler implements BulkImportHandler {
           QuotationSummary q = queries.getByArn(row.text(ARN));
           List<String> errors = new ArrayList<>();
           if (q.status() != QuotationStatus.SENT_TO_CLIENT) {
-            errors.add(q.quotationNo() + " is " + q.status() + ", not sent to the client");
+            errors.add(
+                q.quotationNo()
+                    + " is "
+                    + DisplayFormat.words(q.status())
+                    + ", not sent to the client");
           }
           groups(row);
           if (QuotationBulkSupport.yes(context.parameter(CREATE_ACCOUNTS))) {

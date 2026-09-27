@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.placement.service;
 
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.SheetSpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * Writes a one-sheet OpenDocument spreadsheet (.ods), the alternative CLPC billing file format
  * (BRNB.067 "save the file as .xlsx or .ods"). Numbers are numeric cells, dates date cells and
- * booleans Y / N.
+ * booleans Y / N; the text shown in a cell is written as people read it (17-Oct-2026, 14,315.88).
  */
 public final class OdsSpreadsheetWriter {
 
@@ -100,24 +101,25 @@ public final class OdsSpreadsheetWriter {
   private static String cell(Object value) {
     return switch (value) {
       case null -> "<table:table-cell/>";
-      case BigDecimal n -> numberCell(n.toPlainString());
-      case Number n -> numberCell(n.toString());
+      case BigDecimal n -> numberCell(n.toPlainString(), DisplayFormat.value(n));
+      case Number n -> numberCell(n.toString(), n.toString());
       case LocalDate d ->
           "<table:table-cell office:value-type=\"date\" office:date-value=\""
               + d
               + "\"><text:p>"
-              + d
+              + DisplayFormat.date(d)
               + CELL_END;
       case Boolean b -> textCell(Boolean.TRUE.equals(b) ? "Y" : "N");
       default -> textCell(value.toString());
     };
   }
 
-  private static String numberCell(String number) {
+  /** A numeric cell: the value for the program reading it, the text as people read it. */
+  private static String numberCell(String number, String shown) {
     return "<table:table-cell office:value-type=\"float\" office:value=\""
         + number
         + "\"><text:p>"
-        + number
+        + shown
         + CELL_END;
   }
 

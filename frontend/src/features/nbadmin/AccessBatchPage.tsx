@@ -18,6 +18,7 @@ import { formatDateTime } from '@/utils/format';
 import { REQUEST_TYPE_LABELS } from './accessRequest';
 import { ApproverPicker } from './ApproverPicker';
 import { ReasonDialog } from './ReasonDialog';
+import { displayNameOf } from '@/api/users';
 
 type BatchAction = 'submit' | 'approve' | 'return' | 'reject' | 'cancel';
 
@@ -169,7 +170,7 @@ export default function AccessBatchPage() {
           {
             icon: UserRound,
             label: 'Requested',
-            value: `${b.createdBy} · ${formatDateTime(b.createdAt)}`,
+            value: `${displayNameOf(b.createdBy)} · ${formatDateTime(b.createdAt)}`,
           },
           { icon: FileSpreadsheet, label: 'Lines', value: String(b.lines) },
         ]}

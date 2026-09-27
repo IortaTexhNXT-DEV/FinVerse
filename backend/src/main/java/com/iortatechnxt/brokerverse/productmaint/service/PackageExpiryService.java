@@ -12,6 +12,9 @@ import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionView;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
+import com.iortatechnxt.brokerverse.messaging.domain.Notice;
+import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageRequest;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageRequestRepository;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageTerms;
@@ -56,6 +59,7 @@ public class PackageExpiryService {
   private final ProductCatalogService catalog;
   private final InsurerService insurers;
   private final AlertService alerts;
+  private final NotificationService notifications;
   private final SystemParameterService parameters;
   private final Clock clock;
 
@@ -68,6 +72,7 @@ public class PackageExpiryService {
    * @param catalog products
    * @param insurers insurer panel of the company
    * @param alerts exception alerts
+   * @param notifications in-app notices to TSU and MBS
    * @param parameters business parameters
    * @param clock clock
    */
@@ -78,6 +83,7 @@ public class PackageExpiryService {
       ProductCatalogService catalog,
       InsurerService insurers,
       AlertService alerts,
+      NotificationService notifications,
       SystemParameterService parameters,
       Clock clock) {
     this.versions = versions;
@@ -86,6 +92,7 @@ public class PackageExpiryService {
     this.catalog = catalog;
     this.insurers = insurers;
     this.alerts = alerts;
+    this.notifications = notifications;
     this.parameters = parameters;
     this.clock = clock;
   }
@@ -184,7 +191,7 @@ public class PackageExpiryService {
                 v.versionNo(),
                 product.getMarketSegmentList(),
                 "PACKAGE_EXPIRY",
-                "Package ends on " + v.dates().packageEndDate(),
+                "Package ends on " + DisplayFormat.date(v.dates().packageEndDate()),
                 null,
                 current.withScheme(current.scheme(), rolled(v.dates()))));
     return new RenewalResult(v.productCode(), created, true);
@@ -281,29 +288,45 @@ public class PackageExpiryService {
 
   private boolean alert(Long companyId, ExpiringPackage e, int bucket) {
     ProductVersionView v = e.version();
-    return alerts
-        .raise(
-            ALERT,
-            new AlertFacts(
-                companyId,
-                null,
-                "Product",
-                v.productCode(),
-                "Package "
-                    + v.productCode()
-                    + " version "
-                    + v.versionNo()
-                    + " ends on "
-                    + v.dates().packageEndDate()
-                    + " ("
-                    + e.daysLeft()
-                    + " days)"
-                    + (e.renewal() == null
-                        ? "; no renewal request yet"
-                        : "; renewal " + e.renewal().getRequestNo()),
-                null,
-                ALERT + ":" + v.productCode() + ":" + v.versionNo() + ":" + bucket))
-        .isPresent();
+    String message =
+        "Package "
+            + v.productCode()
+            + " version "
+            + v.versionNo()
+            + " ends on "
+            + DisplayFormat.date(v.dates().packageEndDate())
+            + " ("
+            + e.daysLeft()
+            + " days)"
+            + (e.renewal() == null
+                ? "; no renewal request yet"
+                : "; renewal " + e.renewal().getRequestNo());
+    boolean raised =
+        alerts
+            .raise(
+                ALERT,
+                new AlertFacts(
+                    companyId,
+                    null,
+                    "Product",
+                    v.productCode(),
+                    message,
+                    null,
+                    ALERT + ":" + v.productCode() + ":" + v.versionNo() + ":" + bucket))
+            .isPresent();
+    if (raised) {
+      // The FRS alerts TSU and MBS, who may not see the exception alerts.
+      Notice notice =
+          new Notice(
+              "Package ending: " + v.productCode(),
+              message,
+              "/product-maintenance/expiry",
+              "Product",
+              v.productCode());
+      notifications.notifyPermission("PKG_NEGOTIATE", notice);
+      notifications.notifyPermission("PRODUCT_MAINTAIN", notice);
+    }
+    return raised;
   }
 
   /**

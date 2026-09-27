@@ -21,6 +21,7 @@ import { DateReasonModal } from './DateReasonModal';
 import { Pager } from './Pager';
 import { invoiceActions, invoiceListStart } from './payablesActions';
 import type { InvoiceActionId } from './payablesActions';
+import { UserName } from '@/components/ui/UserName';
 
 const STATUSES = ['', 'DRAFT', 'PENDING_APPROVAL', 'APPROVED', 'CANCELLED'];
 type Action = 'reject' | 'cancel';
@@ -156,7 +157,7 @@ export default function SupplierInvoicesPage() {
               numeric: true,
               render: (i) => <Amount value={i.payableAmount} />,
             },
-            { key: 'm', header: 'Maker', render: (i) => i.createdBy },
+            { key: 'm', header: 'Maker', render: (i) => <UserName login={i.createdBy} /> },
             { key: 's', header: 'Status', render: (i) => <StatusBadge status={i.status} /> },
           ]}
         />

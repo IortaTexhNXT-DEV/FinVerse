@@ -16,7 +16,7 @@ import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, humanize } from '@/utils/format';
+import { formatDate, statusPhrase } from '@/utils/format';
 import { EB_SECTION } from '../EbPlaceholder';
 import '../eb.css';
 import { orNone } from '../common/formValues';
@@ -39,7 +39,7 @@ function Body({ view }: Readonly<{ view: ComparativeView }>) {
     (c, v: { step: Step; remarks: string }) =>
       ebMarketApi.comparativeAction(c, id, v.step, orNone(v.remarks)),
     (r: ComparativeView) =>
-      `Comparative ${r.comparative.comparativeNo} is now ${humanize(r.comparative.status).toLowerCase()}`,
+      `Comparative ${r.comparative.comparativeNo} is now ${statusPhrase(r.comparative.status)}`,
     () => setStep(undefined),
   );
   const save = useEbMutation<undefined, ComparativeView>(

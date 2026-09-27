@@ -160,6 +160,17 @@ export function quotationStepErrors(step: QuotationStep, f: QuotationForm): Reco
   }
 }
 
+/** The message shown when a quotation is submitted without its market segment. */
+export const SEGMENT_REQUIRED = 'Choose the market segment before you submit the quotation';
+
+/**
+ * Field errors that block the submission for review: the market segment is required (it is
+ * defaulted from the client, and the account created from the quotation needs it).
+ */
+export function quotationSubmitErrors(f: QuotationForm): Record<string, string> {
+  return f.marketSegment === '' ? { marketSegment: SEGMENT_REQUIRED } : {};
+}
+
 /** Sets the risk group of an item, keeping groups numbered from 1. */
 export function withGroup(groups: number[], index: number, group: number): number[] {
   const next = [...groups];

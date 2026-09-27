@@ -16,6 +16,7 @@ import { formatDate, formatDateTime } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { BillingStage, DpBilling } from './commissionApi';
 import { STAGE_TABS } from './commissionLogic';
+import { UserName } from '@/components/ui/UserName';
 
 /** Columns of a billing list. */
 const COLUMNS: Column<DpBilling>[] = [
@@ -38,7 +39,7 @@ const COLUMNS: Column<DpBilling>[] = [
       </>
     ),
   },
-  { key: 'handler', header: 'Handler', render: (b) => b.handler ?? '' },
+  { key: 'handler', header: 'Handler', render: (b) => <UserName login={b.handler} empty="" /> },
   { key: 'stage', header: 'Stage', render: (b) => <StatusBadge status={b.stage} /> },
 ];
 

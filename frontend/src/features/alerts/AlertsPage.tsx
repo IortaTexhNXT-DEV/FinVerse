@@ -17,6 +17,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { SeverityBadge } from './SeverityBadge';
+import { UserName } from '@/components/ui/UserName';
 
 const SEVERITIES: AlertSeverity[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
 const STATUSES: AlertStatus[] = ['OPEN', 'ACKNOWLEDGED', 'RESOLVED'];
@@ -179,7 +180,7 @@ export default function AlertsPage() {
             {
               key: 'h',
               header: 'Handled by',
-              render: (a) => a.resolvedBy ?? a.acknowledgedBy ?? '',
+              render: (a) => <UserName login={a.resolvedBy ?? a.acknowledgedBy} empty="" />,
             },
             {
               key: 'x',

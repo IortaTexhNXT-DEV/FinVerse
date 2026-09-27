@@ -20,6 +20,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { DateInput } from '@/components/ui/DateInput';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 type Filters = Omit<KycReviewFilters, 'companyId'>;
 
@@ -169,7 +170,11 @@ export default function KycReviewsPage() {
           columns={[
             { key: 'code', header: 'Code', render: (c) => <span className="mono">{c.code}</span> },
             { key: 'name', header: 'Client', render: (c) => c.displayName },
-            { key: 'segment', header: 'Segment', render: (c) => c.marketSegment ?? '' },
+            {
+              key: 'segment',
+              header: 'Segment',
+              render: (c) => <LovLabel type="MARKET_SEGMENT" code={c.marketSegment} empty="" />,
+            },
             {
               key: 'risk',
               header: 'Risk',

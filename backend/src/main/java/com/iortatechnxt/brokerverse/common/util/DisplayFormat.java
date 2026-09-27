@@ -1,0 +1,144 @@
+package com.iortatechnxt.brokerverse.common.util;
+
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.Set;
+
+/**
+ * How dates and numbers are written for people (UX checklist: dd-MMM-yyyy, amounts with thousands
+ * separators and two decimals): generated documents, human-readable renders of files and texts
+ * built on the server. Files read by another system keep the layout agreed with that system.
+ */
+public final class DisplayFormat {
+
+  /** Date pattern shown to users, e.g. 17-Oct-2026. */
+  public static final String DATE_PATTERN = "dd-MMM-yyyy";
+
+  /** Date format of spreadsheet cells, e.g. 17-Oct-2026 (the cell keeps a real date). */
+  public static final String SHEET_DATE_FORMAT = "dd-mmm-yyyy";
+
+  /** Number format of amount cells in spreadsheets, e.g. 80,000,000.00. */
+  public static final String SHEET_AMOUNT_FORMAT = "#,##0.00";
+
+  private static final DateTimeFormatter DATE =
+      DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH);
+  private static final DateTimeFormatter DATE_TIME =
+      DateTimeFormatter.ofPattern(DATE_PATTERN + " HH:mm", Locale.ENGLISH);
+  private static final int MIN_RATE_DECIMALS = 2;
+  private static final int MAX_RATE_DECIMALS = 6;
+
+  /** Codes kept in capitals when a status is written as words. */
+  private static final Set<String> ACRONYMS =
+      Set.of("ARN", "CBG", "FFY", "IA", "KYC", "PN", "PRF", "PS", "QS", "SI", "TSU");
+
+  private DisplayFormat() {}
+
+  /**
+   * A status or other code written as words inside a sentence: READY_FOR_PLACEMENT becomes "ready
+   * for placement", QS_SENT becomes "QS sent".
+   *
+   * @param code enum or code, may be null
+   * @return words, empty when null
+   */
+  public static String words(Object code) {
+    if (code == null) {
+      return "";
+    }
+    StringBuilder out = new StringBuilder();
+    for (String part : code.toString().split("_")) {
+      if (!out.isEmpty()) {
+        out.append(' ');
+      }
+      out.append(ACRONYMS.contains(part) ? part : part.toLowerCase(Locale.ROOT));
+    }
+    return out.toString();
+  }
+
+  /**
+   * A date as dd-MMM-yyyy.
+   *
+   * @param date date, may be null
+   * @return text, empty when null
+   */
+  public static String date(LocalDate date) {
+    return date == null ? "" : DATE.format(date);
+  }
+
+  /**
+   * A point in time as dd-MMM-yyyy HH:mm in the business zone (Philippine time).
+   *
+   * @param instant instant, may be null
+   * @return text, empty when null
+   */
+  public static String dateTime(Instant instant) {
+    return instant == null ? "" : DATE_TIME.format(instant.atZone(BusinessClock.zone()));
+  }
+
+  /**
+   * A period, e.g. "01-Nov-2026 to 01-Nov-2027".
+   *
+   * @param from first day, may be null
+   * @param to last day, may be null
+   * @return text
+   */
+  public static String period(LocalDate from, LocalDate to) {
+    return date(from) + " to " + date(to);
+  }
+
+  /**
+   * An amount with thousands separators and two decimals, e.g. 80,000,000.00.
+   *
+   * @param amount amount, may be null
+   * @return text, empty when null
+   */
+  public static String amount(BigDecimal amount) {
+    if (amount == null) {
+      return "";
+    }
+    return new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
+        .format(amount.setScale(Money.SCALE, RoundingMode.HALF_UP));
+  }
+
+  /**
+   * A rate in percent to a sensible precision: at least two decimals, trailing zeros removed beyond
+   * them, at most six (0.42500000 becomes 0.425, 2 becomes 2.00).
+   *
+   * @param rate rate in percent, may be null
+   * @return text without the percent sign, empty when null
+   */
+  public static String rate(BigDecimal rate) {
+    if (rate == null) {
+      return "";
+    }
+    BigDecimal shown = rate.setScale(MAX_RATE_DECIMALS, RoundingMode.HALF_UP).stripTrailingZeros();
+    if (shown.scale() < MIN_RATE_DECIMALS) {
+      shown = shown.setScale(MIN_RATE_DECIMALS, RoundingMode.UNNECESSARY);
+    }
+    return shown.toPlainString();
+  }
+
+  /**
+   * Any value as users read it: dates as dd-MMM-yyyy, amounts (two decimals) with thousands
+   * separators, other decimals without trailing zeros, other values as text.
+   *
+   * @param value value, may be null
+   * @return text, empty when null
+   */
+  public static String value(Object value) {
+    return switch (value) {
+      case null -> "";
+      case LocalDate d -> date(d);
+      case Instant i -> dateTime(i);
+      case BigDecimal n when n.scale() == Money.SCALE -> amount(n);
+      case BigDecimal n -> n.stripTrailingZeros().toPlainString();
+      default -> value.toString();
+    };
+  }
+}

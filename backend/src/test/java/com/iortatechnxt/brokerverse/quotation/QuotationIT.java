@@ -23,6 +23,7 @@ import com.iortatechnxt.brokerverse.quotation.service.QuotationDispatchService;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationDispatchService.BatchResult;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationDispatchService.EmailRequest;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationDocuments;
+import com.iortatechnxt.brokerverse.quotation.service.QuotationDraft;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationDraft.DraftItem;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationQueryService;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationSearch;
@@ -307,5 +308,39 @@ class QuotationIT {
                 .premium()
                 .grossPremium())
         .isPositive();
+  }
+
+  @Test
+  void theMarketSegmentIsTakenFromTheClientAndRequiredAtSubmission() {
+    Client client = fx.client("CL-2026-900001");
+    QuotationDraft noSegment =
+        new QuotationDraft(
+            client.getId(),
+            "MTR10",
+            null,
+            "EMAIL",
+            null,
+            null,
+            motor(null, false).terms(),
+            List.of(new DraftItem(1, vehicle("900000"))));
+    Quotation defaulted = as.run("ao", () -> quotations.create(fx.company(), noSegment));
+    assertThat(defaulted.getMarketSegment()).isEqualTo(client.getMarketSegment()).isNotNull();
+
+    Client prospect = fx.prospect(null);
+    QuotationDraft prospectDraft =
+        new QuotationDraft(
+            prospect.getId(),
+            "MTR10",
+            null,
+            "EMAIL",
+            null,
+            null,
+            motor(null, false).terms(),
+            List.of(new DraftItem(1, vehicle("900000"))));
+    Quotation without = as.run("ao", () -> quotations.create(fx.company(), prospectDraft));
+    assertThat(without.getMarketSegment()).isNull();
+    assertThatThrownBy(() -> as.run("ao", () -> quotations.submit(without.getId(), null)))
+        .extracting("code")
+        .isEqualTo("QUOTATION_SEGMENT_REQUIRED");
   }
 }

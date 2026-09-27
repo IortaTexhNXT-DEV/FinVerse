@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.dimension.domain.DimensionType;
 import com.iortatechnxt.brokerverse.dimension.service.DimensionService;
 import java.time.Clock;
@@ -124,7 +125,9 @@ public class BookingQueueService {
     }
     if (account.getStatus() != AccountStatus.POLICY_ISSUED) {
       return new EnqueueResult(
-          arn, false, "Account is " + account.getStatus() + ", not ready for booking");
+          arn,
+          false,
+          "Account is " + DisplayFormat.words(account.getStatus()) + ", not ready for booking");
     }
     return save(account, source);
   }
@@ -159,7 +162,8 @@ public class BookingQueueService {
     QueueEntry entry = require(id);
     if (bookingDate != null && bookingDate.isAfter(BusinessClock.today(clock))) {
       throw new BusinessRuleException(
-          "BOOKING_DATE_FUTURE", "The booking date " + bookingDate + " is in the future");
+          "BOOKING_DATE_FUTURE",
+          "The booking date " + DisplayFormat.date(bookingDate) + " is in the future");
     }
     dimensions.validateOptional(entry.getCompanyId(), DimensionType.COST_CENTER, costCenter);
     entry.edit(bookingDate, costCenter);
@@ -167,7 +171,7 @@ public class BookingQueueService {
         ENTITY,
         entry.getArn(),
         AuditAction.UPDATE,
-        "Booking date " + bookingDate + ", cost center " + costCenter);
+        "Booking date " + DisplayFormat.date(bookingDate) + ", cost center " + costCenter);
     return entry;
   }
 

@@ -5,6 +5,7 @@ import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, today } from '@/utils/format';
 import { effectivity } from './lovForm';
+import { UserName } from '@/components/ui/UserName';
 
 export type LovAction = 'edit' | 'deactivate' | 'authorize';
 
@@ -91,8 +92,10 @@ export function LovValuesTable({
       header: 'Maker / Checker',
       render: (v) => (
         <span className="cell-stack">
-          <span>{v.maker ?? '—'}</span>
-          <span className="muted">{v.authorizedBy ?? '—'}</span>
+          <UserName login={v.maker} />
+          <span className="muted">
+            <UserName login={v.authorizedBy} />
+          </span>
         </span>
       ),
     },

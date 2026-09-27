@@ -11,6 +11,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
 import { ReceiptActions } from './ReceiptActions';
+import { displayNameOf } from '@/api/users';
 
 type Allocation = Receipt['allocations'][number];
 
@@ -25,11 +26,11 @@ function Detail({ label, value }: Readonly<{ label: string; value?: string | num
 
 function approval(receipt: Receipt): string | null {
   const by = receipt.summary.approvedBy;
-  return by === undefined ? null : `${by} ${formatDateTime(receipt.approvedAt)}`;
+  return by === undefined ? null : `${displayNameOf(by)} ${formatDateTime(receipt.approvedAt)}`;
 }
 
 function reversal(receipt: Receipt): string {
-  return `${formatDate(receipt.reversalDate)} ${receipt.reversedBy ?? ''}: ${receipt.reversalReason ?? ''}`;
+  return `${formatDate(receipt.reversalDate)} ${displayNameOf(receipt.reversedBy)}: ${receipt.reversalReason ?? ''}`;
 }
 
 function ReceiptDetails({ receipt }: Readonly<{ receipt: Receipt }>) {
@@ -50,7 +51,7 @@ function ReceiptDetails({ receipt }: Readonly<{ receipt: Receipt }>) {
         <Detail label="Allocation" value={humanize(receipt.allocationMethod)} />
         <Detail label="Income account" value={receipt.incomeAccountCode} />
         <Detail label="Narration" value={receipt.narration} />
-        <Detail label="Entered by" value={r.createdBy} />
+        <Detail label="Entered by" value={displayNameOf(r.createdBy)} />
         <Detail label="Approved by" value={approval(receipt)} />
         <Detail label="Journal" value={receipt.journalBatchNo} />
         <Detail label="Deposited on" value={formatDate(r.depositedOn)} />

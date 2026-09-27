@@ -34,6 +34,7 @@ import {
   ServiceInvoicesTab,
 } from './InvoiceTabs';
 import { UserName } from '@/components/ui/UserName';
+import { InsurerName } from '@/components/broking/LovLabel';
 
 const TABS = [
   { id: 'premium', label: 'Premium & Commission' },
@@ -88,7 +89,12 @@ function Summary({ invoice: i }: Readonly<{ invoice: BookedInvoice }>) {
             {i.facts.clientName} <span className="muted">{i.facts.clientCode}</span>
           </SummaryFact>
           <SummaryFact icon={Building2} label="Insurer(s)">
-            {i.shares.map((s) => `${s.insurerCode} ${String(s.sharePct)}%`).join(', ')}
+            {i.shares.map((s, n) => (
+              <span key={s.insurerCode}>
+                {n > 0 && ', '}
+                <InsurerName code={s.insurerCode} /> {String(s.sharePct)}%
+              </span>
+            ))}
           </SummaryFact>
           <SummaryFact icon={CalendarRange} label="Period">
             {formatDate(i.inceptionDate)} – {formatDate(i.expiryDate)}

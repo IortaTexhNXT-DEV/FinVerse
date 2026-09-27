@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -28,6 +29,7 @@ import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceShare;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -66,6 +68,7 @@ public class AdjustmentDocuments {
   private final LovService lovs;
   private final AuditTrailService audit;
   private final Clock clock;
+  private final UserDirectory users;
 
   /**
    * Creates the service.
@@ -79,6 +82,7 @@ public class AdjustmentDocuments {
    * @param numbers slip numbers
    * @param lovs labels
    * @param audit audit trail
+   * @param users user names
    * @param clock clock
    */
   public AdjustmentDocuments(
@@ -91,6 +95,7 @@ public class AdjustmentDocuments {
       DocumentNumberService numbers,
       LovService lovs,
       AuditTrailService audit,
+      UserDirectory users,
       Clock clock) {
     this.queries = queries;
     this.ledger = ledger;
@@ -101,6 +106,7 @@ public class AdjustmentDocuments {
     this.numbers = numbers;
     this.lovs = lovs;
     this.audit = audit;
+    this.users = users;
     this.clock = clock;
   }
 
@@ -201,8 +207,7 @@ public class AdjustmentDocuments {
         new Field("Additional / Other Instructions", text(t.instructions())));
   }
 
-  private static List<Field> policyFields(
-      EndorsementRequest r, OpsInvoice invoice, Account account) {
+  private List<Field> policyFields(EndorsementRequest r, OpsInvoice invoice, Account account) {
     String coInsurers =
         invoice.getShares().stream()
             .filter(s -> !s.lead())
@@ -218,15 +223,15 @@ public class AdjustmentDocuments {
         new Field("Risk Description", text(r.getSubject().productLine())),
         new Field(
             "Period of Cover",
-            invoice.getClassification().inceptionDate()
-                + " to "
-                + invoice.getClassification().expiryDate()),
-        new Field("Marketing AO", text(r.getSubject().aoUsername())),
+            DisplayFormat.period(
+                invoice.getClassification().inceptionDate(),
+                invoice.getClassification().expiryDate())),
+        new Field("Marketing AO", text(users.displayName(r.getSubject().aoUsername()))),
         new Field("Market Segment", text(r.getSubject().segment())),
         new Field("Total Sum Insured", amount(account.getTotalSumInsured())),
         new Field("Sum Insured Change", amount(change)),
         new Field("Premium Rate (%)", text(r.getTerms().ratePercent())),
-        new Field("Approved by", text(r.trail().approvedBy())));
+        new Field("Approved by", text(users.displayName(r.trail().approvedBy()))));
   }
 
   private static List<Field> paymentFields(OpsInvoice invoice) {
@@ -238,12 +243,12 @@ public class AdjustmentDocuments {
         new Field("Remittance Status", invoice.getRemittanceStatus().name()));
   }
 
-  private static List<Field> validationFields(EndorsementRequest r) {
+  private List<Field> validationFields(EndorsementRequest r) {
     return List.of(
         new Field("Status", r.getStage().name()),
-        new Field("Validated by", text(r.trail().validatedBy())),
+        new Field("Validated by", text(users.displayName(r.trail().validatedBy()))),
         new Field("Validation Date", text(DocText.date(r.trail().validatedAt()))),
-        new Field("Approved by", text(r.trail().approvedBy())),
+        new Field("Approved by", text(users.displayName(r.trail().approvedBy()))),
         new Field("Validation Batch No.", text(r.outcome().batchNo())),
         new Field("Endorsement No.", text(r.outcome().endorsementNo())),
         new Field("Invoice Booked", text(r.outcome().newInvoiceNo())),

@@ -10,6 +10,8 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, humanize } from '@/utils/format';
 import { QuotationActions } from './QuotationActions';
+import { UserName } from '@/components/ui/UserName';
+import { displayNameOf } from '@/api/users';
 
 function Terms({ quotation: q }: Readonly<{ quotation: Quotation }>) {
   const facts: [string, string][] = [
@@ -26,8 +28,8 @@ function Terms({ quotation: q }: Readonly<{ quotation: Quotation }>) {
     ['Proposed period', `${formatDate(q.periodFrom)} – ${formatDate(q.periodTo)}`],
     ['Our share', `${String(q.sharePct)}%`],
     ['Brokerage', `${String(q.commissionRate)}%`],
-    ['Prepared by', q.createdBy],
-    ['Decided by', q.decidedBy ?? '—'],
+    ['Prepared by', displayNameOf(q.createdBy)],
+    ['Decided by', displayNameOf(q.decidedBy) || '—'],
   ];
   return (
     <Card title="Terms">
@@ -134,7 +136,7 @@ export default function QuotationDetailPage() {
               render: (it) => <Amount value={it.brokerage} />,
             },
             { key: 'rem', header: 'Remarks', render: (it) => it.remarks ?? '' },
-            { key: 'by', header: 'By', render: (it) => it.createdBy },
+            { key: 'by', header: 'By', render: (it) => <UserName login={it.createdBy} /> },
           ]}
         />
       </Card>

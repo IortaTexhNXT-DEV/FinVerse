@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.productmaint.service;
 
+import com.iortatechnxt.brokerverse.catalog.service.CatalogNames;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -18,6 +20,7 @@ import com.iortatechnxt.brokerverse.productmaint.domain.PackageRequest;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageTerms;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageTerms.CoverageTerm;
 import com.iortatechnxt.brokerverse.productmaint.domain.Signoff;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.util.ArrayList;
@@ -65,6 +68,8 @@ public class PackageDocuments {
   private final DocTemplateService templates;
   private final OrganizationService organization;
   private final TermsCodec codec;
+  private final CatalogNames names;
+  private final UserDirectory users;
   private final Clock clock;
 
   /**
@@ -74,6 +79,8 @@ public class PackageDocuments {
    * @param templates document templates
    * @param organization companies (letterhead)
    * @param codec terms JSON
+   * @param names line, cover type, product and insurer names
+   * @param users user names
    * @param clock clock
    */
   public PackageDocuments(
@@ -81,11 +88,15 @@ public class PackageDocuments {
       DocTemplateService templates,
       OrganizationService organization,
       TermsCodec codec,
+      CatalogNames names,
+      UserDirectory users,
       Clock clock) {
     this.composer = composer;
     this.templates = templates;
     this.organization = organization;
     this.codec = codec;
+    this.names = names;
+    this.users = users;
     this.clock = clock;
   }
 
@@ -104,14 +115,15 @@ public class PackageDocuments {
                 REFERENCE,
                 p.getRequestNo(),
                 "requestType",
-                p.getRequestType().name(),
+                p.getRequestType().label(),
                 TITLE,
                 p.getTitle()));
     List<Section> sections = new ArrayList<>();
     sections.add(new Text(null, text.text()));
     sections.add(new Fields("Request", requestFields(p)));
-    sections.addAll(termsSections(codec.terms(p.getRequestedTerms()), "Requested"));
-    return pdf(p, "Package Request Form", p.getRequestNo(), sections, text.versionTag());
+    sections.addAll(
+        termsSections(p.getCompanyId(), codec.terms(p.getRequestedTerms()), "Requested"));
+    return pdf(p, "Package Request Form", p.getRequestNo(), sections, text.versionLabel());
   }
 
   /**
@@ -139,8 +151,9 @@ public class PackageDocuments {
     if (r.getQsNotes() != null && !r.getQsNotes().isBlank()) {
       sections.add(new Text("Round " + r.getRoundNo() + " notes", r.getQsNotes()));
     }
-    sections.addAll(termsSections(codec.terms(p.getRequestedTerms()), "Requested"));
-    MessageFile f = pdf(p, "Package Quotation Slip", r.getQsNo(), sections, text.versionTag());
+    sections.addAll(
+        termsSections(p.getCompanyId(), codec.terms(p.getRequestedTerms()), "Requested"));
+    MessageFile f = pdf(p, "Package Quotation Slip", r.getQsNo(), sections, text.versionLabel());
     return new MessageFile(r.getQsNo() + PDF_EXTENSION, PDF, f.content());
   }
 
@@ -176,7 +189,7 @@ public class PackageDocuments {
             new Text(null, text.text()),
             new Fields(PACKAGE, requestFields(p)),
             new Table("Insurer terms", headers, shown.cells(), List.of()));
-    MessageFile f = pdf(p, "Comparative Table", p.getRequestNo(), sections, text.versionTag());
+    MessageFile f = pdf(p, "Comparative Table", p.getRequestNo(), sections, text.versionLabel());
     return new MessageFile(fileName(p, variant, PDF_EXTENSION), PDF, f.content());
   }
 
@@ -218,8 +231,8 @@ public class PackageDocuments {
     sections.add(new Fields(PACKAGE, requestFields(p)));
     PackageTerms terms =
         codec.terms(p.getProposedTerms() == null ? p.getRequestedTerms() : p.getProposedTerms());
-    sections.addAll(termsSections(terms, "Proposed"));
-    MessageFile f = pdf(p, "Package Slip", p.getRequestNo(), sections, text.versionTag());
+    sections.addAll(termsSections(p.getCompanyId(), terms, "Proposed"));
+    MessageFile f = pdf(p, "Package Slip", p.getRequestNo(), sections, text.versionLabel());
     return new MessageFile(p.getRequestNo() + "_package_slip.pdf", PDF, f.content());
   }
 
@@ -238,9 +251,10 @@ public class PackageDocuments {
                 "ManCom sign-off",
                 List.of(
                     new Field("Reference", s.getReference()),
-                    new Field("Decision", s.getDecision()),
-                    new Field("Signed by", s.getSignedBy()),
-                    new Field("Signed at", String.valueOf(s.getSignedAt())),
+                    new Field(
+                        "Decision", "SIGNED".equals(s.getDecision()) ? "Signed off" : "Returned"),
+                    new Field("Signed by", users.displayName(s.getSignedBy())),
+                    new Field("Signed at", DisplayFormat.dateTime(s.getSignedAt())),
                     new Field("Comment", text(s.getComment())))));
     MessageFile f =
         pdf(
@@ -248,7 +262,7 @@ public class PackageDocuments {
             "ManCom Sign-off",
             s.getReference(),
             sections,
-            "Signed in BIBS by " + s.getSignedBy());
+            "Signed in BIBS by " + users.displayName(s.getSignedBy()));
     return new MessageFile(s.getReference() + PDF_EXTENSION, PDF, f.content());
   }
 
@@ -287,14 +301,17 @@ public class PackageDocuments {
    * @param p request
    * @return fields
    */
-  static List<Field> requestFields(PackageRequest p) {
+  List<Field> requestFields(PackageRequest p) {
+    String coverType = names.coverType(p.getLineCode(), p.getCoverTypeCode());
     return List.of(
-        new Field("Request", p.getRequestNo() + " (" + p.getRequestType() + ")"),
+        new Field("Request", p.getRequestNo() + " (" + p.getRequestType().label() + ")"),
         new Field("Package / programme", p.getTitle()),
-        new Field("Scope", p.getScope().name()),
+        new Field("Scope", p.getScope().label()),
         new Field("Client", text(p.getClientName())),
-        new Field("Line / cover type", p.getLineCode() + " / " + text(p.getCoverTypeCode())),
-        new Field("Product", text(p.getTargetProductCode())));
+        new Field(
+            "Line / cover type",
+            names.line(p.getLineCode()) + (coverType.isEmpty() ? "" : " / " + coverType)),
+        new Field("Product", names.product(p.getTargetProductCode())));
   }
 
   /**
@@ -304,7 +321,7 @@ public class PackageDocuments {
    * @param label "Requested" or "Proposed"
    * @return sections
    */
-  static List<Section> termsSections(PackageTerms t, String label) {
+  List<Section> termsSections(Long companyId, PackageTerms t, String label) {
     List<Section> sections = new ArrayList<>();
     t.sections().forEach(s -> sections.add(new Text(s.heading(), s.text())));
     if (!t.coverages().isEmpty()) {
@@ -328,7 +345,7 @@ public class PackageDocuments {
                 new Field("Computation basis", text(s.ratingBasisNote())),
                 new Field("Effective from", text(d.effectiveFrom())),
                 new Field(
-                    "Package term", text(d.packageStartDate()) + " to " + text(d.packageEndDate())),
+                    "Package term", DisplayFormat.period(d.packageStartDate(), d.packageEndDate())),
                 new Field("Anniversary", text(d.anniversaryDate())))));
     if (!t.insurers().isEmpty()) {
       sections.add(
@@ -339,8 +356,8 @@ public class PackageDocuments {
                   .map(
                       i ->
                           List.of(
-                              i.insurerCode(),
-                              text(i.role()),
+                              names.insurer(companyId, i.insurerCode()),
+                              roleText(i.role()),
                               text(i.sharePercent()),
                               text(i.rate()),
                               money(i.minimumPremium())))
@@ -366,7 +383,16 @@ public class PackageDocuments {
    * @return text, empty for null
    */
   static String money(BigDecimal amount) {
-    return amount == null ? "" : String.format(Locale.ROOT, "%,.2f", amount);
+    return DisplayFormat.amount(amount);
+  }
+
+  /** The role of an insurer in a package: Panel, Lead or Participant. */
+  private static String roleText(Object role) {
+    if (role == null) {
+      return "Panel";
+    }
+    String words = role.toString().toLowerCase(Locale.ROOT).replace('_', ' ');
+    return Character.toUpperCase(words.charAt(0)) + words.substring(1);
   }
 
   /**
@@ -376,6 +402,6 @@ public class PackageDocuments {
    * @return text, empty for null
    */
   static String text(Object value) {
-    return value == null ? "" : value.toString();
+    return DisplayFormat.value(value);
   }
 }

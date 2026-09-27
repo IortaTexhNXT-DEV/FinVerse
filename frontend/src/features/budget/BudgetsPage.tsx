@@ -16,7 +16,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime } from '@/utils/format';
+import { formatDateTime, statusPhrase } from '@/utils/format';
 import { displayNameOf } from '@/api/users';
 
 type Action = 'submit' | 'approve' | 'reject';
@@ -77,7 +77,7 @@ export default function BudgetsPage() {
     },
     onSuccess: async (b) => {
       await queryClient.invalidateQueries({ queryKey: ['budgets'] });
-      toast.success(`Budget version ${b.versionNo} is now ${b.status}`);
+      toast.success(`Budget version ${b.versionNo} is now ${statusPhrase(b.status)}`);
     },
   });
 

@@ -19,6 +19,7 @@ import { EndorsementDialog } from './EndorsementDialog';
 import { EndorsementHistory } from './EndorsementHistory';
 import { businessLabel } from './policyForm';
 import { WorkflowActions } from './WorkflowActions';
+import { displayNameOf } from '@/api/users';
 
 function Terms({ policy: p }: Readonly<{ policy: Policy }>) {
   const facts: [string, string][] = [
@@ -37,8 +38,8 @@ function Terms({ policy: p }: Readonly<{ policy: Policy }>) {
     ['Business', businessLabel(p)],
     ['Discount / loading', `${String(p.discountRate)}% / ${String(p.loadingRate)}%`],
     ['Open cover', p.openCoverNo ?? '—'],
-    ['Created by', p.document.createdBy],
-    ['Approved by', p.document.approvedBy ?? '—'],
+    ['Created by', displayNameOf(p.document.createdBy)],
+    ['Approved by', displayNameOf(p.document.approvedBy) || '—'],
   ];
   return (
     <Card title="Policy terms">

@@ -17,6 +17,7 @@ import { DetailList } from './DetailList';
 import { InsurerEditorModal } from './InsurerEditorModal';
 import { BranchModal, CommissionModal } from './InsurerRatesModals';
 import { RecordActions } from './RecordActions';
+import { UserName } from '@/components/ui/UserName';
 
 type Dialog = 'edit' | 'branch' | 'commission' | null;
 
@@ -35,7 +36,7 @@ function Profile({ detail }: Readonly<{ detail: InsurerDetail }>) {
         ['Placement e-mails', i.placementEmails.join(', ')],
         ['Credit days', i.defaultCreditDays],
         ['Maker', i.maker],
-        ['Authorized by', i.authorizedBy],
+        ['Authorized by', <UserName key="a" login={i.authorizedBy} />],
       ]}
     />
   );

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
+import { useShownErrors } from '@/components/ui/useShownErrors';
 import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, today } from '@/utils/format';
 import { cancellationErrors, cancellationRequest, isValid, labelOf } from './bookingForm';
@@ -81,11 +82,16 @@ export function CancellationDialog({
   });
   const errors = cancellationErrors(form);
   const valid = isValid(errors);
+  const { shown, touch, attempt } = useShownErrors(errors);
+  const change = (next: CancellationForm, field: keyof CancellationForm) => {
+    touch(field);
+    setForm(next);
+  };
   const request = cancellationRequest(invoice.arn, form);
   const preview = useQuery({
     queryKey: ['booking', 'cancel-preview', request],
     queryFn: () => bookingApi.previewEndorsement(request),
-    enabled: form.effectiveDate !== '',
+    enabled: valid,
     retry: false,
   });
   const post = useMutation({
@@ -110,8 +116,11 @@ export function CancellationDialog({
           <Button
             variant="danger"
             busy={post.isPending}
-            disabled={!valid}
-            onClick={() => post.mutate()}
+            onClick={() => {
+              if (attempt()) {
+                post.mutate();
+              }
+            }}
           >
             Cancel Booking
           </Button>
@@ -122,28 +131,30 @@ export function CancellationDialog({
         <ErrorAlert error={post.error} />
         <KindFields form={form} onChange={setForm} />
         <div className="form-grid">
-          <Field label="Cancellation date" required error={errors.effectiveDate}>
+          <Field label="Cancellation date" required error={shown.effectiveDate}>
             {(id) => (
               <DateInput
                 id={id}
                 value={form.effectiveDate}
-                onChange={(e) => setForm({ ...form, effectiveDate: e.target.value })}
+                onChange={(e) =>
+                  change({ ...form, effectiveDate: e.target.value }, 'effectiveDate')
+                }
               />
             )}
           </Field>
-          <Field label="Reason" required error={errors.reasonCode}>
+          <Field label="Reason" required error={shown.reasonCode}>
             {(id) => (
               <LovSelect
                 id={id}
                 type="CANCELLATION_REASON"
                 value={form.reasonCode}
-                onChange={(reasonCode) => setForm({ ...form, reasonCode })}
+                onChange={(reasonCode) => change({ ...form, reasonCode }, 'reasonCode')}
                 required
               />
             )}
           </Field>
         </div>
-        <Field label="Description" required error={errors.description}>
+        <Field label="Description" required error={shown.description}>
           {(id) => (
             <textarea
               id={id}
@@ -151,7 +162,7 @@ export function CancellationDialog({
               rows={2}
               maxLength={1000}
               value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              onChange={(e) => change({ ...form, description: e.target.value }, 'description')}
             />
           )}
         </Field>

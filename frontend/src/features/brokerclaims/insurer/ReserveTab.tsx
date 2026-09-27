@@ -11,6 +11,7 @@ import type { InsurerLine, ReserveChange } from './api';
 import { insurerApi } from './api';
 import { ReserveDialog } from './InsurerDialogs';
 import { totalReserve } from './insurerLogic';
+import { UserName } from '@/components/ui/UserName';
 
 function Settlement({ claim }: Readonly<{ claim: Claim }>) {
   const p = claim.progress;
@@ -113,7 +114,7 @@ export function ReserveTab({ claim, companyId }: Readonly<{ claim: Claim; compan
           },
           { key: 'n', header: 'New', numeric: true, render: (r) => formatAmount(r.newAmount) },
           { key: 'r', header: 'Reason', render: (r) => r.reason },
-          { key: 'u', header: 'By', render: (r) => r.changedBy },
+          { key: 'u', header: 'By', render: (r) => <UserName login={r.changedBy} /> },
         ]}
       />
       <Settlement claim={claim} />

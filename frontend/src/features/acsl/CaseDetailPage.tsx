@@ -20,6 +20,7 @@ import { acslApi, CASE_ENTITY } from './api';
 import type { AcslCase } from './api';
 import { CaseActions } from './CaseActions';
 import { UserName } from '@/components/ui/UserName';
+import { displayNameOf } from '@/api/users';
 
 type TabId = 'details' | 'family' | 'documents';
 
@@ -80,7 +81,7 @@ function DetailsTab({ c }: Readonly<{ c: AcslCase }>) {
             ['Findings', c.findings],
             ['Result', c.outcome ? humanize(c.outcome) : undefined],
             ['Remarks', c.resultRemarks],
-            ['Result By', c.resultBy],
+            ['Result By', displayNameOf(c.resultBy) || undefined],
             ['Result Date', c.resultAt ? formatDateTime(c.resultAt) : undefined],
           ]}
         />

@@ -20,6 +20,7 @@ import { adjustmentApi } from './api';
 import type { PostingBatch, RequestSummary } from './api';
 import { BatchResultDialog } from './BatchResultDialog';
 import { RequestFlags } from './RequestParts';
+import { UserName } from '@/components/ui/UserName';
 
 type View = 'READY' | 'BATCHES';
 
@@ -54,7 +55,7 @@ const READY_COLUMNS: Column<RequestSummary>[] = [
 const BATCH_COLUMNS: Column<PostingBatch>[] = [
   { key: 'no', header: 'Batch No.', render: (b) => <strong>{b.batchNo}</strong> },
   { key: 'at', header: 'Posted', render: (b) => formatDateTime(b.createdAt) },
-  { key: 'by', header: 'Posted By', render: (b) => b.createdBy },
+  { key: 'by', header: 'Posted By', render: (b) => <UserName login={b.createdBy} /> },
   { key: 'posted', header: 'Posted', numeric: true, render: (b) => b.postedCount },
   { key: 'pending', header: 'To Re-apply', numeric: true, render: (b) => b.pendingCount },
   { key: 'failed', header: 'Failed', numeric: true, render: (b) => b.failedCount },

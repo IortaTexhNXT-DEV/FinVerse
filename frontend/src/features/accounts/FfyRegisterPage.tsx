@@ -6,12 +6,13 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { formatDate } from '@/utils/format';
 import { ACCOUNT_COLUMNS } from './accountColumns';
 import { AccountTable } from './AccountTable';
+import { UserName } from '@/components/ui/UserName';
 
 const FFY_COLUMNS: Column<AccountSummary>[] = [
   ...ACCOUNT_COLUMNS.filter((c) => c.key !== 'o'),
   { key: 'fs', header: 'FFY Start', render: (a) => formatDate(a.ffyStart) },
   { key: 'fe', header: 'FFY End', render: (a) => formatDate(a.ffyEnd) },
-  { key: 'o', header: 'Officer', render: (a) => a.accountOfficer ?? '' },
+  { key: 'o', header: 'Officer', render: (a) => <UserName login={a.accountOfficer} empty="" /> },
 ];
 
 const CRITERIA = { ffy: true };

@@ -7,6 +7,7 @@ import type { CaseRow } from './api';
 import type { CaseDialogProps } from './CaseDialogs';
 import { LovField, StepDialog, TextField } from './StepDialog';
 import { displayNameOf } from '@/api/users';
+import { UserName } from '@/components/ui/UserName';
 
 const OTHERS = 'OTHERS';
 
@@ -125,8 +126,9 @@ export function ReassignDialog({ detail, onDone, onClose }: Readonly<CaseDialogP
       }}
     >
       <p className="muted">
-        {detail.row.caseNo} is assigned to {detail.row.assignee ?? 'the stage queue'}. The data,
-        stage and history do not change.
+        {detail.row.caseNo} is assigned to{' '}
+        <UserName login={detail.row.assignee} empty="the stage queue" />. The data, stage and
+        history do not change.
       </p>
       <ReassignFields caseId={detail.row.id} form={form} onChange={setForm} touched={touched} />
     </StepDialog>

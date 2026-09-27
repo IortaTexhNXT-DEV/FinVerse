@@ -3,6 +3,8 @@ import {
   formatCompact,
   formatDate,
   formatDateTime,
+  statusPhrase,
+  versionLabel,
   formatDuration,
   humanize,
   titleCase,
@@ -59,5 +61,22 @@ describe('titleCase', () => {
     expect(titleCase('Sent to ManCom')).toBe('Sent to ManCom');
     expect(titleCase('Awaiting insurer OR')).toBe('Awaiting Insurer OR');
     expect(titleCase('')).toBe('');
+  });
+});
+
+describe('status phrases and template versions in messages', () => {
+  it('writes a status inside a sentence with its acronyms kept', () => {
+    expect(statusPhrase('QS_SENT')).toBe('QS sent');
+    expect(statusPhrase('PS_RELEASED')).toBe('PS released');
+    expect(statusPhrase('APPROVED')).toBe('approved');
+    expect(statusPhrase('READY_FOR_PLACEMENT')).toBe('ready for placement');
+    expect(statusPhrase(undefined)).toBe('');
+  });
+
+  it('shows a template version as a version number', () => {
+    expect(versionLabel('PLACEMENT_SLIP v1')).toBe('Version 1');
+    expect(versionLabel('QUOTATION_INTAKE v12')).toBe('Version 12');
+    expect(versionLabel('Manual')).toBe('Manual');
+    expect(versionLabel(undefined)).toBe('');
   });
 });

@@ -88,9 +88,44 @@ export function humanizeMessage(message: string): string {
   return allowed === '' ? 'has an invalid format' : `has an invalid format (allowed: ${allowed})`;
 }
 
-/** Field errors of a VALIDATION_FAILED response as readable lines, in the server's order. */
+/**
+ * Whether a message already names its field ("Item 1: Sum insured is required" for
+ * "items[0].sumInsured"), so the field label is not put in front of it a second time.
+ */
+function namesField(field: string, message: string): boolean {
+  const leaf =
+    field
+      .split('.')
+      .pop()
+      ?.replace(/\[\d+\]$/, '') ?? field;
+  const text = message.toLowerCase();
+  return text.includes(words(leaf)) || text.startsWith(humanizeField(field).toLowerCase());
+}
+
+/**
+ * Field errors of a VALIDATION_FAILED response as readable lines, in the server's order: "Field:
+ * message", or the message alone when it already names the field.
+ */
 export function fieldErrorLines(errors: Record<string, string>): string[] {
-  return Object.entries(errors).map(
-    ([field, message]) => `${humanizeField(field)}: ${humanizeMessage(message)}`,
-  );
+  return Object.entries(errors).map(([field, message]) => {
+    const text = humanizeMessage(message);
+    return namesField(field, text) ? text : `${humanizeField(field)}: ${text}`;
+  });
+}
+
+/**
+ * The field errors to show: none before the user has touched a field or tried to submit, then
+ * those of the touched fields, and all of them once a submission was attempted.
+ */
+export function visibleErrors<E extends Partial<Record<string, string>>>(
+  errors: E,
+  touched: readonly string[],
+  attempted: boolean,
+): E {
+  if (attempted) {
+    return errors;
+  }
+  return Object.fromEntries(
+    Object.entries(errors).filter(([field]) => touched.includes(field)),
+  ) as E;
 }

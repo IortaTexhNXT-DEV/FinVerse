@@ -10,6 +10,7 @@ import {
   YAxis,
 } from 'recharts';
 import type { CompositionItem, DashboardSummary } from '@/api/dashboard';
+import { useAuth } from '@/auth/authContext';
 import { Card } from '@/components/ui/Card';
 import { Kpi } from '@/components/ui/Kpi';
 import { formatAmount, formatCompact } from '@/utils/format';
@@ -39,8 +40,12 @@ function CompositionList({ items }: Readonly<{ items: CompositionItem[] }>) {
   );
 }
 
-/** Headline KPI tiles of the general ledger summary. */
+/**
+ * Headline KPI tiles of the general ledger summary. Technical reserves are an insurer figure: the
+ * tile shows only to users of the insurer suite (reserve viewers), never to BDOI broking roles.
+ */
 export function SummaryKpis({ summary: d }: Readonly<{ summary: DashboardSummary }>) {
+  const { can } = useAuth();
   return (
     <>
       <Kpi
@@ -65,11 +70,13 @@ export function SummaryKpis({ summary: d }: Readonly<{ summary: DashboardSummary
         hint="Cash and bank balances"
       />
       <Kpi label="Insurance receivables" value={formatCompact(d.receivables)} />
-      <Kpi
-        label="Technical reserves"
-        value={formatCompact(d.technicalReserves)}
-        hint="UPR, claims and IBNR reserves"
-      />
+      {can('RESERVE_VIEW') && (
+        <Kpi
+          label="Technical reserves"
+          value={formatCompact(d.technicalReserves)}
+          hint="UPR, claims and IBNR reserves"
+        />
+      )}
       <Kpi label="Total assets" value={formatCompact(d.totalAssets)} />
       <Kpi
         label="Journals in progress"

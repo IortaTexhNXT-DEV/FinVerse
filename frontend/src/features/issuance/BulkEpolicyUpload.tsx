@@ -11,8 +11,8 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { humanize } from '@/utils/format';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { matchText } from './issuanceLogic';
 
 function ArnCell({
   batch,
@@ -151,7 +151,7 @@ export function BulkEpolicyUpload({ companyId }: Readonly<{ companyId: number }>
                 {
                   key: 'how',
                   header: 'Matched By',
-                  render: (i) => (i.matchMethod ? humanize(i.matchMethod) : '—'),
+                  render: (i) => matchText(i.matchMethod),
                 },
                 {
                   key: 'outcome',

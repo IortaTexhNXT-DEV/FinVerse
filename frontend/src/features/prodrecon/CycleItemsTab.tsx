@@ -23,6 +23,7 @@ import { ItemReviewDialog } from './ItemReviewDialog';
 import { prodreconApi } from './prodreconApi';
 import type { Bucket, ReconCycle, ReconFeedback, ReconItem } from './prodreconApi';
 import { bucketTabs, mayPair, maySplit } from './prodreconLogic';
+import { UserName } from '@/components/ui/UserName';
 
 function BulkDialog({
   count,
@@ -195,7 +196,7 @@ function itemColumns(
       header: 'Assured',
       render: (r) => r.bdoi?.assuredName ?? r.insurer?.assuredName ?? '',
     },
-    { key: 'ao', header: 'AO', render: (r) => r.aoUsername ?? '' },
+    { key: 'ao', header: 'AO', render: (r) => <UserName login={r.aoUsername} empty="" /> },
     {
       key: 'gross',
       header: 'Gross Premium (BDOI / Insurer)',

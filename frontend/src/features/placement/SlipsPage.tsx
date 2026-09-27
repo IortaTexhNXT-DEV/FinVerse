@@ -14,6 +14,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import { placementLink } from './placementLogic';
 import { SlipActions } from './SlipActions';
+import { InsurerName } from '@/components/broking/LovLabel';
 
 type Filter = 'ALL' | 'GENERATED' | 'SENT' | 'SUPERSEDED';
 
@@ -71,7 +72,11 @@ export default function SlipsPage() {
             {
               key: 'insurer',
               header: 'Insurer / Branch',
-              render: (s) => `${s.insurerCode} / ${s.branchCode}`,
+              render: (s) => (
+                <>
+                  <InsurerName code={s.insurerCode} /> / {s.branchCode}
+                </>
+              ),
             },
             {
               key: 'accounts',

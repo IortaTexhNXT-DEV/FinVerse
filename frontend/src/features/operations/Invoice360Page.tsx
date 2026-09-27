@@ -19,6 +19,7 @@ import { ComponentsTab, HistoryTab, MovementsTab, RelatedSectionTab } from './In
 import { InvoiceFamilyTab } from './InvoiceFamilyTab';
 import { RELATED_TABS, flagChips, invoiceTabs } from './opsLabels';
 import type { Invoice360TabId } from './opsLabels';
+import { displayNameOf } from '@/api/users';
 
 function TabBody({ tab, view }: Readonly<{ tab: Invoice360TabId; view: Invoice360 }>) {
   const module = RELATED_TABS.find((t) => t.id === tab);
@@ -79,7 +80,7 @@ function facts(view: Invoice360): Fact[] {
       value: [
         formatDate(i.classification.bookingDate),
         i.classification.costCenter,
-        i.classification.aoUsername,
+        displayNameOf(i.classification.aoUsername),
       ]
         .filter(Boolean)
         .join(' · '),

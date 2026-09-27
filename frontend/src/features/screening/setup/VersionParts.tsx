@@ -8,6 +8,8 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, formatDateTime, today } from '@/utils/format';
 import type { ConfigChange, ConfigContent, ConfigVersion } from './api';
 import { DateInput } from '@/components/ui/DateInput';
+import { UserName } from '@/components/ui/UserName';
+import { displayNameOf } from '@/api/users';
 
 /** Building blocks of the configuration version workbench (FR-SS-010, 019). */
 
@@ -40,8 +42,12 @@ export function VersionList({
           },
           { key: 'status', header: 'Status', render: (v) => <StatusBadge status={v.status} /> },
           { key: 'from', header: 'Effective From', render: (v) => formatDate(v.effectiveFrom) },
-          { key: 'maker', header: 'Maker', render: (v) => v.submittedBy ?? v.createdBy },
-          { key: 'checker', header: 'Decided By', render: (v) => v.decidedBy ?? '—' },
+          {
+            key: 'maker',
+            header: 'Maker',
+            render: (v) => <UserName login={v.submittedBy ?? v.createdBy} />,
+          },
+          { key: 'checker', header: 'Decided By', render: (v) => <UserName login={v.decidedBy} /> },
           {
             key: 'note',
             header: 'Change Note',
@@ -146,13 +152,13 @@ export function VersionActions(p: Readonly<ActionsProps>) {
 function decisionText(v: ConfigVersion): string {
   return v.decidedAt === undefined
     ? '—'
-    : `${v.decidedBy ?? ''} ${formatDateTime(v.decidedAt)} ${v.decisionReason ?? ''}`.trim();
+    : `${displayNameOf(v.decidedBy)} ${formatDateTime(v.decidedAt)} ${v.decisionReason ?? ''}`.trim();
 }
 
 function submittedText(v: ConfigVersion): string {
   return v.submittedAt === undefined
     ? '—'
-    : `${v.submittedBy ?? ''} ${formatDateTime(v.submittedAt)}`;
+    : `${displayNameOf(v.submittedBy)} ${formatDateTime(v.submittedAt)}`;
 }
 
 interface HeaderProps {

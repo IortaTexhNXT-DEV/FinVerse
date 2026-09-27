@@ -3,7 +3,8 @@ import type { CoverageTerm, InsurerLine, PackageTerms } from '@/api/productmaint
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
-import { formatAmount, formatDate } from '@/utils/format';
+import { formatAmount, formatDate, humanize } from '@/utils/format';
+import { InsurerName } from '@/components/broking/LovLabel';
 
 function deductible(c: CoverageTerm): string {
   const parts = [
@@ -31,8 +32,16 @@ const COVERAGE_COLUMNS: Column<CoverageTerm>[] = [
 ];
 
 const INSURER_COLUMNS: Column<InsurerLine>[] = [
-  { key: 'insurer', header: 'Insurer', render: (i) => <strong>{i.insurerCode}</strong> },
-  { key: 'role', header: 'Role', render: (i) => i.role ?? 'Panel' },
+  {
+    key: 'insurer',
+    header: 'Insurer',
+    render: (i) => (
+      <strong>
+        <InsurerName code={i.insurerCode} />
+      </strong>
+    ),
+  },
+  { key: 'role', header: 'Role', render: (i) => humanize(i.role ?? 'PANEL') },
   { key: 'share', header: 'Share %', numeric: true, render: (i) => i.sharePercent ?? '—' },
   { key: 'rate', header: 'Rate %', numeric: true, render: (i) => i.rate ?? '—' },
   {

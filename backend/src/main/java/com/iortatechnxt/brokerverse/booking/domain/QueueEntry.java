@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.booking.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -134,7 +135,8 @@ public class QueueEntry extends BaseEntity {
   private void requireQueued() {
     if (status != QueueStatus.QUEUED) {
       throw new BusinessRuleException(
-          "QUEUE_ENTRY_CLOSED", "Account " + arn + " is no longer queued (" + status + ")");
+          "QUEUE_ENTRY_CLOSED",
+          "Account " + arn + " is no longer queued (" + DisplayFormat.words(status) + ")");
     }
   }
 

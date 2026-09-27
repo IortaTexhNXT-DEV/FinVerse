@@ -1,8 +1,10 @@
 package com.iortatechnxt.brokerverse.bulk.service;
 
 import com.iortatechnxt.brokerverse.bulk.domain.BulkJob;
+import com.iortatechnxt.brokerverse.bulk.domain.BulkJobStatus;
 import com.iortatechnxt.brokerverse.bulk.domain.BulkRowRecord;
 import com.iortatechnxt.brokerverse.bulk.domain.BulkRowStatus;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -23,8 +25,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 final class BulkWorkbooks {
 
-  private static final int WIDTH = 22 * 256;
-  private static final int WIDE = WIDTH * 3;
+  static final int WIDTH = 22 * 256;
+  static final int WIDE = WIDTH * 3;
   private static final int DESCRIPTION_COLUMN = 3;
   private static final int EXAMPLE_COLUMN = 4;
   private static final int MESSAGES_COLUMN = 2;
@@ -97,7 +99,7 @@ final class BulkWorkbooks {
     }
   }
 
-  private static String textOf(String value) {
+  static String textOf(String value) {
     return value == null ? "" : value;
   }
 
@@ -110,6 +112,7 @@ final class BulkWorkbooks {
    * @param rows rows
    * @param values row values by row id
    * @param outcomes committed rows per outcome category (BRQID.006)
+   * @param uploadedBy display name of the user who uploaded the file
    * @return xlsx bytes
    */
   static byte[] report(
@@ -117,10 +120,11 @@ final class BulkWorkbooks {
       List<BulkColumn> columns,
       List<BulkRowRecord> rows,
       Map<Long, Map<String, String>> values,
-      Map<String, Long> outcomes) {
+      Map<String, Long> outcomes,
+      String uploadedBy) {
     try (XSSFWorkbook wb = new XSSFWorkbook()) {
       CellStyle head = headStyle(wb);
-      summarySheet(wb, job, outcomes);
+      summarySheet(wb, job, uploadedBy, outcomes);
       rowsSheet(wb, head, columns, rows, values);
       return bytes(wb);
     } catch (IOException e) {
@@ -128,96 +132,33 @@ final class BulkWorkbooks {
     }
   }
 
-  /**
-   * The error file: the rows that were not processed, in the template layout (same headers, so the
-   * corrected file can be uploaded again) with an "Error" column last. The cells a message names
-   * are highlighted, and the Error cell of every rejected row.
-   *
-   * @param columns template columns
-   * @param rows rows of the job
-   * @param values row values by row id
-   * @return xlsx bytes
-   */
-  static byte[] errorFile(
-      List<BulkColumn> columns, List<BulkRowRecord> rows, Map<Long, Map<String, String>> values) {
-    try (XSSFWorkbook wb = new XSSFWorkbook()) {
-      CellStyle head = headStyle(wb);
-      CellStyle marked = errorStyle(wb);
-      Sheet sheet = wb.createSheet("Data");
-      Row header = sheet.createRow(0);
-      for (int c = 0; c < columns.size(); c++) {
-        var cell = header.createCell(c);
-        cell.setCellValue(columns.get(c).header());
-        cell.setCellStyle(head);
-        sheet.setColumnWidth(c, WIDTH);
-      }
-      int errorColumn = columns.size();
-      var errorHead = header.createCell(errorColumn);
-      errorHead.setCellValue("Error");
-      errorHead.setCellStyle(head);
-      sheet.setColumnWidth(errorColumn, WIDE);
-      int r = 1;
-      for (BulkRowRecord row : rows) {
-        if (row.getStatus() == BulkRowStatus.COMMITTED) {
-          continue;
-        }
-        errorRow(
-            sheet.createRow(r++), columns, row, values.getOrDefault(row.getId(), Map.of()), marked);
-      }
-      sheet.createFreezePane(0, 1);
-      return bytes(wb);
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
+  private static String statusText(BulkJobStatus status) {
+    return switch (status) {
+      case VALIDATED -> "Validated, waiting for commit";
+      case COMPLETED -> "Completed";
+      case CANCELLED -> "Cancelled";
+    };
   }
 
-  /** One rejected row of the error file: its values, then its messages in the Error column. */
-  private static void errorRow(
-      Row out,
-      List<BulkColumn> columns,
-      BulkRowRecord row,
-      Map<String, String> v,
-      CellStyle marked) {
-    String messages = textOf(row.getMessages());
-    String lower = messages.toLowerCase(Locale.ROOT);
-    for (int c = 0; c < columns.size(); c++) {
-      String name = columns.get(c).header();
-      var cell = out.createCell(c);
-      cell.setCellValue(v.getOrDefault(name, ""));
-      if (!messages.isEmpty() && lower.contains(name.toLowerCase(Locale.ROOT))) {
-        cell.setCellStyle(marked);
-      }
-    }
-    var error = out.createCell(columns.size());
-    error.setCellValue(messages);
-    if (!messages.isEmpty()) {
-      error.setCellStyle(marked);
-    }
+  private static String rowStatusText(BulkRowStatus status) {
+    String words = status.name().toLowerCase(Locale.ROOT).replace('_', ' ');
+    return Character.toUpperCase(words.charAt(0)) + words.substring(1);
   }
 
-  private static CellStyle errorStyle(XSSFWorkbook wb) {
-    CellStyle style = wb.createCellStyle();
-    Font font = wb.createFont();
-    font.setColor(IndexedColors.DARK_RED.getIndex());
-    style.setFont(font);
-    style.setFillForegroundColor(IndexedColors.ROSE.getIndex());
-    style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-    return style;
-  }
-
-  private static void summarySheet(XSSFWorkbook wb, BulkJob job, Map<String, Long> outcomes) {
+  private static void summarySheet(
+      XSSFWorkbook wb, BulkJob job, String uploadedBy, Map<String, Long> outcomes) {
     Sheet summary = wb.createSheet("Summary");
     Object[][] facts = {
       {"Upload", job.getJobNo()},
       {"File", job.getFileName()},
-      {"Status", job.getStatus().name()},
+      {"Status", statusText(job.getStatus())},
       {"Rows", job.getTotalRows()},
       {"Valid", job.getValidRows()},
       {"Invalid", job.getInvalidRows()},
       {"Committed", job.getCommittedRows()},
       {"Failed at commit", job.getFailedRows()},
-      {"Uploaded by", job.getCreatedBy()},
-      {"Uploaded at", String.valueOf(job.getCreatedAt())},
+      {"Uploaded by", uploadedBy},
+      {"Uploaded at", DisplayFormat.dateTime(job.getCreatedAt())},
       {"Reprocessed", job.getReprocessCount()}
     };
     for (int i = 0; i < facts.length; i++) {
@@ -260,7 +201,7 @@ final class BulkWorkbooks {
     for (BulkRowRecord row : rows) {
       Row out = sheet.createRow(r++);
       out.createCell(0).setCellValue(row.getRowNo());
-      out.createCell(1).setCellValue(row.getStatus().name());
+      out.createCell(1).setCellValue(rowStatusText(row.getStatus()));
       out.createCell(MESSAGES_COLUMN).setCellValue(textOf(row.getMessages()));
       out.createCell(REFERENCE_COLUMN).setCellValue(textOf(row.getResultRef()));
       out.createCell(OUTCOME_COLUMN).setCellValue(textOf(row.getOutcome()));
@@ -281,7 +222,7 @@ final class BulkWorkbooks {
     };
   }
 
-  private static CellStyle headStyle(XSSFWorkbook wb) {
+  static CellStyle headStyle(XSSFWorkbook wb) {
     CellStyle style = wb.createCellStyle();
     Font font = wb.createFont();
     font.setBold(true);
@@ -292,7 +233,7 @@ final class BulkWorkbooks {
     return style;
   }
 
-  private static byte[] bytes(XSSFWorkbook wb) throws IOException {
+  static byte[] bytes(XSSFWorkbook wb) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     wb.write(out);
     return out.toByteArray();

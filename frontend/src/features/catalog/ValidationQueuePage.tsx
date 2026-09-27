@@ -12,6 +12,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, formatDateTime } from '@/utils/format';
 import { ageInDays } from './versionForm';
+import { UserName } from '@/components/ui/UserName';
 
 /**
  * Validation Queue (PMADD06): package versions submitted by MBS and waiting for the post-set-up
@@ -58,7 +59,11 @@ export default function ValidationQueuePage() {
               { key: 's', header: 'Status', render: (v) => <StatusBadge status={v.status} /> },
               { key: 'e', header: 'Effective From', render: (v) => formatDate(v.effectiveFrom) },
               { key: 'q', header: 'Request', render: (v) => v.sourceRequestNo ?? '' },
-              { key: 'b', header: 'Submitted By', render: (v) => v.submittedBy ?? '' },
+              {
+                key: 'b',
+                header: 'Submitted By',
+                render: (v) => <UserName login={v.submittedBy} empty="" />,
+              },
               { key: 'a', header: 'Submitted', render: (v) => formatDateTime(v.submittedAt) },
               {
                 key: 'g',

@@ -8,7 +8,9 @@ import com.iortatechnxt.brokerverse.account.service.AccountService;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.MergedText;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
@@ -73,6 +75,7 @@ public class HoldCoverService {
   private final AccountLifecycleService lifecycle;
   private final SystemParameterService parameters;
   private final AuditTrailService audit;
+  private final CurrentUser currentUser;
   private final Clock clock;
 
   /**
@@ -88,6 +91,7 @@ public class HoldCoverService {
    * @param lifecycle account lifecycle
    * @param parameters business parameters
    * @param audit audit trail
+   * @param currentUser signed-in user (preparer of the request)
    * @param clock clock
    */
   public HoldCoverService(
@@ -101,6 +105,7 @@ public class HoldCoverService {
       AccountLifecycleService lifecycle,
       SystemParameterService parameters,
       AuditTrailService audit,
+      CurrentUser currentUser,
       Clock clock) {
     this.holdCovers = holdCovers;
     this.accounts = accounts;
@@ -112,6 +117,7 @@ public class HoldCoverService {
     this.lifecycle = lifecycle;
     this.parameters = parameters;
     this.audit = audit;
+    this.currentUser = currentUser;
     this.clock = clock;
   }
 
@@ -128,7 +134,7 @@ public class HoldCoverService {
       throw new BusinessRuleException(
           "HOLD_COVER_NOT_ALLOWED",
           "A hold cover is requested while the account is being placed, not "
-              + account.getStatus());
+              + DisplayFormat.words(account.getStatus()));
     }
     if (current(arn).filter(HoldCover::isOpen).isPresent()) {
       throw new BusinessRuleException(
@@ -144,7 +150,13 @@ public class HoldCoverService {
         templates.merge(TEMPLATE, today, Map.of("startDate", start, "reference", arn));
     byte[] pdf =
         documents.holdCoverPdf(
-            new SlipHeader(account.getCompanyId(), arn, account.getInsurerCode(), address, text),
+            new SlipHeader(
+                account.getCompanyId(),
+                arn,
+                account.getInsurerCode(),
+                address,
+                text,
+                currentUser.username()),
             account,
             start,
             expiry);
@@ -169,7 +181,10 @@ public class HoldCoverService {
                 new CoverPeriod(start, expiry)));
     lifecycle.recordHoldCover(arn, HoldCoverStatus.REQUESTED, null, start);
     audit.record(
-        ENTITY, arn, AuditAction.CREATE, "Hold cover requested " + start + " to " + expiry);
+        ENTITY,
+        arn,
+        AuditAction.CREATE,
+        "Hold cover requested " + DisplayFormat.period(start, expiry));
     return saved;
   }
 

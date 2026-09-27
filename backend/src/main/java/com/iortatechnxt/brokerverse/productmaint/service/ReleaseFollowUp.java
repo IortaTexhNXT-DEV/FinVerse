@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.productmaint.service;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductExpired;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionReleased;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionReturned;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.productmaint.domain.Advisory;
@@ -137,7 +138,7 @@ public class ReleaseFollowUp {
             "Version "
                 + event.versionNo()
                 + " ended on "
-                + event.packageEndDate()
+                + DisplayFormat.date(event.packageEndDate())
                 + " without a renewal; the package is no longer sold for new business.",
             "/product-maintenance/expiry",
             "Product",

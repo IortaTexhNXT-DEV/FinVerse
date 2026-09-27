@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.crm.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails;
 import com.iortatechnxt.brokerverse.crm.domain.ClientProfile;
 import com.iortatechnxt.brokerverse.crm.service.ClientRules.Violation;
@@ -99,7 +100,12 @@ public class ClientValidator {
       found.add(
           new Violation(
               "LOV_VALUE_INVALID",
-              "'" + code + "' is not a valid value of " + type + " on " + today));
+              "'"
+                  + code
+                  + "' is not a valid value of "
+                  + type
+                  + " on "
+                  + DisplayFormat.date(today)));
     }
   }
 }

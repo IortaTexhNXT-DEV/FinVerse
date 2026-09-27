@@ -7,7 +7,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
-import { today } from '@/utils/format';
+import { today, statusPhrase } from '@/utils/format';
 import type { ClaimActions } from './claimWorkflow';
 import { DateInput } from '@/components/ui/DateInput';
 
@@ -53,7 +53,7 @@ export function ClaimDecisions({
   const decide = useMutation({
     mutationFn: (d: Decision) => run(claim, d, reason, date),
     onSuccess: async (updated) => {
-      toast.success(`${updated.claimNo}: ${updated.status.toLowerCase().replace('_', ' ')}`);
+      toast.success(`${updated.claimNo}: ${statusPhrase(updated.status)}`);
       setDecision(null);
       setReason('');
       await onChange();

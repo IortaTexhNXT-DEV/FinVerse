@@ -25,6 +25,7 @@ import { TemplateButton, UploadForm } from './RemittanceParts';
 import { SPECIAL_TABS, SPECIAL_TEMPLATE, stagesOf } from './remittanceLabels';
 import type { SpecialTab } from './remittanceLabels';
 import './remittance.css';
+import { UserName } from '@/components/ui/UserName';
 
 const COLUMNS: Column<Special>[] = [
   {
@@ -41,7 +42,7 @@ const COLUMNS: Column<Special>[] = [
   { key: 'assured', header: 'Name of Assured', render: (s) => s.assuredName },
   { key: 'ins', header: 'Insurer', render: (s) => s.insurerCode },
   { key: 'cond', header: 'Condition', render: (s) => s.conditionCode },
-  { key: 'by', header: 'Requestor', render: (s) => s.requestedBy },
+  { key: 'by', header: 'Requestor', render: (s) => <UserName login={s.requestedBy} /> },
   { key: 'batch', header: 'Batch', render: (s) => s.batchNo ?? '' },
   { key: 'stage', header: 'Status', render: (s) => <StatusBadge status={s.stage} /> },
 ];

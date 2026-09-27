@@ -5,6 +5,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate } from '@/utils/format';
 import { typeLabel } from './packageRequest';
 import { StageAge } from './StageAge';
+import { UserName } from '@/components/ui/UserName';
 
 function productOf(r: RequestListItem): string {
   if (r.productCode === undefined) {
@@ -56,5 +57,5 @@ export const REQUEST_COLUMNS: Column<RequestListItem>[] = [
   },
   { key: 'stage', header: 'Stage', render: (r) => <StatusBadge status={r.status} /> },
   { key: 'age', header: 'In Stage', render: (r) => <StageAge item={r} /> },
-  { key: 'assignee', header: 'Assignee', render: (r) => r.assignee ?? '—' },
+  { key: 'assignee', header: 'Assignee', render: (r) => <UserName login={r.assignee} /> },
 ];

@@ -143,6 +143,27 @@ class PlacementSlipIT {
   }
 
   @Test
+  void generatingASlipAgainAfterAReturnSupersedesTheEarlierSlip() {
+    String arn = fx.placed(fx.fire());
+    PlacementSlip first = queries.currentSlip(arn).orElseThrow();
+    as.run("proc", () -> returns.recordReturn(arn, "INSURER_REQUIREMENTS", "Need the survey"));
+    as.run("proc", () -> returns.resubmit(arn, "Survey attached"));
+
+    List<PlacementSlip> generated =
+        as.run("proc", () -> slips.generate(fx.company(), List.of(arn)));
+
+    assertThat(generated).hasSize(1);
+    PlacementSlip second = generated.get(0);
+    assertThat(second.getSlipNo()).isEqualTo(first.getSlipNo());
+    assertThat(second.getVersionNo()).isEqualTo(first.getVersionNo() + 1);
+    assertThat(slips.get(first.getId()).getStatus()).isEqualTo(SlipStatus.SUPERSEDED);
+    assertThat(queries.currentSlip(arn).orElseThrow().getId()).isEqualTo(second.getId());
+    assertThat(queries.slipsFor(arn))
+        .extracting(PlacementSlip::getStatus)
+        .containsExactly(SlipStatus.GENERATED, SlipStatus.SUPERSEDED);
+  }
+
+  @Test
   void placementsAreCancelledAndReactivatedInBulk() {
     String ready = fx.ready(fx.liability());
     String placed = fx.placed(fx.liability());

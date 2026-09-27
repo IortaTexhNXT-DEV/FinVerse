@@ -18,11 +18,12 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
+import { formatAmount, formatDate, formatDateTime, humanize, statusPhrase } from '@/utils/format';
 import { AnswersDialog, CollectDialog, SendBillingDialog } from './BillingDialogs';
 import { BILLING_ENTITY, commissionApi } from './commissionApi';
 import type { DpBilling, DpItem } from './commissionApi';
 import { ReasonDialog } from './DpItemDialogs';
+import { UserName } from '@/components/ui/UserName';
 
 const TABS = [
   { id: 'accounts', label: 'Accounts' },
@@ -99,7 +100,7 @@ function Summary({ billing: b }: Readonly<{ billing: DpBilling }>) {
           label: 'Official Receipt',
           value: b.orNo ?? humanize(b.orStatus ?? ''),
         },
-        { icon: UserRound, label: 'Handler', value: b.handler },
+        { icon: UserRound, label: 'Handler', value: <UserName login={b.handler} /> },
       ]}
     />
   );
@@ -169,7 +170,7 @@ export default function DpBillingPage() {
     onSuccess: async (b) => {
       setDialog(undefined);
       await queryClient.invalidateQueries({ queryKey: ['commission'] });
-      toast.success(`${b.billingNo} is now ${humanize(b.stage).toLowerCase()}`);
+      toast.success(`${b.billingNo} is now ${statusPhrase(b.stage)}`);
     },
   });
   if (billing.data === undefined) {

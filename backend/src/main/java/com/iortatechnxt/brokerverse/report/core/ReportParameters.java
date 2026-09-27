@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.report.core;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -178,10 +179,22 @@ public final class ReportParameters {
     for (ParameterSpec spec : metadata.parameters()) {
       String value = values.get(spec.name());
       if (value != null) {
-        lines.add(spec.label() + " : " + display.display(spec, value));
+        lines.add(spec.label() + " : " + shown(spec, value));
       }
     }
     return lines;
+  }
+
+  /** A parameter value as users read it: dates as dd-MMM-yyyy, ids by their name. */
+  private String shown(ParameterSpec spec, String value) {
+    if (spec.type() == ParameterType.DATE) {
+      try {
+        return DisplayFormat.date(LocalDate.parse(value));
+      } catch (DateTimeParseException ex) {
+        return value;
+      }
+    }
+    return display.display(spec, value);
   }
 
   public ReportMetadata metadata() {

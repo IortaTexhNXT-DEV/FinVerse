@@ -10,7 +10,7 @@ import type { EmailDraft } from '@/components/broking/SendEmailDialog';
 import { workflowKey } from '@/components/broking/workflowKey';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, humanize } from '@/utils/format';
+import { formatDate, statusPhrase } from '@/utils/format';
 import { AcceptanceDialog } from './AcceptanceDialog';
 
 type Simple = 'submit' | 'approve' | 'revise' | 'create_accounts';
@@ -52,7 +52,7 @@ export function QuotationActions({
     await queryClient.invalidateQueries({ queryKey: ['quotations'] });
     await queryClient.invalidateQueries({ queryKey: ['quotation', q.id] });
     await queryClient.invalidateQueries({ queryKey: workflowKey(QUOTATION_ENTITY, q.id) });
-    toast.success(`${label}: ${q.quotationNo} is now ${humanize(q.status).toLowerCase()}`);
+    toast.success(`${label}: ${q.quotationNo} is now ${statusPhrase(q.status)}`);
   };
   const simple = useMutation({
     mutationFn: ({ action, note }: { action: WorkAction; note: ActionNote }) =>

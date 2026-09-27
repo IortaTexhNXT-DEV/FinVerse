@@ -17,6 +17,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { InsurerChoices } from '@/features/proposals/ProposalFormParts';
 import { formatDate, formatDateTime } from '@/utils/format';
 import { ResponseDialog } from './ResponseDialog';
+import { displayNameOf } from '@/api/users';
 
 interface RoundProps {
   request: PackageRequest;
@@ -118,7 +119,9 @@ function roundNote(round: NegotiationRound): string {
     parts.push(`Reply by ${formatDate(round.replyDue)}.`);
   }
   if (round.sentAt !== undefined) {
-    parts.push(`Sent ${formatDateTime(round.sentAt)} (approved by ${round.approvedBy ?? '—'}).`);
+    parts.push(
+      `Sent ${formatDateTime(round.sentAt)} (approved by ${displayNameOf(round.approvedBy) || '—'}).`,
+    );
   }
   return parts.join(' ');
 }

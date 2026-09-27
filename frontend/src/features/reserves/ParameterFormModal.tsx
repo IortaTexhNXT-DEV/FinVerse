@@ -9,6 +9,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormControls';
 import { codeOptions, enumOptions } from '@/features/assets/options';
 import type { ParameterForm } from './reserveMath';
+import { formatDate } from '@/utils/format';
 
 const METHODS = enumOptions(['RATE', 'CHAIN_LADDER']);
 const BASES = enumOptions(['PAID', 'INCURRED']);
@@ -40,7 +41,7 @@ export function ParameterFormModal({ companyId, form, onChange }: Readonly<Props
       await queryClient.invalidateQueries({ queryKey: ['reserve-parameters'] });
       onChange(null);
       toast.success(
-        `Parameters ${p.businessLine} from ${p.effectiveFrom} saved – pending authorization`,
+        `Parameters ${p.businessLine} from ${formatDate(p.effectiveFrom)} saved – pending authorization`,
       );
     },
   });

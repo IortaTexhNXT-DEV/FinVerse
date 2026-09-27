@@ -22,6 +22,7 @@ import type { AccountTabId } from './collectionsLogic';
 import { DetailsDialog, DispositionDialog, EffortDialog } from './WorkDialogs';
 import './collections.css';
 import { UserName } from '@/components/ui/UserName';
+import { displayNameOf } from '@/api/users';
 
 function flags(a: Account): string[] {
   const out: string[] = [];
@@ -90,7 +91,11 @@ function Summary({ account }: Readonly<{ account: Account }>) {
         {
           icon: UserRound,
           label: 'Handler / AO / UH',
-          value: [i.currentHandler ?? 'Unassigned', i.aoUsername, i.unitHead]
+          value: [
+            displayNameOf(i.currentHandler) || 'Unassigned',
+            displayNameOf(i.aoUsername),
+            displayNameOf(i.unitHead),
+          ]
             .filter(Boolean)
             .join(' · '),
         },

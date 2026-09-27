@@ -9,6 +9,7 @@ import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { collectionsApi } from './api';
 import { validity } from './collectionsLogic';
 import { displayNameOf } from '@/api/users';
+import { UserName } from '@/components/ui/UserName';
 
 /** Dispositions (append-only), efforts and hand-offs to Operations (BRCLXN.016-023). */
 export function DispositionsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
@@ -65,7 +66,7 @@ export function DispositionsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) 
               render: (e) => [e.channel, e.contactPerson].filter(Boolean).join(' · '),
             },
             { key: 'r', header: 'Remarks', render: (e) => e.remarks ?? '' },
-            { key: 'b', header: 'Encoded By', render: (e) => e.createdBy },
+            { key: 'b', header: 'Encoded By', render: (e) => <UserName login={e.createdBy} /> },
           ]}
           rows={efforts.data ?? []}
           rowKey={(e) => e.id}
@@ -119,7 +120,8 @@ export function HistoryTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
             {
               key: 'h',
               header: 'Handler',
-              render: (a) => `${a.previousHandler ?? '—'} → ${a.handler}`,
+              render: (a) =>
+                `${displayNameOf(a.previousHandler) || '—'} → ${displayNameOf(a.handler)}`,
             },
             { key: 'k', header: 'Kind', render: (a) => humanize(a.kind) },
             {
@@ -128,7 +130,7 @@ export function HistoryTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
               render: (a) => validity(a.validFrom, a.validTo, formatDate),
             },
             { key: 'r', header: 'Reason', render: (a) => a.reason },
-            { key: 'b', header: 'By', render: (a) => a.assignedBy },
+            { key: 'b', header: 'By', render: (a) => <UserName login={a.assignedBy} /> },
           ]}
           rows={assignments.data ?? []}
           rowKey={(a) => a.id}

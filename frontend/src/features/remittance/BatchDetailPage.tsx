@@ -35,6 +35,7 @@ import { BatchSettlementTab } from './BatchSettlementTab';
 import { TotalsStrip, TypeChip } from './RemittanceParts';
 import { joinParts } from './remittanceLabels';
 import './remittance.css';
+import { UserName } from '@/components/ui/UserName';
 
 const ENTITY = 'RemittanceBatch';
 const TABS = [
@@ -131,9 +132,13 @@ function DocumentsTab({ batch }: Readonly<{ batch: Batch }>) {
         </div>
         <dl className="detail-list">
           <dt>Submitted by</dt>
-          <dd>{batch.submittedBy ?? '—'}</dd>
+          <dd>
+            <UserName login={batch.submittedBy} />
+          </dd>
           <dt>Approved by</dt>
-          <dd>{batch.approvedBy ?? '—'}</dd>
+          <dd>
+            <UserName login={batch.approvedBy} />
+          </dd>
           <dt>Payment request</dt>
           <dd>
             {batch.disbursement.requestNo ?? '—'} {formatAmount(batch.disbursement.amount)}

@@ -27,6 +27,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDate } from '@/utils/format';
 import { SummaryFact } from './BookingParts';
+import { UserName } from '@/components/ui/UserName';
 
 function CreditDialog({ si, onClose }: Readonly<{ si: ServiceInvoice; onClose: () => void }>) {
   const toast = useToast();
@@ -157,7 +158,7 @@ function Facts({ si: s }: Readonly<{ si: ServiceInvoice }>) {
             {s.templateCode} v{s.templateVersion}
           </SummaryFact>
           <SummaryFact icon={UserRound} label="Owner">
-            {s.ownerUsername ?? s.ownerPermission ?? ''}
+            {s.ownerUsername ? <UserName login={s.ownerUsername} /> : (s.ownerPermission ?? '')}
           </SummaryFact>
           <SummaryFact icon={Receipt} label="Credit of">
             {s.creditOf ?? '-'}

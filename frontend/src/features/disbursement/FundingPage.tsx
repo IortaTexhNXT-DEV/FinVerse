@@ -21,6 +21,7 @@ import { bankLabel } from './forms';
 import { FUNDING_TABS } from './labels';
 import type { FundingTab } from './labels';
 import './disbursement.css';
+import { UserName } from '@/components/ui/UserName';
 
 /**
  * Account funding (DIS 2.17.0-2.17.5): transfers between BDOIR bank accounts requested by the
@@ -53,7 +54,7 @@ export default function FundingPage() {
     { key: 'date', header: 'Value Date', render: (f) => formatDate(f.valueDate) },
     { key: 'amount', header: 'Amount', numeric: true, render: (f) => <Amount value={f.amount} /> },
     { key: 'ccy', header: 'Currency', render: (f) => f.currency },
-    { key: 'by', header: 'Requested By', render: (f) => f.createdBy },
+    { key: 'by', header: 'Requested By', render: (f) => <UserName login={f.createdBy} /> },
     { key: 'stage', header: 'Status', render: (f) => <StatusBadge status={f.stage} /> },
   ];
   return (

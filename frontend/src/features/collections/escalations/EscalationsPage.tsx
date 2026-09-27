@@ -23,6 +23,8 @@ import { escalationsApi } from './api';
 import { EscalateDialog } from './EscalationDialogs';
 import type { EscalationTab } from './labels';
 import { ESCALATION_TABS, LEVEL_LABELS, stagesOf } from './labels';
+import { UserName } from '@/components/ui/UserName';
+import { displayNameOf } from '@/api/users';
 
 const COLUMNS: Column<Escalation>[] = [
   {
@@ -31,7 +33,9 @@ const COLUMNS: Column<Escalation>[] = [
     render: (e) => (
       <>
         <strong>{e.escalationNo}</strong>
-        <div className="muted">{e.kind === 'AUTO' ? `Rule ${e.ruleCode ?? ''}` : e.raisedBy}</div>
+        <div className="muted">
+          {e.kind === 'AUTO' ? `Rule ${e.ruleCode ?? ''}` : displayNameOf(e.raisedBy)}
+        </div>
       </>
     ),
   },
@@ -41,7 +45,8 @@ const COLUMNS: Column<Escalation>[] = [
   {
     key: 'target',
     header: 'Escalated To',
-    render: (e) => e.targetUsername ?? LEVEL_LABELS[e.targetLevel],
+    render: (e) =>
+      e.targetUsername ? <UserName login={e.targetUsername} /> : LEVEL_LABELS[e.targetLevel],
   },
   {
     key: 'balance',

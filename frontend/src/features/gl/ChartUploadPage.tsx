@@ -19,6 +19,7 @@ import { formatDateTime } from '@/utils/format';
 import { NumberingPanel } from './NumberingPanel';
 import { glPlatformApi } from './glPlatformApi';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { UserName } from '@/components/ui/UserName';
 
 type Tab = 'upload' | 'numbering' | 'history';
 
@@ -273,7 +274,7 @@ function HistoryPanel() {
           { key: 'no', header: 'Upload No.', render: (j) => <strong>{j.jobNo}</strong> },
           { key: 'file', header: 'File', render: (j) => j.fileName },
           { key: 'at', header: 'Uploaded', render: (j) => formatDateTime(j.createdAt) },
-          { key: 'by', header: 'By', render: (j) => j.createdBy },
+          { key: 'by', header: 'By', render: (j) => <UserName login={j.createdBy} /> },
           {
             key: 'rows',
             header: 'Created / Rows',

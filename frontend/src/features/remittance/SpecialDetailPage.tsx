@@ -13,7 +13,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime } from '@/utils/format';
+import { formatDateTime, statusPhrase } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { Special } from './api';
 import { joinParts } from './remittanceLabels';
@@ -84,7 +84,7 @@ export default function SpecialDetailPage() {
       queryClient.setQueryData(['remittance', 'special', id], s);
       await queryClient.invalidateQueries({ queryKey: workflowKey(ENTITY, id) });
       await queryClient.invalidateQueries({ queryKey: ['remittance', 'specials'] });
-      toast.success(`${s.requestNo}: ${s.stage.toLowerCase().replaceAll('_', ' ')}`);
+      toast.success(`${s.requestNo}: ${statusPhrase(s.stage)}`);
     },
   });
   if (special.data === undefined) {

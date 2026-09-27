@@ -14,7 +14,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { formatDate, formatDateTime, statusPhrase } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { Hold } from './api';
 import { AssignDialog, ExtendDialog } from './HoldDialogs';
@@ -105,7 +105,7 @@ function useHoldAction(id: number, done: () => void) {
       queryClient.setQueryData(['remittance', 'hold', id], h);
       await queryClient.invalidateQueries({ queryKey: workflowKey(ENTITY, id) });
       await queryClient.invalidateQueries({ queryKey: ['remittance', 'holds'] });
-      toast.success(`${h.requestNo}: ${h.stage.toLowerCase().replaceAll('_', ' ')}`);
+      toast.success(`${h.requestNo}: ${statusPhrase(h.stage)}`);
     },
   });
 }

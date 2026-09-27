@@ -29,6 +29,7 @@ import { unappliedApi } from './api';
 import { REQUEST_COLUMNS } from './columns';
 import { DispositionDialog } from './DispositionDialog';
 import { ACTION_LABELS, TAB_LABELS, cashieringStatus, paymentFacts } from './labels';
+import { UserName } from '@/components/ui/UserName';
 
 type DetailTab = 'DETAILS' | 'DISPOSITIONS' | 'REQUESTS' | 'HISTORY';
 
@@ -50,7 +51,7 @@ const DISPOSITION_COLUMNS: Column<CollectorDisposition>[] = [
     numeric: true,
     render: (d) => (d.amount === undefined ? 'Whole balance' : <Amount value={d.amount} />),
   },
-  { key: 'by', header: 'By', render: (d) => d.createdBy },
+  { key: 'by', header: 'By', render: (d) => <UserName login={d.createdBy} /> },
   { key: 'remarks', header: 'Remarks', render: (d) => d.remarks ?? '' },
 ];
 

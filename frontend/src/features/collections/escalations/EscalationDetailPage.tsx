@@ -21,6 +21,7 @@ import { ReasonDialog, RecordLoading } from '../plans/Parts';
 import type { Escalation, EscalationItem } from './api';
 import { escalationsApi } from './api';
 import { LEVEL_LABELS } from './labels';
+import { displayNameOf } from '@/api/users';
 
 const ENTITY = 'CollectionEscalation';
 const BUSINESS_ACTIONS = new Set(['escalate_further', 'resolve', 'resubmit']);
@@ -60,7 +61,7 @@ function Summary({ e }: Readonly<{ e: Escalation }>) {
         {
           icon: UserRound,
           label: 'Escalated To',
-          value: e.targetUsername ?? LEVEL_LABELS[e.targetLevel],
+          value: e.targetUsername ? displayNameOf(e.targetUsername) : LEVEL_LABELS[e.targetLevel],
         },
         {
           icon: Wallet,

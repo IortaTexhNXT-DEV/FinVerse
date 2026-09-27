@@ -15,6 +15,7 @@ import type { CoverDetail } from './api';
 import { coverApi } from './api';
 import { CoverSearch } from './CoverSearch';
 import { CoverTabs } from './CoverTabs';
+import { displayNameOf } from '@/api/users';
 
 function CoverSummary({ cover }: Readonly<{ cover: CoverDetail }>) {
   const h = cover.header;
@@ -52,7 +53,7 @@ function CoverSummary({ cover }: Readonly<{ cover: CoverDetail }>) {
         {
           icon: UserRound,
           label: 'Marketing Team / AO',
-          value: `${cover.salesTeam ?? '—'} · ${cover.accountOfficer ?? '—'}`,
+          value: `${cover.salesTeam ?? '—'} · ${displayNameOf(cover.accountOfficer) || '—'}`,
         },
         { icon: ShieldCheck, label: 'Line', value: humanize(h.lineCode ?? '') },
       ]}

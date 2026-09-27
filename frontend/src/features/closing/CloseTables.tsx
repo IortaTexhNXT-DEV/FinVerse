@@ -7,6 +7,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDateTime } from '@/utils/format';
 import type { BooksCutoff, CloseSchedule, CloseSettings } from './closeControlsApi';
 import { displayNameOf } from '@/api/users';
+import { UserName } from '@/components/ui/UserName';
 
 /** Close settings and the number of scheduled closes (AQ04). */
 export function CloseSettingsKpis({
@@ -54,7 +55,7 @@ export function SchedulesCard(p: Readonly<SchedulesProps>) {
           { key: 'st', header: 'Status', render: (s) => <StatusBadge status={s.status} /> },
           { key: 'run', header: 'Run At', render: (s) => formatDateTime(s.executedAt) },
           { key: 'res', header: 'Outcome', render: (s) => s.result ?? '' },
-          { key: 'by', header: 'Scheduled By', render: (s) => s.scheduledBy },
+          { key: 'by', header: 'Scheduled By', render: (s) => <UserName login={s.scheduledBy} /> },
           {
             key: 'act',
             header: '',
@@ -120,7 +121,7 @@ export function BooksCard(p: Readonly<BooksProps>) {
           {
             key: 'by',
             header: 'Closed',
-            render: (b) => `${b.lockedBy ?? '—'} ${formatDateTime(b.lockedAt)}`,
+            render: (b) => `${displayNameOf(b.lockedBy) || '—'} ${formatDateTime(b.lockedAt)}`,
           },
           { key: 're', header: 'Reopened', render: reopened },
           { key: 'note', header: 'Note', render: (b) => b.note ?? '' },

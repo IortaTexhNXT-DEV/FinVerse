@@ -28,6 +28,7 @@ import { ApproverPicker } from './ApproverPicker';
 import { GroupProfileFields } from './GroupProfileFields';
 import { UserRequestFields } from './UserRequestFields';
 import { DateInput } from '@/components/ui/DateInput';
+import { UserName } from '@/components/ui/UserName';
 
 type Mode = 'draft' | 'submit';
 
@@ -257,7 +258,7 @@ function RequestEditor({ id, initial, saved, users, userIdPattern }: Readonly<Ed
       <ErrorAlert error={save.error} />
       {returned && saved.decisionComment && (
         <div className="alert warning" role="status">
-          Returned by {saved.decidedBy}: {saved.decisionComment}
+          Returned by <UserName login={saved.decidedBy} />: {saved.decisionComment}
         </div>
       )}
       <Card>

@@ -16,6 +16,8 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, humanize } from '@/utils/format';
 import { AutoBookRuleDialog, ServiceInvoiceTypeDialog } from './SetupDialogs';
+import { UserName } from '@/components/ui/UserName';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 type TabId = 'auto' | 'incentive' | 'types';
 
@@ -77,7 +79,11 @@ function AutoBookTab({ companyId, canEdit }: Readonly<{ companyId: number; canEd
         emptyMessage="No auto-book rule: every issued account waits in Ready to Book."
         columns={[
           { key: 'product', header: 'Product', render: (r) => r.productCode ?? ANY },
-          { key: 'segment', header: 'Market Segment', render: (r) => r.marketSegment ?? ANY },
+          {
+            key: 'segment',
+            header: 'Market Segment',
+            render: (r) => <LovLabel type="MARKET_SEGMENT" code={r.marketSegment} empty={ANY} />,
+          },
           { key: 'description', header: 'Description', render: (r) => r.description },
           { key: 'enabled', header: 'Status', render: (r) => onOff(r.enabled) },
         ]}
@@ -125,8 +131,16 @@ function IncentiveTab({ companyId }: Readonly<{ companyId: number }>) {
         emptyMessage="No incentive rules"
         columns={[
           { key: 'product', header: 'Product', render: (r) => r.productCode ?? ANY },
-          { key: 'segment', header: 'Segment', render: (r) => r.marketSegment ?? ANY },
-          { key: 'channel', header: 'Channel', render: (r) => r.sourceChannel ?? ANY },
+          {
+            key: 'segment',
+            header: 'Segment',
+            render: (r) => <LovLabel type="MARKET_SEGMENT" code={r.marketSegment} empty={ANY} />,
+          },
+          {
+            key: 'channel',
+            header: 'Channel',
+            render: (r) => <LovLabel type="SOURCE_CHANNEL" code={r.sourceChannel} empty={ANY} />,
+          },
           {
             key: 'period',
             header: 'Booked',
@@ -185,7 +199,8 @@ function TypesTab({ canEdit }: Readonly<{ canEdit: boolean }>) {
           {
             key: 'owner',
             header: 'Owner',
-            render: (t) => t.ownerUsername ?? t.ownerPermission ?? '',
+            render: (t) =>
+              t.ownerUsername ? <UserName login={t.ownerUsername} /> : (t.ownerPermission ?? ''),
           },
           { key: 'template', header: 'Template', render: (t) => t.templateCode },
           { key: 'active', header: 'Status', render: (t) => onOff(t.active) },

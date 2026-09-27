@@ -6,6 +6,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { InsurerName } from '@/components/broking/LovLabel';
 
 /**
  * "For Placement" (BRNB.069): shows every prerequisite of the selected accounts (payment
@@ -80,7 +81,12 @@ export function GenerateSlipsDialog({
             {
               key: 'insurer',
               header: 'Insurer',
-              render: (r) => [r.insurerCode, r.insurerBranch].filter(Boolean).join(' / ') || '—',
+              render: (r) => (
+                <>
+                  <InsurerName code={r.insurerCode} />
+                  {r.insurerBranch ? ` / ${r.insurerBranch}` : ''}
+                </>
+              ),
             },
             {
               key: 'ready',

@@ -12,6 +12,7 @@ import { Field } from '@/components/ui/Field';
 import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDate } from '@/utils/format';
 import { selectionBalance } from './receivablesMath';
+import { UserName } from '@/components/ui/UserName';
 
 interface WorkbenchProps {
   companyId: number;
@@ -202,7 +203,7 @@ export function MatchWorkbench({ companyId, bank, asOf }: Readonly<WorkbenchProp
               numeric: true,
               render: (m) => <Amount value={m.amount} />,
             },
-            { key: 'by', header: 'By', render: (m) => m.createdBy },
+            { key: 'by', header: 'By', render: (m) => <UserName login={m.createdBy} /> },
             {
               key: 'undo',
               header: 'Undo',

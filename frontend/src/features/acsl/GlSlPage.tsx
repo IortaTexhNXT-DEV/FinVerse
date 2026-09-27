@@ -19,6 +19,7 @@ import type { GlSlRow, GlSlRun } from './api';
 import { GlSlControlsCard } from './GlSlControlsCard';
 import './acsl.css';
 import { DateInput } from '@/components/ui/DateInput';
+import { UserName } from '@/components/ui/UserName';
 
 const RUN_COLUMNS: Column<GlSlRun>[] = [
   {
@@ -31,7 +32,7 @@ const RUN_COLUMNS: Column<GlSlRun>[] = [
       </>
     ),
   },
-  { key: 'by', header: 'Run By', render: (r) => r.runBy },
+  { key: 'by', header: 'Run By', render: (r) => <UserName login={r.runBy} /> },
   { key: 'accounts', header: 'Accounts', numeric: true, render: (r) => r.accounts },
   { key: 'differences', header: 'Differences', numeric: true, render: (r) => r.differences },
   {

@@ -45,7 +45,12 @@ export function ClientStep({ form, set, errors, saved }: Readonly<QuotationStepP
           />
         )}
       </Field>
-      <Field label="Market segment">
+      <Field
+        label="Market segment"
+        required
+        error={errors.marketSegment}
+        hint="Taken from the client; required to submit the quotation."
+      >
         {(id) => (
           <LovSelect
             id={id}

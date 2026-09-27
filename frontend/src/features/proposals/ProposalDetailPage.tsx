@@ -37,6 +37,7 @@ import {
 } from './ProposalTabs';
 import { ResponsesTab } from './ResponsesTab';
 import '@/styles/quotation.css';
+import { ProductLineLabel, InsurerNames } from '@/components/broking/LovLabel';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -57,7 +58,11 @@ const TSU_EDIT: ProposalStatus[] = ['WITH_TSU', 'QS_PREPARATION'];
 function facts(p: Proposal): Fact[] {
   return [
     { icon: User, label: 'Client', value: `${p.clientCode} – ${p.clientName}` },
-    { icon: Layers, label: 'Product', value: `${p.productCode} (${p.lineCode})` },
+    {
+      icon: Layers,
+      label: 'Product',
+      value: <ProductLineLabel product={p.productCode} line={p.lineCode} />,
+    },
     {
       icon: CalendarRange,
       label: 'Period',
@@ -68,7 +73,11 @@ function facts(p: Proposal): Fact[] {
       label: 'Total sum insured',
       value: `${p.currency} ${formatAmount(p.totalSumInsured)}`,
     },
-    { icon: Building2, label: 'Insurers', value: p.insurers.join(', ') || 'To be selected' },
+    {
+      icon: Building2,
+      label: 'Insurers',
+      value: <InsurerNames codes={p.insurers} empty="To be selected" />,
+    },
     {
       icon: FileSignature,
       label: 'Slips',

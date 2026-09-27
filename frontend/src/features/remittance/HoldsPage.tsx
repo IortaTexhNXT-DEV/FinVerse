@@ -23,6 +23,7 @@ import { TemplateButton, UploadForm } from './RemittanceParts';
 import { HOLD_TABS, HOLD_TEMPLATE, stagesOf } from './remittanceLabels';
 import type { HoldTab } from './remittanceLabels';
 import './remittance.css';
+import { UserName } from '@/components/ui/UserName';
 
 const COLUMNS: Column<Hold>[] = [
   {
@@ -32,7 +33,7 @@ const COLUMNS: Column<Hold>[] = [
       <>
         <strong>{h.requestNo}</strong>
         <div className="remit-muted">
-          {h.source === 'COLLECTION_FEED' ? 'Collection file' : h.requestedBy}
+          {h.source === 'COLLECTION_FEED' ? 'Collection file' : <UserName login={h.requestedBy} />}
         </div>
       </>
     ),

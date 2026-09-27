@@ -26,6 +26,8 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { GROUP_TYPES, REQUEST_TYPE_LABELS, USER_TYPES } from './accessRequest';
+import { UserName } from '@/components/ui/UserName';
+import { TypedInput } from '@/components/ui/DateInput';
 
 const STATUSES: AccessRequestStatus[] = [
   'DRAFT',
@@ -85,7 +87,7 @@ function Filters({
   const input = (label: string, key: 'requester' | 'approver' | 'from' | 'to', date = false) => (
     <Field label={label}>
       {(id) => (
-        <input
+        <TypedInput
           id={id}
           className="input"
           type={date ? 'date' : 'text'}
@@ -145,12 +147,12 @@ const COLUMNS: Column<AccessRequest>[] = [
   { key: 'no', header: 'Request', render: (r) => <strong className="mono">{r.requestNo}</strong> },
   { key: 'type', header: 'Type', render: (r) => REQUEST_TYPE_LABELS[r.type] },
   { key: 'summary', header: 'Change', render: (r) => r.summary },
-  { key: 'by', header: 'Requested By', render: (r) => r.requestedBy },
+  { key: 'by', header: 'Requested By', render: (r) => <UserName login={r.requestedBy} /> },
   { key: 'at', header: 'Requested', render: (r) => formatDateTime(r.requestedAt) },
   {
     key: 'approver',
     header: 'Approver',
-    render: (r) => r.lifecycle.assignedApprover ?? r.decidedBy ?? '',
+    render: (r) => <UserName login={r.lifecycle.assignedApprover ?? r.decidedBy} empty="" />,
   },
   { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
 ];

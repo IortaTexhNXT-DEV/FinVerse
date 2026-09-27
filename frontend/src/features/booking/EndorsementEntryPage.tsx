@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { useShownErrors } from '@/components/ui/useShownErrors';
 import { useToast } from '@/components/ui/toastContext';
 import { today } from '@/utils/format';
 import { JournalLines, PremiumTables } from './BookingParts';
@@ -38,7 +39,7 @@ function AmountFields({
 }: Readonly<{
   form: EndorsementForm;
   errors: FieldErrors;
-  onChange: (f: EndorsementForm) => void;
+  onChange: (f: EndorsementForm, field: keyof EndorsementForm) => void;
 }>) {
   return (
     <>
@@ -48,7 +49,7 @@ function AmountFields({
             id={id}
             className="select"
             value={form.basis}
-            onChange={(e) => onChange({ ...form, basis: e.target.value as PeriodBasis })}
+            onChange={(e) => onChange({ ...form, basis: e.target.value as PeriodBasis }, 'basis')}
           >
             {BASES.map((b) => (
               <option key={b} value={b}>
@@ -71,7 +72,9 @@ function AmountFields({
             type="number"
             step="0.01"
             value={form.sumInsuredChange}
-            onChange={(e) => onChange({ ...form, sumInsuredChange: e.target.value })}
+            onChange={(e) =>
+              onChange({ ...form, sumInsuredChange: e.target.value }, 'sumInsuredChange')
+            }
           />
         )}
       </Field>
@@ -83,7 +86,7 @@ function AmountFields({
             type="number"
             step="0.0001"
             value={form.ratePercent}
-            onChange={(e) => onChange({ ...form, ratePercent: e.target.value })}
+            onChange={(e) => onChange({ ...form, ratePercent: e.target.value }, 'ratePercent')}
           />
         )}
       </Field>
@@ -115,6 +118,11 @@ export default function EndorsementEntryPage() {
   });
   const errors = endorsementErrors(form);
   const valid = isValid(errors);
+  const { shown, touch, attempt } = useShownErrors(errors);
+  const change = (next: EndorsementForm, field: keyof EndorsementForm) => {
+    touch(field);
+    setForm(next);
+  };
   const request = endorsementRequest(arn, form);
   const preview = useQuery({
     queryKey: ['booking', 'endorsement-preview', request],
@@ -148,8 +156,12 @@ export default function EndorsementEntryPage() {
             <ReferenceChip label="ARN" value={arn} />
             <Button
               busy={post.isPending}
-              disabled={!valid || arn === ''}
-              onClick={() => post.mutate()}
+              disabled={arn === ''}
+              onClick={() => {
+                if (attempt()) {
+                  post.mutate();
+                }
+              }}
             >
               Post Endorsement
             </Button>
@@ -175,12 +187,14 @@ export default function EndorsementEntryPage() {
               </select>
             )}
           </Field>
-          <Field label="Effective date" required error={errors.effectiveDate}>
+          <Field label="Effective date" required error={shown.effectiveDate}>
             {(id) => (
               <DateInput
                 id={id}
                 value={form.effectiveDate}
-                onChange={(e) => setForm({ ...form, effectiveDate: e.target.value })}
+                onChange={(e) =>
+                  change({ ...form, effectiveDate: e.target.value }, 'effectiveDate')
+                }
               />
             )}
           </Field>
@@ -195,10 +209,10 @@ export default function EndorsementEntryPage() {
             )}
           </Field>
           {form.type !== 'NON_FINANCIAL' && (
-            <AmountFields form={form} errors={errors} onChange={setForm} />
+            <AmountFields form={form} errors={shown} onChange={change} />
           )}
         </div>
-        <Field label="Description" required error={errors.description}>
+        <Field label="Description" required error={shown.description}>
           {(id) => (
             <textarea
               id={id}
@@ -206,7 +220,7 @@ export default function EndorsementEntryPage() {
               rows={2}
               maxLength={1000}
               value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              onChange={(e) => change({ ...form, description: e.target.value }, 'description')}
             />
           )}
         </Field>

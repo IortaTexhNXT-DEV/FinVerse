@@ -15,6 +15,7 @@ import { humanize } from '@/utils/format';
 import { RecordActions } from './RecordActions';
 import { RuleEditorModal } from './RuleEditorModal';
 import type { RuleKind } from './RuleEditorModal';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 const scope = (r: { scope: string; scopeCode: string }) =>
   r.scope === 'ALL' ? 'All products' : `${humanize(r.scope)} ${r.scopeCode}`;
@@ -76,7 +77,11 @@ function DocumentRules() {
           {
             key: 'd',
             header: 'Document',
-            render: (r) => <strong>{humanize(r.documentType)}</strong>,
+            render: (r) => (
+              <strong>
+                <LovLabel type="DOCUMENT_TYPE" code={r.documentType} />
+              </strong>
+            ),
           },
           {
             key: 'r',
@@ -143,7 +148,7 @@ export function CatalogRulesPanel({ kind }: Readonly<{ kind: RuleKind }>) {
       title={TITLES[kind]}
       flush
       actions={
-        can('MASTER_MAINTAIN') && (
+        (can('MASTER_MAINTAIN') || can('PRODUCT_MAINTAIN')) && (
           <Button
             size="sm"
             variant="secondary"

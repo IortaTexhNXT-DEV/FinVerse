@@ -14,6 +14,8 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { TextInput } from '@/features/assets/FormControls';
 import { formatDateTime, humanize } from '@/utils/format';
+import { displayNameOf } from '@/api/users';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 const GROUPS = ['MARKETING', 'TSU', 'MBS', 'PROCESSING', 'OPERATIONS'];
 
@@ -156,7 +158,7 @@ function AdvisoryCard({
         <p className="muted">
           {humanize(advisory.type)} · to {advisory.groups.map(humanize).join(', ')}
           {advisory.sentAt &&
-            ` · sent ${formatDateTime(advisory.sentAt)} by ${advisory.sentBy ?? ''}`}
+            ` · sent ${formatDateTime(advisory.sentAt)} by ${displayNameOf(advisory.sentBy)}`}
         </p>
         <p className="message-body">{advisory.body}</p>
         <ul className="checklist">
@@ -167,7 +169,7 @@ function AdvisoryCard({
               ) : (
                 <CircleAlert size={16} className="text-danger" aria-label="Missing" />
               )}{' '}
-              {humanize(d.documentType)}
+              <LovLabel type="DOCUMENT_TYPE" code={d.documentType} />
             </li>
           ))}
         </ul>

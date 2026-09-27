@@ -16,6 +16,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, humanize } from '@/utils/format';
 import { JournalLines } from './BookingParts';
 import { labelOf } from './bookingForm';
+import { UserName } from '@/components/ui/UserName';
 
 /** Posted journal lines of an invoice, with links to the journals. */
 export function JournalTab({ invoice }: Readonly<{ invoice: BookedInvoice }>) {
@@ -162,7 +163,7 @@ export function EndorsementTable({
         { key: 'effective', header: 'Effective', render: (e) => formatDate(e.effectiveDate) },
         { key: 'description', header: 'Description', render: (e) => e.description },
         { key: 'invoice', header: 'Invoice No.', render: (e) => e.invoiceNo ?? 'Not financial' },
-        { key: 'by', header: 'By', render: (e) => e.createdBy },
+        { key: 'by', header: 'By', render: (e) => <UserName login={e.createdBy} /> },
       ]}
     />
   );

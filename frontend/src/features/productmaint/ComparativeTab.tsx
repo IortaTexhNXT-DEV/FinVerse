@@ -118,7 +118,7 @@ function ClientViewDialog({
           </div>
         </fieldset>
         <p className="muted">
-          A client view is derived from the current master and never changes a value (PMADD03).
+          A client view is derived from the current master and never changes a value.
         </p>
       </div>
     </Modal>

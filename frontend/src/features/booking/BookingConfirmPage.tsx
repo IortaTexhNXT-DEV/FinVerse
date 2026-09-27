@@ -19,6 +19,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDate, today } from '@/utils/format';
 import { JournalLines, PremiumTables, SummaryFact } from './BookingParts';
 import { DateInput } from '@/components/ui/DateInput';
+import { ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
 
 interface Options {
   bookingDate: string;
@@ -142,13 +143,13 @@ function AccountSummary({
           {a.clientName} <span className="muted">{a.clientCode}</span>
         </SummaryFact>
         <SummaryFact icon={Building2} label="Insurer">
-          {a.insurerCode} {a.insurerBranch}
+          <InsurerName code={a.insurerCode} /> {a.insurerBranch}
         </SummaryFact>
         <SummaryFact icon={CalendarRange} label="Period">
           {formatDate(a.periodFrom)} – {formatDate(a.periodTo)}
         </SummaryFact>
         <SummaryFact icon={Landmark} label="Product">
-          {a.productCode} · {a.lineCode}
+          <ProductLineLabel product={a.productCode} line={a.lineCode} />
         </SummaryFact>
         <SummaryFact icon={BadgeCheck} label="Status">
           <StatusBadge status={a.status} />

@@ -23,9 +23,10 @@ import {
   newDraft,
   stepProblems,
   toAccountInput,
+  unsavedReviewText,
   WIZARD_STEPS,
 } from './accountForm';
-import type { AccountDraft, WizardStep } from './accountForm';
+import type { AccountDraft, DraftSaveState, WizardStep } from './accountForm';
 import { PremiumSummary } from './PremiumSummary';
 import { RiskItemsStep } from './RiskItemsStep';
 import { useAutosave } from './useAutosave';
@@ -97,7 +98,13 @@ function StepBody({
   step,
   props,
   detail,
-}: Readonly<{ step: WizardStep; props: StepProps; detail?: ProductDetail }>) {
+  saveState,
+}: Readonly<{
+  step: WizardStep;
+  props: StepProps;
+  detail?: ProductDetail;
+  saveState: DraftSaveState;
+}>) {
   const { draft, set } = props;
   switch (step) {
     case 'client':
@@ -120,7 +127,7 @@ function StepBody({
       return <ContactStep {...props} />;
     default:
       return draft.id === undefined ? (
-        <p className="muted">Choose the client and product to save the draft.</p>
+        <p className="muted">{unsavedReviewText(draft, saveState)}</p>
       ) : (
         <AccountCheckPanel accountId={draft.id} />
       );
@@ -270,7 +277,12 @@ function Wizard({
       <Stepper step={step} onStep={go} />
       <Feedback error={save.error ?? submit.error} problems={problems} />
       <Card title={WIZARD_STEPS.find((s) => s.id === step)?.label}>
-        <StepBody step={step} props={stepProps} detail={product.data} />
+        <StepBody
+          step={step}
+          props={stepProps}
+          detail={product.data}
+          saveState={{ pending: save.isPending, error: save.error }}
+        />
       </Card>
       {step === 'review' && draft.id !== undefined && (
         <>

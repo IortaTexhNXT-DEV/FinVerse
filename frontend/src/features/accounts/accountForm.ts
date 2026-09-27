@@ -325,3 +325,29 @@ export function criteriaOf(panel: SearchPanelValues, quick: QuickFilter): Accoun
 export function panelOf(status: string | null): SearchPanelValues {
   return { ...EMPTY_PANEL, status: status ?? '' };
 }
+
+/** State of an unsaved draft on the review step. */
+export interface DraftSaveState {
+  pending: boolean;
+  error: unknown;
+}
+
+/**
+ * What the review step says while the draft has no id yet: saving, refused as a duplicate,
+ * refused for another reason, or still missing its client or product.
+ */
+export function unsavedReviewText(draft: AccountDraft, state: DraftSaveState): string {
+  if (state.pending) {
+    return 'Saving the draft…';
+  }
+  if (duplicateArns(state.error).length > 0) {
+    return 'The draft was not saved: its risks are already on the account shown above. Change the risk items, or open the existing account instead.';
+  }
+  if (state.error) {
+    return 'The draft was not saved: correct what the message above describes, then save the draft again.';
+  }
+  if (!canSave(draft)) {
+    return 'Choose the client and product to save the draft.';
+  }
+  return 'The draft is not saved yet: click Save Draft to check it before submission.';
+}

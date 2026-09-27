@@ -5,8 +5,9 @@ import type { RowSelection } from '@/components/broking/rowSelection';
 import { DataTable } from '@/components/ui/DataTable';
 import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
 import { rowKeyOf } from './issuanceLogic';
+import { LovLabel, LineLabel, InsurerName } from '@/components/broking/LovLabel';
 
 function tabColumn(tab: IssuanceTab): Column<IssuanceRow> {
   if (tab === 'REVIEW' || tab === 'READY_TO_DISPATCH') {
@@ -29,7 +30,7 @@ function tabColumn(tab: IssuanceTab): Column<IssuanceRow> {
     return {
       key: 'mortgagee',
       header: 'Mortgagee',
-      render: (r) => humanize(r.mortgageeBank ?? ''),
+      render: (r) => <LovLabel type="MORTGAGEE_BANK" code={r.mortgageeBank} empty="" />,
     };
   }
   return {
@@ -76,9 +77,9 @@ export function IssuanceTable({
       header: 'Product Line',
       render: (r) => (
         <span>
-          {humanize(r.lineCode)}
+          <LineLabel code={r.lineCode} />
           <span className="cell-sub">
-            {r.productCode} · {r.insurerCode ?? '—'}
+            {r.productCode} · <InsurerName code={r.insurerCode} />
           </span>
         </span>
       ),

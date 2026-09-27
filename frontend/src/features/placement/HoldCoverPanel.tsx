@@ -13,6 +13,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate } from '@/utils/format';
 import { DateInput } from '@/components/ui/DateInput';
+import { InsurerName } from '@/components/broking/LovLabel';
 
 type Mode = 'request' | 'confirm' | 'decline';
 
@@ -179,7 +180,11 @@ export function HoldCoverPanel({
         emptyMessage="No hold cover requested."
         columns={[
           { key: 'status', header: 'Status', render: (h) => <StatusBadge status={h.status} /> },
-          { key: 'insurer', header: 'Insurer', render: (h) => h.insurerCode },
+          {
+            key: 'insurer',
+            header: 'Insurer',
+            render: (h) => <InsurerName code={h.insurerCode} />,
+          },
           {
             key: 'period',
             header: 'Period',

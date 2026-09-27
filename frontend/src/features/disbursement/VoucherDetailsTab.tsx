@@ -16,6 +16,7 @@ import { MODE_LABELS, MODES } from './labels';
 import './disbursement.css';
 import { UserName } from '@/components/ui/UserName';
 import { DateInput } from '@/components/ui/DateInput';
+import { displayNameOf } from '@/api/users';
 
 function termsOf(v: Voucher): TermsInput {
   return {
@@ -57,7 +58,13 @@ function ReadOnly({ voucher }: Readonly<{ voucher: Voucher }>) {
       <dt>Cost centre / expense account</dt>
       <dd>{slashed(voucher.costCenter, voucher.expenseAccount)}</dd>
       <dt>Processor / checker / approver</dt>
-      <dd>{slashed(voucher.submittedBy, voucher.reviewedBy, voucher.approvedBy)}</dd>
+      <dd>
+        {slashed(
+          displayNameOf(voucher.submittedBy) || undefined,
+          displayNameOf(voucher.reviewedBy) || undefined,
+          displayNameOf(voucher.approvedBy) || undefined,
+        )}
+      </dd>
       <dt>Journal / reversal</dt>
       <dd>{slashed(voucher.journalNo, voucher.cancelJournalNo)}</dd>
       {voucher.cancelReason !== undefined && (

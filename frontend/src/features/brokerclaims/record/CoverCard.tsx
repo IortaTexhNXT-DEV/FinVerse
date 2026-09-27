@@ -6,6 +6,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, humanize } from '@/utils/format';
 import type { ClaimDraft, PremiumCheck, UnpaidInvoice } from '../cover/api';
 import { PREMIUM_LABELS } from './recordLogic';
+import { displayNameOf } from '@/api/users';
 
 /** The premium check of a cover with the invoices not fully paid (BRCLM.001). */
 export function PremiumPanel({ premium }: Readonly<{ premium: PremiumCheck }>) {
@@ -84,7 +85,7 @@ export function CoverCard({ draft }: Readonly<{ draft: ClaimDraft }>) {
           {
             icon: UserRound,
             label: 'Marketing Team / AO',
-            value: `${draft.salesTeam ?? '—'} · ${draft.accountOfficer ?? '—'}`,
+            value: `${draft.salesTeam ?? '—'} · ${displayNameOf(draft.accountOfficer) || '—'}`,
           },
           {
             icon: FileText,

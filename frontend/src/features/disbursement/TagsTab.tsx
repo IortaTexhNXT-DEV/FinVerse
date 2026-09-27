@@ -17,6 +17,7 @@ import type { Tag, Voucher } from './api';
 import { DialogFooter } from './VoucherDialogs';
 import './disbursement.css';
 import { DateInput } from '@/components/ui/DateInput';
+import { UserName } from '@/components/ui/UserName';
 
 const COLUMNS: Column<Tag>[] = [
   { key: 'kind', header: 'Tag', render: (t) => (t.kind === 'OR_AR' ? 'OR / AR' : 'CWT') },
@@ -36,7 +37,7 @@ const COLUMNS: Column<Tag>[] = [
     render: (t) => formatDate(t.receivedOn ?? t.releasedOn),
   },
   { key: 'amount', header: 'Amount', numeric: true, render: (t) => <Amount value={t.amount} /> },
-  { key: 'by', header: 'Tagged By', render: (t) => t.taggedBy },
+  { key: 'by', header: 'Tagged By', render: (t) => <UserName login={t.taggedBy} /> },
 ];
 
 type Kind = 'receipt' | 'cwt';

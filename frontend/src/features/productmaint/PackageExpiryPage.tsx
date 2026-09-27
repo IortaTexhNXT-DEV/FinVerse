@@ -199,7 +199,7 @@ export default function PackageExpiryPage() {
             <EmptyState message="Expired packages are archived in the catalog" />
             <p className="muted">
               Open <Link to="/catalog/products">Products</Link> with the Expired filter to read an
-              expired package and its version history; reactivation is a REACTIVATE request.
+              expired package and its version history; a reactivation request brings it back.
             </p>
           </div>
         ) : (

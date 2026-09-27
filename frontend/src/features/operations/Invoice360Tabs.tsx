@@ -16,6 +16,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
 import { componentLabel, premiumTotals, visibleComponents } from './opsLabels';
 import { displayNameOf } from '@/api/users';
+import { UserName } from '@/components/ui/UserName';
 
 const COMPONENT_COLUMNS: Column<InvoiceComponentRow>[] = [
   { key: 'c', header: 'Component', render: (r) => componentLabel(r.component) },
@@ -70,7 +71,7 @@ const HISTORY_COLUMNS: Column<StatusChange>[] = [
   { key: 'v', header: 'Change', render: (c) => `${c.from ?? '-'} → ${c.to ?? '-'}` },
   { key: 'm', header: 'Module', render: (c) => humanize(c.module) },
   { key: 'r', header: 'Reason', render: (c) => c.reason ?? '' },
-  { key: 'u', header: 'By', render: (c) => c.changedBy },
+  { key: 'u', header: 'By', render: (c) => <UserName login={c.changedBy} /> },
 ];
 
 const RELATED_COLUMNS: Column<RelatedItem>[] = [

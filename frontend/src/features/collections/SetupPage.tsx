@@ -15,6 +15,7 @@ import { humanize } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { DispositionValue } from './api';
 import './collections.css';
+import { UserName } from '@/components/ui/UserName';
 
 /** Attributes each LOV type carries (V1000). */
 const ATTRIBUTES: Record<string, string[]> = {
@@ -132,7 +133,7 @@ export default function SetupPage() {
             { key: 'k', header: 'Parameter', render: (p) => <strong>{p.key}</strong> },
             { key: 'v', header: 'Value', render: (p) => p.value },
             { key: 'd', header: 'Description', render: (p) => p.description },
-            { key: 'u', header: 'Changed By', render: (p) => p.updatedBy },
+            { key: 'u', header: 'Changed By', render: (p) => <UserName login={p.updatedBy} /> },
           ]}
           rows={s?.parameters ?? []}
           rowKey={(p) => p.key}
@@ -224,7 +225,7 @@ export default function SetupPage() {
             {
               key: 'h',
               header: 'Unit Head',
-              render: (u) => u.headUsername ?? 'From the parent unit',
+              render: (u) => <UserName login={u.headUsername} empty="From the parent unit" />,
             },
           ]}
           rows={s?.units ?? []}

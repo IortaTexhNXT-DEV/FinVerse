@@ -14,6 +14,7 @@ import { BrsView } from './BrsView';
 import { MatchWorkbench } from './MatchWorkbench';
 import { bankOptions, useReceivablesLookups } from './useReceivablesLookups';
 import { DateInput } from '@/components/ui/DateInput';
+import { UserName } from '@/components/ui/UserName';
 
 const TABS = [
   { id: 'match', label: 'Match workbench' },
@@ -115,7 +116,11 @@ export default function BankReconciliationPage() {
                   <StatusBadge status={r.status === 'FINALIZED' ? 'RECONCILED' : r.status} />
                 ),
               },
-              { key: 'by', header: 'Finalized by', render: (r) => r.finalizedBy ?? '' },
+              {
+                key: 'by',
+                header: 'Finalized by',
+                render: (r) => <UserName login={r.finalizedBy} empty="" />,
+              },
             ]}
           />
         </Card>

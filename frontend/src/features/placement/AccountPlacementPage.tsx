@@ -16,12 +16,13 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
-import { formatAmount, formatDateTime, humanize } from '@/utils/format';
+import { formatAmount, formatDateTime, humanize, formatDate } from '@/utils/format';
 import { GatePanel } from './GatePanel';
 import { HoldCoverPanel } from './HoldCoverPanel';
 import { PlacementActions } from './PlacementActions';
 import { SlipActions } from './SlipActions';
 import { displayNameOf } from '@/api/users';
+import { ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
 
 const TABS = [
   { id: 'gate', label: 'Payment Gate' },
@@ -53,10 +54,11 @@ function Summary({ account, view }: Readonly<{ account: Account; view: Placement
     <Card>
       <div className="grid-2">
         <Fact icon={<FileStack size={16} aria-hidden="true" />} label="Product">
-          {account.productCode} · {humanize(account.lineCode)}
+          <ProductLineLabel product={account.productCode} line={account.lineCode} />
         </Fact>
         <Fact icon={<Building2 size={16} aria-hidden="true" />} label="Insurer">
-          {[account.insurerCode, account.insurerBranch].filter(Boolean).join(' / ') || '—'}
+          <InsurerName code={account.insurerCode} />
+          {account.insurerBranch ? ` / ${account.insurerBranch}` : ''}
         </Fact>
         <Fact icon={<Wallet size={16} aria-hidden="true" />} label="Gross premium">
           {account.currency} {formatAmount(account.premium.grossPremium)}
@@ -68,7 +70,7 @@ function Summary({ account, view }: Readonly<{ account: Account; view: Placement
           {slip ? `${slip.displayNo} (${humanize(slip.status)})` : 'Not generated'}
         </Fact>
         <Fact icon={<CalendarClock size={16} aria-hidden="true" />} label="Hold cover">
-          {hold ? `${humanize(hold.status)} until ${hold.expiryDate}` : '—'}
+          {hold ? `${humanize(hold.status)} until ${formatDate(hold.expiryDate)}` : '—'}
         </Fact>
       </div>
     </Card>
@@ -89,7 +91,11 @@ function SlipsTable({ slips, onChanged }: Readonly<{ slips: Slip[]; onChanged: (
           {
             key: 'insurer',
             header: 'Insurer',
-            render: (s) => `${s.insurerCode} / ${s.branchCode}`,
+            render: (s) => (
+              <>
+                <InsurerName code={s.insurerCode} /> / {s.branchCode}
+              </>
+            ),
           },
           {
             key: 'sent',

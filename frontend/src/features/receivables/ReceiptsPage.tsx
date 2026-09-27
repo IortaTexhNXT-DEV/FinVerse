@@ -17,6 +17,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, humanize } from '@/utils/format';
 import { DateInput } from '@/components/ui/DateInput';
+import { UserName } from '@/components/ui/UserName';
 
 const STATUSES = ['', 'PENDING_APPROVAL', 'APPROVED', 'REJECTED', 'CANCELLED', 'BOUNCED'];
 const MODES = ['', 'CASH', 'CHEQUE', 'BANK_TRANSFER', 'CARD', 'PDC'];
@@ -164,7 +165,7 @@ export default function ReceiptsPage() {
               numeric: true,
               render: (r) => <Amount value={r.unappliedAmount} />,
             },
-            { key: 'by', header: 'Maker', render: (r) => r.createdBy },
+            { key: 'by', header: 'Maker', render: (r) => <UserName login={r.createdBy} /> },
             { key: 'st', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
             { key: 'dep', header: 'Deposit', render: (r) => humanize(r.depositStatus) },
           ]}

@@ -24,7 +24,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
 import { SelectInput, TextInput } from '@/features/assets/FormControls';
-import { formatAmount, formatCompact, today } from '@/utils/format';
+import { formatAmount, formatCompact, today, formatDate } from '@/utils/format';
 import { RESERVE_ORDER, reserveByLine, reserveLabel, totalsByReserve } from './reserveMath';
 
 const CHART_HEIGHT = 300;
@@ -32,6 +32,11 @@ const RESERVE_OPTIONS = RESERVE_ORDER.map((r) => ({ value: r, label: reserveLabe
 
 function netOf(totals: ReturnType<typeof totalsByReserve>, ...codes: string[]): number {
   return totals.filter((t) => codes.includes(t.reserve)).reduce((s, t) => s + t.net, 0);
+}
+
+/** The previous posted valuation of the summary line, or that there is none. */
+function previousText(date: string | undefined): string {
+  return date ? formatDate(date) : 'no previous posted valuation';
 }
 
 /** Technical reserves dashboard: gross vs net per reserve and line of business, vs last month. */
@@ -57,7 +62,7 @@ export default function ReserveDashboardPage() {
         title="Reserve Summary"
         description={
           summary.data?.currentDate
-            ? `Valuation ${summary.data.currentDate}, compared with ${summary.data.previousDate ?? 'no previous posted valuation'}`
+            ? `Valuation ${formatDate(summary.data.currentDate)}, compared with ${previousText(summary.data.previousDate)}`
             : 'No valuation run on or before the selected date'
         }
         actions={

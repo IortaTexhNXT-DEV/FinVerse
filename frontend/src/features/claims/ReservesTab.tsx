@@ -13,6 +13,7 @@ import { formatDate, humanize } from '@/utils/format';
 import type { ClaimActions } from './claimWorkflow';
 import { DocumentActions } from './DocumentActions';
 import { ReserveDialog } from './ReserveDialog';
+import { UserName } from '@/components/ui/UserName';
 
 export interface ClaimTabProps {
   claim: Claim;
@@ -80,7 +81,11 @@ export function ReservesTab({ claim, actions, onChange }: Readonly<ClaimTabProps
             header: 'Reason',
             render: (r) => (r.systemGenerated ? `${r.reason} (system)` : r.reason),
           },
-          { key: 'by', header: 'Entered by', render: (r) => r.approval.submittedBy },
+          {
+            key: 'by',
+            header: 'Entered by',
+            render: (r) => <UserName login={r.approval.submittedBy} />,
+          },
           {
             key: 'date',
             header: 'Accounting Date',

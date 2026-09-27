@@ -17,10 +17,14 @@ import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,9 +182,27 @@ class MigrationArchiveInquiryApiIT {
             .getContentAsByteArray();
     assertThat(file).isEqualTo(PDF);
 
-    api.download(
-            "legacyaudit", INQUIRY + "/export?companyId=" + company + "&invoiceNo=I" + t + REASON)
-        .andExpect(status().isOk());
+    byte[] export =
+        api.download(
+                "legacyaudit",
+                INQUIRY + "/export?companyId=" + company + "&invoiceNo=I" + t + REASON)
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+    // The export shows the legacy status and record type in words, with the stored status beside.
+    try (XSSFWorkbook wb = new XSSFWorkbook(new ByteArrayInputStream(export))) {
+      Row header = wb.getSheetAt(0).getRow(0);
+      Row first = wb.getSheetAt(0).getRow(1);
+      List<String> heads = new ArrayList<>();
+      header.forEach(c -> heads.add(c.getStringCellValue()));
+      assertThat(first.getCell(heads.indexOf("Record type")).getStringCellValue())
+          .isEqualTo("Invoice");
+      assertThat(first.getCell(heads.indexOf("Status")).getStringCellValue())
+          .isEqualTo("Fully paid");
+      assertThat(first.getCell(heads.indexOf("Status stored in legacy")).getStringCellValue())
+          .isEqualTo("PAID");
+    }
     api.doGet("legacyaudit", INQUIRY + "/access-log?companyId=" + company)
         .andExpect(status().isForbidden());
 

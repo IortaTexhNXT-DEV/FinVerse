@@ -50,3 +50,36 @@ update mig_rule set description = 'The next number is the last used number + 1 a
 update mig_layout_column set description = 'Marks the legacy control accounts whose balance F01 or F02 carries in detail' where seq = 5 and layout_id = (select id from mig_layout where code = 'R08' and version_no = 1);
 update mig_layout_column set allowed_values = 'legacy_invoice_no of F01 or legacy_upp_ref of F02' where seq = 5 and layout_id = (select id from mig_layout where code = 'G03D' and version_no = 1);
 update mig_code_map_set set name = 'Legacy values of the list ID type' where code = 'LOV:ID_TYPE';
+
+-- Legacy status of an archive record: the Legacy Inquiry shows its label, with the value kept from legacy in the
+-- tooltip. A status not in the list reads as the legacy value in words; the list is maintained by the Data Steward.
+insert into lov_type (code, name, description, maintainable, owner_permission, created_at, created_by)
+values ('LEGACY_RECORD_STATUS', 'Legacy record status', 'Status of a legacy archive record as the legacy system stored it',
+        true, 'MIG_MAPPING_EDIT', now(), 'SYSTEM')
+on conflict (code) do nothing;
+
+insert into lov_value (type_code, code, label, sort_order, parent_code, effective_from, record_status,
+                       authorized_by, authorized_at, created_at, created_by)
+select v.type_code, v.code, v.label, v.sort_order, null, date '2020-01-01', 'ACTIVE', 'SYSTEM',
+       now(), now(), 'SYSTEM'
+from (values
+    ('LEGACY_RECORD_STATUS', 'OPEN', 'Open', 10),
+    ('LEGACY_RECORD_STATUS', 'UNPAID', 'Unpaid', 20),
+    ('LEGACY_RECORD_STATUS', 'PARTIAL', 'Partly paid', 30),
+    ('LEGACY_RECORD_STATUS', 'PAID', 'Fully paid', 40),
+    ('LEGACY_RECORD_STATUS', 'CLOSED', 'Closed', 50),
+    ('LEGACY_RECORD_STATUS', 'CANCELLED', 'Cancelled', 60),
+    ('LEGACY_RECORD_STATUS', 'REVERSED', 'Reversed', 70),
+    ('LEGACY_RECORD_STATUS', 'VOID', 'Voided', 80),
+    ('LEGACY_RECORD_STATUS', 'WRITTEN_OFF', 'Written off', 90),
+    ('LEGACY_RECORD_STATUS', 'IF', 'In force', 100),
+    ('LEGACY_RECORD_STATUS', 'EXPIRED', 'Expired', 110),
+    ('LEGACY_RECORD_STATUS', 'LAPSED', 'Lapsed', 120),
+    ('LEGACY_RECORD_STATUS', 'RENEWED', 'Renewed', 130),
+    ('LEGACY_RECORD_STATUS', 'POSTED', 'Posted', 140),
+    ('LEGACY_RECORD_STATUS', 'REMITTED', 'Remitted to the insurer', 150),
+    ('LEGACY_RECORD_STATUS', 'SETTLED', 'Settled', 160),
+    ('LEGACY_RECORD_STATUS', 'ACTIVE', 'Active', 170),
+    ('LEGACY_RECORD_STATUS', 'INACTIVE', 'Inactive', 180)
+) as v(type_code, code, label, sort_order)
+where not exists (select 1 from lov_value x where x.type_code = v.type_code and x.code = v.code);

@@ -1,8 +1,7 @@
 import type { AccessRequest, RoleInfo, UserAccess } from '@/api/nbadmin';
 import { stageSteps } from '@/components/broking/stageSteps';
+import { accessRequestMoves, accessRequestStages } from './accessStages';
 import {
-  accessRequestMoves,
-  accessRequestStages,
   EMPTY_ACCESS_REQUEST,
   fromAccessRequest,
   isCancellable,

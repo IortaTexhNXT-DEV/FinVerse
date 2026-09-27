@@ -26,12 +26,8 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { requestActions } from './accessActions';
 import type { RequestAction } from './accessActions';
-import {
-  accessRequestMoves,
-  accessRequestStages,
-  isGroupProfile,
-  REQUEST_TYPE_LABELS,
-} from './accessRequest';
+import { isGroupProfile, REQUEST_TYPE_LABELS } from './accessRequest';
+import { accessRequestMoves, accessRequestStages } from './accessStages';
 import { StageStepper } from '@/components/broking/StageStepper';
 import { stageSteps } from '@/components/broking/stageSteps';
 import { RequestApprovers, RequestDetails, RequestHistory } from './AccessRequestTabs';

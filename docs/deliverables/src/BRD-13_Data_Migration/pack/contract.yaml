@@ -1,0 +1,108 @@
+# Cross-BRD dependencies and interface contract of BRD-13 Data Migration.
+# direction: Out = another BRD takes it from the migration; In = the migration takes it from another BRD.
+# Columns: id | party | direction | what | when / how | owner of the data | screens | FR
+change_rule: >-
+  Data Migration loads every object through the module that owns it and hands the open items to Operations,
+  Collections, Cashiering, Commission, Remittance, Accounting and Renewal, which process them after go-live. A later
+  change in any of those BRDs that touches a line of this contract (a new mandatory field of a client, account or
+  invoice, another accounting rule for the legacy items, another renewal lead time) is raised as a change request
+  against this signed set in the Change Management Register, assessed for its effect on the layouts, the code maps,
+  the reconciliation and the cut-over plan, and approved by the owners of both BRDs; the affected pages and layouts of
+  this set are then re-issued and signed as a delta.
+contract:
+  - id: IC-01
+    party: BRD-1 New Business
+    direction: Out
+    what: Migrated clients (C01) with their identity, contacts, addresses, segment, AO and KYC status; payout accounts (C03); one BIBS client per matched cluster, found by any legacy client number
+    how: Loaded two weeks before go-live through the client registration of BIBS, then daily deltas until the freeze; no onboarding workflow and no notification
+    owner: Product Owner, Marketing Business System (data owner of C01)
+    screens: Client Matching; Clients (LEGACY badge, Origin filter)
+    frs: [FR-DM-030, FR-DM-031, FR-DM-032, FR-DM-033]
+  - id: IC-02
+    party: BRD-1 New Business; BRD-2 Operations
+    direction: Out
+    what: In-force policy headers (P01, P01S) as booked accounts of origin Migrated with the legacy package as given; the legacy invoices link to them
+    how: Loaded at the cut-over weekend after the freeze; the headers are used for endorsements, servicing and renewal
+    owner: Head, Operations
+    screens: Accounts (LEGACY badge)
+    frs: [FR-DM-040, FR-DM-041]
+  - id: IC-03
+    party: BRD-2 Operations
+    direction: Out
+    what: Open legacy invoices (F01, F01S, F01C) in the Operations ledger with their components, insurer shares and values at cut-over; endorsements of legacy invoices booked in the legacy context
+    how: Loaded after the freeze with an opening entry per insurer share; processed on Invoice 360, payments, remittance and endorsements after go-live; Changes to Legacy Invoices report for Prod Recon
+    owner: Operations - Financial Transactions; Head, Comptrollership
+    screens: Invoice 360 (Legacy Invoice card); Invoice Search
+    frs: [FR-DM-050, FR-DM-051, FR-DM-060, FR-DM-080, FR-DM-090, FR-DM-091, FR-DM-092, FR-DM-100]
+  - id: IC-04
+    party: BRD-2 Operations (Cashiering)
+    direction: Out
+    what: Legacy unapplied payments (F02) with the legacy AR, references and disposition in progress; the Unapplied to Income and Legacy PR 2307 Reversal batches
+    how: Loaded after the freeze with an opening entry; matched by automatch on their references; worked on the Unapplied workbench and in the legacy batches
+    owner: Operations - Financial Transactions
+    screens: Unapplied Payments; Unapplied to Income; Legacy PR 2307 Reversal
+    frs: [FR-DM-052, FR-DM-053, FR-DM-054, FR-DM-055, FR-DM-061, FR-DM-071]
+  - id: IC-05
+    party: BRD-4 Collections
+    direction: Out
+    what: Open collection state (F03) - dispositions, promises to pay, instalment plans and collector assignments of the open legacy invoices, carried as the legacy follow-up of the worklist item; tags "DP PR for reversal"
+    how: Loaded after the freeze; legacy items appear on the PR Worklist with the LEGACY badge
+    owner: Head, Operations (Collections)
+    screens: PR Worklist; Collection Account
+    frs: [FR-DM-052]
+  - id: IC-06
+    party: BRD-2 Operations (Commission); BRD-4
+    direction: Out
+    what: The DP PR Legacy Reversal of legacy invoices paid directly to the insurer
+    how: Batch requested by a Commission user and approved by the Commission team lead; candidates tagged by Collections
+    owner: Commission team lead
+    screens: DP PR Legacy Reversal
+    frs: [FR-DM-070]
+  - id: IC-07
+    party: BRD-5 Accounting (FRBS, ACSL)
+    direction: In and Out
+    what: "In: the chart of accounts, the legacy control accounts and Migration Clearing, and the accounting rules of the legacy components (set up by Comptrollership). Out: the provisional GL opening (G01), the opening entries of the invoices and unapplied payments, the opening-balance adjustments (G03); the legacy context of the GL to sub-ledger reconciliation"
+    how: Opening journals dated 1 January 2028; Migration Clearing 0.00 per branch and currency; each adjustment approved by the Head of Comptrollership
+    owner: Head, Comptrollership
+    screens: Opening-Balance Adjustments; Reconciliation (GL level); journal inquiry
+    frs: [FR-DM-021, FR-DM-022, FR-DM-023, FR-DM-024]
+  - id: IC-08
+    party: BRD-6 Renewal
+    direction: Out
+    what: The migrated policy headers expiring from go-live to 31 May 2028 and the renewal advices already sent (P03) for the go-live renewal extraction; the PACKAGE code map (R06) for the package check at sanitation; the migrated headers for the daily extraction from 1 June 2028
+    how: Go-live extraction at 04:00 on go-live day, January expiries flagged urgent; the map is maintained in Renewal after go-live
+    owner: Heads, Retail and Corporate Marketing; Head, Renewal processing team; TSU (package map)
+    screens: Code Maps (PACKAGE); Batches (P03 resubmissions); Renewal candidates
+    frs: [FR-DM-034, FR-DM-122, FR-DM-124, FR-DM-125]
+  - id: IC-09
+    party: BRD-3 Product Maintenance
+    direction: In
+    what: Products, package versions, insurers and commission rates of BIBS, which the code maps target; values created from the migration (CREATE entries) are authorised in their masters
+    how: Before the load of any dependent object; the PACKAGE map names only released package versions
+    owner: Marketing Business System; TSU
+    screens: Code Maps; Products; Insurers (LEGACY badge)
+    frs: [FR-DM-011, FR-DM-034]
+  - id: IC-10
+    party: BRD-10 Sanction Screening
+    direction: Out
+    what: Migrated clients for one full screening run after the client load (no screening per client during the load)
+    how: Periodic screening with the full re-screen option before go-live; hits in the screening queue for Compliance
+    owner: Compliance
+    screens: Screening queue
+    frs: [FR-DM-030]
+  - id: IC-11
+    party: BRD-11 User Access Maintenance
+    direction: In
+    what: The users of the migration roles and of every persona, created through User Access requests; legacy user IDs are only mapped (user code map)
+    how: Before each trial migration and before the production cut-over (T-27)
+    owner: BDOI IT; user access administration
+    screens: Code Maps (USER)
+    frs: [FR-DM-011]
+  - id: IC-12
+    party: BDOI IT (legacy EBIX, QPS, ISYS, CMS)
+    direction: In
+    what: Extracts in the load templates with their control files; the legacy freeze and read-only mode; the document transfer folder; the read-only addresses of the legacy applications
+    how: Console upload (or the secure file drop when named); final extracts after the last legacy EOD
+    owner: Head, BDOI IT
+    screens: Extracts; Legacy Inquiry
+    frs: [FR-DM-010, FR-DM-110]

@@ -1,0 +1,105 @@
+# The batches that work the legacy balances down after go-live (Handbook Part B).
+area: Legacy batches
+screens:
+  - id: SCR-DM-18
+    title: Unapplied to Income
+    route: /cashiering/unapplied-income
+    also: [/cashiering/legacy-batches/:batchNo]
+    purpose: >-
+      Batches of old unapplied payments, new and legacy, reclassified to other income (unclaimed collections). A
+      Cashiering user opens a batch with its reason and currency and adds the unapplied payments received at least a
+      chosen number of days ago; the Cashiering team lead approves, then top management; after the second approval
+      each line posts on its own and the payment closes. Legacy items come from Unapplied Collections - Legacy, new
+      ones from Unapplied Collections.
+    entry: ["Finance › Cashiering › Unapplied to Income", "Unapplied Payments › an old item"]
+    shots:
+      - {state: list, user: cashier, caption: Unapplied to Income batches}
+      - {state: draft, user: cashier, open: income_draft, caption: A draft batch with its lines and the payments that may be added}
+      - {state: approve, user: topmgmt, open: income_top, caption: A batch waiting for top management}
+    fields:
+      - "List | Batch | Column | Batch number; reason under it | - | Batches | - | - | - | -"
+      - "List | Lines, Total | Column | Count; amount | - | Batch | - | - | - | -"
+      - "List | Requested / Approved | Column | Requester; approvers under it | - | Batch | - | - | - | -"
+      - "List | Posted | Column | Lines posted and refused; date and time | - | Batch | - | - | - | -"
+      - "List | Status | Pill | Draft, For approval, For top management, Posted, Returned, Cancelled | - | Batch | Draft | - | - | -"
+      - "New Batch | Reason | Text area | Up to 500 characters | Y | - | - | Draft | Not blank | -"
+      - "New Batch | Currency | Drop-down | PHP, USD | Y | - | PHP | Draft | - | -"
+      - "Batch | Status, Reason, Total, Lines, Requested By, Submitted, Approved By, Posted, Returned Because | Text | - | - | Batch | - | - | - | -"
+      - "Lines | #, Unapplied Payment, Amount, Result, Status | Columns | LEGACY tag on a legacy item; age in days under it; journal or refusal message | - | Lines | - | - | - | -"
+      - "Add Unapplied Payments | Received At Least (days ago) | Number | Days | N | - | 365 | Draft | - | -"
+      - "Add Unapplied Payments | Origin | Drop-down | All origins, BIBS, Migrated | N | - | All origins | Draft | - | -"
+      - "Add Unapplied Payments | Reason for the Lines | Text | Up to 250 characters | N | - | - | Draft | - | -"
+      - "Add Unapplied Payments | Unapplied Payment, Payor / Client, Age (days), Stage, Balance | Columns | Legacy AR number under a legacy item | - | Open unapplied payments of the currency, old enough, not in another batch | - | - | - | -"
+    actions:
+      - "New Batch | Cashiering user | Always | Opens a draft batch | Draft | -"
+      - "Add | Cashiering user | Draft | Adds the payment as a line | Draft | -"
+      - "Remove | Cashiering user | Draft | Removes a line | Draft | -"
+      - "Submit | Cashiering user | Draft with lines | Sends the batch to the Cashiering team lead | For approval | -"
+      - "Cancel Batch | Cashiering user | Draft | Closes the batch without posting; its lines may be taken again | Cancelled | -"
+      - "Approve | Cashiering team lead, then top management | For approval, For top management; never the requester | First approval sends the batch to top management; the second posts each line in its own transaction | For top management, Posted | -"
+      - "Return | Approver of the step | For approval, For top management | Returns the batch to its requester as a draft with the reason | Draft | -"
+    rules:
+      - "Two approvals by two different people, the Cashiering team lead and then top management; the requester approves neither (FR-DM-055)."
+      - "A line whose payment changed since it was added is refused at posting; the other lines still post (FR-DM-055)."
+      - "Legacy payments post from Unapplied Collections - Legacy, new ones from Unapplied Collections, to other income - unclaimed collections (FR-DM-055)."
+    outcome: Old unapplied payments are taken to income under two approvals, line by line.
+    frs: [FR-DM-055]
+    tests: [RECLASS]
+
+  - id: SCR-DM-19
+    title: Legacy PR 2307 Reversal
+    route: /cashiering/legacy-pr2307
+    also: [/cashiering/legacy-batches/:batchNo]
+    purpose: >-
+      Batches that settle the PR 2307 balance of legacy invoices against the amount due to the insurer. A
+      Cashiering user adds each legacy invoice with the amount to reverse; when the PR 2307 is short, the premium
+      receivable needed is first moved to PR 2307. The Cashiering team lead approves and each line posts on its own.
+    entry: ["Finance › Cashiering › Legacy PR 2307 Reversal"]
+    shots:
+      - {state: draft, user: cashier, open: pr2307_draft, caption: A draft PR 2307 reversal batch with the legacy invoice to add}
+    fields:
+      - "New Batch | Reason, Currency | Text area; Drop-down | Up to 500 characters; PHP or USD | Y | - | PHP | Draft | - | -"
+      - "Add a Legacy Invoice | Invoice No. | Text | Legacy invoice number | Y | Legacy invoices | - | Draft | A legacy invoice with an open PR 2307 | -"
+      - "Add a Legacy Invoice | Amount | Amount | Within the open PR 2307 and the due to insurer | Y | - | - | Draft | Above 0 | -"
+      - "Add a Legacy Invoice | Reason | Text | Up to 250 characters | N | - | - | Draft | - | -"
+      - "Lines | #, Invoice, Amount, Result, Status | Columns | LEGACY tag; journal or refusal message | - | Lines | - | - | - | -"
+    actions:
+      - "Add Invoice | Cashiering user | Draft; invoice and amount given | Adds the line | Draft | -"
+      - "Submit, Cancel Batch | Cashiering user | Draft | Sends the batch for approval, or closes it without posting | For approval, Cancelled | -"
+      - "Approve, Return | Cashiering team lead | For approval; never the requester | Posts each line in its own transaction, or returns the batch with the reason | Posted, Draft | -"
+    rules:
+      - "The amount of a line is within the open PR 2307 (after the move from the premium receivable) and the due to insurer of the invoice (FR-DM-071)."
+      - "The Cashiering team lead approves; the requester never approves (FR-DM-071)."
+    outcome: The PR 2307 balances of legacy invoices are settled against the insurer, line by line.
+    frs: [FR-DM-071]
+    tests: [PR2307REV]
+
+  - id: SCR-DM-20
+    title: DP PR Legacy Reversal
+    route: /commission/dppr-batches
+    also: [/commission/dppr-batches/:batchNo]
+    purpose: >-
+      Batches that reverse the open premium receivable of legacy invoices paid directly to the insurer, with the
+      same amount of the due to insurer; what was collected through the broker stays to remit. The candidates are the
+      legacy invoices that Collections tagged "DP PR for reversal", or any legacy invoice with an open premium. A
+      Commission user prepares the batch, the Commission team lead approves it and each invoice posts on its own.
+    entry: ["Finance › Commission Receivables › DP PR Legacy Reversal"]
+    shots:
+      - {state: draft, user: commrec, open: dppr_draft, caption: A draft batch with the tagged legacy invoices to add}
+    fields:
+      - "New Batch | Reason | Text area | Up to 500 characters | Y | - | - | Draft | Not blank | -"
+      - "Add Legacy Invoices | Show | Drop-down | Tagged DP PR for reversal by Collections, Every legacy invoice with open premium | N | - | Tagged | Draft | - | -"
+      - "Add Legacy Invoices | Reason for the Lines | Text | Up to 250 characters | N | - | - | Draft | - | -"
+      - "Add Legacy Invoices | Invoice, Client / Insurer, Policy, Tagged, Open Premium | Columns | LEGACY tag; source system and legacy number under the invoice | - | Legacy invoices with open premium | - | - | - | -"
+      - "Lines | #, Invoice, Amount, Result, Status | Columns | The whole open premium receivable of the invoice | - | Lines | - | - | - | -"
+    actions:
+      - "Add | Commission user | Draft | Adds the invoice as a line | Draft | -"
+      - "Submit, Cancel Batch | Commission user | Draft | Sends the batch for approval, or closes it without posting | For approval, Cancelled | -"
+      - "Approve, Return | Commission team lead | For approval; never the requester | Posts each invoice on its own, or returns the batch with the reason | Posted, Draft | -"
+    rules:
+      - "The line amount is the whole open premium receivable of the invoice (FR-DM-070)."
+      - "An invoice whose balance changed since it was added is refused at posting; the other lines still post (FR-DM-070)."
+      - "The Commission team lead approves; the requester never approves (FR-DM-070)."
+    outcome: Legacy invoices paid directly to the insurer leave the legacy receivable and payable in one approved batch.
+    frs: [FR-DM-070]
+    tests: [DPPRREV]

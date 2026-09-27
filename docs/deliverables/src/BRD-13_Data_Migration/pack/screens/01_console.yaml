@@ -1,0 +1,394 @@
+# Migration Console: from the data objects to the accepted batch (Handbook Part B).
+area: Migration Console
+screens:
+  - id: SCR-DM-01
+    title: Migration Home
+    route: /migration
+    purpose: >-
+      Shows the progress of the migration at a glance: objects decided and waiting for a decision, batches in
+      progress, failed or with rejects, open reconciliation breaks, unmapped legacy codes, open validation errors and
+      client pairs to review, with the next cut-over tasks and the run-off of the legacy policies. Each tile opens the
+      screen where the item is worked.
+    entry: ["Sidebar › Data Migration › Migration Home"]
+    shots:
+      - {state: view, user: miglead, caption: Migration Home with the tiles, the next cut-over tasks and the run-off}
+    fields:
+      - "Tiles | Objects decided | Tile | Count | - | Data objects | - | - | - | -"
+      - "Tiles | Objects waiting for a decision | Tile | Count of Proposed and For decision objects | - | Data objects | - | - | - | -"
+      - "Tiles | Batches in progress | Tile | Count of Planned, Validated, Load approved and Loading batches | - | Batches | - | - | - | -"
+      - "Tiles | Batches failed or with rejects | Tile | Count; Needs attention when above 0 | - | Batches | - | - | - | -"
+      - "Tiles | Open reconciliation breaks | Tile | Count; Needs attention when above 0 | - | Reconciliation | - | - | - | -"
+      - "Tiles | Unmapped legacy codes | Tile | Count; Needs attention when above 0 | - | Code Maps, Unmapped Codes tab | - | - | - | -"
+      - "Tiles | Open validation errors | Tile | Count; Needs attention when above 0 | - | Batch issues | - | - | - | -"
+      - "Tiles | Client pairs to review | Tile | Count | - | Client Matching | - | - | - | -"
+      - "Next cut-over tasks | Plan, Task, Owner, Planned start, Status | Columns | dd-MMM-yyyy HH:mm | - | Open tasks of the cut-over plans | - | - | - | -"
+      - "Run-off of the legacy policies | Expiry month, In force, Renewed, Not renewed, Still open | Columns | Month yyyy-MM | - | Latest run-off snapshot | - | - | - | -"
+    actions:
+      - "Load Templates | Every migration role | Always | Opens Layouts and Rules with the templates | - | -"
+      - "Batches | Every migration role | Always | Opens the batch list | - | -"
+      - "Upload Extract | Migration Operator | Always | Opens Extracts to upload a file with its control file | - | -"
+      - "[A tile] | Every migration role | Always | Opens the screen of the tile | - | -"
+    rules:
+      - "A tile marked Needs attention has at least one item that blocks a gate: a failed batch, a break, an unmapped code or an open error (FR-DM-003)."
+      - "The run-off table is the latest monthly snapshot of the legacy policies in force at go-live (FR-DM-122)."
+    outcome: The Data Migration Lead sees what blocks the next gate and opens it in one click.
+    frs: [FR-DM-003, FR-DM-120, FR-DM-122]
+    tests: [HOME]
+
+  - id: SCR-DM-02
+    title: Data Objects and the decision of an object
+    route: /migration/objects
+    purpose: >-
+      The register of the legacy data objects: what moves, in which class (migrate, carry forward, conditional,
+      archive or excluded), from which systems, into which part of BIBS and in which load order. An object opens in a
+      panel with the four criteria of the BRD, the owners, the rationale and the decision history; the Data
+      Migration Lead submits the proposed class and the business owner approves or returns it (gate G1). The load
+      template of each object downloads from its row.
+    entry: ["Migration Home › Objects decided", "Sign-off › object"]
+    shots:
+      - {state: list, user: miglead, caption: Data Objects register with the class and status of each object}
+      - {state: object, user: migowner, open: object_c01, caption: "Object C01 with the four criteria, the rationale and the decision history"}
+    fields:
+      - "Filter | Category | Drop-down | All categories, Reference, Client, Policy, Open item, GL, History | N | Categories of the register | All categories | - | - | -"
+      - "Register | Order | Column | Load order | - | Object | - | - | - | -"
+      - "Register | Object | Column | Code and name, category under it | - | Object | - | - | - | -"
+      - "Register | Sources | Column | Legacy systems | - | Object | - | - | - | -"
+      - "Register | Class | Column | Decided class, or the proposed class marked Proposed | - | Decision | Proposed class | - | - | -"
+      - "Register | [Financial and After tags] | Tag | Financial object; objects it loads after | - | Object | - | - | - | -"
+      - "Register | Business owner | Column | Name | - | Object | - | - | - | -"
+      - "Register | Status | Pill | Proposed, For decision, Decided | - | Decision | Proposed | - | - | -"
+      - "Object panel | Category, Sources, Target in BIBS | Text | - | - | Object | - | - | - | -"
+      - "Object panel | Proposed class, Decided class | Text | Migrate, Carry forward, Conditional, Archive, Excluded | - | Decision | - | - | - | -"
+      - "Object panel | Condition | Text | Condition of a conditional object | - | Object | - | - | - | -"
+      - "Object panel | Day-1 need, Compliance need, Archive option | Text | Yes or No, with the note | - | The four criteria of the BRD | - | - | - | -"
+      - "Object panel | Data trust | Text | High, Medium, Low | - | Object | - | - | - | -"
+      - "Object panel | Business owner, Data steward | Text | Name, or the proposed role until named | - | Object | - | - | - | -"
+      - "Object panel | Depends on, Load order | Text | Objects and number | - | Object | - | - | - | -"
+      - "Object panel | Rationale | Text | Up to 2,000 characters | - | Object | - | - | - | -"
+      - "Decision history | Decision, Class, Submitted by, Submitted, Decided by, Return reason, Status | Columns | Decision number MGD-yyyy-nnnnnn | - | Decisions of the object | - | - | - | -"
+    actions:
+      - "All Load Templates | Every migration role | Always | Downloads the workbook of every load template with the columns, the control file and the How to fill rules | - | -"
+      - "[Download on a row] | Every migration role | Always | Downloads the load template workbook of the object | - | -"
+      - "Submit for Decision | Data Migration Lead | Object not waiting for a decision | Sends the proposed class to the business owner after a confirmation | For decision | Alert to the business owner"
+      - "Approve | Data owner (business owner of the object) | Decision For decision and submitted by another user | Decides the class of the object (gate G1), with an optional comment | Decided | -"
+      - "Return | Data owner | Decision For decision and submitted by another user | Returns the proposal to the Data Migration Lead with the reason | Proposed | -"
+      - "Close | Every migration role | Always | Closes the panel | - | -"
+    rules:
+      - "An object loads only after the objects it depends on are accepted in the same environment; its load order follows theirs (FR-DM-001)."
+      - "The business owner of the object decides its class, never the user who submitted it (FR-DM-002)."
+      - "The class of an object whose batches are loaded changes only after the batches are rolled back (FR-DM-002)."
+      - "Only objects decided as Migrate, Carry forward or Conditional (with its condition met) can be planned in a batch; archive objects load into the legacy archive (FR-DM-002)."
+    outcome: Every object has a decided class signed by its business owner (gate G1) and its load template.
+    frs: [FR-DM-001, FR-DM-002, FR-DM-003]
+    tests: [OBJ, OBJDEC]
+
+  - id: SCR-DM-03
+    title: Code Maps and the versions of a code map
+    route: /migration/maps
+    purpose: >-
+      The code maps that turn the legacy codes of each source system into BIBS values (lists of values, insurers,
+      products, packages, branches, sales units, users, GL accounts, statuses and more). A code map opens with its
+      versions and the entries of the chosen version. The Data Steward prepares a draft version on screen or in
+      Excel and submits it; the business owner approves or returns it (gate G2). The Unmapped Codes tab lists the
+      legacy codes found without an entry in the batches under validation.
+    entry: ["Migration Home › Unmapped legacy codes", "Batch › Issues"]
+    shots:
+      - {state: list, user: migsteward, caption: Code Maps with the approved and open version of each map}
+      - {state: set, user: migsteward, open: map_insurer, caption: "Code map INSURER with its versions and the entries of the version"}
+      - {state: entry, user: migsteward, open: map_draft, click: "^add entry$", caption: Add Entry dialog of a draft version}
+      - {state: unmapped, user: migsteward, tab: Unmapped Codes, caption: Unmapped Codes tab}
+    fields:
+      - "Code Maps tab | Search code map | Search | Code or name | N | - | - | - | - | -"
+      - "Code Maps tab | Code map | Column | Set code with its name under it | - | Code map sets | - | - | - | -"
+      - "Code Maps tab | BIBS values | Column | What the codes map to | - | Code map sets | - | - | - | -"
+      - "Code Maps tab | Used by | Column | Layouts whose columns use the map | - | Code map sets | - | - | - | -"
+      - "Code Maps tab | Approved version | Column | vN, or None in red | - | Versions | - | - | - | -"
+      - "Code Maps tab | Open version | Pill | Draft or Submitted | - | Versions | - | - | - | -"
+      - "Versions | Version, Comment, Prepared by, Approved by, Approved, Return reason, Status | Columns | Draft, Submitted, Approved, Superseded | - | Versions of the map | - | - | - | -"
+      - "Entries | Source, Legacy code, Legacy description, Condition, Action, BIBS value, Remarks | Columns | - | - | Entries of the version | - | - | - | -"
+      - "Add Entry | Source | Drop-down | EBIX, QPS, ISYS, EXCEL, CMS | Y | Source systems | QPS | Draft | - | -"
+      - "Add Entry | Legacy code | Text | Up to 80 characters | Y | - | - | Draft | Unique per source and condition in the version | Legacy code <legacy code> of <source system> is mapped twice"
+      - "Add Entry | Legacy description | Text | Up to 250 characters | N | - | - | Draft | - | -"
+      - "Add Entry | Action | Drop-down | Map to a BIBS value, Create in BIBS, Use the default value, Reject the record | Y | - | Map to a BIBS value | Draft | - | Enter the source system, the legacy code and the action"
+      - "Add Entry | BIBS value | Text | A value of the BIBS master | C | The master of the map | - | Draft | Mandatory for Map; the value exists in BIBS | Enter the target code of legacy code <legacy code>"
+      - "Add Entry | Condition column, Condition value | Text | Column and value of a conditional entry, for example insurer_code | N | Layout columns | - | Draft | - | -"
+      - "Add Entry | Remarks | Text | Up to 300 characters | N | - | - | Draft | - | -"
+      - "Unmapped Codes tab | Code map, Source, Legacy code, Rows, Example records, Blocks the load | Columns | Blocks the load Yes for a mandatory column | - | Validation issues of the batches | - | - | - | -"
+    actions:
+      - "New Version | Data Steward | No version is being edited or waiting for approval | Creates a draft from the approved version, with an optional comment | Draft | -"
+      - "Import Excel | Data Steward | No open version | Creates a draft version from an Excel file with the columns source_system, legacy_code and action | Draft | -"
+      - "Export | Every migration role | A version is chosen | Downloads the entries of the version in Excel | - | -"
+      - "Add Entry | Data Steward | Version is a draft | Adds an entry; a row of a draft opens it for change; the bin removes it | Draft | -"
+      - "Submit | Data Steward | Version is a draft with at least one entry | Sends the version to the business owner after a confirmation | Submitted | -"
+      - "Approve | Data owner | Version submitted by another user | Makes the version the approved one; values marked Create are created through the reference-data load | Approved; the previous version Superseded | -"
+      - "Return | Data owner | Version submitted by another user | Returns the version to the Data Steward as a draft with the reason | Draft | -"
+    rules:
+      - "Only the approved version of a map is used by a batch, and the batch records the versions it used (FR-DM-011)."
+      - "A map has one version being edited or waiting for approval at a time (FR-DM-011)."
+      - "The business owner approves a version, never the Data Steward who submitted it (FR-DM-011)."
+      - "A batch with an unmapped code in a mandatory column cannot be approved for load (FR-DM-012)."
+      - "Legacy packages are mapped to package versions in the PACKAGE map, which Renewal uses at sanitation; the migration does not resolve packages on the policy headers (FR-DM-034)."
+    outcome: Every legacy code used by a record in scope has an approved entry, and every batch records the versions it used.
+    frs: [FR-DM-011, FR-DM-012, FR-DM-034]
+    tests: [MAPS, UNMAPPED]
+
+  - id: SCR-DM-04
+    title: Layouts and Rules
+    route: /migration/layouts
+    purpose: >-
+      The extract layouts in force with their columns: the single source of the load templates BDOI fills. A layout
+      opens with its columns (name, description, type and length, mandatory, code map, format, example, validation).
+      The screen downloads the CSV template of a layout, the workbook of an object, the workbook of all templates and
+      the control-file template. The Data-Quality Rules tab lists the checks run on every row; the Masking Rules tab
+      lists the personal data masked outside production.
+    entry: ["Migration Home › Load Templates", "Data Objects › All Load Templates"]
+    shots:
+      - {state: list, user: migsteward, caption: Layouts in force with their key columns and hash total}
+      - {state: columns, user: migsteward, open: layout_f01c, caption: "Columns of layout F01C (open invoice components)"}
+      - {state: rules, user: migsteward, tab: Data-Quality Rules, caption: Data-Quality Rules tab}
+      - {state: masking, user: migsteward, tab: Masking Rules, caption: Masking Rules tab}
+    fields:
+      - "Layouts tab | Layout | Column | Code and version, title under it | - | Layouts in force | - | - | - | -"
+      - "Layouts tab | Object | Column | Object code | - | Layout | - | - | - | -"
+      - "Layouts tab | Key columns | Column | Legacy key of a row | - | Layout | - | - | - | -"
+      - "Layouts tab | Hash total | Column | Count of distinct keys, Row count, Sum of the numeric part | - | Layout | - | - | - | -"
+      - "Layouts tab | Frozen | Column | dd-MMM-yyyy HH:mm | - | Layout | - | - | - | -"
+      - "Layouts tab | Status | Pill | Draft, Frozen, Retired | - | Layout | - | - | - | -"
+      - "Columns | #, Column, Type, Mandatory, Code map, Format, Example, Validation | Columns | Type with its length; description under the column name | - | Columns of the layout | - | - | - | -"
+      - "Data-Quality Rules tab | Rule, Layouts, Columns, Check, Severity, Fixed by, Active | Columns | Severity Error or Warning; the message under the check | - | Rule catalogue | - | - | - | -"
+      - "Masking Rules tab | Layout, Column, Masking, Active | Columns | - | - | Masking rules | - | - | - | -"
+    actions:
+      - "Control File Template | Every migration role | Always | Downloads the header of the control file (CONTROL_template.ctl.csv) | - | -"
+      - "Load Templates Workbook | Every migration role | Always | Downloads one workbook with a sheet per layout, the Columns sheet, the Control file sheet and the How to fill rules | - | -"
+      - "[Download on a layout row] | Every migration role | Always | Downloads the CSV template of the layout (header row only) | - | -"
+      - "Object Workbook | Every migration role | A layout is open | Downloads the workbook of the object of the layout | - | -"
+      - "Freeze | Data Steward | Layout version is a draft | Makes the version the one in force after a confirmation; extracts and templates follow it and the previous version is retired | Frozen | -"
+    rules:
+      - "A file whose header does not match the layout version in force is rejected at intake (FR-DM-010)."
+      - "The layouts of an object are frozen before its mapping is signed (gate G2) (FR-DM-003)."
+      - "Outside production the columns listed on Masking Rules are masked before a row is staged (FR-DM-010)."
+      - "An error stops the row; a warning loads it and reports it (FR-DM-013)."
+    outcome: BDOI IT and the stewards download the templates that match the layouts in force, and see every check a row must pass.
+    frs: [FR-DM-010, FR-DM-013, FR-DM-003]
+    tests: [LAYOUTS]
+
+  - id: SCR-DM-05
+    title: Extracts
+    route: /migration/extracts
+    purpose: >-
+      Receives each legacy extract with its control file and runs the intake checks: file name, checksum, header,
+      row count, amount totals and hash total. A file that passes is staged (masked outside production); a file that
+      fails is rejected as a whole with the reason. The list shows every extract with its layout, source, as-of date,
+      rows, masking, who received it and its status.
+    entry: ["Migration Home › Upload Extract"]
+    shots:
+      - {state: list, user: migops, caption: Extracts with the upload card and the intake results}
+      - {state: rejected, user: migops, custom: extract_rejected, caption: An extract rejected at intake with its reason}
+    fields:
+      - "Upload an extract | Data file | File | LAYOUT_SOURCE_yyyyMMdd_nn.csv or .xlsx | Y | - | - | - | Name, layout, source system and date of the name are valid; the object is decided | Name the file <LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv or .xlsx, for example F01C_EBIX_20271231_01.csv"
+      - "Upload an extract | Control file | File | <data file name>.ctl.csv | Y | - | - | - | Row count, hash total, amount totals and SHA-256 agree with the data file | The file has <n> rows; the control file says <m>"
+      - "Upload an extract | Mode | Drop-down | Full extract, Delta since the previous extract | Y | - | Full extract | - | A delta is later than the previous extract of the layout | -"
+      - "Filter | Object | Text | Object code, for example C01 | N | - | All objects | - | - | -"
+      - "Extracts | Extract | Column | MGX-yyyy-nnnnnn with the file name under it | - | Extracts | - | - | - | -"
+      - "Extracts | Layout | Column | Layout and version; source system and mode under it | - | Extracts | - | - | - | -"
+      - "Extracts | As of | Column | dd-MMM-yyyy HH:mm | - | Control file | - | - | - | -"
+      - "Extracts | Rows | Column | Staged / declared | - | Intake | - | - | - | -"
+      - "Extracts | Masked | Column | Yes or No | - | Environment | - | - | - | -"
+      - "Extracts | Received | Column | Date and time, user under it | - | Intake | - | - | - | -"
+      - "Extracts | Rejection reason | Column | Text | - | Intake | - | - | - | -"
+      - "Extracts | Status | Pill | Received, Checked, Staged, Rejected, Purged | - | Intake | - | - | - | -"
+    actions:
+      - "Upload and Check | Migration Operator | A data file and a control file are chosen | Receives the files and runs the intake checks; the message gives the extract number and the staged rows, or the rejection | Staged or Rejected | Alert Extract rejected to the Data Migration Lead"
+      - "[Download on a row] | Migration Operator | File not yet purged | Downloads the data file as received | - | -"
+    rules:
+      - "The file name starts with the layout code, then the source system, the as-of date and the sequence of the day (FR-DM-010)."
+      - "A file whose checksum, header, row count, amount totals or hash total do not agree with its control file is rejected; nothing of it is staged (FR-DM-010)."
+      - "Extracts are received only for objects decided for migration (FR-DM-002)."
+      - "Staged rows and files are purged 5 days after the batch is accepted or rolled back, or after the rejection (FR-DM-010)."
+    outcome: Every file BDOI sends is either staged exactly as extracted or rejected with the reason and the difference.
+    frs: [FR-DM-010]
+    tests: [EXTRACTS]
+
+  - id: SCR-DM-06
+    title: Batches and resubmissions
+    route: /migration/batches
+    purpose: >-
+      Every load batch with its object, environment, counts, error rate and status. The Migration Operator plans a
+      batch from the staged extracts of a decided object; a batch opens on its own page. The Resubmissions tab lists
+      the corrected rejected rows that a maker has prepared and that a checker approves before they load (used for
+      the renewal advices already sent, object P03).
+    entry: ["Migration Home › Batches", "Extracts › Plan Batch"]
+    shots:
+      - {state: list, user: migops, caption: Batches with their counts and status}
+      - {state: plan, user: migops, click: "^plan batch$", caption: Plan Batch dialog}
+      - {state: resubmissions, user: migowner, tab: Resubmissions, caption: Resubmissions of corrected rows waiting for the checker}
+    fields:
+      - "Batches tab | Batch | Column | MGB-yyyy-nnnnn; Full, Delta or Rerun of the parent batch under it | - | Batches | - | - | - | -"
+      - "Batches tab | Object, Environment | Column | Object code; SIT, UAT, performance or production | - | Batch | - | - | - | -"
+      - "Batches tab | Staged, Loaded, Rejected | Column | Counts | - | Batch | - | - | - | -"
+      - "Batches tab | Error rate | Column | Percent | - | Validation | - | - | - | -"
+      - "Batches tab | Planned | Column | Date and time; user under it | - | Batch | - | - | - | -"
+      - "Batches tab | Status | Pill | Planned, Validated, Load approved, Loading, Loaded, Loaded with rejects, Failed, Reconciled, Accepted, Rollback requested, Rolled back | - | Batch | - | - | - | -"
+      - "Plan Batch | Object | Drop-down | Objects decided as Migrate, Carry forward or Conditional | Y | Data objects | - | - | The object has a staged extract | Object <code> has no staged extract to load"
+      - "Plan Batch | Extracts | Text | Extract numbers separated by commas; empty for the latest staged extract of each layout | N | Staged extracts | - | - | Same as-of date; staged; not in another batch | The extracts of a batch must have the same as-of date: <days>"
+      - "Resubmissions tab | Resubmission, Object, Corrected rows, Prepared, Decided by, Note, Status | Columns | Prepared, Approved, Returned | - | Resubmissions | - | - | - | -"
+    actions:
+      - "Plan Batch | Migration Operator | Always | Plans a batch from the staged extracts and opens it | Planned | -"
+      - "[A batch row] | Every migration role | Always | Opens the batch page | - | -"
+      - "Approve | Checker of the object (resubmission approval) | Resubmission Prepared by another user | Creates a rerun batch of the corrected rows, with an optional note | Approved | -"
+      - "Return | Checker of the object | Resubmission Prepared by another user | Returns the corrected rows to the maker with the reason | Returned | -"
+    rules:
+      - "The extracts of one batch have the same as-of date and one layout each (FR-DM-010)."
+      - "Resubmissions of the RA-sent file are accepted until the resubmission deadline (12:00 on the day before go-live) (FR-DM-125)."
+      - "The checker of a resubmission is never its maker (FR-DM-125)."
+    outcome: Each object is loaded in batches that can be followed from planning to acceptance, and corrected rows load only after a checker approves them.
+    frs: [FR-DM-014, FR-DM-015, FR-DM-125]
+    tests: [BATCH, RESUB]
+
+  - id: SCR-DM-07
+    title: Batch
+    route: /migration/batches/:batchNo
+    parent: /migration/batches
+    purpose: >-
+      One batch from validation to acceptance. The header shows the status and the actions allowed now: validate,
+      sign the validation (G3), approve the load (G4), load, reconcile, rerun the rejected rows, sign the
+      reconciliation (G5), accept the object as data owner and as Data Migration Lead (G6), request, approve or reject
+      a rollback. The steps, the counts and the facts of the batch are followed by tabs for the issues, the rows (with
+      waivers and exclusions), the reconciliation, the gates signed with their evidence and the run log.
+    entry: ["Batches › a batch row", "Sign-off › Latest batch"]
+    shots:
+      - {state: validated, user: miglead, open: batch_validated, caption: "A validated batch: steps, counts, facts and the Issues tab"}
+      - {state: rows, user: migowner, open: batch_validated, tab: Rows, caption: "Rows tab with the waiver and exclusion of failing rows"}
+      - {state: waive, user: migowner, open: batch_validated, tab: Rows, custom: batch_waive, caption: Waive Rows dialog}
+      - {state: signoffs, user: miglead, open: batch_accepted, tab: Sign-offs, caption: "Sign-offs tab of an accepted batch"}
+      - {state: log, user: migops, open: batch_accepted, tab: Run Log, caption: Run Log tab}
+    fields:
+      - "Steps | Planned, Validated, Load approved, Loaded, Reconciled, Accepted | Stepper | Steps done are marked | - | Batch status | - | - | - | -"
+      - "Counts | Staged, Valid, Invalid, Loaded | Tile | Warnings, excluded and waived, unchanged and rejected under them | - | Batch | - | - | - | -"
+      - "Batch | Extracts, Rerun of, Code map versions | Text | Extract numbers; parent batch; map and version | - | Batch | - | - | - | -"
+      - "Batch | Error rate, Unmapped codes, Client pairs to review | Text | Percent; counts | - | Validation | - | - | - | -"
+      - "Batch | Validated by, Load approved by, Loaded by | Text | Name, date and time | - | Batch | - | - | - | -"
+      - "Batch | Load started, Load ended, Accepted | Text | dd-MMM-yyyy HH:mm | - | Batch | - | - | - | -"
+      - "Batch | Rollback reason, Staging purged on | Text | Text; date | - | Batch | - | - | - | -"
+      - "Issues tab | Rule, Severity, Field, Message, Resolution | Columns | Error or Warning; the value under the field; Open, Fixed at source, Mapped, Waived | - | Validation issues | - | - | - | -"
+      - "Rows tab | Row status | Drop-down | All rows, Valid, Warning, Invalid, Loaded, Skipped, Rejected, Excluded, Waived | N | - | All rows | - | - | -"
+      - "Rows tab | Layout, Row, Legacy key, BIBS record, Message, Status | Columns | The BIBS record created, with its kind under it | - | Staged rows | - | - | - | -"
+      - "Waive Rows / Exclude Rows | Reason | Drop-down | Record not needed in BIBS, Entered manually in BIBS after go-live | Y | Waiver reasons | Record not needed in BIBS | Validated | - | -"
+      - "Waive Rows / Exclude Rows | Note / Manual-entry plan | Text area | Free text | Y | - | - | Validated | Not blank | Enter the reason and the manual-entry plan of the excluded rows"
+      - "Resubmit Corrected Rows | Extract of the corrected rows | Text | Extract number of the uploaded correction file | Y | Staged extracts of the object | - | - | Staged extract of the same object | Extract <extract no> is not a staged extract of object <object code>"
+      - "Sign-offs tab | Gate, Role, Signed by, Signed, Comment, Decision, Evidence | Columns | Gate and its name; evidence file | - | Gates signed | - | - | - | -"
+      - "Run Log tab | Time, Step, Level, Message, Counts, By | Columns | - | - | Run log | - | - | - | -"
+    actions:
+      - "Validate | Migration Operator | Planned | Maps the rows with the approved code maps and checks them against the data-quality rules | Validated | Alert Unmapped codes when a code has no entry"
+      - "Sign Validation | Data Steward | Validated | Signs gate G3: the error rate is within the limit, no mandatory code is unmapped and no client pair waits for review | Validated (G3 signed) | -"
+      - "Approve Load | Data Migration Lead | Validated, by a user other than the validator | Signs gate G4: the batch may be loaded by an operator other than the approver | Load approved | -"
+      - "Load | Migration Operator | Load approved, by a user other than the approver | Loads the valid rows through the BIBS services without notifications, then reconciles the batch | Loaded or Loaded with rejects | Alert Load failed when a chunk fails"
+      - "Reconcile | Migration Operator | Loaded, Loaded with rejects or Reconciled | Compares counts, amounts, hash totals and fields again between the source, the staging and BIBS | Reconciled when no break is open | Alert Reconciliation break"
+      - "Rerun Rejects | Migration Operator | Rejected rows exist | Plans a new batch of the rejected rows for validation and load | Planned (rerun batch) | -"
+      - "Sign Reconciliation | Reconciliation approver | Loaded and every break explained and approved | Signs gate G5 | Reconciled | -"
+      - "Accept as Data Owner, Accept as Migration Lead | Data owner; Data Migration Lead | Reconciled | Sign gate G6; with both acceptances the object is accepted and its staging data is purged after the retention days | Accepted | -"
+      - "Request Rollback | Data Migration Lead | Loaded, Reconciled, Accepted or Failed | Asks for the records loaded by the batch to be undone, with the reason | Rollback requested | -"
+      - "Approve Rollback, Reject Rollback | Reconciliation approver | Rollback requested by another user | Undoes the records loaded by the batch through the BIBS services, or keeps the batch loaded with the reason | Rolled back, or the previous status | -"
+      - "Rejects | Every migration role | The batch has rejected or invalid rows | Downloads the rejected rows with their messages and the correction columns | - | -"
+      - "Fixed at Source | Data Steward | Issue open | Records that the legacy source is corrected, with a note | Issue Fixed at source | -"
+      - "Waive Rows, Exclude Rows | Data owner | Batch validated; rows selected | Loads the rows despite their errors (waiver), or leaves them out with a manual-entry plan | Rows Waived or Excluded | -"
+      - "Resubmit Corrected Rows | Data Steward or Migration Operator | The batch has rejected rows | Prepares a resubmission of the corrected rows for the checker | Resubmission Prepared | -"
+      - "Attach | The signer of a gate | Own gate without evidence | Attaches the evidence file to the gate signed | - | -"
+    rules:
+      - "The load of a batch is approved by the Data Migration Lead and run by an operator other than the approver; the validator does not approve the load (FR-DM-014)."
+      - "Master data loads with at most 0.5 percent of rows failing or waived; open items, unapplied payments and the trial balance load with none, unless each excluded row has a manual-entry plan (FR-DM-013)."
+      - "A row already loaded and unchanged is skipped; a rerun loads only the rejected and changed rows (FR-DM-015)."
+      - "A rollback undoes the records of the batch newest first, unless a record was changed in BIBS since the load; the requester never approves it (FR-DM-015)."
+      - "The operator who ran a batch cannot sign its reconciliation or acceptance; one person cannot sign two gates of one batch (FR-DM-003)."
+      - "The reconciliation cannot be signed while a break is open (FR-DM-020)."
+    outcome: The batch is loaded, reconciled and accepted by its owner and the Data Migration Lead, or rolled back, with every step recorded.
+    frs: [FR-DM-013, FR-DM-014, FR-DM-015, FR-DM-003, FR-DM-020]
+    tests: [BATCH, ISSUES]
+
+  - id: SCR-DM-08
+    title: Client Matching
+    route: /migration/matching
+    purpose: >-
+      The review queue of the client pairs whose match score is between the review and the automatic thresholds:
+      two legacy client records, or a legacy record and a BIBS client, side by side with the keys that matched. The
+      Data Steward merges them into one client or keeps them separate; the load of a client batch waits until the
+      queue is empty.
+    entry: ["Migration Home › Client pairs to review", "Batch › Client pairs to review"]
+    shots:
+      - {state: queue, user: migsteward, caption: Client pairs waiting for review}
+      - {state: pair, user: migsteward, open: pair_first, caption: A pair side by side with the matched keys marked}
+    fields:
+      - "Queue | Batch, Cluster, Legacy client | Column | Batch number; cluster number; legacy client number | - | Matching | - | - | - | -"
+      - "Queue | Matched with | Column | Legacy client or BIBS client | - | Matching | - | - | - | -"
+      - "Queue | Score | Column | 60 to 89 in the queue | - | Matching keys | - | - | - | -"
+      - "Queue | Keys matched | Column | TIN, ID, name and birth date, corporate name, CIF, e-mail, mobile, similar name | - | Matching | - | - | - | -"
+      - "Queue | Decision | Pill | To review, Merged, Kept separate, Merged automatically | - | Matching | To review | - | - | -"
+      - "Pair | Field | Column | Matched fields shown as tags | - | Both records | - | - | - | -"
+    actions:
+      - "Merge | Data Steward | Pair To review | Makes the two records one BIBS client; every value that lost is kept for review | Merged | -"
+      - "Keep Separate | Data Steward | Pair To review | Keeps two clients | Kept separate | -"
+    rules:
+      - "Pairs scoring 90 or more merge automatically; 60 to 89 go to this queue; below 60 are different clients (FR-DM-031)."
+      - "The load of a client batch is not approved while pairs wait for review (FR-DM-031)."
+      - "Per field the surviving value is the first non-blank value by source priority, or the latest updated value (FR-DM-031)."
+    outcome: One BIBS client per person or company, with every legacy client number pointing to it.
+    frs: [FR-DM-030, FR-DM-031]
+    tests: [MATCH]
+
+  - id: SCR-DM-09
+    title: Reconciliation
+    route: /migration/reconciliation
+    purpose: >-
+      The loaded batches with their reconciliation and, for the chosen batch, the lines by level: L1 counts, L2
+      amounts, L3 hash totals, L4 fields, L5 general ledger, and the opening-balance adjustment checks. Every
+      difference is a break; the Data Steward or the operator explains it with a reason and the reconciliation
+      approver approves the explanation.
+    entry: ["Migration Home › Open reconciliation breaks", "Batch › Reconciliation tab"]
+    shots:
+      - {state: list, user: migrecon, open: recon_batch, caption: A loaded batch and its reconciliation lines by level}
+      - {state: explain, user: migsteward, open: recon_break, custom: recon_explain, caption: Explain Break dialog}
+    fields:
+      - "Loaded batches | Batch, Object, Loaded, Load ended, Status | Columns | - | - | Batches loaded, reconciled or accepted | - | - | - | -"
+      - "Reconciliation | [Title] | Text | Run number, date and time, user; status on the right | - | Latest run | - | - | - | -"
+      - "Reconciliation | Level | Column | L1 Counts, L2 Amounts, L3 Hash totals, L4 Fields, L5 General ledger, Opening-balance adjustment | - | Run | - | - | - | -"
+      - "Reconciliation | Measure, Currency | Column | Measure with its detail under it | - | Run | - | - | - | -"
+      - "Reconciliation | Source, Staged, BIBS, Difference | Amount | Two decimals | - | Control file, staging, BIBS | - | - | Difference within the tolerance (0.00) | -"
+      - "Reconciliation | Explanation | Column | Text; reason, who explained, who approved under it | - | Break | - | - | - | -"
+      - "Reconciliation | Status | Pill | Matched, Break, Explained | - | Run | - | - | - | -"
+      - "Explain Break | Reason | Drop-down | Timing difference between extract and ledger, Rounding in the legacy extract, Rows excluded by the data owner, Error in the legacy source corrected by manual entry, Code map difference, Other | Y | Break reasons | Timing difference between extract and ledger | Break | - | -"
+      - "Explain Break | Explanation | Text area | Free text | Y | - | - | Break | Not blank | Enter the explanation of the break"
+    actions:
+      - "Explain | Data Steward or Migration Operator | Line in Break | Records the reason and the explanation | Explained | -"
+      - "Approve | Reconciliation approver | Line Explained by another user | Approves the explanation | Explained (approved) | -"
+    rules:
+      - "Counts: received equals the control count and loaded + skipped + rejected + excluded equals staged (FR-DM-020)."
+      - "Amounts: the control total, the staged sum and the value in BIBS agree per amount column and currency (FR-DM-020)."
+      - "GL: Migration Clearing is 0.00 per branch and currency and each legacy control account equals its legacy sub-ledger (FR-DM-021)."
+      - "The explanation of a break is approved by a user other than the one who explained it (FR-DM-020)."
+    outcome: Every loaded object is reconcilable from source to target, each break explained and approved before G5.
+    frs: [FR-DM-020, FR-DM-021]
+    tests: [RECONC, RECGL]
+
+  - id: SCR-DM-10
+    title: Sign-off
+    route: /migration/signoff
+    purpose: >-
+      The gates G1 to G7 of every object and of its latest batch as a matrix: decision, mapping, validation, load
+      approval, reconciliation, acceptance and go-live, each with who signed and when. The business owner signs the
+      mapping of an object here (gate G2); the other batch gates are signed on the batch page.
+    entry: ["Sidebar › Data Migration › Sign-off"]
+    shots:
+      - {state: matrix, user: migowner, caption: Gate matrix per object with the signer and date of each gate}
+    fields:
+      - "Matrix | Object | Column | Code and name; class under it | - | Data objects | - | - | - | -"
+      - "Matrix | Latest batch | Column | Batch number and status | - | Batches | - | - | - | -"
+      - "Matrix | Decision, Mapping, Validation, Load approval, Reconciliation, Acceptance, Go-live | Column | One column per gate G1 to G7; decision pill with the signer and date | - | Gates signed | - | - | - | -"
+    actions:
+      - "Sign Mapping | Data owner | G1 approved and G2 not yet signed | Signs gate G2: the layouts of the object are frozen and every code map its columns use has an approved version | G2 signed | -"
+      - "[Latest batch link] | Every migration role | A batch exists | Opens the batch page | - | -"
+    rules:
+      - "Gates are signed in order; a gate refused returns the object to the step of that gate (FR-DM-003)."
+      - "The mapping is signed only when the layouts are frozen and every map used has an approved version (FR-DM-003)."
+    outcome: The Data Migration Lead sees what is missing per object before a trial migration or the cut-over.
+    frs: [FR-DM-003]
+    tests: [SIGNOFF]

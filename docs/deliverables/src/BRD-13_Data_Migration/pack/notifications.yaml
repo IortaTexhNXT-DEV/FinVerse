@@ -1,0 +1,85 @@
+# Alerts and e-mails of BRD-13 Data Migration. The alerts open in the bell of the page header of the users who follow
+# the migration exceptions (Data Migration Lead, reconciliation approver, the owners concerned) and are listed on the
+# exception screen of the platform. Texts are verbatim; <name> is filled in by BIBS.
+# Columns: id | channel | trigger | recipient | template / text | content | screen | FR
+notifications:
+  - id: NT-01
+    channel: Alert
+    trigger: An extract does not agree with its control file (checksum, header, row count, amount totals or hash total) and is rejected
+    recipient: Data Migration Lead and the Migration Operators
+    template: "Migration extract rejected (severity Medium). Text: Extract <file name> rejected: <reason>"
+    content: The extract number and the reason; the alert opens Extracts
+    screen: Extracts (SCR-DM-05)
+    frs: [FR-DM-010]
+  - id: NT-02
+    channel: Alert
+    trigger: A batch stops, or loads with rejected rows
+    recipient: Data Migration Lead and the Migration Operators
+    template: "Migration load failed (severity High). Text: Batch <batch no> stopped. / Batch <batch no> loaded with rejects. <counts>"
+    content: The batch and its counts; the alert opens the batch
+    screen: Batch (SCR-DM-07)
+    frs: [FR-DM-014]
+  - id: NT-03
+    channel: Alert
+    trigger: Validation finds legacy codes without an approved code map entry
+    recipient: Data Steward and the Data Migration Lead
+    template: "Unmapped legacy codes (severity Medium). Text: Batch <batch no> has <n> unmapped legacy codes"
+    content: The batch; the codes are on the Unmapped Codes tab of Code Maps
+    screen: Code Maps (SCR-DM-03)
+    frs: [FR-DM-012]
+  - id: NT-04
+    channel: Alert
+    trigger: A reconciliation run has lines that do not match
+    recipient: Reconciliation approver and the Data Migration Lead
+    template: "Migration reconciliation break (severity High). Text: Reconciliation <run no> of batch <batch no> has <n> open breaks"
+    content: The run and the batch; the alert opens Reconciliation
+    screen: Reconciliation (SCR-DM-09)
+    frs: [FR-DM-020]
+  - id: NT-05
+    channel: Alert
+    trigger: Migration Clearing is not 0.00 for a branch and currency after an opening load
+    recipient: Head of Comptrollership (reconciliation approver) and the Data Migration Lead
+    template: "Migration clearing not zero (severity Critical). Text: Migration Clearing of <branch> <currency> is <amount>"
+    content: The branch, currency and balance; the Migration Clearing report analyses it per legacy control account
+    screen: Reconciliation (SCR-DM-09), GL level
+    frs: [FR-DM-021]
+  - id: NT-06
+    channel: Alert
+    trigger: An accepted or rolled-back batch still holds staging data after its purge date (daily check)
+    recipient: Data Migration Lead and Compliance
+    template: "Migration staging not purged (severity High). Text: Staging data of batch <batch no> is kept past its purge date <date>"
+    content: The batch and the purge date
+    screen: Batch (SCR-DM-07)
+    frs: [FR-DM-010]
+  - id: NT-07
+    channel: Alert
+    trigger: A user exports more legacy archive records in a day than the alert limit (5,000)
+    recipient: Compliance reviewers of the access log
+    template: "Unusual legacy archive access (severity High). Text: User <user> exported <n> legacy archive records today (limit <limit>)"
+    content: The user and the count; the Access Log shows the exports
+    screen: Legacy Inquiry (SCR-DM-14); Access Log (SCR-DM-15)
+    frs: [FR-DM-111]
+  - id: NT-08
+    channel: Alert
+    trigger: A check of the reconciliation of an opening-balance adjustment fails
+    recipient: Head of Comptrollership and the Comptrollership GL lead
+    template: "Opening-balance adjustment break (severity Critical). Text: Opening-balance adjustment <reference> has <n> reconciliation break(s)"
+    content: The adjustment; it cannot be signed until the break is resolved
+    screen: Opening-Balance Adjustments (SCR-DM-11)
+    frs: [FR-DM-024]
+  - id: NT-09
+    channel: E-mail
+    trigger: First day of each month
+    recipient: Compliance reviewers of the access log
+    template: "Monthly digest of the legacy archive access log: searches, views, downloads and exports of the previous month per user, with the reasons given"
+    content: The digest of the access log of the month
+    screen: Access Log (SCR-DM-15)
+    frs: [FR-DM-111]
+  - id: NT-10
+    channel: None
+    trigger: Any record created by a migration load (client, account, invoice, unapplied payment, insurer, product, payee)
+    recipient: "-"
+    template: No notification to clients, insurers or users and no outbound integration message is sent for a migrated record
+    content: "-"
+    screen: Every business screen
+    frs: [FR-DM-014]

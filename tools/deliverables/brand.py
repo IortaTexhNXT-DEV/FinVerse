@@ -205,8 +205,9 @@ def brd_folder(brd: str) -> str:
 
 def src_dir(brd: str) -> Path:
     """Source folder of a BRD: docs/deliverables/src/<BRD-nn_Name>/, holding its FRS and test plan sources, the
-    FRS figures (figures/), the business sign-off pack data (pack/), the pack screenshots (screenshots/), the Start
-    Here guide and, for BRD-13, the migration sources (migration/). Shared builders and programme-level sources
+    FRS figures (figures/), the business sign-off pack data (pack/), the pack screenshots (screenshots/) and the Start
+    Here guide; BRD-13 keeps its migration catalogue and cut-over plan in pack/ with its builder build_dm_pack.py.
+    Shared builders and programme-level sources
     (alignment, change, decks, registers, signoff and testplans builders) keep their own folders."""
     if brd == "BRD-00":
         return SRC_DIR / "BRD-00_Core_Replacement"
@@ -245,8 +246,9 @@ SIGNOFF_SETS = {"BRD-01": "2.0", "BRD-03": "2.0"}
 READING_ORDER = {"StartHere": "00", "GuideDeck": "01", "FRS": "02", "Signoff": "03", "TestPlan": "04",
                  "TestPlanSummary": "05"}
 # Further documents of a set that only some BRDs have (not required by check_pack): the configuration input templates
-# of a setup BRD (BRD-3 Product Maintenance).
-READING_ORDER_EXTRA = {"Templates": "06"}
+# of a setup BRD (BRD-3 Product Maintenance); the Data Migration Handbook and the Migration Workbook, which are the 02
+# and 03 of the BRD-13 set in place of the FRS and the sign-off workbook.
+READING_ORDER_EXTRA = {"Templates": "06", "Handbook": "02", "Workbook": "03"}
 
 
 def output_name(doc_type: str, brd: str, name: str, version: str, ext: str) -> str:

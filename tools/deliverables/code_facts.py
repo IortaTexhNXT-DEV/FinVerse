@@ -435,7 +435,7 @@ def role_grants(include_seed: bool = True) -> dict[str, set[str]]:
             if not low.startswith("insert into sec_role_permission"):
                 unread.append(f"{f.name}: {s[:120]}")
                 continue
-            pairs = re.search(r"\(values (.*?)\) as g\(role_code, permission\)", s)
+            pairs = re.search(r"\(values (.*?)\) as \w+\(role_code, permission\)", s)
             if pairs:
                 for r, p in re.findall(r"\('([A-Z][A-Z0-9_]*)',\s*'([A-Z][A-Z0-9_]*)'\)", pairs.group(1)):
                     roles.setdefault(r, set()).add(p)

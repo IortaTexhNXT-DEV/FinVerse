@@ -1,0 +1,193 @@
+# Messages catalogue of BRD-13 Data Migration: sources, places and the fix the user makes.
+# The message texts are read from the system at every build (never typed here). This file says where each message
+# appears (by the part of the system that raises it) and what the user does.
+sources:
+  backend_packages: [migration]
+  backend_classes_extra: [LegacyBatchService, LegacyBatchApprovals, LegacyBatchPoster, LegacyBatch, DpprBatchService,
+                          DpprBatchApprovals, DpprBatchPoster, DpprBatch]
+  # The seed loader of the test environments and the steps of the load run by the system are not screens.
+  exclude_classes: [MigrationStoryline, MigrationTabsStoryline, LegacyMigrationSeedData, Workbooks, LoaderRegistry,
+                    LegacyInvoicePosting, OpeningJournals]
+  # A record looked up by its internal key: the screens always open an existing record.
+  exclude_codes: [NOT_FOUND]
+  bulk_handlers: []
+  frontend_dirs: [features/migration, features/legacy-inquiry, features/cashiering/legacy]
+  ui_patterns: extended
+
+# Where a message appears: the first rule whose pattern matches the class (server) or file (screen) wins.
+places:
+  - [ "^(MigrationHomePage)$", "Migration Home (SCR-DM-01)" ]
+  - [ "^(ObjectsPage|ObjectPanel|ObjectRegisterService|DecisionService|MigDataObject|MigObjectDecision)$", "Data Objects and the decision of an object (SCR-DM-02)" ]
+  - [ "^(CodeMapsPage|MapSetPanel|EntryDialog|entryCodes|CodeMapService|CodeMapEntry|CodeMapVersion|CodeMapExcel)$", "Code Maps (SCR-DM-03)" ]
+  - [ "^(LayoutsPage|LayoutService|Layout|RuleCatalogueService)$", "Layouts and Rules (SCR-DM-04)" ]
+  - [ "^(ExtractsPage|ExtractController|ExtractNames|ControlFile|IntakeService|Masker)$", "Extracts (SCR-DM-05)" ]
+  - [ "^(BatchesPage|BatchPlanService|ResubmissionService|Resubmission)$", "Batches and resubmissions (SCR-DM-06)" ]
+  - [ "^(BatchPage|BatchSummary|BatchIssues|BatchRows|BatchRecords|batchActions|MigBatch|ValidationService|LoadRunner|RollbackService|GateRules|MappingGate|SignoffService|EvidenceService)$", "Batch (SCR-DM-07)" ]
+  - [ "Loader(s)?$", "Batch (SCR-DM-07): rows refused at load" ]
+  - [ "^(MatchingPage|MatchReviewService)$", "Client Matching (SCR-DM-08)" ]
+  - [ "^(ReconciliationPage|ReconPanel|ReconciliationService|ReconLine)$", "Reconciliation (SCR-DM-09)" ]
+  - [ "^(SignoffPage)$", "Sign-off (SCR-DM-10)" ]
+  - [ "^(TrueUpsPage|trueUpActions|TrueUpService|MigTrueup)$", "Opening-Balance Adjustments (SCR-DM-11)" ]
+  - [ "^(CutoverPage|PlanPanel|cutoverActions|CutoverService)$", "Cutover (SCR-DM-12)" ]
+  - [ "^(RunoffPage|DecommissionService|RunoffService)$", "Run-off and Decommissioning (SCR-DM-13)" ]
+  - [ "^(LegacyInquiryPage|ReasonCard|RecordPanel|LegacyInquiryController|LegacyInquiryService|ArchiveService|LegacyDocumentDrop)$", "Legacy Inquiry (SCR-DM-14)" ]
+  - [ "^(AccessLogPage)$", "Access Log (SCR-DM-15)" ]
+  - [ "^(LegacyBatchList|LegacyBatchDetail|AddLinesPanel|batchScreens|LegacyBatchService|LegacyBatchApprovals|LegacyBatchPoster|LegacyBatch)$", "Unapplied to Income and Legacy PR 2307 Reversal (SCR-DM-18, SCR-DM-19)" ]
+  - [ "^(DpprBatchService|DpprBatchApprovals|DpprBatchPoster|DpprBatch)$", "DP PR Legacy Reversal (SCR-DM-20)" ]
+  - [ "^(ActionConfirm|MigStatus|migrationCodes|useDownload)$", "Every migration screen (Common screen elements)" ]
+
+# The fix the user makes. Messages that tell the user what to do ("Enter ...", "Give ...") are their own fix and are
+# not repeated here. Keys are message codes; screen messages without a code use their text.
+fixes:
+  MAKER_CHECKER_VIOLATION: Ask another user with the approval right to approve; the maker, submitter or operator of the record cannot.
+  MIG_OBJECT_CODE: Use 2 to 10 letters and digits for the object code.
+  DUPLICATE: Use another code; the code is already used.
+  MIG_RATIONALE_LENGTH: Shorten the rationale to 2,000 characters.
+  MIG_OBJECT_UNKNOWN: Choose objects of the register as dependencies.
+  MIG_LOAD_ORDER: Give a load order after the load order of every object it depends on.
+  MIG_DEPENDENCY_CYCLE: Remove the dependency that makes the object depend on itself.
+  MIG_DECISION_PENDING: Wait for the business owner to approve or return the decision already submitted.
+  MIG_DECISION_NOT_PENDING: Refresh the object; the decision was already approved or returned.
+  MIG_NOT_OBJECT_OWNER: Ask the business owner of the object to decide; only the owner can.
+  MIG_CLASS_CHANGE_LOADED: Request the rollback of the loaded batches of the object first.
+  MIG_MAP_ENTRY: Enter the source system, the legacy code and the action.
+  MIG_MAP_TARGET_REQUIRED: Enter the BIBS value of an entry with the action Map to a BIBS value.
+  MIG_MAP_NOT_DRAFT: Create a new version to change the entries; this one is no longer a draft.
+  MIG_MAP_NOT_SUBMITTED: Ask the Data Steward to submit the version first.
+  MIG_MAP_DRAFT_EXISTS: Complete, submit or return the version being edited before starting another.
+  MIG_MAP_DUPLICATE: Keep one entry per legacy code and source system (a conditional entry needs its condition).
+  MIG_MAP_EMPTY: Add at least one entry before submitting.
+  MIG_MAP_TARGET_MISSING: Correct the BIBS value, or create it in its master and have it authorised first.
+  MIG_MAP_IMPORT_LAYOUT: Use the columns of the exported version in the Excel file (source_system, legacy_code, action and the others).
+  MIG_MAP_IMPORT_ACTION: Correct the action of the row to MAP, DEFAULT, REJECT or CREATE.
+  MIG_LAYOUT_FROZEN: Create a new layout version to change the columns.
+  MIG_LAYOUT_NOT_FROZEN: Ask the Data Steward to freeze the layouts of the object on Layouts and Rules first.
+  MIG_LAYOUT_EMPTY: Add the columns of the layout before freezing it.
+  MIG_RULE_SEVERITY: Choose Error or Warning.
+  MIG_MASKING_EXISTS: Change the masking rule of the column already listed.
+  MIG_FILE_MISSING: No action; the file was purged after the retention days. Ask BDOI IT for the extract if it is needed again.
+  MIG_CONTROL_FILE: Correct the control file (row count, hash total, amount totals, SHA-256) or re-extract the data file, and upload both again.
+  MIG_FILE_NAME: Rename the file as <LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv or .xlsx and upload it again.
+  MIG_FILE_OBJECT: Use the layout code of the object in the file name.
+  MIG_FILE_SOURCE: Use a source system of the object in the file name, or ask the Data Migration Lead to add the source to the object.
+  MIG_OBJECT_NOT_DECIDED: Ask the business owner to decide the object for migration first (gate G1).
+  MIG_MASKING_KEY: Ask the infrastructure team to configure the masking key of the environment.
+  MIG_BATCH_STATUS: Refresh the batch; the action is not allowed in its current status.
+  MIG_OBJECT_NOT_LOADABLE: Choose an object decided as Migrate, Carry forward or Archive.
+  MIG_ASOF_MISMATCH: Plan the batch with extracts of the same as-of date.
+  MIG_NO_EXTRACT: Upload and stage an extract of the object first.
+  MIG_EXTRACT_NOT_STAGED: Choose a staged extract of the object.
+  MIG_EXTRACT_USED: Choose an extract that is not in another batch.
+  MIG_NOTHING_TO_RERUN: No action; the batch has no rejected rows.
+  MIG_LOAD_RUNNING: Wait until the other batch of the object has loaded.
+  MIG_RESUBMISSION_EXTRACT: Upload the corrected rows as an extract of the same object, then prepare the resubmission.
+  MIG_RESUBMISSION_DECIDED: No action; refresh the list.
+  MIG_RESUBMIT_DEADLINE: No action; rows still rejected are checked against the tracker before any renewal advice is sent.
+  MIG_ROLLBACK_NOT_SUPPORTED: Ask the infrastructure team to restore the environment snapshot taken before the load.
+  MIG_ROLLBACK_CHANGED: Correct the changed records in BIBS instead; the batch cannot be rolled back.
+  MIG_RESOLUTION: Record the issue as fixed at source, or change the code map; a waiver is recorded on the Rows tab by the data owner.
+  MIG_ERROR_RATE: Fix the failing rows at source, map the codes, or ask the data owner to waive or exclude rows, then validate again.
+  MIG_UNMAPPED_CODES: Add the missing entries to a new version of the code maps, have it approved and validate again.
+  MIG_REVIEW_QUEUE: Decide the client pairs on Client Matching first.
+  MIG_DEPENDENCY_NOT_ACCEPTED: Accept the objects this object depends on first.
+  MIG_GATE_ORDER: Sign the gates in order.
+  MIG_GATE_SIGNED: Ask another signer; one person signs one gate of a batch.
+  MIG_GATE_ROLE: Ask a user who holds the role of the gate.
+  MIG_MAP_NOT_APPROVED: Have the listed code maps approved first.
+  MIG_NOT_RECONCILED: Reconcile the batch first.
+  MIG_OPEN_BREAKS: Explain every break and have the explanation approved first.
+  MIG_PAIR_DECIDED: No action; refresh the queue.
+  MIG_LINE_MATCHED: No action; the line has no difference.
+  MIG_NOT_EXPLAINED: Explain the break first.
+  MIG_TRUEUP_OPTION: No action; opening-balance adjustments apply only to the year-end go-live (option A).
+  MIG_TRUEUP_NO: Choose 1, 2, 3 or F.
+  MIG_TRUEUP_EXISTS: Open the adjustment already prepared.
+  MIG_TRUEUP_BATCH: Choose a batch of the adjustment journals (G03), and a trial balance batch (G01).
+  MIG_TRUEUP_STATUS: Refresh the adjustment; the action is not allowed in its current status.
+  MIG_TRUEUP_NOT_APPROVED: Ask the Head of Comptrollership to approve the adjustment first.
+  MIG_TRUEUP_ITEM_KIND: Send the adjustment of an unapplied payment with the unapplied payments.
+  MIG_TRUEUP_ITEM_MISSING: Correct the invoice reference of the detail line; the invoice must be migrated.
+  MIG_TRUEUP_OUT_OF_RANGE: Settle the difference with Comptrollership; the invoice moved in BIBS since go-live.
+  MIG_GOLIVE_REQUIRED: Give the go-live date of the plan.
+  MIG_CRITERION_MEASURED: No action; the criterion is measured by BIBS (Measure Criteria).
+  MIG_TASK_DEPENDENCY: Complete the tasks it depends on first.
+  MIG_GONOGO_JUSTIFY: Give the justification of the GO, or wait until the criteria are met.
+  MIG_DECOMMISSION_EXISTS: Open the checklist already listed.
+  MIG_EXPORT_TOO_LARGE: Narrow the search (dates, record type, client) to export at most the number shown.
+  MIG_DATE_INVALID: Give the date as yyyy-MM-dd.
+  MIG_ARCHIVE_EXISTS: No action; the record is already archived.
+  MIG_ARCHIVE_RECORD_MISSING: Load the archive record before its documents.
+  MIG_DOCUMENT_MISSING: Ask BDOI IT to copy the file into the transfer folder.
+  MIG_DOCUMENT_SIZE: Ask BDOI IT to copy the file again; its size differs from the index.
+  MIG_DOCUMENT_CHECKSUM: Ask BDOI IT to copy the file again; it differs from the index.
+  MIG_SOURCE_REQUIRED: Give the legacy system of the documents.
+  MIG_DATE_REQUIRED: Correct the extract; the date is mandatory.
+  MIG_ARCHIVE_DETAIL: Correct the legacy details of the record in the extract (label and value pairs).
+  MIG_F01_NOT_LOADED: Load the invoice (F01) first, or remove the row.
+  MIG_BRANCH_UNKNOWN: Map the legacy branch in the branch code map, or correct the extract.
+  MIG_INSURER_NOT_MAPPED: Add the insurer to the insurer code map and have it approved.
+  MIG_PARENT_NOT_LOADED: Load the original invoice first, or correct the parent invoice number.
+  MIG_NO_INSURER: Send the insurer share of the invoice (F01S).
+  MIG_INVOICE_MISSING: Rerun the batch; the invoice of the row was not created.
+  MIG_SNAPSHOT_MISSING: Rerun the batch; the values at cut-over of the invoice were not kept.
+  MIG_TARGET_MISSING: Create the value in its list first, or map the legacy value to an existing value.
+  MIG_MAP_TARGET: Ask the Data Steward to name the BIBS list of the code map.
+  MIG_EMPTY_JOURNAL: No action; there is nothing to post for the line.
+  MIG_JOURNAL_MISSING: Rerun the batch; the journal was not created.
+  MIG_ACCOUNT_UNKNOWN: Map the legacy account to an account of the chart, or ask Comptrollership to open it.
+  MIG_RATE_MISSING: Correct the extract; a foreign-currency line needs its amount in PHP.
+  MIG_SI_BAND: Write the sum-insured band as from-to amounts.
+  MIG_CLIENT_NOT_LOADED: Load the client first, or correct the legacy client number.
+  MIG_PRODUCT_NOT_MAPPED: Add the risk code to the product code map and have it approved.
+  MIG_RA_DUPLICATE: Keep one renewal advice per expiring policy term.
+  MIG_HEADER_NOT_LOADED: Correct the policy reference, or load its policy header first.
+  MIG_NUMBER_REQUIRED: Correct the extract; the number is mandatory.
+  MIG_OFFICER_UNKNOWN: Map the account officer in the user code map, or add the officer to the sales organisation.
+  MIG_UNIT_UNKNOWN: Map the legacy unit in the sales unit code map.
+  MIG_CODE_REQUIRED: Correct the extract; the legacy code is mandatory.
+  MIG_CODE_NOT_MAPPED: Add the legacy code to the code map named and have it approved.
+  MIG_C01_NOT_LOADED: Load the client first, or correct the legacy client number.
+  MIG_UPP_MISSING: Rerun the batch; the unapplied payment of the row was not created.
+  MIG_PARTY_MISSING: Ask Comptrollership to open the sub-ledger party of the invoice.
+
+  # Texts of the confirmation dialogs (what happens when the user confirms) and short confirmations.
+  "The proposal goes back to the Data Migration Lead.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The proposed class <proposed class> goes to the business owner for approval.": Confirm to go ahead, or cancel to leave the record as it is.
+  "A draft is created from the approved version, ready for your changes.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The version goes back to the Data Steward as a draft.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The version goes to the business owner for approval.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The version replaces the approved one for the next batches; values marked Create are created through the reference-data load.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The layout becomes the version in force: extracts and templates follow it and the previous version is retired.": Confirm to go ahead, or cancel to leave the record as it is.
+  "<extract no> rejected: <reject message>": Read the reason, correct the extract or its control file and upload it again.
+  "A rerun batch of the corrected rows is created for validation and load.": Confirm to go ahead, or cancel to leave the record as it is.
+  "Corrected rows": No action; the screen shows the change.
+  "The corrected rows go back to the maker.": Confirm to go ahead, or cancel to leave the record as it is.
+  "A new batch is planned with the rejected rows for validation and load.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The batch stays loaded.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The legacy source is corrected; the next extract carries the fixed value.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The records loaded by this batch are undone now.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The rows are mapped with the approved code maps and checked against the data-quality rules.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The valid rows are loaded through the BIBS services, without notifications or outbound events, and the batch is reconciled.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The Head of Comptrollership approves or returns the adjustment.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The adjustment batch may then be loaded; its journals post into the opening period.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The adjustment goes back to the preparer.": Confirm to go ahead, or cancel to leave the record as it is.
+  "Checklist updated": No action; the screen shows the change.
+  "Recorded": No action; the screen shows the change.
+  "The actual end is recorded and the tasks after it may start.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The actual start is recorded; the tasks it depends on must be finished.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The cut-over stops and rolls back to the snapshot.<gate>": Confirm to go ahead, or cancel to leave the record as it is.
+  "The task is marked blocked with its reason for the cut-over call.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The Cashiering team lead approves first, then top management; the lines post after the second approval.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The Cashiering team lead approves; any premium receivable needed is first moved to PR 2307.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The Commission team lead approves; each invoice then posts on its own.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The batch goes back to its requester as a draft.": Confirm to go ahead, or cancel to leave the record as it is.
+  "The batch is closed without posting; its lines may be taken again.": Confirm to go ahead, or cancel to leave the record as it is.
+  "Checked": No action; the screen shows the change.
+  # Messages of every screen of the platform.
+  ACCESS_DENIED: Ask for the permission; the menu shows only the screens of your role.
+  CONCURRENT_MODIFICATION: Reload the record; another user changed it. Enter the change again.
+  INTERNAL_ERROR: Report the message with its reference to the System Administrator.
+  MALFORMED_REQUEST: Reload the screen and try again; if it persists, report it with the time to the System Administrator.
+  UPLOAD_TOO_LARGE: Split the file (for example by branch) and upload the parts, or use the secure file drop when it is named.
+  VALIDATION_FAILED: Correct the fields listed under the message.
+  NOT_FOUND: Refresh the screen; the record was changed or removed. Report the message with its reference if it persists.

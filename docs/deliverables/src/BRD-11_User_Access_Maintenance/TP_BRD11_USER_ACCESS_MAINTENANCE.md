@@ -19,7 +19,7 @@ control:
     author: iorta TechNXT QA
     reviewer: iorta TechNXT Business Analysis
     approver: ""
-    change: Internal draft from FRS BRD-11 v1.0, the User Access build design and the built access functions
+    change: Internal draft from FRS BRD-11 v1.0
   - version: "1.0"
     date: 25 Sep 2026
     author: iorta TechNXT QA
@@ -31,7 +31,7 @@ control:
     author: iorta TechNXT QA
     reviewer: iorta TechNXT Project Manager
     approver: BDOI business owner, Information Security and BDOI IT (sign-off)
-    change: "Release set v2.0: BRD-11 is built; expected results quote the built messages and codes, 24 cases name their automated tests, the test data are the seed data V1960; cases re-traced to FRS v2.0 and its screen specifications (Screen ID on every case, Screens sheet); one screen case per screen and one message case per screen or dialog of the messages catalogue added; findings revised. Status as of 27-Sep-2026"
+    change: "Release set v2.0: expected results quote the messages and codes word for word, the test data are the seed data; cases re-traced to FRS v2.0 and its screen specifications (Screen ID on every case, Screens sheet); one screen case per screen and one message case per screen or dialog of the messages catalogue added. Issued 27-Sep-2026"
 distribution:
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Business Administrators (process owner)", role: Business tester, organisation: BDOI, purpose: "Requests, group-profile requests, reports"}
@@ -40,7 +40,7 @@ distribution:
   - {name: "BDOI IT", role: Reviewer, organisation: BDOI, purpose: "Sign-in, identity integration assumptions, System Administrator functions"}
   - {name: "ITIO-SRE and ITSD-AMS", role: System administration, organisation: BDO Unibank, purpose: "System Administrator functions, directory sign-in, logs"}
   - {name: "ES-BPDS, Business Project Services", role: UAT coordinator, organisation: BDO Unibank ESG, purpose: UAT planning and traceability}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "System test, defect fixing, UAT support"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "System test, issue resolution, UAT support"}
 ---
 
 # Introduction
@@ -49,11 +49,10 @@ distribution:
 
 This document summarises the test plan for BRD-11 User Access Maintenance in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the Business Administrators, the approvers and the system administrators what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-11_User_Access_Maintenance_v2.0.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-11 v2.0, to the BRD requirement IDs (the printed BRD numbers 1.001 to 4.003, and the non-functional rows UAM-NFR-nn) that the FR meets, and to the screen of the FRS screen specifications where the tester starts. BRD-11 is built, so:
+Every case traces to a functional requirement (FR) of FRS BRD-11 v2.0, to the BRD requirement IDs (the printed BRD numbers 1.001 to 4.003, and the non-functional rows UAM-NFR-nn) that the FR meets, and to the screen of the FRS screen specifications where the tester starts. In this plan:
 
-- expected results quote the messages and codes that BIBS returns, word for word;
-- cases name the automated test that already covers them, where one exists;
-- the test data are the seed data of the SIT environment (V1960 and the broking seeds), and the screen paths are those of FRS chapter 12;
+- expected results quote the messages and codes that BIBS shows, word for word;
+- the test data are the seed data of the SIT environment, and the screen paths are those of FRS chapter 12;
 - each screen has a screen case (its fields, actions and messages as specified) and each screen or dialog of the messages catalogue a message case.
 
 ## Scope
@@ -72,10 +71,10 @@ The roles-and-access sheet checks each access-maintenance function against the r
 
 ## Out of scope
 
-- Access only from BDO-issued devices; it is enforced by the BDO network and endpoint policy, not by BIBS (finding TF-UA-01).
-- The EUA protocol itself (UQ04). The directory cases run against a test stub once BDO supplies the interface.
+- Access only from BDO-issued devices; it is enforced by the BDO network and device policy, not by BIBS.
+- The EUA protocol itself (UQ04). The directory cases run against a test directory once BDO supplies the interface.
 - An external access-control list and single session per device (UQ09, UQ14), which are parked seams.
-- Temporary access with an end date (UQ06), which is not built.
+- Temporary access with an end date, until BDOI answers UQ06.
 - Portal users of Employee Benefits (user type External); they belong to the BRD-8 Employee Benefits test plan.
 - The infrastructure rows of the BRD NFRs answered "Follow existing QPS set up"; they are covered by the BIBS deployment and security controls (deliverables 25 and 26).
 
@@ -85,9 +84,8 @@ The roles-and-access sheet checks each access-maintenance function against the r
 | Ref. | Document | Version |
 |---|---|---|
 | R1 | Functional Requirements Specification BRD-11 User Access Maintenance (`02_BIBS_FRS_BRD-11_User_Access_Maintenance_v2.0.docx`) | 2.0, 27 Sep 2026 |
-| R2 | QPS User Access Maintenance Module BRD (`docs/source-documents/User Access Maintenance.pdf`) | v1, 15-Apr-2025; signed April-May 2025 |
+| R2 | QPS User Access Maintenance Module BRD | v1, 15-Apr-2025; signed April-May 2025 |
 | R3 | Test plan workbook BRD-11 (`04_BIBS_TestPlan_BRD-11_User_Access_Maintenance_v2.0.xlsx`) | 2.0 |
-| R4 | User Access Maintenance build design (`docs/architecture/USER_ACCESS_DESIGN.md`) | as built (sections 16-19) |
 | R5 | FRS BRD-3 Product Maintenance (role-permission change requests, PMADD05) | 2.0 |
 | R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`) | 1.2 |
 
@@ -98,12 +96,10 @@ The roles-and-access sheet checks each access-maintenance function against the r
 <!-- table: widths=3.2,6.2,3.6,3.6 caption="Test levels" -->
 | Level | What is tested | Who | When |
 |---|---|---|---|
-| Unit and integration (automated) | Request lifecycle and types, approver eligibility, four-eyes and second-approval rules, effective-date job, bulk validation, group-profile implementation, password policy, change log, permissions, against a PostgreSQL database; frontend form checks | iorta TechNXT developers | Baseline tests run today; new tests written during the build; all run on every change in CI (`mvn verify`, `npm run verify`) |
 | System test | Every case of the workbook, screen by screen, with the SIT data sets | iorta TechNXT QA | After the BRD-11 change is deployed on SIT |
 | Persona end-to-end | The eight scenarios from start to finish by the persona that owns each step, with notifications and e-mails checked | iorta TechNXT QA with the BDOI testers | After the system test passes |
 | User acceptance test (UAT) | The scenarios and the High-priority cases, run by BDOI testers on masked production-like user data | BDOI Business Administrators, approvers and system administrators | After the entry criteria of section 3 are met |
 
-Automated tests do not replace the system test. They show that a rule holds after every change; the system test shows that the screens, messages, notifications and reports are what the business expects. When the automated tests exist, version 1.1 of the workbook names them in the automation reference column, and each such case is still run on the screen once per cycle.
 
 ## How the cases were derived
 
@@ -126,7 +122,7 @@ Automated tests do not replace the system test. They show that a rule holds afte
 
 ## Reading the workbook
 
-The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Test Data, Roles and Access and FRS Findings. Case IDs carry their condition: TC-UA-034.2-01 is the first case of condition 2 of FR-UA-034. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Defect ID.
+The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Test Data, Roles and Access. Case IDs carry their condition: TC-UA-034.2-01 is the first case of condition 2 of FR-UA-034. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Issue ID.
 
 # Entry and exit criteria
 
@@ -135,8 +131,8 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | BRD-11 is deployed on SIT with its roles, parameters, lists and jobs; the seed V1960 is loaded; CI is green on the deployed commit; the automated tests exist and pass; screen labels and messages have been compared with this plan and differences recorded; the test mailboxes receive mail. |
-| Persona end-to-end | All High-priority system test cases are run; no open Critical defect; the effective-date and password-expiry jobs run on SIT. |
+| System test | BRD-11 is deployed on SIT with its roles, parameters, lists and jobs; the seed data is loaded; screen labels and messages have been compared with this plan and differences recorded; the test mailboxes receive mail. |
+| Persona end-to-end | All High-priority system test cases are run; no open Critical issue; the effective-date and password-expiry jobs run on SIT. |
 | UAT | FRS BRD-11 v2.0 is signed off or its open comments are agreed; the answers to UQ01, UQ02, UQ05 and UQ07 are applied as configuration; the system test exit criteria are met; the UAT environment holds masked user data (section 4.1); BDOI testers have user IDs with the roles of section 5 and attended the walkthrough of the User Access screens. |
 
 ## Exit criteria
@@ -144,11 +140,11 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.4,11 caption="Exit criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | 100 % of cases run (the directory sign-in cases may be Blocked until UQ04 is answered); 100 % of High-priority cases passed; no open Critical or High defect; open Medium and Low defects have an agreed fix date. |
+| System test | 100 % of cases run (the directory sign-in cases may be Blocked until UQ04 is answered); 100 % of High-priority cases passed; no open Critical or High issue; open Medium and Low issues have an agreed fix date. |
 | Persona end-to-end | All eight scenarios passed end to end with the expected notifications, e-mails and change-log rows. |
-| UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High defect; open defects listed with an agreed plan in the UAT sign-off; the sign-off of section 10 is signed. |
+| UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High issue; open issues listed with an agreed plan in the UAT sign-off; the sign-off of section 9 is signed. |
 
-**Suspension.** Testing of a scenario stops when a Critical defect blocks it, when the environment is down for more than half a day, or when the test users are corrupted (for example all administrators locked). It resumes after the fix is deployed and the blocked cases are re-run from their first step.
+**Suspension.** Testing of a scenario stops when a Critical issue blocks it, when the environment is down for more than half a day, or when the test users are corrupted (for example all administrators locked). It resumes after the fix is deployed and the blocked cases are re-run from their first step.
 
 # Environments and test data
 
@@ -157,15 +153,14 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.6,6.4,5.4 caption="Test environments" -->
 | Environment | Use | Data |
 |---|---|---|
-| CI | Automated unit and integration tests on every change | Created by each test; PostgreSQL in a container |
-| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed profile migrations, the seed V1960 and the data sets of section 4.2; directory stub when available; test mailboxes |
+| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed data and the data sets of section 4.2; test directory when available; test mailboxes |
 | UAT | Acceptance by BDOI testers | Masked copy of production-like user data plus the test users; no real names, Windows IDs or e-mail addresses of BDO staff |
 
 Non-production data is always masked. Full names, Windows IDs, e-mail addresses and mobile numbers of users are replaced before data is loaded into SIT or UAT, and user e-mail addresses point to test mailboxes. Test passwords are issued by the test lead and are never real directory passwords.
 
 ## Named data sets
 
-The cases refer to named data sets. The BRD-11 change has no seed yet; the build design plans V1960 with the new users and requests in every status. Until it exists the test lead prepares each set on SIT as its source column says.
+The cases refer to named data sets. The seed data holds the users and access requests in every status; the test lead prepares the other sets on SIT as their source column says.
 
 <!-- tp:data -->
 
@@ -176,23 +171,23 @@ Many cases change users and profiles (enrolment, deactivation, profile changes).
 <!-- table: widths=4,5.4,5 caption="Test roles" -->
 | Role | Organisation | Responsibilities |
 |---|---|---|
-| Test lead | iorta TechNXT QA | Owns this plan and the workbook; prepares environments, test users and the clock settings; runs the daily defect triage; reports progress |
-| System testers | iorta TechNXT QA | Run the system test and the persona end-to-end scenarios; raise defects with evidence |
-| Developers | iorta TechNXT | Write and keep the automated tests green; fix defects; provide the directory stub; support triage |
+| Test lead | iorta TechNXT QA | Owns this plan and the workbook; prepares environments, test users and the clock settings; runs the daily issue triage; reports progress |
+| System testers | iorta TechNXT QA | Run the system test and the persona end-to-end scenarios; raise issues with evidence |
+| Developers | iorta TechNXT | Resolve issues; support triage |
 | Database administrator | iorta TechNXT with BDO Unibank ITIO | Runs the database checks of FR-UA-003 and FR-UA-064 and hands the evidence to QA |
-| BDOI department testers | Business Administrators; Unit Heads as approvers; ITIO-SRE and ITSD-AMS as system administrators | Run the UAT scenarios of their role; confirm the expected results match the access policy; raise defects |
-| BDOI process owner | Process Owner, User Access Maintenance | Decides on disputed expected results and accepted defects; signs off UAT |
+| BDOI department testers | Business Administrators; Unit Heads as approvers; ITIO-SRE and ITSD-AMS as system administrators | Run the UAT scenarios of their role; confirm the expected results match the access policy; raise issues |
+| BDOI process owner | Process Owner, User Access Maintenance | Decides on disputed expected results and accepted issues; signs off UAT |
 | UAT coordinator | ES-BPDS, Business Project Services, BDO Unibank ESG | Plans the UAT sessions; checks traceability to the BRD |
 
 Requestors run the request scenarios (SC-UA-02, 03); approvers and second approvers run SC-UA-04; the Business Administrators run the group-profile requests and reports (SC-UA-05, 07); the system administrators run SC-UA-06 and the sign-in cases of SC-UA-01. The personas are:
 
 <!-- tp:personas -->
 
-# Defect management
+# Issue management
 
 ## Severity
 
-<!-- table: widths=2.2,8.4,5 caption="Defect severity" -->
+<!-- table: widths=2.2,8.4,5 caption="Issue severity" -->
 | Severity | Definition | Example in User Access Maintenance |
 |---|---|---|
 | Critical | Access is granted without the required approval, a user reaches functions of a role not held, data is lost, or a log can be changed | A requester approves the own request; a deactivated user signs in; a change-log row can be deleted |
@@ -202,10 +197,10 @@ Requestors run the request scenarios (SC-UA-02, 03); approvers and second approv
 
 ## Triage and fixing
 
-- Testers raise a defect for each failed case, with the case ID, steps, actual result, screenshot and the request number or user ID.
-- The test lead triages new defects daily with the development lead and, during UAT, the BDOI process owner. Triage confirms the severity, links duplicates and decides whether the FRS or the build is wrong. A disputed expected result goes to the BDOI process owner; an FRS change goes to the FRS owner (see section 9).
+- Testers raise an issue for each failed case, with the case ID, steps, actual result, screenshot and the request number or user ID.
+- The test lead triages new issues daily with the development lead and, during UAT, the BDOI process owner. Triage confirms the severity, links duplicates and decides whether the FRS or the system needs the correction. A disputed expected result goes to the BDOI process owner; an FRS change goes to the FRS owner, who records it in the clarifications chapter of the FRS.
 - Target fix times on the test environments: Critical within 1 working day, High within 3 working days, Medium within the cycle, Low by agreement.
-- A fixed defect is retested with its case and the cases of the same condition; the automated tests of the FR must also pass.
+- A resolved issue is retested with its case and the cases of the same condition.
 
 # Coverage summary
 
@@ -213,7 +208,7 @@ Requestors run the request scenarios (SC-UA-02, 03); approvers and second approv
 
 <!-- tp:counts -->
 
-Every FR has at least one positive and one negative case, and every BRD ID is covered. The builder of the workbook checks this each time the plan is built and refuses to produce a plan with a gap.
+Every FR has at least one positive and one negative case, and every BRD ID is covered. The coverage is checked each time the workbook is issued, and a plan with a gap is not issued.
 
 ## Coverage by FR
 
@@ -239,28 +234,18 @@ The table shows the functions checked per role. Each Y and N is one row of the R
 
 <!-- tp:access -->
 
-## Automated tests referenced
-
-<!-- tp:automation -->
-
 # Risks
 
 <!-- table: widths=5.4,2,7.2 caption="Test risks and mitigations" -->
 | Risk | Impact | Mitigation |
 |---|---|---|
-| A later build changes a screen, label or message after the sign-off | Medium | The pack check compares the signed rows with the code at every build; a change is a change request and a new version of the set (FRS chapter 21) |
-| BDOI answers to open questions change expected results (UQ02 approver choice, UQ05 user ID format and lists, UQ07 privilege levels and working hours, UQ10 bulk rules, UQ16 profiles with members) | Medium | The values are parameters and lists; the affected cases name them and are re-run after the change without a new build |
+| A screen, label or message changes after the sign-off | Medium | The signed rows are compared with the system before each release; a change is a change request and a new version of the set (FRS chapter 21) |
+| BDOI answers to open questions change expected results (UQ02 approver choice, UQ05 user ID format and lists, UQ07 privilege levels and working hours, UQ10 bulk rules, UQ16 profiles with members) | Medium | The values are parameters and lists; the affected cases name them and are re-run after the change without a change to the system |
 | The directory sign-in (EIAM on Entra ID) is not specified by BDOI IT (UQ04, IQ04) | Medium | Directory sign-in cases stay Blocked; LOCAL mode is tested now |
 | A test locks out the administrators of the environment | High | Keep a second administrator (admin2) outside the lock-out cases; the test lead can unlock through the database |
 | Time-based cases (inactivity, token expiry, password age, effective dates, out-of-hours) need the clock to pass | Medium | The test lead shortens timers and moves dates in the test environment, as the preconditions describe |
 | Existing roles lose functions when the new permissions are introduced | High | FR-UA-050 cases check that ACCESS_REQUEST holders keep their request functions; the BRD-1 to BRD-5 access checks are re-run in the same cycle |
 | BDOI testers (14 Requestors and 8 Approvers, UQ01) are not named in time | High | Agree named testers per role in the UAT plan (deliverable 30) |
-
-# FRS findings
-
-Writing and re-tracing the cases showed the points below, where the FRS or the build is ambiguous, cannot be tested as written, or differs from the screen standards. The cases use the assumption stated in the proposal; the FRS owner decides the correction (a revision of the set or a change request).
-
-<!-- tp:findings -->
 
 <!-- pagebreak -->
 

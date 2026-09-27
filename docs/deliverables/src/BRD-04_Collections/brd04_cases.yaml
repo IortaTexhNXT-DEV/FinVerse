@@ -2431,14 +2431,14 @@ frs:
     cases:
       - c: 1
         type: Positive
-        title: Commission and incentive as two receivables (run when built)
+        title: Commission and incentive as two receivables (run after CQ01)
         pre: Draft requirement BRCLXN.061, not built (CQ01). Run this case once BDOI confirms the draft and the function is delivered.
         steps:
           - Book an invoice with commission and an eligible incentive; open the receivables of the invoice.
         expected: Two receivables with different accounts - commission receivable and incentive receivable (Other Income).
       - c: 2
         type: Negative
-        title: Incentive before eligibility (run when built)
+        title: Incentive before eligibility (run after CQ01)
         pre: As above.
         steps:
           - Try to bill the incentive of an invoice that does not meet the criteria.
@@ -2454,14 +2454,14 @@ frs:
     cases:
       - c: 1
         type: Positive
-        title: Invoice paid within the campaign window (run when built)
+        title: Invoice paid within the campaign window (run after CQ01)
         pre: Draft requirement BRCLXN.062, not built (CQ01).
         steps:
           - Run the campaign for a period with an invoice paid within X days of booking.
         expected: The invoice is billed on a system-generated service invoice with the withholding tax and the campaign code.
       - c: 2
         type: Negative
-        title: Pending negative adjustment excluded (run when built)
+        title: Pending negative adjustment excluded (run after CQ01)
         pre: As above.
         steps:
           - Run the campaign with a qualified invoice that has a pending negative adjustment.
@@ -2476,14 +2476,14 @@ frs:
     cases:
       - c: 1
         type: Positive
-        title: Refund from a negative endorsement (run when built)
+        title: Refund from a negative endorsement (run after CQ01)
         pre: Draft requirement BRCLXN.063, not built (CQ01).
         steps:
           - Book a negative endorsement on an invoice whose commission is collected.
         expected: A commission refund linked to the original commission and the endorsement is created.
       - c: 1
         type: Negative
-        title: The refund stays off the CR statement (run when built)
+        title: The refund stays off the CR statement (run after CQ01)
         pre: As above.
         steps:
           - Open the CR statement of account and the CRU aging.
@@ -2498,14 +2498,14 @@ frs:
     cases:
       - c: 1
         type: Positive
-        title: 40 % paid directly (run when built)
+        title: 40 % paid directly (run after CQ01)
         pre: Draft requirement BRCLXN.064, not built (CQ01); formula to confirm (CQ19).
         steps:
           - Premium 100,000.00 with 40,000.00 paid directly and confirmed; open the CR receivable.
         expected: The collectible commission is 40 % of the commission.
       - c: 1
         type: Negative
-        title: Unconfirmed direct portion not billed (run when built)
+        title: Unconfirmed direct portion not billed (run after CQ01)
         pre: As above.
         steps:
           - Leave the direct portion unconfirmed and run the CR billing.

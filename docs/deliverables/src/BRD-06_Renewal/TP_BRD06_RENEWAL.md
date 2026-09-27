@@ -19,7 +19,7 @@ control:
     author: iorta TechNXT QA
     reviewer: iorta TechNXT Business Analysis
     approver: ""
-    change: Internal draft from FRS BRD-6 v1.1 and the Renewal build design
+    change: Internal draft from FRS BRD-6 v1.1
   - version: "1.0"
     date: 25 Sep 2026
     author: iorta TechNXT QA
@@ -40,7 +40,7 @@ distribution:
   - {name: Marketing Business Services and System Support (MBS), role: Business tester, organisation: BDOI, purpose: "Lists of values, templates, rules and parameters"}
   - {name: "LAMD and Contact Center", role: Business tester, organisation: BDO Unibank / BDOI, purpose: "LAMD reports, follow-ups"}
   - {name: Business Project Services, role: UAT coordinator, organisation: BDO Unibank ESG, purpose: UAT planning and traceability}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "System test, defect fixing, UAT support"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "System test, issue resolution, UAT support"}
 ---
 
 # Introduction
@@ -49,7 +49,7 @@ distribution:
 
 This document summarises the test plan for BRD-6 Renewal in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-06_Renewal_v1.1.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-6 v1.1 and to the BRD requirement IDs (BRRN.nnn and the persona line IDs 1.001 to 6.002) that the FR meets. Renewal is **designed and not yet built**. The expected results therefore quote the message texts of the FRS without codes, the screen paths are those of the build design, and no case names an automated test yet. Where a Renewal check reuses a message that the platform already shows (log-in, bulk upload, account completeness), the case quotes the text BIBS shows today and a finding records the difference from the FRS (section 9).
+Every case traces to a functional requirement (FR) of FRS BRD-6 v1.1 and to the BRD requirement IDs (BRRN.nnn and the persona line IDs 1.001 to 6.002) that the FR meets. The expected results quote the message texts of the FRS, and the screen paths are those of the FRS. Where a Renewal check reuses a message that the platform already shows (log-in, bulk upload, account completeness), the case quotes the text BIBS shows on that screen.
 
 ## Scope
 
@@ -76,7 +76,7 @@ The main BRD repeats most capabilities once per persona. The FRS traces its 1,03
 - Renewal of Employee Benefits programmes (BRD-8, decision D3). A case confirms that HMO lines are not extracted.
 - Renewal of package products (BRD-3). Placement, issuance and booking of the renewal account are BRD-1 functions; the cases stop at the booked invoice of business type RENEWAL.
 - Performance and volume testing beyond the two timing cases (20,000-row list, 30,000-row report). The NFRs of FRS section 8 are tested in the BIBS-wide performance test plan (deliverable 28).
-- BDOI's own letter layouts, file layouts and password convention (RQ15, RQ20, RQ26, Q07). The cases use the draft layouts delivered with the build and are re-run when BDOI's layouts are loaded.
+- BDOI's own letter layouts, file layouts and password convention (RQ15, RQ20, RQ26, Q07). The cases use the draft layouts provided with the system and are re-run when BDOI's layouts are loaded.
 
 ## References
 
@@ -84,10 +84,8 @@ The main BRD repeats most capabilities once per persona. The FRS traces its 1,03
 | Ref. | Document | Version |
 |---|---|---|
 | R1 | Functional Requirements Specification BRD-6 Renewal (`BIBS_FRS_BRD-06_Renewal_v1.1.docx`) | 1.1, 26 Sep 2026 |
-| R2 | Renewal BRD pack: Workshop addendum, Addendum 1 and RMEL Phase 2 BRD (`docs/source-documents/Renewal (RN) BRD.pdf`) | BRD v1.0 9-May-2025; addenda 18-Nov-2025 and 8-Apr-2026 |
+| R2 | Renewal BRD pack: Workshop addendum, Addendum 1 and RMEL Phase 2 BRD | BRD v1.0 9-May-2025; addenda 18-Nov-2025 and 8-Apr-2026 |
 | R3 | Test plan workbook BRD-6 (`BIBS_TestPlan_BRD-06_Renewal_v1.1.xlsx`) | 1.1 |
-| R4 | Renewal build design (`docs/architecture/RENEWAL_DESIGN.md`) | current |
-| R5 | Cross-BRD decisions (`docs/requirements/BDOI_CROSS_BRD_DECISIONS.md`) | current |
 | R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`) | 1.2 |
 
 # Test approach
@@ -97,12 +95,10 @@ The main BRD repeats most capabilities once per persona. The FRS traces its 1,03
 <!-- table: widths=3.2,6.2,3.6,3.6 caption="Test levels" -->
 | Level | What is tested | Who | When |
 |---|---|---|---|
-| Unit and integration (automated) | Checks, bucket and matrix rules, workflow transitions, permissions, uploads and letters of each FR, against a PostgreSQL database | iorta TechNXT developers | Written with the build; every change in CI (`mvn verify`, `npm run verify`) |
 | System test | Every case of the workbook, screen by screen, with the named data sets | iorta TechNXT QA | Before UAT, on the SIT environment |
 | Persona end-to-end | The twelve scenarios run from start to finish by the persona that owns each step, with notifications and e-mails checked in the test mailboxes | iorta TechNXT QA with the BDOI department testers | After the system test passes |
 | User acceptance test (UAT) | The scenarios and the High-priority cases, run by BDOI testers on masked production-like data | BDOI Marketing, Processing, MBS, LAMD and Contact Center testers | After the entry criteria of section 3 are met |
 
-The automation reference column is blank in this version. When the module is built, the developers name in the workbook the integration test that asserts each case, as was done for BRD-1 to BRD-3; a case with an automation reference is still run on the screen once per cycle.
 
 ## How the cases were derived
 
@@ -126,7 +122,7 @@ The automation reference column is blank in this version. When the module is bui
 
 ## Reading the workbook
 
-The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Test Data, Roles and Access and FRS Findings. Case IDs carry their condition: TC-RN-043.2-01 is the first case of condition 2 of FR-RN-043. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Defect ID.
+The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Test Data, Roles and Access. Case IDs carry their condition: TC-RN-043.2-01 is the first case of condition 2 of FR-RN-043. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Issue ID.
 
 # Entry and exit criteria
 
@@ -135,8 +131,8 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | The Renewal module is deployed on SIT with its jobs (RNW_EXTRACTION, RNW_REEVALUATE, RNW_NRNS_LETTERS, RNW_EXPIRY_SWEEP); the shared change BT0 (business type on the account) is deployed; CI is green on the deployed commit; the data sets of section 4.2 are loaded; the test mailboxes of clients and insurers receive mail; the developers have added the automation references to the workbook. |
-| Persona end-to-end | All High-priority system test cases are run; no open Critical defect; notifications and the e-mail relay work on SIT; the Submitted Policies hand-off (BRD-12) is deployed for SC-RN-10. |
+| System test | The Renewal module is deployed on SIT with its jobs (RNW_EXTRACTION, RNW_REEVALUATE, RNW_NRNS_LETTERS, RNW_EXPIRY_SWEEP); the shared change BT0 (business type on the account) is deployed; the data sets of section 4.2 are loaded; the test mailboxes of clients and insurers receive mail; the developers have added the automation references to the workbook. |
+| Persona end-to-end | All High-priority system test cases are run; no open Critical issue; notifications and the e-mail relay work on SIT; the Submitted Policies hand-off (BRD-12) is deployed for SC-RN-10. |
 | UAT | FRS BRD-6 v1.1 is signed off or its open comments are agreed; the open questions that change expected results (RQ01, RQ08, RQ10, RQ15, RQ24) are answered or their test values agreed; the system test exit criteria are met; the UAT environment holds masked data; BDOI testers have user IDs with the roles of section 5. |
 
 ## Exit criteria
@@ -144,11 +140,11 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.4,11 caption="Exit criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | 100 % of cases run; 100 % of High-priority cases passed; no open Critical or High defect; open Medium and Low defects have an agreed fix date. |
+| System test | 100 % of cases run; 100 % of High-priority cases passed; no open Critical or High issue; open Medium and Low issues have an agreed fix date. |
 | Persona end-to-end | All twelve scenarios passed end to end with the expected notifications, letters and e-mails. |
-| UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High defect; open defects listed with an agreed plan in the UAT sign-off; the sign-off of section 10 is signed. |
+| UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High issue; open issues listed with an agreed plan in the UAT sign-off; the sign-off of section 9 is signed. |
 
-**Suspension.** Testing of a scenario stops when a Critical defect blocks it, when the environment or the mail relay is down for more than half a day, or when the test data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
+**Suspension.** Testing of a scenario stops when a Critical issue blocks it, when the environment or the mail relay is down for more than half a day, or when the test data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
 
 # Environments and test data
 
@@ -157,7 +153,6 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.6,6.4,5.4 caption="Test environments" -->
 | Environment | Use | Data |
 |---|---|---|
-| CI | Automated unit and integration tests on every change | Created by each test; PostgreSQL in a container |
 | SIT | System test and persona end-to-end runs by iorta TechNXT QA | Data sets of section 4.2, booked through BRD-1 on SIT; test mailboxes for clients and insurers |
 | UAT | Acceptance by BDOI testers | Masked copy of production-like data plus the data sets; no real client names, TINs, PNs, addresses or e-mail addresses |
 
@@ -165,7 +160,7 @@ Non-production data is always masked. Client names, TINs, PN numbers, addresses,
 
 ## Named data sets
 
-Renewal is not built, so no seed provides the data yet. The test lead prepares each set on SIT as its source column says, mostly by booking policies through BRD-1 with expiry dates relative to the business date. When the module is built, the sets become a seed and this column names it.
+The test lead prepares each set on SIT as its source column says, mostly by booking policies through BRD-1 with expiry dates relative to the business date.
 
 <!-- tp:data -->
 
@@ -176,22 +171,22 @@ Many cases move a candidate to a later stage (post, send, accept). The test lead
 <!-- table: widths=4,5.4,5 caption="Test roles" -->
 | Role | Organisation | Responsibilities |
 |---|---|---|
-| Test lead | iorta TechNXT QA | Owns this plan and the workbook; prepares environments and data; runs the daily defect triage; reports progress |
-| System testers | iorta TechNXT QA | Run the system test and the persona end-to-end scenarios; raise defects with evidence |
-| Developers | iorta TechNXT | Write and keep the automated tests green; add the automation references; fix defects; support triage |
-| BDOI department testers | BDOI Marketing, Processing, MBS; BDO LAMD; Contact Center | Run the UAT scenarios of their department; confirm the expected results match the business rules; raise defects |
-| BDOI process owner | BDOI Product Owner, Renewal | Decides on disputed expected results and accepted defects; signs off UAT |
+| Test lead | iorta TechNXT QA | Owns this plan and the workbook; prepares environments and data; runs the daily issue triage; reports progress |
+| System testers | iorta TechNXT QA | Run the system test and the persona end-to-end scenarios; raise issues with evidence |
+| Developers | iorta TechNXT | Resolve issues; support triage |
+| BDOI department testers | BDOI Marketing, Processing, MBS; BDO LAMD; Contact Center | Run the UAT scenarios of their department; confirm the expected results match the business rules; raise issues |
+| BDOI process owner | BDOI Product Owner, Renewal | Decides on disputed expected results and accepted issues; signs off UAT |
 | UAT coordinator | Business Project Services, BDO Unibank ESG | Plans the UAT sessions; checks traceability to the BRD |
 
 Each department tests the steps it owns: Marketing the extraction, assignment, transfer, disposition, review and letters (SC-RN-02, 04, 05, 06, 09); Processing the upload, processing, insurer round-trip and RAs (SC-RN-07, 08, 09); MBS the administration and rules (SC-RN-03, 12); LAMD and the Contact Center their uploads and follow-ups. The personas are:
 
 <!-- tp:personas -->
 
-# Defect management
+# Issue management
 
 ## Severity
 
-<!-- table: widths=2.2,8.4,5 caption="Defect severity" -->
+<!-- table: widths=2.2,8.4,5 caption="Issue severity" -->
 | Severity | Definition | Example in Renewal |
 |---|---|---|
 | Critical | A main flow cannot be completed, data is lost or wrong in a way that reaches a client or insurer, or a security rule is broken | An RA or insurer extract is e-mailed unprotected; a TL sees another unit's accounts; a failed check gives Clean |
@@ -201,10 +196,10 @@ Each department tests the steps it owns: Marketing the extraction, assignment, t
 
 ## Triage and fixing
 
-- Testers raise a defect for each failed case, with the case ID, steps, actual result, screenshot and the renewal reference.
-- The test lead triages new defects daily with the development lead and, during UAT, the BDOI process owner. Triage confirms the severity, links duplicates and decides whether the FRS or the build is wrong. A disputed expected result goes to the BDOI process owner; an FRS change goes to the FRS owner (section 9).
+- Testers raise an issue for each failed case, with the case ID, steps, actual result, screenshot and the renewal reference.
+- The test lead triages new issues daily with the development lead and, during UAT, the BDOI process owner. Triage confirms the severity, links duplicates and decides whether the FRS or the system needs the correction. A disputed expected result goes to the BDOI process owner; an FRS change goes to the FRS owner, who records it in the clarifications chapter of the FRS.
 - Target fix times on the test environments: Critical within 1 working day, High within 3 working days, Medium within the cycle, Low by agreement.
-- A fixed defect is retested with its case and the cases of the same condition; the automated tests of the FR must also pass.
+- A resolved issue is retested with its case and the cases of the same condition.
 
 # Coverage summary
 
@@ -212,7 +207,7 @@ Each department tests the steps it owns: Marketing the extraction, assignment, t
 
 <!-- tp:counts -->
 
-Every FR has at least one positive and one negative case, and every BRD ID of the FRS is covered. The builder of the workbook checks this each time the plan is built and refuses to produce a plan with a gap.
+Every FR has at least one positive and one negative case, and every BRD ID of the FRS is covered. The coverage is checked each time the workbook is issued, and a plan with a gap is not issued.
 
 ## Coverage by FR
 
@@ -286,31 +281,19 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 
 <!-- tp:access -->
 
-## Automated tests
-
-<!-- tp:automation -->
-
 # Risks
 
 <!-- table: widths=5.4,2,7.2 caption="Test risks and mitigations" -->
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Renewal is not built; screen names, labels and messages may change at build | High | The cases name the design's screens and the FRS texts; the test lead updates the workbook from the build before the system test and records the changes in the document control |
-| Open questions change expected results (RQ01 checks, RQ08 CBG, RQ10 counters, RQ15 insurer file, RQ24 matrix content) | High | The rules are configuration; the cases use the test values of TD-RN-08 and are re-run with BDOI's values without a new build |
-| The Claims module is not connected (decision D4) | Medium | Claims cases expect "claims not connected"; the claim-driven cases (open claim gives Review) use a claims stub until Claims is built |
+| Screen names, labels or messages change after BDOI's review of the FRS | High | The cases name the FRS screens and texts; the test lead updates the workbook before the system test and records the changes in the document control |
+| Open questions change expected results (RQ01 checks, RQ08 CBG, RQ10 counters, RQ15 insurer file, RQ24 matrix content) | High | The rules are configuration; the cases use the test values of TD-RN-08 and are re-run with BDOI's values without a change to the system |
+| The Claims module is not connected (decision D4) | Medium | Claims cases expect "claims not connected"; the claim-driven cases (open claim gives Review) use a prepared list of open claims until the Claims module is connected |
 | Letter, LAMD and insurer file layouts are drafts (RQ15, RQ20, RQ26) | Medium | Upload-download and letter cases run on the draft layouts and are re-run when BDOI's layouts are loaded |
 | Test mailboxes not reachable from SIT or UAT | High | Check the relay before the cycle (entry criterion); letter cases read the send log when the mailbox is down and are re-run later |
 | Date-driven cases need the clock to pass | Medium | The test lead sets the business date and runs the jobs on demand (section 4.2) |
 | Candidates are moved on by earlier cases | Medium | Keep one copy of the data per cycle; cases state the stage they start from |
 | BDOI testers from Marketing, Processing, LAMD and the Contact Center are not available in the UAT window | High | Agree named testers per department and dates in the UAT plan (deliverable 30) before UAT starts |
-
-# FRS findings
-
-Writing the cases showed the points below, where the FRS is ambiguous, cannot be tested as written, or differs from what the platform shows today. The cases follow the proposed resolution; the FRS owner decides the correction for FRS v1.1.
-
-<!-- tp:findings -->
-
-
 
 # Sign-off
 

@@ -40,8 +40,8 @@ class CsfReportsApiIT {
   private Map<String, String> params(Map<String, String> extra) {
     Map<String, String> p = new HashMap<>();
     p.put("companyId", fx.company().toString());
-    p.put("from", "2020-01-01");
-    p.put("to", "2030-12-31");
+    p.put("fromDate", "2020-01-01");
+    p.put("toDate", "2030-12-31");
     p.putAll(extra);
     return p;
   }
@@ -87,7 +87,8 @@ class CsfReportsApiIT {
       ReportResult result = as.run(MANAGEMENT, () -> reports.run(code, params(Map.of())));
       assertThat(result.rows()).as(code).isNotEmpty();
       for (ExportFormat format : List.of(ExportFormat.PDF, ExportFormat.XLSX, ExportFormat.CSV)) {
-        assertThat(as.run(MANAGEMENT, () -> reports.export(code, params(Map.of()), format)).content())
+        assertThat(
+                as.run(MANAGEMENT, () -> reports.export(code, params(Map.of()), format)).content())
             .as(code + " " + format)
             .isNotEmpty();
       }
@@ -113,7 +114,14 @@ class CsfReportsApiIT {
             () ->
                 reports.run(
                     AgentActivityReport.CODE,
-                    params(Map.of("layout", "Detail", "action", "Contact change", "client", c.getCode()))));
+                    params(
+                        Map.of(
+                            "layout",
+                            "Detail",
+                            "action",
+                            "Contact change",
+                            "client",
+                            c.getCode()))));
     assertThat(detail.rows()).filteredOn(r -> r.kind() == RowKind.DETAIL).hasSize(1);
     assertThatThrownBy(
             () ->
@@ -122,7 +130,7 @@ class CsfReportsApiIT {
                     () ->
                         reports.run(
                             ContactChangesReport.CODE,
-                            params(Map.of("from", "2026-10-01", "to", "2026-09-01")))))
+                            params(Map.of("fromDate", "2026-10-01", "toDate", "2026-09-01")))))
         .isInstanceOf(BusinessRuleException.class);
   }
 
@@ -144,7 +152,8 @@ class CsfReportsApiIT {
     api.doPost(
             MANAGEMENT,
             url(base + "/verifications"),
-            Map.of("channel", "HOTLINE", "checks", List.of(Map.of("code", "EMAIL", "matched", true))))
+            Map.of(
+                "channel", "HOTLINE", "checks", List.of(Map.of("code", "EMAIL", "matched", true))))
         .andExpect(status().isForbidden());
     api.doPost(
             AGENT,

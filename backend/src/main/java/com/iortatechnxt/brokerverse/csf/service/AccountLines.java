@@ -30,7 +30,8 @@ public class AccountLines {
    * @param mapper CSF status mapping
    * @param names product and insurer names (agents do not read the catalog)
    */
-  public AccountLines(InvoiceLedgerQueryService ledger, CsfStatusMapper mapper, CatalogNames names) {
+  public AccountLines(
+      InvoiceLedgerQueryService ledger, CsfStatusMapper mapper, CatalogNames names) {
     this.ledger = ledger;
     this.mapper = mapper;
     this.names = names;

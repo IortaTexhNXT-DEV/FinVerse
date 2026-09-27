@@ -24,11 +24,11 @@ public class CsfReportSupport {
   /** Company parameter. */
   static final String COMPANY = "companyId";
 
-  /** First day parameter. */
-  static final String FROM = "from";
+  /** First day parameter (range convention fromDate / toDate). */
+  static final String FROM = "fromDate";
 
   /** Last day parameter. */
-  static final String TO = "to";
+  static final String TO = "toDate";
 
   /** Agent parameter (user ID). */
   static final String AGENT = "agent";
@@ -107,8 +107,8 @@ public class CsfReportSupport {
   List<Map<String, Object>> rows(String sql, ReportParameters p, Map<String, Object> extra) {
     SqlArgs args =
         SqlArgs.company(p.longValue(COMPANY))
-            .with(FROM, p.date(FROM))
-            .with(TO, p.date(TO))
+            .with("from", p.date(FROM))
+            .with("to", p.date(TO))
             .with(
                 AGENT,
                 p.optionalText(AGENT).map(a -> a.strip().toLowerCase(Locale.ROOT)).orElse(""))

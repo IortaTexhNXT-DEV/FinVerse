@@ -2,8 +2,9 @@ package com.iortatechnxt.brokerverse.csf;
 
 import com.iortatechnxt.brokerverse.attachment.domain.Attachment;
 import com.iortatechnxt.brokerverse.attachment.domain.AttachmentTarget;
-import com.iortatechnxt.brokerverse.attachment.service.AttachmentService;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService;
+import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadOptions;
+import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails.Contact;
@@ -36,7 +37,6 @@ public class CsfFixtures {
   private static final String LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   private final ClientService clients;
-  private final AttachmentService attachments;
   private final DocumentService documents;
   private final DocumentComposer composer;
   private final AsUser as;
@@ -44,13 +44,11 @@ public class CsfFixtures {
 
   CsfFixtures(
       ClientService clients,
-      AttachmentService attachments,
       DocumentService documents,
       DocumentComposer composer,
       AsUser as,
       TestData data) {
     this.clients = clients;
-    this.attachments = attachments;
     this.documents = documents;
     this.composer = composer;
     this.as = as;
@@ -141,8 +139,12 @@ public class CsfFixtures {
         "proc",
         () -> {
           Attachment a =
-              attachments.upload(
-                  owner, "RA_" + digits(4) + ".pdf", pdf, "Renewal advice", "RENEWAL_ADVICE");
+              documents
+                  .upload(
+                      owner,
+                      List.of(new UploadedFile("RA_" + digits(4) + ".pdf", pdf)),
+                      new UploadOptions("RENEWAL_ADVICE", false, null, "Renewal advice"))
+                  .get(0);
           documents.link(
               a.getId(), List.of(new AttachmentTarget("Client", String.valueOf(clientId))));
           return a;

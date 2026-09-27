@@ -1,6 +1,6 @@
 # iNXT BrokerVerse - BDOI Customer Servicing Facility (BRD-9) Build Design
 
-Status: **proposal for review**. This design extends `docs/architecture/BROKING_ARCHITECTURE.md`, `docs/architecture/OPERATIONS_DESIGN.md` and the Developer Guide, which stay binding. It does not change them, except for the contract changes listed in section 11.
+Status: **built** (waves S0, S1 and S2; section 16 describes the module as built and its differences from this design). This design extends `docs/architecture/BROKING_ARCHITECTURE.md`, `docs/architecture/OPERATIONS_DESIGN.md` and the Developer Guide, which stay binding. It does not change them, except for the contract changes listed in section 11.
 
 Requirements baseline: [`BDOI_CSF_BRD_SPEC.md`](../requirements/BDOI_CSF_BRD_SPEC.md): 23 requirement rows (BRCSF-001 to 011 with their process steps, e-mail items 7 and 9; case management OUT) and questions CSQ01-CSQ16. Every class, migration and screen cites its BRD ID in Javadoc or a comment, for example `BRCSF-004`.
 
@@ -201,3 +201,64 @@ Parallel-work rules:
 1. **Legacy coexistence.** If QPS / EBIX stay systems of record after BIBS go-live, contact changes diverge until the write-back exists. Mitigation: the outbox keeps every change with its payload; a replay is possible once the interface is specified.
 2. **RA availability.** The RA tab depends on the Renewal and EB modules storing RAs with the agreed document type. Mitigation: the convention is in both designs; the tab is empty, not broken, until then.
 3. **Over-broad agent access.** Agents see every segment and every document type unless access classes restrict them. Mitigation: the attachment access classes of the EB design apply to CSF lists and downloads, and every view and download is logged.
+
+## 16. As built (waves S0-S2)
+
+Module guide: [`docs/modules/CUSTOMER_SERVICING.md`](../modules/CUSTOMER_SERVICING.md). The FRS BRD-9 v1.0 stays the
+business-facing document; the notes below map it to the build.
+
+### 16.1 Files
+
+| Wave | Files |
+|---|---|
+| S0 | `security/domain/Permission.java` (six CSF permissions); `attachment/domain/AllowedFileType.java` (TXT, RTF, HEIC / HEIF, GIF, BMP, TIFF, WEBP) with `AllowedFileTypeTest`; `report/core/ReportCategory.CUSTOMER_SERVICE` and `ReportMetadata.customerService`; `db/migration/V1040__csf_foundation.sql`; `csf/package-info.java` |
+| S1 | `db/migration/V1041__csf_tables.sql`; `crm/domain/ContactChange.java`, `ClientContactChanged.java`, `Client.changeContact`, `crm/service/ClientService.updateContact`, `ClientRules.contactViolations`; `account/service/AccountQueryService.byAccountNumber` and `byLoanApplication` (with two `AccountRepository` queries); `placement/service/PlacementQueryService.arnsByLoanApplication`; `opsledger/service/InvoiceLedgerQueryService.paymentsOfClient`; `cashiering/service/CashReceiptService.modesOf`; `csf/**`; `frontend/src/api/csf.ts`, `frontend/src/features/csf/**`, `navigation/modules.ts` (one entry), `navigation/access.ts` (landing page) |
+| S2 | `db/seed/V1940__seed_csf.sql`, `csf/seed/CsfSeedData.java`; `CsfContactChangeIT`, `CsfServicingIT`, `CsfReportsApiIT`, `CsfStatusRulesTest`; `ApiSmokeIT` and `PersonaMenusIT` entries; `navigation/personaMenus.json` (suite BRD-9); `tools/screenshots/screens.cjs`; help `features/csf/help.ts`; this section, the module guide, the Developer Guide rows and `CONFIGURATION.md` |
+
+### 16.2 Differences from the design
+
+| Topic | Design | As built | Why |
+|---|---|---|---|
+| Field rows and checks | "as rows or JSON" | Child tables `csf_contact_change_field` and `csf_verification_check` | Queryable in the Contact Changes report, one row per field |
+| Change states | APPLIED, REFUSED | APPLIED, REFUSED, REFERRED; a refusal is kept in its own transaction and the request still fails with `CSF_FIELD_NOT_UPDATABLE` | The fulfilment unit referral (e-mail topic 3) needs a record |
+| Referral to the fulfilment unit | "refused and routed" | Refer to Fulfilment Unit: REFERRED record and an Operations hand-off (`HandoffService`, port `CSF_FULFILMENT_REFERRAL`) notified to `CLIENT_MAINTAIN` | Uses the existing hand-off register; no new workflow |
+| Activity actions | SEARCH ... CONTACT_CHANGE | also VERIFY and REFERRAL | Every agent action is logged (FR-CSF-042) |
+| Lists | four | also `CSF_STATUS` (labels), `CSF_CHANNEL`, `CSF_REFERRAL_FIELD`; platform document types `CLIENT_REQUEST`, `PROOF_OF_ADDRESS`, `CLIENT_PHOTO` for `CSF_DOCUMENT_TYPE` | Channel and referral fields are coded fields; the upload types must be platform document types |
+| Status mapping rows | "account stage pattern, payment status pattern" | Code = stage (or `ANY`) with the suffix `_OUTSTANDING` or `_EXPIRED`, group = CSF status, order = evaluation order (`CsfStatusRules`); rows added for `PLACEMENT_CANCELLED` (Closed) and `POLICY_ISSUED` (Awaiting) | LOV codes allow only `A-Z0-9_`; every stage has a status |
+| V1042 `crm_client_contact` | on confirmation of CSQ15 | Not built, version kept free | CSQ15 open |
+| Account-number and application searches | `AccountQueryService.search`, `PlacementQueryService` | plus `AccountQueryService.byAccountNumber` (ARN with or without suffix, policy number, legacy reference) and `byLoanApplication` (account loan application number) | The account search matches fragments of other keys; the loan application number is also on the account |
+| Payment history | `paymentsOfClient` in opsledger | as designed, plus `CashReceiptService.modesOf` for the mode of payment | The movements carry the receipt numbers, not the mode |
+| Names in lists | `ProductName`, `InsurerName` | Product and insurer names sent with the account lines (`catalog.service.CatalogNames`) | CSF roles do not read the catalog |
+| `LegacyAccountLookup` | implemented by `migration` | Port and empty default only (`NoLegacyAccountLookup`); `XrefLegacyAccountLookup` stays with the migration module | Owner of BRD-13 |
+| RA resend text | not specified | Fixed business text, attachment protected with a generated password sent separately (`DocumentPasswordPolicy`) | No RA resend template exists; CSQ06 |
+| Job `CSF_LEGACY_SYNC` | every 15 minutes, manual until enabled | Cron property default `-` (manual); set `0 */15 * * * *` with the interface; replays the NOT_CONFIGURED rows when switched on; workload INTEGRATION | Nothing to send until CSQ01 |
+| Screens | `/csf`, `/csf/clients/:id`, Report Centre | also Contact Changes `/csf/changes` and Customer Service Reports `/csf/reports`; menu after Adjustment (UX guidelines section 3 list) | Supervisors follow the changes and referrals |
+| `CSF-ACTIVITY` | counts and detail | one report with the parameter Layout (Summary, Detail) and an Action filter | One code in the catalogue |
+
+### 16.3 FRS notes (kept here, the FRS stays business-facing)
+
+| FR | Built | Note |
+|---|---|---|
+| FR-CSF-001 | Platform sign-in and lockout; Customer Search is the landing page of the CSF roles | Directory sign-in stays the parked port of BRD-11 (D6) |
+| FR-CSF-002 | Six permissions, three roles (V1040); every endpoint under a CSF permission; resend to another address without `CSF_RESEND_OTHER` answers 403 | Matrix to confirm (CSQ10) |
+| FR-CSF-010 | `CustomerSearchService`, five keys, min 3 characters, max 50 clients, one match opens the view, "No client found" | Legacy lookup empty (CSQ01, CSQ02) |
+| FR-CSF-011 | Summary and six tabs, each its own call; a tab that fails shows "Information not available now. Try again" | No segment scoping (CQ06) |
+| FR-CSF-012 | `CsfStatusMapper` over `CSF_STATUS_MAP` | Seeds to confirm (CSQ04) |
+| FR-CSF-013 | Payments tab, 12 months, Show Older adds 12 (up to 120), filter by account, invoices with balance and status | Content to confirm (CSQ05) |
+| FR-CSF-020 | Checklist of `CSF_VERIFY_CHECK` with channel; pass at `CSF_VERIFY_MIN_MATCHES`; valid `CSF_VERIFICATION_VALID_MINUTES`; alert at `CSF_VERIFY_MAX_FAILS` a day | CSQ03 |
+| FR-CSF-021 | Contact-only change with reason; refusal names the fulfilment unit; Contact History with old and new values | "Add" contacts (CSQ15) and account contacts (CSQ14) not built |
+| FR-CSF-022 | Outbox per legacy system, NOT_CONFIGURED; job, retries on the next run, alert | Interface (CSQ01) |
+| FR-CSF-030, 031 | RA and confirmed e-policy resend, registered e-mail, supervisor other address with reason, password apart | CSQ06, CSQ13 |
+| FR-CSF-032, 033 | Upload with type, seven new file types, list across client, accounts and quotations under the access classes, logged download and ZIP | Size limit and scanning are the platform settings (CSQ08); claims reports appear once stored as `CLAIM_REPORT` linked to the account or client (XQ05) |
+| FR-CSF-040 | Client audit trail with values before and after, source, reference and reason; retention rule `CSF_CONTACT_CHANGE` | |
+| FR-CSF-041, 042 | `CSF-CONTACT-CHANGES`, `CSF-ACTIVITY` in PDF, Excel, CSV; `CTL-AUDIT` for `AUDIT_VIEW` | |
+| FR-CSF-043 | Not in the application | Infrastructure: WAL archiving every 15 minutes (section 8; CSQ11) |
+
+### 16.4 Open points
+
+- CSQ01 / CSQ02: the QPS / EBIX write-back transport (`ContactSyncGateway`) and the legacy account lookup
+  (`LegacyAccountLookup`, to be implemented by the migration module from `mig_key_xref`).
+- CSQ03, CSQ04, CSQ05, CSQ06, CSQ07, CSQ10, CSQ13, CSQ14, CSQ15 as listed in section 14.
+- Which unit is the fulfilment unit and who closes its hand-offs: today the referral notifies `CLIENT_MAINTAIN` and the
+  hand-off is closed by the users who close Operations hand-offs.
+

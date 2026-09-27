@@ -4,8 +4,9 @@ import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.service.AccountQueryService;
 import com.iortatechnxt.brokerverse.attachment.domain.Attachment;
 import com.iortatechnxt.brokerverse.attachment.domain.AttachmentTarget;
-import com.iortatechnxt.brokerverse.attachment.service.AttachmentService;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService;
+import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadOptions;
+import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
@@ -46,7 +47,6 @@ public class CsfSeedData implements ApplicationRunner {
   private final CompanyRepository companies;
   private final ClientRepository clients;
   private final AccountQueryService accounts;
-  private final AttachmentService attachments;
   private final DocumentService documents;
   private final DocumentComposer composer;
   private final TransactionTemplate tx;
@@ -58,7 +58,6 @@ public class CsfSeedData implements ApplicationRunner {
    * @param companies companies
    * @param clients clients
    * @param accounts accounts of the client
-   * @param attachments attachment storage
    * @param documents document links
    * @param composer PDF composer
    * @param transactions transaction manager
@@ -69,7 +68,6 @@ public class CsfSeedData implements ApplicationRunner {
       CompanyRepository companies,
       ClientRepository clients,
       AccountQueryService accounts,
-      AttachmentService attachments,
       DocumentService documents,
       DocumentComposer composer,
       PlatformTransactionManager transactions,
@@ -77,7 +75,6 @@ public class CsfSeedData implements ApplicationRunner {
     this.companies = companies;
     this.clients = clients;
     this.accounts = accounts;
-    this.attachments = attachments;
     this.documents = documents;
     this.composer = composer;
     this.tx = new TransactionTemplate(transactions);
@@ -114,13 +111,12 @@ public class CsfSeedData implements ApplicationRunner {
     LocalDate today = BusinessClock.today(clock);
     byte[] pdf = composer.pdf(spec(company, client, account, today));
     Attachment ra =
-        attachments.upload(
-            new AttachmentTarget(CsfCodes.ENTITY_ACCOUNT, String.valueOf(account.getId())),
-            account.getArn() + "_RENEWAL_ADVICE.pdf",
-            pdf,
-            "Renewal advice",
-            CsfCodes.DOC_RENEWAL_ADVICE);
-    ra.classify(CsfCodes.DOC_RENEWAL_ADVICE);
+        documents
+            .upload(
+                new AttachmentTarget(CsfCodes.ENTITY_ACCOUNT, String.valueOf(account.getId())),
+                List.of(new UploadedFile(account.getArn() + "_RENEWAL_ADVICE.pdf", pdf)),
+                new UploadOptions(CsfCodes.DOC_RENEWAL_ADVICE, false, null, "Renewal advice"))
+            .get(0);
     documents.link(ra.getId(), List.of(clientTarget));
     LOG.info("Customer Servicing Facility seed data: renewal advice of {}", account.getArn());
   }

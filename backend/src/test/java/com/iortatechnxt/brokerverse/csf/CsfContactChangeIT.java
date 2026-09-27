@@ -123,7 +123,7 @@ class CsfContactChangeIT {
         .containsExactly(done.changeNo());
     assertThat(
             jdbc.queryForList(
-                "select status from csf_sync_outbox o join csf_contact_change c on c.id = o.change_id"
+                "select o.status from csf_sync_outbox o join csf_contact_change c on c.id = o.change_id"
                     + " where c.change_no = ?",
                 String.class,
                 done.changeNo()))

@@ -198,13 +198,13 @@ describe('Servicing View', () => {
     const dialog = await screen.findByRole('dialog');
     await within(dialog).findByText('Address');
     fireEvent.change(within(dialog).getByLabelText(/Channel/), { target: { value: 'HOTLINE' } });
-    const matched = within(dialog).getAllByLabelText('Matched');
-    const notMatched = within(dialog).getAllByLabelText('Not Matched');
-    fireEvent.click(matched[0]);
-    fireEvent.click(notMatched[1]);
+    const address = within(dialog).getByRole('radiogroup', { name: 'Address' });
+    const email = within(dialog).getByRole('radiogroup', { name: 'E-mail address' });
+    fireEvent.click(within(address).getByLabelText('Matched'));
+    fireEvent.click(within(email).getByLabelText('Not Matched'));
     fireEvent.click(within(dialog).getByRole('button', { name: 'Record Verification' }));
     expect(await within(dialog).findByText(/could not be verified/)).toBeInTheDocument();
-    fireEvent.click(matched[1]);
+    fireEvent.click(within(email).getByLabelText('Matched'));
     fireEvent.click(within(dialog).getByRole('button', { name: 'Record Verification' }));
     expect(await within(dialog).findByText('Caller verified')).toBeInTheDocument();
     expect(verify).toHaveBeenCalledTimes(2);

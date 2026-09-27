@@ -42,6 +42,9 @@ public class EbParameters {
   /** Endorsement request only after the member change billing is paid (EBQ16). */
   public static final String ADJ_BOOKING_REQUIRES_PAYMENT = "EB_ADJ_BOOKING_REQUIRES_PAYMENT";
 
+  /** Working days after the franchise decision date before a request expires (V1039). */
+  public static final String FRANCHISE_GRACE_DAYS = "EB_FRANCHISE_GRACE_DAYS";
+
   private static final int DEFAULT_RA_LEAD = 135;
   private static final int DEFAULT_REPLY = 5;
   private static final int DEFAULT_ADVICE = 2;
@@ -151,5 +154,14 @@ public class EbParameters {
    */
   public int tatDays(TatActivity activity) {
     return parameters.intValue(activity.parameter(), DEFAULT_REPLY);
+  }
+
+  /**
+   * Working days of grace after the franchise decision date before the request expires.
+   *
+   * @return days
+   */
+  public int franchiseGraceDays() {
+    return parameters.intValue(FRANCHISE_GRACE_DAYS, DEFAULT_ADVICE);
   }
 }

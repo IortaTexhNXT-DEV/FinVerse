@@ -39,4 +39,12 @@ public interface EbTrackedItemRepository
    * @return true when present
    */
   boolean existsByItemTypeAndAccountArn(String itemType, String accountArn);
+
+  /**
+   * Items of a member change.
+   *
+   * @param memberChangeId member change
+   * @return items, oldest first
+   */
+  List<EbTrackedItem> findByMemberChangeIdOrderByIdAsc(Long memberChangeId);
 }

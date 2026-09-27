@@ -86,6 +86,8 @@ export interface Quotation {
   productVersionNo?: number;
   /** Approved rate-scheme exception used, when one was needed. */
   rateOverrideRef?: string;
+  /** Cover period as users read it: the dates, else the package term; empty when unknown. */
+  coverPeriod?: string;
 }
 
 export interface QuotationListItem {

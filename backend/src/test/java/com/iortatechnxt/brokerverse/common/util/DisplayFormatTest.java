@@ -16,6 +16,9 @@ class DisplayFormatTest {
     assertThat(DisplayFormat.date(null)).isEmpty();
     assertThat(DisplayFormat.period(LocalDate.of(2026, 11, 1), LocalDate.of(2027, 11, 1)))
         .isEqualTo("01-Nov-2026 to 01-Nov-2027");
+    assertThat(DisplayFormat.period(LocalDate.of(2026, 11, 1), null)).isEqualTo("from 01-Nov-2026");
+    assertThat(DisplayFormat.period(null, LocalDate.of(2027, 11, 1))).isEqualTo("to 01-Nov-2027");
+    assertThat(DisplayFormat.period(null, null)).isEmpty();
   }
 
   @Test

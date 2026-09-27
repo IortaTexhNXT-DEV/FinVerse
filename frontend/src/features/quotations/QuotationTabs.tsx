@@ -15,17 +15,11 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { DetailList } from '@/features/catalog/DetailList';
-import {
-  formatDate,
-  formatDateTime,
-  formatPeriod,
-  formatRate,
-  humanize,
-  versionLabel,
-} from '@/utils/format';
+import { formatDate, formatDateTime, formatRate, humanize, versionLabel } from '@/utils/format';
 import { PremiumCard } from './PremiumBreakdown';
 import { displayNameOf } from '@/api/users';
 import { LovLabel, ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
+import { coverPeriod } from './coverPeriod';
 
 /** Details: client, product, terms and the workflow facts of the quotation. */
 export function DetailsTab({ quotation: q }: Readonly<{ quotation: Quotation }>) {
@@ -53,7 +47,7 @@ export function DetailsTab({ quotation: q }: Readonly<{ quotation: Quotation }>)
                 'To be advised'
               ),
             ],
-            ['Period', formatPeriod(c.periodFrom, c.periodTo)],
+            ['Period', coverPeriod(q)],
             ['Valid until', formatDate(c.validUntil)],
             ['Premium payment', c.directPayment ? 'Directly to the insurer' : 'Via BDOI'],
             ['Remarks', c.remarks],

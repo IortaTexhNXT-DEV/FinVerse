@@ -54,6 +54,7 @@ public class QuotationDocuments {
   private final QuotationVersions versions;
   private final CatalogNames names;
   private final UserDirectory users;
+  private final QuotationQueryService queries;
   private final Clock clock;
 
   /**
@@ -65,6 +66,7 @@ public class QuotationDocuments {
    * @param versions version store
    * @param names product, line and insurer names
    * @param users user names (signatures)
+   * @param queries quotation reads (the cover period)
    * @param clock clock
    */
   public QuotationDocuments(
@@ -74,7 +76,9 @@ public class QuotationDocuments {
       QuotationVersions versions,
       CatalogNames names,
       UserDirectory users,
+      QuotationQueryService queries,
       Clock clock) {
+    this.queries = queries;
     this.composer = composer;
     this.templates = templates;
     this.organization = organization;
@@ -169,9 +173,14 @@ public class QuotationDocuments {
             c.insurerCode() == null
                 ? "To be advised"
                 : names.insurer(q.getCompanyId(), c.insurerCode())),
-        new Field("Period", DisplayFormat.period(c.periodFrom(), c.periodTo())),
+        new Field("Period", periodText(q, c)),
         new Field("Valid until", DisplayFormat.date(c.validUntil())),
         new Field("Premium payment", c.directPayment() ? "Directly to the insurer" : "Via BDOI"));
+  }
+
+  private String periodText(Quotation q, QuotationContent c) {
+    String period = queries.coverPeriod(q, c);
+    return period.isEmpty() ? "To be advised" : period;
   }
 
   private static List<List<String>> itemRows(QuotationContent c) {

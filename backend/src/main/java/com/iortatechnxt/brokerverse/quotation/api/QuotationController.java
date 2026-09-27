@@ -18,6 +18,7 @@ import com.iortatechnxt.brokerverse.quotation.api.dto.QuotationListItem;
 import com.iortatechnxt.brokerverse.quotation.api.dto.QuotationResponse;
 import com.iortatechnxt.brokerverse.quotation.api.dto.QuotationVersionResponse;
 import com.iortatechnxt.brokerverse.quotation.domain.Quotation;
+import com.iortatechnxt.brokerverse.quotation.domain.QuotationContent;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationStatus;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationAcceptanceService;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationDispatchService;
@@ -371,7 +372,8 @@ public class QuotationController {
 
   private QuotationResponse reload(Long id) {
     Quotation q = queries.get(id);
-    return QuotationResponse.from(q, queries.content(q));
+    QuotationContent content = queries.content(q);
+    return QuotationResponse.from(q, content, queries.coverPeriod(q, content));
   }
 
   /**

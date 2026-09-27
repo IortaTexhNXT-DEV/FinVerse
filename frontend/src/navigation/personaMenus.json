@@ -339,6 +339,108 @@
           "screens": ["/claims-handling/reports"]
         }
       }
+    },
+    {
+      "id": "BRD-8",
+      "description": "Employee Benefits without the partner portal (V1030, V1930; EMPLOYEE_BENEFITS_DESIGN 6.2): marketing, sign-off, threshold approval, Processing, Collection and the EB set-up",
+      "sections": ["eb"],
+      "sharedGroups": ["home", "client-policy", "operations", "reports"],
+      "sharedModules": ["help", "collections"],
+      "roles": {
+        "EB_AO": {
+          "seedUser": "ebao",
+          "permissions": [
+            "ACCOUNT_MAINTAIN",
+            "ACCOUNT_VIEW",
+            "ATTACHMENT_MANAGE",
+            "ATTACHMENT_VIEW",
+            "BULK_PROCESS",
+            "CLIENT_MAINTAIN",
+            "CLIENT_VIEW",
+            "EB_MARKET",
+            "EB_REPORT_VIEW",
+            "EB_VIEW",
+            "REPORT_VIEW",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/eb",
+            "/eb/programmes",
+            "/eb/programmes/new",
+            "/eb/member-changes",
+            "/eb/pending-items"
+          ]
+        },
+        "EB_TL": {
+          "seedUser": "ebtl",
+          "permissions": [
+            "ACCOUNT_VIEW",
+            "ATTACHMENT_VIEW",
+            "CLIENT_VIEW",
+            "EB_COMPARATIVE_APPROVE",
+            "EB_REPORT_VIEW",
+            "EB_VIEW",
+            "REPORT_VIEW",
+            "WORK_ASSIGN",
+            "WORK_VIEW"
+          ],
+          "screens": ["/eb", "/eb/programmes", "/eb/member-changes", "/eb/pending-items"]
+        },
+        "EB_MANAGEMENT": {
+          "seedUser": "ebmgmt",
+          "permissions": [
+            "ACCOUNT_VIEW",
+            "ATTACHMENT_VIEW",
+            "CLIENT_VIEW",
+            "EB_REPORT_VIEW",
+            "EB_THRESHOLD_APPROVE",
+            "EB_VIEW",
+            "REPORT_VIEW",
+            "WORK_VIEW"
+          ],
+          "screens": ["/eb", "/eb/programmes", "/eb/member-changes", "/eb/pending-items"]
+        },
+        "EB_PROCESSOR": {
+          "seedUser": "ebproc",
+          "permissionScope": "EB_",
+          "permissions": ["EB_PROCESS", "EB_REPORT_VIEW", "EB_VIEW"],
+          "screens": ["/eb", "/eb/programmes", "/eb/member-changes", "/eb/pending-items", "/eb/soa"]
+        },
+        "EB_PROC_SUPERVISOR": {
+          "seedUser": "ebprocsup",
+          "permissionScope": "EB_",
+          "permissions": ["EB_PROCESS", "EB_REPORT_VIEW", "EB_VIEW"],
+          "screens": ["/eb", "/eb/programmes", "/eb/member-changes", "/eb/pending-items", "/eb/soa"]
+        },
+        "EB_COLLECTION": {
+          "seedUser": "ebcoll",
+          "permissions": [
+            "ACCOUNT_VIEW",
+            "ATTACHMENT_VIEW",
+            "CLIENT_VIEW",
+            "CLX_VIEW",
+            "CLX_WORK",
+            "EB_COLLECT",
+            "EB_REPORT_VIEW",
+            "EB_VIEW",
+            "REPORT_VIEW",
+            "WORK_VIEW"
+          ],
+          "screens": ["/eb", "/eb/programmes", "/eb/member-changes", "/eb/pending-items", "/eb/soa"]
+        },
+        "BUSINESS_ADMIN": {
+          "seedUser": "badmin",
+          "permissionScope": "EB_",
+          "permissions": ["EB_REPORT_VIEW", "EB_SETUP", "EB_VIEW"],
+          "screens": [
+            "/eb",
+            "/eb/programmes",
+            "/eb/member-changes",
+            "/eb/pending-items",
+            "/eb/setup"
+          ]
+        }
+      }
     }
   ]
 }

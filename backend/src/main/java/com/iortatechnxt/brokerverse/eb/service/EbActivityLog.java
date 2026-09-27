@@ -54,6 +54,28 @@ public class EbActivityLog {
   }
 
   /**
+   * Stamps the start of an activity of a programme outside a cycle (member changes, SOAs).
+   *
+   * @param companyId company
+   * @param programmeId programme
+   * @param activity activity
+   * @param reference business reference, e.g. the member change number
+   * @param actor who performs it
+   * @return the stamp
+   */
+  public EbActivity received(
+      Long companyId, Long programmeId, TatActivity activity, String reference, String actor) {
+    return activities.save(
+        new EbActivity(
+            companyId,
+            new EbDocument.Place(programmeId, null),
+            activity,
+            reference,
+            clock.instant(),
+            actor));
+  }
+
+  /**
    * Stamps an activity of a cycle done at once (received and released now).
    *
    * @param cycle cycle

@@ -82,6 +82,12 @@ public class EbTrackedItem extends BaseEntity {
   @Column(length = 1000)
   private String remarks;
 
+  @Column(name = "member_id")
+  private Long memberId;
+
+  @Column(name = "member_change_id")
+  private Long memberChangeId;
+
   protected EbTrackedItem() {}
 
   /**
@@ -122,6 +128,26 @@ public class EbTrackedItem extends BaseEntity {
     this.recipientEmail = details.recipientEmail();
     this.dueDate = details.dueDate();
     this.remarks = details.remarks();
+  }
+
+  /**
+   * Links the item to the roster member and the member change it is expected for (FR-EB-057: an HMO
+   * card for each added member, the billing of each member change).
+   *
+   * @param member roster member, may be null
+   * @param change member change, may be null
+   */
+  public void linkMember(Long member, Long change) {
+    this.memberId = member;
+    this.memberChangeId = change;
+  }
+
+  public Long getMemberId() {
+    return memberId;
+  }
+
+  public Long getMemberChangeId() {
+    return memberChangeId;
   }
 
   /**

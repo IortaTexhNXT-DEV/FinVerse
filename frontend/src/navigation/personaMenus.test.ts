@@ -42,8 +42,8 @@ function sectionScreens(suite: Suite) {
 }
 
 /**
- * Client requirement 14: each role of Sanction Screening (BRD-10), User Access (BRD-11) and Claims
- * Handling (BRD-7) sees exactly its intended screens. The grants and the screens are the shared
+ * Client requirement 14: each role of Sanction Screening (BRD-10), User Access (BRD-11), Claims
+ * Handling (BRD-7) and Employee Benefits (BRD-8) sees exactly its intended screens. The grants and the screens are the shared
  * fixture personaMenus.json, which the backend checks against the database.
  */
 describe.each(SUITES.map((s) => [s.id, s] as const))('persona menus of %s', (_id, suite) => {
@@ -90,10 +90,10 @@ describe.each(SUITES.map((s) => [s.id, s] as const))('persona menus of %s', (_id
 });
 
 describe('persona menus across suites', () => {
-  it('lists every role once, 16 roles in all', () => {
+  it('lists every role once, 23 roles in all', () => {
     const codes = SUITES.flatMap((s) => Object.keys(s.roles));
     expect(new Set(codes).size).toBe(codes.length);
-    expect(codes).toHaveLength(16);
+    expect(codes).toHaveLength(23);
   });
 
   it('keeps the insurer-side Claims module away from every listed role', () => {

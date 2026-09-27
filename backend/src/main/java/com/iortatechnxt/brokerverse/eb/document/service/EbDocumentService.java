@@ -164,6 +164,77 @@ public class EbDocumentService {
     return saved;
   }
 
+  /**
+   * Stores files of a programme record outside a cycle (member change billing, SOA) on that record
+   * and registers them on the programme; linked to the programme, the client and further records.
+   *
+   * @param programme programme
+   * @param owner the record the files belong to (e.g. the member change)
+   * @param registration type, process and source (never supersedes)
+   * @param files files
+   * @param extraTargets further records to link
+   * @return the registered documents, one per file
+   */
+  public List<EbDocument> storeOn(
+      EbProgramme programme,
+      AttachmentTarget owner,
+      Registration registration,
+      List<UploadedFile> files,
+      List<AttachmentTarget> extraTargets) {
+    List<Attachment> stored =
+        documents.upload(
+            owner,
+            files,
+            new UploadOptions(
+                registration.documentType(),
+                false,
+                programme.getProgrammeNo(),
+                registration.description(),
+                registration.processType()));
+    List<AttachmentTarget> links = new ArrayList<>();
+    links.add(new AttachmentTarget(EbCodes.ENTITY_PROGRAMME, programme.getId().toString()));
+    links.add(new AttachmentTarget("Client", programme.getClientId().toString()));
+    links.addAll(extraTargets);
+    List<EbDocument> saved = new ArrayList<>();
+    for (Attachment a : stored) {
+      documents.link(a.getId(), links, registration.processType());
+      saved.add(
+          register.save(
+              new EbDocument(
+                  programme.getCompanyId(),
+                  new EbDocument.Place(programme.getId(), null),
+                  registration.documentType(),
+                  registration.processType(),
+                  1,
+                  a.getId(),
+                  registration.source())));
+    }
+    audit.record(
+        EbCodes.ENTITY_PROGRAMME,
+        programme.getProgrammeNo(),
+        AuditAction.CREATE,
+        lovs.label("DOCUMENT_TYPE", registration.documentType())
+            + " on "
+            + owner.entityType()
+            + " ("
+            + stored.size()
+            + " file(s), from "
+            + registration.source()
+            + ")");
+    return saved;
+  }
+
+  /**
+   * Links stored files to further records (e.g. the placement documents to the accounts).
+   *
+   * @param attachmentIds stored files
+   * @param targets records
+   * @param processTag process tag
+   */
+  public void linkAll(List<Long> attachmentIds, List<AttachmentTarget> targets, String processTag) {
+    attachmentIds.forEach(id -> documents.link(id, targets, processTag));
+  }
+
   private static String requireType(String documentType) {
     String type = blankToNull(documentType);
     if (type == null) {

@@ -18,11 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Persona menus of BRD-10, BRD-11 and BRD-7 (client requirement 14) on the server side of the
- * shared file {@code frontend/src/navigation/personaMenus.json}: each role holds exactly the
- * permissions the web client's menu is computed from (V1050, V1060, V1062, V1063; Claims V1020),
- * within its permission scope for the Marketing roles, its SIT/UAT user holds only that role, and
- * every screen the role sees answers its SIT/UAT user (no menu entry opens on a refusal).
+ * Persona menus of BRD-10, BRD-11, BRD-7 and BRD-8 (client requirement 14) on the server side of
+ * the shared file {@code frontend/src/navigation/personaMenus.json}: each role holds exactly the
+ * permissions the web client's menu is computed from (V1050, V1060, V1062, V1063; Claims V1020;
+ * Employee Benefits V1030), within its permission scope for the Marketing roles, its SIT/UAT user
+ * holds only that role, and every screen the role sees answers its SIT/UAT user (no menu entry
+ * opens on a refusal).
  */
 @IntegrationTest
 class PersonaMenusIT {
@@ -59,7 +60,14 @@ class PersonaMenusIT {
               "/claims-handling/location-refs",
               "/api/v1/broker-claims/location-refs?companyId={c}"),
           Map.entry("/claims-handling/reports", "/api/v1/reports"),
-          Map.entry("/claims-handling/setup", "/api/v1/broker-claims/setup/matrix"));
+          Map.entry("/claims-handling/setup", "/api/v1/broker-claims/setup/matrix"),
+          Map.entry("/eb", "/api/v1/eb/home?companyId={c}"),
+          Map.entry("/eb/programmes", "/api/v1/eb/programmes?companyId={c}"),
+          Map.entry("/eb/programmes/new", "/api/v1/eb/account-officers"),
+          Map.entry("/eb/member-changes", "/api/v1/eb/member-changes?companyId={c}"),
+          Map.entry("/eb/pending-items", "/api/v1/eb/pending-items?companyId={c}"),
+          Map.entry("/eb/soa", "/api/v1/eb/soa?companyId={c}"),
+          Map.entry("/eb/setup", "/api/v1/eb/setup/threshold-rules?companyId={c}"));
 
   @Autowired private Api api;
   @Autowired private JdbcTemplate jdbc;
@@ -77,7 +85,7 @@ class PersonaMenusIT {
   @Test
   void everyRoleHoldsExactlyThePermissionsTheMenuIsBuiltFrom() throws Exception {
     Map<String, Persona> personas = PersonaMenus.load();
-    assertThat(personas).hasSize(16);
+    assertThat(personas).hasSize(23);
     for (Persona p : personas.values()) {
       assertThat(p.inScope(granted(p.role()))).as(p.role()).isEqualTo(p.permissions());
       JsonNode me = api.read(api.doGet(p.seedUser(), "/api/v1/auth/me"));

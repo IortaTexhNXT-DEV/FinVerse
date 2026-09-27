@@ -2,10 +2,15 @@ package com.iortatechnxt.brokerverse.eb.home.service;
 
 import com.iortatechnxt.brokerverse.eb.domain.EbCycleRepository;
 import com.iortatechnxt.brokerverse.eb.domain.EbCycleStage;
+import com.iortatechnxt.brokerverse.eb.domain.EbMemberChange;
+import com.iortatechnxt.brokerverse.eb.domain.EbMemberChangeRepository;
+import com.iortatechnxt.brokerverse.eb.domain.EbSoa;
+import com.iortatechnxt.brokerverse.eb.domain.EbSoaRepository;
 import com.iortatechnxt.brokerverse.eb.programme.service.ProgrammeQuery;
 import com.iortatechnxt.brokerverse.eb.programme.service.ProgrammeQuery.ProgrammeCriteria;
 import com.iortatechnxt.brokerverse.eb.tracked.service.TrackedItemQuery;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * The counts of EB Home (design 10.1; FR-EB-062): renewal advices due, open cycles per work stage
  * (awaiting feedback, franchise, proposals, sign-off, threshold approval, with client) and pending
- * items past due. Tiles of steps not built yet (member changes) have no count.
+ * items past due, member changes open and SOAs to validate.
  */
 @Service
 @Transactional(readOnly = true)
@@ -24,6 +29,8 @@ public class EbHomeService {
   private final ProgrammeQuery programmes;
   private final EbCycleRepository cycles;
   private final TrackedItemQuery items;
+  private final EbMemberChangeRepository changes;
+  private final EbSoaRepository soas;
 
   /**
    * Creates the service.
@@ -31,12 +38,20 @@ public class EbHomeService {
    * @param programmes programme work list
    * @param cycles cycles per stage
    * @param items pending items
+   * @param changes member changes
+   * @param soas SOAs
    */
   public EbHomeService(
-      ProgrammeQuery programmes, EbCycleRepository cycles, TrackedItemQuery items) {
+      ProgrammeQuery programmes,
+      EbCycleRepository cycles,
+      TrackedItemQuery items,
+      EbMemberChangeRepository changes,
+      EbSoaRepository soas) {
     this.programmes = programmes;
     this.cycles = cycles;
     this.items = items;
+    this.changes = changes;
+    this.soas = soas;
   }
 
   /**
@@ -63,6 +78,16 @@ public class EbHomeService {
     counts.put("comparativesToSignOff", stages.getOrDefault(EbCycleStage.FOR_SIGNOFF, 0L));
     counts.put("thresholdApprovals", stages.getOrDefault(EbCycleStage.THRESHOLD_APPROVAL, 0L));
     counts.put("withClient", stages.getOrDefault(EbCycleStage.WITH_CLIENT, 0L));
+    counts.put(
+        "memberChangesOpen",
+        changes.countByCompanyIdAndStatusIn(
+            companyId,
+            EnumSet.of(
+                EbMemberChange.Status.CAPTURED,
+                EbMemberChange.Status.RELAYED,
+                EbMemberChange.Status.BILLED,
+                EbMemberChange.Status.VALIDATED)));
+    counts.put("soaToValidate", soas.countByCompanyIdAndStatus(companyId, EbSoa.Status.RECEIVED));
     counts.put("pendingItemsOverdue", items.overdue(companyId));
     return counts;
   }

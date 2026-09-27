@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.EmailAddresses;
 import com.iortatechnxt.brokerverse.eb.domain.EbCodes;
 import com.iortatechnxt.brokerverse.eb.domain.EbCycle;
+import com.iortatechnxt.brokerverse.eb.domain.EbItemStatus;
 import com.iortatechnxt.brokerverse.eb.domain.EbProgramme;
 import com.iortatechnxt.brokerverse.eb.domain.EbResponsibleParty;
 import com.iortatechnxt.brokerverse.eb.domain.EbTrackedItem;
@@ -37,6 +38,8 @@ public class TrackedItemService {
 
   /** Item type of the contract after placement. */
   public static final String CONTRACT = "CONTRACT";
+
+  private static final String DUE = " due ";
 
   /** Longest subject of an item. */
   static final int MAX_SUBJECT = 200;
@@ -105,7 +108,7 @@ public class TrackedItemService {
         EbCodes.ENTITY_TRACKED_ITEM,
         item.getId(),
         AuditAction.CREATE,
-        programme.getProgrammeNo() + ": " + item.getSubject() + " due " + item.getDueDate());
+        programme.getProgrammeNo() + ": " + item.getSubject() + DUE + item.getDueDate());
     return item;
   }
 
@@ -144,7 +147,56 @@ public class TrackedItemService {
         EbCodes.ENTITY_TRACKED_ITEM,
         item.getId(),
         AuditAction.CREATE,
-        cycle.getCycleNo() + ": " + item.getSubject() + " due " + due);
+        cycle.getCycleNo() + ": " + item.getSubject() + DUE + due);
+  }
+
+  /**
+   * Opens an item expected for a member or a member change (FR-EB-057: the HMO card of an added
+   * member, the billing of a member change).
+   *
+   * @param programme programme
+   * @param itemType type (list EB_TRACKED_ITEM_TYPE)
+   * @param details what is expected, from whom and by when
+   * @param memberId roster member, may be null
+   * @param memberChangeId member change, may be null
+   * @return the item
+   */
+  public EbTrackedItem openLinked(
+      EbProgramme programme,
+      String itemType,
+      EbTrackedItem.Details details,
+      Long memberId,
+      Long memberChangeId) {
+    EbTrackedItem item =
+        items.save(
+            new EbTrackedItem(
+                programme.getCompanyId(), programme.getId(), null, itemType, details));
+    item.linkMember(memberId, memberChangeId);
+    audit.record(
+        EbCodes.ENTITY_TRACKED_ITEM,
+        item.getId(),
+        AuditAction.CREATE,
+        programme.getProgrammeNo() + ": " + item.getSubject() + DUE + item.getDueDate());
+    return item;
+  }
+
+  /**
+   * Marks received the pending items of a type of a member change (e.g. its billing once billed).
+   *
+   * @param memberChangeId member change
+   * @param itemType type
+   * @param on date received
+   * @return items received
+   */
+  public int receiveLinked(Long memberChangeId, String itemType, LocalDate on) {
+    int received = 0;
+    for (EbTrackedItem item : items.findByMemberChangeIdOrderByIdAsc(memberChangeId)) {
+      if (item.getItemType().equals(itemType) && item.getStatus() == EbItemStatus.PENDING) {
+        item.receive(on, null);
+        received++;
+      }
+    }
+    return received;
   }
 
   /**
@@ -163,7 +215,7 @@ public class TrackedItemService {
         EbCodes.ENTITY_TRACKED_ITEM,
         item.getId(),
         AuditAction.UPDATE,
-        item.getSubject() + " due " + item.getDueDate());
+        item.getSubject() + DUE + item.getDueDate());
     return item;
   }
 

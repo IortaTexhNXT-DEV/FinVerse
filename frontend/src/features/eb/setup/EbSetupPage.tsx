@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useQuery } from '@tanstack/react-query';
 import { Ban, CheckCircle2, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -16,7 +17,6 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
 import { EB_SECTION } from '../EbPlaceholder';
 import '../eb.css';
 import { EbLov } from '../common/EbLabels';
@@ -96,7 +96,8 @@ function ruleColumns(actions: (r: ThresholdRule) => ReactNode): Column<Threshold
     {
       key: 'period',
       header: 'Effective',
-      render: (r) => `${formatDate(r.effectiveFrom)} – ${formatDate(r.effectiveTo) || 'open'}`,
+      kind: 'period',
+      render: (r) => <PeriodCell from={r.effectiveFrom} to={r.effectiveTo} />,
     },
     { key: 'desc', header: 'Description', render: (r) => r.description ?? '' },
     { key: 'status', header: 'Status', kind: 'status', render: status },

@@ -1,4 +1,11 @@
-import { FileBarChart, FileSpreadsheet, Grid3x3, ShieldCheck, UserCheck } from 'lucide-react';
+import {
+  FileBarChart,
+  FileSpreadsheet,
+  Grid3x3,
+  Scale,
+  ShieldCheck,
+  UserCheck,
+} from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -100,6 +107,14 @@ export const userAccessModule: FeatureModule = {
       // The permissions of the matrix endpoint: UAM_VIEW alone showed an entry that answers 403.
       alsoPermissions: ['ACCESS_APPROVE', 'ROLE_MANAGE', 'AUDIT_VIEW'],
       component: lazy(() => import('./AccessMatrixPage')),
+    },
+    {
+      path: '/user-access/sod-rules',
+      label: 'Separation of Duties',
+      icon: Scale,
+      permission: 'UAM_SOD_MAINTAIN',
+      alsoPermissions: ['UAM_SOD_AUTHORIZE'],
+      component: lazy(() => import('./SodRulesPage')),
     },
     {
       path: '/user-access/reports',

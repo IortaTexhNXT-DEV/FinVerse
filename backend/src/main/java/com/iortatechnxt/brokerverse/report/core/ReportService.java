@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.report.render.PrintOptions;
 import com.iortatechnxt.brokerverse.report.render.ReportContext;
 import com.iortatechnxt.brokerverse.report.render.ReportRenderer;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.time.Instant;
@@ -40,6 +41,7 @@ public class ReportService {
   private final BranchRepository branches;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
+  private final UserDirectory users;
   private final SystemParameterService parameters;
   private final Clock clock;
 
@@ -53,6 +55,7 @@ public class ReportService {
    * @param branches branches (names in the echo)
    * @param audit audit trail
    * @param currentUser current user
+   * @param users user directory (the display name of the user in report headers)
    * @param parameters system parameters (report footer)
    * @param clock clock
    */
@@ -65,6 +68,7 @@ public class ReportService {
       BranchRepository branches,
       AuditTrailService audit,
       CurrentUser currentUser,
+      UserDirectory users,
       SystemParameterService parameters,
       Clock clock) {
     this.registry = registry;
@@ -74,6 +78,7 @@ public class ReportService {
     this.branches = branches;
     this.audit = audit;
     this.currentUser = currentUser;
+    this.users = users;
     this.parameters = parameters;
     this.clock = clock;
   }
@@ -204,7 +209,7 @@ public class ReportService {
     ReportContext ctx =
         new ReportContext(
             company,
-            currentUser.username(),
+            runBy(),
             clock.instant(),
             parameters.text(SystemParameterService.REPORT_FOOTER_TEXT, ""),
             print);
@@ -265,9 +270,16 @@ public class ReportService {
   private ReportContext context(ReportParameters params) {
     return new ReportContext(
         companyName(params),
-        currentUser.username(),
+        runBy(),
         clock.instant(),
         parameters.text(SystemParameterService.REPORT_FOOTER_TEXT, ""));
+  }
+
+  /** The user running the report as printed in the header: the display name, never the login id. */
+  private String runBy() {
+    String username = currentUser.username();
+    String name = users.displayName(username);
+    return name == null ? username : name;
   }
 
   private String companyName(ReportParameters params) {

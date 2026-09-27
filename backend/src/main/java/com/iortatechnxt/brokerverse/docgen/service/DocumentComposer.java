@@ -177,7 +177,7 @@ public class DocumentComposer {
 
   private static void table(Document doc, Table t) {
     heading(doc, t.heading());
-    PdfPTable table = new PdfPTable(t.headers().size());
+    PdfPTable table = new PdfPTable(t.columnWeights());
     table.setWidthPercentage(100);
     table.setHeaderRows(1);
     for (int c = 0; c < t.headers().size(); c++) {

@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -14,7 +15,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, humanize } from '@/utils/format';
+import { humanize } from '@/utils/format';
 import { AutoBookRuleDialog, ServiceInvoiceTypeDialog } from './SetupDialogs';
 import { UserName } from '@/components/ui/UserName';
 import { LovLabel } from '@/components/broking/LovLabel';
@@ -144,8 +145,8 @@ function IncentiveTab({ companyId }: Readonly<{ companyId: number }>) {
           {
             key: 'period',
             header: 'Booked',
-            render: (r) =>
-              `${formatDate(r.periodFrom)} – ${r.periodTo ? formatDate(r.periodTo) : 'open'}`,
+            kind: 'period',
+            render: (r) => <PeriodCell from={r.periodFrom} to={r.periodTo} />,
           },
           { key: 'description', header: 'Description', render: (r) => r.description },
           { key: 'active', header: 'Status', kind: 'status', render: (r) => onOff(r.active) },

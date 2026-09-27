@@ -1,0 +1,168 @@
+# Notifications catalogue of BRD-11 User Access Maintenance: in-app notices (bell in the page header), e-mails and the
+# alerts of the Alert inbox. Every row is traced to the code that raises it (source). Texts are verbatim; <name> is
+# filled in by BIBS. An in-app notice of an access request is also e-mailed when the user's notification preference
+# asks for it (on by default, except the cancellation notice).
+# Columns: id | channel | trigger | recipient | template / text | content | screen | FR | source
+notifications:
+  - id: NT-01
+    channel: In-app (and e-mail by preference)
+    trigger: A request is submitted or resubmitted; a group-profile request is approved by one approver and waits for the next in order
+    recipient: The approver chosen by the requester (the next approver in order); for a request raised without a chosen approver, every holder of the approval right
+    template: "Title: Access request <request no> to approve. Text: <description of the change>"
+    content: The request and its change, for example Create user a013000196 with group profiles Marketing Account Officer; the notice opens the request
+    screen: Access Request record; Access Requests (Assigned to Me); My Approvals
+    frs: [FR-UA-030, FR-UA-044, FR-UA-070]
+    source: AccessRequestNotifier.toApprove
+  - id: NT-02
+    channel: In-app (and e-mail by preference)
+    trigger: The first approval of a request with a risk flag (privilege increase, outside working hours)
+    recipient: Every holder of the second approval right (Second Approver)
+    template: "Title: Access request <request no> for second approval. Text: <description of the change> <risk flags>"
+    content: The request, its change and its risk flags; the notice opens the request
+    screen: Access Request record; Access Requests (Second Approval)
+    frs: [FR-UA-034, FR-UA-070]
+    source: AccessRequestNotifier.toSecondApprove
+  - id: NT-03
+    channel: In-app (and e-mail by preference)
+    trigger: The last approval of a group-profile request (the request waits for implementation)
+    recipient: Every holder of the role management right (System Administrator)
+    template: "Title: Access request <request no> to implement. Text: <description of the change>"
+    content: The approved group-profile change; the notice opens the request
+    screen: Roles & Permissions (Approved Requests to Implement); Access Requests (For Implementation)
+    frs: [FR-UA-045, FR-UA-070]
+    source: AccessRequestNotifier.toImplement
+  - id: NT-04
+    channel: In-app (and e-mail by preference)
+    trigger: "A request is decided or completed: approved (applied), approved with a future effective date, approved for implementation, rejected, implemented, applied on its effective date by the daily job"
+    recipient: The requester (the user who submitted the request)
+    template: "Title: Access request <request no> approved | approved, applies on <dd-MMM-yyyy> | approved, for implementation | rejected | implemented | applied on its effective date. Text: <description of the change> (<comment of the decider>)"
+    content: The outcome and the comment of the decider; the notice opens the request
+    screen: Access Request record
+    frs: [FR-UA-020, FR-UA-031, FR-UA-032, FR-UA-045, FR-UA-070]
+    source: AccessRequestNotifier.decided
+  - id: NT-05
+    channel: In-app (and e-mail by preference)
+    trigger: The approver returns a request (Return)
+    recipient: The requester
+    template: "Title: Access request <request no> returned. Text: <description of the change> - <remarks>"
+    content: "The remarks of the approver: what to correct; the notice opens the request"
+    screen: Access Request record; Edit Request
+    frs: [FR-UA-033, FR-UA-016, FR-UA-070]
+    source: AccessRequestNotifier.returned
+  - id: NT-06
+    channel: In-app
+    trigger: The creator cancels a request that was assigned to an approver
+    recipient: The approver the request was assigned to
+    template: "Title: Access request <request no> cancelled. Text: <description of the change> - <reason>"
+    content: The cancellation reason; the notice opens the request
+    screen: Access Request record
+    frs: [FR-UA-017, FR-UA-070]
+    source: AccessRequestNotifier.cancelled
+  - id: NT-07
+    channel: In-app and e-mail
+    trigger: An approved change to a user is applied (at approval, or on the effective date)
+    recipient: The user whose access changed (e-mail to the user's registered address)
+    template: "In-app title: Your access changed. Text: Your access changed: <description of the change> (request <request no>). E-mail subject: BrokerVerse: your access changed; body: the same text"
+    content: What changed and the request number; the password of a new user is never e-mailed
+    screen: Home page (bell); e-mail
+    frs: [FR-UA-070]
+    source: AccessRequestNotifier.accessChanged
+  - id: NT-14
+    channel: In-app and e-mail
+    trigger: A request that deactivates or reactivates a group profile is implemented (or applied on approval)
+    recipient: Each active member of the group profile (e-mail to the member's registered address)
+    template: "In-app title: Your access changed. Text: Your access changed: <description of the change>, a group profile you hold (request <request no>). E-mail subject: BrokerVerse: your access changed; body: the same text"
+    content: The profile deactivated or reactivated and the request number
+    screen: Home page (bell); e-mail
+    frs: [FR-UA-042, FR-UA-043, FR-UA-070]
+    source: AccessRequestNotifier.profileMembersChanged
+  - id: NT-15
+    channel: In-app and e-mail
+    trigger: The daily job UAM_DORMANT_USERS (00:15) finds a user whose deactivation date is UAM_DORMANT_NOTICE_DAYS days away (7)
+    recipient: The dormant user
+    template: "Title: Your account will be deactivated. Text: You have not signed in to BrokerVerse for a long time. Sign in before <dd-MMM-yyyy>, or your account is deactivated and a new access request is needed. E-mail subject: BrokerVerse: sign in to keep your account"
+    content: The deactivation date; the notice opens My Profile
+    screen: My Profile; e-mail
+    frs: [FR-UA-006]
+    source: AccessRequestNotifier.dormantWarning
+  - id: NT-16
+    channel: In-app
+    trigger: The daily job UAM_DORMANT_USERS deactivates one or more users (each also receives NT-07)
+    recipient: Every holder of the request right (Business Administrator, System Administrator)
+    template: "Title: Dormant users deactivated. Text: <count> user(s) without a sign-in for <days> days were deactivated: <user IDs>"
+    content: The deactivated users; their requests are on Access Requests
+    screen: Access Requests
+    frs: [FR-UA-006]
+    source: AccessRequestNotifier.dormantDeactivated
+  - id: NT-08
+    channel: E-mail
+    trigger: A user asks for a reset link (Forgot password?, local sign-in)
+    recipient: The registered e-mail address of the user, when the user is active and has one
+    template: "Subject: BrokerVerse: reset your password. Body: Dear <full name>, A new BrokerVerse password was requested for user <user ID>. Open this link to set it: <link>. The link works once and expires at <date and time> (Philippine time). If you did not ask for it, ignore this e-mail; your password stays as it is."
+    content: The single-use link, valid for 30 minutes
+    screen: Forgot Password and Set a New Password
+    frs: [FR-UA-005]
+    source: PasswordNoticeMailer.onResetRequested
+  - id: NT-09
+    channel: In-app and e-mail (by preference)
+    trigger: The daily job PASSWORD_EXPIRY_NOTICE (06:00) finds a password that expires within 7 days (local sign-in)
+    recipient: The user whose password expires
+    template: "Title: Your password expires soon. Text: Your BrokerVerse password expires on <date and time> (Philippine time). Change it on My Profile before then. E-mail subject: BrokerVerse: your password expires soon"
+    content: The expiry date; the notice opens My Profile
+    screen: My Profile
+    frs: [FR-UA-005]
+    source: PasswordNoticeMailer.notifyExpiry
+  - id: NT-10
+    channel: E-mail
+    trigger: A scheduled batch job fails (for example the daily application of dated access changes)
+    recipient: The addresses of the parameter JOB_FAILURE_RECIPIENTS
+    template: "Subject: BrokerVerse: batch job <job> failed. Body: The batch job <job> failed. Run: <run>. Started: <date and time> (Philippine time). Trigger: <trigger>. Error: <message>. Open Administration > Scheduled Jobs to see the run history and run the job again."
+    content: The failed run and its error
+    screen: Scheduled Jobs
+    frs: [FR-UA-071]
+    source: JobFailureMailer.onFailure
+  - id: NT-11
+    channel: Alert inbox
+    trigger: A request with a risk flag passes its first approval (alert Privileged access change, medium)
+    recipient: Holders of the alert right (System Administrator, Auditor)
+    template: "Access request <request no> <risk flags>: <description of the change>"
+    content: The privileged or out-of-hours change waiting for the second approval
+    screen: Alerts
+    frs: [FR-UA-034]
+    source: AccessDecisionService.approve
+  - id: NT-12
+    channel: Alert inbox
+    trigger: A scheduled request cannot be applied on its effective date (alert Scheduled access change failed, high)
+    recipient: Holders of the alert right (System Administrator, Auditor)
+    template: "Access request <request no> could not be applied on <dd-MMM-yyyy>: <reason>"
+    content: The request stays Scheduled with the reason on its Details tab
+    screen: Alerts; Access Request record
+    frs: [FR-UA-020]
+    source: AccessScheduledChanges.failed
+  - id: NT-13
+    channel: Alert inbox
+    trigger: A group profile is created or changed directly while the emergency path UAM_DIRECT_ROLE_EDIT is open (alert Role edited outside a request, medium)
+    recipient: Holders of the alert right (System Administrator, Auditor)
+    template: "Role <code> <change> directly by <user> (emergency path UAM_DIRECT_ROLE_EDIT)"
+    content: The profile, the change and who made it
+    screen: Alerts; Roles & Permissions
+    frs: [FR-UA-045, FR-UA-052]
+    source: DirectRoleEditAlerts.on
+  - id: NT-17
+    channel: In-app (and e-mail by preference)
+    trigger: A separation-of-duties rule is created, or its deactivation is asked
+    recipient: Every holder of the rule authorisation right (Information Security Officer)
+    template: "Title: Separation-of-duties rule <rule> to authorise. Text: The new rule | deactivation of rule <rule>: <reason>"
+    content: The rule and its reason; the notice opens Separation of Duties
+    screen: Separation of Duties; My Approvals
+    frs: [FR-UA-053]
+    source: SodRuleService.tellAuthorisers
+  - id: NT-18
+    channel: In-app and e-mail (by preference)
+    trigger: The System Administrator changes a security setting on System Parameters
+    recipient: Every holder of the security setting approval right (Information Security Officer)
+    template: "Title: Security setting to approve: <description of the setting>. Text: <user> asks to change it from '<current value>' to '<new value>'"
+    content: The setting and the two values; the notice opens System Parameters
+    screen: System Parameters; My Approvals
+    frs: [FR-UA-054]
+    source: SecurityParameterNotices.on

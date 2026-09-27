@@ -8,6 +8,7 @@ import {
   Hourglass,
   Layers,
   Pencil,
+  ShieldCheck,
   User,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -16,26 +17,32 @@ import { saveFile } from '@/api/client';
 import type { DownloadedFile } from '@/api/client';
 import { useAuth } from '@/auth/authContext';
 import { Attachments } from '@/components/attachments/Attachments';
+import { InsurerName, ProductName } from '@/components/broking/LovLabel';
+import { PolicyTransactions } from '@/components/broking/PolicyTransactions';
 import { RecordSummary } from '@/components/broking/RecordSummary';
 import type { Fact } from '@/components/broking/RecordSummary';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
-import { formatDate, humanize } from '@/utils/format';
+import { formatDate, formatDays, formatPeriod } from '@/utils/format';
 import { adjustmentApi, REQUEST_ENTITY } from './api';
 import type { EndorsementRequest } from './api';
 import { RequestActions } from './RequestActions';
 import { RequestFlags, RequestStatus } from './RequestParts';
-import { AccountingTab, DetailsTab, HistoryTab, RecomputeTab } from './RequestTabs';
+import { AccountingTab, DetailsTab, HistoryTab, PolicyTab, RecomputeTab } from './RequestTabs';
+import { useRequestLabels } from './useRequestLabels';
 import { UserName } from '@/components/ui/UserName';
 
 const TABS = [
   { id: 'details', label: 'Details' },
+  { id: 'policy', label: 'Policy' },
   { id: 'recompute', label: 'Recompute' },
   { id: 'accounting', label: 'Accounting' },
+  { id: 'transactions', label: 'Policy Transactions' },
   { id: 'documents', label: 'Documents' },
   { id: 'history', label: 'History' },
 ] as const;
@@ -44,22 +51,39 @@ type TabId = (typeof TABS)[number]['id'];
 
 const VALIDATED = new Set(['FOR_APPROVAL', 'FOR_POSTING', 'AWAITING_REAPPLICATION', 'POSTED']);
 
-function facts(r: EndorsementRequest): Fact[] {
+function facts(r: EndorsementRequest, typeLabel: string): Fact[] {
+  const p = r.policy;
   return [
+    { icon: ShieldCheck, label: 'Policy No.', value: p?.policyNo ?? r.invoice.policyNo ?? '—' },
     { icon: FileText, label: 'Invoice', value: r.invoice.invoiceNo },
-    { icon: Building2, label: 'Insurer', value: r.invoice.insurerCode },
-    { icon: CalendarRange, label: 'Effective', value: formatDate(r.terms.effectiveDate) },
     {
-      icon: Layers,
-      label: 'Type',
-      value: [r.terms.endorsementType, r.terms.requestType]
-        .filter((c): c is string => c !== undefined)
-        .map(humanize)
-        .join(' · '),
+      icon: Building2,
+      label: 'Insurer / Product',
+      value: (
+        <>
+          <InsurerName code={r.invoice.insurerCode} />
+          {p?.productCode && (
+            <>
+              {' · '}
+              <ProductName code={p.productCode} />
+            </>
+          )}
+        </>
+      ),
     },
+    {
+      icon: CalendarRange,
+      label: 'Period / Effective',
+      value: `${formatPeriod(p?.periodFrom, p?.periodTo) || '—'} · effective ${formatDate(r.terms.effectiveDate)}`,
+    },
+    { icon: Layers, label: 'Type', value: typeLabel },
     { icon: User, label: 'Requested By', value: <UserName login={r.createdBy} /> },
-    { icon: Hourglass, label: 'Aging', value: `${String(r.agingDays)} day(s)` },
-    { icon: CalendarClock, label: 'Batch', value: r.outcome.batchNo ?? '—' },
+    { icon: Hourglass, label: 'Aging', value: formatDays(r.agingDays) },
+    {
+      icon: CalendarClock,
+      label: 'Placement Slip / Batch',
+      value: [p?.slipNo, r.outcome.batchNo].filter(Boolean).join(' · ') || '—',
+    },
   ];
 }
 
@@ -67,8 +91,19 @@ function TabBody({ tab, request }: Readonly<{ tab: TabId; request: EndorsementRe
   switch (tab) {
     case 'details':
       return <DetailsTab request={request} />;
+    case 'policy':
+      return <PolicyTab request={request} />;
     case 'recompute':
       return <RecomputeTab request={request} />;
+    case 'transactions':
+      return (
+        <Card title="Policy Transactions" flush>
+          <PolicyTransactions
+            invoiceNo={request.invoice.invoiceNo}
+            highlightRequestNo={request.requestNo}
+          />
+        </Card>
+      );
     case 'accounting':
       return <AccountingTab request={request} />;
     case 'documents':
@@ -116,6 +151,49 @@ function Downloads({ request }: Readonly<{ request: EndorsementRequest }>) {
   );
 }
 
+/** Header of a request: the policy, ARN and invoice chips, the status, flags and key facts. */
+function RequestSummary({ request: r }: Readonly<{ request: EndorsementRequest }>) {
+  const labels = useRequestLabels();
+  return (
+    <>
+      <RecordSummary
+        title={r.invoice.assuredName}
+        chips={
+          <>
+            {r.policy?.policyNo && <ReferenceChip label="Policy No." value={r.policy.policyNo} />}
+            <ReferenceChip label="ARN" value={r.invoice.arn} />
+            <ReferenceChip label="Invoice" value={r.invoice.invoiceNo} />
+            <RequestStatus stage={r.stage} />
+          </>
+        }
+        flags={
+          <RequestFlags
+            negative={r.control.negative}
+            quotationRequired={r.control.quotationRequired}
+            duplicateOverride={r.control.duplicateOverride !== undefined}
+          />
+        }
+        facts={facts(r, labels.type(r.terms.endorsementType))}
+      />
+      {r.stage === 'RETURNED' && (
+        <div className="alert warning" role="status">
+          Returned: {labels.returnReason(r.control.returnReason ?? 'OTHERS')}
+          {r.control.returnComment ? ` – ${r.control.returnComment}` : ''}. Change the request and
+          resubmit it, or cancel it.
+        </div>
+      )}
+    </>
+  );
+}
+
+/** Title line of a request: its type and the policy (or, before the policy is issued, the invoice). */
+function describe(r: EndorsementRequest, typeLabel: string): string {
+  const target = r.policy?.policyNo
+    ? `policy ${r.policy.policyNo}`
+    : `invoice ${r.invoice.invoiceNo}`;
+  return `${typeLabel} on ${target}: ${r.terms.description}`;
+}
+
 /**
  * One endorsement request (ADJID.001-025, MKTID.008): header with the request number, ARN and
  * invoice chips and the status; the summary; the workflow panel with the business actions; and
@@ -126,6 +204,7 @@ export default function RequestDetailPage() {
   const { can } = useAuth();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<TabId>('details');
+  const labels = useRequestLabels();
   const request = useQuery({
     queryKey: ['adjustment', 'request', id],
     queryFn: () => adjustmentApi.get(id),
@@ -146,7 +225,7 @@ export default function RequestDetailPage() {
         backTo="/adjustment"
         section="Client & Policy · Adjustment"
         title={r.requestNo}
-        description={`${humanize(r.requestClass)} request on ${r.invoice.invoiceNo}: ${r.terms.description}`}
+        description={describe(r, labels.type(r.terms.endorsementType))}
         actions={
           <>
             <Downloads request={r} />
@@ -158,31 +237,7 @@ export default function RequestDetailPage() {
           </>
         }
       />
-      <RecordSummary
-        title={r.invoice.assuredName}
-        chips={
-          <>
-            <ReferenceChip label="ARN" value={r.invoice.arn} />
-            <ReferenceChip label="Invoice" value={r.invoice.invoiceNo} />
-            <RequestStatus stage={r.stage} />
-          </>
-        }
-        flags={
-          <RequestFlags
-            negative={r.control.negative}
-            quotationRequired={r.control.quotationRequired}
-            duplicateOverride={r.control.duplicateOverride !== undefined}
-          />
-        }
-        facts={facts(r)}
-      />
-      {r.stage === 'RETURNED' && (
-        <div className="alert warning" role="status">
-          Returned: {humanize(r.control.returnReason ?? 'OTHERS')}
-          {r.control.returnComment ? ` – ${r.control.returnComment}` : ''}. Change the request and
-          resubmit it, or cancel it.
-        </div>
-      )}
+      <RequestSummary request={r} />
       <WorkflowPanel
         entityType={REQUEST_ENTITY}
         entityId={r.id}

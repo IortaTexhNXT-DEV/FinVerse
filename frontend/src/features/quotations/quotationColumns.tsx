@@ -5,7 +5,7 @@ import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, today } from '@/utils/format';
 import { daysLeft } from './quotationList';
-import { InsurerName } from '@/components/broking/LovLabel';
+import { InsurerName, ProductName } from '@/components/broking/LovLabel';
 
 const EXPIRY_WARNING_DAYS = 7;
 
@@ -56,7 +56,11 @@ export const QUOTATION_COLUMNS: Column<QuotationListItem>[] = [
       </>
     ),
   },
-  { key: 'product', header: 'Product', render: (q) => q.productCode },
+  {
+    key: 'product',
+    header: 'Product',
+    render: (q) => <ProductName code={q.productCode} withCode />,
+  },
   {
     key: 'insurer',
     header: 'Insurer',

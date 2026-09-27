@@ -17,6 +17,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -174,7 +175,7 @@ public class GlobalExceptionHandler {
    * @param ex exception
    * @return problem detail (401)
    */
-  @ExceptionHandler({BadCredentialsException.class, LockedException.class})
+  @ExceptionHandler({BadCredentialsException.class, LockedException.class, DisabledException.class})
   public ProblemDetail handleAuthentication(RuntimeException ex) {
     return problem(HttpStatus.UNAUTHORIZED, "AUTHENTICATION_FAILED", ex.getMessage());
   }

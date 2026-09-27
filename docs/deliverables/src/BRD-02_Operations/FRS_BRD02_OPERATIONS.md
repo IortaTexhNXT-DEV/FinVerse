@@ -1964,7 +1964,8 @@ fit: "CHANGE (ADJID.001, 003), NEW (ADJID.002, 004), FIT (ADJID.020)"
 screens: New Request (wizard); Change Request; Endorsement Request page
 api: POST .../requests/preview; POST .../requests; PUT .../requests/{id}; POST .../requests/{id}/submit
 description:
-  - "The New Request wizard has three steps: choose one or more booked invoices (up to 50; one request ENR-yyyy-n is raised per invoice); enter the request (the form adapts to the type); review the recompute (FR-OP-054) and save or submit. The ARN, invoice, policy, client, insurer, segment and AO are copied from the ledger, so every request is linked to the original account reference."
+  - "The New Request wizard has three steps: choose the policy first - one or more booked invoices (up to 50; one request ENR-yyyy-n is raised per invoice), listed with the insurer policy number, ARN, assured and insurer and searched by policy, ARN, invoice or client; enter the request (the form adapts to the type); review the recompute (FR-OP-054) and save or submit. As soon as an invoice is chosen, and before anything is saved, BIBS shows its policy details: policy number, ARN, invoice, placement slip, client, insurer, product, period of cover and gross premium; they stay on top of the later steps. The ARN, invoice, policy, client, insurer, segment, AO, account and product are copied from the ledger and the account, so every request is linked to its policy and placement."
+  - "Endorsement types are shown with their business labels (class, then the change): for example Financial – Change of Cover, Financial – Change of Premium Rate, Non-financial – Cover Extension, Non-financial – Assured Information, Internal Adjustment. Codes are never shown."
   - "The class comes from the endorsement type (list ENDORSEMENT_TYPE): financial (change of TSI, insured items, commission rate, premium rate or amount, extension of cover, change of cover, adjustment in charges, minimal balance), non-financial (descriptive changes, change of period cover, extension of period covered, extension of cover without premium, change of assured name or information) or internal adjustment."
   - "A financial request needs a request type of Annex V (list ENDORSEMENT_REQUEST_TYPE): Flat Cancellation; Flat Cancellation - Retain DST; Partial Cancellation; Increase / Decrease in TSI; Increase / Decrease of Premium Rate; VAT / Premium Tax exempt; Increase / Decrease of taxes; Change of Cover; Extension of Cover; Write-off; Decrease / Increase in Commission; Cancellation Reversal. A cancellation needs a reason (Annex V, 33 values). A non-financial request carries no request type, sum insured or amount."
   - The invoice is locked by ADJUSTMENT while a request is open (FR-OP-006); a request that reduces the invoice raises PENDING_NEG_ADJ at submission.
@@ -2365,16 +2366,19 @@ acceptance:
 
 ```fr
 id: FR-OP-061
-title: Search requests, view history and ageing
+title: Search requests by policy, view the policy transaction history and ageing
 brd: [ADJID.021 (p.98-99), ADJID.022 (p.99), ADJID.024 (p.100)]
 actor: Adjustment users; Marketing
 priority: Must have
 fit: CHANGE
-screens: Adjustment Workbench; Endorsement Request page (History); Invoice Search and Invoice 360 (Adjustments)
-api: GET .../requests; GET .../requests/{id}; GET .../invoices/{no}/requests; GET /api/v1/ops/invoices/{no}
+screens: Adjustment Workbench; Endorsement Request page (Policy, Policy Transactions, History); Invoice Search and Invoice 360 (Adjustments, Policy Transactions); Account page (Policy Transactions)
+api: GET .../requests; GET .../requests/{id}; GET .../policies/{invoiceNo}; GET .../invoices/{no}/requests; GET /api/v1/ops/invoices/{no}; GET /api/v1/ops/invoices/{no}/transactions; GET /api/v1/ops/accounts/{arn}/transactions
 description:
-  - The Adjustment Workbench lists requests by stage tab with counts, searches by request, invoice, ARN, policy or assured, and shows the ageing of each request from submission (or creation) to completion in Philippine days, with the flags.
-  - The request page keeps the complete history with the old and new details, status and remarks. From an ARN the user opens Invoice 360 with the payment and remittance history and the requests of the invoice (auto-complete on ARN).
+  - "Every request shows the policy it is against: the insurer policy number (as the ledger holds it now, since it is often issued after the request is raised), the ARN, the invoice, the insurer, the product and the placement slip. The chain is request, invoice, account (ARN), placement slip, policy number."
+  - "The Adjustment Workbench lists requests by stage tab with counts. Its columns are Request No. (with the date raised), Policy No. / ARN, Invoice / Placement Slip, Assured (with the client code), Insurer / Product (names, never codes), Type (business label, with the request type), Effective, Aging, Status and Flags. One search box finds a request by request, policy, ARN, invoice or client (also by insurer, product, placement slip or insurer endorsement reference). Aging reads in days (\"0 days\", \"1 day\", \"12 days\"), from submission (or creation) to completion in Philippine days, as on the other workbenches."
+  - The request page shows the Policy No., ARN and invoice chips, the policy and placement (tab Policy, with links to the account and the invoice) and keeps the complete history with the old and new details, status and remarks. From an ARN the user opens Invoice 360 with the payment and remittance history and the requests of the invoice (auto-complete on ARN).
+  - "Policy Transactions (on the request page, on Invoice 360 and on the account page, one table for all three): the original booking (invoice, premium, taxes, commission), then each endorsement, adjustment, cancellation and refund in date order, each with its date and effective date, type label, reference (invoice, request), premium, taxes and commission change, the position after it (gross premium and commission; open requests have none), its status and its accounting entries. A row expands to its GL journals: journal no., date, status and lines (account, debit, credit, party), with a link to the journal page for users who may view journals. The history reads the Operations invoice ledger, the booked invoices and the journals of the accounting engine; no second ledger is kept."
+  - Every journal a posted request writes is kept with the request, including the journals of the re-application of the invoice's payments; the refund to the client of payments made in excess by a decrease or cancellation is its own row with those journals.
 preconditions:
   - The user has an ADJ_* permission or OPS_VIEW.
 main_flow:
@@ -2387,9 +2391,11 @@ notifications:
 audit:
   - "None (read only)."
 acceptance:
-  - A request submitted 3 days ago shows ageing 3 in the workbench.
+  - A request submitted 3 days ago shows ageing "3 days" in the workbench.
   - The History tab shows the before and after values of each change.
   - Searching an ARN lists its requests and opens Invoice 360.
+  - Searching an insurer policy number lists the requests on that policy, with the policy number, ARN, invoice, insurer and product names and placement slip in the list.
+  - The Policy Transactions of a flat-cancelled invoice show the original booking, then the cancellation (Financial – Change of Cover, Flat Cancellation) with the negative premium and tax change, a gross premium of zero after it, status Posted and its journals, whose lines balance.
 ```
 
 ```fr
@@ -4172,9 +4178,9 @@ Every BRD-2 requirement ID (169) is met by at least one FR. The page is the page
 | ADJID.019 | p.98 | FR-OP-062 | /reports (Report Centre) | /reports (ADJ-*); job ADJ_DAILY_REPORT | BUILT |
 | ADJID.020 | p.98 | FR-OP-050 | /adjustment, /operations/invoices/:no | GET /adjustment/invoices/{no}/requests, /ops/invoices/{no} | BUILT |
 | ADJID.021 | p.98-99 | FR-OP-061 | /reports (Report Centre) | /reports (ADJ-*); job ADJ_DAILY_REPORT | BUILT |
-| ADJID.022 | p.99 | FR-OP-061 | /adjustment/requests/:id (History) | GET /adjustment/requests/{id} | BUILT |
+| ADJID.022 | p.99 | FR-OP-061 | /adjustment/requests/:id (History, Policy Transactions) | GET /adjustment/requests/{id}, /ops/invoices/{no}/transactions | BUILT |
 | ADJID.023 | p.99 | FR-OP-051 | /adjustment/new | POST /adjustment/requests | BUILT |
-| ADJID.024 | p.100 | FR-OP-005, FR-OP-061 | /adjustment, /operations/invoices/:no | GET /adjustment/invoices/{no}/requests, /ops/invoices/{no} | BUILT |
+| ADJID.024 | p.100 | FR-OP-005, FR-OP-061 | /adjustment, /operations/invoices/:no, /accounts/:id | GET /adjustment/invoices/{no}/requests, /adjustment/policies/{no}, /ops/invoices/{no}, /ops/accounts/{arn}/transactions | BUILT |
 | ADJID.025 | p.100 | FR-OP-052 | /adjustment/requests/:id (Documents) | /attachments | SEAM |
 | ADJID.026 | p.101-102 | FR-OP-059 | /adjustment/minimal-balance | bulk MINIMAL_BALANCE_FILE; GET /adjustment/write-offs | SEAM |
 | ADJID.027 | p.102-103 | FR-OP-007 | /operations/invoices/:no, /adjustment/requests/:id (Recompute) | GET /ops/invoices/{no}, /adjustment/requests/{id}/recompute | SEAM |

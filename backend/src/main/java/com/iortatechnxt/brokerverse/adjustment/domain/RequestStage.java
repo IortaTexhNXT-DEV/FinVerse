@@ -49,6 +49,16 @@ public enum RequestStage {
   }
 
   /**
+   * Whether the request is posted (its amounts and journals are in the ledger), including a posted
+   * request whose payments still wait for re-application.
+   *
+   * @return true for POSTED and AWAITING_REAPPLICATION
+   */
+  public boolean isPosted() {
+    return this == POSTED || this == AWAITING_REAPPLICATION;
+  }
+
+  /**
    * Whether the request passed validation (validation slip, ADJID.018).
    *
    * @return true from approval onwards

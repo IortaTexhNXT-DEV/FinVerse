@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Calculator, Settings2 } from 'lucide-react';
 import { useState } from 'react';
@@ -18,7 +19,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, today } from '@/utils/format';
+import { today } from '@/utils/format';
 import { frbsApi } from './api';
 import type { ServiceFeeRun, StageCounts } from './api';
 import { RUN_TABS, periodErrors, tabOf } from './serviceFee';
@@ -43,7 +44,8 @@ const COLUMNS: Column<ServiceFeeRun>[] = [
   {
     key: 'period',
     header: 'Fully Paid',
-    render: (r) => `${formatDate(r.periodFrom)} – ${formatDate(r.periodTo)}`,
+    kind: 'period',
+    render: (r) => <PeriodCell from={r.periodFrom} to={r.periodTo} />,
   },
   { key: 'count', header: 'Invoices', numeric: true, render: (r) => r.invoiceCount },
   {

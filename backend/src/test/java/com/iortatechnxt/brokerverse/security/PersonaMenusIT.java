@@ -50,6 +50,7 @@ class PersonaMenusIT {
               "/user-access/group-profiles", "/api/v1/nbadmin/access-requests?groupProfiles=true"),
           Map.entry("/user-access/bulk", "/api/v1/nbadmin/access-batches"),
           Map.entry("/user-access/matrix", "/api/v1/nbadmin/access-matrix"),
+          Map.entry("/user-access/sod-rules", "/api/v1/nbadmin/sod-rules"),
           Map.entry("/user-access/reports", "/api/v1/reports"),
           Map.entry("/claims-handling", "/api/v1/broker-claims/home?companyId={c}"),
           Map.entry("/claims-handling/worklist", "/api/v1/broker-claims/worklist?companyId={c}"),
@@ -112,7 +113,7 @@ class PersonaMenusIT {
   @Test
   void everyRoleHoldsExactlyThePermissionsTheMenuIsBuiltFrom() throws Exception {
     Map<String, Persona> personas = PersonaMenus.load();
-    assertThat(personas).hasSize(38);
+    assertThat(personas).hasSize(39);
     for (Persona p : personas.values()) {
       assertThat(p.inScope(granted(p.role()))).as(p.role()).isEqualTo(p.permissions());
       JsonNode me = api.read(api.doGet(p.seedUser(), "/api/v1/auth/me"));

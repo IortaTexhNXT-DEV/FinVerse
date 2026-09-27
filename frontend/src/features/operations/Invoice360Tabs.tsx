@@ -1,3 +1,4 @@
+import { InsurerName } from '@/components/broking/LovLabel';
 import { Link } from 'react-router-dom';
 import type {
   Invoice360,
@@ -123,7 +124,7 @@ export function ComponentsTab({ view }: Readonly<{ view: Invoice360 }>) {
         <DataTable
           caption="Insurer shares"
           columns={[
-            { key: 'i', header: 'Insurer', render: (s) => s.insurerCode },
+            { key: 'i', header: 'Insurer', render: (s) => <InsurerName code={s.insurerCode} /> },
             { key: 'p', header: 'Share %', numeric: true, render: (s) => formatAmount(s.sharePct) },
             { key: 'l', header: 'Lead', render: (s) => (s.lead ? 'Lead insurer' : '') },
           ]}

@@ -3,10 +3,10 @@
   "suites": [
     {
       "id": "BRD-10/11",
-      "description": "Sanction Screening and User Access Maintenance (V1050, V1060, V1062, V1063)",
+      "description": "Sanction Screening and User Access Maintenance (V1050, V1060, V1062, V1063, V1065, V1130)",
       "sections": ["screening", "screening-setup", "user-access"],
       "sharedGroups": ["home", "client-policy", "reports"],
-      "sharedModules": ["help"],
+      "sharedModules": ["help", "admin"],
       "roles": {
         "COMPLIANCE_OFFICER": {
           "seedUser": "compoff",
@@ -158,6 +158,24 @@
           "seedUser": "secapprover",
           "permissions": ["UAM_SECOND_APPROVE", "UAM_VIEW"],
           "screens": ["/user-access/requests", "/user-access/group-profiles"]
+        },
+        "INFOSEC_OFFICER": {
+          "seedUser": "infosec",
+          "permissions": [
+            "AUDIT_VIEW",
+            "FILE_QUARANTINE_VIEW",
+            "REPORT_VIEW",
+            "SECURITY_PARAMETER_APPROVE",
+            "UAM_REPORT_VIEW",
+            "UAM_SOD_AUTHORIZE"
+          ],
+          "screens": [
+            "/user-access/requests",
+            "/user-access/group-profiles",
+            "/user-access/matrix",
+            "/user-access/sod-rules",
+            "/user-access/reports"
+          ]
         }
       }
     },

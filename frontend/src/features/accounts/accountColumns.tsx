@@ -4,15 +4,16 @@ import { Amount } from '@/components/ui/Amount';
 import { OriginBadge } from '@/components/ui/OriginBadge';
 import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDate } from '@/utils/format';
 import { UserName } from '@/components/ui/UserName';
-import { InsurerName } from '@/components/broking/LovLabel';
+import { InsurerName, ProductName } from '@/components/broking/LovLabel';
+import { periodColumn } from '@/components/ui/periodColumn';
 
 /** Columns of the account lists: ARN chip, client, product, insurer, period, premium, status, flags. */
 export const ACCOUNT_COLUMNS: Column<AccountSummary>[] = [
   {
     key: 'arn',
     header: 'ARN',
+    kind: 'code',
     render: (a) => (
       <span onClick={(e) => e.stopPropagation()} role="presentation">
         <ReferenceChip value={a.arn} />
@@ -29,24 +30,25 @@ export const ACCOUNT_COLUMNS: Column<AccountSummary>[] = [
       </>
     ),
   },
-  { key: 'p', header: 'Product', render: (a) => a.productCode },
+  { key: 'p', header: 'Product', render: (a) => <ProductName code={a.productCode} withCode /> },
   {
     key: 'i',
     header: 'Insurer',
     render: (a) => <InsurerName code={a.insurerCode} empty="" />,
   },
-  {
-    key: 'd',
-    header: 'Period',
-    render: (a) => `${formatDate(a.periodFrom)} – ${formatDate(a.periodTo)}`,
-  },
+  periodColumn<AccountSummary>(
+    'd',
+    'Period',
+    (a) => a.periodFrom,
+    (a) => a.periodTo,
+  ),
   {
     key: 'g',
     header: 'Gross Premium',
     numeric: true,
     render: (a) => <Amount value={a.grossPremium} />,
   },
-  { key: 's', header: 'Status', render: (a) => <StatusBadge status={a.status} /> },
+  { key: 's', header: 'Status', kind: 'status', render: (a) => <StatusBadge status={a.status} /> },
   {
     key: 'f',
     header: 'Flags',

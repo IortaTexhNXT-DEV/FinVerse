@@ -332,16 +332,6 @@ public class AccessRequestService {
   }
 
   /**
-   * One-line description of a request.
-   *
-   * @param r request
-   * @return description
-   */
-  public static String describe(AccessRequest r) {
-    return AccessRequestDescriptions.describe(r);
-  }
-
-  /**
    * Link to the request detail.
    *
    * @param r request

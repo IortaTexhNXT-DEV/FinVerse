@@ -49,6 +49,7 @@ public class EndorsementRequestService {
   private final HandoffService handoffs;
   private final DocumentNumberService numbers;
   private final AuditTrailService audit;
+  private final PolicyLinks links;
   private final Clock clock;
 
   /**
@@ -64,6 +65,7 @@ public class EndorsementRequestService {
    * @param handoffs hand-offs (quotation required)
    * @param numbers document numbers
    * @param audit audit trail
+   * @param links account and product of the invoice
    * @param clock clock
    */
   public EndorsementRequestService(
@@ -77,6 +79,7 @@ public class EndorsementRequestService {
       HandoffService handoffs,
       DocumentNumberService numbers,
       AuditTrailService audit,
+      PolicyLinks links,
       Clock clock) {
     this.requests = requests;
     this.ledger = ledger;
@@ -88,6 +91,7 @@ public class EndorsementRequestService {
     this.handoffs = handoffs;
     this.numbers = numbers;
     this.audit = audit;
+    this.links = links;
     this.clock = clock;
   }
 
@@ -328,7 +332,7 @@ public class EndorsementRequestService {
     }
   }
 
-  private static RequestSubject subjectOf(OpsInvoice invoice) {
+  private RequestSubject subjectOf(OpsInvoice invoice) {
     return new RequestSubject(
         invoice.getInvoiceNo(),
         invoice.getArn(),
@@ -339,6 +343,8 @@ public class EndorsementRequestService {
         invoice.getCurrency(),
         invoice.getClassification().segment(),
         invoice.getClassification().aoUsername(),
-        invoice.getClassification().productLine());
+        invoice.getClassification().productLine(),
+        invoice.getAccountId(),
+        links.productCodeOf(invoice));
   }
 }

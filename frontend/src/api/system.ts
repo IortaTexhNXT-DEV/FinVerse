@@ -14,6 +14,12 @@ export interface SystemParameter {
   maxValue?: number;
   updatedBy?: string;
   updatedAt?: string;
+  /** A change waits for a second approval (security parameters). */
+  secondApproval: boolean;
+  /** Value waiting for approval. */
+  pendingValue?: string | null;
+  pendingBy?: string | null;
+  pendingAt?: string | null;
 }
 
 export interface ConfigEntry {
@@ -74,6 +80,8 @@ export const systemApi = {
   parameters: () => api.get<SystemParameter[]>('/system/parameters'),
   updateParameter: (key: string, value: string) =>
     api.put<SystemParameter>(`/system/parameters/${key}`, { value }),
+  approveParameter: (key: string) => api.post<SystemParameter>(`/system/parameters/${key}/approve`),
+  rejectParameter: (key: string) => api.post<SystemParameter>(`/system/parameters/${key}/reject`),
   configuration: () => api.get<ConfigEntry[]>('/system/configuration'),
   info: () => api.get<SystemInfo>('/system/info'),
   about: () => api.get<AboutInfo>('/system/about'),

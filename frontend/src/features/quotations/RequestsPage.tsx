@@ -22,7 +22,7 @@ import { CaptureRequestDialog } from './CaptureRequestDialog';
 import { quotationLinkOf } from './requestForm';
 import '@/styles/quotation.css';
 import { ClientLabel } from '@/components/broking/ClientLabel';
-import { LovLabel } from '@/components/broking/LovLabel';
+import { LovLabel, ProductName } from '@/components/broking/LovLabel';
 import { CellStack } from '@/components/ui/CellStack';
 
 const TABS: readonly { id: RequestStatus; label: string }[] = [
@@ -203,7 +203,11 @@ export default function RequestsPage() {
                   <span>{r.prospectName ?? '—'}</span>
                 ),
             },
-            { key: 'product', header: 'Product', render: (r) => r.productCode ?? '—' },
+            {
+              key: 'product',
+              header: 'Product',
+              render: (r) => <ProductName code={r.productCode} withCode />,
+            },
             { key: 'cover', header: 'Requested Cover', render: (r) => r.requestedCover ?? '' },
             {
               key: 'status',

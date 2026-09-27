@@ -11,7 +11,10 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
+import { formatDate, titleCase } from '@/utils/format';
+import { InsurerName } from '@/components/broking/LovLabel';
+import { CellStack } from '@/components/ui/CellStack';
+import { PolicyDetails } from './PolicyDetails';
 
 interface InvoicePickerProps {
   selected: string[];
@@ -35,36 +38,54 @@ function columns(selected: string[], toggle: (no: string) => void): Column<OpsIn
       ),
     },
     {
-      key: 'no',
-      header: 'Invoice No. / ARN',
-      render: (i) => (
-        <>
-          <strong>{i.invoiceNo}</strong>
-          <div className="muted">{i.arn}</div>
-        </>
-      ),
+      key: 'policy',
+      header: 'Policy No. / ARN',
+      kind: 'code',
+      render: (i) => <CellStack main={i.policyNo} sub={i.arn} />,
     },
-    { key: 'assured', header: 'Assured', render: (i) => i.assuredName },
-    { key: 'booked', header: 'Booked', render: (i) => formatDate(i.bookingDate) },
+    {
+      key: 'no',
+      header: 'Invoice No.',
+      kind: 'code',
+      render: (i) => <strong>{i.invoiceNo}</strong>,
+    },
+    {
+      key: 'assured',
+      header: 'Assured',
+      render: (i) => <CellStack main={i.assuredName} sub={i.clientCode} />,
+    },
+    { key: 'insurer', header: 'Insurer', render: (i) => <InsurerName code={i.insurerCode} /> },
+    { key: 'booked', header: 'Booked', kind: 'date', render: (i) => formatDate(i.bookingDate) },
     {
       key: 'gross',
       header: 'Gross Premium',
       numeric: true,
       render: (i) => <Amount value={i.grossPremium} />,
     },
-    { key: 'payment', header: 'Payment', render: (i) => <StatusBadge status={i.paymentStatus} /> },
+    {
+      key: 'payment',
+      header: 'Payment',
+      kind: 'status',
+      render: (i) => <StatusBadge status={i.paymentStatus} />,
+    },
     {
       key: 'lock',
       header: 'Lock',
-      render: (i) => (i.flags.lockOwner ? <span className="tag">{i.flags.lockOwner}</span> : '—'),
+      render: (i) =>
+        i.flags.lockOwner ? (
+          <span className="tag">{`Locked by ${titleCase(i.flags.lockOwner.toLowerCase())}`}</span>
+        ) : (
+          ''
+        ),
     },
   ];
 }
 
 /**
- * Step 1 of a new request (ADJID.001/024): booked invoices of the Operations ledger, searched by
- * invoice, ARN, policy or client; several may be chosen (one request each). Invoices locked by
- * another module (remittance queue) cannot be chosen.
+ * Step 1 of a new request (ADJID.001/024): the policy first - booked invoices of the Operations
+ * ledger with their insurer policy number, searched by policy, ARN, invoice or client; several may
+ * be chosen (one request each) and the policy and placement of each chosen invoice are shown before
+ * anything is saved. Invoices locked by another module (remittance queue) cannot be chosen.
  */
 export function InvoicePicker({ selected, onChange }: Readonly<InvoicePickerProps>) {
   const companyId = useCompanyId();
@@ -83,7 +104,7 @@ export function InvoicePicker({ selected, onChange }: Readonly<InvoicePickerProp
   return (
     <div className="stack">
       <WorklistToolbar
-        placeholder="Search Invoice No., ARN, policy or client"
+        placeholder="Search policy, ARN, invoice or client"
         onSearch={(text) => {
           setQ(text);
           setPage(0);
@@ -116,6 +137,7 @@ export function InvoicePicker({ selected, onChange }: Readonly<InvoicePickerProp
         emptyMessage="No items to display"
       />
       <PageFooter data={list.data} noun="invoices" onPage={setPage} />
+      {selected.length > 0 && <PolicyDetails invoiceNos={selected} />}
     </div>
   );
 }

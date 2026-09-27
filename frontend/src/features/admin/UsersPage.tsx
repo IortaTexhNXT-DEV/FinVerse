@@ -20,6 +20,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDateTime } from '@/utils/format';
 import { UserSessionsDialog } from './UserSessionsDialog';
+import { useLovLabel } from '@/components/broking/useLabels';
 
 interface Editing {
   id?: number;
@@ -80,6 +81,9 @@ export default function UsersPage() {
   });
   const online = new Set((onlineUsers.data ?? []).map((u) => u.toLowerCase()));
   const roles = useQuery({ queryKey: ['roles'], queryFn: adminApi.roles });
+  const profileName = (code: string) => roles.data?.find((r) => r.code === code)?.name ?? code;
+  const businessUnit = useLovLabel('UAM_BUSINESS_UNIT');
+  const userLevel = useLovLabel('UAM_USER_LEVEL');
   const settings = useQuery({ queryKey: ['nbadmin', 'settings'], queryFn: nbadminApi.settings });
   const direct = settings.data?.directRoleEdit === true && can('USER_MANAGE');
 
@@ -188,9 +192,13 @@ export default function UsersPage() {
             { key: 'u', header: 'User ID', render: (u) => <strong>{u.username}</strong> },
             { key: 'w', header: 'Windows ID', render: (u) => u.windowsId ?? '' },
             { key: 'n', header: 'Full Name', render: (u) => u.fullName },
-            { key: 'r', header: 'Group Profiles', render: (u) => u.roles.join(', ') },
-            { key: 'bu', header: 'Business Unit', render: (u) => u.businessUnitCode ?? '' },
-            { key: 'lv', header: 'User Level', render: (u) => u.userLevel ?? '' },
+            {
+              key: 'r',
+              header: 'Group Profiles',
+              render: (u) => u.roles.map(profileName).join(', '),
+            },
+            { key: 'bu', header: 'Business Unit', render: (u) => businessUnit(u.businessUnitCode) },
+            { key: 'lv', header: 'User Level', render: (u) => userLevel(u.userLevel) },
             {
               key: 'l',
               header: 'Authorization Limit',

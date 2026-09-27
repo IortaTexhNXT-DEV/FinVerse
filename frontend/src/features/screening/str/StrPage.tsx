@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Download, FileOutput } from 'lucide-react';
 import { useState } from 'react';
@@ -58,7 +59,8 @@ function Extractions({ canDownload }: Readonly<{ canDownload: boolean }>) {
           {
             key: 'period',
             header: 'Period',
-            render: (x) => `${formatDate(x.periodFrom)} – ${formatDate(x.periodTo)}`,
+            kind: 'period',
+            render: (x) => <PeriodCell from={x.periodFrom} to={x.periodTo} />,
           },
           { key: 'count', header: 'STRs', numeric: true, render: (x) => x.strCount },
           {

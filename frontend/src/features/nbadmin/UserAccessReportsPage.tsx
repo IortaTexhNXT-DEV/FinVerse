@@ -27,9 +27,7 @@ export default function UserAccessReportsPage() {
                   <Link to={`/reports/${r.code}`}>{r.name}</Link>
                 </h3>
                 <p className="uam-report-text">{r.text}</p>
-                <div className="uam-report-meta">
-                  {r.code} · Parameters: {r.parameters}
-                </div>
+                <div className="uam-report-meta">Parameters: {r.parameters}</div>
               </div>
             </li>
           ))}

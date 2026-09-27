@@ -379,6 +379,9 @@ def role_grants(include_seed: bool = True) -> dict[str, set[str]]:
     temp: dict[str, list[str]] = {}  # temporary permission lists of a migration (insert into tmp_x values ...)
     for f in files:
         text = re.sub(r"--[^\n]*", "", f.read_text(encoding="utf-8"))
+        # Function bodies ($$ ... $$, for example the immutability triggers) are
+        # not grant statements of their own.
+        text = re.sub(r"\$\$.*?\$\$", "$$ $$", text, flags=re.S)
         for stmt in text.split(";"):
             s = " ".join(stmt.split())
             low = s.lower()
@@ -500,6 +503,9 @@ def workflows(codes: Iterable[str] | None = None) -> dict[str, dict[str, list[di
                    key=_version)
     for f in files:
         text = re.sub(r"--[^\n]*", "", f.read_text(encoding="utf-8"))
+        # Function bodies ($$ ... $$, for example the immutability triggers) are
+        # not grant statements of their own.
+        text = re.sub(r"\$\$.*?\$\$", "$$ $$", text, flags=re.S)
         for stmt in text.split(";"):
             m = re.search(r"insert into (wf_stage|wf_transition)\s*\(([^)]*)\)\s*values(.*)", stmt, re.S | re.I)
             if not m:
@@ -635,7 +641,13 @@ def java_text(expr: str, consts: dict[str, str], cls: str) -> str:
             out.append(_global_constants()[part])
         elif " ? " in part and part.startswith("("):
             branches = re.findall(r'"((?:[^"\\]|\\.)*)"', part)
-            out.append(" / ".join(branches) if branches else _placeholder(part, consts))
+            whole = split_top(part[1:-1], "?") if matching(part, 0) == len(part) - 1 else []
+            alternatives = split_top(whole[1], ":") if len(whole) == 2 else []
+            if len(alternatives) == 2 and any("+" in a for a in alternatives):
+                # (n == 1 ? "a day" : n + " days"): each alternative as its own text.
+                out.append(" / ".join(java_text(a, consts, cls).strip() for a in alternatives))
+            else:
+                out.append(" / ".join(branches) if branches else _placeholder(part, consts))
         else:
             out.append(_placeholder(part, consts))
     return "".join(out)
@@ -661,7 +673,8 @@ def backend_messages(packages: Iterable[str]) -> list[Message]:
             text = _strip_comments(raw)
             consts = _java_constants(text)
             for m in re.finditer(r"new (BusinessRuleException|FieldValidationException|ResourceNotFoundException|"
-                                 r"DuplicateResourceException|Violation|Warning|Unmet)\(", text):
+                                 r"DuplicateResourceException|Violation|Warning|Unmet|BadCredentialsException|"
+                                 r"LockedException|DisabledException)\(", text):
                 start = m.end() - 1
                 args = split_top(text[start + 1:matching(text, start)])
                 kind = m.group(1)
@@ -690,6 +703,10 @@ def backend_messages(packages: Iterable[str]) -> list[Message]:
                 elif kind == "DuplicateResourceException" and args:
                     pairs = [("DUPLICATE", f"{java_text(args[0], consts, p.stem)} already exists: <key>")]
                     label = "Duplicate"
+                elif kind in ("BadCredentialsException", "LockedException", "DisabledException") and len(args) == 1:
+                    # Refused sign-ins: the platform handler answers AUTHENTICATION_FAILED with the text.
+                    pairs = [("AUTHENTICATION_FAILED", java_text(args[0], consts, p.stem))]
+                    label = "Business rule"
                 else:
                     continue
                 probe = text[m.start():m.start() + 60]
@@ -697,6 +714,14 @@ def backend_messages(packages: Iterable[str]) -> list[Message]:
                 for code, msg in pairs:
                     out.append(Message(code=code, text=msg, kind=label, file=str(p.relative_to(REPO)), cls=p.stem,
                                        method=_method_at(text, m.start()), line=line, package=pkg))
+            # Problem details written by a filter as a JSON text constant ("detail":"...","code":"...").
+            for m in re.finditer(r"static\s+final\s+String\s+\w+\s*=\s*((?:\"(?:[^\"\\]|\\.)*\"\s*\+?\s*)+);", text):
+                body = "".join(re.findall(r'"((?:[^"\\]|\\.)*)"', m.group(1))).replace('\\"', '"')
+                hit = re.search(r'"detail":"([^"]*)","code":"([A-Z_]+)"', body)
+                if hit:
+                    out.append(Message(code=hit.group(2), text=hit.group(1), kind="Business rule",
+                                       file=str(p.relative_to(REPO)), cls=p.stem, method="filter",
+                                       line=text[:m.start()].count("\n") + 1, package=pkg))
     return out
 
 
@@ -883,13 +908,16 @@ class UiMessage:
     line: int
 
 
-def _ts_text(expr: str) -> str | None:
-    """A TS string or template literal as text, ${...} as <name>."""
+def _ts_text(expr: str, extended: bool = False) -> str | None:
+    """A TS string or template literal as text, ${...} as <name>. With extended, ${a ? 'x' : 'y'} gives 'x / y'."""
     expr = expr.strip()
     if expr.startswith("`") and expr.endswith("`"):
         body = expr[1:-1]
 
         def name(m: re.Match) -> str:
+            tern = re.fullmatch(r"[^?]+\?\s*('[^']*')\s*:\s*('[^']*')\s*", m.group(1), re.S)
+            if extended and tern:
+                return f"{_ts_string(tern.group(1))} / {_ts_string(tern.group(2))}"
             return _expr_name(m.group(1))
         return re.sub(r"\$\{((?:[^{}]|\{[^}]*\})*)\}", name, body)
     return _ts_string(expr)
@@ -941,9 +969,23 @@ def jsx_text(chunk: str) -> str:
     return " ".join(text.split())
 
 
-def frontend_messages(dirs: Iterable[str]) -> list[UiMessage]:
+UI_STARTS = (r"^(Enter|Select|Choose|Give|Upload|Attach|Add|Use|The |A |An |Only |Check|Complete|Correct|Record|Pick|"
+             r"Type|At least|Must|Cannot")
+# Further message beginnings read with extended=True (the check wording of the user access screens).
+UI_STARTS_EXTENDED = r"|This |Both |Your |You |Grant|Still|Ask)"
+
+
+def frontend_messages(dirs: Iterable[str], extended: bool = False) -> list[UiMessage]:
     """Toasts, field validation messages, alert texts and empty-list texts of the given feature folders
-    (relative to frontend/src, e.g. 'features/crm', 'components/broking')."""
+    (relative to frontend/src, e.g. 'features/crm', 'components/broking').
+
+    extended=True (messages.yaml sources.ui_patterns: extended) also reads the checks written as conditional
+    assignments (errors.x = cond ? 'a' : 'b'; x: cond ? 'message' : undefined), problems.push('...'), returned texts
+    starting with This, Both, Your or You, and the alternatives of ${cond ? 'a' : 'b'} in template texts. The default
+    keeps the reading of the packs issued before (BRD-01, BRD-03)."""
+    starts = UI_STARTS + (UI_STARTS_EXTENDED if extended else ")")
+    if extended:
+        starts = starts.replace("|Use|", "|Use\\b|")  # not "User ID", "User Level" (labels)
     out: list[UiMessage] = []
     root = REPO / "frontend" / "src"
     for d in dirs:
@@ -965,21 +1007,38 @@ def frontend_messages(dirs: Iterable[str]) -> list[UiMessage]:
                 arg = split_top(text[m.end():matching(text, m.end() - 1)])
                 if arg:
                     kind = "Confirmation" if m.group(1) == "success" else ("Error" if m.group(1) == "error" else "Information")
-                    add(_ts_text(arg[0]), kind, m.start(), "toast")
+                    add(_ts_text(arg[0], extended), kind, m.start(), "toast")
+            if extended:
+                lit = r"('[^'\n]*'|`[^`]*`)"
+                # errors.x = ... / problems.x = ...: every text of the assignment is a message.
+                for m in re.finditer(r"\b(?:errors|problems)\.(\w+)\s*=\s*([^;]*);", text):
+                    for v in re.findall(lit, m.group(2)):
+                        add(_ts_text(v, extended), "Validation", m.start(), m.group(1))
+                # cond ? 'message' : undefined, and cond ? undefined : 'message'.
+                for m in re.finditer(r"\?\s*" + lit + r"\s*:\s*undefined|\?\s*undefined\s*:\s*" + lit, text):
+                    val = _ts_text(m.group(1) or m.group(2), extended) or ""
+                    if re.match(starts, val):
+                        add(val, "Validation", m.start(), "check")
+                # return cond ? a : 'message';
+                for m in re.finditer(r"\breturn\s+([^;]*\?[^;]*);", text):
+                    for v in re.findall(lit, m.group(1)):
+                        val = _ts_text(v, extended) or ""
+                        if re.match(starts, val) and not val.endswith(("…", "...")):  # not a placeholder
+                            add(val, "Validation", m.start(), "check")
+                for m in re.finditer(r"\b(?:problems|errors)\.push\(\s*" + lit + r"\s*\)", text):
+                    add(_ts_text(m.group(1), extended), "Validation", m.start(), "check")
             for m in re.finditer(r"(?:errors|e)\.(\w+)\s*=\s*(`[^`]*`|'[^']*'|\"[^\"]*\")", text):
                 add(_ts_text(m.group(2)), "Validation", m.start(), m.group(1))
             for m in re.finditer(r"\b(\w+)\s*:\s*(`[^`]*`|'[^']*')\s*[,}]", text):
                 # messages in error maps { amount: 'Enter the amount' }
                 val = _ts_text(m.group(2)) or ""
-                if re.match(r"^(Enter|Select|Choose|Give|Upload|Attach|Add|Use|The |A |An |Only |Check|Complete|"
-                            r"Correct|Record|Pick|Type|At least|Must|Cannot)", val) and m.group(1) not in (
+                if re.match(starts, val) and m.group(1) not in (
                         "label", "title", "description", "placeholder", "hint", "header", "section", "path", "key",
-                        "emptyMessage", "confirmLabel", "noun"):
+                        "emptyMessage", "confirmLabel", "noun") + (("attribute", "text", "name") if extended else ()):
                     add(val, "Validation", m.start(), m.group(1))
             for m in re.finditer(r"return\s+(`[^`]*`|'[^']*')\s*;", text):
-                val = _ts_text(m.group(1)) or ""
-                if re.match(r"^(Enter|Select|Choose|Give|Upload|Attach|Add|Use|The |A |An |Only |Check|Complete|"
-                            r"Correct|Record|Pick|At least|Must|Cannot)", val):
+                val = _ts_text(m.group(1), extended) or ""
+                if re.match(starts.replace("Type|", ""), val):
                     add(val, "Validation", m.start(), "check")
             for m in re.finditer(r'className="alert (warning|danger|info|success)"[^>]*>', text):
                 end = text.find("</div>", m.end())

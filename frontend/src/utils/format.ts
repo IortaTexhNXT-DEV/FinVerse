@@ -113,6 +113,33 @@ export function formatDate(iso: string | null | undefined): string {
   return `${day}-${name}-${year}`;
 }
 
+/**
+ * A period on one line for texts and detail blocks: "20-Oct-2026 to 20-Oct-2027"; an open end
+ * reads "from 20-Oct-2026" (lists use `PeriodCell`, which puts the two dates on two lines).
+ */
+export function formatPeriod(
+  from: string | null | undefined,
+  to: string | null | undefined,
+): string {
+  const start = formatDate(from);
+  const end = formatDate(to);
+  if (start === '' && end === '') {
+    return '';
+  }
+  if (end === '') {
+    return `from ${start}`;
+  }
+  return start === '' ? `to ${end}` : `${start} to ${end}`;
+}
+
+/** A number of days as users read it: "0 days", "1 day", "12 days" (aging columns). */
+export function formatDays(days: number | null | undefined): string {
+  if (days === null || days === undefined || !Number.isFinite(days)) {
+    return '';
+  }
+  return `${String(days)} ${Math.abs(days) === 1 ? 'day' : 'days'}`;
+}
+
 /** A timestamp as dd-MMM-yyyy HH:mm in Philippine time: 25-Sep-2026 19:32. */
 export function formatDateTime(iso: string | null | undefined): string {
   if (!iso) {
@@ -147,8 +174,19 @@ export function formatDuration(fromIso: string, toIso: string | null | undefined
   return `${String(days)}d ${String(hours % 24)}h`;
 }
 
-export function today(): string {
-  return new Date().toISOString().slice(0, 10);
+const businessDateFormat = new Intl.DateTimeFormat('en-CA', {
+  timeZone: DISPLAY_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+/**
+ * The business date (ISO yyyy-MM-dd) in Philippine time, whatever the zone of the browser: from
+ * 00:00 to 07:59 in Manila the UTC date is still the day before.
+ */
+export function today(now: Date = new Date()): string {
+  return businessDateFormat.format(now);
 }
 
 export function humanize(code: string): string {

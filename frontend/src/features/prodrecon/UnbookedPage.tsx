@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useAuth } from '@/auth/authContext';
@@ -13,7 +14,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, humanize } from '@/utils/format';
+import { humanize } from '@/utils/format';
 import { ItemReviewDialog } from './ItemReviewDialog';
 import { prodreconApi } from './prodreconApi';
 import type { ReconItem, UnbookedStatus } from './prodreconApi';
@@ -40,7 +41,8 @@ const COLUMNS: Column<ReconItem>[] = [
   {
     key: 'period',
     header: 'Period',
-    render: (r) => `${formatDate(r.insurer?.periodFrom)} – ${formatDate(r.insurer?.periodTo)}`,
+    kind: 'period',
+    render: (r) => <PeriodCell from={r.insurer?.periodFrom} to={r.insurer?.periodTo} />,
   },
   {
     key: 'gross',

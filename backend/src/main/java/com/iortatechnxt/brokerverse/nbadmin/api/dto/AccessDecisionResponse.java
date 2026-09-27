@@ -14,11 +14,12 @@ public record AccessDecisionResponse(AccessRequestResponse request, String tempo
    * Maps a decision.
    *
    * @param d decision
+   * @param summary one-line description of the request (AccessRequestDescriber)
    * @return response
    */
-  public static AccessDecisionResponse from(Decision d) {
+  public static AccessDecisionResponse from(Decision d, String summary) {
     return new AccessDecisionResponse(
-        AccessRequestResponse.from(d.request()), d.temporaryPassword());
+        AccessRequestResponse.from(d.request(), summary), d.temporaryPassword());
   }
 
   @Override

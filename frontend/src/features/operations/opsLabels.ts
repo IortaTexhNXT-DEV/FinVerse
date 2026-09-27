@@ -144,6 +144,7 @@ export type Invoice360TabId =
   | 'components'
   | 'movements'
   | 'family'
+  | 'transactions'
   | (typeof RELATED_TABS)[number]['id']
   | 'history'
   | 'documents';
@@ -163,6 +164,7 @@ export function invoiceTabs(
     { id: 'components', label: 'Components & Balances' },
     { id: 'movements', label: 'Movements' },
     { id: 'family', label: 'Invoice Family' },
+    { id: 'transactions', label: 'Policy Transactions' },
     ...RELATED_TABS.map((t) => ({ id: t.id, label: counted(t.label, t.section) })),
     { id: 'history', label: 'History' },
     { id: 'documents', label: counted('Documents', 'DOCUMENTS') },

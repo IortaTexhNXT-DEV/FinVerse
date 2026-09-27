@@ -1,6 +1,7 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { Button } from '@/components/ui/Button';
 import type { Column } from '@/components/ui/DataTable';
-import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime, humanize } from '@/utils/format';
 import { DownloadButton } from './ExtractParts';
 import type { ReconExtract } from './prodreconApi';
 import { displayNameOf } from '@/api/users';
@@ -24,7 +25,8 @@ export function extractColumns(
     {
       key: 'period',
       header: 'Booking Period',
-      render: (e) => `${formatDate(e.bookingFrom)} – ${formatDate(e.bookingTo)}`,
+      kind: 'period',
+      render: (e) => <PeriodCell from={e.bookingFrom} to={e.bookingTo} />,
     },
     { key: 'rows', header: 'Accounts', numeric: true, render: (e) => e.rowCount },
     { key: 'new', header: 'New', numeric: true, render: (e) => e.newCount },

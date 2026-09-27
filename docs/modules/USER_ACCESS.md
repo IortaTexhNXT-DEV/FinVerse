@@ -141,6 +141,7 @@ ending the sessions -> the audit log with from / to values.
 | Job | Cron property (UTC; PHT time) | Work |
 |---|---|---|
 | `UAM_EFFECTIVE_CHANGES` | `brokerverse.jobs.uam-effective-changes-cron` `0 5 16 * * *` (00:05) | Applies the SCHEDULED requests due today or earlier; a failure raises `UAM_SCHEDULED_APPLY_FAILED` |
+| `UAM_DORMANT_USERS` | `brokerverse.jobs.uam-dormant-users-cron` `0 15 16 * * *` (00:15) | Deactivates the users without a sign-in for `UAM_DORMANT_DAYS` (90) by a system Deactivate user request (reason `DORMANT`); notice `UAM_DORMANT_NOTICE_DAYS` (7) days before; SYSADMIN exempt |
 | `PASSWORD_EXPIRY_NOTICE` | `brokerverse.jobs.password-expiry-notice-cron` `0 0 22 * * *` (06:00) | In-app notice and e-mail to users whose password expires within 7 days (LOCAL mode) |
 | `USER_SESSION_SWEEP` | `brokerverse.jobs.user-session-sweep-cron` `0 */15 * * * *` (default in code) | Ends idle, expired, locked and disabled users' sessions |
 

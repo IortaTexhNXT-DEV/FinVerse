@@ -365,6 +365,8 @@ brokerverse:
     uam-effective-changes-cron: ${BROKERVERSE_JOB_UAM_EFFECTIVE_CHANGES_CRON:0 5 16 * * *}
     # LOCAL sign-in: notifies users whose password expires within 7 days (UAM-NFR-36), 06:00 PHT.
     password-expiry-notice-cron: ${BROKERVERSE_JOB_PASSWORD_EXPIRY_NOTICE_CRON:0 0 22 * * *}
+    # UAM_DORMANT_USERS: deactivates the users without a sign-in for UAM_DORMANT_DAYS, 00:15 PHT (V1065).
+    uam-dormant-users-cron: ${BROKERVERSE_JOB_UAM_DORMANT_USERS_CRON:0 15 16 * * *}
     # ---- Claims Handling (BRD-7), docs/architecture/CLAIMS_BROKING_DESIGN.md section 9.1 (PHT = UTC+8) ----
     # Re-check of the premium of open, unauthorised claims (BRCLM.001), 05:30 PHT.
     bcl-premium-recheck-cron: ${BROKERVERSE_JOB_BCL_PREMIUM_RECHECK_CRON:0 30 21 * * *}

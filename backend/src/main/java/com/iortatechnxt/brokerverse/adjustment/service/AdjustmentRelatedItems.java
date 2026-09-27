@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.adjustment.service;
 
 import com.iortatechnxt.brokerverse.adjustment.domain.ComponentChange;
 import com.iortatechnxt.brokerverse.adjustment.domain.EndorsementRequest;
+import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.service.port.InvoiceRelatedItems;
 import java.math.BigDecimal;
@@ -18,14 +19,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdjustmentRelatedItems implements InvoiceRelatedItems {
 
   private final AdjustmentQueryService queries;
+  private final LovService lovs;
 
   /**
    * Creates the source.
    *
    * @param queries requests of an invoice
+   * @param lovs endorsement type labels
    */
-  public AdjustmentRelatedItems(AdjustmentQueryService queries) {
+  public AdjustmentRelatedItems(AdjustmentQueryService queries, LovService lovs) {
     this.queries = queries;
+    this.lovs = lovs;
   }
 
   @Override
@@ -35,10 +39,10 @@ public class AdjustmentRelatedItems implements InvoiceRelatedItems {
 
   @Override
   public List<RelatedItem> itemsFor(String invoiceNo) {
-    return queries.forInvoice(invoiceNo).stream().map(AdjustmentRelatedItems::item).toList();
+    return queries.forInvoice(invoiceNo).stream().map(this::item).toList();
   }
 
-  private static RelatedItem item(EndorsementRequest r) {
+  private RelatedItem item(EndorsementRequest r) {
     BigDecimal premium =
         r.getChanges().stream()
             .filter(c -> c.component() == LedgerComponent.DTIP)
@@ -51,7 +55,9 @@ public class AdjustmentRelatedItems implements InvoiceRelatedItems {
         r.getTerms().effectiveDate(),
         premium,
         r.getStage().name(),
-        r.getTerms().endorsementType() + ": " + r.getTerms().description(),
+        lovs.label(RequestRules.TYPE_LOV, r.getTerms().endorsementType())
+            + ": "
+            + r.getTerms().description(),
         Adjustments.link(r.getId()));
   }
 }

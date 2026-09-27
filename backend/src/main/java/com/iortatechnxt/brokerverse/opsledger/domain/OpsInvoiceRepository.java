@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.opsledger.domain;
 
 import jakarta.persistence.LockModeType;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -25,6 +26,14 @@ public interface OpsInvoiceRepository
       type = EntityGraph.EntityGraphType.LOAD,
       attributePaths = {"components", "shares"})
   Optional<OpsInvoice> findByInvoiceNo(String invoiceNo);
+
+  /**
+   * Invoices by number (links of several records at once).
+   *
+   * @param invoiceNos invoice numbers
+   * @return invoices found
+   */
+  List<OpsInvoice> findByInvoiceNoIn(Collection<String> invoiceNos);
 
   /**
    * An invoice locked for update (movements, flags and locks change it).

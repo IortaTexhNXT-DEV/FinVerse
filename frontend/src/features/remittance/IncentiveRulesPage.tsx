@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -13,7 +14,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, today } from '@/utils/format';
+import { today } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { IncentiveRule, IncentiveRuleInput } from './api';
 import './remittance.css';
@@ -237,8 +238,8 @@ const COLUMNS: Column<IncentiveRule>[] = [
   {
     key: 'from',
     header: 'Effective',
-    render: (r) =>
-      `${formatDate(r.effectiveFrom)} – ${r.effectiveTo ? formatDate(r.effectiveTo) : 'open'}`,
+    kind: 'period',
+    render: (r) => <PeriodCell from={r.effectiveFrom} to={r.effectiveTo} />,
   },
   {
     key: 'status',

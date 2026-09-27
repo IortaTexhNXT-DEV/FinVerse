@@ -160,6 +160,7 @@ No `workflow` case. The request keeps its own state machine (section 4.3), as th
 | Job | Cron property (default) | Work |
 |---|---|---|
 | `UAM_EFFECTIVE_CHANGES` | `brokerverse.jobs.uam-effective-changes-cron` (`0 5 0 * * *`) | Apply SCHEDULED requests whose `effective_from` is today or earlier (UAM-NFR-14) |
+| `UAM_DORMANT_USERS` | `brokerverse.jobs.uam-dormant-users-cron` (`0 15 0 * * *` PHT) | Deactivate the users without a sign-in for `UAM_DORMANT_DAYS` by a system DISABLE_USER request (reason `DORMANT`), after a notice `UAM_DORMANT_NOTICE_DAYS` days before; SYSADMIN exempt (V1065) |
 | `PASSWORD_EXPIRY_NOTICE` | `brokerverse.jobs.password-expiry-notice-cron` (`0 0 6 * * *`) | LOCAL mode only: notify users whose password expires within 7 days |
 
 | Parameter (`sys_parameter`, category SECURITY) | Default | Source |
@@ -553,3 +554,26 @@ What wave U1-B built on U0 and U1-A, and where it differs from or details sectio
     UAM_VIEW to `AccessMatrixController`.
 - **Guide.** [`docs/modules/USER_ACCESS.md`](../modules/USER_ACCESS.md) (with production-support troubleshooting); the
   as-built status per BRD ID is in `BDOI_UAM_BRD_SPEC.md`.
+
+## Sign-off controls (V1065, V1130)
+
+- **Separation-of-duties rules** (`nba_sod_rule`, `SodRule`, `SodRuleService`, `/api/v1/nbadmin/sod-rules`):
+  pairs of group profiles one user may not hold, created or deactivated by `UAM_SOD_MAINTAIN` and
+  authorised by `UAM_SOD_AUTHORIZE` (maker-checker, inbox source `SodRuleApprovalSource`). The active
+  rules are checked by `UserRequestValidator` (`ACCESS_SOD_CONFLICT`) on submission, on every bulk line
+  and again at approval.
+- **Second approval of the security parameters** (`system.SecurityParameterApprovals`): a `PUT` of a
+  parameter of category `SECURITY` keeps the value in `sys_parameter.pending_value`; a holder of
+  `SECURITY_PARAMETER_APPROVE` other than the requester approves (`/approve`) or rejects (`/reject`).
+  `SecurityParameterChangeRequested` is notified and listed in the inbox by
+  `nbadmin.SecurityParameterNotices` (`system` does not depend on messaging). `SystemParameterService.update`
+  stays the direct path for internal callers.
+- **Dormant users** (`DormantUserJob`, `UAM_DORMANT_DAYS`, `UAM_DORMANT_NOTICE_DAYS`): a system
+  DISABLE_USER request with reason `DORMANT`, applied by `SYSTEM`; SYSADMIN holders exempt.
+- **Deactivated users** are refused with `DisabledException` ("Your account is deactivated") before the
+  password check; the attempt is audited and not counted towards the lock-out.
+- **Authorisation limit** on CREATE_USER and MODIFY_USER requests (`nba_access_request.authorization_limit`).
+- **Profile members** are told (`UAM_ACCESS_CHANGED`) when a DEACTIVATE_ROLE or REACTIVATE_ROLE request applies.
+- **External users** are offered only while `UAM_EXTERNAL_USERS` is true.
+- The request descriptions and notices use profile and permission names (`AccessRequestDescriber`,
+  `PermissionNames`, frontend `permissionLabel`).

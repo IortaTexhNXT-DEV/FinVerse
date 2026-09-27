@@ -76,7 +76,7 @@ This page is binding for every BrokerVerse screen. Components read the design to
 | Form builder set | Input text, text area, dropdown, date picker (`DateInput`: typed and shown as dd-MMM-yyyy, with a calendar icon; BIBS uses dd-MMM-yyyy instead of the pack's MM/DD/YYYY, section 8), radio button, checkbox, select-search combo box, password, readable fields, upload file (`FileDropZone`) |
 | Table | Header row in Header Blue with white bold text and sort chevrons, and alternating white / Background Blue rows. A checkbox column for bulk actions. "Showing 1 to n of N results" with numbered pages on the right (the Renewal Expiry List asks for one scrollable view instead: UX-6) |
 | Flag chip | Record flags such as FFY and Direct Payment go in their own column as small gold-tinted chips (`Tag`), never mixed with the status pill. One height (22 px), one font, a minimum width of 88 px, centred text; never wraps |
-| Status pill | One per record in the Status column. Outlined and tinted, radius 8: green = Clean / Approved, yellow = Review / Pending, red = Exception / Rejected, blue = in-process (e.g. "Account for Placement"), grey = draft or inactive. One size everywhere: 24 px high, 12 px bold, centred, 112–176 px wide; in a table cell every pill of the column takes the column width. Long labels use the agreed short form with the full label in the tooltip (section 8.2); a pill never wraps |
+| Status pill | One per record in the Status column. Outlined and tinted, radius 8: green = Clean / Approved, yellow = Review / Pending, red = Exception / Rejected, blue = in-process (e.g. "Account for Placement"), grey = draft or inactive. One size everywhere: 24 px high, 12 px bold, centred, 112–184 px wide; in a table cell every pill of the column takes the column width. Labels up to 21 characters are shown in full ("Returned to Marketing"); only longer labels use the agreed short form with the full label in the tooltip (section 8.2); a pill never wraps |
 | Tabs | Boxed tabs; the active tab is white with a 4 px yellow top bar and CTA Blue text, inactive tabs have a light blue gradient |
 | Empty state | Table-and-magnifier illustration with "No items to display" (`EmptyState`) |
 | Modal | Title with a close ✕, body, and a footer with Cancel (secondary) and the action (primary) on the right |
@@ -128,6 +128,9 @@ Use these instead of building a screen-specific variant.
 | Key-value detail blocks | `components/ui/DefinitionGrid` (aligned label / value rows, dash for empty, "Not provided" collapse); existing `.detail-list` blocks share the look |
 | Record page header | `components/broking/RecordHeader` (name, reference chips, status and labelled statuses, flags, completeness, key facts) |
 | Table cell with a secondary line | `components/ui/CellStack` (`EmptyCell` for the muted dash) |
+| Period, coverage term or date range in a list | `components/ui/PeriodCell` (`periodColumn` for a list column; section 8.3) |
+| Product names | `components/broking/LovLabel` `ProductName` (name, code as the muted second line with `withCode`), `ProductLineLabel` (name and line) |
+| Policy transaction history (booking, endorsements, cancellations, adjustments, refunds, with their GL journals) | `components/broking/PolicyTransactions` (one component on the Invoice 360, account and endorsement request pages; rows expand to the journal lines through `DataTable` `renderExpanded`) |
 | Flag and label chips | `components/ui/Tag` |
 | User names | `components/ui/UserName` (display name, login id in the tooltip; `displayNameOf` for texts) |
 | File upload | `components/ui/FileDropZone` |
@@ -151,7 +154,7 @@ Use these instead of building a screen-specific variant.
 ### 8.2 Status pills and tags
 
 - One height, one font size and weight, centred text, a fixed minimum width; in a table cell the pill takes the column width so every pill of a column is the same size. A pill never wraps.
-- Agreed short forms (full label in the tooltip): Returned to Mktg (Returned to Marketing), Insurer Returned (Returned by Insurer), Accepted as Req. (Accepted as Requested), Appr. with Changes (Approved with Changes), Pending Auth. (Pending Authorization), Plcmt Cancelled (Placement Cancelled), Excl. Cancelled (Excluded Cancelled), Reqts Prep (Requirements Prep), Unit Head Appr. (Unit Head Approval), For Mktg Approval (For MKT Approval), For Placement (Ready for Placement), Skipped (Skipped Locked). Other labels longer than 18 characters are cut with an ellipsis and keep the tooltip.
+- Labels are shown in full up to 21 characters, the width of the widest pill: "Returned to Marketing", "Pending Authorization", "Ready for Placement" (client feedback of 27-Sep-2026: no abbreviated status where the full label fits). The agreed short forms are kept only for longer labels, with the full label in the tooltip: For Mktg Approval (For Marketing Head Approval), Skipped (Skipped Locked) and the like. Other labels longer than 21 characters are cut with an ellipsis and keep the tooltip.
 - One colour tone per state group (section 4). Two statuses of one record (e.g. Unapplied and a Queued request) are two columns, or two aligned pills (`.badge-pair`), never a word above a pill.
 - Flags (FFY, Direct Payment, Information Incomplete) are `Tag` chips in their own column or in the record header's flag list.
 
@@ -159,6 +162,10 @@ Use these instead of building a screen-specific variant.
 
 - Sticky Header Blue header row; the table scrolls inside its card (70% of the window height).
 - Alignment by column kind (`Column.kind`): text left; amounts right with thousand separators and two decimals, the currency code in the header ("Paid (PHP)"); dates dd-MMM-yyyy and timestamps dd-MMM-yyyy HH:mm (Philippine time); codes and references (ARN, CL, PAY… numbers) in a fixed 168 px column that never wraps, with the copy button aligned; status pills centred.
+- **Periods** (period of cover, coverage term, FFY or statement period, any date range) use the shared period cell (`PeriodCell`, column kind `period`): the from date on the first line and "to" the end date on the second ("20-Oct-2026" / "to 20-Oct-2027"), each line kept whole, in a column at least 132 px wide (`--period-col-width`). An open end reads "to open". A period is never written as one text in a list; `DataTable` turns any "dd-MMM-yyyy – dd-MMM-yyyy" text into the period cell. Key-value blocks and sentences write it on one line, "20-Oct-2026 to 20-Oct-2027" (`formatPeriod`).
+- Nothing breaks inside a value: dates, timestamps, amounts (`.num`) and codes stay on one line whatever the column width; only text wraps, between words.
+- Codes and logins never stand alone in a list: products by name with the code as the second line (`ProductName`), insurers by name (`InsurerName`), officers by display name (`UserName`), list values by label (`LovLabel`), statuses by their full label (section 8.2).
+- Aging and other day counts read in days: "0 days", "1 day", "12 days" (`formatDays`), never "0 d".
 - Every cell has one primary value and at most one muted secondary line under it (`CellStack`). Empty values are a single muted dash; a state such as "Not Matched" is a neutral pill, never prose ("None yet").
 - Users are shown by display name, never by login id (`UserName`).
 - Sortable headers (`sortKey` with `sort` / `onSort`) where the API sorts; the pagination bar shows "Showing x to y of n results", numbered pages and, where the API takes a page size, Rows per Page.

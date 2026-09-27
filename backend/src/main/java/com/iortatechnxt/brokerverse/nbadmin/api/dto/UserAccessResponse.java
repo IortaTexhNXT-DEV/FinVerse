@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.nbadmin.api.dto;
 
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.Role;
+import java.math.BigDecimal;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
  * @param businessUnitCode business unit group
  * @param userLevel user level
  * @param locked whether the account is locked
+ * @param authorizationLimit authorisation limit, null for none
  */
 public record UserAccessResponse(
     String username,
@@ -31,7 +33,8 @@ public record UserAccessResponse(
     String windowsId,
     String businessUnitCode,
     String userLevel,
-    boolean locked) {
+    boolean locked,
+    BigDecimal authorizationLimit) {
 
   /**
    * Maps a user.
@@ -50,6 +53,7 @@ public record UserAccessResponse(
         u.getWindowsId(),
         u.getBusinessUnitCode(),
         u.getUserLevel(),
-        u.isLocked());
+        u.isLocked(),
+        u.getAuthorizationLimit());
   }
 }

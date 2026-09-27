@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -11,7 +12,6 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
 import { frbsApi } from './api';
 import type { ServiceFeeRecipient, ServiceFeeRule } from './api';
 import { RecipientDialog, RuleDialog } from './SetupDialogs';
@@ -38,8 +38,8 @@ const RULE_COLUMNS: Column<ServiceFeeRule>[] = [
   {
     key: 'dates',
     header: 'Effective',
-    render: (r) =>
-      `${formatDate(r.effectiveFrom)} – ${r.effectiveTo ? formatDate(r.effectiveTo) : 'open'}`,
+    kind: 'period',
+    render: (r) => <PeriodCell from={r.effectiveFrom} to={r.effectiveTo} />,
   },
   {
     key: 'status',

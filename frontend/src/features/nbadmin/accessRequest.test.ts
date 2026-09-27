@@ -20,6 +20,7 @@ const SUBMIT: ValidationContext = {
   users: USERS,
   submit: true,
   userIdPattern: '^[a-zA-Z][0-9]{9}$',
+  userIdFormatText: 'a letter followed by nine digits, for example a013000196',
   today: '2026-09-25',
 };
 const DRAFT: ValidationContext = { users: USERS, submit: false };
@@ -48,8 +49,12 @@ describe('user access request validation', () => {
       'This user already exists',
     );
     expect(validateAccessRequest(form({ username: 'a01300019X' }), SUBMIT).username).toBe(
-      'The user ID must follow the format ^[a-zA-Z][0-9]{9}$',
+      'The user ID must be a letter followed by nine digits, for example a013000196',
     );
+    expect(
+      validateAccessRequest(form({ username: 'a01300019X' }), { ...SUBMIT, userIdFormatText: '' })
+        .username,
+    ).toBe('The user ID does not have the BDOI format');
     expect(
       validateAccessRequest(
         form({
@@ -62,6 +67,21 @@ describe('user access request validation', () => {
         SUBMIT,
       ),
     ).toEqual({});
+  });
+
+  it('takes an authorisation limit of zero or more with up to 2 decimals', () => {
+    const base = form({ type: 'MODIFY_USER', username: 'aileen', authorizationLimit: '12.345' });
+    expect(validateAccessRequest(base, SUBMIT).authorizationLimit).toBe(
+      'Enter an amount of zero or more, with up to 2 decimals',
+    );
+    expect(
+      validateAccessRequest({ ...base, authorizationLimit: '1,500,000.50' }, SUBMIT)
+        .authorizationLimit,
+    ).toBeUndefined();
+    expect(
+      toAccessRequest({ ...base, authorizationLimit: '1,500,000.50' }).authorizationLimit,
+    ).toBe(1500000.5);
+    expect(toAccessRequest({ ...base, authorizationLimit: '' }).authorizationLimit).toBeUndefined();
   });
 
   it('needs an existing user in the right state and a date from today', () => {

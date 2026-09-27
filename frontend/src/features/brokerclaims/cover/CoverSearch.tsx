@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useQuery } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
@@ -9,7 +10,6 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
 import type { CoverHit, SearchBy } from './api';
 import { coverApi } from './api';
 
@@ -117,7 +117,8 @@ export function CoverSearch({
               {
                 key: 'period',
                 header: 'Period',
-                render: (c) => `${formatDate(c.periodFrom)} – ${formatDate(c.periodTo)}`,
+                kind: 'period',
+                render: (c) => <PeriodCell from={c.periodFrom} to={c.periodTo} />,
               },
               { key: 'status', header: 'Status', render: (c) => <StatusBadge status={c.status} /> },
             ]}

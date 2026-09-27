@@ -23,6 +23,21 @@ public class AccessSettings {
   /** Format of a new user ID (UAM-NFR-13, UQ05). */
   public static final String USER_ID_PATTERN = "USER_ID_PATTERN";
 
+  /** The user ID format in words (V1065). */
+  public static final String USER_ID_FORMAT_TEXT = "USER_ID_FORMAT_TEXT";
+
+  /** Whether requests for external (portal) users may be raised (V1065; false while no portal). */
+  public static final String EXTERNAL_USERS = "UAM_EXTERNAL_USERS";
+
+  /** Days without a sign-in after which a user is deactivated; 0 = never (V1065). */
+  public static final String DORMANT_DAYS = "UAM_DORMANT_DAYS";
+
+  /** Days before the dormant deactivation on which the user is told; 0 = no notice (V1065). */
+  public static final String DORMANT_NOTICE_DAYS = "UAM_DORMANT_NOTICE_DAYS";
+
+  private static final String DEFAULT_FORMAT_TEXT =
+      "a letter followed by nine digits, for example a013000196";
+
   private static final String FALSE = Boolean.FALSE.toString();
 
   private final SystemParameterService parameters;
@@ -79,5 +94,42 @@ public class AccessSettings {
    */
   public String userIdPattern() {
     return parameters.text(USER_ID_PATTERN, "");
+  }
+
+  /**
+   * The user ID format in words, shown with the format check.
+   *
+   * @return words
+   */
+  public String userIdFormatText() {
+    String text = parameters.text(USER_ID_FORMAT_TEXT, "");
+    return text.isBlank() ? DEFAULT_FORMAT_TEXT : text;
+  }
+
+  /**
+   * Whether access requests may be raised for external (portal) users.
+   *
+   * @return true when switched on
+   */
+  public boolean externalUsers() {
+    return Boolean.parseBoolean(parameters.text(EXTERNAL_USERS, FALSE));
+  }
+
+  /**
+   * Days without a sign-in after which a user is deactivated; 0 = never.
+   *
+   * @return days
+   */
+  public int dormantDays() {
+    return parameters.intValue(DORMANT_DAYS, 0);
+  }
+
+  /**
+   * Days before the dormant deactivation on which the user is told; 0 = no notice.
+   *
+   * @return days
+   */
+  public int dormantNoticeDays() {
+    return parameters.intValue(DORMANT_NOTICE_DAYS, 0);
   }
 }

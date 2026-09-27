@@ -37,44 +37,7 @@ Tick the last column during the UAT readiness review.
 | S24 | Company selector shows the short name and code and truncates | Header | Every screen | any | Done | ☐ |
 | S25 | Print in the BDO print layout | `patterns.css` `@media print` | Record pages and lists | print preview | Done | ☐ |
 | S26 | Insurer suite hidden from BDOI users (menu, Help Centre, dashboard widgets) | `mayOpen` `requiresAll`, `showsInsurerWidgets` | Menu of every SIT/UAT persona; finance dashboard | `finance-dashboard` | Done | ☐ |
-
-## 2. Behaviour
-
-| # | Pattern | Shared component | Screens verified | Screenshot | Status | UAT |
-|---|---|---|---|---|---|---|
-| B1 | Notification panel grouped by day with icon, title, summary, reference chip and relative time; unread styling; mark one or all read; View All | `NotificationBell`, `NotificationItem` | Header of every screen | `notification-panel` | Done | ☐ |
-| B2 | Notifications page with filters kept in the URL | `NotificationsPage` | `/notifications` | `notifications` | Done | ☐ |
-| B3 | A notification opens its record (the link sent by the server) and, where the link names it, the tab (`?tab=`) | `NotificationBell`, `useTabParam` | Header; client record tabs | `notification-panel` | Done | ☐ |
-| B4 | Inbox and approvals badge counts from the same service as the lists | `HeaderTools` | Header | any | Done | ☐ |
-| B5 | Field errors inline under the field, field outlined | `Field` | All forms | `new-client` | Done | ☐ |
-| B6 | Form error banner listing the errors, each linked to its field | `ErrorAlert` | All forms | — | Done | ☐ |
-| B7 | Business rule refusals: business message with error code and correlation id; no stack trace, raw JSON or HTTP code | `ErrorAlert`, `ApiError`, `GlobalExceptionHandler` | All screens | — | Done | ☐ |
-| B8 | Success toast | `useToast` | All actions | — | Done | ☐ |
-| B9 | Network and server errors: friendly banner with Retry | `ErrorAlert` `onRetry` | Client record, notifications (others show the banner) | — | Done | ☐ |
-| B10 | Session expiry warning; signing in again returns to the same page | `SessionTimeoutGuard`, `RequireAuth`, `LoginPage` | All screens | — | Done | ☐ |
-| B11 | Themed 403 and 404 pages with a way back | `StatusPage` | Any unknown address; screens without access | `page-not-found` | Done | ☐ |
-| B12 | Uploads validated before commit with a summary (rows read, valid, rejected) and preview | `BulkUploadWizard` | Bulk centre and every bulk upload | `bulk-processing` | Done | ☐ |
-| B13 | Download Error File (template layout, Error column, offending cells highlighted) | `BulkWorkbooks.errorFile`, `/bulk/jobs/{id}/error-file` | Every bulk upload | — | Done | ☐ |
-| B14 | Processing rule stated (valid rows processed, rejected rows in the error file) | `BulkUploadWizard` | Every bulk upload | `bulk-processing` | Done | ☐ |
-| B15 | Re-upload of the corrected file linked to the previous upload | `BulkUploadWizard` (Upload Corrected File) | Every bulk upload | — | Done | ☐ |
-| B16 | Duplicate file detection message | `BulkService` (`BULK_DUPLICATE_FILE`) | Handlers that refuse duplicates | — | Done | ☐ |
-| B17 | Upload progress | `FileDropZone` `busy` | Every upload | — | Done | ☐ |
-| B18 | Download Template next to every bulk upload | `BulkUploadWizard` | Every bulk upload | `bulk-processing` | Done | ☐ |
-| B19 | Themed confirmation naming the record and the effect, with a reason where needed; danger button for destructive actions | `ConfirmDialog`, `ActionDialog` | Workflow actions of every record, client deactivation, year-end close | — | Done | ☐ |
-| B20 | Unsaved-changes guard | `useUnsavedChangesGuard` | New and edit client, new quotation | — | Done | ☐ |
-| B21 | Buttons disabled while submitting (no double submit) | `Button` `busy` | All actions | — | Done | ☐ |
-| B22 | Active filters as removable chips with Clear All; search kept in the URL | `FilterChips`, `WorklistToolbar` | Every work list with the toolbar; notifications | `notifications` | Done | ☐ |
-| B23 | One date picker, dd-MMM-yyyy input and display | `DateInput`, `TypedInput` | Every date field (all modules) | `new-account` | Done | ☐ |
-| B24 | Amounts with two decimals, negatives in brackets, currency code shown | `formatAmount`, `Amount` | All amounts | `collections-unapplied` | Done | ☐ |
-| B25 | Breadcrumbs; back arrow returns to the list with its filters; browser tab title | `PageHeader` | Every screen | any | Done | ☐ |
-| B26 | Keyboard use and focus: tabs with arrow keys, rows with Enter, visible focus rings | `Tabs`, `DataTable`, `base.css` | Every screen | — | Done | ☐ |
-| B27 | AA contrast of pills, tags and text | tokens | Every screen | — | Done | ☐ |
-| B28 | Layouts at 1366×768 and 1920×1080 without horizontal page scroll (wide tables scroll inside their card) | `patterns.css`, `.table-wrap` | Screenshots at 1600×1000; spot checks at 1366×768 | all | Done | ☐ |
-
-## 3. Automated checks
-
-- `frontend`: `npm run verify` (format, lint, type check, Vitest with coverage) runs the component tests of the patterns
-  (`patterns.test.tsx`, `behaviour.test.tsx`, `FileDropZone.test.tsx`, `DateInput.test.tsx`, `businessText.test.ts`)
-  and the wording check `businessWording.test.ts`.
-- `backend`: `mvn verify` runs `BusinessTextTest`, `ReportCatalogueWordingIT`, `UserDirectoryIT` and the error file
-  assertions of `BulkServiceIT`.
+| S27 | Periods in lists on two lines ("20-Oct-2026" / "to 20-Oct-2027"), whole dates, minimum column width; amounts, dates and codes never break inside a value | `PeriodCell`, `periodColumn`, `DataTable` (kind `period`, period text detection), `formatPeriod` | FFY Register and every account list, booking and invoice tabs, hold covers, collections, commission, EB, frbs, prodrecon, renewal, tax, underwriting, reserves, screening lists | `ffy-register` | Done | ☐ |
+| S28 | Names and full labels instead of codes and logins in Accounts & Placement lists (product name with code, insurer name, officer display name, status in full) | `ProductName`, `ProductLineLabel`, `InsurerName`, `UserName`, `StatusBadge` | Accounts, FFY Register, Direct Payment, Placement and Issuance workbenches, proposals, quotations, account and placement headers, Invoice Search and Invoice 360 | `ffy-register`, `placement-workbench` | Done | ☐ |
+| S29 | Policy of every endorsement and adjustment (Policy No., ARN, invoice, insurer, product, placement slip) in the list and on the record, searchable; policy chosen first on New Request | `PolicyLinks` (server), `PolicyDetails` | Adjustment Workbench, New Request, Endorsement Request page | `adjustment-workbench` | Done | ☐ |
+| S30 | Policy Transactions: booking, endorsements, adjustments, cancellations and refunds with change, position after, status and expandable GL journals | `PolicyTransactions` | Endorsement Request, Invoice 360, Account | `adjustment-request` | Done | ☐ |

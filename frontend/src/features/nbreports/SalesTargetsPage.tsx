@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -15,7 +16,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount, formatDate, humanize, today } from '@/utils/format';
+import { formatAmount, humanize, today } from '@/utils/format';
 import { emptyTarget, formOf, monthRange, targetErrors, toTarget } from './targetForm';
 import type { TargetForm } from './targetForm';
 import { DateInput } from '@/components/ui/DateInput';
@@ -25,7 +26,8 @@ const COLUMNS: Column<SalesTarget>[] = [
   {
     key: 'period',
     header: 'Period',
-    render: (t) => `${formatDate(t.periodFrom)} to ${formatDate(t.periodTo)}`,
+    kind: 'period',
+    render: (t) => <PeriodCell from={t.periodFrom} to={t.periodTo} />,
   },
   { key: 'count', header: 'Bookings', numeric: true, render: (t) => t.targetCount },
   {

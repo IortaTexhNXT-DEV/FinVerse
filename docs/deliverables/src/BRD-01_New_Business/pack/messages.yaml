@@ -299,3 +299,4 @@ fixes:
   ACCOUNT_NOT_MIGRATED: Open the account in BIBS as a new-business account; only accounts brought over from the legacy system can be handled as migrated.
   CLIENT_NOT_MIGRATED: Treat the client as a BIBS client; only clients brought over from the legacy system can be handled as migrated.
   CLIENT_ORIGIN_REQUIRED: Give the source system and the legacy client code of the migrated client, or report it to the data migration team.
+  INSURER_CHANGE_NOT_ALLOWED: Change the insurer only up to Returned by Insurer (before the policy is issued); after that the insurer stays as placed.

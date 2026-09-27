@@ -64,6 +64,12 @@ menu_personas:
   MIGRATION_GONOGO: {name: Go-Live Board (migration go / no-go), user: miggonogo}
   LEGACY_INQUIRY: {name: Legacy Inquiry (auditor), user: legacyaudit}
   LEGACY_ACCESS_REVIEWER: {name: Legacy Access Reviewer, user: legacyrev}
+  SBM_HANDLER: {name: Submitted Handler, user: sbmhandler}
+  SBM_CHECKER: {name: Submitted Checker, user: sbmchecker}
+  SBM_SANITATION: {name: Sanitation Handler (Submitted Policies), user: sanitation}
+  SBM_TL: {name: Submitted Policies Team Lead, user: sbmtl}
+  SBM_POLICY_REVIEWER: {name: Policy Review Officer (Submitted Policies), user: polreview}
+  SBM_UPP_HANDLER: {name: Handling Fee Handler (Unapplied Payments), user: sbmfee}
 
 # Packs of other BRDs whose screens a walkthrough step may show (My Approvals and Lists of Values of New Business).
 foreign_packs: [../../BRD-01_New_Business/pack/pack.yaml]
@@ -122,6 +128,7 @@ section_brd:
   nb-reports: BRD-1
   reports: Platform
   broking-setup: BRD-1
+  submitted: BRD-12
   migration: BRD-13
   legacy-inquiry: BRD-13
   screening-setup: BRD-10

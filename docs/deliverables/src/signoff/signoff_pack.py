@@ -818,7 +818,7 @@ def build_workbook(pack: Pack) -> Path:
               "review to Accept, "
               "Change requested or Comment for each row you review, and write the change in BU comment."),
         ("3", "Put your name in Reviewer and the date in Review date. Leave the other columns unchanged."),
-        ("4", "Screen standards lists the elements shared by every screen (status strip and history table, status "
+        ("4", "Screen standards lists the elements shared by every screen (workflow stepper and history table, status "
                "pills, dates and amounts, uploads with the error file, messages, notifications); review them once."),
         ("5", "Menu by persona shows what each role sees in the sidebar; Cross-BRD contract lists what " + nm + " "
               "takes from and hands to the other BRDs."),
@@ -838,7 +838,7 @@ def build_workbook(pack: Pack) -> Path:
         Column("name", "Element", 30, f"Element shared by the {nm} screens"),
         Column("text", "What the user sees and does", 100, "Behaviour of the element on every screen"),
     ] + review_columns(), [{"no": i, **c} for i, c in enumerate(pack.common, start=1)],
-        description="Elements and standards shared by every screen (status strip and history, pills, dates, uploads, "
+        description="Elements and standards shared by every screen (workflow stepper and history, pills, dates, uploads, "
                     "messages, notifications); described once, not repeated per screen")
     date_sheets.append(ws)
 

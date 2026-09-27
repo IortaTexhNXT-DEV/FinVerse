@@ -10,7 +10,7 @@
 --   6. The user ID format in words, shown with the format check.
 --   7. Grants: the Business Administrator maintains the rules; the holders of the enrolment right
 --      (Business and System Administrator) upload bulk requests. The grants of the Information Security
---      Officer are in V1102, after V1101 creates the role.
+--      Officer are in V1066 (applied when V1101 creates the role).
 -- =====================================================================================
 
 -- ---------- 1. Authorisation limit on requests -------------------------------------------------

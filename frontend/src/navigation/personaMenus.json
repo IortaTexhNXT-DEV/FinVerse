@@ -3,7 +3,7 @@
   "suites": [
     {
       "id": "BRD-10/11",
-      "description": "Sanction Screening and User Access Maintenance (V1050, V1060, V1062, V1063, V1065, V1102)",
+      "description": "Sanction Screening and User Access Maintenance (V1050, V1060, V1062, V1063, V1065, V1066)",
       "sections": ["screening", "screening-setup", "user-access"],
       "sharedGroups": ["home", "client-policy", "reports"],
       "sharedModules": ["help", "admin"],

@@ -74,7 +74,7 @@ This plan tests the **functions** of the migration and of legacy item processing
 
 - Loaders owned by other modules and decided under DMQ30: open claims (Claims), EB programmes, submitted-policy masterlists; they are tested in those modules' plans when BDOI brings them into scope.
 - Performance at full volume (1,000,000 client rows, 500,000 open items): tested in the dress rehearsal and the performance plan (deliverable 28).
-- The SFTP drop and the legacy read-only links (parked seams); the cases use console uploads.
+- The SFTP drop and the legacy read-only links (on hold); the cases use console uploads.
 
 ## References
 

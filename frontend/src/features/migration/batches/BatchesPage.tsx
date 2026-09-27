@@ -22,6 +22,7 @@ import type { MigAction } from '../common/ActionConfirm';
 import { MigStatus } from '../common/MigStatus';
 import { MIG_SECTION, migLabel, percent } from '../common/migrationCodes';
 import '../migration.css';
+import { UserName } from '@/components/ui/UserName';
 
 type Tab = 'batches' | 'resubmissions';
 
@@ -110,7 +111,12 @@ export default function BatchesPage() {
               {
                 key: 'created',
                 header: 'Planned',
-                render: (b) => <CellStack main={formatDateTime(b.createdAt)} sub={b.createdBy} />,
+                render: (b) => (
+                  <CellStack
+                    main={formatDateTime(b.createdAt)}
+                    sub={<UserName login={b.createdBy} />}
+                  />
+                ),
               },
               {
                 key: 'status',
@@ -143,9 +149,18 @@ export default function BatchesPage() {
               {
                 key: 'prepared',
                 header: 'Prepared',
-                render: (r) => <CellStack main={formatDateTime(r.preparedAt)} sub={r.preparedBy} />,
+                render: (r) => (
+                  <CellStack
+                    main={formatDateTime(r.preparedAt)}
+                    sub={<UserName login={r.preparedBy} />}
+                  />
+                ),
               },
-              { key: 'decided', header: 'Decided by', render: (r) => r.decidedBy ?? '' },
+              {
+                key: 'decided',
+                header: 'Decided by',
+                render: (r) => <UserName login={r.decidedBy} empty="" />,
+              },
               { key: 'note', header: 'Note', render: (r) => r.decisionNote ?? '' },
               {
                 key: 'status',

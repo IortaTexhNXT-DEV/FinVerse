@@ -15,18 +15,23 @@ import { ActionConfirm } from '../common/ActionConfirm';
 import type { MigAction } from '../common/ActionConfirm';
 import { MigStatus } from '../common/MigStatus';
 import { migLabel, yesNo } from '../common/migrationCodes';
+import { UserName } from '@/components/ui/UserName';
 
 const HISTORY: Column<Decision>[] = [
   { key: 'no', header: 'Decision', kind: 'code', render: (d) => d.decisionNo },
   { key: 'class', header: 'Class', render: (d) => migLabel(d.proposedClass) },
-  { key: 'by', header: 'Submitted by', render: (d) => d.submittedBy },
+  { key: 'by', header: 'Submitted by', render: (d) => <UserName login={d.submittedBy} /> },
   {
     key: 'at',
     header: 'Submitted',
     kind: 'datetime',
     render: (d) => formatDateTime(d.submittedAt),
   },
-  { key: 'decidedBy', header: 'Decided by', render: (d) => d.decidedBy ?? '' },
+  {
+    key: 'decidedBy',
+    header: 'Decided by',
+    render: (d) => <UserName login={d.decidedBy} empty="" />,
+  },
   { key: 'reason', header: 'Return reason', render: (d) => d.returnReason ?? '' },
   {
     key: 'status',
@@ -51,8 +56,14 @@ function ObjectDetails({ object: o }: Readonly<{ object: DataObject }>) {
         { label: 'Compliance need', value: yesNo(o.complianceNeed, o.complianceNote) },
         { label: 'Archive option', value: yesNo(o.archivalOption, o.archivalNote) },
         { label: 'Data trust', value: migLabel(o.dataTrust) },
-        { label: 'Business owner', value: o.businessOwner ?? o.ownerTitle },
-        { label: 'Data steward', value: o.dataSteward ?? o.stewardTitle },
+        {
+          label: 'Business owner',
+          value: o.businessOwner ? <UserName login={o.businessOwner} /> : o.ownerTitle,
+        },
+        {
+          label: 'Data steward',
+          value: o.dataSteward ? <UserName login={o.dataSteward} /> : o.stewardTitle,
+        },
         { label: 'Depends on', value: o.dependsOn.join(', ') },
         { label: 'Load order', value: String(o.loadOrder) },
         { label: 'Rationale', value: o.rationale, wide: true },

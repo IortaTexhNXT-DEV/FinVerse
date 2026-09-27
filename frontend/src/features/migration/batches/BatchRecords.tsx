@@ -13,6 +13,7 @@ import { formatDateTime } from '@/utils/format';
 import { MigStatus } from '../common/MigStatus';
 import { migLabel } from '../common/migrationCodes';
 import { useDownload } from '../common/useDownload';
+import { UserName } from '@/components/ui/UserName';
 
 function EvidenceCell({
   signoff,
@@ -81,7 +82,7 @@ export function BatchSignoffs({ batchNo }: Readonly<{ batchNo: string }>) {
             render: (s) => <CellStack main={s.gate} sub={s.gateLabel} />,
           },
           { key: 'role', header: 'Role', render: (s) => migLabel(s.roleCode) },
-          { key: 'user', header: 'Signed by', render: (s) => s.username },
+          { key: 'user', header: 'Signed by', render: (s) => <UserName login={s.username} /> },
           {
             key: 'at',
             header: 'Signed',
@@ -144,7 +145,7 @@ export function BatchLogTable({ batchNo }: Readonly<{ batchNo: string }>) {
           },
           { key: 'message', header: 'Message', render: (l) => l.message },
           { key: 'counts', header: 'Counts', render: (l) => l.counts ?? '' },
-          { key: 'by', header: 'By', render: (l) => l.loggedBy },
+          { key: 'by', header: 'By', render: (l) => <UserName login={l.loggedBy} /> },
         ]}
       />
     </Card>

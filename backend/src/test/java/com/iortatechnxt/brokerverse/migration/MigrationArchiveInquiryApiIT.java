@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.common.util.Sha256;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
@@ -46,6 +47,7 @@ class MigrationArchiveInquiryApiIT {
           .getBytes(StandardCharsets.US_ASCII);
 
   @Autowired private Api api;
+  @Autowired private UserDisplayNames names;
   @Autowired private MockMvc mvc;
   @Autowired private UserDetailsService users;
   @Autowired private ObjectMapper json;
@@ -196,7 +198,9 @@ class MigrationArchiveInquiryApiIT {
         as.run(
             "legacyrev",
             () -> reports.run("MIG-ACCESS-LOG", Map.of("companyId", String.valueOf(company))));
-    assertThat(report.rows()).anyMatch(r -> "legacyaudit".equals(r.cells().get("username")));
+    // The report names the user, never the login id.
+    String auditor = names.displayName("legacyaudit");
+    assertThat(report.rows()).anyMatch(r -> auditor.equals(r.cells().get("username")));
   }
 
   @Test

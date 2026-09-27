@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.migration.report;
 
 import static com.iortatechnxt.brokerverse.migration.report.MigReport.PHT;
 
+import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
@@ -79,10 +80,11 @@ public class GlReports {
    * {@code MIG-TRUEUP-REGISTER}.
    *
    * @param jdbc report SQL
+   * @param names display names of users
    * @return report
    */
   @Bean
-  public ReportDefinition migTrueupRegisterReport(NbReportJdbc jdbc) {
+  public ReportDefinition migTrueupRegisterReport(NbReportJdbc jdbc, UserDisplayNames names) {
     return MigReport.of(
             jdbc,
             "MIG-TRUEUP-REGISTER",
@@ -121,6 +123,7 @@ public class GlReports {
             ReportColumn.text("signed_at", "Signed at"),
             ReportColumn.text("remarks", "Remarks"))
         .row(MigReport.relabel(STATUS))
+        .users(names, "prepared_by", "approved_by", "signed_by")
         .build();
   }
 

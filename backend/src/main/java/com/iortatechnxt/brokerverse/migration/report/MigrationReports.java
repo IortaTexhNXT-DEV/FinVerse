@@ -4,6 +4,7 @@ import static com.iortatechnxt.brokerverse.migration.report.MigReport.BATCH_FILT
 import static com.iortatechnxt.brokerverse.migration.report.MigReport.OBJECT_FILTER;
 import static com.iortatechnxt.brokerverse.migration.report.MigReport.PHT;
 
+import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
@@ -33,10 +34,11 @@ public class MigrationReports {
    * {@code MIG-OBJECT-REGISTER}.
    *
    * @param jdbc report SQL
+   * @param names display names of users
    * @return report
    */
   @Bean
-  public ReportDefinition migObjectRegisterReport(NbReportJdbc jdbc) {
+  public ReportDefinition migObjectRegisterReport(NbReportJdbc jdbc, UserDisplayNames names) {
     return MigReport.of(
             jdbc,
             "MIG-OBJECT-REGISTER",
@@ -71,6 +73,7 @@ public class MigrationReports {
             ReportColumn.count("load_order", "Load order"),
             ReportColumn.text(STATUS, STATUS_LABEL))
         .row(MigReport.relabel("migration_class", STATUS, "category", "data_trust"))
+        .users(names, "business_owner", "data_steward")
         .build();
   }
 
@@ -78,10 +81,11 @@ public class MigrationReports {
    * {@code MIG-DECISIONS}.
    *
    * @param jdbc report SQL
+   * @param names display names of users
    * @return report
    */
   @Bean
-  public ReportDefinition migDecisionsReport(NbReportJdbc jdbc) {
+  public ReportDefinition migDecisionsReport(NbReportJdbc jdbc, UserDisplayNames names) {
     return MigReport.of(
             jdbc,
             "MIG-DECISIONS",
@@ -111,6 +115,7 @@ public class MigrationReports {
             ReportColumn.text("return_reason", "Return reason"))
         .groupBy(OBJECT, OBJECT_LABEL)
         .row(MigReport.relabel("proposed_class", STATUS))
+        .users(names, "submitted_by", "decided_by")
         .build();
   }
 
@@ -156,10 +161,11 @@ public class MigrationReports {
    * {@code MIG-MAP-VERSIONS}.
    *
    * @param jdbc report SQL
+   * @param names display names of users
    * @return report
    */
   @Bean
-  public ReportDefinition migMapVersionsReport(NbReportJdbc jdbc) {
+  public ReportDefinition migMapVersionsReport(NbReportJdbc jdbc, UserDisplayNames names) {
     return MigReport.of(
             jdbc,
             "MIG-MAP-VERSIONS",
@@ -185,6 +191,7 @@ public class MigrationReports {
             ReportColumn.text("batches", "Used by batches"))
         .groupBy("set_code", "Code map")
         .row(MigReport.relabel(STATUS))
+        .users(names, "submitted_by", "approved_by")
         .build();
   }
 
@@ -264,10 +271,11 @@ public class MigrationReports {
    * {@code MIG-BATCH-LOG}.
    *
    * @param jdbc report SQL
+   * @param names display names of users
    * @return report
    */
   @Bean
-  public ReportDefinition migBatchLogReport(NbReportJdbc jdbc) {
+  public ReportDefinition migBatchLogReport(NbReportJdbc jdbc, UserDisplayNames names) {
     return MigReport.of(
             jdbc,
             "MIG-BATCH-LOG",
@@ -307,6 +315,7 @@ public class MigrationReports {
             ReportColumn.text("ended_at", "Ended"),
             ReportColumn.count("seconds", "Seconds"))
         .row(MigReport.relabel(STATUS, "environment_class", "mode"))
+        .users(names, "load_approved_by", "loaded_by")
         .build();
   }
 
@@ -354,10 +363,11 @@ public class MigrationReports {
    * {@code MIG-RECON-DETAIL}.
    *
    * @param jdbc report SQL
+   * @param names display names of users
    * @return report
    */
   @Bean
-  public ReportDefinition migReconDetailReport(NbReportJdbc jdbc) {
+  public ReportDefinition migReconDetailReport(NbReportJdbc jdbc, UserDisplayNames names) {
     return MigReport.of(
             jdbc,
             "MIG-RECON-DETAIL",
@@ -390,6 +400,7 @@ public class MigrationReports {
             ReportColumn.text("approved_by", "Approved by"))
         .groupBy(BATCH, BATCH_LABEL)
         .row(MigReport.relabel(STATUS, "break_reason"))
+        .users(names, "explained_by", "approved_by")
         .build();
   }
 
@@ -397,10 +408,11 @@ public class MigrationReports {
    * {@code MIG-CLIENT-MATCH}.
    *
    * @param jdbc report SQL
+   * @param names display names of users
    * @return report
    */
   @Bean
-  public ReportDefinition migClientMatchReport(NbReportJdbc jdbc) {
+  public ReportDefinition migClientMatchReport(NbReportJdbc jdbc, UserDisplayNames names) {
     return MigReport.of(
             jdbc,
             "MIG-CLIENT-MATCH",
@@ -428,6 +440,7 @@ public class MigrationReports {
             ReportColumn.text("decided_by", "Decided by"))
         .groupBy(BATCH, BATCH_LABEL)
         .row(MigReport.relabel(DECISION))
+        .users(names, "decided_by")
         .build();
   }
 
@@ -435,10 +448,11 @@ public class MigrationReports {
    * {@code MIG-SIGNOFF-STATUS}.
    *
    * @param jdbc report SQL
+   * @param names display names of users
    * @return report
    */
   @Bean
-  public ReportDefinition migSignoffStatusReport(NbReportJdbc jdbc) {
+  public ReportDefinition migSignoffStatusReport(NbReportJdbc jdbc, UserDisplayNames names) {
     return MigReport.of(
             jdbc,
             "MIG-SIGNOFF-STATUS",
@@ -464,6 +478,7 @@ public class MigrationReports {
             ReportColumn.text("evidence_name", "Evidence"))
         .groupBy(OBJECT, OBJECT_LABEL)
         .row(MigReport.relabel(DECISION))
+        .users(names, "username")
         .build();
   }
 }

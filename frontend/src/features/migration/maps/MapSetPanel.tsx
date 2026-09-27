@@ -17,12 +17,21 @@ import { MigStatus } from '../common/MigStatus';
 import { useDownload } from '../common/useDownload';
 import { EntryDialog } from './EntryDialog';
 import { ACTION_LABEL, EMPTY } from './entryCodes';
+import { UserName } from '@/components/ui/UserName';
 
 const VERSION_COLUMNS: Column<MapVersion>[] = [
   { key: 'v', header: 'Version', kind: 'center', render: (v) => `v${String(v.versionNo)}` },
   { key: 'comment', header: 'Comment', render: (v) => v.comment ?? '' },
-  { key: 'by', header: 'Prepared by', render: (v) => v.submittedBy ?? v.createdBy },
-  { key: 'approvedBy', header: 'Approved by', render: (v) => v.approvedBy ?? '' },
+  {
+    key: 'by',
+    header: 'Prepared by',
+    render: (v) => <UserName login={v.submittedBy ?? v.createdBy} />,
+  },
+  {
+    key: 'approvedBy',
+    header: 'Approved by',
+    render: (v) => <UserName login={v.approvedBy} empty="" />,
+  },
   {
     key: 'approvedAt',
     header: 'Approved',

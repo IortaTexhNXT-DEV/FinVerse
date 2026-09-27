@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.migration.signoff.service;
 
+import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.migration.load.domain.BatchStatus;
 import com.iortatechnxt.brokerverse.migration.load.domain.MigBatch;
 import com.iortatechnxt.brokerverse.migration.load.domain.MigBatchRepository;
@@ -30,6 +31,7 @@ public class GateMatrix {
   private final MigDataObjectRepository objects;
   private final MigBatchRepository batches;
   private final MigSignoffRepository signoffs;
+  private final UserDisplayNames names;
 
   /**
    * Creates the matrix.
@@ -37,12 +39,17 @@ public class GateMatrix {
    * @param objects register
    * @param batches batches
    * @param signoffs sign-offs
+   * @param names display names of the signing users
    */
   public GateMatrix(
-      MigDataObjectRepository objects, MigBatchRepository batches, MigSignoffRepository signoffs) {
+      MigDataObjectRepository objects,
+      MigBatchRepository batches,
+      MigSignoffRepository signoffs,
+      UserDisplayNames names) {
     this.objects = objects;
     this.batches = batches;
     this.signoffs = signoffs;
+    this.names = names;
   }
 
   /**
@@ -63,7 +70,7 @@ public class GateMatrix {
               .findFirst()
               .orElse(null);
       Map<Gate, Cell> cells = cells(all, o.getCode(), latest);
-      golive.ifPresent(s -> cells.put(Gate.G7, Cell.of(s)));
+      golive.ifPresent(s -> cells.put(Gate.G7, Cell.of(s, names)));
       out.add(
           new Row(
               o.getCode(),
@@ -82,13 +89,13 @@ public class GateMatrix {
   }
 
   /** The object gates G1-G2 and the gates of the latest batch. */
-  private static Map<Gate, Cell> cells(List<MigSignoff> all, String code, MigBatch latest) {
+  private Map<Gate, Cell> cells(List<MigSignoff> all, String code, MigBatch latest) {
     Map<Gate, Cell> cells = new EnumMap<>(Gate.class);
     for (MigSignoff s : all) {
       boolean objectGate = s.getGate() == Gate.G1 || s.getGate() == Gate.G2;
       boolean ofBatch = latest != null && latest.getId().equals(s.getBatchId());
       if (s.getObjectCode().equals(code) && (objectGate || ofBatch)) {
-        cells.merge(s.getGate(), Cell.of(s), Cell::combine);
+        cells.merge(s.getGate(), Cell.of(s, names), Cell::combine);
       }
     }
     return cells;
@@ -118,15 +125,16 @@ public class GateMatrix {
    * A gate cell.
    *
    * @param decision APPROVED or REJECTED (the latest; APPROVED only when every role signed)
-   * @param signedBy users and roles
+   * @param signedBy users (by display name) and roles
    * @param signedAt latest time
    */
   public record Cell(String decision, String signedBy, Instant signedAt) {
 
-    static Cell of(MigSignoff s) {
+    static Cell of(MigSignoff s, UserDisplayNames names) {
+      String name = names.displayName(s.getUsername());
       return new Cell(
           s.getDecision().name(),
-          s.getUsername() + " (" + roleName(s.getRoleCode()) + ")",
+          (name == null ? s.getUsername() : name) + " (" + roleName(s.getRoleCode()) + ")",
           s.getSignedAt());
     }
 

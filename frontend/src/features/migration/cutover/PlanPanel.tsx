@@ -23,6 +23,7 @@ import { MigStatus } from '../common/MigStatus';
 import { migLabel } from '../common/migrationCodes';
 import { useDownload } from '../common/useDownload';
 import { criterionActions, decisionActions, taskActions } from './cutoverActions';
+import { UserName } from '@/components/ui/UserName';
 
 const DECISIONS: Column<GonogoDecision>[] = [
   {
@@ -41,7 +42,7 @@ const DECISIONS: Column<GonogoDecision>[] = [
     header: 'Criteria met',
     render: (d) => `${String(d.criteriaMet)} of ${String(d.criteriaTotal)}`,
   },
-  { key: 'by', header: 'Decided by', render: (d) => d.decidedBy },
+  { key: 'by', header: 'Decided by', render: (d) => <UserName login={d.decidedBy} /> },
   { key: 'at', header: 'At', kind: 'datetime', render: (d) => formatDateTime(d.decidedAt) },
   { key: 'comment', header: 'Comment', render: (d) => d.comment ?? '' },
 ];

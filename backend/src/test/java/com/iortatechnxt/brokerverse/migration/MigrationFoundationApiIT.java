@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
@@ -45,6 +46,7 @@ class MigrationFoundationApiIT {
   @Autowired private ObjectMapper json;
   @Autowired private TestData data;
   @Autowired private JdbcTemplate jdbc;
+  @Autowired private UserDisplayNames names;
 
   private long company() {
     return data.company().getId();
@@ -209,6 +211,10 @@ class MigrationFoundationApiIT {
     assertThat(signoffs).hasSizeGreaterThanOrEqualTo(5);
     JsonNode matrix = get("miglead", BASE + "/signoffs/matrix?companyId=" + company());
     assertThat(matrix.toString()).contains(batchNo);
+    // Who signed a gate is named, never shown by login id.
+    String owner = names.displayName("migowner");
+    assertThat(owner).isNotEqualTo("migowner");
+    assertThat(matrix.toString()).contains(owner + " (").doesNotContain("migowner (");
     assertThat(get("migops", BASE + "/batches/" + batchNo + "/log")).isNotEmpty();
     api.download("migops", BASE + "/batches/" + batchNo + "/rejects").andExpect(status().isOk());
     api.download("migops", BASE + "/extracts/" + extract.get("extractNo").asText() + "/files/data")

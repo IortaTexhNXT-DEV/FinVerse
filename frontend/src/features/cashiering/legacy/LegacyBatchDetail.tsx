@@ -19,6 +19,8 @@ import { formatDateTime } from '@/utils/format';
 import { AddLinesPanel } from './AddLinesPanel';
 import type { BatchScreen } from './batchScreens';
 import { approverPermission, approvers } from './batchScreens';
+import { UserName } from '@/components/ui/UserName';
+import { useDisplayName } from '@/components/ui/useDisplayName';
 
 interface BatchAction {
   title: string;
@@ -213,6 +215,7 @@ function BatchLines({
 }
 
 function BatchFacts({ batch }: Readonly<{ batch: LegacyBatch }>) {
+  const name = useDisplayName();
   return (
     <Card>
       <DefinitionGrid
@@ -222,9 +225,9 @@ function BatchFacts({ batch }: Readonly<{ batch: LegacyBatch }>) {
           { label: 'Reason', value: batch.reason },
           { label: 'Total', value: <Amount value={batch.total} /> },
           { label: 'Lines', value: String(batch.lineCount) },
-          { label: 'Requested By', value: batch.createdBy },
+          { label: 'Requested By', value: <UserName login={batch.createdBy} /> },
           { label: 'Submitted', value: formatDateTime(batch.submittedAt) },
-          { label: 'Approved By', value: approvers(batch) },
+          { label: 'Approved By', value: approvers(batch, name) },
           { label: 'Posted', value: formatDateTime(batch.executedAt) },
           { label: 'Returned Because', value: batch.returnReason, wide: true },
         ]}

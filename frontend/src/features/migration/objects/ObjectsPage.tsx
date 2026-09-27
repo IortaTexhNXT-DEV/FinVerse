@@ -18,6 +18,7 @@ import { MIG_SECTION, migLabel } from '../common/migrationCodes';
 import { useDownload } from '../common/useDownload';
 import '../migration.css';
 import { ObjectPanel } from './ObjectPanel';
+import { UserName } from '@/components/ui/UserName';
 
 const CATEGORIES = ['REFERENCE', 'CLIENT', 'POLICY', 'OPEN_ITEM', 'GL', 'HISTORY'];
 
@@ -113,7 +114,11 @@ export default function ObjectsPage() {
                 </span>
               ),
             },
-            { key: 'owner', header: 'Business owner', render: (o) => o.businessOwner ?? '' },
+            {
+              key: 'owner',
+              header: 'Business owner',
+              render: (o) => <UserName login={o.businessOwner} empty="" />,
+            },
             {
               key: 'status',
               header: 'Status',

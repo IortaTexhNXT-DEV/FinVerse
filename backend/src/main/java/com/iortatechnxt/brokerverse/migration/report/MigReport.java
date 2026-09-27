@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.migration.report;
 
+import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
 import com.iortatechnxt.brokerverse.nbreport.service.SqlArgs;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
@@ -265,6 +266,32 @@ public final class MigReport implements ReportDefinition {
      */
     public Builder row(UnaryOperator<Map<String, Object>> value) {
       this.row = value;
+      return this;
+    }
+
+    /**
+     * Shows users by their display name, never by login id: the cells of the given columns hold
+     * login ids and are replaced by the users' names (the login id when the user is unknown).
+     *
+     * @param names display names of users
+     * @param keys columns holding login ids
+     * @return this
+     */
+    public Builder users(UserDisplayNames names, String... keys) {
+      UnaryOperator<Map<String, Object>> before = this.row;
+      List<String> cells = List.of(keys);
+      this.row =
+          r -> {
+            Map<String, Object> out = before.apply(r);
+            for (String key : cells) {
+              Object login = out.get(key);
+              if (login != null) {
+                String name = names.displayName(login.toString());
+                out.put(key, name == null ? login : name);
+              }
+            }
+            return out;
+          };
       return this;
     }
 

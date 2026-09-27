@@ -19,6 +19,7 @@ import { MigStatus } from '../common/MigStatus';
 import { MIG_SECTION } from '../common/migrationCodes';
 import { useDownload } from '../common/useDownload';
 import '../migration.css';
+import { UserName } from '@/components/ui/UserName';
 
 /**
  * Extracts (DATA_MIGRATION_DESIGN section 5): upload of a legacy extract named
@@ -182,7 +183,12 @@ export default function ExtractsPage() {
             {
               key: 'received',
               header: 'Received',
-              render: (e) => <CellStack main={formatDateTime(e.receivedAt)} sub={e.receivedBy} />,
+              render: (e) => (
+                <CellStack
+                  main={formatDateTime(e.receivedAt)}
+                  sub={<UserName login={e.receivedBy} empty="" />}
+                />
+              ),
             },
             { key: 'reason', header: 'Rejection reason', render: (e) => e.rejectMessage ?? '' },
             {

@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.migration.report;
 
 import static com.iortatechnxt.brokerverse.migration.report.MigReport.PHT;
 
+import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
@@ -76,10 +77,11 @@ public class CutoverReports {
    * {@code MIG-GONOGO}.
    *
    * @param jdbc report SQL
+   * @param names display names of users
    * @return report
    */
   @Bean
-  public ReportDefinition migGonogoReport(NbReportJdbc jdbc) {
+  public ReportDefinition migGonogoReport(NbReportJdbc jdbc, UserDisplayNames names) {
     return MigReport.of(
             jdbc,
             "MIG-GONOGO",
@@ -115,6 +117,7 @@ public class CutoverReports {
             ReportColumn.text("decided_at", "Decided at"),
             ReportColumn.text("comment", "Comment"))
         .groupBy(PLAN_NO, PLAN)
+        .users(names, "measured_by", "decided_by")
         .build();
   }
 
@@ -204,10 +207,11 @@ public class CutoverReports {
    * {@code MIG-ACCESS-LOG} (Compliance).
    *
    * @param jdbc report SQL
+   * @param names display names of users
    * @return report
    */
   @Bean
-  public ReportDefinition migAccessLogReport(NbReportJdbc jdbc) {
+  public ReportDefinition migAccessLogReport(NbReportJdbc jdbc, UserDisplayNames names) {
     return MigReport.of(
             jdbc,
             "MIG-ACCESS-LOG",
@@ -238,6 +242,7 @@ public class CutoverReports {
             ReportColumn.count("result_count", "Count"),
             ReportColumn.text("reason_code", "Reason"),
             ReportColumn.text("reason_text", "Details"))
+        .users(names, "username")
         .build();
   }
 }

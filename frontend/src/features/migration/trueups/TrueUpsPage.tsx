@@ -21,6 +21,8 @@ import { MigStatus } from '../common/MigStatus';
 import { MIG_SECTION } from '../common/migrationCodes';
 import { trueUpActions } from './trueUpActions';
 import '../migration.css';
+import { UserName } from '@/components/ui/UserName';
+import { UserNames } from '@/components/ui/UserNames';
 
 const NUMBERS = [
   { value: '1', label: '1 - after the legacy year-end close' },
@@ -101,8 +103,8 @@ export default function TrueUpsPage() {
               header: 'Prepared / Approved / Signed',
               render: (t) => (
                 <CellStack
-                  main={t.preparedBy}
-                  sub={[t.approvedBy, t.signedBy].filter(Boolean).join(' / ')}
+                  main={<UserName login={t.preparedBy} />}
+                  sub={<UserNames logins={[t.approvedBy, t.signedBy]} />}
                 />
               ),
             },

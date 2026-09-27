@@ -24,11 +24,11 @@ meta:
   # References of the deck notes to the chapters of the 02 document of this set.
   chapters:
     document: Data Migration Handbook
-    screens: Handbook Part B, chapter 7
-    menus: Handbook Part B, chapter 6
-    messages: Handbook Part B, chapter 10
-    contract: Handbook Part B, chapter 13
-    walkthroughs: the trial migrations of Handbook Part A, chapter 5
+    screens: Handbook Part B, chapter 19
+    menus: Handbook Part B, chapter 17
+    messages: Handbook Part B, chapter 21
+    contract: Handbook Part B, chapter 28
+    walkthroughs: the trial migrations of Handbook Part A, chapter 10
 
 # The documents of the set in reading order. kind = document type of the file name (brand.READING_ORDER and
 # READING_ORDER_EXTRA).
@@ -40,18 +40,18 @@ documents:
   - {kind: TestPlan, name: Data Migration, ext: xlsx, what: "Test plan workbook: the test cases traced to the requirements and to the screens, with the trial migration, reconciliation, rollback, rerun and cut-over rehearsal scenarios", readers: "Data owners who verify the trial migrations; BDOI IT", when: "After the handbook; used again in the trial migrations"}
   - {kind: TestPlan, name: Data Migration Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Business owner, BDOI IT", when: "Before sign-off"}
 
-# Reading order per role (Handbook parts and chapters of v2.0).
+# Reading order per role (Handbook parts and chapter numbers of v2.0).
 reading:
   - role: Business owner (Program Manager, Business Project Services)
     order: "00 Start Here; 01 Guide deck; Handbook Part A (approach, objects and decisions, cycles, cut-over) and the chapter Proposed business rules and clarifications for confirmation; workbook sheets Object catalogue, Proposed rules and Sign-off certificate"
   - role: "Data owners per object: Marketing Business System (R01, R05, R06, C01, C03); Heads of Retail and Corporate Marketing (R03, C01); Operations (R04, R07, P01, F01-F04, F06); Comptrollership (R02, R08, F01, F02, G01, G03); Disbursement (R09, C03); Compliance and Analytics (C04, H01, H02); Renewal processing team (P03)"
-    order: "Handbook Part A chapter 2 (objects and decisions) and chapter 3 (templates and mapping); the load template sheets of your objects, Code maps and Validation rules; Part C for the reconciliation and the samples you verify; workbook sheets Object catalogue, Data owners, Extract planning, Reconciliation sign-off"
+    order: "Handbook Part A chapter 3 (objects and decisions) and chapter 6 (templates and mapping); the load template sheets of your objects, Code maps and Validation rules; Part C chapters 32 and 34 for the reconciliation and the samples you verify; workbook sheets Object catalogue, Data owners, Extract planning, Reconciliation sign-off"
   - role: Comptrollership
-    order: "Handbook Part A chapter 4 (legacy invoices and sub-ledgers) and chapter 6 (year-end option); Part B screens Reconciliation and Opening-Balance Adjustments; Part C (Migration Clearing and the adjustment reconciliation); the proposed rules PR-DM-01, 02, 06, 10 and 14; workbook sheets G01, G03, G03D, F01C and Reconciliation sign-off"
+    order: "Handbook Part A chapter 7 (legacy invoices and sub-ledgers) and chapter 11 (cut-over strategy); Part D chapter 44 (year-end cut-over); Part B screens Reconciliation and Opening-Balance Adjustments; Part C chapter 33 (Migration Clearing and the adjustment reconciliation); the proposed rules PR-DM-01, 02, 06, 10 and 14; workbook sheets G01, G03, G03D, F01C and Reconciliation sign-off"
   - role: Renewal processing team
-    order: "Handbook Part A chapter 4, renewal-driven transition; Part B Batches (resubmissions of the RA-sent file); Part D tasks of the go-live renewal extraction and the day-1 queue; workbook sheet P03 and the Excel template of P03"
+    order: "Handbook Part A chapter 8 (renewal-driven transition); Part B Batches (resubmissions of the RA-sent file); Part D tasks of the go-live renewal extraction and the day-1 queue; workbook sheet P03 and the load template workbook of P03 exported by the console"
   - role: BDOI IT
-    order: "Handbook Part A chapter 3 (templates, secure transfer, masking) and chapter 7 (data security); Part B Extracts and Layouts and Rules; Part D (freeze, final extracts, rollback, decommissioning); proposed rules PR-DM-03 and PR-DM-04; workbook sheets File rules, Load templates, Control file, Cut-over tasks"
+    order: "Handbook Part A chapter 6 (templates, secure transfer, masking) and chapter 12 (data security); Part B Extracts and Layouts and Rules; Part D (freeze, final extracts, rollback, decommissioning); proposed rules PR-DM-03 and PR-DM-04; workbook sheets File rules, Load templates, Control file, Cut-over tasks"
   - role: iorta TechNXT project team
     order: "All documents; keeps the comments log, the meeting minutes and the version history of the workbook, answers every comment and keeps the traceability to the trial migrations, SIT and UAT"
 
@@ -217,7 +217,7 @@ caveats:
   - topic: Items that depend on BDOI IT
     text: "The secure file drop, the legacy document folder and the read-only links wait for BDOI IT."
     handling: "Until named, files are uploaded on the Extracts screen and documents are loaded with their index; nothing else changes."
-    example: "When BDOI IT names the SFTP folder, extracts arrive there instead of the upload; the checks and templates stay the same."
+    example: "When BDOI IT names the secure file drop, extracts arrive there instead of the upload; the checks and templates stay the same."
 
 # Entry and exit criteria of the sign-off, and the definition of done.
 entry:
@@ -228,7 +228,7 @@ exit:
   - "Every row of the workbook reviewed by its unit (Accept, Change requested or Comment)."
   - "Every proposed rule decided, or accepted as the working assumption with its decision date."
   - "Every comments log item closed: answered, corrected in v2.1, or raised as a change request."
-  - "The sign-off certificate signed by the business owner, Comptrollership, the data owners, BDOI IT and iorta TechNXT."
+  - "The sign-off certificate signed by the business owner, the Data Migration Lead, Comptrollership, the data owners, BDOI IT and iorta TechNXT."
 done:
   - "Signed certificate filed with the set; version history updated."
   - "Objects decided (G1) and layouts frozen, version 1, in the Migration Console (M2)."
@@ -243,7 +243,7 @@ handover:
   - "Owners and stewards named per object"
   - "Proposed rules decided or accepted as assumptions"
   - "Agreed test plan and trial migration calendar"
-handover_note: "The Migration Console is ready: handover means the objects are decided, the layouts are frozen and the first full extracts are prepared for 29 January 2027."
+handover_note: "Handover means the objects are decided, the layouts are frozen and the first full extracts are prepared for 29 January 2027."
 
 # Governance and contacts.
 governance:

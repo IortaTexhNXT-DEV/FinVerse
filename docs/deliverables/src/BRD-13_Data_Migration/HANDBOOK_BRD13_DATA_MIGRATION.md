@@ -3260,6 +3260,10 @@ source: pack/pack.yaml
 render: cut-decommissioning
 ```
 
+# Decisions for BDOI and traceability {-}
+
+The last chapters list the rules and clarifications BDOI confirms, the open decisions with their dates, the assumptions of the set and the traceability of the BRD requirements.
+
 # Proposed business rules and clarifications for confirmation
 
 The table lists each point where the proposed rule fills a gap of the BRD, differs from its text, or rests on a recommendation that BDOI confirms. Until BDOI decides, the proposed rule is the working assumption of the migration. BDOI records its decision on the sheet Proposed rules of the Migration Workbook (Agree, Agree with change, Disagree, Need more information); a decision that changes a screen, layout, rule or message is applied in the next version of this set.

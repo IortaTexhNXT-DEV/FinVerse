@@ -1,10 +1,10 @@
 """Business sign-off pack of a BRD: screen specifications, field register, messages, notifications, menus by
 persona, cross-BRD contract, walkthroughs and the sign-off workbook (client deliverable: one release set per BRD).
 
-Usage
-  python docs/deliverables/src/signoff/signoff_pack.py docs/deliverables/src/signoff/brd01/pack.yaml
-  python docs/deliverables/src/signoff/signoff_pack.py brd01/pack.yaml --check        # checks only
-  python docs/deliverables/src/signoff/signoff_pack.py brd01/pack.yaml --manifest     # screenshot manifest (JSON)
+Usage (the pack of a BRD is docs/deliverables/src/<BRD-nn_Name>/pack/pack.yaml, brand.src_dir)
+  python docs/deliverables/src/signoff/signoff_pack.py BRD-01
+  python docs/deliverables/src/signoff/signoff_pack.py BRD-01 --check                 # checks only
+  python docs/deliverables/src/signoff/signoff_pack.py BRD-01 --manifest m.json       # screenshot manifest (JSON)
 
 What it reads
   * <brd>/pack.yaml             metadata, personas, sections of the BRD, screen-flow links, common screen elements;
@@ -14,7 +14,7 @@ What it reads
   * <brd>/notifications.yaml, contract.yaml, documents.yaml, walkthroughs.yaml;
   * the code itself through tools/deliverables/code_facts.py: sidebar menus, role grants, messages, upload templates,
     so the personas, menu paths and message texts are never typed by hand;
-  * the test plan YAML of the BRD (docs/deliverables/src/testplans), for the test cases of each screen.
+  * the test plan YAML of the BRD (in the BRD source folder), for the test cases of each screen.
 
 What it writes
   * BIBS_Signoff_BRD-nn_<Name>_v<version>.xlsx in the BRD's release folder (brand.out_dir): How to review, Screen
@@ -54,6 +54,8 @@ FIELD_COLS = ["section", "label", "type", "format", "mandatory", "source", "defa
 ACTION_COLS = ["button", "who", "when", "what", "status", "notification"]
 REVIEW_VALUES = ["Accept", "Change requested", "Comment"]
 SIGNOFF_VALUES = ["Approved", "Approved with comments", "Not approved"]
+COMMENT_TYPES = ["Clarification", "Defect", "Change request"]
+COMMENT_STATUS = ["Open", "Answered", "Closed"]
 IMPERATIVE = re.compile(r"^(Enter|Select|Choose|Give|Attach|Upload|Add|Complete|Describe|Record|Compute|Use|Explain|"
                         r"Name|Keep|Confirm|Close|Correct|Check|Save|Submit|Write|Reduce|Leave|Ask)\b")
 BANNED = re.compile(r"\b(" + codecs.decode("qrzb|qhzzl|snxr|fnzcyr qngn|cebgbglcr|cbp|fnaqobk|yberz vcfhz|gbqb|svkzr", "rot13") + r")\b", re.I)
@@ -85,6 +87,7 @@ class Pack:
     def __init__(self, path: str | Path):
         self.path = Path(path).resolve()
         self.dir = self.path.parent
+        self.brd_dir = self.dir.parent  # the BRD source folder (brand.src_dir): FRS, test plan, figures
         raw = yaml.safe_load(self.path.read_text(encoding="utf-8"))
         self.meta: dict[str, Any] = raw["meta"]
         self.personas: dict[str, dict[str, Any]] = raw.get("personas") or {}
@@ -116,6 +119,7 @@ class Pack:
         self.documents = self._load("documents.yaml").get("documents", [])
         self.walkthroughs = self._load("walkthroughs.yaml").get("walkthroughs", [])
         self.msg_cfg = self._load("messages.yaml")
+        self.guide = self._load("guide.yaml")
 
     def _load(self, name: str) -> dict[str, Any]:
         p = self.dir / name
@@ -196,7 +200,7 @@ class Pack:
         sys.path.insert(0, str(REPO / "docs" / "deliverables" / "src" / "testplans"))
         import build_test_plan  # noqa: E402
 
-        return build_test_plan.load(REPO / "docs" / "deliverables" / "src" / "testplans" / tp)
+        return build_test_plan.load(self.brd_dir / tp)
 
     def tests_of(self, scr: Screen) -> list[str]:
         plan = self.test_plan
@@ -324,7 +328,7 @@ class Pack:
         parts = []
         for p in (REPO / "frontend" / "src").rglob("*.ts*"):
             if not re.search(r"\.(test|spec)\.tsx?$", p.name):
-                parts.append(p.read_text(encoding="utf-8", errors="ignore"))
+                parts.append(code_facts._strip_comments(p.read_text(encoding="utf-8", errors="ignore")))
         for wf in code_facts.workflows().values():
             parts += [str(x.get("name") or "") for x in wf["stages"]]
             parts += [str(x.get("label") or "") for x in wf["transitions"]]
@@ -340,7 +344,7 @@ class Pack:
 
     def check(self) -> list[str]:
         problems = list(self.problems)
-        frs_text = (REPO / "docs" / "deliverables" / "src" / "frs" / self.meta["frs"]).read_text(encoding="utf-8")
+        frs_text = (self.brd_dir / self.meta["frs"]).read_text(encoding="utf-8")
         fr_ids = set(re.findall(r"^id: (FR-[A-Z]+-\d+)", frs_text, re.M))
         ids = [s.id for s in self.screens]
         if len(ids) != len(set(ids)):
@@ -480,7 +484,7 @@ def flow_dot(pack: Pack) -> Path:
     for a, b, label in pack.flow:
         lines.append(f'  "{a}" -> "{b}" [label="{label}"];')
     lines.append("}")
-    target = REPO / "docs" / "deliverables" / "src" / "frs" / "figures" / f"{pack.meta['brd'].lower().replace('-', '')}_screen_flow.dot"
+    target = pack.brd_dir / "figures" / f"{pack.meta['brd'].lower().replace('-', '')}_screen_flow.dot"
     text = "\n".join(lines) + "\n"
     if not target.exists() or target.read_text(encoding="utf-8") != text:
         target.write_text(text, encoding="utf-8")
@@ -623,6 +627,29 @@ def r_counts(doc: Any, pack: Pack, **_: Any) -> None:
     doc.table(["Content of the set", "Count"], rows, widths=[10, 3], caption="The set in numbers", size=9)
 
 
+def doc_file(pack: Pack, d: dict[str, Any]) -> str:
+    """File name of a document of the set (with its reading-order prefix)."""
+    return brand.output_name(d["kind"], pack.meta["brd"], d["name"], str(pack.meta["version"]), d["ext"])
+
+
+def r_guide_map(doc: Any, pack: Pack, **_: Any) -> None:
+    rows = [[doc_file(pack, d), d["what"], d["readers"], d["when"]] for d in pack.guide.get("documents", [])]
+    doc.table(["File", "What it is for", "Who reads it", "When"], rows, widths=[5.2, 6.4, 3.4, 2.6],
+              caption="The documents of the set, in reading order", size=7.5, keep_rows=False)
+
+
+def r_guide_reading(doc: Any, pack: Pack, **_: Any) -> None:
+    rows = [[r["role"], r["order"]] for r in pack.guide.get("reading", [])]
+    doc.table(["Role", "Where to start"], rows, widths=[4.2, 13.4], caption="Reading order per role", size=8,
+              first_col_bold=True, keep_rows=False)
+
+
+def r_guide_steps(doc: Any, pack: Pack, **_: Any) -> None:
+    rows = [[str(x["step"]), x["name"], x["who"], x["outputs"], x["duration"]] for x in pack.guide.get("steps", [])]
+    doc.table(["No.", "Step", "Who (R, A, C, I)", "Output", "When / duration"], rows,
+              widths=[0.8, 3.0, 5.2, 5.2, 3.4], caption="From issue to closure", size=7.5, keep_rows=False)
+
+
 RENDERERS = {
     "screen-index": r_screen_index,
     "menus": r_menus,
@@ -636,6 +663,9 @@ RENDERERS = {
     "contract": r_contract,
     "walkthrough": r_walkthrough,
     "counts": r_counts,
+    "guide-map": r_guide_map,
+    "guide-reading": r_guide_reading,
+    "guide-steps": r_guide_steps,
 }
 
 
@@ -683,20 +713,34 @@ def build_workbook(pack: Pack) -> Path:
 
     howto = [
         ("1", "Read the FRS chapter Screen specifications with the screenshots, or walk through the screens on the SIT "
-              "environment during the review sessions of the release note."),
-        ("2", "On the sheets Screen catalogue, Field register, Business rules and Messages, set BU review to Accept, "
+              "environment during the review sessions of the Start Here guide."),
+        ("2", "On the sheets Screen standards, Screen catalogue, Field register, Business rules and Messages, set BU "
+              "review to Accept, "
               "Change requested or Comment for each row you review, and write the change in BU comment."),
         ("3", "Put your name in Reviewer and the date in Review date. Leave the other columns unchanged."),
-        ("4", "Menu by persona shows what each role sees in the sidebar; Cross-BRD contract lists what New Business "
+        ("4", "Screen standards lists the elements shared by every screen (status strip and history table, status "
+               "pills, dates and amounts, uploads with the error file, messages, notifications); review them once."),
+        ("5", "Menu by persona shows what each role sees in the sidebar; Cross-BRD contract lists what New Business "
               "takes from and hands to the other BRDs."),
-        ("5", "Return the workbook to the iorta TechNXT project team by the date of the release note. Every "
-              "Change requested row is answered in the sign-off tracker before sign-off."),
-        ("6", "On the Sign-off sheet, each signatory records the decision and the date. Signing freezes the content, "
+        ("6", "Return the workbook to the iorta TechNXT project team by the date of the Start Here guide. Every "
+              "Change requested row is answered in the Comments log before sign-off."),
+        ("7", "Questions and change requests go to the Comments log; the project team answers each one there. On "
+              "the Sign-off certificate sheet, each signatory records the decision and the date. Signing freezes the "
+              "content, "
               "screens and navigation of this set; the screenshots use fictitious seed data."),
     ]
     wb.sheet("How to review", [Column("step", "Step", 8, "Step number"), Column("text", "How to review", 110, "Instruction")],
              [{"step": a, "text": b} for a, b in howto], description="How the business unit reviews this workbook",
              freeze_first_column=False)
+
+    ws = wb.sheet("Screen standards", [
+        Column("no", "No.", 6, "Row number", kind="number"),
+        Column("name", "Element", 30, "Element shared by the New Business screens"),
+        Column("text", "What the user sees and does", 100, "Behaviour of the element on every screen"),
+    ] + review_columns(), [{"no": i, **c} for i, c in enumerate(pack.common, start=1)],
+        description="Elements and standards shared by every screen (status strip and history, pills, dates, uploads, "
+                    "messages, notifications); described once, not repeated per screen")
+    date_sheets.append(ws)
 
     screen_rows = []
     for s in pack.screens:
@@ -837,21 +881,71 @@ def build_workbook(pack: Pack) -> Path:
     ], [{**c, "frs": ", ".join(c.get("frs") or [])} for c in pack.contract],
         description="What New Business takes from and hands to the other BRDs and systems; a change is a change request")
 
+    comment_rows = [{"id": f"C-{i:03d}"} for i in range(1, 51)]
+    ws = wb.sheet("Comments log", [
+        Column("id", "ID", 9, "Comment identifier"),
+        Column("raised_by", "Raised by", 22, "Name and unit of the reviewer"),
+        Column("date", "Date", 13, "Date raised", kind="date"),
+        Column("where", "Page / screen", 24, "FRS page or section, screen ID or workbook row"),
+        Column("type", "Type", 16, "Clarification, Defect or Change request", values=COMMENT_TYPES),
+        Column("comment", "Comment", 50, "The question, the defect or the change asked for"),
+        Column("response", "Response", 50, "Answer of the project team; for a change request, its register number"),
+        Column("status", "Status", 12, "Open, Answered or Closed", values=COMMENT_STATUS),
+        Column("closed_on", "Closed on", 13, "Date closed", kind="date"),
+    ], comment_rows, description="Questions, defects and change requests raised during the review, with the answer")
+    date_sheets.append(ws)
+
+    sessions = [(str(x.get("duration", "")), x["name"]) for x in pack.guide.get("steps", [])
+                if x.get("step") in (2, 4, 6)]
+    ws = wb.sheet("Meeting minutes", [
+        Column("date", "Date", 13, "Date of the session", kind="date"),
+        Column("session", "Session", 32, "Walkthrough, Q&A or sign-off meeting"),
+        Column("planned", "Planned", 26, "Planned date and length"),
+        Column("attendees", "Attendees", 36, "Names and units"),
+        Column("discussion", "Discussion", 50, "Points discussed"),
+        Column("decisions", "Decisions", 40, "Decisions taken"),
+        Column("actions", "Actions", 40, "Actions, with the comment IDs"),
+        Column("owner", "Owner", 18, "Owner of the actions"),
+        Column("due", "Due date", 13, "Due date of the actions", kind="date"),
+    ], [{"session": n, "planned": d} for d, n in sessions], description="Minutes of the review sessions")
+    date_sheets.append(ws)
+
+    ws = wb.sheet("Version history", [
+        Column("version", "Version", 10, "Version of the release set"),
+        Column("date", "Date", 14, "Date of issue"),
+        Column("author", "Author", 24, "Prepared by"),
+        Column("change", "Change", 70, "What changed; for a revision, the comment IDs answered"),
+        Column("rows", "Rows changed", 24, "Sheets and rows changed"),
+    ], [{"version": str(m["version"]), "date": str(m["date"]), "author": f"{brand.VENDOR} project team",
+         "change": "First issue of the business sign-off pack, built from the system as built", "rows": "All"}],
+        description="Versions of this release set (a revision after review is v2.1; after sign-off, a change request)",
+        freeze_first_column=False)
+
     signatories = [
-        ("Product Owner", "BDOI"), ("Head, Marketing Business Services and System Support", "BDOI"),
-        ("Unit Head, Processing", "BDOI"), ("Head, Retail Marketing", "BDOI"),
-        ("Unit Head, Combank and Corbank", "BDOI"), ("Head, Technical Support Unit", "BDOI"),
-        ("Head, Comptrollership", "BDOI"), ("Program Manager, Business Project Services", "BDO Unibank ESG"),
-        ("Project Manager", brand.VENDOR)]
-    ws = wb.sheet("Sign-off", [
+        ("Product Owner", "BDOI", "Business owner: the whole set"),
+        ("Head, Marketing Business Services and System Support", "BDOI", "Business owner of New Business"),
+        ("Unit Head, Processing", "BDOI", "Payment, placement, issuance and booking screens"),
+        ("Head, Retail Marketing", "BDOI", "Client, quotation and account screens"),
+        ("Unit Head, Combank and Corbank", "BDOI", "Client, quotation, PRF and account screens"),
+        ("Head, Technical Support Unit", "BDOI", "PRF, slips and insurer responses"),
+        ("Head, Comptrollership", "BDOI", "Finance: booking entries, service invoices, accounting hand-off"),
+        ("Compliance Officer", "BDOI", "Compliance: KYC, screening hand-off, retention"),
+        ("Head, BDOI IT", "BDOI", "BDOI IT: interfaces, user access and menus"),
+        ("Program Manager, Business Project Services", "BDO Unibank ESG", "Traceability to the BRD"),
+        ("Project Manager", brand.VENDOR, "Delivery of the set as signed")]
+    ws = wb.sheet("Sign-off certificate", [
         Column("role", "Role", 40, "Signatory role"),
-        Column("org", "Organisation", 20, "Organisation"),
-        Column("name", "Name", 28, "Name of the signatory"),
+        Column("org", "Organisation", 18, "Organisation"),
+        Column("scope", "Signs for", 40, "Part of the set the signatory confirms"),
+        Column("name", "Name", 26, "Name of the signatory"),
         Column("decision", "Decision", 22, "Approved, Approved with comments or Not approved", values=SIGNOFF_VALUES),
-        Column("comments", "Comments", 40, "Conditions of the approval"),
+        Column("comments", "Comments", 36, "Conditions of the approval"),
+        Column("signature", "Signature", 20, "Signature"),
         Column("date", "Date", 14, "Date of the decision", kind="date"),
-    ], [{"role": r, "org": o} for r, o in signatories],
-        description=f"Sign-off of the {m['release_set']} v{m['version']}", freeze_first_column=False)
+    ], [{"role": r, "org": o, "scope": sc} for r, o, sc in signatories],
+        description=(f"By signing, the signatories confirm the {m['release_set']} v{m['version']}: its content, screens and "
+                     "navigation are frozen; the screenshots use fictitious seed data; later changes go through the "
+                     "Change Management Register"), freeze_first_column=False)
     date_sheets.append(ws)
     for sheet in date_sheets:
         for cell in sheet[4]:
@@ -874,13 +968,13 @@ def report(pack: Pack) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Build the business sign-off workbook of a BRD from its pack")
-    ap.add_argument("pack", help="pack.yaml of the BRD (e.g. brd01/pack.yaml)")
+    ap.add_argument("pack", help="BRD of the pack (e.g. BRD-01) or the path of its pack.yaml")
     ap.add_argument("--check", action="store_true", help="check the pack against the code and the FRS only")
     ap.add_argument("--manifest", metavar="JSON", help="write the screenshot manifest for capture_pack.cjs")
     args = ap.parse_args(argv)
     path = Path(args.pack)
     if not path.exists():
-        path = HERE / args.pack
+        path = brand.src_dir(brand.brd_of_code(args.pack)) / "pack" / "pack.yaml"
     pack = Pack(path)
     problems = pack.check()
     for p in problems:

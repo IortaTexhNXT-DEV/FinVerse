@@ -7,7 +7,7 @@ and the compliance reports. The build design is
 (sections 16 to 19 record what each wave built); the requirements and their as-built status per
 SNSRP ID are in [`docs/requirements/BDOI_SANC_BRD_SPEC.md`](../requirements/BDOI_SANC_BRD_SPEC.md);
 the functional specification is
-[`FRS_BRD10_SANCTION_SCREENING.md`](../deliverables/src/frs/FRS_BRD10_SANCTION_SCREENING.md).
+[`FRS_BRD10_SANCTION_SCREENING.md`](../deliverables/src/BRD-10_Sanction_Screening/FRS_BRD10_SANCTION_SCREENING.md).
 
 ## 1. Purpose
 

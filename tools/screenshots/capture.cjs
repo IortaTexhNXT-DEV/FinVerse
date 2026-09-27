@@ -64,7 +64,23 @@ async function capture(page, screen, file) {
     await settle(page);
   }
   if (screen.click) {
-    await page.getByRole('button', { name: new RegExp(screen.click, 'i') }).first().click().catch(() => {});
+    // A button, or a tab of the record (tabs are not buttons).
+    const re = new RegExp(screen.click, 'i');
+    const tab = page.getByRole('tab', { name: re }).first();
+    if (await tab.isVisible().catch(() => false)) {
+      await tab.click();
+      await settle(page);
+      // Bring the opened tab to the top so its content is in the image.
+      await tab.evaluate((e) => {
+        const main = e.closest('main');
+        if (main) {
+          main.scrollTo(0, e.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop - 16);
+        }
+        window.scrollTo(0, 0);
+      });
+    } else {
+      await page.getByRole('button', { name: re }).first().click().catch(() => {});
+    }
     await settle(page);
   }
   await page.screenshot({ path: path.join(OUT, file) });

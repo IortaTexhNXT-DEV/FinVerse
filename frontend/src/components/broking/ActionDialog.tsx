@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
+import { actionPhrase } from '@/utils/format';
 import { LovSelect } from './LovSelect';
 
 interface ActionDialogProps {
@@ -21,6 +22,8 @@ interface ActionDialogProps {
   confirmLabel: string;
   busy?: boolean;
   error?: unknown;
+  /** Title of the error notice; "Cannot <action>" by default. */
+  errorTitle?: string;
   onConfirm: (note: ActionNote) => void;
   onClose: () => void;
 }
@@ -42,6 +45,7 @@ export function ActionDialog({
   confirmLabel,
   busy = false,
   error,
+  errorTitle,
   onConfirm,
   onClose,
 }: Readonly<ActionDialogProps>) {
@@ -76,7 +80,7 @@ export function ActionDialog({
       }
     >
       <div className="stack">
-        <ErrorAlert error={error} />
+        <ErrorAlert error={error} title={errorTitle ?? `Cannot ${actionPhrase(title)}`} />
         {record !== undefined && (
           <p className="confirm-record">
             <strong>{record}</strong>

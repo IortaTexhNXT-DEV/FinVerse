@@ -44,12 +44,22 @@ export interface HistoryEntry {
   occurredAt: string;
 }
 
+/** A stage of a workflow definition, in its defined order. */
+export interface WorkflowStageInfo {
+  code: string;
+  name: string;
+  initial: boolean;
+  terminal: boolean;
+}
+
 export interface WorkCaseDetail {
   item: WorkItem;
   stageTerminal: boolean;
   slaHours?: number;
   actions: WorkAction[];
   history: HistoryEntry[];
+  /** Every stage of the workflow in its defined order (the stage stepper). */
+  stages?: WorkflowStageInfo[];
 }
 
 export interface QueueCount {

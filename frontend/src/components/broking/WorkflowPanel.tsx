@@ -9,9 +9,11 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime, humanize, titleCase } from '@/utils/format';
+import { formatDateTime, titleCase } from '@/utils/format';
 import { ActionDialog } from './ActionDialog';
 import { HistoryTable } from './HistoryTable';
+import { StageStepper } from './StageStepper';
+import { stageSteps } from './stageSteps';
 import { workflowKey } from './workflowKey';
 
 interface WorkflowPanelProps {
@@ -28,37 +30,26 @@ interface WorkflowPanelProps {
   showHistory?: boolean;
 }
 
-/** Stage, in stage since, due time and assignee of a record, as a labelled strip. */
-function StatusStrip({ item, terminal }: Readonly<{ item: WorkItem; terminal: boolean }>) {
-  const stageTerminal = terminal;
+/** Current stage, since, due date with the overdue indicator and assignee, on one row. */
+function StageMeta({ item, terminal }: Readonly<{ item: WorkItem; terminal: boolean }>) {
   return (
-    <dl className="status-strip">
+    <dl className="workflow-meta-row">
       <div>
-        <dt>Stage</dt>
-        <dd className="workflow-stage">
-          <StatusBadge status={item.stageCode} />
-          {titleCase(item.stageName) !== humanize(item.stageCode) && (
-            <span className="workflow-stage-name">{titleCase(item.stageName)}</span>
-          )}
-        </dd>
+        <dt>Current Stage</dt>
+        <dd className="workflow-stage-name">{titleCase(item.stageName)}</dd>
       </div>
       <div>
-        <dt>In Stage Since</dt>
+        <dt>Since</dt>
         <dd className="nowrap">{formatDateTime(item.stageEnteredAt)}</dd>
       </div>
-      {!stageTerminal && (
+      {!terminal && (
         <div>
           <dt>Due</dt>
           <dd className={item.overdue ? 'nowrap workflow-overdue' : 'nowrap'}>
             {item.dueAt ? (
               <>
                 <AlarmClock size={14} aria-hidden="true" /> {formatDateTime(item.dueAt)}
-                {item.overdue && (
-                  <>
-                    {' '}
-                    <StatusBadge status="OVERDUE" />
-                  </>
-                )}
+                {item.overdue && <StatusBadge status="OVERDUE" />}
               </>
             ) : (
               <span className="muted">—</span>
@@ -83,8 +74,10 @@ function StatusStrip({ item, terminal }: Readonly<{ item: WorkItem; terminal: bo
 }
 
 /**
- * Where a record stands (BRNB.022/115) as a structured status panel: stage, in stage since, due
- * time (SLA), assignee, the actions the current user may take, and the status history table.
+ * The workflow header of a record (BRNB.022/115): a horizontal stepper built from the workflow's
+ * defined stages (passed stages checked, the current one highlighted, returned and closed paths
+ * marked), then one meta row with the current stage, since, due (overdue flagged) and assignee,
+ * and the actions the current user may take on the right; the status history table below.
  * Generic actions (return, void, decline) run here with their reason; business actions are
  * supplied by the page.
  */
@@ -126,14 +119,16 @@ export function WorkflowPanel({
   if (!detail.data) {
     return <ErrorAlert error={detail.error} />;
   }
-  const { item, actions, history, stageTerminal } = detail.data;
+  const { item, actions, history, stageTerminal, stages = [] } = detail.data;
+  const steps = stageSteps(stages, item.stageCode, history);
   const generic = actions.filter((a) => a.generic);
   const business = actions.filter((a) => !a.generic);
   return (
     <section className="workflow-panel" aria-label="Workflow status">
+      <StageStepper steps={steps} />
       <div className="workflow-head">
-        <StatusStrip item={item} terminal={stageTerminal} />
-        <div className="row workflow-actions">
+        <StageMeta item={item} terminal={stageTerminal} />
+        <div className="workflow-actions">
           {renderBusinessActions?.(business)}
           {generic.map((a) => (
             <Button key={a.action} variant="secondary" size="sm" onClick={() => setPending(a)}>

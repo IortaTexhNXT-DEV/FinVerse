@@ -59,7 +59,9 @@ function wrap(children: ReactNode) {
       <QueryClientProvider client={queries}>
         <AuthContext.Provider value={auth}>
           <WorkspaceContext.Provider value={workspace}>
-            <ToastContext.Provider value={{ success: vi.fn(), error: vi.fn() }}>
+            <ToastContext.Provider
+              value={{ success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn() }}
+            >
               {children}
             </ToastContext.Provider>
           </WorkspaceContext.Provider>

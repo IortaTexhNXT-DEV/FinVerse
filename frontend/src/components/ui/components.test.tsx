@@ -63,8 +63,8 @@ describe('ui components', () => {
       'Line 1 amount: must be greater than 0',
       'VAT rate: must be at least 0',
     ]);
-    expect(screen.getByText('Invalid request')).toBeInTheDocument();
-    expect(screen.getByText('Reference: VALIDATION_FAILED')).toBeInTheDocument();
+    expect(screen.getByText('Check the highlighted fields')).toBeInTheDocument();
+    expect(screen.queryByText(/VALIDATION_FAILED|Invalid request/)).toBeNull();
   });
 
   it('shows plain errors without a field list and nothing without an error', () => {

@@ -734,31 +734,111 @@
   color: var(--color-danger);
 }
 
+/* ---------- Notices: one standard for error, warning, info and success -------------------
+ * White surface, thin border, a 4 px accent bar in the semantic colour and its icon; bold short
+ * title, business message, bullets. No tinted or pastel fills (BDO_UX_GUIDELINES section 8.6).
+ */
+.notice,
 .alert {
+  --notice-accent: var(--color-info);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--notice-accent);
   border-radius: var(--radius-sm);
-  border-left: 4px solid var(--color-info);
-  background: var(--color-info-bg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 20px;
 }
 
+.alert {
+  display: block;
+}
+
+.notice-error,
 .alert.danger {
-  border-left-color: var(--color-danger);
-  background: var(--color-danger-bg);
+  --notice-accent: var(--color-danger);
 }
 
-.alert.success {
-  border-left-color: var(--color-success);
-  background: var(--color-success-bg);
-}
-
+.notice-warning,
 .alert.warning {
-  border-left-color: var(--brand-gold);
-  background: var(--brand-gold-050);
+  --notice-accent: var(--color-warning-accent);
 }
 
+.notice-success,
+.alert.success {
+  --notice-accent: var(--color-success);
+}
+
+.notice-info,
+.alert.info {
+  --notice-accent: var(--color-info);
+}
+
+.notice-icon {
+  flex: none;
+  margin-top: 1px;
+  color: var(--notice-accent);
+}
+
+.notice-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.notice-title {
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.notice-text {
+  color: var(--color-text);
+}
+
+.notice-items,
 .alert .field-errors {
-  margin: var(--space-2) 0 0;
+  margin: var(--space-1) 0 0;
   padding-left: var(--space-5);
+}
+
+.notice-items li + li {
+  margin-top: 2px;
+}
+
+.notice-actions {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin-left: auto;
+}
+
+.notice-reference {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.notice-details {
+  font-size: 12px;
+}
+
+/* A subtle one-line notice above a table (e.g. "Submission needs an approved rate exception"). */
+.notice.subtle {
+  padding: var(--space-2) var(--space-3);
+  border-color: var(--color-border);
+  border-left-width: 3px;
 }
 
 /* ---------- Modal / toast ----------------------------------------------------------------- */
@@ -802,18 +882,35 @@
 }
 
 .toast {
+  --notice-accent: var(--color-success);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
   min-width: 280px;
   max-width: 420px;
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  background: var(--color-heading);
-  color: #fff;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--notice-accent);
+  background: var(--color-surface);
+  color: var(--color-heading);
   box-shadow: var(--shadow-lg);
-  border-left: 5px solid var(--brand-gold);
+}
+
+.toast .notice-icon {
+  margin-top: 1px;
 }
 
 .toast.error {
-  border-left-color: #ff6b6b;
+  --notice-accent: var(--color-danger);
+}
+
+.toast.warning {
+  --notice-accent: var(--color-warning-accent);
+}
+
+.toast.info {
+  --notice-accent: var(--color-info);
 }
 
 /* ---------- Tabs ------------------------------------------------------------------------ */

@@ -58,8 +58,10 @@ class AllowedFileTypeTest {
     assertThat(AllowedFileType.TIFF.matches(new byte[] {'I', 'I', '*', 0, 8})).isTrue();
     assertThat(AllowedFileType.TIFF.matches(new byte[] {'M', 'M', 0, '*', 0})).isTrue();
     assertThat(AllowedFileType.TIFF.matches(new byte[] {'M', 'M', '*', 0})).isFalse();
-    assertThat(AllowedFileType.WEBP.matches(ascii("RIFF\u0000\u0000\u0000\u0000WEBPVP8 "))).isTrue();
-    assertThat(AllowedFileType.WEBP.matches(ascii("RIFF\u0000\u0000\u0000\u0000WAVEfmt "))).isFalse();
+    assertThat(AllowedFileType.WEBP.matches(ascii("RIFF\u0000\u0000\u0000\u0000WEBPVP8 ")))
+        .isTrue();
+    assertThat(AllowedFileType.WEBP.matches(ascii("RIFF\u0000\u0000\u0000\u0000WAVEfmt ")))
+        .isFalse();
     assertThat(AllowedFileType.WEBP.matches(ascii("RIFF"))).isFalse();
   }
 }

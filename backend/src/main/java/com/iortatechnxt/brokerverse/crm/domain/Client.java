@@ -235,11 +235,11 @@ public class Client extends BaseEntity {
     this.marketSegment = d.marketSegment();
     this.bankClient = d.bankClient();
     this.bankCif = d.bankCif();
-    this.keys =
-        ClientKeys.of(
-            new Identity(null, idType, idNumber),
-            mobile,
-            new PersonName(lastName, firstName, null, null, corporateName));
+    this.keys = ClientKeys.of(new Identity(null, idType, idNumber), mobile, keyName());
+  }
+
+  private PersonName keyName() {
+    return new PersonName(lastName, firstName, null, null, corporateName);
   }
 
   private void requireChangeable() {
@@ -277,6 +277,24 @@ public class Client extends BaseEntity {
     if (reviewDue != null && (kycReviewDue == null || reviewDue.isBefore(kycReviewDue))) {
       this.kycReviewDue = reviewDue;
     }
+  }
+
+  /**
+   * Changes the contact details only (BRCSF-004, contact-only contract of the CSF) and recomputes
+   * the duplicate keys; name, identity and profile stay as they are.
+   *
+   * @param c new e-mail, mobile, phone and address
+   */
+  public void changeContact(Contact c) {
+    requireChangeable();
+    this.email = c.email();
+    this.mobile = c.mobile();
+    this.phone = c.phone();
+    this.addressLine = c.addressLine();
+    this.city = c.city();
+    this.province = c.province();
+    this.postalCode = c.postalCode();
+    this.keys = ClientKeys.of(new Identity(null, idType, idNumber), mobile, keyName());
   }
 
   /**

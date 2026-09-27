@@ -23,6 +23,18 @@ public final class ClientRules {
   /** Philippine mobile number. */
   public static final Pattern MOBILE = Pattern.compile("(09\\d{9}|\\+639\\d{9})");
 
+  /** Landline: digits with the usual separators (contact-only changes, BRCSF-004). */
+  public static final Pattern PHONE = Pattern.compile("[0-9+() ./-]{3,30}");
+
+  /** Longest address line of the client master. */
+  public static final int ADDRESS_MAX = 300;
+
+  /** Longest city or province of the client master. */
+  public static final int PLACE_MAX = 80;
+
+  /** Longest postal code of the client master. */
+  public static final int POSTAL_CODE_MAX = 10;
+
   private ClientRules() {}
 
   /**
@@ -54,6 +66,37 @@ public final class ClientRules {
       checkBirthDate(details, today, minimumAge, found);
     }
     return found;
+  }
+
+  /**
+   * Checks the contact details of a contact-only change (BRCSF-004): the e-mail and mobile rules of
+   * the client master, a landline of digits and separators, and the column lengths of the address.
+   *
+   * @param contact new contact details
+   * @return violations, empty when valid
+   */
+  public static List<Violation> contactViolations(ClientDetails.Contact contact) {
+    List<Violation> found = new ArrayList<>();
+    checkContact(contact, found);
+    if (present(contact.phone()) && !PHONE.matcher(contact.phone().trim()).matches()) {
+      found.add(
+          new Violation(
+              "CLIENT_PHONE_FORMAT", "Enter the phone number with digits and separators"));
+    }
+    tooLong(contact.addressLine(), ADDRESS_MAX, "address line", found);
+    tooLong(contact.city(), PLACE_MAX, "city", found);
+    tooLong(contact.province(), PLACE_MAX, "province", found);
+    tooLong(contact.postalCode(), POSTAL_CODE_MAX, "postal code", found);
+    return found;
+  }
+
+  private static void tooLong(String value, int max, String label, List<Violation> found) {
+    if (value != null && value.length() > max) {
+      found.add(
+          new Violation(
+              "CLIENT_FIELD_TOO_LONG",
+              "Enter the " + label + " in at most " + max + " characters"));
+    }
   }
 
   private static void checkContact(ClientDetails.Contact contact, List<Violation> found) {

@@ -61,4 +61,31 @@ public interface AccountRepository
    * @return accounts
    */
   List<Account> findByClassificationRenewalOfRef(String renewalOfRef);
+
+  /**
+   * Accounts of any status found by account number (Customer Servicing Facility, BRCSF-003): the
+   * ARN itself, the ARN without its two-digit suffix, or a policy number.
+   *
+   * @param companyId company
+   * @param reference ARN (with or without suffix) or policy number
+   * @return accounts
+   */
+  @Query(
+      "select distinct a from Account a left join a.policyNumbers p where a.companyId = :companyId"
+          + " and (a.arn = :reference or a.arn like concat(:reference, '-%') or p = :reference)")
+  List<Account> findByAccountNumber(
+      @Param("companyId") Long companyId, @Param("reference") String reference);
+
+  /**
+   * Accounts of a loan application number (Customer Servicing Facility, BRCSF-003).
+   *
+   * @param companyId company
+   * @param loanApplicationNo loan application number, upper case
+   * @return accounts
+   */
+  @Query(
+      "select a from Account a where a.companyId = :companyId"
+          + " and upper(a.loanApplicationNo) = :loanApplicationNo")
+  List<Account> findByLoanApplication(
+      @Param("companyId") Long companyId, @Param("loanApplicationNo") String loanApplicationNo);
 }

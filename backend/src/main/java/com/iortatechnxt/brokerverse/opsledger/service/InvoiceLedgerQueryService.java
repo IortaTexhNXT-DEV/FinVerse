@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.opsledger.service;
 
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.opsledger.domain.InvoiceFlag;
+import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceAdjustmentTotal;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceAdjustmentTotalRepository;
@@ -13,13 +14,19 @@ import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceStatusChangeRepos
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -38,6 +45,8 @@ public class InvoiceLedgerQueryService {
   private static final String CLASSIFICATION = "classification";
   private static final String BOOKING_DATE = "bookingDate";
   private static final String INCEPTION = "inceptionDate";
+  private static final Set<MovementType> PAYMENT_TYPES =
+      EnumSet.of(MovementType.APPLIED, MovementType.UNAPPLIED, MovementType.LEGACY_PAID);
 
   private final OpsInvoiceRepository invoices;
   private final OpsInvoiceMovementRepository movements;
@@ -183,6 +192,87 @@ public class InvoiceLedgerQueryService {
    */
   public List<OpsInvoiceMovement> movementsOf(String sourceModule, String sourceRef) {
     return movements.findBySourceModuleAndSourceRefOrderByIdAsc(sourceModule, sourceRef);
+  }
+
+  /**
+   * Payments of a client since a date (contract of the Customer Servicing Facility, BRCSF-005;
+   * CUSTOMER_SERVICING_DESIGN section 11): the applications of receipts to the client's invoices,
+   * their reversals and the legacy payments, newest first. One row per invoice and application,
+   * with the premium receivable amount (the component rows of one application are added up).
+   *
+   * @param companyId company
+   * @param clientCode client code
+   * @param from first value date
+   * @return payments, newest first
+   */
+  public List<ClientPayment> paymentsOfClient(Long companyId, String clientCode, LocalDate from) {
+    Map<String, ClientPayment> rows = new LinkedHashMap<>();
+    for (Object[] r : movements.clientMovements(companyId, clientCode, PAYMENT_TYPES, from)) {
+      OpsInvoiceMovement m = (OpsInvoiceMovement) r[0];
+      if (!m.getComponent().isPremiumReceivable()) {
+        continue;
+      }
+      String invoiceNo = (String) r[1];
+      String key =
+          String.join(
+              "|",
+              invoiceNo,
+              m.getMovementType().name(),
+              String.valueOf(m.getSourceRef()),
+              String.valueOf(m.getValueDate()));
+      rows.merge(
+          key,
+          new ClientPayment(
+              invoiceNo,
+              (String) r[2],
+              m.getMovementType(),
+              m.getSourceRef(),
+              m.getArNo(),
+              m.getOrNo(),
+              m.getValueDate(),
+              m.getAmount(),
+              m.getPostedAt()),
+          ClientPayment::plus);
+    }
+    return List.copyOf(rows.values());
+  }
+
+  /**
+   * A payment movement of a client (Customer Servicing Facility payment history).
+   *
+   * @param invoiceNo invoice paid
+   * @param arn account of the invoice
+   * @param type APPLIED, UNAPPLIED (reversed) or LEGACY_PAID
+   * @param sourceRef application reference of the source module
+   * @param arNo acknowledgement receipt number, may be null
+   * @param orNo official receipt number, may be null
+   * @param valueDate value date
+   * @param amount premium receivable amount
+   * @param postedAt time posted
+   */
+  public record ClientPayment(
+      String invoiceNo,
+      String arn,
+      MovementType type,
+      String sourceRef,
+      String arNo,
+      String orNo,
+      LocalDate valueDate,
+      BigDecimal amount,
+      Instant postedAt) {
+
+    ClientPayment plus(ClientPayment other) {
+      return new ClientPayment(
+          invoiceNo,
+          arn,
+          type,
+          sourceRef,
+          arNo == null ? other.arNo : arNo,
+          orNo == null ? other.orNo : orNo,
+          valueDate,
+          amount.add(other.amount),
+          postedAt);
+    }
   }
 
   /**

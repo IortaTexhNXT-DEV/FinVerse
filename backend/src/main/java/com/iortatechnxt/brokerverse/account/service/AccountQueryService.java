@@ -1,14 +1,20 @@
 package com.iortatechnxt.brokerverse.account.service;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
+import com.iortatechnxt.brokerverse.account.domain.AccountLegacyHeader;
+import com.iortatechnxt.brokerverse.account.domain.AccountLegacyHeaderRepository;
 import com.iortatechnxt.brokerverse.account.domain.AccountRepository;
 import com.iortatechnxt.brokerverse.account.domain.AccountStatus;
 import com.iortatechnxt.brokerverse.account.domain.RiskItem;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +35,7 @@ public class AccountQueryService {
           EnumSet.of(AccountStatus.BOOKED, AccountStatus.CANCELLED, AccountStatus.VOIDED));
 
   private final AccountRepository accounts;
+  private final AccountLegacyHeaderRepository legacyHeaders;
   private final AccountChecks checks;
   private final ProductCatalogService catalog;
 
@@ -36,14 +43,67 @@ public class AccountQueryService {
    * Creates the service.
    *
    * @param accounts accounts
+   * @param legacyHeaders legacy references of migrated accounts
    * @param checks completeness checks
    * @param catalog product lines (item kind of a saved account)
    */
   public AccountQueryService(
-      AccountRepository accounts, AccountChecks checks, ProductCatalogService catalog) {
+      AccountRepository accounts,
+      AccountLegacyHeaderRepository legacyHeaders,
+      AccountChecks checks,
+      ProductCatalogService catalog) {
     this.accounts = accounts;
+    this.legacyHeaders = legacyHeaders;
     this.checks = checks;
     this.catalog = catalog;
+  }
+
+  /**
+   * Accounts of any status found by an account number (contract of the Customer Servicing Facility,
+   * BRCSF-003): the ARN with or without its suffix, a policy number, or the legacy reference or
+   * policy number of a migrated account.
+   *
+   * @param companyId company
+   * @param reference account number
+   * @return accounts, each once
+   */
+  public List<Account> byAccountNumber(Long companyId, String reference) {
+    if (reference == null || reference.isBlank()) {
+      return List.of();
+    }
+    String ref = reference.strip();
+    List<Long> legacyIds =
+        Stream.concat(
+                legacyHeaders
+                    .findByCompanyIdAndLegacyRefAndRolledBackAtIsNull(companyId, ref)
+                    .stream(),
+                legacyHeaders
+                    .findByCompanyIdAndPolicyNoOrCompanyIdAndCoverNo(companyId, ref, companyId, ref)
+                    .stream())
+            .map(AccountLegacyHeader::getAccountId)
+            .toList();
+    Map<Long, Account> found = new LinkedHashMap<>();
+    accounts
+        .findByAccountNumber(companyId, ref.toUpperCase(Locale.ROOT))
+        .forEach(a -> found.put(a.getId(), a));
+    accounts.findAllById(legacyIds).forEach(a -> found.putIfAbsent(a.getId(), a));
+    return List.copyOf(found.values());
+  }
+
+  /**
+   * Accounts whose loan application number is the given one (contract of the Customer Servicing
+   * Facility, BRCSF-003).
+   *
+   * @param companyId company
+   * @param loanApplicationNo loan application number
+   * @return accounts
+   */
+  public List<Account> byLoanApplication(Long companyId, String loanApplicationNo) {
+    if (loanApplicationNo == null || loanApplicationNo.isBlank()) {
+      return List.of();
+    }
+    return accounts.findByLoanApplication(
+        companyId, loanApplicationNo.strip().toUpperCase(Locale.ROOT));
   }
 
   /**

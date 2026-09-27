@@ -148,8 +148,7 @@ public enum AllowedFileType {
 
     static boolean at(byte[] content, int offset, byte[] expected) {
       return content.length >= offset + expected.length
-          && Arrays.equals(
-              content, offset, offset + expected.length, expected, 0, expected.length);
+          && Arrays.equals(content, offset, offset + expected.length, expected, 0, expected.length);
     }
 
     static boolean isHeif(byte[] content) {

@@ -54,7 +54,10 @@ final class EbReportSupport {
     params.add(ParameterSpec.required(TO, "To", ParameterType.DATE).withDefault("TODAY"));
     params.add(
         ParameterSpec.select(
-            TEAM, "Team", List.of(ALL, "BDO", "SM", "VOLUNTARY", "SOLICITED", "NEW_BUSINESS"), ALL));
+            TEAM,
+            "Team",
+            List.of(ALL, "BDO", "SM", "VOLUNTARY", "SOLICITED", "NEW_BUSINESS"),
+            ALL));
     params.add(ParameterSpec.optional(AO, "Account Officer", ParameterType.TEXT));
     params.add(ParameterSpec.optional(CLIENT, "Client", ParameterType.TEXT));
     params.add(ParameterSpec.select(LINE, "Benefit Line", List.of(ALL, "HMO", "GLI", "GPA"), ALL));

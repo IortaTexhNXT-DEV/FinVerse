@@ -22,5 +22,6 @@ public interface EbTorRepository extends JpaRepository<EbTor, Long> {
    * @param status status
    * @return the latest such version
    */
-  Optional<EbTor> findFirstByCycleIdAndStatusOrderByVersionNoDesc(Long cycleId, EbTor.Status status);
+  Optional<EbTor> findFirstByCycleIdAndStatusOrderByVersionNoDesc(
+      Long cycleId, EbTor.Status status);
 }

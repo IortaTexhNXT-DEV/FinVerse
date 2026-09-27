@@ -75,7 +75,12 @@ public class SoaInvoices {
     }
     Set<String> own =
         ofProgramme(programme).stream().map(OpsInvoice::getInvoiceNo).collect(Collectors.toSet());
-    List<String> chosen = invoiceNos.stream().filter(n -> n != null && !n.isBlank()).map(String::strip).distinct().toList();
+    List<String> chosen =
+        invoiceNos.stream()
+            .filter(n -> n != null && !n.isBlank())
+            .map(String::strip)
+            .distinct()
+            .toList();
     chosen.stream()
         .filter(n -> !own.contains(n))
         .findFirst()

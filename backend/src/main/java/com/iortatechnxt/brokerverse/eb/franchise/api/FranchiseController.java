@@ -71,7 +71,9 @@ public class FranchiseController {
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(MARKET)
   public List<FranchiseResponse> request(
-      @PathVariable Long cycleId, @RequestParam Long companyId, @RequestBody InsurersRequest request) {
+      @PathVariable Long cycleId,
+      @RequestParam Long companyId,
+      @RequestBody InsurersRequest request) {
     return franchises.request(companyId, cycleId, request.insurerCodes()).stream()
         .map(f -> map(companyId, f))
         .toList();
@@ -89,14 +91,17 @@ public class FranchiseController {
    * @param file the insurer's reply
    * @return the request
    */
-  @PostMapping(value = "/franchise/{requestId}/decision", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(
+      value = "/franchise/{requestId}/decision",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @PreAuthorize(MARKET)
   @SuppressWarnings("java:S107") // one parameter per form field
   public FranchiseResponse decide(
       @PathVariable Long requestId,
       @RequestParam Long companyId,
       @RequestParam boolean approve,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate decidedOn,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+          LocalDate decidedOn,
       @RequestParam(required = false) String reasonCode,
       @RequestParam(required = false) String remarks,
       @RequestParam(required = false) MultipartFile file) {

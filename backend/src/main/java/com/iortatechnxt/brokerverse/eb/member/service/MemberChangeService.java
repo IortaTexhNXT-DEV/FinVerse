@@ -46,9 +46,9 @@ import org.springframework.transaction.annotation.Transactional;
  * EBM-<yyyy>-nnnnnn} with their {@code EB_MEMBER_CHANGE} work case: captured by the AO against the
  * accepted roster (the client's request entered with its files), relayed to the insurer by e-mail
  * (a billing item is opened), billed (the insurer's billing, or the direct billing uploaded as
- * {@code EB_DIRECT_BILLING} for Processing and Collection), validated by Processing (the endorsement
- * request of a change with a premium effect is raised in Operations) and closed, when its lines
- * are applied to the roster. Return and cancel are generic actions of the workflow panel.
+ * {@code EB_DIRECT_BILLING} for Processing and Collection), validated by Processing (the
+ * endorsement request of a change with a premium effect is raised in Operations) and closed, when
+ * its lines are applied to the roster. Return and cancel are generic actions of the workflow panel.
  */
 @Service
 @Transactional
@@ -159,7 +159,8 @@ public class MemberChangeService {
     }
     String number =
         numbers.next(
-            EbCodes.series(EbCodes.PREFIX_MEMBER_CHANGE, BusinessClock.currentYear(clock).getValue()));
+            EbCodes.series(
+                EbCodes.PREFIX_MEMBER_CHANGE, BusinessClock.currentYear(clock).getValue()));
     EbMemberChange change =
         new EbMemberChange(
             programme,
@@ -182,7 +183,8 @@ public class MemberChangeService {
                 programme.getTeamCode()),
             null));
     if (!input.files().isEmpty()) {
-      store(programme, saved, EbDocumentTypes.MEMBER_CHANGE, EbDocumentSource.CLIENT, input.files());
+      store(
+          programme, saved, EbDocumentTypes.MEMBER_CHANGE, EbDocumentSource.CLIENT, input.files());
     }
     activity.received(
         companyId, programme.getId(), TatActivity.MEMBER_CHANGE, number, currentUser.username());
@@ -196,9 +198,7 @@ public class MemberChangeService {
 
   private EbRosterVersion acceptedRoster(EbProgramme programme, Integer year) {
     if (year != null) {
-      return roster
-          .accepted(programme.getId(), year)
-          .orElseThrow(() -> noRoster(programme));
+      return roster.accepted(programme.getId(), year).orElseThrow(() -> noRoster(programme));
     }
     return roster.versions(programme.getCompanyId(), programme.getId()).stream()
         .filter(v -> v.getStatus() == EbRosterVersion.Status.ACCEPTED)
@@ -209,7 +209,9 @@ public class MemberChangeService {
   private static BusinessRuleException noRoster(EbProgramme programme) {
     return new BusinessRuleException(
         "EB_ROSTER_REQUIRED",
-        "Programme " + programme.getProgrammeNo() + " has no accepted roster: upload the master list");
+        "Programme "
+            + programme.getProgrammeNo()
+            + " has no accepted roster: upload the master list");
   }
 
   /**
@@ -245,7 +247,11 @@ public class MemberChangeService {
             null),
         null,
         change.getId());
-    audit.record(EbCodes.ENTITY_MEMBER_CHANGE, change.getChangeNo(), AuditAction.SUBMIT, "Relayed to the insurer");
+    audit.record(
+        EbCodes.ENTITY_MEMBER_CHANGE,
+        change.getChangeNo(),
+        AuditAction.SUBMIT,
+        "Relayed to the insurer");
     return change;
   }
 
@@ -263,14 +269,17 @@ public class MemberChangeService {
     EbMemberChange change = require(companyId, changeId);
     LocalDate today = BusinessClock.today(clock);
     if (billing.billedOn() != null && billing.billedOn().isAfter(today)) {
-      throw new BusinessRuleException("EB_BILLING_DATE_FUTURE", "The billing date cannot be after today");
+      throw new BusinessRuleException(
+          "EB_BILLING_DATE_FUTURE", "The billing date cannot be after today");
     }
     if (billing.direct() && (files == null || files.isEmpty())) {
-      throw new BusinessRuleException("EB_BILLING_FILE_REQUIRED", "Attach the insurer's direct billing");
+      throw new BusinessRuleException(
+          "EB_BILLING_FILE_REQUIRED", "Attach the insurer's direct billing");
     }
     if (change.isFinancial() && (billing.amount() == null || billing.amount().signum() == 0)) {
       throw new BusinessRuleException(
-          "EB_BILLING_AMOUNT_REQUIRED", "Enter the amount billed for a change with a premium effect");
+          "EB_BILLING_AMOUNT_REQUIRED",
+          "Enter the amount billed for a change with a premium effect");
     }
     change.billed(
         new EbMemberChange.Billing(
@@ -286,18 +295,23 @@ public class MemberChangeService {
     trackedItems.receiveLinked(change.getId(), MemberChangeEffects.BILLING, change.getBilledOn());
     Notice notice =
         new Notice(
-            change.getChangeNo() + ": member change billed" + (billing.direct() ? " (direct billing)" : ""),
+            change.getChangeNo()
+                + ": member change billed"
+                + (billing.direct() ? " (direct billing)" : ""),
             programme.getName(),
             EbCodes.MEMBER_CHANGE_LINK + change.getId(),
             EbCodes.ENTITY_MEMBER_CHANGE,
             change.getId().toString());
-    notifications.notifyPermission(EbCodes.PERMISSION_PROCESS, notice, EbCodes.EVENT_MEMBER_CHANGE_BILLED);
-    notifications.notifyPermission(EbCodes.PERMISSION_COLLECT, notice, EbCodes.EVENT_MEMBER_CHANGE_BILLED);
+    notifications.notifyPermission(
+        EbCodes.PERMISSION_PROCESS, notice, EbCodes.EVENT_MEMBER_CHANGE_BILLED);
+    notifications.notifyPermission(
+        EbCodes.PERMISSION_COLLECT, notice, EbCodes.EVENT_MEMBER_CHANGE_BILLED);
     audit.record(
         EbCodes.ENTITY_MEMBER_CHANGE,
         change.getChangeNo(),
         AuditAction.UPDATE,
-        "Billed" + (billing.direct() ? " directly by the insurer" : "")
+        "Billed"
+            + (billing.direct() ? " directly by the insurer" : "")
             + (billing.reference() == null ? "" : ", billing " + billing.reference()));
     return change;
   }
@@ -323,9 +337,10 @@ public class MemberChangeService {
         EbCodes.ENTITY_MEMBER_CHANGE,
         change.getChangeNo(),
         AuditAction.AUTHORIZE,
-        "Validated" + (change.getEndorsementRequestNo() == null
-            ? ""
-            : ", endorsement request " + change.getEndorsementRequestNo()));
+        "Validated"
+            + (change.getEndorsementRequestNo() == null
+                ? ""
+                : ", endorsement request " + change.getEndorsementRequestNo()));
     return change;
   }
 
@@ -348,7 +363,11 @@ public class MemberChangeService {
         EbCodes.ENTITY_MEMBER_CHANGE,
         change.getChangeNo(),
         AuditAction.CLOSE,
-        "Applied to the roster " + accepted.getPolicyYear() + " (" + accepted.getHeadcount() + " members)");
+        "Applied to the roster "
+            + accepted.getPolicyYear()
+            + " ("
+            + accepted.getHeadcount()
+            + " members)");
     return change;
   }
 
@@ -358,7 +377,8 @@ public class MemberChangeService {
       String type,
       EbDocumentSource source,
       List<UploadedFile> files) {
-    String process = change.isFinancial() ? EbDocumentTypes.ENDORSEMENT : EbDocumentTypes.ADJUSTMENT;
+    String process =
+        change.isFinancial() ? EbDocumentTypes.ENDORSEMENT : EbDocumentTypes.ADJUSTMENT;
     documents.storeOn(
         programme,
         new AttachmentTarget(EbCodes.ENTITY_MEMBER_CHANGE, change.getId().toString()),
@@ -371,12 +391,16 @@ public class MemberChangeService {
     if (change.getStatus() != status) {
       throw new BusinessRuleException(
           "EB_MEMBER_CHANGE_STATUS",
-          "Member change " + change.getChangeNo() + " is " + change.getStatus().name().toLowerCase(java.util.Locale.ROOT));
+          "Member change "
+              + change.getChangeNo()
+              + " is "
+              + change.getStatus().name().toLowerCase(java.util.Locale.ROOT));
     }
   }
 
   private void transition(EbMemberChange change, String action, TransitionNote note) {
-    workflow.systemTransition(EbCodes.ENTITY_MEMBER_CHANGE, change.getId().toString(), action, note);
+    workflow.systemTransition(
+        EbCodes.ENTITY_MEMBER_CHANGE, change.getId().toString(), action, note);
   }
 
   /**

@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Franchise (EB-FRANCHISE; FR-EB-032, 060): the franchise requests sent in the period by insurer,
- * with the programme, dates sent and due, the insurer's decision and reason, the days to decide
- * and the advice to the client.
+ * with the programme, dates sent and due, the insurer's decision and reason, the days to decide and
+ * the advice to the client.
  */
 @Component
 public class EbFranchiseReport implements ReportDefinition {
@@ -26,15 +26,22 @@ public class EbFranchiseReport implements ReportDefinition {
 
   private static final String SQL =
       "select f.insurer_code as insurer, f.franchise_no,"
-          + " p.programme_no || ' - ' || p.client_name as programme, " + SENT + " as sent,"
+          + " p.programme_no || ' - ' || p.client_name as programme, "
+          + SENT
+          + " as sent,"
           + " f.due_date, coalesce(f.decision, f.status) as decision, f.decided_on,"
-          + " case when f.decided_on is null then null else f.decided_on - " + SENT + " end as days,"
-          + " f.reason_code, cast(f.advised_at at time zone '" + BusinessClock.zoneId()
+          + " case when f.decided_on is null then null else f.decided_on - "
+          + SENT
+          + " end as days,"
+          + " f.reason_code, cast(f.advised_at at time zone '"
+          + BusinessClock.zoneId()
           + "' as date) as advised, f.status"
           + " from eb_franchise_request f join eb_programme p on p.id = f.programme_id"
           + " join eb_cycle c on c.id = f.cycle_id"
           + " where f.company_id = :company and f.submitted_at is not null"
-          + " and " + SENT + " between :from and :to"
+          + " and "
+          + SENT
+          + " between :from and :to"
           + EbReportSupport.PROGRAMME_FILTERS
           + " and (cast(:insurer as varchar) is null or f.insurer_code = :insurer)"
           + " and (cast(:businessType as varchar) is null or c.business_type = :businessType)"

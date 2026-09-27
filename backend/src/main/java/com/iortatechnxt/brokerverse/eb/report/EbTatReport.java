@@ -21,9 +21,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * Turn-around Time (EB-TAT; FR-EB-062, TAT annex p.42): each activity stamped in the period
- * (received and released) with the working days taken, the target of its {@code EB_TAT_*}
- * parameter and whether it breached it; an open activity counts to the end of the period. The
- * renewal advice is measured in days before the expiry and is listed without a breach.
+ * (received and released) with the working days taken, the target of its {@code EB_TAT_*} parameter
+ * and whether it breached it; an open activity counts to the end of the period. The renewal advice
+ * is measured in days before the expiry and is listed without a breach.
  */
 @Component
 public class EbTatReport implements ReportDefinition {
@@ -36,11 +36,16 @@ public class EbTatReport implements ReportDefinition {
   private static final String SQL =
       "select v.activity_code as activity, v.team_code as team, v.account_officer as ao,"
           + " v.programme_no || ' - ' || v.client_name as programme, v.cycle_no, v.reference,"
-          + " cast(v.received_at at time zone '" + BusinessClock.zoneId() + "' as date) as received,"
-          + " cast(v.released_at at time zone '" + BusinessClock.zoneId() + "' as date) as released,"
+          + " cast(v.received_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) as received,"
+          + " cast(v.released_at at time zone '"
+          + BusinessClock.zoneId()
+          + "' as date) as released,"
           + " v.actor from eb_tat_v v join eb_programme p on p.id = v.programme_id"
           + " where v.company_id = :company"
-          + " and cast(v.received_at at time zone '" + BusinessClock.zoneId()
+          + " and cast(v.received_at at time zone '"
+          + BusinessClock.zoneId()
           + "' as date) between :from and :to"
           + EbReportSupport.PROGRAMME_FILTERS
           + " and (cast(:activity as varchar) is null or v.activity_code = :activity)"

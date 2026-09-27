@@ -346,6 +346,12 @@ class ApiSmokeIT {
     "ebproc, /api/v1/eb/pending-items?companyId={c}&overdue=true",
     "ebcoll, /api/v1/eb/pending-items?companyId={c}&type=HMO_CARD&responsible=INSURER&status=PENDING",
     "ebao, /api/v1/eb/pending-items?companyId={c}&member=EMP&q=EBP",
+    "ebao, /api/v1/eb/member-changes?companyId={c}",
+    "ebproc, /api/v1/eb/member-changes?companyId={c}&status=OPEN&q=EBM",
+    "ebproc, /api/v1/eb/soa?companyId={c}",
+    "ebcoll, /api/v1/eb/soa?companyId={c}&status=RELEASED&insurer=INS-MGIC&q=EBS",
+    "badmin, /api/v1/eb/setup/threshold-rules?companyId={c}",
+    "ebao, /api/v1/eb/setup/required-documents?companyId={c}",
   })
   void employeeBenefitsListsRespondOk(String user, String url) throws Exception {
     mvc.perform(

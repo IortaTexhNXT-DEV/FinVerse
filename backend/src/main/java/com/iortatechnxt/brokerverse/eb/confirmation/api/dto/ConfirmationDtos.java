@@ -22,7 +22,10 @@ public final class ConfirmationDtos {
    * @param choices chosen proposal per programme line
    */
   public record ConfirmationRequest(
-      String channel, LocalDate confirmedOn, String remarks, List<ConfirmationInput.Choice> choices) {}
+      String channel,
+      LocalDate confirmedOn,
+      String remarks,
+      List<ConfirmationInput.Choice> choices) {}
 
   /**
    * A reason.

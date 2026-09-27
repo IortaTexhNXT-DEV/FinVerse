@@ -5,8 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /** Client confirmations. */
-public interface EbClientConfirmationRepository
-    extends JpaRepository<EbClientConfirmation, Long> {
+public interface EbClientConfirmationRepository extends JpaRepository<EbClientConfirmation, Long> {
 
   /**
    * The confirmation of a cycle in a status.

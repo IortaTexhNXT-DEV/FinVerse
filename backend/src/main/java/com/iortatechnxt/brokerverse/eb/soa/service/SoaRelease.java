@@ -32,14 +32,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Releases a validated SOA (BRID-021; FR-EB-053): e-mailed (protected) to the client's HR contacts
- * that receive the SOA with the template {@code EB_SOA_RELEASE}; Collection is notified and sees the
- * SOA through its access class.
+ * that receive the SOA with the template {@code EB_SOA_RELEASE}; Collection is notified and sees
+ * the SOA through its access class.
  */
 @Service
 @Transactional
 public class SoaRelease {
 
-  private final SoaService soas;
+  private final EbSoaService soas;
   private final EbRecords records;
   private final EbParties parties;
   private final EbTemplates templates;
@@ -68,7 +68,7 @@ public class SoaRelease {
    */
   @SuppressWarnings("java:S107") // constructor injection
   public SoaRelease(
-      SoaService soas,
+      EbSoaService soas,
       EbRecords records,
       EbParties parties,
       EbTemplates templates,
@@ -101,26 +101,34 @@ public class SoaRelease {
    */
   public EbSoa release(Long companyId, Long soaId) {
     EbSoa soa = soas.require(companyId, soaId);
-    SoaService.requireStatus(soa, EbSoa.Status.VALIDATED);
+    EbSoaService.requireStatus(soa, EbSoa.Status.VALIDATED);
     EbProgramme programme = records.programme(companyId, soa.getProgrammeId());
     List<String> to = EbParties.soaEmails(programme);
     if (to.isEmpty()) {
       throw new BusinessRuleException(
-          "EB_CONTACT_REQUIRED", "Programme " + programme.getProgrammeNo() + " has no active HR contact");
+          "EB_CONTACT_REQUIRED",
+          "Programme " + programme.getProgrammeNo() + " has no active HR contact");
     }
     Map<String, Object> values = parties.values(programme, null);
     values.put("insurerName", parties.insurerName(companyId, soa.getInsurerCode()));
     values.put("soaNo", soa.getInsurerSoaNo());
-    values.put("period", EbParties.date(soa.getPeriodFrom()) + " to " + EbParties.date(soa.getPeriodTo()));
+    values.put(
+        "period", EbParties.date(soa.getPeriodFrom()) + " to " + EbParties.date(soa.getPeriodTo()));
     values.put("amount", soa.getCurrency() + " " + amount(soa.getAmount()));
     MergedText text = templates.merge(EbCodes.TEMPLATE_SOA_RELEASE, values);
     mailer.send(
         companyId,
         EbCodes.PURPOSE_SOA,
-        new Mail(to, parties.aoCopy(programme), text.title(), text.text(), mailer.files(List.of(soa.getAttachmentId()))),
+        new Mail(
+            to,
+            parties.aoCopy(programme),
+            text.title(),
+            text.text(),
+            mailer.files(List.of(soa.getAttachmentId()))),
         new RecordLink(EbCodes.ENTITY_SOA, soa.getId().toString(), soa.getSoaNo()));
     soa.released(currentUser.username(), clock.instant());
-    workflow.systemTransition(EbCodes.ENTITY_SOA, soa.getId().toString(), "release", TransitionNote.NONE);
+    workflow.systemTransition(
+        EbCodes.ENTITY_SOA, soa.getId().toString(), "release", TransitionNote.NONE);
     activity.released(TatActivity.RELEASE, soa.getSoaNo(), "Released");
     notifications.notifyPermission(
         EbCodes.PERMISSION_COLLECT,
@@ -131,11 +139,16 @@ public class SoaRelease {
             EbCodes.ENTITY_SOA,
             soa.getId().toString()),
         EbCodes.EVENT_SOA_RELEASED);
-    audit.record(EbCodes.ENTITY_SOA, soa.getSoaNo(), AuditAction.SUBMIT, "Released to " + String.join(", ", to));
+    audit.record(
+        EbCodes.ENTITY_SOA,
+        soa.getSoaNo(),
+        AuditAction.SUBMIT,
+        "Released to " + String.join(", ", to));
     return soa;
   }
 
   private static String amount(BigDecimal value) {
-    return new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH)).format(value);
+    return new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
+        .format(value);
   }
 }

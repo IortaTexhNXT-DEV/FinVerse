@@ -41,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ComparativeApproval {
 
-  private final ComparativeService comparatives;
+  private final EbComparativeService comparatives;
   private final EbComparativeSignoffRepository signoffs;
   private final EbProposalRepository proposals;
   private final EbClientConfirmationRepository confirmations;
@@ -70,7 +70,7 @@ public class ComparativeApproval {
    */
   @SuppressWarnings("java:S107") // constructor injection
   public ComparativeApproval(
-      ComparativeService comparatives,
+      EbComparativeService comparatives,
       EbComparativeSignoffRepository signoffs,
       EbProposalRepository proposals,
       EbClientConfirmationRepository confirmations,
@@ -123,7 +123,10 @@ public class ComparativeApproval {
     if (result.met()) {
       askApprovers(comparative, programme, result);
     }
-    tellAo(comparative, programme, result.met() ? "signed off (threshold approval needed)" : "signed off");
+    tellAo(
+        comparative,
+        programme,
+        result.met() ? "signed off (threshold approval needed)" : "signed off");
     audit.record(
         EbCodes.ENTITY_COMPARATIVE,
         comparative.getComparativeNo(),
@@ -133,8 +136,8 @@ public class ComparativeApproval {
   }
 
   /**
-   * Approves a comparative above the threshold. When the client had already confirmed (the rule
-   * was met at confirmation) the cycle returns to CONFIRMED.
+   * Approves a comparative above the threshold. When the client had already confirmed (the rule was
+   * met at confirmation) the cycle returns to CONFIRMED.
    *
    * @param companyId company
    * @param comparativeId comparative waiting for the threshold approval
@@ -159,7 +162,8 @@ public class ComparativeApproval {
     comparative.thresholdApproved();
     record(comparative, EbComparativeSignoff.THRESHOLD, EbComparativeSignoff.APPROVED, remarks);
     String key = cycle.getId().toString();
-    workflow.systemTransition(EbCodes.ENTITY_CYCLE, key, "approve", TransitionNote.comment(remarks));
+    workflow.systemTransition(
+        EbCodes.ENTITY_CYCLE, key, "approve", TransitionNote.comment(remarks));
     Optional<EbClientConfirmation> confirmed =
         confirmations.findFirstByCycleIdAndStatusOrderByIdDesc(
             cycle.getId(), EbClientConfirmation.ACTIVE);
@@ -268,12 +272,7 @@ public class ComparativeApproval {
   private void record(EbComparative comparative, String role, String decision, String remarks) {
     signoffs.save(
         new EbComparativeSignoff(
-            comparative.getId(),
-            role,
-            currentUser.username(),
-            decision,
-            remarks,
-            clock.instant()));
+            comparative.getId(), role, currentUser.username(), decision, remarks, clock.instant()));
   }
 
   private void tellAo(EbComparative comparative, EbProgramme programme, String what) {

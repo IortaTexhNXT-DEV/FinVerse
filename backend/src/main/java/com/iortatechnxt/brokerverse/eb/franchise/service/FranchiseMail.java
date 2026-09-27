@@ -33,9 +33,9 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /**
- * The documents and e-mails of the franchise requests: the files sent (the Broker on Record in force
- * and the documents required for the process FRANCHISE), the request to the insurer, the insurer's
- * reply stored as evidence, the notice to the AO and the advice to the client.
+ * The documents and e-mails of the franchise requests: the files sent (the Broker on Record in
+ * force and the documents required for the process FRANCHISE), the request to the insurer, the
+ * insurer's reply stored as evidence, the notice to the AO and the advice to the client.
  */
 @Component
 public class FranchiseMail {
@@ -202,7 +202,8 @@ public class FranchiseMail {
    * @param request request
    * @param outcome APPROVED or REJECTED
    */
-  void tellAo(EbProgramme programme, EbFranchiseRequest request, EbFranchiseRequest.Status outcome) {
+  void tellAo(
+      EbProgramme programme, EbFranchiseRequest request, EbFranchiseRequest.Status outcome) {
     if (CurrentUser.sameUser(programme.getAccountOfficer(), currentUser.username())) {
       return;
     }
@@ -227,7 +228,8 @@ public class FranchiseMail {
    */
   void sendAdvice(EbProgramme programme, EbCycle cycle, EbFranchiseRequest request) {
     Map<String, Object> values = parties.values(programme, cycle);
-    values.put("insurerName", parties.insurerName(programme.getCompanyId(), request.getInsurerCode()));
+    values.put(
+        "insurerName", parties.insurerName(programme.getCompanyId(), request.getInsurerCode()));
     values.put("outcome", word(request.getDecision()));
     values.put(
         "reasonText",

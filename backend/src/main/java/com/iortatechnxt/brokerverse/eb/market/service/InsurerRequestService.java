@@ -170,8 +170,7 @@ public class InsurerRequestService {
   private InsurerProfile eligible(EbCycle cycle, InsurerProfile insurer) {
     boolean approved =
         franchises.findByCycleIdOrderByIdAsc(cycle.getId()).stream()
-            .anyMatch(
-                f -> f.getInsurerCode().equals(insurer.getPartyCode()) && f.isApproved());
+            .anyMatch(f -> f.getInsurerCode().equals(insurer.getPartyCode()) && f.isApproved());
     if (!approved) {
       throw new BusinessRuleException(
           "EB_FRANCHISE_NOT_APPROVED",
@@ -208,8 +207,12 @@ public class InsurerRequestService {
         EbCodes.ENTITY_REQUEST,
         number,
         AuditAction.SUBMIT,
-        "Request for proposal sent to " + insurer.getName() + " with TOR version "
-            + tor.getVersionNo() + ", due " + batch.due());
+        "Request for proposal sent to "
+            + insurer.getName()
+            + " with TOR version "
+            + tor.getVersionNo()
+            + ", due "
+            + batch.due());
     return request;
   }
 
@@ -231,7 +234,11 @@ public class InsurerRequestService {
     for (EbInsurerRequest request : open) {
       request.updateTor(tor);
       mail.send(
-          programme, cycle, request, parties.insurer(cycle.getCompanyId(), request.getInsurerCode()), files);
+          programme,
+          cycle,
+          request,
+          parties.insurer(cycle.getCompanyId(), request.getInsurerCode()),
+          files);
     }
     return open.size();
   }

@@ -9,9 +9,9 @@ import jakarta.persistence.Table;
 import java.time.LocalDate;
 
 /**
- * A member of a roster version (FR-EB-054): employee number, name, birth date, gender, civil status,
- * plan, dependants and effective dates. Minimal fields and no health data until the master list
- * fields are confirmed (EBQ15).
+ * A member of a roster version (FR-EB-054): employee number, name, birth date, gender, civil
+ * status, plan, dependants and effective dates. Minimal fields and no health data until the master
+ * list fields are confirmed (EBQ15).
  */
 @Entity
 @Table(name = "eb_member")

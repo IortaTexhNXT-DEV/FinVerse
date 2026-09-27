@@ -118,7 +118,8 @@ public class PlacementTrigger {
                 .anyMatch(c -> c.getStatus() == EbComparative.Status.THRESHOLD_APPROVAL);
     if (pending) {
       throw new BusinessRuleException(
-          "EB_THRESHOLD_PENDING", "Cycle " + cycle.getCycleNo() + " waits for the threshold approval");
+          "EB_THRESHOLD_PENDING",
+          "Cycle " + cycle.getCycleNo() + " waits for the threshold approval");
     }
     EbClientConfirmation confirmation =
         confirmations
@@ -129,10 +130,18 @@ public class PlacementTrigger {
                         "EB_CONFIRMATION_REQUIRED", "Record the client's confirmation first"));
     EbProgramme programme = records.programmeOf(cycle);
     Map<Long, EbProposal> chosen = new HashMap<>();
-    confirmation.getLines().forEach(l -> chosen.put(l.getProposalId(), proposals.findById(l.getProposalId()).orElseThrow()));
+    confirmation
+        .getLines()
+        .forEach(
+            l ->
+                chosen.put(l.getProposalId(), proposals.findById(l.getProposalId()).orElseThrow()));
     LocalDate today = BusinessClock.today(clock);
     String process = ConfirmationService.placementProcess(cycle);
-    List<String> lines = confirmation.getLines().stream().map(EbClientConfirmation.Line::getBenefitLine).distinct().toList();
+    List<String> lines =
+        confirmation.getLines().stream()
+            .map(EbClientConfirmation.Line::getBenefitLine)
+            .distinct()
+            .toList();
     Set<String> present = cycleDocuments.presentTypes(cycle, today);
     required.require(companyId, process, lines, present);
     requireIsacom(companyId, confirmation, present, today);
@@ -171,7 +180,9 @@ public class PlacementTrigger {
       String process,
       List<String> lines,
       LocalDate today) {
-    Set<String> types = new LinkedHashSet<>(List.of(EbDocumentTypes.TOR, EbDocumentTypes.BOR, EbDocumentTypes.MASTERLIST));
+    Set<String> types =
+        new LinkedHashSet<>(
+            List.of(EbDocumentTypes.TOR, EbDocumentTypes.BOR, EbDocumentTypes.MASTERLIST));
     required.of(cycle.getCompanyId(), process, lines).forEach(r -> types.add(r.getDocumentType()));
     Set<Long> files = new LinkedHashSet<>();
     files.add(confirmation.getEvidenceAttachmentId());

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  * answer to every requested change on a TOR item (FR-EB-045 R1).
  */
 @Component
-public class ProposalRules {
+public class EbProposalRules {
 
   private static final int MAX_RATING = 5;
 
@@ -31,7 +31,7 @@ public class ProposalRules {
    *
    * @param lovs benefit lines and factors
    */
-  public ProposalRules(LovService lovs) {
+  public EbProposalRules(LovService lovs) {
     this.lovs = lovs;
   }
 
@@ -93,7 +93,8 @@ public class ProposalRules {
       throw new BusinessRuleException(
           "EB_PROPOSAL_PREMIUM", "Plan " + row + ": enter an annual premium of zero or more");
     }
-    if (negative(line.sumInsured()) || negative(line.premiumRate())
+    if (negative(line.sumInsured())
+        || negative(line.premiumRate())
         || (line.members() != null && line.members() < 0)) {
       throw new BusinessRuleException(
           "EB_PROPOSAL_AMOUNTS", "Plan " + row + ": amounts and members cannot be negative");
@@ -120,7 +121,10 @@ public class ProposalRules {
             i -> {
               throw new BusinessRuleException(
                   "EB_REVISION_ITEM_UNANSWERED",
-                  "Answer the requested change " + i.getSortOrder() + ": " + i.getRequestedChange());
+                  "Answer the requested change "
+                      + i.getSortOrder()
+                      + ": "
+                      + i.getRequestedChange());
             });
   }
 }

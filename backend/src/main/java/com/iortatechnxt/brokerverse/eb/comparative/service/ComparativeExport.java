@@ -32,7 +32,7 @@ public class ComparativeExport {
 
   private static final String RECOMMENDED = "Recommended";
 
-  private final ComparativeService comparatives;
+  private final EbComparativeService comparatives;
   private final EbRecords records;
   private final EbParties parties;
   private final EbTemplates templates;
@@ -46,7 +46,7 @@ public class ComparativeExport {
    * @param templates PDF composer
    */
   public ComparativeExport(
-      ComparativeService comparatives,
+      EbComparativeService comparatives,
       EbRecords records,
       EbParties parties,
       EbTemplates templates) {
@@ -63,7 +63,8 @@ public class ComparativeExport {
    * @return PDF bytes
    */
   public byte[] pdf(EbComparative comparative) {
-    EbProgramme programme = records.programme(comparative.getCompanyId(), comparative.getProgrammeId());
+    EbProgramme programme =
+        records.programme(comparative.getCompanyId(), comparative.getProgrammeId());
     List<DocumentSpec.Section> sections = new ArrayList<>();
     sections.add(
         new DocumentSpec.Fields(
@@ -71,10 +72,14 @@ public class ComparativeExport {
             List.of(
                 new DocumentSpec.Field("Client", programme.getClientName()),
                 new DocumentSpec.Field("Programme", programme.getName()),
-                new DocumentSpec.Field("Comparative", comparative.getComparativeNo()
-                    + " version " + comparative.getVersionNo()))));
-    tables(comparative).forEach(
-        t -> sections.add(new DocumentSpec.Table(t.heading(), t.headers(), t.rows(), List.of())));
+                new DocumentSpec.Field(
+                    "Comparative",
+                    comparative.getComparativeNo() + " version " + comparative.getVersionNo()))));
+    tables(comparative)
+        .forEach(
+            t ->
+                sections.add(
+                    new DocumentSpec.Table(t.heading(), t.headers(), t.rows(), List.of())));
     if (comparative.getSummary() != null && !comparative.getSummary().isBlank()) {
       sections.add(new DocumentSpec.Text("Recommendation", comparative.getSummary()));
     }
@@ -83,6 +88,17 @@ public class ComparativeExport {
         new EbTemplates.Heading("COMPARATIVE ANALYSIS", comparative.getComparativeNo(), null),
         sections,
         List.of(parties.aoName(programme)));
+  }
+
+  /**
+   * The comparative of a company as an Excel workbook.
+   *
+   * @param companyId company
+   * @param comparativeId comparative
+   * @return XLSX bytes
+   */
+  public byte[] xlsx(Long companyId, Long comparativeId) {
+    return xlsx(comparatives.require(companyId, comparativeId));
   }
 
   /**
@@ -146,7 +162,10 @@ public class ComparativeExport {
   private static Grid premiums(
       EbComparative comparative, ComparativeMatrix matrix, ComparativeMatrix.LineRow line) {
     Long recommended =
-        comparative.line(line.benefitLine()).map(EbComparative.Line::getRecommendedProposalId).orElse(null);
+        comparative
+            .line(line.benefitLine())
+            .map(EbComparative.Line::getRecommendedProposalId)
+            .orElse(null);
     List<List<String>> rows = new ArrayList<>();
     for (ComparativeMatrix.Column column : matrix.proposals()) {
       ComparativeMatrix.Offer offer = line.offers().get(column.proposalId().toString());
@@ -174,7 +193,8 @@ public class ComparativeExport {
     matrix.proposals().forEach(c -> headers.add(c.insurerName()));
     List<List<String>> rows = new ArrayList<>();
     for (ComparativeMatrix.ItemRow item : matrix.items()) {
-      List<String> row = new ArrayList<>(List.of(item.benefitLine(), item.description(), item.requirement()));
+      List<String> row =
+          new ArrayList<>(List.of(item.benefitLine(), item.description(), item.requirement()));
       for (ComparativeMatrix.Column c : matrix.proposals()) {
         ComparativeMatrix.Answer a = item.answers().get(c.proposalId().toString());
         row.add(a == null ? "-" : a.offeredValue() + (a.deviation() ? " (deviation)" : ""));
@@ -207,7 +227,8 @@ public class ComparativeExport {
   private static String amount(BigDecimal value) {
     return value == null
         ? ""
-        : new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH)).format(value);
+        : new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
+            .format(value);
   }
 
   /**

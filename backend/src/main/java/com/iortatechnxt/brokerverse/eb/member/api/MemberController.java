@@ -58,7 +58,10 @@ public class MemberController {
    * @param json JSON field of the member change form
    */
   public MemberController(
-      RosterService roster, MemberChangeService changes, MemberChangeQuery query, ObjectMapper json) {
+      RosterService roster,
+      MemberChangeService changes,
+      MemberChangeQuery query,
+      ObjectMapper json) {
     this.roster = roster;
     this.changes = changes;
     this.query = query;
@@ -110,7 +113,8 @@ public class MemberController {
    */
   @GetMapping("/roster/{versionId}/differences")
   @PreAuthorize(VIEW)
-  public RosterService.Differences differences(@PathVariable Long versionId, @RequestParam Long companyId) {
+  public RosterService.Differences differences(
+      @PathVariable Long versionId, @RequestParam Long companyId) {
     return roster.differences(companyId, versionId);
   }
 
@@ -138,7 +142,9 @@ public class MemberController {
   @PostMapping("/roster/{versionId}/reject")
   @PreAuthorize(MARKET)
   public RosterResponse reject(
-      @PathVariable Long versionId, @RequestParam Long companyId, @RequestBody ReasonRequest request) {
+      @PathVariable Long versionId,
+      @RequestParam Long companyId,
+      @RequestBody ReasonRequest request) {
     return RosterResponse.from(roster.reject(companyId, versionId, request.reason()));
   }
 
@@ -193,7 +199,9 @@ public class MemberController {
    * @param files the client's request
    * @return change
    */
-  @PostMapping(value = "/programmes/{id}/member-changes", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(
+      value = "/programmes/{id}/member-changes",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(MARKET)
   public MemberChangeResponse capture(
@@ -247,7 +255,8 @@ public class MemberController {
   public MemberChangeResponse bill(
       @PathVariable Long id,
       @RequestParam Long companyId,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate billedOn,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+          LocalDate billedOn,
       @RequestParam(required = false) String reference,
       @RequestParam(required = false) BigDecimal amount,
       @RequestParam(defaultValue = "false") boolean direct,

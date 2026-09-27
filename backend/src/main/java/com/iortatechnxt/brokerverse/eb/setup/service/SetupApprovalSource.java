@@ -58,7 +58,8 @@ public class SetupApprovalSource implements PendingApprovalSource {
                 MODULE,
                 "EB threshold rule",
                 "TR-" + r.getId(),
-                (r.getBenefitLine() == null ? "All lines" : r.getBenefitLine()) + " "
+                (r.getBenefitLine() == null ? "All lines" : r.getBenefitLine())
+                    + " "
                     + r.getMeasure().name().replace('_', ' ').toLowerCase(java.util.Locale.ROOT),
                 r.getAmount(),
                 r.getCurrency(),

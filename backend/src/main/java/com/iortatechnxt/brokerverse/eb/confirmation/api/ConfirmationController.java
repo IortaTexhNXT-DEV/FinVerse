@@ -83,7 +83,9 @@ public class ConfirmationController {
    * @param file the evidence
    * @return the confirmation
    */
-  @PostMapping(value = "/cycles/{cycleId}/confirmation", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(
+      value = "/cycles/{cycleId}/confirmation",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(MARKET)
   public ConfirmationResponse confirm(
@@ -97,7 +99,11 @@ public class ConfirmationController {
             companyId,
             cycleId,
             new ConfirmationInput(
-                body.channel(), body.confirmedOn(), body.remarks(), body.choices(), EbUploads.file(file))));
+                body.channel(),
+                body.confirmedOn(),
+                body.remarks(),
+                body.choices(),
+                EbUploads.file(file))));
   }
 
   /**
@@ -112,7 +118,8 @@ public class ConfirmationController {
   @PreAuthorize(MARKET)
   public ConfirmationResponse voidConfirmation(
       @PathVariable Long cycleId, @RequestParam Long companyId, @RequestBody VoidRequest request) {
-    return ConfirmationResponse.from(confirmations.voidConfirmation(companyId, cycleId, request.reason()));
+    return ConfirmationResponse.from(
+        confirmations.voidConfirmation(companyId, cycleId, request.reason()));
   }
 
   /**
@@ -124,7 +131,8 @@ public class ConfirmationController {
    */
   @PostMapping("/cycles/{cycleId}/trigger-placement")
   @PreAuthorize(MARKET)
-  public List<AccountResponse> triggerPlacement(@PathVariable Long cycleId, @RequestParam Long companyId) {
+  public List<AccountResponse> triggerPlacement(
+      @PathVariable Long cycleId, @RequestParam Long companyId) {
     EbCycle cycle = records.cycle(companyId, cycleId);
     return trigger.trigger(companyId, cycleId).stream()
         .map(a -> AccountResponse.from(a, cycle.getId(), cycle.getCycleNo()))

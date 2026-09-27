@@ -124,8 +124,7 @@ public class RevisionService {
                 .filter(c -> c.change() != null && !c.change().isBlank())
                 .toList();
     if (changes.isEmpty()) {
-      throw new BusinessRuleException(
-          "EB_REVISION_EMPTY", "Add at least one requested change");
+      throw new BusinessRuleException("EB_REVISION_EMPTY", "Add at least one requested change");
     }
     Set<String> codes = new LinkedHashSet<>();
     if (input.insurerCodes() != null) {
@@ -158,7 +157,8 @@ public class RevisionService {
         EbCodes.ENTITY_CYCLE,
         cycle.getId().toString(),
         "request_revision",
-        TransitionNote.comment(changes.size() + " change(s) relayed to " + codes.size() + " insurer(s)"));
+        TransitionNote.comment(
+            changes.size() + " change(s) relayed to " + codes.size() + " insurer(s)"));
     audit.record(
         EbCodes.ENTITY_CYCLE,
         cycle.getCycleNo(),
@@ -230,7 +230,8 @@ public class RevisionService {
    * @param changes requested changes, at least one
    * @param insurerCodes insurers to relay to, at least one
    */
-  public record RevisionInput(String description, List<Change> changes, List<String> insurerCodes) {}
+  public record RevisionInput(
+      String description, List<Change> changes, List<String> insurerCodes) {}
 
   /**
    * A requested change.

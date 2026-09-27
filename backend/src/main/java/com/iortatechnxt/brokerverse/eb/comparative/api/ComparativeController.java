@@ -11,7 +11,7 @@ import com.iortatechnxt.brokerverse.eb.comparative.api.dto.ComparativeDtos.Remar
 import com.iortatechnxt.brokerverse.eb.comparative.service.ComparativeApproval;
 import com.iortatechnxt.brokerverse.eb.comparative.service.ComparativeExport;
 import com.iortatechnxt.brokerverse.eb.comparative.service.ComparativePresenter;
-import com.iortatechnxt.brokerverse.eb.comparative.service.ComparativeService;
+import com.iortatechnxt.brokerverse.eb.comparative.service.EbComparativeService;
 import com.iortatechnxt.brokerverse.eb.domain.EbComparative;
 import com.iortatechnxt.brokerverse.eb.domain.EbCycle;
 import com.iortatechnxt.brokerverse.eb.domain.EbProgramme;
@@ -52,7 +52,7 @@ public class ComparativeController {
   private static final String XLSX =
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-  private final ComparativeService comparatives;
+  private final EbComparativeService comparatives;
   private final ComparativeApproval approval;
   private final ComparativePresenter presenter;
   private final ComparativeExport export;
@@ -68,7 +68,7 @@ public class ComparativeController {
    * @param records programme and cycle
    */
   public ComparativeController(
-      ComparativeService comparatives,
+      EbComparativeService comparatives,
       ComparativeApproval approval,
       ComparativePresenter presenter,
       ComparativeExport export,
@@ -131,7 +131,9 @@ public class ComparativeController {
   @PutMapping("/comparatives/{id}/recommendation")
   @PreAuthorize(MARKET)
   public ComparativeView recommend(
-      @PathVariable Long id, @RequestParam Long companyId, @RequestBody RecommendationRequest request) {
+      @PathVariable Long id,
+      @RequestParam Long companyId,
+      @RequestBody RecommendationRequest request) {
     Map<String, Long> recommendation =
         request.recommendation() == null ? Map.of() : request.recommendation();
     return view(comparatives.recommend(companyId, id, recommendation, request.summary()));
@@ -161,7 +163,9 @@ public class ComparativeController {
   @PostMapping("/comparatives/{id}/sign-off")
   @PreAuthorize(SIGN)
   public ComparativeView signOff(
-      @PathVariable Long id, @RequestParam Long companyId, @RequestBody(required = false) RemarksRequest request) {
+      @PathVariable Long id,
+      @RequestParam Long companyId,
+      @RequestBody(required = false) RemarksRequest request) {
     return view(approval.signOff(companyId, id, remarks(request)));
   }
 
@@ -176,7 +180,9 @@ public class ComparativeController {
   @PostMapping("/comparatives/{id}/threshold-approve")
   @PreAuthorize(VIEW)
   public ComparativeView approveThreshold(
-      @PathVariable Long id, @RequestParam Long companyId, @RequestBody(required = false) RemarksRequest request) {
+      @PathVariable Long id,
+      @RequestParam Long companyId,
+      @RequestBody(required = false) RemarksRequest request) {
     return view(approval.approveThreshold(companyId, id, remarks(request)));
   }
 
@@ -236,7 +242,9 @@ public class ComparativeController {
   @GetMapping("/comparatives/{id}/export")
   @PreAuthorize(VIEW)
   public ResponseEntity<byte[]> export(
-      @PathVariable Long id, @RequestParam Long companyId, @RequestParam(defaultValue = "pdf") String format) {
+      @PathVariable Long id,
+      @RequestParam Long companyId,
+      @RequestParam(defaultValue = "pdf") String format) {
     EbComparative c = comparatives.require(companyId, id);
     boolean excel = "xlsx".equalsIgnoreCase(format);
     byte[] body = excel ? export.xlsx(c) : export.pdf(c);

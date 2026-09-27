@@ -20,8 +20,8 @@ import java.util.List;
  * An insurer proposal on a cycle (BRID-005.02, 005.03, 010, 015; FR-EB-040, 045), numbered {@code
  * EBPR-<yyyy>-nnnnnn}: the incumbent's indicative terms, a proposal answering a request, or a
  * revised proposal answering a revision request. Without the portal the AO enters it with the
- * insurer's document attached; only a VALIDATED proposal counts in the comparative. A new version of
- * the same insurer supersedes the earlier one.
+ * insurer's document attached; only a VALIDATED proposal counts in the comparative. A new version
+ * of the same insurer supersedes the earlier one.
  */
 @Entity
 @Table(name = "eb_proposal")

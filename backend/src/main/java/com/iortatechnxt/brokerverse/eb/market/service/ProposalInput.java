@@ -48,6 +48,15 @@ public record ProposalInput(
    */
   public ProposalInput withDocument(UploadedFile file) {
     return new ProposalInput(
-        insurerCode, receivedOn, validUntil, currency, terms, exclusions, lines, items, factors, file);
+        insurerCode,
+        receivedOn,
+        validUntil,
+        currency,
+        terms,
+        exclusions,
+        lines,
+        items,
+        factors,
+        file);
   }
 }

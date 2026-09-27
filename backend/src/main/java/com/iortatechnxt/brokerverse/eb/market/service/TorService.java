@@ -169,7 +169,8 @@ public class TorService {
     EbTor draft =
         tors.findFirstByCycleIdAndStatusOrderByVersionNoDesc(cycle.getId(), EbTor.Status.DRAFT)
             .orElseThrow(
-                () -> new BusinessRuleException("EB_TOR_EMPTY", "Add the TOR items before release"));
+                () ->
+                    new BusinessRuleException("EB_TOR_EMPTY", "Add the TOR items before release"));
     if (draft.getItems().isEmpty()) {
       throw new BusinessRuleException("EB_TOR_EMPTY", "Add the TOR items before release");
     }
@@ -185,7 +186,9 @@ public class TorService {
                     EbDocumentSource.SYSTEM,
                     true,
                     "Terms of Reference version " + draft.getVersionNo()),
-                List.of(new UploadedFile(cycle.getCycleNo() + "_TOR_v" + draft.getVersionNo() + ".pdf", pdf)))
+                List.of(
+                    new UploadedFile(
+                        cycle.getCycleNo() + "_TOR_v" + draft.getVersionNo() + ".pdf", pdf)))
             .get(0)
             .getAttachmentId();
     tors.findByCycleIdOrderByVersionNoDesc(cycle.getId()).forEach(EbTor::supersede);
@@ -195,8 +198,13 @@ public class TorService {
         EbCodes.ENTITY_CYCLE,
         cycle.getCycleNo(),
         AuditAction.UPDATE,
-        "TOR version " + draft.getVersionNo() + " released (" + draft.getItems().size()
-            + " items; " + resent + " open request(s) updated)");
+        "TOR version "
+            + draft.getVersionNo()
+            + " released ("
+            + draft.getItems().size()
+            + " items; "
+            + resent
+            + " open request(s) updated)");
     return draft;
   }
 
@@ -223,7 +231,9 @@ public class TorService {
     return templates.pdf(
         programme.getCompanyId(),
         new EbTemplates.Heading(
-            "TERMS OF REFERENCE", cycle.getCycleNo() + " v" + tor.getVersionNo(), text.versionTag()),
+            "TERMS OF REFERENCE",
+            cycle.getCycleNo() + " v" + tor.getVersionNo(),
+            text.versionTag()),
         List.of(
             new DocumentSpec.Text(text.title(), text.text()),
             new DocumentSpec.Table(

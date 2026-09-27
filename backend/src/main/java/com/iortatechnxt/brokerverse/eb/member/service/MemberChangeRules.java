@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 /**
  * Checks of the lines of a member change against the accepted roster (FR-EB-055): a deletion or
  * change names an active member of the roster, an addition a new employee number; additions and
- * data changes carry the member data, plan changes the plan; effective dates fall within the
- * line's policy period.
+ * data changes carry the member data, plan changes the plan; effective dates fall within the line's
+ * policy period.
  */
 @Component
 public class MemberChangeRules {
@@ -43,10 +43,14 @@ public class MemberChangeRules {
    * @return line data with the member
    */
   EbMemberChange.LineData check(
-      EbRosterVersion roster, EbProgrammeLine line, MemberChangeInput.Line input, Set<String> seen) {
+      EbRosterVersion roster,
+      EbProgrammeLine line,
+      MemberChangeInput.Line input,
+      Set<String> seen) {
     if (input.action() == null || blank(input.employeeNo())) {
       throw new BusinessRuleException(
-          "EB_MEMBER_LINE_REQUIRED", "Select the action and enter the employee number of each line");
+          "EB_MEMBER_LINE_REQUIRED",
+          "Select the action and enter the employee number of each line");
     }
     String no = input.employeeNo().strip();
     if (!seen.add(no.toUpperCase(Locale.ROOT))) {
@@ -108,7 +112,8 @@ public class MemberChangeRules {
 
   private static void effective(EbProgrammeLine line, LocalDate date) {
     if (date == null) {
-      throw new BusinessRuleException("EB_MEMBER_EFFECTIVE", "Enter the effective date of each line");
+      throw new BusinessRuleException(
+          "EB_MEMBER_EFFECTIVE", "Enter the effective date of each line");
     }
     boolean before = line.getPeriodFrom() != null && date.isBefore(line.getPeriodFrom());
     boolean after = line.getPeriodTo() != null && date.isAfter(line.getPeriodTo());

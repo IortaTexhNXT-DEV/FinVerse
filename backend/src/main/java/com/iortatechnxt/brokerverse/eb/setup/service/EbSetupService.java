@@ -133,7 +133,8 @@ public class EbSetupService {
 
   private EbThresholdRule.Data check(EbThresholdRule.Data data) {
     if (data.measure() == null) {
-      throw new BusinessRuleException("EB_THRESHOLD_MEASURE", "Select the measure: TSI or annual premium");
+      throw new BusinessRuleException(
+          "EB_THRESHOLD_MEASURE", "Select the measure: TSI or annual premium");
     }
     if (data.amount() == null || data.amount().signum() <= 0) {
       throw new BusinessRuleException("EB_THRESHOLD_AMOUNT", "Enter an amount greater than zero");
@@ -173,8 +174,14 @@ public class EbSetupService {
 
   private static String describe(EbThresholdRule rule) {
     return (rule.getBenefitLine() == null ? "All lines" : rule.getBenefitLine())
-        + " " + rule.getMeasure() + " >= " + rule.getCurrency() + " " + rule.getAmount().toPlainString()
-        + ", approver " + rule.getApproverPermission();
+        + " "
+        + rule.getMeasure()
+        + " >= "
+        + rule.getCurrency()
+        + " "
+        + rule.getAmount().toPlainString()
+        + ", approver "
+        + rule.getApproverPermission();
   }
 
   private EbThresholdRule rule(Long companyId, Long id) {
@@ -212,7 +219,8 @@ public class EbSetupService {
           "EB_REQUIRED_EXISTS", "This document is already required for the process and line");
     }
     EbRequiredDocument saved = required.save(new EbRequiredDocument(companyId, clean));
-    audit.record(EbCodes.ENTITY_REQUIRED_DOCUMENT, saved.getId(), AuditAction.CREATE, describe(saved));
+    audit.record(
+        EbCodes.ENTITY_REQUIRED_DOCUMENT, saved.getId(), AuditAction.CREATE, describe(saved));
     return saved;
   }
 
@@ -286,7 +294,8 @@ public class EbSetupService {
   }
 
   private String describe(EbRequiredDocument r) {
-    return lovs.label("DOCUMENT_TYPE", r.getDocumentType()) + " for "
+    return lovs.label("DOCUMENT_TYPE", r.getDocumentType())
+        + " for "
         + lovs.label(EbDocumentTypes.PROCESS_TYPE_LOV, r.getProcessType())
         + (r.getBenefitLine() == null ? "" : " (" + r.getBenefitLine() + ")")
         + (r.isMandatory() ? ", mandatory" : ", optional");

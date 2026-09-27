@@ -12,8 +12,8 @@ import java.time.Instant;
 /**
  * A version of the member roster of a programme and policy year (BRID-013, 014; FR-EB-054), loaded
  * from the master list through the bulk handler {@code EB_MASTERLIST} as STAGED; the AO reviews the
- * differences with the accepted version and accepts it (the earlier accepted version is
- * superseded and stays readable) or rejects it.
+ * differences with the accepted version and accepts it (the earlier accepted version is superseded
+ * and stays readable) or rejects it.
  */
 @Entity
 @Table(name = "eb_roster_version")

@@ -97,8 +97,11 @@ public class MasterListBulkHandler implements BulkImportHandler {
         BulkColumn.required(PLAN, "Plan code of the benefit", "PLAN-A"),
         new BulkColumn(DEPENDANTS, "Number of dependants", false, BulkColumn.Type.NUMBER, "1"),
         new BulkColumn(
-            EFFECTIVE, "Coverage start; the policy year start when blank", false,
-            BulkColumn.Type.DATE, ""));
+            EFFECTIVE,
+            "Coverage start; the policy year start when blank",
+            false,
+            BulkColumn.Type.DATE,
+            ""));
   }
 
   @Override
@@ -138,7 +141,8 @@ public class MasterListBulkHandler implements BulkImportHandler {
       errors.add("Gender must be MALE or FEMALE");
     }
     String civil = row.text(CIVIL);
-    if (civil != null && lovs.values("CIVIL_STATUS").stream().noneMatch(v -> v.getCode().equals(civil))) {
+    if (civil != null
+        && lovs.values("CIVIL_STATUS").stream().noneMatch(v -> v.getCode().equals(civil))) {
       errors.add("Civil Status " + civil + " is not in the list");
     }
     if (row.number(DEPENDANTS) != null && row.number(DEPENDANTS).signum() < 0) {
@@ -151,7 +155,8 @@ public class MasterListBulkHandler implements BulkImportHandler {
   public String commit(BulkRow row, BulkContext context) {
     EbProgramme programme = programme(context);
     int year = policyYear(programme, context);
-    LocalDate effective = row.date(EFFECTIVE) != null ? row.date(EFFECTIVE) : LocalDate.of(year, 1, 1);
+    LocalDate effective =
+        row.date(EFFECTIVE) != null ? row.date(EFFECTIVE) : LocalDate.of(year, 1, 1);
     EbRosterVersion version =
         roster.stage(
             programme,

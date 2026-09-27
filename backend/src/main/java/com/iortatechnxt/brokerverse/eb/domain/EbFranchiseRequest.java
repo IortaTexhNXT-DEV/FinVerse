@@ -230,5 +230,9 @@ public class EbFranchiseRequest extends EbCycleRecord {
    * @param evidenceAttachmentId the stored reply of the insurer
    */
   public record Decision(
-      LocalDate decidedOn, String by, String reasonCode, String remarks, Long evidenceAttachmentId) {}
+      LocalDate decidedOn,
+      String by,
+      String reasonCode,
+      String remarks,
+      Long evidenceAttachmentId) {}
 }

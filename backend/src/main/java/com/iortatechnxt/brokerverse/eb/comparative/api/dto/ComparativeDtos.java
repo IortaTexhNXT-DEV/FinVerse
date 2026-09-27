@@ -175,7 +175,12 @@ public final class ComparativeDtos {
    * @param createdAt time
    */
   public record CommentView(
-      Long id, String authorKind, String text, Long replyToId, String createdBy, Instant createdAt) {
+      Long id,
+      String authorKind,
+      String text,
+      Long replyToId,
+      String createdBy,
+      Instant createdAt) {
 
     /**
      * Maps a comment.
@@ -185,7 +190,12 @@ public final class ComparativeDtos {
      */
     public static CommentView from(EbComment c) {
       return new CommentView(
-          c.getId(), c.getAuthorKind(), c.getText(), c.getReplyToId(), c.getCreatedBy(), c.getCreatedAt());
+          c.getId(),
+          c.getAuthorKind(),
+          c.getText(),
+          c.getReplyToId(),
+          c.getCreatedBy(),
+          c.getCreatedAt());
     }
   }
 }

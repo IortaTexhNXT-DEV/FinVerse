@@ -31,10 +31,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 /**
- * What a member change does once validated (BRID-013, 025; FR-EB-055, 057): a change with a
- * premium effect raises an endorsement request in Operations on the booked invoice of the line's
- * current account (source reference {@code EBM-...}), and closing the change applies its lines to
- * the accepted roster, opening an HMO card item for each member added on an HMO line.
+ * What a member change does once validated (BRID-013, 025; FR-EB-055, 057): a change with a premium
+ * effect raises an endorsement request in Operations on the booked invoice of the line's current
+ * account (source reference {@code EBM-...}), and closing the change applies its lines to the
+ * accepted roster, opening an HMO card item for each member added on an HMO line.
  */
 @Component
 public class MemberChangeEffects {
@@ -125,7 +125,9 @@ public class MemberChangeEffects {
                     null,
                     null,
                     "Member change " + change.getChangeNo() + ": " + summary(change),
-                    change.getBillingRef() == null ? null : "Insurer billing " + change.getBillingRef()),
+                    change.getBillingRef() == null
+                        ? null
+                        : "Insurer billing " + change.getBillingRef()),
                 new AmountInput(change.getBilledAmount(), null, null, null, null, null, null, null),
                 null,
                 null));
@@ -144,7 +146,11 @@ public class MemberChangeEffects {
             .collect(Collectors.groupingBy(EbMemberChange.Line::getAction, Collectors.counting()));
     return counts.entrySet().stream()
         .sorted(Map.Entry.comparingByKey())
-        .map(e -> e.getValue() + " " + e.getKey().name().toLowerCase(java.util.Locale.ROOT).replace('_', ' '))
+        .map(
+            e ->
+                e.getValue()
+                    + " "
+                    + e.getKey().name().toLowerCase(java.util.Locale.ROOT).replace('_', ' '))
         .collect(Collectors.joining(", "));
   }
 
@@ -169,13 +175,18 @@ public class MemberChangeEffects {
       }
     }
     members.flush();
-    roster.recount((int) members.countByRosterVersionIdAndStatus(roster.getId(), EbMember.Status.ACTIVE));
+    roster.recount(
+        (int) members.countByRosterVersionIdAndStatus(roster.getId(), EbMember.Status.ACTIVE));
   }
 
   private void add(
-      EbProgramme programme, EbMemberChange change, EbRosterVersion roster, EbMemberChange.Line line) {
+      EbProgramme programme,
+      EbMemberChange change,
+      EbRosterVersion roster,
+      EbMemberChange.Line line) {
     EbMember member =
-        members.save(new EbMember(roster, line.getEmployeeNo(), line.memberData(), line.getEffectiveDate()));
+        members.save(
+            new EbMember(roster, line.getEmployeeNo(), line.memberData(), line.getEffectiveDate()));
     line.member(member.getId());
     if (!HMO.equals(change.getBenefitLine())) {
       return;
@@ -183,7 +194,9 @@ public class MemberChangeEffects {
     EbProgrammeLine programmeLine = programme.line(change.getLineNo());
     LocalDate due =
         workingDays.plus(
-            programme.getCompanyId(), BusinessClock.today(clock), parameters.tatDays(TatActivity.CARDS));
+            programme.getCompanyId(),
+            BusinessClock.today(clock),
+            parameters.tatDays(TatActivity.CARDS));
     trackedItems.openLinked(
         programme,
         HMO_CARD,

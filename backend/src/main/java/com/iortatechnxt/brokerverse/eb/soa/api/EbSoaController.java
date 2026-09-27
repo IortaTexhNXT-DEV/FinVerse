@@ -10,10 +10,10 @@ import com.iortatechnxt.brokerverse.eb.soa.api.dto.SoaDtos.InvoicesRequest;
 import com.iortatechnxt.brokerverse.eb.soa.api.dto.SoaDtos.ProgrammeInvoice;
 import com.iortatechnxt.brokerverse.eb.soa.api.dto.SoaDtos.RejectRequest;
 import com.iortatechnxt.brokerverse.eb.soa.api.dto.SoaDtos.SoaResponse;
+import com.iortatechnxt.brokerverse.eb.soa.service.EbSoaService;
 import com.iortatechnxt.brokerverse.eb.soa.service.SoaInvoices;
 import com.iortatechnxt.brokerverse.eb.soa.service.SoaQuery;
 import com.iortatechnxt.brokerverse.eb.soa.service.SoaRelease;
-import com.iortatechnxt.brokerverse.eb.soa.service.SoaService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -37,14 +37,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/v1/eb")
 @Transactional
-public class SoaController {
+public class EbSoaController {
 
   private static final String VIEW = "hasAuthority('EB_VIEW')";
   private static final String INTAKE = "hasAnyAuthority('EB_MARKET', 'EB_PROCESS')";
   private static final String PROCESS = "hasAuthority('EB_PROCESS')";
   private static final int MAX_PAGE = 200;
 
-  private final SoaService soas;
+  private final EbSoaService soas;
   private final SoaRelease release;
   private final SoaQuery query;
   private final SoaInvoices invoices;
@@ -64,8 +64,8 @@ public class SoaController {
    * @param parties insurer names
    */
   @SuppressWarnings("java:S107") // constructor injection
-  public SoaController(
-      SoaService soas,
+  public EbSoaController(
+      EbSoaService soas,
       SoaRelease release,
       SoaQuery query,
       SoaInvoices invoices,
@@ -134,7 +134,8 @@ public class SoaController {
    */
   @GetMapping("/programmes/{id}/invoices")
   @PreAuthorize(VIEW)
-  public List<ProgrammeInvoice> programmeInvoices(@PathVariable Long id, @RequestParam Long companyId) {
+  public List<ProgrammeInvoice> programmeInvoices(
+      @PathVariable Long id, @RequestParam Long companyId) {
     return invoices.ofProgramme(records.programme(companyId, id)).stream()
         .map(ProgrammeInvoice::from)
         .toList();
@@ -187,7 +188,9 @@ public class SoaController {
   @PostMapping("/soa/{id}/validate")
   @PreAuthorize(PROCESS)
   public SoaResponse validate(
-      @PathVariable Long id, @RequestParam Long companyId, @RequestBody(required = false) InvoicesRequest request) {
+      @PathVariable Long id,
+      @RequestParam Long companyId,
+      @RequestBody(required = false) InvoicesRequest request) {
     return map(soas.validate(companyId, id, request == null ? null : request.invoiceNos()));
   }
 

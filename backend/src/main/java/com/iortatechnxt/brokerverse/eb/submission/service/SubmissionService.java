@@ -154,14 +154,18 @@ public class SubmissionService {
    * @return the submission
    */
   public EbSubmission submit(Long companyId, Scope scope, SubmissionInput input) {
-    lovs.requireValid(EbDocumentTypes.PROCESS_TYPE_LOV, scope.processType(), BusinessClock.today(clock));
+    lovs.requireValid(
+        EbDocumentTypes.PROCESS_TYPE_LOV, scope.processType(), BusinessClock.today(clock));
     InsurerProfile insurer = parties.insurer(companyId, input.insurerCode());
     Found found = found(companyId, scope);
     required.require(companyId, scope.processType(), found.lines(), found.files().keySet());
     Set<Long> files = new HashSet<>();
     Map<Long, String> types = new LinkedHashMap<>();
     for (EbRequiredDocument r : required.of(companyId, scope.processType(), found.lines())) {
-      found.files().getOrDefault(r.getDocumentType(), List.of()).forEach(id -> types.put(id, r.getDocumentType()));
+      found
+          .files()
+          .getOrDefault(r.getDocumentType(), List.of())
+          .forEach(id -> types.put(id, r.getDocumentType()));
     }
     for (Long extra : input.attachmentIds()) {
       String type = found.typeOf().get(extra);
@@ -193,8 +197,11 @@ public class SubmissionService {
         EbCodes.ENTITY_SUBMISSION,
         saved.getId(),
         AuditAction.SUBMIT,
-        lovs.label(EbDocumentTypes.PROCESS_TYPE_LOV, scope.processType()) + " documents ("
-            + files.size() + ") sent to " + insurer.getName());
+        lovs.label(EbDocumentTypes.PROCESS_TYPE_LOV, scope.processType())
+            + " documents ("
+            + files.size()
+            + ") sent to "
+            + insurer.getName());
     return saved;
   }
 
@@ -202,7 +209,8 @@ public class SubmissionService {
       EbProgramme programme, EbSubmission submission, InsurerProfile insurer, List<Long> files) {
     Map<String, Object> values = parties.values(programme, null);
     values.put("insurerName", insurer.getName());
-    values.put("process", lovs.label(EbDocumentTypes.PROCESS_TYPE_LOV, submission.getProcessType()));
+    values.put(
+        "process", lovs.label(EbDocumentTypes.PROCESS_TYPE_LOV, submission.getProcessType()));
     values.put(
         "documents",
         submission.getDocuments().stream()
@@ -227,17 +235,21 @@ public class SubmissionService {
         .messageId();
   }
 
-  private void tellProcessing(EbProgramme programme, EbSubmission submission, InsurerProfile insurer) {
+  private void tellProcessing(
+      EbProgramme programme, EbSubmission submission, InsurerProfile insurer) {
     Notice notice =
         new Notice(
             programme.getProgrammeNo() + ": documents submitted to " + insurer.getName(),
-            lovs.label(EbDocumentTypes.PROCESS_TYPE_LOV, submission.getProcessType()) + " - "
+            lovs.label(EbDocumentTypes.PROCESS_TYPE_LOV, submission.getProcessType())
+                + " - "
                 + programme.getName(),
             EbCodes.PROGRAMME_LINK + programme.getId() + "?tab=submissions",
             EbCodes.ENTITY_PROGRAMME,
             programme.getId().toString());
-    notifications.notifyPermission(EbCodes.PERMISSION_PROCESS, notice, EbCodes.EVENT_SUBMISSION_SENT);
-    notifications.notifyPermission(EbCodes.PERMISSION_COLLECT, notice, EbCodes.EVENT_SUBMISSION_SENT);
+    notifications.notifyPermission(
+        EbCodes.PERMISSION_PROCESS, notice, EbCodes.EVENT_SUBMISSION_SENT);
+    notifications.notifyPermission(
+        EbCodes.PERMISSION_COLLECT, notice, EbCodes.EVENT_SUBMISSION_SENT);
   }
 
   private Found found(Long companyId, Scope scope) {
@@ -258,7 +270,8 @@ public class SubmissionService {
                       new ResourceNotFoundException(
                           EbCodes.ENTITY_MEMBER_CHANGE, scope.memberChangeId()));
       for (Attachment a :
-          documents.all(new AttachmentTarget(EbCodes.ENTITY_MEMBER_CHANGE, change.getId().toString()))) {
+          documents.all(
+              new AttachmentTarget(EbCodes.ENTITY_MEMBER_CHANGE, change.getId().toString()))) {
         if (a.getDocumentType() != null) {
           byType.computeIfAbsent(a.getDocumentType(), t -> new ArrayList<>()).add(a.getId());
           typeOf.put(a.getId(), a.getDocumentType());
@@ -360,7 +373,11 @@ public class SubmissionService {
    * @param attachmentIds the files found
    */
   public record ChecklistItem(
-      String documentType, String label, boolean mandatory, boolean present, List<Long> attachmentIds) {}
+      String documentType,
+      String label,
+      boolean mandatory,
+      boolean present,
+      List<Long> attachmentIds) {}
 
   private record Found(
       EbProgramme programme,

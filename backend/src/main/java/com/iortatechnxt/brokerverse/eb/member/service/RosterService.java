@@ -32,7 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
  * The member roster of a programme (BRID-013, 014; FR-EB-054): the master list the client sends is
  * loaded by the AO through the bulk upload {@code EB_MASTERLIST} as a STAGED version (one upload,
  * one version); the AO reviews the differences with the accepted roster and accepts it (the earlier
- * accepted version is superseded and stays readable) or rejects it. One employee number per version.
+ * accepted version is superseded and stays readable) or rejects it. One employee number per
+ * version.
  */
 @Service
 @Transactional
@@ -87,8 +88,12 @@ public class RosterService {
   public EbRosterVersion stage(
       EbProgramme programme, int policyYear, String uploadNo, StagedMember row) {
     EbRosterVersion version =
-        versions.findBySourceRef(uploadNo).orElseGet(() -> newVersion(programme, policyYear, uploadNo));
-    if (members.findByRosterVersionIdAndEmployeeNoIgnoreCase(version.getId(), row.employeeNo()).isPresent()) {
+        versions
+            .findBySourceRef(uploadNo)
+            .orElseGet(() -> newVersion(programme, policyYear, uploadNo));
+    if (members
+        .findByRosterVersionIdAndEmployeeNoIgnoreCase(version.getId(), row.employeeNo())
+        .isPresent()) {
       throw new BusinessRuleException(
           "EB_MEMBER_TWICE", "Employee " + row.employeeNo() + " appears twice");
     }
@@ -109,7 +114,12 @@ public class RosterService {
         programme.getAccountOfficer(),
         new Notice(
             programme.getProgrammeNo() + ": master list to review",
-            "Roster version " + next + " of " + policyYear + " is staged for " + programme.getName(),
+            "Roster version "
+                + next
+                + " of "
+                + policyYear
+                + " is staged for "
+                + programme.getName(),
             EbCodes.PROGRAMME_LINK + programme.getId() + "?tab=members",
             EbCodes.ENTITY_PROGRAMME,
             programme.getId().toString()),
@@ -142,8 +152,13 @@ public class RosterService {
         EbCodes.ENTITY_ROSTER,
         versionId,
         AuditAction.AUTHORIZE,
-        "Roster " + version.getPolicyYear() + " version " + version.getVersionNo() + " accepted ("
-            + version.getHeadcount() + " members)");
+        "Roster "
+            + version.getPolicyYear()
+            + " version "
+            + version.getVersionNo()
+            + " accepted ("
+            + version.getHeadcount()
+            + " members)");
     return version;
   }
 
@@ -210,20 +225,28 @@ public class RosterService {
         versions.findFirstByProgrammeIdAndPolicyYearAndStatusOrderByVersionNoDesc(
             version.getProgrammeId(), version.getPolicyYear(), EbRosterVersion.Status.ACCEPTED);
     Map<String, EbMember> current =
-        accepted.filter(a -> !a.getId().equals(version.getId())).map(a -> byEmployee(a.getId())).orElse(Map.of());
-    Set<String> added = staged.keySet().stream().filter(k -> !current.containsKey(k)).collect(Collectors.toSet());
-    Set<String> removed = current.keySet().stream().filter(k -> !staged.containsKey(k)).collect(Collectors.toSet());
+        accepted
+            .filter(a -> !a.getId().equals(version.getId()))
+            .map(a -> byEmployee(a.getId()))
+            .orElse(Map.of());
+    Set<String> added =
+        staged.keySet().stream().filter(k -> !current.containsKey(k)).collect(Collectors.toSet());
+    Set<String> removed =
+        current.keySet().stream().filter(k -> !staged.containsKey(k)).collect(Collectors.toSet());
     long changed =
         staged.entrySet().stream()
             .filter(e -> current.containsKey(e.getKey()))
             .filter(e -> !e.getValue().getPlanCode().equals(current.get(e.getKey()).getPlanCode()))
             .count();
-    return new Differences(staged.size(), current.size(), added.size(), removed.size(), (int) changed);
+    return new Differences(
+        staged.size(), current.size(), added.size(), removed.size(), (int) changed);
   }
 
   private Map<String, EbMember> byEmployee(Long versionId) {
     return members.findByRosterVersionIdOrderByEmployeeNoAsc(versionId).stream()
-        .collect(Collectors.toMap(m -> m.getEmployeeNo().toUpperCase(Locale.ROOT), Function.identity(), (a, b) -> a));
+        .collect(
+            Collectors.toMap(
+                m -> m.getEmployeeNo().toUpperCase(Locale.ROOT), Function.identity(), (a, b) -> a));
   }
 
   /**

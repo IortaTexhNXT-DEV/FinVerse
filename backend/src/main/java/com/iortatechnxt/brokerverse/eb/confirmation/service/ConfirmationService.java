@@ -44,9 +44,9 @@ import org.springframework.transaction.annotation.Transactional;
  * The client's confirmation of the chosen proposals (BRID-017; FR-EB-046): recorded by the AO with
  * its channel (e-mail or signed document) and evidence (stored as {@code EB_CLIENT_CONFIRMATION}),
  * one validated proposal per programme line. The threshold rules are evaluated again on the chosen
- * proposals: a rule the sign-off did not meet sends the cycle to THRESHOLD_APPROVAL
- * ({@code reconfirm_threshold}); otherwise the cycle is CONFIRMED. A confirmation is voided before
- * the placement and recorded again; the placement itself is {@link PlacementTrigger}.
+ * proposals: a rule the sign-off did not meet sends the cycle to THRESHOLD_APPROVAL ({@code
+ * reconfirm_threshold}); otherwise the cycle is CONFIRMED. A confirmation is voided before the
+ * placement and recorded again; the placement itself is {@link PlacementTrigger}.
  */
 @Service
 @Transactional
@@ -164,14 +164,24 @@ public class ConfirmationService {
                     p.sumInsuredOf(line.getBenefitLine()))));
     EbClientConfirmation saved = confirmations.save(confirmation);
     decide(cycle, programme, comparative, chosen, again);
-    activity.done(cycle, TatActivity.CONFIRMATION, cycle.getCycleNo(), currentUser.username(), input.channel());
+    activity.done(
+        cycle,
+        TatActivity.CONFIRMATION,
+        cycle.getCycleNo(),
+        currentUser.username(),
+        input.channel());
     tellAo(programme, cycle);
     audit.record(
         EbCodes.ENTITY_CYCLE,
         cycle.getCycleNo(),
         AuditAction.UPDATE,
-        "Client confirmation recorded (" + input.channel() + ", " + on + ") for "
-            + chosen.size() + " line(s)");
+        "Client confirmation recorded ("
+            + input.channel()
+            + ", "
+            + on
+            + ") for "
+            + chosen.size()
+            + " line(s)");
     return saved;
   }
 
@@ -223,8 +233,11 @@ public class ConfirmationService {
                   () ->
                       new BusinessRuleException(
                           "EB_CONFIRMATION_CHOICE",
-                          "Select the chosen proposal of line " + line.getLineNo() + " ("
-                              + line.getBenefitLine() + ")"));
+                          "Select the chosen proposal of line "
+                              + line.getLineNo()
+                              + " ("
+                              + line.getBenefitLine()
+                              + ")"));
       chosen.put(line, proposal);
     }
     return chosen;
@@ -252,7 +265,8 @@ public class ConfirmationService {
     boolean newRule = result.rules().stream().anyMatch(r -> !signedOff.contains(r));
     if (newRule && again) {
       throw new BusinessRuleException(
-          "EB_THRESHOLD_PENDING", "Cycle " + cycle.getCycleNo() + " waits for the threshold approval");
+          "EB_THRESHOLD_PENDING",
+          "Cycle " + cycle.getCycleNo() + " waits for the threshold approval");
     }
     if (newRule) {
       comparative.needsThresholdApproval(result.text(), result.approver());

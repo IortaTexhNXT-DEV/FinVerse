@@ -76,7 +76,8 @@ public class SubmissionController {
       @RequestParam(required = false) Long cycleId,
       @RequestParam(required = false) Long memberChangeId,
       @RequestParam String processType) {
-    return submissions.checklist(companyId, new Scope(programmeId, cycleId, memberChangeId, processType));
+    return submissions.checklist(
+        companyId, new Scope(programmeId, cycleId, memberChangeId, processType));
   }
 
   /**
@@ -89,13 +90,19 @@ public class SubmissionController {
   @PostMapping("/submissions")
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(SEND)
-  public SubmissionResponse submit(@RequestParam Long companyId, @RequestBody SubmissionRequest request) {
+  public SubmissionResponse submit(
+      @RequestParam Long companyId, @RequestBody SubmissionRequest request) {
     return map(
         companyId,
         submissions.submit(
             companyId,
-            new Scope(request.programmeId(), request.cycleId(), request.memberChangeId(), request.processType()),
-            new SubmissionInput(request.insurerCode(), request.attachmentIds(), request.remarks())));
+            new Scope(
+                request.programmeId(),
+                request.cycleId(),
+                request.memberChangeId(),
+                request.processType()),
+            new SubmissionInput(
+                request.insurerCode(), request.attachmentIds(), request.remarks())));
   }
 
   /**
@@ -109,7 +116,9 @@ public class SubmissionController {
   @PostMapping("/submissions/{submissionId}/acknowledge")
   @PreAuthorize(SEND)
   public SubmissionResponse acknowledge(
-      @PathVariable Long submissionId, @RequestParam Long companyId, @RequestBody AcknowledgeRequest request) {
+      @PathVariable Long submissionId,
+      @RequestParam Long companyId,
+      @RequestBody AcknowledgeRequest request) {
     return map(companyId, submissions.acknowledge(companyId, submissionId, request.date()));
   }
 

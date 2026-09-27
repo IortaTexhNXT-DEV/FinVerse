@@ -134,11 +134,12 @@ public class EbComparative extends EbCycleRecord {
   public void recommend(String benefitLine, Long proposalId) {
     requireStatus(Status.DRAFT);
     line(benefitLine)
-        .orElseThrow(
-            () ->
-                new BusinessRuleException(
-                    "EB_COMPARATIVE_LINE", "Benefit line " + benefitLine + " is not compared"))
-        .recommendedProposalId = proposalId;
+            .orElseThrow(
+                () ->
+                    new BusinessRuleException(
+                        "EB_COMPARATIVE_LINE", "Benefit line " + benefitLine + " is not compared"))
+            .recommendedProposalId =
+        proposalId;
   }
 
   /**
@@ -251,7 +252,10 @@ public class EbComparative extends EbCycleRecord {
     if (status != expected) {
       throw new BusinessRuleException(
           "EB_COMPARATIVE_STATUS",
-          "Comparative " + comparativeNo + " is " + status.name().toLowerCase(Locale.ROOT).replace('_', ' '));
+          "Comparative "
+              + comparativeNo
+              + " is "
+              + status.name().toLowerCase(Locale.ROOT).replace('_', ' '));
     }
   }
 

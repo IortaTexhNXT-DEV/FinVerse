@@ -39,7 +39,8 @@ public record MemberChangeInput(
    * @return input
    */
   public MemberChangeInput withFiles(List<UploadedFile> uploaded) {
-    return new MemberChangeInput(lineNo, policyYear, source, financial, description, lines, uploaded);
+    return new MemberChangeInput(
+        lineNo, policyYear, source, financial, description, lines, uploaded);
   }
 
   /**
@@ -51,5 +52,8 @@ public record MemberChangeInput(
    * @param effectiveDate effective date, within the policy period
    */
   public record Line(
-      EbMemberChange.Action action, String employeeNo, EbMember.Data member, LocalDate effectiveDate) {}
+      EbMemberChange.Action action,
+      String employeeNo,
+      EbMember.Data member,
+      LocalDate effectiveDate) {}
 }

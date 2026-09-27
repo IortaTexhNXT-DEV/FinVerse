@@ -59,7 +59,8 @@ public class MemberChangeMail {
   Long relay(EbProgramme programme, EbProgrammeLine line, EbMemberChange change) {
     if (line.getIncumbentInsurer() == null) {
       throw new BusinessRuleException(
-          "EB_LINE_NO_INSURER", "Line " + line.getLineNo() + " has no insurer to relay the change to");
+          "EB_LINE_NO_INSURER",
+          "Line " + line.getLineNo() + " has no insurer to relay the change to");
     }
     InsurerProfile insurer = parties.insurer(programme.getCompanyId(), line.getIncumbentInsurer());
     Map<String, Object> values = parties.values(programme, null);
@@ -71,15 +72,22 @@ public class MemberChangeMail {
         change.getLines().stream()
             .map(
                 l ->
-                    l.getSortOrder() + ". " + l.getAction().name().replace('_', ' ') + " "
+                    l.getSortOrder()
+                        + ". "
+                        + l.getAction().name().replace('_', ' ')
+                        + " "
                         + l.getEmployeeNo()
-                        + (l.getLastName() == null ? "" : " " + l.getLastName() + ", " + l.getFirstName())
+                        + (l.getLastName() == null
+                            ? ""
+                            : " " + l.getLastName() + ", " + l.getFirstName())
                         + (l.getPlanCode() == null ? "" : ", plan " + l.getPlanCode())
-                        + ", effective " + EbParties.date(l.getEffectiveDate()))
+                        + ", effective "
+                        + EbParties.date(l.getEffectiveDate()))
             .collect(Collectors.joining("\n")));
     MergedText text = templates.merge(EbCodes.TEMPLATE_MEMBER_CHANGE_RELAY, values);
     List<Long> files =
-        documents.all(new AttachmentTarget(EbCodes.ENTITY_MEMBER_CHANGE, change.getId().toString()))
+        documents
+            .all(new AttachmentTarget(EbCodes.ENTITY_MEMBER_CHANGE, change.getId().toString()))
             .stream()
             .map(Attachment::getId)
             .toList();

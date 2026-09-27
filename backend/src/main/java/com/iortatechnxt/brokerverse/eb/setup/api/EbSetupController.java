@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 /** EB Setup (FR-EB-034, 042): threshold rules and required documents with maker-checker. */
 @RestController
 @RequestMapping("/api/v1/eb/setup")
-public class SetupController {
+public class EbSetupController {
 
   private static final String VIEW = "hasAuthority('EB_VIEW')";
   private static final String SETUP = "hasAuthority('EB_SETUP')";
@@ -34,7 +34,7 @@ public class SetupController {
    *
    * @param setup EB set-up
    */
-  public SetupController(EbSetupService setup) {
+  public EbSetupController(EbSetupService setup) {
     this.setup = setup;
   }
 
@@ -136,7 +136,9 @@ public class SetupController {
   @PutMapping("/required-documents/{id}")
   @PreAuthorize(SETUP)
   public RequiredDocumentResponse updateRequired(
-      @PathVariable Long id, @RequestParam Long companyId, @RequestBody EbRequiredDocument.Data data) {
+      @PathVariable Long id,
+      @RequestParam Long companyId,
+      @RequestBody EbRequiredDocument.Data data) {
     return RequiredDocumentResponse.from(setup.updateRequired(companyId, id, data));
   }
 

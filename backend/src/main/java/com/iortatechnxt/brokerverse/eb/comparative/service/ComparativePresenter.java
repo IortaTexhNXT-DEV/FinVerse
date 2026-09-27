@@ -44,7 +44,7 @@ public class ComparativePresenter {
 
   private static final String PDF = "application/pdf";
 
-  private final ComparativeService comparatives;
+  private final EbComparativeService comparatives;
   private final ComparativeExport export;
   private final EbRecords records;
   private final EbParties parties;
@@ -75,7 +75,7 @@ public class ComparativePresenter {
    */
   @SuppressWarnings("java:S107") // constructor injection
   public ComparativePresenter(
-      ComparativeService comparatives,
+      EbComparativeService comparatives,
       ComparativeExport export,
       EbRecords records,
       EbParties parties,

@@ -54,7 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class ProposalService {
+public class EbProposalService {
 
   private static final Set<EbCycleStage> ENTRY_STAGES =
       Set.of(EbCycleStage.PROPOSALS, EbCycleStage.INCUMBENT_TERMS, EbCycleStage.REVISION);
@@ -67,7 +67,7 @@ public class ProposalService {
   private final EbTorRepository tors;
   private final EbRecords records;
   private final EbParties parties;
-  private final ProposalRules rules;
+  private final EbProposalRules rules;
   private final EbDocumentService documents;
   private final EbMailer mailer;
   private final DocumentNumberService numbers;
@@ -95,14 +95,14 @@ public class ProposalService {
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // constructor injection
-  public ProposalService(
+  public EbProposalService(
       EbProposalRepository proposals,
       EbInsurerRequestRepository requests,
       EbRevisionRequestRepository revisions,
       EbTorRepository tors,
       EbRecords records,
       EbParties parties,
-      ProposalRules rules,
+      EbProposalRules rules,
       EbDocumentService documents,
       EbMailer mailer,
       DocumentNumberService numbers,
@@ -181,13 +181,19 @@ public class ProposalService {
         EbCodes.ENTITY_PROPOSAL,
         number,
         AuditAction.CREATE,
-        origin.kind() + " of " + insurer.getName() + " version " + saved.getVersionNo()
-            + " entered on " + cycle.getCycleNo());
+        origin.kind()
+            + " of "
+            + insurer.getName()
+            + " version "
+            + saved.getVersionNo()
+            + " entered on "
+            + cycle.getCycleNo());
     return saved;
   }
 
   private Set<Long> torItemIds(EbCycle cycle) {
-    return tors.findFirstByCycleIdAndStatusOrderByVersionNoDesc(cycle.getId(), EbTor.Status.RELEASED)
+    return tors.findFirstByCycleIdAndStatusOrderByVersionNoDesc(
+            cycle.getId(), EbTor.Status.RELEASED)
         .map(t -> t.getItems().stream().map(EbTorItem::getId).collect(Collectors.toSet()))
         .orElse(Set.of());
   }
@@ -200,7 +206,7 @@ public class ProposalService {
             .filter(r -> r.openTarget(code).isPresent())
             .reduce((a, b) -> b);
     if (revision.isPresent()) {
-      ProposalRules.requireRevisionAnswered(revision.get(), input.items());
+      EbProposalRules.requireRevisionAnswered(revision.get(), input.items());
       return new Origin(EbProposal.Kind.REVISED, Optional.empty(), revision);
     }
     Optional<EbInsurerRequest> request =

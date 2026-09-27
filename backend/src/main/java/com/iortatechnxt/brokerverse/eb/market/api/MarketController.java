@@ -14,9 +14,9 @@ import com.iortatechnxt.brokerverse.eb.market.api.dto.MarketDtos.RevisionRequest
 import com.iortatechnxt.brokerverse.eb.market.api.dto.MarketDtos.RevisionResponse;
 import com.iortatechnxt.brokerverse.eb.market.api.dto.MarketDtos.TorItemsRequest;
 import com.iortatechnxt.brokerverse.eb.market.api.dto.MarketDtos.TorResponse;
+import com.iortatechnxt.brokerverse.eb.market.service.EbProposalService;
 import com.iortatechnxt.brokerverse.eb.market.service.InsurerRequestService;
 import com.iortatechnxt.brokerverse.eb.market.service.ProposalInput;
-import com.iortatechnxt.brokerverse.eb.market.service.ProposalService;
 import com.iortatechnxt.brokerverse.eb.market.service.RevisionService;
 import com.iortatechnxt.brokerverse.eb.market.service.TorService;
 import com.iortatechnxt.brokerverse.eb.service.EbParties;
@@ -50,7 +50,7 @@ public class MarketController {
 
   private final TorService tors;
   private final InsurerRequestService requests;
-  private final ProposalService proposals;
+  private final EbProposalService proposals;
   private final RevisionService revisions;
   private final EbParties parties;
   private final ObjectMapper json;
@@ -68,7 +68,7 @@ public class MarketController {
   public MarketController(
       TorService tors,
       InsurerRequestService requests,
-      ProposalService proposals,
+      EbProposalService proposals,
       RevisionService revisions,
       EbParties parties,
       ObjectMapper json) {
@@ -104,7 +104,9 @@ public class MarketController {
   @PutMapping("/cycles/{cycleId}/tor")
   @PreAuthorize(MARKET)
   public TorResponse saveTor(
-      @PathVariable Long cycleId, @RequestParam Long companyId, @RequestBody TorItemsRequest request) {
+      @PathVariable Long cycleId,
+      @RequestParam Long companyId,
+      @RequestBody TorItemsRequest request) {
     return TorResponse.from(tors.saveItems(companyId, cycleId, request.items()));
   }
 
@@ -146,7 +148,9 @@ public class MarketController {
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(MARKET)
   public List<RequestResponse> send(
-      @PathVariable Long cycleId, @RequestParam Long companyId, @RequestBody InsurersRequest request) {
+      @PathVariable Long cycleId,
+      @RequestParam Long companyId,
+      @RequestBody InsurersRequest request) {
     return requests.send(companyId, cycleId, request.insurerCodes()).stream()
         .map(r -> map(companyId, r))
         .toList();
@@ -163,8 +167,11 @@ public class MarketController {
   @PostMapping("/requests/{requestId}/close")
   @PreAuthorize(MARKET)
   public RequestResponse close(
-      @PathVariable Long requestId, @RequestParam Long companyId, @RequestBody CloseRequest request) {
-    return map(companyId, requests.close(companyId, requestId, request.declined(), request.reason()));
+      @PathVariable Long requestId,
+      @RequestParam Long companyId,
+      @RequestBody CloseRequest request) {
+    return map(
+        companyId, requests.close(companyId, requestId, request.declined(), request.reason()));
   }
 
   /**
@@ -176,7 +183,8 @@ public class MarketController {
    */
   @GetMapping("/cycles/{cycleId}/proposals")
   @PreAuthorize(VIEW)
-  public List<ProposalResponse> proposals(@PathVariable Long cycleId, @RequestParam Long companyId) {
+  public List<ProposalResponse> proposals(
+      @PathVariable Long cycleId, @RequestParam Long companyId) {
     return proposals.ofCycle(companyId, cycleId).stream().map(p -> map(companyId, p)).toList();
   }
 
@@ -189,7 +197,9 @@ public class MarketController {
    * @param file the insurer's document
    * @return the proposal
    */
-  @PostMapping(value = "/cycles/{cycleId}/proposals", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(
+      value = "/cycles/{cycleId}/proposals",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(MARKET)
   public ProposalResponse record(
@@ -240,7 +250,9 @@ public class MarketController {
   @PostMapping("/proposals/{proposalId}/reject")
   @PreAuthorize(MARKET)
   public ProposalResponse reject(
-      @PathVariable Long proposalId, @RequestParam Long companyId, @RequestBody ReasonRequest request) {
+      @PathVariable Long proposalId,
+      @RequestParam Long companyId,
+      @RequestBody ReasonRequest request) {
     return map(companyId, proposals.reject(companyId, proposalId, request.reason()));
   }
 
@@ -253,7 +265,8 @@ public class MarketController {
    */
   @GetMapping("/cycles/{cycleId}/revisions")
   @PreAuthorize(VIEW)
-  public List<RevisionResponse> revisions(@PathVariable Long cycleId, @RequestParam Long companyId) {
+  public List<RevisionResponse> revisions(
+      @PathVariable Long cycleId, @RequestParam Long companyId) {
     return revisions.ofCycle(companyId, cycleId).stream().map(RevisionResponse::from).toList();
   }
 
@@ -269,7 +282,9 @@ public class MarketController {
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(MARKET)
   public RevisionResponse revise(
-      @PathVariable Long cycleId, @RequestParam Long companyId, @RequestBody RevisionRequestBody request) {
+      @PathVariable Long cycleId,
+      @RequestParam Long companyId,
+      @RequestBody RevisionRequestBody request) {
     return RevisionResponse.from(
         revisions.request(
             companyId,

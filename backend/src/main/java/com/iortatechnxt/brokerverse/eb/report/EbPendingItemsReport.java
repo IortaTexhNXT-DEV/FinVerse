@@ -75,7 +75,8 @@ public class EbPendingItemsReport implements ReportDefinition {
             .map(
                 r -> {
                   LocalDate due = (LocalDate) r.get("due_date");
-                  long age = "PENDING".equals(r.get(STATUS)) ? ChronoUnit.DAYS.between(due, end) : 0;
+                  long age =
+                      "PENDING".equals(r.get(STATUS)) ? ChronoUnit.DAYS.between(due, end) : 0;
                   r.put("age", Math.max(0, age));
                   return EbReportSupport.relabel(r, "item_type", "responsible", STATUS);
                 })

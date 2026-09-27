@@ -76,11 +76,21 @@ public final class MarketDtos {
    * @param requirement requirement
    */
   public record TorItemResponse(
-      Long id, int sortOrder, String benefitLine, String planCode, String description, String requirement) {
+      Long id,
+      int sortOrder,
+      String benefitLine,
+      String planCode,
+      String description,
+      String requirement) {
 
     static TorItemResponse from(EbTorItem i) {
       return new TorItemResponse(
-          i.getId(), i.getSortOrder(), i.getBenefitLine(), i.getPlanCode(), i.getDescription(), i.getRequirement());
+          i.getId(),
+          i.getSortOrder(),
+          i.getBenefitLine(),
+          i.getPlanCode(),
+          i.getDescription(),
+          i.getRequirement());
     }
   }
 
@@ -274,7 +284,10 @@ public final class MarketDtos {
                           i.getTorItemId(), i.getOfferedValue(), i.isDeviation(), i.getRemark()))
               .toList(),
           p.getFactors().stream()
-              .map(f -> new EbProposalFactor.Data(f.getFactorCode(), f.getFactorValue(), f.getRating()))
+              .map(
+                  f ->
+                      new EbProposalFactor.Data(
+                          f.getFactorCode(), f.getFactorValue(), f.getRating()))
               .toList());
     }
   }
@@ -332,7 +345,10 @@ public final class MarketDtos {
               .map(i -> new RevisionService.Change(i.getTorItemId(), i.getRequestedChange()))
               .toList(),
           r.getTargets().stream()
-              .map(t -> new Target(t.getInsurerCode(), t.getStatus().name(), t.getAnsweredProposalId()))
+              .map(
+                  t ->
+                      new Target(
+                          t.getInsurerCode(), t.getStatus().name(), t.getAnsweredProposalId()))
               .toList());
     }
   }

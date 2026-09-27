@@ -22,9 +22,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The parties an EB step writes to and the values its templates share: insurers and their
- * placement mailboxes (catalogue), the client's HR contacts and the account officer; the programme
- * values of the {@code EB_*} templates ({@code {{programmeName}}}, {@code {{clientName}}}, ...).
+ * The parties an EB step writes to and the values its templates share: insurers and their placement
+ * mailboxes (catalogue), the client's HR contacts and the account officer; the programme values of
+ * the {@code EB_*} templates ({@code {{programmeName}}}, {@code {{clientName}}}, ...).
  */
 @Component
 @Transactional(readOnly = true)
@@ -66,7 +66,8 @@ public class EbParties {
         .filter(i -> i.getPartyCode().equals(code.strip()))
         .findFirst()
         .orElseThrow(
-            () -> new BusinessRuleException("EB_INSURER_UNKNOWN", "Insurer " + code + " is unknown"));
+            () ->
+                new BusinessRuleException("EB_INSURER_UNKNOWN", "Insurer " + code + " is unknown"));
   }
 
   /**

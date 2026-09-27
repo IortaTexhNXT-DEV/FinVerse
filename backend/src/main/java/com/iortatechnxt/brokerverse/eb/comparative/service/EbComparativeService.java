@@ -54,7 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class ComparativeService {
+public class EbComparativeService {
 
   private static final Set<EbCycleStage> BUILD_STAGES =
       Set.of(EbCycleStage.INCUMBENT_TERMS, EbCycleStage.PROPOSALS, EbCycleStage.REVISION);
@@ -101,7 +101,7 @@ public class ComparativeService {
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // constructor injection
-  public ComparativeService(
+  public EbComparativeService(
       EbComparativeRepository comparatives,
       EbCommentRepository comments,
       EbProposalRepository proposals,
@@ -173,10 +173,14 @@ public class ComparativeService {
         .filter(c -> c.getStatus() != EbComparative.Status.SUPERSEDED)
         .forEach(EbComparative::supersede);
     LocalDate lastProposal =
-        validated.stream().map(EbProposal::getReceivedOn).max(Comparator.naturalOrder()).orElseThrow();
+        validated.stream()
+            .map(EbProposal::getReceivedOn)
+            .max(Comparator.naturalOrder())
+            .orElseThrow();
     String number =
         numbers.next(
-            EbCodes.series(EbCodes.PREFIX_COMPARATIVE, BusinessClock.currentYear(clock).getValue()));
+            EbCodes.series(
+                EbCodes.PREFIX_COMPARATIVE, BusinessClock.currentYear(clock).getValue()));
     EbComparative comparative =
         new EbComparative(
             cycle,
@@ -184,13 +188,17 @@ public class ComparativeService {
             earlier.isEmpty() ? 1 : earlier.get(0).getVersionNo() + 1,
             write(matrix),
             workingDays.plus(companyId, lastProposal, parameters.comparativeDays()));
-    matrix.lines().forEach(l -> comparative.addLine(l.benefitLine(), l.lowestPremium(), l.lowestProposalId()));
+    matrix
+        .lines()
+        .forEach(
+            l -> comparative.addLine(l.benefitLine(), l.lowestPremium(), l.lowestProposalId()));
     EbComparative saved = comparatives.save(comparative);
     workflow.systemTransition(
         EbCodes.ENTITY_CYCLE,
         cycle.getId().toString(),
         "build_comparative",
-        TransitionNote.comment("Comparative " + number + " of " + validated.size() + " proposal(s)"));
+        TransitionNote.comment(
+            "Comparative " + number + " of " + validated.size() + " proposal(s)"));
     activity.received(cycle, TatActivity.PROPOSAL_TO_CLIENT, number, programme.getAccountOfficer());
     audit.record(
         EbCodes.ENTITY_COMPARATIVE,
@@ -201,8 +209,8 @@ public class ComparativeService {
   }
 
   private List<EbProposal> validated(EbCycle cycle) {
-    return proposals
-        .findByCycleIdAndStatusInOrderByIdAsc(cycle.getId(), Set.of(EbProposal.Status.VALIDATED));
+    return proposals.findByCycleIdAndStatusInOrderByIdAsc(
+        cycle.getId(), Set.of(EbProposal.Status.VALIDATED));
   }
 
   private static List<String> benefitLines(EbProgramme programme) {
@@ -214,7 +222,8 @@ public class ComparativeService {
   }
 
   private List<EbTorItem> torItems(EbCycle cycle) {
-    return tors.findFirstByCycleIdAndStatusOrderByVersionNoDesc(cycle.getId(), EbTor.Status.RELEASED)
+    return tors.findFirstByCycleIdAndStatusOrderByVersionNoDesc(
+            cycle.getId(), EbTor.Status.RELEASED)
         .map(EbTor::getItems)
         .orElse(List.of());
   }
@@ -262,7 +271,10 @@ public class ComparativeService {
       Long companyId, Long comparativeId, Map<String, Long> recommendation, String summary) {
     EbComparative comparative = require(companyId, comparativeId);
     Set<Long> compared =
-        Set.copyOf(matrix(comparative).proposals().stream().map(ComparativeMatrix.Column::proposalId).toList());
+        Set.copyOf(
+            matrix(comparative).proposals().stream()
+                .map(ComparativeMatrix.Column::proposalId)
+                .toList());
     recommendation.forEach(
         (line, proposalId) -> {
           EbProposal proposal =

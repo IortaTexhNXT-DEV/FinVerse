@@ -1,10 +1,10 @@
 package com.iortatechnxt.brokerverse.eb.confirmation.service;
 
 import com.iortatechnxt.brokerverse.account.domain.AccountData.Mortgage;
+import com.iortatechnxt.brokerverse.account.domain.BusinessType;
 import com.iortatechnxt.brokerverse.account.domain.PaymentArrangement;
 import com.iortatechnxt.brokerverse.account.domain.RiskItemData;
 import com.iortatechnxt.brokerverse.account.service.AccountDraft;
-import com.iortatechnxt.brokerverse.account.domain.BusinessType;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService.ProductFilter;
@@ -68,10 +68,7 @@ public class PlacementDrafts {
    * @return line placement
    */
   public LinePlacement placement(
-      EbProgramme programme,
-      EbCycle cycle,
-      EbClientConfirmation.Line choice,
-      EbProposal proposal) {
+      EbProgramme programme, EbCycle cycle, EbClientConfirmation.Line choice, EbProposal proposal) {
     EbProgrammeLine line = programme.line(choice.getLineNo());
     LocalDate from = inception(cycle, line);
     String segment = clients.get(programme.getClientId()).getMarketSegment();
@@ -111,7 +108,9 @@ public class PlacementDrafts {
     if (line.getProductCode() != null) {
       return line.getProductCode();
     }
-    return catalog.products(new ProductFilter(line.getBenefitLine(), null, null, null, true)).stream()
+    return catalog
+        .products(new ProductFilter(line.getBenefitLine(), null, null, null, true))
+        .stream()
         .filter(RiskProduct::isSellable)
         .map(RiskProduct::getCode)
         .findFirst()
@@ -133,7 +132,12 @@ public class PlacementDrafts {
     BigDecimal premium = choice.getAnnualPremium();
     BigDecimal tsi = choice.getSumInsured();
     String description =
-        choice.getBenefitLine() + " - " + proposal.getProposalNo() + " (" + plans(proposal, choice) + ")";
+        choice.getBenefitLine()
+            + " - "
+            + proposal.getProposalNo()
+            + " ("
+            + plans(proposal, choice)
+            + ")";
     if (tsi == null || tsi.signum() == 0) {
       return RiskItemData.generic(description, premium, HUNDRED);
     }

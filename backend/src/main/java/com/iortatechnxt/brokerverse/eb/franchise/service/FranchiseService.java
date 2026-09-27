@@ -18,9 +18,7 @@ import com.iortatechnxt.brokerverse.eb.domain.EbFranchiseRequestRepository;
 import com.iortatechnxt.brokerverse.eb.domain.EbProgramme;
 import com.iortatechnxt.brokerverse.eb.domain.TatActivity;
 import com.iortatechnxt.brokerverse.eb.service.EbActivityLog;
-import com.iortatechnxt.brokerverse.eb.service.EbMailer;
 import com.iortatechnxt.brokerverse.eb.service.EbParameters;
-import com.iortatechnxt.brokerverse.eb.service.EbParties;
 import com.iortatechnxt.brokerverse.eb.service.EbRecords;
 import com.iortatechnxt.brokerverse.eb.service.EbWorkingDays;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
@@ -39,8 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Franchise requests of a cycle that goes to market (BRID-026, 027, 029; FR-EB-032, 033): the AO
- * selects the insurers; each request (EBF number, {@code EB_FRANCHISE} work case) is e-mailed to the
- * insurer's placement mailboxes with the Broker on Record and the documents required for the
+ * selects the insurers; each request (EBF number, {@code EB_FRANCHISE} work case) is e-mailed to
+ * the insurer's placement mailboxes with the Broker on Record and the documents required for the
  * process FRANCHISE, due {@code EB_FRANCHISE_TAT_DAYS} working days later. The AO records the
  * insurer's decision with its reply as evidence and advises the client. Only an approved insurer
  * receives the TOR.
@@ -136,7 +134,10 @@ public class FranchiseService {
   private static Set<String> distinct(List<String> insurerCodes) {
     Set<String> codes = new LinkedHashSet<>();
     if (insurerCodes != null) {
-      insurerCodes.stream().filter(c -> c != null && !c.isBlank()).map(String::strip).forEach(codes::add);
+      insurerCodes.stream()
+          .filter(c -> c != null && !c.isBlank())
+          .map(String::strip)
+          .forEach(codes::add);
     }
     if (codes.isEmpty()) {
       throw new BusinessRuleException("EB_INSURER_REQUIRED", "Select the insurers");
@@ -284,8 +285,7 @@ public class FranchiseService {
             .orElseThrow(() -> new ResourceNotFoundException(EbCodes.ENTITY_FRANCHISE, requestId));
     transition(request, "expire", TransitionNote.comment("No decision after the franchise TAT"));
     activity.released(TatActivity.FRANCHISE_DECISION, request.getFranchiseNo(), "EXPIRED");
-    audit.record(
-        EbCodes.ENTITY_FRANCHISE, request.getFranchiseNo(), AuditAction.UPDATE, "Expired");
+    audit.record(EbCodes.ENTITY_FRANCHISE, request.getFranchiseNo(), AuditAction.UPDATE, "Expired");
   }
 
   /**

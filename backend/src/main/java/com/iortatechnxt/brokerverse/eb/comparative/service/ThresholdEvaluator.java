@@ -68,9 +68,15 @@ public class ThresholdEvaluator {
   }
 
   private static String describe(EbThresholdRule rule, String line) {
-    DecimalFormat amount = new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+    DecimalFormat amount =
+        new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
     String measure = rule.getMeasure() == EbThresholdRule.Measure.TSI ? "TSI" : "annual premium";
-    return line + " " + measure + " at or above " + rule.getCurrency() + " "
+    return line
+        + " "
+        + measure
+        + " at or above "
+        + rule.getCurrency()
+        + " "
         + amount.format(rule.getAmount());
   }
 

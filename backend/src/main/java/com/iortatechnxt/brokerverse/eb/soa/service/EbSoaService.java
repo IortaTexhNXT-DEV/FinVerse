@@ -47,7 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class SoaService {
+public class EbSoaService {
 
   private static final Set<String> SOA_FILES = Set.of("pdf", "xls", "xlsx");
 
@@ -79,7 +79,7 @@ public class SoaService {
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // constructor injection
-  public SoaService(
+  public EbSoaService(
       EbSoaRepository soas,
       EbRecords records,
       EbParties parties,
@@ -146,8 +146,10 @@ public class SoaService {
             .get(0)
             .getAttachmentId();
     String number =
-        numbers.next(EbCodes.series(EbCodes.PREFIX_SOA, BusinessClock.currentYear(clock).getValue()));
-    EbSoa soa = soas.save(new EbSoa(programme, number, clean, new EbSoa.StoredFile(attachment, hash)));
+        numbers.next(
+            EbCodes.series(EbCodes.PREFIX_SOA, BusinessClock.currentYear(clock).getValue()));
+    EbSoa soa =
+        soas.save(new EbSoa(programme, number, clean, new EbSoa.StoredFile(attachment, hash)));
     soa.linkInvoices(billed);
     documents.linkAll(
         List.of(attachment),
@@ -165,13 +167,20 @@ public class SoaService {
                 EbCodes.SOA_LINK + soa.getId(),
                 programme.getTeamCode()),
             null));
-    activity.received(companyId, programme.getId(), TatActivity.SOA_VALIDATION, number, currentUser.username());
+    activity.received(
+        companyId, programme.getId(), TatActivity.SOA_VALIDATION, number, currentUser.username());
     audit.record(
         EbCodes.ENTITY_SOA,
         number,
         AuditAction.CREATE,
-        "SOA " + clean.insurerSoaNo() + " of " + insurer.getName() + " received, amount "
-            + clean.currency() + " " + clean.amount().toPlainString());
+        "SOA "
+            + clean.insurerSoaNo()
+            + " of "
+            + insurer.getName()
+            + " received, amount "
+            + clean.currency()
+            + " "
+            + clean.amount().toPlainString());
     return soa;
   }
 
@@ -179,7 +188,9 @@ public class SoaService {
     if (intake.insurerSoaNo() == null || intake.insurerSoaNo().isBlank()) {
       throw new BusinessRuleException("EB_SOA_NO_REQUIRED", "Enter the SOA number");
     }
-    if (intake.periodFrom() == null || intake.periodTo() == null || intake.periodTo().isBefore(intake.periodFrom())) {
+    if (intake.periodFrom() == null
+        || intake.periodTo() == null
+        || intake.periodTo().isBefore(intake.periodFrom())) {
       throw new BusinessRuleException(
           "EB_SOA_PERIOD", "Enter the period of the SOA, the end on or after the start");
     }
@@ -189,7 +200,8 @@ public class SoaService {
     LocalDate today = BusinessClock.today(clock);
     LocalDate received = intake.receivedOn() == null ? today : intake.receivedOn();
     if (received.isAfter(today)) {
-      throw new BusinessRuleException("EB_SOA_DATE_FUTURE", "The date received cannot be after today");
+      throw new BusinessRuleException(
+          "EB_SOA_DATE_FUTURE", "The date received cannot be after today");
     }
     return new EbSoa.Intake(
         insurer.getPartyCode(),
@@ -197,7 +209,9 @@ public class SoaService {
         intake.periodFrom(),
         intake.periodTo(),
         intake.amount(),
-        intake.currency() == null || intake.currency().isBlank() ? "PHP" : intake.currency().strip(),
+        intake.currency() == null || intake.currency().isBlank()
+            ? "PHP"
+            : intake.currency().strip(),
         received,
         intake.remarks());
   }
@@ -215,13 +229,15 @@ public class SoaService {
     if (soas.existsByCompanyIdAndInsurerCodeAndInsurerSoaNoIgnoreCaseAndStatusNot(
         companyId, insurer.getPartyCode(), soaNo, EbSoa.Status.REJECTED)) {
       throw new BusinessRuleException(
-          "EB_SOA_DUPLICATE", "SOA " + soaNo + " of " + insurer.getName() + " is already registered");
+          "EB_SOA_DUPLICATE",
+          "SOA " + soaNo + " of " + insurer.getName() + " is already registered");
     }
     soas.findFirstByCompanyIdAndFileHashAndStatusNot(companyId, hash, EbSoa.Status.REJECTED)
         .ifPresent(
             s -> {
               throw new BusinessRuleException(
-                  "EB_SOA_DUPLICATE_FILE", "This SOA file is already registered as " + s.getSoaNo());
+                  "EB_SOA_DUPLICATE_FILE",
+                  "This SOA file is already registered as " + s.getSoaNo());
             });
   }
 
@@ -251,12 +267,20 @@ public class SoaService {
     EbSoa soa = require(companyId, soaId);
     requireStatus(soa, EbSoa.Status.RECEIVED);
     if (invoiceNos != null) {
-      soa.linkInvoices(invoices.requireOfProgramme(records.programme(companyId, soa.getProgrammeId()), invoiceNos));
+      soa.linkInvoices(
+          invoices.requireOfProgramme(
+              records.programme(companyId, soa.getProgrammeId()), invoiceNos));
     }
     soa.validated(currentUser.username(), clock.instant());
-    workflow.systemTransition(EbCodes.ENTITY_SOA, soa.getId().toString(), "validate", TransitionNote.NONE);
+    workflow.systemTransition(
+        EbCodes.ENTITY_SOA, soa.getId().toString(), "validate", TransitionNote.NONE);
     activity.released(TatActivity.SOA_VALIDATION, soa.getSoaNo(), "Validated");
-    activity.received(companyId, soa.getProgrammeId(), TatActivity.RELEASE, soa.getSoaNo(), currentUser.username());
+    activity.received(
+        companyId,
+        soa.getProgrammeId(),
+        TatActivity.RELEASE,
+        soa.getSoaNo(),
+        currentUser.username());
     audit.record(EbCodes.ENTITY_SOA, soa.getSoaNo(), AuditAction.AUTHORIZE, "Validated");
     return soa;
   }
@@ -278,7 +302,10 @@ public class SoaService {
     }
     soa.rejected(reasonCode.strip());
     workflow.systemTransition(
-        EbCodes.ENTITY_SOA, soa.getId().toString(), "reject", new TransitionNote(reasonCode.strip(), remarks));
+        EbCodes.ENTITY_SOA,
+        soa.getId().toString(),
+        "reject",
+        new TransitionNote(reasonCode.strip(), remarks));
     activity.released(TatActivity.SOA_VALIDATION, soa.getSoaNo(), "Rejected");
     audit.record(EbCodes.ENTITY_SOA, soa.getSoaNo(), AuditAction.REJECT, "Rejected: " + reasonCode);
     return soa;
@@ -293,8 +320,7 @@ public class SoaService {
    */
   @Transactional(readOnly = true)
   public EbSoa require(Long companyId, Long soaId) {
-    return soas
-        .findByIdAndCompanyId(soaId, companyId)
+    return soas.findByIdAndCompanyId(soaId, companyId)
         .orElseThrow(() -> new ResourceNotFoundException(EbCodes.ENTITY_SOA, soaId));
   }
 
@@ -307,7 +333,8 @@ public class SoaService {
   static void requireStatus(EbSoa soa, EbSoa.Status status) {
     if (soa.getStatus() != status) {
       throw new BusinessRuleException(
-          "EB_SOA_STATUS", "SOA " + soa.getSoaNo() + " is " + soa.getStatus().name().toLowerCase(Locale.ROOT));
+          "EB_SOA_STATUS",
+          "SOA " + soa.getSoaNo() + " is " + soa.getStatus().name().toLowerCase(Locale.ROOT));
     }
   }
 }

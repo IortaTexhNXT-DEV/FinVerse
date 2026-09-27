@@ -142,7 +142,8 @@ public class EbClientConfirmation extends EbCycleRecord {
    * @param attachmentId the stored evidence
    * @param remarks remarks, may be null
    */
-  public record Evidence(String channel, LocalDate confirmedOn, Long attachmentId, String remarks) {}
+  public record Evidence(
+      String channel, LocalDate confirmedOn, Long attachmentId, String remarks) {}
 
   /**
    * The chosen proposal of a programme line.

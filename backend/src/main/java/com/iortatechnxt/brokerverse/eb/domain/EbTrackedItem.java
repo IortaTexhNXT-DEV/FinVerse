@@ -131,8 +131,8 @@ public class EbTrackedItem extends BaseEntity {
   }
 
   /**
-   * Links the item to the roster member and the member change it is expected for (FR-EB-057: an
-   * HMO card for each added member, the billing of each member change).
+   * Links the item to the roster member and the member change it is expected for (FR-EB-057: an HMO
+   * card for each added member, the billing of each member change).
    *
    * @param member roster member, may be null
    * @param change member change, may be null

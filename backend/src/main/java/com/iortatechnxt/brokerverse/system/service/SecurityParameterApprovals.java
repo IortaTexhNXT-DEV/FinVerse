@@ -122,7 +122,7 @@ public class SecurityParameterApprovals {
     SystemParameter p = parameters.get(key);
     String value = p.getPendingValue();
     String requestedBy = p.getPendingBy();
-    boolean withdrawn = currentUser.username().equalsIgnoreCase(String.valueOf(requestedBy));
+    boolean withdrawn = currentUser.username().equals(requestedBy);
     if (!withdrawn && (reason == null || reason.isBlank())) {
       throw new BusinessRuleException("REASON_REQUIRED", "Give the reason for the rejection");
     }

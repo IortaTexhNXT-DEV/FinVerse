@@ -74,17 +74,16 @@ The scope is the maintenance of **package products**: pre-arranged insurance pro
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | Product Maintenance (Package) BRD, pages 10-35 of the BRD-3 pack | v1.0, 24-Nov-2025; approved Nov-2025 to Jan-2026 | `docs/source-documents/Product Maintenance.pdf` |
-| R2 | Product Maintenance Addendum (Workshop), pages 1-9 of the BRD-3 pack | v1.1, 10-Apr-2026; signed 12 to 17-Apr-2026 | same file |
-| R3 | Earlier signed version of the main BRD (BRQID numbering), pages 36-61; used only to trace changes | 16-Nov-2025 | same file |
-| R4 | BDOI Product Maintenance (BRD-3) requirements baseline and fit/gap | current | `docs/requirements/BDOI_PM_BRD_SPEC.md` |
-| R5 | Product Maintenance build design, including the as-built notes of sections 15-17 | current | `docs/architecture/PRODUCT_MAINTENANCE_DESIGN.md` |
-| R6 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R7 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
-| R8 | BRD-1 New Business requirements baseline (shared platform capabilities) | current | `docs/requirements/BDOI_NB_BRD_SPEC.md` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | Product Maintenance (Package) BRD, pages 10-35 of the BRD-3 pack | v1.0, 24-Nov-2025; approved Nov-2025 to Jan-2026 |
+| R2 | Product Maintenance Addendum (Workshop), pages 1-9 of the BRD-3 pack | v1.1, 10-Apr-2026; signed 12 to 17-Apr-2026 |
+| R3 | Earlier signed version of the main BRD (BRQID numbering), pages 36-61; used only to trace changes | 16-Nov-2025 |
+| R4 | BDOI Product Maintenance (BRD-3) requirements baseline | current |
+| R6 | Cross-BRD decisions and answered questions | current |
+| R7 | BDO UX guidelines (brand, screen patterns) | current |
+| R8 | BRD-1 New Business requirements baseline (shared platform capabilities) | current |
 
 Page references in this document ("p.18") are pages of the BRD-3 PDF (R1, R2).
 
@@ -131,7 +130,7 @@ Each FR in section 4 has the same parts:
 - **Notifications**, **audit** and numbered **acceptance criteria**. The acceptance criteria are the basis of the test cases of the BRD-3 test plan.
 
 > [!NOTE]
-> Values marked "default" (SLA hours, notice days, list entries) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a new build.
+> Values marked "default" (SLA hours, notice days, list entries) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a change to the system.
 
 <!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R4)" status=Class -->
 | Class | Meaning |
@@ -238,7 +237,7 @@ The addendum states that user roles "will be further defined in succeeding docum
 
 ## Permissions matrix
 
-The table below is the role-to-action matrix delivered with the build ("Y" = granted). The System Administrator maintains it through role-permission change requests (FR-PM-003). The User Access Matrix screen shows it by permission and by action class and exports it to Excel.
+The table below is the role-to-action matrix provided with the system ("Y" = granted). The System Administrator maintains it through role-permission change requests (FR-PM-003). The User Access Matrix screen shows it by permission and by action class and exports it to Excel.
 
 <!-- table: widths=4.7,1.29,1.29,1.29,1.29,1.29,1.29,1.29,1.29,1.29,1.29 caption="Role-to-action matrix for Product Maintenance (proposal until PQ17 / OQ48)" size=8 -->
 | Permission | MKT AO | MKT TL | TSU | TSU TL | TSU Head | MBS | Man Com | Bus. Admin | NB Appr. | Auditor |
@@ -307,7 +306,7 @@ actor: System
 priority: Must have
 screens: All Product Maintenance screens; User Access Matrix
 description:
-  - Every Product Maintenance screen, button and API call requires a permission (section 3.2). Permissions carry an action class (VIEW, CREATE, AMEND, APPROVE), so the matrix answers the addendum's question "who may create, amend, approve or only view" per area.
+  - Every Product Maintenance screen, button and action requires a permission (section 3.2). Permissions carry an action class (VIEW, CREATE, AMEND, APPROVE), so the matrix answers the addendum's question "who may create, amend, approve or only view" per area.
   - Menus show only the screens that the user's roles allow. Buttons for actions the user may not perform are hidden.
 preconditions:
   - "The user is logged in."
@@ -316,7 +315,7 @@ main_flow:
   - BIBS checks the user's permissions for that screen or action.
   - BIBS shows the screen or performs the action.
 alternate_flows:
-  - No permission. The screen is not in the menu; a direct link returns "You do not have access to this page". An API call is refused (HTTP 403) and logged.
+  - No permission. The screen is not in the menu; a direct link returns "You do not have access to this page". A direct request is refused and logged.
   - Segregation of duties. An action refused by a four-eyes rule (for example approving one's own request) is refused with its message even when the role has the permission.
 rules:
   - [R1, "Each permission has an action class: VIEW, CREATE, AMEND or APPROVE (table sec_permission_action).", Configurable, Role-permission change request (FR-PM-003)]
@@ -331,11 +330,11 @@ fields:
 notifications:
   - "None."
 audit:
-  - Refused API calls are logged with user, endpoint and time.
+  - Refused requests are logged with the user and time.
   - The Excel export of the matrix is audited.
 acceptance:
   - A Marketing AO sees Product Maintenance Home, Package Requests and the catalogue screens, and does not see the Validation Queue or TSU Workbench.
-  - A direct call to an approval endpoint by a user without the approval permission is refused and logged.
+  - A direct approval request by a user without the approval permission is refused and logged.
   - The User Access Matrix shows, for each role, which Product Maintenance areas it may view, create, amend and approve, and exports both views to Excel.
 ```
 
@@ -1895,7 +1894,7 @@ Parameter: Product Code (optional). Layout: landscape, grouped by product, versi
 
 ## Documents
 
-Documents are generated from versioned templates (FR-PM-013). The layouts below are the draft layouts delivered with the build; BDOI's own layouts replace them when provided (Q03).
+Documents are generated from versioned templates (FR-PM-013). The layouts below are the draft layouts provided with the system; BDOI's own layouts replace them when provided (Q03).
 
 <!-- table: widths=3.6,3.4,10 caption="Product Maintenance documents" size=8.5 -->
 | Template | Output | Sections |
@@ -2080,40 +2079,40 @@ The table lists every point where the delivered system does what the BRD asks in
 
 Every BRD-3 requirement is met by at least one FR. The screen and API columns name the main entry points.
 
-<!-- table: widths=2.2,3.4,5.2,5.8 caption="BRD ID to FR, screen and API" size=8 -->
-| BRD ID | FR | Screen | API |
+<!-- table: widths=2.2,3.4,5.2,5.2 caption="BRD ID to FR, screen and test cases" size=8 -->
+| BRD ID | FR | Screen | Test cases |
 |---|---|---|---|
-| BRPM.001 | FR-PM-001 | Login | /api/v1/auth/login |
-| BRPM.002 | FR-PM-002 | All; User Access Matrix | Permission checks; /nbadmin/access-matrix |
-| BRPM.003 | FR-PM-012 | Product page (Field Rules) | /catalog/field-rules |
-| BRPM.004 | FR-PM-012 | Product page (Field Rules) | /catalog/field-rules |
-| BRPM.005 | FR-PM-013 | Package Request page (downloads) | .../form.pdf, quotation-slip.pdf, package-slip.pdf |
-| BRPM.006 | FR-PM-052, FR-PM-045, FR-PM-071 | Products (Expired / Retired) | /catalog/products?lifecycle= |
-| BRPM.007 | FR-PM-050, FR-PM-051 | Package Version; Quotation; Premium Calculator | /catalog/products/{code}/versions; /catalog/rating/quote; /catalog/rate-scheme-exceptions |
-| BRPM.008 | FR-PM-020, FR-PM-021 | New Package Request; Package Requests | /product-maintenance/requests; .../submit; .../approve |
-| BRPM.009 | FR-PM-022, FR-PM-023 | TSU Workbench; Package Request page | .../recommend; .../tsu-approve |
-| BRPM.010 | FR-PM-032, FR-PM-033, FR-PM-036 | Package Request page (Negotiation) | .../rounds; .../terms-final |
-| BRPM.011 | FR-PM-020, FR-PM-024, FR-PM-045 | Package Requests; TSU Workbench | /product-maintenance/requests; .../prefill; .../retire |
-| BRPM.012 | FR-PM-030 | Package Request page (Negotiation) | .../rounds/{n}/quotation-slip/submit, approve; .../resend |
-| BRPM.013 | FR-PM-031, FR-PM-034, FR-PM-036 | Package Request page (Negotiation, Comparative) | .../responses/{rid}; .../release-to-marketing; .../accept-terms |
-| BRPM.014 | FR-PM-034 | Package Request page (Comparative) | .../comparatives; .../comparatives/master |
-| BRPM.015 | FR-PM-040, 041, 042, 043 | Requirements & Sign-off; Set-up; Validation Queue | .../submit-requirements; .../signoff; .../setup; /catalog/.../validate |
-| BRPM.016 | FR-PM-044 | Package Request page (Advisories) | /product-maintenance/advisories/{aid}/send |
-| BRPM.017 | FR-PM-060, FR-PM-061, FR-PM-044 | Package Expiry | /product-maintenance/expiry; .../renewal-requests |
-| BRPM.018 | FR-PM-071 | Reports | Report PM-PKG-STATUS |
-| BRPM.019 | FR-PM-070 | Product Maintenance Home | /product-maintenance/counts |
-| BRPM.020 | FR-PM-004 | E-mails and Documents tabs | Messaging outbox |
-| BRPM.021 | FR-PM-073, FR-PM-021 | Workflow panel | Workflow PM_PACKAGE_REQUEST |
-| BRPM.022 | FR-PM-072 | Notifications | Notifications; ProductMasterFeed |
-| BRPM.024 | FR-PM-005 | History tabs | Audit service |
-| PMADD01 | FR-PM-010 | Products; Coverages & Clauses | /catalog/lines, cover-types, coverages |
-| PMADD02 | FR-PM-011, FR-PM-014 | Package Version (Insurer Terms); Coverages & Clauses | /catalog/products/{code}/versions/{n}; /catalog/clauses |
-| PMADD03 | FR-PM-035 | Package Request page (Comparative) | .../comparatives (client view) |
-| PMADD04 | FR-PM-031, FR-PM-032 | Package Request page (Negotiation) | .../responses; .../rounds |
-| PMADD05 | FR-PM-002, FR-PM-003 | User Access Matrix; Access Requests | /nbadmin/access-matrix/by-action; /nbadmin/access-requests |
-| PMADD06 | FR-PM-043 | Validation Queue; Package Version | /catalog/.../submit, validate, return |
-| PMADD07 | FR-PM-080, FR-PM-081 | Incentive Criteria | /catalog/incentive-criteria |
-| PMADD08 | FR-PM-080, FR-PM-081 | Incentive Criteria | /catalog/incentive-criteria |
+| BRPM.001 | FR-PM-001 | Login | TC-PM-001.1, 001.2, 001.3, 001.4 (6 cases) |
+| BRPM.002 | FR-PM-002 | All; User Access Matrix | TC-PM-002.1, 002.2, 002.3, 002.4 (6 cases) |
+| BRPM.003 | FR-PM-012 | Product page (Field Rules) | TC-PM-012.1, 012.3, 012.4 (4 cases) |
+| BRPM.004 | FR-PM-012 | Product page (Field Rules) | TC-PM-012.1, 012.2, 012.3 (3 cases) |
+| BRPM.005 | FR-PM-013 | Package Request page (downloads) | TC-PM-013.1, 013.2, 013.3 (3 cases) |
+| BRPM.006 | FR-PM-052, FR-PM-045, FR-PM-071 | Products (Expired / Retired) | TC-PM-045.1, 045.2, 045.3, 052.1, 052.2, 052.3, 071.1, 071.2, 071.3 (14 cases) |
+| BRPM.007 | FR-PM-050, FR-PM-051 | Package Version; Quotation; Premium Calculator | TC-PM-050.1, 050.2, 050.3, 051.1, 051.2, 051.3, 051.4 (15 cases) |
+| BRPM.008 | FR-PM-020, FR-PM-021 | New Package Request; Package Requests | TC-PM-020.1, 020.2, 020.3, 020.4, 020.5, 021.1, 021.2, 021.3 (16 cases) |
+| BRPM.009 | FR-PM-022, FR-PM-023 | TSU Workbench; Package Request page | TC-PM-022.1, 022.2, 022.3, 023.1, 023.2, 023.3 (9 cases) |
+| BRPM.010 | FR-PM-032, FR-PM-033, FR-PM-036 | Package Request page (Negotiation) | TC-PM-032.1, 032.2, 032.3, 032.4, 033.1, 033.2, 033.3, 036.1, 036.2, 036.3 (16 cases) |
+| BRPM.011 | FR-PM-020, FR-PM-024, FR-PM-045 | Package Requests; TSU Workbench | TC-PM-020.1, 020.2, 020.3, 020.4, 020.5, 024.1, 024.2, 024.3, 024.4, 045.1, 045.2, 045.3 (22 cases) |
+| BRPM.012 | FR-PM-030 | Package Request page (Negotiation) | TC-PM-030.1, 030.2, 030.3, 030.4, 030.5 (7 cases) |
+| BRPM.013 | FR-PM-031, FR-PM-034, FR-PM-036 | Package Request page (Negotiation, Comparative) | TC-PM-031.1, 031.2, 031.3, 034.1, 034.2, 034.3, 034.4, 036.1, 036.2, 036.3 (17 cases) |
+| BRPM.014 | FR-PM-034 | Package Request page (Comparative) | TC-PM-034.1, 034.2, 034.3, 034.4 (5 cases) |
+| BRPM.015 | FR-PM-040, 041, 042, 043 | Requirements & Sign-off; Set-up; Validation Queue | TC-PM-040.1, 040.2, 040.3, 041.1, 041.2, 041.3, 041.4, 042.1, 042.2, 042.3, 042.4, 043.1, 043.2, 043.3, 043.4 (27 cases) |
+| BRPM.016 | FR-PM-044 | Package Request page (Advisories) | TC-PM-044.1, 044.2, 044.3, 044.4 (7 cases) |
+| BRPM.017 | FR-PM-060, FR-PM-061, FR-PM-044 | Package Expiry | TC-PM-044.1, 044.2, 044.3, 044.4, 060.1, 060.2, 060.3, 061.1, 061.2, 061.3 (17 cases) |
+| BRPM.018 | FR-PM-071 | Reports | TC-PM-071.1, 071.2, 071.3 (5 cases) |
+| BRPM.019 | FR-PM-070 | Product Maintenance Home | TC-PM-070.1, 070.2, 070.3 (5 cases) |
+| BRPM.020 | FR-PM-004 | E-mails and Documents tabs | TC-PM-004.1, 004.2, 004.3 (4 cases) |
+| BRPM.021 | FR-PM-073, FR-PM-021 | Workflow panel | TC-PM-021.1, 021.2, 021.3, 073.1, 073.2, 073.3 (10 cases) |
+| BRPM.022 | FR-PM-072 | Notifications | TC-PM-072.1, 072.2 (4 cases) |
+| BRPM.024 | FR-PM-005 | History tabs | TC-PM-005.1, 005.2, 005.3 (3 cases) |
+| PMADD01 | FR-PM-010 | Products; Coverages & Clauses | TC-PM-010.1, 010.2, 010.3, 010.4 (7 cases) |
+| PMADD02 | FR-PM-011, FR-PM-014 | Package Version (Insurer Terms); Coverages & Clauses | TC-PM-011.1, 011.2, 011.3, 014.1, 014.2, 014.3, 014.4 (10 cases) |
+| PMADD03 | FR-PM-035 | Package Request page (Comparative) | TC-PM-035.1, 035.2, 035.3 (5 cases) |
+| PMADD04 | FR-PM-031, FR-PM-032 | Package Request page (Negotiation) | TC-PM-031.1, 031.2, 031.3, 032.1, 032.2, 032.3, 032.4 (11 cases) |
+| PMADD05 | FR-PM-002, FR-PM-003 | User Access Matrix; Access Requests | TC-PM-002.1, 002.2, 002.3, 002.4, 003.1, 003.2, 003.3, 003.4 (12 cases) |
+| PMADD06 | FR-PM-043 | Validation Queue; Package Version | TC-PM-043.1, 043.2, 043.3, 043.4 (9 cases) |
+| PMADD07 | FR-PM-080, FR-PM-081 | Incentive Criteria | TC-PM-080.1, 080.2, 080.3, 080.4, 081.1, 081.2, 081.3 (15 cases) |
+| PMADD08 | FR-PM-080, FR-PM-081 | Incentive Criteria | TC-PM-080.1, 080.2, 080.3, 080.4, 081.1, 081.2, 081.3 (15 cases) |
 
 API paths start with `/api/v1`; "..." stands for `/api/v1/product-maintenance/requests/{id}`.
 

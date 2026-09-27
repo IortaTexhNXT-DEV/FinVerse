@@ -79,19 +79,16 @@ The scope is the renewal of **client policies placed and booked by BDOI**: from 
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | Renewal Addendum (Workshop), BRRN.020-040, pages 1-18 of the BRD-6 pack | v1.0, 8 to 10-Apr-2026; approved 16-Apr-2026 | `docs/source-documents/Renewal (RN) BRD.pdf` |
-| R2 | Renewal Addendum 1, BRRN.001-019 and the out-of-scope list, pages 19-38 | v1.0, 18-Nov-2025 / 16-Dec-2025; approved 20 to 23-Jan-2026 | same file |
-| R3 | RMEL Phase 2 - Online Dispositioning BRD (main BRD, persona IDs 1.xxx to 6.xxx), pages 39-189 | v1.0, 9-May-2025; signed 9 to 27-May-2025 | same file |
-| R4 | BDOI Renewal (BRD-6) requirements baseline and fit/gap | current | `docs/requirements/BDOI_RN_BRD_SPEC.md` |
-| R5 | Renewal build design | current | `docs/architecture/RENEWAL_DESIGN.md` |
-| R6 | Cross-BRD decisions and answered questions (BRD-6 to BRD-12) | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R7 | Submitted Policies build design (`RenewalHandOff`) | current | `docs/architecture/SUBMITTED_POLICIES_DESIGN.md` |
-| R8 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
-| R9 | BRD-1 New Business requirements baseline (shared platform capabilities) | current | `docs/requirements/BDOI_NB_BRD_SPEC.md` |
-| R10 | BRD-13 Data Migration baseline and design (questions DMQ36-DMQ38 answered by BDOI on 26-Sep-2026) | current | `docs/requirements/BDOI_DM_BRD_SPEC.md`; `docs/architecture/DATA_MIGRATION_DESIGN.md` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | Renewal Addendum (Workshop), BRRN.020-040, pages 1-18 of the BRD-6 pack | v1.0, 8 to 10-Apr-2026; approved 16-Apr-2026 |
+| R2 | Renewal Addendum 1, BRRN.001-019 and the out-of-scope list, pages 19-38 | v1.0, 18-Nov-2025 / 16-Dec-2025; approved 20 to 23-Jan-2026 |
+| R3 | RMEL Phase 2 - Online Dispositioning BRD (main BRD, persona IDs 1.xxx to 6.xxx), pages 39-189 | v1.0, 9-May-2025; signed 9 to 27-May-2025 |
+| R4 | BDOI Renewal (BRD-6) requirements baseline | current |
+| R6 | Cross-BRD decisions and answered questions (BRD-6 to BRD-12) | current |
+| R8 | BDO UX guidelines (brand, screen patterns) | current |
+| R9 | BRD-1 New Business requirements baseline (shared platform capabilities) | current |
 
 Page references in this document ("p.27") are PDF page numbers of the BRD-6 pack (R1 to R3). The main BRD also carries its own page footer ("x of 151"); this document does not use it.
 
@@ -148,7 +145,7 @@ Each FR in section 4 has the same parts:
 The main BRD repeats most capabilities once per persona (for example report generation under 1.009, 2.008, 3.010 and 4.008). One FR covers the capability for every persona that has it, and its BRD trace lists each persona's IDs. A range such as "1.009.2.1-40" stands for every line ID in it; the full list of line IDs with their pages is in section 11.2.
 
 > [!NOTE]
-> Values marked "default" (lead days, notice days, thresholds, list entries) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a new build.
+> Values marked "default" (lead days, notice days, thresholds, list entries) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a change to the system.
 
 <!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R4)" status=Class -->
 | Class | Meaning |
@@ -356,7 +353,7 @@ actor: System
 priority: Must have
 screens: All Renewal screens; User Access Matrix
 description:
-  - Every Renewal screen, button and API call requires a permission (section 3.2). Menus show only the screens that the user's roles allow; buttons for actions the user may not perform are hidden.
+  - Every Renewal screen, button and action requires a permission (section 3.2). Menus show only the screens that the user's roles allow; buttons for actions the user may not perform are hidden.
   - Every list, record, report and export is limited to the user's data scope. A Marketing TL sees the candidates of his sales units, an AO those assigned to him, Processing the processing stages. LAMD and Contact Center users see a projection without premium columns.
   - The LAMD role is limited to validation and never holds booking, issuance, placement, letter or customer-communication permissions (BRRN.024).
 preconditions:
@@ -366,7 +363,7 @@ main_flow:
   - BIBS checks the permission of the action and the scope of the record.
   - BIBS shows the screen or performs the action.
 alternate_flows:
-  - No permission. The screen is not in the menu; a direct link shows "You do not have access to this page". An API call is refused and logged.
+  - No permission. The screen is not in the menu; a direct link shows "You do not have access to this page". An direct request is refused and logged.
   - Out of scope. A record outside the user's scope is not listed and cannot be opened.
 rules:
   - [R1, "Roles are granted permissions as in section 3.3 until BDOI confirms the matrix (OQ48, RQ20, RQ21).", Configurable, Role-permission change request (FR-RN-003)]
@@ -377,7 +374,7 @@ validations:
 notifications:
   - "None."
 audit:
-  - Refused API calls are logged with user, endpoint and time.
+  - Refused requests are logged with the user and time.
   - "All LAMD actions are logged (BRRN.024 AC3)."
 acceptance:
   - A Marketing AO sees My Dispositions and the record pages of his accounts, and does not see the Processing Worklist or Renewal Setup.

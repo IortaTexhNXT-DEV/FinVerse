@@ -71,7 +71,7 @@ Both volumes follow the structure of the reference FRS of BRD-3:
 - **BRD references.** Each FR cites the BRD ID and the page of the BRD-5 PDF ("p.69"); "Add.1" is Addendum 1 (pp.28-39) and "Add.2" the Workshop Addendum (pp.1-15). Rows renumbered by Addendum 1 are used in their new form.
 - **Messages and codes.** Validation messages, error codes, lists of values, parameters and permissions are those of the delivered system. A validation done by the screen or the platform shows "-" as code.
 - **Differences.** Where the delivered behaviour differs from the BRD text, the FR describes the delivered behaviour and a note records the difference; section 1.7 of each volume lists them all.
-- **Parked items.** A function that is built but waits for BDOI data (layouts, accounts, lists) is marked "parked" with its open question. The answer is applied as configuration, without a new build, unless the FR says otherwise.
+- **Parked items.** A function that is built but waits for BDOI data (layouts, accounts, lists) is marked "parked" with its open question. The answer is applied as configuration, without a change to the system, unless the FR says otherwise.
 - **Gaps.** Requirements not met by the delivered system carry a gap number, listed below.
 - **Cross-references.** A reference to the other volume names the FR and the volume, for example "FR-DS-041, Volume 2". The accounting events of BRD-5 and their seed entries are in Volume 1, section 5.5.
 
@@ -104,7 +104,7 @@ The login to BDO Business Online Banking (DIS 2.17.1) is outside BIBS and marked
 | R1 | Accounting, Disbursement and ACSL BRD (main BRD), pages 40-153; signed scan pp.154-267 | v1.0, 23-Jul-2025 | `docs/source-documents/Accounting, Disbursement, and Accounting Controls and Subsidiary Ledger BRD.zip` |
 | R2 | Addendum 1, pages 28-39 | v1.0, 18-Dec-2025; signed 13-Jan-2026 | same file |
 | R3 | Addendum 2 (Workshop), pages 1-15 | v1.0, 10-Apr-2026; signed 8 to 15-Apr-2026 | same file |
-| R4 | BRD-5 requirements baseline and fit/gap | current | `docs/requirements/BDOI_ACCT_BRD_SPEC.md` |
+| R4 | BRD-5 requirements baseline | current | `docs/requirements/BDOI_ACCT_BRD_SPEC.md` |
 | R5 | Accounting, Disbursement and ACSL build design with the as-built notes | current | `docs/architecture/ACCOUNTING_DISBURSEMENT_DESIGN.md` |
 | R6 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
 

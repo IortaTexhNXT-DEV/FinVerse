@@ -77,17 +77,14 @@ Operations takes over every invoice booked in New Business (BRD-1) and follows i
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | Operations BRD: Cashiering, Remittance, Prod Recon, Adjustment / Cancellation, Collection of Commission Receivables (Direct Payment), pages 8-132 of the BRD-2 pack | v1.0, Jul-2025; signed Jul to Sep-2025 | `docs/source-documents/Operations.pdf` |
-| R2 | Operations Addendum 1 (RMTID.002, ADJID.014), pages 1-7 of the BRD-2 pack | v1.0, 18-Dec-2025; signed Jan-2026 | same file |
-| R3 | BDOI Operations (BRD-2) requirements baseline and fit/gap, open questions OQ01-OQ50 | current | `docs/requirements/BDOI_OPS_BRD_SPEC.md` |
-| R4 | Operations requirements traceability (status, screens, endpoints, tests per BR ID) | current | `docs/requirements/BDOI_OPS_TRACEABILITY.md` |
-| R5 | Operations build design | current | `docs/architecture/OPERATIONS_DESIGN.md` |
-| R6 | Operations module guide (as built) | current | `docs/modules/OPERATIONS.md` |
-| R7 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R8 | FRS BRD-1 New Business and FRS BRD-3 Product Maintenance (booking, catalogue, shared platform) | v1.0 | `docs/deliverables/out/*/FRS/` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | Operations BRD: Cashiering, Remittance, Prod Recon, Adjustment / Cancellation, Collection of Commission Receivables (Direct Payment), pages 8-132 of the BRD-2 pack | v1.0, Jul-2025; signed Jul to Sep-2025 |
+| R2 | Operations Addendum 1 (RMTID.002, ADJID.014), pages 1-7 of the BRD-2 pack | v1.0, 18-Dec-2025; signed Jan-2026 |
+| R3 | BDOI Operations (BRD-2) requirements baseline, open questions OQ01-OQ50 | current |
+| R7 | Cross-BRD decisions and answered questions | current |
+| R8 | FRS BRD-1 New Business and FRS BRD-3 Product Maintenance (booking, catalogue, shared platform) | v1.0 |
 
 Page references in this document ("p.23") are pages of the BRD-2 PDF (R1, R2). The annex pages 121-132 are scanned; the report and endorsement slip lists of the annex are quoted from those pages.
 
@@ -146,7 +143,7 @@ Each FR in section 4 has the same parts:
 API paths start with `/api/v1`. In the header tables "..." stands for the module path given in the section introduction.
 
 > [!NOTE]
-> Values marked "default" (holding days, tolerances, SLA hours, list entries) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a new build.
+> Values marked "default" (holding days, tolerances, SLA hours, list entries) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a change to the system.
 
 <!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R3)" status=Class -->
 | Class | Meaning |
@@ -297,7 +294,7 @@ Segregation of duties is enforced by the system, whatever the role grants: a rec
 
 ## Permissions matrix
 
-The table below is the role-to-permission matrix delivered with the build (migration V760; "Y" = granted). Every Operations role also has WORK_VIEW, REPORT_VIEW, ATTACHMENT_VIEW, CLIENT_VIEW and ACCOUNT_VIEW. Handler and team leader roles have BULK_PROCESS and ATTACHMENT_MANAGE; team leaders have WORK_ASSIGN.
+The table below is the role-to-permission matrix provided with the system (migration V760; "Y" = granted). Every Operations role also has WORK_VIEW, REPORT_VIEW, ATTACHMENT_VIEW, CLIENT_VIEW and ACCOUNT_VIEW. Handler and team leader roles have BULK_PROCESS and ATTACHMENT_MANAGE; team leaders have WORK_ASSIGN.
 
 <!-- landscape -->
 
@@ -372,7 +369,7 @@ actor: System
 priority: Must have
 screens: All Operations screens
 description:
-  - Every Operations screen, button and API call requires a permission (section 3.2). Menus show only the screens that the user's roles allow; buttons for actions the user may not perform are hidden.
+  - Every Operations screen, button and action requires a permission (section 3.2). Menus show only the screens that the user's roles allow; buttons for actions the user may not perform are hidden.
   - The Cashiering, Remittance and Commission Receivables screens are in the Finance group of the menu; Adjustment and Product Reconciliation are in Client & Policy; the Operations home, invoice search, Invoice 360, Disbursement queue, hand-offs, interfaces and report archive are in the Operations group.
 preconditions:
   - "The user is logged in."
@@ -381,7 +378,7 @@ main_flow:
   - BIBS checks the user's permissions for that screen or action.
   - BIBS shows the screen or performs the action.
 alternate_flows:
-  - No permission. The screen is not in the menu; a direct link returns "You do not have access to this page". An API call is refused (HTTP 403) and logged.
+  - No permission. The screen is not in the menu; a direct link returns "You do not have access to this page". A direct request is refused and logged.
   - Segregation of duties. An approval refused by a four-eyes rule is refused with its message even when the role has the permission (section 3.3).
 rules:
   - [R1, Roles are granted permissions as in section 3.3 until BDOI confirms the matrix (OQ48)., Configurable, Role-permission change request (BRD-11)]
@@ -391,10 +388,10 @@ validations:
 notifications:
   - "None."
 audit:
-  - Refused API calls are logged with user, endpoint and time.
+  - Refused requests are logged with the user and time.
 acceptance:
   - A Remittance Processor sees the Remittance screens and not the Cashiering Setup or the Disbursement queue.
-  - A direct call to an approval endpoint by a user without the approval permission is refused and logged.
+  - A direct approval request by a user without the approval permission is refused and logged.
   - A Marketing Collection user sees Remittance Holds, Special Remittance and BIR 2307 tagging but cannot approve a hold.
 ```
 

@@ -68,18 +68,17 @@ The function FRS (BRD-1 to BRD-12) remain the specifications of the business pro
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | BDOI Core Replacement BRD (48 pages) | v1.0, approved 21-Nov to 1-Dec-2025 | `docs/source-documents/00 - BRD BDOI Core Replacement v01.pdf` |
-| R2 | Core Replacement requirements baseline and fit/gap (rows CORE-nn.mm, XC-nn; questions CRQnn) | current | `docs/requirements/BDOI_CORE_BRD_SPEC.md` |
-| R3 | Core Replacement impact on BIBS (design proposals, build waves) | current | `docs/architecture/CORE_REPLACEMENT_IMPACT.md` |
-| R4 | FRS BRD-1 to BRD-12 (BRD-5 in two volumes) | v1.0 | `docs/deliverables/out/*/FRS/` |
-| R5 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R6 | BRD discrepancy and clarification register | v1.0 | `docs/deliverables/out/Programme/Registers/` |
-| R7 | ReInsurance BRD (phase 2) | 11-Mar-2025 | `docs/source-documents/ReInsurance (Phase 2).PDF` |
-| R8 | Data Migration BRD | draft v0.01 | `docs/source-documents/BRD - Data Migration - draft V0.01.pdf` |
-| R9 | BDO UX guidelines and BDOI UX design | current | `docs/design/BDO_UX_GUIDELINES.md`; `docs/source-documents/BDOI_UXD.docx` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | BDOI Core Replacement BRD (48 pages) | v1.0, approved 21-Nov to 1-Dec-2025 |
+| R2 | Core Replacement requirements baseline (rows CORE-nn.mm, XC-nn; questions CRQnn) | current |
+| R4 | FRS BRD-1 to BRD-12 (BRD-5 in two volumes) | v1.0 |
+| R5 | Cross-BRD decisions and answered questions | current |
+| R6 | BRD discrepancy and clarification register | v1.0 |
+| R7 | ReInsurance BRD (phase 2) | 11-Mar-2025 |
+| R8 | Data Migration BRD | draft v0.01 |
+| R9 | BDO UX guidelines and BDOI UX design | current |
 
 Page references ("p.14") are pages of the umbrella BRD (R1).
 
@@ -241,7 +240,7 @@ main_flow:
   - BIBS shows the menu groups and screens those permissions open.
   - The user opens a screen; BIBS checks the permission again on every call.
 alternate_flows:
-  - Screen opened by URL without permission. BIBS shows "You do not have access to this page" and the API refuses the call (HTTP 403).
+  - Screen opened by URL without permission. BIBS shows "You do not have access to this page" and the API refuses the call.
 rules:
   - [R1, "Roles and their permissions are changed only through an approved User Access request (BRD-11).", Configurable, User Access requests]
   - [R2, "A screen without a permission of the user is never shown, even if the user knows its address.", Fixed, "-"]

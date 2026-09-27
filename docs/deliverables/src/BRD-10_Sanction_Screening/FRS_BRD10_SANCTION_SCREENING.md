@@ -71,16 +71,15 @@ The scope is the screening of BDOI clients against sanctions and politically exp
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | Sanction Screening and Risk Profiling Business Requirements Document, 29 pages | Prepared 10-Apr-2026; approved 16 to 17-Apr-2026 | `docs/source-documents/Sanction Screening and Risk Profiling BRD.pdf` |
-| R2 | BDOI Sanction Screening and Risk Profiling (BRD-10) requirements baseline and fit/gap | current | `docs/requirements/BDOI_SANC_BRD_SPEC.md` |
-| R3 | Sanction Screening and Risk Profiling build design | current (proposal for review) | `docs/architecture/SANCTION_SCREENING_DESIGN.md` |
-| R4 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R5 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
-| R6 | BRD-1 New Business requirements baseline (client master, KYC review, shared platform) | current | `docs/requirements/BDOI_NB_BRD_SPEC.md` |
-| R7 | FRS BRD-11 User Access Maintenance (roles, sign-in, session policy) | v1.0 | `docs/deliverables/out/Drop-0_Setup_and_Data_Migration/BRD-11_User_Access_Maintenance/BIBS_FRS_BRD-11_User_Access_Maintenance_v1.0.pdf` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | Sanction Screening and Risk Profiling Business Requirements Document, 29 pages | Prepared 10-Apr-2026; approved 16 to 17-Apr-2026 |
+| R2 | BDOI Sanction Screening and Risk Profiling (BRD-10) requirements baseline | current |
+| R4 | Cross-BRD decisions and answered questions | current |
+| R5 | BDO UX guidelines (brand, screen patterns) | current |
+| R6 | BRD-1 New Business requirements baseline (client master, KYC review, shared platform) | current |
+| R7 | FRS BRD-11 User Access Maintenance (roles, sign-in, session policy) | v1.0 |
 
 Page references in this document ("p.14") are pages of the BRD-10 PDF (R1). The requirement table is printed as images on pp.10-21; it was read from the page images.
 
@@ -130,7 +129,7 @@ Each FR in section 4 has the same parts:
 - **Notifications**, **audit** and numbered **acceptance criteria**. The acceptance criteria are the basis of the test cases of the BRD-10 test plan.
 
 > [!NOTE]
-> Thresholds, SLA hours, template fields, dispositions and routing rules shown as "default" or "seed" are placeholders until BDOI answers the open questions in section 10.3. They are configuration entered by Compliance, so a changed answer does not need a new build.
+> Thresholds, SLA hours, template fields, dispositions and routing rules shown as "default" or "seed" are placeholders until BDOI answers the open questions in section 10.3. They are configuration entered by Compliance, so a changed answer does not need a change to the system.
 
 <!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R2)" status=Class -->
 | Class | Meaning |

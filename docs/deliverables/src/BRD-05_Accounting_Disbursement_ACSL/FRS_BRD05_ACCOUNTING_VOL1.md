@@ -81,17 +81,16 @@ Each volume has its own traceability chapter. Cross-references to the other volu
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | Accounting, Disbursement and ACSL BRD (main BRD), pages 40-153 of the BRD-5 pack; signed scan pp.154-267 | v1.0, 23-Jul-2025; approved Jul to Oct 2025 | `docs/source-documents/Accounting, Disbursement, and Accounting Controls and Subsidiary Ledger BRD.zip` |
-| R2 | Addendum 1 "Accounting, Disbursement and ACSL - Addendum", pages 28-39 (signed copy pp.16-27) | v1.0, 18-Dec-2025; signed 13-Jan-2026 | same file |
-| R3 | Addendum 2 "Financial Reporting, Disbursement and ACSL - Addendum (Workshop)", pages 1-15 (scanned) | v1.0, 10-Apr-2026; signed 8 to 15-Apr-2026 | same file |
-| R4 | BDOI Accounting, Disbursement and ACSL (BRD-5) requirements baseline and fit/gap | current | `docs/requirements/BDOI_ACCT_BRD_SPEC.md` |
-| R5 | Accounting, Disbursement and ACSL build design, including section 17 and the as-built notes A1-GL, A1-PRQ, A1-DSB, A1-FRBS | current | `docs/architecture/ACCOUNTING_DISBURSEMENT_DESIGN.md` |
-| R6 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R7 | BRD-5 FRS Volume 2 (Disbursement, Payment Requests, ACSL) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/BRD-05_Accounting_Disbursement_ACSL/BIBS_FRS_BRD-05_Accounting_Disbursement_ACSL_Vol2_v1.0.docx` |
-| R8 | BRD-2 Operations FRS (receipts, remittance, commission) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/BRD-02_Operations/BIBS_FRS_BRD-02_Operations_v1.0.docx` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | Accounting, Disbursement and ACSL BRD (main BRD), pages 40-153 of the BRD-5 pack; signed scan pp.154-267 | v1.0, 23-Jul-2025; approved Jul to Oct 2025 |
+| R2 | Addendum 1 "Accounting, Disbursement and ACSL - Addendum", pages 28-39 (signed copy pp.16-27) | v1.0, 18-Dec-2025; signed 13-Jan-2026 |
+| R3 | Addendum 2 "Financial Reporting, Disbursement and ACSL - Addendum (Workshop)", pages 1-15 (scanned) | v1.0, 10-Apr-2026; signed 8 to 15-Apr-2026 |
+| R4 | BDOI Accounting, Disbursement and ACSL (BRD-5) requirements baseline | current |
+| R6 | Cross-BRD decisions and answered questions | current |
+| R7 | BRD-5 FRS Volume 2 (Disbursement, Payment Requests, ACSL) | v1.0 |
+| R8 | BRD-2 Operations FRS (receipts, remittance, commission) | v1.0 |
 
 Page references ("p.51") are pages of the BRD-5 PDF. "Add.1" is Addendum 1 (pp.28-39) and "Add.2" is the Workshop Addendum (pp.1-15). The BRD numbers the Accounting access rows "BRD 1.1.0-1.1.3"; this FRS writes them FRBS 1.1.0-1.1.3. The second row numbered FRBS 3.6.0 (item q, p.66) is written FRBS 3.6.0b.
 
@@ -136,7 +135,7 @@ Each FR in section 4 has the same parts:
 Every BRD-5 row carries the priority **Must have** in the BRD. API paths start with `/api/v1`.
 
 > [!NOTE]
-> The real chart of accounts, the accounting rules, the report layouts and several rates are BDOI data that have not been given (AQ01-AQ07, AQ20, AQ26). BIBS holds them as configuration with seed values, so a BDOI answer does not need a new build.
+> The real chart of accounts, the accounting rules, the report layouts and several rates are BDOI data that have not been given (AQ01-AQ07, AQ20, AQ26). BIBS holds them as configuration with seed values, so a BDOI answer does not need a change to the system.
 
 <!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R4)" status=Class -->
 | Class | Meaning |

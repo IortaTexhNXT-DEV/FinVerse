@@ -76,17 +76,16 @@ BDOI is a broker. The insurer accepts, evaluates and pays a claim; BDOI files an
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | Claims - Addendum (Workshop), pages 1-9 of the BRD-7 pack (BRCLM.037-043) | v1.0, 08-Apr-2026; signed 10 to 16-Apr-2026 | `docs/source-documents/Claims (CLM).PDF` |
-| R2 | Claims - Addendum (renumbering FRID-001-036 to BRCLM.001-036), pages 10-18 | v1.0, 17-Dec-2025; approved 17 to 22-Dec-2025 | same file |
-| R3 | Motor and Non-Motor Claims Logging BRD, pages 19-45 (process, stakeholders, FRID table, NFR, capacity, retention, report list) | v1, 22-Jan-2025; signed 5 to 6-Mar-2025 | same file |
-| R4 | BDOI Claims (BRD-7) requirements baseline and fit/gap | current | `docs/requirements/BDOI_CLM_BRD_SPEC.md` |
-| R5 | Claims build design (module `brokerclaims`) | proposal for review | `docs/architecture/CLAIMS_BROKING_DESIGN.md` |
-| R6 | Cross-BRD decisions and answered questions (BRD-6 to BRD-12) | binding | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R7 | BDOI Report List as of 27-Apr-2026 (Claims reports, p.39-42) | 27-Apr-2026 | `docs/source-documents/Report List as of APR-27-2026.pdf` |
-| R8 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | Claims - Addendum (Workshop), pages 1-9 of the BRD-7 pack (BRCLM.037-043) | v1.0, 08-Apr-2026; signed 10 to 16-Apr-2026 |
+| R2 | Claims - Addendum (renumbering FRID-001-036 to BRCLM.001-036), pages 10-18 | v1.0, 17-Dec-2025; approved 17 to 22-Dec-2025 |
+| R3 | Motor and Non-Motor Claims Logging BRD, pages 19-45 (process, stakeholders, FRID table, NFR, capacity, retention, report list) | v1, 22-Jan-2025; signed 5 to 6-Mar-2025 |
+| R4 | BDOI Claims (BRD-7) requirements baseline | current |
+| R6 | Cross-BRD decisions and answered questions (BRD-6 to BRD-12) | binding |
+| R7 | BDOI Report List as of 27-Apr-2026 (Claims reports, p.39-42) | 27-Apr-2026 |
+| R8 | BDO UX guidelines (brand, screen patterns) | current |
 
 Page references in this document ("p.13") are pages of the BRD-7 PDF. BRCLM.001-036 appear twice with the same text, in the renumbering addendum (p.13-16) and as FRID-001-036 in the original BRD (p.29-31); FRs cite both, for example "BRCLM.001 (p.13; p.29)".
 
@@ -128,7 +127,7 @@ Each FR in section 4 has the same parts:
 - **Notifications**, **audit** and numbered **acceptance criteria**. The acceptance criteria are the basis of the test cases of the BRD-7 test plan.
 
 > [!NOTE] Designed, not built
-> Screen names, permissions, parameters and lists come from the build design (R5). API paths and business message codes are fixed when the module is built: the API entry reads "To be assigned at build" and the Code column reads "To be assigned at build". Codes quoted in this document exist in the platform today (for example ACCESS_DENIED). Values marked "default" are placeholders that BDOI confirms through the open questions in section 10.3; they are configuration, so a changed answer does not need a new build.
+> Screen names, permissions, parameters and lists come from the build design (R5). API paths and business message codes are fixed when the module is built: the API entry reads "To be assigned at build" and the Code column reads "To be assigned at build". Codes quoted in this document exist in the platform today (for example ACCESS_DENIED). Values marked "default" are placeholders that BDOI confirms through the open questions in section 10.3; they are configuration, so a changed answer does not need a change to the system.
 
 <!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R4)" status=Class -->
 | Class | Meaning |
@@ -311,7 +310,7 @@ actor: System; Unit Head (grants through User Access)
 priority: High (BRD p.21)
 screens: All Claims Handling screens
 description:
-  - Nine BRD requirements ask that a user "have the necessary permissions" before an action (p.28). Each Claims screen, button and API call requires one of the permissions of section 3.2. Menus show only the screens the user's roles allow; buttons for actions the user may not perform are hidden.
+  - Nine BRD requirements ask that a user "have the necessary permissions" before an action (p.28). Each Claims screen, button and action requires one of the permissions of section 3.2. Menus show only the screens the user's roles allow; buttons for actions the user may not perform are hidden.
   - The permission grants of section 3.3 are changed through User Access Maintenance requests, which another user approves (BRD-11). The Unit Head requests the changes for the Claims roles.
 preconditions:
   - "The user is logged in."
@@ -320,7 +319,7 @@ main_flow:
   - BIBS checks the user's permission for that action and, for a status change, the status matrix (FR-CM-041).
   - BIBS shows the screen or performs the action.
 alternate_flows:
-  - No permission. The action is not offered; a direct call is refused (HTTP 403) and logged.
+  - No permission. The action is not offered; a direct call is refused and logged.
   - Claims record of another company. BIBS returns "not found" and does not reveal the record.
 rules:
   - [R1, "Roles are granted the permissions of section 3.3 until BDOI confirms the matrix (OQ48).", Configurable, User Access Maintenance request]
@@ -1056,7 +1055,7 @@ audit:
   - "Matrix and register changes with maker and checker."
 acceptance:
   - A Claims Officer of Motor HO sees only the statuses the matrix gives the officer role.
-  - A direct API call setting a status outside the matrix is refused.
+  - A direct direct request setting a status outside the matrix is refused.
   - A matrix row takes effect only after another user authorises it.
 ```
 
@@ -1131,7 +1130,7 @@ audit:
   - "Changes with maker, checker and before / after values."
 acceptance:
   - The settlement type list offers the 10 BRD values with their outcome.
-  - Changing "Settled - LOA Issued - Vehicle Under Repair" to not close the claim takes effect without a new build.
+  - Changing "Settled - LOA Issued - Vehicle Under Repair" to not close the claim takes effect without a change to the system.
 ```
 
 ```fr

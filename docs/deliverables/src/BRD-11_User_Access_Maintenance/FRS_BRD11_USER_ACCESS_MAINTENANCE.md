@@ -83,18 +83,15 @@ The BRD was written in April 2025 for the Quotation and Pre-processing System (Q
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | Business Requirements Document - QPS User Access Maintenance Module, 39 pages (pp.1-19 text; pp.20-38 the signed scanned copy; p.39 e-mail sign-off) | v1, 15-Apr-2025; signed April-May 2025 | `docs/source-documents/User Access Maintenance.pdf` |
-| R2 | BDOI User Access Maintenance (BRD-11) requirements baseline and fit/gap | current | `docs/requirements/BDOI_UAM_BRD_SPEC.md` |
-| R3 | User Access Maintenance build design, with the as-built sections of waves U0, U1-A, U1-B and U2 | current (as built) | `docs/architecture/USER_ACCESS_DESIGN.md` |
-| R4 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R5 | Built access functions: users, roles and sign-in (`security`); access requests, User Access Matrix, retention (`nbadmin`); screens | as built | `backend/.../security`, `backend/.../nbadmin`, `frontend/src/features/nbadmin`, `frontend/src/features/admin` |
-| R6 | FRS BRD-3 Product Maintenance (role-permission change requests, PMADD05) | v2.0 | `docs/deliverables/out/Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/02_BIBS_FRS_BRD-03_Product_Maintenance_v2.0.docx` |
-| R7 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
-| R8 | BRD-1 New Business business sign-off set (My Approvals, Lists of Values, Data Retention) | v2.0 | `docs/deliverables/out/Drop-1_Transactional/BRD-01_New_Business/` |
-| R9 | Persona menu check: the screens each persona of a suite must see, no more, no less | as built | `frontend/src/navigation/personaMenus.json` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | Business Requirements Document - QPS User Access Maintenance Module, 39 pages (pp.1-19 text; pp.20-38 the signed scanned copy; p.39 e-mail sign-off) | v1, 15-Apr-2025; signed April-May 2025 |
+| R2 | BDOI User Access Maintenance (BRD-11) requirements baseline | current |
+| R4 | Cross-BRD decisions and answered questions | current |
+| R6 | FRS BRD-3 Product Maintenance (role-permission change requests, PMADD05) | v2.0 |
+| R7 | BDO UX guidelines (brand, screen patterns) | current |
+| R8 | BRD-1 New Business business sign-off set (My Approvals, Lists of Values, Data Retention) | v2.0 |
 
 Page references in this document ("p.8") are pages of the BRD PDF (R1). The BRD has no NFR IDs; the NFR rows carry the analyst's IDs UAM-NFR-01 to UAM-NFR-41 of R2.
 
@@ -1268,7 +1265,7 @@ priority: Must have
 screens: Administration > Roles & Permissions
 description: The build delivers the group profiles of the BRD personas - UAM_REQUESTOR (Requestor), UAM_APPROVER (Approver) and UAM_SECOND_APPROVER - and grants the new permissions to BUSINESS_ADMIN (Business Administrator, exists) and SYSADMIN (exists), as in section 3.3. Later changes to these profiles are group-profile requests (FR-UA-040 to FR-UA-045).
 preconditions:
-  - "None (delivered with the build)."
+  - "None (provided with the system)."
 main_flow:
   - The System Administrator opens Roles & Permissions.
   - BIBS lists the delivered profiles with their permissions.
@@ -1291,7 +1288,7 @@ actor: System Administrator (through approved group-profile requests)
 priority: Must have
 screens: Roles & Permissions; User Access Matrix
 description:
-  - Baseline. Every BIBS screen, button and API call requires a permission; roles are bundles of permissions; the User Access Matrix shows them by permission and by area / action class and exports to Excel.
+  - Baseline. Every BIBS screen, button and action requires a permission; roles are bundles of permissions; the User Access Matrix shows them by permission and by area / action class and exports to Excel.
   - Change. Each access-maintenance function of BRD 4.002.2 has its own permission (section 3.2), so it can be assigned to any profile. Every permission of BIBS gets an area and action class, so the matrix and the group-profile report show a module for every task. The request endpoints accept the type-specific permission or ACCESS_REQUEST.
 preconditions:
   - "An approved group-profile request (FR-UA-045)."

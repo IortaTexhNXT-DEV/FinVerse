@@ -68,15 +68,14 @@ The CSF replaces the BDO-Insure Front-End System used by the BDO Insure Contact 
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | Customer Servicing Facility (CSF) BRD, pages 1-16 (BRCSF-001 to 011; usage requirements; approval sheet) | v1.0, 09-Jun-2025; approved 24-Jun to 02-Jul-2025 | `docs/source-documents/Customer Servicing Facility.PDF` |
-| R2 | E-mail thread "Core Modernization: CSF", pages 17-18 (minutes of 23-Jan-2026; scope confirmation of 13-Feb-2026) | 22-Jan to 13-Feb-2026 | same file |
-| R3 | BDOI Customer Servicing Facility (BRD-9) requirements baseline and fit/gap | current | `docs/requirements/BDOI_CSF_BRD_SPEC.md` |
-| R4 | Customer Servicing Facility build design (module `csf`) | proposal for review | `docs/architecture/CUSTOMER_SERVICING_DESIGN.md` |
-| R5 | Cross-BRD decisions and answered questions (BRD-6 to BRD-12) | binding | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R6 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | Customer Servicing Facility (CSF) BRD, pages 1-16 (BRCSF-001 to 011; usage requirements; approval sheet) | v1.0, 09-Jun-2025; approved 24-Jun to 02-Jul-2025 |
+| R2 | E-mail thread "Core Modernization: CSF", pages 17-18 (minutes of 23-Jan-2026; scope confirmation of 13-Feb-2026) | 22-Jan to 13-Feb-2026 |
+| R3 | BDOI Customer Servicing Facility (BRD-9) requirements baseline | current |
+| R5 | Cross-BRD decisions and answered questions (BRD-6 to BRD-12) | binding |
+| R6 | BDO UX guidelines (brand, screen patterns) | current |
 
 Page references in this document ("p.8") are pages of the BRD-9 PDF. The BRD reuses its BR ID for the process steps (for example BRCSF-003 / 3.001); FRs cite both. The e-mail items 7 and 9, which the e-mail of 13-Feb-2026 adds to the scope, are traced as CSF-EM07 and CSF-EM09.
 
@@ -112,7 +111,7 @@ Each FR in section 4 has the same parts:
 - **Notifications**, **audit** and numbered **acceptance criteria**. The acceptance criteria are the basis of the test cases of the BRD-9 test plan.
 
 > [!NOTE] Designed, not built
-> Screen names, permissions, parameters and lists come from the build design (R4). API paths and business message codes are fixed when the module is built: the API entry reads "To be assigned at build" and the Code column reads "To be assigned at build". Codes quoted in this document exist in the platform today (for example ACCESS_DENIED). Values marked "default" are placeholders that BDOI confirms through the open questions in section 10.3; they are configuration, so a changed answer does not need a new build.
+> Screen names, permissions, parameters and lists come from the build design (R4). API paths and business message codes are fixed when the module is built: the API entry reads "To be assigned at build" and the Code column reads "To be assigned at build". Codes quoted in this document exist in the platform today (for example ACCESS_DENIED). Values marked "default" are placeholders that BDOI confirms through the open questions in section 10.3; they are configuration, so a changed answer does not need a change to the system.
 
 <!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R3)" status=Class -->
 | Class | Meaning |
@@ -274,7 +273,7 @@ main_flow:
   - BIBS checks the permission.
   - BIBS shows the screen or performs the action.
 alternate_flows:
-  - No permission. The action is not offered; a direct call is refused (HTTP 403) and logged.
+  - No permission. The action is not offered; a direct call is refused and logged.
 rules:
   - [R1, "Grants of section 3.3 until BDOI confirms the matrix (CSQ10).", Configurable, User Access Maintenance request]
 validations:
@@ -371,7 +370,7 @@ brd: [BRCSF-005 / 5.001 (p.8), CSF-EM07 (p.17)]
 actor: Contact Center Agent
 priority: Must have
 screens: Servicing View (Accounts tab)
-description: Each account shows the latest CSF status - Pending, Awaiting, Booked, Open or Closed - next to its BIBS stage. BIBS computes the status from the account stage, the invoice payment status and the policy period through a maintainable mapping, so the definitions agreed by Marketing, Processing and Operations can be applied without a new build (e-mail open item 3).
+description: Each account shows the latest CSF status - Pending, Awaiting, Booked, Open or Closed - next to its BIBS stage. BIBS computes the status from the account stage, the invoice payment status and the policy period through a maintainable mapping, so the definitions agreed by Marketing, Processing and Operations can be applied without a change to the system (e-mail open item 3).
 preconditions:
   - "None."
 main_flow:
@@ -388,7 +387,7 @@ audit:
 acceptance:
   - An account awaiting payment shows the CSF status Awaiting and the BIBS stage AWAITING_PAYMENT.
   - A booked account in force shows Open; a cancelled account shows Closed.
-  - Changing the mapping of a stage changes the displayed status without a new build.
+  - Changing the mapping of a stage changes the displayed status without a change to the system.
 ```
 
 ```fr
@@ -805,7 +804,7 @@ The CSF has no approval workflow. Two models apply: the CSF status of an account
 | Open | BOOKED and in force | CSF-EM07 |
 | Closed | CANCELLED, VOIDED, or policy period ended | CSF-EM07 |
 
-The BRD does not define Pending and Awaiting; the e-mail says the statuses follow the definitions of Marketing, Processing and Operations. The mapping is data, so the agreed definitions are applied without a new build.
+The BRD does not define Pending and Awaiting; the e-mail says the statuses follow the definitions of Marketing, Processing and Operations. The mapping is data, so the agreed definitions are applied without a change to the system.
 
 ## Contact change and legacy sync
 

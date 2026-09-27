@@ -71,16 +71,14 @@ The EB desk of Marketing places group benefit programmes (HMO, Group Life Insura
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | Employee Benefits Addendum, PDF pages 1-17 (BRID-005.01-005.03, 022.01, 025, 026, 028; volumes; target user matrix) | 23-Feb-2026; approved 26-Feb-2026 | `docs/source-documents/Employee Benefits.pdf` |
-| R2 | Employee Benefits BRD, PDF pages 18-59 (BRID-001 to 030; usage requirements; current role matrix; TAT annex) | v1.0, 14-Nov-2025; signed 12 to 28-Nov-2025 | same file |
-| R3 | BDOI Employee Benefits (BRD-8) requirements baseline and fit/gap | current | `docs/requirements/BDOI_EB_BRD_SPEC.md` |
-| R4 | Employee Benefits build design (modules `eb` and `portal`) | proposal for review | `docs/architecture/EMPLOYEE_BENEFITS_DESIGN.md` |
-| R5 | Cross-BRD decisions and answered questions (BRD-6 to BRD-12) | binding | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R6 | User Access Maintenance build design (external user requests) | proposal for review | `docs/architecture/USER_ACCESS_DESIGN.md` |
-| R7 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | Employee Benefits Addendum, PDF pages 1-17 (BRID-005.01-005.03, 022.01, 025, 026, 028; volumes; target user matrix) | 23-Feb-2026; approved 26-Feb-2026 |
+| R2 | Employee Benefits BRD, PDF pages 18-59 (BRID-001 to 030; usage requirements; current role matrix; TAT annex) | v1.0, 14-Nov-2025; signed 12 to 28-Nov-2025 |
+| R3 | BDOI Employee Benefits (BRD-8) requirements baseline | current |
+| R5 | Cross-BRD decisions and answered questions (BRD-6 to BRD-12) | binding |
+| R7 | BDO UX guidelines (brand, screen patterns) | current |
 
 Page references: "Add. p.n" is page n of the addendum (PDF page n). "p.n" is page n of the main BRD, which is PDF page n + 17; for example BRID-001 (p.7) is on PDF page 24. The addendum overrides the main BRD; BRID-025 and BRID-026 are cited with the addendum text.
 
@@ -126,7 +124,7 @@ Each FR in section 4 has the same parts:
 - **Notifications**, **audit** and numbered **acceptance criteria**. The acceptance criteria are the basis of the test cases of the BRD-8 test plan.
 
 > [!NOTE] Designed, not built
-> Screen names, permissions, parameters and lists come from the build design (R4). API paths and business message codes are fixed when the modules are built: the API entry reads "To be assigned at build" (portal endpoints live under `/api/portal`) and the Code column reads "To be assigned at build". Codes quoted in this document exist in the platform today (for example ACCESS_DENIED). Values marked "default" are placeholders that BDOI confirms through the open questions in section 10.3; they are configuration, so a changed answer does not need a new build.
+> Screen names, permissions, parameters and lists come from the build design (R4). API paths and business message codes are fixed when the modules are built: the API entry reads "To be assigned at build" (portal endpoints live under `/api/portal`) and the Code column reads "To be assigned at build". Codes quoted in this document exist in the platform today (for example ACCESS_DENIED). Values marked "default" are placeholders that BDOI confirms through the open questions in section 10.3; they are configuration, so a changed answer does not need a change to the system.
 
 <!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R3)" status=Class -->
 | Class | Meaning |
@@ -269,7 +267,7 @@ main_flow:
   - BIBS checks the permission and, for a document, its access class.
   - BIBS shows the item or refuses the request.
 alternate_flows:
-  - No permission. The action is not offered; a direct call is refused (HTTP 403) and logged.
+  - No permission. The action is not offered; a direct call is refused and logged.
 rules:
   - [R1, "Roles are granted the permissions of section 3.3 until BDOI confirms the matrix.", Configurable, User Access Maintenance request]
 validations:
@@ -1145,7 +1143,7 @@ audit:
 acceptance:
   - A comparative with a recommended annual premium above the rule amount waits for Management approval.
   - Placement cannot be triggered before the threshold approval.
-  - A rule changed by the administrator applies after authorisation without a new build.
+  - A rule changed by the administrator applies after authorisation without a change to the system.
 ```
 
 ```fr

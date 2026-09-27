@@ -79,20 +79,17 @@ BDOI replaces its legacy platforms (EBIX and QPS in the BRD; ISYS and Excel mast
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | BDO Insure Core Modernization - Data Migration BRD | draft v0.01, 14-Apr-2026; not signed | `docs/source-documents/BRD - Data Migration - draft V0.01.pdf` |
-| R2 | BDOI Data Migration (BRD-13) requirements baseline and fit/gap | current | `docs/requirements/BDOI_DM_BRD_SPEC.md` |
-| R3 | Data Migration build design | current | `docs/architecture/DATA_MIGRATION_DESIGN.md` |
-| R4 | BRD BDOI Core Replacement (umbrella BRD) | v01 | `docs/source-documents/00 - BRD BDOI Core Replacement v01.pdf` |
-| R5 | Operations build design and FRS BRD-2 (cashiering, remittance, Prod Recon, adjustment, commission) | current | `docs/architecture/OPERATIONS_DESIGN.md`; FRS BRD-2 |
-| R6 | Collections, Accounting / ACSL, Renewal and Customer Servicing designs | current | `docs/architecture/` |
-| R7 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R8 | Deliverables plan (hosting appendix: masked non-production data, staging purge within 5 days, access from the Philippines only) | current | `docs/deliverables/README.md` |
-| R9 | BDOI drop plan and programme timeline | received 26-Sep-2026 | `docs/source-documents/BDOI_DROP_PLAN.md` |
-| R10 | Concept Paper - Advance Implementation of Renewal Processing (early renewal release) | V1.0, signed 06-Sep-2026; superseded by the single January 2028 go-live (BDOI, 26-Sep-2026) | `docs/source-documents/Concept Paper - Advance Implementation of Renewal Processing V1.0 (signed).pdf` |
-| R11 | BDOI answers to DMQ36-DMQ39 (package remapping, January-May 2028 renewals, RMEL and disposition sources, year-end cut-over) | 26-Sep-2026; DMQ39 awaits Comptrollership confirmation | R2 section 10.2 |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | BDO Insure Core Modernization - Data Migration BRD | draft v0.01, 14-Apr-2026; not signed |
+| R2 | BDOI Data Migration (BRD-13) requirements baseline | current |
+| R4 | BRD BDOI Core Replacement (umbrella BRD) | v01 |
+| R7 | Cross-BRD decisions and answered questions | current |
+| R8 | Deliverables plan (hosting appendix: masked non-production data, staging purge within 5 days, access from the Philippines only) | current |
+| R9 | BDOI drop plan and programme timeline | received 26-Sep-2026 |
+| R10 | Concept Paper - Advance Implementation of Renewal Processing (early renewal release) | V1.0, signed 06-Sep-2026; superseded by the single January 2028 go-live (BDOI, 26-Sep-2026) |
+| R11 | BDOI answers to DMQ36-DMQ39 (package remapping, January-May 2028 renewals, RMEL and disposition sources, year-end cut-over) | 26-Sep-2026; DMQ39 awaits Comptrollership confirmation |
 
 Page references ("p.8") are pages of the Data Migration BRD (R1) unless another document is named.
 
@@ -157,7 +154,7 @@ Each FR in section 4 has the same parts:
 The BRD numbers two requirements "BRID 1.1" (p.7). This FRS calls the first one (decision gates) **BRID 1.1a** and the second one (reconciliation) **BRID 1.1b**.
 
 > [!NOTE]
-> Values marked "default" (thresholds, retention days, chunk sizes, timings) are placeholders that BDOI confirms through the open questions of section 10.3. They are configuration, so a changed answer does not need a new build.
+> Values marked "default" (thresholds, retention days, chunk sizes, timings) are placeholders that BDOI confirms through the open questions of section 10.3. They are configuration, so a changed answer does not need a change to the system.
 
 <!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R2)" status=Class -->
 | Class | Meaning |

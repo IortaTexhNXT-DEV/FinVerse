@@ -75,18 +75,17 @@ The scope is the follow-up of **premium receivables (PR)** and **unapplied payme
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | Collection Management System (CMS) BRD, pages 35-61 of the BRD-4 pack (signed printout pp.66-93) | v1, 17-Jan-2025 to 10-Mar-2025; signed Feb to Mar 2025 | `docs/source-documents/Collections (CLXN) BRD.pdf` |
-| R2 | Renumbering addendum (FRID-001-048 to BRCLXN.001-048), pages 23-34 | 17-Dec-2025; approved 19 to 22-Dec-2025 | same file |
-| R3 | Collections Addendum (Workshop), signed version, pages 13-22 (BRCLXN.049-060) | v1.0, 10-Apr-2026; approved 16 to 17-Apr-2026 | same file |
-| R4 | Collections Addendum (Workshop), draft version, pages 1-12 (BRCLXN.049-064; 061-064 only here) | v1.0 draft, 05 to 10-Apr-2026 | same file |
-| R5 | BDOI Collections (BRD-4) requirements baseline and fit/gap | current | `docs/requirements/BDOI_CLXN_BRD_SPEC.md` |
-| R6 | Collections build design, including section 14 and the as-built notes of waves C1-A, C1-B and C1-C | current | `docs/architecture/COLLECTIONS_DESIGN.md` |
-| R7 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R8 | BRD-2 Operations FRS (Cashiering, Commission Receivables, Remittance) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/BRD-02_Operations/BIBS_FRS_BRD-02_Operations_v1.0.docx` |
-| R9 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | Collection Management System (CMS) BRD, pages 35-61 of the BRD-4 pack (signed printout pp.66-93) | v1, 17-Jan-2025 to 10-Mar-2025; signed Feb to Mar 2025 |
+| R2 | Renumbering addendum (FRID-001-048 to BRCLXN.001-048), pages 23-34 | 17-Dec-2025; approved 19 to 22-Dec-2025 |
+| R3 | Collections Addendum (Workshop), signed version, pages 13-22 (BRCLXN.049-060) | v1.0, 10-Apr-2026; approved 16 to 17-Apr-2026 |
+| R4 | Collections Addendum (Workshop), draft version, pages 1-12 (BRCLXN.049-064; 061-064 only here) | v1.0 draft, 05 to 10-Apr-2026 |
+| R5 | BDOI Collections (BRD-4) requirements baseline | current |
+| R7 | Cross-BRD decisions and answered questions | current |
+| R8 | BRD-2 Operations FRS (Cashiering, Commission Receivables, Remittance) | v1.0 |
+| R9 | BDO UX guidelines (brand, screen patterns) | current |
 
 Page references in this document ("p.26") are pages of the BRD-4 PDF. For BRCLXN.001-048 the first page is the renumbering addendum (R2, the governing wording) and the second page is the FRID table of the CMS BRD (R1), for example "p.26 / 47". For BRCLXN.049-060 the page is the signed addendum (R3); for BRCLXN.061-064 the page is the draft (R4).
 
@@ -138,7 +137,7 @@ API paths start with `/api/v1/collections` unless another path is given; "..." i
 The CMS BRD states that "unless otherwise stated, all requirements are considered high priority and committed for this phase" (p.37). BRCLXN.001-048 therefore carry the priority **High**. The signed addendum gives **Must have** for BRCLXN.049 and 051-060 and no priority for BRCLXN.050.
 
 > [!NOTE]
-> Values marked "to confirm" (threshold, disposition values, effort codes, escalation defaults) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a new build.
+> Values marked "to confirm" (threshold, disposition values, effort codes, escalation defaults) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a change to the system.
 
 <!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R5)" status=Class -->
 | Class | Meaning |
@@ -273,7 +272,7 @@ Every new Collections role also holds WORK_VIEW, ATTACHMENT_VIEW, REPORT_VIEW, C
 
 ## Permissions matrix
 
-The table below is the role-to-permission matrix delivered with the build ("Y" = granted). The System Administrator changes it through role-permission change requests; the User Access Matrix screen shows it by permission and by action class.
+The table below is the role-to-permission matrix provided with the system ("Y" = granted). The System Administrator changes it through role-permission change requests; the User Access Matrix screen shows it by permission and by action class.
 
 <!-- table: widths=4.2,1.23,1.23,1.23,1.23,1.23,1.23,1.23,1.23,1.23,1.23,1.23 caption="Role-to-permission matrix for Collections (proposal until OQ48)" size=7.5 -->
 | Permission | MKT AO | MKT TL | MKT Hdlr | Coll. Hdlr | CLX TL | Sect. Head | UPP Hdlr | Proc. | Cash-ier | Disb. / Compt. / ACSL | Admin / DCO |
@@ -307,7 +306,7 @@ actor: System
 priority: High
 screens: All Collections screens; User Access Matrix
 description:
-  - Every Collections screen, button and API call requires a permission (section 3.2). The permissions carry an action class (VIEW, CREATE, AMEND, APPROVE) in the area COLLECTIONS, so the User Access Matrix shows who may view, work, bulk update, assign, escalate and set up.
+  - Every Collections screen, button and action requires a permission (section 3.2). The permissions carry an action class (VIEW, CREATE, AMEND, APPROVE) in the area COLLECTIONS, so the User Access Matrix shows who may view, work, bulk update, assign, escalate and set up.
   - Menus show only the screens the user's roles allow. Collections is a section of the Finance group, listed before Cashiering.
   - Users log in with the platform log-in of BRD-1. After three consecutive failed attempts the account locks (NFR 1.04, 2.02); the lock-out applies to all BIBS users.
 preconditions:
@@ -317,7 +316,7 @@ main_flow:
   - BIBS checks the user's permissions for that screen or action.
   - BIBS shows the screen or performs the action.
 alternate_flows:
-  - No permission. The screen is not in the menu; a direct link returns "You do not have access to this page"; an API call is refused (HTTP 403) and logged.
+  - No permission. The screen is not in the menu; a direct link returns "You do not have access to this page"; an direct request is refused and logged.
   - Reserved disposition. A disposition value reserved to other roles is refused even when the user holds CLX_WORK (FR-CL-031).
 rules:
   - [R1, "Roles are granted permissions as in section 3.3 until BDOI confirms the matrix (OQ48).", Configurable, Role-permission change request]
@@ -330,7 +329,7 @@ validations:
 notifications:
   - "None."
 audit:
-  - Refused API calls are logged with user, endpoint and time; every log-in attempt is logged with its source address.
+  - Refused direct request are logged with user, endpoint and time; every log-in attempt is logged with its source address.
 acceptance:
   - A Disbursement user sees the PR Worklist read only and cannot record a disposition.
   - A Marketing AO does not see Collections Setup or Assignments.

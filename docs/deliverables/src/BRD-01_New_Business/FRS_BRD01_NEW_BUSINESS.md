@@ -84,16 +84,14 @@ The scope is the New Business process of BDOI as a broker: from the quotation or
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | New Business BRD pack: Workshop Addendum (pp.1-22, repeated pp.23-44), Addendum for Other Lines and Non-Package (pp.45-90), Fire and Motor BRD ID consolidation (pp.91-129), Fire and Motor BRD V06162025 (pp.130-218) | Addendum signed 9 to 15-Apr-2026; Other Lines 16-Dec-2025; consolidation 21-Dec-2025 | `docs/source-documents/New Business (NB) BRD.pdf` |
-| R2 | BDOI New Business (BRD-1) requirements baseline and fit/gap, including the open questions Q01-Q44 | current | `docs/requirements/BDOI_NB_BRD_SPEC.md` |
-| R3 | New Business requirements traceability (built status, module, screen, API, test per BRD ID) | current | `docs/requirements/BDOI_NB_TRACEABILITY.md` |
-| R4 | Broking (BDOI New Business) architecture | current | `docs/architecture/BROKING_ARCHITECTURE.md` |
-| R5 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R6 | FRS BRD-3 Product Maintenance (package products, versions, incentive criteria) | 1.0, 25-Sep-2026 | `docs/deliverables/out/Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.pdf` |
-| R7 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | New Business BRD pack: Workshop Addendum (pp.1-22, repeated pp.23-44), Addendum for Other Lines and Non-Package (pp.45-90), Fire and Motor BRD ID consolidation (pp.91-129), Fire and Motor BRD V06162025 (pp.130-218) | Addendum signed 9 to 15-Apr-2026; Other Lines 16-Dec-2025; consolidation 21-Dec-2025 |
+| R2 | BDOI New Business (BRD-1) requirements baseline, including the open questions Q01-Q44 | current |
+| R5 | Cross-BRD decisions and answered questions | current |
+| R6 | FRS BRD-3 Product Maintenance (package products, versions, incentive criteria) | 1.0, 25-Sep-2026 |
+| R7 | BDO UX guidelines (brand, screen patterns) | current |
 
 Page references in this document ("p.49") are pages of the BRD PDF (R1). The Workshop Addendum is cited by its first copy (pp.1-22). A reference to a legacy BRD step ("BRD 2.3.1") is given where no BRNB ID exists.
 
@@ -149,7 +147,7 @@ Each FR in section 4 has the same parts:
 - **Notifications**, **audit** and numbered **acceptance criteria**. The acceptance criteria are the basis of the test cases of the BRD-1 test plan.
 
 > [!NOTE]
-> Values marked "default" (SLA hours, days, thresholds, list entries) are the values delivered with the build. They are configuration, so a changed BDOI answer to an open question in section 10.3 does not need a new build.
+> Values marked "default" (SLA hours, days, thresholds, list entries) are the values provided with the system. They are configuration, so a changed BDOI answer to an open question in section 10.3 does not need a change to the system.
 
 <!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R2)" status=Class -->
 | Class | Meaning |
@@ -263,7 +261,7 @@ The BRD persona footnote says that user roles "will be further defined in succee
 
 ## Permissions matrix
 
-The table below is the role-to-permission matrix delivered with the build ("Y" = granted, migration V750). Changes go through access requests of type "Modify role permissions" (FR-NB-135). The User Access Matrix screen shows it by permission and by action class and exports it to Excel.
+The table below is the role-to-permission matrix provided with the system ("Y" = granted, migration V750). Changes go through access requests of type "Modify role permissions" (FR-NB-135). The User Access Matrix screen shows it by permission and by action class and exports it to Excel.
 
 <!-- table: widths=4.3,1.12,1.12,1.12,1.12,1.12,1.12,1.12,1.12,1.12,1.12,1.12 caption="Role-to-permission matrix for New Business (build V750)" size=7.5 -->
 | Permission | MKT AO | MKT TL | TSU | Proc. | Proc. TL | NB Appr. | E-pol. Send. | Adjust. | Bus. Admin | Sys. Admin | Audit. |

@@ -71,17 +71,15 @@ A **submitted policy** is a policy that a bank borrower bought elsewhere and sub
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | BDOI Submitted Policies BRD (16 pages; pages 1-12 scanned) | v1.3, 20-Apr-2026; e-signed 24 to 28-Apr-2026 | `docs/source-documents/BRD - Submitted Policies (with e-sig MCM 4.24.2026).pdf` |
-| R2 | BDOI Report List (Submitted Policies rows #133-#164) | 27-Apr-2026 | `docs/source-documents/Report List as of APR-27-2026.pdf` |
-| R3 | Submitted Policies build design | current | `docs/architecture/SUBMITTED_POLICIES_DESIGN.md` |
-| R4 | BDOI Submitted Policies (BRD-12) requirements baseline and fit/gap | current | `docs/requirements/BDOI_SP_BRD_SPEC.md` |
-| R5 | Cross-BRD decisions and answered questions (BRD-6 to BRD-12) | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R6 | Renewal build design (implementation of `RenewalHandOff`) and FRS BRD-6 Renewal | current | `docs/architecture/RENEWAL_DESIGN.md`; BIBS-FRS-BRD-06 |
-| R7 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
-| R8 | BRD-1 New Business requirements baseline (shared platform capabilities) | current | `docs/requirements/BDOI_NB_BRD_SPEC.md` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | BDOI Submitted Policies BRD (16 pages; pages 1-12 scanned) | v1.3, 20-Apr-2026; e-signed 24 to 28-Apr-2026 |
+| R2 | BDOI Report List (Submitted Policies rows #133-#164) | 27-Apr-2026 |
+| R4 | BDOI Submitted Policies (BRD-12) requirements baseline | current |
+| R5 | Cross-BRD decisions and answered questions (BRD-6 to BRD-12) | current |
+| R7 | BDO UX guidelines (brand, screen patterns) | current |
+| R8 | BRD-1 New Business requirements baseline (shared platform capabilities) | current |
 
 Page references in this document ("p.9") are pages of the BRD PDF (R1); "RL #nnn" is a row of the Report List (R2). The question prefix SQ is shared by two BRDs; this document writes the Submitted Policies questions as SP SQnn (cross-BRD question XQ07).
 
@@ -133,7 +131,7 @@ Each FR in section 4 has the same parts:
 The BRD writes its personas as "As a System", "As a Marketing User", "As an Account Officer", "As a Placement User", "As a Booking User" and "As a User". The FRs name the BIBS roles that act for them (section 3).
 
 > [!NOTE]
-> Values marked "default" (lead days, acceptance days, thresholds, list entries) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a new build.
+> Values marked "default" (lead days, acceptance days, thresholds, list entries) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a change to the system.
 
 <!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R4)" status=Class -->
 | Class | Meaning |

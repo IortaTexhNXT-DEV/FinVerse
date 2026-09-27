@@ -127,7 +127,7 @@ screens:
       - "A map has one version being edited or waiting for approval at a time (FR-DM-011)."
       - "The business owner approves a version, never the Data Steward who submitted it (FR-DM-011)."
       - "A batch with an unmapped code in a mandatory column cannot be approved for load (FR-DM-012)."
-      - "Legacy packages are mapped to package versions in the PACKAGE map, which Renewal uses at sanitation; the migration does not resolve packages on the policy headers (FR-DM-034)."
+      - "Legacy packages are mapped to package versions in the package code map, which Renewal uses at sanitation; the migration does not resolve packages on the policy headers (FR-DM-034)."
     outcome: Every legacy code used by a record in scope has an approved entry, and every batch records the versions it used.
     frs: [FR-DM-011, FR-DM-012, FR-DM-034]
     tests: [MAPS, UNMAPPED]

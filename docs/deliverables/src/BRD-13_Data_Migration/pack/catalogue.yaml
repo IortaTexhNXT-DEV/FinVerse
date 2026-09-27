@@ -16,12 +16,12 @@ decision_classes:
   - [EXCLUDED, "Not migrated; set up again in BIBS or not needed"]
 
 milestones:
-  - [M0, "Pack issued to BDOI (v1.2 with the BDOI answers to DMQ36-DMQ39)", "26 Sep 2026"]
+  - [M0, "Business sign-off set issued to BDOI (release set v2.0, with the BDOI answers to DMQ36-DMQ39)", "5 Oct 2026"]
   - [M1, "Scope-shaping decisions (answers that change the migration functions)", "16 Oct 2026"]
   - [M2, "Owners, stewards, keys and remaining business rules; object decisions signed (gate G1); layouts frozen, version 1 (G2 part 1) - end of requirements and mapping", "30 Oct 2026"]
   - [M3, "First full extracts in the templates, with control files and volumes (profiling, performance sizing)", "29 Jan 2027"]
   - [M4, "Extracts for Trial migration 1 (SIT migration starts); reference data and clients first", "9 Apr 2027"]
-  - [M5, "Code maps approved for Trial migration 2 (G2), including the PACKAGE map", "18 Jun 2027"]
+  - [M5, "Code maps approved for Trial migration 2 (G2), including the package code map", "18 Jun 2027"]
   - [M6, "Cut-over date and window, fallback and decommissioning criteria agreed; Comptrollership confirms the year-end option A (DMQ39)", "1 Oct 2027"]
 
 # --------------------------------------------------------------------------------------------------------------
@@ -124,10 +124,10 @@ objects:
     bound: A few hundred codes
     layouts: [R05]
   - code: R06
-    name: PACKAGE code map (legacy package and version to BIBS package version)
+    name: Package code map (legacy package and version to BIBS package version)
     category: Reference
     decision: MIGRATE
-    rationale: Packages are remapped at sanitation in Renewal, not at migration intake (DMQ36, answered 26-Sep-2026). The migration loads the PACKAGE code map as reference data only; the Renewal package check uses it and sends unmapped packages to the Exception bucket, worked by the Renewal processing team. The BIBS packages themselves are maintained by TSU in Product Maintenance (BRD-3) and are not migrated.
+    rationale: Packages are remapped at sanitation in Renewal, not at migration intake (DMQ36, answered 26-Sep-2026). The migration loads the package code map as reference data only; the Renewal package check uses it and sends unmapped packages to the Exception bucket, worked by the Renewal processing team. The BIBS packages themselves are maintained by TSU in Product Maintenance (BRD-3) and are not migrated.
     source: QPS (legacy packages); TSU (BIBS package versions)
     target: "Renewal package map, used by the package check of the Renewal sanitation"
     owner: Product Owner, MBS (approves); TSU (prepares)
@@ -737,7 +737,7 @@ decisions:
   - [DMQ34, Collection history, "Carry open dispositions, promises, installment plans and collector assignments", F03, M2, "Head, Operations (Collections)", OPEN]
   - [DCR-202, Write-back to legacy, "Confirm that no contact or client update is written back to QPS / EBIX after the freeze (legacy read-only; proposal)", "C01 deltas; CSF contact write-back", M1, "Product Owner, MBS", OPEN]
   - [DMQ35, Foreign currency, "Rate for the openings of USD invoices and UPP (legacy booking rate or cutover BOOK rate); FX difference at collection", "F01, F02, G01", M2, "Head, Comptrollership", OPEN]
-  - [DMQ36, Package remapping, "At upload (migration intake) or during Renewal sanitation; owner of the decision and of the map; legacy packages that split and on which attributes", "R06, P01; PACKAGE map; Renewal check PACKAGE_REMAP", M1, "Product Owner, MBS; TSU", ANSWERED, "BDOI 26-Sep-2026 - at sanitation in Renewal, not at migration intake. The migration loads the PACKAGE code map as reference data only (R06); P01 keeps the legacy package; the Renewal check PACKAGE_REMAP sends unmapped packages to the Exception bucket, worked by the Renewal processing team"]
+  - [DMQ36, Package remapping, "At upload (migration intake) or during Renewal sanitation; owner of the decision and of the map; legacy packages that split and on which attributes", "R06, P01; package code map; package check of the Renewal sanitation", M1, "Product Owner, MBS; TSU", ANSWERED, "BDOI 26-Sep-2026 - at sanitation in Renewal, not at migration intake. The migration loads the package code map as reference data only (R06); P01 keeps the legacy package; the package check of the Renewal sanitation sends unmapped packages to the Exception bucket, worked by the Renewal processing team"]
   - [DMQ37, January-May 2028 renewals, "Prepared in legacy and carried at the freeze, or processed in BIBS after go-live", "P01 scope; P03; Renewal go-live extraction", M1, "Heads, Retail and Corporate Marketing", ANSWERED, "BDOI 26-Sep-2026 - processed in BIBS after go-live; no carried candidates. Go-live extraction of every expiry from T to 31-May-2028 from the migrated headers (P01), prioritised by expiry date, January expiries flagged urgent; RAs already sent by hand loaded as a small reference file (P03) and not re-sent"]
   - [DMQ38, RMEL and disposition sources, "Where the RMEL, dispositions and RAs are kept; who reviews rejected rows", "P03 template and review", M2, "Head of the Renewal processing team", ANSWERED, "BDOI 26-Sep-2026 - RMEL and dispositions are kept in Excel; rejected rows are reviewed by the Renewal processing team, maker and checker. Only the RAs already sent are taken from the trackers (XLSX template, rejection report with correction columns, maker-checker resubmission)"]
   - [DMQ39, Year-end cut-over, "Go-live at the year-end boundary; last business day; year-end close; late 2027 and audit adjustments after go-live", "Runbook calendar; G01, G03; true-up journals", M6, Program Manager; Head of Comptrollership, RECOMMENDED, "BDOI 26-Sep-2026, recommendation awaiting Comptrollership confirmation - option A - go-live Mon 3-Jan-2028; legacy closes FY2027; provisional opening TB (balance sheet only) from the preliminary December TB; legacy GL open only for FY2027 closing and audit adjustments; true-ups as opening-balance adjustment journals after the legacy close (about mid-late January 2028) and after the audited FS (about March-April 2028); December soft close by about 20-Dec-2027. Options B (April 2028, YTD P&L) and C (two books in Q1 2028) not recommended"]
@@ -765,7 +765,7 @@ control_fields:
 file_rules_extra:
   - [Personal data, "Production extracts are loaded only in production. Every other environment receives masked data: names, addresses, TIN, ID, account and phone numbers, e-mail addresses and birth dates are masked when the file is received. Staged rows and files are deleted within 5 days of the batch sign-off"]
   - [Layout changes, "A layout is frozen at gate G2. A file whose header does not match the layout in force is rejected. A change of layout is a new layout version agreed with the Data Migration Lead"]
-  - [Excel template of P03, "The Renewal processing team may send the RA-sent file in the Excel template of layout P03 (first sheet with the header in row 1, a list on the channel column, an instructions sheet); the CSV template is also accepted"]
+  - [Load template workbook of P03, "The Renewal processing team may send the RA-sent file in the load template workbook of layout P03 exported by the Migration Console (first sheet with the header row, the Columns sheet with the allowed values, the How to fill sheet); the CSV template is also accepted"]
 
 # The BIBS values that each code map set maps to, as the business knows them (the console shows the same set).
 map_labels:
@@ -800,11 +800,11 @@ map_due:
 # L5 or business check; sample: what the data owner verifies on the BIBS screens (gate G6).
 reconciliation:
   - objects: [R01, R02, R03, R04, R05, R06, R07, R08, R11]
-    l1: Values received, mapped, created, rejected; PACKAGE map entries
+    l1: Values received, mapped, created, rejected; package code map entries
     l2: "-"
     l3: Distinct keys
-    l4: Created values (name, status, dates); PACKAGE entries in the Renewal package map
-    business: Unmapped-code report empty; every value created in BIBS authorised in its master; the PACKAGE entries in the Renewal package map equal the approved version
+    l4: Created values (name, status, dates); package code map entries in the Renewal package map
+    business: Unmapped-code report empty; every value created in BIBS authorised in its master; the package code map entries in the Renewal package map equal the approved version
     sample: "Every value created in BIBS; 10 mapped values per code map set; every legacy package with more than one BIBS target; every receipt series. Checked: value, description and status in the master; the package entries of each split in the Renewal package map; next AR / OR number = legacy last used + 1"
   - objects: [R09]
     l1: Payees received and loaded
@@ -904,3 +904,9 @@ proposals:
   - [PR-DM-20, Retention of the migration evidence, "Staged rows and files are deleted within 5 days of the batch sign-off; counts, hashes, totals, reports and sign-offs are kept 10 years; the archive and its access log follow the retention of historical data (5 years online, 15 years archive)", "The personal data of the extracts is not kept longer than needed while the evidence of the migration stays available for audit", "Compliance confirms the retention of the evidence", "DMQ29, DMQ24", "M2 (30 Oct 2026)"]
   - [PR-DM-21, Decommissioning of a legacy system, "A legacy system is switched off only against a signed checklist: final extracts reconciled, the final opening-balance adjustment reconciled (EBIX, ISYS), archive loaded and reconciled, Legacy Inquiry verified by Audit / Compliance, no open item or claim needing it, access logs archived, retention covered, owners signed", "History and audit evidence stay available; nothing still open depends on the system", "The Program Manager and BDOI IT confirm the criteria and the owner per system", DMQ27, "M6 (1 Oct 2027)"]
   - [PR-DM-22, No write-back to legacy, "After the freeze no client or contact change is written back to QPS or EBIX; legacy is read-only", "One system of record per item from the freeze", "The Product Owner of MBS confirms", DCR-202, "M1 (16 Oct 2026)"]
+  - [PR-DM-23, Treatment of a legacy invoice, "A legacy invoice is not re-booked in BIBS: it enters the Operations ledger with its open balances per component and insurer share, keeps its legacy number, and is processed like a BIBS invoice (payments, remittance, reversals, endorsements) with its postings on the legacy control accounts", "The legacy books stay traceable item by item and the processes after go-live are the ones users already learn for BIBS invoices", "Comptrollership and Operations confirm the treatment", "DMQ10, DMQ18", "M1 (16 Oct 2026)"]
+  - [PR-DM-24, Package remapping at Renewal sanitation, "The migration loads the policy headers with the legacy package as given and loads the package code map (object R06) prepared by TSU; each candidate is remapped at the package check of the Renewal sanitation, and a package without a map entry goes to the Exception bucket", "BDOI decision of 26 September 2026; no package is guessed at load", "The Product Owner of Marketing Business System confirms the decision and names the TSU preparer of the map", DMQ36, "M2 (30 Oct 2026)"]
+  - [PR-DM-25, Renewals of the January-May 2028 expiries, "No renewal cohort is carried from legacy: the expiries from go-live to 31 May 2028 are extracted at go-live and processed in BIBS, January expiries first and flagged Urgent; the renewal advices already sent are loaded from the Excel trackers of the Renewal processing team (object P03) with a maker and a checker", "BDOI decisions of 26 September 2026; the renewal lead time of the first months is protected", "The Heads of Retail and Corporate Marketing and the Head of the Renewal processing team confirm", "DMQ26, DMQ37, DMQ38", "M2 (30 Oct 2026)"]
+  - [PR-DM-26, Objects outside the migration, "Open claims, Employee Benefits programmes, the Excel masterlists of submitted policies, payees and users are not migrated until BDOI decides; users are created through User Access requests and legacy user IDs are only mapped; an object brought into scope uses the same layouts, gates and reconciliation", "The scope of these objects is open in the BRD", "The Program Manager decides the scope of each object", DMQ30, "M2 (30 Oct 2026)"]
+  - [PR-DM-27, Loading through the BIBS functions, "Each row is loaded through the same BIBS function that the screens use, so every rule, audit entry and accounting entry applies, without notifications to clients or insurers; each record keeps a cross-reference to its legacy key", "Migrated data meets the same rules as data keyed on the screens and every load is reconcilable", "The Program Manager confirms the approach", "-", "M1 (16 Oct 2026)"]
+  - [PR-DM-28, Reconciliation tolerance, "An amount difference between the control total, staging and BIBS is a break unless it is within the amount tolerance per currency (proposed 0.00); every break is fixed by a rerun or explained with a reason from the list and approved by the reconciliation approver", "Financial objects must reconcile to the centavo; the BRD gives no tolerance", "Comptrollership confirms the tolerance", "-", "M2 (30 Oct 2026)"]

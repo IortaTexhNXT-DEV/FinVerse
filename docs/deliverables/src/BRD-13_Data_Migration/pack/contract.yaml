@@ -69,16 +69,16 @@ contract:
   - id: IC-08
     party: BRD-6 Renewal
     direction: Out
-    what: The migrated policy headers expiring from go-live to 31 May 2028 and the renewal advices already sent (P03) for the go-live renewal extraction; the PACKAGE code map (R06) for the package check at sanitation; the migrated headers for the daily extraction from 1 June 2028
+    what: The migrated policy headers expiring from go-live to 31 May 2028 and the renewal advices already sent (P03) for the go-live renewal extraction; the package code map (R06) for the package check at sanitation; the migrated headers for the daily extraction from 1 June 2028
     how: Go-live extraction at 04:00 on go-live day, January expiries flagged urgent; the map is maintained in Renewal after go-live
     owner: Heads, Retail and Corporate Marketing; Head, Renewal processing team; TSU (package map)
-    screens: Code Maps (PACKAGE); Batches (P03 resubmissions); Renewal candidates
+    screens: Code Maps (package code map); Batches (P03 resubmissions); Renewal candidates
     frs: [FR-DM-034, FR-DM-122, FR-DM-124, FR-DM-125]
   - id: IC-09
     party: BRD-3 Product Maintenance
     direction: In
     what: Products, package versions, insurers and commission rates of BIBS, which the code maps target; values created from the migration (CREATE entries) are authorised in their masters
-    how: Before the load of any dependent object; the PACKAGE map names only released package versions
+    how: Before the load of any dependent object; the package code map names only released package versions
     owner: Marketing Business System; TSU
     screens: Code Maps; Products; Insurers (LEGACY badge)
     frs: [FR-DM-011, FR-DM-034]

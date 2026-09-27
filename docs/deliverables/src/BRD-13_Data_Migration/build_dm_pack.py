@@ -553,7 +553,8 @@ def r_decisions(doc: Any, cat: Catalogue, **_: Any) -> None:
 
 
 def r_proposals(doc: Any, cat: Catalogue, **_: Any) -> None:
-    rows = [[p[0], p[1], p[2], p[3], f"{p[4]} Needed by {p[6]} ({p[5]})."] for p in cat.proposals]
+    rows = [[p[0], p[1], p[2], p[3], f"{p[4].rstrip('.')}. Needed by {p[6]}" + (f" ({p[5]})." if p[5] not in ("-", "") else ".")]
+            for p in cat.proposals]
     _table(doc, ["Ref", "Topic", "Proposed rule", "Reason", "Decision requested"], rows,
            [1.6, 2.6, 5.8, 3.4, 3.2], "Proposed business rules and clarifications for confirmation", size=7.5)
 

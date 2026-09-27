@@ -27,6 +27,10 @@ import java.time.LocalDate;
  * @param mobile mobile
  * @param marketSegment market segment
  * @param bankClient BDO bank client
+ * @param origin BIBS or MIGRATED
+ * @param sourceSystem legacy source system of a migrated client
+ * @param legacyRef legacy client code
+ * @param migrationBatch migration batch that loaded the client
  */
 public record ClientListItem(
     Long id,
@@ -45,7 +49,11 @@ public record ClientListItem(
     String email,
     String mobile,
     String marketSegment,
-    boolean bankClient) {
+    boolean bankClient,
+    String origin,
+    String sourceSystem,
+    String legacyRef,
+    String migrationBatch) {
 
   /**
    * Maps a client.
@@ -71,6 +79,10 @@ public record ClientListItem(
         c.getEmail(),
         c.getMobile(),
         c.getMarketSegment(),
-        c.isBankClient());
+        c.isBankClient(),
+        c.getRecordOrigin().origin().name(),
+        c.getRecordOrigin().sourceSystem(),
+        c.getRecordOrigin().legacyRef(),
+        c.getRecordOrigin().migrationBatch());
   }
 }

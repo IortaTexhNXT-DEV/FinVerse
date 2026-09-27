@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.UnappliedOrigin;
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -78,6 +79,8 @@ public class Unapplied extends BaseEntity {
   @Column(length = 250)
   private String remarks;
 
+  @Embedded private UnappliedLegacy legacy = UnappliedLegacy.NONE;
+
   protected Unapplied() {}
 
   /**
@@ -106,6 +109,15 @@ public class Unapplied extends BaseEntity {
     this.sourceModule = spec.sourceModule();
     this.sourceRef = spec.sourceRef();
     this.remarks = spec.remarks();
+  }
+
+  /**
+   * Marks a new item as an unapplied payment carried from legacy (Data Migration, F02).
+   *
+   * @param facts source system, legacy reference, batch, AR of legacy and automatch references
+   */
+  public void markMigrated(UnappliedLegacy facts) {
+    this.legacy = facts;
   }
 
   /**
@@ -225,6 +237,10 @@ public class Unapplied extends BaseEntity {
 
   public String getRemarks() {
     return remarks;
+  }
+
+  public UnappliedLegacy getLegacy() {
+    return legacy == null ? UnappliedLegacy.NONE : legacy;
   }
 
   /**

@@ -1,6 +1,6 @@
 /** Disbursement API client (DIS 2.2-3.28): /api/v1/disbursement. */
 import { api } from '@/api/client';
-import type { PageResponse } from '@/api/types';
+import type { PageResponse, RecordOriginKind } from '@/api/types';
 import type {
   RequestStatus,
   VoucherStage,
@@ -100,9 +100,15 @@ export const disbursementApi = {
   requestEdit: (id: number, toStatus: InstrumentStatus, reason: string) =>
     api.post<StatusEdit>(instrumentPath(id, 'status-edits'), { toStatus, reason }),
   approveEdit: (editId: number) => api.post<StatusEdit>(`${BASE}/status-edits/${editId}/approve`),
-  payees: (companyId: number, stages: readonly PayeeStage[], q: string, page: number) =>
+  payees: (
+    companyId: number,
+    stages: readonly PayeeStage[],
+    q: string,
+    page: number,
+    origin?: RecordOriginKind,
+  ) =>
     api.get<PageResponse<PayeeSummary>>(
-      `${BASE}/payees${toQuery({ companyId, stage: stages, q, page, size: 20 })}`,
+      `${BASE}/payees${toQuery({ companyId, stage: stages, q, origin, page, size: 20 })}`,
     ),
   payee: (id: number) => api.get<Payee>(`${BASE}/payees/${id}`),
   createPayee: (body: PayeeInput) => api.post<Payee>(`${BASE}/payees`, body),

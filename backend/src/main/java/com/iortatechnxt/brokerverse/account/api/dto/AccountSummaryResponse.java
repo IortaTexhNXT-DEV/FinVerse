@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.account.api.dto;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
+import com.iortatechnxt.brokerverse.account.domain.AccountLegacyHeader;
+import com.iortatechnxt.brokerverse.account.domain.AccountOrigin;
 import com.iortatechnxt.brokerverse.account.domain.AccountStatus;
 import com.iortatechnxt.brokerverse.account.domain.BusinessType;
 import com.iortatechnxt.brokerverse.account.domain.PaymentArrangement;
@@ -32,6 +34,10 @@ import java.time.LocalDate;
  * @param accountOfficer account officer
  * @param createdAt creation time
  * @param businessType New Business or Renewal (BRNB.097, BT0)
+ * @param origin how the account was created (MIGRATED: imported from a legacy system)
+ * @param sourceSystem legacy source system of an imported account
+ * @param legacyRef legacy policy reference
+ * @param migrationBatch migration batch that imported it
  */
 public record AccountSummaryResponse(
     Long id,
@@ -54,7 +60,11 @@ public record AccountSummaryResponse(
     boolean directPayment,
     String accountOfficer,
     Instant createdAt,
-    BusinessType businessType) {
+    BusinessType businessType,
+    AccountOrigin origin,
+    String sourceSystem,
+    String legacyRef,
+    String migrationBatch) {
 
   /**
    * Maps an account (scalar columns only).
@@ -63,6 +73,17 @@ public record AccountSummaryResponse(
    * @return response
    */
   public static AccountSummaryResponse from(Account a) {
+    return from(a, null);
+  }
+
+  /**
+   * Maps an account with the legacy header of an imported account.
+   *
+   * @param a account
+   * @param legacy legacy header, null for an account created in BIBS
+   * @return response
+   */
+  public static AccountSummaryResponse from(Account a, AccountLegacyHeader legacy) {
     return new AccountSummaryResponse(
         a.getId(),
         a.getArn(),
@@ -84,6 +105,10 @@ public record AccountSummaryResponse(
         a.isDirectPayment(),
         a.getSales().accountOfficer(),
         a.getCreatedAt(),
-        a.getBusinessType());
+        a.getBusinessType(),
+        a.getClassification().origin(),
+        legacy == null ? null : legacy.getSourceSystem(),
+        legacy == null ? null : legacy.getLegacyRef(),
+        legacy == null ? null : legacy.getMigrationBatch());
   }
 }

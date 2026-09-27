@@ -1,4 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { RecordOriginKind } from '@/api/types';
+import { OriginBadge } from '@/components/ui/OriginBadge';
+import { OriginFilter } from '@/components/ui/OriginFilter';
 import { UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -23,7 +26,15 @@ import type { PayeeTab } from './labels';
 import './disbursement.css';
 
 const PAYEE_COLUMNS: Column<PayeeSummary>[] = [
-  { key: 'code', header: 'Payee Code', render: (p) => p.payeeCode },
+  {
+    key: 'code',
+    header: 'Payee Code',
+    render: (p) => (
+      <>
+        {p.payeeCode} <OriginBadge record={p} />
+      </>
+    ),
+  },
   { key: 'name', header: 'Name', render: (p) => p.name },
   { key: 'class', header: 'Class', render: (p) => humanize(p.payeeClass) },
   { key: 'mode', header: 'Default Mode', render: (p) => MODE_LABELS[p.defaultMode] },
@@ -116,11 +127,12 @@ export default function PayeesPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<PayeeTab>('ACTIVE');
   const [query, setQuery] = useState('');
+  const [origin, setOrigin] = useState<RecordOriginKind>();
   const [page, setPage] = useState(0);
   const stages = PAYEE_TABS.find((t) => t.id === tab)?.stages ?? [];
   const payees = useQuery({
-    queryKey: ['disbursement', 'payees', companyId, tab, query, page],
-    queryFn: () => disbursementApi.payees(companyId, stages, query, page),
+    queryKey: ['disbursement', 'payees', companyId, tab, query, origin, page],
+    queryFn: () => disbursementApi.payees(companyId, stages, query, page, origin),
     enabled: companyId > 0 && tab !== 'REQUESTS',
   });
   return (
@@ -162,7 +174,15 @@ export default function PayeesPage() {
                   setQuery(text);
                   setPage(0);
                 }}
-              />
+              >
+                <OriginFilter
+                  value={origin}
+                  onChange={(o) => {
+                    setOrigin(o);
+                    setPage(0);
+                  }}
+                />
+              </WorklistToolbar>
               <DataTable
                 caption="Payees"
                 columns={PAYEE_COLUMNS}

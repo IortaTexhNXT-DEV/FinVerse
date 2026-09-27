@@ -1,12 +1,14 @@
 package com.iortatechnxt.brokerverse.disbursement.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.DisbursementMode;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeSource;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeStage;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -85,6 +87,8 @@ public class Payee extends BaseEntity {
 
   @Column(length = 500)
   private String remarks;
+
+  @Embedded private RecordOrigin recordOrigin = RecordOrigin.BIBS;
 
   @OneToMany(mappedBy = "payee", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("id")
@@ -258,6 +262,20 @@ public class Payee extends BaseEntity {
 
   public boolean isUsed() {
     return used;
+  }
+
+  /**
+   * Marks a record loaded from a legacy system (Data Migration): origin MIGRATED with its source
+   * system, legacy reference and loading batch; the screens show a LEGACY badge.
+   *
+   * @param origin origin
+   */
+  public void markMigrated(RecordOrigin origin) {
+    this.recordOrigin = origin;
+  }
+
+  public RecordOrigin getRecordOrigin() {
+    return recordOrigin == null ? RecordOrigin.BIBS : recordOrigin;
   }
 
   public String getRemarks() {

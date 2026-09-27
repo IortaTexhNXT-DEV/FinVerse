@@ -14,12 +14,14 @@ import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
 import { PolicyTransactions } from '@/components/broking/PolicyTransactions';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { OriginBadge } from '@/components/ui/OriginBadge';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { formatAmount, formatDate, formatPeriod, humanize } from '@/utils/format';
 import { ComponentsTab, HistoryTab, MovementsTab, RelatedSectionTab } from './Invoice360Tabs';
 import { InvoiceFamilyTab } from './InvoiceFamilyTab';
+import { LegacyInvoiceBlock } from './LegacyInvoiceBlock';
 import { RELATED_TABS, flagChips, invoiceTabs } from './opsLabels';
 import type { Invoice360TabId } from './opsLabels';
 import { displayNameOf } from '@/api/users';
@@ -120,6 +122,10 @@ function Summary({ view }: Readonly<{ view: Invoice360 }>) {
       chips={
         <>
           <ReferenceChip label="Invoice" value={i.keys.invoiceNo} />
+          <OriginBadge record={i} />
+          {i.legacyInvoiceNo !== undefined && i.legacyInvoiceNo !== i.keys.invoiceNo && (
+            <ReferenceChip label="Legacy Invoice" value={i.legacyInvoiceNo} />
+          )}
           <ReferenceChip label="ARN" value={i.keys.arn} />
           {i.keys.policyNo !== undefined && (
             <ReferenceChip label="Policy No." value={i.keys.policyNo} />
@@ -152,7 +158,8 @@ function Summary({ view }: Readonly<{ view: Invoice360 }>) {
  * Invoice 360 (RMTID.026/032/038, ADJID.024): the booked invoice as Operations sees it - the
  * premium receivable by component with its outstanding balance, the insurer shares, payment and
  * remittance status, flags and lock, every movement, the records of the Operations modules and
- * the history.
+ * the history. An open legacy invoice migrated at cut-over shows a LEGACY badge and its legacy
+ * block (the frozen original values).
  */
 export default function Invoice360Page() {
   const invoiceNo = decodeURIComponent(useParams().no ?? '');
@@ -195,6 +202,7 @@ export default function Invoice360Page() {
         }
       />
       <Summary view={v} />
+      {v.legacy !== undefined && <LegacyInvoiceBlock legacy={v.legacy} />}
       {v.invoice.keys.accountId !== undefined && (
         <WorkflowPanel
           entityType="Account"

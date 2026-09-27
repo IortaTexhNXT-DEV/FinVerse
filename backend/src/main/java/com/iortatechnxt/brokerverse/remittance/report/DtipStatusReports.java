@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
+import com.iortatechnxt.brokerverse.report.core.ReportOrigin;
 import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.TabularReportBuilder;
@@ -23,7 +24,8 @@ public final class DtipStatusReports {
       " from ops_invoice i join ops_invoice_component d on d.invoice_id = i.id"
           + " and d.component = 'DTIP'"
           + " where i.company_id = :companyId and i.dp_flag = false"
-          + " and (cast(:insurer as varchar) is null or i.insurer_code = :insurer)";
+          + " and (cast(:insurer as varchar) is null or i.insurer_code = :insurer)"
+          + ReportOrigin.sql("i.origin");
 
   private DtipStatusReports() {}
 
@@ -54,7 +56,8 @@ public final class DtipStatusReports {
           "REM-DTIP-SUMMARY",
           "DTIP Status Report - Summary",
           "Outstanding due to insurers per insurer and remittance status",
-          false);
+          false,
+          ReportOrigin.parameter());
     }
 
     @Override
@@ -123,7 +126,8 @@ public final class DtipStatusReports {
           "REM-DTIP-DETAIL",
           "DTIP Status Report - Detailed",
           "Invoices with outstanding due to insurer, collections and remittances",
-          false);
+          false,
+          ReportOrigin.parameter());
     }
 
     @Override

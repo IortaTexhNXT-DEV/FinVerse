@@ -35,6 +35,18 @@ public interface JournalBatchRepository
   Optional<JournalBatch> findByCompanyIdAndBatchNo(Long companyId, String batchNo);
 
   /**
+   * System journals of a module whose source key starts with a prefix, oldest first (the opening
+   * journals of a migrated invoice, one per insurer share).
+   *
+   * @param companyId company
+   * @param sourceModule module
+   * @param prefix start of the source key
+   * @return batches
+   */
+  List<JournalBatch> findByCompanyIdAndSourceModuleAndSourceReferenceStartingWithOrderByIdAsc(
+      Long companyId, String sourceModule, String prefix);
+
+  /**
    * Finds a non-cancelled system journal by its source idempotency key.
    *
    * @param companyId company

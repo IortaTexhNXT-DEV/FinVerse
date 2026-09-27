@@ -2,13 +2,16 @@ import { useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { catalogApi } from '@/api/catalog';
+import { api, toQuery } from '@/api/client';
 import type { Insurer } from '@/api/catalog';
+import type { RecordOriginKind } from '@/api/types';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { OriginBadge } from '@/components/ui/OriginBadge';
+import { OriginFilter } from '@/components/ui/OriginFilter';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
@@ -33,9 +36,10 @@ export default function InsurersPage() {
   const navigate = useNavigate();
   const { can } = useAuth();
   const [creating, setCreating] = useState(false);
+  const [origin, setOrigin] = useState<RecordOriginKind>();
   const insurers = useQuery({
-    queryKey: ['catalog', 'insurers', companyId],
-    queryFn: () => catalogApi.insurers(companyId),
+    queryKey: ['catalog', 'insurers', companyId, origin],
+    queryFn: () => api.get<Insurer[]>(`/catalog/insurers${toQuery({ companyId, origin })}`),
   });
   return (
     <div className="stack">
@@ -52,6 +56,9 @@ export default function InsurersPage() {
         }
       />
       <ErrorAlert error={insurers.error} />
+      <Card>
+        <OriginFilter value={origin} onChange={setOrigin} />
+      </Card>
       <Card flush>
         <DataTable<Insurer>
           loading={insurers.isLoading}
@@ -60,7 +67,15 @@ export default function InsurersPage() {
           onRowClick={(i) => void navigate(`/catalog/insurers/${i.id}`)}
           emptyMessage="No insurer on the panel yet."
           columns={[
-            { key: 'c', header: 'Code', render: (i) => <strong>{i.partyCode}</strong> },
+            {
+              key: 'c',
+              header: 'Code',
+              render: (i) => (
+                <>
+                  <strong>{i.partyCode}</strong> <OriginBadge record={i} />
+                </>
+              ),
+            },
             { key: 'n', header: 'Name', render: (i) => i.name },
             { key: 'a', header: 'Accredited Until', render: accreditation },
             {

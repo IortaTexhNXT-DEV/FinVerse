@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
+@SuppressWarnings("PMD.GodClass") // assembles the history from the ledger, bookings and sources
 public class PolicyTransactionService {
 
   /** Status of a booked invoice without a request behind it. */
@@ -58,6 +59,7 @@ public class PolicyTransactionService {
   private final BookingQueryService bookings;
   private final JournalBatchRepository journals;
   private final List<PolicyTransactionSource> sources;
+  private final MigratedInvoiceHistory history;
 
   /**
    * Creates the service.
@@ -66,16 +68,19 @@ public class PolicyTransactionService {
    * @param bookings booked invoices (components and booking journals)
    * @param journals journal batches of the accounting engine
    * @param sources transactions of the other modules
+   * @param history opening journals of migrated invoices
    */
   public PolicyTransactionService(
       InvoiceLedgerQueryService ledger,
       BookingQueryService bookings,
       JournalBatchRepository journals,
-      List<PolicyTransactionSource> sources) {
+      List<PolicyTransactionSource> sources,
+      MigratedInvoiceHistory history) {
     this.ledger = ledger;
     this.bookings = bookings;
     this.journals = journals;
     this.sources = sources;
+    this.history = history;
   }
 
   /**
@@ -174,7 +179,7 @@ public class PolicyTransactionService {
   }
 
   private Draft invoiceDraft(OpsInvoice invoice, SourcedTransaction request, int order) {
-    Optional<BookedInvoice> booked = booked(invoice.getInvoiceNo());
+    Optional<BookedInvoice> booked = booked(invoice);
     Set<String> batches = new LinkedHashSet<>();
     booked.ifPresent(b -> batches.addAll(b.getJournalBatches()));
     ledger.movements(invoice.getInvoiceNo()).stream()
@@ -188,22 +193,7 @@ public class PolicyTransactionService {
             request == null ? null : request.recordId());
     Map<LedgerComponent, BigDecimal> changes = invoiceChanges(invoice, booked.orElse(null));
     if (request == null) {
-      return new Draft(
-          kindOf(invoice.getKind()),
-          invoice.getClassification().bookingDate(),
-          invoice.getKind() == InvoiceKind.BOOKING
-              ? invoice.getClassification().inceptionDate()
-              : null,
-          kindLabel(invoice.getKind()),
-          invoice.getEndorsementNo(),
-          refs,
-          changes,
-          null,
-          BOOKED,
-          "Booked",
-          true,
-          List.copyOf(batches),
-          order);
+      return bookedDraft(invoice, refs, changes, batches, order);
     }
     batches.addAll(request.journalBatchNos());
     return new Draft(
@@ -290,6 +280,42 @@ public class PolicyTransactionService {
       }
     }
     return drafts;
+  }
+
+  /** An invoice without a request behind it: booked in BIBS, or migrated with its opening. */
+  private Draft bookedDraft(
+      OpsInvoice invoice,
+      Refs refs,
+      Map<LedgerComponent, BigDecimal> changes,
+      Set<String> batches,
+      int order) {
+    boolean migrated = invoice.getRecordOrigin().isMigrated();
+    if (migrated) {
+      batches.addAll(history.openingJournals(invoice));
+    }
+    return new Draft(
+        kindOf(invoice.getKind()),
+        invoice.getClassification().bookingDate(),
+        invoice.getKind() == InvoiceKind.BOOKING
+            ? invoice.getClassification().inceptionDate()
+            : null,
+        kindLabel(invoice.getKind()) + (migrated ? " (Migrated)" : ""),
+        migrated ? MigratedInvoiceHistory.detail(invoice) : invoice.getEndorsementNo(),
+        refs,
+        changes,
+        null,
+        migrated ? MigratedInvoiceHistory.MIGRATED : BOOKED,
+        migrated ? "Migrated" : "Booked",
+        true,
+        List.copyOf(batches),
+        order);
+  }
+
+  /** The booked invoice; none for a migrated invoice (a lookup would mark the transaction). */
+  private Optional<BookedInvoice> booked(OpsInvoice invoice) {
+    return invoice.getRecordOrigin().isMigrated()
+        ? Optional.empty()
+        : booked(invoice.getInvoiceNo());
   }
 
   private Optional<BookedInvoice> booked(String invoiceNo) {

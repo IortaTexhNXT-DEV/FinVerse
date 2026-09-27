@@ -1,6 +1,6 @@
 import { api, toQuery } from './client';
 import type { ClientStatus, ClientType, KycStatus } from './crm';
-import type { PageResponse } from './types';
+import type { PageResponse, RecordOriginFields, RecordOriginKind } from './types';
 
 /** KYC profile per BDO standard (BRNB.030). */
 export interface ClientProfile {
@@ -12,7 +12,7 @@ export interface ClientProfile {
 }
 
 /** Complete client details (BRNB.046). */
-export interface ClientDetail {
+export interface ClientDetail extends RecordOriginFields {
   id: number;
   companyId: number;
   code: string;
@@ -65,8 +65,8 @@ export interface ClientDetail {
   };
 }
 
-/** A client in a list. */
-export interface ClientListItem {
+/** A client in a list (origin fields: migrated clients, BRD-13). */
+export interface ClientListItem extends RecordOriginFields {
   id: number;
   code: string;
   prospectCode: string;
@@ -125,6 +125,7 @@ export interface ClientSearch {
   bankClient?: boolean;
   clientType?: ClientType;
   kycDue?: boolean;
+  origin?: RecordOriginKind;
   page?: number;
 }
 

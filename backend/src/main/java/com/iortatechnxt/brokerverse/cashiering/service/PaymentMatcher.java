@@ -72,13 +72,20 @@ public class PaymentMatcher {
    * Booked invoices of a reference, oldest first.
    *
    * @param companyId company
-   * @param ref invoice, ARN, policy or PN number
+   * @param ref invoice (or legacy invoice), ARN, policy or PN number
    * @return invoices (components loaded)
    */
   public List<OpsInvoice> invoices(Long companyId, String ref) {
     Optional<OpsInvoice> byNo = ledger.find(ref).filter(i -> i.getCompanyId().equals(companyId));
     if (byNo.isPresent()) {
       return List.of(loaded(byNo.get()));
+    }
+    List<OpsInvoice> byLegacyNo =
+        ledger.findByLegacyNo(ref).stream()
+            .filter(i -> i.getCompanyId().equals(companyId))
+            .toList();
+    if (!byLegacyNo.isEmpty()) {
+      return byLegacyNo;
     }
     List<OpsInvoice> byArn =
         ledger.forArn(ref).stream().filter(i -> i.getCompanyId().equals(companyId)).toList();

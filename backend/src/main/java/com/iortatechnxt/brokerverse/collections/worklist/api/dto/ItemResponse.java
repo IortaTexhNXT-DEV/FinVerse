@@ -1,9 +1,11 @@
 package com.iortatechnxt.brokerverse.collections.worklist.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.iortatechnxt.brokerverse.collections.common.domain.CollectionItem;
 import com.iortatechnxt.brokerverse.collections.common.domain.ItemParts.Classification;
 import com.iortatechnxt.brokerverse.collections.common.domain.ItemParts.Figures;
 import com.iortatechnxt.brokerverse.collections.common.domain.ItemParts.Parties;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -50,6 +52,8 @@ import java.time.LocalDate;
  * @param escalationLevel escalation flag
  * @param installmentOverdue overdue installment flag
  * @param lastRefreshedAt last refresh
+ * @param origin BIBS or MIGRATED with the source system, legacy invoice number and batch
+ *     (unwrapped; the worklist shows a LEGACY badge)
  */
 public record ItemResponse(
     Long id,
@@ -90,7 +94,8 @@ public record ItemResponse(
     String promiseStatus,
     String escalationLevel,
     boolean installmentOverdue,
-    Instant lastRefreshedAt) {
+    Instant lastRefreshedAt,
+    @JsonUnwrapped RecordOrigin origin) {
 
   /**
    * Maps an item.
@@ -141,6 +146,7 @@ public record ItemResponse(
         i.getPromiseStatus(),
         i.getEscalationLevel(),
         i.isInstallmentOverdue(),
-        i.getLastRefreshedAt());
+        i.getLastRefreshedAt(),
+        i.getRecordOrigin());
   }
 }

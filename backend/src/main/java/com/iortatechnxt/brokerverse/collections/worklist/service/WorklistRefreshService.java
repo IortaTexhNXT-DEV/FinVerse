@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.collections.common.domain.FieldChange.Target
 import com.iortatechnxt.brokerverse.collections.common.service.ChangeRecorder;
 import com.iortatechnxt.brokerverse.collections.common.service.ClxSettings;
 import com.iortatechnxt.brokerverse.collections.common.service.CollectionItems;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
@@ -179,15 +180,16 @@ public class WorklistRefreshService {
     }
     Snapshot snapshot = snapshot(invoice, ctx);
     if (existing.isEmpty()) {
-      CollectionItem created =
-          items.save(
-              new CollectionItem(
-                  invoice.getCompanyId(),
-                  invoice.getInvoiceNo(),
-                  snapshot,
-                  status,
-                  ctx.now(),
-                  ctx.today()));
+      CollectionItem listed =
+          new CollectionItem(
+              invoice.getCompanyId(),
+              invoice.getInvoiceNo(),
+              snapshot,
+              status,
+              ctx.now(),
+              ctx.today());
+      listed.markOrigin(originOf(invoice));
+      CollectionItem created = items.save(listed);
       audit.record(
           CollectionItems.ENTITY,
           created.getInvoiceNo(),
@@ -196,6 +198,7 @@ public class WorklistRefreshService {
       return Change.CREATED;
     }
     CollectionItem item = existing.get();
+    item.markOrigin(originOf(invoice));
     ItemStatus previous = item.refresh(snapshot, status, ctx.now(), ctx.today());
     if (previous == status) {
       return Change.UPDATED;
@@ -216,6 +219,16 @@ public class WorklistRefreshService {
       case COMPLETED -> Change.COMPLETED;
       default -> Change.EXCLUDED;
     };
+  }
+
+  /** The origin of a ledger invoice; a legacy invoice is referred to by its legacy number. */
+  private static RecordOrigin originOf(OpsInvoice invoice) {
+    RecordOrigin o = invoice.getRecordOrigin();
+    if (o == null || !o.isMigrated()) {
+      return RecordOrigin.BIBS;
+    }
+    return RecordOrigin.migrated(
+        o.sourceSystem(), invoice.getLegacy().legacyInvoiceNo(), o.migrationBatch());
   }
 
   private Snapshot snapshot(OpsInvoice invoice, Context ctx) {

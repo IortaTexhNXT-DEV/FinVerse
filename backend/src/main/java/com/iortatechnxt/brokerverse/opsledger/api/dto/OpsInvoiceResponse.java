@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.opsledger.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
 import com.iortatechnxt.brokerverse.opsledger.domain.FeedSource;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
@@ -31,6 +32,7 @@ import java.util.List;
  * @param feedSource event or replay
  * @param components components with balances, in component order
  * @param shares insurer shares
+ * @param origin BIBS or MIGRATED with the legacy facts (unwrapped)
  */
 public record OpsInvoiceResponse(
     Keys keys,
@@ -46,7 +48,8 @@ public record OpsInvoiceResponse(
     FlagsResponse flags,
     FeedSource feedSource,
     List<Component> components,
-    List<Share> shares) {
+    List<Share> shares,
+    @JsonUnwrapped InvoiceOriginResponse origin) {
 
   /**
    * Maps an invoice (components and shares loaded).
@@ -82,7 +85,8 @@ public record OpsInvoiceResponse(
             .sorted(Comparator.comparing(OpsInvoiceComponent::getComponent))
             .map(Component::from)
             .toList(),
-        i.getShares().stream().map(Share::from).toList());
+        i.getShares().stream().map(Share::from).toList(),
+        InvoiceOriginResponse.from(i));
   }
 
   /**

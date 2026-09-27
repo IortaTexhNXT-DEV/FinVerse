@@ -53,6 +53,33 @@ public interface UnappliedRepository extends JpaRepository<Unapplied, Long> {
       Pageable pageable);
 
   /**
+   * Items of a tab by origin (Data Migration origin filter): migrated from legacy or created in
+   * BIBS.
+   *
+   * @param companyId company
+   * @param stages stages of the tab
+   * @param text reference, client, payor, invoice or legacy reference fragment (lower case)
+   * @param migrated true for migrated items, false for BIBS items
+   * @param migratedOrigin the MIGRATED origin
+   * @param pageable page
+   * @return items
+   */
+  @Query(
+      "select u from Unapplied u where u.companyId = :companyId and u.stage in :stages"
+          + " and (:text is null or lower(u.reference) like :text or lower(u.clientCode) like :text"
+          + " or lower(u.payorName) like :text or lower(u.invoiceNo) like :text"
+          + " or lower(u.legacy.legacyRef) like :text or lower(u.legacy.legacyArNo) like :text)"
+          + " and ((:migrated = true and u.origin = :migratedOrigin)"
+          + " or (:migrated = false and u.origin <> :migratedOrigin)) order by u.id desc")
+  Page<Unapplied> searchByOrigin(
+      @Param("companyId") Long companyId,
+      @Param("stages") Collection<String> stages,
+      @Param("text") String text,
+      @Param("migrated") boolean migrated,
+      @Param("migratedOrigin") UnappliedOrigin migratedOrigin,
+      Pageable pageable);
+
+  /**
    * Items in a stage with a positive balance up to an amount (minimal excess sweep).
    *
    * @param stage UNAPPLIED

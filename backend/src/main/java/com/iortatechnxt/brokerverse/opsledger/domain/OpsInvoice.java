@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.opsledger.domain;
 
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.hibernate.Hibernate;
 
 /**
@@ -151,6 +153,10 @@ public class OpsInvoice extends BaseEntity {
   @Column(name = "feed_source", nullable = false, length = 20, updatable = false)
   private FeedSource feedSource;
 
+  @Embedded private RecordOrigin recordOrigin = RecordOrigin.BIBS;
+
+  @Embedded private LegacyInvoiceRef legacy = LegacyInvoiceRef.NEW;
+
   @ElementCollection
   @CollectionTable(name = "ops_invoice_share", joinColumns = @JoinColumn(name = "invoice_id"))
   @OrderColumn(name = "share_index")
@@ -189,12 +195,7 @@ public class OpsInvoice extends BaseEntity {
     }
     boolean receivable = !i.dpFlag && !i.kind.isNegative();
     i.paymentStatus = receivable ? PaymentStatus.UNPAID : PaymentStatus.NOT_APPLICABLE;
-    if (i.dpFlag) {
-      i.remittanceStatus = RemittanceStatus.NOT_APPLICABLE;
-    } else {
-      i.remittanceStatus =
-          receivable ? RemittanceStatus.WITH_OUTSTANDING_BALANCE : RemittanceStatus.UNPROCESSED;
-    }
+    i.remittanceStatus = RemittanceStatus.initial(i.dpFlag, receivable);
     return i;
   }
 
@@ -217,6 +218,18 @@ public class OpsInvoice extends BaseEntity {
     this.assuredName = p.assuredName();
     this.payorName = p.payorName();
     this.insurerCode = p.insurerCode();
+  }
+
+  /**
+   * Marks the invoice as an open legacy invoice (Data Migration F01), or as an invoice of a legacy
+   * family (LEGACY context, origin BIBS) so its postings go to the legacy control accounts.
+   *
+   * @param origin origin of the invoice
+   * @param ref ledger context and legacy invoice number
+   */
+  public void markLegacy(RecordOrigin origin, LegacyInvoiceRef ref) {
+    this.recordOrigin = origin;
+    this.legacy = ref;
   }
 
   /**
@@ -339,7 +352,7 @@ public class OpsInvoice extends BaseEntity {
               + invoiceNo
               + " is locked by "
               + lockOwner
-              + (lockReason == null ? "" : " (" + lockReason + ")"));
+              + Optional.ofNullable(lockReason).map(r -> " (" + r + ")").orElse(""));
     }
   }
 
@@ -561,6 +574,14 @@ public class OpsInvoice extends BaseEntity {
 
   public FeedSource getFeedSource() {
     return feedSource;
+  }
+
+  public RecordOrigin getRecordOrigin() {
+    return recordOrigin;
+  }
+
+  public LegacyInvoiceRef getLegacy() {
+    return legacy;
   }
 
   public List<OpsInvoiceShare> getShares() {

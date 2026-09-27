@@ -14,6 +14,7 @@ import { SentMessages } from '@/components/broking/SentMessages';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { OriginBadge } from '@/components/ui/OriginBadge';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
@@ -83,16 +84,52 @@ function accountFacts(a: Account): Fact[] {
       label: 'Account Officer',
       value: <UserName login={a.sales.accountOfficer} />,
     },
+    ...legacyFacts(a),
   ];
 }
 
-/** The flags of the record summary: renewal (BT0), Free First Year, direct payment. */
+/** Legacy policy, package and migration batch of an account imported from legacy (BRD-13). */
+function legacyFacts(a: Account): Fact[] {
+  if (a.legacy === undefined) {
+    return [];
+  }
+  const pkg = a.legacy.legacyPackageCode
+    ? `${a.legacy.legacyPackageCode} v${String(a.legacy.legacyPackageVersion ?? '')}`
+    : '—';
+  return [
+    {
+      icon: Layers,
+      label: 'Legacy Policy',
+      value: `${a.legacy.sourceSystem} ${a.legacy.policyNo}`,
+    },
+    { icon: Layers, label: 'Legacy Package', value: pkg },
+    { icon: Layers, label: 'Migration Batch', value: a.legacy.migrationBatch },
+  ];
+}
+
+/** The LEGACY badge of an imported account with its legacy reference and batch. */
+function LegacyBadge({ account: a }: Readonly<{ account: Account }>) {
+  return (
+    <OriginBadge
+      record={{
+        origin: 'MIGRATED',
+        sourceSystem: a.legacy?.sourceSystem,
+        legacyRef: a.legacy?.legacyRef,
+        migrationBatch: a.legacy?.migrationBatch,
+      }}
+    />
+  );
+}
+
+/** The flags of the record summary: LEGACY, renewal (BT0), Free First Year, direct payment. */
 function accountFlags(a: Account) {
-  if (!a.freeFirstYear.active && !a.directPayment && a.businessType !== 'RENEWAL') {
+  const migrated = a.origin === 'MIGRATED';
+  if (!a.freeFirstYear.active && !a.directPayment && a.businessType !== 'RENEWAL' && !migrated) {
     return undefined;
   }
   return (
     <>
+      {migrated && <LegacyBadge account={a} />}
       {a.businessType === 'RENEWAL' && (
         <span className="tag" title={a.renewalOfRef ? `Renews ${a.renewalOfRef}` : undefined}>
           Renewal

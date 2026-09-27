@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.opsledger.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.PaymentStatus;
@@ -27,6 +28,7 @@ import java.time.LocalDate;
  * @param inceptionDate period start
  * @param aoUsername account officer
  * @param rootInvoiceNo root of the invoice family (DIS 3.27.2)
+ * @param origin BIBS or MIGRATED with the legacy facts (unwrapped)
  */
 public record OpsInvoiceSummaryResponse(
     String invoiceNo,
@@ -45,7 +47,8 @@ public record OpsInvoiceSummaryResponse(
     FlagsResponse flags,
     LocalDate inceptionDate,
     String aoUsername,
-    String rootInvoiceNo) {
+    String rootInvoiceNo,
+    @JsonUnwrapped InvoiceOriginResponse origin) {
 
   /**
    * Maps an invoice (components loaded).
@@ -71,6 +74,7 @@ public record OpsInvoiceSummaryResponse(
         FlagsResponse.from(i),
         i.getClassification().inceptionDate(),
         i.getClassification().aoUsername(),
-        i.getRootInvoiceNo());
+        i.getRootInvoiceNo(),
+        InvoiceOriginResponse.from(i));
   }
 }

@@ -1,8 +1,10 @@
 package com.iortatechnxt.brokerverse.catalog.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -81,6 +83,8 @@ public class RiskProduct extends AuthorizableEntity implements CatalogRecord {
   @Enumerated(EnumType.STRING)
   @Column(name = "tsu_involvement", nullable = false, length = 20)
   private TsuInvolvement tsuInvolvement;
+
+  @Embedded private RecordOrigin recordOrigin = RecordOrigin.BIBS;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "lifecycle_status", nullable = false, length = 10)
@@ -327,6 +331,20 @@ public class RiskProduct extends AuthorizableEntity implements CatalogRecord {
     return maxSumInsured != null
         && totalSumInsured != null
         && totalSumInsured.compareTo(maxSumInsured) > 0;
+  }
+
+  /**
+   * Marks a record loaded from a legacy system (Data Migration): origin MIGRATED with its source
+   * system, legacy reference and loading batch; the screens show a LEGACY badge.
+   *
+   * @param origin origin
+   */
+  public void markMigrated(RecordOrigin origin) {
+    this.recordOrigin = origin;
+  }
+
+  public RecordOrigin getRecordOrigin() {
+    return recordOrigin == null ? RecordOrigin.BIBS : recordOrigin;
   }
 
   public TsuInvolvement getTsuInvolvement() {

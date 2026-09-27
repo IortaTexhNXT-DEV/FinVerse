@@ -38,7 +38,8 @@ public class GlSlQueries {
       "select coalesce(sum(c.balance), 0) from ops_invoice_component c"
           + " join ops_invoice i on i.id = c.invoice_id"
           + " where i.company_id = ? and c.component = any(string_to_array(?, ','))"
-          + " and (cast(? as varchar) is null or i.currency = ?)";
+          + " and (cast(? as varchar) is null or i.currency = ?)"
+          + " and (cast(? as varchar) = 'ANY' or i.ledger_context = ?)";
 
   private final JdbcTemplate jdbc;
 
@@ -107,11 +108,16 @@ public class GlSlQueries {
    * @param companyId company
    * @param components components
    * @param currency invoice currency, null for all
+   * @param ledgerContext ANY, NEW or LEGACY invoices (DATA_MIGRATION_DESIGN 14.2)
    * @param account the control account (for the sign)
    * @return balance, debit positive
    */
   public BigDecimal opsLedger(
-      Long companyId, List<String> components, String currency, ControlAccount account) {
+      Long companyId,
+      List<String> components,
+      String currency,
+      String ledgerContext,
+      ControlAccount account) {
     BigDecimal natural =
         Money.round(
             jdbc.queryForObject(
@@ -120,7 +126,9 @@ public class GlSlQueries {
                 companyId,
                 String.join(",", components),
                 currency,
-                currency));
+                currency,
+                ledgerContext,
+                ledgerContext));
     return account.accountClass().normalBalance() == BalanceSide.CREDIT
         ? natural.negate()
         : natural;

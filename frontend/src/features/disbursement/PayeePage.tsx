@@ -12,6 +12,7 @@ import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { OriginBadge } from '@/components/ui/OriginBadge';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
@@ -257,6 +258,7 @@ function ExistingPayee({ id }: Readonly<{ id: number }>) {
         description={payeeDescription(p)}
         actions={
           <div className="dsb-actions">
+            <OriginBadge record={p.summary} />
             <StatusBadge status={p.summary.stage} />
             {can('DISB_PAYEE_MAINTAIN') && !p.summary.used && (
               <Button

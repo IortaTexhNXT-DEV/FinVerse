@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.disbursement.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.PayeeDtos.AccountRequest;
@@ -72,6 +73,7 @@ public class PayeeController {
    * @param stage stages
    * @param payeeClass class
    * @param q code or name
+   * @param origin BIBS or MIGRATED (Data Migration origin filter), all when absent
    * @param page page
    * @param size size
    * @return payees
@@ -83,12 +85,13 @@ public class PayeeController {
       @RequestParam(required = false) List<PayeeStage> stage,
       @RequestParam(required = false) String payeeClass,
       @RequestParam(required = false) String q,
+      @RequestParam(required = false) RecordOrigin.Origin origin,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "20") int size) {
     boolean full = full();
     return PageResponse.of(
         queries.search(
-            new PayeeSearch(companyId, stage, payeeClass, q),
+            new PayeeSearch(companyId, stage, payeeClass, q, origin),
             DisbursementAccess.newestFirst(page, size)),
         p -> PayeeSummary.from(p, full));
   }

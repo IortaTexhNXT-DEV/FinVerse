@@ -11,10 +11,10 @@ digraph v2_payee {
   FD  [label="FOR_DEACTIVATION\nApprover"];
   IN  [label="INACTIVE", fillcolor="@DIRTY_WHITE", color="@MUTED"];
   FRA [label="FOR_REACTIVATION\nApprover"];
-  DR -> FA [label=" submit"];
+  DR -> FA [label=" Submit for authorisation"];
   FA -> AC [label=" authorise"];
-  FA -> DR [label=" return", style=dashed];
-  AC -> FA [label=" amend"];
+  FA -> DR [label=" Return to maker", style=dashed];
+  AC -> FA [label=" Submit changes for authorisation"];
   AC -> FD [label=" request deactivation"];
   FD -> IN [label=" authorise"];
   FD -> AC [label=" keep active", style=dashed];

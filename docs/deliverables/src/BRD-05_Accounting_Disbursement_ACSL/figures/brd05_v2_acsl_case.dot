@@ -10,8 +10,8 @@ digraph v2_case {
   IV [label="INVESTIGATING\nprocessor"];
   RP [label="RESULT_PROVIDED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
   CO [label="CORRECTION\ncorrection raised", fillcolor="@AMBER_BG"];
-  RE -> AS [label=" assign"];
-  AS -> IV [label=" start"];
+  RE -> AS [label=" Assign"];
+  AS -> IV [label=" Start investigation"];
   AS -> RE [label=" send back", style=dashed];
   IV -> RP [label=" provide result"];
   IV -> CO [label=" raise correction"];

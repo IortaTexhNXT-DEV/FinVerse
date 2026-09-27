@@ -24,7 +24,7 @@ digraph nb_integration {
   ops   [label="Operations (BRD-2)\ncashiering, adjustment"];
   bdoi  [label="Other BDOI systems", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
 
-  hls -> front [label="requests (upload today;\nport parked Q11)", style=dashed, color="@MUTED"];
+  hls -> front [label="requests (upload;\nfeed on hold Q11)", style=dashed, color="@MUTED"];
   mbox -> front [label="manual capture\n(Q12, Q31)", style=dashed, color="@MUTED"];
   pm -> front [label="products, versions,\nincentive criteria"];
   front -> proc [label="submitted accounts"];
@@ -33,7 +33,7 @@ digraph nb_integration {
   mail -> ins [label="QS, slips,\nhold cover"];
   proc -> clpc [label="download /\nupload (Q28)"];
   bkg -> acc [label="BROKER_BOOKING\nevents"];
-  bkg -> ops [label="InvoiceBooked"];
+  bkg -> ops [label="invoice booked"];
   ops -> proc [label="cashier receipts\n(payment confirmed)"];
-  bkg -> bdoi [label="feed parked (Q08)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+  bkg -> bdoi [label="feed on hold (Q08)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
 }

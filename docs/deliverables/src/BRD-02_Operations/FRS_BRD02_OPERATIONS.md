@@ -3598,7 +3598,7 @@ Figure 12 shows the interfaces of Operations. The modules exchange data only thr
 
 SUPERSEDED means an upload or queue in Operations that BRD-4 Collections or BRD-5 Accounting and Disbursement replaces. ON HOLD means the transfer waits for BDOI's specification (OQ17, OQ45, OQ46).
 
-> [!PARKED] Parked transports
+> [!PARKED] Transfers on hold
 > Insurer SFTP / portal channels, BDO bank file transports (FS01 / FS04) and the shared drive are not specified in the BRD (OQ03, OQ17, OQ22, OQ29). Adding a transfer later changes none of the Operations screens.
 
 # Non-functional requirements

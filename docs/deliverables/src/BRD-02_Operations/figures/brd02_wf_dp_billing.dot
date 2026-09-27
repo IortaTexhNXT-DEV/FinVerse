@@ -14,12 +14,12 @@ digraph wf_dp_billing {
   RETURNED_TO_COLLECTION [label="RETURNED_TO_COLLECTION", fillcolor="@DIRTY_WHITE", color="@MUTED"];
   CANCELLED [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
 
-  DP_FOR_BILLING -> AWAITING_INSURER [label=" bill"];
-  AWAITING_INSURER -> APPROVED [label=" insurer_approved"];
-  AWAITING_INSURER -> RETURNED_TO_COLLECTION [label=" insurer_rejected", style=dotted];
-  APPROVED -> COLLECTED [label=" collected"];
-  COLLECTED -> CLOSED [label=" pr_reversed"];
-  DP_FOR_BILLING -> CANCELLED [label=" cancel", style=dotted];
+  DP_FOR_BILLING -> AWAITING_INSURER [label=" Send Billing to Insurer"];
+  AWAITING_INSURER -> APPROVED [label=" Insurer approved"];
+  AWAITING_INSURER -> RETURNED_TO_COLLECTION [label=" Insurer rejected", style=dotted];
+  APPROVED -> COLLECTED [label=" Commission collected"];
+  COLLECTED -> CLOSED [label=" Premium receivable reversed"];
+  DP_FOR_BILLING -> CANCELLED [label=" Cancel Billing", style=dotted];
   { rank=same; DP_FOR_BILLING; CANCELLED; }
   { rank=same; APPROVED; RETURNED_TO_COLLECTION; }
 }

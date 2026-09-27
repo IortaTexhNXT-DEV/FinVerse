@@ -1694,7 +1694,7 @@ Parameters: Date From / To; User; Activity; include log-ins and log-outs (yes / 
 
 Figure 4 shows the interfaces. Every BIBS module reads the effective permissions of the signed-in user; the directory, SSO and external ACL are on hold until BDO specifies them.
 
-![Interfaces of User Access Maintenance (dashed = parked)](figures/brd11_integration.dot){width=16}
+![Interfaces of User Access Maintenance (dashed = on hold)](figures/brd11_integration.dot){width=16}
 
 <!-- table: widths=3.8,1.8,7.6,2.8,2.2 caption="Interfaces" status=Scope size=8.5 -->
 | Interface | Direction | Content and trigger | BRD | Scope |

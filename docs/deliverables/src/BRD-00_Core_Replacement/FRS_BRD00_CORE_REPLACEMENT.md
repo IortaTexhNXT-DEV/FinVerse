@@ -19,7 +19,7 @@ control:
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Solution Architect
     approver: ""
-    change: Internal draft from the Core Replacement BRD, the twelve BRD specs and the code as built
+    change: Internal draft from the Core Replacement BRD and the twelve BRD specs
   - version: "1.0"
     date: 26 Sep 2026
     author: iorta TechNXT Business Analysis
@@ -32,7 +32,7 @@ distribution:
   - {name: "Head, Operations", role: Approver, organisation: BDOI, purpose: Review of the Operations and reporting requirements}
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Review of the front-office and dashboard requirements}
   - {name: "Unit Head, Claims, Analytics, Risk Management, Reinsurance and Technical Underwriting", role: Reviewer, organisation: BDOI, purpose: Claims and Reinsurance (phase 2) scope}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Build, test and UAT preparation"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, test and UAT preparation"}
 ---
 
 # Introduction
@@ -45,7 +45,7 @@ The document does three things:
 
 - it maps every capability and bullet of the umbrella BRD to the BRD and FRS that specify it (section 3.2 and the traceability in section 10);
 - it states the **cross-cutting functional requirements** that no function BRD owns: navigation and persona menus, dashboards, notifications, audit, report generation, document generation, data management, security and integration (section 4);
-- it lists the gaps of the umbrella BRD, with a proposed FR or an open question for each (section 5).
+- it lists the gaps of the umbrella BRD, with a proposed rule or FR and the decision requested from BDOI for each (section 5).
 
 The function FRS (BRD-1 to BRD-12) remain the specifications of the business processes. Where this document and a function FRS describe the same behaviour, the function FRS governs.
 
@@ -55,9 +55,9 @@ The function FRS (BRD-1 to BRD-12) remain the specifications of the business pro
 | Area | In scope | Source |
 |---|---|---|
 | Platform scope and journey | The end-to-end flow of the umbrella BRD and the BIBS BRD of each step | p.3, p.26 |
-| Capability map | 21 capabilities, 184 bullets and 8 items of the capability matrix, each mapped to a BRD, an FRS and a fit class | p.6-12, p.26-29 |
+| Capability map | 21 capabilities, 184 bullets and 8 items of the capability matrix, each mapped to a BRD and an FRS | p.6-12, p.26-29 |
 | Cross-cutting requirements | Navigation, dashboards, notifications, audit, reports, documents, data management, security, integration, Invoice Master List | p.4-5, BR-000-004, 027, 051, 063, 083, 088, 101, 125, 152, 160, 170-177 |
-| Gaps | Requirements with no owning BRD or in conflict with their BRD | Section 5 |
+| Proposed rules and clarifications | Requirements with no owning BRD or in conflict with their BRD | Section 5 |
 | Non-functional requirements | Users, response time, volumes, retention (p.42-46) against the function BRDs and the hosting appendix | Section 7 |
 
 **Out of scope for phase 1:**
@@ -114,16 +114,7 @@ XC-nn: Cross-cutting row of the requirements baseline (R2), a requirement of the
 
 ## How to read the functional requirements
 
-Each FR in section 4 has a header with the **BRD trace** (BR ID and page of the umbrella), the actor, the priority (every BR row is "Must have"), the **fit** class and the screens and API. The fit class is measured against BIBS as built:
-
-<!-- table: widths=2.6,14 caption="Fit classes" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Works today |
-| CONFIGURE | Needs set-up only (parameters, templates, rules) |
-| CHANGE | Extends an existing capability |
-| NEW | A capability that does not exist yet |
-| OUT | Not in phase 1 |
+Each FR in section 4 has a header with the **BRD trace** (BR ID and page of the umbrella), the actor, the priority (every BR row is "Must have") and the screens.
 
 Validations list the message the user sees and its code. A "-" marks a screen check without a business code. Values marked "default" are placeholders that BDOI confirms through the open questions in section 9.3; they are configuration.
 
@@ -137,24 +128,24 @@ BDOI is a non-life insurance and reinsurance broker. The umbrella BRD sets the g
 
 Figure 1 shows the flow of the umbrella BRD (p.26) with the BIBS BRD of each step. The left column is the new-business and money flow; the right column holds the lifecycle services and the functions that feed it (dashed arrows); the bar at the bottom lists the platform services that every step uses.
 
-![End-to-end journey and the BIBS BRD of each step (amber = designed or being built; dashed box = phase 2)](figures/brd00_journey.dot){width=16}
+![End-to-end journey and the BIBS BRD of each step (dashed box = phase 2)](figures/brd00_journey.dot){width=16}
 
 <!-- table: widths=3.6,4.6,6 caption="Umbrella BRD list (p.3) and BIBS" size=8.5 -->
 | Umbrella BRD (p.3) | BIBS BRD and FRS | Note |
 |---|---|---|
 | 1 New Business | BRD-1, FR-NB | Capabilities 1-5 |
-| 2 Renewal | BRD-6, FR-RN | Designed, not built |
+| 2 Renewal | BRD-6, FR-RN | Capability 6 |
 | 3 Collection Management | BRD-4, FR-CL (BRD-4) | Capability 7 |
 | 4 Accounting, Disbursement and ACSL | BRD-5, FR-AC / FR-DS / FR-AS | Capability 8 |
 | 5 Claims | BRD-7, FR-CM (BRD-7) | Claim recording and insurer updates merged |
 | 6 Operations | BRD-2, FR-OP | Capabilities 9-13 |
 | 7 Reinsurance | ReInsurance BRD | Phase 2 - BRD received |
-| 8 Customer Service Facility | BRD-9, FR-CSF | Designed, not built |
+| 8 Customer Service Facility | BRD-9, FR-CSF | Capability 16 |
 | 9 Product Maintenance | BRD-3, FR-PM | Capability 20 |
-| 10 Employee Benefits | BRD-8, FR-EB | Designed, not built |
+| 10 Employee Benefits | BRD-8, FR-EB | Capability 19 |
 | Not listed | BRD-10 Sanction Screening, FR-SS | Screening of clients (capability 1) |
 | Not listed | BRD-11 User Access Maintenance, FR-UA | BR-000 to BR-003 |
-| Not listed | BRD-12 Submitted Policies, FR-SP | Designed, not built |
+| Not listed | BRD-12 Submitted Policies, FR-SP | Submitted policies of the bank (capability 3) |
 | Not listed | Data Migration BRD | Draft; client migration volumes (p.43) |
 
 # Personas, navigation and capability map
@@ -181,42 +172,39 @@ The umbrella BRD names four generic personas (System, User, Administrator, Autho
 
 ## Capability map
 
-<!-- table: widths=3.7,1.1,0.8,1.8,1.5,1.1,0.9,2.6,2.2 caption="Umbrella capabilities, fit and coverage" size=8 -->
-| Capability | Rows | FIT | CONFIGURE | CHANGE | NEW | OUT | Covered by | BRD status |
-|---|---|---|---|---|---|---|---|---|
-| CORE-01 Client Onboarding | 7 | 7 | 0 | 0 | 0 | 0 | BRD-1 | Built |
-| CORE-02 Quotation or Proposal | 9 | 9 | 0 | 0 | 0 | 0 | BRD-1 | Built |
-| CORE-03 Account Creation and Maintenance | 6 | 6 | 0 | 0 | 0 | 0 | BRD-1 | Built |
-| CORE-04 Non-Package Management | 24 | 24 | 0 | 0 | 0 | 0 | BRD-1 | Built |
-| CORE-05 Placement and Booking | 8 | 8 | 0 | 0 | 0 | 0 | BRD-1 | Built |
-| CORE-06 Renewal | 9 | 0 | 0 | 3 | 6 | 0 | BRD-6 | Designed |
-| CORE-07 Marketing Collection | 6 | 6 | 0 | 0 | 0 | 0 | BRD-4 | Built |
-| CORE-08 Accounting / GL / Disbursement / ACSL | 22 | 22 | 0 | 0 | 0 | 0 | BRD-5, BRD-2, BRD-1 | Built |
-| CORE-09 Cashiering (Payments Acceptance and Application) | 12 | 12 | 0 | 0 | 0 | 0 | BRD-2 | Built |
-| CORE-10 Remittance | 7 | 7 | 0 | 0 | 0 | 0 | BRD-2 | Built |
-| CORE-11 Production Reconciliation | 5 | 5 | 0 | 0 | 0 | 0 | BRD-2 | Built |
-| CORE-12 Adjustment / Cancellation | 7 | 7 | 0 | 0 | 0 | 0 | BRD-2 | Built |
-| CORE-13 Collection of Commission Receivables (Direct Payment) | 8 | 8 | 0 | 0 | 0 | 0 | BRD-2 | Built |
-| CORE-14 Claims | 13 | 0 | 0 | 0 | 13 | 0 | BRD-7 | Being built |
-| CORE-15 Reinsurance | 10 | 0 | 0 | 0 | 0 | 10 | ReInsurance BRD | Phase 2 |
-| CORE-16 Customer Service Facility | 6 | 0 | 0 | 4 | 1 | 1 | BRD-9 | Designed |
-| CORE-17 Data Management | 5 | 2 | 0 | 2 | 1 | 0 | none, BRD-1, BRD-3 | Built, No BRD |
-| CORE-18 Emerging Capabilities | 1 | 0 | 0 | 0 | 0 | 1 | none | No BRD |
-| CORE-19 Employee Benefits | 12 | 0 | 0 | 4 | 8 | 0 | BRD-8 | Designed |
-| CORE-20 Product Maintenance | 10 | 9 | 1 | 0 | 0 | 0 | BRD-3 | Built |
-| CORE-21 Report Generation | 5 | 3 | 0 | 2 | 0 | 0 | BRD-1, none | Built, No BRD |
+<!-- table: widths=6.4,1.4,1.8,1.4,5.6 caption="Umbrella capabilities and coverage" size=8 -->
+| Capability | Rows | Phase 1 | Out | Covered by |
+|---|---|---|---|---|
+| CORE-01 Client Onboarding | 7 | 7 | 0 | BRD-1 |
+| CORE-02 Quotation or Proposal | 9 | 9 | 0 | BRD-1 |
+| CORE-03 Account Creation and Maintenance | 6 | 6 | 0 | BRD-1 |
+| CORE-04 Non-Package Management | 24 | 24 | 0 | BRD-1 |
+| CORE-05 Placement and Booking | 8 | 8 | 0 | BRD-1 |
+| CORE-06 Renewal | 9 | 9 | 0 | BRD-6 |
+| CORE-07 Marketing Collection | 6 | 6 | 0 | BRD-4 |
+| CORE-08 Accounting / GL / Disbursement / ACSL | 22 | 22 | 0 | BRD-5, BRD-2, BRD-1 |
+| CORE-09 Cashiering (Payments Acceptance and Application) | 12 | 12 | 0 | BRD-2 |
+| CORE-10 Remittance | 7 | 7 | 0 | BRD-2 |
+| CORE-11 Production Reconciliation | 5 | 5 | 0 | BRD-2 |
+| CORE-12 Adjustment / Cancellation | 7 | 7 | 0 | BRD-2 |
+| CORE-13 Collection of Commission Receivables (Direct Payment) | 8 | 8 | 0 | BRD-2 |
+| CORE-14 Claims | 13 | 13 | 0 | BRD-7 |
+| CORE-15 Reinsurance | 10 | 0 | 10 | ReInsurance BRD |
+| CORE-16 Customer Service Facility | 6 | 5 | 1 | BRD-9 |
+| CORE-17 Data Management | 5 | 5 | 0 | none, BRD-1, BRD-3 |
+| CORE-18 Emerging Capabilities | 1 | 0 | 1 | none |
+| CORE-19 Employee Benefits | 12 | 12 | 0 | BRD-8 |
+| CORE-20 Product Maintenance | 10 | 10 | 0 | BRD-3 |
+| CORE-21 Report Generation | 5 | 5 | 0 | BRD-1, none |
 
-The row-level map (every bullet, BR ID, BRD requirement ID and FR) is in section 10. Totals of the 192 capability rows and 23 cross-cutting rows:
+The row-level map (every bullet, BR ID, BRD requirement ID and FR) is in section 10. The 192 capability rows and 23 cross-cutting rows are:
 
-<!-- table: widths=6.4,2.4,2.4,2 caption="Rows per fit class" -->
-| Meaning | Capability rows | Cross-cutting rows | Total |
+<!-- table: widths=6.4,2.4,2.4,2 caption="Rows in and out of phase 1" -->
+| Scope | Capability rows | Cross-cutting rows | Total |
 |---|---|---|---|
-| Works today | 135 | 12 | 147 |
-| Set-up only | 1 | 2 | 3 |
-| Extends an existing capability | 15 | 6 | 21 |
-| New build (in BIBS, or in a designed BRD not yet built) | 29 | 1 | 30 |
+| Phase 1 | 180 | 21 | 201 |
 | Out of phase 1 scope | 12 | 2 | 14 |
-| | **192** | **23** | **215** |  |
+| **Total** | **192** | **23** | **215** |
 
 # Cross-cutting functional requirements
 
@@ -230,7 +218,7 @@ actor: Every user
 priority: Must have
 screens: Sidebar menu (groups Home, Client & Policy, Operations, Finance, Claims & Insurance, Reports, Setup & Administration)
 description:
-  - The sidebar is built from the modules of BIBS. Each screen names the permission that opens it; a user sees only the screens that the permissions of his roles allow, in seven groups in a fixed order.
+  - The sidebar lists the modules of BIBS. Each screen names the permission that opens it; a user sees only the screens that the permissions of his roles allow, in seven groups in a fixed order.
   - A user may hold several roles (decision D5); the menu is the union of the roles.
   - Insurer-side modules of the platform (underwriting, insurer claims, treaty reinsurance, reserves) are not granted to BDOI roles.
 preconditions:
@@ -735,7 +723,7 @@ main_flow:
 alternate_flows:
   - As FRS BRD-3.
 rules:
-  - [R1, "Synchronisation with other BDOI systems (BR-206) waits for the target systems (PQ16).", Configurable, ProductMasterFeed adapter]
+  - [R1, "Synchronisation with other BDOI systems (BR-206) waits for the target systems (PQ16).", Configurable, Product master feed (PQ16)]
 validations:
   - [As FRS BRD-3, "-", "-"]
 notifications:
@@ -756,7 +744,7 @@ actor: Every user; System Administrator; UAM requestor and approver
 priority: Must have
 screens: Login; Reset password; User Access requests
 description:
-  - Users sign in with user ID and password (directory sign-in is a parked port until BDO supplies the interface, decision D6). A user who forgot the password receives a reset link. Users are internal or external (portal) and hold one or more roles.
+  - Users sign in with user ID and password (directory sign-in is added when BDO supplies the interface, decision D6). A user who forgot the password receives a reset link. Users are internal or external (portal) and hold one or more roles.
   - User accounts are created, changed, disabled and re-enabled only through User Access requests approved as in FRS BRD-11; the user ID itself is not changed.
 preconditions:
   - None.
@@ -844,12 +832,12 @@ actor: System; Processing and Comptrollership (view)
 priority: Must have
 screens: Insurer Invoice Batches (Client & Policy > Booking)
 description:
-  - Today each service invoice is e-mailed to the insurer. A daily job (after booking closes, default 20:00) also builds for each insurer one batch of that day's service invoices (merged PDF, or ZIP with a manifest), stores it and delivers it through the insurer's configured channel. The SFTP channel is added when BDOI supplies the endpoints (CRQ18). A delivery report lists each batch, invoice count, amount, channel and result.
+  - Today each service invoice is e-mailed to the insurer. A daily job (after booking closes, default 20:00) also creates for each insurer one batch of that day's service invoices (merged PDF, or ZIP with a manifest), stores it and delivers it through the insurer's configured channel. The SFTP channel is added when BDOI supplies the SFTP addresses (CRQ18). A delivery report lists each batch, invoice count, amount, channel and result.
 preconditions:
   - Service invoices were issued for the insurer that day.
 main_flow:
   - The job groups the day's service invoices by insurer.
-  - BIBS builds and stores the batch and its manifest.
+  - BIBS creates and stores the batch and its manifest.
   - BIBS delivers it through the insurer's channel and records the result.
 alternate_flows:
   - Delivery fails. BIBS retries at the next run and lists the batch as failed on the report.
@@ -1040,32 +1028,35 @@ acceptance:
   - After CRQ12, booking an account produces the service invoice and the SOA with the same invoice number.
 ```
 
-# Gaps and proposed requirements
+# Proposed business rules and clarifications for confirmation
 
-<!-- table: widths=0.9,4,2.5,5.6,2.1 caption="Gaps of the umbrella BRD" size=8 -->
-| # | Gap | Rows | Proposal | FR |
+The umbrella BRD has requirements that no function BRD owns, or that conflict with their BRD. The table gives, for each, the proposed rule or FR and the decision requested from BDOI. BDOI records its decision with the sign-off of this FRS (chapter 11); a decision that changes a screen, field, rule or message is applied in the next version of the FRS.
+
+<!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
+| Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
 |---|---|---|---|---|
-| G1 | Reinsurance | CORE-15.01-15.10 | Phase 2 - BRD received; seams kept open (section 6) | - |
-| G2 | Claims cheque safekeeping and hand-over to / from Cashiering | CORE-14.08-14.10 | Parked until CRQ03 (with CLQ10); if yes, a cheque custody register in Claims | - |
-| G3 | CSF case resolution | CORE-16.06 | Out until CRQ04; BRD-9 keeps case logging in SharePoint | - |
-| G4 | Master data change log | CORE-17.01 | Field-level log of registered master data | FR-CR-031 |
-| G5 | Insurer management | CORE-17.02 | Insurer page with the missing attributes | FR-CR-061 |
-| G6 | MIS field definition | CORE-17.04 | MIS field catalogue | FR-CR-062 |
-| G7 | Report customisation | CORE-21.04 | Layout in the variant | FR-CR-042 |
-| G8 | Scheduled reports | CORE-21.05 | Report subscriptions | FR-CR-043 |
-| G9 | Emerging capabilities | CORE-18.01 | No build until listed (CRQ10) | - |
-| G10 | ALeA e-mail address encoding | XC-21 | No build until defined (CRQ20) | - |
-| G11 | Role dashboards | XC-02 | Role home page | FR-CR-010, 011 |
-| G12 | Invoice Master List | XC-13 | Columns added to the invoice ledger view | FR-CR-090 |
-| G13 | Insurer invoice batch and SFTP | XC-19 | Daily batch per insurer | FR-CR-081 |
-| G14 | Client migration and daily client batches | XC-20 | Load and feed through the Data Migration programme | FR-CR-082 |
-| G15 | SOA at booking | XC-10 | After CRQ12 | FR-CR-093 |
+| CLR-CR-01 | Reinsurance (CORE-15.01-15.10) | Phase 2: the ReInsurance BRD is received; phase 1 keeps party types, templates, subscriptions, open-item matching and event types open for the phase 2 module (section 6). | The insurer-side reinsurance module does not fit the broker model. | Confirm reinsurance in phase 2. |
+| CLR-CR-02 | Claims cheque safekeeping (CORE-14.08-14.10) | No cheque custody in phase 1; if BDOI holds claim settlement cheques, a cheque custody register is added in Claims with hand-over to and from Cashiering. | Whether BDOI holds claim cheques is open (CRQ03, CLQ10). | Answer CRQ03. |
+| CLR-CR-03 | CSF case resolution (CORE-16.06) | Out of phase 1; case logging stays in SharePoint. | BRD-9 keeps case logging in SharePoint (CRQ04). | Confirm (CRQ04). |
+| CLR-CR-04 | Master data change log (CORE-17.01; FR-CR-031) | A field-level log of registered master data. | No function BRD owns the log. | Confirm the master data in the log (CRQ07). |
+| CLR-CR-05 | Insurer management (CORE-17.02; FR-CR-061) | An insurer page with the attributes the function BRDs do not hold. | No function BRD owns the insurer record. | Confirm the insurer attributes (CRQ08). |
+| CLR-CR-06 | MIS field definition (CORE-17.04; FR-CR-062) | A catalogue names the MIS fields of the existing data; users do not add database fields. | No function BRD owns MIS fields. | Confirm the catalogue (CRQ09). |
+| CLR-CR-07 | Report customisation (CORE-21.04; FR-CR-042) | The user saves the layout of a report in a variant. | No function BRD owns report customisation. | Confirm the variants. |
+| CLR-CR-08 | Scheduled reports (CORE-21.05; FR-CR-043) | The user subscribes to a report with a schedule and recipients (at most 20 active subscriptions per user by default). | No function BRD owns report scheduling. | Confirm the subscriptions. |
+| CLR-CR-09 | Emerging capabilities (CORE-18.01) | Not in scope until BDOI lists them. | The capability is not defined (CRQ10). | List the capabilities (CRQ10). |
+| CLR-CR-10 | ALeA e-mail address encoding (XC-21) | Not in scope until the requirement is defined. | The requirement is not defined (CRQ20). | Define the requirement (CRQ20). |
+| CLR-CR-11 | Role dashboards (XC-02; FR-CR-010, 011) | Each role has a home page with its counts and queues, refreshed every 5 minutes by default. | The umbrella asks for centralised dashboards for all roles; the contents per role are open (CRQ06). | Define the dashboard contents per role (CRQ06). |
+| CLR-CR-12 | Invoice Master List (XC-13; FR-CR-090) | The Invoice Master List columns are added to the invoice ledger view. | No function BRD owns the list. | Confirm the columns. |
+| CLR-CR-13 | Insurer invoice batch (XC-19; FR-CR-081) | A daily batch per insurer of the day's service invoices, stored and delivered through the insurer's channel; the SFTP channel is added when BDOI supplies the addresses. | The file format and whether the batch replaces the e-mail are open (CRQ18). | Answer CRQ18. |
+| CLR-CR-14 | Client migration and daily client batches (XC-20; FR-CR-082) | Clients are loaded and fed through the Data Migration programme with the duplicate check. | The migration scope and coexistence are decided by the Data Migration BRD (CRQ19). | Confirm (CRQ19). |
+| CLR-CR-15 | SOA at booking (XC-10; FR-CR-093) | Booking issues the service invoice; the SOA is issued at booking once BDOI says which SOA is meant. | The SOA of the placement report and booking is open (CRQ12). | Answer CRQ12. |
+| CLR-CR-16 | Directory sign-in (FR-CR-070) | Users sign in with user ID and password; directory sign-in is added when BDO supplies the interface. | Cross-BRD decision D6. | Confirm decision D6. |
 
 # Reinsurance (phase 2)
 
-Capability 15 (6 bullets, BR-153 to BR-160) and 4 more items of the capability matrix (p.28) belong to the ReInsurance BRD. That BRD is received and is **phase 2**: it is not built in phase 1 and its rows are marked "Phase 2" in section 10. The insurer-side reinsurance module of the platform (treaties and cessions of an insurance company) is not the broker model BDOI needs and stays hidden from BDOI roles.
+Capability 15 (6 bullets, BR-153 to BR-160) and 4 more items of the capability matrix (p.28) belong to the ReInsurance BRD. That BRD is received and is **phase 2**: it is not in phase 1 and its rows are marked "Phase 2" in section 10. The insurer-side reinsurance module of the platform (treaties and cessions of an insurance company) is not the broker model BDOI needs and stays hidden from BDOI roles.
 
-Phase 1 keeps these seams open so that the phase 2 module can reuse them: party types for reinsurers and RI brokers; template-driven placement slips and SOAs; the report subscriptions of FR-CR-043 for SOA scheduling; open-item matching for net settlement; accounting event types added without changing existing posting rules; and a claim party model open to reinsurers. The design notes are in R3, section 6.
+Phase 1 keeps these points open so that the phase 2 module can reuse them: party types for reinsurers and RI brokers; template-driven placement slips and SOAs; the report subscriptions of FR-CR-043 for SOA scheduling; open-item matching for net settlement; accounting event types added without changing existing posting rules; and a claim party model open to reinsurers.
 
 # Non-functional requirements
 
@@ -1118,10 +1109,10 @@ Phase 1 keeps these seams open so that the phase 2 module can reuse them: party 
 |---|---|---|
 | D-CR-01 | BDOI defines the dashboard contents per role | FR-CR-010, 011 (CRQ06) |
 | D-CR-02 | BDOI confirms the master data in the change log and the insurer attributes | FR-CR-031, 061 (CRQ07, CRQ08) |
-| D-CR-03 | BDOI supplies the SFTP endpoints of the insurers | FR-CR-081 (CRQ18) |
+| D-CR-03 | BDOI supplies the SFTP addresses of the insurers | FR-CR-081 (CRQ18) |
 | D-CR-04 | The Data Migration BRD decides the client migration scope and coexistence | FR-CR-082 (CRQ19) |
 | D-CR-05 | BDOI supplies the icon set and design files | FR-CR-092 (CRQ17) |
-| D-CR-06 | Builds of Renewal, Claims, Employee Benefits, CSF and Submitted Policies complete the rows marked Designed or Being built | Section 10 |
+| D-CR-06 | BDOI signs off the FRS of Renewal, Claims, Employee Benefits, CSF and Submitted Policies | Section 10 |
 
 ## Open questions
 
@@ -1130,14 +1121,14 @@ Phase 1 keeps these seams open so that the phase 2 module can reuse them: party 
 |---|---|---|---|
 | CRQ01 | Is the umbrella over all twelve BRDs, Data Migration and ReInsurance? Who owns Data Management (capability 17)? | Scope | OPEN |
 | CRQ02 | Is Non-Package Management the NB non-package placement (no BR ID, added 20-Nov-2025)? | CORE-04 | OPEN |
-| CRQ03 | Does BDOI hold claim settlement cheques (safekeeping, hand-over to and retrieval from Cashiering, BR-146-148)? | G2 | OPEN |
-| CRQ04 | Is CSF case resolution (BR-165) in phase 1, given BRD-9 keeps it in SharePoint? | G3 | OPEN |
+| CRQ03 | Does BDOI hold claim settlement cheques (safekeeping, hand-over to and retrieval from Cashiering, BR-146-148)? | CLR-CR-02 | OPEN |
+| CRQ04 | Is CSF case resolution (BR-165) in phase 1, given BRD-9 keeps it in SharePoint? | CLR-CR-03 | OPEN |
 | CRQ05 | Is deactivation acceptable for "delete of prospect" (BR-008)? | A-CR-03 | OPEN |
 | CRQ06 | Which figures does each role see on its home page (BR-125, 152, 160)? | FR-CR-010 | OPEN |
 | CRQ07 | Which master data is in the change log; old and new values; approver; who views it? | FR-CR-031 | OPEN |
 | CRQ08 | Meaning of risk participation, payment terms and remittance schedules on the insurer; owners and approval | FR-CR-061 | OPEN |
 | CRQ09 | Is MIS field definition a fixed list per entity or user-defined fields? | FR-CR-062 | OPEN |
-| CRQ10 | List the emerging capabilities or withdraw BR-176 | G9 | OPEN |
+| CRQ10 | List the emerging capabilities or withdraw BR-176 | CLR-CR-09 | OPEN |
 | CRQ11 | Which reports need custom layouts and schedules; formats and delivery; Word for all reports? | FR-CR-042, 043 | OPEN |
 | CRQ12 | Which SOA is issued with the placement report and at booking (BR-039, BR-043)? | FR-CR-093 | OPEN |
 | CRQ13 | Is the Invoice Master List the Operations invoice ledger; columns and owner? | FR-CR-090 | OPEN |
@@ -1145,9 +1136,9 @@ Phase 1 keeps these seams open so that the phase 2 module can reuse them: party 
 | CRQ15 | What does "Bank Account Operations" cover? | CORE-08.21 | OPEN |
 | CRQ16 | Do CSF agents also resend e-policies (BR-164)? | CORE-16.04 | OPEN |
 | CRQ17 | Supply the BDO icon set and design or Figma files | FR-CR-092 | OPEN |
-| CRQ18 | Insurer invoice batch: file format, SFTP endpoints, replaces e-mail? | FR-CR-081 | OPEN |
+| CRQ18 | Insurer invoice batch: file format, SFTP addresses, replaces e-mail? | FR-CR-081 | OPEN |
 | CRQ19 | Client migration source, period (2020 to present) and duration of daily batches | FR-CR-082 | OPEN |
-| CRQ20 | What is ALeA and its "e-mail address encoding"? | G10 | OPEN |
+| CRQ20 | What is ALeA and its "e-mail address encoding"? | CLR-CR-10 | OPEN |
 | CRQ21 | Response under 5 s for every role and 429 concurrent users: which values govern? | Section 7 | OPEN |
 | CRQ22 | Do the umbrella retention and backup values replace the BRD-specific ones? | Section 7 | OPEN |
 | CRQ23 | Send "E2E BDOI Mapping.xlsx"; confirm the final IDs of each BRD govern | Section 10 | OPEN |
@@ -1300,9 +1291,9 @@ Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that 
 | CORE-14.05 | Process settlement offer from insurer (p.10) | BR-143 | BRD-7 BRCLM.010, BRCLM.014 | FR-CM-040, FR-CM-046, FR-CM-043 |
 | CORE-14.06 | Tag permanent closure (p.10) | BR-144 | BRD-7 BRCLM.035, BRCLM.005 | FR-CM-045, FR-CM-002 |
 | CORE-14.07 | Tag temporary closure (p.10) | BR-145 | BRD-7 BRCLM.035 | FR-CM-045 |
-| CORE-14.08 | Unclaimed checks safekeeping (p.10) | BR-146 | BRD-7 | Gap G2 (CRQ03) |
-| CORE-14.09 | Handover of settlement checks to Cashiering (p.10) | BR-147 | BRD-7 | Gap G2 (CRQ03) |
-| CORE-14.10 | Retrieval of checks from Cashiering for release (p.10) | BR-148 | BRD-7 | Gap G2 (CRQ03) |
+| CORE-14.08 | Unclaimed checks safekeeping (p.10) | BR-146 | BRD-7 | CLR-CR-02 (CRQ03) |
+| CORE-14.09 | Handover of settlement checks to Cashiering (p.10) | BR-147 | BRD-7 | CLR-CR-02 (CRQ03) |
+| CORE-14.10 | Retrieval of checks from Cashiering for release (p.10) | BR-148 | BRD-7 | CLR-CR-02 (CRQ03) |
 | CORE-14.11 | Maintain full claims history for audit and compliance (p.10) | BR-151 | BRD-7 BRCLM.004, BRCLM.022 | FR-CM-012, FR-CM-052, FR-CM-054 |
 | CORE-14.12 | Reports and analytics viewing (p.10) | BR-149, BR-152 | BRD-7 BRCLM.026, BRCLM.029, BRCLM.030, BRCLM.031, BRCLM.032 | FR-CM-060, FR-CM-044, FR-CM-061, FR-CM-062 |
 | CORE-14.13 | Encode / override the next follow-up date (p.10) | BR-150 | BRD-7 BRCLM.019 | FR-CM-002, FR-CM-050, FR-CM-054 |
@@ -1321,13 +1312,13 @@ Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that 
 | CORE-16.03 | View mode of payment (history) and current status (p.11) | BR-163 | BRD-9 BRCSF-005 | FR-CSF-012, FR-CSF-013 |
 | CORE-16.04 | View and resend RA (and e-policy) (p.11) | BR-164 | BRD-9 BRCSF-006, BRCSF-009 | FR-CSF-030, FR-CSF-033 |
 | CORE-16.05 | Upload supporting documents (p.11) | - | BRD-9 BRCSF-007 | FR-CSF-032 |
-| CORE-16.06 | Case resolution: add / edit case details and status (p.11) | BR-165 | BRD-9 | Gap G3 (CRQ04) |
+| CORE-16.06 | Case resolution: add / edit case details and status (p.11) | BR-165 | BRD-9 | CLR-CR-03 (CRQ04) |
 | CORE-17.01 | Master data change logging (user, product, insurer, LOVs) (p.11) | BR-170 | None (BRNB.016, BRNB.083, BRPM.024, BRCLXN.043 related) | FR-CR-031; FR-NB-016, FR-NB-132, FR-PM-005, FR-CL-003 |
 | CORE-17.02 | Insurer management (p.11) | BR-171 | None (BRNB.008 related) | FR-CR-061; FR-NB-053 |
 | CORE-17.03 | LOV maintenance (p.11) | BR-004, BR-172 | BRD-1 BRNB.083, BASAU 2.2.0 | FR-CR-060; FR-NB-132, FR-AC-070 |
 | CORE-17.04 | MIS field definition (p.11) | BR-173, BR-174 | None (BRNB.108 related) | FR-CR-062; FR-NB-110, FR-NB-119 |
 | CORE-17.05 | Product maintenance (p.11) | - | BRD-3 BRPM.003, PMADD01 | FR-CR-063; FR-PM-012, FR-PM-010 |
-| CORE-18.01 | Include any other / additional system capabilities (p.11) | BR-176 | None | Gap G9 (CRQ10) |
+| CORE-18.01 | Include any other / additional system capabilities (p.11) | BR-176 | None | CLR-CR-09 (CRQ10) |
 | CORE-19.01 | Automated renewal notifications (p.11) | BR-184, BR-196 | BRD-8 BRID-001 | FR-EB-022 |
 | CORE-19.02 | Manual and system-based proposal generation (p.11) | BR-185, BR-197 | BRD-8 BRID-003 | FR-EB-024 |
 | CORE-19.03 | Document and data upload management (p.11) | BR-186, BR-198 | BRD-8 BRID-005, BRID-005.01, BRID-014, BRID-025 | FR-EB-001, FR-EB-010, FR-EB-011, FR-EB-014 ... |
@@ -1375,7 +1366,7 @@ Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that 
 | XC-18 | Retail and wholesale business (p.4) | - | BRD-1 BRNB.001 | FR-CR-001; FR-NB-001 |
 | XC-19 | Invoice batch printing, delivery to insurers by SFTP and delivery report (daily, per insurer) (p.43) | - | None (BRNB.100 related) | FR-CR-081; FR-NB-117 |
 | XC-20 | Client migration (one-time, 2020 to present) and daily midday / EOD client batches with modification report (p.43) | - | Data Migration BRD | FR-CR-082 |
-| XC-21 | ALeA e-mail address encoding (as needed) (p.43) | - | None | Gap G10 (CRQ20) |
+| XC-21 | ALeA e-mail address encoding (as needed) (p.43) | - | None | CLR-CR-10 (CRQ20) |
 | XC-22 | Daily synchronisation from source systems (CMS, Reinsurance) (p.42-43) | - | BRD-4 BRCLXN.013, BRCLXN.014, BRCLXN.015 | FR-CR-082; FR-CL-017 |
 | XC-23 | MIS LOV, QPS insurer, LGT rates and insurer branch maintenance (MILB, 24 a year) (p.45) | - | BRD-1 BRNB.083 | FR-CR-060; FR-NB-132 |
 

@@ -69,7 +69,7 @@ The scope is the follow-up of **premium receivables (PR)** and **unapplied payme
 
 - Posting of money. Collections posts no journal and no ledger movement. Payments, BIR 2307 reversals, direct payment (DP) reversals and cancellations are posted by Cashiering, Commission and Adjustment (BRD-2).
 - Holds, special remittances, the send-schedule request and the endorsement slip (MKTID.001-009). The CLXN BRD does not cover them; they stay in Operations as described in the BRD-2 FRS (OQ45).
-- The Marketing Diary kept in ISYS (p.40-42). There is no FR ID for it; the panel is parked until BDOI answers CQ20.
+- The Marketing Diary kept in ISYS (p.40-42). There is no FR ID for it; the panel is on hold until BDOI answers CQ20.
 - Transport of the daily application file to the BDOI file server FS04. The file is kept in the list of extracts, from which the user downloads it, until OQ17 is answered.
 - BRCLXN.061-064 as confirmed functions. They are in the unsigned draft addendum only (CQ01). Section 4.10 proposes them so that BDOI can confirm them.
 
@@ -2304,7 +2304,7 @@ Figure 6 shows the interfaces of Collections. Collections reads the Operations i
 <!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.51-58)" size=8.5 -->
 | Topic | BRD value | BIBS target and approach |
 |---|---|---|
-| Authentication | SSO with Windows credentials; masked password; friendly errors; all attempts logged; lock-out after 3 attempts (NFR 1-2) | Platform log-in of BRD-1; lock-out at 3 for all users (D5); SSO parked (Q42) |
+| Authentication | SSO with Windows credentials; masked password; friendly errors; all attempts logged; lock-out after 3 attempts (NFR 1-2) | Platform log-in of BRD-1; lock-out at 3 for all users (D5); SSO on hold (Q42) |
 | Password rules | 8 / 12 characters, complexity, history 8, minimum age 1 day, change every 90 days (NFR 2) | Platform password policy of BRD-1 |
 | Access control | RBAC, custom roles, user maintenance; no multiple roles; IDOR protection (NFR 3) | RBAC and user administration exist; several roles per user allowed (D5) |
 | Audit logging | Log-in / log-out, admin and configuration changes, record access and updates; timestamp, user, source IP, resource; exportable (NFR 4) | Platform audit plus the Collections change log with source IP (FR-CL-003, 004) |

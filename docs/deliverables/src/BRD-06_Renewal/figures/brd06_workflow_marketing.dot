@@ -16,14 +16,14 @@ digraph rn_workflow_mkt {
   LETTER_PENDING   [label="LETTER_PENDING\nNFR / NAL (part 2)", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
   CLOSED           [label="CLOSED (LOST)", fillcolor="@DIRTY_WHITE", color="@MUTED"];
 
-  EXTRACTED -> EVALUATING [label=" initiate"];
+  EXTRACTED -> EVALUATING [label=" Initiate"];
   EVALUATING -> UNASSIGNED [label=" non-CBG; MANUAL\n or not CLEAN"];
   EVALUATING -> FOR_TL_REVIEW [label=" CLEAN + AUTO", style=dashed];
-  UNASSIGNED -> FOR_DISPOSITION [label=" assign"];
+  UNASSIGNED -> FOR_DISPOSITION [label=" Assign Disposition"];
   UNASSIGNED -> TRANSFER_PENDING [label=" transfer", style=dashed];
-  TRANSFER_PENDING -> UNASSIGNED [label=" accept /\n decline", style=dashed, constraint=false];
+  TRANSFER_PENDING -> UNASSIGNED [label=" Accept Transfer /\n Return to Sending Unit", style=dashed, constraint=false];
   FOR_DISPOSITION -> FOR_TL_REVIEW [label=" dispose + push"];
-  FOR_TL_REVIEW -> FOR_DISPOSITION [label=" return", style=dashed, constraint=false];
+  FOR_TL_REVIEW -> FOR_DISPOSITION [label=" Return to AO", style=dashed, constraint=false];
   FOR_TL_REVIEW -> FOR_PROCESSING [label=" post: For Renewal"];
   FOR_TL_REVIEW -> NB_PATH [label=" post: For Quotation /\n For Proposal"];
   FOR_TL_REVIEW -> LETTER_PENDING [label=" post: Not for Renewal"];

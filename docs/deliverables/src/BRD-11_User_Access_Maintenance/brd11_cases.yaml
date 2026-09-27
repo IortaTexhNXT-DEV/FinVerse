@@ -1,10 +1,9 @@
 # Test plan BRD-11 User Access Maintenance - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-11_User_Access_Maintenance/brd11_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# BRD-11 is designed, not built: the expected results quote the message text of the FRS and the build
-# design (docs/architecture/USER_ACCESS_DESIGN.md) without codes, and no case names an automated test.
-# Part of the function exists today (the "baseline" of FRS section 2.3); the cases test the behaviour
-# the FRS asks for after the BRD-11 change. Screen paths follow section 11.2 of the build design.
+# Version 2.0 (business sign-off pack): BRD-11 is built. The expected results quote the messages and codes of the
+# build (backend/src/main, frontend/src), the cases are traced to the screens of FRS v2.0 (pack/pack.yaml adds one
+# screen case per screen and one message case per screen or dialog), and the test data are the seed data of V1960.
 
 meta:
   brd: BRD-11
@@ -12,20 +11,21 @@ meta:
   code: UA
   frs: FRS_BRD11_USER_ACCESS_MAINTENANCE.md
   summary: TP_BRD11_USER_ACCESS_MAINTENANCE.md
-  version: "1.0"
-  date: 25 September 2026
-  built: false
+  version: "2.0"
+  date: 27 September 2026
+  signoff: pack/pack.yaml
+  built: true
 
 personas:
-  UAM_REQUESTOR: {name: Requestor, short: Req.}
-  UAM_APPROVER: {name: Approver, short: Appr.}
-  UAM_SECOND_APPROVER: {name: Second approver, short: 2nd Appr.}
-  BUSINESS_ADMIN: {name: Business Administrator, short: Bus. Admin}
-  SYSADMIN: {name: System Administrator, short: Sys Admin}
-  NB_APPROVER: {name: New Business approver (keeps ACCESS_APPROVE), short: NB Appr.}
-  AUDITOR: {name: Auditor, short: Audit.}
-  MKT_AO: {name: Business user without access-maintenance rights (Marketing AO), short: MKT AO}
-  SYSTEM: {name: BIBS scheduled job or event}
+  UAM_REQUESTOR: {name: Requestor, user: requestor, short: Req.}
+  UAM_APPROVER: {name: Approver, user: uamapprover, short: Appr.}
+  UAM_SECOND_APPROVER: {name: Second approver, user: secapprover, short: 2nd Appr.}
+  BUSINESS_ADMIN: {name: Business Administrator, user: badmin, short: Bus. Admin}
+  SYSADMIN: {name: System Administrator, user: admin, short: Sys Admin}
+  NB_APPROVER: {name: New Business approver (keeps ACCESS_APPROVE), user: approver, short: NB Appr.}
+  AUDITOR: {name: Auditor, user: auditor, short: Audit.}
+  MKT_AO: {name: Business user without access-maintenance rights (Marketing AO), user: ao, short: MKT AO}
+  SYSTEM: {name: BIBS scheduled job or event, user: "-"}
 
 screens:
   LOGIN: Login page
@@ -53,12 +53,12 @@ screens:
 data:
   - id: TD-UA-01
     name: Test users per role
-    content: requestor and requestor2 (UAM_REQUESTOR), uamapprover and uamapprover2 (UAM_APPROVER), secapprover (UAM_SECOND_APPROVER), badmin (BUSINESS_ADMIN), admin and admin2 (SYSADMIN), approver (NB_APPROVER), auditor (AUDITOR), ao (MKT_AO); a disabled user and a locked user.
-    source: Planned seed V1960 (requestor, uamapprover, secapprover) and existing seeds V900 / V980; the others created by the test lead
+    content: requestor (UAM_REQUESTOR), uamapprover (UAM_APPROVER), secapprover (UAM_SECOND_APPROVER), badmin (BUSINESS_ADMIN), admin (SYSADMIN), approver (NB_APPROVER), auditor (AUDITOR), infosec (INFOSEC_OFFICER), ao (MKT_AO); subject users a013000101 to a013000104 (MKT_AO); requestor2, uamapprover2 and admin2 created by the test lead through requests; a disabled user and a locked user prepared by the test lead. The SIT/UAT password is issued by the test lead.
+    source: Seeds V1960 (user access users and subject users), V980 (broking users), V900 (admin, auditor), V1109 (infosec); the others created by the test lead
   - id: TD-UA-02
     name: Requests in every status
-    content: A draft, a request pending for uamapprover, a returned request, a cancelled request, a scheduled request with a future date, an approved and applied request, a bulk batch of three lines, a group-profile create request FOR_IMPLEMENTATION, a privileged change waiting for the second approval.
-    source: Planned seed V1960 of the build design
+    content: AR-2026-900001 draft (requestor); AR-2026-900002 pending for uamapprover (modify a013000101); AR-2026-900003 returned with remarks; AR-2026-900004 cancelled; AR-2026-900005 scheduled (deactivation of a013000103, 30 days ahead); AR-2026-900006 approved and applied (enrolment of a013000101); AR-2026-900007 group-profile creation PROCESSING_TL2 for implementation; AR-2026-900008 privileged change waiting for the second approval; batch BLK-2026-900001 of three lines pending for uamapprover.
+    source: Seed V1960
   - id: TD-UA-03
     name: Group profiles
     content: UAM_REQUESTOR, UAM_APPROVER, UAM_SECOND_APPROVER (Standard); Marketing Team Lead (MKT_TL) and Processing Team Lead (Standard); SYSADMIN (Admin); a High profile UAT_HIGH; an inactive profile UAT_INACTIVE; profile Marketing Account Officer.
@@ -133,6 +133,7 @@ frs:
       - c: 1
         type: Positive
         title: Requestor logs in
+        auto: PersonaMenusIT#everyRoleHoldsExactlyThePermissionsTheMenuIsBuiltFrom; PersonaMenusIT#everyScreenOfAPersonaOpensForItsSeedUser; LoginLockoutTest#theAccountLocksAtTheConfiguredThreshold
         steps:
           - Log in as requestor; open the side menu.
         expected: User Access shows Access Requests and Bulk Request. Group Profile Requests, User Access Reports and Administration are not shown.
@@ -188,6 +189,7 @@ frs:
       - c: 1
         type: Boundary
         title: Warning after 15 minutes
+        auto: SessionLogIT#theInactivitySignOutIsRecordedWithItsReason
         steps:
           - Log in as ao; leave the screen idle for 15 minutes.
           - Click Continue in the warning.
@@ -234,6 +236,7 @@ frs:
       - c: 1
         type: Positive
         title: Windows ID sign-in in DIRECTORY mode
+        auto: SignInPasswordIT#directoryModeWithoutItsAdapterRefusesSignInWithAServiceMessage
         pre: AUTH_MODE = DIRECTORY; the directory stub of TD-UA-07 answers.
         steps:
           - Enter the Windows ID of requestor and the stub password.
@@ -280,6 +283,7 @@ frs:
         persona: AUDITOR
         screen: UAREP
         title: Log-out recorded
+        auto: LogoutIT#logoutRevokesTheTokenAndIsAudited; SessionLogIT#anAdministratorListsAndEndsSessionsAndTheTokenIsRefused
         steps:
           - As requestor click Log Out.
           - As auditor run the User Access Audit Log for today with log-ins and log-outs included.
@@ -315,6 +319,7 @@ frs:
       - c: 1
         type: Positive
         title: Change to a compliant password
+        auto: SignInPasswordIT#historyAndMinimumAgeAreEnforced; SignInPasswordIT#theResetLinkWorksOnceAndNotAfterItExpires
         steps:
           - Open My Profile > Change password; enter the current password and "Uat#Pass2026a" twice; save.
         expected: The password is changed.
@@ -324,8 +329,8 @@ frs:
         title: Nine-character password
         steps:
           - Enter "Uat#Pas26" as the new password.
-        expected: Refused.
-        msg: [must contain upper and lower case letters and a digit and a symbol]
+        expected: The checklist under the fields shows the rule still needed and Change Password stays disabled.
+        msg: [At least 10 characters]
       - c: 1
         type: Negative
         title: Wrong current password
@@ -347,7 +352,7 @@ frs:
         steps:
           - Change the password; change it again.
         expected: The second change is refused.
-        msg: [You changed your password less than a day ago]
+        msg: ["You changed your password less than {a day} ago", PASSWORD_CHANGED_TOO_SOON]
       - c: 3
         type: Workflow
         persona: SYSADMIN
@@ -406,6 +411,7 @@ frs:
       - c: 1
         type: Workflow
         title: Draft today, submit tomorrow
+        auto: UserAccessLifecycleIT#draftIsSubmittedReturnedCorrectedApprovedAndApplied
         steps:
           - New Request, type Enrol new user; enter the data of TD-UA-04; approver uamapprover; remarks; Save Draft.
           - The next day open the draft; change the home branch; Submit.
@@ -425,7 +431,7 @@ frs:
         steps:
           - As requestor2 open the address of requestor's draft; call the edit.
         expected: The draft is not listed for requestor2; the edit is refused.
-        msg: [Only the creator can edit this draft]
+        msg: ["Only the creator can {edit} request {AR-2026-900001}", ACCESS_NOT_REQUESTER]
       - c: 3
         type: Workflow
         screen: REQS
@@ -460,7 +466,7 @@ frs:
         steps:
           - Submit a Modify user request for the user of the pending request of TD-UA-02.
         expected: Refused.
-        msg: ["A request for user {uatuser2} is already waiting for approval"]
+        msg: ["A request for {user a013000101} is already waiting for approval", ACCESS_REQUEST_PENDING]
 
   FR-UA-011:
     scenario: SC-UA-02
@@ -476,6 +482,7 @@ frs:
       - c: 1
         type: Workflow
         title: Enrol a013000196
+        auto: AccessRequestIT#createdUserIsAppliedOnApprovalWithATemporaryPassword; UserAccessEndToEndApiIT#aUserIsEnrolledSignsInChangesAndIsDeactivated
         steps:
           - Enrol new user a013000196, UAT User One, profile Marketing Account Officer; approver uamapprover; submit.
           - As uamapprover approve; note the temporary password; log in as a013000196.
@@ -550,6 +557,7 @@ frs:
       - c: 1
         type: Workflow
         title: Move a user to Processing Team Lead
+        auto: AccessRequestIT#modifyDisableAndEnable
         steps:
           - Modify user; search the Marketing Team Lead test user; replace the profile with Processing Team Lead; submit; approve as uamapprover.
           - As auditor run the User Access Audit Log.
@@ -596,6 +604,7 @@ frs:
       - c: 1
         type: Workflow
         title: Deactivate a user
+        auto: AccessRequestIT#modifyDisableAndEnable
         steps:
           - Deactivate user; search a013000196; reason Resigned; remarks; submit; approve as uamapprover.
           - Log in as a013000196; as badmin run the User Access Report.
@@ -636,6 +645,7 @@ frs:
       - c: 1
         type: Workflow
         title: Reactivate a013000196
+        auto: AccessRequestIT#modifyDisableAndEnable
         steps:
           - Reactivate user; search a013000196; remarks; submit; approve.
           - Log in as a013000196.
@@ -709,6 +719,7 @@ frs:
       - c: 1
         type: Workflow
         title: Correct and re-submit
+        auto: AccessRequestReturnIT#returnedRequestIsResubmittedAndApprovedInBulk
         steps:
           - Open the notification of the returned request; read the remarks; correct the e-mail; correction remark; Re-submit.
         expected: The request is PENDING and the approver is notified.
@@ -841,6 +852,7 @@ frs:
       - c: 1
         type: Upload-download
         title: Three enrolments
+        auto: UserAccessBulkAndApiIT#bulkBatchOfThreeEnrolmentsIsSubmittedApprovedAndApplied
         steps:
           - Download the template; attach the three-row file; check the validation report; remarks; Save Draft; choose uamapprover; Submit.
           - As uamapprover approve the batch.
@@ -891,6 +903,7 @@ frs:
         persona: SYSTEM
         screen: JOBS
         title: Approved on the 10th, applied on the 15th
+        auto: UserAccessLifecycleIT#scheduledChangeIsAppliedByTheJobOnItsDate
         steps:
           - Submit a deactivation effective the 15th; approve on the 10th (test date).
           - Run UAM_EFFECTIVE_CHANGES with the test date the 15th.
@@ -964,6 +977,7 @@ frs:
       - c: 1
         type: Workflow
         title: Approve and Apply an enrolment
+        auto: AccessRequestIT#requestsAreValidatedAndDecidedUnderFourEyes
         steps:
           - Open the pending enrolment; comment; Approve and Apply; close the password dialog; reopen the request.
         expected: The user is created; the temporary password is shown once and not again.
@@ -1046,7 +1060,7 @@ frs:
         steps:
           - Return with the remarks blank.
         expected: Refused.
-        msg: [Enter the reason for the return]
+        msg: [Enter the remarks for the requester, ACCESS_RETURN_REASON]
 
   FR-UA-034:
     scenario: SC-UA-04
@@ -1061,6 +1075,7 @@ frs:
       - c: 1
         type: Workflow
         title: Adding the System Administrator profile
+        auto: UserAccessLifecycleIT#privilegedChangeNeedsASecondApprovalByAnotherApprover
         steps:
           - As requestor submit a Modify user adding SYSADMIN; as uamapprover approve.
           - As secapprover open tab Second Approval; approve.
@@ -1106,6 +1121,7 @@ frs:
       - c: 1
         type: Workflow
         title: New profile Processing Team Lead 2
+        auto: GroupProfileRequestIT#groupProfileRequestsAreChecked
         steps:
           - New Group Profile Request, Create; code PROC_TL2; name; privilege Standard; pick permissions by area and action; approvers uamapprover then approver; remarks; submit.
           - Approve as uamapprover, then as approver.
@@ -1194,7 +1210,7 @@ frs:
         steps:
           - Submit another Modify request for Marketing Team Lead while one is pending.
         expected: Refused.
-        msg: ["A request for role {MKT_TL} is already waiting for approval"]
+        msg: ["A request for {role MKT_TL} is already waiting for approval", ACCESS_REQUEST_PENDING]
       - c: 3
         type: Positive
         persona: SYSADMIN
@@ -1217,6 +1233,7 @@ frs:
       - c: 1
         type: Workflow
         title: Deactivate profile UAT_HIGH
+        auto: GroupProfileRequestIT#deactivateAndReactivate
         steps:
           - Deactivate UAT_HIGH; approvers; submit; approve; admin implements.
           - A member of UAT_HIGH clicks a screen of that profile; requestor opens New Request.
@@ -1279,6 +1296,7 @@ frs:
         type: Workflow
         persona: NB_APPROVER
         title: Two approvers in order
+        auto: GroupProfileRequestIT#approversDecideInOrderAndTheAdministratorImplements
         steps:
           - badmin submits with approvers uamapprover then approver; approver checks the bell.
           - uamapprover approves; approver checks again.
@@ -1329,6 +1347,7 @@ frs:
         type: Workflow
         screen: ROLES
         title: Implement the approved create request
+        auto: GroupProfileRequestIT#approversDecideInOrderAndTheAdministratorImplements
         steps:
           - Open tab For Implementation; the request; Implement Request; review; save.
         expected: The profile exists; IMPLEMENTED; badmin notified.
@@ -1339,7 +1358,7 @@ frs:
         steps:
           - Open Roles & Permissions; edit a role without a request; save.
         expected: Refused.
-        msg: [A group profile is changed only by implementing an approved request]
+        msg: [Roles are changed through an approved group-profile request; implement the request instead, ROLE_EDIT_BY_REQUEST]
       - c: 2
         type: Positive
         screen: ROLES
@@ -1404,6 +1423,7 @@ frs:
         persona: BUSINESS_ADMIN
         screen: GP
         title: Add UAM_CANCEL to a profile
+        auto: AccessRequestIT#accessMatrixListsRolesAgainstPermissions
         steps:
           - Request UAM_CANCEL for UAT_HIGH; approve; implement; a member opens a pending own request.
         expected: The member now sees Cancel Request.
@@ -1474,6 +1494,7 @@ frs:
       - c: 1
         type: Report-output
         title: Report as of today
+        auto: UserAccessReportsIT#theUserAccessReportAndTheMembershipShowTheProfilesAsOfADate
         steps:
           - Run the User Access Report as of today for a013000196.
         expected: The profile, created by the approver of the enrolment with its request number, and the later changes with their approvers.
@@ -1517,6 +1538,7 @@ frs:
       - c: 1
         type: Report-output
         title: Marketing Account Officer profile
+        auto: UserAccessReportsIT#theGroupProfileAndRequestReportsRunAndEveryReportExports
         steps:
           - Run the User Group Profile Report for Marketing Account Officer, area Client Management.
         expected: Client Management tasks each marked With Access or No Access; created and modified dates and actors.
@@ -1539,6 +1561,7 @@ frs:
       - c: 1
         type: Report-output
         title: Members of Marketing Team Lead
+        auto: UserAccessReportsIT#theUserAccessReportAndTheMembershipShowTheProfilesAsOfADate
         steps:
           - Run Group Profile Membership for Marketing Team Lead as of today; export to XLSX.
         expected: Every member with user ID, name, added by and date; the file matches the screen.
@@ -1562,6 +1585,7 @@ frs:
       - c: 1
         type: Report-output
         title: Profile change in the audit log
+        auto: UserAccessReportsIT#theAuditLogShowsTheProfileChangeWithFromAndToValues
         steps:
           - Run the User Access Audit Log for the week.
         expected: The change of TC-UA-012.1-01 as Modify User Group Profile, from "Marketing Team Lead" to "Processing Team Lead", done by, approved by and request number.
@@ -1739,32 +1763,32 @@ access:
 
 findings:
   - fr: FR-UA-001
-    issue: '"Access only from BDO-issued devices" is enforced by the BDO network and endpoint policy, not by BIBS, so it cannot be tested in BIBS.'
-    proposal: Move the device condition to the assumptions (A-UA) and ask BDO IT for the evidence; the cases test the profile and lock-out only.
+    issue: '"Access only from BDO-issued devices" is enforced by the BDO network and endpoint policy, not by BIBS, so it cannot be tested in BIBS. A deactivated user who signs in gets the wrong-password message and the attempt counts towards the lock-out.'
+    proposal: Move the device condition to the assumptions and ask BDOI IT for the evidence; confirm with Information Security that the deactivated user's message and count are acceptable.
   - fr: FR-UA-003
-    issue: The EUA protocol, host and messages are not known (UQ04), so the directory cases need a stub and cannot quote the EUA refusal message.
-    proposal: Record the EUA messages in the FRS when BDO supplies the interface; TC-UA-003 cases stay Blocked until the stub of TD-UA-07 exists.
-  - fr: FR-UA-005
-    issue: 'The weak-password message is a fragment ("must contain upper and lower case letters and a digit and a symbol"); the full text the user sees is not given, and the length rule (at least 10) has no message of its own.'
-    proposal: Quote the full message, and state whether a 9-character password gets the same message or a length message.
+    issue: The directory adapter is not built (UQ04); BDOI named EIAM on Microsoft Entra ID as the target (IQ04). The directory mode refuses every sign-in with a service message, so the directory cases stay Blocked.
+    proposal: Specify the Entra ID sign-in with BDOI IT as a change request; the cases then test it with a test tenant.
   - fr: FR-UA-011
-    issue: 'The description says "at least 10 alphanumeric characters, format a999999999", but the default USER_ID_PATTERN ^[a-zA-Z][0-9]{9}$ allows exactly 10 (one letter, nine digits). The baseline check "3 to 50 letters, digits, dots, dashes or underscores" also still applies, so two messages can answer the same wrong ID.'
-    proposal: State one rule (exactly 10, or 10 or more) and which message wins; the cases assume exactly 10 per the pattern.
+    issue: 'The user ID check shows the pattern of the parameter to the user ("The user ID must follow the format ^[a-zA-Z][0-9]{9}$"), and the baseline check "3 to 50 letters, digits, dots, dashes or underscores" also applies, so two messages can answer the same wrong ID. The New Request screen offers the user type External although external users are refused.'
+    proposal: Show the format in words (a letter and nine digits); hide the user type External while no portal is installed.
   - fr: FR-UA-017
-    issue: The FR says the Requestor cancels a SCHEDULED request; the transition table (section 5.1) also lets the approver cancel it (UQ06). The acceptance does not cover the approver.
-    proposal: State who may cancel a scheduled request and add an acceptance criterion; the cases test the creator only.
+    issue: The approver who scheduled a request can cancel it (as built); the FRS acceptance covers the creator only.
+    proposal: Add an acceptance criterion for the approver's cancellation of a scheduled request.
   - fr: FR-UA-019
-    issue: The maximum number of rows, line-by-line decisions and mixed actions in one file are open (UQ10), so the size boundary cannot be tested.
-    proposal: Set the maximum rows as a parameter with a default; add the boundary case when UQ10 is answered.
+    issue: The maximum number of rows is open (UQ10). The Business Administrator and the System Administrator see Bulk Request but cannot upload (no bulk upload right).
+    proposal: Set the maximum rows with UQ10; decide whether these profiles upload bulk files (a group-profile request) or the menu entry is hidden for them.
   - fr: FR-UA-034
-    issue: UAM_WORKING_HOURS has no holiday calendar, so a submission on a public holiday during office hours is not flagged. The FRS does not say whether "outside hours" is judged at submission, at approval or both for a request submitted inside and approved outside hours.
-    proposal: Use the BIBS holiday calendar for the out-of-hours flag and state the moments when it is evaluated (the cases assume both).
+    issue: UAM_WORKING_HOURS has no holiday calendar, so a request submitted or approved on a public holiday during office hours is not flagged. The risk rules are evaluated both at submission and at approval (as built).
+    proposal: Use the BIBS holiday calendar for the out-of-hours flag; the cases assume both moments.
   - fr: FR-UA-042
-    issue: Whether a profile with active members may be deactivated is open (UQ16); the validation "Move the n members before deactivating it" applies only if BDOI says block, so it cannot be tested now.
-    proposal: Answer UQ16 and state the rule; the cases test deactivation with members allowed.
+    issue: A profile with members is deactivated (UQ16 open); the members lose its screens at once and are not told one by one.
+    proposal: Answer UQ16; if members must be told, add a notice per member (change request).
+  - fr: FR-UA-052
+    issue: The authorisation limit of a user, used by the journal and payables approvals, cannot be set through an access request; only the emergency direct edit sets it.
+    proposal: Add the authorisation limit to the Modify user request (change request); until then the System Administrator sets it on the emergency path, audited and alerted.
   - fr: FR-UA-060
-    issue: The meaning of the as-of date (end of day, from the change log) is to be confirmed (UQ11); a change applied by the scheduled job at 00:05 falls on the effective date, not the approval date.
-    proposal: Confirm that the as-of view uses the date the change was applied; the cases assume that.
-  - fr: FR-UA-004
-    issue: The Online status comes from an open session whose last activity is updated at most every 5 minutes. A user who closes the browser without logging out stays Online until the inactivity sign-out (30 minutes); the FRS does not say so.
-    proposal: State how long a user can show Online after closing the browser; the case checks Online only while the user is active.
+    issue: 'The report parameters "Group Profile (code)" and "Module (area code)" take codes typed by hand, and the User Group Profile Report shows the module and the task as codes (UQ11).'
+    proposal: Offer the profiles and modules as drop-downs by name; answer UQ11 for the task names.
+  - fr: FR-UA-070
+    issue: 'The notice for the second approval shows the risk flags as codes ([OUTSIDE_HOURS]); the decision notice of a scheduled request gives the date as yyyy-mm-dd.'
+    proposal: Show the flags by their labels and the date as dd-MMM-yyyy.

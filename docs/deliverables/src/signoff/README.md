@@ -16,6 +16,7 @@ BRD").
 | `pack/screens/*.yaml` | One file per process area; one entry per screen |
 | `pack/messages.yaml` | Where each message appears and the fix; the texts are read from the code |
 | `pack/notifications.yaml`, `contract.yaml`, `documents.yaml`, `walkthroughs.yaml` | Notifications, cross-BRD interface contract, generated documents, end-to-end walkthroughs |
+| `config_inputs.py` | 06 Configuration input templates of a Drop 0 set and the FRS chapter "Configuration inputs the business provides", from `pack/config_inputs.yaml` of the BRD (`python docs/deliverables/src/signoff/config_inputs.py BRD-11`); BRD-03 keeps its own copy in its pack |
 | `screenshots/` of the BRD folder | PNG screenshots and document pages captured with seed data (`tools/screenshots/capture_pack.cjs`, recipe `tools/screenshots/packs/brdNN.cjs`; see `tools/screenshots/README.md`) |
 
 ## Build and check
@@ -34,8 +35,15 @@ python tools/deliverables/drop_index.py
 Optional keys of `pack.yaml`: `foreign_packs` (paths of the packs of other BRDs, relative to `pack.yaml`, whose
 screens a walkthrough step may show, for example My Approvals of New Business in a Product Maintenance walkthrough)
 and `signatories` (`[role, organisation, signs for]` of the sign-off certificate; the New Business list by default).
-Optional key of `messages.yaml` › `sources`: `bulk_screen` (the screen named for upload row messages). The two column
-checks of every upload type are listed only for a pack with upload types.
+For a set that signs the role matrix (BRD-11): `menu_personas` (`{ROLE: {name, user}}`, more personas whose sidebar
+the FRS and the workbook show; a walkthrough step may use them), `menu_suites` (the persona menu check,
+`frontend/src/navigation/personaMenus.json`: the check refuses a suite persona without a menu or with another seed
+user, and notes under each menu whether the persona sees the screens of its suite sections, no more, no less) and
+`menu_sheets: per_persona` (one workbook sheet per persona, with the review columns, besides Menu by persona).
+Optional keys of `messages.yaml` › `sources`: `bulk_screen` (the screen named for upload row messages) and
+`ui_patterns: extended` (also reads the screen checks written as conditional texts, `problems.push(...)` and the
+alternatives of a template text; the packs issued before keep the default reading). The two column checks of every
+upload type are listed only for a pack with upload types.
 
 The check refuses: a field label or button that is not a text of `frontend/src` (or a workflow stage or action), a
 route that is not a screen of the menu, a screen no persona can open, an FR that is not in the FRS, a test-plan screen
@@ -51,7 +59,9 @@ a panel) instead of quoting a screen text and is not checked; the brackets are n
   route: /crm/clients/new           # route of navigation/modules.ts; decides personas, permission and menu path
   also: [/crm/clients/:id/edit]     # other routes of the same screen (optional)
   parent: /crm/clients                  # for a screen without a menu entry: the screen it is reached from
-  public: true                      # only for the sign-in screen (no menu, no permission)
+  public: true                      # only for the screens before sign-in (no menu, no permission)
+  everyone: true                    # a page or dialog of every signed-in user without a route of its own
+  menu: "Dialog over any screen"    # the menu path text of a public or everyone screen
   purpose: >-
     What the screen is for.
   entry: ["Clients › New Client", "Client record › Edit"]   # other ways in (the menu path is added)

@@ -1,0 +1,166 @@
+# Messages catalogue of BRD-11 User Access Maintenance: sources, places and the fix the user makes.
+# The message texts are read from the code by tools/deliverables/code_facts.py at every build (never typed here).
+# This file says where each message appears (by the class or file that raises it) and what the user does.
+sources:
+  backend_packages: [nbadmin, security]
+  # Data retention (Broking Setup › Data Retention) belongs to the New Business set.
+  exclude_classes: [RetentionRule, RetentionService]
+  bulk_handlers: [AccessRequestBulkHandler]
+  bulk_screen: Bulk Request (SCR-UA-09)
+  ui_patterns: extended
+  frontend_dirs:
+    - auth
+    - session
+    - features/profile
+    - features/nbadmin/AccessRequestsPage.tsx
+    - features/nbadmin/AccessRequestWorklist.tsx
+    - features/nbadmin/GroupProfileRequestsPage.tsx
+    - features/nbadmin/AccessRequestFormPage.tsx
+    - features/nbadmin/UserRequestFields.tsx
+    - features/nbadmin/GroupProfileFields.tsx
+    - features/nbadmin/RolePermissionFields.tsx
+    - features/nbadmin/ApproverPicker.tsx
+    - features/nbadmin/accessRequest.ts
+    - features/nbadmin/accessActions.ts
+    - features/nbadmin/AccessRequestPage.tsx
+    - features/nbadmin/AccessRequestTabs.tsx
+    - features/nbadmin/ReasonDialog.tsx
+    - features/nbadmin/BulkRequestPage.tsx
+    - features/nbadmin/AccessBatchPage.tsx
+    - features/nbadmin/AccessMatrixPage.tsx
+    - features/nbadmin/UserAccessReportsPage.tsx
+    - features/admin/UsersPage.tsx
+    - features/admin/UserSessionsDialog.tsx
+    - features/admin/RolesPage.tsx
+
+# Where a message appears: the first rule whose pattern matches the class (backend) or file (frontend) wins.
+places:
+  - [ "^(LoginPage|LoginRateLimitFilter|AuthService|LocalPasswordAuthenticator|DirectoryAuthenticators|SignInFrame|RequireAuth|AuthProvider)$", "Login (SCR-UA-01)" ]
+  - [ "^(ResetPasswordPage|AuthPasswordService)$", "Forgot Password and Set a New Password (SCR-UA-02)" ]
+  - [ "^(ForcedPasswordChange|AuthPasswordPolicy|passwordRules|PasswordChangeForm)$", "Password rules: Change Your Password, My Profile, Set a New Password (SCR-UA-02, SCR-UA-03, SCR-UA-05)" ]
+  - [ "^(SessionTimeoutGuard|useServerKeepAlive|AuthSessionService|UserSessionLog)$", "Inactivity and Session-end Warnings (SCR-UA-04)" ]
+  - [ "^(MyProfilePage|ContactDetailsCard|profileRules|SessionsTable|AuthProfileService)$", "My Profile (SCR-UA-05)" ]
+  - [ "^(AccessRequestBulkApprovals)$", "My Approvals: approval of several requests (New Business set, SCR-NB-39)" ]
+  - [ "^(AccessRequestsPage|AccessRequestWorklist|AccessRequestSearch)$", "Access Requests (SCR-UA-06)" ]
+  - [ "^(AccessRequestFormPage|UserRequestFields|ApproverPicker|accessRequest|AccessRequestValidator|UserRequestValidator|UserStateRules|AccessApprovers|AccessRequestService)$", "New Request and Edit Request (SCR-UA-07)" ]
+  - [ "^(AccessRequestPage|AccessRequestTabs|ReasonDialog|accessActions|AccessDecisionService|AccessRequestReturnService|AccessRequest|AccessChangeApplier|AccessScheduledChanges|NbadminPortDefaults)$", "Access Request record: decisions (SCR-UA-08)" ]
+  - [ "^(BulkRequestPage|AccessRequestBulkHandler)$", "Bulk Request (SCR-UA-09)" ]
+  - [ "^(AccessBatchPage|AccessBatchService)$", "Bulk Request Batch (SCR-UA-10)" ]
+  - [ "^(GroupProfileRequestsPage)$", "Group Profile Requests (SCR-UA-11)" ]
+  - [ "^(GroupProfileFields|RolePermissionFields|GroupProfileRequestValidator|RolePermissionChangeValidator)$", "New Group Profile Request (SCR-UA-12)" ]
+  - [ "^(AccessMatrixPage|AccessMatrixService)$", "User Access Matrix (SCR-UA-13)" ]
+  - [ "^(UserAccessReportsPage|UamReportSupport)$", "User access reports (SCR-UA-14, SCR-UA-17)" ]
+  - [ "^(UsersPage|UserSessionsDialog|UserAdminService)$", "Users (SCR-UA-15)" ]
+  - [ "^(RolesPage|RoleEditGuard|Role|AccessImplementationService)$", "Roles & Permissions: implementation (SCR-UA-16)" ]
+
+# The fix the user makes. Messages that tell the user what to do ("Enter ...", "Select ...") are their own fix and are
+# not repeated here. Keys are message codes; frontend messages without a code use their text.
+fixes:
+  # Sign-in and password
+  AUTHENTICATION_FAILED: Check the user ID and the password and sign in again. After three failed attempts the account locks; ask the System Administrator to unlock it (Users › Unlock), or ask for a reactivation request with Also unlock the account. A deactivated user asks for a reactivation request.
+  LOGIN_RATE_LIMITED: Wait a minute before signing in again; repeated attempts from one computer are slowed down.
+  SIGN_IN_UNAVAILABLE: Try again later; if the directory stays unavailable, report the time to BDOI IT and the System Administrator.
+  INVALID_PASSWORD: Enter your current password again; use Forgot password? on the Login page if you no longer know it.
+  PASSWORD_REUSED: Choose a password you have not used for your last 8 changes.
+  PASSWORD_CHANGED_TOO_SOON: Wait until the minimum age has passed, or ask the System Administrator to reset the password.
+  PASSWORD_MANAGED_BY_DIRECTORY: Change the password through the BDO directory (BDO network password).
+  RESET_LINK_EXPIRED: Request a new link with Forgot password? on the Login page and use it within 30 minutes.
+  RESET_LINK_INVALID: Request a new link with Forgot password?; only the latest link works, once.
+  UNKNOWN_USER: Sign in again; if it persists, report it to the System Administrator.
+  PROFILE_INVALID: Correct the fields marked in red.
+  SESSION_ALREADY_ENDED: No action; refresh the list of sessions.
+  # Requests
+  ACCESS_TYPE: Choose the type of request.
+  ACCESS_USERNAME: Enter a user ID of 3 to 50 letters, digits, dots, dashes or underscores.
+  ACCESS_USER_EXISTS: Choose Modify user for an existing user, or enter another user ID.
+  ACCESS_USER_ID_FORMAT: Enter the user ID in the BDOI format (a letter followed by nine digits, for example a013000196).
+  ACCESS_UNKNOWN_USER: Choose an existing user from the list.
+  ACCESS_USER_ALREADY_INACTIVE: No action; the user is already deactivated.
+  ACCESS_USER_ALREADY_ACTIVE: No action; the user is already active and not locked.
+  ACCESS_NOTHING_CHANGED: Change at least one value or group profile, or cancel the request.
+  ACCESS_UNKNOWN_ROLE: Choose the group profiles from the list.
+  ACCESS_ROLE_INACTIVE: Choose an active group profile, or request the reactivation of the profile first.
+  ACCESS_WINDOWS_ID_IN_USE: Enter the user's own Windows ID; a Windows ID belongs to one user only.
+  SELF_ROLE_CHANGE: Ask another requester to raise the change of your own group profiles.
+  ACCESS_REQUEST_PENDING: Wait for the decision on the open request of that user or profile, or cancel it first.
+  ACCESS_EFFECTIVE_DATE_USER_ONLY: Leave the effective date blank; a group-profile change applies when it is implemented.
+  ACCESS_EXTERNAL_TYPE: Choose Internal (BIBS user); external users are not available in this release.
+  ACCESS_EXTERNAL_PARTY: Choose Internal (BIBS user); external users are not available in this release.
+  NOT_AVAILABLE: Choose Internal (BIBS user); external (portal) users are not available in this release.
+  ACCESS_APPROVER_TWICE: Remove the duplicate approver.
+  ACCESS_ONE_APPROVER: Choose one approver.
+  ACCESS_APPROVER_NOT_ELIGIBLE: Choose an approver from the list; the requester and the user concerned cannot approve.
+  ACCESS_NOT_REQUESTER: Ask the creator of the request or batch to take the action.
+  ACCESS_REQUEST_TYPE_FIXED: Cancel the request and raise a new one of the right type.
+  ACCESS_REQUEST_NOT_RETURNED: Refresh the request; only a returned request is resubmitted.
+  # Decisions
+  ACCESS_FOUR_EYES: Ask another approver to decide; the requester never decides his own request.
+  ACCESS_SUBJECT_DECIDES: Ask another approver to decide; nobody decides a request about his own access.
+  ACCESS_NOT_ASSIGNED: Leave the request to the approver chosen by the requester.
+  ACCESS_REQUEST_DECIDED: Refresh the request; another user has already decided it.
+  ACCESS_SECOND_APPROVAL_PENDING: Leave the request to a second approver.
+  ACCESS_NOT_SECOND_APPROVAL: Refresh the request; it is not waiting for a second approval.
+  ACCESS_SECOND_SAME_APPROVER: Ask another second approver; the first approver cannot give the second approval.
+  ACCESS_APPROVE_INDIVIDUALLY: Open the enrolment request and approve it on its own, so that its temporary password is shown.
+  ACCESS_REQUEST_NOT_FOR_IMPLEMENTATION: Refresh the request; it is not waiting for implementation.
+  ACCESS_IMPLEMENTER_IS_REQUESTER: Ask another System Administrator to implement the request.
+  ROLE_EDIT_BY_REQUEST: Raise a group-profile request, or implement the approved one from Roles & Permissions.
+  ROLE_REQUEST_NOT_APPROVED: Implement the request from Roles & Permissions once it is approved.
+  ROLE_ALREADY_INACTIVE: No action; the group profile is already inactive.
+  ROLE_ALREADY_ACTIVE: No action; the group profile is already active.
+  # Bulk
+  ACCESS_BATCH_NOTHING_TO_SUBMIT: Upload a file with at least one valid row.
+  ACCESS_BATCH_NO_LINE: Refresh the batch; its lines were already decided.
+  ACCESS_BULK_ACTION: Use ENROL, MODIFY, DEACTIVATE or REACTIVATE in the Action column and upload the file again.
+  ACCESS_BULK_BRANCH: Use the code of an existing branch in Home Branch Code and upload the file again.
+  # Group profiles
+  ACCESS_ROLE_CODE: Enter a profile code of up to 40 capital letters, digits or underscores.
+  ACCESS_ROLE_ALREADY_ACTIVE: Choose an inactive profile to reactivate.
+  ACCESS_ROLE_ALREADY_INACTIVE: Choose an active profile to deactivate.
+  ACCESS_ROLE_PROTECTED: Choose another profile; the System Administrator profile always stays active.
+  ACCESS_PERMISSION_CONFLICT: Tick or untick the permission once; a permission is either added or removed.
+  ACCESS_NO_PERMISSION_CHANGE: Grant or withdraw at least one permission, or change the name, description or level.
+  ACCESS_UNKNOWN_PERMISSION: Choose the permissions from the list.
+  ACCESS_PERMISSION_LIST_TOO_LONG: Split the change into several requests.
+  PERMISSION_NOT_OFFERED: Remove the insurer permissions; they are not offered to BDOI profiles.
+  UNKNOWN_ROLE: Choose the group profiles from the list.
+  WINDOWS_ID_IN_USE: Enter the user's own Windows ID; a Windows ID belongs to one user only.
+  # Reports
+  AS_OF_IN_FUTURE: Enter today or an earlier date.
+  DATE_RANGE_REVERSED: Enter an end date on or after the start date.
+  # Common
+  DUPLICATE: Use another code; the code already exists.
+  NOT_FOUND: Refresh the screen; the record was changed or removed. Report the message with its reference if it persists.
+  VALIDATION_FAILED: Correct the fields listed under the message.
+  CONCURRENT_MODIFICATION: Reload the record; another user changed it. Enter the change again.
+  ACCESS_DENIED: Ask for the permission through an access request; the menu shows only the screens of your group profiles.
+  INTERNAL_ERROR: Report the message with its reference to the System Administrator.
+  MALFORMED_REQUEST: Reload the screen and try again; if it persists, report it with the time to the System Administrator.
+  UPLOAD_TOO_LARGE: Reduce the file and upload it again.
+  "<Column> '<value>' is not a valid <number, date (yyyy-mm-dd), Y/N value>": Correct the value in the file in the format of the column and upload the file again.
+  "<Column> is mandatory": Fill in the column in the file and upload the file again.
+  # Screen checks without a code (by text)
+  "Select an existing user": Choose the user from the list.
+  "This user already exists": Choose Modify user for an existing user, or enter another user ID.
+  "This user is already deactivated": No action; the user is already deactivated.
+  "This user is already active": No action; the user is already active and not locked.
+  "The user ID must follow the format <pattern>": Enter the user ID in the BDOI format (a letter followed by nine digits, for example a013000196).
+  "The effective date cannot be before today": Enter today or a later date, or leave the date blank to apply the change on approval.
+  "At least 10 characters": Lengthen the new password to at least 10 characters.
+  "An upper-case letter": Add an upper-case letter to the new password.
+  "A lower-case letter": Add a lower-case letter to the new password.
+  "A digit": Add a digit to the new password.
+  "A symbol": Add a symbol to the new password.
+  "Both new passwords must match": Type the same new password in both fields.
+  "<email> is not a valid e-mail address": Correct the e-mail address.
+  "Your password was set by an administrator. Choose your own password to continue.": Enter the password you were given as the current password and choose your own.
+  "Your password is older<age> and has expired. Choose a new password to continue.": Enter the current password and choose a new one.
+  "This page needs the link from your e-mail.": Open the page from the link in the e-mail, or request a new link with Forgot password?.
+  "Your session has ended. Please sign in again.": Sign in again; save work regularly before the session ends.
+  "You were signed out after <timeout minutes> minutes of inactivity.": Sign in again.
+  "Returned by <user>: <decision comment>": Correct the request as the remarks say and resubmit it with correction remarks.
+  "Emergency path UAM_DIRECT_ROLE_EDIT is open: every direct edit is audited and raises the alert UAM_DIRECT_ROLE_EDIT.": Close the emergency path (parameter UAM_DIRECT_ROLE_EDIT = false) as soon as the emergency is over.
+  "<list>": Check the members listed before submitting the deactivation.
+  "The profile has no members.": No action.
+  "Grant or withdraw at least one permission": Tick or untick at least one permission, or change the name, description or level.
+  "The approvers are chosen on submission.": No action; the approvers are listed once the request is submitted.

@@ -1,0 +1,94 @@
+# End-to-end walkthroughs of BRD-11 User Access Maintenance, shown step by step with screenshots of the seed profile.
+# Each step: persona (role code), screen (SCR id), what the user does, what the user sees, the result, and the
+# screenshot taken after the step (captured live by tools/screenshots/capture_pack.cjs, which performs the steps).
+# The walkthroughs run in order: B changes and then deactivates the user enrolled in A; C and D use the seed data.
+walkthroughs:
+  - id: WT-A
+    title: A new user from the enrolment request to the first sign-in with the menus of the persona
+    summary: >-
+      Marketing hires an account officer. The Requestor raises an enrolment request with the user's data, the group
+      profile Marketing Account Officer and the chosen approver, saves it as a draft and submits it. The Approver finds
+      it in Assigned to Me and approves it; BIBS creates the user and shows the temporary password once. The new user
+      signs in, must choose a personal password first, and then sees exactly the sidebar of the Marketing Account
+      Officer given in chapter 12 and checked by the persona menu test. The Auditor finds the enrolment, the approval
+      and the first sign-in in the User Access Audit Log.
+    data: "Seed data: new user a013000196, Isabel Navarro (fictitious), e-mail isabel.navarro@brokerverse-seed.ph, Windows ID INAVARRO, home branch HO, group profile Marketing Account Officer; Requestor requestor, Approver uamapprover, Auditor auditor"
+    steps:
+      - [UAM_REQUESTOR, SCR-UA-07, "Opens User Access › Access Requests › New Request, keeps Enrol new user, enters the user ID a013000196, the full name, e-mail, Windows ID and home branch, ticks Marketing Account Officer, chooses the approver Ulysses Access Approver, writes the justification and clicks Save Draft", "Toast: AR-yyyy-nnnnnn saved as a draft; the request opens as Draft with Approver Chosen on submission", Draft request, wt-a-01]
+      - [UAM_REQUESTOR, SCR-UA-08, "Clicks Edit Request, checks the data and clicks Submit", "Toast: AR-yyyy-nnnnnn submitted; the status is Pending and the History tab lists Saved and Submitted", Pending, wt-a-02]
+      - [UAM_APPROVER, SCR-UA-06, "Opens the notice Access request AR-yyyy-nnnnnn to approve, or User Access › Access Requests", "The request is on the Assigned to Me tab with its change: Create user a013000196 with roles [MKT_AO]", Request found, wt-a-03]
+      - [UAM_APPROVER, SCR-UA-08, "Opens the request, reads the Details tab (current and requested values), clicks Approve and Apply, adds a comment and confirms", "User a013000196 was created, with the temporary password shown once to be given through a secure channel; the status is Approved", Approved and applied, wt-a-04]
+      - [MKT_AO, SCR-UA-01, "The new user opens BIBS and signs in with a013000196 and the temporary password", "Change Your Password: Your password was set by an administrator. Choose your own password to continue.", Forced change, wt-a-05]
+      - [MKT_AO, SCR-UA-03, "Enters the temporary password as the current password and a personal password twice, and clicks Change Password", "Toast: Password changed; the home page opens", Signed in, wt-a-06]
+      - [MKT_AO, SCR-UA-05, "Opens the sidebar and My Profile", "The sidebar holds exactly the entries of the Marketing Account Officer (chapter 12); My Profile lists the group profile Marketing Account Officer and its permissions, and the first session", Menus of the persona, wt-a-07]
+      - [AUDITOR, SCR-UA-17, "Opens User Access Reports › User Access Audit Log for today, ticks Include Log-ins and Log-outs and clicks Run Report", "Enroll New User a013000196 with the from and to values of the full name, e-mail and profiles, Done By and Approved By the Approver, the request number, and the Log-in of the new user", Evidence of the enrolment, wt-a-08]
+    downstream:
+      - "Every BIBS module now opens its screens to the new user according to the Marketing Account Officer profile: Clients, Quotation / Proposal, Accounts & Placement, Renewal and the reports of that profile (menu of chapter 12); nothing else is shown or accepted."
+      - "The user appears in the User Access Report and in the Group Profile Membership of Marketing Account Officer, with the approver and the request number as Created by."
+      - "The change is logged once, insert-only: the access change log cannot be edited by any user."
+
+  - id: WT-B
+    title: A change and a revocation under four eyes, and a group-profile change approved in order and implemented
+    summary: >-
+      The new account officer also covers as team leader: the Requestor asks to add the profile, the Approver
+      approves it and the user is told. A privileged change (a back-up System Administrator) is flagged and needs the
+      Second Approver. The Business Administrator asks for a new group profile; two approvers approve it in order and
+      the System Administrator implements it. When the officer resigns, the Requestor deactivates the user; the
+      Approver approves and the user's sessions end at once.
+    data: "Seed data: user a013000196 of walkthrough A; seed request AR-2026-900008 (privileged change of a013000104 waiting for the second approval); new group profile RENEWAL_ENQUIRY (fictitious) with two permissions; approvers uamapprover and approver"
+    steps:
+      - [UAM_REQUESTOR, SCR-UA-07, "Opens a New Request of type Modify user for a013000196, ticks Marketing Team Leader / Head (approver) besides the current profile, chooses the approver, writes the justification and clicks Submit", "The Group Profiles show (current) after Marketing Account Officer; toast AR-yyyy-nnnnnn submitted", Pending, wt-b-01]
+      - [UAM_APPROVER, SCR-UA-08, "Opens the request: the Details tab shows the group profiles added; clicks Approve and Apply", "The status is Approved; the user receives Your access changed in the app and by e-mail", Change applied, wt-b-02]
+      - [UAM_SECOND_APPROVER, SCR-UA-08, "Opens AR-2026-900008 from the Second Approval tab: the tag Privilege Increase, first approved by the Approver; clicks Second Approval and confirms", "The status is Approved; the alert Privileged access change stays in the Alert inbox as evidence", Second approval given, wt-b-03]
+      - [BUSINESS_ADMIN, SCR-UA-12, "Opens Group Profile Requests › New Group Profile Request, enters the code RENEWAL_ENQUIRY, the name and description, keeps the level Standard, ticks two permissions, adds the approvers Ulysses Access Approver then the New Business Approver, writes the justification and clicks Submit", "Toast: AR-yyyy-nnnnnn submitted; the Approvers tab lists the two approvers in order", Pending (first approver), wt-b-04]
+      - [UAM_APPROVER, SCR-UA-08, "Approves the group-profile request", "The status stays Pending; the request moves to the New Business Approver, who receives the notice", Next approver, wt-b-05]
+      - [NB_APPROVER, SCR-UA-08, "Opens the request from My Approvals and approves it", "The status is For Implementation; the System Administrators receive Access request AR-yyyy-nnnnnn to implement", For implementation, wt-b-06]
+      - [SYSADMIN, SCR-UA-16, "Opens Roles & Permissions, finds the request under Approved Requests to Implement, clicks Implement Request and confirms", "Toast: AR-yyyy-nnnnnn implemented; the profile appears in the matrix with its two permissions", Implemented, wt-b-07]
+      - [UAM_REQUESTOR, SCR-UA-07, "Opens a New Request of type Deactivate user for a013000196, chooses the reason Resigned, leaves the effective date blank, chooses the approver and clicks Submit", "Toast: AR-yyyy-nnnnnn submitted", Pending, wt-b-08]
+      - [UAM_APPROVER, SCR-UA-08, "Approves the deactivation", "The status is Approved; the user is Disabled and every open session of the user has ended", User deactivated, wt-b-09]
+      - [SYSADMIN, SCR-UA-15, "Opens Administration › Users with the status Disabled", "a013000196 is listed Disabled with the profiles it held; Sessions shows the last session ended by the administrator", Evidence of the revocation, wt-b-10]
+    downstream:
+      - "Each change is in the User Access Audit Log with its from and to values, the approver and the request number; the deactivated user keeps the history but can no longer sign in."
+      - "The new group profile can be given to users by access requests at once; its content is in the User Group Profile Report and the User Access Matrix."
+
+  - id: WT-C
+    title: Refused cases and the messages the user sees
+    summary: >-
+      The same processes when something is wrong or not allowed: an incomplete or badly formatted enrolment, a second
+      request for a user who already has one open, a change of one's own profiles, a decision by someone other than
+      the chosen approver, an implementation by the requester, a locked account, a deactivated user signing in, and a
+      password that breaks the rules. Each step shows the message and what the user does next.
+    data: "Seed data: seed requests AR-2026-900002 (pending for uamapprover); users a013000101 (active) and a013000196 (deactivated in walkthrough B); a group-profile request raised by the System Administrator and approved for implementation (prepared by the capture)"
+    steps:
+      - [UAM_REQUESTOR, SCR-UA-07, "Opens New Request, enters the user ID ab and clicks Submit without a full name, profile, approver or justification", "Under the fields: Use 3 to 50 letters, digits, dots, dashes or underscores; Enter the full name of the new user; Select at least one role; Select the approver; Enter the justification. Nothing is saved", Form corrected, wt-c-01]
+      - [UAM_REQUESTOR, SCR-UA-07, "Enters the user ID a01300019X with the other fields complete and clicks Submit", "Under the user ID: The user ID must follow the format ^[a-zA-Z][0-9]{9}$ (the format parameter is shown as it is set)", User ID corrected, wt-c-02]
+      - [UAM_REQUESTOR, SCR-UA-07, "Raises a Modify user request for a013000101, which already has a pending request, and clicks Submit", "A request for user a013000101 is already waiting for approval, with its reference", Wait for the open request, wt-c-03]
+      - [UAM_REQUESTOR, SCR-UA-07, "Raises a Modify user request for himself (requestor), ticks an additional profile and clicks Submit", "You cannot change your own roles", Another requester raises it, wt-c-04]
+      - [NB_APPROVER, SCR-UA-08, "Opens AR-2026-900002, assigned to Ulysses Access Approver", "The request shows no decision button for this approver; a decision would be refused: Request AR-2026-900002 is assigned to uamapprover for approval", Left to the chosen approver, wt-c-05]
+      - [SYSADMIN, SCR-UA-16, "Clicks Implement Request on a group-profile request he raised himself", "A request is implemented by someone other than its requester", Another System Administrator implements it, wt-c-06]
+      - [MKT_AO, SCR-UA-01, "User a013000101 enters a wrong password three times, then the right one", "Invalid user name or password, then Account is locked. Contact your administrator.", Account locked, wt-c-07]
+      - [SYSADMIN, SCR-UA-15, "Opens Users with the status Locked and clicks Unlock on a013000101", "The user is Active again; the unlock is in the access change log", Account unlocked, wt-c-08]
+      - [MKT_AO, SCR-UA-01, "The deactivated user a013000196 tries to sign in", "Invalid user name or password: the message does not tell a deactivated user from a wrong password", Refused, wt-c-09]
+      - [UAM_REQUESTOR, SCR-UA-05, "On My Profile, types a new password that is too short and has no symbol", "Still needed: At least 10 characters; A symbol; Change Password stays disabled", Password rules shown, wt-c-10]
+      - [UAM_REQUESTOR, SCR-UA-05, "Enters the current password as the new password and clicks Change Password", "You used this password recently. Choose another one", Another password chosen, wt-c-11]
+    downstream:
+      - "A refused action changes nothing; the message names what to correct, and a server refusal shows its reference for support."
+      - "Every failed sign-in, lock and unlock is in the audit trail and the User Access Audit Log."
+
+  - id: WT-D
+    title: The evidence of access, and the insurer roles hidden from BDOI
+    summary: >-
+      The Auditor and Information Security review who can do what: the User Access Matrix, the User Group Profile
+      Report and the Group Profile Membership of a profile, and the audit log of the changes. The insurer functions of
+      the platform (underwriting, insurer claims, reinsurance, reserves) are not used by BDOI: their permissions are
+      withdrawn from every BDOI profile, the three insurer roles are deactivated, and no User Access screen lists or
+      accepts them.
+    data: "Seed data: the delivered profiles and grants; the seed users of the personas; the withdrawal of the insurer permissions and the deactivation of the insurer roles recorded at installation"
+    steps:
+      - [AUDITOR, SCR-UA-13, "Opens User Access › User Access Matrix, By Action, and searches USER ACCESS", "The User Access area by action class, with the permissions each profile holds: the Requestor creates and amends, the Approver approves, the Second Approver gives the second approval", Matrix reviewed, wt-d-01]
+      - [AUDITOR, SCR-UA-17, "Runs the User Group Profile Report for the profile UAM_APPROVER", "The modules and tasks of the Approver with With Access, and the dates and actors of its creation and last change", Profile content reviewed, wt-d-02]
+      - [AUDITOR, SCR-UA-17, "Runs Group Profile Membership for MKT_AO as of today", "The members of the Marketing Account Officer profile with who added each and when", Members reviewed, wt-d-03]
+      - [AUDITOR, SCR-UA-17, "Runs the User Access Audit Log from the installation date with the activity Group Profile Changes", "Deactivate Group Profile of the three insurer roles, Done By the system at installation, with their from and to values", Insurer roles deactivated, wt-d-04]
+      - [BUSINESS_ADMIN, SCR-UA-12, "Opens New Group Profile Request of type New group profile and looks for the underwriting, insurer claims, reinsurance and reserve permissions", "The permission picker lists no insurer permission; the Reactivate group profile list offers no insurer role", Nothing to request, wt-d-05]
+    downstream:
+      - "Information Security signs the role matrix of chapter 12 and the separation-of-duties rules of chapter 13 on the basis of these reports; later changes to the matrix are group-profile requests and show in the same reports."

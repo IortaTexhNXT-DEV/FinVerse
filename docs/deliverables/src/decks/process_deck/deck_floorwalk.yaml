@@ -1,0 +1,630 @@
+# Business process reverse KT deck, floor-walk edition (v3.0): the understanding chapter, the holistic chapter, the
+# department parts, the cross-cutting chapter and the roadmap. Sources are only the BDOI Day 1 overview and
+# floor-walk slides, the floor-walk notes taken by the project team, and the business process flows BDOI shared.
+# The area chapters are the areas/*.yaml files with their `fw:` overrides.
+# Build: python docs/deliverables/src/decks/build_floorwalk_deck.py
+title: BDOI Reverse KT - Floor Walk
+subtitle: 'What we saw and heard on the floor: As-Is, pain points and the way forward'
+date: 27 September 2026
+
+notes:
+  title: >-
+    Reverse knowledge transfer from the iorta TechNXT team to BDOI, based only on what we saw and heard: the Day 1
+    business overview of 21-Sep-2026, the floor walks of 22 and 23-Sep with the designated process owners, the
+    discovery sessions of 23 to 25-Sep and our notes of them, and the business process flows BDOI shared. The deck
+    plays back our understanding of how each department works today, where the users feel the pain, what they asked
+    for, and the practices and roadmap we suggest. It deliberately leaves out the BRD review and build status; those
+    are in the end-to-end deck (v2.0). Reinsurance, Sanction Screening and User Access are not in this edition
+    because they were not part of the floor walk.
+  agenda: >-
+    Chapter 0 is the enterprise view. Parts A to E follow the departments we walked; each chapter has the same slides:
+    at a glance, what we heard, the As-Is swimlane(s), the pain points, what the business wants, and best practice.
+    Part F covers data, integrations and shared needs; Part G the roadmap and the open points.
+  reading: >-
+    Refs: floor-walk notes carry the row number of our floor-walk notes workbook (OV-, NB-, PM-, CA-...); "Day 1 p.n"
+    is a page of the BDOI Day 1 overview; "NB flow", "Renewal flow" and so on are the process flows BDOI shared.
+
+reading:
+  - 'Every statement comes from the floor walk, our notes or a process flow BDOI shared; the ref says which'
+  - 'Each department chapter: at a glance, what we heard, the As-Is flow, the pain points, what the business wants, best practice'
+  - 'Swimlanes: one lane per BDOI role, external party (grey) or system (light blue); dashed boxes are steps in today''s systems or files'
+  - 'Yellow numbered circles are pain points; the slide after the swimlanes explains each one'
+  - '"What the business wants" pairs each pain point with what users asked for, and the lever we suggest'
+  - 'Not in this deck: the BRD review, build status, Reinsurance, Sanction Screening, User Access (not walked)'
+
+understanding:
+  purpose:
+    title: Why this reverse KT
+    intro: 'We walked the floor with 40+ process owners. This deck gives back what we saw and heard, so BDOI can correct it.'
+    notes: >-
+      The purpose is validation: each department confirms or corrects the As-Is, the pain points and what we
+      understood the business wants. Corrections go into our floor-walk notes.
+    cards:
+      - head: What this deck is
+        body:
+          - 'How each department works today, as we saw it on the floor'
+          - 'The pain points the business users raised, in their words'
+          - 'What the users asked for, and the practices we suggest'
+          - 'The end-to-end view across departments'
+      - head: What we ask of each department
+        body:
+          - 'Confirm or correct the As-Is swimlanes and pain points'
+          - 'Confirm the rules and values we heard (days, rates, volumes)'
+          - 'Answer the 17 open points of the floor walk'
+          - 'Say which suggestions BDOI wants on the roadmap'
+      - head: What this deck is not
+        body:
+          - 'Not a review of the BRDs'
+          - 'Not a build status or test report'
+          - 'Not a design: it describes today and the business''s wishes'
+  summary:
+    title: 'What we learned, in six messages'
+    notes: 'The six messages of the floor walk; each is developed in the chapters.'
+    cards:
+      - head: '1. One deal, five tools, three references'
+        body: ['Excel templates, Broker, ISYS, QPS and EBIX for one policy (NB flow)', 'ISYS, QPS and EBIX numbers on the same transaction (OV-03)', 'IT migrates accounts from ISYS to QPS']
+      - head: '2. E-mail and Excel carry the work'
+        body: ['15 hand-offs between teams by e-mail, file, Teams or paper', 'Dispositions, recon, DP lists and trackers in Excel', 'Masterlists on Drive H and SharePoint']
+      - head: '3. Controls rely on people'
+        body: ['Wet signatures at 3-6 levels; checker-poster one by one', 'Intake checks, reversals and journals by hand', 'Approvals on Teams lists with signed copies']
+      - head: '4. IT is in the business path'
+        body: ['Extracts (RMEL, production recon), migrations, batches', 'Reports and the close need IT (RP-01)', 'WinSCP and text files between systems']
+      - head: '5. Volumes are real'
+        body: ['50,000+ EB members (EB-01)', '20-30K production lines per insurer a month', 'About 2,000 records in a bulk payment file (CA-05)']
+      - head: '6. The business knows what it wants'
+        body: ['Product maintenance, claims and renewals in a system', 'Receipts, endorsements and reports without manual work', 'One way to connect to about 55 insurers (OV-01)']
+  sources:
+    title: How we built our understanding
+    notes: >-
+      Four sources: the Day 1 business overview BDOI presented on 21-Sep; the floor walks of 22 and 23-Sep with the
+      designated process owners; the discovery sessions of 21, 23, 24 and 25-Sep and our notes of them; and the
+      process flows BDOI shared (HL Process Overview pack).
+    foot: 'Process flows shared by BDOI: end to end, New Business, Renewal, Submitted Policies, Employee Benefits, TSU, Operations, Collections, Disbursement, Refund, FRBS, ACSL, Claims, Customer Servicing, Case Management.'
+    tiles:
+      - {value: '21-25 Sep', label: 'Day 1 business overview, floor walks and discovery sessions', source: 'BDOI Day 1 deck; floor-walk schedule'}
+      - {value: '12', label: 'floor-walk sessions with designated process owners (22-23 Sep)', source: 'Floor-walk POC schedule'}
+      - {value: '66', label: 'floor-walk notes: As-Is, wants, pain points', source: 'Our floor-walk notes'}
+      - {value: '17', label: 'open points raised on the floor', source: 'Floor-walk notes, open points'}
+      - {value: '15', label: 'business process flows shared by BDOI', source: 'HL Process Overview pack'}
+      - {value: '10', label: 'business areas in this deck, in 5 department parts', source: 'This deck'}
+      - {value: '59', label: 'change champions (21) and additional POCs / SMEs (38)', source: 'Day 1 p.5'}
+      - {value: '40+', label: 'process owners met on the floor', source: 'Floor-walk POC schedule'}
+  schedule:
+    title: Floor-walk coverage
+    headers: [Date, Time, Process, Floor, Process owners]
+    widths: [1.1, 1.3, 2.4, 0.8, 6.8]
+    bold_cols: [2]
+    notes: 'The designated process owners of the floor-walk POC schedule and the discovery sessions.'
+    rows:
+      - ['21 Sep', 'Full day', 'Business overview; discovery', '-', 'BDOI programme, BU and IT leads (Day 1 deck)']
+      - ['22 Sep', '9-10 am', New Business, 43F, 'Rose Lique, Marla Apostol (Corporate); Grace Tordesillas, Kin Ysaac Flores (Non-CBG Retail); Justine Malonzo, Jhosven Awa (CBG Motor); Lyka Palomeno, Regina Matutina']
+      - ['22 Sep', '10-11 am', Renewal Marketing, 43F, 'Amara Cruz, Rose Lique, Joy Ilagan, Tina Fajardo; Grace Tordesillas, Kin Ysaac Flores; Criffson Rendon, Joyce Aritao; Ma. Christena Cezar; Cezssane Canarias, Jeramie Ramos']
+      - ['22 Sep', '11-11:30 am', Marketing Admin, 43F, 'Rose Lique, Reymark Marcelo; Nina Odvina, Kim Nayve, Mae Varron, Grace Tordesillas, Jordan Lambino']
+      - ['22 Sep', '1-1:30 pm', Product Maintenance (TSU), 44F, 'Cherry Ann Manalo, Joy Intia']
+      - ['22 Sep', '1:30-3 pm', Renewal Processing, 44F, 'Angelo Alibuyog (CBG Fire), Ces Remodo (CBG Motor), Berna Corpuz (Non-CBG Corporate), Norberto Fulo (Non-CBG Retail)']
+      - ['22 Sep', '2-3:30 pm', Placement and Booking, 43F, 'Ramoncito Manalo, Cherry Ann Catayas; Jean Deam Dela Cruz, Cristina Labrador, Mae Anne B. Roque; John Ray Bellen, Rey Mark Magsael']
+      - ['22 Sep', '3:30-5 pm', Collections, '43F, 44F', 'Sheryne Hernaez, Pia Pinili']
+      - ['22 Sep', '5-6 pm', Claims, 44F, 'Elmar O. Alvarez Jr., Richard Castanares']
+      - ['23 Sep', '9-10 am', Employee Benefits, 43F, 'Marianne Alpapara, Jyneffer Liansing, Edwin Garcia']
+      - ['23 Sep', '10 am-12 nn', 'Disbursement, FRBS, ACSL', 44F, 'Rodrigo Dela Cruz, Cherry Francisco, Lineth Santos, Guada Jane Pelo; Iris Marquez, Fatima Joy Aguas, Cherie Jocson; Jeniffer Lugtu, Mario Sabangan, Jennifer Carinan, Freddie Atanque']
+      - ['23 Sep', '1-5 pm', 'Operations: Cashiering, Remittance, Adjustment, Prod Recon', 44F, 'Perjelyn Joy Gutierrez, Shirley Catapang, Ronna Marie Go, Aimee Medina, Renque Galos, Carolyn Pasia Baloto, Joy Ebuenga, Mark Andrew Francisco']
+      - ['23-25 Sep', 'Sessions', 'Cashiering, Other Income, Tax (23); Collections, Commission (24); NB, Trade, Product (25)', '-', 'Operations, Comptrollership, Marketing and TSU process owners']
+
+holistic:
+  subtitle: 'The enterprise as we saw it on the floor'
+  notes: >-
+    Before the department chapters, the enterprise view: BDOI at a glance, who does what, the broking lifecycle, the
+    end-to-end flow today, the tools each area depends on, the reference problem, the hand-offs between departments,
+    the business challenges BDOI named, and what the business asked for across departments.
+
+  glance:
+    title: BDOI at a glance
+    notes: 'BDOI is the insurance brokerage arm of BDO, serving retail and corporate customers across the full broking lifecycle (Day 1 p.6).'
+    foot: 'Sources: floor-walk notes OV-01, OV-03, FN-01, EB-01, CA-05; Day 1 p.5, p.10 and p.24.'
+    tiles:
+      - {value: '~55', label: 'insurer partners, each connected and handled differently', source: 'OV-01'}
+      - {value: '8', label: 'branches, plus head office units', source: 'FN-01'}
+      - {value: '3', label: 'core systems: ISYS / Broker, QPS, EBIX Evolution, plus Excel', source: 'Day 1 p.10'}
+      - {value: '3', label: 'references for one transaction (ISYS, QPS, EBIX), plus the payment reference', source: 'OV-03'}
+      - {value: '50,000+', label: 'Employee Benefits members', source: 'EB-01'}
+      - {value: '20-30K', label: 'production lines per insurer a month to reconcile', source: 'Day 1 p.24'}
+      - {value: '~2,000', label: 'records in one bulk payment file', source: 'CA-05'}
+      - {value: '59', label: 'change champions and SMEs across the units', source: 'Day 1 p.5'}
+
+  org:
+    title: Who does what today
+    notes: 'The BDOI functions as we met them on the floor (Day 1 p.4-8 and the floor-walk schedule), with the chapter of this deck that covers each.'
+    cards:
+      - head: 'Marketing: Corporate and IBG'
+        body: ['Corporate and institutional clients; IBG referrals', 'Quotations, proposals, renewals, collections follow-up', 'Chapters 1, 2, 7']
+      - head: 'Marketing: Retail and Branches'
+        body: ['CBG Motor, Fire, Home; Non-CBG Retail; 8 branches', 'Bank-referred and bulk business (HLS, LAD)', 'Chapters 1, 2, 3']
+      - head: 'Marketing Admin and Support'
+        body: ['RMEL split and dispositions; refunds (RRF)', 'Account Support for Combank; UPP handling', 'Chapters 2, 8']
+      - head: Employee Benefits
+        body: ['Group life, HMO and accident programmes', 'BOR, TOR, proposals, comparative, placement', 'Chapter 4']
+      - head: 'TSU and MBS'
+        body: ['Non-package terms; quotation slips; comparative', 'Package design, set-up and release', 'Chapter 5']
+      - head: Processing
+        body: ['Client and account set-up; placement; booking', 'Renewal sanitation (CBG Fire and Motor)', 'Chapters 1, 2']
+      - head: Operations
+        body: ['Cashiering, Remittance, Adjustment and Collateral Release', 'Production recon, CRU, invoicing', 'Chapter 6']
+      - head: Collections
+        body: ['Premium receivable follow-up with Marketing AOs', 'ICS, commitments, CTE, dispositions', 'Chapter 7']
+      - head: Comptrollership
+        body: ['FRBS: GL, reconciliation, close, BIR', 'Disbursement; ACSL sub-ledger', 'Chapter 8']
+      - head: Claims
+        body: ['Motor and Non-Motor claims, client advocacy', 'Insurers, adjusters, repair shops', 'Chapter 9']
+      - head: 'Contact centre and COG'
+        body: ['Contact centre: inquiries, updates, resends, cases', 'COG-OPRM: RA letters, e-policies', 'Chapters 2, 10']
+      - head: IT
+        body: ['Extracts, migrations, batches and reports', 'In the business path of most departments', 'All chapters']
+
+  lifecycle:
+    title: The broking lifecycle and its three flows
+    notes: >-
+      BDOI's own view of the lifecycle (Day 1 p.6), with the systems and owners we saw at each stage. Information,
+      decisions and money move together; today each crosses several tools and e-mail.
+    stages: ['Market, find the opportunity', 'Understand the need', 'Source quotes and terms', 'Present, confirm', 'Place and book', 'Collect, reconcile', 'Service, adjust, renew, claims']
+    systems:
+      - 'ISYS / Broker; bank lists (HLS, LAD)'
+      - 'E-mail; Broker; declaration form'
+      - 'IDF Excel, QPS, ISYS; TSU Excel'
+      - 'E-mail, PDF, shared drive'
+      - 'ISYS, QPS, EBIX; SFTP, e-mail'
+      - 'EBIX, ICS, Autopay, Excel, Teams'
+      - 'EBIX, Excel, CLS, e-mail'
+    owners: ['Marketing AO', 'Marketing AO', 'Marketing, TSU', 'Marketing', 'Processing, IT', 'Operations, Collections, Comptrollership', 'Operations, Renewal, Claims, contact centre']
+    flows:
+      - head: Information flow
+        body: ['Client and policy data keyed in Broker, ISYS, QPS and EBIX', 'Quotations, instructions and documents by e-mail and shared drive', 'Three references per transaction (OV-03)']
+      - head: Decision flow
+        body: ['Reviews and approvals by e-mail, Teams and wet signature', 'Insurer and customer confirmations by e-mail', 'SLA and validity kept by memory (NB-03, NB-07)']
+      - head: Financial flow
+        body: ['Premium receipts, application and reconciliation across payment routes', 'Commission after full premium; remittance weekly', 'Entries, reversals and adjustments partly by hand']
+
+  e2e_1:
+    title: 'End to end today (1/2): prospect to booked policy'
+    caption: 'From the client''s need to a booked policy (BDOIR end-to-end process flow; Day 1 p.11, p.18)'
+    notes: >-
+      The first half of BDOI's end-to-end flow. Marketing works the prospect and decides package or non-package; TSU
+      sources non-package terms. The quotation is prepared in Excel templates, QPS or ISYS; after acceptance and
+      payment the client is created in Broker, the account in ISYS and both are migrated to QPS by IT. Processing
+      places with the insurer, handles returns and hold covers, receives the e-policy, delivers it through COG, the
+      officer or the contact centre, and books and invoices in EBIX.
+    cols: 7
+    lanes:
+      - {id: cli, label: 'Client, bank unit', kind: external}
+      - {id: mkt, label: Marketing}
+      - {id: tsu, label: TSU}
+      - {id: prc, label: 'Processing, IT'}
+      - {id: ins, label: Insurers, kind: external}
+      - {id: sys, label: 'Broker, ISYS, QPS, EBIX, Excel', kind: system}
+    steps:
+      - {id: s1, lane: cli, col: 1, text: 'Need: client, bank referral, loan list', kind: external}
+      - {id: s2, lane: mkt, col: 1, text: 'Prospect; package or non-package?'}
+      - {id: s3, lane: tsu, col: 2, text: 'Non-package: slip, insurers, comparative'}
+      - {id: s4, lane: sys, col: 2, text: 'Quote in IDF Excel, QPS or ISYS', kind: legacy}
+      - {id: s5, lane: mkt, col: 3, text: 'Proposal sent; follow-up'}
+      - {id: s6, lane: cli, col: 3, text: 'Accepts; proof of payment', kind: external}
+      - {id: s7, lane: sys, col: 4, text: 'Client in Broker, account in ISYS, IT to QPS', kind: legacy}
+      - {id: s8, lane: prc, col: 5, text: 'Placement to insurer; returns, hold cover'}
+      - {id: s9, lane: ins, col: 5, text: 'Approves; issues e-policy', kind: external}
+      - {id: s10, lane: prc, col: 6, text: 'E-policy delivered (COG, PO, contact centre)'}
+      - {id: s11, lane: sys, col: 7, text: Booked and invoiced in EBIX, kind: legacy}
+      - {id: s12, lane: mkt, col: 7, text: 'Servicing, renewal, claims (next slide)'}
+    edges:
+      - [s1, s2, dashed, e-mail]
+      - [s2, s3, dashed, non-package]
+      - [s2, s4]
+      - [s3, s5]
+      - [s4, s5]
+      - [s5, s6, dashed, e-mail]
+      - [s6, s7]
+      - [s7, s8]
+      - [s8, s9, dashed, 'e-mail, SFTP']
+      - [s9, s10]
+      - [s10, s11]
+      - [s11, s12]
+
+  e2e_2:
+    title: 'End to end today (2/2): premium to books, and servicing'
+    caption: 'Money and servicing after booking (BDOIR end-to-end process flow; Day 1 p.12-14)'
+    notes: >-
+      The second half. The client pays through bills payment, over the counter, CLPC, autopay or directly to the
+      insurer; Cashiering applies the payment and monitors checks and PDCs; Collections follows unpaid premium with the
+      AO. Every week Remittance prepares the settlement net of commission, Disbursement pays the insurer and FRBS books
+      it; commission on direct payments is billed to the insurer; ACSL reconciles the insurer statements and adjusts the
+      sub-ledger; FRBS closes the books. After booking three servicing paths start: adjustment or cancellation (with a
+      refund), renewal from the expiring list 140 days ahead, and claims.
+    cols: 7
+    lanes:
+      - {id: cli, label: Client, kind: external}
+      - {id: ops, label: 'Cashiering, Collections, Remittance'}
+      - {id: fin, label: 'Disbursement, FRBS, ACSL'}
+      - {id: ins, label: Insurers, kind: external}
+      - {id: svc, label: 'Adjustment, Renewal, Claims'}
+      - {id: sys, label: 'EBIX, ICS, Excel, Teams', kind: system}
+    steps:
+      - {id: u1, lane: cli, col: 1, text: 'Pays: bills payment, OTC, CLPC, direct', kind: external}
+      - {id: u2, lane: ops, col: 1, text: 'Applied; checks and PDCs monitored; AR'}
+      - {id: u3, lane: ops, col: 2, text: 'Unpaid: Collections and AO follow up'}
+      - {id: u4, lane: sys, col: 2, text: 'Applied payments in EBIX; ICS ageing', kind: legacy}
+      - {id: u5, lane: ops, col: 3, text: 'Weekly remittance, net of commission'}
+      - {id: u6, lane: fin, col: 4, text: 'Disbursement pays; FRBS books'}
+      - {id: u7, lane: ins, col: 4, text: 'Premium received; OR; DP commission billed', kind: external}
+      - {id: u8, lane: fin, col: 5, text: 'SOA reconciliation; SL adjustments (ACSL)'}
+      - {id: u9, lane: fin, col: 6, text: 'Reports; EOD, EOM, EOY close'}
+      - {id: u10, lane: svc, col: 5, text: 'Adjustment or cancellation; refund'}
+      - {id: u11, lane: svc, col: 6, text: 'Renewal: expiring list at -140 days'}
+      - {id: u12, lane: svc, col: 7, text: 'Claim: documents to insurer; settlement'}
+    edges:
+      - [u1, u2, dashed, files]
+      - [u2, u3, dashed, unpaid]
+      - [u2, u4]
+      - [u4, u5]
+      - [u5, u6, dashed, Teams list]
+      - [u6, u7, dashed]
+      - [u7, u8]
+      - [u8, u9]
+
+  asis_map:
+    title: 'Today: ten areas and the tools they depend on'
+    caption: 'Each line is a system, file or channel an area depends on today (floor walk and BDOI process flows)'
+    top_label: 'Chapters 1-5'
+    bottom_label: 'Chapters 6-10'
+    notes: >-
+      Every area works in its own mix of systems and files. New Business alone touches Excel templates, Broker, ISYS,
+      QPS, EBIX, bank files and SFTP. Operations and Comptrollership run on EBIX with Excel, Teams and SharePoint around
+      it; Collections uses ICS; the contact centre CLS and CC Nav. The yellow number on each area is the count of pain
+      points in its chapter.
+    areas_top: [nb, rn, sp, eb, pm]
+    areas_bottom: [ops, clxn, acct, clm, csf]
+    systems:
+      - {id: isys, text: ISYS / Broker}
+      - {id: qps, text: QPS}
+      - {id: ebix, text: EBIX Evolution}
+      - {id: xls, text: 'Excel, IDF, Drive H, SharePoint'}
+      - {id: mail, text: 'E-mail, Teams, paper'}
+      - {id: bank, text: 'Bank files: HLS, LAD, CLPC, LAMD, PMS'}
+      - {id: other, text: 'ICS, CLS, CC Nav'}
+      - {id: sftp, text: 'SFTP, WinSCP, EFPS, BancNet'}
+    links:
+      nb: [isys, qps, ebix, xls, mail, bank, sftp]
+      rn: [isys, ebix, xls, mail]
+      sp: [isys, xls, mail, bank]
+      eb: [ebix, xls, mail]
+      pm: [xls, mail]
+      ops: [isys, qps, ebix, xls, mail, bank]
+      clxn: [isys, ebix, xls, other]
+      acct: [qps, ebix, xls, mail, sftp]
+      clm: [xls, mail]
+      csf: [qps, ebix, other]
+
+  refs:
+    title: 'One transaction, several references'
+    caption: 'Seen in Cashiering (CA-01), the overview (OV-03), the e-policy text files (NB flow) and the reversal lists (Day 1 p.24).'
+    brd_title: 'What the business asked'
+    rec_title: 'Our suggestion'
+    notes: >-
+      The same deal carries an ISYS invoice number (the client pays against it), a QPS reference, an EBIX reference and
+      a payment reference; QPS holds all three. It was the most repeated friction on the floor: it slows every trace,
+      forces manual receipts and VLOOKUPs, and it matters for the data migration.
+    refs:
+      - {system: 'ISYS / Broker', number: 'Invoice number', who: 'Marketing; the client pays against it'}
+      - {system: QPS, number: 'QPS reference', who: 'Processing; holds all three numbers'}
+      - {system: EBIX, number: 'EBIX reference', who: 'Booking, accounting, remittance'}
+      - {system: 'Bank, Cashiering', number: 'Payment reference', who: 'Bills payment, CLPC, Autopay'}
+    effects:
+      - 'Tracing one transaction across systems is slow (OV-03)'
+      - 'Receipts are created by hand against three numbers (CA-01)'
+      - 'Each payment is checked: "in QPS with an EBIX reference?" (Cashiering flow)'
+      - 'Reversal lists are matched to IT extracts by VLOOKUP on the invoice number (Day 1 p.24)'
+      - 'E-policy updates need text files with the policy, ISYS, EBIX and QPS numbers (NB flow)'
+    brd:
+      - 'Does BDOI expect one common reference across the lifecycle? (open point OV-03)'
+      - 'Receipts generated from the system (CA-01, CA-04)'
+    rec:
+      - 'One lifecycle reference printed on quotation, invoice, AR / OR, SOA and e-policy letter'
+      - 'A payment reference with a check digit derived from it, carried in bank files'
+
+  handoffs:
+    title: Hand-offs between departments
+    headers: [From, To, What passes, Channel today, What it causes]
+    widths: [1.9, 1.9, 3.2, 2.2, 3.2]
+    notes: 'Every row is a hand-off we saw on the floor or in a BDOI process flow, where work waits, is re-keyed or is lost.'
+    rows:
+      - [Marketing, TSU, 'Non-package request (PRF / TSU form)', E-mail, 'Incomplete requests returned; tracked in Excel']
+      - [Marketing, Processing, 'Accepted quote, GRF / ARF, proof of payment', 'E-mail, ISYS ARF', 'Re-keying; waiting for documents']
+      - [Processing, IT, 'ISYS to QPS migration; policy-number text files', 'Request, text file', 'Fall-out loops; delay to placement']
+      - [Processing, Insurers, 'Placement slips, hold covers, returns', 'E-mail, SFTP', 'Each insurer different; no send record']
+      - ['Processing, IT', 'COG, contact centre', 'E-policy delivery and fall-outs', 'SFTP, e-mail', 'Three senders; exception report']
+      - [Marketing, Operations, 'Endorsement and cancellation requests', 'E-mail with documents', 'Validation and keying by hand']
+      - ['Marketing, units', CRU, 'Direct-payment lists', Shared folder, 'Consolidation and duplicates in Excel']
+      - [Collections, Marketing AO, 'CTE, escalation, day-60 outcome', E-mail, 'Follow-up depends on the handler']
+      - [Remittance, Disbursement, 'Weekly settlement list', 'Teams list, signed copy', 'Paper kept for audit']
+      - [Marketing, Disbursement, 'Refund requests (RRF)', 'Paper, scanned copies', '4-6 signatures; re-keying in EBIX']
+      - [Disbursement, FRBS, 'Signed documents for the GL entry', Paper, 'Entries made by another unit']
+      - [IT, 'FRBS, ACSL, units', 'Reports and extracts', Shared folder, 'Business waits for IT']
+      - [CRU, 'IT, Cashiering', 'DPPR / PR2307 reversal lists', 'SharePoint, Teams', 'VLOOKUP and manual journals']
+      - [IT, 'Marketing Admin, AO', 'Expiring list (RMEL) and dispositions', 'Excel, e-mail', 'Four hands before work starts']
+      - [Contact centre, Fulfilment unit, 'Referred client concerns', 'E-mail, CLS prompt', 'No TAT view; re-logging']
+
+  challenges:
+    title: 'Business challenges BDOI named, and what we saw'
+    notes: 'The four challenge areas of the Day 1 overview (p.15), each with the evidence we saw on the floor.'
+    cards:
+      - head: Operational bottlenecks
+        body:
+          - 'Multiple hand-offs: 15 department hand-offs by e-mail, file or paper'
+          - 'Waiting for approval: 3-6 signatures on refunds and disbursements'
+          - 'Peak workload: 20-30K recon lines per insurer a month; renewals from 140 days out'
+      - head: Data quality
+        body:
+          - 'Three references per transaction (OV-03)'
+          - 'Leads and existing customers in one category (OV-04)'
+          - 'Outstanding per client not reliable; ageing runs after payment (CO-01, CO-02)'
+      - head: Manual workarounds
+        body:
+          - 'Excel for quotes, dispositions, recon, DP lists and trackers'
+          - 'E-mail for requests, returns and CTE; Teams for approvals'
+          - 'Receipts, reversals, invoices and journals by hand'
+      - head: Reporting limitations
+        body:
+          - 'Reports need IT and a consolidation from several systems (RP-01)'
+          - 'No real-time pipeline or status; ManCom lists in Excel'
+          - 'Hard to trace figures back to source transactions'
+
+  aspirations:
+    title: 'What the business asked for'
+    headers: [Theme, What the users asked for, Ref, Chapter]
+    widths: [2.2, 6.6, 1.8, 1.6]
+    notes: 'The To-Be as the business users voiced it on the floor, gathered from the "What the business wants" column of our notes.'
+    rows:
+      - ['Connecting insurers', 'One common way to connect with every insurer partner', OV-01, All]
+      - ['One reference', 'One common reference across the lifecycle (to confirm)', OV-03, 'All']
+      - ['Client categories', 'Leads, prospects and existing clients; retail and corporate (to confirm)', OV-04, '1']
+      - ['Product maintenance', 'Package and non-package products maintained in the system; switch at renewal', 'PM-01, 03, 04', '5']
+      - ['Quotes', '30-day validity applied; SLA tracking; pipeline for Retail and Corporate', 'NB-03, 07, 11', '1']
+      - ['Renewals', 'Renewal advice from the BDOI template; pro-forma accounting entries', 'DC-01, RN-02', '2']
+      - ['Endorsements', 'Endorsement computes the premium like New Business', EN-01, '6']
+      - ['Cashiering', 'AR and OR from the system; configurable threshold; a direct-pay solution', 'CA-02, 03, 04', '6']
+      - ['Collections', 'Correct outstanding per customer', CO-01, '7']
+      - ['Employee Benefits', 'The system handles 50K+ members', EB-01, '4']
+      - ['Accounting', 'Debit Cash in Bank, credit the insurer directly; profit and cost centres; 2% WHT certificates', 'DS-05, FN-01, TX-03', '8']
+      - ['Reconciliation', 'Insurer reconciliation account-wise', RC-02, '8']
+      - ['Other income', 'Other income registered through invoicing', OI-01, '8']
+      - ['Reports', 'Business units run reports themselves', RP-01, All]
+      - ['Claims', 'Claims in a system, linked to the policy', 'CL-01; Day 1 p.8', '9']
+      - ['Case management', 'Cases routed to the account''s unit, TAT visible (BDOI''s To-Be)', Case Management flow, '10']
+      - ['E-signature', 'E-signature, to check with Legal and Compliance', CP-01, All]
+
+parts:
+  - num: A
+    title: Marketing and Sales
+    subtitle: 'New business, renewal, submitted policies and employee benefits: the front office and its hand-off to Processing'
+    areas: [nb, rn, sp, eb]
+  - num: B
+    title: 'TSU and Product'
+    subtitle: 'Package and non-package products and insurer terms'
+    areas: [pm]
+  - num: C
+    title: Operations
+    subtitle: 'The money after booking: cashiering, remittance, adjustments, commission, reconciliation, collections'
+    areas: [ops, clxn]
+  - num: D
+    title: Comptrollership
+    subtitle: 'Disbursement, FRBS accounting, ACSL, refunds, tax and BIR'
+    areas: [acct]
+  - num: E
+    title: Claims and Customer Service
+    subtitle: 'Serving the client after the sale: claims, the contact centre and case management'
+    areas: [clm, csf]
+
+closing_tiles:
+  - {num: '11-13', title: 'Data, integrations, shared needs', sub: 'Part F | cross-cutting'}
+  - {num: '14', title: 'Roadmap and open points', sub: 'Part G'}
+
+crosscut:
+  part:
+    num: F
+    title: Cross-cutting topics
+    subtitle: 'Data, integrations and shared needs we saw in every department'
+    notes: 'Three topics cut across the chapters: where the data lives today, how BDOI exchanges with insurers, banks and the government, and the needs every department raised.'
+    chapters:
+      - {num: 11, title: 'Data we will have to move', sub: 'What the floor walk tells us'}
+      - {num: 12, title: Integrations, sub: 'Channels we saw on the floor'}
+      - {num: 13, title: Shared needs, sub: 'Across departments'}
+  dm_sources:
+    title: '11. Data: where it lives today'
+    headers: [Where, What we saw it hold, Seen in]
+    widths: [2.4, 7.0, 3.0]
+    notes: 'Every place the floor walk and the process flows showed business data being kept. All of it matters for the move to one system.'
+    rows:
+      - [EBIX Evolution, 'Booking, invoices, AR / OR, remittance, unapplied, GL, payees, policy-fee invoices; DP tags without premium entries', 'Operations, Comptrollership flows; CA-03']
+      - [QPS, 'Quotations, package policies, renewals; holds the three references', 'NB flow; OV-03']
+      - [ISYS / Broker, 'Leads, clients, accounts, Marketing Diary; client codes kept for renewal', 'NB flow; NB-15; Collections flow']
+      - [ICS, 'Premium and commission collection status and ageing', 'CO-02']
+      - ['Excel, Drive H, SharePoint', 'NB masterlist, RMEL dispositions, submitted masterlists, DP lists, commission trackers, ManCom unbooked list, UPP list', 'NB, Renewal, SP, Operations flows']
+      - ['CLS, CC Nav', 'Contact-centre cases and knowledge', 'Case Management flow']
+  dm_challenges:
+    title: '11. Data: challenges we see for the move'
+    notes: 'What the floor walk tells us about the data quality and the effort to move it.'
+    cards:
+      - head: Several references per transaction
+        body: ['ISYS, QPS, EBIX and payment references (OV-03)', 'Each must map to one record', 'Decide the one reference first']
+      - head: Client categories and duplicates
+        body: ['Leads and existing customers in one category (OV-04)', 'Same client in Broker, QPS and EBIX', 'Clean-up before the move']
+      - head: Balances with workarounds
+        body: ['Direct-pay tags without premium entries (CA-03)', 'Threshold account for amounts below 0.99 (CA-02)', 'Reversal variances 0.01-0.99']
+      - head: Status not reliable
+        body: ['ICS status stays on the last action; ageing runs (CO-02)', 'Outstanding per client not shown properly (CO-01)', 'Needs a reconciliation before the move']
+      - head: Data in spreadsheets
+        body: ['Trackers and masterlists in Excel and SharePoint', 'Some are the only record of the work', 'Decide per tracker: move or archive']
+      - head: Volumes
+        body: ['50,000+ EB members (EB-01)', '20-30K recon lines per insurer a month', 'Bulk files of about 2,000 records']
+  integration:
+    title: '12. Integrations: channels we saw on the floor'
+    headers: [Counterparty, What passes, How it works today, Seen in]
+    widths: [2.6, 3.8, 3.4, 2.6]
+    notes: 'Every external exchange the floor walk and the process flows showed. Today most are e-mail, files moved by IT, or forms.'
+    rows:
+      - ['Insurers (~55)', 'Placement slips, returns, e-policies, SOAs, production recon, DP billing, ORs', 'E-mail; SFTP for enrolled insurers; each handled differently', 'OV-01; NB, Operations flows']
+      - ['BDO bank units (HLS, LAD, CLAS, CTS, LAMD, LFS, CIU)', 'Loan lists, insurance reports, submitted policies', 'Excel reports sanitised by hand', 'NB, SP flows']
+      - ['CLPC', 'CBG Fire billing and payment confirmation', 'Excel billing file; masterlist check', NB flow]
+      - ['Bank payment files', 'Bills payment, CLPC, PMS (PDC), Trade, direct credit, FS04', 'Files uploaded or run by IT; Autopay', 'Day 1 p.20']
+      - ['BDO TPD, branches', 'Credit files; MC, TT, DD, ATD, credit tickets', 'QPS text file via WinSCP; bank forms at a branch', Disbursement flow]
+      - ['Government', 'BIR (EFPS); SSS, Pag-IBIG, PhilHealth (BancNet)', 'Filed and paid by hand; websites watched', Disbursement flow]
+      - ['Clients', 'Quotations, RA letters, e-policies, SOAs', 'E-mail; snail mail through COG', 'NB, Renewal, SP flows']
+  integration_challenges:
+    title: '12. Integrations: challenges we see'
+    notes: 'From the floor walk and the process flows.'
+    cards:
+      - head: '55 insurers, 55 ways'
+        body: ['Each partner handled differently (OV-01)', 'SFTP for some, e-mail for the rest', 'The business asked for one common solution']
+      - head: IT runs the files
+        body: ['Extracts, batches and migrations by IT', 'Text files for policy-number updates', 'WinSCP for credit files']
+      - head: Bank lists by hand
+        body: ['HLS, LAD, CLAS, CTS and LAMD reports sanitised in Excel', 'CLPC billing and paid lists matched by hand', 'Loan status updated manually']
+      - head: Government by hand
+        body: ['EFPS filing and BancNet payments', '24-hour posting; websites watched', 'No calendar or confirmation record']
+      - head: Letters by print and mail
+        body: ['RA and reminders printed by COG', 'Snail mail for CBG clients', 'NRNS lists blasted as text files']
+      - head: E-policy fall-outs
+        body: ['SFTP fall-outs need text files and an IT exception report', 'Three different senders', 'Contact centre sends after Marketing fixes']
+  shared:
+    title: '13. Shared needs every department raised'
+    headers: [Need, What the floor walk showed, Our suggestion]
+    widths: [2.2, 5.2, 5.0]
+    notes: 'Needs that are not one department''s; the floor walk raised each of them in several sessions.'
+    rows:
+      - ['One lifecycle reference', 'Three system references per deal (OV-03)', 'One reference on every document']
+      - ['Documents and templates', 'Insurer templates for schedules; BDOI template for RA only (DC-01)', 'One template library owned by the business']
+      - ['E-signature', 'Wet signatures on refunds, disbursements, ManCom; signed copy for audit (CP-01)', 'Decision with Legal and Compliance']
+      - ['SLA and TAT', '7 / 3 days for quotes, TAT for referred cases', 'One SLA catalogue with values per step']
+      - ['Notifications', 'Follow-ups by e-mail, phone, chat', 'Automatic reminders to clients and staff']
+      - ['Self-service reports', 'Reports need IT (RP-01)', 'Business-run reports and dashboards']
+      - ['Reference data', 'Insurers, products, LOVs, MIS fields, audit (Day 1 p.9)', 'Business owners per master']
+      - ['Tolerances', 'Threshold account and reversal variances (CA-02)', 'One configurable tolerance table']
+
+roadmap:
+  part:
+    num: G
+    title: 'Roadmap and open points'
+    subtitle: 'Streamline first, then automate: what BDOI can do now, at go-live and after'
+    notes: 'The roadmap does not wait for the system. Some improvements are decisions BDOI can take now; automation follows once the platform is live.'
+    chapters:
+      - {num: 14, title: 'Roadmap and open points', sub: 'Levers, automation map, horizons, KPIs, open points'}
+  principles:
+    title: '14. Five levers to streamline before we automate'
+    notes: >-
+      Automating a broken process only makes it fail faster. These five levers, applied in order, are how insurance
+      brokers usually take cost and delay out of operations; each has BDOI examples from the floor walk.
+    items:
+      - head: Eliminate
+        text: 'Remove steps that exist only because systems are separate'
+        examples: ['ISYS to QPS migration', 'Split payment files', 'Text files for e-policy updates', 'Zero-value remittance workfile']
+      - head: Simplify
+        text: 'Fewer hand-offs and approval levels'
+        examples: ['Five refund chains to one rule', '3-4 signatures to an approval matrix', 'RMEL passed through 4 hands']
+      - head: Standardise
+        text: 'One rule, one value, one template'
+        examples: ['One tolerance table', 'One credit policy', 'One insurer layout', 'Notice days per segment']
+      - head: Automate
+        text: 'Let the system do the routine; people handle exceptions'
+        examples: ['Cash application', 'Insurer recon', 'Renewal rules', 'Reversals and entries']
+      - head: Integrate and measure
+        text: 'Connect partners; run on KPIs'
+        examples: ['Insurer and bank channels', 'SLA and TAT dashboards', 'Self-service reports']
+  automation:
+    title: '14. Automation opportunities by department'
+    headers: [Department, Manual work today (floor walk), Lever, Benefit]
+    widths: [2.2, 4.8, 4.2, 1.2]
+    notes: 'The benefit is our estimate of effort removed and control gained, from what we saw on the floor.'
+    rows:
+      - [New Business, 'Excel quotes; three systems; e-policy fall-outs', 'One client and account; exception queue; insurer standard', High]
+      - [Renewal, 'Excel sanitation and dispositions; RA text files; snail mail', 'Renewal rules; RA in batch; print batch', High]
+      - [Submitted Policies, 'Masterlists on Drive H; LAMD matching by hand', 'Rules on one masterlist; bank feeds', Medium]
+      - [Employee Benefits, '50K+ member lists by e-mail', 'Census upload with checks; portals', Medium]
+      - ['TSU, Product', 'Excel tracker and comparative; IT for set-up', 'Workflow; rules maintained by TSU', Medium]
+      - [Cashiering, 'Intake checks; split files; receipts', 'Auto application; unique payment reference', High]
+      - ['Remittance, Recon', 'Excel sanitising; 20-30K lines per insurer', 'Scheduled batches; automatic matching', High]
+      - [Commission, 'DP lists in Excel; reversals via IT', 'DP billing tracked; reversal entries generated', High]
+      - [Collections, 'ICS status; CTE by e-mail', 'Worklist with rules; reminders; credit policy', Medium]
+      - [Comptrollership, 'Wet signatures; WinSCP; journals; IT close', 'E-approval; host-to-host; entries at source', High]
+      - [Claims, 'Offline claims and repairs', 'Claim on the policy; client notices', Medium]
+      - [Contact centre, 'Cases logged by hand in CLS', 'Case management (BDOI''s To-Be)', Medium]
+  horizons:
+    title: '14. Roadmap in four horizons'
+    notes: 'H0 is what BDOI can decide and prepare now; H1 is one system at go-live; H2 and H3 build on it. The enablers make every horizon possible.'
+    columns:
+      - title: 'H0: Prepare'
+        when: 'Now to Dec 2027'
+        theme: 'Streamline and decide'
+        items: ['Credit policy, approval matrix, tolerance table', 'One reference; notice days; SLA values', 'Data owners; clean-up at source', 'Insurer interface standard agreed', 'Retire trackers per department']
+      - title: 'H1: Go-live'
+        when: 'Jan 2028'
+        theme: 'One system for the daily work'
+        items: ['One client, one account, one invoice', 'Workflows with maker-checker', 'Matching, batches, renewal rules', 'Reports run by users', 'Masters and open items moved']
+      - title: 'H2: Automate'
+        when: 'Feb 2028 - Dec 2028'
+        theme: 'Exceptions only'
+        items: ['Cash application with scoring; payment references', 'E-policy reading; fall-out queue', 'Case management; client notices', 'Bank host-to-host; government calendar']
+      - title: 'H3: Optimise'
+        when: '2029 onward'
+        theme: 'Integrated and measured'
+        items: ['Insurer APIs and portals', 'Self-service for clients and HR', 'Analytics: retention, profitability', 'Continuous close', 'Assisted work: document reading, next best action']
+    enablers_title: Enablers across the horizons
+    enablers: ['Business owners for every master, rule and report', 'Change champions (21) and SMEs (38) per department', 'BDO IT for bank, insurer and government channels', 'Answers to the open points of the floor walk', 'Training and quick-reference cards per role', 'KPIs measured from go-live']
+  kpis:
+    title: '14. KPIs to measure operational efficiency'
+    headers: [KPI, How it is today, Target idea, Owner]
+    widths: [3.0, 3.4, 3.4, 2.4]
+    notes: 'Targets are suggestions for BDOI to set; the baseline is what we heard on the floor.'
+    rows:
+      - ['Quote turnaround', '7 / 3 days, not tracked (NB-07)', 'Measured per quote; share within SLA', Marketing]
+      - ['Request to booked policy', 'Not measured; three systems', 'Days from acceptance to booking', 'Processing']
+      - ['E-policy fall-outs', 'Exception report from IT', 'Share of e-policies without fall-out', 'Processing, IT']
+      - ['Renewal retention', 'Excel dispositions', 'Retention and reasons per segment', Marketing]
+      - ['Unapplied cash', 'Unapplied report worked offline', 'Amount and age of unapplied', Cashiering]
+      - ['Days sales outstanding', 'ICS ageing unreliable (CO-02)', 'DSO per segment; promises kept', Collections]
+      - ['Remittance on time', 'Weekly, by hand', 'Share remitted in the incentive window', Remittance]
+      - ['Recon match rate', '20-30K lines by hand', 'Share matched automatically', 'Production recon']
+      - ['Close duration', 'IT runs the close', 'Working days to close the month', FRBS]
+      - ['Claims cycle time', 'Offline', 'Notice to settlement, per insurer', Claims]
+      - ['First-contact resolution', 'Cases by hand in CLS', 'Share closed at first contact', Contact centre]
+  open_points:
+    title: '14. Open points for BDOI to confirm'
+    headers: ['#', Ref, Area, Open point, Where it closes]
+    widths: [0.5, 1.2, 2.2, 6.4, 2.1]
+    bold_cols: [1]
+    notes: 'The 17 open points of our floor-walk notes.'
+    rows:
+      - ['1', OV-03, Business overview, 'One common reference across the lifecycle?', BDOI to confirm]
+      - ['2', OV-04, Business overview, 'Client categories going forward: lead, prospect, existing; retail, corporate', BDOI to confirm]
+      - ['3', NB-01, New Business, 'Routing per product type: TSU for non-package only? Package direct to placement?', Floor walk]
+      - ['4', NB-04, New Business, 'KYC and AMLA in the system, or outside?', BDOI to confirm]
+      - ['5', NB-05, New Business, 'Basis of the 500M risk-survey threshold (sum insured? PHP?)', BDOI to confirm]
+      - ['6', NB-09, New Business, 'Confirm "ibis" and "qbs" in our notes are EBIX and QPS', Internal]
+      - ['7', NB-14, New Business, 'Commission on the free first-year premium', Floor walk (Cashiering)]
+      - ['8', NB-15, 'New Business, Renewal', 'Non-CBG bank-referred clients at renewal', Floor walk (Renewal)]
+      - ['9', EN-02, Operations, 'Tax treatment on cancellation refunds', Follow-up session]
+      - ['10', TR-02, 'Trade, Marine', 'Marine accumulation by location', Follow-up session]
+      - ['11', CA-03, Cashiering, 'Payment received on a direct-pay policy: allow a change of the DP tag?', Floor walk]
+      - ['12', CA-05, Cashiering, 'Walk through the bulk payment (~2,000 records)', Floor walk]
+      - ['13', CO-03, Collections, 'Credit policy', BDOI to confirm]
+      - ['14', IC-01, Incentives, 'Early-remittance incentive by insurer', Floor walk]
+      - ['15', TX-02, Tax, 'DPPR / PR2307 reversal and knock-off process', Floor walk]
+      - ['16', RC-01, Reconciliation, 'Bank and insurer reconciliation detail', Floor walk]
+      - ['17', CP-01, Compliance, 'E-signature requirement', Legal and Compliance]
+  ask:
+    title: What we ask of BDOI
+    notes: >-
+      The reverse KT is complete when each department has confirmed or corrected its chapter. We propose one 60-minute
+      session per part (A to E) in the first two weeks of October, and a review of Parts F and G with the programme leads.
+    items:
+      - 'Each department confirms or corrects its chapter: As-Is swimlanes, pain points, rules and values (by 9-Oct-2026)'
+      - 'Answer the 17 open points, starting with the one reference, the direct-pay rule, the credit policy and e-signature'
+      - 'Choose the suggestions BDOI wants on the roadmap (H0 to H3)'
+      - 'Name data owners per department; start the clean-up of references, categories and trackers'
+      - 'Plan the remaining walks: Reinsurance, Compliance (sanction screening) and user access'

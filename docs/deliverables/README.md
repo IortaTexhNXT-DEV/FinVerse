@@ -71,7 +71,7 @@ so each document can be regenerated after every build.
 | 38 | Observability and alert catalogue: dashboards, metrics, log fields (correlation id), and alerts routed to PagerDuty with their runbook step | Word + Excel | B |
 | 39 | Training material per department (quick-reference cards and walkthroughs), derived from the user manuals | Word + PowerPoint | B |
 | 40 | Accessibility and browser support statement (WCAG 2.1 AA checks on the main screens) | Word | B |
-| 41 | Business process deck: As-Is, Envisioned (BIBS), gaps and best practice per business area, plus the holistic enterprise view (current, envisioned, best practice) | PowerPoint | A (refreshed in B) |
+| 41 | Business process deck, v2.0 the reverse KT to BDOI after the floor walks of 21-25 Sep 2026: per department the floor-walk notes, As-Is swimlanes, pain points, To-Be in the BRD and how it answers them, what the BRD does not cover, and best practice beyond the BRD; the holistic end-to-end view; data migration, integrations and shared capabilities; a streamlining and automation roadmap, KPIs and the open points. No build status | PowerPoint | A (refreshed in B) |
 | 42 | Programme alignment: BDOI drops, timeline, integrations and infrastructure (Word), with the integration inventory (Excel) and the IER-aligned architecture diagrams. Analysis [`PROGRAMME_ALIGNMENT.md`](../architecture/PROGRAMME_ALIGNMENT.md); source `src/alignment/` | Word + Excel + PNG | A |
 
 ## FRS with annotated screenshots (FRS v1.1)
@@ -324,7 +324,8 @@ tools/deliverables/drop_index.py` regenerates the four indexes.
 | 17 | Reports in Excel and PDF; documents and schedules in Word and PDF | All (platform) | Built in the platform (`ExportFormat.DOCX`, document renditions); see Developer Guide 6.1-6.2 |
 | 20 | Upload and download templates | Drop 0 (migration templates) | Migration extract templates: `out/Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/templates/` (27 layouts and the control file). Platform upload and download templates follow after the build |
 | 29 | Data migration (BRD-13) | Drop 0 | v1.1 (BDOI timeline, go-live January 2028): Strategy and Approach (52 pages), Data Requirements Workbook (31 data objects, 27 extract layouts, 352 fields, 51 data-quality rules), Cutover Runbook and Task Plan (75 tasks, T-30 to T+30), Reconciliation Approach and Sign-off, in `out/Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/`; FRS BRD-13 v1.1 (80 pages); source `src/migration/` |
-| 41 | Business process deck | Programme | v1.0: `out/Programme/Decks/BIBS_Deck_BRD-00_Business_Process_AsIs_Envisioned_BestPractice_v1.0.pptx` |
+| 41 | Business process deck, end to end with the BRD view | Programme | v2.0: `out/Programme/Decks/BIBS_Deck_BRD-00_Business_Process_AsIs_Envisioned_BestPractice_v2.0.pptx`; source `src/decks/build_process_deck.py` |
+| 41 | Business process reverse KT, floor-walk edition (only the floor walk, our notes and the BDOI process flows; no BRD review; Reinsurance, Sanction Screening and User Access left for a later walk) | Programme | v3.0: `out/Programme/Decks/BIBS_Deck_BRD-00_Business_Process_Reverse_KT_Floor_Walk_v3.0.pptx`; source `src/decks/build_floorwalk_deck.py` with `process_deck/deck_floorwalk.yaml` and the `fw:` blocks of the area files |
 | 42 | Programme alignment and integration inventory | Programme | v1.0: `out/Programme/Alignment/BIBS_Alignment_BRD-00_Drops_Integrations_Infrastructure_v1.0.docx`, `BIBS_Alignment_BRD-00_Integration_Inventory_v1.0.xlsx` (20 integrations) and the IER diagrams in `out/Programme/Alignment/IER/`; source `src/alignment/` |
 
 Edits still owed to documents that the build teams are editing: [`PENDING_EDITS.md`](PENDING_EDITS.md).

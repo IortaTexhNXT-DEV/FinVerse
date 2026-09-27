@@ -1,41 +1,50 @@
-# BRD-12 Submitted Policies: chapter 12 of the business process deck.
-# Sources: "BRD - Submitted Policies (with e-sig MCM 4.24.2026).pdf" p.4-7 (current and envisioned process, image
-# pages), p.13-14 (NFR); FRS BRD-12 sections 2, 5, 9; cross-BRD decisions D1, D2, XQ01, XQ03; discrepancy register
-# (DCR-124, 125, 126, 129, 146).
+# Submitted Policies (BRD-12): chapter 3 of the business process reverse KT deck (Part A, Marketing and Sales).
+# Sources: discovery 24-Sep-2026 (floor-walk note SP-01); high-level Submitted Policies process flow (new business
+# intake, handling fee for CBG Motor, renewal for CBG Motor, CBG Fire and Non-CBG Retail); BRD-12 p.4-14;
+# discrepancy register (DCR-124, 125, 126, 129, 146, 155).
 id: brd12
 key: sp
-num: 12
+num: 3
 title: Submitted Policies
 brd: BRD-12
-scope: 'Policies submitted by bank clients: masterlist, sanitation, review, IAAF, renewal hand-off'
-status: DESIGNED
-status_text: Designed, not yet built; FRS v1.0 issued for review
+scope: 'Policies submitted by bank clients (home loans, auto loans, leasing): masterlist, review, IAAF, conversion at renewal'
 department: CBG and Non-CBG Marketing - Submitted Policies
 roles:
   - Submitted Handler and Submitted Checker (CBG)
-  - Sanitation Handler; Team Lead; rule administrator
-  - Policy Review Officer (Non-CBG Corporate)
-  - Marketing AO, NB Team Lead, TSU
-  - Admin Team UPP handler; Placement and Booking users
+  - Sanitation Handler; Team Lead
+  - Policy Reviewer (Non-CBG Corporate); Marketing AO; NB AO and TL
+  - Admin Team UPP handler (handling fee)
+  - 'Bank units: Home Loan AO, IBG / Leasing, LFS, CIU, LAMD; COG'
 figures:
-  - ['63,000', 'sanitations a year, +25% a year (p.13-14)']
-  - ['30', 'CBG Admin / Marketing users, 15 concurrent']
-  - ['2 s', 'response for every listed transaction']
-  - ['30', 'days to consolidate CBG Motor policies (p.4-5)']
+  - ['63,000', 'sanitations a year, growing 25% a year (BRD-12 p.13-14)']
+  - ['30 days', 'to consolidate the submitted masterlist after extraction']
+  - ['150 days', 'before expiry: masterlist to the Sanitation Handler (SP flow)']
+  - ['3-5 days', 'for the insurer to accept the 30-day hold cover, else re-assign']
+session:
+  when: 'Discovery 24-Sep-2026; process flow walked with Marketing (Submitted Policies)'
+  pocs: 'CBG and Non-CBG Marketing process owners (Submitted Policies)'
 sources:
-  - BRD-12 p.4-7 (current and envisioned, image pages)
-  - BRIDSP-01 to 33
-  - FRS BRD-12 v1.0, sections 2 and 5; decision D2
-chevrons: [Intake, Extraction, Masterlist, Processing run, Review and IAAF, Limits and TOR, Expiry scan, Renewal]
+  - 'High-level Submitted Policies process flow (5 pages: intake, handling fee, three renewal paths)'
+  - 'BRD-12 p.4-7 (current and envisioned); BRIDSP-01 to 33'
+  - 'Floor-walk note SP-01'
+chevrons: [Bank extract, Documents, Masterlist, Review, IAAF, Loan match, Expiry, Conversion]
 notes:
   glance: >-
-    Submitted policies are policies that bank clients (CBG Motor, CBG Fire, Non-CBG Corporate and Branches, Non-CBG
-    Retail) placed outside BDOI and submitted to the bank. BDOI keeps them on a masterlist, reviews their adequacy, and
-    at expiry converts them to BDOI-placed renewals. In BIBS the renewal from the hand-off on belongs to the Renewal
-    module (decision D2). The module is designed; the build needs BT0, Collections and Cashiering for its ports.
-  pains: The eight points are the current-process rows of FRS BRD-12 section 2.1, read from the image pages of the BRD (p.4-7).
-  after: The usage table gives the volumes and the 2-second response target (p.13-14), the tightest in the twelve BRDs.
-  gaps: The bucket list (DCR-124) and the LAMD intake (DCR-146) decide which submitted policies are renewed.
+    When a bank client (home loan, auto loan, leasing) buys insurance outside BDOI and submits the policy to the bank,
+    BDOI checks that the cover is adequate, issues an IAAF to the bank unit, monitors the policy on a masterlist and
+    tries to win the business at renewal. Today it is tracked outside any system, on masterlists kept on a shared drive
+    (Drive H) and SharePoint (SP-01).
+  heard: 'Note of the 24-Sep session and the steps of the Submitted Policies process flow.'
+  pains: 'The eight points of the BRD-12 current process (p.4-7); the process flow confirms each one.'
+  after: 'The benefit column names what the To-Be removes.'
+  missed: 'Mostly timing and channel details; the lead days of Submitted Policies and Renewal do not line up.'
+heard:
+  - {ref: SP-01, kind: pain, topic: Leasing and mortgage, asis: 'Leasing and mortgage accounts are "submitted policies"; they are tracked manually, not in a system.'}
+  - {ref: 'SP flow p.1', kind: asis, topic: Intake, asis: 'Policy details extracted from LFS and CIU and the daily HLS insurance report; documents from the Home Loan AO and IBG / Leasing; validated and consolidated in the Submitted Masterlist on Drive H within 30 days; IAAF (PDF) issued when there are findings.'}
+  - {ref: 'SP flow p.2', kind: asis, topic: Handling fee (CBG Motor), asis: 'UPP list on SharePoint filtered for handling-fee billing; NB TL assigns to the AO; disposition fed back by e-mail; client IDs saved in a shared folder.'}
+  - {ref: 'SP flow p.3', kind: asis, topic: Renewal CBG Motor, asis: 'SPI list from Drive H mapped to NB and Renewal databases; matched with LAMD; FFY, BDO / SM employees and No Touch excluded; loan status updated; RA by snail mail at 90 days; NRNS list to COG and to AOs for call-outs.'}
+  - {ref: 'SP flow p.4', kind: rule, topic: Renewal CBG Fire, asis: 'Assign an insurer different from the expiring one; proposal with a 30-day hold cover by e-mail; accepted within 3-5 days or re-assigned.'}
+  - {ref: 'SP flow p.5', kind: asis, topic: Renewal Non-CBG Retail, asis: 'AO asks the insurer to quote on expiring terms, quotes the employee, prepares the ARF in ISYS; NRNS letter by e-mail if declined.'}
 asis:
   caption: 'Submitted policies today (BRD-12 p.4-7)'
   notes: >-
@@ -134,17 +143,113 @@ after:
   - {n: 6, bibs: 'Expiry scan hands renewable policies to Renewal: account, hold cover, letters', measure: 'No manual RA file'}
   - {n: 7, bibs: 'Handling-fee payments tagged automatically by PN or location reference', measure: 'Tagged daily'}
   - {n: 8, bibs: 'Reports, alerts and notifications from live data', measure: 'Live status'}
-gaps:
-  - {sev: High, gap: Bucket list and precedence, impact: Which submitted policies are renewed, owner: 'CBG and Non-CBG Marketing', decision: 'Complete bucket list; FFY, RMU, Fully Paid renewed?', ref: 'DCR-124'}
-  - {sev: High, gap: Renewal boundary with BRD-6, impact: Two renewal paths for one policy, owner: 'Submitted Policies and RMEL owners', decision: 'Confirm decision D2; notices and proposals (XQ03)', ref: 'DCR-129'}
-  - {sev: High, gap: One LAMD intake or two, impact: Loan status for buckets and renewal eligibility, owner: 'Marketing, LAMD', decision: 'One report, one owner, frequency', ref: 'DCR-146, XQ01'}
-  - {sev: Medium, gap: One IAAF per policy, impact: IAAF generation and approvals, owner: Non-CBG Corporate Marketing, decision: 'One IAAF per policy; approval matrix', ref: 'DCR-125'}
-  - {sev: Medium, gap: Handling fee undefined, impact: 'Amount, payer, VAT, OR, GL account', owner: 'Marketing, Comptrollership', decision: 'Define the fee and who dispositions it', ref: 'DCR-126'}
-  - {sev: Parked, gap: 'Source feeds, OCR, e-signature, COG', impact: 'Uploads, manual entry, stamped signature, print batch', owner: 'BDO IT, COG', decision: 'Interface specifications per source', ref: 'FRS BRD-12 section 7'}
+variants:
+  title: intake and three renewal paths
+  headers: [Path, Source, What the handler does, Output, Channel]
+  widths: [2.0, 2.6, 3.8, 2.2, 2.0]
+  per_page: 5
+  rows:
+    - ['Intake (all segments)', 'LFS, CIU, HLS daily; documents from Home Loan AO and IBG / Leasing', 'Validate, match, consolidate; review adequacy; checker validates', 'Masterlist on Drive H; IAAF if findings', 'E-mail (PDF)']
+    - ['Handling fee (CBG Motor)', 'UPP list on SharePoint', 'Filter for handling-fee billing; NB TL assigns; AO dispositions', 'UPP list updated', 'E-mail, SharePoint']
+    - ['Renewal CBG Motor', 'SPI list on Drive H; LAMD', 'Map to NB and Renewal data; exclude FFY, employees, No Touch; loan status; vehicle type and insurer', 'RA text file to COG; NRNS list', 'Snail mail at 90 days; call-outs']
+    - ['Renewal CBG Fire', 'Expiring list; LAMD', 'Different insurer from the expiring one; premium; 30-day hold cover request', 'RA, status to TL', 'E-mail to insurer; snail mail']
+    - ['Renewal Non-CBG Retail', 'LAMD report', 'Insurer approval to quote on expiring terms; quotation; ARF in ISYS', 'Placement file and booking', 'E-mail; NRNS letter']
+  notes: The five pages of the Submitted Policies process flow.
+missed:
+  - {cov: PARTLY, item: Lead days, seen: 'Masterlist to sanitation at 150 days; RMEL at 140 days; RA at 90 days.', brd: 'Hand-off to Renewal; days not stated.', rec: 'One timeline shared with Renewal (chapter 2).', ref: 'BRIDSP-23; DCR-129'}
+  - {cov: NOT_IN_BRD, item: Snail-mail RA and reminders, seen: 'COG prints and mails RA and reminder letters.', brd: 'Channel open.', rec: 'Same print channel as Renewal, with tracking.', ref: SQ09}
+  - {cov: PARTLY, item: Handling fee, seen: 'UPP list on SharePoint; AO disposition by e-mail.', brd: 'Tagging only; fee undefined.', rec: 'Define the fee and bill it from the masterlist.', ref: 'BRIDSP-31; DCR-126'}
+  - {cov: PARTLY, item: Two LAMD intakes, seen: 'LAMD used by Submitted Policies and Renewal.', brd: 'Two loan-status feeds.', rec: 'One LAMD intake shared by both.', ref: DCR-146}
+  - {cov: CONFIRM, item: One or many policies per IAAF, seen: 'An IAAF may cover several policies.', brd: 'Open.', rec: 'Allow several policies per IAAF.', ref: DCR-125}
+  - {cov: PARTLY, item: Hold-cover expiry, seen: '30-day hold cover; 3-5 days to accept.', brd: 'Hold cover requested; expiry rule open.', rec: 'Expiry alert and re-assignment rule.', ref: DCR-155}
 best:
-  - {practice: Automated matching with bank loan data, status: BIBS, bibs: 'LAMD matching by PN in the processing run; fallout with reason codes.', bdoi: 'One LAMD report and owner (DCR-146).'}
-  - {practice: Rules owned by the business, status: BIBS, bibs: 'Sanitation, bucket and insurer-assignment rules maintained by a rule administrator.', bdoi: 'Give the bucket precedence (DCR-124).'}
-  - {practice: Adequacy review with an approval matrix, status: BIBS, bibs: 'Policy reviews and IAAF routed by the matrix.', bdoi: 'Approve the IAAF matrix (DCR-125).'}
-  - {practice: Digital signature, status: PARTLY, bibs: 'Stamped signature image today; e-signature port parked.', bdoi: 'Choose a qualified e-signature service.'}
-  - {practice: One masterlist, status: BIBS, bibs: 'One record per policy with history, handler and conversion status.', bdoi: 'Migrate the Excel masterlists with reconciliation (BRIDSP-33).'}
-  - {practice: Conversion KPI, status: ADOPT, bibs: 'Masterlist shows BOOKED when the renewal books; persistency report for submitted accounts.', bdoi: 'Set conversion targets per segment.'}
+  - {practice: Live bank loan feeds, status: PARTLY, lever: No masterlists, what: 'Loan, collateral and paid-off status received from the bank systems daily.', rec: 'Specify LFS, CIU, HLS and LAMD feeds (SQ01).'}
+  - {practice: Rule-based adequacy check, status: PARTLY, lever: Faster review, what: 'Sum insured against loan, mortgagee clause and expiry checked by rule on extracted data.', rec: 'Start with CBG Motor and Fire.'}
+  - {practice: Deficiency notices to the bank, status: PARTLY, lever: Protects the bank, what: 'Automatic notices and escalation to the bank unit when cover is short or lapsed.', rec: 'Use the IAAF as the notice, sent from the system.'}
+  - {practice: Conversion programme, status: PARTLY, lever: New premium, what: 'Submitted policies targeted for conversion with offers at renewal, tracked per segment.', rec: 'Report conversion rate per segment.'}
+  - {practice: E-signature on IAAF and TOR, status: CONFIRM, lever: No paper, what: 'IAAF and TOR signed electronically.', rec: 'Decide with Legal and Compliance (CP-01).'}
+
+# Floor-walk edition (reverse KT v3.0): overrides for build_floorwalk_deck.py; floor walk and BDOI flows only.
+fw:
+  num: 3
+  figures:
+    - ['30 days', 'to consolidate the submitted masterlist after extraction (SP flow)']
+    - ['150 days', 'before expiry: masterlist to the Sanitation Handler (SP flow)']
+    - ['90 days', 'before expiry: RA by snail mail for CBG Motor (SP flow)']
+    - ['3-5 days', 'for the insurer to accept the 30-day hold cover, else re-assign']
+  sources:
+    - 'Submitted Policies process flow (5 pages: intake, handling fee, three renewal paths)'
+    - 'Floor-walk note SP-01'
+  notes:
+    glance: >-
+      When a bank client (home loan, auto loan, leasing) buys insurance elsewhere and submits the policy to the bank,
+      BDOI checks the cover, issues an IAAF to the bank unit, monitors the policy on a masterlist and tries to win the
+      business at renewal. It is tracked outside any system today (SP-01), on masterlists on Drive H and SharePoint.
+    pains: 'The eight points are on the Submitted Policies swimlane.'
+    wants: 'For each pain point: what the business needs, and the lever we suggest.'
+  asis:
+    caption: 'Submitted policies today (Submitted Policies process flow pages 1-5; SP-01)'
+    notes: >-
+      Policy details are extracted from LFS and CIU and from the daily HLS insurance report, and policy documents come
+      from the Home Loan AO and IBG / Leasing. The Submitted Handler validates, matches and consolidates them into the
+      Submitted Masterlist on Drive H within 30 days, reviews the adequacy of the cover, has a checker validate it and
+      issues an IAAF (PDF) by e-mail when there are findings. 150 days before expiry the masterlist goes to the
+      Sanitation Handler, who matches it with LAMD, excludes free-first-year, BDO / SM employee and No Touch accounts,
+      updates the loan status, computes the premium and asks an insurer for a 30-day hold cover by e-mail; if the
+      insurer does not accept in 3-5 days the account is re-assigned. COG sends the RA and reminder letters by snail
+      mail (CBG Motor at 90 days) and blasts the NRNS list; AOs call the clients. The handling fee for CBG Motor is
+      worked from the UPP list on SharePoint.
+    cols: 7
+    lanes:
+      - {id: bank, label: 'Bank units: HL AO, IBG, LFS, CIU, HLS, LAMD', kind: external}
+      - {id: sub, label: 'Submitted Handler, Checker'}
+      - {id: san, label: 'Sanitation Handler, TL'}
+      - {id: mao, label: 'Marketing AO, NB TL, UPP'}
+      - {id: cog, label: 'Insurers, COG', kind: external}
+      - {id: sys, label: 'Drive H, SharePoint, ISYS, e-mail', kind: system}
+    steps:
+      - {id: k1, lane: bank, col: 1, text: 'Documents; LFS, CIU, HLS extracts', kind: external}
+      - {id: k2, lane: sub, col: 1, text: 'Validated, matched, consolidated by hand', pain: [1]}
+      - {id: k3, lane: sys, col: 2, text: 'Submitted Masterlist on Drive H', kind: legacy, pain: [2]}
+      - {id: k4, lane: sub, col: 3, text: 'Adequacy review; IAAF PDF by e-mail', pain: [3]}
+      - {id: k5, lane: san, col: 4, text: 'Masterlist at 150 days before expiry', pain: [4]}
+      - {id: k6, lane: san, col: 5, text: 'LAMD match; exclusions; loan status', pain: [5]}
+      - {id: k7, lane: sys, col: 5, text: 'Handling fee from UPP list on SharePoint', kind: legacy, pain: [8]}
+      - {id: k8, lane: san, col: 6, text: '30-day hold cover asked by e-mail', pain: [6]}
+      - {id: k9, lane: cog, col: 6, text: 'Insurer: 3-5 days, else re-assign', kind: external}
+      - {id: k10, lane: cog, col: 7, text: 'COG mails RA; NRNS blasted', kind: external, pain: [7]}
+      - {id: k11, lane: mao, col: 7, text: 'Call-outs; ARF in ISYS'}
+    edges:
+      - [k1, k2, dashed, files]
+      - [k2, k3]
+      - [k3, k4]
+      - [k3, k5, dashed, 150 days]
+      - [k5, k6]
+      - [k6, k8]
+      - [k8, k9, dashed, e-mail]
+      - [k9, k10]
+      - [k10, k11]
+  pains:
+    - {n: 1, title: Policy details consolidated by hand, text: 'Extracts and documents from several bank units validated and merged manually.', ref: 'SP flow p.1; SP-01'}
+    - {n: 2, title: Masterlists on a shared drive, text: 'Masterlists per segment on Drive H; status monitored in them.', ref: 'SP flow p.1, p.3'}
+    - {n: 3, title: Review and IAAF by e-mail, text: 'Adequacy reviewed by hand; IAAF issued as a PDF by e-mail.', ref: 'SP flow p.1'}
+    - {n: 4, title: Timelines do not line up, text: 'Masterlist at 150 days, RMEL at 140, RA at 90 days.', ref: 'SP flow p.3; Renewal flow'}
+    - {n: 5, title: LAMD matching by hand, text: 'Exclusions and loan status updated manually.', ref: 'SP flow p.3'}
+    - {n: 6, title: Insurers chased by e-mail, text: 'Hold-cover requests; accept in 3-5 days or re-assign by hand.', ref: 'SP flow p.4'}
+    - {n: 7, title: Letters by snail mail, text: 'RA and reminders printed and mailed by COG; NRNS lists blasted.', ref: 'SP flow p.3'}
+    - {n: 8, title: Handling fee from a SharePoint list, text: 'UPP list filtered; AO disposition by e-mail.', ref: 'SP flow p.2'}
+  wants:
+    - {n: 1, bibs: 'Bank extracts and documents captured once, matched by rule', measure: 'Rules'}
+    - {n: 2, bibs: 'One masterlist with history, no shared-drive copies', measure: 'One record'}
+    - {n: 3, bibs: 'Review, checker and IAAF in one flow, sent and logged', measure: 'Workflow'}
+    - {n: 4, bibs: 'One renewal timeline shared with Renewal', measure: 'One calendar'}
+    - {n: 5, bibs: 'Loan status and exclusions applied by rule', measure: 'Rules'}
+    - {n: 6, bibs: 'Hold-cover requests tracked with the 3-5 day clock', measure: 'SLA clock'}
+    - {n: 7, bibs: 'Letters by e-mail or a tracked print batch', measure: 'Print batch'}
+    - {n: 8, bibs: 'Handling fee billed from the masterlist', measure: 'Billing rule'}
+  best:
+    - {practice: Live bank loan feeds, lever: No masterlists, what: 'Loan, collateral and paid-off status received from the bank systems daily.', rec: 'Agree feeds for LFS, CIU, HLS and LAMD with BDO IT.'}
+    - {practice: Rule-based adequacy check, lever: Faster review, what: 'Sum insured against loan, mortgagee clause and expiry checked by rule on extracted data.', rec: 'Start with CBG Motor and Fire.'}
+    - {practice: Deficiency notices to the bank, lever: Protects the bank, what: 'Automatic notices and escalation to the bank unit when cover is short or lapsed.', rec: 'Use the IAAF as the notice, sent from the system.'}
+    - {practice: Conversion programme, lever: New premium, what: 'Submitted policies targeted for conversion with offers at renewal, tracked per segment.', rec: 'Report conversion rate per segment.'}
+    - {practice: E-signature on IAAF, lever: No paper, what: 'IAAF and terms of reference signed electronically.', rec: 'Decide with Legal and Compliance (CP-01).'}

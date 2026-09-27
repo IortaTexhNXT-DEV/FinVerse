@@ -1,90 +1,225 @@
-# BRD-2 Operations: chapter 2 of the business process deck.
-# Sources: "Operations.pdf" p.10-13 (executive summary, current and envisioned process), annex p.115-120 (NFR);
-# FRS BRD-2 sections 1.6, 2 and 9; discrepancy register (DCR-013, 014, 015, 027, 028); open questions OQ01-OQ49.
+# Operations (BRD-2): chapter 7 of the business process reverse KT deck (Part C, Operations).
+# Sources: floor walk 23-Sep-2026 (Cashiering, Remittance, Adjustment / Collateral Release, Production Reconciliation)
+# and discovery sessions 21 and 23-Sep-2026 (floor-walk notes CA-, CM-, IC-, EN-, OV-03, TX-02); BDOI Day 1 overview
+# p.20-25; high-level Operations process flow confirmed by the process owners; "Operations.pdf" p.10-13 and annex
+# p.115-120; discrepancy register (DCR-013, 014, 015, 025, 027, 028); open questions OQ01-OQ49.
 id: brd02
 key: ops
-num: 2
+num: 7
 title: Operations
 brd: BRD-2
-scope: 'Cashiering, Remittance, Production Reconciliation, Adjustment, Commission / Direct Payment'
-status: BUILT
-status_text: Built; FRS v1.0 issued for review
-department: Operations, Financial Transactions and Processing
+scope: 'Cashiering, Remittance, Adjustment, Commission receivables, Production Reconciliation, DPPR / PR2307 reversal, invoicing'
+department: Operations (Financial Transactions and Processing)
 roles:
-  - Cashier, HO (11) and branches (5); Cashiering TL / TH
+  - Cashiers at head office (11) and branches (5); Cashiering TL / TH
   - Remittance Processor (4) and TL / TH
-  - Production Reconciliation Handler (4)
-  - Adjustment Processor (6) and TL
-  - Commission Handler and TL / TH
-  - Marketing Collection; Comptrollership; Disbursement
+  - Adjustment / Collateral Release Processor (6) and TL / TH (checker-poster)
+  - Production Reconciliation Handler (4); CRU (Commission Receivable Unit)
+  - IT (monthly extracts, reversal files, Autopay)
+  - Marketing, Comptrollership, Disbursement (hand-offs)
 figures:
-  - ['16', 'cashiers: 11 head office, 5 branches (annex p.115-120)']
-  - ['< 5 s', 'response for every function; batch print of 50 documents < 10 s']
-  - ['99.9%', 'availability; use 07:00-18:30']
-  - ['1.00', 'matching tolerance for insurer feedback (FRS BRD-2)']
+  - ['~55', 'insurer partners, each settled and reconciled separately (OV-01)']
+  - ['20-30K', 'production lines per insurer a month to reconcile (Day 1 p.24)']
+  - ['~2,000', 'records in one bulk payment file (CA-05)']
+  - ['4 days', 'check hold before a payment is applied (Cashiering flow)']
+session:
+  when: '23-Sep-2026, 1:00-5:00 pm, 44F; discovery 21 and 23-Sep-2026'
+  pocs: 'Perjelyn Joy Gutierrez, Shirley Catapang, Ronna Marie Go, Aimee Medina, Renque Galos, Carolyn Pasia Baloto, Joy Ebuenga, Mark Andrew Francisco'
 sources:
-  - BRD-2 p.10-13 (current and envisioned process)
-  - CSHID, RMTID, PRCID, ADJID, CMRID, MKTID, DBMID
-  - FRS BRD-2 v1.0, sections 1.6 and 2
-chevrons: [Booked invoice, Payment, Apply, Unapplied, Remittance, Disbursement, Insurer OR, Reconciliation]
+  - 'High-level Operations process flow (Cashiering, Remittance, Adjustment, Commission receivables, Production recon, DPPR / PR2307 reversal, Invoicing)'
+  - BDOI Day 1 overview p.20-25
+  - 'BRD-2 p.10-13; CSHID, RMTID, PRCID, ADJID, CMRID, MKTID, DBMID'
+chevrons: [Payment files, Checks, Split and apply, Receipts, Remittance, Disbursement, Insurer OR, Reconciliation]
 notes:
   glance: >-
-    Operations takes over every invoice booked in New Business and follows its money until the insurer is paid, the
-    insurer's official receipt is recorded and every difference is closed. BDOI collects premium on behalf of insurers
-    and remits it net of its commission (BRD-2 p.11). The modules are built; FRS BRD-2 describes the delivered screens.
-    The BRD gives users and response times but no transaction volumes (OQ44). The annex names 11 head-office and 5 branch
-    cashiers, 4 remittance processors, 4 reconciliation handlers and 6 adjustment processors, plus team leads.
-  pains: The six points are the six "current process" items of the BRD (p.11), in the same order.
+    Operations takes over every invoice booked by Processing and follows its money until the insurer is paid, the
+    insurer's official receipt is recorded and every difference is closed. BDOI collects premium on behalf of about
+    55 insurers and remits it net of its commission. Seven sub-processes run side by side: Cashiering, Remittance,
+    Adjustment and Cancellation, Commission receivables for direct-payment policies, Production Reconciliation,
+    DPPR / PR2307 reversal and policy-fee invoicing. The floor walk added the volumes the BRD does not give (OQ44,
+    DCR-025): 20-30 thousand production lines per insurer a month and bulk payment files of about 2,000 records.
+  heard: >-
+    The notes of the discovery sessions (21 and 23-Sep) and of the Operations floor walk (23-Sep). Joy was the
+    single point of contact for the Cashiering items.
+  pains: >-
+    The twelve points combine the six current-process items of BRD-2 (p.11) with what the process owners showed on
+    the floor. Points 1 to 7 are on the Cashiering and Remittance swimlane, 8, 11 and 12 on the Commission and
+    Adjustment swimlane, 9 and 10 on the Reconciliation and Reversal swimlane.
   after: >-
-    The BRD states the target (unified operations, scheduled extraction, auto-matching, validated entries, tracking)
-    without turnaround targets; the measures are the controls BIBS adds.
-  gaps: >-
-    Most Operations gaps are rules that the BRD states twice or leaves open. BIBS builds a documented default behind a
-    parameter, so the answer is a configuration change (FRS BRD-2 section 1.6).
+    The BRD states the target (unified operations, scheduled extraction, automatic matching, validated entries,
+    tracking) without turnaround targets; the benefit column names the control or the effort the To-Be removes.
+  missed: >-
+    Items the floor walk showed that BRD-2 does not state, or states differently. The first two are true gaps; the
+    others are rules or values the BRD must carry. Each becomes a register item (DCR) or an answer to an open question.
+heard:
+  - {ref: OV-03, kind: pain, topic: Three references, asis: 'One transaction carries three numbers: ISYS invoice no., QPS reference and EBIX reference, plus the payment reference. QPS holds all three.', want: 'One reference across the lifecycle (to confirm).'}
+  - {ref: CA-01, kind: pain, topic: Receipts, asis: 'The client pays against the ISYS invoice number; QPS has the insurer reference and EBIX its own. Receipts are created by hand.', want: 'Receipts generated by the system.'}
+  - {ref: CA-02, kind: rule, topic: Threshold account, asis: 'Amounts below PHP 0.99 go to a separate adjustment (threshold) account, e.g. the .99 of 8,787.99.', want: 'Threshold and variance handling configurable.'}
+  - {ref: CA-03, kind: pain, topic: Direct pay, asis: 'A direct-pay policy is tagged, so only commission entries exist. If the insured still pays BDOI, no accounting entry is created.', want: 'A solution, e.g. allow the direct-pay tag to be changed.'}
+  - {ref: CA-04, kind: rule, topic: Receipt types, asis: 'Two receipts: AR to the client for premium, OR to the insurer for commission.', want: 'Both AR and OR generated from the system.'}
+  - {ref: CA-05, kind: asis, topic: Bulk payment, asis: 'Bulk payment files of about 2,000 records.', want: 'Walk through bulk payment on the floor (open point).'}
+  - {ref: 'Day 1 p.20', kind: asis, topic: Payment files, asis: 'Bills Payment, CLPC, PMS, Trade, Direct Credit and FS04 files; 4-day check hold, bounced-check list, QPS / EBIX reference and zero-PR checks; exact, excess or actual-payment files; Autopay; unapplied report.'}
+  - {ref: 'Day 1 p.21', kind: asis, topic: Remittance, asis: 'Weekly EBIX extract of applied payments (Monday to Friday); DPPR reversal, endorsement / knock-off and invalid accounts removed; settlement approved on an MS Teams list; signed copy kept for audit; Disbursement posts.'}
+  - {ref: EN-01, kind: want, topic: Endorsement, asis: 'Marketing e-mails the request with documents; Operations validates, keys it in the EBIX endorsement module; TL / TH checker-poster; posting one by one; entries flow to Comptrollership.', want: 'Endorsement computes the premium from the adjustment, like New Business, not just captures it.'}
+  - {ref: EN-02, kind: open, topic: Cancellation, asis: 'Cancellation with refund of premium including applicable tax.', want: 'Tax treatment on refund to confirm (FRS).'}
+  - {ref: CM-01, kind: rule, topic: Commission trigger, asis: 'Commission is confirmed from premium collected (Collections) and only after the full premium is collected, also for instalment and multi-year policies.'}
+  - {ref: CM-02, kind: rule, topic: Co-insurance, asis: 'Co-insurance: commission can be processed when one insurer has paid. Direct policy: partial commission payment is not accepted.'}
+  - {ref: CM-03, kind: rule, topic: Excess commission, asis: 'Excess commission is computed differently for Motor and Fire and kept in the incentive module.'}
+  - {ref: IC-01, kind: rule, topic: Early-remittance incentive, asis: 'Insurers pay an incentive for early remittance, only on premium sold within credit terms. Rates agreed with each insurer; posted to Other Income (IC-02).', want: 'Incentive by insurer to walk through (open point).'}
+  - {ref: 'Day 1 p.23-24', kind: pain, topic: 'DP commission, reversal', asis: 'DP lists per unit in a shared folder, consolidated in Excel, billed by e-mail; production recon of 20-30K lines per insurer; DPPR / PR2307 reversal through SharePoint, Teams, IT extract and VLOOKUP, with a 0.01-0.99 variance.'}
 asis:
-  caption: 'Payment to insurer today (BRD-2 p.11)'
+  caption: 'Cashiering and Remittance today (Operations process flow; Day 1 p.20-21; CA-01 to CA-05)'
   notes: >-
-    Today receipts are issued by hand and payment details are not visible; payment application is fragmented.
-    Remittances are extracted manually with no tracking of batches and no check of what is not for remittance. Booked
-    accounts are matched with insurer reports by hand. Endorsements go through redundant steps with manual
-    computation. Reports depend on IT, and direct-payment commission receivables are gathered, cleaned and billed by
-    hand (BRD-2 p.11, current process items 1-6).
-  cols: 6
+    Payment files arrive from bills payment, CLPC, PMS (post-dated checks), Trade, direct credit and the FS04 batch;
+    cash is received at the counter. Before a payment is applied the cashier checks the 4-day hold on checks, the
+    bounced-check list and the exclusion list, and whether the account is in QPS with an EBIX reference. Zero-PR
+    accounts are tagged, and exact-payment, excess-payment and actual-payment files are built before upload or
+    Autopay; items that do not apply end in the unapplied report. Receipts (AR to the client, OR to the insurer) are
+    prepared by hand. When a direct-pay policy is paid to BDOI no premium entry is created (CA-03). Every week
+    Remittance extracts the applied payments of Monday to Friday from EBIX, removes DPPR reversals, knock-offs and
+    invalid accounts in Excel, and has the settlement list approved on an MS Teams list with a signed copy kept for
+    audit; Disbursement then posts and pays the insurer.
+  cols: 7
   lanes:
-    - {id: cli, label: 'Clients, banks', kind: external}
+    - {id: cli, label: 'Clients, banks, CLPC, PMS', kind: external}
     - {id: csh, label: Cashiering}
-    - {id: rem, label: 'Remittance, Recon'}
-    - {id: adj, label: 'Adjustment, Commission'}
-    - {id: ins, label: Insurers, kind: external}
-    - {id: sys, label: 'EBIX, Excel, e-mail', kind: system}
+    - {id: rem, label: Remittance}
+    - {id: dis, label: Disbursement}
+    - {id: sys, label: 'EBIX, QPS, ISYS, Excel, Teams', kind: system}
   steps:
-    - {id: a0, lane: sys, col: 1, text: Booked invoice in EBIX, kind: legacy}
-    - {id: a1, lane: cli, col: 1, text: 'Pays: counter, bank, PDC', kind: external}
-    - {id: a2, lane: csh, col: 2, text: Receipt issued by hand, pain: [1]}
-    - {id: a3, lane: rem, col: 2, text: Remittance extracted by hand, pain: [2]}
-    - {id: a4, lane: ins, col: 3, text: Production report by e-mail, kind: external}
-    - {id: a5, lane: rem, col: 3, text: Report matched in a spreadsheet, pain: [3]}
-    - {id: a6, lane: adj, col: 4, text: Endorsement computed by hand, pain: [4]}
-    - {id: a7, lane: adj, col: 5, text: 'DP commission gathered, billed by hand', pain: [6]}
-    - {id: a8, lane: ins, col: 5, text: Pays commission, kind: external}
-    - {id: a9, lane: sys, col: 6, text: Reports requested from IT, kind: legacy, pain: [5]}
+    - {id: a1, lane: cli, col: 1, text: 'Pays: bills payment, OTC, CLPC, Trade, direct credit', kind: external}
+    - {id: a2, lane: csh, col: 1, text: Payment files and cash received}
+    - {id: a3, lane: csh, col: 2, text: '4-day hold, bounced-check and exclusion lists checked', pain: [1]}
+    - {id: a4, lane: sys, col: 2, text: 'In QPS with an EBIX reference?', kind: legacy, pain: [2]}
+    - {id: a5, lane: csh, col: 3, text: 'Zero PR tagged; exact / excess pay files in Excel', pain: [3]}
+    - {id: a6, lane: sys, col: 4, text: 'Upload or Autopay; DP-tagged pay gets no entry', kind: legacy, pain: [5]}
+    - {id: a7, lane: csh, col: 4, text: 'AR / OR by hand; unapplied report', pain: [4]}
+    - {id: a8, lane: sys, col: 5, text: 'Weekly EBIX extract, Mon-Fri applied', kind: legacy}
+    - {id: a9, lane: rem, col: 5, text: 'DPPR, KO, invalid accounts removed in Excel', pain: [6]}
+    - {id: a10, lane: rem, col: 6, text: 'Settlement list approved on Teams; signed copy', pain: [7]}
+    - {id: a11, lane: dis, col: 7, text: Disbursement posts and pays the insurer}
   edges:
-    - [a1, a2]
-    - [a0, a2, dashed]
+    - [a1, a2, dashed, files]
     - [a2, a3]
-    - [a3, a5]
-    - [a4, a5, dashed, e-mail]
+    - [a3, a4]
+    - [a4, a5]
     - [a5, a6]
     - [a6, a7]
-    - [a7, a8, dashed]
+    - [a7, a8, dashed, weekly]
     - [a8, a9]
+    - [a9, a10]
+    - [a10, a11, dashed, list]
+asis_extra:
+  - caption: 'Commission receivables (direct payment), Adjustment and policy-fee invoicing today (Operations process flow; Day 1 p.22-23, 25; EN-01)'
+    notes: >-
+      When a client pays the insurer directly, BDOI's commission is still due. Each unit lists these direct-payment
+      (DP) transactions in a shared folder; the CRU consolidates the lists in Excel, removes duplicates and validates
+      them against production reports and commission trackers, bills each insurer by e-mail and follows up by e-mail,
+      phone and messaging. When the insurer pays, the CRU asks Cashiering for the OR, sends it to the insurer and
+      prepares the DP reversal by hand. Endorsements and cancellations start with an e-mail from Marketing; Operations
+      checks the documents, keys the request in the EBIX endorsement module and the TL or TH checks and posts each one
+      individually; the entries flow to Comptrollership. Policy-fee (service) invoices are keyed in the EBIX report
+      menu from the schedule of the requestor. Reports are requested from IT.
+    cols: 7
+    lanes:
+      - {id: mkt, label: 'Marketing, business units'}
+      - {id: cru, label: 'CRU, Collections'}
+      - {id: ins, label: Insurers, kind: external}
+      - {id: ops, label: 'Adjustment TL / TH'}
+      - {id: csh, label: 'Cashiering, Comptrollership'}
+      - {id: sys, label: 'EBIX, Excel, shared folder', kind: system}
+    steps:
+      - {id: c1, lane: mkt, col: 1, text: DP lists per unit in a shared folder, pain: [8]}
+      - {id: c2, lane: cru, col: 2, text: 'Consolidated and validated in Excel', pain: [8]}
+      - {id: c3, lane: ins, col: 3, text: 'Billed by e-mail; follow-up by phone, chat', kind: external}
+      - {id: c4, lane: cru, col: 4, text: 'Paid: OR requested, tracker updated'}
+      - {id: c5, lane: csh, col: 4, text: OR issued and sent to insurer}
+      - {id: c6, lane: sys, col: 5, text: DP reversal prepared by hand, kind: legacy}
+      - {id: c7, lane: mkt, col: 5, text: 'Endorsement / cancellation by e-mail', pain: [11]}
+      - {id: c8, lane: ops, col: 6, text: 'Checked; keyed in EBIX endorsement module', pain: [11]}
+      - {id: c9, lane: ops, col: 7, text: 'Checker-poster; posted one by one'}
+      - {id: c10, lane: csh, col: 7, text: Entries flow to Comptrollership}
+      - {id: c11, lane: sys, col: 7, text: 'Policy-fee invoice keyed; reports from IT', kind: legacy, pain: [12]}
+    edges:
+      - [c1, c2]
+      - [c2, c3, dashed, e-mail]
+      - [c3, c4, dashed]
+      - [c4, c5]
+      - [c4, c6]
+      - [c7, c8, dashed, e-mail]
+      - [c8, c9]
+      - [c9, c10]
+  - caption: 'Production reconciliation and DPPR / PR2307 reversal today (Operations process flow; Day 1 p.24)'
+    notes: >-
+      In the first week of each month IT extracts the accounts booked in the previous month. Operations filters the
+      file per insurer, protects it with a password and e-mails it. The insurer marks matched accounts and
+      discrepancies and adds a file of accounts it has but BDOI has not booked; the handler classifies 20-30 thousand
+      lines per insurer as matched, matched with discrepancies or unbooked, sends the unbooked and discrepancy files to
+      Marketing and Processing and keeps a ManCom masterlist in Excel. For the DPPR / PR2307 reversal the CRU uploads
+      a reversal list to SharePoint and notifies IT on Teams; IT extracts the reversal and knock-off file; Cashiering
+      matches it by invoice number with a VLOOKUP and a variance of 0.01 to 0.99, posts the EBIX sub-ledger reversal
+      and the commission knock-off, copies the journal register to Excel and creates a zero-value remittance workfile
+      for Disbursement.
+    cols: 7
+    lanes:
+      - {id: it, label: IT}
+      - {id: ops, label: 'Recon handler, Cashiering'}
+      - {id: cru, label: CRU}
+      - {id: ins, label: Insurers, kind: external}
+      - {id: mp, label: 'Marketing, Processing'}
+      - {id: sys, label: 'EBIX, Excel, SharePoint, Teams', kind: system}
+    steps:
+      - {id: d1, lane: it, col: 1, text: 'Monthly extract of prior-month bookings', pain: [9]}
+      - {id: d2, lane: ops, col: 2, text: 'Filtered per insurer; password; e-mail', pain: [9]}
+      - {id: d3, lane: ins, col: 3, text: 'Marks matched, discrepancy; adds unbooked', kind: external}
+      - {id: d4, lane: ops, col: 4, text: 'Classifies 20-30K lines per insurer', pain: [9]}
+      - {id: d5, lane: mp, col: 5, text: 'Books unbooked; ManCom list in Excel'}
+      - {id: d6, lane: cru, col: 3, text: 'Reversal list to SharePoint; Teams notice', pain: [10]}
+      - {id: d7, lane: it, col: 4, text: Extracts the reversal / KO file}
+      - {id: d8, lane: ops, col: 6, text: 'VLOOKUP by invoice; variance 0.01-0.99', pain: [10]}
+      - {id: d9, lane: sys, col: 6, text: 'EBIX SL reversal and commission knock-off', kind: legacy}
+      - {id: d10, lane: ops, col: 7, text: Zero-value remittance workfile, pain: [10]}
+      - {id: d11, lane: sys, col: 7, text: Journal register copied to Excel, kind: legacy}
+    edges:
+      - [d1, d2]
+      - [d2, d3, dashed, e-mail]
+      - [d3, d4, dashed, e-mail]
+      - [d4, d5, dashed, files]
+      - [d6, d7, dashed, Teams]
+      - [d7, d8, dashed, SharePoint]
+      - [d8, d9]
+      - [d9, d10]
+      - [d9, d11]
+variants:
+  title: seven sub-processes at a glance
+  headers: [Sub-process, 'Trigger and frequency', What happens today, Tools, 'Volume, rule', Owner]
+  widths: [1.8, 1.9, 4.0, 1.7, 1.9, 1.5]
+  per_page: 7
+  rows:
+    - [Cashiering, 'Daily payment files; counter', 'Checks, split files, upload or Autopay, receipts, unapplied report', 'EBIX, QPS, ISYS, Excel', '~2,000 rows a file; 4-day hold; 0.99 threshold', Cashiering TL / TH]
+    - [Remittance, 'Weekly (Monday to Friday)', 'Extract applied payments, sanitise, settlement list, approval, hand-off', 'EBIX, Excel, Teams', 'Per insurer; signed copy for audit', Remittance TL / TH]
+    - ['Adjustment, cancellation', Marketing e-mail, 'Validate documents, key in EBIX endorsement module, checker-poster', 'EBIX, e-mail', 'Posted one by one; refund with tax', Adjustment TL / TH]
+    - ['Commission receivables (DP)', 'Monthly DP lists', 'Consolidate, validate, bill per insurer, follow up, OR, DP reversal', 'Excel, e-mail, phone', 'Full premium first; no partial for direct', CRU]
+    - [Production reconciliation, 'Monthly, first week', 'IT extract, per-insurer files, insurer feedback, classification, unbooked follow-up', 'Excel, e-mail', '20-30K lines per insurer', Recon handler]
+    - ['DPPR / PR2307 reversal', 'On CRU list', 'SharePoint list, IT extract, VLOOKUP, SL reversal, knock-off, zero workfile', 'EBIX, SharePoint, Teams', 'Variance 0.01-0.99', 'CRU, Cashiering']
+    - [Policy-fee invoicing, Requestor schedule, 'Key client, risk code, date, amount, branch, allocation; preview; send', EBIX report menu, 'Status must read Invoiced', Operations]
+  notes: >-
+    The seven sub-processes BDOI showed on 23-Sep (Day 1 overview p.20-25 and the Operations process flow). BRD-2
+    covers all seven; the volumes, frequencies and tolerances in the fifth column come from the floor walk, not the
+    BRD.
 pains:
-  - {n: 1, title: Manual receipts, text: 'Payment details are not visible and payment application is fragmented.', ref: 'BRD-2 p.11, item 1; CSHID.001-027'}
-  - {n: 2, title: Remittance extracted by hand, text: 'No batch tracking and no check of what is not for remittance.', ref: 'BRD-2 p.11, item 2; RMTID.001-023'}
-  - {n: 3, title: Insurer reports matched by hand, text: 'Booked accounts are matched manually; unmatched items are checked one by one.', ref: 'BRD-2 p.11, item 3; PRCID.001-039'}
-  - {n: 4, title: Endorsements computed by hand, text: 'Redundant steps, manual computation and limited traceability.', ref: 'BRD-2 p.11, item 4; ADJID.001-028'}
-  - {n: 5, title: Reports depend on IT, text: 'Timely, correct and complete reports need the IT Group.', ref: 'BRD-2 p.11, item 5'}
-  - {n: 6, title: Commission receivables billed by hand, text: 'Direct-payment data are gathered, sanitised and billed to insurers manually.', ref: 'BRD-2 p.11, item 6; CMRID.001-015'}
+  - {n: 1, title: Intake checks by hand, text: '4-day check hold, bounced-check list and exclusion list are checked before each payment is applied.', ref: 'Operations flow (Cashiering); Day 1 p.20'}
+  - {n: 2, title: Three references per transaction, text: 'ISYS invoice no., QPS reference, EBIX reference and payment reference; tracing is slow.', ref: 'OV-03, CA-01'}
+  - {n: 3, title: Payment files split in Excel, text: 'Zero-PR tagging and exact, excess and actual-payment files are built by hand.', ref: 'Operations flow (Cashiering)'}
+  - {n: 4, title: Manual receipts and unapplied, text: 'AR and OR are prepared by hand; unapplied items are followed offline.', ref: 'CA-01, CA-04; BRD-2 p.11'}
+  - {n: 5, title: Direct-pay money without entries, text: 'A client payment on a DP-tagged policy creates no premium entry.', ref: CA-03}
+  - {n: 6, title: Remittance sanitised by hand, text: 'Weekly EBIX extract cleaned of reversals, knock-offs and invalid accounts in Excel.', ref: 'Day 1 p.21; BRD-2 p.11'}
+  - {n: 7, title: 'Approval on Teams, signed paper copy', text: 'The settlement list is approved on an MS Teams list; a signed copy is kept for audit.', ref: 'Day 1 p.21'}
+  - {n: 8, title: DP commission billed from Excel, text: 'Unit lists consolidated by hand, billed by e-mail, chased by phone and chat.', ref: 'Day 1 p.23; BRD-2 p.11'}
+  - {n: 9, title: Insurer reconciliation in Excel, text: '20-30K lines per insurer a month, password e-mails, manual classification.', ref: 'Day 1 p.24; BRD-2 p.11'}
+  - {n: 10, title: Reversals through IT and VLOOKUP, text: 'SharePoint and Teams hand-offs, IT extract, manual SL journals, zero-value workfile.', ref: 'Day 1 p.24; TX-02'}
+  - {n: 11, title: Endorsements by e-mail and keyed, text: 'Requests arrive by e-mail; premium is computed outside; posting one by one.', ref: 'EN-01; BRD-2 p.11'}
+  - {n: 12, title: 'Invoices keyed, reports from IT', text: 'Policy-fee invoices keyed in a report menu; reports need IT.', ref: 'Day 1 p.25; RP-01; BRD-2 p.11'}
 tobe:
   caption: 'Life of a booked invoice in BIBS: Cashiering, Remittance, Reconciliation, Adjustment, Commission (FRS BRD-2 section 2.2)'
   notes: >-
@@ -129,23 +264,75 @@ tobe:
     - [b10, b11]
     - [b11, b12]
 after:
-  - {n: 1, bibs: 'AR and OR from controlled series; payment matched at acceptance and applied by component', measure: 'Unapplied money kept in a workbench'}
-  - {n: 2, bibs: 'Scheduled and manual extraction with eligibility checks; batches with approval, DV and insurer OR', measure: 'Batch reference per remittance'}
-  - {n: 3, bibs: 'Register sent to the insurer; feedback uploaded and matched; differences followed to closure', measure: 'Tolerance 1.00'}
-  - {n: 4, bibs: 'Endorsement requests recomputed per insurer, approved, posted in batches, linked to the original', measure: 'Four-eyes approval'}
-  - {n: 5, bibs: 'Users run the reports themselves, with view and export rights', measure: 'Response < 5 s (annex)'}
-  - {n: 6, bibs: 'DP lists validated and billed per insurer; answers tracked; commission collected with an OR', measure: '10 working days SLA'}
-gaps:
-  - {sev: High, gap: Early-remittance incentive in two places, impact: Incentive income computed twice or on the wrong lines, owner: Operations, decision: 'One programme? Lines, rates and start of the window', ref: DCR-013}
-  - {sev: High, gap: Three minimal-balance rules, impact: Small balances post to different GL accounts, owner: 'Operations, Comptrollership', decision: 'One rule at 10.00; GL accounts; who approves write-off', ref: DCR-014}
-  - {sev: High, gap: Paid AR above the DTIP balance, impact: Remittance capped or withheld, owner: Operations, decision: 'Remit the DTIP balance or exclude the account', ref: DCR-015}
-  - {sev: High, gap: CWT 2307 cash payments without entries, impact: GL entries for CWT unclear, owner: Comptrollership, decision: 'Give the entries and when Dr DTIP / Cr PR2307 posts', ref: DCR-028}
-  - {sev: High, gap: CLPC payments and endorsements also in BRD-1, impact: Two payment intakes and two endorsement paths, owner: 'Operations and NB', decision: Confirm Cashiering and Adjustment as owners, ref: DCR-027}
-  - {sev: Parked, gap: 'Insurer report pick-up; Collection and Disbursement links', impact: 'Uploads and in-app queue until BRD-4 / BRD-5 are built', owner: 'Insurers, BDO IT', decision: 'Mailbox or SFTP channel per insurer', ref: 'OQ29, OQ01, OQ02'}
+  - {n: 1, bibs: 'Clearing period and bounced-check status checked by the system at acceptance; holds carry a reason', measure: 'Checks at entry'}
+  - {n: 2, bibs: 'The booked invoice carries one ARN and invoice number; legacy references kept for search', measure: 'One number to trace'}
+  - {n: 3, bibs: 'Payment matched to the invoice and applied by component; excess goes to unapplied automatically', measure: 'No split files'}
+  - {n: 4, bibs: 'AR and OR from controlled series per branch; unapplied workbench with disposition and approval', measure: 'Receipts generated'}
+  - {n: 5, bibs: 'DP tag set at quotation and reversed on confirmed collection (MKTID.011-012); a payment on a DP invoice needs a rule (see gaps)', measure: 'Partly answered'}
+  - {n: 6, bibs: 'Scheduled extraction of paid, cleared and eligible premium into batches per insurer', measure: 'No manual extract'}
+  - {n: 7, bibs: 'Batch approval in the workflow by a TL / TH who is not the maker; audit trail kept', measure: 'Four eyes, no paper'}
+  - {n: 8, bibs: 'DP lists uploaded, validated, billed per insurer with a 10-working-day SLA; OR on collection', measure: 'Tracked to closure'}
+  - {n: 9, bibs: 'Register sent to the insurer; feedback uploaded and matched within tolerance; unbooked followed', measure: 'Matching automated'}
+  - {n: 10, bibs: 'PR2307 tagging and reversal entries generated from the invoice (CSHID.026-027)', measure: 'No IT extract'}
+  - {n: 11, bibs: 'Endorsement request in the system, premium recomputed per insurer, approved, posted in batches', measure: 'Computed, not keyed'}
+  - {n: 12, bibs: 'Service invoice from the Other Income screen; users run reports and exports themselves', measure: 'Self-service'}
+missed:
+  - {cov: NOT_IN_BRD, item: Payment on a direct-pay invoice, seen: 'The client still pays BDOI; no entry is created (CA-03).', brd: 'DP tag at quotation (MKTID.011); no rule for cash received on a DP invoice.', rec: 'Alert at acceptance, park in unapplied with a DP flag, re-tag with approval, define the entries. Raise a High DCR.', ref: 'CA-03'}
+  - {cov: NOT_IN_BRD, item: Exclusion and bounced-check lists, seen: 'Checked by hand at intake; tagged "Processed: Exclusion - reason".', brd: 'Bounced check is a cancel reason only (CSHID.003); exclusion applies to remittance.', rec: 'Maintained lists with reason codes, checked at acceptance; payor flag "cash only".', ref: 'Day 1 p.20'}
+  - {cov: PARTLY, item: Check hold, seen: '4 days at Cashiering before application.', brd: '3 banking days at remittance (RMTID.017).', rec: 'One clearing rule per instrument, configurable; confirm where it applies.', ref: 'OQ20; RMTID.017'}
+  - {cov: PARTLY, item: Tolerances and threshold account, seen: '0.99 threshold account; 0.01-0.99 reversal variance.', brd: 'Three other values: 10.00, 1.00, 10-100 (DCR-014).', rec: 'One tolerance matrix by component, band and approver, with its GL account.', ref: 'CA-02; DCR-014; OQ11'}
+  - {cov: NOT_IN_BRD, item: Volumes, seen: '20-30K lines per insurer a month; ~2,000-row payment files.', brd: 'Operations NFR volumes are blank.', rec: 'Add volume NFRs and test them in the performance test.', ref: 'CA-05; DCR-025'}
+  - {cov: PARTLY, item: Commission recognition, seen: 'Only after full premium; co-insurance per insurer; no partial for direct.', brd: 'Realised on application (CSHID.014); rule for regular commission open.', rec: 'State the rule per case; align with PFRS 15 (see best practice).', ref: 'CM-01, CM-02; OQ07'}
+  - {cov: PARTLY, item: Early-remittance incentive, seen: 'Only on premium sold within credit terms; rates per insurer.', brd: 'Two definitions (RMTID.023, PRCID.028); no credit-term condition.', rec: 'One incentive programme per insurer with its condition and rate table.', ref: 'IC-01, IC-02; DCR-013'}
+  - {cov: PARTLY, item: Remittance approval, seen: 'Teams list and signed copy.', brd: 'Workflow approval; approver not named.', rec: 'Name the approver per insurer or amount; the e-approval replaces the paper copy.', ref: 'OQ21; CP-01'}
+  - {cov: PARTLY, item: Knock-off entries, seen: 'Dr Commission Receivable / Cr Insurer; zero-value workfile to Disbursement.', brd: 'Reversal entries partly given; knock-off not stated.', rec: 'Define the entries; netting removes the zero cheque.', ref: 'OQ07; DCR-028'}
+  - {cov: PARTLY, item: Policy-fee invoice, seen: 'Allocation by branch and department (100%); amounts from a requestor schedule.', brd: 'Manual service invoice (CORE-08.22); split allocation not stated.', rec: 'Allow split allocation and a schedule upload.', ref: 'Day 1 p.25'}
+  - {cov: CONFIRM, item: Excess commission, seen: 'Motor and Fire computed differently, in the incentive module.', brd: 'CPC2 package incentive (Add.2 p.8-9).', rec: 'Confirm that excess commission is CPC2 and give rate and base.', ref: 'CM-03; DCR-037'}
+  - {cov: CONFIRM, item: One lifecycle reference, seen: 'Three system references per transaction.', brd: 'ARN and invoice ledger; legacy references kept.', rec: 'Confirm one reference from quotation to remittance, printed on every document.', ref: 'OV-03; AQ29'}
 best:
-  - {practice: Automated bank and insurer reconciliation, status: BIBS, bibs: 'Bank files uploaded and matched; insurer feedback matched within 1.00; duplicate files refused.', bdoi: 'Give the bank file layouts and an OR tolerance (OQ03, OQ22).'}
-  - {practice: Premium remittance discipline, status: BIBS, bibs: 'Only paid, cleared (3 banking days) and eligible premium is batched; holds need a reason.', bdoi: 'Agree a remittance calendar per insurer and the DTIP rule (DCR-015).'}
-  - {practice: Maker-checker and segregation of duties, status: BIBS, bibs: 'Batch approval, receipt cancellation and endorsements need a TL / TH who is not the maker.', bdoi: 'Set approver limits per team.'}
-  - {practice: Unapplied cash under ageing control, status: PARTLY, bibs: 'Unapplied workbench with disposition, approval and reversal.', bdoi: 'One small-balance rule and write-off authority (DCR-014).'}
-  - {practice: Commission receivable follow-up, status: PARTLY, bibs: 'DP billing per insurer with a 10-working-day SLA; incentive scheme engine built.', bdoi: 'Give incentive targets and amounts so the schemes can go live (OQ39).'}
-  - {practice: Controlled receipt series, status: BIBS, bibs: 'AR and OR numbered from controlled series per branch; cancellations approved.', bdoi: 'Confirm OR per batch or per payment for BIR purposes (OQ49).'}
+  - {practice: Unique payment reference, status: PARTLY, lever: Auto cash application, what: 'A check-digit reference or virtual account per client or invoice, printed on invoices and SOAs and carried in bank files.', rec: 'Generate it at booking and ask the bank channels to carry it (OBPCS, direct credit).'}
+  - {practice: Automated cash application, status: PARTLY, lever: Fewer manual matches, what: 'Rule and fuzzy matching (payor name, amount tolerance, many-to-one) with confidence scores; the system learns from manual matches.', rec: 'Extend exact matching with scored suggestions on the unapplied workbench.'}
+  - {practice: Bank host-to-host collections, status: BEYOND, lever: Same-day cash visibility, what: 'Collections through bank APIs, InstaPay / PESONet and QR Ph with intraday notices instead of text files run by IT.', rec: 'Plan with BDO IT after go-live (CMS / BOB, OBPCS).'}
+  - {practice: Premium trust account discipline, status: PARTLY, lever: Control, what: 'Premium held in trust for insurers is reconciled daily: bank, unapplied plus amounts due to insurers, and the sub-ledger.', rec: 'Add a daily three-way reconciliation report; confirm the Insurance Commission rules with Compliance.'}
+  - {practice: One tolerance and write-off matrix, status: PARTLY, lever: Consistency, what: 'Tolerances by component, amount band and approver in one table, each with its GL account.', rec: 'Replace the four values seen today (DCR-014).'}
+  - {practice: Remittance calendar per insurer, status: PARTLY, lever: Incentive capture, what: 'Remittance dates per insurer, an automatic remittance advice and the insurer OR returned electronically.', rec: 'Use the calendar to meet the early-remittance window and earn the incentive.'}
+  - {practice: Insurer statement reconciliation, status: PARTLY, lever: Fewer disputes, what: 'Insurer statements of account and commission statements matched automatically, differences routed to owners.', rec: 'Extend production matching to commission statements.'}
+  - {practice: Commission recognition under PFRS 15, status: CONFIRM, lever: Accurate income, what: 'Commission recognised when the placement is done, with a provision for cancellations; collection tracked separately.', rec: 'Agree the policy with Comptrollership and the auditors.'}
+  - {practice: Incentive accruals, status: PARTLY, lever: Income visibility, what: 'Contingent and incentive commission estimated and accrued monthly, trued up when the insurer pays.', rec: 'Add a monthly accrual to the incentive schemes.'}
+
+# Floor-walk edition (reverse KT v3.0): overrides for build_floorwalk_deck.py; floor walk and BDOI flows only.
+fw:
+  num: 6
+  variants_note: 'The seven sub-processes BDOI showed on 23-Sep (Day 1 overview p.20-25 and the Operations process flow); volumes, frequencies and tolerances as heard on the floor.'
+  roles:
+    - 'Cashiers at head office and branches; Cashiering TL / TH'
+    - 'Remittance Processor and TL / TH'
+    - 'Adjustment / Collateral Release Processor and TL / TH (checker-poster)'
+    - 'Production Reconciliation Handler; CRU (Commission Receivable Unit)'
+    - 'IT (monthly extracts, reversal files, Autopay)'
+    - 'Marketing, Comptrollership, Disbursement (hand-offs)'
+  sources:
+    - 'Operations process flow (Cashiering, Remittance, Adjustment, Commission receivables, Production recon, DPPR / PR2307 reversal, Invoicing)'
+    - 'BDOI Day 1 overview p.20-25'
+    - 'Floor-walk notes CA-01 to CA-05, CM-01 to CM-03, IC-01, IC-02, EN-01, EN-02, OV-03'
+  notes:
+    glance: >-
+      Operations takes over every booked invoice and follows its money until the insurer is paid and every difference
+      is closed. BDOI collects premium for about 55 insurers and remits it net of commission. Seven sub-processes run
+      side by side. The floor walk gave the volumes: 20-30 thousand production lines per insurer a month and bulk
+      payment files of about 2,000 records.
+    pains: 'Points 1 to 7 are on the Cashiering and Remittance swimlane, 8, 11 and 12 on the Commission and Adjustment swimlane, 9 and 10 on the Reconciliation and Reversal swimlane.'
+    wants: 'For each pain point: what the business users asked for, and the lever we suggest.'
+  wants:
+    - {n: 1, bibs: 'Clearing period, bounced checks and exclusions checked automatically at acceptance', measure: 'Checks at entry'}
+    - {n: 2, bibs: 'One reference across the lifecycle (OV-03, to confirm)', measure: 'One reference'}
+    - {n: 3, bibs: 'Payments matched and applied without split files', measure: 'Auto application'}
+    - {n: 4, bibs: 'AR and OR generated by the system (CA-01, CA-04)', measure: 'System receipts'}
+    - {n: 5, bibs: 'A rule for payments on direct-pay policies, e.g. allow the tag to change (CA-03)', measure: 'To decide'}
+    - {n: 6, bibs: 'Weekly remittance extract ready, already cleaned of reversals and invalid accounts', measure: 'Scheduled batches'}
+    - {n: 7, bibs: 'Approval in the workflow with an audit trail instead of a Teams list and paper', measure: 'E-approval'}
+    - {n: 8, bibs: 'DP billing per insurer tracked to collection', measure: 'Worklist'}
+    - {n: 9, bibs: 'Insurer feedback matched automatically; unbooked items followed', measure: 'Auto matching'}
+    - {n: 10, bibs: 'Reversals and knock-offs without IT extracts or VLOOKUP', measure: 'Entries at source'}
+    - {n: 11, bibs: 'Endorsement computes the premium like New Business (EN-01)', measure: 'Rated endorsement'}
+    - {n: 12, bibs: 'Other income registered through invoicing; users run their own reports (OI-01, RP-01)', measure: 'Self-service'}

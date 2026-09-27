@@ -1,42 +1,52 @@
-# BRD-9 Customer Servicing Facility: chapter 9 of the business process deck.
-# Sources: "Customer Servicing Facility.PDF" p.3-5 (current and envisioned), p.13-14 (NFR), e-mail clarification p.17;
-# FRS BRD-9 sections 2, 5, 9; cross-BRD questions XQ02, XQ04, XQ05; discrepancy register (DCR-098, 100-104, 143).
+# Customer Servicing Facility and case management (BRD-9): chapter 11 of the business process reverse KT deck
+# (Part E, Claims and Customer Service). Sources: high-level Customer Servicing Facility process flow; BDOI "Case
+# Management To-Be process flow" of 15-Jul-2026; New Business and Renewal flows (contact centre sends e-policies after
+# a fall-out); BRD-9 p.3-5, p.13-17; discrepancy register (DCR-104, 163, 202); cross-BRD question XQ02.
 id: brd09
 key: csf
-num: 9
-title: Customer Servicing Facility
+num: 11
+title: Customer Servicing and Case Management
 short: Customer Servicing
 brd: BRD-9
-scope: 'Contact centre search, servicing view, contact updates, document resends'
-status: DESIGNED
-status_text: Designed, not yet built; FRS v1.0 issued for review
+scope: 'Contact centre search and servicing view, contact updates, document resends, case logging and referral'
 department: Contact Center Management / Alternative Distribution
 roles:
-  - BDO Insure Contact Center Agent
-  - Contact Center Supervisor; BDO Contact Center personnel
-  - Contact Center Management, leads and heads
-  - System Administrator
-  - Callers (clients) and the fulfilment units
+  - BDO Insure contact centre agent (CSR)
+  - 'Contact centre supervisor; BDO contact centre (BDO CCC) personnel'
+  - 'Fulfilment units: the Marketing unit that manages the account'
+  - Contact centre management, leads and heads; System Administrator
+  - Callers (clients)
 figures:
-  - ['144,400', 'access, retrieval and search transactions a year (p.13-14)']
+  - ['144,400', 'access, retrieval and search transactions a year (BRD-9 p.13-14)']
   - ['24', 'concurrent agents, supervisors and personnel']
+  - ['2', 'contact centres involved: BDO Insure and BDO CCC (XQ02)']
   - ['< 3 s', 'retrieval, update and search; 5 s documents']
-  - ['06-22', 'use 06:00-22:00; availability 99.9%']
+session:
+  when: 'Process flows walked with the contact centre owners; not a September floor-walk slot'
+  pocs: 'Contact Center Management (BDO Insure)'
 sources:
-  - BRD-9 p.3-5 (current and envisioned); e-mail clarification p.17
-  - BRCSF-001-011
-  - FRS BRD-9 v1.0, sections 2 and 5
-chevrons: [Sign in, Search, Servicing view, Verify caller, Update contact, Resend, Documents, Audit]
+  - 'High-level Customer Servicing Facility process flow'
+  - 'BDOI Case Management To-Be process flow, 15-Jul-2026'
+  - 'BRD-9 p.3-5; e-mail clarification p.17; BRCSF-001-011'
+chevrons: [Contact, Identify, Search, View, Verify, Update, Resend or refer, Close]
 notes:
   glance: >-
-    The BDO-Insure Front-End System was built by BDO IT for the contact centre agents. It shows full account details
-    only for CBG accounts, lets agents update contact details only, has servers at end of life and no role-based access
-    control (BRD-9 p.4). In BIBS the CSF reads the BIBS modules through their query services and stores only its own
-    records. It has no approval workflow: every action is immediate and logged. It is designed. Note: the printed e-mail
-    in the pack carries meeting credentials; circulate a redacted copy (DCR-098).
-  pains: The six points are the current-process rows of FRS BRD-9 section 2.1, from the BRD (p.3-5, p.17).
-  after: The usage table gives the volumes and response times (p.13-14).
-  gaps: The write-back to QPS and EBIX (DCR-104) decides how long two systems of record coexist.
+    The BDO Insure contact centre answers clients by phone, e-mail and digital channels. Agents search the client's
+    accounts, answer inquiries, update contact details and resend documents; concerns they cannot close go to the
+    fulfilment unit that manages the account. Today the facility shows full details for CBG accounts only, and every
+    contact is logged by hand in a separate case tool. BDOI has already drawn its own case-management To-Be (15-Jul-2026),
+    which goes further than BRD-9.
+  heard: 'Steps of the Customer Servicing flow and of BDOI''s case-management To-Be flow.'
+  pains: 'The six points of the BRD-9 current process (p.3-5).'
+  after: 'The benefit column names what the To-Be removes.'
+  missed: 'Case management is the main gap: BRD-9 puts it out of scope while the umbrella BRD and BDOI''s own To-Be want it.'
+heard:
+  - {ref: 'CSF flow', kind: asis, topic: Search, asis: 'Account inquiry by invoice number, PN number, last, first or full name (CBG); client inquiry by name for Non-CBG; open the account from the invoice or client code; view contact and insurance details.'}
+  - {ref: 'CSF flow', kind: pain, topic: Contact update, asis: 'When contact details change, the agent updates them and the system migration updates the source databases (QPS, EBIX).'}
+  - {ref: 'Case To-Be', kind: want, topic: Case logging, asis: 'Agent identifies the client and the concern; logs every concern in CLS by typing it in; general inquiries answered from CC Nav and closed.', want: 'Client details filled in automatically in the case form.'}
+  - {ref: 'Case To-Be', kind: want, topic: Positive identification, asis: 'Positive identification (PID) of the client before any account transaction; failed PID closes the case.', want: 'PID as a step of the case.'}
+  - {ref: 'Case To-Be', kind: want, topic: Referral and TAT, asis: 'Concerns not solved at the first contact are referred to the fulfilment unit by e-mail and a CLS prompt.', want: 'Cases routed automatically to the Marketing unit of the account; open cases within or past TAT visible; invalid returns re-logged by BDO CCC.'}
+  - {ref: 'NB and RN flows', kind: pain, topic: E-policy after fall-out, asis: 'After an SFTP fall-out Marketing fixes the e-policy and the BDOI contact centre sends it to the client.'}
 asis:
   caption: 'Contact centre servicing today (BRD-9 p.4)'
   notes: >-
@@ -117,17 +127,108 @@ after:
   - {n: 4, bibs: 'Update made once in the BIBS client master after verifying the caller; write-back seam for QPS / EBIX', measure: 'Verification before change'}
   - {n: 5, bibs: 'Agent views, downloads and resends the RA and e-policy to the registered e-mail, protected', measure: 'Resend in one call'}
   - {n: 6, bibs: 'Every change and agent action logged; audit trail in PDF or Excel', measure: 'Full audit trail'}
-gaps:
-  - {sev: High, gap: Write-back to QPS and EBIX, impact: Two systems of record while they coexist, owner: 'Contact Center Management, BDO IT', decision: 'Until when are QPS / EBIX kept? Write back or not?', ref: 'DCR-104, CSQ01'}
-  - {sev: High, gap: Agents in the BDO directory, impact: Sign-in of contact centre agents, owner: 'BDO ITIO', decision: 'Are agents in EUA? Local sign-in meanwhile?', ref: 'DCR-143'}
-  - {sev: High, gap: Backup every 15 minutes or 4 hours, impact: Backup and recovery design of the platform, owner: 'BDO IT', decision: 'Is RPO 15 minutes BIBS-wide?', ref: 'DCR-102'}
-  - {sev: Medium, gap: 'Statuses Pending, Awaiting, Booked, Open / Closed', impact: What the agent tells the caller, owner: Contact Center Management, decision: Define each status and its source, ref: 'DCR-101'}
-  - {sev: Medium, gap: Two contact centre roles, impact: 'Renewal follow-up role and CSF roles', owner: 'Contact Center, RMEL', decision: 'Same people? One role or two?', ref: 'XQ02'}
-  - {sev: Medium, gap: Documents agents may see, impact: Confidential claim and renewal documents, owner: 'Contact Center, Compliance', decision: Confidentiality matrix per document type, ref: 'XQ04, XQ05'}
+variants:
+  title: BDOI's case-management To-Be
+  headers: [Step, What happens, Who]
+  widths: [2.2, 7.6, 2.6]
+  per_page: 7
+  rows:
+    - ['1 Contact', 'Customer contacts the BDO Insure contact centre by phone, e-mail, web or digital channel', Customer]
+    - ['2 Identify', 'Agent identifies the client and whether the concern is account-related or a general inquiry', BDO Insure agent]
+    - ['3 General inquiry', 'Answered from CC Nav; concern logged and closed', BDO Insure agent]
+    - ['4 PID', 'Existing client: positive identification; failed PID ends the transaction and the case is logged and closed', BDO Insure agent]
+    - ['5 First-contact fix', 'Solved at the point of contact: request fulfilled; case logged with client details filled in automatically; closed', BDO Insure agent]
+    - ['6 Referral', 'Not solvable at first contact: case routed automatically to the Marketing unit of the account; unit notified', 'Agent, system']
+    - ['7 Resolve or return', 'Fulfilment unit filters open cases within or past TAT, resolves and closes, or returns an erroneous case; BDO CCC re-logs valid returns', 'Fulfilment unit, BDO CCC']
+  notes: BDOI's case-management To-Be flow of 15-Jul-2026. It is BDOI's own design, beyond BRD-9, and should be taken into the BRD.
+missed:
+  - {cov: NOT_IN_BRD, item: Case management, seen: 'Every contact logged by hand in CLS; BDOI''s To-Be wants cases in the system.', brd: 'Case logging out of BRD-9 (CSF-EM10); umbrella BRD wants it.', rec: 'Bring BDOI''s 15-Jul To-Be into scope as a change request.', ref: 'DCR-163; CRQ04'}
+  - {cov: PARTLY, item: Positive identification, seen: 'PID before any account transaction.', brd: 'Caller verification topic only.', rec: 'PID questions and result recorded on the case.', ref: CSQ03}
+  - {cov: NOT_IN_BRD, item: Referral routing and TAT, seen: 'Referral by e-mail; no TAT view.', brd: 'Not specified.', rec: 'Auto-route to the account''s unit; TAT per case type; return loop.', ref: 'Case To-Be'}
+  - {cov: PARTLY, item: Write-back to legacy, seen: 'Contact updates written to QPS and EBIX.', brd: 'Write-back seam; open.', rec: 'No write-back after go-live; one client master.', ref: 'DCR-104, 202'}
+  - {cov: PARTLY, item: E-policy after a fall-out, seen: 'Contact centre sends e-policies Marketing fixed.', brd: 'Resend on request only.', rec: 'One e-policy sender with an exception queue (chapter 1).', ref: 'NB flow'}
+  - {cov: CONFIRM, item: Two contact centres, seen: 'BDO Insure and BDO CCC both handle cases.', brd: 'Roles open.', rec: 'Confirm who logs, who resolves, who re-logs.', ref: XQ02}
 best:
-  - {practice: Single client view, status: BIBS, bibs: 'All accounts, payments, RAs, e-policies and documents of the client on one screen.', bdoi: 'Retire the Front-End once the data are in BIBS.'}
-  - {practice: Verify the caller before any change, status: BIBS, bibs: 'Verification checklist before a contact update; only contact fields change.', bdoi: 'Approve the verification questions.'}
-  - {practice: Protected delivery of documents, status: BIBS, bibs: 'Resend to the registered e-mail only, password protected, password sent separately.', bdoi: 'Agree the password convention (DCR-153).'}
-  - {practice: Least-privilege roles, status: BIBS, bibs: 'Separate rights to update, resend and upload for agents, supervisors and management.', bdoi: 'Approve the role matrix (DCR-121).'}
-  - {practice: Quality review of agent actions, status: BIBS, bibs: 'Agent activity and contact-change reports for supervisors.', bdoi: 'Set a sampling routine for supervisors.'}
-  - {practice: First-contact resolution KPI, status: ADOPT, bibs: 'Actions logged per contact.', bdoi: 'Track first-contact resolution and repeat calls per reason.'}
+  - {practice: Omnichannel case management, status: NOT_IN_BRD, lever: One view of every concern, what: 'Every call, e-mail and chat is a case with SLA, routing and history on the client record.', rec: 'Adopt BDOI''s 15-Jul To-Be.'}
+  - {practice: Screen-pop and assisted PID, status: PARTLY, lever: Shorter calls, what: 'Caller recognised from the number; PID by OTP or questions from the client record.', rec: 'Add PID to the servicing view.'}
+  - {practice: Self-service, status: BEYOND, lever: Fewer calls, what: 'Clients get RA, e-policy, SOA and payment status online or by chatbot.', rec: 'Phase after go-live; start with document download.'}
+  - {practice: Knowledge base and scripts, status: BEYOND, lever: Consistent answers, what: 'Answers and call scripts per concern type, kept by the contact centre.', rec: 'Move CC Nav content into the case tool.'}
+  - {practice: First-contact resolution metrics, status: BEYOND, lever: Service quality, what: 'First-contact resolution, TAT met and satisfaction per unit.', rec: 'Report from case data.'}
+
+# Floor-walk edition (reverse KT v3.0): overrides for build_floorwalk_deck.py; floor walk and BDOI flows only.
+fw:
+  num: 10
+  variants_place: wants
+  variants_note: 'BDOI''s case-management To-Be flow of 15-Jul-2026: how the business wants the contact centre to work.'
+  figures:
+    - ['2 centres', 'BDO Insure contact centre and BDO CCC handle cases (Case To-Be)']
+    - ['2 paths', 'search: CBG accounts by invoice or PN, non-CBG by name (CSF flow)']
+    - ['7 steps', 'in BDOI''s case-management To-Be of 15-Jul-2026']
+    - ['TAT', 'per referred case, which BDOI wants visible (Case To-Be)']
+  sources:
+    - 'Customer Servicing Facility process flow'
+    - 'BDOI Case Management To-Be process flow, 15-Jul-2026'
+    - 'New Business and Renewal flows (e-policy after a fall-out)'
+  session:
+    when: 'Process flows shared by BDOI; the contact centre was not in the September floor-walk slots'
+    pocs: 'Contact Center Management (BDO Insure)'
+  notes:
+    glance: >-
+      The BDO Insure contact centre answers clients by phone, e-mail and digital channels: searching accounts,
+      answering inquiries, updating contact details, resending documents and referring what it cannot close to the
+      Marketing unit that manages the account. Every contact is logged by hand in CLS. BDOI has drawn its own
+      case-management To-Be (15-Jul-2026), shown after the pain points.
+    pains: 'The seven points are on the Customer Servicing swimlane.'
+    wants: 'For each pain point: what BDOI''s case-management To-Be asks for.'
+  asis:
+    caption: 'Contact-centre servicing today (CSF process flow; Case Management flow; NB flow)'
+    notes: >-
+      The client contacts the BDO Insure contact centre. The agent identifies the client and the concern, searches CBG
+      accounts by invoice number, PN or name and non-CBG accounts by name only, and answers general inquiries from CC
+      Nav. For an account concern the agent checks the client's identity (PID). Contact changes are updated and pushed
+      to the QPS and EBIX databases. Every concern is typed into CLS; concerns that cannot be closed are referred to
+      the fulfilment unit by e-mail and a CLS prompt, without a TAT view, and cases returned as erroneous are re-logged
+      by BDO CCC. After an e-policy fall-out the contact centre also sends the e-policy to the client.
+    cols: 7
+    lanes:
+      - {id: cal, label: Caller (client), kind: external}
+      - {id: agt, label: Contact centre agent}
+      - {id: ful, label: 'Fulfilment unit (Marketing)'}
+      - {id: ccc, label: BDO CCC}
+      - {id: sys, label: 'CC Nav, CLS, Front-End', kind: system}
+    steps:
+      - {id: s1, lane: cal, col: 1, text: 'Calls, e-mails or messages', kind: external}
+      - {id: s2, lane: agt, col: 1, text: Identifies client and concern}
+      - {id: s3, lane: sys, col: 2, text: 'Search: CBG by invoice or PN; others by name', kind: legacy, pain: [1]}
+      - {id: s4, lane: agt, col: 3, text: 'PID; answers from CC Nav', pain: [2]}
+      - {id: s5, lane: sys, col: 3, text: 'Contact update pushed to QPS, EBIX', kind: legacy, pain: [3]}
+      - {id: s6, lane: agt, col: 4, text: Every concern typed into CLS, pain: [4]}
+      - {id: s7, lane: ful, col: 5, text: 'Referral by e-mail; no TAT view', pain: [5]}
+      - {id: s8, lane: ful, col: 6, text: 'Resolves, or returns the case'}
+      - {id: s9, lane: ccc, col: 7, text: Re-logs valid returns, pain: [6]}
+      - {id: s10, lane: agt, col: 7, text: 'Sends e-policies after fall-outs', pain: [7]}
+    edges:
+      - [s1, s2]
+      - [s2, s3]
+      - [s3, s4]
+      - [s4, s5]
+      - [s4, s6]
+      - [s6, s7, dashed, e-mail]
+      - [s7, s8]
+      - [s8, s9, dashed, return]
+  pains:
+    - {n: 1, title: Two search paths, text: 'CBG accounts by invoice or PN; non-CBG accounts by name only.', ref: 'CSF flow'}
+    - {n: 2, title: PID and answers by hand, text: 'Identity checked by questions; answers looked up in CC Nav.', ref: 'Case Management flow'}
+    - {n: 3, title: Updates pushed to legacy, text: 'Contact changes written to the QPS and EBIX databases.', ref: 'CSF flow'}
+    - {n: 4, title: Every concern keyed into CLS, text: 'Agents type every contact into CLS, even resolved ones.', ref: 'Case Management flow'}
+    - {n: 5, title: Referrals by e-mail, text: 'Fulfilment units are told by e-mail; no view of TAT.', ref: 'Case Management flow'}
+    - {n: 6, title: Returned cases re-logged, text: 'Erroneous cases go back and BDO CCC logs them again.', ref: 'Case Management flow'}
+    - {n: 7, title: Contact centre sends fall-outs, text: 'E-policies fixed by Marketing are sent by the contact centre.', ref: 'NB flow'}
+  wants:
+    - {n: 1, bibs: 'One search across every account, CBG and non-CBG', measure: 'One view'}
+    - {n: 2, bibs: 'PID as a step of the case; answers at hand', measure: 'PID step'}
+    - {n: 3, bibs: 'Contact changes made once in one client record', measure: 'One client'}
+    - {n: 4, bibs: 'Case form filled with the client''s details automatically', measure: 'Case management'}
+    - {n: 5, bibs: 'Cases routed automatically to the Marketing unit of the account; TAT visible', measure: 'Routing and TAT'}
+    - {n: 6, bibs: 'Return loop in the case, without re-logging', measure: 'Case history'}
+    - {n: 7, bibs: 'One e-policy sender (see chapter 1)', measure: 'One sender'}

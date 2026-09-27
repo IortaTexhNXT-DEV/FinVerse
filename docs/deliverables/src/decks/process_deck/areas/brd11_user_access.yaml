@@ -1,15 +1,13 @@
-# BRD-11 User Access Maintenance: chapter 11 of the business process deck.
-# Sources: "User Access Maintenance.pdf" p.5 (current and envisioned), p.6 (process diagrams), p.11-18 (NFR);
-# FRS BRD-11 sections 2 (incl. the built baseline), 5, 9; decisions D5, D6, D7; register (DCR-096, 114, 115, 121, 141, 143).
+# User Access Maintenance (BRD-11): chapter 13 of the business process reverse KT deck (Part F, Control and
+# Enablement). Sources: floor-walk observations on who books and sends (New Business process flow), BRD-11 p.5-18;
+# discrepancy register (DCR-096, 121, 143, 229, 230); cross-BRD question XQ02; integration inventory INT-01, INT-02.
 id: brd11
 key: uam
-num: 11
+num: 13
 title: User Access Maintenance
 short: User Access
 brd: BRD-11
-scope: 'User access requests, approvals, group profiles, access reports'
-status: PARTLY BUILT
-status_text: 'Baseline built (users, roles, access requests); BRD-11 changes designed'
+scope: 'User access requests, approvals, group profiles, access reports; sign-in and the access matrix for all modules'
 department: UAM process owner (Product Owner) with BDO ITIO
 roles:
   - Requestor (14 users)
@@ -18,28 +16,34 @@ roles:
   - System Administrator (implements group profiles)
   - Auditor; the affected user
 figures:
-  - ['10', 'access transactions a month on average (p.11)']
-  - ['14', 'requestors, 5 concurrent; 8 approvers']
-  - ['10 s', 'response; reports 20 s (p.11)']
-  - ['3', 'failed sign-ins lock the account (built, D5)']
+  - ['1,344', 'named users across the BRDs; 429 concurrent at most (umbrella BRD)']
+  - ['10', 'access transactions a month on average (BRD-11 p.11)']
+  - ['14 / 8', 'requestors / approvers']
+  - ['3', 'failed sign-ins lock the account (BRD-11)']
+session:
+  when: 'Not walked in Sep-2026; access issues seen in the New Business and Customer Servicing flows'
+  pocs: 'UAM process owner; BDO ITIO'
 sources:
-  - BRD-11 p.5-6 (current, envisioned, two process diagrams)
-  - BRD 1.002-4.003; NFR p.11-18
-  - FRS BRD-11 v1.0, sections 2.3 (baseline) and 5
+  - 'BRD-11 p.5-6 (current, envisioned); NFR p.11-18'
+  - 'New Business process flow (who books); Case Management To-Be (two contact centres)'
+  - 'Integration inventory INT-01 (EIAM), INT-02 (UIDM-ISC)'
 chevrons: [Draft, Submit, Risk check, Decide, Correct, Apply, Group profile, Reports]
 notes:
   glance: >-
-    Today BDOI coordinates every QPS access request with IT, which causes delays (BRD-11 p.5). The BRD asks for a module
-    in which the business unit manages permissions, roles and access levels itself, with self-service requests. Part of
-    it is built: users, roles, permissions, sign-in with lock-out after 3 attempts, the session policy (warning at 15
-    minutes, sign-out at 30), access requests under four eyes and the User Access Matrix. BRD-11 adds drafts, returns,
-    chosen approvers, effective dates, bulk, second approval, group-profile requests and four reports. Directory sign-in
-    (EUA) is a parked port until BDO supplies the interface (decision D6).
-  pains: The five points are the current-process rows of the BRD (p.5).
-  after: The volumes are small (p.11); the value is control and speed, not throughput.
-  gaps: >-
-    The BRD is written for the "QPS User Access Maintenance Module" (DCR-114); the project reads it as BIBS-wide.
-    It has no acceptance criteria (DCR-115); the FRS proposes them for BDOI's concurrence.
+    Today BDOI coordinates every access request with IT, which causes delays (BRD-11 p.5). The BRD asks for a module
+    in which the business manages permissions, roles and access levels itself, with self-service requests, approvals
+    and access reports. The floor walk showed why this matters beyond BRD-11: in New Business, who books depends on who
+    has EBIX access; Combank account support books on behalf of Marketing; two contact centres handle cases; and EB
+    portal users would be BDOI's first external users.
+  heard: 'Access observations from the process flows and the floor walk.'
+  pains: 'The five points of the BRD-11 current process (p.5-6).'
+  after: 'The benefit column names what the To-Be removes.'
+  missed: 'The BIBS-wide access matrix and the enterprise identity decisions shape every module.'
+heard:
+  - {ref: 'NB flow', kind: pain, topic: Who books, asis: 'The Processing Officer or the MAO books in EBIX "depending on who has access"; Marketing Account Support books for Combank.'}
+  - {ref: 'Case To-Be', kind: asis, topic: Two contact centres, asis: 'BDO Insure agents and BDO CCC both log and handle cases.'}
+  - {ref: 'EB flow', kind: want, topic: External users, asis: 'Insurer and client HR portals planned for Employee Benefits.', want: 'Portal users with their own access rules.'}
+  - {ref: 'BRD-11 p.5', kind: pain, topic: Requests through IT, asis: 'Every QPS access request is coordinated with IT; approvers are reached by e-mail; access lists compiled by hand.'}
 asis:
   caption: 'Access requests today (BRD-11 p.5-6)'
   notes: >-
@@ -113,17 +117,15 @@ after:
   - {n: 3, bibs: 'BIBS applies the access on approval or on the effective date; high-risk changes need a 2nd approval', measure: 'Four eyes on every change'}
   - {n: 4, bibs: 'Business Administrator requests; approvers approve in order; System Administrator implements', measure: 'Approval trail'}
   - {n: 5, bibs: 'Four reports and a structured audit log with from / to values', measure: 'Reports in 20 s'}
-gaps:
-  - {sev: High, gap: No BIBS-wide user access matrix, impact: Roles and persona tests of every module, owner: 'UAM process owner, all BRD owners', decision: Provide or approve one matrix, ref: 'DCR-121'}
-  - {sev: High, gap: Directory sign-in (EUA), impact: Identity source for every user, owner: 'BDO ITIO', decision: 'EUA interface; local sign-in meanwhile', ref: 'DCR-143, D6'}
-  - {sev: High, gap: BRD written for QPS only, impact: Scope of access maintenance, owner: UAM process owner, decision: 'Confirm BRD-11 applies to all of BIBS', ref: 'DCR-114'}
-  - {sev: High, gap: No acceptance criteria; NFRs "follow QPS", impact: Test and sign-off, owner: UAM process owner, decision: 'Concur with the FRS criteria; give QPS retention', ref: 'DCR-115'}
-  - {sev: High, gap: Single session per device, impact: Session control for all users, owner: 'UAM owner, ITIO', decision: 'All users, Collections only, or no one', ref: 'DCR-141, XQ11'}
-  - {sev: High, gap: External portal users, impact: First internet-facing users, owner: 'UAM owner, Information Security', decision: 'Provisioning, MFA, hosting (decision D7)', ref: 'DCR-096'}
+missed:
+  - {cov: PARTLY, item: BIBS-wide access matrix, seen: 'Access decides who books, sends and approves.', brd: 'BRD-11 covers the process; the matrix of all modules is open.', rec: 'One role and access matrix for all modules, approved by every BRD owner.', ref: DCR-121}
+  - {cov: CONFIRM, item: Enterprise sign-in, seen: 'Windows ID through BDO EUA today.', brd: 'EUA in BRD-11; the IER names EIAM (Entra ID).', rec: 'Confirm EIAM single sign-on and MFA for all users.', ref: 'DCR-143, 230; INT-01'}
+  - {cov: CONFIRM, item: Identity governance, seen: 'Access requests in the business module.', brd: 'UIDM-ISC may take over requests and approvals.', rec: 'Decide which tool owns requests and recertification.', ref: 'DCR-229; INT-02'}
+  - {cov: PARTLY, item: Personas seen on the floor, seen: 'Combank account support; two contact centres; sanitation handlers.', brd: 'Not all in the role list.', rec: 'Add them to the matrix.', ref: 'XQ02; DCR-121'}
+  - {cov: PARTLY, item: External users, seen: 'EB portal users planned.', brd: 'Provisioning, MFA and hosting open.', rec: 'Rules for external users before any portal goes live.', ref: DCR-096}
 best:
-  - {practice: Least privilege from one role matrix, status: PARTLY, bibs: 'Roles by permission and area; User Access Matrix with Excel export.', bdoi: 'Approve one BIBS-wide matrix (DCR-121).'}
-  - {practice: Segregation of duties, status: BIBS, bibs: 'Approver cannot be the requester; maker-checker in every module; incompatible pairs can be blocked.', bdoi: 'Name the role pairs one user must not hold.'}
-  - {practice: 'Joiner, mover, leaver discipline', status: BIBS, bibs: 'Enrol, modify, deactivate and reactivate requests with effective dates.', bdoi: 'Link HR movements to access requests.'}
-  - {practice: Periodic access review, status: ADOPT, bibs: 'User access, group profile and membership reports.', bdoi: 'Run a quarterly recertification by each unit head.'}
-  - {practice: Single sign-on with the BDO directory, status: PARTLY, bibs: 'Directory authentication port; local sign-in with lock-out until then.', bdoi: 'Provide the EUA interface (DCR-143).'}
-  - {practice: Audit of every access change, status: BIBS, bibs: 'Insert-only change log with from / to values and the approver.', bdoi: 'Agree the retention of access logs.'}
+  - {practice: Single sign-on with MFA, status: PARTLY, lever: Security and convenience, what: 'Sign-in through the enterprise identity provider with MFA.', rec: 'Confirm EIAM (DCR-230).'}
+  - {practice: Access recertification, status: PARTLY, lever: Audit, what: 'Managers confirm their team''s access every quarter.', rec: 'Use the access reports as the review input.'}
+  - {practice: Segregation-of-duties matrix, status: PARTLY, lever: Fraud control, what: 'Conflicting roles (maker and approver, payee set-up and payment) blocked by rule.', rec: 'Define the conflicts with Audit.'}
+  - {practice: Privileged access control, status: NOT_IN_BRD, lever: Security, what: 'Administrator access time-bound, approved and recorded.', rec: 'Agree with BDO IT Security.'}
+  - {practice: Joiner-mover-leaver automation, status: BEYOND, lever: No stale access, what: 'Access granted and removed from HR events.', rec: 'Through the identity governance tool.'}

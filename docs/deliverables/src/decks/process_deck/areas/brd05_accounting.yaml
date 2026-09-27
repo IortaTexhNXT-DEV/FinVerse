@@ -1,92 +1,180 @@
-# BRD-5 Accounting, Disbursement, Accounting Controls and Subsidiary Ledger (ACSL), and financial reporting.
-# Sources: "Accounting, Disbursement, and Accounting Controls and Subsidiary Ledger BRD.zip" (one PDF of 267 pages):
-# current process p.44-45, envisioned process p.46-48, NFR p.133-139, Addendum 1 p.37, Appendix A p.142-144;
-# requirements baseline BDOI_ACCT_BRD_SPEC.md sections 2, 3, 7, 9; build design ACCOUNTING_DISBURSEMENT_DESIGN.md;
-# discrepancy register (DCR-037, 052, 054, 058, 157). No FRS yet.
+# Accounting, Disbursement and ACSL (BRD-5): chapter 9 of the business process reverse KT deck (Part D, Comptrollership).
+# Sources: floor walk 23-Sep-2026 (Disbursement / FRBS, ACSL, 44F) and discovery 21 and 23-Sep-2026 (floor-walk notes
+# OI-, DS-, TX-, RC-, FN-, RP-); BDOI Day 1 overview p.26-27; high-level Disbursement, Refund Request, FRBS Accounting
+# and ACSL process flows confirmed by the process owners; BRD-5 p.44-48; design ACCOUNTING_DISBURSEMENT_DESIGN;
+# discrepancy register (DCR-052, 054, 055, 056, 234); open questions AQ01-AQ31.
 id: brd05
 key: acct
-num: 5
-title: Accounting and Disbursement
+num: 9
+title: Accounting, Disbursement and ACSL
 short: Accounting
 brd: BRD-5
-scope: 'Accounting (FRBS), Disbursement, ACSL, Marketing refund and cash-advance requests, financial reports'
-status: IN BUILD
-status_text: 'GL platform built; Disbursement, ACSL, FRBS reports in build'
+scope: 'FRBS general ledger and close, Disbursement, ACSL, refund and cash-advance requests, tax and BIR, other income'
 department: 'Comptrollership: FRBS (GL team), Disbursement, ACSL'
 roles:
-  - FRBS officer, TL, TH (Accounting, 5 users)
-  - Disbursement processor, verifier and approvers (8 users)
-  - ACSL officer and approver (6 users)
-  - Marketing AO and employees (refund and cash-advance requests); HR approver
-  - Business and System Administrator
+  - 'FRBS Accounting Assistant, TL, TH (GL set-up, journals, reconciliation, close)'
+  - 'Disbursement Processor (DPO), TL (DTL), Section Head (DSH), Unit Head (DUH)'
+  - 'ACSL Accounting Processor and AP TL; FRBS approver'
+  - 'Marketing AO, Marketing Admin, UPP and Marketing Support (refund requests)'
+  - 'MBS, UPP handler (payee upkeep); IT Operations; BDO TPD and branches'
 figures:
-  - ['19', 'Comptrollership users: FRBS 5, Disbursement 8, ACSL 6 (p.133-137)']
-  - ['198', 'remittance DVs a year (+20%); 246 refunds; 293 supplier payments']
-  - ['5-10 s', 'screen load; reports 10-20 s first load']
-  - ['15 Apr', 'year-end close deadline (FRBS 2.7.0, p.59)']
+  - ['3 levels', 'of signed approval: DTL, DSH, DUH (DS-01)']
+  - ['5', 'refund approval chains, one per segment (Refund Request flow)']
+  - ['8', 'branches to tag with profit and cost centres (FN-01)']
+  - ['15% / 2%', 'withholding tax on commission / on suppliers (TX-01, TX-03)']
+session:
+  when: '23-Sep-2026, 10:00 am-12:00 nn, 44F; discovery 21 and 23-Sep-2026'
+  pocs: 'Rodrigo Dela Cruz, Cherry Francisco, Lineth Santos, Guada Jane Pelo (Disbursement); Iris Marquez, Fatima Joy Aguas, Cherie Jocson (FRBS); Jeniffer Lugtu, Mario Sabangan, Jennifer Carinan, Freddie Atanque (ACSL)'
 sources:
-  - BRD-5 p.44-45 (current process), p.46-48 (envisioned)
-  - FRBS, DIS, MKT, ACSL, BASAU requirements; Addenda 1 and 2
-  - Requirements baseline BDOI_ACCT_BRD_SPEC.md; design ACCOUNTING_DISBURSEMENT_DESIGN.md
-chevrons: [Request, Voucher, Approval, Payment, Status and CWT, Posting, Reconciliation, Close and report]
+  - 'High-level flows: Disbursement (in-system, online banking, outside the system, government), Refund Request (five segments), FRBS GL, ACSL'
+  - BDOI Day 1 overview p.26-27
+  - 'BRD-5 p.44-48; DIS, MKT, FRBS, ACSL requirement families'
+chevrons: [Request, Payee, Voucher, Approvals, Payment, GL entry, Reconciliation, Close and report]
 notes:
   glance: >-
-    BDOI handles two kinds of money: trust money (premium collected for insurers and remitted net of commission) and its
-    own income (commission, service fee, profit share, incentives). BRD-2 covers the front of the cycle; BRD-5 covers
-    the back office of Comptrollership. Most of the accounting core already exists in BIBS (chart, journals, accounting
-    engine, sub-ledger, periods, FX revaluation, year-end, bank reconciliation, BIR returns and 2307). The large new
-    build is Disbursement, then ACSL reconciliation and correction, the Marketing request flow and the BDOI report
-    pack. There is no FRS yet; this chapter uses the requirements baseline and the design.
-  pains: 'The points are the lettered current-process items of the BRD (A = Accounting, B = Disbursement, B.2 = Marketing requests, C = ACSL), p.44-45.'
-  after: 'The BRD gives response times and yearly volumes; it states no turnaround targets. The measures are the controls BIBS adds.'
-  gaps: 'The invoice-number question (DCR-058, AQ29) decides how ACSL links booking, adjustment and cancellation.'
+    Comptrollership turns every business event into accounting and pays everyone BDOI owes: insurers (remittance),
+    clients (refunds), suppliers, employees and the government. Disbursement runs four routes (in the system, online
+    banking, bank instruments outside the system and government payments) with three levels of signed approval. FRBS
+    keeps the chart of accounts, reviews the reports IT prepares, reconciles, posts manual journals and closes the
+    books at day, month and year end. ACSL keeps the accounts sub-ledger clean by finding abnormal balances and posting
+    adjustments. Refund requests start in Marketing with five different approval chains.
+  heard: Notes of the Cashiering, Other Income, Disbursement and Tax session (23-Sep) and of the Comptrollership floor walk.
+  pains: Points 1 to 8 are on the Disbursement and Refund swimlane, 9 to 12 on the GL and ACSL swimlane.
+  after: The benefit column names the control or the effort the To-Be removes.
+  missed: >-
+    Government remittances are the one true gap. The others are rules and values the floor showed (approval levels,
+    tax rates, refund routing) that BRD-5 leaves open.
+heard:
+  - {ref: DS-01, kind: rule, topic: Approval, asis: 'Multi-level approval with maker and checker.'}
+  - {ref: DS-02, kind: asis, topic: Settlement types, asis: 'Remittance and settlement cover insurer payments, customer payments and sundry creditors; client premium refunds are also settled here.'}
+  - {ref: DS-03, kind: pain, topic: Working file, asis: 'For individual companies a working file is prepared and sent to the Disbursement team.'}
+  - {ref: DS-04, kind: pain, topic: Payment mode, asis: 'Remittance is always processed in batch. The mode of payment is captured outside the system, as most modes are not in the system.'}
+  - {ref: DS-05, kind: want, topic: Entries, asis: 'Remittance entries pass through intermediate accounts.', want: 'Debit Cash in Bank and credit the insurance company directly.'}
+  - {ref: TX-01, kind: rule, topic: WHT on commission, asis: 'WHT on commission is 15% during remittance processing.'}
+  - {ref: TX-03, kind: want, topic: WHT certificate, asis: 'Certificates prepared outside the system.', want: '2% WHT certificate (BIR 2307) generated for suppliers.'}
+  - {ref: TX-04, kind: rule, topic: BIR reports, asis: 'Monthly, from the trial balance and sub-ledger; WHT based on disbursements; the tax code changes by supplier.'}
+  - {ref: TX-05, kind: rule, topic: VAT, asis: 'Input VAT quarterly from the sub-ledger; output VAT the same.'}
+  - {ref: RC-01, kind: open, topic: Reconciliation, asis: 'Bank reconciliation and insurer reconciliation (premium and commission).', want: 'Detail during the floor walk.'}
+  - {ref: RC-02, kind: want, topic: Insurer reconciliation, asis: 'Done on statements of account.', want: 'Insurer reconciliation account-wise.'}
+  - {ref: FN-01, kind: want, topic: Branches, asis: 'BDOI has 8 branches.', want: 'Profit centre and cost centre tagged and mapped.'}
+  - {ref: RP-01, kind: pain, topic: Reports, asis: 'Reports are made by hand: data pulled from several systems and consolidated, with IT help.', want: 'Business units run reports themselves.'}
+  - {ref: OI-01, kind: want, topic: Other income, asis: 'Other income recorded outside a standard invoice.', want: 'Other income registered through invoicing.'}
+  - {ref: OI-02, kind: rule, topic: Service fee, asis: 'A service invoice records other income; WHT rate differs by income type; VAT applies; OR issued after.'}
+  - {ref: OI-03, kind: pain, topic: Referral fee, asis: 'Referral is treated as a service fee, credited from an Excel list.'}
 asis:
-  caption: 'Disbursement, accounting and ACSL today (BRD-5 p.44-45)'
+  caption: 'Refunds and Disbursement today (Refund Request and Disbursement process flows; Day 1 p.27; DS-01 to DS-05)'
   notes: >-
-    Today Marketing refund and cash-advance requests arrive from AOs by e-mail; review and approval happen outside
-    the system and signed paper is handed to Disbursement. Some disbursement requests still come on paper or by e-mail;
-    not every payment method is integrated; processing and CWT tagging are manual; communication and approval run
-    outside the system. In Accounting the input reports and the closing of the broking books depend on IT, output
-    reports and reconciliations are manual, unbalanced transactions are not prevented and some entries are keyed by
-    hand. In ACSL, input reports depend on IT, corrections and reversals are manual and posted by a separate unit, a
-    cancellation gets a different invoice number, and reports lack the source-system references (BRD-5 p.44-45).
-  cols: 6
+    A refund starts with a Refund Request Form (client ID, CA / SA or check details, amount, reason) that the AO fills
+    in; depending on the segment it goes through four to six signatures, and Marketing Admin, Collections or UPP fills
+    an Excel template and keys the CA / SA in EBIX. Disbursement receives requests through the EBIX flow-in, by e-mail
+    or on paper. Payee details are kept by MBS (insurers), the UPP handler (clients) and the DTL (sundry creditors).
+    The DPO prepares the Excel disbursement template and bank forms; the DTL, DSH and DUH sign in turn. In-system
+    payments run from EBIX to QPS by an IT batch, and the credit file is sent through WinSCP to the Transaction
+    Processing Department (TPD); checks are printed in QPS. Credit tickets, ATDs, manager's checks, demand drafts and
+    telegraphic transfers are bank forms done at a BDO branch. The signed documents go to FRBS for the GL entry. FRBS
+    files taxes in EFPS and pays SSS, Pag-IBIG and PhilHealth through BancNet, then watches the government websites.
+  cols: 7
   lanes:
-    - {id: mkt, label: Marketing AO}
-    - {id: dsb, label: Disbursement}
-    - {id: acc, label: Accounting (FRBS)}
-    - {id: acs, label: ACSL}
-    - {id: bank, label: 'Bank (BOB), payees', kind: external}
-    - {id: sys, label: 'EBIX, e-mail, paper', kind: system}
+    - {id: mkt, label: 'Marketing, UPP, Marketing Admin'}
+    - {id: dpo, label: 'Disbursement DPO, DTL'}
+    - {id: apr, label: 'DSH, DUH approvers'}
+    - {id: bank, label: 'BDO TPD, branches, BancNet', kind: external}
+    - {id: frbs, label: FRBS}
+    - {id: sys, label: 'EBIX, QPS, WinSCP, Excel, paper', kind: system}
   steps:
-    - {id: a1, lane: mkt, col: 1, text: Refund request by e-mail; paper signed, pain: [1]}
-    - {id: a2, lane: dsb, col: 2, text: Request on paper or e-mail; keyed in, pain: [2]}
-    - {id: a3, lane: dsb, col: 3, text: 'Processed, CWT tagged by hand', pain: [3]}
-    - {id: a4, lane: bank, col: 3, text: Payment modes partly integrated, kind: external, pain: [4]}
-    - {id: a5, lane: acc, col: 4, text: Manual entries; no balance check, pain: [5]}
-    - {id: a6, lane: acs, col: 4, text: Corrections posted by another unit, pain: [6]}
-    - {id: a7, lane: sys, col: 5, text: New invoice number per cancellation, kind: legacy, pain: [7]}
-    - {id: a8, lane: sys, col: 6, text: Input reports and closing need IT, kind: legacy, pain: [8]}
-    - {id: a9, lane: acc, col: 6, text: Reconciliation and reports by hand, pain: [9]}
+    - {id: p1, lane: mkt, col: 1, text: 'Refund form signed by 4-6 people', pain: [1]}
+    - {id: p2, lane: sys, col: 2, text: 'Excel template; CA / SA keyed in EBIX', kind: legacy, pain: [1]}
+    - {id: p3, lane: dpo, col: 2, text: 'Request by EBIX flow-in, e-mail, hard copy', pain: [2]}
+    - {id: p4, lane: dpo, col: 3, text: 'Payee keyed; Excel voucher template', pain: [3]}
+    - {id: p5, lane: apr, col: 4, text: 'DTL, DSH, DUH sign in turn', pain: [4]}
+    - {id: p6, lane: sys, col: 4, text: 'EBIX to QPS batch; credit file by WinSCP', kind: legacy, pain: [5]}
+    - {id: p7, lane: bank, col: 5, text: 'TPD credits; branch MC, TT, ATD forms', kind: external, pain: [6]}
+    - {id: p8, lane: sys, col: 5, text: Checks printed in QPS, kind: legacy, pain: [5]}
+    - {id: p9, lane: frbs, col: 6, text: GL entry from signed documents, pain: [7]}
+    - {id: p10, lane: dpo, col: 7, text: Confirmation e-mail; status tagged}
+    - {id: p11, lane: frbs, col: 7, text: 'EFPS, BancNet; websites watched', pain: [8]}
   edges:
-    - [a1, a2, dashed, paper]
-    - [a2, a3]
-    - [a3, a4]
-    - [a3, a5]
-    - [a5, a6, dashed]
-    - [a6, a7]
-    - [a7, a8]
-    - [a8, a9, dashed]
+    - [p1, p2]
+    - [p2, p3, dashed, paper]
+    - [p3, p4]
+    - [p4, p5, dashed, paper]
+    - [p5, p6]
+    - [p6, p7, dashed, WinSCP]
+    - [p6, p8]
+    - [p7, p9, dashed, documents]
+    - [p9, p10]
+asis_extra:
+  - caption: 'General ledger, close and ACSL today (FRBS Accounting and ACSL process flows; Day 1 p.26)'
+    notes: >-
+      FRBS team leads add GL accounts in the EBIX account maintenance; EBIX creates entries from the source
+      transactions and FRBS adds manual entries; sub-ledgers post automatically. IT generates the required reports
+      and saves them in a shared folder; the accounting assistant reviews them, reconciles and prepares manual
+      journals that the TL or TH reviews and posts. At day, month and year end IT extracts the output reports and
+      closes the broking transactions before FRBS triggers the closing of the books and the balances are carried
+      forward. ACSL receives reports from IT (PR, DTIP, CRU), looks for abnormal balances, analyses the invoices,
+      prints the adjustment for the AP TL and routes it to an FRBS approver for posting; Cashiering e-mails invoices
+      due for AR refund adjustment.
+    cols: 7
+    lanes:
+      - {id: it, label: IT}
+      - {id: aa, label: FRBS Accounting Assistant}
+      - {id: tl, label: 'FRBS TL, TH'}
+      - {id: ap, label: 'ACSL AP, AP TL'}
+      - {id: csh, label: Cashiering}
+      - {id: sys, label: 'EBIX, shared folder, Excel', kind: system}
+    steps:
+      - {id: q1, lane: tl, col: 1, text: GL account added in EBIX}
+      - {id: q2, lane: sys, col: 1, text: 'System and manual entries; SL auto-posted', kind: legacy}
+      - {id: q3, lane: it, col: 2, text: Reports saved to a shared folder, pain: [9]}
+      - {id: q4, lane: aa, col: 3, text: 'Reports reviewed; reconciled by hand', pain: [10]}
+      - {id: q5, lane: aa, col: 4, text: Manual journals prepared, pain: [10]}
+      - {id: q6, lane: tl, col: 5, text: Journals reviewed and posted}
+      - {id: q7, lane: it, col: 6, text: 'EOD / EOM / EOY run; IT closes broking', pain: [11]}
+      - {id: q8, lane: tl, col: 7, text: 'Books closed; balances carried forward'}
+      - {id: q9, lane: csh, col: 1, text: Invoices for AR refund adjustment by e-mail}
+      - {id: q10, lane: ap, col: 2, text: 'Abnormal balances found in IT reports', pain: [12]}
+      - {id: q11, lane: ap, col: 3, text: 'Adjustment printed; AP TL; FRBS posts', pain: [12]}
+    edges:
+      - [q1, q2]
+      - [q2, q3]
+      - [q3, q4, dashed, folder]
+      - [q4, q5]
+      - [q5, q6]
+      - [q6, q7]
+      - [q7, q8]
+      - [q9, q11, dashed, e-mail]
+      - [q10, q11]
+variants:
+  title: refund chains and payment routes
+  headers: [Route or segment, Starts with, Approvals today, 'Keyed or executed by', Hand-off]
+  widths: [2.2, 2.8, 3.4, 2.1, 2.2]
+  per_page: 5
+  rows:
+    - ['Refund: Non-CBG Retail', 'AO fills the RRF', 'MTL, TH, then MAD TL and Marketing UH', 'Marketing Admin (Excel, EBIX)', 'MAD TL to Disbursement']
+    - ['Refund: Non-CBG Corporate', 'AO fills the RRF', 'MAD review, MAD TL, Marketing UH', 'Marketing Admin', 'MAD TL to Disbursement']
+    - ['Refund: CBG Motor', 'AO instructs the UPP AO; bank confirms account name', 'Approver 1, Approver 2, UH', 'Approver 2 keys in EBIX', 'UPP AO to Disbursement']
+    - ['Refund: CBG Fire', 'AO instructs Marketing Support', 'MS TL, UH', 'MS TL keys CA / SA', 'Paper and scanned copy']
+    - ['Refund: Non-CBG Branches', 'AO fills the RRF', 'MTL, UH, then Collections TL and UH', 'Collections Processor', 'CP to Disbursement']
+    - ['Pay: in the system', 'EBIX flow-in (remittance, refunds)', 'DSH approves and posts; DTL runs end of day', 'IT batch EBIX to QPS; WinSCP to TPD', 'TPD returns processed list']
+    - ['Pay: online banking', 'Hard-copy request', 'DTL, second DTL verifier, DSH, DUH; two online authorisations', 'DTL in online banking', 'Signed documents to FRBS']
+    - ['Pay: outside the system', 'Hard-copy request', 'DTL, DSH, DUH', 'DPO: CT, ATD, MC, DD, TT forms at a BDO branch', 'Bank confirmation e-mail']
+    - ['Pay: government', 'Tax and contribution due dates', 'DTL maker, DSH, DUH', 'FRBS SH in EFPS; BancNet for SSS, Pag-IBIG, PhilHealth', '24-hour posting; website check']
+  notes: >-
+    From the Refund Request and Disbursement flows confirmed by the process owners (Dec 2025). The five refund chains
+    answer open question AQ18; the government route is not in BRD-5.
 pains:
-  - {n: 1, title: Marketing requests by e-mail and paper, text: 'Review and approval outside the system; signed paper handed to Disbursement.', ref: 'BRD-5 p.45, B.2 a-c'}
-  - {n: 2, title: Requests received by hand, text: 'Some disbursement requests still arrive as paper or e-mail.', ref: 'BRD-5 p.45, B a'}
-  - {n: 3, title: Manual processing and CWT tagging, text: 'Communication and approval run outside the system; payees only for CTA and check.', ref: 'BRD-5 p.45, B c-e'}
-  - {n: 4, title: Payment methods not all integrated, text: 'Not every mode of payment is in the system; most output reports are manual.', ref: 'BRD-5 p.45, B b, f'}
-  - {n: 5, title: Unbalanced entries not prevented, text: 'Some accounting entries are keyed by hand.', ref: 'BRD-5 p.44, A d-e'}
-  - {n: 6, title: Corrections by another unit, text: 'Correction and reversal entries are processed manually and posted by a separate unit.', ref: 'BRD-5 p.45, C b-c'}
-  - {n: 7, title: Cancellations get a new invoice number, text: 'Related transactions cannot be followed under one number; reports lack source references.', ref: 'BRD-5 p.45, C d-e'}
-  - {n: 8, title: IT needed for input and closing, text: 'Input reports and the closing of the broking books depend on IT support.', ref: 'BRD-5 p.44, A a; p.45, C a'}
-  - {n: 9, title: Reconciliation and reports by hand, text: 'Output reports are generated and reconciliations performed manually.', ref: 'BRD-5 p.44, A b-c'}
+  - {n: 1, title: 'Refunds on paper, five chains', text: 'RRF signed by 4-6 people; Excel template; CA / SA re-keyed in EBIX.', ref: 'Refund Request flow; BRD-5 p.45'}
+  - {n: 2, title: Requests by e-mail and paper, text: 'Disbursement receives EBIX flow-in, e-mails and hard copies.', ref: 'Disbursement flow; Day 1 p.27'}
+  - {n: 3, title: Payees kept in three places, text: 'MBS (insurers), UPP handler (clients), DTL (sundry) keep payee details.', ref: 'Disbursement flow'}
+  - {n: 4, title: Three levels of wet signature, text: 'DTL, DSH and DUH sign; online banking adds a second DTL.', ref: 'DS-01; Disbursement flow'}
+  - {n: 5, title: File chain through IT and QPS, text: 'EBIX to QPS batch, credit file by WinSCP to TPD, checks printed in QPS.', ref: 'Disbursement flow; DS-04'}
+  - {n: 6, title: Payment modes outside the system, text: 'Credit tickets, ATD, MC, DD and TT are bank forms at a branch.', ref: 'DS-04; BRD-5 p.45'}
+  - {n: 7, title: GL entries by another unit, text: 'Signed documents go to FRBS, who enters the GL entry.', ref: 'Disbursement flow; BRD-5 p.45'}
+  - {n: 8, title: Government payments by hand, text: 'EFPS filing and BancNet payments with a 24-hour posting; websites watched.', ref: 'Disbursement flow (government)'}
+  - {n: 9, title: Reports prepared by IT, text: 'IT saves reports in a shared folder; business cannot run them.', ref: 'FRBS flow; RP-01'}
+  - {n: 10, title: Reconciliation and journals by hand, text: 'Bank and insurer reconciliation and manual journals in Excel.', ref: 'FRBS flow; RC-01'}
+  - {n: 11, title: IT needed to close, text: 'IT runs end-of-day, month and year and closes broking transactions.', ref: 'FRBS flow; BRD-5 p.45'}
+  - {n: 12, title: Abnormal balances found by reading, text: 'ACSL scans IT reports; adjustments printed for review.', ref: 'ACSL flow'}
 tobe:
   caption: 'Disbursement, accounting and ACSL in BIBS (design ACCOUNTING_DISBURSEMENT_DESIGN; BRD-5 p.46-48)'
   notes: >-
@@ -132,26 +220,75 @@ tobe:
     - [b9, b12]
     - [b10, b11]
 after:
-  - {n: 1, bibs: 'RRF and RFP in BIBS with documents; Marketing (and HR) approval routes them to Disbursement', measure: 'No paper hand-over'}
+  - {n: 1, bibs: 'RRF and RFP in the system with documents; approval routes them to Disbursement', measure: 'No paper hand-over'}
   - {n: 2, bibs: 'Requests from other modules, uploads and encoding in one intake', measure: 'One request queue'}
-  - {n: 3, bibs: 'DV and proforma entry created by BIBS; approval in the workflow; payees for every mode', measure: 'Verifier plus two approvers'}
-  - {n: 4, bibs: 'Seven payment modes with instrument life cycles; end-of-day files and forms', measure: 'Statuses tagged by bank file'}
-  - {n: 5, bibs: 'Validator refuses unbalanced entries and flags negative balances; accruals reverse automatically', measure: 'Debit = credit enforced'}
-  - {n: 6, bibs: 'ACSL corrections post on approval to the sub-ledger and the invoice ledger', measure: 'Posting on approval'}
-  - {n: 7, bibs: 'Every related transaction carries one root invoice number; source references in reports', measure: 'One invoice family'}
-  - {n: 8, bibs: 'Users run input reports; broking books close by a scheduled job', measure: 'No IT request'}
-  - {n: 9, bibs: 'Bank file matched on check number and amount; reports on demand', measure: 'Reports 10-20 s (p.133-137)'}
-gaps:
-  - {sev: High, gap: One invoice number or a root number, impact: BIR invoice uniqueness against one reference per policy, owner: Comptrollership (ACSL), decision: 'Accept a root invoice number linking related documents', ref: 'DCR-058, AQ29'}
-  - {sev: High, gap: Incentive programmes (CPC2 and early incentive), impact: Incentive income and service invoices, owner: 'Comptrollership, MBS, Operations', decision: 'Rates, base, payer, service invoice per programme', ref: 'DCR-037, AQ24'}
-  - {sev: High, gap: Payee master and open items at go-live, impact: Disbursement cannot start without payees, owner: Comptrollership, decision: 'Migration file, cut-off and reconciliation', ref: 'DCR-157, AQ11'}
-  - {sev: Medium, gap: GL month-end closing rule, impact: 'Close date, reopening, period controls', owner: FRBS, decision: '2nd banking day or a preferred date; can a month reopen?', ref: 'DCR-054, AQ04'}
-  - {sev: Medium, gap: RRF and RFP mandatory fields, impact: Marketing request screens and tests, owner: 'Comptrollership, Marketing', decision: Mandatory fields and approval chain per segment, ref: 'DCR-052, AQ18'}
-  - {sev: Parked, gap: BDO Business Online Banking and DCTF channel, impact: Funding approvals confirmed by hand or file, owner: BDO IT, decision: 'Channel per payment mode; DCTF specification', ref: 'AQ09, AQ10'}
+  - {n: 3, bibs: 'One consolidated payee master for every mode (DIS 2.2.0-2.2.8)', measure: 'Payee kept once'}
+  - {n: 4, bibs: 'Voucher and proforma entry by the system; verifier and approvers decide in the workflow', measure: 'E-approval'}
+  - {n: 5, bibs: 'Credit file and check printing from the same system; credited file uploaded back', measure: 'No QPS step'}
+  - {n: 6, bibs: 'Seven payment modes with instrument life cycles and bank forms generated', measure: 'Mode recorded'}
+  - {n: 7, bibs: 'Approval posts the entry to the GL and sub-ledger; unbalanced entries refused', measure: 'Entry at approval'}
+  - {n: 8, bibs: 'Payment to government is a disbursement class only; filing and confirmation not specified', measure: 'Gap: see next slides'}
+  - {n: 9, bibs: 'Users run input and output reports on demand', measure: 'No IT request'}
+  - {n: 10, bibs: 'Bank file matched on check number and amount; insurer statements reconciled per invoice', measure: 'Matching automated'}
+  - {n: 11, bibs: 'Broking books close by a scheduled job; FRBS closes the period', measure: 'No IT in the close'}
+  - {n: 12, bibs: 'Ageing with SL-GL difference; corrections through create, review, approve, post', measure: 'Posting on approval'}
+missed:
+  - {cov: NOT_IN_BRD, item: Government remittances, seen: 'EFPS for BIR; BancNet for SSS, Pag-IBIG, PhilHealth; 24-hour posting; websites watched.', brd: 'A disbursement class only (DIS 3.25.1).', rec: 'Tax and contribution calendar, filing reference and payment confirmation captured on the voucher.', ref: 'Disbursement flow'}
+  - {cov: PARTLY, item: Delegation of authority, seen: 'DTL, DSH, DUH; second DTL for online banking.', brd: 'Single approver (DIS 2.19) or verifier plus two for funding.', rec: 'Approval matrix by amount and payment type, all in the workflow.', ref: 'DS-01; AQ28'}
+  - {cov: PARTLY, item: Refund routing per segment, seen: 'Five chains of 3-6 approvers.', brd: 'Refund approval generic (MKT 1.14-1.16).', rec: 'Configure routing by segment; aim for two levels.', ref: 'Refund flow; AQ18'}
+  - {cov: PARTLY, item: Payee bank details, seen: 'Bank confirms the account name; same name as depositor?', brd: 'Duplicate check only; validation open.', rec: 'Name match, dual control on bank-detail changes.', ref: 'AQ11, AQ19'}
+  - {cov: PARTLY, item: WHT rate on commission, seen: '15% at remittance.', brd: 'WTAX column; rate not stated.', rec: 'Tax table by payee class (ATC) and rate.', ref: 'TX-01'}
+  - {cov: PARTLY, item: Tax by income type, seen: 'WHT differs by income type; VAT applies.', brd: 'OR types with VAT and WTAX; no matrix.', rec: 'Income-type matrix (ATC, WHT, VAT) driving the service invoice.', ref: 'OI-02'}
+  - {cov: PARTLY, item: Referral fees, seen: 'Credited from an Excel list.', brd: 'Service-fee monitoring (FRBS 2.10); no referrer master.', rec: 'Referrer master, computation, payout and 2307.', ref: 'OI-03; AQ20'}
+  - {cov: PARTLY, item: Profit and cost centres, seen: '8 branches to map.', brd: 'Cost-centre rules (FRBS 3.1.1); profit centre has no BRD.', rec: 'Profit and cost centre on every entry, mapped per branch.', ref: 'FN-01; AQ26'}
+  - {cov: PARTLY, item: Remittance entries, seen: 'Want Dr Cash in Bank / Cr Insurer directly.', brd: 'Entries per voucher type not given.', rec: 'Give the entries per voucher type.', ref: 'DS-05; AQ02'}
+  - {cov: PARTLY, item: Abnormal balances, seen: 'Found by reading IT reports.', brd: 'Ageing with SL-GL difference only.', rec: 'Rule-based exception queue for ACSL.', ref: 'ACSL flow; AQ30'}
+  - {cov: PARTLY, item: Self-service reports, seen: 'Reports need IT (RP-01).', brd: 'Standard reports on demand; ad-hoc builder parked.', rec: 'Governed report builder after go-live.', ref: 'RP-01; CRQ11'}
+  - {cov: CONFIRM, item: BIR books and VAT return, seen: 'Monthly BIR reports; VAT quarterly.', brd: 'Books format open; monthly VAT return still listed.', rec: 'Confirm CAS format and drop the monthly VAT return.', ref: 'TX-04, TX-05; AQ07; DCR-055'}
 best:
-  - {practice: Maker-checker and dual approval on payments, status: BIBS, bibs: 'DV verifier and approvers; account funding with a verifier and two approvers; maker cannot approve.', bdoi: 'Confirm the approvers, their order and limits (AQ10, AQ28).'}
-  - {practice: Balanced posting and a closed period, status: BIBS, bibs: 'Unbalanced entries refused; posting only to open periods; scheduled close with a checklist.', bdoi: 'Agree the close calendar and reopen rule (AQ04).'}
-  - {practice: Automated bank reconciliation, status: PARTLY, bibs: 'Bank file import and matching on check number and amount.', bdoi: 'Give the bank file layouts per bank (AQ08).'}
-  - {practice: Sub-ledger reconciled to the GL, status: BIBS, bibs: 'GL-SL reconciliation per GL code; insurer SOA reconciled per invoice.', bdoi: 'Ask insurers to show the BDOI invoice number on their SOA (AQ21).'}
-  - {practice: BIR withholding and certificates from the system, status: PARTLY, bibs: 'CWT tagging and BIR 2307 generated; BIR returns from the tax module.', bdoi: 'Confirm the BIR forms and books still required (AQ07).'}
-  - {practice: One invoice family for audit, status: ADOPT, bibs: 'Root invoice number carried by booking, ledger and every downstream document.', bdoi: 'Accept the root-number model (DCR-058).'}
+  - {practice: Payment hub with the bank, status: PARTLY, lever: No file hand-offs, what: 'Host-to-host payments for credit to account, MC, TT and online banking, with digital signing and status back.', rec: 'Replace WinSCP and branch forms with BDO host-to-host (CMS / New BOB).'}
+  - {practice: Delegation of authority in the workflow, status: PARTLY, lever: Faster approval, what: 'Approval limits by amount and type, e-approval, no wet signatures.', rec: 'Approve a DOA matrix; the audit trail replaces the signed copy.'}
+  - {practice: Payee account validation, status: PARTLY, lever: Fraud control, what: 'Name match, test credit and dual control on bank-detail changes.', rec: 'Apply to refunds and new payees.'}
+  - {practice: Government payments calendar, status: NOT_IN_BRD, lever: No penalties, what: 'Due dates, filing and payment through eFPS / eGov, confirmation captured.', rec: 'Add a calendar and confirmation to Disbursement.'}
+  - {practice: Straight-through refunds, status: PARTLY, lever: Client experience, what: 'Refund computed from the cancellation or excess and paid to a validated account.', rec: 'Link cancellation, refund request and payment.'}
+  - {practice: Continuous close, status: PARTLY, lever: Shorter close, what: 'Daily SL-GL reconciliation, close calendar and checklist, variance analysis.', rec: 'Add a close checklist and daily reconciliation report.'}
+  - {practice: Automated tax certificates, status: PARTLY, lever: Compliance, what: '2307 for every payee and a register of certificates received, reconciled to SAWT.', rec: 'Extend 2307 generation to all payees.'}
+  - {practice: BIR e-invoicing readiness, status: CONFIRM, lever: Compliance, what: 'CAS-registered books and electronic invoicing (EIS) when it applies.', rec: 'Confirm applicability with Tax and plan the format.'}
+  - {practice: Multi-dimensional chart of accounts, status: PARTLY, lever: Profitability view, what: 'Branch, profit centre, cost centre, product, insurer and segment on every entry.', rec: 'Map the 8 branches and centres before go-live.'}
+
+# Floor-walk edition (reverse KT v3.0): overrides for build_floorwalk_deck.py; floor walk and BDOI flows only.
+fw:
+  num: 8
+  title: Comptrollership
+  short: Comptrollership
+  sources:
+    - 'Process flows: Disbursement (in the system, online banking, outside the system, government), Refund Request (five segments), FRBS GL, ACSL'
+    - 'BDOI Day 1 overview p.26-27'
+    - 'Floor-walk notes DS-01 to DS-05, TX-01 to TX-05, RC-01, RC-02, FN-01, RP-01, OI-01 to OI-03'
+  pains_refs:
+    1: 'Refund Request flow'
+    6: 'DS-04; Disbursement flow'
+    7: 'Disbursement flow'
+    11: 'FRBS flow'
+  notes:
+    glance: >-
+      Comptrollership turns every business event into accounting and pays everyone BDOI owes: insurers, clients,
+      suppliers, employees and the government. Disbursement runs four routes with three levels of signed approval;
+      FRBS keeps the chart of accounts, reviews the reports IT prepares, reconciles, posts manual journals and closes
+      the books; ACSL keeps the sub-ledger clean. Refund requests start in Marketing with five approval chains.
+    pains: 'Points 1 to 8 are on the Disbursement and Refund swimlane, 9 to 12 on the GL and ACSL swimlane.'
+    wants: 'For each pain point: what the business users asked for, and the lever we suggest.'
+  variants_note: 'From the Refund Request and Disbursement process flows confirmed by the process owners.'
+  wants:
+    - {n: 1, bibs: 'One refund request with routing by segment and fewer signatures', measure: 'Workflow'}
+    - {n: 2, bibs: 'Every disbursement request in one intake, none on paper', measure: 'One queue'}
+    - {n: 3, bibs: 'Payee details kept once for every payment type', measure: 'One payee master'}
+    - {n: 4, bibs: 'Maker-checker kept, with approval limits instead of wet signatures (DS-01)', measure: 'DOA matrix'}
+    - {n: 5, bibs: 'Credit files and checks produced without QPS and WinSCP', measure: 'Host-to-host'}
+    - {n: 6, bibs: 'Mode of payment captured in the system (DS-04)', measure: 'Mode recorded'}
+    - {n: 7, bibs: 'Entry Debit Cash in Bank / Credit Insurance Company, posted at approval (DS-05)', measure: 'Entries at source'}
+    - {n: 8, bibs: 'Tax and contribution due dates tracked; filing and payment confirmed', measure: 'Calendar'}
+    - {n: 9, bibs: 'Business units run reports themselves (RP-01)', measure: 'Self-service'}
+    - {n: 10, bibs: 'Bank and insurer reconciliation account-wise, automated (RC-01, RC-02)', measure: 'Auto matching'}
+    - {n: 11, bibs: 'Close run by Comptrollership, not IT', measure: 'Scheduled close'}
+    - {n: 12, bibs: 'Abnormal balances flagged by rule', measure: 'Exception queue'}

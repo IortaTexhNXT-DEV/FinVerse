@@ -1,0 +1,166 @@
+# Reinsurance (RI BRD, phase 2): chapter 6 of the business process reverse KT deck (Part B, Technical).
+# Sources: high-level Reinsurance process flow (placement, RI commission collections, RI claims, RI settlement)
+# confirmed by the RI and Claims heads (Feb 2026); ReInsurance BRD v1 of 11-Mar-2025 (FRID-001 to 106) in
+# docs/source-documents; BDOI answer A3 of 26-Sep-2026 (reinsurance module in phase 2); umbrella BRD capability 15
+# (CORE-15.01 to 15.10); Report List #112-115; discrepancy register (DCR-210).
+id: ri
+key: ri
+num: 6
+title: Reinsurance
+brd: RI BRD (phase 2)
+scope: 'Facultative placement for cedants and TSU, RI premium and commission, RI claims, cash calls and settlement'
+department: 'BDOI Reinsurance (RI Team Head, RI Officers), with TSU, Claims and Comptrollership'
+roles:
+  - 'RI Unit Head, RI Team Head, RI Officer'
+  - 'BDOI TSU (requests facultative placement); Claims Handler (RI claims)'
+  - 'Commission Receivable Unit; Cashiering and Remittance'
+  - 'Comptrollership (RI entries)'
+  - 'Cedants, reinsurers and partner RI brokers (external)'
+figures:
+  - ['24 h', 'to acknowledge a facultative placement request (RI flow)']
+  - ['3 days', 'working days to prepare the facultative slip (RI flow)']
+  - ['48 / 72 h', 'to share loss reports / invoice reinsurers for their share of a claim']
+  - ['106', 'requirements in the RI BRD, phase 2 (FRID-001 to 106)']
+session:
+  when: 'Process flow confirmed by the RI and Claims heads (Feb 2026); not walked in Sep-2026'
+  pocs: 'Alvin B. Pila (RI Team Head), Allan I. Villas (Claims)'
+sources:
+  - 'High-level Reinsurance process flow (4 pages: placement, RI commission collections, RI claims, RI settlement)'
+  - 'ReInsurance BRD v1, 11-Mar-2025 (phase 2); BDOI answer A3'
+  - 'Umbrella BRD capability 15; Report List #112-115'
+chevrons: [Request, Acknowledge, Slip, Market, Closing, Debit note, Collections, Claims]
+notes:
+  glance: >-
+    BDOI Reinsurance places facultative reinsurance for cedants and for risks TSU cannot place fully in the direct
+    market. The RI officer reviews the request, prepares the facultative slip, approaches reinsurers or partner RI
+    brokers, negotiates, confirms the closings and sends the debit note to the cedant; then monitors premium payment
+    warranties, RI premium remittance and RI commission, and handles RI claims, cash calls and settlement. BDOI placed
+    the reinsurance module in phase 2 (answer A3), so it is outside the January 2028 go-live, but the TSU referral and
+    the RI transactions that Remittance handles in Drop 1 (DCR-210) touch phase 1.
+  heard: 'Steps of the Reinsurance process flow; the RI team was not part of the September floor walks.'
+  pains: 'Points 1 to 8 are on the As-Is swimlane.'
+  after: 'The To-Be is the phase-2 RI BRD (FRID numbers).'
+  missed: 'The TATs of the flow are not requirements in the RI BRD, and the RI transactions of Drop 1 are undefined.'
+heard:
+  - {ref: 'RI flow p.4', kind: rule, topic: Facultative placement, asis: 'TSU sends the request; RI acknowledges within 24 hours, reviews and prepares the facultative slip within 3 working days, approaches reinsurers or RI brokers, negotiates and informs TSU in writing.'}
+  - {ref: 'RI flow p.4', kind: asis, topic: Closing, asis: 'RI checks special conditions, warranties and subjectivities, the share placed, sends the closings and the debit note to the cedant and secures the signed placement slip from the reinsurers.'}
+  - {ref: 'RI flow p.1', kind: pain, topic: RI commission, asis: 'A monitoring sheet of premium payment schedules and expected RI premium and commission dates is shared with the Commission Receivable Unit; reminders and extensions handled by hand.'}
+  - {ref: 'RI flow p.4', kind: rule, topic: RI claims, asis: 'Preliminary loss advice within 5 days; RCRF not later than the next working day; loss adjuster reports to all reinsurers within 48 hours; lead reinsurer agrees the adjuster.'}
+  - {ref: 'RI flow p.4', kind: rule, topic: Settlement, asis: 'Acknowledge the statement of claim or cash call within 48 hours; invoice the reinsurer panel within 72 hours; collect within 10 days; remit to the reinsured within 5 days.'}
+  - {ref: 'A3; DCR-210', kind: open, topic: Scope, asis: 'Reinsurance module in phase 2; Remittance handles "reinsurance transactions" in Drop 1.', want: 'Which RI transactions and entries are in Drop 1.'}
+asis:
+  caption: 'Reinsurance today (Reinsurance process flow: placement, commission collections, claims, settlement)'
+  notes: >-
+    TSU e-mails the facultative request. The RI officer acknowledges it within 24 hours, reviews the underwriting
+    information and prepares the facultative slip within 3 working days, approaches reinsurers and partner RI brokers
+    by e-mail and negotiates. Once enough capacity is secured the officer checks conditions and warranties, informs TSU
+    in writing, sends the closings and the debit note to the cedant and chases the signed slips. Premium payment
+    schedules, warranties and expected RI commission are tracked on a monitoring sheet shared with the Commission
+    Receivable Unit, with reminders by e-mail. For claims the claims handler records the reserve, shares the adjuster's
+    reports with every reinsurer within 48 hours, prepares the RCRF and the formal loss advice, and for cash calls
+    invoices the panel within 72 hours, collects within 10 days and remits within 5 days. None of the deadlines is
+    tracked by a system.
+  cols: 7
+  lanes:
+    - {id: tsu, label: 'TSU, cedant', kind: external}
+    - {id: ri, label: 'RI Officer, Team Head'}
+    - {id: mkt, label: 'Reinsurers, RI brokers', kind: external}
+    - {id: cru, label: 'Commission Receivable, Cashiering'}
+    - {id: clm, label: RI Claims Handler}
+    - {id: sys, label: 'E-mail, Word, Excel sheets', kind: system}
+  steps:
+    - {id: i1, lane: tsu, col: 1, text: Facultative request by e-mail, kind: external}
+    - {id: i2, lane: ri, col: 1, text: 'Acknowledge in 24 h; slip in 3 days', pain: [1, 2]}
+    - {id: i3, lane: mkt, col: 2, text: 'Approached and negotiated by e-mail', kind: external, pain: [3]}
+    - {id: i4, lane: ri, col: 3, text: 'Conditions checked; TSU informed in writing'}
+    - {id: i5, lane: tsu, col: 3, text: 'Closings and debit note to cedant', kind: external, pain: [4]}
+    - {id: i6, lane: sys, col: 4, text: 'Monitoring sheet: schedules, warranties', kind: legacy, pain: [5]}
+    - {id: i7, lane: cru, col: 4, text: 'RI commission followed up by hand', pain: [6]}
+    - {id: i8, lane: clm, col: 5, text: 'Reserve; reports to reinsurers in 48 h', pain: [7]}
+    - {id: i9, lane: clm, col: 6, text: 'RCRF and formal loss advice prepared'}
+    - {id: i10, lane: ri, col: 7, text: 'Cash call: invoice 72 h, collect 10 days', pain: [8]}
+    - {id: i11, lane: mkt, col: 7, text: Reinsurers pay their share, kind: external}
+  edges:
+    - [i1, i2, dashed, e-mail]
+    - [i2, i3, dashed, e-mail]
+    - [i3, i4]
+    - [i4, i5, dashed]
+    - [i5, i6]
+    - [i6, i7]
+    - [i8, i9]
+    - [i9, i10]
+    - [i10, i11, dashed, invoice]
+pains:
+  - {n: 1, title: Requests by e-mail, text: 'TSU requests and underwriting information arrive by e-mail.', ref: 'RI flow p.4'}
+  - {n: 2, title: TATs tracked by memory, text: '24-hour acknowledgement and 3-day slip are not measured.', ref: 'RI flow p.4'}
+  - {n: 3, title: Market approached by e-mail, text: 'Slips, shares and terms negotiated in e-mail threads.', ref: 'RI flow p.4'}
+  - {n: 4, title: Closings and debit notes by hand, text: 'Word documents; signed slips chased by e-mail.', ref: 'RI flow p.4'}
+  - {n: 5, title: Monitoring sheet in Excel, text: 'Payment schedules and warranties on a shared spreadsheet.', ref: 'RI flow p.1'}
+  - {n: 6, title: RI commission chased by hand, text: 'Commission Receivable and RI follow up reinsurers and brokers.', ref: 'RI flow p.1'}
+  - {n: 7, title: Claim deadlines not tracked, text: '5-day PLA, next-day RCRF, 48-hour report sharing kept by hand.', ref: 'RI flow p.4'}
+  - {n: 8, title: Cash calls and settlement by hand, text: '72-hour invoice, 10-day collection, 5-day remittance.', ref: 'RI flow p.4'}
+tobe:
+  caption: 'Reinsurance To-Be in the RI BRD (phase 2): FRID-001 to 106'
+  notes: >-
+    In the RI BRD, TSU creates the placement request in the system and it flows to BDOI RI with the slip information.
+    Reinsurers and RI brokers are kept as contacts with their shares; the request and the slips are sent to them from
+    the system, and non-acceptance reasons are captured and notified to TSU. Revised slips go back to the cedant or TSU
+    for sign-off and then to the reinsurers; the signed slip is handed to Operations, booked with generated accounting
+    entries and an SOA is scheduled and sent. Premium payments are applied and matched, instalment reminders go to the
+    AO, and a proof of remittance and remittance schedule are generated. For claims the system records the net loss
+    reserve per reinsurer, generates the PLA, RCRF and formal loss advice, sends cash calls and debit notes, captures
+    paid proceeds with the cash entry and supports net settlement. Every action is logged with its turnaround time.
+  cols: 7
+  lanes:
+    - {id: tsu, label: 'TSU, cedant', kind: external}
+    - {id: ri, label: 'RI Officer'}
+    - {id: mkt, label: 'Reinsurers, RI brokers', kind: external}
+    - {id: clm, label: 'Claims, Comptrollership'}
+    - {id: bibs, label: BIBS (automatic), kind: bibs}
+  steps:
+    - {id: t1, lane: tsu, col: 1, text: Placement request created, kind: external}
+    - {id: t2, lane: bibs, col: 1, text: 'Request flows to RI with slip data', kind: auto}
+    - {id: t3, lane: ri, col: 2, text: 'Reviews; picks reinsurers and shares'}
+    - {id: t4, lane: bibs, col: 3, text: 'Slip sent; answers and reasons captured', kind: auto}
+    - {id: t5, lane: mkt, col: 3, text: 'Accept, decline or sign the slip', kind: external}
+    - {id: t6, lane: ri, col: 4, text: 'Revised slip to cedant / TSU for sign-off'}
+    - {id: t7, lane: bibs, col: 5, text: 'Booked; entries; SOA scheduled', kind: auto}
+    - {id: t8, lane: bibs, col: 6, text: 'Instalment reminders; proof of remittance', kind: doc}
+    - {id: t9, lane: clm, col: 6, text: 'Loss reserve per reinsurer; PLA, RCRF, FLA'}
+    - {id: t10, lane: bibs, col: 7, text: 'Cash call, debit note; net settlement', kind: auto}
+    - {id: t11, lane: mkt, col: 7, text: 'Pays share; proceeds captured', kind: external}
+  edges:
+    - [t1, t2]
+    - [t2, t3]
+    - [t3, t4]
+    - [t4, t5, dashed, e-mail + log]
+    - [t5, t6]
+    - [t6, t7]
+    - [t7, t8]
+    - [t8, t9]
+    - [t9, t10]
+    - [t10, t11, dashed]
+after:
+  - {n: 1, bibs: 'TSU creates the placement request; it flows to RI with the slip data (FRID-001-007)', measure: 'No e-mail intake'}
+  - {n: 2, bibs: 'Status changes and turnaround times logged (FRID-098); no SLA clock', measure: 'Partly: see gaps'}
+  - {n: 3, bibs: 'Reinsurers and brokers as contacts with shares; slips sent and answers captured (FRID-008-016)', measure: 'Communication log'}
+  - {n: 4, bibs: 'Revisions logged; signed slip to Operations; booking and entries generated (FRID-020-032)', measure: 'Entries generated'}
+  - {n: 5, bibs: 'Instalment and due-date reminders scheduled (FRID-049-054)', measure: 'No sheet'}
+  - {n: 6, bibs: 'Premium applied and matched; proof of remittance; commission scenarios (FRID-039-048)', measure: 'Tracked per account'}
+  - {n: 7, bibs: 'Loss reserve per reinsurer; PLA, RCRF and FLA generated and sent (FRID-101-105)', measure: 'Templates, log'}
+  - {n: 8, bibs: 'Cash calls, debit notes, proceeds capture and net settlement (FRID-058-094, 106)', measure: 'Entry on receipt'}
+missed:
+  - {cov: CONFIRM, item: RI transactions in Drop 1, seen: 'Remittance handles RI transactions today.', brd: 'Which transactions and entries is undefined.', rec: 'List the RI transactions Remittance must support at go-live.', ref: 'DCR-210; A3'}
+  - {cov: NOT_IN_BRD, item: TSU referral in phase 1, seen: 'Large or special risks go from TSU to RI.', brd: 'No referral in BRD-1 or BRD-3.', rec: 'A referral status on the TSU request until the module arrives.', ref: 'TSU flow'}
+  - {cov: PARTLY, item: Turnaround clocks, seen: '24 h, 3 days, 48 h, 72 h, 10 days, 5 days.', brd: 'Turnaround logged, no SLA clocks or alerts.', rec: 'SLA clocks with alerts on each deadline.', ref: 'RI flow; FRID-098'}
+  - {cov: PARTLY, item: RI commission follow-up, seen: 'Monitoring sheet with the Commission Receivable Unit.', brd: 'Commission scenarios; follow-up owner not stated.', rec: 'RI commission receivable on the same worklist as direct commission.', ref: 'RI flow p.1; FRID-042'}
+  - {cov: PARTLY, item: Warranty breaches and extensions, seen: 'Extensions escalated to the RI Unit Head.', brd: 'Reminders only.', rec: 'Warranty breach alert and an extension approval.', ref: 'RI flow p.1'}
+  - {cov: NOT_IN_BRD, item: Reinsurer security, seen: 'Reinsurers chosen per slip.', brd: 'Contacts and shares only.', rec: 'Reinsurer register with rating and accreditation.', ref: 'CORE-15'}
+  - {cov: PARTLY, item: RI reports, seen: 'Four RI reports in the Report List.', brd: 'Generic reporting (FRID-095).', rec: 'Specify the four reports (#112-115).', ref: 'Report List #112-115'}
+best:
+  - {practice: Structured RI placement, status: PARTLY, lever: Control of shares, what: 'Lines, shares, signing-down and the order placed held per slip; the total always adds to 100%.', rec: 'Specify share and signing rules in the phase-2 design.'}
+  - {practice: Reinsurer security register, status: NOT_IN_BRD, lever: Counterparty risk, what: 'Rating, Insurance Commission accreditation and limits per reinsurer, checked at placement.', rec: 'Add to the insurer register.'}
+  - {practice: Bordereaux automation, status: PARTLY, lever: Less re-keying, what: 'Premium and claims bordereaux generated and reconciled per reinsurer.', rec: 'Extend the SOA to bordereaux.'}
+  - {practice: SLA tracker for claims and cash calls, status: PARTLY, lever: Faster recoveries, what: 'Clocks on PLA, reports, invoices, collection and remittance, with escalation.', rec: 'Use the TATs of the flow as the SLA values.'}
+  - {practice: Payment warranty monitor, status: PARTLY, lever: Avoids cover disputes, what: 'Premium payment warranties tracked with alerts before breach.', rec: 'Build on FRID-049-054.'}
+  - {practice: Net settlement with reinsurers, status: IN_BRD, lever: Fewer payments, what: 'Premium, commission and claims netted per reinsurer and period.', rec: 'Agree netting rules with Comptrollership (FRID-106).'}

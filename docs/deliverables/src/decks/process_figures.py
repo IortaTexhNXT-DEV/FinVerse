@@ -52,6 +52,8 @@ STEP = {
 LEGENDS = {
     "asis": [("manual", "Manual step (BDOI)"), ("legacy", "Step in today's system or file"),
              ("external", "External party"), ("pain", "Pain point (see next slide)")],
+    "e2e": [("manual", "Step by a BDOI team"), ("legacy", "Step in today's system or file"),
+            ("external", "External party")],
     "tobe": [("screen", "BDOI user on a BIBS screen"), ("auto", "BIBS does it automatically"),
              ("doc", "Document or notice"), ("external", "External party"), ("parked", "Parked interface")],
 }
@@ -91,7 +93,7 @@ class Canvas:
 
     def _id(self, prefix: str) -> str:
         self._n += 1
-        return f"{prefix}{self._n}"
+        return f"zz_{prefix}{self._n}"  # never clashes with a step id of the YAML
 
     def rect(self, x: float, y: float, w: float, h: float, fill: str, border: str = "@BORDER",
              label: str = "", font: str = "@NEAR_BLACK", size: float = FONT_PT, bold: bool = False,
@@ -188,7 +190,7 @@ class Canvas:
 
 def swimlane(name: str, spec: dict[str, Any], mode: str, comment: str) -> str:
     """Swimlane from {lanes: [{id, label, kind}], cols, steps: [{id, lane, col, text, kind, pain}],
-    edges: [[a, b, style?, label?]]}. ``mode`` is asis or tobe (legend)."""
+    edges: [[a, b, style?, label?]]}. ``mode`` is asis, e2e or tobe (legend)."""
     lanes = spec["lanes"]
     ncols = spec.get("cols") or max(s["col"] for s in spec["steps"])
     legend_h = 24
@@ -211,7 +213,7 @@ def swimlane(name: str, spec: dict[str, Any], mode: str, comment: str) -> str:
         w = col_w * span - 10
         x = head_w + (s["col"] - 1) * col_w + 5 + s.get("dx", 0)
         y = lane_y[s["lane"]] + (lane_h - box_h) / 2
-        kind = s.get("kind") or ("manual" if mode == "asis" else "screen")
+        kind = s.get("kind") or ("manual" if mode in ("asis", "e2e") else "screen")
         cv.step(s["id"], x, y, w, box_h, s["text"], kind)
         for k, p in enumerate(reversed(s.get("pain", []) or [])):
             cv.marker(x + w - 4 - k * 21, y + 2, str(p))

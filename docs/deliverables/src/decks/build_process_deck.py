@@ -1,13 +1,24 @@
-"""Builds the BIBS business process deck (deliverable 41): As-Is, Envisioned, Gaps and Best Practice.
+"""Builds the BDOI business process reverse KT deck (deliverable 41, v2.0).
+
+The deck gives BDOI back the project team's understanding of how BDOI works, department by department and end to
+end: the current (As-Is) process as walked on the floor, the pain points the business users raised, the To-Be the
+BRDs ask for and how it answers those pain points, what the BRDs do not cover yet, and the broker-industry practices
+that go beyond the BRDs, with a roadmap for streamlining and automation, data migration and integrations. It does not
+report build progress.
 
 Content lives next to this script:
 
-* ``process_deck/deck.yaml``: title, agenda, the holistic chapter and the closing summary;
-* ``process_deck/areas/brdNN_*.yaml``: one file per business area (at a glance, As-Is swimlane,
-  pain points, envisioned swimlane, before / after, gaps, best practice, speaker notes).
+* ``process_deck/deck.yaml``: title, the understanding chapter, the holistic chapter, the department parts, the
+  cross-cutting chapter (data migration, integrations, shared capabilities) and the roadmap;
+* ``process_deck/areas/*.yaml``: one file per business area (at a glance, floor-walk notes, As-Is swimlanes,
+  pain points, To-Be swimlane, before / after, what the BRD does not cover, best practice, speaker notes).
 
-The swimlanes and enterprise maps are generated as Graphviz sources in ``figures/*.dot`` and
-rendered to ``figures/*.png`` with the BDO colour tokens (tools/deliverables).
+Sources of the content: the BDOI Day 1 business overview of 21-Sep-2026, the floor walks of 22 to 25-Sep-2026 and
+their notes (Ref OV-, NB-, PM-, CA-...), the high-level process flows confirmed by the BDOI process owners, the BRDs
+(PDF page), the discrepancy register (DCR-nnn) and the design documents of the repository.
+
+The swimlanes and enterprise maps are generated as Graphviz sources in ``figures/*.dot`` and rendered to
+``figures/*.png`` with the BDO colour tokens (tools/deliverables).
 
     python docs/deliverables/src/decks/build_process_deck.py              # deck
     python docs/deliverables/src/decks/build_process_deck.py --previews [dir]   # deck + slide PNGs
@@ -40,29 +51,39 @@ import process_figures as pf  # noqa: E402
 
 DATA = HERE / "process_deck"
 FIG = HERE / "figures"
+VERSION = "2.0"
 OUT = brand.out_dir("BRD-00", "Decks") / brand.output_name(
-    "Deck", "BRD-00", "Business Process AsIs Envisioned BestPractice", "1.0", "pptx")
+    "Deck", "BRD-00", "Business Process AsIs Envisioned BestPractice", VERSION, "pptx")
 
 CONTENT_W = W - 2 * MARGIN
 TOP = Inches(1.4)
+BOTTOM = H - Inches(0.62)  # top of the footer rule
 
-STATUS = {  # status chip: (label, fill, font)
-    "BUILT": ("Built", brand.SUCCESS_BG, brand.SUCCESS),
-    "IN BUILD": ("In build", brand.AMBER_BG, brand.AMBER),
-    "DESIGNED": ("Designed", brand.BG_BLUE, brand.HEADER_BLUE),
-    "PARTLY BUILT": ("Partly built", brand.AMBER_BG, brand.AMBER),
-}
-SEVERITY = {  # gap severity: (fill, font)
+SEVERITY = {  # level of a gap or open point: (fill, font)
     "High": (brand.DANGER_BG, brand.DANGER),
     "Medium": (brand.AMBER_BG, brand.AMBER),
     "Low": (brand.DIRTY_WHITE, brand.MUTED),
     "Parked": ("EDE7F6", "4527A0"),
     "Answered": (brand.SUCCESS_BG, brand.SUCCESS),
 }
-PRACTICE = {  # best-practice support: (label, fill, font)
-    "BIBS": ("Supported by BIBS", brand.SUCCESS_BG, brand.SUCCESS),
-    "PARTLY": ("Partly in BIBS", brand.AMBER_BG, brand.AMBER),
-    "ADOPT": ("BDOI to adopt", brand.BG_BLUE, brand.HEADER_BLUE),
+COVERAGE = {  # how far the BRD covers a floor-walk item or a practice: (label, fill, font)
+    "IN_BRD": ("In the BRD", brand.SUCCESS_BG, brand.SUCCESS),
+    "PARTLY": ("Partly in BRD", brand.AMBER_BG, brand.AMBER),
+    "NOT_IN_BRD": ("Not in BRD", brand.DANGER_BG, brand.DANGER),
+    "BEYOND": ("Beyond the BRD", brand.BG_BLUE, brand.HEADER_BLUE),
+    "CONFIRM": ("BDOI to confirm", "EDE7F6", "4527A0"),
+}
+HEARD = {  # kind of a floor-walk note: (label, fill, font)
+    "asis": ("As-Is", brand.DIRTY_WHITE, brand.NEAR_BLACK),
+    "pain": ("Pain point", brand.DANGER_BG, brand.DANGER),
+    "want": ("User aspiration", brand.BG_BLUE, brand.HEADER_BLUE),
+    "rule": ("Business rule", brand.SUCCESS_BG, brand.SUCCESS),
+    "open": ("Open point", "EDE7F6", "4527A0"),
+}
+LEVEL = {  # benefit or effort level in the roadmap tables: (fill, font)
+    "High": (brand.SUCCESS_BG, brand.SUCCESS),
+    "Medium": (brand.AMBER_BG, brand.AMBER),
+    "Low": (brand.DIRTY_WHITE, brand.MUTED),
 }
 
 
@@ -85,6 +106,19 @@ def _textbox(s, x, y, w, h):
 
 def _table(s, rows, cols, x, y, w, h):
     return s.shapes.add_table(rows, cols, int(x), int(y), int(w), int(h))
+
+
+def chunks(rows: list, size: int) -> list[list]:
+    """Splits rows into pages of at most ``size`` rows, balanced (7 rows at size 6 give 4 + 3, not 6 + 1)."""
+    if len(rows) <= size:
+        return [rows]
+    pages = math.ceil(len(rows) / size)
+    per = math.ceil(len(rows) / pages)
+    return [rows[i:i + per] for i in range(0, len(rows), per)]
+
+
+def paged(title: str, i: int, n: int) -> str:
+    return title if n == 1 else f"{title} ({i + 1}/{n})"
 
 
 # ====================================================================== deck with extra layouts
@@ -110,11 +144,22 @@ class ProcessDeck(BdoiDeck):
         self.slide.notes_slide.notes_text_frame.text = text.strip()
 
     def page(self, title: str):
-        if len(title) > 50:  # 26 pt bold wraps onto the yellow rule beyond about 50 characters
-            print(f"warning: slide {self._n + 1} title is {len(title)} characters: {title}")
         s = self._slide()
         self._chrome(s, title)
         return s
+
+    def _chrome(self, slide, title: str) -> None:
+        """The toolkit chrome, with the title stepped down from 26 pt when it would wrap onto the yellow rule."""
+        super()._chrome(slide, title)
+        size = 26 if len(title) <= 50 else 23 if len(title) <= 58 else 20
+        if len(title) > 66:
+            print(f"warning: slide {self._n} title is {len(title)} characters: {title}")
+        if size != 26:
+            for shape in slide.shapes:
+                if shape.has_text_frame and shape.text_frame.text == title:
+                    for r in shape.text_frame.paragraphs[0].runs:
+                        r.font.size = Pt(size)
+                    break
 
     def para(self, s, x, y, w, h, runs, size=12, anchor=MSO_ANCHOR.TOP, align=None, space=4):
         """Text box with paragraphs; each paragraph is a list of (text, bold, colour) runs or a str."""
@@ -274,28 +319,117 @@ class ProcessDeck(BdoiDeck):
                        italic=True, colour=brand.MUTED, align=PP_ALIGN.CENTER)
         self.notes(notes)
 
+    def card(self, s, x, y, w, h, head, body, chip=None, head_h=Inches(0.5), size=12, head_size=13,
+             head_fill=brand.HEADER_BLUE, fill=brand.WHITE):
+        """Card with a coloured header; ``body`` is a list of paragraphs (str or runs); ``chip`` is
+        (label, fill, font)."""
+        self.box(s, x, y, w, h, fill, brand.BORDER)
+        self.box(s, x, y, w, head_h, head_fill, radius=False)
+        self.para(s, x + Inches(0.08), y, w - Inches(0.16), head_h, [[(head, True, brand.WHITE)]], size=head_size,
+                  anchor=MSO_ANCHOR.MIDDLE, space=0)
+        by = y + head_h + Inches(0.08)
+        if chip:
+            label, cf, ct = chip
+            self.chip(s, x + Inches(0.1), by, label, cf, ct, w=Inches(1.7), h=Inches(0.28), size=11)
+            by += Inches(0.36)
+        runs = []
+        for p in body:
+            if isinstance(p, str):
+                runs.append([("•  ", False, brand.HEADER_BLUE), (p, False, brand.TEXT)])
+            else:
+                runs.append(p)
+        self.para(s, x + Inches(0.08), by, w - Inches(0.16), y + h - by - Inches(0.04), runs, size=size, space=3)
+
+    def cards(self, title: str, items: list[dict], cols: int = 3, notes="", intro: str = "", size=12,
+              head_size=13, rows: int | None = None) -> None:
+        """Grid of cards: {head, body: [..], chip: key of COVERAGE or LEVEL, note}."""
+        s = self.page(title)
+        y0 = TOP
+        if intro:
+            self.para(s, MARGIN, TOP - Inches(0.05), CONTENT_W, Inches(0.5), [[(intro, False, brand.NEAR_BLACK)]],
+                      size=13, space=0)
+            y0 = TOP + Inches(0.5)
+        gap = Inches(0.18)
+        cw = (CONTENT_W - gap * (cols - 1)) / cols
+        nrows = rows or math.ceil(len(items) / cols)
+        ch = (BOTTOM - Inches(0.1) - y0 - gap * (nrows - 1)) / nrows
+        for i, it in enumerate(items):
+            x = MARGIN + (i % cols) * (cw + gap)
+            y = y0 + (i // cols) * (ch + gap)
+            chip = None
+            if it.get("chip"):
+                chip = COVERAGE.get(it["chip"]) or HEARD.get(it["chip"])
+            self.card(s, x, y, cw, ch, it["head"], it.get("body", []), chip=chip, size=size, head_size=head_size)
+        self.notes(notes or [f"{it['head']}: " + "; ".join(b if isinstance(b, str) else "".join(r[0] for r in b)
+                                                       for b in it.get("body", [])) for it in items])
+
+    def stats(self, title: str, tiles: list[dict], notes, foot: str = "") -> None:
+        """Big-number tiles: {value, label, source}."""
+        s = self.page(title)
+        cols = 4
+        rows = math.ceil(len(tiles) / cols)
+        gap = Inches(0.2)
+        tw = (CONTENT_W - gap * (cols - 1)) / cols
+        avail = BOTTOM - TOP - (Inches(0.5) if foot else Inches(0.1))
+        th = (avail - gap * (rows - 1)) / rows
+        for i, t in enumerate(tiles):
+            x = MARGIN + (i % cols) * (tw + gap)
+            y = TOP + (i // cols) * (th + gap)
+            self.box(s, x, y, tw, th, brand.BG_BLUE)
+            self._text(s, x + Inches(0.15), y + Inches(0.08), tw - Inches(0.3), Inches(0.75), str(t["value"]),
+                       size=30, bold=True, colour=brand.HEADER_BLUE)
+            self.para(s, x + Inches(0.15), y + Inches(0.85), tw - Inches(0.3), th - Inches(1.25),
+                      [[(t["label"], True, brand.NEAR_BLACK)]], size=13, space=0)
+            if t.get("source"):
+                self.para(s, x + Inches(0.15), y + th - Inches(0.42), tw - Inches(0.3), Inches(0.38),
+                          [[(t["source"], False, brand.MUTED)]], size=10, anchor=MSO_ANCHOR.BOTTOM, space=0)
+        if foot:
+            self.para(s, MARGIN, BOTTOM - Inches(0.45), CONTENT_W, Inches(0.4), [[(foot, False, brand.MUTED)]],
+                      size=11, space=0)
+        self.notes(notes)
+
     def agenda(self, title: str, tiles: list[dict]) -> None:
         s = self.page(title)
         cols = 4
-        gap = Inches(0.18)
+        gap = Inches(0.16)
         tw = (CONTENT_W - gap * (cols - 1)) / cols
-        th = Inches(1.18)
+        rows = math.ceil(len(tiles) / cols)
+        th = min(Inches(1.18), (BOTTOM - TOP - Inches(0.1) - gap * (rows - 1)) / rows)
         for i, t in enumerate(tiles):
             x = MARGIN + (i % cols) * (tw + gap)
             y = TOP + (i // cols) * (th + gap)
             hl = t.get("highlight")
             self.box(s, x, y, tw, th, brand.HEADER_BLUE if hl else brand.WHITE, brand.HEADER_BLUE)
             colour = brand.WHITE if hl else brand.HEADER_BLUE
-            self._text(s, x + Inches(0.1), y + Inches(0.06), Inches(0.6), Inches(0.5), t["num"], size=22,
+            self._text(s, x + Inches(0.08), y + Inches(0.04), Inches(0.62), Inches(0.5), t["num"], size=20,
                        bold=True, colour=brand.YELLOW if hl else brand.CTA_BLUE)
-            self.para(s, x + Inches(0.62), y + Inches(0.08), tw - Inches(0.7), Inches(0.75),
-                      [[(t["title"], True, colour)]], size=14)
-            if t.get("brd"):
-                self._text(s, x + Inches(0.12), y + th - Inches(0.42), Inches(1.3), Inches(0.35), t["brd"],
-                           size=12, colour=brand.WHITE if hl else brand.MUTED)
-            if t.get("status"):
-                label, fill, font = STATUS[t["status"]]
-                self.chip(s, x + tw - Inches(1.42), y + th - Inches(0.42), label, fill, font, w=Inches(1.3))
+            self.para(s, x + Inches(0.66), y + Inches(0.06), tw - Inches(0.72), th - Inches(0.4),
+                      [[(t["title"], True, colour)]], size=13)
+            if t.get("sub"):
+                self._text(s, x + Inches(0.1), y + th - Inches(0.36), tw - Inches(0.2), Inches(0.32), t["sub"],
+                           size=11, colour=brand.BG_BLUE if hl else brand.MUTED)
+
+    def part(self, p: dict) -> None:
+        """Divider of a department part, listing its chapters."""
+        s = self._slide()
+        self._rect(s, 0, 0, W, H, brand.HEADER_BLUE)
+        self._text(s, MARGIN, Inches(1.5), Inches(11.5), Inches(0.6), f"Part {p['num']}", size=20, bold=True,
+                   colour=brand.YELLOW)
+        size = 36 if len(p["title"]) <= 42 else 28
+        self._text(s, MARGIN, Inches(2.05), Inches(11.5), Inches(1.0), p["title"], size=size, bold=True,
+                   colour=brand.WHITE, anchor=MSO_ANCHOR.TOP)
+        self._rect(s, MARGIN, Inches(3.15), Inches(1.6), Pt(4), brand.YELLOW)
+        self.para(s, MARGIN, Inches(3.35), Inches(11.5), Inches(0.9), [[(p["subtitle"], False, brand.BG_BLUE)]],
+                  size=16)
+        y = Inches(4.35)
+        for ch in p.get("chapters", []):
+            self.para(s, MARGIN, y, Inches(11.5), Inches(0.4),
+                      [[(f"{ch['num']}.  ", True, brand.YELLOW), (ch["title"], True, brand.WHITE),
+                        (f"   {ch['sub']}", False, brand.FIELD_BLUE)]], size=15, space=0)
+            y += Inches(0.42)
+        self._text(s, MARGIN, H - Inches(0.6), Inches(6), Inches(0.35), f"{brand.FOOTER_TEXT} | {self.title_text}",
+                   size=9, colour=brand.FIELD_BLUE)
+        self.notes(p.get("notes", p["subtitle"]))
 
     def glance(self, a: dict) -> None:
         s = self.page(f"{a['num']}. {_short(a)}: at a glance")
@@ -315,11 +449,11 @@ class ProcessDeck(BdoiDeck):
         x = MARGIN + colw + Inches(0.2)
         self.box(s, x, y0, colw, hh, brand.WHITE, brand.BORDER)
         self.box(s, x, y0, colw, Inches(0.45), brand.HEADER_BLUE, radius=False)
-        self._text(s, x + Inches(0.12), y0, colw, Inches(0.45), "Volumes and NFRs (BRD)", size=14, bold=True,
+        self._text(s, x + Inches(0.12), y0, colw, Inches(0.45), "Volumes and business rules", size=14, bold=True,
                    colour=brand.WHITE, anchor=MSO_ANCHOR.MIDDLE)
         figs = a.get("figures", [])
         fy = y0 + Inches(0.55)
-        tile_h = Inches(0.8)
+        tile_h = Inches(0.78)
         for k, (value, label) in enumerate(figs[:4]):
             ty = fy + k * (tile_h + Inches(0.08))
             self.box(s, x + Inches(0.1), ty, colw - Inches(0.2), tile_h, brand.BG_BLUE)
@@ -327,27 +461,52 @@ class ProcessDeck(BdoiDeck):
                        colour=brand.HEADER_BLUE, anchor=MSO_ANCHOR.MIDDLE)
             self.para(s, x + Inches(1.72), ty, colw - Inches(1.85), tile_h, [label], size=12,
                       anchor=MSO_ANCHOR.MIDDLE, space=0)
-        # card 3: sources and status
+        # card 3: how we learned it
         x = MARGIN + 2 * (colw + Inches(0.2))
         self.box(s, x, y0, colw, hh, brand.WHITE, brand.BORDER)
         self.box(s, x, y0, colw, Inches(0.45), brand.HEADER_BLUE, radius=False)
-        self._text(s, x + Inches(0.12), y0, colw, Inches(0.45), "BRD and build status", size=14, bold=True,
+        self._text(s, x + Inches(0.12), y0, colw, Inches(0.45), "How we learned it", size=14, bold=True,
                    colour=brand.WHITE, anchor=MSO_ANCHOR.MIDDLE)
-        label, fill, font = STATUS[a["status"]]
-        self.chip(s, x + Inches(0.12), y0 + Inches(0.58), label, fill, font, w=Inches(1.5), h=Inches(0.36),
-                  size=13)
-        self.para(s, x + Inches(0.1), y0 + Inches(1.0), colw - Inches(0.2), Inches(0.5),
-                  [[(a["status_text"], True, brand.NEAR_BLACK)]], size=12)
-        runs = [[("•  ", False, brand.HEADER_BLUE), (t, False, brand.TEXT)] for t in a["sources"]]
-        self.para(s, x + Inches(0.1), y0 + Inches(1.55), colw - Inches(0.2), hh - Inches(1.6), runs, size=12,
-                  space=3)
+        fw = a["session"]
+        pocs = fw["pocs"]
+        if len(pocs) > 150:  # the full list is in the notes and on the floor-walk coverage slide
+            names = [n.strip() for n in pocs.replace(";", ",").split(",")]
+            shown = ", ".join(names[:6])
+            pocs = f"{shown} and {len(names) - 6} more (floor-walk coverage slide)"
+        runs = [[("Floor walk: ", True, brand.HEADER_BLUE), (fw["when"], False, brand.NEAR_BLACK)],
+                [("Process owners: ", True, brand.HEADER_BLUE), (pocs, False, brand.TEXT)]]
+        runs += [[("•  ", False, brand.HEADER_BLUE), (t, False, brand.TEXT)] for t in a["sources"]]
+        self.para(s, x + Inches(0.1), y0 + Inches(0.55), colw - Inches(0.2), hh - Inches(0.6), runs, size=11,
+                  space=4)
         # process in one line
         cy = y0 + hh + Inches(0.22)
         self._text(s, MARGIN, cy, CONTENT_W, Inches(0.3), "The process in one line", size=12, bold=True,
                    colour=brand.MUTED)
         size = 12 if max(len(c) for c in a["chevrons"]) <= 12 else 11
         self.chevrons(s, MARGIN, cy + Inches(0.32), CONTENT_W, Inches(0.72), a["chevrons"], size=size)
-        self.notes(a.get("notes", {}).get("glance", "") + "\n\nSources: " + "; ".join(a["sources"]))
+        self.notes(a.get("notes", {}).get("glance", "") + f"\n\nFloor walk: {fw['when']}; {fw['pocs']}."
+                   + "\nSources: " + "; ".join(a["sources"]))
+
+    def heard(self, a: dict) -> None:
+        """Floor-walk notes of the area: Ref, topic, kind, what we heard, what BDOI wants."""
+        items = a["heard"]
+        pages = chunks(items, 7)
+        for i, rows_in in enumerate(pages):
+            s = self.page(paged(f"{a['num']}. {_short(a)}: what we heard on the floor", i, len(pages)))
+            headers = ["Ref", "Topic", "Type", "What we heard (As-Is)", "What the business wants (To-Be)"]
+            rows, fills = [], {}
+            for k, h in enumerate(rows_in):
+                label, fill, font = HEARD[h["kind"]]
+                rows.append([h["ref"], h["topic"], label, h["asis"], h.get("want") or "-"])
+                fills[(k, 2)] = (fill, font)
+            row_h = min(Inches(0.9), (BOTTOM - TOP - Inches(0.5)) / max(1, len(rows)))
+            self.grid_table(s, MARGIN, TOP, CONTENT_W, headers, rows, [0.8, 1.9, 1.35, 4.6, 3.4], size=11,
+                            row_h=row_h, fills=fills, bold_cols=(0,))
+        notes = [a.get("notes", {}).get("heard", "Notes of the floor walk and the discovery sessions; the Ref is "
+                                                 "the row of the floor-walk notes workbook.")]
+        notes += [f"{h['ref']} {h['topic']} ({HEARD[h['kind']][0]}): {h['asis']}"
+                  + (f" Wants: {h['want']}" if h.get("want") else "") for h in items]
+        self.notes(notes)
 
     def pain_legend(self, a: dict) -> None:
         s = self.page(f"{a['num']}. {_short(a)}: pain points today")
@@ -369,79 +528,238 @@ class ProcessDeck(BdoiDeck):
         notes += [f"{p['n']}. {p['title']}: {p['text']} ({p['ref']})" for p in pains]
         self.notes(notes)
 
-    def before_after(self, a: dict) -> None:
-        s = self.page(f"{a['num']}. {_short(a)}: before and after")
+    def before_after(self, a: dict, rows_key: str = "after", suffix: str = "how the BRD answers",
+                     heads: tuple = ("Pain point today", "To-Be in the BRD", "Benefit")) -> None:
+        """Pain point -> answer -> benefit rows ({n, bibs, measure}), seven a slide."""
         pains = {p["n"]: p for p in a["pains"]}
-        rows = a["after"]
-        head_y = TOP - Inches(0.02)
-        xb, wb = MARGIN + Inches(0.5), Inches(4.0)
-        xa, wa = xb + wb + Inches(0.45), Inches(4.9)
-        xm, wm = xa + wa + Inches(0.12), CONTENT_W - (xa + wa + Inches(0.12) - MARGIN)
-        for x, w, t in ((xb, wb, "Today (pain point)"), (xa, wa, "In BIBS"), (xm, wm, "Measure")):
-            self._text(s, x, head_y, w, Inches(0.3), t, size=12, bold=True, colour=brand.HEADER_BLUE)
-        rh = min(Inches(0.72), Inches(5.0) / len(rows))
-        for i, r in enumerate(rows):
-            y = TOP + Inches(0.32) + i * rh
-            bh = rh - Inches(0.08)
-            self.circle(s, MARGIN, y + (bh - Inches(0.36)) / 2, r["n"], size=12)
-            self.box(s, xb, y, wb, bh, brand.DIRTY_WHITE, brand.BORDER)
-            self.para(s, xb + Inches(0.05), y, wb - Inches(0.1), bh, [pains[r["n"]]["title"]], size=12,
-                      anchor=MSO_ANCHOR.MIDDLE, space=0)
-            self.arrow(s, xb + wb + Inches(0.08), y + bh / 2 - Inches(0.12), Inches(0.3), Inches(0.24))
-            self.box(s, xa, y, wa, bh, brand.BG_BLUE, brand.CTA_BLUE)
-            self.para(s, xa + Inches(0.05), y, wa - Inches(0.1), bh, [r["bibs"]], size=12,
-                      anchor=MSO_ANCHOR.MIDDLE, space=0)
-            self.para(s, xm, y, wm, bh, [[(r.get("measure") or "-", True, brand.SUCCESS)]], size=12,
-                      anchor=MSO_ANCHOR.MIDDLE, space=0)
-        notes = [a.get("notes", {}).get("after", "")]
+        pages = chunks(a[rows_key], 7)
+        for pi, rows in enumerate(pages):
+            s = self.page(paged(f"{a['num']}. {_short(a)}: {suffix}", pi, len(pages)))
+            head_y = TOP - Inches(0.02)
+            xb, wb = MARGIN + Inches(0.5), Inches(3.7)
+            xa, wa = xb + wb + Inches(0.45), Inches(5.2)
+            xm, wm = xa + wa + Inches(0.12), CONTENT_W - (xa + wa + Inches(0.12) - MARGIN)
+            for x, w, t in zip((xb, xa, xm), (wb, wa, wm), heads):
+                self._text(s, x, head_y, w, Inches(0.3), t, size=12, bold=True, colour=brand.HEADER_BLUE)
+            rh = Inches(5.0) / 7
+            for i, r in enumerate(rows):
+                y = TOP + Inches(0.32) + i * rh
+                bh = rh - Inches(0.08)
+                self.circle(s, MARGIN, y + (bh - Inches(0.36)) / 2, r["n"], size=12)
+                self.box(s, xb, y, wb, bh, brand.DIRTY_WHITE, brand.BORDER)
+                self.para(s, xb + Inches(0.05), y, wb - Inches(0.1), bh, [pains[r["n"]]["title"]], size=12,
+                          anchor=MSO_ANCHOR.MIDDLE, space=0)
+                self.arrow(s, xb + wb + Inches(0.08), y + bh / 2 - Inches(0.12), Inches(0.3), Inches(0.24))
+                self.box(s, xa, y, wa, bh, brand.BG_BLUE, brand.CTA_BLUE)
+                self.para(s, xa + Inches(0.05), y, wa - Inches(0.1), bh, [r["bibs"]], size=11,
+                          anchor=MSO_ANCHOR.MIDDLE, space=0)
+                self.para(s, xm, y, wm, bh, [[(r.get("measure") or "-", True, brand.SUCCESS)]], size=11,
+                          anchor=MSO_ANCHOR.MIDDLE, space=0)
+        notes = [a.get("notes", {}).get(rows_key, "")]
         notes += [f"{r['n']}. {pains[r['n']]['title']} -> {r['bibs']}"
-                  + (f" Measure: {r['measure']}." if r.get("measure") else "") for r in rows]
+                  + (f" {heads[2]}: {r['measure']}." if r.get("measure") else "") for r in a[rows_key]]
         self.notes(notes)
 
-    def gaps(self, a: dict | None, title: str | None = None, rows_in: list | None = None,
-             notes: str = "") -> None:
-        rows_in = rows_in if rows_in is not None else a["gaps"]
-        title = title or f"{a['num']}. {_short(a)}: gaps to close"
-        s = self.page(title)
-        headers = ["Level", "Gap", "Impact", "Owner", "Decision needed", "Ref"]
-        rows, fills = [], {}
-        for i, g in enumerate(rows_in):
-            rows.append([g["sev"], g["gap"], g["impact"], g["owner"], g["decision"], g["ref"]])
-            fills[(i, 0)] = SEVERITY[g["sev"]]
-        size = 12 if len(rows) <= 5 else 11
-        row_h = min(Inches(0.85), Inches(4.9) / max(1, len(rows)))
-        self.grid_table(s, MARGIN, TOP, CONTENT_W, headers, rows, [1.0, 3.2, 3.0, 1.9, 3.3, 1.2], size=size,
-                        row_h=row_h, fills=fills)
-        n = [notes or (a.get("notes", {}).get("gaps", "") if a else "")]
-        n += [f"{g['ref']} ({g['sev']}): {g['gap']}. Impact: {g['impact']}. Owner: {g['owner']}. "
-              f"Decision: {g['decision']}" for g in rows_in]
+    def missed(self, a: dict | None, title: str | None = None, rows_in: list | None = None, notes: str = "",
+               per_page: int = 7) -> None:
+        """What the BRD does not cover (yet): coverage, item, what we saw, BRD position, recommendation, ref."""
+        rows_in = rows_in if rows_in is not None else a["missed"]
+        title = title or f"{a['num']}. {_short(a)}: gaps in the BRD"
+        pages = chunks(rows_in, per_page)
+        for i, part in enumerate(pages):
+            s = self.page(paged(title, i, len(pages)))
+            headers = ["Coverage", "Item", "What we saw on the floor", "What the BRD says", "Our recommendation",
+                       "Ref"]
+            rows, fills = [], {}
+            for k, g in enumerate(part):
+                label, fill, font = COVERAGE[g["cov"]]
+                rows.append([label, g["item"], g["seen"], g["brd"], g["rec"], g["ref"]])
+                fills[(k, 0)] = (fill, font)
+            row_h = min(Inches(0.9), (BOTTOM - TOP - Inches(0.5)) / max(1, len(rows)))
+            self.grid_table(s, MARGIN, TOP, CONTENT_W, headers, rows, [1.15, 2.0, 3.0, 2.6, 3.2, 1.15], size=11,
+                            row_h=row_h, fills=fills, bold_cols=(1,))
+        n = [notes or (a.get("notes", {}).get("missed", "") if a else "")]
+        n += [f"[{COVERAGE[g['cov']][0]}] {g['item']}. Seen: {g['seen']} BRD: {g['brd']} Recommendation: "
+              f"{g['rec']} ({g['ref']})" for g in rows_in]
         self.notes(n)
 
-    def best_practice(self, a: dict) -> None:
-        s = self.page(f"{a['num']}. {_short(a)}: best practice")
+    def best_practice(self, a: dict, chips: bool = True) -> None:
+        """Practice cards; ``chips`` shows how far the BRD covers each (off in the floor-walk edition)."""
         items = a["best"]
-        cols = 3
-        gap = Inches(0.18)
-        cw = (CONTENT_W - gap * (cols - 1)) / cols
-        rows = math.ceil(len(items) / cols)
-        ch = (Inches(5.35) - gap * (rows - 1)) / rows
-        for i, b in enumerate(items):
-            x = MARGIN + (i % cols) * (cw + gap)
-            y = TOP + (i // cols) * (ch + gap)
-            self.box(s, x, y, cw, ch, brand.WHITE, brand.BORDER)
-            self.box(s, x, y, cw, Inches(0.62), brand.HEADER_BLUE, radius=False)
-            self.para(s, x + Inches(0.08), y, cw - Inches(0.16), Inches(0.62),
-                      [[(b["practice"], True, brand.WHITE)]], size=13, anchor=MSO_ANCHOR.MIDDLE, space=0)
-            label, fill, font = PRACTICE[b["status"]]
-            self.chip(s, x + Inches(0.1), y + Inches(0.7), label, fill, font, w=Inches(1.75), h=Inches(0.28),
-                      size=11)
-            self.para(s, x + Inches(0.08), y + Inches(1.02), cw - Inches(0.16), ch - Inches(1.05),
-                      [[("BIBS: ", True, brand.HEADER_BLUE), (b["bibs"], False, brand.TEXT)],
-                       [("BDOI: ", True, brand.HEADER_BLUE), (b["bdoi"], False, brand.TEXT)]], size=12, space=4)
-        notes = [a.get("notes", {}).get("best", "Practices that fit a Philippine insurance broker, and what "
-                                                 "BIBS supports today or by design.")]
-        notes += [f"{b['practice']} [{PRACTICE[b['status']][0]}]. BIBS: {b['bibs']} BDOI: {b['bdoi']}"
-                  for b in items]
+        pages = chunks(items, 6)
+        for pi, part in enumerate(pages):
+            s = self.page(paged(f"{a['num']}. {_short(a)}: best practice", pi, len(pages)))
+            cols = 3
+            gap = Inches(0.18)
+            cw = (CONTENT_W - gap * (cols - 1)) / cols
+            rows = math.ceil(len(part) / cols)
+            ch = (Inches(5.35) - gap * (rows - 1)) / rows
+            for i, b in enumerate(part):
+                x = MARGIN + (i % cols) * (cw + gap)
+                y = TOP + (i // cols) * (ch + gap)
+                self.box(s, x, y, cw, ch, brand.WHITE, brand.BORDER)
+                self.box(s, x, y, cw, Inches(0.62), brand.HEADER_BLUE, radius=False)
+                self.para(s, x + Inches(0.08), y, cw - Inches(0.16), Inches(0.62),
+                          [[(b["practice"], True, brand.WHITE)]], size=13, anchor=MSO_ANCHOR.MIDDLE, space=0)
+                lx = x + Inches(0.1)
+                if chips:
+                    label, fill, font = COVERAGE[b["status"]]
+                    self.chip(s, lx, y + Inches(0.7), label, fill, font, w=Inches(1.75), h=Inches(0.28), size=11)
+                    lx = x + Inches(1.95)
+                if b.get("lever"):
+                    self.para(s, lx, y + Inches(0.68), x + cw - lx - Inches(0.1), Inches(0.32),
+                              [[(b["lever"], True, brand.CTA_BLUE)]], size=11, anchor=MSO_ANCHOR.MIDDLE, space=0)
+                self.para(s, x + Inches(0.08), y + Inches(1.02), cw - Inches(0.16), ch - Inches(1.05),
+                          [[("Industry practice: ", True, brand.HEADER_BLUE), (b["what"], False, brand.TEXT)],
+                           [("For BDOI: ", True, brand.HEADER_BLUE), (b["rec"], False, brand.TEXT)]], size=12,
+                          space=4)
+        notes = [a.get("notes", {}).get("best", "Practices of insurance brokers that fit BDOI, beyond what the BRD "
+                                                 "asks; the chip shows how far the BRD already covers each one.")]
+        notes += [f"{b['practice']}" + (f" [{COVERAGE[b['status']][0]}]" if chips else "")
+                  + f". {b['what']} For BDOI: {b['rec']}" for b in items]
+        self.notes(notes)
+
+    def table_slide(self, title: str, t: dict, fill_col: int | None = None, fill_map: dict | None = None,
+                    per_page: int = 8, size: int = 11) -> None:
+        """Generic table from {headers, widths, rows, notes, intro}; ``fill_map`` colours column ``fill_col``."""
+        pages = chunks(t["rows"], per_page)
+        for i, part in enumerate(pages):
+            s = self.page(paged(title, i, len(pages)))
+            y = TOP
+            if t.get("intro"):
+                self.para(s, MARGIN, TOP - Inches(0.05), CONTENT_W, Inches(0.45),
+                          [[(t["intro"], False, brand.NEAR_BLACK)]], size=13, space=0)
+                y = TOP + Inches(0.45)
+            fills = {}
+            if fill_col is not None and fill_map:
+                for k, r in enumerate(part):
+                    key = str(r[fill_col])
+                    if key in fill_map:
+                        fills[(k, fill_col)] = fill_map[key]
+            row_h = min(Inches(0.8), (BOTTOM - y - Inches(0.5)) / max(1, len(part)))
+            self.grid_table(s, MARGIN, y, CONTENT_W, t["headers"], part, t["widths"], size=size, row_h=row_h,
+                            fills=fills, bold_cols=tuple(t.get("bold_cols", (0,))))
+            if t.get("foot"):
+                self.para(s, MARGIN, BOTTOM - Inches(0.42), CONTENT_W, Inches(0.38),
+                          [[(t["foot"], False, brand.MUTED)]], size=11, space=0)
+        self.notes(t.get("notes", ""))
+
+    def lifecycle(self, title: str, lc: dict) -> None:
+        """Seven stages as chevrons, the systems used at each stage, and the three flows."""
+        s = self.page(title)
+        self.chevrons(s, MARGIN, TOP, CONTENT_W, Inches(0.8), lc["stages"], size=11)
+        n = len(lc["stages"])
+        step = CONTENT_W / n
+        y = TOP + Inches(0.9)
+        self._text(s, MARGIN, y, CONTENT_W, Inches(0.3), lc.get("row1", "Systems and tools used today"), size=12,
+                   bold=True, colour=brand.MUTED)
+        for i, sy in enumerate(lc["systems"]):
+            self.box(s, MARGIN + i * step + Inches(0.04), y + Inches(0.32), step - Inches(0.08), Inches(0.72),
+                     brand.DIRTY_WHITE, brand.BORDER)
+            self.para(s, MARGIN + i * step + Inches(0.08), y + Inches(0.32), step - Inches(0.16), Inches(0.72),
+                      [sy], size=11, anchor=MSO_ANCHOR.MIDDLE, align=PP_ALIGN.CENTER, space=0)
+        y += Inches(1.18)
+        self._text(s, MARGIN, y, CONTENT_W, Inches(0.3), lc.get("row2", "Owner"), size=12, bold=True,
+                   colour=brand.MUTED)
+        for i, ow in enumerate(lc["owners"]):
+            self.para(s, MARGIN + i * step + Inches(0.04), y + Inches(0.28), step - Inches(0.08), Inches(0.5),
+                      [[(ow, True, brand.HEADER_BLUE)]], size=11, align=PP_ALIGN.CENTER, space=0)
+        y += Inches(0.85)
+        fw = (CONTENT_W - Inches(0.36)) / 3
+        fh = BOTTOM - y - Inches(0.1)
+        for k, f in enumerate(lc["flows"]):
+            x = MARGIN + k * (fw + Inches(0.18))
+            self.card(s, x, y, fw, fh, f["head"], f["body"], head_h=Inches(0.42), size=12)
+        self.notes(lc.get("notes", ""))
+
+    def refs_figure(self, title: str, r: dict) -> None:
+        """One transaction, several references: boxes for each system's number, and what it causes."""
+        s = self.page(title)
+        n = len(r["refs"])
+        gap = Inches(0.35)
+        bw = (Inches(8.0) - gap * (n - 1)) / n
+        y = TOP + Inches(0.1)
+        for i, ref in enumerate(r["refs"]):
+            x = MARGIN + i * (bw + gap)
+            self.box(s, x, y, bw, Inches(1.5), brand.BG_BLUE, brand.HEADER_BLUE)
+            self.para(s, x + Inches(0.06), y + Inches(0.06), bw - Inches(0.12), Inches(1.4),
+                      [[(ref["system"], True, brand.HEADER_BLUE)], [(ref["number"], True, brand.NEAR_BLACK)],
+                       [(ref["who"], False, brand.MUTED)]], size=12, align=PP_ALIGN.CENTER, space=2)
+            if i < n - 1:
+                self.arrow(s, x + bw + Inches(0.04), y + Inches(0.62), gap - Inches(0.08), Inches(0.26))
+        self.para(s, MARGIN, y + Inches(1.6), Inches(8.0), Inches(0.4), [[(r["caption"], False, brand.MUTED)]],
+                  size=11, space=0)
+        # effects
+        ey = y + Inches(2.1)
+        self._text(s, MARGIN, ey, Inches(8), Inches(0.35), "What it causes today", size=14, bold=True,
+                   colour=brand.HEADER_BLUE)
+        runs = [[("•  ", False, brand.HEADER_BLUE), (t, False, brand.TEXT)] for t in r["effects"]]
+        self.para(s, MARGIN, ey + Inches(0.4), Inches(8.0), BOTTOM - ey - Inches(0.5), runs, size=13, space=4)
+        # right panel
+        px = MARGIN + Inches(8.3)
+        pw = CONTENT_W - Inches(8.3)
+        ph = (BOTTOM - TOP - Inches(0.28)) / 2
+        self.card(s, px, TOP, pw, ph, r.get("brd_title", "To-Be in the BRD"), r["brd"], head_h=Inches(0.45))
+        self.card(s, px, TOP + ph + Inches(0.18), pw, ph, r.get("rec_title", "Our recommendation"), r["rec"],
+                  head_h=Inches(0.45),
+                  head_fill=brand.CTA_BLUE)
+        self.notes(r.get("notes", ""))
+
+    def horizons(self, title: str, r: dict) -> None:
+        """Roadmap in horizons: columns with a period, a theme and items; enablers underneath."""
+        s = self.page(title)
+        cols = r["columns"]
+        gap = Inches(0.2)
+        cw = (CONTENT_W - gap * (len(cols) - 1)) / len(cols)
+        ch = Inches(4.0)
+        shades = [brand.DIRTY_WHITE, brand.BG_BLUE, brand.FIELD_BLUE, brand.CTA_BLUE]
+        for i, c in enumerate(cols):
+            x = MARGIN + i * (cw + gap)
+            fill = shades[i % len(shades)]
+            font = brand.WHITE if fill == brand.CTA_BLUE else brand.HEADER_BLUE
+            self.box(s, x, TOP, cw, ch, brand.WHITE, brand.BORDER)
+            self.box(s, x, TOP, cw, Inches(0.8), fill, brand.HEADER_BLUE, radius=False)
+            self.para(s, x + Inches(0.1), TOP, cw - Inches(0.2), Inches(0.8),
+                      [[(c["title"], True, font)], [(c["when"], False, font)]], size=13, anchor=MSO_ANCHOR.MIDDLE,
+                      space=0)
+            runs = [[(c["theme"], True, brand.NEAR_BLACK)]]
+            runs += [[("•  ", False, brand.HEADER_BLUE), (t, False, brand.TEXT)] for t in c["items"]]
+            self.para(s, x + Inches(0.1), TOP + Inches(0.88), cw - Inches(0.2), ch - Inches(0.92), runs, size=12,
+                      space=3)
+            if i < len(cols) - 1:
+                self.arrow(s, x + cw - Inches(0.02), TOP + Inches(0.26), gap + Inches(0.04), Inches(0.3))
+        y = TOP + ch + Inches(0.15)
+        self.box(s, MARGIN, y, CONTENT_W, BOTTOM - y - Inches(0.08), brand.BG_BLUE, brand.HEADER_BLUE)
+        self._text(s, MARGIN + Inches(0.12), y + Inches(0.03), CONTENT_W, Inches(0.32), r["enablers_title"],
+                   size=13, bold=True, colour=brand.HEADER_BLUE)
+        half = math.ceil(len(r["enablers"]) / 2)
+        for k in range(2):
+            items = r["enablers"][k * half:(k + 1) * half]
+            runs = [[("•  ", False, brand.HEADER_BLUE), (t, False, brand.NEAR_BLACK)] for t in items]
+            self.para(s, MARGIN + Inches(0.12) + k * CONTENT_W / 2, y + Inches(0.36),
+                      CONTENT_W / 2 - Inches(0.25), BOTTOM - y - Inches(0.5), runs, size=11, space=2)
+        self.notes(r.get("notes", ""))
+
+    def principles(self, title: str, items: list[dict], notes: str) -> None:
+        """Numbered principles in a row of circles with text below (streamlining levers)."""
+        s = self.page(title)
+        n = len(items)
+        cw = CONTENT_W / n
+        for i, it in enumerate(items):
+            x = MARGIN + i * cw
+            d = Inches(0.9)
+            self.circle(s, x + (cw - d) / 2, TOP + Inches(0.1), str(i + 1), d=d, fill=brand.HEADER_BLUE,
+                        font=brand.WHITE, size=24)
+            self.para(s, x + Inches(0.08), TOP + Inches(1.1), cw - Inches(0.16), Inches(0.5),
+                      [[(it["head"], True, brand.HEADER_BLUE)]], size=15, align=PP_ALIGN.CENTER, space=0)
+            self.para(s, x + Inches(0.1), TOP + Inches(1.6), cw - Inches(0.2), Inches(1.3),
+                      [[(it["text"], False, brand.TEXT)]], size=12, align=PP_ALIGN.CENTER, space=0)
+            self.box(s, x + Inches(0.1), TOP + Inches(2.95), cw - Inches(0.2), BOTTOM - TOP - Inches(3.05),
+                     brand.BG_BLUE)
+            runs = [[("At BDOI", True, brand.HEADER_BLUE)]]
+            runs += [[("•  ", False, brand.HEADER_BLUE), (t, False, brand.NEAR_BLACK)] for t in it["examples"]]
+            self.para(s, x + Inches(0.16), TOP + Inches(3.0), cw - Inches(0.32), BOTTOM - TOP - Inches(3.15), runs,
+                      size=11, space=3)
         self.notes(notes)
 
     def maturity(self, title: str, m: dict, notes: str) -> None:
@@ -461,7 +779,7 @@ class ProcessDeck(BdoiDeck):
         themes = m["themes"]
         rh = Inches(3.7) / len(themes)
         y0 = TOP + Inches(0.72)
-        marks = [("now", brand.MUTED, "Today"), ("bibs", brand.CTA_BLUE, "BIBS envisioned"),
+        marks = [("now", brand.MUTED, "Today"), ("bibs", brand.CTA_BLUE, "To-Be in the BRDs"),
                  ("best", brand.YELLOW, "Best practice")]
         for k, t in enumerate(themes):
             y = y0 + k * rh
@@ -490,7 +808,7 @@ class ProcessDeck(BdoiDeck):
             lx += Inches(2.3)
         self.para(s, MARGIN + Inches(7.0), ly - Inches(0.05), CONTENT_W - Inches(7.0), Inches(0.5),
                   [[(m["basis"], False, brand.MUTED)]], size=11)
-        n = [notes] + [f"{t['theme']}: today {t['now']}, BIBS {t['bibs']}, best practice {t['best']}. {t['why']}"
+        n = [notes] + [f"{t['theme']}: today {t['now']}, To-Be {t['bibs']}, best practice {t['best']}. {t['why']}"
                        for t in themes]
         self.notes(n)
 
@@ -514,36 +832,6 @@ class ProcessDeck(BdoiDeck):
         self.notes(notes + "\nSource: docs/deliverables/src/registers/discrepancy_register.yaml. An item "
                            "that touches several BRDs is counted under each of them.")
 
-    def roadmap(self, title: str, r: dict) -> None:
-        s = self.page(title)
-        cols = r["columns"]
-        gap = Inches(0.2)
-        cw = (CONTENT_W - gap * (len(cols) - 1)) / len(cols)
-        ch = Inches(3.1)
-        for i, c in enumerate(cols):
-            x = MARGIN + i * (cw + gap)
-            label, fill, font = STATUS[c["status"]]
-            self.box(s, x, TOP, cw, ch, brand.WHITE, brand.BORDER)
-            self.box(s, x, TOP, cw, Inches(0.5), fill, font, radius=False)
-            self._text(s, x + Inches(0.1), TOP, cw, Inches(0.5), c["title"], size=15, bold=True, colour=font,
-                       anchor=MSO_ANCHOR.MIDDLE)
-            runs = [[("•  ", False, brand.HEADER_BLUE), (t, False, brand.TEXT)] for t in c["items"]]
-            self.para(s, x + Inches(0.1), TOP + Inches(0.58), cw - Inches(0.2), ch - Inches(0.6), runs, size=12,
-                      space=3)
-            if i < len(cols) - 1:
-                self.arrow(s, x + cw - Inches(0.02), TOP + Inches(0.1), gap + Inches(0.04), Inches(0.3))
-        y = TOP + ch + Inches(0.18)
-        self.box(s, MARGIN, y, CONTENT_W, Inches(5.45) - ch - Inches(0.18), brand.BG_BLUE, brand.HEADER_BLUE)
-        self._text(s, MARGIN + Inches(0.12), y + Inches(0.05), CONTENT_W, Inches(0.35),
-                   r["decisions_title"], size=14, bold=True, colour=brand.HEADER_BLUE)
-        half = math.ceil(len(r["decisions"]) / 2)
-        for k in range(2):
-            items = r["decisions"][k * half:(k + 1) * half]
-            runs = [[("•  ", False, brand.HEADER_BLUE), (t, False, brand.NEAR_BLACK)] for t in items]
-            self.para(s, MARGIN + Inches(0.12) + k * CONTENT_W / 2, y + Inches(0.42), CONTENT_W / 2 - Inches(0.25),
-                      Inches(1.7), runs, size=12, space=3)
-        self.notes(r.get("notes", ""))
-
 
 # ====================================================================== figures
 
@@ -552,46 +840,52 @@ def render(name: str, text: str) -> Path:
     return render_dot(path, dpi=200)
 
 
-def area_figures(a: dict) -> tuple[Path, Path]:
+def area_figures(a: dict) -> dict[str, Path]:
     base = f"{a['id']}"
-    asis = render(f"{base}_asis", pf.swimlane(f"{base}_asis", a["asis"], "asis",
-                                              f"{a['brd']} {a['title']}: As-Is swimlane. {a['asis']['caption']}"))
-    tobe = render(f"{base}_envisioned", pf.swimlane(f"{base}_envisioned", a["tobe"], "tobe",
-                                                    f"{a['brd']} {a['title']}: envisioned swimlane in BIBS. "
-                                                    f"{a['tobe']['caption']}"))
-    return asis, tobe
+    out = {"asis": render(f"{base}_asis", pf.swimlane(f"{base}_asis", a["asis"], "asis",
+                                                      f"{a['title']}: As-Is swimlane. {a['asis']['caption']}")),
+           "tobe": render(f"{base}_envisioned", pf.swimlane(f"{base}_envisioned", a["tobe"], "tobe",
+                                                            f"{a['title']}: To-Be swimlane in the BRD. "
+                                                            f"{a['tobe']['caption']}"))}
+    for k, extra in enumerate(a.get("asis_extra", []) or []):
+        name = f"{base}_asis_{k + 2}"
+        out[f"asis_{k + 2}"] = render(name, pf.swimlane(name, extra, "asis",
+                                                        f"{a['title']}: As-Is swimlane. {extra['caption']}"))
+    return out
 
 
 def asis_map_spec(m: dict, areas: dict[str, dict]) -> dict:
     """Areas above and below, today's systems in the middle; one line per dependency."""
     nodes, edges = [], []
-    w, h, gx = 136.0, 50.0, 145.4
+    n_areas = max(len(m["areas_top"]), len(m["areas_bottom"]))
+    gx = (pf.CANVAS_W - 8) / n_areas
+    w, h = gx - 8, 50.0
     for key, y in (("areas_top", 26.0), ("areas_bottom", 272.0)):
         for i, aid in enumerate(m[key]):
             a = areas.get(aid)
-            if a is None:  # chapter not written yet
+            if a is None:
                 continue
             nodes.append({"id": aid, "x": 6 + i * gx, "y": y, "w": w, "h": h,
-                          "text": f"{a['num']}  {a['title']}", "kind": "area", "size": 12,
+                          "text": f"{a['num']}  {_short(a)}", "kind": "area", "size": 11.5,
                           "pain": [len(a["pains"])]})
-    sw, sg = 116.0, 124.6
+    sg = (pf.CANVAS_W - 6) / len(m["systems"])
     for i, sy in enumerate(m["systems"]):
-        nodes.append({"id": sy["id"], "x": 4 + i * sg, "y": 150.0, "w": sw, "h": 54, "text": sy["text"],
-                      "kind": "legacy", "size": 12})
+        nodes.append({"id": sy["id"], "x": 4 + i * sg, "y": 150.0, "w": sg - 8, "h": 54, "text": sy["text"],
+                      "kind": "legacy", "size": 11.5})
     top = set(m["areas_top"])
     for aid, targets in m["links"].items():
         for t in targets if aid in areas else []:
             ports = ("s", "n") if aid in top else ("n", "s")
             edges.append({"a": aid, "b": t, "style": "solid", "colour": "@MUTED", "arrow": False, "ports": ports,
                           "width": 0.9})
-    bands = [{"x": 0, "y": 0, "w": pf.CANVAS_W, "h": 84, "fill": "@WHITE", "label": "Business areas 1-6",
-              "label_w": 200},
+    bands = [{"x": 0, "y": 0, "w": pf.CANVAS_W, "h": 84, "fill": "@WHITE", "label": m["top_label"],
+              "label_w": 320},
              {"x": 0, "y": 124, "w": pf.CANVAS_W, "h": 90, "fill": "#EEF3F8"},
-             {"x": 0, "y": 248, "w": pf.CANVAS_W, "h": 100, "fill": "@WHITE", "label": "Business areas 7-12",
-              "label_w": 200, "label_pos": "bottom"}]
+             {"x": 0, "y": 248, "w": pf.CANVAS_W, "h": 100, "fill": "@WHITE", "label": m["bottom_label"],
+              "label_w": 320, "label_pos": "bottom"}]
     return {"bands": bands, "nodes": nodes, "edges": edges,
-            "legend": [["area", "Business area"], ["legacy", "Today's system or channel"],
-                       ["pain", "Number of pain points in the area chapter"]]}
+            "legend": [["area", "Business area (chapter)"], ["legacy", "Today's system, file or channel"],
+                       ["pain", "Number of pain points in the chapter"]]}
 
 
 def envisioned_map_spec(m: dict) -> dict:
@@ -622,12 +916,12 @@ def envisioned_map_spec(m: dict) -> dict:
     nodes.append({"id": "host", "x": x0 + 6, "y": 293, "w": span, "h": 24, "text": m["hosting"],
                   "kind": "module", "size": 11})
     bands = [{"x": x0, "y": 0, "w": pf.CANVAS_W - x0, "h": 222, "fill": "@DIRTY_WHITE",
-              "label": "BIBS modules by navigation group", "label_w": 300},
+              "label": "Business functions in one system (BRD scope)", "label_w": 360},
              {"x": x0, "y": 224, "w": pf.CANVAS_W - x0, "h": 98, "fill": "@BG_BLUE",
-              "label": "Shared services and hosting", "label_w": 300}]
+              "label": "Shared capabilities every function uses", "label_w": 360}]
     return {"bands": bands, "nodes": nodes, "edges": edges,
-            "legend": [["external", "External party"], ["group", "Navigation group"],
-                       ["service", "Shared service"], ["parked", "Parked interface"]]}
+            "legend": [["external", "External party"], ["group", "Business function group"],
+                       ["service", "Shared capability"], ["parked", "Interface still to be specified"]]}
 
 
 def value_chain_spec(m: dict) -> dict:
@@ -637,16 +931,12 @@ def value_chain_spec(m: dict) -> dict:
     for i, st in enumerate(stages):
         row, k = divmod(i, 6)
         col = k if row == 0 else 5 - k
-        status = st["status"].lower()
-        kind = "vc_build" if "in build" in status else ("vc_designed" if status == "designed" else "vc_built")
         nodes.append({"id": f"v{i}", "x": 2 + col * gx, "y": 14 + row * 172, "w": w, "h": h, "text": st["text"],
-                      "sub": [st["owner"], "BIBS: " + st["module"], f"({st['status']})"], "kind": kind,
-                      "size": 13})
+                      "sub": [st["owner"], "To-Be: " + st["tobe"]], "kind": "stage", "size": 12.5})
     for i in range(len(stages) - 1):
         edges.append({"a": f"v{i}", "b": f"v{i + 1}", "width": 2.0})
     return {"nodes": nodes, "edges": edges,
-            "legend": [["vc_built", "Built (at least in part)"], ["vc_build", "In build"],
-                       ["vc_designed", "Designed, not yet built"]]}
+            "legend": [["stage", "Stage: BDOI owner and the To-Be of the BRDs"]]}
 
 
 def holistic_figures(h: dict, areas: list[dict]) -> dict[str, Path]:
@@ -654,14 +944,36 @@ def holistic_figures(h: dict, areas: list[dict]) -> dict[str, Path]:
     specs = {"asis_map": asis_map_spec(h["asis_map"], by_key),
              "envisioned_map": envisioned_map_spec(h["envisioned_map"]),
              "value_chain": value_chain_spec(h["value_chain"])}
-    return {key: render(f"holistic_{key}", pf.free_layout(f"holistic_{key}", spec, h[key]["caption"]))
-            for key, spec in specs.items()}
+    out = {key: render(f"holistic_{key}", pf.free_layout(f"holistic_{key}", spec, h[key]["caption"]))
+           for key, spec in specs.items()}
+    for key in ("e2e_1", "e2e_2"):
+        out[key] = render(f"holistic_{key}", pf.swimlane(f"holistic_{key}", h[key], "e2e", h[key]["caption"]))
+    return out
 
 
 # ====================================================================== build
 
-AREA_KEYS = ("id", "key", "num", "title", "brd", "scope", "status", "status_text", "department", "roles", "figures",
-             "sources", "chevrons", "asis", "pains", "tobe", "after", "gaps", "best")
+AREA_KEYS = ("id", "key", "num", "title", "brd", "scope", "department", "roles", "figures", "session", "sources",
+             "chevrons", "heard", "asis", "pains", "tobe", "after", "missed", "best")
+
+
+def _check_swimlane(name: str, diagram: str, spec: dict, pains: set) -> list[str]:
+    errs = []
+    lanes = {ln["id"] for ln in spec["lanes"]}
+    steps = {s["id"] for s in spec["steps"]}
+    for s in spec["steps"]:
+        if s["lane"] not in lanes:
+            errs.append(f"{name} {diagram}: step {s['id']} in unknown lane {s['lane']}")
+        if not isinstance(s["text"], str):
+            errs.append(f"{name} {diagram}: step {s['id']} text is not a string")
+        for p in s.get("pain", []) or []:
+            if p not in pains:
+                errs.append(f"{name} {diagram}: step {s['id']} marks unknown pain point {p}")
+    for e in spec.get("edges", []):
+        for end in e[:2]:
+            if end not in steps:
+                errs.append(f"{name} {diagram}: edge {e} names unknown step {end}")
+    return errs
 
 
 def validate(a: dict, name: str) -> list[str]:
@@ -670,39 +982,33 @@ def validate(a: dict, name: str) -> list[str]:
     if errs:
         return errs
     pains = {p["n"] for p in a["pains"]}
-    for diagram in ("asis", "tobe"):
-        lanes = {ln["id"] for ln in a[diagram]["lanes"]}
-        steps = {s["id"] for s in a[diagram]["steps"]}
-        for s in a[diagram]["steps"]:
-            if s["lane"] not in lanes:
-                errs.append(f"{name} {diagram}: step {s['id']} in unknown lane {s['lane']}")
-            if not isinstance(s["text"], str):
-                errs.append(f"{name} {diagram}: step {s['id']} text is not a string")
-            for p in s.get("pain", []) or []:
-                if p not in pains:
-                    errs.append(f"{name} {diagram}: step {s['id']} marks unknown pain point {p}")
-        for e in a[diagram].get("edges", []):
-            for end in e[:2]:
-                if end not in steps:
-                    errs.append(f"{name} {diagram}: edge {e} names unknown step {end}")
-    marked = {p for s in a["asis"]["steps"] for p in (s.get("pain") or [])}
-    errs += [f"{name}: pain point {p} is not marked on the As-Is diagram" for p in sorted(pains - marked)]
+    diagrams = [("asis", a["asis"]), ("tobe", a["tobe"])]
+    diagrams += [(f"asis_{k + 2}", x) for k, x in enumerate(a.get("asis_extra", []) or [])]
+    for diagram, spec in diagrams:
+        errs += _check_swimlane(name, diagram, spec, pains)
+    marked = {p for d, spec in diagrams if d.startswith("asis") for s in spec["steps"] for p in (s.get("pain") or [])}
+    errs += [f"{name}: pain point {p} is not marked on an As-Is diagram" for p in sorted(pains - marked)]
     errs += [f"{name}: before / after row {r['n']} has no pain point" for r in a["after"] if r["n"] not in pains]
-    for g in a["gaps"]:
-        for k in ("sev", "gap", "impact", "owner", "decision", "ref"):
+    for h in a["heard"]:
+        if h.get("kind") not in HEARD or not all(isinstance(h.get(k), str) for k in ("ref", "topic", "asis")):
+            errs.append(f"{name}: floor-walk note {h.get('ref')} is incomplete")
+        if h.get("want") is not None and not isinstance(h["want"], str):
+            errs.append(f"{name}: floor-walk note {h.get('ref')} want is not text")
+    for g in a["missed"]:
+        for k in ("cov", "item", "seen", "brd", "rec", "ref"):
             if not isinstance(g.get(k), str):
-                errs.append(f"{name}: gap {g.get('ref')} field {k} is not text")
-        if g.get("sev") not in SEVERITY:
-            errs.append(f"{name}: gap {g.get('ref')} has unknown level {g.get('sev')}")
+                errs.append(f"{name}: not-covered item {g.get('item')} field {k} is not text")
+        if g.get("cov") not in COVERAGE:
+            errs.append(f"{name}: not-covered item {g.get('item')} has unknown coverage {g.get('cov')}")
     for b in a["best"]:
-        if b.get("status") not in PRACTICE or not all(isinstance(b.get(k), str) for k in ("practice", "bibs", "bdoi")):
+        if b.get("status") not in COVERAGE or not all(isinstance(b.get(k), str) for k in ("practice", "what", "rec")):
             errs.append(f"{name}: best practice {b.get('practice')} is incomplete")
     return errs
 
 
 def load_areas() -> list[dict]:
     areas, errs = [], []
-    for p in sorted((DATA / "areas").glob("brd*.yaml")):
+    for p in sorted((DATA / "areas").glob("*.yaml")):
         try:
             a = load(p)
         except yaml.YAMLError as exc:
@@ -719,69 +1025,134 @@ def register_counts(areas: list[dict]) -> list[list]:
     reg = load(ROOT / "docs/deliverables/src/registers/discrepancy_register.yaml")
     rows = []
     for a in areas:
+        if not a["brd"].startswith("BRD-"):
+            continue
         key = "BRD-%02d" % int(a["brd"].split("-")[1])
         items = [i for i in reg["items"] if key in i["brds"]]
-        rows.append([a["title"], a["brd"], sum(i["sev"] == "High" for i in items),
+        rows.append([_short(a), a["brd"], sum(i["sev"] == "High" for i in items),
                      sum(i["sev"] == "Medium" for i in items), sum(i["sev"] == "Low" for i in items),
                      sum(i["status"] == "Open" for i in items), sum(i["status"] != "Open" for i in items)])
     return rows
 
 
+def area_chapter(deck: ProcessDeck, a: dict, figs: dict[str, Path]) -> None:
+    deck.glance(a)
+    deck.heard(a)
+    deck.diagram(f"{a['num']}. {_short(a)}: As-Is process" + (" (1/%d)" % (1 + len(a.get("asis_extra") or []))
+                                                             if a.get("asis_extra") else ""),
+                 figs["asis"], a["asis"]["caption"], a["asis"]["notes"])
+    extras = a.get("asis_extra") or []
+    for k, extra in enumerate(extras):
+        deck.diagram(f"{a['num']}. {_short(a)}: As-Is process ({k + 2}/{len(extras) + 1})", figs[f"asis_{k + 2}"],
+                     extra["caption"], extra["notes"])
+    if a.get("variants"):
+        v = a["variants"]
+        deck.table_slide(f"{a['num']}. {_short(a)}: {v['title']}", v, per_page=v.get("per_page", 6))
+    deck.pain_legend(a)
+    deck.diagram(f"{a['num']}. {_short(a)}: To-Be in the BRD", figs["tobe"], a["tobe"]["caption"],
+                 a["tobe"]["notes"])
+    deck.before_after(a)
+    deck.missed(a)
+    deck.best_practice(a)
+
+
 def build(previews: str | None = None, figures_only: bool = False) -> Path:
     d = load(DATA / "deck.yaml")
     areas = load_areas()
+    by_key = {a["key"]: a for a in areas}
     hol = holistic_figures(d["holistic"], areas)
     figs = {a["id"]: area_figures(a) for a in areas}
     if figures_only:
         return FIG
 
-    deck = ProcessDeck(d["title"], version=d["version"], date=d["date"], subtitle=d["subtitle"])
+    deck = ProcessDeck(d["title"], version=VERSION, date=d["date"], subtitle=d["subtitle"])
     deck.title()
     deck.notes(d["notes"]["title"])
-    tiles = [{"num": "0", "title": "Holistic view: the enterprise today, in BIBS and at best practice",
+
+    # ---- opening: purpose, sources, floor-walk coverage, agenda, reading guide
+    u = d["understanding"]
+    deck.cards(u["purpose"]["title"], u["purpose"]["cards"], cols=3, notes=u["purpose"]["notes"],
+               intro=u["purpose"]["intro"], size=15, head_size=15)
+    deck.cards(u["summary"]["title"], u["summary"]["cards"], cols=3, notes=u["summary"]["notes"], size=14)
+    deck.stats(u["sources"]["title"], u["sources"]["tiles"], u["sources"]["notes"], foot=u["sources"]["foot"])
+    deck.table_slide(u["schedule"]["title"], u["schedule"], per_page=9)
+    tiles = [{"num": "0", "title": "Our understanding of BDOI, end to end", "sub": "Holistic view",
               "highlight": True}]
-    tiles += [{"num": str(a["num"]), "title": a["title"], "brd": a["brd"], "status": a["status"]} for a in areas]
-    tiles += [{"num": str(len(areas) + 1), "title": "Summary: maturity, decisions and roadmap", "highlight": True}]
+    for p in d["parts"]:
+        for k in p["areas"]:
+            a = by_key[k]
+            tiles.append({"num": str(a["num"]), "title": a["title"], "sub": f"Part {p['num']} | {a['brd']}"})
+    for t in d["closing_tiles"]:
+        tiles.append({**t, "highlight": True})
     deck.agenda("Agenda", tiles)
     deck.notes(d["notes"]["agenda"])
-    deck.content("How to read the process slides", d["reading"], size=16)
+    deck.content("How to read this deck", d["reading"], size=15)
     deck.notes(d["notes"]["reading"])
 
+    # ---- chapter 0: holistic
     h = d["holistic"]
-    deck.section("0. Holistic view", h["subtitle"])
+    deck.section("0. Our understanding of BDOI", h["subtitle"])
     deck.notes(h["notes"])
+    deck.stats(h["glance"]["title"], h["glance"]["tiles"], h["glance"]["notes"], foot=h["glance"].get("foot", ""))
+    deck.cards(h["org"]["title"], h["org"]["cards"], cols=4, notes=h["org"]["notes"], size=11, head_size=12)
+    deck.lifecycle(h["lifecycle"]["title"], h["lifecycle"])
+    deck.diagram(h["e2e_1"]["title"], hol["e2e_1"], h["e2e_1"]["caption"], h["e2e_1"]["notes"])
+    deck.diagram(h["e2e_2"]["title"], hol["e2e_2"], h["e2e_2"]["caption"], h["e2e_2"]["notes"])
     deck.diagram(h["asis_map"]["title"], hol["asis_map"], h["asis_map"]["caption"], h["asis_map"]["notes"])
+    deck.refs_figure(h["refs"]["title"], h["refs"])
+    deck.table_slide(h["handoffs"]["title"], h["handoffs"], per_page=7)
+    deck.cards(h["challenges"]["title"], h["challenges"]["cards"], cols=2, notes=h["challenges"]["notes"])
     deck.diagram(h["envisioned_map"]["title"], hol["envisioned_map"], h["envisioned_map"]["caption"],
                  h["envisioned_map"]["notes"])
     deck.diagram(h["value_chain"]["title"], hol["value_chain"], h["value_chain"]["caption"],
                  h["value_chain"]["notes"])
     deck.maturity(h["maturity"]["title"], h["maturity"], h["maturity"]["notes"])
-    deck.heat_counts(h["register"]["title"], register_counts(areas), h["register"]["text"])
-    deck.gaps(None, title=h["decisions"]["title"], rows_in=h["decisions"]["rows"], notes=h["decisions"]["notes"])
-    deck.roadmap(h["roadmap"]["title"], h["roadmap"])
 
-    for a in areas:
-        deck.section(f"{a['num']}. {a['title']}", f"{a['brd']} | {a['scope']}")
-        deck.notes(a.get("notes", {}).get("section", f"{a['brd']} {a['title']}: {a['scope']}."))
-        deck.glance(a)
-        asis, tobe = figs[a["id"]]
-        deck.diagram(f"{a['num']}. {_short(a)}: As-Is process", asis, a["asis"]["caption"],
-                     a["asis"]["notes"])
-        deck.pain_legend(a)
-        deck.diagram(f"{a['num']}. {_short(a)}: envisioned in BIBS", tobe, a["tobe"]["caption"],
-                     a["tobe"]["notes"])
-        deck.before_after(a)
-        deck.gaps(a)
-        deck.best_practice(a)
+    # ---- department parts
+    for p in d["parts"]:
+        p = {**p, "chapters": [{"num": by_key[k]["num"], "title": by_key[k]["title"],
+                                "sub": by_key[k]["brd"]} for k in p["areas"]]}
+        deck.part(p)
+        for k in p["areas"]:
+            area_chapter(deck, by_key[k], figs[by_key[k]["id"]])
 
-    c = d["closing"]
-    deck.section(f"{len(areas) + 1}. Summary", c["subtitle"])
-    deck.notes(c["notes"])
-    deck.maturity(c["maturity_title"], h["maturity"], c["maturity_notes"])
-    deck.gaps(None, title=c["decisions_title"], rows_in=h["decisions"]["rows"], notes=c["decisions_notes"])
-    deck.roadmap(c["roadmap_title"], h["roadmap"])
-    deck.content(c["next_title"], c["next_steps"], size=16)
-    deck.notes(c["next_notes"])
+    # ---- cross-cutting: data migration, integrations, shared capabilities
+    x = d["crosscut"]
+    deck.part({**x["part"], "chapters": x["part"]["chapters"]})
+    dm = x["dm"]
+    deck.cards(dm["context"]["title"], dm["context"]["cards"], cols=3, notes=dm["context"]["notes"],
+               intro=dm["context"].get("intro", ""))
+    deck.table_slide(dm["sources"]["title"], dm["sources"], per_page=6)
+    deck.table_slide(dm["objects"]["title"], dm["objects"], per_page=8)
+    deck.lifecycle(dm["approach"]["title"], dm["approach"])
+    deck.cards(dm["challenges"]["title"], dm["challenges"]["cards"], cols=3, notes=dm["challenges"]["notes"],
+               size=11)
+    deck.missed(None, title=dm["missed"]["title"], rows_in=dm["missed"]["rows"], notes=dm["missed"]["notes"])
+    deck.best_practice({"num": dm["num"], "title": dm["short"], "best": dm["best"], "notes": dm.get("notes", {})})
+    it = x["integration"]
+    deck.cards(it["context"]["title"], it["context"]["cards"], cols=3, notes=it["context"]["notes"],
+               intro=it["context"].get("intro", ""))
+    deck.table_slide(it["inventory"]["title"], it["inventory"], per_page=7, size=10)
+    deck.cards(it["challenges"]["title"], it["challenges"]["cards"], cols=3, notes=it["challenges"]["notes"],
+               size=11)
+    deck.missed(None, title=it["missed"]["title"], rows_in=it["missed"]["rows"], notes=it["missed"]["notes"])
+    deck.best_practice({"num": it["num"], "title": it["short"], "best": it["best"], "notes": it.get("notes", {})})
+    sc = x["shared"]
+    deck.table_slide(sc["title"], sc, per_page=7)
+
+    # ---- roadmap
+    r = d["roadmap"]
+    deck.part(r["part"])
+    deck.principles(r["principles"]["title"], r["principles"]["items"], r["principles"]["notes"])
+    deck.table_slide(r["automation"]["title"], r["automation"], fill_col=4, fill_map=LEVEL, per_page=7)
+    deck.horizons(r["horizons"]["title"], r["horizons"])
+    deck.table_slide(r["kpis"]["title"], r["kpis"], per_page=8)
+    deck.maturity(r["maturity_title"], h["maturity"], r["maturity_notes"])
+    deck.table_slide(r["top_missed"]["title"], r["top_missed"], fill_col=0, fill_map=SEVERITY, per_page=7)
+    deck.heat_counts(r["register"]["title"], register_counts(areas), r["register"]["text"])
+    deck.table_slide(r["open_points"]["title"], r["open_points"], per_page=9)
+    deck.content(r["ask"]["title"], r["ask"]["items"], size=18)
+    deck.notes(r["ask"]["notes"])
 
     out = deck.save(OUT)
     print(f"{out} ({deck._n} slides)")

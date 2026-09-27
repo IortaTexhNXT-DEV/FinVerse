@@ -1,97 +1,184 @@
-# BRD-1 New Business: content of chapter 1 of the business process deck.
-# Sources: BRD-1 "New Business (NB) BRD.pdf" p.47-48, p.82, p.132-134, p.210-212; FRS BRD-1 sections 2, 5, 9, 10;
-# discrepancy register (DCR-001, 005, 006, 027, 112); open questions Q01-Q44.
+# New Business (BRD-1): chapter 1 of the business process reverse KT deck (Part A, Marketing and Sales).
+# Sources: floor walks 22-Sep-2026 (New Business 43F; Placement and Booking 43F) and 25-Sep-2026 (New Business
+# Corporate and Retail, Trade); discovery 21-Sep-2026 (floor-walk notes NB-01 to NB-15, DC-01, TR-01, TR-02);
+# BDOI Day 1 overview p.11 and p.18; high-level New Business process flow confirmed by the process owners (Dec 2025 -
+# Mar 2026); BRD-1 p.47-48, p.132-134, p.210-212; discrepancy register (DCR-001, 005, 006, 027, 112, 121, 132).
 id: brd01
 key: nb
 num: 1
 title: New Business
 brd: BRD-1
-scope: Client onboarding to booking (Fire, Motor, Other Lines, Non-Package)
-status: BUILT
-status_text: Built; FRS v1.0 issued for review
-department: Marketing, TSU and Processing
+scope: 'Request, quotation, client and account, placement, e-policy, booking (Motor, Fire, Home, other lines)'
+department: 'Marketing (CBG, Non-CBG Retail, Corporate, Branches) and Processing (Placement and Booking)'
 roles:
-  - Marketing AO, TL / TH / UH (Retail, Commercial, Corporate, Institutional)
-  - TSU (non-package slips, insurer terms)
-  - Processing and Processing TL (placement, issuance, booking)
-  - Approver, E-policy Sender, Adjustment
-  - Comptrollership (service invoice)
+  - 'Marketing AO, TL, TH, UH per segment; Marketing Account Support (Combank)'
+  - 'TSU (non-package proposals; see chapter 5)'
+  - 'Processing Team (client and account set-up), Processing Officer and TL (placement, booking)'
+  - 'IT (ISYS to QPS migration, e-policy batch, exception report); COG-OPRM (e-policy sending)'
+  - 'BDOI contact centre (e-policy after a fall-out); Adjustment Team (cancellations)'
 figures:
-  - ['485', 'named users; 145 concurrent (p.210)']
-  - ['21,200', 'transactions a month (p.210); 1,300 endorsements (p.211)']
-  - ['10 s', 'response for every listed function (p.210-211)']
-  - ['5 + 15', 'years online + archive; backup every 4 h (p.82)']
+  - ['485', 'named users, 145 concurrent (BRD-1 p.210)']
+  - ['21,200', 'transactions a month; 1,300 endorsements (p.210-211)']
+  - ['30 days', 'quote validity for every product, retail and corporate (NB-03)']
+  - ['7 / 3 days', 'SLA for complex / normal corporate risks (NB-07)']
+session:
+  when: '22-Sep-2026 (New Business 9-10 am; Placement and Booking 2-3:30 pm, 43F) and 25-Sep-2026'
+  pocs: 'Rose Lique, Marla Apostol, Grace Tordesillas, Kin Ysaac Flores, Justine Malonzo, Jhosven Awa, Lyka Palomeno, Regina Matutina; Ramoncito Manalo, Cherry Ann Catayas, Jean Deam Dela Cruz, Cristina Labrador, Mae Anne B. Roque, John Ray Bellen, Rey Mark Magsael'
 sources:
-  - BRD-1 p.132-134 (current and envisioned process)
-  - Other Lines addendum p.47-48; Workshop addendum Apr-2026 p.3-19
-  - BRNB.001-115
-  - FRS BRD-1 v1.0, sections 2 and 5
-chevrons: [Request, Onboarding, Quotation / PRF, Account, Payment, Placement, Issuance, Booking]
+  - 'High-level New Business process flow (CBG Motor, CBG Fire, Non-CBG Corporate, Non-CBG Retail, Branches)'
+  - BDOI Day 1 overview p.11 and p.18
+  - 'BRD-1 p.132-134; Other Lines addendum p.47-48; BRNB.001-115'
+chevrons: [Request, Quotation, Acceptance, Client and account, Migration, Placement, E-policy, Booking]
 notes:
   glance: >-
-    New Business is the spine of BIBS: every other area reads the client, the account (ARN) and the booked invoice
-    that it creates. It is built, and FRS BRD-1 v1.0 describes the delivered screens. The volumes come from the usage
-    tables of the BRD (p.210-212) and the retention values from the workshop addendum (p.82), which prevail over
-    "follow QPS" (assumption A-NB-08).
-  pains: The numbered markers on the As-Is swimlane refer to these points. The page numbers are PDF pages of the BRD-1 pack.
-  after: >-
-    Each row pairs a pain point with the BIBS behaviour that removes it. The BRD states objectives (batch processing
-    across all segments, one workflow, reports) but no turnaround targets, so the measures are the NFR values and
-    the controls added.
-  gaps: >-
-    High items first. The parked interfaces are built as seams: a port, a staging table or a manual upload, so adding
-    the transport later needs no workflow change (FRS section 7).
+    New Business turns a customer need into an issued, booked and delivered policy. It is the spine of the business:
+    every other area reads the client, the account and the booked invoice it creates. The journey differs by segment
+    (CBG Motor, CBG Fire and Home, Non-CBG Retail, Corporate, Branches, bank trade business) and by product type:
+    package products go from quotation to policy on fixed terms, non-package risks go through TSU for insurer terms
+    (chapter 5). Today one deal crosses five tools: Excel templates, Broker, ISYS, QPS and EBIX.
+  heard: >-
+    Notes of the business overview (21-Sep) and of the New Business sessions of 22 and 25-Sep. NB-01 has two
+    versions from two sessions and is an open point.
+  pains: >-
+    Points 1 to 5 are on the request-to-account swimlane, 6 to 12 on the placement-to-booking swimlane. The BRD-1
+    current-process section (p.133-134) names most of them; the process flow adds the ISYS to QPS migration loop and
+    the e-policy fall-out chain.
+  after: The BRD states objectives without turnaround targets; the benefit column names what the To-Be removes.
+  missed: >-
+    Quote validity, the risk survey, the e-policy fall-out queue and Marine open-cover declarations are not in any
+    BRD. The other items are rules the BRD leaves open.
+heard:
+  - {ref: NB-01, kind: open, topic: Routing, asis: 'Package goes quote to policy; non-package goes direct to policy issuance; some package products go straight to placement. On 25-Sep: the TSU step is for non-package only.', want: 'Confirm routing per product type.'}
+  - {ref: NB-02, kind: asis, topic: Premium confirmation, asis: 'Marketing shares the premium computation with the client; placement follows once the client confirms.'}
+  - {ref: NB-03, kind: rule, topic: Quote validity, asis: 'A quote is valid 30 days for all products, retail and corporate.', want: 'The system applies 30-day validity on every quote.'}
+  - {ref: NB-04, kind: open, topic: 'KYC, AMLA', asis: 'Insurance declaration form and KYC done outside the system, for every new customer; then the AMLA check.', want: 'Confirm whether KYC and AMLA come into the system.'}
+  - {ref: NB-05, kind: rule, topic: Risk survey, asis: 'A risk survey is required above 500M.', want: 'Confirm the basis (sum insured? PHP?).'}
+  - {ref: NB-06, kind: asis, topic: Quote to insurer, asis: 'Non-life lines (Motor, Property, Marine): the quote request goes to the insurer with recommended terms.'}
+  - {ref: NB-07, kind: want, topic: SLA, asis: 'Complex risk 7 days, normal risk 3 days.', want: 'SLA tracking available.'}
+  - {ref: NB-08, kind: rule, topic: TSU step, asis: 'Non-package: TSU before the quotation; after acceptance to the Placement team.'}
+  - {ref: NB-09, kind: pain, topic: Package flow, asis: 'Client created in Broker, proposal in EBIX, then QPS for the package policy: one deal keyed in three systems.'}
+  - {ref: NB-10, kind: asis, topic: TOR, asis: 'Terms of reference kept per product.'}
+  - {ref: NB-11, kind: want, topic: Pipeline, asis: 'TSU outstanding items and risk profile in a pipeline report; sources are the bank and direct clients.', want: 'Pipeline for Retail and Corporate accounts.'}
+  - {ref: NB-12, kind: asis, topic: CBG quick quote, asis: 'CBG gives quick-quote details; allocation by branch or area and by region to the handler; placement once agreed.'}
+  - {ref: NB-13, kind: rule, topic: CBG Motor, asis: 'CBG is Motor and package only, so TSU is not involved.'}
+  - {ref: NB-14, kind: open, topic: Non-CBG from the bank, asis: 'The bank gives details and premium; the first year premium is free; the process stops when the COC is received from PGA.', want: 'Commission on the free first year (Cashiering).'}
+  - {ref: NB-15, kind: asis, topic: Kept for renewal, asis: 'Client code created and kept in Broker so it can be retrieved at renewal.'}
+  - {ref: DC-01, kind: rule, topic: Documents, asis: 'Policy schedules follow insurer templates; no BDOI template for NB or endorsement; the renewal advice uses the BDOI template.'}
+  - {ref: 'TR-01, 02', kind: asis, topic: Trade and Marine, asis: 'Clients import with bank trade loans; business from the bank is mostly Marine Open Policy declarations; accumulation to track by location.'}
 asis:
-  caption: 'Request to booking today (BRD-1 p.133-134, p.47)'
+  caption: 'Request to account today (New Business process flow; Day 1 p.18; NB-01 to NB-15)'
   notes: >-
-    Today most New Business work is manual. Requests arrive by e-mail; HLS requests are keyed in. Quotations are
-    prepared in QPS or Excel; non-package risks go to TSU by e-mail and the comparative is built in Excel. Clients
-    are created without a standard onboarding step. Accounts are tracked in spreadsheets, so duplicates are found
-    late. CBG Fire billing and payment matching are manual. Placement files, hold covers and e-policies go by e-mail
-    without a log. Booking, GL entries and invoices are separate steps, and status reports are compiled by hand
-    (BRD p.133-134; Other Lines addendum p.47). Bulk processing exists for CBG Home only.
+    Requests reach the Marketing AO by e-mail: individual requests from bank AOs, branches, IBG or clients, and for
+    CBG Fire a daily list of approved loans from CBG LAD. The AO builds the insurance report from HLS, CLAS and CTS
+    and sanitises it by hand. Quotations are prepared in the IDF Excel templates (or ISYS for package accounts),
+    saved as PDF and e-mailed; non-package risks go to TSU. There is no control on quote validity or SLA. Once the
+    client accepts with proof of payment, KYC and the insurance declaration are done outside the system, the client
+    is created in Broker and the account in ISYS. The Processing Officer then asks IT to migrate client and account
+    from ISYS to QPS; when the migration fails the account is fixed and re-migrated, then pushed to the core system.
+    Marketing submits the GRF / ARF and the TL reviews it.
   cols: 7
   lanes:
-    - {id: cli, label: 'Client, bank units (HLS, CLPC)', kind: external}
-    - {id: mkt, label: Marketing AO / TL}
+    - {id: bank, label: 'Bank units, clients', kind: external}
+    - {id: mao, label: 'Marketing AO, TL'}
     - {id: tsu, label: TSU}
-    - {id: prc, label: Processing}
-    - {id: ins, label: Insurers, kind: external}
-    - {id: sys, label: 'QPS, EBIX, Excel, e-mail', kind: system}
+    - {id: prc, label: 'Processing, IT'}
+    - {id: sys, label: 'Excel, Broker, ISYS, QPS', kind: system}
   steps:
-    - {id: a1, lane: cli, col: 1, text: Request by e-mail or HLS list, kind: external}
-    - {id: a2, lane: mkt, col: 1, text: HLS request keyed in, pain: [1]}
-    - {id: a3, lane: sys, col: 2, text: Quotation in QPS or Excel, kind: legacy, pain: [2]}
-    - {id: a4, lane: tsu, col: 2, text: 'Non-package: comparative in Excel', pain: [3]}
-    - {id: a5, lane: mkt, col: 3, text: Client created without KYC step, pain: [4]}
-    - {id: a6, lane: sys, col: 4, text: Account tracked in a spreadsheet, kind: legacy, pain: [5]}
-    - {id: a7, lane: prc, col: 4, text: CBG Fire billing matched by hand, pain: [6]}
-    - {id: a8, lane: prc, col: 5, text: Placement and hold cover by e-mail, pain: [7]}
-    - {id: a9, lane: ins, col: 5, text: Policy issued; e-policy by e-mail, kind: external}
-    - {id: a10, lane: sys, col: 6, text: 'Booking in EBIX: invoice, GL, invoice apart', kind: legacy, pain: [8]}
-    - {id: a11, lane: mkt, col: 7, text: Status report compiled by hand, pain: [9]}
+    - {id: n1, lane: bank, col: 1, text: 'Request by e-mail; LAD daily loan list', kind: external}
+    - {id: n2, lane: mao, col: 1, text: 'HLS, CLAS, CTS reports sanitised by hand', pain: [1]}
+    - {id: n3, lane: sys, col: 2, text: 'Quotation in IDF Excel template, saved as PDF', kind: legacy, pain: [2]}
+    - {id: n4, lane: tsu, col: 2, text: 'Non-package: TSU proposal'}
+    - {id: n5, lane: mao, col: 3, text: 'Proposal e-mailed; no validity or SLA clock', pain: [3]}
+    - {id: n6, lane: bank, col: 3, text: 'Accepts with proof of payment', kind: external}
+    - {id: n7, lane: mao, col: 4, text: 'KYC and declaration form outside the system', pain: [4]}
+    - {id: n8, lane: sys, col: 4, text: 'Client in Broker; account in ISYS', kind: legacy, pain: [5]}
+    - {id: n9, lane: prc, col: 5, text: 'IT migrates ISYS to QPS', pain: [5]}
+    - {id: n10, lane: prc, col: 6, text: 'Fall-out fixed, re-migrated, pushed to core', pain: [5]}
+    - {id: n11, lane: mao, col: 7, text: 'GRF / ARF submitted; TL reviews'}
   edges:
-    - [a1, a2]
-    - [a2, a3]
-    - [a2, a4, dashed, e-mail]
-    - [a3, a5]
-    - [a4, a5, dashed]
-    - [a5, a6]
-    - [a6, a7, dashed, e-mail]
-    - [a7, a8]
-    - [a8, a9, dashed]
-    - [a9, a10]
-    - [a10, a11]
+    - [n1, n2, dashed, e-mail]
+    - [n2, n3]
+    - [n3, n4, dashed, non-package]
+    - [n3, n5]
+    - [n4, n5, dashed]
+    - [n5, n6, dashed, e-mail]
+    - [n6, n7]
+    - [n7, n8]
+    - [n8, n9]
+    - [n9, n10]
+    - [n10, n11]
+asis_extra:
+  - caption: 'Placement to booking and e-policy delivery today (New Business process flow; Day 1 p.18)'
+    notes: >-
+      The Processing Officer sends the placement slip to each insurer by SFTP or, for insurers without SFTP, as a PDF
+      by e-mail, and handles returns (revision, more documents, cancellation) with Marketing. Hold covers go by e-mail
+      and the PDF is saved on the shared drive with the link in the e-mail. The insurer issues the e-policy. When SFTP
+      works, IT updates the policy number in EBIX by batch and COG-OPRM sends the e-policy to the client; when the
+      insurer is not on SFTP or the transfer falls out, the officer creates a text file for the policy-number update,
+      IT runs an e-policy exception report, and Marketing fixes the fall-out and passes the e-policy to the BDOI
+      contact centre to send. Placement and booking are done in ISYS or EBIX depending on who has access. For CBG Fire
+      the AO prepares the billing file for CLPC and checks the CLPC masterlist to see whether billed accounts are paid.
+      Status is kept in the NB masterlist in Excel.
+    cols: 7
+    lanes:
+      - {id: mkt, label: 'Marketing, contact centre'}
+      - {id: prc, label: 'Processing Officer, TL'}
+      - {id: ins, label: Insurers, kind: external}
+      - {id: it, label: 'IT, COG-OPRM'}
+      - {id: cli, label: 'Client, CLPC', kind: external}
+      - {id: sys, label: 'EBIX, ISYS, SFTP, e-mail', kind: system}
+    steps:
+      - {id: m1, lane: prc, col: 1, text: 'Placement slip by SFTP or e-mail per insurer', pain: [6]}
+      - {id: m2, lane: ins, col: 2, text: 'Returns: revision, more documents', kind: external}
+      - {id: m3, lane: prc, col: 3, text: 'Returns and hold cover by e-mail; PDF on drive', pain: [7]}
+      - {id: m4, lane: ins, col: 4, text: 'Issues the e-policy (SFTP or e-mail)', kind: external}
+      - {id: m5, lane: it, col: 4, text: 'SFTP fall-out; exception report', pain: [8]}
+      - {id: m6, lane: prc, col: 5, text: Text file for policy-number update, pain: [8]}
+      - {id: m7, lane: it, col: 5, text: Batch update of policy number in EBIX}
+      - {id: m8, lane: mkt, col: 5, text: 'Fall-out fixed; contact centre sends', pain: [9]}
+      - {id: m9, lane: sys, col: 6, text: 'Booked in ISYS or EBIX by whoever has access', kind: legacy, pain: [10]}
+      - {id: m10, lane: cli, col: 6, text: 'CBG Fire: CLPC billing file, paid list', kind: external, pain: [11]}
+      - {id: m11, lane: mkt, col: 7, text: NB masterlist and status in Excel, pain: [12]}
+    edges:
+      - [m1, m2, dashed, e-mail]
+      - [m2, m3]
+      - [m3, m4, dashed]
+      - [m4, m5]
+      - [m5, m6]
+      - [m6, m7]
+      - [m5, m8, dashed, fall-out]
+      - [m7, m9]
+      - [m9, m10, dashed]
+      - [m10, m11]
+variants:
+  title: one process, seven segment variants
+  headers: [Segment, Request from, Quotation, Client and account, 'Placement, e-policy']
+  widths: [2.0, 2.5, 2.6, 2.8, 2.8]
+  per_page: 7
+  rows:
+    - [CBG Motor (package), 'BDO branch or CBG Auto Loans AO, by e-mail', 'Excel template with ISYS reference; quick quote', 'Client in Broker; account in ISYS; IT migration to QPS', 'Slip by SFTP or e-mail; IT batch policy number; COG or PO sends']
+    - [CBG Fire and Home, 'CBG AO; CBG LAD daily approved-loan list from HLS', 'IDF Excel template converted to PDF', 'Processing bulk upload into Broker from the insurance report', 'GRF to Placement; hold cover by e-mail; CLPC billing and paid list']
+    - ['Non-CBG Corporate, all lines', 'IBG or client, by e-mail', 'ISYS full quote (package); Excel or TSU proposal (non-package)', 'Broker and ISYS; IT migration to QPS', 'Placement PDF by e-mail per insurer; SFTP or PO sends']
+    - [Non-CBG Retail, 'BDO branch, by e-mail', 'Excel quick quote; ISYS for package and motor', 'Broker; ISYS ARF module', 'Slip PDF by e-mail; e-policy as above']
+    - [Branches, 'Bank AO or client; single or bulk', 'Excel quick quote; ISYS for package', 'Broker; ISYS', 'Slip PDF by e-mail; e-policy as above']
+    - ['Bank-referred, free first year', 'Bank gives details and premium', 'None; premium from the bank', 'Client code in Broker for renewal', 'Stops at the COC from PGA; handled at renewal']
+    - ['TSU accounts, EB, SM Construction, Combank', 'Via TSU, EB or Marketing Account Support', 'TSU proposal or insurer terms', 'Encoded in EBIX directly', 'PO places; insurer SOA before booking and invoicing']
+  notes: >-
+    The segment variants of the New Business process flow (confirmed by the CBG Motor, CBG Fire, Non-CBG Corporate,
+    Non-CBG Retail and Branches process owners, Dec 2025 - Mar 2026) and of the 25-Sep session (NB-12 to NB-15).
 pains:
-  - {n: 1, title: Requests arrive by e-mail and are keyed in, text: 'HLS requests are re-keyed; bulk processing exists for CBG Home only.', ref: 'BRD-1 p.133; BRNB.023, 041'}
-  - {n: 2, title: Quotations prepared in QPS or Excel, text: 'Rating and versions live outside one workflow; approvals by e-mail.', ref: 'BRD-1 p.133; FRS 2.1 row 2'}
-  - {n: 3, title: Non-package placement by e-mail, text: 'TSU receives risks by e-mail and builds the comparative table in Excel.', ref: 'Other Lines addendum p.47'}
-  - {n: 4, title: No standard client onboarding, text: 'Clients are created without a KYC verification step.', ref: 'Workshop addendum p.3-5; BRNB.090'}
-  - {n: 5, title: Accounts in spreadsheets, text: 'No single account number; duplicates are found late.', ref: 'BRD-1 p.133; BRNB.032, 051'}
-  - {n: 6, title: CBG Fire billing and payment matching by hand, text: 'The CLPC billing file and payment reports are handled manually.', ref: 'BRD-1 p.133; BRNB.067, 068'}
-  - {n: 7, title: 'Placement, hold cover, e-policy by e-mail', text: 'Files leave by e-mail with no send log and no protection rule.', ref: 'BRD-1 p.133; BRNB.071, 072, 073'}
-  - {n: 8, title: Booking in separate steps, text: 'Invoice, GL entry and service invoice are separate tasks.', ref: 'BRD-1 p.133-134; BRNB.027, 100'}
-  - {n: 9, title: Status monitoring by hand, text: 'Status and reconciliation reports are compiled manually.', ref: 'BRD-1 p.133'}
+  - {n: 1, title: Requests and bank lists by hand, text: 'Requests arrive by e-mail; HLS, CLAS and CTS reports are sanitised by hand.', ref: 'NB flow; BRD-1 p.133'}
+  - {n: 2, title: Quotations in Excel templates, text: 'IDF templates filled, converted to PDF, shared by drive link.', ref: 'NB flow; BRD-1 p.133'}
+  - {n: 3, title: No validity or SLA control, text: '30-day validity and 7 / 3-day SLA are tracked by memory.', ref: 'NB-03, NB-07'}
+  - {n: 4, title: KYC outside the system, text: 'Insurance declaration form and KYC done on paper before the AMLA check.', ref: 'NB-04; Workshop addendum p.3-5'}
+  - {n: 5, title: One deal keyed in three systems, text: 'Broker, then ISYS, then an IT migration to QPS with a fall-out loop.', ref: 'NB-09; NB flow; OV-02'}
+  - {n: 6, title: Placement per insurer by e-mail, text: 'Slips by SFTP only for enrolled insurers; the rest by e-mail.', ref: 'NB flow; OV-01'}
+  - {n: 7, title: Returns and hold covers by e-mail, text: 'Revisions, hold covers and PDFs travel by e-mail and shared drive.', ref: 'NB flow; BRD-1 p.133'}
+  - {n: 8, title: E-policy fall-outs, text: 'Text files, an IT exception report and a batch update of policy numbers.', ref: 'NB flow'}
+  - {n: 9, title: Three senders of the e-policy, text: 'COG-OPRM, the Processing Officer or the contact centre after a fall-out.', ref: 'NB flow'}
+  - {n: 10, title: Booking depends on access, text: 'Placement and booking done in ISYS or EBIX by whoever has access.', ref: 'NB flow; BRD-1 p.133-134'}
+  - {n: 11, title: CBG Fire billing by hand, text: 'CLPC billing file prepared and paid list checked manually.', ref: 'NB flow; BRD-1 p.133'}
+  - {n: 12, title: Pipeline and status in Excel, text: 'NB masterlist and status reports compiled by hand.', ref: 'NB-11; BRD-1 p.133'}
 tobe:
   caption: 'Request to booking in BIBS: workflows NB_CLIENT, NB_QUOTATION, NB_PROPOSAL, NB_ACCOUNT (FRS BRD-1 section 5)'
   notes: >-
@@ -143,25 +230,72 @@ tobe:
     - [b13, b14]
 after:
   - {n: 1, bibs: 'Request inbox; HLS extract and bulk files uploaded with a template and row checks', measure: 'Up to 5,000 rows a file'}
-  - {n: 2, bibs: 'Quotation rated with the Appendix A formulas, versioned, approved before it is sent', measure: 'Approval before send'}
-  - {n: 3, bibs: 'PRF workflow: TSU slips per insurer, insurer terms keyed once, comparative compiled by BIBS', measure: 'Comparative not re-keyed'}
-  - {n: 4, bibs: 'Prospect, KYC documents, verification by a second user, then confirmed client', measure: 'Four-eyes KYC'}
-  - {n: 5, bibs: 'One ARN per account; workflow stage; duplicate check at creation', measure: 'Duplicates stopped at entry'}
-  - {n: 6, bibs: 'CLPC billing file produced and payment report matched in BIBS', measure: 'Matching automated'}
-  - {n: 7, bibs: 'Slips, hold cover requests and e-policies generated, password protected and logged', measure: 'Send log per document'}
-  - {n: 8, bibs: 'Booking posts invoice, GL entry and service invoice in one transaction; batch at 20:00', measure: 'One step instead of three'}
-  - {n: 9, bibs: 'Dashboards and status reports read the workflow history', measure: '10 s response (p.210-211)'}
-gaps:
-  - {sev: High, gap: Quotation before the client exists, impact: Walk-in and bank-referred prospects may not be quotable, owner: Marketing / Product Owner, decision: 'May BIBS create a prospect code at quotation (BRNB.029 vs 063)?', ref: DCR-001}
-  - {sev: High, gap: Fire premium tax rate and base, impact: Gross premium on every Fire quotation and invoice, owner: Comptrollership, decision: 'Which taxes, rates and bases apply to Fire?', ref: DCR-005}
-  - {sev: High, gap: Motor OD / Theft base 81% or 90% of TSI, impact: Motor premium differs by 9 points of TSI, owner: Marketing / TSU, decision: When each base applies, ref: DCR-006}
-  - {sev: High, gap: CLPC payments and endorsements specified twice, impact: Two payment intakes and two endorsement paths, owner: 'NB and Operations', decision: Confirm Cashiering as the single payment intake and Adjustment for endorsements, ref: DCR-027}
-  - {sev: High, gap: Sanctions match blocks or warns, impact: Business placed with a possible sanctioned party, owner: Compliance, decision: Block or warn on quotation to booking, ref: DCR-112}
-  - {sev: Parked, gap: 'HLS, mailbox, insurer SFTP / API, OCR', impact: Uploads and manual capture remain, owner: BDO IT and insurers, decision: Interface specifications, ref: 'Q11, Q12, Q06, Q24'}
+  - {n: 2, bibs: 'Quotation rated with the Appendix A formulas, versioned, approved and sent protected', measure: 'No Excel quotes'}
+  - {n: 3, bibs: 'SLA timers and breach alerts (BRNB.012, 022); quote validity not specified', measure: 'Partly: see gaps'}
+  - {n: 4, bibs: 'Prospect, KYC documents, verification by a second user, screening, then confirmed client', measure: 'Four-eyes KYC'}
+  - {n: 5, bibs: 'One client master and one account (ARN) used by every module; no migration between systems', measure: 'Keyed once'}
+  - {n: 6, bibs: 'Placement slip generated and sent per insurer with a send log; channel per insurer configurable', measure: 'Send log per slip'}
+  - {n: 7, bibs: 'Returns and hold cover requests handled in the placement workflow; documents stored', measure: 'No drive links'}
+  - {n: 8, bibs: 'E-policy received, matched and policy number set automatically (BRNB.073-074)', measure: 'Fall-out queue open'}
+  - {n: 9, bibs: 'One E-policy Sender role sends protected e-policies with a log', measure: 'One sender'}
+  - {n: 10, bibs: 'Booking posts invoice, GL entry and service invoice in one transaction; roles by persona', measure: 'One step'}
+  - {n: 11, bibs: 'CLPC billing file produced and payment report matched in the system', measure: 'Matching automated'}
+  - {n: 12, bibs: 'Dashboards and status reports read the workflow history', measure: 'Live pipeline'}
+missed:
+  - {cov: NOT_IN_BRD, item: Quote validity, seen: '30 days for every product (NB-03).', brd: 'No validity or expiry on the quotation (BRNB.043).', rec: 'Validity parameter per product, auto-expiry and re-quote.', ref: NB-03}
+  - {cov: NOT_IN_BRD, item: Risk survey, seen: 'Required above 500M (NB-05).', brd: 'No survey step; the TSI threshold only routes to TSU.', rec: 'Survey trigger by sum insured, survey document type, status on the account.', ref: NB-05}
+  - {cov: PARTLY, item: SLA values, seen: 'Complex 7 days, normal 3 days (NB-07).', brd: 'SLA timers without values or complexity class.', rec: 'Configure the values and a complex / normal flag.', ref: 'NB-07; PQ08'}
+  - {cov: CONFIRM, item: Routing per product, seen: 'Two versions of the routing (21 and 25-Sep).', brd: 'Rule-based TSU routing; thresholds open.', rec: 'One routing matrix per product and segment.', ref: 'NB-01; Q04'}
+  - {cov: NOT_IN_BRD, item: E-policy fall-out queue, seen: 'Text files, IT exception report, contact centre sends.', brd: 'Receive and match only; no exception queue.', rec: 'Exception queue with owner and SLA; one sender.', ref: 'NB flow; Q31'}
+  - {cov: NOT_IN_BRD, item: Marine open-cover declarations, seen: 'Bank trade business; declarations under open policies (TR-01).', brd: 'Product codes only; no open-cover master or declarations.', rec: 'Open-cover master, declaration intake, certificate, premium per declaration.', ref: 'TR-01; DCR-132'}
+  - {cov: NOT_IN_BRD, item: Accumulation by location, seen: 'Marine accumulation to track by location (TR-02).', brd: 'Trade accumulation report listed, no BRD.', rec: 'Location-based accumulation with capacity alerts.', ref: 'TR-02; DCR-132'}
+  - {cov: PARTLY, item: Pipeline and lead source, seen: 'Pipeline from bank and direct sources, TSU items (NB-11).', brd: 'Status and stalled-account reports; lead source not defined.', rec: 'Lead source on every prospect; pipeline for Retail and Corporate.', ref: 'NB-11; Q19'}
+  - {cov: PARTLY, item: Allocation to handlers, seen: 'By branch or area and region (NB-12).', brd: 'Assign and re-assign by hand.', rec: 'Automatic allocation rules by branch and region.', ref: 'NB-12'}
+  - {cov: PARTLY, item: Free first year and COC, seen: 'Premium free in year one; COC from PGA ends the case (NB-14).', brd: 'FFY register; COC and payer not specified.', rec: 'Define the COC receipt and the commission on FFY.', ref: 'NB-14; Q36'}
+  - {cov: PARTLY, item: Terms of reference per product, seen: 'TOR kept per product (NB-10).', brd: 'TOR only in Submitted Policies and EB.', rec: 'TOR held on the product and shown at quotation.', ref: 'NB-10; SQ19'}
+  - {cov: CONFIRM, item: 'KYC, declaration form, CIF', seen: 'Outside the system (NB-04).', brd: 'KYC gate at onboarding; declaration form in no BRD; CIF reuse open.', rec: 'Bring the declaration form into onboarding; reuse the BDO CIF if allowed.', ref: 'NB-04; Q16'}
+  - {cov: PARTLY, item: Source feeds and personas, seen: 'CLAS and CTS reports; Combank Account Support books.', brd: 'HLS only; Combank roles not in the matrix.', rec: 'Add CLAS / CTS to the inventory and the roles to the access matrix.', ref: 'Q11; DCR-121'}
 best:
-  - {practice: Straight-through processing with exception queues, status: PARTLY, bibs: 'Bulk uploads with row checks, batch booking, work queues per stage.', bdoi: 'Give the product matrix and minimum fields per line (Q01, Q02) so clean cases pass untouched.'}
-  - {practice: KYC at onboarding and a single client view, status: BIBS, bibs: 'Prospect to confirmed client with four-eyes KYC; one client record for every module.', bdoi: 'Confirm the BDO KYC standard fields, CIF and duplicate keys (Q16, Q17).'}
-  - {practice: Maker-checker on client documents, status: BIBS, bibs: 'Approval before a quotation, PRF or slip is sent; maker cannot approve.', bdoi: 'Set the approval chain and limits (Q05).'}
-  - {practice: Protected digital documents, status: PARTLY, bibs: 'Password-protected PDF and Excel, password sent separately, send log.', bdoi: 'Agree the password convention (DCR-153).'}
-  - {practice: Screening before binding, status: PARTLY, bibs: 'Screening on client creation and account submission (BRD-10 design).', bdoi: 'Decide block or warn while a match is open (DCR-112).'}
-  - {practice: Production KPIs against target, status: ADOPT, bibs: 'Dashboard by region, department, team and officer.', bdoi: 'Provide the sales hierarchy and targets (Q41).'}
+  - {practice: Digital placement exchange, status: PARTLY, lever: One pattern for ~55 insurers, what: 'Placement, returns and e-policies exchanged through one standard channel (API or SFTP with a common layout).', rec: 'Agree a BDOI insurer data standard and on-board insurers in waves.'}
+  - {practice: Broker CRM and pipeline, status: PARTLY, lever: Sales productivity, what: 'Leads from bank referrals, funnel stages, hit ratio and cross-sell per client.', rec: 'Add lead source and funnel KPIs to the dashboard.'}
+  - {practice: E-policy ingestion with OCR, status: PARTLY, lever: No fall-out text files, what: 'E-policies read, matched to the account and filed automatically; exceptions in a queue.', rec: 'Start with the top insurers by volume.'}
+  - {practice: Reuse of bank KYC, status: CONFIRM, lever: Faster onboarding, what: 'Client data and KYC reused from the bank CIF for bank-referred clients.', rec: 'Confirm with Compliance and BDO IT (Q16).'}
+  - {practice: Quote lifecycle control, status: NOT_IN_BRD, lever: Fewer stale quotes, what: 'Validity, auto-expiry, SLA clocks and reminders on every quote.', rec: 'Add validity and SLA values (NB-03, NB-07).'}
+  - {practice: Digital acceptance and payment link, status: BEYOND, lever: Shorter cycle, what: 'Client accepts the proposal online with e-signature and pays by link.', rec: 'After go-live, with the e-signature decision (CP-01).'}
+  - {practice: Straight-through bank business, status: PARTLY, lever: Volume at low cost, what: 'Bank loan files (HLS, LAD) become quotations and accounts in bulk without re-keying.', rec: 'Specify the HLS, CLAS and CTS feeds.'}
+  - {practice: Marine declarations portal, status: BEYOND, lever: Trade growth, what: 'Declarations by portal or API with e-certificates and QR verification.', rec: 'Specify open covers first (TR-01).'}
+
+# Floor-walk edition (reverse KT v3.0): overrides for the deck built by build_floorwalk_deck.py. Sources are the
+# floor walk, the floor-walk notes and the process flows BDOI shared; no BRD content.
+fw:
+  num: 1
+  figures:
+    - ['30 days', 'quote validity for every product, retail and corporate (NB-03)']
+    - ['7 / 3 days', 'SLA for complex / normal corporate risks (NB-07)']
+    - ['500M', 'value above which a risk survey is required (NB-05)']
+    - ['5 tools', 'for one deal: Excel templates, Broker, ISYS, QPS, EBIX (NB flow)']
+  sources:
+    - 'New Business process flow (CBG Motor, CBG Fire, Non-CBG Corporate, Non-CBG Retail, Branches)'
+    - 'BDOI Day 1 overview p.11 and p.18'
+    - 'Floor-walk notes NB-01 to NB-15, DC-01, TR-01, TR-02'
+  notes:
+    glance: >-
+      New Business turns a customer need into an issued, booked and delivered policy, and every other area reads the
+      client, the account and the invoice it creates. The journey differs by segment and by product type: package
+      products follow fixed terms, non-package risks go through TSU. On the floor one deal crossed five tools: Excel
+      templates, Broker, ISYS, QPS and EBIX, with an IT migration between ISYS and QPS.
+    pains: 'Points 1 to 5 are on the request-to-account swimlane, 6 to 12 on the placement-to-booking swimlane.'
+    wants: 'For each pain point: what the business users asked for, and the lever we suggest.'
+  wants:
+    - {n: 1, bibs: 'Bank lists and e-mailed requests captured once, in bulk where the bank sends a list', measure: 'Bulk intake'}
+    - {n: 2, bibs: 'Quotations produced from one rated template, versioned and approved before sending', measure: 'Rating rules'}
+    - {n: 3, bibs: '30-day validity and the 7 / 3-day SLA tracked on every quote (NB-03, NB-07)', measure: 'SLA clocks'}
+    - {n: 4, bibs: 'Decide whether KYC and AMLA move into the system (NB-04)', measure: 'To confirm'}
+    - {n: 5, bibs: 'One client and one account created once, used by placement, booking and renewal', measure: 'Key once'}
+    - {n: 6, bibs: 'One way of sending placement slips to every insurer, with a record of what was sent', measure: 'Insurer standard'}
+    - {n: 7, bibs: 'Returns and hold covers tracked with the placement, documents stored with the account', measure: 'Document store'}
+    - {n: 8, bibs: 'E-policy fall-outs visible in one queue with an owner, no text files', measure: 'Exception queue'}
+    - {n: 9, bibs: 'One team sends every e-policy', measure: 'One sender'}
+    - {n: 10, bibs: 'Booking by role, not by who has access to which system', measure: 'Access by role'}
+    - {n: 11, bibs: 'CLPC billing file produced and the paid list matched automatically', measure: 'Auto matching'}
+    - {n: 12, bibs: 'Pipeline for Retail and Corporate, by source, without Excel (NB-11)', measure: 'Live dashboard'}

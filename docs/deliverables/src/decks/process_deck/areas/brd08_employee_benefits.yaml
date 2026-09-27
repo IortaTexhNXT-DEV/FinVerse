@@ -1,41 +1,51 @@
-# BRD-8 Employee Benefits, including the partner portal: chapter 8 of the business process deck.
-# Sources: "Employee Benefits.pdf": main BRD p.5, p.36-37 (NFR); workshop addendum Add. p.3-5 (current and envisioned),
-# Add. p.14 (teams and volumes); FRS BRD-8 sections 2, 5, 9; cross-BRD decisions D1, D3, D7; discrepancy register
-# (DCR-087, 088, 090, 094, 096, 097).
+# Employee Benefits (BRD-8): chapter 4 of the business process reverse KT deck (Part A, Marketing and Sales).
+# Sources: floor walk 23-Sep-2026 (Employee Benefits, 43F) and discovery 21-Sep-2026 (floor-walk notes EB-01 to
+# EB-03); high-level Employee Benefits process flow (new business and renewal); BRD-8 main p.5 and workshop addendum
+# p.3-14; discrepancy register (DCR-087, 088, 090, 094, 096, 211).
 id: brd08
 key: eb
-num: 8
+num: 4
 title: Employee Benefits
 brd: BRD-8
-scope: 'Group benefit programmes: renewal advice to placement, member servicing, partner portal'
-status: DESIGNED
-status_text: 'Designed with the partner portal; FRS v1.0 issued for review'
+scope: 'Group life, health (HMO) and accident programmes: renewal advice, BOR, TOR, proposals, comparative, placement, members'
 department: 'Employee Benefits: Marketing, Processing and Collection'
 roles:
   - EB Marketing AO and TL / UH (five EB teams)
-  - BDOI Management (threshold approval)
-  - EB Processing and Processing Supervisor
-  - EB Collection
-  - 'Portal: insurer and HMO users, client HR users'
+  - BDOI Management (approval above the threshold); ISACOM (non-accredited provider)
+  - EB Processing and Processing Supervisor; EB Collection
+  - Client HR (master list, utilization)
+  - Insurers and HMOs (proposals, claims validation)
 figures:
-  - ['4,200', 'transactions in 2025; 4,150 are renewals (Add. p.14)']
+  - ['50,000+', 'members handled today (EB-01)']
+  - ['4,200', 'transactions in 2025, of which 4,150 renewals (Add. p.14)']
+  - ['135 days', 'before expiry: default renewal advice (TAT annex)']
   - ['20', 'BDOI users: Marketing 13, Processing 4, Collection 3']
-  - ['135', 'days before expiry: default renewal advice (TAT annex)']
-  - ['99.99%', 'availability asked; use 08:30-19:00 (p.36-37)']
+session:
+  when: '23-Sep-2026, 9-10 am, 43F; discovery 21-Sep-2026'
+  pocs: 'Marianne Alpapara, Jyneffer Liansing, Edwin Garcia'
 sources:
-  - BRD-8 workshop addendum Add. p.3-5 (current and envisioned)
-  - BRID-001-030; main BRD p.5
-  - FRS BRD-8 v1.0; decision D7 (portal users)
-chevrons: [Renewal advice, Requirements, BOR and franchise, TOR, Proposals, Comparative, Client decision, Placement]
+  - 'High-level Employee Benefits process flow (new business and renewal)'
+  - 'BRD-8 workshop addendum p.3-5 (current and envisioned); BRID-001-030'
+  - 'Floor-walk notes EB-01 to EB-03'
+chevrons: [Renewal advice, BOR, Franchise, TOR, Proposals, Comparative, Client decision, Placement]
 notes:
   glance: >-
-    Business comes from five EB teams: BDO (captive bank group accounts), SM, Voluntary, Solicited and New Business.
-    Renewals dominate. Insurers and client HR users are the first external users of BIBS: they work in the partner
-    portal, and nothing they upload takes effect before BDOI validates it. Portal users are provisioned through User
-    Access Maintenance as external users (decision D7). Employee Benefits is designed.
-  pains: The seven points are the current-process rows of FRS BRD-8 section 2.1, from the addendum (Add. p.3).
-  after: The BRD asks for automatic renewal advices, one repository, secure access and standard comparatives (Add. p.4-5); it gives no turnaround target.
-  gaps: 'Member lists and utilization reports are health-related personal data: DCR-094 is the main compliance gap.'
+    Employee Benefits places group programmes for corporate clients. It works like non-life business with more
+    parties: the client's HR sends the master list (headcount only at quote stage), BDOI obtains the broker of record
+    (BOR) and the insurers' franchise, releases the terms of reference (TOR), compares the proposals on premium,
+    benefits and provider capabilities and presents a recommendation. After the client confirms, Processing receives the
+    employee details and places the programme. BDOI handles more than 50,000 members today.
+  heard: Notes of the business overview (21-Sep) and of the EB floor walk (23-Sep).
+  pains: 'The seven points of the BRD-8 current process (Add. p.3-5); the EB process flow confirms them.'
+  after: 'The benefit column names what the To-Be removes.'
+  missed: 'EB claims capture and the ISACOM approval are not in the BRD; member volumes are not sized.'
+heard:
+  - {ref: EB-01, kind: want, topic: Quote and placement, asis: 'Like non-life: Marketing gets the master list from the customer (headcount only at quote stage), sends it to insurers and negotiates; Processing then gets the employee details and places. More than 50,000 members today.', want: 'The system handles large member volumes (50K+).'}
+  - {ref: EB-02, kind: asis, topic: EB claims, asis: 'Claims are validated by the provider; BDOI only captures the details from the provider.'}
+  - {ref: EB-03, kind: rule, topic: Broker of record, asis: 'The broker of record is kept for corporate EB renewal.'}
+  - {ref: 'EB flow', kind: asis, topic: Renewal, asis: 'Renewal advice before expiry; BOR, master list, utilization and indicative proposal secured; indicative renewal from the incumbent; client feedback; comparative; approval above the internal threshold; placement after confirmation.'}
+  - {ref: 'EB flow', kind: rule, topic: New business, asis: 'New client tagged as prospect; BOR to insurers for franchise approval; TOR from existing benefits; TOR, master list and utilization released to the insurers with franchise; ISACOM approval if awarded to a non-accredited provider.'}
+  - {ref: 'EB flow', kind: want, topic: Portals, asis: 'Insurer portal for uploads and management; client portal for uploads and policy management.', want: 'Portals for insurers and client HR (the drop plan says no portal at go-live).'}
 asis:
   caption: 'Employee Benefits today (BRD-8 Add. p.3)'
   notes: >-
@@ -124,17 +134,118 @@ after:
   - {n: 5, bibs: 'Client confirmation creates one account per benefit line and notifies Processing', measure: 'Hand-off in the system'}
   - {n: 6, bibs: 'Member changes, direct billing, contracts, HMO cards and SOAs are tracked items with follow-ups', measure: 'Automatic follow-ups'}
   - {n: 7, bibs: 'Production, Renewal, Placement, New Business and TAT reports with a business type filter', measure: 'Live reports'}
-gaps:
-  - {sev: High, gap: No data-privacy rule for member data, impact: 'Health-related personal data under the Data Privacy Act', owner: 'EB, Compliance (DPO)', decision: 'Access, masking and retention for master lists and utilization', ref: 'DCR-094'}
-  - {sev: High, gap: External portal users, impact: 'Internet-facing access: hosting, MFA, provisioning', owner: 'EB, BDO Information Security', decision: 'Who creates and approves portal users; MFA; DMZ', ref: 'DCR-096'}
-  - {sev: Medium, gap: RA 180 or 135 days before expiry, impact: Timing of the renewal cycle, owner: EB Marketing, decision: 'Days before expiry and number of reminders', ref: 'DCR-087'}
-  - {sev: Medium, gap: BOR for renewals, impact: Insurer requests blocked or not, owner: EB Marketing, decision: 'Never, when remarketing, or always', ref: 'DCR-088'}
-  - {sev: Medium, gap: Franchise and ISACOM steps, impact: Steps without requirement rows, owner: EB Marketing, decision: 'What ISACOM approves, and when', ref: 'DCR-090'}
-  - {sev: Medium, gap: HMO providers as insurers, impact: Catalog of placement counterparties, owner: 'EB, MBS', decision: 'List the benefit lines; HMOs held with insurers?', ref: 'DCR-097'}
+missed:
+  - {cov: NOT_IN_BRD, item: EB claims capture, seen: 'Provider validates; BDOI captures claim details (EB-02).', brd: 'No claims row in BRD-8; BRD-7 covers Motor and Non-Motor only.', rec: 'Capture provider claims and utilization per programme.', ref: EB-02}
+  - {cov: NOT_IN_BRD, item: ISACOM approval, seen: 'Needed when a non-accredited provider wins.', brd: 'Only in the process flow.', rec: 'Approval step and document in the EB cycle.', ref: 'EB flow; DCR-090'}
+  - {cov: PARTLY, item: Member volumes, seen: '50,000+ members (EB-01).', brd: 'NFR counts transactions (4,200 a year), not members.', rec: 'Size and test member uploads and roster at 50K+.', ref: 'EB-01; EBQ15'}
+  - {cov: PARTLY, item: Census validation, seen: 'Master lists by e-mail and Excel.', brd: 'Upload with AO validation; no data checks.', rec: 'Checks for duplicates, eligibility and changes since the last list.', ref: 'BRID-007, 013'}
+  - {cov: CONFIRM, item: Portals at go-live, seen: 'Insurer and client portals in the EB flow.', brd: 'Portal in BRD-8; drop plan says no portal.', rec: 'Confirm the portal timing and external-user security.', ref: 'DCR-211, 096'}
+  - {cov: PARTLY, item: Member data privacy, seen: 'Employee data travels by e-mail.', brd: 'Masking and need-to-know rules open.', rec: 'Data Privacy Act controls on member data.', ref: DCR-094}
+  - {cov: CONFIRM, item: Renewal advice lead days, seen: 'Advice sent before expiry.', brd: '180 or 135 days.', rec: 'Confirm the default per programme.', ref: DCR-087}
 best:
-  - {practice: Data-privacy controls on member data, status: PARTLY, bibs: 'Document access classes, protected files, download logging, audit trail.', bdoi: 'Set masking and retention for member data with the DPO (DCR-094).'}
-  - {practice: Secure partner portal, status: PARTLY, bibs: 'Portal roles for insurers and client HR; uploads validated before use; lock-out after 3 attempts.', bdoi: 'Decide MFA, hosting and provisioning (DCR-096).'}
-  - {practice: One version-controlled repository, status: BIBS, bibs: 'Documents registered by cycle, type, process and version.', bdoi: 'Stop e-mailing census files once the portal is live.'}
-  - {practice: Approval thresholds owned by the business, status: BIBS, bibs: 'Threshold rules on TSI or premium route the comparative to BDOI Management.', bdoi: 'Set the threshold values.'}
-  - {practice: Service KPIs per programme, status: BIBS, bibs: 'TAT report and EB home with pending items and overdue follow-ups.', bdoi: 'Agree TAT targets per step with the five EB teams.'}
-  - {practice: Straight-through renewal where terms are unchanged, status: ADOPT, bibs: 'Incumbent indicative terms can go to the client without remarketing.', bdoi: 'Define when a renewal may skip remarketing.'}
+  - {practice: HR self-service census, status: PARTLY, lever: Clean member data, what: 'Client HR uploads the census; the system checks duplicates, eligibility and changes.', rec: 'Start with an upload template and checks, portal later.'}
+  - {practice: Automatic member endorsements, status: PARTLY, lever: Accurate billing, what: 'Additions and deletions billed pro rata and reconciled to the insurer invoice.', rec: 'Use BRID-013 / 025 / 030 as the base.'}
+  - {practice: Utilization analytics, status: PARTLY, lever: Better renewals, what: 'Claims and utilization per programme drive the renewal negotiation.', rec: 'Capture provider claims (EB-02).'}
+  - {practice: Digital member cards, status: BEYOND, lever: Member experience, what: 'HMO and life cards issued digitally to members.', rec: 'With the HMOs after go-live.'}
+  - {practice: Privacy by design, status: NOT_IN_BRD, lever: Compliance, what: 'Masking, need-to-know access and retention for member data.', rec: 'Agree the rules with the DPO (DCR-094).'}
+  - {practice: Provider scorecard, status: BEYOND, lever: Better advice, what: 'Insurer and HMO service levels, network and claims turnaround scored in the comparative.', rec: 'Add capability scores to the comparative.'}
+
+# Floor-walk edition (reverse KT v3.0): overrides for build_floorwalk_deck.py; floor walk and BDOI flows only.
+fw:
+  num: 4
+  variants_place: wants
+  roles:
+    - 'EB Marketing AO, TL and UH'
+    - 'BDOI Management (approval above the internal threshold); ISACOM (non-accredited provider)'
+    - 'EB Processing and Collection'
+    - 'Client HR (master list, utilization, broker of record)'
+    - 'Insurers and HMOs (proposals, claims validation)'
+  figures:
+    - ['50,000+', 'members handled today (EB-01)']
+    - ['BOR', 'broker of record kept for corporate renewal (EB-03)']
+    - ['2 portals', 'for insurers and client HR in BDOI''s EB flow']
+    - ['Provider', 'validates EB claims; BDOI captures them (EB-02)']
+  sources:
+    - 'Employee Benefits process flow shared by BDOI (new business and renewal)'
+    - 'Floor-walk notes EB-01 to EB-03'
+  notes:
+    glance: >-
+      Employee Benefits places group life, HMO and accident programmes for corporate clients. It works like non-life
+      business with more parties: client HR sends the master list, BDOI obtains the broker of record and the insurers'
+      franchise, sends the terms of reference, compares the proposals and presents a recommendation; after the client
+      confirms, Processing receives the employee details and places the programme. More than 50,000 members today.
+    pains: 'The six points are on the EB swimlane.'
+    wants: 'For each pain point: what the business needs; the next slide is BDOI''s own EB flow.'
+  asis:
+    caption: 'Employee Benefits today (EB floor walk 23-Sep; EB-01 to EB-03; EB process flow)'
+    notes: >-
+      Marketing receives the master list from the client (headcount only at quote stage) and the broker of record,
+      sends them to the insurers and negotiates; proposals come back by e-mail and the comparative is prepared by
+      hand. After the client confirms, Processing gets the employee details and places the programme; member lists
+      of more than 50,000 members travel as files. Above-threshold awards and awards to a non-accredited provider
+      need management or ISACOM approval. EB claims are validated by the provider and BDOI captures the details.
+    cols: 7
+    lanes:
+      - {id: hr, label: Client HR, kind: external}
+      - {id: mao, label: EB Marketing AO}
+      - {id: ins, label: 'Insurers, HMOs', kind: external}
+      - {id: prc, label: 'EB Processing, Collection'}
+      - {id: sys, label: 'Excel, e-mail, EBIX', kind: system}
+    steps:
+      - {id: e1, lane: hr, col: 1, text: 'Master list (headcount); BOR', kind: external}
+      - {id: e2, lane: mao, col: 1, text: 'List and BOR sent to insurers', pain: [1]}
+      - {id: e3, lane: ins, col: 2, text: 'Franchise; proposals by e-mail', kind: external, pain: [2]}
+      - {id: e4, lane: mao, col: 3, text: 'Negotiation; comparative by hand', pain: [3]}
+      - {id: e5, lane: sys, col: 3, text: 'Management / ISACOM approval outside', kind: legacy, pain: [6]}
+      - {id: e6, lane: hr, col: 4, text: Client confirms, kind: external}
+      - {id: e7, lane: prc, col: 5, text: 'Employee details; placement', pain: [4]}
+      - {id: e8, lane: sys, col: 5, text: '50K+ members in Excel files', kind: legacy, pain: [4]}
+      - {id: e9, lane: prc, col: 6, text: 'Booked and billed'}
+      - {id: e10, lane: ins, col: 7, text: Provider validates claims, kind: external}
+      - {id: e11, lane: mao, col: 7, text: Claim details captured, pain: [5]}
+    edges:
+      - [e1, e2, dashed, e-mail]
+      - [e2, e3, dashed, e-mail]
+      - [e3, e4, dashed]
+      - [e4, e5]
+      - [e4, e6, dashed]
+      - [e6, e7]
+      - [e7, e8]
+      - [e7, e9]
+      - [e10, e11, dashed]
+  pains:
+    - {n: 1, title: Master lists and BOR by e-mail, text: 'Headcount lists and the broker of record travel by e-mail.', ref: 'EB-01, EB-03'}
+    - {n: 2, title: Proposals by e-mail, text: 'Insurers and HMOs send proposals and revisions by e-mail.', ref: 'EB-01; EB flow'}
+    - {n: 3, title: Comparative by hand, text: 'Premiums, benefits and provider capabilities compared manually.', ref: 'EB flow'}
+    - {n: 4, title: 50K+ members in files, text: 'Employee details for placement handled as spreadsheets.', ref: 'EB-01'}
+    - {n: 5, title: Claims captured from providers, text: 'Provider validates; BDOI re-captures the details.', ref: 'EB-02'}
+    - {n: 6, title: Approvals outside the system, text: 'Above-threshold and ISACOM approvals handled offline.', ref: 'EB flow'}
+  wants:
+    - {n: 1, bibs: 'Master list, utilization and BOR uploaded once and kept per programme', measure: 'Upload'}
+    - {n: 2, bibs: 'Insurers upload proposals themselves (insurer portal in BDOI''s flow)', measure: 'Insurer portal'}
+    - {n: 3, bibs: 'Comparative generated on premiums, benefits and capabilities', measure: 'Generated comparative'}
+    - {n: 4, bibs: 'The system handles 50K+ members (EB-01)', measure: 'Volume'}
+    - {n: 5, bibs: 'Provider claims captured per programme', measure: 'Claims capture'}
+    - {n: 6, bibs: 'Approval triggered by the internal threshold; ISACOM when needed', measure: 'Workflow'}
+  variants:
+    title: BDOI's EB flow, step by step
+    headers: [Step, What happens, Who]
+    widths: [2.2, 7.6, 2.6]
+    per_page: 8
+    rows:
+      - ['1 Renewal advice', 'System sends the renewal advice before expiry', 'System']
+      - ['2 Requirements', 'Request the BOR; secure the master list, utilization and indicative proposal; uploaded', 'EB Marketing, client HR']
+      - ['3 Franchise', 'BOR sent to the insurers for franchise approval', 'EB Marketing, insurers']
+      - ['4 TOR', 'TOR from the existing benefits and options; released with the master list and utilization to insurers with franchise', 'EB Marketing']
+      - ['5 Proposals', 'Indicative renewal from the incumbent; client feedback; insurers update proposals on client changes', 'Insurers, client']
+      - ['6 Comparative', 'Comparative on premiums, benefits and capabilities (stability, clinics, hospitals, technology); approval above the threshold; ISACOM for a non-accredited provider', 'EB Marketing, management']
+      - ['7 Placement', 'Placement after client confirmation; hand-off to Processing and Collections', 'EB Processing']
+      - ['8 Reports and portals', 'New business, renewal and placement reports; insurer and client portals', 'All']
+    notes: 'The EB process flow BDOI shared. It describes how BDOI wants EB to run, so it is the business aspiration for this chapter.'
+  best:
+    - {practice: HR self-service census, lever: Clean member data, what: 'Client HR uploads the census; the system checks duplicates, eligibility and changes.', rec: 'Start with an upload template and checks; portal later.'}
+    - {practice: Automatic member endorsements, lever: Accurate billing, what: 'Additions and deletions billed pro rata and reconciled to the insurer invoice.', rec: 'Start with the largest programmes.'}
+    - {practice: Utilization analytics, lever: Better renewals, what: 'Claims and utilization per programme drive the renewal negotiation.', rec: 'Capture provider claims (EB-02).'}
+    - {practice: Digital member cards, lever: Member experience, what: 'HMO and life cards issued digitally to members.', rec: 'With the HMOs after go-live.'}
+    - {practice: Privacy by design, lever: Compliance, what: 'Masking, need-to-know access and retention for member data.', rec: 'Agree the rules with the Data Protection Officer.'}
+    - {practice: Provider scorecard, lever: Better advice, what: 'Insurer and HMO service levels, network and claims turnaround scored in the comparative.', rec: 'Add capability scores to the comparative.'}

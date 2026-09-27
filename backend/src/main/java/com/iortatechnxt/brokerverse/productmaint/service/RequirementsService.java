@@ -150,7 +150,7 @@ public class RequirementsService {
       missing.add("the chosen insurer(s)");
     }
     if (!documentTypes(p).contains(SIGNED_SLIP)) {
-      missing.add("the signed package slip (document " + SIGNED_SLIP + ")");
+      missing.add("the signed package slip");
     }
     return missing;
   }

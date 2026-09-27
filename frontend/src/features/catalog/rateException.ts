@@ -1,5 +1,5 @@
 import type { RateException, RateExceptionDetail } from '@/api/productCatalog';
-import { formatDate } from '@/utils/format';
+import { formatDate, formatRate } from '@/utils/format';
 
 /** Permission of the approvers of rate exceptions (FR-PM-051). */
 export const DECIDE_PERMISSION = 'PRODUCT_AUTHORIZE';
@@ -67,12 +67,8 @@ export function schemeInForce(
   return `Version ${d.currentVersionNo}, ${rate}`;
 }
 
-/** A rate in percent with at least two decimals and no trailing zeros beyond them (1.1 → 1.10). */
-export function formatRate(rate: number): string {
-  const text = String(Number(rate.toFixed(6)));
-  const [whole, decimals = ''] = text.split('.');
-  return `${whole ?? '0'}.${decimals.padEnd(2, '0')}`;
-}
+/** A rate in percent: two to four decimals, as on the documents (shared rule). */
+export { formatRate };
 
 /** The requested rate less the scheme rate, signed, in percentage points. */
 export function rateDifference(requested?: number, scheme?: number): string {

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.service;
 
+import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
@@ -15,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 /** Read-only facts about users needed by business modules (roles, authorization limits). */
 @Service
 @Transactional(readOnly = true)
-public class UserDirectory {
+public class UserDirectory implements UserDisplayNames {
 
   private final AppUserRepository users;
 
@@ -54,6 +55,7 @@ public class UserDirectory {
    * @param username login id, may be null
    * @return display name
    */
+  @Override
   public String displayName(String username) {
     if (username == null || username.isBlank()) {
       return null;

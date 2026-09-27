@@ -112,6 +112,17 @@ public class HoldCover extends BaseEntity {
   }
 
   /** Marks the hold cover as lapsed without a policy. */
+  /**
+   * Closes an open request because the insurer was re-assigned (BRIDSP-32).
+   *
+   * @param reason reason code
+   */
+  public void reassign(String reason) {
+    requireOpen();
+    this.status = HoldCoverStatus.REASSIGNED;
+    this.insurerRef = reason;
+  }
+
   public void expire() {
     this.status = HoldCoverStatus.EXPIRED;
   }

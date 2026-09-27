@@ -160,6 +160,7 @@ public class UnappliedHistory {
       case RECLASS -> "RECLASSIFIED";
       case TRANSFER -> "TRANSFERRED";
       case MANUAL -> "RELEASED";
+      case INCOME -> "RECOGNISED";
     };
   }
 
@@ -170,6 +171,7 @@ public class UnappliedHistory {
       case RECLASS -> "Reclassified to client " + d.getTargetClientCode();
       case TRANSFER -> "Transferred to unit " + d.getTargetUnit();
       case MANUAL -> "Released (settled outside the system)";
+      case INCOME -> "Recognised as income, OR " + d.getOrNo();
     };
   }
 

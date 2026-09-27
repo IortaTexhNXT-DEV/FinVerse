@@ -23,6 +23,9 @@ public class ServiceInvoiceTypeService {
 
   private static final String ENTITY = "ServiceInvoiceType";
 
+  /** Name of a service invoice type in messages. */
+  private static final String NAME = "Service invoice type";
+
   private final ServiceInvoiceTypeRepository types;
   private final DocTemplateService templates;
   private final AuditTrailService audit;
@@ -83,7 +86,7 @@ public class ServiceInvoiceTypeService {
    */
   public ServiceInvoiceType update(Long id, ServiceInvoiceType.Settings settings) {
     ServiceInvoiceType type =
-        types.findById(id).orElseThrow(() -> new ResourceNotFoundException(ENTITY, id));
+        types.findById(id).orElseThrow(() -> new ResourceNotFoundException(NAME, id));
     templates.current(settings.templateCode(), BusinessClock.today(clock));
     type.apply(settings);
     audit.record(ENTITY, type.getCode(), AuditAction.UPDATE, settings.name());

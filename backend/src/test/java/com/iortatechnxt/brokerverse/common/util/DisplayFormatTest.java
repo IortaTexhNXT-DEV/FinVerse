@@ -16,6 +16,9 @@ class DisplayFormatTest {
     assertThat(DisplayFormat.date(null)).isEmpty();
     assertThat(DisplayFormat.period(LocalDate.of(2026, 11, 1), LocalDate.of(2027, 11, 1)))
         .isEqualTo("01-Nov-2026 to 01-Nov-2027");
+    assertThat(DisplayFormat.period(LocalDate.of(2026, 11, 1), null)).isEqualTo("from 01-Nov-2026");
+    assertThat(DisplayFormat.period(null, LocalDate.of(2027, 11, 1))).isEqualTo("to 01-Nov-2027");
+    assertThat(DisplayFormat.period(null, null)).isEmpty();
   }
 
   @Test
@@ -39,6 +42,12 @@ class DisplayFormatTest {
     assertThat(DisplayFormat.rate(new BigDecimal("100"))).isEqualTo("100.00");
     assertThat(DisplayFormat.rate(new BigDecimal("1.30000000"))).isEqualTo("1.30");
     assertThat(DisplayFormat.rate(new BigDecimal("0.123456"))).isEqualTo("0.1235");
+    // The same cases as formatRate on the screens (frontend utils/format.test.ts).
+    assertThat(DisplayFormat.rate(new BigDecimal("1.2"))).isEqualTo("1.20");
+    assertThat(DisplayFormat.rate(new BigDecimal("0.12345"))).isEqualTo("0.1235");
+    assertThat(DisplayFormat.rate(new BigDecimal("-0.5"))).isEqualTo("-0.50");
+    assertThat(DisplayFormat.rate(BigDecimal.ZERO)).isEqualTo("0.00");
+    assertThat(DisplayFormat.rate(null)).isEmpty();
     assertThat(DisplayFormat.rate(null)).isEmpty();
   }
 

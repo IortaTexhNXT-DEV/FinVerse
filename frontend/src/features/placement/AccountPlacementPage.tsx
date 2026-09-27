@@ -195,6 +195,7 @@ export default function AccountPlacementPage() {
       <WorkflowPanel
         entityType={ACCOUNT_ENTITY}
         entityId={a.id}
+        recordStatus={a.status}
         onChanged={refresh}
         renderBusinessActions={(actions) => (
           <PlacementActions arn={a.arn} status={a.status} actions={actions} onChanged={refresh} />

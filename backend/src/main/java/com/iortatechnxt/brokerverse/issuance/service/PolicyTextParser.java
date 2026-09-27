@@ -59,6 +59,25 @@ public final class PolicyTextParser {
   }
 
   /**
+   * The first capture group of the first match of a pattern, trimmed.
+   *
+   * @param text document text
+   * @param pattern regular expression with one capture group
+   * @return value, empty when the pattern is invalid or does not match
+   */
+  public static Optional<String> firstMatch(String text, String pattern) {
+    try {
+      Matcher m = Pattern.compile(pattern).matcher(text);
+      if (m.find() && m.groupCount() >= 1 && m.group(1) != null && !m.group(1).isBlank()) {
+        return Optional.of(m.group(1).strip());
+      }
+    } catch (PatternSyntaxException e) {
+      return Optional.empty();
+    }
+    return Optional.empty();
+  }
+
+  /**
    * Account Reference Numbers found in a text, in order.
    *
    * @param text text (document or file name)

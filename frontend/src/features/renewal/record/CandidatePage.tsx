@@ -168,6 +168,7 @@ export default function CandidatePage() {
       <WorkflowPanel
         entityType={ENTITY}
         entityId={d.lifecycle.id}
+        recordStatus={d.row.stage}
         showHistory={false}
         onChanged={refresh}
         renderBusinessActions={() => <RecordActions detail={d} />}

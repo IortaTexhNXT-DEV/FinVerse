@@ -47,14 +47,16 @@ public class CollectorRequestService {
           Action.APPLY_TO_INVOICE, "APPLY_OTHER_INVOICE",
           Action.REFUND, "REFUND",
           Action.RECLASS, "RECLASS",
-          Action.TRANSFER, "TRANSFER_UNIT");
+          Action.TRANSFER, "TRANSFER_UNIT",
+          Action.RECOGNIZE_INCOME, "HANDLING_FEE");
 
   private static final Map<Action, Set<DispositionAction>> ALLOWED =
       Map.of(
           Action.APPLY_TO_INVOICE, Set.of(DispositionAction.APPLY, DispositionAction.DST_APPLY),
           Action.REFUND, Set.of(DispositionAction.REFUND),
           Action.RECLASS, Set.of(DispositionAction.RECLASS),
-          Action.TRANSFER, Set.of(DispositionAction.TRANSFER));
+          Action.TRANSFER, Set.of(DispositionAction.TRANSFER),
+          Action.RECOGNIZE_INCOME, Set.of(DispositionAction.INCOME));
 
   private final CollectorRequestRepository requests;
   private final UnappliedRepository items;
@@ -190,6 +192,32 @@ public class CollectorRequestService {
     tracker.publish(item, r, CollectorRequestTracker.ACCEPTED, "Disposition " + type + " assigned");
     audit.record(ENTITY, r.getRequestNo(), AuditAction.UPDATE, "Accepted as " + type);
     return input.submit() ? dispositions.submit(item.getId()) : d;
+  }
+
+  /**
+   * Carries out at once a request to recognise an unapplied payment as income (BRIDSP-31): the
+   * disposition of the income type is assigned and processed as a system action, the request is
+   * accepted and, once executed, applied (the OR number travels on the event).
+   *
+   * @param id queued request
+   * @param incomeType disposition type of the income (e.g. HANDLING_FEE)
+   * @return the processed disposition
+   */
+  public Disposition recogniseIncome(Long id, String incomeType) {
+    CollectorRequest r = queued(id);
+    Unapplied item = item(r);
+    String type = incomeType == null ? DEFAULT_TYPES.get(Action.RECOGNIZE_INCOME) : incomeType;
+    requireMatchingType(Action.RECOGNIZE_INCOME, type);
+    BigDecimal amount = firstOf(null, r.getAmount(), item.getBalance());
+    return dispositions.processBySystem(
+        item.getId(),
+        type,
+        new DispositionDetails(amount, null, null, null, null, r.getRemarks()),
+        d -> {
+          r.accept(d.getId(), CurrentUser.SYSTEM, clock.instant());
+          tracker.publish(item, r, CollectorRequestTracker.ACCEPTED, "Disposition " + type);
+          audit.record(ENTITY, r.getRequestNo(), AuditAction.UPDATE, "Processed as " + type);
+        });
   }
 
   /**

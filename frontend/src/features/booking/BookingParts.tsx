@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import type { Commission, Premium, PreviewLine } from '@/api/booking';
 import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatAmount } from '@/utils/format';
+import { formatAmount, formatRate } from '@/utils/format';
 import { journalTotals } from './bookingForm';
 import './booking.css';
 
@@ -43,10 +43,10 @@ function premiumLines(premium: Premium): AmountLine[] {
 
 function commissionLines(commission: Commission): AmountLine[] {
   return [
-    { label: `Commission (${commission.rate}%)`, amount: commission.commission },
+    { label: `Commission (${formatRate(commission.rate)}%)`, amount: commission.commission },
     { label: 'VAT on commission', amount: commission.vatOnCommission },
     {
-      label: `Withholding tax (${commission.wtaxRate}%)`,
+      label: `Withholding tax (${formatRate(commission.wtaxRate)}%)`,
       amount: -commission.wtaxAmount,
     },
     { label: 'Net commission', amount: commission.net },

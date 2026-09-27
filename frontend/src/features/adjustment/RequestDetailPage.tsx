@@ -242,6 +242,7 @@ export default function RequestDetailPage() {
       <WorkflowPanel
         entityType={REQUEST_ENTITY}
         entityId={r.id}
+        recordStatus={r.stage}
         showHistory={false}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['adjustment'] })}
         renderBusinessActions={(actions) => <RequestActions request={r} actions={actions} />}

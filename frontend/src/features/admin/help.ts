@@ -52,7 +52,7 @@ export const ADMIN_HELP: HelpSection = {
         'Business parameters such as session timeout, ageing buckets, report footer and suspense accounts, plus a read-only view of the runtime configuration.',
       controls: [
         'Values are validated by type and every change is audited.',
-        'A change of a security setting (sign-in, password, lock-out, session and access settings, the emergency direct edit of roles among them) waits until Information Security approves it; the user who asked for it cannot approve it.',
+        'A change of a security setting (sign-in, password, lock-out, session and access settings, the emergency direct edit of roles among them) waits until Information Security approves it; the user who requested it cannot approve it.',
       ],
     },
     {

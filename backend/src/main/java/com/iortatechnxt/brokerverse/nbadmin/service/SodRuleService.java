@@ -132,7 +132,8 @@ public class SodRuleService {
     SodRule rule = get(id);
     rule.requestDeactivation();
     rules.saveAndFlush(rule);
-    audit.record(ENTITY, rule.getRuleCode(), AuditAction.SUBMIT, text("Deactivation asked", rule));
+    audit.record(
+        ENTITY, rule.getRuleCode(), AuditAction.SUBMIT, text("Deactivation requested", rule));
     tellAuthorisers(rule, "deactivation");
     return rule;
   }

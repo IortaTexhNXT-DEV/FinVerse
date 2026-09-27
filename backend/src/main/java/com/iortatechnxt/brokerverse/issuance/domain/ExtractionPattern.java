@@ -15,6 +15,12 @@ import jakarta.persistence.Table;
 @Table(name = "iss_extraction_pattern")
 public class ExtractionPattern extends BaseEntity {
 
+  /** Kind of the e-policies of BIBS accounts. */
+  public static final String KIND_EPOLICY = "EPOLICY";
+
+  /** Kind of the policies submitted to the bank (Submitted Policies). */
+  public static final String KIND_SUBMITTED = "SUBMITTED_POLICY";
+
   @Column(name = "insurer_code", length = 30)
   private String insurerCode;
 
@@ -33,6 +39,10 @@ public class ExtractionPattern extends BaseEntity {
 
   @Column(nullable = false)
   private boolean active;
+
+  @Column(nullable = false, length = 20)
+  @SuppressWarnings("PMD.ImmutableField") // mapped by JPA
+  private String kind = KIND_EPOLICY;
 
   protected ExtractionPattern() {}
 
@@ -58,5 +68,15 @@ public class ExtractionPattern extends BaseEntity {
 
   public boolean isActive() {
     return active;
+  }
+
+  /**
+   * Document kind the pattern reads: {@value #KIND_EPOLICY} (policies of BIBS accounts) or {@value
+   * #KIND_SUBMITTED} (policies submitted to the bank, BRIDSP-02).
+   *
+   * @return kind
+   */
+  public String getKind() {
+    return kind;
   }
 }

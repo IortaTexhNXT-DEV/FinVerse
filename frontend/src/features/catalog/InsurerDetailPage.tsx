@@ -12,7 +12,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
+import { formatDate, formatRate } from '@/utils/format';
 import { DetailList } from './DetailList';
 import { InsurerEditorModal } from './InsurerEditorModal';
 import { BranchModal, CommissionModal } from './InsurerRatesModals';
@@ -53,7 +53,7 @@ function Branches({ rows }: Readonly<{ rows: InsurerBranch[] }>) {
         { key: 'c', header: 'Code', render: (b) => <strong>{b.code}</strong> },
         { key: 'n', header: 'Name', render: (b) => b.name },
         { key: 'y', header: 'City', render: (b) => b.city ?? '' },
-        { key: 'l', header: 'LGT %', numeric: true, render: (b) => b.lgtRate },
+        { key: 'l', header: 'LGT %', numeric: true, render: (b) => formatRate(b.lgtRate) },
         { key: 'e', header: 'Placement e-mail', render: (b) => b.placementEmail ?? '' },
         { key: 's', header: 'Status', render: (b) => <StatusBadge status={b.recordStatus} /> },
         {
@@ -74,7 +74,7 @@ function Commissions({ rows }: Readonly<{ rows: Commission[] }>) {
       emptyMessage="No commission rate: the product default applies."
       columns={[
         { key: 'p', header: 'Product', render: (c) => c.productCode ?? 'All products' },
-        { key: 'r', header: 'Commission %', numeric: true, render: (c) => c.rate },
+        { key: 'r', header: 'Commission %', numeric: true, render: (c) => formatRate(c.rate) },
         { key: 'f', header: 'From', render: (c) => formatDate(c.effectiveFrom) },
         { key: 't', header: 'To', render: (c) => formatDate(c.effectiveTo) || 'Open' },
         { key: 's', header: 'Status', render: (c) => <StatusBadge status={c.recordStatus} /> },

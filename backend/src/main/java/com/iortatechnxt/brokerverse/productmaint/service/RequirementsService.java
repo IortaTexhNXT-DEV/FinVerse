@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.productmaint.domain.RequestStage;
 import com.iortatechnxt.brokerverse.productmaint.domain.RequestType;
 import com.iortatechnxt.brokerverse.productmaint.domain.Signoff;
 import com.iortatechnxt.brokerverse.productmaint.domain.SignoffRepository;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
@@ -56,6 +57,7 @@ public class RequirementsService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final UserDirectory directory;
 
   /**
    * Creates the service.
@@ -70,6 +72,7 @@ public class RequirementsService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param directory user directory (display names in texts)
    */
   public RequirementsService(
       PackageRequests requests,
@@ -81,7 +84,8 @@ public class RequirementsService {
       WorkflowService workflow,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      UserDirectory directory) {
     this.requests = requests;
     this.negotiation = negotiation;
     this.signoffs = signoffs;
@@ -92,6 +96,7 @@ public class RequirementsService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.directory = directory;
   }
 
   /**
@@ -205,7 +210,7 @@ public class RequirementsService {
         PackageRequests.ENTITY,
         p.getRequestNo(),
         AuditAction.UPDATE,
-        "ManCom sign-off " + s.getReference() + " by " + user);
+        "ManCom sign-off " + s.getReference() + " by " + directory.displayName(user));
     return s;
   }
 

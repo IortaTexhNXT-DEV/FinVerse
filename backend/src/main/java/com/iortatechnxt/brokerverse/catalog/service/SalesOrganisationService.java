@@ -14,7 +14,9 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.dimension.domain.DimensionType;
 import com.iortatechnxt.brokerverse.dimension.service.DimensionService;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,7 @@ public class SalesOrganisationService {
   private final DimensionService dimensions;
   private final AppUserRepository users;
   private final AuditTrailService audit;
+  private final UserDirectory directory;
 
   /**
    * Creates the service.
@@ -42,18 +45,21 @@ public class SalesOrganisationService {
    * @param dimensions dimensions (cost centers)
    * @param users users
    * @param audit audit trail
+   * @param directory user directory (display names in texts)
    */
   public SalesOrganisationService(
       SalesUnitRepository units,
       SalesOfficerRepository officers,
       DimensionService dimensions,
       AppUserRepository users,
-      AuditTrailService audit) {
+      AuditTrailService audit,
+      UserDirectory directory) {
     this.units = units;
     this.officers = officers;
     this.dimensions = dimensions;
     this.users = users;
     this.audit = audit;
+    this.directory = directory;
   }
 
   /**
@@ -244,7 +250,10 @@ public class SalesOrganisationService {
         CatalogKind.SALES_UNIT.label(),
         unitCode,
         AuditAction.UPDATE,
-        "Unit head changed from " + previous + " to " + head);
+        "Unit head changed from "
+            + Objects.toString(directory.displayName(previous), "none")
+            + " to "
+            + Objects.toString(directory.displayName(head), "none"));
     return unit;
   }
 

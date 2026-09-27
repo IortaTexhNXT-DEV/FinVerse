@@ -195,6 +195,7 @@ export default function RequestDetailPage() {
       <WorkflowPanel
         entityType={REQUEST_ENTITY}
         entityId={r.id}
+        recordStatus={r.stage}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['payrequest'] })}
         renderBusinessActions={(actions) => <RequestActions request={r} actions={actions} />}
       />

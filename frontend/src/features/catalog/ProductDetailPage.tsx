@@ -16,7 +16,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
-import { formatDate, humanize, statusPhrase } from '@/utils/format';
+import { formatDate, formatRate, humanize, statusPhrase } from '@/utils/format';
 import { DetailList } from './DetailList';
 import type { DetailRow } from './DetailList';
 import { ProductEditorModal } from './ProductEditorModal';
@@ -181,7 +181,7 @@ function Summary({ detail }: Readonly<{ detail: ProductDetail }>) {
           label: 'Current Version',
           value: p.currentVersionNo ? `v${p.currentVersionNo}` : '–',
         },
-        { icon: Percent, label: 'Rate %', value: p.defaultRate ?? '–' },
+        { icon: Percent, label: 'Rate %', value: formatRate(p.defaultRate, '–') },
         { icon: CalendarDays, label: 'Package End', value: formatDate(p.packageEndDate) },
         { icon: ShieldCheck, label: 'TSU Review', value: humanize(p.tsuInvolvement ?? 'BY_RULES') },
       ]}

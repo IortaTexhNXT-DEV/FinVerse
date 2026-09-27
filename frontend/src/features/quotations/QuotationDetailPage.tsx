@@ -29,13 +29,14 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
-import { formatAmount, formatDate, formatPeriod } from '@/utils/format';
+import { formatAmount, formatDate } from '@/utils/format';
 import { QuotationActions } from './QuotationActions';
 import { RateExceptionsCard } from './RateExceptionsCard';
 import { DetailsTab, HistoryTab, ItemsTab, VersionsTab } from './QuotationTabs';
 import { RecordSummary } from '@/components/broking/RecordSummary';
 import type { Fact } from '@/components/broking/RecordSummary';
 import { ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
+import { coverPeriod } from './coverPeriod';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -65,7 +66,7 @@ function facts(q: Quotation): Fact[] {
     {
       icon: CalendarRange,
       label: 'Period',
-      value: formatPeriod(c.periodFrom, c.periodTo),
+      value: coverPeriod(q),
     },
     { icon: CalendarClock, label: 'Valid until', value: formatDate(c.validUntil) },
     {
@@ -258,6 +259,7 @@ export default function QuotationDetailPage() {
       <WorkflowPanel
         entityType={QUOTATION_ENTITY}
         entityId={q.id}
+        recordStatus={q.status}
         showHistory={false}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['quotation', id] })}
         renderBusinessActions={(actions) => <QuotationActions quotation={q} actions={actions} />}

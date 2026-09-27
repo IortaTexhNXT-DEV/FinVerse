@@ -395,6 +395,11 @@ public class Account extends BaseEntity {
     lifecycle.holdCover(holdCoverStatus, reference, date);
   }
 
+  public void changeInsurer(String newInsurerCode) {
+    this.insurerCode = newInsurerCode;
+    this.insurerBranch = null;
+  }
+
   /**
    * Records the policy numbers (one per policy year, BRNB.112) and the issue date.
    *

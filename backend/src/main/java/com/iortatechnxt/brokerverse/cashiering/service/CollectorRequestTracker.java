@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.CollectorRequestRepository
 import com.iortatechnxt.brokerverse.cashiering.domain.Disposition;
 import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
 import com.iortatechnxt.brokerverse.opsledger.service.OpsLedgerEvents.UnappliedDispositionChanged;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.time.Clock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,7 @@ public class CollectorRequestTracker {
   private final CollectorRequestRepository requests;
   private final ApplicationEventPublisher events;
   private final Clock clock;
+  private final UserDirectory directory;
 
   /**
    * Creates the tracker.
@@ -41,12 +43,17 @@ public class CollectorRequestTracker {
    * @param requests collector requests
    * @param events event publisher
    * @param clock clock
+   * @param directory user directory (display names in texts)
    */
   public CollectorRequestTracker(
-      CollectorRequestRepository requests, ApplicationEventPublisher events, Clock clock) {
+      CollectorRequestRepository requests,
+      ApplicationEventPublisher events,
+      Clock clock,
+      UserDirectory directory) {
     this.requests = requests;
     this.events = events;
     this.clock = clock;
+    this.directory = directory;
   }
 
   /**
@@ -69,9 +76,10 @@ public class CollectorRequestTracker {
                       + " executed"
                       + (d.getDisbursementRequestNo() == null
                           ? ""
-                          : " (refund request " + d.getDisbursementRequestNo() + ")");
+                          : " (refund request " + d.getDisbursementRequestNo() + ")")
+                      + (d.getOrNo() == null ? "" : " (official receipt " + d.getOrNo() + ")");
               r.applied(clock.instant(), note);
-              publish(item, r, APPLIED, note);
+              publish(item, r, APPLIED, note, d.getOrNo());
             });
   }
 
@@ -87,7 +95,8 @@ public class CollectorRequestTracker {
         .findByDispositionId(d.getId())
         .ifPresent(
             r -> {
-              String note = "Disposition withdrawn by Cashiering (" + by + ")";
+              String note =
+                  "Disposition withdrawn by Cashiering (" + directory.displayName(by) + ")";
               r.reject(by, clock.instant(), note);
               publish(item, r, REJECTED, note);
             });
@@ -102,6 +111,11 @@ public class CollectorRequestTracker {
    * @param message reason or remarks
    */
   void publish(Unapplied item, CollectorRequest r, String status, String message) {
+    publish(item, r, status, message, null);
+  }
+
+  private void publish(
+      Unapplied item, CollectorRequest r, String status, String message, String documentNo) {
     events.publishEvent(
         new UnappliedDispositionChanged(
             r.getCompanyId(),
@@ -110,6 +124,7 @@ public class CollectorRequestTracker {
             r.getSourceRef(),
             status,
             r.getRequestNo(),
-            message));
+            message,
+            documentNo));
   }
 }

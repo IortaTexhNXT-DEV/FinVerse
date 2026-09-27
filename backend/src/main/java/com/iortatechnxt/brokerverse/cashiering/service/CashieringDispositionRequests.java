@@ -23,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
  * item is checked against the item and queued ({@code CRQ-<yyyy>}) for the cashiers ({@code
  * CASH_DISPOSITION}), who act on it through {@link CollectorRequestService}. Refused at once when
  * the item is unknown or has no balance, the amount is above the balance or an application has no
- * invoice. Idempotent on (source, source reference).
+ * invoice. A request to recognise the payment as income (handling fee, BRIDSP-31) is carried out at
+ * once by {@link CollectorRequestService#recogniseIncome}, since its type needs no approval.
+ * Idempotent on (source, source reference).
  */
 @Service
 @Transactional
@@ -33,6 +35,7 @@ public class CashieringDispositionRequests implements UnappliedDispositionReques
   private final UnappliedRepository items;
   private final DocumentNumberService numbers;
   private final NotificationService notifications;
+  private final CollectorRequestService collectorRequests;
   private final AuditTrailService audit;
   private final Clock clock;
 
@@ -43,6 +46,7 @@ public class CashieringDispositionRequests implements UnappliedDispositionReques
    * @param items unapplied items
    * @param numbers document numbers
    * @param notifications notifications
+   * @param collectorRequests collector requests (income recognised at once)
    * @param audit audit trail
    * @param clock clock
    */
@@ -51,12 +55,14 @@ public class CashieringDispositionRequests implements UnappliedDispositionReques
       UnappliedRepository items,
       DocumentNumberService numbers,
       NotificationService notifications,
+      CollectorRequestService collectorRequests,
       AuditTrailService audit,
       Clock clock) {
     this.requests = requests;
     this.items = items;
     this.numbers = numbers;
     this.notifications = notifications;
+    this.collectorRequests = collectorRequests;
     this.audit = audit;
     this.clock = clock;
   }
@@ -77,6 +83,24 @@ public class CashieringDispositionRequests implements UnappliedDispositionReques
       return new DispositionTicket(Status.REJECTED, null, refusal.get());
     }
     Unapplied item = found.orElseThrow();
+    CollectorRequest saved = save(request, item);
+    if (request.action() == Action.RECOGNIZE_INCOME) {
+      collectorRequests.recogniseIncome(saved.getId(), request.incomeType());
+      return ticket(saved);
+    }
+    notifications.notifyPermission(
+        "CASH_DISPOSITION",
+        new Notice(
+            saved.getRequestNo() + ": " + request.action() + " requested by a collector",
+            item.getReference()
+                + (saved.getInvoiceNo() == null ? "" : " to invoice " + saved.getInvoiceNo()),
+            "/cashiering/requests",
+            CollectorRequestService.ENTITY,
+            saved.getId().toString()));
+    return ticket(saved);
+  }
+
+  private CollectorRequest save(DispositionRequest request, Unapplied item) {
     CollectorRequest saved =
         requests.save(
             new CollectorRequest(
@@ -96,16 +120,7 @@ public class CashieringDispositionRequests implements UnappliedDispositionReques
         saved.getRequestNo(),
         AuditAction.CREATE,
         request.action() + " of " + item.getReference() + " requested by " + request.requestedBy());
-    notifications.notifyPermission(
-        "CASH_DISPOSITION",
-        new Notice(
-            saved.getRequestNo() + ": " + request.action() + " requested by a collector",
-            item.getReference()
-                + (saved.getInvoiceNo() == null ? "" : " to invoice " + saved.getInvoiceNo()),
-            "/cashiering/requests",
-            CollectorRequestService.ENTITY,
-            saved.getId().toString()));
-    return ticket(saved);
+    return saved;
   }
 
   private static Optional<String> refusal(Optional<Unapplied> found, DispositionRequest request) {

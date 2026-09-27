@@ -104,7 +104,7 @@ public class SystemParameter extends BaseEntity {
     requirePending();
     if (Objects.equals(pendingBy, approver)) {
       throw new BusinessRuleException(
-          "MAKER_CHECKER_VIOLATION", "A change cannot be approved by the user who asked for it");
+          "MAKER_CHECKER_VIOLATION", "A change cannot be approved by the user who requested it");
     }
     String approved = pendingValue;
     clearPending();

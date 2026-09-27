@@ -12,4 +12,12 @@ public interface ExtractionPatternRepository extends JpaRepository<ExtractionPat
    * @return patterns
    */
   List<ExtractionPattern> findByActiveTrueOrderByPriorityAscIdAsc();
+
+  /**
+   * Active patterns of a document kind.
+   *
+   * @param kind EPOLICY or SUBMITTED_POLICY
+   * @return patterns by priority
+   */
+  List<ExtractionPattern> findByKindAndActiveTrueOrderByPriorityAscIdAsc(String kind);
 }

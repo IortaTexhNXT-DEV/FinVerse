@@ -81,14 +81,18 @@ public final class DisplayFormat {
   }
 
   /**
-   * A period, e.g. "01-Nov-2026 to 01-Nov-2027".
+   * A period, e.g. "01-Nov-2026 to 01-Nov-2027"; "from 01-Nov-2026" or "to 01-Nov-2027" when one
+   * end is open, empty when neither is known (the same rule as the screens' formatPeriod).
    *
    * @param from first day, may be null
    * @param to last day, may be null
-   * @return text
+   * @return text, empty when both are null
    */
   public static String period(LocalDate from, LocalDate to) {
-    return date(from) + " to " + date(to);
+    if (from == null) {
+      return to == null ? "" : "to " + date(to);
+    }
+    return to == null ? "from " + date(from) : date(from) + " to " + date(to);
   }
 
   /**

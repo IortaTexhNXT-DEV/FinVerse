@@ -273,6 +273,7 @@ export default function BatchDetailPage() {
       <WorkflowPanel
         entityType={ENTITY}
         entityId={id}
+        recordStatus={s.stage}
         renderBusinessActions={(available) => (
           <BusinessActions actions={available} onOpen={setDialog} />
         )}

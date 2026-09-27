@@ -249,7 +249,13 @@ export default function BookingConfirmPage() {
       <ErrorAlert error={account.error ?? book.error} />
       <AccountSummary arn={arn} account={account.data} />
       {account.data && (
-        <WorkflowPanel entityType={ACCOUNT_ENTITY} entityId={account.data.id} showHistory={false} />
+        <WorkflowPanel
+          entityType={ACCOUNT_ENTITY}
+          entityId={account.data.id}
+          recordStatus={account.data.status}
+          onChanged={() => void account.refetch()}
+          showHistory={false}
+        />
       )}
       <Card
         title="Booking options"

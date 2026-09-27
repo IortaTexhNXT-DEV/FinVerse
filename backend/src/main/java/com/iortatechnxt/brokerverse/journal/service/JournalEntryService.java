@@ -197,7 +197,7 @@ public class JournalEntryService {
         ENTITY,
         batch.getBatchNo(),
         AuditAction.UPDATE,
-        user == null ? "Assignment cleared" : "Assigned to " + user);
+        user == null ? "Assignment cleared" : "Assigned to " + userDirectory.displayName(user));
     return batch;
   }
 

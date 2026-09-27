@@ -136,6 +136,12 @@ public final class RenewalCodes {
   /** Template: first-notice Renewal Advice. */
   public static final String TEMPLATE_RA_FIRST = "RNW_RA_FIRST";
 
+  /** Template of the RA of a Free First Year submitted policy (wave R3). */
+  public static final String TEMPLATE_RA_FFY = "RNW_RA_FFY";
+
+  /** Template of the follow-up of a mortgaged submitted policy (wave R3). */
+  public static final String TEMPLATE_SFU = "RNW_SFU";
+
   /** Template: second-notice Renewal Advice. */
   public static final String TEMPLATE_RA_SECOND = "RNW_RA_SECOND";
 

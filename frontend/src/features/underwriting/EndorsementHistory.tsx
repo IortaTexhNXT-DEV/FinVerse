@@ -48,7 +48,7 @@ export function EndorsementHistory({
           {
             key: 'st',
             header: 'Status',
-            render: (e) => <StatusBadge status={e.document.status} />,
+            render: (e) => <StatusBadge full status={e.document.status} />,
           },
           {
             key: 'act',

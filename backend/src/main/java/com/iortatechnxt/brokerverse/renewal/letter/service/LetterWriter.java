@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage.RecordLink;
 import com.iortatechnxt.brokerverse.messaging.service.MessageService;
 import com.iortatechnxt.brokerverse.messaging.service.OutboundEmail;
 import com.iortatechnxt.brokerverse.messaging.service.QueuedEmail;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateSource;
 import com.iortatechnxt.brokerverse.renewal.domain.LetterBatch;
 import com.iortatechnxt.brokerverse.renewal.domain.LetterSource;
 import com.iortatechnxt.brokerverse.renewal.domain.LetterType;
@@ -23,6 +24,12 @@ import com.iortatechnxt.brokerverse.renewal.domain.RenewalLetter;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalLetterRepository;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalCodes;
 import com.iortatechnxt.brokerverse.renewal.service.port.RecipientPolicy;
+import com.iortatechnxt.brokerverse.renewal.submitted.SubmittedHandOffRecord;
+import com.iortatechnxt.brokerverse.renewal.submitted.SubmittedHandOffRecordRepository;
+import com.iortatechnxt.brokerverse.submitted.service.port.MailHouseGateway;
+import com.iortatechnxt.brokerverse.submitted.service.port.MailHouseGateway.PrintHandOver;
+import com.iortatechnxt.brokerverse.submitted.service.port.MailHouseGateway.PrintRequest;
+import com.iortatechnxt.brokerverse.submitted.service.port.MailHouseGateway.PrintedLetter;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -50,6 +57,16 @@ public class LetterWriter {
   private final DocumentNumberService numbers;
   private final AuditTrailService audit;
   private final Clock clock;
+  private final PrintChannel print;
+
+  /**
+   * The mail house of the letters of submitted policies without an e-mail (wave R3).
+   *
+   * @param mailHouse print hand-over of Submitted Policies
+   * @param handOffs terms of the submitted policies handed over (mailing address)
+   */
+  public record PrintChannel(
+      MailHouseGateway mailHouse, SubmittedHandOffRecordRepository handOffs) {}
 
   /**
    * Creates the writer.
@@ -63,6 +80,8 @@ public class LetterWriter {
    * @param numbers document numbers
    * @param audit audit trail
    * @param clock clock
+   * @param mailHouse print hand-over of Submitted Policies
+   * @param handOffs terms of the submitted policies handed over
    */
   @SuppressWarnings("java:S107") // constructor injection
   public LetterWriter(
@@ -74,7 +93,9 @@ public class LetterWriter {
       AccountRepository accounts,
       DocumentNumberService numbers,
       AuditTrailService audit,
-      Clock clock) {
+      Clock clock,
+      MailHouseGateway mailHouse,
+      SubmittedHandOffRecordRepository handOffs) {
     this.letters = letters;
     this.content = content;
     this.documents = documents;
@@ -84,6 +105,7 @@ public class LetterWriter {
     this.numbers = numbers;
     this.audit = audit;
     this.clock = clock;
+    this.print = new PrintChannel(mailHouse, handOffs);
   }
 
   /**
@@ -140,6 +162,9 @@ public class LetterWriter {
    */
   public Optional<String> send(RenewalCandidate c, RenewalLetter letter) {
     String email = c.getSnapshot().client() == null ? null : c.getSnapshot().client().email();
+    if ((email == null || email.isBlank()) && c.getSource() == CandidateSource.SUBMITTED_POLICY) {
+      return printed(c, letter);
+    }
     Optional<String> refusal =
         email == null || email.isBlank()
             ? Optional.of("The client of " + c.getRenewalRef() + " has no registered e-mail")
@@ -173,6 +198,49 @@ public class LetterWriter {
         c.getRenewalRef(),
         AuditAction.SUBMIT,
         letter.getLetterNo() + " sent to " + email.strip() + " (protected)");
+    return Optional.empty();
+  }
+
+  /**
+   * Hands the letter of a submitted policy without an e-mail to the mail house (print batch of
+   * Submitted Policies, wave R3).
+   */
+  private Optional<String> printed(RenewalCandidate c, RenewalLetter letter) {
+    Long storedFileId =
+        letter.getAttachmentId() == null
+            ? null
+            : documents.downloadable(letter.getAttachmentId()).storedFileId();
+    if (storedFileId == null) {
+      String reason = "The letter " + letter.getLetterNo() + " has no stored file to print";
+      letter.refused(reason);
+      return Optional.of(reason);
+    }
+    String address =
+        print
+            .handOffs()
+            .findByCandidateId(c.getId())
+            .map(SubmittedHandOffRecord::getMailingAddress)
+            .orElse(null);
+    String addressee =
+        c.getSnapshot().client() == null ? null : c.getSnapshot().client().assuredName();
+    PrintHandOver batch =
+        print
+            .mailHouse()
+            .handOver(
+                new PrintRequest(
+                    c.getCompanyId(),
+                    "RENEWAL",
+                    letter.getType().name(),
+                    BusinessClock.today(clock),
+                    List.of(
+                        new PrintedLetter(
+                            letter.getLetterNo(), addressee, address, storedFileId))));
+    letter.printed(batch.batchNo(), clock.instant());
+    audit.record(
+        RenewalCodes.ENTITY,
+        c.getRenewalRef(),
+        AuditAction.SUBMIT,
+        letter.getLetterNo() + " printed in mail house batch " + batch.batchNo());
     return Optional.empty();
   }
 

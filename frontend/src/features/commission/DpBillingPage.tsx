@@ -195,6 +195,7 @@ export default function DpBillingPage() {
       <WorkflowPanel
         entityType={BILLING_ENTITY}
         entityId={b.id}
+        recordStatus={b.stage}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['commission'] })}
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />

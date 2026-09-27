@@ -275,6 +275,7 @@ export default function VoucherPage() {
       <WorkflowPanel
         entityType={ENTITY}
         entityId={id}
+        recordStatus={v.summary.stage}
         renderBusinessActions={businessActions}
         onChanged={() => void refresh()}
       />

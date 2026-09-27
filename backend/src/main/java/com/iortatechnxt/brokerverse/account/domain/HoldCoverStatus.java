@@ -9,5 +9,7 @@ public enum HoldCoverStatus {
   /** Declined by the insurer. */
   DECLINED,
   /** Lapsed without a policy. */
-  EXPIRED
+  EXPIRED,
+  /** Closed because the insurer was re-assigned while the request was open (BRIDSP-32). */
+  REASSIGNED
 }

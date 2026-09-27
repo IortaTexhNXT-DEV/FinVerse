@@ -13,7 +13,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, formatPeriod, humanize } from '@/utils/format';
+import { formatDate, formatPeriod, formatRate, humanize } from '@/utils/format';
 import { DebitNote } from './DebitNote';
 import { EndorsementDialog } from './EndorsementDialog';
 import { EndorsementHistory } from './EndorsementHistory';
@@ -37,7 +37,7 @@ function Terms({ policy: p }: Readonly<{ policy: Policy }>) {
     ['UW year', String(p.uwYear)],
     ['Currency', p.currency],
     ['Business', businessLabel(p)],
-    ['Discount / loading', `${String(p.discountRate)}% / ${String(p.loadingRate)}%`],
+    ['Discount / loading', `${formatRate(p.discountRate)}% / ${formatRate(p.loadingRate)}%`],
     ['Open cover', p.openCoverNo ?? '—'],
     ['Created by', displayNameOf(p.document.createdBy)],
     ['Approved by', displayNameOf(p.document.approvedBy) || '—'],
@@ -143,7 +143,7 @@ export default function PolicyDetailPage() {
               numeric: true,
               render: (r) => <Amount value={r.sumInsured} />,
             },
-            { key: 'rate', header: 'Rate %', numeric: true, render: (r) => r.rate },
+            { key: 'rate', header: 'Rate %', numeric: true, render: (r) => formatRate(r.rate) },
             {
               key: 'prem',
               header: 'Premium',

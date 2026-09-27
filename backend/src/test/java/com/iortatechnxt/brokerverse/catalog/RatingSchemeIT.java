@@ -281,6 +281,25 @@ class RatingSchemeIT {
   }
 
   @Test
+  void aPackageQuotationShowsItsCoverPeriodOrElseThePackageTerm() {
+    String code = fx.released();
+    Long clientId = clients.requireByCode(fx.company(), CLIENT).getId();
+    Quotation dated =
+        as.run("ao", () -> quotations.create(fx.company(), draft(clientId, code, null)));
+    Quotation undated =
+        as.run(
+            "ao", () -> quotations.create(fx.company(), draft(clientId, code, null, null, null)));
+    Quotation d = quotationQueries.get(dated.getId());
+    assertThat(quotationQueries.coverPeriod(d, quotationQueries.content(d)))
+        .isEqualTo("01-Nov-2026 to 01-Nov-2027");
+    Quotation u = quotationQueries.get(undated.getId());
+    assertThat(quotationQueries.coverPeriod(u, quotationQueries.content(u)))
+        .startsWith("Package term ")
+        .contains(" to ")
+        .doesNotContain("null");
+  }
+
+  @Test
   void quotationAndAccountsCarryTheVersionAndSubmissionNeedsTheException() {
     String code = fx.released();
     Long clientId = clients.requireByCode(fx.company(), CLIENT).getId();
@@ -330,6 +349,11 @@ class RatingSchemeIT {
   }
 
   private static QuotationDraft draft(Long clientId, String code, BigDecimal rate) {
+    return draft(clientId, code, rate, LocalDate.of(2026, 11, 1), LocalDate.of(2027, 11, 1));
+  }
+
+  private static QuotationDraft draft(
+      Long clientId, String code, BigDecimal rate, LocalDate from, LocalDate to) {
     String id = PackageFixtures.code();
     RiskItemData vehicle =
         new RiskItemData(
@@ -349,15 +373,7 @@ class RatingSchemeIT {
         "EMAIL",
         null,
         null,
-        new Terms(
-            "INS-MGIC",
-            "MKT",
-            LocalDate.of(2026, 11, 1),
-            LocalDate.of(2027, 11, 1),
-            null,
-            false,
-            null,
-            "Scheme test"),
+        new Terms("INS-MGIC", "MKT", from, to, null, false, null, "Scheme test"),
         List.of(new DraftItem(1, vehicle)));
   }
 }

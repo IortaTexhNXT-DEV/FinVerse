@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { UserName } from '@/components/ui/UserName';
 import { formatDateTime } from '@/utils/format';
 import { claimStatusApi } from './api';
 import type { FieldChange, StatusChange } from './api';
@@ -48,7 +49,7 @@ export function HistoryTab({
               numeric: true,
               render: (h) => h.daysInPrevious ?? '—',
             },
-            { key: 'by', header: 'User', render: (h) => h.stamp.by },
+            { key: 'by', header: 'User', render: (h) => <UserName login={h.stamp.by} /> },
             { key: 'remark', header: 'Remark', render: (h) => h.stamp.remark ?? '' },
           ]}
         />
@@ -65,7 +66,7 @@ export function HistoryTab({
             { key: 'field', header: 'Field', render: (f) => FIELD_LABELS[f.field] ?? f.field },
             { key: 'old', header: 'Old Value', render: (f) => f.oldValue ?? '—' },
             { key: 'new', header: 'New Value', render: (f) => f.newValue ?? '—' },
-            { key: 'by', header: 'User', render: (f) => f.stamp.by },
+            { key: 'by', header: 'User', render: (f) => <UserName login={f.stamp.by} /> },
             { key: 'reason', header: 'Reason', render: (f) => f.stamp.remark ?? '' },
           ]}
         />

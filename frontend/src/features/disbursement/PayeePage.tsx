@@ -287,6 +287,7 @@ function ExistingPayee({ id }: Readonly<{ id: number }>) {
       <WorkflowPanel
         entityType={ENTITY}
         entityId={id}
+        recordStatus={p.summary.stage}
         renderBusinessActions={businessActions}
         onChanged={() => void payee.refetch()}
       />

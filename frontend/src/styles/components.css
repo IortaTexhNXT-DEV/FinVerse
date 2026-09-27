@@ -648,6 +648,17 @@
   width: 100%;
 }
 
+/* History tables: the full label, never the short form; the pill grows to fit and may wrap. */
+.badge.badge-full {
+  height: auto;
+  min-height: 24px;
+  max-width: none;
+  white-space: normal;
+  overflow: visible;
+  line-height: 1.3;
+  padding: 3px 10px;
+}
+
 /* Two statuses of one record (e.g. Unapplied and a Queued request): two aligned pills. */
 .badge-pair {
   display: inline-flex;

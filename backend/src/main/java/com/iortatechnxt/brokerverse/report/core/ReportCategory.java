@@ -24,7 +24,8 @@ public enum ReportCategory {
   DATA_MIGRATION("Data Migration"),
   CLAIMS_HANDLING("Claims Handling"),
   EMPLOYEE_BENEFITS("Employee Benefits"),
-  RENEWAL("Renewal");
+  RENEWAL("Renewal"),
+  SUBMITTED_POLICIES("Submitted Policies");
 
   private final String label;
 

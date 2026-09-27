@@ -14,6 +14,7 @@ import { Modal } from '@/components/ui/Modal';
 import { PageFooter } from '@/components/ui/Pager';
 import { MigStatus } from '../common/MigStatus';
 import { WAIVER_REASONS, migLabel } from '../common/migrationCodes';
+import { effectOf } from './rowEffect';
 
 const ROW_STATUSES = [
   'VALID',
@@ -181,7 +182,7 @@ function ResolveDialog({
       onClose();
     },
   });
-  const title = mode === 'waive' ? 'Waive Rows' : 'Exclude Rows';
+  const title = `${mode === 'waive' ? 'Waive' : 'Exclude'} ${rowIds.length === 1 ? 'Row' : 'Rows'}`;
   return (
     <Modal
       title={title}
@@ -204,11 +205,7 @@ function ResolveDialog({
       }
     >
       <ErrorAlert error={save.error} />
-      <p>
-        {mode === 'waive'
-          ? `${String(rowIds.length)} rows load despite their errors and count as waived.`
-          : `${String(rowIds.length)} rows are left out of the load; state how they are handled.`}
-      </p>
+      <p>{effectOf(mode, rowIds.length)}</p>
       <div className="form-grid">
         <Field label="Reason" required>
           {(id) => (

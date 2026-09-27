@@ -14,7 +14,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime } from '@/utils/format';
+import { countOf, formatDateTime } from '@/utils/format';
 import { MigStatus } from '../common/MigStatus';
 import { MIG_SECTION } from '../common/migrationCodes';
 import { useDownload } from '../common/useDownload';
@@ -49,7 +49,7 @@ export default function ExtractsPage() {
       if (e.status === 'REJECTED') {
         toast.error(`${e.extractNo} rejected: ${e.rejectMessage ?? ''}`);
       } else {
-        toast.success(`${e.extractNo} staged with ${String(e.stagedRows)} rows`);
+        toast.success(`${e.extractNo} staged with ${countOf(e.stagedRows, 'row')}`);
       }
       setData(undefined);
       setControl(undefined);

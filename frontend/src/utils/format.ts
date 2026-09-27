@@ -213,6 +213,14 @@ export function today(now: Date = new Date()): string {
   return businessDateFormat.format(now);
 }
 
+/**
+ * A count with its noun in the right number: "1 row", "3 rows", "0 rows". The plural is the noun
+ * with an "s" unless given ("1 entry", "2 entries").
+ */
+export function countOf(count: number, singular: string, plural = `${singular}s`): string {
+  return `${String(count)} ${count === 1 ? singular : plural}`;
+}
+
 export function humanize(code: string): string {
   return code
     .split('_')

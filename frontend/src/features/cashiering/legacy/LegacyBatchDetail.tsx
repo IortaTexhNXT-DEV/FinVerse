@@ -15,7 +15,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tag } from '@/components/ui/Tag';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime } from '@/utils/format';
+import { countOf, formatDateTime } from '@/utils/format';
 import { AddLinesPanel } from './AddLinesPanel';
 import type { BatchScreen } from './batchScreens';
 import { approverPermission, approvers } from './batchScreens';
@@ -170,7 +170,7 @@ function BatchLines({
                     {l.ledgerContext === 'LEGACY' && <Tag tone="info">LEGACY</Tag>}
                   </>
                 }
-                sub={l.ageDays === undefined ? l.reason : `${String(l.ageDays)} days old`}
+                sub={l.ageDays === undefined ? l.reason : `${countOf(l.ageDays, 'day')} old`}
               />
             ),
           },

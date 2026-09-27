@@ -238,8 +238,8 @@ rules:
   - [R1, "Lockout after 3 failed attempts.", Configurable, Parameter LOGIN_MAX_FAILED_ATTEMPTS]
   - [R2, "The landing page of CSF roles is the Customer Search.", Fixed, "-"]
 validations:
-  - [User ID or password wrong, Invalid user ID or password, "-"]
-  - [Account locked, Your account is locked. Contact the System Administrator, "-"]
+  - [User ID or password wrong, Invalid user name or password, AUTHENTICATION_FAILED]
+  - [Account locked, Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:

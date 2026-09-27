@@ -283,8 +283,8 @@ rules:
   - [R2, "Idle timeout per the BIBS session policy; the Claims value of 15 minutes is confirmed under CLQ24.", Configurable, Session policy (System Administrator)]
   - [R3, "Directory sign-in (Windows ID) through the parked DirectoryAuthenticator port; local sign-in until BDO supplies the interface (UQ04).", Configurable, Parameter AUTH_MODE]
 validations:
-  - [User ID or password wrong, Invalid user ID or password, "-"]
-  - [Account locked, Your account is locked. Contact the System Administrator, "-"]
+  - [User ID or password wrong, Invalid user name or password, AUTHENTICATION_FAILED]
+  - [Account locked, Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:

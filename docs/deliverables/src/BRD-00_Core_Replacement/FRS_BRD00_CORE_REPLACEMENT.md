@@ -240,12 +240,12 @@ main_flow:
   - BIBS shows the menu groups and screens those permissions open.
   - The user opens a screen; BIBS checks the permission again on every call.
 alternate_flows:
-  - Screen opened by URL without permission. BIBS shows "You do not have access to this page" and the API refuses the call.
+  - Screen opened by URL without permission. BIBS shows "You do not have access to this screen. Contact your administrator if you need it." and the API refuses the call.
 rules:
   - [R1, "Roles and their permissions are changed only through an approved User Access request (BRD-11).", Configurable, User Access requests]
   - [R2, "A screen without a permission of the user is never shown, even if the user knows its address.", Fixed, "-"]
 validations:
-  - [Screen without permission, You do not have access to this page, "-"]
+  - [Screen without permission, "You do not have access to this screen. Contact your administrator if you need it.", "-"]
 notifications:
   - None.
 audit:
@@ -321,7 +321,7 @@ alternate_flows:
 rules:
   - [R1, "The contents of the dashboard views are 'to be defined' in BR-125, 152 and 160; BIBS delivers the default widgets of section 3.1 until BDOI answers CRQ06.", Configurable, Role Home Set-up]
 validations:
-  - [No permission on the target screen, You do not have access to this page, "-"]
+  - [No permission on the target screen, "You do not have access to this screen. Contact your administrator if you need it.", "-"]
 notifications:
   - None.
 audit:
@@ -768,7 +768,7 @@ rules:
   - [R1, "Lock-out after 3 failed attempts for every user (decision D5).", Configurable, Parameter LOGIN_MAX_FAILED_ATTEMPTS]
   - [R2, "Accounts are disabled, never deleted, so that their history stays traceable (BR-003 'delete').", Fixed, "-"]
 validations:
-  - [Wrong credentials, Invalid user ID or password, "-"]
+  - [Wrong credentials, Invalid user name or password, AUTHENTICATION_FAILED]
 notifications:
   - Password reset link and access request decisions by e-mail.
 audit:

@@ -308,7 +308,7 @@ main_flow:
   - BIBS checks the user's permissions for that screen or action.
   - BIBS shows the screen or performs the action.
 alternate_flows:
-  - No permission. The screen is not in the menu; a direct link returns "You do not have access to this page"; an direct request is refused and logged.
+  - No permission. The screen is not in the menu; a direct link shows "You do not have access to this screen. Contact your administrator if you need it."; a direct request is refused and logged.
   - Reserved disposition. A disposition value reserved to other roles is refused even when the user holds CLX_WORK (FR-CL-031).
 rules:
   - [R1, "Roles are granted permissions as in section 3.3 until BDOI confirms the matrix (OQ48).", Configurable, Role-permission change request]
@@ -317,7 +317,7 @@ rules:
   - [R4, "BDO single sign-on with Windows credentials (NFR 1.01) is not part of this phase (Q42).", Fixed, "-"]
 validations:
   - [Action without permission, You are not permitted to perform this action, ACCESS_DENIED]
-  - [Account locked after failed log-ins, Your account is locked. Contact the System Administrator, "-"]
+  - [Account locked after failed log-ins, Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:

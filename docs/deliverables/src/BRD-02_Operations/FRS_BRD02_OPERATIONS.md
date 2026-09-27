@@ -341,8 +341,8 @@ rules:
   - [R1, "Log-in, lock-out and session rules follow the session policy of BRD-1 (BRNB.040).", Configurable, Session policy (System Administrator)]
   - [R2, "BDO single sign-on / Active Directory is not part of this phase (BRD-1 Q42).", Fixed, "-"]
 validations:
-  - [User ID or password wrong, Invalid user ID or password, "-"]
-  - [Account locked, Your account is locked. Contact the System Administrator, "-"]
+  - [User ID or password wrong, Invalid user name or password, AUTHENTICATION_FAILED]
+  - [Account locked, Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:
@@ -370,7 +370,7 @@ main_flow:
   - BIBS checks the user's permissions for that screen or action.
   - BIBS shows the screen or performs the action.
 alternate_flows:
-  - No permission. The screen is not in the menu; a direct link returns "You do not have access to this page". A direct request is refused and logged.
+  - No permission. The screen is not in the menu; a direct link shows "You do not have access to this screen. Contact your administrator if you need it.". A direct request is refused and logged.
   - Segregation of duties. An approval refused by a four-eyes rule is refused with its message even when the role has the permission (section 3.3).
 rules:
   - [R1, Roles are granted permissions as in section 3.3 until BDOI confirms the matrix (OQ48)., Configurable, Role-permission change request (BRD-11)]
@@ -3821,229 +3821,229 @@ Every BRD-2 requirement ID (169) is met by at least one FR. The page is the page
 
 ## General requirements (BRQID)
 
-<!-- table: widths=2.2,1.8,2.9,4.4,4.7 caption="Traceability: General requirements (BRQID)" size=7.5 -->
-| BRD ID | Page | FR | Screen | API / job |
+<!-- table: widths=2.2,1.8,2.9,4.4,5.2 caption="Traceability: General requirements (BRQID)" size=7.5 -->
+| BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| BRQID.001 | p.16 | FR-OP-001 | /login | /auth |
-| BRQID.002 | p.16 | FR-OP-002 | /login | /auth |
-| BRQID.003 | p.17 | FR-OP-003 | /operations, section workbenches | GET /ops/home |
-| BRQID.004 | p.18 | FR-OP-130 | /operations/interfaces | /ops/flow-in |
-| BRQID.005 | p.18 | FR-OP-131 | /operations/interfaces | /ops/flow-in/feeds, runs, records |
-| BRQID.006 | p.19-20 | FR-OP-008 | /bulk, /operations/interfaces | /bulk |
+| BRQID.001 | p.16 | FR-OP-001 | Login | TC-OP-001.1, 001.2 (3 cases) |
+| BRQID.002 | p.16 | FR-OP-002 | Login | TC-OP-002.1, 002.2, 002.3 (3 cases) |
+| BRQID.003 | p.17 | FR-OP-003 | Operations Home, section workbenches | TC-OP-003.1, 003.2, 003.3 (3 cases) |
+| BRQID.004 | p.18 | FR-OP-130 | Interfaces | TC-OP-130.1, 130.2 (3 cases) |
+| BRQID.005 | p.18 | FR-OP-131 | Interfaces | TC-OP-131.1, 131.2 (3 cases) |
+| BRQID.006 | p.19-20 | FR-OP-008 | Bulk Uploads, Interfaces | TC-OP-008.1, 008.2, 008.3 (4 cases) |
 
 ## Cashiering (CSHID) and Disbursement (DBMID)
 
-<!-- table: widths=2.2,1.8,2.9,4.4,4.7 caption="Traceability: Cashiering (CSHID) and Disbursement (DBMID)" size=7.5 -->
-| BRD ID | Page | FR | Screen | API / job |
+<!-- table: widths=2.2,1.8,2.9,4.4,5.2 caption="Traceability: Cashiering (CSHID) and Disbursement (DBMID)" size=7.5 -->
+| BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| CSHID.001 | p.23-24 | FR-OP-011, FR-OP-013, FR-OP-014 | /cashiering/receive, /cashiering/receipts/:id | POST /cashiering/receipts/ar, /receipts/{id}/cancel, /reinstate |
-| CSHID.002 | p.24-25 | FR-OP-012, FR-OP-013 | /cashiering/receipts | POST /cashiering/receipts/or |
-| CSHID.003 | p.25-26 | FR-OP-013 | /cashiering/receipts/:id | POST /cashiering/receipts/{id}/cancel, /reinstate, /receipt-actions/{id}/approve |
-| CSHID.004 | p.26-27 | FR-OP-014 | /cashiering/receipts/:id | POST /cashiering/receipts/{id}/cancel, /reinstate, /receipt-actions/{id}/approve |
-| CSHID.005 | p.27-28 | FR-OP-014 | /cashiering/receipts/:id | POST /cashiering/receipts/{id}/cancel, /reinstate, /receipt-actions/{id}/approve |
-| CSHID.006 | p.28-29 | FR-OP-010 | /cashiering/series | /cashiering/series |
-| CSHID.007 | p.29 | FR-OP-021 | /cashiering/commission-ors, /operations/interfaces | GET /cashiering/commission-payments, POST /commission-payments/issue; feed COLLECTION_C... |
-| CSHID.008 | p.29-32 | FR-OP-015, FR-OP-016 | /cashiering/uploads, /cashiering/pdc | bulk PAY_BILLS / PAY_TRADE / PAY_CLPC / PAY_DIRECT_CREDIT / PAY_PDC; /cashiering/pdc |
-| CSHID.009 | p.32-33 | FR-OP-017 | /cashiering/pickups | /cashiering/pickups; feed COLLECTION_CHECK_PICKUP |
-| CSHID.010 | p.33-34 | FR-OP-024 | /cashiering/receipts | GET /cashiering/receipts |
-| CSHID.011 | p.34-35 | FR-OP-024 | /cashiering/receipts/:id (History) | GET /cashiering/receipts/{id} |
-| CSHID.012 | p.35 | FR-OP-013, FR-OP-027 | /cashiering/receipts/:id (Journal) | /cashiering/receipts/* |
-| CSHID.013 | p.35-36 | FR-OP-014, FR-OP-027 | /cashiering/receipts/:id (Journal) | /cashiering/receipts/* |
-| CSHID.014 | p.36 | FR-OP-027 | /cashiering/receipts/:id (Journal) | /cashiering/receipts/* |
-| CSHID.015 | p.37 | FR-OP-010 | /cashiering/series | /cashiering/series |
-| CSHID.016 | p.37-38 | FR-OP-023 | /cashiering/setup | GET /cashiering/minimal-balance/rules, POST /minimal-balance/sweep |
-| CSHID.017 | p.38 | FR-OP-009 | /reports (Report Centre) | /reports |
-| CSHID.018 | p.38 | FR-OP-009 | /reports (Report Centre) | /reports |
-| CSHID.019 | p.39-40 | FR-OP-025 | /cashiering/print | /cashiering/print-batches |
-| CSHID.020 | p.40-41 | FR-OP-018, FR-OP-132 | /cashiering/receive, /cashiering/prebooked | POST /cashiering/payments, /payments/preview, GET /prebooked, POST /matching/run |
-| CSHID.021 | p.41 | FR-OP-020 | /cashiering/receipts | POST /cashiering/receipts/ar (AR_INSURANCE) |
-| CSHID.022 | p.42 | FR-OP-019 | /cashiering/receive | POST /cashiering/payments/preview, /payments |
-| CSHID.023 | p.42,125-127 | FR-OP-028 | /reports (Report Centre) | /reports (CSH-*) |
-| CSHID.024 | p.42-43 | FR-OP-022 | /cashiering/unapplied, /cashiering/unapplied/:id | /cashiering/unapplied/* |
-| CSHID.025 | p.43-44 | FR-OP-022 | /cashiering/unapplied, /cashiering/unapplied/:id | /cashiering/unapplied/* |
-| CSHID.026 | p.44 | FR-OP-026 | /cashiering/cwt | /cashiering/cwt/*; feed COLLECTION_CWT2307 |
-| CSHID.027 | p.44-45 | FR-OP-026 | /cashiering/cwt | /cashiering/cwt/*; feed COLLECTION_CWT2307 |
-| DBMID.001 | p.46 | FR-OP-120, FR-OP-121 | /cashiering/cwt, /operations/disbursements | POST /cashiering/cwt/batches/{id}/route, /release; /ops/disbursements |
+| CSHID.001 | p.23-24 | FR-OP-011, FR-OP-013, FR-OP-014 | Receive Payment, Receipt | TC-OP-011.1, 011.2, 011.3, 013.1, 013.2, 013.3, 014.1, 014.2, 014.3 (13 cases) |
+| CSHID.002 | p.24-25 | FR-OP-012, FR-OP-013 | Receipts | TC-OP-012.1, 012.2, 013.1, 013.2, 013.3 (7 cases) |
+| CSHID.003 | p.25-26 | FR-OP-013 | Receipt | TC-OP-013.1, 013.2, 013.3 (4 cases) |
+| CSHID.004 | p.26-27 | FR-OP-014 | Receipt | TC-OP-014.1, 014.2, 014.3 (4 cases) |
+| CSHID.005 | p.27-28 | FR-OP-014 | Receipt | TC-OP-014.1, 014.2, 014.3 (4 cases) |
+| CSHID.006 | p.28-29 | FR-OP-010 | Receipt Series | TC-OP-010.1, 010.2, 010.3 (5 cases) |
+| CSHID.007 | p.29 | FR-OP-021 | Commission ORs, Interfaces | TC-OP-021.1, 021.2 (4 cases) |
+| CSHID.008 | p.29-32 | FR-OP-015, FR-OP-016 | Payment Uploads, PDC Warehouse | TC-OP-015.1, 015.2, 015.3, 016.1, 016.2, 016.3 (8 cases) |
+| CSHID.009 | p.32-33 | FR-OP-017 | Check Pick-up | TC-OP-017.1, 017.2 (3 cases) |
+| CSHID.010 | p.33-34 | FR-OP-024 | Receipts | TC-OP-024.1, 024.2 (3 cases) |
+| CSHID.011 | p.34-35 | FR-OP-024 | Receipt (History) | TC-OP-024.1, 024.2 (3 cases) |
+| CSHID.012 | p.35 | FR-OP-013, FR-OP-027 | Receipt (Journal) | TC-OP-013.1, 013.2, 013.3, 027.1, 027.2 (7 cases) |
+| CSHID.013 | p.35-36 | FR-OP-014, FR-OP-027 | Receipt (Journal) | TC-OP-014.1, 014.2, 014.3, 027.1, 027.2 (7 cases) |
+| CSHID.014 | p.36 | FR-OP-027 | Receipt (Journal) | TC-OP-027.1, 027.2 (3 cases) |
+| CSHID.015 | p.37 | FR-OP-010 | Receipt Series | TC-OP-010.1, 010.2, 010.3 (5 cases) |
+| CSHID.016 | p.37-38 | FR-OP-023 | Cashiering Setup | TC-OP-023.1, 023.2 (3 cases) |
+| CSHID.017 | p.38 | FR-OP-009 | Report Centre (Report Centre) | TC-OP-009.1, 009.2 (2 cases) |
+| CSHID.018 | p.38 | FR-OP-009 | Report Centre (Report Centre) | TC-OP-009.1, 009.2 (2 cases) |
+| CSHID.019 | p.39-40 | FR-OP-025 | Batch Print | TC-OP-025.1, 025.2 (3 cases) |
+| CSHID.020 | p.40-41 | FR-OP-018, FR-OP-132 | Receive Payment, Pre-booked Payments | TC-OP-018.1, 018.2, 018.3, 132.1, 132.2 (7 cases) |
+| CSHID.021 | p.41 | FR-OP-020 | Receipts | TC-OP-020.1, 020.2 (2 cases) |
+| CSHID.022 | p.42 | FR-OP-019 | Receive Payment | TC-OP-019.1, 019.2 (3 cases) |
+| CSHID.023 | p.42,125-127 | FR-OP-028 | Report Centre (Report Centre) | TC-OP-028.1, 028.2 (3 cases) |
+| CSHID.024 | p.42-43 | FR-OP-022 | Unapplied Payments, Unapplied Payment | TC-OP-022.1, 022.2, 022.3 (6 cases) |
+| CSHID.025 | p.43-44 | FR-OP-022 | Unapplied Payments, Unapplied Payment | TC-OP-022.1, 022.2, 022.3 (6 cases) |
+| CSHID.026 | p.44 | FR-OP-026 | BIR 2307 | TC-OP-026.1, 026.2, 026.3 (4 cases) |
+| CSHID.027 | p.44-45 | FR-OP-026 | BIR 2307 | TC-OP-026.1, 026.2, 026.3 (4 cases) |
+| DBMID.001 | p.46 | FR-OP-120, FR-OP-121 | BIR 2307, Disbursement Queue | TC-OP-120.1, 120.2, 121.1, 121.2 (5 cases) |
 
 ## Remittance (RMTID)
 
-<!-- table: widths=2.2,1.8,2.9,4.4,4.7 caption="Traceability: Remittance (RMTID)" size=7.5 -->
-| BRD ID | Page | FR | Screen | API / job |
+<!-- table: widths=2.2,1.8,2.9,4.4,5.2 caption="Traceability: Remittance (RMTID)" size=7.5 -->
+| BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| RMTID.001 | p.49 | FR-OP-030 | /remittance/extraction | GET/POST /remittance/runs, GET /runs/{id}/tags |
-| RMTID.002 | p.50; add. p.4-5 | FR-OP-032 | /remittance/batches/:id | POST /remittance/batches/{id}/exclude, /restore |
-| RMTID.003 | p.50-51 | FR-OP-030 | /remittance/extraction | GET/POST /remittance/runs, GET /runs/{id}/tags |
-| RMTID.004 | p.51-52 | FR-OP-030 | /remittance/extraction, /remittance/dtip | POST /remittance/runs, GET/POST /eod-requests |
-| RMTID.005 | p.52 | FR-OP-030 | /remittance/extraction, /remittance/dtip | POST /remittance/runs, GET/POST /eod-requests |
-| RMTID.006 | p.52 | FR-OP-031 | /remittance/batches/:id | GET /remittance/batches/{id} |
-| RMTID.007 | p.52-53 | FR-OP-030 | /remittance/extraction | GET/POST /remittance/runs, GET /runs/{id}/tags |
-| RMTID.008 | p.53 | FR-OP-030 | /remittance/extraction | GET/POST /remittance/runs, GET /runs/{id}/tags |
-| RMTID.009 | p.53-54 | FR-OP-033 | /remittance/batches, /remittance/batches/:id | POST /remittance/batches/{id}/submit, /approve, /return, /assign |
-| RMTID.010 | p.54 | FR-OP-033, FR-OP-035 | /remittance/batches, /remittance/batches/:id | POST /remittance/batches/{id}/submit, /approve, /return, /assign |
-| RMTID.011 | p.54-55 | FR-OP-034 | /remittance/batches/:id (Documents) | GET /remittance/batches/{id}/documents/{kind} |
-| RMTID.012 | p.55-56 | FR-OP-037 | /remittance/insurer-or | POST /remittance/insurer-or/upload, GET /insurer-or/runs; feed INSURER_REMIT_OR |
-| RMTID.013 | p.56 | FR-OP-037 | /remittance/insurer-or | POST /remittance/insurer-or/upload, GET /insurer-or/runs; feed INSURER_REMIT_OR |
-| RMTID.014 | p.56-57 | FR-OP-031 | /remittance/extraction | /remittance/runs; report REM-PAIDAR-OVER-DTIP |
-| RMTID.015 | p.57 | FR-OP-031 | /remittance/extraction | /remittance/runs; report REM-PAIDAR-OVER-DTIP |
-| RMTID.016 | p.57-58 | FR-OP-037 | /remittance/insurer-or | POST /remittance/insurer-or/upload, GET /insurer-or/runs; feed INSURER_REMIT_OR |
-| RMTID.017 | p.58-59 | FR-OP-031 | /remittance/extraction | GET /remittance/runs/{id}/tags |
-| RMTID.018 | p.59 | FR-OP-031 | /remittance/extraction | GET /remittance/runs/{id}/tags |
-| RMTID.019 | p.59-60 | FR-OP-033, FR-OP-035 | /remittance/batches, /remittance/batches/:id | POST /remittance/batches/{id}/submit, /approve, /return, /assign |
-| RMTID.020 | p.60-61 | FR-OP-031 | /remittance/extraction, /remittance/holds | /remittance/runs, /holds |
-| RMTID.021 | p.61 | FR-OP-111 | /remittance/holds, /remittance/holds/:id | /remittance/holds/*; job HOLD_EXPIRY |
-| RMTID.022 | p.61-62 | FR-OP-031 | /remittance/extraction | /remittance/runs |
-| RMTID.023 | p.62 | FR-OP-038 | /remittance/incentive-rules | GET/POST /remittance/incentive-rules, PUT /incentive-rules/{id} |
-| RMTID.024 | p.62-63 | FR-OP-032 | /remittance/dtip, /remittance/batches | GET /remittance/dtip, /batches, /runs/{id}/tags |
-| RMTID.025 | p.63 | FR-OP-039 | /remittance/dtip, /remittance/batches | GET /remittance/dtip, /batches, /runs/{id}/tags |
-| RMTID.026 | p.63 | FR-OP-005 | /operations/invoices, /operations/invoices/:no | GET /ops/invoices, /invoices/{no} |
-| RMTID.027 | p.64 | FR-OP-032 | /remittance/dtip, /remittance/batches | GET /remittance/dtip, /batches, /runs/{id}/tags |
-| RMTID.028 | p.64 | FR-OP-031 | /remittance/batches/:id | GET /remittance/batches/{id} |
-| RMTID.029 | p.64-65 | FR-OP-033 | /remittance/batches, /remittance/batches/:id | POST /remittance/batches/{id}/submit, /approve, /return, /assign |
-| RMTID.030 | p.65 | FR-OP-040 | /remittance/special, /remittance/special/:id | /remittance/special/*; feed COLLECTION_SPECIAL_REMIT |
-| RMTID.031 | p.65-66 | FR-OP-031 | /remittance/extraction, /remittance/holds | /remittance/runs, /holds |
-| RMTID.032 | p.66 | FR-OP-005 | /operations/invoices, /operations/invoices/:no | GET /ops/invoices, /invoices/{no} |
-| RMTID.033 | p.66-67 | FR-OP-040 | /remittance/special, /remittance/special/:id | /remittance/special/*; feed COLLECTION_SPECIAL_REMIT |
-| RMTID.034 | p.67 | FR-OP-036, FR-OP-120 | /remittance/batches/:id, /operations/disbursements | /ops/disbursements/* |
-| RMTID.035 | p.67 | FR-OP-031 | /remittance/extraction, /remittance/holds | /remittance/runs, /holds |
-| RMTID.036 | p.67-68 | FR-OP-036 | /remittance/batches/:id, /operations/invoices/:no | GET /remittance/batches/{id}, /ops/invoices/{no} |
-| RMTID.037 | p.68 | FR-OP-097 | /commission/estimated | GET/POST /commission/estimated |
-| RMTID.038 | p.68-69 | FR-OP-004 | /operations/invoices, /operations/invoices/:no | GET /ops/invoices, /invoices/{no} |
-| RMTID.039 | p.69,127-129 | FR-OP-041 | /reports (Report Centre) | /reports (REM-*) |
-| RMTID.040 | p.69-70 | FR-OP-006 | /operations/invoices/:no | GET /ops/invoices/{no} |
+| RMTID.001 | p.49 | FR-OP-030 | Extraction | TC-OP-030.1, 030.2, 030.3 (5 cases) |
+| RMTID.002 | p.50; add. p.4-5 | FR-OP-032 | Remittance Batch | TC-OP-032.1, 032.2, 032.3 (4 cases) |
+| RMTID.003 | p.50-51 | FR-OP-030 | Extraction | TC-OP-030.1, 030.2, 030.3 (5 cases) |
+| RMTID.004 | p.51-52 | FR-OP-030 | Extraction, DTIP Status | TC-OP-030.1, 030.2, 030.3 (5 cases) |
+| RMTID.005 | p.52 | FR-OP-030 | Extraction, DTIP Status | TC-OP-030.1, 030.2, 030.3 (5 cases) |
+| RMTID.006 | p.52 | FR-OP-031 | Remittance Batch | TC-OP-031.1, 031.2, 031.3 (5 cases) |
+| RMTID.007 | p.52-53 | FR-OP-030 | Extraction | TC-OP-030.1, 030.2, 030.3 (5 cases) |
+| RMTID.008 | p.53 | FR-OP-030 | Extraction | TC-OP-030.1, 030.2, 030.3 (5 cases) |
+| RMTID.009 | p.53-54 | FR-OP-033 | Remittance Batches, Remittance Batch | TC-OP-033.1, 033.2, 033.3 (4 cases) |
+| RMTID.010 | p.54 | FR-OP-033, FR-OP-035 | Remittance Batches, Remittance Batch | TC-OP-033.1, 033.2, 033.3, 035.1, 035.2, 035.3 (7 cases) |
+| RMTID.011 | p.54-55 | FR-OP-034 | Remittance Batch (Documents) | TC-OP-034.1, 034.2 (3 cases) |
+| RMTID.012 | p.55-56 | FR-OP-037 | Insurer OR Upload | TC-OP-037.1, 037.2 (4 cases) |
+| RMTID.013 | p.56 | FR-OP-037 | Insurer OR Upload | TC-OP-037.1, 037.2 (4 cases) |
+| RMTID.014 | p.56-57 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3 (5 cases) |
+| RMTID.015 | p.57 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3 (5 cases) |
+| RMTID.016 | p.57-58 | FR-OP-037 | Insurer OR Upload | TC-OP-037.1, 037.2 (4 cases) |
+| RMTID.017 | p.58-59 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3 (5 cases) |
+| RMTID.018 | p.59 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3 (5 cases) |
+| RMTID.019 | p.59-60 | FR-OP-033, FR-OP-035 | Remittance Batches, Remittance Batch | TC-OP-033.1, 033.2, 033.3, 035.1, 035.2, 035.3 (7 cases) |
+| RMTID.020 | p.60-61 | FR-OP-031 | Extraction, Remittance Holds | TC-OP-031.1, 031.2, 031.3 (5 cases) |
+| RMTID.021 | p.61 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| RMTID.022 | p.61-62 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3 (5 cases) |
+| RMTID.023 | p.62 | FR-OP-038 | Incentive Rules | TC-OP-038.1, 038.2 (3 cases) |
+| RMTID.024 | p.62-63 | FR-OP-032 | DTIP Status, Remittance Batches | TC-OP-032.1, 032.2, 032.3 (4 cases) |
+| RMTID.025 | p.63 | FR-OP-039 | DTIP Status, Remittance Batches | TC-OP-039.1, 039.2 (3 cases) |
+| RMTID.026 | p.63 | FR-OP-005 | Invoice Search, Invoice 360 | TC-OP-005.1, 005.2, 005.3 (4 cases) |
+| RMTID.027 | p.64 | FR-OP-032 | DTIP Status, Remittance Batches | TC-OP-032.1, 032.2, 032.3 (4 cases) |
+| RMTID.028 | p.64 | FR-OP-031 | Remittance Batch | TC-OP-031.1, 031.2, 031.3 (5 cases) |
+| RMTID.029 | p.64-65 | FR-OP-033 | Remittance Batches, Remittance Batch | TC-OP-033.1, 033.2, 033.3 (4 cases) |
+| RMTID.030 | p.65 | FR-OP-040 | Special Remittance, Special Remittance Request | TC-OP-040.1, 040.2 (3 cases) |
+| RMTID.031 | p.65-66 | FR-OP-031 | Extraction, Remittance Holds | TC-OP-031.1, 031.2, 031.3 (5 cases) |
+| RMTID.032 | p.66 | FR-OP-005 | Invoice Search, Invoice 360 | TC-OP-005.1, 005.2, 005.3 (4 cases) |
+| RMTID.033 | p.66-67 | FR-OP-040 | Special Remittance, Special Remittance Request | TC-OP-040.1, 040.2 (3 cases) |
+| RMTID.034 | p.67 | FR-OP-036, FR-OP-120 | Remittance Batch, Disbursement Queue | TC-OP-036.1, 036.2, 120.1, 120.2 (6 cases) |
+| RMTID.035 | p.67 | FR-OP-031 | Extraction, Remittance Holds | TC-OP-031.1, 031.2, 031.3 (5 cases) |
+| RMTID.036 | p.67-68 | FR-OP-036 | Remittance Batch, Invoice 360 | TC-OP-036.1, 036.2 (3 cases) |
+| RMTID.037 | p.68 | FR-OP-097 | Estimated Items | TC-OP-097.1, 097.2 (3 cases) |
+| RMTID.038 | p.68-69 | FR-OP-004 | Invoice Search, Invoice 360 | TC-OP-004.1, 004.2, 004.3 (4 cases) |
+| RMTID.039 | p.69,127-129 | FR-OP-041 | Report Centre (Report Centre) | TC-OP-041.1, 041.2 (3 cases) |
+| RMTID.040 | p.69-70 | FR-OP-006 | Invoice 360 | TC-OP-006.1, 006.2, 006.3 (3 cases) |
 
 ## Marketing activities (MKTID)
 
-<!-- table: widths=2.2,1.8,2.9,4.4,4.7 caption="Traceability: Marketing activities (MKTID)" size=7.5 -->
-| BRD ID | Page | FR | Screen | API / job |
+<!-- table: widths=2.2,1.8,2.9,4.4,5.2 caption="Traceability: Marketing activities (MKTID)" size=7.5 -->
+| BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| MKTID.001 | p.70-71 | FR-OP-110 | /remittance/batches/:id | POST /remittance/batches/{id}/send-schedule |
-| MKTID.002 | p.71 | FR-OP-111 | /remittance/holds, /remittance/holds/:id | /remittance/holds/*; feed COLLECTION_HOLD |
-| MKTID.003 | p.71-72 | FR-OP-111 | /remittance/holds, /remittance/holds/:id | /remittance/holds/*; feed COLLECTION_HOLD |
-| MKTID.004 | p.72 | FR-OP-111 | /remittance/holds, /remittance/holds/:id | /remittance/holds/*; feed COLLECTION_HOLD |
-| MKTID.005 | p.72-73 | FR-OP-111 | /remittance/holds, /remittance/holds/:id | /remittance/holds/*; feed COLLECTION_HOLD |
-| MKTID.006 | p.73 | FR-OP-111 | /remittance/holds, /remittance/holds/:id | /remittance/holds/*; feed COLLECTION_HOLD |
-| MKTID.007 | p.73-74 | FR-OP-111 | /remittance/holds, /remittance/holds/:id | /remittance/holds/*; feed COLLECTION_HOLD |
-| MKTID.008 | p.114 | FR-OP-114 | /adjustment/requests/:id | GET /adjustment/requests/{id}/endorsement-slip |
-| MKTID.009 | p.74 | FR-OP-112 | /remittance/special, /remittance/special/:id | /remittance/special/* |
-| MKTID.010 | p.74-75 | FR-OP-113 | /cashiering/cwt | POST /cashiering/cwt; bulk CWT_TAGS; feed COLLECTION_CWT2307 |
-| MKTID.011 | p.75 | FR-OP-004 | New Business account (direct payment tag), /operations/invoices/:no | GET /ops/invoices/{no} |
-| MKTID.012 | p.75-76 | FR-OP-094 | /commission/dp/items | POST /commission/dp/items/{id}/reverse, /reinstate |
-| MKTID.013 | p.46 | FR-OP-113 | /cashiering/cwt | POST /cashiering/cwt; bulk CWT_TAGS; feed COLLECTION_CWT2307 |
+| MKTID.001 | p.70-71 | FR-OP-110 | Remittance Batch | TC-OP-110.1, 110.2 (3 cases) |
+| MKTID.002 | p.71 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.003 | p.71-72 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.004 | p.72 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.005 | p.72-73 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.006 | p.73 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.007 | p.73-74 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.008 | p.114 | FR-OP-114 | Endorsement Request | TC-OP-114.1, 114.2 (2 cases) |
+| MKTID.009 | p.74 | FR-OP-112 | Special Remittance, Special Remittance Request | TC-OP-112.1, 112.2 (3 cases) |
+| MKTID.010 | p.74-75 | FR-OP-113 | BIR 2307 | TC-OP-113.1, 113.2 (3 cases) |
+| MKTID.011 | p.75 | FR-OP-004 | New Business account (direct payment tag), Invoice 360 | TC-OP-004.1, 004.2, 004.3 (4 cases) |
+| MKTID.012 | p.75-76 | FR-OP-094 | DP Accounts | TC-OP-094.1, 094.2 (4 cases) |
+| MKTID.013 | p.46 | FR-OP-113 | BIR 2307 | TC-OP-113.1, 113.2 (3 cases) |
 
 ## Production Reconciliation (PRCID)
 
-<!-- table: widths=2.2,1.8,2.9,4.4,4.7 caption="Traceability: Production Reconciliation (PRCID)" size=7.5 -->
-| BRD ID | Page | FR | Screen | API / job |
+<!-- table: widths=2.2,1.8,2.9,4.4,5.2 caption="Traceability: Production Reconciliation (PRCID)" size=7.5 -->
+| BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| PRCID.001 | p.79 | FR-OP-070 | /prodrecon/schedules | GET/POST /prodrecon/schedules, PUT /schedules/{id}; job PRODUCTION_EXTRACT |
-| PRCID.002 | p.79 | FR-OP-072 | /prodrecon/extracts | GET /prodrecon/extracts/{id}/file |
-| PRCID.003 | p.79 | FR-OP-073 | /prodrecon/extracts | POST /prodrecon/extracts/{id}/send |
-| PRCID.004 | p.79-80 | FR-OP-072 | /prodrecon/extracts | POST /prodrecon/extracts/{id}/send |
-| PRCID.005 | p.80 | FR-OP-071 | /prodrecon/extracts | POST/GET /prodrecon/extracts, GET /extracts/{id}/lines |
-| PRCID.006 | p.80 | FR-OP-072 | /prodrecon/extracts | GET /prodrecon/extracts/{id}/file |
-| PRCID.007 | p.80 | FR-OP-072 | /prodrecon/extracts | POST /prodrecon/extracts/{id}/send |
-| PRCID.008 | p.81 | FR-OP-073 | /prodrecon/extracts | POST /prodrecon/extracts/{id}/send |
-| PRCID.009 | p.81 | FR-OP-074 | /prodrecon/uploads | POST/GET /prodrecon/uploads; feed INSURER_PRODUCTION |
-| PRCID.010 | p.81 | FR-OP-074 | /prodrecon/uploads | POST/GET /prodrecon/uploads; feed INSURER_PRODUCTION |
-| PRCID.011 | p.81 | FR-OP-071 | /prodrecon/extracts | POST/GET /prodrecon/extracts, GET /extracts/{id}/lines |
-| PRCID.012 | p.82 | FR-OP-071 | /prodrecon/extracts | POST/GET /prodrecon/extracts, GET /extracts/{id}/lines |
-| PRCID.013 | p.82 | FR-OP-071 | /prodrecon/extracts | POST/GET /prodrecon/extracts, GET /extracts/{id}/lines |
-| PRCID.014 | p.82 | FR-OP-077 | /prodrecon/cycles/:id | GET /prodrecon/cycles/{id}/items, POST /items/{id}/pair, /split |
-| PRCID.015 | p.82 | FR-OP-077 | /prodrecon/cycles/:id | PUT /prodrecon/items/{id}/feedback, POST /items/feedback |
-| PRCID.016 | p.82 | FR-OP-077 | /prodrecon/cycles/:id | PUT /prodrecon/items/{id}/feedback, POST /items/feedback |
-| PRCID.017 | p.82-83 | FR-OP-080 | /prodrecon/cycles/:id | PUT /prodrecon/items/{id}/feedback, POST /items/feedback |
-| PRCID.018 | p.83 | FR-OP-080 | /prodrecon/cycles/:id | PUT /prodrecon/items/{id}/feedback, POST /items/feedback |
-| PRCID.019 | p.83 | FR-OP-076 | /prodrecon/unbooked | GET /prodrecon/unbooked |
-| PRCID.020 | p.83 | FR-OP-071 | /prodrecon/extracts | POST/GET /prodrecon/extracts, GET /extracts/{id}/lines |
-| PRCID.021 | p.83 | FR-OP-077 | /prodrecon/cycles/:id | GET /prodrecon/cycles/{id}/items, POST /items/{id}/pair, /split |
-| PRCID.022 | p.83-84 | FR-OP-074 | /prodrecon/uploads | POST/GET /prodrecon/uploads; feed INSURER_PRODUCTION |
-| PRCID.023 | p.84 | FR-OP-076 | /prodrecon/unbooked | GET /prodrecon/unbooked |
-| PRCID.024 | p.84 | FR-OP-075 | /prodrecon/cycles/:id | POST /prodrecon/cycles/{id}/automatch; job RECON_AUTOMATCH |
-| PRCID.025 | p.84 | FR-OP-075 | /prodrecon/cycles/:id | POST /prodrecon/cycles/{id}/automatch; job RECON_AUTOMATCH |
-| PRCID.026 | p.84 | FR-OP-075 | /prodrecon/cycles/:id | POST /prodrecon/cycles/{id}/automatch; job RECON_AUTOMATCH |
-| PRCID.027 | p.84-85 | FR-OP-075 | /prodrecon/cycles/:id | POST /prodrecon/cycles/{id}/automatch; job RECON_AUTOMATCH |
-| PRCID.028 | p.85 | FR-OP-078 | /prodrecon/cycles/:id (Early Incentive) | GET /prodrecon/cycles/{id}/early-incentive |
-| PRCID.029 | p.85 | FR-OP-079 | /prodrecon/cycles/:id (History) | GET /prodrecon/cycles/{id} |
-| PRCID.030 | p.85 | FR-OP-075 | /prodrecon/cycles/:id | POST /prodrecon/cycles/{id}/automatch; job RECON_AUTOMATCH |
-| PRCID.031 | p.85-86 | FR-OP-074 | /prodrecon/uploads | POST/GET /prodrecon/uploads; feed INSURER_PRODUCTION |
-| PRCID.032 | p.86 | FR-OP-074 | /prodrecon/uploads | POST/GET /prodrecon/uploads; feed INSURER_PRODUCTION |
-| PRCID.033 | p.86 | FR-OP-076 | /prodrecon/unbooked | GET /prodrecon/unbooked |
-| PRCID.034 | p.86 | FR-OP-071 | /prodrecon/extracts | POST/GET /prodrecon/extracts, GET /extracts/{id}/lines |
-| PRCID.035 | p.86 | FR-OP-080 | /reports (Report Centre) | /reports (PRC-*) |
-| PRCID.036 | p.86-87 | FR-OP-080 | /reports (Report Centre) | /reports (PRC-*) |
-| PRCID.037 | p.87 | FR-OP-080 | /reports (Report Centre) | /reports (PRC-*) |
-| PRCID.038 | p.87 | FR-OP-080 | /prodrecon/cycles/:id | PUT /prodrecon/items/{id}/feedback, POST /items/feedback |
-| PRCID.039 | p.87 | FR-OP-080 | /prodrecon/cycles/:id | PUT /prodrecon/items/{id}/feedback, POST /items/feedback |
+| PRCID.001 | p.79 | FR-OP-070 | Extract Schedules | TC-OP-070.1, 070.2 (2 cases) |
+| PRCID.002 | p.79 | FR-OP-072 | Production Extracts | TC-OP-072.1, 072.2 (3 cases) |
+| PRCID.003 | p.79 | FR-OP-073 | Production Extracts | TC-OP-073.1, 073.2 (3 cases) |
+| PRCID.004 | p.79-80 | FR-OP-072 | Production Extracts | TC-OP-072.1, 072.2 (3 cases) |
+| PRCID.005 | p.80 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.006 | p.80 | FR-OP-072 | Production Extracts | TC-OP-072.1, 072.2 (3 cases) |
+| PRCID.007 | p.80 | FR-OP-072 | Production Extracts | TC-OP-072.1, 072.2 (3 cases) |
+| PRCID.008 | p.81 | FR-OP-073 | Production Extracts | TC-OP-073.1, 073.2 (3 cases) |
+| PRCID.009 | p.81 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.010 | p.81 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.011 | p.81 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.012 | p.82 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.013 | p.82 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.014 | p.82 | FR-OP-077 | Reconciliation Cycle | TC-OP-077.1, 077.2 (4 cases) |
+| PRCID.015 | p.82 | FR-OP-077 | Reconciliation Cycle | TC-OP-077.1, 077.2 (4 cases) |
+| PRCID.016 | p.82 | FR-OP-077 | Reconciliation Cycle | TC-OP-077.1, 077.2 (4 cases) |
+| PRCID.017 | p.82-83 | FR-OP-080 | Reconciliation Cycle | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.018 | p.83 | FR-OP-080 | Reconciliation Cycle | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.019 | p.83 | FR-OP-076 | Unbooked Accounts | TC-OP-076.1, 076.2 (3 cases) |
+| PRCID.020 | p.83 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.021 | p.83 | FR-OP-077 | Reconciliation Cycle | TC-OP-077.1, 077.2 (4 cases) |
+| PRCID.022 | p.83-84 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.023 | p.84 | FR-OP-076 | Unbooked Accounts | TC-OP-076.1, 076.2 (3 cases) |
+| PRCID.024 | p.84 | FR-OP-075 | Reconciliation Cycle | TC-OP-075.1, 075.2, 075.3 (3 cases) |
+| PRCID.025 | p.84 | FR-OP-075 | Reconciliation Cycle | TC-OP-075.1, 075.2, 075.3 (3 cases) |
+| PRCID.026 | p.84 | FR-OP-075 | Reconciliation Cycle | TC-OP-075.1, 075.2, 075.3 (3 cases) |
+| PRCID.027 | p.84-85 | FR-OP-075 | Reconciliation Cycle | TC-OP-075.1, 075.2, 075.3 (3 cases) |
+| PRCID.028 | p.85 | FR-OP-078 | Reconciliation Cycle (Early Incentive) | TC-OP-078.1, 078.2 (2 cases) |
+| PRCID.029 | p.85 | FR-OP-079 | Reconciliation Cycle (History) | TC-OP-079.1, 079.2 (2 cases) |
+| PRCID.030 | p.85 | FR-OP-075 | Reconciliation Cycle | TC-OP-075.1, 075.2, 075.3 (3 cases) |
+| PRCID.031 | p.85-86 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.032 | p.86 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.033 | p.86 | FR-OP-076 | Unbooked Accounts | TC-OP-076.1, 076.2 (3 cases) |
+| PRCID.034 | p.86 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.035 | p.86 | FR-OP-080 | Report Centre (Report Centre) | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.036 | p.86-87 | FR-OP-080 | Report Centre (Report Centre) | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.037 | p.87 | FR-OP-080 | Report Centre (Report Centre) | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.038 | p.87 | FR-OP-080 | Reconciliation Cycle | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.039 | p.87 | FR-OP-080 | Reconciliation Cycle | TC-OP-080.1, 080.2 (3 cases) |
 
 ## Adjustment / Cancellation (ADJID)
 
-<!-- table: widths=2.2,1.8,2.9,4.4,4.7 caption="Traceability: Adjustment / Cancellation (ADJID)" size=7.5 -->
-| BRD ID | Page | FR | Screen | API / job |
+<!-- table: widths=2.2,1.8,2.9,4.4,5.2 caption="Traceability: Adjustment / Cancellation (ADJID)" size=7.5 -->
+| BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| ADJID.001 | p.89 | FR-OP-050 | /adjustment/new, /adjustment | POST /adjustment/requests/preview, /requests |
-| ADJID.002 | p.89-90 | FR-OP-050 | /adjustment/new, /adjustment | POST /adjustment/requests/preview, /requests |
-| ADJID.003 | p.90 | FR-OP-050 | /adjustment/requests/:id | POST /adjustment/requests/{id}/post |
-| ADJID.004 | p.90-91 | FR-OP-050 | /adjustment/new, /adjustment | POST /adjustment/requests/preview, /requests |
-| ADJID.005 | p.91-92 | FR-OP-053 | /adjustment/requests/:id, /adjustment/batches | POST /adjustment/batches/return |
-| ADJID.006 | p.92 | FR-OP-056 | /adjustment/batches, /adjustment/upload | POST /adjustment/batches; bulk ADJ_BATCH |
-| ADJID.007 | p.92 | FR-OP-053 | /adjustment/requests/:id, /adjustment/batches | POST /adjustment/batches/return |
-| ADJID.008 | p.92-93 | FR-OP-055 | /adjustment/new | POST /adjustment/requests/{id}/quotation |
-| ADJID.009 | p.93-94 | FR-OP-057 | /adjustment/requests/:id | POST /adjustment/requests/{id}/post, /reapply |
-| ADJID.010 | p.94 | FR-OP-053 | /adjustment/requests/:id | POST /adjustment/requests/{id}/approve |
-| ADJID.011 | p.94 | FR-OP-056 | /adjustment/requests/:id (Accounting) | GET /adjustment/requests/{id}/journal |
-| ADJID.012 | p.94-95 | FR-OP-057 | /adjustment/requests/:id | POST /adjustment/requests/{id}/post, /reapply |
-| ADJID.013 | p.95 | FR-OP-057 | /adjustment/requests/:id | POST /adjustment/requests/{id}/post, /reapply |
-| ADJID.014 | p.95-96; add. p.5 | FR-OP-054 | /adjustment/requests/:id (Recompute) | GET /adjustment/requests/{id}/recompute |
-| ADJID.015 | p.96 | FR-OP-060 | /adjustment/requests/:id | GET /adjustment/requests/{id}/endorsement-slip |
-| ADJID.016 | p.96 | FR-OP-062 | /reports (Report Centre) | /reports (ADJ-*); job ADJ_DAILY_REPORT |
-| ADJID.017 | p.97 | FR-OP-062 | /reports (Report Centre) | /reports (ADJ-*); job ADJ_DAILY_REPORT |
-| ADJID.018 | p.97-98 | FR-OP-060 | /adjustment/requests/:id | GET /adjustment/requests/{id}/validation-slip |
-| ADJID.019 | p.98 | FR-OP-062 | /reports (Report Centre) | /reports (ADJ-*); job ADJ_DAILY_REPORT |
-| ADJID.020 | p.98 | FR-OP-050 | /adjustment, /operations/invoices/:no | GET /adjustment/invoices/{no}/requests, /ops/invoices/{no} |
-| ADJID.021 | p.98-99 | FR-OP-061 | /reports (Report Centre) | /reports (ADJ-*); job ADJ_DAILY_REPORT |
-| ADJID.022 | p.99 | FR-OP-061 | /adjustment/requests/:id (History, Policy Transactions) | GET /adjustment/requests/{id}, /ops/invoices/{no}/transactions |
-| ADJID.023 | p.99 | FR-OP-051 | /adjustment/new | POST /adjustment/requests |
-| ADJID.024 | p.100 | FR-OP-005, FR-OP-061 | /adjustment, /operations/invoices/:no, /accounts/:id | GET /adjustment/invoices/{no}/requests, /adjustment/policies/{no}, /ops/invoices/{no}, /ops/accounts/{arn}/transactions |
-| ADJID.025 | p.100 | FR-OP-052 | /adjustment/requests/:id (Documents) | /attachments |
-| ADJID.026 | p.101-102 | FR-OP-059 | /adjustment/minimal-balance | bulk MINIMAL_BALANCE_FILE; GET /adjustment/write-offs |
-| ADJID.027 | p.102-103 | FR-OP-007 | /operations/invoices/:no, /adjustment/requests/:id (Recompute) | GET /ops/invoices/{no}, /adjustment/requests/{id}/recompute |
-| ADJID.028 | p.103 | FR-OP-058 | /adjustment/new | POST /adjustment/requests/{id}/submit |
+| ADJID.001 | p.89 | FR-OP-050 | New Request, Adjustment Workbench | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| ADJID.002 | p.89-90 | FR-OP-050 | New Request, Adjustment Workbench | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| ADJID.003 | p.90 | FR-OP-050 | Endorsement Request | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| ADJID.004 | p.90-91 | FR-OP-050 | New Request, Adjustment Workbench | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| ADJID.005 | p.91-92 | FR-OP-053 | Endorsement Request, Posting Batches | TC-OP-053.1, 053.2, 053.3 (5 cases) |
+| ADJID.006 | p.92 | FR-OP-056 | Posting Batches, Batch Request Upload | TC-OP-056.1, 056.2 (3 cases) |
+| ADJID.007 | p.92 | FR-OP-053 | Endorsement Request, Posting Batches | TC-OP-053.1, 053.2, 053.3 (5 cases) |
+| ADJID.008 | p.92-93 | FR-OP-055 | New Request | TC-OP-055.1, 055.2 (3 cases) |
+| ADJID.009 | p.93-94 | FR-OP-057 | Endorsement Request | TC-OP-057.1, 057.2 (3 cases) |
+| ADJID.010 | p.94 | FR-OP-053 | Endorsement Request | TC-OP-053.1, 053.2, 053.3 (5 cases) |
+| ADJID.011 | p.94 | FR-OP-056 | Endorsement Request (Accounting) | TC-OP-056.1, 056.2 (3 cases) |
+| ADJID.012 | p.94-95 | FR-OP-057 | Endorsement Request | TC-OP-057.1, 057.2 (3 cases) |
+| ADJID.013 | p.95 | FR-OP-057 | Endorsement Request | TC-OP-057.1, 057.2 (3 cases) |
+| ADJID.014 | p.95-96; add. p.5 | FR-OP-054 | Endorsement Request (Recompute) | TC-OP-054.1, 054.2, 054.3 (4 cases) |
+| ADJID.015 | p.96 | FR-OP-060 | Endorsement Request | TC-OP-060.1, 060.2 (3 cases) |
+| ADJID.016 | p.96 | FR-OP-062 | Report Centre (Report Centre) | TC-OP-062.1, 062.2 (3 cases) |
+| ADJID.017 | p.97 | FR-OP-062 | Report Centre (Report Centre) | TC-OP-062.1, 062.2 (3 cases) |
+| ADJID.018 | p.97-98 | FR-OP-060 | Endorsement Request | TC-OP-060.1, 060.2 (3 cases) |
+| ADJID.019 | p.98 | FR-OP-062 | Report Centre (Report Centre) | TC-OP-062.1, 062.2 (3 cases) |
+| ADJID.020 | p.98 | FR-OP-050 | Adjustment Workbench, Invoice 360 | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| ADJID.021 | p.98-99 | FR-OP-061 | Report Centre (Report Centre) | TC-OP-061.1, 061.2, 061.3 (5 cases) |
+| ADJID.022 | p.99 | FR-OP-061 | Endorsement Request (History, Policy Transactions) | TC-OP-061.1, 061.2, 061.3 (5 cases) |
+| ADJID.023 | p.99 | FR-OP-051 | New Request | TC-OP-051.1, 051.2 (2 cases) |
+| ADJID.024 | p.100 | FR-OP-005, FR-OP-061 | Adjustment Workbench, Invoice 360, Account | TC-OP-005.1, 005.2, 005.3, 061.1, 061.2, 061.3 (9 cases) |
+| ADJID.025 | p.100 | FR-OP-052 | Endorsement Request (Documents) | TC-OP-052.1, 052.2 (2 cases) |
+| ADJID.026 | p.101-102 | FR-OP-059 | Minimal Balance File | TC-OP-059.1, 059.2 (3 cases) |
+| ADJID.027 | p.102-103 | FR-OP-007 | Invoice 360, Endorsement Request (Recompute) | TC-OP-007.1, 007.2 (4 cases) |
+| ADJID.028 | p.103 | FR-OP-058 | New Request | TC-OP-058.1, 058.2 (3 cases) |
 
 ## Commission Receivables (CMRID)
 
-<!-- table: widths=2.2,1.8,2.9,4.4,4.7 caption="Traceability: Commission Receivables (CMRID)" size=7.5 -->
-| BRD ID | Page | FR | Screen | API / job |
+<!-- table: widths=2.2,1.8,2.9,4.4,5.2 caption="Traceability: Commission Receivables (CMRID)" size=7.5 -->
+| BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| CMRID.001 | p.106 | FR-OP-090 | /commission/dp/lists | GET/POST /commission/dp/lists, POST /dp/lists/pull; feed COLLECTION_DP_LIST |
-| CMRID.002 | p.106-107 | FR-OP-091 | /commission/dp/items | GET /commission/dp/items, POST /dp/items/confirm, /exclude, /{id}/revalidate |
-| CMRID.003 | p.107 | FR-OP-095 | /commission/incentives/schemes, /commission/incentives/runs | /commission/incentives/* |
-| CMRID.004 | p.108 | FR-OP-098 | /reports (Report Centre) | /reports (CMR-*) |
-| CMRID.005 | p.108-109 | FR-OP-095 | /commission/incentives/schemes, /commission/incentives/runs | /commission/incentives/* |
-| CMRID.006 | p.109 | FR-OP-095 | /commission/incentives/schemes, /commission/incentives/runs | /commission/incentives/* |
-| CMRID.007 | p.109 | FR-OP-091 | /commission/dp/items | GET /commission/dp/items, POST /dp/items/confirm, /exclude, /{id}/revalidate |
-| CMRID.008 | p.109-110 | FR-OP-091, FR-OP-093 | /commission/dp/items | GET /commission/dp/items, POST /dp/items/confirm, /exclude, /{id}/revalidate |
-| CMRID.009 | p.110-111 | FR-OP-092, FR-OP-093 | /commission/dp/billings/:id, /commission/dp/responses | POST /commission/dp/billings/{id}/send, /answers, POST /dp/responses; feed INSURER_DP_R... |
-| CMRID.010 | p.111 | FR-OP-094, FR-OP-096 | /commission/dp/billings/:id | POST /commission/dp/billings/{id}/collect |
-| CMRID.011 | p.111 | FR-OP-093 | /commission/dp/billings | GET /commission/dp/billings; job DP_FEEDBACK_SLA |
-| CMRID.012 | p.111-112 | FR-OP-092 | /commission/dp/billings/:id, /commission/dp/responses | POST /commission/dp/billings/{id}/send, /answers, POST /dp/responses; feed INSURER_DP_R... |
-| CMRID.013 | p.112 | FR-OP-091 | /commission/dp/items | GET /commission/dp/items, POST /dp/items/confirm, /exclude, /{id}/revalidate |
-| CMRID.014 | p.112-113 | FR-OP-097 | /commission/estimated, /reports (Report Centre) | /commission/estimated; /reports (CMR-PRODUCTION-YEARLY) |
-| CMRID.015 | p.113 | FR-OP-096 | /commission/certificates, /commission/certificates/:id | /commission/certificates/* |
+| CMRID.001 | p.106 | FR-OP-090 | DP Lists | TC-OP-090.1, 090.2 (3 cases) |
+| CMRID.002 | p.106-107 | FR-OP-091 | DP Accounts | TC-OP-091.1, 091.2 (4 cases) |
+| CMRID.003 | p.107 | FR-OP-095 | Incentive Schemes, Incentive Runs | TC-OP-095.1, 095.2 (4 cases) |
+| CMRID.004 | p.108 | FR-OP-098 | Report Centre (Report Centre) | TC-OP-098.1, 098.2 (2 cases) |
+| CMRID.005 | p.108-109 | FR-OP-095 | Incentive Schemes, Incentive Runs | TC-OP-095.1, 095.2 (4 cases) |
+| CMRID.006 | p.109 | FR-OP-095 | Incentive Schemes, Incentive Runs | TC-OP-095.1, 095.2 (4 cases) |
+| CMRID.007 | p.109 | FR-OP-091 | DP Accounts | TC-OP-091.1, 091.2 (4 cases) |
+| CMRID.008 | p.109-110 | FR-OP-091, FR-OP-093 | DP Accounts | TC-OP-091.1, 091.2, 093.1, 093.2, 093.3 (8 cases) |
+| CMRID.009 | p.110-111 | FR-OP-092, FR-OP-093 | DP Billing, Insurer Responses | TC-OP-092.1, 092.2, 093.1, 093.2, 093.3 (7 cases) |
+| CMRID.010 | p.111 | FR-OP-094, FR-OP-096 | DP Billing | TC-OP-094.1, 094.2, 096.1, 096.2 (7 cases) |
+| CMRID.011 | p.111 | FR-OP-093 | DP Billings | TC-OP-093.1, 093.2, 093.3 (4 cases) |
+| CMRID.012 | p.111-112 | FR-OP-092 | DP Billing, Insurer Responses | TC-OP-092.1, 092.2 (3 cases) |
+| CMRID.013 | p.112 | FR-OP-091 | DP Accounts | TC-OP-091.1, 091.2 (4 cases) |
+| CMRID.014 | p.112-113 | FR-OP-097 | Estimated Items, Report Centre (Report Centre) | TC-OP-097.1, 097.2 (3 cases) |
+| CMRID.015 | p.113 | FR-OP-096 | BIR Certificates, BIR Certificate | TC-OP-096.1, 096.2 (3 cases) |
 
 ## Coverage summary
 
-<!-- table: widths=4,2,2,2,2.4,2 caption="BRD-2 requirement IDs covered" -->
-| Family | IDs | BUILT | SEAM | SUPERSEDED | Covered |
-|---|---|---|---|---|---|
-| BRQID | 6 | 4 | 1 | 1 | 6 |
-| CSHID | 27 | 8 | 18 | 1 | 27 |
-| DBMID | 1 | 0 | 0 | 1 | 1 |
-| RMTID | 40 | 18 | 21 | 1 | 40 |
-| MKTID | 13 | 3 | 7 | 3 | 13 |
-| PRCID | 39 | 15 | 24 | 0 | 39 |
-| ADJID | 28 | 20 | 8 | 0 | 28 |
-| CMRID | 15 | 7 | 7 | 1 | 15 |
-| **Total** | **169** | **75** | **86** | **8** | **169** |
+<!-- table: widths=4,2,2,2.4,2 caption="BRD-2 requirement IDs covered" -->
+| Family | IDs | SEAM | SUPERSEDED | Covered |
+|---|---|---|---|---|
+| BRQID | 6 | 1 | 1 | 6 |
+| CSHID | 27 | 18 | 1 | 27 |
+| DBMID | 1 | 0 | 1 | 1 |
+| RMTID | 40 | 21 | 1 | 40 |
+| MKTID | 13 | 7 | 3 | 13 |
+| PRCID | 39 | 24 | 0 | 39 |
+| ADJID | 28 | 8 | 0 | 28 |
+| CMRID | 15 | 7 | 1 | 15 |
+| **Total** | **169** | **86** | **8** | **169** |
 
 The non-functional requirements of the BRD annex (p.115-120) are traced in section 8.
 

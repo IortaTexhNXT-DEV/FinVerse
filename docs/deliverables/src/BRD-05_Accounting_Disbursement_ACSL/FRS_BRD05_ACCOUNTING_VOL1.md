@@ -283,8 +283,8 @@ rules:
   - [R1, "Log-in, lock-out and session rules are those of BRD-1 (BRNB.040).", Configurable, Session parameters]
   - [R2, "BDO single sign-on / Active Directory is not part of this phase (Q42).", Fixed, "-"]
 validations:
-  - [User ID or password wrong, Invalid user ID or password, "-"]
-  - [Account locked, Your account is locked. Contact the System Administrator, "-"]
+  - [User ID or password wrong, Invalid user name or password, AUTHENTICATION_FAILED]
+  - [Account locked, Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:

@@ -306,7 +306,7 @@ main_flow:
 rules:
   - [R1, "Log-in, lock-out (3 attempts) and session rules of BRD-1.", Configurable, Session parameters]
 validations:
-  - [User ID or password wrong, Invalid user ID or password, "-"]
+  - [User ID or password wrong, Invalid user name or password, AUTHENTICATION_FAILED]
 notifications:
   - "On-screen warnings only."
 audit:

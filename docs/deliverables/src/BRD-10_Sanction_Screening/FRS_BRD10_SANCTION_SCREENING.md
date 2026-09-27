@@ -287,7 +287,7 @@ main_flow:
   - BIBS checks the user's permissions and, for a case, the stage owner and the assignee.
   - BIBS shows the screen or performs the action.
 alternate_flows:
-  - No permission. The screen is not in the menu; a direct link returns "You do not have access to this page". A service call is refused and logged.
+  - No permission. The screen is not in the menu; a direct link shows "You do not have access to this screen. Contact your administrator if you need it.". A service call is refused and logged.
   - Segregation of duties. An action refused by a four-eyes rule is refused with its message even when the role has the permission.
 rules:
   - [R1, "Permissions and their action classes are those of section 3.2; roles are granted as in section 3.3 until BDOI confirms the matrix.", Configurable, BRD-11 group-profile request]

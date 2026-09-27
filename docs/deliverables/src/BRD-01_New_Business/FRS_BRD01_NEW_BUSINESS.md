@@ -3484,8 +3484,8 @@ rules:
   - [R1, "Session timeout 30 minutes; idle warning after 15 minutes; expiry warning 30 minutes before the absolute sign-out.", Configurable, "Parameters SESSION_TIMEOUT_MINUTES, SESSION_IDLE_WARNING_MINUTES, SESSION_EXPIRY_WARNING_MINUTES"]
   - [R2, "Lock-out after 3 failed attempts.", Configurable, Parameter LOGIN_MAX_FAILED_ATTEMPTS]
 validations:
-  - [Wrong user ID or password, Invalid user ID or password, "-"]
-  - [Account locked, Your account is locked. Contact the System Administrator, "-"]
+  - [Wrong user ID or password, Invalid user name or password, AUTHENTICATION_FAILED]
+  - [Account locked, Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:

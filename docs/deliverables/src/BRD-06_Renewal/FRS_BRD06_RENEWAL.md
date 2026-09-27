@@ -323,7 +323,7 @@ rules:
   - [R2, "Account lock after 3 failed attempts for all users (decision D5).", Configurable, Parameter LOGIN_MAX_FAILED_ATTEMPTS]
   - [R3, "Directory sign-in (BDO EUA / Windows ID) is built as a parked port; local sign-in stays until BDO supplies the interface (decision D6).", Fixed, "-"]
 validations:
-  - [User ID or password wrong, Invalid user ID or password, "-"]
+  - [User ID or password wrong, Invalid user name or password, AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:
@@ -355,7 +355,7 @@ main_flow:
   - BIBS checks the permission of the action and the scope of the record.
   - BIBS shows the screen or performs the action.
 alternate_flows:
-  - No permission. The screen is not in the menu; a direct link shows "You do not have access to this page". An direct request is refused and logged.
+  - No permission. The screen is not in the menu; a direct link shows "You do not have access to this screen. Contact your administrator if you need it.". A direct request is refused and logged.
   - Out of scope. A record outside the user's scope is not listed and cannot be opened.
 rules:
   - [R1, "Roles are granted permissions as in section 3.3 until BDOI confirms the matrix (OQ48, RQ20, RQ21).", Configurable, Role-permission change request (FR-RN-003)]

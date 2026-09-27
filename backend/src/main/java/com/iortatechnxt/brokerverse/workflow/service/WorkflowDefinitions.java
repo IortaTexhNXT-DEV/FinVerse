@@ -85,6 +85,16 @@ public class WorkflowDefinitions {
   }
 
   /**
+   * The stages of a workflow in their defined order (the stepper of a record's workflow header).
+   *
+   * @param workflowCode workflow
+   * @return stages in stage order
+   */
+  public List<WorkflowStage> stages(String workflowCode) {
+    return stages.findByWorkflowCodeOrderBySortOrder(workflowCode);
+  }
+
+  /**
    * Transitions out of a case's current stage.
    *
    * @param workCase case

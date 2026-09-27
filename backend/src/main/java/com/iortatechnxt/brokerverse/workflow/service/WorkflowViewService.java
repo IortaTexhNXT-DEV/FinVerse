@@ -69,7 +69,8 @@ public class WorkflowViewService {
         definitions.stageOf(workCase),
         actions,
         history.findByCaseIdOrderByIdAsc(workCase.getId()),
-        definitions.stageNames(workCase.getWorkflowCode()));
+        definitions.stageNames(workCase.getWorkflowCode()),
+        definitions.stages(workCase.getWorkflowCode()));
   }
 
   /**

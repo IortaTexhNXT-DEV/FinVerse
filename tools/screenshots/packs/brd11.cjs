@@ -91,14 +91,14 @@ const fills = {
   new_profile: [
     ['Profile Code', 'UAT_ENQUIRY'], ['Name', 'Client enquiry (seed data)'],
     ['Description', 'Read-only enquiry of clients and reports'],
-    // Each permission shows its name with the code as the second line of its label; the code finds it.
-    async (page) => page.getByLabel(/CLIENT_VIEW$/).first().check(),
-    async (page) => page.getByLabel(/REPORT_VIEW$/).first().check(),
+    // Each permission shows its name; its check box is found by the permission code (id perm-CODE).
+    async (page) => page.locator('#perm-CLIENT_VIEW').check(),
+    async (page) => page.locator('#perm-REPORT_VIEW').check(),
     ['Approvers in Order', 'Ulysses'], ['Approvers in Order', '\\(approver\\)'],
     ['Remarks (Justification)', 'Enquiry profile for the contact centre (seed data)'],
   ],
   modify_profile: [['Request Type', 'Modify group profile'], ['Group Profile', '^Marketing Account Officer'],
-    async (page) => page.getByLabel(/UAM_VIEW$/).first().check()],
+    async (page) => page.locator('#perm-UAM_VIEW').check()],
   deactivate_profile: [['Request Type', 'Deactivate group profile'], ['Group Profile', '^Processing Team Lead']],
   report_profile: [['Group Profile (code)', 'UAM_APPROVER']],
 };

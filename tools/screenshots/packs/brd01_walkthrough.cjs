@@ -95,6 +95,24 @@ function button(scope, name) {
  * Clicks an action and completes its dialog when one opens: the reason (first value, or the one asked), the
  * comment, then the dialog's confirm button (same name, or the last button of the dialog).
  */
+/**
+ * Clicks a workflow action button and, when the screen asks for a confirmation (the confirmation standard: every
+ * approve, submit, release and the like opens a dialog naming the record and the effect), confirms it with the
+ * dialog's button of the same name or its main button.
+ */
+async function press(page, name) {
+  await button(page, name).click();
+  await page.waitForTimeout(700);
+  const dialog = page.locator('dialog.modal[open]').last();
+  if (await dialog.isVisible().catch(() => false)) {
+    const same = dialog.getByRole('button', { name });
+    const confirm = (await same.count()) > 0 ? same.last() : dialog.locator('.modal-footer button, footer button').last();
+    await confirm.click();
+  }
+  await settle(page, 1200);
+  return page;
+}
+
 async function act(page, name, opts = {}) {
   const target = button(page, name);
   try {
@@ -794,4 +812,4 @@ const bulk = {
 
 async function prepare() {}
 
-module.exports = { steps, bulk, prepare, addItem, bulkClientFile, pdf, csv, act, tab, go, button, settle, uploadDocument, TMP };
+module.exports = { steps, bulk, prepare, addItem, bulkClientFile, pdf, csv, act, press, tab, go, button, settle, uploadDocument, TMP };

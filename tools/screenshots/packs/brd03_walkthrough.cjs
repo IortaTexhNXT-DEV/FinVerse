@@ -1,7 +1,7 @@
 // End-to-end walkthroughs of BRD-03 Product Maintenance, performed live on the seed profile by capture_pack.cjs (see
 // walkthroughs.yaml of the pack). Each step signs in as the persona of the step, does what the step says on the
 // screen and returns the page to capture. The records created carry fictitious seed values only.
-const { pdf, act, tab, go, button, settle } = require('./brd01_walkthrough.cjs');
+const { pdf, act, press, tab, go, button, settle } = require('./brd01_walkthrough.cjs');
 
 const TITLE = 'Motor Fleet Plus';
 const RISK_CODE = 'MTR30';
@@ -103,7 +103,7 @@ const steps = {
     for (const insurer of ['Mabuhay General Insurance Corp.', 'Luzon Assurance Co.']) {
       await page.getByLabel(insurer).check();
     }
-    await button(page, /^submit for approval$/i).click();
+    await press(page, /^submit for approval$/i);
     await settle(page, 2000);
     return page;
   },
@@ -121,13 +121,13 @@ const steps = {
   'wt-a-07': async (ctx) => {
     const page = await openRequest(ctx, 'tsu', requestA(ctx), 'Negotiation');
     await page.getByLabel(/^Notes to the insurers/).fill('Please quote the fleet programme as requested (seed data).');
-    await button(page, /^submit for approval$/i).click();
+    await press(page, /^submit for approval$/i);
     await settle(page, 1500);
     return page;
   },
   'wt-a-08': async (ctx) => {
     const page = await openRequest(ctx, 'tsulead', requestA(ctx), 'Negotiation');
-    await button(page, /^approve and send$/i).click();
+    await press(page, /^approve and send$/i);
     await settle(page, 2500);
     return page;
   },
@@ -213,7 +213,7 @@ const steps = {
         await clauses.selectOption({ label: pick });
       }
     }
-    await button(page, /^submit for validation$/i).click();
+    await press(page, /^submit for validation$/i);
     await settle(page, 1500);
     return page;
   },
@@ -222,7 +222,7 @@ const steps = {
     for (const box of await page.locator('main input[type=checkbox]').all()) {
       await box.check().catch(() => {});
     }
-    await button(page, /^validate and release$/i).click();
+    await press(page, /^validate and release$/i);
     await settle(page, 2000);
     return page;
   },
@@ -319,7 +319,7 @@ const steps = {
     const page = await go(ctx, 'ao', `${REQUESTS}/new`);
     await ctx.runSteps(page, [['Package / programme name', 'Travel Assist Programme'], ['Product line', 'Motor'],
       ['Cover type / subtype', 'Comprehensive'], ['Reason', 'Market competitiveness']]);
-    await button(page, /^submit for approval$/i).click();
+    await press(page, /^submit for approval$/i);
     await settle(page, 1500);
     return page;
   },
@@ -399,7 +399,7 @@ const steps = {
     const page = await go(ctx, 'mbs', '/catalog/products/MTR12/versions/2');
     await page.getByLabel(/^Minimum Premium/).fill('');
     await page.getByLabel(/^Effective From/).fill('2020-01-01');
-    await button(page, /^submit for validation$/i).click();
+    await press(page, /^submit for validation$/i);
     await settle(page, 800);
     return page;
   },

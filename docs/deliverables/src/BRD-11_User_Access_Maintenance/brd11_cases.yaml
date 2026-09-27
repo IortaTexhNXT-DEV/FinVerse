@@ -1574,7 +1574,7 @@ frs:
         steps:
           - As admin send a direct request to approve the own change.
         expected: Refused.
-        msg: [A change cannot be approved by the user who asked for it]
+        msg: [A change cannot be approved by the user who requested it]
       - c: 2
         type: Negative
         title: Second change while one waits

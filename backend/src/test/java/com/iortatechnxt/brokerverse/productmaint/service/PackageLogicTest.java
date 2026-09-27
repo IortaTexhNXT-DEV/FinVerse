@@ -82,10 +82,10 @@ class PackageLogicTest {
     assertThat(client.headers()).containsExactly("Insurer", "Rate %", "Remarks");
     assertThat(client.cells()).containsExactly(List.of("A Insurance", "0.40", "rem"));
     assertThat(t.select(Selection.ALL).rows()).hasSize(4);
-    assertThat(t.rows().get(1).value("VALID_UNTIL")).isEqualTo("2027-01-01");
+    assertThat(t.rows().get(1).value("VALID_UNTIL")).isEqualTo("01-Jan-2027");
     assertThat(t.rows().get(1).value("MINIMUM_PREMIUM")).isEmpty();
     assertThat(t.rows().get(1).value("CONDITIONS")).isEqualTo("cond");
-    assertThat(t.rows().get(1).value("OUTCOME")).isEqualTo("APPROVED_WITH_CHANGES");
+    assertThat(t.rows().get(1).value("OUTCOME")).isEqualTo("Approved with changes");
     assertThatThrownBy(() -> t.select(new Selection(List.of("PREMIUM"), List.of())))
         .extracting("code")
         .isEqualTo("COMPARATIVE_FIELD_UNKNOWN");

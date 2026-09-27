@@ -133,7 +133,11 @@ public class RuleSetService {
    * @return draft
    */
   public SbmRuleSet create(
-      Long companyId, String code, SbmRuleSet.Scope scope, LocalDate effectiveFrom, String description) {
+      Long companyId,
+      String code,
+      SbmRuleSet.Scope scope,
+      LocalDate effectiveFrom,
+      String description) {
     if (sets.findFirstByCompanyIdAndCodeOrderByVersionNoDesc(companyId, code).isPresent()) {
       throw new BusinessRuleException(
           "SBM_RULE_SET_EXISTS", "Rule set " + code + " exists; create a new version of it");
@@ -284,7 +288,8 @@ public class RuleSetService {
   public SbmRuleSet approve(Long id, String remarks) {
     SbmRuleSet s = get(id);
     s.approve(currentUser.username(), clock.instant(), remarks);
-    sets.findByCompanyIdAndCodeAndStatusIn(
+    sets
+        .findByCompanyIdAndCodeAndStatusIn(
             s.getCompanyId(), s.getCode(), List.of(SbmRuleSetStatus.ACTIVE))
         .stream()
         .filter(other -> !other.getId().equals(s.getId()))
@@ -302,7 +307,8 @@ public class RuleSetService {
    */
   public SbmRuleSet reject(Long id, String reason) {
     if (reason == null || reason.isBlank()) {
-      throw new BusinessRuleException("SBM_REJECT_REASON_REQUIRED", "Enter the reason of the rejection");
+      throw new BusinessRuleException(
+          "SBM_REJECT_REASON_REQUIRED", "Enter the reason of the rejection");
     }
     SbmRuleSet s = get(id);
     s.reject(currentUser.username(), clock.instant(), reason.strip());
@@ -339,7 +345,8 @@ public class RuleSetService {
             .anyMatch(r -> r.getPriority() == c.priority() && !r.getId().equals(ruleId));
     if (samePriority) {
       throw new BusinessRuleException(
-          "SBM_RULE_PRIORITY_TAKEN", "Priority " + c.priority() + " is already used in this version");
+          "SBM_RULE_PRIORITY_TAKEN",
+          "Priority " + c.priority() + " is already used in this version");
     }
   }
 

@@ -22,7 +22,6 @@ public record RunContext(
   /** Renewal action EXCLUDE. */
   public static final String EXCLUDE = "EXCLUDE";
 
-
   /** Defensive copy. */
   public RunContext {
     bucketActions = Map.copyOf(bucketActions);

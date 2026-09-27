@@ -134,5 +134,6 @@ public class SbmNoTouchLine extends BaseEntity {
    * @param vat VAT
    * @param wtax withholding tax
    */
-  public record Values(BigDecimal basicPremium, BigDecimal grossFee, BigDecimal vat, BigDecimal wtax) {}
+  public record Values(
+      BigDecimal basicPremium, BigDecimal grossFee, BigDecimal vat, BigDecimal wtax) {}
 }

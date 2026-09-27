@@ -100,7 +100,8 @@ public class PrintBatchMailHouse implements MailHouseGateway {
     return files
         .storeChecked(
             new StoreRequest(
-                new FileOwner(r.companyId(), SubmittedFileStorage.PRINT_BATCH, batch.getId().toString()),
+                new FileOwner(
+                    r.companyId(), SubmittedFileStorage.PRINT_BATCH, batch.getId().toString()),
                 null,
                 RECORD_CLASS,
                 name,

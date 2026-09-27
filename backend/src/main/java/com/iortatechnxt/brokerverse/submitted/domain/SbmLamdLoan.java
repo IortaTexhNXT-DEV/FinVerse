@@ -76,7 +76,7 @@ public class SbmLamdLoan extends BaseEntity {
    *
    * @param facts loan facts
    */
-  public void update(LoanFacts facts) {
+  public final void update(LoanFacts facts) {
     this.borrowerName = facts.borrowerName();
     this.loanStatus = facts.loanStatus();
     this.amortised = facts.amortised();

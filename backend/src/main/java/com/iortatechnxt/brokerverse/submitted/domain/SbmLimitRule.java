@@ -52,7 +52,7 @@ public class SbmLimitRule extends AuthorizableEntity {
    */
   public SbmLimitRule(Long companyId, Limits limits) {
     this.companyId = companyId;
-    change(limits);
+    set(limits);
   }
 
   /**
@@ -60,7 +60,12 @@ public class SbmLimitRule extends AuthorizableEntity {
    *
    * @param limits insurer, segment, limits and description
    */
-  public void change(Limits limits) {
+  public final void change(Limits limits) {
+    set(limits);
+    markModified();
+  }
+
+  private void set(Limits limits) {
     this.insurerCode = limits.insurerCode();
     this.segment = limits.segment();
     this.line = limits.line();
@@ -69,7 +74,6 @@ public class SbmLimitRule extends AuthorizableEntity {
     this.attribute = limits.attribute();
     this.attributeLimit = limits.attributeLimit();
     this.description = limits.description();
-    markModified();
   }
 
   public Long getCompanyId() {

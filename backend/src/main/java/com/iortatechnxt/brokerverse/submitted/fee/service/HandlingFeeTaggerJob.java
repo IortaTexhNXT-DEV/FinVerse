@@ -80,6 +80,7 @@ public class HandlingFeeTaggerJob implements ManagedJob {
         LOG.warn("Handling-fee tagging of {} failed: {}", company.getCode(), e.getMessage());
       }
     }
-    return new JobOutcome(tagged, tagged + " payments tagged, " + ambiguous + " left for the handler");
+    return new JobOutcome(
+        tagged, tagged + " payments tagged, " + ambiguous + " left for the handler");
   }
 }

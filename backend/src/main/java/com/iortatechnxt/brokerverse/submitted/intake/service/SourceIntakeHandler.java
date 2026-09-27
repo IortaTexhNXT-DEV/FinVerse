@@ -132,7 +132,10 @@ public class SourceIntakeHandler implements BulkImportHandler {
             SourceColumns.data(row, spec.segment(), spec.businessType()),
             new UpsertContext(
                 new SbmPolicyOrigin(
-                    spec.sourceCode(), run.getId(), context.businessDate(), SbmPolicyStatus.RECEIVED),
+                    spec.sourceCode(),
+                    run.getId(),
+                    context.businessDate(),
+                    SbmPolicyStatus.RECEIVED),
                 SbmHistorySource.INTAKE,
                 run.getRunNo(),
                 row.text(SourceColumns.HANDLER)));

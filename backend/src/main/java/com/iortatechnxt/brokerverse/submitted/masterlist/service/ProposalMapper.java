@@ -42,9 +42,12 @@ public final class ProposalMapper {
   public static SbmPolicyData proposed(SbmExtraction x, SbmPolicyData current) {
     Map<String, SbmExtractedValue> f = x.getFields();
     SbmLoan l = current == null ? SbmLoan.NONE : current.loan();
-    SbmAssured a = current == null ? new SbmAssured(null, null, null, null, null, null) : current.assured();
+    SbmAssured a =
+        current == null ? new SbmAssured(null, null, null, null, null, null) : current.assured();
     SbmTerms t =
-        current == null ? new SbmTerms(null, null, null, null, null, null, null, "PHP") : current.terms();
+        current == null
+            ? new SbmTerms(null, null, null, null, null, null, null, "PHP")
+            : current.terms();
     SbmRisk r = current == null ? SbmRisk.NONE : current.risk();
     return new SbmPolicyData(
         current == null ? x.getSegment() : current.segment(),
@@ -93,7 +96,8 @@ public final class ProposalMapper {
     return v == null || v.value() == null ? fallback : v.value();
   }
 
-  private static LocalDate date(Map<String, SbmExtractedValue> f, String field, LocalDate fallback) {
+  private static LocalDate date(
+      Map<String, SbmExtractedValue> f, String field, LocalDate fallback) {
     String v = text(f, field, null);
     if (v == null) {
       return fallback;

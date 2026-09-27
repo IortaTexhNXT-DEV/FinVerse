@@ -57,10 +57,16 @@ public class NoTouchReturnHandler implements BulkImportHandler {
   public List<BulkColumn> columns() {
     return List.of(
         BulkColumn.required(SBM_NO, "Masterlist number of the exported line", "SBM-2026-000012"),
-        new BulkColumn("Basic Premium", "Basic premium validated by the insurer", true, Type.NUMBER, "18500.00"),
+        new BulkColumn(
+            "Basic Premium",
+            "Basic premium validated by the insurer",
+            true,
+            Type.NUMBER,
+            "18500.00"),
         new BulkColumn("Gross Service Fee", "Gross service fee", true, Type.NUMBER, "925.00"),
         new BulkColumn("VAT", "VAT on the service fee", true, Type.NUMBER, "111.00"),
-        new BulkColumn("Withholding Tax", "Withholding tax on the service fee", true, Type.NUMBER, "138.75"));
+        new BulkColumn(
+            "Withholding Tax", "Withholding tax on the service fee", true, Type.NUMBER, "138.75"));
   }
 
   @Override

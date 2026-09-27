@@ -40,13 +40,6 @@ public record SbmTerms(
     }
     int days = (int) ChronoUnit.DAYS.between(inceptionDate, expiryDate);
     return new SbmTerms(
-        insurerCode,
-        policyNo,
-        inceptionDate,
-        expiryDate,
-        days,
-        sumInsured,
-        totalPremium,
-        currency);
+        insurerCode, policyNo, inceptionDate, expiryDate, days, sumInsured, totalPremium, currency);
   }
 }

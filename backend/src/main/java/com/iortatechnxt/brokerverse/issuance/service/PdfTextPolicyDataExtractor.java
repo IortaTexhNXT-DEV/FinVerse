@@ -6,7 +6,6 @@ import com.iortatechnxt.brokerverse.issuance.service.PolicyTextParser.Rule;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.parser.PdfTextExtractor;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -26,16 +25,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class PdfTextPolicyDataExtractor implements PolicyDataExtractor {
 
   private static final int MAX_PAGES = 50;
+  private static final java.math.BigDecimal DEFAULT_CONFIDENCE = new java.math.BigDecimal("0.70");
+  private static final java.math.BigDecimal INSURER_CONFIDENCE = new java.math.BigDecimal("0.90");
 
   private final ExtractionPatternRepository patterns;
+  private final OcrEngine ocr;
 
   /**
    * Creates the extractor.
    *
    * @param patterns extraction patterns
+   * @param ocr OCR of documents without a text layer
    */
-  public PdfTextPolicyDataExtractor(ExtractionPatternRepository patterns) {
+  public PdfTextPolicyDataExtractor(ExtractionPatternRepository patterns, OcrEngine ocr) {
     this.patterns = patterns;
+    this.ocr = ocr;
   }
 
   @Override
@@ -83,9 +87,7 @@ public class PdfTextPolicyDataExtractor implements PolicyDataExtractor {
                         field,
                         new ExtractedValue(
                             v,
-                            p.getInsurerCode() == null
-                                ? DEFAULT_CONFIDENCE
-                                : INSURER_CONFIDENCE)));
+                            p.getInsurerCode() == null ? DEFAULT_CONFIDENCE : INSURER_CONFIDENCE)));
       }
     }
     kindPatterns.stream()

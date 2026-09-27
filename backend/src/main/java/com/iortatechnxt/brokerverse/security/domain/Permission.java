@@ -420,7 +420,8 @@ public enum Permission {
   // on top of these permissions (BRIDSP-28).
   // Masterlist, records, home (BRIDSP-04, 28)
   SBM_VIEW,
-  // Manual entry and edit, renewal tag, handler, remarks, documents, confirm extraction (02, 03, 29)
+  // Manual entry and edit, renewal tag, handler, remarks, documents, confirm extraction (02, 03,
+  // 29)
   SBM_MAINTAIN,
   // Source uploads, intake runs, LAMD snapshot (01, 13)
   SBM_INTAKE,

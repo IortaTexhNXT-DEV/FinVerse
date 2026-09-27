@@ -10,8 +10,8 @@ import java.time.LocalDate;
 /**
  * The renewal hand-off of a masterlist record (BRIDSP-23, 25, 32; design section 4.4): pending
  * until the Renewal module takes it, then the renewal reference, the insurer assigned, the renewal
- * account and its hold cover as Submitted Policies follows them, the re-assignments and the
- * outcome read from the Renewal module.
+ * account and its hold cover as Submitted Policies follows them, the re-assignments and the outcome
+ * read from the Renewal module.
  */
 @Entity
 @Table(name = "sbm_renewal")

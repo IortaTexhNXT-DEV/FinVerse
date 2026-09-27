@@ -137,7 +137,8 @@ public class SbmHandlingFee extends BaseEntity {
    */
   public void ticket(String ref, String message) {
     this.ticketRef = ref;
-    this.ticketMessage = message != null && message.length() > 500 ? message.substring(0, 500) : message;
+    this.ticketMessage =
+        message != null && message.length() > 500 ? message.substring(0, 500) : message;
   }
 
   /**

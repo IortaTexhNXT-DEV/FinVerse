@@ -35,7 +35,13 @@ public enum SbmPolicyStatus {
 
   private static final Set<SbmPolicyStatus> PROCESSABLE =
       EnumSet.of(
-          RECEIVED, VALIDATED, CLASSIFIED, IN_REVIEW, FOR_RENEWAL, FOR_MANUAL_DISPOSITION, EXCLUDED);
+          RECEIVED,
+          VALIDATED,
+          CLASSIFIED,
+          IN_REVIEW,
+          FOR_RENEWAL,
+          FOR_MANUAL_DISPOSITION,
+          EXCLUDED);
 
   /**
    * Whether a processing run may still classify the record (before the renewal hand-off).

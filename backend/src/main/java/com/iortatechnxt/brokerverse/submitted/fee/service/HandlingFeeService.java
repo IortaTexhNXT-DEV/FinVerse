@@ -27,12 +27,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Handling fees (BRIDSP-31; FRS FR-SP-070; design section 3.6): the billed records, the tagger
- * that matches the open unapplied payments - CLPC payments on the PN, OTC payments on the
- * location reference - against the billed records and asks Cashiering to recognise a matched
- * payment as handling-fee income ({@code RECOGNIZE_INCOME}, income type HANDLING_FEE), the manual
- * tag of the UPP handler, and the answer of Cashiering (APPLIED with the official receipt). A
- * payment matching several records is left for the UPP handler.
+ * Handling fees (BRIDSP-31; FRS FR-SP-070; design section 3.6): the billed records, the tagger that
+ * matches the open unapplied payments - CLPC payments on the PN, OTC payments on the location
+ * reference - against the billed records and asks Cashiering to recognise a matched payment as
+ * handling-fee income ({@code RECOGNIZE_INCOME}, income type HANDLING_FEE), the manual tag of the
+ * UPP handler, and the answer of Cashiering (APPLIED with the official receipt). A payment matching
+ * several records is left for the UPP handler.
  */
 @Service
 @Transactional
@@ -102,7 +102,10 @@ public class HandlingFeeService {
     SbmHandlingFee fee =
         fees.save(
             new SbmHandlingFee(
-                companyId, numbers.next("SBF-" + BusinessClock.today(clock).getYear()), bill, bulkJobNo));
+                companyId,
+                numbers.next("SBF-" + BusinessClock.today(clock).getYear()),
+                bill,
+                bulkJobNo));
     audit.record("SubmittedHandlingFee", fee.getFeeNo(), AuditAction.CREATE, "Handling fee billed");
     return fee;
   }
@@ -170,7 +173,10 @@ public class HandlingFeeService {
             .filter(i -> i.companyId().equals(fee.getCompanyId()))
             .orElseThrow(() -> new ResourceNotFoundException("Unapplied payment", unappliedRef));
     if (!fees.findByUnappliedRef(unappliedRef).stream()
-        .filter(f -> !SbmHandlingFee.BILLED.equals(f.getStatus()) && !SbmHandlingFee.CANCELLED.equals(f.getStatus()))
+        .filter(
+            f ->
+                !SbmHandlingFee.BILLED.equals(f.getStatus())
+                    && !SbmHandlingFee.CANCELLED.equals(f.getStatus()))
         .toList()
         .isEmpty()) {
       throw new BusinessRuleException(
@@ -211,7 +217,11 @@ public class HandlingFeeService {
     } else {
       fee.ticket(ticket.reference(), ticket.message());
     }
-    audit.record("SubmittedHandlingFee", fee.getFeeNo(), AuditAction.UPDATE, "Tagged " + item.unappliedRef() + ": " + ticket.status());
+    audit.record(
+        "SubmittedHandlingFee",
+        fee.getFeeNo(),
+        AuditAction.UPDATE,
+        "Tagged " + item.unappliedRef() + ": " + ticket.status());
   }
 
   /**
@@ -220,7 +230,9 @@ public class HandlingFeeService {
    * @param event disposition change
    */
   public void answered(UnappliedDispositionChanged event) {
-    if (!SOURCE.equals(event.source()) || event.sourceRef() == null || !event.sourceRef().startsWith("HF:")) {
+    if (!SOURCE.equals(event.source())
+        || event.sourceRef() == null
+        || !event.sourceRef().startsWith("HF:")) {
       return;
     }
     fees.findByFeeNo(event.sourceRef().substring(3))

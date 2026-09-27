@@ -119,7 +119,13 @@ public class TorService {
     Long lastRun = all.isEmpty() ? null : all.get(0).getRunId();
     return all.stream()
         .filter(c -> c.isBreached() && Objects.equals(c.getRunId(), lastRun))
-        .map(c -> c.getAttribute() + ": " + c.getActualValue() + " above the limit " + c.getLimitValue())
+        .map(
+            c ->
+                c.getAttribute()
+                    + ": "
+                    + c.getActualValue()
+                    + " above the limit "
+                    + c.getLimitValue())
         .collect(Collectors.joining("\n"));
   }
 
@@ -146,8 +152,13 @@ public class TorService {
                 numbers.next("TOR-" + BusinessClock.today(clock).getYear()),
                 new SbmTor.Account(p.getId(), p.getRenewalArn()),
                 new SbmTor.Content(breached, proposedTerms.strip(), aoUsername)));
-    approvals.start(DocumentApprovals.TOR, t, p.getAssured().assuredName(), DocumentApprovals.linkOf(DocumentApprovals.TOR, t));
-    history.note(p, "TOR", "TOR " + t.getTorNo() + " generated", SbmHistorySource.MANUAL, t.getTorNo());
+    approvals.start(
+        DocumentApprovals.TOR,
+        t,
+        p.getAssured().assuredName(),
+        DocumentApprovals.linkOf(DocumentApprovals.TOR, t));
+    history.note(
+        p, "TOR", "TOR " + t.getTorNo() + " generated", SbmHistorySource.MANUAL, t.getTorNo());
     audit.record(ENTITY, t.getTorNo(), AuditAction.CREATE, "TOR of " + p.getSbmNo());
     return t;
   }
@@ -215,7 +226,8 @@ public class TorService {
               ENTITY,
               t.getId().toString()),
           "SBM_TOR_RELEASED");
-      history.note(p, "TOR", "TOR " + t.getTorNo() + " approved", SbmHistorySource.MANUAL, t.getTorNo());
+      history.note(
+          p, "TOR", "TOR " + t.getTorNo() + " approved", SbmHistorySource.MANUAL, t.getTorNo());
     }
     audit.record(ENTITY, t.getTorNo(), AuditAction.AUTHORIZE, last ? "Approved" : "Level approved");
     return t;

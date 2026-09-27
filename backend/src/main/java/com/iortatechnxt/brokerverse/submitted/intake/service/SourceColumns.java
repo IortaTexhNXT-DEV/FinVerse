@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * The columns of the source files of submitted policies (BRIDSP-01; the fields of Report List
- * #151) and their mapping to the masterlist data. One layout serves every source until BDOI
- * supplies the layouts of each (SP SQ01, SQ02): a source with a fixed segment or business type
- * fills those when the file leaves them blank.
+ * The columns of the source files of submitted policies (BRIDSP-01; the fields of Report List #151)
+ * and their mapping to the masterlist data. One layout serves every source until BDOI supplies the
+ * layouts of each (SP SQ01, SQ02): a source with a fixed segment or business type fills those when
+ * the file leaves them blank.
  */
 public final class SourceColumns {
 
@@ -53,9 +53,19 @@ public final class SourceColumns {
    */
   public static List<BulkColumn> columns() {
     List<BulkColumn> c = new ArrayList<>();
-    c.add(BulkColumn.optional(SEGMENT, "CBG Motor, CBG Fire, Non-CBG Corporate or Non-CBG Retail; blank for the segment of the source", "CBG Motor"));
-    c.add(BulkColumn.optional(BUSINESS_TYPE, "NB (new business) or RB (renewal business); blank for NB", "NB"));
-    c.add(BulkColumn.optional(PN, "Promissory note number of the loan; required for CBG Motor and CBG Fire", "PN-2026-000123"));
+    c.add(
+        BulkColumn.optional(
+            SEGMENT,
+            "CBG Motor, CBG Fire, Non-CBG Corporate or Non-CBG Retail; blank for the segment of the source",
+            "CBG Motor"));
+    c.add(
+        BulkColumn.optional(
+            BUSINESS_TYPE, "NB (new business) or RB (renewal business); blank for NB", "NB"));
+    c.add(
+        BulkColumn.optional(
+            PN,
+            "Promissory note number of the loan; required for CBG Motor and CBG Fire",
+            "PN-2026-000123"));
     c.add(BulkColumn.optional("Loan Application No", "Loan application number", "LA-778812"));
     c.add(BulkColumn.optional("CIF", "Bank client number", "CIF-00012345"));
     c.add(date("Value Date", "Loan value date"));
@@ -64,25 +74,35 @@ public final class SourceColumns {
     c.add(BulkColumn.optional("Originating Unit", "Originating unit of the loan", "Auto Loans"));
     c.add(BulkColumn.optional("Borrower", "Borrower name", "Juan Dela Cruz"));
     c.add(BulkColumn.required(ASSURED, "Assured (client) name", "Juan Dela Cruz"));
-    c.add(BulkColumn.optional("Mailing Address", "Mailing address of the assured", "12 Rizal St, Makati City"));
+    c.add(
+        BulkColumn.optional(
+            "Mailing Address", "Mailing address of the assured", "12 Rizal St, Makati City"));
     c.add(BulkColumn.optional("Telephone", "Telephone", "02 8888 1234"));
     c.add(BulkColumn.optional("Mobile", "Mobile number", "0917 123 4567"));
     c.add(BulkColumn.optional("Email", "E-mail of the assured", "juan@example.ph"));
-    c.add(BulkColumn.optional("Bank Counterpart Email", "E-mail of the bank counterpart", "loans@bank.ph"));
+    c.add(
+        BulkColumn.optional(
+            "Bank Counterpart Email", "E-mail of the bank counterpart", "loans@bank.ph"));
     c.add(BulkColumn.optional("Insurer Code", "Insurer code", "INS-MGIC"));
     c.add(BulkColumn.optional("Policy No", "Policy number", "MC-2026-001234"));
     c.add(date("Inception Date", "Policy inception"));
     c.add(new BulkColumn(EXPIRY, "Policy expiry", true, Type.DATE, "2027-03-31"));
     c.add(number("Sum Insured", "Amount insured", "850000.00"));
     c.add(number("Total Premium", "Total premium", "21500.00"));
-    c.add(BulkColumn.optional("Unit Description", "Vehicle make and model (motor)", "Toyota Vios 1.3 XLE"));
+    c.add(
+        BulkColumn.optional(
+            "Unit Description", "Vehicle make and model (motor)", "Toyota Vios 1.3 XLE"));
     c.add(BulkColumn.optional("Serial No", "Chassis or serial number (motor)", "MHFA1234567"));
     c.add(BulkColumn.optional("Motor No", "Engine or motor number (motor)", "2NR1234567"));
     c.add(BulkColumn.optional("Colour", "Colour (motor)", "White"));
     c.add(BulkColumn.optional("Plate No", "Plate number (motor)", "ABC 1234"));
-    c.add(BulkColumn.optional("Vehicle Type", "Vehicle type (motor), as in the insurer rules", "Private car"));
+    c.add(
+        BulkColumn.optional(
+            "Vehicle Type", "Vehicle type (motor), as in the insurer rules", "Private car"));
     c.add(number(YEAR_MODEL, "Year model (motor)", "2023"));
-    c.add(BulkColumn.optional("Property Location", "Location of the property (fire)", "Lot 5, Taguig City"));
+    c.add(
+        BulkColumn.optional(
+            "Property Location", "Location of the property (fire)", "Lot 5, Taguig City"));
     c.add(BulkColumn.optional("Occupancy", "Occupancy (fire)", "Residential"));
     c.add(BulkColumn.optional("Mortgagee", "Mortgagee", "BDO Unibank, Inc."));
     c.add(yesNo("FFY", "Y when the auto loan has the Free First Year promotion"));
@@ -128,7 +148,8 @@ public final class SourceColumns {
    * @return code
    */
   public static String segmentCode(String value) {
-    String code = value.toUpperCase(Locale.ROOT).replaceAll("[\\s-]+", "_").replace("NON_CBG", "NONCBG");
+    String code =
+        value.toUpperCase(Locale.ROOT).replaceAll("[\\s-]+", "_").replace("NON_CBG", "NONCBG");
     return code.startsWith("NONCBG_CORPORATE") ? "NONCBG_CORPORATE" : code;
   }
 

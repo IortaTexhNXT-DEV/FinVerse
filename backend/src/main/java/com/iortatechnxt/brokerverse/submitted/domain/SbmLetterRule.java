@@ -51,7 +51,7 @@ public class SbmLetterRule extends AuthorizableEntity {
    */
   public SbmLetterRule(Long companyId, Row row) {
     this.companyId = companyId;
-    change(row);
+    set(row);
   }
 
   /**
@@ -59,7 +59,12 @@ public class SbmLetterRule extends AuthorizableEntity {
    *
    * @param row content
    */
-  public void change(Row row) {
+  public final void change(Row row) {
+    set(row);
+    markModified();
+  }
+
+  private void set(Row row) {
     this.letterType = row.letterType();
     this.segment = row.segment();
     this.bucket = row.bucket();
@@ -68,7 +73,6 @@ public class SbmLetterRule extends AuthorizableEntity {
     this.channel = row.channel();
     this.templateCode = row.templateCode();
     this.description = row.description();
-    markModified();
   }
 
   public Long getCompanyId() {

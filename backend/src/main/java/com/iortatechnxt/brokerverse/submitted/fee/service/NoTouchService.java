@@ -44,10 +44,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * No Touch billing (Report List #164; OQ39; design section 3.7): the No Touch accounts of an insurer
- * expiring in a month are exported with the premium and fee columns blank; the insurer's return
- * (upload {@code SBM_NO_TOUCH_RETURN}) fills basic premium, gross service fee, VAT and withholding
- * tax and produces the billing statement; billing issues a service invoice of type
+ * No Touch billing (Report List #164; OQ39; design section 3.7): the No Touch accounts of an
+ * insurer expiring in a month are exported with the premium and fee columns blank; the insurer's
+ * return (upload {@code SBM_NO_TOUCH_RETURN}) fills basic premium, gross service fee, VAT and
+ * withholding tax and produces the billing statement; billing issues a service invoice of type
  * SERVICE_FEE_NO_TOUCH to the insurer and posts {@code SBM_NO_TOUCH_FEE}.
  */
 @Service
@@ -57,7 +57,8 @@ public class NoTouchService {
   /** Service invoice type. */
   public static final String SI_TYPE = "SERVICE_FEE_NO_TOUCH";
 
-  private static final String XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  private static final String XLSX =
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
   private final SbmNoTouchBatchRepository batches;
   private final SbmNoTouchLineRepository lines;
@@ -155,8 +156,16 @@ public class NoTouchService {
             new SheetSpec(
                 "No Touch " + period,
                 List.of(
-                    "Masterlist No", "PN No", "Assured", "Policy No", "Plate No", "Sum Insured",
-                    "Basic Premium", "Gross Service Fee", "VAT", "Withholding Tax"),
+                    "Masterlist No",
+                    "PN No",
+                    "Assured",
+                    "Policy No",
+                    "Plate No",
+                    "Sum Insured",
+                    "Basic Premium",
+                    "Gross Service Fee",
+                    "VAT",
+                    "Withholding Tax"),
                 saved.stream()
                     .map(
                         l ->
@@ -173,17 +182,21 @@ public class NoTouchService {
                                 ""))
                     .toList()));
     batch.exported(saved.size(), store(batch, batch.getBatchNo() + ".xlsx", xlsx, XLSX));
-    audit.record("SubmittedNoTouch", batch.getBatchNo(), AuditAction.EXPORT, saved.size() + " accounts");
+    audit.record(
+        "SubmittedNoTouch", batch.getBatchNo(), AuditAction.EXPORT, saved.size() + " accounts");
     return batch;
   }
 
-  private static Specification<SbmPolicy> noTouch(Long companyId, String insurer, YearMonth period) {
+  private static Specification<SbmPolicy> noTouch(
+      Long companyId, String insurer, YearMonth period) {
     return (root, q, cb) ->
         cb.and(
             cb.equal(root.get("companyId"), companyId),
             cb.equal(root.get("terms").get("insurerCode"), insurer),
             cb.equal(root.get("renewalMonth"), period.toString()),
-            cb.or(cb.isTrue(root.get("marks").get("noTouch")), cb.equal(root.get("bucket"), "NO_TOUCH")));
+            cb.or(
+                cb.isTrue(root.get("marks").get("noTouch")),
+                cb.equal(root.get("bucket"), "NO_TOUCH")));
   }
 
   /**
@@ -224,7 +237,10 @@ public class NoTouchService {
             sum(all, SbmNoTouchLine::getGrossFee),
             sum(all, SbmNoTouchLine::getVat),
             sum(all, SbmNoTouchLine::getWtax));
-    batch.returned(totals, store(batch, batchNo + "-statement.pdf", statement(batch, all, totals), "application/pdf"), clock.instant());
+    batch.returned(
+        totals,
+        store(batch, batchNo + "-statement.pdf", statement(batch, all, totals), "application/pdf"),
+        clock.instant());
     audit.record("SubmittedNoTouch", batchNo, AuditAction.UPDATE, "Returned by the insurer");
     return batch;
   }
@@ -252,7 +268,13 @@ public class NoTouchService {
                 new Text(null, text.text()),
                 new Table(
                     "Accounts",
-                    List.of("Masterlist No", "Assured", "Policy No", "Gross Service Fee", "VAT", "Withholding Tax"),
+                    List.of(
+                        "Masterlist No",
+                        "Assured",
+                        "Policy No",
+                        "Gross Service Fee",
+                        "VAT",
+                        "Withholding Tax"),
                     all.stream()
                         .map(
                             l ->
@@ -280,7 +302,8 @@ public class NoTouchService {
         batches.findById(id).orElseThrow(() -> new ResourceNotFoundException("No Touch batch", id));
     if (!SbmNoTouchBatch.RETURNED.equals(batch.getStatus())) {
       throw new BusinessRuleException(
-          "SBM_NO_TOUCH_NOT_RETURNED", "Upload the insurer's return of " + batch.getBatchNo() + " first");
+          "SBM_NO_TOUCH_NOT_RETURNED",
+          "Upload the insurer's return of " + batch.getBatchNo() + " first");
     }
     ServiceInvoice si =
         serviceInvoices.issue(
@@ -321,7 +344,8 @@ public class NoTouchService {
                     null))
             .getBatchNo();
     batch.billed(si.getSiNo(), journal, clock.instant());
-    audit.record("SubmittedNoTouch", batch.getBatchNo(), AuditAction.POST, "Billed " + si.getSiNo());
+    audit.record(
+        "SubmittedNoTouch", batch.getBatchNo(), AuditAction.POST, "Billed " + si.getSiNo());
     return batch;
   }
 
@@ -344,6 +368,19 @@ public class NoTouchService {
     return batches
         .findByBatchNo(batchNo)
         .orElseThrow(() -> new ResourceNotFoundException("No Touch batch", batchNo));
+  }
+
+  /**
+   * A batch.
+   *
+   * @param id batch
+   * @return batch
+   */
+  @Transactional(readOnly = true)
+  public SbmNoTouchBatch get(Long id) {
+    return batches
+        .findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("No Touch batch", id));
   }
 
   /**
@@ -372,7 +409,8 @@ public class NoTouchService {
     return files
         .storeChecked(
             new StoreRequest(
-                new FileOwner(b.getCompanyId(), SubmittedFileStorage.NO_TOUCH, b.getId().toString()),
+                new FileOwner(
+                    b.getCompanyId(), SubmittedFileStorage.NO_TOUCH, b.getId().toString()),
                 null,
                 "WORKING_FILE",
                 name,

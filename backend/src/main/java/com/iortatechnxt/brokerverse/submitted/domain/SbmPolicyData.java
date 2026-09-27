@@ -1,8 +1,8 @@
 package com.iortatechnxt.brokerverse.submitted.domain;
 
 /**
- * The maintainable data of a masterlist record: what a source row, a confirmed extraction, a
- * manual entry or a migrated row provides (BRIDSP-01-04, 33).
+ * The maintainable data of a masterlist record: what a source row, a confirmed extraction, a manual
+ * entry or a migrated row provides (BRIDSP-01-04, 33).
  *
  * @param segment segment code (LOV SBM_SEGMENT)
  * @param businessType NB or RB

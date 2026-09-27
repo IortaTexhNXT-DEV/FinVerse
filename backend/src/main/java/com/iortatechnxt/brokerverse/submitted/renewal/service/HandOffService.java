@@ -97,8 +97,8 @@ public class HandOffService {
   }
 
   /**
-   * "Renew with BDOI": the AO starts the renewal of a For Renewal record by hand; the renewal starts
-   * unassigned for a manual disposition.
+   * "Renew with BDOI": the AO starts the renewal of a For Renewal record by hand; the renewal
+   * starts unassigned for a manual disposition.
    *
    * @param policyId record
    * @return the hand-off
@@ -146,7 +146,11 @@ public class HandOffService {
         SbmHistorySource.RENEWAL,
         r.getRenewalRef());
     notifyStarted(p);
-    audit.record(SubmittedCodes.ENTITY, p.getSbmNo(), AuditAction.SUBMIT, "Renewal hand-off " + r.getHandoffStatus());
+    audit.record(
+        SubmittedCodes.ENTITY,
+        p.getSbmNo(),
+        AuditAction.SUBMIT,
+        "Renewal hand-off " + r.getHandoffStatus());
     return r;
   }
 
@@ -171,8 +175,7 @@ public class HandOffService {
                     p.getAoUsername(),
                     r.isManual()),
                 currentUser.username()));
-    r.answered(
-        answer.outcome().name(), answer.renewalRef(), answer.arn(), answer.message());
+    r.answered(answer.outcome().name(), answer.renewalRef(), answer.arn(), answer.message());
     p.renewal(answer.renewalRef(), answer.arn());
     if (answer.outcome() == RenewalHandOff.Outcome.HANDED_OFF) {
       p.convert("PROCESS_PLACEMENT");
@@ -193,8 +196,7 @@ public class HandOffService {
         insurerRules.findByCompanyIdAndSegmentAndRecordStatusOrderByPriorityDesc(
             p.getCompanyId(), p.getSegment(), RecordStatus.ACTIVE)) {
       boolean vehicleOk =
-          rule.getVehicleType() == null
-              || same(rule.getVehicleType(), p.getRisk().vehicleType());
+          rule.getVehicleType() == null || same(rule.getVehicleType(), p.getRisk().vehicleType());
       boolean occupancyOk =
           rule.getOccupancy() == null || same(rule.getOccupancy(), p.getRisk().occupancy());
       boolean insurerOk =
@@ -207,7 +209,8 @@ public class HandOffService {
   }
 
   private static boolean same(String a, String b) {
-    return b != null && a.strip().toLowerCase(Locale.ROOT).equals(b.strip().toLowerCase(Locale.ROOT));
+    return b != null
+        && a.strip().toLowerCase(Locale.ROOT).equals(b.strip().toLowerCase(Locale.ROOT));
   }
 
   private void notifyStarted(SbmPolicy p) {
@@ -238,7 +241,8 @@ public class HandOffService {
         p.getAssured().assuredName(),
         p.getLoan().borrowerName(),
         p.getLoan().cif(),
-        new Contact(p.getAssured().mailingAddress(), p.getAssured().email(), p.getAssured().mobile()),
+        new Contact(
+            p.getAssured().mailingAddress(), p.getAssured().email(), p.getAssured().mobile()),
         p.getTerms().insurerCode(),
         p.getTerms().policyNo(),
         new Period(p.getTerms().inceptionDate(), p.getTerms().expiryDate()),

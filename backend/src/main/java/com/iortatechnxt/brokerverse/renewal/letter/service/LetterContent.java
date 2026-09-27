@@ -14,10 +14,13 @@ import com.iortatechnxt.brokerverse.docgen.service.MergedText;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateSource;
 import com.iortatechnxt.brokerverse.renewal.domain.LetterType;
 import com.iortatechnxt.brokerverse.renewal.domain.RaNotice;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalCodes;
+import com.iortatechnxt.brokerverse.renewal.submitted.SubmittedHandOffRecord;
+import com.iortatechnxt.brokerverse.renewal.submitted.SubmittedHandOffRecordRepository;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import java.math.BigDecimal;
@@ -47,6 +50,7 @@ public class LetterContent {
   private final InsurerProfileRepository insurers;
   private final AppUserRepository users;
   private final LovService lovs;
+  private final SubmittedHandOffRecordRepository handOffs;
 
   /**
    * Creates the content builder.
@@ -58,7 +62,9 @@ public class LetterContent {
    * @param insurers insurers
    * @param users user names
    * @param lovs labels
+   * @param handOffs terms of the submitted policies handed over (FFY template)
    */
+  @SuppressWarnings("java:S107") // constructor injection
   public LetterContent(
       DocTemplateService templates,
       DocumentComposer composer,
@@ -66,7 +72,8 @@ public class LetterContent {
       AccountRepository accounts,
       InsurerProfileRepository insurers,
       AppUserRepository users,
-      LovService lovs) {
+      LovService lovs,
+      SubmittedHandOffRecordRepository handOffs) {
     this.templates = templates;
     this.composer = composer;
     this.organization = organization;
@@ -74,6 +81,7 @@ public class LetterContent {
     this.insurers = insurers;
     this.users = users;
     this.lovs = lovs;
+    this.handOffs = handOffs;
   }
 
   /**
@@ -97,6 +105,28 @@ public class LetterContent {
   }
 
   /**
+   * The template of a letter of a renewal: the first RA of a Free First Year submitted policy is
+   * the FFY variant (wave R3).
+   *
+   * @param c renewal
+   * @param type letter type
+   * @param notice RA notice
+   * @return template code
+   */
+  public String templateOf(RenewalCandidate c, LetterType type, RaNotice notice) {
+    boolean freeFirstYear =
+        type == LetterType.RA
+            && notice != RaNotice.SECOND
+            && c.getSource() == CandidateSource.SUBMITTED_POLICY
+            && c.getId() != null
+            && handOffs
+                .findByCandidateId(c.getId())
+                .map(SubmittedHandOffRecord::isFreeFirstYear)
+                .orElse(false);
+    return freeFirstYear ? RenewalCodes.TEMPLATE_RA_FFY : template(type, notice);
+  }
+
+  /**
    * A letter merged and rendered.
    *
    * @param c renewal
@@ -109,7 +139,7 @@ public class LetterContent {
   public Rendered render(
       RenewalCandidate c, LetterType type, RaNotice notice, String letterNo, LocalDate today) {
     Map<String, Object> values = values(c, today);
-    MergedText text = templates.merge(template(type, notice), today, values);
+    MergedText text = templates.merge(templateOf(c, type, notice), today, values);
     String subject = DocTemplateService.fill(text.title(), values);
     byte[] pdf =
         composer.pdf(

@@ -6,8 +6,8 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 
 /**
- * Terms of Reference of an account above the insurer limits (BRIDSP-17-19): the breached limits
- * and the proposed terms, approved by the TSU matrix and released when the Account Officer opens or
+ * Terms of Reference of an account above the insurer limits (BRIDSP-17-19): the breached limits and
+ * the proposed terms, approved by the TSU matrix and released when the Account Officer opens or
  * downloads it.
  */
 @Entity
@@ -66,7 +66,7 @@ public class SbmTor extends SbmApprovable {
    *
    * @param content breaches, proposed terms and Account Officer
    */
-  public void change(Content content) {
+  public final void change(Content content) {
     this.breaches = content.breaches();
     this.proposedTerms = content.proposedTerms();
     this.aoUsername = content.aoUsername();

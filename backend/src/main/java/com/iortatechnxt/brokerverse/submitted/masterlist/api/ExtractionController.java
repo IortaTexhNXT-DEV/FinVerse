@@ -160,7 +160,8 @@ public class ExtractionController {
   }
 
   private ExtractionView view(SbmExtraction x) {
-    SbmPolicyData current = x.getPolicyId() == null ? null : masterlist.require(x.getPolicyId()).data();
+    SbmPolicyData current =
+        x.getPolicyId() == null ? null : masterlist.require(x.getPolicyId()).data();
     return ExtractionView.from(x, ProposalMapper.proposed(x, current), current);
   }
 }

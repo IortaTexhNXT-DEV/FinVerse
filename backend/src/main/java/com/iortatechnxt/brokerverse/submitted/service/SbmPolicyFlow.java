@@ -33,7 +33,8 @@ public class SbmPolicyFlow {
    * @param cases work cases (assignee)
    * @param currentUser current user
    */
-  public SbmPolicyFlow(WorkflowService workflow, WorkCaseRepository cases, CurrentUser currentUser) {
+  public SbmPolicyFlow(
+      WorkflowService workflow, WorkCaseRepository cases, CurrentUser currentUser) {
     this.workflow = workflow;
     this.cases = cases;
     this.currentUser = currentUser;
@@ -80,8 +81,8 @@ public class SbmPolicyFlow {
   }
 
   /**
-   * A user action (dispose, exclude, reinstate, renew, close, validate); without a signed-in user it
-   * runs as a system action.
+   * A user action (dispose, exclude, reinstate, renew, close, validate); without a signed-in user
+   * it runs as a system action.
    *
    * @param policy record
    * @param action action code

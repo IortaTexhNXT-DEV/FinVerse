@@ -137,7 +137,8 @@ public class SbmHistoryService {
       String old = blankToNull(before.get(e.getKey()));
       String now = blankToNull(e.getValue());
       if (!Objects.equals(old, now)) {
-        history.save(new SbmPolicyHistory(p.getId(), e.getKey(), new Change(old, now), source, reference));
+        history.save(
+            new SbmPolicyHistory(p.getId(), e.getKey(), new Change(old, now), source, reference));
         changed++;
       }
     }
@@ -155,7 +156,8 @@ public class SbmHistoryService {
    */
   public void note(
       SbmPolicy p, String field, String value, SbmHistorySource source, String reference) {
-    history.save(new SbmPolicyHistory(p.getId(), field, new Change(null, value), source, reference));
+    history.save(
+        new SbmPolicyHistory(p.getId(), field, new Change(null, value), source, reference));
   }
 
   private String name(String username) {

@@ -16,9 +16,9 @@ import com.iortatechnxt.brokerverse.submitted.domain.SbmIntakeRun.FileFacts;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmIntakeRunRepository;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicy;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicyRepository;
+import com.iortatechnxt.brokerverse.submitted.domain.SbmRun;
 import com.iortatechnxt.brokerverse.submitted.processing.service.SbmProcessingService;
 import com.iortatechnxt.brokerverse.submitted.processing.service.SbmProcessingService.RunRequest;
-import com.iortatechnxt.brokerverse.submitted.domain.SbmRun;
 import com.iortatechnxt.brokerverse.submitted.service.SubmittedCodes;
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -33,8 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
  * Intake runs (BRIDSP-01, 09; FRS FR-SP-001, 021): one run per source file, opened by its first
  * committed row and counted row by row; once the rows are committed the run closes, the handlers
  * are told of the new submissions, failures raise {@code SBM_INTAKE_FAILED}, and a processing run
- * starts for the records of the file (when approved rule sets are in force; otherwise the daily
- * run takes them).
+ * starts for the records of the file (when approved rule sets are in force; otherwise the daily run
+ * takes them).
  */
 @Service
 @Transactional
@@ -110,7 +110,8 @@ public class IntakeRunService {
                     job.map(BulkJob::getFileName).orElse(null),
                     job.map(BulkJob::getFileSha256).orElse(null)),
                 clock.instant()));
-    audit.record("SubmittedIntakeRun", run.getRunNo(), AuditAction.CREATE, "Intake of " + sourceCode);
+    audit.record(
+        "SubmittedIntakeRun", run.getRunNo(), AuditAction.CREATE, "Intake of " + sourceCode);
     return run;
   }
 
@@ -139,10 +140,7 @@ public class IntakeRunService {
       SbmRun processed =
           processing.run(
               new RunRequest(
-                  run.getCompanyId(),
-                  SbmRun.Trigger.INTAKE,
-                  "Intake " + run.getRunNo(),
-                  ids));
+                  run.getCompanyId(), SbmRun.Trigger.INTAKE, "Intake " + run.getRunNo(), ids));
       processingRunNo = processed.getRunNo();
     }
     run.complete(failed, clock.instant(), processingRunNo);

@@ -28,10 +28,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Runs the steps of a processing run for one record (BRIDSP-08-16; design section 3.2):
- * SANITATION, MATCHING (the latest LAMD snapshot row of the PN), CLASSIFICATION, DISPOSITION and
- * LIMITS. Each step writes one result row with the rule and rule-set version; a fallout ends the
- * run of the record. The final bucket moves the record: RENEW to For Renewal, MANUAL to For Manual
+ * Runs the steps of a processing run for one record (BRIDSP-08-16; design section 3.2): SANITATION,
+ * MATCHING (the latest LAMD snapshot row of the PN), CLASSIFICATION, DISPOSITION and LIMITS. Each
+ * step writes one result row with the rule and rule-set version; a fallout ends the run of the
+ * record. The final bucket moves the record: RENEW to For Renewal, MANUAL to For Manual
  * Disposition, EXCLUDE to Excluded, a REVIEW flag to In Review, no bucket to Classified. A manual
  * renewal tag overrides the rule's (outcome OVERRIDDEN).
  */
@@ -118,7 +118,10 @@ public class PolicyProcessor {
     history.record(p, before, SbmHistorySource.RUN, ctx.run().getRunNo());
     Outcome kind = overridden ? Outcome.OVERRIDDEN : bucketed(carry);
     return new Processed(
-        p, kind, !Objects.equals(oldBucket, p.getBucket()) && p.getBucket() != null, !breaches.isEmpty());
+        p,
+        kind,
+        !Objects.equals(oldBucket, p.getBucket()) && p.getBucket() != null,
+        !breaches.isEmpty());
   }
 
   private Duplicates duplicates(SbmPolicy p) {
@@ -128,7 +131,8 @@ public class PolicyProcessor {
     String motor = p.getRisk().motorNo();
     boolean sameUnit =
         serial != null && policies.countSameSerial(p.getCompanyId(), serial, p.getId(), OPEN) > 0
-            || motor != null && policies.countSameMotor(p.getCompanyId(), motor, p.getId(), OPEN) > 0;
+            || motor != null
+                && policies.countSameMotor(p.getCompanyId(), motor, p.getId(), OPEN) > 0;
     return new Duplicates(samePn, sameUnit);
   }
 

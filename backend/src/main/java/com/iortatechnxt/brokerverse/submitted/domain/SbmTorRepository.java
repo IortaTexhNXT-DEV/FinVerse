@@ -35,4 +35,13 @@ public interface SbmTorRepository extends JpaRepository<SbmTor, Long> {
    * @return TORs
    */
   List<SbmTor> findByStatus(SbmDocStatus status);
+
+  /**
+   * Count of a company in a status (home).
+   *
+   * @param companyId company
+   * @param status status
+   * @return count
+   */
+  long countByCompanyIdAndStatus(Long companyId, SbmDocStatus status);
 }

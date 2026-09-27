@@ -49,7 +49,7 @@ public class SbmSource extends BaseEntity {
    * @param newMandatoryFields mandatory fields, comma separated
    * @param isActive active
    */
-  public void maintain(String newName, String newMandatoryFields, boolean isActive) {
+  public final void maintain(String newName, String newMandatoryFields, boolean isActive) {
     this.name = newName;
     this.mandatoryFields = newMandatoryFields;
     this.active = isActive;

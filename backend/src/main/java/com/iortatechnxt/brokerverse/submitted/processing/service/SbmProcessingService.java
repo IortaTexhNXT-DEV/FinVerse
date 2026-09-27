@@ -138,7 +138,8 @@ public class SbmProcessingService {
   public void process(Long runId, List<Long> policyIds) {
     SbmRun run = require(runId);
     LocalDate today = BusinessClock.today(clock);
-    RunContext ctx = new RunContext(run, activeRules(run.getCompanyId(), today), today, bucketActions(today));
+    RunContext ctx =
+        new RunContext(run, activeRules(run.getCompanyId(), today), today, bucketActions(today));
     Map<String, Integer> movedByHandler = new TreeMap<>();
     for (SbmPolicy p : policies.findAllById(policyIds)) {
       if (!p.getStatus().isProcessable() || !p.getCompanyId().equals(run.getCompanyId())) {

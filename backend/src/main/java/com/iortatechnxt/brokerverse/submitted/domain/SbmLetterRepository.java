@@ -55,4 +55,13 @@ public interface SbmLetterRepository extends JpaRepository<SbmLetter, Long> {
    * @return letters
    */
   List<SbmLetter> findByPrintBatchIdOrderByIdAsc(Long printBatchId);
+
+  /**
+   * Count of a company in a status (home).
+   *
+   * @param companyId company
+   * @param status status
+   * @return count
+   */
+  long countByCompanyIdAndStatus(Long companyId, String status);
 }

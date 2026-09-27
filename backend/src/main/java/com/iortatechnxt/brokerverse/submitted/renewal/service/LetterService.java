@@ -148,7 +148,8 @@ public class LetterService {
    */
   public Dispatch dispatch(Long companyId, LocalDate today) {
     int produced = 0;
-    for (SbmLetterRule rule : rules.findByCompanyIdAndRecordStatus(companyId, RecordStatus.ACTIVE)) {
+    for (SbmLetterRule rule :
+        rules.findByCompanyIdAndRecordStatus(companyId, RecordStatus.ACTIVE)) {
       for (SbmPolicy p : policies.findAll(due(companyId, rule, today))) {
         if (!letters.existsByPolicyIdAndRuleId(p.getId(), rule.getId())) {
           produce(p, rule);
@@ -189,7 +190,11 @@ public class LetterService {
                 p.getCompanyId(),
                 numbers.next("SBL-" + clockYear()),
                 p.getId(),
-                new SbmLetter.Kind(rule.getId(), rule.getLetterType(), rule.getChannel(), rule.getTemplateCode())));
+                new SbmLetter.Kind(
+                    rule.getId(),
+                    rule.getLetterType(),
+                    rule.getChannel(),
+                    rule.getTemplateCode())));
     deliver(p, letter);
     return letter;
   }
@@ -197,8 +202,12 @@ public class LetterService {
   private void deliver(SbmPolicy p, SbmLetter letter) {
     String to = recipient(p, letter.getChannel());
     if (!PRINT.equals(letter.getChannel()) && (to == null || to.isBlank())) {
-      fail(p, letter, (EMAIL.equals(letter.getChannel()) ? "Client " : "The bank counterpart of ")
-          + p.getAssured().assuredName() + " has no e-mail address");
+      fail(
+          p,
+          letter,
+          (EMAIL.equals(letter.getChannel()) ? "Client " : "The bank counterpart of ")
+              + p.getAssured().assuredName()
+              + " has no e-mail address");
       return;
     }
     MergedText text = templates.merge(letter.getTemplateCode(), today(), values(p));
@@ -212,7 +221,11 @@ public class LetterService {
                 List.of(),
                 text.versionTag()));
     Long fileId = store(p, letter, pdf);
-    letter.generated(text.versionNo(), null, fileId, PRINT.equals(letter.getChannel()) ? p.getAssured().mailingAddress() : to);
+    letter.generated(
+        text.versionNo(),
+        null,
+        fileId,
+        PRINT.equals(letter.getChannel()) ? p.getAssured().mailingAddress() : to);
     if (!PRINT.equals(letter.getChannel())) {
       Long messageId =
           messages
@@ -224,20 +237,27 @@ public class LetterService {
                       List.of(),
                       text.title(),
                       text.text(),
-                      List.of(new MessageFile(letter.getLetterNo() + ".pdf", "application/pdf", pdf)),
+                      List.of(
+                          new MessageFile(letter.getLetterNo() + ".pdf", "application/pdf", pdf)),
                       null,
                       new RecordLink(SubmittedCodes.ENTITY, p.getId().toString(), p.getSbmNo())))
               .messageId();
       letter.sent(messageId, clock.instant());
     }
-    history.note(p, "Letter", DisplayFormat.words(letter.getLetterType()) + " " + letter.getLetterNo(), SbmHistorySource.MANUAL, letter.getLetterNo());
+    history.note(
+        p,
+        "Letter",
+        DisplayFormat.words(letter.getLetterType()) + " " + letter.getLetterNo(),
+        SbmHistorySource.MANUAL,
+        letter.getLetterNo());
   }
 
   private Long store(SbmPolicy p, SbmLetter letter, byte[] pdf) {
     return files
         .storeChecked(
             new StoreRequest(
-                new FileOwner(p.getCompanyId(), SubmittedFileStorage.LETTER, letter.getId().toString()),
+                new FileOwner(
+                    p.getCompanyId(), SubmittedFileStorage.LETTER, letter.getId().toString()),
                 "SBM_LETTER",
                 "GENERAL_DOCUMENT",
                 letter.getLetterNo() + ".pdf",
@@ -269,9 +289,11 @@ public class LetterService {
    * @return the letter
    */
   public SbmLetter resend(Long id) {
-    SbmLetter letter = letters.findById(id).orElseThrow(() -> new ResourceNotFoundException("Letter", id));
+    SbmLetter letter =
+        letters.findById(id).orElseThrow(() -> new ResourceNotFoundException("Letter", id));
     if (!SbmLetter.FAILED.equals(letter.getStatus())) {
-      throw new BusinessRuleException("SBM_LETTER_NOT_FAILED", letter.getLetterNo() + " was not refused");
+      throw new BusinessRuleException(
+          "SBM_LETTER_NOT_FAILED", letter.getLetterNo() + " was not refused");
     }
     SbmPolicy p = policies.findById(letter.getPolicyId()).orElseThrow();
     deliver(p, letter);
@@ -288,20 +310,30 @@ public class LetterService {
    */
   public List<PrintHandOver> printBatches(Long companyId, LocalDate today) {
     Map<String, List<SbmLetter>> byType =
-        letters.findByCompanyIdAndChannelAndStatusOrderByIdAsc(companyId, PRINT, SbmLetter.GENERATED).stream()
-            .collect(Collectors.groupingBy(SbmLetter::getLetterType, LinkedHashMap::new, Collectors.toList()));
+        letters
+            .findByCompanyIdAndChannelAndStatusOrderByIdAsc(companyId, PRINT, SbmLetter.GENERATED)
+            .stream()
+            .collect(
+                Collectors.groupingBy(
+                    SbmLetter::getLetterType, LinkedHashMap::new, Collectors.toList()));
     List<PrintHandOver> out = new ArrayList<>();
     byType.forEach(
         (type, list) -> {
           List<PrintedLetter> printed =
               list.stream()
-                  .map(l -> {
-                    SbmPolicy p = policies.findById(l.getPolicyId()).orElseThrow();
-                    return new PrintedLetter(l.getLetterNo(), p.getAssured().assuredName(), l.getRecipient(), l.getStoredFileId());
-                  })
+                  .map(
+                      l -> {
+                        SbmPolicy p = policies.findById(l.getPolicyId()).orElseThrow();
+                        return new PrintedLetter(
+                            l.getLetterNo(),
+                            p.getAssured().assuredName(),
+                            l.getRecipient(),
+                            l.getStoredFileId());
+                      })
                   .toList();
           PrintHandOver batch =
-              mailHouse.handOver(new PrintRequest(companyId, SubmittedCodes.MODULE, type, today, printed));
+              mailHouse.handOver(
+                  new PrintRequest(companyId, SubmittedCodes.MODULE, type, today, printed));
           Long batchId =
               printBatches.findByBatchNo(batch.batchNo()).map(SbmPrintBatch::getId).orElse(null);
           list.forEach(l -> l.printed(batchId, clock.instant()));
@@ -331,9 +363,15 @@ public class LetterService {
     v.put("sumInsured", DisplayFormat.amount(p.getTerms().sumInsured()));
     v.put(
         "riskDescription",
-        p.getRisk().unitDescription() != null ? p.getRisk().unitDescription() : String.valueOf(p.getRisk().propertyLocation()));
-    v.put("bankCounterpart", p.getAssured().bankCounterpartEmail() == null ? "" : p.getAssured().bankCounterpartEmail());
-    v.put("findings", p.getAdequacyStatus() == null ? "no finding" : DisplayFormat.words(p.getAdequacyStatus()));
+        p.getRisk().unitDescription() != null
+            ? p.getRisk().unitDescription()
+            : String.valueOf(p.getRisk().propertyLocation()));
+    v.put(
+        "bankCounterpart",
+        p.getAssured().bankCounterpartEmail() == null ? "" : p.getAssured().bankCounterpartEmail());
+    v.put(
+        "findings",
+        p.getAdequacyStatus() == null ? "no finding" : DisplayFormat.words(p.getAdequacyStatus()));
     v.put("proposedInsurer", p.getTerms().insurerCode() == null ? "" : p.getTerms().insurerCode());
     return v;
   }

@@ -26,7 +26,10 @@ public record SbmRuleOutcome(
    * @return false when every part is empty
    */
   public boolean isEmpty() {
-    return bucket == null && tag == null && classification == null && raTemplate == null
+    return bucket == null
+        && tag == null
+        && classification == null
+        && raTemplate == null
         && flag == null;
   }
 }

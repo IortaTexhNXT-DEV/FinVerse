@@ -125,8 +125,12 @@ public class SetupService {
       throw new BusinessRuleException("SBM_LIMIT_EMPTY", "Enter at least one limit");
     }
     segment(l.segment());
-    SbmLimitRule r = id == null ? limits.save(new SbmLimitRule(companyId, l)) : changed(limits, id, x -> x.change(l));
-    audit.record(ENTITY, "limit " + r.getId(), AuditAction.UPDATE, "Limit rule of " + l.insurerCode());
+    SbmLimitRule r =
+        id == null
+            ? limits.save(new SbmLimitRule(companyId, l))
+            : changed(limits, id, x -> x.change(l));
+    audit.record(
+        ENTITY, "limit " + r.getId(), AuditAction.UPDATE, "Limit rule of " + l.insurerCode());
     return r;
   }
 
@@ -152,8 +156,11 @@ public class SetupService {
   public SbmInsurerRule saveInsurerRule(Long companyId, Long id, SbmInsurerRule.Row row) {
     segment(row.segment());
     SbmInsurerRule r =
-        id == null ? insurers.save(new SbmInsurerRule(companyId, row)) : changed(insurers, id, x -> x.change(row));
-    audit.record(ENTITY, "insurer " + r.getId(), AuditAction.UPDATE, "Insurer rule " + row.insurerCode());
+        id == null
+            ? insurers.save(new SbmInsurerRule(companyId, row))
+            : changed(insurers, id, x -> x.change(row));
+    audit.record(
+        ENTITY, "insurer " + r.getId(), AuditAction.UPDATE, "Insurer rule " + row.insurerCode());
     return r;
   }
 
@@ -190,8 +197,11 @@ public class SetupService {
       SbmPolicyStatus.valueOf(row.status());
     }
     SbmLetterRule r =
-        id == null ? letters.save(new SbmLetterRule(companyId, row)) : changed(letters, id, x -> x.change(row));
-    audit.record(ENTITY, "letter " + r.getId(), AuditAction.UPDATE, "Letter rule " + row.letterType());
+        id == null
+            ? letters.save(new SbmLetterRule(companyId, row))
+            : changed(letters, id, x -> x.change(row));
+    audit.record(
+        ENTITY, "letter " + r.getId(), AuditAction.UPDATE, "Letter rule " + row.letterType());
     return r;
   }
 
@@ -221,12 +231,19 @@ public class SetupService {
     try {
       Permission.valueOf(row.permission());
     } catch (IllegalArgumentException | NullPointerException e) {
-      throw new BusinessRuleException("SBM_MATRIX_PERMISSION", "Select the permission of the approvers");
+      throw new BusinessRuleException(
+          "SBM_MATRIX_PERMISSION", "Select the permission of the approvers");
     }
     segment(row.segment());
     SbmApprovalMatrix m =
-        id == null ? matrix.save(new SbmApprovalMatrix(companyId, row)) : changed(matrix, id, x -> x.change(row));
-    audit.record(ENTITY, "matrix " + m.getId(), AuditAction.UPDATE, row.document() + " level " + row.level());
+        id == null
+            ? matrix.save(new SbmApprovalMatrix(companyId, row))
+            : changed(matrix, id, x -> x.change(row));
+    audit.record(
+        ENTITY,
+        "matrix " + m.getId(),
+        AuditAction.UPDATE,
+        row.document() + " level " + row.level());
     return m;
   }
 
@@ -240,7 +257,8 @@ public class SetupService {
   public AuthorizableEntity authorize(String kind, Long id) {
     AuthorizableEntity e = find(kind, id);
     e.authorize(currentUser.username(), clock.instant());
-    audit.record(ENTITY, kind.toLowerCase(Locale.ROOT) + " " + id, AuditAction.AUTHORIZE, "Approved");
+    audit.record(
+        ENTITY, kind.toLowerCase(Locale.ROOT) + " " + id, AuditAction.AUTHORIZE, "Approved");
     return e;
   }
 
@@ -254,7 +272,8 @@ public class SetupService {
   public AuthorizableEntity deactivate(String kind, Long id) {
     AuthorizableEntity e = find(kind, id);
     e.deactivate();
-    audit.record(ENTITY, kind.toLowerCase(Locale.ROOT) + " " + id, AuditAction.DEACTIVATE, "Deactivated");
+    audit.record(
+        ENTITY, kind.toLowerCase(Locale.ROOT) + " " + id, AuditAction.DEACTIVATE, "Deactivated");
     return e;
   }
 
@@ -290,7 +309,8 @@ public class SetupService {
    * @return source
    */
   public SbmSource saveSource(Long id, String name, String mandatoryFields, boolean active) {
-    SbmSource s = sources.findById(id).orElseThrow(() -> new ResourceNotFoundException("Source", id));
+    SbmSource s =
+        sources.findById(id).orElseThrow(() -> new ResourceNotFoundException("Source", id));
     s.maintain(name, mandatoryFields, active);
     audit.record(ENTITY, "source " + s.getCode(), AuditAction.UPDATE, "Source changed");
     return s;
@@ -352,7 +372,8 @@ public class SetupService {
    * @param ownOnly own records only
    * @return scope
    */
-  public SbmUserScope saveScope(Long companyId, String username, List<String> segments, boolean ownOnly) {
+  public SbmUserScope saveScope(
+      Long companyId, String username, List<String> segments, boolean ownOnly) {
     segments.forEach(this::segment);
     SbmUserScope s =
         scopes

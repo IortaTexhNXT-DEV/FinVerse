@@ -5,9 +5,9 @@ import java.util.Optional;
 
 /**
  * Default {@link RenewalHandOff} before the Renewal module implements it (wave R3; cross-BRD
- * decision D2): the hand-off is only recorded as PENDING - no renewal account, hold cover or
- * letter - so there is never a second renewal path. The expiry scan offers the pending hand-offs
- * again, so they are replayed once the Renewal adapter is deployed.
+ * decision D2): the hand-off is only recorded as PENDING - no renewal account, hold cover or letter
+ * - so there is never a second renewal path. The expiry scan offers the pending hand-offs again, so
+ * they are replayed once the Renewal adapter is deployed.
  */
 public class PendingRenewalHandOff implements RenewalHandOff {
 

@@ -79,7 +79,10 @@ public final class SbmRuleEngine {
     if (a.isPresent() && e.isPresent()) {
       return a.get().compareTo(e.get()) == 0;
     }
-    return actual.strip().toUpperCase(Locale.ROOT).equals(expected.strip().toUpperCase(Locale.ROOT));
+    return actual
+        .strip()
+        .toUpperCase(Locale.ROOT)
+        .equals(expected.strip().toUpperCase(Locale.ROOT));
   }
 
   private static List<String> list(String value) {

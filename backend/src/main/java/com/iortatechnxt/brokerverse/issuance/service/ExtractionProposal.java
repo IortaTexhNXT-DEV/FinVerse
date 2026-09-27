@@ -10,7 +10,8 @@ import java.util.Map;
  * @param readable false when no text could be read (scanned document without OCR)
  * @param note what is missing or why nothing was read, may be null
  */
-public record ExtractionProposal(Map<String, ExtractedValue> fields, boolean readable, String note) {
+public record ExtractionProposal(
+    Map<String, ExtractedValue> fields, boolean readable, String note) {
 
   /** Defensive copy. */
   public ExtractionProposal {

@@ -83,7 +83,10 @@ public class HandlingFeeBillingHandler implements BulkImportHandler {
     }
     String sbmNo = row.text(SBM_NO);
     if (sbmNo != null
-        && policies.findBySbmNo(sbmNo).filter(p -> p.getCompanyId().equals(context.companyId())).isEmpty()) {
+        && policies
+            .findBySbmNo(sbmNo)
+            .filter(p -> p.getCompanyId().equals(context.companyId()))
+            .isEmpty()) {
       errors.add("Masterlist number " + sbmNo + " is unknown");
     }
     return errors;

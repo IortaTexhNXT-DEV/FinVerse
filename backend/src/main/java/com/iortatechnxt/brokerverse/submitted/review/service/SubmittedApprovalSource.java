@@ -80,10 +80,12 @@ public class SubmittedApprovalSource implements PendingApprovalSource {
       document(viewer, DocumentApprovals.IAAF, i, i.getPolicyId(), "IAAF").ifPresent(out::add);
     }
     for (SbmTor t : tors.findByStatus(SbmDocStatus.FOR_APPROVAL)) {
-      document(viewer, DocumentApprovals.TOR, t, t.getPolicyId(), "Terms of Reference").ifPresent(out::add);
+      document(viewer, DocumentApprovals.TOR, t, t.getPolicyId(), "Terms of Reference")
+          .ifPresent(out::add);
     }
     if (viewer.can(APPROVE)) {
-      for (SbmRuleSet s : ruleSets.findByStatusInOrderByIdAsc(List.of(SbmRuleSetStatus.SUBMITTED))) {
+      for (SbmRuleSet s :
+          ruleSets.findByStatusInOrderByIdAsc(List.of(SbmRuleSetStatus.SUBMITTED))) {
         if (viewer.mayApproveItemOf(s.getSubmittedBy())) {
           out.add(
               new PendingApproval(
@@ -101,10 +103,40 @@ public class SubmittedApprovalSource implements PendingApprovalSource {
       }
     }
     Scope scope = new Scope(MODULE, APPROVE);
-    out.addAll(masters.pending(viewer, scope, SbmLimitRule.class, r -> facts("Limit rule", r.getInsurerCode(), r.getDescription(), r.getCompanyId())));
-    out.addAll(masters.pending(viewer, scope, SbmInsurerRule.class, r -> facts("Insurer rule", r.getSegment() + " " + r.getInsurerCode(), r.getDescription(), r.getCompanyId())));
-    out.addAll(masters.pending(viewer, scope, SbmLetterRule.class, r -> facts("Letter rule", r.getLetterType(), r.getDescription(), r.getCompanyId())));
-    out.addAll(masters.pending(viewer, scope, SbmApprovalMatrix.class, r -> facts("Approval level", r.getDocument() + " level " + r.getLevel(), r.getSignatoryTitle(), r.getCompanyId())));
+    out.addAll(
+        masters.pending(
+            viewer,
+            scope,
+            SbmLimitRule.class,
+            r -> facts("Limit rule", r.getInsurerCode(), r.getDescription(), r.getCompanyId())));
+    out.addAll(
+        masters.pending(
+            viewer,
+            scope,
+            SbmInsurerRule.class,
+            r ->
+                facts(
+                    "Insurer rule",
+                    r.getSegment() + " " + r.getInsurerCode(),
+                    r.getDescription(),
+                    r.getCompanyId())));
+    out.addAll(
+        masters.pending(
+            viewer,
+            scope,
+            SbmLetterRule.class,
+            r -> facts("Letter rule", r.getLetterType(), r.getDescription(), r.getCompanyId())));
+    out.addAll(
+        masters.pending(
+            viewer,
+            scope,
+            SbmApprovalMatrix.class,
+            r ->
+                facts(
+                    "Approval level",
+                    r.getDocument() + " level " + r.getLevel(),
+                    r.getSignatoryTitle(),
+                    r.getCompanyId())));
     return out;
   }
 
@@ -131,7 +163,11 @@ public class SubmittedApprovalSource implements PendingApprovalSource {
             MODULE,
             type,
             d.number(),
-            p.getAssured().assuredName() + " - level " + d.getCurrentLevel() + " of " + d.getTotalLevels(),
+            p.getAssured().assuredName()
+                + " - level "
+                + d.getCurrentLevel()
+                + " of "
+                + d.getTotalLevels(),
             p.getTerms().sumInsured(),
             p.getTerms().currency(),
             d.getCreatedBy(),
@@ -140,7 +176,8 @@ public class SubmittedApprovalSource implements PendingApprovalSource {
             DocumentApprovals.linkOf(doc, d)));
   }
 
-  private static RecordFacts facts(String type, String reference, String description, Long companyId) {
+  private static RecordFacts facts(
+      String type, String reference, String description, Long companyId) {
     return new RecordFacts(type, reference, description, companyId, SETUP_LINK);
   }
 }

@@ -96,7 +96,7 @@ public final class PolicyDtos {
           p.getStatus().name(),
           p.getHandlerUsername(),
           p.getConversionStatus(),
-          flags(p),
+          flagsOf(p),
           p.getFalloutReason());
     }
   }
@@ -107,7 +107,7 @@ public final class PolicyDtos {
    * @param p record
    * @return flags
    */
-  public static List<String> flags(SbmPolicy p) {
+  public static List<String> flagsOf(SbmPolicy p) {
     List<String> flags = new java.util.ArrayList<>();
     if (p.getRenewalTag() != null) {
       flags.add(p.getRenewalTag());
@@ -182,7 +182,8 @@ public final class PolicyDtos {
               p.isHasDocuments(),
               p.getCreatedBy(),
               p.getCreatedAt()),
-          new Renewal(p.getRenewalRef(), p.getRenewalArn(), p.getBookedInvoiceNo(), p.getBookedOn()));
+          new Renewal(
+              p.getRenewalRef(), p.getRenewalArn(), p.getBookedInvoiceNo(), p.getBookedOn()));
     }
   }
 
@@ -242,7 +243,8 @@ public final class PolicyDtos {
    * @param bookedInvoiceNo booked invoice
    * @param bookedOn booking date
    */
-  public record Renewal(String renewalRef, String arn, String bookedInvoiceNo, LocalDate bookedOn) {}
+  public record Renewal(
+      String renewalRef, String arn, String bookedInvoiceNo, LocalDate bookedOn) {}
 
   /**
    * A new or edited record (FR-SP-003).

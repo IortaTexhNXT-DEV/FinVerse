@@ -25,7 +25,8 @@ public final class SbmPolicyChecks {
           Map.entry("totalPremium", new Field("Total premium", d -> d.terms().totalPremium())),
           Map.entry("pnNo", new Field("PN", d -> d.loan().pnNo())),
           Map.entry("borrowerName", new Field("Borrower", d -> d.loan().borrowerName())),
-          Map.entry("mailingAddress", new Field("Mailing address", d -> d.assured().mailingAddress())));
+          Map.entry(
+              "mailingAddress", new Field("Mailing address", d -> d.assured().mailingAddress())));
 
   private SbmPolicyChecks() {}
 

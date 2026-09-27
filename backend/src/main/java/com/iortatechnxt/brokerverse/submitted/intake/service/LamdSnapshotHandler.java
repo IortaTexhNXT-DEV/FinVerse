@@ -69,13 +69,13 @@ public class LamdSnapshotHandler implements BulkImportHandler {
     return List.of(
         BulkColumn.required(PN, "Promissory note number of the loan", "PN-2026-000123"),
         BulkColumn.optional("Borrower", "Borrower name", "Juan Dela Cruz"),
-        BulkColumn.required(
-            STATUS, "Active, Open Market, Fully Paid or Remedial", "Active"),
+        BulkColumn.required(STATUS, "Active, Open Market, Fully Paid or Remedial", "Active"),
         new BulkColumn("Amortised", "Y when the loan is amortised", false, Type.YES_NO, "N"),
         new BulkColumn("Maturity Date", "Loan maturity date", false, Type.DATE, "2029-06-30"),
         BulkColumn.optional("Originating Unit", "Originating unit", "Auto Loans"),
         new BulkColumn("Balance", "Outstanding balance", false, Type.NUMBER, "450000.00"),
-        BulkColumn.optional("Serial No", "Chassis or serial number of the collateral", "MHFA1234567"),
+        BulkColumn.optional(
+            "Serial No", "Chassis or serial number of the collateral", "MHFA1234567"),
         BulkColumn.optional("Motor No", "Engine or motor number of the collateral", "2NR1234567"));
   }
 
@@ -84,7 +84,8 @@ public class LamdSnapshotHandler implements BulkImportHandler {
     String v = value.trim().replaceAll("\\s+", " ");
     return switch (header) {
       case PN, "Serial No", "Motor No" -> BulkImportHandler.identifier(v);
-      case STATUS -> v.toUpperCase(Locale.ROOT).replace(' ', '_').replace("REMEDIAL_(RMU)", "REMEDIAL");
+      case STATUS ->
+          v.toUpperCase(Locale.ROOT).replace(' ', '_').replace("REMEDIAL_(RMU)", "REMEDIAL");
       default -> v;
     };
   }

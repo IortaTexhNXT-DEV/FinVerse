@@ -22,8 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
  * The expiry scan (BRIDSP-23; FRS FR-SP-060; job {@code SBM_EXPIRY_SCAN}): the For Renewal records
  * whose expiry falls within the lead days of their segment are handed to Renewal with the insurer
  * of the insurer rules, except the segments renewed by hand; a record no insurer rule fits stays
- * For Renewal in the fallout with reason NO_INSURER. The hand-offs still pending are offered to
- * the Renewal module again (replay once it is connected).
+ * For Renewal in the fallout with reason NO_INSURER. The hand-offs still pending are offered to the
+ * Renewal module again (replay once it is connected).
  */
 @Service
 @Transactional
@@ -103,8 +103,7 @@ public class ExpiryScanService {
         renewals.findByCompanyIdAndHandoffStatusInAndOutcome(
             companyId, List.of(SbmRenewal.PENDING), SbmRenewal.IN_PROGRESS)) {
       SbmPolicy p = policies.findById(r.getPolicyId()).orElse(null);
-      if (p != null
-          && handOffs.offer(p, r).outcome() == RenewalHandOff.Outcome.HANDED_OFF) {
+      if (p != null && handOffs.offer(p, r).outcome() == RenewalHandOff.Outcome.HANDED_OFF) {
         replayed++;
       }
     }

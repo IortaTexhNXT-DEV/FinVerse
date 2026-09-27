@@ -40,10 +40,10 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * What Submitted Policies follows of a renewal after the hand-off (BRIDSP-24, 26, 27, 32; FRS
  * FR-SP-063-065): the renewal account (its ARN names the masterlist number), its status (Placed,
- * Booked with the invoice), the status the Renewal module answers for a closed renewal (Not
- * Renewed with the reason), the hold cover watch (insurer not accepted within the acceptance days,
- * hold cover of an unbooked account ending soon) and the insurer re-assignment while the hold
- * cover request is open.
+ * Booked with the invoice), the status the Renewal module answers for a closed renewal (Not Renewed
+ * with the reason), the hold cover watch (insurer not accepted within the acceptance days, hold
+ * cover of an unbooked account ending soon) and the insurer re-assignment while the hold cover
+ * request is open.
  */
 @Service
 @Transactional
@@ -133,13 +133,18 @@ public class RenewalFollowService {
               }
               p.renewal(p.getRenewalRef(), arn);
               if (to == AccountStatus.READY_FOR_PLACEMENT) {
-                notifyHandler(p, "Renewal of " + p.getSbmNo() + " ready for placement", "SBM_PLACEMENT_READY");
+                notifyHandler(
+                    p,
+                    "Renewal of " + p.getSbmNo() + " ready for placement",
+                    "SBM_PLACEMENT_READY");
               } else if (to == AccountStatus.PLACED
                   && p.getStatus() == SbmPolicyStatus.RENEWAL_IN_PROGRESS) {
                 flow.system(p, "placed", "Placement slip sent (" + arn + ")");
                 p.convert(CONVERSION_PLACED);
-                history.note(p, "Renewal", "Placed with the insurer", SbmHistorySource.RENEWAL, arn);
-                notifyHandler(p, "Renewal of " + p.getSbmNo() + " sent to the insurer", "SBM_PLACEMENT_SENT");
+                history.note(
+                    p, "Renewal", "Placed with the insurer", SbmHistorySource.RENEWAL, arn);
+                notifyHandler(
+                    p, "Renewal of " + p.getSbmNo() + " sent to the insurer", "SBM_PLACEMENT_SENT");
               }
             });
   }
@@ -153,8 +158,10 @@ public class RenewalFollowService {
    */
   public void booked(String arn, String invoiceNo, LocalDate bookingDate) {
     recordOf(arn)
-        .filter(p -> p.getStatus() == SbmPolicyStatus.RENEWAL_IN_PROGRESS
-            || p.getStatus() == SbmPolicyStatus.PLACED)
+        .filter(
+            p ->
+                p.getStatus() == SbmPolicyStatus.RENEWAL_IN_PROGRESS
+                    || p.getStatus() == SbmPolicyStatus.PLACED)
         .ifPresent(
             p -> {
               p.renewal(p.getRenewalRef(), arn);
@@ -162,8 +169,17 @@ public class RenewalFollowService {
               p.convert(CONVERSION_RENEWED);
               flow.system(p, "booked", "Invoice " + invoiceNo);
               renewals.findByPolicyId(p.getId()).ifPresent(r -> r.close(CONVERSION_RENEWED, null));
-              history.note(p, "Renewal", "Booked, invoice " + invoiceNo, SbmHistorySource.BOOKING, invoiceNo);
-              audit.record(SubmittedCodes.ENTITY, p.getSbmNo(), AuditAction.UPDATE, "Renewal booked " + invoiceNo);
+              history.note(
+                  p,
+                  "Renewal",
+                  "Booked, invoice " + invoiceNo,
+                  SbmHistorySource.BOOKING,
+                  invoiceNo);
+              audit.record(
+                  SubmittedCodes.ENTITY,
+                  p.getSbmNo(),
+                  AuditAction.UPDATE,
+                  "Renewal booked " + invoiceNo);
             });
   }
 
@@ -229,10 +245,16 @@ public class RenewalFollowService {
           default -> "DECLINED";
         };
     r.close(outcome, s.reason());
-    if (p.getStatus() == SbmPolicyStatus.RENEWAL_IN_PROGRESS || p.getStatus() == SbmPolicyStatus.PLACED) {
+    if (p.getStatus() == SbmPolicyStatus.RENEWAL_IN_PROGRESS
+        || p.getStatus() == SbmPolicyStatus.PLACED) {
       flow.system(p, "not_renewed", s.reason() == null ? "Not renewed" : s.reason());
       p.convert("UNRENEWED");
-      history.note(p, "Renewal", "Not renewed: " + (s.reason() == null ? "" : s.reason()), SbmHistorySource.RENEWAL, s.renewalRef());
+      history.note(
+          p,
+          "Renewal",
+          "Not renewed: " + (s.reason() == null ? "" : s.reason()),
+          SbmHistorySource.RENEWAL,
+          s.renewalRef());
     }
     return true;
   }
@@ -255,9 +277,24 @@ public class RenewalFollowService {
             && p.getBookedInvoiceNo() == null
             && !c.getExpiryDate().minusDays(parameters.unbookedAlertDays()).isAfter(today);
     if (notAccepted) {
-      raise(p, r, "SBM_INSURER_NOT_ACCEPTED", "The insurer " + c.getInsurerCode() + " has not accepted the hold cover of " + r.getArn());
+      raise(
+          p,
+          r,
+          "SBM_INSURER_NOT_ACCEPTED",
+          "The insurer "
+              + c.getInsurerCode()
+              + " has not accepted the hold cover of "
+              + r.getArn());
     } else if (unbooked) {
-      raise(p, r, "SBM_HOLD_COVER_UNBOOKED", "The hold cover of " + r.getArn() + " ends on " + c.getExpiryDate() + " and the account is not booked");
+      raise(
+          p,
+          r,
+          "SBM_HOLD_COVER_UNBOOKED",
+          "The hold cover of "
+              + r.getArn()
+              + " ends on "
+              + c.getExpiryDate()
+              + " and the account is not booked");
     } else {
       return false;
     }
@@ -297,7 +334,9 @@ public class RenewalFollowService {
                 () ->
                     new BusinessRuleException(
                         "SBM_NO_RENEWAL_ACCOUNT",
-                        "Policy " + p.getSbmNo() + " has no renewal account with a hold cover yet"));
+                        "Policy "
+                            + p.getSbmNo()
+                            + " has no renewal account with a hold cover yet"));
     if (reasonCode == null || reasonCode.isBlank()) {
       throw new BusinessRuleException("SBM_REASON_REQUIRED", "Select the reason");
     }
@@ -308,8 +347,13 @@ public class RenewalFollowService {
     }
     holdCovers.reassign(r.getArn(), insurerCode, reasonCode);
     r.reassigned(insurerCode);
-    history.note(p, "Renewal", "Insurer re-assigned to " + insurerCode, SbmHistorySource.MANUAL, r.getArn());
-    audit.record(SubmittedCodes.ENTITY, p.getSbmNo(), AuditAction.UPDATE, "Insurer re-assigned to " + insurerCode);
+    history.note(
+        p, "Renewal", "Insurer re-assigned to " + insurerCode, SbmHistorySource.MANUAL, r.getArn());
+    audit.record(
+        SubmittedCodes.ENTITY,
+        p.getSbmNo(),
+        AuditAction.UPDATE,
+        "Insurer re-assigned to " + insurerCode);
     return r;
   }
 
@@ -318,7 +362,12 @@ public class RenewalFollowService {
       return;
     }
     Notice notice =
-        new Notice(title, p.getAssured().assuredName(), SubmittedCodes.link(p.getId()), SubmittedCodes.ENTITY, p.getId().toString());
+        new Notice(
+            title,
+            p.getAssured().assuredName(),
+            SubmittedCodes.link(p.getId()),
+            SubmittedCodes.ENTITY,
+            p.getId().toString());
     if (event == null) {
       notifications.notifyUser(p.getHandlerUsername(), notice);
     } else {

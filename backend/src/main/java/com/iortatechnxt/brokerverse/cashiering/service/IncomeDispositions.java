@@ -165,7 +165,9 @@ public class IncomeDispositions {
     }
     BigDecimal vat =
         Money.round(
-            amount.multiply(rate).divide(BigDecimal.ONE.add(rate), RATE_SCALE, RoundingMode.HALF_UP));
+            amount
+                .multiply(rate)
+                .divide(BigDecimal.ONE.add(rate), RATE_SCALE, RoundingMode.HALF_UP));
     return new Split(amount.subtract(vat), vat);
   }
 

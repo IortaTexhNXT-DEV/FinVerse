@@ -65,7 +65,7 @@ public class SbmRule extends BaseEntity {
    *
    * @param content priority, name, conditions, outcome, reason, stop and active
    */
-  public void change(Content content) {
+  public final void change(Content content) {
     this.priority = content.priority();
     this.name = content.name();
     this.outcome = content.outcome();

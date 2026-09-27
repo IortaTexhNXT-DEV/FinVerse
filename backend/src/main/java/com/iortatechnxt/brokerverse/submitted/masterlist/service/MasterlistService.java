@@ -35,8 +35,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The Submitted Masterlist (BRIDSP-03, 04, 29; FRS FR-SP-003, 010, 012): manual entry and edit,
- * the create-or-update of a record on its natural key (intake, extraction, migration), the manual
+ * The Submitted Masterlist (BRIDSP-03, 04, 29; FRS FR-SP-003, 010, 012): manual entry and edit, the
+ * create-or-update of a record on its natural key (intake, extraction, migration), the manual
  * renewal tag, the tracking fields and the handlers' actions (dispose, exclude, reinstate, close).
  * Every change writes the field history and the audit trail.
  */
@@ -172,8 +172,8 @@ public class MasterlistService {
   }
 
   /**
-   * Creates a record, or updates the one with the same natural key (intake, extraction,
-   * migration; BRIDSP-01 R2). A record already in the renewal is not changed (DUPLICATE).
+   * Creates a record, or updates the one with the same natural key (intake, extraction, migration;
+   * BRIDSP-01 R2). A record already in the renewal is not changed (DUPLICATE).
    *
    * @param companyId company
    * @param data policy data
@@ -219,7 +219,11 @@ public class MasterlistService {
             other -> {
               throw new BusinessRuleException(
                   "SBM_POLICY_EXISTS",
-                  "Policy " + label(data) + " is already in the masterlist (" + other.getSbmNo() + ")");
+                  "Policy "
+                      + label(data)
+                      + " is already in the masterlist ("
+                      + other.getSbmNo()
+                      + ")");
             });
     write(p, data, SbmHistorySource.MANUAL, null);
     audit.record(SubmittedCodes.ENTITY, p.getSbmNo(), AuditAction.UPDATE, "Policy details edited");
@@ -365,7 +369,8 @@ public class MasterlistService {
       p.fallout(null, p.getLastRunNo());
     }
     history.record(p, before, SbmHistorySource.MANUAL, null);
-    audit.record(SubmittedCodes.ENTITY, p.getSbmNo(), AuditAction.UPDATE, action + " " + reasonCode);
+    audit.record(
+        SubmittedCodes.ENTITY, p.getSbmNo(), AuditAction.UPDATE, action + " " + reasonCode);
     return p;
   }
 

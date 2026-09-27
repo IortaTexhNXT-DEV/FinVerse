@@ -70,7 +70,9 @@ public class MigrationHandler implements BulkImportHandler {
    * @param statusMap legacy status map
    */
   public MigrationHandler(
-      MasterlistService masterlist, SbmPolicyRepository policies, SbmStatusMapRepository statusMap) {
+      MasterlistService masterlist,
+      SbmPolicyRepository policies,
+      SbmStatusMapRepository statusMap) {
     this.masterlist = masterlist;
     this.policies = policies;
     this.statusMap = statusMap;
@@ -94,9 +96,15 @@ public class MigrationHandler implements BulkImportHandler {
   @Override
   public List<BulkColumn> columns() {
     List<BulkColumn> c = new ArrayList<>();
-    c.add(BulkColumn.required(LEGACY_REF, "Reference of the policy in the Excel masterlist", "NBM-2025-0457"));
-    c.add(BulkColumn.required(LEGACY_STATUS, "Submission status in the Excel masterlist", "For Renewal"));
-    c.add(new BulkColumn(DATE_RECEIVED, "Date the policy was received", true, Type.DATE, "2025-06-15"));
+    c.add(
+        BulkColumn.required(
+            LEGACY_REF, "Reference of the policy in the Excel masterlist", "NBM-2025-0457"));
+    c.add(
+        BulkColumn.required(
+            LEGACY_STATUS, "Submission status in the Excel masterlist", "For Renewal"));
+    c.add(
+        new BulkColumn(
+            DATE_RECEIVED, "Date the policy was received", true, Type.DATE, "2025-06-15"));
     c.addAll(SourceColumns.columns());
     return List.copyOf(c);
   }
@@ -145,7 +153,8 @@ public class MigrationHandler implements BulkImportHandler {
     SbmStatusMap mapped = statusMap.findByLegacyStatus(row.text(LEGACY_STATUS)).orElseThrow();
     String legacyRef = row.text(LEGACY_REF);
     SbmPolicyData data = data(row, context);
-    Optional<SbmPolicy> earlier = policies.findFirstByCompanyIdAndLegacyRef(context.companyId(), legacyRef);
+    Optional<SbmPolicy> earlier =
+        policies.findFirstByCompanyIdAndLegacyRef(context.companyId(), legacyRef);
     if (earlier.isPresent()) {
       SbmPolicy p = earlier.get();
       if (p.getStatus().isProcessable()) {
@@ -176,7 +185,8 @@ public class MigrationHandler implements BulkImportHandler {
 
   @Override
   public List<String> outcomeCategories() {
-    return List.of(SourceIntakeHandler.CREATED, SourceIntakeHandler.UPDATED, SourceIntakeHandler.DUPLICATE);
+    return List.of(
+        SourceIntakeHandler.CREATED, SourceIntakeHandler.UPDATED, SourceIntakeHandler.DUPLICATE);
   }
 
   private static SbmPolicyData data(BulkRow row, BulkContext context) {

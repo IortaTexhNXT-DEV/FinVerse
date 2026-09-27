@@ -14,9 +14,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * {@code SBM_HOLD_COVER_WATCH} (BRIDSP-24, 32; cron {@code brokerverse.jobs.sbm-hold-cover-watch-cron},
- * 07:00 PHT): per company, the status of the handed-over renewals read from the Renewal module,
- * the insurers that have not accepted the hold cover and the hold covers of unbooked accounts.
+ * {@code SBM_HOLD_COVER_WATCH} (BRIDSP-24, 32; cron {@code
+ * brokerverse.jobs.sbm-hold-cover-watch-cron}, 07:00 PHT): per company, the status of the
+ * handed-over renewals read from the Renewal module, the insurers that have not accepted the hold
+ * cover and the hold covers of unbooked accounts.
  */
 @Component
 public class HoldCoverWatchJob implements ManagedJob {
@@ -80,6 +81,7 @@ public class HoldCoverWatchJob implements ManagedJob {
         LOG.warn("Hold cover watch of {} failed: {}", company.getCode(), e.getMessage());
       }
     }
-    return new JobOutcome(alerted + closed, alerted + " alerted, " + closed + " closed as not renewed");
+    return new JobOutcome(
+        alerted + closed, alerted + " alerted, " + closed + " closed as not renewed");
   }
 }

@@ -150,4 +150,13 @@ public interface SbmPolicyRepository
    */
   @Query("select distinct p.companyId from SbmPolicy p")
   List<Long> companies();
+
+  /**
+   * Whether a record of a company has a natural key (seed idempotency).
+   *
+   * @param companyId company
+   * @param naturalKey PN or policy key
+   * @return true when present
+   */
+  boolean existsByCompanyIdAndNaturalKey(Long companyId, String naturalKey);
 }

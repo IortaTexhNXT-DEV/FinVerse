@@ -18,8 +18,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 /**
  * {@code SBM_PROCESSING} (BRIDSP-09; FRS FR-SP-021; cron {@code
  * brokerverse.jobs.sbm-processing-cron}, 21:30 PHT): for every company, one processing run of the
- * records received, validated, classified, in review or waiting for a manual disposition, in
- * chunks of 200 records per transaction so a failing chunk does not undo the others.
+ * records received, validated, classified, in review or waiting for a manual disposition, in chunks
+ * of 200 records per transaction so a failing chunk does not undo the others.
  */
 @Component
 public class ProcessingJob implements ManagedJob {
@@ -98,6 +98,8 @@ public class ProcessingJob implements ManagedJob {
     }
     return new JobOutcome(
         processed,
-        processed + " submitted policies processed" + (failedChunks > 0 ? ", " + failedChunks + " chunk(s) failed" : ""));
+        processed
+            + " submitted policies processed"
+            + (failedChunks > 0 ? ", " + failedChunks + " chunk(s) failed" : ""));
   }
 }

@@ -150,7 +150,8 @@ public class RunController {
             : results.findByRunIdAndOutcomeOrderByIdAsc(id, outcome, pageable);
     Map<Long, SbmPolicy> byId =
         policies
-            .findAllById(page.getContent().stream().map(SbmRunResult::getPolicyId).distinct().toList())
+            .findAllById(
+                page.getContent().stream().map(SbmRunResult::getPolicyId).distinct().toList())
             .stream()
             .filter(scope.current(run.getCompanyId())::allows)
             .collect(Collectors.toMap(SbmPolicy::getId, Function.identity()));

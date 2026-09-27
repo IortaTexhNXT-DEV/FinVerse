@@ -42,7 +42,7 @@ public class SbmStatusMap extends BaseEntity {
    * @param newStatus status
    * @param newBucket bucket, may be null
    */
-  public void maintain(SbmPolicyStatus newStatus, String newBucket) {
+  public final void maintain(SbmPolicyStatus newStatus, String newBucket) {
     this.status = newStatus;
     this.bucket = newBucket;
   }

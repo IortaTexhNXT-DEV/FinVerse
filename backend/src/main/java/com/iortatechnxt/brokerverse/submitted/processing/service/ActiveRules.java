@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 
 /**
  * The active rules of a company for one run (BRIDSP-08): the ACTIVE rule sets in force at the
- * business date, and per step the rules of the sets whose segment and business type fit the
- * record, highest priority first, each with the rule set that holds it.
+ * business date, and per step the rules of the sets whose segment and business type fit the record,
+ * highest priority first, each with the rule set that holds it.
  *
  * @param sets active rule sets by id
  * @param rules active rules of those sets

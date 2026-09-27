@@ -50,7 +50,7 @@ public class SbmUserScope extends BaseEntity {
    * @param newSegments segments, empty for all
    * @param own own records only
    */
-  public void maintain(List<String> newSegments, boolean own) {
+  public final void maintain(List<String> newSegments, boolean own) {
     this.segments =
         newSegments == null || newSegments.isEmpty() ? null : String.join(",", newSegments);
     this.ownRecordsOnly = own;

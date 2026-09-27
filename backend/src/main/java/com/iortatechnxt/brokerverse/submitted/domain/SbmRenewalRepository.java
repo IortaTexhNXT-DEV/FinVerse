@@ -34,4 +34,36 @@ public interface SbmRenewalRepository extends JpaRepository<SbmRenewal, Long> {
    */
   List<SbmRenewal> findByCompanyIdAndHandoffStatusInAndOutcome(
       Long companyId, Collection<String> statuses, String outcome);
+
+  /**
+   * The hand-offs of a company, newest first (renewal work list).
+   *
+   * @param companyId company
+   * @param pageable page
+   * @return hand-offs
+   */
+  org.springframework.data.domain.Page<SbmRenewal> findByCompanyIdOrderByIdDesc(
+      Long companyId, org.springframework.data.domain.Pageable pageable);
+
+  /**
+   * The hand-offs of a company in hand-off statuses, newest first.
+   *
+   * @param companyId company
+   * @param statuses statuses
+   * @param pageable page
+   * @return hand-offs
+   */
+  org.springframework.data.domain.Page<SbmRenewal> findByCompanyIdAndHandoffStatusInOrderByIdDesc(
+      Long companyId,
+      Collection<String> statuses,
+      org.springframework.data.domain.Pageable pageable);
+
+  /**
+   * Count of a company in a hand-off status (home).
+   *
+   * @param companyId company
+   * @param handoffStatus status
+   * @return count
+   */
+  long countByCompanyIdAndHandoffStatus(Long companyId, String handoffStatus);
 }

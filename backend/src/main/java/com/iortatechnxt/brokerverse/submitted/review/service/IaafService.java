@@ -41,9 +41,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Policy reviews and the IAAF (BRIDSP-05-07; FRS FR-SP-040, 041): the reviewer records each review
  * of a record in review; findings are e-mailed to the bank counterpart; once the last review is
- * adequate the reviewer generates the one IAAF of the policy, links related policies and submits
- * it to the IAAF matrix. The last approval renders the signed PDF; Send to Bank Counterpart
- * e-mails it and issues the IAAF.
+ * adequate the reviewer generates the one IAAF of the policy, links related policies and submits it
+ * to the IAAF matrix. The last approval renders the signed PDF; Send to Bank Counterpart e-mails it
+ * and issues the IAAF.
  */
 @Service
 @Transactional
@@ -142,7 +142,8 @@ public class IaafService {
         "Review " + r.getReviewNo() + ": " + DisplayFormat.words(content.adequacy()),
         SbmHistorySource.MANUAL,
         null);
-    audit.record(SubmittedCodes.ENTITY, p.getSbmNo(), AuditAction.CREATE, "Review " + r.getReviewNo());
+    audit.record(
+        SubmittedCodes.ENTITY, p.getSbmNo(), AuditAction.CREATE, "Review " + r.getReviewNo());
     return r;
   }
 
@@ -197,8 +198,8 @@ public class IaafService {
   }
 
   /**
-   * Generates the IAAF of a policy (one per policy) once its last review is adequate, with links
-   * to related policies.
+   * Generates the IAAF of a policy (one per policy) once its last review is adequate, with links to
+   * related policies.
    *
    * @param policyId record
    * @param related related policies and their relation
@@ -211,7 +212,8 @@ public class IaafService {
         .ifPresent(
             i -> {
               throw new BusinessRuleException(
-                  "SBM_IAAF_EXISTS", "Policy " + p.getSbmNo() + " already has IAAF " + i.getIaafNo());
+                  "SBM_IAAF_EXISTS",
+                  "Policy " + p.getSbmNo() + " already has IAAF " + i.getIaafNo());
             });
     List<SbmIaafReview> done = reviews.findByPolicyIdOrderByReviewNoAsc(policyId);
     if (done.isEmpty() || !SbmIaafReview.ADEQUATE.equals(done.get(done.size() - 1).getAdequacy())) {
@@ -222,11 +224,18 @@ public class IaafService {
     SbmIaaf i =
         iaafs.save(
             new SbmIaaf(
-                p.getCompanyId(), numbers.next("IAAF-" + BusinessClock.today(clock).getYear()), policyId));
+                p.getCompanyId(),
+                numbers.next("IAAF-" + BusinessClock.today(clock).getYear()),
+                policyId));
     done.forEach(r -> r.iaaf(i.getId()));
     link(i, related);
-    approvals.start(DocumentApprovals.IAAF, i, p.getAssured().assuredName(), DocumentApprovals.linkOf(DocumentApprovals.IAAF, i));
-    history.note(p, "IAAF", "IAAF " + i.getIaafNo() + " generated", SbmHistorySource.MANUAL, i.getIaafNo());
+    approvals.start(
+        DocumentApprovals.IAAF,
+        i,
+        p.getAssured().assuredName(),
+        DocumentApprovals.linkOf(DocumentApprovals.IAAF, i));
+    history.note(
+        p, "IAAF", "IAAF " + i.getIaafNo() + " generated", SbmHistorySource.MANUAL, i.getIaafNo());
     audit.record(ENTITY, i.getIaafNo(), AuditAction.CREATE, "IAAF of " + p.getSbmNo());
     return i;
   }
@@ -276,9 +285,11 @@ public class IaafService {
       Rendered pdf = render(i, p);
       i.signedPdf(pdf.attachmentId());
       i.rendered(pdf.versionNo());
-      history.note(p, "IAAF", "IAAF " + i.getIaafNo() + " approved", SbmHistorySource.MANUAL, i.getIaafNo());
+      history.note(
+          p, "IAAF", "IAAF " + i.getIaafNo() + " approved", SbmHistorySource.MANUAL, i.getIaafNo());
     }
-    audit.record(ENTITY, i.getIaafNo(), AuditAction.AUTHORIZE, last ? "Approved" : "Level approved");
+    audit.record(
+        ENTITY, i.getIaafNo(), AuditAction.AUTHORIZE, last ? "Approved" : "Level approved");
     return i;
   }
 
@@ -311,15 +322,17 @@ public class IaafService {
       throw new BusinessRuleException(
           "SBM_NO_COUNTERPART", "Enter the e-mail of the bank counterpart on the policy first");
     }
-    byte[] pdf =
-        i.getAttachmentId() == null ? render(i, p).pdf() : pdfs.read(i.getAttachmentId());
+    byte[] pdf = i.getAttachmentId() == null ? render(i, p).pdf() : pdfs.read(i.getAttachmentId());
     messages.queueEmail(
         new OutboundEmail(
             p.getCompanyId(),
             "SBM_IAAF",
             List.of(to),
             List.of(),
-            "Insurance Adequacy Assessment Form " + i.getIaafNo() + " - " + p.getAssured().assuredName(),
+            "Insurance Adequacy Assessment Form "
+                + i.getIaafNo()
+                + " - "
+                + p.getAssured().assuredName(),
             "Please find attached the Insurance Adequacy Assessment Form of the policy "
                 + nz(p.getTerms().policyNo())
                 + " of "
@@ -330,7 +343,12 @@ public class IaafService {
             new RecordLink(SubmittedCodes.ENTITY, p.getId().toString(), p.getSbmNo())));
     i.issued(to, clock.instant());
     approvals.move(DocumentApprovals.IAAF, i, "issue", TransitionNote.NONE);
-    history.note(p, "IAAF", "IAAF " + i.getIaafNo() + " sent to the bank counterpart", SbmHistorySource.MANUAL, i.getIaafNo());
+    history.note(
+        p,
+        "IAAF",
+        "IAAF " + i.getIaafNo() + " sent to the bank counterpart",
+        SbmHistorySource.MANUAL,
+        i.getIaafNo());
     audit.record(ENTITY, i.getIaafNo(), AuditAction.POST, "Sent to " + to);
     return i;
   }
@@ -394,7 +412,12 @@ public class IaafService {
     v.put(
         "links",
         links.findByIaafIdOrderByIdAsc(i.getId()).stream()
-            .map(l -> policies.findById(l.getRelatedPolicyId()).map(SbmPolicy::getSbmNo).orElse("") + " (" + DisplayFormat.words(l.getRelation()) + ")")
+            .map(
+                l ->
+                    policies.findById(l.getRelatedPolicyId()).map(SbmPolicy::getSbmNo).orElse("")
+                        + " ("
+                        + DisplayFormat.words(l.getRelation())
+                        + ")")
             .collect(Collectors.joining(", ")));
     v.put("adequacy", "Adequate");
     return pdfs.render(

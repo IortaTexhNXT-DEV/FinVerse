@@ -182,7 +182,7 @@ public class SbmPolicy extends BaseEntity {
    *
    * @param data policy data
    */
-  public void apply(SbmPolicyData data) {
+  public final void apply(SbmPolicyData data) {
     if (data.terms() == null || data.terms().expiryDate() == null) {
       throw new BusinessRuleException("SBM_EXPIRY_REQUIRED", "Expiry date is required");
     }

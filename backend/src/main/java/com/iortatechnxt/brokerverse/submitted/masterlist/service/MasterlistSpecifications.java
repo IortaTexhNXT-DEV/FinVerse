@@ -66,16 +66,14 @@ final class MasterlistSpecifications {
     };
   }
 
-  private static void tab(
-      Tab tab, Root<SbmPolicy> root, CriteriaBuilder cb, List<Predicate> all) {
+  private static void tab(Tab tab, Root<SbmPolicy> root, CriteriaBuilder cb, List<Predicate> all) {
     if (tab == null) {
       return;
     }
     switch (tab) {
       case FOR_VALIDATION -> all.add(cb.equal(root.get(STATUS), SbmPolicyStatus.RECEIVED));
       case CLASSIFIED ->
-          all.add(
-              root.get(STATUS).in(SbmPolicyStatus.CLASSIFIED, SbmPolicyStatus.IN_REVIEW));
+          all.add(root.get(STATUS).in(SbmPolicyStatus.CLASSIFIED, SbmPolicyStatus.IN_REVIEW));
       case FOR_RENEWAL -> all.add(root.get(STATUS).in(RENEWAL));
       case MANUAL_DISPOSITION ->
           all.add(cb.equal(root.get(STATUS), SbmPolicyStatus.FOR_MANUAL_DISPOSITION));

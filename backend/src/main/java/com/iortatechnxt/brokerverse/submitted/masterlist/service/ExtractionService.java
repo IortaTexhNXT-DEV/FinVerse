@@ -117,7 +117,11 @@ public class ExtractionService {
             : new AttachmentTarget(SubmittedCodes.ENTITY, policy.getId().toString());
     Attachment file =
         attachments.upload(
-            target, upload.fileName(), upload.content(), "Policy document", SubmittedCodes.DOC_POLICY);
+            target,
+            upload.fileName(),
+            upload.content(),
+            "Policy document",
+            SubmittedCodes.DOC_POLICY);
     ExtractionProposal proposal =
         extractor.propose(
             new ExtractionRequest(
@@ -194,7 +198,8 @@ public class ExtractionService {
     }
     p.documentAttached();
     x.confirm(p.getId(), currentUser.username(), clock.instant());
-    audit.record(PENDING_ENTITY, x.getExtractionNo(), AuditAction.AUTHORIZE, "Confirmed to " + p.getSbmNo());
+    audit.record(
+        PENDING_ENTITY, x.getExtractionNo(), AuditAction.AUTHORIZE, "Confirmed to " + p.getSbmNo());
     return p;
   }
 

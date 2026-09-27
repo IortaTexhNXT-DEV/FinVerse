@@ -52,7 +52,7 @@ public class SbmApprovalMatrix extends AuthorizableEntity {
    */
   public SbmApprovalMatrix(Long companyId, Row row) {
     this.companyId = companyId;
-    change(row);
+    set(row);
   }
 
   /**
@@ -60,7 +60,12 @@ public class SbmApprovalMatrix extends AuthorizableEntity {
    *
    * @param row document, segment, band, level, approver and title
    */
-  public void change(Row row) {
+  public final void change(Row row) {
+    set(row);
+    markModified();
+  }
+
+  private void set(Row row) {
     this.document = row.document();
     this.segment = row.segment();
     this.tsiFrom = row.tsiFrom() == null ? BigDecimal.ZERO : row.tsiFrom();
@@ -69,7 +74,6 @@ public class SbmApprovalMatrix extends AuthorizableEntity {
     this.permission = row.permission();
     this.approverUsername = row.approverUsername();
     this.signatoryTitle = row.signatoryTitle();
-    markModified();
   }
 
   /**

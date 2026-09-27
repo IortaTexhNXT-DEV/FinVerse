@@ -5,9 +5,9 @@
  * ({@code sbm_policy}) with its history, is sanitised, matched against the LAMD loan snapshot,
  * classified and bucketed by rules that are data, reviewed for adequacy (IAAF), checked against the
  * insurer limits (TOR), and handed to the Renewal module when it nears expiry. From the hand-off on
- * the renewal is an ordinary BRD-1 account of business type RENEWAL; the masterlist only follows
- * it (placed, booked, not renewed). Money appears only in the handling fee (recognised by
- * Cashiering) and the No Touch service fee.
+ * the renewal is an ordinary BRD-1 account of business type RENEWAL; the masterlist only follows it
+ * (placed, booked, not renewed). Money appears only in the handling fee (recognised by Cashiering)
+ * and the No Touch service fee.
  *
  * <p>Layout: {@code submitted.domain} holds every entity and repository; each area has a {@code
  * service} and an {@code api} sub-package ({@code intake, masterlist, processing, review, renewal,

@@ -1,8 +1,8 @@
 package com.iortatechnxt.brokerverse.issuance.service;
 
 /**
- * What to extract (BRIDSP-02; SUBMITTED_POLICIES_DESIGN section 9, issuance row): the document
- * kind selects the patterns and the field set.
+ * What to extract (BRIDSP-02; SUBMITTED_POLICIES_DESIGN section 9, issuance row): the document kind
+ * selects the patterns and the field set.
  *
  * @param kind document kind ({@code EPOLICY} or {@code SUBMITTED_POLICY})
  * @param content document bytes (PDF)

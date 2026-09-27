@@ -7,8 +7,8 @@ import jakarta.persistence.Table;
 
 /**
  * An insurer assignment rule of the expiry scan (BRIDSP-23; SP SQ11): per segment, vehicle type or
- * occupancy, the insurer to propose, highest priority first, optionally never the expiring
- * insurer. Maintained with maker and checker.
+ * occupancy, the insurer to propose, highest priority first, optionally never the expiring insurer.
+ * Maintained with maker and checker.
  */
 @Entity
 @Table(name = "sbm_insurer_rule")
@@ -48,7 +48,7 @@ public class SbmInsurerRule extends AuthorizableEntity {
    */
   public SbmInsurerRule(Long companyId, Row row) {
     this.companyId = companyId;
-    change(row);
+    set(row);
   }
 
   /**
@@ -56,7 +56,12 @@ public class SbmInsurerRule extends AuthorizableEntity {
    *
    * @param row content
    */
-  public void change(Row row) {
+  public final void change(Row row) {
+    set(row);
+    markModified();
+  }
+
+  private void set(Row row) {
     this.segment = row.segment();
     this.vehicleType = row.vehicleType();
     this.occupancy = row.occupancy();
@@ -64,7 +69,6 @@ public class SbmInsurerRule extends AuthorizableEntity {
     this.priority = row.priority();
     this.excludeExpiring = row.excludeExpiring();
     this.description = row.description();
-    markModified();
   }
 
   public Long getCompanyId() {

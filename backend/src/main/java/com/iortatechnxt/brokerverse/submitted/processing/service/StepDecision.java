@@ -59,7 +59,10 @@ public record StepDecision(
       }
     }
     return new StepDecision(
-        first != null, new SbmRuleOutcome(bucket, tag, classification, template, flag), reason, first);
+        first != null,
+        new SbmRuleOutcome(bucket, tag, classification, template, flag),
+        reason,
+        first);
   }
 
   /**

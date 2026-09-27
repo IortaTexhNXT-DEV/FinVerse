@@ -37,9 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * The approval of an IAAF or a TOR by its matrix (BRIDSP-07, 18; FRS FR-SP-041, 052): the levels of
  * the band of the document's segment and sum insured, the approvers of the current level notified,
- * each level approved by a holder of its permission (or its named approver) who is not the
- * preparer and signed by the {@link SignatureProvider}, the document returned with a reason. The
- * {@code SBM_IAAF} and {@code SBM_TOR} work cases keep the history.
+ * each level approved by a holder of its permission (or its named approver) who is not the preparer
+ * and signed by the {@link SignatureProvider}, the document returned with a reason. The {@code
+ * SBM_IAAF} and {@code SBM_TOR} work cases keep the history.
  */
 @Component
 @Transactional(propagation = Propagation.MANDATORY)
@@ -167,7 +167,8 @@ public class DocumentApprovals {
    * @param subject what is approved (for the notice)
    * @return true when the last level was approved
    */
-  public boolean approve(String doc, SbmApprovable d, List<SbmApprovalMatrix> levels, String subject) {
+  public boolean approve(
+      String doc, SbmApprovable d, List<SbmApprovalMatrix> levels, String subject) {
     d.require(SbmDocStatus.FOR_APPROVAL);
     String me = currentUser.username();
     if (CurrentUser.sameUser(me, d.getCreatedBy())) {
@@ -219,7 +220,8 @@ public class DocumentApprovals {
       throw new BusinessRuleException("WORKFLOW_REASON_REQUIRED", "Select a reason for 'Return'");
     }
     move(doc, d, "return", new TransitionNote(reasonCode, comment));
-    d.returned(lovs.label("SBM_RETURN_REASON", reasonCode) + (comment == null ? "" : ": " + comment));
+    d.returned(
+        lovs.label("SBM_RETURN_REASON", reasonCode) + (comment == null ? "" : ": " + comment));
     notifications.notifyUser(
         d.getCreatedBy(),
         new Notice(

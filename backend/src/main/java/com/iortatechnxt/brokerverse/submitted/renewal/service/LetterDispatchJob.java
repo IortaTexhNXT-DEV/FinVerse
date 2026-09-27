@@ -15,8 +15,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * {@code SBM_LETTER_DISPATCH} (BRIDSP-22; cron {@code brokerverse.jobs.sbm-letter-dispatch-cron},
- * 06:30 PHT): the letters due by the letter rules and the print batches of the day, one
- * transaction per company.
+ * 06:30 PHT): the letters due by the letter rules and the print batches of the day, one transaction
+ * per company.
  */
 @Component
 public class LetterDispatchJob implements ManagedJob {

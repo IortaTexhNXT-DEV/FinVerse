@@ -141,7 +141,13 @@ public final class RunDtos {
    * @param at time
    */
   public record LimitCheckView(
-      Long id, Long runId, String attribute, String limit, String value, boolean breached, Instant at) {
+      Long id,
+      Long runId,
+      String attribute,
+      String limit,
+      String value,
+      boolean breached,
+      Instant at) {
 
     /**
      * Maps a check.

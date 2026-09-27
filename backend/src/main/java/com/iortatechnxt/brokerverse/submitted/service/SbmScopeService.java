@@ -16,9 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * The data scope of the user (BRIDSP-28; SUBMITTED_POLICIES_DESIGN section 6.2): the segments of
  * the user's scope row (all when none) and, for the roles of {@code SBM_OWN_RECORDS_ROLES} (the
- * account officers) or a scope row that says so, only the records the user handles or whose
- * renewal account the user owns. Every list, record, report and extract applies it; background
- * jobs (no signed-in user) see everything.
+ * account officers) or a scope row that says so, only the records the user handles or whose renewal
+ * account the user owns. Every list, record, report and extract applies it; background jobs (no
+ * signed-in user) see everything.
  */
 @Service
 @Transactional(readOnly = true)
@@ -58,10 +58,7 @@ public class SbmScopeService {
    * @return scope
    */
   public Scope current(Long companyId) {
-    return currentUser
-        .optionalUsername()
-        .map(u -> of(companyId, u))
-        .orElse(Scope.ALL);
+    return currentUser.optionalUsername().map(u -> of(companyId, u)).orElse(Scope.ALL);
   }
 
   /**
@@ -82,7 +79,8 @@ public class SbmScopeService {
     Set<String> roles = users.roleCodes(username);
     List<String> ownRoles = parameters.items(OWN_ROLES);
     boolean own = roles.stream().anyMatch(ownRoles::contains);
-    boolean submittedTeam = roles.stream().anyMatch(r -> r.startsWith("SBM_") || "MKT_TL".equals(r));
+    boolean submittedTeam =
+        roles.stream().anyMatch(r -> r.startsWith("SBM_") || "MKT_TL".equals(r));
     return own && !submittedTeam;
   }
 

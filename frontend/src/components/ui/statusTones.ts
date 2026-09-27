@@ -79,6 +79,12 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'VALIDATED',
     'PROSPECT',
     'PENDING',
+    // employee benefits: waiting for a sign-off, an approval or a validation
+    'FOR_SIGNOFF',
+    'THRESHOLD_APPROVAL',
+    'READY_TO_PRESENT',
+    'UPLOADED',
+    'LAPSED',
     'FOR_REVIEW',
     'FOR_MKT_APPROVAL',
     'QS_FOR_APPROVAL',
@@ -158,6 +164,16 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     // accounting reports: computed service fee, schedule layout to confirm
     'COMPUTED',
     'TO_CONFIRM',
+    // employee benefits: cycle stages in marketing and placement
+    'RA_SENT',
+    'REQUIREMENTS',
+    'INCUMBENT_TERMS',
+    'FRANCHISE',
+    'PROPOSALS',
+    'COMPARATIVE',
+    'REVISION',
+    'WITH_CLIENT',
+    'IN_PLACEMENT',
   ],
   neutral: [
     'DRAFT',
@@ -184,6 +200,10 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'NOT_REQUIRED',
   ],
   danger: [
+    // employee benefits: cycles and programmes lost or not renewed
+    'CLOSED_LOST',
+    'NOT_RENEWED',
+    'LOST',
     // sanction screening: a confirmed match, a case past its SLA
     'TRUE_MATCH',
     'BREACHED',

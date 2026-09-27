@@ -1,14 +1,16 @@
 # iNXT BrokerVerse - BDOI Employee Benefits (BRD-8) Build Design
 
-Status: **proposal for review**. This design extends `docs/architecture/BROKING_ARCHITECTURE.md`, `docs/architecture/OPERATIONS_DESIGN.md`, `docs/architecture/COLLECTIONS_DESIGN.md` and the Developer Guide, which stay binding. It does not change them, except for the contract changes listed in section 11.
+Status: **proposal for review**, built in waves (section 16). This design extends `docs/architecture/BROKING_ARCHITECTURE.md`, `docs/architecture/OPERATIONS_DESIGN.md`, `docs/architecture/COLLECTIONS_DESIGN.md` and the Developer Guide, which stay binding. It does not change them, except for the contract changes listed in section 11.
+
+Drop: BDOI places "Employee Benefits (no portal feature)" in **Drop 2** (requirements Dec 2026 - Feb 2027, build Mar - Apr 2027, SIT Jul - Sep 2027, UAT Oct - Nov 2027). EB placement and the EB upstream reports are in Drop 1 items 1.U6 and 1.U9 (DCR-235). The partner portal of the first proposal is removed from this design (section 16.1): insurers and client HR send their files by e-mail or an agreed channel and the EB users upload them.
 
 Requirements baseline: [`BDOI_EB_BRD_SPEC.md`](../requirements/BDOI_EB_BRD_SPEC.md): 34 requirement rows (BRID-001 to 030, 005.01-005.03, 022.01; BRID-028 OUT) and questions EBQ01-EBQ28. Every class, migration and screen cites its BRD ID in Javadoc or a comment, for example `BRID-016`.
 
 ## 1. Design principles
 
 1. **The EB cycle ends where the BRD-1 spine starts.** Everything before the client's decision is new: renewal advice, BOR, franchise, TOR, insurer requests and proposals, comparative, revisions, threshold approval. The client's confirmation turns the chosen proposal into **accounts** through `AccountService.createDraft`, one per benefit line. Placement, issuance, booking, the invoice ledger, cashiering, collections and commission then work unchanged. EB never posts a journal itself.
-2. **External parties never touch the core.** Insurers and client HR users are not `AppUser`s. They sign in to a separate realm (`/api/portal/**`, token audience `portal`) that the core API refuses. Every portal query is scoped by the party the user is bound to. The portal is a platform module that later BRDs can reuse (insurer files for Prod Recon or Remittance, client self-service).
-3. **Nothing external takes effect before an internal user validates it (BRID-005.01 AC7, 014 AC7).** Portal uploads land in a staging table and become attachments or business data only on validation. Insurer proposals are SUBMITTED until the AO validates them; client master lists are staged roster versions until the AO accepts them.
+2. **External parties never touch BIBS.** Insurers and client HR users have no BIBS access. They send their files by e-mail or an agreed channel, and internal EB users upload them on the programme, cycle or member change with the source INSURER or CLIENT (BRID-005.01, 014 through internal upload). Nothing takes effect before an internal user validates it (principle 3).
+3. **Nothing external takes effect before an internal user validates it (BRID-005.01 AC7, 014 AC7).** Files received from insurers and clients are uploaded by the EB users and become business data only through an EB action. Insurer proposals entered by the AO are SUBMITTED until validated; client master lists are staged roster versions until the AO accepts them.
 4. **Versions, not updates.** TOR, BOR, proposals, comparatives and member rosters are versioned rows that are never changed after submission (BRID-008, 015, 024). The history tab and the diff come from the rows.
 5. **Documents carry their context.** Every EB document is registered with its type, process (placement, renewal, endorsement, adjustment, franchise) and access class (Marketing, Processing, Collection) (BRID-025). The platform attachment module enforces the class for every module, not only EB.
 6. **Parked means seam, not simulation.** The insurer API, e-signature verification of the BOR, HRIS master list feeds, reading insurer mailboxes and the EBIX booking each get a seam. No integration is simulated.
@@ -18,8 +20,7 @@ Requirements baseline: [`BDOI_EB_BRD_SPEC.md`](../requirements/BDOI_EB_BRD_SPEC.
 
 | Module | Purpose | BRD IDs | Depends on | Flyway (seed) |
 |---|---|---|---|---|
-| `portal` (new, platform, package `com.iortatechnxt.brokerverse.portal`, tables `ptl_*`) | External identities bound to a party (insurer or client), invitation and approval of portal users, separate security realm and tokens, party context, staged uploads with review, portal notices, portal audit, ports for business modules | BRID-005, 005.01-005.03, 014 (realm and staging), 011 / 015 (channel) | security, attachment, audit, messaging, workflow, system, party | V1032 (V1930) |
-| `eb` (new, package `com.iortatechnxt.brokerverse.eb`, tables `eb_*`) | EB programmes and cycles, RA and reminders, feedback, document register, BOR, franchise, TOR, insurer requests, proposals and revisions, comparative and approvals, value thresholds, client confirmation and placement trigger, submissions, member roster and member changes, tracked items, SOA intake, EB reports and jobs, EB portal endpoints | BRID-001-004, 007-010, 012, 013, 016, 017, 019, 021, 022, 024, 026, 027, 029, 030 | portal, crm, catalog, account, booking (read), opsledger (read, events), adjustment (endorsement intake), issuance (e-policy receipt), workflow, approval, messaging, docgen, attachment, bulk, report, lov, alert, system, nbadmin (retention port) | V1033-V1035 (V1931-V1932) |
+| `eb` (new, package `com.iortatechnxt.brokerverse.eb`, tables `eb_*`) | EB programmes and cycles, RA and reminders, feedback, document register, BOR, franchise, TOR, insurer requests, proposals and revisions, comparative and approvals, value thresholds, client confirmation and placement trigger, submissions, member roster and member changes, tracked items, SOA intake, EB reports and jobs | BRID-001-004, 007-010, 012, 013, 016, 017, 019, 021, 022, 024, 026, 027, 029, 030 | crm, catalog, account, booking (read), opsledger (read, events), adjustment (endorsement intake), issuance (e-policy receipt), workflow, approval, messaging, docgen, attachment, bulk, report, lov, alert, system, nbadmin (retention port) | V1030, V1031, V1033-V1036 (V1930-V1932) |
 | `account` (built) | Business type on the account: the shared work item **BT0** (`V822__account_business_type.sql`, account range), also used by Renewal and Submitted Policies; EB creates no column of its own | BRID-022.01 | unchanged | V822 (BT0) |
 | `booking` (built) | Business type from the account (part of BT0); + insurer billing number with duplicate block (EB) | BRID-020, 022.01 | unchanged | V822 (BT0, code only); V1031 (billing number) |
 | `attachment` (platform) | + document access classes; + process tag on links | BRID-025 | unchanged | V1031 |
@@ -31,21 +32,14 @@ Requirements baseline: [`BDOI_EB_BRD_SPEC.md`](../requirements/BDOI_EB_BRD_SPEC.
                      crm  catalog  account  booking(read)  opsledger(read)  adjustment  issuance
                        \      |       |         |               |              |          |
                         +-----+-------+---------+------ eb -----+--------------+----------+
-                                                         |
-                                                       portal ---> security, attachment, audit, messaging, workflow, party
 ```
 
-- `portal` knows nothing about EB. It declares the ports below; `eb` implements them.
 - `eb` calls BRD-1 and Operations services only through their public services (`AccountService`, `AccountLifecycleService` is **not** used by EB; `EndorsementRequestService.create`, `EpolicyService.receive`, `InvoiceLedgerQueryService`).
 - No BRD-1 or Operations module depends on `eb`. EB learns about account progress from `AccountStatusChanged` and about payments from `InvoiceMovementPosted` (Spring events after commit).
 
-### 2.2 Ports declared in `portal.service.port`
+### 2.2 Ports
 
-| Port | Implemented by | Purpose |
-|---|---|---|
-| `PortalUploadTarget` | eb (`EbUploadTargets`) | `targetTypes()`, `authorize(PortalParty, targetType, targetId)` (the party may upload to this target), `reviewPermission(targetType)`, `onValidated(StagedUpload, attachmentId)`, `onRejected(StagedUpload, reason)` |
-| `PortalTaskSource` | eb (`EbPortalTasks`) | Open tasks of a party for the portal home: request to answer, franchise to decide, member change to bill, SOA to send, master list to upload, comparative to review |
-| `PortalHomeCounts` | eb | Counts per tile for the internal "Portal uploads to review" queue per permission |
+EB declares none. It implements the platform ports `crm.service.ClientRecordsProvider` (`EbClientRecords`: the programmes on the client 360 view) and `nbadmin.service.RetentionCandidateProvider` (`EbProgrammeRetentionProvider`), and inside the module the port `eb.cycle.service.BorGate` (implemented by the BOR service; section 16.6). The portal ports of the first proposal are removed with the portal (section 16.1).
 
 ## 3. Flyway allocation
 
@@ -53,17 +47,17 @@ Allocated to Employee Benefits in the Developer Guide: **schema V1030-V1039, see
 
 | Version | Owner (wave) | Content |
 |---|---|---|
-| `V1030__eb_foundation.sql` | E0 | Grants of the EB and portal permissions to new and existing roles; roles `EB_AO`, `EB_TL`, `EB_MANAGEMENT`, `EB_PROCESSOR`, `EB_PROC_SUPERVISOR`, `EB_COLLECTION`; LOV types and values (section 8.4); `DOCUMENT_TYPE` values (spec 6.1); `sys_parameter` rows; exception codes; workflows `EB_CYCLE`, `EB_FRANCHISE`, `EB_MEMBER_CHANGE`, `EB_SOA`, `PORTAL_UPLOAD_REVIEW` (`wf_stage`, `wf_transition`); `doc_template` rows; notification events |
+| `V1030__eb_foundation.sql` | E0 | Grants of the EB permissions to new and existing roles; roles `EB_AO`, `EB_TL`, `EB_MANAGEMENT`, `EB_PROCESSOR`, `EB_PROC_SUPERVISOR`, `EB_COLLECTION`; LOV types and values (section 8.4); `DOCUMENT_TYPE` values (spec 6.1); `sys_parameter` rows; exception codes; workflows `EB_CYCLE`, `EB_FRANCHISE`, `EB_MEMBER_CHANGE`, `EB_SOA` (`wf_stage`, `wf_transition`); `doc_template` rows; notification events |
 | `V1031__eb_platform_extensions.sql` | E0 | `att_document_access` (document type, permission) and `att_attachment_link.process_tag`; the cross-BRD document types `RENEWAL_ADVICE` (Renewal, EB) and `CLAIM_REPORT` (Claims) with their access rows, including the CSF view permission (insert ... on conflict do nothing, so the order against V1010 / V1020 does not matter; final matrix: cross-BRD question XQ04); `bkg_invoice.insurer_billing_no varchar(60)` and a unique partial index on (company_id, insurer_code, insurer_billing_no) where not null. **Not** the account business type: `acc_account.business_type` is the shared `V822__account_business_type.sql` (BT0, cross-BRD decision D1), which must be merged before E1-B creates accounts |
-| `V1032__portal.sql` | E1-A | `ptl_user`, `ptl_invitation`, `ptl_login_event`, `ptl_upload`, `ptl_notice`, `ptl_download_log`. No request table: portal users are provisioned through User Access Maintenance requests (`nba_access_request`, user type EXTERNAL, V1062; decision D7) |
-| `V1033__eb_programmes_cycles.sql` | E1-B | `eb_programme`, `eb_programme_line`, `eb_programme_contact`, `eb_cycle`, `eb_renewal_advice`, `eb_feedback`, `eb_document`, `eb_bor`, `eb_activity_log` |
-| `V1034__eb_marketing.sql` | E1-B | `eb_franchise_request`, `eb_tor`, `eb_tor_item`, `eb_insurer_request`, `eb_proposal`, `eb_proposal_line`, `eb_proposal_item`, `eb_proposal_factor`, `eb_revision_request`, `eb_revision_item`, `eb_revision_target`, `eb_comparative`, `eb_comparative_signoff`, `eb_comment`, `eb_threshold_rule`, `eb_client_confirmation`, `eb_confirmation_line`, `eb_submission`, `eb_submission_document`, `eb_required_document` |
-| `V1035__eb_servicing.sql` | E1-C | `eb_roster_version`, `eb_member`, `eb_member_change`, `eb_member_change_line`, `eb_tracked_item`, `eb_soa` |
-| `V1036__eb_reports_support.sql` | E1-C | Indexes and the read view `eb_tat_v` over `eb_activity_log` for `EB-TAT`; retention rules (`nba_retention_rule`: EB_PROGRAMME, EB_MEMBER) |
-| `V1037`-`V1039` | - | Kept free |
-| `db/seed/V1930__seed_eb_reference.sql` | E2 | EB product lines and products (HMO, GLI, GPA) in the seed catalog, HMO providers as panel insurers with commission rates, threshold rules, required documents, seed internal users and portal users |
-| `db/seed/V1931__seed_eb_cycles.sql` | E2 | Six programmes of the V981 corporate clients, with cycles in every stage: RA sent, franchise pending, proposals received, comparative for approval above the threshold, with client, confirmed and placed |
-| `db/seed/V1932__seed_eb_servicing.sql` | E2 | Rosters, member changes (one relayed, one billed, one closed), tracked items (an overdue HMO card), SOA received and released, portal uploads waiting for review |
+| `V1032` | - | Reserved: the partner portal is not built (Drop 2 has no portal; section 16.1) |
+| `V1033__eb_programmes_cycles.sql` | E0 (moved from E1-B, section 16.4) | `eb_programme`, `eb_programme_line`, `eb_programme_contact`, `eb_cycle`, `eb_cycle_account`, `eb_document`, `eb_activity_log` |
+| `V1034__eb_renewal_advice_feedback_bor.sql` | E1-B | `eb_renewal_advice`, `eb_feedback`, `eb_bor` (as built, section 16.6). The marketing tables of the proposal (`eb_franchise_request`, `eb_tor`, `eb_tor_item`, `eb_insurer_request`, `eb_proposal` and its lines, items and factors, `eb_revision_*`, `eb_comparative`, `eb_comparative_signoff`, `eb_comment`, `eb_threshold_rule`, `eb_client_confirmation`, `eb_confirmation_line`, `eb_submission`, `eb_submission_document`, `eb_required_document`) take a free version (V1037-V1039) with their wave |
+| `V1035__eb_tracked_items.sql` | E1-C | `eb_tracked_item` (as built). The roster, member, member change and SOA tables of the proposal (`eb_roster_version`, `eb_member`, `eb_member_change`, `eb_member_change_line`, `eb_soa`) take a free version with their wave |
+| `V1036__eb_reports_support.sql` | E1-C | Indexes and the read view `eb_tat_v` over `eb_activity_log` for `EB-TAT`; retention rule `EB_PROGRAMME` (`EB_MEMBER` follows with the roster); notification event `EB_BOR_DECIDED` |
+| `V1037`-`V1039` | - | Kept free for the marketing and servicing tables still to build |
+| `db/seed/V1930__seed_eb_reference.sql` | E1-B | SIT/UAT users of the EB roles (section 6.4). EB product lines and products (HMO, GLI, GPA), HMO providers as panel insurers, threshold rules and required documents follow with the product set-up (EBQ01) |
+| `db/seed/V1931__seed_eb_cycles.sql` | E1-B | Six programmes of the V981 corporate clients and prospects: renewal advice sent and awaiting feedback, renewal due, new business in requirements, new business lost, feedback received, a programme not flagged for renewal (section 16.6) |
+| `db/seed/V1932__seed_eb_servicing.sql` | E1-C | Tracked items: an HMO card past due with one follow-up, a pending billing, a received card replacement. Rosters, member changes and SOAs follow with their wave |
 
 Rules:
 - V1031 alters `bkg_invoice` (V870) and the attachment tables, which always exist before V1031 on a fresh database. The `booking` entity changes in the same wave (E0), because Hibernate validates the schema. The account business type comes from V822 (BT0), which runs before V1031.
@@ -74,16 +68,9 @@ Rules:
 
 Money is `numeric(19,2)`; every table has `company_id`, the audit columns and `version`.
 
-### 4.1 `portal`
+### 4.1 Portal
 
-| Table | Key fields |
-|---|---|
-| `ptl_user` | username (e-mail, unique), full name, party kind INSURER / CLIENT, party code (insurer party code or client code), company, portal role (INSURER_USER, CLIENT_HR), status INVITED / ACTIVE / LOCKED / DISABLED, password hash, failed attempts, MFA required, last login |
-| `ptl_invitation` | user, one-time token hash, expires at (`PORTAL_INVITE_VALID_HOURS`), used at |
-| `ptl_login_event` | user, time, outcome, IP, user agent |
-| `ptl_upload` | portal user, party, target type (EB_INSURER_REQUEST, EB_FRANCHISE, EB_MEMBER_CHANGE, EB_SOA_REQUEST, EB_POLICY_FORM, EB_PROGRAMME_DOCS ...), target id, document type, file name, content, SHA-256, size, virus-scan result, status RECEIVED / VALIDATED / REJECTED, reviewer, reason, attachment id (after validation) |
-| `ptl_notice` | portal user or party, subject, body, link, read at |
-| `ptl_download_log` | portal user, attachment id, time (BRID-014 AC6: downloads audited) |
+Removed: BDOI Drop 2 has no partner portal (section 16.1). No `ptl_*` table is built.
 
 ### 4.2 `eb`: programme, cycle, documents
 
@@ -91,11 +78,11 @@ Money is `numeric(19,2)`; every table has `company_id`, the audit columns and `v
 |---|---|
 | `eb_programme` | programme no. `EBP-<yyyy>-nnnnnn`, client id and code, name, team (LOV `EB_TEAM`), funding EMPLOYER / VOLUNTARY, AO username and sales unit, renewal eligible flag, status PROSPECT / ACTIVE / LAPSED / LOST / INACTIVE |
 | `eb_programme_line` | programme, benefit line (LOV `EB_BENEFIT_LINE`), product code, incumbent insurer code, current policy no., current ARN, period from / to, headcount |
-| `eb_programme_contact` | programme, name, e-mail, mobile, role (HR_HEAD, HR_OFFICER, FINANCE), receives RA / SOA flags, portal user id |
+| `eb_programme_contact` | programme, name, e-mail, mobile, role (HR_HEAD, HR_OFFICER, FINANCE), receives RA / SOA flags |
 | `eb_cycle` | cycle no. `EBC-<yyyy>-nnnnnn`, programme, business type NEW_BUSINESS / RENEWAL, policy year, target inception, remarketing flag, stage (mirror of the `EB_CYCLE` case), outcome RENEWED_INCUMBENT / MOVED / NEW_PLACED / NOT_RENEWED / LOST with reason, account ARNs |
 | `eb_renewal_advice` | cycle, sent at, recipients, message id, attachment id, reminders sent, last reminder at |
-| `eb_feedback` | cycle, channel AO / PORTAL / EMAIL, text, received at, attachment links |
-| `eb_document` | cycle or programme, document type, process type (LOV `EB_PROCESS_TYPE`), version, attachment id, source AO / CLIENT_PORTAL / INSURER_PORTAL / SYSTEM, status ACTIVE / SUPERSEDED / REJECTED |
+| `eb_feedback` | cycle, channel AO / EMAIL / PHONE / MEETING / LETTER, text, date received, number of files (stored as `EB_CLIENT_FEEDBACK` documents) |
+| `eb_document` | cycle or programme, document type, process type (LOV `EB_PROCESS_TYPE`), version, attachment id, source AO / PROCESSING / CLIENT / INSURER / SYSTEM, status ACTIVE / SUPERSEDED / REJECTED |
 | `eb_bor` | programme, cycle, version, attachment id, status PENDING / UPLOADED / VALIDATED / REJECTED, checklist answers (signed by authorised signatory, not blank, client name matches), validated by / at, valid from / to |
 | `eb_activity_log` | cycle or programme, activity code (TAT annex, spec 6.3), received at, released at, actor; written by the services at each step (source of `EB-TAT`) |
 
@@ -103,17 +90,17 @@ Money is `numeric(19,2)`; every table has `company_id`, the audit columns and `v
 
 | Table | Key fields |
 |---|---|
-| `eb_franchise_request` | franchise no. `EBF-<yyyy>-nnnnnn`, cycle, insurer code, documents, submitted at, due at, status (mirror of `EB_FRANCHISE`), decided at, decided by (portal user or AO with evidence), reason, client advised at |
+| `eb_franchise_request` | franchise no. `EBF-<yyyy>-nnnnnn`, cycle, insurer code, documents, submitted at, due at, status (mirror of `EB_FRANCHISE`), decided at, decided by (the AO, with the insurer's evidence), reason, client advised at |
 | `eb_tor`, `eb_tor_item` | cycle, version, status DRAFT / RELEASED / SUPERSEDED; items: benefit line, plan code, item code, description, requirement, sort order |
-| `eb_insurer_request` | request no. `EBR-<yyyy>-nnnnnn`, cycle, insurer code, TOR version, documents sent, sent at, due at, channel PORTAL_AND_EMAIL, status OPEN / RESPONDED / DECLINED / CLOSED |
-| `eb_proposal` | proposal no., cycle, request (null for the incumbent's indicative), insurer code, kind INCUMBENT_INDICATIVE / PROPOSAL / REVISED, version, revision request id, status SUBMITTED / VALIDATED / REJECTED / SUPERSEDED, validity, source PORTAL / AO |
+| `eb_insurer_request` | request no. `EBR-<yyyy>-nnnnnn`, cycle, insurer code, TOR version, documents sent, sent at, due at, channel EMAIL, status OPEN / RESPONDED / DECLINED / CLOSED |
+| `eb_proposal` | proposal no., cycle, request (null for the incumbent's indicative), insurer code, kind INCUMBENT_INDICATIVE / PROPOSAL / REVISED, version, revision request id, status SUBMITTED / VALIDATED / REJECTED / SUPERSEDED, validity, source AO (the insurer's e-mail attached) |
 | `eb_proposal_line`, `eb_proposal_item`, `eb_proposal_factor` | per benefit line: annual premium, TSI (GLI / GPA), premium per plan; per TOR item: offered value, deviation flag, remark; per capability factor (LOV `EB_CAPABILITY_FACTOR`): value and rating |
 | `eb_revision_request`, `_item`, `_target` | cycle, requested changes (TOR item or free text), target insurers with status OPEN / ANSWERED, answered by proposal version |
 | `eb_comparative` | comparative no., cycle, version, snapshot (JSON of the rows), recommended proposal per line, status DRAFT / FOR_APPROVAL / THRESHOLD_APPROVAL / APPROVED / PRESENTED / SUPERSEDED, due at |
 | `eb_comparative_signoff` | comparative, signatory, role, decision, time |
-| `eb_comment` | comparative, author (internal or portal user), text, time, reply to |
+| `eb_comment` | comparative, author (internal user; client comments received by e-mail are entered by the AO), text, time, reply to |
 | `eb_threshold_rule` | benefit line (blank = all), measure TSI / ANNUAL_PREMIUM, amount, currency, approver permission, level, effective from / to; `AuthorizableEntity` (maker-checker) |
-| `eb_client_confirmation`, `eb_confirmation_line` | cycle, channel SYSTEM / EMAIL / SIGNED_DOCUMENT, evidence attachment, confirmed by (portal user or AO), per line: chosen proposal and insurer, created ARN |
+| `eb_client_confirmation`, `eb_confirmation_line` | cycle, channel EMAIL / SIGNED_DOCUMENT, evidence attachment, recorded by the AO, per line: chosen proposal and insurer, created ARN |
 | `eb_submission`, `eb_submission_document` | process type, insurer, cycle / member change, documents, sent at, acknowledged at |
 | `eb_required_document` | process type x benefit line x document type, mandatory flag; maker-checker |
 
@@ -123,7 +110,7 @@ Money is `numeric(19,2)`; every table has `company_id`, the audit columns and `v
 |---|---|
 | `eb_roster_version` | programme, policy year, version, source upload (bulk job), status STAGED / ACCEPTED / REJECTED, headcount, accepted by |
 | `eb_member` | roster version, employee no., last / first name, birth date, gender, civil status, plan code, dependants count, effective from / to, status ACTIVE / DELETED; unique (programme, policy year, employee no.) in the accepted version |
-| `eb_member_change`, `eb_member_change_line` | change no. `EBM-<yyyy>-nnnnnn`, programme, line, source AO / CLIENT_PORTAL, financial flag, direct-billed flag, status (mirror of `EB_MEMBER_CHANGE`), adjustment request id; lines: action ADD / DELETE / CHANGE_PLAN / CHANGE_DATA, member data, effective date |
+| `eb_member_change`, `eb_member_change_line` | change no. `EBM-<yyyy>-nnnnnn`, programme, line, source AO / CLIENT, financial flag, direct-billed flag, status (mirror of `EB_MEMBER_CHANGE`), adjustment request id; lines: action ADD / DELETE / CHANGE_PLAN / CHANGE_DATA, member data, effective date |
 | `eb_tracked_item` | type CONTRACT / HMO_CARD / CARD_REPLACEMENT / BILLING_INVOICE, programme, member or member change, responsible INSURER / CLIENT / BDOI, status PENDING / RECEIVED / RELEASED / CLOSED, due date, follow-ups sent, last follow-up at |
 | `eb_soa` | SOA intake no. `EBS-<yyyy>-nnnnnn`, insurer, programme, insurer SOA no., period, amount, currency, attachment, file hash, invoice no(s)., status (mirror of `EB_SOA`), released at |
 
@@ -154,39 +141,26 @@ The guideline "no payment, no booking on adjustment" (p.3) is handled by the par
 | `EB_COLLECT` | Collection: SOA and billing view, release acknowledgement |
 | `EB_SETUP` | Threshold rules, required documents, EB parameters and templates (authorised with `MASTER_AUTHORIZE`) |
 | `EB_REPORT_VIEW` | EB reports |
-| `PORTAL_USER_REQUEST`, `PORTAL_USER_APPROVE` | Raise and decide User Access Maintenance requests of user type EXTERNAL (portal users; four eyes by the UAM rules, decision D7) |
-| `PORTAL_ADMIN` | Lock / unlock portal users, portal login and download logs |
 
 ### 6.2 Roles (V1030) and SIT/UAT users (V1930)
 
 | Role | Persona | Main permissions | SIT/UAT user |
 |---|---|---|---|
-| `EB_AO` | Marketing Account Officer (EB) | EB_VIEW, EB_MARKET, EB_REPORT_VIEW, PORTAL_USER_REQUEST, CLIENT_VIEW, CLIENT_MAINTAIN, ACCOUNT_VIEW, ACCOUNT_MAINTAIN, ATTACHMENT_VIEW, ATTACHMENT_MANAGE, WORK_VIEW | `ebao`, `ebao2` |
+| `EB_AO` | Marketing Account Officer (EB) | EB_VIEW, EB_MARKET, EB_REPORT_VIEW, CLIENT_VIEW, CLIENT_MAINTAIN, ACCOUNT_VIEW, ACCOUNT_MAINTAIN, ATTACHMENT_VIEW, ATTACHMENT_MANAGE, WORK_VIEW | `ebao`, `ebao2` |
 | `EB_TL` | Marketing TL / UH (EB) | EB_VIEW, EB_COMPARATIVE_APPROVE, EB_REPORT_VIEW, WORK_VIEW, WORK_ASSIGN | `ebtl` |
 | `EB_MANAGEMENT` | BDOI Management (threshold approver) | EB_VIEW, EB_THRESHOLD_APPROVE, EB_REPORT_VIEW | `ebmgmt` |
 | `EB_PROCESSOR` | Processing (EB) | EB_VIEW, EB_PROCESS + the BRD-1 `PROCESSOR` permissions | `ebproc` |
 | `EB_PROC_SUPERVISOR` | Processing Supervisor | EB_PROCESSOR permissions + WORK_ASSIGN | `ebprocsup` |
 | `EB_COLLECTION` | Collection (EB) | EB_VIEW, EB_COLLECT + `CLX_VIEW`, `CLX_WORK` | `ebcoll` |
-| `BUSINESS_ADMIN` (existing) | Business Administrator | + EB_SETUP, PORTAL_USER_APPROVE, PORTAL_ADMIN | `badmin` |
+| `BUSINESS_ADMIN` (existing) | Business Administrator | + EB_SETUP | `badmin` |
 
 ### 6.3 Portal realm
 
-- Portal authorities are an enum of the `portal` module (`PortalRole.INSURER_USER`, `CLIENT_HR`), not core permissions. Portal controllers use `@PreAuthorize("hasAuthority('PORTAL_INSURER_USER')")` or `...CLIENT_HR`.
-- `config/SecurityConfig.java` gets a second `SecurityFilterChain` ordered first with `securityMatcher("/api/portal/**")`: portal login, invitation acceptance and portal endpoints. Tokens from `JwtTokenService` carry `aud` = `portal` and the claims `partyKind`, `partyCode`. The core chain rejects any token whose audience is not `core`; the portal chain rejects core tokens.
-- `PortalContext.current()` returns the bound party; every EB portal query filters on it (insurer code or client code). A mismatch is `404`, not `403`, so a portal user cannot probe other records.
-- Lockout after `PORTAL_MAX_FAILED_LOGINS`; session timeout `PORTAL_SESSION_MINUTES`; e-mail one-time code when `PORTAL_MFA_REQUIRED` (default true; the final method is EBQ13).
-- Portal users are provisioned only through **User Access Maintenance requests** as an **external user type** (cross-BRD decision D7; USER_ACCESS_DESIGN section 4.4): the AO raises a CREATE / DISABLE / ENABLE request of user type EXTERNAL (party kind, party code, portal role) with `PORTAL_USER_REQUEST`; a chosen approver holding `PORTAL_USER_APPROVE` decides it (never the requester), with the UAM draft, return, history and change log. On approval `nbadmin` calls the port `ExternalUserProvisioner`, which `portal` implements: it creates the `ptl_user` (INVITED) and sends the invitation link, and the user sets the password. No password is ever sent by e-mail. Lock / unlock and the login and download logs stay in `portal` (`PORTAL_ADMIN`).
-- Every portal action writes `AuditTrailService` entries under the portal username prefixed `portal:`; downloads go to `ptl_download_log`.
-- Uploads: allowed types from `AllowedFileType`, `PORTAL_MAX_UPLOAD_MB`, signature check, and the `VirusScanner` port. A production adapter is required before go-live (the default is a no-op); the staging status stays RECEIVED until the scan passes.
-- Deployment: the same image can run with profile `portal`, which registers only the portal chain and controllers, in the DMZ; the core runs internally. Details follow BDO Information Security (EBQ13).
+Removed with the portal (section 16.1). No second filter chain or token audience is built. User Access requests of user type EXTERNAL (decision D7, dormant) stay refused by the default `ExternalUserProvisioner` of `nbadmin`.
 
-### 6.4 Seed portal users (V1930)
+### 6.4 SIT/UAT users (V1930)
 
-| User | Party | Role |
-|---|---|---|
-| `hmo1@seed.portal` | first seed HMO provider | INSURER_USER |
-| `life1@seed.portal` | first seed life insurer | INSURER_USER |
-| `hr@cl2026000001.portal` | client `CL-2026-000001` | CLIENT_HR |
+`ebao` and `ebao2` (EB_AO), `ebtl` (EB_TL), `ebmgmt` (EB_MANAGEMENT), `ebproc` (EB_PROCESSOR), `ebprocsup` (EB_PROC_SUPERVISOR), `ebcoll` (EB_COLLECTION); the Business Administrator `badmin` holds EB_SETUP. No portal user.
 
 ## 7. Workflows (`wf_stage` / `wf_transition`, seeded in V1030)
 
@@ -219,7 +193,6 @@ any open stage --close_lost(reason)--> CLOSED_LOST ; RENEWAL stages --not_renewe
 | `EB_FRANCHISE` | DRAFT -> SUBMITTED -> APPROVED / REJECTED; SUBMITTED -> EXPIRED (job, after `EB_FRANCHISE_TAT_DAYS` + grace); APPROVED / REJECTED -> ADVISED | BRID-026, 027, 029 |
 | `EB_MEMBER_CHANGE` | CAPTURED -> RELAYED -> BILLED (insurer billing / direct billing uploaded) -> VALIDATED (Processing) -> CLOSED; returns to CAPTURED with a reason; CANCELLED | BRID-013, 025 |
 | `EB_SOA` | RECEIVED -> VALIDATED (Processing) -> RELEASED (client and Collection); RECEIVED -> REJECTED (reason) | BRID-021 |
-| `PORTAL_UPLOAD_REVIEW` | RECEIVED -> VALIDATED / REJECTED (reason); re-map target while RECEIVED | BRID-005.03 |
 
 ## 8. Jobs, alerts, parameters, LOVs, numbers, templates, bulk handlers
 
@@ -229,24 +202,23 @@ any open stage --close_lost(reason)--> CLOSED_LOST ; RENEWAL stages --not_renewe
 |---|---|---|
 | `EB_RENEWAL_ADVICE` | daily 06:00 | Opens RENEWAL cycles for eligible programmes whose expiry is `EB_RA_LEAD_DAYS` away, sends the RA, stores it as `RENEWAL_ADVICE` (linked to programme, current ARN and client), and sends reminders at `EB_RA_REMINDER_DAYS` while no feedback is recorded |
 | `EB_ITEM_FOLLOWUP` | daily 07:00 | Follow-up e-mails for tracked items past due (`EB_FOLLOWUP_DAYS`), escalation after `EB_FOLLOWUP_MAX` |
-| `PORTAL_INVITATION_EXPIRY` | daily | Expires unused invitations |
 
 Crons are configurable (`brokerverse.jobs.eb-renewal-advice-cron`, ...), documented in `docs/operations/CONFIGURATION.md` by the build team.
 
 ### 8.2 Alerts (`alt_exception_code`, V1030) and daily checks (`AlertCheck`)
 
-`EB_RA_NOT_SENT` (inside the lead time, no RA: no contact, no flag), `EB_FRANCHISE_OVERDUE`, `EB_PROPOSAL_OVERDUE` (request past due), `EB_COMPARATIVE_LATE` (`EB_COMPARATIVE_DAYS` after the last proposal), `EB_SOA_VALIDATION_LATE` (`EB_TAT_SOA_VALIDATION`), `EB_ITEM_OVERDUE`, `PORTAL_UPLOAD_WAITING` (staged upload older than one working day), `PORTAL_LOGIN_LOCKED`.
+`EB_RA_NOT_SENT` (inside the lead time, no RA: no contact, no flag), `EB_FRANCHISE_OVERDUE`, `EB_PROPOSAL_OVERDUE` (request past due), `EB_COMPARATIVE_LATE` (`EB_COMPARATIVE_DAYS` after the last proposal), `EB_SOA_VALIDATION_LATE` (`EB_TAT_SOA_VALIDATION`), `EB_ITEM_OVERDUE`.
 
-### 8.3 Parameters (`sys_parameter`, category EMPLOYEE_BENEFITS / PORTAL)
+### 8.3 Parameters (`sys_parameter`, category EMPLOYEE_BENEFITS)
 
-`EB_RA_LEAD_DAYS` (135), `EB_RA_REMINDER_DAYS` (INTEGER_LIST 120, 105, 90), `EB_PROPOSAL_REPLY_DAYS` (5), `EB_FRANCHISE_TAT_DAYS` (5), `EB_FRANCHISE_ADVICE_DAYS` (2), `EB_COMPARATIVE_DAYS` (3), `EB_FOLLOWUP_DAYS` (5), `EB_FOLLOWUP_MAX` (3), the TAT parameters of spec 6.3, `EB_ADJ_BOOKING_REQUIRES_PAYMENT` (false), `BOOKING_BILLING_NO_LINES` (CODE_LIST of product lines that require the insurer billing number; EB lines), `PORTAL_SESSION_MINUTES` (15), `PORTAL_MAX_FAILED_LOGINS` (3), `PORTAL_MFA_REQUIRED` (true), `PORTAL_INVITE_VALID_HOURS` (72), `PORTAL_MAX_UPLOAD_MB` (10). All defaults are placeholders until EBQ02, EBQ07, EBQ10, EBQ13, EBQ16 and EBQ20 are answered.
+`EB_RA_LEAD_DAYS` (135), `EB_RA_REMINDER_DAYS` (INTEGER_LIST 120, 105, 90), `EB_PROPOSAL_REPLY_DAYS` (5), `EB_FRANCHISE_TAT_DAYS` (5), `EB_FRANCHISE_ADVICE_DAYS` (2), `EB_COMPARATIVE_DAYS` (3), `EB_FOLLOWUP_DAYS` (5), `EB_FOLLOWUP_MAX` (3), the TAT parameters of spec 6.3, `EB_ADJ_BOOKING_REQUIRES_PAYMENT` (false), `BOOKING_BILLING_NO_LINES` (CODE_LIST of product lines that require the insurer billing number; EB lines). All defaults are placeholders until EBQ02, EBQ07, EBQ10, EBQ16 and EBQ20 are answered.
 
 ### 8.4 LOVs, numbers, templates, bulk handlers
 
-- LOVs: `EB_BENEFIT_LINE` (HMO, GLI, GPA), `EB_TEAM` (BDO, SM, VOLUNTARY, SOLICITED, NEW_BUSINESS), `EB_PROCESS_TYPE` (NB_PLACEMENT, RENEWAL_PLACEMENT, ENDORSEMENT, ADJUSTMENT, FRANCHISE, PROPOSAL), `EB_CAPABILITY_FACTOR` (COMPANY_STABILITY, CLINIC_PROVIDERS, HOSPITAL_NETWORK, TECHNOLOGY), `EB_LOST_REASON`, `EB_MEMBER_CHANGE_TYPE`, `EB_TRACKED_ITEM_TYPE`, `EB_FRANCHISE_REJECT_REASON`, `EB_SOA_REJECT_REASON`, `PORTAL_REJECT_REASON`; `DOCUMENT_TYPE` values of spec 6.1.
+- LOVs: `EB_BENEFIT_LINE` (HMO, GLI, GPA), `EB_TEAM` (BDO, SM, VOLUNTARY, SOLICITED, NEW_BUSINESS), `EB_PROCESS_TYPE` (NB_PLACEMENT, RENEWAL_PLACEMENT, ENDORSEMENT, ADJUSTMENT, FRANCHISE, PROPOSAL), `EB_CAPABILITY_FACTOR` (COMPANY_STABILITY, CLINIC_PROVIDERS, HOSPITAL_NETWORK, TECHNOLOGY), `EB_LOST_REASON`, `EB_MEMBER_CHANGE_TYPE`, `EB_TRACKED_ITEM_TYPE`, `EB_FRANCHISE_REJECT_REASON`, `EB_SOA_REJECT_REASON`; `DOCUMENT_TYPE` values of spec 6.1.
 - Numbers (`DocumentNumberService`): `EBP-<yyyy>`, `EBC-<yyyy>`, `EBF-<yyyy>`, `EBR-<yyyy>`, `EBPR-<yyyy>` (proposal), `EBCA-<yyyy>` (comparative), `EBM-<yyyy>`, `EBS-<yyyy>`.
-- Templates (`doc_template`): `EB_RENEWAL_ADVICE`, `EB_RA_REMINDER`, `EB_INDICATIVE_PROPOSAL`, `EB_TOR`, `EB_RFP_COVER`, `EB_FRANCHISE_REQUEST`, `EB_FRANCHISE_ADVICE`, `EB_COMPARATIVE`, `EB_REVISION_RELAY`, `EB_ITEM_FOLLOWUP`, `PORTAL_INVITATION`. Contents are placeholders until BDOI supplies the layouts (EBQ21).
-- Bulk handlers: `EB_MASTERLIST` (template with the roster columns; creates a STAGED roster version; permission EB_MARKET, and the client portal upload uses it through the staging path), `EB_MEMBER_CHANGE` (lines of one member change), `EB_PROGRAMME_LOAD` (go-live migration of existing EB programmes and current policies from EBIX).
+- Templates (`doc_template`): `EB_RENEWAL_ADVICE`, `EB_RA_REMINDER`, `EB_INDICATIVE_PROPOSAL`, `EB_TOR`, `EB_RFP_COVER`, `EB_FRANCHISE_REQUEST`, `EB_FRANCHISE_ADVICE`, `EB_COMPARATIVE`, `EB_REVISION_RELAY`, `EB_ITEM_FOLLOWUP`. Contents are placeholders until BDOI supplies the layouts (EBQ21).
+- Bulk handlers: `EB_MASTERLIST` (template with the roster columns; creates a STAGED roster version; permission EB_MARKET; the AO uploads the list the client sends), `EB_MEMBER_CHANGE` (lines of one member change), `EB_PROGRAMME_LOAD` (go-live migration of existing EB programmes and current policies from EBIX).
 
 ## 9. Reports (category `EMPLOYEE_BENEFITS`, package `eb.report`)
 
@@ -258,7 +230,7 @@ Crons are configurable (`brokerverse.jobs.eb-renewal-advice-cron`, ...), documen
 
 | Screen | Route | Content | Permission |
 |---|---|---|---|
-| EB Home | `/eb` | Tiles: RA due, awaiting feedback, franchise pending, proposals outstanding, comparatives to sign off, threshold approvals, with client, member changes open, pending items overdue, portal uploads to review | EB_VIEW |
+| EB Home | `/eb` | Tiles: RA due, awaiting feedback, franchise pending, proposals outstanding, comparatives to sign off, threshold approvals, with client, member changes open, pending items overdue | EB_VIEW |
 | Programmes | `/eb/programmes` | Work list with status tabs Renewal Due / In Progress / With Client / In Placement / Placed / Lost; toolbar and bulk "Send RA" | EB_VIEW |
 | New Programme | `/eb/programmes/new` | Client picker (or "New Client" to crm), lines, team, contacts | EB_MARKET |
 | Programme page | `/eb/programmes/:id` | Record summary card; `WorkflowPanel` of the current cycle; tabs Cycle / Documents / BOR / Franchise / Insurer Requests / Proposals / Comparative / Members / Member Changes / Billing & SOA / Pending Items / History | EB_VIEW |
@@ -266,21 +238,16 @@ Crons are configurable (`brokerverse.jobs.eb-renewal-advice-cron`, ...), documen
 | Member Changes | `/eb/member-changes` | Work list, entry and upload (`/bulk/EB_MEMBER_CHANGE`) | EB_VIEW |
 | Pending Items | `/eb/pending-items` | Tracked items by programme / member, filters, manual update | EB_VIEW |
 | SOA Register | `/eb/soa` | Intake, validation, release | EB_PROCESS or EB_COLLECT |
-| Portal Uploads | `/eb/portal-uploads` | Review queue (filtered by the reviewer's permission per target type) | EB_MARKET, EB_PROCESS or EB_COLLECT |
 | EB Setup | `/eb/setup` | Threshold rules, required documents, EB parameters | EB_SETUP |
 
-- **Setup & Administration** group: **Portal Users** (`/admin/portal-users`: portal user list, lock / unlock, login and download logs; PORTAL_ADMIN). Requests for portal users are raised and approved on the User Access screens (`/user-access/requests`, user type External; PORTAL_USER_REQUEST / PORTAL_USER_APPROVE).
+- No Portal Users screen and no Portal Uploads queue: the portal is removed (section 16.1).
 - **Reports** group: the EB reports appear in the Report Centre under "Employee Benefits".
 - The crm client page gains the tab **Employee Benefits** through `ClientRecordsProvider` (`EbClientRecords`).
 - Help entries in `frontend/src/features/eb/help.ts`, registered in `HELP_SECTIONS`.
 
-### 10.2 Portal (separate SPA entry `frontend/src/portal/`, served at `/portal`)
+### 10.2 Portal
 
-Sign-in (BDO Insure branding, "BIBS Partner Portal"), invitation acceptance, Home (tasks and notices), and:
-- Insurer: Requests for Proposal (TOR and documents download, structured proposal form, attachments, revisions), Franchise Requests (approve / reject with reason), Member Changes (billing upload, confirmation), SOA and Policy Forms upload, Documents.
-- Client HR: Programmes (summary, policy details, contacts), Members (read), Uploads (master list, utilization, member changes, feedback), Comparative (view, comment, confirm when channel SYSTEM is allowed, EBQ12), Renewal Advice and Documents.
-
-The portal SPA reuses the UI kit and tokens of `frontend/src/components/ui`, and has no route into the internal application.
+Removed (section 16.1): no portal SPA is built. The insurer and client HR steps of the first proposal are done by the EB users on the internal screens (upload with the source INSURER or CLIENT, decisions recorded with the evidence).
 
 ## 11. Impact on modules already built or being built (contract changes)
 
@@ -292,7 +259,7 @@ The portal SPA reuses the UI kit and tokens of `frontend/src/components/ui`, and
 | `report` | `ExportFormat.DOCX` and `DocxReportRenderer` (Apache POI XWPF, already a dependency through POI) | E0 | BRID-022.01 |
 | `messaging` | `DocumentProtector.canProtect / protect` for DOCX (POI agile encryption, as XLSX); `DOCUMENT_NOT_PROTECTABLE` for other types when protection is requested | E0 | BRID-007 |
 | `attachment` | `att_document_access` read by `DocumentService` for list, download and ZIP (document types without a row keep today's behaviour); `AttachmentLink.processTag`; `Attachments` component shows only allowed documents | E0 | BRID-025 |
-| `security` / `config` | Permissions of 6.1; second filter chain and token audience (6.3); core chain rejects portal tokens | E0 (permissions), E1-A (chain) | BRID-005 |
+| `security` | Permissions of 6.1 | E0 | BRID-023 |
 | `adjustment` | None required: EB calls `EndorsementRequestService.create(RequestDraft)` with source reference `EBM-...`. Ask: a `source` / `sourceRef` field on the request so Adjustment lists show "from EB member change" | E1-C (ask to Operations owner) | BRID-013 |
 | `issuance` | None required: validated insurer policy forms go to `EpolicyService.receive(...)` for the placed account | E2 | BRID-019, 005.01 |
 | `catalog` / Product Maintenance | Configuration only: EB product lines (HMO, GLI, GPA, risk item kind PERSON / GENERIC), EB products, HMO providers as panel insurers with commission rates; seeds in V1930, production through Product Maintenance | E2 / BDOI | EBQ01 |
@@ -301,34 +268,31 @@ The portal SPA reuses the UI kit and tokens of `frontend/src/components/ui`, and
 | `collections` (being built) | None: EB invoices enter the worklist like any invoice; Collection users see EB SOA and billing documents through the COLLECTION access class | - | BRID-021, 025 |
 | `commission` | None: EB accounts billed directly by the insurer use the direct-payment arrangement | - | BRID-025 |
 | `renewal` (Renewal BRD, designed, V1010-V1019) | **Decided (decision D3, EBQ28 closed for the boundary):** EB programmes are excluded from the general renewal candidate lists (`RNW_EXCLUDED_LINES` = the `EB_BENEFIT_LINE` values). Every renewal advice, EB's (job `EB_RENEWAL_ADVICE`) and Renewal's, is stored as document type `RENEWAL_ADVICE` linked to the account and the client (EB also links the programme), so CSF resends both. `RENEWAL_ADVICE` is seeded with `on conflict do nothing` by whichever of V1010 / V1030 runs first. Optional: a read method listing the current ARNs of EB programme lines would let Renewal exclude by ARN as well as by line | coordination | EBQ28 |
-| User Access Maintenance (`security` / `nbadmin`, V1060-V1069) | **Decided (decision D7):** portal users are provisioned through UAM requests as an external user type; `ptl_user_request` is dropped. `portal` implements the `nbadmin` port `ExternalUserProvisioner` (E1-A, after UAM U1-A has committed the port) | E1-A | EBQ13 |
+| User Access Maintenance (`security` / `nbadmin`, V1060-V1069) | Decision D7 is dormant: with no portal there are no external users; requests of user type EXTERNAL stay refused by the default `ExternalUserProvisioner` | - | EBQ13 (closed as not applicable) |
 
 ## 12. Integrations to park (seam only)
 
 | Item | Seam | Question |
 |---|---|---|
-| Insurer system-to-system API | The portal endpoints are the API; OAuth2 client credentials for insurer systems are not enabled | EBQ13 |
+| Insurer system-to-system API | Not built; insurers send files by e-mail and the EB users upload them with the source INSURER | EBQ13 |
 | E-signature verification of the BOR | `BorValidator` port; default = validator checklist attestation | EBQ06 |
-| HRIS / client payroll feed of master lists | `EB_MASTERLIST` bulk handler and portal upload | EBQ15 |
+| HRIS / client payroll feed of master lists | `EB_MASTERLIST` bulk handler (the AO uploads the list the client sends) | EBQ15 |
 | Insurer mailbox reading (proposals, SOAs by e-mail) | AO uploads with the e-mail attached (`EML` / `MSG`) | - |
 | EBIX booking (TAT annex) | Replaced by BIBS booking; `EB_PROGRAMME_LOAD` for migration | EBQ18 |
-| Virus scanning product | `attachment.service.VirusScanner` adapter (required before the portal goes live) | EBQ13 |
-| SMS / push notifications to portal users | `ptl_notice` and e-mail only | - |
+| Virus scanning product | `attachment.service.VirusScanner` adapter for the files uploaded on behalf of insurers and clients | - |
 
 ## 13. Build-wave plan
 
 | Wave | Team | Owns (files) | Delivers | Depends on |
 |---|---|---|---|---|
-| E0 | Foundation | `db/migration/V1030__*`, `V1031__*`; `security/domain/Permission.java` (EB and portal entries); the BT0 files (`account/**` business type only, `booking/service/InvoiceBuilder.java`, `InvoiceBooked.java`, the three `nbreport` reports, `V822`) **only if** no Submitted Policies S0 or Renewal R0 has merged BT0 first; `booking/service/BookingService.java`, booking DTOs and `BOOKING_UPLOAD` handler (billing number); `report/render/**`; `messaging/service/DocumentProtector.java`; `attachment/**`; `eb/package-info.java` and `eb/domain/EbDocumentTypes.java` (constants) | Section 11 platform changes, roles, workflows, LOVs, parameters | BT0 merged (or built here) |
-| E1-A | Portal | `portal/**` (including `PortalUserProvisioner` implementing `nbadmin`'s `ExternalUserProvisioner`), `config/SecurityConfig.java`, `security/service/JwtTokenService.java` (audience), `db/migration/V1032__*`, `frontend/src/portal/**` (shell, sign-in, home, uploads), `frontend/src/features/admin/PortalUsers*` | Realm, users, invitations, staging and review, notices; **the ports of 2.2 are committed on day one** | E0; UAM U1-A (the provisioner port and the EXTERNAL request type) |
-| E1-B | EB marketing | `eb/domain` and `eb/service` classes for programme, cycle, RA, feedback, document, BOR, franchise, TOR, insurer request, proposal, revision, comparative, threshold, confirmation, submission, required document; `eb/api` for the same; `db/migration/V1033__*`, `V1034__*`; `frontend/src/features/eb/` except members, pending items, SOA and reports | BRID-001-004, 007-012, 015-017, 024, 026, 027, 029 | E0; portal ports (interfaces only) |
+| E0 | Foundation | `db/migration/V1030__*`, `V1031__*`; `security/domain/Permission.java` (EB entries); the BT0 files (`account/**` business type only, `booking/service/InvoiceBuilder.java`, `InvoiceBooked.java`, the three `nbreport` reports, `V822`) **only if** no Submitted Policies S0 or Renewal R0 has merged BT0 first; `booking/service/BookingService.java`, booking DTOs and `BOOKING_UPLOAD` handler (billing number); `report/render/**`; `messaging/service/DocumentProtector.java`; `attachment/**`; `eb/package-info.java` and `eb/domain/EbDocumentTypes.java` (constants) | Section 11 platform changes, roles, workflows, LOVs, parameters | BT0 merged (or built here) |
+| E1-B | EB marketing | `eb/domain` and `eb/service` classes for programme, cycle, RA, feedback, document, BOR, franchise, TOR, insurer request, proposal, revision, comparative, threshold, confirmation, submission, required document; `eb/api` for the same; `db/migration/V1033__*`, `V1034__*`; `frontend/src/features/eb/` except members, pending items, SOA and reports | BRID-001-004, 007-012, 015-017, 024, 026, 027, 029 | E0 |
 | E1-C | EB servicing and reports | `eb/domain` and `eb/service` classes for roster, member, member change, tracked item, SOA; `eb/report/**`; EB jobs; `db/migration/V1035__*`, `V1036__*`; `frontend/src/features/eb/{members,pending,soa}*` | BRID-013, 019, 021, 022, 025 (EB side), 030 | E0 |
-| E2 | Integration | `eb/api/portal/**` (EB portal endpoints on `PortalContext`), `eb/service/EbUploadTargets.java`, `EbPortalTasks.java`, portal EB screens in `frontend/src/portal/eb/**`, `db/seed/V1930-V1932`, integration tests, `ApiSmokeIT` entries, help entries, `docs/modules/EMPLOYEE_BENEFITS.md` | End-to-end NB and renewal cycles through the portal; seed storyline | E1-A, E1-B, E1-C |
+| E2 | Integration | End-to-end tests of the internal new-business and renewal flows, `ApiSmokeIT` entries, help entries, `docs/modules/EMPLOYEE_BENEFITS.md` (seed data V1930-V1932 delivered with E1-B / E1-C) | End-to-end NB and renewal cycles; seed storyline | E1-B, E1-C |
 
 Parallel-work rules:
-- E1-A, E1-B and E1-C start together after E0 is delivered. Nobody but E0 edits `Permission.java`, `account/**`, `booking/**`, `attachment/**`; later needs go to E0's owner as a follow-up commit.
+- E1-B and E1-C start together after E0 is delivered. Nobody but E0 edits `Permission.java`, `account/**`, `booking/**`, `attachment/**`; later needs go to E0's owner as a follow-up commit.
 - E1-B and E1-C share `eb/` by class ownership as listed; shared constants live in `eb/domain/EbDocumentTypes.java` and `eb/service/EbParameters.java`, created by E0 and changed only by additions.
-- E1-B and E1-C code against the portal ports but do not implement them; E2 wires them.
 - Migrations use only the listed versions; a missing column in another wave's table is a new migration in V1037-V1039, agreed first.
 - Every wave passes `mvn verify` and `npm run verify`; help entries are added with each screen.
 
@@ -343,23 +307,22 @@ Parallel-work rules:
 | Password convention | EBQ09 | Existing `DocumentPasswordPolicy` (generated) |
 | Comparative factors and signatories | EBQ10 | LOV of factors; one sign-off stage |
 | Threshold values and approvers | EBQ11 | Rule table with seed values TSI 500M, premium 20M |
-| Portal security model | EBQ13 | Realm, invitation, lockout, e-mail OTP; production IdP / MFA decision open |
 | Member data and privacy rules | EBQ15 | Roster with access classes and download logs; retention rule placeholders |
 | Movement types, "no payment no booking" | EBQ16 | LOV and parameter |
 | Report layouts, TAT events | EBQ21 | Reports with the BRD columns; activity log stamps |
 
 ## 15. Risks
 
-1. **Internet-facing portal.** The first external surface of BIBS. BDO Information Security approval, penetration testing, a production virus scanner and the MFA method can delay go-live. Mitigation: build the portal first (E1-A) and run the internal flow without it (AO uploads on behalf of insurers and clients) until it is approved.
+1. **Files from insurers and clients by e-mail.** Without a portal (Drop 2) the EB users upload what insurers and clients send. Mitigation: every upload carries its source, process and cycle; the access classes restrict who sees each document type; nothing takes effect before an internal user acts on it.
 2. **Sensitive personal data.** Rosters and utilization reports. Mitigation: access classes, download logs, minimal roster fields until EBQ15 is answered, no health data in the roster.
 3. **Boundary with the Renewal BRD.** Two renewal processes could send two RAs to the same client. Mitigation (decided, D3): EB lines excluded from the Renewal lists (EBQ28), one document type `RENEWAL_ADVICE` for every RA.
 4. **Shared platform changes** (attachment access classes, DOCX export, business type on the account) touch every module. Mitigation: they are cross-BRD prerequisite work items (`BDOI_CROSS_BRD_DECISIONS.md` section 6); the business type is BT0 (V822), built once; E0 lands the access classes and DOCX export with defaults that keep today's behaviour.
 5. **Undefined thresholds and TATs.** Mitigation: every value is a parameter or a rule row.
 
-## 16. E0 foundation: as built (BDOI Drop 2, no portal)
+## 16. As built (BDOI Drop 2, no portal)
 
-What the E0 wave built, and where it details or differs from the sections above. E1-B and E1-C build on this and
-compile only against it.
+What the waves built, and where it details or differs from the sections above: the foundation E0 (16.1 to 16.5) and the
+first business slice of E1-B and E1-C (16.6, 16.7).
 
 ### 16.1 Scope change: "Employee Benefits (No Portal Feature)"
 
@@ -528,3 +491,173 @@ origin `SUBMITTED_POLICY` with `renewal_of_ref` = SBM number.
   insurer of the invoice (`bkg_invoice.insurer_code`).
 - Screen paths: the portal screens and "Portal Uploads" of the test plan are out of Drop 2; client and insurer
   documents are uploaded by the EB users.
+
+### 16.6 E1-B and E1-C: programmes, renewal advice, BOR, placement accounts and tracked items
+
+The first business slice of the two waves: programmes and cycles with their requirement steps, the renewal advice with
+its job and reminders, client feedback, the document register, the Broker on Record, the accounts of a confirmed cycle
+with the shared business type (BT0), and the tracked items with their follow-up job. The marketing steps after the
+requirements (franchise, TOR, insurer requests, proposals, revisions, comparative, threshold approval, client
+confirmation, submissions and required documents) and the servicing records (roster, members, member changes, SOA) and
+the EB reports are not in this slice; their tables take V1037-V1039 (section 3).
+
+**Migrations.** `V1034__eb_renewal_advice_feedback_bor.sql`: `eb_renewal_advice` (one per cycle: expiry announced, sent
+at / by, JOB or MANUAL, recipients, outbox message, stored document, reminders sent, last reminder, feedback time),
+`eb_feedback` (channel AO, EMAIL, PHONE, MEETING or LETTER; date received; text up to 4,000 characters and / or files;
+check "text or files"), `eb_bor` (version per cycle, stored file, status UPLOADED, VALIDATED, REJECTED or SUPERSEDED, the
+three checklist answers, validity, decision). `V1035__eb_tracked_items.sql`: `eb_tracked_item` (type of list
+`EB_TRACKED_ITEM_TYPE`, subject, member and member change as plain references until those tables exist, account ARN,
+responsible INSURER / CLIENT / BDOI with the insurer party code, follow-up recipients, status PENDING, RECEIVED,
+RELEASED or CLOSED, due date, follow-ups sent, last follow-up, escalation, dates received / released / closed).
+`V1036__eb_reports_support.sql`: indexes, read view `eb_tat_v` (activity stamps with the programme's team and AO and
+the elapsed days), retention rule `EB_PROGRAMME` (LOST, INACTIVE; 5 years online, 10 more in the archive), notification
+event `EB_BOR_DECIDED`. No file content in any table: every file is a `doc_attachment` in the file store.
+
+**Domain** (`eb.domain`, additions): `EbRenewalAdvice` (+ `Sending`), `EbFeedback`, `EbFeedbackChannel`, `EbBor`
+(+ `Checklist`), `EbBorStatus`, `EbTrackedItem` (+ `Details`), `EbItemStatus`, `EbResponsibleParty` and their
+repositories; `EbCodes` gains the entity type `EbTrackedItem`, the template, alert, event, outbox purpose and retention
+codes and `PROGRAMME_LINK`; `EbProgrammeRepository` (`findByIdAndCompanyId`, `findWithLinesExpiring`, specifications),
+`EbCycleRepository` (`findByIdAndCompanyId`, `findOpenOfProgramme`, `countOpenByStage`), `EbDocumentRepository`
+(`findByAttachmentId`, `findByCycleIdOrderByIdAsc`).
+
+**Services** (by sub-package):
+
+| Package | Class | Does |
+|---|---|---|
+| `eb.service` | `EbRecords` | Programme and cycle of a company (another company's record is "not found"), open-cycle guard `EB_CYCLE_CLOSED` |
+| | `EbWorkingDays` | Working days on the head office calendar (weekends and holidays), Monday to Friday without a head office |
+| | `EbActivityLog` | Received / released stamps of the TAT activities (`received`, `done`, `released`) |
+| `eb.programme` | `ProgrammeService`, `ProgrammeRules` | Create (client prospect or confirmed; EBP number; ACTIVE when a line has a current policy or ARN, else PROSPECT), profile, lines and contacts (at least one active line and one active contact; LOV team and benefit line; incumbent insurer known; period; e-mail; AO must hold EB_MARKET) |
+| | `ProgrammeQuery` | Work list tabs RENEWAL_DUE (flagged, ACTIVE, a line expiring within `EB_RA_LEAD_DAYS`, no advice yet), IN_PROGRESS, WITH_CLIENT (with CONFIRMED), IN_PLACEMENT, PLACED, LOST (with LAPSED and not renewed), ALL; filters stage, AO, team, text |
+| | `ProgrammeViewService` | Programme page (lines, contacts, cycles with renewal advice and BOR status, current cycle) and activity log |
+| | `EbClientRecords`, `EbProgrammeRetentionProvider` | Client 360 records; retention candidates of `EB_PROGRAMME` |
+| `eb.cycle` | `CycleService` | Open a cycle (business type required, `EB_BUSINESS_TYPE_REQUIRED`; renewal only for a flagged programme; one open cycle per policy year `EB_CYCLE_OPEN_EXISTS`; EBC number; `EB_CYCLE` work case), `start` (new business only), `stay_with_incumbent` (renewal only), `remarket` (needs the BOR gate; marks remarketing) |
+| | `CycleOutcomeListener` | `close_lost` / `not_renewed` (generic, reason `EB_LOST_REASON`): outcome and reason on the cycle; programme LAPSED (renewal not renewed) or LOST |
+| | `BorGate` (port) | "No validated BOR in force": `EB_BOR_REQUIRED` "Cycle <no.> has no validated Broker on Record" |
+| `eb.renewal` | `RenewalAdviceService`, `RenewalAdviceLetter`, `RenewalTarget` | Send the advice (below); reminders |
+| | `RenewalAdviceJob` | `EB_RENEWAL_ADVICE` |
+| | `RenewalAdviceBatch` | Send RA from the work list, one transaction per programme, a result per programme |
+| | `FeedbackService` | Record feedback (below) |
+| `eb.document` | `EbDocumentService`, `EbDocumentQuery` | Register (below); Documents tab filtered by the access classes |
+| `eb.bor` | `BorService` | Upload (PDF or Word, `ATTACHMENT_TYPE_NOT_ALLOWED` "Upload the BOR as PDF or Word"; one version waiting at a time, `EB_BOR_PENDING`), validate (checklist complete `EB_BOR_CHECKLIST_INCOMPLETE`, validity required and ordered), reject with a reason (register entry REJECTED); an earlier validated version is superseded; the uploader is notified (`EB_BOR_DECIDED`); implements `BorGate` over the programme's versions in force on the business date |
+| `eb.placement` | `EbPlacementService`, `LinePlacement`, `PlacementProgressListener` | Accounts of a confirmed cycle (below) |
+| `eb.tracked` | `TrackedItemService`, `TrackedItemQuery`, `ItemFollowUpService`, `FollowUpSchedule`, `ItemFollowUpJob` | Tracked items and `EB_ITEM_FOLLOWUP` (below) |
+| `eb.home` | `EbHomeService` | EB Home counts |
+
+**Renewal advice (FR-EB-022).** The advice announces the earliest expiry of the programme's active lines (on or after
+the business date; for the job, not after the lead time); its policy year is the expiry's year. The RENEWAL cycle of
+that year is opened (or an OPEN renewal cycle without advice is reused). The text is template `EB_RENEWAL_ADVICE`
+(contact names, programme, lines, expiry dd-MMM-yyyy, incumbent insurers, AO); the PDF (`DocumentComposer`) is stored
+as `RENEWAL_ADVICE`, process `RENEWAL_PLACEMENT`, source SYSTEM, on the cycle and linked to the programme, the client and
+every current ARN of the lines (decision D3: Customer Servicing finds it). The e-mail goes to the active contacts that
+receive the advice, the AO in copy, with the PDF password-protected and the password in a second e-mail
+(`OutboundEmail.Protection`). The cycle moves `send_ra`; the activity `RENEWAL_ADVICE` is stamped. Refused: not flagged
+("Programme <no.> is not flagged for renewal"), not ACTIVE ("has no current business to renew"), no contact for the
+advice, no line ending on or after today (`EB_RA_NO_EXPIRY`), cycle past the advice (`EB_RA_ALREADY_SENT`). The job
+raises `EB_RA_NOT_SENT` (de-duplicated per programme and expiry) instead of refusing, and skips a policy year that
+already has a cycle past OPEN or a closed cycle. Reminders: template `EB_RA_REMINDER`, one per run for each day of
+`EB_RA_REMINDER_DAYS` reached while the cycle is RA_SENT; a cycle that left RA_SENT stops them.
+
+**Feedback (FR-EB-023).** Channel and date received (not after the business date) are required; text or at least one
+file (`EB_FEEDBACK_EMPTY` "Enter the feedback or attach a file"). Files are `EB_CLIENT_FEEDBACK` documents, source
+CLIENT. The first feedback stops the reminders and moves RA_SENT to REQUIREMENTS (`record_feedback`). The AO is notified
+(`EB_FEEDBACK_RECEIVED`) when someone else records it.
+
+**Document register (FR-EB-002, 030).** Upload on a cycle (the transaction; `EB_DOCUMENT_TRANSACTION_REQUIRED` without
+it), with the document type (an EB type or `RENEWAL_ADVICE`; the BOR only on its tab, `EB_BOR_ON_BOR_TAB`), the process
+(list `EB_PROCESS_TYPE`, `EB_PROCESS_REQUIRED` "Select the process of the document") and the source (AO, PROCESSING,
+CLIENT, INSURER). Files go through `DocumentService.upload` (type, signature, size, file store) on the cycle and are
+linked to the programme and the client with the process tag. All files of one upload share a version number; the ACTIVE
+entries of the type on the cycle become SUPERSEDED (feedback and BOR files do not supersede). The Documents tab lists only
+the documents whose type the user may see (`DocumentService.list`, access classes of V1031).
+
+**Accounts with the shared business type (FR-EB-021 R2, FR-EB-046).** Contract for the client-confirmation step:
+`EbPlacementService.trigger(companyId, cycleId, List<LinePlacement(lineNo, AccountDraft draft, PremiumBreakdown
+premium)>)` on a CONFIRMED cycle (`EB_CYCLE_NOT_CONFIRMED`). One `AccountService.createDraft` per line (a line only once,
+`EB_LINE_TWICE`): the programme's client and AO, the line's product and incumbent insurer where the draft has none;
+classification RENEWAL with `renewal_of_ref` = the line's current ARN (else its current policy number, else
+programme/line) for a RENEWAL cycle, NEW_BUSINESS for a new-business cycle, origin `EMPLOYEE_BENEFITS` for both. The ARNs
+are kept on the cycle, a line without a product takes the account's product, the account's contract becomes a tracked
+item (CONTRACT, owed by the insurer, due `EB_TAT_POLICY_SOA` working days ahead), the cycle moves `trigger_placement`,
+the activity `PLACEMENT_REQUEST` is stamped and Processing (`EB_PROCESS`) is notified (`EB_PLACEMENT_TRIGGERED`).
+`PlacementProgressListener` listens to `AccountStatusChanged`: when the last account of an IN_PLACEMENT cycle is BOOKED
+the cycle records its outcome (NEW_PLACED; RENEWED_INCUMBENT when every account keeps the line's product and incumbent
+insurer, else MOVED), each line takes its account as the current policy (ARN, insurer, period, first policy number), the
+programme becomes ACTIVE and the cycle moves `placed`. The accounts stay drafts for the AO to complete and submit on the
+account screens (the EB product catalogue and the proposal data are not yet in BIBS).
+
+**Tracked items (FR-EB-057).** Opened by EB_MARKET or EB_PROCESS users on a programme (type, subject, due date,
+responsible party required; recipients e-mail checked) and for each placed account. Moved on: RECEIVE (date required,
+`EB_ITEM_RECEIVED_DATE` "Enter the date received"), RELEASE (after RECEIVED), CLOSE (a pending item needs its date
+received); dates not after the business date; only a pending item changes. `EB_ITEM_FOLLOWUP`: for each PENDING item
+past due, `FollowUpSchedule` gives the n-th follow-up `n x EB_FOLLOWUP_DAYS` working days after the due date; while fewer
+than `EB_FOLLOWUP_MAX` were sent, template `EB_ITEM_FOLLOWUP` goes to the item's recipients, else the insurer's
+placement mailboxes, the client's active contacts or the AO; then (or when nobody can be written to) the alert
+`EB_ITEM_OVERDUE` (de-duplicated per item) and the notice `EB_ITEM_ESCALATED` to the AO, once.
+
+**API** (`/api/v1/eb`, company in `companyId`):
+
+| Method and path | Permission | Does |
+|---|---|---|
+| `GET /home` | EB_VIEW | Tile counts: `raDue`, `awaitingFeedback`, `franchisePending`, `proposalsOutstanding`, `comparativesToSignOff`, `thresholdApprovals`, `withClient`, `pendingItemsOverdue` |
+| `GET /account-officers` | EB_VIEW | Users holding EB_MARKET |
+| `GET /programmes?tab=&stage=&ao=&team=&q=&page=&size=` | EB_VIEW | Work list |
+| `POST /programmes`, `GET`, `PUT /programmes/{id}` | EB_MARKET / EB_VIEW | Create, read, change the profile |
+| `POST /programmes/{id}/lines`, `PUT`, `DELETE /programmes/{id}/lines/{lineNo}` | EB_MARKET | Lines |
+| `POST /programmes/{id}/contacts`, `PUT`, `DELETE /programmes/{id}/contacts/{contactId}` | EB_MARKET | Contacts |
+| `POST /programmes/send-ra` | EB_MARKET | Send RA of the selected programmes |
+| `GET /programmes/{id}/activity`, `/feedback`, `/documents`, `/bor`, `/accounts` | EB_VIEW | Tabs of the programme page |
+| `POST /programmes/{id}/cycles` | EB_MARKET | Open a cycle |
+| `POST /cycles/{id}/start`, `/stay-with-incumbent`, `/remarket` | EB_MARKET | Requirement steps |
+| `POST /cycles/{id}/feedback` (multipart) | EB_MARKET | Record feedback |
+| `POST /cycles/{id}/documents` (multipart) | EB_MARKET or EB_PROCESS | Upload documents |
+| `POST /cycles/{id}/bor` (multipart), `POST /bor/{id}/validate`, `POST /bor/{id}/reject` | EB_MARKET; validate / reject EB_MARKET or EB_PROCESS | BOR |
+| `GET /pending-items?programmeId=&member=&type=&responsible=&status=&overdue=&q=`, `POST /pending-items`, `PUT /pending-items/{id}`, `POST /pending-items/{id}/status` | EB_VIEW; changes EB_MARKET or EB_PROCESS | Pending Items |
+
+Documents are downloaded through the attachment API (`/api/v1/attachments/{id}/content`, access classes applied).
+
+**Screens** (`features/eb`, standard record and work list pattern): EB Home (tile counts, "Needs attention" on RA due and
+pending items overdue), Programmes (tabs, search, stage and team filters, selection column and Send RA with a result
+list), New Programme (client picker with prospects, profile, repeated benefit line and HR contact groups, validation,
+unsaved-changes guard), the programme page (`RecordHeader` with the programme, client and cycle chips, status and cycle
+stage, flags; `WorkflowPanel` of the current cycle with Send RA, Record Feedback, Start Requirements, Stay with Incumbent
+and Go to Market; page actions Edit Programme, Add Pending Item, Open Cycle; tabs Cycle (cycles, renewal advice,
+feedback), Lines, Contacts, Documents (upload dialog), BOR (upload, validate with the checklist, reject), Accounts,
+Pending Items and History (activity log)), Pending Items (filters member, type, party, status, past due; Add Pending
+Item; Mark Received / Released, Close Item). The comparative, member change, SOA and set-up routes keep the E0
+placeholder. Status tones for the EB stages were added to `statusTones`.
+
+**Seed data.** V1930 SIT/UAT users; V1931 six programmes and four cycles with their work cases, advices, feedback and
+activity (dates relative to the load date; series `EBP-2026` and `EBC-2026` continue at 101); V1932 three tracked items.
+Screenshots: `eb-home`, `eb-programmes`, `eb-programme-record`, `eb-new-programme`, `eb-pending-items` in
+`tools/screenshots/screens.cjs`.
+
+**Tests.** `EbProgrammeIT`, `EbRenewalAdviceIT`, `EbDocumentsBorIT`, `EbPlacementIT`, `EbTrackedItemsIT`,
+`api/EbProgrammesApiIT`, the EB block of `ApiSmokeIT`; unit tests `EbServicingDomainTest`, `RenewalTargetTest`,
+`FollowUpScheduleTest`; frontend `module.test.tsx`, `programmes/programmePages.test.tsx`,
+`programmes/programmeLogic.test.ts`, `pending/pendingItems.test.tsx`.
+
+### 16.7 Notes for FRS v1.1 (E1-B, E1-C)
+
+- FR-EB-021: "Programme <no.> already has an open cycle for <year>" is `EB_CYCLE_OPEN_EXISTS`; a renewal cycle of a
+  programme not flagged for renewal is refused with `EB_NOT_RENEWAL_ELIGIBLE`. Validation codes `EB_LINE_REQUIRED`,
+  `EB_CONTACT_REQUIRED`, `EB_CLIENT_REQUIRED`, `EB_AO_INVALID`, `EB_LINE_PERIOD_INVALID`, `EMAIL_ADDRESS_INVALID`. The
+  account officer list is the users holding EB_MARKET (`GET /api/v1/eb/account-officers`).
+- FR-EB-022: manual send refusal "Programme <no.> is not flagged for renewal" is `EB_RA_NOT_ALLOWED` (also "has no
+  current business to renew", "has no HR contact receiving the renewal advice"); `EB_RA_NO_EXPIRY`,
+  `EB_RA_ALREADY_SENT`, `EB_RA_SELECTION`. The reminder carries no portal link (no portal); the client replies by e-mail.
+  New or prospect programmes (no current business) receive no advice.
+- FR-EB-023: channel list AO / E-mail / Telephone / Meeting / Letter (no Portal); codes `EB_FEEDBACK_EMPTY`,
+  `EB_FEEDBACK_DATE_FUTURE`, `EB_FEEDBACK_DATE_REQUIRED`, `EB_FEEDBACK_CHANNEL_REQUIRED`.
+- FR-EB-002 / 030: `EB_PROCESS_REQUIRED` (the FRS "-"), `EB_DOCUMENT_TRANSACTION_REQUIRED`, `EB_DOCUMENT_TYPE_REQUIRED`,
+  `EB_DOCUMENT_TYPE_INVALID`, `EB_BOR_ON_BOR_TAB`. "Request Unnamed Master List" (portal task) is not built; the AO
+  asks the incumbent by e-mail and uploads the census with the source INSURER.
+- FR-EB-031: `EB_BOR_CHECKLIST_INCOMPLETE`, `EB_BOR_REQUIRED` ("Cycle <no.> has no validated Broker on Record"),
+  `EB_BOR_VALIDITY_REQUIRED`, `EB_BOR_VALIDITY_INVALID`, `EB_BOR_REASON_REQUIRED`, `EB_BOR_PENDING`,
+  `EB_BOR_ALREADY_DECIDED`; the validator is an EB_MARKET or EB_PROCESS user; a validated BOR in force for the
+  programme (any cycle) opens the market.
+- FR-EB-046: `EB_CYCLE_NOT_CONFIRMED`, `EB_LINE_TWICE`. The trigger creates draft accounts; submitting them to
+  Processing waits for the EB products and the proposal data (the minimum-field matrix of BRD-1 applies on submit).
+- FR-EB-057: `EB_ITEM_RECEIVED_DATE`, `EB_ITEM_NOT_RECEIVED`, `EB_ITEM_NOT_PENDING`, `EB_ITEM_CLOSED`,
+  `EB_ITEM_DUE_REQUIRED`, `EB_ITEM_SUBJECT_REQUIRED`, `EB_ITEM_RESPONSIBLE_REQUIRED`, `EB_ITEM_DATE_FUTURE`. HMO card
+  and billing items are opened by the users until the member and member change steps create them.

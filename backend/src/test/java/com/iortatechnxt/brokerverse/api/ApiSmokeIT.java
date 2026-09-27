@@ -327,6 +327,33 @@ class ApiSmokeIT {
         .andExpect(status().isOk());
   }
 
+  /**
+   * The list reads of Employee Benefits (BRD-8, waves E1-B and E1-C), each as the persona whose
+   * screen makes it; the record reads of one programme are in {@code EbProgrammesApiIT}.
+   */
+  @ParameterizedTest
+  @CsvSource({
+    "ebao, /api/v1/eb/home?companyId={c}",
+    "ebao, /api/v1/eb/account-officers",
+    "ebao, /api/v1/eb/programmes?companyId={c}",
+    "ebao, /api/v1/eb/programmes?companyId={c}&tab=RENEWAL_DUE",
+    "ebtl, /api/v1/eb/programmes?companyId={c}&tab=IN_PROGRESS&stage=RA_SENT",
+    "ebmgmt, /api/v1/eb/programmes?companyId={c}&tab=WITH_CLIENT",
+    "ebproc, /api/v1/eb/programmes?companyId={c}&tab=IN_PLACEMENT&q=EBP",
+    "ebcoll, /api/v1/eb/programmes?companyId={c}&tab=LOST&page=0&size=5",
+    "auditor, /api/v1/eb/programmes?companyId={c}&tab=PLACED&team=BDO&ao=ebao",
+    "ebao, /api/v1/eb/pending-items?companyId={c}",
+    "ebproc, /api/v1/eb/pending-items?companyId={c}&overdue=true",
+    "ebcoll, /api/v1/eb/pending-items?companyId={c}&type=HMO_CARD&responsible=INSURER&status=PENDING",
+    "ebao, /api/v1/eb/pending-items?companyId={c}&member=EMP&q=EBP",
+  })
+  void employeeBenefitsListsRespondOk(String user, String url) throws Exception {
+    mvc.perform(
+            get(url.replace("{c}", data.company().getId().toString()))
+                .with(user(users.loadUserByUsername(user))))
+        .andExpect(status().isOk());
+  }
+
   @ParameterizedTest
   @ValueSource(
       strings = {

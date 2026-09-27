@@ -296,6 +296,8 @@ export interface SearchPanelValues {
   includeVoided: boolean;
   /** NEW_BUSINESS or RENEWAL (BRNB.097, shared work item BT0); blank for both. */
   businessType: string;
+  /** BIBS or MIGRATED (BRD-13); blank for both. */
+  origin: string;
 }
 
 export const EMPTY_PANEL: SearchPanelValues = {
@@ -310,6 +312,7 @@ export const EMPTY_PANEL: SearchPanelValues = {
   periodTo: '',
   includeVoided: false,
   businessType: '',
+  origin: '',
 };
 
 /** Criteria of the search panel combined with a quick filter (the quick filter's status wins). */

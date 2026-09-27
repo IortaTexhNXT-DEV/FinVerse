@@ -223,6 +223,18 @@ class MigrationClientsHeadersApiIT {
     assertThat(account.get("client_code")).isEqualTo(clientCode);
     assertThat(account.get("insurer_code")).isEqualTo("INS-MGIC");
     assertThat(account.get("legacy_package_code")).isEqualTo("PKG-CAR");
+    JsonNode byPolicy =
+        mig.get("ao", "/api/v1/accounts?companyId=" + company + "&origin=MIGRATED&text=POL-" + t);
+    assertThat(byPolicy.get("content")).hasSize(1);
+    JsonNode summary = byPolicy.get("content").get(0);
+    assertThat(summary.get("origin").asText()).isEqualTo("MIGRATED");
+    assertThat(summary.get("legacyRef").asText()).isEqualTo(ref);
+    JsonNode record = mig.get("ao", "/api/v1/accounts/" + summary.get("id").asText());
+    assertThat(record.get("legacy").get("legacyPackageCode").asText()).isEqualTo("PKG-CAR");
+    assertThat(
+            mig.get("ao", "/api/v1/accounts?companyId=" + company + "&origin=BIBS&text=POL-" + t)
+                .get("content"))
+        .isEmpty();
 
     Map<String, String> ra = new HashMap<>();
     ra.put("legacy_policy_ref", ref);

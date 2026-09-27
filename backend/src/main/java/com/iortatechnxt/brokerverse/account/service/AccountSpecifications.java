@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.account.service;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
+import com.iortatechnxt.brokerverse.account.domain.AccountLegacyHeader;
+import com.iortatechnxt.brokerverse.account.domain.AccountOrigin;
 import com.iortatechnxt.brokerverse.account.domain.AccountStatus;
 import com.iortatechnxt.brokerverse.account.domain.PaymentArrangement;
 import com.iortatechnxt.brokerverse.account.domain.RiskIdentifiers;
@@ -35,7 +37,8 @@ final class AccountSpecifications {
       if (!s.includeVoided()) {
         where.add(cb.notEqual(root.get("status"), AccountStatus.VOIDED));
       }
-      text(root, cb, s.text(), where);
+      text(root, query.subquery(Long.class), cb, s.text(), where);
+      origin(root, cb, s.migrated(), where);
       equal(root, cb, "productCode", s.productCode(), where);
       equal(root, cb, "lineCode", s.lineCode(), where);
       equal(root, cb, "insurerCode", s.insurerCode(), where);
@@ -61,17 +64,43 @@ final class AccountSpecifications {
   }
 
   private static void text(
-      Root<Account> root, CriteriaBuilder cb, String text, List<Predicate> where) {
+      Root<Account> root,
+      Subquery<Long> legacy,
+      CriteriaBuilder cb,
+      String text,
+      List<Predicate> where) {
     if (!present(text)) {
       return;
     }
     String like = like(text);
+    Root<AccountLegacyHeader> h = legacy.from(AccountLegacyHeader.class);
+    legacy
+        .select(h.get("accountId"))
+        .where(
+            cb.equal(h.get("accountId"), root.get("id")),
+            cb.or(
+                cb.like(cb.lower(h.get("legacyRef")), like),
+                cb.like(cb.lower(h.get("policyNo")), like),
+                cb.like(cb.lower(h.get("coverNo")), like)));
     where.add(
         cb.or(
             cb.like(cb.lower(root.get("arn")), like),
             cb.like(cb.lower(root.get("clientCode")), like),
             cb.like(cb.lower(root.get("clientName")), like),
-            cb.like(cb.lower(root.get("quotationRef")), like)));
+            cb.like(cb.lower(root.get("quotationRef")), like),
+            cb.exists(legacy)));
+  }
+
+  /** Accounts imported from legacy (origin MIGRATED) or the others. */
+  private static void origin(
+      Root<Account> root, CriteriaBuilder cb, Boolean migrated, List<Predicate> where) {
+    if (migrated != null) {
+      Expression<AccountOrigin> origin = root.get("classification").get("origin");
+      where.add(
+          Boolean.TRUE.equals(migrated)
+              ? cb.equal(origin, AccountOrigin.MIGRATED)
+              : cb.notEqual(origin, AccountOrigin.MIGRATED));
+    }
   }
 
   private static void flags(

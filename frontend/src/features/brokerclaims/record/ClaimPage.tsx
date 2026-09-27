@@ -128,6 +128,7 @@ export default function ClaimPage() {
           <WorkflowPanel
             entityType={CLAIM_ENTITY}
             entityId={c.id}
+            recordStatus={c.progress.statusLabel ?? c.progress.phase}
             onChanged={() => void claim.refetch()}
           />
           <ClaimTabs claim={c} companyId={companyId} />

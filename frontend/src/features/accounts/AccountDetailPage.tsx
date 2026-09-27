@@ -239,6 +239,7 @@ export default function AccountDetailPage() {
       <WorkflowPanel
         entityType={ACCOUNT_ENTITY}
         entityId={a.id}
+        recordStatus={a.status}
         showHistory={false}
         onChanged={() => void refresh()}
         renderBusinessActions={(actions) => <AccountActions account={a} actions={actions} />}

@@ -155,6 +155,7 @@ export default function CertificatePage() {
       <WorkflowPanel
         entityType={CERTIFICATE_ENTITY}
         entityId={c.id}
+        recordStatus={c.stage}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['commission'] })}
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />

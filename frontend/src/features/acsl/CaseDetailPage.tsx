@@ -198,6 +198,7 @@ export default function CaseDetailPage() {
       <WorkflowPanel
         entityType={CASE_ENTITY}
         entityId={c.id}
+        recordStatus={c.stage}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['acsl'] })}
         renderBusinessActions={(actions) => <CaseActions c={c} actions={actions} />}
       />

@@ -334,6 +334,7 @@ export default function ServiceFeeRunPage() {
       <WorkflowPanel
         entityType={RUN_ENTITY}
         entityId={r.id}
+        recordStatus={r.stage}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['frbs'] })}
         renderBusinessActions={(actions) => <RunActions run={r} actions={actions} />}
       />

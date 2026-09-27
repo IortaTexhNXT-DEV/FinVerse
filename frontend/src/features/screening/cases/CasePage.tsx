@@ -220,6 +220,7 @@ export default function CasePage() {
       <WorkflowPanel
         entityType="ScreeningCase"
         entityId={d.row.id}
+        recordStatus={d.row.stage}
         showHistory={false}
         onChanged={() => void refresh()}
         renderBusinessActions={() =>

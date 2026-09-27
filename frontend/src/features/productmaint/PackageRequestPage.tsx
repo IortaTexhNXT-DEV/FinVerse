@@ -217,6 +217,7 @@ export default function PackageRequestPage() {
       <WorkflowPanel
         entityType={PACKAGE_REQUEST_ENTITY}
         entityId={p.id}
+        recordStatus={p.status}
         showHistory={false}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['package-request', id] })}
         renderBusinessActions={(actions) => <PackageActions request={p} actions={actions} />}

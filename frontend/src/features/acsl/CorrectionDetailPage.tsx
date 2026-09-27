@@ -163,6 +163,7 @@ export default function CorrectionDetailPage() {
       <WorkflowPanel
         entityType={CORRECTION_ENTITY}
         entityId={c.id}
+        recordStatus={c.stage}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['acsl'] })}
         renderBusinessActions={(actions) => <CorrectionActions c={c} actions={actions} />}
       />

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlarmClock, UserCheck } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { workflowApi } from '@/api/workflow';
 import type { ActionNote, WorkAction, WorkItem } from '@/api/workflow';
@@ -28,6 +28,11 @@ interface WorkflowPanelProps {
   onChanged?: () => void;
   /** Show the status history below the stage. */
   showHistory?: boolean;
+  /**
+   * The status shown in the record header. When it changes (a business action run by the page,
+   * a save, a refresh) the stepper is reloaded, so the header and the stepper never disagree.
+   */
+  recordStatus?: string;
 }
 
 /** Current stage, since, due date with the overdue indicator and assignee, on one row. */
@@ -74,6 +79,37 @@ function StageMeta({ item, terminal }: Readonly<{ item: WorkItem; terminal: bool
 }
 
 /**
+ * Keeps the record header and the stepper on the same state: a change of the header status
+ * reloads the stepper, and a stage change seen by the stepper (after an action taken anywhere)
+ * refreshes the record through `onChanged`. Returns the last stage seen, which the panel's own
+ * actions update (they call `onChanged` themselves).
+ */
+function useHeaderSync(
+  key: ReturnType<typeof workflowKey>,
+  stage: string | undefined,
+  recordStatus: string | undefined,
+  onChanged: (() => void) | undefined,
+) {
+  const queryClient = useQueryClient();
+  const lastStatus = useRef(recordStatus);
+  const lastStage = useRef(stage);
+  useEffect(() => {
+    if (recordStatus !== lastStatus.current) {
+      lastStatus.current = recordStatus;
+      void queryClient.invalidateQueries({ queryKey: key });
+    }
+  }, [recordStatus, queryClient, key]);
+  useEffect(() => {
+    const before = lastStage.current;
+    lastStage.current = stage;
+    if (before !== undefined && stage !== undefined && before !== stage) {
+      onChanged?.();
+    }
+  }, [stage, onChanged]);
+  return lastStage;
+}
+
+/**
  * The workflow header of a record (BRNB.022/115): a horizontal stepper built from the workflow's
  * defined stages (passed stages checked, the current one highlighted, returned and closed paths
  * marked), then one meta row with the current stage, since, due (overdue flagged) and assignee,
@@ -87,6 +123,7 @@ export function WorkflowPanel({
   renderBusinessActions,
   onChanged,
   showHistory = true,
+  recordStatus,
 }: Readonly<WorkflowPanelProps>) {
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -96,11 +133,13 @@ export function WorkflowPanel({
     queryKey: key,
     queryFn: () => workflowApi.byRecord(entityType, entityId),
   });
+  const seenStageRef = useHeaderSync(key, detail.data?.item.stageCode, recordStatus, onChanged);
   const act = useMutation({
     mutationFn: ({ action, note }: { action: WorkAction; note: ActionNote }) =>
       workflowApi.act(detail.data?.item.id ?? 0, action.action, note),
     onSuccess: async (result) => {
       setPending(null);
+      seenStageRef.current = result.item.stageCode;
       queryClient.setQueryData(key, result);
       await queryClient.invalidateQueries({ queryKey: ['workflow', 'queue'] });
       toast.success(`Moved to ${result.item.stageName}`);

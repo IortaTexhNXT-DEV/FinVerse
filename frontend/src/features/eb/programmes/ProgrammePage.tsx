@@ -177,6 +177,7 @@ export default function ProgrammePage() {
         <WorkflowPanel
           entityType="EbCycle"
           entityId={current.id}
+          recordStatus={current.stage}
           onChanged={() => void queryClient.invalidateQueries({ queryKey: ['eb'] })}
           renderBusinessActions={(actions) =>
             market && (

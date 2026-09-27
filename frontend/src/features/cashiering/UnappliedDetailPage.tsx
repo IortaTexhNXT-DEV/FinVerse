@@ -182,6 +182,7 @@ export default function UnappliedDetailPage() {
       <WorkflowPanel
         entityType={ENTITY}
         entityId={u.id}
+        recordStatus={u.stage}
         onChanged={() => void refresh()}
         renderBusinessActions={(actions) =>
           actions

@@ -21,6 +21,7 @@ import type { RequestForm } from './packageRequest';
 import { RequestHeaderCard } from './RequestHeaderCard';
 import { TermsEditor } from './TermsEditor';
 import '@/styles/quotation.css';
+import { refreshRecord } from '@/components/broking/recordRefresh';
 
 function useRequestSaver(setForm: (u: (f: RequestForm) => RequestForm) => void) {
   const companyId = useCompanyId();
@@ -44,7 +45,8 @@ function useRequestSaver(setForm: (u: (f: RequestForm) => RequestForm) => void) 
   });
   const submit = useMutation({
     mutationFn: async (f: RequestForm) => productMaintApi.submit((await persist(f)).id),
-    onSuccess: (p) => {
+    onSuccess: async (p) => {
+      await refreshRecord(queryClient, ['package-request', p.id], PACKAGE_REQUEST_ENTITY, p.id, p);
       toast.success(`${p.requestNo} submitted for Marketing approval`);
       void navigate(`/product-maintenance/requests/${p.id}`);
     },

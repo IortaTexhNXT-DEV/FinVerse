@@ -258,6 +258,7 @@ export default function QuotationDetailPage() {
       <WorkflowPanel
         entityType={QUOTATION_ENTITY}
         entityId={q.id}
+        recordStatus={q.status}
         showHistory={false}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['quotation', id] })}
         renderBusinessActions={(actions) => <QuotationActions quotation={q} actions={actions} />}

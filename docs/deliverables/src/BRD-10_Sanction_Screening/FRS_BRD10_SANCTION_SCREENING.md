@@ -19,20 +19,20 @@ control:
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Solution Architect
     approver: ""
-    change: Internal draft from the BRD-10 baseline and the build design
+    change: Internal draft from the BRD-10 baseline
   - version: "1.0"
     date: 25 Sep 2026
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
-    change: First issue for BDOI review; specified from the BRD and the build design (not yet built); aligned with the cross-BRD decisions
+    change: First issue for BDOI review; specified from the BRD; aligned with the cross-BRD decisions
 distribution:
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: Chief Compliance Officer and Compliance unit, role: Business owner, organisation: BDOI, purpose: Review of all FRs}
   - {name: "Unit Head, Claims and Risk Management", role: Approver, organisation: BDOI, purpose: Review of the risk-profiling and case steps}
   - {name: "Combank, Corbank and Retail Marketing", role: Business user, organisation: BDOI, purpose: Review of the investigation and approval steps}
   - {name: Business Project Services, role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Build, test and UAT preparation"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, test and UAT preparation"}
 ---
 
 # Introduction
@@ -41,9 +41,9 @@ distribution:
 
 This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker System, on iNXT BrokerVerse) meets the Sanction Screening and Risk Profiling business requirements of BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It turns each BRD requirement into functional requirements with actors, flows, rules, validations, screens, fields, notifications, audit and acceptance criteria.
 
-BDOI uses this document to confirm that the system will behave as Compliance expects. The project team uses it to build, test and prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
+BDOI uses this document to confirm that the system will behave as Compliance expects. The project team uses it to deliver and test the screening functions and to prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
 
-Sanction screening is designed but not yet built. The FRs are specified from the BRD (R1), the requirements baseline (R2) and the build design (R3). Message codes are assigned at build; this document gives the message text only.
+The FRs are specified from the BRD (R1) and the requirements baseline (R2). They describe the proposed behaviour of the screening screens. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, chapter 12 lists each such point for confirmation. This document gives the message text; the message codes are confirmed with BDOI's review.
 
 ## Scope
 
@@ -124,7 +124,7 @@ Each FR in section 4 has the same parts:
 - A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority** (every BRD-10 requirement is "Must have") and the **screens** where the user performs it.
 - **Description**, **preconditions**, **main flow** and **alternate and exception flows**.
 - **Business rules**. *Configurable* rules are maintained by Compliance or the System Administrator in BIBS (configuration version, parameter or list of values, section 9). *Fixed* rules are part of the system and change only through a change request.
-- **Validations and messages**: the check and the message the user sees. The message codes are assigned when the module is built; the column shows "To be assigned at build". A "-" marks a screen check (for example a blank mandatory field), which has no business code.
+- **Validations and messages**: the check and the message the user sees. The message codes are confirmed with BDOI's review; the column shows "To be confirmed". A "-" marks a screen check (for example a blank mandatory field), which has no business code.
 - **Screens and fields**: label, type, whether mandatory ("Cond." = mandatory when the condition in the Validation column applies), the source list and the validation.
 - **Notifications**, **audit** and numbered **acceptance criteria**. The acceptance criteria are the basis of the test cases of the BRD-10 test plan.
 
@@ -206,7 +206,7 @@ A case has one of six types (LOV SCR_CASE_TYPE). The type comes from the risk ca
 
 ## Personas
 
-<!-- table: widths=3,4.6,6.6,3.4 caption="Personas and BIBS roles (design R3, section 6.2)" -->
+<!-- table: widths=3,4.6,6.6,3.4 caption="Personas and BIBS roles" -->
 | Persona | BIBS role | Responsibilities in Sanction Screening | BRD |
 |---|---|---|---|
 | Compliance Officer | COMPLIANCE_OFFICER | Drafts configuration; maintains list entries and uploads list files; reviews BU escalations; prepares and extracts STRs; re-assigns cases; runs reports and the audit report | SNSRP-101 to 108, 203, 703, 705, 706, 901, 903 |
@@ -295,7 +295,7 @@ rules:
   - [R3, "Four-eyes rules cannot be switched off.", Fixed, "-"]
 validations:
   - [Action without permission, You are not permitted to perform this action, ACCESS_DENIED]
-  - [Action on a case not assigned to the user, "Case <case no.> is assigned to <user>", To be assigned at build]
+  - [Action on a case not assigned to the user, "Case <case no.> is assigned to <user>", To be confirmed]
 notifications:
   - "None."
 audit:
@@ -337,9 +337,9 @@ rules:
   - [R3, "The difference is computed against the version active on the day of submission and stored with the version.", Fixed, "-"]
   - [R4, "A case records the version of each type it used; later versions do not change it.", Fixed, "-"]
 validations:
-  - [Effective date in the past, The effective date cannot be before today, To be assigned at build]
-  - [Draft has no rule, Add at least one rule before submitting, To be assigned at build]
-  - [Draft identical to the active version, The draft does not change the active configuration, To be assigned at build]
+  - [Effective date in the past, The effective date cannot be before today, To be confirmed]
+  - [Draft has no rule, Add at least one rule before submitting, To be confirmed]
+  - [Draft identical to the active version, The draft does not change the active configuration, To be confirmed]
 fields_screen: Configuration Version (header)
 fields:
   - [Type, List, "Yes", "MATCH_CRITERIA, RISK_RULES, APPROVAL_MATRIX, ASSIGNMENT_MATRIX, SLA_MATRIX, VALIDATION_RULES, TEMPLATE, STR_LAYOUT", Fixed after creation]
@@ -367,7 +367,7 @@ priority: Must have
 screens: Configuration Versions (tab Matching Criteria)
 description:
   - The matching criteria control screening quality. For each list type (SANCTION, PEP, INTERNAL, ADVERSE_MEDIA) and subject type (individual or entity) the Compliance Officer sets the algorithms used - exact, phonetic (Double Metaphone) and fuzzy (Jaro-Winkler) - their thresholds, the fields compared and the minimum score that opens a case.
-  - The BRD gives no values. The build delivers seed thresholds; Compliance enters the production values before go-live (SQ02).
+  - The BRD gives no values. BIBS starts with seed thresholds; Compliance enters the production values before go-live (SQ02).
 preconditions:
   - "The user has SCR_CONFIG_MAINTAIN; a draft of type MATCH_CRITERIA is open (FR-SS-010)."
 main_flow:
@@ -382,7 +382,7 @@ rules:
   - [R5, "A hit on an alias counts as a hit on the entry (to confirm, SQ02).", Configurable, Configuration MATCH_CRITERIA]
 validations:
   - [Threshold outside 0-1, Enter a threshold between 0 and 1, "-"]
-  - [Case threshold below the matching threshold, The case threshold must be at least the matching threshold, To be assigned at build]
+  - [Case threshold below the matching threshold, The case threshold must be at least the matching threshold, To be confirmed]
   - [No field selected, Select at least the name field, "-"]
 fields_screen: Matching rule
 fields:
@@ -424,9 +424,9 @@ rules:
   - [R3, "Categories that require EDD open an EDD case when the client has an active policy (FR-SS-034).", Configurable, Configuration RISK_RULES]
   - [R4, "Whether High-risk equals the rating HIGH, and the category list itself, are confirmed by BDOI (SQ03).", Configurable, Configuration RISK_RULES]
 validations:
-  - [Rating not in the list, "Risk rating <code> is not a value of KYC_RISK_RATING", To be assigned at build]
-  - [Two rules with the same priority, Each rule needs its own priority, To be assigned at build]
-  - [Rule points to an unknown category, "Category <code> is not defined in this version", To be assigned at build]
+  - [Rating not in the list, "Risk rating <code> is not a value of KYC_RISK_RATING", To be confirmed]
+  - [Two rules with the same priority, Each rule needs its own priority, To be confirmed]
+  - [Rule points to an unknown category, "Category <code> is not defined in this version", To be confirmed]
 fields_screen: Risk category / Risk rule
 fields:
   - [Category code / name, Text, "Yes", "-", Unique in the version]
@@ -475,7 +475,7 @@ rules:
 validations:
   - [Route without to-stage, Select the next stage, "-"]
   - [Approver kind USER without a user, Select the approving user, "-"]
-  - [Route to a stage that cannot follow the from-stage, "Stage <to> cannot follow <from>", To be assigned at build]
+  - [Route to a stage that cannot follow the from-stage, "Stage <to> cannot follow <from>", To be confirmed]
 fields_screen: Approval route
 fields:
   - [Order, Number, "Yes", "-", Unique whole number]
@@ -517,7 +517,7 @@ rules:
   - [R3, "Only users holding SCR_INVESTIGATE and enabled are assigned.", Fixed, "-"]
 validations:
   - [Target neither role nor user, Select a team role or a user, "-"]
-  - [User without SCR_INVESTIGATE, "User <user> cannot investigate cases", To be assigned at build]
+  - [User without SCR_INVESTIGATE, "User <user> cannot investigate cases", To be confirmed]
 fields_screen: Assignment rule
 fields:
   - [Order, Number, "Yes", "-", Unique whole number]
@@ -556,7 +556,7 @@ rules:
   - [R3, "A changed SLA applies to stage entries from its effective date; running due times do not move.", Fixed, "-"]
 validations:
   - [SLA hours not positive, Enter the SLA in hours (greater than 0), "-"]
-  - [Reminder lead not below the SLA, The reminder must fall before the SLA ends, To be assigned at build]
+  - [Reminder lead not below the SLA, The reminder must fall before the SLA ends, To be confirmed]
 fields_screen: SLA rule
 fields:
   - [Stage, List, "Yes", Stages of SCR_CASE, "-"]
@@ -584,7 +584,7 @@ screens: Compliance Setup > Templates
 description:
   - Review templates give every reviewer the same format. A template has a code, a type (KYC review, transaction review, EDD), sections and fields. Each field has a label, data type (text, long text, number, amount, date, list, check box, attachment), mandatory flag, list type, help text and order.
   - The Compliance Officer designs the fields on the template designer and previews the form. A new template version is approved like any configuration and applies to reviews started after its effective date; a review in progress keeps the version it started with (SNSRP-104 AC2).
-  - The field lists of the three templates are supplied by BDOI (SQ05). The build delivers seed templates.
+  - The field lists of the three templates are supplied by BDOI (SQ05). BIBS starts with seed templates.
 preconditions:
   - "The user has SCR_CONFIG_MAINTAIN."
 main_flow:
@@ -598,7 +598,7 @@ rules:
 validations:
   - [Field without label, Enter the field label, "-"]
   - [List field without list type, Select the list of values of the field, "-"]
-  - [Template without a mandatory field, A review template needs at least one mandatory field, To be assigned at build]
+  - [Template without a mandatory field, A review template needs at least one mandatory field, To be confirmed]
 fields_screen: Template field
 fields:
   - [Section, Text, "Yes", "-", Up to 100 characters]
@@ -628,7 +628,7 @@ screens: Compliance Setup > Templates (STR); Configuration Versions (tab STR Lay
 description:
   - The STR template holds the fields of the STR form and, for each field, the case data that prefills it (client, case review, account and invoice data). The STR layout defines the extraction file - format (CSV, fixed width, XLSX or XML), delimiter, encoding and the columns with their order, header, length, padding and code mapping.
   - Both are versioned. An update applies to new STRs only and does not change STRs already submitted (SNSRP-105 AC2).
-  - The AMLC prescribed format is not in the BRD (SQ09). The build delivers a placeholder layout with the case fields; the AMLC layout is entered as a new version when BDOI supplies it.
+  - The AMLC prescribed format is not in the BRD (SQ09). BIBS starts with a provisional layout with the case fields; the AMLC layout is entered as a new version when BDOI supplies it.
 preconditions:
   - "The user has SCR_CONFIG_MAINTAIN."
 main_flow:
@@ -639,7 +639,7 @@ rules:
   - [R1, "An STR records the template version it was created with; the extraction records the layout version.", Fixed, "-"]
   - [R2, "Every layout column maps to an STR field or a fixed value.", Fixed, "-"]
 validations:
-  - [Column without source, "Column <n> needs an STR field or a fixed value", To be assigned at build]
+  - [Column without source, "Column <n> needs an STR field or a fixed value", To be confirmed]
   - [Fixed-width column without length, Enter the column length, "-"]
 fields_screen: STR layout column
 fields:
@@ -666,7 +666,7 @@ priority: Must have
 screens: Lists of Values (type SCR_DISPOSITION)
 description:
   - Dispositions are values of the list SCR_DISPOSITION, each with the case stage as its parent. The case screen offers only the dispositions of the current stage, so a user cannot pick an option that does not belong to the stage.
-  - The list uses the existing Lists of Values screen, with maker-checker and effective dates. The delivered values are placeholders until BDOI confirms them (SQ06).
+  - The list uses the existing Lists of Values screen, with maker-checker and effective dates. The values provided are placeholders until BDOI confirms them (SQ06).
 preconditions:
   - "The user has LOV_MANAGE (maker) or LOV approval rights (checker)."
 main_flow:
@@ -689,7 +689,7 @@ notifications:
 audit:
   - "List changes audited with before and after values."
 acceptance:
-  - In UNIT_HEAD_APPROVAL the disposition list shows only CONCUR and NOT_CONCUR (delivered values).
+  - In UNIT_HEAD_APPROVAL the disposition list shows only CONCUR and NOT_CONCUR (values provided).
   - An end-dated disposition is no longer offered and stays on the cases that used it.
 ```
 
@@ -715,7 +715,7 @@ rules:
   - [R2, "A rejection needs a reason.", Fixed, "-"]
   - [R3, "If no ACTIVE matching version exists when a trigger fires, the run stops and alert SCR_NO_ACTIVE_CONFIG is raised.", Fixed, "-"]
 validations:
-  - [Checker is the maker, A configuration change is approved by someone other than its maker, To be assigned at build]
+  - [Checker is the maker, A configuration change is approved by someone other than its maker, To be confirmed]
   - [Reject without reason, Enter the reason for the rejection, "-"]
 notifications:
   - The maker is notified of approval or rejection.
@@ -737,15 +737,15 @@ actor: System; Compliance Officer (upload)
 priority: Must have
 screens: Compliance Setup > List Sources and Runs
 description:
-  - Each list source has a code, name, list type (SANCTION, PEP, INTERNAL, ADVERSE_MEDIA), transport (file, API, manual), schedule and file layout. The delivered sources are AML_ADVISORY (sanctions, file), NLDS_PEP (PEP, file) and INTERNAL (manual).
+  - Each list source has a code, name, list type (SANCTION, PEP, INTERNAL, ADVERSE_MEDIA), transport (file, API, manual), schedule and file layout. The sources provided are AML_ADVISORY (sanctions, file), NLDS_PEP (PEP, file) and INTERNAL (manual).
   - The ingestion job reads each active source on its schedule; the Compliance Officer can also upload a file with **Upload List File**. Each run adds new entries, updates changed entries and delists removed ones, and writes a run log - source, trigger, records received, added, updated, delisted and failed, status and reason for failure (SNSRP-201 AC).
-  - Entries loaded from a source file are active at once, as the file is the official list; manual changes go through maker-checker (FR-SS-022). Real-time or API sources are parked until BDOI names them (SQ01).
+  - Entries loaded from a source file are active at once, as the file is the official list; manual changes go through maker-checker (FR-SS-022). Real-time or API sources wait until BDOI names them (SQ01).
 preconditions:
   - "The source is active; for an upload the user has SCR_LIST_MAINTAIN."
 main_flow:
   - At the scheduled time (default 01:00 daily) the job reads the file of each file source.
   - BIBS validates each record against the source layout.
-  - BIBS adds, updates or delists the entries and rebuilds their name keys.
+  - BIBS adds, updates or delists the entries and refreshes their name keys.
   - BIBS writes the run log and starts delta screening of the changed entries (FR-SS-030).
 alternate_flows:
   - Some records fail. BIBS loads the valid records, logs each failed record with its line and reason, and marks the run PARTIAL (FR-SS-021).
@@ -757,14 +757,14 @@ rules:
   - [R3, "Schedules run outside 08:00-17:00 by default (peak hours, p.24).", Configurable, Source schedule; job cron]
   - [R4, "List sources, formats, frequency and transport are confirmed by BDOI (SQ01).", Configurable, List sources]
 validations:
-  - [Record without name, "Line <n>: name is missing", To be assigned at build]
-  - [Invalid date, "Line <n>: <field> is not a valid date", To be assigned at build]
-  - [File type not allowed, "The file type is not allowed for source <code>", To be assigned at build]
+  - [Record without name, "Line <n>: name is missing", To be confirmed]
+  - [Invalid date, "Line <n>: <field> is not a valid date", To be confirmed]
+  - [File type not allowed, "The file type is not allowed for source <code>", To be confirmed]
 fields_screen: List source / Upload list file
 fields:
   - [Code / Name, Text, "Yes", "-", Unique code]
   - [List type, List, "Yes", LOV SCR_LIST_TYPE, "-"]
-  - [Transport, List, "Yes", "File, API, Manual", API parked]
+  - [Transport, List, "Yes", "File, API, Manual", API on hold]
   - [Schedule, Text, Conditional, "-", Required for File and API]
   - [File layout, List, Conditional, "CSV / XLSX template", Required for File]
   - [Active, Check box, "Yes", "-", "-"]
@@ -791,7 +791,7 @@ preconditions:
   - "At least one run with failed records since the last digest."
 main_flow:
   - The digest job collects the failed records since the last digest.
-  - BIBS builds the report and e-mails it to the recipients.
+  - BIBS produces the report and e-mails it to the recipients.
   - The Compliance Officer opens the run detail, corrects the source file and uploads it again.
 alternate_flows:
   - No failed records. No e-mail is sent.
@@ -835,7 +835,7 @@ validations:
   - [Primary name blank, Enter the name of the listed person or entity, "-"]
   - [List type not selected, Select the list type, "-"]
   - [Remarks blank, Enter the reason for the change, "-"]
-  - [Pending change exists, "Entry <ref> already has a change waiting for approval", To be assigned at build]
+  - [Pending change exists, "Entry <ref> already has a change waiting for approval", To be confirmed]
 fields_screen: Watchlist entry
 fields:
   - [Source, List, "Yes", List sources, "-"]
@@ -879,7 +879,7 @@ rules:
   - [R1, "The maker never approves.", Fixed, "-"]
   - [R2, "A decided change is read-only.", Fixed, "-"]
 validations:
-  - [Checker is the maker, A list change is approved by someone other than its maker, To be assigned at build]
+  - [Checker is the maker, A list change is approved by someone other than its maker, To be confirmed]
   - [Reject without remarks, Enter the remarks for the rejection, "-"]
 notifications:
   - The maker is notified of the decision.
@@ -914,7 +914,7 @@ alternate_flows:
   - No active matching version. The run is not started; alert SCR_NO_ACTIVE_CONFIG is raised.
   - A client created in bulk. Each created client is screened; the runs are grouped under the bulk job.
 rules:
-  - [R1, "Re-running the same client, entry version and configuration version produces no second match (idempotent).", Fixed, "-"]
+  - [R1, "Re-running the same client, entry version and configuration version produces no second match.", Fixed, "-"]
   - [R2, "Client statuses in scope of the batch window.", Configurable, Parameter SCR_SCREENING_SCOPE (SQ11)]
   - [R3, "Batch window default 01:30 daily; full re-screen on day SCR_FULL_RESCREEN_DAY of the month.", Configurable, Job cron; parameter SCR_FULL_RESCREEN_DAY]
   - [R4, "Screening runs after the client or account transaction is saved and never delays it.", Fixed, "-"]
@@ -942,7 +942,7 @@ description:
 preconditions:
   - "A screening run is in progress (FR-SS-030)."
 main_flow:
-  - BIBS builds the candidate pairs of the clients in scope.
+  - BIBS forms the candidate pairs of the clients in scope.
   - BIBS scores each pair.
   - BIBS records a match for each pair that meets the threshold.
   - BIBS passes the matches to the risk rules (FR-SS-033) and case creation (FR-SS-034).
@@ -1044,7 +1044,7 @@ screens: Cases; Case
 description:
   - A case opens when a client is tagged High-risk or PEP, when a match reaches the case threshold, and when a client applies for an account and screening requires a review. The case gets a number SCR-yyyy-nnnnnn, the client, trigger, case type, risk category, active-policy flag, marketing unit and Unit Head, and is assigned by the assignment matrix (FR-SS-014).
   - Only clients with an active policy require a KYC review or EDD. For a client without an active policy, the case type is MONITOR and the UCC and the Investigator are notified (SNSRP-303 AC2).
-  - The active policy of a client is read through a port. The default reads the client's accounts in status POLICY_ISSUED or BOOKED; BDOI confirms the definition (SQ10).
+  - The active policy of a client is read from the accounts. The default reads the client's accounts in status POLICY_ISSUED or BOOKED; BDOI confirms the definition (SQ10).
 preconditions:
   - "Risk tagging or matching produced a result that requires a case."
 main_flow:
@@ -1058,7 +1058,7 @@ alternate_flows:
 rules:
   - [R1, "One open case per client and case type.", Fixed, "-"]
   - [R2, "Case numbers are SCR-<yyyy>-<nnnnnn>.", Configurable, Parameter SCR_CASE_SEQUENCE_PREFIX]
-  - [R3, "Active policy - accounts in POLICY_ISSUED or BOOKED (default until SQ10).", Configurable, ActivePolicyQuery adapter]
+  - [R3, "Active policy - accounts in POLICY_ISSUED or BOOKED (default until SQ10).", Configurable, Active policy definition (SQ10)]
   - [R4, "The case records the configuration versions in force at creation.", Fixed, "-"]
 validations: []
 notifications:
@@ -1095,7 +1095,7 @@ rules:
   - [R2, "Suppression is per client, entry and entry version (default until SQ12).", Fixed, "-"]
 validations:
   - [Justification blank, Enter the justification of the change, "-"]
-  - [No evidence attached, Attach at least one evidence document, To be assigned at build]
+  - [No evidence attached, Attach at least one evidence document, To be confirmed]
   - [Rating not in the list, Select a valid risk rating, "-"]
 fields_screen: Update Risk Tag dialog
 fields:
@@ -1135,8 +1135,8 @@ rules:
   - [R1, "Only the transitions of section 5.2 are possible.", Fixed, "-"]
   - [R2, "A closed case is re-opened only by SCR_COMPLIANCE_REVIEW with a reason.", Fixed, "-"]
 validations:
-  - [Action not allowed in the stage, "The action <action> is not allowed in stage <stage>", To be assigned at build]
-  - [Edit by the previous assignee, "Case <case no.> is no longer assigned to you", To be assigned at build]
+  - [Action not allowed in the stage, "The action <action> is not allowed in stage <stage>", To be confirmed]
+  - [Edit by the previous assignee, "Case <case no.> is no longer assigned to you", To be confirmed]
 notifications:
   - "Stage entry to the next owner (FR-SS-080)."
 audit:
@@ -1235,7 +1235,7 @@ rules:
   - [R2, "The case data, stage and history are not changed by a re-assignment.", Fixed, "-"]
 validations:
   - [Reason not selected, Select the reason for the re-assignment, "-"]
-  - [User not eligible, "<user> cannot take cases in stage <stage>", To be assigned at build]
+  - [User not eligible, "<user> cannot take cases in stage <stage>", To be confirmed]
   - [OTHERS without comment, Enter a comment for reason Others, "-"]
 fields_screen: Re-assign dialog
 fields:
@@ -1445,8 +1445,8 @@ rules:
   - [R1, "Rule types - TEMPLATE_COMPLETE, DOCUMENT_TYPES_PRESENT, DISPOSITION_ALLOWED, RECOMMENDATION_PRESENT, STR_FLAG_CONSISTENT.", Fixed, "-"]
   - [R2, "Rules, their parameters and blocking flag per stage and case type.", Configurable, Configuration VALIDATION_RULES]
 validations:
-  - [Required document missing, "Upload the <document type> before submitting", To be assigned at build]
-  - [STR flag inconsistent, "Disposition <disposition> requires the STR flag", To be assigned at build]
+  - [Required document missing, "Upload the <document type> before submitting", To be confirmed]
+  - [STR flag inconsistent, "Disposition <disposition> requires the STR flag", To be confirmed]
 fields_screen: Validation rule
 fields:
   - [Stage, List, "Yes", Stages of SCR_CASE, "-"]
@@ -1484,7 +1484,7 @@ rules:
   - [R2, "SLA 24 hours (default).", Configurable, Configuration SLA_MATRIX]
 validations:
   - [Disapprove without rationale, Write the rationale for disapproving, "-"]
-  - [Approver is the Investigator, A case is approved by someone other than its Investigator, To be assigned at build]
+  - [Approver is the Investigator, A case is approved by someone other than its Investigator, To be confirmed]
 fields_screen: Decision dialog
 fields:
   - [Decision, List, "Yes", LOV SCR_DISPOSITION (parent UNIT_HEAD_APPROVAL), "-"]
@@ -1542,7 +1542,7 @@ main_flow:
 alternate_flows:
   - Return for rework. The Compliance Officer selects the reason and writes the remarks; the case goes to RETURNED.
 rules:
-  - [R1, "Outcomes from LOV SCR_DISPOSITION parent COMPLIANCE_REVIEW (delivered - CLOSE_NO_ACTION, ESCALATE_COMMITTEE, FOR_STR, RETURN).", Configurable, LOV SCR_DISPOSITION]
+  - [R1, "Outcomes from LOV SCR_DISPOSITION parent COMPLIANCE_REVIEW (provided - CLOSE_NO_ACTION, ESCALATE_COMMITTEE, FOR_STR, RETURN).", Configurable, LOV SCR_DISPOSITION]
   - [R2, "Remarks are mandatory for a return.", Fixed, "-"]
 validations:
   - [Outcome not selected, Select the outcome, "-"]
@@ -1581,7 +1581,7 @@ rules:
   - [R2, "Decision rule and committee size.", Configurable, Parameters SCR_COMMITTEE_RULE and SCR_COMMITTEE_SIZE]
 validations:
   - [Decision not selected, Select your decision, "-"]
-  - [Member already voted, You have already recorded your decision on this case, To be assigned at build]
+  - [Member already voted, You have already recorded your decision on this case, To be confirmed]
 fields_screen: Record Decision dialog
 fields:
   - [Decision, List, "Yes", "LOV SCR_DISPOSITION (parent AML_COMMITTEE) - APPROVE_STR, NO_STR, RETURN", "-"]
@@ -1622,7 +1622,7 @@ rules:
   - [R2, "Fields, reason codes and prefill sources follow the STR template (FR-SS-017); the AMLC field list is SQ09.", Configurable, Configuration TEMPLATE (STR)]
 validations:
   - [Mandatory STR field blank, "<Field> is required for the STR", "-"]
-  - [No transaction listed, Add at least one transaction, To be assigned at build]
+  - [No transaction listed, Add at least one transaction, To be confirmed]
   - [Transaction amount not positive, The amount must be greater than 0, "-"]
 fields_screen: STR
 fields:
@@ -1649,8 +1649,8 @@ actor: Compliance Officer
 priority: Must have
 screens: STR (Extract Approved STRs)
 description:
-  - The Compliance Officer starts the extraction for a period. BIBS selects only the STRs approved by the AML Committee and not yet extracted, builds the file with the active STR layout (FR-SS-017) and saves it to the designated location. The extraction is recorded (batch, period, count, file, user, time) and the STRs become EXTRACTED.
-  - Until BDOI names the designated folder (SQ16), the file is saved in the BIBS report archive and downloaded from the STR screen. A shared-folder or SFTP destination is a later adapter with no change to this function.
+  - The Compliance Officer starts the extraction for a period. BIBS selects only the STRs approved by the AML Committee and not yet extracted, creates the file with the active STR layout (FR-SS-017) and saves it to the designated location. The extraction is recorded (batch, period, count, file, user, time) and the STRs become EXTRACTED.
+  - Until BDOI names the designated folder (SQ16), the file is saved in the BIBS report archive and downloaded from the STR screen. A shared-folder or SFTP destination can be added later with no change to this function.
 preconditions:
   - "The user has SCR_STR_EXTRACT; at least one APPROVED STR exists in the period."
 main_flow:
@@ -1666,7 +1666,7 @@ rules:
   - [R3, "File format per the active STR layout; the AMLC format is SQ09.", Configurable, Configuration STR_LAYOUT]
 validations:
   - [Period end before start, The end date must be on or after the start date, "-"]
-  - [Nothing to extract, No committee-approved STR to extract, To be assigned at build]
+  - [Nothing to extract, No committee-approved STR to extract, To be confirmed]
 fields_screen: Extract Approved STRs dialog
 fields:
   - [Period from / to, Date, "Yes", "-", To on or after from]
@@ -1699,7 +1699,7 @@ rules:
   - [R1, "The AMLC reference is unique.", Fixed, "-"]
 validations:
   - [Reference blank, Enter the AMLC reference, "-"]
-  - [Filing date before extraction, The filing date cannot be before the extraction date, To be assigned at build]
+  - [Filing date before extraction, The filing date cannot be before the extraction date, To be confirmed]
 notifications:
   - "None."
 audit:
@@ -1896,21 +1896,21 @@ The SLA hours are the workflow defaults. The SLA matrix (FR-SS-015) overrides th
 <!-- table: widths=4,2.8,3.6,4.4,2.6 caption="Transitions of SCR_CASE" size=8 -->
 | From | Action | To | Permission | Reason list |
 |---|---|---|---|---|
-| NEW | route (system) | INVESTIGATION | - | - |
-| INVESTIGATION | submit | UNIT_HEAD_APPROVAL, or CLOSED when a route says so | SCR_INVESTIGATE | - |
-| INVESTIGATION | request_info | INVESTIGATION | SCR_INVESTIGATE | - |
-| RETURNED | resubmit | the stage that returned the case | SCR_INVESTIGATE | - |
-| UNIT_HEAD_APPROVAL | approve | COMPLIANCE_REVIEW or CLOSED (by route) | SCR_CASE_APPROVE | - |
-| UNIT_HEAD_APPROVAL | disapprove | RETURNED | SCR_CASE_APPROVE | RETURN_REASON |
-| COMPLIANCE_REVIEW | escalate_committee | AML_COMMITTEE | SCR_COMPLIANCE_REVIEW | - |
-| COMPLIANCE_REVIEW | prepare_str | STR_PREPARATION | SCR_COMPLIANCE_REVIEW | - |
-| COMPLIANCE_REVIEW | close | CLOSED | SCR_COMPLIANCE_REVIEW | - |
-| COMPLIANCE_REVIEW | return_for_rework | RETURNED | SCR_COMPLIANCE_REVIEW | RETURN_REASON |
-| AML_COMMITTEE | finalise (system) | STR_PREPARATION / CLOSED / COMPLIANCE_REVIEW | SCR_COMMITTEE (votes) | - |
-| STR_PREPARATION | str_ready | STR_EXTRACTION | SCR_COMPLIANCE_REVIEW | - |
-| STR_EXTRACTION | filed | CLOSED | SCR_STR_EXTRACT | - |
-| CLOSED | reopen | INVESTIGATION | SCR_COMPLIANCE_REVIEW | RETURN_REASON |
-| Any open stage | re-assign | same stage | SCR_CASE_ASSIGN | SCR_REASSIGN_REASON |
+| NEW | Route to investigation (automatic) | INVESTIGATION | - | - |
+| INVESTIGATION | Submit for approval | UNIT_HEAD_APPROVAL, or CLOSED when a route says so | SCR_INVESTIGATE | - |
+| INVESTIGATION | Request more information | INVESTIGATION | SCR_INVESTIGATE | - |
+| RETURNED | Resubmit to the unit head | the stage that returned the case | SCR_INVESTIGATE | - |
+| UNIT_HEAD_APPROVAL | Approve and escalate to Compliance | COMPLIANCE_REVIEW or CLOSED (by route) | SCR_CASE_APPROVE | - |
+| UNIT_HEAD_APPROVAL | Disapprove and return | RETURNED | SCR_CASE_APPROVE | RETURN_REASON |
+| COMPLIANCE_REVIEW | Escalate to the AML Committee | AML_COMMITTEE | SCR_COMPLIANCE_REVIEW | - |
+| COMPLIANCE_REVIEW | Prepare STR | STR_PREPARATION | SCR_COMPLIANCE_REVIEW | - |
+| COMPLIANCE_REVIEW | Close the case | CLOSED | SCR_COMPLIANCE_REVIEW | - |
+| COMPLIANCE_REVIEW | Return for rework | RETURNED | SCR_COMPLIANCE_REVIEW | RETURN_REASON |
+| AML_COMMITTEE | Committee: file an STR; Committee: no STR; Committee: return to Compliance (automatic, from the votes) | STR_PREPARATION / CLOSED / COMPLIANCE_REVIEW | SCR_COMMITTEE (votes) | - |
+| STR_PREPARATION | STR ready for extraction | STR_EXTRACTION | SCR_COMPLIANCE_REVIEW | - |
+| STR_EXTRACTION | Record AMLC filing | CLOSED | SCR_STR_EXTRACT | - |
+| CLOSED | Reopen the case | INVESTIGATION | SCR_COMPLIANCE_REVIEW | RETURN_REASON |
+| Any open stage | Re-assign | same stage | SCR_CASE_ASSIGN | SCR_REASSIGN_REASON |
 
 ## Configuration versions and list changes
 
@@ -2048,7 +2048,7 @@ Parameters: Run; Source; Date Range. Layout: landscape, sorted by run and line.
 | Column | Format | Content |
 |---|---|---|
 | Run Date / Run No. | Date / Text | - |
-| Source | Text | Source code and name |
+| Source | Text | Code and name of the list source |
 | File | Text | File name |
 | Line | Number | Line in the file |
 | Record | Text | Raw record (truncated to 200 characters) |
@@ -2096,9 +2096,9 @@ Screening produces two outputs in addition to the reports. Both come from versio
 
 # Interfaces and integration
 
-Figure 5 shows the interfaces of Sanction Screening. Screening reads the client master and accounts and writes the client risk rating and tags only through the client master's service.
+Figure 5 shows the interfaces of Sanction Screening. Screening reads the client master and accounts and writes the client risk rating and tags only through the client master.
 
-![Interfaces of Sanction Screening (dashed = parked)](figures/brd10_integration.dot){width=15}
+![Interfaces of Sanction Screening (dashed = on hold)](figures/brd10_integration.dot){width=15}
 
 <!-- table: widths=3.8,1.8,7.4,2.4,2.4 caption="Interfaces" status=Scope size=8.5 -->
 | Interface | Direction | Content and trigger | BRD | Scope |
@@ -2113,8 +2113,8 @@ Figure 5 shows the interfaces of Sanction Screening. Screening reads the client 
 | Designated STR folder (shared drive / SFTP) | Out | Automatic saving of the extraction file | SNSRP-706 | ON HOLD |
 | AMLC portal | Out | STR filing; manual, outside BIBS | p.8 | OUT |
 
-> [!PARKED] Parked seams
-> The list transports (SQ01), the designated STR folder (SQ16), the AMLC file format (SQ09) and the definition of an active policy (SQ10) are not in the BRD. BIBS builds each as a replaceable adapter with a working default - file upload, report archive, placeholder layout and booked accounts. Adding the final transport or format is configuration or a new adapter, with no change to the screening workflow.
+> [!NOTE] Interfaces on hold
+> The list transports (SQ01), the designated STR folder (SQ16), the AMLC file format (SQ09) and the definition of an active policy (SQ10) are not in the BRD. Each starts with a working default - file upload, report archive, provisional layout and booked accounts. Adding the final transport or format needs no change to the screening workflow.
 
 # Non-functional requirements
 
@@ -2155,8 +2155,8 @@ The items below are changed in BIBS without a release. Screening rules are maint
 
 ## Lists of values
 
-<!-- table: widths=5.4,11.2 caption="Lists of values (delivered values to be confirmed, SQ06)" size=8.5 -->
-| List | Values delivered |
+<!-- table: widths=5.4,11.2 caption="Lists of values (values to be confirmed, SQ06)" size=8.5 -->
+| List | Values provided |
 |---|---|
 | SCR_DISPOSITION (parent = stage) | INVESTIGATION - False positive; True match, for review; Possible match, EDD; Need more information. UNIT_HEAD_APPROVAL - Concur; Not concur. COMPLIANCE_REVIEW - Close, no action; Escalate to committee; For STR; Return. AML_COMMITTEE - Approve STR; No STR; Return |
 | SCR_CASE_TYPE | Name match; PEP; High-risk; EDD; Monitor (no active policy); Account application |
@@ -2193,7 +2193,7 @@ The items below are changed in BIBS without a release. Screening rules are maint
 |---|---|---|
 | A-SS-01 | The BRD approved on 16 to 17-Apr-2026 (29 pages) is the baseline | R1 |
 | A-SS-02 | Filing on the AMLC portal stays outside BIBS; BIBS extracts the file and records the reference | p.8 |
-| A-SS-03 | Screening informs and does not block business; a block is built only if BDOI asks | SQ07 |
+| A-SS-03 | Screening informs and does not block business; a block is added only if BDOI asks | SQ07 |
 | A-SS-04 | EDD is a review template type used by risk categories that require it | p.4-5; SNSRP-303 |
 | A-SS-05 | SNSRP-602, printed under capability 6, is the matching trigger of capability 3 | R2 section 11 |
 | A-SS-06 | The Approver is the Unit Head of the client's marketing unit | SQ04 |
@@ -2245,48 +2245,67 @@ BRD-10 also answers questions raised on other BRDs, in part: Q18 (tags trigger r
 
 Every BRD-10 requirement is met by at least one FR. The screen column names the main entry point.
 
-<!-- table: widths=2.4,1.6,4.2,5.4 caption="BRD ID to FR and screen" size=8 -->
-| BRD ID | Page | FR | Screen |
-|---|---|---|---|
-| SNSRP-101 | p.10 | FR-SS-010, FR-SS-011 | Configuration Versions (Matching Criteria) |
-| SNSRP-102 | p.10 | FR-SS-010, FR-SS-012 | Configuration Versions (Risk Rules) |
-| SNSRP-103 | p.10 | FR-SS-010, FR-SS-013 | Configuration Versions (Approval Matrix) |
-| SNSRP-104 | p.10-11 | FR-SS-010, FR-SS-016 | Templates |
-| SNSRP-105 | p.11 | FR-SS-010, FR-SS-017 | Templates (STR); STR Layout |
-| SNSRP-106 | p.11 | FR-SS-010, FR-SS-014 | Configuration Versions (Assignment Matrix) |
-| SNSRP-107 | p.11-12 | FR-SS-018 | Lists of Values (SCR_DISPOSITION) |
-| SNSRP-108 | p.12 | FR-SS-010, FR-SS-015, FR-SS-044 | Configuration Versions (SLA Matrix) |
-| SNSRP-109 | p.12 | FR-SS-019 | My Approvals; Configuration Versions |
-| SNSRP-201 | p.12 | FR-SS-020, FR-SS-082 | List Sources and Runs |
-| SNSRP-202 | p.13 | FR-SS-021 | List Sources and Runs; Reports |
-| SNSRP-203 | p.13 | FR-SS-022, FR-SS-001 | Watchlist |
-| SNSRP-204 | p.13 | FR-SS-023 | My Approvals; Watchlist |
-| SNSRP-301 | p.14 | FR-SS-031, FR-SS-032 | Matches |
-| SNSRP-302 | p.14 | FR-SS-033 | Client page (Screening tab) |
-| SNSRP-303 | p.14 | FR-SS-034, FR-SS-030 | Cases |
-| SNSRP-304 | p.14 | FR-SS-035, FR-SS-032 | Case; Matches |
-| SNSRP-401 | p.15 | FR-SS-040 | Case (workflow panel, Timeline) |
-| SNSRP-402 | p.15-16 | FR-SS-041, FR-SS-045 | Cases; Case; Screening Home |
-| SNSRP-403 | p.16 | FR-SS-042, FR-SS-001 | Cases (search) |
-| SNSRP-404 | p.16 | FR-SS-043 | Case (Re-assign) |
-| SNSRP-405 | p.17 | FR-SS-044, FR-SS-045 | Screening Home; Cases |
-| SNSRP-501 | p.17 | FR-SS-050 | Case (Review) |
-| SNSRP-502 | p.17 | FR-SS-051 | Case (workflow panel) |
-| SNSRP-601 | p.17 | FR-SS-052 | Case (Documents) |
-| SNSRP-602 | p.14-15 | FR-SS-030 | Screening Home (runs); client page |
-| SNSRP-701 | p.17 | FR-SS-060 | Case (validation messages) |
-| SNSRP-702 | p.18 | FR-SS-061, FR-SS-062 | Cases (For Approval); Case |
-| SNSRP-703 | p.18 | FR-SS-063, FR-SS-013, FR-SS-062 | Cases (Compliance Review); Case |
-| SNSRP-704 | p.18-19 | FR-SS-064 | Cases (Committee); Case (Decisions) |
-| SNSRP-705 | p.19 | FR-SS-070 | Case (STR) |
-| SNSRP-706 | p.19-20 | FR-SS-071, FR-SS-072 | STR |
-| SNSRP-801 | p.20 | FR-SS-080 | Notifications |
-| SNSRP-802 | p.20 | FR-SS-081 | Notifications |
-| SNSRP-901 | p.20 | FR-SS-090 | Reports |
-| SNSRP-902 | p.21 | FR-SS-091 | Case (Timeline); Audit Trail |
-| SNSRP-903 | p.21 | FR-SS-092 | Reports (SCR-AUDIT-LOG) |
+<!-- table: widths=2.4,1.6,4.2,5.4,5.2 caption="BRD ID to FR, screen and test cases" size=8 -->
+| BRD ID | Page | FR | Screen | Test cases |
+|---|---|---|---|---|
+| SNSRP-101 | p.10 | FR-SS-010, FR-SS-011 | Configuration Versions (Matching Criteria) | TC-SS-010.1, 010.2, 010.3, 010.4, 010.5, 011.1, 011.2, 011.3 (14 cases) |
+| SNSRP-102 | p.10 | FR-SS-010, FR-SS-012 | Configuration Versions (Risk Rules) | TC-SS-010.1, 010.2, 010.3, 010.4, 010.5, 012.1, 012.2, 012.3, 012.4 (14 cases) |
+| SNSRP-103 | p.10 | FR-SS-010, FR-SS-013 | Configuration Versions (Approval Matrix) | TC-SS-010.1, 010.2, 010.3, 010.4, 010.5, 013.1, 013.2, 013.3, 013.4 (16 cases) |
+| SNSRP-104 | p.10-11 | FR-SS-010, FR-SS-016 | Templates | TC-SS-010.1, 010.2, 010.3, 010.4, 010.5, 016.1, 016.2, 016.3 (14 cases) |
+| SNSRP-105 | p.11 | FR-SS-010, FR-SS-017 | Templates (STR); STR Layout | TC-SS-010.1, 010.2, 010.3, 010.4, 010.5, 017.1, 017.2, 017.3 (13 cases) |
+| SNSRP-106 | p.11 | FR-SS-010, FR-SS-014 | Configuration Versions (Assignment Matrix) | TC-SS-010.1, 010.2, 010.3, 010.4, 010.5, 014.1, 014.2, 014.3, 014.4, 014.5 (16 cases) |
+| SNSRP-107 | p.11-12 | FR-SS-018 | Lists of Values (SCR_DISPOSITION) | TC-SS-018.1, 018.2, 018.3 (5 cases) |
+| SNSRP-108 | p.12 | FR-SS-010, FR-SS-015, FR-SS-044 | Configuration Versions (SLA Matrix) | TC-SS-010.1, 010.2, 010.3, 010.4, 010.5, 015.1, 015.2, 015.3, 044.1, 044.2, 044.3 (19 cases) |
+| SNSRP-109 | p.12 | FR-SS-019 | My Approvals; Configuration Versions | TC-SS-019.1, 019.2, 019.3, 019.4 (5 cases) |
+| SNSRP-201 | p.12 | FR-SS-020, FR-SS-082 | List Sources and Runs | TC-SS-020.1, 020.2, 020.3, 020.4, 020.5, 082.1, 082.2 (8 cases) |
+| SNSRP-202 | p.13 | FR-SS-021 | List Sources and Runs; Reports | TC-SS-021.1, 021.2, 021.3, 021.4 (6 cases) |
+| SNSRP-203 | p.13 | FR-SS-022, FR-SS-001 | Watchlist | TC-SS-001.1, 001.2, 001.3, 001.4, 001.5, 022.1, 022.2, 022.3, 022.4 (13 cases) |
+| SNSRP-204 | p.13 | FR-SS-023 | My Approvals; Watchlist | TC-SS-023.1, 023.2, 023.3, 023.4 (5 cases) |
+| SNSRP-301 | p.14 | FR-SS-031, FR-SS-032 | Matches | TC-SS-031.1, 031.2, 031.3, 032.1, 032.2, 032.3, 032.4 (8 cases) |
+| SNSRP-302 | p.14 | FR-SS-033 | Client page (Screening tab) | TC-SS-033.1, 033.2, 033.3, 033.4, 033.5 (6 cases) |
+| SNSRP-303 | p.14 | FR-SS-034, FR-SS-030 | Cases | TC-SS-030.1, 030.2, 030.3, 030.4, 030.5, 034.1, 034.2, 034.3, 034.4 (11 cases) |
+| SNSRP-304 | p.14 | FR-SS-035, FR-SS-032 | Case; Matches | TC-SS-032.1, 032.2, 032.3, 032.4, 035.1, 035.2, 035.3 (9 cases) |
+| SNSRP-401 | p.15 | FR-SS-040 | Case (workflow panel, Timeline) | TC-SS-040.1, 040.2, 040.3, 040.4 (5 cases) |
+| SNSRP-402 | p.15-16 | FR-SS-041, FR-SS-045 | Cases; Case; Screening Home | TC-SS-041.1, 041.2, 041.3, 041.4, 045.1, 045.2, 045.3 (7 cases) |
+| SNSRP-403 | p.16 | FR-SS-042, FR-SS-001 | Cases (search) | TC-SS-001.1, 001.2, 001.3, 001.4, 001.5, 042.1, 042.2, 042.3 (10 cases) |
+| SNSRP-404 | p.16 | FR-SS-043 | Case (Re-assign) | TC-SS-043.1, 043.2, 043.3, 043.4 (6 cases) |
+| SNSRP-405 | p.17 | FR-SS-044, FR-SS-045 | Screening Home; Cases | TC-SS-044.1, 044.2, 044.3, 045.1, 045.2, 045.3 (7 cases) |
+| SNSRP-501 | p.17 | FR-SS-050 | Case (Review) | TC-SS-050.1, 050.2, 050.3 (4 cases) |
+| SNSRP-502 | p.17 | FR-SS-051 | Case (workflow panel) | TC-SS-051.1, 051.2, 051.3, 051.4 (5 cases) |
+| SNSRP-601 | p.17 | FR-SS-052 | Case (Documents) | TC-SS-052.1, 052.2, 052.3 (5 cases) |
+| SNSRP-602 | p.14-15 | FR-SS-030 | Screening Home (runs); client page | TC-SS-030.1, 030.2, 030.3, 030.4, 030.5 (7 cases) |
+| SNSRP-701 | p.17 | FR-SS-060 | Case (validation messages) | TC-SS-060.1, 060.2, 060.3 (4 cases) |
+| SNSRP-702 | p.18 | FR-SS-061, FR-SS-062 | Cases (For Approval); Case | TC-SS-061.1, 061.2, 061.3, 062.1, 062.2, 062.3 (7 cases) |
+| SNSRP-703 | p.18 | FR-SS-063, FR-SS-013, FR-SS-062 | Cases (Compliance Review); Case | TC-SS-013.1, 013.2, 013.3, 013.4, 062.1, 062.2, 062.3, 063.1, 063.2, 063.3 (15 cases) |
+| SNSRP-704 | p.18-19 | FR-SS-064 | Cases (Committee); Case (Decisions) | TC-SS-064.1, 064.2, 064.3, 064.4, 064.5 (6 cases) |
+| SNSRP-705 | p.19 | FR-SS-070 | Case (STR) | TC-SS-070.1, 070.2, 070.3, 070.4 (6 cases) |
+| SNSRP-706 | p.19-20 | FR-SS-071, FR-SS-072 | STR | TC-SS-071.1, 071.2, 071.3, 071.4, 072.1, 072.2 (9 cases) |
+| SNSRP-801 | p.20 | FR-SS-080 | Notifications | TC-SS-080.1, 080.2, 080.3 (3 cases) |
+| SNSRP-802 | p.20 | FR-SS-081 | Notifications | TC-SS-081.1, 081.2 (3 cases) |
+| SNSRP-901 | p.20 | FR-SS-090 | Reports | TC-SS-090.1, 090.2, 090.3 (5 cases) |
+| SNSRP-902 | p.21 | FR-SS-091 | Case (Timeline); Audit Trail | TC-SS-091.1, 091.2, 091.3 (3 cases) |
+| SNSRP-903 | p.21 | FR-SS-092 | Reports (SCR-AUDIT-LOG) | TC-SS-092.1, 092.2, 092.3 (4 cases) |
 
 The BRD's process sections add three items without a requirement ID, also covered: the high-risk client list (p.8, FR-SS-045), notifications on newly added sanctioned names (p.8, FR-SS-082) and the manual AMLC filing (p.8, FR-SS-072). The non-functional requirements of pp.22-25 are in section 8.
+
+# Proposed business rules and clarifications for confirmation
+
+The table lists each point where the proposed screen or rule fills a gap the BRD leaves open or needs a decision of BDOI. The open questions of section 10.3 stay open; each item below gives the proposed rule that applies until BDOI answers. BDOI records its decision with the sign-off of this FRS (chapter 13); a decision that changes a screen, field, rule or message is applied in the next version of the FRS.
+
+<!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
+| Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
+|---|---|---|---|---|
+| CLR-SS-01 | Lists screened (SNSRP-201; FR-SS-020, 021) | The AML advisory and NLDS-PEP lists are loaded by file upload (CSV or XLSX) on a schedule; feeds by API and a direct NLDS query are added when BDOI names them. | The lists, formats, frequency and transport are not given (SQ01). | Name the lists, formats, frequency and transport (SQ01). |
+| CLR-SS-02 | Matching thresholds (FR-SS-011, 031) | BIBS starts with seed thresholds per method; Compliance enters the production values before go-live. | The BRD gives no values (SQ02). | Give the thresholds and the fields compared (SQ02). |
+| CLR-SS-03 | Screening does not block business (FR-SS-033) | Screening informs and does not block quotation, account submission, placement or booking; a block is added only if BDOI asks. | The BRD does not say whether an open match blocks business (SQ07). | Choose inform or block (SQ07). |
+| CLR-SS-04 | Active policy (SNSRP-303; FR-SS-034) | A client has an active policy when one of the client's accounts is POLICY_ISSUED or BOOKED; only such clients require a KYC review or EDD. | The BRD does not define an active policy (SQ10). | Give the definition of an active policy (SQ10). |
+| CLR-SS-05 | Approver (FR-SS-013) | The Approver is the Unit Head of the client's marketing unit. | The BRD does not name the Approver (SQ04). | Confirm the Approver and the matrix dimensions (SQ04). |
+| CLR-SS-06 | AML Committee (FR-SS-064) | The AML Committee decides by majority of five members. | The decision rule is not given (SQ15). | Give the decision rule (SQ15). |
+| CLR-SS-07 | STR file (SNSRP-706; FR-SS-017, 071) | The STR file is created with a provisional layout of the case fields and saved in the BIBS report archive, from which Compliance downloads it; the AMLC layout is entered as a new version when BDOI supplies it. | The AMLC format and the designated folder are not given (SQ09, SQ16). | Give the AMLC format and the folder (SQ09, SQ16). |
+| CLR-SS-08 | Templates (FR-SS-016, 050, 070) | BIBS starts with seed KYC review, transaction review, EDD and STR templates; Compliance maintains them as versions. | The field lists are not given (SQ05). | Give the field lists (SQ05). |
+| CLR-SS-09 | Dispositions (FR-SS-018, 060) | The dispositions per stage start with the values provided in section 9 and are maintained as a list of values with maker-checker. | The dispositions and validation criteria are not given (SQ06). | Confirm the dispositions (SQ06). |
+| CLR-SS-10 | Investigators (section 3) | Investigators may be existing Marketing Account Officers; BDOI grants SCR_INVESTIGATOR in addition to their role, as a user may hold several roles. | Who the 287 investigators are is open (SQ19); cross-BRD decision D5. | Confirm the investigators (SQ19). |
+| CLR-SS-11 | Adverse media (section 1.2) | Adverse-media screening is out of scope; the list type ADVERSE_MEDIA is available if BDOI adds a source. | BSP M-2025-017 is cited in the objectives, but no requirement asks for it (SQ20). | Confirm the scope (SQ20). |
 
 # Sign-off
 

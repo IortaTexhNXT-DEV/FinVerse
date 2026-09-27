@@ -1,9 +1,8 @@
 # Test plan BRD-10 Sanction Screening and Risk Profiling - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-10_Sanction_Screening/brd10_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# BRD-10 is designed, not built: the expected results quote the message text of the FRS and the build
-# design (docs/architecture/SANCTION_SCREENING_DESIGN.md) without codes, and no case names an automated
-# test. Screen paths follow section 11 of the build design. All list names used in the tests are
+# The expected results quote the message text of the FRS; screen paths follow the screening screens of the
+# FRS. All list names used in the tests are
 # invented; no real listed person or entity is used.
 
 meta:
@@ -99,7 +98,7 @@ data:
     content: Case in STR_PREPARATION for "ABC Trading" with two receipts and one invoice; test STR reason codes UAT01 and UAT02 added to SCR_STR_REASON by the test lead; an STR approved by the committee this month and one approved last month.
     source: Case of TD-SS-06; reason codes keyed in Lists of Values until BDOI supplies the AMLC codes (SQ09)
   - id: TD-SS-10
-    name: Parameters and jobs as delivered
+    name: Parameters and jobs at their defaults
     content: "SCR_SCREENING_SCOPE PROSPECT, CONFIRMED; SCR_FULL_RESCREEN_DAY 1; SCR_BLOCK_ON_OPEN_MATCH false; SCR_COMMITTEE_RULE MAJORITY; SCR_COMMITTEE_SIZE 5; SCR_INGEST_ALERT_RECIPIENTS = test mailbox; jobs SCR_WATCHLIST_INGEST 01:00, SCR_PERIODIC_SCREENING 01:30, SCR_SLA_MONITOR hourly, SCR_INGEST_ERROR_DIGEST 07:00 Monday to Friday."
     source: Configuration of the SIT environment (FRS section 9.1); recipients set by the test lead
 

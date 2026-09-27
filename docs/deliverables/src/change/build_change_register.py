@@ -1,7 +1,7 @@
 """Builds the Change Management Register workbook and its Word summary (BRD-00, programme level).
 
 The register lists every deviation from the BRDs that goes through change control, with the effort in man-days to
-close it. It is for documentation and change control; it does not change the platform build or the FRS baseline.
+close it. It is for documentation and change control; it does not change the platform or the FRS baseline.
 
 Usage
   python docs/deliverables/src/change/build_change_register.py --check      # checks only
@@ -57,7 +57,7 @@ BRD_NAMES = {
     "BRD-10": "Sanction Screening", "BRD-11": "User Access Maintenance", "BRD-12": "Submitted Policies",
     "BRD-13": "Data Migration",
 }
-REQUIRED = ("id", "drop", "brd", "ref", "fr", "module", "type", "req", "built", "reason", "impact", "depts", "eff",
+REQUIRED = ("id", "drop", "brd", "ref", "fr", "type", "req", "proposed", "reason", "impact", "depts", "eff",
             "prio", "status", "xref", "target", "src")
 # Filler words of the writing standard (docs/deliverables/README.md).
 FILLER =("seamless", "robust", "comprehensive", "leverage", "cutting-edge", "state-of-the-art", "best-in-class",
@@ -179,7 +179,7 @@ class CrWorkbook(BdoiWorkbook):
         self._readme.title = "How to read"
         self._control = self.wb.create_sheet("Document control")
         self._sheets.append(_SheetInfo("Document control", "Version history, review and approval, distribution; the "
-                                                           "statement that the register does not change the build "
+                                                           "statement that the register does not change the platform "
                                                            "or the FRS", [], None))
 
     def custom(self, name: str, description: str, landscape: bool = True):
@@ -209,17 +209,17 @@ class CrWorkbook(BdoiWorkbook):
         ws["A2"].font = font(10, True, brand.NEAR_BLACK)
         r = 4
         guide = [
-            "One row per deviation from a BRD requirement, merged across sources (FRS recorded differences, specs, "
-            "designs, the discrepancy register v1.2, the alignment pack, the cross-BRD decisions and the BDOI answers "
-            "of 26 September 2026). The Source column says where each deviation is recorded.",
+            "One row per deviation from a BRD requirement, merged across sources (the clarifications chapters of the "
+            "FRS, the requirements baselines, the discrepancy register v1.2, the alignment pack, the cross-BRD "
+            "decisions and the BDOI answers of 26 September 2026). The Source column says where each deviation is "
+            "recorded.",
             "Filter the Register sheet by Drop, BRD, Deviation type, Priority or CR status. The Summary sheet recounts "
             "from the Register, so it stays correct when rows are added or a status changes.",
             "Effort is in man-days for the work still needed to close the deviation as proposed (Effort basis sheet). "
-            "It is 0 when the behaviour is built and only needs acceptance. 'BRD as written' gives the indicative "
-            "effort to build the BRD text instead, where the CCB may want to compare.",
-            "A CR moves Draft -> For CCB review -> Approved or Rejected -> Implemented. Rows marked 'Implemented (as "
-            "built, for acceptance)' describe built behaviour that differs from the BRD: the CCB records the "
-            "acceptance; no build remains.",
+            "It is 0 when no work remains and the behaviour only needs acceptance. 'BRD as written' gives the "
+            "indicative effort to deliver the BRD text instead, where the CCB may want to compare.",
+            "A CR moves Draft -> For CCB review -> Approved or Rejected. Rows marked 'For acceptance' describe "
+            "decided behaviour that differs from the BRD: the CCB records the acceptance; no work remains.",
             "The register does not change the FRS. An approved CR reaches the FRS only through the next FRS revision, "
             "which cites the CR ID.",
         ]
@@ -247,7 +247,7 @@ class CrWorkbook(BdoiWorkbook):
                   merge_last_to=4)
         r += 1
         r = self._heading(ws, r, "Size classes (effort basis)")
-        r = table(ws, r, ["Class", "Man-days"], [["0", "Built; acceptance only"]] +
+        r = table(ws, r, ["Class", "Man-days"], [["0", "Acceptance only"]] +
                   [[n, f"{lo} to {hi}" if hi < 9999 else f"more than {lo - 1}"] for n, lo, hi in d["sizes"]],
                   [1, 2], merge_last_to=4)
         r += 1
@@ -403,31 +403,30 @@ REG_COLUMNS = [
     ("brd", "BRD", 8, "Primary BRD; other BRDs involved are named in the BRD requirement column"),
     ("ref", "BRD requirement ID(s) and page", 24, "BRD requirement IDs with the PDF page of the source BRD"),
     ("fr", "FRS FR ID(s)", 16, "Functional requirement IDs of the FRS, or the FRS section that records the item"),
-    ("module", "Module / screen", 19, "BIBS module, screen, job or port concerned"),
     ("type", "Deviation type", 18, "Kind of deviation (How to read)"),
     ("req", "BRD requirement", 30, "What the BRD asks, in short"),
-    ("built", "As built / proposed behaviour", 42, "What BIBS does today, or the proposed behaviour"),
+    ("proposed", "Proposed behaviour", 42, "The proposed behaviour of BIBS"),
     ("reason", "Reason", 22, "BDOI decision, open question or technical constraint behind the deviation"),
     ("impact", "Business impact", 22, "Effect on the business process, money, control or users"),
     ("depts", "Affected departments", 18, "BDOI departments affected"),
     ("a", "Analysis (md)", 7, "Man-days of analysis still needed"),
-    ("b", "Build (md)", 7, "Man-days of build (code, configuration, unit and integration tests)"),
+    ("b", "Dev. (md)", 7, "Man-days of development and configuration"),
     ("t", "Test (md)", 7, "Man-days of SIT test preparation, execution and regression"),
-    ("d", "Doc. (md)", 7, "Man-days of documentation (FRS, design, test plan, guides)"),
+    ("d", "Doc. (md)", 7, "Man-days of documentation (FRS, test plan, guides)"),
     ("total", "Total (md)", 7, "Sum of the four effort columns (formula)"),
     ("basis", "Size basis", 12, "Size class and chosen number: S 1-3, M 4-10, L 11-25, XL over 25; 0 = acceptance "
                                 "only (formula)"),
-    ("alt", "BRD as written (md)", 9, "Indicative man-days to build the BRD text instead of the proposed behaviour "
+    ("alt", "BRD as written (md)", 9, "Indicative man-days to deliver the BRD text instead of the proposed behaviour "
                                       "(blank where not applicable)"),
     ("prio", "Priority", 9, "High, Medium or Low (How to read)"),
     ("status", "CR status", 16, "Status in the change-control process"),
     ("owner", "Decision owner (BDOI)", 22, "BDOI role that decides the CR"),
     ("xref", "Register / question refs", 18, "Discrepancy register items (DCR-), question IDs and decisions (D1-D10)"),
-    ("target", "Target drop / release", 17, "Build wave or release in which the CR is closed"),
-    ("src", "Source of the record", 24, "Where the deviation is recorded (FRS section, spec, design, register, "
+    ("target", "Target drop / release", 17, "Drop or release in which the CR is closed"),
+    ("src", "Source of the record", 24, "Where the deviation is recorded (FRS section, requirements baseline, register, "
                                         "alignment pack)"),
 ]
-FIRST_PAGE_LAST_COL = 11  # columns A-K on the first printed page, L-Y (with A repeated) on the second
+FIRST_PAGE_LAST_COL = 10  # columns A-J on the first printed page, K-X (with A repeated) on the second
 
 
 def reg_rows(d: dict[str, Any]) -> list[dict[str, Any]]:
@@ -435,8 +434,8 @@ def reg_rows(d: dict[str, Any]) -> list[dict[str, Any]]:
     for r in d["rows"]:
         a, b, t, doc = r["eff"]
         out.append({
-            "id": r["id"], "drop": r["drop"], "brd": r["brd"], "ref": r["ref"], "fr": r["fr"], "module": r["module"],
-            "type": d["types"][r["type"]], "req": r["req"], "built": r["built"], "reason": r["reason"],
+            "id": r["id"], "drop": r["drop"], "brd": r["brd"], "ref": r["ref"], "fr": r["fr"],
+            "type": d["types"][r["type"]], "req": r["req"], "proposed": r["proposed"], "reason": r["reason"],
             "impact": r["impact"], "depts": r["depts"], "a": a, "b": b, "t": t, "d": doc, "total": None,
             "basis": None, "alt": r.get("alt"), "prio": r["prio"], "status": d["statuses"][r["status"]],
             "owner": d["owners"][r.get("owner") or r["brd"]], "xref": r["xref"], "target": d["targets"][r["target"]],
@@ -454,7 +453,7 @@ def build_workbook(d: dict[str, Any]) -> Path:
     wb = CrWorkbook(d, m["title"], doc_type=m["doc_type"], brd=m["brd"], version=m["version"], date=m["date"],
                     subtitle=m["statement"])
     wb.legend = [(d["statuses"][k], d["status_meaning"][k]) for k in ("DRAFT", "CCB", "APPR", "REJ")] + \
-        [("Implemented", f"Shown as \"{d['statuses']['IMPL']}\". {d['status_meaning']['IMPL']}")]
+        [(d['statuses']['IMPL'], d['status_meaning']['IMPL'])]
     wb.cover_notes = [f"Status as of {m['status_as_of']}. Baseline: {m['baseline']}."]
     values = {"drop": DROPS, "brd": BRDS, "type": list(d["types"].values()), "prio": PRIORITIES,
               "status": list(d["statuses"].values()), "target": list(d["targets"].values())}
@@ -539,8 +538,8 @@ def build_summary(wb: CrWorkbook, d: dict[str, Any], n: int) -> None:
         nonlocal r
         ws.cell(row=r, column=1, value=title).font = font(12, True, brand.HEADER_BLUE)
         r += 1
-        heads = ["Value", "Description", "CRs", "High", "Draft", "For CCB review", "Implemented", "Analysis (md)",
-                 "Build (md)", "Test (md)", "Doc. (md)", "Total (md)"]
+        heads = ["Value", "Description", "CRs", "High", "Draft", "For CCB review", "For acceptance", "Analysis (md)",
+                 "Dev. (md)", "Test (md)", "Doc. (md)", "Total (md)"]
         for c, h in enumerate(heads, start=1):
             cell = ws.cell(row=r, column=c, value=h)
             cell.font = font(9, True, brand.WHITE)
@@ -612,7 +611,7 @@ def build_effort(wb: CrWorkbook, d: dict[str, Any], n: int) -> None:
     r += 1
     ws.cell(row=r, column=1, value="Size classes").font = font(12, True, brand.HEADER_BLUE)
     r = table(ws, r + 1, ["Class", "Man-days", "CRs"],
-              [["0", "Built; acceptance only", f'=COUNTIFS({reg_range("total", n)},0)']] +
+              [["0", "Acceptance only", f'=COUNTIFS({reg_range("total", n)},0)']] +
               [[nm, f"{lo} to {hi}" if hi < 9999 else f"more than {lo - 1}",
                 f'=COUNTIFS({reg_range("total", n)},">={lo}",{reg_range("total", n)},"<={hi}")']
                for nm, lo, hi in d["sizes"]], [2, 3, 4], number_cols=(2,))
@@ -620,9 +619,9 @@ def build_effort(wb: CrWorkbook, d: dict[str, Any], n: int) -> None:
     ws.cell(row=r, column=1, value="Man-days by activity (all CRs)").font = font(12, True, brand.HEADER_BLUE)
     r = table(ws, r + 1, ["Activity", "Meaning", "Man-days"],
               [["Analysis", "Impact analysis, workshops, rules and layouts", f"=SUM({reg_range('a', n)})"],
-               ["Build", "Code, configuration, unit and integration tests", f"=SUM({reg_range('b', n)})"],
+               ["Development", "Development and configuration", f"=SUM({reg_range('b', n)})"],
                ["Test", "SIT cases written and run, regression", f"=SUM({reg_range('t', n)})"],
-               ["Documentation", "FRS, design, test plan, guides", f"=SUM({reg_range('d', n)})"],
+               ["Documentation", "FRS, test plan, guides", f"=SUM({reg_range('d', n)})"],
                ["Total", "", f"=SUM({reg_range('total', n)})"]], [2, 3, 4], number_cols=(2,))
     ws.page_setup.fitToWidth = 1
 
@@ -691,7 +690,7 @@ def build_form(wb: CrWorkbook, d: dict[str, Any]) -> None:
         hint = ws.cell(row=r, column=2, value=guide)
         hint.font = font(8, False, brand.PLACEHOLDER, italic=True)
         hint.alignment = Alignment(wrap_text=True, vertical="top")
-        big = field in ("What the BRD asks", "Change requested or as-built behaviour", "Business impact",
+        big = field in ("What the BRD asks", "Change requested or proposed behaviour", "Business impact",
                         "Conditions", "Reason")
         ws.row_dimensions[r].height = 48 if big else 24
         r += 1
@@ -766,7 +765,7 @@ def group_rows(d: dict[str, Any], key: str, order: list[str], label=None, desc=N
     return out
 
 
-GROUP_HEADERS = ["CRs", "High", "Open", "Analysis", "Build", "Test", "Doc.", "Total md"]
+GROUP_HEADERS = ["CRs", "High", "Open", "Analysis", "Dev.", "Test", "Doc.", "Total md"]
 
 
 def top20(d: dict[str, Any]) -> list[dict[str, Any]]:
@@ -793,8 +792,8 @@ def placeholders(d: dict[str, Any]) -> dict[str, list[str]]:
         "by_brd": md_table(["BRD", "Name"] + GROUP_HEADERS,
                            group_rows(d, "brd", BRDS, desc=lambda v: BRD_NAMES[v]),
                            [1.3, 3.5, 0.8, 0.8, 0.9, 1.4, 1, 0.9, 0.9, 1.3], "Deviations and man-days by BRD"),
-        "top20": md_table(["CR", "BRD", "BRD asks", "As built / proposed", "Man-days", "Priority", "Status"],
-                          [[r["id"], r["brd"], first_sentence(r["req"], 90), first_sentence(r["built"], 120),
+        "top20": md_table(["CR", "BRD", "BRD asks", "Proposed", "Man-days", "Priority", "Status"],
+                          [[r["id"], r["brd"], first_sentence(r["req"], 90), first_sentence(r["proposed"], 120),
                             f"{total(r)} ({size_class(d, total(r))})", r["prio"], st[r["status"]]]
                            for r in top20(d)],
                           [1.4, 1.3, 5.0, 6.3, 1.4, 1.3, 1.9],

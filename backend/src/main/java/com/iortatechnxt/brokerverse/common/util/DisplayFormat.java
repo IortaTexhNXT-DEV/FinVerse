@@ -31,8 +31,7 @@ public final class DisplayFormat {
       DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH);
   private static final DateTimeFormatter DATE_TIME =
       DateTimeFormatter.ofPattern(DATE_PATTERN + " HH:mm", Locale.ENGLISH);
-  private static final int MIN_RATE_DECIMALS = 2;
-  private static final int MAX_RATE_DECIMALS = 6;
+  private static final int RATE_DECIMALS = 4;
 
   /** Codes kept in capitals when a status is written as words. */
   private static final Set<String> ACRONYMS =
@@ -107,8 +106,9 @@ public final class DisplayFormat {
   }
 
   /**
-   * A rate in percent to a sensible precision: at least two decimals, trailing zeros removed beyond
-   * them, at most six (0.42500000 becomes 0.425, 2 becomes 2.00).
+   * A rate in percent as the FRS states rates: four decimals (0.42500000 becomes 0.4250, 2 becomes
+   * 2.0000), the same precision as the rate is keyed on the screens; the column header carries the
+   * percent sign ("Rate %").
    *
    * @param rate rate in percent, may be null
    * @return text without the percent sign, empty when null
@@ -117,11 +117,7 @@ public final class DisplayFormat {
     if (rate == null) {
       return "";
     }
-    BigDecimal shown = rate.setScale(MAX_RATE_DECIMALS, RoundingMode.HALF_UP).stripTrailingZeros();
-    if (shown.scale() < MIN_RATE_DECIMALS) {
-      shown = shown.setScale(MIN_RATE_DECIMALS, RoundingMode.UNNECESSARY);
-    }
-    return shown.toPlainString();
+    return rate.setScale(RATE_DECIMALS, RoundingMode.HALF_UP).toPlainString();
   }
 
   /**

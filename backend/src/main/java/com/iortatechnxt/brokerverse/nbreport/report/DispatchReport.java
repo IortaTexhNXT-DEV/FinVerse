@@ -35,7 +35,9 @@ public class DispatchReport implements ReportDefinition {
           + " case o.purpose when 'EPOLICY' then 'E-policy' else 'Insurance Advice' end"
           + " as document, o.reference, o.created_at as queued, o.sent_at as sent,"
           + " o.recipients, o.subject, o.attempts, o.last_error as reason, o.simulated,"
-          + " o.created_by as sender"
+          + " "
+          + NbReportSupport.userName("o.created_by")
+          + " as sender"
           + " from msg_outbound o"
           + " where o.company_id = :company and o.purpose in ('EPOLICY', 'INSURANCE_ADVICE')"
           + " and cast(o.created_at at time zone '"

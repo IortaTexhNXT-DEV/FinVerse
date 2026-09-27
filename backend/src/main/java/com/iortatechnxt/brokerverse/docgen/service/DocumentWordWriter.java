@@ -87,8 +87,11 @@ final class DocumentWordWriter {
 
   private static void table(BrandedDocx docx, Table t) {
     heading(docx, t.heading());
-    double[] weights = new double[t.headers().size()];
-    Arrays.fill(weights, 1);
+    float[] columns = t.columnWeights();
+    double[] weights = new double[columns.length];
+    for (int i = 0; i < columns.length; i++) {
+      weights[i] = columns[i];
+    }
     XWPFTable table = docx.table(weights, true, NATURAL);
     BrandedDocx.headingRow(table, t.headers());
     for (List<String> values : t.rows()) {

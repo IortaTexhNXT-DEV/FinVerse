@@ -69,7 +69,7 @@ class DocxReportRendererTest {
       assertThat(text)
           .contains("Schedule of Cash")
           .contains("Report ID: T-DOCX")
-          .contains("User ID: tester")
+          .contains("Run By: tester")
           .contains("Run Date: 24-Sep-2026 09:00")
           .contains("Filters: As of : 2026-09-24")
           .contains("Note: Amounts in PHP")

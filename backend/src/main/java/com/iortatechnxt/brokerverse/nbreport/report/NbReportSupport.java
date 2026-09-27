@@ -37,6 +37,22 @@ final class NbReportSupport {
   private NbReportSupport() {}
 
   /**
+   * SQL expression of the display name of the user whose login id is in a column (the full name of
+   * the user directory; the login id when the user is unknown, e.g. SYSTEM): reports show people by
+   * name, never by login id.
+   *
+   * @param column SQL column holding a login id
+   * @return SQL expression
+   */
+  static String userName(String column) {
+    return "coalesce((select u.full_name from sec_user u where lower(u.username) = lower("
+        + column
+        + ")), "
+        + column
+        + ")";
+  }
+
+  /**
    * Metadata of a New Business report with the company and, when {@code period}, the date range.
    *
    * @param code report code

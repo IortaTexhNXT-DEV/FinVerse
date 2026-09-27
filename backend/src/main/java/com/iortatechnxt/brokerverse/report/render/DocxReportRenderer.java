@@ -63,7 +63,7 @@ public class DocxReportRenderer implements ReportRenderer {
     docx.paragraph(
         "Report ID: "
             + result.code()
-            + "    User ID: "
+            + "    Run By: "
             + context.generatedBy()
             + "    Run Date: "
             + STAMP.format(context.generatedAt()),

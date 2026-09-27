@@ -63,6 +63,9 @@ public class ProposalDocuments {
           "Valid until",
           "Remarks",
           "Recommended");
+  // Conditions and remarks are free text: wider columns, so they do not wrap word by word.
+  private static final List<Float> COMPARISON_WIDTHS =
+      List.of(1.6f, 1.1f, 1.3f, 0.9f, 1.5f, 3.0f, 1.1f, 1.8f, 1.3f);
 
   private final DocumentComposer composer;
   private final DocTemplateService templates;
@@ -149,7 +152,8 @@ public class ProposalDocuments {
                         "Insurer terms",
                         COMPARISON,
                         table.rows().stream().map(ProposalDocuments::cells).toList(),
-                        AMOUNT_COLUMNS)),
+                        AMOUNT_COLUMNS,
+                        COMPARISON_WIDTHS)),
                 List.of("Prepared by"),
                 "Compiled from " + responses.size() + " insurer response(s)"));
     return new MessageFile(p.getPrfNo() + "_comparative.pdf", PDF, pdf);

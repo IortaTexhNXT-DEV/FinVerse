@@ -1,5 +1,6 @@
 import {
   BadgeCheck,
+  BadgePercent,
   Building2,
   Calculator,
   Gift,
@@ -48,6 +49,15 @@ export const catalogModule: FeatureModule = {
       permission: 'PRODUCT_VIEW',
       alsoPermissions: ['MASTER_VIEW', 'PRODUCT_MAINTAIN', 'PRODUCT_VALIDATE'],
       component: lazy(() => import('./VersionEditorPage')),
+      hidden: true,
+    },
+    {
+      path: '/catalog/rate-exceptions/:reference',
+      label: 'Rate Exception',
+      icon: BadgePercent,
+      permission: 'PRODUCT_VIEW',
+      alsoPermissions: ['MASTER_VIEW', 'QUOTE_VIEW', 'ACCOUNT_VIEW', 'PRODUCT_AUTHORIZE'],
+      component: lazy(() => import('./RateExceptionPage')),
       hidden: true,
     },
     {

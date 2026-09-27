@@ -231,6 +231,19 @@ export interface RateException extends Authorizable {
   validUntil: string;
   requestedBy: string;
   requestedAt: string;
+  /** Approver who approved or rejected it. */
+  decidedBy?: string;
+  decidedAt?: string;
+  /** Approval comment or rejection reason. */
+  decisionComment?: string;
+}
+
+/** A rate exception as the approver sees it, with the product and the scheme in force. */
+export interface RateExceptionDetail {
+  exception: RateException;
+  productName: string;
+  currentVersionNo?: number;
+  schemeRate?: number;
 }
 
 const base = '/catalog';
@@ -274,4 +287,12 @@ export const productCatalogApi = {
     api.get<RateException[]>(`${base}/rate-scheme-exceptions${toQuery({ transactionRef })}`),
   requestRateException: (input: RateExceptionInput) =>
     api.post<RateException>(`${base}/rate-scheme-exceptions`, input),
+  rateException: (reference: string) =>
+    api.get<RateExceptionDetail>(`${base}/rate-scheme-exceptions/${reference}`),
+  approveRateException: (reference: string, comment?: string) =>
+    api.post<RateException>(`${base}/rate-scheme-exceptions/${reference}/approve`, { comment }),
+  rejectRateException: (reference: string, reason: string) =>
+    api.post<RateException>(`${base}/rate-scheme-exceptions/${reference}/reject`, {
+      comment: reason,
+    }),
 };

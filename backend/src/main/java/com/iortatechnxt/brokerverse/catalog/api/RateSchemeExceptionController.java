@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.catalog.api;
 
+import com.iortatechnxt.brokerverse.catalog.api.dto.RateExceptionDtos.Decision;
+import com.iortatechnxt.brokerverse.catalog.api.dto.RateExceptionDtos.ExceptionDetail;
 import com.iortatechnxt.brokerverse.catalog.api.dto.RateExceptionDtos.ExceptionRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.RateExceptionDtos.ExceptionResponse;
 import com.iortatechnxt.brokerverse.catalog.service.RateSchemeExceptionService;
@@ -8,6 +10,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,9 +19,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Rate-scheme exceptions (BRPM.007): requested from a quotation or account, decided in My Approvals
- * through {@code /api/v1/catalog/records/RATE_SCHEME_EXCEPTION/{id}/authorize} (approve) or {@code
- * .../deactivate} (reject).
+ * Rate-scheme exceptions (BRPM.007, FR-PM-051): requested from a quotation or account; My Approvals
+ * opens the exception record, where an approver other than the requester approves it (optional
+ * comment) or rejects it (reason).
  */
 @RestController
 @RequestMapping("/api/v1/catalog/rate-scheme-exceptions")
@@ -58,5 +61,46 @@ public class RateSchemeExceptionController {
   @PreAuthorize(CatalogAccess.REQUEST_EXCEPTION)
   public ExceptionResponse request(@Valid @RequestBody ExceptionRequest request) {
     return ExceptionResponse.from(exceptions.request(request.toRequest()));
+  }
+
+  /**
+   * One exception with the product name and the scheme in force.
+   *
+   * @param reference reference number
+   * @return exception record
+   */
+  @GetMapping("/{reference}")
+  @PreAuthorize(CatalogAccess.READ)
+  public ExceptionDetail get(@PathVariable String reference) {
+    return ExceptionDetail.from(exceptions.detail(reference));
+  }
+
+  /**
+   * Approves a pending exception (checker, never the requester).
+   *
+   * @param reference reference number
+   * @param decision optional comment
+   * @return the approved exception
+   */
+  @PostMapping("/{reference}/approve")
+  @PreAuthorize(CatalogAccess.DECIDE_EXCEPTION)
+  public ExceptionResponse approve(
+      @PathVariable String reference, @Valid @RequestBody(required = false) Decision decision) {
+    return ExceptionResponse.from(
+        exceptions.approve(reference, decision == null ? null : decision.comment()));
+  }
+
+  /**
+   * Rejects a pending exception with its reason (checker, never the requester).
+   *
+   * @param reference reference number
+   * @param decision the reason
+   * @return the rejected exception
+   */
+  @PostMapping("/{reference}/reject")
+  @PreAuthorize(CatalogAccess.DECIDE_EXCEPTION)
+  public ExceptionResponse reject(
+      @PathVariable String reference, @Valid @RequestBody Decision decision) {
+    return ExceptionResponse.from(exceptions.reject(reference, decision.comment()));
   }
 }

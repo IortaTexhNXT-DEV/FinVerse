@@ -1,4 +1,4 @@
-import { useInsurerName, useLineName, useLovLabel } from './useLabels';
+import { useInsurerName, useLineName, useLovLabel, useProductName } from './useLabels';
 
 interface LovLabelProps {
   /** List of values the code belongs to (e.g. SOURCE_CHANNEL). */
@@ -33,13 +33,43 @@ export function LineLabel({ code }: Readonly<{ code: string | null | undefined }
   return <>{name(code)}</>;
 }
 
-/** "CAR00 (Engineering)": a product code with the name of its line. */
+/**
+ * "Contractor's All Risk (Engineering)": the product name with the name of its line; the product
+ * code is in the tooltip.
+ */
 export function ProductLineLabel({
   product,
   line,
 }: Readonly<{ product: string; line: string | null | undefined }>) {
-  const name = useLineName();
-  return <>{line ? `${product} (${name(line)})` : product}</>;
+  const lineName = useLineName();
+  const productName = useProductName();
+  const name = productName(product);
+  return <span title={product}>{line ? `${name} (${lineName(line)})` : name}</span>;
+}
+
+/**
+ * The name of a product (never its code alone), with the code as a muted second line in a list
+ * (`withCode`) or in the tooltip.
+ */
+export function ProductName({
+  code,
+  withCode = false,
+  empty = '—',
+}: Readonly<{ code: string | null | undefined; withCode?: boolean; empty?: string }>) {
+  const name = useProductName();
+  if (!code) {
+    return <span className="muted">{empty}</span>;
+  }
+  const shown = name(code);
+  if (!withCode || shown === code) {
+    return <span title={code}>{shown}</span>;
+  }
+  return (
+    <span className="cell-stack">
+      <span>{shown}</span>
+      <span className="muted">{code}</span>
+    </span>
+  );
 }
 
 /** The name of an insurer, from its party code (the code while the list loads). */

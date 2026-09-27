@@ -7,7 +7,7 @@ import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDateTime } from '@/utils/format';
 import { rowKeyOf } from './issuanceLogic';
-import { LovLabel, LineLabel, InsurerName } from '@/components/broking/LovLabel';
+import { InsurerName, LineLabel, LovLabel, ProductName } from '@/components/broking/LovLabel';
 
 function tabColumn(tab: IssuanceTab): Column<IssuanceRow> {
   if (tab === 'REVIEW' || tab === 'READY_TO_DISPATCH') {
@@ -79,7 +79,7 @@ export function IssuanceTable({
         <span>
           <LineLabel code={r.lineCode} />
           <span className="cell-sub">
-            {r.productCode} · <InsurerName code={r.insurerCode} />
+            <ProductName code={r.productCode} /> · <InsurerName code={r.insurerCode} />
           </span>
         </span>
       ),

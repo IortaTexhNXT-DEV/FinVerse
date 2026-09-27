@@ -53,3 +53,18 @@ export function useInsurerName(): (code: string | null | undefined) => string {
     return insurers.data?.find((i) => i.partyCode === code)?.name ?? code;
   };
 }
+
+/** Name lookup of products: returns a function from product code to its name (the code while loading). */
+export function useProductName(): (code: string | null | undefined) => string {
+  const products = useQuery({
+    queryKey: ['catalog', 'products', 'names'],
+    queryFn: () => catalogApi.products(),
+    staleTime: STALE,
+  });
+  return (code) => {
+    if (!code) {
+      return '';
+    }
+    return products.data?.find((p) => p.code === code)?.name ?? code;
+  };
+}

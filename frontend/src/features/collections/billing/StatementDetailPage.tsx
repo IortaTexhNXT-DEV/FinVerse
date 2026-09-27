@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarClock, Download, FileText, Layers, Send, UserRound, Wallet } from 'lucide-react';
 import { useState } from 'react';
@@ -37,7 +38,8 @@ const LINE_COLUMNS: Column<StatementLine>[] = [
   {
     key: 'cover',
     header: 'Coverage',
-    render: (l) => `${formatDate(l.coverageFrom)} – ${formatDate(l.coverageTo)}`,
+    kind: 'period',
+    render: (l) => <PeriodCell from={l.coverageFrom} to={l.coverageTo} />,
   },
   { key: 'due', header: 'Due Date', render: (l) => formatDate(l.dueDate) },
   { key: 'amount', header: 'Amount', numeric: true, render: (l) => <Amount value={l.amount} /> },

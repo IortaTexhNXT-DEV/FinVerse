@@ -1,12 +1,16 @@
 import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
+import { Fragment } from 'react';
 import type { KeyboardEvent, ReactNode } from 'react';
 import { EmptyState } from './EmptyState';
+import { PeriodCell } from './PeriodCell';
 
 /**
  * Kind of a column, which fixes its alignment and width (BDO table conventions): text left,
- * amounts right, codes fixed width and never wrapped, dates in one format, status pills centred.
+ * amounts right, codes fixed width and never wrapped, dates in one format, periods on two lines
+ * (`PeriodCell`), status pills centred.
  */
-export type ColumnKind = 'text' | 'amount' | 'code' | 'date' | 'datetime' | 'status' | 'center';
+export type ColumnKind =
+  'text' | 'amount' | 'code' | 'date' | 'datetime' | 'period' | 'status' | 'center';
 
 export interface Column<T> {
   key: string;
@@ -46,6 +50,10 @@ interface DataTableProps<T> {
   selectedKey?: string | number;
   /** Number of skeleton rows while loading. */
   skeletonRows?: number;
+  /** Detail shown in a full-width row under a row whose key is in `expanded` (e.g. GL lines). */
+  renderExpanded?: (row: T) => ReactNode;
+  /** Keys of the expanded rows. */
+  expanded?: ReadonlySet<string | number>;
 }
 
 const KIND_CLASS: Record<ColumnKind, string | undefined> = {
@@ -54,6 +62,7 @@ const KIND_CLASS: Record<ColumnKind, string | undefined> = {
   code: 'col-code',
   date: 'col-date',
   datetime: 'col-datetime',
+  period: 'col-period',
   status: 'col-status',
   center: 'center',
 };
@@ -61,21 +70,43 @@ const KIND_CLASS: Record<ColumnKind, string | undefined> = {
 /** Dates (23-Sep-2026, 23-Sep-2026 19:32) and codes (PAY-2026-000010, T-CBG1): never wrapped. */
 const DATE_TEXT = /^\d{2}-[A-Z][a-z]{2}-\d{4}/;
 const CODE_TEXT = /^[A-Z0-9]+(?:-[A-Z0-9]+)+$/;
+/** A period written as one text (20-Oct-2026 – 20-Oct-2027): shown on two lines. */
+const PERIOD_TEXT = /^(\d{2}-[A-Z][a-z]{2}-\d{4}) (?:–|-|to) (\d{2}-[A-Z][a-z]{2}-\d{4}|open)$/;
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** 20-Oct-2026 as the ISO date 2026-10-20 (the period cell formats it back). */
+function isoOf(date: string): string {
+  const [day = '', month = '', year = ''] = date.split('-');
+  return `${year}-${String(MONTHS.indexOf(month) + 1).padStart(2, '0')}-${day}`;
+}
+
+function periodOf(text: string): ReactNode {
+  const match = PERIOD_TEXT.exec(text);
+  if (match === null) {
+    return <>{text}</>;
+  }
+  const [, from = '', to = ''] = match;
+  return to === 'open' ? (
+    <PeriodCell from={isoOf(from)} to={undefined} />
+  ) : (
+    <PeriodCell from={isoOf(from)} to={isoOf(to)} />
+  );
+}
 
 function unbreakable(text: string): boolean {
   return text.length <= 24 && (DATE_TEXT.test(text) || CODE_TEXT.test(text));
 }
 
 /**
- * A cell's content: an empty value is one muted dash; a plain date or code is kept on one line;
- * anything else as rendered.
+ * A cell's content: an empty value is one muted dash; a plain date or code is kept on one line; a
+ * period written as one text becomes the two-line period cell; anything else as rendered.
  */
 function keepTogether(value: ReactNode): ReactNode {
   let content: ReactNode = value;
   if (value === '' || value === null || value === undefined) {
     content = <span className="muted">—</span>;
-  } else if (typeof value === 'string' && unbreakable(value)) {
-    content = <span className="nowrap">{value}</span>;
+  } else if (typeof value === 'string') {
+    content = unbreakable(value) ? <span className="nowrap">{value}</span> : periodOf(value);
   }
   return content;
 }
@@ -121,7 +152,15 @@ function SortHeader<T>({
 
 type BodyProps<T> = Pick<
   DataTableProps<T>,
-  'columns' | 'rows' | 'rowKey' | 'onRowClick' | 'emptyMessage' | 'emptyAction' | 'selectedKey'
+  | 'columns'
+  | 'rows'
+  | 'rowKey'
+  | 'onRowClick'
+  | 'emptyMessage'
+  | 'emptyAction'
+  | 'selectedKey'
+  | 'renderExpanded'
+  | 'expanded'
 > & { loading: boolean; skeletonRows: number };
 
 function SkeletonRows<T>({ columns, count }: Readonly<{ columns: Column<T>[]; count: number }>) {
@@ -155,6 +194,8 @@ function TableBody<T>({
   loading,
   selectedKey,
   skeletonRows,
+  renderExpanded,
+  expanded,
 }: Readonly<BodyProps<T>>) {
   if (loading) {
     return (
@@ -183,21 +224,29 @@ function TableBody<T>({
     <tbody>
       {rows.map((row) => {
         const key = rowKey(row);
+        const open = renderExpanded !== undefined && expanded?.has(key) === true;
         return (
-          <tr
-            key={key}
-            className={onRowClick ? 'clickable' : undefined}
-            aria-selected={selectedKey === key || undefined}
-            onClick={onRowClick ? () => onRowClick(row) : undefined}
-            onKeyDown={onRowClick ? keyDown(row) : undefined}
-            tabIndex={onRowClick ? 0 : undefined}
-          >
-            {columns.map((c) => (
-              <td key={c.key} className={cellClass(c)}>
-                {keepTogether(c.render(row))}
-              </td>
-            ))}
-          </tr>
+          <Fragment key={key}>
+            <tr
+              className={onRowClick ? 'clickable' : undefined}
+              aria-selected={selectedKey === key || undefined}
+              aria-expanded={renderExpanded === undefined ? undefined : open}
+              onClick={onRowClick ? () => onRowClick(row) : undefined}
+              onKeyDown={onRowClick ? keyDown(row) : undefined}
+              tabIndex={onRowClick ? 0 : undefined}
+            >
+              {columns.map((c) => (
+                <td key={c.key} className={cellClass(c)}>
+                  {keepTogether(c.render(row))}
+                </td>
+              ))}
+            </tr>
+            {open && (
+              <tr className="row-expanded">
+                <td colSpan={columns.length}>{renderExpanded(row)}</td>
+              </tr>
+            )}
+          </Fragment>
         );
       })}
     </tbody>
@@ -223,6 +272,8 @@ export function DataTable<T>({
   footer,
   selectedKey,
   skeletonRows = 5,
+  renderExpanded,
+  expanded,
 }: Readonly<DataTableProps<T>>) {
   return (
     <div className="table-wrap">
@@ -257,6 +308,8 @@ export function DataTable<T>({
           loading={loading}
           selectedKey={selectedKey}
           skeletonRows={skeletonRows}
+          renderExpanded={renderExpanded}
+          expanded={expanded}
         />
         {footer !== undefined && !loading && rows.length > 0 && <tfoot>{footer}</tfoot>}
       </table>

@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Calculator } from 'lucide-react';
 import { useState } from 'react';
@@ -15,7 +16,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount, formatDate, humanize, today } from '@/utils/format';
+import { formatAmount, humanize, today } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { IncentiveRun, RunLine, Scheme } from './commissionApi';
 import { DateInput } from '@/components/ui/DateInput';
@@ -57,7 +58,8 @@ function columnsOf(schemes: Scheme[]): Column<IncentiveRun>[] {
     {
       key: 'period',
       header: 'Period',
-      render: (r) => `${formatDate(r.periodFrom)} – ${formatDate(r.periodTo)}`,
+      kind: 'period',
+      render: (r) => <PeriodCell from={r.periodFrom} to={r.periodTo} />,
     },
     {
       key: 'production',

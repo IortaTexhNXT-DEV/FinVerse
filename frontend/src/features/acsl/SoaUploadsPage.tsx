@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useQuery } from '@tanstack/react-query';
 import { Upload } from 'lucide-react';
 import { useState } from 'react';
@@ -12,7 +13,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
 import { acslApi } from './api';
 import type { SoaUpload } from './api';
 import { SoaUploadDialog } from './SoaUploadDialog';
@@ -33,7 +34,8 @@ const COLUMNS: Column<SoaUpload>[] = [
   {
     key: 'period',
     header: 'Period',
-    render: (u) => `${formatDate(u.periodFrom)} – ${formatDate(u.periodTo)}`,
+    kind: 'period',
+    render: (u) => <PeriodCell from={u.periodFrom} to={u.periodTo} />,
   },
   { key: 'file', header: 'File', render: (u) => u.fileName },
   {

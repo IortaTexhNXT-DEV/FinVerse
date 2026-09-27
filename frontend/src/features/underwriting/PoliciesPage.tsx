@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useQuery } from '@tanstack/react-query';
 import { Pager as SharedPager } from '@/components/ui/Pager';
 import { Plus } from 'lucide-react';
@@ -14,7 +15,6 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useWorkspace } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
 import { DateField, SelectField, TextField } from './FormFields';
 import { useUwLookups } from './useUwLookups';
 
@@ -125,7 +125,8 @@ export default function PoliciesPage() {
             {
               key: 'per',
               header: 'Period',
-              render: (p) => `${formatDate(p.periodFrom)} – ${formatDate(p.periodTo)}`,
+              kind: 'period',
+              render: (p) => <PeriodCell from={p.periodFrom} to={p.periodTo} />,
             },
             { key: 'ccy', header: 'Ccy', render: (p) => p.currency },
             {

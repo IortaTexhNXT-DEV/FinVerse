@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useProductName } from '@/components/broking/useLabels';
 import { Building2, CalendarClock, FileStack, ShieldCheck, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
@@ -149,6 +150,7 @@ export default function AccountPlacementPage() {
   const arn = useParams().arn ?? '';
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<TabId>('gate');
+  const productName = useProductName();
   const account = useQuery({
     queryKey: ['account', 'arn', arn],
     queryFn: () => accountsApi.byArn(arn),
@@ -178,7 +180,7 @@ export default function AccountPlacementPage() {
         backTo="/placement"
         section="Placement & Booking · Account Placement"
         title={a.clientName}
-        description={`${a.clientCode} · ${a.productCode} · placement, hold cover and insurer returns`}
+        description={`${a.clientCode} · ${productName(a.productCode)} · placement, hold cover and insurer returns`}
         actions={
           <>
             <ReferenceChip label="ARN" value={a.arn} />

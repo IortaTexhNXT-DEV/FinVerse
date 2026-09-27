@@ -4,7 +4,7 @@ import { Amount } from '@/components/ui/Amount';
 import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate } from '@/utils/format';
-import { InsurerName } from '@/components/broking/LovLabel';
+import { InsurerName, ProductName } from '@/components/broking/LovLabel';
 
 /** Columns of the PRF lists. */
 export const PROPOSAL_COLUMNS: Column<ProposalListItem>[] = [
@@ -38,7 +38,11 @@ export const PROPOSAL_COLUMNS: Column<ProposalListItem>[] = [
       </>
     ),
   },
-  { key: 'product', header: 'Product', render: (p) => p.productCode },
+  {
+    key: 'product',
+    header: 'Product',
+    render: (p) => <ProductName code={p.productCode} withCode />,
+  },
   {
     key: 'tsi',
     header: 'Sum Insured',

@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ebApi } from '@/api/eb';
@@ -10,7 +11,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount, formatDate, formatDateTime } from '@/utils/format';
+import { formatAmount, formatDateTime } from '@/utils/format';
 import { ebLabel } from '../common/ebCodes';
 
 const ACCOUNT_COLUMNS: Column<CycleAccount>[] = [
@@ -31,7 +32,8 @@ const ACCOUNT_COLUMNS: Column<CycleAccount>[] = [
   {
     key: 'period',
     header: 'Period',
-    render: (a) => `${formatDate(a.periodFrom)} – ${formatDate(a.periodTo)}`,
+    kind: 'period',
+    render: (a) => <PeriodCell from={a.periodFrom} to={a.periodTo} />,
   },
   {
     key: 'premium',

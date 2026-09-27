@@ -47,11 +47,18 @@ const HISTORY: HistoryEntry[] = [
 ];
 
 describe('status pills and tags', () => {
-  it('shows the agreed short form of a long status with the full label in the tooltip', () => {
+  it('shows a status that fits the pill in full, never an abbreviation', () => {
     render(<StatusBadge status="RETURNED_TO_MARKETING" />);
-    const pill = screen.getByText('Returned to Mktg');
+    const pill = screen.getByText('Returned to Marketing');
     expect(pill).toHaveClass('badge', 'danger');
     expect(pill).toHaveAttribute('title', 'Returned to Marketing');
+    expect(statusShortLabel('PENDING_AUTHORIZATION')).toBe('Pending Authorization');
+  });
+
+  it('keeps the agreed short form for a label longer than the pill', () => {
+    expect(statusShortLabel('FOR_MKT_APPROVAL', 'For Marketing Head Approval')).toBe(
+      'For Mktg Approval',
+    );
   });
 
   it('keeps short labels in full and accepts a label and tone override', () => {

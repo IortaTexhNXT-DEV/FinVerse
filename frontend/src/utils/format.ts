@@ -113,6 +113,33 @@ export function formatDate(iso: string | null | undefined): string {
   return `${day}-${name}-${year}`;
 }
 
+/**
+ * A period on one line for texts and detail blocks: "20-Oct-2026 to 20-Oct-2027"; an open end
+ * reads "from 20-Oct-2026" (lists use `PeriodCell`, which puts the two dates on two lines).
+ */
+export function formatPeriod(
+  from: string | null | undefined,
+  to: string | null | undefined,
+): string {
+  const start = formatDate(from);
+  const end = formatDate(to);
+  if (start === '' && end === '') {
+    return '';
+  }
+  if (end === '') {
+    return `from ${start}`;
+  }
+  return start === '' ? `to ${end}` : `${start} to ${end}`;
+}
+
+/** A number of days as users read it: "0 days", "1 day", "12 days" (aging columns). */
+export function formatDays(days: number | null | undefined): string {
+  if (days === null || days === undefined || !Number.isFinite(days)) {
+    return '';
+  }
+  return `${String(days)} ${Math.abs(days) === 1 ? 'day' : 'days'}`;
+}
+
 /** A timestamp as dd-MMM-yyyy HH:mm in Philippine time: 25-Sep-2026 19:32. */
 export function formatDateTime(iso: string | null | undefined): string {
   if (!iso) {

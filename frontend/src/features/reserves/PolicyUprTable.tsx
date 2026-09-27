@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useQuery } from '@tanstack/react-query';
 import { PageFooter } from '@/components/ui/Pager';
 import { useState } from 'react';
@@ -7,7 +8,7 @@ import { Amount } from '@/components/ui/Amount';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { SelectInput } from '@/features/assets/FormControls';
-import { formatDate, humanize } from '@/utils/format';
+import { humanize } from '@/utils/format';
 
 /** Policy-level UPR of a run (drill-down), paged, optionally for one line of business. */
 export function PolicyUprTable({ runId, lines }: Readonly<{ runId: number; lines: string[] }>) {
@@ -49,7 +50,8 @@ export function PolicyUprTable({ runId, lines }: Readonly<{ runId: number; lines
           {
             key: 'c',
             header: 'Cover',
-            render: (d) => `${formatDate(d.coverFrom)} – ${formatDate(d.coverTo)}`,
+            kind: 'period',
+            render: (d) => <PeriodCell from={d.coverFrom} to={d.coverTo} />,
           },
           { key: 'b', header: 'Basis', render: (d) => humanize(d.basis) },
           {

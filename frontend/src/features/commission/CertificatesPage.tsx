@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FilePlus2 } from 'lucide-react';
 import { useState } from 'react';
@@ -15,7 +16,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
 import { CertificateDialog } from './CertificateDialog';
 import { commissionApi } from './commissionApi';
 import type { Certificate, CertificateInput } from './commissionApi';
@@ -46,8 +47,8 @@ const COLUMNS: Column<Certificate>[] = [
   {
     key: 'period',
     header: 'Period',
-    render: (c) =>
-      `${formatDate(c.certificate.periodFrom)} – ${formatDate(c.certificate.periodTo)}`,
+    kind: 'period',
+    render: (c) => <PeriodCell from={c.certificate.periodFrom} to={c.certificate.periodTo} />,
   },
   {
     key: 'tax',

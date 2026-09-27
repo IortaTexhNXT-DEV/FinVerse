@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -55,7 +56,8 @@ export function InstallmentsTab({
     {
       key: 'cycle',
       header: 'Coverage',
-      render: (i) => `${formatDate(i.cycleFrom)} – ${formatDate(i.cycleTo)}`,
+      kind: 'period',
+      render: (i) => <PeriodCell from={i.cycleFrom} to={i.cycleTo} />,
     },
     { key: 'due', header: 'Due Date', render: (i) => formatDate(i.dueDate) },
     { key: 'amount', header: 'Amount', numeric: true, render: (i) => <Amount value={i.amount} /> },
@@ -83,7 +85,8 @@ const STATEMENT_COLUMNS: Column<Statement>[] = [
   {
     key: 'period',
     header: 'Billing Cycle',
-    render: (s) => `${formatDate(s.cycleFrom)} – ${formatDate(s.cycleTo)}`,
+    kind: 'period',
+    render: (s) => <PeriodCell from={s.cycleFrom} to={s.cycleTo} />,
   },
   { key: 'due', header: 'Due Date', render: (s) => formatDate(s.dueDate) },
   { key: 'bal', header: 'Amount Due', numeric: true, render: (s) => <Amount value={s.balance} /> },

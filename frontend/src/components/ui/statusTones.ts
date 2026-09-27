@@ -269,8 +269,11 @@ const SHORT_LABELS: Record<string, string> = {
   SKIPPED_LOCKED: 'Skipped',
 };
 
-/** Longest label shown in full; longer labels use the short form or are cut with an ellipsis. */
-export const BADGE_MAX_CHARS = 18;
+/**
+ * Longest label shown in full (fits the widest pill: "Returned to Marketing", "Pending
+ * Authorization"); longer labels use the short form or are cut with an ellipsis.
+ */
+export const BADGE_MAX_CHARS = 21;
 
 /** Colour tone of a status code (empty for an unknown status: neutral Header Blue). */
 export function statusTone(status: string): Tone | '' {

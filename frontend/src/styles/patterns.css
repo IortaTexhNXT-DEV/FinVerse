@@ -60,6 +60,38 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Amounts never break inside the figure: 1,234,567.89 and (1,234.00) stay on one line */
+.table td.num,
+.table td .num {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Periods, coverage terms and date ranges (PeriodCell): the from date, then "to" the end date on a
+   second line; each line keeps its date whole and the column is wide enough for both. */
+.table th.col-period,
+.table td.col-period {
+  min-width: var(--period-col-width);
+  white-space: nowrap;
+}
+
+.period-cell {
+  display: inline-flex;
+  flex-direction: column;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.period-cell > .period-cell-to {
+  color: var(--color-text-muted);
+}
+
+/* Detail under a row (e.g. the GL lines of a transaction) */
+.table tbody tr.row-expanded > td {
+  background: var(--brand-blue-050);
+  padding: var(--space-3) var(--space-4) var(--space-4) var(--space-6);
+}
+
 /* Every cell: a primary value and at most one muted secondary line under it */
 .table td .cell-stack > .muted {
   font-size: 12px;
@@ -945,4 +977,17 @@ dl.form-grid dd {
 .kpi-link:hover,
 .kpi-link:focus-visible {
   text-decoration: underline;
+}
+
+/* ---------- Policy transactions (history of a policy with its GL journals) ------------------ */
+.policy-txn-journals > section + section {
+  margin-top: var(--space-3);
+}
+
+.policy-txn-journal-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
 }

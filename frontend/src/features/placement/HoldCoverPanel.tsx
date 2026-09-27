@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { placementApi } from '@/api/placement';
@@ -188,7 +189,8 @@ export function HoldCoverPanel({
           {
             key: 'period',
             header: 'Period',
-            render: (h) => `${formatDate(h.startDate)} to ${formatDate(h.expiryDate)}`,
+            kind: 'period',
+            render: (h) => <PeriodCell from={h.startDate} to={h.expiryDate} />,
           },
           { key: 'ref', header: 'Insurer Reference', render: (h) => h.insurerRef ?? '—' },
           { key: 'confirmed', header: 'Confirmed On', render: (h) => formatDate(h.confirmedOn) },

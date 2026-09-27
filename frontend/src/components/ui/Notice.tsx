@@ -34,6 +34,8 @@ interface NoticeProps {
   /** Live-region role; an error is announced as an alert, others as a status by default. */
   role?: 'alert' | 'status' | 'note';
   className?: string;
+  /** Stable name of the notice for callouts and capture recipes (data-callout). */
+  callout?: string;
 }
 
 /** Whether a part of a notice has something to show. */
@@ -82,6 +84,7 @@ export function Notice({
   label,
   role,
   className,
+  callout,
 }: Readonly<NoticeProps>) {
   const Icon = ICONS[tone];
   const shownItems = (items ?? []).filter(present);
@@ -90,6 +93,7 @@ export function Notice({
       className={['notice', `notice-${tone}`, className].filter(Boolean).join(' ')}
       role={role ?? (tone === 'error' ? 'alert' : 'status')}
       aria-label={label}
+      data-callout={callout}
     >
       <Icon className="notice-icon" size={18} aria-hidden="true" />
       <div className="notice-body">

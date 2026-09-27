@@ -5,7 +5,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { catalogApi } from '@/api/catalog';
 import type { ProductDetail } from '@/api/catalog';
 import { crmApi } from '@/api/crm';
-import { quotationsApi } from '@/api/quotations';
+import { QUOTATION_ENTITY, quotationsApi } from '@/api/quotations';
 import type { Quotation } from '@/api/quotations';
 import { LovLabel } from '@/components/broking/LovLabel';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
@@ -33,6 +33,7 @@ import { ClientStep, ItemsStep, TermsStep } from './QuotationSteps';
 import type { QuotationStepProps } from './QuotationSteps';
 import '@/styles/quotation.css';
 import { useUnsavedChangesGuard } from '@/components/ui/useUnsavedChangesGuard';
+import { refreshRecord } from '@/components/broking/recordRefresh';
 
 function numberParam(value: string | null): number | undefined {
   return value === null || value === '' ? undefined : Number(value);
@@ -100,7 +101,8 @@ function useQuotationSaver(setForm: (update: (f: QuotationForm) => QuotationForm
   });
   const submit = useMutation({
     mutationFn: async (f: QuotationForm) => quotationsApi.submit((await persist(f)).id),
-    onSuccess: (q) => {
+    onSuccess: async (q) => {
+      await refreshRecord(queryClient, ['quotation', q.id], QUOTATION_ENTITY, q.id, q);
       toast.success(`${q.quotationNo} submitted for review`);
       void navigate(`/quotations/${q.id}`);
     },

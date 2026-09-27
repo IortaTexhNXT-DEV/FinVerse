@@ -59,6 +59,30 @@ const amountFormat = new Intl.NumberFormat('en-PH', {
 
 const integerFormat = new Intl.NumberFormat('en-PH', { maximumFractionDigits: 0 });
 
+/** Most decimals of a rate on screens and documents (DisplayFormat.rate on the server). */
+const RATE_DECIMALS = 4;
+
+/**
+ * A rate in percent as users read it, the same rule as the documents: at least two and at most
+ * four decimals, rounded half up (1.2 becomes 1.20, 0.425 stays 0.425, 0.123456 becomes 0.1235).
+ * The percent sign comes from the column header or the caller. A missing rate shows `empty`.
+ */
+export function formatRate(rate: number | string | null | undefined, empty = ''): string {
+  if (rate === null || rate === undefined || rate === '') {
+    return empty;
+  }
+  const n = typeof rate === 'number' ? rate : Number(rate);
+  if (!Number.isFinite(n)) {
+    return String(rate);
+  }
+  const exponent = String(RATE_DECIMALS);
+  const scaled = Math.round(Number(String(Math.abs(n)) + 'e' + exponent));
+  const rounded = Math.sign(n) * Number(String(scaled) + 'e-' + exponent);
+  const text = String(Object.is(rounded, -0) ? 0 : rounded);
+  const [whole = '0', decimals = ''] = text.split('.');
+  return `${whole}.${decimals.padEnd(2, '0')}`;
+}
+
 export function formatAmount(value: number | string | null | undefined): string {
   if (value === null || value === undefined || value === '') {
     return '';

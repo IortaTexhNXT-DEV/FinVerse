@@ -13,7 +13,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
-import { formatDate, humanize } from '@/utils/format';
+import { formatDate, formatRate, humanize } from '@/utils/format';
 import { RateModal } from './RateModals';
 import type { RateTable } from './RateModals';
 import { RecordActions } from './RecordActions';
@@ -58,7 +58,7 @@ function Taxes() {
             header: 'Line',
             render: (r) => (r.lineCode ? <LineLabel code={r.lineCode} /> : 'All lines'),
           },
-          { key: 'r', header: '%', numeric: true, render: (r) => r.rate },
+          { key: 'r', header: '%', numeric: true, render: (r) => formatRate(r.rate) },
           ...dated<TaxRate>('RATE'),
         ]}
       />

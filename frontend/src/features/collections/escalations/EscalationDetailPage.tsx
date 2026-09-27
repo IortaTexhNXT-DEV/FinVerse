@@ -130,6 +130,7 @@ export default function EscalationDetailPage() {
       <WorkflowPanel
         entityType={ENTITY}
         entityId={id}
+        recordStatus={e.status}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['collections'] })}
         renderBusinessActions={(actions) =>
           actions

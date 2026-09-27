@@ -40,6 +40,8 @@ interface DataTableProps<T> {
   /** Next step shown under the empty message (e.g. a button). */
   emptyAction?: ReactNode;
   loading?: boolean;
+  /** Stable name of the table for callouts and capture recipes (data-callout). */
+  callout?: string;
   caption?: string;
   /** Current sort of the list (server side). */
   sort?: SortState;
@@ -274,9 +276,10 @@ export function DataTable<T>({
   skeletonRows = 5,
   renderExpanded,
   expanded,
+  callout,
 }: Readonly<DataTableProps<T>>) {
   return (
-    <div className="table-wrap">
+    <div className="table-wrap" data-callout={callout}>
       <table className="table" aria-busy={loading || undefined}>
         {caption !== undefined && <caption className="visually-hidden">{caption}</caption>}
         <thead>

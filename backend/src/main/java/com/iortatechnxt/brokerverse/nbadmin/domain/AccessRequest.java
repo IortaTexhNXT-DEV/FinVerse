@@ -207,6 +207,13 @@ public class AccessRequest extends BaseEntity {
     setContent(content);
   }
 
+  /** Keeps the approvers chosen on a draft or returned request (kept on edit, used on submit). */
+  public void planApprovers(List<String> approverNames) {
+    requireStatus(AccessRequestStatus.EDITABLE, "ACCESS_REQUEST_NOT_EDITABLE");
+    approvers.clear();
+    approvers.addAll(AccessRequestApprover.inOrder(this, approverNames));
+  }
+
   /**
    * Submits a draft or resubmits a returned request to its approvers in order (BRD 1.002.1.4,
    * 1.006.1.5); the first approver decides first. Without approvers any approver may decide
@@ -219,11 +226,7 @@ public class AccessRequest extends BaseEntity {
    */
   public void submit(
       List<String> approverNames, Set<AccessRiskFlag> flags, String by, Instant when) {
-    requireStatus(AccessRequestStatus.EDITABLE, "ACCESS_REQUEST_NOT_EDITABLE");
-    approvers.clear();
-    for (int i = 0; i < approverNames.size(); i++) {
-      approvers.add(new AccessRequestApprover(this, i + 1, approverNames.get(i)));
-    }
+    planApprovers(approverNames);
     this.assignedApprover = approverNames.isEmpty() ? null : approverNames.get(0);
     this.status = AccessRequestStatus.PENDING;
     this.submittedBy = by;

@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.approval.service.PendingApproval;
 import com.iortatechnxt.brokerverse.approval.service.PendingApprovalSource;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.system.domain.SystemParameter;
 import com.iortatechnxt.brokerverse.system.service.SecurityParameterApprovals;
 import com.iortatechnxt.brokerverse.system.service.SecurityParameterChangeRequested;
@@ -30,17 +31,22 @@ public class SecurityParameterNotices implements PendingApprovalSource {
 
   private final NotificationService notifications;
   private final SecurityParameterApprovals approvals;
+  private final UserDirectory users;
 
   /**
    * Creates the component.
    *
    * @param notifications notices
    * @param approvals changes that wait
+   * @param users display names of the requesters
    */
   public SecurityParameterNotices(
-      NotificationService notifications, SecurityParameterApprovals approvals) {
+      NotificationService notifications,
+      SecurityParameterApprovals approvals,
+      UserDirectory users) {
     this.notifications = notifications;
     this.approvals = approvals;
+    this.users = users;
   }
 
   /**
@@ -54,8 +60,8 @@ public class SecurityParameterNotices implements PendingApprovalSource {
         SecurityParameterApprovals.APPROVE,
         new Notice(
             "Security setting to approve: " + event.description(),
-            event.requestedBy()
-                + " asks to change it from '"
+            users.displayName(event.requestedBy())
+                + " requests a change from '"
                 + event.currentValue()
                 + "' to '"
                 + event.requestedValue()

@@ -184,6 +184,7 @@ export default function ProposalDetailPage() {
       <WorkflowPanel
         entityType={PROPOSAL_ENTITY}
         entityId={p.id}
+        recordStatus={p.status}
         showHistory={false}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['proposal', id] })}
         renderBusinessActions={(actions) => <ProposalActions proposal={p} actions={actions} />}

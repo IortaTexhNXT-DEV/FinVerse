@@ -47,6 +47,24 @@ export function defaultErrorMessage(status: number): string {
   return 'The request could not be completed.';
 }
 
+const CLASS_NAME = /^([A-Z][a-z0-9]+(?:[A-Z][a-z0-9]*)+)( not found| already exists)\b/;
+
+/**
+ * A server message as users read it: a record named by its class name at the start of a "not
+ * found" or "already exists" message (AutoBookRule not found: 7) is written in words (Auto book
+ * rule not found: 7). The server names records in words; this keeps older messages readable.
+ */
+export function businessDetail(detail: string): string {
+  const m = CLASS_NAME.exec(detail);
+  if (m === null) {
+    return detail;
+  }
+  const [, name = '', rest = ''] = m;
+  const words = name.replace(/([a-z0-9])([A-Z])/g, '$1 $2').toLowerCase();
+  const text = words.charAt(0).toUpperCase() + words.slice(1);
+  return text + rest + detail.slice(name.length + rest.length);
+}
+
 export class ApiError extends Error {
   readonly status: number;
   readonly code: string;
@@ -55,7 +73,9 @@ export class ApiError extends Error {
   readonly reference?: string;
 
   constructor(status: number, problem: ProblemDetail) {
-    super(problem.detail ?? defaultErrorMessage(status));
+    super(
+      problem.detail === undefined ? defaultErrorMessage(status) : businessDetail(problem.detail),
+    );
     this.name = 'ApiError';
     this.status = status;
     this.code = problem.code ?? (status === NETWORK_STATUS ? 'NETWORK_ERROR' : 'UNKNOWN');

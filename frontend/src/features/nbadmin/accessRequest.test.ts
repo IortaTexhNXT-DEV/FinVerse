@@ -280,6 +280,60 @@ describe('access request mapping', () => {
   });
 });
 
+describe('editing a saved draft', () => {
+  it('keeps every saved field and the chosen approver, so the submission does not ask again', () => {
+    const draft = {
+      id: 9,
+      requestNo: 'AR-9',
+      type: 'CREATE_USER',
+      userType: 'INTERNAL',
+      summary: '',
+      username: 'a013000196',
+      fullName: 'Nora Santos',
+      email: 'nora.santos@example.ph',
+      roleCodes: ['MKT_AO'],
+      homeBranchId: 3,
+      justification: 'New account officer',
+      status: 'DRAFT',
+      requestedBy: 'mktao',
+      requestedAt: '2026-09-25T00:00:00Z',
+      permissionsAdded: [],
+      permissionsRemoved: [],
+      returnedCount: 0,
+      details: {
+        unlock: false,
+        windowsId: 'BDO\\nsantos',
+        businessUnitCode: 'MKT',
+        userLevel: 'OFFICER',
+        effectiveFrom: '2026-10-01',
+        authorizationLimit: 250000,
+      },
+      lifecycle: {
+        approvers: [{ sequence: 1, approver: 'uamapprover', decision: 'PENDING' }],
+        riskFlags: [],
+        secondApprovalRequired: false,
+      },
+    } satisfies AccessRequest;
+    const edited = fromAccessRequest(draft, []);
+    expect(edited.approvers).toEqual(['uamapprover']);
+    expect(validateAccessRequest(edited, SUBMIT).approvers).toBeUndefined();
+    expect(toAccessRequest(edited)).toMatchObject({
+      username: 'a013000196',
+      fullName: 'Nora Santos',
+      email: 'nora.santos@example.ph',
+      roleCodes: ['MKT_AO'],
+      homeBranchId: 3,
+      windowsId: 'BDO\\nsantos',
+      businessUnitCode: 'MKT',
+      userLevel: 'OFFICER',
+      authorizationLimit: 250000,
+      effectiveFrom: '2026-10-01',
+      justification: 'New account officer',
+      approvers: ['uamapprover'],
+    });
+  });
+});
+
 describe('access request stepper', () => {
   const lifecycle = { approvers: [], riskFlags: [], secondApprovalRequired: true };
   const steps = (r: Parameters<typeof accessRequestStages>[0]) =>

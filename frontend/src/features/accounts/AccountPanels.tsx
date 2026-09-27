@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { DetailList } from '@/features/catalog/DetailList';
 import type { DetailRow } from '@/features/catalog/DetailList';
-import { formatDate, formatDateTime, formatPeriod, humanize } from '@/utils/format';
+import { formatDate, formatDateTime, formatPeriod, formatRate, humanize } from '@/utils/format';
 import { displayNameOf } from '@/api/users';
 import { LovLabel, ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
 
@@ -107,7 +107,7 @@ export function ItemsPanel({ account }: Readonly<{ account: Account }>) {
             numeric: true,
             render: (i) => <Amount value={i.sumInsured} />,
           },
-          { key: 'r', header: 'Rate %', numeric: true, render: (i) => i.rate ?? '' },
+          { key: 'r', header: 'Rate %', numeric: true, render: (i) => formatRate(i.rate) },
           {
             key: 'p',
             header: 'Premium',

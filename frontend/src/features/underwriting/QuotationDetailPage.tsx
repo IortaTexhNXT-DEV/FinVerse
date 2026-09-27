@@ -8,7 +8,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDate, formatPeriod, humanize } from '@/utils/format';
+import { formatDate, formatPeriod, formatRate, humanize } from '@/utils/format';
 import { QuotationActions } from './QuotationActions';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
@@ -28,7 +28,7 @@ function Terms({ quotation: q }: Readonly<{ quotation: Quotation }>) {
     ['Valid until', `${formatDate(q.expiryDate)} (${String(q.validityDays)} days)`],
     ['Proposed period', formatPeriod(q.periodFrom, q.periodTo)],
     ['Our share', `${String(q.sharePct)}%`],
-    ['Brokerage', `${String(q.commissionRate)}%`],
+    ['Brokerage', `${formatRate(q.commissionRate)}%`],
     ['Prepared by', displayNameOf(q.createdBy)],
     ['Decided by', displayNameOf(q.decidedBy) || '—'],
   ];

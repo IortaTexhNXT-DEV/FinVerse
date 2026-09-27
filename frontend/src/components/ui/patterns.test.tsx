@@ -67,6 +67,15 @@ describe('status pills and tags', () => {
     expect(screen.getByText('Queued')).toHaveClass('badge', 'warning');
   });
 
+  it('shows the full label in a history table pill, never the short form', () => {
+    render(
+      <StatusBadge full status="REQUIREMENTS_PREP" label="Requirements preparation by Marketing" />,
+    );
+    const pill = screen.getByText('Requirements preparation by Marketing');
+    expect(pill).toHaveClass('badge', 'badge-full');
+    expect(screen.queryByText('Reqts Prep')).not.toBeInTheDocument();
+  });
+
   it('renders flag chips with a tooltip and a tone', () => {
     render(
       <>
@@ -103,6 +112,25 @@ describe('HistoryTable', () => {
     expect(cells[5]).toHaveTextContent('Approved');
     // The final stage of a closed record has no running duration.
     expect(cells[6]).toHaveTextContent('—');
+  });
+
+  it('shows the full stage name of a long stage, never the short pill', () => {
+    render(
+      <HistoryTable
+        history={[
+          {
+            toStage: 'REQUIREMENTS_PREP',
+            toStageName: 'Requirements preparation by Marketing',
+            action: 'APPROVE',
+            actor: 'marketing',
+            automatic: false,
+            occurredAt: '2026-09-25T11:32:00Z',
+          },
+        ]}
+      />,
+    );
+    expect(screen.getByText('Requirements Preparation by Marketing')).toHaveClass('badge-full');
+    expect(screen.queryByText('Reqts Prep')).not.toBeInTheDocument();
   });
 
   it('toggles to oldest first', async () => {

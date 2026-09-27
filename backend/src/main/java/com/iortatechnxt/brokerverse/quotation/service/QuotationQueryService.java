@@ -1,7 +1,11 @@
 package com.iortatechnxt.brokerverse.quotation.service;
 
+import com.iortatechnxt.brokerverse.catalog.service.version.PackageSpec.PackageDates;
+import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQueryService;
+import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionView;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.quotation.domain.Quotation;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationContent;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationRepository;
@@ -34,6 +38,7 @@ public class QuotationQueryService {
   private final QuotationRepository quotations;
   private final QuotationVersions versions;
   private final SystemParameterService parameters;
+  private final ProductVersionQueryService packageVersions;
   private final Clock clock;
 
   /**
@@ -42,17 +47,49 @@ public class QuotationQueryService {
    * @param quotations quotations
    * @param versions version store
    * @param parameters business parameters
+   * @param packageVersions package versions (the package term of a quotation without dates)
    * @param clock clock
    */
   public QuotationQueryService(
       QuotationRepository quotations,
       QuotationVersions versions,
       SystemParameterService parameters,
+      ProductVersionQueryService packageVersions,
       Clock clock) {
     this.quotations = quotations;
     this.versions = versions;
     this.parameters = parameters;
+    this.packageVersions = packageVersions;
     this.clock = clock;
+  }
+
+  /**
+   * The cover period of a quotation as users read it (header and documents): inception to expiry
+   * when entered, else the term of the package version that priced it (or of the package in force);
+   * empty only when neither is known.
+   *
+   * @param q quotation
+   * @param c its content
+   * @return text, empty when unknown
+   */
+  public String coverPeriod(Quotation q, QuotationContent c) {
+    if (c.periodFrom() != null || c.periodTo() != null) {
+      return DisplayFormat.period(c.periodFrom(), c.periodTo());
+    }
+    Optional<ProductVersionView> version =
+        c.schemeVersion() == null
+            ? packageVersions.current(q.getProductCode())
+            : packageVersions.version(q.getProductCode(), c.schemeVersion());
+    return version
+        .map(ProductVersionView::dates)
+        .map(QuotationQueryService::packageTerm)
+        .orElse("");
+  }
+
+  private static String packageTerm(PackageDates d) {
+    LocalDate start = d.packageStartDate() == null ? d.effectiveFrom() : d.packageStartDate();
+    String term = DisplayFormat.period(start, d.packageEndDate());
+    return term.isEmpty() ? "" : "Package term " + term;
   }
 
   /**

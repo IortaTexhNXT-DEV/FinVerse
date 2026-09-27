@@ -22,6 +22,7 @@ import { DocumentChecklist, InsurerChoices, SectionsCard } from './ProposalFormP
 import { formOfProposal, newProposalForm, proposalErrors, toProposalInput } from './proposalForm';
 import type { ProposalForm } from './proposalForm';
 import '@/styles/quotation.css';
+import { refreshRecord } from '@/components/broking/recordRefresh';
 
 function HeaderCard({
   form,
@@ -143,7 +144,8 @@ function useProposalSaver(setForm: (u: (f: ProposalForm) => ProposalForm) => voi
   });
   const submit = useMutation({
     mutationFn: async (f: ProposalForm) => proposalsApi.submit((await persist(f)).id),
-    onSuccess: (p) => {
+    onSuccess: async (p) => {
+      await refreshRecord(queryClient, ['proposal', p.id], PROPOSAL_ENTITY, p.id, p);
       toast.success(`${p.prfNo} submitted for Marketing approval`);
       void navigate(`/proposals/${p.id}`);
     },

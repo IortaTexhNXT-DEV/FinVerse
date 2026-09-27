@@ -14,7 +14,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { today } from '@/utils/format';
+import { formatRate, today } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { IncentiveRule, IncentiveRuleInput } from './api';
 import './remittance.css';
@@ -229,7 +229,7 @@ const COLUMNS: Column<IncentiveRule>[] = [
   { key: 'ins', header: 'Insurer', render: (r) => r.insurerCode },
   { key: 'line', header: 'Product Line', render: (r) => r.productLine ?? 'All' },
   { key: 'seg', header: 'Segment', render: (r) => r.segment ?? 'All' },
-  { key: 'rate', header: 'Rate', numeric: true, render: (r) => `${r.rate}%` },
+  { key: 'rate', header: 'Rate', numeric: true, render: (r) => `${formatRate(r.rate)}%` },
   {
     key: 'win',
     header: 'Window',

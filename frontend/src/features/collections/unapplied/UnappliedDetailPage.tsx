@@ -65,7 +65,7 @@ const HISTORY_COLUMNS: Column<HistoryEvent>[] = [
     numeric: true,
     render: (e) => (e.amount === undefined ? '' : <Amount value={e.amount} />),
   },
-  { key: 'by', header: 'By', render: (e) => e.by },
+  { key: 'by', header: 'By', render: (e) => <UserName login={e.by} /> },
   { key: 'ref', header: 'Reference', render: (e) => e.reference ?? '' },
 ];
 

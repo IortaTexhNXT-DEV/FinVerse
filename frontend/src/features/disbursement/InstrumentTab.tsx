@@ -190,7 +190,7 @@ function InstrumentHistory({ history }: Readonly<{ history: HistoryEvent[] }>) {
           key: 'status',
           header: 'Status',
           kind: 'status',
-          render: (e) => <StatusBadge status={e.toStatus} />,
+          render: (e) => <StatusBadge full status={e.toStatus} />,
         },
         { key: 'source', header: 'Source', render: (e) => humanize(e.source) },
         { key: 'by', header: 'By', render: (e) => <UserName login={e.by} /> },

@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.system.domain.SystemParameter;
 import com.iortatechnxt.brokerverse.system.domain.SystemParameterRepository;
 import java.time.Clock;
@@ -32,6 +33,7 @@ public class SecurityParameterApprovals {
   private final SystemParameterService parameters;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
+  private final UserDisplayNames users;
   private final ApplicationEventPublisher events;
   private final Clock clock;
 
@@ -44,6 +46,7 @@ public class SecurityParameterApprovals {
    * @param currentUser current user
    * @param events event of a change to approve
    * @param clock clock
+   * @param users display names of the requesters in the texts
    */
   public SecurityParameterApprovals(
       SystemParameterRepository repository,
@@ -51,7 +54,9 @@ public class SecurityParameterApprovals {
       AuditTrailService audit,
       CurrentUser currentUser,
       ApplicationEventPublisher events,
-      Clock clock) {
+      Clock clock,
+      UserDisplayNames users) {
+    this.users = users;
     this.repository = repository;
     this.parameters = parameters;
     this.audit = audit;
@@ -79,7 +84,7 @@ public class SecurityParameterApprovals {
         ENTITY,
         key,
         AuditAction.SUBMIT,
-        "Asked to change "
+        "Requested a change of "
             + key
             + " from '"
             + p.getValue()
@@ -107,7 +112,12 @@ public class SecurityParameterApprovals {
         ENTITY,
         key,
         AuditAction.AUTHORIZE,
-        "Approved the change of " + key + " to '" + value + "' asked by " + requestedBy);
+        "Approved the change of "
+            + key
+            + " to '"
+            + value
+            + "' requested by "
+            + users.displayName(requestedBy));
     return parameters.update(key, value);
   }
 
@@ -136,8 +146,8 @@ public class SecurityParameterApprovals {
             + key
             + " to '"
             + value
-            + "' asked by "
-            + requestedBy
+            + "' requested by "
+            + users.displayName(requestedBy)
             + (reason == null || reason.isBlank() ? "" : ". Reason: " + reason.strip()));
     return p;
   }

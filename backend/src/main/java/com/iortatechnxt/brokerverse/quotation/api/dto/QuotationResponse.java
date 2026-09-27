@@ -42,6 +42,7 @@ import java.util.List;
  * @param content current content
  * @param productVersionNo package version that priced the current version (BRPM.007)
  * @param rateOverrideRef approved rate-scheme exception used, null when none
+ * @param coverPeriod cover period as users read it (dates, else the package term; empty unknown)
  */
 public record QuotationResponse(
     Long id,
@@ -76,16 +77,18 @@ public record QuotationResponse(
     Instant createdAt,
     QuotationContentResponse content,
     Integer productVersionNo,
-    String rateOverrideRef) {
+    String rateOverrideRef,
+    String coverPeriod) {
 
   /**
    * Maps a quotation (account references loaded) with its current content.
    *
    * @param q quotation
    * @param content current content
+   * @param coverPeriod cover period as users read it
    * @return response
    */
-  public static QuotationResponse from(Quotation q, QuotationContent content) {
+  public static QuotationResponse from(Quotation q, QuotationContent content, String coverPeriod) {
     return new QuotationResponse(
         q.getId(),
         q.getCompanyId(),
@@ -119,6 +122,7 @@ public record QuotationResponse(
         q.getCreatedAt(),
         QuotationContentResponse.from(content),
         content.schemeVersion(),
-        q.getRateOverrideRef());
+        q.getRateOverrideRef(),
+        coverPeriod);
   }
 }

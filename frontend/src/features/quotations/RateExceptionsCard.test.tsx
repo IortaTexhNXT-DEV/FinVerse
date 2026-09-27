@@ -66,6 +66,17 @@ describe('rate exceptions card', () => {
     resetUserDirectory();
   });
 
+  it('gives the card, its notice and its table stable callout names for the capture recipes', async () => {
+    const { container } = renderCard(['QUOTE_MAINTAIN']);
+    await screen.findByRole('link', { name: 'RSE-2026-000003' });
+    const card = container.querySelector('[data-callout="rate-exceptions"]');
+    expect(card).not.toBeNull();
+    const notice = card?.querySelector('[data-callout="rate-exceptions-notice"]');
+    expect(notice).toHaveTextContent('Priced on package version');
+    const table = card?.querySelector('[data-callout="rate-exceptions-table"]');
+    expect(table?.querySelector('a[href*="/catalog/rate-exceptions/"]')).not.toBeNull();
+  });
+
   it('lists the exceptions as a record table in a titled card, not in a highlighted panel', async () => {
     const { container } = renderCard(['QUOTE_MAINTAIN']);
     expect(await screen.findByRole('link', { name: 'RSE-2026-000003' })).toHaveAttribute(

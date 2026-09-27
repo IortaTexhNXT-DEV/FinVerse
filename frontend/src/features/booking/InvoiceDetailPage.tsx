@@ -191,6 +191,7 @@ export default function InvoiceDetailPage() {
       <WorkflowPanel
         entityType={ACCOUNT_ENTITY}
         entityId={i.accountId}
+        recordStatus={i.status}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['booking'] })}
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />

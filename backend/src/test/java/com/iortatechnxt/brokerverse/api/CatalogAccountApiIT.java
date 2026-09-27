@@ -220,6 +220,13 @@ class CatalogAccountApiIT {
                 .content("{\"comment\":\"ready\"}"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("SUBMITTED"));
+    // The record header and the workflow stepper read the same state right after the action.
+    mvc.perform(get("/api/v1/accounts/" + id))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("SUBMITTED"));
+    mvc.perform(get("/api/v1/workflow/cases/by-record?entityType=Account&entityId=" + id))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.item.stageCode").value("SUBMITTED"));
   }
 
   @Test

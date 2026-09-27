@@ -29,6 +29,7 @@ import {
 import type { AccountDraft, DraftSaveState, WizardStep } from './accountForm';
 import { PremiumSummary } from './PremiumSummary';
 import { RiskItemsStep } from './RiskItemsStep';
+import { useAccountRefresh } from './useAccountRefresh';
 import { useAutosave } from './useAutosave';
 import { ClientStep, ContactStep, PeriodStep, ProductStep } from './WizardSteps';
 import type { StepProps } from './WizardSteps';
@@ -207,6 +208,7 @@ function useAccountSaver(
   const toast = useToast();
   const queryClient = useQueryClient();
   const [savedAt, setSavedAt] = useState<string>();
+  const refresh = useAccountRefresh();
   const persist = async (d: AccountDraft): Promise<Account> => {
     const body = toAccountInput(d, companyId);
     const account =
@@ -224,7 +226,7 @@ function useAccountSaver(
       return resubmission ? accountsApi.resubmit(account.id) : accountsApi.submit(account.id);
     },
     onSuccess: async (a) => {
-      await queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      await refresh(a);
       toast.success(`${a.arn} submitted to Processing`);
       void navigate(`/accounts/${a.id}`);
     },

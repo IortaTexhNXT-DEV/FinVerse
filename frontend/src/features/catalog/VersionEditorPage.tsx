@@ -14,7 +14,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, today } from '@/utils/format';
+import { formatDate, formatRate, today } from '@/utils/format';
 import { VersionCheckpoint } from './VersionCheckpoint';
 import { VersionCoveragesSection, VersionInsurersSection } from './VersionPanelSections';
 import { VersionSchemeSection } from './VersionSchemeSection';
@@ -49,7 +49,11 @@ function Summary({ detail }: Readonly<{ detail: VersionDetail }>) {
       facts={[
         { icon: CalendarDays, label: 'Effective', value: formatDate(s.effectiveFrom) },
         { icon: CalendarDays, label: 'Package End', value: formatDate(s.packageEndDate) },
-        { icon: Percent, label: 'Rate %', value: detail.scheme.defaultRate ?? 'Per insurer' },
+        {
+          icon: Percent,
+          label: 'Rate %',
+          value: formatRate(detail.scheme.defaultRate, 'Per insurer'),
+        },
         { icon: UserRound, label: 'Set Up By', value: <UserName login={s.maker} /> },
         { icon: FileSignature, label: 'ManCom Ref.', value: detail.mancomSignoffRef },
       ]}

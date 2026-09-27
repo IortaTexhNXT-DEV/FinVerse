@@ -23,6 +23,7 @@ import com.iortatechnxt.brokerverse.renewal.service.RenewalRecords;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -53,6 +54,7 @@ public class ProcessingService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final UserDirectory directory;
 
   /**
    * Creates the service.
@@ -69,6 +71,7 @@ public class ProcessingService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param directory user directory (display names in texts)
    */
   @SuppressWarnings("java:S107") // constructor injection
   public ProcessingService(
@@ -83,7 +86,8 @@ public class ProcessingService {
       LovService lovs,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      UserDirectory directory) {
     this.records = records;
     this.assignments = assignments;
     this.renewalAccounts = renewalAccounts;
@@ -96,6 +100,7 @@ public class ProcessingService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.directory = directory;
   }
 
   /**
@@ -135,7 +140,10 @@ public class ProcessingService {
           assignments.save(
               new RenewalAssignment(c.getId(), RenewalAssignment.Role.PO, officer, previous, null));
           if (c.getStage() == RenewalStage.FOR_PROCESSING) {
-            flow.act(c, "assign_po", TransitionNote.comment("Assigned to " + officer));
+            flow.act(
+                c,
+                "assign_po",
+                TransitionNote.comment("Assigned to " + directory.displayName(officer)));
           }
           flow.assign(c, officer);
           audit.record(

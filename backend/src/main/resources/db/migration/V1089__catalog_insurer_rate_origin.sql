@@ -1,6 +1,7 @@
 -- =====================================================================================
--- iNXT BrokerVerse - V818 Origin of insurers and commission rates (Data Migration BRD-13, wave
--- DM1-C; docs/architecture/DATA_MIGRATION_DESIGN.md sections 10 and 24).
+-- iNXT BrokerVerse - V1089 Origin of insurers and commission rates (Data Migration BRD-13, wave
+-- DM1-C; docs/architecture/DATA_MIGRATION_DESIGN.md sections 10 and 24). V1089 is the Data Migration
+-- number reserved for owners whose own range is full (catalog).
 --   origin            BIBS (maintained in BIBS) or MIGRATED (loaded from a legacy system)
 --   source_system     legacy source system
 --   legacy_ref        legacy insurer code / legacy rate key

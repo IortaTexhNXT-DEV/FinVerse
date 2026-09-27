@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.AccountRepository;
 import com.iortatechnxt.brokerverse.account.domain.AccountStatus;
 import com.iortatechnxt.brokerverse.account.domain.RiskItem;
+import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import java.util.EnumSet;
 import java.util.List;
@@ -29,16 +30,20 @@ public class AccountQueryService {
 
   private final AccountRepository accounts;
   private final AccountChecks checks;
+  private final ProductCatalogService catalog;
 
   /**
    * Creates the service.
    *
    * @param accounts accounts
    * @param checks completeness checks
+   * @param catalog product lines (item kind of a saved account)
    */
-  public AccountQueryService(AccountRepository accounts, AccountChecks checks) {
+  public AccountQueryService(
+      AccountRepository accounts, AccountChecks checks, ProductCatalogService catalog) {
     this.accounts = accounts;
     this.checks = checks;
+    this.catalog = catalog;
   }
 
   /**
@@ -104,6 +109,20 @@ public class AccountQueryService {
    */
   public List<Account> byClient(Long clientId) {
     return accounts.findByClientIdOrderByCreatedAtDesc(clientId);
+  }
+
+  /**
+   * The data of a saved account as a draft (Renewal, design section 13): the renewal account of the
+   * next term is built from the expiring account as of its last posted endorsement (BRRN.032), with
+   * the same client, product, items, insurer, mortgage and PN numbers, and contact.
+   *
+   * @param arn Account Reference Number of the saved account
+   * @return draft carrying its data
+   */
+  public AccountDraft draftOf(String arn) {
+    Account account = requireByArn(arn);
+    return AccountFields.draftOf(
+        account, catalog.requireLine(account.getLineCode()).getRiskItemKind());
   }
 
   /**

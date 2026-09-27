@@ -153,7 +153,10 @@ public class AccountChecks {
    * @param account account (saved or not)
    */
   public void rejectDuplicates(Account account) {
-    duplicates.check(subject(account.getCompanyId(), account.getId(), snapshot(account)), false);
+    String renewed =
+        account.getClassification() == null ? null : account.getClassification().renewalOfRef();
+    duplicates.check(
+        subject(account.getCompanyId(), account.getId(), snapshot(account)), false, renewed);
   }
 
   /**

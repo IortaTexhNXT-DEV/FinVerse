@@ -360,6 +360,48 @@ class ApiSmokeIT {
         .andExpect(status().isOk());
   }
 
+  /**
+   * The list reads of Renewal (BRD-6), each as the persona whose screen makes it; the record reads
+   * of one renewal are in the renewal integration tests.
+   */
+  @ParameterizedTest
+  @CsvSource({
+    "mkttl, /api/v1/renewal/home?companyId={c}",
+    "mkttl, /api/v1/renewal/candidates?companyId={c}",
+    "mkttl, /api/v1/renewal/candidates?companyId={c}&tab=UNASSIGNED&bucket=CLEAN,REVIEW",
+    "mkttl, /api/v1/renewal/candidates?companyId={c}&tab=EXCEPTIONS&riskCode=!MTR10&q=RNW",
+    "mkttl, /api/v1/renewal/candidates/count?companyId={c}&tab=REVIEW",
+    "ao, /api/v1/renewal/candidates?companyId={c}&mine=true&returned=true",
+    "ao, /api/v1/renewal/candidates?companyId={c}&disposed=true&dueWithin=30",
+    "proctl, /api/v1/renewal/candidates?companyId={c}&tab=FOR_PROCESSING",
+    "proc, /api/v1/renewal/candidates?companyId={c}&tab=IN_PROCESSING&assignedPo=proc",
+    "lamd, /api/v1/renewal/candidates?companyId={c}&tab=ALL",
+    "contactc, /api/v1/renewal/candidates?companyId={c}&tab=NRNS",
+    "mkttl, /api/v1/renewal/officers?companyId={c}",
+    "proctl, /api/v1/renewal/processing/officers",
+    "mkttl, /api/v1/renewal/transfers/incoming?companyId={c}",
+    "mkttl, /api/v1/renewal/transfers/outgoing?companyId={c}",
+    "mkttl, /api/v1/renewal/extraction/runs?companyId={c}",
+    "mkttl, /api/v1/renewal/extraction/source",
+    "proc, /api/v1/renewal/extraction/ra-sent-corrections?companyId={c}",
+    "proc, /api/v1/renewal/insurer-batches?companyId={c}",
+    "lamd, /api/v1/renewal/lamd-reports?companyId={c}",
+    "proc, /api/v1/renewal/package-choices/pending",
+    "badmin, /api/v1/renewal/setup/risk-codes?companyId={c}",
+    "badmin, /api/v1/renewal/setup/checks",
+    "badmin, /api/v1/renewal/setup/bucket-rules?companyId={c}",
+    "badmin, /api/v1/renewal/setup/matrix?companyId={c}",
+    "proc, /api/v1/renewal/setup/package-map?companyId={c}",
+    "mkttl, /api/v1/reports/code-sets/renewal.riskCode?companyId={c}",
+    "mkttl, /api/v1/reports/code-sets/renewal.stage?companyId={c}",
+  })
+  void renewalListsRespondOk(String user, String url) throws Exception {
+    mvc.perform(
+            get(url.replace("{c}", data.company().getId().toString()))
+                .with(user(users.loadUserByUsername(user))))
+        .andExpect(status().isOk());
+  }
+
   @ParameterizedTest
   @ValueSource(
       strings = {

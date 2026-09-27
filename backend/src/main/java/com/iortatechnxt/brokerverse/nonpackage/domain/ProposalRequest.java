@@ -143,6 +143,12 @@ public class ProposalRequest extends BaseEntity {
   @Column(name = "accepted_groups", length = 200)
   private String acceptedGroups;
 
+  @Column(name = "renewal_ref", length = 30)
+  private String renewalRef;
+
+  @Column(name = "renewal_of_ref", length = 40)
+  private String renewalOfRef;
+
   @ElementCollection
   @CollectionTable(name = "npk_proposal_insurer", joinColumns = @JoinColumn(name = "proposal_id"))
   @OrderColumn(name = "insurer_index")
@@ -528,4 +534,24 @@ public class ProposalRequest extends BaseEntity {
    * @param email e-mail
    */
   public record ClientFacts(Long id, String code, String name, String email) {}
+
+  /**
+   * Links the PRF to the renewal it serves (Renewal New Business path, BRRN.033): its accounts are
+   * created as RENEWAL of the expiring policy (shared work item BT0).
+   *
+   * @param renewalRef renewal reference of the candidate
+   * @param renewalOf what the renewal renews (expiring ARN or legacy reference)
+   */
+  public void linkRenewal(String renewalRef, String renewalOf) {
+    this.renewalRef = renewalRef;
+    this.renewalOfRef = renewalOf;
+  }
+
+  public String getRenewalRef() {
+    return renewalRef;
+  }
+
+  public String getRenewalOfRef() {
+    return renewalOfRef;
+  }
 }

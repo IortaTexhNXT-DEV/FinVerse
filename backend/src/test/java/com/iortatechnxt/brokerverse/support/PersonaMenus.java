@@ -62,7 +62,8 @@ public final class PersonaMenus {
   /**
    * Reads the file.
    *
-   * @return personas of every suite by role code, in file order
+   * @return personas of every suite by key (the role code, or the suite prefix and role code of a
+   *     role listed in several suites, whose code is then the field {@code role}), in file order
    */
   public static Map<String, Persona> load() {
     try {
@@ -79,14 +80,15 @@ public final class PersonaMenus {
     }
   }
 
-  private static Persona persona(String role, JsonNode node) {
+  private static Persona persona(String key, JsonNode node) {
     Set<String> permissions = new TreeSet<>();
     node.get("permissions").forEach(p -> permissions.add(p.asText()));
     List<String> screens = new ArrayList<>();
     node.get("screens").forEach(s -> screens.add(s.asText()));
     JsonNode scope = node.get("permissionScope");
+    JsonNode code = node.get("role");
     return new Persona(
-        role,
+        code == null ? key : code.asText(),
         node.get("seedUser").asText(),
         scope == null ? null : scope.asText(),
         permissions,

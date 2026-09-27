@@ -82,7 +82,23 @@ public class RiskDuplicateService {
    * @return findings (only for endorsements; otherwise empty)
    */
   public List<DuplicateFinding> check(DuplicateSubject subject, boolean endorsement) {
-    List<DuplicateFinding> found = findings(subject);
+    return check(subject, endorsement, null);
+  }
+
+  /**
+   * Rejects duplicates other than the account a renewal renews (its risks are the same by nature).
+   *
+   * @param subject record to check
+   * @param endorsement endorsement transaction (duplicates allowed, flagged)
+   * @param renewedArn ARN renewed by the record, null for new business
+   * @return findings (only for endorsements; otherwise empty)
+   */
+  public List<DuplicateFinding> check(
+      DuplicateSubject subject, boolean endorsement, String renewedArn) {
+    List<DuplicateFinding> found =
+        findings(subject).stream()
+            .filter(f -> renewedArn == null || !renewedArn.equals(f.existingArn()))
+            .toList();
     if (found.isEmpty() || endorsement) {
       return found;
     }

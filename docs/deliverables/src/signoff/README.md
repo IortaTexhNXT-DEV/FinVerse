@@ -12,7 +12,7 @@ BRD").
 | `<brd>/screens/*.yaml` | One file per process area; one entry per screen |
 | `<brd>/messages.yaml` | Where each message appears and the fix; the texts are read from the code |
 | `<brd>/notifications.yaml`, `contract.yaml`, `documents.yaml`, `walkthroughs.yaml` | Notifications, cross-BRD interface contract, generated documents, end-to-end walkthroughs |
-| `<brd>/screenshots/` | PNG screenshots captured on the SIT environment (`tools/screenshots/capture_pack.cjs`) |
+| `../frs/figures/<brd>/` | PNG screenshots and document pages captured with seed data (`tools/screenshots/capture_pack.cjs`, recipe `tools/screenshots/packs/<brd>.cjs`; see `tools/screenshots/README.md`) |
 
 ## Build and check
 
@@ -60,4 +60,5 @@ a panel) instead of quoting a screen text and is not checked; the brackets are n
 ```
 
 Screenshots are named `<screen id>-<nn>-<state>.png` (walkthrough steps and documents by their slug) and are captured
-with seed data only. Until a screenshot exists, the FRS shows a framed placeholder with its caption.
+with seed data only by `tools/screenshots/capture_pack.cjs`. Until a screenshot exists, the FRS shows a framed
+placeholder with its caption.

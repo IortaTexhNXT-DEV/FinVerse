@@ -387,6 +387,11 @@ function optimise(file) {
     }
   });
   const shots = manifest.shots.filter((s) => !only || new RegExp(only).test(s.slug));
+  if (!only) {
+    // A full run keeps only the images of the current pack.
+    const wanted = new Set(manifest.shots.map((s) => `${s.slug}.png`));
+    fs.readdirSync(OUT).filter((f) => f.endsWith('.png') && !wanted.has(f)).forEach((f) => fs.unlinkSync(path.join(OUT, f)));
+  }
   if (recipe.prepare) {
     await recipe.prepare(ctx);
   }

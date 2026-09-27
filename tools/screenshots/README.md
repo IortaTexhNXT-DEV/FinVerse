@@ -32,3 +32,29 @@ Run it after every change that affects screens. Commit the refreshed folder in t
 The script waits until `API/actuator/health/readiness` reports UP. The seed start-up runners (booking, ledger replay, Operations seed data) run after "Started" is logged, so capturing earlier would show empty Operations screens.
 
 The script exits with code 1 and lists the screens it could not capture, for example after a route has been renamed. Fix the manifest and run it again.
+
+## Business sign-off pack screenshots
+
+`capture_pack.cjs` captures the screenshots of a BRD sign-off pack (`docs/deliverables/src/signoff/<brd>/`): every
+screen state of the pack (list, empty form, filled form, validation error, record per status, approval, dialog),
+the steps of the end-to-end walkthroughs, the upload error-file flow and the first page of each generated document.
+The shots come from the pack itself (`signoff_pack.py --manifest`), so the FRS, the sign-off workbook and the images
+name the same screens and fields. Numbered callout badges are drawn in an overlay on the page before the capture;
+each badge number is the No. of the field in the screen's field table. The images are saved as optimised PNG in
+the pack's screenshot folder (`meta.screenshot_dir`, for BRD-01 `docs/deliverables/src/frs/figures/brd01`).
+
+How each state is reached (the record to open for a status, the values typed, the files uploaded, the walkthrough
+steps and the document downloads) is in the recipe of the BRD, `packs/<brd>.cjs`. The walkthroughs create records,
+so capture on a fresh seed database, after readiness is UP:
+
+```
+SEED_PASSWORD=... BASE=http://localhost:5195 API=http://localhost:8095 \
+PGHOST=localhost PGDATABASE=<seed database> PGUSER=... PGPASSWORD=... \
+STORAGE_ROOT=<BROKERVERSE_STORAGE_LOCAL_ROOT of the backend> \
+PLAYWRIGHT_MODULE=/opt/node22/lib/node_modules/playwright CHROMIUM=/opt/pw-browsers/chromium-1194/chrome-linux/chrome \
+node tools/screenshots/capture_pack.cjs brd01 [slug-regex]
+```
+
+The script needs `psql` (read-only queries that find the records), LibreOffice and `pdftoppm` (document pages) and
+Python with Pillow (PNG optimisation). It lists the shots it could not take and exits with code 1; the page at the
+moment of a failure is saved as `capture-pack-failed-<slug>-<user>.png` in the temporary folder.

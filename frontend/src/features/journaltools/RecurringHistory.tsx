@@ -33,7 +33,7 @@ export function RecurringHistory({ templateId }: Readonly<{ templateId: number }
             key: 's',
             header: 'Status',
             render: (o) =>
-              o.batchStatus === undefined ? '' : <StatusBadge status={o.batchStatus} />,
+              o.batchStatus === undefined ? '' : <StatusBadge full status={o.batchStatus} />,
           },
           {
             key: 'r',

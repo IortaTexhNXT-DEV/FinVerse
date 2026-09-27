@@ -214,7 +214,7 @@ export function RequestApprovers({ request: r }: Readonly<{ request: AccessReque
 const HISTORY_COLUMNS: Column<AccessRequestEvent>[] = [
   { key: 't', header: 'Date', render: (e) => formatDateTime(e.occurredAt) },
   { key: 'a', header: 'Action', render: (e) => humanize(e.action) },
-  { key: 's', header: 'Status', render: (e) => <StatusBadge status={e.toStatus} /> },
+  { key: 's', header: 'Status', render: (e) => <StatusBadge full status={e.toStatus} /> },
   { key: 'u', header: 'By', render: (e) => <UserName login={e.actor} /> },
   { key: 'r', header: 'Remarks', render: (e) => e.remarks ?? '' },
 ];

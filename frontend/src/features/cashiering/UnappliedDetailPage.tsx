@@ -50,7 +50,7 @@ const HISTORY: Column<Disposition>[] = [
     header: 'Document',
     render: (d) => d.disbursementRequestNo ?? d.journalBatchNo ?? '',
   },
-  { key: 'status', header: 'Status', render: (d) => <StatusBadge status={d.status} /> },
+  { key: 'status', header: 'Status', render: (d) => <StatusBadge full status={d.status} /> },
 ];
 
 /** Business actions of the workflow run through the Cashiering endpoints. */

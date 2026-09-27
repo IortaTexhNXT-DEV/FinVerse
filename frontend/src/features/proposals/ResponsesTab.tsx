@@ -159,7 +159,7 @@ function ResponseHistory({ proposalId }: Readonly<{ proposalId: number }>) {
               <CellStack main={insurer(h.responseId)} sub={`Revision ${String(h.revision)}`} />
             ),
           },
-          { key: 's', header: 'Status', render: (h) => <StatusBadge status={h.status} /> },
+          { key: 's', header: 'Status', render: (h) => <StatusBadge full status={h.status} /> },
           {
             key: 'p',
             header: 'Premium',

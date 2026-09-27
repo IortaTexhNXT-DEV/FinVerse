@@ -222,7 +222,7 @@ export default function PdcIssuedPage() {
               header: 'From',
               render: (e) => (e.fromStatus === undefined ? '' : humanize(e.fromStatus)),
             },
-            { key: 't', header: 'To', render: (e) => <StatusBadge status={e.toStatus} /> },
+            { key: 't', header: 'To', render: (e) => <StatusBadge full status={e.toStatus} /> },
             { key: 'j', header: 'Journal', render: (e) => e.batchNo ?? '' },
             { key: 'r', header: 'Remarks', render: (e) => e.remarks ?? '' },
             {

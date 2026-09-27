@@ -121,7 +121,7 @@ const HISTORY_COLUMNS: Column<ResponseHistory>[] = [
   { key: 'at', header: 'Changed', render: (h) => formatDateTime(h.changedAt) },
   { key: 'by', header: 'By', render: (h) => <UserName login={h.changedBy} /> },
   { key: 'rev', header: 'Rev.', numeric: true, render: (h) => h.revision },
-  { key: 'outcome', header: 'Outcome', render: (h) => <StatusBadge status={h.outcome} /> },
+  { key: 'outcome', header: 'Outcome', render: (h) => <StatusBadge full status={h.outcome} /> },
   { key: 'rate', header: 'Rate %', numeric: true, render: (h) => h.rate ?? '—' },
   { key: 'remarks', header: 'Remarks', render: (h) => h.remarks ?? '—' },
 ];

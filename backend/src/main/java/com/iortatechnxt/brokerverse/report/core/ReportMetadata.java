@@ -379,4 +379,27 @@ public record ReportMetadata(
         Permission.SBM_REPORT_EXPORT,
         true);
   }
+
+  /**
+   * A Customer Servicing Facility report (CUSTOMER_SERVICING_DESIGN section 9, BRCSF-011): viewed
+   * and exported with {@code CSF_REPORT_VIEW}, archived.
+   *
+   * @param code report code (e.g. {@code CSF-ACTIVITY})
+   * @param title title
+   * @param description one line purpose
+   * @param parameters parameters
+   * @return metadata in the Customer Service category
+   */
+  public static ReportMetadata customerService(
+      String code, String title, String description, List<ParameterSpec> parameters) {
+    return new ReportMetadata(
+        code,
+        title,
+        ReportCategory.CUSTOMER_SERVICE,
+        description,
+        parameters,
+        Permission.CSF_REPORT_VIEW,
+        Permission.CSF_REPORT_VIEW,
+        true);
+  }
 }

@@ -25,7 +25,8 @@ public enum ReportCategory {
   CLAIMS_HANDLING("Claims Handling"),
   EMPLOYEE_BENEFITS("Employee Benefits"),
   RENEWAL("Renewal"),
-  SUBMITTED_POLICIES("Submitted Policies");
+  SUBMITTED_POLICIES("Submitted Policies"),
+  CUSTOMER_SERVICE("Customer Service");
 
   private final String label;
 

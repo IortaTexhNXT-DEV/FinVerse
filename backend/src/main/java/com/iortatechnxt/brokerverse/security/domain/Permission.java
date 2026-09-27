@@ -498,7 +498,23 @@ public enum Permission {
   SBM_EXPORT,
   // Submitted Policies reports: view, export and archive (20, 21, 30)
   SBM_REPORT_VIEW,
-  SBM_REPORT_EXPORT;
+  SBM_REPORT_EXPORT,
+
+  // Customer Servicing Facility (BDOI BRD-9). See docs/architecture/CUSTOMER_SERVICING_DESIGN.md
+  // section 6.1 and V1040. Agents hold neither CLIENT_MAINTAIN nor EPOLICY_SEND: the CSF endpoints
+  // call the contact-only update and the e-policy dispatch under these permissions.
+  // Customer Search and Servicing View (BRCSF-002, 003, 005, 008, 009)
+  CSF_VIEW,
+  // Verification of the caller and contact changes (BRCSF-004)
+  CSF_CONTACT_UPDATE,
+  // Resend of the renewal advice and the e-policy to the registered e-mail (BRCSF-006, CSF-EM09)
+  CSF_RESEND,
+  // Resend to another address, with a reason (supervisor, CSQ06)
+  CSF_RESEND_OTHER,
+  // Document upload from the Servicing View (BRCSF-007)
+  CSF_DOCUMENT_UPLOAD,
+  // Contact Changes and Agent Activity reports (BRCSF-011, usage requirements)
+  CSF_REPORT_VIEW;
 
   // The portal permissions of design 6.1 (PORTAL_USER_REQUEST, PORTAL_USER_APPROVE, PORTAL_ADMIN)
   // are parked with the partner portal (BDOI Drop 2 "Employee Benefits (No Portal Feature)"):

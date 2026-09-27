@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +22,14 @@ public class CodeSetSources {
    * Creates the registry.
    *
    * @param sources the sources of the business modules
+   * @param groups groups of sources of the business modules
    */
-  public CodeSetSources(List<CodeSetSource> sources) {
+  public CodeSetSources(
+      ObjectProvider<CodeSetSource> sources, ObjectProvider<CodeSetSourceGroup> groups) {
     this.sources =
-        sources.stream().collect(Collectors.toMap(CodeSetSource::source, Function.identity()));
+        Stream.concat(
+                sources.orderedStream(), groups.orderedStream().flatMap(g -> g.sources().stream()))
+            .collect(Collectors.toMap(CodeSetSource::source, Function.identity()));
   }
 
   /**

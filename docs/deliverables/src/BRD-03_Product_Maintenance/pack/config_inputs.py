@@ -1,8 +1,8 @@
 """Configuration inputs the business provides for BRD-3 Product Maintenance: the FRS chapter and the input templates.
 
 Usage
-  python docs/deliverables/src/BRD-03_Product_Maintenance/config_inputs.py            # template workbook
-  python docs/deliverables/src/BRD-03_Product_Maintenance/config_inputs.py --check    # checks only
+  python docs/deliverables/src/BRD-03_Product_Maintenance/pack/config_inputs.py            # template workbook
+  python docs/deliverables/src/BRD-03_Product_Maintenance/pack/config_inputs.py --check    # checks only
 
 What it reads
   * config_inputs.yaml (this folder): one entry per template, with its owner, source, how it is loaded and its
@@ -28,7 +28,7 @@ from typing import Any
 import yaml
 
 HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[3]
+REPO = HERE.parents[4]
 sys.path.insert(0, str(REPO / "tools" / "deliverables"))
 import brand  # noqa: E402
 

@@ -1,7 +1,7 @@
 ---
 # Source of "00 Start Here - Guide to the BRD-03 Sign-off Pack" (Word), release set v2.0 of BRD-3 Product Maintenance.
 # Build: python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-03_Product_Maintenance/START_HERE_BRD03.md
-# The map, the reading order and the steps come from guide.yaml of this folder (the same source as the guide deck).
+# The map, the reading order and the steps come from pack/guide.yaml (the same source as the guide deck).
 title: Start Here
 subtitle: Guide to the BRD-03 Product Maintenance Sign-off Pack, release set v2.0
 doc_type: Start Here Guide
@@ -40,7 +40,7 @@ The files are numbered so that they sort in reading order in the folder BRD-03_P
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ./pack.yaml
+source: pack/pack.yaml
 render: guide-map
 ```
 
@@ -48,7 +48,7 @@ render: guide-map
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ./pack.yaml
+source: pack/pack.yaml
 render: guide-reading
 ```
 
@@ -58,7 +58,7 @@ SIT users of the seed data for the review: ao and mkttl (Marketing), tsu, tsulea
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ./pack.yaml
+source: pack/pack.yaml
 render: guide-steps
 ```
 

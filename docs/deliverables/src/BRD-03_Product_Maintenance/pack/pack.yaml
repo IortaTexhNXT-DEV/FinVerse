@@ -13,7 +13,7 @@ meta:
   frs: FRS_BRD03_PRODUCT_MAINTENANCE.md
   test_plan: brd03_cases.yaml
   screens_dir: screens
-  screenshot_dir: figures
+  screenshot_dir: ../screenshots
 
 # The Product Maintenance personas: role code, name, SIT/UAT user of the seed profile.
 personas:

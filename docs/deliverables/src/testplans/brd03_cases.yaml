@@ -12,7 +12,7 @@ meta:
   summary: TP_BRD03_PRODUCT_MAINTENANCE.md
   version: "2.0"
   date: 27 September 2026
-  signoff: ../BRD-03_Product_Maintenance/pack.yaml
+  signoff: ../BRD-03_Product_Maintenance/pack/pack.yaml
   built: true
 
 personas:

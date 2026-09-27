@@ -2201,7 +2201,7 @@ The 22 screens specified in chapter 13, with the menu path and the roles that ca
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ../BRD-03_Product_Maintenance/pack.yaml
+source: ../BRD-03_Product_Maintenance/pack/pack.yaml
 render: screen-index
 ```
 
@@ -2211,7 +2211,7 @@ How the screens link: from a list to its record, from a record action to the nex
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ../BRD-03_Product_Maintenance/pack.yaml
+source: ../BRD-03_Product_Maintenance/pack/pack.yaml
 render: flow
 ```
 
@@ -2223,7 +2223,7 @@ For each Product Maintenance persona, the SIT and UAT user of the seed data and 
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ../BRD-03_Product_Maintenance/pack.yaml
+source: ../BRD-03_Product_Maintenance/pack/pack.yaml
 render: menus
 ```
 
@@ -2233,7 +2233,7 @@ Elements that behave the same on every Product Maintenance screen are described 
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ../BRD-03_Product_Maintenance/pack.yaml
+source: ../BRD-03_Product_Maintenance/pack/pack.yaml
 render: common
 ```
 
@@ -2253,7 +2253,7 @@ A message in angle brackets (`<risk code>`) is completed by the system with the 
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ../BRD-03_Product_Maintenance/pack.yaml
+source: ../BRD-03_Product_Maintenance/pack/pack.yaml
 render: screens
 ```
 
@@ -2267,7 +2267,7 @@ Two walkthroughs follow a package through the screens, persona by persona, with 
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ../BRD-03_Product_Maintenance/pack.yaml
+source: ../BRD-03_Product_Maintenance/pack/pack.yaml
 render: walkthrough
 id: WT-A
 ```
@@ -2276,7 +2276,7 @@ id: WT-A
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ../BRD-03_Product_Maintenance/pack.yaml
+source: ../BRD-03_Product_Maintenance/pack/pack.yaml
 render: walkthrough
 id: WT-B
 ```
@@ -2294,7 +2294,7 @@ Every message a Product Maintenance user can see, grouped by the screen or dialo
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ../BRD-03_Product_Maintenance/pack.yaml
+source: ../BRD-03_Product_Maintenance/pack/pack.yaml
 render: messages
 ```
 
@@ -2304,7 +2304,7 @@ The in-app notifications, alerts and e-mails that Product Maintenance sends: wha
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ../BRD-03_Product_Maintenance/pack.yaml
+source: ../BRD-03_Product_Maintenance/pack/pack.yaml
 render: notifications
 ```
 
@@ -2316,7 +2316,7 @@ The documents Product Maintenance generates, each from a document template maint
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ../BRD-03_Product_Maintenance/pack.yaml
+source: ../BRD-03_Product_Maintenance/pack/pack.yaml
 render: documents
 ```
 
@@ -2340,14 +2340,14 @@ The product masters of go-live (lists of values, sales organisation, insurers, p
 Product Maintenance is a setup object of Drop 0: before New Business, Renewal and the data migration can use it, BDOI provides the product catalogue, the rate tables, the packages in force, the document templates and the lists of values. Products, insurers, commission rates, lists and the sales organisation of the legacy systems are loaded by the data migration; the packages themselves are not migrated but set up by TSU and MBS through package requests, and the package map (object R06) tells Renewal which BIBS package version renews each legacy package at sanitation (check PACKAGE_REMAP). Each input has a template in the workbook of configuration input templates of this set, with one fictitious example row.
 
 ```pack
-plugin: ../BRD-03_Product_Maintenance/config_inputs.py
-source: ../BRD-03_Product_Maintenance/config_inputs.yaml
+plugin: ../BRD-03_Product_Maintenance/pack/config_inputs.py
+source: ../BRD-03_Product_Maintenance/pack/config_inputs.yaml
 render: summary
 ```
 
 ```pack
-plugin: ../BRD-03_Product_Maintenance/config_inputs.py
-source: ../BRD-03_Product_Maintenance/config_inputs.yaml
+plugin: ../BRD-03_Product_Maintenance/pack/config_inputs.py
+source: ../BRD-03_Product_Maintenance/pack/config_inputs.yaml
 render: templates
 ```
 
@@ -2357,7 +2357,7 @@ Product Maintenance is the source of the products, package versions, rate scheme
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ../BRD-03_Product_Maintenance/pack.yaml
+source: ../BRD-03_Product_Maintenance/pack/pack.yaml
 render: contract
 ```
 
@@ -2381,7 +2381,7 @@ The business sign-off covers the release set BRD-03 Product Maintenance v2.0:
 
 ```pack
 plugin: ../signoff/signoff_pack.py
-source: ../BRD-03_Product_Maintenance/pack.yaml
+source: ../BRD-03_Product_Maintenance/pack/pack.yaml
 render: counts
 ```
 

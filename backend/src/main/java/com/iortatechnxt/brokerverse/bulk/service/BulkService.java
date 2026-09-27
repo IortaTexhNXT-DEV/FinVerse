@@ -412,7 +412,7 @@ public class BulkService {
     List<BulkRowRecord> all = rows.findByJobIdOrderByRowNo(jobId);
     Map<Long, Map<String, String>> values = new HashMap<>();
     all.forEach(r -> values.put(r.getId(), store.read(r.getData())));
-    return BulkWorkbooks.errorFile(registry.get(job.getHandlerCode()).columns(), all, values);
+    return BulkErrorFile.write(registry.get(job.getHandlerCode()).columns(), all, values);
   }
 
   private BulkJob requireOpen(Long jobId) {

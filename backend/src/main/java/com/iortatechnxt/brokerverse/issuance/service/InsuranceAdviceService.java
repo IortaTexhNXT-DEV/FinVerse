@@ -160,13 +160,9 @@ public class InsuranceAdviceService {
           "IA_NOT_MORTGAGED", "Account " + arn + " has no mortgagee bank: no Insurance Advice");
     }
     if (!ADVISABLE.contains(account.getStatus())) {
+      String status = DisplayFormat.words(account.getStatus());
       throw new BusinessRuleException(
-          "IA_ACCOUNT_STATUS",
-          "Account "
-              + arn
-              + " is "
-              + DisplayFormat.words(account.getStatus())
-              + "; it must be placed first");
+          "IA_ACCOUNT_STATUS", "Account " + arn + " is " + status + "; it must be placed first");
     }
     LocalDate today = BusinessClock.today(clock);
     String iaNo = numbers.next("IA-" + today.getYear());

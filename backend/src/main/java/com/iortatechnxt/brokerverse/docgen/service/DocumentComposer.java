@@ -3,8 +3,6 @@ package com.iortatechnxt.brokerverse.docgen.service;
 import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.office.PdfBrandFooter;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
-import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
-import com.iortatechnxt.brokerverse.common.util.Money;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Field;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Fields;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Section;
@@ -21,21 +19,9 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
 /**
@@ -67,12 +53,6 @@ public class DocumentComposer {
   private static final float LABEL_WIDTH = 1.2f;
   private static final float VALUE_WIDTH = 2.8f;
   private static final float SIGNATURE_SPACING = 36f;
-  private static final int SHEET_COLUMN_WIDTH = 20 * 256;
-  private static final String FOOTER_SEPARATOR = "  |  ";
-
-  /** A template code with its version, e.g. "PLACEMENT_SLIP v1" (never shown to users as such). */
-  private static final Pattern TEMPLATE_TAG =
-      Pattern.compile("\\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+ v(\\d+)\\b");
 
   private static final Font COMPANY = new Font(Font.HELVETICA, 11, Font.BOLD, COMPANY_BLUE);
   private static final Font TITLE = new Font(Font.HELVETICA, 15, Font.BOLD, NAVY);
@@ -136,7 +116,7 @@ public class DocumentComposer {
     try (Document doc = new Document(PageSize.A4, MARGIN, MARGIN, MARGIN, MARGIN)) {
       PdfWriter writer = PdfWriter.getInstance(doc, out);
       doc.open();
-      writer.setPageEvent(new PdfBrandFooter(pageFooter(spec), "", writer));
+      writer.setPageEvent(new PdfBrandFooter(DocumentText.pageFooter(spec), "", writer));
       letterhead(doc, spec, date);
       for (Section section : spec.sections()) {
         render(doc, section);
@@ -162,42 +142,8 @@ public class DocumentComposer {
     title.setSpacingBefore(SPACING);
     doc.add(title);
     if (spec.reference() != null) {
-      doc.add(new Paragraph(referenceLine(spec, date), REF));
+      doc.add(new Paragraph(DocumentText.referenceLine(spec, date), REF));
     }
-  }
-
-  /**
-   * The line under the title: "Reference: PS-2026-000001 Date: 27-Sep-2026".
-   *
-   * @param spec document
-   * @param date document date
-   * @return text
-   */
-  static String referenceLine(DocumentSpec spec, LocalDate date) {
-    return "Reference: " + spec.reference() + "    Date: " + DisplayFormat.date(date);
-  }
-
-  /**
-   * The business footer printed on every page before "Page x of y": the document title, the company
-   * and the document's small print, where a template tag ("PLACEMENT_SLIP v1") is written as its
-   * version ("Version 1"). The "Confidential" classification is added in front by the footer
-   * itself.
-   *
-   * @param spec document
-   * @return footer text
-   */
-  public static String pageFooter(DocumentSpec spec) {
-    List<String> parts = new ArrayList<>();
-    parts.add(spec.title());
-    parts.add(spec.companyName());
-    String note =
-        spec.footer() == null ? "" : TEMPLATE_TAG.matcher(spec.footer()).replaceAll("Version $1");
-    if (!note.isBlank()) {
-      parts.add(note.strip());
-    }
-    return parts.stream()
-        .filter(p -> p != null && !p.isBlank())
-        .collect(Collectors.joining(FOOTER_SEPARATOR));
   }
 
   private static void render(Document doc, Section section) {
@@ -305,70 +251,6 @@ public class DocumentComposer {
    * @return xlsx bytes
    */
   public byte[] xlsx(List<SheetSpec> specs) {
-    try (XSSFWorkbook wb = new XSSFWorkbook()) {
-      CellStyle head = wb.createCellStyle();
-      org.apache.poi.ss.usermodel.Font font = wb.createFont();
-      font.setBold(true);
-      font.setColor(IndexedColors.WHITE.getIndex());
-      head.setFont(font);
-      head.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
-      head.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-      CellStyle date = wb.createCellStyle();
-      date.setDataFormat(
-          wb.getCreationHelper().createDataFormat().getFormat(DisplayFormat.SHEET_DATE_FORMAT));
-      CellStyle amount = wb.createCellStyle();
-      amount.setDataFormat(
-          wb.getCreationHelper().createDataFormat().getFormat(DisplayFormat.SHEET_AMOUNT_FORMAT));
-      CellStyles styles = new CellStyles(head, date, amount);
-      for (SheetSpec spec : specs) {
-        writeSheet(wb.createSheet(spec.sheetName()), spec, styles);
-      }
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      wb.write(out);
-      return out.toByteArray();
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
-  }
-
-  /** Cell styles of a workbook: heading row, dates and amounts. */
-  private record CellStyles(CellStyle head, CellStyle date, CellStyle amount) {}
-
-  private static void writeSheet(Sheet sheet, SheetSpec spec, CellStyles styles) {
-    Row header = sheet.createRow(0);
-    for (int c = 0; c < spec.headers().size(); c++) {
-      var cell = header.createCell(c);
-      cell.setCellValue(spec.headers().get(c));
-      cell.setCellStyle(styles.head());
-      sheet.setColumnWidth(c, SHEET_COLUMN_WIDTH);
-    }
-    int r = 1;
-    for (List<Object> values : spec.rows()) {
-      Row row = sheet.createRow(r++);
-      for (int c = 0; c < values.size(); c++) {
-        write(row.createCell(c), values.get(c), styles);
-      }
-    }
-    sheet.createFreezePane(0, 1);
-  }
-
-  private static void write(
-      org.apache.poi.ss.usermodel.Cell cell, Object value, CellStyles styles) {
-    switch (value) {
-      case null -> cell.setBlank();
-      case BigDecimal n -> {
-        cell.setCellValue(n.doubleValue());
-        if (n.scale() == Money.SCALE) {
-          cell.setCellStyle(styles.amount());
-        }
-      }
-      case Number n -> cell.setCellValue(n.doubleValue());
-      case LocalDate d -> {
-        cell.setCellValue(d);
-        cell.setCellStyle(styles.date());
-      }
-      case Boolean b -> cell.setCellValue(Boolean.TRUE.equals(b) ? "Y" : "N");
-      default -> cell.setCellValue(value.toString());
-    }
+    return SheetWriter.write(specs);
   }
 }

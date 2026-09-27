@@ -1,9 +1,10 @@
 """Build the iNXT BrokerVerse User Manual (Word) on the iorta TechNXT template.
 
     pip install python-docx pillow pypdfium2      # LibreOffice (soffice) is needed for the PDF pass
-    python tools/user-manual/build_user_manual.py [--pdf] [--previews DIR]
+    python tools/user-manual/build_user_manual.py [--edition 2.0] [--pdf] [--previews DIR]
 
-The text lives in content.py. The builder renders the document twice: the first PDF gives the page of every
+The text lives in content.py (edition 1.0) and content_v2.py (edition 2.0, built from the screen inventory in
+screens/inventory.json and the screen captures next to it). The builder renders the document twice: the first PDF gives the page of every
 heading, which is written into the table of contents (a real Word TOC field, so Update Field in Word refreshes
 it). The .docx goes to docs/user-manual/; --pdf also keeps the PDF next to it (not committed).
 """
@@ -25,16 +26,37 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 
-from content import CHAPTERS
-
 ROOT = Path(__file__).resolve().parents[2]
 LOGO = ROOT / "frontend" / "src" / "assets" / "brand" / "iorta-technxt.png"
+SCREENS = Path(__file__).resolve().parent / "screens"
 OUT_DIR = ROOT / "docs" / "user-manual"
-VERSION = "1.0"
-ISSUE_DATE = date(2026, 9, 27)
 TITLE = "iNXT BrokerVerse"
 SUBTITLE = "User Manual"
-FILE_NAME = f"iNXT_BrokerVerse_User_Manual_v{VERSION}.docx"
+
+# Each edition keeps its own text module, so an older edition can still be rebuilt as issued.
+EDITIONS = {
+    "1.0": {"content": "content", "date": date(2026, 9, 27),
+            "history": [("1.0", date(2026, 9, 27), "First issue")]},
+    "2.0": {"content": "content_v2", "date": date(2026, 9, 27),
+            "history": [("1.0", date(2026, 9, 27), "First issue"),
+                        ("2.0", date(2026, 9, 27), "Screen-by-screen edition: every menu screen with its screenshot, "
+                                                   "fields, validation messages, actions, rules and statuses")]},
+}
+VERSION = "2.0"
+ISSUE_DATE = EDITIONS[VERSION]["date"]
+CHAPTERS: list = []
+
+
+def use_edition(version: str) -> None:
+    global VERSION, ISSUE_DATE, CHAPTERS
+    import importlib
+    VERSION = version
+    ISSUE_DATE = EDITIONS[version]["date"]
+    CHAPTERS = importlib.import_module(EDITIONS[version]["content"]).CHAPTERS
+
+
+def file_name() -> str:
+    return f"iNXT_BrokerVerse_User_Manual_v{VERSION}.docx"
 
 # iorta TechNXT palette, taken from the logo: shield blue, cube teal, dark text.
 NAVY = "0B4F9C"
@@ -387,7 +409,7 @@ class Builder:
         self.doc.add_page_break()
         self.front_title("Document control")
         self.table(["Version", "Date", "Description", "Author"],
-                   [[VERSION, ISSUE_DATE.strftime("%d-%b-%Y"), "First issue", "iorta TechNXT"]],
+                   [[v, d.strftime("%d-%b-%Y"), text, "iorta TechNXT"] for v, d, text in EDITIONS[VERSION]["history"]],
                    [2.2, 3.0, 7.4, 4.0])
         self.paragraph("**Distribution**: customer project team and key users.")
         self.paragraph("**Copyright**: this document and its contents are the property of iorta TechNXT and are "
@@ -517,6 +539,27 @@ class Builder:
         after = self.doc.add_paragraph()
         spacing(after, after=4, line=1.0)
 
+    def info(self, rows) -> None:
+        """A small two-column panel without a header row (for "Used by" and "Where to find it")."""
+        table = self.doc.add_table(rows=len(rows), cols=2)
+        table.alignment = WD_TABLE_ALIGNMENT.LEFT
+        table_borders(table, color=BORDER)
+        fixed_layout(table, [4.2, 12.4])
+        for row, (label, value) in zip(table.rows, rows):
+            no_split(row)
+            shade(row.cells[0], BAND)
+            for cell in row.cells:
+                cell_margins(cell, top=60, bottom=60)
+            p = row.cells[0].paragraphs[0]
+            style_run(p.add_run(label), size=9.5, color=NAVY, bold=True)
+            spacing(p, after=0, line=1.1)
+            p = row.cells[1].paragraphs[0]
+            add_rich(p, value, size=9.5, color=TEXT)
+            spacing(p, after=0, line=1.1)
+            for cell in row.cells:
+                cell.paragraphs[0].paragraph_format.keep_with_next = True  # keep the panel with the screenshot
+        spacing(self.doc.add_paragraph(), after=4, line=1.0, keep_next=True)
+
     def callout(self, label: str, text: str, bar: str, fill: str) -> None:
         table = self.doc.add_table(rows=1, cols=1)
         fixed_layout(table, [CONTENT_WIDTH_CM])
@@ -544,6 +587,19 @@ class Builder:
         style_run(c.add_run(caption), size=9, color=MUTED, italic=True)
         spacing(c, after=10)
 
+    def shot(self, name: str, caption: str, figures_dir: Path, crop: str = "full") -> None:
+        """A screen capture from tools/user-manual/screens, cropped and framed for the page."""
+        path = prepare_shot(name, crop, figures_dir)
+        p = self.doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.add_run().add_picture(str(path), width=Cm(CONTENT_WIDTH_CM if crop == "full" else 15.2))
+        spacing(p, before=4, after=2, keep_next=True)
+        self.figures += 1
+        c = self.doc.add_paragraph()
+        c.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        style_run(c.add_run(f"Figure {self.figures}. {caption}"), size=9, color=MUTED, italic=True)
+        spacing(c, after=10)
+
     def chapter(self, blocks, figures_dir: Path) -> None:
         for block in blocks:
             kind = block[0]
@@ -563,6 +619,12 @@ class Builder:
                 self.callout("Note", block[1], NOTE_BAR, NOTE_BG)
             elif kind == "figure":
                 self.figure(block[1], block[2], figures_dir)
+            elif kind == "shot":
+                self.shot(block[1], block[2], figures_dir, *block[3:])
+            elif kind == "info":
+                self.info(block[1])
+            elif kind == "keep":
+                self.doc.paragraphs[-1].paragraph_format.keep_with_next = True
             else:
                 raise ValueError(f"unknown block {kind}")
 
@@ -639,6 +701,27 @@ def draw_cycle(path: Path) -> None:
     img.save(path, dpi=(300, 300))
 
 
+def prepare_shot(name: str, crop: str, out_dir: Path) -> Path:
+    """Crop a 1600x1000 capture ("full" keeps the menu, "content" drops it), trim the empty bottom band and
+    save a JPEG so the Word file stays small."""
+    from PIL import Image, ImageChops
+
+    out = out_dir / f"{Path(name).stem}-{crop}.jpg"
+    if out.exists():
+        return out
+    img = Image.open(SCREENS / name).convert("RGB")
+    if crop == "content":
+        img = img.crop((300, 0, img.width, img.height))
+    # Trim rows at the bottom that are one flat colour (the page background under short screens).
+    bg = Image.new("RGB", img.size, img.getpixel((img.width - 5, img.height - 5)))
+    box = ImageChops.difference(img.crop((300 if crop == "full" else 0, 0, img.width, img.height)),
+                                bg.crop((300 if crop == "full" else 0, 0, img.width, img.height))).getbbox()
+    if box and box[3] < img.height - 40:
+        img = img.crop((0, 0, img.width, max(box[3] + 24, 420)))
+    img.save(out, "JPEG", quality=84, optimize=True)
+    return out
+
+
 # ---------------------------------------------------------------- build
 
 def build(pages: dict[str, int] | None, figures_dir: Path, out: Path) -> list[tuple[int, str]]:
@@ -693,7 +776,10 @@ def heading_pages(pdf: Path, headings: list[tuple[int, str]]) -> dict[str, int]:
         page.close()
     document.close()
     pages: dict[str, int] = {}
-    start = 3  # skip the cover, document control and contents
+    # The contents can run over several pages and lists every heading, so start at the page that carries the
+    # first chapter heading for the last time (its contents line comes first).
+    first = re.sub(r"\s+", " ", headings[0][1]).strip()
+    start = max(i for i, lines in enumerate(texts) if first in lines)
     for _, label in headings:
         target = re.sub(r"\s+", " ", label).strip()
         for index in range(start, len(texts)):
@@ -710,10 +796,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--pdf", action="store_true", help="keep the PDF next to the .docx")
     parser.add_argument("--previews", type=Path, help="write page PNGs to this folder")
+    parser.add_argument("--edition", choices=sorted(EDITIONS), default="2.0", help="edition to build (default 2.0)")
     args = parser.parse_args()
+    use_edition(args.edition)
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    out = OUT_DIR / FILE_NAME
+    out = OUT_DIR / file_name()
     with tempfile.TemporaryDirectory() as tmp:
         tmp_dir = Path(tmp)
         draw_cycle(tmp_dir / "cycle.png")

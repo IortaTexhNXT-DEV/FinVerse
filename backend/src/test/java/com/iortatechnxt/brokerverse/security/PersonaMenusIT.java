@@ -77,7 +77,12 @@ class PersonaMenusIT {
           Map.entry("/migration/matching", "/api/v1/migration/matches"),
           Map.entry("/migration/reconciliation", "/api/v1/migration/batches?companyId={c}"),
           Map.entry("/migration/trueups", "/api/v1/migration/trueups?companyId={c}"),
-          Map.entry("/migration/signoff", "/api/v1/migration/signoffs/matrix?companyId={c}"));
+          Map.entry("/migration/cutover", "/api/v1/migration/cutover/plans?companyId={c}"),
+          Map.entry("/migration/runoff", "/api/v1/migration/decommission?companyId={c}"),
+          Map.entry("/migration/signoff", "/api/v1/migration/signoffs/matrix?companyId={c}"),
+          Map.entry("/legacy-inquiry", "/api/v1/legacy-inquiry/settings"),
+          Map.entry(
+              "/legacy-inquiry/access-log", "/api/v1/legacy-inquiry/access-log?companyId={c}"));
 
   @Autowired private Api api;
   @Autowired private JdbcTemplate jdbc;
@@ -95,7 +100,7 @@ class PersonaMenusIT {
   @Test
   void everyRoleHoldsExactlyThePermissionsTheMenuIsBuiltFrom() throws Exception {
     Map<String, Persona> personas = PersonaMenus.load();
-    assertThat(personas).hasSize(29);
+    assertThat(personas).hasSize(31);
     for (Persona p : personas.values()) {
       assertThat(p.inScope(granted(p.role()))).as(p.role()).isEqualTo(p.permissions());
       JsonNode me = api.read(api.doGet(p.seedUser(), "/api/v1/auth/me"));

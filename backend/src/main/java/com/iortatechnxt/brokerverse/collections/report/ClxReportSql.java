@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
+import com.iortatechnxt.brokerverse.report.core.ReportOrigin;
 import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -67,7 +68,8 @@ public class ClxReportSql {
   static final String ITEM_FILTERS =
       " and (cast(:segment as varchar) is null or i.segment = :segment)"
           + " and (cast(:salesUnit as varchar) is null or i.sales_unit = :salesUnit)"
-          + " and (cast(:branchId as bigint) is null or i.branch_id = :branchId)";
+          + " and (cast(:branchId as bigint) is null or i.branch_id = :branchId)"
+          + ReportOrigin.sql("i.origin");
 
   private static final ZoneId MANILA = BusinessClock.zone();
 
@@ -112,6 +114,7 @@ public class ClxReportSql {
     params.add(ParameterSpec.optional(SEGMENT, "Market segment", ParameterType.TEXT));
     params.add(ParameterSpec.optional(UNIT, "Sales unit", ParameterType.TEXT));
     params.add(ParameterSpec.optional(BRANCH, "Invoicing branch", ParameterType.BRANCH));
+    params.add(ReportOrigin.parameter());
     return params;
   }
 
@@ -129,6 +132,7 @@ public class ClxReportSql {
     args.put(SEGMENT, text(p, SEGMENT));
     args.put(UNIT, text(p, UNIT));
     args.put(BRANCH, p.optionalLong(BRANCH).orElse(null));
+    args.put(ReportOrigin.PARAM, ReportOrigin.value(p));
     return args;
   }
 

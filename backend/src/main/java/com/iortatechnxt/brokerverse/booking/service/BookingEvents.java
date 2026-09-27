@@ -52,6 +52,9 @@ public class BookingEvents {
   static final String COMMISSION_INCOME = "COMMISSION_INCOME";
   static final String OUTPUT_VAT = "OUTPUT_VAT";
 
+  /** Prefix of the components of the legacy context. */
+  static final String LEGACY_PREFIX = "LG_";
+
   private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
   private static final List<String> PR_COMPONENTS =
       List.of(PR_BASIC, PR_DST, PR_PTX_VAT, PR_LGT, PR_FST, PR_OTHER);
@@ -85,6 +88,9 @@ public class BookingEvents {
         PR_COMPONENTS.forEach(c -> parties.put(c, posting.clientCode()));
       }
       commissionAmounts(share.commission(), realize, amounts);
+      if (posting.legacy()) {
+        legacy(amounts, parties);
+      }
       events.add(
           new ShareEvent(
               share.insurerCode(),
@@ -132,7 +138,23 @@ public class BookingEvents {
         draft.flags().directPayment(),
         draft.premium(),
         draft.commission(),
-        draft.shares());
+        draft.shares(),
+        false);
+  }
+
+  /**
+   * The components of an endorsement of a migrated invoice: {@code LG_} components, posted on the
+   * legacy control accounts (DATA_MIGRATION_DESIGN 14.4 H).
+   */
+  private static void legacy(Map<String, BigDecimal> amounts, Map<String, String> parties) {
+    Map<String, BigDecimal> prefixed = new LinkedHashMap<>();
+    amounts.forEach((k, v) -> prefixed.put(LEGACY_PREFIX + k, v));
+    amounts.clear();
+    amounts.putAll(prefixed);
+    Map<String, String> partyOf = new HashMap<>();
+    parties.forEach((k, v) -> partyOf.put(LEGACY_PREFIX + k, v));
+    parties.clear();
+    parties.putAll(partyOf);
   }
 
   private static void premiumAmounts(PremiumComponents p, Map<String, BigDecimal> amounts) {
@@ -200,6 +222,7 @@ public class BookingEvents {
    * @param premium premium by component
    * @param commission commission terms
    * @param shares insurer shares
+   * @param legacy endorsement of a migrated invoice (legacy components)
    */
   public record PostingFacts(
       Long companyId,
@@ -214,7 +237,8 @@ public class BookingEvents {
       boolean directPayment,
       PremiumComponents premium,
       CommissionTerms commission,
-      List<InsurerShare> shares) {}
+      List<InsurerShare> shares,
+      boolean legacy) {}
 
   /**
    * One insurer's part of an invoice.

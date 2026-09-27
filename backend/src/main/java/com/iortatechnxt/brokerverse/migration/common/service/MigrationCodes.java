@@ -49,6 +49,9 @@ public final class MigrationCodes {
   /** Entity type (and attachment type) of an archive record. */
   public static final String ENTITY_ARCHIVE = "MigArchiveRecord";
 
+  /** Owner type of legacy documents staged for the archive document index (H02). */
+  public static final String ENTITY_DOCUMENT_DROP = "MigDocumentDrop";
+
   /** Workflow of a data object decision (gate G1). */
   public static final String WF_DECISION = "MIG_OBJECT_DECISION";
 

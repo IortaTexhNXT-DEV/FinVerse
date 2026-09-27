@@ -92,7 +92,8 @@ public class BookingPosting {
         invoice.getFlags().directPayment(),
         invoice.getPremium(),
         invoice.getCommission(),
-        invoice.getShares());
+        invoice.getShares(),
+        invoice.isLegacy());
   }
 
   /**

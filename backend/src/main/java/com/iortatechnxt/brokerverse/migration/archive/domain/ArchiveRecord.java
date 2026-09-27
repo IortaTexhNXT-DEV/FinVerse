@@ -137,6 +137,11 @@ public class ArchiveRecord {
     this.documentCount++;
   }
 
+  /** Records that a document of the record was removed (rollback of its document batch). */
+  public void documentRemoved() {
+    this.documentCount = Math.max(0, documentCount - 1);
+  }
+
   /** Undone by a rollback of its batch. */
   public void rollBack() {
     this.rolledBack = true;

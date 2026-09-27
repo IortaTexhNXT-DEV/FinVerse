@@ -30,12 +30,13 @@ public class MigrationFileAccess implements FileOwnerAccess {
     return Set.of(
         MigrationCodes.ENTITY_EXTRACT,
         MigrationCodes.ENTITY_SIGNOFF,
-        MigrationCodes.ENTITY_CUTOVER);
+        MigrationCodes.ENTITY_CUTOVER,
+        MigrationCodes.ENTITY_DOCUMENT_DROP);
   }
 
   @Override
   public boolean mayRead(FileOwner owner, String documentType) {
-    if (MigrationCodes.ENTITY_EXTRACT.equals(owner.entityType())) {
+    if (staging(owner)) {
       return currentUser.hasAuthority("MIG_INTAKE") || currentUser.hasAuthority("MIG_LOAD_RUN");
     }
     return currentUser.hasAuthority("MIG_VIEW");
@@ -43,7 +44,7 @@ public class MigrationFileAccess implements FileOwnerAccess {
 
   @Override
   public boolean mayStore(FileOwner owner, String documentType) {
-    if (MigrationCodes.ENTITY_EXTRACT.equals(owner.entityType())) {
+    if (staging(owner)) {
       return currentUser.hasAuthority("MIG_INTAKE");
     }
     if (MigrationCodes.ENTITY_CUTOVER.equals(owner.entityType())) {
@@ -53,5 +54,10 @@ public class MigrationFileAccess implements FileOwnerAccess {
         || currentUser.hasAuthority("MIG_RECON_SIGNOFF")
         || currentUser.hasAuthority("MIG_DQ_RESOLVE")
         || currentUser.hasAuthority("MIG_LOAD_APPROVE");
+  }
+
+  private static boolean staging(FileOwner owner) {
+    return MigrationCodes.ENTITY_EXTRACT.equals(owner.entityType())
+        || MigrationCodes.ENTITY_DOCUMENT_DROP.equals(owner.entityType());
   }
 }

@@ -1,5 +1,7 @@
 import {
   ArrowLeftRight,
+  CalendarClock,
+  Archive,
   ClipboardCheck,
   Database,
   FileSpreadsheet,
@@ -17,7 +19,8 @@ import type { FeatureModule } from '@/navigation/types';
  * Data Migration (BRD-13; docs/architecture/DATA_MIGRATION_DESIGN.md section 22): the migration
  * console in its own sidebar group - home, data objects, code maps, layouts and load templates,
  * extracts, batches, client matching, reconciliation, the opening-balance adjustments of the
- * year-end cut-over and sign-off. Migration reports are in the
+ * year-end cut-over, the cutover plans with their go / no-go, the run-off and decommissioning
+ * of the legacy systems, and sign-off. Migration reports are in the
  * Report Centre under Data Migration.
  */
 export const migrationModule: FeatureModule = {
@@ -94,6 +97,20 @@ export const migrationModule: FeatureModule = {
       icon: Scroll,
       permission: 'MIG_VIEW',
       component: lazy(() => import('./trueups/TrueUpsPage')),
+    },
+    {
+      path: '/migration/cutover',
+      label: 'Cutover',
+      icon: CalendarClock,
+      permission: 'MIG_VIEW',
+      component: lazy(() => import('./cutover/CutoverPage')),
+    },
+    {
+      path: '/migration/runoff',
+      label: 'Run-off and Decommissioning',
+      icon: Archive,
+      permission: 'MIG_VIEW',
+      component: lazy(() => import('./cutover/RunoffPage')),
     },
     {
       path: '/migration/signoff',

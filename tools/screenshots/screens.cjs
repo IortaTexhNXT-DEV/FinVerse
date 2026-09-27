@@ -176,7 +176,11 @@ module.exports = [
   { slug: 'mig-matching', title: 'Client Matching review queue', user: 'migsteward', path: '/migration/matching' },
   { slug: 'mig-reconciliation', title: 'Reconciliation', user: 'migrecon', path: '/migration/reconciliation' },
   { slug: 'mig-trueups', title: 'Opening-Balance Adjustments', user: 'migrecon', path: '/migration/trueups' },
+  { slug: 'mig-cutover', title: 'Cutover plans and go / no-go', user: 'miglead', path: '/migration/cutover' },
+  { slug: 'mig-runoff', title: 'Run-off and Decommissioning', user: 'miglead', path: '/migration/runoff' },
   { slug: 'mig-signoff', title: 'Sign-off gate matrix', user: 'miglead', path: '/migration/signoff' },
+  { slug: 'legacy-inquiry', title: 'Legacy Inquiry (reason of the inquiry)', user: 'legacyaudit', path: '/legacy-inquiry' },
+  { slug: 'legacy-access-log', title: 'Legacy archive Access Log', user: 'legacyrev', path: '/legacy-inquiry/access-log' },
   // Reports
   { slug: 'nb-reports', title: 'New Business Reports', user: 'mkttl', path: '/nb/reports' },
   { slug: 'report-account-status', title: 'Account Status Report (run on screen)', user: 'mkttl', path: '/reports/NB-ACC-STATUS', click: '^run report$' },

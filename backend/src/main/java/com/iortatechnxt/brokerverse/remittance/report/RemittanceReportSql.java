@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
+import com.iortatechnxt.brokerverse.report.core.ReportOrigin;
 import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -92,6 +93,7 @@ public class RemittanceReportSql {
     args.put(TO, p.optionalDate(TO).orElse(null));
     args.put(
         INSURER, p.optionalText(INSURER).map(String::strip).filter(s -> !s.isEmpty()).orElse(null));
+    args.put(ReportOrigin.PARAM, ReportOrigin.value(p));
     return args;
   }
 

@@ -106,6 +106,34 @@ export const MIGRATION_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Cutover',
+      path: '/migration/cutover',
+      summary:
+        'The mock runs, the dress rehearsal and the production cut-over. Each plan gets the runbook tasks planned from its go-live date, with their owners and dependencies, and the twelve go / no-go criteria: seven measured by the system (objects accepted, count and amount reconciliation, financial rejects, Migration Clearing, legacy control accounts, client review queue) and five recorded with evidence. Download the runbook as a workbook.',
+      workflow: [
+        'The Data Migration Lead creates the plan and records the start and end of each task during the run.',
+        'Measure Criteria refreshes the measured criteria; the recorded ones are marked met or not met with their evidence.',
+        'The go / no-go board decides GO or NO-GO; on the production plan the decision signs the go-live gate.',
+      ],
+      controls: [
+        'A task starts only when the tasks it depends on are finished; a blocked task needs its reason.',
+        'A GO with criteria not met needs its justification; a NO-GO always needs its reason.',
+      ],
+    },
+    {
+      name: 'Run-off and Decommissioning',
+      path: '/migration/runoff',
+      summary:
+        'The monthly run-off of the legacy in-force headers by expiry month and legacy system (renewed, not renewed, lapsed, still open), and the decommissioning checklists: one per legacy system, and one for the legacy context of BIBS whose criteria (no open legacy invoice, no legacy unapplied balance, legacy accounts at zero) are measured.',
+      workflow: [
+        'The snapshot runs on the first of each month; Take Snapshot adds one now.',
+        'Open the checklist of a legacy system when its decommissioning starts; record each criterion as met with its evidence, then sign it.',
+      ],
+      controls: [
+        'Every criterion needs its evidence; the measured criteria are refreshed each time the page opens.',
+      ],
+    },
+    {
       name: 'Sign-off',
       path: '/migration/signoff',
       summary:

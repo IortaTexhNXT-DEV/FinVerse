@@ -444,8 +444,8 @@
     },
     {
       "id": "BRD-13",
-      "description": "Data Migration (V1080-V1085; SIT/UAT users V1980)",
-      "sections": ["migration"],
+      "description": "Data Migration and Legacy Inquiry (V1080-V1085; SIT/UAT users V1980)",
+      "sections": ["migration", "legacy-inquiry"],
       "sharedGroups": ["home", "reports"],
       "sharedModules": ["help"],
       "roles": {
@@ -469,6 +469,8 @@
             "/migration/batches",
             "/migration/reconciliation",
             "/migration/trueups",
+            "/migration/cutover",
+            "/migration/runoff",
             "/migration/signoff"
           ]
         },
@@ -490,6 +492,8 @@
             "/migration/matching",
             "/migration/reconciliation",
             "/migration/trueups",
+            "/migration/cutover",
+            "/migration/runoff",
             "/migration/signoff"
           ]
         },
@@ -512,6 +516,8 @@
             "/migration/batches",
             "/migration/reconciliation",
             "/migration/trueups",
+            "/migration/cutover",
+            "/migration/runoff",
             "/migration/signoff"
           ]
         },
@@ -527,6 +533,8 @@
             "/migration/batches",
             "/migration/reconciliation",
             "/migration/trueups",
+            "/migration/cutover",
+            "/migration/runoff",
             "/migration/signoff"
           ]
         },
@@ -548,6 +556,8 @@
             "/migration/batches",
             "/migration/reconciliation",
             "/migration/trueups",
+            "/migration/cutover",
+            "/migration/runoff",
             "/migration/signoff"
           ]
         },
@@ -562,8 +572,20 @@
             "/migration/batches",
             "/migration/reconciliation",
             "/migration/trueups",
+            "/migration/cutover",
+            "/migration/runoff",
             "/migration/signoff"
           ]
+        },
+        "LEGACY_INQUIRY": {
+          "seedUser": "legacyaudit",
+          "permissions": ["ATTACHMENT_VIEW", "LEGACY_INQUIRY_EXPORT", "LEGACY_INQUIRY_VIEW"],
+          "screens": ["/legacy-inquiry"]
+        },
+        "LEGACY_ACCESS_REVIEWER": {
+          "seedUser": "legacyrev",
+          "permissions": ["LEGACY_ACCESS_LOG_VIEW", "REPORT_VIEW"],
+          "screens": ["/legacy-inquiry/access-log"]
         }
       }
     }

@@ -11,24 +11,30 @@ import com.iortatechnxt.brokerverse.booking.domain.BookedInvoiceRepository;
 import com.iortatechnxt.brokerverse.booking.domain.BookingEndorsement;
 import com.iortatechnxt.brokerverse.booking.domain.BookingEndorsementRepository;
 import com.iortatechnxt.brokerverse.booking.domain.BookingSource;
+import com.iortatechnxt.brokerverse.booking.domain.BusinessType;
 import com.iortatechnxt.brokerverse.booking.domain.CancellationKind;
 import com.iortatechnxt.brokerverse.booking.domain.CommissionTerms;
 import com.iortatechnxt.brokerverse.booking.domain.EndorsementType;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceDraft;
+import com.iortatechnxt.brokerverse.booking.domain.InvoiceFlags;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceStatus;
 import com.iortatechnxt.brokerverse.booking.domain.PremiumComponents;
 import com.iortatechnxt.brokerverse.booking.service.BookingPreviewService.PreviewLine;
 import com.iortatechnxt.brokerverse.booking.service.EndorsementCalculator.Amounts;
 import com.iortatechnxt.brokerverse.booking.service.EndorsementCalculator.PolicyYear;
+import com.iortatechnxt.brokerverse.booking.service.port.LegacyInvoiceSource;
+import com.iortatechnxt.brokerverse.booking.service.port.LegacyInvoiceSource.LegacyOriginal;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +64,7 @@ public class EndorsementPostingService {
 
   private static final String PREVIEW = "PREVIEW";
   private static final String ENTITY = "Endorsement";
+  private static final String LEGACY_USER = "MIGRATION";
 
   private final AccountQueryService accounts;
   private final AccountLifecycleService lifecycle;
@@ -68,6 +75,8 @@ public class EndorsementPostingService {
   private final BookingPreviewService preview;
   private final DocumentNumberService numbers;
   private final AuditTrailService audit;
+  private final InvoiceBuilder builder;
+  private final LegacyInvoiceSource legacyInvoices;
   private final Clock clock;
 
   /**
@@ -82,6 +91,8 @@ public class EndorsementPostingService {
    * @param preview journal preview
    * @param numbers document numbers
    * @param audit audit trail
+   * @param builder invoice facts of an account
+   * @param legacyInvoices migrated invoices (original of an endorsement of a migrated account)
    * @param clock clock
    */
   public EndorsementPostingService(
@@ -94,6 +105,8 @@ public class EndorsementPostingService {
       BookingPreviewService preview,
       DocumentNumberService numbers,
       AuditTrailService audit,
+      InvoiceBuilder builder,
+      LegacyInvoiceSource legacyInvoices,
       Clock clock) {
     this.accounts = accounts;
     this.lifecycle = lifecycle;
@@ -104,6 +117,8 @@ public class EndorsementPostingService {
     this.preview = preview;
     this.numbers = numbers;
     this.audit = audit;
+    this.builder = builder;
+    this.legacyInvoices = legacyInvoices;
     this.clock = clock;
   }
 
@@ -124,7 +139,7 @@ public class EndorsementPostingService {
         return resultOf(existing.get());
       }
     }
-    BookedInvoice original = originalOf(posting.arn(), posting.effectiveDate());
+    BookedInvoice original = originalOf(account, posting.effectiveDate());
     PolicyYear year = policyYear(original);
     LocalDate date = bookingDate(posting);
     String number = numbers.next("EN-" + date.getYear());
@@ -135,8 +150,11 @@ public class EndorsementPostingService {
       return new EndorsementResult(number, null, List.of(), null);
     }
     InvoiceDraft draft = draft(account, posting, original, year, number);
-    BookedInvoice invoice =
-        booker.book(BookedInvoice.draft(draft), date, BookingSource.ENDORSEMENT);
+    BookedInvoice scheduled = BookedInvoice.draft(draft);
+    if (original.isLegacy()) {
+      scheduled.markLegacy();
+    }
+    BookedInvoice invoice = booker.book(scheduled, date, BookingSource.ENDORSEMENT);
     endorsement.linkInvoice(invoice.getInvoiceNo());
     endorsements.save(endorsement);
     if (posting.type() == EndorsementType.CANCELLATION) {
@@ -171,7 +189,7 @@ public class EndorsementPostingService {
   public EndorsementPreview preview(EndorsementPosting posting) {
     requireComplete(posting);
     Account account = requireBooked(posting.arn());
-    BookedInvoice original = originalOf(posting.arn(), posting.effectiveDate());
+    BookedInvoice original = originalOf(account, posting.effectiveDate());
     PolicyYear year = policyYear(original);
     if (posting.type() == EndorsementType.NON_FINANCIAL) {
       return new EndorsementPreview(year.year(), null, List.of());
@@ -278,12 +296,18 @@ public class EndorsementPostingService {
         InvoiceBooked.of(invoice));
   }
 
-  private BookedInvoice originalOf(String arn, LocalDate effective) {
+  private BookedInvoice originalOf(Account account, LocalDate effective) {
+    String arn = account.getArn();
     return invoices.findByArnOrderByPolicyYearAscIdAsc(arn).stream()
         .filter(i -> i.getKind() == InvoiceKind.BOOKING && i.isBooked())
         .filter(
             i -> !effective.isBefore(i.getInceptionDate()) && effective.isBefore(i.getExpiryDate()))
         .findFirst()
+        .or(
+            () ->
+                legacyInvoices
+                    .original(account.getCompanyId(), arn, effective)
+                    .map(o -> legacyOriginal(account, o)))
         .orElseThrow(
             () ->
                 new BusinessRuleException(
@@ -294,12 +318,51 @@ public class EndorsementPostingService {
                         + arn));
   }
 
+  /**
+   * The original of a migrated account: the legacy invoice held by Operations, as a booked invoice
+   * that is never saved (DATA_MIGRATION_DESIGN 14.4 H).
+   */
+  private BookedInvoice legacyOriginal(Account account, LegacyOriginal o) {
+    BookedInvoice original =
+        BookedInvoice.draft(
+            new InvoiceDraft(
+                account.getCompanyId(),
+                o.branchId(),
+                account.getArn(),
+                account.getId(),
+                o.invoiceNo(),
+                InvoiceKind.BOOKING,
+                o.policyYear(),
+                o.policyNo(),
+                builder.facts(account, o.costCenter()),
+                o.currency(),
+                o.inceptionDate(),
+                o.expiryDate(),
+                o.premium(),
+                o.commission(),
+                new InvoiceFlags(
+                    o.directPayment(),
+                    o.cwt2Percent(),
+                    false,
+                    BusinessType.of(account.getBusinessType())),
+                o.shares(),
+                null,
+                null));
+    original.book(
+        o.invoiceNo(), o.bookingDate(), BookingSource.ENDORSEMENT, LEGACY_USER, clock.instant());
+    original.markLegacy();
+    return original;
+  }
+
   private PolicyYear policyYear(BookedInvoice original) {
     List<BookedInvoice> year =
         invoices.findByArnOrderByPolicyYearAscIdAsc(original.getArn()).stream()
             .filter(i -> i.getStatus() == InvoiceStatus.BOOKED)
             .filter(i -> i.getPolicyYear() == original.getPolicyYear())
-            .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
+    if (original.getId() == null) {
+      year.add(0, original);
+    }
     PremiumComponents premium =
         year.stream()
             .map(BookedInvoice::getPremium)

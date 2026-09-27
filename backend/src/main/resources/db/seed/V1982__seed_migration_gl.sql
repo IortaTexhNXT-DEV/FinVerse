@@ -9,7 +9,8 @@
 --   Rules:      seed rules of the opening events MIG_LEGACY_INVOICE_OPENING and MIG_UPP_OPENING and
 --               of the year-end adjustment MIG_LEGACY_POSITION_TRUEUP, balanced on LGC-CLR, and the
 --               legacy lines (LG_ components) added to the seed rules of the Operations events:
---               payment application, unapplied refund and reclass, remittance.
+--               payment application, unapplied refund and reclass, remittance, and the booking of
+--               the endorsements of legacy invoices (BROKER_BOOKING, V873).
 --   Parameter:  the opening value date of the rehearsals, inside the open seed year (production
 --               keeps 1-Jan-2028).
 -- =====================================================================================
@@ -115,7 +116,7 @@ cross join (values ('1215.01', 'BASIC'), ('1215.02', 'DST'), ('1215.03', 'PREMIU
 where c.code = 'FVI'
   and not exists (select 1 from acsl_glsl_control g where g.company_id = c.id and g.account_code = x.code);
 
--- ---------- Legacy lines of the Operations events (DATA_MIGRATION_DESIGN 14.4) ------------------
+-- ---------- Legacy lines of the Operations and booking events (DATA_MIGRATION_DESIGN 14.4) --------
 insert into acc_rule_line (rule_id, line_no, side, account_code, amount_component, party_line, narration)
 select r.id, l.n, l.side, l.acc, l.comp, l.party, l.narr
 from acc_rule r
@@ -136,7 +137,19 @@ join (values
   ('OPS_UNAPPLIED_RECLASS', 101, 'DEBIT', '2206', 'LG_RELEASED', true, 'Legacy unapplied collections released'),
   ('OPS_UNAPPLIED_RECLASS', 102, 'CREDIT', '2206', 'LG_ASSIGNED', true, 'Legacy unapplied collections assigned'),
   ('OPS_REMITTANCE', 101, 'DEBIT', 'LGC-DTIP', 'LG_DTIP', true, 'Legacy due to insurer - paid AR remitted'),
-  ('OPS_REMITTANCE', 102, 'CREDIT', 'LGC-COMM', 'LG_COMMISSION_RECEIVABLE', true, 'Legacy commission and VAT retained')
+  ('OPS_REMITTANCE', 102, 'CREDIT', 'LGC-COMM', 'LG_COMMISSION_RECEIVABLE', true, 'Legacy commission and VAT retained'),
+  ('BROKER_BOOKING', 101, 'DEBIT', '1215.01', 'LG_PR_BASIC', true, 'Legacy premium receivable - basic premium'),
+  ('BROKER_BOOKING', 102, 'DEBIT', '1215.02', 'LG_PR_DST', true, 'Legacy premium receivable - DST'),
+  ('BROKER_BOOKING', 103, 'DEBIT', '1215.03', 'LG_PR_PTX_VAT', true, 'Legacy premium receivable - premium tax / VAT'),
+  ('BROKER_BOOKING', 104, 'DEBIT', '1215.04', 'LG_PR_LGT', true, 'Legacy premium receivable - LGT'),
+  ('BROKER_BOOKING', 105, 'DEBIT', '1215.05', 'LG_PR_FST', true, 'Legacy premium receivable - fire service tax'),
+  ('BROKER_BOOKING', 106, 'DEBIT', '1215.06', 'LG_PR_OTHER', true, 'Legacy premium receivable - other charges'),
+  ('BROKER_BOOKING', 107, 'CREDIT', 'LGC-DTIP', 'LG_DTIP', true, 'Legacy due to insurer'),
+  ('BROKER_BOOKING', 108, 'DEBIT', 'LGC-COMM', 'LG_COMMISSION_RECEIVABLE', true, 'Legacy commission receivable (with VAT)'),
+  ('BROKER_BOOKING', 109, 'CREDIT', '2222', 'LG_UNREALIZED_COMMISSION', false, 'Legacy unrealized commission'),
+  ('BROKER_BOOKING', 110, 'CREDIT', '2223', 'LG_DEFERRED_OUTPUT_VAT', false, 'Legacy deferred output VAT'),
+  ('BROKER_BOOKING', 111, 'CREDIT', '4101', 'LG_COMMISSION_INCOME', false, 'Commission income'),
+  ('BROKER_BOOKING', 112, 'CREDIT', '2504', 'LG_OUTPUT_VAT', false, 'Output VAT on commission')
 ) as l(event_type, n, side, acc, comp, party, narr) on l.event_type = r.event_type
 join org_company c on c.id = r.company_id and c.code = 'FVI'
 where not exists (select 1 from acc_rule_line x where x.rule_id = r.id and x.line_no = l.n);

@@ -22,4 +22,10 @@ public final class MigrationJobs {
   public static final String CLIENT_DELTA = "MIG_CLIENT_DELTA";
 
   private MigrationJobs() {}
+
+  /** Monthly run-off tracker of the migrated policies. */
+  public static final String RUNOFF_SNAPSHOT = "MIG_RUNOFF_SNAPSHOT";
+
+  /** Monthly access-log report to the reviewers. */
+  public static final String ACCESS_LOG_DIGEST = "MIG_ACCESS_LOG_DIGEST";
 }

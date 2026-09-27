@@ -194,6 +194,16 @@ public class MigrationParameters {
     return flag(ACCESS_REASON_REQUIRED, true);
   }
 
+  /**
+   * The address of the read-only application of a legacy system, blank when none.
+   *
+   * @param system EBIX, QPS, ISYS or CMS
+   * @return the address
+   */
+  public String legacyLink(String system) {
+    return parameters.text("MIG_LEGACY_LINK_" + system, "").strip();
+  }
+
   public LocalDate openingValueDate() {
     return date(OPENING_VALUE_DATE, DEFAULT_OPENING);
   }

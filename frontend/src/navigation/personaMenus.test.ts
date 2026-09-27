@@ -90,10 +90,10 @@ describe.each(SUITES.map((s) => [s.id, s] as const))('persona menus of %s', (_id
 });
 
 describe('persona menus across suites', () => {
-  it('lists every role once, 29 roles in all', () => {
+  it('lists every role once, 31 roles in all', () => {
     const codes = SUITES.flatMap((s) => Object.keys(s.roles));
     expect(new Set(codes).size).toBe(codes.length);
-    expect(codes).toHaveLength(29);
+    expect(codes).toHaveLength(31);
   });
 
   it('keeps the insurer-side Claims module away from every listed role', () => {

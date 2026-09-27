@@ -441,6 +441,125 @@
           ]
         }
       }
+    },
+    {
+      "id": "BRD-13",
+      "description": "Data Migration (V1080-V1085; SIT/UAT users V1980)",
+      "sections": ["migration"],
+      "sharedGroups": ["home", "reports"],
+      "sharedModules": ["help"],
+      "roles": {
+        "DATA_MIGRATION_LEAD": {
+          "seedUser": "miglead",
+          "permissions": [
+            "ATTACHMENT_VIEW",
+            "MIG_CUTOVER_MANAGE",
+            "MIG_LOAD_APPROVE",
+            "MIG_OBJECT_MANAGE",
+            "MIG_ROLLBACK_REQUEST",
+            "MIG_SIGNOFF",
+            "MIG_VIEW",
+            "REPORT_VIEW"
+          ],
+          "screens": [
+            "/migration",
+            "/migration/objects",
+            "/migration/maps",
+            "/migration/layouts",
+            "/migration/batches",
+            "/migration/reconciliation",
+            "/migration/signoff"
+          ]
+        },
+        "DATA_STEWARD": {
+          "seedUser": "migsteward",
+          "permissions": [
+            "MIG_DQ_RESOLVE",
+            "MIG_MAPPING_EDIT",
+            "MIG_MATCH_DECIDE",
+            "MIG_VIEW",
+            "REPORT_VIEW"
+          ],
+          "screens": [
+            "/migration",
+            "/migration/objects",
+            "/migration/maps",
+            "/migration/layouts",
+            "/migration/batches",
+            "/migration/matching",
+            "/migration/reconciliation",
+            "/migration/signoff"
+          ]
+        },
+        "DATA_OWNER": {
+          "seedUser": "migowner",
+          "permissions": [
+            "ATTACHMENT_VIEW",
+            "MIG_DECISION_APPROVE",
+            "MIG_DQ_WAIVE",
+            "MIG_MAPPING_APPROVE",
+            "MIG_SIGNOFF",
+            "MIG_VIEW",
+            "REPORT_VIEW"
+          ],
+          "screens": [
+            "/migration",
+            "/migration/objects",
+            "/migration/maps",
+            "/migration/layouts",
+            "/migration/batches",
+            "/migration/reconciliation",
+            "/migration/signoff"
+          ]
+        },
+        "MIGRATION_OPERATOR": {
+          "seedUser": "migops",
+          "permissions": ["MIG_INTAKE", "MIG_LOAD_RUN", "MIG_VIEW", "REPORT_VIEW"],
+          "screens": [
+            "/migration",
+            "/migration/objects",
+            "/migration/maps",
+            "/migration/layouts",
+            "/migration/extracts",
+            "/migration/batches",
+            "/migration/reconciliation",
+            "/migration/signoff"
+          ]
+        },
+        "MIGRATION_RECON_APPROVER": {
+          "seedUser": "migrecon",
+          "permissions": [
+            "ATTACHMENT_VIEW",
+            "MIG_RECON_SIGNOFF",
+            "MIG_ROLLBACK_APPROVE",
+            "MIG_TRUEUP_APPROVE",
+            "MIG_VIEW",
+            "REPORT_VIEW"
+          ],
+          "screens": [
+            "/migration",
+            "/migration/objects",
+            "/migration/maps",
+            "/migration/layouts",
+            "/migration/batches",
+            "/migration/reconciliation",
+            "/migration/signoff"
+          ]
+        },
+        "MIGRATION_GONOGO": {
+          "seedUser": "miggonogo",
+          "permissions": ["MIG_GONOGO_DECIDE", "MIG_VIEW", "REPORT_VIEW"],
+          "screens": [
+            "/migration",
+            "/migration/objects",
+            "/migration/maps",
+            "/migration/layouts",
+            "/migration/batches",
+            "/migration/reconciliation",
+            "/migration/signoff"
+          ]
+        }
+      }
     }
   ]
 }

@@ -21,6 +21,7 @@ public enum ReportCategory {
   ACSL("ACSL"),
   FRBS("BDOI Report Pack"),
   COMPLIANCE("Compliance"),
+  DATA_MIGRATION("Data Migration"),
   CLAIMS_HANDLING("Claims Handling"),
   EMPLOYEE_BENEFITS("Employee Benefits");
 

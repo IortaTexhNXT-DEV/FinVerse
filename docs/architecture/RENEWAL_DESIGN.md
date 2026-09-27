@@ -710,7 +710,7 @@ The screens of section 12 are built, with these differences:
   policies and advices already sent (Renewal Setup, tabs Package Map and Go-live).
 - Renewal Setup has the tabs Non-renewable Risk Codes, Checks, Classification Rules, Decision Matrix, Package Map,
   Package Choices and Go-live; the parameters and lists of values are maintained on the platform screens.
-- The persona suite `BRD-6` of `personaMenus.json` lists the eight roles with Renewal permissions (keys `RNW:<role>`,
+- The persona suite `BRD-6` of `personaMenus.json` lists seven of the eight roles with Renewal permissions (the Auditor seed user holds a second role, so it is not listed) (keys `RNW:<role>`,
   field `role`, scope `RNW_`); the screenshots are in `tools/screenshots/screens.cjs` (slugs `renewal-*`).
 
 ### 17.5 Departures from the sections above
